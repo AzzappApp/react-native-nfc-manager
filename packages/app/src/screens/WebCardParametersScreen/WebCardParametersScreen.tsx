@@ -1,6 +1,11 @@
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { ActivityIndicator, Alert, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Alert,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import Toast from 'react-native-toast-message';
 import {
   graphql,
@@ -9,7 +14,7 @@ import {
   usePreloadedQuery,
 } from 'react-relay';
 import ERRORS from '@azzapp/shared/errors';
-import { isOwner } from '@azzapp/shared/profileHelpers';
+import { profileIsOwner } from '@azzapp/shared/profileHelpers';
 import { isWebCardKindSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { colors, textStyles } from '#theme';
 import { useRouter } from '#components/NativeRouter';
@@ -17,8 +22,8 @@ import PremiumIndicator from '#components/PremiumIndicator';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { keyExtractor } from '#helpers/idHelpers';
 import relayScreen from '#helpers/relayScreen';
-import useAuthState from '#hooks/useAuthState';
 import useQuitWebCard from '#hooks/useQuitWebCard';
+import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';
@@ -29,7 +34,10 @@ import Select from '#ui/Select';
 import SelectSection from '#ui/SelectSection';
 import Switch from '#ui/Switch';
 import Text from '#ui/Text';
+import WebcardParametersCompanyNameForm from './WebCardParametersCompanyNameForm';
+import WebcardParametersFirstNameForm from './WebCardParametersFirstNameForm';
 import WebCardParametersHeader from './WebCardParametersHeader';
+import WebcardParametersLastNameForm from './WebCardParametersLastNameForm';
 import WebCardParametersNameForm from './WebCardParametersNameForm';
 import WebCardParametersScreenFallback from './WebCardParametersScreenFallback';
 import type { RelayScreenProps } from '#helpers/relayScreen';
@@ -45,11 +53,16 @@ import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { GraphQLError } from 'graphql';
 
 const webCardParametersScreenQuery = graphql`
-  query WebCardParametersScreenQuery($webCardId: ID!) {
+  query WebCardParametersScreenQuery($webCardId: ID!, $profileId: ID!) {
     webCard: node(id: $webCardId) {
       ...WebCardParametersScreen_webCard
       ... on WebCard {
         isPremium
+      }
+    }
+    profile: node(id: $profileId) {
+      ... on Profile {
+        profileRole
       }
     }
     webCardCategories {
@@ -76,16 +89,15 @@ const WebCardParametersScreen = ({
 }: RelayScreenProps<WebCardParametersRoute, WebCardParametersScreenQuery>) => {
   const {
     webCard: webCardKey,
+    profile,
     webCardCategories,
     webCardParameters: { userNameChangeFrequencyDay },
   } = usePreloadedQuery(webCardParametersScreenQuery, preloadedQuery);
   const router = useRouter();
 
-  const { profileInfos } = useAuthState();
-  const isWebCardOwner = useMemo(
-    () => isOwner(profileInfos?.profileRole),
-    [profileInfos?.profileRole],
-  );
+  const isWebCardOwner = useMemo(() => {
+    return profileIsOwner(profile?.profileRole);
+  }, [profile?.profileRole]);
 
   const webCard = useFragment(
     graphql`
@@ -106,6 +118,9 @@ const WebCardParametersScreen = ({
         hasCover
         requiresSubscription
         isPremium
+        firstName
+        lastName
+        companyName
         ...AccountHeader_webCard
       }
     `,
@@ -115,6 +130,10 @@ const WebCardParametersScreen = ({
   const intl = useIntl();
   const styles = useStyleSheet(styleSheet);
   const [userNameFormVisible, toggleUserNameFormVisible] = useToggle(false);
+  const [firstNameFormVisible, toggleFirstNameFormVisible] = useToggle(false);
+  const [lastNameFormVisible, toggleLastNameFormVisible] = useToggle(false);
+  const [companyNameFormVisible, toggleCompanyNameFormVisible] =
+    useToggle(false);
 
   const [searchActivities, setSearchActivities] = useState('');
 
@@ -123,11 +142,17 @@ const WebCardParametersScreen = ({
     description: 'Default activity type label',
   });
 
+  const categoryActivities = useMemo(
+    () =>
+      webCardCategories?.find(a => a.id === webCard?.webCardCategory?.id)
+        ?.companyActivities,
+    [webCardCategories, webCard?.webCardCategory?.id],
+  );
+
   const activities = useMemo(
     () =>
-      webCardCategories
-        ?.find(a => a.id === webCard?.webCardCategory?.id)
-        ?.companyActivities.filter(
+      categoryActivities
+        ?.filter(
           activity =>
             !searchActivities.trim() ||
             activity.label
@@ -170,12 +195,7 @@ const WebCardParametersScreen = ({
 
           return acc;
         }, []),
-    [
-      otherActivityType,
-      searchActivities,
-      webCard?.webCardCategory?.id,
-      webCardCategories,
-    ],
+    [categoryActivities, otherActivityType, searchActivities],
   );
 
   const [commitToggleWebCardPublished] =
@@ -483,9 +503,15 @@ const WebCardParametersScreen = ({
     ]);
   }, [intl, isWebCardOwner, quitWebCard]);
 
+  const { height: windowHeight } = useWindowDimensions();
+  const insets = useScreenInsets();
+
+  const bottomSheetMaxHeight = windowHeight - 90 - insets.top;
+
   if (!webCard) {
     return null;
   }
+
   return (
     <Container style={{ flex: 1 }}>
       <SafeAreaView
@@ -574,8 +600,8 @@ const WebCardParametersScreen = ({
               selectedItemKey={webCard.webCardCategory?.id}
               keyExtractor={keyExtractor}
               bottomSheetHeight={Math.min(
-                (webCardCategories?.length ?? 0) * 50 + 80,
-                500,
+                (webCardCategories.length ?? 0) * 50 + 80,
+                bottomSheetMaxHeight,
               )}
               onItemSelected={updateWebCardCategory}
               bottomSheetTitle={
@@ -605,6 +631,34 @@ const WebCardParametersScreen = ({
               )}
             />
           </View>
+          {webCard.webCardKind === 'personal' && (
+            <PressableNative
+              style={styles.sectionField}
+              onPress={toggleFirstNameFormVisible}
+            >
+              <Text variant="smallbold">
+                <FormattedMessage
+                  defaultMessage="Firstname"
+                  description="firstname field in the webcard parameters screen"
+                />
+              </Text>
+              <Text variant="medium">{webCard.firstName}</Text>
+            </PressableNative>
+          )}
+          {webCard.webCardKind === 'personal' && (
+            <PressableNative
+              style={styles.sectionField}
+              onPress={toggleLastNameFormVisible}
+            >
+              <Text variant="smallbold">
+                <FormattedMessage
+                  defaultMessage="Lastname"
+                  description="lastname field in the webcard parameters screen"
+                />
+              </Text>
+              <Text variant="medium">{webCard.lastName}</Text>
+            </PressableNative>
+          )}
           {webCard.webCardKind !== 'personal' && (
             <View style={styles.sectionField}>
               <Text variant="smallbold">
@@ -633,8 +687,11 @@ const WebCardParametersScreen = ({
                 sections={activities ?? []}
                 selectedItemKey={webCard.companyActivity?.id}
                 bottomSheetHeight={Math.max(
-                  Math.min((webCardCategories?.length ?? 0) * 50 + 80, 400),
-                  300,
+                  Math.min(
+                    (categoryActivities?.length ?? 0) * 50 + 200,
+                    bottomSheetMaxHeight,
+                  ),
+                  600,
                 )}
                 keyExtractor={keyExtractor}
                 onItemSelected={updateProfileActivity}
@@ -663,6 +720,20 @@ const WebCardParametersScreen = ({
                 })}
               />
             </View>
+          )}
+          {webCard.webCardKind !== 'personal' && (
+            <PressableNative
+              style={styles.sectionField}
+              onPress={toggleCompanyNameFormVisible}
+            >
+              <Text variant="smallbold">
+                <FormattedMessage
+                  defaultMessage="Company name"
+                  description="company name field in the webcard parameters screen"
+                />
+              </Text>
+              <Text variant="medium">{webCard.companyName}</Text>
+            </PressableNative>
           )}
 
           <Text variant="xsmall" style={styles.descriptionText}>
@@ -713,11 +784,28 @@ const WebCardParametersScreen = ({
           </PressableNative>
         </View>
         {webCard && (
-          <WebCardParametersNameForm
-            webCard={webCard}
-            visible={userNameFormVisible}
-            toggleBottomSheet={toggleUserNameFormVisible}
-          />
+          <>
+            <WebCardParametersNameForm
+              webCard={webCard}
+              visible={userNameFormVisible}
+              toggleBottomSheet={toggleUserNameFormVisible}
+            />
+            <WebcardParametersFirstNameForm
+              webCard={webCard}
+              visible={firstNameFormVisible}
+              toggleBottomSheet={toggleFirstNameFormVisible}
+            />
+            <WebcardParametersLastNameForm
+              webCard={webCard}
+              visible={lastNameFormVisible}
+              toggleBottomSheet={toggleLastNameFormVisible}
+            />
+            <WebcardParametersCompanyNameForm
+              webCard={webCard}
+              visible={companyNameFormVisible}
+              toggleBottomSheet={toggleCompanyNameFormVisible}
+            />
+          </>
         )}
       </SafeAreaView>
     </Container>
@@ -786,6 +874,7 @@ export default relayScreen(WebCardParametersScreen, {
   query: webCardParametersScreenQuery,
   getVariables: (_, profileInfos) => ({
     webCardId: profileInfos?.webCardId ?? '',
+    profileId: profileInfos?.profileId ?? '',
   }),
   fallback: WebCardParametersScreenFallback,
   fetchPolicy: 'store-and-network',

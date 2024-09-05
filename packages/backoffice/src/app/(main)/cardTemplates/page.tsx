@@ -1,7 +1,8 @@
 import { Box, TextField, Typography } from '@mui/material';
-import { eq, like, sql, and, asc, desc, or } from 'drizzle-orm';
-import { alias } from 'drizzle-orm/mysql-core';
-import { CardTemplateTable, LocalizationMessageTable, db } from '@azzapp/data';
+import {
+  getAllCardTemplates,
+  getLocalizationMessagesByLocaleAndTarget,
+} from '@azzapp/data';
 import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import CardTemplatesList from './CardTemplatesList';
 import type { CardModuleTemplate } from '@azzapp/data';
@@ -22,107 +23,9 @@ export type Filters = {
   businessStatus?: Status | 'All';
 };
 
-const CardTemplateTypeLocalizationMessage = alias(
-  LocalizationMessageTable,
-  'CardTemplateTypeLocalizationMessage',
-);
+const sortsColumns = ['label', 'type', 'personalEnabled', 'businessEnabled'];
 
-const getFilters = (filters: Filters) => {
-  const f = [];
-  if (filters.personalStatus && filters.personalStatus !== 'All') {
-    f.push(eq(sql`personalEnabled`, filters.personalStatus === 'Enabled'));
-  }
-  if (filters.businessStatus && filters.businessStatus !== 'All') {
-    f.push(eq(sql`businessEnabled`, filters.businessStatus === 'Enabled'));
-  }
-
-  return f;
-};
-
-const getSearch = (search: string | null) => {
-  if (search) {
-    return or(
-      like(LocalizationMessageTable.value, `%${search}%`),
-      like(CardTemplateTypeLocalizationMessage.value, `%${search}%`),
-    );
-  }
-  return undefined;
-};
-
-export type SortColumn = 'label' | 'type';
-
-const sortsColumns = {
-  label: LocalizationMessageTable.value,
-  type: sql`type`,
-  personalEnabled: sql`personalEnabled`,
-  businessEnabled: sql`businessEnabled`,
-};
-
-const getQuery = (search: string | null, filters: Filters) => {
-  const query = db
-    .select({
-      id: CardTemplateTable.id,
-      label: LocalizationMessageTable.value,
-      type: sql`${CardTemplateTypeLocalizationMessage.value}`
-        .mapWith(String)
-        .as('type'),
-      modules: CardTemplateTable.modules,
-      personalEnabled: CardTemplateTable.personalEnabled,
-      businessEnabled: CardTemplateTable.businessEnabled,
-    })
-    .from(CardTemplateTable)
-    .leftJoin(
-      LocalizationMessageTable,
-      and(
-        eq(CardTemplateTable.id, LocalizationMessageTable.key),
-        eq(LocalizationMessageTable.target, ENTITY_TARGET),
-        eq(LocalizationMessageTable.locale, DEFAULT_LOCALE),
-      ),
-    )
-    .leftJoin(
-      CardTemplateTypeLocalizationMessage,
-      and(
-        eq(
-          CardTemplateTable.cardTemplateTypeId,
-          CardTemplateTypeLocalizationMessage.key,
-        ),
-        eq(CardTemplateTypeLocalizationMessage.target, ENTITY_TARGET),
-        eq(CardTemplateTypeLocalizationMessage.locale, DEFAULT_LOCALE),
-      ),
-    )
-    .where(and(getSearch(search), ...getFilters(filters)))
-    .$dynamic();
-
-  return query;
-};
-
-const getCardTemplates = (
-  page: number,
-  sort: SortColumn,
-  order: 'asc' | 'desc',
-  search: string | null,
-  filters: Filters,
-) => {
-  const query = getQuery(search, filters);
-
-  query
-    .offset(page * PAGE_SIZE)
-    .limit(PAGE_SIZE)
-    .orderBy(
-      order === 'asc' ? asc(sortsColumns[sort]) : desc(sortsColumns[sort]),
-    );
-
-  return query;
-};
-
-const getCount = async (search: string | null, filters: Filters) => {
-  const subQuery = getQuery(search, filters);
-  const query = db
-    .select({ count: sql`count(*)`.mapWith(Number) })
-    .from(subQuery.as('subQuery'));
-
-  return query.then(rows => rows[0].count);
-};
+export type SortColumn = (typeof sortsColumns)[number];
 
 type Props = {
   searchParams?: {
@@ -139,9 +42,10 @@ const CardTemplatesPage = async ({ searchParams = {} }: Props) => {
   let page = searchParams.page ? parseInt(searchParams.page, 10) : 1;
   page = Math.max(isNaN(page) ? 1 : page, 1);
 
-  const sort = Object.keys(sortsColumns).includes(searchParams.sort as any)
-    ? (searchParams.sort as any)
-    : 'label';
+  const sort =
+    searchParams.sort && Object.keys(sortsColumns).includes(searchParams.sort)
+      ? searchParams.sort
+      : 'label';
 
   const order = searchParams.order === 'desc' ? 'desc' : 'asc';
   const search = searchParams.s ?? null;
@@ -150,14 +54,49 @@ const CardTemplatesPage = async ({ searchParams = {} }: Props) => {
     businessStatus: (searchParams.bs as Status) || 'All',
   };
 
-  const cardTemplates = await getCardTemplates(
-    page - 1,
-    sort,
-    order,
-    search,
-    filters,
-  );
-  const count = await getCount(search, filters);
+  const [cardTemplates, labels] = await Promise.all([
+    getAllCardTemplates(),
+    await getLocalizationMessagesByLocaleAndTarget(
+      DEFAULT_LOCALE,
+      ENTITY_TARGET,
+    ),
+  ]);
+  const labelsMap = new Map(labels.map(label => [label.key, label.value]));
+
+  const items = cardTemplates
+    .map(cardTemplate => ({
+      id: cardTemplate.id,
+      label: labelsMap.get(cardTemplate.id) ?? null,
+      type: cardTemplate.cardTemplateTypeId
+        ? labelsMap.get(cardTemplate.cardTemplateTypeId) ??
+          cardTemplate.cardTemplateTypeId
+        : null,
+      modules: cardTemplate.modules,
+      personalEnabled: cardTemplate.personalEnabled,
+      businessEnabled: cardTemplate.businessEnabled,
+    }))
+    .filter(item => {
+      if (
+        (filters.personalStatus === 'Disabled' && item.personalEnabled) ||
+        (filters.personalStatus === 'Enabled' && !item.personalEnabled)
+      ) {
+        return false;
+      }
+      if (
+        (filters.businessStatus === 'Disabled' && item.businessEnabled) ||
+        (filters.businessStatus === 'Enabled' && !item.businessEnabled)
+      ) {
+        return false;
+      }
+      if (search) {
+        return (
+          item.label?.toLowerCase().includes(search.toLowerCase()) ||
+          item.type?.toLowerCase().includes(search.toLowerCase())
+        );
+      }
+      return true;
+    });
+
   return (
     <Box
       sx={{
@@ -183,8 +122,8 @@ const CardTemplatesPage = async ({ searchParams = {} }: Props) => {
         }
       />
       <CardTemplatesList
-        cardTemplates={cardTemplates}
-        count={count}
+        cardTemplates={items.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)}
+        count={items.length}
         page={page}
         pageSize={PAGE_SIZE}
         sortField={sort}

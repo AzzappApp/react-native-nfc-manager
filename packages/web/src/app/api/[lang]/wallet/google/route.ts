@@ -9,7 +9,7 @@ import jwt from 'jsonwebtoken';
 import { NextResponse } from 'next/server';
 import {
   buildDefaultContactCard,
-  getUserProfileWithWebCardId,
+  getProfileByUserAndWebCard,
   getWebCardById,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
@@ -20,6 +20,8 @@ import type {
   GenericClass,
   GenericObject,
 } from 'google-wallet/lib/cjs/generic';
+
+export const maxDuration = 30; //30 seconds
 
 const getGoogleWalletPass = async (
   req: Request,
@@ -40,7 +42,7 @@ const getGoogleWalletPass = async (
       );
     }
     currentUserId = userId;
-    const profile = await getUserProfileWithWebCardId(userId, webCardId);
+    const profile = await getProfileByUserAndWebCard(userId, webCardId);
     if (!profile) {
       return NextResponse.json(
         { message: ERRORS.UNAUTHORIZED },
@@ -114,7 +116,7 @@ const getGoogleWalletPass = async (
               }`.trim() ||
                 webCard?.commonInformation?.company ||
                 contactCard?.company) ??
-              '',
+              webCard?.userName, // empty string is not allowed
           },
         },
         genericType: GenericTypeEnum.GENERIC_OTHER,

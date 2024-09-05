@@ -1,12 +1,8 @@
-import { asc } from 'drizzle-orm';
-import { ModuleBackgroundTable, db } from '@azzapp/data';
+import { getModuleBackgrounds } from '@azzapp/data';
 import ModuleBackgroundsList from './ModuleBackgroundsList';
 
 const ModuleBackgroundsPage = async () => {
-  const moduleBackgrounds = await db
-    .select()
-    .from(ModuleBackgroundTable)
-    .orderBy(asc(ModuleBackgroundTable.order));
+  const moduleBackgrounds = await getModuleBackgrounds(false);
 
   return <ModuleBackgroundsList moduleBackgrounds={moduleBackgrounds} />;
 };

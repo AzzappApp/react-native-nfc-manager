@@ -1,7 +1,7 @@
 import { useCoverEditorContext } from '#components/CoverEditor/CoverEditorContext';
-import ImagePicker, { SelectImageStep } from '#components/ImagePicker';
+import CoverEditorMediaPicker from '#components/CoverEditor/CoverEditorMediaPicker';
 import { ScreenModal } from '#components/NativeRouter';
-import type { ImagePickerResult } from '#components/ImagePicker';
+import type { Media } from '#helpers/mediaHelpers';
 
 type Props = {
   open: boolean;
@@ -9,19 +9,18 @@ type Props = {
 };
 
 const CoverEditorAddOverlay = ({ open, onClose }: Props) => {
-  const { dispatch } = useCoverEditorContext();
+  const { dispatch, coverEditorState } = useCoverEditorContext();
 
-  const onFinish = (param: ImagePickerResult) => {
-    dispatch({
-      type: 'ADD_OVERLAY_LAYER',
-      payload: {
-        kind: 'image',
-        uri: param.uri,
-        width: param.width,
-        height: param.height,
-      },
-    });
-
+  const onFinish = (medias: Media[]) => {
+    if (medias.length > 0) {
+      const media = medias[0];
+      if (media.kind === 'image') {
+        dispatch({
+          type: 'ADD_OVERLAY_LAYER',
+          payload: media,
+        });
+      }
+    }
     onClose();
   };
 
@@ -32,15 +31,15 @@ const CoverEditorAddOverlay = ({ open, onClose }: Props) => {
       onRequestDismiss={onClose}
     >
       {open && (
-        <ImagePicker
-          kind="image"
-          steps={[SelectImageStep]}
+        <CoverEditorMediaPicker
+          initialMedias={null}
+          multiSelection={false}
+          durationsFixed={!!coverEditorState.lottie}
+          maxSelectableVideos={0}
+          allowVideo={false}
           onFinished={onFinish}
-          onCancel={onClose}
-          additionalData={{
-            hideAspectRatio: true,
-            hideTabs: true,
-          }}
+          onClose={onClose}
+          durations={null}
         />
       )}
     </ScreenModal>

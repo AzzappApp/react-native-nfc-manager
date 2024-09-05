@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import { LinearGradient } from 'expo-linear-gradient';
+import LottieView from 'lottie-react-native';
 import { useCallback, useEffect } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Image, StyleSheet, View } from 'react-native';
+import { Image, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { mainRoutes } from '#mobileRoutes';
 import { colors } from '#theme';
@@ -13,10 +13,10 @@ import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import relayScreen from '#helpers/relayScreen';
 import useAuthState from '#hooks/useAuthState';
 import { useFocusEffect } from '#hooks/useFocusEffect';
+import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
-import Container from '#ui/Container';
 import IconButton from '#ui/IconButton';
 import Text from '#ui/Text';
 import HomeBottomSheetPanel from './HomeBottomSheetPanel';
@@ -50,38 +50,45 @@ const WelcomeScreen = ({
   }, [profileInfos, router]);
 
   useFocusEffect(goBackToHome);
-
+  const { width } = useWindowDimensions();
+  const { top } = useScreenInsets();
   return profileInfos?.profileId ? (
-    <Container
-      style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
-    >
+    <View style={styles.containerLoading}>
       <ActivityIndicator />
-    </Container>
+    </View>
   ) : (
-    <Container style={{ flex: 1 }}>
-      <LinearGradient colors={['#FF688C', '#FFF']} style={styles.linear} />
-      <Image
-        source={require('#assets/logo-full_white.png')}
-        style={styles.logo}
-      />
-      <View style={styles.imageContainer}>
-        <Image source={require('#assets/welcome.png')} style={styles.image} />
+    <View style={[styles.container, { paddingTop: top }]}>
+      <View style={styles.header}>
+        <Image
+          source={require('#assets/welcome/welcome_logo.png')}
+          style={styles.logo}
+        />
+        <IconButton
+          icon="menu"
+          style={styles.menu}
+          iconStyle={{ tintColor: colors.black }}
+          onPress={toggleShowMenu}
+        />
       </View>
-      <IconButton
-        icon="menu"
-        style={styles.menu}
-        iconStyle={{ tintColor: 'white' }}
-        onPress={toggleShowMenu}
+      <LottieView
+        source={require('../../assets/welcome/welcom_lottie.json')}
+        autoPlay
+        loop
+        hardwareAccelerationAndroid
+        style={{
+          width,
+          height: width,
+        }}
+        resizeMode="cover"
       />
-
       <View style={styles.content}>
-        <Text variant="xlarge" style={styles.title}>
+        <Text variant="xlarge" style={styles.title} appearance="light">
           {intl.formatMessage({
             defaultMessage: 'Welcome to Azzap',
             description: 'Title for welcome screen',
           })}
         </Text>
-        <Text style={styles.subtitle}>
+        <Text style={styles.subtitle} appearance="light">
           <FormattedMessage
             defaultMessage="Introduce yourself in a new way by creating your own WebCard{azzappA}."
             description="Subtitle for welcome screen"
@@ -94,7 +101,7 @@ const WelcomeScreen = ({
           <Button
             label={intl.formatMessage(
               {
-                defaultMessage: 'Create my first webcard{azzappA}',
+                defaultMessage: 'Create my first WebCard{azzappA}',
                 description: 'Button label for welcome screen',
               },
               {
@@ -105,6 +112,7 @@ const WelcomeScreen = ({
                 ),
               },
             )}
+            appearance="light"
           />
         </Link>
       </View>
@@ -113,7 +121,7 @@ const WelcomeScreen = ({
         close={toggleShowMenu}
         userIsPremium={currentUser?.isPremium}
       />
-    </Container>
+    </View>
   );
 };
 
@@ -138,18 +146,18 @@ WelcomeRelayScreen.getScreenOptions = (): ScreenOptions => ({
 });
 
 export default WelcomeRelayScreen;
+const BOTTOM_HEIGHT = 280;
 
 const styles = StyleSheet.create({
-  linear: {
-    height: '50%',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
+  containerLoading: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  container: {
+    flex: 1,
+    justifyContent: 'space-between',
+    backgroundColor: colors.white,
   },
   logo: {
     marginHorizontal: 120,
-    top: 50,
+
     position: 'absolute',
   },
   imageContainer: {
@@ -162,9 +170,11 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   content: {
-    flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
     alignItems: 'center',
+    backgroundColor: colors.white,
+    height: BOTTOM_HEIGHT,
+    paddingBottom: 100,
   },
   title: {
     marginBottom: 14,
@@ -176,11 +186,12 @@ const styles = StyleSheet.create({
   },
   menu: {
     position: 'absolute',
-    top: 39,
+    top: -10,
     right: 25,
     borderWidth: 0,
   },
   icon: {
     color: colors.white,
   },
+  header: { backgroundColor: colors.white, height: 50 },
 });

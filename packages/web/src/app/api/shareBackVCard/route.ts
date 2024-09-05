@@ -19,7 +19,7 @@ const shareBackVCard = async (req: NextRequest) => {
     });
   }
 
-  let contactData: string;
+  let contactData: Record<string, string>;
   let signature: string;
   try {
     [contactData, signature] = JSON.parse(
@@ -67,15 +67,17 @@ const shareBackVCard = async (req: NextRequest) => {
   );
   const vCardContactString = buildVCardContact.toString();
 
-  // @todo: wording for filename vcf
+  let vCardFileName = `${contactData?.firstName?.trim() ? `-${contactData.firstName.trim()}` : ''}${contactData?.lastName?.trim() ? `-${contactData.lastName.trim()}` : ''}`;
+  if (!vCardFileName) {
+    vCardFileName = 'azzapp-contact';
+  }
+
   return new Response(vCardContactString, {
     headers: {
-      'Content-Disposition': `attachment; filename="azzapp-contact.vcf"`,
+      'Content-Disposition': `attachment; filename="${vCardFileName}.vcf"`,
       'Content-Type': 'text/vcard',
     },
   });
 };
 
 export const { GET } = { GET: withAxiom(shareBackVCard) };
-
-export const runtime = 'edge';

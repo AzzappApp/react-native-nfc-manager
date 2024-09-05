@@ -2,15 +2,15 @@ import * as Sentry from '@sentry/nextjs';
 import { NextResponse } from 'next/server';
 import { withAxiom } from 'next-axiom';
 import {
-  getProfilesOfUser,
   getUserByEmail,
   getUserByPhoneNumber,
   updateUser,
+  getProfilesByUser,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
 import { handleSignInAuthMethod } from '#helpers/auth';
-import { twilioVerificationService } from '#helpers/twilioHelpers';
+import { checkTwilioVerificationCode } from '#helpers/twilioHelpers';
 
 type ConfirmRegistrationBody = {
   token?: string;
@@ -35,11 +35,10 @@ export const POST = withAxiom(async (req: Request) => {
       : await getUserByPhoneNumber(issuer);
 
     if (user) {
-      const verificationCheck =
-        await twilioVerificationService().verificationChecks.create({
-          to: issuer,
-          code: token,
-        });
+      const verificationCheck = await checkTwilioVerificationCode(
+        issuer,
+        token,
+      );
 
       if (verificationCheck.status !== 'approved') {
         return NextResponse.json(
@@ -55,8 +54,8 @@ export const POST = withAxiom(async (req: Request) => {
       await updateUser(user.id, update);
 
       // if we found a user by email or phonenumber, we look for the profile
-      const profiles = await getProfilesOfUser(user.id, 1);
-      const profile = profiles[0]?.Profile;
+      const profiles = await getProfilesByUser(user.id);
+      const profile = profiles[0];
 
       return handleSignInAuthMethod({ ...user, ...update }, profile);
     }
@@ -74,5 +73,3 @@ export const POST = withAxiom(async (req: Request) => {
     { status: 400 },
   );
 });
-
-export const runtime = 'nodejs';

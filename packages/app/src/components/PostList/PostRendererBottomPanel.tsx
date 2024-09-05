@@ -2,12 +2,12 @@
 import * as Sentry from '@sentry/react-native';
 import * as Clipboard from 'expo-clipboard';
 import { fromGlobalId } from 'graphql-relay';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { FormattedMessage, FormattedRelativeTime, useIntl } from 'react-intl';
 import { View, StyleSheet, Share, Platform } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
-import { isEditor } from '@azzapp/shared/profileHelpers';
+import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import { buildPostUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
@@ -15,12 +15,14 @@ import { relativeDateMinute } from '#helpers/dateHelpers';
 import useAuthState from '#hooks/useAuthState';
 import { useSendReport } from '#hooks/useSendReport';
 import useToggleFollow from '#hooks/useToggleFollow';
+import { POST_MAX_CONTENT_LENGTH } from '#screens/PostCreationScreen/PostContentPanel';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import ExpendableText from '#ui/ExpendableText';
 import PressableNative from '#ui/PressableNative';
 import Switch from '#ui/Switch';
 import Text from '#ui/Text';
+import TextAreaModal from '#ui/TextAreaModal';
 import PostRendererActionBar, {
   PostRendererActionBarSkeleton,
 } from './PostRendererActionBar';
@@ -28,6 +30,7 @@ import type { PostRendererActionBar_post$key } from '#relayArtifacts/PostRendere
 import type { PostRendererBottomPanelDeletePostMutation } from '#relayArtifacts/PostRendererBottomPanelDeletePostMutation.graphql';
 import type { PostRendererBottomPanelFragment_post$key } from '#relayArtifacts/PostRendererBottomPanelFragment_post.graphql';
 import type { PostRendererBottomPanelUpdateAllowLikesPostMutation } from '#relayArtifacts/PostRendererBottomPanelUpdateAllowLikesPostMutation.graphql';
+import type { PostRendererBottomPanelUpdateContentPostMutation } from '#relayArtifacts/PostRendererBottomPanelUpdateContentPostMutation.graphql';
 import type { PostRendererBottomPanelUpdatePostAllowCommentsMutation } from '#relayArtifacts/PostRendererBottomPanelUpdatePostAllowCommentsMutation.graphql';
 
 type PostRendererBottomPanelProps = {
@@ -92,7 +95,8 @@ const PostRendererBottomPanel = ({
     postKey as PostRendererBottomPanelFragment_post$key,
   );
 
-  const copyLink = () => {
+  const intl = useIntl();
+  const copyLink = useCallback(() => {
     toggleModal();
 
     Clipboard.setStringAsync(
@@ -118,7 +122,7 @@ const PostRendererBottomPanel = ({
         });
       }, MODAL_ANIMATION_TIME);
     });
-  };
+  }, [intl, post.id, post.webCard.userName, toggleModal]);
 
   const onShare = async () => {
     // a quick share method using the native share component. If we want to make a custom share (like tiktok for example, when they are recompressiong the media etc) we can use react-native-shares
@@ -154,6 +158,7 @@ const PostRendererBottomPanel = ({
       params: { postId: post.id },
     });
   };
+
   const addComment = () => {
     goToComments();
     toggleModal();
@@ -189,7 +194,70 @@ const PostRendererBottomPanel = ({
       }
     `);
 
-  const intl = useIntl();
+  const [commitUpdatePostContent, isLoadingUpdatePostContent] =
+    useMutation<PostRendererBottomPanelUpdateContentPostMutation>(graphql`
+      mutation PostRendererBottomPanelUpdateContentPostMutation(
+        $webCardId: ID!
+        $input: UpdatePostInput!
+      ) {
+        updatePost(webCardId: $webCardId, input: $input) {
+          post {
+            id
+            content
+          }
+        }
+      }
+    `);
+
+  //useToggle does not well here with modal and textmodal
+  const [showEdit, setShowEdit] = useState(false);
+  const openEditcontent = useCallback(() => {
+    setShowEdit(true);
+  }, []);
+  const onCloseEditContent = useCallback(() => {
+    setShowEdit(false);
+  }, []);
+
+  const editPostContent = useCallback(
+    (text: string) => {
+      commitUpdatePostContent({
+        variables: {
+          webCardId: post.webCard.id,
+          input: {
+            postId: post.id,
+            content: text,
+          },
+        },
+        optimisticResponse: {
+          updatePost: {
+            post: {
+              id: post.id,
+              content: text,
+            },
+          },
+        },
+        onCompleted: onCloseEditContent,
+        onError: error => {
+          Sentry.captureException(error);
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage:
+                'Error while updating this post, please try again.',
+              description: 'Error toast message when updating post fails.',
+            }),
+          });
+        },
+      });
+    },
+    [
+      commitUpdatePostContent,
+      intl,
+      onCloseEditContent,
+      post.id,
+      post.webCard.id,
+    ],
+  );
 
   const updatePost = useCallback(
     (input: { allowComments: boolean } | { allowLikes: boolean }) => {
@@ -215,7 +283,7 @@ const PostRendererBottomPanel = ({
           },
         },
         onError: error => {
-          console.error(error);
+          Sentry.captureException(error);
           Toast.show({
             type: 'error',
             text1: intl.formatMessage({
@@ -251,7 +319,7 @@ const PostRendererBottomPanel = ({
   const toggleFollow = useToggleFollow();
 
   const onToggleFollow = () => {
-    if (isEditor(profileInfos?.profileRole)) {
+    if (profileHasEditorRight(profileInfos?.profileRole)) {
       toggleFollow(
         post.webCard.id,
         post.webCard.userName,
@@ -291,7 +359,10 @@ const PostRendererBottomPanel = ({
     `);
 
   const deletePost = useCallback(() => {
-    if (isEditor(profileInfos?.profileRole) && profileInfos?.webCardId) {
+    if (
+      profileHasEditorRight(profileInfos?.profileRole) &&
+      profileInfos?.webCardId
+    ) {
       commit({
         variables: {
           webCardId: profileInfos?.webCardId,
@@ -371,7 +442,7 @@ const PostRendererBottomPanel = ({
           />
         )}
         <PressableNative onPress={goToComments}>
-          {post.previewComment && (
+          {post.allowComments && post.previewComment && (
             <Text variant="small" numberOfLines={2} ellipsizeMode="tail">
               <Text variant="smallbold">
                 {post.previewComment.webCard.userName}{' '}
@@ -380,24 +451,26 @@ const PostRendererBottomPanel = ({
             </Text>
           )}
           {post.allowComments && post.counterComments > 0 && (
-            <Text
-              variant="medium"
-              style={styles.textCommentCounter}
-              numberOfLines={3}
-              ellipsizeMode="tail"
-            >
-              <FormattedMessage
-                defaultMessage="See {counterComments, plural,
+            <PressableNative onPress={goToComments}>
+              <Text
+                variant="medium"
+                style={styles.textCommentCounter}
+                numberOfLines={3}
+                ellipsizeMode="tail"
+              >
+                <FormattedMessage
+                  defaultMessage="See {counterComments, plural,
                                     =0 {0 comment}
                                     one {1 comment}
                                     other {# comments}
                                 }"
-                description="PostRendererBottomPanel - Comments Counter"
-                values={{
-                  counterComments: post.counterComments ?? 0,
-                }}
-              />
-            </Text>
+                  description="PostRendererBottomPanel - Comments Counter"
+                  values={{
+                    counterComments: post.counterComments ?? 0,
+                  }}
+                />
+              </Text>
+            </PressableNative>
           )}
         </PressableNative>
         <Text variant="small" style={styles.relativeTime}>
@@ -445,6 +518,16 @@ const PostRendererBottomPanel = ({
                 onValueChange={setAllowComments}
               />
             </View>
+          )}
+          {isViewer && (
+            <PressableNative onPress={openEditcontent} style={styles.modalLine}>
+              <Text variant="medium">
+                <FormattedMessage
+                  defaultMessage="Edit"
+                  description="PostItem Modal - Edit Label"
+                />
+              </Text>
+            </PressableNative>
           )}
 
           <PressableNative onPress={copyLink} style={styles.modalLine}>
@@ -529,6 +612,25 @@ const PostRendererBottomPanel = ({
             </PressableNative>
           )}
         </View>
+        <TextAreaModal
+          visible={showEdit}
+          value={post.content ?? ''}
+          headerTitle={intl.formatMessage({
+            defaultMessage: 'Edit description',
+            description:
+              'Title for text area header modal in post content edition screen',
+          })}
+          placeholder={intl.formatMessage({
+            defaultMessage: 'Enter description',
+            description:
+              'Placeholder for text area in post content edition screen',
+          })}
+          maxLength={POST_MAX_CONTENT_LENGTH}
+          onClose={onCloseEditContent}
+          closeOnBlur={false}
+          onChangeText={editPostContent}
+          loading={isLoadingUpdatePostContent}
+        />
       </BottomSheetModal>
     </>
   );

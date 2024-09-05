@@ -33,6 +33,11 @@ const HomeBottomPanelMessage = ({ user }: HomeBottomPanelMessageProps) => {
       fragment HomeBottomPanelMessage_profiles on Profile @relay(plural: true) {
         id
         invited
+        invitedBy {
+          user {
+            email
+          }
+        }
         profileRole
         promotedAsOwner
         webCard {

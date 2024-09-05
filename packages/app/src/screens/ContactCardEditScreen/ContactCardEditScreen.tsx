@@ -102,7 +102,6 @@ const contactCardEditScreenQuery = graphql`
             selected
           }
         }
-        serializedContactCard
         avatar {
           id
           uri: uri(width: 112, pixelRatio: $pixelRatio)
@@ -178,7 +177,8 @@ const ContactCardEditScreen = ({
               selected
             }
           }
-          serializedContactCard
+          contactCardUrl
+          contactCardQrCode(width: $width)
           avatar {
             id
             uri: uri(width: 112, pixelRatio: $pixelRatio)
@@ -187,7 +187,6 @@ const ContactCardEditScreen = ({
             id
             uri: uri(width: 180, pixelRatio: $pixelRatio)
           }
-          contactCardQrCode(width: $width)
         }
       }
     }

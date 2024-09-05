@@ -7,33 +7,15 @@ jobs:
     environment: ${{(github.ref_name == 'stable' && 'Production') || (github.ref_name == 'staging' && 'Staging') || 'Development' }} 
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
           token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
-      - name: Enable Corepack
-        run: corepack enable
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '20'
 
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"    
-        
-      - name: Cache yarn
-        uses: actions/cache@v3
-        id: yarn-cache
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      
+      - name: Setup
+        uses: ./.github/actions/setup
 
-      - name: Install dependencies
-        run: yarn install --immutable
-    
       - name: Git config
         run: |
           git config user.name "Azzapp Dev Bot"

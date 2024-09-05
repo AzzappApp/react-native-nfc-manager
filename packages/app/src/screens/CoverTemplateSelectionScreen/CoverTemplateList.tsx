@@ -12,6 +12,7 @@ import { useCoverTemplateTypes } from './useCoverTemplateTypes';
 import type { CoverTemplateList_profile$key } from '#relayArtifacts/CoverTemplateList_profile.graphql';
 import type { CoverTemplate } from './CoverTemplateTypePreviews';
 import type { CoverTemplateType } from './useCoverTemplateTypes';
+import type { ColorPaletteColor } from '@azzapp/shared/cardHelpers';
 import type { ListRenderItemInfo } from '@shopify/flash-list';
 import type { ReactElement } from 'react';
 import type { ViewToken } from 'react-native';
@@ -19,7 +20,7 @@ import type { ViewToken } from 'react-native';
 export type CoverEditorProps = {
   profile: CoverTemplateList_profile$key;
   tag: string | null;
-  onSelectTemplate: (templateId: string) => void;
+  onSelectTemplate: (templateId: string, color?: ColorPaletteColor) => void;
   ListFooterComponent?: ReactElement;
 };
 
@@ -57,7 +58,10 @@ const CoverTemplateList = ({
 
   const onConfirmTemplate = useCallback(() => {
     if (selectedTemplate) {
-      onSelectTemplate(selectedTemplate.id);
+      onSelectTemplate(
+        selectedTemplate.id,
+        (selectedTemplate.backgroundColor as ColorPaletteColor) ?? undefined,
+      );
       setSelectedTemplate(null);
     }
   }, [onSelectTemplate, selectedTemplate]);
@@ -69,7 +73,7 @@ const CoverTemplateList = ({
     isLoadingNext,
     hasNext,
     loadNext,
-  } = useCoverTemplateTypes(webCard.coverTemplatesFragment);
+  } = useCoverTemplateTypes(webCard?.coverTemplatesFragment ?? null);
 
   const onEndReached = useCallback(() => {
     if (!isLoadingNext && hasNext) {

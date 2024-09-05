@@ -4,8 +4,8 @@ import { headers } from 'next/headers';
 import {
   incrementWebCardViews,
   incrementContactCardScans,
-  db,
-  updateContactCardTotalScans,
+  incrementContactCardTotalScans,
+  transaction,
 } from '@azzapp/data';
 
 export const updateWebCardViewsCounter = async (webcardId: string) => {
@@ -17,8 +17,8 @@ export const updateWebCardViewsCounter = async (webcardId: string) => {
 export const updateContactCardScanCounter = async (profileId: string) => {
   // @TODO: make this function dynamic with a better mechanism than headers
   headers();
-  return db.transaction(async tx => {
-    await updateContactCardTotalScans(profileId, tx);
-    await incrementContactCardScans(profileId, true, tx);
+  return transaction(async () => {
+    await incrementContactCardTotalScans(profileId);
+    await incrementContactCardScans(profileId, true);
   });
 };

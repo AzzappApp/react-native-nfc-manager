@@ -30,11 +30,7 @@ const ContactCard = ({
   height,
   style,
 }: ContactCardProps) => {
-  const {
-    contactCard,
-    contactCardQrCode,
-    webCard: { userName, cardColors, commonInformation, isMultiUser },
-  } = useFragment(
+  const { contactCard, contactCardQrCode, webCard } = useFragment(
     graphql`
       fragment ContactCard_profile on Profile
       @argumentDefinitions(
@@ -61,6 +57,9 @@ const ContactCard = ({
     `,
     profileKey,
   );
+  const { userName, cardColors, commonInformation, isMultiUser } =
+    webCard ?? {};
+
   const styles = useStyleSheet(stylesheet);
 
   const backgroundColor = cardColors?.primary ?? colors.black;
@@ -85,7 +84,7 @@ const ContactCard = ({
   const src = rect(0, 0, svg?.width() ?? 0, svg?.height() ?? 0);
   const dst = rect(0, 0, 80, 80);
 
-  if (!contactCard) {
+  if (!contactCard || !webCard) {
     return null;
   }
 
@@ -130,11 +129,11 @@ const ContactCard = ({
         />
       </View>
       <View style={{ flex: 1 }}>
-        <View>
+        <View style={styles.firstLineView}>
           <Image
             source={require('#assets/logo-full_white.png')}
             resizeMode="contain"
-            style={{ width: 85, tintColor: readableColor }}
+            style={[styles.azzappImage, { tintColor: readableColor }]}
           />
         </View>
 
@@ -187,16 +186,18 @@ const ContactCard = ({
           </View>
         </View>
         <View style={styles.webCardFooter}>
-          <Text
-            variant="xsmall"
-            numberOfLines={1}
-            style={[
-              styles.webCardLabel,
-              { opacity: 0.5, color: readableColor },
-            ]}
-          >
-            {buildUserUrl(userName)}
-          </Text>
+          {userName && (
+            <Text
+              variant="xsmall"
+              numberOfLines={1}
+              style={[
+                styles.webCardLabel,
+                { opacity: 0.5, color: readableColor },
+              ]}
+            >
+              {buildUserUrl(userName)}
+            </Text>
+          )}
         </View>
       </View>
     </View>
@@ -255,5 +256,33 @@ const stylesheet = createStyleSheet(appearance => ({
     justifyContent: 'center',
     alignItems: 'center',
     height: '100%',
+  },
+  editButtonText: {
+    fontSize: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    lineHeight: 20,
+  },
+  editButtonContainer: {
+    height: 33,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF4D',
+    borderRadius: 78,
+    width: 70,
+    ...shadow('light', 'center'),
+    overflow: 'visible',
+  },
+  firstLineView: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'visible',
+  },
+  azzappImage: {
+    width: 85,
+
+    position: 'absolute',
+    left: 0,
+    top: 3,
   },
 }));

@@ -166,72 +166,105 @@ const WebCardFormScreen = ({
 
   const environment = useRelayEnvironment();
 
-  const { control, trigger, handleSubmit, setError, watch } =
-    useForm<WebCardForm>({
-      defaultValues: {
-        firstName: '',
-        lastName: '',
-        companyName: '',
-        companyActivityId: '',
-        userName: '',
-      },
-      mode: 'onSubmit',
-      resolver: async data => {
-        const result = webCardFormSchema.safeParse(data);
+  const {
+    control,
+    trigger,
+    handleSubmit,
+    setError,
+    watch,
+    setValue,
+    getValues,
+    getFieldState,
+  } = useForm<WebCardForm>({
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      companyName: '',
+      companyActivityId: '',
+      userName: '',
+    },
+    mode: 'onSubmit',
+    resolver: async data => {
+      const result = webCardFormSchema.safeParse(data);
 
-        if (result.success) {
-          if (data.userName) {
-            try {
-              const res = await fetchQuery<WebCardFormScreenCheckUserNameQuery>(
-                environment,
-                graphql`
-                  query WebCardFormScreenCheckUserNameQuery(
-                    $userName: String!
-                  ) {
-                    userNameAvailable(userName: $userName)
-                  }
-                `,
-                { userName: data.userName },
-              ).toPromise();
-              if (!res?.userNameAvailable) {
-                const { userName, ...values } = data;
+      if (result.success) {
+        if (data.userName) {
+          try {
+            const res = await fetchQuery<WebCardFormScreenCheckUserNameQuery>(
+              environment,
+              graphql`
+                query WebCardFormScreenCheckUserNameQuery($userName: String!) {
+                  userNameAvailable(userName: $userName)
+                }
+              `,
+              { userName: data.userName },
+            ).toPromise();
+            if (!res?.userNameAvailable) {
+              const { userName, ...values } = data;
 
-                return {
-                  values,
-                  errors: {
-                    userName: {
-                      type: 'validation',
-                      message: userNameAlreadyExistsError,
-                    },
+              return {
+                values,
+                errors: {
+                  userName: {
+                    type: 'validation',
+                    message: userNameAlreadyExistsError,
                   },
-                };
-              }
-            } catch (e) {
-              //waiting for submit
-            }
-          }
-
-          return {
-            values: data,
-            errors: {},
-          };
-        } else {
-          return {
-            values: {},
-            errors: Object.entries(result.error.formErrors.fieldErrors).reduce(
-              (allErrors, [path, message]) => ({
-                ...allErrors,
-                [path]: {
-                  type: 'validation',
-                  message: path === 'userName' ? userNameInvalidError : message,
                 },
-              }),
-              {},
-            ),
-          };
+              };
+            }
+          } catch (e) {
+            //waiting for submit
+          }
         }
-      },
-    });
+
+        return {
+          values: data,
+          errors: {},
+        };
+      } else {
+        return {
+          values: {},
+          errors: Object.entries(result.error.formErrors.fieldErrors).reduce(
+            (allErrors, [path, message]) => ({
+              ...allErrors,
+              [path]: {
+                type: 'validation',
+                message: path === 'userName' ? userNameInvalidError : message,
+              },
+            }),
+            {},
+          ),
+        };
+      }
+    },
+  });
+
+  const onUpdateField = useCallback(
+    (text: string, field: 'companyName' | 'firstName' | 'lastName') => {
+      if (getFieldState('userName').isDirty) {
+        return;
+      }
+      const [firstName, lastName] = getValues(['firstName', 'lastName']);
+      switch (field) {
+        case 'companyName':
+          setValue('userName', text.toLowerCase());
+          break;
+        case 'firstName':
+          setValue(
+            'userName',
+            `${text.toLowerCase()}${lastName.toLowerCase()}`,
+          );
+          break;
+        case 'lastName':
+          setValue(
+            'userName',
+            `${firstName.toLowerCase()}${text.toLowerCase()}`,
+          );
+          break;
+      }
+    },
+    [getFieldState, getValues, setValue],
+  );
 
   const [commit, saving] = useMutation<WebCardFormScreenMutation>(graphql`
     mutation WebCardFormScreenMutation($input: CreateWebCardInput!) {
@@ -332,6 +365,9 @@ const WebCardFormScreen = ({
           profileRole,
           webCard,
         } = data.createWebCard.profile;
+        if (!webCard) {
+          throw new Error('WebCard not created');
+        }
         onChangeWebCard({
           profileId,
           webCardId: webCard.id,
@@ -461,7 +497,10 @@ const WebCardFormScreen = ({
                         'ProfileForm first name textinput placeholder',
                     })}
                     value={value}
-                    onChangeText={onChange}
+                    onChangeText={(text: string) => {
+                      onChange(text);
+                      onUpdateField(text, 'firstName');
+                    }}
                     autoCapitalize="words"
                     autoComplete="name"
                     autoCorrect={false}
@@ -493,7 +532,10 @@ const WebCardFormScreen = ({
                         'ProfileForm last name textinput placeholder',
                     })}
                     value={value}
-                    onChangeText={onChange}
+                    onChangeText={(text: string) => {
+                      onChange(text);
+                      onUpdateField(text, 'lastName');
+                    }}
                     autoCapitalize="words"
                     autoComplete="name-family"
                     autoCorrect={false}
@@ -527,7 +569,10 @@ const WebCardFormScreen = ({
                         'ProfileForm company name textinput placeholder',
                     })}
                     value={value}
-                    onChangeText={onChange}
+                    onChangeText={(text: string) => {
+                      onChange(text);
+                      onUpdateField(text, 'companyName');
+                    }}
                     autoCapitalize="words"
                     autoComplete="name"
                     autoCorrect={false}
@@ -556,6 +601,7 @@ const WebCardFormScreen = ({
                       sections={filteredCompanyActivities}
                       selectedItemKey={value}
                       keyExtractor={keyExtractor}
+                      avoidKeyboard
                       bottomSheetHeight={windowHeight - 90 - insets.top}
                       inputLabel={
                         value
@@ -629,7 +675,9 @@ const WebCardFormScreen = ({
                   })}
                   isErrored={Boolean(error)}
                   value={userName}
-                  onChangeText={text => onChange(text.toLowerCase())}
+                  onChangeText={text => {
+                    onChange(text.toLowerCase());
+                  }}
                   autoCapitalize="none"
                   autoComplete="off"
                   autoCorrect={false}

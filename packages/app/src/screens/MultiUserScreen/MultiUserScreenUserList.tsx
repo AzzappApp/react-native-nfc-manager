@@ -17,7 +17,7 @@ import {
   convertToNonNullArray,
   type ArrayItemType,
 } from '@azzapp/shared/arrayHelpers';
-import { isOwner } from '@azzapp/shared/profileHelpers';
+import { profileIsOwner } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import { MediaImageRenderer } from '#components/medias';
 import { useRouter } from '#components/NativeRouter';
@@ -90,11 +90,11 @@ const MultiUserScreenUserList = ({
   // @TODO
   const nbCommonInformation =
     (webCard.commonInformation?.company ? 1 : 0) +
-    (webCard.commonInformation?.addresses?.some(a => a.address) ? 1 : 0) +
-    (webCard.commonInformation?.emails?.some(a => a.address) ? 1 : 0) +
-    (webCard.commonInformation?.phoneNumbers?.some(p => p.number) ? 1 : 0) +
-    (webCard.commonInformation?.urls?.some(u => u.address) ? 1 : 0) +
-    (webCard.commonInformation?.socials?.some(s => s.url) ? 1 : 0) +
+    (webCard.commonInformation?.addresses?.length ?? 0) +
+    (webCard.commonInformation?.emails?.length ?? 0) +
+    (webCard.commonInformation?.phoneNumbers?.length ?? 0) +
+    (webCard.commonInformation?.urls?.length ?? 0) +
+    (webCard.commonInformation?.socials?.length ?? 0) +
     (webCard.logo ? 1 : 0);
 
   const onAddUsers = useCallback(() => {
@@ -208,18 +208,16 @@ const MultiUserScreenUserList = ({
 
   const { profileInfos } = useAuthState();
 
-  const isWebCardOwner = useMemo(
-    () => isOwner(profileInfos?.profileRole),
-    [profileInfos?.profileRole],
-  );
-
   const { transferOwnerMode } = useContext(MultiUserTransferOwnerContext);
 
   const [searching, setSearching] = useState(false);
 
   const renderListItem = useCallback<ListRenderItem<Profile>>(
     ({ item }) => {
-      if (isWebCardOwner && item.id === profileInfos?.profileId) {
+      if (
+        item.id === profileInfos?.profileId &&
+        profileIsOwner(item.profileRole)
+      ) {
         return (
           <View>
             <UserListItem item={item} />
@@ -229,7 +227,7 @@ const MultiUserScreenUserList = ({
       }
       return <UserListItem item={item} />;
     },
-    [isWebCardOwner, profileInfos?.profileId, searching, webCard],
+    [profileInfos?.profileId, searching, webCard],
   );
 
   //filter the sections without having to reparse all the data

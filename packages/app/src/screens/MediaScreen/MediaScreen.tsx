@@ -3,11 +3,11 @@ import { FormattedMessage } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import Link from '#components/Link';
+import { useMainTabBarVisibilityController } from '#components/MainTabBar';
 import { useRouter } from '#components/NativeRouter';
 import ProfilePostsList from '#components/WebCardPostsList';
 import relayScreen from '#helpers/relayScreen';
 import useScreenInsets from '#hooks/useScreenInsets';
-import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
@@ -16,8 +16,9 @@ import TabView from '#ui/TabView';
 import Text from '#ui/Text';
 import MediaFollowingsScreen from './MediaFollowingsScreen';
 import MediaFollowingsWebCards from './MediaFollowingsWebCards';
-import MediaSuggestionsScreen from './MediaSuggestionsScreen';
-import MediaSuggestionsWebCards from './MediaSuggestionsWebCards';
+import MediaSuggestionsScreen, {
+  MediaSuggestionsScreenFallback,
+} from './MediaSuggestionsScreen';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { MediaScreenQuery } from '#relayArtifacts/MediaScreenQuery.graphql';
 import type { MediaRoute } from '#routes';
@@ -35,12 +36,12 @@ const mediaScreenQuery = graphql`
         webCard {
           id
           userName
+          cardIsPublished
           ...WebCardPostsList_webCard
             @arguments(viewerWebCardId: $viewerWebCardId)
           ...PostRendererFragment_author
           ...MediaFollowingsWebCards_webCard
           ...MediaFollowingsScreen_webCard
-          ...MediaSuggestionsWebCards_webCard
         }
       }
     }
@@ -58,14 +59,16 @@ const MediaScreen = ({
 
   const router = useRouter();
 
+  useMainTabBarVisibilityController(true);
+
   useEffect(() => {
-    if (profile?.invited) {
+    if (profile?.invited || !profile?.webCard?.cardIsPublished) {
       router.replace({ route: 'HOME' });
     }
-  }, [profile?.invited, router]);
+  }, [profile?.invited, profile?.webCard?.cardIsPublished, router]);
 
   // viewer might be briefly null when the user logs out or by switching accounts
-  if (!profile) {
+  if (!profile || !profile.webCard) {
     return null;
   }
 
@@ -73,43 +76,16 @@ const MediaScreen = ({
     {
       id: 'SUGGESTIONS',
       element: (
-        <MediaSuggestionsScreen
-          profile={profile}
-          canPlay={hasFocus && tab === 'SUGGESTIONS'}
-          ListHeaderComponent={
-            <View>
-              <MediaSuggestionsWebCards
-                header={
-                  <Text variant="large" style={styles.coversTitleStyle}>
-                    <FormattedMessage
-                      defaultMessage="Webcards{azzappA} to follow"
-                      description="List of suggested profiles"
-                      values={{
-                        azzappA: <Text variant="azzapp">a</Text>,
-                      }}
-                    />
-                  </Text>
-                }
-                coverListStyle={styles.coverList}
-                profile={profile}
-                webcard={node?.profile.webCard}
-                isCurrentTab={tab === 'SUGGESTIONS'}
-              />
-              <Text style={styles.postsTitleStyle} variant="large">
-                <FormattedMessage
-                  defaultMessage="Posts"
-                  description="List of suggested posts"
-                />
-              </Text>
-            </View>
-          }
-        />
+        <Suspense fallback={<MediaSuggestionsScreenFallback />}>
+          <MediaSuggestionsScreen
+            profile={profile}
+            isCurrentTab={tab === 'SUGGESTIONS'}
+            canPlay={hasFocus && tab === 'SUGGESTIONS'}
+          />
+        </Suspense>
       ),
     },
-  ];
-
-  if (profile?.webCard) {
-    tabs.push({
+    {
       id: 'FOLLOWINGS',
       element: (
         <Suspense>
@@ -145,11 +121,8 @@ const MediaScreen = ({
           />
         </Suspense>
       ),
-    });
-  }
-
-  if (profile) {
-    tabs.push({
+    },
+    {
       id: 'MY_POSTS',
       element: (
         <View style={{ flex: 1 }}>
@@ -161,8 +134,8 @@ const MediaScreen = ({
           </Suspense>
         </View>
       ),
-    });
-  }
+    },
+  ];
 
   return (
     <Container style={{ flex: 1, marginTop: top }}>
@@ -173,11 +146,13 @@ const MediaScreen = ({
 };
 
 const MediaScreenTabBar = ({
-  currentTab,
+  currentTab = 'SUGGESTIONS',
   setTab,
+  disabled,
 }: {
-  currentTab: TAB;
-  setTab: (tab: TAB) => void;
+  currentTab?: TAB;
+  setTab?: (tab: TAB) => void;
+  disabled?: boolean;
 }) => {
   return (
     <View style={styles.tabBarContainer} accessibilityRole="tablist">
@@ -194,13 +169,15 @@ const MediaScreenTabBar = ({
             borderless: true,
             radius: 20,
           }}
+          disabled={disabled}
         >
           <Icon icon="search" style={{ width: 28, height: 28 }} />
         </PressableNative>
       </Link>
       <TabBarMenuItem
         selected={currentTab === 'SUGGESTIONS'}
-        onPress={() => setTab('SUGGESTIONS')}
+        onPress={() => setTab?.('SUGGESTIONS')}
+        disabled={disabled}
       >
         <FormattedMessage
           defaultMessage="For me"
@@ -209,7 +186,8 @@ const MediaScreenTabBar = ({
       </TabBarMenuItem>
       <TabBarMenuItem
         selected={currentTab === 'FOLLOWINGS'}
-        onPress={() => setTab('FOLLOWINGS')}
+        onPress={() => setTab?.('FOLLOWINGS')}
+        disabled={disabled}
       >
         <FormattedMessage
           defaultMessage="Following"
@@ -219,7 +197,8 @@ const MediaScreenTabBar = ({
 
       <TabBarMenuItem
         selected={currentTab === 'MY_POSTS'}
-        onPress={() => setTab('MY_POSTS')}
+        onPress={() => setTab?.('MY_POSTS')}
+        disabled={disabled}
       >
         <FormattedMessage
           defaultMessage="My posts"
@@ -238,11 +217,10 @@ const MediaScreenFallback = () => {
       style={{
         flex: 1,
         marginTop: top,
-        alignItems: 'center',
-        justifyContent: 'center',
       }}
     >
-      <ActivityIndicator />
+      <MediaScreenTabBar disabled />
+      <MediaSuggestionsScreenFallback />
     </Container>
   );
 };

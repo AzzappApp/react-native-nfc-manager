@@ -69,6 +69,7 @@ import ContactCardScreen from '#screens/ContactCardScreen';
 import CoverCreationScreen from '#screens/CoverCreationScreen';
 import CoverEditionScreen from '#screens/CoverEditionScreen';
 import CoverTemplateSelectionScreen from '#screens/CoverTemplateSelectionScreen';
+import EmailSignatureScreen from '#screens/EmailSignatureScreen';
 import FollowersScreen from '#screens/FollowersScreen';
 import FollowingsMosaicScreen from '#screens/FollowingsMosaicScreen';
 import FollowingsScreen from '#screens/FollowingsScreen';
@@ -85,11 +86,12 @@ import MultiUserDetailsScreen from '#screens/MultiUserDetailsScreen';
 import MultiUserScreen from '#screens/MultiUserScreen';
 import PostCommentsMobileScreen from '#screens/PostCommentsScreen';
 import PostCreationScreen from '#screens/PostCreationScreen';
+import PostLikesScreen from '#screens/PostLikesScreen/PostLikesScreen';
 import PostScreen from '#screens/PostScreen';
 import ResetPasswordScreen from '#screens/ResetPasswordScreen';
 import SearchScreen from '#screens/SearchScreen';
 import SignInScreen from '#screens/SignInScreen';
-import SignupScreen from '#screens/SignUpScreen';
+import SignUpScreen from '#screens/SignUpScreen';
 import UpdateApplicationScreen from '#screens/UpdateApplicationScreen';
 import UserPayWallScreen from '#screens/UserPayWallScreen';
 import WebCardFormScreen from '#screens/WebCardFormScreen';
@@ -214,6 +216,7 @@ const screens = {
   COVER_CREATION: CoverCreationScreen,
   COVER_EDITION: CoverEditionScreen,
   COVER_TEMPLATE_SELECTION: CoverTemplateSelectionScreen,
+  EMAIL_SIGNATURE: EmailSignatureScreen,
   FOLLOWINGS: FollowingsScreen,
   FOLLOWINGS_MOSAIC: FollowingsMosaicScreen,
   FOLLOWERS: FollowersScreen,
@@ -230,9 +233,10 @@ const screens = {
   ONBOARDING: WelcomeScreen,
   POST: PostScreen,
   POST_COMMENTS: PostCommentsMobileScreen,
+  POST_LIKES: PostLikesScreen,
   RESET_PASSWORD: ResetPasswordScreen,
   SIGN_IN: SignInScreen,
-  SIGN_UP: SignupScreen,
+  SIGN_UP: SignUpScreen,
   CONFIRM_REGISTRATION: ConfirmRegistrationScreen,
   SEARCH: SearchScreen,
   USER_PAY_WALL: UserPayWallScreen,

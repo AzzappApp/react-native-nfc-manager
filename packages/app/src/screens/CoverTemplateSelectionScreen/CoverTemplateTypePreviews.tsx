@@ -49,6 +49,7 @@ const CoverTemplateTypePreviews = ({
             thumbnail(width: 512, pixelRatio: $pixelRatio)
           }
         }
+        backgroundColor
       }
     `,
     template.coverTemplates,

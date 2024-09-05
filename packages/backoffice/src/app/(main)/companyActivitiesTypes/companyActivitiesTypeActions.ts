@@ -2,8 +2,8 @@
 import { revalidatePath } from 'next/cache';
 import {
   createCompanyActivitiesType,
-  db,
   saveLocalizationMessage,
+  transaction,
 } from '@azzapp/data';
 import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import { companyActivitiesTypeSchema } from './companyActivitiesTypeSchema';
@@ -27,7 +27,7 @@ export const saveCompanyActivitiesType = async (data: {
 
   let companyActivitiesTypeId: string;
   try {
-    companyActivitiesTypeId = await db.transaction(async trx => {
+    companyActivitiesTypeId = await transaction(async () => {
       //check if WebCard Template type exist
 
       let companyActivityTypesId;
@@ -35,18 +35,15 @@ export const saveCompanyActivitiesType = async (data: {
       if (data.id) {
         companyActivityTypesId = data.id;
       } else {
-        const id = await createCompanyActivitiesType(trx);
+        const id = await createCompanyActivitiesType();
         companyActivityTypesId = id;
       }
-      await saveLocalizationMessage(
-        {
-          key: companyActivityTypesId,
-          value: validation.data.label,
-          locale: DEFAULT_LOCALE,
-          target: ENTITY_TARGET,
-        },
-        trx,
-      );
+      await saveLocalizationMessage({
+        key: companyActivityTypesId,
+        value: validation.data.label,
+        locale: DEFAULT_LOCALE,
+        target: ENTITY_TARGET,
+      });
       return companyActivityTypesId;
     });
     revalidatePath(`/companyActivitiesTypes/[id]`);

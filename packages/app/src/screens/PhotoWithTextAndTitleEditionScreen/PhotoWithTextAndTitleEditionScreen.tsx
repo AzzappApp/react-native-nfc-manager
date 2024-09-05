@@ -6,6 +6,7 @@ import { Platform, StyleSheet } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
+import { Observable } from 'relay-runtime';
 import {
   MODULE_IMAGE_MAX_WIDTH,
   PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
@@ -56,7 +57,6 @@ import type {
   SavePhotoWithTextAndTitleModuleInput,
 } from '#relayArtifacts/PhotoWithTextAndTitleEditionScreenUpdateModuleMutation.graphql';
 import type { ViewProps } from 'react-native';
-import type { Observable } from 'relay-runtime';
 
 export type PhotoWithTextAndTitleEditionScreenProps = ViewProps & {
   /**
@@ -201,7 +201,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
   const { data, value, fieldUpdateHandler, updateFields, dirty } =
     useModuleDataEditor({
       initialValue,
-      cardStyle: profile?.webCard.cardStyle,
+      cardStyle: profile?.webCard?.cardStyle,
       styleValuesMap: PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES,
       defaultValues: PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
     });
@@ -259,17 +259,19 @@ const PhotoWithTextAndTitleEditionScreen = ({
     setTouched(true);
   }, []);
 
-  const isValid =
-    (isNotFalsyString(title) || isNotFalsyString(content)) && image;
-  const canSave = (dirty || touched) && isValid && !saving;
-
-  const router = useRouter();
-  const intl = useIntl();
   const [progressIndicator, setProgressIndicator] =
     useState<Observable<number> | null>(null);
 
+  const isValid =
+    (isNotFalsyString(title) || isNotFalsyString(content)) && image;
+  const canSave =
+    (dirty || touched) && isValid && !saving && !progressIndicator;
+  const router = useRouter();
+  const intl = useIntl();
+
   const cardModulesCount =
-    (profile.webCard.cardModules.length ?? 0) + (photoWithTextAndTitle ? 0 : 1);
+    (profile.webCard?.cardModules.length ?? 0) +
+    (photoWithTextAndTitle ? 0 : 1);
 
   const onCancel = router.back;
 
@@ -401,7 +403,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
   const onBackgroundStyleChange = fieldUpdateHandler('backgroundStyle');
 
   const onSave = useCallback(async () => {
-    if (!canSave) {
+    if (!canSave || !profile.webCard) {
       return;
     }
 
@@ -411,39 +413,38 @@ const PhotoWithTextAndTitleEditionScreen = ({
     );
 
     if (
-      profile.webCard.cardIsPublished &&
+      profile.webCard?.cardIsPublished &&
       requireSubscription &&
-      !profile.webCard.isPremium
+      !profile.webCard?.isPremium
     ) {
       router.push({ route: 'USER_PAY_WALL' });
       return;
     }
 
+    setProgressIndicator(Observable.from(0));
+
     const { image: updateImage, ...rest } = value;
     let mediaId = updateImage?.id;
 
     if (!mediaId && updateImage?.uri) {
-      //we need to save the media first
-      const { uploadURL, uploadParameters } = await uploadSign({
-        kind: 'image',
-        target: 'module',
-      });
-      const fileName = getFileName(updateImage.uri);
-      const file: any = {
-        name: fileName,
-        uri: `file://${updateImage.uri}`,
-        type: 'image/jpeg',
-      };
-
-      const { progress: uploadProgress, promise: uploadPromise } = uploadMedia(
-        file,
-        uploadURL,
-        uploadParameters,
-      );
-      setProgressIndicator(
-        uploadProgress.map(({ loaded, total }) => loaded / total),
-      );
       try {
+        //we need to save the media first
+        const { uploadURL, uploadParameters } = await uploadSign({
+          kind: 'image',
+          target: 'module',
+        });
+        const fileName = getFileName(updateImage.uri);
+        const file: any = {
+          name: fileName,
+          uri: `file://${updateImage.uri}`,
+          type: 'image/jpeg',
+        };
+
+        const { progress: uploadProgress, promise: uploadPromise } =
+          uploadMedia(file, uploadURL, uploadParameters);
+        setProgressIndicator(
+          uploadProgress.map(({ loaded, total }) => loaded / total),
+        );
         const { public_id } = await uploadPromise;
         mediaId = public_id;
       } catch (error) {
@@ -456,6 +457,8 @@ const PhotoWithTextAndTitleEditionScreen = ({
               'Error toast message when saving a photo with text and title failed because of a media upload error.',
           }),
         });
+        setProgressIndicator(null);
+        return;
       }
     }
 
@@ -495,12 +498,12 @@ const PhotoWithTextAndTitleEditionScreen = ({
         handleProfileActionError(e);
       },
     });
+
+    setProgressIndicator(null);
   }, [
     canSave,
     cardModulesCount,
-    profile.webCard.cardIsPublished,
-    profile.webCard.isPremium,
-    profile.webCard.id,
+    profile.webCard,
     value,
     photoWithTextAndTitle?.id,
     titleFontSize.value,
@@ -601,8 +604,8 @@ const PhotoWithTextAndTitleEditionScreen = ({
             contentFontSize,
             contentVerticalSpacing,
           }}
-          colorPalette={profile?.webCard.cardColors}
-          cardStyle={profile?.webCard.cardStyle}
+          colorPalette={profile?.webCard?.cardColors}
+          cardStyle={profile?.webCard?.cardStyle}
         />
       </PressableOpacity>
       <TabView
@@ -718,7 +721,10 @@ const PhotoWithTextAndTitleEditionScreen = ({
         })}
         maxLength={PHOTO_WITH_TEXT_AND_TITLE_TEXT_MAX_LENGTH}
         onClose={onCloseContentModal}
-        onChangeText={onContentChange}
+        onChangeText={text => {
+          onContentChange(text);
+          onCloseContentModal();
+        }}
         onFocus={() => {
           if (content === undefined) {
             onContentChange('');

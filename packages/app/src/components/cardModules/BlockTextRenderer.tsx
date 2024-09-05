@@ -161,7 +161,7 @@ const BlockTextRenderer = ({
           paddingHorizontal: rest.textMarginHorizontal,
           fontSize: rest.fontSize ?? undefined,
           lineHeight:
-            rest.fontSize && rest.verticalSpacing
+            rest.fontSize && rest.verticalSpacing != null
               ? rest.fontSize * 1.2 + rest.verticalSpacing
               : undefined,
         };
@@ -184,7 +184,7 @@ const BlockTextRenderer = ({
       paddingHorizontal: textMarginHorizontal?.value ?? 0,
       fontSize: fontSizeValue ?? undefined,
       lineHeight:
-        fontSizeValue && verticalSpacingValue
+        fontSizeValue && verticalSpacingValue != null
           ? fontSizeValue * 1.2 + verticalSpacingValue
           : undefined,
     };

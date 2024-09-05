@@ -20,7 +20,7 @@ import {
   useTransition,
 } from 'react';
 import DataGrid from '#components/DataGrid';
-import type { AccountStatus, Filters, UserTable } from './page';
+import type { SortField, UserTable } from './page';
 import type { SelectChangeEvent } from '@mui/material';
 import type {
   GridColDef,
@@ -33,10 +33,10 @@ type UsersListProps = {
   count: number;
   page: number;
   pageSize: number;
-  sortField: 'createdAt' | 'email' | 'phoneNumber' | 'webcardsCount';
+  sortField: SortField;
   sortOrder: 'asc' | 'desc';
   search: string | null;
-  filters: Filters;
+  enabledFilter: boolean | undefined;
 };
 
 const UsersList = ({
@@ -47,13 +47,19 @@ const UsersList = ({
   sortField,
   sortOrder,
   search,
-  filters,
+  enabledFilter,
 }: UsersListProps) => {
   const router = useRouter();
   const [loading, startTransition] = useTransition();
   const [currentSearch, setCurrentSearch] = useState(search ?? '');
-  const [statusFilter, setStatusFilter] = useState(filters.status);
-  const defferedSearch = useDeferredValue(currentSearch);
+  const [statusFilter, setStatusFilter] = useState(
+    enabledFilter === true
+      ? 'Active'
+      : enabledFilter === false
+        ? 'Suspended'
+        : 'All',
+  );
+  const deferredSearch = useDeferredValue(currentSearch);
 
   const updateSearchParams = useCallback(
     (
@@ -61,11 +67,11 @@ const UsersList = ({
       sort: string,
       order: string,
       search: string | null,
-      filters: Filters,
+      status: string | null,
     ) => {
       startTransition(() => {
         router.replace(
-          `/users?page=${page}&sort=${sort}&order=${order}&s=${search ?? ''}&status=${filters?.status ?? ''}`,
+          `/users?page=${page}&sort=${sort}&order=${order}&s=${search ?? ''}&status=${status}`,
         );
       });
     },
@@ -74,42 +80,46 @@ const UsersList = ({
 
   const onPageChange = useCallback(
     (model: GridPaginationModel) => {
-      updateSearchParams(model.page + 1, sortField, sortOrder, search, {
-        status: statusFilter,
-      });
+      updateSearchParams(
+        model.page + 1,
+        sortField,
+        sortOrder,
+        search,
+        statusFilter,
+      );
     },
     [search, sortField, sortOrder, statusFilter, updateSearchParams],
   );
 
   const onSortModelChange = useCallback(
     (model: GridSortModel) => {
-      updateSearchParams(page, model[0].field, model[0].sort ?? 'asc', search, {
-        status: statusFilter,
-      });
+      updateSearchParams(
+        page,
+        model[0].field,
+        model[0].sort ?? 'asc',
+        search,
+        statusFilter,
+      );
     },
     [page, search, statusFilter, updateSearchParams],
   );
 
   const onStatusChange = useCallback(
     (event: SelectChangeEvent) => {
-      const newStatus = event.target.value as AccountStatus;
+      const newStatus = event.target.value as any;
       setStatusFilter(newStatus);
-      updateSearchParams(1, sortField, sortOrder, search, {
-        status: newStatus,
-      });
+      updateSearchParams(1, sortField, sortOrder, search, newStatus);
     },
     [search, sortField, sortOrder, updateSearchParams],
   );
 
   useEffect(() => {
-    if (search === defferedSearch) {
+    if (search === deferredSearch) {
       return;
     }
-    updateSearchParams(1, sortField, sortOrder, defferedSearch, {
-      status: statusFilter,
-    });
+    updateSearchParams(1, sortField, sortOrder, deferredSearch, statusFilter);
   }, [
-    defferedSearch,
+    deferredSearch,
     page,
     search,
     sortField,
@@ -129,6 +139,19 @@ const UsersList = ({
       <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
         Users
       </Typography>
+      <TextField
+        id="note"
+        inputProps={{
+          readOnly: true,
+        }}
+        label="Note"
+        multiline
+        rows={1}
+        maxRows={3}
+        value={
+          'The number of WebCards in this table may be affected by the current search. Open the account details to view the total number of WebCards.'
+        }
+      />
       <Box display="flex" gap={2} alignItems="center">
         <TextField
           margin="normal"
@@ -155,7 +178,7 @@ const UsersList = ({
             label="Status"
             onChange={onStatusChange}
           >
-            <MenuItem value={'all'}>All</MenuItem>
+            <MenuItem value={'All'}>All</MenuItem>
             <MenuItem value={'Active'}>Active</MenuItem>
             <MenuItem value={'Suspended'}>Suspended</MenuItem>
           </Select>
@@ -222,7 +245,7 @@ const columns: GridColDef[] = [
       />
     ),
   },
-  { field: 'webcardsCount', headerName: 'WebCards', width: 150 },
+  { field: 'webCardsCount', headerName: 'WebCards', width: 150 },
   {
     field: 'createdAt',
     headerName: 'Inscription date',

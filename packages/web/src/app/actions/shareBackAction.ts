@@ -8,17 +8,19 @@ import { headers } from 'next/headers';
 import { getUserById } from '@azzapp/data';
 import { buildVCardFromShareBackContact } from '@azzapp/shared/vCardHelpers';
 import { ShareBackFormSchema } from '#components/ShareBackModal/shareBackFormSchema';
-import { sendSMS, sendEmail } from '#helpers/contactHelpers';
 import {
   CONTACT_METHODS,
   getPreferredContactMethod,
 } from '#helpers/contactMethodsHelpers';
+import { sendEmail } from '#helpers/emailHelpers';
 import { getServerIntl } from '#helpers/i18nHelpers';
 import {
   getValuesFromSubmitData,
   shareBackSignature,
+  shareBackVCardFilename,
 } from '#helpers/shareBackHelper';
-import type { EmailAttachment } from '#helpers/contactHelpers';
+import { sendTwilioSMS } from '#helpers/twilioHelpers';
+import type { EmailAttachment } from '#helpers/emailHelpers';
 import type { SubmissionResult } from '@conform-to/react';
 import type { JwtPayload } from 'jwt-decode';
 
@@ -51,13 +53,27 @@ export const processShareBackSubmission = async (
     // verify expiration date
     if (!decodedToken.exp || decodedToken.exp < Date.now() / 1000) {
       return submission.reply({
-        formErrors: ['Token expired, please refresh and try sharing again'],
+        formErrors: [
+          intl.formatMessage({
+            defaultMessage:
+              'Oops, something went wrong, please refresh the page.',
+            id: 'l3KPmc',
+            description: 'ShareBack - Error message for expired token',
+          }),
+        ],
       });
     }
 
     if (submission.status !== 'success') {
       return submission.reply({
-        formErrors: ['Share back form is not valid'],
+        formErrors: [
+          intl.formatMessage({
+            defaultMessage:
+              'Your submission has errors, please check the form and try again.',
+            id: 'heLjo+',
+            description: 'ShareBack - Error message for invalid submission',
+          }),
+        ],
       });
     }
     // get user data from userId
@@ -118,40 +134,36 @@ export const processShareBackSubmission = async (
       );
 
       const shareBackContactVCardUrl = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/shareBackVCard?c=${shareBackContactCompressedData}`;
-
-      await sendSMS([
-        {
-          phoneNumber: user.phoneNumber as string,
-          body: shareBackBody,
-          mediaUrl: [shareBackContactVCardUrl],
-        },
-      ]);
+      await sendTwilioSMS({
+        body: shareBackBody,
+        to: user.phoneNumber as string,
+        mediaUrl: shareBackContactVCardUrl,
+      });
     } else {
       const buildVCardContact = buildVCardFromShareBackContact(
         submission.payload,
       );
 
-      // @todo: wording for filename vcf
+      const vCardFileName = shareBackVCardFilename(submission.value);
+
       const shareBackContactVCardAttachment = {
         content: Buffer.from(buildVCardContact.toString()).toString('base64'),
-        filename: 'azzapp-contact.vcf',
+        filename: vCardFileName,
         disposition: 'attachment',
       } as EmailAttachment;
 
       // @todo: wording for title email share back
-      await sendEmail([
-        {
-          email: user.email as string,
-          subject: intl.formatMessage({
-            id: 'ivEKQ2',
-            defaultMessage: 'New Contact ShareBack Received',
-            description: 'Email subject for new contact share back received',
-          }),
-          text: shareBackBody,
-          html: shareBackBody,
-          attachments: [shareBackContactVCardAttachment],
-        },
-      ]);
+      await sendEmail({
+        to: user.email as string,
+        subject: intl.formatMessage({
+          id: 'ivEKQ2',
+          defaultMessage: 'New Contact ShareBack Received',
+          description: 'Email subject for new contact share back received',
+        }),
+        text: shareBackBody,
+        html: shareBackBody,
+        attachments: [shareBackContactVCardAttachment],
+      });
     }
 
     return submission.reply({

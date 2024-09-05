@@ -12,32 +12,24 @@ const slideDown = keyframes({
   '100%': { transform: 'translateY(100%)' },
 });
 
-const fadeIn = keyframes({
-  '0%': { opacity: 0 },
-  '100%': { opacity: 1 },
-});
-
-const fadeOut = keyframes({
-  '0%': { opacity: 1 },
-  '100%': { opacity: 0 },
-});
-
 const wrapper = style({
   position: 'fixed',
   top: 0,
   width: '100vw',
-  height: '100vh',
+  height: '100%',
   backgroundColor: convertHexToRGBA('#000000', 70),
   zIndex: 999,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   padding: '20px',
-  animation: `${fadeIn} 0.3s ease-out`,
+  transition: `opacity 0.3s ease-out`,
+  opacity: 1,
 });
 
 const wrapperClosing = style({
-  animation: `${fadeOut} 0.3s ease-in`,
+  transition: `opacity 0.3s ease-in`,
+  opacity: 0,
 });
 
 const modal = style({
@@ -48,8 +40,12 @@ const modal = style({
   backgroundColor: vars.color.white,
   width: '375px',
   maxWidth: '100%',
+  maxHeight: '100%',
   boxShadow: '0px 1px 25px 0px rgba(0, 0, 0, 0.45)',
   animation: `${slideUp} 0.3s ease-out`,
+  overflow: 'scroll',
+  display: 'flex',
+  flexDirection: 'column',
 });
 
 const modalClosing = style({

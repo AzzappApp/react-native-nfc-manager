@@ -9,7 +9,7 @@ import Animated, {
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
-import { isEditor } from '@azzapp/shared/profileHelpers';
+import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import useAuthState from '#hooks/useAuthState';
@@ -242,7 +242,10 @@ const WebCardScreenButtonActionButton = ({
       return;
     }
 
-    if (profileInfos?.profileRole && isEditor(profileInfos.profileRole)) {
+    if (
+      profileInfos?.profileRole &&
+      profileHasEditorRight(profileInfos.profileRole)
+    ) {
       onToggleFollow(webCard.id, webCard.userName, !isFollowing);
     } else if (isFollowing) {
       Toast.show({
@@ -266,7 +269,10 @@ const WebCardScreenButtonActionButton = ({
   }, 600);
 
   const onCreateNewPost = () => {
-    if (profileInfos?.profileRole && isEditor(profileInfos?.profileRole)) {
+    if (
+      profileInfos?.profileRole &&
+      profileHasEditorRight(profileInfos?.profileRole)
+    ) {
       router.push({ route: 'NEW_POST', params: { fromProfile: true } });
     } else {
       Toast.show({

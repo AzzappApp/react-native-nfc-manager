@@ -1,15 +1,14 @@
 'use server';
-import { asc, eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import {
-  CardModuleTable,
-  WebCardTable,
   checkMedias,
   createCardTemplate,
-  db,
+  getCardModulesByWebCard,
   getCardTemplateById,
+  getWebCardByUserName,
   referencesMedias,
   saveLocalizationMessage,
+  transaction,
   updateCardTemplate,
 } from '@azzapp/data';
 import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
@@ -20,19 +19,15 @@ import {
 import type { CardTemplateType } from '@azzapp/data';
 
 export const getModulesData = async (profileUserName: string) => {
-  const res = await db
-    .select()
-    .from(CardModuleTable)
-    .innerJoin(WebCardTable, eq(WebCardTable.id, CardModuleTable.webCardId))
-    .where(eq(WebCardTable.userName, profileUserName))
-    .orderBy(asc(CardModuleTable.position));
-
-  if (res.length < 1) return null;
-
-  return res.map(({ CardModule }) => ({
-    kind: CardModule.kind,
-    data: CardModule.data,
-  }));
+  const webCard = await getWebCardByUserName(profileUserName);
+  if (!webCard) {
+    return null;
+  }
+  const modules = await getCardModulesByWebCard(webCard.id);
+  if (modules.length === 0) {
+    return null;
+  }
+  return modules.map(({ data, kind }) => ({ kind, data }));
 };
 
 export const saveCardTemplate = async (
@@ -62,40 +57,32 @@ export const saveCardTemplate = async (
   try {
     await checkMedias([validation.data.previewMediaId]);
 
-    await db.transaction(async trx => {
+    await transaction(async () => {
       let previousMediaId: string | null = null;
-
       if (id) {
         const cardTemplate = await getCardTemplateById(id);
+        if (!cardTemplate) {
+          throw new Error('Card template not found');
+        }
         previousMediaId = cardTemplate.previewMediaId;
 
-        await db.transaction(async trx => {
-          await updateCardTemplate(id, template, trx);
-          await saveLocalizationMessage(
-            {
-              key: id,
-              value: validation.data.label,
-              locale: DEFAULT_LOCALE,
-              target: ENTITY_TARGET,
-            },
-            trx,
-          );
+        await updateCardTemplate(id, template);
+        await saveLocalizationMessage({
+          key: id,
+          value: validation.data.label,
+          locale: DEFAULT_LOCALE,
+          target: ENTITY_TARGET,
         });
       } else {
-        await db.transaction(async trx => {
-          const id = await createCardTemplate(template, trx);
-          await saveLocalizationMessage(
-            {
-              key: id,
-              value: validation.data.label,
-              locale: DEFAULT_LOCALE,
-              target: ENTITY_TARGET,
-            },
-            trx,
-          );
+        const id = await createCardTemplate(template);
+        await saveLocalizationMessage({
+          key: id,
+          value: validation.data.label,
+          locale: DEFAULT_LOCALE,
+          target: ENTITY_TARGET,
         });
       }
-      await referencesMedias([template.previewMediaId], [previousMediaId], trx);
+      await referencesMedias([template.previewMediaId], [previousMediaId]);
     });
 
     revalidatePath(`/cardTemplates/[id]`);

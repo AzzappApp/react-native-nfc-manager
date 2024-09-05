@@ -1,8 +1,13 @@
-import { useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
+import { useColorScheme } from 'react-native';
 import ShareCommand from 'react-native-share';
 import { graphql, useFragment } from 'react-relay';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
-import Button from '#ui/Button';
+import { colors } from '#theme';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import Icon from '#ui/Icon';
+import PressableNative from '#ui/PressableNative';
+import Text from '#ui/Text';
 import type { ContactCardExportVcf_card$key } from '#relayArtifacts/ContactCardExportVcf_card.graphql';
 
 export type ContactCardExportVcfProps = {
@@ -27,14 +32,17 @@ const ContactCardExportVcf = ({
     profileKey,
   );
 
-  const intl = useIntl();
+  const styles = useStyleSheet(styleSheet);
+  const colorScheme = useColorScheme();
 
   return (
-    <Button
-      label={intl.formatMessage({
-        defaultMessage: 'Share',
-        description: 'Share button label',
-      })}
+    <PressableNative
+      ripple={{
+        foreground: true,
+        color: colorScheme === 'dark' ? colors.grey100 : colors.grey900,
+      }}
+      accessibilityRole="button"
+      style={styles.button}
       onPress={async () => {
         const title =
           formatDisplayName(
@@ -52,8 +60,40 @@ const ContactCardExportVcf = ({
           console.error(e);
         }
       }}
-    />
+    >
+      <Icon
+        icon="share"
+        style={styles.sharedIcon}
+        size={24}
+        tintColor={colorScheme === 'dark' ? colors.black : colors.white}
+      />
+      <Text variant="button" style={styles.text}>
+        <FormattedMessage
+          defaultMessage="Share"
+          description="Share button label"
+        />
+      </Text>
+    </PressableNative>
   );
 };
 
 export default ContactCardExportVcf;
+
+const styleSheet = createStyleSheet(appearance => ({
+  sharedIcon: {
+    position: 'absolute',
+    left: 10,
+    marginVertical: 'auto',
+  },
+  button: {
+    width: '100%',
+    height: 47,
+    borderRadius: 12,
+    backgroundColor: appearance === 'light' ? colors.black : colors.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  text: {
+    color: appearance === 'light' ? colors.white : colors.black,
+  },
+}));

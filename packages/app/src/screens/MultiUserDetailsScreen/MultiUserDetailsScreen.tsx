@@ -1,8 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { fromGlobalId } from 'graphql-relay';
 import { parsePhoneNumber } from 'libphonenumber-js';
+import { useCallback, useEffect, type ReactNode } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View, useColorScheme } from 'react-native';
+import { Alert, StyleSheet, View, useColorScheme } from 'react-native';
 import * as mime from 'react-native-mime-types';
 import Toast from 'react-native-toast-message';
 import {
@@ -43,7 +45,6 @@ import type { MultiUserDetailsScreenQuery } from '#relayArtifacts/MultiUserDetai
 import type { ProfileRole } from '#relayArtifacts/MultiUserScreenQuery.graphql';
 import type { MultiUserDetailRoute } from '#routes';
 import type { ContactCardEditFormValues } from '#screens/ContactCardEditScreen/ContactCardEditModalSchema';
-import type { ReactNode } from 'react';
 import type { Control } from 'react-hook-form';
 
 export type MultiUserDetailFormValues = ContactCardEditFormValues & {
@@ -66,7 +67,7 @@ const MultiUserDetailsScreen = ({
   const profile = node?.profile;
 
   const phoneNumber =
-    profile?.user.phoneNumber && parsePhoneNumber(profile.user.phoneNumber);
+    profile?.user?.phoneNumber && parsePhoneNumber(profile.user.phoneNumber);
 
   const {
     control,
@@ -91,7 +92,7 @@ const MultiUserDetailsScreen = ({
       socials: profile?.contactCard?.socials?.slice() ?? [],
       addresses: profile?.contactCard?.addresses?.slice() ?? [],
       avatar: profile?.avatar,
-      selectedContact: profile?.user.email
+      selectedContact: profile?.user?.email
         ? {
             countryCodeOrEmail: 'email',
             value: profile.user.email,
@@ -318,7 +319,13 @@ const MultiUserDetailsScreen = ({
 
   const router = useRouter();
 
-  const onRemoveUser = () => {
+  useEffect(() => {
+    if (!node) {
+      router.back();
+    }
+  }, [node, router]);
+
+  const onRemoveUser = useCallback(() => {
     if (profileInfos?.webCardId == null || profile == null) return;
     commitDelete({
       variables: {
@@ -340,7 +347,11 @@ const MultiUserDetailsScreen = ({
         });
       },
       updater: (store, response) => {
-        if (!response?.removeUsersFromWebCard?.includes(profile.id)) {
+        if (
+          !response?.removeUsersFromWebCard?.includes(
+            fromGlobalId(profile.id).id,
+          )
+        ) {
           Toast.show({
             type: 'error',
             text1: intl.formatMessage({
@@ -352,22 +363,55 @@ const MultiUserDetailsScreen = ({
           return;
         }
 
-        const webCardRecord = store.get(profile.webCard.id);
-        if (webCardRecord) {
-          const connection = ConnectionHandler.getConnection(
-            webCardRecord,
-            'MultiUserScreenUserList_webCard_connection_profiles',
-          );
-          if (connection) {
-            ConnectionHandler.deleteNode(connection, profile.id);
+        if (profile.webCard) {
+          const webCardRecord = store.get(profile.webCard.id);
+          if (webCardRecord) {
+            const connection = ConnectionHandler.getConnection(
+              webCardRecord,
+              'MultiUserScreenUserList_webCard_connection_profiles',
+            );
+            if (connection) {
+              ConnectionHandler.deleteNode(connection, profile.id);
+            }
+            //update the user counter profile?.webCard?.nbProfiles
+            const nbProfiles = webCardRecord?.getValue('nbProfiles') as number;
+            webCardRecord?.setValue(nbProfiles - 1, 'nbProfiles');
           }
-          //update the user counter profile?.webCard?.nbProfiles
-          const nbProfiles = webCardRecord?.getValue('nbProfiles') as number;
-          webCardRecord?.setValue(nbProfiles - 1, 'nbProfiles');
         }
       },
     });
-  };
+  }, [commitDelete, intl, profile, profileInfos?.webCardId, router]);
+
+  const onConfirmRemoveUser = useCallback(() => {
+    Alert.alert(
+      intl.formatMessage({
+        defaultMessage: 'Removed user will loose access to this WebCard.',
+        description: 'Remove user from multi-user confirm title',
+      }),
+      intl.formatMessage({
+        defaultMessage:
+          'This action is irreversible, but you can always invite this user again.',
+        description: 'Remove user from multi-user confirm subtitle',
+      }),
+      [
+        {
+          text: intl.formatMessage({
+            defaultMessage: 'Cancel',
+            description: 'Remove user from multi-user cancel button label',
+          }),
+          style: 'cancel',
+        },
+        {
+          text: intl.formatMessage({
+            defaultMessage: 'Confirm',
+            description: 'Remove user from multi-user confirm button label',
+          }),
+          onPress: onRemoveUser,
+          style: 'destructive',
+        },
+      ],
+    );
+  }, [intl, onRemoveUser]);
 
   const colorScheme = useColorScheme();
 
@@ -414,7 +458,7 @@ const MultiUserDetailsScreen = ({
             role !== 'owner' && (
               <PressableNative
                 style={styles.removeButton}
-                onPress={onRemoveUser}
+                onPress={onConfirmRemoveUser}
                 disabled={deletionIsActive}
               >
                 <Text variant="button" style={styles.removeText}>
@@ -499,7 +543,7 @@ const MultiUserDetailsScreen = ({
               )}
             />
 
-            {!profile.webCard.profilePendingOwner && (
+            {!profile.webCard?.profilePendingOwner && (
               <Text variant="xsmall" style={styles.description}>
                 {role === 'user' && (
                   <FormattedMessage
@@ -539,7 +583,7 @@ const MultiUserDetailsScreen = ({
                 )}
               </Text>
             )}
-            {profile.webCard.profilePendingOwner && (
+            {profile.webCard?.profilePendingOwner && (
               <Text variant="xsmall" style={styles.description}>
                 <FormattedMessage
                   defaultMessage="An ownership request has been sent. Ownership will be transfered as soon as the request is accepted."

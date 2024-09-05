@@ -248,6 +248,7 @@ const CarouselRenderer = ({
         horizontal
         showsHorizontalScrollIndicator={false}
         style={{ height: '100%' }}
+        contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
       >
         <Animated.View style={containerStyle}>
           {images?.map(image => (

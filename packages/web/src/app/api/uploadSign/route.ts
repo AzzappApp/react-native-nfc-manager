@@ -2,8 +2,7 @@
 import { NextResponse } from 'next/server';
 import { withAxiom } from 'next-axiom';
 import * as z from 'zod';
-import { createMedia } from '@azzapp/data';
-import { createId } from '@azzapp/data/helpers/createId';
+import { createMedia, createId } from '@azzapp/data';
 import { MODULE_IMAGES_SIZES } from '@azzapp/shared/cardModuleHelpers';
 import { createPresignedUpload } from '@azzapp/shared/cloudinaryHelpers';
 import { COVER_ASSET_SIZES } from '@azzapp/shared/coverHelpers';
@@ -93,5 +92,3 @@ const getPregeneratedSizes = (body: uploadSignParams) => {
 };
 
 export const { POST, OPTIONS } = cors({ POST: withAxiom(uploadSignApi) });
-
-export const runtime = 'edge';

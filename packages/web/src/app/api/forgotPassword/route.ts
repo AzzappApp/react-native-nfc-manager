@@ -8,10 +8,7 @@ import {
   isInternationalPhoneNumber,
   isValidEmail,
 } from '@azzapp/shared/stringHelpers';
-import {
-  findTwilioLocale,
-  twilioVerificationService,
-} from '#helpers/twilioHelpers';
+import { sendTwilioVerificationCode } from '#helpers/twilioHelpers';
 
 type ForgotPasswordBody = {
   credential: string;
@@ -50,16 +47,16 @@ export const POST = withAxiom(async (req: Request) => {
       return NextResponse.json({ issuer: credential }, { status: 200 });
     }
 
-    const verification = await twilioVerificationService().verifications.create(
-      {
-        to: issuer,
-        channel,
-        locale: locale ? findTwilioLocale(locale) : undefined,
-      },
+    const verification = await sendTwilioVerificationCode(
+      issuer,
+      channel,
+      locale,
     );
-
     if (verification && verification.status === 'canceled') {
-      throw new Error('Verification canceled');
+      return NextResponse.json(
+        { message: ERRORS.INVALID_REQUEST },
+        { status: 400 },
+      );
     }
     return NextResponse.json({ issuer });
   } catch (error) {
@@ -71,5 +68,3 @@ export const POST = withAxiom(async (req: Request) => {
     );
   }
 });
-
-export const runtime = 'nodejs';

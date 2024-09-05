@@ -1,3 +1,4 @@
+/* eslint-disable no-bitwise */
 import {
   BlendColor,
   Canvas,
@@ -9,7 +10,7 @@ import {
   rect,
 } from '@shopify/react-native-skia';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Suspense, useCallback, useState } from 'react';
+import { Suspense, useCallback, useEffect, useState } from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
 import {
   Directions,
@@ -53,7 +54,7 @@ const ShakeShare = () => {
 
   //Gesture to close on swipe
   const fling = Gesture.Fling()
-    .direction(Directions.DOWN)
+    .direction(Directions.DOWN | Directions.RIGHT)
     .runOnJS(true)
     .onEnd(dismount);
 
@@ -94,6 +95,7 @@ const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
         node(id: $profileId) {
           ... on Profile @alias(as: "profile") {
             webCard {
+              cardIsPublished
               userName
               ...CoverRenderer_webCard
             }
@@ -110,12 +112,22 @@ const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
 
   const profile = node?.profile;
 
+  useEffect(() => {
+    if (!profile?.webCard?.cardIsPublished) {
+      onClose();
+    }
+  }, [onClose, profile?.webCard?.cardIsPublished]);
+
   const svg = profile?.contactCardQrCode
     ? Skia.SVG.MakeFromString(profile?.contactCardQrCode)
     : null;
 
   const src = rect(0, 0, svg?.width() ?? 0, svg?.height() ?? 0);
   const dst = rect(0, 0, QR_CODE_WIDTH, QR_CODE_WIDTH);
+
+  if (!profile?.webCard?.cardIsPublished) {
+    return null;
+  }
 
   return (
     <>
@@ -124,7 +136,7 @@ const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
           width={width}
           webCard={profile?.webCard}
           style={styles.coverStyle}
-          animationEnabled={true}
+          canPlay={true}
         />
         <LinearGradient
           colors={['rgba(14, 18, 22,0)', 'rgba(0, 0, 0, 1)']}

@@ -174,7 +174,7 @@ const SimpleTextEditionScreen = ({
 
   const { data, value, fieldUpdateHandler, dirty } = useModuleDataEditor({
     initialValue,
-    cardStyle: profile?.webCard.cardStyle,
+    cardStyle: profile?.webCard?.cardStyle,
     styleValuesMap:
       moduleKind === 'simpleText'
         ? SIMPLE_TEXT_STYLE_VALUES
@@ -258,7 +258,7 @@ const SimpleTextEditionScreen = ({
   const onCancel = router.back;
 
   const cardModulesCount =
-    (profile.webCard.cardModules.length ?? 0) + (moduleData ? 0 : 1);
+    (profile.webCard?.cardModules.length ?? 0) + (moduleData ? 0 : 1);
 
   const handleProfileActionError = useHandleProfileActionError(
     intl.formatMessage({
@@ -300,9 +300,9 @@ const SimpleTextEditionScreen = ({
     );
 
     if (
-      profile.webCard.cardIsPublished &&
+      profile.webCard?.cardIsPublished &&
       requireSubscription &&
-      !profile.webCard.isPremium
+      !profile.webCard?.isPremium
     ) {
       router.push({ route: 'USER_PAY_WALL' });
       return;
@@ -310,7 +310,7 @@ const SimpleTextEditionScreen = ({
 
     commit({
       variables: {
-        webCardId: profile.webCard.id,
+        webCardId: profile.webCard?.id,
         input: {
           ...value,
           fontSize: fontSize.value,
@@ -434,8 +434,8 @@ const SimpleTextEditionScreen = ({
           marginVertical,
         }}
         onPreviewPress={onPreviewPress}
-        colorPalette={profile?.webCard.cardColors}
-        cardStyle={profile?.webCard.cardStyle}
+        colorPalette={profile?.webCard?.cardColors}
+        cardStyle={profile?.webCard?.cardStyle}
       />
       <TabView
         style={{ height: bottomPanelHeight }}
@@ -517,7 +517,10 @@ const SimpleTextEditionScreen = ({
             : SIMPLE_TITLE_MAX_LENGTH
         }
         onClose={onCloseContentModal}
-        onChangeText={onTextChange}
+        onChangeText={text => {
+          onTextChange(text);
+          onCloseContentModal();
+        }}
       />
       <SimpleTextEditionBottomMenu
         currentTab={currentTab}

@@ -1,5 +1,5 @@
 import * as Clipboard from 'expo-clipboard';
-import { memo, useMemo } from 'react';
+import { memo } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
@@ -36,8 +36,9 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
 
   const { currentIndexProfile, currentIndexSharedValue } =
     useHomeScreenContext();
-  const userNames = useMemo(
-    () => profiles?.map(p => p.webCard.userName) ?? [],
+
+  const userNames = useDerivedValue(
+    () => profiles?.map(p => p.webCard?.userName) ?? [],
     [profiles],
   );
 
@@ -60,7 +61,7 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
   const intl = useIntl();
   const onPress = () => {
     Clipboard.setStringAsync(
-      buildUserUrl(userNames[currentIndexProfile.value - 1] ?? ''),
+      buildUserUrl(userNames.value[currentIndexProfile.value - 1] ?? ''),
     )
       .then(() => {
         Toast.show({
@@ -80,7 +81,7 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
     if (currentIndexSharedValue.value > 0.5) {
       return (
         'azzapp.com/' +
-          userNames[Math.round(currentIndexSharedValue.value - 1)] ?? ''
+          userNames.value[Math.round(currentIndexSharedValue.value - 1)] ?? ''
       );
     }
 

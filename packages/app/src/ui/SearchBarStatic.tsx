@@ -24,6 +24,7 @@ const SearchBarStatic = (props: SearchBarStaticProps) => {
     onChangeText,
     onSubmitEditing,
     value,
+    style,
     ...others
   } = props;
 
@@ -67,7 +68,10 @@ const SearchBarStatic = (props: SearchBarStaticProps) => {
   };
 
   return (
-    <View style={[styles.innerSearchBarView]} onTouchStart={onInnerFocus}>
+    <View
+      style={[style, styles.innerSearchBarView]}
+      onTouchStart={onInnerFocus}
+    >
       <Icon
         icon="search"
         style={[styles.lensIcon, isFocused && styles.lensIconFocuses]}

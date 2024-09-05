@@ -1,0 +1,345 @@
+//
+//  ShareContactAppClipApp.swift
+//  ShareContactAppClip
+//
+//  Created by seb on 02/08/2024.
+//
+
+import SwiftUI
+import ContactsUI
+
+@main
+struct ShareContactAppClipApp: App {
+
+    var body: some Scene {
+        WindowGroup {
+            VStack {
+               
+            }
+            .onOpenURL { url in
+                handleURL(url)
+            }
+            //FOR DEBUG
+            // .onAppear {
+            //  handleURL(URL(string: "http://192.168.2.1:3000/villagramaci2?c=NoIgOiwRB2BOBPAlgCwFZIEYGMCuaBraEAGmJQA5MAPA3Ac2wCYcnizwQApAUxhiQAzHnHbEAygFskAFxRjOANSQAbFQEMABAHE46yeuxIFEACI8AzknowR7YFE4AJAPaSeJkAGoAzD4DsAGz+AJxMIT4ALIHEALokjhCu7p6+PgAMgcFhYdFx8Q7EyR6cHBC4AA7SMjIAAvQGqgB02G75CfEwuGqx0KIwpCAAigDqLiMAgtjYAKoA+nAAchYAmgCiTgCO6QDyAKwqAEIAKoJILkMYAIz+pgDSABqSi6baLFcAJukAkiCxQA")!)
+            //   // handleURL(URL(string: "http://192.168.2.1:3000/evg660_2?c=NoIgOiwRD2DOBbAjgThgdwGwEMBmArABmhABoSATAcwA58BLAdhswA8A3V48MkgOWwIAppkyEAYvQBOcAC4lyPADLY5owgOEKSAYRgIEMAHZ6EAB2xGAnpqHaeAFXqyANiLELgUHgFls9I3sIAGoAZgAWTABWcNCAJgBGFBpGEgBdUm8IcWxWIJAw8IACaJQihMYo8oSE9MySAAl9Ox5FEIjMBNDGBNEPHjSMrxI-APyAY31DIwABIQR-FwA6SYQ6rJAmrVaSVemZ7AoEAJX9dKGN0cCdnlNposOKKSE4ODAwIwcAC3o4B4oni8-l9VCUii4Ai8igAjIQuDDvIxKSG1D7IoxCOKI9FCULYyHhfEYopRIlCErnNogJIoOIAWkINDpcRoDkIjAAXAk4hzCIQlnzCAAtdLQKQfMggRgAaSicQACugHABBKw6ADiKi+VAQoQaAHUUAAhMyydg6dDiIhRAD6AFEANYAJXlNAofC+RoAmj4fCA0kA")!)
+            // }
+        }
+    }
+    private func handleURL(_ url: URL) {
+    
+
+      guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
+            let queryItems = components.queryItems,
+  
+            let compressedContactCard = queryItems.first(where: { $0.name == "c" })?.value else {
+          return
+      }
+
+        
+      let path = components.path
+      let username = path.hasPrefix("/") ? String(path.dropFirst()) : path
+
+
+      // Decode URI component
+      guard let decodedURI = compressedContactCard.removingPercentEncoding else {
+          print("Failed to decode URI component.")
+          return
+      }
+
+      let decompressedContactCard = decompressFromEncodedURIComponent(input:decodedURI)
+      guard let jsonData = decompressedContactCard.data(using: .utf8) else {
+            print("Failed to convert cleaned string to data.")
+            return
+      }
+
+      do {
+        // Parse the JSON array
+        guard let jsonArray = try JSONSerialization.jsonObject(with: jsonData, options: []) as? [Any] else {
+          print("Failed to parse JSON array.")
+          return
+        }
+        
+        guard jsonArray.count == 2 else {
+          print("Invalid JSON structure: Expected 2 elements, found \(jsonArray.count).")
+          return
+        }
+        
+        guard let contactDataString = jsonArray[0] as? String else {
+          print("Invalid JSON structure: First element is not a string.")
+          return
+        }
+        
+        guard let signature = jsonArray[1] as? String else {
+          print("Invalid JSON structure: Second element is not a string.")
+          return
+        }
+        
+        // Remove outer quotes and unescape characters
+        let cleanedContactDataString = contactDataString
+          .replacingOccurrences(of: "\r", with: "")
+          .replacingOccurrences(of: "\n", with: "")
+          .replacingOccurrences(of: "\"[", with: "[")
+          .replacingOccurrences(of: "]\"", with: "]")
+          .replacingOccurrences(of: "\"\"", with: "\"")
+        
+        
+        
+        verifySign(signature: signature, data: contactDataString, salt: username) { result in
+          switch result {
+          case .success(let additionalContactData):
+
+            guard let contactDataJSONData = cleanedContactDataString.data(using: .utf8) else {
+              print("Failed to convert contact data string to data.")
+              return
+            }
+            do {
+            // Parse the cleaned JSON string (or does notcompile if not using a do block
+              guard let contactDataArray = try JSONSerialization.jsonObject(with: contactDataJSONData, options: []) as? [Any] else {
+                print("Failed to parse contact data JSON array.")
+                return
+              }
+              
+              // Map the JSON array to ContactData
+              var contactData = mapToContactData(from: contactDataArray)
+              
+              if let avatarUrl = additionalContactData["avatarUrl"] as? String {
+                contactData.avatarUrl = avatarUrl
+              }
+              
+              if let socialsArray = additionalContactData["socials"] as? [[String: Any]] {
+                  var socials: [Social] = []
+                  for socialDict in socialsArray {
+                      if let label = socialDict["label"] as? String,
+                         let url = socialDict["url"] as? String{
+                          socials.append(Social(label: label, url: url))
+                      }
+                  }
+                  contactData.socials = socials
+              }
+              
+              if let urlsArray = additionalContactData["urls"] as? [[String: Any]] {
+                  var urls: [URLData] = []
+                  for urlDict in urlsArray {
+                        if let url = urlDict["address"] as? String {
+                          urls.append(URLData(label: "custom", url: url))
+                      }
+                  }
+                  contactData.urls = urls
+              }
+               DispatchQueue.main.async {
+                addContact(contactData, username: username)
+                }
+            } catch {
+              print("Error parsing contact data JSON: \(error)")
+          }
+          case .failure(let error):
+            print("Error verifying sign-in: \(error.localizedDescription)")
+          }
+        }
+      } catch {
+        print("Failed to decode contact data: \(error)")
+      }
+    }
+
+  private func addContact(_ contactData: ContactData, username :String) {
+    let contact = CNMutableContact()
+    contact.givenName = contactData.firstName ?? ""
+    contact.familyName = contactData.lastName ?? ""
+    contact.organizationName = contactData.company ?? ""
+    contact.jobTitle = contactData.title ?? ""
+    
+    if let emails = contactData.emails {
+        contact.emailAddresses = emails.map { email in
+            CNLabeledValue(label: email[0], value: email[1] as NSString)
+        }
+    }
+    
+    if let phoneNumbers = contactData.phoneNumbers {
+        contact.phoneNumbers = phoneNumbers.map { phoneNumber in
+            CNLabeledValue(label: phoneNumber[0], value: CNPhoneNumber(stringValue: phoneNumber[1]))
+        }
+    }
+    
+    if let addresses = contactData.addresses {
+        contact.postalAddresses = addresses.map { address in
+            let postalAddress = CNMutablePostalAddress()
+            postalAddress.street = address[1]
+            return CNLabeledValue(label: address[0], value: postalAddress)
+        }
+    }
+    
+     if let birthday = contactData.birthday {
+        let dateFormatter = DateFormatter()
+        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+       if let date = dateFormatter.date(from: birthday) {
+         let calendar = Calendar.current
+         let components = calendar.dateComponents([.year, .month, .day], from: date)
+         contact.birthday = components
+       }
+    }
+
+     if let socials = contactData.socials {
+        contact.socialProfiles = socials.map { social in
+            CNLabeledValue(label: social.label, value: CNSocialProfile(urlString: social.url, username: social.url, userIdentifier: nil, service: social.label))
+        }
+    }
+    var urlAddresses = [CNLabeledValue<NSString>]()
+    if let urls = contactData.urls {
+        urlAddresses = urls.map { urlData in
+            CNLabeledValue(label: urlData.label, value: urlData.url as NSString)
+        }
+    }
+    guard let baseUrl = ProcessInfo.processInfo.environment["BASE_URL"] else {
+      print("Base url not defined")
+      return
+    }
+
+    urlAddresses.append(CNLabeledValue(label: "Azzapp", value:  "\(baseUrl)\(username)" as NSString))
+
+    contact.urlAddresses = urlAddresses
+
+    // Add note with link
+    contact.note = "Made with Azzapp" 	
+    
+    if let avatarUrl = contactData.avatarUrl, let url = URL(string: avatarUrl) {
+    URLSession.shared.dataTask(with: url) { data, response, error in
+        if let data = data {
+            contact.imageData = data
+        }
+        
+        DispatchQueue.main.async {
+            self.presentContactViewController(with: contact)
+        }
+    }.resume()
+    } else {
+        presentContactViewController(with: contact)
+    }
+}
+
+private func presentContactViewController(with contact: CNMutableContact) {
+    let contactViewController = CNContactViewController(forNewContact: contact)
+    // contactViewController.delegate = context.coordinator
+    
+    let viewController = UIApplication.shared.windows.first?.rootViewController
+    viewController?.present(UINavigationController(rootViewController: contactViewController), animated: true)
+}
+
+ func contactViewController(_ viewController: CNContactViewController, didCompleteWith contact: CNContact?) {
+        viewController.dismiss(animated: true) {
+            // Close the App Clip
+            exit(0)
+        }
+    }
+
+
+}
+
+
+struct ContactData: Codable {
+    var profileId: String?
+    var webCardId: String?
+    var firstName: String?
+    var lastName: String?
+    var company: String?
+    var title: String?
+    var emails: [[String]]?
+    var phoneNumbers: [[String]]?
+    var addresses: [[String]]?
+    var birthday: String?
+    var avatarUrl: String?
+    var socials: [Social]?
+    var urls: [URLData]?
+}
+
+
+struct Social: Codable {
+    var label: String
+    var url: String
+}
+
+struct URLData: Codable  {
+    var label: String
+    var url: String
+}
+
+private func mapToContactData(from array: [Any]) -> ContactData {
+    let profileId = array[0] as? String
+    let webCardId = array[1] as? String
+    let firstName = array[2] as? String
+    let lastName = array[3] as? String
+    let company = array[4] as? String
+    let title = array[5] as? String
+    let phoneNumbers = array[6] as? [[String]]
+    let emails = array[7] as? [[String]]
+    let addresses = array[8] as? [[String]]
+    let birthday = array[9] as? String
+
+    return ContactData(
+        profileId: profileId,
+        webCardId: webCardId,
+        firstName: firstName,
+        lastName: lastName,
+        company: company,
+        title: title,
+        emails: emails,
+        phoneNumbers: phoneNumbers,
+        addresses: addresses,
+        birthday: birthday
+    )
+}
+
+func verifySign(signature: String, data: String, salt: String, completion: @escaping (Result<[String: Any], Error>) -> Void) {
+    guard let baseUrl = ProcessInfo.processInfo.environment["BASE_URL"] else {
+      print("Base url not defined")
+      return
+    }
+
+    
+    guard let url = URL(string: "\(baseUrl)api/verifySign") else {
+        print("Invalid URL")
+        return
+    }
+
+    var request = URLRequest(url: url)
+    request.httpMethod = "POST"
+    request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+    request.setValue("application/json", forHTTPHeaderField: "Accept")
+        
+    let json: [String: String] = ["signature": signature, "data": data, "salt": salt]
+        do {
+            let jsonData = try JSONSerialization.data(withJSONObject: json, options: [])
+            request.httpBody = jsonData
+             if let jsonString = String(data: jsonData, encoding: .utf8) {
+        }
+        } catch {
+            print("Failed to serialize JSON: \(error.localizedDescription)")
+            return
+        }
+   
+
+    URLSession.shared.dataTask(with: request) { data, response, error in
+        if let error = error {
+            completion(.failure(error))
+            return
+        }
+
+        guard let data = data else {
+        
+            completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data received"])))
+            return
+        }
+
+        do {
+            if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                completion(.success(json))
+            } else {
+                print("Failed to parse JSON response")
+                completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to parse JSON response"])))
+            }
+        } catch {
+            print("Failed to parse JSON: \(error.localizedDescription)")
+            completion(.failure(error))
+        }
+    }.resume()
+    }

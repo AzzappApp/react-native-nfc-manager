@@ -1,6 +1,5 @@
 import { useCallback, useEffect } from 'react';
-import { useIntl } from 'react-intl';
-import { Alert, Linking } from 'react-native';
+import { Linking } from 'react-native';
 import { MMKV } from 'react-native-mmkv';
 import { useRouter } from '#components/NativeRouter';
 import { matchUrlWithRoute } from '#helpers/deeplinkHelpers';
@@ -15,25 +14,9 @@ const ROUTE_KEY = '@azzapp/route';
 
 export const useDeepLink = (router: NativeRouter | null) => {
   const { authenticated } = useAuthState();
-  const intl = useIntl();
-  const deeplinkHandler = useCallback(
+  const deepLinkHandler = useCallback(
     async (url: string) => {
-      const route = await matchUrlWithRoute(url, (route: string) => {
-        if (route === 'emailSignature') {
-          Alert.alert(
-            intl.formatMessage({
-              defaultMessage: 'Email Signature',
-              description: 'Email Signature alert title when opening on mobile',
-            }),
-            intl.formatMessage({
-              defaultMessage:
-                'Please open this link on a desktop to configure your email signature.',
-              description:
-                'Email Signature alert message when opening on mobile',
-            }),
-          );
-        }
-      });
+      const route = await matchUrlWithRoute(url);
       if (route) {
         if (authenticated) {
           router?.push(route);
@@ -42,12 +25,12 @@ export const useDeepLink = (router: NativeRouter | null) => {
         }
       }
     },
-    [authenticated, intl, router],
+    [authenticated, router],
   );
 
   useEffect(() => {
     const listener = Linking.addEventListener('url', ({ url }) => {
-      deeplinkHandler(url).catch(err => {
+      deepLinkHandler(url).catch(err => {
         console.error(err);
       });
       return () => {
@@ -56,13 +39,13 @@ export const useDeepLink = (router: NativeRouter | null) => {
     });
 
     return listener.remove;
-  }, [deeplinkHandler]);
+  }, [deepLinkHandler]);
 
   useEffect(() => {
     Linking.getInitialURL()
       .then(url => {
         if (url) {
-          deeplinkHandler(url).catch(err => {
+          deepLinkHandler(url).catch(err => {
             console.error(err);
           });
         }
@@ -70,7 +53,7 @@ export const useDeepLink = (router: NativeRouter | null) => {
       .catch(err => {
         console.error(err);
       });
-  }, [deeplinkHandler]);
+  }, [deepLinkHandler]);
 };
 
 export const useDeepLinkStoredRoute = () => {

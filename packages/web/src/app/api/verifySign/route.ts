@@ -2,8 +2,7 @@ import { SignJWT } from 'jose';
 
 import { NextResponse } from 'next/server';
 import { withAxiom } from 'next-axiom';
-import { getProfileById, getWebCardById } from '@azzapp/data';
-import { createId } from '@azzapp/data/helpers/createId';
+import { getProfileById, getWebCardById, createId } from '@azzapp/data';
 import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
 import { verifyHmacWithPassword } from '@azzapp/shared/crypto';
 import ERRORS from '@azzapp/shared/errors';
@@ -13,12 +12,8 @@ import cors from '#helpers/cors';
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
 const verifySignApi = async (req: Request) => {
-  const { signature, data, salt } =
-    ((await req.json()) as {
-      signature?: string;
-      data?: string;
-      salt?: string;
-    }) || {};
+  const request = await req.json();
+  const { signature, data, salt } = request;
 
   if (!signature || !data || !salt) {
     return new Response('Invalid request', { status: 400 });
@@ -51,7 +46,7 @@ const verifySignApi = async (req: Request) => {
       .setIssuer('azzapp')
       .setSubject('contact-card')
       .setIssuedAt()
-      .setExpirationTime('10m')
+      .setExpirationTime('20m')
       .setProtectedHeader({ alg: 'HS256' })
       .sign(new TextEncoder().encode(JWT_SECRET));
 
@@ -79,5 +74,3 @@ const verifySignApi = async (req: Request) => {
 };
 
 export const { POST, OPTIONS } = cors({ POST: withAxiom(verifySignApi) });
-
-export const runtime = 'edge';

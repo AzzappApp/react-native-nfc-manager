@@ -8,7 +8,7 @@ const Xcode = require('pbxproj-dom/xcode').Xcode;
 const plist = require('plist');
 const RNVersion = require('react-native-version');
 
-module.exports = function setWorkspaceVersions(version) {
+module.exports = function setWorkspaceVersions(version, androidVersionCode) {
   if (!version || !version.match(/^\d+\.\d+\.\d+(-[a-z]+\.\d+)?$/)) {
     console.error('Please provide a valid version number');
     process.exit(1);
@@ -30,7 +30,7 @@ module.exports = function setWorkspaceVersions(version) {
   });
 
   execSync(
-    `yarn react-native-version -A -r --generate-build --skip-tag packages/app`,
+    `yarn react-native-version -A -r --generate-build --skip-tag packages/app --set-build ${androidVersionCode}`,
   );
 
   let bundleVersion = 1;

@@ -10,66 +10,33 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+env:
+  VERCEL_ORG_ID: 'team_nigXfZEKLJrpoK0ZHytix9jX'
+  TURBO_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+  TURBO_TEAM: 'azzapp'
+  PHRASE_ACCESS_TOKEN: ${{ secrets.PHRASE_ACCESS_TOKEN }}
+  PAYMENT_API_URL: ${{ vars.PAYMENT_API_URL }}
 jobs:
-  build-and-deploy:
+  test-and-update-app:
     environment: ${{(github.ref_name == 'stable' && 'Production') || (github.ref_name == 'staging' && 'Staging') || 'Development' }}
-    name: Build and Deploy Azzapp application
-    runs-on: macos-latest-xlarge
-    env:
-      VERCEL_ORG_ID: "team_nigXfZEKLJrpoK0ZHytix9jX"
-      TURBO_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-      TURBO_TEAM: "azzapp"
-      PHRASE_ACCESS_TOKEN: ${{ secrets.PHRASE_ACCESS_TOKEN }}
-      PAYMENT_API_URL: ${{ vars.PAYMENT_API_URL }}
+    name: Build, Test and update Azzapp application version, translations and persisted queries
+    runs-on: ubuntu-latest
     steps:
-      ############################################
-      #
-      # Setup
-      #
-      ############################################
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
           token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
-      - name: Enable Corepack
-        run: corepack enable
-      - uses: actions/setup-node@v3
-        with:
-          node-version: "20"
 
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
+      - name: Setup
+        uses: ./.github/actions/setup
 
-      - name: Cache yarn
-        uses: actions/cache@v3
-        id: yarn-cache
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-
-      - name: Install Vercel CLI
-        run: npm i -g vercel@latest
-
-      - name: Install dependencies
-        run: yarn install --immutable
-
-      ############################################
-      #
-      # Translations management
-      #
-      ############################################
       - name: Pull translations
-        run: yarn i18n:pull
-        env:
-          DATABASE_HOST: ${{ vars.DATABASE_HOST }}
-          DATABASE_USERNAME: ${{ vars.DATABASE_USERNAME }}
-          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
-
-      - name: Extract translations keys
-        run: yarn i18n:extract
+        uses: ./.github/actions/i18n-pull
+        with:
+          database-host: ${{ vars.DATABASE_HOST }}
+          database-username: ${{ vars.DATABASE_USERNAME }}
+          database-password: ${{ secrets.DATABASE_PASSWORD }}
 
       - name: Purge translations key that are not used
         run: yarn i18n:purge
@@ -77,12 +44,6 @@ jobs:
           DATABASE_HOST: ${{ vars.DATABASE_HOST }}
           DATABASE_USERNAME: ${{ vars.DATABASE_USERNAME }}
           DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
-
-      ############################################
-      #
-      # JavaScript build and tests
-      #
-      ############################################
 
       - name: JavaScript build
         run: yarn build-app-dependencies
@@ -96,11 +57,6 @@ jobs:
       - name: Test
         run: yarn test
 
-      ############################################
-      #
-      # Bump version
-      #
-      ############################################
       - name: Bump version
         run: |
           NEXT_VERSION=""
@@ -117,11 +73,6 @@ jobs:
         env:
           github_token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
 
-      ############################################
-      #
-      # Precompiled Queries merging
-      #
-      ############################################
       - name: Force rebuild the query-map.json
         run: yarn relay:build --repersist
         if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/stable'
@@ -134,11 +85,6 @@ jobs:
         env:
           LAST_SUPPORTED_APP_VERSION: ${{ vars.LAST_SUPPORTED_APP_VERSION }}
 
-      ############################################
-      #
-      # Commit changes
-      #
-      ############################################
       - name: Git config
         run: |
           git config user.name "Azzapp Dev Bot"
@@ -148,103 +94,32 @@ jobs:
           git add .
           git commit -m "chore: bump version [skip ci]"
           git push origin $GITHUB_REF_NAME
-          yarn install --immutable
 
-      ############################################
-      #
-      # PlanetScale schema migration
-      #
-      ############################################
-      - name: PlanetScale - Check if migration is needed
-        id: planetscale_migration_needed
-        working-directory: packages/data
-        env:
-          DATABASE_HOST: ${{ vars.DATABASE_HOST }}
-          DATABASE_USERNAME: ${{ vars.DATABASE_USERNAME }}
-          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
-        run: |
-          yarn introspect
-          yarn generate-migration
-          HAS_CHANGE="false"
-          if compgen -G "drizzle/0001*" > /dev/null; then
-              cat $(compgen -G "drizzle/0001*")
-              HAS_CHANGE="true"
-          fi
-          echo "has_change=$HAS_CHANGE" >> $GITHUB_OUTPUT
+  deploy-to-vercel:
+    environment: ${{(github.ref_name == 'stable' && 'Production') || (github.ref_name == 'staging' && 'Staging') || 'Development' }}
+    name: Deploy Azzapp web services to Vercel
+    runs-on: ubuntu-latest
+    needs: test-and-update-app
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
 
-      - name: PlanetScale - Extract branch name
-        if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
-        run: echo "branch=$(echo ci-${GITHUB_SHA})" >> $GITHUB_OUTPUT
-        id: extract_branch
+      - name: Setup
+        uses: ./.github/actions/setup
 
-      - name: PlanetScale - Create a branch
-        if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
-        uses: planetscale/create-branch-action@v1
-        id: create_branch
+      - name: Pull translations
+        uses: ./.github/actions/i18n-pull
         with:
-          org_name: azzapp
-          database_name: azzapp
-          branch_name: ${{ steps.extract_branch.outputs.branch }}
-          from: ${{ github.ref_name }}
-          wait: true
-        env:
-          PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
-          PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
+          database-host: ${{ vars.DATABASE_HOST }}
+          database-username: ${{ vars.DATABASE_USERNAME }}
+          database-password: ${{ secrets.DATABASE_PASSWORD }}
 
-      - name: PlanetScale - Create a password
-        if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
-        uses: planetscale/create-branch-password-action@v1
-        id: create_password
-        with:
-          org_name: azzapp
-          database_name: azzapp
-          branch_name: ${{ steps.extract_branch.outputs.branch }}
-          name: "pass-${{ steps.extract_branch.outputs.branch }}"
-        env:
-          PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
-          PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
+      - name: Install Vercel CLI
+        run: npm i -g vercel@latest
 
-      - name: PlanetScale - Apply drizzle changes
-        if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
-        working-directory: packages/data
-        run: |
-          export DATABASE_HOST=steps.create_password.outputs.hostname
-          export DATABASE_PASSWORD=steps.create_password.outputs.password
-          export DATABASE_USERNAME=steps.create_password.outputs.username
-          yarn push-migration
-
-      - name: PlanetScale - Create a deploy request
-        if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
-        uses: planetscale/create-deploy-request-action@v1
-        id: create_deploy_request
-        with:
-          org_name: azzapp
-          database_name: azzapp
-          branch_name: ${{ steps.extract_branch.outputs.branch }}
-        env:
-          PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
-          PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
-
-      - name: PlanetScale - Deploy the changes
-        if: ${{ steps.planetscale_migration_needed.outputs.has_change == 'true'}}
-        uses: planetscale/deploy-deploy-request-action@v1
-        with:
-          org_name: azzapp
-          database_name: azzapp
-          number: ${{ steps.create_deploy_request.outputs.number }}
-          wait: true
-        env:
-          PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
-          PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
-
-      ############################################
-      #
-      # Deploy the web app to Vercel
-      #
-      ############################################
       - name: Azzapp Web - Pull Vercel configuration
         env:
-          VERCEL_PROJECT_ID: "azzapp"
+          VERCEL_PROJECT_ID: 'azzapp'
         run: |
           ENVIRONMENT="preview"
           ADDITIONAL_ARGS=""
@@ -258,7 +133,7 @@ jobs:
 
       - name: Azzapp Web - Vercel deployment
         env:
-          VERCEL_PROJECT_ID: "azzapp"
+          VERCEL_PROJECT_ID: 'azzapp'
         run: |
           ADDITIONAL_ARGS=""
           GITHUB_REF="${{ github.ref }}"
@@ -267,17 +142,9 @@ jobs:
           fi
           vercel deploy --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }} $ADDITIONAL_ARGS
 
-      ############################################
-      #
-      # Deploy the backoffice to Vercel
-      #
-      ############################################
-
-      # Vercel already installed in web app deployment
-
       - name: Azzapp Backoffice - Pull Vercel configuration
         env:
-          VERCEL_PROJECT_ID: "azzapp-backoffice"
+          VERCEL_PROJECT_ID: 'azzapp-backoffice'
         run: |
           ENVIRONMENT="preview"
           ADDITIONAL_ARGS=""
@@ -291,7 +158,7 @@ jobs:
 
       - name: Azzapp Backoffice - Vercel deployment
         env:
-          VERCEL_PROJECT_ID: "azzapp-backoffice"
+          VERCEL_PROJECT_ID: 'azzapp-backoffice'
         run: |
           ADDITIONAL_ARGS=""
           GITHUB_REF="${{ github.ref }}"
@@ -300,12 +167,29 @@ jobs:
           fi
           rm -fr ./packages/web/.next
           vercel deploy --token=${{ secrets.VERCEL_TOKEN }} --meta githubCommitRef=${{ github.ref_name }} $ADDITIONAL_ARGS
+  buid-ios:
+    environment: ${{(github.ref_name == 'stable' && 'Production') || (github.ref_name == 'staging' && 'Staging') || 'Development' }}
+    name: Build native iOS application
+    runs-on: macos-latest-xlarge
+    needs:
+      - test-and-update-app
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
 
-      ############################################
-      #
-      # IOS Application build
-      #
-      ############################################
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Pull translations
+        uses: ./.github/actions/i18n-pull
+        with:
+          database-host: ${{ vars.DATABASE_HOST }}
+          database-username: ${{ vars.DATABASE_USERNAME }}
+          database-password: ${{ secrets.DATABASE_PASSWORD }}
+
+      - name: JavaScript build
+        run: yarn build-app-dependencies
+
       - uses: ruby/setup-ruby@v1
         with:
           working-directory: packages/app
@@ -337,14 +221,17 @@ jobs:
           PURCHASE_IOS_KEY: ${{ vars.PURCHASE_IOS_KEY }}
           PURCHASE_ANDROID_KEY: ${{ vars.PURCHASE_ANDROID_KEY }}
           APP_WEBSHARED_CREDENTIALS: ${{ vars.APP_WEBSHARED_CREDENTIALS }}
-          SENTRY_DSN: "https://13a33b3788344ceea14cf298a220fead@o4505353883680768.ingest.sentry.io/4505358469038080"
+          SENTRY_DSN: 'https://13a33b3788344ceea14cf298a220fead@o4505353883680768.ingest.sentry.io/4505358469038080'
           TERMS_OF_SERVICE: https://web.azzapp.com/legal/terms-of-service
           PRIVACY_POLICY: https://web.azzapp.com/legal/privacy
           ABOUT: https://web.azzapp.com/company/about_us
           FAQ: https://web.azzapp.com/company/faq
           IOS_APP_IDENTIFIER: ${{ vars.IOS_APP_IDENTIFIER }}
+          IOS_APPCLIP_IDENTIFIER: ${{ vars.IOS_APPCLIP_IDENTIFIER }}
           IOS_SCHEME: ${{ vars.IOS_SCHEME }}
           IOS_PROFILE_ID: ${{ vars.IOS_PROFILE_ID }}
+          IOS_PROFILECLIP_ID: ${{ vars.IOS_PROFILECLIP_ID }}
+          IOS_APPCLIP_SCHEME: ${{ vars.IOS_APPCLIP_SCHEME }}
           IOS_CODE_SIGNING_IDENTITY: ${{ vars.IOS_CODE_SIGNING_IDENTITY }}
           IOS_EXPORT_METHOD: ${{ vars.IOS_EXPORT_METHOD }}
           IOS_CERTIFICATE_P12_PASSWORD: ${{ secrets.IOS_CERTIFICATE_P12_PASSWORD }}
@@ -373,30 +260,105 @@ jobs:
           IOS_EXPORT_METHOD: ${{ vars.IOS_EXPORT_METHOD }}
           IOS_CERTIFICATE_P12_PASSWORD: ${{ secrets.IOS_CERTIFICATE_P12_PASSWORD }}
           APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
+  buid-android:
+    environment: ${{(github.ref_name == 'stable' && 'Production') || (github.ref_name == 'staging' && 'Staging') || 'Development' }}
+    name: Build native Android application
+    runs-on: ubuntu-latest
+    env:
+      RUBYOPT: -rostruct
+    needs:
+      - test-and-update-app
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
 
-      ############################################
-      #
-      # EAS Android application Build
-      #
-      ############################################
-      - name: Prepare Working Directory for EAS
-        working-directory: ./packages/i18n
-        run: rm .gitignore
+      - name: Setup
+        uses: ./.github/actions/setup
 
-      - name: Setup Expo and EAS
-        uses: expo/expo-github-action@v8
+      - name: Pull translations
+        uses: ./.github/actions/i18n-pull
         with:
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
+          database-host: ${{ vars.DATABASE_HOST }}
+          database-username: ${{ vars.DATABASE_USERNAME }}
+          database-password: ${{ secrets.DATABASE_PASSWORD }}
 
-      - name: Build on EAS
-        working-directory: ./packages/app
+      - name: JavaScript build
+        run: yarn build-app-dependencies
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '2.7.6' #hot fix for android fastlane ubuntu
+          working-directory: packages/app
+          bundler-cache: true
+
+      - name: force Install fastlane
         run: |
-          PROFILE="development"
-          GITHUB_REF="${{ github.ref }}"
-          if [ "$GITHUB_REF" == "refs/heads/stable" ]; then
-            PROFILE="production"
-          elif [ "$GITHUB_REF" == "refs/heads/staging" ]; then
-            PROFILE="staging"
-          fi
-          eas build --platform android --profile $PROFILE --non-interactive --no-wait
+          cd packages/app && bundle install --jobs 4 --retry 3
+
+      - name: Configure Keystore
+        run: |
+          echo "$ANDROID_KEYSTORE_FILE" > keystore.jks.b64
+          base64 -d -i keystore.jks.b64 > keystore.jks
+          echo "storeFile=keystore.jks" >> keystore.properties
+          echo "keyAlias=$KEYSTORE_KEY_ALIAS" >> keystore.properties
+          echo "storePassword=$KEYSTORE_STORE_PASSWORD" >> keystore.properties
+          echo "keyPassword=$KEYSTORE_KEY_PASSWORD" >> keystore.properties
+        env:
+          ANDROID_KEYSTORE_FILE: ${{ secrets.ANDROID_KEYSTORE_FILE }}
+          KEYSTORE_KEY_ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS }}
+          KEYSTORE_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
+          KEYSTORE_STORE_PASSWORD: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
+
+      - name: Create Google Play Config file
+        run: |
+          echo "$PLAYSTORE_SERVICE_SECRET" > play_config.json.b64
+          base64 -d -i play_config.json.b64 > ${{ github.workspace }}/play_config.json
+        env:
+          PLAYSTORE_SERVICE_SECRET: ${{ secrets.PLAYSTORE_SERVICE_SECRET }}
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu' 
+          java-version: '17'
+
+      - name: Build android application
+        run: yarn build:android
+        working-directory: packages/app
+        env:
+          NEXT_PUBLIC_URL: ${{ vars.NEXT_PUBLIC_URL }}
+          NEXT_PUBLIC_API_ENDPOINT: ${{ vars.NEXT_PUBLIC_API_ENDPOINT }}
+          DEPLOYMENT_ENVIRONMENT: ${{ vars.NEXT_PUBLIC_PLATFORM }}
+          PURCHASE_ANDROID_KEY: ${{ vars.PURCHASE_ANDROID_KEY }}
+          APP_WEBSHARED_CREDENTIALS: ${{ vars.APP_WEBSHARED_CREDENTIALS }}
+          SENTRY_DSN: 'https://13a33b3788344ceea14cf298a220fead@o4505353883680768.ingest.sentry.io/4505358469038080'
+          TERMS_OF_SERVICE: https://web.azzapp.com/legal/terms-of-service
+          PRIVACY_POLICY: https://web.azzapp.com/legal/privacy
+          ABOUT: https://web.azzapp.com/company/about_us
+          FAQ: https://web.azzapp.com/company/faq
+          ANDROID_APP_IDENTIFIER: ${{ vars.ANDROID_APP_IDENTIFIER }}
+          ANDROID_BUILD_TASK: ${{ vars.ANDROID_BUILD_TASK }}
+          ANDROID_KEYSTORE_PATH: ${{ github.workspace }}/keystore.jks
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
+          PLAY_CONFIG_PATH: ${{ github.workspace }}/play_config.json
+
+      - name: Upload android artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-${{ vars.ANDROID_BUILD_TASK }}-release.aab
+          path: ${{ github.workspace }}/packages/app/android/app/build/outputs/bundle/${{ vars.ANDROID_BUILD_TASK }}Release/app-${{ vars.ANDROID_BUILD_TASK }}-release.aab
+
+      - name: Deploy android application
+        run: bundle exec fastlane android deploy
+        working-directory: packages/app
+        env:
+          DEPLOYMENT_ENVIRONMENT: ${{ vars.NEXT_PUBLIC_PLATFORM }}
+          ANDROID_APP_IDENTIFIER: ${{ vars.ANDROID_APP_IDENTIFIER }}
+          ANDROID_BUILD_TASK: ${{ vars.ANDROID_BUILD_TASK }}
+          ANDROID_KEYSTORE_PATH: ${{ github.workspace }}/keystore.jks
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          PLAY_CONFIG_PATH: ${{ github.workspace }}/play_config.json
+          AAB_PATH: ${{ github.workspace }}/packages/app/android/app/build/outputs/bundle/${{ vars.ANDROID_BUILD_TASK }}Release/app-${{ vars.ANDROID_BUILD_TASK }}-release.aab

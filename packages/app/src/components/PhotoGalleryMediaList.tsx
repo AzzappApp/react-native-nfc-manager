@@ -2,47 +2,37 @@ import {
   CameraRoll,
   progressUpdateEventEmitter,
 } from '@react-native-camera-roll/camera-roll';
-import { FlashList } from '@shopify/flash-list';
-import { Image } from 'expo-image';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
   AppState,
   Platform,
   View,
+  unstable_batchedUpdates,
   useWindowDimensions,
-  StyleSheet,
 } from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import { openPhotoPicker, openSettings } from 'react-native-permissions';
-import Toast from 'react-native-toast-message';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import {
-  formatVideoTime,
-  getImageSize,
-  getVideoSize,
-} from '#helpers/mediaHelpers';
+import { getImageSize, getVideoSize } from '#helpers/mediaHelpers';
 import { usePermissionContext } from '#helpers/PermissionContext';
 import useToggle from '#hooks/useToggle';
-import ActivityIndicator from '#ui/ActivityIndicator';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
-import PressableNative from '#ui/PressableNative';
+import Container from '#ui/Container';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
+import MediaGridList from './MediaGridList';
 import type { Media } from '#helpers/mediaHelpers';
 import type {
   Album,
   PhotoIdentifier,
 } from '@react-native-camera-roll/camera-roll';
+import type { ContentStyle } from '@shopify/flash-list';
+import type { ViewProps } from 'react-native';
 
-import type { FlashListProps, ListRenderItemInfo } from '@shopify/flash-list';
-
-type PhotoGalleryMediaListProps = Omit<
-  FlashListProps<PhotoIdentifier>,
-  'children' | 'data' | 'onEndReached' | 'renderItem'
-> & {
+type PhotoGalleryMediaListProps = Omit<ViewProps, 'children'> & {
   /**
    * The ID of the media that is currently selected.
    * this id is the uri of the media as in camera roll (phassets on ios).
@@ -61,6 +51,8 @@ type PhotoGalleryMediaListProps = Omit<
    * Allows the list to be filtered by album.
    */
   album: Album | null;
+
+  numColumns?: number;
   /**
    * Called when the user selects a media.
    * @param media The media that was selected.
@@ -68,8 +60,7 @@ type PhotoGalleryMediaListProps = Omit<
   onMediaSelected: (media: Media) => void;
   /**autoSelectFirstItem */
   autoSelectFirstItem?: boolean;
-
-  disableVideoSelection?: boolean | null;
+  contentContainerStyle?: ContentStyle;
 };
 
 /**
@@ -85,27 +76,30 @@ const PhotoGalleryMediaList = ({
   autoSelectFirstItem = true,
   numColumns = 4,
   contentContainerStyle,
-  disableVideoSelection = null,
   ...props
 }: PhotoGalleryMediaListProps) => {
-  const scrollViewRef = useRef<FlashList<PhotoIdentifier>>(null);
   const styles = useStyleSheet(styleSheet);
   const [medias, setMedias] = useState<PhotoIdentifier[]>([]);
   const [hasNext, setHasNext] = useState(true);
-  const nextCursor = useRef<string | undefined>();
+  const lastPhotoTimestamp = useRef<number | undefined>(undefined);
+
   const { mediaPermission } = usePermissionContext();
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const mediaLength = useRef(0);
 
   const load = useCallback(
     async (refreshing = false, updatePictures = false) => {
-      setIsLoadingMore(true);
+      unstable_batchedUpdates(() => {
+        setIsLoadingMore(true);
+        setIsRefreshing(refreshing);
+      });
 
       try {
         const result = await CameraRoll.getPhotos({
           first: updatePictures ? mediaLength.current || 48 : 48, //multiple of items per row
-          after: refreshing ? undefined : nextCursor.current,
+          toTime: refreshing ? undefined : lastPhotoTimestamp.current,
           assetType:
             kind === 'mixed' ? 'All' : kind === 'image' ? 'Photos' : 'Videos',
           groupTypes: album?.type,
@@ -114,12 +108,8 @@ const PhotoGalleryMediaList = ({
         });
 
         const hasNextPage = result.page_info.has_next_page;
-        const endCursor = result.page_info.end_cursor;
         const assets = result.edges;
-
-        if (refreshing) {
-          scrollViewRef.current?.scrollToIndex({ index: 0 });
-        }
+        const endTimestamp = assets[assets.length - 1]?.node.timestamp;
 
         setMedias(previous => {
           const result = refreshing ? assets : [...previous, ...assets];
@@ -127,23 +117,28 @@ const PhotoGalleryMediaList = ({
           return result;
         });
 
-        nextCursor.current = endCursor;
+        if (endTimestamp) {
+          lastPhotoTimestamp.current = Math.round(endTimestamp * 1000) - 1;
+        }
         setHasNext(hasNextPage);
       } catch (e) {
         console.log(e);
         return;
       } finally {
-        setIsLoadingMore(false);
+        unstable_batchedUpdates(() => {
+          setIsLoadingMore(false);
+          setIsRefreshing(false);
+        });
       }
     },
-    [album?.title, album?.type, kind],
+    [album?.title, album?.type, kind, lastPhotoTimestamp],
   );
 
   useEffect(() => {
     void load(true);
   }, [load]);
 
-  const [downloadingFiles, setDownloadingFiles] = useState<string[]>([]);
+  const [filesDownloading, setFilesDownloading] = useState<string[]>([]);
 
   useEffect(() => {
     const subscription = progressUpdateEventEmitter.addListener(
@@ -153,13 +148,13 @@ const PhotoGalleryMediaList = ({
         // downloaded using event.id and event.progress
 
         if (event.progress === 1) {
-          setDownloadingFiles(previous =>
+          setFilesDownloading(previous =>
             previous.includes(event.id)
               ? previous.filter(id => id !== event.id)
               : previous,
           );
         } else {
-          setDownloadingFiles(previous => {
+          setFilesDownloading(previous => {
             if (!previous.includes(event.id)) {
               return [...previous, event.id];
             }
@@ -183,7 +178,7 @@ const PhotoGalleryMediaList = ({
 
       if (Platform.OS === 'ios') {
         if (asset.node.sourceType === 'CloudShared') {
-          setDownloadingFiles(previous => {
+          setFilesDownloading(previous => {
             if (!previous.includes(asset.node.id)) {
               return [...previous, asset.node.id];
             }
@@ -209,33 +204,19 @@ const PhotoGalleryMediaList = ({
       }
       let { width, height, orientation: rotation } = asset.node.image;
       if (asset.node.type.includes('video')) {
-        if (
-          disableVideoSelection &&
-          !selectedMediasIds?.includes(asset.node.image.uri)
-        ) {
-          Toast.show({
-            type: 'error',
-            text1: intl.formatMessage({
-              defaultMessage: 'Maximum number of videos reached',
-              description: 'Error message when trying to add more videos',
-            }),
-            visibilityTime: 2000,
-          });
-        } else {
-          if (width == null || height == null || rotation == null) {
-            ({ width, height, rotation } = await getVideoSize(uri));
-          }
-
-          onMediaSelected({
-            galleryUri: asset.node.image.uri,
-            kind: 'video',
-            uri,
-            width,
-            height,
-            rotation,
-            duration: asset.node.image.playableDuration,
-          });
+        if (width == null || height == null || rotation == null) {
+          ({ width, height, rotation } = await getVideoSize(uri));
         }
+
+        onMediaSelected({
+          galleryUri: asset.node.image.uri,
+          kind: 'video',
+          uri,
+          width,
+          height,
+          rotation,
+          duration: asset.node.image.playableDuration,
+        });
       } else {
         if (width == null || height == null) {
           ({ width, height } = await getImageSize(uri));
@@ -249,7 +230,7 @@ const PhotoGalleryMediaList = ({
         });
       }
     },
-    [disableVideoSelection, intl, onMediaSelected, selectedMediasIds],
+    [onMediaSelected],
   );
 
   const onEndReached = useCallback(() => {
@@ -257,33 +238,6 @@ const PhotoGalleryMediaList = ({
       void load();
     }
   }, [hasNext, isLoadingMore, load]);
-
-  const itemHeight =
-    (useWindowDimensions().width - (numColumns - 1 * SEPARATOR_WIDTH)) /
-    numColumns;
-
-  const renderItem = useCallback(
-    ({ item }: ListRenderItemInfo<PhotoIdentifier>) => (
-      <MemoPhotoGalleyMediaItem
-        item={item}
-        selected={
-          selectedMediaId === item.node.image.uri ||
-          (selectedMediasIds?.includes(item.node.image.uri ?? '') ?? false)
-        }
-        isLoading={downloadingFiles.includes(item.node.image.uri)}
-        height={itemHeight}
-        onMediaPress={onMediaPress}
-      />
-    ),
-
-    [
-      selectedMediaId,
-      selectedMediasIds,
-      downloadingFiles,
-      itemHeight,
-      onMediaPress,
-    ],
-  );
 
   //should select the first media when the list if no media is selected
   useEffect(() => {
@@ -307,26 +261,20 @@ const PhotoGalleryMediaList = ({
     };
   }, [load]);
 
-  const extraData = useMemo(
-    () => ({ selectedMediasIds, selectedMediaId, downloadingFiles }),
-    [selectedMediasIds, selectedMediaId, downloadingFiles],
-  );
-
   const [manageAccessMediaVisible, toggleManageAccessMediaVisible] =
     useToggle(false);
 
-  const ListFooterComponent = useMemo(
-    () =>
-      isLoadingMore ? (
-        <View style={styles.loadingMore}>
-          <ActivityIndicator />
-        </View>
-      ) : null,
-    [isLoadingMore, styles.loadingMore],
-  );
+  const selectedMediaIdsInner = useMemo(() => {
+    if (selectedMediasIds) {
+      return selectedMediasIds;
+    }
+    return selectedMediaId ? [selectedMediaId] : [];
+  }, [selectedMediaId, selectedMediasIds]);
+
+  const { width: windowWidth } = useWindowDimensions();
 
   return (
-    <View style={styles.container}>
+    <Container style={styles.container}>
       {Platform.OS === 'ios' && mediaPermission === 'limited' && (
         <View style={{ flexDirection: 'row' }}>
           <Text
@@ -352,23 +300,21 @@ const PhotoGalleryMediaList = ({
           />
         </View>
       )}
-      <FlashList
-        ref={scrollViewRef}
+      <MediaGridList
+        medias={medias}
+        selectedMediaIds={selectedMediaIdsInner}
+        filesDownloading={filesDownloading}
+        refreshing={isRefreshing}
+        isLoadingMore={isLoadingMore}
         numColumns={numColumns}
-        data={medias}
-        showsVerticalScrollIndicator={false}
-        keyExtractor={keyExtractor}
-        renderItem={renderItem}
-        onEndReachedThreshold={medias.length <= 16 ? 0.1 : 0.5}
-        drawDistance={1200} //this value will need tweaking with android low end device
-        onEndReached={onEndReached}
-        accessibilityRole="list"
+        width={windowWidth}
         contentContainerStyle={contentContainerStyle}
-        ItemSeparatorComponent={ItemSeparatorComponent}
-        estimatedItemSize={itemHeight}
-        extraData={extraData}
+        getItemId={getPhotoUri}
+        getItemUri={getPhotoUri}
+        getItemDuration={getPhotoDuration}
+        onSelect={onMediaPress}
+        onEndReached={onEndReached}
         testID="photo-gallery-list"
-        ListFooterComponent={ListFooterComponent}
         {...props}
       />
       <BottomSheetModal
@@ -420,97 +366,23 @@ const PhotoGalleryMediaList = ({
           </PressableOpacity>
         </View>
       </BottomSheetModal>
-    </View>
+    </Container>
   );
 };
 
-const keyExtractor = (item: PhotoIdentifier) => item.node.id;
+const getPhotoUri = (item: PhotoIdentifier) => item.node.image.uri;
 
-// This list can be a litle laggy (due to the library we use for image at the moment).
-// Using the RN preconisation for this list to try to improve a bit
-type PhotoGalleyMediaItemProps = {
-  item: PhotoIdentifier;
-  height: number;
-  selected: boolean;
-  onMediaPress: (media: PhotoIdentifier) => void;
-  isLoading: boolean;
-  disabled?: boolean;
-};
-
-const PhotoGalleyMediaItem = ({
-  item,
-  selected,
-  height,
-  onMediaPress,
-  isLoading,
-  disabled,
-}: PhotoGalleyMediaItemProps) => {
-  const intl = useIntl();
-  const styles = useStyleSheet(styleSheet);
-
-  const onPress = useCallback(() => {
-    onMediaPress(item);
-  }, [item, onMediaPress]);
-
-  return (
-    <PressableNative
-      style={{
-        aspectRatio: 1,
-        height,
-        position: 'relative',
-      }}
-      accessibilityRole="button"
-      accessibilityHint={intl.formatMessage({
-        defaultMessage: 'tap to select this media',
-        description:
-          'accessibility hint for media selection buttons in photo gallery',
-      })}
-      onPress={onPress}
-      activeOpacity={0.7}
-      disabled={disabled}
-    >
-      <Image
-        accessibilityRole="image"
-        accessibilityIgnoresInvertColors={true}
-        style={[
-          {
-            width: height,
-            height,
-          },
-          selected && {
-            opacity: 0.5,
-          },
-        ]}
-        source={{ uri: item.node.image.uri, width: height, height }}
-        recyclingKey={item.node.id}
-      />
-      {isLoading && (
-        <View style={styles.loader}>
-          <ActivityIndicator color="white" />
-        </View>
-      )}
-      {item.node.type.includes('video') && (
-        <Text variant="button" style={styles.textDuration}>
-          {formatVideoTime(item.node.image.playableDuration)}
-        </Text>
-      )}
-    </PressableNative>
-  );
-};
-
-const ItemSeparatorComponent = () => <View style={separatorStyles.separator} />;
-
-const MemoPhotoGalleyMediaItem = memo(PhotoGalleyMediaItem);
+const getPhotoDuration = (item: PhotoIdentifier) =>
+  item.node.type.includes('video')
+    ? item.node.image.playableDuration
+    : undefined;
 
 export default PhotoGalleryMediaList;
 
 const styleSheet = createStyleSheet(appearance => ({
   container: {
     flex: 1,
-    backgroundColor: appearance === 'light' ? colors.white : colors.black,
   },
-  textDuration: { position: 'absolute', bottom: 10, right: 10, color: 'white' },
-  flatListStyle: { flex: 1 },
   manageAccessMediaText: {
     flex: 1,
     flexWrap: 'wrap',
@@ -520,16 +392,6 @@ const styleSheet = createStyleSheet(appearance => ({
     marginRight: 16,
   },
   buttonManageAccessMedia: { marginVertical: 7, marginRight: 16 },
-  loader: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingMore: { justifyContent: 'center', alignItems: 'center' },
   cancelMarginTop: { marginTop: 30 },
   bottomContainer: {
     flex: 1,
@@ -541,9 +403,3 @@ const styleSheet = createStyleSheet(appearance => ({
     color: appearance === 'light' ? colors.grey400 : colors.grey600,
   },
 }));
-
-const SEPARATOR_WIDTH = 1;
-
-const separatorStyles = StyleSheet.create({
-  separator: { width: SEPARATOR_WIDTH, height: SEPARATOR_WIDTH },
-});

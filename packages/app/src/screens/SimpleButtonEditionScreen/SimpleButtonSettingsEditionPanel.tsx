@@ -11,11 +11,7 @@ import {
   SIMPLE_BUTTON_MAX_LABEL_LENGTH,
   SIMPLE_BUTTON_MIN_FONT_SIZE,
 } from '@azzapp/shared/cardModuleHelpers';
-import {
-  isPhoneNumber,
-  isValidEmail,
-  isValidUrl,
-} from '@azzapp/shared/stringHelpers';
+import { isPhoneNumber, isValidEmail } from '@azzapp/shared/stringHelpers';
 import WebCardColorPicker, {
   WebCardColorDropDownPicker,
 } from '#components/WebCardColorPicker';
@@ -225,15 +221,8 @@ const SimpleButtonSettingsEditionPanel = ({
         }
         break;
       case 'link':
-        if (!isValidUrl(actionLink)) {
-          Toast.show({
-            type: 'error',
-            text1: intl.formatMessage({
-              defaultMessage: 'The url is not valid.',
-              description:
-                'Error toast message when a the url in button editor is not valid.',
-            }),
-          });
+        if (!actionLink.startsWith('http')) {
+          onActionLinkChange(`https://${actionLink}`);
         }
         break;
       default:
@@ -249,7 +238,7 @@ const SimpleButtonSettingsEditionPanel = ({
         }
         break;
     }
-  }, [actionLink, actionType, intl]);
+  }, [actionLink, actionType, intl, onActionLinkChange]);
 
   return (
     <View style={[styles.root, style]} {...props}>

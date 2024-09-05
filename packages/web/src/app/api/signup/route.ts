@@ -5,12 +5,12 @@ import { withAxiom } from 'next-axiom';
 import * as z from 'zod';
 import {
   createUser,
-  db,
-  getProfilesOfUser,
+  getProfilesByUser,
   getUserByEmail,
   getUserByPhoneNumber,
   updateUser,
   createFreeSubscriptionForBetaPeriod,
+  transaction,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import {
@@ -19,10 +19,7 @@ import {
   isInternationalPhoneNumber,
 } from '@azzapp/shared/stringHelpers';
 import { handleSignInAuthMethod } from '#helpers/auth';
-import {
-  findTwilioLocale,
-  twilioVerificationService,
-} from '#helpers/twilioHelpers';
+import { sendTwilioVerificationCode } from '#helpers/twilioHelpers';
 import type { User } from '@azzapp/data';
 
 const SignupSchema = z
@@ -55,8 +52,8 @@ const handleExistingUser = async (user: User, password: string) => {
     // instead of bcrypt.compareSync() to compare passwords. This helps prevent timing attacks.
     if (user?.password && bcrypt.compareSync(password, user.password)) {
       // we can log the user
-      const profiles = await getProfilesOfUser(user.id, 1);
-      return await handleSignInAuthMethod(user, profiles.shift()?.Profile);
+      const profiles = await getProfilesByUser(user.id);
+      return await handleSignInAuthMethod(user, profiles.at(0));
     } else if (!user?.password && user.invited) {
       await updateUser(user.id, {
         password: bcrypt.hashSync(password, 12),
@@ -64,8 +61,8 @@ const handleExistingUser = async (user: User, password: string) => {
         invited: false,
       });
 
-      const profiles = await getProfilesOfUser(user.id, 1);
-      return await handleSignInAuthMethod(user, profiles.shift()?.Profile);
+      const profiles = await getProfilesByUser(user.id);
+      return await handleSignInAuthMethod(user, profiles.at(0));
     }
   } catch (error) {
     return NextResponse.json(
@@ -117,28 +114,23 @@ export const POST = withAxiom(async (req: Request) => {
     }
 
     const userPhoneNumber = phoneNumber ? formatPhoneNumber(phoneNumber) : null;
-    await db.transaction(async trx => {
-      const userId = await createUser(
-        {
-          email: email ?? null,
-          phoneNumber: userPhoneNumber,
-          password: bcrypt.hashSync(password, 12),
-          locale: locale ?? null,
-          roles: null,
-        },
-        trx,
-      );
+    await transaction(async () => {
+      const userId = await createUser({
+        email: email ?? null,
+        phoneNumber: userPhoneNumber,
+        password: bcrypt.hashSync(password, 12),
+        locale: locale ?? null,
+        roles: null,
+      });
 
-      await createFreeSubscriptionForBetaPeriod([userId], trx);
+      await createFreeSubscriptionForBetaPeriod([userId]);
     });
 
     const issuer = (email ?? userPhoneNumber) as string;
-    const verification = await twilioVerificationService().verifications.create(
-      {
-        to: issuer,
-        channel: email ? 'email' : 'sms',
-        locale: locale ? findTwilioLocale(locale) : undefined,
-      },
+    const verification = await sendTwilioVerificationCode(
+      issuer,
+      email ? 'email' : 'sms',
+      locale,
     );
 
     if (verification && verification.status === 'canceled') {
@@ -157,5 +149,3 @@ export const POST = withAxiom(async (req: Request) => {
     );
   }
 });
-
-export const runtime = 'nodejs';

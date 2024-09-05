@@ -3,6 +3,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { Linking, Platform, StyleSheet, View, Share } from 'react-native';
 // import { openComposer } from 'react-native-email-link';
 import { graphql, usePreloadedQuery } from 'react-relay';
+import { buildInviteUrl } from '@azzapp/shared/urlHelpers';
 import AccountHeader from '#components/AccountHeader';
 import relayScreen from '#helpers/relayScreen';
 import Container from '#ui/Container';
@@ -42,7 +43,7 @@ const InviteFriendsScreen = ({
         'Invite message to share with friends - avoid specific characters like &',
     },
     {
-      url: 'https://azzapp.com',
+      url: buildInviteUrl(webCard?.userName ?? ''),
       userName: webCard?.userName,
     },
   );
@@ -58,7 +59,7 @@ const InviteFriendsScreen = ({
 
   useEffect(() => {
     Linking.canOpenURL(whatsappMessage)
-      .then(() => setHasWhatsapp(true))
+      .then(setHasWhatsapp)
       .catch(() => setHasWhatsapp(false));
   }, [whatsappMessage]);
 

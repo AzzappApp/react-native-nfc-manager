@@ -16,8 +16,7 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material';
-import { sql } from 'drizzle-orm';
-import { db, ReportTable } from '@azzapp/data';
+import { getActiveReports } from '@azzapp/data';
 import CollapseListItem from '#components/CollapseListItem';
 import LogoutButton from '#components/LogoutButton';
 import SectionItem from '#components/SectionItem';
@@ -28,15 +27,7 @@ const APPBAR_HEIGHT = 64;
 
 const MainLayout = async ({ children }: { children: React.ReactNode }) => {
   const user = await getCurrentUser();
-  const report = await db
-    .select({
-      status:
-        sql`(ISNULL(MAX(${ReportTable.treatedAt})) OR MAX(${ReportTable.treatedAt}) < MAX(${ReportTable.createdAt}))`
-          .mapWith(Number)
-          .as('status'),
-    })
-    .from(ReportTable)
-    .groupBy(ReportTable.targetId, ReportTable.targetType);
+  const reports = await getActiveReports();
 
   const sections = backOfficeSections.map(section =>
     'subSections' in section
@@ -46,7 +37,7 @@ const MainLayout = async ({ children }: { children: React.ReactNode }) => {
             ...subSection,
             badge:
               subSection.id === 'moderations'
-                ? report.filter(({ status }) => status > 0).length
+                ? reports.filter(({ status }) => status > 0).length
                 : 0,
           })),
         }

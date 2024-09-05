@@ -1,0 +1,183 @@
+"""
+Represent a Azzapp publication
+"""
+type Post implements Node {
+  """
+  The ID of an object
+  """
+  id: ID!
+
+  """
+  The webCard associated to the publication
+  """
+  webCard: WebCard!
+
+  """
+  The media of the publication
+  """
+  media: Media!
+
+  """
+  The text content of the publication
+  """
+  content: String!
+
+  """
+  Does this post allow comments
+  """
+  allowComments: Boolean!
+
+  """
+  Does this post allow likes
+  """
+  allowLikes: Boolean!
+
+  """
+  Reaction of a given WebCard to this post
+  """
+  postReaction(webCardId: ID): ReactionKind
+  """
+  Number of reactions associated to this post
+  """
+  counterReactions: Int!
+  """
+  Number of comments associated to this post
+  """
+  counterComments: Int!
+
+  """
+  Creation date ot the post
+  """
+  createdAt: DateTime!
+
+  """
+  Return the recommended comment for the post (for now the last one)
+  """
+  previewComment: PostComment
+
+  """
+  Return a list of comments for the post
+  """
+  comments(
+    """
+    Returns the items in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the first n items from the list.
+    """
+    first: Int @max(value: 50)
+  ): PostCommentConnection
+  relatedPosts(
+    """
+    Returns the items in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the first n items from the list.
+    """
+    first: Int
+  ): PostConnection!
+
+  """
+  The profiles associated to the post reactions
+  """
+  reactions(
+    """
+    Returns the items in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the first n items from the list.
+    """
+    first: Int @max(value: 50)
+  ): WebCardConnection!
+}
+
+enum ReactionKind {
+  like
+}
+
+"""
+Represent a Azzapp publication
+"""
+type PostComment implements Node {
+  """
+  The ID of an object
+  """
+  id: ID!
+
+  """
+  The webCard associate to the comment
+  """
+  webCard: WebCard!
+  comment: String!
+
+  """
+  Creation date ot the post
+  """
+  createdAt: DateTime!
+}
+
+"""
+A connection to a list of items.
+"""
+type PostCommentConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+
+  """
+  A list of edges.
+  """
+  edges: [PostCommentEdge]
+}
+
+"""
+An edge in a connection.
+"""
+type PostCommentEdge {
+  """
+  The item at the end of the edge
+  """
+  node: PostComment
+
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+}
+
+"""
+An edge in a connection.
+"""
+type PostEdge {
+  """
+  The item at the end of the edge
+  """
+  node: Post
+
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+}
+
+"""
+A connection to a list of items.
+"""
+type PostConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+
+  """
+  A list of edges.
+  """
+  edges: [PostEdge]
+}

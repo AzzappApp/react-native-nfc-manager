@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { DEFAULT_VARCHAR_LENGTH } from '@azzapp/data/helpers/constants';
 
 export const colorValidator = z
   .string()
@@ -12,6 +11,10 @@ export const colorValidatorWithPalette = z.union([
   z.literal('dark'),
 ]);
 
-export const defaultStringValidator = z.string().max(DEFAULT_VARCHAR_LENGTH);
+/**
+ * Importing that from @azzapp/data completely breaks the build
+ * because of the circular dependency ? 🤔
+ */
+export const defaultStringValidator = z.string().max(191);
 
 export const fontSizeValidator = z.number().int().gte(1).max(100);

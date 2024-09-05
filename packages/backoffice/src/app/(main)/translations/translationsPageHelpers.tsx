@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 export const langNames = {
   'en-US': 'English (US)',
+  fr: 'Français',
   // disabled for now
   // 'en-GB': 'English (UK)',
   // da: 'Dansk',

@@ -22,9 +22,16 @@ export const hasModuleKindSubscription = (
 
 export const webCardRequiresSubscription = (
   _modules: ReadonlyArray<{ readonly kind: string }>,
-  _kind?: string | null,
+  _webCard: {
+    webCardKind: string;
+    isMultiUser: boolean;
+  },
 ) => {
-  if (_kind && isWebCardKindSubscription(_kind)) return true;
+  if (
+    _webCard.isMultiUser ||
+    (_webCard.webCardKind && isWebCardKindSubscription(_webCard.webCardKind))
+  )
+    return true;
   return (
     moduleCountRequiresSubscription(_modules.length) ||
     _modules.some(module => isModuleKindSubscription(module.kind))

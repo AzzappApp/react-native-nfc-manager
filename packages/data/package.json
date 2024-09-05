@@ -1,40 +1,22 @@
 {
   "name": "@azzapp/data",
-  "version": "0.5.47-rc.1",
+  "version": "0.7.0-rc.0",
   "private": true,
-  "exports": {
-    ".": {
-      "types": "./lib/index.d.ts",
-      "default": "./lib/index.js"
-    },
-    "./*": {
-      "types": "./lib/*.d.ts",
-      "default": "./lib/*.js"
-    }
-  },
+  "main": "src/index.ts",
   "scripts": {
-    "build": "yarn compile && yarn definition",
-    "dev": "yarn compile:watch & yarn definition:watch",
-    "typecheck": "yarn definition",
+    "typecheck": "tsc -p tsconfig.build.json --noEmit",
     "generate-migration": "drizzle-kit generate --config ./src/drizzle.config.ts",
     "push-migration": "drizzle-kit push --config ./src/drizzle.config.ts",
     "introspect": "drizzle-kit introspect --config ./src/drizzle.config.ts",
-    "definition": "tsc -p tsconfig.build.json",
-    "definition:watch": "yarn definition --watch",
-    "compile": "babel src --config-file ./babel.config.js -d lib --extensions '.ts,.tsx,.js,.jsx,.json'",
-    "compile:watch": "yarn compile --watch",
     "clean": "rm -rf lib && rm -f tsconfig.build.tsbuildinfo && rm -rf node_modules",
     "studio": "drizzle-kit studio --config ./src/drizzle.config.ts"
   },
-  "devScripts": [
-    "compile:watch",
-    "definition:watch"
-  ],
   "dependencies": {
+    "@azzapp/i18n": "workspace:^",
     "@azzapp/shared": "workspace:^",
     "@paralleldrive/cuid2": "^2.2.2",
     "@planetscale/database": "^1.18.0",
-    "drizzle-orm": "^0.31.2",
+    "drizzle-orm": "^0.33.0",
     "lodash": "^4.17.21",
     "zod": "^3.23.8"
   },
@@ -44,9 +26,9 @@
     "@types/lodash": "4.17.1",
     "@types/node-fetch": "2.6.11",
     "better-sqlite3": "^9.6.0",
-    "drizzle-kit": "^0.22.7",
+    "drizzle-kit": "^0.24.2",
     "mysql2": "^3.9.7",
-    "node-fetch": "^3",
+    "node-fetch": "2",
     "typescript": "^5.5.3"
   }
 }

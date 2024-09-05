@@ -93,6 +93,7 @@ const CoverTemplatesParametersForm = ({
           size: '24',
         },
       },
+      backgroundColor: coverTemplate?.backgroundColor ?? null,
     },
     lastResult,
     onSubmit() {
@@ -299,6 +300,34 @@ const CoverTemplatesParametersForm = ({
                   <Typography>{coverTemplateType.label}</Typography>
                 </MenuItem>
               ))}
+            </Select>
+          </FormControl>
+
+          <FormControl
+            fullWidth
+            error={!!fields.backgroundColor.errors}
+            sx={{ flex: 1 }}
+          >
+            <InputLabel id="coverTemplateBackground-label">
+              Background
+            </InputLabel>
+            <Select
+              labelId={'coverTemplateBackground-label'}
+              label="Background"
+              {...getSelectProps(fields.backgroundColor)}
+              key={fields.backgroundColor.key}
+            >
+              {coverTemplateBackgrounds.map(coverTemplateBackground => (
+                <MenuItem
+                  key={coverTemplateBackground.id}
+                  value={coverTemplateBackground.id}
+                >
+                  <Typography>{coverTemplateBackground.label}</Typography>
+                </MenuItem>
+              ))}
+              <MenuItem value={undefined}>
+                <Typography>None</Typography>
+              </MenuItem>
             </Select>
           </FormControl>
 
@@ -560,5 +589,20 @@ const CoverTemplatesParametersForm = ({
     </>
   );
 };
+
+const coverTemplateBackgrounds = [
+  {
+    id: 'primary',
+    label: 'Primary',
+  },
+  {
+    id: 'light',
+    label: 'Light',
+  },
+  {
+    id: 'dark',
+    label: 'Dark',
+  },
+];
 
 export default CoverTemplatesParametersForm;

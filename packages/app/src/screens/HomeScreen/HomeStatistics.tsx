@@ -74,7 +74,10 @@ const HomeStatistics = ({
   );
 
   const likes = useDerivedValue(
-    () => [0, ...(profiles?.map(profile => profile.webCard.nbLikes) ?? [])],
+    () => [
+      0,
+      ...(profiles?.map(profile => profile.webCard?.nbLikes ?? 0) ?? []),
+    ],
     [profiles],
   );
   const contactCardScans = useDerivedValue(
@@ -87,7 +90,7 @@ const HomeStatistics = ({
   const webCardViews = useDerivedValue(
     () => [
       0,
-      ...(profiles?.map(profile => profile.webCard.nbWebCardViews) ?? []),
+      ...(profiles?.map(profile => profile.webCard?.nbWebCardViews ?? 0) ?? []),
     ],
     [profiles],
   );
@@ -178,6 +181,7 @@ const HomeStatistics = ({
           horizontal
           onScroll={scrollHandler}
           contentOffset={{ x: initialStatsIndex * BOX_NUMBER_WIDTH, y: 0 }}
+          overScrollMode="never"
         >
           <StatisticItems
             variant={variant}
@@ -207,8 +211,8 @@ const HomeStatistics = ({
             title={
               intl.formatMessage(
                 {
-                  defaultMessage: 'Contact card{azzappA} scans',
-                  description: 'Home statistics - Contact card scans label',
+                  defaultMessage: 'Contact card{azzappA} views',
+                  description: 'Home statistics - Contact card views label',
                 },
                 {
                   azzappA: <Text variant="azzapp">a</Text>,
@@ -359,6 +363,7 @@ const stylesheet = createVariantsStyleSheet(() => ({
       ...fontFamilies.extrabold,
       textAlign: 'center',
       fontSize: 40,
+      lineHeight: 40,
     },
     smallText: {
       textAlign: 'center',

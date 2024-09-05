@@ -37,12 +37,12 @@ const rateLimit = {
   api: Array.isArray(redisClient)
     ? new MultiRegionRatelimit({
         redis: redisClient,
-        limiter: MultiRegionRatelimit.slidingWindow(20, '1 s'),
+        limiter: MultiRegionRatelimit.slidingWindow(25, '1 s'),
         ephemeralCache: cache,
       })
     : new Ratelimit({
         redis: redisClient,
-        limiter: Ratelimit.slidingWindow(20, '1 s'),
+        limiter: Ratelimit.slidingWindow(25, '1 s'),
         ephemeralCache: cache,
       }),
   web: Array.isArray(redisClient)

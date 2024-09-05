@@ -16,9 +16,6 @@ const postFeedHeader = style({
     [MediaQuery.Desktop]: {
       display: 'none',
     },
-    [MediaQuery.Mobile]: {
-      paddingTop: '96px',
-    },
   },
 });
 

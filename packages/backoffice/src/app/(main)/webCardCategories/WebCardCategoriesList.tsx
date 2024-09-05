@@ -12,121 +12,63 @@ import {
   TextField,
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import {
-  useCallback,
-  useDeferredValue,
-  useEffect,
-  useState,
-  useTransition,
-} from 'react';
+import { useCallback, useDeferredValue, useMemo, useState } from 'react';
 import DataGrid from '#components/DataGrid';
-import type { Filters, WebCardCategoryItem } from './page';
+import type { LocalizationMessage, WebCardCategory } from '@azzapp/data';
 import type { SelectChangeEvent } from '@mui/material';
-import type {
-  GridColDef,
-  GridPaginationModel,
-  GridSortModel,
-} from '@mui/x-data-grid';
+import type { GridColDef } from '@mui/x-data-grid';
 
 type WebCardCategoriesListProps = {
-  webCardCategories: WebCardCategoryItem[];
-  count: number;
-  page: number;
-  pageSize: number;
-  sortField: 'createdAt' | 'email' | 'phoneNumber' | 'roles';
-  sortOrder: 'asc' | 'desc';
-  search: string | null;
-  filters: Filters;
+  webCardCategories: WebCardCategory[];
+  labels: Array<LocalizationMessage | null>;
 };
 
 const WebCardCategoriesList = ({
   webCardCategories,
-  count,
-  page,
-  pageSize,
-  sortField,
-  sortOrder,
-  search,
-  filters,
+  labels,
 }: WebCardCategoriesListProps) => {
   const router = useRouter();
-  const [loading, startTransition] = useTransition();
-  const [currentSearch, setCurrentSearch] = useState(search ?? '');
-  const defferedSearch = useDeferredValue(currentSearch);
-  const [statusFilter, setStatusFilter] = useState(filters?.enabled || 'all');
+  const [currentSearch, setCurrentSearch] = useState('');
+  const deferredSearch = useDeferredValue(currentSearch);
+  const [statusFilter, setStatusFilter] = useState<
+    'all' | 'disabled' | 'enabled'
+  >('all');
 
-  const updateSearchParams = useCallback(
-    (
-      page: number,
-      sort: string,
-      order: string,
-      search: string | null,
-      status: string | null,
-    ) => {
-      startTransition(() => {
-        router.replace(
-          `/webCardCategories?page=${page}&sort=${sort}&order=${order}&s=${search ?? ''}&status=${status ?? ''}`,
-        );
+  const onStatusChange = useCallback((event: SelectChangeEvent) => {
+    const newStatus = event.target.value;
+    setStatusFilter(newStatus as 'all' | 'disabled' | 'enabled');
+  }, []);
+
+  const items = useMemo(() => {
+    const labelsMap = labels.reduce(
+      (acc, label) => {
+        if (label) {
+          acc[label.key] = label.value;
+        }
+        return acc;
+      },
+      {} as Record<string, string>,
+    );
+    return webCardCategories
+      .map(category => ({
+        ...category,
+        label: labelsMap[category.id] ?? category.id,
+      }))
+      .filter(category => {
+        if (
+          statusFilter !== 'all' &&
+          category.enabled !== (statusFilter === 'enabled')
+        ) {
+          return false;
+        }
+        if (deferredSearch) {
+          return category.label
+            .toLowerCase()
+            .includes(deferredSearch.toLowerCase());
+        }
+        return true;
       });
-    },
-    [router, startTransition],
-  );
-
-  const onPageChange = useCallback(
-    (model: GridPaginationModel) => {
-      updateSearchParams(
-        model.page + 1,
-        sortField,
-        sortOrder,
-        search,
-        statusFilter,
-      );
-    },
-    [search, sortField, sortOrder, statusFilter, updateSearchParams],
-  );
-
-  const onSortModelChange = useCallback(
-    (model: GridSortModel) => {
-      updateSearchParams(
-        page,
-        model[0]?.field ?? 'order',
-        model[0]?.sort ?? 'asc',
-        search,
-        statusFilter,
-      );
-    },
-    [page, search, statusFilter, updateSearchParams],
-  );
-
-  useEffect(() => {
-    if (search === defferedSearch) {
-      return;
-    }
-    updateSearchParams(1, sortField, sortOrder, defferedSearch, statusFilter);
-  }, [
-    defferedSearch,
-    page,
-    search,
-    sortField,
-    sortOrder,
-    statusFilter,
-    updateSearchParams,
-  ]);
-
-  const onStatusChange = useCallback(
-    (event: SelectChangeEvent) => {
-      const newStatus = event.target.value as string;
-      setStatusFilter(newStatus);
-      updateSearchParams(
-        1,
-        sortField,
-        sortOrder,
-        search,
-        newStatus === 'all' ? '' : newStatus,
-      );
-    },
-    [search, sortField, sortOrder, updateSearchParams],
-  );
+  }, [deferredSearch, labels, statusFilter, webCardCategories]);
 
   return (
     <>
@@ -164,8 +106,8 @@ const WebCardCategoriesList = ({
               onChange={onStatusChange}
             >
               <MenuItem value={'all'}>All</MenuItem>
-              <MenuItem value={'true'}>Enabled</MenuItem>
-              <MenuItem value={'false'}>Disabled</MenuItem>
+              <MenuItem value={'enabled'}>Enabled</MenuItem>
+              <MenuItem value={'disabled'}>Disabled</MenuItem>
             </Select>
           </FormControl>
         </Box>
@@ -182,19 +124,7 @@ const WebCardCategoriesList = ({
       </Box>
       <DataGrid
         columns={columns}
-        rows={webCardCategories}
-        rowCount={count}
-        initialState={{
-          pagination: {
-            paginationModel: { pageSize, page: page - 1 },
-          },
-        }}
-        sortModel={[
-          {
-            field: sortField,
-            sort: sortOrder,
-          },
-        ]}
+        rows={items}
         onRowClick={params => {
           router.push(`/webCardCategories/${params.id}`);
         }}
@@ -203,12 +133,7 @@ const WebCardCategoriesList = ({
             cursor: 'pointer',
           },
         }}
-        paginationMode="server"
-        sortingMode="server"
-        onPaginationModelChange={onPageChange}
-        onSortModelChange={onSortModelChange}
-        loading={loading}
-        pageSizeOptions={[pageSize]}
+        pageSizeOptions={[25]}
         rowSelection={false}
         sortingOrder={['asc', 'desc']}
       />

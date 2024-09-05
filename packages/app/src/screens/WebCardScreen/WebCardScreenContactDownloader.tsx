@@ -12,6 +12,7 @@ import { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 import { Alert, Platform } from 'react-native';
 import { MMKV } from 'react-native-mmkv';
+import Toast from 'react-native-toast-message';
 import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import type { CommonInformation } from '@azzapp/shared/contactCardHelpers';
@@ -83,11 +84,11 @@ const WebCardScreenContactDownloader = ({
               },
             ),
             [
-              { text: 'Cancel', style: 'cancel' },
               {
                 text: 'OK',
                 onPress: async () => {
                   try {
+                    let messageToast = '';
                     const { status } = await requestPermissionsAsync();
                     if (status === 'granted') {
                       let foundContact: Contact | undefined = undefined;
@@ -107,18 +108,64 @@ const WebCardScreenContactDownloader = ({
                         } else {
                           await presentFormAsync(foundContact.id, contact);
                         }
+                        messageToast = intl.formatMessage({
+                          defaultMessage:
+                            'The contact was updated successfully.',
+                          description:
+                            'Toast message when a contact is updated successfully',
+                        });
                       } else {
                         const resultId = await addContactAsync(contact);
                         if (contact.id) {
                           storage.set(contact.id, resultId);
                         }
+                        messageToast = intl.formatMessage({
+                          defaultMessage:
+                            'The contact was created successfully.',
+                          description:
+                            'Toast message when a contact is created successfully',
+                        });
                       }
+
+                      Toast.show({
+                        type: 'success',
+                        text1: messageToast,
+                      });
                     }
                   } catch (e) {
                     console.error(e);
                   }
                 },
               },
+              {
+                text: intl.formatMessage({
+                  defaultMessage: 'View Contact',
+                  description: 'Button to view the contact',
+                }),
+                onPress: async () => {
+                  if (Platform.OS === 'android') {
+                    const readContactPermission =
+                      await requestPermissionsAsync();
+                    if (readContactPermission.status !== 'granted') {
+                      Toast.show({
+                        type: 'error',
+                        text1: intl.formatMessage({
+                          defaultMessage:
+                            'You have to grant the permission to view the contact',
+                          description:
+                            'WebCard screen - Error message when trying to view a contact',
+                        }),
+                      });
+                      return;
+                    }
+                  }
+
+                  await presentFormAsync(null, contact, {
+                    isNew: true,
+                  });
+                },
+              },
+              { text: 'Cancel', style: 'cancel' },
             ],
           );
         }
@@ -186,13 +233,21 @@ const buildContact = async (
       id: `${profileId}-${address[1]}`,
     })),
     phoneNumbers: phoneNumbers.map(phone => ({
-      label: phone[0],
+      label:
+        Platform.OS === 'android' && phone[0] !== 'Main'
+          ? phone[0] === 'Fax'
+            ? 'workFax'
+            : phone[0].toLowerCase()
+          : phone[0],
       number: phone[1],
       isPrimary: phone[0] === 'Main',
       id: `${profileId}-${phone[1]}`,
     })),
     emails: emails.map(email => ({
-      label: email[0],
+      label:
+        Platform.OS === 'android' && email[0] !== 'Main'
+          ? email[0].toLowerCase()
+          : email[0],
       email: email[1],
       isPrimary: email[0] === 'Main',
       id: `${profileId}-${email[1]}`,

@@ -42,8 +42,10 @@ const posts = style({
   transitionTimingFunction: 'ease-out',
   '@media': {
     [MediaQuery.Desktop]: {
+      display: 'flex',
+      flexDirection: 'row',
       transition: 'width 0.3s',
-      width: '300px',
+      width: '400px',
       position: 'fixed',
       right: 0,
     },
@@ -61,6 +63,17 @@ const posts = style({
     },
   },
   zIndex: 2,
+});
+
+const postsContent = style({
+  '@media': {
+    [MediaQuery.Desktop]: {
+      width: '350px',
+    },
+    [MediaQuery.Mobile]: {
+      background: '#FFF!important',
+    },
+  },
 });
 
 const postsClosed = style({
@@ -144,6 +157,7 @@ const styles = {
   background,
   modules,
   posts,
+  postsContent,
   modulesWithPosts,
   modulesBehind,
   postsBehind,

@@ -4,7 +4,6 @@
     "noEmit": true,
     "paths": {
       "@azzapp/shared/*": ["../shared/src/*"],
-      "@azzapp/data/*": ["../data/src/*"],
       "#testing/*": ["./testing/*"],
       "#*": ["./src/*"]
     }

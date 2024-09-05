@@ -1,7 +1,15 @@
 import { parsePhoneNumber } from 'libphonenumber-js';
+import LottieView from 'lottie-react-native';
 import { useCallback, useState, useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Image, View, Keyboard, Platform } from 'react-native';
+import {
+  Image,
+  View,
+  Keyboard,
+  Platform,
+  useWindowDimensions,
+  StyleSheet,
+} from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { setSharedWebCredentials } from 'react-native-keychain';
 import { waitTime } from '@azzapp/shared/asyncHelpers';
@@ -24,7 +32,10 @@ import SecuredTextInput from '#ui/SecuredTextInput';
 import Text from '#ui/Text';
 import type { EmailPhoneInput } from '#components/EmailOrPhoneInput';
 import type { Route } from '#routes';
-import type { TextInput as NativeTextInput } from 'react-native';
+import type {
+  LayoutChangeEvent,
+  TextInput as NativeTextInput,
+} from 'react-native';
 
 const SignInScreen = () => {
   const [credential, setCredential] = useState<EmailPhoneInput>({
@@ -155,11 +166,28 @@ const SignInScreen = () => {
     setClearPassword(false);
   });
 
+  const { height } = useWindowDimensions();
+  const [panelHeight, setPanelHeight] = useState(height - 353);
+  const onLayout = useCallback(
+    (event: LayoutChangeEvent) => {
+      setPanelHeight(height - event.nativeEvent.layout.height + 20); //20 for the radius
+    },
+    [height],
+  );
+
   return (
     <View style={styles.root}>
       <View style={styles.background}>
-        <Image
-          source={require('#assets/sign/darkensign_background.png')}
+        <LottieView
+          source={require('../assets/sign/login_sign_up_asset.json')}
+          autoPlay
+          loop
+          hardwareAccelerationAndroid
+          style={{
+            width: '100%',
+            height: panelHeight,
+            opacity: 0.3,
+          }}
           resizeMode="cover"
         />
       </View>
@@ -172,138 +200,143 @@ const SignInScreen = () => {
         />
       </View>
       <KeyboardAvoidingView behavior="padding" style={styles.content}>
-        <View style={styles.header}>
-          <Text variant="xlarge">
-            <FormattedMessage
-              defaultMessage="Log in"
-              description="Signin Screen - Log in title"
-            />
-          </Text>
-        </View>
-        <View style={[styles.form, { marginBottom: insets.bottom }]}>
-          <EmailOrPhoneInput
-            input={credential ?? { countryCodeOrEmail: 'email', value: '' }}
-            onChange={input => {
-              if (!isSubmitting) setCredential(input);
-            }}
-            testID="credential-input"
-            placeholder={
-              credential.countryCodeOrEmail === 'email'
-                ? intl.formatMessage({
-                    defaultMessage: 'Email address',
-                    description:
-                      'SignIn Screen email address input placeholder',
-                  })
-                : intl.formatMessage({
-                    defaultMessage: 'Phone number',
-                    description: 'SignIn Screen phone number input placeholder',
-                  })
-            }
-            hasError={credentialInvalid}
-            autoCapitalize="none"
-            autoComplete="email"
-            keyboardType="email-address"
-            autoCorrect={false}
-            accessibilityLabel={intl.formatMessage({
-              defaultMessage: 'Enter your phone number or email address',
-              description:
-                'SignIn Screen - Accessibility TextInput phone number or email address',
-            })}
-            returnKeyType="next"
-            onSubmitEditing={() => passwordRef.current?.focus()}
-            blurOnSubmit={false}
-            readOnly={isSubmitting}
-          />
-          <View>
-            <SecuredTextInput
-              ref={passwordRef}
-              testID="password-input"
-              placeholder={intl.formatMessage({
-                defaultMessage: 'Password',
-                description: 'Password input placeholder',
-              })}
-              value={clearPassword ? '' : password}
-              onChangeText={isSubmitting ? undefined : setPassword}
+        <View onLayout={onLayout}>
+          <View style={styles.header}>
+            <Text variant="xlarge">
+              <FormattedMessage
+                defaultMessage="Log in"
+                description="Signin Screen - Log in title"
+              />
+            </Text>
+          </View>
+          <View style={[styles.form, { marginBottom: insets.bottom }]}>
+            <EmailOrPhoneInput
+              input={credential ?? { countryCodeOrEmail: 'email', value: '' }}
+              onChange={input => {
+                if (!isSubmitting) setCredential(input);
+              }}
+              testID="credential-input"
+              placeholder={
+                credential.countryCodeOrEmail === 'email'
+                  ? intl.formatMessage({
+                      defaultMessage: 'Email address',
+                      description:
+                        'SignIn Screen email address input placeholder',
+                    })
+                  : intl.formatMessage({
+                      defaultMessage: 'Phone number',
+                      description:
+                        'SignIn Screen phone number input placeholder',
+                    })
+              }
+              hasError={credentialInvalid}
+              autoCapitalize="none"
+              autoComplete="email"
+              keyboardType="email-address"
+              autoCorrect={false}
               accessibilityLabel={intl.formatMessage({
-                defaultMessage: 'Enter your password',
+                defaultMessage: 'Enter your phone number or email address',
                 description:
-                  'SignIn Screen - Accessibility TextInput email address ',
+                  'SignIn Screen - Accessibility TextInput phone number or email address',
               })}
-              returnKeyType="done"
-              onSubmitEditing={onSubmit}
+              returnKeyType="next"
+              onSubmitEditing={() => passwordRef.current?.focus()}
+              blurOnSubmit={false}
               readOnly={isSubmitting}
             />
-            <View style={styles.forgotPasswordContainer}>
-              <PressableOpacity onPress={onForgotLinkPasswordPress}>
-                <Text style={styles.greyText} variant="small">
+            <View>
+              <SecuredTextInput
+                ref={passwordRef}
+                testID="password-input"
+                placeholder={intl.formatMessage({
+                  defaultMessage: 'Password',
+                  description: 'Password input placeholder',
+                })}
+                value={clearPassword ? '' : password}
+                onChangeText={isSubmitting ? undefined : setPassword}
+                accessibilityLabel={intl.formatMessage({
+                  defaultMessage: 'Enter your password',
+                  description:
+                    'SignIn Screen - Accessibility TextInput email address ',
+                })}
+                returnKeyType="done"
+                onSubmitEditing={onSubmit}
+                readOnly={isSubmitting}
+              />
+              <View style={styles.forgotPasswordContainer}>
+                <PressableOpacity onPress={onForgotLinkPasswordPress}>
+                  <Text style={styles.greyText} variant="small">
+                    <FormattedMessage
+                      defaultMessage="Forgot your password?"
+                      description="SigninScreen - Forgot your password?"
+                    />
+                  </Text>
+                </PressableOpacity>
+              </View>
+            </View>
+            <Button
+              variant="primary"
+              testID="submitButton"
+              label={intl.formatMessage({
+                defaultMessage: 'Log In',
+                description: 'SigninScreen - Login Button Placeholder',
+              })}
+              accessibilityLabel={intl.formatMessage({
+                defaultMessage: 'Tap to sign in',
+                description:
+                  'SignIn Screen - AccessibilityLabel Sign In button',
+              })}
+              disabled={
+                !isNotFalsyString(credential.value) ||
+                !isNotFalsyString(password)
+              }
+              loading={isSubmitting}
+              onPress={onSubmit}
+            />
+            <View
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <Text variant="error">
+                {credentialInvalid ? (
                   <FormattedMessage
-                    defaultMessage="Forgot your password?"
-                    description="SigninScreen - Forgot your password?"
+                    defaultMessage="Please use a valid phone number or email address"
+                    description="SigninScreen - Invalid email or phone number"
+                  />
+                ) : signinError === 'default' ? (
+                  <FormattedMessage
+                    defaultMessage="Invalid credentials"
+                    description="SigninScreen - Invalid Credentials"
+                  />
+                ) : signinError === 'forbidden' ? (
+                  <FormattedMessage
+                    defaultMessage="Your account has been disabled. Please contact support."
+                    description="SigninScreen - Account disabled"
+                  />
+                ) : (
+                  // just to keep the same height
+                  ' '
+                )}
+              </Text>
+            </View>
+            <View style={styles.footer}>
+              <Text style={styles.greyText} variant="medium">
+                <FormattedMessage
+                  defaultMessage="Don't have an account?"
+                  description="SigninScreen - Don't have an account"
+                />
+              </Text>
+              <PressableOpacity onPress={onSignupLinkPress}>
+                <Text style={styles.linkLogout} variant="medium">
+                  <FormattedMessage
+                    defaultMessage="Sign Up"
+                    description="SigninScreen - Sign Up"
                   />
                 </Text>
               </PressableOpacity>
             </View>
-          </View>
-          <Button
-            variant="primary"
-            testID="submitButton"
-            label={intl.formatMessage({
-              defaultMessage: 'Log In',
-              description: 'SigninScreen - Login Button Placeholder',
-            })}
-            accessibilityLabel={intl.formatMessage({
-              defaultMessage: 'Tap to sign in',
-              description: 'SignIn Screen - AccessibilityLabel Sign In button',
-            })}
-            disabled={
-              !isNotFalsyString(credential.value) || !isNotFalsyString(password)
-            }
-            loading={isSubmitting}
-            onPress={onSubmit}
-          />
-          <View
-            style={{
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            <Text variant="error">
-              {credentialInvalid ? (
-                <FormattedMessage
-                  defaultMessage="Please use a valid phone number or email address"
-                  description="SigninScreen - Invalid email or phone number"
-                />
-              ) : signinError === 'default' ? (
-                <FormattedMessage
-                  defaultMessage="Invalid credentials"
-                  description="SigninScreen - Invalid Credentials"
-                />
-              ) : signinError === 'forbidden' ? (
-                <FormattedMessage
-                  defaultMessage="Your account has been disabled. Please contact support."
-                  description="SigninScreen - Account disabled"
-                />
-              ) : (
-                // just to keep the same height
-                ' '
-              )}
-            </Text>
-          </View>
-          <View style={styles.footer}>
-            <Text style={styles.greyText} variant="medium">
-              <FormattedMessage
-                defaultMessage="Don't have an account?"
-                description="SigninScreen - Don't have an account"
-              />
-            </Text>
-            <PressableOpacity onPress={onSignupLinkPress}>
-              <Text style={styles.linkLogout} variant="medium">
-                <FormattedMessage
-                  defaultMessage="Sign Up"
-                  description="SigninScreen - Sign Up"
-                />
-              </Text>
-            </PressableOpacity>
           </View>
         </View>
       </KeyboardAvoidingView>
@@ -335,13 +368,7 @@ const stylesheet = createStyleSheet(appearance => ({
   root: {
     flex: 1,
   },
-  background: {
-    width: '100%',
-    alignItems: 'center',
-    position: 'absolute',
-    top: 0,
-    backgroundColor: 'black',
-  },
+  background: [StyleSheet.absoluteFill, { backgroundColor: 'black' }],
   logoContainer: {
     flex: 1,
     alignItems: 'center',

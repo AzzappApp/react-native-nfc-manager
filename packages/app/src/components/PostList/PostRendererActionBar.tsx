@@ -7,12 +7,13 @@ import Toast from 'react-native-toast-message';
 import { useMutation, graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
 import ERRORS from '@azzapp/shared/errors';
-import { isEditor } from '@azzapp/shared/profileHelpers';
+import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import { buildPostUrl } from '@azzapp/shared/urlHelpers';
 import { useRouter } from '#components/NativeRouter';
 import useAuthState from '#hooks/useAuthState';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
+import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import type {
   PostRendererActionBar_post$key,
@@ -221,7 +222,7 @@ const PostRendererActionBar = ({
       return;
     }
 
-    if (isEditor(profileInfos?.profileRole)) {
+    if (profileHasEditorRight(profileInfos?.profileRole)) {
       if (reaction) {
         setCountReactions(countReactions - 1);
         setReaction(null);
@@ -250,8 +251,42 @@ const PostRendererActionBar = ({
   ]);
 
   const goToComments = () => {
+    if (!actionEnabled) {
+      Alert.alert(
+        intl.formatMessage({
+          defaultMessage: 'Unpublished WebCard.',
+          description:
+            'PostRendererActionBar - Alert Message title when the user is viewing a post (from deeplinking) with an unpublished WebCard',
+        }),
+        intl.formatMessage({
+          defaultMessage:
+            'This action can only be done from a published WebCard.',
+          description:
+            'PostRendererActionBar - AlertMessage when the user is viewing a post (from deeplinking) with an unpublished WebCard',
+        }),
+        [
+          {
+            text: intl.formatMessage({
+              defaultMessage: 'Ok',
+              description:
+                'PostRendererActionBar - Alert button when the user is viewing a post (from deeplinking) with an unpublished WebCard',
+            }),
+          },
+        ],
+      );
+
+      return;
+    }
+
     router.push({
       route: 'POST_COMMENTS',
+      params: { postId },
+    });
+  };
+
+  const goToLikes = () => {
+    router.push({
+      route: 'POST_LIKES',
       params: { postId },
     });
   };
@@ -363,17 +398,19 @@ const PostRendererActionBar = ({
           />
         </View>
         {allowLikes && (
-          <Text variant="smallbold">
-            <FormattedMessage
-              defaultMessage="{countReactions, plural,
+          <PressableNative onPress={goToLikes}>
+            <Text variant="smallbold">
+              <FormattedMessage
+                defaultMessage="{countReactions, plural,
                                     =0 {0 like}
                                     one {1 like}
                                     other {# likes}
                                 }"
-              description="PastRendererActionBar - Like Counter"
-              values={{ countReactions }}
-            />
-          </Text>
+                description="PostRendererActionBar - Like Counter"
+                values={{ countReactions }}
+              />
+            </Text>
+          </PressableNative>
         )}
       </View>
     </>

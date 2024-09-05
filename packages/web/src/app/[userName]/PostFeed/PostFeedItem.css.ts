@@ -1,5 +1,6 @@
 import { style } from '@vanilla-extract/css';
 import {
+  MediaQuery,
   textMedium,
   textSmall,
   textSmallBold,
@@ -7,9 +8,13 @@ import {
 } from '#app/[userName]/theme.css';
 
 const post = style({
-  borderWidth: '1px',
-  borderStyle: 'solid',
-  borderColor: vars.color.grey100,
+  '@media': {
+    [MediaQuery.Mobile]: {
+      borderWidth: '1px',
+      borderStyle: 'solid',
+      borderColor: vars.color.grey100,
+    },
+  },
 });
 
 const postHeader = style({
@@ -20,6 +25,11 @@ const postHeader = style({
   padding: '10px',
   background: 'none',
   border: 'none',
+  '@media': {
+    [MediaQuery.Desktop]: {
+      display: 'none',
+    },
+  },
 });
 
 const postAuthorCover = style({
@@ -30,9 +40,19 @@ const postAuthorCover = style({
   position: 'relative',
 });
 
+const postAuthorUsername = style({
+  color: vars.color.black,
+});
+
 const postMedias = style({
   position: 'relative',
   width: '100%',
+  '@media': {
+    [MediaQuery.Desktop]: {
+      paddingLeft: '20px',
+      paddingRight: '20px',
+    },
+  },
 });
 
 const postFooter = style({
@@ -40,6 +60,11 @@ const postFooter = style({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'space-between',
+  '@media': {
+    [MediaQuery.Desktop]: {
+      display: 'none',
+    },
+  },
 });
 
 const postActions = style({
@@ -54,6 +79,11 @@ const postMore = style({
   display: 'flex',
   flexDirection: 'column',
   gap: '10px',
+  '@media': {
+    [MediaQuery.Desktop]: {
+      display: 'none',
+    },
+  },
 });
 
 const postComment = style({
@@ -94,6 +124,7 @@ const styles = {
   postSeeMore,
   postElapsedTime,
   postAuthorCover,
+  postAuthorUsername,
 };
 
 export default styles;

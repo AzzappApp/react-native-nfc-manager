@@ -170,7 +170,7 @@ const tableButton = style({
   height: '34px',
   width: '125px',
   paddingLeft: '10px',
-  paddingRight: ' 10px',
+  paddingRight: '10px',
   borderRadius: '48px',
   fontSize: '12px',
   marginTop: '12px',

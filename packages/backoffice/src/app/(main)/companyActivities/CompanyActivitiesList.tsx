@@ -3,70 +3,52 @@
 import { Search } from '@mui/icons-material';
 import { Box, Button, InputAdornment, TextField } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import {
-  useCallback,
-  useDeferredValue,
-  useEffect,
-  useState,
-  useTransition,
-} from 'react';
+import { useDeferredValue, useMemo, useState } from 'react';
 import DataGrid from '#components/DataGrid';
-import type { CompanyActivityItem, SortColumn } from './page';
-import type {
-  GridColDef,
-  GridPaginationModel,
-  GridSortModel,
-} from '@mui/x-data-grid';
+import type { CompanyActivity, LocalizationMessage } from '@azzapp/data';
+import type { GridColDef } from '@mui/x-data-grid';
 
 type CompanyActivitiesListProps = {
-  companyActivities: CompanyActivityItem[];
-  count: number;
-  page: number;
-  pageSize: number;
-  sortField: SortColumn;
-  sortOrder: 'asc' | 'desc';
-  search: string | null;
+  companyActivities: CompanyActivity[];
+  labels: LocalizationMessage[];
 };
 
 const CompanyActivitiesList = ({
   companyActivities,
-  count,
-  page,
-  pageSize,
-  sortField,
-  sortOrder,
-  search,
+  labels,
 }: CompanyActivitiesListProps) => {
   const router = useRouter();
-  const [loading, startTransition] = useTransition();
-  const updateSearchParams = useCallback(
-    (page: number, sort: string, order: string, search: string | null) => {
-      startTransition(() => {
-        router.replace(
-          `/companyActivities?page=${page}&sort=${sort}&order=${order}&s=${search ?? ''}`,
-        );
-      });
-    },
-    [router, startTransition],
-  );
 
-  const onPageChange = (model: GridPaginationModel) => {
-    updateSearchParams(model.page + 1, sortField, sortOrder, search);
-  };
+  const [currentSearch, setCurrentSearch] = useState('');
+  const deferredSearch = useDeferredValue(currentSearch);
 
-  const onSortModelChange = (model: GridSortModel) => {
-    updateSearchParams(page, model[0].field, model[0].sort ?? 'asc', search);
-  };
-
-  const [currentSearch, setCurrentSearch] = useState(search ?? '');
-  const defferedSearch = useDeferredValue(currentSearch);
-
-  useEffect(() => {
-    if (search === defferedSearch) {
-      return;
-    }
-    updateSearchParams(1, sortField, sortOrder, defferedSearch);
-  }, [defferedSearch, page, search, sortField, sortOrder, updateSearchParams]);
+  const items = useMemo(() => {
+    const labelsMap = new Map(labels.map(label => [label.key, label.value]));
+    return companyActivities
+      .map(activity => ({
+        id: activity.id,
+        label: labelsMap.get(activity.id) || activity.id,
+        companyActivityTypeLabel: activity.companyActivityTypeId
+          ? labelsMap.get(activity.companyActivityTypeId)
+          : null,
+        cardTemplateTypeLabel: activity.cardTemplateTypeId
+          ? labelsMap.get(activity.cardTemplateTypeId)
+          : null,
+      }))
+      .filter(
+        item =>
+          !deferredSearch ||
+          item.label.toLowerCase().includes(deferredSearch.toLowerCase()) ||
+          (item.companyActivityTypeLabel &&
+            item.companyActivityTypeLabel
+              .toLowerCase()
+              .includes(deferredSearch.toLowerCase())) ||
+          (item.cardTemplateTypeLabel &&
+            item.cardTemplateTypeLabel
+              .toLowerCase()
+              .includes(deferredSearch.toLowerCase())),
+      );
+  }, [companyActivities, deferredSearch, labels]);
 
   return (
     <>
@@ -106,19 +88,7 @@ const CompanyActivitiesList = ({
       </Box>
       <DataGrid
         columns={columns}
-        rows={companyActivities}
-        rowCount={count}
-        initialState={{
-          pagination: {
-            paginationModel: { pageSize, page: page - 1 },
-          },
-        }}
-        sortModel={[
-          {
-            field: sortField,
-            sort: sortOrder,
-          },
-        ]}
+        rows={items}
         onRowClick={params => {
           router.push(`/companyActivities/${params.id}`);
         }}
@@ -127,12 +97,7 @@ const CompanyActivitiesList = ({
             cursor: 'pointer',
           },
         }}
-        paginationMode="server"
-        sortingMode="server"
-        onPaginationModelChange={onPageChange}
-        onSortModelChange={onSortModelChange}
-        loading={loading}
-        pageSizeOptions={[pageSize]}
+        pageSizeOptions={[25]}
         rowSelection={false}
         sortingOrder={['asc', 'desc']}
       />
@@ -149,11 +114,6 @@ const columns: GridColDef[] = [
   {
     field: 'companyActivityTypeLabel',
     headerName: 'Activity Type',
-    flex: 1,
-  },
-  {
-    field: 'webCardCategoryLabel',
-    headerName: 'Category',
     flex: 1,
   },
   {

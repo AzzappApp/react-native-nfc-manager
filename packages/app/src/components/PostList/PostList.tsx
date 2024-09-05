@@ -15,15 +15,18 @@ import type {
   PostList_posts$data,
   PostList_posts$key,
 } from '#relayArtifacts/PostList_posts.graphql';
+import type { PostList_viewerProfile$key } from '#relayArtifacts/PostList_viewerProfile.graphql';
 import type { PostList_viewerWebCard$key } from '#relayArtifacts/PostList_viewerWebCard.graphql';
 import type { PostRendererFragment_author$key } from '#relayArtifacts/PostRendererFragment_author.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { ContentStyle, ListRenderItemInfo } from '@shopify/flash-list';
 import type { ViewProps, ViewToken } from 'react-native';
+
 type PostListProps = ViewProps & {
   posts: PostList_posts$key;
   author?: PostRendererFragment_author$key;
-  webCard?: PostList_viewerWebCard$key;
+  viewerWebCard?: PostList_viewerWebCard$key;
+  profile?: PostList_viewerProfile$key;
   canPlay?: boolean;
   onEndReached?: () => void;
   onRefresh?: () => void;
@@ -32,6 +35,7 @@ type PostListProps = ViewProps & {
   contentContainerStyle?: ContentStyle;
   onPressAuthor?: () => void;
   showUnpublished?: boolean;
+  firstItemVideoTime?: number | null;
 };
 
 const viewabilityConfig = {
@@ -44,7 +48,8 @@ const { height: windowHeight, width: windowWidth } = Dimensions.get('window');
 const PostList = ({
   posts: postKey,
   author,
-  webCard: webCardKey,
+  viewerWebCard: viewerWebCardKey,
+  profile: profileKey,
   canPlay = true,
   refreshing = false,
   loading = false,
@@ -52,6 +57,7 @@ const PostList = ({
   onRefresh,
   onPressAuthor,
   showUnpublished = false,
+  firstItemVideoTime,
   ...props
 }: PostListProps) => {
   const posts = useFragment(
@@ -84,15 +90,27 @@ const PostList = ({
         cardIsPublished
       }
     `,
-    webCardKey ?? null,
+    viewerWebCardKey ?? null,
+  );
+
+  const viewerProfile = useFragment(
+    graphql`
+      fragment PostList_viewerProfile on Profile {
+        id
+        invited
+      }
+    `,
+    profileKey ?? null,
   );
 
   const postActionEnabled = useMemo(
     () =>
       viewerWebCard?.cardIsPublished != null
-        ? viewerWebCard?.cardIsPublished
-        : true,
-    [viewerWebCard?.cardIsPublished],
+        ? !viewerProfile?.invited
+          ? !!viewerWebCard?.cardIsPublished
+          : false
+        : false,
+    [viewerProfile?.invited, viewerWebCard?.cardIsPublished],
   );
 
   const [visiblePostIds, setVisiblePostIds] = useState<{
@@ -170,7 +188,7 @@ const PostList = ({
   );
 
   const renderItem = useCallback(
-    ({ item, extraData }: ListRenderItemInfo<Post>) => {
+    ({ item, extraData, index }: ListRenderItemInfo<Post>) => {
       return item ? (
         <PostRenderer
           post={item}
@@ -180,6 +198,8 @@ const PostList = ({
           author={item.webCard ?? extraData.author!}
           actionEnabled={extraData.postActionEnabled}
           showUnpublished={extraData.showUnpublished}
+          useAnimationSnapshot={index === 0}
+          initialTime={index === 0 ? extraData.firstItemVideoTime : undefined}
         />
       ) : null;
     },
@@ -187,8 +207,14 @@ const PostList = ({
   );
 
   const extraData = useMemo(
-    () => ({ canPlay, author, postActionEnabled, showUnpublished }),
-    [canPlay, author, postActionEnabled, showUnpublished],
+    () => ({
+      canPlay,
+      author,
+      firstItemVideoTime,
+      postActionEnabled,
+      showUnpublished,
+    }),
+    [canPlay, author, postActionEnabled, firstItemVideoTime, showUnpublished],
   );
 
   const ListFooterComponent = useMemo(

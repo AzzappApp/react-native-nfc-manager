@@ -1,7 +1,15 @@
 import { parsePhoneNumber } from 'libphonenumber-js';
+import LottieView from 'lottie-react-native';
 import { useCallback, useState, useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View, Image, Keyboard, Platform } from 'react-native';
+import {
+  View,
+  Image,
+  Keyboard,
+  Platform,
+  useWindowDimensions,
+  StyleSheet,
+} from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { setSharedWebCredentials } from 'react-native-keychain';
 import { getLocales } from 'react-native-localize';
@@ -29,12 +37,15 @@ import Text from '#ui/Text';
 import type { EmailPhoneInput } from '#components/EmailOrPhoneInput';
 import type { Route } from '#routes';
 import type { CheckboxStatus } from '#ui/CheckBox';
-import type { TextInput as NativeTextInput } from 'react-native';
+import type {
+  LayoutChangeEvent,
+  TextInput as NativeTextInput,
+} from 'react-native';
 
 const TERMS_OF_SERVICE = process.env.TERMS_OF_SERVICE;
 const PRIVACY_POLICY = process.env.PRIVACY_POLICY;
 
-const SignupScreen = () => {
+const SignUpScreen = () => {
   const router = useRouter();
   const [contact, setContact] = useState<EmailPhoneInput>({
     countryCodeOrEmail: 'email',
@@ -206,12 +217,29 @@ const SignupScreen = () => {
     setClearPassword(false);
   });
 
+  const { height } = useWindowDimensions();
+  const [panelHeight, setPanelHeight] = useState(height - 353);
+  const onLayout = useCallback(
+    (event: LayoutChangeEvent) => {
+      setPanelHeight(height - event.nativeEvent.layout.height + 20); //20 for the radius
+    },
+    [height],
+  );
+
   const insets = useScreenInsets();
   return (
     <View style={styles.root}>
       <View style={styles.background}>
-        <Image
-          source={require('#assets/sign/darkensign_background.png')}
+        <LottieView
+          source={require('../assets/sign/login_sign_up_asset.json')}
+          autoPlay
+          loop
+          hardwareAccelerationAndroid
+          style={{
+            width: '100%',
+            height: panelHeight,
+            opacity: 0.3,
+          }}
           resizeMode="cover"
         />
       </View>
@@ -224,7 +252,10 @@ const SignupScreen = () => {
         />
       </View>
       <KeyboardAvoidingView behavior="padding" style={styles.body}>
-        <View style={[styles.form, { marginBottom: insets.bottom }]}>
+        <View
+          style={[styles.form, { marginBottom: insets.bottom }]}
+          onLayout={onLayout}
+        >
           <View style={styles.header}>
             <Text style={styles.title} variant="xlarge">
               <FormattedMessage
@@ -380,9 +411,9 @@ const SignupScreen = () => {
   );
 };
 
-export default SignupScreen;
+export default SignUpScreen;
 
-SignupScreen.options = {
+SignUpScreen.options = {
   replaceAnimation: 'push',
   stackAnimation: 'fade',
 };
@@ -392,14 +423,7 @@ const styleSheet = createStyleSheet(appearance => ({
   root: {
     flex: 1,
   },
-  background: {
-    width: '100%',
-    position: 'absolute',
-    top: 0,
-    backgroundColor: 'black',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  background: [StyleSheet.absoluteFill, { backgroundColor: 'black' }],
   content: {
     flex: 1,
   },

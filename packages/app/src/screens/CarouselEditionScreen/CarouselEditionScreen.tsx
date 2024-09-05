@@ -5,6 +5,7 @@ import { StyleSheet } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
+import { Observable } from 'relay-runtime';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
   CAROUSEL_DEFAULT_VALUES,
@@ -43,7 +44,6 @@ import type { CarouselEditionScreen_module$key } from '#relayArtifacts/CarouselE
 import type { CarouselEditionScreen_profile$key } from '#relayArtifacts/CarouselEditionScreen_profile.graphql';
 import type { CarouselEditionScreenUpdateModuleMutation } from '#relayArtifacts/CarouselEditionScreenUpdateModuleMutation.graphql';
 import type { ViewProps } from 'react-native';
-import type { Observable } from 'relay-runtime';
 
 export type CarouselEditionScreenProps = ViewProps & {
   /**
@@ -166,7 +166,7 @@ const CarouselEditionScreen = ({
   const { data, value, updateFields, fieldUpdateHandler, dirty } =
     useModuleDataEditor({
       initialValue,
-      cardStyle: profile?.webCard.cardStyle,
+      cardStyle: profile?.webCard?.cardStyle,
       styleValuesMap: CAROUSEL_STYLE_VALUES,
       defaultValues: CAROUSEL_DEFAULT_VALUES,
     });
@@ -211,15 +211,17 @@ const CarouselEditionScreen = ({
     setTouched(true);
   }, []);
 
-  const canSave = (dirty || touched) && isValid && !saving;
-
-  const router = useRouter();
-  const intl = useIntl();
   const [progressIndicator, setProgressIndicator] =
     useState<Observable<number> | null>(null);
 
+  const canSave =
+    (dirty || touched) && isValid && !saving && !progressIndicator;
+
+  const router = useRouter();
+  const intl = useIntl();
+
   const cardModulesCount =
-    profile.webCard.cardModules.length + (carousel ? 0 : 1);
+    (profile.webCard?.cardModules.length ?? 0) + (carousel ? 0 : 1);
 
   const onCancel = router.back;
 
@@ -324,7 +326,7 @@ const CarouselEditionScreen = ({
   const onBackgroundStyleChange = fieldUpdateHandler('backgroundStyle');
 
   const onSave = useCallback(async () => {
-    if (!canSave) {
+    if (!canSave || !profile.webCard?.id) {
       return;
     }
 
@@ -334,13 +336,15 @@ const CarouselEditionScreen = ({
     );
 
     if (
-      profile.webCard.cardIsPublished &&
+      profile.webCard?.cardIsPublished &&
       requireSubscription &&
       !profile.webCard.isPremium
     ) {
       router.push({ route: 'USER_PAY_WALL' });
       return;
     }
+
+    setProgressIndicator(Observable.from(0));
 
     const { images, ...rest } = value;
 
@@ -447,12 +451,14 @@ const CarouselEditionScreen = ({
         handleProfileActionError(e);
       },
     });
+
+    setProgressIndicator(null);
   }, [
     canSave,
     cardModulesCount,
-    profile.webCard.cardIsPublished,
-    profile.webCard.isPremium,
-    profile.webCard.id,
+    profile.webCard?.cardIsPublished,
+    profile.webCard?.isPremium,
+    profile.webCard?.id,
     value,
     commit,
     carousel?.id,
@@ -521,8 +527,8 @@ const CarouselEditionScreen = ({
           gap,
         }}
         style={{ height: topPanelHeight - 40, marginVertical: 20 }}
-        colorPalette={profile?.webCard.cardColors}
-        cardStyle={profile?.webCard.cardStyle}
+        colorPalette={profile?.webCard?.cardColors}
+        cardStyle={profile?.webCard?.cardStyle}
       />
       <TabView
         style={{ height: bottomPanelHeight }}

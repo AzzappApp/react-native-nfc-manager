@@ -1,6 +1,6 @@
 import { memo, useCallback, useMemo } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { FlatList, View } from 'react-native';
+import { FlatList, useWindowDimensions, View } from 'react-native';
 import { graphql, useLazyLoadQuery } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { getTextColor } from '@azzapp/shared/colorsHelpers';
@@ -115,6 +115,7 @@ const ColorTriptychChooser = ({
   const onRestorePreviousTriptych = useCallback(() => {
     onUpdateColorPalette(currentPalette);
   }, [onUpdateColorPalette, currentPalette]);
+  const { width } = useWindowDimensions();
 
   return (
     <View>
@@ -138,10 +139,18 @@ const ColorTriptychChooser = ({
             style={{
               position: 'absolute',
               top: -size / RATIO_PRESS - 10,
-              left: 15,
+              width,
+              left: (-width + size) / 2,
             }}
           >
-            <Text variant="xsmall" style={{ color: colors.grey200 }}>
+            <Text
+              variant="xsmall"
+              style={{
+                color: colors.grey200,
+                width: '100%',
+                textAlign: 'center',
+              }}
+            >
               <FormattedMessage
                 defaultMessage="Main color"
                 description="ColorTriptych choose - Main color"
@@ -151,11 +160,18 @@ const ColorTriptychChooser = ({
           <View
             style={{
               position: 'absolute',
-              start: -size / RATIO_PRESS - 20,
+              left: -size / RATIO_PRESS - 70,
               bottom: 0,
+              width: 80,
             }}
           >
-            <Text variant="xsmall" style={{ color: colors.grey200 }}>
+            <Text
+              variant="xsmall"
+              style={{
+                color: colors.grey200,
+                textAlign: 'right',
+              }}
+            >
               <FormattedMessage
                 defaultMessage="Dark"
                 description="ColorTriptych choose - Dark color"

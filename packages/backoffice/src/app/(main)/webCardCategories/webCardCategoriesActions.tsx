@@ -1,17 +1,18 @@
 'use server';
 import { createId } from '@paralleldrive/cuid2';
-import { and, eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import {
-  WebCardCategoryTable,
-  CompanyActivityTable,
-  WebCardCategoryCompanyActivityTable,
   getWebCardCategoryById,
-  db,
   referencesMedias,
   checkMedias,
-  LocalizationMessageTable,
   saveLocalizationMessage,
+  transaction,
+  updateWebCardCategory,
+  createWebCardCategory,
+  removeAllWebCardCategoryCompanyActivities,
+  createCompanyActivities,
+  createLocalizationMessages,
+  createWebCardCategoryCompanyActivities,
 } from '@azzapp/data';
 import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import { ADMIN } from '#roles';
@@ -54,7 +55,7 @@ export const saveWebCardCategory = async (
   await checkMedias(data.medias);
 
   try {
-    webCardCategoryId = await db.transaction(async trx => {
+    webCardCategoryId = await transaction(async () => {
       const {
         id,
         activities,
@@ -67,37 +68,29 @@ export const saveWebCardCategory = async (
       if (id) {
         const oldCategory = await getWebCardCategoryById(id);
         if (!oldCategory) {
-          throw new Error('Profile category not found');
+          throw new Error('Web Card category not found');
         }
         previousMedias = oldCategory.medias;
 
         webCardCategoryId = id;
-        await trx
-          .update(WebCardCategoryTable)
-          .set({
-            ...webCardCategoryData,
-            cardTemplateTypeId: data.cardTemplateType?.id ?? null,
-          })
-          .where(eq(WebCardCategoryTable.id, id));
-      } else {
-        webCardCategoryId = createId();
-        await trx.insert(WebCardCategoryTable).values({
+        await updateWebCardCategory(id, {
           ...webCardCategoryData,
           cardTemplateTypeId: data.cardTemplateType?.id ?? null,
-          id: webCardCategoryId,
+        });
+      } else {
+        webCardCategoryId = await createWebCardCategory({
+          ...webCardCategoryData,
+          cardTemplateTypeId: data.cardTemplateType?.id ?? null,
         });
       }
 
-      await saveLocalizationMessage(
-        {
-          key: webCardCategoryId,
-          value: label,
-          locale: DEFAULT_LOCALE,
-          target: ENTITY_TARGET,
-        },
-        trx,
-      );
-      await referencesMedias(webCardCategoryData.medias, previousMedias, trx);
+      await saveLocalizationMessage({
+        key: webCardCategoryId,
+        value: label,
+        locale: DEFAULT_LOCALE,
+        target: ENTITY_TARGET,
+      });
+      await referencesMedias(webCardCategoryData.medias, previousMedias);
 
       if (activities?.length) {
         const activitiesToCreate: Array<CompanyActivity & { label: string }> =
@@ -119,34 +112,22 @@ export const saveWebCardCategory = async (
         });
 
         //delete all activities associated to the category
-        await trx
-          .delete(WebCardCategoryCompanyActivityTable)
-          .where(
-            and(
-              eq(
-                WebCardCategoryCompanyActivityTable.webCardCategoryId,
-                webCardCategoryId,
-              ),
-            ),
-          );
+        await removeAllWebCardCategoryCompanyActivities(webCardCategoryId);
 
         if (activitiesToCreate.length) {
-          await trx.insert(CompanyActivityTable).values(activitiesToCreate);
+          await createCompanyActivities(activitiesToCreate);
           const labels = activitiesToCreate.map(activity => ({
             key: activity.id,
             value: activity.label,
             locale: DEFAULT_LOCALE,
             target: ENTITY_TARGET,
           }));
-          await trx.insert(LocalizationMessageTable).values(labels);
+          await createLocalizationMessages(labels);
         }
         if (categoriesToAssociate.length > 0) {
-          await trx.insert(WebCardCategoryCompanyActivityTable).values(
-            categoriesToAssociate.map((activityId, index) => ({
-              webCardCategoryId,
-              companyActivityId: activityId,
-              order: index,
-            })),
+          await createWebCardCategoryCompanyActivities(
+            webCardCategoryId,
+            categoriesToAssociate,
           );
         }
       }

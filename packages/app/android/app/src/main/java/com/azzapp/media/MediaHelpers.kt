@@ -63,36 +63,4 @@ class MediaHelpers(private val reactContext: ReactApplicationContext) :
     map.putInt("rotation", rotation);
     promise.resolve(map)
   }
-
-  @ReactMethod
-  fun prefetchVideo(uriStr: String, promise: Promise) {
-    val uri = try {
-      Uri.parse(uriStr)
-    } catch (e: NullPointerException) {
-      promise.reject("INVALID_URI", "provided uri is invalid")
-      return;
-    }
-    VideoCache.prefetch(uri, promise)
-  }
-
-  @ReactMethod
-  fun observeVideoPrefetchResult(uriStr: String, promise: Promise) {
-    val uri = try {
-      Uri.parse(uriStr)
-    } catch (e: NullPointerException) {
-      promise.reject("INVALID_URI", "provided uri is invalid")
-      return;
-    }
-    VideoCache.observePrefetchResult(uri, promise)
-  }
-
-  @ReactMethod
-  fun cancelVideoPrefetch(uriStr: String) {
-    val uri = try {
-      Uri.parse(uriStr)
-    } catch (e: NullPointerException) {
-      return
-    }
-    VideoCache.cancelPrefetch(uri)
-  }
 }

@@ -1,5 +1,8 @@
+import LottieView from 'lottie-react-native';
 import { Suspense, useEffect, useMemo } from 'react';
+import { useColorScheme } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
+import { replaceColors } from '@azzapp/shared/lottieHelpers';
 import { mainRoutes } from '#mobileRoutes';
 import { useMainTabBarVisibilityController } from '#components/MainTabBar';
 import { useRouter } from '#components/NativeRouter';
@@ -8,7 +11,6 @@ import relayScreen from '#helpers/relayScreen';
 import { useDeepLinkStoredRoute } from '#hooks/useDeepLink';
 // import { useRevenueCat } from '#hooks/useRevenueCat';
 //import { useSetRevenueCatUserInfo } from '#hooks/useSetRevenueCatUserInfo';
-import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
 import HomeScreenContent from './HomeScreenContent';
 import { HomeScreenProvider } from './HomeScreenContext';
@@ -73,8 +75,28 @@ const HomeScreen = ({
   );
 };
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const lottie = require('./assets/home-loader.json');
+
 const HomeScreenFallback = () => {
   useMainTabBarVisibilityController(false);
+  const colorScheme = useColorScheme() ?? 'light';
+
+  const source = useMemo(
+    () =>
+      colorScheme === 'light'
+        ? lottie
+        : replaceColors(
+            [
+              {
+                sourceColor: '#000000',
+                targetColor: '#ffffff',
+              },
+            ],
+            lottie,
+          ),
+    [colorScheme],
+  );
 
   return (
     <Container
@@ -84,7 +106,16 @@ const HomeScreenFallback = () => {
         justifyContent: 'center',
       }}
     >
-      <ActivityIndicator />
+      <LottieView
+        source={source}
+        autoPlay
+        loop
+        hardwareAccelerationAndroid
+        style={{
+          width: 150,
+          height: 150,
+        }}
+      />
     </Container>
   );
 };

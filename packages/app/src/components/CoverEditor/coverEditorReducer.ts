@@ -24,6 +24,17 @@ export function coverEditorReducer(
 ): CoverEditorState {
   const { type, payload } = action;
 
+  if (
+    !action.type.startsWith?.('LOADING') &&
+    action.type !== 'SET_EDITION_MODE' &&
+    !state.isModified
+  ) {
+    state = {
+      ...state,
+      isModified: true,
+    };
+  }
+
   switch (type) {
     // #region Generic Layer Actions
     case 'SET_EDITION_MODE':
@@ -439,45 +450,92 @@ export function coverEditorReducer(
       return state;
     }
     case 'UPDATE_ACTIVE_MEDIA': {
+      //handle overlay first
       if (
-        state.editionMode === 'mediaEdit' &&
-        state.selectedItemIndex != null
-      ) {
-        const medias = [...state.medias];
-        medias[state.selectedItemIndex] = payload;
-
-        let imagesScales = state.imagesScales;
-        if (payload.media.kind === 'image') {
-          imagesScales = {
-            ...state.imagesScales,
-            [payload.media.uri]: calculateImageScale(payload.media),
-          };
-        }
-
-        return {
-          ...state,
-          imagesScales,
-          medias,
-        };
-      } else if (
         state.editionMode === 'overlay' &&
         state.selectedItemIndex != null &&
-        mediaInfoIsImage(payload)
+        payload.kind === 'image'
       ) {
         const overlayLayers = [...state.overlayLayers];
         overlayLayers[state.selectedItemIndex] = {
           ...overlayLayers[state.selectedItemIndex],
           //TODO: type as any as quick n dirty because the type was changed compare to initial creation.
           // MediaInfoImage is not applicable to overlay for duration and animation, but the reducer type was updated without taking this acion in account
-          ...(payload as any),
+          media: payload,
         };
         return {
           ...state,
           overlayLayers,
         };
       }
-      console.warn('Update active media without selected media');
-      return state;
+      if (
+        !(state.editionMode === 'mediaEdit' && state.selectedItemIndex != null)
+      ) {
+        return state;
+      }
+      let aspectRatio = COVER_RATIO;
+
+      const index = state.selectedItemIndex;
+      let imagesScales = state.imagesScales;
+      const medias = [...state.medias];
+      const updatedMedia = medias[state.selectedItemIndex];
+      if (state.lottie) {
+        const lottieInfo = extractLottieInfoMemoized(state.lottie);
+        const asset = lottieInfo?.assetsInfos[index];
+        if (!asset) {
+          console.error("Too many medias for the template's assets");
+        } else {
+          aspectRatio = asset.width / asset.height;
+        }
+      }
+      const cropData = cropDataForAspectRatio(
+        payload.width,
+        payload.height,
+        aspectRatio,
+      );
+      if (payload.kind === 'image') {
+        imagesScales = {
+          ...imagesScales,
+          [payload.uri]: calculateImageScale(payload),
+        };
+
+        medias[state.selectedItemIndex] = {
+          media: payload,
+          filter: updatedMedia.filter,
+          animation: mediaInfoIsImage(updatedMedia)
+            ? updatedMedia.animation
+            : null,
+          editionParameters: { ...updatedMedia.editionParameters, cropData },
+
+          duration: mediaInfoIsImage(updatedMedia)
+            ? updatedMedia.duration
+            : COVER_MAX_MEDIA_DURATION,
+        };
+      } else {
+        const lottieInfo = extractLottieInfoMemoized(state.lottie);
+        const durations = lottieInfo
+          ? getLottieMediasDurations(lottieInfo)
+          : null;
+        const duration = durations ? durations[index] : null;
+
+        medias[state.selectedItemIndex] = {
+          media: payload,
+          filter: updatedMedia.filter,
+          animation: null,
+          editionParameters: { ...updatedMedia.editionParameters, cropData },
+          timeRange: {
+            startTime: 0,
+            duration:
+              duration ??
+              Math.min(COVER_VIDEO_DEFAULT_DURATION, payload.duration),
+          },
+        };
+      }
+      return {
+        ...state,
+        medias,
+        imagesScales,
+      };
     }
     case 'UPDATE_MEDIA_TRANSITION': {
       return { ...state, coverTransition: payload };
@@ -702,6 +760,8 @@ export function coverEditorReducer(
       return {
         ...state,
         loadingError: payload.error,
+        loadingLocalMedia: false,
+        loadingRemoteMedia: false,
       };
     case 'LOADING_SUCCESS':
       const { images, lutShaders, videoPaths } = payload;

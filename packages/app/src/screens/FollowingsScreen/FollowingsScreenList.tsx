@@ -4,7 +4,7 @@ import Toast from 'react-native-toast-message';
 import { graphql, usePaginationFragment } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-import { isEditor } from '@azzapp/shared/profileHelpers';
+import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import WebCardList from '#components/WebCardList';
 import useAuthState from '#hooks/useAuthState';
 import useToggleFollow from '#hooks/useToggleFollow';
@@ -84,7 +84,7 @@ const FollowingsScreenList = ({ webCard: webCardKey }: FollowingsListProps) => {
 
   const onToggleFollow = useCallback(
     (profileId: string, profileUserName: string) => {
-      if (isEditor(profileInfos?.profileRole)) {
+      if (profileHasEditorRight(profileInfos?.profileRole)) {
         toggleFollow(profileId, profileUserName, false);
       } else {
         Toast.show({

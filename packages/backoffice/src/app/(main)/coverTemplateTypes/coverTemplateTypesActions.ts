@@ -1,13 +1,12 @@
 'use server';
-import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import {
-  db,
   getCoverTemplateTypeById,
-  CoverTemplateTypeTable,
   saveLocalizationMessage,
+  transaction,
+  updateCoverTemplateType,
+  createCoverTemplateType,
 } from '@azzapp/data';
-import { createId } from '@azzapp/data/helpers/createId';
 import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import { ADMIN } from '#roles';
 import { currentUserHasRole } from '#helpers/roleHelpers';
@@ -35,8 +34,8 @@ export const saveCoverTemplateType = async (
   let coverTemplateTypeId: string;
 
   try {
-    coverTemplateTypeId = await db.transaction(async trx => {
-      const { id, label, ...webCardCategoryData } = data;
+    coverTemplateTypeId = await transaction(async () => {
+      const { id, label, ...coverTemplateTypeData } = data;
 
       let coverTemplateTypeId: string;
       if (id) {
@@ -46,29 +45,20 @@ export const saveCoverTemplateType = async (
         }
 
         coverTemplateTypeId = id;
-        await trx
-          .update(CoverTemplateTypeTable)
-          .set({
-            ...webCardCategoryData,
-          })
-          .where(eq(CoverTemplateTypeTable.id, id));
+        await updateCoverTemplateType(
+          coverTemplateTypeId,
+          coverTemplateTypeData,
+        );
       } else {
-        coverTemplateTypeId = createId();
-        await trx.insert(CoverTemplateTypeTable).values({
-          ...webCardCategoryData,
-          id: coverTemplateTypeId,
-        });
+        coverTemplateTypeId = await createCoverTemplateType(data);
       }
 
-      await saveLocalizationMessage(
-        {
-          key: coverTemplateTypeId,
-          value: label,
-          locale: DEFAULT_LOCALE,
-          target: ENTITY_TARGET,
-        },
-        trx,
-      );
+      await saveLocalizationMessage({
+        key: coverTemplateTypeId,
+        value: label,
+        locale: DEFAULT_LOCALE,
+        target: ENTITY_TARGET,
+      });
 
       return coverTemplateTypeId;
     });

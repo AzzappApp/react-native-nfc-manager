@@ -15,7 +15,7 @@ import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
 import ERRORS from '@azzapp/shared/errors';
-import { isAdmin } from '@azzapp/shared/profileHelpers';
+import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors, shadow } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
@@ -393,7 +393,7 @@ const WebCardModal = ({
             <CoverRenderer
               webCard={webCard}
               width={windowsWith / 3}
-              animationEnabled={false}
+              canPlay={false}
             />
           </View>
         </View>
@@ -428,7 +428,7 @@ const WebCardModal = ({
           </View>
         </View>
         <View style={styles.bottomSheetOptionsContainer}>
-          {isViewer && isAdmin(profileInfos?.profileRole) && (
+          {isViewer && profileHasAdminRight(profileInfos?.profileRole) && (
             <PressableNative
               style={styles.bottomSheetOptionButton}
               onPress={onWebCardParameters}
@@ -447,7 +447,7 @@ const WebCardModal = ({
               </View>
             </PressableNative>
           )}
-          {isViewer && isAdmin(profileInfos?.profileRole) && (
+          {isViewer && profileHasAdminRight(profileInfos?.profileRole) && (
             <PressableNative
               style={styles.bottomSheetOptionButton}
               onPress={onMultiUser}

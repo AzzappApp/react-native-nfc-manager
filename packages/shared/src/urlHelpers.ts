@@ -20,6 +20,15 @@ export function buildPostUrl(userName: string, postId: string) {
 }
 
 /**
+ *
+ * @param userName is the webCard userName
+ * @returns the url for invitation (redirect to store when relevant)
+ */
+export function buildInviteUrl(userName: string) {
+  return `${buildUserUrl(userName)}/invite`;
+}
+
+/**
  * Builds a user URL from a user name and a serialized contact card.
  * this url will be used to share the contact card
  */

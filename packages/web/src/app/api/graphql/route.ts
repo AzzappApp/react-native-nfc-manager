@@ -1,11 +1,22 @@
 /* eslint-disable react-hooks/rules-of-hooks */
+import { useLogger, useErrorHandler } from '@envelop/core';
 import { UnauthenticatedError, useGenericAuth } from '@envelop/generic-auth';
+import { useParserCache } from '@envelop/parser-cache';
 import { useSentry } from '@envelop/sentry';
+import { useValidationCache } from '@envelop/validation-cache';
+import { maxAliasesPlugin } from '@escape.tech/graphql-armor-max-aliases';
+import { maxTokensPlugin } from '@escape.tech/graphql-armor-max-tokens';
 import { useDisableIntrospection } from '@graphql-yoga/plugin-disable-introspection';
 import { usePersistedOperations } from '@graphql-yoga/plugin-persisted-operations';
+import { createYoga } from 'graphql-yoga';
 import { withAxiom } from 'next-axiom';
 import { compare } from 'semver';
-import { createGraphqlEndpoint, type GraphQLContext } from '@azzapp/schema';
+import {
+  getDatabaseConnectionsInfos,
+  startDatabaseConnectionMonitoring,
+} from '@azzapp/data';
+import { DEFAULT_LOCALE, type Locale } from '@azzapp/i18n';
+import { schema, type GraphQLContext } from '@azzapp/schema';
 import ERRORS from '@azzapp/shared/errors';
 import { AZZAPP_SERVER_HEADER } from '@azzapp/shared/urlHelpers';
 import queryMap from '#persisted-query-map.json';
@@ -13,48 +24,11 @@ import { buildCoverAvatarUrl } from '#helpers/avatar';
 import { notifyUsers } from '#helpers/sendMessages';
 import { getSessionData } from '#helpers/tokens';
 import packageJSON from '../../../../package.json';
-
+import type { GraphQLError } from 'graphql';
 import type { LogLevel, Plugin as YogaPlugin } from 'graphql-yoga';
+
 const LAST_SUPPORTED_APP_VERSION =
   process.env.LAST_SUPPORTED_APP_VERSION ?? packageJSON.version;
-
-function useRevalidatePages(): YogaPlugin<GraphQLContext> {
-  return {
-    onExecute: () => {
-      return {
-        async onExecuteDone(payload) {
-          const cards = [
-            ...payload.args.contextValue.cardUsernamesToRevalidate.values(),
-          ];
-          const posts = [
-            ...payload.args.contextValue.postsToRevalidate.values(),
-          ];
-
-          if (cards.length || posts.length) {
-            const res = await fetch(
-              `${process.env.NEXT_PUBLIC_API_ENDPOINT}/revalidate`,
-              {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  [AZZAPP_SERVER_HEADER]: process.env.API_SERVER_TOKEN ?? '',
-                },
-                body: JSON.stringify({
-                  cards,
-                  posts,
-                }),
-              },
-            );
-            if (!res.ok) {
-              console.error('Error revalidating pages');
-            }
-          }
-        },
-      };
-    },
-  };
-}
-
 function useAppVersion(): YogaPlugin {
   return {
     onRequest({ request, fetchAPI, endResponse }) {
@@ -82,8 +56,59 @@ function useAppVersion(): YogaPlugin {
   };
 }
 
-const SUPPORTED_LOG_LEVELS = ['debug', 'info', 'warn', 'error', 'silent'];
+function useRevalidatePages(): YogaPlugin<GraphQLContext> {
+  return {
+    onExecute: ({ extendContext }) => {
+      const invalidatedWebCards = new Set<string>();
+      const invalidateWebCard = (userName: string) =>
+        invalidatedWebCards.add(userName);
+      const getInvalidatedWebCards = () => Array.from(invalidatedWebCards);
 
+      const invalidatedPosts = new Set<string>();
+      const getInvalidatedPosts = () =>
+        Array.from(invalidatedPosts, key => {
+          const [userName, id] = key.split(':');
+          return { userName, id };
+        });
+
+      const invalidatePost = (userName: string, id: string) =>
+        invalidatedPosts.add(`${userName}:${id}`);
+
+      extendContext({
+        invalidatePost,
+        invalidateWebCard,
+      });
+
+      return {
+        async onExecuteDone() {
+          const cards = getInvalidatedWebCards();
+          const posts = getInvalidatedPosts();
+          if (cards.length || posts.length) {
+            const res = await fetch(
+              `${process.env.NEXT_PUBLIC_API_ENDPOINT}/revalidate`,
+              {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  [AZZAPP_SERVER_HEADER]: process.env.API_SERVER_TOKEN ?? '',
+                },
+                body: JSON.stringify({
+                  cards,
+                  posts,
+                }),
+              },
+            );
+            if (!res.ok) {
+              console.error('Error revalidating pages');
+            }
+          }
+        },
+      };
+    },
+  };
+}
+
+const SUPPORTED_LOG_LEVELS = ['debug', 'info', 'warn', 'error', 'silent'];
 const getLoggingLevel = () => {
   const logLevel = process.env.API_LOG_LEVEL;
 
@@ -100,16 +125,81 @@ const getLoggingLevel = () => {
   return process.env.NODE_ENV !== 'production' ? 'debug' : 'error';
 };
 
-const { handleRequest } = createGraphqlEndpoint({
+const { handleRequest } = createYoga({
   graphqlEndpoint: '/api/graphql',
+  schema,
   fetchAPI: {
     Request,
     Response,
   },
-  buildCoverAvatarUrl,
   logging: getLoggingLevel(),
+  graphiql: process.env.NODE_ENV !== 'production',
+  batching: {
+    limit: 5,
+  },
+  context: ({
+    request,
+  }): Omit<
+    GraphQLContext,
+    'currentUser' | 'invalidatePost' | 'invalidateWebCard'
+  > => {
+    const locale = request.headers.get('azzapp-locale') as Locale;
+    return {
+      locale: locale ?? DEFAULT_LOCALE,
+      notifyUsers,
+      validateMailOrPhone,
+      buildCoverAvatarUrl,
+    };
+  },
   plugins: [
     useAppVersion(),
+    useLogger({
+      logFn: (eventName, { args }) => {
+        if (process.env.ENABLE_DATABASE_MONITORING === 'true') {
+          if (eventName === 'execute-start') {
+            startDatabaseConnectionMonitoring();
+          }
+          if (eventName === 'execute-end') {
+            const infos = getDatabaseConnectionsInfos();
+            if (infos) {
+              const gqlName = /query\s*(\S+)\s*[{(]/g.exec(
+                args.contextValue.params.query,
+              )?.[1];
+              console.log(
+                `-------------------- Graphql Query : ${gqlName} --------------------`,
+              );
+              console.log('Number database requests', infos.nbRequests);
+              console.log(
+                'Max concurrent requests',
+                infos.maxConcurrentRequests,
+              );
+              console.log('Queries:\n---\n', infos.queries.join('\n---\n'));
+              console.log(
+                '----------------------------------------------------------------',
+              );
+            }
+          }
+        }
+      },
+    }),
+    useErrorHandler(({ errors }) => {
+      console.log({ errors });
+      errors
+        .filter(
+          err =>
+            (err as GraphQLError).extensions?.code !== ERRORS.INVALID_TOKEN,
+        )
+        .map(err => console.error(err));
+    }),
+    useParserCache(),
+    useValidationCache(),
+    maxAliasesPlugin({
+      n: 50, // Number of aliases allowed
+      allowList: ['node', 'uri'],
+    }),
+    maxTokensPlugin({
+      n: 1000, // Number of tokens allowed
+    }),
     useDisableIntrospection({
       isDisabled: request => {
         return process.env.NODE_ENV !== 'production'
@@ -150,7 +240,6 @@ const { handleRequest } = createGraphqlEndpoint({
           return null;
         }
       },
-      contextFieldName: 'auth',
       validateUser: params => {
         if (!params.user?.userId) {
           return new UnauthenticatedError(ERRORS.INVALID_TOKEN, {
@@ -160,6 +249,7 @@ const { handleRequest } = createGraphqlEndpoint({
           });
         }
       },
+      contextFieldName: 'currentUser',
       mode: 'protect-all',
     }) as YogaPlugin,
     useRevalidatePages() as YogaPlugin,
@@ -168,28 +258,6 @@ const { handleRequest } = createGraphqlEndpoint({
       includeExecuteVariables: true,
     }),
   ],
-  notifyUsers,
-  validateMailOrPhone: async (
-    type: 'email' | 'phone',
-    issuer: string,
-    token: string,
-  ) => {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_ENDPOINT}/validateMailOrPhone`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          [AZZAPP_SERVER_HEADER]: process.env.API_SERVER_TOKEN ?? '',
-        },
-        body: JSON.stringify({ type, issuer, token }),
-      },
-    );
-
-    if (!res.ok) {
-      throw new Error('Error validating mail or phone');
-    }
-  },
 });
 
 const handleRequestWithAxiom = withAxiom(handleRequest);
@@ -199,4 +267,25 @@ export { handleRequestWithAxiom as GET, handleRequestWithAxiom as POST };
 const removePreRelease = (version: string) => {
   const versionParts = version.split('-');
   return versionParts[0];
+};
+
+const validateMailOrPhone = async (
+  type: 'email' | 'phone',
+  issuer: string,
+  token: string,
+) => {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_ENDPOINT}/validateMailOrPhone`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        [AZZAPP_SERVER_HEADER]: process.env.API_SERVER_TOKEN ?? '',
+      },
+      body: JSON.stringify({ type, issuer, token }),
+    },
+  );
+  if (!res.ok) {
+    throw new Error('Error validating mail or phone');
+  }
 };

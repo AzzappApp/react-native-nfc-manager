@@ -5,6 +5,7 @@ import type { ComponentType, HTMLAttributes } from 'react';
 
 type ButtonIconProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   Icon: ComponentType<Omit<HTMLAttributes<HTMLDivElement>, 'children'>>;
+  iconClassName?: string;
   size?: number;
   width?: number;
   height?: number;
@@ -16,6 +17,7 @@ const ButtonIcon = (props: ButtonIconProps) => {
     Icon,
     className,
     color = 'black',
+    iconClassName,
     width,
     height,
     children,
@@ -33,7 +35,11 @@ const ButtonIcon = (props: ButtonIconProps) => {
       className={classnames}
       {...others}
     >
-      <Icon color={color} style={{ width: size, height: size }} />
+      <Icon
+        color={color}
+        style={{ width: size, height: size }}
+        className={iconClassName}
+      />
       {children}
     </button>
   );

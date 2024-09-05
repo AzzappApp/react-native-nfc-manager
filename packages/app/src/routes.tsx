@@ -103,12 +103,20 @@ export type PostRoute = {
   route: 'POST';
   params: {
     postId: string;
+    videoTime?: number | null;
     fromRectangle?: LayoutRectangle;
   };
 };
 
 export type PostCommentsRoute = {
   route: 'POST_COMMENTS';
+  params: {
+    postId: string;
+  };
+};
+
+export type PostLikesRoute = {
+  route: 'POST_LIKES';
   params: {
     postId: string;
   };
@@ -227,6 +235,15 @@ export type MultiUserDetailRoute = {
   };
 };
 
+export type EmailSignatureRoute = {
+  route: 'EMAIL_SIGNATURE';
+  params: {
+    userName: string;
+    mode: string;
+    compressedContactCard: string;
+  };
+};
+
 export type Route =
   | AboutRoute
   | AccountDetailsRoute
@@ -239,6 +256,7 @@ export type Route =
   | CoverCreationRoute
   | CoverEditionRoute
   | CoverTemplateSelectionRoute
+  | EmailSignatureRoute
   | FollowersRoute
   | FollowingsMosaicRoute
   | FollowingsRoute
@@ -254,6 +272,7 @@ export type Route =
   | NewPostRoute
   | OnboardingRoute
   | PostCommentsRoute
+  | PostLikesRoute
   | PostRoute
   | ResetPasswordRoute
   | SearchRoute

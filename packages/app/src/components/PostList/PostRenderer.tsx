@@ -13,7 +13,7 @@ import { useIntl } from 'react-intl';
 import { Alert, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
-import { isEditor } from '@azzapp/shared/profileHelpers';
+import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import AuthorCartouche from '#components/AuthorCartouche';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -27,11 +27,14 @@ import PostRendererBottomPanel, {
   PostRendererBottomPanelSkeleton,
 } from './PostRendererBottomPanel';
 import PostRendererMedia from './PostRendererMedia';
-import type { MediaVideoRendererHandle } from '#components/medias';
+import type {
+  MediaVideoRendererHandle,
+  MediaImageRendererHandle,
+} from '#components/medias';
 import type { PostRendererFragment_author$key } from '#relayArtifacts/PostRendererFragment_author.graphql';
 import type { PostRendererFragment_post$key } from '#relayArtifacts/PostRendererFragment_post.graphql';
 import type { ForwardedRef } from 'react';
-import type { ViewProps, HostComponent } from 'react-native';
+import type { ViewProps } from 'react-native';
 
 export type PostRendererProps = ViewProps & {
   /**
@@ -70,6 +73,12 @@ export type PostRendererProps = ViewProps & {
    */
   paused?: boolean;
   /**
+   * If true, and if a snapshot of the post media exists, it will be while loading the media
+   *
+   * @type {boolean}
+   */
+  useAnimationSnapshot?: boolean;
+  /**
    * initial time of the video
    *
    * @type {(number | null)}
@@ -104,6 +113,7 @@ const PostRenderer = (
     onPressAuthor,
     actionEnabled = true,
     showUnpublished = false,
+    useAnimationSnapshot,
     ...props
   }: PostRendererProps,
   forwardedRef: ForwardedRef<PostRendererHandle>,
@@ -135,9 +145,9 @@ const PostRenderer = (
     authorKey,
   );
 
-  const mediaRef = useRef<HostComponent<any> | MediaVideoRendererHandle | null>(
-    null,
-  );
+  const mediaRef = useRef<
+    MediaImageRendererHandle | MediaVideoRendererHandle | null
+  >(null);
 
   useImperativeHandle(
     forwardedRef,
@@ -167,7 +177,7 @@ const PostRenderer = (
   const intl = useIntl();
 
   const openModal = useCallback(() => {
-    if (isEditor(profileInfos?.profileRole)) {
+    if (profileHasEditorRight(profileInfos?.profileRole)) {
       toggleModal();
     } else {
       Toast.show({
@@ -252,6 +262,7 @@ const PostRenderer = (
             videoDisabled={
               videoDisabled || (!shouldPlayVideo && !shouldPauseVideo)
             }
+            useAnimationSnapshot={useAnimationSnapshot}
           />
         )}
       </View>

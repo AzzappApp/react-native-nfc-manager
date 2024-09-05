@@ -17,7 +17,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.5.47</string>
+	<string>0.7.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -30,7 +30,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>2</string>
+	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true />
 	<key>NSAppTransportSecurity</key>
@@ -60,6 +60,9 @@
 		<string>PlusJakartaSans-ExtraBold.ttf</string>
 		<string>PlusJakartaSans-Bold.ttf</string>
 		<string>Azzapp.ttf</string>
+		<string>HelveticaNeue.ttf</string>
+		<string>HelveticaNeue-Bold.ttf</string>
+		<string>HelveticaNeue-Medium.ttf</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>BootSplash.storyboard</string>

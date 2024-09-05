@@ -1,23 +1,43 @@
 import { Image } from 'expo-image';
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View, Alert } from 'react-native';
+import { View, Alert, Modal, useWindowDimensions } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
+import { RESULTS } from 'react-native-permissions';
 import Toast from 'react-native-toast-message';
 import {
   COVER_IMAGE_DEFAULT_DURATION,
   COVER_MAX_MEDIA,
 } from '@azzapp/shared/coverHelpers';
 import { colors, shadow } from '#theme';
+import {
+  AlbumPickerScreen,
+  getLatestAlbumLabel,
+} from '#components/AlbumPicker';
+import {
+  CancelHeaderButton,
+  SaveHeaderButton,
+} from '#components/commonsButtons';
+import { MediaGridListFallback } from '#components/MediaGridList';
+import PermissionModal from '#components/PermissionModal';
+import PhotoGalleryMediaList from '#components/PhotoGalleryMediaList';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { duplicateMediaToFillSlots } from '#helpers/mediaHelpers';
+import { duplicateMediaToFillSlots, getMediaId } from '#helpers/mediaHelpers';
+import { usePermissionContext } from '#helpers/PermissionContext';
 import useScreenInsets from '#hooks/useScreenInsets';
+import useToggle from '#hooks/useToggle';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
+import Header from '#ui/Header';
+import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
+import TabsBar from '#ui/TabsBar';
+import TabView from '#ui/TabView';
 import Text from '#ui/Text';
-import MultiMediasSelector from './MultiMediasSelector';
+import useMediaLimitedSelectionAlert from '../useMediaLimitedSelectionAlert';
+import StockMediaList from './StockMediaList';
 import type { Media } from '#helpers/mediaHelpers';
+import type { Album } from '@react-native-camera-roll/camera-roll';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type CoverEditorMediaPickerProps = Omit<ViewProps, 'children'> & {
@@ -26,6 +46,19 @@ type CoverEditorMediaPickerProps = Omit<ViewProps, 'children'> & {
   initialMedias: Media[] | null;
   onFinished: (results: Media[]) => void;
   maxSelectableVideos?: number;
+  onClose: () => void;
+  /**
+   * Simple media selection to avoid having the bottom panel
+   *
+   * @type {boolean}
+   */
+  multiSelection?: boolean;
+  /**
+   * allow video selection
+   *
+   * @type {boolean}
+   */
+  allowVideo?: boolean;
 };
 
 const CoverEditorMediaPicker = ({
@@ -35,36 +68,126 @@ const CoverEditorMediaPicker = ({
   onFinished,
   style,
   maxSelectableVideos,
+  onClose,
+  multiSelection = true,
+  allowVideo = true,
   ...props
 }: CoverEditorMediaPickerProps) => {
   const [selectedMedias, setSelectedMedias] = useState<Media[]>(
     initialMedias ?? [],
   );
+  const [selectedTab, setSelectedTab] = useState('gallery');
+  const [selectedAlbum, setSelectedAlbum] = useState<Album | null>(null);
+  const [showAlbumModal, toggleShowAlbumModal] = useToggle(false);
 
-  const maxMedias =
-    durationsFixed && durations ? durations.length : COVER_MAX_MEDIA;
+  const onSelectAlbum = useCallback(
+    (album: Album | null) => {
+      setSelectedAlbum(album);
+      toggleShowAlbumModal();
+    },
+    [toggleShowAlbumModal],
+  );
 
-  // remove media by index
+  const { mediaPermission } = usePermissionContext();
+  useMediaLimitedSelectionAlert(mediaPermission);
+
+  const onTabPress = useCallback(
+    (tab: string) => {
+      if (tab === 'gallery' && selectedTab === 'gallery') {
+        toggleShowAlbumModal();
+      } else {
+        setSelectedTab(tab);
+      }
+    },
+    [selectedTab, toggleShowAlbumModal],
+  );
+
+  const intl = useIntl();
+  const styles = useStyleSheet(stylesheet);
+
+  const tabs = useMemo(() => {
+    const result = [
+      {
+        tabKey: 'gallery',
+        label: selectedAlbum?.title ?? getLatestAlbumLabel(intl),
+        rightElement: <Icon icon="arrow_down" style={styles.arrowIcon} />,
+      },
+      {
+        tabKey: 'stock_photo',
+        label: intl.formatMessage({
+          defaultMessage: 'Stock Photos',
+          description:
+            'Label for the stock photos tab in the cover Media picker',
+        }),
+      },
+    ];
+    if (allowVideo) {
+      result.push({
+        tabKey: 'stock_video',
+        label: intl.formatMessage({
+          defaultMessage: 'Stock Videos',
+          description:
+            'Label for the stock videos tab in the cover Media picker',
+        }),
+      });
+    }
+    return result;
+  }, [selectedAlbum?.title, intl, styles.arrowIcon, allowVideo]);
+
+  const maxMedias = !multiSelection
+    ? 1
+    : durationsFixed && durations
+      ? durations.length
+      : COVER_MAX_MEDIA;
+
+  // remove Media by index
   const handleRemoveMedia = (index: number) => {
     setSelectedMedias(mediasPicked =>
       mediasPicked.filter((_, i) => i !== index),
     );
   };
 
+  const selectedMediasIds = useMemo(
+    () => selectedMedias?.map(getMediaId) ?? [],
+    [selectedMedias],
+  );
+
   // @todo better define the expected type according to the evolution of the new cover
-  const handleMediaSelected = (media: Media) => {
-    setSelectedMedias(currentMedias => {
-      const index = currentMedias.findIndex(
-        value => value.galleryUri === media.galleryUri,
-      );
-      if (index !== -1) {
-        currentMedias = [...currentMedias];
-        currentMedias.splice(index, 1);
-        return currentMedias;
+  const handleMediaSelected = useCallback(
+    (media: Media) => {
+      if (!multiSelection) {
+        setSelectedMedias([media]);
+        return;
       }
-      if (currentMedias.length < maxMedias) {
+      const disableVideoSelection = maxSelectableVideos
+        ? maxSelectableVideos -
+            (selectedMedias?.filter(m => m.kind === 'video').length ?? 0) ===
+          0
+        : false;
+
+      const index = selectedMedias.findIndex(
+        value => getMediaId(value) === getMediaId(media),
+      );
+
+      if (disableVideoSelection && index === -1 && media.kind === 'video') {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'Maximum number of videos reached',
+            description: 'Error message when trying to add more videos',
+          }),
+          visibilityTime: 2000,
+        });
+        return;
+      }
+
+      if (index !== -1) {
+        setSelectedMedias(selectedMedias.filter((_, i) => i !== index));
+        return;
+      }
+      if (selectedMedias.length < maxMedias) {
         const expectedDuration =
-          durations?.[currentMedias.length] ?? COVER_IMAGE_DEFAULT_DURATION;
+          durations?.[selectedMedias.length] ?? COVER_IMAGE_DEFAULT_DURATION;
 
         if (media.kind === 'video' && media.duration < expectedDuration) {
           Toast.show({
@@ -78,15 +201,20 @@ const CoverEditorMediaPicker = ({
               { duration: Math.ceil(expectedDuration * 10) / 10 },
             ),
           });
-          return currentMedias;
+          return;
         }
-
-        const updatedMedias = [...currentMedias, media as Media];
-        return updatedMedias;
+        setSelectedMedias([...selectedMedias, media]);
       }
-      return currentMedias;
-    });
-  };
+    },
+    [
+      durations,
+      intl,
+      maxMedias,
+      maxSelectableVideos,
+      multiSelection,
+      selectedMedias,
+    ],
+  );
 
   const handleDuplicateMedia = () => {
     if (
@@ -121,21 +249,31 @@ const CoverEditorMediaPicker = ({
       }
     }
 
-    const videoMedia = selectedMedias.filter(media =>
-      media.kind.includes('video'),
-    );
+    const missingMedia =
+      maxMedias - selectedMedias.filter(m => m !== null).length;
 
-    const mediaToDuplicate =
-      maxSelectableVideos && videoMedia.length < maxSelectableVideos
-        ? selectedMedias
-        : selectedMedias.filter(media => media.kind.includes('image'));
-    if (mediaToDuplicate.length > 0) {
+    if (missingMedia > 0) {
+      const selected = selectedMedias.filter(
+        media => media !== null,
+      ) as Media[];
       const duplicatedMedias = duplicateMediaToFillSlots(
         maxMedias,
-        selectedMedias.filter(media => media !== null) as Media[],
+        selected,
+        maxSelectableVideos,
       );
-
       setSelectedMedias(duplicatedMedias);
+
+      if (duplicatedMedias.length < maxMedias) {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'Maximum number of videos reached',
+            description: 'Error message when trying to add more videos',
+          }),
+          visibilityTime: 2000,
+        });
+        return null;
+      }
 
       return duplicatedMedias;
     } else {
@@ -151,7 +289,6 @@ const CoverEditorMediaPicker = ({
     }
   };
 
-  const intl = useIntl();
   const handleOnFinished = () => {
     if (selectedMedias.length === 0) {
       Alert.alert(
@@ -164,6 +301,10 @@ const CoverEditorMediaPicker = ({
           description: 'Description of the no media selected',
         }),
       );
+      return;
+    }
+    if (!multiSelection) {
+      onFinished(selectedMedias);
       return;
     }
 
@@ -215,12 +356,13 @@ const CoverEditorMediaPicker = ({
     onFinished(selectedMedias);
   };
 
-  const mediaOrSlot: Array<Media | null> = durationsFixed
+  const mediasOrSlot: Array<Media | null> = durationsFixed
     ? Array.from(
         { length: maxMedias },
         (_, index) => selectedMedias[index] ?? null,
       )
     : selectedMedias;
+
   const selectionLabel = durationsFixed
     ? intl.formatMessage(
         {
@@ -248,92 +390,203 @@ const CoverEditorMediaPicker = ({
       );
 
   const { top, bottom } = useScreenInsets();
-  const styles = useStyleSheet(stylesheet);
+  const { width: windowWidth } = useWindowDimensions();
   return (
-    <Container
-      {...props}
-      style={[style, styles.root, { paddingBottom: bottom, paddingTop: top }]}
-    >
-      <MultiMediasSelector
-        selectedMedias={selectedMedias}
-        onMediaSelected={handleMediaSelected}
-        maxSelectableVideos={maxSelectableVideos}
-      />
-      <View style={styles.bottomBar}>
-        <View style={styles.selectionRow}>
-          <View style={styles.labelMediaContainer}>
-            <Text variant="medium" style={styles.labelMediaSelected}>
-              {selectionLabel}
-            </Text>
-            {maxSelectableVideos ? (
-              <Text variant="small" style={styles.labelMediaSelected}>
-                <FormattedMessage
-                  defaultMessage={`{max, plural,
-               =1 {{max} video max}
-               other {{max} videos max}
-             }`}
-                  values={{ max: maxSelectableVideos }}
-                  description="CoverEditorMediaPicker - max videos"
+    <>
+      <Container
+        {...props}
+        style={[style, styles.root, { paddingBottom: bottom, paddingTop: top }]}
+      >
+        <View style={styles.headerSection}>
+          {multiSelection ? (
+            <Header
+              leftElement={
+                <IconButton
+                  icon="arrow_down"
+                  onPress={onClose}
+                  iconSize={28}
+                  variant="icon"
                 />
-              </Text>
-            ) : null}
-          </View>
-          <Button label="Done" onPress={handleOnFinished} />
+              }
+              middleElement={intl.formatMessage({
+                defaultMessage: 'Select Medias',
+                description: 'Title of the Cover Editor Media picker',
+              })}
+            />
+          ) : (
+            <Header
+              leftElement={
+                <CancelHeaderButton onPress={onClose} variant="secondary" />
+              }
+              rightElement={<SaveHeaderButton onPress={handleOnFinished} />}
+              middleElement={intl.formatMessage({
+                defaultMessage: 'Select Media',
+                description:
+                  'Title of the Cover Editor Media picker - Select Media',
+              })}
+            />
+          )}
+          <TabsBar
+            tabs={tabs}
+            currentTab={selectedTab}
+            onTabPress={onTabPress}
+            decoration="underline"
+            style={styles.gallery}
+          />
         </View>
-        {!!mediaOrSlot.length && (
-          <ScrollView
-            horizontal
-            contentContainerStyle={styles.selectedMediasList}
-          >
-            {mediaOrSlot.map((media, index) => {
-              const duration = durationsFixed
-                ? durations?.[index] ?? null
-                : null;
-              return (
-                <View key={index} style={styles.media}>
-                  {media && (
-                    <>
-                      <View
-                        style={styles.mediaPicked}
-                        testID="image-picker-media-image"
-                      >
-                        <Image
-                          source={{
-                            uri: media?.galleryUri ?? media.uri,
-                          }}
-                          style={{
-                            width: '100%',
-                            height: '100%',
-                          }}
-                        />
+        <TabView
+          style={styles.content}
+          currentTab={selectedTab}
+          tabs={[
+            {
+              id: 'gallery',
+              element:
+                // we partially unmount the gallery to avoid performance issues
+                selectedTab === 'gallery' &&
+                (mediaPermission === RESULTS.GRANTED ||
+                  mediaPermission === RESULTS.LIMITED) ? (
+                  <PhotoGalleryMediaList
+                    selectedMediasIds={selectedMediasIds}
+                    album={selectedAlbum}
+                    kind={allowVideo ? 'mixed' : 'image'}
+                    autoSelectFirstItem={false}
+                    onMediaSelected={handleMediaSelected}
+                  />
+                ) : (
+                  <MediaGridListFallback numColumns={4} width={windowWidth} />
+                ),
+            },
+            {
+              id: 'stock_photo',
+              element: (
+                <StockMediaList
+                  kind="image"
+                  selectedMediasIds={selectedMediasIds}
+                  onMediaSelected={handleMediaSelected}
+                  displayList={selectedTab === 'stock_photo'}
+                />
+              ),
+            },
+            {
+              id: 'stock_video',
+              element: (
+                <StockMediaList
+                  kind="video"
+                  selectedMediasIds={selectedMediasIds}
+                  onMediaSelected={handleMediaSelected}
+                  displayList={selectedTab === 'stock_video'}
+                />
+              ),
+            },
+          ]}
+        />
+        {multiSelection && (
+          <View style={styles.bottomBar}>
+            <View style={styles.selectionRow}>
+              <View style={styles.labelMediaContainer}>
+                <Text variant="medium" style={styles.labelMediaSelected}>
+                  {selectionLabel}
+                </Text>
+                {maxSelectableVideos ? (
+                  <Text variant="small" style={styles.labelMediaSelected}>
+                    <FormattedMessage
+                      defaultMessage={`{max, plural, =1 {{max} video max} other {{max} videos max}}`}
+                      values={{ max: maxSelectableVideos }}
+                      description="CoverEditorMediaPicker - max videos"
+                    />
+                  </Text>
+                ) : null}
+              </View>
+              <Button
+                label={intl.formatMessage({
+                  defaultMessage: 'Done',
+                  description: 'Cover Editor Media Picker - Done button',
+                })}
+                onPress={handleOnFinished}
+              />
+            </View>
+            {!!mediasOrSlot.length && (
+              <ScrollView
+                horizontal
+                contentContainerStyle={styles.selectedMediasList}
+                style={{ overflow: 'visible' }}
+              >
+                {mediasOrSlot.map((media, index) => {
+                  const duration = durationsFixed
+                    ? durations?.[index] ?? null
+                    : null;
+                  return (
+                    <View style={styles.mediaContainer} key={index}>
+                      <View style={styles.media}>
+                        {media && (
+                          <>
+                            <View
+                              style={styles.mediaPicked}
+                              testID="image-picker-Media-image"
+                            >
+                              <Image
+                                source={{
+                                  uri:
+                                    media?.galleryUri ??
+                                    media.thumbnail ??
+                                    media.uri,
+                                }}
+                                style={{
+                                  width: '100%',
+                                  height: '100%',
+                                }}
+                              />
+                            </View>
+                            <IconButton
+                              icon="close"
+                              size={24}
+                              onPress={() => handleRemoveMedia(index)}
+                              iconStyle={styles.mediaDeleteIcon}
+                              style={styles.mediaDeleteButton}
+                            />
+                          </>
+                        )}
+                        {duration != null && (
+                          <View style={styles.mediaDuration}>
+                            <Text variant="button" style={styles.textDuration}>
+                              <FormattedMessage
+                                defaultMessage="{duration}s"
+                                description="CoverEditorMediaPicker - duration in seconds"
+                                values={{
+                                  duration: Math.round(duration * 10) / 10,
+                                }}
+                              />
+                            </Text>
+                          </View>
+                        )}
                       </View>
-                      <IconButton
-                        icon="close"
-                        size={24}
-                        onPress={() => handleRemoveMedia(index)}
-                        iconStyle={styles.mediaDeleteIcon}
-                        style={styles.mediaDeleteButton}
-                      />
-                    </>
-                  )}
-                  {duration != null && (
-                    <View style={styles.mediaDuration}>
-                      <Text variant="button" style={styles.textDuration}>
-                        <FormattedMessage
-                          defaultMessage="{duration}s"
-                          description="CoverEditorMediaPicker - duration in seconds"
-                          values={{ duration: Math.round(duration * 10) / 10 }}
-                        />
-                      </Text>
                     </View>
-                  )}
-                </View>
-              );
-            })}
-          </ScrollView>
+                  );
+                })}
+              </ScrollView>
+            )}
+          </View>
         )}
-      </View>
-    </Container>
+      </Container>
+      <PermissionModal
+        permissionsFor={'gallery'}
+        autoFocus
+        onRequestClose={onClose}
+      />
+      {(mediaPermission === RESULTS.GRANTED ||
+        mediaPermission === RESULTS.LIMITED) && (
+        <Modal
+          visible={showAlbumModal}
+          onRequestClose={toggleShowAlbumModal}
+          animationType="slide"
+        >
+          <AlbumPickerScreen
+            onSelectAlbum={onSelectAlbum}
+            onClose={toggleShowAlbumModal}
+          />
+        </Modal>
+      )}
+    </>
   );
 };
 
@@ -345,7 +598,7 @@ const stylesheet = createStyleSheet(appearance => ({
   },
   bottomBar: {
     width: '100%',
-    paddingVertical: 15,
+    paddingTop: 15,
     borderTopWidth: 1,
     borderColor: appearance === 'light' ? colors.grey100 : colors.grey1000,
   },
@@ -363,9 +616,10 @@ const stylesheet = createStyleSheet(appearance => ({
     justifyItems: 'center',
     gap: 15,
     paddingTop: 20,
-    marginBottom: 20,
+    paddingBottom: 20,
     paddingHorizontal: 20,
     backgroundColor: appearance === 'light' ? colors.white : colors.black,
+    overflow: 'visible',
   },
   labelMediaSelected: {
     color: colors.grey400,
@@ -380,6 +634,9 @@ const stylesheet = createStyleSheet(appearance => ({
     backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
     overflow: 'visible',
     ...shadow(appearance, 'center'),
+  },
+  mediaContainer: {
+    paddingBottom: 15,
   },
   mediaDeleteIcon: {
     tintColor: appearance === 'light' ? colors.black : colors.grey100,
@@ -411,5 +668,19 @@ const stylesheet = createStyleSheet(appearance => ({
   },
   textDuration: {
     color: 'white',
+  },
+  headerSection: {
+    gap: 15,
+    marginBottom: 15,
+  },
+  content: {
+    flex: 1,
+  },
+  gallery: {
+    flexGrow: 1,
+  },
+  arrowIcon: {
+    width: 12,
+    marginTop: 3,
   },
 }));

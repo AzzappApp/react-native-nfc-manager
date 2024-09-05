@@ -1,13 +1,12 @@
 'use server';
-import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import {
-  db,
   getCoverTemplateTagById,
-  CoverTemplateTagTable,
   saveLocalizationMessage,
+  transaction,
+  updateCoverTemplateTag,
+  createCoverTemplateTag,
 } from '@azzapp/data';
-import { createId } from '@azzapp/data/helpers/createId';
 import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import { ADMIN } from '#roles';
 import { currentUserHasRole } from '#helpers/roleHelpers';
@@ -37,7 +36,7 @@ export const saveCoverTemplateTag = async (data: {
   let coverTemplateTagId: string;
 
   try {
-    coverTemplateTagId = await db.transaction(async trx => {
+    coverTemplateTagId = await transaction(async () => {
       const { id, label, ...coverTemplateTagData } = data;
 
       let coverTemplateTagId: string;
@@ -48,27 +47,17 @@ export const saveCoverTemplateTag = async (data: {
         }
 
         coverTemplateTagId = id;
-        await trx
-          .update(CoverTemplateTagTable)
-          .set(coverTemplateTagData)
-          .where(eq(CoverTemplateTagTable.id, id));
+        await updateCoverTemplateTag(coverTemplateTagId, coverTemplateTagData);
       } else {
-        coverTemplateTagId = createId();
-        await trx.insert(CoverTemplateTagTable).values({
-          ...coverTemplateTagData,
-          id: coverTemplateTagId,
-        });
+        coverTemplateTagId = await createCoverTemplateTag(coverTemplateTagData);
       }
 
-      await saveLocalizationMessage(
-        {
-          key: coverTemplateTagId,
-          value: label,
-          locale: DEFAULT_LOCALE,
-          target: ENTITY_TARGET,
-        },
-        trx,
-      );
+      await saveLocalizationMessage({
+        key: coverTemplateTagId,
+        value: label,
+        locale: DEFAULT_LOCALE,
+        target: ENTITY_TARGET,
+      });
 
       return coverTemplateTagId;
     });

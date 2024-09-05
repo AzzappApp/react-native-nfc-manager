@@ -53,7 +53,7 @@ const AlbumPicker = ({
         {...props}
       >
         <Text variant="large" style={styles.title}>
-          {album?.title ?? latestAlbumTitme(intl)}
+          {album?.title ?? getLatestAlbumLabel(intl)}
         </Text>
         <Icon icon="arrow_down" style={styles.arrowIcon} />
       </PressableNative>
@@ -73,7 +73,7 @@ const AlbumPicker = ({
 
 export default AlbumPicker;
 
-const AlbumPickerScreen = ({
+export const AlbumPickerScreen = ({
   onSelectAlbum,
   onClose,
 }: {
@@ -147,7 +147,7 @@ const AlbumPickerScreen = ({
   );
 };
 
-const latestAlbumTitme = (intl: IntlShape) =>
+export const getLatestAlbumLabel = (intl: IntlShape) =>
   intl.formatMessage({
     defaultMessage: 'Latest',
     description: 'Latest photos album title in image wizzard album selection ',
@@ -199,7 +199,7 @@ const AlbumRenderer = ({
       />
       <View>
         <Text variant="medium">
-          {album ? album.title : latestAlbumTitme(intl)}
+          {album ? album.title : getLatestAlbumLabel(intl)}
         </Text>
         <Text variant="small">{album ? album.count : 'all'}</Text>
       </View>

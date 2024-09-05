@@ -13,7 +13,7 @@ const wrapper = style({
   borderTopStyle: 'solid',
   '@media': {
     [MediaQuery.Desktop]: {
-      height: 130,
+      height: 145,
       position: 'absolute',
       bottom: 0,
       padding: '20px 10px 10px 10px',
@@ -41,7 +41,7 @@ const buttons = style({
   color: vars.color.grey400,
 });
 
-const likes = style([textSmallBold]);
+const likes = style([textSmallBold, { color: vars.color.black }]);
 
 const elapsed = style([
   textSmall,

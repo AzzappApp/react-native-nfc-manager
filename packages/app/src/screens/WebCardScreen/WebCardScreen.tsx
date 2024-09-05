@@ -35,7 +35,10 @@ import {
 import { MODULE_KINDS } from '@azzapp/shared/cardModuleHelpers';
 import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
-import { isEditor, isOwner } from '@azzapp/shared/profileHelpers';
+import {
+  profileHasEditorRight,
+  profileIsOwner,
+} from '@azzapp/shared/profileHelpers';
 import {
   useDidAppear,
   useRouter,
@@ -97,8 +100,8 @@ const WebCardScreen = ({
 
   const { profileInfos } = useAuthState();
   const isViewer = profileInfos?.webCardId === data.webCard?.id;
-  const isWebCardOwner = isViewer && isOwner(profileInfos?.profileRole);
-  const canEdit = isViewer && isEditor(profileInfos?.profileRole);
+  const isWebCardOwner = isViewer && profileIsOwner(profileInfos?.profileRole);
+  const canEdit = isViewer && profileHasEditorRight(profileInfos?.profileRole);
 
   const environment = useRelayEnvironment();
 
@@ -120,7 +123,7 @@ const WebCardScreen = ({
         commit({
           variables: {
             input: {
-              profileId: contactData.profileId,
+              scannedProfileId: contactData?.profileId,
             },
           },
         });
@@ -181,7 +184,10 @@ const WebCardScreen = ({
 
   const toggleFollow = useCallback(
     (webCardId: string, userName: string, follow: boolean) => {
-      if (profileInfos?.profileRole && isEditor(profileInfos.profileRole)) {
+      if (
+        profileInfos?.profileRole &&
+        profileHasEditorRight(profileInfos.profileRole)
+      ) {
         onToggleFollow(webCardId, userName, follow);
       } else if (follow) {
         Toast.show({
@@ -327,7 +333,7 @@ const WebCardScreen = ({
   // #end region
 
   const onEdit = useCallback(() => {
-    if (isEditor(profileInfos?.profileRole)) {
+    if (profileHasEditorRight(profileInfos?.profileRole)) {
       if (!ref.current?.animationRunning.value) {
         toggleEditing();
       }

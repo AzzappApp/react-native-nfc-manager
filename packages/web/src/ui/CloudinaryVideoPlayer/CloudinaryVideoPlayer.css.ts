@@ -1,4 +1,5 @@
 import { style } from '@vanilla-extract/css';
+import { MediaQuery } from '#app/[userName]/theme.css';
 
 const container = style({
   position: 'relative',
@@ -15,11 +16,26 @@ const sound = style({
   borderRadius: 28,
   backgroundColor: 'rgba(0, 0, 0, 0.5)',
   position: 'absolute',
-  right: 20,
-  bottom: 20,
   display: 'flex',
   alignItems: 'center',
+  right: 20,
   justifyContent: 'center',
+  '@media': {
+    [MediaQuery.Desktop]: {
+      transition: 'all 0.3s ease-out',
+      bottom: 0,
+      opacity: 0,
+    },
+    [MediaQuery.Mobile]: {
+      bottom: 10,
+      opacity: 1,
+    },
+  },
+});
+
+const soundOpen = style({
+  bottom: '10px!important',
+  opacity: '1!important',
 });
 
 const play = style({
@@ -37,6 +53,7 @@ const styles = {
   container,
   containerFluid,
   sound,
+  soundOpen,
   play,
 };
 

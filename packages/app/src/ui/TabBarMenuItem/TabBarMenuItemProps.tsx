@@ -50,6 +50,12 @@ type TabBarMenuItemProps = PropsWithChildren<{
    * @type {Icons}
    */
   icon?: Icons;
+
+  /**
+   * Whether the item is disabled
+   * @type {boolean}
+   */
+  disabled?: boolean;
 }>;
 
 export default TabBarMenuItemProps;

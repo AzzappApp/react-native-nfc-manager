@@ -642,7 +642,7 @@ const getUserContacts = (user: Contact) => {
       const phoneNumber = a.digits || a.number;
       if (phoneNumber) {
         let formattedNumber = phoneNumber;
-        let countryCode = a.countryCode as CountryCode;
+        let countryCode = a.countryCode?.toUpperCase() as CountryCode;
 
         const parsedPhoneNumber = parsePhoneNumberFromString(phoneNumber);
         if (phoneNumber.startsWith('+') && parsedPhoneNumber?.isValid()) {
@@ -666,7 +666,7 @@ const getUserContacts = (user: Contact) => {
             getLocales()[0].countryCode;
 
           if (country) {
-            countryCode = country as CountryCode;
+            countryCode = country.toUpperCase() as CountryCode;
             const parsed = parsePhoneNumberFromString(phoneNumber, countryCode);
             if (parsed?.isValid()) {
               formattedNumber = parsed.formatInternational();

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { useRef } from 'react';
+import { FormattedMessage } from 'react-intl';
 import { Button } from '#ui';
 import DownloadAppModal from '#components/DownloadAppModal';
 import CoverRenderer from '#components/renderer/CoverRenderer';
@@ -36,7 +37,11 @@ const CommentFeedHeader = (props: CommentFeedHeaderProps) => {
           <span>{webCard.userName}</span>
         </Link>
         <Button onClick={() => download.current?.open()} size="small">
-          Follow
+          <FormattedMessage
+            defaultMessage="Follow"
+            id="LQ5guw"
+            description="Follow button button in comment feed"
+          />
         </Button>
       </div>
       <DownloadAppModal ref={download} media={media} webCard={webCard} />

@@ -5,29 +5,18 @@
   ],
   "tasks": {
     "build": {
-      "dependsOn": [
-        "payment-api-client",
-        "^build"
-      ],
-      "outputs": [
-        "lib/**"
-      ],
-      "inputs": [
-        "src/**"
-      ]
+      "dependsOn": ["payment-api-client", "^build"],
+      "outputs": ["lib/**"],
+      "inputs": ["src/**"]
     },
     "payment-api-client": {
-      "passThroughEnv": [
-        "PAYMENT_API_URL"
-      ],
+      "passThroughEnv": ["PAYMENT_API_URL"],
       "dependsOn": [],
       "inputs": [],
       "cache": false
     },
     "typecheck": {
-      "dependsOn": [
-        "^build"
-      ],
+      "dependsOn": ["payment-api-client", "^build"],
       "inputs": [
         "src/**"
       ]

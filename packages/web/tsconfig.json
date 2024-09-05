@@ -3,10 +3,9 @@
   "compilerOptions": {
     "paths": {
       "@azzapp/shared/*": ["../shared/src/*"],
-      "@azzapp/data/*": ["../data/src/*"],
       "@azzapp/schema/*": ["../schema/src/*"],
       "@azzapp/payment/*": ["../payment/src/*"],
-      "#*": ["./src/*"],
+      "#*": ["./src/*"]
     }
   }
 }

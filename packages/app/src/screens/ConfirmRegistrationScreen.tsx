@@ -7,7 +7,6 @@ import {
   useBlurOnFulfill,
   useClearByFocusCell,
 } from 'react-native-confirmation-code-field';
-import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Toast from 'react-native-toast-message';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
@@ -93,90 +92,89 @@ const ConfirmRegistrationScreen = ({
 
   return (
     <Container style={styles.flex}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={styles.flex}
-      >
-        <View onTouchStart={Keyboard.dismiss} style={styles.container}>
-          <View style={styles.inner}>
-            <View style={styles.logoContainer}>
-              <Icon icon={isEmail ? 'mail_line' : 'sms'} style={styles.logo} />
-            </View>
-            <View style={styles.viewText}>
-              {isEmail ? (
-                <>
-                  <Text style={styles.textForgot} variant="xlarge">
-                    <FormattedMessage
-                      defaultMessage="Check your emails!"
-                      description="ConfirmRegistrationScreen - Check your emails or messages!"
-                    />
-                  </Text>
-                  <Text style={styles.textForgotExplain} variant="medium">
-                    <FormattedMessage
-                      defaultMessage="We just sent you a link to confirm your email, or you can type the code below"
-                      description="ConfirmRegistrationScreen - message to inform the user an email has been sent to confirm his email address"
-                    />
-                  </Text>
-                </>
-              ) : (
-                <>
-                  <Text style={styles.textForgot} variant="xlarge">
-                    <FormattedMessage
-                      defaultMessage="Check your messages!"
-                      description="ConfirmRegistrationScreen - Check your messages!"
-                    />
-                  </Text>
-                  <Text style={styles.textForgotExplain} variant="medium">
-                    <FormattedMessage
-                      defaultMessage="You can type the code below"
-                      description="ConfirmRegistrationScreen - message to inform the user an sms has been sent to confirm his phone number"
-                    />
-                  </Text>
-                </>
-              )}
-            </View>
-
-            <CodeField
-              ref={ref}
-              {...props}
-              value={code}
-              onChangeText={setCode}
-              cellCount={CELL_COUNT}
-              rootStyle={styles.codeFieldRoot}
-              keyboardType="number-pad"
-              textContentType="oneTimeCode"
-              autoComplete="sms-otp"
-              autoFocus
-              renderCell={({ index, symbol, isFocused }) => (
-                <View
-                  key={index}
-                  style={[styles.cell, isFocused && styles.focusCell]}
-                  onLayout={getCellOnLayoutHandler(index)}
-                >
-                  <Text variant="large">
-                    {symbol || (isFocused ? <Cursor /> : null)}
-                  </Text>
-                </View>
-              )}
-            />
-            <Button
-              label={intl.formatMessage({
-                defaultMessage: 'Confirm',
-                description: 'ConfirmRegistrationScreen - Confirm button',
-              })}
-              accessibilityLabel={intl.formatMessage({
-                defaultMessage: 'Tap to confirm you email or phone number',
-                description:
-                  'ConfirmRegistrationScreen - AccessibilityLabel confirm email or phone number button',
-              })}
-              style={styles.button}
-              onPress={onSubmit}
-              disabled={!(code.length === CELL_COUNT)}
-              loading={isSubmitting}
-            />
+      <View onTouchStart={Keyboard.dismiss} style={styles.container}>
+        <View style={styles.inner}>
+          <View style={styles.logoContainer}>
+            <Icon icon={isEmail ? 'mail_line' : 'sms'} style={styles.logo} />
           </View>
+          <View style={styles.viewText}>
+            {isEmail ? (
+              <>
+                <Text style={styles.textForgot} variant="xlarge">
+                  <FormattedMessage
+                    defaultMessage="Check your emails!"
+                    description="ConfirmRegistrationScreen - Check your emails or messages!"
+                  />
+                </Text>
+                <Text style={styles.textForgotExplain} variant="medium">
+                  <FormattedMessage
+                    defaultMessage="We just sent you a link to confirm your email, or you can type the code below"
+                    description="ConfirmRegistrationScreen - message to inform the user an email has been sent to confirm his email address"
+                  />
+                </Text>
+              </>
+            ) : (
+              <>
+                <Text style={styles.textForgot} variant="xlarge">
+                  <FormattedMessage
+                    defaultMessage="Check your messages!"
+                    description="ConfirmRegistrationScreen - Check your messages!"
+                  />
+                </Text>
+                <Text style={styles.textForgotExplain} variant="medium">
+                  <FormattedMessage
+                    defaultMessage="You can type the code below"
+                    description="ConfirmRegistrationScreen - message to inform the user an sms has been sent to confirm his phone number"
+                  />
+                </Text>
+              </>
+            )}
+          </View>
+
+          <CodeField
+            ref={ref}
+            {...props}
+            value={code}
+            onChangeText={setCode}
+            cellCount={CELL_COUNT}
+            rootStyle={styles.codeFieldRoot}
+            keyboardType="number-pad"
+            textContentType="oneTimeCode"
+            autoComplete={Platform.select({
+              android: 'sms-otp' as const,
+              default: 'one-time-code' as const,
+            })}
+            caretHidden={true}
+            renderCell={({ index, symbol, isFocused }) => (
+              <View
+                key={index}
+                style={[styles.cell, isFocused && styles.focusCell]}
+                onLayout={getCellOnLayoutHandler(index)}
+              >
+                <Text variant="large">
+                  {symbol || (isFocused ? <Cursor /> : null)}
+                </Text>
+              </View>
+            )}
+          />
+          <Button
+            label={intl.formatMessage({
+              defaultMessage: 'Confirm',
+              description: 'ConfirmRegistrationScreen - Confirm button',
+            })}
+            accessibilityLabel={intl.formatMessage({
+              defaultMessage: 'Tap to confirm you email or phone number',
+              description:
+                'ConfirmRegistrationScreen - AccessibilityLabel confirm email or phone number button',
+            })}
+            style={styles.button}
+            onPress={onSubmit}
+            disabled={!(code.length === CELL_COUNT)}
+            loading={isSubmitting}
+          />
         </View>
-      </KeyboardAvoidingView>
+      </View>
+
       <View
         style={{
           bottom: insets.bottom,
