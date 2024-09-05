@@ -21,7 +21,7 @@ jobs:
     environment: ${{(github.ref_name == 'stable' && 'Production') || (github.ref_name == 'staging' && 'Staging') || 'Development' }}
     name: Build, Test and update Azzapp application version, translations and persisted queries
     runs-on: ubuntu-latest
-    steps: 
+    steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -30,7 +30,7 @@ jobs:
 
       - name: Setup
         uses: ./.github/actions/setup
- 
+
       - name: Pull translations
         uses: ./.github/actions/i18n-pull
         with:
@@ -47,13 +47,13 @@ jobs:
 
       - name: JavaScript build
         run: yarn build-app-dependencies
-  
+
       - name: Lint
         run: yarn lint
-  
+
       - name: Type check
         run: yarn typecheck
-  
+
       - name: Test
         run: yarn test
 
@@ -106,7 +106,7 @@ jobs:
 
       - name: Setup
         uses: ./.github/actions/setup
- 
+
       - name: Pull translations
         uses: ./.github/actions/i18n-pull
         with:
@@ -116,10 +116,10 @@ jobs:
 
       - name: Install Vercel CLI
         run: npm i -g vercel@latest
-      
+
       - name: Azzapp Web - Pull Vercel configuration
         env:
-          VERCEL_PROJECT_ID: "azzapp"
+          VERCEL_PROJECT_ID: 'azzapp'
         run: |
           ENVIRONMENT="preview"
           ADDITIONAL_ARGS=""
@@ -133,7 +133,7 @@ jobs:
 
       - name: Azzapp Web - Vercel deployment
         env:
-          VERCEL_PROJECT_ID: "azzapp"
+          VERCEL_PROJECT_ID: 'azzapp'
         run: |
           ADDITIONAL_ARGS=""
           GITHUB_REF="${{ github.ref }}"
@@ -171,16 +171,15 @@ jobs:
     environment: ${{(github.ref_name == 'stable' && 'Production') || (github.ref_name == 'staging' && 'Staging') || 'Development' }}
     name: Build native iOS application
     runs-on: macos-latest-xlarge
-    needs: 
+    needs:
       - test-and-update-app
-      - deploy-to-vercel
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
       - name: Setup
         uses: ./.github/actions/setup
- 
+
       - name: Pull translations
         uses: ./.github/actions/i18n-pull
         with:
@@ -188,10 +187,9 @@ jobs:
           database-username: ${{ vars.DATABASE_USERNAME }}
           database-password: ${{ secrets.DATABASE_PASSWORD }}
 
-
       - name: JavaScript build
         run: yarn build-app-dependencies
-        
+
       - uses: ruby/setup-ruby@v1
         with:
           working-directory: packages/app
@@ -266,16 +264,15 @@ jobs:
     environment: ${{(github.ref_name == 'stable' && 'Production') || (github.ref_name == 'staging' && 'Staging') || 'Development' }}
     name: Build native Android application
     runs-on: ubuntu-latest
-    needs: 
+    needs:
       - test-and-update-app
-      - deploy-to-vercel
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
       - name: Setup
         uses: ./.github/actions/setup
-  
+
       - name: Pull translations
         uses: ./.github/actions/i18n-pull
         with:
@@ -283,10 +280,14 @@ jobs:
           database-username: ${{ vars.DATABASE_USERNAME }}
           database-password: ${{ secrets.DATABASE_PASSWORD }}
 
-
       - name: JavaScript build
         run: yarn build-app-dependencies
-        
+      
+      - uses: ruby/setup-ruby@v1
+        with:
+          working-directory: packages/app
+          bundler-cache: true  
+
       - name: Configure Keystore
         run: |
           echo "$ANDROID_KEYSTORE_FILE" > keystore.jks.b64
@@ -307,11 +308,6 @@ jobs:
           base64 -d -i play_config.json.b64 > ${{ github.workspace }}/play_config.json
         env:
           PLAYSTORE_SERVICE_SECRET: ${{ secrets.PLAYSTORE_SERVICE_SECRET }}
-
-      - name: Verify Google Play Config file
-        run: |
-          cat ${{ github.workspace }}/play_config.json
-          jq . ${{ github.workspace }}/play_config.json
 
       - name: Build android application
         run: yarn build:android
