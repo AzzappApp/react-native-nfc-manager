@@ -1,5 +1,6 @@
-## 0.7.0-canary.2
+## 0.7.0-canary.3
 
+* **build:**  - put back database migration
 * **fix:**  -  jagged bars appear due to top borderRadius ([#4902](https://github.com/AzzappApp/azzapp/pull/4902))
 * **build:**  - add github token on release
 * **fix:**  - avoid infinite loading in coverId is missing ([#4894](https://github.com/AzzappApp/azzapp/pull/4894))
