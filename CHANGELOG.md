@@ -1,5 +1,6 @@
-## 0.7.0-canary.5
+## 0.7.0-canary.6
 
+* **fix:**  - **multiUser:** [#4872](https://github.com/AzzappApp/azzapp/pull/4872) wrong phone number is stored in db ([#4928](https://github.com/AzzappApp/azzapp/pull/4928))
 * **fix:**  - **post:** [#4912](https://github.com/AzzappApp/azzapp/pull/4912) wrong params in removeComment method ([#4925](https://github.com/AzzappApp/azzapp/pull/4925))
 * **fix:**  - **web:** [#4919](https://github.com/AzzappApp/azzapp/pull/4919) href was never passed to link ([#4922](https://github.com/AzzappApp/azzapp/pull/4922))
 * **fix:**  - **posts:** [#4913](https://github.com/AzzappApp/azzapp/pull/4913) item may be null ([#4920](https://github.com/AzzappApp/azzapp/pull/4920))
