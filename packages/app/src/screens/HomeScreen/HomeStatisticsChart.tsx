@@ -325,25 +325,17 @@ const AnimatedBarChartItem = ({
     <View
       style={{
         flexDirection: 'column-reverse',
-        marginRight: CHART_BAR_SEPARATOR,
+        paddingRight: CHART_BAR_SEPARATOR,
+        width: chartBarWidth,
       }}
     >
       <Animated.View
         style={[
           {
-            width: chartBarWidth - CHART_BAR_SEPARATOR,
-            borderTopLeftRadius: chartBarWidth / 2,
-            borderTopRightRadius: chartBarWidth / 2,
-          },
-          styles.barTop,
-        ]}
-      />
-      <Animated.View
-        style={[
-          {
-            width: chartBarWidth - CHART_BAR_SEPARATOR,
-            borderTopLeftRadius: chartBarWidth / 2,
-            borderTopRightRadius: chartBarWidth / 2,
+            width: '100%',
+            borderRadius: chartBarWidth / 2,
+            borderBottomLeftRadius: 0.5,
+            borderBottomRightRadius: 0.5, //THIS IS A HACK, without border, gradient appear on bottom of the bar https://github.com/AzzappApp/azzapp/issues/4792
           },
           animatedStyle,
           styles.bar,
@@ -376,10 +368,6 @@ const stylesheet = createVariantsStyleSheet(() => ({
     dateContainer: {
       position: 'absolute',
       bottom: 0,
-    },
-    barTop: {
-      height: '5%',
-      position: 'absolute',
     },
   },
   dark: {
