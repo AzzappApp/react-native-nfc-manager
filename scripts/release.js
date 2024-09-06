@@ -34,9 +34,13 @@ const main = async () => {
   });
 
   const { nextVersion, changeLog } = await buildChangeLog(prerelease, majorInc);
+  const [major, minor, patch] = nextVersion.split('-')[0].split('.');
+  const paddedMinor = minor.padStart(2, '0');
+  const paddedPatch = patch.padStart(2, '0');
+  const androidVersionCode = `${major}${paddedMinor}${paddedPatch}000`;
 
   console.log('Updating worskpace version...');
-  setWorkspaceVersions(nextVersion);
+  setWorkspaceVersions(nextVersion, androidVersionCode);
 
   console.log('Commiting changes...');
   execSyncWithLog(`git add .`);

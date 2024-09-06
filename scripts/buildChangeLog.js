@@ -132,7 +132,7 @@ module.exports = async function buildChangeLog(
         break;
     }
     if (prerelease) {
-      nextVersion = `${nextVersion}-rc.0`;
+      nextVersion = `${nextVersion}-rc.1`;
     }
   }
 
