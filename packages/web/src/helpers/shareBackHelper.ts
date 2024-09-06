@@ -33,7 +33,7 @@ export const shareBackVCardFilename = (data: {
     vCardFileName = 'azzapp-contact';
   }
 
-  return vCardFileName;
+  return `${vCardFileName}.vcf`;
 };
 
 export const shareBackSignature = async (
