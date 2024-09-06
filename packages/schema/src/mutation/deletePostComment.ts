@@ -28,7 +28,7 @@ const deletePostComment: MutationResolvers['deletePostComment'] = async (
       throw new GraphQLError(ERRORS.FORBIDDEN);
     }
 
-    await removeComment(commentId, userId, originalComment.postId);
+    await removeComment(commentId, originalComment.postId, userId);
     postCommentLoader.clear(commentId);
 
     return {
