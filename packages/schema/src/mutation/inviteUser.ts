@@ -99,7 +99,7 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
       if (!existingUser) {
         userId = await createUser({
           email: invited.email,
-          phoneNumber: invited.phoneNumber,
+          phoneNumber,
           invited: true,
         });
         await createFreeSubscriptionForBetaPeriod([userId]);
