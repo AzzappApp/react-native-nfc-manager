@@ -1,5 +1,6 @@
-## 0.7.0-canary.3
+## 0.7.0-canary.4
 
+* **perf:**  - improve some queries on home ([#4900](https://github.com/AzzappApp/azzapp/pull/4900))
 * **build:**  - put back database migration
 * **fix:**  -  jagged bars appear due to top borderRadius ([#4902](https://github.com/AzzappApp/azzapp/pull/4902))
 * **build:**  - add github token on release
