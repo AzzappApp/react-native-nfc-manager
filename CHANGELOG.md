@@ -1,5 +1,6 @@
-## 0.7.0-canary.1
+## 0.7.0-canary.2
 
+* **fix:**  -  jagged bars appear due to top borderRadius ([#4902](https://github.com/AzzappApp/azzapp/pull/4902))
 * **build:**  - add github token on release
 * **fix:**  - avoid infinite loading in coverId is missing ([#4894](https://github.com/AzzappApp/azzapp/pull/4894))
 * **fix:**  - **cover:** [#4659](https://github.com/AzzappApp/azzapp/pull/4659) wrong cover text height ([#4893](https://github.com/AzzappApp/azzapp/pull/4893))
