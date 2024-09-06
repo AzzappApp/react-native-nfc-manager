@@ -37,8 +37,7 @@ const commonProfilesDataLoader = createSessionDataLoader(
 const hasAdminRightOnSharedWebCard = async (user: UserModel) => {
   const profiles = (await commonProfilesDataLoader.load(user.id)) ?? [];
   return profiles.some(
-    profile =>
-      profile.profileRole === 'owner' || profile.profileRole === 'admin',
+    profileRole => profileRole === 'owner' || profileRole === 'admin',
   );
 };
 

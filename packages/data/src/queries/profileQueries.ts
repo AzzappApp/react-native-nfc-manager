@@ -390,11 +390,11 @@ export const removeWebCardNonOwnerProfiles = async (webCardId: string) => {
 export const getCommonWebCardProfiles = async (
   userId: string,
   targetUserIds: readonly string[],
-): Promise<Record<string, Profile[]>> => {
+): Promise<Record<string, string[]>> => {
   const TargetProfileTable = alias(ProfileTable, 'TargetProfileTable');
   return db()
     .select({
-      profile: ProfileTable,
+      profileRole: ProfileTable.profileRole,
       targetUserId: TargetProfileTable.userId,
     })
     .from(ProfileTable)
@@ -410,14 +410,14 @@ export const getCommonWebCardProfiles = async (
     )
     .then(res =>
       res.reduce(
-        (acc, { profile, targetUserId }) => {
+        (acc, { profileRole, targetUserId }) => {
           if (!acc[targetUserId]) {
             acc[targetUserId] = [];
           }
-          acc[targetUserId].push(profile);
+          acc[targetUserId].push(profileRole);
           return acc;
         },
-        {} as Record<string, Profile[]>,
+        {} as Record<string, string[]>,
       ),
     );
 };
