@@ -1,8 +1,15 @@
-## 0.7.0-canary.4
+## 0.7.0-canary.5
 
+* **fix:**  - **post:** [#4912](https://github.com/AzzappApp/azzapp/pull/4912) wrong params in removeComment method ([#4925](https://github.com/AzzappApp/azzapp/pull/4925))
+* **fix:**  - **web:** [#4919](https://github.com/AzzappApp/azzapp/pull/4919) href was never passed to link ([#4922](https://github.com/AzzappApp/azzapp/pull/4922))
+* **fix:**  - **posts:** [#4913](https://github.com/AzzappApp/azzapp/pull/4913) item may be null ([#4920](https://github.com/AzzappApp/azzapp/pull/4920))
+* **fix:**  - check of profile roles ([#4918](https://github.com/AzzappApp/azzapp/pull/4918))
+* **fix:**  - routing info in sentry ([#4914](https://github.com/AzzappApp/azzapp/pull/4914))
+* **fix:**  - **shareBack:** [#4905](https://github.com/AzzappApp/azzapp/pull/4905) put extension in filename for shareback via mail ([#4906](https://github.com/AzzappApp/azzapp/pull/4906))
 * **perf:**  - improve some queries on home ([#4900](https://github.com/AzzappApp/azzapp/pull/4900))
 * **build:**  - put back database migration
 * **fix:**  -  jagged bars appear due to top borderRadius ([#4902](https://github.com/AzzappApp/azzapp/pull/4902))
+* **docs:**  - Update README.md
 * **build:**  - add github token on release
 * **fix:**  - avoid infinite loading in coverId is missing ([#4894](https://github.com/AzzappApp/azzapp/pull/4894))
 * **fix:**  - **cover:** [#4659](https://github.com/AzzappApp/azzapp/pull/4659) wrong cover text height ([#4893](https://github.com/AzzappApp/azzapp/pull/4893))
