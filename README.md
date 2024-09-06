@@ -153,7 +153,6 @@ The application use a [GraphQL](https://graphql.org/) API to communicate between
 
 - The workspace build system is based on [Turbo Repo](https://turbo.build/)
 - The CI/CD Process is based on [Github Actions](https://github.com/features/actions)
-- The natives applications are built [EAS](https://expo.dev/). 
 
 ### List of environement variables during the build process:
 

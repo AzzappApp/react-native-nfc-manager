@@ -7,7 +7,7 @@ import ERRORS from '@azzapp/shared/errors';
 import { notifyUsers } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
 import { userLoader, webCardLoader } from '#loaders';
-import { hasWebCardProfileAdminRight } from '#helpers/permissionsHelpers';
+import { checkWebCardProfileAdminRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 
@@ -20,9 +20,7 @@ const sendInvitations: MutationResolvers['sendInvitations'] = async (
 ) => {
   const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
 
-  if (!(await hasWebCardProfileAdminRight(webCardId))) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
-  }
+  await checkWebCardProfileAdminRight(webCardId);
 
   if (!profileIds?.length && !allProfiles) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);

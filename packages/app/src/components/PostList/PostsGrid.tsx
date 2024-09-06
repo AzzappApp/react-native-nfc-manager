@@ -177,13 +177,13 @@ const viewabilityConfig: ViewabilityConfig = {
 
 const overrideItemLayout = (
   layout: { span?: number; size?: number },
-  item: Post,
+  item: Post | null,
   _index: number,
   _maxColumns: number,
   extraData?: any,
 ) => {
   const itemWidth = extraData.itemWidth;
-  const ratio = item.media?.aspectRatio ?? 1;
+  const ratio = item?.media?.aspectRatio ?? 1;
   layout.size = itemWidth / ratio + 8;
 };
 

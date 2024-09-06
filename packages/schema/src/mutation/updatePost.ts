@@ -4,7 +4,7 @@ import { updatePost } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { invalidateWebCard } from '#externals';
 import { postLoader, webCardLoader } from '#loaders';
-import { hasWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
+import { checkWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 import type { Post } from '@azzapp/data';
@@ -18,9 +18,8 @@ const updatePostMutation: MutationResolvers['updatePost'] = async (
 ) => {
   const postId = fromGlobalIdWithType(gqlPostId, 'Post');
   const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
-  if (!(await hasWebCardProfileEditorRight(webCardId))) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
-  }
+  await checkWebCardProfileEditorRight(webCardId);
+
   const post = await postLoader.load(postId);
   if (!post || post.webCardId !== webCardId) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);

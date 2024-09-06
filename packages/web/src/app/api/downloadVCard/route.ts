@@ -109,7 +109,7 @@ const downloadVCard = async (req: NextRequest) => {
   const vCardFileName = shareBackVCardFilename(buildVCardContact);
   return new Response(vCardContactString, {
     headers: {
-      'Content-Disposition': `attachment; filename="${vCardFileName}.vcf"`,
+      'Content-Disposition': `attachment; filename="${vCardFileName}"`,
       'Content-Type': 'text/vcard',
     },
   });

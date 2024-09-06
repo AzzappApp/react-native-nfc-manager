@@ -308,8 +308,9 @@ const AppRouter = () => {
   }, [profileInfos]);
 
   useEffect(() => {
-    const previous = router.getCurrentRoute();
     const disposable = router.addRouteWillChangeListener(route => {
+      const previous = router.getCurrentRoute();
+
       routingInstrumentation.onRouteWillChange({
         name: route.route,
         op: 'navigation',

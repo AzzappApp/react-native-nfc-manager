@@ -2,7 +2,7 @@ import { GraphQLError } from 'graphql';
 import { follows, unfollows } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { webCardLoader } from '#loaders';
-import { hasWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
+import { checkWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 import type { WebCard } from '@azzapp/data';
@@ -15,9 +15,7 @@ const toggleFollowing: MutationResolvers['toggleFollowing'] = async (
   },
 ) => {
   const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
-  if (!(await hasWebCardProfileEditorRight(webCardId))) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
-  }
+  await checkWebCardProfileEditorRight(webCardId);
 
   const targetId = fromGlobalIdWithType(gqlTargetWebCardId, 'WebCard');
 

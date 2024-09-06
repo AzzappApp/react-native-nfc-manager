@@ -11,7 +11,7 @@ import {
   webCardLoader,
   webCardOwnerLoader,
 } from '#loaders';
-import { hasWebCardOwnerProfile } from '#helpers/permissionsHelpers';
+import { checkWebCardOwnerProfile } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 import type { WebCard } from '@azzapp/data';
@@ -21,9 +21,7 @@ const updateMultiUser: MutationResolvers['updateMultiUser'] = async (
   { webCardId: gqlWebCardId, input: { isMultiUser } },
 ) => {
   const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
-  if (!(await hasWebCardOwnerProfile(webCardId))) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
-  }
+  await checkWebCardOwnerProfile(webCardId);
 
   const updates: Partial<WebCard> = {
     isMultiUser,

@@ -100,7 +100,7 @@ const PostCreationScreen = ({
 
   useEffect(() => {
     if (!webCard?.cardIsPublished) {
-      router.replace({ route: 'HOME' });
+      router.backToTop();
     }
   }, [webCard?.cardIsPublished, router]);
 

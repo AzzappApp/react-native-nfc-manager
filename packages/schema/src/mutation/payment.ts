@@ -13,8 +13,8 @@ import {
 import ERRORS from '@azzapp/shared/errors';
 import { getSessionInfos } from '#GraphQLContext';
 import {
-  hasWebCardOwnerProfile,
-  hasWebCardProfileAdminRight,
+  checkWebCardOwnerProfile,
+  checkWebCardProfileAdminRight,
 } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#__generated__/types';
@@ -34,9 +34,7 @@ export const estimateSubscriptionCost: MutationResolvers['estimateSubscriptionCo
 export const createPaymentIntent: MutationResolvers['createPaymentIntent'] =
   async (_, { intent, webCardId: gqlWebCardId }) => {
     const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
-    if (!(await hasWebCardOwnerProfile(webCardId))) {
-      throw new GraphQLError(ERRORS.UNAUTHORIZED);
-    }
+    await checkWebCardOwnerProfile(webCardId);
     const { userId } = getSessionInfos();
     if (!userId) {
       throw new GraphQLError(ERRORS.UNAUTHORIZED);
@@ -61,9 +59,7 @@ export const createSubscriptionFromPaymentMean: MutationResolvers['createSubscri
   async (_, { intent, webCardId: gqlWebCardId, paymentMeanId }) => {
     const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
 
-    if (!(await hasWebCardOwnerProfile(webCardId))) {
-      throw new GraphQLError(ERRORS.UNAUTHORIZED);
-    }
+    await checkWebCardOwnerProfile(webCardId);
 
     const { userId } = getSessionInfos();
     if (!userId) {
@@ -92,9 +88,7 @@ export const createPaymentMean: MutationResolvers['createPaymentMean'] = async (
 ) => {
   const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
 
-  if (!(await hasWebCardOwnerProfile(webCardId))) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
-  }
+  await checkWebCardOwnerProfile(webCardId);
 
   const { userId } = getSessionInfos();
   if (!userId) {
@@ -121,9 +115,7 @@ export const generatePaymentInvoice: MutationResolvers['generatePaymentInvoice']
   async (_, { webCardId: gqlWebCardId, paymentId }) => {
     const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
 
-    if (!(await hasWebCardOwnerProfile(webCardId))) {
-      throw new GraphQLError(ERRORS.UNAUTHORIZED);
-    }
+    await checkWebCardOwnerProfile(webCardId);
 
     const { userId } = getSessionInfos();
     if (!userId) {
@@ -158,9 +150,7 @@ export const updateSubscription: MutationResolvers['updateSubscription'] =
       'UserSubscription',
     );
 
-    if (!(await hasWebCardOwnerProfile(webCardId))) {
-      throw new GraphQLError(ERRORS.UNAUTHORIZED);
-    }
+    await checkWebCardOwnerProfile(webCardId);
     const { userId } = getSessionInfos();
     if (!userId) {
       throw new GraphQLError(ERRORS.UNAUTHORIZED);
@@ -184,9 +174,7 @@ export const upgradeSubscriptionPlan: MutationResolvers['upgradeSubscriptionPlan
       'UserSubscription',
     );
 
-    if (!(await hasWebCardOwnerProfile(webCardId))) {
-      throw new GraphQLError(ERRORS.UNAUTHORIZED);
-    }
+    await checkWebCardOwnerProfile(webCardId);
 
     return upgradePlan(webCardId, subscriptionId);
   };
@@ -200,9 +188,7 @@ export const endSubscription: MutationResolvers['endSubscription'] = async (
     gqlSubscriptionId,
     'UserSubscription',
   );
-  if (!(await hasWebCardOwnerProfile(webCardId))) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
-  }
+  await checkWebCardOwnerProfile(webCardId);
 
   const subscription = await endExistingSubscription(webCardId, subscriptionId);
 
@@ -224,9 +210,7 @@ export const updateSubscriptionCustomer: MutationResolvers['updateSubscriptionCu
       'UserSubscription',
     );
 
-    if (!(await hasWebCardProfileAdminRight(webCardId))) {
-      throw new GraphQLError(ERRORS.UNAUTHORIZED);
-    }
+    await checkWebCardProfileAdminRight(webCardId);
 
     return updateCustomer(webCardId, subscriptionId, customer);
   };

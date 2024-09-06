@@ -49,8 +49,15 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
 
-  if (profile.userId !== userId || !profileHasAdminRight(profile.profileRole)) {
+  if (profile.userId !== userId) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
+  }
+  if (!profileHasAdminRight(profile.profileRole)) {
+    throw new GraphQLError(ERRORS.FORBIDDEN, {
+      extensions: {
+        role: profile.profileRole,
+      },
+    });
   }
 
   const rejected: InviteUserRejected[] = [];

@@ -9,7 +9,7 @@ import {
 import ERRORS from '@azzapp/shared/errors';
 import { getSessionInfos } from '#GraphQLContext';
 import { profileLoader, webCardLoader } from '#loaders';
-import { hasWebCardProfileAdminRight } from '#helpers/permissionsHelpers';
+import { checkWebCardProfileAdminRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 import type { Profile } from '@azzapp/data';
@@ -27,12 +27,11 @@ const saveContactCard: MutationResolvers['saveContactCard'] = async (
   if (!profile) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
-  if (
-    profile.userId !== userId &&
-    !(await hasWebCardProfileAdminRight(profile.webCardId))
-  ) {
+  if (profile.userId !== userId) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
+
+  await checkWebCardProfileAdminRight(profile.webCardId);
 
   const webCard = await webCardLoader.load(profile.webCardId);
 

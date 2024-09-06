@@ -2,16 +2,14 @@ import { GraphQLError } from 'graphql';
 import { getWebCardPendingOwnerProfile, updateProfile } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { profileLoader } from '#loaders';
-import { hasWebCardOwnerProfile } from '#helpers/permissionsHelpers';
+import { checkWebCardOwnerProfile } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 
 const cancelTransferOwnership: MutationResolvers['cancelTransferOwnership'] =
   async (_, { webCardId: gqlWebCardId }) => {
     const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
-    if (!(await hasWebCardOwnerProfile(webCardId))) {
-      throw new GraphQLError(ERRORS.UNAUTHORIZED);
-    }
+    await checkWebCardOwnerProfile(webCardId);
 
     const targetProfile = await getWebCardPendingOwnerProfile(webCardId);
 
