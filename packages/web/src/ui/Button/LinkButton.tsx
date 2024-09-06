@@ -16,7 +16,6 @@ const LinkButton = (props: ButtonProps) => {
     size = 'medium',
     disabled,
     download,
-    href,
     ...others
   } = props;
 
@@ -28,7 +27,7 @@ const LinkButton = (props: ButtonProps) => {
     [styles.large]: size === 'large',
   });
 
-  return <a {...others} className={classnames} />;
+  return <a {...others} className={classnames} download={download} />;
 };
 
 export default LinkButton;
