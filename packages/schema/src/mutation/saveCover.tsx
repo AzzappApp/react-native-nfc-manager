@@ -10,7 +10,7 @@ import {
 import ERRORS from '@azzapp/shared/errors';
 import { invalidatePost, invalidateWebCard } from '#externals';
 import { webCardLoader } from '#loaders';
-import { hasWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
+import { checkWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 import type { WebCard } from '@azzapp/data';
@@ -23,9 +23,8 @@ const saveCover: MutationResolvers['saveCover'] = async (
   },
 ) => {
   const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
-  if (!(await hasWebCardProfileEditorRight(webCardId))) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
-  }
+  await checkWebCardProfileEditorRight(webCardId);
+
   const webCard = await webCardLoader.load(webCardId);
 
   if (!webCard) {

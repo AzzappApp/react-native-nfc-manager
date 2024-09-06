@@ -4,7 +4,7 @@ import ERRORS from '@azzapp/shared/errors';
 import { invalidatePost, invalidateWebCard } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
 import { postLoader, webCardLoader } from '#loaders';
-import { hasWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
+import { checkWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#__generated__/types';
 
@@ -28,9 +28,8 @@ const deletePostMutation: MutationResolvers['deletePost'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  if (!(await hasWebCardProfileEditorRight(webCard.id))) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
-  }
+  await checkWebCardProfileEditorRight(webCard.id);
+
   try {
     await markPostAsDeleted(postId, userId);
   } catch (error) {

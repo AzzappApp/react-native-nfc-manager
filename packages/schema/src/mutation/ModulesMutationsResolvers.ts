@@ -31,7 +31,7 @@ import {
   webCardLoader,
   webCardOwnerLoader,
 } from '#loaders';
-import { hasWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
+import { checkWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 import type { ZodType } from 'zod';
@@ -52,9 +52,7 @@ const createModuleSavingMutation =
   ) => {
     const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
 
-    if (!(await hasWebCardProfileEditorRight(webCardId))) {
-      throw new GraphQLError(ERRORS.UNAUTHORIZED);
-    }
+    await checkWebCardProfileEditorRight(webCardId);
 
     let webCard = await webCardLoader.load(webCardId);
     if (!webCard) {

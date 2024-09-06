@@ -8,7 +8,7 @@ import {
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { webCardLoader } from '#loaders';
-import { hasWebCardProfileAdminRight } from '#helpers/permissionsHelpers';
+import { checkWebCardProfileAdminRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 import type { WebCard } from '@azzapp/data';
@@ -16,9 +16,7 @@ import type { WebCard } from '@azzapp/data';
 const saveCommonInformation: MutationResolvers['saveCommonInformation'] =
   async (_, { webCardId: gqlWebCardId, input: { logoId, ...data } }) => {
     const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
-    if (!(await hasWebCardProfileAdminRight(webCardId))) {
-      throw new GraphQLError(ERRORS.UNAUTHORIZED);
-    }
+    await checkWebCardProfileAdminRight(webCardId);
 
     const webCard = await webCardLoader.load(webCardId);
 

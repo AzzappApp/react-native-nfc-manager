@@ -1,3 +1,5 @@
+import { GraphQLError } from 'graphql';
+import ERRORS from '@azzapp/shared/errors';
 import {
   profileHasAdminRight,
   profileHasEditorRight,
@@ -25,17 +27,35 @@ export const hasWebCardProfileRight = async (webCardId: string) => {
   return (await getWebCardProfile(webCardId)) !== null;
 };
 
-export const hasWebCardProfileEditorRight = async (webCardId: string) => {
+export const checkWebCardProfileEditorRight = async (webCardId: string) => {
   const profile = await getWebCardProfile(webCardId);
-  return !!profile && profileHasEditorRight(profile.profileRole);
+  if (!!profile && !profileHasEditorRight(profile.profileRole)) {
+    throw new GraphQLError(ERRORS.FORBIDDEN, {
+      extensions: {
+        role: profile?.profileRole,
+      },
+    });
+  }
 };
 
-export const hasWebCardProfileAdminRight = async (webCardId: string) => {
+export const checkWebCardProfileAdminRight = async (webCardId: string) => {
   const profile = await getWebCardProfile(webCardId);
-  return !!profile && profileHasAdminRight(profile.profileRole);
+  if (!!profile && !profileHasAdminRight(profile.profileRole)) {
+    throw new GraphQLError(ERRORS.FORBIDDEN, {
+      extensions: {
+        role: profile?.profileRole,
+      },
+    });
+  }
 };
 
-export const hasWebCardOwnerProfile = async (webCardId: string) => {
+export const checkWebCardOwnerProfile = async (webCardId: string) => {
   const profile = await getWebCardProfile(webCardId);
-  return !!profile && profileIsOwner(profile.profileRole);
+  if (!!profile && !profileIsOwner(profile.profileRole)) {
+    throw new GraphQLError(ERRORS.FORBIDDEN, {
+      extensions: {
+        role: profile?.profileRole,
+      },
+    });
+  }
 };

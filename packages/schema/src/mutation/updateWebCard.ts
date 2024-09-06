@@ -9,7 +9,7 @@ import {
   webCardCategoryLoader,
   webCardLoader,
 } from '#loaders';
-import { hasWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
+import { checkWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { checkWebCardHasSubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
@@ -21,9 +21,7 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
   const { userId } = getSessionInfos();
   const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
 
-  if (!(await hasWebCardProfileEditorRight(webCardId))) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
-  }
+  await checkWebCardProfileEditorRight(webCardId);
 
   const {
     webCardCategoryId: graphqlWebCardCategoryId,
@@ -82,12 +80,15 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
       const profile =
         userId &&
         (await profileByWebCardIdAndUserIdLoader.load({ userId, webCardId }));
-      if (
-        !profile ||
-        !profileHasAdminRight(profile.profileRole) ||
-        profile.invited
-      ) {
+      if (!profile || profile.invited) {
         throw new GraphQLError(ERRORS.UNAUTHORIZED);
+      }
+      if (!profileHasAdminRight(profile.profileRole)) {
+        throw new GraphQLError(ERRORS.FORBIDDEN, {
+          extensions: {
+            role: profile.profileRole,
+          },
+        });
       }
     }
 

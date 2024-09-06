@@ -41,15 +41,24 @@ const updateProfileMutation: MutationResolvers['updateProfile'] = async (
   }
 
   if (profileRole === 'owner' && !profileIsOwner(currentProfile.profileRole)) {
-    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+    throw new GraphQLError(ERRORS.FORBIDDEN, {
+      extensions: {
+        role: currentProfile.profileRole,
+      },
+    });
   }
 
-  if (
-    currentProfile.id !== targetProfileId &&
-    (!profileHasAdminRight(currentProfile.profileRole) ||
-      currentProfile.invited)
-  ) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
+  if (currentProfile.id !== targetProfileId) {
+    if (!profileHasAdminRight(currentProfile.profileRole)) {
+      throw new GraphQLError(ERRORS.FORBIDDEN, {
+        extensions: {
+          role: currentProfile.profileRole,
+        },
+      });
+    }
+    if (currentProfile.invited) {
+      throw new GraphQLError(ERRORS.UNAUTHORIZED);
+    }
   }
 
   if (

@@ -36,8 +36,15 @@ const loadCardTemplateMutation: MutationResolvers['loadCardTemplate'] = async (
     webCardId,
   });
 
-  if (!profile || !profileHasEditorRight(profile.profileRole)) {
+  if (!profile) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
+  }
+  if (!profileHasEditorRight(profile.profileRole)) {
+    throw new GraphQLError(ERRORS.FORBIDDEN, {
+      extensions: {
+        role: profile.profileRole,
+      },
+    });
   }
 
   const cardTemplateId = fromGlobalIdWithType(

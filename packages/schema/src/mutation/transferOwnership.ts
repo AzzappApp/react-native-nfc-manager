@@ -5,7 +5,7 @@ import { guessLocale } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
 import { notifyUsers } from '#externals';
 import { profileLoader, userLoader, webCardLoader } from '#loaders';
-import { hasWebCardOwnerProfile } from '#helpers/permissionsHelpers';
+import { checkWebCardOwnerProfile } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 
@@ -14,9 +14,7 @@ const transferOwnership: MutationResolvers['transferOwnership'] = async (
   { webCardId: gqlWebCardId, input: { profileId: gqlProfileId } },
 ) => {
   const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
-  if (!(await hasWebCardOwnerProfile(webCardId))) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
-  }
+  await checkWebCardOwnerProfile(webCardId);
 
   const targetProfileId = fromGlobalIdWithType(gqlProfileId, 'Profile');
   const [targetProfile, webCard] = await Promise.all([

@@ -8,7 +8,7 @@ import {
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { getSessionInfos } from '#GraphQLContext';
-import { hasWebCardProfileAdminRight } from '#helpers/permissionsHelpers';
+import { checkWebCardProfileAdminRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { updateMonthlySubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
@@ -32,9 +32,7 @@ const removeUsersFromWebCard: MutationResolvers['removeUsersFromWebCard'] =
     }
 
     const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
-    if (!(await hasWebCardProfileAdminRight(webCardId))) {
-      throw new GraphQLError(ERRORS.UNAUTHORIZED);
-    }
+    await checkWebCardProfileAdminRight(webCardId);
 
     const profileToRemoveIds = allProfiles
       ? null

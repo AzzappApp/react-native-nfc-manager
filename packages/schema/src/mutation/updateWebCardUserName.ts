@@ -9,7 +9,7 @@ import ERRORS from '@azzapp/shared/errors';
 import { isValidUserName } from '@azzapp/shared/stringHelpers';
 import { invalidateWebCard } from '#externals';
 import { webCardLoader } from '#loaders';
-import { hasWebCardProfileAdminRight } from '#helpers/permissionsHelpers';
+import { checkWebCardProfileAdminRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 
@@ -30,9 +30,7 @@ const updateWebCardUserNameMutation: MutationResolvers['updateWebCardUserName'] 
     if (!isValidUserName(userName)) {
       throw new GraphQLError(ERRORS.INVALID_WEBCARD_USERNAME);
     }
-    if (!(await hasWebCardProfileAdminRight(webCardId))) {
-      throw new GraphQLError(ERRORS.UNAUTHORIZED);
-    }
+    await checkWebCardProfileAdminRight(webCardId);
 
     const webCard = await webCardLoader.load(webCardId);
 

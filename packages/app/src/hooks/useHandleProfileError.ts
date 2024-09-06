@@ -47,7 +47,7 @@ const useHandleProfileActionError = (errorText: string) => {
               profileRole: role as string,
             },
           }).then(() => {
-            router.push({ route: 'HOME' });
+            router.backToTop();
           });
         }
       }
@@ -62,7 +62,7 @@ const useHandleProfileActionError = (errorText: string) => {
           );
         });
 
-        router.push({ route: 'HOME' });
+        router.backToTop();
       }
 
       const errors: Record<string, string> = {

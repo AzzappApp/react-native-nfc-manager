@@ -1,7 +1,7 @@
 import { GraphQLError } from 'graphql';
 import { getWebCardById, unfollows } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
-import { hasWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
+import { checkWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 
@@ -9,9 +9,8 @@ type Mutation = MutationResolvers['removeFollower'];
 
 const removeFollowerMutation: Mutation = async (_, params) => {
   const webCardId = fromGlobalIdWithType(params.webCardId, 'WebCard');
-  if (!(await hasWebCardProfileEditorRight(webCardId))) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
-  }
+  await checkWebCardProfileEditorRight(webCardId);
+
   const removedFollowerId = fromGlobalIdWithType(
     params.input.removedFollowerId,
     'WebCard',

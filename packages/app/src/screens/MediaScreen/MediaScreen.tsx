@@ -63,7 +63,7 @@ const MediaScreen = ({
 
   useEffect(() => {
     if (profile?.invited || !profile?.webCard?.cardIsPublished) {
-      router.replace({ route: 'HOME' });
+      router.backToTop();
     }
   }, [profile?.invited, profile?.webCard?.cardIsPublished, router]);
 

@@ -9,7 +9,7 @@ import {
 import ERRORS from '@azzapp/shared/errors';
 import { invalidateWebCard } from '#externals';
 import { webCardLoader } from '#loaders';
-import { hasWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
+import { checkWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 
 const reorderModules: MutationResolvers['reorderModules'] = async (
@@ -28,9 +28,7 @@ const reorderModules: MutationResolvers['reorderModules'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  if (!(await hasWebCardProfileEditorRight(webCardId))) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
-  }
+  await checkWebCardProfileEditorRight(webCardId);
 
   try {
     transaction(async () => {

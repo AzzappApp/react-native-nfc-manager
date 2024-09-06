@@ -9,7 +9,7 @@ import {
 import ERRORS from '@azzapp/shared/errors';
 import { invalidateWebCard } from '#externals';
 import { webCardLoader } from '#loaders';
-import { hasWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
+import { checkWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 
@@ -26,9 +26,7 @@ const createPostMutation: MutationResolvers['createPost'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  if (!(await hasWebCardProfileEditorRight(webCardId))) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
-  }
+  await checkWebCardProfileEditorRight(webCardId);
 
   try {
     await checkMedias([mediaId]);

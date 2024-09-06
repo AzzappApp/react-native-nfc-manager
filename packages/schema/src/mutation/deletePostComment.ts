@@ -4,7 +4,7 @@ import { removeComment } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { getSessionInfos } from '#GraphQLContext';
 import { postCommentLoader } from '#loaders';
-import { hasWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
+import { checkWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 
@@ -20,9 +20,7 @@ const deletePostComment: MutationResolvers['deletePostComment'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  if (!(await hasWebCardProfileEditorRight(webCardId))) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
-  }
+  await checkWebCardProfileEditorRight(webCardId);
 
   try {
     const originalComment = await postCommentLoader.load(commentId);
