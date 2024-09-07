@@ -17,13 +17,14 @@ export const db = (): DrizzleDatabase => {
 export const transaction = async <T>(
   callback: (tx: { rollback(): void }) => Promise<T>,
 ): Promise<T> =>
-  db().transaction(async tx =>
-    transactionStorage.run(tx, () =>
+  db().transaction(async tx => {
+    const res = await transactionStorage.run(tx, () =>
       callback({
         rollback() {
           tx.rollback();
           return;
         },
       }),
-    ),
-  );
+    );
+    return res;
+  });
