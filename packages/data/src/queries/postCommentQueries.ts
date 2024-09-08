@@ -240,7 +240,7 @@ export const removeComment = async (
   postId: string,
   userId: string,
 ) => {
-  transaction(async () => {
+  await transaction(async () => {
     await db()
       .update(PostCommentTable)
       .set({

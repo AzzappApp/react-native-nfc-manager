@@ -81,7 +81,7 @@ const subscriptionWebHook = async (req: Request) => {
         // Use it for analytics. The flow will always return a expiration event at the end of the subscription
         break;
       case 'EXPIRATION':
-        await await transaction(async () => {
+        await transaction(async () => {
           const sub = (await getUserSubscriptions(userId)).filter(
             s => s.issuer !== 'web',
           );
@@ -118,7 +118,7 @@ const subscriptionWebHook = async (req: Request) => {
         break;
       case 'SUBSCRIPTION_EXTENDED':
       case 'UNCANCELLATION':
-        await await transaction(async () => {
+        await transaction(async () => {
           const sub = (await getUserSubscriptions(userId)).filter(
             s => s.issuer !== 'web',
           );
@@ -151,7 +151,7 @@ const subscriptionWebHook = async (req: Request) => {
         });
         break;
       case 'RENEWAL':
-        await await transaction(async () => {
+        await transaction(async () => {
           const sub = (await getUserSubscriptions(userId)).filter(
             s => s.issuer !== 'web',
           );
@@ -190,7 +190,7 @@ const subscriptionWebHook = async (req: Request) => {
           grace_period_expiration_at_ms &&
           new Date(grace_period_expiration_at_ms) > new Date()
         ) {
-          await await transaction(async () => {
+          await transaction(async () => {
             const sub = (await getUserSubscriptions(userId)).filter(
               s => s.issuer !== 'web',
             );
@@ -222,7 +222,7 @@ const subscriptionWebHook = async (req: Request) => {
         break;
 
       case 'PRODUCT_CHANGE':
-        await await transaction(async () => {
+        await transaction(async () => {
           //with the difference bteween azzapp Profile and ios/adnroid account, it can happen that a renewal is done on another profile if the uer created a new profile, initial purchase does not happen
           const sub = (await getUserSubscriptions(userId)).filter(
             s => s.issuer !== 'web',
