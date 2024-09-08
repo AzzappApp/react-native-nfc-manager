@@ -1,5 +1,7 @@
-## 0.7.0-canary.6
+## 0.7.0-canary.7
 
+* **fix:**  - errors in transactions ([#4930](https://github.com/AzzappApp/azzapp/pull/4930))
+* **fix:**  - try with explicit await ([#4929](https://github.com/AzzappApp/azzapp/pull/4929))
 * **fix:**  - **multiUser:** [#4872](https://github.com/AzzappApp/azzapp/pull/4872) wrong phone number is stored in db ([#4928](https://github.com/AzzappApp/azzapp/pull/4928))
 * **fix:**  - **post:** [#4912](https://github.com/AzzappApp/azzapp/pull/4912) wrong params in removeComment method ([#4925](https://github.com/AzzappApp/azzapp/pull/4925))
 * **fix:**  - **web:** [#4919](https://github.com/AzzappApp/azzapp/pull/4919) href was never passed to link ([#4922](https://github.com/AzzappApp/azzapp/pull/4922))
