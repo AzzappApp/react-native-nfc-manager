@@ -240,8 +240,7 @@ export const removeComment = async (
   postId: string,
   userId: string,
 ) => {
-  transaction(async () => {
-    console.log('removeComment - transaction started');
+  await transaction(async () => {
     await db()
       .update(PostCommentTable)
       .set({
@@ -257,15 +256,11 @@ export const removeComment = async (
         ),
       );
 
-    console.log('removeComment - item removed');
-
     await db()
       .update(PostTable)
       .set({
         counterComments: sql`GREATEST(0, ${PostTable.counterComments} -  1)`,
       })
       .where(eq(PostTable.id, postId));
-
-    console.log('removeComment - transaction finished');
   });
 };

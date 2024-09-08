@@ -13,7 +13,7 @@ export const unpublishWebCardForUser = async (
   userId: string,
   userSubscription?: UserSubscription,
 ) => {
-  transaction(async () => {
+  await transaction(async () => {
     const profiles = (await getUserProfilesWithWebCard(userId)).filter(
       ({ profile }) => profile.profileRole === 'owner',
     );
