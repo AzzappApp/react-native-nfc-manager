@@ -1,10 +1,13 @@
-## 0.7.0-canary.14
+## 0.7.0-canary.15
 
+* **feat:**  - homogeneous render of contact card between home and contact card screen ([#4945](https://github.com/AzzappApp/azzapp/pull/4945))
+* **fix:**  - **multiUser:** [#4740](https://github.com/AzzappApp/azzapp/pull/4740) ensure sms are sent ([#4946](https://github.com/AzzappApp/azzapp/pull/4946))
 * **build:**  - upgrade dependencies ([#4934](https://github.com/AzzappApp/azzapp/pull/4934))
 * **feat:**  - add finger hint ([#4940](https://github.com/AzzappApp/azzapp/pull/4940))
 * **fix:**  - 🐛 properly display saving animation for section image ([#4944](https://github.com/AzzappApp/azzapp/pull/4944))
 * **fix:**  - 🐛 properly display title, text, and background desktop ([#4892](https://github.com/AzzappApp/azzapp/pull/4892))
 * **fix:**  - add autofocus on webcard creation ([#4935](https://github.com/AzzappApp/azzapp/pull/4935))
+* **fix:**  - use next_public_ variable ([#4938](https://github.com/AzzappApp/azzapp/pull/4938))
 * **feat:**  - upgrde and restore revenue cat ios ([#4933](https://github.com/AzzappApp/azzapp/pull/4933))
 * **fix:**  - errors in transactions ([#4930](https://github.com/AzzappApp/azzapp/pull/4930))
 * **fix:**  - try with explicit await ([#4929](https://github.com/AzzappApp/azzapp/pull/4929))
