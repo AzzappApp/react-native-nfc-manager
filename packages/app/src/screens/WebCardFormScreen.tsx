@@ -506,6 +506,7 @@ const WebCardFormScreen = ({
                     autoCorrect={false}
                     returnKeyType="next"
                     onSubmitEditing={focusLastName}
+                    autoFocus
                   />
                 )}
               />
@@ -577,6 +578,7 @@ const WebCardFormScreen = ({
                     autoComplete="name"
                     autoCorrect={false}
                     returnKeyType="next"
+                    autoFocus
                   />
                 )}
               />
