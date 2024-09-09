@@ -65,7 +65,7 @@ export const notifyUsers = async (
         case 'phone':
           await Promise.all(
             receivers.map(async receiver => {
-              sendTwilioSMS({
+              await sendTwilioSMS({
                 to: receiver,
                 body: intl.formatMessage(
                   {

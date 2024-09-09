@@ -30,7 +30,7 @@ type ProfilePageLayoutProps = PropsWithChildren<{
 }>;
 
 const isAppClipSupported = () => {
-  if (!process.env.NEXT_APPLE_APP_ENABLED) {
+  if (!process.env.NEXT_PUBLIC_APPLE_APP_ENABLED) {
     return false;
   }
   const userAgent = navigator.userAgent.toLowerCase();
