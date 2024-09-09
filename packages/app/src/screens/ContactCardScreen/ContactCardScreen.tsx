@@ -38,6 +38,7 @@ import useToggle from '#hooks/useToggle';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
+import FingerHint from '#ui/FingerHint';
 import Icon from '#ui/Icon';
 import PressableAnimated from '#ui/PressableAnimated';
 import PressableNative from '#ui/PressableNative';
@@ -64,6 +65,8 @@ const contactCardMobileScreenQuery = graphql`
             primary
           }
         }
+        lastContactCardUpdate
+        createdAt
         ...ContactCard_profile
         ...ContactCardExportVcf_card
         ...SignaturePreview_profile
@@ -303,6 +306,13 @@ export const ContactCardScreen = ({
               });
             }}
           />
+          {profile.lastContactCardUpdate <= profile.createdAt && (
+            <FingerHint
+              color={colorScheme === 'dark' ? 'light' : 'dark'}
+              style={styles.fingerHint}
+            />
+          )}
+
           <ScrollView
             style={[styles.scrollViewStyle, { height: height - 247 }]}
             showsVerticalScrollIndicator={false}
@@ -576,4 +586,5 @@ const styleSheet = createStyleSheet(appearance => ({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  fingerHint: { top: -57 },
 }));

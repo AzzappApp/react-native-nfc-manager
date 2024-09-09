@@ -134,6 +134,7 @@ const WebCardScreenPublishHelper = ({
       },
       onCompleted: () => {
         setShowPublishModal(false);
+        router.backToTop();
       },
       onError: error => {
         console.error(error);
@@ -156,6 +157,7 @@ const WebCardScreenPublishHelper = ({
 
   const onClose = () => {
     setShowPublishModal(false);
+    router.backToTop();
   };
   const url = buildUserUrl(userName);
 

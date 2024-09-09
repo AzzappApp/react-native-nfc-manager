@@ -179,6 +179,8 @@ const ContactCardEditScreen = ({
           }
           contactCardUrl
           contactCardQrCode(width: $width)
+          lastContactCardUpdate
+          createdAt
           avatar {
             id
             uri: uri(width: 112, pixelRatio: $pixelRatio)
@@ -309,6 +311,25 @@ const ContactCardEditScreen = ({
           );
         }
         router.back();
+      },
+      updater: store => {
+        if (id) {
+          const user = store.getRoot().getLinkedRecord('currentUser');
+          const profiles = user?.getLinkedRecords('profiles');
+
+          if (profiles) {
+            const profile = profiles?.find(
+              profile => profile.getDataID() === id,
+            );
+
+            if (profile) {
+              profile.setValue(
+                new Date().toISOString(),
+                'lastContactCardUpdate',
+              );
+            }
+          }
+        }
       },
       onError: e => {
         console.error(e);

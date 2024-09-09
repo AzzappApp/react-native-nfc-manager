@@ -278,6 +278,8 @@ const WebCardFormScreen = ({
           statsSummary {
             contactCardScans
           }
+          lastContactCardUpdate
+          createdAt
           webCard {
             id
             userName

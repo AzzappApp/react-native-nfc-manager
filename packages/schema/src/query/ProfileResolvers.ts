@@ -113,6 +113,12 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
     }
     return profile.lastContactCardUpdate;
   },
+  createdAt: async profile => {
+    if (!profileIsAssociatedToCurrentUser(profile)) {
+      return null;
+    }
+    return profile.createdAt;
+  },
   nbContactCardScans: async profile => {
     if (
       !profileIsAssociatedToCurrentUser(profile) &&
