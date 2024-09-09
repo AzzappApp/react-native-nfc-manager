@@ -489,17 +489,19 @@ const PhotoWithTextAndTitleEditionScreen = ({
         input,
       },
       onCompleted() {
+        setProgressIndicator(null);
+
         setShowImagePicker(false);
         router.back();
       },
       onError(e) {
+        setProgressIndicator(null);
+
         setShowImagePicker(false);
         console.log(e);
         handleProfileActionError(e);
       },
     });
-
-    setProgressIndicator(null);
   }, [
     canSave,
     cardModulesCount,

@@ -375,17 +375,19 @@ const HorizontalPhotoEditionScreen = ({
         input,
       },
       onCompleted() {
+        setProgressIndicator(null);
+
         setShowImagePicker(false);
         router.back();
       },
       onError(e) {
+        setProgressIndicator(null);
+
         console.error(e);
         setShowImagePicker(false);
         handleProfileActionError(e);
       },
     });
-
-    setProgressIndicator(null);
   }, [
     canSave,
     cardModulesCount,
