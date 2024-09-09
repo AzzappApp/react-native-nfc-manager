@@ -1,5 +1,7 @@
-## 0.7.0-canary.11
+## 0.7.0-canary.12
 
+* **fix:**  - 🐛 properly display saving animation for section image ([#4944](https://github.com/AzzappApp/azzapp/pull/4944))
+* **fix:**  - 🐛 properly display title, text, and background desktop ([#4892](https://github.com/AzzappApp/azzapp/pull/4892))
 * **fix:**  - add autofocus on webcard creation ([#4935](https://github.com/AzzappApp/azzapp/pull/4935))
 * **feat:**  - upgrde and restore revenue cat ios ([#4933](https://github.com/AzzappApp/azzapp/pull/4933))
 * **fix:**  - errors in transactions ([#4930](https://github.com/AzzappApp/azzapp/pull/4930))
