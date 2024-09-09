@@ -15,7 +15,7 @@ import { FormattedMessage, IntlProvider, injectIntl } from 'react-intl';
 import { Platform, useColorScheme } from 'react-native';
 import { hide as hideSplashScreen } from 'react-native-bootsplash';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
-// import Purchases from 'react-native-purchases';
+import Purchases from 'react-native-purchases';
 import {
   initialWindowMetrics,
   SafeAreaProvider,
@@ -126,15 +126,15 @@ Sentry.init({
 });
 
 //initializing RC sneed to be done early
-// if (Platform.OS === 'ios') {
-//   Purchases.configure({
-//     apiKey: process.env.PURCHASE_IOS_KEY!,
-//   });
-// } else if (Platform.OS === 'android') {
-//   Purchases.configure({
-//     apiKey: process.env.PURCHASE_ANDROID_KEY!,
-//   });
-// }
+if (Platform.OS === 'ios') {
+  Purchases.configure({
+    apiKey: process.env.PURCHASE_IOS_KEY!,
+  });
+} else if (Platform.OS === 'android') {
+  Purchases.configure({
+    apiKey: process.env.PURCHASE_ANDROID_KEY!,
+  });
+}
 
 /**
  * Initialize the application
