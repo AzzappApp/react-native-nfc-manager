@@ -122,7 +122,6 @@ const multiUserAddFormSchema = z.object({
     .optional(),
 });
 
-// eslint-disable-next-line @typescript-eslint/ban-types
 type MultiUserAddModalProps = {
   beforeClose: () => void;
   onCompleted: () => void;
@@ -559,7 +558,7 @@ const MultiUserAddModal = (
               webCard?.setValue(nbProfiles + 1, 'nbProfiles');
             },
           });
-        } catch (e) {
+        } catch {
           Toast.show({
             type: 'error',
             text1: intl.formatMessage({

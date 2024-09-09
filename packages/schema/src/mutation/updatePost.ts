@@ -46,7 +46,7 @@ const updatePostMutation: MutationResolvers['updatePost'] = async (
     return {
       post: { ...post, ...partialPost },
     };
-  } catch (error) {
+  } catch {
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 };

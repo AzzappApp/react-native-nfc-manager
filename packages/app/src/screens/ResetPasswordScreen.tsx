@@ -85,7 +85,7 @@ const ResetPasswordScreen = ({
             }),
             onHide: navigateToLogin,
           });
-        } catch (e) {
+        } catch {
           Toast.show({
             type: 'error',
             text1: intl.formatMessage({

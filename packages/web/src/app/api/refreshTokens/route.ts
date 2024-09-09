@@ -15,7 +15,7 @@ const refreshTokensApi = async (req: Request) => {
   try {
     const { refreshToken, token } = await refreshTokens(oldToken);
     return NextResponse.json({ ok: true, token, refreshToken });
-  } catch (e) {
+  } catch {
     return NextResponse.json(
       { message: ERRORS.INVALID_TOKEN },
       { status: 401 },

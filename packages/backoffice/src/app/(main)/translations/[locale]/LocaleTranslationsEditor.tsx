@@ -127,7 +127,7 @@ const LocaleTranslationsEditor = ({
           target,
           value,
         });
-      } catch (error) {
+      } catch {
         setSaveStatus('error');
         return;
       }

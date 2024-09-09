@@ -64,7 +64,7 @@ const handleExistingUser = async (user: User, password: string) => {
       const profiles = await getProfilesByUser(user.id);
       return await handleSignInAuthMethod(user, profiles.at(0));
     }
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { message: ERRORS.INVALID_REQUEST },
       { status: 400 },

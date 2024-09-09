@@ -55,16 +55,13 @@ const CarouselRendererFragment = graphql`
   }
 `;
 
-const animatedProps = [
-  'borderWidth',
-  'borderRadius',
-  'marginVertical',
-  'marginHorizontal',
-  'imageHeight',
-  'gap',
-] as const;
-
-type AnimatedProps = (typeof animatedProps)[number];
+type AnimatedProps =
+  | 'borderRadius'
+  | 'borderWidth'
+  | 'gap'
+  | 'imageHeight'
+  | 'marginHorizontal'
+  | 'marginVertical';
 
 const AnimatedImage = Animated.createAnimatedComponent(Image);
 

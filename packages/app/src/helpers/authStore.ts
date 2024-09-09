@@ -202,7 +202,7 @@ export const getAuthState = (): AuthState => {
   let profileInfos: any = null;
   try {
     profileInfos = profileInfoString ? JSON.parse(profileInfoString) : null;
-  } catch (e) {
+  } catch {
     profileInfos = null;
   }
 

@@ -447,7 +447,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
         );
         const { public_id } = await uploadPromise;
         mediaId = public_id;
-      } catch (error) {
+      } catch {
         Toast.show({
           type: 'error',
           text1: intl.formatMessage({

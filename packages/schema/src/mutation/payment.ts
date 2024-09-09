@@ -50,7 +50,7 @@ export const createPaymentIntent: MutationResolvers['createPaymentIntent'] =
         throw new GraphQLError(ERRORS.PAYMENT_ERROR);
       }
       return result;
-    } catch (error) {
+    } catch {
       throw new GraphQLError(ERRORS.PAYMENT_ERROR);
     }
   };

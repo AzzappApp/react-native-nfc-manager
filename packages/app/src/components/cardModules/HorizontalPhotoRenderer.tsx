@@ -48,15 +48,12 @@ const HorizontalPhotoRendererFragment = graphql`
   }
 `;
 
-const animatedProps = [
-  'borderWidth',
-  'borderRadius',
-  'marginHorizontal',
-  'marginVertical',
-  'imageHeight',
-] as const;
-
-type AnimatedProps = (typeof animatedProps)[number];
+type AnimatedProps =
+  | 'borderRadius'
+  | 'borderWidth'
+  | 'imageHeight'
+  | 'marginHorizontal'
+  | 'marginVertical';
 
 export const readHorizontalPhotoData = (
   module: HorizontalPhotoRenderer_module$key,

@@ -235,7 +235,7 @@ export const ContactCardScreen = ({
           await addPassJWT(pass.token);
         }
       }
-    } catch (e) {
+    } catch {
       Toast.show({
         text1: intl.formatMessage({
           defaultMessage: 'Error',

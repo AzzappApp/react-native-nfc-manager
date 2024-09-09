@@ -212,7 +212,7 @@ const WebCardFormScreen = ({
                 },
               };
             }
-          } catch (e) {
+          } catch {
             //waiting for submit
           }
         }
