@@ -1,5 +1,6 @@
-## 0.7.0-canary.9
+## 0.7.0-canary.10
 
+* **fix:**  - add autofocus on webcard creation ([#4935](https://github.com/AzzappApp/azzapp/pull/4935))
 * **feat:**  - upgrde and restore revenue cat ios ([#4933](https://github.com/AzzappApp/azzapp/pull/4933))
 * **fix:**  - errors in transactions ([#4930](https://github.com/AzzappApp/azzapp/pull/4930))
 * **fix:**  - try with explicit await ([#4929](https://github.com/AzzappApp/azzapp/pull/4929))
