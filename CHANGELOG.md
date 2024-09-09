@@ -1,5 +1,6 @@
-## 0.7.0-canary.12
+## 0.7.0-canary.13
 
+* **feat:**  - add finger hint ([#4940](https://github.com/AzzappApp/azzapp/pull/4940))
 * **fix:**  - 🐛 properly display saving animation for section image ([#4944](https://github.com/AzzappApp/azzapp/pull/4944))
 * **fix:**  - 🐛 properly display title, text, and background desktop ([#4892](https://github.com/AzzappApp/azzapp/pull/4892))
 * **fix:**  - add autofocus on webcard creation ([#4935](https://github.com/AzzappApp/azzapp/pull/4935))
