@@ -1,5 +1,6 @@
-## 0.7.0-canary.7
+## 0.7.0-canary.8
 
+* **feat:**  - upgrde and restore revenue cat ios ([#4933](https://github.com/AzzappApp/azzapp/pull/4933))
 * **fix:**  - errors in transactions ([#4930](https://github.com/AzzappApp/azzapp/pull/4930))
 * **fix:**  - try with explicit await ([#4929](https://github.com/AzzappApp/azzapp/pull/4929))
 * **fix:**  - **multiUser:** [#4872](https://github.com/AzzappApp/azzapp/pull/4872) wrong phone number is stored in db ([#4928](https://github.com/AzzappApp/azzapp/pull/4928))
