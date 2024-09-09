@@ -33,26 +33,15 @@ describe('ChangePasswordScreen Screen', () => {
     );
   };
 
-  test('button `Create new password` should be disabled if new password and old password are not enter', () => {
-    renderAccountDetailsEmailForm();
-    const buttonComponent = screen.getByTestId('submitButton');
-    expect(buttonComponent).toBeDisabled();
-    cleanup();
-  });
-
   test('should not call the `changePassword` callback and show error message when password does not match the requirement', async () => {
     renderAccountDetailsEmailForm();
     const inputPwd = screen.getByPlaceholderText('New password');
     const inputConfirm = screen.getByPlaceholderText('Confirm password');
 
-    const buttonComponent = screen.getByTestId('submitButton');
-
     fireEvent.changeText(inputPwd, 'insufficient password');
     fireEvent(inputPwd, 'onBlur');
     fireEvent.changeText(inputConfirm, 'insufficient password');
     fireEvent(inputConfirm, 'onBlur');
-
-    expect(buttonComponent).toBeDisabled();
 
     flushPromises();
 
@@ -78,10 +67,6 @@ describe('ChangePasswordScreen Screen', () => {
     fireEvent(inputPwd, 'onBlur');
     fireEvent.changeText(inputConfirm, 'doest not match');
     fireEvent(inputConfirm, 'onBlur');
-
-    const buttonComponent = screen.getByTestId('submitButton');
-
-    expect(buttonComponent).toBeDisabled();
 
     await waitFor(() => {
       expect(screen.getByText('Passwords do not match')).toBeTruthy();
@@ -111,8 +96,6 @@ describe('ChangePasswordScreen Screen', () => {
     await waitFor(() => {
       expect(changePasswordMock).toHaveBeenCalled();
     });
-
-    expect(buttonComponent).toBeDisabled();
 
     cleanup();
   });

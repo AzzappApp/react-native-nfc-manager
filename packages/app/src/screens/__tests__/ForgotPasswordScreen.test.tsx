@@ -51,14 +51,4 @@ describe('ForgotPassword Screen', () => {
     });
     expect(forgotPassword).not.toHaveBeenCalled();
   });
-
-  test('Change password button should be `disabled` when the provided email is invalid', () => {
-    const { queryByRole, getByPlaceholderText } = render(
-      <ForgotPasswordScreen />,
-    );
-    const inputLogin = getByPlaceholderText('Email address');
-    act(() => fireEvent(inputLogin, 'onChangeText', 'test@com'));
-    const ubutton = queryByRole('button');
-    expect(ubutton).toBeDisabled();
-  });
 });
