@@ -100,7 +100,7 @@ export const ContactCardScreen = ({
 
   const sharedRotationState = useAnimatedState(fullScreen, defaultTimingParam);
 
-  const cardWidth = (width * 78) / 100;
+  const cardWidth = width - 40;
   const cardHeight = cardWidth / CONTACT_CARD_RATIO;
   const fullScreenCardWidth = width - 40;
   const fullScreenCardHeight = fullScreenCardWidth * CONTACT_CARD_RATIO;
