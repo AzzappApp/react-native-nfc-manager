@@ -609,7 +609,8 @@
 				FD1404502A07EA4900CCA6B9 /* AVAssetCache.swift */,
 				FD1404532A0949C000CCA6B9 /* MediaURICache.swift */,
 			);
-			path = Medias;
+			name = Medias;
+			path = azzapp/Medias;
 			sourceTree = "<group>";
 		};
 		FD7AA9E02BF4DA8E00BEC0E9 /* jsi */ = {
