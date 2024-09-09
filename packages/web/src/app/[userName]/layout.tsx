@@ -80,7 +80,7 @@ const RootLayout = async ({
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#ef3962" />
         <meta
           name="apple-itunes-app"
-          content={`${process.env.NEXT_APPLE_ITUNES_APP_META}`}
+          content={`${process.env.NEXT_PUBLIC_APPLE_ITUNES_APP_META}`}
         />
       </head>
       <body>
