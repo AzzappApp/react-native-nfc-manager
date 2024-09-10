@@ -1,5 +1,6 @@
-## 0.7.0-canary.16
+## 0.7.0-canary.17
 
+* **feat:**  - webcard process ([#4943](https://github.com/AzzappApp/azzapp/pull/4943))
 * **feat:**  - homogeneous render of contact card between home and contact card screen ([#4945](https://github.com/AzzappApp/azzapp/pull/4945))
 * **fix:**  - **multiUser:** [#4740](https://github.com/AzzappApp/azzapp/pull/4740) ensure sms are sent ([#4946](https://github.com/AzzappApp/azzapp/pull/4946))
 * **build:**  - upgrade dependencies ([#4934](https://github.com/AzzappApp/azzapp/pull/4934))
