@@ -254,6 +254,20 @@ export const incrementContactCardTotalScans = async (profileId: string) => {
 };
 
 /**
+ * Increment the number of contact card scans for a profile
+ *
+ * @param profileId - The id of the profile
+ */
+export const incrementShareBacksTotal = async (profileId: string) => {
+  await db()
+    .update(ProfileTable)
+    .set({
+      nbShareBacks: sql`${ProfileTable.nbShareBacks} + 1`,
+    })
+    .where(eq(ProfileTable.id, profileId));
+};
+
+/**
  * Retrieves the list of profiles associated to a web card
  * @param webCardId - The id of the web card
  * @returns The list of profiles associated to the web card

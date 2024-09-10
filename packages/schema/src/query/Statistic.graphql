@@ -33,4 +33,8 @@ type ProfileStatistic implements Node {
   Number of contactCardScans for the day
   """
   contactCardScans: Int!
+  """
+  Number of shareBacks for the day
+  """
+  shareBacks: Int!
 }

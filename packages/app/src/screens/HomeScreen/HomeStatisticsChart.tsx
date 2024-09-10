@@ -28,6 +28,7 @@ type HomeStatisticsChartProps = {
 };
 // * TODO: using SKIA here would have been great, but need to be validated by dev team.
 // Until we have reanimated3, some part of skia a running on JS thread , so can wait
+
 const HomeStatisticsChart = ({
   user,
   width,
@@ -42,8 +43,10 @@ const HomeStatisticsChart = ({
         statsSummary {
           day
           contactCardScans
+          shareBacks
         }
         webCard {
+          userName
           statsSummary {
             day
             webCardViews
@@ -68,6 +71,7 @@ const HomeStatisticsChart = ({
             contactCardScans: 0,
             webCardViews: 0,
             likes: 0,
+            shareBacks: 0,
           }),
         };
       });
@@ -88,7 +92,8 @@ const HomeStatisticsChart = ({
               const index = result.findIndex(item => item.day === stats.day);
 
               if (index !== -1) {
-                //find the stats in webcard stats for the day
+                //find the stats in webcard stats for the daysafari
+
                 result[index].data[indexProfile] = {
                   ...result[index].data[indexProfile],
                   webCardViews: stats.webCardViews,
@@ -111,7 +116,12 @@ const HomeStatisticsChart = ({
     const filtered = chartsData.reduce((acc: StatsData[], group) => {
       group.data.forEach((data, index) => {
         if (!acc[index]) {
-          acc[index] = { contactCardScans: 0, webCardViews: 0, likes: 0 };
+          acc[index] = {
+            contactCardScans: 0,
+            webCardViews: 0,
+            likes: 0,
+            shareBacks: 0,
+          };
         }
 
         acc[index].contactCardScans = Math.max(
@@ -123,6 +133,10 @@ const HomeStatisticsChart = ({
           data.webCardViews,
         );
         acc[index].likes = Math.max(acc[index].likes, data.likes);
+        acc[index].shareBacks = Math.max(
+          acc[index].shareBacks,
+          data.shareBacks,
+        );
       });
 
       return acc;
@@ -130,6 +144,7 @@ const HomeStatisticsChart = ({
     return filtered.flatMap(obj => [
       obj.webCardViews,
       obj.contactCardScans,
+      obj.shareBacks,
       obj.likes,
     ]);
   }, [chartsData]);
@@ -250,6 +265,7 @@ const AnimatedBarChartItem = ({
       item.data.flatMap(obj => [
         obj.webCardViews,
         obj.contactCardScans,
+        obj.shareBacks,
         obj.likes,
       ]),
     [item.data],
@@ -257,30 +273,40 @@ const AnimatedBarChartItem = ({
 
   const animatedStyle = useAnimatedStyle(() => {
     const statsIndex = Math.round(statsScrollIndex.value);
-    const currentValue = flattenedData[currentUserIndex.value * 3 + statsIndex];
-    const currentMax = maxValues[currentUserIndex.value * 3 + statsIndex];
+    const currentValue =
+      flattenedData[currentUserIndex.value * NUMBER_STATISTICS + statsIndex];
+    const currentMax =
+      maxValues[currentUserIndex.value * NUMBER_STATISTICS + statsIndex];
 
     const interpolateValuePanel = interpolate(
       statsScrollIndex.value,
       [statsIndex - 1, statsIndex, statsIndex + 1],
       [
-        flattenedData[currentUserIndex.value * 3 + statsIndex - 1] ?? 0,
+        flattenedData[
+          currentUserIndex.value * NUMBER_STATISTICS + statsIndex - 1
+        ] ?? 0,
         currentValue,
-        flattenedData[currentUserIndex.value * 3 + statsIndex + 1] ?? 0,
+        flattenedData[
+          currentUserIndex.value * NUMBER_STATISTICS + statsIndex + 1
+        ] ?? 0,
       ],
     );
 
     const interpolateValueProfile = interpolate(
-      currentProfileIndexSharedValue.value * 3,
+      currentProfileIndexSharedValue.value * NUMBER_STATISTICS,
       [
-        (currentUserIndex.value - 1) * 3,
-        currentUserIndex.value * 3,
-        (currentUserIndex.value + 1) * 3,
+        (currentUserIndex.value - 1) * NUMBER_STATISTICS,
+        currentUserIndex.value * NUMBER_STATISTICS,
+        (currentUserIndex.value + 1) * NUMBER_STATISTICS,
       ],
       [
-        flattenedData[(currentUserIndex.value - 1) * 3 + statsIndex] ?? 0,
+        flattenedData[
+          (currentUserIndex.value - 1) * NUMBER_STATISTICS + statsIndex
+        ] ?? 0,
         currentValue,
-        flattenedData[(currentUserIndex.value + 1) * 3 + statsIndex] ?? 0,
+        flattenedData[
+          (currentUserIndex.value + 1) * NUMBER_STATISTICS + statsIndex
+        ] ?? 0,
       ],
     );
 
@@ -288,28 +314,35 @@ const AnimatedBarChartItem = ({
       statsScrollIndex.value,
       [statsIndex - 1, statsIndex, statsIndex + 1],
       [
-        maxValues[currentUserIndex.value * 3 + statsIndex - 1] ?? 0,
+        maxValues[
+          currentUserIndex.value * NUMBER_STATISTICS + statsIndex - 1
+        ] ?? 0,
         currentMax,
-        maxValues[currentUserIndex.value * 3 + statsIndex + 1] ?? 0,
+        maxValues[
+          currentUserIndex.value * NUMBER_STATISTICS + statsIndex + 1
+        ] ?? 0,
       ],
     );
 
     const maxValueProfile = interpolate(
-      currentProfileIndexSharedValue.value * 3,
+      currentProfileIndexSharedValue.value * NUMBER_STATISTICS,
       [
-        (currentUserIndex.value - 1) * 3,
-        currentUserIndex.value * 3,
-        (currentUserIndex.value + 1) * 3,
+        (currentUserIndex.value - 1) * NUMBER_STATISTICS,
+        currentUserIndex.value * NUMBER_STATISTICS,
+        (currentUserIndex.value + 1) * NUMBER_STATISTICS,
       ],
       [
-        maxValues[(currentUserIndex.value - 1) * 3 + statsIndex] ?? 0,
+        maxValues[
+          (currentUserIndex.value - 1) * NUMBER_STATISTICS + statsIndex
+        ] ?? 0,
         currentMax,
-        maxValues[(currentUserIndex.value + 1) * 3 + statsIndex] ?? 0,
+        maxValues[
+          (currentUserIndex.value + 1) * NUMBER_STATISTICS + statsIndex
+        ] ?? 0,
       ],
     );
 
     const max = Math.max(1, maxValuePanel + maxValueProfile - currentMax); //Avoid max =0, division by zero what broke animation transition
-
     return {
       height: `${
         ((interpolateValueProfile + interpolateValuePanel - currentValue) /
@@ -349,6 +382,7 @@ const AnimatedBarChart = memo(AnimatedBarChartItem);
 export type StatsData = {
   contactCardScans: number;
   webCardViews: number;
+  shareBacks: number;
   likes: number;
 };
 
@@ -393,3 +427,5 @@ const stylesheet = createVariantsStyleSheet(() => ({
     },
   },
 }));
+
+const NUMBER_STATISTICS = 4;

@@ -275,8 +275,10 @@ const WebCardFormScreen = ({
           #required data on HomeScreen
           ...ContactCard_profile
           nbContactCardScans
+          nbShareBacks
           statsSummary {
             contactCardScans
+            shareBacks
           }
           lastContactCardUpdate
           createdAt

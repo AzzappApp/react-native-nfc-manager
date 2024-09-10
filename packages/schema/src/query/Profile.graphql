@@ -17,6 +17,10 @@ type Profile implements Node {
   """
   nbContactCardScans: Int
   """
+  the number of total Share Back
+  """
+  nbShareBacks: Int
+  """
   The related user
   """
   user: User

@@ -51,6 +51,7 @@ const HomeStatistics = ({
           nbWebCardViews
         }
         nbContactCardScans
+        nbShareBacks
         ...HomeStatisticsChart_profiles
       }
     `,
@@ -87,6 +88,10 @@ const HomeStatistics = ({
     ],
     [profiles],
   );
+  const shareBacks = useDerivedValue(
+    () => [0, ...(profiles?.map(profile => profile.nbShareBacks ?? 0) ?? [])],
+    [profiles],
+  );
   const webCardViews = useDerivedValue(
     () => [
       0,
@@ -112,6 +117,11 @@ const HomeStatistics = ({
         '-1',
     ),
   );
+  const totalShareBacks = useSharedValue(
+    format(
+      shareBacks.value[Math.round(currentIndexSharedValue?.value ?? 0)] ?? '-1',
+    ),
+  );
 
   useAnimatedReaction(
     () => currentIndexSharedValue?.value ?? 1,
@@ -126,10 +136,14 @@ const HomeStatistics = ({
         totalViews.value = format(
           interpolate(actual ?? 0, inputRange.value, webCardViews.value),
         );
+        totalShareBacks.value = format(
+          interpolate(actual ?? 0, inputRange.value, shareBacks.value),
+        );
       } else if (actual >= 0) {
         totalLikes.value = format(likes.value[actual]);
         totalScans.value = format(contactCardScans.value[actual]);
         totalViews.value = format(webCardViews.value[actual]);
+        totalShareBacks.value = format(shareBacks.value[actual]);
       }
     },
     [profiles?.length],
@@ -225,13 +239,24 @@ const HomeStatistics = ({
           />
           <StatisticItems
             variant={variant}
+            value={totalShareBacks}
+            title={intl.formatMessage({
+              defaultMessage: 'ShareBacks',
+              description: 'Home statistics - Share backs label',
+            })}
+            scrollIndex={scrollIndexOffset}
+            index={2}
+            onSelect={onSelectStat}
+          />
+          <StatisticItems
+            variant={variant}
             value={totalLikes}
             title={intl.formatMessage({
               defaultMessage: 'Total Likes',
               description: 'Home statistics - Total Likes',
             })}
             scrollIndex={scrollIndexOffset}
-            index={2}
+            index={3}
             onSelect={onSelectStat}
           />
         </AnimatedScrollView>
