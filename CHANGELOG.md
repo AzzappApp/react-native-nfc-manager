@@ -1,5 +1,8 @@
-## 0.7.0-canary.17
+## 0.7.0-canary.18
 
+* **fix:**  - 🐛 properly display carousel preview with border ([#4953](https://github.com/AzzappApp/azzapp/pull/4953))
+* **build:**  - rollback to previous vision-camera
+* **fix:**  - **contactCard:** [#4951](https://github.com/AzzappApp/azzapp/pull/4951) remove blocking verification ([#4952](https://github.com/AzzappApp/azzapp/pull/4952))
 * **feat:**  - webcard process ([#4943](https://github.com/AzzappApp/azzapp/pull/4943))
 * **feat:**  - homogeneous render of contact card between home and contact card screen ([#4945](https://github.com/AzzappApp/azzapp/pull/4945))
 * **fix:**  - **multiUser:** [#4740](https://github.com/AzzappApp/azzapp/pull/4740) ensure sms are sent ([#4946](https://github.com/AzzappApp/azzapp/pull/4946))
