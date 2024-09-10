@@ -1,5 +1,6 @@
-## 0.7.0-canary.22
+## 0.7.0-canary.23
 
+* **fix:**  - **i18n:** add localization in permissions ([#4968](https://github.com/AzzappApp/azzapp/pull/4968))
 * **fix:**  - **posts:** [#4959](https://github.com/AzzappApp/azzapp/pull/4959) can’t unlike post in post I like screen ([#4961](https://github.com/AzzappApp/azzapp/pull/4961))
 * **fix:**  - 🐛 properly display toast with bigger content ([#4960](https://github.com/AzzappApp/azzapp/pull/4960))
 * **fix:**  - **multiUser:** [#4956](https://github.com/AzzappApp/azzapp/pull/4956) update to new role on polling ([#4957](https://github.com/AzzappApp/azzapp/pull/4957))
