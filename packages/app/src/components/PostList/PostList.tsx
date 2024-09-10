@@ -25,7 +25,7 @@ import type { ViewProps, ViewToken } from 'react-native';
 type PostListProps = ViewProps & {
   posts: PostList_posts$key;
   author?: PostRendererFragment_author$key;
-  viewerWebCard?: PostList_viewerWebCard$key;
+  viewerWebCard?: PostList_viewerWebCard$key | null;
   profile?: PostList_viewerProfile$key;
   canPlay?: boolean;
   onEndReached?: () => void;

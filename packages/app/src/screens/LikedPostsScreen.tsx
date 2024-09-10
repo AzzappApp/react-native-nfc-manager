@@ -17,8 +17,9 @@ import type { LikedPostsRoute } from '#routes';
 
 const likedPostsScreenQuery = graphql`
   query LikedPostsScreenQuery($webCardId: ID!) {
-    profile: node(id: $webCardId) {
+    webCard: node(id: $webCardId) {
       ...LikedPostsScreen_profile @arguments(viewerWebCardId: $webCardId)
+      ...PostList_viewerWebCard
     }
   }
 `;
@@ -34,7 +35,7 @@ const LikedPostsScreen = ({
     router.back();
   };
 
-  const { profile } = usePreloadedQuery(likedPostsScreenQuery, preloadedQuery);
+  const { webCard } = usePreloadedQuery(likedPostsScreenQuery, preloadedQuery);
   const { data, loadNext, hasNext, isLoadingNext, refetch } =
     usePaginationFragment(
       graphql`
@@ -60,7 +61,7 @@ const LikedPostsScreen = ({
           }
         }
       `,
-      profile as LikedPostsScreen_profile$key,
+      webCard as LikedPostsScreen_profile$key,
     );
 
   const [refreshing, setRefreshing] = useState(false);
@@ -119,6 +120,7 @@ const LikedPostsScreen = ({
         refreshing={refreshing}
         onEndReached={onEndReached}
         onRefresh={onRefresh}
+        viewerWebCard={webCard}
       />
     </SafeAreaView>
   );
