@@ -1,5 +1,6 @@
-## 0.7.0-canary.18
+## 0.7.0-canary.19
 
+* **fix:**  - **multiUser:** [#4956](https://github.com/AzzappApp/azzapp/pull/4956) update to new role on polling ([#4957](https://github.com/AzzappApp/azzapp/pull/4957))
 * **fix:**  - 🐛 properly display carousel preview with border ([#4953](https://github.com/AzzappApp/azzapp/pull/4953))
 * **build:**  - rollback to previous vision-camera
 * **fix:**  - **contactCard:** [#4951](https://github.com/AzzappApp/azzapp/pull/4951) remove blocking verification ([#4952](https://github.com/AzzappApp/azzapp/pull/4952))
