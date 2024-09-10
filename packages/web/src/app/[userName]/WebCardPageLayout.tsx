@@ -61,6 +61,7 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
 
   const [contactDataVCard, setContactDataVCard] = useState({
     userId: '',
+    webcardId: '',
     avatarUrl: '',
     token: '',
     firstName: '',
@@ -86,6 +87,7 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
         const tokenDecoded = jwtDecode<DownloadVCardJwtPayload>(token);
         setContactDataVCard({
           userId: tokenDecoded.userId,
+          webcardId: webCard?.id,
           avatarUrl: tokenDecoded.avatarUrl ?? '',
           isMultiUser: tokenDecoded.isMultiUser,
           token,
@@ -226,6 +228,7 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
         fullname={`${contactDataVCard.firstName} ${contactDataVCard.lastName}`}
         initials={`${(contactDataVCard.firstName?.length ?? 0) > 0 && (contactDataVCard.lastName?.length ?? 0) > 0 ? `${contactDataVCard.firstName[0]}${contactDataVCard.lastName[0]}` : webCard.companyName ? webCard.companyName.slice(0, 2) : webCard.userName.slice(0, 2)}`}
         userId={contactDataVCard.userId}
+        webcardId={webCard.id}
         avatarUrl={contactDataVCard.avatarUrl}
         token={contactDataVCard.token}
         isMultiUser={contactDataVCard.isMultiUser}

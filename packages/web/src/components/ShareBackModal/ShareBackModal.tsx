@@ -21,6 +21,7 @@ type ShareBackModalProps = Omit<ModalProps, 'children'> & {
   avatarUrl?: string;
   token: string;
   userId: string;
+  webcardId: string;
   isMultiUser?: boolean;
   initials: string;
 };
@@ -28,7 +29,15 @@ type ShareBackModalProps = Omit<ModalProps, 'children'> & {
 // eslint-disable-next-line react/display-name
 const ShareBackModal = forwardRef<ModalActions, ShareBackModalProps>(
   (props, ref) => {
-    const { fullname, avatarUrl, token, userId, isMultiUser, initials } = props;
+    const {
+      fullname,
+      avatarUrl,
+      token,
+      userId,
+      webcardId,
+      isMultiUser,
+      initials,
+    } = props;
 
     const internalRef = useRef<ModalActions>(null);
 
@@ -75,6 +84,7 @@ const ShareBackModal = forwardRef<ModalActions, ShareBackModalProps>(
           <ShareBackModalForm
             token={token}
             userId={userId}
+            webcardId={webcardId}
             onSuccess={() => {
               internalRef.current?.close();
             }}
