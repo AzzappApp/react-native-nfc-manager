@@ -1,4 +1,4 @@
-## 0.7.0-canary.21
+## 0.7.0-canary.22
 
 * **fix:**  - **posts:** [#4959](https://github.com/AzzappApp/azzapp/pull/4959) can’t unlike post in post I like screen ([#4961](https://github.com/AzzappApp/azzapp/pull/4961))
 * **fix:**  - 🐛 properly display toast with bigger content ([#4960](https://github.com/AzzappApp/azzapp/pull/4960))
