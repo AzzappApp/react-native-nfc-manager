@@ -1,5 +1,6 @@
-## 0.7.0-canary.19
+## 0.7.0-canary.20
 
+* **fix:**  - 🐛 properly display toast with bigger content ([#4960](https://github.com/AzzappApp/azzapp/pull/4960))
 * **fix:**  - **multiUser:** [#4956](https://github.com/AzzappApp/azzapp/pull/4956) update to new role on polling ([#4957](https://github.com/AzzappApp/azzapp/pull/4957))
 * **fix:**  - 🐛 properly display carousel preview with border ([#4953](https://github.com/AzzappApp/azzapp/pull/4953))
 * **build:**  - rollback to previous vision-camera
