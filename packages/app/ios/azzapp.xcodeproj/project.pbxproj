@@ -56,6 +56,9 @@
 		96DD48BE2C5D42FA00620722 /* ShareContactAppClipApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96DD48BD2C5D42FA00620722 /* ShareContactAppClipApp.swift */; };
 		96DD48C22C5D42FB00620722 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 96DD48C12C5D42FB00620722 /* Assets.xcassets */; };
 		96DD48C52C5D42FB00620722 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 96DD48C42C5D42FB00620722 /* Preview Assets.xcassets */; };
+		BCACF1142C90C43800F87577 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = BCACF1132C90C43800F87577 /* InfoPlist.xcstrings */; };
+		BCACF1152C90C43800F87577 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = BCACF1132C90C43800F87577 /* InfoPlist.xcstrings */; };
+		BCACF1162C90C43800F87577 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = BCACF1132C90C43800F87577 /* InfoPlist.xcstrings */; };
 		BCEB3A042A74063A0010EEEE /* Azzapp.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BCEB3A032A74063A0010EEEE /* Azzapp.ttf */; };
 		C2D439B36EA94AC7B690F721 /* HelveticaNeue-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1259B693B98B486E9E0394C7 /* HelveticaNeue-Medium.ttf */; };
 		CE3FB77EFA1BBCFCBA646C5A /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C59A4752184E6A4BC4A569FB /* ExpoModulesProvider.swift */; };
@@ -301,6 +304,7 @@
 		96DD48C62C5D42FB00620722 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		96DD48C72C5D42FB00620722 /* ShareContactAppClip.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ShareContactAppClip.entitlements; sourceTree = "<group>"; };
 		9FE48A15437D4CFB8B1E8602 /* HelveticaNeue-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "HelveticaNeue-Bold.ttf"; path = "../assets/fonts/HelveticaNeue-Bold.ttf"; sourceTree = "<group>"; };
+		BCACF1132C90C43800F87577 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		BCEB3A032A74063A0010EEEE /* Azzapp.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Azzapp.ttf; path = ../../assets/fonts/Azzapp.ttf; sourceTree = "<group>"; };
 		C59A4752184E6A4BC4A569FB /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-common-azzappTests/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		C786997AD89104071327546B /* libPods-common-azzapp-staging.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-common-azzapp-staging.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -430,6 +434,7 @@
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
+				BCACF1132C90C43800F87577 /* InfoPlist.xcstrings */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				FD4BD5452AA626F100DDDB54 /* BootSplash.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
@@ -856,6 +861,7 @@
 			knownRegions = (
 				en,
 				Base,
+				fr,
 			);
 			mainGroup = 83CBB9F61A601CBA00E9B192;
 			productRefGroup = 83CBBA001A601CBA00E9B192 /* Products */;
@@ -886,6 +892,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BCACF1142C90C43800F87577 /* InfoPlist.xcstrings in Resources */,
 				96678DE429D5CFF80073D683 /* PlusJakartaSans-ExtraBold.ttf in Resources */,
 				96678DE229D5CFF80073D683 /* PlusJakartaSans-Bold.ttf in Resources */,
 				96847F192C5248B20089A75C /* HelveticaNeue-Bold.ttf in Resources */,
@@ -941,6 +948,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BCACF1152C90C43800F87577 /* InfoPlist.xcstrings in Resources */,
 				FD292EAE2A94BDC300D880E8 /* Azzapp.ttf in Resources */,
 				FD39DAB92A52AB5F00C49A82 /* PlusJakartaSans-ExtraBold.ttf in Resources */,
 				96847F1A2C5248B20089A75C /* HelveticaNeue-Bold.ttf in Resources */,
@@ -960,6 +968,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BCACF1162C90C43800F87577 /* InfoPlist.xcstrings in Resources */,
 				FD292EAF2A94BDC700D880E8 /* Azzapp.ttf in Resources */,
 				FD39DAF02A52AC2100C49A82 /* PlusJakartaSans-ExtraBold.ttf in Resources */,
 				96847F1B2C5248B20089A75C /* HelveticaNeue-Bold.ttf in Resources */,
