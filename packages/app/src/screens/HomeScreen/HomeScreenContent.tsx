@@ -1,7 +1,9 @@
-import { memo, useMemo, useState } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { runOnJS, useAnimatedReaction } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
+import { getAuthState } from '#helpers/authStore';
+import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
@@ -61,6 +63,21 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
     },
   );
 
+  // TODO: here we rely on polling on HOME to check if the profileRole has changed. We should have a better way to keep our app state in sync with the server.
+  useEffect(() => {
+    const { profileInfos } = getAuthState();
+    if (
+      currentProfile?.profileRole &&
+      profileInfos?.profileRole !== currentProfile.profileRole
+    ) {
+      void dispatchGlobalEvent({
+        type: 'PROFILE_ROLE_CHANGE',
+        payload: {
+          profileRole: currentProfile.profileRole,
+        },
+      });
+    }
+  }, [currentProfile?.profileRole]);
   //#endregion
 
   // #region bottomMenu
