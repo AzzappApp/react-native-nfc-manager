@@ -9,7 +9,7 @@ import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { combineLatest } from '@azzapp/shared/observableHelpers';
 import { isWebCardKindSubscription } from '@azzapp/shared/subscriptionHelpers';
-import { colors, shadow } from '#theme';
+import { colors } from '#theme';
 import { MediaImageRenderer } from '#components/medias';
 import { useRouter } from '#components/NativeRouter';
 import PremiumIndicator from '#components/PremiumIndicator';
@@ -76,7 +76,7 @@ const WebCardKindSelectionScreen = ({
         layout: { height },
       },
     }: LayoutChangeEvent) => {
-      setCardWidth((height - 40) * COVER_RATIO);
+      setCardWidth(height * COVER_RATIO);
     },
     [],
   );
@@ -121,13 +121,24 @@ const WebCardKindSelectionScreen = ({
   const mediaStyle = useMemo(
     () => [
       styles.mediaImage,
-      { width: cardWidth, borderRadius, aspectRatio: COVER_RATIO },
+      {
+        width: cardWidth,
+        borderRadius,
+        aspectRatio: COVER_RATIO,
+      },
     ],
     [styles.mediaImage, cardWidth, borderRadius],
   );
 
+  const linearGradientWidth = useMemo(() => {
+    return (mediaStyle[1] as { width: number }).width + 2;
+  }, [mediaStyle]);
+
   const mediaImageContainerStyle = useMemo(
-    () => [styles.mediaImageContainer, { borderRadius }],
+    () => [
+      styles.mediaImageContainer,
+      { borderRadius, position: 'relative' as const },
+    ],
     [styles.mediaImageContainer, borderRadius],
   );
 
@@ -135,6 +146,17 @@ const WebCardKindSelectionScreen = ({
     (media: Media) => {
       return cardWidth > 0 ? (
         <View style={mediaImageContainerStyle}>
+          <LinearGradient
+            colors={['rgba(255,255,255,0)', '#FFF']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 0, y: 1 }}
+            locations={[0, 0.95]}
+            style={[
+              mediaStyle,
+              { width: linearGradientWidth },
+              styles.mediaLinear,
+            ]}
+          />
           <MediaImageRenderer
             testID="category-image"
             alt={intl.formatMessage({
@@ -142,12 +164,19 @@ const WebCardKindSelectionScreen = ({
               description: 'WebCardKindStep - Category image alt',
             })}
             source={{ mediaId: media.id, requestedSize: 300, uri: media.uri }}
-            style={mediaStyle}
+            style={[mediaStyle]}
           />
         </View>
       ) : null;
     },
-    [cardWidth, intl, mediaImageContainerStyle, mediaStyle],
+    [
+      cardWidth,
+      intl,
+      linearGradientWidth,
+      mediaImageContainerStyle,
+      mediaStyle,
+      styles.mediaLinear,
+    ],
   );
 
   const selectedCategory = webCardCategories.find(
@@ -329,14 +358,14 @@ type WebCardCategory = ArrayItemType<
 >;
 type Media = ArrayItemType<WebCardCategory['medias']>;
 
-const styleSheet = createStyleSheet(apperance => ({
+const styleSheet = createStyleSheet(() => ({
   content: {
     flex: 1,
-    paddingTop: 50,
   },
   mediasList: {
     flex: 1,
-    paddingVertical: 20,
+    paddingTop: 30,
+    paddingBottom: 20,
     paddingRight: 20,
   },
   mediaImageContainer: [
@@ -344,7 +373,6 @@ const styleSheet = createStyleSheet(apperance => ({
       marginLeft: 20,
       backgroundColor: colors.grey200,
     },
-    shadow(apperance),
   ],
   mediaImage: {
     aspectRatio: COVER_RATIO,
@@ -367,5 +395,11 @@ const styleSheet = createStyleSheet(apperance => ({
   titleText: {
     textAlign: 'center',
     textAlignVertical: 'center',
+  },
+  mediaLinear: {
+    position: 'absolute',
+    zIndex: 1,
+    top: -1,
+    left: -1,
   },
 }));

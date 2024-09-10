@@ -32,6 +32,8 @@ const queryWithCoverTemplate = graphql`
       ... on Profile {
         webCard {
           webCardKind
+          id
+          userName
         }
       }
     }
@@ -55,6 +57,8 @@ const queryWithoutCoverTemplate = graphql`
       ... on Profile {
         webCard {
           webCardKind
+          id
+          userName
         }
       }
     }
@@ -74,6 +78,7 @@ const CoverCreationScreen = ({
     templateId ? queryWithCoverTemplate : queryWithoutCoverTemplate,
     preloadedQuery,
   );
+  const { profile, currentUser } = data;
 
   const [canSave, setCanSave] = useState(false);
   const coverEditorRef = useRef<CoverEditorHandle | null>(null);
@@ -117,11 +122,22 @@ const CoverCreationScreen = ({
     coverEditorRef.current?.save().then(() => {
       if (fromCoverEdition) {
         router.pop(2);
-      } else {
-        router.splice({ route: 'WEBCARD_TEMPLATE_SELECTION' }, 2);
+      } else if (profile?.webCard) {
+        router.splice(
+          {
+            route: 'WEBCARD',
+            params: {
+              webCardId: profile?.webCard?.id,
+              userName: profile?.webCard?.userName,
+              editing: true,
+              fromCreation: true,
+            },
+          },
+          2,
+        );
       }
     });
-  }, [fromCoverEdition, router]);
+  }, [fromCoverEdition, profile?.webCard, router]);
 
   const onCanSaveChange = useCallback((value: boolean) => {
     setCanSave(value);
@@ -159,7 +175,6 @@ const CoverCreationScreen = ({
     );
   }, [intl, onSaveCover]);
 
-  const { profile, currentUser } = data;
   const webCardKind = profile?.webCard?.webCardKind;
   const isPremium = currentUser?.isPremium;
 
