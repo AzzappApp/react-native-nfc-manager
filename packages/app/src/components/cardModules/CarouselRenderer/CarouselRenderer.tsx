@@ -187,13 +187,11 @@ const CarouselRenderer = ({
       typeof marginVertical === 'number'
         ? marginVertical
         : marginVertical?.value ?? 0;
-    const borderWidthValue =
-      typeof borderWidth === 'number' ? borderWidth : borderWidth?.value ?? 0;
 
     return {
-      height: imageHeightValue + marginVerticalValue * 2 + borderWidthValue * 2,
+      height: imageHeightValue + marginVerticalValue * 2,
     };
-  }, [imageHeight, marginVertical, borderWidth]);
+  }, [imageHeight, marginVertical]);
 
   const containerStyle = useAnimatedStyle(() => {
     return {
