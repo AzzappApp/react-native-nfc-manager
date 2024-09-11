@@ -298,6 +298,7 @@ const MultiUserAddModal = (
           },
         });
         setIsManual(isManual);
+        setContact(undefined);
       }
       setVisible(true);
     },
