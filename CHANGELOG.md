@@ -1,6 +1,9 @@
-## 0.7.0-canary.24
+## 0.7.0-canary.25
 
+* **fix:**  - **multiUser:** replace hardcoded strings in multiuser screen ([#4971](https://github.com/AzzappApp/azzapp/pull/4971))
+* **docs:**  - fix typo
 * **fix:**  - **post:** [#4899](https://github.com/AzzappApp/azzapp/pull/4899) don’t redirect to home when webCard is not published ([#4965](https://github.com/AzzappApp/azzapp/pull/4965))
+* **docs:**  - fix typo
 * **fix:**  - **i18n:** add localization in permissions ([#4968](https://github.com/AzzappApp/azzapp/pull/4968))
 * **fix:**  - **posts:** [#4959](https://github.com/AzzappApp/azzapp/pull/4959) can’t unlike post in post I like screen ([#4961](https://github.com/AzzappApp/azzapp/pull/4961))
 * **fix:**  - 🐛 properly display toast with bigger content ([#4960](https://github.com/AzzappApp/azzapp/pull/4960))
