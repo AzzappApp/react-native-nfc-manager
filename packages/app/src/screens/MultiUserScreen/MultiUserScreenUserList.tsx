@@ -7,7 +7,7 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { SectionList, View } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -154,7 +154,7 @@ const MultiUserScreenUserList = ({
         const item = curr?.node;
         if (item) {
           const existingSection = acc.find(
-            section => section.title === item.profileRole,
+            section => section.profileRole === item.profileRole,
           );
           if (existingSection) {
             existingSection.data.push(item);
@@ -166,11 +166,39 @@ const MultiUserScreenUserList = ({
         return acc;
       },
       [
-        { title: 'owner', data: [] },
-        { title: 'admin', data: [] },
-        { title: 'editor', data: [] },
-        { title: 'user', data: [] },
-      ] as Array<{ title: string; data: Profile[] }>,
+        {
+          title: intl.formatMessage({
+            defaultMessage: 'owner',
+            description: 'MultiUserScreen - Owner role',
+          }),
+          profileRole: 'owner',
+          data: [],
+        },
+        {
+          title: intl.formatMessage({
+            defaultMessage: 'admin',
+            description: 'MultiUserScreen - Admin role',
+          }),
+          profileRole: 'admin',
+          data: [],
+        },
+        {
+          title: intl.formatMessage({
+            defaultMessage: 'editor',
+            description: 'MultiUserScreen - Editor role',
+          }),
+          profileRole: 'editor',
+          data: [],
+        },
+        {
+          title: intl.formatMessage({
+            defaultMessage: 'user',
+            description: 'MultiUserScreen - User role',
+          }),
+          profileRole: 'user',
+          data: [],
+        },
+      ] as Array<{ title: string; profileRole: string; data: Profile[] }>,
     );
     return convertToNonNullArray(
       result.map(section => {
@@ -180,7 +208,7 @@ const MultiUserScreenUserList = ({
         return section;
       }),
     );
-  }, [data.profiles.edges]);
+  }, [data.profiles.edges, intl]);
 
   const onEndReached = useCallback(() => {
     if (hasNext && !isLoadingNext) {
@@ -233,7 +261,7 @@ const MultiUserScreenUserList = ({
   //filter the sections without having to reparse all the data
   const filteredSections = useMemo(() => {
     if (transferOwnerMode) {
-      return sections.filter(section => section.title !== 'owner');
+      return sections.filter(section => section.profileRole !== 'owner');
     }
     return sections;
   }, [sections, transferOwnerMode]);
@@ -411,7 +439,12 @@ const ItemList = ({ item }: { item: Profile }) => {
         <View style={styles.userInfos}>
           <Text variant="large">
             ~{contactCard.firstName ?? ''} {contactCard.lastName ?? ''}{' '}
-            {isCurrentUser && '(me)'}
+            {isCurrentUser && (
+              <FormattedMessage
+                defaultMessage="(me)"
+                description="MultiUserScreen - (me) suffix"
+              />
+            )}
           </Text>
           <Text style={styles.contact}>
             {item.user?.email ?? item.user?.phoneNumber}

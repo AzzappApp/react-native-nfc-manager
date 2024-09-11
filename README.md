@@ -4,7 +4,7 @@ This is the main repository of the Azzapp application source code.
 
 ## Development environment
 
-Developping and building the project requires **MacOS version 12+**.
+Developing and building the project requires **MacOS version 12+**.
 In addition developpers should install the followings dependencies:
 
 - [Node.js](https://nodejs.org/en/) version **20** (recommended install through [nvm](https://github.com/nvm-sh/nvm))
@@ -104,7 +104,7 @@ yarn test
 
 The sources of the project are organized as a monorepo. Dependencies are managed through the `yarn` [workspaces](https://classic.yarnpkg.com/lang/en/docs/workspaces/) feature.
 
-The differents packages of the application are located under the `packages` directory :
+The different packages of the application are located under the `packages` directory :
 
 - [app](./packages/app/): contains the source code of the client React Native application.
 - [backoffice](./packages/backoffice/): contains the source code of the backoffice of the application.
