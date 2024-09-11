@@ -1,5 +1,6 @@
-## 0.7.0-canary.26
+## 0.7.0-canary.27
 
+* **fix:**  - 🐛 https://github.com/vercel/next.js/discussions/65969 ([#4972](https://github.com/AzzappApp/azzapp/pull/4972))
 * **fix:**  - 🐛 properly reset fields ([#4976](https://github.com/AzzappApp/azzapp/pull/4976))
 * **fix:**  - **multiUser:** replace hardcoded strings in multiuser screen ([#4971](https://github.com/AzzappApp/azzapp/pull/4971))
 * **docs:**  - fix typo
