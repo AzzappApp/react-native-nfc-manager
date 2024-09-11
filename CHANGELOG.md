@@ -1,5 +1,6 @@
-## 0.7.0-canary.25
+## 0.7.0-canary.26
 
+* **fix:**  - 🐛 properly reset fields ([#4976](https://github.com/AzzappApp/azzapp/pull/4976))
 * **fix:**  - **multiUser:** replace hardcoded strings in multiuser screen ([#4971](https://github.com/AzzappApp/azzapp/pull/4971))
 * **docs:**  - fix typo
 * **fix:**  - **post:** [#4899](https://github.com/AzzappApp/azzapp/pull/4899) don’t redirect to home when webCard is not published ([#4965](https://github.com/AzzappApp/azzapp/pull/4965))
