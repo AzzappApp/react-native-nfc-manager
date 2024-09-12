@@ -1,5 +1,8 @@
-## 0.7.0-canary.28
+## 0.7.0-canary.29
 
+* **fix:**  - 🐛 avoid page hang on post navigation ([#4975](https://github.com/AzzappApp/azzapp/pull/4975))
+* **fix:**  - 🐛 instantly quit webcard with optimistic update, color fix ([#4977](https://github.com/AzzappApp/azzapp/pull/4977))
+* **fix:**  - **subscription:** [#4802](https://github.com/AzzappApp/azzapp/pull/4802) all users were viewed as subscribed + incorrect headers in section editing ([#4964](https://github.com/AzzappApp/azzapp/pull/4964))
 * **fix:**  - 🐛 https://github.com/vercel/next.js/discussions/65969 ([#4972](https://github.com/AzzappApp/azzapp/pull/4972))
 * **fix:**  - 🐛 properly reset fields ([#4976](https://github.com/AzzappApp/azzapp/pull/4976))
 * **fix:**  - **multiUser:** replace hardcoded strings in multiuser screen ([#4971](https://github.com/AzzappApp/azzapp/pull/4971))
