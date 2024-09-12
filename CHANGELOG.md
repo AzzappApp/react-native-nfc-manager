@@ -1,5 +1,6 @@
-## 0.7.0-canary.31
+## 0.7.0-canary.32
 
+* **fix:**  - Android button ripple effect  overflow (square) if style was passed in props ([#4993](https://github.com/AzzappApp/azzapp/pull/4993))
 * **feat:**  - Google Analytics ([#4974](https://github.com/AzzappApp/azzapp/pull/4974))
 * **docs:**  - fix typo
 * **fix:**  - 🐛 avoid page hang on post navigation ([#4975](https://github.com/AzzappApp/azzapp/pull/4975))
