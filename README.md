@@ -146,7 +146,7 @@ The application use a [GraphQL](https://graphql.org/) API to communicate between
 
 ### Miscellaneous
 
-- The authentification process of the mobile applications is based on tokens
+- The authentication process of the mobile applications is based on tokens
 - On IOS the main image component is based on [Nuke](https://github.com/kean/Nuke)
 
 ## CI/CD
