@@ -26,6 +26,7 @@ import ContactCard, {
   CONTACT_CARD_RATIO,
 } from '#components/ContactCard/ContactCard';
 import { useRouter } from '#components/NativeRouter';
+import { logEvent } from '#helpers/analytics';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import {
   generateEmailSignature,
@@ -185,6 +186,7 @@ export const ContactCardScreen = ({
       const base64 = image?.encodeToBase64(ImageFormat.JPEG, 100);
 
       try {
+        logEvent('generate_email_signature');
         await generateEmailSignature({
           locale: intl.locale,
           profileId: fromGlobalId(profile.id).id,
@@ -234,6 +236,7 @@ export const ContactCardScreen = ({
 
           await addPassJWT(pass.token);
         }
+        logEvent('add_pass_wallet');
       }
     } catch {
       Toast.show({

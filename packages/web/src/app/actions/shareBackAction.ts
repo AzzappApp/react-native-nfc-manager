@@ -1,6 +1,7 @@
 'use server';
 
 import { parseWithZod } from '@conform-to/zod';
+import { sendGAEvent } from '@next/third-parties/google';
 import * as Sentry from '@sentry/nextjs';
 import { jwtDecode } from 'jwt-decode';
 import { compressToEncodedURIComponent } from 'lz-string';
@@ -140,6 +141,11 @@ export const processShareBackSubmission = async (
     await saveShareBack({
       profileId: profile.id,
       ...submission.payload,
+    });
+    sendGAEvent('event', 'shareback', {
+      event_category: 'Form',
+      event_label: 'ShareBackForm',
+      value: 'Submit',
     });
 
     if (contactMethod.method === CONTACT_METHODS.SMS) {

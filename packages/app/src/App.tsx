@@ -35,6 +35,7 @@ import {
 //import ShakeShare from '#components/ShakeShare';
 import ShakeShare from '#components/ShakeShare';
 import Toast from '#components/Toast';
+import { analyticsLogScreenEvent } from '#helpers/analytics';
 import { getAuthState, init as initAuthStore } from '#helpers/authStore';
 import { addGlobalEventListener } from '#helpers/globalEvents';
 import {
@@ -327,6 +328,7 @@ const AppRouter = () => {
             : null,
         },
       });
+      analyticsLogScreenEvent(route.route);
     });
     return () => {
       disposable.dispose();

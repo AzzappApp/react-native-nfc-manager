@@ -24,6 +24,7 @@ import {
 import { colors } from '#theme';
 import EmailOrPhoneInput from '#components/EmailOrPhoneInput';
 import { useNativeNavigationEvent, useRouter } from '#components/NativeRouter';
+import { logSignup } from '#helpers/analytics';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { signup } from '#helpers/MobileWebAPI';
@@ -146,8 +147,9 @@ const SignUpScreen = () => {
             },
           });
         } else {
-          const { issuer } = tokens;
-
+          const { issuer, userId } = tokens;
+          //here is a signup( not a signin on signup screen)
+          logSignup(userId);
           router.push({
             route: 'CONFIRM_REGISTRATION',
             params: {

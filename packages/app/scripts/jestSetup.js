@@ -82,3 +82,10 @@ jest.mock('react-native-purchases', () => ({
 }));
 
 jest.mock('#hooks/useApplicationFonts', () => ({}));
+
+jest.mock('@react-native-firebase/analytics', () => {
+  return () => ({
+    logEvent: jest.fn(),
+    logSignUp: jest.fn(),
+  });
+});

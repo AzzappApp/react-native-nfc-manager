@@ -31,6 +31,7 @@
     "@escape.tech/graphql-armor-max-tokens": "^2.4.0",
     "@graphql-yoga/plugin-disable-introspection": "^2.7.0",
     "@graphql-yoga/plugin-persisted-operations": "^3.7.0",
+    "@next/third-parties": "^14.2.9",
     "@paralleldrive/cuid2": "^2.2.2",
     "@sentry/nextjs": "^7.113.0",
     "@sentry/tracing": "^7.114.0",
