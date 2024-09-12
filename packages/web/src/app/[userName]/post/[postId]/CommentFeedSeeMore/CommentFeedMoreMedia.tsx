@@ -1,4 +1,5 @@
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useCallback } from 'react';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CloudinaryVideo from '#ui/CloudinaryVideo';
 import styles from './CommentFeedSeeMore.css';
@@ -14,13 +15,20 @@ const CommentFeedMoreMedia = (props: CommentFeedMoreMediaProps) => {
 
   const media = post.medias[0];
 
+  const href = `/${webCard.userName}/post/${post.id}`;
+  const router = useRouter();
+  const onClick = useCallback(() => {
+    router.push(href);
+  }, [href, router]);
+
   return (
-    <Link
-      href={`/${webCard.userName}/post/${post.id}`}
+    <a
+      href={href}
       className={styles.media}
       style={{
         aspectRatio: `${media.width / media.height}`,
       }}
+      onClick={onClick}
     >
       {media.kind === 'video' ? (
         <>
@@ -48,7 +56,7 @@ const CommentFeedMoreMedia = (props: CommentFeedMoreMediaProps) => {
           format="auto"
         />
       )}
-    </Link>
+    </a>
   );
 };
 
