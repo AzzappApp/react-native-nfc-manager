@@ -312,6 +312,7 @@ const PostCreationScreen = ({
       content,
       handleProfileActionError,
       intl,
+      params?.fromProfile,
       router,
       webCard,
     ],

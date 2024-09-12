@@ -159,55 +159,53 @@ const ContactCardEditForm = ({
         <View style={styles.sectionsContainer}>
           {children}
 
-          {webCard?.isMultiUser ? (
-            <View style={styles.avatarSection}>
-              <Controller
-                control={control}
-                name="avatar"
-                render={({ field: { value, onChange } }) =>
-                  value?.uri ? (
-                    <View style={styles.avatarContainer}>
-                      <PressableNative
-                        onPress={() => setImagePicker('avatar')}
-                        android_ripple={{
-                          borderless: true,
-                          foreground: true,
-                        }}
-                      >
-                        <View style={[styles.avatar, styles.avatarWrapper]}>
-                          <Image
-                            source={{ uri: value?.uri }}
-                            style={styles.avatar}
-                          />
-                        </View>
-                      </PressableNative>
-                      <IconButton
-                        icon="delete_filled"
-                        variant="icon"
-                        iconStyle={styles.removeAvatarIcon}
-                        style={styles.removeAvatarButton}
-                        onPress={() => onChange(null)}
-                      />
-                    </View>
-                  ) : (
-                    <View style={styles.noAvatarContainer}>
-                      <PressableNative
-                        onPress={() => setImagePicker('avatar')}
-                        android_ripple={{
-                          borderless: true,
-                          foreground: true,
-                        }}
-                      >
-                        <View style={styles.noAvatar}>
-                          <Icon icon="add" />
-                        </View>
-                      </PressableNative>
-                    </View>
-                  )
-                }
-              />
-            </View>
-          ) : null}
+          <View style={styles.avatarSection}>
+            <Controller
+              control={control}
+              name="avatar"
+              render={({ field: { value, onChange } }) =>
+                value?.uri ? (
+                  <View style={styles.avatarContainer}>
+                    <PressableNative
+                      onPress={() => setImagePicker('avatar')}
+                      android_ripple={{
+                        borderless: true,
+                        foreground: true,
+                      }}
+                    >
+                      <View style={[styles.avatar, styles.avatarWrapper]}>
+                        <Image
+                          source={{ uri: value?.uri }}
+                          style={styles.avatar}
+                        />
+                      </View>
+                    </PressableNative>
+                    <IconButton
+                      icon="delete_filled"
+                      variant="icon"
+                      iconStyle={styles.removeAvatarIcon}
+                      style={styles.removeAvatarButton}
+                      onPress={() => onChange(null)}
+                    />
+                  </View>
+                ) : (
+                  <View style={styles.noAvatarContainer}>
+                    <PressableNative
+                      onPress={() => setImagePicker('avatar')}
+                      android_ripple={{
+                        borderless: true,
+                        foreground: true,
+                      }}
+                    >
+                      <View style={styles.noAvatar}>
+                        <Icon icon="add" />
+                      </View>
+                    </PressableNative>
+                  </View>
+                )
+              }
+            />
+          </View>
           <Separation small />
           <Controller
             control={control}
