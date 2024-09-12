@@ -140,6 +140,7 @@ const HorizontalPhotoEditionScreen = ({
             id
           }
           ...HorizontalPhotoBorderEditionPanel_webCard
+          ...ModuleEditionScreenTitle_webCard
         }
       }
     `,
@@ -438,6 +439,7 @@ const HorizontalPhotoEditionScreen = ({
             })}
             kind="horizontalPhoto"
             moduleCount={cardModulesCount}
+            webCardKey={profile.webCard}
           />
         }
         leftElement={

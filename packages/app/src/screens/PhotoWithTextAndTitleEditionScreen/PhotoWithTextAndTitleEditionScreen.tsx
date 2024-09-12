@@ -158,6 +158,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
           }
           isPremium
           ...PhotoWithTextAndTitleSettingsEditionPanel_webCard
+          ...ModuleEditionScreenTitle_webCard
         }
         ...PhotoWithTextAndTitleBackgroundEditionPanel_profile
       }
@@ -566,6 +567,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
             })}
             kind="photoWithTextAndTitle"
             moduleCount={cardModulesCount}
+            webCardKey={profile.webCard}
           />
         }
         leftElement={

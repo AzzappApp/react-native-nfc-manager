@@ -88,6 +88,6 @@ export const User: ProtectedResolver<UserResolvers> = {
       return null;
     }
     const subscription = await activeUserSubscription([user.id]);
-    return !!subscription?.length;
+    return !!subscription.filter(sub => !!sub).length;
   },
 };

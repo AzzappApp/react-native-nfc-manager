@@ -128,6 +128,7 @@ const CarouselEditionScreen = ({
           }
           ...WebCardColorPicker_webCard
           ...CarouselEditionBorderPanel_webCard
+          ...ModuleEditionScreenTitle_webCard
         }
         moduleBackgrounds {
           id
@@ -493,6 +494,7 @@ const CarouselEditionScreen = ({
             })}
             kind="carousel"
             moduleCount={cardModulesCount}
+            webCardKey={profile.webCard}
           />
         }
         leftElement={
