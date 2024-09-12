@@ -183,10 +183,10 @@ const DownloadVCard = ({
               description="Download vCard modal message"
               values={{
                 userName: contact
-                  ? `${contact.firstName ?? ''}  ${
-                      contact.lastName ?? ''
+                  ? `${webCard.firstName ?? ''}  ${
+                      webCard.lastName ?? ''
                     }`.trim() ||
-                    contact.company ||
+                    webCard.companyName ||
                     webCard.userName
                   : '',
               }}
