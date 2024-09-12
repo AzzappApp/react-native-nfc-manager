@@ -675,4 +675,4 @@ export const PostRendererBottomPanelSkeleton = () => {
 const TOAST_BOTTOM_OFFSET = 50;
 const MODAL_ANIMATION_TIME = 800;
 const MODAL_HEIGHT = 284;
-const SMALL_MODAL_HEIGHT = 200;
+const SMALL_MODAL_HEIGHT = 242;
