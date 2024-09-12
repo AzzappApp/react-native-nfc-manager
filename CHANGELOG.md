@@ -1,4 +1,4 @@
-## 0.7.0-canary.29
+## 0.7.0-canary.30
 
 * **fix:**  - 🐛 avoid page hang on post navigation ([#4975](https://github.com/AzzappApp/azzapp/pull/4975))
 * **fix:**  - 🐛 instantly quit webcard with optimistic update, color fix ([#4977](https://github.com/AzzappApp/azzapp/pull/4977))
