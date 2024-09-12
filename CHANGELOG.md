@@ -1,4 +1,4 @@
-## 0.7.0-canary.27
+## 0.7.0-canary.28
 
 * **fix:**  - 🐛 https://github.com/vercel/next.js/discussions/65969 ([#4972](https://github.com/AzzappApp/azzapp/pull/4972))
 * **fix:**  - 🐛 properly reset fields ([#4976](https://github.com/AzzappApp/azzapp/pull/4976))
