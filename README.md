@@ -146,7 +146,7 @@ The application use a [GraphQL](https://graphql.org/) API to communicate between
 
 ### Miscellaneous
 
-- The authentification process of the mobile applications is based on tokens
+- The authentication process of the mobile applications is based on tokens
 - On IOS the main image component is based on [Nuke](https://github.com/kean/Nuke)
 
 ## CI/CD
@@ -154,14 +154,14 @@ The application use a [GraphQL](https://graphql.org/) API to communicate between
 - The workspace build system is based on [Turbo Repo](https://turbo.build/)
 - The CI/CD Process is based on [Github Actions](https://github.com/features/actions)
 
-### List of environement variables during the build process:
+### List of environment variables during the build process:
 
 - `VERCEL_TOKEN`: vercel api token
 
 Valid environments are `DEV`, `STAGING` and `PRODUCTION` (the later is omitted in env variable name).
 Valid platforms are  `IOS` and `ANDROID`. 
 
-### List of environement variables used at runtime by the application server:
+### List of environment variables used at runtime by the application server:
 
 - `DATABASE_HOST`: Host of the planetscale database
 - `DATABASE_USERNAME`: Username of the planetscale database
@@ -173,7 +173,7 @@ Valid platforms are  `IOS` and `ANDROID`.
 - `TOKEN_SECRET`: password used to encrypt jwt tokens
 - `REFRESH_TOKEN_SECRET`: password used to encrypt jwt refresh tokens
 
-### List of environement variables used at runtime by the application clients:
+### List of environment variables used at runtime by the application clients:
 
 - `NEXT_PUBLIC_API_ENDPOINT`: the endpoint of api (generated at build time for mobile clients, set to `/api` for web client)
 - `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`: the cloudinary cloud name (only used on WEB)
