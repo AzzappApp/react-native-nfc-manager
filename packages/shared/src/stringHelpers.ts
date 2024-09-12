@@ -115,6 +115,22 @@ export function formatPhoneNumber(phoneNumber: string) {
 }
 
 /**
+ *The function parse the phone number string and then formats the parsed phone number  as a uri (for call to action)
+ *
+ *
+ * @export
+ * @param {string} phoneNumber
+ * @return {*}
+ */
+export function formatPhoneNumberUri(phoneNumber: string) {
+  try {
+    return parsePhoneNumber(phoneNumber).getURI();
+  } catch {
+    return `tel:${phoneNumber}`;
+  }
+}
+
+/**
  * Simple function to format duration in minutes and seconds
  *
  * @param {number} duration

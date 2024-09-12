@@ -35,7 +35,7 @@ import type { ForwardedRef } from 'react';
 import type { EdgeInsets } from 'react-native-safe-area-context';
 
 const postScreenQuery = graphql`
-  query PostScreenQuery($postId: ID!, $webCardId: ID!) {
+  query PostScreenQuery($postId: ID!, $webCardId: ID!, $profileId: ID!) {
     post: node(id: $postId) {
       id
       ...PostList_posts
@@ -45,12 +45,18 @@ const postScreenQuery = graphql`
     webCard: node(id: $webCardId) {
       ...PostList_viewerWebCard
     }
+    profile: node(id: $profileId) {
+      ...PostList_viewerProfile
+    }
   }
 `;
 
 const PostScreen = ({
   preloadedQuery,
   hasFocus,
+  route: {
+    params: { videoTime },
+  },
 }: RelayScreenProps<PostRoute, PostScreenQuery>) => {
   const router = useRouter();
   const intl = useIntl();
@@ -58,7 +64,10 @@ const PostScreen = ({
     router.back();
   };
 
-  const { post, webCard } = usePreloadedQuery(postScreenQuery, preloadedQuery);
+  const { post, webCard, profile } = usePreloadedQuery(
+    postScreenQuery,
+    preloadedQuery,
+  );
 
   const ready = useDidAppear();
 
@@ -142,7 +151,7 @@ const PostScreen = ({
       </SafeAreaView>
     );
   }
-  if (!webCard) {
+  if (!webCard || !profile) {
     return null;
   }
   return (
@@ -165,9 +174,11 @@ const PostScreen = ({
       <PostList
         canPlay={ready && hasFocus}
         posts={posts}
-        webCard={webCard}
+        viewerWebCard={webCard}
+        profile={profile}
         onEndReached={onEndReached}
         loading={loading}
+        firstItemVideoTime={videoTime}
       />
       <Suspense>
         <RelatedPostLoader
@@ -217,6 +228,7 @@ export default relayScreen(PostScreen, {
   getVariables: ({ postId }, profileInfos) => ({
     postId,
     webCardId: profileInfos?.webCardId ?? '',
+    profileId: profileInfos?.profileId ?? '',
   }),
 });
 

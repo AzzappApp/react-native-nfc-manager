@@ -127,8 +127,6 @@ export type ImagePickerState = {
   ): void;
 
   cameraButtonsLeftRightPosition?: number;
-
-  disableVideoSelection?: boolean;
 };
 
 const ImagePickerContext = createContext<ImagePickerState | null>(null);
@@ -190,8 +188,6 @@ type ImagePickerContextProviderProps = {
     filter: Filter | null;
     timeRange?: TimeRange | null;
   } | null;
-
-  disableVideoSelection?: boolean;
 };
 
 const _ImagePickerContextProvider = (
@@ -206,7 +202,6 @@ const _ImagePickerContextProvider = (
     onMediaChange: onMediaChangeProps,
     cameraButtonsLeftRightPosition,
     initialData,
-    disableVideoSelection,
   }: ImagePickerContextProviderProps,
   forwardedRef: ForwardedRef<ImagePickerState>,
 ) => {
@@ -361,7 +356,6 @@ const _ImagePickerContextProvider = (
       clearMedia,
       cameraButtonsLeftRightPosition,
       isSkImageReady,
-      disableVideoSelection,
     }),
     [
       kind,
@@ -383,7 +377,6 @@ const _ImagePickerContextProvider = (
       clearMedia,
       cameraButtonsLeftRightPosition,
       isSkImageReady,
-      disableVideoSelection,
     ],
   );
 

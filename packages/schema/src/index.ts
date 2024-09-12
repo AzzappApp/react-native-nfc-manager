@@ -1,7 +1,5 @@
-import { createGraphqlEndpoint } from './endpoint';
-import { createGraphQLContext } from './GraphQLContext';
-import type { GraphQLContext, Loaders } from './GraphQLContext';
+import schema from './schema';
 
-export { createGraphQLContext, createGraphqlEndpoint };
+export { schema };
 
-export type { GraphQLContext, Loaders };
+export type { GraphQLContext } from './GraphQLContext';

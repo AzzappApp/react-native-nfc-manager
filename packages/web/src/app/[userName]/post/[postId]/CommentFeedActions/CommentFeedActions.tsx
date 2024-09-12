@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useRef, useState, useTransition } from 'react';
+import { FormattedMessage } from 'react-intl';
 import { getFormatedElapsedTime } from '@azzapp/shared/timeHelpers';
 import { HearthIcon, ShareIcon } from '#assets';
 import { generateSharePostLink } from '#helpers';
@@ -7,6 +8,7 @@ import { Button, ButtonIcon } from '#ui';
 import { ProfileActions } from '#app/actions';
 import DownloadAppModal from '#components/DownloadAppModal';
 import ShareModal from '#components/ShareModal';
+import PostLikesModal from '../PostLikesModal/PostLikesModal';
 import styles from './CommentFeedActions.css';
 import type { ModalActions } from '#ui/Modal';
 import type { Media, PostWithMedias, WebCard } from '@azzapp/data';
@@ -27,6 +29,8 @@ const CommentFeedActions = (props: CommentFeedActionsProps) => {
     new Date(post.createdAt).getTime(),
   );
   const [, startTransition] = useTransition();
+
+  const likes = useRef<ModalActions>(null);
 
   useEffect(() => {
     startTransition(async () => {
@@ -55,14 +59,27 @@ const CommentFeedActions = (props: CommentFeedActionsProps) => {
             />
           </div>
           {post.allowLikes && (
-            <span className={styles.likes}>{post.counterReactions} Likes</span>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                likes.current?.open();
+              }}
+            >
+              <span className={styles.likes}>
+                {post.counterReactions} Likes
+              </span>
+            </Button>
           )}
         </div>
         <span className={styles.elapsed}>{elapsedTime}</span>
         {post.allowComments && (
           <div className={styles.comment}>
             <Button size="small" onClick={() => download.current?.open()}>
-              Add a comment
+              <FormattedMessage
+                defaultMessage="Add a comment"
+                id="pjM5zZ"
+                description="Add a comment button in comment feed"
+              />
             </Button>
           </div>
         )}
@@ -72,6 +89,7 @@ const CommentFeedActions = (props: CommentFeedActionsProps) => {
         link={generateSharePostLink(webCard.userName, post.id)}
       />
       <DownloadAppModal ref={download} webCard={webCard} media={media} />
+      <PostLikesModal postId={post.id} ref={likes} />
     </>
   );
 };

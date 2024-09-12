@@ -12,10 +12,7 @@ describe('deeplinkHelpers', () => {
   });
 
   test('should redirect to profile', async () => {
-    const res = await matchUrlWithRoute(
-      `${process.env.NEXT_PUBLIC_URL}123`,
-      () => {},
-    );
+    const res = await matchUrlWithRoute(`${process.env.NEXT_PUBLIC_URL}123`);
 
     expect(res).toEqual({
       route: 'WEBCARD',
@@ -50,7 +47,6 @@ describe('deeplinkHelpers', () => {
 
     const res = await matchUrlWithRoute(
       `${process.env.NEXT_PUBLIC_URL}/123?c=${compressedCard}`,
-      () => {},
     );
 
     expect(verifySignMock).toBeCalledTimes(1);
@@ -93,7 +89,6 @@ describe('deeplinkHelpers', () => {
 
     const res = await matchUrlWithRoute(
       `${process.env.NEXT_PUBLIC_URL}124?c=${compressedCard}`,
-      () => {},
     );
 
     expect(verifySignMock).toBeCalledTimes(1);
@@ -114,7 +109,6 @@ describe('deeplinkHelpers', () => {
   test('should redirect to reset password with token', async () => {
     const res = await matchUrlWithRoute(
       'https://fake-azzapp.com/reset-password/?token=123&issuer=azzapp',
-      () => {},
     );
 
     expect(res).toEqual({
@@ -127,10 +121,7 @@ describe('deeplinkHelpers', () => {
   });
 
   test('should redirect to a post', async () => {
-    const res = await matchUrlWithRoute(
-      'https://fake-azzapp.com/123/post/456',
-      () => {},
-    );
+    const res = await matchUrlWithRoute('https://fake-azzapp.com/123/post/456');
 
     expect(res).toEqual({
       route: 'POST',
@@ -141,10 +132,7 @@ describe('deeplinkHelpers', () => {
   });
 
   test('should redirect to a webcard if there is not post id', async () => {
-    const res = await matchUrlWithRoute(
-      'https://fake-azzapp.com/123/post',
-      () => {},
-    );
+    const res = await matchUrlWithRoute('https://fake-azzapp.com/123/post');
 
     expect(res).toEqual({
       route: 'WEBCARD',
@@ -154,20 +142,26 @@ describe('deeplinkHelpers', () => {
     });
   });
 
-  test('should redirect to a webcard if there emailSignature', async () => {
-    const onEmailSignature = jest.fn();
+  test('should redirect to email signature screen if the web route match', async () => {
     const res = await matchUrlWithRoute(
-      'https://fake-azzapp.com/123/emailSignature',
-      onEmailSignature,
+      'https://fake-azzapp.com/123/emailsignature?e=compressedCard&mode=simple',
     );
 
-    expect(onEmailSignature).toHaveBeenCalledTimes(1);
-
     expect(res).toEqual({
-      route: 'WEBCARD',
+      route: 'EMAIL_SIGNATURE',
       params: {
         userName: '123',
+        compressedContactCard: 'compressedCard',
+        mode: 'simple',
       },
+    });
+  });
+
+  test('invite should redirect to home', async () => {
+    const res = await matchUrlWithRoute('https://fake-azzapp.com/123/invite');
+
+    expect(res).toEqual({
+      route: 'HOME',
     });
   });
 });

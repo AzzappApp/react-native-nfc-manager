@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
@@ -43,12 +44,21 @@ const AccountDetailsEmailForm = ({
     handleSubmit,
     setError,
     formState: { isSubmitting, errors },
+    reset,
   } = useForm<EmailForm>({
     resolver: zodResolver(emailFormSchema),
     defaultValues: {
       email: currentUser.email ?? '',
     },
   });
+
+  useEffect(() => {
+    if (visible) {
+      reset({
+        email: currentUser.email ?? '',
+      });
+    }
+  }, [currentUser.email, reset, visible]);
 
   const intl = useIntl();
 

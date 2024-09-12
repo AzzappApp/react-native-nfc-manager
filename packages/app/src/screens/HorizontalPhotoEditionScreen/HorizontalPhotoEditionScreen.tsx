@@ -6,6 +6,7 @@ import { StyleSheet, View } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
+import { Observable } from 'relay-runtime';
 import {
   HORIZONTAL_PHOTO_DEFAULT_VALUES,
   HORIZONTAL_PHOTO_STYLE_VALUES,
@@ -51,7 +52,6 @@ import type {
   SaveHorizontalPhotoModuleInput,
 } from '#relayArtifacts/HorizontalPhotoEditionScreenUpdateModuleMutation.graphql';
 import type { ViewProps } from 'react-native';
-import type { Observable } from 'relay-runtime';
 
 export type HorizontalPhotoEditionScreenProps = ViewProps & {
   /**
@@ -165,7 +165,7 @@ const HorizontalPhotoEditionScreen = ({
 
   const { data, value, fieldUpdateHandler, dirty } = useModuleDataEditor({
     initialValue,
-    cardStyle: profile?.webCard.cardStyle,
+    cardStyle: profile?.webCard?.cardStyle,
     styleValuesMap: HORIZONTAL_PHOTO_STYLE_VALUES,
     defaultValues: HORIZONTAL_PHOTO_DEFAULT_VALUES,
   });
@@ -208,16 +208,17 @@ const HorizontalPhotoEditionScreen = ({
     setTouched(true);
   }, [setTouched]);
 
-  const canSave = (dirty || touched) && isValid && !saving;
+  const [progressIndicator, setProgressIndicator] =
+    useState<Observable<number> | null>(null);
+
+  const canSave =
+    (dirty || touched) && isValid && !saving && !progressIndicator;
 
   const router = useRouter();
   const intl = useIntl();
 
-  const [progressIndicator, setProgressIndicator] =
-    useState<Observable<number> | null>(null);
-
   const cardModulesCount =
-    profile.webCard.cardModules.length + (horizontalPhoto ? 0 : 1);
+    (profile.webCard?.cardModules.length ?? 0) + (horizontalPhoto ? 0 : 1);
 
   const onCancel = router.back;
 
@@ -296,7 +297,7 @@ const HorizontalPhotoEditionScreen = ({
   const onImageChange = fieldUpdateHandler('image');
 
   const onSave = useCallback(async () => {
-    if (!canSave) {
+    if (!canSave || !profile.webCard) {
       return;
     }
 
@@ -306,40 +307,39 @@ const HorizontalPhotoEditionScreen = ({
     );
 
     if (
-      profile.webCard.cardIsPublished &&
+      profile.webCard?.cardIsPublished &&
       requireSubscription &&
-      !profile.webCard.isPremium
+      !profile.webCard?.isPremium
     ) {
       router.push({ route: 'USER_PAY_WALL' });
       return;
     }
 
+    setProgressIndicator(Observable.from(0));
+
     const { image: updateMedia, ...rest } = value;
 
     let mediaId = updateMedia?.id;
     if (!mediaId && updateMedia?.uri) {
-      //we need to save the media first
-      const { uploadURL, uploadParameters } = await uploadSign({
-        kind: 'image',
-        target: 'module',
-      });
-      const fileName = getFileName(updateMedia.uri);
-      const file: any = {
-        name: fileName,
-        uri: `file://${updateMedia.uri}`,
-        type: 'image/jpeg',
-      };
-
-      const { progress: uploadProgress, promise: uploadPromise } = uploadMedia(
-        file,
-        uploadURL,
-        uploadParameters,
-      );
-
-      setProgressIndicator(
-        uploadProgress.map(({ loaded, total }) => loaded / total),
-      );
       try {
+        //we need to save the media first
+        const { uploadURL, uploadParameters } = await uploadSign({
+          kind: 'image',
+          target: 'module',
+        });
+        const fileName = getFileName(updateMedia.uri);
+        const file: any = {
+          name: fileName,
+          uri: `file://${updateMedia.uri}`,
+          type: 'image/jpeg',
+        };
+
+        const { progress: uploadProgress, promise: uploadPromise } =
+          uploadMedia(file, uploadURL, uploadParameters);
+
+        setProgressIndicator(
+          uploadProgress.map(({ loaded, total }) => loaded / total),
+        );
         const { public_id } = await uploadPromise;
         mediaId = public_id;
       } catch (error) {
@@ -353,6 +353,8 @@ const HorizontalPhotoEditionScreen = ({
               'Error toast message when saving a horizontal photo module failed because medias upload failed.',
           }),
         });
+        setProgressIndicator(null);
+        return;
       }
     }
 
@@ -382,12 +384,12 @@ const HorizontalPhotoEditionScreen = ({
         handleProfileActionError(e);
       },
     });
+
+    setProgressIndicator(null);
   }, [
     canSave,
     cardModulesCount,
-    profile.webCard.cardIsPublished,
-    profile.webCard.isPremium,
-    profile.webCard.id,
+    profile.webCard,
     value,
     horizontalPhoto?.id,
     marginHorizontal.value,
@@ -470,8 +472,8 @@ const HorizontalPhotoEditionScreen = ({
             marginVertical,
             imageHeight,
           }}
-          colorPalette={profile?.webCard.cardColors}
-          cardStyle={profile?.webCard.cardStyle}
+          colorPalette={profile?.webCard?.cardColors}
+          cardStyle={profile?.webCard?.cardStyle}
         />
       </PressableOpacity>
       <View

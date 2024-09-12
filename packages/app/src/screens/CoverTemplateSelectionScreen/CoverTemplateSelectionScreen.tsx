@@ -71,12 +71,13 @@ const CoverTemplateSelectionScreen = ({
   const webCardKind = profile?.webCard?.webCardKind;
 
   const onSelectTemplate = useCallback(
-    (templateId: string) => {
+    (templateId: string, color?: ColorPaletteColor) => {
       router.push({
         route: 'COVER_CREATION',
         params: {
           templateId,
           fromCoverEdition: !!fromCoverEdition,
+          color,
         },
       });
     },
@@ -110,7 +111,7 @@ const CoverTemplateSelectionScreen = ({
               <Text variant="large" style={styles.titleText}>
                 {intl.formatMessage({
                   defaultMessage: 'Create your Cover',
-                  description: 'Cover creation screen title',
+                  description: 'Cover Template Selection Screen - screen title',
                 })}
               </Text>
               <CoverTemplateSelectionScreenPremiumIndicator
@@ -238,22 +239,23 @@ const CoverTemplateSelectionScreenBody = ({
   const onSelectTag = useCallback(
     (tagId: string | null) => {
       setTag(tagId);
-      refetch({ tagId });
+      refetch({ tagId }, { fetchPolicy: 'store-and-network' });
     },
     [refetch],
   );
 
   const styles = useStyleSheet(stylesheet);
 
-  const ListFooterComponent = useMemo(
-    () => (
+  const ListFooterComponent = useMemo(() => {
+    if (tag) return undefined;
+
+    return (
       <CoverTemplateScratchStarters
         onColorSelect={onSelectBackgroundColor}
         cardColors={profile.webCard?.cardColors}
       />
-    ),
-    [onSelectBackgroundColor, profile.webCard?.cardColors],
-  );
+    );
+  }, [onSelectBackgroundColor, profile.webCard?.cardColors, tag]);
 
   return (
     <View style={styles.body}>

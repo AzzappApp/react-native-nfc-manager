@@ -102,6 +102,7 @@ const WebCardScreenHeader = ({
         id
         isPremium
         webCardKind
+        isMultiUser
         cardModules {
           id
           kind

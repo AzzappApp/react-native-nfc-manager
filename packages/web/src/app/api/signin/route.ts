@@ -6,8 +6,8 @@ import {
   getUserByEmail,
   getUserByPhoneNumber,
   getUserById,
-  getProfilesOfUser,
-  getProfileByUserName,
+  getProfilesByUser,
+  getOwnerProfileByUserName,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import {
@@ -48,11 +48,11 @@ const signin = async (req: Request) => {
     }
     if (user) {
       // if we found a user by email or phonenumber, we look for the profile
-      const profiles = await getProfilesOfUser(user.id, 1);
-      profile = profiles[0]?.Profile;
+      const profiles = await getProfilesByUser(user.id);
+      profile = profiles[0];
     } else {
       // in all other case, look for username
-      profile = await getProfileByUserName(credential);
+      profile = await getOwnerProfileByUserName(credential);
       user = profile ? await getUserById(profile.userId) : null;
     }
 
@@ -83,5 +83,3 @@ const signin = async (req: Request) => {
 };
 
 export const { POST, OPTIONS } = cors({ POST: withAxiom(signin) });
-
-export const runtime = 'nodejs';

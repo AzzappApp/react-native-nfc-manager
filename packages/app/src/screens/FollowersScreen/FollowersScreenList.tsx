@@ -4,7 +4,7 @@ import Toast from 'react-native-toast-message';
 import { graphql, useMutation, usePaginationFragment } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-import { isEditor } from '@azzapp/shared/profileHelpers';
+import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import WebCardList from '#components/WebCardList';
 import useAuthState from '#hooks/useAuthState';
 import type {
@@ -90,7 +90,7 @@ const FollowersScreenList = ({
       if (!profileInfos) {
         return;
       }
-      if (isEditor(profileInfos?.profileRole)) {
+      if (profileHasEditorRight(profileInfos?.profileRole)) {
         // currentProfileId is undefined when user is anonymous so we can't follow
         if (currentWebCardId && data?.followers) {
           //data.followers was null on sentry crash

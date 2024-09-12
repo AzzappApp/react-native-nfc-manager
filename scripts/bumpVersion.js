@@ -9,18 +9,22 @@ if (preReleaseKind && !preReleaseKind.match(/^[a-z]+$/)) {
 }
 
 const version = pkg.version;
-const [, currentPreReleaseKind, preReleaseNumber] =
-  version.match(/-([a-z]+)\.(\d+)$/) ?? [];
+const [, , preReleaseNumber] = version.match(/-([a-z]+)\.(\d+)$/) ?? [];
 const [major, minor, patch] = version.split('-')[0].split('.');
+const paddedMinor = minor.padStart(2, '0');
 
 let nextVersion = '';
-if (preReleaseKind && currentPreReleaseKind === preReleaseKind) {
-  //prettier-ignore
-  nextVersion = `${major}.${minor}.${patch}-${preReleaseKind}.${Number(preReleaseNumber) + 1}`;
-} else if (preReleaseKind) {
-  nextVersion = `${major}.${minor}.${Number(patch) + 1}-${preReleaseKind}.0`;
+let androidVersionCode = 0;
+
+if (preReleaseKind) {
+  const paddedPatch = patch.padStart(2, '0');
+  const nextPreReleaseNumber = (Number(preReleaseNumber) + 1).toString();
+  nextVersion = `${major}.${minor}.${patch}-${preReleaseKind}.${nextPreReleaseNumber}`;
+  androidVersionCode = `${major}${paddedMinor}${paddedPatch}${nextPreReleaseNumber.padStart(3, '0')}`;
 } else {
-  nextVersion = `${major}.${minor}.${Number(patch) + 1}`;
+  const newPatch = Number(patch) + 1;
+  nextVersion = `${major}.${minor}.${newPatch}`;
+  androidVersionCode = `${major}${paddedMinor}${newPatch.toString().padStart(2, '0')}`;
 }
 
-setWorkspaceVersions(nextVersion);
+setWorkspaceVersions(nextVersion, androidVersionCode);

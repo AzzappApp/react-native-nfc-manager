@@ -26,16 +26,17 @@ const getCoverUrl = (webCard: WebCard, size: number) =>
 export const buildApplePass = async (profileId: string, locale: string) => {
   const res = await getProfileWithWebCardById(profileId);
   if (res) {
-    const [media] = res.WebCard.coverMediaId
-      ? await getMediasByIds([res.WebCard.coverMediaId])
+    const { webCard, profile } = res;
+    const [media] = webCard.coverMediaId
+      ? await getMediasByIds([webCard.coverMediaId])
       : [];
 
     const thumbnails: Record<string, Buffer> = {};
 
     if (media) {
-      const thumbnail = await getCoverUrl(res.WebCard, 90);
-      const thumbnail2x = await getCoverUrl(res.WebCard, 90 * 2);
-      const thumbnail3x = await getCoverUrl(res.WebCard, 90 * 3);
+      const thumbnail = await getCoverUrl(webCard, 90);
+      const thumbnail2x = await getCoverUrl(webCard, 90 * 2);
+      const thumbnail3x = await getCoverUrl(webCard, 90 * 3);
       const [thumbnailUrl, thumbnail2xUrl, thumbnail3xUrl] = thumbnail
         ? await Promise.allSettled([
             fetch(thumbnail).then(res => res.arrayBuffer()),
@@ -55,13 +56,10 @@ export const buildApplePass = async (profileId: string, locale: string) => {
       }
     }
 
-    let contactCard = res.Profile.contactCard;
+    let contactCard = profile.contactCard;
 
     if (!contactCard) {
-      contactCard = await buildDefaultContactCard(
-        res.WebCard,
-        res.Profile.userId,
-      );
+      contactCard = await buildDefaultContactCard(webCard, profile.userId);
     }
 
     const [iconContent, icon2xContent, logoContent, logo2xContent] =
@@ -80,7 +78,7 @@ export const buildApplePass = async (profileId: string, locale: string) => {
         ),
       ]);
 
-    const primary = res.WebCard.cardColors?.primary;
+    const primary = webCard.cardColors?.primary;
 
     const backgroundColor = primary
       ? convertHexToRGBA(primary)
@@ -126,16 +124,16 @@ export const buildApplePass = async (profileId: string, locale: string) => {
 
     if (contactCard) {
       const { data, signature } = await serializeAndSignContactCard(
-        res.WebCard.userName,
+        webCard.userName,
         profileId,
-        res.WebCard.id,
+        webCard.id,
         contactCard,
-        res.WebCard.commonInformation,
+        webCard.commonInformation,
       );
 
       pass.setBarcodes({
         message: buildUserUrlWithContactCard(
-          res.WebCard?.userName ?? '',
+          webCard?.userName ?? '',
           data,
           signature,
         ),
@@ -159,8 +157,7 @@ export const buildApplePass = async (profileId: string, locale: string) => {
     });
     pass.secondaryFields.push({
       key: 'company',
-      value:
-        res.WebCard.commonInformation?.company ?? contactCard?.company ?? '',
+      value: webCard.commonInformation?.company ?? contactCard?.company ?? '',
       textAlignment: 'PKTextAlignmentLeft',
     });
 

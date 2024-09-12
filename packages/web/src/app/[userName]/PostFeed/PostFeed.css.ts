@@ -1,10 +1,10 @@
 import { style } from '@vanilla-extract/css';
+import { colors } from '@azzapp/shared/colorsHelpers';
 import { MediaQuery, textSmall, vars } from '#app/[userName]/theme.css';
 
 const wrapper = style({
   width: '100%',
   height: '100vh',
-  backgroundColor: vars.color.white,
   overflowY: 'scroll',
   '::-webkit-scrollbar': {
     display: 'none',
@@ -12,7 +12,6 @@ const wrapper = style({
   },
   scrollbarWidth: 'none',
   position: 'relative',
-  paddingTop: '96px',
 });
 
 const header = style({
@@ -21,8 +20,6 @@ const header = style({
   justifyContent: 'space-between',
   alignItems: 'center',
   padding: '10px',
-  position: 'fixed',
-  top: 0,
   height: '96px',
   '@media': {
     [MediaQuery.Desktop]: {
@@ -33,13 +30,20 @@ const header = style({
     },
   },
   zIndex: 1,
-  backgroundColor: vars.color.white,
 });
 
 const close = style({
   '@media': {
     [MediaQuery.Mobile]: {
       visibility: 'hidden',
+    },
+  },
+});
+
+const share = style({
+  '@media': {
+    [MediaQuery.Mobile]: {
+      color: `${vars.color.black}!important`,
     },
   },
 });
@@ -53,21 +57,46 @@ const headerData = style({
 const headerName = style({
   fontWeight: vars.fontWeight.bold,
   textDecoration: 'none',
-  color: vars.color.black,
+  '@media': {
+    [MediaQuery.Mobile]: {
+      color: `${vars.color.black}!important`,
+    },
+  },
 });
 
 const headerPostsCount = style([textSmall, { color: vars.color.grey200 }]);
 
 const headerButton = style({ marginTop: '5px' });
 
+const headerButtonLight = style({
+  color: colors.white,
+  borderWidth: 1,
+  borderColor: colors.white,
+  borderStyle: 'solid',
+});
+
+const posts = style({
+  display: 'flex',
+  flexDirection: 'column',
+  flex: 1,
+  '@media': {
+    [MediaQuery.Desktop]: {
+      gap: '20px',
+    },
+  },
+});
+
 const styles = {
   wrapper,
   header,
   close,
+  share,
   headerData,
   headerName,
   headerPostsCount,
   headerButton,
+  headerButtonLight,
+  posts,
 };
 
 export default styles;

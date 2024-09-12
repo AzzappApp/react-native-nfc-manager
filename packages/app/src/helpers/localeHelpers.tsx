@@ -1,9 +1,6 @@
 import { useEffect, useState } from 'react';
 import { AppState } from 'react-native';
-import {
-  findBestLanguageTag,
-  getLocales as getLocalesRNLocalize,
-} from 'react-native-localize';
+import { getLocales as getLocalesRNLocalize } from 'react-native-localize';
 import { SUPPORTED_LOCALES, DEFAULT_LOCALE } from '@azzapp/i18n';
 import type { Locale } from '@azzapp/i18n';
 
@@ -48,13 +45,30 @@ export const useCurrentLocale = () => {
   return locale;
 };
 
+/* 
+  Get the best supported language close to the languages set in the phone
+  based first on the language tag and at least the languageCode based on the 
+  2 first letters of supported languages
+*/
+const findBestLanguage = () => {
+  const locales = getLocales();
+
+  return locales.reduce<Locale | null>(
+    (lang, { languageCode, languageTag }) =>
+      lang ||
+      SUPPORTED_LOCALES.find(tag => languageTag === tag) ||
+      SUPPORTED_LOCALES.find(lang => lang.split('-')[0] === languageCode) ||
+      null,
+    null,
+  );
+};
+
 /**
  * Sets the current locale based on the user preferred locales.
  * If the user preferred locales are not supported, the default locale is used.
  */
 const guessCurrentLocale = () => {
-  const locale = findBestLanguageTag(SUPPORTED_LOCALES);
-  const lang = locale?.languageTag ?? DEFAULT_LOCALE;
+  const lang = findBestLanguage() ?? DEFAULT_LOCALE;
   if (currentLocale !== lang) {
     currentLocale = lang;
     localeChangeListeners.forEach(listener => listener());
@@ -81,6 +95,9 @@ export const init = () => {
 export const messages: Record<Locale, Record<string, string>> = {
   get 'en-US'() {
     return require('@azzapp/i18n/compiled/app/en-US.json');
+  },
+  get fr() {
+    return require('@azzapp/i18n/compiled/app/fr.json');
   },
   // disabled for now
   // get da() {

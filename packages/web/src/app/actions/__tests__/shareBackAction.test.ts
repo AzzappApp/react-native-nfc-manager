@@ -2,7 +2,8 @@ import { parseWithZod } from '@conform-to/zod';
 import { jwtDecode } from 'jwt-decode';
 
 import { getUserById } from '@azzapp/data';
-import { sendSMS, sendEmail } from '#helpers/contactHelpers';
+import { sendEmail } from '#helpers/emailHelpers';
+import { sendTwilioSMS } from '#helpers/twilioHelpers';
 import { processShareBackSubmission } from '../shareBackAction';
 import type { ShareBackFormData } from '../shareBackAction';
 import type { User } from '@azzapp/data';
@@ -11,9 +12,12 @@ jest.mock('@azzapp/data', () => ({
   getUserById: jest.fn(),
 }));
 
-jest.mock('#helpers/contactHelpers', () => ({
-  sendSMS: jest.fn(),
+jest.mock('#helpers/emailHelpers', () => ({
   sendEmail: jest.fn(),
+}));
+
+jest.mock('#helpers/twilioHelpers', () => ({
+  sendTwilioSMS: jest.fn(),
 }));
 
 jest.mock('@sentry/nextjs', () => ({
@@ -87,10 +91,10 @@ describe('processShareBackSubmission', () => {
 
     await processShareBackSubmission(userId, token, null, formData);
 
-    expect(sendSMS).toHaveBeenCalledWith(
-      '1234567890',
-      shareBackWithSuccessBody,
-    );
+    expect(sendTwilioSMS).toHaveBeenCalledWith({
+      to: '1234567890',
+      body: shareBackWithSuccessBody,
+    });
     expect(sendEmail).not.toHaveBeenCalled();
   });
 
@@ -124,7 +128,7 @@ describe('processShareBackSubmission', () => {
         html: shareBackWithSuccessBody,
       },
     ]);
-    expect(sendSMS).not.toHaveBeenCalled();
+    expect(sendTwilioSMS).not.toHaveBeenCalled();
   });
 
   it('should reply with form error if token is expired', async () => {

@@ -7,7 +7,7 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { SectionList, View } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -17,7 +17,7 @@ import {
   convertToNonNullArray,
   type ArrayItemType,
 } from '@azzapp/shared/arrayHelpers';
-import { isOwner } from '@azzapp/shared/profileHelpers';
+import { profileIsOwner } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import { MediaImageRenderer } from '#components/medias';
 import { useRouter } from '#components/NativeRouter';
@@ -90,11 +90,11 @@ const MultiUserScreenUserList = ({
   // @TODO
   const nbCommonInformation =
     (webCard.commonInformation?.company ? 1 : 0) +
-    (webCard.commonInformation?.addresses?.some(a => a.address) ? 1 : 0) +
-    (webCard.commonInformation?.emails?.some(a => a.address) ? 1 : 0) +
-    (webCard.commonInformation?.phoneNumbers?.some(p => p.number) ? 1 : 0) +
-    (webCard.commonInformation?.urls?.some(u => u.address) ? 1 : 0) +
-    (webCard.commonInformation?.socials?.some(s => s.url) ? 1 : 0) +
+    (webCard.commonInformation?.addresses?.length ?? 0) +
+    (webCard.commonInformation?.emails?.length ?? 0) +
+    (webCard.commonInformation?.phoneNumbers?.length ?? 0) +
+    (webCard.commonInformation?.urls?.length ?? 0) +
+    (webCard.commonInformation?.socials?.length ?? 0) +
     (webCard.logo ? 1 : 0);
 
   const onAddUsers = useCallback(() => {
@@ -154,7 +154,7 @@ const MultiUserScreenUserList = ({
         const item = curr?.node;
         if (item) {
           const existingSection = acc.find(
-            section => section.title === item.profileRole,
+            section => section.profileRole === item.profileRole,
           );
           if (existingSection) {
             existingSection.data.push(item);
@@ -166,11 +166,39 @@ const MultiUserScreenUserList = ({
         return acc;
       },
       [
-        { title: 'owner', data: [] },
-        { title: 'admin', data: [] },
-        { title: 'editor', data: [] },
-        { title: 'user', data: [] },
-      ] as Array<{ title: string; data: Profile[] }>,
+        {
+          title: intl.formatMessage({
+            defaultMessage: 'owner',
+            description: 'MultiUserScreen - Owner role',
+          }),
+          profileRole: 'owner',
+          data: [],
+        },
+        {
+          title: intl.formatMessage({
+            defaultMessage: 'admin',
+            description: 'MultiUserScreen - Admin role',
+          }),
+          profileRole: 'admin',
+          data: [],
+        },
+        {
+          title: intl.formatMessage({
+            defaultMessage: 'editor',
+            description: 'MultiUserScreen - Editor role',
+          }),
+          profileRole: 'editor',
+          data: [],
+        },
+        {
+          title: intl.formatMessage({
+            defaultMessage: 'user',
+            description: 'MultiUserScreen - User role',
+          }),
+          profileRole: 'user',
+          data: [],
+        },
+      ] as Array<{ title: string; profileRole: string; data: Profile[] }>,
     );
     return convertToNonNullArray(
       result.map(section => {
@@ -180,7 +208,7 @@ const MultiUserScreenUserList = ({
         return section;
       }),
     );
-  }, [data.profiles.edges]);
+  }, [data.profiles.edges, intl]);
 
   const onEndReached = useCallback(() => {
     if (hasNext && !isLoadingNext) {
@@ -208,18 +236,16 @@ const MultiUserScreenUserList = ({
 
   const { profileInfos } = useAuthState();
 
-  const isWebCardOwner = useMemo(
-    () => isOwner(profileInfos?.profileRole),
-    [profileInfos?.profileRole],
-  );
-
   const { transferOwnerMode } = useContext(MultiUserTransferOwnerContext);
 
   const [searching, setSearching] = useState(false);
 
   const renderListItem = useCallback<ListRenderItem<Profile>>(
     ({ item }) => {
-      if (isWebCardOwner && item.id === profileInfos?.profileId) {
+      if (
+        item.id === profileInfos?.profileId &&
+        profileIsOwner(item.profileRole)
+      ) {
         return (
           <View>
             <UserListItem item={item} />
@@ -229,13 +255,13 @@ const MultiUserScreenUserList = ({
       }
       return <UserListItem item={item} />;
     },
-    [isWebCardOwner, profileInfos?.profileId, searching, webCard],
+    [profileInfos?.profileId, searching, webCard],
   );
 
   //filter the sections without having to reparse all the data
   const filteredSections = useMemo(() => {
     if (transferOwnerMode) {
-      return sections.filter(section => section.title !== 'owner');
+      return sections.filter(section => section.profileRole !== 'owner');
     }
     return sections;
   }, [sections, transferOwnerMode]);
@@ -413,7 +439,12 @@ const ItemList = ({ item }: { item: Profile }) => {
         <View style={styles.userInfos}>
           <Text variant="large">
             ~{contactCard.firstName ?? ''} {contactCard.lastName ?? ''}{' '}
-            {isCurrentUser && '(me)'}
+            {isCurrentUser && (
+              <FormattedMessage
+                defaultMessage="(me)"
+                description="MultiUserScreen - (me) suffix"
+              />
+            )}
           </Text>
           <Text style={styles.contact}>
             {item.user?.email ?? item.user?.phoneNumber}

@@ -19,11 +19,15 @@ default_platform(:ios)
 
 
 APP_IDENT = ENV['IOS_APP_IDENTIFIER']
+APPCLIP_IDENT = ENV['IOS_APPCLIP_IDENTIFIER']
 IOS_SCHEME = ENV["IOS_SCHEME"]
+IOS_APPCLIP_SCHEME = ENV["IOS_APPCLIP_SCHEME"]
 EXPORT_METHOD = ENV['IOS_EXPORT_METHOD']
 P12_PASSWORD = ENV["IOS_CERTIFICATE_P12_PASSWORD"]
 PROFILE_ID = ENV["IOS_PROFILE_ID"]
-CODE_SIGNING_IDENTITY = ENV["IOS_CODE_SIGNING_IDENTITY"]
+PROFILECLIP_ID = ENV["IOS_PROFILECLIP_ID"]
+##CODE_SIGNING_IDENTITY = ENV["IOS_CODE_SIGNING_IDENTITY"]
+CODE_SIGNING_IDENTITY = "iPhone Distribution: APPCORP (66D3U3GLN6)"
 APP_STORE_CONNECT_API_KEY = ENV["APP_STORE_CONNECT_API_KEY"]
 TEAM_ID = "66D3U3GLN6"
 
@@ -32,6 +36,52 @@ platform :ios do
 
   desc 'Build IOS application.'
   lane :build do
+    #force appclip bundle version to app bundle version (they must be the same)
+    # Define paths to Info.plist files
+    main_app_plist = "ios/azzapp/Info.plist"
+    app_clip_plist = "ios/ShareContactAppClip/Info.plist"
+
+    # Get the version number from the main app's Info.plist
+    version_number = get_info_plist_value(
+      path: main_app_plist,
+      key: "CFBundleVersion"
+    )
+
+    # Get the build version from the main app's Info.plist
+    build_version = get_info_plist_value(
+      path: main_app_plist,
+      key: "CFBundleShortVersionString"
+    )
+
+    # Set the same version number for the App Clip's Info.plist (and futur other extension)
+    set_info_plist_value(
+      path: app_clip_plist,
+      key: "CFBundleVersion",
+      value: version_number
+    )
+
+    # Set the same build version for the App Clip's Info.plist
+    set_info_plist_value(
+      path: app_clip_plist,
+      key: "CFBundleShortVersionString",
+      value: build_version
+    )
+
+    # Update the CURRENT_PROJECT_VERSION for the App Clip scheme in the project.pbxproj file (this is required for the App Clip to build)
+    update_project_version(
+      xcodeproj: "../ios/azzapp.xcodeproj",
+      target: IOS_APPCLIP_SCHEME,
+      version: version_number,
+       value: 'CURRENT_PROJECT_VERSION'
+    )
+   
+    update_project_version(
+      xcodeproj: "../ios/azzapp.xcodeproj",
+      target: IOS_APPCLIP_SCHEME,
+      version: build_version,
+      value: 'MARKETING_VERSION'
+    )
+        
     keychain_created = true
     create_keychain(
       name: "CI",
@@ -44,6 +94,7 @@ platform :ios do
 
     # Import certificate and provisioning profile
     PROFILE_PATH = "./ios/certs/#{APP_IDENT}.mobileprovision"
+    PROFILE_CLIP_PATH = "./ios/certs/#{APPCLIP_IDENT}.mobileprovision"
     CERTIFICATE_PATH = "./ios/certs/cerfiticate.p12"
 
     import_certificate(
@@ -54,6 +105,7 @@ platform :ios do
     )
 
     install_provisioning_profile(path: PROFILE_PATH)
+    install_provisioning_profile(path: PROFILE_CLIP_PATH)
 
     # Update code signing settings
     pbxprojPath = "ios/azzapp.xcodeproj/project.pbxproj"
@@ -65,22 +117,45 @@ platform :ios do
       "azzapp-staging" => "azzapp-stagingRelease.entitlements",
       "azzapp" => "azzapp/azzappRelease.entitlements"
     }
+
+    clip_entitlements_files = {
+      "azzapp-dev" => "ShareContactAppClip/ShareContactAppClip-dev.entitlements",
+      "azzapp-staging" => "ShareContactAppClip/ShareContactAppClip-staging.entitlements",
+      "azzapp" => "ShareContactAppClip/ShareContactAppClip.entitlements"
+    }
+
     # Determine the entitlements file based on the target
     update_code_signing_settings(
       use_automatic_signing: false,
       path: "ios/azzapp.xcodeproj",
-      entitlements_file_path: entitlements_files[IOS_SCHEME]
+      entitlements_file_path: entitlements_files[IOS_SCHEME],
+      targets: [IOS_SCHEME],
+      code_sign_identity: CODE_SIGNING_IDENTITY,
+    )
+
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: "ios/azzapp.xcodeproj",
+      entitlements_file_path: clip_entitlements_files[IOS_APPCLIP_SCHEME],
+      targets: [IOS_APPCLIP_SCHEME],
+      code_sign_identity: CODE_SIGNING_IDENTITY,
     )
 
     update_project_provisioning(
       xcodeproj: "ios/azzapp.xcodeproj",
       profile: PROFILE_PATH,
       target_filter: IOS_SCHEME,
-      code_signing_identity: CODE_SIGNING_IDENTITY
+      code_signing_identity: CODE_SIGNING_IDENTITY,
+      build_configuration: "Release",
     )
 
-     # Determine the entitlements file based on the target
-
+    update_project_provisioning(
+      xcodeproj: "ios/azzapp.xcodeproj",
+      profile: PROFILE_CLIP_PATH,
+      code_signing_identity: CODE_SIGNING_IDENTITY,
+      target_filter: IOS_APPCLIP_SCHEME,
+      build_configuration: "Release",
+    )
 
     # Build the application
     gym(
@@ -90,14 +165,15 @@ platform :ios do
       output_directory: "./fastlane/builds",
       export_method: EXPORT_METHOD,
       export_team_id: TEAM_ID,
-      codesigning_identity: CODE_SIGNING_IDENTITY,
       export_options: {
         method: EXPORT_METHOD,
         signingStyle: "manual",
         provisioningProfiles: { 
           APP_IDENT => PROFILE_ID,
+          APPCLIP_IDENT => PROFILECLIP_ID,
         },
-        installerSigningCertificate: CODE_SIGNING_IDENTITY
+        installerSigningCertificate: CODE_SIGNING_IDENTITY,
+        distributionBundleIdentifier: APP_IDENT,
       }
     )
     
@@ -134,4 +210,83 @@ platform :ios do
       delete_keychain(name: "CI")	
     end
   end
+end
+
+platform :android do
+  APP_IDENT_ANDROID = ENV['ANDROID_APP_IDENTIFIER']
+  KEYSTORE_PATH = ENV['ANDROID_KEYSTORE_PATH']
+  KEYSTORE_PASSWORD = ENV['ANDROID_KEYSTORE_PASSWORD']
+  KEY_ALIAS = ENV['ANDROID_KEY_ALIAS']
+  KEY_PASSWORD = ENV['ANDROID_KEY_PASSWORD']
+  PLAY_CONFIG_PATH = ENV['PLAY_CONFIG_PATH']
+  ANDROID_APP_IDENTIFIER = ENV['ANDROID_APP_IDENTIFIER']
+  ANDROID_BUILD_TASK = ENV['ANDROID_BUILD_TASK']
+
+ 
+  desc 'Build Android application based on ANDROID_TARGET environment variable.'
+  lane :build do
+    android_target = capitalize_first_letter(ANDROID_BUILD_TASK)
+   
+    gradle(
+      task: ":app:bundle#{android_target}",
+      build_type: "Release",
+      project_dir: "./android",
+      print_command_output: true,
+      print_command: true,
+      properties: {
+        "android.injected.signing.store.file" => KEYSTORE_PATH,
+        "android.injected.signing.store.password" => KEYSTORE_PASSWORD,
+        "android.injected.signing.key.alias" => KEY_ALIAS,
+        "android.injected.signing.key.password" => KEY_PASSWORD,
+      }
+    )
+    puts "Test"
+    puts Actions.lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH]
+    puts Actions.lane_context[SharedValues::GRADLE_ALL_AAB_OUTPUT_PATHS]
+    puts Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH]
+    puts Actions.lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS]
+   
+  end
+
+
+   lane :deploy do   
+    AAB_PATH = ENV['AAB_PATH']
+    puts "deploy"
+    puts Actions.lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH]
+    puts Actions.lane_context[SharedValues::GRADLE_ALL_AAB_OUTPUT_PATHS]
+    puts Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH]
+    puts Actions.lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS]
+    supply(
+      json_key: PLAY_CONFIG_PATH,
+      package_name: ANDROID_APP_IDENTIFIER,
+      aab: AAB_PATH,
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      skip_upload_apk: true,
+      track: "internal",
+    )
+
+   end
+end
+
+def update_project_version(xcodeproj:, target:, version:, value:)
+  require 'xcodeproj'
+
+  project_path = xcodeproj
+  project = Xcodeproj::Project.open(project_path)
+
+  project.targets.each do |proj_target|
+    if proj_target.name == target
+      proj_target.build_configurations.each do |config|
+        config.build_settings[value] = version
+      end
+    end
+  end
+
+  project.save
+end
+
+def capitalize_first_letter(string)
+  string[0].upcase + string[1..-1]
 end

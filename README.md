@@ -4,7 +4,7 @@ This is the main repository of the Azzapp application source code.
 
 ## Development environment
 
-Developping and building the project requires **MacOS version 12+**.
+Developing and building the project requires **MacOS version 12+**.
 In addition developpers should install the followings dependencies:
 
 - [Node.js](https://nodejs.org/en/) version **20** (recommended install through [nvm](https://github.com/nvm-sh/nvm))
@@ -104,7 +104,7 @@ yarn test
 
 The sources of the project are organized as a monorepo. Dependencies are managed through the `yarn` [workspaces](https://classic.yarnpkg.com/lang/en/docs/workspaces/) feature.
 
-The differents packages of the application are located under the `packages` directory :
+The different packages of the application are located under the `packages` directory :
 
 - [app](./packages/app/): contains the source code of the client React Native application.
 - [backoffice](./packages/backoffice/): contains the source code of the backoffice of the application.
@@ -146,23 +146,22 @@ The application use a [GraphQL](https://graphql.org/) API to communicate between
 
 ### Miscellaneous
 
-- The authentification process of the mobile applications is based on tokens
+- The authentication process of the mobile applications is based on tokens
 - On IOS the main image component is based on [Nuke](https://github.com/kean/Nuke)
 
 ## CI/CD
 
 - The workspace build system is based on [Turbo Repo](https://turbo.build/)
 - The CI/CD Process is based on [Github Actions](https://github.com/features/actions)
-- The natives applications are built [EAS](https://expo.dev/). 
 
-### List of environement variables during the build process:
+### List of environment variables during the build process:
 
 - `VERCEL_TOKEN`: vercel api token
 
 Valid environments are `DEV`, `STAGING` and `PRODUCTION` (the later is omitted in env variable name).
 Valid platforms are  `IOS` and `ANDROID`. 
 
-### List of environement variables used at runtime by the application server:
+### List of environment variables used at runtime by the application server:
 
 - `DATABASE_HOST`: Host of the planetscale database
 - `DATABASE_USERNAME`: Username of the planetscale database
@@ -174,7 +173,7 @@ Valid platforms are  `IOS` and `ANDROID`.
 - `TOKEN_SECRET`: password used to encrypt jwt tokens
 - `REFRESH_TOKEN_SECRET`: password used to encrypt jwt refresh tokens
 
-### List of environement variables used at runtime by the application clients:
+### List of environment variables used at runtime by the application clients:
 
 - `NEXT_PUBLIC_API_ENDPOINT`: the endpoint of api (generated at build time for mobile clients, set to `/api` for web client)
 - `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`: the cloudinary cloud name (only used on WEB)

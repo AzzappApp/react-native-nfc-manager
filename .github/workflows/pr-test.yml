@@ -16,31 +16,12 @@ jobs:
       NODE_OPTIONS: --max-old-space-size=4096
       PAYMENT_API_URL: ${{ vars.PAYMENT_API_URL }}
     steps:
-      - uses: actions/checkout@v3
-      - name: Enable Corepack
-        run: corepack enable
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-          
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"    
-        
-      - name: Cache yarn
-        uses: actions/cache@v3
-        id: yarn-cache
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+      - name: Checkout
+        uses: actions/checkout@v3
 
-      - name: Install dependencies
-        run: yarn install --immutable
-  
+      - name: Setup
+        uses: ./.github/actions/setup 
 
-      # Testing
       - name: Build translations
         run: yarn i18n:extract
 

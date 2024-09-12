@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import * as RNLocalize from 'react-native-localize';
-import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from '@azzapp/i18n';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import { act, renderHook } from '#helpers/testHelpers';
 import * as localHelpersModule from '../localeHelpers';
 import type { AppStateStatus } from 'react-native';
@@ -28,42 +28,89 @@ describe('localeHelpers', () => {
   describe('init', () => {
     test('should set the current locale', () => {
       const { getCurrentLocale, init } = localHelpers;
-      const findBestLanguageTagSpy = jest
-        .spyOn(RNLocalize, 'findBestLanguageTag')
-        .mockReturnValueOnce({
+      jest.spyOn(RNLocalize, 'getLocales').mockReturnValueOnce([
+        {
+          languageCode: 'fr',
+          countryCode: 'fr',
           languageTag: 'fr',
           isRTL: false,
-        });
+        },
+      ]);
 
       init();
 
       expect(getCurrentLocale()).toBe('fr');
-      expect(findBestLanguageTagSpy).toHaveBeenCalledWith(SUPPORTED_LOCALES);
+    });
+
+    test('should set the best locale close to current locale', () => {
+      const { getCurrentLocale, init } = localHelpers;
+      jest.spyOn(RNLocalize, 'getLocales').mockReturnValueOnce([
+        {
+          languageCode: 'en',
+          countryCode: 'en',
+          languageTag: 'en-AU',
+          isRTL: false,
+        },
+      ]);
+
+      init();
+
+      expect(getCurrentLocale()).toBe('en-US');
+    });
+
+    test('should set the first locale supported', () => {
+      const { getCurrentLocale, init } = localHelpers;
+      jest.spyOn(RNLocalize, 'getLocales').mockReturnValueOnce([
+        {
+          languageCode: 'unsupported',
+          countryCode: 'unsupported',
+          languageTag: 'unsupported',
+          isRTL: false,
+        },
+        {
+          languageCode: 'en',
+          countryCode: 'en',
+          languageTag: 'en-GB',
+          isRTL: false,
+        },
+      ]);
+
+      init();
+
+      expect(getCurrentLocale()).toBe('en-US');
     });
 
     test('should listen to AppState and set again the current locale when app goes to foreground', () => {
       const { getCurrentLocale, init } = localHelpers;
 
-      const findBestLanguageTagSpy = jest
-        .spyOn(RNLocalize, 'findBestLanguageTag')
-        .mockReturnValueOnce({
-          languageTag: 'fr',
-          isRTL: false,
-        })
-        .mockReturnValueOnce({
-          languageTag: 'en',
-          isRTL: false,
-        });
+      const spy = jest
+        .spyOn(RNLocalize, 'getLocales')
+        .mockReturnValueOnce([
+          {
+            languageCode: 'fr',
+            countryCode: 'fr',
+            languageTag: 'fr',
+            isRTL: false,
+          },
+        ])
+        .mockReturnValueOnce([
+          {
+            languageCode: 'en',
+            countryCode: 'en',
+            languageTag: 'en-US',
+            isRTL: false,
+          },
+        ]);
 
       init();
       expect(getCurrentLocale()).toBe('fr');
-      expect(findBestLanguageTagSpy).toHaveBeenCalledTimes(1);
+      expect(spy).toHaveBeenCalledTimes(1);
 
       mockListener!('background');
-      expect(findBestLanguageTagSpy).toHaveBeenCalledTimes(1);
+      expect(spy).toHaveBeenCalledTimes(1);
       mockListener!('active');
-      expect(getCurrentLocale()).toBe('en');
-      expect(findBestLanguageTagSpy).toHaveBeenCalledTimes(2);
+      expect(getCurrentLocale()).toBe('en-US');
+      expect(spy).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -73,80 +120,163 @@ describe('localeHelpers', () => {
       const consoleWarn = jest
         .spyOn(console, 'warn')
         .mockImplementationOnce(() => void 0);
-
       expect(getCurrentLocale()).toBe(DEFAULT_LOCALE);
       expect(consoleWarn).toHaveBeenCalledWith(
         'trying to access `getCurrentLocale` before initialization',
       );
-
       consoleWarn.mockRestore();
     });
-
     test('should not warn if called after initialization', () => {
       const { getCurrentLocale, init } = localHelpers;
-
-      jest.spyOn(RNLocalize, 'findBestLanguageTag').mockReturnValueOnce({
-        languageTag: 'fr',
-        isRTL: false,
-      });
+      jest.spyOn(RNLocalize, 'getLocales').mockReturnValueOnce([
+        {
+          languageCode: 'fr',
+          countryCode: 'fr',
+          languageTag: 'fr',
+          isRTL: false,
+        },
+      ]);
       const consoleWarn = jest
         .spyOn(console, 'warn')
         .mockImplementationOnce(() => void 0);
-
       init();
       expect(getCurrentLocale()).toBe('fr');
       expect(consoleWarn).not.toHaveBeenCalled();
-
       consoleWarn.mockRestore();
     });
   });
 
   describe('useCurrentLocale', () => {
     beforeAll(() => {
-      const findBestLanguageTagMock = jest
-        .spyOn(RNLocalize, 'findBestLanguageTag')
-        .mockReturnValueOnce({
+      const mock = jest.spyOn(RNLocalize, 'getLocales').mockReturnValueOnce([
+        {
+          languageCode: 'fr',
+          countryCode: 'fr',
           languageTag: 'fr',
           isRTL: false,
-        });
+        },
+      ]);
       localHelpersModule.init();
-      findBestLanguageTagMock.mockRestore();
+      mock.mockRestore();
     });
-
     test('should return the currentLocale', () => {
       const { result } = renderHook(() =>
         localHelpersModule.useCurrentLocale(),
       );
-
       expect(result.current).toBe('fr');
     });
-
     test('should change when the currentLocale change', () => {
       const { result } = renderHook(() =>
         localHelpersModule.useCurrentLocale(),
       );
-
-      const findBestLanguageTagMock = jest
-        .spyOn(RNLocalize, 'findBestLanguageTag')
-        .mockReturnValueOnce({
+      const mock = jest.spyOn(RNLocalize, 'getLocales').mockReturnValueOnce([
+        {
+          languageCode: 'fr',
+          countryCode: 'fr',
           languageTag: 'fr',
           isRTL: false,
-        });
+        },
+      ]);
       act(() => {
         mockListener?.('inactive');
         mockListener?.('active');
       });
       expect(result.current).toBe('fr');
-
-      findBestLanguageTagMock.mockReturnValueOnce({
-        languageTag: 'es',
-        isRTL: false,
-      });
+      mock.mockReturnValueOnce([
+        {
+          languageCode: 'es',
+          countryCode: 'es',
+          languageTag: 'es',
+          isRTL: false,
+        },
+      ]);
       act(() => {
         mockListener?.('inactive');
         mockListener?.('active');
       });
-      expect(result.current).toBe('es');
+      expect(result.current).toBe('en-US');
+    });
+  });
+  describe('getCurrentLocale', () => {
+    test('should warn if called before initialization', () => {
+      const { getCurrentLocale } = localHelpers;
+      const consoleWarn = jest
+        .spyOn(console, 'warn')
+        .mockImplementationOnce(() => void 0);
+      expect(getCurrentLocale()).toBe(DEFAULT_LOCALE);
+      expect(consoleWarn).toHaveBeenCalledWith(
+        'trying to access `getCurrentLocale` before initialization',
+      );
+      consoleWarn.mockRestore();
+    });
+    test('should not warn if called after initialization', () => {
+      const { getCurrentLocale, init } = localHelpers;
+      jest.spyOn(RNLocalize, 'getLocales').mockReturnValueOnce([
+        {
+          languageCode: 'fr',
+          countryCode: 'fr',
+          languageTag: 'fr',
+          isRTL: false,
+        },
+      ]);
+      const consoleWarn = jest
+        .spyOn(console, 'warn')
+        .mockImplementationOnce(() => void 0);
+      init();
+      expect(getCurrentLocale()).toBe('fr');
+      expect(consoleWarn).not.toHaveBeenCalled();
+      consoleWarn.mockRestore();
+    });
+  });
+  describe('useCurrentLocale', () => {
+    beforeAll(() => {
+      const mock = jest.spyOn(RNLocalize, 'getLocales').mockReturnValueOnce([
+        {
+          languageCode: 'fr',
+          countryCode: 'fr',
+          languageTag: 'fr',
+          isRTL: false,
+        },
+      ]);
+      localHelpersModule.init();
+      mock.mockRestore();
+    });
+    test('should return the currentLocale', () => {
+      const { result } = renderHook(() =>
+        localHelpersModule.useCurrentLocale(),
+      );
+      expect(result.current).toBe('fr');
+    });
+    test('should change when the currentLocale change', () => {
+      const { result } = renderHook(() =>
+        localHelpersModule.useCurrentLocale(),
+      );
+      const mock = jest.spyOn(RNLocalize, 'getLocales').mockReturnValueOnce([
+        {
+          languageCode: 'fr',
+          countryCode: 'fr',
+          languageTag: 'fr',
+          isRTL: false,
+        },
+      ]);
+      act(() => {
+        mockListener?.('inactive');
+        mockListener?.('active');
+      });
+      expect(result.current).toBe('fr');
+      mock.mockReturnValueOnce([
+        {
+          languageCode: 'es',
+          countryCode: 'es',
+          languageTag: 'es',
+          isRTL: false,
+        },
+      ]);
+      act(() => {
+        mockListener?.('inactive');
+        mockListener?.('active');
+      });
+      expect(result.current).toBe('en-US');
     });
   });
 });

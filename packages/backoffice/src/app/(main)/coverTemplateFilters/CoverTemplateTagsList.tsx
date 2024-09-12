@@ -13,118 +13,39 @@ import {
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { useRouter } from 'next/navigation';
-import {
-  useCallback,
-  useDeferredValue,
-  useEffect,
-  useState,
-  useTransition,
-} from 'react';
+import { useCallback, useDeferredValue, useMemo, useState } from 'react';
 import type { CoverTemplateTagItem } from './page';
 import type { SelectChangeEvent } from '@mui/material';
-import type {
-  GridColDef,
-  GridPaginationModel,
-  GridSortModel,
-} from '@mui/x-data-grid';
+import type { GridColDef } from '@mui/x-data-grid';
 
 type Props = {
-  search: string | null;
-  count: number;
   coverTemplateTags: CoverTemplateTagItem[];
-  page: number;
-  pageSize: number;
-  sortField: 'label' | 'status' | 'templates';
-  sortOrder: 'asc' | 'desc';
 };
 
-const CoverTemplateTagsList = ({
-  search,
-  count,
-  coverTemplateTags,
-  page,
-  pageSize,
-  sortField,
-  sortOrder,
-}: Props) => {
+type StatusFilter = 'All' | 'Disabled' | 'Enabled';
+
+const CoverTemplateTagsList = ({ coverTemplateTags }: Props) => {
   const router = useRouter();
 
-  const [currentSearch, setCurrentSearch] = useState(search ?? '');
+  const [currentSearch, setCurrentSearch] = useState('');
   const defferedSearch = useDeferredValue(currentSearch);
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [loading, startTransition] = useTransition();
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('All');
 
-  const updateSearchParams = useCallback(
-    (
-      page: number,
-      sort: string,
-      order: string,
-      search: string | null,
-      status: string | null,
-    ) => {
-      startTransition(() => {
-        router.replace(
-          `/coverTemplateFilters?page=${page}&sort=${sort}&order=${order}&s=${search ?? ''}&status=${status ?? ''}`,
-        );
-      });
-    },
-    [router, startTransition],
-  );
+  const onStatusChange = useCallback((event: SelectChangeEvent) => {
+    const newStatus = event.target.value as StatusFilter;
+    setStatusFilter(newStatus);
+  }, []);
 
-  const onPageChange = useCallback(
-    (model: GridPaginationModel) => {
-      updateSearchParams(
-        model.page + 1,
-        sortField,
-        sortOrder,
-        search,
-        statusFilter,
-      );
-    },
-    [search, sortField, sortOrder, statusFilter, updateSearchParams],
-  );
-
-  const onSortModelChange = useCallback(
-    (model: GridSortModel) => {
-      updateSearchParams(
-        page,
-        model[0]?.field ?? 'order',
-        model[0]?.sort ?? 'asc',
-        search,
-        statusFilter,
-      );
-    },
-    [page, search, statusFilter, updateSearchParams],
-  );
-
-  useEffect(() => {
-    if (search === defferedSearch) {
-      return;
-    }
-    updateSearchParams(1, sortField, sortOrder, defferedSearch, statusFilter);
-  }, [
-    defferedSearch,
-    page,
-    search,
-    sortField,
-    sortOrder,
-    statusFilter,
-    updateSearchParams,
-  ]);
-
-  const onStatusChange = useCallback(
-    (event: SelectChangeEvent) => {
-      const newStatus = event.target.value as string;
-      setStatusFilter(newStatus);
-      updateSearchParams(
-        1,
-        sortField,
-        sortOrder,
-        search,
-        newStatus === 'all' ? '' : newStatus,
-      );
-    },
-    [search, sortField, sortOrder, updateSearchParams],
+  const items = useMemo(
+    () =>
+      coverTemplateTags.filter(
+        tag =>
+          (statusFilter === 'All' ||
+            tag.enabled === (statusFilter === 'Enabled')) &&
+          (!defferedSearch ||
+            tag.label?.toLowerCase().includes(defferedSearch.toLowerCase())),
+      ),
+    [coverTemplateTags, statusFilter, defferedSearch],
   );
 
   return (
@@ -162,9 +83,9 @@ const CoverTemplateTagsList = ({
               label="Status"
               onChange={onStatusChange}
             >
-              <MenuItem value={'all'}>All</MenuItem>
-              <MenuItem value={'true'}>Enabled</MenuItem>
-              <MenuItem value={'false'}>Disabled</MenuItem>
+              <MenuItem value={'All'}>All</MenuItem>
+              <MenuItem value={'Enabled'}>Enabled</MenuItem>
+              <MenuItem value={'Disabled'}>Disabled</MenuItem>
             </Select>
           </FormControl>
         </Box>
@@ -181,19 +102,7 @@ const CoverTemplateTagsList = ({
       </Box>
       <DataGrid
         columns={columns}
-        rows={coverTemplateTags}
-        rowCount={count}
-        initialState={{
-          pagination: {
-            paginationModel: { pageSize, page: page - 1 },
-          },
-        }}
-        sortModel={[
-          {
-            field: sortField,
-            sort: sortOrder,
-          },
-        ]}
+        rows={items}
         onRowClick={params => {
           router.push(`/coverTemplateFilters/${params.id}`);
         }}
@@ -202,12 +111,7 @@ const CoverTemplateTagsList = ({
             cursor: 'pointer',
           },
         }}
-        paginationMode="server"
-        sortingMode="server"
-        onPaginationModelChange={onPageChange}
-        onSortModelChange={onSortModelChange}
-        loading={loading}
-        pageSizeOptions={[pageSize]}
+        pageSizeOptions={[25]}
         rowSelection={false}
         sortingOrder={['asc', 'desc']}
       />

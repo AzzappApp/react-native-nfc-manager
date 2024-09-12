@@ -95,9 +95,12 @@ const PostContentPanel = ({
         visible={showContentModal}
         value={content ?? ''}
         placeholder={textAraPlaceHolder}
-        maxLength={MAX_CONTENT_LENGHT}
+        maxLength={POST_MAX_CONTENT_LENGTH}
         onClose={onModalClose}
-        onChangeText={setContent}
+        onChangeText={text => {
+          setContent(text);
+          onModalClose();
+        }}
       />
     </>
   );
@@ -105,7 +108,7 @@ const PostContentPanel = ({
 
 export default memo(PostContentPanel);
 
-const MAX_CONTENT_LENGHT = 2200;
+export const POST_MAX_CONTENT_LENGTH = 2200;
 
 const styleSheet = createStyleSheet(appearance => ({
   authorCartouche: {

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import {
-  ReactNativeBlobUtil,
+import ReactNativeBlobUtil, {
   type FetchBlobResponse,
   type StatefulPromise,
 } from 'react-native-blob-util';

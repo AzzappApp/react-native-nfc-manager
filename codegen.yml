@@ -19,8 +19,8 @@ generates:
         Profile: '@azzapp/data#Profile as ProfileModel'
         ModuleBackground: '@azzapp/data#ModuleBackground as ModuleBackgroundModel'
         WebCardCategory: '@azzapp/data#WebCardCategory as WebCardCategoryModel'
-        MediaImage: ../MediaResolvers#MediaResolverBaseType as MediaImageModel
-        MediaVideo: ../MediaResolvers#MediaResolverBaseType as MediaVideoModel
+        MediaImage: ../query/MediaResolvers#MediaResolverBaseType as MediaImageModel
+        MediaVideo: ../query/MediaResolvers#MediaResolverBaseType as MediaVideoModel
         CompanyActivity: '@azzapp/data#CompanyActivity as CompanyActivityModel'
         CompanyActivityType: '@azzapp/data#CompanyActivityType as CompanyActivityTypeModel'
         Post: '@azzapp/data#Post as PostModel'
@@ -31,7 +31,6 @@ generates:
         CoverTemplate: '@azzapp/data#CoverTemplate as CoverTemplateModel'
         CoverTemplateType: '@azzapp/data#CoverTemplateType as CoverTemplateTypeModel'
         CoverTemplateTag: '@azzapp/data#CoverTemplateTag as CoverTemplateTagModel'
-        # CoverTemplateData: '@azzapp/data#CoverTemplateData as CoverTemplateDataModel'
         CardCover: '@azzapp/data#WebCard as WebCardModel'
         CardModule: '@azzapp/data#CardModule as CardModuleModel'
         CardModuleCarousel: '@azzapp/data#CardModuleCarousel as CardModuleCarouselModel'
@@ -58,7 +57,7 @@ generates:
       scalars:
         JSON: Record<string, unknown>
         ID: string
-      contextType: ../GraphQLContext#GraphQLContext
+      contextType: never
   ./schema.graphql:
     plugins:
       - schema-ast

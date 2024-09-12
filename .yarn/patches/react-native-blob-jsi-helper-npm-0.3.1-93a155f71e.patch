@@ -1,0 +1,13 @@
+diff --git a/react-native-blob-jsi-helper.podspec b/react-native-blob-jsi-helper.podspec
+index 53ec31fd81699b905f2a56c02a8b1e026ba54baa..b566b276717a1cb019ee74f25816cd158b637956 100644
+--- a/react-native-blob-jsi-helper.podspec
++++ b/react-native-blob-jsi-helper.podspec
+@@ -17,4 +17,8 @@ Pod::Spec.new do |s|
+ 
+   s.dependency "React-Core"
+   s.dependency "React"
++
++  s.pod_target_xcconfig = {
++    "CLANG_CXX_LANGUAGE_STANDARD" => "c++17",
++  }
+ end

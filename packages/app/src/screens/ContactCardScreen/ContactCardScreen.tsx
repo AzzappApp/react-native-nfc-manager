@@ -1,13 +1,15 @@
 import { addPass, addPassJWT } from '@reeq/react-native-passkit';
+import { ImageFormat, makeImageFromView } from '@shopify/react-native-skia';
+import { Image } from 'expo-image';
 import { fromGlobalId } from 'graphql-relay';
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
   View,
   useWindowDimensions,
-  Image,
   useColorScheme,
   Platform,
+  ScrollView,
 } from 'react-native';
 import { getArrayBufferForBlob } from 'react-native-blob-jsi-helper';
 import { fromByteArray } from 'react-native-quick-base64';
@@ -18,7 +20,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { graphql, usePreloadedQuery } from 'react-relay';
-import { colors } from '#theme';
+import { colors, shadow } from '#theme';
 import AccountHeader from '#components/AccountHeader';
 import ContactCard, {
   CONTACT_CARD_RATIO,
@@ -36,11 +38,13 @@ import useToggle from '#hooks/useToggle';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
+import Icon from '#ui/Icon';
 import PressableAnimated from '#ui/PressableAnimated';
 import PressableNative from '#ui/PressableNative';
 import SafeAreaView from '#ui/SafeAreaView';
 import Text from '#ui/Text';
 import ContactCardExportVcf from './ContactCardExportVcf';
+import SignaturePreview from './SignaturePreview';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { AccountHeader_webCard$key } from '#relayArtifacts/AccountHeader_webCard.graphql';
 import type { ContactCardScreenQuery } from '#relayArtifacts/ContactCardScreenQuery.graphql';
@@ -62,6 +66,7 @@ const contactCardMobileScreenQuery = graphql`
         }
         ...ContactCard_profile
         ...ContactCardExportVcf_card
+        ...SignaturePreview_profile
       }
     }
     currentUser {
@@ -156,6 +161,7 @@ export const ContactCardScreen = ({
     [sharedRotationState.value],
   );
 
+  const ref = useRef<View>(null);
   const generateEmail = useCallback(async () => {
     if (!currentUser?.email) {
       Toast.show({
@@ -169,12 +175,21 @@ export const ContactCardScreen = ({
       });
       return;
     }
-    if (profile?.id && webCard?.id) {
+    if (profile?.id && webCard?.id && ref.current) {
       setIsGeneratingEmail(true);
-      await generateEmailSignature({
-        locale: intl.locale,
-        profileId: fromGlobalId(profile.id).id,
-      });
+      // const base64card = await ref.current?.capture();
+      const image = await makeImageFromView(ref);
+      const base64 = image?.encodeToBase64(ImageFormat.JPEG, 100);
+
+      try {
+        await generateEmailSignature({
+          locale: intl.locale,
+          profileId: fromGlobalId(profile.id).id,
+          preview: base64 ?? '',
+        });
+      } catch (e) {
+        console.log(e);
+      }
       Toast.show({
         type: 'success',
         text1: intl.formatMessage({
@@ -194,6 +209,59 @@ export const ContactCardScreen = ({
   const colorScheme = useColorScheme();
 
   const router = useRouter();
+
+  const generateLoadingPass = useCallback(async () => {
+    try {
+      setLoadingPass(true);
+      if (webCard?.id) {
+        if (Platform.OS === 'ios') {
+          const pass = await getAppleWalletPass({
+            webCardId: fromGlobalId(webCard.id).id,
+            locale: intl.locale,
+          });
+
+          const base64Pass = fromByteArray(getArrayBufferForBlob(pass));
+
+          await addPass(base64Pass);
+        } else if (Platform.OS === 'android') {
+          const pass = await getGoogleWalletPass({
+            webCardId: fromGlobalId(webCard.id).id,
+            locale: intl.locale,
+          });
+
+          await addPassJWT(pass.token);
+        }
+      }
+    } catch (e) {
+      Toast.show({
+        text1: intl.formatMessage({
+          defaultMessage: 'Error',
+          description: 'Error toast title',
+        }),
+        text2: Platform.select({
+          ios: intl.formatMessage(
+            {
+              defaultMessage:
+                'Oops, ContactCard{azzappA} could not add pass to Apple Wallet',
+              description: 'Error toast message',
+            },
+            { azzappA: <Text variant="azzapp">a</Text> },
+          ) as string,
+          android: intl.formatMessage(
+            {
+              defaultMessage:
+                'Oops, ContactCard{azzappA} could not add pass to Google Wallet',
+              description: 'Error toast message',
+            },
+            { azzappA: <Text variant="azzapp">a</Text> },
+          ),
+        }) as string,
+        type: 'error',
+      });
+    } finally {
+      setLoadingPass(false);
+    }
+  }, [webCard, intl]);
 
   if (!webCard) {
     return null;
@@ -215,16 +283,6 @@ export const ContactCardScreen = ({
         </PressableAnimated>
 
         <Animated.View style={[footerStyle, styles.footer]}>
-          <Text variant="xsmall" style={styles.contactCardDescriptionText}>
-            <FormattedMessage
-              defaultMessage="Your Contact Card{azzappA} is a convenient way to share your contact information."
-              description="Description of the contact card screen."
-              values={{
-                azzappA: <Text variant="azzapp">a</Text>,
-              }}
-            />
-          </Text>
-
           <Button
             variant="secondary"
             style={styles.editContactCardButton}
@@ -245,74 +303,29 @@ export const ContactCardScreen = ({
               });
             }}
           />
-
-          <View style={{ width: '100%' }}>
-            <Text variant="xsmall">
+          <ScrollView
+            style={[styles.scrollViewStyle, { height: height - 247 }]}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{
+              gap: 20,
+            }}
+          >
+            <Text variant="xsmall" style={styles.contactCardDescriptionText}>
               <FormattedMessage
-                defaultMessage="Your ContactCard{azzappA} is not publicly visible on your WebCard{azzappA}. Only you can share your ContactCard{azzappA} with others."
-                description="Description message when contact card is private."
+                defaultMessage="Your Contact Card{azzappA} is a convenient way to share your contact information. It is not publicly visible on your WebCard{azzappA}, and only you can share it with others."
+                description="Description of the contact card screen."
                 values={{
                   azzappA: <Text variant="azzapp">a</Text>,
                 }}
               />
             </Text>
-          </View>
-
-          <View style={styles.buttons}>
             {Platform.OS === 'ios' && (
               <View style={styles.addToWalletContainer}>
                 <PressableNative
                   testID="add-to-wallet-button"
                   disabled={loadingPass}
-                  ripple={{
-                    borderless: true,
-                    foreground: true,
-                    color:
-                      colorScheme === 'dark' ? colors.grey100 : colors.grey900,
-                  }}
                   style={styles.addToWalletButton}
-                  onPress={async () => {
-                    try {
-                      setLoadingPass(true);
-                      if (Platform.OS === 'ios') {
-                        const pass = await getAppleWalletPass({
-                          webCardId: fromGlobalId(webCard.id).id,
-                          locale: intl.locale,
-                        });
-
-                        const base64Pass = fromByteArray(
-                          getArrayBufferForBlob(pass),
-                        );
-
-                        await addPass(base64Pass);
-                      } else if (Platform.OS === 'android') {
-                        const pass = await getGoogleWalletPass({
-                          webCardId: fromGlobalId(webCard.id).id,
-                          locale: intl.locale,
-                        });
-
-                        await addPassJWT(pass.token);
-                      }
-                    } catch (e) {
-                      Toast.show({
-                        text1: intl.formatMessage({
-                          defaultMessage: 'Error',
-                          description: 'Error toast title',
-                        }),
-                        text2: intl.formatMessage(
-                          {
-                            defaultMessage:
-                              'Oops, ContactCard{azzappA} could not add pass to Apple Wallet',
-                            description: 'Error toast message',
-                          },
-                          { azzappA: <Text variant="azzapp">a</Text> },
-                        ) as string,
-                        type: 'error',
-                      });
-                    } finally {
-                      setLoadingPass(false);
-                    }
-                  }}
+                  onPress={generateLoadingPass}
                 >
                   {loadingPass ? (
                     <ActivityIndicator
@@ -326,31 +339,102 @@ export const ContactCardScreen = ({
                     />
                   )}
                   <Text variant="button" style={styles.addToWalletButtonText}>
-                    {Platform.OS === 'ios' ? (
-                      <FormattedMessage
-                        defaultMessage="Add to Apple Wallet"
-                        description="Add to Apple Wallet button label"
-                      />
-                    ) : (
-                      <FormattedMessage
-                        defaultMessage="Add to Google Wallet"
-                        description="Add to Google Wallet button label"
-                      />
-                    )}
+                    <FormattedMessage
+                      defaultMessage="Add to Apple Wallet"
+                      description="Add to Apple Wallet button label"
+                    />
                   </Text>
                 </PressableNative>
               </View>
             )}
-            {webCard && <ContactCardExportVcf profile={profile} />}
-            <Button
-              label={intl.formatMessage({
-                defaultMessage: 'Generate an email Signature',
-                description: 'Generate an email Signature button label',
-              })}
-              onPress={generateEmail}
-              loading={isGeneratingEmail}
-            />
-          </View>
+            {Platform.OS === 'android' && (
+              <View>
+                <PressableNative
+                  testID="add-to-wallet-button"
+                  disabled={loadingPass}
+                  onPress={generateLoadingPass}
+                  ripple={{
+                    foreground: true,
+                    borderless: false,
+                    color:
+                      colorScheme === 'dark' ? colors.grey100 : colors.grey900,
+                  }}
+                  style={styles.googleWalletButton}
+                >
+                  <Image
+                    source={require('#assets/google-wallet.svg')}
+                    style={styles.googleWalletLogo}
+                    contentFit="contain"
+                  />
+                </PressableNative>
+                {loadingPass && (
+                  <View style={styles.googleWalletLoadingContainer}>
+                    <ActivityIndicator
+                      color={colorScheme === 'dark' ? 'black' : 'white'}
+                    />
+                  </View>
+                )}
+              </View>
+            )}
+            <View style={styles.buttons}>
+              {webCard && <ContactCardExportVcf profile={profile} />}
+              <PressableNative
+                ripple={{
+                  foreground: true,
+                  color:
+                    colorScheme === 'dark' ? colors.grey100 : colors.grey900,
+                }}
+                style={styles.addToWalletButton}
+                onPress={generateEmail}
+              >
+                {isGeneratingEmail ? (
+                  <ActivityIndicator
+                    color={colorScheme === 'dark' ? 'black' : 'white'}
+                    style={styles.addToWalletIcon}
+                  />
+                ) : (
+                  <Icon
+                    icon="signature"
+                    style={styles.sharedIcon}
+                    size={24}
+                    tintColor={
+                      colorScheme === 'dark' ? colors.black : colors.white
+                    }
+                  />
+                )}
+                <Text variant="button" style={styles.addToWalletButtonText}>
+                  <FormattedMessage
+                    defaultMessage="Smart email Signature"
+                    description="Generate an email Signature button label"
+                  />
+                </Text>
+              </PressableNative>
+              <Text
+                variant="xsmall"
+                style={{
+                  width: '100%',
+                  textAlign: 'center',
+                  color: colors.grey400,
+                  paddingTop: 10,
+                }}
+              >
+                <FormattedMessage
+                  defaultMessage="Your smart email signature:"
+                  description="ConctactCardScreen - Your smart email signature"
+                />
+              </Text>
+              <View style={styles.signaturePreview}>
+                <View
+                  ref={ref}
+                  collapsable={false}
+                  style={styles.viewShotBackgroundColor}
+                >
+                  <SignaturePreview profile={profile} />
+                </View>
+              </View>
+              <View style={{ height: 90, width: '100%' }} />
+            </View>
+          </ScrollView>
         </Animated.View>
       </SafeAreaView>
     </Container>
@@ -415,12 +499,12 @@ const styleSheet = createStyleSheet(appearance => ({
     height: 29,
   },
   contactCardDescriptionText: {
-    maxWidth: 255,
+    width: '100%',
     textAlign: 'center',
     color: appearance === 'light' ? colors.black : colors.white,
   },
   footer: {
-    marginTop: 20,
+    marginTop: 15,
     alignItems: 'center',
     rowGap: 20,
     paddingHorizontal: 10,
@@ -435,8 +519,15 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   buttons: { rowGap: 10, width: '100%' },
   addToWalletIcon: {
+    width: 38,
+    height: 37,
     position: 'absolute',
-    left: 4,
+    left: 10,
+    marginVertical: 'auto',
+  },
+  sharedIcon: {
+    position: 'absolute',
+    left: 10,
     marginVertical: 'auto',
   },
   addToWalletContainer: { overflow: 'hidden', borderRadius: 12 },
@@ -456,5 +547,33 @@ const styleSheet = createStyleSheet(appearance => ({
     borderWidth: 1,
     borderRadius: 20,
     padding: 6,
+  },
+  signaturePreview: {
+    width: '100%',
+    backgroundColor: 'white',
+    padding: 15,
+    borderRadius: 16,
+    transform: [{ scale: 0.85 }, { translateY: -20 }],
+    ...shadow('light', 'bottom'),
+  },
+  scrollViewStyle: { width: '100%' },
+  viewShotBackgroundColor: { backgroundColor: 'white', paddingBottom: 5 },
+  googleWalletLogo: {
+    height: 47,
+    overflow: 'visible',
+  },
+  googleWalletButton: {
+    aspectRatio: 283 / 50, // derived from google wallet logo svg
+    height: 47,
+    alignSelf: 'center',
+  },
+  googleWalletLoadingContainer: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 }));

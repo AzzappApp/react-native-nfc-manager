@@ -157,7 +157,7 @@ const BlockTextEditionScreen = ({
 
   const { data, value, fieldUpdateHandler, dirty } = useModuleDataEditor({
     initialValue,
-    cardStyle: profile?.webCard.cardStyle,
+    cardStyle: profile?.webCard?.cardStyle,
     styleValuesMap: BLOCK_TEXT_STYLE_VALUES,
     defaultValues: BLOCK_TEXT_DEFAULT_VALUES,
   });
@@ -221,7 +221,7 @@ const BlockTextEditionScreen = ({
   const intl = useIntl();
 
   const cardModulesCount =
-    profile.webCard.cardModules.length + (blockText ? 0 : 1);
+    (profile.webCard?.cardModules.length ?? 0) + (blockText ? 0 : 1);
 
   const onCancel = useCallback(() => {
     router.back();
@@ -277,7 +277,7 @@ const BlockTextEditionScreen = ({
   const onBackgroundStyleChange = fieldUpdateHandler('backgroundStyle');
 
   const onSave = useCallback(async () => {
-    if (!canSave) {
+    if (!canSave || !profile.webCard?.id) {
       return;
     }
 
@@ -287,9 +287,9 @@ const BlockTextEditionScreen = ({
     );
 
     if (
-      profile.webCard.cardIsPublished &&
+      profile.webCard?.cardIsPublished &&
       requireSubscription &&
-      !profile.webCard.isPremium
+      !profile.webCard?.isPremium
     ) {
       router.push({ route: 'USER_PAY_WALL' });
       return;
@@ -309,7 +309,7 @@ const BlockTextEditionScreen = ({
 
     commit({
       variables: {
-        webCardId: profile.webCard.id,
+        webCardId: profile.webCard?.id,
         input,
       },
       onCompleted() {
@@ -323,9 +323,9 @@ const BlockTextEditionScreen = ({
   }, [
     canSave,
     cardModulesCount,
-    profile.webCard.cardIsPublished,
-    profile.webCard.isPremium,
-    profile.webCard.id,
+    profile.webCard?.cardIsPublished,
+    profile.webCard?.isPremium,
+    profile.webCard?.id,
     value,
     blockText?.id,
     textMarginHorizontal.value,
@@ -420,8 +420,8 @@ const BlockTextEditionScreen = ({
           textMarginHorizontal,
         }}
         onPreviewPress={onPreviewPress}
-        colorPalette={profile?.webCard.cardColors}
-        cardStyle={profile?.webCard.cardStyle}
+        colorPalette={profile?.webCard?.cardColors}
+        cardStyle={profile?.webCard?.cardStyle}
       />
       <TabView
         style={{
@@ -533,7 +533,10 @@ const BlockTextEditionScreen = ({
         })}
         maxLength={BLOCK_TEXT_MAX_LENGTH}
         onClose={onCloseContentModal}
-        onChangeText={onTextChange}
+        onChangeText={text => {
+          onTextChange(text);
+          onCloseContentModal();
+        }}
       />
     </Container>
   );

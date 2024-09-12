@@ -116,7 +116,6 @@ const styleSheet = createStyleSheet(appearance => ({
     width: 26,
     height: 26,
 
-    marginRight: 5,
     marginLeft: 5,
   },
   text: {
@@ -140,10 +139,12 @@ const styleSheet = createStyleSheet(appearance => ({
     alignItems: 'center',
     textAlign: 'center',
     height: 47,
-    width: 74,
+    flex: 1,
     textTransform: 'uppercase',
     color: appearance === 'light' ? colors.black : colors.white, //TODO: darkmode input color is not defined waiting for design team
     ...textStyles.medium,
+    paddingLeft: 0,
+    paddingRight: 0,
   },
 }));
 

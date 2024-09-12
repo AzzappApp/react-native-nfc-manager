@@ -22,7 +22,7 @@ import {
   useTransition,
 } from 'react';
 import DataGrid from '#components/DataGrid';
-import type { Filters, SortColumn, Status, Type } from './page';
+import type { SortColumn, Status, Type } from './page';
 import type { UserSubscription } from '@azzapp/data';
 import type { SelectChangeEvent } from '@mui/material';
 import type {
@@ -39,7 +39,10 @@ type SubscriptionListProps = {
   sortField: SortColumn;
   sortOrder: 'asc' | 'desc';
   search: string | null;
-  filters: Filters;
+  filters: {
+    status: Status | 'all';
+    type: Type | 'all';
+  };
 };
 
 const SubscriptionList = ({
@@ -56,8 +59,8 @@ const SubscriptionList = ({
   const [loading, startTransition] = useTransition();
   const [currentSearch, setCurrentSearch] = useState(search ?? '');
   const defferedSearch = useDeferredValue(currentSearch);
-  const [statusFilter, setStatusFilter] = useState(filters?.status || 'All');
-  const [typeFilter, setTypeFilter] = useState(filters?.type || 'All');
+  const [statusFilter, setStatusFilter] = useState(filters?.status || 'all');
+  const [typeFilter, setTypeFilter] = useState(filters?.type || 'all');
 
   const updateSearchParams = useCallback(
     (
@@ -65,7 +68,10 @@ const SubscriptionList = ({
       sort: string,
       order: string,
       search: string | null,
-      filters: Filters,
+      filters: {
+        status: Status | 'all';
+        type: Type | 'all';
+      },
     ) => {
       startTransition(() => {
         router.replace(
@@ -192,7 +198,7 @@ const SubscriptionList = ({
               label="Status"
               onChange={onStatusChange}
             >
-              <MenuItem value={'All'}>All</MenuItem>
+              <MenuItem value={'all'}>all</MenuItem>
               <MenuItem value={'active'}>Active</MenuItem>
               <MenuItem value={'canceled'}>Canceled</MenuItem>
               <MenuItem value={'waiting_payment'}>Waiting Payment</MenuItem>
@@ -207,7 +213,7 @@ const SubscriptionList = ({
               label="Type"
               onChange={onTypeChange}
             >
-              <MenuItem value={'All'}>All</MenuItem>
+              <MenuItem value={'all'}>all</MenuItem>
               <MenuItem value={'web.monthly'}>Monthly</MenuItem>
               <MenuItem value={'web.yearly'}>Yearly</MenuItem>
               <MenuItem value={'web.lifetime'}>LifeTime</MenuItem>
@@ -262,7 +268,7 @@ const columns: GridColDef[] = [
     field: 'subscriptionPlan',
     headerName: 'Type',
     width: 100,
-    valueGetter: ({ value }) => value.replace('web.', ''),
+    valueGetter: ({ value }) => value?.replace('web.', '') || '',
   },
   {
     field: 'userId',

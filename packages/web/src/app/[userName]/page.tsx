@@ -1,7 +1,7 @@
 import { capitalize } from 'lodash';
 import { notFound } from 'next/navigation';
 import {
-  getCardModules,
+  getCardModulesByWebCard,
   getMediasByIds,
   getProfilesPostsWithTopComment,
   getModuleBackgroundsByIds,
@@ -44,7 +44,7 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
 
   const [posts, modules, media] = await Promise.all([
     getProfilesPostsWithTopComment(webCard.id, 5, 0),
-    getCardModules(webCard.id),
+    getCardModulesByWebCard(webCard.id),
     webCard.coverMediaId
       ? getMediasByIds([webCard.coverMediaId]).then(([media]) => media)
       : null,
@@ -109,6 +109,10 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
     );
   }
 
+  const linearGradientEndColor = modules.length
+    ? firstModuleBackgroundColor
+    : swapColor(webCard.coverBackgroundColor, cardColors);
+
   return (
     <WebCardPageLayout
       webCard={webCard}
@@ -121,10 +125,18 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
             className={styles.coverContainer}
             style={{
               background: `linear-gradient(to bottom, transparent 0%, ${
-                modules.length ? firstModuleBackgroundColor : '#FFF'
+                linearGradientEndColor ?? '#FFF'
               } 95%)`,
             }}
           >
+            <div
+              style={{
+                flex: 1,
+                background: `linear-gradient(to left, transparent 0%, ${
+                  linearGradientEndColor ?? '#FFF'
+                } 95%)`,
+              }}
+            />
             <CoverRenderer webCard={webCard} media={media} priority />
           </div>
         </>
@@ -132,6 +144,7 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
       cardBackgroundColor={cardBackgroundColor}
       lastModuleBackgroundColor={lastModuleBackgroundColor}
       userName={params.userName}
+      color={linearGradientEndColor}
     >
       {modules.map(module => (
         <ModuleRenderer

@@ -109,7 +109,7 @@ export const HomeScreenProvider = ({
       user?.profiles?.length < profilesRef.current.length
     ) {
       const newProfile = user.profiles?.[0];
-      if (newProfile) {
+      if (newProfile?.webCard?.id) {
         onChangeWebCard({
           profileId: newProfile.id,
           webCardId: newProfile.webCard.id,
@@ -127,7 +127,7 @@ export const HomeScreenProvider = ({
         const profile = profilesRef.current?.find(
           profile => profile.id === profileInfos.profileId,
         );
-        if (profile) {
+        if (profile?.webCard) {
           const environment = getRelayEnvironment();
           profilesDisposables.push(
             prefetchRoute(environment, {
@@ -169,7 +169,7 @@ export const HomeScreenProvider = ({
       if (newProfile) {
         onChangeWebCard({
           profileId: newProfile.id,
-          webCardId: newProfile.webCard.id,
+          webCardId: newProfile.webCard?.id,
           profileRole: newProfile.invited ? 'invited' : newProfile.profileRole,
         });
       }

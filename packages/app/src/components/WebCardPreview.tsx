@@ -1,7 +1,9 @@
 import { forwardRef, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { View, useWindowDimensions } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
+import { colors } from '#theme';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import ToggleButton from '#ui/ToggleButton';
 import CardModuleRenderer from './cardModules/CardModuleRenderer';
 import CoverRenderer from './CoverRenderer';
@@ -75,6 +77,7 @@ const WebCardPreview = (
   }: WebCardPreviewProps,
   ref: ForwardedRef<ScrollView>,
 ) => {
+  const styles = useStyleSheet(stylesheet);
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('mobile');
 
   const { width: windowWidth } = useWindowDimensions();
@@ -150,7 +153,7 @@ const WebCardPreview = (
       >
         <ScrollView
           ref={ref}
-          style={[{ flex: 1 }, style]}
+          style={[styles.webCardContainer, style]}
           contentOffset={contentOffset}
           contentContainerStyle={{
             paddingBottom: contentPaddingBottom / scale,
@@ -174,7 +177,7 @@ const WebCardPreview = (
                 webCard={webCard}
                 width={windowWidth}
                 large
-                animationEnabled
+                canPlay
               />
             )}
             {cardModules.map((module, index) => (
@@ -196,13 +199,17 @@ const WebCardPreview = (
   );
 };
 
-const styles = StyleSheet.create({
+const stylesheet = createStyleSheet(theme => ({
   toggleContainer: {
     paddingHorizontal: 20,
     paddingVertical: 10,
     justifyContent: 'center',
     flexDirection: 'row',
     gap: 10,
+  },
+  webCardContainer: {
+    flex: 1,
+    backgroundColor: theme === 'dark' ? colors.black : colors.white,
   },
   webCardBackground: {
     position: 'absolute',
@@ -212,7 +219,7 @@ const styles = StyleSheet.create({
     left: 0,
     zIndex: -1,
   },
-});
+}));
 
 export default forwardRef(WebCardPreview);
 

@@ -1,32 +1,13 @@
 'use server';
-import { asc, eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import {
-  CardModuleTable,
-  WebCardTable,
   createCompanyActivity,
-  db,
   saveLocalizationMessage,
+  transaction,
   updateCompanyActivity,
 } from '@azzapp/data';
 import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import { companyActivitySchema } from './companyActivitySchema';
-
-export const getModulesData = async (profileUserName: string) => {
-  const res = await db
-    .select()
-    .from(CardModuleTable)
-    .innerJoin(WebCardTable, eq(WebCardTable.id, CardModuleTable.webCardId))
-    .where(eq(WebCardTable.userName, profileUserName))
-    .orderBy(asc(CardModuleTable.position));
-
-  if (res.length < 1) return null;
-
-  return res.map(({ CardModule }) => ({
-    kind: CardModule.kind,
-    data: CardModule.data,
-  }));
-};
 
 export const saveCompanyActivity = async (data: {
   id?: string;
@@ -49,50 +30,35 @@ export const saveCompanyActivity = async (data: {
 
   let companyActivityId: string;
   try {
-    companyActivityId = await db.transaction(async trx => {
-      //check if WebCard Template type exist
-
+    companyActivityId = await transaction(async () => {
       let companyActivityId;
 
       if (data.id) {
-        await updateCompanyActivity(
-          data.id,
-          {
-            cardTemplateTypeId: data.cardTemplateTypeId ?? null,
-            companyActivityTypeId: data.companyActivityTypeId ?? null,
-          },
-          trx,
-        );
+        await updateCompanyActivity(data.id, {
+          cardTemplateTypeId: data.cardTemplateTypeId ?? null,
+          companyActivityTypeId: data.companyActivityTypeId ?? null,
+        });
 
-        await saveLocalizationMessage(
-          {
-            key: data.id,
-            value: validation.data.label,
-            locale: DEFAULT_LOCALE,
-            target: ENTITY_TARGET,
-          },
-          trx,
-        );
+        await saveLocalizationMessage({
+          key: data.id,
+          value: validation.data.label,
+          locale: DEFAULT_LOCALE,
+          target: ENTITY_TARGET,
+        });
 
         companyActivityId = data.id;
       } else {
-        const id = await createCompanyActivity(
-          {
-            cardTemplateTypeId: data.cardTemplateTypeId ?? null,
-            companyActivityTypeId: data.companyActivityTypeId ?? null,
-          },
-          trx,
-        );
+        const id = await createCompanyActivity({
+          cardTemplateTypeId: data.cardTemplateTypeId ?? null,
+          companyActivityTypeId: data.companyActivityTypeId ?? null,
+        });
 
-        await saveLocalizationMessage(
-          {
-            key: id,
-            value: validation.data.label,
-            locale: DEFAULT_LOCALE,
-            target: ENTITY_TARGET,
-          },
-          trx,
-        );
+        await saveLocalizationMessage({
+          key: id,
+          value: validation.data.label,
+          locale: DEFAULT_LOCALE,
+          target: ENTITY_TARGET,
+        });
 
         companyActivityId = id;
       }

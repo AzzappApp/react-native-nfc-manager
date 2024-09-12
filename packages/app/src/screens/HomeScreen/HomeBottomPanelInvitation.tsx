@@ -67,7 +67,7 @@ const HomeBottomPanelInvitation = ({
   const intl = useIntl();
 
   const [quitWebCard, isLoadingQuitWebCard] = useQuitWebCard(
-    profile.webCard.id,
+    profile.webCard?.id,
     undefined,
     e => {
       console.error(e);
@@ -96,6 +96,7 @@ const HomeBottomPanelInvitation = ({
           description="Home bottom panel invitation"
           values={{
             contact:
+              profile?.invitedBy?.user?.email ||
               profile?.webCard?.owner?.email ||
               profile?.webCard?.owner?.phoneNumber ||
               '',

@@ -1,5 +1,6 @@
 const SUPPORTED_LOCALES = [
   'en-US',
+  'fr',
   // disabled for now
   // 'en-GB',
   // 'fr',

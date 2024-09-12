@@ -19,10 +19,12 @@ type PostFeedProps = {
   media: Media;
   onClose: () => void;
   onPressAuthor: () => void;
+  background?: string;
 };
 
 const PostFeed = (props: PostFeedProps) => {
-  const { webCard, defaultPosts, postsCount, media, onClose } = props;
+  const { webCard, defaultPosts, postsCount, media, onClose, background } =
+    props;
 
   const share = useRef<ModalActions>(null);
   const download = useRef<ModalActions>(null);
@@ -89,22 +91,25 @@ const PostFeed = (props: PostFeedProps) => {
           postsCount={postsCount}
           media={media}
           onClose={onClose}
+          background={background}
         />
-        {posts.map((post, i) => (
-          <PostFeedItem
-            ref={e => {
-              videos.current[i] = e;
-            }}
-            key={`${post.id}-${i}`}
-            media={media}
-            webCard={webCard}
-            post={post}
-            onDownload={() => download.current?.open()}
-            onPlay={() => onVideoPlay(i)}
-            onMuteChanged={muted => onMuteChanged(muted)}
-            onPressAuthor={props.onPressAuthor}
-          />
-        ))}
+        <div className={styles.posts}>
+          {posts.map((post, i) => (
+            <PostFeedItem
+              ref={e => {
+                videos.current[i] = e;
+              }}
+              key={`${post.id}-${i}`}
+              media={media}
+              webCard={webCard}
+              post={post}
+              onDownload={() => download.current?.open()}
+              onPlay={() => onVideoPlay(i)}
+              onMuteChanged={muted => onMuteChanged(muted)}
+              onPressAuthor={props.onPressAuthor}
+            />
+          ))}
+        </div>
       </div>
       <DownloadAppModal ref={download} webCard={webCard} media={media} />
       <ShareModal

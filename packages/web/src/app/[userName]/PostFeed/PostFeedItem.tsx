@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useRef, forwardRef } from 'react';
 import { getFormatedElapsedTime } from '@azzapp/shared/timeHelpers';
 import { CommentIcon, HearthIcon, ShareIcon } from '#assets';
@@ -6,9 +7,8 @@ import { generateSharePostLink } from '#helpers';
 import { ButtonIcon } from '#ui';
 import CoverRenderer from '#components/renderer/CoverRenderer';
 import ShareModal from '#components/ShareModal';
-import CloudinaryImage from '#ui/CloudinaryImage';
-import CloudinaryVideoPlayer from '#ui/CloudinaryVideoPlayer';
 import styles from './PostFeedItem.css';
+import PostFeedMediaPlayer from './PostFeedMediaPlayer';
 import type { CloudinaryVideoPlayerActions } from '#ui/CloudinaryVideoPlayer';
 import type { ModalActions } from '#ui/Modal';
 import type { Media, PostWithCommentAndAuthor, WebCard } from '@azzapp/data';
@@ -30,6 +30,7 @@ const PostFeedItem = (
 ) => {
   const { post, media, webCard, onDownload, onPlay, onMuteChanged } = props;
   const share = useRef<ModalActions>(null);
+  const router = useRouter();
 
   const elapsedTime = getFormatedElapsedTime(
     new Date(post.createdAt).getTime(),
@@ -50,45 +51,21 @@ const PostFeedItem = (
               />
             </div>
           )}
-          <span>{webCard.userName}</span>
+          <span className={styles.postAuthorUsername}>{webCard.userName}</span>
         </button>
         {postMedia && (
-          <div
-            className={styles.postMedias}
-            style={{
-              aspectRatio: `${postMedia.width / postMedia.height}`,
-            }}
-          >
-            {postMedia.kind === 'video' ? (
-              <>
-                <CloudinaryVideoPlayer
-                  ref={ref}
-                  assetKind="post"
-                  media={postMedia}
-                  alt="cover"
-                  fluid
-                  sizes="100vw"
-                  style={{
-                    objectFit: 'cover',
-                    width: '100%',
-                  }}
-                  onPlay={onPlay}
-                  onMuteChanged={onMuteChanged}
-                  autoPlay={false}
-                />
-              </>
-            ) : (
-              <CloudinaryImage
-                mediaId={postMedia.id}
-                alt="cover"
-                fill
-                sizes="100vw"
-                style={{
-                  objectFit: 'cover',
-                }}
-                format="auto"
-              />
-            )}
+          <div className={styles.postMedias}>
+            <PostFeedMediaPlayer
+              ref={ref}
+              media={postMedia}
+              onPlay={onPlay}
+              onMuteChanged={onMuteChanged}
+              reactions={post.counterReactions}
+              comments={post.counterComments}
+              onClick={() =>
+                router.push(`/${webCard.userName}/post/${post.id}`)
+              }
+            />
           </div>
         )}
         <div className={styles.postFooter}>

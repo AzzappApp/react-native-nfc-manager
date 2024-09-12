@@ -9,6 +9,10 @@ type MediaBase = {
    */
   uri: string;
   /**
+   * The URI of the media.
+   */
+  thumbnail?: string | null;
+  /**
    * The width of the media.
    */
   width: number;

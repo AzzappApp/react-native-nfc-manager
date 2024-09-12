@@ -313,16 +313,14 @@ export const getGoogleWalletPass: APIMethod<
  * Api call to generate a google wallet pass.
  */
 export const generateEmailSignature: APIMethod<
-  { locale: string; profileId: string },
+  { locale: string; profileId: string; preview: string },
   { token: string }
-> = ({ locale, profileId }, init) =>
-  apiFetch(
-    `${API_ENDPOINT}/${locale}/generateEmailSignature?profileId=${profileId}`,
-    {
-      ...init,
-      method: 'POST',
-    },
-  );
+> = ({ locale, profileId, preview }, init) =>
+  apiFetch(`${API_ENDPOINT}/${locale}/generateEmailSignature`, {
+    ...init,
+    method: 'POST',
+    body: JSON.stringify({ profileId, preview }),
+  });
 
 export const requestUpdateContact: APIMethod<
   { email?: string | null; phoneNumber?: string | null; locale: string },

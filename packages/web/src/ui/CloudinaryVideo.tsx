@@ -1,6 +1,7 @@
 import { getCldImageUrl, getCldVideoUrl } from 'next-cloudinary';
 import { forwardRef, type ForwardedRef } from 'react';
 import { COVER_ASSET_SIZES } from '@azzapp/shared/coverHelpers';
+import { DEFAULT_VIDEO_PERCENTAGE_THUMBNAIL } from '@azzapp/shared/imagesHelpers';
 import { POST_VIDEO_SIZES } from '@azzapp/shared/postHelpers';
 import type { Media } from '@azzapp/data';
 
@@ -61,7 +62,7 @@ const CloudinaryVideo = (
         quality: 'auto:best',
         width: maxSize,
         height: maxSize && media.height * (maxSize / media.width),
-        rawTransformations: ['so_17p'],
+        rawTransformations: [`so_${DEFAULT_VIDEO_PERCENTAGE_THUMBNAIL}p`],
       })}
       src={getCldVideoUrl({
         src: media.id,

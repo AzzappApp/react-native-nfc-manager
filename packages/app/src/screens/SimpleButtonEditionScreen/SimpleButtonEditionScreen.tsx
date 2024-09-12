@@ -52,7 +52,7 @@ const actionTypeSchema = z.intersection(
   z.union([
     z.object({
       actionType: z.literal('email'),
-      actionLink: z.string().email().min(1),
+      actionLink: z.string().min(1),
     }),
     z
       .object({
@@ -180,7 +180,7 @@ const SimpleButtonEditionScreen = ({
 
   const { data, value, fieldUpdateHandler, dirty } = useModuleDataEditor({
     initialValue,
-    cardStyle: profile?.webCard.cardStyle,
+    cardStyle: profile?.webCard?.cardStyle,
     styleValuesMap: SIMPLE_BUTTON_STYLE_VALUES,
     defaultValues: SIMPLE_BUTTON_DEFAULT_VALUES,
   });
@@ -261,7 +261,7 @@ const SimpleButtonEditionScreen = ({
   const intl = useIntl();
 
   const cardModulesCount =
-    (profile.webCard.cardModules.length ?? 0) + (simpleButton ? 0 : 1);
+    (profile.webCard?.cardModules.length ?? 0) + (simpleButton ? 0 : 1);
 
   const onCancel = router.back;
 
@@ -319,9 +319,9 @@ const SimpleButtonEditionScreen = ({
     );
 
     if (
-      profile.webCard.cardIsPublished &&
+      profile.webCard?.cardIsPublished &&
       requireSubscription &&
-      !profile.webCard.isPremium
+      !profile.webCard?.isPremium
     ) {
       router.push({ route: 'USER_PAY_WALL' });
       return;
@@ -344,7 +344,7 @@ const SimpleButtonEditionScreen = ({
 
     commit({
       variables: {
-        webCardId: profile.webCard.id,
+        webCardId: profile.webCard?.id,
         input,
       },
       onCompleted() {
@@ -439,8 +439,8 @@ const SimpleButtonEditionScreen = ({
             width,
             height,
           }}
-          colorPalette={profile?.webCard.cardColors}
-          cardStyle={profile?.webCard.cardStyle}
+          colorPalette={profile?.webCard?.cardColors}
+          cardStyle={profile?.webCard?.cardStyle}
         />
         <TabView
           style={{ height: bottomPanelHeight }}

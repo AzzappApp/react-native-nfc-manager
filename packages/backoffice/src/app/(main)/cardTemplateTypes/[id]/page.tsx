@@ -1,11 +1,12 @@
+import { notFound } from 'next/navigation';
 import {
-  db,
   getCardTemplateTypeById,
   getLocalizationMessagesByLocaleAndTarget,
-  WebCardCategoryTable,
+  getWebCardCategories,
 } from '@azzapp/data';
 import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import CardTemplateTypesForm from '../CardTemplateTypesForm';
+
 type CardTemplatePageProps = {
   params: {
     id: string;
@@ -15,12 +16,19 @@ type CardTemplatePageProps = {
 const CardTemplatePage = async (props: CardTemplatePageProps) => {
   const { params } = props;
 
-  const template = await getCardTemplateTypeById(params.id);
-  const webCardCategories = await db.select().from(WebCardCategoryTable);
+  const [template, allWebCardCategories, labels] = await Promise.all([
+    getCardTemplateTypeById(params.id),
+    getWebCardCategories(false),
+    getLocalizationMessagesByLocaleAndTarget(DEFAULT_LOCALE, ENTITY_TARGET),
+  ]);
 
-  const labels = await getLocalizationMessagesByLocaleAndTarget(
-    DEFAULT_LOCALE,
-    ENTITY_TARGET,
+  if (!template) {
+    return notFound();
+  }
+
+  // Filter out disabled categories but keep the one that is assigned to the template
+  const webCardCategories = allWebCardCategories.filter(
+    category => category.enabled || category.id === template.webCardCategoryId,
   );
 
   return (

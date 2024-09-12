@@ -3,7 +3,7 @@ import { withAxiom } from 'next-axiom';
 import * as z from 'zod';
 import ERRORS from '@azzapp/shared/errors';
 import { checkServerAuth } from '#helpers/tokens';
-import { twilioVerificationService } from '#helpers/twilioHelpers';
+import { checkTwilioVerificationCode } from '#helpers/twilioHelpers';
 
 const ValidateSchema = z.union([
   z.object({
@@ -24,10 +24,7 @@ export const POST = withAxiom(async (req: Request) => {
     const body = await req.json();
     const input = ValidateSchema.parse(body);
 
-    const result = await twilioVerificationService().verificationChecks.create({
-      to: input.issuer,
-      code: input.token,
-    });
+    const result = await checkTwilioVerificationCode(input.issuer, input.token);
 
     if (result.status === 'approved') {
       return NextResponse.json(
@@ -61,5 +58,3 @@ export const POST = withAxiom(async (req: Request) => {
     );
   }
 });
-
-export const runtime = 'nodejs';

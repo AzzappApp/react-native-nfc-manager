@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
-import { isAdmin } from '@azzapp/shared/profileHelpers';
+import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
 import { colors, shadow } from '#theme';
 import CoverErrorRenderer from '#components/CoverErrorRenderer';
 import CoverLink from '#components/CoverLink';
@@ -62,13 +62,20 @@ const HomeProfilesCarousel = ({ user: userKey }: HomeProfilesCarouselProps) => {
     initialProfileIndex,
   } = useHomeScreenContext();
 
+  const { width: windowWidth } = useWindowDimensions();
+
   const onLayout = useCallback(
     ({ nativeEvent: { layout } }: LayoutChangeEvent) => {
       setCoverWidth(
-        Math.trunc(PixelRatio.roundToNearestPixel(layout.height * COVER_RATIO)),
+        Math.min(
+          windowWidth / 2,
+          Math.trunc(
+            PixelRatio.roundToNearestPixel(layout.height * COVER_RATIO),
+          ),
+        ),
       );
     },
-    [],
+    [windowWidth],
   );
   const coverHeight = useMemo(() => coverWidth / COVER_RATIO, [coverWidth]);
   const { profiles } = useFragment(
@@ -161,8 +168,6 @@ const HomeProfilesCarousel = ({ user: userKey }: HomeProfilesCarouselProps) => {
     [coverWidth, coverHeight, scrollToIndex, selectedIndex],
   );
 
-  const { width: windowWidth } = useWindowDimensions();
-
   if (profiles == null) {
     return null;
   }
@@ -193,7 +198,7 @@ const HomeProfilesCarousel = ({ user: userKey }: HomeProfilesCarouselProps) => {
 const SCALE_RATIO = 108 / 291;
 
 const keyExtractor = (item: ProfileType | null, index: number) =>
-  item?.webCard.id ?? `new_${index}`;
+  item?.webCard?.id ?? `new_${index}`;
 
 export default HomeProfilesCarousel;
 
@@ -256,11 +261,11 @@ const ItemRenderComponent = ({
   const router = useRouter();
 
   const onPressMultiUser = useCallback(() => {
-    if (isAdmin(profile.profileRole)) {
+    if (profileHasAdminRight(profile.profileRole)) {
       router.push({
         route: 'MULTI_USER',
       });
-    } else {
+    } else if (profile.webCard) {
       router.push({
         route: 'WEBCARD',
         params: {
@@ -269,12 +274,7 @@ const ItemRenderComponent = ({
         },
       });
     }
-  }, [
-    router,
-    profile.profileRole,
-    profile.webCard.id,
-    profile.webCard.userName,
-  ]);
+  }, [router, profile.profileRole, profile.webCard]);
 
   const hasFocus = useScreenHasFocus();
 
@@ -331,13 +331,13 @@ const ItemRenderComponent = ({
             tintColor={colors.white}
           />
         </View>
-      ) : profile.webCard.hasCover ? (
+      ) : profile.webCard?.hasCover ? (
         <View style={styles.coverLinkWrapper}>
           <CoverLink
             webCard={profile.webCard}
             width={coverWidth}
             webCardId={profile.webCard.id}
-            animationEnabled={isCurrent && hasFocus}
+            canPlay={isCurrent && hasFocus}
             onReadyForDisplay={onReady}
             onError={onError}
           />
@@ -345,6 +345,10 @@ const ItemRenderComponent = ({
             <PressableNative
               style={styles.multiUserContainer}
               onPress={onPressMultiUser}
+              android_ripple={{
+                borderless: true,
+                foreground: true,
+              }}
             >
               <BlurView style={styles.multiUserIconContainer}>
                 <Icon icon="shared_webcard" style={styles.multiUserIcon} />
@@ -423,7 +427,12 @@ const CreateItem = ({
 const CreateItemMemo = memo(CreateItem);
 
 const styles = StyleSheet.create({
-  container: { flex: 1, marginVertical: 15 },
+  container: {
+    flex: 1,
+    marginVertical: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   carousel: {
     flexGrow: 0,
     overflow: 'visible',

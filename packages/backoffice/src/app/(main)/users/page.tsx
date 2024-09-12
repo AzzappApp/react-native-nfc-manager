@@ -1,103 +1,23 @@
-import { asc, desc, like, or, sql, eq, and, isNull } from 'drizzle-orm';
-import { UserTable, db, ProfileTable, WebCardTable } from '@azzapp/data';
+import { getUsersInfos } from '@azzapp/data';
 import UsersList from './UsersList';
-import type { SQLWrapper } from 'drizzle-orm';
-
-export type AccountStatus = 'Active' | 'Suspended';
 
 export type UserTable = {
   id: string;
   email: string | null;
   phoneNumber: string | null;
-  webcardsCount: number;
+  webCardsCount: number;
   createdAt: Date;
 };
 
-export type Filters = {
-  status?: AccountStatus | 'all';
-};
+const sortsColumns = [
+  'createdAt',
+  'email',
+  'phoneNumber',
+  'webCardsCount',
+  'status',
+] as const;
 
-const sortsColumns = {
-  createdAt: UserTable.createdAt,
-  email: UserTable.email,
-  phoneNumber: UserTable.phoneNumber,
-  webcardsCount: sql`webcardsCount`,
-  status: UserTable.deleted,
-};
-
-const getFilters = (filters: Filters): SQLWrapper[] => {
-  const f: SQLWrapper[] = [];
-  if (filters.status && filters.status !== 'all') {
-    f.push(eq(UserTable.deleted, filters.status === 'Suspended'));
-  }
-
-  return f;
-};
-
-const getSearch = (search: string | null) => {
-  if (search) {
-    return or(
-      like(UserTable.email, `%${search}%`),
-      like(UserTable.phoneNumber, `%${search}%`),
-      like(UserTable.id, `%${search}%`),
-      like(WebCardTable.userName, `%${search}%`),
-      like(WebCardTable.companyName, `%${search}%`),
-    );
-  }
-};
-
-const getQuery = (search: string | null, filters: Filters) => {
-  const query = db
-    .select({
-      id: UserTable.id,
-      email: UserTable.email,
-      phoneNumber: UserTable.phoneNumber,
-      webcardsCount: sql`count(webCardId) as webcardsCount`.mapWith(Number),
-      createdAt: UserTable.createdAt,
-      status: UserTable.deleted,
-    })
-    .from(UserTable)
-    .leftJoin(ProfileTable, eq(UserTable.id, ProfileTable.userId))
-    .leftJoin(WebCardTable, eq(WebCardTable.id, ProfileTable.webCardId))
-    .where(
-      and(
-        or(isNull(ProfileTable.deleted), eq(ProfileTable.deleted, false)),
-        getSearch(search),
-        ...getFilters(filters),
-      ),
-    )
-    .groupBy(UserTable.id)
-    .$dynamic();
-
-  return query;
-};
-const getUsers = (
-  page: number,
-  sort: 'createdAt' | 'email' | 'phoneNumber' | 'webcardsCount',
-  order: 'asc' | 'desc',
-  search: string | null,
-  filters: Filters,
-) => {
-  const query = getQuery(search, filters);
-
-  query
-    .offset(page * PAGE_SIZE)
-    .limit(PAGE_SIZE)
-    .orderBy(
-      order === 'asc' ? asc(sortsColumns[sort]) : desc(sortsColumns[sort]),
-    );
-
-  return query;
-};
-
-const getCount = async (search: string | null, filters: Filters) => {
-  const subQuery = getQuery(search, filters);
-  const query = db
-    .select({ count: sql`count(*)`.mapWith(Number) })
-    .from(subQuery.as('Subquery'));
-
-  return query.then(rows => rows[0].count);
-};
+export type SortField = (typeof sortsColumns)[number];
 
 type UsersPageProps = {
   searchParams?: {
@@ -113,28 +33,37 @@ const UsersPage = async ({ searchParams = {} }: UsersPageProps) => {
   let page = searchParams.page ? parseInt(searchParams.page, 10) : 0;
   page = Math.max(isNaN(page) ? 1 : page, 1);
 
-  const sort = Object.keys(sortsColumns).includes(searchParams.sort as any)
-    ? (searchParams.sort as any)
-    : 'createdAt';
+  const sortField =
+    searchParams.sort && sortsColumns.includes(searchParams.sort as any)
+      ? (searchParams.sort as SortField)
+      : 'createdAt';
 
-  const order = searchParams.order === 'asc' ? 'asc' : 'desc';
+  const sortOrder = searchParams.order === 'asc' ? 'asc' : 'desc';
   const search = searchParams.s ?? null;
-  const filters: Filters = {
-    status: (searchParams.status as AccountStatus) || 'all',
-  };
-  const users = await getUsers(page - 1, sort, order, search, filters);
-  const count = await getCount(search, filters);
-
+  const enabledFilter =
+    searchParams.status === 'Active'
+      ? true
+      : searchParams.status === 'Suspended'
+        ? false
+        : undefined;
+  const { users, count } = await getUsersInfos({
+    offset: (page - 1) * PAGE_SIZE,
+    limit: PAGE_SIZE,
+    sortField,
+    sortOrder,
+    search,
+    enabled: enabledFilter,
+  });
   return (
     <UsersList
       users={users}
       count={count}
       page={page}
       pageSize={PAGE_SIZE}
-      sortField={sort}
-      sortOrder={order}
+      sortField={sortField}
+      sortOrder={sortOrder}
       search={search}
-      filters={filters}
+      enabledFilter={enabledFilter}
     />
   );
 };

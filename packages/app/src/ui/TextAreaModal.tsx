@@ -5,9 +5,9 @@ import {
   Modal,
   Platform,
   SafeAreaView, //we want to use this one here on purpose
-  StyleSheet,
 } from 'react-native';
 import { colors } from '#theme';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Header from './Header';
 import HeaderButton from './HeaderButton';
 import Text from './Text';
@@ -52,6 +52,8 @@ export type TextAreaModalProps = Omit<
   closeOnBlur?: boolean;
 
   onFocus?: () => void;
+
+  loading?: boolean;
 };
 
 /**
@@ -67,10 +69,11 @@ const TextAreaModal = ({
   ItemTopComponent,
   closeOnBlur = true,
   onFocus,
+  loading,
   ...props
 }: TextAreaModalProps) => {
   const intl = useIntl();
-
+  const styles = useStyleSheet(styleSheet);
   const [text, setText] = useState(value);
 
   const onCancel = useCallback(() => {
@@ -114,6 +117,7 @@ const TextAreaModal = ({
               })}
               variant="secondary"
               onPress={onCancel}
+              disabled={loading}
             />
           }
           middleElement={
@@ -129,14 +133,14 @@ const TextAreaModal = ({
                 defaultMessage: 'Ok',
                 description: 'Ok button label in text edition modal',
               })}
+              loading={loading}
               onPress={() => {
                 onChangeText(text);
-                onClose();
               }}
             />
           }
         />
-        <KeyboardAvoidingView behavior="height" style={styles.contentModal}>
+        <KeyboardAvoidingView behavior="padding" style={styles.contentModal}>
           {ItemTopComponent}
           <TextInput
             multiline
@@ -149,6 +153,7 @@ const TextAreaModal = ({
             onBlur={onBlur}
             style={styles.textInput}
             ref={textInputRef}
+            readOnly={loading}
           />
           {maxLength != null && (
             <Text
@@ -171,9 +176,10 @@ const TextAreaModal = ({
 
 export default TextAreaModal;
 
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
   modal: {
     flex: 1,
+    backgroundColor: appearance === 'light' ? colors.white : colors.black,
   },
   header: {
     marginBottom: 10,
@@ -188,6 +194,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
     marginLeft: 12,
     color: 'white',
+    marginBottom: 30,
   },
   textInput: {
     borderWidth: 0,
@@ -195,4 +202,4 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     verticalAlign: 'top',
   },
-});
+}));

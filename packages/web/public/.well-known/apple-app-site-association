@@ -32,5 +32,12 @@
       "66D3U3GLN6.com.azzapp.app-dev",
       "66D3U3GLN6.com.azzapp.app-staging"
     ]
+  },
+  "appclips": {
+    "apps": [
+      "66D3U3GLN6.com.azzapp.app.Clip",
+      "66D3U3GLN6.com.azzapp.app-dev.Clip",
+      "66D3U3GLN6.com.azzapp.app-staging.Clip"
+    ]
   }
 }

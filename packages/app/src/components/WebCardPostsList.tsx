@@ -89,7 +89,7 @@ const WebCardPostsList = ({
       onEndReached={onEndReached}
       onRefresh={onRefresh}
       contentContainerStyle={styles.container}
-      webCard={viewerWebCard}
+      viewerWebCard={viewerWebCard}
       showUnpublished={true}
     />
   );

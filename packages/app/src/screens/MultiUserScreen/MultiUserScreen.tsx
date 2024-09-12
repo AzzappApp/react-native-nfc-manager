@@ -10,7 +10,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
-import { isAdmin } from '@azzapp/shared/profileHelpers';
+import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import { CancelHeaderButton } from '#components/commonsButtons';
 import CoverRenderer from '#components/CoverRenderer';
@@ -94,7 +94,7 @@ const MultiUserScreen = ({
 
   useEffect(() => {
     // users that loose their admin role should not be able to access this screen
-    if (!isAdmin(profile?.profileRole)) {
+    if (!profileHasAdminRight(profile?.profileRole)) {
       router.back();
     }
   }, [profile?.profileRole, router]);
@@ -110,10 +110,10 @@ const MultiUserScreen = ({
   const toggleMultiUser = useCallback(
     (value: boolean) => {
       if (
-        !profile?.webCard.isPremium &&
-        profile?.webCard.subscription &&
-        (profile?.webCard.subscription?.status !== 'active' ||
-          profile?.webCard.subscription?.endAt < new Date())
+        !profile?.webCard?.isPremium &&
+        profile?.webCard?.subscription &&
+        (profile?.webCard?.subscription?.status !== 'active' ||
+          profile?.webCard?.subscription?.endAt < new Date())
       ) {
         Toast.show({
           type: 'error',
@@ -129,7 +129,7 @@ const MultiUserScreen = ({
         });
         return;
       }
-      if (!profile?.webCard.isPremium && value) {
+      if (!profile?.webCard?.isPremium && value) {
         router.push({
           route: 'USER_PAY_WALL',
           params: {
@@ -145,8 +145,8 @@ const MultiUserScreen = ({
       }
     },
     [
-      profile?.webCard.isPremium,
-      profile?.webCard.subscription,
+      profile?.webCard?.isPremium,
+      profile?.webCard?.subscription,
       intl,
       router,
       setAllowMultiUser,
@@ -179,10 +179,11 @@ const MultiUserScreen = ({
   const [transferOwnerMode, toggleTransferOwnerMode] = useToggle(false);
 
   const transferOwnership = useCallback(() => {
-    if (selectedProfileId && profile?.webCard?.id) {
+    const webCard = profile?.webCard;
+    if (selectedProfileId && webCard) {
       transferOwner({
         variables: {
-          webCardId: profile.webCard.id,
+          webCardId: webCard?.id,
           input: {
             profileId: selectedProfileId,
           },
@@ -196,18 +197,18 @@ const MultiUserScreen = ({
           const pendingProfile = store
             .getRootField('transferOwnership')
             .getLinkedRecord('profile');
-          const webCardRecord = store.get(profile.webCard.id);
+          const webCardRecord = store.get(webCard.id);
           if (!webCardRecord) {
             return;
           }
           store
-            .get(profile.webCard.id)
+            .get(webCard?.id)
             ?.setLinkedRecord(pendingProfile, 'profilePendingOwner');
         },
       });
     }
   }, [
-    profile?.webCard.id,
+    profile?.webCard,
     selectedProfileId,
     toggleTransferOwnerMode,
     transferOwner,
@@ -241,7 +242,7 @@ const MultiUserScreen = ({
             defaultMessage="$0,99/user, billed monthly "
             description="Price for MultiUserScreen"
           />
-          {profile?.webCard.isMultiUser && (
+          {profile?.webCard?.isMultiUser && (
             <FormattedMessage
               defaultMessage="{nbUsers} user"
               description="Title for switch section in MultiUserScreen"
@@ -258,11 +259,11 @@ const MultiUserScreen = ({
                   description="Title for switch section in MultiUserScreen"
                 />
               </Text>
-              <PremiumIndicator isRequired={!profile?.webCard.isPremium} />
+              <PremiumIndicator isRequired={!profile?.webCard?.isPremium} />
             </View>
             <Switch
               variant="large"
-              value={profile?.webCard.isMultiUser}
+              value={profile?.webCard?.isMultiUser}
               onValueChange={toggleMultiUser}
             />
           </View>
@@ -271,8 +272,8 @@ const MultiUserScreen = ({
     );
   }, [
     profile?.profileRole,
-    profile?.webCard.isMultiUser,
-    profile?.webCard.isPremium,
+    profile?.webCard?.isMultiUser,
+    profile?.webCard?.isPremium,
     styles.description,
     styles.proContainer,
     styles.sharedIcon,
@@ -351,7 +352,7 @@ const MultiUserScreen = ({
         )}
 
         <View style={styles.content}>
-          {profile.webCard.isMultiUser ? (
+          {profile.webCard?.isMultiUser ? (
             <Suspense
               fallback={
                 <View

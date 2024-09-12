@@ -5,7 +5,7 @@ import { withAxiom } from 'next-axiom';
 import { updateUser, getUserByPhoneNumber, getUserByEmail } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
-import { twilioVerificationService } from '#helpers/twilioHelpers';
+import { checkTwilioVerificationCode } from '#helpers/twilioHelpers';
 
 type ChangePasswordBody = {
   password: string;
@@ -23,12 +23,7 @@ export const POST = withAxiom(async (req: Request) => {
   }
 
   try {
-    const verificationCheck =
-      await twilioVerificationService().verificationChecks.create({
-        to: issuer,
-        code: token,
-      });
-
+    const verificationCheck = await checkTwilioVerificationCode(issuer, token);
     if (verificationCheck.status !== 'approved') {
       return NextResponse.json(
         { message: ERRORS.INVALID_REQUEST },
@@ -58,11 +53,4 @@ export const POST = withAxiom(async (req: Request) => {
       { status: 500 },
     );
   }
-
-  return NextResponse.json(
-    { message: ERRORS.INVALID_REQUEST },
-    { status: 400 },
-  );
 });
-
-export const runtime = 'nodejs';

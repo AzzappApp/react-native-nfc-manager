@@ -1,5 +1,8 @@
 import { getMediasByIds, type WebCard } from '@azzapp/data';
-import { CLOUDINARY_BASE_URL } from '@azzapp/shared/imagesHelpers';
+import {
+  CLOUDINARY_BASE_URL,
+  DEFAULT_VIDEO_PERCENTAGE_THUMBNAIL,
+} from '@azzapp/shared/imagesHelpers';
 
 export const CROP = ['fit', 'lpad', 'fill'] as const;
 
@@ -22,7 +25,7 @@ export const buildCoverImageUrl = async (
 
     return `${CLOUDINARY_BASE_URL}/${
       media?.kind === 'video' ? 'video' : 'image'
-    }/upload${
+    }/upload${media?.kind === 'video' ? `/so_${DEFAULT_VIDEO_PERCENTAGE_THUMBNAIL}p` : ''}${
       crop ? `/c_${crop}` : '/c_fit'
     },g_east,w_${width},h_${height},ar_1:1/${coverMediaId}.png`;
   }

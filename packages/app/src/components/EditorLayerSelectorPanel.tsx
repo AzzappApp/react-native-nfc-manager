@@ -231,6 +231,7 @@ export default EditorLayerSelectorPanel;
 const styles = StyleSheet.create({
   content: {
     marginVertical: 15,
+    maxHeight: 190,
   },
 });
 

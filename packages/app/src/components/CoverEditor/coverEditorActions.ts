@@ -8,7 +8,6 @@ import type {
   CoverEditionMode,
   CoverEditorTextLayerItem,
   CardColors,
-  MediaInfo,
   CoverEditorLinksLayerItem,
 } from './coverEditorTypes';
 import type { Filter } from '@azzapp/shared/filtersHelper';
@@ -97,7 +96,7 @@ export type UpdateAllMediasEditionParameters = {
 
 export type UpdateActiveMediaAction = {
   type: 'UPDATE_ACTIVE_MEDIA';
-  payload: MediaInfo;
+  payload: Media;
 };
 
 export type UpdateMediasTransitionAction = {

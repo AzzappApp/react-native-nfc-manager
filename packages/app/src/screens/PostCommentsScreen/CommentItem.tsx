@@ -3,7 +3,7 @@ import { FormattedRelativeTime, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
-import { isEditor } from '@azzapp/shared/profileHelpers';
+import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import AuthorCartouche from '#components/AuthorCartouche';
 import Link from '#components/Link';
@@ -56,7 +56,7 @@ const CommentItem = ({ item }: CommentItemProps) => {
         <View style={{ flexDirection: 'row' }}>
           <Text variant="small">
             {postComment.webCard.cardIsPublished ||
-            (isEditor(profileInfos?.profileRole) &&
+            (profileHasEditorRight(profileInfos?.profileRole) &&
               profileInfos?.webCardId === postComment.webCard.id) ? (
               <Link
                 route="WEBCARD"

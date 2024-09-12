@@ -16,6 +16,7 @@ const TabBarMenuItem = ({
   selectedLabelColor = colors.black,
   backgroundColor = `${colors.grey50}00`,
   icon,
+  disabled,
   style,
 }: TabBarMenuItemProps) => {
   const state = useAnimatedState(selected);
@@ -35,6 +36,7 @@ const TabBarMenuItem = ({
       onPress={onPress}
       accessibilityRole="tab"
       android_ripple={{ color: selectedBackgroundColor, borderless: false }}
+      disabled={disabled}
     >
       {icon && (
         <Icon

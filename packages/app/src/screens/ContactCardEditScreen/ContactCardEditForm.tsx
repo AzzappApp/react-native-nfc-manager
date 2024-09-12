@@ -15,7 +15,6 @@ import ImagePicker, {
   SelectImageStep,
   SelectImageStepWithFrontCameraByDefault,
 } from '#components/ImagePicker';
-import { MediaImageRenderer } from '#components/medias';
 import { ScreenModal } from '#components/NativeRouter';
 
 import {
@@ -160,7 +159,7 @@ const ContactCardEditForm = ({
         <View style={styles.sectionsContainer}>
           {children}
 
-          {webCard.isMultiUser ? (
+          {webCard?.isMultiUser ? (
             <View style={styles.avatarSection}>
               <Controller
                 control={control}
@@ -175,14 +174,12 @@ const ContactCardEditForm = ({
                           foreground: true,
                         }}
                       >
-                        <MediaImageRenderer
-                          source={{
-                            uri: value.uri,
-                            mediaId: value.id ?? '',
-                            requestedSize: AVATAR_WIDTH,
-                          }}
-                          style={styles.avatar}
-                        />
+                        <View style={[styles.avatar, styles.avatarWrapper]}>
+                          <Image
+                            source={{ uri: value?.uri }}
+                            style={styles.avatar}
+                          />
+                        </View>
                       </PressableNative>
                       <IconButton
                         icon="delete_filled"
@@ -294,7 +291,7 @@ const ContactCardEditForm = ({
             )}
           />
           <Separation />
-          {webCard.isMultiUser && commonInformation?.company ? (
+          {webCard?.isMultiUser && commonInformation?.company ? (
             <View style={styles.fieldCommon}>
               <View style={styles.fieldTitleWithLock}>
                 <Icon icon="locked" />
@@ -336,7 +333,7 @@ const ContactCardEditForm = ({
               )}
             />
           )}
-          {webCard.isMultiUser && logo ? (
+          {webCard?.isMultiUser && logo ? (
             <View style={styles.logoField}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <View style={styles.logoButton}>
@@ -441,7 +438,7 @@ const ContactCardEditForm = ({
           )}
 
           <Separation />
-          {webCard.isMultiUser &&
+          {webCard?.isMultiUser &&
             commonInformation?.phoneNumbers?.map((phoneNumber, index) => (
               <Fragment key={index}>
                 <CommonInformationField
@@ -454,7 +451,7 @@ const ContactCardEditForm = ({
             ))}
           <ContactCardEditModalPhones control={control} />
           <Separation />
-          {webCard.isMultiUser &&
+          {webCard?.isMultiUser &&
             commonInformation?.emails?.map((email, index) => (
               <Fragment key={index}>
                 <CommonInformationField
@@ -467,7 +464,7 @@ const ContactCardEditForm = ({
             ))}
           <ContactCardEditModalEmails control={control} />
           <Separation />
-          {webCard.isMultiUser &&
+          {webCard?.isMultiUser &&
             commonInformation?.urls?.map((url, index) => (
               <Fragment key={index}>
                 <CommonInformationField value={url.address} labelMargin={18} />
@@ -476,7 +473,7 @@ const ContactCardEditForm = ({
             ))}
           <ContactCardEditModalUrls control={control} />
           <Separation />
-          {webCard.isMultiUser &&
+          {webCard?.isMultiUser &&
             commonInformation?.addresses?.map((address, index) => (
               <CommonInformationField
                 key={index}
@@ -489,7 +486,7 @@ const ContactCardEditForm = ({
           <Separation />
           <ContactCardEditModalBirthdays control={control} />
           <Separation />
-          {webCard.isMultiUser &&
+          {webCard?.isMultiUser &&
             commonInformation?.socials?.map((social, index) => (
               <Fragment key={index}>
                 <CommonInformationField
@@ -591,6 +588,11 @@ const styleSheet = createStyleSheet(appearance => ({
   noAvatarContainer: {
     overflow: 'hidden',
     borderRadius: AVATAR_WIDTH / 2,
+  },
+  avatarWrapper: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
   },
   avatar: {
     width: AVATAR_WIDTH,

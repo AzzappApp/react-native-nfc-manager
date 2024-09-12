@@ -1,8 +1,8 @@
+import { notFound } from 'next/navigation';
 import {
-  CardStyleTable,
-  CardTemplateTypeTable,
-  db,
+  getAllCardStyles,
   getCardTemplateById,
+  getCardTemplateTypes,
   getLocalizationMessagesByLocaleAndTarget,
 } from '@azzapp/data';
 import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
@@ -17,11 +17,19 @@ type CardTemplatePageProps = {
 const CardTemplatePage = async (props: CardTemplatePageProps) => {
   const { params } = props;
 
-  const [cardStyles, template, cardTemplateTypes] = await Promise.all([
-    db.select().from(CardStyleTable),
+  const [cardStyles, template, allCardTemplateTypes] = await Promise.all([
+    getAllCardStyles(),
     getCardTemplateById(params.id),
-    db.select().from(CardTemplateTypeTable),
+    getCardTemplateTypes(false),
   ]);
+
+  if (!template) {
+    return notFound();
+  }
+
+  const cardTemplateTypes = allCardTemplateTypes.filter(
+    type => type.enabled || type.id === template.cardTemplateTypeId,
+  );
 
   const labels = await getLocalizationMessagesByLocaleAndTarget(
     DEFAULT_LOCALE,

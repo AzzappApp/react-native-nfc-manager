@@ -5,6 +5,10 @@ import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
 import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
+import type {
+  MediaImageRendererHandle,
+  MediaVideoRendererHandle,
+} from '#components/medias';
 import type { CoverLinkRendererProps } from './coverLinkTypes';
 import type { GestureResponderEvent, View } from 'react-native';
 import type { Disposable } from 'react-relay';
@@ -23,6 +27,9 @@ const CoverLink = ({
   ...props
 }: CoverLinkRendererProps) => {
   const ref = useRef<View | null>(null);
+  const mediaRef = useRef<
+    MediaImageRendererHandle | MediaVideoRendererHandle | null
+  >(null);
   const router = useRouter();
   const prefetchScreen = usePrefetchRoute();
 
@@ -42,6 +49,7 @@ const CoverLink = ({
       return;
     }
     container.measureInWindow(async (x, y, width, height) => {
+      await mediaRef.current?.snapshot();
       router.push({
         route: 'WEBCARD',
         params: {
@@ -83,7 +91,7 @@ const CoverLink = ({
       ]}
       accessibilityRole="link"
     >
-      <CoverRenderer {...props} style={coverStyle} />
+      <CoverRenderer {...props} mediaRef={mediaRef} style={coverStyle} />
     </PressableScaleHighlight>
   );
 };

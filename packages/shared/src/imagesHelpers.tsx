@@ -4,6 +4,8 @@ export const CLOUDINARY_CLOUDNAME =
   process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
 export const CLOUDINARY_BASE_URL = `https://${process.env.NEXT_PUBLIC_CLOUDINARY_SECURE_DISTRIBUTION ?? 'res.cloudinary.com'}/${CLOUDINARY_CLOUDNAME}`;
 
+export const DEFAULT_VIDEO_PERCENTAGE_THUMBNAIL = 17;
+
 /**
  * Helpers used to create an asset url from a cloudinary id without any transformation
  *

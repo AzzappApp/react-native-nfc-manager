@@ -6,6 +6,7 @@
 	<array>
 		<string>webcredentials:staging.azzapp.com</string>
 		<string>applinks:staging.azzapp.com</string>
+		<string>appclips:staging.azzapp.com</string>
 	</array>
 </dict>
 </plist>

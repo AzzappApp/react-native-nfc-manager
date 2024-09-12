@@ -13,13 +13,14 @@ import type { WebCard } from '@azzapp/data';
 
 type Props = {
   webcard: WebCard;
+  role: string;
   onRemoveWebcard: (webcardId: string) => void;
 };
 
 const WIDTH = 276;
 const HEIGHT = 411;
 
-const WebcardCover = ({ webcard, onRemoveWebcard }: Props) => {
+const WebcardCover = ({ webcard, role, onRemoveWebcard }: Props) => {
   return (
     <Card sx={{ minWidth: WIDTH, margin: 1 }}>
       {webcard.coverMediaId?.startsWith('v') ? (
@@ -39,8 +40,14 @@ const WebcardCover = ({ webcard, onRemoveWebcard }: Props) => {
         />
       )}
       <CardContent>
-        <Typography variant="subtitle2">name: {webcard.userName}</Typography>
-        <Typography variant="body1">id: {webcard.id}</Typography>
+        <Typography variant="body1">name: {webcard.userName}</Typography>
+        {webcard.companyName && (
+          <Typography variant="subtitle2">
+            Company: {webcard.companyName}
+          </Typography>
+        )}
+        <Typography variant="subtitle2">id: {webcard.id}</Typography>
+        <Typography variant="subtitle2">role: {role}</Typography>
       </CardContent>
       <CardActions>
         <Button

@@ -1,4 +1,4 @@
-import { memo, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
   interpolateColor,
@@ -13,7 +13,6 @@ import { graphql, useFragment } from 'react-relay';
 import { getTextColor } from '@azzapp/shared/colorsHelpers';
 import { colors } from '#theme';
 import PremiumIndicator from '#components/PremiumIndicator';
-import useScreenInsets from '#hooks/useScreenInsets';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import { useHomeScreenContext } from './HomeScreenContext';
@@ -42,15 +41,14 @@ const HomeHeader = ({ openPanel, user: userKey }: HomeHeaderProps) => {
     `,
     userKey,
   );
-  const insets = useScreenInsets();
-  const headerStyle = useMemo(() => ({ marginTop: insets.top }), [insets.top]);
+
   const { currentIndexSharedValue, currentIndexProfile, inputRange } =
     useHomeScreenContext();
   const readableColors = useMemo(
     () => [
       colors.white,
       ...(profiles?.map(profile => {
-        return profile?.webCard.cardColors?.primary
+        return profile?.webCard?.cardColors?.primary
           ? getTextColor(profile?.webCard.cardColors?.primary)
           : colors.white;
       }) ?? []),
@@ -127,12 +125,12 @@ const HomeHeader = ({ openPanel, user: userKey }: HomeHeaderProps) => {
           />
         </View>
       }
-      style={[styles.header, headerStyle]}
+      style={styles.header}
     />
   );
 };
 
-export default memo(HomeHeader);
+export default HomeHeader;
 export const HOME_HEADER_HEIGHT = 28;
 
 const styles = StyleSheet.create({

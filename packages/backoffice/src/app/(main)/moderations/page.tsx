@@ -1,10 +1,5 @@
-import { asc, desc, eq, sql, and } from 'drizzle-orm';
-import { db, ReportTable } from '@azzapp/data';
+import { getReportsByTarget } from '@azzapp/data';
 import ReportsList from './ModerationList';
-import type { SQLWrapper } from 'drizzle-orm';
-
-export type ReportStatus = 'Closed' | 'Opened';
-export type ReportKind = 'comment' | 'post' | 'webCard';
 
 export type ModerationItem = {
   targetId: string;
@@ -12,92 +7,15 @@ export type ModerationItem = {
   reportCount: number;
   latestReport: string | null;
   treatedAt: string | null;
-  status: ReportStatus;
+  status: Exclude<ReportStatus, 'all'>;
 };
 
 export type Filters = {
-  status?: ReportStatus | 'all';
-  kind?: ReportKind | 'all';
+  status?: ReportStatus;
+  kind?: ReportKind;
 };
 
-const getFilters = (filters: Filters): SQLWrapper[] => {
-  const f: SQLWrapper[] = [];
-  if (filters.status && filters.status !== 'all') {
-    f.push(eq(sql`status`, filters.status === 'Opened' ? 1 : 0));
-  }
-  if (filters.kind && filters.kind !== 'all') {
-    f.push(eq(sql`targetType`, filters.kind));
-  }
-
-  return f;
-};
-
-const sortsColumns = {
-  targetId: ReportTable.targetId,
-  targetType: ReportTable.targetType,
-  reportCount: sql`reportCount`,
-  latestReport: sql`latestReport`,
-  treatedAt: sql`treatedAt`,
-  status: sql`status`,
-};
-
-const getReportsQuery = () => {
-  const query = db
-    .select({
-      targetId: ReportTable.targetId,
-      targetType: ReportTable.targetType,
-      reportCount: sql`count(*)`.mapWith(Number).as('reportCount'),
-      latestReport: sql`MAX(${ReportTable.createdAt})`
-        .mapWith(String)
-        .as('latestReport'),
-      treatedAt: sql`MAX(${ReportTable.treatedAt})`
-        .mapWith(String)
-        .as('treatedAt'),
-      status:
-        sql`(ISNULL(MAX(${ReportTable.treatedAt})) OR MAX(${ReportTable.treatedAt}) < MAX(${ReportTable.createdAt}))`
-          .mapWith(Number)
-          .as('status'),
-    })
-    .from(ReportTable)
-    .groupBy(ReportTable.targetId, ReportTable.targetType)
-    .$dynamic();
-
-  return query;
-};
-
-const getFilteredReports = (
-  page: number,
-  sort: 'latestReport' | 'targetId' | 'targetType',
-  order: 'asc' | 'desc',
-  filters: Filters,
-) => {
-  const subQuery = getReportsQuery();
-  const query = db
-    .select()
-    .from(subQuery.as('Report'))
-    .where(and(...getFilters(filters)));
-
-  query
-    .offset(page * PAGE_SIZE)
-    .limit(PAGE_SIZE)
-    .orderBy(
-      order === 'asc' ? asc(sortsColumns[sort]) : desc(sortsColumns[sort]),
-    );
-
-  return query;
-};
-
-const countReports = async (filters: Filters) => {
-  const subQuery = getReportsQuery();
-  const query = db
-    .select({ count: sql`count(*)`.mapWith(Number) })
-    .from(subQuery.as('Report'))
-    .where(and(...getFilters(filters)));
-
-  return query.then(rows => rows[0].count);
-};
-
-type ModerationsPageProps = {
+type ModerationPageProps = {
   searchParams?: {
     page?: string;
     sort?: string;
@@ -107,40 +25,91 @@ type ModerationsPageProps = {
   };
 };
 
-const ModerationsPage = async ({ searchParams = {} }: ModerationsPageProps) => {
+const sortColumns = [
+  'latestReport',
+  'reportCount',
+  'status',
+  'targetId',
+  'targetType',
+  'treatedAt',
+] as const;
+
+export type SortFields = (typeof sortColumns)[number];
+
+const reportStatus = ['all', 'closed', 'open'] as const;
+
+export type ReportStatus = (typeof reportStatus)[number];
+
+const reportKind = ['all', 'comment', 'post', 'webCard'] as const;
+
+export type ReportKind = (typeof reportKind)[number];
+
+const ModerationPage = async ({ searchParams = {} }: ModerationPageProps) => {
   let page = searchParams.page ? parseInt(searchParams.page, 10) : 1;
   page = Math.max(isNaN(page) ? 1 : page, 1);
 
-  const sort = Object.keys(sortsColumns).includes(searchParams.sort as any)
-    ? (searchParams.sort as any)
-    : 'latestReport';
+  const sortField: SortFields =
+    searchParams.sort && sortColumns.includes(searchParams.sort as any)
+      ? (searchParams.sort as SortFields)
+      : 'latestReport';
 
-  const order = searchParams.order === 'asc' ? 'asc' : 'desc';
-  const filters: Filters = {
-    status: (searchParams.status as ReportStatus) || 'Opened',
-    kind: (searchParams.kind as ReportKind) || 'all',
-  };
+  const sortOrder = searchParams.order === 'asc' ? 'asc' : 'desc';
 
-  const reports = await getFilteredReports(page - 1, sort, order, filters);
-  const moderationReports: ModerationItem[] = reports.map(report => ({
-    ...report,
-    status: report.status ? 'Opened' : 'Closed',
-  }));
-  const count = await countReports(filters);
+  const statusFilter =
+    searchParams.status && reportStatus.includes(searchParams.status as any)
+      ? (searchParams.status as ReportStatus)
+      : 'all';
+
+  const kindFilter =
+    searchParams.kind && reportKind.includes(searchParams.kind as any)
+      ? (searchParams.kind as ReportKind)
+      : 'all';
+
+  const { reports: moderationReports, count } = await getReportsByTarget({
+    offset: (page - 1) * PAGE_SIZE,
+    limit: PAGE_SIZE,
+    status: statusFilter,
+    targetType: kindFilter,
+    sort: {
+      sortField,
+      sortOrder,
+    },
+  });
+
+  const reports = moderationReports.map(
+    ({
+      targetId,
+      targetType,
+      reportCount,
+      latestReport,
+      treatedAt,
+      status,
+    }) => ({
+      targetId,
+      targetType,
+      reportCount,
+      latestReport: latestReport?.toString() ?? null,
+      treatedAt: treatedAt?.toString() ?? null,
+      status: status === 1 ? ('open' as const) : ('closed' as const),
+    }),
+  );
 
   return (
     <ReportsList
-      reports={moderationReports}
+      reports={reports}
       count={count}
       page={page}
       pageSize={PAGE_SIZE}
-      sortField={sort}
-      sortOrder={order}
-      filters={filters}
+      sortField={sortField}
+      sortOrder={sortOrder}
+      filters={{
+        status: statusFilter,
+        kind: kindFilter,
+      }}
     />
   );
 };
 
 const PAGE_SIZE = 25;
 
-export default ModerationsPage;
+export default ModerationPage;

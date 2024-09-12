@@ -17,6 +17,10 @@
     {
       "path": "/api/cron/cancelPayments",
       "schedule": "*/1 * * * *"
+    },
+    {
+      "path": "/api/cron/unpublishWebCards",
+      "schedule": "*/3 * * * *"
     }
   ],
   "redirects": [

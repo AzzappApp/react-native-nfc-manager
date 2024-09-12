@@ -3,7 +3,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, commitMutation } from 'react-relay';
-import { isAdmin } from '@azzapp/shared/profileHelpers';
+import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import PremiumIndicator from '#components/PremiumIndicator';
@@ -40,7 +40,7 @@ const HomeBottomPanelPublish = ({ profile }: HomeBottomPanelPublishProps) => {
   const router = useRouter();
 
   const onPublish = useCallback(() => {
-    if (!profile) {
+    if (!profile || !profile.webCard?.id) {
       return;
     }
     const { profileInfos } = getAuthState();
@@ -50,11 +50,11 @@ const HomeBottomPanelPublish = ({ profile }: HomeBottomPanelPublishProps) => {
     // using disable state with current profile show a disabled style during maybe one secdon
     // (currentProfile is not animated so need to be updated)
     // avoid adding a new interpolation by using this condition
-    if (!isAdmin(profile.profileRole)) {
+    if (!profileHasAdminRight(profile.profileRole)) {
       return;
     }
 
-    if (profile.webCard.requiresSubscription && !profile.webCard.isPremium) {
+    if (profile.webCard?.requiresSubscription && !profile.webCard.isPremium) {
       router.push({ route: 'USER_PAY_WALL' });
       return;
     }
@@ -145,7 +145,7 @@ const HomeBottomPanelPublish = ({ profile }: HomeBottomPanelPublishProps) => {
           }}
         />
       </Text>
-      {isAdmin(profile?.profileRole) && (
+      {profileHasAdminRight(profile?.profileRole) && (
         <Button
           variant="secondary"
           appearance="dark"
@@ -165,7 +165,7 @@ const HomeBottomPanelPublish = ({ profile }: HomeBottomPanelPublishProps) => {
           rightElement={
             <PremiumIndicator
               isRequired={
-                profile?.webCard.requiresSubscription &&
+                profile?.webCard?.requiresSubscription &&
                 !profile?.webCard.isPremium
               }
             />

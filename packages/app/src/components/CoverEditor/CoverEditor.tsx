@@ -9,13 +9,14 @@ import {
   useRef,
   useState,
 } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View, Platform } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
+import { useDebounce } from 'use-debounce';
 import {
   DEFAULT_COLOR_LIST,
   DEFAULT_COLOR_PALETTE,
@@ -29,6 +30,7 @@ import useToggle from '#hooks/useToggle';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Text from '#ui/Text';
+import UploadProgressModal from '#ui/UploadProgressModal';
 import CoverEditorContextProvider from './CoverEditorContext';
 import {
   mediaInfoIsImage,
@@ -64,6 +66,8 @@ export type CoverEditorProps = Omit<ViewProps, 'children'> & {
   backgroundColor: string | null;
   coverInitialSate?: Partial<CoverEditorState> | null;
   onCanSaveChange?: (canSave: boolean) => void;
+  onCoverModified?: () => void;
+  onCancel: () => void;
 };
 
 export type CoverEditorHandle = {
@@ -116,9 +120,11 @@ const CoverEditorCore = (
     coverTemplate: coverTemplateKey,
     backgroundColor,
     onCanSaveChange,
+    onCoverModified,
     coverInitialSate,
     style,
     placeholder,
+    onCancel,
     ...props
   }: CoverEditorProps & { placeholder: Asset },
   ref: ForwardedRef<CoverEditorHandle>,
@@ -220,9 +226,9 @@ const CoverEditorCore = (
         ).map(({ customText, ...textLayer }) => {
           const text =
             textLayer.text === 'mainName'
-              ? profile.webCard.companyName || profile.webCard.lastName
+              ? profile.webCard?.companyName || profile.webCard?.lastName
               : textLayer.text === 'firstName'
-                ? profile.webCard.firstName
+                ? profile.webCard?.firstName
                 : textLayer.text === 'custom'
                   ? customText
                   : null;
@@ -272,13 +278,16 @@ const CoverEditorCore = (
       }, imagesScales);
     }
 
+    const cardColors =
+      profile.webCard?.cardColors ?? coverTemplate?.colorPalette ?? {};
+
     return {
+      isModified: false,
       lottie,
       cardColors: {
         ...DEFAULT_COLOR_PALETTE,
         otherColors: [...DEFAULT_COLOR_LIST],
-        ...profile.webCard.cardColors,
-        ...coverTemplate?.colorPalette,
+        ...cardColors,
       } as any, // typescript is not happy with readonly
       backgroundColor: backgroundColor ?? 'light',
 
@@ -305,6 +314,12 @@ const CoverEditorCore = (
     };
   });
 
+  useEffect(() => {
+    if (coverEditorState.isModified) {
+      onCoverModified?.();
+    }
+  }, [coverEditorState.isModified, onCoverModified]);
+
   const contextValue = useMemo(() => {
     return {
       coverEditorState,
@@ -314,6 +329,7 @@ const CoverEditorCore = (
   // #endregion
 
   const imageRefKeys = useRef<Record<string, string>>({});
+  const [reloadCount, setReloadCount] = useState(0);
   // #region Resources loading
   useEffect(() => {
     let canceled = false;
@@ -454,7 +470,13 @@ const CoverEditorCore = (
     coverEditorState.videoPaths,
     coverEditorState.overlayLayers,
     coverEditorState.imagesScales,
+    // here to force the effect to run again when the reloadCount changes
+    reloadCount,
   ]);
+
+  const retryMediaLoading = useCallback(() => {
+    setReloadCount(reloadCount => reloadCount + 1);
+  }, []);
 
   useEffect(() => {
     const keys = imageRefKeys.current;
@@ -478,7 +500,7 @@ const CoverEditorCore = (
     uploadProgressIndicator,
     error,
     canSave,
-  } = useSaveCover(profile.webCard.id, coverEditorState);
+  } = useSaveCover(profile.webCard?.id ?? null, coverEditorState);
 
   useEffect(() => {
     if (error) {
@@ -507,10 +529,18 @@ const CoverEditorCore = (
   // #region Initial Media picking
   const [showImagePicker, toggleImagePicker] = useToggle(false);
   useEffect(() => {
+    const lottieInfo = extractLottieInfoMemoized(coverEditorState.lottie);
+    if (lottieInfo && lottieInfo.assetsInfos.length === 0) {
+      return;
+    }
     if (coverEditorState.medias.length === 0) {
       toggleImagePicker();
     }
-  }, [coverEditorState.medias.length, toggleImagePicker]);
+  }, [
+    coverEditorState.lottie,
+    coverEditorState.medias.length,
+    toggleImagePicker,
+  ]);
 
   const durations = useMemo(() => {
     const lottieInfo = extractLottieInfoMemoized(coverEditorState.lottie);
@@ -570,6 +600,13 @@ const CoverEditorCore = (
     toolbox.current?.toggleLinksModal();
   }, []);
 
+  const intl = useIntl();
+
+  const [loadingRemoteMedia] = useDebounce(
+    coverEditorState.loadingRemoteMedia,
+    200,
+  );
+
   return (
     <>
       <CoverEditorContextProvider value={contextValue}>
@@ -627,18 +664,73 @@ const CoverEditorCore = (
       <ScreenModal
         visible={showImagePicker}
         animationType="slide"
-        onRequestDismiss={preventModalDismiss}
-        gestureEnabled={false}
+        onRequestDismiss={onCancel}
       >
         <CoverEditorMediaPicker
           initialMedias={null}
-          onFinished={onMediasPicked}
           durations={durations}
           durationsFixed={!!coverEditorState.lottie}
           maxSelectableVideos={getMaxAllowedVideosPerCover(
             !!coverEditorState.lottie,
           )}
+          onFinished={onMediasPicked}
+          onClose={onCancel}
         />
+      </ScreenModal>
+      <ScreenModal
+        visible={loadingRemoteMedia}
+        animationType="slide"
+        onRequestDismiss={onCancel}
+      >
+        <UploadProgressModal
+          text={intl.formatMessage({
+            defaultMessage: 'Processing media',
+            description: 'Cover Editor - Loading remote media',
+          })}
+          onCancel={onCancel}
+        />
+      </ScreenModal>
+
+      <ScreenModal
+        visible={coverEditorState.loadingError != null}
+        onRequestDismiss={onCancel}
+      >
+        <Container
+          style={{
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 20,
+            padding: 20,
+          }}
+        >
+          <Text>
+            <FormattedMessage
+              defaultMessage="An error occurred while loading the media"
+              description="Cover Editor - Loading media error message"
+            />
+          </Text>
+          <View style={{ flexDirection: 'row', gap: 20 }}>
+            <Button
+              onPress={onCancel}
+              label={
+                <FormattedMessage
+                  defaultMessage="Cancel"
+                  description="Cover Editor - Loading media error cancel button"
+                />
+              }
+            />
+            <Button
+              onPress={retryMediaLoading}
+              label={
+                <FormattedMessage
+                  defaultMessage="Retry"
+                  description="Cover Editor - Loading media error retry button"
+                />
+              }
+            />
+          </View>
+        </Container>
       </ScreenModal>
     </>
   );

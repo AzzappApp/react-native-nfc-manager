@@ -274,7 +274,9 @@ const SocialInputComponent = ({
         filterText = 'https://' + (filterText === 'h' ? '' : filterText);
       }
       setLocalValue(filterText);
-      debouncedChangeLink(icon, filterText);
+      if (icon !== 'mail') {
+        debouncedChangeLink(icon, filterText);
+      }
     },
     [debouncedChangeLink, icon, localValue, mask],
   );

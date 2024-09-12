@@ -3,70 +3,33 @@
 import { Search } from '@mui/icons-material';
 import { Box, Button, InputAdornment, TextField } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import {
-  useCallback,
-  useDeferredValue,
-  useEffect,
-  useState,
-  useTransition,
-} from 'react';
+import { useDeferredValue, useMemo, useState } from 'react';
 import DataGrid from '#components/DataGrid';
-import type { CompanyActivityTypeItem, SortColumn } from './page';
-import type {
-  GridColDef,
-  GridPaginationModel,
-  GridSortModel,
-} from '@mui/x-data-grid';
+import type { CompanyActivityTypeItem } from './page';
+import type { GridColDef } from '@mui/x-data-grid';
 
 type CompanyActivitiesListProps = {
   companyActivitiesTypes: CompanyActivityTypeItem[];
-  count: number;
-  page: number;
-  pageSize: number;
-  sortField: SortColumn;
-  sortOrder: 'asc' | 'desc';
-  search: string | null;
 };
 
 const CompanyActivitiesTypesList = ({
   companyActivitiesTypes,
-  count,
-  page,
-  pageSize,
-  sortField,
-  sortOrder,
-  search,
 }: CompanyActivitiesListProps) => {
   const router = useRouter();
-  const [loading, startTransition] = useTransition();
-  const updateSearchParams = useCallback(
-    (page: number, sort: string, order: string, search: string | null) => {
-      startTransition(() => {
-        router.replace(
-          `/companyActivitiesTypes?page=${page}&sort=${sort}&order=${order}&s=${search ?? ''}`,
-        );
-      });
-    },
-    [router, startTransition],
+
+  const [currentSearch, setCurrentSearch] = useState('');
+  const deferredSearch = useDeferredValue(currentSearch);
+
+  const items = useMemo(
+    () =>
+      companyActivitiesTypes.filter(
+        item =>
+          !deferredSearch ||
+          item.label?.toLowerCase().includes(deferredSearch.toLowerCase()) ||
+          item.id.toLowerCase().includes(deferredSearch.toLowerCase()),
+      ),
+    [companyActivitiesTypes, deferredSearch],
   );
-
-  const onPageChange = (model: GridPaginationModel) => {
-    updateSearchParams(model.page + 1, sortField, sortOrder, search);
-  };
-
-  const onSortModelChange = (model: GridSortModel) => {
-    updateSearchParams(page, model[0].field, model[0].sort ?? 'asc', search);
-  };
-
-  const [currentSearch, setCurrentSearch] = useState(search ?? '');
-  const defferedSearch = useDeferredValue(currentSearch);
-
-  useEffect(() => {
-    if (search === defferedSearch) {
-      return;
-    }
-    updateSearchParams(1, sortField, sortOrder, defferedSearch);
-  }, [defferedSearch, page, search, sortField, sortOrder, updateSearchParams]);
 
   return (
     <>
@@ -106,19 +69,7 @@ const CompanyActivitiesTypesList = ({
       </Box>
       <DataGrid
         columns={columns}
-        rows={companyActivitiesTypes}
-        rowCount={count}
-        initialState={{
-          pagination: {
-            paginationModel: { pageSize, page: page - 1 },
-          },
-        }}
-        sortModel={[
-          {
-            field: sortField,
-            sort: sortOrder,
-          },
-        ]}
+        rows={items}
         onRowClick={params => {
           router.push(`/companyActivitiesTypes/${params.id}`);
         }}
@@ -127,12 +78,7 @@ const CompanyActivitiesTypesList = ({
             cursor: 'pointer',
           },
         }}
-        paginationMode="server"
-        sortingMode="server"
-        onPaginationModelChange={onPageChange}
-        onSortModelChange={onSortModelChange}
-        loading={loading}
-        pageSizeOptions={[pageSize]}
+        pageSizeOptions={[25]}
         rowSelection={false}
         sortingOrder={['asc', 'desc']}
       />

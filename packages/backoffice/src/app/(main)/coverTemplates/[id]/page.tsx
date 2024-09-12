@@ -1,7 +1,6 @@
 import {
-  CompanyActivityTable,
-  db,
   getColorPalettes,
+  getCompanyActivities,
   getCoverTemplateById,
   getCoverTemplatePreviewsByCoverTemplateId,
   getCoverTemplateTags,
@@ -55,7 +54,7 @@ const CoverTemplatePage = async ({
       label: labelsMap[type.id],
     })),
   );
-  const activities = await db.select().from(CompanyActivityTable);
+  const activities = await getCompanyActivities();
   const activitiesWithLabel: ActivityItem[] = await Promise.all(
     activities.map(async activity => ({
       id: activity.id,

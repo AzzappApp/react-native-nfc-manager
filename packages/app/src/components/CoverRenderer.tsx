@@ -17,6 +17,10 @@ import PressableNative from '#ui/PressableNative';
 import { DynamicLinkRenderer } from './CoverEditor/CoverPreview/DynamicLinkRenderer';
 import { MediaImageRenderer, MediaVideoRenderer } from './medias';
 import type { CoverRenderer_webCard$key } from '#relayArtifacts/CoverRenderer_webCard.graphql';
+import type {
+  MediaImageRendererHandle,
+  MediaVideoRendererHandle,
+} from './medias';
 import type { ForwardedRef } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 
@@ -38,7 +42,16 @@ export type CoverRendererProps = {
    * if true, the cover will play the cover animations if any or the video if any
    * @default false
    */
-  animationEnabled?: boolean;
+  canPlay?: boolean;
+  /**
+   * A ref to the media renderer of the cover
+   */
+  mediaRef?: ForwardedRef<MediaImageRendererHandle | MediaVideoRendererHandle>;
+  /**
+   * If true and if there is a snapshot of the cover media, the snapshot will be displayed
+   * during the loading of the media
+   */
+  useAnimationSnapshot?: boolean;
   /**
    * Called when the cover is ready for display,
    * which means both the media and the text are ready for display,
@@ -64,7 +77,9 @@ const CoverRenderer = (
     width = 125,
     large,
     style,
-    animationEnabled,
+    canPlay,
+    useAnimationSnapshot,
+    mediaRef,
     onReadyForDisplay,
     onError,
   }: CoverRendererProps,
@@ -80,6 +95,10 @@ const CoverRenderer = (
           cappedPixelRatio: {
             type: "Float!"
             provider: "CappedPixelRatio.relayprovider"
+          }
+          videoDurationPercentage: {
+            type: "Int"
+            provider: "VideoDurationPercentage.relayprovider"
           }
         ) {
           id
@@ -101,12 +120,12 @@ const CoverRenderer = (
               thumbnail(
                 width: $screenWidth
                 pixelRatio: $pixelRatio
-                videoDurationPercentage: 17
+                videoDurationPercentage: $videoDurationPercentage
               )
               smallThumbnail: thumbnail(
                 width: 125
                 pixelRatio: $cappedPixelRatio
-                videoDurationPercentage: 17
+                videoDurationPercentage: $videoDurationPercentage
               )
             }
           }
@@ -225,22 +244,26 @@ const CoverRenderer = (
           {coverSource ? (
             isVideoMedia ? (
               <MediaVideoRenderer
+                ref={mediaRef as any}
                 testID="CoverRenderer_media"
                 source={coverSource}
                 thumbnailURI={isSmallCover ? smallThumbnail : thumbnail}
                 onReadyForDisplay={onReadyForDisplay}
-                videoEnabled={animationEnabled}
+                videoEnabled={canPlay}
                 onError={onError}
                 style={styles.layer}
-                paused={!animationEnabled}
+                paused={!canPlay}
+                useAnimationSnapshot={useAnimationSnapshot}
               />
             ) : (
               <MediaImageRenderer
+                ref={mediaRef as any}
                 testID="CoverRenderer_media"
                 source={coverSource}
                 onReadyForDisplay={onReadyForDisplay}
                 onError={onError}
                 style={styles.layer}
+                useAnimationSnapshot={useAnimationSnapshot}
               />
             )
           ) : (
@@ -261,7 +284,11 @@ const CoverRenderer = (
                 flexDirection: 'row',
                 position: 'absolute',
                 transformOrigin: 'center',
-                transform: [{ rotate: `${coverDynamicLinks.rotation}rad` }],
+                transform: [
+                  { rotate: `${coverDynamicLinks.rotation}rad` },
+                  // Fixes https://github.com/AzzappApp/azzapp/issues/4423 (When a parent element has a rotateY with a value of 0, it creates this bug on Android)
+                  { rotateY: '0.1deg' },
+                ],
                 top:
                   (coverDynamicLinks.position.y * layout.height) / 100 -
                   linksSize.height / 2,
@@ -269,6 +296,7 @@ const CoverRenderer = (
                   (coverDynamicLinks.position.x * layout.width) / 100 -
                   linksSize.width / 2,
                 gap: convertToBaseCanvasRatio(LINKS_GAP, layout.width),
+                zIndex: 1,
               }}
             >
               {coverDynamicLinks.links.map(link => (
@@ -289,7 +317,7 @@ const CoverRenderer = (
       </View>
     ),
     [
-      animationEnabled,
+      canPlay,
       cardColors,
       containerStyle,
       coverDynamicLinks,
@@ -301,6 +329,7 @@ const CoverRenderer = (
       layout,
       linksSize.height,
       linksSize.width,
+      mediaRef,
       onError,
       onReadyForDisplay,
       shadowStyle,
@@ -309,6 +338,7 @@ const CoverRenderer = (
       styles.coverPlaceHolder,
       styles.layer,
       thumbnail,
+      useAnimationSnapshot,
       width,
     ],
   );

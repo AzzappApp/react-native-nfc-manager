@@ -8,6 +8,7 @@ import {
   getWebCardById,
   getWebCardsPostsWithMedias,
 } from '@azzapp/data';
+import { DEFAULT_VIDEO_PERCENTAGE_THUMBNAIL } from '@azzapp/shared/imagesHelpers';
 import { getMetaData } from '#helpers/seo';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CloudinaryVideoPlayer from '#ui/CloudinaryVideoPlayer';
@@ -82,6 +83,7 @@ const PostPage = async (props: PostPageProps) => {
                       width: '100%',
                       maxHeight: '100%',
                     }}
+                    mutable
                   />
                 </>
               ) : (
@@ -131,6 +133,7 @@ export async function generateMetadata({
   if (post?.medias && post.medias.length > 0) {
     metaData.ogImage = getCldOgImageUrl({
       src: post.medias[0].id,
+      rawTransformations: [`so_${DEFAULT_VIDEO_PERCENTAGE_THUMBNAIL}p`],
     });
   }
   return getMetaData(metaData);

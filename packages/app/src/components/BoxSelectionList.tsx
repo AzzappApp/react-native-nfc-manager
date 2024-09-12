@@ -42,6 +42,7 @@ const BoxSelectionList = <T,>({
   onSelect,
   onLayout,
   onItemHeightChange,
+  fixedItemWidth,
   ...props
 }: BoxSelectionListProps<T>) => {
   const styles = useStyleSheet(styleSheet);
@@ -74,6 +75,7 @@ const BoxSelectionList = <T,>({
           isSelected={selectedItem == item}
           height={height - VERTICAL_PADDING * 2}
           onSelect={onSelect}
+          fixedItemWidth={fixedItemWidth}
           {...props}
         />
       );
@@ -85,6 +87,7 @@ const BoxSelectionList = <T,>({
       imageRatio,
       selectedItem,
       onSelect,
+      fixedItemWidth,
       props,
     ],
   );
@@ -99,6 +102,26 @@ const BoxSelectionList = <T,>({
     [data, height],
   );
 
+  // We need a itemLayout to be able to preselect the initial item
+  // this component try to be used in different case and far to complexe. one case of handle aspectRatio and other case of fixed width
+  // it should have been stay separated, in addition the callback  onItemHeightChange can change the width and adding more complexity to the calcul
+  // including some magic number to make if fit
+  const getItemLayout = useCallback(
+    (_: any, index: number) => {
+      return {
+        length: fixedItemWidth ?? 0,
+        offset: fixedItemWidth ? fixedItemWidth * index : 0,
+        index,
+      };
+    },
+    [fixedItemWidth],
+  );
+
+  const initialScrollIndex =
+    innerData.length > 0 && fixedItemWidth && selectedItem
+      ? innerData.indexOf(selectedItem)
+      : 0;
+
   return (
     <FlatList
       {...props}
@@ -109,6 +132,8 @@ const BoxSelectionList = <T,>({
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={styles.listContentContainer}
       onLayout={onLayoutInner}
+      getItemLayout={fixedItemWidth ? getItemLayout : undefined}
+      initialScrollIndex={fixedItemWidth ? initialScrollIndex : 0}
     />
   );
 };

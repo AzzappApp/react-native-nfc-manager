@@ -182,7 +182,10 @@ function SelectSectionListItem<ItemT>({
       }}
     >
       {renderItem?.({ item, isSelected, index }) ?? (
-        <Text variant="medium" style={styles.defaultItemRenderer}>
+        <Text
+          variant={isSelected ? 'button' : 'medium'}
+          style={[styles.defaultItemRenderer]}
+        >
           {(item as any)?.[labelField]}
         </Text>
       )}
@@ -200,7 +203,10 @@ const styleSheet = createStyleSheet(appearance => ({
     alignItems: 'center',
   },
   selectedItemContainer: {
+    justifyContent: 'center',
     backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey900,
+    borderRadius: 5,
+    height: 32,
   },
   itemContainer: {
     backgroundColor: appearance === 'light' ? colors.white : colors.black,

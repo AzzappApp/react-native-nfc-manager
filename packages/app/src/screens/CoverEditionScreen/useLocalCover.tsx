@@ -7,7 +7,7 @@ import type { CoverEditorState } from '#components/CoverEditor';
 const useLocalCover = (
   saving: boolean,
   webCardId?: string,
-  coverId?: string,
+  coverId?: string | null,
 ) => {
   const [state, setState] = useState<{
     cover: Partial<CoverEditorState> | null;
@@ -39,6 +39,9 @@ const useLocalCover = (
       const fileExists = (
         await Promise.all(
           medias.map(async media => {
+            if (media.uri.startsWith('http')) {
+              return true;
+            }
             try {
               return ReactNativeBlobUtil.fs.exists(
                 media.uri.replace('file://', ''),
@@ -69,6 +72,11 @@ const useLocalCover = (
       loadCover({
         webCardId,
         coverId,
+      });
+    } else if (!saving && !(webCardId && coverId)) {
+      setState({
+        cover: null,
+        loading: false,
       });
     }
     return () => {

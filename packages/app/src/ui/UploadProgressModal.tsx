@@ -4,6 +4,7 @@ import { useIntl } from 'react-intl';
 import { View, StyleSheet, useWindowDimensions } from 'react-native';
 import { colors } from '#theme';
 import Text from '#ui/Text';
+import Button from './Button';
 import ProgressBar from './ProgressBar';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 import type { Subscription, Observable } from 'relay-runtime';
@@ -13,11 +14,13 @@ const UploadProgressModal = ({
   progressIndicators,
   text,
   texts,
+  onCancel,
 }: {
   progressIndicator?: Observable<number> | null;
   progressIndicators?: Array<Observable<number> | null> | null;
   text?: string;
   texts?: string[];
+  onCancel?: () => void;
 }) => {
   const windowWidth = useWindowDimensions().width;
 
@@ -65,6 +68,19 @@ const UploadProgressModal = ({
           ),
         )}
       </View>
+      {onCancel && (
+        <View style={styles.cancelButtonContainer}>
+          <Button
+            variant="secondary"
+            onPress={onCancel}
+            label={intl.formatMessage({
+              defaultMessage: 'Cancel',
+              description: 'Cancel button in upload modal',
+            })}
+            appearance="dark"
+          />
+        </View>
+      )}
     </View>
   );
 };
@@ -122,5 +138,12 @@ const styles = StyleSheet.create({
     color: colors.white,
     textAlign: 'center',
     lineHeight: 36,
+  },
+  cancelButtonContainer: {
+    bottom: 42,
+    left: 0,
+    width: '100%',
+    alignItems: 'center',
+    position: 'absolute',
   },
 });

@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/i18n",
-  "version": "0.5.48",
+  "version": "0.8.2",
   "private": true,
   "types": "index.d.ts",
   "main": "index.js",
@@ -16,6 +16,6 @@
     "clean": "rm -rf node_modules && rm -rf compiled"
   },
   "dependencies": {
-    "@formatjs/cli": "^6.2.10"
+    "@formatjs/cli": "^6.2.12"
   }
 }

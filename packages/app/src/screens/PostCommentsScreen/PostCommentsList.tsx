@@ -19,7 +19,7 @@ import {
 } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import ERRORS from '@azzapp/shared/errors';
-import { isEditor } from '@azzapp/shared/profileHelpers';
+import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import AuthorCartouche from '#components/AuthorCartouche';
@@ -188,7 +188,7 @@ const PostCommentsList = ({
     setSubmitting(true);
     if (!submitting) {
       Keyboard.dismiss();
-      if (isEditor(auth.profileInfos?.profileRole)) {
+      if (profileHasEditorRight(auth.profileInfos?.profileRole)) {
         commit({
           variables: {
             webCardId: auth.profileInfos?.webCardId,

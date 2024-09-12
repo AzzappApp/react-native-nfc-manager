@@ -33,6 +33,27 @@ Build IOS application.
 
 ----
 
+
+## Android
+
+### android build
+
+```sh
+[bundle exec] fastlane android build
+```
+
+Build Android application based on ANDROID_TARGET environment variable.
+
+### android deploy
+
+```sh
+[bundle exec] fastlane android deploy
+```
+
+
+
+----
+
 This README.md is auto-generated and will be re-generated every time [_fastlane_](https://fastlane.tools) is run.
 
 More information about _fastlane_ can be found on [fastlane.tools](https://fastlane.tools).

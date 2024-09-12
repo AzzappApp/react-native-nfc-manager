@@ -1,0 +1,36 @@
+"""
+Represent an Application User
+"""
+type User {
+  """
+  The ID of an object
+  """
+  id: ID!
+  """
+  Returns the email of the user
+  """
+  email: String
+
+  """
+  Returns the phone number of the user
+  """
+  phoneNumber: String
+
+  """
+  Returns a list of Profiles of the user
+  """
+  profiles: [Profile!]
+
+  """
+  Returns a list of published WebCards of the user
+  """
+  publishedWebCards: [WebCard!] @deprecated(reason: "Use profiles instead")
+  """
+  Returns the active Subscription
+  """
+  userSubscription: UserSubscription
+  """
+  Returns the subscription state of the current user
+  """
+  isPremium: Boolean
+}

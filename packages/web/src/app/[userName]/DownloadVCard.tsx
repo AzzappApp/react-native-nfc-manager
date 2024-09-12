@@ -11,7 +11,7 @@ import { ButtonIcon } from '#ui';
 import { updateContactCardScanCounter } from '#app/actions/statisticsAction';
 
 import Avatar from '#ui/Avatar/Avatar';
-import LinkButton from '#ui/Button/LinkButton';
+import DownloadVCardLinkButton from '#ui/Button/DownloadVCardLinkButton';
 import styles from './DownloadVCard.css';
 import type { WebCard } from '@azzapp/data';
 
@@ -91,8 +91,12 @@ const DownloadVCard = ({
             );
 
             if (contact.webCardId === webCard.id) {
+              const isIE = !!(window as any)?.StyleMedia;
+
               setContact({ ...contact, avatarUrl: additionalData.avatarUrl });
-              const file = new Blob([vCard.toString()], { type: 'text/vcard' });
+              const file = new Blob([vCard.toString()], {
+                type: isIE ? 'application/octet-stream' : 'text/vcard',
+              });
               const fileURL = URL.createObjectURL(file);
               setFileUrl(fileURL);
               setOpened(true);
@@ -172,12 +176,7 @@ const DownloadVCard = ({
               )
             ) : null}
           </div>
-          <span
-            className={cx(
-              styles.message,
-              webCard.isMultiUser ? styles.messageContainsAvatars : '',
-            )}
-          >
+          <span className={cx(styles.message)}>
             <FormattedMessage
               defaultMessage="Add {userName} to your contacts"
               id="5AubE3"
@@ -195,17 +194,18 @@ const DownloadVCard = ({
           </span>
 
           {fileUrl && (
-            <LinkButton
+            <DownloadVCardLinkButton
               size="medium"
               href={fileUrl}
               download={`${webCard.userName}${contact?.firstName.trim() ? `-${contact.firstName.trim()}` : ''}${contact?.lastName.trim() ? `-${contact.lastName.trim()}` : ''}.vcf`}
+              userName={webCard.userName}
             >
               <FormattedMessage
                 defaultMessage="Save Contact Card"
                 id="a4m505"
                 description="Download vCard modal message"
               />
-            </LinkButton>
+            </DownloadVCardLinkButton>
           )}
 
           <ButtonIcon

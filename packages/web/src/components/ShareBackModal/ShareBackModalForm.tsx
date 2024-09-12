@@ -1,7 +1,7 @@
 import { getFormProps, getInputProps, useForm } from '@conform-to/react';
 import { parseWithZod } from '@conform-to/zod';
 import cx from 'classnames';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { SuccessIcon } from '#assets';
@@ -26,6 +26,14 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
     userId,
     token,
   );
+
+  const refs = {
+    lastname: useRef<HTMLInputElement>(null),
+    phone: useRef<HTMLInputElement>(null),
+    email: useRef<HTMLInputElement>(null),
+    company: useRef<HTMLInputElement>(null),
+    title: useRef<HTMLInputElement>(null),
+  };
 
   const [lastResult, action] = useFormState(
     shareBackActionWithUserIdAndToken,
@@ -95,6 +103,14 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
                 id: 'v7tRnI',
                 description: 'First Name label',
               })}
+              inputMode="text"
+              enterKeyHint="next"
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  refs.lastname.current?.focus();
+                }
+              }}
             />
           </div>
 
@@ -114,6 +130,13 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
                 id: 'A5iAGb',
                 description: 'Last Name label',
               })}
+              ref={refs.lastname}
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  refs.phone.current?.focus();
+                }
+              }}
             />
           </div>
           <div className={styles.formField}>
@@ -132,6 +155,13 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
                 id: 'tZyK9Z',
                 description: 'Phone label',
               })}
+              ref={refs.phone}
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  refs.email.current?.focus();
+                }
+              }}
             />
           </div>
           <div className={styles.formField}>
@@ -150,6 +180,14 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
                 id: 'pf0OWK',
                 description: 'Email label',
               })}
+              ref={refs.email}
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  refs.company.current?.focus();
+                }
+              }}
+              inputMode="email"
             />
           </div>
           <div className={styles.formField}>
@@ -168,6 +206,13 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
                 id: 'tZcw8b',
                 description: 'Company label',
               })}
+              ref={refs.company}
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  refs.title.current?.focus();
+                }
+              }}
             />
           </div>
           <div className={styles.formField}>
@@ -186,6 +231,7 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
                 id: 'LrvwcI',
                 description: 'Title label',
               })}
+              ref={refs.title}
             />
           </div>
         </div>

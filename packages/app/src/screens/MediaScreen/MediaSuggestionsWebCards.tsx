@@ -1,10 +1,10 @@
+import range from 'lodash/range';
 import {
   useMemo,
   useCallback,
   startTransition,
   useEffect,
   useRef,
-  Suspense,
 } from 'react';
 import { useIntl } from 'react-intl';
 import { View } from 'react-native';
@@ -12,15 +12,16 @@ import Animated, { FadeOut } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, usePaginationFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-import { isEditor } from '@azzapp/shared/profileHelpers';
+import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
+import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import { colors, shadow } from '#theme';
 import CoverLink from '#components/CoverLink';
 import CoverList from '#components/CoverList';
+import Skeleton from '#components/Skeleton';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useAuthState from '#hooks/useAuthState';
 import useToggleFollow from '#hooks/useToggleFollow';
 import CoverLink_webCardFragment from '#relayArtifacts/CoverLink_webCard.graphql';
-import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
 import type { CoverLinkProps } from '#components/CoverLink';
 import type { MediaSuggestionsWebCards_profile$key } from '#relayArtifacts/MediaSuggestionsWebCards_profile.graphql';
@@ -29,56 +30,19 @@ import type { StyleProp, ViewStyle } from 'react-native';
 
 type MediaSuggestionsWebCardsProps = {
   profile: MediaSuggestionsWebCards_profile$key;
-  webcard: MediaSuggestionsWebCards_webCard$key;
-  coverListStyle?: StyleProp<ViewStyle>;
-  header?: React.ReactNode;
+  webCard: MediaSuggestionsWebCards_webCard$key | null;
   isCurrentTab: boolean;
+  style?: StyleProp<ViewStyle>;
 };
 
 const NB_PROFILES = 6;
 
 const MediaSuggestionsWebCards = ({
   profile,
-  webcard,
-  coverListStyle,
-  header,
+  webCard,
   isCurrentTab,
-}: MediaSuggestionsWebCardsProps) => (
-  <View>
-    {header}
-    <Suspense
-      fallback={
-        <View
-          style={[
-            { height: 260, alignItems: 'center', justifyContent: 'center' },
-            coverListStyle,
-          ]}
-        >
-          <ActivityIndicator />
-        </View>
-      }
-    >
-      <MediaSuggestionsWebCardsInner
-        profile={profile}
-        webcard={webcard}
-        style={coverListStyle}
-        isCurrentTab={isCurrentTab}
-      />
-    </Suspense>
-  </View>
-);
-
-const MediaSuggestionsWebCardsInner = ({
-  profile,
-  webcard,
   style,
-  isCurrentTab,
-}: {
-  profile: MediaSuggestionsWebCards_profile$key;
-  webcard: MediaSuggestionsWebCards_webCard$key;
-  style?: StyleProp<ViewStyle>;
-  isCurrentTab: boolean;
-}) => {
+}: MediaSuggestionsWebCardsProps) => {
   const { data, refetch, loadNext, hasNext, isLoadingNext } =
     usePaginationFragment(
       graphql`
@@ -109,8 +73,8 @@ const MediaSuggestionsWebCardsInner = ({
         cardIsPublished
       }
     `,
-    webcard,
-  );
+    webCard,
+  ) ?? { cardIsPublished: false };
 
   const isCurrentTabRef = useRef(isCurrentTab);
   useEffect(() => {
@@ -185,69 +149,115 @@ const CoverLinkWithOptions = ({
 
   const intl = useIntl();
 
+  const onPress = useCallback(() => {
+    if (!cardIsPublished) {
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage({
+          defaultMessage:
+            'This action can only be done from a published WebCard.',
+          description:
+            'MediaSuggestionsWebCards - AlertMessage when the user is viewing a post with an unpublished WebCard',
+        }),
+      });
+      return;
+    }
+
+    if (profileHasEditorRight(profileInfos?.profileRole)) {
+      startTransition(() => {
+        toggleFollow(props.webCardId, userName, !isFollowing);
+      });
+    } else if (isFollowing) {
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage({
+          defaultMessage: 'Your role does not permit this action',
+          description:
+            'Error message when trying to unfollow a WebCard without being an admin',
+        }),
+      });
+    } else {
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage({
+          defaultMessage: 'Your role does not permit this action',
+          description:
+            'Error message when trying to follow a WebCard without being an admin',
+        }),
+      });
+    }
+  }, [
+    cardIsPublished,
+    intl,
+    isFollowing,
+    profileInfos?.profileRole,
+    props.webCardId,
+    toggleFollow,
+    userName,
+  ]);
+
   return (
     <Animated.View style={styles.coverContainerStyle} exiting={FadeOut}>
-      <CoverLink {...props} width={135} />
+      <CoverLink {...props} width={COVER_SUGGESTIONS_WIDTH} />
       <View style={styles.bottomActions}>
-        <Button
-          variant={isFollowing ? 'little_round_inverted' : 'little_round'}
-          label={
-            isFollowing
-              ? intl.formatMessage({
-                  defaultMessage: 'Unfollow',
-                  description: 'Unfollow button label in profile suggestions',
-                })
-              : intl.formatMessage({
-                  defaultMessage: 'Follow',
-                  description: 'Follow button label in profile suggestions',
-                })
-          }
-          style={{ flex: 1 }}
-          onPress={() => {
-            if (!cardIsPublished) {
-              Toast.show({
-                type: 'error',
-                text1: intl.formatMessage({
-                  defaultMessage:
-                    'This action can only be done from a published WebCard.',
-                  description:
-                    'MediaSuggestionsWebCards - AlertMessage when the user is viewing a post with an unpublished WebCard',
-                }),
-              });
-              return;
-            }
-
-            if (isEditor(profileInfos?.profileRole)) {
-              startTransition(() => {
-                toggleFollow(props.webCardId, userName, !isFollowing);
-              });
-            } else if (isFollowing) {
-              Toast.show({
-                type: 'error',
-                text1: intl.formatMessage({
-                  defaultMessage: 'Your role does not permit this action',
-                  description:
-                    'Error message when trying to unfollow a WebCard without being an admin',
-                }),
-              });
-            } else {
-              Toast.show({
-                type: 'error',
-                text1: intl.formatMessage({
-                  defaultMessage: 'Your role does not permit this action',
-                  description:
-                    'Error message when trying to follow a WebCard without being an admin',
-                }),
-              });
-            }
-          }}
-        />
+        <FollowButton isFollowing={isFollowing} onPress={onPress} />
       </View>
     </Animated.View>
   );
 };
+type FollowButtonProps = {
+  onPress?: () => void;
+  isFollowing: boolean;
+  disabled?: boolean;
+};
+
+const FollowButton = ({
+  onPress,
+  isFollowing,
+  disabled,
+}: FollowButtonProps) => {
+  const intl = useIntl();
+  return (
+    <Button
+      variant={isFollowing ? 'little_round_inverted' : 'little_round'}
+      label={
+        isFollowing
+          ? intl.formatMessage({
+              defaultMessage: 'Unfollow',
+              description: 'Unfollow button label in profile suggestions',
+            })
+          : intl.formatMessage({
+              defaultMessage: 'Follow',
+              description: 'Follow button label in profile suggestions',
+            })
+      }
+      disabled={disabled}
+      style={{ flex: 1 }}
+      onPress={onPress}
+    />
+  );
+};
 
 export default MediaSuggestionsWebCards;
+
+export const MediaSuggestionWebCardFallback = () => {
+  const styles = useStyleSheet(styleSheet);
+  return (
+    <View style={[styles.containerStyle, { flexDirection: 'row' }]}>
+      {range(0, 4).map(index => (
+        <View key={index} style={styles.coverContainerStyle}>
+          <Skeleton style={styles.coverContainerFallback} key={index} />
+          <View style={styles.bottomActions}>
+            <FollowButton isFollowing={false} disabled />
+          </View>
+        </View>
+      ))}
+    </View>
+  );
+};
+
+export const COVER_SUGGESTIONS_WIDTH = 135;
+export const COVER_SUGGESTIONS_PADDING = 5;
 
 const styleSheet = createStyleSheet(appearance => ({
   containerStyle: {
@@ -260,10 +270,15 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   coverContainerStyle: {
     backgroundColor: appearance === 'light' ? colors.white : colors.black,
-    padding: 5,
-    gap: 5,
+    padding: COVER_SUGGESTIONS_PADDING,
+    gap: COVER_SUGGESTIONS_PADDING,
     borderRadius: 15,
     ...shadow(appearance, 'bottom'),
+  },
+  coverContainerFallback: {
+    width: COVER_SUGGESTIONS_WIDTH,
+    borderRadius: COVER_SUGGESTIONS_WIDTH * COVER_CARD_RADIUS,
+    aspectRatio: COVER_RATIO,
   },
   bottomActions: {
     flexDirection: 'row',

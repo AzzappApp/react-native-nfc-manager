@@ -9,6 +9,9 @@ import PostRendererMedia from '#components/PostList/PostRendererMedia';
 import type { PostRendererMediaProps } from '#components/PostList/PostRendererMedia';
 import type { PostRendererMediaTestQuery } from '#relayArtifacts/PostRendererMediaTestQuery.graphql';
 
+jest.mock('#components/medias/MediaVideoRenderer', () => 'MediaVideoRenderer');
+jest.mock('#components/medias/MediaImageRenderer', () => 'MediaImageRenderer');
+
 const renderPost = (props?: Partial<PostRendererMediaProps>) => {
   const environement = createMockEnvironment();
   environement.mock.queueOperationResolver(operation =>

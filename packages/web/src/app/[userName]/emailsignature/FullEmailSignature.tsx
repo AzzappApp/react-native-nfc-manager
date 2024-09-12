@@ -7,7 +7,10 @@ import { colors, getTextColor } from '@azzapp/shared/colorsHelpers';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { parseEmailSignature } from '@azzapp/shared/emailSignatureHelpers';
 import { getImageURLForSize } from '@azzapp/shared/imagesHelpers';
-import { formatDisplayName } from '@azzapp/shared/stringHelpers';
+import {
+  formatDisplayName,
+  formatPhoneNumberUri,
+} from '@azzapp/shared/stringHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import mailLogo from '@azzapp/web/public/signature/mail.png';
 import phoneLogo from '@azzapp/web/public/signature/phone.png';
@@ -112,7 +115,6 @@ const FullEmailSignature = ({
         : buildSaveMyContactSignature(
             buildUserUrl(webCard.userName) + '?c=' + compressedContactCard,
           );
-
     const type = 'text/html';
     const blob = new Blob([url], { type });
     const data = [new ClipboardItem({ [type]: blob })];
@@ -197,7 +199,7 @@ const FullEmailSignature = ({
             </tr>
           )}
           <tr>
-            <td height="100%" valign="top" width="100%">
+            <td height="100%" valign="top" width="50%">
               <div>
                 <div>
                   <div
@@ -275,7 +277,7 @@ const FullEmailSignature = ({
               valign="top"
               style={{
                 width: '50%',
-                paddingLeft: '30px',
+                paddingLeft: '15px',
                 borderLeft: '1px solid  #E2E1E3',
               }}
             >
@@ -444,72 +446,93 @@ export function buildCardSignature(
   readableColor: string,
 ) {
   let card = `
-  <table  border="0" cellpadding="0" cellspacing="0" 
-    style="table-layout: fixed;max-width:  500px; text-decoration: unset !important; width:100%;">
+  <table  border="0" cellpadding="0" cellspacing="0" style="width:550px; text-decoration: unset !important;">
     <tbody>`;
   if (avatarUrl) {
     card += `<tr>
               <td height="60px" valign="top" colspan="2">
-                <img style="width: 60px; height: 60px; border-radius: 30px; margin-bottom: 20px;"  src="${avatarUrl}" />
+                <img width="60px" height="60px" style="width: 60px; height: 60px; border-radius: 30px; margin-bottom: 20px;"  src="${avatarUrl}" />
               </td>
             </tr>`;
   }
-  card += `<tr style="max-width: 100% !important">
-            <td height="100%" valign="top" style="width:100% !important; flex-direction:column; justify-content:space-evenly">
-           <div style="height: 100%">`;
+  card += `<tr>
+            <td height="100%" valign="top" style="width:225px">
+              <table style="max-width:225px; width 100%">
+                <tbody>`;
   if (displayName) {
-    card += `<div style="text-align: left; color: black; font-size: 16px; font-family: Helvetica Neue; font-weight: 500 !important; word-wrap: break-word; line-height: 20px; margin-bottom:5px">${displayName}</div>`;
+    card += `<tr><td style="margin-bottom:5px"><span style="text-align: left; color: black; font-size: 16px; font-family: Helvetica Neue; font-weight: 500 !important; word-wrap: break-word; line-height: 20px;">${displayName}</span></td></tr>`;
   }
   if (title) {
-    card += `<div style="text-align: left; color: black; font-size: 14px; font-family: Helvetica Neue; font-weight: 500; word-wrap: break-word; color: ${primaryColor};line-height: 18px; margin-bottom:5px">${title}</div>`;
+    card += `<tr><td style="margin-bottom:5px"><span style="text-align: left; color: black; font-size: 14px; font-family: Helvetica Neue; font-weight: 500; word-wrap: break-word; color: ${primaryColor};line-height: 18px;">${title}</span></td></tr>`;
   }
   if (company) {
-    card += ` <div style="text-align: left; color: black; font-size: 12px; font-family: Helvetica Neue; font-weight: 400; word-wrap: break-word; color : #87878E; margin-bottom:5px">${company}</div>`;
+    card += `<tr><td style="text-align: left; color: black; font-size: 12px; font-family: Helvetica Neue; font-weight: 400; word-wrap: break-word; color : #87878E; margin-bottom:5px">${company}</td></tr>`;
   }
-  card += `</div>`;
-  card += `<a href="${url}" rel=“noopener” noreferrer target=“_blank”  style="text-decoration: unset !important;">
-            <table style="background-color: ${primaryColor};height:34px;width:125px;padding-left: 10px;padding-right: 10px;border-radius:48px;font-size:12px;margin-top:12px">
-            <tbody> 
-              <tr>
-                <td style="vertical-align: middle; text-align: center;color: ${readableColor}; font-size: 12px; font-family: Helvetica; font-weight: 700">
-                  Save my contact
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          </a>
-        </td>
-   <td  height="100%" valign="top" style="width:100% !important; padding-left: 30px; border-left: 1px solid  #E2E1E3">`;
+  card += `<tr>
+            <td>
+              <a href="${url}" rel=“noopener” noreferrer target=“_blank”  style="text-decoration: none !important;">
+                <table style="background-color: ${primaryColor};height:34px;width:125px;padding-left: 10px;padding-right: 10px;border-radius:48px;font-size:12px;margin-top:12px">
+                <tbody> 
+                  <tr>
+                    <td style="vertical-align: middle; text-align: center;color: ${readableColor}; font-size: 12px; font-family: Helvetica; font-weight: 700">
+                      <span style="text-decoration: unset !important;color: ${readableColor};">Save my contact</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              </a>
+            </td>
+          </tr>`;
 
+  card += `</tbody>
+          </table>
+          </td>
+          <td  height="100%" valign="top" style="padding-left: 15px; width:300px, border-left: 1px solid  #E2E1E3">
+            <table style="width:300px; width 100%">`;
   if (phones) {
     for (let index = 0; index < phones.length; index++) {
-      card += `<div style="height:20px; width:100%; display:inline-block; vertical-align: middle;">
-                  <img src="${process.env.NEXT_PUBLIC_URL}${phoneLogo.src}"  style="width: 14px; height: 14px;vertical-align: middle"/>
-                   <a href="tel:${phones[index]}" rel=“noopener” noreferrer target=“_blank”  style="text-decoration: unset !important;color:black;font-size: 12px;font-weight:400px; color: black">
-                    ${phones[index]}
-                  </span>
-              </div>`;
+      const formattedPoneNumber = formatPhoneNumberUri(phones[index]);
+      if (formattedPoneNumber) {
+        card += `<tr>
+                    <td style="height:20px; width:100%; display:inline-block; vertical-align: middle;">
+                       <a href="${formattedPoneNumber}" rel=“noopener” noreferrer target=“_blank” style="text-decoration: unset !important;color:black;font-size: 12px;font-weight:400px; color: black">
+                           <img src="${process.env.NEXT_PUBLIC_URL}${phoneLogo.src}"   height="14px" width="14px" style="width: 14px; height: 14px;vertical-align: middle"/>
+                         <span style="text-decoration: unset !important;color:black;font-size: 12px;font-weight:400px; color: black">${phones[index]}</span>
+                      </a>
+                    </td>
+                  </tr>`;
+      }
     }
   }
   if (mails) {
     for (let index = 0; index < mails.length; index++) {
-      card += `<div style="height:20px; width:100%; display:inline-block; vertical-align: middle;">
-                  <img src="${process.env.NEXT_PUBLIC_URL}${mailLogo.src}"  style="width: 14px; height: 14px;vertical-align: middle"/>
+      card += `<tr>
+             <td style="height:20px; width:100%; display:inline-block; vertical-align: middle;">
+                 
                    <a href="mailto:${mails[index]}" rel=“noopener” noreferrer target=“_blank”  style="text-decoration: unset !important;color:black;font-size: 12px;font-weight:400px; color: black">
-                    ${mails[index]}
-                    </a>
-              </div>`;
+                      <img src="${process.env.NEXT_PUBLIC_URL}${mailLogo.src}"   height="14px" width="14px" style="width: 14px; height: 14px;vertical-align: middle"/>
+                   <span style="text-decoration: unset !important;color:black;font-size: 12px;font-weight:400px; color: black;text-decoration: unset !important;">${mails[index]}</span>
+                  </a>
+                </td>
+              </tr>`;
     }
   }
   if (companyLogo) {
-    card += `<a href="${url}" rel=“noopener” noreferrer target=“_blank”  style="text-decoration: unset !important;">
-      <img style="margin-top:15px; height: 60px; object-fit: contain;" src="${companyLogo}" />
-    </a>`;
+    card += `<tr>
+              <td>
+                <a href="${url}" rel=“noopener” noreferrer target=“_blank”  style="text-decoration: unset !important;">
+                  <img style="margin-top:15px; height: 60px; object-fit: contain;max-width:195px;" src="${companyLogo}" />
+                </a>
+              </td>
+            </tr>`;
   }
-  card += `</td>
-      </tr>
-    </tbody>
-  </table>`;
+  card += `</table>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+        `;
+
   return card;
 }
 

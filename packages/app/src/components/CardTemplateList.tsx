@@ -16,6 +16,7 @@ import {
   useWindowDimensions,
   ScrollView,
   StatusBar,
+  TouchableOpacity,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useLazyLoadQuery, usePaginationFragment } from 'react-relay';
@@ -29,7 +30,6 @@ import Button, { BUTTON_HEIGHT } from '#ui/Button';
 import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
-import PressableNative from '#ui/PressableNative';
 import SearchBarStatic from '#ui/SearchBarStatic';
 import SelectSection from '#ui/SelectSection';
 import Text from '#ui/Text';
@@ -439,6 +439,12 @@ const CardTemplateList = (
 
   const { height: windowHeight } = useWindowDimensions();
 
+  useEffect(() => {
+    if (templates.length > 0) {
+      onSelectTemplate?.(templates[0]);
+    }
+  }, [onSelectTemplate, templates]);
+
   return (
     <>
       <View style={[styles.root, style]} {...props}>
@@ -495,7 +501,7 @@ const CardTemplateList = (
             variant="secondary"
           />
           {canSkip && (
-            <PressableNative
+            <TouchableOpacity
               onPress={onSkip}
               style={styles.skipButton}
               disabled={loading}
@@ -507,7 +513,7 @@ const CardTemplateList = (
                     'label of the button allowing to skil loading card template',
                 })}
               </Text>
-            </PressableNative>
+            </TouchableOpacity>
           )}
         </View>
       </View>

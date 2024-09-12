@@ -1,15 +1,14 @@
 import dayjs from 'dayjs';
-import { eq } from 'drizzle-orm';
 import {
-  PaymentTable,
   createPaymentMean,
   createSubscription,
-  db,
   getPaymentById,
   getSubscriptionById,
   getUserSubscriptionForWebCard,
+  transaction,
+  updatePayment,
+  createId,
 } from '@azzapp/data';
-import { createId } from '@azzapp/data/helpers/createId';
 import { login } from '#authent';
 import client from './client';
 import {
@@ -172,16 +171,13 @@ export const createPaymentRequest = async ({
 
   const { clientRedirectUrl, ulid } = result.data;
 
-  await db.transaction(async trx => {
-    await createPaymentMean(
-      {
-        userId,
-        webCardId,
-        id: ulid,
-        maskedCard: '',
-      },
-      trx,
-    );
+  await transaction(async () => {
+    await createPaymentMean({
+      userId,
+      webCardId,
+      id: ulid,
+      maskedCard: '',
+    });
 
     const subscription = await getUserSubscriptionForWebCard(userId, webCardId);
 
@@ -189,33 +185,30 @@ export const createPaymentRequest = async ({
       throw new Error('Subscription already active');
     }
 
-    await createSubscription(
-      {
-        userId,
-        webCardId,
-        issuer: 'web',
-        totalSeats,
-        subscriberName: customer.name,
-        subscriberEmail: customer.email,
-        subscriberPhoneNumber: customer.phone,
-        subscriberAddress: customer.address,
-        subscriberCity: customer.city,
-        subscriberZip: customer.zip,
-        subscriberCountry: customer.country,
-        subscriberCountryCode: customer.countryCode,
-        subscriberVatNumber: customer.vatNumber,
-        startAt: date,
-        subscriptionId: createId(),
-        subscriptionPlan,
-        paymentMeanId: ulid,
-        endAt: expirationDate,
-        amount,
-        taxes,
-        rebillManagerId: null,
-        status: 'waiting_payment',
-      },
-      trx,
-    );
+    await createSubscription({
+      userId,
+      webCardId,
+      issuer: 'web',
+      totalSeats,
+      subscriberName: customer.name,
+      subscriberEmail: customer.email,
+      subscriberPhoneNumber: customer.phone,
+      subscriberAddress: customer.address,
+      subscriberCity: customer.city,
+      subscriberZip: customer.zip,
+      subscriberCountry: customer.country,
+      subscriberCountryCode: customer.countryCode,
+      subscriberVatNumber: customer.vatNumber,
+      startAt: date,
+      subscriptionId: createId(),
+      subscriptionPlan,
+      paymentMeanId: ulid,
+      endAt: expirationDate,
+      amount,
+      taxes,
+      rebillManagerId: null,
+      status: 'waiting_payment',
+    });
   });
 
   return {
@@ -321,6 +314,7 @@ export const createSubscriptionRequest = async ({
     canceledAt: null,
     freeSeats: 0,
     lastPaymentError: false,
+    invalidatedAt: null,
   };
 
   const id = await createSubscription(subscription);
@@ -484,13 +478,10 @@ export const generateInvoice = async (webCardId: string, paymentId: string) => {
     throw new Error('Invoice generation failed', { cause: result.error });
   }
 
-  await db
-    .update(PaymentTable)
-    .set({
-      invoiceId: result.data.invoiceId,
-      invoicePdfUrl: result.data.invoicePdfPath,
-    })
-    .where(eq(PaymentTable.id, paymentId));
+  await updatePayment(paymentId, {
+    invoiceId: result.data.invoiceId,
+    invoicePdfUrl: result.data.invoicePdfPath,
+  });
 
   return result.data.invoicePdfPath;
 };

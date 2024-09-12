@@ -1,0 +1,16 @@
+"""
+Media used in web card edition provided by azzapp
+"""
+type ModuleBackground {
+  id: ID!
+  uri: String!
+  resizeMode: ModuleBackgroundResizeMode!
+}
+
+enum ModuleBackgroundResizeMode {
+  cover
+  contain
+  center
+  repeat
+  stretch
+}

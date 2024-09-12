@@ -3,14 +3,21 @@ import { textSmall, vars } from '#app/[userName]/theme.css';
 
 const content = style({
   position: 'relative',
+  display: 'flex',
+  flexDirection: 'column',
+  flex: 1,
+  maxHeight: '100%',
 });
 
 const formFields = style({
+  maxHeight: 'calc(100% - 140px)',
+  overflowY: 'scroll',
   borderBottomStyle: 'solid',
   borderBottomWidth: '1px',
   borderBottomColor: vars.color.grey100,
-  maxHeight: '300px',
-  overflowX: 'scroll',
+  display: 'flex',
+  flexDirection: 'column',
+  flex: 1,
   '::-webkit-scrollbar': {
     display: 'none',
     width: '0 !important',
@@ -25,6 +32,9 @@ const formSpacingInner = style({
 const form = style({
   display: 'flex',
   flexDirection: 'column',
+  flex: 1,
+  maxHeight: 'calc(100vh - 310px)',
+  overflowY: 'scroll',
 });
 
 const formFieldContainer = style([

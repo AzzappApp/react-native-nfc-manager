@@ -1,4 +1,5 @@
 import ImageSize from 'react-native-image-size';
+import type { Media } from './mediaTypes';
 
 /**
  * Returns the size of an image.
@@ -80,23 +81,44 @@ export const isPNG = (uri: string) => uri.toLowerCase().endsWith('.png');
  * console.log(finalMediaList); // Outputs: ['Media A', 'Media B', 'Media C', 'Media A', 'Media B']
  * ```
  */
-export const duplicateMediaToFillSlots = <T>(
+export const duplicateMediaToFillSlots = (
   totalSlots: number,
-  selectedMedias: T[],
-): T[] => {
+  selectedMedias: Media[],
+  maxSelectableVideos?: number | undefined,
+): Media[] => {
   if (selectedMedias.length >= totalSlots) {
     return selectedMedias;
   }
 
-  const filledMediaSlots: T[] = [...selectedMedias];
+  const filledMediaSlots = [...selectedMedias];
+  let filledSlots = 0;
 
-  while (filledMediaSlots.length < totalSlots) {
+  const selectableMedia = [...selectedMedias];
+
+  while (filledMediaSlots.length < totalSlots && selectableMedia.length) {
+    const index = filledSlots % selectableMedia.length;
+
+    const addedMedia = selectableMedia[index];
+
+    if (
+      addedMedia.kind === 'video' &&
+      maxSelectableVideos !== undefined &&
+      filledMediaSlots.filter(media => media.kind === 'video').length >=
+        maxSelectableVideos
+    ) {
+      selectableMedia.splice(index, 1);
+      continue;
+    }
+
     // Add to the list the media to be duplicated.
     // The media to be duplicated is from the initial list of selected medias, cycling through them.
     filledMediaSlots.push(
-      filledMediaSlots[filledMediaSlots.length % selectedMedias.length],
+      selectableMedia[filledSlots % selectableMedia.length],
     );
+    filledSlots++;
   }
 
   return filledMediaSlots;
 };
+
+export const getMediaId = (media: Media) => media.galleryUri ?? media.uri;

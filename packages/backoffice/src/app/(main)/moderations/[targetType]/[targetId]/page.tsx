@@ -13,32 +13,29 @@ import {
   Link as MuiLink,
   Breadcrumbs,
 } from '@mui/material';
-import { and, desc, eq, sql } from 'drizzle-orm';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import {
-  PostCommentTable,
-  PostTable,
-  WebCardTable,
-  db,
-  ReportTable,
-  ProfileTable,
+  getPostById,
+  getPostCommentById,
+  getProfilesByWebCard,
+  getTargetReports,
+  getWebCardById,
+  type Post,
+  type PostComment,
+  type Report,
+  type ReportTargetType,
+  type WebCard,
 } from '@azzapp/data';
 import { getImageURLForSize, getVideoURL } from '@azzapp/shared/imagesHelpers';
 import { deleteRelatedItem, ignoreReport } from './reportsAction';
 import ReportsList from './ReportsList';
 import type { ReportStatus } from '../../page';
-import type {
-  Post,
-  PostComment,
-  Report,
-  TargetType,
-  WebCard,
-} from '@azzapp/data';
 
 type ReportPageProps = {
   params: {
     targetId: string;
-    targetType: TargetType;
+    targetType: ReportTargetType;
   };
   searchParams: {
     page?: string;
@@ -46,60 +43,67 @@ type ReportPageProps = {
 };
 
 type Item = {
-  targetType: TargetType;
-  WebCard: WebCard;
-  Post?: Post;
-  PostComment?: PostComment;
+  targetType: ReportTargetType;
+  webCard: WebCard;
+  post?: Post;
+  postComment?: PostComment;
 };
 
 const getItem = async (
   targetId: string,
-  targetType: TargetType,
-): Promise<Item> => {
-  if (targetType === 'comment') {
-    return db
-      .select()
-      .from(PostCommentTable)
-      .where(eq(PostCommentTable.id, targetId))
-      .innerJoin(PostTable, eq(PostTable.id, PostCommentTable.postId))
-      .innerJoin(WebCardTable, eq(PostTable.webCardId, WebCardTable.id))
-      .then(rows => ({ ...rows[0], targetType }));
-  } else if (targetType === 'post') {
-    return db
-      .select()
-      .from(PostTable)
-      .where(eq(PostTable.id, targetId))
-      .innerJoin(WebCardTable, eq(PostTable.webCardId, WebCardTable.id))
-      .then(rows => ({ ...rows[0], targetType }));
-  } else if (targetType === 'webCard') {
-    return db
-      .select()
-      .from(WebCardTable)
-      .where(eq(WebCardTable.id, targetId))
-      .then(rows => ({ WebCard: { ...rows[0] }, targetType }));
+  targetType: ReportTargetType,
+): Promise<Item | null> => {
+  let webCardId = targetType === 'webCard' ? targetId : undefined;
+  let postId = targetType === 'post' ? targetId : undefined;
+  const postCommentId = targetType === 'comment' ? targetId : undefined;
+
+  let postComment: PostComment | undefined = undefined;
+  if (postCommentId) {
+    postComment = (await getPostCommentById(postCommentId)) ?? undefined;
+    if (!postComment) {
+      return null;
+    }
+    postId = postComment.postId;
   }
 
-  throw new Error('Invalid targetType');
+  let post: Post | undefined = undefined;
+  if (postId) {
+    post = (await getPostById(postId)) ?? undefined;
+    if (!post) {
+      return null;
+    }
+    webCardId = post.webCardId;
+  }
+
+  if (!webCardId) {
+    return null;
+  }
+  const webCard = await getWebCardById(webCardId);
+  if (!webCard) {
+    return null;
+  }
+
+  return {
+    targetType,
+    webCard,
+    post,
+    postComment,
+  };
 };
 
-const getOwner = async (webCardId: string) => {
-  const query = db
-    .select()
-    .from(ProfileTable)
-    .where(
-      and(
-        eq(ProfileTable.webCardId, webCardId),
-        eq(ProfileTable.profileRole, 'owner'),
+const getOwner = async (webCardId: string) =>
+  getProfilesByWebCard(webCardId)
+    .then(profiles =>
+      profiles.filter(
+        profile => !profile.deleted && profile.profileRole === 'owner',
       ),
-    );
-
-  return query.then(rows => rows[0]);
-};
+    )
+    .then(profiles => profiles[0] ?? null);
 
 const getStatus = (reports: Report[]): ReportStatus => {
   const treated = reports.find(({ treatedAt }) => !!treatedAt);
   if (!treated || !treated.treatedAt) {
-    return 'Opened';
+    return 'open';
   }
 
   const lastReportDate = reports.reduce(
@@ -107,7 +111,7 @@ const getStatus = (reports: Report[]): ReportStatus => {
     -Infinity,
   );
 
-  return treated.treatedAt.getTime() <= lastReportDate ? 'Opened' : 'Closed';
+  return treated.treatedAt.getTime() <= lastReportDate ? 'open' : 'closed';
 };
 
 const ReportPage = async ({
@@ -117,37 +121,24 @@ const ReportPage = async ({
   let page = searchParams.page ? parseInt(searchParams.page, 10) : 1;
   page = Math.max(isNaN(page) ? 1 : page, 1);
 
-  const reports = await db
-    .select()
-    .from(ReportTable)
-    .where(
-      and(
-        eq(ReportTable.targetId, targetId),
-        eq(ReportTable.targetType, targetType),
-      ),
-    )
-    .offset((page - 1) * PAGE_SIZE)
-    .orderBy(desc(ReportTable.createdAt))
-    .limit(PAGE_SIZE);
-
-  const [reportCount] = await db
-    .select({ count: sql`count(*)`.mapWith(Number) })
-    .from(ReportTable)
-    .where(
-      and(
-        eq(ReportTable.targetId, targetId),
-        eq(ReportTable.targetType, targetType),
-      ),
-    );
-
   const item = await getItem(targetId, targetType);
-  const owner = await getOwner(item.WebCard.id);
+  if (!item) {
+    return notFound();
+  }
+  const owner = await getOwner(item.webCard.id);
+
+  const { reports, count: reportCount } = await getTargetReports(
+    targetId,
+    targetType,
+    (page - 1) * PAGE_SIZE,
+    PAGE_SIZE,
+  );
 
   const ignoreWithData = ignoreReport.bind(null, targetId, targetType);
   const deleteWithData = deleteRelatedItem.bind(null, targetId, targetType);
   const status = getStatus(reports);
   const deleted =
-    item.PostComment?.deleted || item.Post?.deleted || item.WebCard?.deleted;
+    item.postComment?.deleted || item.post?.deleted || item.webCard?.deleted;
 
   return (
     <div>
@@ -169,29 +160,29 @@ const ReportPage = async ({
       )}
       <Box display="flex" flexDirection="column" alignItems="flex-Start">
         <Card sx={{ mb: 5 }} raised>
-          {item.targetType === 'comment' && item.PostComment && item.Post ? (
+          {item.targetType === 'comment' && item.postComment && item.post ? (
             <CardContent>
               <Typography variant="body2" color="text.secondary">
-                {item.PostComment.comment}
+                {item.postComment.comment}
               </Typography>
               <Chip
                 sx={{ mt: 2, mb: 2 }}
                 label={status}
-                color={status === 'Opened' ? 'warning' : 'default'}
+                color={status === 'open' ? 'warning' : 'default'}
               />
               <Typography variant="body2" color="text.secondary">
                 Post:
                 <Link
-                  href={`${process.env.NEXT_PUBLIC_URL}/${item.WebCard.userName}/post/${item.Post.id}`}
+                  href={`${process.env.NEXT_PUBLIC_URL}/${item.webCard.userName}/post/${item.post.id}`}
                   target="_blank"
-                >{`${process.env.NEXT_PUBLIC_URL}/${item.WebCard.userName}/post/${item.Post.id}`}</Link>
+                >{`${process.env.NEXT_PUBLIC_URL}/${item.webCard.userName}/post/${item.post.id}`}</Link>
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Webcard:
                 <Link
-                  href={`${process.env.NEXT_PUBLIC_URL}/${item.WebCard.userName}`}
+                  href={`${process.env.NEXT_PUBLIC_URL}/${item.webCard.userName}`}
                   target="_blank"
-                >{`${process.env.NEXT_PUBLIC_URL}/${item.WebCard.userName}`}</Link>
+                >{`${process.env.NEXT_PUBLIC_URL}/${item.webCard.userName}`}</Link>
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Owner:
@@ -200,9 +191,9 @@ const ReportPage = async ({
                 </Link>
               </Typography>
             </CardContent>
-          ) : item.targetType === 'post' && item.Post ? (
+          ) : item.targetType === 'post' && item.post ? (
             <>
-              {item.Post.medias.map(media =>
+              {item.post.medias.map(media =>
                 media.startsWith('v') ? (
                   <CardMedia
                     key={media}
@@ -223,12 +214,12 @@ const ReportPage = async ({
 
               <CardContent>
                 <Typography variant="body2" color="text.secondary">
-                  {item.Post.content}
+                  {item.post.content}
                 </Typography>
                 <Chip
                   sx={{ mt: 2, mb: 2 }}
                   label={status}
-                  color={status === 'Opened' ? 'warning' : 'default'}
+                  color={status === 'open' ? 'warning' : 'default'}
                 />
                 <Typography
                   display="flex"
@@ -239,17 +230,17 @@ const ReportPage = async ({
                   Post:
                   <Typography variant="body2" color="text.secondary">
                     <Link
-                      href={`${process.env.NEXT_PUBLIC_URL}/${item.WebCard.userName}/post/${item.Post.id}`}
+                      href={`${process.env.NEXT_PUBLIC_URL}/${item.webCard.userName}/post/${item.post.id}`}
                       target="_blank"
-                    >{`${process.env.NEXT_PUBLIC_URL}/${item.WebCard.userName}/post/${item.Post.id}`}</Link>
+                    >{`${process.env.NEXT_PUBLIC_URL}/${item.webCard.userName}/post/${item.post.id}`}</Link>
                   </Typography>
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   Webcard:
                   <Link
-                    href={`${process.env.NEXT_PUBLIC_URL}/${item.WebCard.userName}`}
+                    href={`${process.env.NEXT_PUBLIC_URL}/${item.webCard.userName}`}
                     target="_blank"
-                  >{`${process.env.NEXT_PUBLIC_URL}/${item.WebCard.userName}`}</Link>
+                  >{`${process.env.NEXT_PUBLIC_URL}/${item.webCard.userName}`}</Link>
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   Owner:
@@ -259,22 +250,22 @@ const ReportPage = async ({
                 </Typography>
               </CardContent>
             </>
-          ) : item.targetType === 'webCard' && item.WebCard ? (
+          ) : item.targetType === 'webCard' && item.webCard ? (
             <CardContent>
               <Typography variant="body2" color="text.secondary">
-                {item.WebCard.userName}
+                {item.webCard.userName}
               </Typography>
               <Chip
                 sx={{ mt: 2, mb: 2 }}
                 label={status}
-                color={status === 'Opened' ? 'warning' : 'default'}
+                color={status === 'open' ? 'warning' : 'default'}
               />
               <Typography variant="body2" color="text.secondary">
                 Webcard:
                 <Link
-                  href={`${process.env.NEXT_PUBLIC_URL}/${item.WebCard.userName}`}
+                  href={`${process.env.NEXT_PUBLIC_URL}/${item.webCard.userName}`}
                   target="_blank"
-                >{`${process.env.NEXT_PUBLIC_URL}/${item.WebCard.userName}`}</Link>
+                >{`${process.env.NEXT_PUBLIC_URL}/${item.webCard.userName}`}</Link>
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Owner:
@@ -292,7 +283,7 @@ const ReportPage = async ({
                 color="primary"
                 startIcon={<Check />}
                 type="submit"
-                disabled={status === 'Closed'}
+                disabled={status === 'closed'}
               >
                 IGNORE
               </Button>
@@ -315,7 +306,7 @@ const ReportPage = async ({
 
       <ReportsList
         reports={reports}
-        count={reportCount.count}
+        count={reportCount}
         page={page}
         pageSize={PAGE_SIZE}
       />

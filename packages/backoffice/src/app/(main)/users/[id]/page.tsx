@@ -3,7 +3,7 @@ import { Box, Breadcrumbs, Link } from '@mui/material';
 import { notFound } from 'next/navigation';
 import {
   getUserById,
-  getProfilesOfUser,
+  getUserProfilesWithWebCard,
   getSubscriptionsOfUser,
   getWebCardProfilesCount,
 } from '@azzapp/data';
@@ -26,7 +26,7 @@ const UserPage = async ({ params: { id } }: UserPageProps) => {
   if (!user) {
     return notFound();
   }
-  const profiles = await getProfilesOfUser(user.id);
+  const profiles = await getUserProfilesWithWebCard(user.id);
 
   const subscriptions = await getSubscriptionsOfUser(user.id);
   const userSubscriptions: SubscriptionWithProfilesCount[] = await Promise.all(
@@ -50,7 +50,7 @@ const UserPage = async ({ params: { id } }: UserPageProps) => {
           Users
         </Link>
       </Breadcrumbs>
-      <UserForm user={user} webCards={profiles.map(({ WebCard }) => WebCard)} />
+      <UserForm user={user} profiles={profiles} />
 
       <Subscriptions
         user={user}

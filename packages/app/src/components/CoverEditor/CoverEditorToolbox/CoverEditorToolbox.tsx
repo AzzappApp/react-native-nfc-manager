@@ -4,6 +4,7 @@ import { ScrollView, Share, StyleSheet, View } from 'react-native';
 import ColorTriptychRenderer from '#components/ColorTriptychRenderer';
 import useToggle from '#hooks/useToggle';
 import { useCoverEditorContext } from '../CoverEditorContext';
+import { extractLottieInfoMemoized } from '../coverEditorHelpers';
 import CoverEditorLinksToolbox from './CoverEditorLinkToolbox';
 import CoverEditorMediaEditToolbox from './CoverEditorMediaEditToolbox';
 import CoverEditorMediaToolbox from './CoverEditorMediaToolbox';
@@ -57,6 +58,8 @@ const CoverEditorToolbox = (
     };
   }
 
+  const lottieInfo = extractLottieInfoMemoized(coverEditorState.lottie);
+
   const intl = useIntl();
 
   return (
@@ -83,14 +86,16 @@ const CoverEditorToolbox = (
             icon="overlay"
             onPress={toggleOverlayImagePicker}
           />
-          <ToolBoxSection
-            label={intl.formatMessage({
-              defaultMessage: 'Media',
-              description: 'Cover Edition - Toolbox media',
-            })}
-            icon="add_media"
-            onPress={() => setCurrentEditionMode('media')}
-          />
+          {(!lottieInfo || lottieInfo.assetsInfos.length > 0) && (
+            <ToolBoxSection
+              label={intl.formatMessage({
+                defaultMessage: 'Media',
+                description: 'Cover Edition - Toolbox media',
+              })}
+              icon="add_media"
+              onPress={() => setCurrentEditionMode('media')}
+            />
+          )}
           <ToolBoxSection
             label={intl.formatMessage({
               defaultMessage: 'Links',

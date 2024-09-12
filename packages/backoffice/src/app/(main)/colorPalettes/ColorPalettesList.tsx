@@ -13,118 +13,40 @@ import {
   Typography,
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import {
-  useCallback,
-  useDeferredValue,
-  useEffect,
-  useState,
-  useTransition,
-} from 'react';
+import { useCallback, useDeferredValue, useMemo, useState } from 'react';
 import DataGrid from '#components/DataGrid';
-import type { ColorStatus, Filters, SortColumn } from './page';
 import type { ColorPalette } from '@azzapp/data';
 import type { SelectChangeEvent } from '@mui/material';
-import type {
-  GridColDef,
-  GridPaginationModel,
-  GridSortModel,
-} from '@mui/x-data-grid';
+import type { GridColDef } from '@mui/x-data-grid';
 
 type ColorPalettesListProps = {
   colorPalettes: ColorPalette[];
-  count: number;
-  page: number;
-  pageSize: number;
-  sortField: SortColumn;
-  sortOrder: 'asc' | 'desc';
-  search: string | null;
-  filters: Filters;
 };
 
-const ColorPalettesList = ({
-  colorPalettes,
-  count,
-  page,
-  pageSize,
-  sortField,
-  sortOrder,
-  search,
-  filters,
-}: ColorPalettesListProps) => {
+type StatusFilter = 'All' | 'Disabled' | 'Enabled';
+
+const ColorPalettesList = ({ colorPalettes }: ColorPalettesListProps) => {
   const router = useRouter();
-  const [loading, startTransition] = useTransition();
-  const [currentSearch, setCurrentSearch] = useState(search ?? '');
-  const defferedSearch = useDeferredValue(currentSearch);
-  const [statusFilter, setStatusFilter] = useState(filters.status);
+  const [currentSearch, setCurrentSearch] = useState('');
+  const deferredSearch = useDeferredValue(currentSearch);
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('All');
 
-  const updateSearchParams = useCallback(
-    (
-      page: number,
-      sort: string,
-      order: string,
-      search: string | null,
-      filters: Filters,
-    ) => {
-      startTransition(() => {
-        router.replace(
-          `/colorPalettes?page=${page}&sort=${sort}&order=${order}&s=${search ?? ''}&status=${filters?.status ?? ''}`,
-        );
-      });
-    },
-    [router, startTransition],
+  const onStatusChange = useCallback((event: SelectChangeEvent) => {
+    const newStatus = event.target.value as StatusFilter;
+    setStatusFilter(newStatus);
+  }, []);
+
+  const items = useMemo(
+    () =>
+      colorPalettes.filter(
+        item =>
+          (statusFilter === 'All' ||
+            (item.enabled ? 'Enabled' : 'Disabled') === statusFilter) &&
+          (!deferredSearch ||
+            item.id.toLowerCase().includes(deferredSearch.toLowerCase())),
+      ),
+    [colorPalettes, deferredSearch, statusFilter],
   );
-
-  const onPageChange = useCallback(
-    (model: GridPaginationModel) => {
-      updateSearchParams(model.page + 1, sortField, sortOrder, search, {
-        status: statusFilter,
-      });
-    },
-    [search, sortField, sortOrder, statusFilter, updateSearchParams],
-  );
-
-  const onSortModelChange = useCallback(
-    (model: GridSortModel) => {
-      updateSearchParams(
-        page,
-        model[0]?.field ?? 'id',
-        model[0]?.sort ?? 'asc',
-        search,
-        {
-          status: statusFilter,
-        },
-      );
-    },
-    [page, search, statusFilter, updateSearchParams],
-  );
-
-  const onStatusChange = useCallback(
-    (event: SelectChangeEvent) => {
-      const newStatus = event.target.value as ColorStatus;
-      setStatusFilter(newStatus);
-      updateSearchParams(1, sortField, sortOrder, search, {
-        status: newStatus,
-      });
-    },
-    [search, sortField, sortOrder, updateSearchParams],
-  );
-
-  useEffect(() => {
-    if (search === defferedSearch) {
-      return;
-    }
-    updateSearchParams(1, sortField, sortOrder, defferedSearch, {
-      status: statusFilter,
-    });
-  }, [
-    defferedSearch,
-    page,
-    search,
-    sortField,
-    sortOrder,
-    statusFilter,
-    updateSearchParams,
-  ]);
 
   return (
     <Box
@@ -164,7 +86,7 @@ const ColorPalettesList = ({
               label="Status"
               onChange={onStatusChange}
             >
-              <MenuItem value={'all'}>All</MenuItem>
+              <MenuItem value={'All'}>All</MenuItem>
               <MenuItem value={'Enabled'}>Enabled</MenuItem>
               <MenuItem value={'Disabled'}>Disabled</MenuItem>
             </Select>
@@ -183,19 +105,7 @@ const ColorPalettesList = ({
       </Box>
       <DataGrid
         columns={columns}
-        rows={colorPalettes}
-        rowCount={count}
-        initialState={{
-          pagination: {
-            paginationModel: { pageSize, page: page - 1 },
-          },
-        }}
-        sortModel={[
-          {
-            field: sortField,
-            sort: sortOrder,
-          },
-        ]}
+        rows={items}
         onRowClick={params => {
           router.push(`/colorPalettes/${params.id}`);
         }}
@@ -204,12 +114,7 @@ const ColorPalettesList = ({
             cursor: 'pointer',
           },
         }}
-        paginationMode="server"
-        sortingMode="server"
-        onPaginationModelChange={onPageChange}
-        onSortModelChange={onSortModelChange}
-        loading={loading}
-        pageSizeOptions={[pageSize]}
+        pageSizeOptions={[25]}
         rowSelection={false}
         sortingOrder={['asc', 'desc']}
       />
