@@ -49,10 +49,17 @@ const Button = (
     variant,
     appearance,
   );
+
+  let color: 'black' | 'white' = variant === 'primary' ? 'white' : 'black';
+
+  if (appearance === 'dark') {
+    color = variant === 'primary' ? 'black' : 'white';
+  }
+
   const buttonProps = {
     accessibilityRole: 'button',
     children: loading ? (
-      <ActivityIndicator color={appearance === 'light' ? 'white' : 'black'} />
+      <ActivityIndicator color={color} />
     ) : (
       <View style={variantStyles.labelContainer}>
         <Text variant="button" style={variantStyles.label} numberOfLines={1}>

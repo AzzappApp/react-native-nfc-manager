@@ -51,7 +51,7 @@ const useQuitWebCard = (
           webCardId,
         },
       },
-      updater: store => updater(store, webCardId),
+      optimisticUpdater: store => updater(store, webCardId),
       onCompleted,
       onError,
     });
