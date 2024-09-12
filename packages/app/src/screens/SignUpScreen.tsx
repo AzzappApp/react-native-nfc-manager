@@ -356,6 +356,7 @@ const SignUpScreen = () => {
           </View>
 
           <Button
+            variant="primary"
             testID="submit"
             label={intl.formatMessage({
               defaultMessage: 'Sign Up',

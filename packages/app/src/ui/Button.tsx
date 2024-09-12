@@ -132,6 +132,7 @@ const computedStyles = createVariantsStyleSheet(appearance => ({
       borderRadius: 12,
       borderCurve: 'continuous',
       paddingHorizontal: 20,
+      overflow: 'hidden',
     },
     labelContainer: {
       flexDirection: 'row',
@@ -153,6 +154,7 @@ const computedStyles = createVariantsStyleSheet(appearance => ({
       paddingRight: 0,
       paddingTop: 0,
       paddingBottom: 0,
+      overflow: 'hidden',
     },
   },
   primary: {
