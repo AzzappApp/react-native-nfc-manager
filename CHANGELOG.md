@@ -1,5 +1,7 @@
-## 0.7.0-canary.30
+## 0.7.0-canary.31
 
+* **feat:**  - Google Analytics ([#4974](https://github.com/AzzappApp/azzapp/pull/4974))
+* **docs:**  - fix typo
 * **fix:**  - 🐛 avoid page hang on post navigation ([#4975](https://github.com/AzzappApp/azzapp/pull/4975))
 * **fix:**  - 🐛 instantly quit webcard with optimistic update, color fix ([#4977](https://github.com/AzzappApp/azzapp/pull/4977))
 * **fix:**  - **subscription:** [#4802](https://github.com/AzzappApp/azzapp/pull/4802) all users were viewed as subscribed + incorrect headers in section editing ([#4964](https://github.com/AzzappApp/azzapp/pull/4964))
@@ -132,6 +134,7 @@
 * **fix:**  - 🐛 improve gesture on hue picker ([#4713](https://github.com/AzzappApp/azzapp/pull/4713))
 * **feat:**  - 🎸 complete feed redesign implementation ([#4632](https://github.com/AzzappApp/azzapp/pull/4632))
 * **feat:**  - deactivation of drizzle and planetscale
+* **fix:**  - update NSPhotoLibraryUsageDescription message ([#4714](https://github.com/AzzappApp/azzapp/pull/4714))
 * **fix:**  - **CI:** Deploy PS change
 * **fix:**  - remove edit button on ContactCard ([#4704](https://github.com/AzzappApp/azzapp/pull/4704))
 * **feat:**  - update congratz screen ([#4705](https://github.com/AzzappApp/azzapp/pull/4705))

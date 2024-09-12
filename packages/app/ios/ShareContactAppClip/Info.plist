@@ -10,8 +10,8 @@
 		<false />
 	</dict>
 	<key>CFBundleShortVersionString</key>
-	<string>0.8.2</string>
+	<string>0.7.0</string>
 	<key>CFBundleVersion</key>
-	<string>31</string>
+	<string>32</string>
 </dict>
 </plist>
