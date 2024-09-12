@@ -43,9 +43,19 @@ const modal = style({
   maxHeight: '100%',
   boxShadow: '0px 1px 25px 0px rgba(0, 0, 0, 0.45)',
   animation: `${slideUp} 0.3s ease-out`,
-  overflow: 'scroll',
+  overflow: 'hidden',
   display: 'flex',
   flexDirection: 'column',
+});
+
+const modalContent = style({
+  width: '100%',
+  height: '100%',
+  overflow: 'auto',
+  '::-webkit-scrollbar': {
+    width: 5,
+  },
+  scrollbarWidth: 'thin',
 });
 
 const modalClosing = style({
@@ -62,6 +72,7 @@ const styles = {
   wrapper,
   wrapperClosing,
   modal,
+  modalContent,
   modalClosing,
   close,
 };

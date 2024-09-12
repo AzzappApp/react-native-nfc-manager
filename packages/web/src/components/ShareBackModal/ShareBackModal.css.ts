@@ -26,6 +26,7 @@ const avatarContainer = style({
   justifyContent: 'center',
   gap: '20px',
   marginBottom: '10px',
+  paddingTop: 5,
 });
 
 const styles = {

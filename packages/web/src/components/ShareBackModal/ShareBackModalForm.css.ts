@@ -34,7 +34,7 @@ const form = style({
   flexDirection: 'column',
   flex: 1,
   maxHeight: 'calc(100vh - 310px)',
-  overflowY: 'scroll',
+  overflowY: 'auto',
 });
 
 const formFieldContainer = style([

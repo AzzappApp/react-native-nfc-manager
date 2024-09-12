@@ -77,13 +77,15 @@ const Modal = forwardRef(
           className={cn(classnames, { [styles.modalClosing]: closing })}
           ref={window}
         >
-          <ButtonIcon
-            onClick={handleClose}
-            size={30}
-            Icon={CloseIcon}
-            className={styles.close}
-          />
-          {children}
+          <div className={styles.modalContent}>
+            <ButtonIcon
+              onClick={handleClose}
+              size={30}
+              Icon={CloseIcon}
+              className={styles.close}
+            />
+            {children}
+          </div>
         </div>
       </div>,
       document.body,
