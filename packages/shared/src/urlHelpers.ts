@@ -13,6 +13,16 @@ export function buildUserUrl(
 }
 
 /**
+ * Builds a user URL from a user name.
+ */
+export function buildReadableUserUrl(
+  userName: string,
+  base: string = process.env.NEXT_PUBLIC_URL ?? 'https://www.azzapp.com/',
+) {
+  return buildUserUrl(userName, base).replace(base, 'azzapp.com/');
+}
+
+/**
  * Builds a post URL from a user name and post.
  */
 export function buildPostUrl(userName: string, postId: string) {

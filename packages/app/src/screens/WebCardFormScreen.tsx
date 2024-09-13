@@ -15,7 +15,7 @@ import { useDebounce } from 'use-debounce';
 import * as z from 'zod';
 import ERRORS from '@azzapp/shared/errors';
 import { isValidUserName } from '@azzapp/shared/stringHelpers';
-import { buildUserUrl } from '@azzapp/shared/urlHelpers';
+import { buildReadableUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import { NextHeaderButton } from '#components/commonsButtons';
 import { useRouter } from '#components/NativeRouter';
@@ -708,7 +708,7 @@ const WebCardFormScreen = ({
                         error && { color: colors.red400 },
                       ]}
                     >
-                      {buildUserUrl(userName)}
+                      {buildReadableUserUrl(userName)}
                     </Text>
                   </>
                 )}

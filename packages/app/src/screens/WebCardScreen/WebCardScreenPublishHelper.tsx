@@ -3,7 +3,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
-import { buildUserUrl } from '@azzapp/shared/urlHelpers';
+import { buildReadableUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors, shadow } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import {
@@ -159,7 +159,7 @@ const WebCardScreenPublishHelper = ({
     setShowPublishModal(false);
     router.backToTop();
   };
-  const url = buildUserUrl(userName);
+  const url = buildReadableUserUrl(userName);
 
   const styles = useStyleSheet(stylesheet);
 
@@ -209,7 +209,7 @@ const WebCardScreenPublishHelper = ({
           <Container style={styles.urlContainer}>
             <Icon icon="earth" style={styles.iconLink} />
             <Text variant="button" numberOfLines={1} style={styles.url}>
-              {url.replace('https://', '')}
+              {url}
             </Text>
           </Container>
           <View style={{ flex: 1, justifyContent: 'center' }}>
