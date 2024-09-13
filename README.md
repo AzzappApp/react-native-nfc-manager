@@ -5,7 +5,7 @@ This is the main repository of the Azzapp application source code.
 ## Development environment
 
 Developing and building the project requires **MacOS version 12+**.
-In addition developpers should install the followings dependencies:
+In addition developers should install the followings dependencies:
 
 - [Node.js](https://nodejs.org/en/) version **20** (recommended install through [nvm](https://github.com/nvm-sh/nvm))
 - [yarn](https://yarnpkg.com/)
@@ -17,7 +17,7 @@ In addition developpers should install the followings dependencies:
 
 In addition one should follow the react-native-cli setup instruction of the [React Native documentation](https://reactnative.dev/docs/0.69/getting-started).
 
-The sources of this project should be edited through [Visual Studio Code](https://code.visualstudio.com/). A recommanded extensions list has been commited in the sources and should be prompted for instalation the first time the project is open in the code editor.
+The sources of this project should be edited through [Visual Studio Code](https://code.visualstudio.com/). A recommanded extensions list has been commited in the sources and should be prompted for installation the first time the project is open in the code editor.
 
 ## Installation and development
 
