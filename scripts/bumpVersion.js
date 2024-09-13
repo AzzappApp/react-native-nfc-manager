@@ -24,7 +24,7 @@ if (preReleaseKind) {
 } else {
   const newPatch = Number(patch) + 1;
   nextVersion = `${major}.${minor}.${newPatch}`;
-  androidVersionCode = `${major}${paddedMinor}${newPatch.toString().padStart(2, '0')}`;
+  androidVersionCode = `${major}${paddedMinor}${newPatch.toString().padStart(2, '0')}0`;
 }
 
 setWorkspaceVersions(nextVersion, androidVersionCode);

@@ -27,6 +27,7 @@ import {
   activeSubscriptionsForWebCardLoader,
   cardModuleByWebCardLoader,
   companyActivityLoader,
+  companyActivityTypeLoader,
   profileByWebCardIdAndUserIdLoader,
   webCardCategoryLoader,
   webCardOwnerLoader,
@@ -501,7 +502,7 @@ export const CompanyActivity: CompanyActivityResolvers = {
   label: labelResolver,
   companyActivityType: async companyActivity => {
     return companyActivity.companyActivityTypeId
-      ? companyActivityLoader.load(companyActivity.companyActivityTypeId)
+      ? companyActivityTypeLoader.load(companyActivity.companyActivityTypeId)
       : null;
   },
 };
