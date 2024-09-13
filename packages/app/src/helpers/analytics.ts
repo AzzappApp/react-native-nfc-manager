@@ -28,7 +28,6 @@ export function logSignup(userId: string) {
  * @param {{ [key: string]: any }} [params]
  */
 export async function logEvent(name: string, params?: { [key: string]: any }) {
-  console.log('logEvent', name, params);
   analytics().logEvent(name, params);
 }
 
