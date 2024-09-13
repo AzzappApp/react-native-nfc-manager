@@ -2,7 +2,7 @@ import { addPass, addPassJWT } from '@reeq/react-native-passkit';
 import { ImageFormat, makeImageFromView } from '@shopify/react-native-skia';
 import { Image } from 'expo-image';
 import { fromGlobalId } from 'graphql-relay';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
   View,
@@ -58,6 +58,7 @@ const contactCardMobileScreenQuery = graphql`
     node(id: $profileId) {
       ... on Profile @alias(as: "profile") {
         id
+        invited
         webCard {
           id
           userName
@@ -65,6 +66,7 @@ const contactCardMobileScreenQuery = graphql`
           cardColors {
             primary
           }
+          cardIsPublished
         }
         lastContactCardUpdate
         createdAt
@@ -214,6 +216,12 @@ export const ContactCardScreen = ({
   const colorScheme = useColorScheme();
 
   const router = useRouter();
+
+  useEffect(() => {
+    if (profile?.invited || !profile?.webCard?.cardIsPublished) {
+      router.backToTop();
+    }
+  }, [profile?.invited, profile?.webCard?.cardIsPublished, router]);
 
   const generateLoadingPass = useCallback(async () => {
     try {
