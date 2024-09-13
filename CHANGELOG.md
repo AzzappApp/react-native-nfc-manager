@@ -1,5 +1,10 @@
-## 0.7.0-canary.32
+## 0.7.0-canary.33
 
+* **fix:**  - pass env properly
+* **fix:**  - EOF?
+* **fix:**  - simple keystore info file
+* **fix:**  - use last version of uppload artifact
+* **feat:**  - github action task to recover keystore
 * **fix:**  - Android button ripple effect  overflow (square) if style was passed in props ([#4993](https://github.com/AzzappApp/azzapp/pull/4993))
 * **feat:**  - Google Analytics ([#4974](https://github.com/AzzappApp/azzapp/pull/4974))
 * **docs:**  - fix typo
