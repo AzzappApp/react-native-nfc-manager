@@ -1,5 +1,8 @@
-## 0.7.0-canary.33
+## 0.7.0-canary.34
 
+* **clean:**  - log ([#5009](https://github.com/AzzappApp/azzapp/pull/5009))
+* **fix:**  - 🐛 ensure contact card is accessed from published profile ([#5005](https://github.com/AzzappApp/azzapp/pull/5005))
+* **fix:**  - click through finger hint ([#5004](https://github.com/AzzappApp/azzapp/pull/5004))
 * **fix:**  - pass env properly
 * **fix:**  - EOF?
 * **fix:**  - simple keystore info file
