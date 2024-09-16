@@ -1,4 +1,4 @@
-## 0.9.0-canary.2
+## 0.9.0-canary.3
 
 * **build:**  - bump version to 0.9.0
 * **build:**  - update checkout
