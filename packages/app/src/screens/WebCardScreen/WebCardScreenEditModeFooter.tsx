@@ -97,14 +97,16 @@ const WebCardScreenEditModeFooter = ({
     <View style={[styles.root, styles.creation]}>
       {webCard.cardModules.length === 0 && (
         <View style={styles.lottieContainer}>
-          <LottieView
-            source={source}
-            autoPlay
-            loop
-            hardwareAccelerationAndroid
-            style={styles.lottie}
-            resizeMode="cover"
-          />
+          <View style={styles.lottie}>
+            <LottieView
+              source={source}
+              autoPlay
+              loop
+              hardwareAccelerationAndroid
+              resizeMode="cover"
+              style={{ flex: 1 }}
+            />
+          </View>
         </View>
       )}
       {webCard.cardModules.length === 0 && (
@@ -170,10 +172,13 @@ const stylesheet = createStyleSheet(theme => ({
     aspectRatio: 2.5,
     borderRadius: 15,
     overflow: 'hidden',
+  },
+  lottieContainer: {
+    ...shadow(theme, 'bottom'),
     marginBottom: 20,
     marginTop: 20,
+    borderRadius: 15,
   },
-  lottieContainer: shadow(theme),
   load: {
     marginTop: 20,
   },
