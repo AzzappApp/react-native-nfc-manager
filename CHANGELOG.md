@@ -1,5 +1,6 @@
-## 0.9.0-canary.5
+## 0.9.0-canary.6
 
+* **fix:**  - 🐛 properly display border and shadow on android ([#5033](https://github.com/AzzappApp/azzapp/pull/5033))
 * **build:**  - bump version to 0.9.0
 * **build:**  - update checkout
 * **build:**  - use last commit on checkout
