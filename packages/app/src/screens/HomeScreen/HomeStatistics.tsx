@@ -229,7 +229,11 @@ const HomeStatistics = ({
                   description: 'Home statistics - Contact card views label',
                 },
                 {
-                  azzappA: <Text variant="azzapp">a</Text>,
+                  azzappA: (
+                    <Text variant="azzapp" style={styles.icon}>
+                      a
+                    </Text>
+                  ),
                 },
               ) as string
             }
@@ -279,7 +283,11 @@ const HomeStatistics = ({
                   description: 'Home statistics - Contact card scans label',
                 },
                 {
-                  azzappA: <Text variant="azzapp">a</Text>,
+                  azzappA: (
+                    <Text variant="azzapp" style={styles.icon}>
+                      a
+                    </Text>
+                  ),
                 },
               ) as string
             }
