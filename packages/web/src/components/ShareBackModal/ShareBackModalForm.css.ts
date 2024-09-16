@@ -33,7 +33,7 @@ const form = style({
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
-  maxHeight: 'calc(100vh - 310px)',
+  maxHeight: 'calc(100% - 310px)',
   overflowY: 'auto',
 });
 
