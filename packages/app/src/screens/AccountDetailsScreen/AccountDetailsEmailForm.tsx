@@ -43,7 +43,7 @@ const AccountDetailsEmailForm = ({
     control,
     handleSubmit,
     setError,
-    formState: { isSubmitting, errors },
+    formState: { isSubmitting, errors, isSubmitSuccessful },
     reset,
   } = useForm<EmailForm>({
     resolver: zodResolver(emailFormSchema),
@@ -140,6 +140,7 @@ const AccountDetailsEmailForm = ({
   });
 
   const { bottom } = useScreenInsets();
+
   return (
     <InputAccessoryView
       visible={visible}
@@ -161,7 +162,7 @@ const AccountDetailsEmailForm = ({
         rightElement={
           <Button
             loading={isSubmitting || isLoading}
-            disabled={isSubmitting || isLoading}
+            disabled={isSubmitSuccessful || isLoading}
             label={intl.formatMessage({
               defaultMessage: 'Save',
               description: 'Edit email address modal save button label',

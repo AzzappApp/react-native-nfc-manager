@@ -85,7 +85,7 @@ const AccountDetailsPhoneNumberForm = ({
     handleSubmit,
     setError,
     clearErrors,
-    formState: { isSubmitting, errors },
+    formState: { isSubmitting, errors, isSubmitSuccessful },
     reset,
   } = useForm<z.infer<typeof phoneNumberFormSchema>>({
     resolver: (data, context, options) => {
@@ -217,7 +217,7 @@ const AccountDetailsPhoneNumberForm = ({
         rightElement={
           <Button
             loading={isSubmitting || isLoading}
-            disabled={isSubmitting || isLoading}
+            disabled={isSubmitSuccessful || isLoading}
             label={intl.formatMessage({
               defaultMessage: 'Save',
               description: 'Edit phone number modal save button label',
