@@ -17,7 +17,7 @@ const AppIntlProvider = dynamic(() => import('../AppIntlProvider'), {
 });
 
 type ShareBackModalProps = Omit<ModalProps, 'children'> & {
-  fullname: string;
+  name: string;
   avatarUrl?: string;
   token: string;
   userId: string;
@@ -29,15 +29,8 @@ type ShareBackModalProps = Omit<ModalProps, 'children'> & {
 // eslint-disable-next-line react/display-name
 const ShareBackModal = forwardRef<ModalActions, ShareBackModalProps>(
   (props, ref) => {
-    const {
-      fullname,
-      avatarUrl,
-      token,
-      userId,
-      webcardId,
-      isMultiUser,
-      initials,
-    } = props;
+    const { name, avatarUrl, token, userId, webcardId, isMultiUser, initials } =
+      props;
 
     const internalRef = useRef<ModalActions>(null);
 
@@ -60,16 +53,14 @@ const ShareBackModal = forwardRef<ModalActions, ShareBackModalProps>(
             )}
           >
             <div className={styles.avatarContainer}>
-              {isMultiUser ? (
-                <>
-                  <Avatar variant="icon" icon={<ShareBackIcon />} />
-                  {avatarUrl ? (
-                    <Avatar variant="image" url={avatarUrl} alt={fullname} />
-                  ) : (
-                    <Avatar variant="initials" initials={initials} />
-                  )}
-                </>
-              ) : null}
+              <>
+                <Avatar variant="icon" icon={<ShareBackIcon />} />
+                {avatarUrl ? (
+                  <Avatar variant="image" url={avatarUrl} alt={name} />
+                ) : (
+                  <Avatar variant="initials" initials={initials} />
+                )}
+              </>
             </div>
             <span className={styles.title}>
               <FormattedMessage
@@ -78,7 +69,7 @@ const ShareBackModal = forwardRef<ModalActions, ShareBackModalProps>(
                 description="Share back modal title"
               />
             </span>
-            <span className={styles.title}>{fullname}</span>
+            <span className={styles.title}>{name}</span>
           </div>
 
           <ShareBackModalForm

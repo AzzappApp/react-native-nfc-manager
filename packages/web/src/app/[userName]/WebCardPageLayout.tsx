@@ -120,6 +120,11 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const fullname =
+    contactDataVCard.firstName || contactDataVCard.lastName
+      ? `${contactDataVCard.firstName} ${contactDataVCard.lastName}`.trim()
+      : '';
+
   return (
     <>
       <div className={styles.wrapper}>
@@ -228,10 +233,7 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
       </div>
       <ShareBackModal
         ref={shareBackModal}
-        fullname={
-          contactDataVCard.companyName ||
-          `${contactDataVCard.firstName} ${contactDataVCard.lastName}`
-        }
+        name={fullname || contactDataVCard.companyName || webCard.userName}
         initials={`${(contactDataVCard.firstName?.length ?? 0) > 0 && (contactDataVCard.lastName?.length ?? 0) > 0 ? `${contactDataVCard.firstName[0]}${contactDataVCard.lastName[0]}` : webCard.companyName ? webCard.companyName.slice(0, 2) : webCard.userName.slice(0, 2)}`}
         userId={contactDataVCard.userId}
         webcardId={webCard.id}

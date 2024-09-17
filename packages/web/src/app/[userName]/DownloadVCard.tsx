@@ -157,7 +157,7 @@ const DownloadVCard = ({
           })}
         >
           <div className={styles.avatarContainer}>
-            {webCard.isMultiUser && contact ? (
+            {contact ? (
               contact?.avatarUrl ? (
                 <Avatar
                   variant="image"
