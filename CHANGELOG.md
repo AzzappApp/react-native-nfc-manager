@@ -1,5 +1,9 @@
-## 0.9.0-canary.6
+## 0.9.0-canary.7
 
+* **fix:**  - 🐛 restore diff for url handling ([#5012](https://github.com/AzzappApp/azzapp/pull/5012))
+* **fix:**  - 🐛 properly count reactions on post ([#5039](https://github.com/AzzappApp/azzapp/pull/5039))
+* **fix:**  - 🐛 query posts based on webcard name as well ([#5043](https://github.com/AzzappApp/azzapp/pull/5043))
+* **fix:**  - 🐛 properly display placeholder color based on theme ([#5042](https://github.com/AzzappApp/azzapp/pull/5042))
 * **fix:**  - 🐛 properly display border and shadow on android ([#5033](https://github.com/AzzappApp/azzapp/pull/5033))
 * **build:**  - bump version to 0.9.0
 * **build:**  - update checkout
