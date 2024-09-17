@@ -16011,10 +16011,10 @@ __metadata:
 
 "expo-contacts@patch:expo-contacts@npm%3A13.0.5#./.yarn/patches/expo-contacts-npm-13.0.5-ee92319df7.patch::locator=%40azzapp%2Fmonorepo%40workspace%3A.":
   version: 13.0.5
-  resolution: "expo-contacts@patch:expo-contacts@npm%3A13.0.5#./.yarn/patches/expo-contacts-npm-13.0.5-ee92319df7.patch::version=13.0.5&hash=1eb384&locator=%40azzapp%2Fmonorepo%40workspace%3A."
+  resolution: "expo-contacts@patch:expo-contacts@npm%3A13.0.5#./.yarn/patches/expo-contacts-npm-13.0.5-ee92319df7.patch::version=13.0.5&hash=f61598&locator=%40azzapp%2Fmonorepo%40workspace%3A."
   peerDependencies:
     expo: "*"
-  checksum: 93efde1c63e607de937fc03b6f823d402ea78ab874164672c188a66c43f61dceeefcd67a8f68a5145acf3e61b2bce05c83dd1d27362be989184a0b2fc4025683
+  checksum: 02a0216c8f4f1f449a42e6b1d6e3a6a904e460fb282d14cc82decc864284176562d08ecc1207d524ac04a788196de3539e5c98f33c83bf471fcb715422f59b0a
   languageName: node
   linkType: hard
 
