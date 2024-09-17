@@ -182,6 +182,7 @@ const SearchBar = ({
               returnKeyType="search"
               onSubmitEditing={onSubmitEditingLocal}
               autoFocus={autoFocus}
+              placeholderTextColor={styles.input.color}
             />
             {isNotFalsyString(searchValue) && (
               <PressableNative
