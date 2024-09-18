@@ -1,5 +1,6 @@
-## 0.9.0-canary.9
+## 0.9.0-canary.10
 
+* **fix:**  - **shareBack:** [#5041](https://github.com/AzzappApp/azzapp/pull/5041) don’t send ga event on server side ([#5052](https://github.com/AzzappApp/azzapp/pull/5052))
 * **fix:**  - remove useless table ([#5035](https://github.com/AzzappApp/azzapp/pull/5035))
 * **feat:**  - **auth:** [#4763](https://github.com/AzzappApp/azzapp/pull/4763) replace react-native-encrypted-storage ([#5034](https://github.com/AzzappApp/azzapp/pull/5034))
 * **fix:**  - **auth:** [#5024](https://github.com/AzzappApp/azzapp/pull/5024) issue on signup log event ([#5050](https://github.com/AzzappApp/azzapp/pull/5050))
