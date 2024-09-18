@@ -11,6 +11,7 @@ import Toast from 'react-native-toast-message';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import { useRouter, type NativeScreenProps } from '#components/NativeRouter';
+import { logSignUp } from '#helpers/analytics';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { confirmRegistration } from '#helpers/MobileWebAPI';
@@ -52,6 +53,8 @@ const ConfirmRegistrationScreen = ({
         token: code,
       });
       const { profileInfos } = tokens;
+
+      logSignUp(tokens.userId);
 
       await dispatchGlobalEvent({
         type: 'SIGN_IN',

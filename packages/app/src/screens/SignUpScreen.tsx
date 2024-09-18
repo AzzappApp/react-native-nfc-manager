@@ -24,7 +24,7 @@ import {
 import { colors } from '#theme';
 import EmailOrPhoneInput from '#components/EmailOrPhoneInput';
 import { useNativeNavigationEvent, useRouter } from '#components/NativeRouter';
-import { logSignup } from '#helpers/analytics';
+import { logEvent } from '#helpers/analytics';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { signup } from '#helpers/MobileWebAPI';
@@ -129,7 +129,6 @@ const SignUpScreen = () => {
           password,
         ).catch(() => {});
         setClearPassword(true);
-
         if (isNotFalsyString(tokens.userId)) {
           // Signin process
           const { profileInfos } = tokens;
@@ -147,9 +146,10 @@ const SignUpScreen = () => {
             },
           });
         } else {
-          const { issuer, userId } = tokens;
-          //here is a signup( not a signin on signup screen)
-          logSignup(userId);
+          const { issuer } = tokens;
+
+          logEvent('sign_up_attempt', { issuer });
+
           router.push({
             route: 'CONFIRM_REGISTRATION',
             params: {

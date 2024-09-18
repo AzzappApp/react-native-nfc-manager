@@ -10,7 +10,7 @@ export function setAnalyticsUserId(profileId: string) {
  * @param {string} userId
  *
  */
-export function logSignup(userId: string) {
+export function logSignUp(userId: string) {
   analytics()
     .setUserId(userId)
     .then(() => {
