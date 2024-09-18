@@ -406,17 +406,27 @@ export type LocalizationMessage = InferSelectModel<
 //#endregion
 
 // #region Media
-export const MediaTable = cols.table('Media', {
-  id: cols.mediaId('id').notNull().primaryKey(),
-  kind: cols.enum('kind', ['image', 'video']).notNull(),
-  height: cols.double('height').notNull(),
-  width: cols.double('width').notNull(),
-  refCount: cols.int('refCount').default(0).notNull(),
-  createdAt: cols
-    .dateTime('createdAt')
-    .notNull()
-    .default(DEFAULT_DATETIME_VALUE),
-});
+export const MediaTable = cols.table(
+  'Media',
+  {
+    id: cols.mediaId('id').notNull().primaryKey(),
+    kind: cols.enum('kind', ['image', 'video']).notNull(),
+    height: cols.double('height').notNull(),
+    width: cols.double('width').notNull(),
+    refCount: cols.int('refCount').default(0).notNull(),
+    createdAt: cols
+      .dateTime('createdAt')
+      .notNull()
+      .default(DEFAULT_DATETIME_VALUE),
+  },
+  table => {
+    return {
+      refCountKey: cols
+        .index('Media_refCount_key')
+        .on(table.refCount, table.createdAt),
+    };
+  },
+);
 
 export type Media = InferSelectModel<typeof MediaTable>;
 //#endregion

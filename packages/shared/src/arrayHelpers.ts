@@ -5,10 +5,10 @@ export type ArrayItemType<T> = T extends ReadonlyArray<infer U> ? U : never;
 
 /**
  * An helper function that filters out null and undefined values from an array
+ * @deprecated Use `array.filter(n => n !== null) or array.filter(n => n!==undefined)` instead
  */
-export const convertToNonNullArray = <T>(
-  val: T[],
-): Array<Exclude<T, null | undefined>> => val.filter(t => t != null) as any;
+export const convertToNonNullArray = <T>(val: T[]) =>
+  val.filter(t => t !== null && t !== undefined);
 
 /**
  * And helper function that returns a shuffled version of the given array using the given seed

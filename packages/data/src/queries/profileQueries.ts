@@ -1,7 +1,7 @@
 import { and, asc, eq, inArray, ne, sql } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/mysql-core';
-import { db } from '../database';
-import { ProfileTable, WebCardTable } from '../schema';
+import { db, transaction } from '../database';
+import { MediaTable, ProfileTable, WebCardTable } from '../schema';
 import { getEntitiesByIds } from './entitiesQueries';
 import type { Profile, WebCard } from '../schema';
 import type { InferInsertModel } from 'drizzle-orm';
@@ -366,7 +366,38 @@ export const getWebCardPendingOwnerProfile = async (
  * @param id - The id of the profile
  */
 export const removeProfile = async (id: string) => {
-  await db().delete(ProfileTable).where(eq(ProfileTable.id, id));
+  await transaction(async () => {
+    const profile = await getProfileById(id);
+
+    if (profile?.avatarId) {
+      await db()
+        .update(MediaTable)
+        .set({ refCount: sql`${MediaTable.refCount} - 1` })
+        .where(eq(MediaTable.id, profile.avatarId));
+    }
+
+    if (profile?.logoId) {
+      await db()
+        .update(MediaTable)
+        .set({ refCount: sql`${MediaTable.refCount} - 1` })
+        .where(eq(MediaTable.id, profile.logoId));
+    }
+
+    await db().delete(ProfileTable).where(eq(ProfileTable.id, id));
+  });
+};
+
+const getAvatarAndLogo = async (profileIds: string[]) => {
+  if (profileIds.length === 0) {
+    return [];
+  }
+  return db()
+    .select({
+      avatarId: ProfileTable.avatarId,
+      logoId: ProfileTable.logoId,
+    })
+    .from(ProfileTable)
+    .where(inArray(ProfileTable.id, profileIds));
 };
 
 /**
@@ -375,7 +406,33 @@ export const removeProfile = async (id: string) => {
  * @param profileIds - The list of profile ids to delete
  */
 export const removeProfiles = async (profileIds: string[]) => {
-  await db().delete(ProfileTable).where(inArray(ProfileTable.id, profileIds));
+  await transaction(async () => {
+    const profiles = await getAvatarAndLogo(profileIds);
+
+    const avatarIds = profiles
+      .map(({ avatarId }) => avatarId)
+      .filter(av => av !== null);
+
+    if (avatarIds.length > 0) {
+      await db()
+        .update(MediaTable)
+        .set({ refCount: sql`${MediaTable.refCount} - 1` })
+        .where(inArray(MediaTable.id, avatarIds));
+    }
+
+    const logoIds = profiles
+      .map(({ logoId }) => logoId)
+      .filter(logo => logo !== null);
+
+    if (logoIds.length > 0) {
+      await db()
+        .update(MediaTable)
+        .set({ refCount: sql`${MediaTable.refCount} - 1` })
+        .where(inArray(MediaTable.id, logoIds));
+    }
+
+    await db().delete(ProfileTable).where(inArray(ProfileTable.id, profileIds));
+  });
 };
 
 /**

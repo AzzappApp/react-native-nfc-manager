@@ -1,4 +1,4 @@
-import { eq, inArray, sql } from 'drizzle-orm';
+import { eq, inArray, sql, asc } from 'drizzle-orm';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { getMediaInfoByPublicIds } from '@azzapp/shared/cloudinaryHelpers';
 import { db } from '../database';
@@ -139,4 +139,13 @@ export const referencesMedias = async (
       .set({ refCount: sql`${MediaTable.refCount} - 1` })
       .where(inArray(MediaTable.id, removedMediaIds));
   }
+};
+
+export const getUnusedMedias = async (limit: number) => {
+  return db()
+    .select()
+    .from(MediaTable)
+    .where(eq(MediaTable.refCount, 0))
+    .orderBy(asc(MediaTable.createdAt))
+    .limit(limit);
 };
