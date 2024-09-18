@@ -82,7 +82,7 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
     if (currentIndexSharedValue.value > 0.5) {
       return (
         'azzapp.com/' +
-          userNames.value[Math.round(currentIndexSharedValue.value - 1)] ?? ''
+        userNames.value[Math.round(currentIndexSharedValue.value - 1)]
       );
     }
 

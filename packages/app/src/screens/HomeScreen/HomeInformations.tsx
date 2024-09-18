@@ -49,36 +49,30 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
   );
 
   const nbLikesValue = useMemo(
-    () =>
-      [
-        0,
-        ...(profiles?.map(({ webCard }) => webCard?.nbPostsLiked ?? 0) ?? []),
-      ] ?? [0],
+    () => [
+      0,
+      ...(profiles?.map(({ webCard }) => webCard?.nbPostsLiked ?? 0) ?? []),
+    ],
     [profiles],
   );
   const nbFollowersValue = useMemo(
-    () =>
-      [
-        0,
-        ...(profiles?.map(({ webCard }) => webCard?.nbFollowers ?? 0) ?? []),
-      ] ?? [0],
+    () => [
+      0,
+      ...(profiles?.map(({ webCard }) => webCard?.nbFollowers ?? 0) ?? []),
+    ],
     [profiles],
   );
 
   const nbFollowingsValue = useMemo(
-    () =>
-      [
-        0,
-        ...(profiles?.map(({ webCard }) => webCard?.nbFollowings ?? 0) ?? []),
-      ] ?? [0],
+    () => [
+      0,
+      ...(profiles?.map(({ webCard }) => webCard?.nbFollowings ?? 0) ?? []),
+    ],
     [profiles],
   );
 
   const nbPostsValue = useMemo(
-    () =>
-      [0, ...(profiles?.map(({ webCard }) => webCard?.nbPosts ?? 0) ?? [])] ?? [
-        0,
-      ],
+    () => [0, ...(profiles?.map(({ webCard }) => webCard?.nbPosts ?? 0) ?? [])],
     [profiles],
   );
 

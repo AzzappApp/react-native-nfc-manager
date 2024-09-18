@@ -283,7 +283,7 @@ const CameraView = (
         style={[
           styles.focusRing,
           {
-            top: (focusPoint?.y ?? 0) - FOCUS_RING_SIZE / 2 ?? 0,
+            top: (focusPoint?.y ?? 0) - FOCUS_RING_SIZE / 2,
             left: (focusPoint?.x ?? 0) - FOCUS_RING_SIZE / 2,
           },
           focusRingStyle,
