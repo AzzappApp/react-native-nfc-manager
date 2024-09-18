@@ -1,5 +1,9 @@
-## 0.9.0-canary.12
+## 0.9.0-canary.13
 
+* **feat:**  - [#2912](https://github.com/AzzappApp/azzapp/pull/2912) clean unused media ([#4995](https://github.com/AzzappApp/azzapp/pull/4995))
+* **fix:**  - display avatar back when appclip is activated. try to show share… ([#5060](https://github.com/AzzappApp/azzapp/pull/5060))
+* **fix:**  - 🐛 properly leave/decline invitation to webcard ([#5062](https://github.com/AzzappApp/azzapp/pull/5062))
+* **build:**  - add CFBundleIconName ([#5063](https://github.com/AzzappApp/azzapp/pull/5063))
 * **fix:**  - 🐛 properly handle transparent PNG ([#5059](https://github.com/AzzappApp/azzapp/pull/5059))
 * **feat:**  - add specific app icon for each env ([#5058](https://github.com/AzzappApp/azzapp/pull/5058))
 * **build:**  - upgrade deps ([#5021](https://github.com/AzzappApp/azzapp/pull/5021))
