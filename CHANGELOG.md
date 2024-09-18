@@ -1,5 +1,6 @@
-## 0.9.0-canary.13
+## 0.9.0-canary.14
 
+* **build:**  - fix podfile
 * **feat:**  - [#2912](https://github.com/AzzappApp/azzapp/pull/2912) clean unused media ([#4995](https://github.com/AzzappApp/azzapp/pull/4995))
 * **fix:**  - display avatar back when appclip is activated. try to show share… ([#5060](https://github.com/AzzappApp/azzapp/pull/5060))
 * **fix:**  - 🐛 properly leave/decline invitation to webcard ([#5062](https://github.com/AzzappApp/azzapp/pull/5062))
