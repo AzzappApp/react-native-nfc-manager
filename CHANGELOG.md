@@ -1,5 +1,8 @@
-## 0.9.0-canary.14
+## 0.9.0-canary.15
 
+* **fix:**  - 🐛 properly load through relay for cover ([#5061](https://github.com/AzzappApp/azzapp/pull/5061))
+* **fix:**  - 🐛 don't display skip with added modules ([#5064](https://github.com/AzzappApp/azzapp/pull/5064))
+* **build:**  - add 120x120 icon
 * **build:**  - fix podfile
 * **feat:**  - [#2912](https://github.com/AzzappApp/azzapp/pull/2912) clean unused media ([#4995](https://github.com/AzzappApp/azzapp/pull/4995))
 * **fix:**  - display avatar back when appclip is activated. try to show share… ([#5060](https://github.com/AzzappApp/azzapp/pull/5060))
