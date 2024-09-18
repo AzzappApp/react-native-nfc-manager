@@ -1,5 +1,8 @@
-## 0.9.0-canary.11
+## 0.9.0-canary.12
 
+* **fix:**  - 🐛 properly handle transparent PNG ([#5059](https://github.com/AzzappApp/azzapp/pull/5059))
+* **feat:**  - add specific app icon for each env ([#5058](https://github.com/AzzappApp/azzapp/pull/5058))
+* **build:**  - upgrade deps ([#5021](https://github.com/AzzappApp/azzapp/pull/5021))
 * **fix:**  - 🐛 ensure replaced color ([#5055](https://github.com/AzzappApp/azzapp/pull/5055))
 * **fix:**  - **shareBack:** [#5041](https://github.com/AzzappApp/azzapp/pull/5041) don’t send ga event on server side ([#5052](https://github.com/AzzappApp/azzapp/pull/5052))
 * **fix:**  - remove useless table ([#5035](https://github.com/AzzappApp/azzapp/pull/5035))
