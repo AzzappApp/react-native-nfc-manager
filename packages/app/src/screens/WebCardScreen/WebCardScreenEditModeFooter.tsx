@@ -184,7 +184,7 @@ const stylesheet = createStyleSheet(theme => ({
   },
 }));
 
-const PLACEHOLDER_BACKGROUND_COLOR = '#000000';
-const PLACEHOLDER_ELEMENT_COLOR = '#FFFFFF';
+const PLACEHOLDER_BACKGROUND_COLOR = '#010101';
+const PLACEHOLDER_ELEMENT_COLOR = '#FEFEFE';
 
 export default WebCardScreenEditModeFooter;
