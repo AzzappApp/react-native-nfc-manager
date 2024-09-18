@@ -1,4 +1,3 @@
-import EncryptedStorage from 'react-native-encrypted-storage';
 import { MMKV } from 'react-native-mmkv';
 import ERRORS from '@azzapp/shared/errors';
 import { clearRecentSearch } from '#screens/SearchScreen/useRecentSearch';
@@ -11,6 +10,11 @@ import { addGlobalEventListener } from './globalEvents';
 const ENCRYPTED_STORAGE_TOKENS_KEY = 'AZZAPP_AUTH';
 const MMKVS_PROFILE_INFOS = '@azzap/auth.profileInfos';
 const MMKVS_HAS_BEEN_SIGNED_IN = '@azzap/auth.hasBeenSignedIn';
+
+export const encryptedStorage = new MMKV({
+  id: `encrypted-storage`,
+  encryptionKey: '@azzapp-encryption-key',
+});
 
 /**
  * The profile infos
@@ -74,15 +78,17 @@ const authStateListener = new Set<(state: AuthState) => void>();
  * Init the store
  */
 export const init = async () => {
-  authTokens = await EncryptedStorage.getItem(ENCRYPTED_STORAGE_TOKENS_KEY)
-    .then(value => (value ? JSON.parse(value) : null))
-    .catch(() => null);
+  const storedAuthToken = encryptedStorage.getString(
+    ENCRYPTED_STORAGE_TOKENS_KEY,
+  );
+
+  authTokens = storedAuthToken ? JSON.parse(storedAuthToken) : null;
 
   addGlobalEventListener(
     'SIGN_UP',
-    async ({ payload: { authTokens: tokens, email, phoneNumber, userId } }) => {
+    ({ payload: { authTokens: tokens, email, phoneNumber, userId } }) => {
       storage.set(MMKVS_HAS_BEEN_SIGNED_IN, true);
-      await EncryptedStorage.setItem(
+      encryptedStorage.set(
         ENCRYPTED_STORAGE_TOKENS_KEY,
         JSON.stringify(tokens),
       );
@@ -97,7 +103,7 @@ export const init = async () => {
 
   addGlobalEventListener(
     'SIGN_IN',
-    async ({
+    ({
       payload: { authTokens: tokens, profileInfos, email, phoneNumber, userId },
     }) => {
       if (profileInfos) {
@@ -117,7 +123,7 @@ export const init = async () => {
         );
       }
       storage.set(MMKVS_HAS_BEEN_SIGNED_IN, true);
-      await EncryptedStorage.setItem(
+      encryptedStorage.set(
         ENCRYPTED_STORAGE_TOKENS_KEY,
         JSON.stringify(tokens),
       );
@@ -168,15 +174,15 @@ export const init = async () => {
   addGlobalEventListener('SIGN_OUT', async () => {
     storage.delete(MMKVS_PROFILE_INFOS);
     clearRecentSearch();
-    await EncryptedStorage.clear();
+    encryptedStorage.clearAll();
     authTokens = null;
     emitAuthState();
   });
 
   addGlobalEventListener(
     'TOKENS_REFRESHED',
-    async ({ payload: { authTokens: tokens } }) => {
-      await EncryptedStorage.setItem(
+    ({ payload: { authTokens: tokens } }) => {
+      encryptedStorage.set(
         ENCRYPTED_STORAGE_TOKENS_KEY,
         JSON.stringify(tokens),
       );
@@ -187,7 +193,7 @@ export const init = async () => {
   addGlobalEventListener('NETWORK_ERROR', async ({ payload: { error } }) => {
     if (error instanceof Error && error.message === ERRORS.INVALID_TOKEN) {
       storage.delete(MMKVS_PROFILE_INFOS);
-      await EncryptedStorage.removeItem(ENCRYPTED_STORAGE_TOKENS_KEY);
+      encryptedStorage.delete(ENCRYPTED_STORAGE_TOKENS_KEY);
       authTokens = null;
       emitAuthState();
     }

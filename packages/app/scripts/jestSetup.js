@@ -32,9 +32,6 @@ jest.mock(
 );
 
 // React Encrypted Storage Mock
-jest.mock('react-native-encrypted-storage');
-
-// React Encrypted Storage Mock
 jest.mock('react-native-vision-camera');
 
 // react-native-keyboard-controller

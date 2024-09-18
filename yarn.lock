@@ -180,7 +180,6 @@ __metadata:
     react-native-confirmation-code-field: ^7.4.0
     react-native-dotenv: ^3.4.11
     react-native-email-link: ^1.16.1
-    react-native-encrypted-storage: ^4.0.3
     react-native-gesture-handler: ^2.19.0
     react-native-haptic-feedback: ^2.3.1
     react-native-image-size: ^1.1.6
@@ -22724,16 +22723,6 @@ __metadata:
     react: ">=16.8.0"
     react-native: ">=0.40.0"
   checksum: d1bc617df9def627afa85433953c0f950c130100dfd5fa186ca368824919aa04aedf484bf70b39e25dfd9c78b9dded599d4e8877ec217fe6f31a9d7ab2a35fb2
-  languageName: node
-  linkType: hard
-
-"react-native-encrypted-storage@npm:^4.0.3":
-  version: 4.0.3
-  resolution: "react-native-encrypted-storage@npm:4.0.3"
-  peerDependencies:
-    react: "*"
-    react-native: "*"
-  checksum: 9d2999c58559f1e4f66d1baf2c3edeff96cf42027900850d94c6bbea24ac9715047ce69bf6e8a73b68aff4508cf35dd88ac494ad5905933286ef3b75cd123e30
   languageName: node
   linkType: hard
 
