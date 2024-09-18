@@ -119,7 +119,7 @@ const WebCardScreenEditModeFooter = ({
           onPress={onAddContent}
         />
       )}
-      {fromCreation && (
+      {fromCreation && webCard.cardModules.length === 0 && (
         <TouchableOpacity onPress={onSkip} style={styles.skipButton}>
           <Text style={styles.skip}>
             {intl.formatMessage({
