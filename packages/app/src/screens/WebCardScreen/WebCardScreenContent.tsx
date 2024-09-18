@@ -107,14 +107,12 @@ const WebCardScreenContent = ({
         ...LoadCardTemplateModal_webCard
         ...AddContentBelowCoverModal_webCard
         ...WebCardScreenEditModeFooter_webCard
+        ...WebCardScreenFooter_webCard
         coverBackgroundColor
         cardColors {
           primary
           dark
           light
-        }
-        cardModules {
-          id
         }
       }
     `,
@@ -423,24 +421,22 @@ const WebCardScreenContent = ({
             </ScreenDidAppear>
           </Suspense>
         </WebCardScreenScrollView>
-        {webCard.cardModules.length > 0 && (
-          <Suspense fallback={null}>
-            <WebCardScreenFooter
-              editing={editing}
-              selectionMode={selectionMode}
-              hasSelectedModules={nbSelectedModules > 0}
-              selectionContainsHiddenModules={selectionContainsHiddenModules}
-              webCard={webCard}
-              onRequestNewModule={onRequestNewModule}
-              onRequestColorPicker={onRequestWebcardColorPicker}
-              onRequestWebCardStyle={openCardStyleModal}
-              onRequestPreview={openPreviewModal}
-              onDelete={onDeleteSelectedModules}
-              onDuplicate={onDuplicateSelectedModules}
-              onToggleVisibility={onToggleSelectedModulesVisibility}
-            />
-          </Suspense>
-        )}
+        <Suspense fallback={null}>
+          <WebCardScreenFooter
+            editing={editing}
+            selectionMode={selectionMode}
+            hasSelectedModules={nbSelectedModules > 0}
+            selectionContainsHiddenModules={selectionContainsHiddenModules}
+            webCard={webCard}
+            onRequestNewModule={onRequestNewModule}
+            onRequestColorPicker={onRequestWebcardColorPicker}
+            onRequestWebCardStyle={openCardStyleModal}
+            onRequestPreview={openPreviewModal}
+            onDelete={onDeleteSelectedModules}
+            onDuplicate={onDuplicateSelectedModules}
+            onToggleVisibility={onToggleSelectedModulesVisibility}
+          />
+        </Suspense>
         <Animated.View style={[styles.background, backgroundStyle]}>
           <Suspense
             fallback={
