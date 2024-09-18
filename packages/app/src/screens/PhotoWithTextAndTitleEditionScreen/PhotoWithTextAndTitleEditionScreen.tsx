@@ -1,4 +1,3 @@
-import { ImageFormat } from '@shopify/react-native-skia';
 import { omit } from 'lodash';
 import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -26,7 +25,10 @@ import {
   preventModalDismiss,
 } from '#components/NativeRouter';
 import { getFileName } from '#helpers/fileHelpers';
-import { saveTransformedImageToFile } from '#helpers/mediaEditions';
+import {
+  getTargetFormatFromPath,
+  saveTransformedImageToFile,
+} from '#helpers/mediaEditions';
 import { downScaleImage } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import useEditorLayout from '#hooks/useEditorLayout';
@@ -305,7 +307,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
     const exportPath = await saveTransformedImageToFile({
       uri,
       resolution: size,
-      format: ImageFormat.JPEG,
+      format: getTargetFormatFromPath(uri),
       quality: 95,
       filter,
       editionParameters,

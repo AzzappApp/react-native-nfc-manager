@@ -180,3 +180,9 @@ export const saveTransformedVideoToFile = async ({
   );
   return outPath;
 };
+
+export const getTargetFormatFromPath = (path: string) => {
+  return path.toLowerCase().endsWith('.png')
+    ? ImageFormat.PNG
+    : ImageFormat.JPEG;
+};
