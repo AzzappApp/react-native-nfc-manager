@@ -37,7 +37,7 @@ const isAppClipSupported = () => {
   const isIOS = /iphone|ipad/.test(userAgent);
   const iosVersionMatch = userAgent.match(/os (\d+)_/);
   const iosVersion = iosVersionMatch ? parseInt(iosVersionMatch[1], 10) : 0;
-  return isIOS && iosVersion > 16.4; //opening appclip from link only supported after 16.4 (FYI: appclip is supported since 14.3)
+  return isIOS && iosVersion >= 16.4; //opening appclip from link only supported after 16.4, open from another app is supported from 17.0
 };
 
 const WebCardPageLayout = (props: ProfilePageLayoutProps) => {

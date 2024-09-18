@@ -31,7 +31,7 @@ const AppClipLoadButton = () => {
   const showAppClip = useCallback(
     async (e: React.MouseEvent<HTMLAnchorElement>) => {
       e.preventDefault();
-      const appClipUrl = `${process.env.NEXT_PUBLIC_APPLE_APP_CLIP_URL}&url=${encodeURIComponent(window.location.href)}`;
+      const appClipUrl = `https://appclip.apple.com/id?p=com.azzapp.app-dev.Clip&url=${encodeURIComponent(window.location.href)}`;
 
       // Open the App Clip URL
       window.location.href = appClipUrl;
