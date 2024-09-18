@@ -1,32 +1,38 @@
 {
   "images" : [
     {
-      "filename" : "ICON-DEV@2x.png",
-      "idiom" : "universal",
-      "platform" : "ios",
-      "size" : "1024x1024"
+      "filename": "ICON-DEV@2x.png",
+      "idiom": "universal",
+      "platform": "ios",
+      "size": "1024x1024"
     },
     {
-      "appearances" : [
-        {
-          "appearance" : "luminosity",
-          "value" : "dark"
-        }
-      ],
-      "idiom" : "universal",
-      "platform" : "ios",
-      "size" : "1024x1024"
+      "filename": "ICON-DEV.png",
+      "idiom": "universal",
+      "platform": "ios",
+      "size": "120x120"
     },
     {
-      "appearances" : [
+      "appearances": [
         {
-          "appearance" : "luminosity",
-          "value" : "tinted"
+          "appearance": "luminosity",
+          "value": "dark"
         }
       ],
-      "idiom" : "universal",
-      "platform" : "ios",
-      "size" : "1024x1024"
+      "idiom": "universal",
+      "platform": "ios",
+      "size": "1024x1024"
+    },
+    {
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "tinted"
+        }
+      ],
+      "idiom": "universal",
+      "platform": "ios",
+      "size": "1024x1024"
     }
   ],
   "info" : {
