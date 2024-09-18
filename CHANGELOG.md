@@ -1,4 +1,4 @@
-## 0.9.0-canary.7
+## 0.9.0-canary.8
 
 * **fix:**  - 🐛 restore diff for url handling ([#5012](https://github.com/AzzappApp/azzapp/pull/5012))
 * **fix:**  - 🐛 properly count reactions on post ([#5039](https://github.com/AzzappApp/azzapp/pull/5039))
