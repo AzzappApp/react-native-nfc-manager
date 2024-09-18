@@ -728,25 +728,6 @@ export type Report = InferSelectModel<typeof ReportTable>;
 export type ReportTargetType = Report['targetType'];
 //#endregion
 
-// #region Transaction
-export const TransactionTable = cols.table(
-  'Transaction',
-  {
-    id: cols.cuid('id').primaryKey().notNull().$defaultFn(createId),
-    userId: cols.cuid('userId').notNull(),
-    receipt: cols.json('receipt').$type<any>().notNull(), //TODO type to defined
-    createdAt: cols.dateTime('createdAt').notNull(),
-  },
-  table => {
-    return {
-      userIdIdx: cols.index('Transaction_userId_idx').on(table.userId),
-    };
-  },
-);
-
-export type Transaction = InferSelectModel<typeof TransactionTable>;
-//#endregion
-
 // #region User
 
 export const UserTable = cols.table(
