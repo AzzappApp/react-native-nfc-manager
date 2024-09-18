@@ -1,5 +1,7 @@
-## 0.9.0-canary.15
+## 0.9.0-canary.16
 
+* **fix:**  - update contactCardUrl from mutation and use proper contact data for browser popup ([#5066](https://github.com/AzzappApp/azzapp/pull/5066))
+* **build:**  - add ios marketing file
 * **fix:**  - 🐛 properly load through relay for cover ([#5061](https://github.com/AzzappApp/azzapp/pull/5061))
 * **fix:**  - 🐛 don't display skip with added modules ([#5064](https://github.com/AzzappApp/azzapp/pull/5064))
 * **build:**  - add 120x120 icon
