@@ -13,6 +13,12 @@
       "size": "120x120"
     },
     {
+      "filename": "ICON-DEV@2x.png",
+      "idiom": "ios-marketing",
+      "scale": "1x",
+      "size": "1024x1024"
+    },
+    {
       "appearances": [
         {
           "appearance": "luminosity",
