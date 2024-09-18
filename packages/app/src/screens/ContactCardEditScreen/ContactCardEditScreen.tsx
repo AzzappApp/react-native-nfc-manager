@@ -143,6 +143,7 @@ const ContactCardEditScreen = ({
       saveContactCard(profileId: $profileId, contactCard: $contactCard) {
         profile {
           id
+          contactCardUrl
           contactCard {
             firstName
             lastName

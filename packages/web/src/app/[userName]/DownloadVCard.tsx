@@ -3,7 +3,7 @@ import cx from 'classnames';
 import { decompressFromEncodedURIComponent } from 'lz-string';
 import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { buildVCardFromSerializedContact } from '@azzapp/shared/vCardHelpers';
 import { CloseIcon } from '#assets';
@@ -163,6 +163,30 @@ const DownloadVCard = ({
     };
   }, [appClipWasOpen, handleClose]);
 
+  const displayName = useMemo(() => {
+    if (contact) {
+      if (contact.firstName || contact.lastName) {
+        return `${contact.firstName ?? ''}  ${contact.lastName ?? ''}`.trim();
+      }
+      if (contact.company) {
+        return contact.company;
+      }
+    }
+    if (webCard.firstName || webCard.lastName) {
+      return `${webCard.firstName ?? ''}  ${webCard.lastName ?? ''}`.trim();
+    }
+    if (webCard.companyName) {
+      return webCard.companyName;
+    }
+    return webCard.userName;
+  }, [
+    contact,
+    webCard.companyName,
+    webCard.firstName,
+    webCard.lastName,
+    webCard.userName,
+  ]);
+
   return (
     <AppIntlProvider>
       <div
@@ -219,13 +243,7 @@ const DownloadVCard = ({
               id="5AubE3"
               description="Download vCard modal message"
               values={{
-                userName: contact
-                  ? `${webCard.firstName ?? ''}  ${
-                      webCard.lastName ?? ''
-                    }`.trim() ||
-                    webCard.companyName ||
-                    webCard.userName
-                  : '',
+                userName: displayName,
               }}
             />
           </span>
