@@ -8,7 +8,6 @@ import { FlipIcon } from '#assets';
 import { ButtonIcon } from '#ui';
 import { updateWebCardViewsCounter } from '#app/actions/statisticsAction';
 import ShareBackModal from '#components/ShareBackModal/ShareBackModal';
-import AppClipLoadButton from './AppClipLoadButton';
 import DownloadVCard from './DownloadVCard';
 import PostFeed from './PostFeed';
 import styles from './WebCardPage.css';
@@ -29,17 +28,6 @@ type ProfilePageLayoutProps = PropsWithChildren<{
   color: string | null;
 }>;
 
-const isAppClipSupported = () => {
-  if (!process.env.NEXT_PUBLIC_APPLE_APP_ENABLED) {
-    return false;
-  }
-  const userAgent = navigator.userAgent.toLowerCase();
-  const isIOS = /iphone|ipad/.test(userAgent);
-  const iosVersionMatch = userAgent.match(/os (\d+)_/);
-  const iosVersion = iosVersionMatch ? parseInt(iosVersionMatch[1], 10) : 0;
-  return isIOS && iosVersion >= 16.4; //opening appclip from link only supported after 16.4, open from another app is supported from 17.0
-};
-
 const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
   const {
     webCard,
@@ -53,11 +41,6 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
   } = props;
   const [display, setDisplay] = useState<'card' | 'posts'>('card');
   const [postsOpen, setPostsOpen] = useState(false);
-  const [appClipIsSupported, setAppClipIsSupported] = useState(false);
-
-  useEffect(() => {
-    setAppClipIsSupported(isAppClipSupported());
-  }, []);
 
   const [contactDataVCard, setContactDataVCard] = useState({
     userId: '',
@@ -225,11 +208,7 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
             }}
           />
         )}
-        {appClipIsSupported ? (
-          <AppClipLoadButton />
-        ) : (
-          <DownloadVCard webCard={webCard} onClose={handleCloseDownloadVCard} />
-        )}
+        <DownloadVCard webCard={webCard} onClose={handleCloseDownloadVCard} />
       </div>
       <ShareBackModal
         ref={shareBackModal}

@@ -12,6 +12,7 @@ import { updateContactCardScanCounter } from '#app/actions/statisticsAction';
 
 import Avatar from '#ui/Avatar/Avatar';
 import DownloadVCardLinkButton from '#ui/Button/DownloadVCardLinkButton';
+import LinkButton from '#ui/Button/LinkButton';
 import styles from './DownloadVCard.css';
 import type { WebCard } from '@azzapp/data';
 
@@ -43,6 +44,12 @@ const DownloadVCard = ({
   }>();
 
   const [token, setToken] = useState('');
+
+  const [appClipIsSupported, setAppClipIsSupported] = useState(false);
+
+  useEffect(() => {
+    setAppClipIsSupported(isAppClipSupported());
+  }, []);
 
   useEffect(() => {
     const compressedContactCard = searchParams.get('c');
@@ -110,13 +117,13 @@ const DownloadVCard = ({
     }
   }, [webCard.userName, webCard.id, searchParams]);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setOpened(false);
 
     if (onClose) {
       onClose({ token });
     }
-  };
+  }, [onClose, token]);
 
   const handleAnimationEnd = useCallback(() => {
     if (!opened) {
@@ -125,6 +132,36 @@ const DownloadVCard = ({
   }, [opened]);
 
   const intl = useIntl();
+  const [appClipWasOpen, setAppClipWasOpen] = useState(false);
+  const showAppClip = useCallback(
+    async (e: React.MouseEvent<HTMLAnchorElement>) => {
+      console.log('opening appclip');
+      e.preventDefault();
+      const appClipUrl = `${process.env.NEXT_PUBLIC_APPLE_APP_CLIP_URL}&url=${encodeURIComponent(window.location.href)}`;
+
+      // Open the App Clip URL
+      setAppClipWasOpen(true);
+      window.location.href = appClipUrl;
+    },
+    [],
+  );
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        console.log('App Clip is closed or user navigated away');
+        // Show the shareback here
+        if (appClipWasOpen) {
+          handleClose();
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [appClipWasOpen, handleClose]);
 
   return (
     <AppIntlProvider>
@@ -192,8 +229,15 @@ const DownloadVCard = ({
               }}
             />
           </span>
-
-          {fileUrl && (
+          {appClipIsSupported ? (
+            <LinkButton size="medium" onClick={showAppClip}>
+              <FormattedMessage
+                defaultMessage="Save Contact Card"
+                id="TiZK4B"
+                description="Save contact with AppClip modal message"
+              />
+            </LinkButton>
+          ) : fileUrl ? (
             <DownloadVCardLinkButton
               size="medium"
               href={fileUrl}
@@ -206,7 +250,7 @@ const DownloadVCard = ({
                 description="Download vCard modal message"
               />
             </DownloadVCardLinkButton>
-          )}
+          ) : null}
 
           <ButtonIcon
             onClick={handleClose}
@@ -221,3 +265,15 @@ const DownloadVCard = ({
 };
 
 export default DownloadVCard;
+
+const isAppClipSupported = () => {
+  if (!process.env.NEXT_PUBLIC_APPLE_APP_ENABLED) {
+    return false;
+  }
+  const userAgent = navigator.userAgent.toLowerCase();
+
+  const isIOS = /iphone|ipad/.test(userAgent);
+  const iosVersionMatch = userAgent.match(/os (\d+)_/);
+  const iosVersion = iosVersionMatch ? parseInt(iosVersionMatch[1], 10) : 0;
+  return isIOS && iosVersion >= 16.4; //opening appclip from link only supported after 16.4, open from another app is supported from 17.0
+};
