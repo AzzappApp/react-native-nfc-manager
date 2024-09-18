@@ -1,5 +1,6 @@
 'use client';
 
+import { sendGAEvent } from '@next/third-parties/google';
 import cx from 'classnames';
 import dynamic from 'next/dynamic';
 import { forwardRef, useImperativeHandle, useRef } from 'react';
@@ -77,6 +78,11 @@ const ShareBackModal = forwardRef<ModalActions, ShareBackModalProps>(
             userId={userId}
             webcardId={webcardId}
             onSuccess={() => {
+              sendGAEvent('event', 'shareback', {
+                event_category: 'Form',
+                event_label: 'ShareBackForm',
+                value: 'Submit',
+              });
               internalRef.current?.close();
             }}
           />
