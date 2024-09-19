@@ -22,7 +22,6 @@ import type { Profile, User } from '@azzapp/data';
 type SignInBody = {
   credential?: string; //email or username or phone number
   password?: string;
-  authMethod?: 'cookie' | 'token';
 };
 
 const signin = async (req: Request) => {
