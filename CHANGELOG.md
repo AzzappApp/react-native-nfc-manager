@@ -1,4 +1,4 @@
-## 0.9.1-canary.2
+## 0.9.1-canary.3
 
 * **feat:**  - add social link and order ([#5071](https://github.com/AzzappApp/azzapp/pull/5071))
 * **fix:**  - **contactCard:** [#4998](https://github.com/AzzappApp/azzapp/pull/4998) add protocol when missing ([#5070](https://github.com/AzzappApp/azzapp/pull/5070))
