@@ -35,7 +35,7 @@ import DeletableCommentItem from './DeletableCommentItem';
 import PostCommentsScreenHeader from './PostCommentsScreenHeader';
 import ReportableCommentItem from './ReportableCommentItem';
 import type { CommentItemFragment_comment$key } from '#relayArtifacts/CommentItemFragment_comment.graphql';
-import type { PostCommentsList_myWebCard$key } from '#relayArtifacts/PostCommentsList_myWebCard.graphql';
+import type { PostCommentsList_myProfile$key } from '#relayArtifacts/PostCommentsList_myProfile.graphql';
 import type { PostCommentsList_post$key } from '#relayArtifacts/PostCommentsList_post.graphql';
 import type {
   NativeSyntheticEvent,
@@ -48,7 +48,7 @@ type PostCommentsListProps = {
    *
    * @type {PostCommentsListQuery$key}
    */
-  webCard: PostCommentsList_myWebCard$key;
+  profile: PostCommentsList_myProfile$key;
   /**
    *
    *
@@ -64,7 +64,7 @@ type PostCommentsListProps = {
 };
 
 const PostCommentsList = ({
-  webCard: webCardKey,
+  profile: profileKey,
   post: postKey,
   postId,
 }: PostCommentsListProps) => {
@@ -105,15 +105,18 @@ const PostCommentsList = ({
       postKey,
     );
 
-  const viewerWebCard = useFragment(
+  const profile = useFragment(
     graphql`
-      fragment PostCommentsList_myWebCard on WebCard {
-        id
-        cardIsPublished
-        ...AuthorCartoucheFragment_webCard
+      fragment PostCommentsList_myProfile on Profile {
+        webCard {
+          id
+          cardIsPublished
+          ...AuthorCartoucheFragment_webCard
+        }
+        invited
       }
     `,
-    webCardKey,
+    profileKey,
   );
 
   const [comment, setComment] = useState<string>('');
@@ -148,7 +151,7 @@ const PostCommentsList = ({
   const [submitting, setSubmitting] = useState(false);
 
   const onSubmit = () => {
-    if (!viewerWebCard.cardIsPublished) {
+    if (!profile.webCard?.cardIsPublished) {
       Alert.alert(
         intl.formatMessage(
           {
@@ -237,6 +240,16 @@ const PostCommentsList = ({
               });
             }
           },
+        });
+      } else if (profile.invited) {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage:
+              'Oops, first you must accept the pending invitation to join the WebCard.',
+            description:
+              'PostCommentsList - AlertMessage when the user is viewing a post (from deeplinking) with an invited WebCard',
+          }),
         });
       } else {
         Toast.show({
@@ -332,7 +345,7 @@ const PostCommentsList = ({
         />
         <View style={styles.inputContainer}>
           <AuthorCartouche
-            author={viewerWebCard}
+            author={profile.webCard!}
             variant="post"
             hideUserName
             style={{ height: 48 }}

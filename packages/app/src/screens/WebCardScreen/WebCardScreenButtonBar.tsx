@@ -21,7 +21,7 @@ import BlurredFloatingButton, {
 import FloatingButton from '#ui/FloatingButton';
 import Text from '#ui/Text';
 import { useEditTransition } from './WebCardScreenTransitions';
-import type { WebCardScreenButtonBar_viewerWebCard$key } from '#relayArtifacts/WebCardScreenButtonBar_viewerWebCard.graphql';
+import type { WebCardScreenButtonBar_profile$key } from '#relayArtifacts/WebCardScreenButtonBar_profile.graphql';
 import type { WebCardScreenButtonBar_webCard$key } from '#relayArtifacts/WebCardScreenButtonBar_webCard.graphql';
 import type { ViewProps } from 'react-native';
 
@@ -33,7 +33,7 @@ type WebCardScreenButtonBarProps = ViewProps & {
   /**
    * The current user  webCard
    */
-  viewerWebCard: WebCardScreenButtonBar_viewerWebCard$key;
+  profile: WebCardScreenButtonBar_profile$key;
   /**
    * true if the webCard is the current user
    */
@@ -79,7 +79,7 @@ type WebCardScreenButtonBarProps = ViewProps & {
  */
 const WebCardScreenButtonBar = ({
   webCard,
-  viewerWebCard,
+  profile,
   editing,
   isViewer,
   onEdit,
@@ -127,7 +127,7 @@ const WebCardScreenButtonBar = ({
       >
         <WebCardScreenButtonActionButton
           webCard={webCard}
-          viewerWebCard={viewerWebCard}
+          profile={profile}
           isViewer={isViewer}
           onEdit={onEdit}
           isWebCardDisplayed={isWebCardDisplayed}
@@ -151,7 +151,7 @@ export default WebCardScreenButtonBar;
 
 type ProfileScreenButtonActionButtonProps = {
   webCard: WebCardScreenButtonBar_webCard$key;
-  viewerWebCard: WebCardScreenButtonBar_viewerWebCard$key;
+  profile: WebCardScreenButtonBar_profile$key;
   isViewer: boolean;
   isWebCardDisplayed: boolean;
   onEdit: () => void;
@@ -168,21 +168,24 @@ type ProfileScreenButtonActionButtonProps = {
 
 const WebCardScreenButtonActionButton = ({
   webCard: webCardKey,
-  viewerWebCard: viewerWebCardKey,
+  profile: profileKey,
   isViewer,
   isWebCardDisplayed,
   onEdit,
   onToggleFollow,
   onShowWebcardModal,
 }: ProfileScreenButtonActionButtonProps) => {
-  const { cardIsPublished } = useFragment(
+  const profile = useFragment(
     graphql`
-      fragment WebCardScreenButtonBar_viewerWebCard on WebCard {
-        id
-        cardIsPublished
+      fragment WebCardScreenButtonBar_profile on Profile {
+        webCard {
+          id
+          cardIsPublished
+        }
+        invited
       }
     `,
-    viewerWebCardKey,
+    profileKey,
   );
 
   const webCard = useFragment(
@@ -230,7 +233,7 @@ const WebCardScreenButtonActionButton = ({
   };
 
   const onShowWebcardModalCallback = () => {
-    if (cardIsPublished || isViewer) {
+    if (profile.webCard?.cardIsPublished || isViewer) {
       onShowWebcardModal();
     } else {
       showWebcardUnpublishAlert();
@@ -238,8 +241,21 @@ const WebCardScreenButtonActionButton = ({
   };
 
   const debouncedToggleFollowing = useDebouncedCallback(() => {
-    if (!cardIsPublished) {
+    if (!profile.webCard?.cardIsPublished) {
       showWebcardUnpublishAlert();
+      return;
+    }
+
+    if (profile.invited) {
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage({
+          defaultMessage:
+            'Oops, first you must accept the pending invitation to join the WebCard',
+          description:
+            'WebCardScreenButtonBar - Error message when trying to follow/unfollow a WebCard from an invited webcard',
+        }),
+      });
       return;
     }
 

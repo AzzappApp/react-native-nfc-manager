@@ -386,7 +386,7 @@ const WebCardScreen = ({
   //   );
   // }, [intl, router]);
 
-  if (!data.webCard || !data.node?.viewerWebCard) {
+  if (!data.webCard || !data.profile?.webCard) {
     return null;
   }
 
@@ -428,7 +428,7 @@ const WebCardScreen = ({
                   webCardId={data.webCard.id}
                   hasFocus={hasFocus && showPost && ready}
                   userName={data.webCard.userName!}
-                  viewerWebCard={data.node.viewerWebCard}
+                  viewerWebCard={data.profile.webCard}
                 />
               </Suspense>
             </Animated.View>
@@ -436,7 +436,7 @@ const WebCardScreen = ({
         </GestureDetector>
         <WebCardScreenButtonBar
           webCard={data.webCard}
-          viewerWebCard={data.node.viewerWebCard}
+          profile={data.profile}
           isViewer={isViewer}
           editing={editing}
           onHome={router.backToTop}
@@ -472,7 +472,11 @@ const getQuery = (params: WebCardRoute['params']) =>
   params.webCardId ? webCardScreenByIdQuery : webCardScreenByNameQuery;
 
 const webCardScreenByIdQuery = graphql`
-  query WebCardScreenByIdQuery($webCardId: ID!, $viewerWebCardId: ID!) {
+  query WebCardScreenByIdQuery(
+    $webCardId: ID!
+    $viewerWebCardId: ID!
+    $profileId: ID!
+  ) {
     webCard: node(id: $webCardId) {
       id
       ... on WebCard {
@@ -485,10 +489,13 @@ const webCardScreenByIdQuery = graphql`
       ...WebCardBackground_webCard
       ...WebCardModal_webCard @arguments(viewerWebCardId: $viewerWebCardId)
     }
-    node(id: $viewerWebCardId) {
-      ... on WebCard @alias(as: "viewerWebCard") {
-        ...WebCardScreenButtonBar_viewerWebCard
-        ...PostList_viewerWebCard
+    profile: node(id: $profileId) {
+      ... on Profile {
+        ...WebCardScreenButtonBar_profile
+        webCard {
+          ...PostList_viewerWebCard
+        }
+        invited
       }
     }
   }
@@ -498,6 +505,7 @@ const webCardScreenByNameQuery = graphql`
   query WebCardScreenByUserNameQuery(
     $userName: String!
     $viewerWebCardId: ID!
+    $profileId: ID!
   ) {
     webCard(userName: $userName) {
       id
@@ -509,10 +517,13 @@ const webCardScreenByNameQuery = graphql`
       ...WebCardBackground_webCard
       ...WebCardModal_webCard @arguments(viewerWebCardId: $viewerWebCardId)
     }
-    node(id: $viewerWebCardId) {
-      ... on WebCard @alias(as: "viewerWebCard") {
-        ...WebCardScreenButtonBar_viewerWebCard
-        ...PostList_viewerWebCard
+    profile: node(id: $profileId) {
+      ... on Profile {
+        ...WebCardScreenButtonBar_profile
+        webCard {
+          ...PostList_viewerWebCard
+        }
+        invited
       }
     }
   }
@@ -557,8 +568,16 @@ export default relayScreen(WebCardScreen, {
   query: getQuery,
   getVariables: ({ userName, webCardId }, profileInfos) =>
     webCardId
-      ? { webCardId, viewerWebCardId: profileInfos?.webCardId ?? '' }
-      : { userName, viewerWebCardId: profileInfos?.webCardId ?? '' },
+      ? {
+          webCardId,
+          viewerWebCardId: profileInfos?.webCardId ?? '',
+          profileId: profileInfos?.profileId,
+        }
+      : {
+          userName,
+          viewerWebCardId: profileInfos?.webCardId ?? '',
+          profileId: profileInfos?.profileId,
+        },
   fetchPolicy: 'store-and-network',
 });
 

@@ -1,7 +1,7 @@
 import { FlashList } from '@shopify/flash-list';
 import { useCallback, useMemo, useState } from 'react';
-import { FormattedMessage } from 'react-intl';
-import { Dimensions, useColorScheme, View } from 'react-native';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { Alert, Dimensions, useColorScheme, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
 import PostRenderer from '#components/PostList/PostRenderer';
@@ -83,6 +83,8 @@ const PostList = ({
     postKey,
   );
 
+  const intl = useIntl();
+
   const viewerWebCard = useFragment(
     graphql`
       fragment PostList_viewerWebCard on WebCard {
@@ -112,6 +114,58 @@ const PostList = ({
         : false,
     [viewerProfile?.invited, viewerWebCard?.cardIsPublished],
   );
+
+  const onActionDisabled = useCallback(() => {
+    if (!viewerWebCard?.cardIsPublished) {
+      Alert.alert(
+        intl.formatMessage({
+          defaultMessage: 'Unpublished WebCard.',
+          description:
+            'PostList - Alert Message title when the user is viewing a post (from deeplinking) with an unpublished WebCard',
+        }),
+        intl.formatMessage({
+          defaultMessage:
+            'This action can only be done from a published WebCard.',
+          description:
+            'PostList - AlertMessage when the user is viewing a post (from deeplinking) with an unpublished WebCard',
+        }),
+        [
+          {
+            text: intl.formatMessage({
+              defaultMessage: 'Ok',
+              description:
+                'PostList - Alert button when the user is viewing a post (from deeplinking) with an unpublished WebCard',
+            }),
+          },
+        ],
+      );
+    }
+
+    if (viewerProfile?.invited) {
+      Alert.alert(
+        intl.formatMessage({
+          defaultMessage: 'Invitation pending.',
+          description:
+            'PostList - Alert Message title when the user is viewing a post (from deeplinking) with an invited WebCard',
+        }),
+        intl.formatMessage({
+          defaultMessage:
+            'Oops, first you must accept the pending invitation to join the WebCard.',
+          description:
+            'PostList - AlertMessage when the user is viewing a post (from deeplinking) with an invited WebCard',
+        }),
+        [
+          {
+            text: intl.formatMessage({
+              defaultMessage: 'Ok',
+              description:
+                'PostList - Alert button when the user is viewing a post (from deeplinking) with an invited WebCard',
+            }),
+          },
+        ],
+      );
+    }
+  }, [intl, viewerProfile?.invited, viewerWebCard?.cardIsPublished]);
 
   const [visiblePostIds, setVisiblePostIds] = useState<{
     played: string | null;
@@ -197,13 +251,14 @@ const PostList = ({
           onPressAuthor={onPressAuthor}
           author={item.webCard ?? extraData.author!}
           actionEnabled={extraData.postActionEnabled}
+          onActionDisabled={onActionDisabled}
           showUnpublished={extraData.showUnpublished}
           useAnimationSnapshot={index === 0}
           initialTime={index === 0 ? extraData.firstItemVideoTime : undefined}
         />
       ) : null;
     },
-    [onPressAuthor],
+    [onActionDisabled, onPressAuthor],
   );
 
   const extraData = useMemo(

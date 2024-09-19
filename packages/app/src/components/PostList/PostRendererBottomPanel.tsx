@@ -59,6 +59,8 @@ type PostRendererBottomPanelProps = {
    * @type {boolean}
    */
   actionEnabled: boolean;
+
+  onActionDisabled?: () => void;
 };
 
 const PostRendererBottomPanel = ({
@@ -66,6 +68,7 @@ const PostRendererBottomPanel = ({
   toggleModal,
   post: postKey,
   actionEnabled,
+  onActionDisabled,
 }: PostRendererBottomPanelProps) => {
   const router = useRouter();
   const post = useFragment(
@@ -432,6 +435,7 @@ const PostRendererBottomPanel = ({
           style={{ marginTop: 10 }}
           postKey={postKey}
           actionEnabled={actionEnabled}
+          onActionDisabled={onActionDisabled}
         />
         {!!post.content && (
           <ExpendableText
