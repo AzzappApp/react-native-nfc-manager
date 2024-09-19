@@ -17,7 +17,7 @@ In addition developers should install the followings dependencies:
 
 In addition one should follow the react-native-cli setup instruction of the [React Native documentation](https://reactnative.dev/docs/0.69/getting-started).
 
-The sources of this project should be edited through [Visual Studio Code](https://code.visualstudio.com/). A recommanded extensions list has been commited in the sources and should be prompted for installation the first time the project is open in the code editor.
+The sources of this project should be edited through [Visual Studio Code](https://code.visualstudio.com/). A recommended extensions list has been committed in the sources and should be prompted for installation the first time the project is open in the code editor.
 
 ## Installation and development
 
