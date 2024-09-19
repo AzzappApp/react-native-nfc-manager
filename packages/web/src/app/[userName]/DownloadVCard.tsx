@@ -223,11 +223,7 @@ const DownloadVCard = ({
                 <Avatar
                   variant="image"
                   url={contact.avatarUrl}
-                  alt={
-                    `${contact.firstName ?? ''}  ${contact.lastName ?? ''}`.trim() ||
-                    contact.company ||
-                    webCard.userName
-                  }
+                  alt={displayName}
                 />
               ) : (
                 <Avatar
