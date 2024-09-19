@@ -1,5 +1,6 @@
-## 0.9.0-canary.17
+## 0.9.0-canary.18
 
+* **feat:**  - add social link and order ([#5071](https://github.com/AzzappApp/azzapp/pull/5071))
 * **fix:**  - **contactCard:** [#4998](https://github.com/AzzappApp/azzapp/pull/4998) add protocol when missing ([#5070](https://github.com/AzzappApp/azzapp/pull/5070))
 * **fix:**  - update contactCardUrl from mutation and use proper contact data for browser popup ([#5066](https://github.com/AzzappApp/azzapp/pull/5066))
 * **build:**  - add ios marketing file
