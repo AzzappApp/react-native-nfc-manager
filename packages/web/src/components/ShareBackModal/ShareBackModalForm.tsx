@@ -15,15 +15,17 @@ import styles from './ShareBackModalForm.css';
 type ShareBackModalContentProps = {
   token: string;
   userId: string;
+  webcardId: string;
   onSuccess: () => void;
 };
 
 const ShareBackModalForm = (props: ShareBackModalContentProps) => {
-  const { token, userId, onSuccess } = props;
+  const { token, userId, webcardId, onSuccess } = props;
 
   const shareBackActionWithUserIdAndToken = processShareBackSubmission.bind(
     null,
     userId,
+    webcardId,
     token,
   );
 

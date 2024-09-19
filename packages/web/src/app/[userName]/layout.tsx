@@ -1,3 +1,4 @@
+import { GoogleAnalytics } from '@next/third-parties/google';
 import cn from 'classnames';
 import { Plus_Jakarta_Sans } from 'next/font/google';
 import { headers } from 'next/headers';
@@ -82,6 +83,7 @@ const RootLayout = async ({
           name="apple-itunes-app"
           content={`${process.env.NEXT_PUBLIC_APPLE_ITUNES_APP_META}`}
         />
+        <GoogleAnalytics gaId={`${process.env.NEXT_PUBLIC_GA_ANALYTICS_ID}`} />
       </head>
       <body>
         <ClientWrapper locale={locale} messages={messages}>

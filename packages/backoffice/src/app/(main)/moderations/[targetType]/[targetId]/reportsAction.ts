@@ -69,7 +69,7 @@ export const deleteRelatedItem = async (
                   }
                 }
               }
-            } catch (e) {
+            } catch {
               console.error('Error revalidating pages');
             }
           }
@@ -100,7 +100,7 @@ export const deleteRelatedItem = async (
                 );
               }
             }
-          } catch (e) {
+          } catch {
             console.error('Error revalidating pages');
           }
 
@@ -133,7 +133,7 @@ export const deleteRelatedItem = async (
             if (!res.ok) {
               console.error('Error revalidating pages');
             }
-          } catch (e) {
+          } catch {
             console.error('Error revalidating pages');
           }
 

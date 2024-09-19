@@ -64,7 +64,7 @@ const ForgotPasswordScreen = () => {
                     contact.countryCodeOrEmail,
                   ).formatInternational(),
           }));
-        } catch (e) {
+        } catch {
           setIsSubmitted(false);
           setError(true);
           return;

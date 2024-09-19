@@ -10,29 +10,40 @@ import ContactsUI
 
 @main
 struct ShareContactAppClipApp: App {
-
     var body: some Scene {
         WindowGroup {
-            VStack {
-               
-            }
-            .onOpenURL { url in
-                handleURL(url)
-            }
-            //FOR DEBUG
-            // .onAppear {
-            //  handleURL(URL(string: "http://192.168.2.1:3000/villagramaci2?c=NoIgOiwRB2BOBPAlgCwFZIEYGMCuaBraEAGmJQA5MAPA3Ac2wCYcnizwQApAUxhiQAzHnHbEAygFskAFxRjOANSQAbFQEMABAHE46yeuxIFEACI8AzknowR7YFE4AJAPaSeJkAGoAzD4DsAGz+AJxMIT4ALIHEALokjhCu7p6+PgAMgcFhYdFx8Q7EyR6cHBC4AA7SMjIAAvQGqgB02G75CfEwuGqx0KIwpCAAigDqLiMAgtjYAKoA+nAAchYAmgCiTgCO6QDyAKwqAEIAKoJILkMYAIz+pgDSABqSi6baLFcAJukAkiCxQA")!)
-            //   // handleURL(URL(string: "http://192.168.2.1:3000/evg660_2?c=NoIgOiwRD2DOBbAjgThgdwGwEMBmArABmhABoSATAcwA58BLAdhswA8A3V48MkgOWwIAppkyEAYvQBOcAC4lyPADLY5owgOEKSAYRgIEMAHZ6EAB2xGAnpqHaeAFXqyANiLELgUHgFls9I3sIAGoAZgAWTABWcNCAJgBGFBpGEgBdUm8IcWxWIJAw8IACaJQihMYo8oSE9MySAAl9Ox5FEIjMBNDGBNEPHjSMrxI-APyAY31DIwABIQR-FwA6SYQ6rJAmrVaSVemZ7AoEAJX9dKGN0cCdnlNposOKKSE4ODAwIwcAC3o4B4oni8-l9VCUii4Ai8igAjIQuDDvIxKSG1D7IoxCOKI9FCULYyHhfEYopRIlCErnNogJIoOIAWkINDpcRoDkIjAAXAk4hzCIQlnzCAAtdLQKQfMggRgAaSicQACugHABBKw6ADiKi+VAQoQaAHUUAAhMyydg6dDiIhRAD6AFEANYAJXlNAofC+RoAmj4fCA0kA")!)
-            // }
+            ContentView()
         }
     }
-    private func handleURL(_ url: URL) {
-    
+}
+struct ContentView: View {
+    var body: some View {
+          VStack{
+          }.onContinueUserActivity(NSUserActivityTypeBrowsingWeb, perform: handleUserActivity)
+    }
 
-      guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
+    private func handleUserActivity(_ userActivity: NSUserActivity) {
+        guard let webpageURL = userActivity.webpageURL else {
+            return
+        }
+      
+        // Extract the query parameter from the URL
+        guard let urlComponents = URLComponents(url: webpageURL, resolvingAgainstBaseURL: false),
+              let queryItems = urlComponents.queryItems,
+              let nestedURLString = queryItems.first(where: { $0.name == "url" })?.value,
+              let nestedURL = URL(string: nestedURLString) else {
+            closeAppClip()
+            return
+        }
+        handleURL(nestedURL)
+    }
+
+    private func handleURL(_ url: URL) {
+        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
             let queryItems = components.queryItems,
   
             let compressedContactCard = queryItems.first(where: { $0.name == "c" })?.value else {
+        closeAppClip()
           return
       }
 
@@ -209,32 +220,40 @@ struct ShareContactAppClipApp: App {
         }
         
         DispatchQueue.main.async {
-            self.presentContactViewController(with: contact)
+             ContactViewControllerDelegateHandler.shared.presentContactViewController(with: contact)
         }
     }.resume()
     } else {
-        presentContactViewController(with: contact)
+         ContactViewControllerDelegateHandler.shared.presentContactViewController(with: contact)
     }
+  }
 }
 
-private func presentContactViewController(with contact: CNMutableContact) {
-    let contactViewController = CNContactViewController(forNewContact: contact)
-    // contactViewController.delegate = context.coordinator
-    
-    let viewController = UIApplication.shared.windows.first?.rootViewController
-    viewController?.present(UINavigationController(rootViewController: contactViewController), animated: true)
-}
 
- func contactViewController(_ viewController: CNContactViewController, didCompleteWith contact: CNContact?) {
-        viewController.dismiss(animated: true) {
-            // Close the App Clip
-            exit(0)
-        }
+class ContactViewControllerDelegateHandler: NSObject, CNContactViewControllerDelegate {
+  static let shared = ContactViewControllerDelegateHandler()
+
+  func presentContactViewController(with contact: CNMutableContact) {
+      let contactViewController = CNContactViewController(forNewContact: contact)
+      contactViewController.delegate = self
+
+      let viewController = UIApplication.shared.windows.first?.rootViewController
+      viewController?.present(UINavigationController(rootViewController: contactViewController), animated: true)
+  }
+
+  func contactViewController(_ viewController: CNContactViewController, didCompleteWith contact: CNContact?) {
+    if let contact = contact {
+        // Handle the "Done" button click
+        print("Contact saved: \(contact)")
+    } else {
+        // Handle the "Cancel" button click
+        print("Contact creation canceled")
     }
-
-
+    viewController.dismiss(animated: true) {
+        UIApplication.shared.perform(#selector(NSXPCConnection.suspend))
+    }
+  }
 }
-
 
 struct ContactData: Codable {
     var profileId: String?
@@ -251,7 +270,6 @@ struct ContactData: Codable {
     var socials: [Social]?
     var urls: [URLData]?
 }
-
 
 struct Social: Codable {
     var label: String
@@ -276,16 +294,16 @@ private func mapToContactData(from array: [Any]) -> ContactData {
     let birthday = array[9] as? String
 
     return ContactData(
-        profileId: profileId,
-        webCardId: webCardId,
-        firstName: firstName,
-        lastName: lastName,
-        company: company,
-        title: title,
-        emails: emails,
-        phoneNumbers: phoneNumbers,
-        addresses: addresses,
-        birthday: birthday
+      profileId: profileId,
+      webCardId: webCardId,
+      firstName: firstName,
+      lastName: lastName,
+      company: company,
+      title: title,
+      emails: emails,
+      phoneNumbers: phoneNumbers,
+      addresses: addresses,
+      birthday: birthday
     )
 }
 
@@ -295,10 +313,9 @@ func verifySign(signature: String, data: String, salt: String, completion: @esca
       return
     }
 
-    
     guard let url = URL(string: "\(baseUrl)api/verifySign") else {
-        print("Invalid URL")
-        return
+      print("Invalid URL")
+      return
     }
 
     var request = URLRequest(url: url)
@@ -307,39 +324,43 @@ func verifySign(signature: String, data: String, salt: String, completion: @esca
     request.setValue("application/json", forHTTPHeaderField: "Accept")
         
     let json: [String: String] = ["signature": signature, "data": data, "salt": salt]
-        do {
-            let jsonData = try JSONSerialization.data(withJSONObject: json, options: [])
-            request.httpBody = jsonData
-             if let jsonString = String(data: jsonData, encoding: .utf8) {
-        }
-        } catch {
-            print("Failed to serialize JSON: \(error.localizedDescription)")
-            return
-        }
-   
-
-    URLSession.shared.dataTask(with: request) { data, response, error in
-        if let error = error {
-            completion(.failure(error))
-            return
-        }
-
-        guard let data = data else {
-        
-            completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data received"])))
-            return
-        }
-
-        do {
-            if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
-                completion(.success(json))
-            } else {
-                print("Failed to parse JSON response")
-                completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to parse JSON response"])))
-            }
-        } catch {
-            print("Failed to parse JSON: \(error.localizedDescription)")
-            completion(.failure(error))
-        }
-    }.resume()
+    do {
+      let jsonData = try JSONSerialization.data(withJSONObject: json, options: [])
+      request.httpBody = jsonData
+    } catch {
+      print("Failed to serialize JSON: \(error.localizedDescription)")
+      return
     }
+   
+    URLSession.shared.dataTask(with: request) { data, response, error in
+      if let error = error {
+          completion(.failure(error))
+          return
+      }
+
+      guard let data = data else {
+        completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data received"])))
+        return
+      }
+
+      do {
+        if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+            completion(.success(json))
+        } else {
+            print("Failed to parse JSON response")
+            completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to parse JSON response"])))
+        }
+      } catch {
+          print("Failed to parse JSON: \(error.localizedDescription)")
+          completion(.failure(error))
+      }
+    }.resume()
+}
+
+
+
+private func closeAppClip() {
+  UIApplication.shared.perform(#selector(NSXPCConnection.suspend))
+}
+
+

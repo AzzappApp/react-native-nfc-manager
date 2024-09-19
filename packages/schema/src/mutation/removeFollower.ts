@@ -23,7 +23,7 @@ const removeFollowerMutation: Mutation = async (_, params) => {
 
   try {
     await unfollows(removedFollowerId, webCardId);
-  } catch (e) {
+  } catch {
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 

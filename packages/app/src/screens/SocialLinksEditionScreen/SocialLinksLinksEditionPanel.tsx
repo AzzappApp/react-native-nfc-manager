@@ -132,17 +132,16 @@ const SocialLinksLinksEditionPanel = ({
 
       consolidatedLinks.push({
         ...link,
-        position: NO_POSITION_INDEX,
+        position: NO_POSITION_INDEX, //required for reordering
         ...value,
         placeholder,
       });
     }
     return consolidatedLinks.sort((a, b) => {
-      if (a.position === b.position) {
-        return a.id.localeCompare(b.id);
-      } else {
+      if (a.position !== b.position) {
         return a.position - b.position;
       }
+      return 0;
     });
   }, [intl, links]);
 

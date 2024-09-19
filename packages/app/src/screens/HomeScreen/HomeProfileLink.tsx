@@ -1,7 +1,7 @@
 import * as Clipboard from 'expo-clipboard';
 import { memo } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, useWindowDimensions, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useDerivedValue,
@@ -20,6 +20,7 @@ type HomeProfileLinkProps = {
   user: HomeProfileLink_user$key;
 };
 const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
+  const windowWidth = useWindowDimensions();
   const { profiles } = useFragment(
     graphql`
       fragment HomeProfileLink_user on User {
@@ -81,7 +82,7 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
     if (currentIndexSharedValue.value > 0.5) {
       return (
         'azzapp.com/' +
-          userNames.value[Math.round(currentIndexSharedValue.value - 1)] ?? ''
+        userNames.value[Math.round(currentIndexSharedValue.value - 1)]
       );
     }
 
@@ -100,6 +101,7 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
             style={styles.url}
             text={text}
             containerStyle={{ flex: 1 }}
+            maxLength={windowWidth.width / 13}
           />
           <View style={styles.emptyViewCenter} />
         </View>

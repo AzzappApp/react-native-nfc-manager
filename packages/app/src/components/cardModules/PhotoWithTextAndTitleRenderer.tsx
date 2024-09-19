@@ -81,19 +81,16 @@ export const readPhotoWithTextAndTitleData = (
   module: PhotoWithTextAndTitleRenderer_module$key,
 ) => readInlineData(PhotoWithTextAndTitleRendererFragment, module);
 
-const animatedProps = [
-  'contentFontSize',
-  'contentVerticalSpacing',
-  'titleFontSize',
-  'titleVerticalSpacing',
-  'gap',
-  'borderRadius',
-  'marginHorizontal',
-  'marginVertical',
-  'aspectRatio',
-] as const;
-
-type AnimatedProps = (typeof animatedProps)[number];
+type AnimatedProps =
+  | 'aspectRatio'
+  | 'borderRadius'
+  | 'contentFontSize'
+  | 'contentVerticalSpacing'
+  | 'gap'
+  | 'marginHorizontal'
+  | 'marginVertical'
+  | 'titleFontSize'
+  | 'titleVerticalSpacing';
 
 export type PhotoWithTextAndTitleRendererData = NullableFields<
   Omit<PhotoWithTextAndTitleRenderer_module$data, ' $fragmentType'>

@@ -15,8 +15,8 @@ import CoverEditorAddTextModal from './modals/CoverEditorAddTextModal';
 import CoverEditorColorsManager from './tools/CoverEditorColorsManager';
 import ToolBarContainer from './ui/ToolBarTransitioner';
 import ToolBoxSection, { TOOLBOX_SECTION_HEIGHT } from './ui/ToolBoxSection';
-import type { CoverEditorLinksToolActions } from './tools/CoverEditorLinksTool';
 import type { CoverEditionMode } from '../coverEditorTypes';
+import type { CoverEditorLinksToolActions } from './tools/CoverEditorLinksTool';
 import type { ForwardedRef } from 'react';
 
 const CoverEditorToolbox = (

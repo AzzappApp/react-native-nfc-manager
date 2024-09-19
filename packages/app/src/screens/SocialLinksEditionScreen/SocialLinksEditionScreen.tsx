@@ -122,6 +122,7 @@ const SocialLinksEditionScreen = ({
             id
           }
           ...SocialLinksSettingsEditionPanel_webCard
+          ...ModuleEditionScreenTitle_webCard
         }
       }
     `,
@@ -335,6 +336,7 @@ const SocialLinksEditionScreen = ({
             })}
             kind="socialLinks"
             moduleCount={cardModulesCount}
+            webCardKey={profile.webCard}
           />
         }
         leftElement={

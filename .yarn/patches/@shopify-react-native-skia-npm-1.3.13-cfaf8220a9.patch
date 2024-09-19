@@ -1,5 +1,5 @@
 diff --git a/cpp/rnskia/RNSkDomView.h b/cpp/rnskia/RNSkDomView.h
-index 27bb74720fdec62871d0639e3a2cd12479612a7a..513d4c8c85c5176e27a0fcf17b0c6db40a02f62e 100644
+index 27bb74720fdec62871d0639e3a2cd12479612a7a..2a8466cdd36d1a39c872e61eeb4aef8e7d0109b6 100644
 --- a/cpp/rnskia/RNSkDomView.h
 +++ b/cpp/rnskia/RNSkDomView.h
 @@ -10,6 +10,7 @@
@@ -10,7 +10,7 @@ index 27bb74720fdec62871d0639e3a2cd12479612a7a..513d4c8c85c5176e27a0fcf17b0c6db4
  #include "RNSkView.h"
  
  #include "JsiDomRenderNode.h"
-@@ -136,5 +137,22 @@ public:
+@@ -136,5 +137,20 @@ public:
        }
      }
    }
@@ -30,14 +30,12 @@ index 27bb74720fdec62871d0639e3a2cd12479612a7a..513d4c8c85c5176e27a0fcf17b0c6db4
 +    return jsi::Value::undefined();
 +  }
  };
-+
-+
  } // namespace RNSkia
 diff --git a/cpp/rnskia/RNSkJsiViewApi.h b/cpp/rnskia/RNSkJsiViewApi.h
-index c1f920e1ab209c023cacc445d88a6a823d13a6db..f19169798a086a6f5cc74c2cd4ca9a819060a453 100644
+index c1f920e1ab209c023cacc445d88a6a823d13a6db..f33f31b169f3b4f4cf136344c91fff8e77bbdff6 100644
 --- a/cpp/rnskia/RNSkJsiViewApi.h
 +++ b/cpp/rnskia/RNSkJsiViewApi.h
-@@ -189,7 +189,55 @@ public:
+@@ -189,7 +189,54 @@ public:
          });
    }
  
@@ -87,7 +85,6 @@ index c1f920e1ab209c023cacc445d88a6a823d13a6db..f19169798a086a6f5cc74c2cd4ca9a81
 +    return info->view->callJsiMethod(runtime, action, params, paramsCount);
 +  }
 +
-+
    JSI_EXPORT_FUNCTIONS(JSI_EXPORT_FUNC(RNSkJsiViewApi, setJsiProperty),
 +                       JSI_EXPORT_FUNC(RNSkJsiViewApi, callJsiMethod),
                         JSI_EXPORT_FUNC(RNSkJsiViewApi, requestRedraw),
@@ -116,10 +113,10 @@ index 90c46f4a4f8e45722638f2a6371006e76c920cd8..beb07f038ef75d8065981d254314c363
     * Repaints the Skia view using the underlying context and the drawcallback.
     * This method schedules a draw request that will be run on the correct
 diff --git a/src/views/SkiaDomView.tsx b/src/views/SkiaDomView.tsx
-index 25d07873a00eda96bbe662f435dc85b408bf8e1f..4b78faddd46d3deea6e841d49fffc7ec3f7b80a8 100644
+index 3f740e42e8dc16cc14ffb66068477e254c0cc1bd..b501f68819bbcc88b4eec16c4fe1ccc1f209322a 100644
 --- a/src/views/SkiaDomView.tsx
 +++ b/src/views/SkiaDomView.tsx
-@@ -115,7 +115,8 @@ const assertSkiaViewApi = () => {
+@@ -107,7 +107,8 @@ const assertSkiaViewApi = () => {
      SkiaViewApi === null ||
      SkiaViewApi.setJsiProperty === null ||
      SkiaViewApi.requestRedraw === null ||
@@ -130,7 +127,7 @@ index 25d07873a00eda96bbe662f435dc85b408bf8e1f..4b78faddd46d3deea6e841d49fffc7ec
      throw Error("Skia View Api was not found.");
    }
 diff --git a/src/views/types.ts b/src/views/types.ts
-index 022c941d9052630769ee63d60a7dfcd9dbb87f48..7e0ba36be6e7be5bd5386501ae01ad6fa8dde605 100644
+index 022c941d9052630769ee63d60a7dfcd9dbb87f48..bcf20c121fee96fb0c0af15f772d94f8533956b3 100644
 --- a/src/views/types.ts
 +++ b/src/views/types.ts
 @@ -51,6 +51,11 @@ export type TouchHandler = (touchInfo: Array<Array<TouchInfo>>) => void;
@@ -138,10 +135,10 @@ index 022c941d9052630769ee63d60a7dfcd9dbb87f48..7e0ba36be6e7be5bd5386501ae01ad6f
    setJsiProperty: <T>(nativeId: number, name: string, value: T) => void;
    requestRedraw: (nativeId: number) => void;
 +  callJsiMethod: <T extends Array<unknown>>(
-+        nativeId: number,
-+        name: string,
-+        ...args: T
-+      ) => void;
++              nativeId: number,
++              name: string,
++              ...args: T
++            ) => void;
    makeImageSnapshot: (nativeId: number, rect?: SkRect) => SkImage;
    makeImageSnapshotAsync: (nativeId: number, rect?: SkRect) => Promise<SkImage>;
  }

@@ -109,7 +109,7 @@ const createWebCardMutation: MutationResolvers['createWebCard'] = async (
       throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
     }
     return { profile };
-  } catch (error) {
+  } catch {
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 };

@@ -29,7 +29,6 @@ import { getAuthState } from '#helpers/authStore';
 import { getRelayEnvironment } from '#helpers/relayEnvironment';
 import { useMultiUserUpdate } from '#hooks/useMultiUserUpdate';
 import useScreenInsets from '#hooks/useScreenInsets';
-//import { useUserSubscriptionOffer } from '#hooks/useSubscriptionOffer';
 import { useUserSubscriptionOffer } from '#hooks/useSubscriptionOffer';
 import Button from '#ui/Button';
 import IconButton from '#ui/IconButton';

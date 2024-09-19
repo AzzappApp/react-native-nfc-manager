@@ -56,6 +56,11 @@
             value = "https://dev.azzapp.com/"
             isEnabled = "YES">
          </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "_XCAppClipURL"
+            value = "https://appclip.apple/?p=id&amp;url=http://localhost:3000/hint10?c=NoIgOiwRAOCeAPAzAawBYIGYAYCOBTXaEAGmIBMB3OAFwCY4BnAY2ZszmLPBAAkBLAHY0AjNi7EAyuUyMZEnguIQSwKD14B7ALb4lIANRIkANgDsATnMAWbAFYkxALpPV6iFt37G+AEYA6cgBXXwAbIQABAHNtAEN+UP9mHWdXYFdBINDQp2gAJzBBUhBNAE0AaQAOFAAVUoBJGppmgDEzFu0UMwB5AH0AcV9B8gAZAEUADQBRAFlsEwARAHUlgCUABW7K3kqTZhAnIA"
+            isEnabled = "NO">
+         </EnvironmentVariable>
       </EnvironmentVariables>
    </LaunchAction>
    <ProfileAction

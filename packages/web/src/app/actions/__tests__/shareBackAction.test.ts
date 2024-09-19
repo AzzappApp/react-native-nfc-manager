@@ -1,12 +1,12 @@
 import { parseWithZod } from '@conform-to/zod';
 import { jwtDecode } from 'jwt-decode';
 
-import { getUserById } from '@azzapp/data';
+import { getProfileByUserAndWebCard, getUserById } from '@azzapp/data';
 import { sendEmail } from '#helpers/emailHelpers';
 import { sendTwilioSMS } from '#helpers/twilioHelpers';
 import { processShareBackSubmission } from '../shareBackAction';
 import type { ShareBackFormData } from '../shareBackAction';
-import type { User } from '@azzapp/data';
+import type { Profile, User } from '@azzapp/data';
 
 jest.mock('@azzapp/data', () => ({
   getUserById: jest.fn(),
@@ -41,6 +41,10 @@ const jwtDecodeMocked = jwtDecode as jest.MockedFunction<typeof jwtDecode>;
 const getUserByIdMocked = getUserById as jest.MockedFunction<
   typeof getUserById
 >;
+const getProfileByUserAndWebCardMocked =
+  getProfileByUserAndWebCard as jest.MockedFunction<
+    typeof getProfileByUserAndWebCard
+  >;
 const parseWithZodMocked = parseWithZod as jest.MockedFunction<any>;
 
 const formData = {
@@ -63,6 +67,7 @@ const shareBackWithSuccessSubject = 'New Contact ShareBack Received';
 
 describe('processShareBackSubmission', () => {
   const userId = 'user123';
+  const webcardId = 'webcard123';
   const token = 'token123';
 
   beforeEach(() => {
@@ -79,6 +84,9 @@ describe('processShareBackSubmission', () => {
       emailConfirmed: false,
       phoneNumberConfirmed: true,
     } as User);
+    getProfileByUserAndWebCardMocked.mockResolvedValue({
+      id: 'profile123',
+    } as Profile);
 
     parseWithZodMocked.mockReturnValueOnce({
       status: 'success',
@@ -89,7 +97,7 @@ describe('processShareBackSubmission', () => {
       }),
     });
 
-    await processShareBackSubmission(userId, token, null, formData);
+    await processShareBackSubmission(userId, webcardId, token, null, formData);
 
     expect(sendTwilioSMS).toHaveBeenCalledWith({
       to: '1234567890',
@@ -108,6 +116,9 @@ describe('processShareBackSubmission', () => {
       emailConfirmed: true,
       phoneNumberConfirmed: false,
     } as User);
+    getProfileByUserAndWebCardMocked.mockResolvedValue({
+      id: 'profile123',
+    } as Profile);
 
     parseWithZodMocked.mockReturnValueOnce({
       status: 'success',
@@ -118,7 +129,7 @@ describe('processShareBackSubmission', () => {
       }),
     });
 
-    await processShareBackSubmission(userId, token, null, formData);
+    await processShareBackSubmission(userId, webcardId, token, null, formData);
 
     expect(sendEmail).toHaveBeenCalledWith([
       {
@@ -144,6 +155,7 @@ describe('processShareBackSubmission', () => {
 
     const result = await processShareBackSubmission(
       userId,
+      webcardId,
       token,
       null,
       formData,

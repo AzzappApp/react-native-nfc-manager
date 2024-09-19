@@ -57,16 +57,13 @@ const SocialLinksRendererFragment = graphql`
 export const readSocialLinksData = (module: SocialLinksRenderer_module$key) =>
   readInlineData(SocialLinksRendererFragment, module);
 
-const animatedProps = [
-  'iconSize',
-  'borderWidth',
-  'columnGap',
-  'marginTop',
-  'marginBottom',
-  'marginHorizontal',
-] as const;
-
-type AnimatedProps = (typeof animatedProps)[number];
+type AnimatedProps =
+  | 'borderWidth'
+  | 'columnGap'
+  | 'iconSize'
+  | 'marginBottom'
+  | 'marginHorizontal'
+  | 'marginTop';
 
 export type SocialLinksRendererData = NullableFields<
   Omit<SocialLinksRenderer_module$data, ' $fragmentType'>

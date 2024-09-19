@@ -1,31 +1,58 @@
 import { FormattedMessage } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
+import { graphql, useFragment } from 'react-relay';
 import {
   isModuleKindSubscription,
+  isWebCardKindSubscription,
   MODULE_COUNT_LIMIT_FOR_SUBSCRIPTION,
   moduleCountRequiresSubscription,
 } from '@azzapp/shared/subscriptionHelpers';
 import { colors } from '#theme';
 import PremiumIndicator from '#components/PremiumIndicator';
 import Text from './Text';
+import type { ModuleEditionScreenTitle_webCard$key } from '#relayArtifacts/ModuleEditionScreenTitle_webCard.graphql';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 
 type ModuleEditionScreenTitleProps = {
   label: string;
   kind: ModuleKind;
   moduleCount: number;
-  isPremium?: boolean;
+  webCardKey: ModuleEditionScreenTitle_webCard$key | null;
 };
 const ModuleEditionScreenTitle = (props: ModuleEditionScreenTitleProps) => {
-  const { label, moduleCount, kind, isPremium = false } = props;
+  const { label, moduleCount, kind, webCardKey } = props;
 
   const requiresSubscription = isModuleKindSubscription(kind);
+
+  const webCard = useFragment(
+    graphql`
+      fragment ModuleEditionScreenTitle_webCard on WebCard {
+        id
+        isPremium
+        webCardKind
+      }
+    `,
+    webCardKey,
+  );
 
   return (
     <View style={styles.container}>
       <Text variant="large">{label}</Text>
-      {!isPremium ? (
-        moduleCountRequiresSubscription(moduleCount) ? (
+      {!webCard?.isPremium ? (
+        webCard && isWebCardKindSubscription(webCard.webCardKind) ? (
+          <View style={styles.pro}>
+            <Text variant="medium" style={styles.proText}>
+              <FormattedMessage
+                defaultMessage="azzapp+ WebCard{azzappA}"
+                values={{
+                  azzappA: <Text variant="azzapp">a</Text>,
+                }}
+                description="ModuleEditionScreenTitle - webCard is premium"
+              />
+            </Text>
+            <PremiumIndicator isRequired />
+          </View>
+        ) : moduleCountRequiresSubscription(moduleCount) ? (
           <View style={styles.pro}>
             <Text variant="medium" style={styles.proText}>
               <FormattedMessage
@@ -36,6 +63,7 @@ const ModuleEditionScreenTitle = (props: ModuleEditionScreenTitleProps) => {
                 description="ModuleEditionScreenTitle - label when module count requires subscription"
               />
             </Text>
+            <PremiumIndicator isRequired />
           </View>
         ) : (
           requiresSubscription && (

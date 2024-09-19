@@ -8,7 +8,6 @@ import {
   referencesMedias,
   removeCardModules,
   transaction,
-  updateProfile,
   updateWebCard,
 } from '@azzapp/data';
 import { DEFAULT_CARD_STYLE } from '@azzapp/shared/cardHelpers';
@@ -112,10 +111,6 @@ const loadCardTemplateMutation: MutationResolvers['loadCardTemplate'] = async (
         cardStyle: omit(cardStyle, 'id', 'labels', 'enabled'),
         updatedAt: new Date(),
         lastCardUpdate: new Date(),
-      });
-
-      await updateProfile(profile.id, {
-        lastContactCardUpdate: new Date(),
       });
     });
   } catch (e) {

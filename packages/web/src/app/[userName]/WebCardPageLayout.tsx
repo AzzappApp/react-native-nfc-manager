@@ -8,7 +8,6 @@ import { FlipIcon } from '#assets';
 import { ButtonIcon } from '#ui';
 import { updateWebCardViewsCounter } from '#app/actions/statisticsAction';
 import ShareBackModal from '#components/ShareBackModal/ShareBackModal';
-import AppClipLoadButton from './AppClipLoadButton';
 import DownloadVCard from './DownloadVCard';
 import PostFeed from './PostFeed';
 import styles from './WebCardPage.css';
@@ -29,17 +28,6 @@ type ProfilePageLayoutProps = PropsWithChildren<{
   color: string | null;
 }>;
 
-const isAppClipSupported = () => {
-  if (!process.env.NEXT_PUBLIC_APPLE_APP_ENABLED) {
-    return false;
-  }
-  const userAgent = navigator.userAgent.toLowerCase();
-  const isIOS = /iphone|ipad/.test(userAgent);
-  const iosVersionMatch = userAgent.match(/os (\d+)_/);
-  const iosVersion = iosVersionMatch ? parseInt(iosVersionMatch[1], 10) : 0;
-  return isIOS && iosVersion > 16.4; //opening appclip from link only supported after 16.4 (FYI: appclip is supported since 14.3)
-};
-
 const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
   const {
     webCard,
@@ -53,18 +41,15 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
   } = props;
   const [display, setDisplay] = useState<'card' | 'posts'>('card');
   const [postsOpen, setPostsOpen] = useState(false);
-  const [appClipIsSupported, setAppClipIsSupported] = useState(false);
-
-  useEffect(() => {
-    setAppClipIsSupported(isAppClipSupported());
-  }, []);
 
   const [contactDataVCard, setContactDataVCard] = useState({
     userId: '',
+    webcardId: '',
     avatarUrl: '',
     token: '',
     firstName: '',
     lastName: '',
+    companyName: '',
     isMultiUser: false,
   });
 
@@ -78,6 +63,7 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
     isMultiUser: boolean;
     firstName?: string;
     lastName?: string;
+    companyName?: string;
   };
 
   const handleCloseDownloadVCard = ({ token }: { token?: string }) => {
@@ -86,11 +72,13 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
         const tokenDecoded = jwtDecode<DownloadVCardJwtPayload>(token);
         setContactDataVCard({
           userId: tokenDecoded.userId,
+          webcardId: webCard?.id,
           avatarUrl: tokenDecoded.avatarUrl ?? '',
           isMultiUser: tokenDecoded.isMultiUser,
           token,
           firstName: tokenDecoded.firstName ?? '',
           lastName: tokenDecoded.lastName ?? '',
+          companyName: tokenDecoded.companyName ?? '',
         });
       } catch (error) {
         Sentry.captureException(
@@ -114,6 +102,11 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const fullname =
+    contactDataVCard.firstName || contactDataVCard.lastName
+      ? `${contactDataVCard.firstName} ${contactDataVCard.lastName}`.trim()
+      : '';
 
   return (
     <>
@@ -215,17 +208,14 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
             }}
           />
         )}
-        {appClipIsSupported ? (
-          <AppClipLoadButton />
-        ) : (
-          <DownloadVCard webCard={webCard} onClose={handleCloseDownloadVCard} />
-        )}
+        <DownloadVCard webCard={webCard} onClose={handleCloseDownloadVCard} />
       </div>
       <ShareBackModal
         ref={shareBackModal}
-        fullname={`${contactDataVCard.firstName} ${contactDataVCard.lastName}`}
+        name={fullname || contactDataVCard.companyName || webCard.userName}
         initials={`${(contactDataVCard.firstName?.length ?? 0) > 0 && (contactDataVCard.lastName?.length ?? 0) > 0 ? `${contactDataVCard.firstName[0]}${contactDataVCard.lastName[0]}` : webCard.companyName ? webCard.companyName.slice(0, 2) : webCard.userName.slice(0, 2)}`}
         userId={contactDataVCard.userId}
+        webcardId={webCard.id}
         avatarUrl={contactDataVCard.avatarUrl}
         token={contactDataVCard.token}
         isMultiUser={contactDataVCard.isMultiUser}

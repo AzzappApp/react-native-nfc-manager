@@ -141,6 +141,7 @@ const SimpleTextEditionScreen = ({
           }
           ...WebCardColorPicker_webCard
           ...SimpleTextStyleEditionPanel_webCard
+          ...ModuleEditionScreenTitle_webCard
         }
         moduleBackgrounds {
           id
@@ -396,6 +397,7 @@ const SimpleTextEditionScreen = ({
       }
       kind={moduleKind}
       moduleCount={cardModulesCount}
+      webCardKey={profile.webCard}
     />
   );
 

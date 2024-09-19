@@ -2,6 +2,7 @@ import { useCallback, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
 import ColorTriptychRenderer from '#components/ColorTriptychRenderer';
 import { useWebCardColors } from '#components/WebCardColorPicker';
@@ -14,11 +15,11 @@ import {
   useEditTransition,
   useSelectionModeTransition,
 } from './WebCardScreenTransitions';
-import type { WebCardColorPicker_webCard$key } from '#relayArtifacts/WebCardColorPicker_webCard.graphql';
+import type { WebCardScreenFooter_webCard$key } from '#relayArtifacts/WebCardScreenFooter_webCard.graphql';
 import type { BottomMenuItem } from '#ui/BottomMenu';
 
 export type WebCardScreenFooterProps = {
-  webCard: WebCardColorPicker_webCard$key;
+  webCard: WebCardScreenFooter_webCard$key;
   /**
    * Whether the webCard is in edit mode
    */
@@ -79,7 +80,19 @@ const WebCardScreenFooter = ({
   onToggleVisibility,
   onDuplicate,
 }: WebCardScreenFooterProps) => {
-  const { colorPalette } = useWebCardColors(webCardKey);
+  const webCard = useFragment(
+    graphql`
+      fragment WebCardScreenFooter_webCard on WebCard {
+        cardModules {
+          id
+        }
+        ...WebCardColorPicker_webCard
+      }
+    `,
+    webCardKey,
+  );
+
+  const { colorPalette } = useWebCardColors(webCard);
 
   const insets = useScreenInsets();
 
@@ -166,6 +179,11 @@ const WebCardScreenFooter = ({
   const selectionMenuStyle = useAnimatedStyle(() => ({
     opacity: editing ? selectionModeTransition?.value ?? 0 : 0,
   }));
+
+  if (webCard.cardModules.length === 0) {
+    return null;
+  }
+
   return (
     <>
       <Animated.View

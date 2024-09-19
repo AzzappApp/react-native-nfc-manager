@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "340769797889",
+    "project_id": "azzapp-dev",
+    "storage_bucket": "azzapp-dev.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:340769797889:android:6f8b52b01ada3b0a1f8d00",
+        "android_client_info": {
+          "package_name": "com.azzapp.app_dev"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC3WzDW2n7AzWflXVlkqDboU9gO8SwIZR0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

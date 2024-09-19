@@ -89,7 +89,7 @@ index 7cede315fb2d316e94bea65e14088ee87f897e78..9ca92a40d6f655e0b3b7db3791412fad
          put(Columns.ID, id)
          put(Columns.IS_PRIMARY, isPrimary)
 diff --git a/android/src/main/java/expo/modules/contacts/models/DateModel.kt b/android/src/main/java/expo/modules/contacts/models/DateModel.kt
-index 9ff83690ab4d7ceec1e8e0142b5f08fd3101fc5d..f8fd8bdb98bfdc5920dd7e66c902fff18470f418 100644
+index 9ff83690ab4d7ceec1e8e0142b5f08fd3101fc5d..d1e83320820aa1eb950a4cc627727d7599846792 100644
 --- a/android/src/main/java/expo/modules/contacts/models/DateModel.kt
 +++ b/android/src/main/java/expo/modules/contacts/models/DateModel.kt
 @@ -1,10 +1,10 @@
@@ -179,7 +179,6 @@ index 9ff83690ab4d7ceec1e8e0142b5f08fd3101fc5d..f8fd8bdb98bfdc5920dd7e66c902fff1
 +    }
 +  }
  }
-\ No newline at end of file
 diff --git a/android/src/main/java/expo/modules/contacts/models/EmailModel.kt b/android/src/main/java/expo/modules/contacts/models/EmailModel.kt
 index 74ce36a325d5a39f5ee6d77650f61c0cf77b8ca3..5d74ec068c1dad7800d3242354615203e9398d4e 100644
 --- a/android/src/main/java/expo/modules/contacts/models/EmailModel.kt
@@ -271,3 +270,36 @@ index fb43686cb6de23dff42c0774f1210558c69f4adc..9bfed69e26bccd4eeaecffba2df50e03
        else -> ContactsContract.CommonDataKinds.StructuredPostal.TYPE_OTHER
      }
      return postalAddressType
+diff --git a/ios/Decoding.swift b/ios/Decoding.swift
+index 49d6f4866553a83dd1eab0d665e6c12609e03cde..b8ead58605830ce77801c3d957924b495777f0be 100644
+--- a/ios/Decoding.swift
++++ b/ios/Decoding.swift
+@@ -34,13 +34,12 @@ func decodeSocialProfiles(_ input: [SocialProfile]?) -> [CNLabeledValue<CNSocial
+   var output = [CNLabeledValue<CNSocialProfile>]()
+   for item in input {
+     let label = decodeLabel(label: item.label)
+-    if let urlString = item.url,
+-    let username = item.username,
+-    let userId = item.userId,
+-    let service = item.service {
+-      let profile = CNSocialProfile(urlString: urlString.path, username: username, userIdentifier: userId, service: service)
+-      output.append(CNLabeledValue(label: label, value: profile))
+-    }
++    let urlString = item.url
++    let username = item.username
++    let userId = item.userId
++    let service = item.service
++    let profile = CNSocialProfile(urlString: urlString?.path, username: username, userIdentifier: userId, service: service)
++    output.append(CNLabeledValue(label: label, value: profile))
+   }
+   return output
+ }
+@@ -69,7 +68,7 @@ func decodeUrlAddresses(_ input: [UrlAddress]?) -> [CNLabeledValue<NSString>]? {
+   var output = [CNLabeledValue<NSString>]()
+   for item in input {
+     let label = decodeUrlAddressLabel(item.label)
+-    if let urlString = item.url?.path {
++    if let urlString = item.url?.absoluteString {
+       output.append(CNLabeledValue(label: label, value: urlString as NSString))
+     }
+   }

@@ -45,7 +45,7 @@ const ResetPasswordScreen = ({
 }: NativeScreenProps<ResetPasswordRoute>) => {
   const {
     control,
-    formState: { isSubmitting, isDirty, isValid, errors, isSubmitSuccessful },
+    formState: { isSubmitting, isDirty, errors, isSubmitSuccessful },
     handleSubmit,
   } = useForm<ResetPasswordForm>({
     resolver: zodResolver(ResetPasswordScreenSchema),
@@ -85,7 +85,7 @@ const ResetPasswordScreen = ({
             }),
             onHide: navigateToLogin,
           });
-        } catch (e) {
+        } catch {
           Toast.show({
             type: 'error',
             text1: intl.formatMessage({
@@ -179,9 +179,7 @@ const ResetPasswordScreen = ({
                   'Create new password Screen - AccessibilityLabel Create New Password button',
               })}
               style={styles.field}
-              disabled={
-                !isDirty || !isValid || isSubmitting || isSubmitSuccessful
-              }
+              disabled={!isDirty || isSubmitting || isSubmitSuccessful}
               loading={isSubmitting}
               onPress={onSubmit}
             />

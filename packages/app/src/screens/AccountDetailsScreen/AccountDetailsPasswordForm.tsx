@@ -34,7 +34,7 @@ const AccountDetailsPasswordForm = ({
     control,
     handleSubmit,
     setError,
-    formState: { isSubmitting, errors, isSubmitSuccessful },
+    formState: { isSubmitting, errors, isSubmitSuccessful, isLoading },
     reset,
   } = useForm<PasswordForm>({
     resolver: zodResolver(passwordFormSchema),
@@ -105,10 +105,10 @@ const AccountDetailsPasswordForm = ({
   return (
     <InputAccessoryView visible={visible} onClose={toggleBottomSheet}>
       <Header
-        leftElement={
+        rightElement={
           <Button
-            disabled={isSubmitting || isSubmitSuccessful}
-            loading={isSubmitting}
+            disabled={isSubmitSuccessful || isLoading}
+            loading={isSubmitting || isLoading}
             label={intl.formatMessage({
               defaultMessage: 'Save',
               description: 'Edit password modal save button label',
@@ -118,7 +118,7 @@ const AccountDetailsPasswordForm = ({
             style={styles.headerButton}
           />
         }
-        rightElement={
+        leftElement={
           <Button
             label={intl.formatMessage({
               defaultMessage: 'Cancel',

@@ -196,8 +196,9 @@
         // "@typescript-eslint/prefer-nullish-coalescing": "error",
         // "@typescript-eslint/prefer-optional-chain": "error",
         "@typescript-eslint/prefer-ts-expect-error": "error",
-        "@typescript-eslint/sort-type-constituents": "error"
+        "@typescript-eslint/sort-type-constituents": "error",
         // "@typescript-eslint/switch-exhaustiveness-check": "error"
+        "@typescript-eslint/no-require-imports": "off"
       },
       "overrides": [
         {

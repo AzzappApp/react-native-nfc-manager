@@ -19,6 +19,7 @@ import {
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import Link from '#components/Link';
+import { logEvent } from '#helpers/analytics';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import useQuitWebCard from '#hooks/useQuitWebCard';
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -208,6 +209,7 @@ const HomeBottomSheetPanel = ({
             }),
           },
         );
+        logEvent('share_webcard', { source: 'home' });
         close();
 
         //TODO: handle result of the share when specified
@@ -283,7 +285,10 @@ const HomeBottomSheetPanel = ({
               linkProps: {
                 route: 'WEBCARD_PARAMETERS',
               },
-              onPress: close,
+              onPress: () => {
+                logEvent('open_webcard_parameters', { source: 'home' });
+                close();
+              },
             }
           : null,
         !profile?.invited &&
@@ -299,7 +304,10 @@ const HomeBottomSheetPanel = ({
               linkProps: {
                 route: 'MULTI_USER',
               },
-              onPress: close,
+              onPress: () => {
+                logEvent('open_multi_user', { source: 'home' });
+                close();
+              },
             }
           : null,
         profile && profile?.webCard?.cardIsPublished && !profile?.invited
@@ -328,7 +336,10 @@ const HomeBottomSheetPanel = ({
               linkProps: {
                 route: 'INVITE_FRIENDS',
               },
-              onPress: close,
+              onPress: () => {
+                logEvent('invite_friend', { source: 'home' });
+                close();
+              },
             }
           : null,
         {
@@ -339,6 +350,7 @@ const HomeBottomSheetPanel = ({
             description: 'Contact us message in Home bottom sheet panel',
           }),
           onPress: () => {
+            logEvent('open_mail_support');
             Linking.openURL('mailto:support@azzapp.com');
           },
         },

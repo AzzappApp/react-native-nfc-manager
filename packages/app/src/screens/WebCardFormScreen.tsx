@@ -15,7 +15,7 @@ import { useDebounce } from 'use-debounce';
 import * as z from 'zod';
 import ERRORS from '@azzapp/shared/errors';
 import { isValidUserName } from '@azzapp/shared/stringHelpers';
-import { buildUserUrl } from '@azzapp/shared/urlHelpers';
+import { buildReadableUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import { NextHeaderButton } from '#components/commonsButtons';
 import { useRouter } from '#components/NativeRouter';
@@ -212,7 +212,7 @@ const WebCardFormScreen = ({
                 },
               };
             }
-          } catch (e) {
+          } catch {
             //waiting for submit
           }
         }
@@ -275,9 +275,13 @@ const WebCardFormScreen = ({
           #required data on HomeScreen
           ...ContactCard_profile
           nbContactCardScans
+          nbShareBacks
           statsSummary {
             contactCardScans
+            shareBacks
           }
+          lastContactCardUpdate
+          createdAt
           webCard {
             id
             userName
@@ -506,6 +510,7 @@ const WebCardFormScreen = ({
                     autoCorrect={false}
                     returnKeyType="next"
                     onSubmitEditing={focusLastName}
+                    autoFocus
                   />
                 )}
               />
@@ -577,6 +582,7 @@ const WebCardFormScreen = ({
                     autoComplete="name"
                     autoCorrect={false}
                     returnKeyType="next"
+                    autoFocus
                   />
                 )}
               />
@@ -702,7 +708,7 @@ const WebCardFormScreen = ({
                         error && { color: colors.red400 },
                       ]}
                     >
-                      {buildUserUrl(userName)}
+                      {buildReadableUserUrl(userName)}
                     </Text>
                   </>
                 )}

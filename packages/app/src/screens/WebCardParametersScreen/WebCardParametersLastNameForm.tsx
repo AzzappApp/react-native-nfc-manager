@@ -1,3 +1,4 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
@@ -43,6 +44,7 @@ const WebcardParametersLastNameForm = ({
       lastName: webCard.lastName ?? '',
     },
     mode: 'onSubmit',
+    resolver: zodResolver(lastNameFormSchema),
   });
 
   useEffect(() => {

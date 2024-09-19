@@ -5,7 +5,11 @@ import * as Sentry from '@sentry/nextjs';
 import { jwtDecode } from 'jwt-decode';
 import { compressToEncodedURIComponent } from 'lz-string';
 import { headers } from 'next/headers';
-import { getUserById } from '@azzapp/data';
+import {
+  getProfileByUserAndWebCard,
+  getUserById,
+  saveShareBack,
+} from '@azzapp/data';
 import { buildVCardFromShareBackContact } from '@azzapp/shared/vCardHelpers';
 import { ShareBackFormSchema } from '#components/ShareBackModal/shareBackFormSchema';
 import {
@@ -37,6 +41,7 @@ const intl = getServerIntl();
 
 export const processShareBackSubmission = async (
   userId: string,
+  webcardId: string,
   token: string,
   prevState: unknown,
   formData: FormData,
@@ -91,6 +96,19 @@ export const processShareBackSubmission = async (
       });
     }
 
+    const profile = await getProfileByUserAndWebCard(user.id, webcardId);
+    if (!profile) {
+      Sentry.captureException(
+        new Error(
+          `No profile found to send the share back with userId: ${userId} and webCardId: ${webcardId}`,
+        ),
+      );
+
+      return submission.reply({
+        formErrors: ['Profile not found'],
+      });
+    }
+
     const userParamsContactMethods = {
       email: user.email,
       phoneNumber: user.phoneNumber,
@@ -117,6 +135,11 @@ export const processShareBackSubmission = async (
       id: 'dMfROA',
       defaultMessage: `Hello, You've received a new contact ShareBack. Best.`,
       description: 'Email body for new contact share back',
+    });
+
+    await saveShareBack({
+      profileId: profile.id,
+      ...submission.payload,
     });
 
     if (contactMethod.method === CONTACT_METHODS.SMS) {

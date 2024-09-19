@@ -59,6 +59,7 @@ const MultiUserScreenUserList = ({
     graphql`
       fragment MultiUserScreenUserList_webCard on WebCard {
         id
+        nbProfiles
         commonInformation {
           company
           addresses {
@@ -244,6 +245,7 @@ const MultiUserScreenUserList = ({
     ({ item }) => {
       if (
         item.id === profileInfos?.profileId &&
+        webCard.nbProfiles > 1 &&
         profileIsOwner(item.profileRole)
       ) {
         return (

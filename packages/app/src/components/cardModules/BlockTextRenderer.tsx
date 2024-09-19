@@ -55,16 +55,13 @@ const BlockTextRendererFragment = graphql`
   }
 `;
 
-const animatedProps = [
-  'fontSize',
-  'verticalSpacing',
-  'marginHorizontal',
-  'marginVertical',
-  'textMarginVertical',
-  'textMarginHorizontal',
-] as const;
-
-type AnimatedProps = (typeof animatedProps)[number];
+type AnimatedProps =
+  | 'fontSize'
+  | 'marginHorizontal'
+  | 'marginVertical'
+  | 'textMarginHorizontal'
+  | 'textMarginVertical'
+  | 'verticalSpacing';
 
 export const readBlockTextData = (module: BlockTextRenderer_module$key) =>
   readInlineData(BlockTextRendererFragment, module);

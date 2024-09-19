@@ -29,6 +29,7 @@ type TextProps = RNTextProps & {
    * @type {('dark' | 'light')}
    */
   appearance?: ColorSchemeName;
+  maxLength?: number;
 };
 
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
@@ -39,14 +40,19 @@ const AnimatedText = ({
   variant = 'none',
   containerStyle,
   appearance,
+  maxLength,
   ...props
 }: TextProps) => {
   const styles = useVariantStyleSheet(textStyleSheet, variant, appearance);
 
   const { text, style } = { style: {}, ...props };
+
   const animatedProps = useAnimatedProps(() => {
     return {
-      text: text.value,
+      text:
+        !maxLength || text.value.length < maxLength
+          ? text.value
+          : `${text.value.slice(0, maxLength)}...`,
       // Here we use any because the text prop is not available in the type
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
@@ -59,7 +65,11 @@ const AnimatedText = ({
         accessibilityRole="text"
         underlineColorAndroid="transparent"
         editable={false}
-        defaultValue={text.value}
+        defaultValue={
+          !maxLength || text.value.length < maxLength
+            ? text.value
+            : `${text.value.slice(0, maxLength)}...`
+        }
         allowFontScaling={false}
         style={[styles.text, { padding: 0 }, style]}
         pointerEvents="none"

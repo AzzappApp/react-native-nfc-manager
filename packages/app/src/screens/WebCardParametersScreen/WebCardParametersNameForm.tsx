@@ -81,7 +81,7 @@ const WebcardParametersNameForm = ({
                 },
               };
             }
-          } catch (e) {
+          } catch {
             //waiting for submi5
           }
         }

@@ -36,7 +36,7 @@ const updateWebCardViews: MutationResolvers['updateWebCardViews'] = async (
     }
 
     return true;
-  } catch (error) {
+  } catch {
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 };
@@ -70,7 +70,7 @@ const updateContactCardScans: MutationResolvers['updateContactCardScans'] =
       }
 
       return true;
-    } catch (error) {
+    } catch {
       throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
     }
   };

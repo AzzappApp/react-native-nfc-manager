@@ -214,8 +214,8 @@ const columns: GridColDef[] = [
     flex: 1,
     renderCell: params => (
       <Chip
-        color={params.value === 'Opened' ? 'warning' : 'default'}
-        label={params.value}
+        color={params.value === 'open' ? 'warning' : 'default'}
+        label={params.value === 'open' ? 'Opened' : 'Closed'}
       />
     ),
   },
