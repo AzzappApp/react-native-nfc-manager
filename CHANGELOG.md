@@ -1,5 +1,6 @@
-## 0.9.0-canary.16
+## 0.9.0-canary.17
 
+* **fix:**  - **contactCard:** [#4998](https://github.com/AzzappApp/azzapp/pull/4998) add protocol when missing ([#5070](https://github.com/AzzappApp/azzapp/pull/5070))
 * **fix:**  - update contactCardUrl from mutation and use proper contact data for browser popup ([#5066](https://github.com/AzzappApp/azzapp/pull/5066))
 * **build:**  - add ios marketing file
 * **fix:**  - 🐛 properly load through relay for cover ([#5061](https://github.com/AzzappApp/azzapp/pull/5061))
