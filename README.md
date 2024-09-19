@@ -163,12 +163,12 @@ Valid platforms are  `IOS` and `ANDROID`.
 
 ### List of environment variables used at runtime by the application server:
 
-- `DATABASE_HOST`: Host of the planetscale database
-- `DATABASE_USERNAME`: Username of the planetscale database
-- `DATABASE_PASSWORD`: Password of the planetscale database 
-- `CLOUDINARY_API_SECRET`: cloudinary api secret
-- `CLOUDINARY_API_KEY`: the cloudinary api key 
-- `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`:  the cloudinary cloud name (also used by web application client)
+- `DATABASE_HOST`: Host of the _planetscale_ database
+- `DATABASE_USERNAME`: Username of the _planetscale_ database
+- `DATABASE_PASSWORD`: Password of the _planetscale_ database 
+- `CLOUDINARY_API_SECRET`: _cloudinary_ api secret
+- `CLOUDINARY_API_KEY`: the _cloudinary_ api key 
+- `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`:  the _cloudinary_ cloud name (also used by web application client)
 - `SECRET_COOKIE_PASSWORD`: password used to encrypt web cookie
 - `TOKEN_SECRET`: password used to encrypt jwt tokens
 - `REFRESH_TOKEN_SECRET`: password used to encrypt jwt refresh tokens
@@ -176,7 +176,7 @@ Valid platforms are  `IOS` and `ANDROID`.
 ### List of environment variables used at runtime by the application clients:
 
 - `NEXT_PUBLIC_API_ENDPOINT`: the endpoint of api (generated at build time for mobile clients, set to `/api` for web client)
-- `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`: the cloudinary cloud name (only used on WEB)
+- `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`: the _cloudinary_ cloud name (only used on WEB)
 
 ## Resources
 
