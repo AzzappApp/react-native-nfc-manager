@@ -23,6 +23,9 @@ const socialIcons = {
   get figma() {
     return require('./assets/social/figma.png');
   },
+  get flickr() {
+    return require('./assets/social/flickr.png');
+  },
   get github() {
     return require('./assets/social/github.png');
   },
@@ -50,6 +53,9 @@ const socialIcons = {
   get mastodon() {
     return require('./assets/social/mastodon.png');
   },
+  get medium() {
+    return require('./assets/social/medium.png');
+  },
   get messenger() {
     return require('./assets/social/messenger.png');
   },
@@ -65,11 +71,23 @@ const socialIcons = {
   get pinterest() {
     return require('./assets/social/pinterest.png');
   },
+  get producthunt() {
+    return require('./assets/social/producthunt.png');
+  },
+  get reddit() {
+    return require('./assets/social/reddit.png');
+  },
   get sms() {
     return require('./assets/social/sms.png');
   },
   get snapchat() {
     return require('./assets/social/snapchat.png');
+  },
+  get soundcloud() {
+    return require('./assets/social/soundcloud.png');
+  },
+  get spotify() {
+    return require('./assets/social/spotify.png');
   },
   get telegram() {
     return require('./assets/social/telegram.png');
@@ -80,6 +98,9 @@ const socialIcons = {
   get tripadvisor() {
     return require('./assets/social/tripadvisor.png');
   },
+  get tumblr() {
+    return require('./assets/social/tumblr.png');
+  },
   get twitch() {
     return require('./assets/social/twitch.png');
   },
@@ -88,6 +109,9 @@ const socialIcons = {
   },
   get typefully() {
     return require('./assets/social/typefully.png');
+  },
+  get vimeo() {
+    return require('./assets/social/vimeo.png');
   },
   get whatsapp() {
     return require('./assets/social/whatsapp.png');
@@ -100,6 +124,9 @@ const socialIcons = {
   },
   get website() {
     return require('./assets/social/website.png');
+  },
+  get wechat() {
+    return require('./assets/social/wechat.png');
   },
 } as const;
 
