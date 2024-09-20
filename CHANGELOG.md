@@ -1,5 +1,6 @@
-## 0.9.1-canary.4
+## 0.9.1-canary.5
 
+* **fix:**  - 🐛 properly send invite from list ([#5080](https://github.com/AzzappApp/azzapp/pull/5080))
 * **feat:**  - 🎸 show disabled action specific to pending invitation ([#5073](https://github.com/AzzappApp/azzapp/pull/5073))
 * **feat:**  - add social link and order ([#5071](https://github.com/AzzappApp/azzapp/pull/5071))
 * **fix:**  - **contactCard:** [#4998](https://github.com/AzzappApp/azzapp/pull/4998) add protocol when missing ([#5070](https://github.com/AzzappApp/azzapp/pull/5070))
