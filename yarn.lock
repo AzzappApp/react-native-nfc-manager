@@ -9114,12 +9114,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native-camera-roll/camera-roll@npm:^7.8.3":
+"@react-native-camera-roll/camera-roll@npm:7.8.3":
   version: 7.8.3
   resolution: "@react-native-camera-roll/camera-roll@npm:7.8.3"
   peerDependencies:
     react-native: ">=0.59"
   checksum: 1465566ed52b6e1478debcebc1bcaecbd6752611064d7fd5a0c4ed06deb702626ebd945c7ca664d5d070f822a4d3338e5dbb447a9acb27adb35dd77f8bfba2f9
+  languageName: node
+  linkType: hard
+
+"@react-native-camera-roll/camera-roll@patch:@react-native-camera-roll/camera-roll@npm%3A7.8.3#./.yarn/patches/@react-native-camera-roll-camera-roll-npm-7.8.3-9c4439f311.patch::locator=%40azzapp%2Fmonorepo%40workspace%3A.":
+  version: 7.8.3
+  resolution: "@react-native-camera-roll/camera-roll@patch:@react-native-camera-roll/camera-roll@npm%3A7.8.3#./.yarn/patches/@react-native-camera-roll-camera-roll-npm-7.8.3-9c4439f311.patch::version=7.8.3&hash=241227&locator=%40azzapp%2Fmonorepo%40workspace%3A."
+  peerDependencies:
+    react-native: ">=0.59"
+  checksum: 25e6e63df32102d8b319e31ffb4943809079322582c5d286d427b3d8e7077c6979a368b5537d21bbf8a01b1f618d7249fb61e61c3e7027240efd40a12e93420d
   languageName: node
   linkType: hard
 

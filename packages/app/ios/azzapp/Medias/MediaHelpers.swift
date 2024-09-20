@@ -46,41 +46,5 @@ class MediaHelpers: NSObject {
     }
   }
   
-  @objc
-  func getPHAssetPath(_ internalId:NSString, resolve:  @escaping RCTPromiseResolveBlock, reject:  @escaping RCTPromiseRejectBlock) {
-    var mediaIdentifier = internalId as String
-    if mediaIdentifier.starts(with: "ph://")  {
-      mediaIdentifier = mediaIdentifier.replacingOccurrences(of: "ph://", with: "")
-    }
-    
-    guard let asset = PHAsset.fetchAssets(withLocalIdentifiers: [mediaIdentifier], options: nil).firstObject else {
-      reject("NOT_FOUND", "Asset not found",  nil)
-      return
-    }
-
-    let assetResources = PHAssetResource.assetResources(for: asset)
-    if assetResources.first == nil {
-        return
-    }
-    var filePath = ""
-    let editOptions = PHContentEditingInputRequestOptions()
-    // Download asset if on icloud.
-    editOptions.isNetworkAccessAllowed = true
-
-    asset.requestContentEditingInput(with: editOptions) { contentEditingInput, infos in
-      var imageURL = contentEditingInput?.fullSizeImageURL
-      if let audiovisualAsset = contentEditingInput?.audiovisualAsset as? AVURLAsset {
-          imageURL = audiovisualAsset.url as URL
-      }
-      if let imageURL = imageURL, imageURL.absoluteString.count != 0 {
-          filePath = imageURL.absoluteString.replacingOccurrences(of: "pathfile:", with: "file:")
-          resolve(filePath)
-      } else {
-          let errorMessage = String.init(format: "Failed to load asset with localIdentifier %@ with no error message.", internalId)
-          let error = RCTErrorWithMessage(errorMessage)
-          reject("Error while getting file path", "Error while getting file path", error)
-      }
-    }
-  }
 }
 
