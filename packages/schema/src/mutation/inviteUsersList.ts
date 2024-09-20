@@ -204,12 +204,16 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
 
   try {
     if (sentEmail.length > 0 && sendInvite) {
-      await notifyUsers(
-        'email',
-        sentEmail,
-        webCard,
-        'invitation',
-        guessLocale(user?.locale),
+      await Promise.allSettled(
+        sentEmail.map(email =>
+          notifyUsers(
+            'email',
+            [email],
+            webCard,
+            'invitation',
+            guessLocale(user?.locale),
+          ),
+        ),
       );
     }
   } catch (e) {
