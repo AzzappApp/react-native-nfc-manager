@@ -167,9 +167,13 @@ function relayScreen<TRoute extends Route>(
               params,
               profileInfos,
             );
+            const { useOfflineCache } = options;
             currentSubscription = fetchQuery(environment, query, variables, {
               fetchPolicy: 'network-only',
-              networkCacheConfig: { force: true },
+              networkCacheConfig: {
+                force: true,
+                metadata: { useOfflineCache },
+              },
             }).subscribe({
               complete: () => {
                 retryCount = 0;

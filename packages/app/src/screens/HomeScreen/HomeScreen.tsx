@@ -126,4 +126,5 @@ export default relayScreen(HomeScreen, {
   fallback: HomeScreenFallback,
   canGoBack: false,
   pollInterval: 30000,
+  useOfflineCache: true,
 });
