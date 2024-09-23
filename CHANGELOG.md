@@ -1,5 +1,7 @@
-## 0.9.1-canary.7
+## 0.9.1-canary.8
 
+* **fix:**  - shareAndShare dismiss (and update marketing version of iOS) ([#5114](https://github.com/AzzappApp/azzapp/pull/5114))
+* **fix:**  - 🐛 show newly added media in limited selection mode ([#5115](https://github.com/AzzappApp/azzapp/pull/5115))
 * **fix:**  - 🐛 properly send invite from list ([#5080](https://github.com/AzzappApp/azzapp/pull/5080))
 * **feat:**  - 🎸 show disabled action specific to pending invitation ([#5073](https://github.com/AzzappApp/azzapp/pull/5073))
 * **feat:**  - add social link and order ([#5071](https://github.com/AzzappApp/azzapp/pull/5071))
