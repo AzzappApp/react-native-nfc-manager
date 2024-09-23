@@ -1,5 +1,7 @@
-## 0.9.5-canary.3
+## 0.9.5-canary.4
 
+* **perf:**  - move rate limiting from middleware to apis ([#5124](https://github.com/AzzappApp/azzapp/pull/5124))
+* **fix:**  - **android:** [#5087](https://github.com/AzzappApp/azzapp/pull/5087) wallet can’t stand empty string ([#5125](https://github.com/AzzappApp/azzapp/pull/5125))
 * **build:**  - force version upgrade
 * **docs:**  - update readme
 * **fix:**  - shareAndShare dismiss (and update marketing version of iOS) ([#5114](https://github.com/AzzappApp/azzapp/pull/5114))
