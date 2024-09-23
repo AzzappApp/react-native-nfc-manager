@@ -87,6 +87,7 @@ const LineDividerEditionScreen = ({
         }
         isPremium
         ...WebCardColorPicker_webCard
+        ...ModuleEditionScreenTitle_webCard
       }
     `,
     webCardKey,
@@ -280,6 +281,7 @@ const LineDividerEditionScreen = ({
             })}
             kind="lineDivider"
             moduleCount={cardModulesCount}
+            webCardKey={webCard ?? null}
           />
         }
         leftElement={

@@ -23,6 +23,7 @@ import {
   useRouter,
   useScreenHasFocus,
 } from '#components/NativeRouter';
+import { logEvent } from '#helpers/analytics';
 import { getAuthState } from '#helpers/authStore';
 import CarouselSelectList from '#ui/CarouselSelectList';
 import Icon from '#ui/Icon';
@@ -417,6 +418,7 @@ const CreateItem = ({
           defaultMessage: 'Create a new WebCard',
           description: 'Start new profile creation from account screen',
         })}
+        onPress={() => logEvent('CreateWebCard', { source: 'HomeScreen' })}
       >
         <Icon icon="add" style={styles.icon} />
       </PressableOpacity>

@@ -35,6 +35,37 @@ export const incrementContactCardScans = async (
 };
 
 /**
+ * The function `incrementShareBacks` updates `shareBacks` in the statistics table for a given profile
+ * ID, incrementing the value by 1 if `increase` is true.
+ *
+ * @param profileId - The id of profile for whom the statistics are being updated.
+ * @param increase - The `increase` parameter is a boolean value that determines whether the statistics
+ * should be increased or decreased. If `increase` is `true`, the statistics will be increased by 1. If
+ * `increase` is `false`, the statistics will be decreased by 1.
+ */
+export const incrementShareBacks = async (
+  profileId: string,
+  increase: boolean,
+) => {
+  const onDuplicateSet = {
+    set: {
+      shareBacks: increase
+        ? sql`${ProfileStatisticTable.shareBacks} + 1`
+        : sql`${ProfileStatisticTable.shareBacks} - 1`,
+    },
+  };
+
+  await db()
+    .insert(ProfileStatisticTable)
+    .values({
+      profileId,
+      day: new Date(),
+      shareBacks: 1,
+    })
+    .onDuplicateKeyUpdate(onDuplicateSet);
+};
+
+/**
  * Retrieve the last `days` of statistics for a list of profiles.
  *
  * @param profileIds - The list of profile IDs for which the statistics are being retrieved.

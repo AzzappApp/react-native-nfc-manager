@@ -168,17 +168,16 @@ const Toast = ({
 
 export default memo(Toast);
 
-const TOAST_HEIGHT = 44;
-
 const styleSheet = createStyleSheet(appearance => ({
   baseToast: {
-    height: TOAST_HEIGHT,
+    height: undefined,
     borderRadius: 15,
     borderLeftWidth: 0,
     alignItems: 'center',
     paddingLeft: 10,
     paddingRight: 10,
     marginHorizontal: 20,
+    paddingVertical: 10,
     flex: 0,
     width: undefined,
     // TODO UI
@@ -216,7 +215,6 @@ const styleSheet = createStyleSheet(appearance => ({
   toastText: {
     // TODO UI
     color: colors.black, //appearance === 'light' ? colors.black : colors.white,
-    textAlign: 'center',
     width: undefined,
   },
   info: {

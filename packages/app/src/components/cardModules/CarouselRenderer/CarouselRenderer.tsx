@@ -55,16 +55,13 @@ const CarouselRendererFragment = graphql`
   }
 `;
 
-const animatedProps = [
-  'borderWidth',
-  'borderRadius',
-  'marginVertical',
-  'marginHorizontal',
-  'imageHeight',
-  'gap',
-] as const;
-
-type AnimatedProps = (typeof animatedProps)[number];
+type AnimatedProps =
+  | 'borderRadius'
+  | 'borderWidth'
+  | 'gap'
+  | 'imageHeight'
+  | 'marginHorizontal'
+  | 'marginVertical';
 
 const AnimatedImage = Animated.createAnimatedComponent(Image);
 
@@ -190,13 +187,11 @@ const CarouselRenderer = ({
       typeof marginVertical === 'number'
         ? marginVertical
         : marginVertical?.value ?? 0;
-    const borderWidthValue =
-      typeof borderWidth === 'number' ? borderWidth : borderWidth?.value ?? 0;
 
     return {
-      height: imageHeightValue + marginVerticalValue * 2 + borderWidthValue * 2,
+      height: imageHeightValue + marginVerticalValue * 2,
     };
-  }, [imageHeight, marginVertical, borderWidth]);
+  }, [imageHeight, marginVertical]);
 
   const containerStyle = useAnimatedStyle(() => {
     return {

@@ -2,7 +2,7 @@ import { addPass, addPassJWT } from '@reeq/react-native-passkit';
 import { ImageFormat, makeImageFromView } from '@shopify/react-native-skia';
 import { Image } from 'expo-image';
 import { fromGlobalId } from 'graphql-relay';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
   View,
@@ -26,6 +26,7 @@ import ContactCard, {
   CONTACT_CARD_RATIO,
 } from '#components/ContactCard/ContactCard';
 import { useRouter } from '#components/NativeRouter';
+import { logEvent } from '#helpers/analytics';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import {
   generateEmailSignature,
@@ -38,6 +39,7 @@ import useToggle from '#hooks/useToggle';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
+import FingerHint from '#ui/FingerHint';
 import Icon from '#ui/Icon';
 import PressableAnimated from '#ui/PressableAnimated';
 import PressableNative from '#ui/PressableNative';
@@ -56,6 +58,7 @@ const contactCardMobileScreenQuery = graphql`
     node(id: $profileId) {
       ... on Profile @alias(as: "profile") {
         id
+        invited
         webCard {
           id
           userName
@@ -63,7 +66,10 @@ const contactCardMobileScreenQuery = graphql`
           cardColors {
             primary
           }
+          cardIsPublished
         }
+        lastContactCardUpdate
+        createdAt
         ...ContactCard_profile
         ...ContactCardExportVcf_card
         ...SignaturePreview_profile
@@ -97,7 +103,7 @@ export const ContactCardScreen = ({
 
   const sharedRotationState = useAnimatedState(fullScreen, defaultTimingParam);
 
-  const cardWidth = (width * 78) / 100;
+  const cardWidth = width - 40;
   const cardHeight = cardWidth / CONTACT_CARD_RATIO;
   const fullScreenCardWidth = width - 40;
   const fullScreenCardHeight = fullScreenCardWidth * CONTACT_CARD_RATIO;
@@ -182,6 +188,7 @@ export const ContactCardScreen = ({
       const base64 = image?.encodeToBase64(ImageFormat.JPEG, 100);
 
       try {
+        logEvent('generate_email_signature');
         await generateEmailSignature({
           locale: intl.locale,
           profileId: fromGlobalId(profile.id).id,
@@ -210,6 +217,12 @@ export const ContactCardScreen = ({
 
   const router = useRouter();
 
+  useEffect(() => {
+    if (profile?.invited || !profile?.webCard?.cardIsPublished) {
+      router.backToTop();
+    }
+  }, [profile?.invited, profile?.webCard?.cardIsPublished, router]);
+
   const generateLoadingPass = useCallback(async () => {
     try {
       setLoadingPass(true);
@@ -231,8 +244,9 @@ export const ContactCardScreen = ({
 
           await addPassJWT(pass.token);
         }
+        logEvent('add_pass_wallet');
       }
-    } catch (e) {
+    } catch {
       Toast.show({
         text1: intl.formatMessage({
           defaultMessage: 'Error',
@@ -303,6 +317,13 @@ export const ContactCardScreen = ({
               });
             }}
           />
+          {profile.lastContactCardUpdate <= profile.createdAt && (
+            <FingerHint
+              color={colorScheme === 'dark' ? 'light' : 'dark'}
+              style={styles.fingerHint}
+            />
+          )}
+
           <ScrollView
             style={[styles.scrollViewStyle, { height: height - 247 }]}
             showsVerticalScrollIndicator={false}
@@ -576,4 +597,5 @@ const styleSheet = createStyleSheet(appearance => ({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  fingerHint: { top: -57 },
 }));

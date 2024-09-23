@@ -33,8 +33,8 @@ const form = style({
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
-  maxHeight: 'calc(100vh - 310px)',
-  overflowY: 'scroll',
+  maxHeight: 'calc(100% - 310px)',
+  overflowY: 'auto',
 });
 
 const formFieldContainer = style([

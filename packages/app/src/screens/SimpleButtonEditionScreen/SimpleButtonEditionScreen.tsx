@@ -147,6 +147,7 @@ const SimpleButtonEditionScreen = ({
           }
           ...SimpleButtonBordersEditionPanel_webCard
           ...SimpleButtonSettingsEditionPanel_webCard
+          ...ModuleEditionScreenTitle_webCard
         }
         ...SimpleButtonBackgroundEditionPanel_profile
       }
@@ -398,6 +399,7 @@ const SimpleButtonEditionScreen = ({
             })}
             kind="simpleButton"
             moduleCount={cardModulesCount}
+            webCardKey={profile.webCard}
           />
         }
         leftElement={

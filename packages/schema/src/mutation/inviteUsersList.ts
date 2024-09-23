@@ -148,6 +148,7 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
         contactCardIsPrivate: displayedOnWebCard ?? false,
         profileRole: invited.profileRole ?? 'user',
         nbContactCardScans: 0,
+        nbShareBacks: 0,
         promotedAsOwner: false,
         createdAt,
       };

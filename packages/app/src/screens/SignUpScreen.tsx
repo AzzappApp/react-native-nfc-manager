@@ -24,6 +24,7 @@ import {
 import { colors } from '#theme';
 import EmailOrPhoneInput from '#components/EmailOrPhoneInput';
 import { useNativeNavigationEvent, useRouter } from '#components/NativeRouter';
+import { logEvent } from '#helpers/analytics';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { signup } from '#helpers/MobileWebAPI';
@@ -35,7 +36,6 @@ import PressableOpacity from '#ui/PressableOpacity';
 import SecuredTextInput from '#ui/SecuredTextInput';
 import Text from '#ui/Text';
 import type { EmailPhoneInput } from '#components/EmailOrPhoneInput';
-import type { Route } from '#routes';
 import type { CheckboxStatus } from '#ui/CheckBox';
 import type {
   LayoutChangeEvent,
@@ -129,7 +129,6 @@ const SignUpScreen = () => {
           password,
         ).catch(() => {});
         setClearPassword(true);
-
         if (isNotFalsyString(tokens.userId)) {
           // Signin process
           const { profileInfos } = tokens;
@@ -148,6 +147,8 @@ const SignUpScreen = () => {
           });
         } else {
           const { issuer } = tokens;
+
+          logEvent('sign_up_attempt', { issuer });
 
           router.push({
             route: 'CONFIRM_REGISTRATION',
@@ -194,24 +195,13 @@ const SignUpScreen = () => {
 
   // #endregion
 
-  const navigateTo = useCallback(
-    async (route: Route, replace: boolean) => {
-      if (Platform.OS === 'ios') {
-        setClearPassword(true);
-        await waitTime(100);
-      }
-      if (replace) {
-        router.replace(route);
-      } else {
-        router.push(route);
-      }
-    },
-    [router],
-  );
-
-  const onSigninLinkPress = useCallback(() => {
-    navigateTo({ route: 'SIGN_IN' }, true);
-  }, [navigateTo]);
+  const navigateTo = useCallback(async () => {
+    if (Platform.OS === 'ios') {
+      setClearPassword(true);
+      await waitTime(100);
+    }
+    router.push({ route: 'SIGN_IN' });
+  }, [router]);
 
   useNativeNavigationEvent('appear', () => {
     setClearPassword(false);
@@ -366,6 +356,7 @@ const SignUpScreen = () => {
           </View>
 
           <Button
+            variant="primary"
             testID="submit"
             label={intl.formatMessage({
               defaultMessage: 'Sign Up',
@@ -396,7 +387,7 @@ const SignUpScreen = () => {
                 description="Signup Screen - Already have an account?"
               />
             </Text>
-            <PressableOpacity onPress={onSigninLinkPress}>
+            <PressableOpacity onPress={navigateTo}>
               <Text style={styles.linkLogin} variant="medium">
                 <FormattedMessage
                   defaultMessage="Log In"

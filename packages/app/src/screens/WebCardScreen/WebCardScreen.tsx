@@ -44,6 +44,7 @@ import {
   useRouter,
   useScreenOptionsUpdater,
 } from '#components/NativeRouter';
+import { logEvent } from '#helpers/analytics';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import relayScreen from '#helpers/relayScreen';
 import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
@@ -218,7 +219,12 @@ const WebCardScreen = ({
   const cardRadius = COVER_CARD_RADIUS * windowWidth;
 
   const toggleFlip = useCallback(() => {
-    setPositionFlip(prev => prev + 1);
+    setPositionFlip(prev => {
+      if (prev % 2 === 0) {
+        logEvent('webcard_flip_to_post');
+      }
+      return prev + 1;
+    });
   }, []);
 
   const manualFlip = useSharedValue(0);

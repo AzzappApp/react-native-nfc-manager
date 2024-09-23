@@ -32,9 +32,6 @@ jest.mock(
 );
 
 // React Encrypted Storage Mock
-jest.mock('react-native-encrypted-storage');
-
-// React Encrypted Storage Mock
 jest.mock('react-native-vision-camera');
 
 // react-native-keyboard-controller
@@ -82,3 +79,10 @@ jest.mock('react-native-purchases', () => ({
 }));
 
 jest.mock('#hooks/useApplicationFonts', () => ({}));
+
+jest.mock('@react-native-firebase/analytics', () => {
+  return () => ({
+    logEvent: jest.fn(),
+    logSignUp: jest.fn(),
+  });
+});

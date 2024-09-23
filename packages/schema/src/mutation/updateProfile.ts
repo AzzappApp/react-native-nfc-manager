@@ -90,7 +90,7 @@ const updateProfileMutation: MutationResolvers['updateProfile'] = async (
         targetProfile.logoId,
       ]);
     });
-  } catch (e) {
+  } catch {
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 

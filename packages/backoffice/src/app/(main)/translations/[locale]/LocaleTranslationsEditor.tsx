@@ -127,7 +127,7 @@ const LocaleTranslationsEditor = ({
           target,
           value,
         });
-      } catch (error) {
+      } catch {
         setSaveStatus('error');
         return;
       }
@@ -295,6 +295,16 @@ const KeyEditor = ({
     setValidationErrors(validateTranslation(defaultMessage, value));
   }, [defaultMessage, value]);
 
+  const getCharsNumberColor = (diff: number) => {
+    if (Math.abs(diff) < 3) {
+      return 'black';
+    } else if (Math.abs(diff) < 6) {
+      return 'orange';
+    }
+
+    return 'red';
+  };
+
   return (
     <Box
       sx={{
@@ -314,20 +324,38 @@ const KeyEditor = ({
         {description}
       </Typography>
       <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-        <ICUMessageDisplay sx={{ flex: 1 }} value={defaultMessage} />
+        <Box sx={{ flex: 1 }}>
+          <ICUMessageDisplay value={defaultMessage} />
+          <Typography
+            variant="body2"
+            sx={{ paddingTop: 1 }}
+            color={getCharsNumberColor(defaultMessage.length - value.length)}
+          >
+            {`chars : ${defaultMessage.length}`}
+          </Typography>
+        </Box>
         <Box sx={{ width: 0, borderLeft: 1, borderColor: 'divider' }} />
-        <TextField
-          margin="normal"
-          name="search"
-          label="Value"
-          type="text"
-          value={value}
-          sx={{ flex: 1, m: 0 }}
-          multiline
-          onFocus={onFocus}
-          onChange={onChange}
-          onBlur={onBlur}
-        />
+        <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+          <TextField
+            margin="normal"
+            name="search"
+            label="Value"
+            type="text"
+            value={value}
+            sx={{ flex: 1, m: 0 }}
+            multiline
+            onFocus={onFocus}
+            onChange={onChange}
+            onBlur={onBlur}
+          />
+          <Typography
+            variant="body2"
+            sx={{ paddingTop: 1 }}
+            color={getCharsNumberColor(defaultMessage.length - value.length)}
+          >
+            {`chars : ${value.length}`}
+          </Typography>
+        </Box>
       </Box>
       <Button
         variant="contained"

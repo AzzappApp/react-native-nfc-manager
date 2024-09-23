@@ -25,8 +25,10 @@ setup_permissions([
    'Contacts',
    'PhotoLibrary',
    'Microphone',
-])
-
+])  
+$RNFirebaseAsStaticFramework = true
+$RNFirebaseAnalyticsEnableAdSupport = true # enable Firebase Analytics to generate automatic audience metrics for iOS 
+$RNFirebaseAnalyticsWithoutAdIdSupport = true
 linkage = ENV['USE_FRAMEWORKS']
 if linkage != nil
   Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
@@ -47,6 +49,12 @@ abstract_target 'common' do
       Pod::UI.warn e
     end
   end
+  # Specify modular headers for Firebase dependencies
+  pod 'Firebase', :modular_headers => true
+  pod 'FirebaseCore', :modular_headers => true
+  pod 'FirebaseAnalytics', :modular_headers => true
+  pod 'GoogleUtilities', :modular_headers => true
+
   config = use_native_modules!
 
   use_react_native!(

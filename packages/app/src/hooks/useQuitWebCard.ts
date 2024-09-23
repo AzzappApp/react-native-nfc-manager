@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { graphql, useMutation } from 'react-relay';
+import { logEvent } from '#helpers/analytics';
 import type { RecordSourceSelectorProxy } from 'relay-runtime';
 
 const updater = (
@@ -42,6 +43,7 @@ const useQuitWebCard = (
     if (!webCardId) {
       return;
     }
+    logEvent('quitWebCard', { webCardId });
     return commitMutationFn({
       variables: {
         webCardId,
@@ -52,6 +54,7 @@ const useQuitWebCard = (
         },
       },
       updater: store => updater(store, webCardId),
+      optimisticUpdater: store => updater(store, webCardId),
       onCompleted,
       onError,
     });

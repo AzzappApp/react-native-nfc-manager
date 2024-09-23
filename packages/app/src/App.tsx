@@ -15,7 +15,7 @@ import { FormattedMessage, IntlProvider, injectIntl } from 'react-intl';
 import { Platform, useColorScheme } from 'react-native';
 import { hide as hideSplashScreen } from 'react-native-bootsplash';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
-// import Purchases from 'react-native-purchases';
+import Purchases from 'react-native-purchases';
 import {
   initialWindowMetrics,
   SafeAreaProvider,
@@ -35,6 +35,7 @@ import {
 //import ShakeShare from '#components/ShakeShare';
 import ShakeShare from '#components/ShakeShare';
 import Toast from '#components/Toast';
+import { analyticsLogScreenEvent } from '#helpers/analytics';
 import { getAuthState, init as initAuthStore } from '#helpers/authStore';
 import { addGlobalEventListener } from '#helpers/globalEvents';
 import {
@@ -126,15 +127,15 @@ Sentry.init({
 });
 
 //initializing RC sneed to be done early
-// if (Platform.OS === 'ios') {
-//   Purchases.configure({
-//     apiKey: process.env.PURCHASE_IOS_KEY!,
-//   });
-// } else if (Platform.OS === 'android') {
-//   Purchases.configure({
-//     apiKey: process.env.PURCHASE_ANDROID_KEY!,
-//   });
-// }
+if (Platform.OS === 'ios') {
+  Purchases.configure({
+    apiKey: process.env.PURCHASE_IOS_KEY!,
+  });
+} else if (Platform.OS === 'android') {
+  Purchases.configure({
+    apiKey: process.env.PURCHASE_ANDROID_KEY!,
+  });
+}
 
 /**
  * Initialize the application
@@ -327,6 +328,7 @@ const AppRouter = () => {
             : null,
         },
       });
+      analyticsLogScreenEvent(route.route);
     });
     return () => {
       disposable.dispose();

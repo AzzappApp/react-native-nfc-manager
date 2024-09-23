@@ -100,7 +100,7 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
     return {
       webCard: result,
     };
-  } catch (error) {
+  } catch {
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 };

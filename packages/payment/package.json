@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/payment",
-  "version": "0.8.9",
+  "version": "0.9.2",
   "private": true,
   "exports": {
     ".": {
@@ -21,7 +21,7 @@
     "compile": "babel src --config-file ./babel.config.js -d lib --extensions '.ts,.tsx,.js,.jsx,.json'",
     "compile:watch": "yarn compile --watch",
     "clean": "rm -rf lib && rm -f tsconfig.build.tsbuildinfo && rm -rf node_modules",
-    "payment-api-client": "touch .env && node --env-file=.env ./scripts/generatePaymentApiClient.js"
+    "payment-api-client": "touch .env && node --env-file=.env ./scripts/generatePaymentApiClient.mjs"
   },
   "devScripts": [
     "compile:watch",
@@ -31,12 +31,12 @@
     "@azzapp/data": "workspace:^",
     "@azzapp/shared": "workspace:^",
     "@mlecoq/sales-tax": "2.14.1",
-    "dayjs": "^1.11.11",
-    "openapi-fetch": "^0.9.5"
+    "dayjs": "^1.11.13",
+    "openapi-fetch": "^0.12.0"
   },
   "devDependencies": {
-    "@babel/cli": "7.24.5",
-    "openapi-typescript": "^6.7.5",
-    "typescript": "^5.5.3"
+    "@babel/cli": "^7.25.6",
+    "openapi-typescript": "^7.4.0",
+    "typescript": "^5.6.2"
   }
 }

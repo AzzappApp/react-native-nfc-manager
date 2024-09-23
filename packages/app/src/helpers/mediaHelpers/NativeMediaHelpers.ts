@@ -1,4 +1,4 @@
-import { NativeModules, Platform } from 'react-native';
+import { NativeModules } from 'react-native';
 import * as LocalMediaCache from './LocalMediaCache';
 import { createExpoImagePrefetcher } from './MediaPrefetcher';
 
@@ -17,19 +17,6 @@ export const getVideoSize: (
   uri: string,
 ) => Promise<{ width: number; height: number; rotation: number }> =
   AZPMediaHelpers.getVideoSize;
-
-/**
- * Returns the real uri of a PHAsset.
- * @ios Only.
- * @param uri The uri of the PHAsset.
- */
-export const getPHAssetPath: (uri: string) => Promise<string | null> =
-  Platform.select({
-    ios: AZPMediaHelpers.getPHAssetPath,
-    default: () => {
-      throw new Error('getPHAssetPath is only available on iOS');
-    },
-  });
 
 /**
  * Prefetches an image.

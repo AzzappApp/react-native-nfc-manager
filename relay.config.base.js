@@ -17,11 +17,7 @@ module.exports = {
         JSON: 'Record<string, unknown>',
         DateTime: 'Date',
       },
-      featureFlags: {
-        enable_fragment_aliases: {
-          kind: 'enabled',
-        },
-      },
+      featureFlags: {},
     },
   },
 };

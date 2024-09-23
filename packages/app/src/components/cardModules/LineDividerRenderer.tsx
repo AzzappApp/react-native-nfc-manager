@@ -35,9 +35,7 @@ const LineDividerRendererFragment = graphql`
 export const readLineDividerData = (module: LineDividerRenderer_module$key) =>
   readInlineData(LineDividerRendererFragment, module);
 
-const animatedProps = ['height', 'marginBottom', 'marginTop'] as const;
-
-type AnimatedProps = (typeof animatedProps)[number];
+type AnimatedProps = 'height' | 'marginBottom' | 'marginTop';
 
 export type LineDividerRendererData = NullableFields<
   Omit<LineDividerRenderer_module$data, ' $fragmentType'>

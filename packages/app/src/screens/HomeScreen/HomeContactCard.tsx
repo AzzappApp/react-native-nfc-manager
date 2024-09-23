@@ -1,11 +1,12 @@
-import { memo, useCallback } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { useWindowDimensions, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useDerivedValue,
 } from 'react-native-reanimated';
 import { useFragment, graphql } from 'react-relay';
-import { shadow } from '#theme';
+import { getTextColor } from '@azzapp/shared/colorsHelpers';
+import { colors, shadow } from '#theme';
 import ContactCard, {
   CONTACT_CARD_RADIUS_HEIGHT,
   CONTACT_CARD_RATIO,
@@ -13,6 +14,7 @@ import ContactCard, {
 import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useAuthState from '#hooks/useAuthState';
+import FingerHint from '#ui/FingerHint';
 import PressableNative from '#ui/PressableNative';
 import { useHomeScreenCurrentIndex } from './HomeScreenContext';
 import type { HomeContactCard_profile$key } from '#relayArtifacts/HomeContactCard_profile.graphql';
@@ -96,10 +98,15 @@ const ContactCardItem = ({ height, item, index }: ContactCardItemProps) => {
         webCard {
           userName
           cardIsPublished
+          cardColors {
+            primary
+          }
         }
         invited
         promotedAsOwner
         ...ContactCard_profile
+        lastContactCardUpdate
+        createdAt
       }
     `,
     item,
@@ -117,6 +124,13 @@ const ContactCardItem = ({ height, item, index }: ContactCardItemProps) => {
     }
   }, [disabled, router]);
 
+  const showUpdateContactHint =
+    profile.lastContactCardUpdate <= profile.createdAt;
+
+  const readableColor = useMemo(
+    () => getTextColor(profile.webCard?.cardColors?.primary ?? colors.black),
+    [profile.webCard?.cardColors?.primary],
+  );
   return (
     <Animated.View
       style={[
@@ -153,6 +167,9 @@ const ContactCardItem = ({ height, item, index }: ContactCardItemProps) => {
             </PressableNative>
           </View>
         )}
+      {showUpdateContactHint && (
+        <FingerHint color={readableColor === colors.black ? 'dark' : 'light'} />
+      )}
     </Animated.View>
   );
 };

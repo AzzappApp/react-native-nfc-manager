@@ -81,14 +81,11 @@ export const readSimpleTitleData = (
   module: SimpleTextRenderer_simpleTitleModule$key,
 ) => readInlineData(SimpleTitleRendererFragment, module);
 
-const animatedProps = [
-  'fontSize',
-  'verticalSpacing',
-  'marginVertical',
-  'marginHorizontal',
-] as const;
-
-type AnimatedProps = (typeof animatedProps)[number];
+type AnimatedProps =
+  | 'fontSize'
+  | 'marginHorizontal'
+  | 'marginVertical'
+  | 'verticalSpacing';
 
 export type SimpleTextRendererData = NullableFields<
   | Omit<SimpleTextRenderer_simpleTextModule$data, ' $fragmentType'>

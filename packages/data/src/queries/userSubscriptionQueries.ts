@@ -144,7 +144,7 @@ export const getActiveUserSubscriptionForWebCard = async (
         webCardIds.length
           ? or(
               and(
-                inArray(UserSubscriptionTable.userId, userIds),
+                inArray(UserSubscriptionTable.userId, [...new Set(userIds)]),
                 isNull(UserSubscriptionTable.webCardId),
               ),
               inArray(UserSubscriptionTable.webCardId, webCardIds),

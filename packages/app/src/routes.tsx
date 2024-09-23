@@ -97,6 +97,7 @@ export type WebCardRoute = {
     contactData?: string | null;
     additionalContactData?: Pick<ContactCard, 'socials' | 'urls'>;
     editing?: boolean;
+    fromCreation?: boolean;
   };
 };
 export type PostRoute = {

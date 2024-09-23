@@ -14,7 +14,7 @@ jest.mock('react-native', () => ({
 describe('useAppState', () => {
   const addEventListenerMock = AppState.addEventListener as jest.Mock;
   const createEmitAppStateChange = () => {
-    // eslint-disable-next-line @typescript-eslint/ban-types
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
     let listener: (newStatus: AppStateStatus) => {};
 
     addEventListenerMock.mockImplementationOnce((_, fn) => {

@@ -194,7 +194,7 @@ const WebCardModal = ({
             : 'image/png',
         failOnCancel: false,
       });
-    } catch (error: any) {
+    } catch {
       Toast.show({
         type: 'error',
         text1: intl.formatMessage({

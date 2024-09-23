@@ -11,6 +11,7 @@ import Toast from 'react-native-toast-message';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import { useRouter, type NativeScreenProps } from '#components/NativeRouter';
+import { logSignUp } from '#helpers/analytics';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { confirmRegistration } from '#helpers/MobileWebAPI';
@@ -52,6 +53,8 @@ const ConfirmRegistrationScreen = ({
         token: code,
       });
       const { profileInfos } = tokens;
+
+      logSignUp(tokens.userId);
 
       await dispatchGlobalEvent({
         type: 'SIGN_IN',
@@ -108,8 +111,11 @@ const ConfirmRegistrationScreen = ({
                 </Text>
                 <Text style={styles.textForgotExplain} variant="medium">
                   <FormattedMessage
-                    defaultMessage="We just sent you a link to confirm your email, or you can type the code below"
+                    defaultMessage="We just sent you a link to confirm your email {email}, or you can type the code below"
                     description="ConfirmRegistrationScreen - message to inform the user an email has been sent to confirm his email address"
+                    values={{
+                      email: params.issuer,
+                    }}
                   />
                 </Text>
               </>
@@ -123,8 +129,11 @@ const ConfirmRegistrationScreen = ({
                 </Text>
                 <Text style={styles.textForgotExplain} variant="medium">
                   <FormattedMessage
-                    defaultMessage="You can type the code below"
+                    defaultMessage="We just sent you a code in your phone {phoneNumber}, or you can type the code below"
                     description="ConfirmRegistrationScreen - message to inform the user an sms has been sent to confirm his phone number"
+                    values={{
+                      phoneNumber: params.issuer,
+                    }}
                   />
                 </Text>
               </>

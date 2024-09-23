@@ -45,7 +45,7 @@ export const getSessionData = async (): Promise<SessionData | null> => {
     try {
       const { userId } = await verifyToken(token);
       return { userId };
-    } catch (e) {
+    } catch {
       throw new Error(ERRORS.INVALID_TOKEN);
     }
   }

@@ -2,6 +2,11 @@ import { forwardRef, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { View, useWindowDimensions } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
+import {
+  swapColor,
+  type CardStyle,
+  type ColorPalette,
+} from '@azzapp/shared/cardHelpers';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import ToggleButton from '#ui/ToggleButton';
@@ -13,7 +18,6 @@ import type { CoverRenderer_webCard$key } from '#relayArtifacts/CoverRenderer_we
 import type { WebCardBackground_webCard$key } from '#relayArtifacts/WebCardBackground_webCard.graphql';
 import type { WebCardBackgroundPreview_webCard$key } from '#relayArtifacts/WebCardBackgroundPreview_webCard.graphql';
 import type { ModuleRenderInfo } from './cardModules/CardModuleRenderer';
-import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { ForwardedRef } from 'react';
 import type { LayoutRectangle, PointProp, ViewProps } from 'react-native';
 
@@ -107,6 +111,11 @@ const WebCardPreview = (
     });
   };
 
+  const lastSection = cardModules[cardModules.length - 1]?.data as any;
+
+  const lastSectionColor = lastSection?.data?.backgroundStyle
+    ?.backgroundColor as string;
+
   return (
     <View
       style={{
@@ -153,7 +162,11 @@ const WebCardPreview = (
       >
         <ScrollView
           ref={ref}
-          style={[styles.webCardContainer, style]}
+          style={[
+            styles.webCardContainer,
+            style,
+            { backgroundColor: swapColor(lastSectionColor, cardColors) },
+          ]}
           contentOffset={contentOffset}
           contentContainerStyle={{
             paddingBottom: contentPaddingBottom / scale,

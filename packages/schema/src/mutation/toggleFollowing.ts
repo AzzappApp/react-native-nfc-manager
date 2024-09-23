@@ -22,7 +22,7 @@ const toggleFollowing: MutationResolvers['toggleFollowing'] = async (
   let target: WebCard | null;
   try {
     target = await webCardLoader.load(targetId);
-  } catch (e) {
+  } catch {
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
   if (!target) {
@@ -38,7 +38,7 @@ const toggleFollowing: MutationResolvers['toggleFollowing'] = async (
     } else {
       await unfollows(webCardId, targetId);
     }
-  } catch (e) {
+  } catch {
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 

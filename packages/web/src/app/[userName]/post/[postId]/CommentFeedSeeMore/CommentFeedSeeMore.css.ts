@@ -88,6 +88,7 @@ const media = style({
     [MediaQuery.Desktop]: {
       width: `calc(${mediaWidthPercent}% - ${mediaWidthMarginPx}px)`,
       marginTop: '20px',
+      cursor: 'pointer',
     },
   },
 });

@@ -21,7 +21,7 @@ const saveCardStyle: MutationResolvers['saveCardStyle'] = async (
   };
   try {
     await updateWebCard(webCardId, updates);
-  } catch (e) {
+  } catch {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 

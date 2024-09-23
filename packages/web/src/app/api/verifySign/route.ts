@@ -39,8 +39,10 @@ const verifySignApi = async (req: Request) => {
       avatarUrl,
       userId: storedProfile?.userId,
       isMultiUser: webCard?.isMultiUser,
-      firstName: foundContactCard.firstName,
-      lastName: foundContactCard.lastName,
+      firstName: foundContactCard.firstName || webCard?.firstName,
+      lastName: foundContactCard.lastName || webCard?.lastName,
+      companyName: foundContactCard.company || webCard?.companyName,
+      userName: foundContactCard.company || webCard?.companyName,
     })
       .setJti(createId())
       .setIssuer('azzapp')

@@ -1,4 +1,4 @@
-import { Suspense, memo, useCallback, useRef, useState } from 'react';
+import { Suspense, memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useWindowDimensions, View, StyleSheet } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
@@ -10,11 +10,14 @@ import { colors } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import {
   ScreenDidAppear,
+  useCurrentRoute,
   useRouter,
   useScreenHasFocus,
 } from '#components/NativeRouter';
 import WebCardBackground from '#components/WebCardBackgroundPreview';
+import useToggle from '#hooks/useToggle';
 import ActivityIndicator from '#ui/ActivityIndicator';
+import AddContentBelowCoverModal from './AddContentBelowCoverModal';
 import CardStyleModal from './CardStyleModal';
 import LoadCardTemplateModal from './LoadCardTemplateModal';
 import ModuleSelectionListModal from './ModuleSelectionListModal';
@@ -102,6 +105,9 @@ const WebCardScreenContent = ({
         ...WebCardBackgroundPreview_webCard
         ...PreviewModal_webCard
         ...LoadCardTemplateModal_webCard
+        ...AddContentBelowCoverModal_webCard
+        ...WebCardScreenEditModeFooter_webCard
+        ...WebCardScreenFooter_webCard
         coverBackgroundColor
         cardColors {
           primary
@@ -116,6 +122,16 @@ const WebCardScreenContent = ({
 
   // #region Navigation
   const router = useRouter();
+
+  const route = useCurrentRoute();
+
+  const fromCreation = useMemo(() => {
+    if (route?.params && 'fromCreation' in route.params) {
+      return route.params?.fromCreation ?? false;
+    }
+
+    return false;
+  }, [route?.params]);
 
   const onClose = useCallback(() => {
     router.back();
@@ -143,6 +159,16 @@ const WebCardScreenContent = ({
   // #endregion
 
   // #region New Module
+  const [showContentModal, toggleShowContentModal] = useToggle(false);
+
+  const onAddContent = useCallback(() => {
+    // @TODO: restore when templates are ready to be used instead of module picker
+    // toggleShowContentModal()
+
+    Toast.hide();
+    setShowModulePicker(true);
+  }, []);
+
   const [showModulePicker, setShowModulePicker] = useState(false);
   const onRequestNewModule = useCallback(() => {
     Toast.hide();
@@ -333,7 +359,12 @@ const WebCardScreenContent = ({
           allBlockLoaded={allBlockLoaded}
           onScroll={onScroll}
           editFooter={
-            <WebCardScreenEditModeFooter setLoadTemplate={setLoadTemplate} />
+            <WebCardScreenEditModeFooter
+              fromCreation={fromCreation}
+              onAddContent={onAddContent}
+              onSkip={onDone}
+              webcard={webCard}
+            />
           }
           editFooterHeight={WEBCARD_SCREEN_EDIT_MODE_FOOTER_HEIGHT}
         >
@@ -449,6 +480,11 @@ const WebCardScreenContent = ({
               webCard={webCard}
               visible={showWebcardColorPicker}
               onRequestClose={onClosWebcardColorPicker}
+            />
+            <AddContentBelowCoverModal
+              onClose={toggleShowContentModal}
+              open={showContentModal}
+              webCard={webCard}
             />
           </Suspense>
         </>

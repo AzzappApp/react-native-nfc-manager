@@ -79,7 +79,7 @@ export const fetchBlob = async (
   if (response.ok) {
     try {
       return response.blob();
-    } catch (e) {
+    } catch {
       throw new FetchError({
         message: ERRORS.BLOB_DECODING_ERROR,
         response,

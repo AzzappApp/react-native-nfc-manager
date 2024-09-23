@@ -1,5 +1,6 @@
 import * as Sentry from '@sentry/nextjs';
 import { waitUntil } from '@vercel/functions';
+import { withAxiom } from 'next-axiom';
 import {
   getExpiredSubscription,
   transaction,
@@ -8,7 +9,7 @@ import {
 import { unpublishWebCardForUser } from '#helpers/subscription';
 import type { NextRequest } from 'next/server';
 
-export function GET(request: NextRequest) {
+export const GET = withAxiom((request: NextRequest) => {
   const authHeader = request.headers.get('authorization');
   console.log({ authHeader });
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -21,7 +22,7 @@ export function GET(request: NextRequest) {
   waitUntil(unpublishedWebCards());
 
   return Response.json({ success: true });
-}
+});
 
 const unpublishedWebCards = async () => {
   const expiredSubscriptions = await getExpiredSubscription(20);

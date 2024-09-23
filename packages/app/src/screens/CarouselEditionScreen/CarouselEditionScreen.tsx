@@ -1,4 +1,3 @@
-import { ImageFormat } from '@shopify/react-native-skia';
 import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
@@ -21,7 +20,10 @@ import {
   preventModalDismiss,
 } from '#components/NativeRouter';
 import { getFileName } from '#helpers/fileHelpers';
-import { saveTransformedImageToFile } from '#helpers/mediaEditions';
+import {
+  getTargetFormatFromPath,
+  saveTransformedImageToFile,
+} from '#helpers/mediaEditions';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
@@ -128,6 +130,7 @@ const CarouselEditionScreen = ({
           }
           ...WebCardColorPicker_webCard
           ...CarouselEditionBorderPanel_webCard
+          ...ModuleEditionScreenTitle_webCard
         }
         moduleBackgrounds {
           id
@@ -262,7 +265,7 @@ const CarouselEditionScreen = ({
       const localPath = await saveTransformedImageToFile({
         uri,
         resolution: { width: exportWidth, height: exportHeight },
-        format: ImageFormat.JPEG,
+        format: getTargetFormatFromPath(uri),
         quality: 95,
         filter,
         editionParameters,
@@ -442,17 +445,17 @@ const CarouselEditionScreen = ({
         },
       },
       onCompleted() {
+        setProgressIndicator(null);
         setShowImagePicker(false);
         router.back();
       },
       onError(e) {
+        setProgressIndicator(null);
         console.error(e);
         setShowImagePicker(false);
         handleProfileActionError(e);
       },
     });
-
-    setProgressIndicator(null);
   }, [
     canSave,
     cardModulesCount,
@@ -493,6 +496,7 @@ const CarouselEditionScreen = ({
             })}
             kind="carousel"
             moduleCount={cardModulesCount}
+            webCardKey={profile.webCard}
           />
         }
         leftElement={

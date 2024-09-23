@@ -55,17 +55,14 @@ const SimpleButtonRendererFragment = graphql`
 export const readSimpleButtonData = (module: SimpleButtonRenderer_module$key) =>
   readInlineData(SimpleButtonRendererFragment, module);
 
-const animatedProps = [
-  'borderRadius',
-  'borderWidth',
-  'fontSize',
-  'height',
-  'marginBottom',
-  'marginTop',
-  'width',
-] as const;
-
-type AnimatedProps = (typeof animatedProps)[number];
+type AnimatedProps =
+  | 'borderRadius'
+  | 'borderWidth'
+  | 'fontSize'
+  | 'height'
+  | 'marginBottom'
+  | 'marginTop'
+  | 'width';
 
 export type SimpleButtonRendererData = NullableFields<
   Omit<SimpleButtonRenderer_module$data, ' $fragmentType'>

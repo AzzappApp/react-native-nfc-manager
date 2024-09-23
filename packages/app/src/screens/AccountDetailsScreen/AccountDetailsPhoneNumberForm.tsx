@@ -5,7 +5,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
 import { getCountry } from 'react-native-localize';
-//import Purchases from 'react-native-purchases';
+import Purchases from 'react-native-purchases';
 import Toast from 'react-native-toast-message';
 import { z } from 'zod';
 import { isPhoneNumber } from '@azzapp/shared/stringHelpers';
@@ -85,7 +85,7 @@ const AccountDetailsPhoneNumberForm = ({
     handleSubmit,
     setError,
     clearErrors,
-    formState: { isSubmitting, errors },
+    formState: { isSubmitting, errors, isSubmitSuccessful },
     reset,
   } = useForm<z.infer<typeof phoneNumberFormSchema>>({
     resolver: (data, context, options) => {
@@ -160,7 +160,7 @@ const AccountDetailsPhoneNumberForm = ({
           .getLinkedRecord('currentUser')
           ?.setValue(null, 'phoneNumber');
 
-        //  Purchases.setPhoneNumber(null);
+        Purchases.setPhoneNumber(null);
       },
       onCompleted: () => {
         toggleBottomSheet();
@@ -217,7 +217,7 @@ const AccountDetailsPhoneNumberForm = ({
         rightElement={
           <Button
             loading={isSubmitting || isLoading}
-            disabled={isSubmitting || isLoading}
+            disabled={isSubmitSuccessful || isLoading}
             label={intl.formatMessage({
               defaultMessage: 'Save',
               description: 'Edit phone number modal save button label',

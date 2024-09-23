@@ -36,7 +36,7 @@ const updateUserMutation: MutationResolvers['updateUser'] = async (_, args) => {
     try {
       await validateMailOrPhone('phone', phoneNumber, token);
       partialUser.phoneNumberConfirmed = true;
-    } catch (e) {
+    } catch {
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
   }
@@ -49,7 +49,7 @@ const updateUserMutation: MutationResolvers['updateUser'] = async (_, args) => {
     try {
       await validateMailOrPhone('email', email, token);
       partialUser.emailConfirmed = true;
-    } catch (e) {
+    } catch {
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
   }
@@ -103,7 +103,7 @@ const updateUserMutation: MutationResolvers['updateUser'] = async (_, args) => {
     await updateUser(userId, partialUser);
 
     return { user: { ...dbUser, ...partialUser } };
-  } catch (error) {
+  } catch {
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 };

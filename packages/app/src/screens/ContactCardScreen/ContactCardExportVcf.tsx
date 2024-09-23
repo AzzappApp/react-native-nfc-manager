@@ -4,6 +4,7 @@ import ShareCommand from 'react-native-share';
 import { graphql, useFragment } from 'react-relay';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
+import { logEvent } from '#helpers/analytics';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
@@ -50,6 +51,7 @@ const ContactCardExportVcf = ({
             profile.contactCard?.lastName,
           ) ?? '';
         try {
+          logEvent('share_contact_card');
           await ShareCommand.open({
             title,
             subject: title,

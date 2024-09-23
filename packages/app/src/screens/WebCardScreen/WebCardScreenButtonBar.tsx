@@ -12,6 +12,7 @@ import { useDebouncedCallback } from 'use-debounce';
 import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
+import { logEvent } from '#helpers/analytics';
 import useAuthState from '#hooks/useAuthState';
 import useScreenInsets from '#hooks/useScreenInsets';
 import BlurredFloatingButton, {
@@ -273,6 +274,7 @@ const WebCardScreenButtonActionButton = ({
       profileInfos?.profileRole &&
       profileHasEditorRight(profileInfos?.profileRole)
     ) {
+      logEvent('create_post', { source: 'webcard' });
       router.push({ route: 'NEW_POST', params: { fromProfile: true } });
     } else {
       Toast.show({

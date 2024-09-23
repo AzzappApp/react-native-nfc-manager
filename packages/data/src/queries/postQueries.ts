@@ -8,6 +8,7 @@ import {
   inArray,
   count,
   like,
+  or,
 } from 'drizzle-orm';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { db, transaction } from '../database';
@@ -139,7 +140,10 @@ export const searchPosts = async ({
         eq(WebCardTable.deleted, false),
         eq(WebCardTable.cardIsPublished, true),
         after ? lt(PostTable.createdAt, after) : undefined,
-        search ? like(PostTable.content, `%${search}%`) : undefined,
+        or(
+          search ? like(PostTable.content, `%${search}%`) : undefined,
+          search ? like(WebCardTable.userName, `%${search}%`) : undefined,
+        ),
       ),
     )
     .orderBy(desc(PostTable.createdAt))

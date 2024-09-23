@@ -189,7 +189,6 @@ const PhotoGalleryMediaList = ({
         const fileData = await CameraRoll.iosGetImageDataById(
           asset.node.image.uri,
         );
-
         uri = fileData.node.image.filepath;
       } else if (Platform.OS === 'android') {
         const fileData = await ReactNativeBlobUtil.fs.stat(
@@ -207,7 +206,6 @@ const PhotoGalleryMediaList = ({
         if (width == null || height == null || rotation == null) {
           ({ width, height, rotation } = await getVideoSize(uri));
         }
-
         onMediaSelected({
           galleryUri: asset.node.image.uri,
           kind: 'video',

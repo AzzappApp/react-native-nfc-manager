@@ -52,7 +52,6 @@ export type {
   Report,
   ReportTargetType,
   SocialLinks,
-  Transaction,
   User,
   UserSubscription,
   WebCard,

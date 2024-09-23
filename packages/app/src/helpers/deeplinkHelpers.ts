@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/react-native';
 import { toGlobalId } from 'graphql-relay';
 import { decompressFromEncodedURIComponent } from 'lz-string';
+import { logEvent } from './analytics';
 import { verifySign } from './MobileWebAPI';
 import type { Route } from '#routes';
 
@@ -67,6 +68,7 @@ export const matchUrlWithRoute = async (
     }
     if (route === 'post' && routeId) {
       if (routeId) {
+        logEvent('link_post', { postId: routeId });
         return {
           route: 'POST',
           params: {
@@ -82,6 +84,7 @@ export const matchUrlWithRoute = async (
           route: 'HOME',
         };
       }
+      logEvent('link_emailSignature');
       return {
         route: 'EMAIL_SIGNATURE',
         params: {
@@ -125,7 +128,7 @@ export const matchUrlWithRoute = async (
             data: contactData,
             salt: username,
           });
-
+          logEvent('link_contactCard');
           return {
             route: 'WEBCARD',
             params: {
@@ -135,6 +138,7 @@ export const matchUrlWithRoute = async (
             },
           };
         } catch {
+          logEvent('link_webCard');
           return {
             route: 'WEBCARD',
             params: {
@@ -144,7 +148,7 @@ export const matchUrlWithRoute = async (
         }
       }
     } else {
-      //this is a webcard deeplink
+      logEvent('link_webCard');
       return {
         route: 'WEBCARD',
         params: {

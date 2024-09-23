@@ -406,17 +406,27 @@ export type LocalizationMessage = InferSelectModel<
 //#endregion
 
 // #region Media
-export const MediaTable = cols.table('Media', {
-  id: cols.mediaId('id').notNull().primaryKey(),
-  kind: cols.enum('kind', ['image', 'video']).notNull(),
-  height: cols.double('height').notNull(),
-  width: cols.double('width').notNull(),
-  refCount: cols.int('refCount').default(0).notNull(),
-  createdAt: cols
-    .dateTime('createdAt')
-    .notNull()
-    .default(DEFAULT_DATETIME_VALUE),
-});
+export const MediaTable = cols.table(
+  'Media',
+  {
+    id: cols.mediaId('id').notNull().primaryKey(),
+    kind: cols.enum('kind', ['image', 'video']).notNull(),
+    height: cols.double('height').notNull(),
+    width: cols.double('width').notNull(),
+    refCount: cols.int('refCount').default(0).notNull(),
+    createdAt: cols
+      .dateTime('createdAt')
+      .notNull()
+      .default(DEFAULT_DATETIME_VALUE),
+  },
+  table => {
+    return {
+      refCountKey: cols
+        .index('Media_refCount_key')
+        .on(table.refCount, table.createdAt),
+    };
+  },
+);
 
 export type Media = InferSelectModel<typeof MediaTable>;
 //#endregion
@@ -636,6 +646,7 @@ export const ProfileTable = cols.table(
       .default(DEFAULT_DATETIME_VALUE)
       .$onUpdate(() => new Date()),
     nbContactCardScans: cols.int('nbContactCardScans').default(0).notNull(),
+    nbShareBacks: cols.int('nbShareBacks').default(0).notNull(),
     deleted: cols.boolean('deleted').default(false).notNull(),
     deletedAt: cols.dateTime('deletedAt'),
     deletedBy: cols.cuid('deletedBy'),
@@ -665,6 +676,7 @@ export const ProfileStatisticTable = cols.table(
     profileId: cols.cuid('profileId').notNull(),
     day: cols.date('day').notNull(),
     contactCardScans: cols.int('contactCardScans').default(0).notNull(),
+    shareBacks: cols.int('shareBacks').default(0).notNull(),
   },
   table => {
     return {
@@ -724,25 +736,6 @@ export const ReportTable = cols.table(
 export type Report = InferSelectModel<typeof ReportTable>;
 
 export type ReportTargetType = Report['targetType'];
-//#endregion
-
-// #region Transaction
-export const TransactionTable = cols.table(
-  'Transaction',
-  {
-    id: cols.cuid('id').primaryKey().notNull().$defaultFn(createId),
-    userId: cols.cuid('userId').notNull(),
-    receipt: cols.json('receipt').$type<any>().notNull(), //TODO type to defined
-    createdAt: cols.dateTime('createdAt').notNull(),
-  },
-  table => {
-    return {
-      userIdIdx: cols.index('Transaction_userId_idx').on(table.userId),
-    };
-  },
-);
-
-export type Transaction = InferSelectModel<typeof TransactionTable>;
 //#endregion
 
 // #region User
@@ -987,4 +980,23 @@ export const WebCardStatisticTable = cols.table(
 );
 
 export type WebCardStatistic = InferSelectModel<typeof WebCardStatisticTable>;
+//#endregion
+
+// #region ShareBack
+
+export const ShareBackTable = cols.table('ShareBack', {
+  id: cols.cuid('id').primaryKey().$defaultFn(createId),
+  profileId: cols.cuid('profileId').notNull(),
+  email: cols.defaultVarchar('email').default(''),
+  phone: cols.defaultVarchar('phone').default(''),
+  firstName: cols.defaultVarchar('firstName').default(''),
+  lastName: cols.defaultVarchar('lastName').default(''),
+  company: cols.defaultVarchar('company').default(''),
+  title: cols.defaultVarchar('title').default(''),
+  createdAt: cols
+    .dateTime('createdAt')
+    .notNull()
+    .default(DEFAULT_DATETIME_VALUE),
+});
+export type ShareBack = InferSelectModel<typeof ShareBackTable>;
 //#endregion

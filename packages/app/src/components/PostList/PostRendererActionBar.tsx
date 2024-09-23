@@ -88,6 +88,10 @@ const PostRendererActionBar = ({
   const [countReactions, setCountReactions] =
     useState<number>(counterReactions);
 
+  useEffect(() => {
+    setCountReactions(counterReactions);
+  }, [counterReactions]);
+
   const { profileInfos } = useAuthState();
   const debouncedCommit = useDebouncedCallback(
     () => {
@@ -109,10 +113,7 @@ const PostRendererActionBar = ({
               post: {
                 id: postId,
                 postReaction: add ? reaction : null,
-                counterReactions: Math.max(
-                  0,
-                  add ? countReactions + 1 : countReactions - 1,
-                ),
+                counterReactions: Math.max(0, countReactions),
               },
             },
           },

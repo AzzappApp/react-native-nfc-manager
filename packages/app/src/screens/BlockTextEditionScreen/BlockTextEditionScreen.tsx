@@ -125,6 +125,7 @@ const BlockTextEditionScreen = ({
             id
           }
           ...BlockTextSettingsEditionPanel_webCard
+          ...ModuleEditionScreenTitle_webCard
         }
         ...BlockTextSectionBackgroundEditionPanel_profile
         ...BlockTextTextBackgroundEditionPanel_profile
@@ -385,6 +386,7 @@ const BlockTextEditionScreen = ({
             })}
             kind="blockText"
             moduleCount={cardModulesCount}
+            webCardKey={profile.webCard}
           />
         }
         leftElement={
