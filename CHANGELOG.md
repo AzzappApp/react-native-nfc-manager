@@ -1,4 +1,4 @@
-## 0.9.1-canary.6
+## 0.9.1-canary.7
 
 * **fix:**  - 🐛 properly send invite from list ([#5080](https://github.com/AzzappApp/azzapp/pull/5080))
 * **feat:**  - 🎸 show disabled action specific to pending invitation ([#5073](https://github.com/AzzappApp/azzapp/pull/5073))
