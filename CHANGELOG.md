@@ -1,4 +1,4 @@
-## 0.9.1-canary.8
+## 0.9.1-canary.9
 
 * **fix:**  - shareAndShare dismiss (and update marketing version of iOS) ([#5114](https://github.com/AzzappApp/azzapp/pull/5114))
 * **fix:**  - 🐛 show newly added media in limited selection mode ([#5115](https://github.com/AzzappApp/azzapp/pull/5115))
