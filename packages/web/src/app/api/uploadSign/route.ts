@@ -1,6 +1,5 @@
 /* eslint-disable no-bitwise */
 import { NextResponse } from 'next/server';
-import { withAxiom } from 'next-axiom';
 import * as z from 'zod';
 import { createMedia, createId } from '@azzapp/data';
 import { MODULE_IMAGES_SIZES } from '@azzapp/shared/cardModuleHelpers';
@@ -13,6 +12,7 @@ import {
   POST_VIDEO_SIZES,
 } from '@azzapp/shared/postHelpers';
 import cors from '#helpers/cors';
+import { withPluginsRoute } from '#helpers/queries';
 import { getSessionData } from '#helpers/tokens';
 import type { SessionData } from '#helpers/tokens';
 
@@ -91,4 +91,6 @@ const getPregeneratedSizes = (body: uploadSignParams) => {
   }
 };
 
-export const { POST, OPTIONS } = cors({ POST: withAxiom(uploadSignApi) });
+export const { POST, OPTIONS } = cors({
+  POST: withPluginsRoute(uploadSignApi),
+});

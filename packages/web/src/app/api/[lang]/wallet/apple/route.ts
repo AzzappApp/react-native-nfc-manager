@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getProfileByUserAndWebCard } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { buildApplePass } from '#helpers/pass/apple';
+import { withPluginsRoute } from '#helpers/queries';
 import { getSessionData } from '#helpers/tokens';
 
 // TODO check if auth token is sent in request
@@ -53,4 +54,4 @@ const createPass = async (
   }
 };
 
-export const { GET } = { GET: createPass };
+export const { GET } = { GET: withPluginsRoute(createPass) };

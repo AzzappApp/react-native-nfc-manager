@@ -3,6 +3,7 @@ import { getProfileById } from '@azzapp/data';
 import { unseal } from '@azzapp/shared/crypto';
 import ERRORS from '@azzapp/shared/errors';
 import { buildApplePass } from '#helpers/pass/apple';
+import { withPluginsRoute } from '#helpers/queries';
 
 const APPLE_HEADER_PREFIX = 'ApplePass ';
 
@@ -58,4 +59,4 @@ const updatePass = async (
   }
 };
 
-export const { GET } = { GET: updatePass };
+export const { GET } = { GET: withPluginsRoute(updatePass) };

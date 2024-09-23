@@ -9,7 +9,6 @@ import { maxTokensPlugin } from '@escape.tech/graphql-armor-max-tokens';
 import { useDisableIntrospection } from '@graphql-yoga/plugin-disable-introspection';
 import { usePersistedOperations } from '@graphql-yoga/plugin-persisted-operations';
 import { createYoga } from 'graphql-yoga';
-import { withAxiom } from 'next-axiom';
 import { compare } from 'semver';
 import {
   getDatabaseConnectionsInfos,
@@ -21,6 +20,7 @@ import ERRORS from '@azzapp/shared/errors';
 import { AZZAPP_SERVER_HEADER } from '@azzapp/shared/urlHelpers';
 import queryMap from '#persisted-query-map.json';
 import { buildCoverAvatarUrl } from '#helpers/avatar';
+import { withPluginsRoute } from '#helpers/queries';
 import { notifyUsers } from '#helpers/sendMessages';
 import { getSessionData } from '#helpers/tokens';
 import packageJSON from '../../../../package.json';
@@ -260,7 +260,7 @@ const { handleRequest } = createYoga({
   ],
 });
 
-const handleRequestWithAxiom = withAxiom(handleRequest);
+const handleRequestWithAxiom = withPluginsRoute(handleRequest);
 
 export { handleRequestWithAxiom as GET, handleRequestWithAxiom as POST };
 

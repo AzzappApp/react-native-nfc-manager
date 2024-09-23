@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation';
 import { NextResponse } from 'next/server';
-import { withAxiom } from 'next-axiom';
 import {
   getAllCardStyles,
   getAllCardTemplates,
@@ -16,9 +15,10 @@ import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
 import appMessages from '@azzapp/i18n/src/appMessages.json';
 import webMessages from '@azzapp/i18n/src/webMessages.json';
 import ERRORS from '@azzapp/shared/errors';
+import { withPluginsRoute } from '#helpers/queries';
 import { checkServerAuth } from '#helpers/tokens';
 
-export const GET = withAxiom(
+export const GET = withPluginsRoute(
   async (
     req: Request,
     {

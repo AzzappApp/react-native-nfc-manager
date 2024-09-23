@@ -1,9 +1,9 @@
 import { waitUntil } from '@vercel/functions';
-import { withAxiom } from 'next-axiom';
 import { cancelExpiredSubscription } from '@azzapp/data';
+import { withPluginsRoute } from '#helpers/queries';
 import type { NextRequest } from 'next/server';
 
-export const GET = withAxiom((request: NextRequest) => {
+export const GET = withPluginsRoute((request: NextRequest) => {
   const authHeader = request.headers.get('authorization');
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return new Response('Unauthorized', {

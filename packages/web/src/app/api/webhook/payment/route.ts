@@ -1,10 +1,10 @@
-import { withAxiom } from 'next-axiom';
 import * as z from 'zod';
 import {
   acknowledgeFirstPayment,
   checkSignature,
   rejectFirstPayment,
 } from '@azzapp/payment';
+import { withPluginsRoute } from '#helpers/queries';
 
 const paymentCallbackBody = z.object({
   transaction_status: z.string(),
@@ -14,7 +14,7 @@ const paymentCallbackBody = z.object({
   HASH: z.string().optional(),
 });
 
-export const POST = withAxiom(async (req: Request) => {
+export const POST = withPluginsRoute(async (req: Request) => {
   const body = await req.json();
 
   if ('HASH' in body) {

@@ -2,7 +2,6 @@ import { sendGAEvent } from '@next/third-parties/google';
 import * as Sentry from '@sentry/nextjs';
 import { decompressFromEncodedURIComponent } from 'lz-string';
 import { NextResponse } from 'next/server';
-import { withAxiom } from 'next-axiom';
 import { getProfileById, getWebCardById } from '@azzapp/data';
 import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
 import { verifyHmacWithPassword } from '@azzapp/shared/crypto';
@@ -10,6 +9,7 @@ import { buildVCardFromSerializedContact } from '@azzapp/shared/vCardHelpers';
 
 import { buildAvatarUrl } from '#helpers/avatar';
 import cors from '#helpers/cors';
+import { withPluginsRoute } from '#helpers/queries';
 import { shareBackVCardFilename } from '#helpers/shareBackHelper';
 import type { NextRequest } from 'next/server';
 
@@ -122,4 +122,6 @@ const downloadVCard = async (req: NextRequest) => {
   });
 };
 
-export const { GET, OPTIONS } = cors({ GET: withAxiom(downloadVCard) });
+export const { GET, OPTIONS } = cors({
+  GET: withPluginsRoute(downloadVCard),
+});

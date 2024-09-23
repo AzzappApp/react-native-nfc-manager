@@ -1,6 +1,5 @@
 import * as Sentry from '@sentry/nextjs';
 import { NextResponse } from 'next/server';
-import { withAxiom } from 'next-axiom';
 import {
   createSubscription,
   getUserSubscriptions,
@@ -8,6 +7,7 @@ import {
   updateActiveUserSubscription,
 } from '@azzapp/data';
 import cors from '#helpers/cors';
+import { withPluginsRoute } from '#helpers/queries';
 import { unpublishWebCardForUser } from '#helpers/subscription';
 
 const BEARER_HEADER = process.env.IAP_REVENUECAT_NOTIFICATION_BEARER;
@@ -277,7 +277,9 @@ const subscriptionWebHook = async (req: Request) => {
   }
 };
 
-export const { POST, OPTIONS } = cors({ POST: withAxiom(subscriptionWebHook) });
+export const { POST, OPTIONS } = cors({
+  POST: withPluginsRoute(subscriptionWebHook),
+});
 
 function extractSeatsFromSubscriptionId(id: string) {
   const parts = id.split('.');

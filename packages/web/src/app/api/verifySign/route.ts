@@ -1,7 +1,6 @@
 import { SignJWT } from 'jose';
 
 import { NextResponse } from 'next/server';
-import { withAxiom } from 'next-axiom';
 import { getProfileById, getWebCardById, createId } from '@azzapp/data';
 import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
 import { verifyHmacWithPassword } from '@azzapp/shared/crypto';
@@ -9,6 +8,7 @@ import ERRORS from '@azzapp/shared/errors';
 import { buildAvatarUrl } from '#helpers/avatar';
 import { displayName } from '#helpers/contactCardHelpers';
 import cors from '#helpers/cors';
+import { withPluginsRoute } from '#helpers/queries';
 import type { WebCard } from '@azzapp/data';
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
@@ -78,4 +78,6 @@ const verifySignApi = async (req: Request) => {
   }
 };
 
-export const { POST, OPTIONS } = cors({ POST: withAxiom(verifySignApi) });
+export const { POST, OPTIONS } = cors({
+  POST: withPluginsRoute(verifySignApi),
+});

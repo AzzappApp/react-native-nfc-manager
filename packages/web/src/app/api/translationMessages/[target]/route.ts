@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { withAxiom } from 'next-axiom';
 import * as z from 'zod';
 import {
   getLocalizationMessagesByTarget,
@@ -7,9 +6,10 @@ import {
 } from '@azzapp/data';
 import { SUPPORTED_LOCALES, ENTITY_TARGET } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
+import { withPluginsRoute } from '#helpers/queries';
 import { checkServerAuth } from '#helpers/tokens';
 
-export const GET = withAxiom(
+export const GET = withPluginsRoute(
   async (
     req: Request,
     {
@@ -44,7 +44,7 @@ const updateMessageSchema = z.object({
   value: z.string(),
 });
 
-export const POST = withAxiom(
+export const POST = withPluginsRoute(
   async (
     req: Request,
     {

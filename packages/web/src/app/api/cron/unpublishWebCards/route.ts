@@ -1,15 +1,15 @@
 import * as Sentry from '@sentry/nextjs';
 import { waitUntil } from '@vercel/functions';
-import { withAxiom } from 'next-axiom';
 import {
   getExpiredSubscription,
   transaction,
   updateSubscription,
 } from '@azzapp/data';
+import { withPluginsRoute } from '#helpers/queries';
 import { unpublishWebCardForUser } from '#helpers/subscription';
 import type { NextRequest } from 'next/server';
 
-export const GET = withAxiom((request: NextRequest) => {
+export const GET = withPluginsRoute((request: NextRequest) => {
   const authHeader = request.headers.get('authorization');
   console.log({ authHeader });
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {

@@ -1,10 +1,10 @@
-import { withAxiom } from 'next-axiom';
 import * as z from 'zod';
 import {
   acknowledgeRecurringPayment,
   checkSignature,
   rejectRecurringPayment,
 } from '@azzapp/payment';
+import { withPluginsRoute } from '#helpers/queries';
 
 const subscriptionPostSchema = z.object({
   json: z.object({
@@ -22,7 +22,7 @@ const subscriptionPostSchema = z.object({
   }),
 });
 
-export const POST = withAxiom(async (req: Request) => {
+export const POST = withPluginsRoute(async (req: Request) => {
   const json = await req.json();
 
   const data = subscriptionPostSchema.parse(json);
