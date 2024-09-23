@@ -7,7 +7,9 @@ import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
 import { verifyHmacWithPassword } from '@azzapp/shared/crypto';
 import ERRORS from '@azzapp/shared/errors';
 import { buildAvatarUrl } from '#helpers/avatar';
+import { displayName } from '#helpers/contactCardHelpers';
 import cors from '#helpers/cors';
+import type { WebCard } from '@azzapp/data';
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
@@ -42,7 +44,7 @@ const verifySignApi = async (req: Request) => {
       firstName: foundContactCard.firstName || webCard?.firstName,
       lastName: foundContactCard.lastName || webCard?.lastName,
       companyName: foundContactCard.company || webCard?.companyName,
-      userName: foundContactCard.company || webCard?.companyName,
+      userName: webCard?.userName,
     })
       .setJti(createId())
       .setIssuer('azzapp')
@@ -63,6 +65,7 @@ const verifySignApi = async (req: Request) => {
           ) ?? [],
         ),
         avatarUrl,
+        displayName: displayName(foundContactCard, webCard as WebCard),
         token,
       },
       { status: 200 },
