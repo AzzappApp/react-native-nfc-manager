@@ -1,5 +1,6 @@
-## 0.9.5-canary.6
+## 0.9.5-canary.7
 
+* **perf:**  - try fixed window
 * **perf:**  - try greater rate limiter window size
 * **fix:**  - 🐛 properly reset field after webcard rename ([#5127](https://github.com/AzzappApp/azzapp/pull/5127))
 * **build:**  - upgrade deps ([#5128](https://github.com/AzzappApp/azzapp/pull/5128))
