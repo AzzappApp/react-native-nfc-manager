@@ -64,9 +64,16 @@ export async function middleware(request: NextRequest) {
   if (process.env.NODE_ENV === 'production') {
     const ip = request.ip ?? '127.0.0.1';
 
+    const startTime = performance.now();
     const { pending, success } = nextUrl.pathname.startsWith('/api')
       ? await rateLimit.api.limit(ip)
       : await rateLimit.web.limit(ip);
+
+    console.log(
+      `Rate limit: ${nextUrl.pathname} ${ip} ${success} ${
+        performance.now() - startTime
+      }ms`,
+    );
 
     waitUntil(pending);
 
@@ -90,7 +97,13 @@ export async function middleware(request: NextRequest) {
   if (nextUrl.pathname?.length > 1) {
     const pathComponents = nextUrl.pathname.substring(1).split('/');
     //we have to check for a redirection
+    const startTime = performance.now();
     const redirection = await getRedirectWebCardByUserName(pathComponents[0]);
+    console.log(
+      `Redirection: ${pathComponents[0]} ${redirection.length} ${
+        performance.now() - startTime
+      }ms`,
+    );
 
     if (redirection.length > 0) {
       pathComponents[0] = redirection[0].toUserName;
