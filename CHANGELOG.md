@@ -1,5 +1,8 @@
-## 0.9.5-canary.4
+## 0.9.5-canary.5
 
+* **fix:**  - 🐛 properly reset field after webcard rename ([#5127](https://github.com/AzzappApp/azzapp/pull/5127))
+* **build:**  - upgrade deps ([#5128](https://github.com/AzzappApp/azzapp/pull/5128))
+* **build:**  - error on release case ([#5126](https://github.com/AzzappApp/azzapp/pull/5126))
 * **perf:**  - move rate limiting from middleware to apis ([#5124](https://github.com/AzzappApp/azzapp/pull/5124))
 * **fix:**  - **android:** [#5087](https://github.com/AzzappApp/azzapp/pull/5087) wallet can’t stand empty string ([#5125](https://github.com/AzzappApp/azzapp/pull/5125))
 * **build:**  - force version upgrade
