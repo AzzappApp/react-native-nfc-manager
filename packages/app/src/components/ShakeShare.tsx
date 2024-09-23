@@ -56,7 +56,7 @@ const ShakeShare = () => {
   const fling = Gesture.Fling()
     .direction(Directions.DOWN | Directions.RIGHT)
     .runOnJS(true)
-    .onEnd(dismount);
+    .onBegin(dismount); //seems to be a bug, only work with onBegin
 
   if (!mountScreen) {
     return null;
