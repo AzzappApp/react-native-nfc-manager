@@ -90,6 +90,7 @@ const SearchBarStatic = (props: SearchBarStaticProps) => {
         returnKeyType="search"
         onSubmitEditing={onSubmitEditingLocal}
         autoFocus={autoFocus}
+        placeholderTextColor={styles.placeHolder.color}
       />
       {searchValue && (
         <IconButton
@@ -127,6 +128,9 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 46,
     color: colors.black,
+  },
+  placeHolder: {
+    color: colors.grey400,
   },
   close: {
     position: 'absolute',
