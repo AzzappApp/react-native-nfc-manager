@@ -1,0 +1,164 @@
+diff --git a/ios/RNCCameraRoll.mm b/ios/RNCCameraRoll.mm
+index d63f1a7ca21d0ce18454c1bf1a488a4160768bb6..349e005235d2e3963a8fe8e50d97b3ea912096fe 100644
+--- a/ios/RNCCameraRoll.mm
++++ b/ios/RNCCameraRoll.mm
+@@ -753,50 +753,119 @@ -(void)sendProgressUpdateWithId:(NSString *)internalId
+ 		editOptions.progressHandler = ^(double progress, BOOL * _Nonnull stop) {
+ 			[self sendProgressUpdateWithId:internalId progress:progress];
+ 		};
++      
++        if (asset.mediaType == PHAssetMediaTypeImage) {
++          [asset requestContentEditingInputWithOptions:editOptions completionHandler:^(PHContentEditingInput *contentEditingInput, NSDictionary *info) {
++            if (contentEditingInput.mediaType == PHAssetMediaTypeImage) {
++                imageURL = contentEditingInput.fullSizeImageURL;
++            } else {
++                AVURLAsset *avURLAsset = (AVURLAsset*)contentEditingInput.audiovisualAsset;
++                imageURL = [avURLAsset URL];
++            }
+ 
+-        [asset requestContentEditingInputWithOptions:editOptions completionHandler:^(PHContentEditingInput *contentEditingInput, NSDictionary *info) {
+-          if (contentEditingInput.mediaType == PHAssetMediaTypeImage) {
+-              imageURL = contentEditingInput.fullSizeImageURL;
+-          } else {
+-              AVURLAsset *avURLAsset = (AVURLAsset*)contentEditingInput.audiovisualAsset;
+-              imageURL = [avURLAsset URL];
+-          }
+-
+-          if (imageURL.absoluteString.length != 0) {
+-
+-            filePath = [imageURL.absoluteString stringByReplacingOccurrencesOfString:@"pathfile:" withString:@"file:"];
+-
+-            resolve(@{
+-                      @"node": @{
+-                          @"type": assetMediaTypeLabel,
+-                          @"subTypes":assetMediaSubtypesLabel,
+-                          @"image": @{
+-                              @"filepath": filePath,
+-                              @"filename": originalFilename,
+-                              @"height": @([asset pixelHeight]),
+-                              @"width": @([asset pixelWidth]),
+-                              @"isStored": @YES,
+-                              @"playableDuration": @([asset duration]), // fractional seconds
+-                              @"fileSize": fileSize
+-                              },
+-                          @"timestamp": @(asset.creationDate.timeIntervalSince1970),
+-                          @"modificationTimestamp": @(asset.modificationDate.timeIntervalSince1970),
+-                          @"location": (loc ? @{
+-                                                @"latitude": @(loc.coordinate.latitude),
+-                                                @"longitude": @(loc.coordinate.longitude),
+-                                                @"altitude": @(loc.altitude),
+-                                                @"heading": @(loc.course),
+-                                                @"speed": @(loc.speed), // speed in m/s
+-                                                } : @{})
+-                          }
+-                      });
+-          } else {
++            if (imageURL.absoluteString.length != 0) {
++
++              filePath = [imageURL.absoluteString stringByReplacingOccurrencesOfString:@"pathfile:" withString:@"file:"];
++
++              resolve(@{
++                        @"node": @{
++                            @"type": assetMediaTypeLabel,
++                            @"subTypes":assetMediaSubtypesLabel,
++                            @"image": @{
++                                @"filepath": filePath,
++                                @"filename": originalFilename,
++                                @"height": @([asset pixelHeight]),
++                                @"width": @([asset pixelWidth]),
++                                @"isStored": @YES,
++                                @"playableDuration": @([asset duration]), // fractional seconds
++                                @"fileSize": fileSize
++                                },
++                            @"timestamp": @(asset.creationDate.timeIntervalSince1970),
++                            @"modificationTimestamp": @(asset.modificationDate.timeIntervalSince1970),
++                            @"location": (loc ? @{
++                                                  @"latitude": @(loc.coordinate.latitude),
++                                                  @"longitude": @(loc.coordinate.longitude),
++                                                  @"altitude": @(loc.altitude),
++                                                  @"heading": @(loc.course),
++                                                  @"speed": @(loc.speed), // speed in m/s
++                                                  } : @{})
++                            }
++                        });
++            } else {
++              NSString *errorMessage = [NSString stringWithFormat:@"Failed to load asset"
++                                        " with localIdentifier %@ with no error message.", internalId];
++              NSError *error = RCTErrorWithMessage(errorMessage);
++              reject(@"Error while getting file path",@"Error while getting file path",error);
++            }
++          }];
++        } else {
++          PHAssetResourceManager *resourceManager = [PHAssetResourceManager defaultManager];
++          PHAssetResource *resource = [PHAssetResource assetResourcesForAsset:asset].firstObject;
++          if (resource == nil) {
+             NSString *errorMessage = [NSString stringWithFormat:@"Failed to load asset"
+-                                      " with localIdentifier %@ with no error message.", internalId];
++                                " with localIdentifier %@ with no error message.", internalId];
+             NSError *error = RCTErrorWithMessage(errorMessage);
+-            reject(@"Error while getting file path",@"Error while getting file path",error);
++            reject(@"No asset found",@"No asset found",error);
+           }
+-        }];
++          NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
++          NSString *cacheDirectory = [paths objectAtIndex:0];
++          NSString *phAssetCacheDir = [cacheDirectory stringByAppendingPathComponent:@"ph-assets-cache"];
++          if (![[NSFileManager defaultManager] fileExistsAtPath:phAssetCacheDir]) {
++            NSError * error = nil;
++            [[NSFileManager defaultManager] createDirectoryAtPath:phAssetCacheDir withIntermediateDirectories:NO attributes:nil error: &error];
++            if (error) {
++              reject(@"Faile to create temp dir", @"Faile to create temp dir", error);
++              return;
++            }
++          }
++          NSString *sanitizedLocalIdentifier = [asset.localIdentifier stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
++          NSURL *fileURL = [NSURL fileURLWithPath:[[phAssetCacheDir stringByAppendingPathComponent:sanitizedLocalIdentifier]
++              stringByAppendingPathExtension:[resource.originalFilename pathExtension]]];
++          
++          NSString* filePath = [fileURL.absoluteString stringByReplacingOccurrencesOfString:@"pathfile:" withString:@"file:"];
++          
++          NSDictionary *result = @{
++            @"node": @{
++                @"type": assetMediaTypeLabel,
++                @"subTypes":assetMediaSubtypesLabel,
++                @"image": @{
++                    @"filepath": filePath,
++                    @"filename": originalFilename,
++                    @"height": @([asset pixelHeight]),
++                    @"width": @([asset pixelWidth]),
++                    @"isStored": @YES,
++                    @"playableDuration": @([asset duration]), // fractional seconds
++                    @"fileSize": fileSize
++                    },
++                @"timestamp": @(asset.creationDate.timeIntervalSince1970),
++                @"modificationTimestamp": @(asset.modificationDate.timeIntervalSince1970),
++                @"location": (loc ? @{
++                                      @"latitude": @(loc.coordinate.latitude),
++                                      @"longitude": @(loc.coordinate.longitude),
++                                      @"altitude": @(loc.altitude),
++                                      @"heading": @(loc.course),
++                                      @"speed": @(loc.speed), // speed in m/s
++                                      } : @{})
++                }
++            };
++          
++          
++          if ([[NSFileManager defaultManager] fileExistsAtPath:fileURL.path]) {
++            resolve(result);
++            return;
++          }
++          
++          
++          PHAssetResourceRequestOptions* resourceRequestsOptions = [PHAssetResourceRequestOptions new];
++          resourceRequestsOptions.networkAccessAllowed = YES;
++          [resourceManager writeDataForAssetResource:resource toFile:fileURL options:resourceRequestsOptions completionHandler:^(NSError * _Nullable error) {
++            if (error) {
++              reject(@"Error while creating image tmp file",@"Error creating tmp file",error);
++              return;
++            }
++             resolve(result);
++          }];
++        }
+       }
+ 
+     } else {

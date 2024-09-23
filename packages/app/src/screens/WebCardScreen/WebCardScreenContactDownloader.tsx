@@ -283,7 +283,7 @@ const buildContact = async (
       additionalContactData?.urls?.map(url => ({
         label: '',
         url:
-          !url.address || url.address.startsWith('http')
+          !url.address || url.address.toLocaleLowerCase().startsWith('http')
             ? url.address
             : `http://${url.address}`,
         id: `${profileId}-${url.address}`,

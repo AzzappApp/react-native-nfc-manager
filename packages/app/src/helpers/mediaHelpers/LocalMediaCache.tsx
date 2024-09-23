@@ -44,8 +44,9 @@ export const useLocalCachedMediaFile = (
   useEffect(() => {
     let cancelled = false;
     if (localFile) {
+      const path = localFile.replace('file://', '');
       ReactNativeBlobUtil.fs
-        .exists(localFile)
+        .exists(path)
         .catch(() => false)
         .then(exists => {
           if (!exists) {

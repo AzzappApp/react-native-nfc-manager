@@ -242,14 +242,18 @@ const StockMediaListInner = ({
     if (!data) {
       return [];
     }
-    if ('searchStockPhotos' in data) {
+    if ('searchStockPhotos' in data && data.searchStockPhotos) {
       return (data.searchStockPhotos.edges ?? [])
         .map(edge => edge?.node)
         .filter(item => !!item);
     }
-    return (data.searchStockVideos.edges ?? [])
-      .map(edge => edge?.node)
-      .filter(item => !!item);
+    if ('searchStockVideos' in data && data.searchStockVideos) {
+      return (data.searchStockVideos.edges ?? [])
+        .map(edge => edge?.node)
+        .filter(item => !!item);
+    }
+
+    return [];
   }, [data]);
 
   return (
