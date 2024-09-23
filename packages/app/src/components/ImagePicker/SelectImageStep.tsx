@@ -24,6 +24,7 @@ import { ImagePickerStep } from './ImagePickerWizardContainer';
 import type { Media } from '#helpers/mediaHelpers';
 import type { BottomMenuItem } from '#ui/BottomMenu';
 import type { CameraViewHandle } from '../CameraView';
+import type { PhotoGalleryMediaListActions } from '../PhotoGalleryMediaList';
 import type { Album } from '@react-native-camera-roll/camera-roll';
 
 export type SelectImageStepProps = {
@@ -84,6 +85,8 @@ const SelectImageStep = ({
     onMediaChange(media, aspectRatio);
   };
 
+  const gallery = useRef<PhotoGalleryMediaListActions>(null);
+
   const [pickerMode, setPickerMode] = useState<'gallery' | 'photo' | 'video'>(
     'gallery',
   );
@@ -100,7 +103,10 @@ const SelectImageStep = ({
   const [selectedAlbum, setSelectedAlbum] = useState<Album | null>(null);
   const { mediaPermission, cameraPermission, audioPermission } =
     usePermissionContext();
-  useMediaLimitedSelectionAlert(mediaPermission);
+
+  useMediaLimitedSelectionAlert(mediaPermission, {
+    onSelectedMorePhotos: () => gallery.current?.load(),
+  });
 
   const onChangePickerMode = useCallback(
     (mode: 'gallery' | 'photo' | 'video') => {
@@ -334,6 +340,7 @@ const SelectImageStep = ({
                 kind={kind}
                 contentContainerStyle={galleryContainerStyle}
                 autoSelectFirstItem={media == null}
+                ref={gallery}
               />
             ) : null
           ) : (
