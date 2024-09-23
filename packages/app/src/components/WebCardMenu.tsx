@@ -33,16 +33,16 @@ import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import type { WebCardModal_webCard$key } from '#relayArtifacts/WebCardModal_webCard.graphql';
+import type { WebCardMenu_webCard$key } from '#relayArtifacts/WebCardMenu_webCard.graphql';
 
-type WebCardModalProps = {
+type WebCardMenuProps = {
   close: () => void;
   /**
    *
    *
-   * @type {WebCardModal_webCard$key}
+   * @type {WebCardMenu_webCard$key}
    */
-  webCard: WebCardModal_webCard$key;
+  webCard: WebCardMenu_webCard$key;
   /**
    *
    *
@@ -70,17 +70,17 @@ type WebCardModalProps = {
   ) => void;
 };
 
-const WebCardModal = ({
+const WebCardMenu = ({
   webCard: webCardKey,
   onToggleFollow,
   visible,
   close,
   isViewer,
   isOwner,
-}: WebCardModalProps) => {
+}: WebCardMenuProps) => {
   const webCard = useFragment(
     graphql`
-      fragment WebCardModal_webCard on WebCard
+      fragment WebCardMenu_webCard on WebCard
       @argumentDefinitions(viewerWebCardId: { type: "ID" }) {
         id
         userName
@@ -92,13 +92,13 @@ const WebCardModal = ({
           __typename
           uriDownload: uri
         }
-        webCardModal_isFollowing: isFollowing(webCardId: $viewerWebCardId)
+        WebCardMenu_isFollowing: isFollowing(webCardId: $viewerWebCardId)
         ...CoverRenderer_webCard
       }
     `,
     webCardKey,
   );
-  const isFollowing = webCard.webCardModal_isFollowing;
+  const isFollowing = webCard.WebCardMenu_isFollowing;
   const { profileInfos } = useAuthState();
 
   const { width: windowsWith, height: windowsHeight } = useWindowDimensions();
@@ -111,7 +111,7 @@ const WebCardModal = ({
     let message = intl.formatMessage({
       defaultMessage: 'Check out this azzapp WebCard: ',
       description:
-        'Profile WebcardModal, message use when sharing the contact card',
+        'Profile WebCardMenu, message use when sharing the contact card',
     });
     if (Platform.OS === 'android') {
       // for android we need to add the message to the share
@@ -123,7 +123,7 @@ const WebCardModal = ({
           title: intl.formatMessage({
             defaultMessage: 'WebCard on azzapp',
             description:
-              'Profile WebcardModal, message use when sharing the contact card',
+              'Profile WebCardMenu, message use when sharing the contact card',
           }),
           message,
           url,
@@ -132,12 +132,12 @@ const WebCardModal = ({
           dialogTitle: intl.formatMessage({
             defaultMessage: 'Azzapp | An app made for your business',
             description:
-              'Profile WebcardModal, message use when sharing the contact card',
+              'Profile WebCardMenu, message use when sharing the contact card',
           }),
           subject: intl.formatMessage({
             defaultMessage: 'Azzapp | An app made for your business',
             description:
-              'Profile WebcardModal, message use when sharing the contact card',
+              'Profile WebCardMenu, message use when sharing the contact card',
           }),
         },
       );
@@ -604,7 +604,7 @@ const WebCardModal = ({
   );
 };
 
-export default WebCardModal;
+export default WebCardMenu;
 
 const stylesheet = createStyleSheet(appearance => ({
   bottomSheetContentContainer: { paddingHorizontal: 0 },

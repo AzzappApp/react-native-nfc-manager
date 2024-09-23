@@ -44,6 +44,7 @@ import {
   useRouter,
   useScreenOptionsUpdater,
 } from '#components/NativeRouter';
+import WebCardMenu from '#components/WebCardMenu';
 import { logEvent } from '#helpers/analytics';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import relayScreen from '#helpers/relayScreen';
@@ -58,7 +59,6 @@ import useToggle from '#hooks/useToggle';
 import useToggleFollow from '#hooks/useToggleFollow';
 import Container from '#ui/Container';
 import WebCardBackground from './WebCardBackground';
-import WebCardModal from './WebCardModal';
 import WebCardPostsList from './WebCardPostsList';
 import WebCardScreenButtonBar from './WebCardScreenButtonBar';
 import WebCardScreenContactDownloader from './WebCardScreenContactDownloader';
@@ -455,7 +455,7 @@ const WebCardScreen = ({
       />
       <Suspense fallback={null}>
         <WebCardScreenPublishHelper webCard={data.webCard} editMode={editing} />
-        <WebCardModal
+        <WebCardMenu
           visible={showWebcardModal}
           webCard={data.webCard}
           close={toggleWebcardModal}
@@ -487,7 +487,7 @@ const webCardScreenByIdQuery = graphql`
         @arguments(viewerWebCardId: $viewerWebCardId)
       ...WebCardScreenPublishHelper_webCard
       ...WebCardBackground_webCard
-      ...WebCardModal_webCard @arguments(viewerWebCardId: $viewerWebCardId)
+      ...WebCardMenu_webCard @arguments(viewerWebCardId: $viewerWebCardId)
     }
     profile: node(id: $profileId) {
       ... on Profile {
@@ -515,7 +515,7 @@ const webCardScreenByNameQuery = graphql`
         @arguments(viewerWebCardId: $viewerWebCardId)
       ...WebCardScreenPublishHelper_webCard
       ...WebCardBackground_webCard
-      ...WebCardModal_webCard @arguments(viewerWebCardId: $viewerWebCardId)
+      ...WebCardMenu_webCard @arguments(viewerWebCardId: $viewerWebCardId)
     }
     profile: node(id: $profileId) {
       ... on Profile {

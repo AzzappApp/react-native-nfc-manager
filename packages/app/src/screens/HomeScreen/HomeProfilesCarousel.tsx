@@ -1,5 +1,13 @@
 import { BlurView } from 'expo-blur';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  memo,
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
   View,
@@ -11,7 +19,10 @@ import {
 } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
-import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
+import {
+  profileHasAdminRight,
+  profileIsOwner,
+} from '@azzapp/shared/profileHelpers';
 import { colors, shadow } from '#theme';
 import CoverErrorRenderer from '#components/CoverErrorRenderer';
 import CoverLink from '#components/CoverLink';
@@ -23,8 +34,11 @@ import {
   useRouter,
   useScreenHasFocus,
 } from '#components/NativeRouter';
+import WebCardMenu from '#components/WebCardMenu';
 import { logEvent } from '#helpers/analytics';
 import { getAuthState } from '#helpers/authStore';
+import useToggle from '#hooks/useToggle';
+import useToggleFollow from '#hooks/useToggleFollow';
 import CarouselSelectList from '#ui/CarouselSelectList';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
@@ -237,14 +251,17 @@ const ItemRenderComponent = ({
           hasCover
           ...CoverLink_webCard
           ...CoverRenderer_webCard
+          ...WebCardMenu_webCard
         }
       }
     `,
     item as HomeProfilesCarouselItem_profile$key,
   );
 
+  const onToggleFollow = useToggleFollow();
   const [ready, setReady] = useState(!profile?.webCard?.hasCover);
   const [loadingFailed, setLoadingFailed] = useState(false);
+  const [showWebcardModal, toggleWebcardModal] = useToggle(false);
   const onReady = useCallback(() => {
     setReady(true);
   }, []);
@@ -299,96 +316,111 @@ const ItemRenderComponent = ({
   }, [scrollToIndex, isCurrent, index]);
 
   return (
-    <Pressable
-      style={containerStyle}
-      onPress={onContainerPress}
-      pointerEvents={isCurrent ? 'box-none' : 'box-only'}
-    >
-      {loadingFailed ? (
-        <CoverErrorRenderer
-          label={
-            <FormattedMessage
-              defaultMessage="An error occured"
-              description="Error message displayed when a cover failed to load in HomeScreen"
-            />
-          }
-          width={coverWidth}
-          onRetry={onRetry}
-        />
-      ) : profile.invited ? (
-        <View
-          style={{
-            width: coverWidth,
-            aspectRatio: 0.625,
-            justifyContent: 'center',
-            alignItems: 'center',
-            borderRadius: coverWidth * COVER_CARD_RADIUS,
-            backgroundColor: colors.black,
-          }}
-        >
-          <Icon
-            icon="shared_webcard"
-            style={styles.invitationIcon}
-            tintColor={colors.white}
-          />
-        </View>
-      ) : profile.webCard?.hasCover ? (
-        <View style={styles.coverLinkWrapper}>
-          <CoverLink
-            webCard={profile.webCard}
+    <>
+      <Pressable
+        style={containerStyle}
+        onPress={onContainerPress}
+        pointerEvents={isCurrent ? 'box-none' : 'box-only'}
+      >
+        {loadingFailed ? (
+          <CoverErrorRenderer
+            label={
+              <FormattedMessage
+                defaultMessage="An error occured"
+                description="Error message displayed when a cover failed to load in HomeScreen"
+              />
+            }
             width={coverWidth}
-            webCardId={profile.webCard.id}
-            canPlay={isCurrent && hasFocus}
-            onReadyForDisplay={onReady}
-            onError={onError}
+            onRetry={onRetry}
           />
-          {profile.webCard.isMultiUser && (
-            <PressableNative
-              style={styles.multiUserContainer}
-              onPress={onPressMultiUser}
-              android_ripple={{
-                borderless: true,
-                foreground: true,
-              }}
-            >
-              <BlurView style={styles.multiUserIconContainer}>
-                <Icon icon="shared_webcard" style={styles.multiUserIcon} />
-              </BlurView>
-            </PressableNative>
-          )}
-        </View>
-      ) : (
-        <Link route="COVER_TEMPLATE_SELECTION" params={{ fromHome: true }}>
-          <PressableOpacity
-            style={[
-              {
-                width: coverWidth,
-                height: coverHeight,
-                borderRadius: coverWidth * COVER_CARD_RADIUS,
-                overflow: 'visible',
-              },
-            ]}
-            accessibilityLabel={intl.formatMessage({
-              defaultMessage: 'Create a new WebCard',
-              description: 'Start new profile creation from account screen',
-            })}
+        ) : profile.invited ? (
+          <View
+            style={{
+              width: coverWidth,
+              aspectRatio: 0.625,
+              justifyContent: 'center',
+              alignItems: 'center',
+              borderRadius: coverWidth * COVER_CARD_RADIUS,
+              backgroundColor: colors.black,
+            }}
           >
-            <CoverRenderer
-              width={coverWidth}
+            <Icon
+              icon="shared_webcard"
+              style={styles.invitationIcon}
+              tintColor={colors.white}
+            />
+          </View>
+        ) : profile.webCard?.hasCover ? (
+          <View style={styles.coverLinkWrapper}>
+            <CoverLink
               webCard={profile.webCard}
+              width={coverWidth}
+              webCardId={profile.webCard.id}
+              canPlay={isCurrent && hasFocus}
               onReadyForDisplay={onReady}
               onError={onError}
+              onLongPress={toggleWebcardModal}
             />
-          </PressableOpacity>
-        </Link>
+            {profile.webCard.isMultiUser && (
+              <PressableNative
+                style={styles.multiUserContainer}
+                onPress={onPressMultiUser}
+                android_ripple={{
+                  borderless: true,
+                  foreground: true,
+                }}
+              >
+                <BlurView style={styles.multiUserIconContainer}>
+                  <Icon icon="shared_webcard" style={styles.multiUserIcon} />
+                </BlurView>
+              </PressableNative>
+            )}
+          </View>
+        ) : (
+          <Link route="COVER_TEMPLATE_SELECTION" params={{ fromHome: true }}>
+            <PressableOpacity
+              style={[
+                {
+                  width: coverWidth,
+                  height: coverHeight,
+                  borderRadius: coverWidth * COVER_CARD_RADIUS,
+                  overflow: 'visible',
+                },
+              ]}
+              accessibilityLabel={intl.formatMessage({
+                defaultMessage: 'Create a new WebCard',
+                description: 'Start new profile creation from account screen',
+              })}
+            >
+              <CoverRenderer
+                width={coverWidth}
+                webCard={profile.webCard}
+                onReadyForDisplay={onReady}
+                onError={onError}
+              />
+            </PressableOpacity>
+          </Link>
+        )}
+        {!ready && !profile.invited && !loadingFailed && (
+          <CoverLoadingIndicator
+            width={coverWidth}
+            style={StyleSheet.absoluteFill}
+          />
+        )}
+      </Pressable>
+      {profile.webCard && (
+        <Suspense fallback={null}>
+          <WebCardMenu
+            visible={showWebcardModal}
+            webCard={profile.webCard}
+            close={toggleWebcardModal}
+            onToggleFollow={onToggleFollow}
+            isViewer
+            isOwner={profileIsOwner(profile.profileRole)}
+          />
+        </Suspense>
       )}
-      {!ready && !profile.invited && !loadingFailed && (
-        <CoverLoadingIndicator
-          width={coverWidth}
-          style={StyleSheet.absoluteFill}
-        />
-      )}
-    </Pressable>
+    </>
   );
 };
 
