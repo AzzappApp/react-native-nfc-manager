@@ -111,11 +111,11 @@ const getGoogleWalletPass = async (
           defaultValue: {
             language: lang,
             value:
-              (`${contactCard?.firstName ?? ''} ${
+              `${contactCard?.firstName ?? ''} ${
                 contactCard?.lastName ?? ''
               }`.trim() ||
-                webCard?.commonInformation?.company ||
-                contactCard?.company) ??
+              webCard?.commonInformation?.company?.trim() ||
+              contactCard?.company?.trim() ||
               webCard?.userName, // empty string is not allowed
           },
         },
