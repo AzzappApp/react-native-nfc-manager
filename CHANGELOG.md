@@ -1,4 +1,4 @@
-## 0.9.5-canary.2
+## 0.9.5-canary.3
 
 * **build:**  - force version upgrade
 * **docs:**  - update readme
