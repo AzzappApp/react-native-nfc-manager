@@ -181,7 +181,7 @@ type Profile implements Node {
   """
   Fetches cover template type
   """
-  coverTemplateTypes: [CoverTemplateType!]!
+  coverTemplateTypes: [CoverTemplateType!]! @deprecated(reason: "Unused in version 0.9.5-canary.13")
 
   """
   Fetches card styles
