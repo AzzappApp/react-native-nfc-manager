@@ -33,58 +33,39 @@ const createEntitiesBatchLoadFunction =
   (ids: readonly string[]) =>
     getEntitiesByIds(entity, ids);
 
-export const cardModuleLoader = createSessionDataLoader(
-  'CardModuleLoader',
-  createEntitiesBatchLoadFunction('CardModule'),
-);
-
-export const cardStyleLoader = createSessionDataLoader(
-  'CardStyleLoader',
+export const cardStyleLoader = createDataLoader(
   createEntitiesBatchLoadFunction('CardStyle'),
 );
 
-export const cardTemplateLoader = createSessionDataLoader(
-  'CardTemplateLoader',
+export const cardTemplateLoader = createDataLoader(
   createEntitiesBatchLoadFunction('CardTemplate'),
 );
 
-export const cardTemplateTypeLoader = createSessionDataLoader(
-  'CardTemplateTypeLoader',
+export const cardTemplateTypeLoader = createDataLoader(
   createEntitiesBatchLoadFunction('CardTemplateType'),
 );
 
-export const colorPaletteLoader = createSessionDataLoader(
-  'ColorPaletteLoader',
+export const colorPaletteLoader = createDataLoader(
   createEntitiesBatchLoadFunction('ColorPalette'),
 );
 
-export const companyActivityLoader = createSessionDataLoader(
-  'CompanyActivityLoader',
+export const companyActivityLoader = createDataLoader(
   createEntitiesBatchLoadFunction('CompanyActivity'),
 );
 
-export const companyActivityTypeLoader = createSessionDataLoader(
-  'CompanyActivityTypeLoader',
+export const companyActivityTypeLoader = createDataLoader(
   createEntitiesBatchLoadFunction('CompanyActivityType'),
 );
 
-export const coverTemplateLoader = createSessionDataLoader(
-  'CoverTemplateLoader',
+export const coverTemplateLoader = createDataLoader(
   createEntitiesBatchLoadFunction('CoverTemplate'),
 );
 
-export const coverTemplateTypeLoader = createSessionDataLoader(
-  'CoverTemplateTypeLoader',
+export const coverTemplateTypeLoader = createDataLoader(
   createEntitiesBatchLoadFunction('CoverTemplateType'),
 );
 
-export const coverTemplateTagLoader = createSessionDataLoader(
-  'CoverTemplateTagLoader',
-  createEntitiesBatchLoadFunction('CoverTemplateTag'),
-);
-
-export const mediaLoader = createSessionDataLoader(
-  'MediaLoader',
+export const mediaLoader = createDataLoader(
   createEntitiesBatchLoadFunction('Media'),
 );
 
@@ -98,8 +79,7 @@ export const postLoader = createSessionDataLoader(
   createEntitiesBatchLoadFunction('Post'),
 );
 
-export const webCardCategoryLoader = createSessionDataLoader(
-  'WebCardCategoryLoader',
+export const webCardCategoryLoader = createDataLoader(
   createEntitiesBatchLoadFunction('WebCardCategory'),
 );
 
@@ -113,8 +93,7 @@ export const webCardLoader = createSessionDataLoader(
   createEntitiesBatchLoadFunction('WebCard'),
 );
 
-export const moduleBackgroundLoader = createSessionDataLoader(
-  'ModuleBackgroundLoader',
+export const moduleBackgroundLoader = createDataLoader(
   createEntitiesBatchLoadFunction('ModuleBackground'),
 );
 
