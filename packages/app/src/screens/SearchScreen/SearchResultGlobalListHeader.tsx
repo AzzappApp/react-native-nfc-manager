@@ -135,7 +135,6 @@ export const SearchResultGlobalListHeaderPlaceholder = () => {
 };
 
 const styles = StyleSheet.create({
-  flexOne: { flex: 1 },
   titleSection: {
     marginTop: 17,
     marginBottom: 7,

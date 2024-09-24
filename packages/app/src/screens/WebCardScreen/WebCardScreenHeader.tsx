@@ -230,9 +230,6 @@ const WebCardScreenHeader = ({
 export default WebCardScreenHeader;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   closeButton: {
     position: 'absolute',
     start: 15,

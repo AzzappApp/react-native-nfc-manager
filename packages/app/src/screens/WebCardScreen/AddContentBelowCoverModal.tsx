@@ -148,10 +148,6 @@ const styles = StyleSheet.create({
     width: 115,
     height: 190,
   },
-  flatList: {
-    paddingHorizontal: 10,
-    paddingTop: 20,
-  },
 });
 
 export default AddContentBelowCoverModal;

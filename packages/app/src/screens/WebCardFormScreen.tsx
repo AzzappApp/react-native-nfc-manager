@@ -749,9 +749,6 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
   },
-  form: {
-    flex: 1,
-  },
   formElement: {
     marginHorizontal: 20,
   },

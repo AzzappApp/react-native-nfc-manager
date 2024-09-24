@@ -328,14 +328,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  proContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  proText: {
-    color: colors.grey400,
-  },
-  badge: {
-    marginLeft: 5,
-  },
 });

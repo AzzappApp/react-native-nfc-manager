@@ -89,12 +89,4 @@ const styles = StyleSheet.create({
   title: {
     textAlign: 'center',
   },
-  headerSegmentLeft: {
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-  },
-  headerSegmentRight: {
-    justifyContent: 'center',
-    alignItems: 'flex-end',
-  },
 });

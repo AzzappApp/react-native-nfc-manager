@@ -305,7 +305,6 @@ const getItemDuration = (item: StockPhoto | StockVideo) =>
 const styles = StyleSheet.create({
   root: { flex: 1, paddingTop: 10, gap: 10 },
   searchBar: { marginHorizontal: 20 },
-  list: { flex: 1 },
   pexelsLink: {
     position: 'absolute',
     bottom: 10,

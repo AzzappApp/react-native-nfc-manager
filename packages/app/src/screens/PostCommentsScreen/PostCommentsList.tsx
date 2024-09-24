@@ -400,13 +400,5 @@ const styles = StyleSheet.create({
   keyboardAreaView: {
     flex: 1,
   },
-  contentModal: {
-    padding: 10,
-  },
-  counter: {
-    marginTop: 5,
-    marginLeft: 12,
-    color: 'white',
-  },
   list: { flex: 1 },
 });

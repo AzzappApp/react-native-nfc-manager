@@ -114,10 +114,6 @@ const PhotoWithTextAndTitleBackgroundEditionPanel = ({
 export default PhotoWithTextAndTitleBackgroundEditionPanel;
 
 const styles = StyleSheet.create({
-  slider: {
-    width: '90%',
-    alignSelf: 'center',
-  },
   mediaSelector: {
     flex: 1,
     marginBottom: 20,

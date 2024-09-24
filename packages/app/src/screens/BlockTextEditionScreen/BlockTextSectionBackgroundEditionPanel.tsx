@@ -113,23 +113,8 @@ const BlockTextSectionBackgroundEditionPanel = ({
 export default BlockTextSectionBackgroundEditionPanel;
 
 const styles = StyleSheet.create({
-  root: {
-    paddingHorizontal: 20,
-    rowGap: 15,
-    justifyContent: 'flex-start',
-  },
   mediaSelector: {
     flex: 1,
     marginBottom: 20,
-  },
-  paramContainer: {
-    width: '100%',
-    flex: 1,
-    rowGap: 25,
-    justifyContent: 'center',
-  },
-  slider: {
-    width: '90%',
-    alignSelf: 'center',
   },
 });

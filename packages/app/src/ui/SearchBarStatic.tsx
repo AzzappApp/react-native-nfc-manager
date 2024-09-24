@@ -129,6 +129,7 @@ const styles = StyleSheet.create({
     height: 46,
     color: colors.black,
   },
+  // eslint-disable-next-line react-native/no-unused-styles
   placeHolder: {
     color: colors.grey400,
   },

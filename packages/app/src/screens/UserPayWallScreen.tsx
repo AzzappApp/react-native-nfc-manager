@@ -642,7 +642,6 @@ const styles = StyleSheet.create({
     elevation: 4,
     paddingHorizontal: 20,
   },
-  titleText: { paddingTop: 20 },
   contentContainerStyle: {
     marginHorizontal: 20,
     paddingTop: 15,

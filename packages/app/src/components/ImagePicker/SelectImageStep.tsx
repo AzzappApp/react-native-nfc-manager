@@ -393,10 +393,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  imageEditor: {
-    width: '100%',
-    height: '100%',
-  },
   adjustButton: {
     position: 'absolute',
     left: 25,

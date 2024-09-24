@@ -123,14 +123,4 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginRight: 20,
   },
-  sliderValue: {
-    marginBottom: 0,
-    alignSelf: 'center',
-    height: 20,
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginHorizontal: '10%',
-  },
 });

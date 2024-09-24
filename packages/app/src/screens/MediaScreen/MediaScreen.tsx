@@ -226,7 +226,6 @@ const MediaScreenFallback = () => {
 };
 
 const styles = StyleSheet.create({
-  tabsContainer: { flex: 1, paddingTop: 20 },
   tabBarContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -234,13 +233,6 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingHorizontal: 5,
     paddingVertical: 9,
-  },
-  tab: {
-    width: 83,
-    height: 32,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 33,
   },
   coverList: {
     overflow: 'visible',

@@ -37,12 +37,6 @@ const PermissionScreen = ({
 export default PermissionScreen;
 
 const styles = StyleSheet.create({
-  content: {
-    flex: 1,
-    justifyContent: 'center',
-    backgroundColor: 'white',
-    padding: 20,
-  },
   permissionScreenTitle: {
     marginBottom: 20,
     padding: 10,

@@ -23,7 +23,7 @@
     "plugin:react-hooks/recommended",
     "plugin:prettier/recommended"
   ],
-  "plugins": ["formatjs"],
+  "plugins": ["formatjs", "react-native"],
   "ignorePatterns": [
     "**/__generated__/*",
     "packages/app/src/relayArtifacts/",
@@ -136,7 +136,8 @@
     "formatjs/enforce-description": "error",
     "formatjs/enforce-default-message": "error",
     "formatjs/enforce-placeholders": "error",
-    "formatjs/no-multiple-whitespaces": "error"
+    "formatjs/no-multiple-whitespaces": "error",
+    "react-native/no-unused-styles": 2
   },
   "overrides": [
     {
