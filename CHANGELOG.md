@@ -1,4 +1,4 @@
-## 0.9.5-canary.8
+## 0.9.5-canary.9
 
 * **test:**  - try nodejs runtime
 * **perf:**  - try fixed window
