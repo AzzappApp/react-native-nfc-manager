@@ -72,8 +72,11 @@ const ForgotPasswordConfirmationScreen = ({
                 </Text>
                 <Text style={styles.textForgotExplain} variant="medium">
                   <FormattedMessage
-                    defaultMessage="We just send you a link to create a new password or you can type the code below"
-                    description="ForgotPasswordScreen - message to inform the user an email or sms has been sent to reset the password"
+                    defaultMessage="We've sent a validation code to {email}. Please enter the code below to reset your password."
+                    description="ForgotPasswordScreen - message to inform the user an email has been sent to reset the password"
+                    values={{
+                      email: params.issuer,
+                    }}
                   />
                 </Text>
               </>
@@ -87,8 +90,11 @@ const ForgotPasswordConfirmationScreen = ({
                 </Text>
                 <Text style={styles.textForgotExplain} variant="medium">
                   <FormattedMessage
-                    defaultMessage="You can type the code below"
-                    description="ForgotPasswordScreen - message to inform the user an email or sms has been sent to reset the password"
+                    defaultMessage="We've sent a validation code to {phoneNumber}. Please enter the code below to reset your password."
+                    description="ForgotPasswordScreen - message to inform the user an sms has been sent to reset the password"
+                    values={{
+                      phoneNumber: params.issuer,
+                    }}
                   />
                 </Text>
               </>
