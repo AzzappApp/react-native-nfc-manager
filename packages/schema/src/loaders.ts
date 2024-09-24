@@ -9,6 +9,7 @@ import {
   activeUserSubscription,
   getActiveUserSubscriptionForWebCard,
   getProfileByUserAndWebCard,
+  isFollowing,
 } from '@azzapp/data';
 import { ENTITY_TARGET } from '@azzapp/i18n';
 import {
@@ -163,6 +164,16 @@ export const profileByWebCardIdAndUserIdLoader = createSessionDataLoader(
     ),
   {
     cacheKeyFn: key => `${key.userId}-${key.webCardId}`,
+  },
+);
+
+export const followingsLoader = createSessionDataLoader(
+  'FollowingsLoader',
+  async (keys: ReadonlyArray<[follower: string, following: string]>) => {
+    return Promise.all(keys.map(key => isFollowing(key[0], key[1])));
+  },
+  {
+    cacheKeyFn: key => key.join('-'),
   },
 );
 

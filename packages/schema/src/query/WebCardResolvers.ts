@@ -6,7 +6,6 @@ import {
 import {
   getCompanyActivitiesByWebCardCategory,
   getWebCardPosts,
-  isFollowing,
   getLikedPosts,
   getFollowerProfiles,
   getFollowingsWebCard,
@@ -28,6 +27,7 @@ import {
   cardModuleByWebCardLoader,
   companyActivityLoader,
   companyActivityTypeLoader,
+  followingsLoader,
   profileByWebCardIdAndUserIdLoader,
   webCardCategoryLoader,
   webCardOwnerLoader,
@@ -237,7 +237,7 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
     );
 
     return maybeFollowingWebCardId
-      ? isFollowing(maybeFollowingWebCardId, webCard.id)
+      ? followingsLoader.load([maybeFollowingWebCardId, webCard.id])
       : false;
   },
   posts: async (webCard, args) => {
