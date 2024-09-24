@@ -6,6 +6,7 @@ import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
 import Text from '#ui/Text';
+import { calculateBoxSize } from './CoverEditor/coverEditorHelpers';
 import type {
   LayoutChangeEvent,
   ListRenderItemInfo,
@@ -108,19 +109,35 @@ const BoxSelectionList = <T,>({
   // including some magic number to make if fit
   const getItemLayout = useCallback(
     (_: any, index: number) => {
+      if (fixedItemWidth) {
+        return {
+          length: fixedItemWidth,
+          offset: fixedItemWidth * index,
+          index,
+        };
+      }
+
+      const { width } = calculateBoxSize({
+        height: height ? height - VERTICAL_PADDING * 2 : 0,
+        hasLabel: !!renderLabel,
+        ratio: imageRatio,
+        fixedItemWidth,
+      });
+
       return {
-        length: fixedItemWidth ?? 0,
-        offset: fixedItemWidth ? fixedItemWidth * index : 0,
+        length: width,
+        offset: width * index + HORIZONTAL_PADDING,
         index,
       };
     },
-    [fixedItemWidth],
+    [fixedItemWidth, height, imageRatio, renderLabel],
   );
 
-  const initialScrollIndex =
-    innerData.length > 0 && fixedItemWidth && selectedItem
-      ? innerData.indexOf(selectedItem)
-      : 0;
+  const initialScrollIndex = useMemo(() => {
+    if (innerData.length === 0 || !selectedItem) return 0;
+
+    return innerData.indexOf(selectedItem);
+  }, [innerData, selectedItem]);
 
   return (
     <FlatList
@@ -132,8 +149,8 @@ const BoxSelectionList = <T,>({
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={styles.listContentContainer}
       onLayout={onLayoutInner}
-      getItemLayout={fixedItemWidth ? getItemLayout : undefined}
-      initialScrollIndex={fixedItemWidth ? initialScrollIndex : 0}
+      getItemLayout={getItemLayout}
+      initialScrollIndex={initialScrollIndex}
     />
   );
 };
@@ -167,9 +184,13 @@ const BoxButton = <T,>({
     onSelect(item);
   }, [onSelect, item]);
 
-  const itemHeight = height - 12 - (renderLabel ? 25 : 0);
-  const itemWidth = itemHeight * imageRatio;
-  const width = fixedItemWidth ?? itemWidth + 12;
+  const { itemHeight, itemWidth, width } = calculateBoxSize({
+    height,
+    hasLabel: !!renderLabel,
+    ratio: imageRatio,
+    fixedItemWidth,
+  });
+
   const borderRadius = itemWidth * COVER_CARD_RADIUS;
 
   const itemInfos = { item, index, width: itemWidth, height: itemHeight };
@@ -247,10 +268,11 @@ const BoxButtonMemo: <T>(props: BoxButtonProps<T>) => React.ReactNode = memo(
 ) as any;
 
 const VERTICAL_PADDING = 15;
+const HORIZONTAL_PADDING = 20;
 
 const styleSheet = createStyleSheet(appearance => ({
   listContentContainer: {
-    paddingHorizontal: 20,
+    paddingHorizontal: HORIZONTAL_PADDING,
     paddingVertical: VERTICAL_PADDING,
   },
   button: [
