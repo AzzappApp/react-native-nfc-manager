@@ -9,7 +9,6 @@ import { buildAvatarUrl } from '#helpers/avatar';
 import { displayName } from '#helpers/contactCardHelpers';
 import cors from '#helpers/cors';
 import { withPluginsRoute } from '#helpers/queries';
-import type { WebCard } from '@azzapp/data';
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
@@ -41,9 +40,9 @@ const verifySignApi = async (req: Request) => {
       avatarUrl,
       userId: storedProfile?.userId,
       isMultiUser: webCard?.isMultiUser,
-      firstName: foundContactCard.firstName || webCard?.firstName,
-      lastName: foundContactCard.lastName || webCard?.lastName,
-      companyName: foundContactCard.company || webCard?.companyName,
+      firstName: foundContactCard.firstName,
+      lastName: foundContactCard.lastName,
+      companyName: foundContactCard.company,
       userName: webCard?.userName,
     })
       .setJti(createId())
@@ -65,7 +64,7 @@ const verifySignApi = async (req: Request) => {
           ) ?? [],
         ),
         avatarUrl,
-        displayName: displayName(foundContactCard, webCard as WebCard),
+        displayName: displayName(foundContactCard, webCard),
         token,
       },
       { status: 200 },

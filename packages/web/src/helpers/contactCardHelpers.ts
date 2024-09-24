@@ -1,22 +1,13 @@
-import type { WebCard } from '@azzapp/data';
-
 export const displayName = (
-  contact: { firstName?: string; lastName?: string; company?: string },
-  webCard: WebCard,
+  contact: { firstName?: string; lastName?: string; companyName?: string },
+  webCard: { userName: string } | null,
 ) => {
-  if (contact) {
-    if (contact.firstName || contact.lastName) {
-      return `${contact.firstName ?? ''}  ${contact.lastName ?? ''}`.trim();
-    }
-    if (contact.company) {
-      return contact.company;
-    }
+  if (contact.firstName || contact.lastName) {
+    return `${contact.firstName ?? ''}  ${contact.lastName ?? ''}`.trim();
   }
-  if (webCard.firstName || webCard.lastName) {
-    return `${webCard.firstName ?? ''}  ${webCard.lastName ?? ''}`.trim();
+
+  if (contact.companyName) {
+    return contact.companyName;
   }
-  if (webCard.companyName) {
-    return webCard.companyName;
-  }
-  return webCard.userName;
+  return webCard?.userName ?? '';
 };
