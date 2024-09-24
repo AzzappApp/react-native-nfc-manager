@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/web",
-  "version": "0.9.5-canary.14",
+  "version": "0.9.5-canary.15",
   "private": true,
   "scripts": {
     "dev": "next dev",
