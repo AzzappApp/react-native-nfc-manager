@@ -1,5 +1,6 @@
-## 0.9.5-canary.7
+## 0.9.5-canary.8
 
+* **test:**  - try nodejs runtime
 * **perf:**  - try fixed window
 * **perf:**  - try greater rate limiter window size
 * **fix:**  - 🐛 properly reset field after webcard rename ([#5127](https://github.com/AzzappApp/azzapp/pull/5127))
