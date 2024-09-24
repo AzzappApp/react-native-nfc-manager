@@ -289,3 +289,5 @@ const validateMailOrPhone = async (
     throw new Error('Error validating mail or phone');
   }
 };
+
+export const runtime = 'nodejs';
