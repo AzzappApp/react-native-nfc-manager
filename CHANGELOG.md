@@ -1,5 +1,7 @@
-## 0.9.5-canary.16
+## 0.9.5-canary.17
 
+* **fix:**  - **contactCard:** [#5150](https://github.com/AzzappApp/azzapp/pull/5150) use company everywhere ([#5153](https://github.com/AzzappApp/azzapp/pull/5153))
+* **fix:**  - **api:** [#5087](https://github.com/AzzappApp/azzapp/pull/5087) missing args in handler ([#5141](https://github.com/AzzappApp/azzapp/pull/5141))
 * **fix:**  - remove unused styles and add an eslint rule to check it with linter ([#5140](https://github.com/AzzappApp/azzapp/pull/5140))
 * **fix:**  - 🐛 properly scroll initially to selected item ([#5136](https://github.com/AzzappApp/azzapp/pull/5136))
 * **test:**  - try nodejs runtime
