@@ -290,4 +290,4 @@ const validateMailOrPhone = async (
   }
 };
 
-export const runtime = 'nodejs';
+//export const runtime = 'nodejs';
