@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Linking, Platform, StyleSheet, View, Share } from 'react-native';
-// import { openComposer } from 'react-native-email-link';
+import { openComposer } from 'react-native-email-link';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { buildInviteUrl } from '@azzapp/shared/urlHelpers';
 import AccountHeader from '#components/AccountHeader';
@@ -48,10 +48,10 @@ const InviteFriendsScreen = ({
     },
   );
 
-  // const subject = intl.formatMessage({
-  //   defaultMessage: "I'm using Azzapp",
-  //   description: 'Invite subject to share with friends',
-  // });
+  const subject = intl.formatMessage({
+    defaultMessage: "I'm using Azzapp",
+    description: 'Invite subject to share with friends',
+  });
 
   const [hasWhatsapp, setHasWhatsapp] = useState(false);
 
@@ -124,8 +124,7 @@ const InviteFriendsScreen = ({
             </Text>
             <Icon icon="arrow_right" />
           </PressableNative>
-          {/* TODO: uncomment when ready */}
-          {/* <PressableNative
+          <PressableNative
             style={styles.inviteOption}
             onPress={() => {
               openComposer({
@@ -145,7 +144,7 @@ const InviteFriendsScreen = ({
               />
             </Text>
             <Icon icon="arrow_right" />
-          </PressableNative> */}
+          </PressableNative>
           <PressableNative
             style={styles.inviteOption}
             onPress={() => {
