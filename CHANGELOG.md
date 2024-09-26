@@ -1,4 +1,4 @@
-## 0.9.5-canary.18
+## 0.9.5-canary.19
 
 * **fix:**  - 🐛 restore invite friend by email ([#5169](https://github.com/AzzappApp/azzapp/pull/5169))
 * **fix:**  - **contactCard:** [#5150](https://github.com/AzzappApp/azzapp/pull/5150) use company everywhere ([#5153](https://github.com/AzzappApp/azzapp/pull/5153))
