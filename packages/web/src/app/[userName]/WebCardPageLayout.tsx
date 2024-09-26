@@ -50,7 +50,7 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
     token: '',
     firstName: '',
     lastName: '',
-    companyName: '',
+    company: '',
     isMultiUser: false,
   });
 
@@ -64,7 +64,7 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
     isMultiUser: boolean;
     firstName?: string;
     lastName?: string;
-    companyName?: string;
+    company?: string;
   };
 
   const handleCloseDownloadVCard = ({ token }: { token?: string }) => {
@@ -79,7 +79,7 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
           token,
           firstName: tokenDecoded.firstName ?? '',
           lastName: tokenDecoded.lastName ?? '',
-          companyName: tokenDecoded.companyName ?? '',
+          company: tokenDecoded.company ?? '',
         });
       } catch (error) {
         Sentry.captureException(
@@ -209,7 +209,7 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
       <ShareBackModal
         ref={shareBackModal}
         name={displayName(contactDataVCard, webCard)}
-        initials={`${(contactDataVCard.firstName?.length ?? 0) > 0 && (contactDataVCard.lastName?.length ?? 0) > 0 ? `${contactDataVCard.firstName[0]}${contactDataVCard.lastName[0]}` : webCard.companyName ? webCard.companyName.slice(0, 2) : webCard.userName.slice(0, 2)}`}
+        initials={`${(contactDataVCard.firstName?.length ?? 0) > 0 && (contactDataVCard.lastName?.length ?? 0) > 0 ? `${contactDataVCard.firstName[0]}${contactDataVCard.lastName[0]}` : contactDataVCard.company ? contactDataVCard.company.slice(0, 2) : webCard.userName.slice(0, 2)}`}
         userId={contactDataVCard.userId}
         webcardId={webCard.id}
         avatarUrl={contactDataVCard.avatarUrl}

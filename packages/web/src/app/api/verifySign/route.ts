@@ -42,7 +42,7 @@ const verifySignApi = async (req: Request) => {
       isMultiUser: webCard?.isMultiUser,
       firstName: foundContactCard.firstName,
       lastName: foundContactCard.lastName,
-      companyName: foundContactCard.company,
+      company: foundContactCard.company,
       userName: webCard?.userName,
     })
       .setJti(createId())
