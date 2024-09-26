@@ -1,6 +1,8 @@
 import { style } from '@vanilla-extract/css';
 import { textLargeSemiBold, vars } from '#app/[userName]/theme.css';
 
+const AVATAR_CONTAINER_TOP_POSITION = 35;
+
 const headerContainsAvatars = style({});
 const header = style({
   display: 'flex',
@@ -10,7 +12,7 @@ const header = style({
   borderBottomWidth: '1px',
   borderBottomStyle: 'solid',
   borderBottomColor: vars.color.grey100,
-
+  marginTop: `${AVATAR_CONTAINER_TOP_POSITION}px`,
   selectors: {
     [`:not(${headerContainsAvatars})&`]: {
       marginTop: 0,
@@ -21,12 +23,13 @@ const header = style({
 const title = style([{ marginLeft: '0 10px' }, textLargeSemiBold]);
 
 const avatarContainer = style({
+  position: 'absolute',
+  top: -AVATAR_CONTAINER_TOP_POSITION,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   gap: '20px',
-  marginBottom: '10px',
-  paddingTop: 5,
+  zIndex: 1,
 });
 
 const styles = {
