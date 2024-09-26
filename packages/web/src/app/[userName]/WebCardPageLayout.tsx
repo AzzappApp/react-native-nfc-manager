@@ -214,7 +214,6 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
         webcardId={webCard.id}
         avatarUrl={contactDataVCard.avatarUrl}
         token={contactDataVCard.token}
-        isMultiUser={contactDataVCard.isMultiUser}
       />
     </>
   );
