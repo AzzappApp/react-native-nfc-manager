@@ -1,4 +1,4 @@
-## 0.9.5-canary.15
+## 0.9.5-canary.16
 
 * **fix:**  - remove unused styles and add an eslint rule to check it with linter ([#5140](https://github.com/AzzappApp/azzapp/pull/5140))
 * **fix:**  - 🐛 properly scroll initially to selected item ([#5136](https://github.com/AzzappApp/azzapp/pull/5136))
