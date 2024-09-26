@@ -52,7 +52,7 @@ const rateLimit = Array.isArray(redisClient)
 
 const withRateLimiterRoute =
   (handler: NextHandler): NextHandler =>
-  async req => {
+  async (req, args) => {
     if (process.env.NODE_ENV === 'production') {
       const ip = req.ip ?? '127.0.0.1';
 
@@ -78,7 +78,7 @@ const withRateLimiterRoute =
         );
       }
     }
-    return handler(req);
+    return handler(req, args);
   };
 
 export const withPluginsRoute = (handler: NextHandler): NextHandler =>
