@@ -1,4 +1,4 @@
-## 0.9.5-canary.20
+## 0.9.5-canary.21
 
 * **fix:**  - 🐛 properly display paywall in darkmode ([#5177](https://github.com/AzzappApp/azzapp/pull/5177))
 * **fix:**  - 🐛 restore invite friend by email ([#5169](https://github.com/AzzappApp/azzapp/pull/5169))
