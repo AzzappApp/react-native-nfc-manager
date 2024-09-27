@@ -1,5 +1,6 @@
-## 0.9.5-canary.19
+## 0.9.5-canary.20
 
+* **fix:**  - 🐛 properly display paywall in darkmode ([#5177](https://github.com/AzzappApp/azzapp/pull/5177))
 * **fix:**  - 🐛 restore invite friend by email ([#5169](https://github.com/AzzappApp/azzapp/pull/5169))
 * **fix:**  - **contactCard:** [#5150](https://github.com/AzzappApp/azzapp/pull/5150) use company everywhere ([#5153](https://github.com/AzzappApp/azzapp/pull/5153))
 * **fix:**  - **api:** [#5087](https://github.com/AzzappApp/azzapp/pull/5087) missing args in handler ([#5141](https://github.com/AzzappApp/azzapp/pull/5141))
