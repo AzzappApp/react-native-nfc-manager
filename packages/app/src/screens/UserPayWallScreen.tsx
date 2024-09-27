@@ -11,7 +11,6 @@ import {
   ScrollView,
   StyleSheet,
   View,
-  useColorScheme,
   useWindowDimensions,
 } from 'react-native';
 import Purchases, { INTRO_ELIGIBILITY_STATUS } from 'react-native-purchases';
@@ -23,11 +22,10 @@ import Animated, {
   useSharedValue,
 } from 'react-native-reanimated';
 import { commitLocalUpdate } from 'react-relay';
-import { colors, shadow } from '#theme';
+import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import PremiumIndicator from '#components/PremiumIndicator';
 import { getAuthState } from '#helpers/authStore';
-import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getRelayEnvironment } from '#helpers/relayEnvironment';
 import { useMultiUserUpdate } from '#hooks/useMultiUserUpdate';
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -53,9 +51,6 @@ const UserPayWallScreen = ({ route }: NativeScreenProps<UserPayWallRoute>) => {
   const intl = useIntl();
   const router = useRouter();
   const { height } = useWindowDimensions();
-
-  const styles = useStyleSheet(stylesheet);
-  const theme = useColorScheme();
 
   const { bottom } = useScreenInsets();
   const lottieHeight = height - BOTTOM_HEIGHT + 20;
@@ -361,11 +356,7 @@ const UserPayWallScreen = ({ route }: NativeScreenProps<UserPayWallRoute>) => {
       <View style={[styles.content]}>
         <View style={styles.contaienrLogo}>
           <Image
-            source={
-              theme === 'light'
-                ? require('#assets/logo-full.png')
-                : require('#assets/logo-full_white.png')
-            }
+            source={require('#assets/logo-full.png')}
             resizeMode="contain"
             style={styles.plusImage}
           />
@@ -399,24 +390,22 @@ const UserPayWallScreen = ({ route }: NativeScreenProps<UserPayWallRoute>) => {
               );
             })}
           </ScrollView>
-          {theme === 'light' && (
-            <LinearGradient
-              colors={[
-                colors.white,
-                'rgba(255, 255, 255, 0.00) ',
-                'rgba(255, 255, 255, 0.00)',
-                colors.white,
-              ]}
-              locations={[0, 0.1149, 0.8716, 1]}
-              style={{
-                height: '100%',
-                width,
-                position: 'absolute',
-                paddingBottom: 5,
-              }}
-              pointerEvents="none"
-            />
-          )}
+          <LinearGradient
+            colors={[
+              colors.white,
+              'rgba(255, 255, 255, 0.00) ',
+              'rgba(255, 255, 255, 0.00)',
+              colors.white,
+            ]}
+            locations={[0, 0.1149, 0.8716, 1]}
+            style={{
+              height: '100%',
+              width,
+              position: 'absolute',
+              paddingBottom: 5,
+            }}
+            pointerEvents="none"
+          />
         </View>
         <View style={[styles.bottomContainer, { paddingBottom: bottom }]}>
           <Button
@@ -517,8 +506,6 @@ const AnimatedTabIndex = ({ currentIndex, index }: AnimatedTabIndexProps) => {
     };
   });
 
-  const styles = useStyleSheet(stylesheet);
-
   return (
     <Animated.View
       accessibilityRole="none"
@@ -545,9 +532,6 @@ const OfferItem = ({
     () => setSelectedPurchasePackage(offer),
     [offer, setSelectedPurchasePackage],
   );
-
-  const styles = useStyleSheet(stylesheet);
-
   return (
     <PressableOpacity
       key={offer.identifier}
@@ -600,7 +584,7 @@ const OfferItem = ({
 
 const Offer = memo(OfferItem);
 const BOTTOM_HEIGHT = width;
-const stylesheet = createStyleSheet(theme => ({
+const styles = StyleSheet.create({
   monthlyPricing: { textAlign: 'right', color: colors.grey600 },
   promoContainer: {
     alignItems: 'flex-end',
@@ -633,11 +617,7 @@ const stylesheet = createStyleSheet(theme => ({
     bottom: 20,
     height: 30,
   },
-  featureContainer: {
-    flex: 1,
-    marginBottom: -20,
-    aspectRatio: 1,
-  },
+  featureContainer: { flex: 1, marginBottom: -20, aspectRatio: 1 },
   container: { flex: 1, backgroundColor: 'transparent' },
   priceItem: {
     flexDirection: 'row',
@@ -650,8 +630,17 @@ const stylesheet = createStyleSheet(theme => ({
     marginHorizontal: 10,
     marginBottom: 10,
     borderRadius: 18,
+    backgroundColor: 'white',
+    //custom shadow, (this screen has no darmode )
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 0,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
     paddingHorizontal: 20,
-    ...shadow(theme),
   },
   contentContainerStyle: {
     marginHorizontal: 20,
@@ -662,13 +651,13 @@ const stylesheet = createStyleSheet(theme => ({
   content: {
     justifyContent: 'flex-end',
     alignItems: 'center',
+    backgroundColor: 'white',
     borderTopRightRadius: 24,
     borderTopLeftRadius: 24,
     overflow: 'visible',
     paddingTop: 20,
     width,
     height: BOTTOM_HEIGHT,
-    backgroundColor: theme === 'light' ? colors.white : colors.black,
   },
   descriptionText: {
     color: colors.grey400,
@@ -708,4 +697,4 @@ const stylesheet = createStyleSheet(theme => ({
     alignItems: 'center',
     justifyContent: 'center',
   },
-}));
+});
