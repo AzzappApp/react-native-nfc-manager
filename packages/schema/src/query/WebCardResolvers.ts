@@ -162,6 +162,7 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
     return webCard.coverMediaId
       ? {
           assetKind: 'cover',
+          previewPositionPercentage: webCard.coverPreviewPositionPercentage,
           media: webCard.coverMediaId,
         }
       : null;

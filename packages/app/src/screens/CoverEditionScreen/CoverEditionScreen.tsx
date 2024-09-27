@@ -178,7 +178,7 @@ const CoverEditionScreen = ({
             ref={coverEditorRef}
             profile={profile}
             // template infos are saved in the cover state
-            coverInitialSate={savedCoverState}
+            coverInitialState={savedCoverState}
             coverTemplate={null}
             onCanSaveChange={onCanSaveChange}
             onCoverModified={onCoverModified}

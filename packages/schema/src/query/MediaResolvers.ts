@@ -2,6 +2,7 @@ import { MODULE_IMAGES_SIZES } from '@azzapp/shared/cardModuleHelpers';
 import { CONTACTCARD_ASSET_SIZES } from '@azzapp/shared/contactCardHelpers';
 import { COVER_ASSET_SIZES } from '@azzapp/shared/coverHelpers';
 import {
+  DEFAULT_VIDEO_PERCENTAGE_THUMBNAIL,
   getCloudinaryAssetURL,
   getImageURLForSize,
   getVideoThumbnailURL,
@@ -18,20 +19,20 @@ import type {
   MediaVideoResolvers,
 } from '#/__generated__/types';
 import type { Media as MediaModel } from '@azzapp/data';
+import type { UrLForSizeParam } from '@azzapp/shared/imagesHelpers';
 
 export type DeferredMedia = MediaModel | string;
 
-export type MediaWithAssetKind = {
-  media: DeferredMedia;
-  assetKind:
-    | 'contactCard'
-    | 'cover'
-    | 'coverPreview'
-    | 'logo'
-    | 'module'
-    | 'post'
-    | 'rawCover';
-};
+export type MediaWithAssetKind =
+  | {
+      media: DeferredMedia;
+      assetKind: 'contactCard' | 'logo' | 'module' | 'post';
+    }
+  | {
+      media: DeferredMedia;
+      previewPositionPercentage?: number | null;
+      assetKind: 'cover' | 'coverPreview' | 'rawCover';
+    };
 
 export type MediaResolverBaseType = DeferredMedia | MediaWithAssetKind;
 
@@ -40,6 +41,15 @@ const getDeferredMedia = (media: MediaResolverBaseType) => {
     return media.media;
   }
   return media;
+};
+
+const getPercentagePreview = (media: MediaResolverBaseType) => {
+  if (typeof media === 'object' && 'previewPositionPercentage' in media) {
+    return (
+      media.previewPositionPercentage ?? DEFAULT_VIDEO_PERCENTAGE_THUMBNAIL
+    );
+  }
+  return undefined;
 };
 
 const getActualMedia = async (media: MediaResolverBaseType) => {
@@ -104,7 +114,7 @@ export const Media: MediaResolvers = {
 };
 
 const uriResolver =
-  (kind: 'image' | 'video', uriGenerator: typeof getImageURLForSize) =>
+  (kind: 'image' | 'video', uriGenerator: (prop: UrLForSizeParam) => string) =>
   (
     media: MediaResolverBaseType,
     {
@@ -112,16 +122,15 @@ const uriResolver =
       height,
       pixelRatio,
       raw,
-      videoDurationPercentage,
     }: {
       width?: number | null;
       height?: number | null;
       pixelRatio?: number | null;
       raw?: boolean | null;
-      videoDurationPercentage?: number | null;
     },
   ) => {
     const assetKind = getAssetKind(media);
+    const previewPositionPercentage = getPercentagePreview(media);
     media = getDeferredMedia(media);
     const id = typeof media === 'string' ? media : media.id;
     if (raw) {
@@ -145,7 +154,7 @@ const uriResolver =
       height,
       pixelRatio,
       pregeneratedSizes,
-      videoDurationPercentage,
+      previewPositionPercentage,
     });
   };
 

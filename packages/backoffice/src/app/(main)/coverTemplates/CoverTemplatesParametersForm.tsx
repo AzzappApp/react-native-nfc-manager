@@ -94,6 +94,7 @@ const CoverTemplatesParametersForm = ({
         },
       },
       backgroundColor: coverTemplate?.backgroundColor ?? null,
+      previewPositionPercentage: coverTemplate?.previewPositionPercentage,
     },
     lastResult,
     onSubmit() {
@@ -424,6 +425,7 @@ const CoverTemplatesParametersForm = ({
         <PreviewInput
           previewField={fields.preview}
           previewIdField={fields.previewId}
+          previewPositionPercentage={fields.previewPositionPercentage}
         />
 
         <Typography variant="body1">Lottie</Typography>

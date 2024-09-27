@@ -278,6 +278,7 @@ export const CoverTemplateTable = cols.table('CoverTemplate', {
   enabled: cols.boolean('enabled').default(true).notNull(),
   params: cols.json('params').$type<CoverTemplateParams>(),
   backgroundColor: cols.defaultVarchar('backgroundColor'),
+  previewPositionPercentage: cols.int('previewPositionPercentage'),
 });
 
 export type CoverTextType = 'custom' | 'firstName' | 'mainName';
@@ -922,6 +923,7 @@ export const WebCardTable = cols.table(
         rotation: 0,
         shadow: false,
       }),
+    coverPreviewPositionPercentage: cols.int('coverPreviewPositionPercentage'),
 
     /* Social medias infos */
     nbFollowers: cols.int('nbFollowers').default(0).notNull(),

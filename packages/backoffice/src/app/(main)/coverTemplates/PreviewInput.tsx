@@ -3,20 +3,42 @@ import {
   useInputControl,
   type FieldMetadata,
 } from '@conform-to/react';
-import { Box, Button, CardMedia, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  CardMedia,
+  Grid,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { useRef, useState, type ChangeEvent } from 'react';
-import { getVideoURL } from '@azzapp/shared/imagesHelpers';
+import { useDebouncedCallback } from 'use-debounce';
+import {
+  getVideoThumbnailURL,
+  getVideoURL,
+} from '@azzapp/shared/imagesHelpers';
 
 type Props = {
   previewField: FieldMetadata<File | undefined>;
   previewIdField: FieldMetadata<string>;
+  previewPositionPercentage: FieldMetadata<number | null>;
 };
 
-const PreviewInput = ({ previewField, previewIdField }: Props) => {
+const PreviewInput = ({
+  previewField,
+  previewIdField,
+  previewPositionPercentage,
+}: Props) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const previewInput = useInputControl(previewField as any);
   const [src, setSrc] = useState<any>(
     previewIdField.initialValue ? getVideoURL(previewIdField.initialValue) : '',
+  );
+
+  const [previewPosition, setPreviewPosition] = useState<number | undefined>(
+    previewPositionPercentage.initialValue
+      ? parseInt(previewPositionPercentage.initialValue, 10)
+      : undefined,
   );
 
   const onLoadFile = (event: ChangeEvent<any>) => {
@@ -26,19 +48,73 @@ const PreviewInput = ({ previewField, previewIdField }: Props) => {
     }
   };
 
+  const previewImageWithPercentage = getVideoThumbnailURL({
+    id: previewIdField.initialValue ?? '',
+    width: 100,
+    previewPositionPercentage: previewPosition,
+  });
+
+  const onPreviewPercentageChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const value = event.target.value;
+    if (!Number.isNaN(value)) {
+      let iValue = value as unknown as number;
+      if (iValue < 0) {
+        iValue = 0;
+      } else if (iValue > 100) {
+        iValue = 100;
+      }
+      setPreviewPosition(iValue);
+    } else {
+      setPreviewPosition(0);
+    }
+  };
+  const debouncedPreviewChange = useDebouncedCallback(
+    onPreviewPercentageChange,
+    300,
+  );
+
   return (
     <Box>
       {src && (
-        <Box height={200} width={100}>
-          <CardMedia
-            sx={{ height: 200, width: 100 }}
-            component="video"
-            title="preview"
-            image={src}
-            autoPlay
-            loop
-            muted
-          />
+        <Box height={300} width={'100%'}>
+          <Grid container columns={2}>
+            <CardMedia
+              sx={{ height: 200, width: 100, m: 2 }}
+              component="video"
+              title="preview"
+              image={src}
+              autoPlay
+              loop
+              muted
+            />
+            <Grid>
+              <CardMedia
+                sx={{ height: 200, width: 100, m: 2, objectFit: 'contain' }}
+                component="img"
+                title="preview image"
+                image={previewImageWithPercentage}
+              />
+              <input
+                {...getInputProps(previewPositionPercentage, {
+                  type: 'hidden',
+                })}
+                key={previewPositionPercentage.key}
+                value={previewPosition}
+                max={100}
+                min={0}
+              />
+              <TextField
+                label="Preview image position in %"
+                sx={{ flex: 1, width: 200, m: 1 }}
+                defaultValue={previewPositionPercentage.initialValue}
+                type={'number'}
+                key={'previewPosition'}
+                onChangeCapture={debouncedPreviewChange}
+              />
+            </Grid>
+          </Grid>
         </Box>
       )}
 

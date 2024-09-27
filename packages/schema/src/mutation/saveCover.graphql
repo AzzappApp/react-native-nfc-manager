@@ -26,6 +26,9 @@ input SaveCoverInput {
   The links of the card cover
   """
   dynamicLinks: DynamicLinksInput
+
+  """The Cover preview position"""
+  coverPreviewPositionPercentage: Int
 }
 
 input CardColorsInput {

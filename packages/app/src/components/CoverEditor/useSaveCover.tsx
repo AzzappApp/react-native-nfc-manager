@@ -151,7 +151,8 @@ const useSaveCover = (
     setSavingStatus('saving');
 
     const texts = coverEditorState.textLayers.map(({ text }) => text);
-    const { backgroundColor, cardColors } = coverEditorState;
+    const { backgroundColor, cardColors, coverPreviewPositionPercentage } =
+      coverEditorState;
 
     try {
       await new Promise<void>((resolve, reject) => {
@@ -162,6 +163,7 @@ const useSaveCover = (
               mediaId: public_id,
               texts,
               backgroundColor: backgroundColor ?? 'light',
+              coverPreviewPositionPercentage,
               cardColors,
               dynamicLinks: coverEditorState.linksLayer,
             },
