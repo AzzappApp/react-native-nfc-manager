@@ -13,6 +13,7 @@ import {
   checkMedias,
   referencesMedias,
   transaction,
+  getCoverTemplateById,
 } from '@azzapp/data';
 
 import { ADMIN } from '#roles';
@@ -44,16 +45,20 @@ export const saveCoverTemplate = async (
         ...submission.value,
         enabled: submission.value.enabled === 'true',
       };
-      const previousPreviewId = data.previewId;
+      const previousPreviewIds: string[] = [];
 
       let coverTemplateId = data.id;
       if (coverTemplateId) {
+        const coverTemplate = await getCoverTemplateById(coverTemplateId);
+        if (coverTemplate) {
+          previousPreviewIds.push(coverTemplate.previewId);
+        }
         await updateCoverTemplate(coverTemplateId, data);
       } else {
         coverTemplateId = await createCoverTemplate(data);
       }
 
-      await referencesMedias([data.previewId], [previousPreviewId]);
+      await referencesMedias([data.previewId], previousPreviewIds);
 
       return {
         ...submission.reply(),

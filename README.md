@@ -1,6 +1,6 @@
 # Azzapp
 
-This is the main repository of the Azzapp application source code.
+This is the main repository of the *Azzapp* application source code.
 
 ## Development environment
 
