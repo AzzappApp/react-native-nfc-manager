@@ -356,6 +356,17 @@ const HomeBottomSheetPanel = ({
         },
         {
           type: 'row',
+          icon: 'help',
+          text: intl.formatMessage({
+            defaultMessage: 'Help center',
+            description: 'Help center us message in Home bottom sheet panel',
+          }),
+          onPress: () => {
+            Linking.openURL(process.env.FAQ || '');
+          },
+        },
+        {
+          type: 'row',
           icon: 'about',
           text: intl.formatMessage({
             defaultMessage: 'About',
