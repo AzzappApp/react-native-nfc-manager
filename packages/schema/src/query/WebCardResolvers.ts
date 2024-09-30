@@ -360,13 +360,14 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
     }
     return getWebCardPendingOwnerProfile(webCard.id);
   },
-  profiles: async (webCard, { first, after, search }) => {
+  profiles: async (webCard, { first, after, search, withDeleted }) => {
     if (!(await hasWebCardProfileRight(webCard.id))) {
       return emptyConnection;
     }
     const limit = first ?? 100;
     const offset = after ? cursorToOffset(after) : 0;
     const profiles = await getWebCardProfiles(webCard.id, {
+      withDeleted,
       limit,
       after: offset,
       search: search ?? null, //cannot be undefined

@@ -292,10 +292,12 @@ export const getProfilesByWebCard = async (
 export const getWebCardProfiles = async (
   webCardId: string,
   {
+    withDeleted = false,
     search,
     limit,
     after = 0,
   }: {
+    withDeleted?: boolean | null;
     search: string | null;
     limit: number;
     after: number;
@@ -313,7 +315,8 @@ export const getWebCardProfiles = async (
             OR JSON_EXTRACT(contactCard, '$.lastName') LIKE ${`%${search}%`}
             OR User.email LIKE ${`%${search}%`}
             OR User.phoneNumber LIKE ${`%${search}%`}
-          ) 
+          )
+          ${withDeleted ? '' : sql` AND Profile.deleted = true`} 
           ORDER BY 
             CASE 
                 WHEN profileRole = 'owner' THEN 1

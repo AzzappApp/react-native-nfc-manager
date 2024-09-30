@@ -185,6 +185,10 @@ type WebCard implements Node {
     Returns the first n items from the list.
     """
     first: Int @max(value: 50)
+    """
+    When true, the query will return the profiles that have been deleted
+    """
+    withDeleted: Boolean
   ): ProfileConnection!
 
   """

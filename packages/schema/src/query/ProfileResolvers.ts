@@ -546,6 +546,9 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
       },
     );
   },
+  deleted: async profile => {
+    return profile.deleted;
+  },
 };
 
 export { ProfileResolverImpl as Profile };

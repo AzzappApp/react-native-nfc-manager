@@ -220,6 +220,8 @@ type Profile implements Node {
     first: Int @max(value: 100)
     after: String
   ): StockVideoConnection!
+
+  deleted: Boolean!
 }
 
 """
