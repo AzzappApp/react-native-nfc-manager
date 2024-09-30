@@ -5,42 +5,26 @@
   ],
   "tasks": {
     "build": {
-      "dependsOn": [
-        "build:app",
-        "build:web"
-      ]
+      "dependsOn": ["build:app", "build:web"]
     },
     "build:app": {
-      "inputs": [
-        "src/app/*.json"
-      ],
-      "outputs": [
-        "compiled/app/**"
-      ],
-      "dependsOn": [
-        "prepare"
-      ]
+      "inputs": ["src/app/*.json"],
+      "outputs": ["compiled/app/**"],
+      "dependsOn": ["prepare"]
     },
     "build:web": {
-      "inputs": [
-        "src/web/*.json"
-      ],
-      "outputs": [
-        "compiled/web/**"
-      ],
-      "dependsOn": [
-        "prepare"
-      ]
+      "inputs": ["src/web/*.json"],
+      "outputs": ["compiled/web/**"],
+      "dependsOn": ["prepare"]
     },
     "prepare": {
-      "inputs": [
-        "src/*.json"
-      ],
-      "outputs": [
-        "src/app/*.json",
-        "src/web/*.json"
-      ],
-      "cache": false
+      "inputs": ["src/*.json"],
+      "outputs": ["src/app/*.json", "src/web/*.json"],
+      "cache": false,
+      "dependsOn": ["extract"]
+    },
+    "extract": {
+      "outputs": ["src/appMessages.json", "src/webMessages.json"]
     }
   }
 }
