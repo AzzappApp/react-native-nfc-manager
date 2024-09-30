@@ -32,7 +32,7 @@ export const SOCIAL_NETWORK_LINKS = [
   { id: 'hashnode', mask: 'hashnode.com/@' },
   { id: 'letterboxd', mask: 'letterboxd.com/' },
   { id: 'mastodon', mask: 'mastodon.social/@' },
-  { id: 'npm', mask: 'npmjs.com/' },
+  { id: 'npm', mask: 'npmjs.com/~' },
   { id: 'tripadvisor', mask: 'tripadvisor.com/' },
   { id: 'typefully', mask: 'typefully.app/' },
   { id: 'yelp', mask: 'yelp.com/@' },
