@@ -1,5 +1,6 @@
-## 0.9.5-canary.22
+## 0.9.5-canary.23
 
+* **fix:**  - **webCard:** media in modules were badly counted ([#5173](https://github.com/AzzappApp/azzapp/pull/5173))
 * **build:**  - issue on i18n prepare script without extract ([#5185](https://github.com/AzzappApp/azzapp/pull/5185))
 * **feat:**  - return deleted profiles ([#5192](https://github.com/AzzappApp/azzapp/pull/5192))
 * **fix:**  - 🐛 properly display paywall in darkmode ([#5177](https://github.com/AzzappApp/azzapp/pull/5177))
