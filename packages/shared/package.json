@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/shared",
-  "version": "0.9.8-rc.1",
+  "version": "0.9.9",
   "private": true,
   "exports": {
     "./*": {
