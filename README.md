@@ -1,6 +1,6 @@
 # Azzapp
 
-This is the main repository of the Azzapp application source code.
+This is the main repository of the *Azzapp* application source code.
 
 ## Development environment
 
@@ -21,7 +21,7 @@ The sources of this project should be edited through [Visual Studio Code](https:
 
 ## Installation and development
 
-To build with xcode, one should first create a .xcode.env.local file under `packages/app/ios` with a path to node :
+To build with `xcode`, one should first create a `.xcode.env.local` file under `packages/app/ios` with a path to `node` :
 
 ```
 export NODE_BINARY=<PATH_TO_YOUR_NODE_BIN>
