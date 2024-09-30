@@ -1,5 +1,6 @@
-## 0.9.5-canary.28
+## 0.9.10-canary.1
 
+* **fix:**  - **multiUser:** 5209 wrong condition in query ([#5210](https://github.com/AzzappApp/azzapp/pull/5210))
 * **fix:**  - 🐛 properly display paywall ([#5184](https://github.com/AzzappApp/azzapp/pull/5184))
 * **fix:**  - **webCard:** media in modules were badly counted ([#5173](https://github.com/AzzappApp/azzapp/pull/5173))
 * **build:**  - issue on i18n prepare script without extract ([#5185](https://github.com/AzzappApp/azzapp/pull/5185))
@@ -19,7 +20,6 @@
 * **perf:**  - move rate limiting from middleware to apis ([#5124](https://github.com/AzzappApp/azzapp/pull/5124))
 * **fix:**  - **android:** [#5087](https://github.com/AzzappApp/azzapp/pull/5087) wallet can’t stand empty string ([#5125](https://github.com/AzzappApp/azzapp/pull/5125))
 * **build:**  - force version upgrade
-* **docs:**  - update readme
 * **fix:**  - shareAndShare dismiss (and update marketing version of iOS) ([#5114](https://github.com/AzzappApp/azzapp/pull/5114))
 * **fix:**  - 🐛 show newly added media in limited selection mode ([#5115](https://github.com/AzzappApp/azzapp/pull/5115))
 * **fix:**  - 🐛 properly send invite from list ([#5080](https://github.com/AzzappApp/azzapp/pull/5080))
