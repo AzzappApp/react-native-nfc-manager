@@ -1,4 +1,4 @@
-## 0.9.5-canary.25
+## 0.9.5-canary.26
 
 * **fix:**  - **webCard:** media in modules were badly counted ([#5173](https://github.com/AzzappApp/azzapp/pull/5173))
 * **build:**  - issue on i18n prepare script without extract ([#5185](https://github.com/AzzappApp/azzapp/pull/5185))
