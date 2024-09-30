@@ -359,6 +359,7 @@ const SocialInputComponent = ({
         autoCapitalize="none"
         autoCorrect={false}
         inputStyle={styles.inputStyleSocial}
+        keyboardType={['phone', 'sms'].includes(icon) ? 'phone-pad' : 'default'}
       />
       <GestureDetector gesture={panGesture}>
         <Icon icon="menu" style={{ tintColor: colors.grey400 }} />

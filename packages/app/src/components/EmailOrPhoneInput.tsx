@@ -19,7 +19,10 @@ export type EmailPhoneInput = {
   countryCodeOrEmail: CountryCode | 'email';
   value: string;
 };
-type EmailOrPhoneInputProps = Omit<TextInputProps, 'onChange' | 'value'> & {
+type EmailOrPhoneInputProps = Omit<
+  TextInputProps,
+  'keyboardType' | 'onChange' | 'value'
+> & {
   input: EmailPhoneInput;
   onChange: (value: EmailPhoneInput) => void;
   hasError: boolean;
