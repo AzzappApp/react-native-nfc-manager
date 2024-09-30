@@ -1,5 +1,7 @@
-## 0.9.5-canary.21
+## 0.9.5-canary.22
 
+* **build:**  - issue on i18n prepare script without extract ([#5185](https://github.com/AzzappApp/azzapp/pull/5185))
+* **feat:**  - return deleted profiles ([#5192](https://github.com/AzzappApp/azzapp/pull/5192))
 * **fix:**  - 🐛 properly display paywall in darkmode ([#5177](https://github.com/AzzappApp/azzapp/pull/5177))
 * **fix:**  - 🐛 restore invite friend by email ([#5169](https://github.com/AzzappApp/azzapp/pull/5169))
 * **fix:**  - **contactCard:** [#5150](https://github.com/AzzappApp/azzapp/pull/5150) use company everywhere ([#5153](https://github.com/AzzappApp/azzapp/pull/5153))
