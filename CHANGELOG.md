@@ -1,5 +1,6 @@
-## 0.9.5-canary.26
+## 0.9.5-canary.27
 
+* **fix:**  - 🐛 properly display paywall ([#5184](https://github.com/AzzappApp/azzapp/pull/5184))
 * **fix:**  - **webCard:** media in modules were badly counted ([#5173](https://github.com/AzzappApp/azzapp/pull/5173))
 * **build:**  - issue on i18n prepare script without extract ([#5185](https://github.com/AzzappApp/azzapp/pull/5185))
 * **feat:**  - return deleted profiles ([#5192](https://github.com/AzzappApp/azzapp/pull/5192))
