@@ -1,4 +1,4 @@
-## 0.9.5-canary.27
+## 0.9.5-canary.28
 
 * **fix:**  - 🐛 properly display paywall ([#5184](https://github.com/AzzappApp/azzapp/pull/5184))
 * **fix:**  - **webCard:** media in modules were badly counted ([#5173](https://github.com/AzzappApp/azzapp/pull/5173))
