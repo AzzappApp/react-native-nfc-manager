@@ -14,6 +14,7 @@ import { Alert, Platform } from 'react-native';
 import { MMKV } from 'react-native-mmkv';
 import Toast from 'react-native-toast-message';
 import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
+import { SOCIAL_LINKS } from '@azzapp/shared/socialLinkHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import type { CommonInformation } from '@azzapp/shared/contactCardHelpers';
 import type { Contact, Image } from 'expo-contacts';
@@ -264,12 +265,19 @@ const buildContact = async (
         ]
       : [],
     socialProfiles:
-      additionalContactData?.socials?.map(social => ({
-        label: social.label,
-        url: social.url,
-        id: `${profileId}-${social.label}`,
-        service: social.label,
-      })) ?? [],
+      additionalContactData?.socials?.map(social => {
+        const service = SOCIAL_LINKS.find(
+          link => link.id === social.label.toLowerCase(),
+        );
+
+        return {
+          label: social.label,
+          url: `https://${social.url.replace(/^https?:\/\//, '')}`,
+          id: `${profileId}-${social.label}`,
+          service: social.label,
+          username: service ? social.url.replace(service.mask, '') : '',
+        };
+      }) ?? [],
     urlAddresses: (userName
       ? [
           {

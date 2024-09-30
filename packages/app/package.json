@@ -89,7 +89,7 @@
     "expo-asset": "^10.0.10",
     "expo-blur": "^13.0.2",
     "expo-clipboard": "~6.0.3",
-    "expo-contacts": "^13.0.5",
+    "expo-contacts": "patch:expo-contacts@patch%3Aexpo-contacts@npm%253A13.0.5%23./.yarn/patches/expo-contacts-npm-13.0.5-ee92319df7.patch%3A%3Aversion=13.0.5&hash=f61598&locator=%2540azzapp%252Fmonorepo%2540workspace%253A.#~/.yarn/patches/expo-contacts-patch-69121a9c2e.patch",
     "expo-device": "^6.0.2",
     "expo-file-system": "^17.0.1",
     "expo-font": "^12.0.10",
