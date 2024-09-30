@@ -364,6 +364,7 @@ const UserPayWallScreen = ({ route }: NativeScreenProps<UserPayWallRoute>) => {
         </View>
         <SwitchLabel
           variant="small"
+          appearance="light"
           value={period === 'year'}
           labelPosition="left"
           onValueChange={() => setPeriod(period === 'year' ? 'month' : 'year')}
@@ -411,6 +412,7 @@ const UserPayWallScreen = ({ route }: NativeScreenProps<UserPayWallRoute>) => {
           <Button
             label={labelPurchase}
             style={[styles.buttonSubscribe, { width: '100%' }]}
+            appearance="light"
             onPress={processOrder}
           />
           <View style={styles.footer}>
@@ -544,7 +546,7 @@ const OfferItem = ({
         },
       ]}
     >
-      <Text variant="button">
+      <Text variant="button" appearance="light">
         <FormattedMessage
           defaultMessage={`{qty, plural,
             =1 {{qty} User}
@@ -557,7 +559,7 @@ const OfferItem = ({
         />
       </Text>
       <View>
-        <Text variant="button">
+        <Text variant="button" appearance="light">
           <FormattedNumber
             value={offer.product.price}
             style="currency"
