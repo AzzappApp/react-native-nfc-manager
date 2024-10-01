@@ -50,7 +50,10 @@ const removeUsersFromWebCard: MutationResolvers['removeUsersFromWebCard'] =
 
     await transaction(async () => {
       await deleteUnusedAccounts(profilesToDelete.map(profile => profile.id));
-      await removeProfiles(profilesToDelete.map(profile => profile.id));
+      await removeProfiles(
+        profilesToDelete.map(profile => profile.id),
+        userId,
+      );
       await updateMonthlySubscription(userId, webCardId);
     });
 

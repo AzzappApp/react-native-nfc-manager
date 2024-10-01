@@ -6,8 +6,10 @@ import {
   createUser,
   getProfileByUserAndWebCard,
   getUserByEmailPhoneNumber,
+  Profile,
   referencesMedias,
   transaction,
+  updateProfile,
   updateWebCard,
 } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
@@ -95,6 +97,7 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
       );
 
       let userId: string;
+      let existingProfileId: string | undefined;
 
       if (!existingUser) {
         userId = await createUser({
@@ -104,14 +107,18 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
         });
         await createFreeSubscriptionForBetaPeriod([userId]);
       } else {
+        userId = existingUser.id;
+
         const existingProfile = await getProfileByUserAndWebCard(
           existingUser.id,
           webCard.id,
         );
-        if (existingProfile) {
+
+        if (existingProfile && !existingProfile.deleted) {
           throw new GraphQLError(ERRORS.PROFILE_ALREADY_EXISTS);
         }
-        userId = existingUser.id;
+
+        existingProfileId = existingProfile?.id;
       }
 
       const { displayedOnWebCard, isPrivate, avatarId, logoId, ...data } =
@@ -138,16 +145,30 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
         deletedAt: null,
         deletedBy: null,
       };
-      const createdProfileId = await createProfile(profileData);
+
       await referencesMedias(addedMedia, []);
 
-      return {
-        profile: {
-          ...profileData,
-          id: createdProfileId,
-        },
-        existingUser,
-      };
+      if (existingProfileId) {
+        await updateProfile(existingProfileId, profileData);
+
+        return {
+          profile: {
+            ...profileData,
+            id: existingProfileId,
+          },
+          existingUser,
+        };
+      } else {
+        const createdProfileId = await createProfile(profileData);
+
+        return {
+          profile: {
+            ...profileData,
+            id: createdProfileId,
+          },
+          existingUser,
+        };
+      }
     });
 
     if (sendInvite) {

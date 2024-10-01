@@ -50,7 +50,7 @@ const quitWebCard: Mutation = async (_, params) => {
     }
   } else {
     await transaction(async () => {
-      await removeProfile(profile.id);
+      await removeProfile(profile.id, userId);
       await updateMonthlySubscription(userId, profile.webCardId);
     });
   }

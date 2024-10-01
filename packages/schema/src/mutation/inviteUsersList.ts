@@ -9,6 +9,8 @@ import {
   getUsersByEmail,
   getProfilesByIds,
   createId,
+  getProfilesByWebCard,
+  updateProfile,
 } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
@@ -29,7 +31,7 @@ import type {
   InviteUserRejected,
   MutationResolvers,
 } from '#/__generated__/types';
-import type { NewProfile } from '@azzapp/data';
+import type { NewProfile, Profile } from '@azzapp/data';
 
 const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
   _,
@@ -113,7 +115,10 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
       user => !!user,
     );
 
+    const profiles = await getProfilesByWebCard(webCard.id);
+
     const profileToCreate: NewProfile[] = [];
+    const profilesToUpdate: Array<Pick<Profile, 'id'> & Partial<Profile>> = [];
 
     const createdAt = new Date();
     for (const invited of filtered) {
@@ -128,6 +133,10 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
         });
         continue;
       }
+
+      const existingProfile = profiles.find(
+        profile => profile.userId === existingUser.id,
+      );
 
       userId = existingUser.id;
       const { displayedOnWebCard, isPrivate, avatarId, ...data } =
@@ -153,17 +162,30 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
         createdAt,
       };
 
-      profileToCreate.push(payload);
+      if (existingProfile) {
+        profilesToUpdate.push({ id: existingProfile.id, ...payload });
+      } else {
+        profileToCreate.push(payload);
+      }
     }
 
     let createdProfileIds: string[] = [];
     if (profileToCreate.length) {
       createdProfileIds = await createProfiles(profileToCreate);
+
+      await Promise.all(
+        profilesToUpdate.map(({ id, ...profile }) =>
+          updateProfile(id, profile),
+        ),
+      );
     }
 
-    const createdProfiles = (await getProfilesByIds(createdProfileIds)).filter(
-      profile => !!profile,
-    );
+    const createdProfiles = (
+      await getProfilesByIds([
+        ...createdProfileIds,
+        ...profilesToUpdate.map(({ id }) => id),
+      ])
+    ).filter(profile => !!profile);
 
     const owner = await webCardOwnerLoader.load(profile.webCardId);
 

@@ -368,7 +368,7 @@ export const getWebCardPendingOwnerProfile = async (
  *
  * @param id - The id of the profile
  */
-export const removeProfile = async (id: string) => {
+export const removeProfile = async (id: string, deletedBy: string) => {
   await transaction(async () => {
     const profile = await getProfileById(id);
 
@@ -386,7 +386,14 @@ export const removeProfile = async (id: string) => {
         .where(eq(MediaTable.id, profile.logoId));
     }
 
-    await db().delete(ProfileTable).where(eq(ProfileTable.id, id));
+    await db()
+      .update(ProfileTable)
+      .set({
+        deleted: true,
+        deletedAt: new Date(),
+        deletedBy,
+      })
+      .where(eq(ProfileTable.id, id));
   });
 };
 
@@ -408,7 +415,10 @@ const getAvatarAndLogo = async (profileIds: string[]) => {
  *
  * @param profileIds - The list of profile ids to delete
  */
-export const removeProfiles = async (profileIds: string[]) => {
+export const removeProfiles = async (
+  profileIds: string[],
+  deletedBy: string,
+) => {
   await transaction(async () => {
     const profiles = await getAvatarAndLogo(profileIds);
 
@@ -434,7 +444,14 @@ export const removeProfiles = async (profileIds: string[]) => {
         .where(inArray(MediaTable.id, logoIds));
     }
 
-    await db().delete(ProfileTable).where(inArray(ProfileTable.id, profileIds));
+    await db()
+      .update(ProfileTable)
+      .set({
+        deleted: true,
+        deletedAt: new Date(),
+        deletedBy,
+      })
+      .where(inArray(ProfileTable.id, profileIds));
   });
 };
 
