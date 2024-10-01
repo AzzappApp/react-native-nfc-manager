@@ -1,5 +1,6 @@
-## 0.9.10-canary.3
+## 0.9.10-canary.4
 
+* **fix:**  - center QRCode in contactCard ([#5214](https://github.com/AzzappApp/azzapp/pull/5214))
 * **feat:**  - 🎸 soft delete profiles ([#5196](https://github.com/AzzappApp/azzapp/pull/5196))
 * **build:**  - upgrade native dependencies ([#5204](https://github.com/AzzappApp/azzapp/pull/5204))
 * **fix:**  - **post:** [#4987](https://github.com/AzzappApp/azzapp/pull/4987) post may be null after deletion ([#5195](https://github.com/AzzappApp/azzapp/pull/5195))
