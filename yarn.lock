@@ -151,7 +151,7 @@ __metadata:
     expo-asset: "npm:^10.0.10"
     expo-blur: "npm:^13.0.2"
     expo-clipboard: "npm:~6.0.3"
-    expo-contacts: "patch:expo-contacts@patch%3Aexpo-contacts@npm%253A13.0.5%23./.yarn/patches/expo-contacts-npm-13.0.5-ee92319df7.patch%3A%3Aversion=13.0.5&hash=f61598&locator=%2540azzapp%252Fmonorepo%2540workspace%253A.#~/.yarn/patches/expo-contacts-patch-69121a9c2e.patch"
+    expo-contacts: "patch:expo-contacts@patch%3Aexpo-contacts@patch%253Aexpo-contacts@npm%25253A13.0.5%2523./.yarn/patches/expo-contacts-npm-13.0.5-ee92319df7.patch%253A%253Aversion=13.0.5&hash=f61598&locator=%252540azzapp%25252Fmonorepo%252540workspace%25253A.%23~/.yarn/patches/expo-contacts-patch-69121a9c2e.patch%3A%3Aversion=13.0.5&hash=410e55#~/.yarn/patches/expo-contacts-patch-54b8b71ee4.patch"
     expo-device: "npm:^6.0.2"
     expo-file-system: "npm:^17.0.1"
     expo-font: "npm:^12.0.10"
@@ -15960,12 +15960,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-contacts@patch:expo-contacts@patch%3Aexpo-contacts@npm%253A13.0.5%23./.yarn/patches/expo-contacts-npm-13.0.5-ee92319df7.patch%3A%3Aversion=13.0.5&hash=f61598&locator=%2540azzapp%252Fmonorepo%2540workspace%253A.#~/.yarn/patches/expo-contacts-patch-69121a9c2e.patch":
+"expo-contacts@patch:expo-contacts@patch%3Aexpo-contacts@npm%253A13.0.5%23./.yarn/patches/expo-contacts-npm-13.0.5-ee92319df7.patch%3A%3Aversion=13.0.5&hash=f61598&locator=%2540azzapp%252Fmonorepo%2540workspace%253A.#~/.yarn/patches/expo-contacts-patch-69121a9c2e.patch::version=13.0.5&hash=410e55":
   version: 13.0.5
   resolution: "expo-contacts@patch:expo-contacts@patch%3Aexpo-contacts@npm%253A13.0.5%23./.yarn/patches/expo-contacts-npm-13.0.5-ee92319df7.patch%3A%3Aversion=13.0.5&hash=f61598&locator=%2540azzapp%252Fmonorepo%2540workspace%253A.#~/.yarn/patches/expo-contacts-patch-69121a9c2e.patch::version=13.0.5&hash=410e55"
   peerDependencies:
     expo: "*"
   checksum: 10/c3bd38c2c9a3145c9a009b3c8c3ed2841e2f826c0b2efc07e23a3624646993113014a04cdc772f82e53a02ffdf08b7bd3d6b5d70b643f2584b3eeec43afba52e
+  languageName: node
+  linkType: hard
+
+"expo-contacts@patch:expo-contacts@patch%3Aexpo-contacts@patch%253Aexpo-contacts@npm%25253A13.0.5%2523./.yarn/patches/expo-contacts-npm-13.0.5-ee92319df7.patch%253A%253Aversion=13.0.5&hash=f61598&locator=%252540azzapp%25252Fmonorepo%252540workspace%25253A.%23~/.yarn/patches/expo-contacts-patch-69121a9c2e.patch%3A%3Aversion=13.0.5&hash=410e55#~/.yarn/patches/expo-contacts-patch-54b8b71ee4.patch":
+  version: 13.0.5
+  resolution: "expo-contacts@patch:expo-contacts@patch%3Aexpo-contacts@patch%253Aexpo-contacts@npm%25253A13.0.5%2523./.yarn/patches/expo-contacts-npm-13.0.5-ee92319df7.patch%253A%253Aversion=13.0.5&hash=f61598&locator=%252540azzapp%25252Fmonorepo%252540workspace%25253A.%23~/.yarn/patches/expo-contacts-patch-69121a9c2e.patch%3A%3Aversion=13.0.5&hash=410e55#~/.yarn/patches/expo-contacts-patch-54b8b71ee4.patch::version=13.0.5&hash=3fe629"
+  peerDependencies:
+    expo: "*"
+  checksum: 10/58156d384434111b54f2fb7edeb84aaeadc44972f192ce90961c780af51bebc2aff4414361c10b6c49330a0fef0048f03fd5be9541230d9de21d9923db90dbae
   languageName: node
   linkType: hard
 
