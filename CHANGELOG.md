@@ -1,5 +1,6 @@
-## 0.9.10-canary.4
+## 0.9.10-canary.5
 
+* **fix:**  - **webCard:** real error was masked with try/catch ([#5218](https://github.com/AzzappApp/azzapp/pull/5218))
 * **fix:**  - center QRCode in contactCard ([#5214](https://github.com/AzzappApp/azzapp/pull/5214))
 * **feat:**  - 🎸 soft delete profiles ([#5196](https://github.com/AzzappApp/azzapp/pull/5196))
 * **build:**  - upgrade native dependencies ([#5204](https://github.com/AzzappApp/azzapp/pull/5204))
