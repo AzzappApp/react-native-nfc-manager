@@ -173,35 +173,6 @@ const ContactCard = ({
               </Text>
             )}
           </View>
-          <View style={styles.qrCodeContainer}>
-            {svg ? (
-              <Canvas style={styles.qrCodeCanvas}>
-                {withRotationArrows && (
-                  <Group
-                    layer={
-                      <Paint>
-                        <BlendColor color={readableColor} mode="srcATop" />
-                        <ColorMatrix matrix={OpacityMatrix(0.5)} />
-                      </Paint>
-                    }
-                  >
-                    <ImageSVG x={90} y={3} svg={rotateArrowLeft} />
-                    <ImageSVG x={7} y={95} svg={rotateArrowRight} />
-                  </Group>
-                )}
-                <Group
-                  layer={
-                    <Paint>
-                      <BlendColor color={readableColor} mode="srcATop" />
-                    </Paint>
-                  }
-                  transform={fitbox('contain', src, dst)}
-                >
-                  <ImageSVG svg={svg} />
-                </Group>
-              </Canvas>
-            ) : null}
-          </View>
         </View>
         <View style={styles.webCardFooter}>
           {userName && (
@@ -217,6 +188,35 @@ const ContactCard = ({
             </Text>
           )}
         </View>
+      </View>
+      <View style={styles.qrCodeContainer}>
+        {svg ? (
+          <Canvas style={styles.qrCodeCanvas}>
+            {withRotationArrows && (
+              <Group
+                layer={
+                  <Paint>
+                    <BlendColor color={readableColor} mode="srcATop" />
+                    <ColorMatrix matrix={OpacityMatrix(0.5)} />
+                  </Paint>
+                }
+              >
+                <ImageSVG x={90} y={3} svg={rotateArrowLeft} />
+                <ImageSVG x={7} y={95} svg={rotateArrowRight} />
+              </Group>
+            )}
+            <Group
+              layer={
+                <Paint>
+                  <BlendColor color={readableColor} mode="srcATop" />
+                </Paint>
+              }
+              transform={fitbox('contain', src, dst)}
+            >
+              <ImageSVG svg={svg} />
+            </Group>
+          </Canvas>
+        ) : null}
       </View>
     </View>
   );
