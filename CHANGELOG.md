@@ -1,5 +1,6 @@
-## 0.9.10-canary.2
+## 0.9.10-canary.3
 
+* **feat:**  - 🎸 soft delete profiles ([#5196](https://github.com/AzzappApp/azzapp/pull/5196))
 * **build:**  - upgrade native dependencies ([#5204](https://github.com/AzzappApp/azzapp/pull/5204))
 * **fix:**  - **post:** [#4987](https://github.com/AzzappApp/azzapp/pull/4987) post may be null after deletion ([#5195](https://github.com/AzzappApp/azzapp/pull/5195))
 * **perf:**  - don’t wait revalidation of page to return results ([#5202](https://github.com/AzzappApp/azzapp/pull/5202))
