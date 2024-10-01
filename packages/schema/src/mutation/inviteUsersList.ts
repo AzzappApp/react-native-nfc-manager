@@ -118,7 +118,7 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
     const profiles = await getProfilesByWebCard(webCard.id);
 
     const profileToCreate: NewProfile[] = [];
-    const profilesToUpdate: Array<Pick<Profile, 'id'> & Partial<Profile>> = [];
+    const profilesToUpdate: Array<Partial<Profile> & Pick<Profile, 'id'>> = [];
 
     const createdAt = new Date();
     for (const invited of filtered) {

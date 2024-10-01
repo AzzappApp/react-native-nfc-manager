@@ -6,7 +6,6 @@ import {
   createUser,
   getProfileByUserAndWebCard,
   getUserByEmailPhoneNumber,
-  Profile,
   referencesMedias,
   transaction,
   updateProfile,
