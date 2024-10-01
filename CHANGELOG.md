@@ -1,5 +1,9 @@
-## 0.9.10-canary.1
+## 0.9.10-canary.2
 
+* **build:**  - upgrade native dependencies ([#5204](https://github.com/AzzappApp/azzapp/pull/5204))
+* **fix:**  - **post:** [#4987](https://github.com/AzzappApp/azzapp/pull/4987) post may be null after deletion ([#5195](https://github.com/AzzappApp/azzapp/pull/5195))
+* **perf:**  - don’t wait revalidation of page to return results ([#5202](https://github.com/AzzappApp/azzapp/pull/5202))
+* **fix:**  - **contactCard:** [#5206](https://github.com/AzzappApp/azzapp/pull/5206) display date correctly in presentFormAsync ([#5212](https://github.com/AzzappApp/azzapp/pull/5212))
 * **fix:**  - **multiUser:** 5209 wrong condition in query ([#5210](https://github.com/AzzappApp/azzapp/pull/5210))
 * **fix:**  - 🐛 properly display paywall ([#5184](https://github.com/AzzappApp/azzapp/pull/5184))
 * **fix:**  - **webCard:** media in modules were badly counted ([#5173](https://github.com/AzzappApp/azzapp/pull/5173))
