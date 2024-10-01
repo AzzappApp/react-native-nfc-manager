@@ -8,6 +8,7 @@ import { maxAliasesPlugin } from '@escape.tech/graphql-armor-max-aliases';
 import { maxTokensPlugin } from '@escape.tech/graphql-armor-max-tokens';
 import { useDisableIntrospection } from '@graphql-yoga/plugin-disable-introspection';
 import { usePersistedOperations } from '@graphql-yoga/plugin-persisted-operations';
+import { waitUntil } from '@vercel/functions';
 import { createYoga } from 'graphql-yoga';
 import { compare } from 'semver';
 import {
@@ -84,9 +85,8 @@ function useRevalidatePages(): YogaPlugin<GraphQLContext> {
           const cards = getInvalidatedWebCards();
           const posts = getInvalidatedPosts();
           if (cards.length || posts.length) {
-            const res = await fetch(
-              `${process.env.NEXT_PUBLIC_API_ENDPOINT}/revalidate`,
-              {
+            waitUntil(
+              fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/revalidate`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
@@ -96,11 +96,8 @@ function useRevalidatePages(): YogaPlugin<GraphQLContext> {
                   cards,
                   posts,
                 }),
-              },
+              }),
             );
-            if (!res.ok) {
-              console.error('Error revalidating pages');
-            }
           }
         },
       };
