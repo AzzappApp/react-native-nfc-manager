@@ -39,59 +39,57 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  try {
-    if (graphqlWebCardCategoryId) {
-      const webCardCategoryId = fromGlobalIdWithType(
-        graphqlWebCardCategoryId,
-        'WebCardCategory',
-      );
-      partialWebCard.webCardCategoryId = webCardCategoryId;
-      if (webCardCategoryId !== webCard.webCardCategoryId) {
-        partialWebCard.companyActivityId = undefined;
-      }
-
-      const webCardCategory =
-        await webCardCategoryLoader.load(webCardCategoryId);
-
-      partialWebCard.webCardKind = webCardCategory?.webCardKind;
-    }
-    if (graphqlCompanyActivityId) {
-      const companyActivityId = fromGlobalIdWithType(
-        graphqlCompanyActivityId,
-        'CompanyActivity',
-      );
-      partialWebCard.companyActivityId = companyActivityId;
-    } else if (graphqlCompanyActivityId === null) {
-      partialWebCard.companyActivityId = null;
+  if (graphqlWebCardCategoryId) {
+    const webCardCategoryId = fromGlobalIdWithType(
+      graphqlWebCardCategoryId,
+      'WebCardCategory',
+    );
+    partialWebCard.webCardCategoryId = webCardCategoryId;
+    if (webCardCategoryId !== webCard.webCardCategoryId) {
+      partialWebCard.companyActivityId = undefined;
     }
 
-    await checkWebCardHasSubscription({
-      webCard: {
-        ...webCard,
-        ...Object.fromEntries(
-          Object.entries(partialWebCard).filter(
-            ([_entry, value]) => value !== undefined,
-          ),
+    const webCardCategory = await webCardCategoryLoader.load(webCardCategoryId);
+
+    partialWebCard.webCardKind = webCardCategory?.webCardKind;
+  }
+  if (graphqlCompanyActivityId) {
+    const companyActivityId = fromGlobalIdWithType(
+      graphqlCompanyActivityId,
+      'CompanyActivity',
+    );
+    partialWebCard.companyActivityId = companyActivityId;
+  } else if (graphqlCompanyActivityId === null) {
+    partialWebCard.companyActivityId = null;
+  }
+
+  await checkWebCardHasSubscription({
+    webCard: {
+      ...webCard,
+      ...Object.fromEntries(
+        Object.entries(partialWebCard).filter(
+          ([_entry, value]) => value !== undefined,
         ),
-      },
-    });
+      ),
+    },
+  });
 
-    if (webCard.companyActivityId !== partialWebCard.companyActivityId) {
-      const profile =
-        userId &&
-        (await profileByWebCardIdAndUserIdLoader.load({ userId, webCardId }));
-      if (!profile || profile.invited) {
-        throw new GraphQLError(ERRORS.UNAUTHORIZED);
-      }
-      if (!profileHasAdminRight(profile.profileRole)) {
-        throw new GraphQLError(ERRORS.FORBIDDEN, {
-          extensions: {
-            role: profile.profileRole,
-          },
-        });
-      }
+  if (webCard.companyActivityId !== partialWebCard.companyActivityId) {
+    const profile =
+      userId &&
+      (await profileByWebCardIdAndUserIdLoader.load({ userId, webCardId }));
+    if (!profile || profile.invited) {
+      throw new GraphQLError(ERRORS.UNAUTHORIZED);
     }
-
+    if (!profileHasAdminRight(profile.profileRole)) {
+      throw new GraphQLError(ERRORS.FORBIDDEN, {
+        extensions: {
+          role: profile.profileRole,
+        },
+      });
+    }
+  }
+  try {
     await updateWebCard(webCardId, partialWebCard);
 
     webCardLoader.clear(webCardId);
