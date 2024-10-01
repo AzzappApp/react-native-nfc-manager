@@ -132,7 +132,8 @@ const FilterSelectionList = ({
   );
 };
 
-const keyExtractor = (item: [string, string]) => item[0];
+const keyExtractor = (item: [string, string] | null, index: number) =>
+  item?.[0] ?? `${index}`;
 
 const SELECTION_MINIMUM_IMAGE_RATIO = 0.5;
 const SELECTION_MAXIMUM_IMAGE_RATIO = 2;

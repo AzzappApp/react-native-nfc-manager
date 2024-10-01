@@ -13,6 +13,7 @@ import {
   COVER_CARD_RADIUS,
   COVER_RATIO,
 } from '@azzapp/shared/coverHelpers';
+import { keyExtractor } from '#helpers/idHelpers';
 import BoxSelectionList from './BoxSelectionList';
 import CardModuleBackgroundImage from './cardModules/CardModuleBackgroundImage';
 import type {
@@ -148,8 +149,6 @@ const ModuleBackgroundList = ({
 
 type ModuleBackgroundItem =
   ArrayItemType<ModuleBackgroundList_ModuleBackgrounds$data>;
-
-const keyExtractor = (item: ModuleBackgroundItem) => item.id;
 
 export default ModuleBackgroundList;
 

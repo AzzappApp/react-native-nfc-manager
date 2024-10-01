@@ -27,7 +27,7 @@ export type BoxSelectionListProps<T> = Omit<ViewProps, 'hitSlop'> & {
   imageRatio?: number;
   renderItem: (params: BoxButtonItemInfo<T>) => React.ReactNode;
   renderLabel?: (params: BoxButtonItemInfo<T>) => React.ReactNode;
-  keyExtractor: (item: T) => string;
+  keyExtractor: (item: T | null, index: number) => string;
   onSelect: (item: T | null) => void;
   onItemHeightChange?: (height: number) => void;
   fixedItemWidth?: number;
@@ -94,7 +94,8 @@ const BoxSelectionList = <T,>({
   );
 
   const innerKeyExtractor = useCallback(
-    (item: T | null) => (item ? keyExtractor(item) : `first-item`),
+    (item: T | null, index: number) =>
+      item ? keyExtractor(item, index) : `first-item`,
     [keyExtractor],
   );
 
