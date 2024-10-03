@@ -1002,3 +1002,45 @@ export const ShareBackTable = cols.table('ShareBack', {
 });
 export type ShareBack = InferSelectModel<typeof ShareBackTable>;
 //#endregion
+
+// #region ShareBack
+export const ContactTable = cols.table(
+  'Contact',
+  {
+    id: cols.cuid('id').primaryKey().$defaultFn(createId),
+    ownerProfileId: cols.cuid('ownerProfileId').notNull(),
+    contactProfileId: cols.cuid('contactProfileId').notNull(),
+    firstName: cols.defaultVarchar('firstName').default('').notNull(),
+    lastName: cols.defaultVarchar('lastName').default('').notNull(),
+    company: cols.defaultVarchar('company').default('').notNull(),
+    title: cols.defaultVarchar('title').default('').notNull(),
+    createdAt: cols
+      .dateTime('createdAt')
+      .notNull()
+      .default(DEFAULT_DATETIME_VALUE),
+    type: cols.enum('type', ['contact', 'shareback']).notNull(),
+    birthday: cols.date('birthday'),
+    phoneNumbers: cols
+      .json('phoneNumbers')
+      .$type<Array<{ label: string; number: string }>>()
+      .notNull(),
+    emails: cols
+      .json('emails')
+      .$type<Array<{ label: string; address: string }>>()
+      .notNull(),
+    addresses: cols
+      .json('addresses')
+      .$type<Array<{ label: string; address: string }>>()
+      .notNull(),
+    deviceIds: cols.json('deviceIds').$type<string[]>().notNull(),
+  },
+  table => {
+    return {
+      profilesKey: cols
+        .uniqueIndex('Contact_profiles_key')
+        .on(table.ownerProfileId, table.contactProfileId),
+    };
+  },
+);
+export type Contact = InferSelectModel<typeof ContactTable>;
+//#endregion

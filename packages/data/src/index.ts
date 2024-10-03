@@ -57,4 +57,5 @@ export type {
   WebCard,
   WebCardCategory,
   WebCardStatistic,
+  Contact,
 } from './schema';

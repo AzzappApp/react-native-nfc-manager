@@ -28,3 +28,4 @@ export * from './reportQueries';
 export * from './paymentQueries';
 export * from './paymentMeanQueries';
 export * from './shareBackQueries';
+export * from './contactQueries';

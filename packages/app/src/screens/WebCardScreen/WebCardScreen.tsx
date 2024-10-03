@@ -58,10 +58,10 @@ import {
 import useToggle from '#hooks/useToggle';
 import useToggleFollow from '#hooks/useToggleFollow';
 import Container from '#ui/Container';
+import AddContactModal from './AddContactModal';
 import WebCardBackground from './WebCardBackground';
 import WebCardPostsList from './WebCardPostsList';
 import WebCardScreenButtonBar from './WebCardScreenButtonBar';
-import WebCardScreenContactDownloader from './WebCardScreenContactDownloader';
 import WebCardScreenContent from './WebCardScreenContent';
 import WebCardScreenPublishHelper from './WebCardScreenPublishHelper';
 import { WebCardScreenTransitionsProvider } from './WebCardScreenTransitions';
@@ -447,12 +447,14 @@ const WebCardScreen = ({
           onShowWebcardModal={onShowWebcardModal}
         />
       </WebCardScreenTransitionsProvider>
-      <WebCardScreenContactDownloader
-        userName={data.webCard.userName}
-        webCard={data.webCard}
-        contactData={params.contactData}
-        additionalContactData={params.additionalContactData}
-      />
+      <Suspense>
+        <AddContactModal
+          user={data.currentUser!}
+          webCard={data.webCard}
+          contactData={params.contactData}
+          additionalContactData={params.additionalContactData}
+        />
+      </Suspense>
       <Suspense fallback={null}>
         <WebCardScreenPublishHelper webCard={data.webCard} editMode={editing} />
         <WebCardMenu
@@ -488,6 +490,7 @@ const webCardScreenByIdQuery = graphql`
       ...WebCardScreenPublishHelper_webCard
       ...WebCardBackground_webCard
       ...WebCardMenu_webCard @arguments(viewerWebCardId: $viewerWebCardId)
+      ...AddContactModal_webCard
     }
     profile: node(id: $profileId) {
       ... on Profile {
@@ -497,6 +500,9 @@ const webCardScreenByIdQuery = graphql`
         }
         invited
       }
+    }
+    currentUser {
+      ...AddContactModalProfiles_user
     }
   }
 `;
@@ -516,6 +522,7 @@ const webCardScreenByNameQuery = graphql`
       ...WebCardScreenPublishHelper_webCard
       ...WebCardBackground_webCard
       ...WebCardMenu_webCard @arguments(viewerWebCardId: $viewerWebCardId)
+      ...AddContactModal_webCard
     }
     profile: node(id: $profileId) {
       ... on Profile {
@@ -525,6 +532,9 @@ const webCardScreenByNameQuery = graphql`
         }
         invited
       }
+    }
+    currentUser {
+      ...AddContactModalProfiles_user
     }
   }
 `;

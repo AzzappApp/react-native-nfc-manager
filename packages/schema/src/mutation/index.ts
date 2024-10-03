@@ -1,5 +1,6 @@
 import acceptInvitation from './acceptInvitation';
 import acceptOwnership from './acceptOwnership';
+import addContact from './addContact';
 import cancelTransferOwnership from './cancelTransferOwnership';
 import createPost from './createPost';
 import createPostCommentMutation from './createPostComment';
@@ -116,6 +117,7 @@ export const Mutation: MutationResolvers = {
   deletePost,
   updateSubscriptionCustomer,
   deleteUser,
+  addContact,
 };
 
 export default Mutation;

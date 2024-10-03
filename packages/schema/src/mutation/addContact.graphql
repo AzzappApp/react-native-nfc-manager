@@ -1,0 +1,41 @@
+extend type Mutation {
+  addContact(profileId: ID!, input: AddContactInput!): AddContactPayload
+}
+
+input AddContactInput {
+  profileId: String!
+  firstname: String!
+  lastname: String!
+  company: String!
+  title: String!
+  birthday: DateTime
+  phoneNumbers: [AddContactPhoneNumberInput!]!
+  emails: [AddContactEmailInput!]!
+  addresses: [AddContactAddressInput!]!
+  deviceId: String!
+  withShareBack: Boolean!
+}
+
+input AddContactPhoneNumberInput {
+  label: String!
+  number: String!
+}
+
+input AddContactEmailInput {
+  label: String!
+  address: String!
+}
+
+input AddContactAddressInput {
+  label: String!
+  address: String!
+}
+
+type AddContactPayload {
+  contact: Contact!
+}
+
+enum AddContactType {
+  contact
+  shareback
+}

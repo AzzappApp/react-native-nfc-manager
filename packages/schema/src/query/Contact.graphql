@@ -1,0 +1,34 @@
+"""
+Represent a Contact
+"""
+type Contact {
+  id: ID!
+  ownerProfileId: String!
+  contactProfileId: String!
+  firstname: String!
+  lastname: String!
+  company: String!
+  title: String!
+  createdAt: DateTime!
+  type: String!
+  birthday: DateTime
+  phoneNumbers: [ContactPhoneNumber!]!
+  emails: [ContactEmail!]!
+  addresses: [ContactAddress!]!
+  deviceIds: [String!]!
+}
+
+type ContactPhoneNumber {
+  label: String!
+  number: String!
+}
+
+type ContactEmail {
+  label: String!
+  address: String!
+}
+
+type ContactAddress {
+  label: String!
+  address: String!
+}

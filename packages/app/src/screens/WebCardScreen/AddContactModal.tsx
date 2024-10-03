@@ -1,0 +1,497 @@
+import * as Sentry from '@sentry/react-native';
+import {
+  addContactAsync,
+  getContactByIdAsync,
+  presentFormAsync,
+  requestPermissionsAsync,
+  updateContactAsync,
+} from 'expo-contacts';
+import * as FileSystem from 'expo-file-system';
+import { fromGlobalId } from 'graphql-relay';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { Alert, Platform, StyleSheet, View } from 'react-native';
+import { MMKV } from 'react-native-mmkv';
+import Toast from 'react-native-toast-message';
+import { graphql, useFragment, useMutation } from 'react-relay';
+import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
+import { buildUserUrl } from '@azzapp/shared/urlHelpers';
+import CoverRenderer from '#components/CoverRenderer';
+import BottomSheetModal from '#ui/BottomSheetModal';
+import Button from '#ui/Button';
+import CheckBox from '#ui/CheckBox';
+import Container from '#ui/Container';
+import Header from '#ui/Header';
+import Icon from '#ui/Icon';
+import PressableNative from '#ui/PressableNative';
+import SafeAreaView from '#ui/SafeAreaView';
+import Text from '#ui/Text';
+import AddContactModalProfiles from './AddContactModalProfiles';
+import type { AddContactModal_webCard$key } from '#relayArtifacts/AddContactModal_webCard.graphql';
+
+import type { AddContactModalMutation } from '#relayArtifacts/AddContactModalMutation.graphql';
+import type { AddContactModalProfiles_user$key } from '#relayArtifacts/AddContactModalProfiles_user.graphql';
+import type { CheckboxStatus } from '#ui/CheckBox';
+import type { CommonInformation } from '@azzapp/shared/contactCardHelpers';
+import type { Contact, Image } from 'expo-contacts';
+
+export const storage = new MMKV({
+  id: 'contacts',
+});
+
+type Props = {
+  contactData?: string | null;
+  additionalContactData?: Pick<CommonInformation, 'socials' | 'urls'> & {
+    avatarUrl?: string;
+  };
+  webCard: AddContactModal_webCard$key;
+  user: AddContactModalProfiles_user$key;
+};
+
+const AddContactModal = ({
+  contactData,
+  additionalContactData,
+  webCard: webCardKey,
+  user: userKey,
+}: Props) => {
+  const [viewer, setViewer] = useState<string | null>(null);
+
+  const webCard = useFragment(
+    graphql`
+      fragment AddContactModal_webCard on WebCard {
+        ...CoverRenderer_webCard
+        id
+        userName
+      }
+    `,
+    webCardKey,
+  );
+
+  const [commit, saving] = useMutation<AddContactModalMutation>(graphql`
+    mutation AddContactModalMutation(
+      $profileId: ID!
+      $input: AddContactInput!
+    ) {
+      addContact(profileId: $profileId, input: $input) {
+        contact {
+          id
+        }
+      }
+    }
+  `);
+
+  const intl = useIntl();
+
+  const [withShareBack, setWithShareBack] = useState<CheckboxStatus>('checked');
+  const [scanned, setScanned] = useState<{
+    contact: Contact;
+    profileId: string;
+  } | null>(null);
+
+  const onClose = useCallback(() => {
+    setScanned(null);
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      if (!scanned && contactData && webCard) {
+        const { contact, webCardId, profileId } = await buildContact(
+          contactData,
+          additionalContactData,
+          webCard.userName,
+        );
+        if (webCardId === fromGlobalId(webCard.id).id) {
+          setScanned({ contact, profileId });
+        }
+      }
+    })();
+  }, [contactData, webCard, additionalContactData, scanned]);
+
+  const onAddContact = useCallback(
+    (deviceId: string) => {
+      if (!scanned || !viewer) return;
+
+      const addresses = scanned.contact.addresses?.map(({ label, street }) => ({
+        label,
+        address: street ?? '',
+      }));
+
+      const emails = scanned.contact.emails?.map(({ label, email }) => ({
+        label,
+        address: email ?? '',
+      }));
+
+      const phoneNumbers = scanned.contact.phoneNumbers
+        ?.map(({ label, number }) => ({
+          label,
+          number,
+        }))
+        .filter(({ number }) => !!number) as Array<{
+        label: string;
+        number: string;
+      }>;
+
+      commit({
+        variables: {
+          input: {
+            addresses: addresses ?? [],
+            company: scanned.contact.company ?? '',
+            emails: emails ?? [],
+            firstname: scanned.contact.firstName ?? '',
+            lastname: scanned.contact.lastName ?? '',
+            phoneNumbers: phoneNumbers ?? [],
+            profileId: scanned.profileId ?? '',
+            title: scanned.contact.jobTitle ?? '',
+            withShareBack: withShareBack === 'checked',
+            birthday: scanned.contact.birthday
+              ? new Date(
+                  scanned.contact.birthday.year!,
+                  scanned.contact.birthday.month!,
+                  scanned.contact.birthday.day!,
+                )
+              : null,
+            deviceId,
+          },
+          profileId: viewer,
+        },
+        onCompleted: () => {
+          setScanned(null);
+        },
+      });
+    },
+    [commit, scanned, viewer, withShareBack],
+  );
+
+  const onShowContact = useCallback(() => {
+    if (!scanned) return;
+
+    Alert.alert(
+      intl.formatMessage(
+        {
+          defaultMessage: 'Add {name} to contacts?',
+          description: 'Alert title when adding a profile to contacts',
+        },
+        {
+          name: `${
+            `${scanned.contact.firstName ?? ''}  ${scanned.contact.lastName ?? ''}`.trim() ||
+            scanned.contact.company ||
+            webCard.userName
+          }`,
+        },
+      ),
+      intl.formatMessage(
+        {
+          defaultMessage: 'Add {name} to the contacts list of your phone',
+          description: 'Alert message when adding a profile to contacts',
+        },
+        {
+          name: `${
+            `${scanned.contact.firstName ?? ''}  ${scanned.contact.lastName ?? ''}`.trim() ||
+            scanned.contact.company ||
+            webCard.userName
+          }`,
+        },
+      ),
+      [
+        {
+          text: 'OK',
+          onPress: async () => {
+            try {
+              let messageToast = '';
+              const { status } = await requestPermissionsAsync();
+              if (status === 'granted') {
+                let foundContact: Contact | undefined = undefined;
+                if (scanned.profileId && storage.contains(scanned.profileId)) {
+                  const internalId = storage.getString(scanned.profileId);
+                  if (internalId) {
+                    foundContact = await getContactByIdAsync(internalId);
+                  }
+                }
+
+                if (foundContact) {
+                  if (Platform.OS === 'ios') {
+                    await updateContactAsync({
+                      ...scanned.contact,
+                      id: foundContact.id,
+                    });
+                    onAddContact(foundContact.id!);
+                  } else {
+                    await presentFormAsync(foundContact.id, scanned.contact);
+                    onAddContact(foundContact.id!);
+                  }
+                  messageToast = intl.formatMessage({
+                    defaultMessage: 'The contact was updated successfully.',
+                    description:
+                      'Toast message when a contact is updated successfully',
+                  });
+                } else {
+                  const resultId = await addContactAsync(scanned.contact);
+                  onAddContact(resultId);
+                  if (scanned.profileId) {
+                    storage.set(scanned.profileId, resultId);
+                  }
+                  messageToast = intl.formatMessage({
+                    defaultMessage: 'The contact was created successfully.',
+                    description:
+                      'Toast message when a contact is created successfully',
+                  });
+                }
+
+                Toast.show({
+                  type: 'success',
+                  text1: messageToast,
+                });
+              }
+            } catch (e) {
+              console.error(e);
+            }
+          },
+        },
+        {
+          text: intl.formatMessage({
+            defaultMessage: 'View Contact',
+            description: 'Button to view the contact',
+          }),
+          onPress: async () => {
+            if (Platform.OS === 'android') {
+              const readContactPermission = await requestPermissionsAsync();
+              if (readContactPermission.status !== 'granted') {
+                Toast.show({
+                  type: 'error',
+                  text1: intl.formatMessage({
+                    defaultMessage:
+                      'You have to grant the permission to view the contact',
+                    description:
+                      'WebCard screen - Error message when trying to view a contact',
+                  }),
+                });
+                return;
+              }
+            }
+
+            await presentFormAsync(null, scanned.contact, {
+              isNew: true,
+            });
+          },
+        },
+        { text: 'Cancel', style: 'cancel' },
+      ],
+    );
+  }, [scanned, intl, webCard.userName, onAddContact]);
+
+  const userName = useMemo(() => {
+    if (scanned) {
+      const { contact } = scanned;
+
+      if (contact.firstName || contact.lastName) {
+        return `${contact.firstName} ${contact.lastName}`;
+      }
+
+      if (contact.company) {
+        return contact.company;
+      }
+    }
+
+    return webCard.userName;
+  }, [scanned, webCard.userName]);
+
+  return (
+    <BottomSheetModal visible={!!scanned} onRequestClose={onClose} height={650}>
+      <Container style={styles.container}>
+        <SafeAreaView
+          style={styles.container}
+          edges={{ bottom: 'off', top: 'additive' }}
+        >
+          <Header
+            middleElement={
+              <Text variant="large">
+                <FormattedMessage
+                  defaultMessage="Add {userName} to your contacts"
+                  description="Title for add contact modal"
+                  values={{
+                    userName,
+                  }}
+                />
+              </Text>
+            }
+            leftElement={
+              <PressableNative onPress={onClose}>
+                <Icon icon="close" />
+              </PressableNative>
+            }
+          />
+          <View style={styles.section}>
+            <CoverRenderer webCard={webCard} width={120} canPlay={false} />
+          </View>
+          <View style={styles.separator}>
+            <Icon icon="arrow_down" />
+            <Icon icon="arrow_up" style={{ marginLeft: 10 }} />
+          </View>
+          <AddContactModalProfiles user={userKey} onSelectProfile={setViewer} />
+          <CheckBox
+            label={intl.formatMessage({
+              defaultMessage: 'Share back your contact details',
+              description: 'AddContactModal - shareback title',
+            })}
+            labelStyle={styles.label}
+            status={withShareBack}
+            onValueChange={setWithShareBack}
+            style={styles.checkbox}
+          />
+          <Button
+            loading={saving}
+            style={styles.button}
+            label={intl.formatMessage({
+              defaultMessage: 'Add to my WebCard contacts',
+              description: 'AddContactModal - Submit title',
+            })}
+            onPress={onShowContact}
+          />
+        </SafeAreaView>
+      </Container>
+    </BottomSheetModal>
+  );
+};
+
+const buildContact = async (
+  contactCardData: string,
+  additionalContactData: Props['additionalContactData'],
+  userName?: string,
+) => {
+  const {
+    profileId,
+    webCardId,
+    firstName,
+    addresses,
+    lastName,
+    company,
+    title,
+    phoneNumbers,
+    emails,
+    birthday,
+  } = parseContactCard(contactCardData);
+
+  let image: Image | undefined = undefined;
+
+  if (additionalContactData?.avatarUrl) {
+    try {
+      const avatar = await FileSystem.downloadAsync(
+        additionalContactData.avatarUrl,
+        FileSystem.cacheDirectory + 'avatar',
+      );
+      if (avatar.status >= 200 && avatar.status < 300) {
+        image = {
+          width: 720,
+          height: 720,
+          uri: avatar.uri,
+        };
+      }
+    } catch (e) {
+      Sentry.captureException(e);
+    }
+  }
+
+  const birthdayDate = birthday ? new Date(birthday) : undefined;
+
+  const contact: Contact = {
+    id: profileId,
+    contactType: 'person',
+    firstName: firstName ?? '',
+    lastName: lastName ?? '',
+    name: `${firstName ?? ''} ${lastName ?? ''}`,
+    company: company ?? '',
+    jobTitle: title ?? '',
+    addresses: addresses.map(address => ({
+      label: address[0],
+      street: address[1],
+      isPrimary: address[0] === 'Main',
+      id: `${profileId}-${address[1]}`,
+    })),
+    phoneNumbers: phoneNumbers.map(phone => ({
+      label:
+        Platform.OS === 'android' && phone[0] !== 'Main'
+          ? phone[0] === 'Fax'
+            ? 'workFax'
+            : phone[0].toLowerCase()
+          : phone[0],
+      number: phone[1],
+      isPrimary: phone[0] === 'Main',
+      id: `${profileId}-${phone[1]}`,
+    })),
+    emails: emails.map(email => ({
+      label:
+        Platform.OS === 'android' && email[0] !== 'Main'
+          ? email[0].toLowerCase()
+          : email[0],
+      email: email[1],
+      isPrimary: email[0] === 'Main',
+      id: `${profileId}-${email[1]}`,
+    })),
+    dates: birthdayDate
+      ? [
+          {
+            label: 'birthday',
+            year: birthdayDate?.getFullYear(),
+            month: birthdayDate?.getMonth(),
+            day: birthdayDate?.getDate(),
+            id: `${profileId}-birthday`,
+          },
+        ]
+      : [],
+    socialProfiles:
+      additionalContactData?.socials?.map(social => ({
+        label: social.label,
+        url: social.url,
+        id: `${profileId}-${social.label}`,
+        service: social.label,
+      })) ?? [],
+    urlAddresses: (userName
+      ? [
+          {
+            label: 'azzapp',
+            url: buildUserUrl(userName),
+            id: `${profileId}-azzapp`,
+          },
+        ]
+      : []
+    ).concat(
+      additionalContactData?.urls?.map(url => ({
+        label: '',
+        url:
+          !url.address || url.address.toLocaleLowerCase().startsWith('http')
+            ? url.address
+            : `http://${url.address}`,
+        id: `${profileId}-${url.address}`,
+      })) ?? [],
+    ),
+    image,
+  };
+
+  return { contact, webCardId, profileId };
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  section: {
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  separator: {
+    marginTop: 20,
+    justifyContent: 'center',
+    flexDirection: 'row',
+  },
+  checkbox: {
+    marginTop: 20,
+  },
+  label: {
+    marginLeft: 10,
+  },
+  button: {
+    marginTop: 20,
+  },
+});
+
+export default AddContactModal;
