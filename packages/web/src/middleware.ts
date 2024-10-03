@@ -14,6 +14,7 @@ export async function middleware(request: NextRequest) {
     const pathComponents = nextUrl.pathname.substring(1).split('/');
     //we have to check for a redirection
     const startTime = performance.now();
+
     const redirection = await getRedirectWebCardByUserName(pathComponents[0]);
     console.log(
       `Redirection: ${pathComponents[0]} ${redirection.length} ${
