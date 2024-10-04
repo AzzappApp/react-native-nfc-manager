@@ -316,7 +316,7 @@ export const getWebCardProfiles = async (
             OR User.email LIKE ${`%${search}%`}
             OR User.phoneNumber LIKE ${`%${search}%`}
           )
-          ${withDeleted ? '' : sql` AND Profile.deleted != true`} 
+          ${withDeleted ? sql`` : sql` AND Profile.deleted != true`} 
           ORDER BY 
             CASE 
                 WHEN profileRole = 'owner' THEN 1
