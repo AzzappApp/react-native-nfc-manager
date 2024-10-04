@@ -18,6 +18,7 @@ import {
   getLastSubscription,
   getFilterCoverTemplateTypes,
   getCoverTemplatesByTypesAndTag,
+  countWebCardPayments,
 } from '@azzapp/data';
 import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { buildCoverAvatarUrl } from '#externals';
@@ -443,7 +444,7 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
       { after, first },
       {
         sliceStart: offset,
-        arrayLength: await countWebCardProfiles(webCard.id),
+        arrayLength: await countWebCardPayments(webCard.id),
       },
     );
   },
