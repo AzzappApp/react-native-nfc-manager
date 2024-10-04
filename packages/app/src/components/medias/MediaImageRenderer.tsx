@@ -11,7 +11,10 @@ import {
   useState,
 } from 'react';
 import { StyleSheet, View } from 'react-native';
-import SnapshotView, { snapshotView } from '#components/SnapshotView';
+import {
+  captureSnapshot,
+  SnapshotRenderer,
+} from '@azzapp/react-native-snapshot-view';
 import { useLocalCachedMediaFile } from '#helpers/mediaHelpers/LocalMediaCache';
 import type { ImageErrorEventData } from 'expo-image';
 import type { ForwardedRef } from 'react';
@@ -123,7 +126,7 @@ const MediaImageRenderer = (
         if (containerRef.current) {
           _imageSnapshots.set(
             sourceRef.current.mediaId,
-            await snapshotView(containerRef.current),
+            await captureSnapshot(containerRef.current),
           );
         }
       },
@@ -207,8 +210,7 @@ const MediaImageRenderer = (
         />
       )}
       {snapshotID && (
-        <SnapshotView
-          clearOnUnmount
+        <SnapshotRenderer
           snapshotID={snapshotID}
           style={StyleSheet.absoluteFill}
         />

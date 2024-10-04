@@ -78,6 +78,7 @@ __metadata:
   dependencies:
     "@azzapp/i18n": "workspace:^"
     "@azzapp/react-native-skia-video": "npm:v0.5.1"
+    "@azzapp/react-native-snapshot-view": "npm:^0.1.1"
     "@azzapp/shared": "workspace:^"
     "@expo-google-fonts/amatic-sc": "npm:^0.2.3"
     "@expo-google-fonts/anton": "npm:^0.2.3"
@@ -369,6 +370,16 @@ __metadata:
     react-native: "*"
     react-native-reanimated: ">= 3.15.0"
   checksum: 10/5a3e6dd322ec94faae5f8d475cb1a540a6bbdab0af225ae8c832d4af5f2a98190000696e1436682792296e922880383feccdcf3d34f0a1bfda06ab3b2cc124d3
+  languageName: node
+  linkType: hard
+
+"@azzapp/react-native-snapshot-view@npm:^0.1.1":
+  version: 0.1.1
+  resolution: "@azzapp/react-native-snapshot-view@npm:0.1.1"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 10/6fa11ff6d87a5516af05e3221246c2b0c8b8097bc00b003ab83986bc1238e4b6eb3703c7e65335d86cc19b6e135f024277cb189a0d2ee585208e0cdbfe4ab27c
   languageName: node
   linkType: hard
 

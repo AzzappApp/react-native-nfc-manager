@@ -24,6 +24,27 @@ PODS:
     - ReactCommon/turbomodule/core
     - RNReanimated
     - Yoga
+  - azzapp-react-native-snapshot-view (0.1.1):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.01.01.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
   - boost (1.84.0)
   - DoubleConversion (1.1.6)
   - DVAssetLoaderDelegate (0.3.3)
@@ -2189,6 +2210,7 @@ PODS:
 
 DEPENDENCIES:
   - "azzapp-react-native-skia-video (from `../../../node_modules/@azzapp/react-native-skia-video`)"
+  - "azzapp-react-native-snapshot-view (from `../../../node_modules/@azzapp/react-native-snapshot-view`)"
   - boost (from `../../../node_modules/react-native/third-party-podspecs/boost.podspec`)
   - DoubleConversion (from `../../../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - DVAssetLoaderDelegate
@@ -2338,6 +2360,8 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   azzapp-react-native-skia-video:
     :path: "../../../node_modules/@azzapp/react-native-skia-video"
+  azzapp-react-native-snapshot-view:
+    :path: "../../../node_modules/@azzapp/react-native-snapshot-view"
   boost:
     :podspec: "../../../node_modules/react-native/third-party-podspecs/boost.podspec"
   DoubleConversion:
@@ -2559,7 +2583,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
-  azzapp-react-native-skia-video: 81bd4b0f431c4cf8840d2e520358f45753967c9e
+  azzapp-react-native-skia-video: 2f2b48ef7ec5dddaa0de1325386f96161cbcc091
+  azzapp-react-native-snapshot-view: 9555fc6434e7d41ae76865a6985e763a1efb66ae
   boost: 4cb898d0bf20404aab1850c656dcea009429d6c1
   DoubleConversion: 76ab83afb40bddeeee456813d9c04f67f78771b5
   DVAssetLoaderDelegate: 0caec20e4e08b8560b691131539e9180024d4bce
@@ -2638,7 +2663,7 @@ SPEC CHECKSUMS:
   react-native-quick-base64: f98f17faf04c9779faf726921a2b389d4775e8b6
   react-native-safe-area-context: 851c62c48dce80ccaa5637b6aa5991a1bc36eca9
   react-native-skia: 00e92fdc3e2e9e7d6df254296d2f3e8c548224af
-  react-native-skottie-template-player: 1796ae03e1225d7c5fdaaeda5ce63792c3122e31
+  react-native-skottie-template-player: fe4f9b24aaf3dfde4f953ac6c40d64ec2712ffe0
   react-native-video: 50e74e7d12e0931c83e21ceef38498f5ba785ded
   react-native-webview: 7aaf4bb5b2ec08901c821aceb4b55908ad012b04
   React-nativeconfig: 4a9543185905fe41014c06776bf126083795aed9
@@ -2693,7 +2718,7 @@ SPEC CHECKSUMS:
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   SPTPersistentCache: df36ea46762d7cf026502bbb86a8b79d0080dff4
   VisionCamera: b08345ad559243834112380d3fd2a839de794215
-  Yoga: 4ef80d96a5534f0e01b3055f17d1e19a9fc61b63
+  Yoga: 1354c027ab07c7736f99a3bef16172d6f1b12b47
 
 PODFILE CHECKSUM: e668bbb6dc7e86cdf39d6504e504feb4acfa5946
 

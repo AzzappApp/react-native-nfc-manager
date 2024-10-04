@@ -22,6 +22,7 @@
   "dependencies": {
     "@azzapp/i18n": "workspace:^",
     "@azzapp/react-native-skia-video": "v0.5.1",
+    "@azzapp/react-native-snapshot-view": "^0.1.1",
     "@azzapp/shared": "workspace:^",
     "@expo-google-fonts/amatic-sc": "^0.2.3",
     "@expo-google-fonts/anton": "^0.2.3",

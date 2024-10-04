@@ -11,7 +11,10 @@ import {
 } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Video from 'react-native-video';
-import SnapshotView, { snapshotView } from '#components/SnapshotView';
+import {
+  captureSnapshot,
+  SnapshotRenderer,
+} from '@azzapp/react-native-snapshot-view';
 import { useLocalCachedMediaFile } from '#helpers/mediaHelpers/LocalMediaCache';
 import { DelayedActivityIndicator } from '#ui/ActivityIndicator/ActivityIndicator';
 import MediaImageRenderer from './MediaImageRenderer';
@@ -153,7 +156,7 @@ const MediaVideoRenderer = (
         if (containerRef.current) {
           _videoSnapshots.set(
             sourceRef.current.mediaId,
-            await snapshotView(containerRef.current),
+            await captureSnapshot(containerRef.current),
           );
         }
       },
@@ -272,8 +275,7 @@ const MediaVideoRenderer = (
         />
       )}
       {snapshotID && (
-        <SnapshotView
-          clearOnUnmount
+        <SnapshotRenderer
           snapshotID={snapshotID}
           style={StyleSheet.absoluteFill}
         />
