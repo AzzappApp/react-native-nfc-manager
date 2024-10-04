@@ -41,6 +41,7 @@ export type CoverEditorState = {
 
   // cover preview informations
   coverPreviewPositionPercentage?: number | null;
+  shouldComputeCoverPreviewPositionPercentage: boolean;
 };
 
 export type CardColors = Readonly<

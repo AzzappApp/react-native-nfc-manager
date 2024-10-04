@@ -282,6 +282,11 @@ const CoverEditorCore = (
     const cardColors =
       profile.webCard?.cardColors ?? coverTemplate?.colorPalette ?? {};
 
+    // if we create a new cover without a new template and there is no cover already done
+    // then we should interpolate the cover preview position
+    const shouldComputeCoverPreviewPositionPercentage =
+      !coverTemplate && !coverInitialState?.lottie;
+
     return {
       isModified: false,
       lottie,
@@ -311,6 +316,7 @@ const CoverEditorCore = (
       loadingLocalMedia: false,
       loadingError: null,
       coverPreviewPositionPercentage: coverTemplate?.previewPositionPercentage,
+      shouldComputeCoverPreviewPositionPercentage,
 
       ...coverInitialState,
     };

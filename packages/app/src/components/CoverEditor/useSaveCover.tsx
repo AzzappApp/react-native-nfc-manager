@@ -18,7 +18,7 @@ import { waitTime } from '@azzapp/shared/asyncHelpers';
 import { createRandomFilePath, getFileName } from '#helpers/fileHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadSign } from '#helpers/MobileWebAPI';
-import coverDrawer from './coverDrawer';
+import coverDrawer, { coverTransitions } from './coverDrawer';
 import {
   mediaInfoIsImage,
   createCoverSkottieWithColorReplacement,
@@ -32,7 +32,12 @@ import {
 } from './coverEditorHelpers';
 import coverLocalStore from './coversLocalStore';
 import type { useSaveCoverMutation } from '#relayArtifacts/useSaveCoverMutation.graphql';
-import type { CoverEditorState } from './coverEditorTypes';
+import type {
+  CoverEditorState,
+  MediaInfo,
+  MediaInfoImage,
+  MediaInfoVideo,
+} from './coverEditorTypes';
 import type { Sink } from 'relay-runtime/lib/network/RelayObservable';
 
 export type SavingStatus =
@@ -46,6 +51,12 @@ type ProgressCallback = (progress: {
   framesCompleted: number;
   nbFrames: number;
 }) => void;
+
+const getMediaDuration = (media: MediaInfo) => {
+  const imgInfo = media as MediaInfoImage;
+  const vidInfo = media as MediaInfoVideo;
+  return (imgInfo?.duration || 0) + (vidInfo?.timeRange?.duration || 0);
+};
 
 const useSaveCover = (
   webCardId: string | null,
@@ -151,9 +162,32 @@ const useSaveCover = (
     setSavingStatus('saving');
 
     const texts = coverEditorState.textLayers.map(({ text }) => text);
-    const { backgroundColor, cardColors, coverPreviewPositionPercentage } =
-      coverEditorState;
+    const {
+      backgroundColor,
+      cardColors,
+      coverPreviewPositionPercentage,
+      shouldComputeCoverPreviewPositionPercentage,
+      coverTransition,
+    } = coverEditorState;
 
+    let _coverPreviewPositionPercentage = coverPreviewPositionPercentage;
+    // compute cover preview percentage for manually created cover
+    if (shouldComputeCoverPreviewPositionPercentage) {
+      // full duration of cover
+      const fullDuration = coverEditorState.medias.reduce((acc, media) => {
+        return acc + getMediaDuration(media);
+      }, 0);
+      // duration of first cover
+      const firstMediaDuration = getMediaDuration(coverEditorState.medias[0]);
+      // remove transition duration
+      const transitionDuration =
+        (coverTransition && coverTransitions[coverTransition].duration) || 0;
+      const expectedPosition = firstMediaDuration - transitionDuration;
+      // move to percent
+      _coverPreviewPositionPercentage = Math.floor(
+        (expectedPosition * 100) / fullDuration,
+      );
+    }
     try {
       await new Promise<void>((resolve, reject) => {
         commit({
@@ -163,7 +197,7 @@ const useSaveCover = (
               mediaId: public_id,
               texts,
               backgroundColor: backgroundColor ?? 'light',
-              coverPreviewPositionPercentage,
+              coverPreviewPositionPercentage: _coverPreviewPositionPercentage,
               cardColors,
               dynamicLinks: coverEditorState.linksLayer,
             },
