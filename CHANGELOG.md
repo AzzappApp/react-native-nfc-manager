@@ -1,5 +1,6 @@
-## 0.9.10-canary.8
+## 0.9.10-canary.9
 
+* **fix:**  - withDeleted query case ([#5247](https://github.com/AzzappApp/azzapp/pull/5247))
 * **feat:**  - contact scan ([#5225](https://github.com/AzzappApp/azzapp/pull/5225))
 * **build:**  - try to put back on fra1
 * **feat:**  - **web:** add a new page support redirect on page indicating email signature cannot be managed on mobile devices ([#5217](https://github.com/AzzappApp/azzapp/pull/5217))
