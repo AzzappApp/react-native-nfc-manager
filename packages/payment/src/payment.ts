@@ -184,8 +184,11 @@ export const createPaymentRequest = async ({
     if (subscription && subscription.status === 'active') {
       throw new Error('Subscription already active');
     }
+    const subscriptionId = createId();
 
     await createSubscription({
+      id: subscriptionId,
+      subscriptionId,
       userId,
       webCardId,
       issuer: 'web',

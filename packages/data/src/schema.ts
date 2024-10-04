@@ -794,6 +794,7 @@ export const UserSubscriptionTable = cols.table(
       'web.yearly',
       'web.lifetime',
     ]),
+    subscriptionId: cols.text('subscriptionId').notNull(),
     totalSeats: cols.int('totalSeats').default(0).notNull(),
     freeSeats: cols.int('freeSeats').default(0).notNull(),
     revenueCatId: cols.text('revenueCatId'),
