@@ -137,7 +137,6 @@ const DownloadVCard = ({
   const [appClipWasOpen, setAppClipWasOpen] = useState(false);
   const showAppClip = useCallback(
     async (e: React.MouseEvent<HTMLAnchorElement>) => {
-      console.log('opening appclip');
       e.preventDefault();
       const appClipUrl = `${process.env.NEXT_PUBLIC_APPLE_APP_CLIP_URL}&url=${encodeURIComponent(window.location.href)}`;
 
@@ -150,7 +149,6 @@ const DownloadVCard = ({
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'hidden') {
-        console.log('App Clip is closed or user navigated away');
         // Show the shareback here
         if (appClipWasOpen) {
           handleClose();

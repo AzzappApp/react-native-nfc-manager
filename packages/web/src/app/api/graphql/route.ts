@@ -21,6 +21,7 @@ import ERRORS from '@azzapp/shared/errors';
 import { AZZAPP_SERVER_HEADER } from '@azzapp/shared/urlHelpers';
 import queryMap from '#persisted-query-map.json';
 import { buildCoverAvatarUrl } from '#helpers/avatar';
+import { sendPushNotification } from '#helpers/notificationsHelpers';
 import { withPluginsRoute } from '#helpers/queries';
 import { notifyUsers } from '#helpers/sendMessages';
 import { getSessionData } from '#helpers/tokens';
@@ -146,6 +147,7 @@ const { handleRequest } = createYoga({
       notifyUsers,
       validateMailOrPhone,
       buildCoverAvatarUrl,
+      sendPushNotification,
     };
   },
   plugins: [

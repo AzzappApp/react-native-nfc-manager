@@ -80,6 +80,10 @@ export type RelayScreenProps<
    * The preloaded query.
    */
   preloadedQuery: PreloadedQuery<P>;
+  /**
+   * A function to refresh the query.
+   */
+  refreshQuery?: () => void;
 };
 
 /**
@@ -149,6 +153,12 @@ function relayScreen<TRoute extends Route>(
         loadQueryFor(screenId, options, params);
       }
     }, [screenId, params, preloadedQuery, hasFocus]);
+
+    const refreshQuery = useCallback(() => {
+      if (!preloadedQuery && hasFocus) {
+        loadQueryFor(screenId, options, params, true);
+      }
+    }, [hasFocus, params, preloadedQuery, screenId]);
 
     const environment = useRelayEnvironment();
     useEffect(() => {
@@ -268,7 +278,11 @@ function relayScreen<TRoute extends Route>(
     const inner = (
       <Suspense fallback={Fallback ? <Fallback {...props} /> : null}>
         {preloadedQuery && (
-          <Component {...props} preloadedQuery={preloadedQuery} />
+          <Component
+            {...props}
+            preloadedQuery={preloadedQuery}
+            refreshQuery={refreshQuery}
+          />
         )}
       </Suspense>
     );

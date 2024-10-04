@@ -1,0 +1,7 @@
+extend type Mutation {
+  deleteFCMToken(input: DeleteFCMTokenInput!): Boolean!
+}
+
+input DeleteFCMTokenInput {
+  deviceId: ID!
+}

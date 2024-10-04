@@ -19,7 +19,7 @@ import {
   isInternationalPhoneNumber,
   isValidEmail,
 } from '@azzapp/shared/stringHelpers';
-import { notifyUsers } from '#externals';
+import { notifyUsers, sendPushNotification } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
 import {
   profileLoader,
@@ -146,9 +146,16 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
       };
 
       await referencesMedias(addedMedia, []);
-
       if (existingProfileId) {
         await updateProfile(existingProfileId, profileData);
+        const locale = guessLocale(existingUser?.locale ?? user.locale);
+        await sendPushNotification(userId, {
+          type: 'multiuser_invitation',
+          mediaId: webCard.coverMediaId,
+          deepLink: 'multiuser_invitation',
+          localeParams: { userName: webCard.userName },
+          locale,
+        });
 
         return {
           profile: {

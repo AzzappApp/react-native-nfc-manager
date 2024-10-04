@@ -34,6 +34,7 @@ export const homeScreenQuery = graphql`
 const HomeScreen = ({
   preloadedQuery,
   hasFocus,
+  refreshQuery,
 }: RelayScreenProps<HomeRoute, HomeScreenQuery>) => {
   //we need to wait the initial screen to be load before doing any deep link
   useDeepLinkStoredRoute();
@@ -69,7 +70,7 @@ const HomeScreen = ({
   return (
     <Suspense>
       <HomeScreenProvider userKey={currentUser}>
-        <HomeScreenContent user={currentUser} />
+        <HomeScreenContent user={currentUser} refreshQuery={refreshQuery} />
       </HomeScreenProvider>
     </Suspense>
   );

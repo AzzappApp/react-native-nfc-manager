@@ -6,6 +6,7 @@ import createPost from './createPost';
 import createPostCommentMutation from './createPostComment';
 import createWebCard from './createWebCard';
 import declineOwnership from './declineOwnership';
+import deleteFCMToken from './deleteFCMToken';
 import deleteModules from './deleteModules';
 import deletePost from './deletePost';
 import deletePostComment from './deletePostComment';
@@ -45,6 +46,7 @@ import saveCardStyle from './saveCardStyle';
 import saveCommonInformation from './saveCommonInformation';
 import saveContactCard from './saveContactCard';
 import saveCover from './saveCover';
+import saveFCMToken from './saveFCMToken';
 import sendInvitations from './sendInvitations';
 import sendReport from './sendReport';
 import toggleFollowing from './toggleFollowing';
@@ -118,6 +120,8 @@ export const Mutation: MutationResolvers = {
   updateSubscriptionCustomer,
   deleteUser,
   addContact,
+  saveFCMToken,
+  deleteFCMToken,
 };
 
 export default Mutation;

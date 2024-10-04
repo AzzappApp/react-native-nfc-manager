@@ -6,9 +6,11 @@ import {
   getContactByProfiles,
   updateContact,
 } from '@azzapp/data';
+import { guessLocale } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
+import { sendPushNotification } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
-import { profileLoader } from '#loaders';
+import { profileLoader, userLoader } from '#loaders';
 import type { MutationResolvers } from '#__generated__/types';
 import type { Contact } from '@azzapp/data';
 
@@ -22,7 +24,7 @@ const addContact: MutationResolvers['addContact'] = async (
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
   const profileId = fromGlobalId(gqlProfileId).id;
-
+  const user = await userLoader.load(userId);
   const profile = await profileLoader.load(profileId);
 
   if (!profile || profile.userId !== userId) {
@@ -127,6 +129,13 @@ const addContact: MutationResolvers['addContact'] = async (
         firstName: profile.contactCard?.firstName ?? undefined,
         lastName: profile.contactCard?.lastName ?? undefined,
         title: profile.contactCard?.title ?? undefined,
+      });
+      await sendPushNotification(profile.userId, {
+        type: 'shareBack',
+        mediaId: null,
+        sound: 'default',
+        deepLink: 'shareBack',
+        locale: guessLocale(user?.locale),
       });
     }
   }

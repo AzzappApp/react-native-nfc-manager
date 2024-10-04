@@ -10,6 +10,7 @@ import {
   getUserById,
   saveShareBack,
 } from '@azzapp/data';
+import { guessLocale } from '@azzapp/i18n';
 import { buildVCardFromShareBackContact } from '@azzapp/shared/vCardHelpers';
 import { ShareBackFormSchema } from '#components/ShareBackModal/shareBackFormSchema';
 import {
@@ -18,6 +19,7 @@ import {
 } from '#helpers/contactMethodsHelpers';
 import { sendEmail } from '#helpers/emailHelpers';
 import { getServerIntl } from '#helpers/i18nHelpers';
+import { sendPushNotification } from '#helpers/notificationsHelpers';
 import {
   getValuesFromSubmitData,
   shareBackSignature,
@@ -140,6 +142,14 @@ export const processShareBackSubmission = async (
     await saveShareBack({
       profileId: profile.id,
       ...submission.payload,
+    });
+
+    await sendPushNotification(profile.userId, {
+      type: 'shareBack',
+      mediaId: null,
+      sound: 'default',
+      deepLink: 'shareBack',
+      locale: guessLocale(user?.locale),
     });
 
     if (contactMethod.method === CONTACT_METHODS.SMS) {

@@ -25,6 +25,7 @@ setup_permissions([
    'Contacts',
    'PhotoLibrary',
    'Microphone',
+   'Notifications'
 ])  
 $RNFirebaseAsStaticFramework = true
 $RNFirebaseAnalyticsEnableAdSupport = true # enable Firebase Analytics to generate automatic audience metrics for iOS 
@@ -53,6 +54,7 @@ abstract_target 'common' do
   pod 'Firebase', :modular_headers => true
   pod 'FirebaseCore', :modular_headers => true
   pod 'FirebaseAnalytics', :modular_headers => true
+  pod 'FirebaseMessaging', :modular_headers => true
   pod 'GoogleUtilities', :modular_headers => true
 
   config = use_native_modules!

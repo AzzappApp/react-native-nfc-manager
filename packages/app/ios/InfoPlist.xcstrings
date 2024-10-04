@@ -126,6 +126,24 @@
           }
         }
       }
+    },
+    "NSUserNotificationsUsageDescription" : {
+      "comment" : "Privacy - User Notifications Usage Description",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "azzapp wants to send you notifications"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "azzapp shouaite vous envoyer des notifications"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

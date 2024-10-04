@@ -9,6 +9,7 @@ import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import relayScreen from '#helpers/relayScreen';
+import { useDeleteNotifications } from '#hooks/useNotifications';
 import useToggle from '#hooks/useToggle';
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';
@@ -65,6 +66,8 @@ const AccountDetailsScreen = ({
     }
   `);
 
+  const deleteFcmToken = useDeleteNotifications();
+
   const deleteMyAccount = useCallback(() => {
     Alert.alert(
       intl.formatMessage({
@@ -97,7 +100,9 @@ const AccountDetailsScreen = ({
             commit({
               variables: {},
               onCompleted: () => {
-                void dispatchGlobalEvent({ type: 'SIGN_OUT' });
+                deleteFcmToken().finally(() => {
+                  void dispatchGlobalEvent({ type: 'SIGN_OUT' });
+                });
               },
               onError: (e: Error) => {
                 if (e.message === ERRORS.SUBSCRIPTION_IS_ACTIVE) {
@@ -126,7 +131,7 @@ const AccountDetailsScreen = ({
         },
       ],
     );
-  }, [commit, intl]);
+  }, [commit, deleteFcmToken, intl]);
 
   if (!currentUser) {
     return null;

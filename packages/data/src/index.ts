@@ -37,6 +37,7 @@ export type {
   CoverTemplateType,
   CoverText,
   CoverTextType,
+  FCMToken,
   Follow,
   LocalizationMessage,
   Media,

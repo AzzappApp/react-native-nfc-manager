@@ -1003,7 +1003,7 @@ export const ShareBackTable = cols.table('ShareBack', {
 export type ShareBack = InferSelectModel<typeof ShareBackTable>;
 //#endregion
 
-// #region ShareBack
+// #region ContactTable
 export const ContactTable = cols.table(
   'Contact',
   {
@@ -1043,4 +1043,32 @@ export const ContactTable = cols.table(
   },
 );
 export type Contact = InferSelectModel<typeof ContactTable>;
+//#endregion
+
+// #region FCMToken
+export const FCMTokenTable = cols.table(
+  'FCMToken',
+  {
+    deviceId: cols.defaultVarchar('deviceId').notNull(),
+    userId: cols.cuid('userId').notNull(),
+    fcmToken: cols.defaultVarchar('fcmToken').notNull(),
+    deviceOS: cols.defaultVarchar('deviceOS').notNull(),
+    deviceType: cols.defaultVarchar('deviceType').notNull(),
+    createdAt: cols
+      .dateTime('createdAt')
+      .notNull()
+      .default(DEFAULT_DATETIME_VALUE),
+    updatedAt: cols
+      .dateTime('updatedAt')
+      .notNull()
+      .default(DEFAULT_DATETIME_VALUE), //to help catch OLD fcm token
+  },
+  table => {
+    return {
+      id: cols.primaryKey({ columns: [table.userId, table.deviceId] }),
+    };
+  },
+);
+export type FCMToken = InferSelectModel<typeof FCMTokenTable>;
+
 //#endregion

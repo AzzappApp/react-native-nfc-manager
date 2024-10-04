@@ -1,86 +1,98 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict>
-	<key>CFBundleIconName</key>
-	<string>${APP_ICON_NAME}</string>
-	<key>CFBundleDevelopmentRegion</key>
-	<string>en</string>
-	<key>CFBundleDisplayName</key>
-	<string>$(DISPLAY_NAME)</string>
-	<key>CFBundleExecutable</key>
-	<string>$(EXECUTABLE_NAME)</string>
-	<key>CFBundleIdentifier</key>
-	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
-	<key>CFBundleName</key>
-	<string>$(PRODUCT_NAME)</string>
-	<key>CFBundlePackageType</key>
-	<string>APPL</string>
-	<key>CFBundleShortVersionString</key>
-	<string>0.9.10</string>
-	<key>CFBundleSignature</key>
-	<string>????</string>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>azzapp</string>
-			</array>
-		</dict>
-	</array>
-	<key>CFBundleVersion</key>
-	<string>15</string>
-	<key>LSRequiresIPhoneOS</key>
-	<true />
-	<key>NSAppTransportSecurity</key>
 	<dict>
-		<key>NSAllowsArbitraryLoads</key>
+		<key>CFBundleDevelopmentRegion</key>
+		<string>en</string>
+		<key>CFBundleDisplayName</key>
+		<string>$(DISPLAY_NAME)</string>
+		<key>CFBundleExecutable</key>
+		<string>$(EXECUTABLE_NAME)</string>
+		<key>CFBundleIconName</key>
+		<string>${APP_ICON_NAME}</string>
+		<key>CFBundleIdentifier</key>
+		<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+		<key>CFBundleInfoDictionaryVersion</key>
+		<string>6.0</string>
+		<key>CFBundleName</key>
+		<string>$(PRODUCT_NAME)</string>
+		<key>CFBundlePackageType</key>
+		<string>APPL</string>
+		<key>CFBundleShortVersionString</key>
+		<string>0.9.10</string>
+		<key>CFBundleSignature</key>
+		<string>????</string>
+		<key>CFBundleURLTypes</key>
+		<array>
+			<dict>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>azzapp</string>
+				</array>
+			</dict>
+		</array>
+		<key>CFBundleVersion</key>
+		<string>15</string>
+		<key>ITSAppUsesNonExemptEncryption</key>
 		<false />
-		<key>NSAllowsLocalNetworking</key>
+		<key>LSRequiresIPhoneOS</key>
+		<true />
+		<key>NSAppTransportSecurity</key>
+		<dict>
+			<key>NSAllowsArbitraryLoads</key>
+			<false />
+			<key>NSAllowsLocalNetworking</key>
+			<true />
+		</dict>
+		<key>NSCameraUsageDescription</key>
+		<string>$(PRODUCT_NAME) needs access to your camera to capture photos and videos for sharing
+			within the app.</string>
+		<key>NSContactsUsageDescription</key>
+		<string>Allow $(PRODUCT_NAME) to access your contacts to easily invite friends to join a
+			multi-user WebCard.</string>
+		<key>NSMicrophoneUsageDescription</key>
+		<string>$(PRODUCT_NAME) needs access to your microphone to record audio for video content within
+			the app.</string>
+		<key>NSMotionUsageDescription</key>
+		<string>$(PRODUCT_NAME) uses motion detection to optimize the display of your contact card based
+			on your device’s orientation.</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>$(PRODUCT_NAME) requires access to your photo library, in order to create your WebCard,
+			share and upload media.</string>
+		<key>NSUserNotificationsUsageDescription</key>
+		<string>$(PRODUCT_NAME) wants to send you notifications.</string>
+		<key>PHPhotoLibraryPreventAutomaticLimitedAccessAlert</key>
+		<true />
+		<key>UIAppFonts</key>
+		<array>
+			<string>PlusJakartaSans-SemiBold.ttf</string>
+			<string>PlusJakartaSans-Regular.ttf</string>
+			<string>PlusJakartaSans-Medium.ttf</string>
+			<string>PlusJakartaSans-ExtraBold.ttf</string>
+			<string>PlusJakartaSans-Bold.ttf</string>
+			<string>Azzapp.ttf</string>
+			<string>HelveticaNeue.ttf</string>
+			<string>HelveticaNeue-Bold.ttf</string>
+			<string>HelveticaNeue-Medium.ttf</string>
+		</array>
+		<key>UIBackgroundModes</key>
+		<array>
+			<string>fetch</string>
+			<string>remote-notification</string>
+		</array>
+		<key>UILaunchStoryboardName</key>
+		<string>BootSplash.storyboard</string>
+		<key>UIRequiredDeviceCapabilities</key>
+		<array>
+			<string>arm64</string>
+		</array>
+		<key>UIStatusBarStyle</key>
+		<string></string>
+		<key>UISupportedInterfaceOrientations</key>
+		<array>
+			<string>UIInterfaceOrientationPortrait</string>
+		</array>
+		<key>UIViewControllerBasedStatusBarAppearance</key>
 		<true />
 	</dict>
-	<key>NSCameraUsageDescription</key>
-	<string>$(PRODUCT_NAME) needs access to your camera to capture photos and videos for sharing within the app.</string>
-	<key>NSContactsUsageDescription</key>
-	<string>Allow $(PRODUCT_NAME) to access your contacts to easily invite friends to join a multi-user WebCard.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>$(PRODUCT_NAME) needs access to your microphone to record audio for video content within the app.</string>
-	<key>NSMotionUsageDescription</key>
-	<string>$(PRODUCT_NAME) uses motion detection to optimize the display of your contact card based on your device’s orientation.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>$(PRODUCT_NAME) requires access to your photo library, in order to create your WebCard, share and upload media.</string>
-	<key>PHPhotoLibraryPreventAutomaticLimitedAccessAlert</key>
-	<true />
-	<key>UIAppFonts</key>
-	<array>
-		<string>PlusJakartaSans-SemiBold.ttf</string>
-		<string>PlusJakartaSans-Regular.ttf</string>
-		<string>PlusJakartaSans-Medium.ttf</string>
-		<string>PlusJakartaSans-ExtraBold.ttf</string>
-		<string>PlusJakartaSans-Bold.ttf</string>
-		<string>Azzapp.ttf</string>
-		<string>HelveticaNeue.ttf</string>
-		<string>HelveticaNeue-Bold.ttf</string>
-		<string>HelveticaNeue-Medium.ttf</string>
-	</array>
-	<key>UILaunchStoryboardName</key>
-	<string>BootSplash.storyboard</string>
-	<key>UIRequiredDeviceCapabilities</key>
-	<array>
-		<string>arm64</string>
-	</array>
-	<key>UIStatusBarStyle</key>
-	<string />
-	<key>UISupportedInterfaceOrientations</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-	</array>
-	<key>UIViewControllerBasedStatusBarAppearance</key>
-	<true />
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false />
-</dict>
 </plist>
