@@ -1,5 +1,6 @@
-## 0.9.10-canary.11
+## 0.9.10-canary.12
 
+* **feat:**  - **payment:** add configuration for recurrence ([#5015](https://github.com/AzzappApp/azzapp/pull/5015))
 * **fix:**  - compute preview position for manually created covers ([#5251](https://github.com/AzzappApp/azzapp/pull/5251))
 * **fix:**  - **webCard:** [#5232](https://github.com/AzzappApp/azzapp/pull/5232) set default percentage for preview ([#5245](https://github.com/AzzappApp/azzapp/pull/5245))
 * **fix:**  - **multiUser:** [#5249](https://github.com/AzzappApp/azzapp/pull/5249) remove deletion flags ([#5250](https://github.com/AzzappApp/azzapp/pull/5250))
