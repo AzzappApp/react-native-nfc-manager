@@ -3,10 +3,7 @@ import {
   updateSubscription,
   createId,
 } from '@azzapp/data';
-import {
-  dateDiffInMinutes,
-  dateDiffInMonths,
-} from '@azzapp/shared/timeHelpers';
+import { dateDiffInMinutes } from '@azzapp/shared/timeHelpers';
 import { login } from '#authent';
 import client from '#client';
 import {
@@ -14,6 +11,8 @@ import {
   calculateNextPaymentIntervalInMinutes,
   calculateTaxes,
   generateRebillFailRule,
+  MONTHLY_RECURRENCE,
+  YEARLY_RECURRENCE,
 } from '#helpers';
 import type { Customer } from '#types';
 import type { UserSubscription } from '@azzapp/data';
@@ -245,13 +244,14 @@ export const updateExistingSubscription = async ({
       }
     }
 
-    const intervalInMonths = dateDiffInMonths(
-      new Date(),
-      existingSubscription.endAt,
-    );
+    const currentDate = new Date();
+
+    const intervalInMonths =
+      Math.floor(currentDate.getTime() - existingSubscription.endAt.getTime()) /
+      MONTHLY_RECURRENCE;
 
     const intervalInMinutes = dateDiffInMinutes(
-      new Date(),
+      currentDate,
       existingSubscription.endAt,
     );
 
@@ -262,7 +262,7 @@ export const updateExistingSubscription = async ({
             existingSubscription.subscriptionPlan,
           ) *
             intervalInMonths) /
-            12,
+            Math.floor(YEARLY_RECURRENCE / MONTHLY_RECURRENCE),
         )
       : 0;
 

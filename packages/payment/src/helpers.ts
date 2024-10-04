@@ -1,8 +1,16 @@
+import ms from 'ms';
 import { sha256 } from '@azzapp/shared/crypto';
 import { getTaxRate } from '#taxes';
 import type { UserSubscription } from '@azzapp/data';
 
 export type SubscriptionPlan = UserSubscription['subscriptionPlan'];
+
+export const MONTHLY_RECURRENCE = ms(
+  process.env.PAYMENT_MONTHLY_RECURRENCE ?? '30d',
+);
+export const YEARLY_RECURRENCE = ms(
+  process.env.PAYMENT_YEARLY_RECURRENCE ?? '365d',
+);
 
 /**
  *
@@ -15,10 +23,12 @@ export const getNextPaymentDate = (
   previousEndDate?: Date,
 ) => {
   const endAt = new Date();
-  endAt.setDate(
-    (previousEndDate?.getDate() ?? 0) +
-      endAt.getDate() +
-      (subscriptionPlan === 'web.monthly' ? 30 : 365),
+  endAt.setDate((previousEndDate?.getDate() ?? 0) + endAt.getDate());
+  endAt.setTime(
+    endAt.getTime() +
+      (subscriptionPlan === 'web.monthly'
+        ? MONTHLY_RECURRENCE
+        : YEARLY_RECURRENCE),
   );
 
   return endAt;
@@ -33,7 +43,9 @@ export const calculateAmount = (
       ? totalSeats * 1.2
       : totalSeats * 0.99) *
       100 *
-      (subscriptionPlan === 'web.monthly' ? 1 : 12),
+      (subscriptionPlan === 'web.monthly'
+        ? 1
+        : Math.floor(YEARLY_RECURRENCE / MONTHLY_RECURRENCE)),
   ); // cents;
 };
 
@@ -52,7 +64,9 @@ export const calculateTaxes = async (
 export const calculateNextPaymentIntervalInMinutes = (
   subscriptionPlan: SubscriptionPlan,
 ) => {
-  return subscriptionPlan === 'web.monthly' ? 30 * 24 * 60 : 365 * 24 * 60;
+  return subscriptionPlan === 'web.monthly'
+    ? Math.floor(MONTHLY_RECURRENCE / 60000)
+    : Math.floor(YEARLY_RECURRENCE / 60000);
 };
 
 export const generateRebillFailRule = () => {

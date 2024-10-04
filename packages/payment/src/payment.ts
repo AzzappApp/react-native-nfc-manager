@@ -271,7 +271,7 @@ export const createSubscriptionRequest = async ({
         clientPaymentRequestUlid: paymentMeanId,
         rebill_manager_fail_rule: generateRebillFailRule(),
         rebill_manager_external_reference: subscriptionId,
-        rebill_manager_callback_url: `${process.env.NEXT_PUBLIC_WEB_URL}/api/webhook/subscription`,
+        rebill_manager_callback_url: `${process.env.NEXT_PUBLIC_URL}api/webhook/subscription`,
       },
     },
   );
