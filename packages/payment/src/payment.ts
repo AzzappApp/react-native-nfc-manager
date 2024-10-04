@@ -200,7 +200,6 @@ export const createPaymentRequest = async ({
       subscriberCountryCode: customer.countryCode,
       subscriberVatNumber: customer.vatNumber,
       startAt: date,
-      subscriptionId: createId(),
       subscriptionPlan,
       paymentMeanId: ulid,
       endAt: expirationDate,
@@ -470,6 +469,7 @@ export const generateInvoice = async (webCardId: string, paymentId: string) => {
         invoicedCountry: subscription.subscriberCountry ?? '',
         invoicedVat: subscription.subscriberVatNumber ?? '',
         invoicedPhone: subscription.subscriberPhoneNumber ?? '',
+        invoicedProduct: 'Azzapp PRO',
       },
     },
   );

@@ -789,7 +789,6 @@ export const UserSubscriptionTable = cols.table(
     id: cols.cuid('id').primaryKey().notNull().$defaultFn(createId),
     userId: cols.cuid('userId').notNull(),
     webCardId: cols.cuid('webCardId'),
-    subscriptionId: cols.text('subscriptionId').notNull(),
     subscriptionPlan: cols.enum('subscriptionPlan', [
       'web.monthly',
       'web.yearly',

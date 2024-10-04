@@ -1,8 +1,4 @@
-import {
-  getSubscriptionById,
-  updateSubscription,
-  createId,
-} from '@azzapp/data';
+import { getSubscriptionById, updateSubscription } from '@azzapp/data';
 import { dateDiffInMinutes } from '@azzapp/shared/timeHelpers';
 import { login } from '#authent';
 import client from '#client';
@@ -154,8 +150,6 @@ export const updateExistingSubscription = async ({
 
       const timeUntilNextPayment = dateDiffInMinutes(currentDate, endDate);
 
-      const subscriptionId = createId();
-
       const rebillManager = await client.POST(
         '/api/client-payment-requests/create-rebill-manager',
         {
@@ -172,7 +166,7 @@ export const updateExistingSubscription = async ({
             rebill_manager_rebill_period_mins: `${intervalInMinutes}`,
             clientPaymentRequestUlid: existingSubscription.paymentMeanId,
             rebill_manager_fail_rule: generateRebillFailRule(),
-            rebill_manager_external_reference: subscriptionId,
+            rebill_manager_external_reference: existingSubscription.id,
             rebill_manager_callback_url: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/webhook/subscription`,
           },
         },
@@ -195,7 +189,6 @@ export const updateExistingSubscription = async ({
       await updateSubscription(existingSubscription.id, {
         totalSeats: totalSeats ?? existingSubscription.totalSeats,
         rebillManagerId: newRebillManagerId,
-        subscriptionId,
         canceledAt: null,
         status: 'active',
         paymentMeanId: newPaymentMean,
@@ -286,8 +279,6 @@ export const updateExistingSubscription = async ({
         )
       : { amount: 0 };
 
-    const subscriptionId = createId();
-
     const rebillManager = await client.POST(
       '/api/client-payment-requests/create-rebill-manager',
       {
@@ -304,7 +295,7 @@ export const updateExistingSubscription = async ({
           rebill_manager_rebill_period_mins: `${calculateNextPaymentIntervalInMinutes(existingSubscription.subscriptionPlan)}`,
           clientPaymentRequestUlid: existingSubscription.paymentMeanId,
           rebill_manager_fail_rule: generateRebillFailRule(),
-          rebill_manager_external_reference: subscriptionId,
+          rebill_manager_external_reference: existingSubscription.id,
           rebill_manager_callback_url: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/webhook/subscription`,
         },
       },
@@ -329,7 +320,6 @@ export const updateExistingSubscription = async ({
       amount,
       taxes,
       rebillManagerId: newRebillManagerId,
-      subscriptionId,
       canceledAt: null,
       status: 'active',
     });
@@ -382,8 +372,6 @@ export const upgradePlan = async (
 
     const token = await login();
 
-    const subscriptionId = createId();
-
     const rebillManager = await client.POST(
       '/api/client-payment-requests/create-rebill-manager',
       {
@@ -400,7 +388,7 @@ export const upgradePlan = async (
           rebill_manager_rebill_period_mins: `${intervalInMinutes}`,
           clientPaymentRequestUlid: existingSubscription.paymentMeanId,
           rebill_manager_fail_rule: generateRebillFailRule(),
-          rebill_manager_external_reference: subscriptionId,
+          rebill_manager_external_reference: existingSubscription.id,
           rebill_manager_callback_url: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/webhook/subscription`,
         },
       },
@@ -423,7 +411,6 @@ export const upgradePlan = async (
       rebillManagerId: rebillManager.data.rebillManagerId,
       amount,
       taxes,
-      subscriptionId,
     });
     return (await getSubscriptionById(existingSubscription.id))!;
   } else {
