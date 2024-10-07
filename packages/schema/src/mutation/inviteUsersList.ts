@@ -178,13 +178,11 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
     let createdProfileIds: string[] = [];
     if (profileToCreate.length) {
       createdProfileIds = await createProfiles(profileToCreate);
-
-      await Promise.all(
-        profilesToUpdate.map(({ id, ...profile }) =>
-          updateProfile(id, profile),
-        ),
-      );
     }
+
+    await Promise.all(
+      profilesToUpdate.map(({ id, ...profile }) => updateProfile(id, profile)),
+    );
 
     const createdProfiles = (
       await getProfilesByIds([

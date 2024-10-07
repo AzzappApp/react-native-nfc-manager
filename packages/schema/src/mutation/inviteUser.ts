@@ -30,6 +30,7 @@ import {
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { checkSubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#__generated__/types';
+import type { Profile } from '@azzapp/data';
 
 const inviteUserMutation: MutationResolvers['inviteUser'] = async (
   _,
@@ -96,7 +97,7 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
       );
 
       let userId: string;
-      let existingProfileId: string | undefined;
+      let existingProfile: Profile | null = null;
 
       if (!existingUser) {
         userId = await createUser({
@@ -108,16 +109,16 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
       } else {
         userId = existingUser.id;
 
-        const existingProfile = await getProfileByUserAndWebCard(
+        const foundProfile = await getProfileByUserAndWebCard(
           existingUser.id,
           webCard.id,
         );
 
-        if (existingProfile && !existingProfile.deleted) {
+        if (foundProfile && !foundProfile.deleted) {
           throw new GraphQLError(ERRORS.PROFILE_ALREADY_EXISTS);
         }
 
-        existingProfileId = existingProfile?.id;
+        existingProfile = foundProfile;
       }
 
       const { displayedOnWebCard, isPrivate, avatarId, logoId, ...data } =
@@ -144,10 +145,16 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
         deletedAt: null,
         deletedBy: null,
       };
+      await referencesMedias(
+        addedMedia,
+        [
+          existingProfile?.avatarId ?? null,
+          existingProfile?.logoId ?? null,
+        ].filter(mediaId => mediaId),
+      );
 
-      await referencesMedias(addedMedia, []);
-      if (existingProfileId) {
-        await updateProfile(existingProfileId, profileData);
+      if (existingProfile) {
+        await updateProfile(existingProfile.id, profileData);
         const locale = guessLocale(existingUser?.locale ?? user.locale);
         await sendPushNotification(userId, {
           type: 'multiuser_invitation',
@@ -160,7 +167,7 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
         return {
           profile: {
             ...profileData,
-            id: existingProfileId,
+            id: existingProfile.id,
           },
           existingUser,
         };
