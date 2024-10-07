@@ -1,4 +1,4 @@
-## 0.9.10-canary.22
+## 0.9.10-canary.23
 
 * **build:**  - fix provisioning profile
 * **build:**  - update gemfile.lock
