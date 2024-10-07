@@ -1,5 +1,6 @@
-## 0.9.10-canary.18
+## 0.9.10-canary.19
 
+* **build:**  - update gemfile.lock
 * **fix:**  - **analytics:** [#5268](https://github.com/AzzappApp/azzapp/pull/5268) don’t send ga event on server ([#5269](https://github.com/AzzappApp/azzapp/pull/5269))
 * **fix:**  - **subscription:** [#5054](https://github.com/AzzappApp/azzapp/pull/5054) update endAt to lifetime subscription ([#5256](https://github.com/AzzappApp/azzapp/pull/5256))
 * **perf:**  - add index on webCardId ([#5262](https://github.com/AzzappApp/azzapp/pull/5262))
