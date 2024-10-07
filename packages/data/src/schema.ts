@@ -830,6 +830,7 @@ export const UserSubscriptionTable = cols.table(
       userIdWebCardIDIdx: cols
         .index('userId_webCardId_idx')
         .on(table.userId, table.webCardId),
+      webCardIDIdx: cols.index('webCardId_idx').on(table.webCardId),
       statusExpirationDate: cols
         .index('status_expiration_date')
         .on(table.status, table.endAt, table.invalidatedAt),
