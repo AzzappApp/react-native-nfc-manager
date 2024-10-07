@@ -11,6 +11,7 @@ import { fromGlobalId } from 'graphql-relay';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Alert, Platform, StyleSheet, View } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { MMKV } from 'react-native-mmkv';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
@@ -55,6 +56,10 @@ const AddContactModal = ({
   user: userKey,
 }: Props) => {
   const [viewer, setViewer] = useState<string | null>(null);
+  const scrollerGesture = Gesture.Native();
+  const checkBoxGesture = Gesture.Native();
+
+  const nativeGestureItems = [checkBoxGesture, scrollerGesture];
 
   const webCard = useFragment(
     graphql`
@@ -88,8 +93,10 @@ const AddContactModal = ({
     profileId: string;
   } | null>(null);
 
+  const [isOpen, setIsOpen] = useState(false);
+
   const onClose = useCallback(() => {
-    setScanned(null);
+    setIsOpen(false);
   }, []);
 
   useEffect(() => {
@@ -102,6 +109,7 @@ const AddContactModal = ({
         );
         if (webCardId === fromGlobalId(webCard.id).id) {
           setScanned({ contact, profileId });
+          setIsOpen(true);
         }
       }
     })();
@@ -155,7 +163,7 @@ const AddContactModal = ({
           profileId: viewer,
         },
         onCompleted: () => {
-          setScanned(null);
+          setIsOpen(false);
         },
       });
     },
@@ -296,7 +304,13 @@ const AddContactModal = ({
   }, [scanned, webCard.userName]);
 
   return (
-    <BottomSheetModal visible={!!scanned} onRequestClose={onClose} height={650}>
+    <BottomSheetModal
+      visible={isOpen}
+      onRequestClose={onClose}
+      height={650}
+      nativeGestureItems={nativeGestureItems}
+      lazy={true}
+    >
       <Container style={styles.container}>
         <SafeAreaView
           style={styles.container}
@@ -319,6 +333,8 @@ const AddContactModal = ({
                 <Icon icon="close" />
               </PressableNative>
             }
+            middleElementStyle={styles.middleElement}
+            style={styles.header}
           />
           <View style={styles.section}>
             <CoverRenderer webCard={webCard} width={120} canPlay={false} />
@@ -327,17 +343,23 @@ const AddContactModal = ({
             <Icon icon="arrow_down" />
             <Icon icon="arrow_up" style={{ marginLeft: 10 }} />
           </View>
-          <AddContactModalProfiles user={userKey} onSelectProfile={setViewer} />
-          <CheckBox
-            label={intl.formatMessage({
-              defaultMessage: 'Share back your contact details',
-              description: 'AddContactModal - shareback title',
-            })}
-            labelStyle={styles.label}
-            status={withShareBack}
-            onValueChange={setWithShareBack}
-            style={styles.checkbox}
+          <AddContactModalProfiles
+            user={userKey}
+            onSelectProfile={setViewer}
+            nativeGesture={scrollerGesture}
           />
+          <GestureDetector gesture={checkBoxGesture}>
+            <CheckBox
+              label={intl.formatMessage({
+                defaultMessage: 'Share back your contact details',
+                description: 'AddContactModal - shareback title',
+              })}
+              labelStyle={styles.label}
+              style={styles.checkbox}
+              status={withShareBack}
+              onValueChange={setWithShareBack}
+            />
+          </GestureDetector>
           <Button
             loading={saving}
             style={styles.button}
@@ -491,6 +513,12 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 20,
+  },
+  middleElement: {
+    left: 0,
+  },
+  header: {
+    paddingHorizontal: 0,
   },
 });
 

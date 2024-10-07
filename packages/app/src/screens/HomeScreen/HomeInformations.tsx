@@ -1,19 +1,20 @@
-import { memo, useCallback, useEffect, useMemo } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import {
   useAnimatedReaction,
   interpolate,
   useSharedValue,
+  interpolateColor,
 } from 'react-native-reanimated';
 import { useFragment, graphql } from 'react-relay';
-import { colors } from '#theme';
-import AnimatedText from '#components/AnimatedText';
 import { useRouter } from '#components/NativeRouter';
-import PressableOpacity from '#ui/PressableOpacity';
-import Text from '#ui/Text';
+import { HomeButtonContactLink } from './HomeButtonContactLink';
+import { HomeButtonContactLinkCentral } from './HomeButtonContactLinkCentral';
 import { useHomeScreenContext } from './HomeScreenContext';
 import type { HomeInformations_user$key } from '#relayArtifacts/HomeInformations_user.graphql';
+import type { LayoutChangeEvent } from 'react-native';
+
 type HomeInformationsProps = {
   user: HomeInformations_user$key;
   height: number;
@@ -33,6 +34,7 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
       fragment HomeInformations_user on User {
         profiles {
           id
+          nbContacts
           webCard {
             id
             userName
@@ -41,11 +43,19 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
             nbFollowings
             nbFollowers
             nbPostsLiked
+            cardColors {
+              primary
+            }
           }
         }
       }
     `,
     user,
+  );
+
+  const nbContactsValue = useMemo(
+    () => [0, ...(profiles?.map(({ nbContacts }) => nbContacts) ?? [])],
+    [profiles],
   );
 
   const nbLikesValue = useMemo(
@@ -76,10 +86,22 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
     [profiles],
   );
 
+  const primaryColorValue = useMemo(
+    () => [
+      '#000000',
+      ...(profiles?.map(
+        ({ webCard }) => webCard?.cardColors?.primary ?? '#000000',
+      ) ?? []),
+    ],
+    [profiles],
+  );
+
   const nbPosts = useSharedValue('-1');
   const nbLikes = useSharedValue('-1');
   const nbFollowers = useSharedValue('-1');
   const nbFollowings = useSharedValue('-1');
+  const nbContacts = useSharedValue('-1');
+  const primaryColor = useSharedValue('#000000');
 
   const { currentIndexSharedValue, currentIndexProfile, inputRange } =
     useHomeScreenContext();
@@ -89,6 +111,8 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
     nbLikes.value = format(nbLikesValue[currentIndexProfile.value]);
     nbFollowings.value = format(nbFollowingsValue[currentIndexProfile.value]);
     nbFollowers.value = format(nbFollowersValue[currentIndexProfile.value]);
+    nbContacts.value = format(nbContactsValue[currentIndexProfile.value]);
+    primaryColor.value = primaryColorValue[currentIndexProfile.value];
   }, [
     currentIndexProfile,
     nbFollowers,
@@ -99,6 +123,10 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
     nbLikesValue,
     nbPosts,
     nbPostsValue,
+    nbContacts,
+    nbContactsValue,
+    primaryColor,
+    primaryColorValue,
   ]);
 
   useAnimatedReaction(
@@ -117,11 +145,21 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
         nbFollowings.value = format(
           interpolate(actual, inputRange.value, nbFollowingsValue),
         );
+        nbContacts.value = format(
+          interpolate(actual, inputRange.value, nbContactsValue),
+        );
+        primaryColor.value = interpolateColor(
+          actual,
+          inputRange.value,
+          primaryColorValue,
+        );
       } else if (actual >= 0) {
         nbPosts.value = format(nbPostsValue[actual]);
         nbLikes.value = format(nbLikesValue[actual]);
         nbFollowers.value = format(nbFollowersValue[actual]);
         nbFollowings.value = format(nbFollowingsValue[actual]);
+        nbContacts.value = format(nbContactsValue[actual]);
+        primaryColor.value = primaryColorValue[actual];
       }
     },
   );
@@ -159,52 +197,80 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
     });
   }, [router]);
 
+  const goToContacts = useCallback(() => {
+    router.push({
+      route: 'CONTACTS',
+    });
+  }, [router]);
+
+  const [circleWidth, setCircleWidth] = useState(100);
+
+  const onMainLayout = (event: LayoutChangeEvent) => {
+    const newHeight = event.nativeEvent.layout.height / 2 - 12;
+    setCircleWidth(newHeight);
+  };
+
   return (
-    <View style={[styles.container, { height }]}>
-      <View style={styles.row}>
-        <PressableOpacity style={styles.square} onPress={goToPosts}>
-          <AnimatedText variant="xlarge" text={nbPosts} appearance="dark" />
-          <Text variant="small" style={styles.text}>
+    <View style={[styles.container, { height }]} onLayout={onMainLayout}>
+      <View style={styles.row} pointerEvents="box-none">
+        <HomeButtonContactLink
+          svgFile={require('#assets/home-top-left.svg')}
+          count={nbPosts}
+          MessageComponent={
             <FormattedMessage
               defaultMessage="Posts"
               description="HomeScreen - information panel - Post label"
             />
-          </Text>
-        </PressableOpacity>
-        <PressableOpacity style={styles.square} onPress={goToLikedPost}>
-          <AnimatedText variant="xlarge" text={nbLikes} appearance="dark" />
-          <Text variant="small" style={styles.text}>
+          }
+          onPress={goToPosts}
+          isTop
+          isLeft
+        />
+        <HomeButtonContactLink
+          svgFile={require('#assets/home-top-right.svg')}
+          count={nbLikes}
+          MessageComponent={
             <FormattedMessage
               defaultMessage="Likes"
               description="HomeScreen - information panel - Likes label"
             />
-          </Text>
-        </PressableOpacity>
+          }
+          onPress={goToLikedPost}
+          isTop
+        />
       </View>
       <View style={styles.row}>
-        <PressableOpacity style={styles.square} onPress={goToFollower}>
-          <AnimatedText variant="xlarge" text={nbFollowers} appearance="dark" />
-          <Text variant="small" style={styles.text}>
+        <HomeButtonContactLink
+          svgFile={require('#assets/home-bottom-left.svg')}
+          count={nbFollowers}
+          MessageComponent={
             <FormattedMessage
               defaultMessage="Followers"
               description="HomeScreen - information panel - Followers label"
             />
-          </Text>
-        </PressableOpacity>
-        <PressableOpacity style={styles.square} onPress={goToFollowing}>
-          <AnimatedText
-            variant="xlarge"
-            text={nbFollowings}
-            appearance="dark"
-          />
-          <Text variant="small" style={styles.text}>
+          }
+          onPress={goToFollower}
+          isLeft
+        />
+        <HomeButtonContactLink
+          svgFile={require('#assets/home-bottom-right.svg')}
+          count={nbFollowings}
+          MessageComponent={
             <FormattedMessage
               defaultMessage="Followings"
               description="HomeScreen - information panel - Followings label"
             />
-          </Text>
-        </PressableOpacity>
+          }
+          onPress={goToFollowing}
+        />
       </View>
+      {/* central circle */}
+      <HomeButtonContactLinkCentral
+        circleWidth={circleWidth}
+        onPress={goToContacts}
+        primaryColor={primaryColor}
+        count={nbContacts}
+      />
     </View>
   );
 };
@@ -224,22 +290,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingVertical: 15,
-    rowGap: 12,
+    paddingVertical: 30,
   },
   row: {
     flexDirection: 'row',
     flex: 1,
-    columnGap: 12,
-  },
-  square: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 12,
-    flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.18)',
-  },
-  text: {
-    color: colors.white,
   },
 });

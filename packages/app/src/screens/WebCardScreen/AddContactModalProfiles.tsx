@@ -5,6 +5,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
+import { type GestureType } from 'react-native-gesture-handler';
 import { useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
@@ -23,9 +24,14 @@ import type { LayoutChangeEvent, ListRenderItemInfo } from 'react-native';
 type Props = {
   user: AddContactModalProfiles_user$key;
   onSelectProfile: (profileId: string) => void;
+  nativeGesture?: GestureType;
 };
 
-const AddContactModalProfiles = ({ user: userKey, onSelectProfile }: Props) => {
+const AddContactModalProfiles = ({
+  user: userKey,
+  onSelectProfile,
+  nativeGesture,
+}: Props) => {
   const auth = useAuthState();
 
   const { profiles } = useFragment(
@@ -109,6 +115,7 @@ const AddContactModalProfiles = ({ user: userKey, onSelectProfile }: Props) => {
       {coverWidth > 0 && (
         <CarouselSelectList
           ref={carouselRef}
+          nativeGesture={nativeGesture}
           data={data}
           keyExtractor={keyExtractor}
           renderItem={renderItem}

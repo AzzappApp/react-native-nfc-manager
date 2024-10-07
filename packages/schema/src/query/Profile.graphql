@@ -67,6 +67,11 @@ type Profile implements Node {
   webCard: WebCard
 
   """
+  Return number of contact for a given profile
+  """
+  nbContacts: Int!
+
+  """
   Return a list of suggested web cards for a given profile
   """
   suggestedWebCards(

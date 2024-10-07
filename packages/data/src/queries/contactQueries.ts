@@ -1,4 +1,4 @@
-import { and, eq, type InferInsertModel } from 'drizzle-orm';
+import { and, count, eq, type InferInsertModel } from 'drizzle-orm';
 import { db } from '../database';
 import { ContactTable } from '../schema';
 import type { Contact } from '../schema';
@@ -17,6 +17,14 @@ export const getContactByProfiles = (profiles: {
       ),
     )
     .then(rows => rows[0] ?? null);
+};
+
+export const getContactCount = (profileId: string): Promise<number> => {
+  return db()
+    .select({ count: count() })
+    .from(ContactTable)
+    .where(eq(ContactTable.ownerProfileId, profileId))
+    .then(res => res[0].count || 0);
 };
 
 export const createContact = async (

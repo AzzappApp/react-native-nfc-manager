@@ -67,6 +67,7 @@ import ConfirmChangeContactScreen from '#screens/ConfirmChangeContactScreen';
 import ConfirmRegistrationScreen from '#screens/ConfirmRegistrationScreen';
 import ContactCardEditScreen from '#screens/ContactCardEditScreen';
 import ContactCardScreen from '#screens/ContactCardScreen';
+import ContactsScreen from '#screens/ContactsScreen';
 import CoverCreationScreen from '#screens/CoverCreationScreen';
 import CoverEditionScreen from '#screens/CoverEditionScreen';
 import CoverTemplateSelectionScreen from '#screens/CoverTemplateSelectionScreen';
@@ -214,6 +215,7 @@ const screens = {
   CONTACT_CARD_EDIT: ContactCardEditScreen,
   CONFIRM_CHANGE_CONTACT: ConfirmChangeContactScreen,
   COMMON_INFORMATION: CommonInformationScreen,
+  CONTACTS: ContactsScreen,
   COVER_CREATION: CoverCreationScreen,
   COVER_EDITION: CoverEditionScreen,
   COVER_TEMPLATE_SELECTION: CoverTemplateSelectionScreen,

@@ -15,6 +15,7 @@ import {
   searchPosts,
   searchWebCards,
   getCardTemplatesForWebCardKind,
+  getContactCount,
 } from '@azzapp/data';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import { shuffle } from '@azzapp/shared/arrayHelpers';
@@ -255,6 +256,12 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
       throw new Error(ERRORS.GRAPHQL_ERROR);
     }
     return webCardLoader.load(profile.webCardId);
+  },
+  nbContacts: async profile => {
+    if (!profileIsAssociatedToCurrentUser(profile)) {
+      return 0;
+    }
+    return getContactCount(profile.id);
   },
   suggestedWebCards: async () => {
     return emptyConnection;

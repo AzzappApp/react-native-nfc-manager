@@ -7,6 +7,7 @@ import {
   useRef,
   useEffect,
 } from 'react';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   Extrapolation,
   interpolate,
@@ -27,6 +28,7 @@ import type {
   NativeSyntheticEvent,
   ListRenderItemInfo,
 } from 'react-native';
+import type { GestureType } from 'react-native-gesture-handler';
 import type { SharedValue } from 'react-native-reanimated';
 
 export type CarouselSelectListProps<TItem = any> = Omit<
@@ -96,6 +98,8 @@ export type CarouselSelectListProps<TItem = any> = Omit<
    * stick it here and treat it immutably.
    */
   extraData?: any | undefined;
+
+  nativeGesture?: GestureType;
 };
 
 export type CarouselSelectListHandle = {
@@ -123,6 +127,7 @@ function CarouselSelectList<TItem = any>(
     extraData,
     currentProfileIndexSharedValue,
     onSelectedIndexChange,
+    nativeGesture = Gesture.Native(),
     ...props
   }: CarouselSelectListProps<TItem>,
   ref: ForwardedRef<CarouselSelectListHandle>,
@@ -248,33 +253,35 @@ function CarouselSelectList<TItem = any>(
   );
 
   return (
-    <Animated.FlatList
-      ref={listRef}
-      data={data}
-      horizontal
-      renderItem={renderAnimatedItem}
-      keyExtractor={keyExtractor}
-      getItemLayout={getItemLayout}
-      scrollEventThrottle={16}
-      snapToInterval={itemWidth}
-      decelerationRate="fast"
-      snapToAlignment="start"
-      disableIntervalMomentum
-      //removeClippedSubviews removing this to avoid blank (was use to improve perf)
-      pagingEnabled
-      bounces={false}
-      onScroll={scrollHandler}
-      showsHorizontalScrollIndicator={false}
-      showsVerticalScrollIndicator={false}
-      style={computedStyle}
-      onMomentumScrollEnd={onMomentumScrollEnd}
-      initialNumToRender={7}
-      windowSize={11}
-      maxToRenderPerBatch={11}
-      extraData={extraData}
-      contentContainerStyle={ccstyle}
-      {...props}
-    />
+    <GestureDetector gesture={nativeGesture}>
+      <Animated.FlatList
+        ref={listRef}
+        data={data}
+        horizontal
+        renderItem={renderAnimatedItem}
+        keyExtractor={keyExtractor}
+        getItemLayout={getItemLayout}
+        scrollEventThrottle={16}
+        snapToInterval={itemWidth}
+        decelerationRate="fast"
+        snapToAlignment="start"
+        disableIntervalMomentum
+        //removeClippedSubviews removing this to avoid blank (was use to improve perf)
+        pagingEnabled
+        bounces={false}
+        onScroll={scrollHandler}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        style={computedStyle}
+        onMomentumScrollEnd={onMomentumScrollEnd}
+        initialNumToRender={7}
+        windowSize={11}
+        maxToRenderPerBatch={11}
+        extraData={extraData}
+        contentContainerStyle={ccstyle}
+        {...props}
+      />
+    </GestureDetector>
   );
 }
 

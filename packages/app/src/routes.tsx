@@ -245,6 +245,11 @@ export type EmailSignatureRoute = {
   };
 };
 
+export type ContactsRoute = {
+  route: 'CONTACTS';
+  params?: never;
+};
+
 export type Route =
   | AboutRoute
   | AccountDetailsRoute
@@ -254,6 +259,7 @@ export type Route =
   | ConfirmRegistrationRoute
   | ContactCardEditRoute
   | ContactCardRoute
+  | ContactsRoute
   | CoverCreationRoute
   | CoverEditionRoute
   | CoverTemplateSelectionRoute

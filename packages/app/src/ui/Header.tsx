@@ -22,6 +22,11 @@ export type HeaderProps = Omit<ViewProps, 'children'> & {
    * @see https://reactnative.dev/docs/view-style-props
    */
   style?: StyleProp<ViewStyle>;
+
+  /**
+   * style applied to text middle element.
+   */
+  middleElementStyle?: ViewStyle;
 };
 
 /**
@@ -33,6 +38,7 @@ const Header = ({
   leftElement,
   rightElement,
   style,
+  middleElementStyle,
   ...props
 }: HeaderProps) => {
   return (
@@ -42,7 +48,10 @@ const Header = ({
       {...props}
     >
       <View style={styles.headerInner}>
-        <View style={styles.headerMiddle} pointerEvents="box-none">
+        <View
+          style={[styles.headerMiddle, middleElementStyle]}
+          pointerEvents="box-none"
+        >
           {typeof middleElement === 'string' || Array.isArray(middleElement) ? (
             <Text variant="large" style={styles.title} numberOfLines={1}>
               {middleElement}
