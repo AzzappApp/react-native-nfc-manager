@@ -13,6 +13,10 @@ import {
 } from '@shopify/react-native-skia';
 import { memo, useMemo } from 'react';
 import { Image, View } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+} from 'react-native-reanimated';
 import { useFragment, graphql } from 'react-relay';
 import { getTextColor } from '@azzapp/shared/colorsHelpers';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
@@ -21,7 +25,7 @@ import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Text from '#ui/Text';
 import type { ContactCard_profile$key } from '#relayArtifacts/ContactCard_profile.graphql';
-import type { StyleProp, ViewStyle } from 'react-native';
+import type { LayoutChangeEvent, StyleProp, ViewStyle } from 'react-native';
 
 type ContactCardProps = {
   profile: ContactCard_profile$key;
@@ -91,6 +95,17 @@ const ContactCard = ({
   const src = rect(0, 0, svg?.width() ?? 0, svg?.height() ?? 0);
   const dst = rect(15, 15, 80, 80);
 
+  const layoutWidth = useSharedValue(0);
+
+  const onTextLayout = ({ nativeEvent }: LayoutChangeEvent) => {
+    layoutWidth.value = nativeEvent.layout.width - 40; // remove the margins
+  };
+
+  const animatedFooterWidth = useAnimatedStyle(
+    () => ({ width: layoutWidth.value }),
+    [],
+  );
+
   if (!contactCard || !webCard) {
     return null;
   }
@@ -108,6 +123,7 @@ const ContactCard = ({
       ]}
     >
       <View
+        onLayout={onTextLayout}
         style={[
           styles.webCardBackground,
           {
@@ -174,7 +190,7 @@ const ContactCard = ({
             )}
           </View>
         </View>
-        <View style={styles.webCardFooter}>
+        <Animated.View style={[styles.webCardFooter, animatedFooterWidth]}>
           {userName && (
             <Text
               variant="xsmall"
@@ -187,7 +203,7 @@ const ContactCard = ({
               {buildUserUrl(userName)}
             </Text>
           )}
-        </View>
+        </Animated.View>
       </View>
       <View style={styles.qrCodeContainer}>
         {svg ? (
@@ -261,7 +277,10 @@ const stylesheet = createStyleSheet(appearance => ({
     rowGap: 10,
   },
   webCardLabel: { color: colors.white },
-  webCardFooter: { justifyContent: 'flex-end', marginTop: 10 },
+  webCardFooter: {
+    justifyContent: 'flex-end',
+    marginTop: 10,
+  },
   webcardText: {
     flexDirection: 'column',
     height: '100%',
