@@ -38,6 +38,7 @@
       "dependsOn": [],
       "cache": false,
       "persistent": true
-    }
+    },
+    "lint": {}
   }
 }

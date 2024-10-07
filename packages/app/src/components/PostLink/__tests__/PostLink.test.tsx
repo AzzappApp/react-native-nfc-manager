@@ -10,7 +10,6 @@ import type { ForwardedRef } from 'react';
 let mockPostHandle: any = null;
 
 jest.mock('../../PostList/PostRendererFeed', () => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { forwardRef, useImperativeHandle, createElement } = require('react');
   function PostRenderer(
     props: PostRendererProps,

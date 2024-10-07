@@ -319,7 +319,6 @@ const WebCardScreenButtonActionButton = ({
         >
           <Text variant="button" style={styles.textButton}>
             <FormattedMessage
-              // eslint-disable-next-line formatjs/enforce-placeholders
               defaultMessage="Build my WebCard{azzappA}"
               description="Build my webcard button label in Profile Screen Button Bar"
               values={{

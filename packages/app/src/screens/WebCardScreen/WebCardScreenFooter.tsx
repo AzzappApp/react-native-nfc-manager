@@ -177,7 +177,7 @@ const WebCardScreenFooter = ({
       (editTransition?.value ?? 0) - (selectionModeTransition?.value ?? 0),
   }));
   const selectionMenuStyle = useAnimatedStyle(() => ({
-    opacity: editing ? selectionModeTransition?.value ?? 0 : 0,
+    opacity: editing ? (selectionModeTransition?.value ?? 0) : 0,
   }));
 
   if (webCard.cardModules.length === 0) {

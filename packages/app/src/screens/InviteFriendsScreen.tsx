@@ -37,7 +37,6 @@ const InviteFriendsScreen = ({
   const message = intl.formatMessage(
     {
       defaultMessage:
-        // eslint-disable-next-line formatjs/enforce-placeholders
         'Hey, I’m using azzapp as {userName}. Install the app to follow my WebCard and to see my posts. {url}',
       description:
         'Invite message to share with friends - avoid specific characters like &',

@@ -115,7 +115,7 @@ describe('fetchWithAuthTokens', () => {
       refreshToken: 'fakeRefreshToken2',
     });
     fetchJSONMock.mockResolvedValue({
-      errors: [{ extensions: { code: ERRORS.INVALID_TOKEN } }],
+      errors: [{ message: ERRORS.INVALID_TOKEN }],
     });
     refreshTokensMock.mockResolvedValueOnce({
       token: 'fakeToken2',

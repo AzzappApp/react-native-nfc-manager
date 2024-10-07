@@ -5,6 +5,7 @@
   "types": "index.d.ts",
   "main": "index.js",
   "scripts": {
+    "lint": "eslint .",
     "prepare": "node ./scripts/prepare.js",
     "build:app": "formatjs compile-folder --format simple --ast src/app compiled/app",
     "build:web": "formatjs compile-folder --format simple --ast src/web compiled/web",

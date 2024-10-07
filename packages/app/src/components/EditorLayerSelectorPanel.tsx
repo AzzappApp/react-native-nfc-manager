@@ -209,7 +209,7 @@ const EditorLayerSelectorPanel = ({
         }
         selectedColor={
           currentTab === 'backgroundColor'
-            ? backgroundColor ?? colors.white
+            ? (backgroundColor ?? colors.white)
             : tintColor
         }
         colorPalette={colorPalette}

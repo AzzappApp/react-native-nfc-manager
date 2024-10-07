@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { GraphQLError } from 'graphql';
 import { updateWebCard, type WebCard } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';

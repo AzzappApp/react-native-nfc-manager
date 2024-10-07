@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 import i18nCountries from 'i18n-iso-countries';
 import { getCountries, getCountryCallingCode } from 'libphonenumber-js';
 import { useCallback, useMemo } from 'react';

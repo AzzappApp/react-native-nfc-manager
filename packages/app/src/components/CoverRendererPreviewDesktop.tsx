@@ -78,10 +78,10 @@ const CoverRendererPreviewDesktop = ({
         colors={[
           'transparent',
           backgroundStyle || colorTop
-            ? swapColor(
+            ? (swapColor(
                 (backgroundStyle?.backgroundColor || colorTop) ?? '#FFF',
                 cardColors,
-              ) ?? '#FFF'
+              ) ?? '#FFF')
             : '#FFF',
         ]}
         start={{ x: 0, y: 0 }}

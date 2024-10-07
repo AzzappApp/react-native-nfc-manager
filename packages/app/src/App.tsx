@@ -358,7 +358,7 @@ const AppRouter = () => {
       createScreenPrefetcher(
         screens as Record<ROUTES, ScreenPrefetchOptions<any>>,
       ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
     [],
   );
 

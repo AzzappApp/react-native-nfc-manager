@@ -1,4 +1,3 @@
-/* eslint-disable no-alert */
 import * as Sentry from '@sentry/react-native';
 import * as Clipboard from 'expo-clipboard';
 import { fromGlobalId } from 'graphql-relay';

@@ -513,7 +513,7 @@ const CoverEditorMediaPicker = ({
               >
                 {mediasOrSlot.map((media, index) => {
                   const duration = durationsFixed
-                    ? durations?.[index] ?? null
+                    ? (durations?.[index] ?? null)
                     : null;
                   return (
                     <View style={styles.mediaContainer} key={index}>

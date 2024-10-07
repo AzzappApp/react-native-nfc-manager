@@ -21,7 +21,6 @@ const mockCameraRef = {
 };
 
 jest.mock('react-native-vision-camera', () => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const react = require('react');
   const CameraInner = (props: any, ref: any) => {
     react.useImperativeHandle(ref, () => mockCameraRef);

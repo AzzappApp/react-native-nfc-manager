@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/default-param-last */
 /**
  * code from https://github.com/xxmuaddib/lottie-colorify/blob/master/src/index.ts
  * MIT License

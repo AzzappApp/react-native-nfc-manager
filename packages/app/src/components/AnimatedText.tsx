@@ -54,7 +54,6 @@ const AnimatedText = ({
           ? text.value
           : `${text.value.slice(0, maxLength)}...`,
       // Here we use any because the text prop is not available in the type
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
   }, [text]);
 

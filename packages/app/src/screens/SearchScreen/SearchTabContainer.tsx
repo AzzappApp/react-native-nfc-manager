@@ -190,7 +190,6 @@ const TabBarSearch = (
     }>;
   },
 ) => {
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const styles = useStyleSheet(styleSheet);
 
   return (

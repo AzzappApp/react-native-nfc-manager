@@ -1,6 +1,9 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { useLogger, useErrorHandler } from '@envelop/core';
-import { UnauthenticatedError, useGenericAuth } from '@envelop/generic-auth';
+import {
+  createUnauthenticatedError,
+  useGenericAuth,
+} from '@envelop/generic-auth';
 import { useParserCache } from '@envelop/parser-cache';
 import { useSentry } from '@envelop/sentry';
 import { useValidationCache } from '@envelop/validation-cache';
@@ -184,10 +187,7 @@ const { handleRequest } = createYoga({
     useErrorHandler(({ errors }) => {
       console.log({ errors });
       errors
-        .filter(
-          err =>
-            (err as GraphQLError).extensions?.code !== ERRORS.INVALID_TOKEN,
-        )
+        .filter(err => (err as GraphQLError).message !== ERRORS.INVALID_TOKEN)
         .map(err => console.error(err));
     }),
     useParserCache(),
@@ -241,10 +241,9 @@ const { handleRequest } = createYoga({
       },
       validateUser: params => {
         if (!params.user?.userId) {
-          return new UnauthenticatedError(ERRORS.INVALID_TOKEN, {
-            extensions: {
-              code: ERRORS.INVALID_TOKEN,
-            },
+          return createUnauthenticatedError({
+            message: ERRORS.INVALID_TOKEN,
+            statusCode: 200,
           });
         }
       },

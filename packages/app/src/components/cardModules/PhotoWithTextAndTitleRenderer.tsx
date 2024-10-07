@@ -195,14 +195,14 @@ const PhotoWithTextAndTitleRenderer = ({
           ? 'marginHorizontal' in rest
             ? rest.marginHorizontal
             : 0
-          : animatedData?.marginHorizontal.value ?? 0),
+          : (animatedData?.marginHorizontal.value ?? 0)),
   );
 
   const imageWidth = useDerivedValue(() =>
     os === 'web'
       ? widthMargin.value / 2
       : imageMargin === 'width_full'
-        ? layout?.width ?? 0
+        ? (layout?.width ?? 0)
         : widthMargin.value,
   );
 
@@ -223,8 +223,8 @@ const PhotoWithTextAndTitleRenderer = ({
           flexDirection,
           rowGap: rest.gap ?? 0,
           columnGap: rest.gap ?? 0,
-          width: os === 'web' ? widthMargin.value : layout?.width ?? 0,
-          marginHorizontal: os === 'web' ? rest.marginHorizontal ?? 0 : 0,
+          width: os === 'web' ? widthMargin.value : (layout?.width ?? 0),
+          marginHorizontal: os === 'web' ? (rest.marginHorizontal ?? 0) : 0,
         };
       }
       return {
@@ -237,9 +237,9 @@ const PhotoWithTextAndTitleRenderer = ({
       flexDirection,
       rowGap: gapValue,
       columnGap: gapValue,
-      width: os === 'web' ? widthMargin.value : layout?.width ?? 0,
+      width: os === 'web' ? widthMargin.value : (layout?.width ?? 0),
       marginHorizontal:
-        os === 'web' ? animatedData.marginHorizontal.value ?? 0 : 0,
+        os === 'web' ? (animatedData.marginHorizontal.value ?? 0) : 0,
     };
   });
 
@@ -287,7 +287,7 @@ const PhotoWithTextAndTitleRenderer = ({
               os === 'web'
                 ? widthMargin.value / 2 - (rest.gap ?? 0)
                 : undefined,
-            marginHorizontal: os === 'web' ? 0 : rest.marginHorizontal ?? 0,
+            marginHorizontal: os === 'web' ? 0 : (rest.marginHorizontal ?? 0),
             justifyContent: viewMode === 'desktop' ? 'center' : undefined,
           }
         : {}
@@ -297,7 +297,7 @@ const PhotoWithTextAndTitleRenderer = ({
               ? widthMargin.value / 2 - (animatedData?.gap.value ?? 0)
               : undefined,
           marginHorizontal:
-            os === 'web' ? 0 : animatedData?.marginHorizontal.value ?? 0,
+            os === 'web' ? 0 : (animatedData?.marginHorizontal.value ?? 0),
           justifyContent: viewMode === 'desktop' ? 'center' : undefined,
         };
   });

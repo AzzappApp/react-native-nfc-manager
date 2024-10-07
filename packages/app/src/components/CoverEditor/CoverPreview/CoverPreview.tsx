@@ -869,7 +869,7 @@ const CoverPreview = ({
    */
   const editedTextLayer =
     editionMode === 'textEdit' && selectedLayerIndex != null
-      ? textLayers[selectedLayerIndex] ?? null
+      ? (textLayers[selectedLayerIndex] ?? null)
       : null;
 
   /**

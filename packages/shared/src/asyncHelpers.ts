@@ -13,7 +13,6 @@ export const executeWithRetries = async <T>(
 ): Promise<T> => {
   let i = 0;
   let error: any;
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     let result: T;
     try {

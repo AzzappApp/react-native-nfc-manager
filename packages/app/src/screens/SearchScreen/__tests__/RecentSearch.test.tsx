@@ -12,7 +12,6 @@ const removeSearch = jest.fn();
 const search = jest.fn();
 
 jest.mock('#components/CoverLink', () => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { createElement } = require('react');
   function CoverLink(
     props: CoverRendererProps & {

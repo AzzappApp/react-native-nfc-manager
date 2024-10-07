@@ -204,7 +204,7 @@ const DownloadVCard = ({
               ) : (
                 <Avatar
                   variant="initials"
-                  initials={`${contact.firstName?.length ?? 0 > 0 ? contact.firstName[0] : ''}${contact.lastName?.length ?? 0 > 0 ? contact.lastName[0] : ''}`}
+                  initials={`${(contact.firstName?.length ?? 0 > 0) ? contact.firstName[0] : ''}${(contact.lastName?.length ?? 0 > 0) ? contact.lastName[0] : ''}`}
                 />
               )
             ) : null}

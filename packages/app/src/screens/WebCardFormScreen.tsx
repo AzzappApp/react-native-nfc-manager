@@ -611,9 +611,9 @@ const WebCardFormScreen = ({
                       bottomSheetHeight={windowHeight - 90 - insets.top}
                       inputLabel={
                         value
-                          ? companyActivities.find(
+                          ? (companyActivities.find(
                               activity => activity.id === value,
-                            )?.label ?? undefined
+                            )?.label ?? undefined)
                           : undefined
                       }
                       onItemSelected={item => onChange(item.id)}

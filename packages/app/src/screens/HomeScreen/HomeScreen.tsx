@@ -76,7 +76,6 @@ const HomeScreen = ({
   );
 };
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const lottie = require('./assets/home-loader.json');
 
 const HomeScreenFallback = () => {

@@ -1,4 +1,3 @@
-/* eslint-disable no-bitwise */
 import { NextResponse } from 'next/server';
 import * as z from 'zod';
 import { createMedia, createId } from '@azzapp/data';

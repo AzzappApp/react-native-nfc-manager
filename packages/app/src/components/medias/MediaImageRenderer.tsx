@@ -90,7 +90,7 @@ const MediaImageRenderer = (
   const sourceRef = useRef(source);
   const localFile = useLocalCachedMediaFile(source.mediaId, 'image');
   const [snapshotID, setSnapshotID] = useState(() =>
-    useAnimationSnapshot ? _imageSnapshots.get(source.mediaId) ?? null : null,
+    useAnimationSnapshot ? (_imageSnapshots.get(source.mediaId) ?? null) : null,
   );
   const [thumbnail, setThumbnail] = useState(
     () => getThumbnail(source.mediaId, source.requestedSize) ?? null,
@@ -112,7 +112,7 @@ const MediaImageRenderer = (
       setThumbnail(getThumbnail(source.mediaId, source.requestedSize) ?? null);
       setSnapshotID(
         useAnimationSnapshotRef.current
-          ? _imageSnapshots.get(source.mediaId) ?? null
+          ? (_imageSnapshots.get(source.mediaId) ?? null)
           : null,
       );
     }

@@ -128,7 +128,7 @@ const MediaVideoRenderer = (
   const [loading, setLoading] = useState(true);
   const localVideoFile = useLocalCachedMediaFile(source.mediaId, 'video');
   const [snapshotID, setSnapshotID] = useState(() =>
-    useAnimationSnapshot ? _videoSnapshots.get(source.mediaId) ?? null : null,
+    useAnimationSnapshot ? (_videoSnapshots.get(source.mediaId) ?? null) : null,
   );
 
   const useAnimationSnapshotRef = useRef(useAnimationSnapshot);
@@ -170,7 +170,7 @@ const MediaVideoRenderer = (
       isReadyForDisplay.current = false;
       setSnapshotID(
         useAnimationSnapshotRef.current
-          ? _videoSnapshots.get(source.mediaId) ?? null
+          ? (_videoSnapshots.get(source.mediaId) ?? null)
           : null,
       );
     }

@@ -288,7 +288,6 @@ const PRESSABLE_OFFSET_FACTOR = 7 / 10;
 // the icon ratio based on size of the tryptich
 const RATIO_ICON = 0.279;
 
-// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
 type PressableSlideComponentProps = PressableOpacityProps & {
   size: number;
   color: string;

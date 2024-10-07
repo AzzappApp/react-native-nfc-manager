@@ -9,6 +9,7 @@
     }
   },
   "scripts": {
+    "lint": "eslint .",
     "test": "jest",
     "dev": "tsc --watch",
     "build": "tsc -p tsconfig.build.json",
@@ -22,15 +23,16 @@
     "chroma-js": "^3.1.1",
     "csv42": "5.0.0",
     "iron-webcrypto": "^1.2.1",
-    "libphonenumber-js": "^1.11.7",
+    "libphonenumber-js": "^1.11.11",
     "lz-string": "^1.5.0",
     "validator": "^13.12.0",
     "vcard-creator": "^0.7.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.25.6",
+    "@babel/cli": "^7.25.7",
     "@types/chroma-js": "^2.4.4",
-    "@types/validator": "^13.11.9",
+    "@types/validator": "^13.12.2",
+    "eslint": "^9.12.0",
     "typescript": "^5.6.2"
   }
 }

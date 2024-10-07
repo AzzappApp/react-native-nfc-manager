@@ -153,7 +153,9 @@ const CompanyActivityForm = ({
         sx={{ flex: 1, minWidth: 200 }}
         {...fieldProps('cardTemplateTypeId', {
           format: value =>
-            value ? cardTemplateTypes.find(t => t.id === value) ?? null : null,
+            value
+              ? (cardTemplateTypes.find(t => t.id === value) ?? null)
+              : null,
           parse: value =>
             (typeof value === 'string' ? value : value?.id) ?? null,
         })}
@@ -168,7 +170,7 @@ const CompanyActivityForm = ({
         {...fieldProps('companyActivityTypeId', {
           format: value =>
             value
-              ? companyActivitiesTypes.find(t => t.id === value) ?? null
+              ? (companyActivitiesTypes.find(t => t.id === value) ?? null)
               : null,
           parse: value =>
             (typeof value === 'string' ? value : value?.id) ?? null,

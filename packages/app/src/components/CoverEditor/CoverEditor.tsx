@@ -243,7 +243,7 @@ const CoverEditorCore = (
     textLayers = textLayers.filter(textLayer => !!textLayer.text);
 
     const overlayLayers = placeholder
-      ? (data?.overlayLayers as any)?.map((overlay: CoverEditorOverlayItem) =>
+      ? ((data?.overlayLayers as any)?.map((overlay: CoverEditorOverlayItem) =>
           placeholder.localUri
             ? {
                 ...overlay,
@@ -256,7 +256,7 @@ const CoverEditorCore = (
                 rotation: 0,
               }
             : overlay,
-        ) ?? []
+        ) ?? [])
       : [];
 
     let imagesScales =
