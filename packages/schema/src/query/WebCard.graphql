@@ -169,6 +169,10 @@ type WebCard implements Node {
   """
   nbProfiles: Int!
   """
+  The number of removed profiles associated to the webCard
+  """
+  nbDeletedProfiles: Int!
+  """
   The associated profiles to the WebCard
   """
   profiles(

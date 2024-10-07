@@ -1,4 +1,4 @@
-import { and, asc, eq, inArray, ne, sql } from 'drizzle-orm';
+import { and, asc, count, eq, inArray, ne, sql } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/mysql-core';
 import { db, transaction } from '../database';
 import { MediaTable, ProfileTable, WebCardTable } from '../schema';
@@ -336,11 +336,31 @@ export const getWebCardProfiles = async (
  *
  * @param webCardId - The id of the web card
  */
-export const countWebCardProfiles = async (webCardId: string) =>
+export const countWebCardProfiles = async (
+  webCardId: string,
+  withDeleted?: boolean | null,
+) =>
   db()
-    .select({ count: sql`count(*)`.mapWith(Number) })
+    .select({ count: count() })
     .from(ProfileTable)
-    .where(eq(ProfileTable.webCardId, webCardId))
+    .where(
+      and(
+        eq(ProfileTable.webCardId, webCardId),
+        withDeleted ? undefined : ne(ProfileTable.deleted, true),
+      ),
+    )
+    .then(res => res[0].count);
+
+export const countDeletedWebCardProfiles = async (webCardId: string) =>
+  db()
+    .select({ count: count() })
+    .from(ProfileTable)
+    .where(
+      and(
+        eq(ProfileTable.webCardId, webCardId),
+        eq(ProfileTable.deleted, true),
+      ),
+    )
     .then(res => res[0].count);
 
 /**

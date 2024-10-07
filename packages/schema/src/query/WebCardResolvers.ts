@@ -19,6 +19,7 @@ import {
   getFilterCoverTemplateTypes,
   getCoverTemplatesByTypesAndTag,
   countWebCardPayments,
+  countDeletedWebCardProfiles,
 } from '@azzapp/data';
 import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { buildCoverAvatarUrl } from '#externals';
@@ -352,8 +353,13 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
     if (!(await hasWebCardProfileRight(webCard.id))) {
       return 1;
     }
-    const count = await countWebCardProfiles(webCard.id);
-    return count;
+    return countWebCardProfiles(webCard.id);
+  },
+  nbDeletedProfiles: async (webCard, _) => {
+    if (!(await hasWebCardProfileRight(webCard.id))) {
+      return 1;
+    }
+    return countDeletedWebCardProfiles(webCard.id);
   },
   profilePendingOwner: async webCard => {
     if (!(await hasWebCardProfileRight(webCard.id))) {
@@ -374,7 +380,7 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
       search: search ?? null, //cannot be undefined
     });
     const result = profiles.slice(0, limit);
-    const count = await countWebCardProfiles(webCard.id);
+    const count = await countWebCardProfiles(webCard.id, withDeleted);
     return connectionFromArraySlice(
       result,
       { after, first },
