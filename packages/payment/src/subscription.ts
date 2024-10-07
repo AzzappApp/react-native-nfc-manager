@@ -371,6 +371,55 @@ export const upgradePlan = async (
       calculateNextPaymentIntervalInMinutes('web.yearly');
 
     const token = await login();
+    const rebillManagerId = existingSubscription.rebillManagerId;
+    if (rebillManagerId) {
+      const state = await client.POST(
+        `/api/client-payment-requests/check-rebill-manager`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: {
+            rebillManagerId,
+            clientPaymentRequestUlid: existingSubscription.paymentMeanId,
+          },
+        },
+      );
+
+      if (!state.data) {
+        throw new Error('Failed to check rebill manager', {
+          cause: state.error,
+        });
+      }
+
+      if (state.data.rebill_manager_state === 'ON') {
+        const result = await client.POST(
+          '/api/client-payment-requests/stop-rebill-manager',
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            body: {
+              rebillManagerId,
+              clientPaymentRequestUlid: existingSubscription.paymentMeanId,
+              stopReason: `Upgrade subscription to web.yearly`,
+            },
+          },
+        );
+
+        if (!result.data) {
+          throw new Error('Failed to stop rebill manager', {
+            cause: result.error,
+          });
+        }
+
+        if ((result.data.status as string) !== 'STOPPED') {
+          throw new Error(
+            result.data.reason || 'Failed to stop rebill manager',
+          );
+        }
+      }
+    }
 
     const rebillManager = await client.POST(
       '/api/client-payment-requests/create-rebill-manager',
