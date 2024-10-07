@@ -1,5 +1,6 @@
-## 0.9.10-canary.16
+## 0.9.10-canary.17
 
+* **build:**  - update provisionning profiles
 * **build:**  - update provisionning profiles
 * **fix:**  - webcard count payments ([#5261](https://github.com/AzzappApp/azzapp/pull/5261))
 * **fix:**  - put back subscriptionId
