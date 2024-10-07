@@ -1,5 +1,6 @@
-## 0.9.10-canary.23
+## 0.9.10-canary.24
 
+* **build:**  - update project deps + migrate to eslint v9 ([#5271](https://github.com/AzzappApp/azzapp/pull/5271))
 * **build:**  - fix provisioning profile
 * **build:**  - update gemfile.lock
 * **fix:**  - **analytics:** [#5268](https://github.com/AzzappApp/azzapp/pull/5268) don’t send ga event on server ([#5269](https://github.com/AzzappApp/azzapp/pull/5269))
