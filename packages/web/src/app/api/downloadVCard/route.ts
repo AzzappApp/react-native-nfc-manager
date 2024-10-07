@@ -1,4 +1,3 @@
-import { sendGAEvent } from '@next/third-parties/google';
 import * as Sentry from '@sentry/nextjs';
 import { decompressFromEncodedURIComponent } from 'lz-string';
 import { NextResponse } from 'next/server';
@@ -108,11 +107,6 @@ const downloadVCard = async (req: NextRequest) => {
   const vCardContactString = vCard.toString();
 
   const vCardFileName = shareBackVCardFilename(buildVCardContact);
-  sendGAEvent('event', 'download_vcard', {
-    event_category: 'Form',
-    event_label: 'ShareBackForm',
-    value: 'Submit',
-  });
 
   return new Response(vCardContactString, {
     headers: {
