@@ -77,11 +77,10 @@ const downloadVCard = async (req: NextRequest) => {
 
   const additionalData = {
     urls: (webCard?.commonInformation?.urls ?? []).concat(
-      storedProfile?.contactCard?.urls?.filter(url => url.selected) ?? [],
+      storedProfile?.contactCard?.urls || [],
     ),
     socials: (webCard?.commonInformation?.socials ?? []).concat(
-      storedProfile?.contactCard?.socials?.filter(social => social.selected) ??
-        [],
+      storedProfile?.contactCard?.socials || [],
     ),
     avatarUrl,
     avatar: undefined as { type: string; base64: string } | undefined,

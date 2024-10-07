@@ -56,12 +56,10 @@ const verifySignApi = async (req: Request) => {
     return NextResponse.json(
       {
         urls: (webCard?.commonInformation?.urls ?? []).concat(
-          storedProfile?.contactCard?.urls?.filter(url => url.selected) ?? [],
+          storedProfile?.contactCard?.urls || [],
         ),
         socials: (webCard?.commonInformation?.socials ?? []).concat(
-          storedProfile?.contactCard?.socials?.filter(
-            social => social.selected,
-          ) ?? [],
+          storedProfile?.contactCard?.socials || [],
         ),
         avatarUrl,
         displayName: displayName(foundContactCard, webCard),
