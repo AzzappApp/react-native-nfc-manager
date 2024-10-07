@@ -1,4 +1,4 @@
-## 0.9.10-canary.24
+## 0.9.10-canary.25
 
 * **build:**  - update project deps + migrate to eslint v9 ([#5271](https://github.com/AzzappApp/azzapp/pull/5271))
 * **build:**  - fix provisioning profile
