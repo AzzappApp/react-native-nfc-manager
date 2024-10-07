@@ -112,7 +112,7 @@ async function getAccessToken() {
   if (accessToken && now < tokenExpiry) {
     return accessToken;
   }
-
+  console.log('FIREBASE_PRIVATE_KEY', process.env.FIREBASE_PRIVATE_KEY);
   const privateKey = await importPKCS8(
     process.env.FIREBASE_PRIVATE_KEY!,
     'RS256',
