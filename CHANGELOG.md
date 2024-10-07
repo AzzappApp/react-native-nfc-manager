@@ -1,5 +1,6 @@
-## 0.9.10-canary.25
+## 0.9.10-canary.26
 
+* **fix:**  - manage correctly media ([#5278](https://github.com/AzzappApp/azzapp/pull/5278))
 * **build:**  - update project deps + migrate to eslint v9 ([#5271](https://github.com/AzzappApp/azzapp/pull/5271))
 * **build:**  - fix provisioning profile
 * **build:**  - update gemfile.lock
