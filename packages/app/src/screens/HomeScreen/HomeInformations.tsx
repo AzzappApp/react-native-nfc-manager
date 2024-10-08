@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import {
@@ -14,7 +14,6 @@ import { HomeButtonContactLink } from './HomeButtonContactLink';
 import { HomeButtonContactLinkCentral } from './HomeButtonContactLinkCentral';
 import { useHomeScreenContext } from './HomeScreenContext';
 import type { HomeInformations_user$key } from '#relayArtifacts/HomeInformations_user.graphql';
-import type { LayoutChangeEvent } from 'react-native';
 
 type HomeInformationsProps = {
   user: HomeInformations_user$key;
@@ -53,6 +52,8 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
     `,
     user,
   );
+
+  const circleWidth = 86;
 
   const nbContactsValue = useMemo(
     () => [0, ...(profiles?.map(({ nbContacts }) => nbContacts) ?? [])],
@@ -219,18 +220,10 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
     });
   }, [router]);
 
-  const [circleWidth, setCircleWidth] = useState(100);
-
-  const onMainLayout = (event: LayoutChangeEvent) => {
-    const newHeight = event.nativeEvent.layout.height / 2 - 12;
-    setCircleWidth(newHeight);
-  };
-
   return (
-    <View style={[styles.container, { height }]} onLayout={onMainLayout}>
+    <View style={[styles.container, { height }]}>
       <View style={styles.row} pointerEvents="box-none">
         <HomeButtonContactLink
-          svgFile={require('#assets/home-top-left.svg')}
           count={nbPosts}
           onPress={goToPosts}
           isTop
@@ -238,7 +231,8 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
           renderMessageComponent={isPlural => (
             <FormattedMessage
               defaultMessage="{isPlural, plural,
-      =0 {Post}
+      =0 {Posts}
+      =1 {Post}
       other {Posts}
     }"
               description="HomeScreen - information panel - Post label"
@@ -247,14 +241,14 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
           )}
         />
         <HomeButtonContactLink
-          svgFile={require('#assets/home-top-right.svg')}
           count={nbLikes}
           onPress={goToLikedPost}
           isTop
           renderMessageComponent={isPlural => (
             <FormattedMessage
               defaultMessage="{isPlural, plural,
-      =0 {Like}
+      =0 {Likes}
+      =1 {Like}
       other {Likes}
     }"
               description="HomeScreen - information panel - Likes label"
@@ -265,14 +259,14 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
       </View>
       <View style={styles.row}>
         <HomeButtonContactLink
-          svgFile={require('#assets/home-bottom-left.svg')}
           count={nbFollowers}
           onPress={goToFollower}
           isLeft
           renderMessageComponent={isPlural => (
             <FormattedMessage
               defaultMessage="{isPlural, plural,
-    =0 {Follower}
+    =0 {Followers}
+    =1 {Follower}
     other {Followers}
     }"
               description="HomeScreen - information panel - Followers label"
@@ -281,13 +275,13 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
           )}
         />
         <HomeButtonContactLink
-          svgFile={require('#assets/home-bottom-right.svg')}
           count={nbFollowings}
           onPress={goToFollowing}
           renderMessageComponent={isPlural => (
             <FormattedMessage
               defaultMessage="{isPlural, plural,
     =0 {Following}
+    =1 {Following}
     other {Following}
     }"
               description="HomeScreen - information panel - Followings label"
@@ -323,7 +317,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingVertical: 30,
   },
   row: {
     flexDirection: 'row',

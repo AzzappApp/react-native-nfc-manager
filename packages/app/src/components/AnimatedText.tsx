@@ -50,14 +50,17 @@ const AnimatedText = ({
   const { text, style } = { style: {}, ...props };
 
   const animatedProps = useAnimatedProps(() => {
-    return {
+    let result = {
       text:
         !maxLength || text.value.length < maxLength
           ? text.value
           : `${text.value.slice(0, maxLength)}...`,
       // Here we use any because the text prop is not available in the type
-      color: animatedTextColor ? animatedTextColor.value : undefined,
     } as any;
+    if (animatedTextColor) {
+      result = { ...result, color: animatedTextColor?.value };
+    }
+    return result;
   }, [text]);
 
   return (

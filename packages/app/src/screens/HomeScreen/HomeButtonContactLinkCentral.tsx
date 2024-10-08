@@ -8,7 +8,6 @@ import {
   Shadow,
   useSVG,
 } from '@shopify/react-native-skia';
-import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, {
@@ -16,14 +15,12 @@ import Animated, {
   Easing,
   withSequence,
   withTiming,
-  useDerivedValue,
-  useAnimatedReaction,
-  runOnJS,
   useAnimatedStyle,
 } from 'react-native-reanimated';
 import { colors } from '#theme';
 
 import AnimatedText from '#components/AnimatedText';
+import { useAnimatedTextToPluralValue } from '#hooks/useAnimatedTextToPluralValue';
 import type { SharedValue } from 'react-native-reanimated';
 
 type HomeButtonContactLinkCentralProps = {
@@ -41,12 +38,6 @@ export const HomeButtonContactLinkCentral = ({
   count,
   contactsTextColor,
 }: HomeButtonContactLinkCentralProps) => {
-  const sharedCircleWidth = useSharedValue(circleWidth);
-
-  useEffect(() => {
-    sharedCircleWidth.value = circleWidth / 2;
-  }, [circleWidth, sharedCircleWidth]);
-
   const opacityValue = useSharedValue(1);
 
   const easing = Easing.inOut(Easing.ease);
@@ -65,12 +56,11 @@ export const HomeButtonContactLinkCentral = ({
   };
   const svg = useSVG(require('#assets/home-contact.svg'));
 
-  const contactCountTransform = useDerivedValue(() => {
-    return [
-      { translateY: sharedCircleWidth.value - (svg?.height() || 0) / 2 - 25 },
-      { translateX: sharedCircleWidth.value - (svg?.width() || 0) / 2 },
-    ];
-  });
+  const contactCountTransform = [
+    { translateY: circleWidth / 2 - (svg?.height() || 0) / 2 - 23 },
+    { translateX: circleWidth / 2 - (svg?.width() || 0) / 2 },
+  ];
+
   const containerStyle = [
     styles.container,
     {
@@ -82,19 +72,11 @@ export const HomeButtonContactLinkCentral = ({
   const textStyle = [
     styles.textStyle,
     {
-      top: (9 * circleWidth) / 24,
+      top: 0.37 * circleWidth,
     },
   ];
 
-  const [isPlural, setIsPlural] = useState(1);
-
-  useAnimatedReaction(
-    () => parseInt(count.value, 10) > 1,
-    _isPlural => {
-      runOnJS(setIsPlural)(_isPlural ? 1 : 0);
-    },
-    [],
-  );
+  const isPlural = useAnimatedTextToPluralValue(count);
 
   const textColorStyle = useAnimatedStyle(() => {
     return { color: contactsTextColor.value };
@@ -105,9 +87,9 @@ export const HomeButtonContactLinkCentral = ({
       <Canvas style={styles.circleCanvas}>
         <Group>
           <Circle
-            r={sharedCircleWidth}
-            cx={sharedCircleWidth}
-            cy={sharedCircleWidth}
+            r={circleWidth / 2}
+            cx={circleWidth / 2}
+            cy={circleWidth / 2}
             color={primaryColor}
             opacity={opacityValue}
           >
@@ -138,8 +120,9 @@ export const HomeButtonContactLinkCentral = ({
         <Animated.Text style={[styles.text, textColorStyle]}>
           <FormattedMessage
             defaultMessage="{isPlural, plural,
-                                    =0 {contact}
-                                    other {contacts}
+                                    =0 {Contacts}
+                                    =1 {Contact}
+                                    other {Contacts}
                                 }"
             description="HomeScreen - information panel - contacts label -- Note: the internal value is 0 for singular, 1 for plural "
             values={{ isPlural }}
