@@ -4,12 +4,18 @@ import type { ContactResolvers } from '#/__generated__/types';
 
 export const Contact: ContactResolvers = {
   webCard: contact => {
-    return getWebCardByProfileId(contact.contactProfileId);
+    if (contact.contactProfileId) {
+      return getWebCardByProfileId(contact.contactProfileId);
+    }
+    return null;
   },
   ownerProfile: contact => {
     return profileLoader.load(contact.ownerProfileId);
   },
   contactProfile: contact => {
-    return profileLoader.load(contact.contactProfileId);
+    if (contact.contactProfileId) {
+      return profileLoader.load(contact.contactProfileId);
+    }
+    return null;
   },
 };

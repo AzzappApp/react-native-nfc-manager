@@ -54,7 +54,7 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
   });
 
   useEffect(() => {
-    let timeout: NodeJS.Timeout | null = null;
+    let timeout: ReturnType<typeof setTimeout>;
     if (lastResult?.status === 'success') {
       sendGAEvent('event', 'download_vcard', {
         event_category: 'Form',

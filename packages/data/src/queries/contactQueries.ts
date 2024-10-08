@@ -1,7 +1,11 @@
 import { and, eq, like, or, type InferInsertModel, count } from 'drizzle-orm';
-import { db } from '../database';
+import { db, transaction } from '../database';
 import { ContactTable } from '../schema';
+import { incrementShareBacksTotal } from './profileQueries';
+import { incrementShareBacks } from './profileStatisticQueries';
 import type { Contact } from '../schema';
+
+export type ContactRow = InferInsertModel<typeof ContactTable>;
 
 export const getContactByProfiles = (profiles: {
   owner: string;
@@ -27,9 +31,7 @@ export const getContactCount = (profileId: string): Promise<number> => {
     .then(res => res[0].count || 0);
 };
 
-export const createContact = async (
-  newContact: InferInsertModel<typeof ContactTable>,
-) => {
+export const createContact = async (newContact: ContactRow) => {
   return db()
     .insert(ContactTable)
     .values(newContact)
@@ -42,6 +44,39 @@ export const updateContact = async (
   values: Partial<Omit<Contact, 'id'>>,
 ) => {
   await db().update(ContactTable).set(values).where(eq(ContactTable.id, id));
+};
+
+export type NewSharedContact = {
+  firstName: string;
+  lastName: string;
+  phone: string;
+  email: string;
+};
+/**
+ * Save a shareBack
+ *
+ * @param newShareBack - The shareBack data to save
+ */
+export const saveShareBack = async (
+  profileId: string,
+  newContact: NewSharedContact,
+) => {
+  const value: ContactRow = {
+    firstName: newContact.firstName,
+    lastName: newContact.lastName,
+    ownerProfileId: profileId,
+    phoneNumbers: [{ label: 'Home', number: newContact.phone }],
+    emails: [{ label: 'Main', address: newContact.email }],
+    addresses: [],
+    deviceIds: [],
+    type: 'shareback',
+  };
+
+  await transaction(async () => {
+    await db().insert(ContactTable).values(value);
+    await incrementShareBacksTotal(profileId);
+    await incrementShareBacks(profileId, true);
+  });
 };
 
 export const searchContacts = async (

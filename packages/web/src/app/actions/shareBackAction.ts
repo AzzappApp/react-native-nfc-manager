@@ -27,6 +27,7 @@ import {
 } from '#helpers/shareBackHelper';
 import { sendTwilioSMS } from '#helpers/twilioHelpers';
 import type { EmailAttachment } from '#helpers/emailHelpers';
+import type { NewSharedContact } from '@azzapp/data';
 import type { SubmissionResult } from '@conform-to/react';
 import type { JwtPayload } from 'jwt-decode';
 
@@ -139,10 +140,7 @@ export const processShareBackSubmission = async (
       description: 'Email body for new contact share back',
     });
 
-    await saveShareBack({
-      profileId: profile.id,
-      ...submission.payload,
-    });
+    await saveShareBack(profile.id, submission.payload as NewSharedContact);
 
     await sendPushNotification(profile.userId, {
       type: 'shareBack',

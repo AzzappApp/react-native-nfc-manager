@@ -985,32 +985,13 @@ export const WebCardStatisticTable = cols.table(
 export type WebCardStatistic = InferSelectModel<typeof WebCardStatisticTable>;
 //#endregion
 
-// #region ShareBack
-
-export const ShareBackTable = cols.table('ShareBack', {
-  id: cols.cuid('id').primaryKey().$defaultFn(createId),
-  profileId: cols.cuid('profileId').notNull(),
-  email: cols.defaultVarchar('email').default(''),
-  phone: cols.defaultVarchar('phone').default(''),
-  firstName: cols.defaultVarchar('firstName').default(''),
-  lastName: cols.defaultVarchar('lastName').default(''),
-  company: cols.defaultVarchar('company').default(''),
-  title: cols.defaultVarchar('title').default(''),
-  createdAt: cols
-    .dateTime('createdAt')
-    .notNull()
-    .default(DEFAULT_DATETIME_VALUE),
-});
-export type ShareBack = InferSelectModel<typeof ShareBackTable>;
-//#endregion
-
 // #region ContactTable
 export const ContactTable = cols.table(
   'Contact',
   {
     id: cols.cuid('id').primaryKey().$defaultFn(createId),
     ownerProfileId: cols.cuid('ownerProfileId').notNull(),
-    contactProfileId: cols.cuid('contactProfileId').notNull(),
+    contactProfileId: cols.cuid('contactProfileId'),
     firstName: cols.defaultVarchar('firstName').default('').notNull(),
     lastName: cols.defaultVarchar('lastName').default('').notNull(),
     company: cols.defaultVarchar('company').default('').notNull(),
