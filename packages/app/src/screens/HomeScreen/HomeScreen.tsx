@@ -127,4 +127,5 @@ export default relayScreen(HomeScreen, {
   canGoBack: false,
   pollInterval: 30000,
   useOfflineCache: true,
+  refreshOnFocus: true,
 });

@@ -67,6 +67,11 @@ export type RelayScreenOptions<TRoute extends Route> = LoadQueryOptions<
      * @default true
      */
     stopPollingWhenNotFocused?: boolean;
+    /**
+     * If true, the screen will refresh the query when it gains focus.
+     * @default false
+     */
+    refreshOnFocus?: boolean;
   };
 
 /**
@@ -113,6 +118,7 @@ function relayScreen<TRoute extends Route>(
     profileBound = true,
     pollInterval,
     stopPollingWhenNotFocused = true,
+    refreshOnFocus = false,
     ...options
   }: RelayScreenOptions<TRoute> & {
     getScreenOptions?: (
@@ -161,6 +167,9 @@ function relayScreen<TRoute extends Route>(
     }, [hasFocus, params, preloadedQuery, screenId]);
 
     const environment = useRelayEnvironment();
+
+    const usedProfile = profileBound ? profileInfos : null;
+
     useEffect(() => {
       let currentTimeout: any;
       let currentSubscription: Subscription | null;
@@ -170,42 +179,45 @@ function relayScreen<TRoute extends Route>(
         Number.isInteger(pollInterval) &&
         (props.hasFocus || !stopPollingWhenNotFocused)
       ) {
-        const poll = () => {
-          currentTimeout = setTimeout(() => {
-            const { query, variables } = getLoadQueryInfo(
-              options,
-              params,
-              profileInfos,
-            );
-            const { useOfflineCache } = options;
-            currentSubscription = fetchQuery(environment, query, variables, {
-              fetchPolicy: 'network-only',
-              networkCacheConfig: {
-                force: true,
-                metadata: { useOfflineCache },
-              },
-            }).subscribe({
-              complete: () => {
-                retryCount = 0;
-                if (cancelled) {
-                  return;
-                }
-                poll();
-              },
-              error: () => {
-                retryCount += 1;
-                setTimeout(
-                  () => {
-                    if (cancelled) {
-                      return;
-                    }
-                    poll();
-                  },
-                  2 ** Math.min(retryCount, 5) * 1000,
-                );
-              },
-            });
-          }, pollInterval);
+        const poll = (interval?: number) => {
+          currentTimeout = setTimeout(
+            () => {
+              const { query, variables } = getLoadQueryInfo(
+                options,
+                params,
+                usedProfile,
+              );
+              const { useOfflineCache } = options;
+              currentSubscription = fetchQuery(environment, query, variables, {
+                fetchPolicy: 'network-only',
+                networkCacheConfig: {
+                  force: true,
+                  metadata: { useOfflineCache },
+                },
+              }).subscribe({
+                complete: () => {
+                  retryCount = 0;
+                  if (cancelled) {
+                    return;
+                  }
+                  poll(pollInterval);
+                },
+                error: () => {
+                  retryCount += 1;
+                  setTimeout(
+                    () => {
+                      if (cancelled) {
+                        return;
+                      }
+                      poll(pollInterval);
+                    },
+                    2 ** Math.min(retryCount, 5) * 1000,
+                  );
+                },
+              });
+            },
+            interval ?? (refreshOnFocus ? 0 : pollInterval),
+          );
         };
         poll();
       }
@@ -214,7 +226,7 @@ function relayScreen<TRoute extends Route>(
         currentSubscription?.unsubscribe();
         clearTimeout(currentTimeout);
       };
-    }, [environment, params, profileInfos, props.hasFocus, screenId]);
+    }, [environment, params, usedProfile, props.hasFocus, screenId]);
 
     const intl = useIntl();
     const router = useRouter();
