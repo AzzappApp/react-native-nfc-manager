@@ -590,8 +590,8 @@ const getActivityName = async (webCardId: string, locale: string) => {
     ? await companyActivityLoader.load(webcard.companyActivityId)
     : null;
   const activityName = activity?.id
-    ? (await labelLoader.load([activity.id, locale])) ??
-      (await labelLoader.load([activity.id, DEFAULT_LOCALE]))
+    ? ((await labelLoader.load([activity.id, locale])) ??
+      (await labelLoader.load([activity.id, DEFAULT_LOCALE])))
     : null;
   return activityName?.value;
 };
