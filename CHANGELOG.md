@@ -1,5 +1,6 @@
-## 0.9.10-canary.31
+## 0.9.10-canary.32
 
+* **fix:**  - **home:** [#4967](https://github.com/AzzappApp/azzapp/pull/4967) add refresh on focus because polling restart while navigating ([#5291](https://github.com/AzzappApp/azzapp/pull/5291))
 * **fix:**  - manage plural on home screen buttons ([#5290](https://github.com/AzzappApp/azzapp/pull/5290))
 * **fix:**  - manage correctly media ([#5278](https://github.com/AzzappApp/azzapp/pull/5278))
 * **build:**  - update project deps + migrate to eslint v9 ([#5271](https://github.com/AzzappApp/azzapp/pull/5271))
