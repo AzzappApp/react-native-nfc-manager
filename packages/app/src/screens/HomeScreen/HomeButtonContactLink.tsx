@@ -16,6 +16,8 @@ import Animated, {
   withTiming,
   Easing,
   withSequence,
+  useAnimatedReaction,
+  runOnJS,
 } from 'react-native-reanimated';
 import { colors } from '#theme';
 import AnimatedText from '#components/AnimatedText';
@@ -27,19 +29,19 @@ import type { SharedValue } from 'react-native-reanimated';
 type HomeButtonContactLinkProps = {
   svgFile: DataSourceParam;
   count: SharedValue<string>;
-  MessageComponent: JSX.Element;
   onPress?: () => void;
   isLeft?: boolean;
   isTop?: boolean;
+  renderMessageComponent: (isPlural: number) => JSX.Element;
 };
 
 export const HomeButtonContactLink = ({
   svgFile,
   count,
-  MessageComponent,
   onPress,
   isLeft,
   isTop,
+  renderMessageComponent,
 }: HomeButtonContactLinkProps) => {
   const animationDuration = 150;
   const defaultOpacity = 0.18;
@@ -96,6 +98,16 @@ export const HomeButtonContactLink = ({
     );
   };
 
+  const [isPlural, setIsPlural] = useState(1);
+
+  useAnimatedReaction(
+    () => parseInt(count.value, 10) > 1,
+    _isPlural => {
+      runOnJS(setIsPlural)(_isPlural ? 1 : 0);
+    },
+    [],
+  );
+
   return (
     <View style={styles.item} onLayout={onLayout}>
       <Animated.View
@@ -117,7 +129,7 @@ export const HomeButtonContactLink = ({
       <View pointerEvents="none" style={styles.textContainer}>
         <AnimatedText variant="xlarge" text={count} appearance="dark" />
         <Text variant="small" style={styles.text}>
-          {MessageComponent}
+          {renderMessageComponent(isPlural)}
         </Text>
       </View>
     </View>

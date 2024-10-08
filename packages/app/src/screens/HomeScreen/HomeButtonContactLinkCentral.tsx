@@ -6,7 +6,7 @@ import {
   Shadow,
   useSVG,
 } from '@shopify/react-native-skia';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Pressable, StyleSheet, View } from 'react-native';
 import {
@@ -15,6 +15,8 @@ import {
   withSequence,
   withTiming,
   useDerivedValue,
+  useAnimatedReaction,
+  runOnJS,
 } from 'react-native-reanimated';
 import { colors } from '#theme';
 
@@ -80,6 +82,16 @@ export const HomeButtonContactLinkCentral = ({
     },
   ];
 
+  const [isPlural, setIsPlural] = useState(1);
+
+  useAnimatedReaction(
+    () => parseInt(count.value, 10) > 1,
+    _isPlural => {
+      runOnJS(setIsPlural)(_isPlural ? 1 : 0);
+    },
+    [],
+  );
+
   return (
     <View style={containerStyle} pointerEvents="box-none">
       <Canvas style={styles.circleCanvas}>
@@ -109,8 +121,12 @@ export const HomeButtonContactLinkCentral = ({
 
         <Text variant="small" style={styles.text}>
           <FormattedMessage
-            defaultMessage="Contacts"
-            description="HomeScreen - information panel - contacts label"
+            defaultMessage="{isPlural, plural,
+                                    =0 {contact}
+                                    other {contacts}
+                                }"
+            description="HomeScreen - information panel - contacts label -- Note: the internal value is 0 for singular, 1 for plural "
+            values={{ isPlural }}
           />
         </Text>
       </View>

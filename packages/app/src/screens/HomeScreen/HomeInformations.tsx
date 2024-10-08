@@ -216,52 +216,68 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
         <HomeButtonContactLink
           svgFile={require('#assets/home-top-left.svg')}
           count={nbPosts}
-          MessageComponent={
-            <FormattedMessage
-              defaultMessage="Posts"
-              description="HomeScreen - information panel - Post label"
-            />
-          }
           onPress={goToPosts}
           isTop
           isLeft
+          renderMessageComponent={isPlural => (
+            <FormattedMessage
+              defaultMessage="{isPlural, plural,
+      =0 {Post}
+      other {Posts}
+    }"
+              description="HomeScreen - information panel - Post label"
+              values={{ isPlural }}
+            />
+          )}
         />
         <HomeButtonContactLink
           svgFile={require('#assets/home-top-right.svg')}
           count={nbLikes}
-          MessageComponent={
-            <FormattedMessage
-              defaultMessage="Likes"
-              description="HomeScreen - information panel - Likes label"
-            />
-          }
           onPress={goToLikedPost}
           isTop
+          renderMessageComponent={isPlural => (
+            <FormattedMessage
+              defaultMessage="{isPlural, plural,
+      =0 {Like}
+      other {Likes}
+    }"
+              description="HomeScreen - information panel - Likes label"
+              values={{ isPlural }}
+            />
+          )}
         />
       </View>
       <View style={styles.row}>
         <HomeButtonContactLink
           svgFile={require('#assets/home-bottom-left.svg')}
           count={nbFollowers}
-          MessageComponent={
-            <FormattedMessage
-              defaultMessage="Followers"
-              description="HomeScreen - information panel - Followers label"
-            />
-          }
           onPress={goToFollower}
           isLeft
+          renderMessageComponent={isPlural => (
+            <FormattedMessage
+              defaultMessage="{isPlural, plural,
+    =0 {Follower}
+    other {Followers}
+    }"
+              description="HomeScreen - information panel - Followers label"
+              values={{ isPlural }}
+            />
+          )}
         />
         <HomeButtonContactLink
           svgFile={require('#assets/home-bottom-right.svg')}
           count={nbFollowings}
-          MessageComponent={
-            <FormattedMessage
-              defaultMessage="Followings"
-              description="HomeScreen - information panel - Followings label"
-            />
-          }
           onPress={goToFollowing}
+          renderMessageComponent={isPlural => (
+            <FormattedMessage
+              defaultMessage="{isPlural, plural,
+    =0 {Following}
+    other {Following}
+    }"
+              description="HomeScreen - information panel - Followings label"
+              values={{ isPlural }}
+            />
+          )}
         />
       </View>
       {/* central circle */}
