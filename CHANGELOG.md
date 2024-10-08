@@ -1,5 +1,8 @@
-## 0.9.10-canary.35
+## 0.9.10-canary.36
 
+* **fix:**  - remove shareBack contact table ([#5280](https://github.com/AzzappApp/azzapp/pull/5280))
+* **fix:**  - rework contact link buttons to be more flexible and manage UI more dynamically ([#5294](https://github.com/AzzappApp/azzapp/pull/5294))
+* **perf:**  - reduce usage of useAuthState to limit rerendering ([#5300](https://github.com/AzzappApp/azzapp/pull/5300))
 * **fix:**  - **home:** [#4967](https://github.com/AzzappApp/azzapp/pull/4967) add refresh on focus because polling restart while navigating ([#5291](https://github.com/AzzappApp/azzapp/pull/5291))
 * **fix:**  - manage plural on home screen buttons ([#5290](https://github.com/AzzappApp/azzapp/pull/5290))
 * **fix:**  - manage correctly media ([#5278](https://github.com/AzzappApp/azzapp/pull/5278))
