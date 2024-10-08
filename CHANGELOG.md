@@ -1,4 +1,4 @@
-## 0.9.10-canary.34
+## 0.9.10-canary.35
 
 * **fix:**  - **home:** [#4967](https://github.com/AzzappApp/azzapp/pull/4967) add refresh on focus because polling restart while navigating ([#5291](https://github.com/AzzappApp/azzapp/pull/5291))
 * **fix:**  - manage plural on home screen buttons ([#5290](https://github.com/AzzappApp/azzapp/pull/5290))
