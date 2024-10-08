@@ -114,7 +114,7 @@ async function getAccessToken() {
   }
 
   const privateKey = await importPKCS8(
-    process.env.FIREBASE_PRIVATE_KEY!.replace(/\\n/g, '\n'),
+    process.env.FIREBASE_PRIVATE_KEY!.replace(/\\\n/g, '\n'),
     'RS256',
   );
 
