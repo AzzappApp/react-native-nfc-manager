@@ -1,4 +1,4 @@
-## 0.9.10-canary.28
+## 0.9.10-canary.29
 
 * **fix:**  - manage correctly media ([#5278](https://github.com/AzzappApp/azzapp/pull/5278))
 * **build:**  - update project deps + migrate to eslint v9 ([#5271](https://github.com/AzzappApp/azzapp/pull/5271))
