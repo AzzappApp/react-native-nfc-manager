@@ -515,7 +515,8 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   middleElement: {
-    left: 0,
+    left: '6%',
+    width: '90%',
   },
   header: {
     paddingHorizontal: 0,
