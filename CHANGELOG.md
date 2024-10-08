@@ -1,4 +1,4 @@
-## 0.9.10-canary.36
+## 0.9.10-canary.37
 
 * **fix:**  - remove shareBack contact table ([#5280](https://github.com/AzzappApp/azzapp/pull/5280))
 * **fix:**  - rework contact link buttons to be more flexible and manage UI more dynamically ([#5294](https://github.com/AzzappApp/azzapp/pull/5294))
