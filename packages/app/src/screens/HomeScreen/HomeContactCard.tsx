@@ -112,9 +112,9 @@ const ContactCardItem = ({ height, item, index }: ContactCardItemProps) => {
     item,
   );
 
-  const authState = useAuthState();
+  const { profileInfos } = useAuthState();
   const router = useRouter();
-  const disabled = authState.profileInfos?.profileId !== profile.id;
+  const disabled = profileInfos?.profileId !== profile.id;
 
   const onPressContactCard = useCallback(() => {
     if (!disabled) {

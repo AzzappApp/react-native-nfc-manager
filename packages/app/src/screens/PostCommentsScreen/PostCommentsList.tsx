@@ -75,7 +75,7 @@ const PostCommentsList = ({
 
   const router = useRouter();
   const intl = useIntl();
-  const auth = useAuthState();
+  const { profileInfos } = useAuthState();
 
   const { data, loadNext, refetch, hasNext, isLoadingNext } =
     usePaginationFragment(
@@ -191,10 +191,10 @@ const PostCommentsList = ({
     setSubmitting(true);
     if (!submitting) {
       Keyboard.dismiss();
-      if (profileHasEditorRight(auth.profileInfos?.profileRole)) {
+      if (profileHasEditorRight(profileInfos?.profileRole)) {
         commit({
           variables: {
-            webCardId: auth.profileInfos?.webCardId,
+            webCardId: profileInfos?.webCardId,
             input: { postId, comment },
             connections: [connectionID],
           },
@@ -302,12 +302,12 @@ const PostCommentsList = ({
     }: {
       item: CommentItemFragment_comment$key & { webCard: { id: string } };
     }) => {
-      if (auth.profileInfos?.webCardId !== item.webCard.id) {
+      if (profileInfos?.webCardId !== item.webCard.id) {
         return <ReportableCommentItem item={item} />;
       }
       return <DeletableCommentItem item={item} postId={postId} />;
     },
-    [auth.profileInfos?.webCardId, postId],
+    [profileInfos?.webCardId, postId],
   );
 
   const insets = useScreenInsets();

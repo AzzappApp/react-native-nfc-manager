@@ -16,8 +16,8 @@ import { graphql, useFragment } from 'react-relay';
 import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import AuthorCartouche from '#components/AuthorCartouche';
+import { getAuthState } from '#helpers/authStore';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import useAuthState from '#hooks/useAuthState';
 import useToggle from '#hooks/useToggle';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
@@ -170,8 +170,6 @@ const PostRenderer = (
     [],
   );
 
-  const { profileInfos } = useAuthState();
-
   const [showModal, toggleModal] = useToggle();
   const context = useContext(PostListContext);
   const shouldPlayVideo = context.played === post.id;
@@ -180,6 +178,7 @@ const PostRenderer = (
   const intl = useIntl();
 
   const openModal = useCallback(() => {
+    const { profileInfos } = getAuthState();
     if (profileHasEditorRight(profileInfos?.profileRole)) {
       toggleModal();
     } else {
@@ -192,7 +191,7 @@ const PostRenderer = (
         }),
       });
     }
-  }, [intl, profileInfos?.profileRole, toggleModal]);
+  }, [intl, toggleModal]);
 
   const handleOpenModal = () => {
     if (!actionEnabled) {

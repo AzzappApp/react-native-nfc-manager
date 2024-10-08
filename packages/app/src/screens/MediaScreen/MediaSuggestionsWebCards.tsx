@@ -18,8 +18,8 @@ import { colors, shadow } from '#theme';
 import CoverLink from '#components/CoverLink';
 import CoverList from '#components/CoverList';
 import Skeleton from '#components/Skeleton';
+import { getAuthState } from '#helpers/authStore';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import useAuthState from '#hooks/useAuthState';
 import useToggleFollow from '#hooks/useToggleFollow';
 import CoverLink_webCardFragment from '#relayArtifacts/CoverLink_webCard.graphql';
 import Button from '#ui/Button';
@@ -141,8 +141,6 @@ const CoverLinkWithOptions = ({
 }) => {
   const styles = useStyleSheet(styleSheet);
 
-  const { profileInfos } = useAuthState();
-
   const toggleFollow = useToggleFollow();
 
   const { userName } = useFragment(CoverLink_webCardFragment, props.webCard);
@@ -162,6 +160,8 @@ const CoverLinkWithOptions = ({
       });
       return;
     }
+
+    const { profileInfos } = getAuthState();
 
     if (profileHasEditorRight(profileInfos?.profileRole)) {
       startTransition(() => {
@@ -190,7 +190,6 @@ const CoverLinkWithOptions = ({
     cardIsPublished,
     intl,
     isFollowing,
-    profileInfos?.profileRole,
     props.webCardId,
     toggleFollow,
     userName,

@@ -32,7 +32,7 @@ const AddContactModalProfiles = ({
   onSelectProfile,
   nativeGesture,
 }: Props) => {
-  const auth = useAuthState();
+  const { profileInfos } = useAuthState();
 
   const { profiles } = useFragment(
     graphql`
@@ -57,10 +57,10 @@ const AddContactModalProfiles = ({
 
   const initialProfileIndex = useMemo(() => {
     return Math.max(
-      data.findIndex(profile => profile.id === auth.profileInfos?.profileId),
+      data.findIndex(profile => profile.id === profileInfos?.profileId),
       0,
     );
-  }, [auth.profileInfos?.profileId, data]);
+  }, [profileInfos?.profileId, data]);
 
   const currentIndexSharedValue = useSharedValue(initialProfileIndex);
 

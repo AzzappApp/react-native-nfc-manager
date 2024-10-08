@@ -22,7 +22,7 @@ type Props = {
 };
 
 const AddContentBelowCoverTemplates = ({ isPremium }: Props) => {
-  const auth = useAuthState();
+  const { profileInfos } = useAuthState();
   const intl = useIntl();
   const router = useRouter();
 
@@ -39,7 +39,7 @@ const AddContentBelowCoverTemplates = ({ isPremium }: Props) => {
     templates,
     onSelectSection,
     loadMore,
-  ] = useCardTemplates(auth.profileInfos!.profileId);
+  ] = useCardTemplates(profileInfos!.profileId);
 
   const selectedIndexRef = useRef(0);
 
@@ -94,18 +94,18 @@ const AddContentBelowCoverTemplates = ({ isPremium }: Props) => {
     router.replace({
       route: 'WEBCARD',
       params: {
-        webCardId: auth.profileInfos!.webCardId,
-        userName: auth.profileInfos!.userName,
+        webCardId: profileInfos!.webCardId,
+        userName: profileInfos!.userName,
         editing: true,
       },
     });
-  }, [auth.profileInfos, router]);
+  }, [profileInfos, router]);
 
   const [commit, inFlight] = useLoadCardTemplateMutation();
 
   const onSubmit = useCallback(
     (cardTemplate: CardTemplateItem) => {
-      const webCardId = auth.profileInfos!.webCardId;
+      const webCardId = profileInfos?.webCardId;
       if (!webCardId || !cardTemplate?.id) {
         return;
       }
@@ -129,7 +129,7 @@ const AddContentBelowCoverTemplates = ({ isPremium }: Props) => {
         },
       });
     },
-    [auth.profileInfos, commit, intl, onDone],
+    [profileInfos?.webCardId, commit, intl, onDone],
   );
 
   const onChoseTemplatePress = useCallback(() => {

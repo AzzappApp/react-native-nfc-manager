@@ -16,7 +16,7 @@ type Props = {
 };
 
 const PostLikesListItem = ({ webcard: webcardKey }: Props) => {
-  const state = useAuthState();
+  const { profileInfos } = useAuthState();
   const webCard = useFragment(
     graphql`
       fragment PostLikesListItem_webCard on WebCard
@@ -61,7 +61,7 @@ const PostLikesListItem = ({ webcard: webcardKey }: Props) => {
             </View>
           </PressableNative>
         </Link>
-        {state.profileInfos?.webCardId !== webCard.id && (
+        {profileInfos?.webCardId !== webCard.id && (
           <PressableNative onPress={onToggleFollow}>
             {!webCard.isFollowing && (
               <Text variant="button">

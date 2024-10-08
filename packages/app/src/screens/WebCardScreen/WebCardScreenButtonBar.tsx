@@ -1,4 +1,4 @@
-import { Suspense } from 'react';
+import { Suspense, useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Alert, StyleSheet, View } from 'react-native';
 import Animated, {
@@ -13,7 +13,7 @@ import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import { logEvent } from '#helpers/analytics';
-import useAuthState from '#hooks/useAuthState';
+import { getAuthState } from '#helpers/authStore';
 import useScreenInsets from '#hooks/useScreenInsets';
 import BlurredFloatingButton, {
   BlurredFloatingIconButton,
@@ -203,7 +203,6 @@ const WebCardScreenButtonActionButton = ({
   );
   const isFollowing = webCard.webCardScreenButtonBar_isFollowing;
 
-  const { profileInfos } = useAuthState();
   const intl = useIntl();
 
   const router = useRouter();
@@ -258,7 +257,7 @@ const WebCardScreenButtonActionButton = ({
       });
       return;
     }
-
+    const { profileInfos } = getAuthState();
     if (
       profileInfos?.profileRole &&
       profileHasEditorRight(profileInfos.profileRole)
@@ -285,7 +284,8 @@ const WebCardScreenButtonActionButton = ({
     }
   }, 600);
 
-  const onCreateNewPost = () => {
+  const onCreateNewPost = useCallback(() => {
+    const { profileInfos } = getAuthState();
     if (
       profileInfos?.profileRole &&
       profileHasEditorRight(profileInfos?.profileRole)
@@ -302,7 +302,7 @@ const WebCardScreenButtonActionButton = ({
         }),
       });
     }
-  };
+  }, [intl, router]);
 
   return isViewer ? (
     isWebCardDisplayed ? (

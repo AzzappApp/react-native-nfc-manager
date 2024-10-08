@@ -18,6 +18,7 @@ import Animated, {
 import Toast from 'react-native-toast-message';
 import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import { logEvent } from '#helpers/analytics';
+import { getAuthState } from '#helpers/authStore';
 import { createId } from '#helpers/idHelpers';
 import useAuthState from '#hooks/useAuthState';
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -82,8 +83,6 @@ const MainTabBar = ({
 }) => {
   const router = useRouter();
 
-  const { profileInfos } = useAuthState();
-
   const insets = useScreenInsets();
   const { width } = useWindowDimensions();
 
@@ -133,6 +132,8 @@ const MainTabBar = ({
 
       if (!hasFinishedTransition) return;
 
+      const { profileInfos } = getAuthState();
+
       if (
         key !== 'NEW_POST' ||
         profileHasEditorRight(profileInfos?.profileRole)
@@ -149,7 +150,7 @@ const MainTabBar = ({
         });
       }
     },
-    [intl, profileInfos?.profileRole, router, visibilityState],
+    [intl, router, visibilityState],
   );
 
   useEffect(() => {
