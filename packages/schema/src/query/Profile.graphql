@@ -152,6 +152,24 @@ type Profile implements Node {
   ): PostConnection!
 
   """
+  Return a list of contacts that match the search query
+  """
+  searchContacts(
+    """
+    The search query
+    """
+    name: String
+    """
+    Returns the items in the list that come after the specified cursor.
+    """
+    after: String
+    """
+    Returns the first n items from the list.
+    """
+    first: Int @max(value: 50)
+  ): ContactConnection!
+
+  """
   Return a list of profiles that match the search query
   """
   searchWebCards(
@@ -186,7 +204,8 @@ type Profile implements Node {
   """
   Fetches cover template type
   """
-  coverTemplateTypes: [CoverTemplateType!]! @deprecated(reason: "Unused in version 0.9.5-canary.13")
+  coverTemplateTypes: [CoverTemplateType!]!
+    @deprecated(reason: "Unused in version 0.9.5-canary.13")
 
   """
   Fetches card styles

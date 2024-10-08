@@ -3,10 +3,10 @@ Represent a Contact
 """
 type Contact {
   id: ID!
-  ownerProfileId: String!
-  contactProfileId: String!
-  firstname: String!
-  lastname: String!
+  ownerProfile: Profile
+  contactProfile: Profile
+  firstName: String!
+  lastName: String!
   company: String!
   title: String!
   createdAt: DateTime!
@@ -16,6 +16,7 @@ type Contact {
   emails: [ContactEmail!]!
   addresses: [ContactAddress!]!
   deviceIds: [String!]!
+  webCard: WebCard
 }
 
 type ContactPhoneNumber {
@@ -31,4 +32,34 @@ type ContactEmail {
 type ContactAddress {
   label: String!
   address: String!
+}
+
+"""
+An edge in a connection.
+"""
+type ContactEdge {
+  """
+  The item at the end of the edge
+  """
+  node: Contact
+
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+}
+
+"""
+A connection to a list of items.
+"""
+type ContactConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+
+  """
+  A list of edges.
+  """
+  edges: [ContactEdge]
 }

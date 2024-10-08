@@ -1034,6 +1034,8 @@ export const ContactTable = cols.table(
       .$type<Array<{ label: string; address: string }>>()
       .notNull(),
     deviceIds: cols.json('deviceIds').$type<string[]>().notNull(),
+    deleted: cols.boolean('deleted').default(false).notNull(),
+    deletedAt: cols.dateTime('deletedAt'),
   },
   table => {
     return {

@@ -15,6 +15,7 @@ import {
   searchPosts,
   searchWebCards,
   getCardTemplatesForWebCardKind,
+  searchContacts,
   getContactCount,
 } from '@azzapp/data';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
@@ -334,6 +335,29 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
       hasPreviousPage: offset !== null,
     });
   },
+  searchContacts: async (profile, { first, after, name }) => {
+    if (!profileIsAssociatedToCurrentUser(profile)) {
+      return emptyConnection;
+    }
+    first = first ?? 50;
+    const offset = after ? cursorToOffset(after) : 0;
+
+    const { contacts, count } = await searchContacts({
+      limit: first,
+      ownerProfileId: profile.id,
+      name: name ?? undefined,
+      offset,
+    });
+
+    return connectionFromArraySlice(
+      contacts,
+      { after, first },
+      {
+        sliceStart: offset,
+        arrayLength: count,
+      },
+    );
+  },
   searchWebCards: async (profile, { first, after, search }) => {
     if (!profileIsAssociatedToCurrentUser(profile)) {
       return emptyConnection;
@@ -566,8 +590,8 @@ const getActivityName = async (webCardId: string, locale: string) => {
     ? await companyActivityLoader.load(webcard.companyActivityId)
     : null;
   const activityName = activity?.id
-    ? ((await labelLoader.load([activity.id, locale])) ??
-      (await labelLoader.load([activity.id, DEFAULT_LOCALE])))
+    ? (await labelLoader.load([activity.id, locale])) ??
+      (await labelLoader.load([activity.id, DEFAULT_LOCALE]))
     : null;
   return activityName?.value;
 };
