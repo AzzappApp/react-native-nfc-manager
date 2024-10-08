@@ -1,15 +1,17 @@
 import {
+  BlendColor,
   Canvas,
   Circle,
   Group,
   ImageSVG,
+  Paint,
   Shadow,
   useSVG,
 } from '@shopify/react-native-skia';
 import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Pressable, StyleSheet, View } from 'react-native';
-import {
+import Animated, {
   useSharedValue,
   Easing,
   withSequence,
@@ -17,16 +19,17 @@ import {
   useDerivedValue,
   useAnimatedReaction,
   runOnJS,
+  useAnimatedStyle,
 } from 'react-native-reanimated';
 import { colors } from '#theme';
 
 import AnimatedText from '#components/AnimatedText';
-import Text from '#ui/Text';
 import type { SharedValue } from 'react-native-reanimated';
 
 type HomeButtonContactLinkCentralProps = {
   circleWidth: number;
   primaryColor: SharedValue<string>;
+  contactsTextColor: SharedValue<string>;
   onPress: () => void;
   count: SharedValue<string>;
 };
@@ -36,6 +39,7 @@ export const HomeButtonContactLinkCentral = ({
   primaryColor,
   onPress,
   count,
+  contactsTextColor,
 }: HomeButtonContactLinkCentralProps) => {
   const sharedCircleWidth = useSharedValue(circleWidth);
 
@@ -92,6 +96,10 @@ export const HomeButtonContactLinkCentral = ({
     [],
   );
 
+  const textColorStyle = useAnimatedStyle(() => {
+    return { color: contactsTextColor.value };
+  });
+
   return (
     <View style={containerStyle} pointerEvents="box-none">
       <Canvas style={styles.circleCanvas}>
@@ -107,7 +115,14 @@ export const HomeButtonContactLinkCentral = ({
             <Shadow dx={-1} dy={-1} blur={2} color="#00000050" inner />
           </Circle>
         </Group>
-        <Group transform={contactCountTransform}>
+        <Group
+          transform={contactCountTransform}
+          layer={
+            <Paint>
+              <BlendColor color={contactsTextColor} mode="srcIn" />
+            </Paint>
+          }
+        >
           <ImageSVG svg={svg} />
         </Group>
       </Canvas>
@@ -117,9 +132,10 @@ export const HomeButtonContactLinkCentral = ({
           text={count}
           appearance="dark"
           style={styles.textAlign}
+          animatedTextColor={contactsTextColor}
         />
 
-        <Text variant="small" style={styles.text}>
+        <Animated.Text style={[styles.text, textColorStyle]}>
           <FormattedMessage
             defaultMessage="{isPlural, plural,
                                     =0 {contact}
@@ -128,7 +144,7 @@ export const HomeButtonContactLinkCentral = ({
             description="HomeScreen - information panel - contacts label -- Note: the internal value is 0 for singular, 1 for plural "
             values={{ isPlural }}
           />
-        </Text>
+        </Animated.Text>
       </View>
       <Pressable
         style={styles.circlePressable}

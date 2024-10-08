@@ -8,6 +8,7 @@ import {
   interpolateColor,
 } from 'react-native-reanimated';
 import { useFragment, graphql } from 'react-relay';
+import { getTextColor } from '@azzapp/shared/colorsHelpers';
 import { useRouter } from '#components/NativeRouter';
 import { HomeButtonContactLink } from './HomeButtonContactLink';
 import { HomeButtonContactLinkCentral } from './HomeButtonContactLinkCentral';
@@ -96,11 +97,17 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
     [profiles],
   );
 
+  const contactsTextColorValue = useMemo(
+    () => primaryColorValue.map(color => getTextColor(color)),
+    [primaryColorValue],
+  );
+
   const nbPosts = useSharedValue('-1');
   const nbLikes = useSharedValue('-1');
   const nbFollowers = useSharedValue('-1');
   const nbFollowings = useSharedValue('-1');
   const nbContacts = useSharedValue('-1');
+  const contactsTextColor = useSharedValue('-1');
   const primaryColor = useSharedValue('#000000');
 
   const { currentIndexSharedValue, currentIndexProfile, inputRange } =
@@ -113,6 +120,7 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
     nbFollowers.value = format(nbFollowersValue[currentIndexProfile.value]);
     nbContacts.value = format(nbContactsValue[currentIndexProfile.value]);
     primaryColor.value = primaryColorValue[currentIndexProfile.value];
+    contactsTextColor.value = contactsTextColorValue[currentIndexProfile.value];
   }, [
     currentIndexProfile,
     nbFollowers,
@@ -127,6 +135,8 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
     nbContactsValue,
     primaryColor,
     primaryColorValue,
+    contactsTextColor,
+    contactsTextColorValue,
   ]);
 
   useAnimatedReaction(
@@ -153,6 +163,11 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
           inputRange.value,
           primaryColorValue,
         );
+        contactsTextColor.value = interpolateColor(
+          actual,
+          inputRange.value,
+          contactsTextColorValue,
+        );
       } else if (actual >= 0) {
         nbPosts.value = format(nbPostsValue[actual]);
         nbLikes.value = format(nbLikesValue[actual]);
@@ -160,6 +175,7 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
         nbFollowings.value = format(nbFollowingsValue[actual]);
         nbContacts.value = format(nbContactsValue[actual]);
         primaryColor.value = primaryColorValue[actual];
+        contactsTextColor.value = contactsTextColorValue[actual];
       }
     },
   );
@@ -285,6 +301,7 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
         circleWidth={circleWidth}
         onPress={goToContacts}
         primaryColor={primaryColor}
+        contactsTextColor={contactsTextColor}
         count={nbContacts}
       />
     </View>
