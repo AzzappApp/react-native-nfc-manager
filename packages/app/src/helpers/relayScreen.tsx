@@ -160,15 +160,25 @@ function relayScreen<TRoute extends Route>(
       }
     }, [screenId, params, preloadedQuery, hasFocus]);
 
-    const refreshQuery = useCallback(() => {
-      if (!preloadedQuery && hasFocus) {
-        loadQueryFor(screenId, options, params, true);
-      }
-    }, [hasFocus, params, preloadedQuery, screenId]);
-
     const environment = useRelayEnvironment();
 
     const usedProfile = profileBound ? profileInfos : null;
+
+    const refreshQuery = useCallback(() => {
+      const { query, variables } = getLoadQueryInfo(
+        options,
+        params,
+        usedProfile,
+      );
+      const { useOfflineCache } = options;
+      fetchQuery(environment, query, variables, {
+        fetchPolicy: 'network-only',
+        networkCacheConfig: {
+          force: true,
+          metadata: { useOfflineCache },
+        },
+      });
+    }, [environment, params, usedProfile]);
 
     useEffect(() => {
       let currentTimeout: any;
