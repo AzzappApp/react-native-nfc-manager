@@ -1,4 +1,4 @@
-## 0.9.10-canary.41
+## 0.9.10-canary.42
 
 * **fix:**  - limit contact text size ([#5309](https://github.com/AzzappApp/azzapp/pull/5309))
 * **fix:**  - implement contact count on top level of contact screen ([#5308](https://github.com/AzzappApp/azzapp/pull/5308))
