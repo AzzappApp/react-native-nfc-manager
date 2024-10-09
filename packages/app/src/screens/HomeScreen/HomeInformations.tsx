@@ -108,7 +108,7 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
   const nbFollowers = useSharedValue('-1');
   const nbFollowings = useSharedValue('-1');
   const nbContacts = useSharedValue('-1');
-  const contactsTextColor = useSharedValue('-1');
+  const contactsTextColor = useSharedValue(getTextColor('#000000'));
   const primaryColor = useSharedValue('#000000');
 
   const { currentIndexSharedValue, currentIndexProfile, inputRange } =
