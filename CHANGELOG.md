@@ -1,5 +1,6 @@
-## 0.9.10-canary.38
+## 0.9.10-canary.39
 
+* **fix:**  - limit contact text size ([#5309](https://github.com/AzzappApp/azzapp/pull/5309))
 * **fix:**  - implement contact count on top level of contact screen ([#5308](https://github.com/AzzappApp/azzapp/pull/5308))
 * **fix:**  - **home:** [#5297](https://github.com/AzzappApp/azzapp/pull/5297) refresh query get partial infos ([#5307](https://github.com/AzzappApp/azzapp/pull/5307))
 * **fix:**  - **mutiUser:** [#5258](https://github.com/AzzappApp/azzapp/pull/5258) sendInvitations undeletes profiles ([#5306](https://github.com/AzzappApp/azzapp/pull/5306))
