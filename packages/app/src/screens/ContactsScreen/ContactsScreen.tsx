@@ -48,6 +48,7 @@ const contactsScreenQuery = graphql`
   query ContactsScreenQuery($profileId: ID!) {
     profile: node(id: $profileId) {
       ... on Profile {
+        nbContacts
         ...ContactsScreen_contacts
       }
     }
@@ -169,8 +170,12 @@ const ContactsScreen = ({
             <Text variant="large">
               <FormattedMessage
                 description="ContactsScreen - Title"
-                defaultMessage="{contacts} Contacts"
-                values={{ contacts: 0 }}
+                defaultMessage="{contacts, plural,
+                  =0 {# Contacts}
+                  =1 {# Contact}
+                  other {# Contacts}
+          }"
+                values={{ contacts: profile?.nbContacts ?? 0 }}
               />
             </Text>
           }
