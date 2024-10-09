@@ -1,12 +1,12 @@
 import { GraphQLError } from 'graphql';
-import { getContactByProfiles, removeContact } from '@azzapp/data';
+import { removeContacts } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { getSessionInfos } from '#GraphQLContext';
 import { profileLoader } from '#loaders';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#__generated__/types';
 
-type Mutation = MutationResolvers['removeContact'];
+type Mutation = MutationResolvers['removeContacts'];
 
 const removeFollowerMutation: Mutation = async (
   _,
@@ -25,24 +25,14 @@ const removeFollowerMutation: Mutation = async (
     throw new GraphQLError(ERRORS.FORBIDDEN);
   }
 
-  const profileIdToRemove = fromGlobalIdWithType(input.profileId, 'Profile');
+  const contactIdsToRemove = input.contactIds.map(contactIdToRemove =>
+    fromGlobalIdWithType(contactIdToRemove, 'Contact'),
+  );
 
-  const contactToRemove = await getContactByProfiles({
-    owner: profileId,
-    contact: profileIdToRemove,
-  });
-
-  if (!contactToRemove) {
-    throw new GraphQLError(ERRORS.INVALID_REQUEST);
-  }
-
-  await removeContact({
-    owner: profileId,
-    contact: profileIdToRemove,
-  });
+  await removeContacts(profileId, contactIdsToRemove);
 
   return {
-    removedContactId: contactToRemove.id,
+    removedContactIds: input.contactIds,
   };
 };
 

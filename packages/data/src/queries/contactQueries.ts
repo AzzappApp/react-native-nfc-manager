@@ -1,4 +1,13 @@
-import { and, eq, like, or, type InferInsertModel, count } from 'drizzle-orm';
+import {
+  and,
+  eq,
+  like,
+  or,
+  type InferInsertModel,
+  count,
+  desc,
+  inArray,
+} from 'drizzle-orm';
 import { db, transaction } from '../database';
 import { ContactTable } from '../schema';
 import { incrementShareBacksTotal } from './profileQueries';
@@ -27,7 +36,12 @@ export const getContactCount = (profileId: string): Promise<number> => {
   return db()
     .select({ count: count() })
     .from(ContactTable)
-    .where(eq(ContactTable.ownerProfileId, profileId))
+    .where(
+      and(
+        eq(ContactTable.ownerProfileId, profileId),
+        eq(ContactTable.deleted, false),
+      ),
+    )
     .then(res => res[0].count || 0);
 };
 
@@ -85,14 +99,21 @@ export const searchContacts = async (
     offset,
     ownerProfileId,
     name,
+    orderBy,
   }: {
     limit: number;
     offset?: number;
     ownerProfileId: string;
     name?: string;
+    orderBy: 'date' | 'name';
   },
   withDeleted = false,
 ): Promise<{ count: number; contacts: Contact[] }> => {
+  const orders =
+    orderBy === 'name'
+      ? [ContactTable.firstName, ContactTable.lastName]
+      : [desc(ContactTable.createdAt)];
+
   const [counter, contacts] = await Promise.all([
     db()
       .select({ count: count() })
@@ -123,7 +144,7 @@ export const searchContacts = async (
             : undefined,
         ),
       )
-      .orderBy(ContactTable.firstName, ContactTable.lastName)
+      .orderBy(...orders)
       .limit(limit)
       .offset(offset ?? 0),
   ]);
@@ -134,13 +155,10 @@ export const searchContacts = async (
   };
 };
 
-export const removeContact = async ({
-  owner,
-  contact,
-}: {
-  owner: string;
-  contact: string;
-}) => {
+export const removeContacts = async (
+  ownerProfileId: string,
+  contactIds: string[],
+) => {
   return db()
     .update(ContactTable)
     .set({
@@ -149,8 +167,8 @@ export const removeContact = async ({
     })
     .where(
       and(
-        eq(ContactTable.ownerProfileId, owner),
-        eq(ContactTable.contactProfileId, contact),
+        eq(ContactTable.ownerProfileId, ownerProfileId),
+        inArray(ContactTable.id, contactIds),
       ),
     );
 };

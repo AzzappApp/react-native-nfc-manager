@@ -1,13 +1,15 @@
 import {
   addContactAsync,
+  Fields,
   getContactByIdAsync,
+  getContactsAsync,
   presentFormAsync,
   requestPermissionsAsync,
   updateContactAsync,
 } from 'expo-contacts';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Alert, Platform, SectionList, View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { MMKV } from 'react-native-mmkv';
 import Toast from 'react-native-toast-message';
 import {
@@ -17,13 +19,11 @@ import {
   usePreloadedQuery,
 } from 'react-relay';
 import { useDebounce } from 'use-debounce';
-import { colors, textStyles } from '#theme';
-import CoverRenderer from '#components/CoverRenderer';
+import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import relayScreen from '#helpers/relayScreen';
 import useAuthState from '#hooks/useAuthState';
-import useScreenInsets from '#hooks/useScreenInsets';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import Icon from '#ui/Icon';
@@ -32,12 +32,13 @@ import RoundedMenuComponent from '#ui/RoundedMenuComponent';
 import SafeAreaView from '#ui/SafeAreaView';
 import SearchBarStatic from '#ui/SearchBarStatic';
 import Text from '#ui/Text';
+import ContactsScreenSearchByDate from './ContactsScreenSearchByDate';
+import ContactsScreenSearchByName from './ContactsScreenSearchByName';
 import type { ContactsScreen_contacts$data } from '#relayArtifacts/ContactsScreen_contacts.graphql';
 import type { ContactsScreenQuery } from '#relayArtifacts/ContactsScreenQuery.graphql';
 import type { ContactsScreenRemoveContactMutation } from '#relayArtifacts/ContactsScreenRemoveContactMutation.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { Contact } from 'expo-contacts';
-import type { SectionListData, SectionListRenderItemInfo } from 'react-native';
 import type { PreloadedQuery } from 'react-relay';
 
 export const storage = new MMKV({
@@ -74,6 +75,7 @@ const ContactsScreen = ({
   const [debounceSearch] = useDebounce(search, 500);
 
   const intl = useIntl();
+  const [localContacts, setLocalContacts] = useState<Contact[]>([]);
 
   const [refreshing, setRefreshing] = useState(false);
   const { data, loadNext, hasNext, isLoadingNext, refetch } =
@@ -85,9 +87,14 @@ const ContactsScreen = ({
           after: { type: String }
           first: { type: Int, defaultValue: 10 }
           name: { type: String, defaultValue: "" }
+          orderBy: { type: SearchContactOrderBy, defaultValue: name }
         ) {
-          searchContacts(after: $after, first: $first, name: $name)
-            @connection(key: "Profile_searchContacts") {
+          searchContacts(
+            after: $after
+            first: $first
+            name: $name
+            orderBy: $orderBy
+          ) @connection(key: "Profile_searchContacts") {
             __id
             edges {
               node {
@@ -96,8 +103,20 @@ const ContactsScreen = ({
                 lastName
                 company
                 createdAt
+                deviceIds
+                emails {
+                  label
+                  address
+                }
+                phoneNumbers {
+                  label
+                  number
+                }
                 contactProfile {
                   id
+                  webCard {
+                    ...CoverRenderer_webCard
+                  }
                 }
                 webCard {
                   ...CoverRenderer_webCard
@@ -110,39 +129,24 @@ const ContactsScreen = ({
       profile,
     );
 
-  const sections = useMemo(() => {
-    const contacts =
+  const contacts = useMemo(() => {
+    return (
       (data as ContactsScreen_contacts$data)?.searchContacts?.edges
         ?.map(edge => edge?.node)
-        .filter(contact => !!contact) ?? [];
-
-    return contacts?.reduce(
-      (accumulator, contact) => {
-        const initial = contact.firstName[0] ?? '';
-
-        const existingSection = accumulator.find(
-          section => section.initial === initial,
-        );
-
-        if (!existingSection) {
-          accumulator.push({ initial, data: [contact] });
-        } else {
-          existingSection.data.push(contact);
-        }
-
-        return accumulator;
-      },
-      [] as Array<{ initial: string; data: ContactType[] }>,
+        .filter(contact => !!contact) ?? []
     );
   }, [data]);
 
   const onRefresh = useCallback(() => {
     if (!isLoadingNext) {
       setRefreshing(true);
-      refetch({ name: debounceSearch }, { fetchPolicy: 'store-and-network' });
+      refetch(
+        { name: debounceSearch, orderBy: searchBy },
+        { fetchPolicy: 'store-and-network' },
+      );
       setRefreshing(false);
     }
-  }, [debounceSearch, isLoadingNext, refetch]);
+  }, [isLoadingNext, refetch, debounceSearch, searchBy]);
 
   const onEndReached = useCallback(() => {
     if (hasNext && !isLoadingNext) {
@@ -152,12 +156,131 @@ const ContactsScreen = ({
 
   useEffect(() => {
     refetch(
-      { name: debounceSearch || undefined },
+      { name: debounceSearch || undefined, orderBy: searchBy },
       { fetchPolicy: 'store-and-network' },
     );
-  }, [debounceSearch, refetch]);
+  }, [debounceSearch, refetch, searchBy]);
 
-  const { bottom } = useScreenInsets();
+  const { profileInfos } = useAuthState();
+
+  const [commitRemoveContact] =
+    useMutation<ContactsScreenRemoveContactMutation>(graphql`
+      mutation ContactsScreenRemoveContactMutation(
+        $profileId: ID!
+        $input: RemoveContactsInput!
+      ) {
+        removeContacts(profileId: $profileId, input: $input) {
+          removedContactIds
+        }
+      }
+    `);
+
+  const onRemoveContacts = (contactIds: string[]) => {
+    commitRemoveContact({
+      variables: {
+        profileId: profileInfos!.profileId,
+        input: {
+          contactIds,
+        },
+      },
+      updater: (store, response) => {
+        if (response?.removeContacts) {
+          response.removeContacts.removedContactIds.forEach(
+            removedContactId => {
+              store.delete(removedContactId);
+            },
+          );
+        }
+      },
+    });
+  };
+
+  const onInviteContact = useCallback(
+    async (contact: ContactType, onHideInvitation: () => void) => {
+      const contactToAdd = {
+        ...contact,
+        emails: contact.emails.map(({ label, address }) => ({
+          label,
+          email: address,
+        })),
+        phoneNumbers: contact.phoneNumbers.map(({ label, number }) => ({
+          label,
+          number,
+        })),
+        contactType: 'person' as const,
+        name: `${contact.firstName} ${contact.lastName}`,
+      };
+
+      try {
+        let messageToast = '';
+        const { status } = await requestPermissionsAsync();
+        if (status === 'granted') {
+          let foundContact: Contact | undefined = undefined;
+          if (storage.contains(contact.contactProfile!.id)) {
+            const internalId = storage.getString(contact.contactProfile!.id);
+            if (internalId) {
+              foundContact = await getContactByIdAsync(internalId);
+            } else {
+              const contactsByDeviceId = await Promise.all(
+                contact.deviceIds.map(deviceId =>
+                  getContactByIdAsync(deviceId),
+                ),
+              );
+
+              foundContact = contactsByDeviceId.find(
+                contactByDeviceId => !!contactByDeviceId,
+              );
+            }
+          }
+
+          if (foundContact) {
+            if (Platform.OS === 'ios') {
+              await updateContactAsync({
+                ...contactToAdd,
+                id: foundContact.id,
+              });
+            } else {
+              await presentFormAsync(foundContact.id, contactToAdd);
+            }
+            messageToast = intl.formatMessage({
+              defaultMessage: 'The contact was updated successfully.',
+              description:
+                'Toast message when a contact is updated successfully',
+            });
+          } else {
+            const resultId = await addContactAsync(contactToAdd);
+            storage.set(contact.contactProfile!.id, resultId);
+            messageToast = intl.formatMessage({
+              defaultMessage: 'The contact was created successfully.',
+              description:
+                'Toast message when a contact is created successfully',
+            });
+          }
+
+          onHideInvitation();
+
+          Toast.show({
+            type: 'success',
+            text1: messageToast,
+          });
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    [intl],
+  );
+
+  useEffect(() => {
+    const getLocalContacts = async () => {
+      const { data } = await getContactsAsync({
+        fields: [Fields.Emails, Fields.PhoneNumbers, Fields.ID],
+      });
+      setLocalContacts(data);
+    };
+
+    getLocalContacts();
+  }, []);
 
   return (
     <Container style={[styles.container]}>
@@ -171,10 +294,10 @@ const ContactsScreen = ({
               <FormattedMessage
                 description="ContactsScreen - Title"
                 defaultMessage="{contacts, plural,
-                  =0 {# Contacts}
-                  =1 {# Contact}
-                  other {# Contacts}
-          }"
+                =0 {# Contacts}
+                =1 {# Contact}
+                other {# Contacts}
+        }"
                 values={{ contacts: profile?.nbContacts ?? 0 }}
               />
             </Text>
@@ -214,271 +337,34 @@ const ContactsScreen = ({
           })}
           onChangeText={e => setSearch(e ?? '')}
         />
-        <SectionList
-          accessibilityRole="list"
-          sections={sections}
-          keyExtractor={sectionKeyExtractor}
-          renderItem={RenderListItem}
-          renderSectionHeader={RenderHeaderSection}
-          showsVerticalScrollIndicator={false}
-          onEndReached={onEndReached}
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          contentContainerStyle={[styles.section, { paddingBottom: bottom }]}
-          ItemSeparatorComponent={RenderItemSeparator}
-          onEndReachedThreshold={0.5}
-          keyboardShouldPersistTaps="always"
-        />
+        {profile && searchBy === 'name' && (
+          <ContactsScreenSearchByName
+            contacts={contacts}
+            onEndReached={onEndReached}
+            onRefresh={onRefresh}
+            refreshing={refreshing}
+            onRemoveContacts={onRemoveContacts}
+            onInviteContact={onInviteContact}
+            storage={storage}
+            localContacts={localContacts}
+          />
+        )}
+        {profile && searchBy === 'date' && (
+          <ContactsScreenSearchByDate
+            contacts={contacts}
+            onEndReached={onEndReached}
+            onRefresh={onRefresh}
+            refreshing={refreshing}
+            onRemoveContacts={onRemoveContacts}
+            onInviteContact={onInviteContact}
+            storage={storage}
+            localContacts={localContacts}
+          />
+        )}
       </SafeAreaView>
     </Container>
   );
 };
-
-const RenderItemSeparator = () => {
-  const styles = useStyleSheet(stylesheet);
-  return <View style={styles.separator} />;
-};
-
-const RenderListItem = ({
-  item: contact,
-}: SectionListRenderItemInfo<
-  ContactType,
-  { initial: string; data: ContactType[] }
->) => {
-  const styles = useStyleSheet(stylesheet);
-  const [showInvite, setShowInvite] = useState(false);
-  const intl = useIntl();
-
-  useEffect(() => {
-    const verifyInvitation = async () => {
-      const { status } = await requestPermissionsAsync();
-
-      if (status === 'granted') {
-        if (storage.contains(contact.contactProfile!.id)) {
-          const internalId = storage.getString(contact.contactProfile!.id);
-          if (internalId) {
-            return;
-          }
-        }
-
-        setShowInvite(true);
-      }
-    };
-
-    verifyInvitation();
-  }, [contact.contactProfile]);
-
-  const onShow = useCallback(async () => {
-    const { status } = await requestPermissionsAsync();
-
-    const contactToShow = {
-      ...contact,
-      contactType: 'person' as const,
-      name: `${contact.firstName} ${contact.lastName}`,
-    };
-
-    if (status === 'granted') {
-      let foundContact: Contact | undefined = undefined;
-      if (storage.contains(contact.contactProfile!.id)) {
-        const internalId = storage.getString(contact.contactProfile!.id);
-        if (internalId) {
-          foundContact = await getContactByIdAsync(internalId);
-        }
-      }
-
-      if (foundContact) {
-        await presentFormAsync(foundContact.id, contactToShow);
-      } else {
-        await presentFormAsync(null, contactToShow);
-      }
-    }
-  }, [contact]);
-
-  const onInvite = useCallback(async () => {
-    const contactToAdd = {
-      ...contact,
-      contactType: 'person' as const,
-      name: `${contact.firstName} ${contact.lastName}`,
-    };
-
-    try {
-      let messageToast = '';
-      const { status } = await requestPermissionsAsync();
-      if (status === 'granted') {
-        let foundContact: Contact | undefined = undefined;
-        if (storage.contains(contact.contactProfile!.id)) {
-          const internalId = storage.getString(contact.contactProfile!.id);
-          if (internalId) {
-            foundContact = await getContactByIdAsync(internalId);
-          }
-        }
-
-        if (foundContact) {
-          if (Platform.OS === 'ios') {
-            await updateContactAsync({
-              ...contactToAdd,
-              id: foundContact.id,
-            });
-          } else {
-            await presentFormAsync(foundContact.id, contactToAdd);
-          }
-          messageToast = intl.formatMessage({
-            defaultMessage: 'The contact was updated successfully.',
-            description: 'Toast message when a contact is updated successfully',
-          });
-        } else {
-          const resultId = await addContactAsync(contactToAdd);
-          storage.set(contact.contactProfile!.id, resultId);
-          messageToast = intl.formatMessage({
-            defaultMessage: 'The contact was created successfully.',
-            description: 'Toast message when a contact is created successfully',
-          });
-        }
-
-        setShowInvite(false);
-
-        Toast.show({
-          type: 'success',
-          text1: messageToast,
-        });
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }, [contact, intl]);
-
-  const { profileInfos } = useAuthState();
-
-  const [commitRemove] = useMutation<ContactsScreenRemoveContactMutation>(
-    graphql`
-      mutation ContactsScreenRemoveContactMutation(
-        $profileId: ID!
-        $input: RemoveContactInput!
-      ) {
-        removeContact(profileId: $profileId, input: $input) {
-          removedContactId
-        }
-      }
-    `,
-  );
-
-  const onRemove = useCallback(async () => {
-    commitRemove({
-      variables: {
-        profileId: profileInfos!.profileId,
-        input: {
-          profileId: contact.contactProfile!.id,
-        },
-      },
-      updater: (store, response) => {
-        if (response?.removeContact) {
-          store.delete(response.removeContact.removedContactId);
-        }
-      },
-    });
-  }, [commitRemove, contact.contactProfile, profileInfos]);
-
-  const onMore = useCallback(() => {
-    Alert.alert(`${contact.firstName} ${contact.lastName}`, '', [
-      {
-        text: intl.formatMessage({
-          defaultMessage: 'View Contact',
-          description: 'ContactsScreen - More option alert - view',
-        }),
-        onPress: onShow,
-      },
-      // {
-      //   text: intl.formatMessage({
-      //     defaultMessage: 'Share Contact',
-      //     description: 'ContactsScreen - More option alert - share',
-      //   }),
-      //   onPress: () => {
-      //     // @TODO: how to share without a pre-generated URL?
-      //   },
-      // },
-      {
-        text: intl.formatMessage({
-          defaultMessage: "Save to my phone's Contact",
-          description: 'ContactsScreen - More option alert - save',
-        }),
-        onPress: onInvite,
-      },
-      {
-        text: intl.formatMessage({
-          defaultMessage: 'Remove contact',
-          description: 'ContactsScreen - More option alert - remove',
-        }),
-        style: 'destructive',
-        onPress: onRemove,
-      },
-      {
-        text: intl.formatMessage({
-          defaultMessage: 'Cancel',
-          description: 'ContactsScreen - More option alert - cancel',
-        }),
-        style: 'cancel',
-      },
-    ]);
-  }, [contact.firstName, contact.lastName, intl, onInvite, onRemove, onShow]);
-
-  return (
-    <View key={contact.id} style={styles.contact}>
-      <CoverRenderer
-        style={styles.webcard}
-        width={35}
-        webCard={contact.webCard}
-      />
-      <View style={styles.infos}>
-        {(contact.firstName || contact.lastName) && (
-          <Text variant="large" numberOfLines={1}>
-            {contact.firstName} {contact.lastName}
-          </Text>
-        )}
-        {contact.company && (
-          <Text style={styles.company} numberOfLines={1}>
-            {contact.company}
-          </Text>
-        )}
-        <Text style={(textStyles.small, styles.date)} numberOfLines={1}>
-          {new Date(contact.createdAt).toLocaleDateString()}
-        </Text>
-      </View>
-      <View style={styles.actions}>
-        {showInvite && (
-          <PressableNative onPress={onInvite}>
-            <Icon icon="invite" />
-          </PressableNative>
-        )}
-
-        <PressableNative onPress={onMore}>
-          <Icon icon="more" />
-        </PressableNative>
-      </View>
-    </View>
-  );
-};
-const RenderHeaderSection = ({
-  section: { initial },
-}: {
-  section: SectionListData<
-    ContactType,
-    { initial: string; data: ContactType[] }
-  >;
-}) => {
-  return <Text style={{ marginVertical: 20 }}>{initial}</Text>;
-};
-
-const sectionKeyExtractor = (item: { id: string }) => {
-  return item.id;
-};
-
-type ContactType = NonNullable<
-  NonNullable<
-    NonNullable<
-      ArrayItemType<ContactsScreen_contacts$data['searchContacts']['edges']>
-    >
-  >['node']
->;
 
 const stylesheet = createStyleSheet(theme => ({
   container: {
@@ -530,6 +416,14 @@ const stylesheet = createStyleSheet(theme => ({
     gap: 15,
   },
 }));
+
+type ContactType = NonNullable<
+  NonNullable<
+    NonNullable<
+      ArrayItemType<ContactsScreen_contacts$data['searchContacts']['edges']>
+    >
+  >['node']
+>;
 
 export default relayScreen(ContactsScreen, {
   query: contactsScreenQuery,

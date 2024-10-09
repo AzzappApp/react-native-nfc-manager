@@ -160,6 +160,10 @@ type Profile implements Node {
     """
     name: String
     """
+    The ordering
+    """
+    orderBy: SearchContactOrderBy!
+    """
     Returns the items in the list that come after the specified cursor.
     """
     after: String
@@ -366,4 +370,9 @@ type ProfileEdge {
   A cursor for use in pagination
   """
   cursor: String!
+}
+
+enum SearchContactOrderBy {
+  name
+  date
 }

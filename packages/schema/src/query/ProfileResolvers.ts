@@ -335,7 +335,7 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
       hasPreviousPage: offset !== null,
     });
   },
-  searchContacts: async (profile, { first, after, name }) => {
+  searchContacts: async (profile, { first, after, name, orderBy }) => {
     if (!profileIsAssociatedToCurrentUser(profile)) {
       return emptyConnection;
     }
@@ -347,6 +347,7 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
       ownerProfileId: profile.id,
       name: name ?? undefined,
       offset,
+      orderBy,
     });
 
     return connectionFromArraySlice(

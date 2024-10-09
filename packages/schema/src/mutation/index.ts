@@ -38,7 +38,7 @@ import {
 } from './payment';
 import togglePostReaction from './postReaction';
 import quitWebCard from './quitWebCard';
-import removeContact from './removeContact';
+import removeContacts from './removeContacts';
 import removeFollower from './removeFollower';
 import removeUsersFromWebCard from './removeUsersFromWebCard';
 import reorderModules from './reorderModules';
@@ -121,7 +121,7 @@ export const Mutation: MutationResolvers = {
   updateSubscriptionCustomer,
   deleteUser,
   addContact,
-  removeContact,
+  removeContacts,
   saveFCMToken,
   deleteFCMToken,
 };
