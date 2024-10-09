@@ -120,9 +120,9 @@ export const HomeButtonContactLinkCentral = ({
         <Animated.Text style={[styles.text, textColorStyle]}>
           <FormattedMessage
             defaultMessage="{isPlural, plural,
-                                    =0 {Contacts}
-                                    =1 {Contact}
-                                    other {Contacts}
+                                    =0 {contacts}
+                                    =1 {contact}
+                                    other {contacts}
                                 }"
             description="HomeScreen - information panel - contacts label -- Note: the internal value is 0 for singular, 1 for plural "
             values={{ isPlural }}
