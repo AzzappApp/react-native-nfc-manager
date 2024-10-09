@@ -69,7 +69,13 @@ const sendInvitations: MutationResolvers['sendInvitations'] = async (
     if (withPhoneNumbers.length > 0 || withEmail.length > 0) {
       await updateWebCardProfiles(
         webCardId,
-        { inviteSent: true },
+        {
+          inviteSent: true,
+          invited: true,
+          deleted: false,
+          deletedAt: null,
+          deletedBy: null,
+        },
         withPhoneNumbers
           .map(({ profileId }) => profileId)
           .concat(withEmail.map(({ profileId }) => profileId)),
