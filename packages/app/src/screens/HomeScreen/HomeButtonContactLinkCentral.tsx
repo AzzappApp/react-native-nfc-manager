@@ -155,6 +155,7 @@ const styles = StyleSheet.create({
   text: {
     color: colors.white,
     textAlign: 'center',
+    top: -7,
   },
   textAlign: { textAlign: 'center' },
 });

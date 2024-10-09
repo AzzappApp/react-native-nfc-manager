@@ -29,6 +29,7 @@ type HomeButtonContactLinkProps = {
   isTop?: boolean;
   renderMessageComponent: (isPlural: number) => JSX.Element;
 };
+const gap = 6;
 
 export const HomeButtonContactLink = ({
   count,
@@ -40,7 +41,6 @@ export const HomeButtonContactLink = ({
   const animationDuration = 150;
   const defaultOpacity = 0.18;
   const pressOpacity = 0.3;
-  const gap = 6;
 
   const [layoutRegion, setLayoutRegion] = useState({ height: 0, width: 0 });
 
@@ -188,6 +188,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flex: 1,
     alignItems: 'center',
+    paddingBottom: gap,
   },
   svgContainer: { height: '100%', width: '100%' },
   svgCanvas: {
