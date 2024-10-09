@@ -429,13 +429,17 @@ const RenderListItem = ({
         webCard={contact.webCard}
       />
       <View style={styles.infos}>
-        <Text variant="large">
-          {contact.firstName} {contact.lastName}
-        </Text>
-        {contact.company && (
-          <Text style={styles.company}>{contact.company}</Text>
+        {(contact.firstName || contact.lastName) && (
+          <Text variant="large" numberOfLines={1}>
+            {contact.firstName} {contact.lastName}
+          </Text>
         )}
-        <Text style={(textStyles.small, styles.date)}>
+        {contact.company && (
+          <Text style={styles.company} numberOfLines={1}>
+            {contact.company}
+          </Text>
+        )}
+        <Text style={(textStyles.small, styles.date)} numberOfLines={1}>
           {new Date(contact.createdAt).toLocaleDateString()}
         </Text>
       </View>
@@ -516,6 +520,7 @@ const stylesheet = createStyleSheet(theme => ({
   },
   infos: {
     justifyContent: 'center',
+    width: '75%',
   },
   actions: {
     flex: 1,
