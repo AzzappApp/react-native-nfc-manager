@@ -1,5 +1,8 @@
-## 0.9.10-canary.37
+## 0.9.10-canary.38
 
+* **fix:**  - implement contact count on top level of contact screen ([#5308](https://github.com/AzzappApp/azzapp/pull/5308))
+* **fix:**  - **home:** [#5297](https://github.com/AzzappApp/azzapp/pull/5297) refresh query get partial infos ([#5307](https://github.com/AzzappApp/azzapp/pull/5307))
+* **fix:**  - **mutiUser:** [#5258](https://github.com/AzzappApp/azzapp/pull/5258) sendInvitations undeletes profiles ([#5306](https://github.com/AzzappApp/azzapp/pull/5306))
 * **fix:**  - remove shareBack contact table ([#5280](https://github.com/AzzappApp/azzapp/pull/5280))
 * **fix:**  - rework contact link buttons to be more flexible and manage UI more dynamically ([#5294](https://github.com/AzzappApp/azzapp/pull/5294))
 * **perf:**  - reduce usage of useAuthState to limit rerendering ([#5300](https://github.com/AzzappApp/azzapp/pull/5300))
