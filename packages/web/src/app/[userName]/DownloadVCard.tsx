@@ -233,6 +233,7 @@ const DownloadVCard = ({
               href={fileUrl}
               download={`${webCard.userName}${contact?.firstName.trim() ? `-${contact.firstName.trim()}` : ''}${contact?.lastName.trim() ? `-${contact.lastName.trim()}` : ''}.vcf`}
               userName={webCard.userName}
+              onClick={handleClose}
             >
               <FormattedMessage
                 defaultMessage="Save Contact Card"

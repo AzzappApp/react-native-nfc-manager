@@ -20,19 +20,22 @@ const verifySignApi = async (req: Request) => {
     return new Response('Invalid request', { status: 400 });
   }
 
-  const isValid = await verifyHmacWithPassword(
-    process.env.CONTACT_CARD_SIGNATURE_SECRET ?? '',
-    signature,
-    decodeURIComponent(data),
-    { salt },
-  );
+  const decodedData = decodeURIComponent(data);
+
+  const foundContactCard = parseContactCard(decodedData);
+
+  const [isValid, storedProfile, webCard] = await Promise.all([
+    verifyHmacWithPassword(
+      process.env.CONTACT_CARD_SIGNATURE_SECRET ?? '',
+      signature,
+      decodedData,
+      { salt },
+    ),
+    getProfileById(foundContactCard.profileId),
+    getWebCardById(foundContactCard.webCardId),
+  ]);
+
   if (isValid) {
-    const foundContactCard = parseContactCard(decodeURIComponent(data));
-
-    const storedProfile = await getProfileById(foundContactCard.profileId);
-
-    const webCard = await getWebCardById(foundContactCard.webCardId);
-
     const avatarUrl =
       storedProfile && (await buildAvatarUrl(storedProfile, webCard));
 
