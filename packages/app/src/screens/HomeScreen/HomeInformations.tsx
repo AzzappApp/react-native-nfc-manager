@@ -56,7 +56,7 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
   const circleWidth = 86;
 
   const nbContactsValue = useMemo(
-    () => [0, ...(profiles?.map(({ nbContacts }) => nbContacts) ?? [])],
+    () => [0, ...(profiles?.map(({ nbContacts }) => nbContacts ?? 0) ?? [])],
     [profiles],
   );
 
