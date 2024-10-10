@@ -1,5 +1,9 @@
-## 0.9.10-canary.42
+## 0.9.10-canary.43
 
+* **build:**  - speed up with caching on codegen ([#5336](https://github.com/AzzappApp/azzapp/pull/5336))
+* **fix:**  - add missing company information for web ([#5327](https://github.com/AzzappApp/azzapp/pull/5327))
+* **fix:**  - appClip handle url in multiple way ([#5329](https://github.com/AzzappApp/azzapp/pull/5329))
+* **feat:**  - increase size of button Save My Contact ([#5333](https://github.com/AzzappApp/azzapp/pull/5333))
 * **fix:**  - limit contact text size ([#5309](https://github.com/AzzappApp/azzapp/pull/5309))
 * **fix:**  - implement contact count on top level of contact screen ([#5308](https://github.com/AzzappApp/azzapp/pull/5308))
 * **fix:**  - **home:** [#5297](https://github.com/AzzappApp/azzapp/pull/5297) refresh query get partial infos ([#5307](https://github.com/AzzappApp/azzapp/pull/5307))
