@@ -24,11 +24,7 @@ export const POST = withPluginsRoute(async (req: Request) => {
   const data = paymentCallbackBody.parse(body);
 
   if (data.MULTIPSP_UNIFIED_STATUS === 'OK') {
-    await acknowledgeFirstPayment(
-      data.MULTIPSP_CLIENT_PAYMENT_REQUEST_ULID,
-      data.TRANSACTIONID,
-      data.MESSAGE,
-    );
+    await acknowledgeFirstPayment(data.MULTIPSP_CLIENT_PAYMENT_REQUEST_ULID);
   } else {
     await rejectFirstPayment(
       data.MULTIPSP_CLIENT_PAYMENT_REQUEST_ULID,

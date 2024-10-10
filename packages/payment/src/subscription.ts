@@ -1,4 +1,10 @@
-import { getSubscriptionById, updateSubscription } from '@azzapp/data';
+import {
+  createId,
+  createSubscription,
+  getSubscriptionById,
+  transaction,
+  updateSubscription,
+} from '@azzapp/data';
 import { dateDiffInMinutes } from '@azzapp/shared/timeHelpers';
 import { login } from '#authent';
 import client from '#client';
@@ -73,6 +79,8 @@ export const updateExistingSubscription = async ({
   if (existingSubscription.webCardId === null) {
     throw new Error('No web card id found');
   }
+
+  let newSubscriptionId = existingSubscription.id;
 
   if (existingSubscription.subscriptionPlan === 'web.monthly') {
     //update amount of next subscription
@@ -150,6 +158,8 @@ export const updateExistingSubscription = async ({
 
       const timeUntilNextPayment = dateDiffInMinutes(currentDate, endDate);
 
+      newSubscriptionId = createId();
+
       const rebillManager = await client.POST(
         '/api/client-payment-requests/create-rebill-manager',
         {
@@ -158,7 +168,7 @@ export const updateExistingSubscription = async ({
           },
           body: {
             billing_description: `Subscription ${existingSubscription.subscriptionPlan} for ${totalSeats} seats`,
-            rebill_manager_initial_type: 'FREE',
+            rebill_manager_initial_type: 'PAID',
             rebill_manager_initial_price_cnts: '0',
             rebill_manager_initial_duration_min: `${timeUntilNextPayment}`,
             rebill_manager_rebill_price_cnts: `${(amount ?? 0) + taxes}`,
@@ -166,7 +176,7 @@ export const updateExistingSubscription = async ({
             rebill_manager_rebill_period_mins: `${intervalInMinutes}`,
             clientPaymentRequestUlid: existingSubscription.paymentMeanId,
             rebill_manager_fail_rule: generateRebillFailRule(),
-            rebill_manager_external_reference: existingSubscription.id,
+            rebill_manager_external_reference: newSubscriptionId,
             rebill_manager_callback_url: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/webhook/subscription`,
           },
         },
@@ -186,14 +196,27 @@ export const updateExistingSubscription = async ({
 
       const newRebillManagerId = rebillManager.data.rebillManagerId;
 
-      await updateSubscription(existingSubscription.id, {
+      const newSubscription: UserSubscription = {
+        ...existingSubscription,
+        subscriptionId: newSubscriptionId,
+        id: newSubscriptionId,
         totalSeats: totalSeats ?? existingSubscription.totalSeats,
+        amount,
+        taxes,
         rebillManagerId: newRebillManagerId,
         canceledAt: null,
         status: 'active',
+        startAt: currentDate,
         paymentMeanId: newPaymentMean,
-        amount,
-        taxes,
+      };
+
+      await transaction(async () => {
+        await createSubscription(newSubscription);
+        await updateSubscription(existingSubscription.id, {
+          canceledAt: currentDate,
+          status: 'canceled',
+          endAt: currentDate,
+        });
       });
     } else {
       throw new Error('No payment mean found');
@@ -279,6 +302,8 @@ export const updateExistingSubscription = async ({
         )
       : { amount: 0 };
 
+    newSubscriptionId = createId();
+
     const rebillManager = await client.POST(
       '/api/client-payment-requests/create-rebill-manager',
       {
@@ -295,7 +320,7 @@ export const updateExistingSubscription = async ({
           rebill_manager_rebill_period_mins: `${calculateNextPaymentIntervalInMinutes(existingSubscription.subscriptionPlan)}`,
           clientPaymentRequestUlid: existingSubscription.paymentMeanId,
           rebill_manager_fail_rule: generateRebillFailRule(),
-          rebill_manager_external_reference: existingSubscription.id,
+          rebill_manager_external_reference: newSubscriptionId,
           rebill_manager_callback_url: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/webhook/subscription`,
         },
       },
@@ -315,17 +340,30 @@ export const updateExistingSubscription = async ({
 
     const newRebillManagerId = rebillManager.data.rebillManagerId;
 
-    await updateSubscription(existingSubscription.id, {
+    const newSubscription: UserSubscription = {
+      ...existingSubscription,
+      subscriptionId: newSubscriptionId,
+      id: newSubscriptionId,
       totalSeats: totalSeats ?? existingSubscription.totalSeats,
       amount,
       taxes,
       rebillManagerId: newRebillManagerId,
       canceledAt: null,
       status: 'active',
+      startAt: currentDate,
+    };
+
+    await transaction(async () => {
+      await createSubscription(newSubscription);
+      await updateSubscription(existingSubscription.id, {
+        canceledAt: currentDate,
+        status: 'canceled',
+        endAt: currentDate,
+      });
     });
   }
 
-  return (await getSubscriptionById(existingSubscription.id))!;
+  return (await getSubscriptionById(newSubscriptionId))!;
 };
 
 export const upgradePlan = async (
@@ -421,6 +459,8 @@ export const upgradePlan = async (
       }
     }
 
+    const newSubscriptionId = createId();
+
     const rebillManager = await client.POST(
       '/api/client-payment-requests/create-rebill-manager',
       {
@@ -437,7 +477,7 @@ export const upgradePlan = async (
           rebill_manager_rebill_period_mins: `${intervalInMinutes}`,
           clientPaymentRequestUlid: existingSubscription.paymentMeanId,
           rebill_manager_fail_rule: generateRebillFailRule(),
-          rebill_manager_external_reference: existingSubscription.id,
+          rebill_manager_external_reference: newSubscriptionId,
           rebill_manager_callback_url: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/webhook/subscription`,
         },
       },
@@ -453,15 +493,31 @@ export const upgradePlan = async (
       );
     }
 
-    await updateSubscription(existingSubscription.id, {
-      canceledAt: null,
-      status: 'active',
+    const currentDate = new Date();
+
+    const newSubscription: UserSubscription = {
+      ...existingSubscription,
+      subscriptionId: newSubscriptionId,
+      id: newSubscriptionId,
       subscriptionPlan: 'web.yearly',
-      rebillManagerId: rebillManager.data.rebillManagerId,
       amount,
       taxes,
+      rebillManagerId: rebillManager.data.rebillManagerId,
+      canceledAt: null,
+      status: 'active',
+      startAt: currentDate,
+    };
+
+    await transaction(async () => {
+      await createSubscription(newSubscription);
+      await updateSubscription(existingSubscription.id, {
+        canceledAt: currentDate,
+        status: 'canceled',
+        endAt: currentDate,
+      });
     });
-    return (await getSubscriptionById(existingSubscription.id))!;
+
+    return (await getSubscriptionById(newSubscriptionId))!;
   } else {
     throw new Error('Cannot upgrade plan for yearly subscription');
   }

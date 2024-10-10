@@ -17,11 +17,7 @@ import {
 } from './helpers';
 import type { UserSubscription } from '@azzapp/data';
 
-export const acknowledgeFirstPayment = async (
-  paymentMeanId: string,
-  transactionId: string,
-  paymentProviderResponse?: string,
-) => {
+export const acknowledgeFirstPayment = async (paymentMeanId: string) => {
   const subscription = await getSubscriptionByPaymentMeanId(paymentMeanId);
 
   const token = await login();
@@ -107,18 +103,6 @@ export const acknowledgeFirstPayment = async (
         await updateSubscriptionByPaymentMeanId(paymentMeanId, updates);
 
         await updateWebCard(webCardId, { isMultiUser: true });
-
-        await createPayment({
-          status: 'paid',
-          transactionId,
-          subscriptionId: subscription.id,
-          webCardId,
-          amount,
-          taxes,
-          paymentMeanId,
-          paymentProviderResponse,
-          rebillManagerId: rebillManager.data?.rebillManagerId,
-        });
       });
 
       if (!rebillManager.data) {

@@ -442,6 +442,23 @@ export const generateInvoice = async (webCardId: string, paymentId: string) => {
     throw new Error('Missing payment data');
   }
 
+  const rebillManager = await client.POST(
+    '/api/client-payment-requests/check-rebill-manager',
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: {
+        rebillManagerId: payment.rebillManagerId,
+        clientPaymentRequestUlid: payment.paymentMeanId,
+      },
+    },
+  );
+
+  const foundTransaction = rebillManager.data?.transactions?.find(
+    transaction => transaction.transaction_id === payment.transactionId,
+  );
+
   const result = await client.POST(
     '/api/client-payment-requests/create-rebill-manager-invoice',
     {
@@ -451,7 +468,8 @@ export const generateInvoice = async (webCardId: string, paymentId: string) => {
       body: {
         clientPaymentRequestUlid: payment.paymentMeanId,
         rebillManagerId: payment.rebillManagerId,
-        rebillManagerTransactionId: payment.transactionId,
+        rebillManagerTransactionId:
+          foundTransaction?.rebill_manager_transaction_id ?? '',
         invoicingCompany: process.env.INVOICING_COMPANY ?? 'APPCORP',
         invoicingEmail: process.env.INVOICING_EMAIL ?? 'contact@azzapp.com',
         invoicingAddress1:
@@ -473,7 +491,9 @@ export const generateInvoice = async (webCardId: string, paymentId: string) => {
         invoicedVat: subscription.subscriberVatNumber ?? '',
         invoicedPhone: subscription.subscriberPhoneNumber ?? '',
         invoicedProduct: 'Azzapp PRO',
-      },
+        hasVat: payment.taxes > 0 ? '1' : '0',
+        vatRate: `${Math.round((payment.taxes / payment.amount) * 100)}`,
+      } as any, //hasVat and vatRate types does not match the API,
     },
   );
 
