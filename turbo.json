@@ -31,8 +31,7 @@
     },
     "//#graphql-codegen": {
       "dependsOn": [],
-      "inputs": ["packages/**/*.graphql"],
-      "cache": false
+      "inputs": ["packages/**/*.graphql"]
     },
     "//#relay:watch": {
       "dependsOn": [],
