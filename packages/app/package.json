@@ -13,7 +13,7 @@
     "build:android": "bundle exec fastlane android build",
     "deploy:ios": "bundle exec fastlane ios deploy",
     "pod-install": "cd ios && bundle exec pod install",
-    "clean": "watchman watch-del-all && rm -Rf node_modules && rm -Rf ios/Pods && rm -Rf ios/build",
+    "clean": "watchman watch-del-all && rm -Rf node_modules && rm -Rf ios/Pods && rm -Rf ios/build && rm -rf ./android/app/.cxx && rm -rf ./android/app/build && rm -rf ./android/.gradle && rm -rf ./android/build && rm -rf ./src/relayArtifacts ",
     "eas-build-post-install": "(cd ../.. && yarn build-app-dependencies)",
     "eas-build-pre-install": "corepack enable"
   },
