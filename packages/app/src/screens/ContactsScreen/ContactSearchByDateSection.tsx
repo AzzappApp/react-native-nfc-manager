@@ -1,0 +1,271 @@
+import {
+  addContactAsync,
+  requestPermissionsAsync,
+  updateContactAsync,
+} from 'expo-contacts';
+import { useCallback, useState } from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { Alert, FlatList, Platform, StyleSheet, View } from 'react-native';
+import Toast from 'react-native-toast-message';
+import { colors } from '#theme';
+import { findLocalContact } from '#helpers/contactCardHelpers';
+import { keyExtractor } from '#helpers/idHelpers';
+import Icon from '#ui/Icon';
+import PressableNative from '#ui/PressableNative';
+import Text from '#ui/Text';
+import ContactSearchByDateItem from './ContactSearchByDateItem';
+import type { ContactsScreen_contacts$data } from '#relayArtifacts/ContactsScreen_contacts.graphql';
+import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
+import type { Contact } from 'expo-contacts';
+import type { AlertButton, ListRenderItemInfo } from 'react-native';
+import type { MMKV } from 'react-native-mmkv';
+
+type Props = {
+  title: string;
+  data: ContactType[];
+  onRemoveContacts: (contacts: string[]) => void;
+  storage: MMKV;
+  localContacts: Contact[];
+  onInviteContact: (contact: ContactType, onHideInvitation: () => void) => void;
+};
+
+const ContactSearchByDateSection = ({
+  title,
+  data,
+  onRemoveContacts,
+  storage,
+  localContacts,
+  onInviteContact,
+}: Props) => {
+  const intl = useIntl();
+  const [invited, setInvited] = useState(false);
+
+  const onInvite = async () => {
+    try {
+      const { status } = await requestPermissionsAsync();
+
+      if (status === 'granted') {
+        const contactsToCreate: Array<{
+          contact: Contact;
+          profileId?: string;
+        }> = [];
+        const contactsToUpdate: Contact[] = [];
+
+        await Promise.all(
+          data.map(async contact => {
+            const socialProfiles =
+              contact.contactProfile?.contactCard?.socials
+                ?.filter(social => !!social.selected)
+                .map(({ label, url }) => ({ label, url })) ?? [];
+
+            const urlAddresses =
+              contact.contactProfile?.contactCard?.urls
+                ?.filter(url => !!url.selected)
+                .map(({ address }) => ({ label: '', url: address })) ?? [];
+
+            const contactToAdd: Contact = {
+              ...contact,
+              emails: contact.emails.map(({ label, address }) => ({
+                label,
+                email: address,
+              })),
+              phoneNumbers: contact.phoneNumbers.map(({ label, number }) => ({
+                label,
+                number,
+              })),
+              contactType: 'person' as const,
+              name: `${contact.firstName} ${contact.lastName}`,
+              socialProfiles,
+              urlAddresses,
+            };
+
+            const foundContact = await findLocalContact(
+              storage,
+              contact.emails.map(({ address }) => address),
+              contact.phoneNumbers.map(({ number }) => number),
+              contact.deviceIds as string[],
+              localContacts,
+              contact.contactProfile?.id,
+            );
+
+            if (foundContact) {
+              contactsToUpdate.push({
+                ...contactToAdd,
+                id: foundContact.id,
+              });
+            } else {
+              contactsToCreate.push({
+                contact: contactToAdd,
+                profileId: contact.contactProfile?.id,
+              });
+            }
+          }),
+        );
+
+        await Promise.all([
+          ...contactsToCreate.map(async contactToCreate => {
+            const resultId = await addContactAsync(contactToCreate.contact);
+            if (contactToCreate.profileId) {
+              storage.set(contactToCreate.profileId, resultId);
+            }
+          }),
+          ...contactsToUpdate.map(contactToUpdate =>
+            updateContactAsync(contactToUpdate),
+          ),
+        ]);
+
+        setInvited(true);
+        Toast.show({
+          type: 'success',
+          text1: intl.formatMessage({
+            defaultMessage: 'The contacts were invited successfully.',
+            description:
+              'Toast message when contacts were invited successfully',
+          }),
+        });
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const onRemove = () => {
+    onRemoveContacts(data.map(({ id }) => id));
+  };
+
+  const onMore = () => {
+    const options: AlertButton[] = [
+      // {
+      //   text: intl.formatMessage({
+      //     defaultMessage: 'Share Contact',
+      //     description: 'ContactsScreen - More option alert - share',
+      //   }),
+      //   onPress: () => {
+      //     // @TODO: how to share without a pre-generated URL?
+      //   },
+      // },
+      {
+        text: intl.formatMessage({
+          defaultMessage: 'Remove contacts',
+          description: 'ContactsScreen - More option alert - remove',
+        }),
+        style: 'destructive',
+        onPress: onRemove,
+      },
+      {
+        text: intl.formatMessage({
+          defaultMessage: 'Cancel',
+          description: 'ContactsScreen - More option alert - cancel',
+        }),
+        style: 'cancel',
+      },
+    ];
+
+    if (Platform.OS === 'ios') {
+      options.unshift({
+        text: intl.formatMessage({
+          defaultMessage: "Save to my phone's Contacts",
+          description: 'ContactsScreen - More option alert - save',
+        }),
+        onPress: onInvite,
+      });
+    }
+
+    Alert.alert(
+      intl.formatMessage(
+        {
+          defaultMessage: '{contacts} contacts',
+          description: 'ContactsScreenSearchByDate - Title for onMore alert',
+        },
+        { contacts: data.length },
+      ),
+      '',
+      options,
+    );
+  };
+
+  const RenderProfile = useCallback(
+    ({ item }: ListRenderItemInfo<ContactType>) => {
+      return (
+        <ContactSearchByDateItem
+          contact={item}
+          onInviteContact={onHideInvitation => {
+            onInviteContact(item, onHideInvitation);
+          }}
+          storage={storage}
+          localContacts={localContacts}
+          invited={invited}
+        />
+      );
+    },
+    [invited, localContacts, onInviteContact, storage],
+  );
+
+  return (
+    <View style={styles.section}>
+      <View style={styles.sectionTitle}>
+        <View>
+          <Text variant="large">{title}</Text>
+          <Text variant="small" style={styles.count}>
+            <FormattedMessage
+              defaultMessage="{contacts, plural,
+              =0 {# Contacts}
+              =1 {# Contact}
+              other {# Contacts}
+      }"
+              description="ContactsScreenSearchByDate - Contacts counter under section by date"
+              values={{ contacts: data.length }}
+            />
+          </Text>
+        </View>
+        <PressableNative onPress={onMore}>
+          <Icon icon="more" />
+        </PressableNative>
+      </View>
+
+      <FlatList
+        data={data}
+        keyExtractor={keyExtractor}
+        renderItem={RenderProfile}
+        horizontal
+        contentContainerStyle={styles.profiles}
+        showsHorizontalScrollIndicator={false}
+        snapToAlignment="start"
+        decelerationRate="fast"
+        scrollEventThrottle={16}
+        nestedScrollEnabled
+      />
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  section: {
+    marginTop: 25,
+  },
+  sectionTitle: {
+    marginHorizontal: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  count: {
+    color: colors.grey400,
+    marginTop: 5,
+  },
+  profiles: {
+    paddingLeft: 20,
+    marginTop: 15,
+    gap: 5,
+  },
+});
+
+type ContactType = NonNullable<
+  NonNullable<
+    NonNullable<
+      ArrayItemType<ContactsScreen_contacts$data['searchContacts']['edges']>
+    >
+  >['node']
+>;
+
+export default ContactSearchByDateSection;

@@ -1,18 +1,14 @@
+import { type Contact } from 'expo-contacts';
 import { useCallback, useMemo } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
-import { Alert, FlatList, Platform, View } from 'react-native';
+import { useIntl } from 'react-intl';
+import { FlatList, View } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { keyExtractor } from '#helpers/idHelpers';
 import useScreenInsets from '#hooks/useScreenInsets';
-import Icon from '#ui/Icon';
-import PressableNative from '#ui/PressableNative';
-import Text from '#ui/Text';
-import ContactSearchByDateItem from './ContactSearchByDateItem';
+import ContactSearchByDateSection from './ContactSearchByDateSection';
 import type { ContactsScreen_contacts$data } from '#relayArtifacts/ContactsScreen_contacts.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
-import type { Contact } from 'expo-contacts';
-import type { AlertButton, ListRenderItemInfo } from 'react-native';
+import type { ListRenderItemInfo } from 'react-native';
 import type { MMKV } from 'react-native-mmkv';
 
 type Props = {
@@ -37,7 +33,6 @@ const ContactsScreenSearchByDate = ({
   localContacts,
 }: Props) => {
   const { bottom } = useScreenInsets();
-  const styles = useStyleSheet(stylesheet);
 
   const intl = useIntl();
 
@@ -74,120 +69,20 @@ const ContactsScreenSearchByDate = ({
     );
   }, [contacts, intl]);
 
-  const RenderProfile = useCallback(
-    ({ item }: ListRenderItemInfo<ContactType>) => {
+  const RenderListItem = useCallback(
+    ({ item }: ListRenderItemInfo<{ title: string; data: ContactType[] }>) => {
       return (
-        <ContactSearchByDateItem
-          contact={item}
-          onInviteContact={onHideInvitation => {
-            onInviteContact(item, onHideInvitation);
-          }}
-          storage={storage}
+        <ContactSearchByDateSection
+          data={item.data}
           localContacts={localContacts}
+          onInviteContact={onInviteContact}
+          onRemoveContacts={onRemoveContacts}
+          storage={storage}
+          title={item.title}
         />
       );
     },
-    [localContacts, onInviteContact, storage],
-  );
-
-  const RenderListItem = useCallback(
-    ({ item }: ListRenderItemInfo<{ title: string; data: ContactType[] }>) => {
-      const onInvite = () => {};
-
-      const onRemove = () => {
-        onRemoveContacts(item.data.map(({ id }) => id));
-      };
-
-      const onMore = () => {
-        const options: AlertButton[] = [
-          // {
-          //   text: intl.formatMessage({
-          //     defaultMessage: 'Share Contact',
-          //     description: 'ContactsScreen - More option alert - share',
-          //   }),
-          //   onPress: () => {
-          //     // @TODO: how to share without a pre-generated URL?
-          //   },
-          // },
-          {
-            text: intl.formatMessage({
-              defaultMessage: 'Remove contacts',
-              description: 'ContactsScreen - More option alert - remove',
-            }),
-            style: 'destructive',
-            onPress: onRemove,
-          },
-          {
-            text: intl.formatMessage({
-              defaultMessage: 'Cancel',
-              description: 'ContactsScreen - More option alert - cancel',
-            }),
-            style: 'cancel',
-          },
-        ];
-
-        if (Platform.OS === 'ios') {
-          options.unshift({
-            text: intl.formatMessage({
-              defaultMessage: "Save to my phone's Contacts",
-              description: 'ContactsScreen - More option alert - save',
-            }),
-            onPress: onInvite,
-          });
-        }
-
-        Alert.alert(
-          intl.formatMessage(
-            {
-              defaultMessage: '{contacts} contacts',
-              description:
-                'ContactsScreenSearchByDate - Title for onMore alert',
-            },
-            { contacts: item.data.length },
-          ),
-          '',
-          options,
-        );
-      };
-
-      return (
-        <View style={styles.section}>
-          <View style={styles.sectionTitle}>
-            <View>
-              <Text variant="large">{item.title}</Text>
-              <Text variant="small" style={styles.count}>
-                <FormattedMessage
-                  defaultMessage="{contacts, plural,
-                =0 {# Contacts}
-                =1 {# Contact}
-                other {# Contacts}
-        }"
-                  description="ContactsScreenSearchByDate - Contacts counter under section by date"
-                  values={{ contacts: item.data.length }}
-                />
-              </Text>
-            </View>
-            <PressableNative onPress={onMore}>
-              <Icon icon="more" />
-            </PressableNative>
-          </View>
-
-          <FlatList
-            data={item.data}
-            keyExtractor={keyExtractor}
-            renderItem={RenderProfile}
-            horizontal
-            contentContainerStyle={styles.profiles}
-            showsHorizontalScrollIndicator={false}
-            snapToAlignment="start"
-            decelerationRate="fast"
-            scrollEventThrottle={16}
-            nestedScrollEnabled
-          />
-        </View>
-      );
-    },
-    [RenderProfile, intl, onRemoveContacts, styles],
+    [localContacts, onInviteContact, onRemoveContacts, storage],
   );
 
   return (
@@ -219,28 +114,10 @@ const RenderSectionSeparator = () => {
 };
 
 const stylesheet = createStyleSheet(theme => ({
-  section: {
-    marginTop: 25,
-  },
-  sectionTitle: {
-    marginHorizontal: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  count: {
-    color: colors.grey400,
-    marginTop: 5,
-  },
   separator: {
     height: 1,
     width: '100%',
     backgroundColor: theme === 'light' ? colors.grey50 : colors.grey900,
-  },
-  profiles: {
-    paddingLeft: 20,
-    marginTop: 15,
-    gap: 5,
   },
 }));
 

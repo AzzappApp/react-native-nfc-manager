@@ -1,7 +1,6 @@
 import {
   addContactAsync,
   Fields,
-  getContactByIdAsync,
   getContactsAsync,
   presentFormAsync,
   requestPermissionsAsync,
@@ -21,6 +20,7 @@ import {
 import { useDebounce } from 'use-debounce';
 import { colors } from '#theme';
 import { useOnFocus, useRouter } from '#components/NativeRouter';
+import { findLocalContact } from '#helpers/contactCardHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import relayScreen from '#helpers/relayScreen';
 import useAuthState from '#hooks/useAuthState';
@@ -114,6 +114,17 @@ const ContactsScreen = ({
                 }
                 contactProfile {
                   id
+                  contactCard {
+                    urls {
+                      address
+                      selected
+                    }
+                    socials {
+                      url
+                      label
+                      selected
+                    }
+                  }
                   webCard {
                     ...CoverRenderer_webCard
                   }
@@ -213,6 +224,16 @@ const ContactsScreen = ({
 
   const onInviteContact = useCallback(
     async (contact: ContactType, onHideInvitation: () => void) => {
+      const socialProfiles =
+        contact.contactProfile?.contactCard?.socials
+          ?.filter(social => !!social.selected)
+          .map(({ label, url }) => ({ label, url })) ?? [];
+
+      const urlAddresses =
+        contact.contactProfile?.contactCard?.urls
+          ?.filter(url => !!url.selected)
+          .map(({ address }) => ({ label: '', url: address })) ?? [];
+
       const contactToAdd = {
         ...contact,
         emails: contact.emails.map(({ label, address }) => ({
@@ -225,29 +246,22 @@ const ContactsScreen = ({
         })),
         contactType: 'person' as const,
         name: `${contact.firstName} ${contact.lastName}`,
+        socialProfiles,
+        urlAddresses,
       };
 
       try {
         let messageToast = '';
         const { status } = await requestPermissionsAsync();
         if (status === 'granted') {
-          let foundContact: Contact | undefined = undefined;
-          if (storage.contains(contact.contactProfile!.id)) {
-            const internalId = storage.getString(contact.contactProfile!.id);
-            if (internalId) {
-              foundContact = await getContactByIdAsync(internalId);
-            } else {
-              const contactsByDeviceId = await Promise.all(
-                contact.deviceIds.map(deviceId =>
-                  getContactByIdAsync(deviceId),
-                ),
-              );
-
-              foundContact = contactsByDeviceId.find(
-                contactByDeviceId => !!contactByDeviceId,
-              );
-            }
-          }
+          const foundContact = await findLocalContact(
+            storage,
+            contact.emails.map(({ address }) => address),
+            contact.phoneNumbers.map(({ number }) => number),
+            contact.deviceIds as string[],
+            localContacts,
+            contact.contactProfile?.id,
+          );
 
           if (foundContact) {
             if (Platform.OS === 'ios') {
@@ -265,7 +279,10 @@ const ContactsScreen = ({
             });
           } else {
             const resultId = await addContactAsync(contactToAdd);
-            storage.set(contact.contactProfile!.id, resultId);
+
+            if (contact.contactProfile) {
+              storage.set(contact.contactProfile.id, resultId);
+            }
             messageToast = intl.formatMessage({
               defaultMessage: 'The contact was created successfully.',
               description:
@@ -284,7 +301,7 @@ const ContactsScreen = ({
         console.error(e);
       }
     },
-    [intl],
+    [intl, localContacts],
   );
 
   useEffect(() => {

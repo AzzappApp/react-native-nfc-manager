@@ -1,13 +1,10 @@
-import {
-  getContactByIdAsync,
-  presentFormAsync,
-  requestPermissionsAsync,
-} from 'expo-contacts';
+import { presentFormAsync, requestPermissionsAsync } from 'expo-contacts';
 import { useCallback, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Alert, StyleSheet, View } from 'react-native';
 import { colors, textStyles } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
+import { findLocalContact } from '#helpers/contactCardHelpers';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
@@ -39,39 +36,16 @@ const ContactSearchByNameItem = ({
       const { status } = await requestPermissionsAsync();
 
       if (status === 'granted') {
-        if (storage.contains(contact.contactProfile!.id)) {
-          const internalId = storage.getString(contact.contactProfile!.id);
-          if (internalId) {
-            return;
-          }
+        const foundContact = await findLocalContact(
+          storage,
+          contact.emails.map(({ address }) => address),
+          contact.phoneNumbers.map(({ number }) => number),
+          contact.deviceIds as string[],
+          localContacts,
+          contact.contactProfile?.id,
+        );
 
-          const contactsByDeviceId = await Promise.all(
-            contact.deviceIds.map(deviceId => getContactByIdAsync(deviceId)),
-          );
-
-          const foundContact = contactsByDeviceId.find(
-            contactByDeviceId => !!contactByDeviceId,
-          );
-
-          if (foundContact) {
-            return;
-          }
-        }
-
-        const localContact = localContacts.find(localContact => {
-          const hasCommonPhoneNumber = localContact.phoneNumbers?.find(
-            phoneNumber =>
-              contact.phoneNumbers.some(ph => ph.number === phoneNumber.number),
-          );
-
-          const hasCommonEmails = localContact.emails?.find(email =>
-            contact.emails.some(em => em.address === email.email),
-          );
-
-          return hasCommonPhoneNumber || hasCommonEmails;
-        });
-
-        if (localContact) {
+        if (foundContact) {
           return;
         }
 
@@ -96,6 +70,16 @@ const ContactSearchByNameItem = ({
   const onShow = useCallback(async () => {
     const { status } = await requestPermissionsAsync();
 
+    const socialProfiles =
+      contact.contactProfile?.contactCard?.socials
+        ?.filter(social => !!social.selected)
+        .map(({ label, url }) => ({ label, url })) ?? [];
+
+    const urlAddresses =
+      contact.contactProfile?.contactCard?.urls
+        ?.filter(url => !!url.selected)
+        .map(({ address }) => ({ label: '', url: address })) ?? [];
+
     const contactToShow = {
       ...contact,
       emails: contact.emails.map(({ label, address }) => ({
@@ -108,33 +92,30 @@ const ContactSearchByNameItem = ({
       })),
       contactType: 'person' as const,
       name: `${contact.firstName} ${contact.lastName}`,
+      socialProfiles,
+      urlAddresses,
     };
 
     if (status === 'granted') {
-      let foundContact: Contact | undefined = undefined;
-      if (storage.contains(contact.contactProfile!.id)) {
-        const internalId = storage.getString(contact.contactProfile!.id);
-
-        if (internalId) {
-          foundContact = await getContactByIdAsync(internalId);
-        } else {
-          const contactsByDeviceId = await Promise.all(
-            contact.deviceIds.map(deviceId => getContactByIdAsync(deviceId)),
-          );
-
-          foundContact = contactsByDeviceId.find(
-            contactByDeviceId => !!contactByDeviceId,
-          );
-        }
-      }
+      const foundContact = await findLocalContact(
+        storage,
+        contact.emails.map(({ address }) => address),
+        contact.phoneNumbers.map(({ number }) => number),
+        contact.deviceIds as string[],
+        localContacts,
+        contact.contactProfile?.id,
+      );
 
       if (foundContact) {
-        await presentFormAsync(foundContact.id, contactToShow);
+        await presentFormAsync(foundContact.id, contactToShow, {
+          allowsActions: false,
+          allowsEditing: false,
+        });
       } else {
         await presentFormAsync(null, contactToShow);
       }
     }
-  }, [contact, storage]);
+  }, [contact, localContacts, storage]);
 
   const onMore = useCallback(() => {
     Alert.alert(`${contact.firstName} ${contact.lastName}`, '', [

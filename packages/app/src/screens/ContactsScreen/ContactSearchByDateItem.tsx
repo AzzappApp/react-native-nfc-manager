@@ -1,8 +1,9 @@
-import { getContactByIdAsync, requestPermissionsAsync } from 'expo-contacts';
+import { requestPermissionsAsync } from 'expo-contacts';
 import { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { colors } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
+import { findLocalContact } from '#helpers/contactCardHelpers';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import type { ContactsScreen_contacts$data } from '#relayArtifacts/ContactsScreen_contacts.graphql';
@@ -15,6 +16,7 @@ type Props = {
   storage: MMKV;
   onInviteContact: (onHideInvitation: () => void) => void;
   localContacts: Contact[];
+  invited: boolean;
 };
 
 const ContactSearchByDateItem = ({
@@ -22,6 +24,7 @@ const ContactSearchByDateItem = ({
   storage,
   onInviteContact,
   localContacts,
+  invited,
 }: Props) => {
   const [showInvite, setShowInvite] = useState(false);
 
@@ -30,39 +33,16 @@ const ContactSearchByDateItem = ({
       const { status } = await requestPermissionsAsync();
 
       if (status === 'granted') {
-        if (storage.contains(contact.contactProfile!.id)) {
-          const internalId = storage.getString(contact.contactProfile!.id);
-          if (internalId) {
-            return;
-          }
+        const foundContact = await findLocalContact(
+          storage,
+          contact.emails.map(({ address }) => address),
+          contact.phoneNumbers.map(({ number }) => number),
+          contact.deviceIds as string[],
+          localContacts,
+          contact.contactProfile?.id,
+        );
 
-          const contactsByDeviceId = await Promise.all(
-            contact.deviceIds.map(deviceId => getContactByIdAsync(deviceId)),
-          );
-
-          const foundContact = contactsByDeviceId.find(
-            contactByDeviceId => !!contactByDeviceId,
-          );
-
-          if (foundContact) {
-            return;
-          }
-        }
-
-        const localContact = localContacts.find(localContact => {
-          const hasCommonPhoneNumber = localContact.phoneNumbers?.find(
-            phoneNumber =>
-              contact.phoneNumbers.some(ph => ph.number === phoneNumber.number),
-          );
-
-          const hasCommonEmails = localContact.emails?.find(email =>
-            contact.emails.some(em => em.address === email.email),
-          );
-
-          return hasCommonPhoneNumber || hasCommonEmails;
-        });
-
-        if (localContact) {
+        if (foundContact) {
           return;
         }
 
@@ -87,7 +67,7 @@ const ContactSearchByDateItem = ({
   return (
     <View style={styles.profile}>
       <CoverRenderer width={80} webCard={contact.webCard} />
-      {showInvite && (
+      {showInvite && !invited && (
         <PressableNative style={styles.invite} onPress={onInvite}>
           <Icon icon="invite" style={styles.icon} size={17} />
         </PressableNative>

@@ -1,9 +1,12 @@
+import { getContactByIdAsync } from 'expo-contacts';
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { SOCIAL_NETWORK_LINKS } from '@azzapp/shared/socialLinkHelpers';
 import { textStyles } from '#theme';
 import { createStyleSheet } from '#helpers/createStyles';
+import type { Contact } from 'expo-contacts';
 import type { ColorSchemeName } from 'react-native';
+import type { MMKV } from 'react-native-mmkv';
 
 export const DELETE_BUTTON_WIDTH = 70;
 export const MAX_FIELD_HEIGHT = 85;
@@ -222,4 +225,47 @@ export const useSocialLinkLabels = () => {
   );
 
   return labelValues;
+};
+
+export const findLocalContact = async (
+  storage: MMKV,
+  phoneNumbers: string[],
+  emails: string[],
+  deviceIds: string[],
+  localContacts: Contact[],
+  profileId?: string,
+): Promise<Contact | undefined> => {
+  if (profileId && storage.contains(profileId)) {
+    const internalId = storage.getString(profileId);
+    if (internalId) {
+      const contactByInternalId = getContactByIdAsync(internalId);
+      if (contactByInternalId) {
+        return contactByInternalId;
+      }
+    }
+  }
+
+  const contactsByDeviceId = await Promise.all(
+    deviceIds.map(deviceId => getContactByIdAsync(deviceId)),
+  );
+  const foundContactByDeviceId = contactsByDeviceId.find(
+    contactByDeviceId => !!contactByDeviceId,
+  );
+  if (foundContactByDeviceId) {
+    return foundContactByDeviceId;
+  }
+
+  const localContact = localContacts.find(localContact => {
+    const hasCommonPhoneNumber = localContact.phoneNumbers?.find(phoneNumber =>
+      phoneNumbers.some(ph => ph === phoneNumber.number),
+    );
+
+    const hasCommonEmails = localContact.emails?.find(email =>
+      emails.some(em => em === email.email),
+    );
+
+    return hasCommonPhoneNumber || hasCommonEmails;
+  });
+
+  return localContact;
 };
