@@ -248,9 +248,9 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     height: 34 * SCALE_RATIO,
-    width: 125 * SCALE_RATIO,
-    paddingLeft: 10 * SCALE_RATIO,
-    paddingRight: 10 * SCALE_RATIO,
+    maxWidth: 190 * SCALE_RATIO,
+    paddingLeft: 5 * SCALE_RATIO,
+    paddingRight: 5 * SCALE_RATIO,
     borderRadius: 48 * SCALE_RATIO,
     fontSize: 12 * SCALE_RATIO,
     marginTop: 12 * SCALE_RATIO,
