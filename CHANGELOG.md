@@ -1,5 +1,8 @@
-## 0.9.10-canary.45
+## 0.9.10-canary.46
 
+* **fix:**  - ensure contact count is well displayed and contact screen is refreshed after add/remove contacts ([#5337](https://github.com/AzzappApp/azzapp/pull/5337))
+* **fix:**  - **shareBack:** [#5332](https://github.com/AzzappApp/azzapp/pull/5332) speed up verifySign + open shareback on download ([#5338](https://github.com/AzzappApp/azzapp/pull/5338))
+* **fix:**  - **multiUser:** [#5340](https://github.com/AzzappApp/azzapp/pull/5340) parallel updates break transaction ([#5346](https://github.com/AzzappApp/azzapp/pull/5346))
 * **fix:**  - ensure webcard is well retrieved ([#5341](https://github.com/AzzappApp/azzapp/pull/5341))
 * **build:**  - speed up with caching on codegen ([#5336](https://github.com/AzzappApp/azzapp/pull/5336))
 * **fix:**  - add missing company information for web ([#5327](https://github.com/AzzappApp/azzapp/pull/5327))
