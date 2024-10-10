@@ -194,6 +194,7 @@ const styles = StyleSheet.create({
   },
   infos: {
     justifyContent: 'center',
+    flex: 3.5,
   },
   actions: {
     flex: 1,
