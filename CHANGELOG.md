@@ -1,4 +1,4 @@
-## 0.9.10-canary.43
+## 0.9.10-canary.44
 
 * **build:**  - speed up with caching on codegen ([#5336](https://github.com/AzzappApp/azzapp/pull/5336))
 * **fix:**  - add missing company information for web ([#5327](https://github.com/AzzappApp/azzapp/pull/5327))
