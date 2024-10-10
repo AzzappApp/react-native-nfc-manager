@@ -1,5 +1,7 @@
-## 0.9.10-canary.48
+## 0.9.10-canary.49
 
+* **feat:**  - view contact ([#5356](https://github.com/AzzappApp/azzapp/pull/5356))
+* **fix:**  - **payment:** [#5266](https://github.com/AzzappApp/azzapp/pull/5266) create new subscriptions on updates ([#5351](https://github.com/AzzappApp/azzapp/pull/5351))
 * **fix:**  - fix NaN contacts at first publish ([#5354](https://github.com/AzzappApp/azzapp/pull/5354))
 * **feat:**  - 🎸 complete options + contact content ([#5353](https://github.com/AzzappApp/azzapp/pull/5353))
 * **fix:**  - ensure contact count is well displayed and contact screen is refreshed after add/remove contacts ([#5337](https://github.com/AzzappApp/azzapp/pull/5337))
