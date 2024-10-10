@@ -21,7 +21,6 @@ import {
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import { shuffle } from '@azzapp/shared/arrayHelpers';
 import { serializeContactCard } from '@azzapp/shared/contactCardHelpers';
-import ERRORS from '@azzapp/shared/errors';
 import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
 import { simpleHash } from '@azzapp/shared/stringHelpers';
 import {
@@ -248,15 +247,17 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
     return result;
   },
   webCard: async profile => {
+    const webcard = await webCardLoader.load(profile.webCardId);
+
     if (
-      !profileIsAssociatedToCurrentUser(profile) &&
-      !(await hasWebCardProfileRight(profile.webCardId))
+      profileIsAssociatedToCurrentUser(profile) ||
+      (await hasWebCardProfileRight(profile.webCardId)) ||
+      webcard?.cardIsPublished
     ) {
-      // TODO schema error, the field should be nullable, but it's not until we
-      // can change the schema, we throw an error here
-      throw new Error(ERRORS.GRAPHQL_ERROR);
+      return webcard;
     }
-    return webCardLoader.load(profile.webCardId);
+
+    return null;
   },
   nbContacts: async profile => {
     if (!profileIsAssociatedToCurrentUser(profile)) {
