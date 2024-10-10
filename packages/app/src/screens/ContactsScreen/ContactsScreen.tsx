@@ -126,6 +126,7 @@ const ContactsScreen = ({
                     }
                   }
                   webCard {
+                    userName
                     ...CoverRenderer_webCard
                   }
                 }
@@ -304,6 +305,61 @@ const ContactsScreen = ({
     [intl, localContacts],
   );
 
+  const onShowContact = useCallback(
+    async (contact: ContactType) => {
+      const { status } = await requestPermissionsAsync();
+
+      const socialProfiles =
+        contact.contactProfile?.contactCard?.socials
+          ?.filter(social => !!social.selected)
+          .map(({ label, url }) => ({ label, url })) ?? [];
+
+      const urlAddresses =
+        contact.contactProfile?.contactCard?.urls
+          ?.filter(url => !!url.selected)
+          .map(({ address }) => ({ label: '', url: address })) ?? [];
+
+      const contactToShow = {
+        ...contact,
+        emails: contact.emails.map(({ label, address }) => ({
+          label,
+          email: address,
+        })),
+        phoneNumbers: contact.phoneNumbers.map(({ label, number }) => ({
+          label,
+          number,
+        })),
+        contactType: 'person' as const,
+        name: `${contact.firstName} ${contact.lastName}`,
+        socialProfiles,
+        urlAddresses,
+      };
+
+      if (status === 'granted') {
+        const foundContact = await findLocalContact(
+          storage,
+          contact.emails.map(({ address }) => address),
+          contact.phoneNumbers.map(({ number }) => number),
+          contact.deviceIds as string[],
+          localContacts,
+          contact.contactProfile?.id,
+        );
+
+        if (foundContact) {
+          await presentFormAsync(foundContact.id, contactToShow, {
+            allowsActions: false,
+            allowsEditing: false,
+          });
+        } else {
+          await presentFormAsync(undefined, contactToShow, {
+            isNew: true,
+          });
+        }
+      }
+    },
+    [localContacts],
+  );
+
   useEffect(() => {
     const getLocalContacts = async () => {
       const { data } = await getContactsAsync({
@@ -378,6 +434,7 @@ const ContactsScreen = ({
             refreshing={refreshing}
             onRemoveContacts={onRemoveContacts}
             onInviteContact={onInviteContact}
+            onShowContact={onShowContact}
             storage={storage}
             localContacts={localContacts}
           />
@@ -390,6 +447,7 @@ const ContactsScreen = ({
             refreshing={refreshing}
             onRemoveContacts={onRemoveContacts}
             onInviteContact={onInviteContact}
+            onShowContact={onShowContact}
             storage={storage}
             localContacts={localContacts}
           />

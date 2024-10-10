@@ -27,6 +27,7 @@ type Props = {
   storage: MMKV;
   localContacts: Contact[];
   onInviteContact: (contact: ContactType, onHideInvitation: () => void) => void;
+  onShowContact: (contact: ContactType) => void;
 };
 
 const ContactSearchByDateSection = ({
@@ -36,6 +37,7 @@ const ContactSearchByDateSection = ({
   storage,
   localContacts,
   onInviteContact,
+  onShowContact,
 }: Props) => {
   const intl = useIntl();
   const [invited, setInvited] = useState(false);
@@ -192,13 +194,14 @@ const ContactSearchByDateSection = ({
           onInviteContact={onHideInvitation => {
             onInviteContact(item, onHideInvitation);
           }}
+          onShowContact={onShowContact}
           storage={storage}
           localContacts={localContacts}
           invited={invited}
         />
       );
     },
-    [invited, localContacts, onInviteContact, storage],
+    [invited, localContacts, onInviteContact, onShowContact, storage],
   );
 
   return (

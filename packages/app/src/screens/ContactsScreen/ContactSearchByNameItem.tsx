@@ -1,4 +1,4 @@
-import { presentFormAsync, requestPermissionsAsync } from 'expo-contacts';
+import { requestPermissionsAsync } from 'expo-contacts';
 import { useCallback, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Alert, StyleSheet, View } from 'react-native';
@@ -17,6 +17,7 @@ type Props = {
   contact: ContactType;
   onRemoveContact: () => void;
   onInviteContact: (onHideInvitation: () => void) => void;
+  onShowContact: (contact: ContactType) => void;
   storage: MMKV;
   localContacts: Contact[];
 };
@@ -25,6 +26,7 @@ const ContactSearchByNameItem = ({
   contact,
   onRemoveContact,
   onInviteContact,
+  onShowContact,
   storage,
   localContacts,
 }: Props) => {
@@ -67,55 +69,9 @@ const ContactSearchByNameItem = ({
     onInviteContact(() => setShowInvite(false));
   }, [onInviteContact]);
 
-  const onShow = useCallback(async () => {
-    const { status } = await requestPermissionsAsync();
-
-    const socialProfiles =
-      contact.contactProfile?.contactCard?.socials
-        ?.filter(social => !!social.selected)
-        .map(({ label, url }) => ({ label, url })) ?? [];
-
-    const urlAddresses =
-      contact.contactProfile?.contactCard?.urls
-        ?.filter(url => !!url.selected)
-        .map(({ address }) => ({ label: '', url: address })) ?? [];
-
-    const contactToShow = {
-      ...contact,
-      emails: contact.emails.map(({ label, address }) => ({
-        label,
-        email: address,
-      })),
-      phoneNumbers: contact.phoneNumbers.map(({ label, number }) => ({
-        label,
-        number,
-      })),
-      contactType: 'person' as const,
-      name: `${contact.firstName} ${contact.lastName}`,
-      socialProfiles,
-      urlAddresses,
-    };
-
-    if (status === 'granted') {
-      const foundContact = await findLocalContact(
-        storage,
-        contact.emails.map(({ address }) => address),
-        contact.phoneNumbers.map(({ number }) => number),
-        contact.deviceIds as string[],
-        localContacts,
-        contact.contactProfile?.id,
-      );
-
-      if (foundContact) {
-        await presentFormAsync(foundContact.id, contactToShow, {
-          allowsActions: false,
-          allowsEditing: false,
-        });
-      } else {
-        await presentFormAsync(null, contactToShow);
-      }
-    }
-  }, [contact, localContacts, storage]);
+  const onShow = useCallback(() => {
+    onShowContact(contact);
+  }, [contact, onShowContact]);
 
   const onMore = useCallback(() => {
     Alert.alert(`${contact.firstName} ${contact.lastName}`, '', [
@@ -169,17 +125,26 @@ const ContactSearchByNameItem = ({
 
   return (
     <View key={contact.id} style={styles.contact}>
-      <CoverRenderer
-        style={styles.webcard}
-        width={35}
-        webCard={contact.webCard}
-      />
+      <PressableNative onPress={onShow}>
+        <CoverRenderer
+          style={styles.webcard}
+          width={35}
+          webCard={contact.webCard}
+        />
+      </PressableNative>
       <View style={styles.infos}>
         {(contact.firstName || contact.lastName) && (
           <Text variant="large" numberOfLines={1}>
             {contact.firstName} {contact.lastName}
           </Text>
         )}
+        {!contact.firstName &&
+          !contact.lastName &&
+          contact.contactProfile?.webCard?.userName && (
+            <Text variant="large" numberOfLines={1}>
+              {contact.contactProfile.webCard.userName}
+            </Text>
+          )}
         {contact.company && (
           <Text style={styles.company} numberOfLines={1}>
             {contact.company}

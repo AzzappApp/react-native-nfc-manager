@@ -15,6 +15,7 @@ type Props = {
   contact: ContactType;
   storage: MMKV;
   onInviteContact: (onHideInvitation: () => void) => void;
+  onShowContact: (contact: ContactType) => void;
   localContacts: Contact[];
   invited: boolean;
 };
@@ -23,6 +24,7 @@ const ContactSearchByDateItem = ({
   contact,
   storage,
   onInviteContact,
+  onShowContact,
   localContacts,
   invited,
 }: Props) => {
@@ -64,9 +66,15 @@ const ContactSearchByDateItem = ({
     onInviteContact(() => setShowInvite(false));
   }, [onInviteContact]);
 
+  const onShow = useCallback(() => {
+    onShowContact(contact);
+  }, [contact, onShowContact]);
+
   return (
     <View style={styles.profile}>
-      <CoverRenderer width={80} webCard={contact.webCard} />
+      <PressableNative onPress={onShow}>
+        <CoverRenderer width={80} webCard={contact.webCard} />
+      </PressableNative>
       {showInvite && !invited && (
         <PressableNative style={styles.invite} onPress={onInvite}>
           <Icon icon="invite" style={styles.icon} size={17} />

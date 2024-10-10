@@ -18,6 +18,7 @@ type Props = {
   refreshing: boolean;
   onRemoveContacts: (contacts: string[]) => void;
   onInviteContact: (contact: ContactType, onHideInvitation: () => void) => void;
+  onShowContact: (contact: ContactType) => void;
   storage: MMKV;
   localContacts: Contact[];
 };
@@ -29,6 +30,7 @@ const ContactsScreenSearchByDate = ({
   refreshing,
   onRemoveContacts,
   onInviteContact,
+  onShowContact,
   storage,
   localContacts,
 }: Props) => {
@@ -77,12 +79,13 @@ const ContactsScreenSearchByDate = ({
           localContacts={localContacts}
           onInviteContact={onInviteContact}
           onRemoveContacts={onRemoveContacts}
+          onShowContact={onShowContact}
           storage={storage}
           title={item.title}
         />
       );
     },
-    [localContacts, onInviteContact, onRemoveContacts, storage],
+    [localContacts, onInviteContact, onRemoveContacts, onShowContact, storage],
   );
 
   return (
