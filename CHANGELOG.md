@@ -1,5 +1,6 @@
-## 0.9.10-canary.44
+## 0.9.10-canary.45
 
+* **fix:**  - ensure webcard is well retrieved ([#5341](https://github.com/AzzappApp/azzapp/pull/5341))
 * **build:**  - speed up with caching on codegen ([#5336](https://github.com/AzzappApp/azzapp/pull/5336))
 * **fix:**  - add missing company information for web ([#5327](https://github.com/AzzappApp/azzapp/pull/5327))
 * **fix:**  - appClip handle url in multiple way ([#5329](https://github.com/AzzappApp/azzapp/pull/5329))
