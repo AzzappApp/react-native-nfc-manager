@@ -3,8 +3,8 @@ import {
   addContactAsync,
   getContactByIdAsync,
   presentFormAsync,
-  requestPermissionsAsync,
   updateContactAsync,
+  PermissionStatus as ContactPermissionStatus,
 } from 'expo-contacts';
 import * as FileSystem from 'expo-file-system';
 import { fromGlobalId } from 'graphql-relay';
@@ -23,6 +23,7 @@ import {
 import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import CoverRenderer from '#components/CoverRenderer';
+import { usePhonebookPermission } from '#hooks/usePhonebookPermission';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
 import CheckBox from '#ui/CheckBox';
@@ -64,6 +65,8 @@ const AddContactModal = ({
   const scrollerGesture = Gesture.Native();
   const checkBoxGesture = Gesture.Native();
 
+  const { requestPhonebookPermissionAndRedirectToSettingsAsync } =
+    usePhonebookPermission();
   const nativeGestureItems = [checkBoxGesture, scrollerGesture];
 
   const webCard = useFragment(
@@ -229,8 +232,9 @@ const AddContactModal = ({
           onPress: async () => {
             try {
               let messageToast = '';
-              const { status } = await requestPermissionsAsync();
-              if (status === 'granted') {
+              const { status } =
+                await requestPhonebookPermissionAndRedirectToSettingsAsync();
+              if (status === ContactPermissionStatus.GRANTED) {
                 let foundContact: Contact | undefined = undefined;
                 if (scanned.profileId && storage.contains(scanned.profileId)) {
                   const internalId = storage.getString(scanned.profileId);
@@ -284,22 +288,11 @@ const AddContactModal = ({
             description: 'Button to view the contact',
           }),
           onPress: async () => {
-            if (Platform.OS === 'android') {
-              const readContactPermission = await requestPermissionsAsync();
-              if (readContactPermission.status !== 'granted') {
-                Toast.show({
-                  type: 'error',
-                  text1: intl.formatMessage({
-                    defaultMessage:
-                      'You have to grant the permission to view the contact',
-                    description:
-                      'WebCard screen - Error message when trying to view a contact',
-                  }),
-                });
-                return;
-              }
+            const { status } =
+              await requestPhonebookPermissionAndRedirectToSettingsAsync();
+            if (status !== ContactPermissionStatus.GRANTED) {
+              return;
             }
-
             await presentFormAsync(null, scanned.contact, {
               isNew: true,
             });
@@ -307,8 +300,18 @@ const AddContactModal = ({
         },
         { text: 'Cancel', style: 'cancel' },
       ],
+      {
+        // options
+        cancelable: true,
+      },
     );
-  }, [scanned, intl, webCard.userName, onAddContact]);
+  }, [
+    scanned,
+    intl,
+    webCard.userName,
+    requestPhonebookPermissionAndRedirectToSettingsAsync,
+    onAddContact,
+  ]);
 
   const userName = useMemo(() => {
     if (scanned) {
