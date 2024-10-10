@@ -14,7 +14,12 @@ import { Alert, Platform, StyleSheet, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { MMKV } from 'react-native-mmkv';
 import Toast from 'react-native-toast-message';
-import { graphql, useFragment, useMutation } from 'react-relay';
+import {
+  ConnectionHandler,
+  graphql,
+  useFragment,
+  useMutation,
+} from 'react-relay';
 import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import CoverRenderer from '#components/CoverRenderer';
@@ -138,7 +143,6 @@ const AddContactModal = ({
         label: string;
         number: string;
       }>;
-
       commit({
         variables: {
           input: {
@@ -161,6 +165,25 @@ const AddContactModal = ({
             deviceId,
           },
           profileId: viewer,
+        },
+        updater: (store, response) => {
+          if (response && response.addContact) {
+            const profile = store.get(viewer);
+            const nbContacts = profile?.getValue('nbContacts');
+
+            if (typeof nbContacts === 'number') {
+              profile?.setValue(nbContacts + 1, 'nbContacts');
+            }
+
+            if (profile) {
+              ConnectionHandler.getConnection(
+                profile,
+                'Profile_searchContacts',
+              )?.invalidateRecord();
+            }
+          } else {
+            console.warn('fail to add contact ?');
+          }
         },
         onCompleted: () => {
           setIsOpen(false);

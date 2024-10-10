@@ -20,7 +20,7 @@ import {
 } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { colors } from '#theme';
-import { useRouter } from '#components/NativeRouter';
+import { useOnFocus, useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import relayScreen from '#helpers/relayScreen';
 import useAuthState from '#hooks/useAuthState';
@@ -148,6 +148,13 @@ const ContactsScreen = ({
     }
   }, [isLoadingNext, refetch, debounceSearch, searchBy]);
 
+  // This code is used to refresh the screen when we come back to it.
+  // After a contact exchange, this screen shall be refreshed to ensure the new contact is well displayed
+  // Or not.
+  // In some case, the new contact shall be displayed, and during search for exemple we cannot infer if the new contact shall be displayed
+  // The safest way to implement it is to refresh the screen.
+  useOnFocus(onRefresh);
+
   const onEndReached = useCallback(() => {
     if (hasNext && !isLoadingNext) {
       loadNext(50);
@@ -190,6 +197,15 @@ const ContactsScreen = ({
               store.delete(removedContactId);
             },
           );
+          const profile = store.get(profileInfos!.profileId);
+          const nbContacts = profile?.getValue('nbContacts');
+
+          if (typeof nbContacts === 'number') {
+            profile?.setValue(
+              nbContacts - response.removeContacts.removedContactIds.length,
+              'nbContacts',
+            );
+          }
         }
       },
     });
