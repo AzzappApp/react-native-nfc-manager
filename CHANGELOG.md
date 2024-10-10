@@ -1,4 +1,4 @@
-## 0.9.10-canary.49
+## 0.9.10-canary.50
 
 * **feat:**  - view contact ([#5356](https://github.com/AzzappApp/azzapp/pull/5356))
 * **fix:**  - **payment:** [#5266](https://github.com/AzzappApp/azzapp/pull/5266) create new subscriptions on updates ([#5351](https://github.com/AzzappApp/azzapp/pull/5351))
