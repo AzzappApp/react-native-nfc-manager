@@ -16,11 +16,12 @@ import * as ROLES from '#roles';
 import ConfirmDialog from '#components/ConfirmDialog';
 import {
   toggleRole,
-  removeWebcard,
+  removeWebCard,
   toggleUserActive,
   updateNote,
+  toggleStar,
 } from './userActions';
-import WebcardCover from './WebcardCover';
+import WebCardCover from './WebcardCover';
 import type { User, Profile, WebCard } from '@azzapp/data';
 import type { ChangeEvent } from 'react';
 
@@ -99,13 +100,14 @@ const UserForm = ({ user, profiles }: UserFormProps) => {
         }}
       >
         {profiles.map(({ webCard, profile: { profileRole } }) => (
-          <WebcardCover
+          <WebCardCover
             key={webCard.id}
             webcard={webCard}
             role={profileRole}
-            onRemoveWebcard={(webCardId: string) =>
-              removeWebcard(user.id, webCardId)
-            }
+            onRemoveWebCard={() => removeWebCard(user.id, webCard.id)}
+            onToggleStar={() => {
+              toggleStar(user.id, webCard.id);
+            }}
           />
         ))}
       </Card>

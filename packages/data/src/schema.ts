@@ -933,6 +933,7 @@ export const WebCardTable = cols.table(
     nbPostsLiked: cols.int('nbPostsLiked').default(0).notNull(), // this is the informations postLiked
     nbLikes: cols.int('nbLikes').default(0).notNull(), //this is the stats TotalLikes (number of likes received)
     nbWebCardViews: cols.int('nbWebCardViews').default(0).notNull(),
+    starred: cols.boolean('starred').default(false).notNull(),
 
     /* Deletion infos */
     deleted: cols.boolean('deleted').default(false).notNull(),

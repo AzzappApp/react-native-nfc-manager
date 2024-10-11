@@ -337,7 +337,7 @@ export const getRecommendedWebCards = async (
         eq(WebCardTable.deleted, false),
       ),
     )
-    .orderBy(desc(WebCardTable.createdAt))
+    .orderBy(desc(WebCardTable.starred), desc(WebCardTable.createdAt))
     .then(res => res.map(({ WebCard }) => WebCard));
 };
 
