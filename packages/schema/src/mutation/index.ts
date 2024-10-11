@@ -39,6 +39,7 @@ import {
 import togglePostReaction from './postReaction';
 import quitWebCard from './quitWebCard';
 import removeContacts from './removeContacts';
+import removeContactsFromWebCard from './removeContactsFromWebCard';
 import removeFollower from './removeFollower';
 import removeUsersFromWebCard from './removeUsersFromWebCard';
 import reorderModules from './reorderModules';
@@ -122,6 +123,7 @@ export const Mutation: MutationResolvers = {
   deleteUser,
   addContact,
   removeContacts,
+  removeContactsFromWebCard,
   saveFCMToken,
   deleteFCMToken,
 };

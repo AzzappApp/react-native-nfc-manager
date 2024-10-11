@@ -9,7 +9,7 @@ import {
   inArray,
 } from 'drizzle-orm';
 import { db, transaction } from '../database';
-import { ContactTable } from '../schema';
+import { ContactTable, ProfileTable, WebCardTable } from '../schema';
 import { incrementShareBacksTotal } from './profileQueries';
 import { incrementShareBacks } from './profileStatisticQueries';
 import type { Contact } from '../schema';
@@ -30,6 +30,18 @@ export const getContactByProfiles = (profiles: {
       ),
     )
     .then(rows => rows[0] ?? null);
+};
+
+export const getWebcardsFromContactIds = (
+  contactIds: string[],
+): Promise<string[]> => {
+  return db()
+    .select({ id: WebCardTable.id })
+    .from(WebCardTable)
+    .innerJoin(ProfileTable, eq(WebCardTable.id, ProfileTable.webCardId))
+    .innerJoin(ContactTable, eq(ContactTable.ownerProfileId, ProfileTable.id))
+    .where(inArray(ContactTable.id, contactIds))
+    .then(rows => rows.map(({ id }) => id));
 };
 
 export const getContactCount = (profileId: string): Promise<number> => {
@@ -157,6 +169,91 @@ export const searchContacts = async (
   };
 };
 
+export const searchContactsByWebcardId = async ({
+  limit,
+  offset,
+  webcardId,
+  search,
+  ownerProfileId,
+  withDeleted,
+}: {
+  webcardId: string;
+  limit: number;
+  search: string | null;
+  offset?: number;
+  ownerProfileId?: string | null;
+  withDeleted?: boolean | null;
+}): Promise<{ count: number; contacts: Contact[] }> => {
+  const [counter, result] = await Promise.all([
+    db()
+      .select({ count: count() })
+      .from(ContactTable)
+      .innerJoin(ProfileTable, eq(ContactTable.ownerProfileId, ProfileTable.id))
+      .innerJoin(WebCardTable, eq(ProfileTable.webCardId, WebCardTable.id))
+      .where(
+        and(
+          eq(WebCardTable.id, webcardId),
+          (ownerProfileId && eq(ContactTable.ownerProfileId, ownerProfileId)) ||
+            undefined,
+          (!withDeleted && eq(ContactTable.deleted, false)) || undefined,
+          search
+            ? or(
+                like(ContactTable.firstName, `%${search}%`),
+                like(ContactTable.lastName, `%${search}%`),
+                like(ContactTable.company, `%${search}%`),
+              )
+            : undefined,
+        ),
+      ),
+    db()
+      .select({ contact: ContactTable })
+      .from(ContactTable)
+      .innerJoin(ProfileTable, eq(ContactTable.ownerProfileId, ProfileTable.id))
+      .innerJoin(WebCardTable, eq(ProfileTable.webCardId, WebCardTable.id))
+      .where(
+        and(
+          eq(WebCardTable.id, webcardId),
+          (ownerProfileId && eq(ContactTable.ownerProfileId, ownerProfileId)) ||
+            undefined,
+          (!withDeleted && eq(ContactTable.deleted, false)) || undefined,
+          search
+            ? or(
+                like(ContactTable.firstName, `%${search}%`),
+                like(ContactTable.lastName, `%${search}%`),
+                like(ContactTable.company, `%${search}%`),
+              )
+            : undefined,
+        ),
+      )
+      .orderBy(ContactTable.firstName, ContactTable.lastName)
+      .limit(limit)
+      .offset(offset ?? 0),
+  ]);
+
+  return {
+    count: counter[0].count,
+    contacts: result.map(({ contact }) => contact),
+  };
+};
+
+export const getContactCountWithWebcardId = (
+  webcardId: string,
+  withDeleted: boolean = false,
+): Promise<number> => {
+  return db()
+    .select({ count: count() })
+    .from(ContactTable)
+    .innerJoin(ProfileTable, eq(ContactTable.ownerProfileId, ProfileTable.id))
+    .innerJoin(WebCardTable, eq(ProfileTable.webCardId, WebCardTable.id))
+    .where(
+      and(
+        eq(WebCardTable.id, webcardId),
+        eq(ContactTable.deleted, withDeleted),
+      ),
+    )
+    .then(res => res[0].count || 0);
+};
+
 export const removeContacts = async (
   ownerProfileId: string,
   contactIds: string[],
@@ -173,4 +270,14 @@ export const removeContacts = async (
         inArray(ContactTable.id, contactIds),
       ),
     );
+};
+
+export const removeContactsbyIds = async (contactIds: string[]) => {
+  return db()
+    .update(ContactTable)
+    .set({
+      deleted: true,
+      deletedAt: new Date(),
+    })
+    .where(inArray(ContactTable.id, contactIds));
 };

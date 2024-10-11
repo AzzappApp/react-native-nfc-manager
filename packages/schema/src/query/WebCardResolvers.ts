@@ -20,7 +20,10 @@ import {
   getCoverTemplatesByTypesAndTag,
   countWebCardPayments,
   countDeletedWebCardProfiles,
+  searchContactsByWebcardId,
+  getContactCountWithWebcardId,
 } from '@azzapp/data';
+import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
 import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { buildCoverAvatarUrl } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
@@ -43,10 +46,14 @@ import {
 } from '#helpers/connectionsHelpers';
 import { labelResolver } from '#helpers/localeHelpers';
 import {
+  getWebCardProfile,
   hasWebCardProfileRight,
   type ProtectedResolver,
 } from '#helpers/permissionsHelpers';
-import { idResolver, maybeFromGlobalIdWithType } from '#helpers/relayIdHelpers';
+import fromGlobalIdWithType, {
+  idResolver,
+  maybeFromGlobalIdWithType,
+} from '#helpers/relayIdHelpers';
 import type {
   CompanyActivityResolvers,
   CompanyActivityTypeResolvers,
@@ -392,6 +399,47 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
           count,
       },
     );
+  },
+  searchContacts: async (
+    webCard,
+    { first, after, search, withDeleted, ownerProfileId: oid },
+  ) => {
+    const ownerProfileId = oid ? fromGlobalIdWithType(oid, 'Profile') : oid;
+    const webCardProfile = await getWebCardProfile(webCard.id);
+    if (!webCardProfile || !profileHasAdminRight(webCardProfile.profileRole)) {
+      return emptyConnection;
+    }
+    const limit = first ?? 100;
+    const offset = after ? cursorToOffset(after) : 0;
+    const result = await searchContactsByWebcardId({
+      webcardId: webCard.id,
+      limit,
+      offset,
+      search: search ?? null, //cannot be undefined
+      ownerProfileId,
+      withDeleted,
+    });
+    const contacts = result.contacts.slice(0, limit);
+    return connectionFromArraySlice(
+      contacts,
+      { after, first },
+      {
+        sliceStart: offset,
+        arrayLength: result.count,
+      },
+    );
+  },
+  nbContacts: async (webCard, _) => {
+    if (!(await hasWebCardProfileRight(webCard.id))) {
+      return 1;
+    }
+    return getContactCountWithWebcardId(webCard.id);
+  },
+  nbDeletedContacts: async (webCard, _) => {
+    if (!(await hasWebCardProfileRight(webCard.id))) {
+      return 1;
+    }
+    return getContactCountWithWebcardId(webCard.id, true);
   },
   nextChangeUsernameAllowedAt: async webCard => {
     if (!(await hasWebCardProfileRight(webCard.id))) {
