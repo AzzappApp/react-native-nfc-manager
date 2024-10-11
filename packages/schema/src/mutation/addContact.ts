@@ -4,6 +4,9 @@ import { fromGlobalId } from 'graphql-relay';
 import {
   createContact,
   getContactByProfiles,
+  incrementShareBacks,
+  incrementShareBacksTotal,
+  transaction,
   updateContact,
 } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
@@ -120,21 +123,27 @@ const addContact: MutationResolvers['addContact'] = async (
         ? new Date(profile.contactCard.birthday.birthday)
         : null;
 
-      await createContact({
-        ownerProfileId: input.profileId,
-        contactProfileId: profileId,
-        createdAt: new Date(),
-        type: 'shareback',
-        deviceIds: [],
-        addresses: addresses ?? [],
-        emails: emails ?? [],
-        phoneNumbers: phoneNumbers ?? [],
-        birthday,
-        company: profile.contactCard?.company ?? undefined,
-        firstName: profile.contactCard?.firstName ?? undefined,
-        lastName: profile.contactCard?.lastName ?? undefined,
-        title: profile.contactCard?.title ?? undefined,
+      await transaction(async () => {
+        await createContact({
+          ownerProfileId: input.profileId,
+          contactProfileId: profileId,
+          createdAt: new Date(),
+          type: 'shareback',
+          deviceIds: [],
+          addresses: addresses ?? [],
+          emails: emails ?? [],
+          phoneNumbers: phoneNumbers ?? [],
+          birthday,
+          company: profile.contactCard?.company ?? undefined,
+          firstName: profile.contactCard?.firstName ?? undefined,
+          lastName: profile.contactCard?.lastName ?? undefined,
+          title: profile.contactCard?.title ?? undefined,
+        });
+
+        await incrementShareBacksTotal(input.profileId);
+        await incrementShareBacks(input.profileId, true);
       });
+
       await sendPushNotification(profile.userId, {
         type: 'shareBack',
         mediaId: null,
