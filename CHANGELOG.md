@@ -1,5 +1,6 @@
-## 0.9.10-canary.50
+## 0.9.10-canary.51
 
+* **fix:**  - avoid crash when providing an undefined color to rnskia and fix initial values ([#5365](https://github.com/AzzappApp/azzapp/pull/5365))
 * **feat:**  - view contact ([#5356](https://github.com/AzzappApp/azzapp/pull/5356))
 * **fix:**  - **payment:** [#5266](https://github.com/AzzappApp/azzapp/pull/5266) create new subscriptions on updates ([#5351](https://github.com/AzzappApp/azzapp/pull/5351))
 * **fix:**  - fix NaN contacts at first publish ([#5354](https://github.com/AzzappApp/azzapp/pull/5354))
