@@ -12,7 +12,7 @@ input AddContactInput {
   phoneNumbers: [AddContactPhoneNumberInput!]!
   emails: [AddContactEmailInput!]!
   addresses: [AddContactAddressInput!]!
-  deviceId: String!
+  deviceId: String
   withShareBack: Boolean!
 }
 

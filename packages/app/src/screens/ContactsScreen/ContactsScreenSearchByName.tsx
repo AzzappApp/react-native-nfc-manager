@@ -40,7 +40,7 @@ const ContactsScreenSearchByName = ({
   const sections = useMemo(() => {
     return contacts?.reduce(
       (accumulator, contact) => {
-        const initial = contact.firstName[0] ?? '';
+        const initial = contact.firstName?.[0] ?? '';
 
         const existingSection = accumulator.find(
           section => section.initial === initial,

@@ -23,6 +23,7 @@ import {
 import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import CoverRenderer from '#components/CoverRenderer';
+import { useRouter } from '#components/NativeRouter';
 import { usePhonebookPermission } from '#hooks/usePhonebookPermission';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
@@ -102,29 +103,10 @@ const AddContactModal = ({
   } | null>(null);
 
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
 
-  const onClose = useCallback(() => {
-    setIsOpen(false);
-  }, []);
-
-  useEffect(() => {
-    (async () => {
-      if (!scanned && contactData && webCard) {
-        const { contact, webCardId, profileId } = await buildContact(
-          contactData,
-          additionalContactData,
-          webCard.userName,
-        );
-        if (webCardId === fromGlobalId(webCard.id).id) {
-          setScanned({ contact, profileId });
-          setIsOpen(true);
-        }
-      }
-    })();
-  }, [contactData, webCard, additionalContactData, scanned]);
-
-  const onAddContact = useCallback(
-    (deviceId: string) => {
+  const getContactInput = useCallback(
+    (deviceId?: string) => {
       if (!scanned || !viewer) return;
 
       const addresses = scanned.contact.addresses?.map(({ label, street }) => ({
@@ -146,58 +128,53 @@ const AddContactModal = ({
         label: string;
         number: string;
       }>;
+      return {
+        addresses: addresses ?? [],
+        company: scanned.contact.company ?? '',
+        emails: emails ?? [],
+        firstname: scanned.contact.firstName ?? '',
+        lastname: scanned.contact.lastName ?? '',
+        phoneNumbers: phoneNumbers ?? [],
+        profileId: scanned.profileId ?? '',
+        title: scanned.contact.jobTitle ?? '',
+        withShareBack: withShareBack === 'checked',
+        birthday: scanned.contact.birthday
+          ? new Date(
+              scanned.contact.birthday.year!,
+              scanned.contact.birthday.month!,
+              scanned.contact.birthday.day!,
+            )
+          : null,
+        deviceId,
+      };
+    },
+    [scanned, viewer, withShareBack],
+  );
+
+  /* will update existing */
+  const onAddContactToPhonebook = useCallback(
+    (deviceId: string) => {
+      if (!scanned || !viewer) return;
+      const input = getContactInput(deviceId);
+      if (!input) return;
       commit({
         variables: {
-          input: {
-            addresses: addresses ?? [],
-            company: scanned.contact.company ?? '',
-            emails: emails ?? [],
-            firstname: scanned.contact.firstName ?? '',
-            lastname: scanned.contact.lastName ?? '',
-            phoneNumbers: phoneNumbers ?? [],
-            profileId: scanned.profileId ?? '',
-            title: scanned.contact.jobTitle ?? '',
-            withShareBack: withShareBack === 'checked',
-            birthday: scanned.contact.birthday
-              ? new Date(
-                  scanned.contact.birthday.year!,
-                  scanned.contact.birthday.month!,
-                  scanned.contact.birthday.day!,
-                )
-              : null,
-            deviceId,
-          },
+          input,
           profileId: viewer,
-        },
-        updater: (store, response) => {
-          if (response && response.addContact) {
-            const profile = store.get(viewer);
-            const nbContacts = profile?.getValue('nbContacts');
-
-            if (typeof nbContacts === 'number') {
-              profile?.setValue(nbContacts + 1, 'nbContacts');
-            }
-
-            if (profile) {
-              ConnectionHandler.getConnection(
-                profile,
-                'Profile_searchContacts',
-              )?.invalidateRecord();
-            }
-          } else {
-            console.warn('fail to add contact ?');
-          }
-        },
-        onCompleted: () => {
-          setIsOpen(false);
         },
       });
     },
-    [commit, scanned, viewer, withShareBack],
+    [scanned, viewer, getContactInput, commit],
   );
 
-  const onShowContact = useCallback(() => {
+  const onRequestAddContactToPhonebook = useCallback(() => {
     if (!scanned) return;
+
+    const name = `${
+      `${scanned.contact.firstName ?? ''}  ${scanned.contact.lastName ?? ''}`.trim() ||
+      scanned.contact.company ||
+      webCard.userName
+    }`;
 
     Alert.alert(
       intl.formatMessage(
@@ -206,11 +183,7 @@ const AddContactModal = ({
           description: 'Alert title when adding a profile to contacts',
         },
         {
-          name: `${
-            `${scanned.contact.firstName ?? ''}  ${scanned.contact.lastName ?? ''}`.trim() ||
-            scanned.contact.company ||
-            webCard.userName
-          }`,
+          name,
         },
       ),
       intl.formatMessage(
@@ -219,11 +192,7 @@ const AddContactModal = ({
           description: 'Alert message when adding a profile to contacts',
         },
         {
-          name: `${
-            `${scanned.contact.firstName ?? ''}  ${scanned.contact.lastName ?? ''}`.trim() ||
-            scanned.contact.company ||
-            webCard.userName
-          }`,
+          name,
         },
       ),
       [
@@ -232,6 +201,7 @@ const AddContactModal = ({
           onPress: async () => {
             try {
               let messageToast = '';
+              // Here we don't want to display popup
               const { status } =
                 await requestPhonebookPermissionAndRedirectToSettingsAsync();
               if (status === ContactPermissionStatus.GRANTED) {
@@ -243,16 +213,16 @@ const AddContactModal = ({
                   }
                 }
 
-                if (foundContact) {
+                if (foundContact && foundContact.id) {
                   if (Platform.OS === 'ios') {
                     await updateContactAsync({
                       ...scanned.contact,
                       id: foundContact.id,
                     });
-                    onAddContact(foundContact.id!);
+                    onAddContactToPhonebook(foundContact.id);
                   } else {
                     await presentFormAsync(foundContact.id, scanned.contact);
-                    onAddContact(foundContact.id!);
+                    onAddContactToPhonebook(foundContact.id);
                   }
                   messageToast = intl.formatMessage({
                     defaultMessage: 'The contact was updated successfully.',
@@ -261,7 +231,7 @@ const AddContactModal = ({
                   });
                 } else {
                   const resultId = await addContactAsync(scanned.contact);
-                  onAddContact(resultId);
+                  onAddContactToPhonebook(resultId);
                   if (scanned.profileId) {
                     storage.set(scanned.profileId, resultId);
                   }
@@ -307,11 +277,91 @@ const AddContactModal = ({
     );
   }, [
     scanned,
-    intl,
     webCard.userName,
+    intl,
+    onAddContactToPhonebook,
     requestPhonebookPermissionAndRedirectToSettingsAsync,
-    onAddContact,
   ]);
+
+  const onAddContactToAzzapp = useCallback(() => {
+    if (!scanned || !viewer) return;
+    const input = getContactInput();
+    if (!input) return;
+    commit({
+      variables: {
+        input,
+        profileId: viewer,
+      },
+      updater: (store, response) => {
+        if (response && response.addContact) {
+          const profile = store.get(viewer);
+          const nbContacts = profile?.getValue('nbContacts');
+
+          if (typeof nbContacts === 'number') {
+            profile?.setValue(nbContacts + 1, 'nbContacts');
+          }
+
+          if (profile) {
+            ConnectionHandler.getConnection(
+              profile,
+              'Profile_searchContacts',
+            )?.invalidateRecord();
+          }
+        } else {
+          console.warn('fail to add contact ?');
+        }
+      },
+      onCompleted: () => {
+        setIsOpen(false);
+        router.pop(1);
+        onRequestAddContactToPhonebook();
+      },
+    });
+  }, [
+    scanned,
+    viewer,
+    getContactInput,
+    commit,
+    router,
+    onRequestAddContactToPhonebook,
+  ]);
+
+  const onClose = useCallback(() => {
+    setIsOpen(false);
+    router.pop(1);
+    onRequestAddContactToPhonebook();
+  }, [onRequestAddContactToPhonebook, router]);
+
+  useEffect(() => {
+    (async () => {
+      if (!scanned && contactData && webCard) {
+        const { contact, webCardId, profileId } = await buildContact(
+          contactData,
+          additionalContactData,
+          webCard.userName,
+        );
+        if (webCardId === fromGlobalId(webCard.id).id) {
+          setScanned({ contact, profileId });
+          setIsOpen(true);
+        }
+      }
+    })();
+  }, [contactData, webCard, additionalContactData, scanned]);
+
+  const onShowContact = useCallback(() => {
+    if (!scanned) return;
+
+    // When user click on add contact, the contact shall always be added to azzapp contacts
+    onAddContactToAzzapp();
+    const messageToast = intl.formatMessage({
+      defaultMessage: 'The contact was created successfully.',
+      description: 'Toast message when a contact is created successfully',
+    });
+    Toast.show({
+      type: 'success',
+      text1: messageToast,
+    });
+  }, [intl, onAddContactToAzzapp, scanned]);
 
   const userName = useMemo(() => {
     if (scanned) {

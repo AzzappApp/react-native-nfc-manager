@@ -62,7 +62,7 @@ const addContact: MutationResolvers['addContact'] = async (
   if (existingContact) {
     const deviceIds = [...existingContact.deviceIds];
 
-    if (!existingContact.deviceIds.includes(input.deviceId)) {
+    if (input.deviceId && !existingContact.deviceIds.includes(input.deviceId)) {
       deviceIds.push(input.deviceId);
     }
 
@@ -77,16 +77,18 @@ const addContact: MutationResolvers['addContact'] = async (
       deviceIds,
     };
   } else {
+    const newDeviceIds = input.deviceId ? [input.deviceId] : [];
+
     const id = await createContact({
       ...contactToCreate,
-      deviceIds: [input.deviceId],
+      deviceIds: newDeviceIds,
     });
 
     contact = {
       id,
       createdAt: new Date(),
       deletedAt: null,
-      deviceIds: [input.deviceId],
+      deviceIds: newDeviceIds,
       ...contactToCreate,
     };
   }
