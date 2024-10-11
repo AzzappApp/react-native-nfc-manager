@@ -1,5 +1,8 @@
-## 0.9.10-canary.51
+## 0.9.10-canary.52
 
+* **fix:**  - **contact:** [#5312](https://github.com/AzzappApp/azzapp/pull/5312) use common text component ([#5368](https://github.com/AzzappApp/azzapp/pull/5368))
+* **fix:**  - **contact:** [#5311](https://github.com/AzzappApp/azzapp/pull/5311) center header text in modal ([#5367](https://github.com/AzzappApp/azzapp/pull/5367))
+* **fix:**  - **contact:** [#5359](https://github.com/AzzappApp/azzapp/pull/5359) increment shareback counter ([#5366](https://github.com/AzzappApp/azzapp/pull/5366))
 * **fix:**  - avoid crash when providing an undefined color to rnskia and fix initial values ([#5365](https://github.com/AzzappApp/azzapp/pull/5365))
 * **feat:**  - view contact ([#5356](https://github.com/AzzappApp/azzapp/pull/5356))
 * **fix:**  - **payment:** [#5266](https://github.com/AzzappApp/azzapp/pull/5266) create new subscriptions on updates ([#5351](https://github.com/AzzappApp/azzapp/pull/5351))
