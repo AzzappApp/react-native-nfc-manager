@@ -1,5 +1,6 @@
-## 0.9.10-canary.54
+## 0.9.10-canary.55
 
+* **fix:**  - **webCard:** [#5321](https://github.com/AzzappApp/azzapp/pull/5321) add stars on webCard ([#5370](https://github.com/AzzappApp/azzapp/pull/5370))
 * **feat:**  - Improve CoverList using FlashList ([#5373](https://github.com/AzzappApp/azzapp/pull/5373))
 * **fix:**  - **contact:** [#5363](https://github.com/AzzappApp/azzapp/pull/5363) make name clickable ([#5369](https://github.com/AzzappApp/azzapp/pull/5369))
 * **fix:**  - **contact:** [#5312](https://github.com/AzzappApp/azzapp/pull/5312) use common text component ([#5368](https://github.com/AzzappApp/azzapp/pull/5368))
