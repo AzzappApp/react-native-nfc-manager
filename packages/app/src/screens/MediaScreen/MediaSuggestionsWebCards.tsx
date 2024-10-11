@@ -116,15 +116,21 @@ const MediaSuggestionsWebCards = ({
   const renderItem = useCallback(
     ({
       item,
+      index,
       extraData,
-    }: ListRenderItemInfo<ArrayItemType<CoverList_users$data>>) => (
-      <CoverLinkWithOptions
-        webCard={item}
-        isFollowing={extraData.followingMap.get(item.id) ?? false}
-        webCardId={item.id}
-        cardIsPublished={extraData.cardIsPublished}
-      />
-    ),
+    }: ListRenderItemInfo<ArrayItemType<CoverList_users$data>>) => {
+      const shouldPlay = extraData.viewableItems.some((v: any) => v === index);
+
+      return (
+        <CoverLinkWithOptions
+          webCard={item}
+          isFollowing={extraData.followingMap.get(item.id) ?? false}
+          webCardId={item.id}
+          cardIsPublished={extraData.cardIsPublished}
+          canPlay={shouldPlay}
+        />
+      );
+    },
     [],
   );
 
@@ -270,6 +276,7 @@ export const MediaSuggestionWebCardFallback = () => {
 
 export const COVER_SUGGESTIONS_WIDTH = 135;
 export const COVER_SUGGESTIONS_PADDING = 5;
+const ACTION_BUTTON_HEIGHT = 29;
 
 const styleSheet = createStyleSheet(appearance => ({
   containerStyle: {
@@ -284,6 +291,12 @@ const styleSheet = createStyleSheet(appearance => ({
     gap: COVER_SUGGESTIONS_PADDING,
     borderRadius: 15,
     overFlow: 'visible',
+    width: COVER_SUGGESTIONS_WIDTH + 2 * COVER_SUGGESTIONS_PADDING,
+    height:
+      COVER_SUGGESTIONS_WIDTH / COVER_RATIO +
+      2 * COVER_SUGGESTIONS_PADDING +
+      2 * COVER_SUGGESTIONS_PADDING +
+      ACTION_BUTTON_HEIGHT, //required for android
     ...shadow(appearance, 'bottom'),
   },
   coverContainerFallback: {
@@ -293,9 +306,9 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   bottomActions: {
     flexDirection: 'row',
-    gap: 5,
     width: '100%',
     alignItems: 'center',
+    height: ACTION_BUTTON_HEIGHT, //fix on android
   },
   followButton: {},
 }));

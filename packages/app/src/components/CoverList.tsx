@@ -1,5 +1,5 @@
 import { FlashList } from '@shopify/flash-list';
-import { memo, useCallback, useMemo } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import {
@@ -16,7 +16,7 @@ import type {
   CoverList_users$key,
 } from '#relayArtifacts/CoverList_users.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
-import type { ListRenderItemInfo } from '@shopify/flash-list';
+import type { ListRenderItemInfo, ViewToken } from '@shopify/flash-list';
 import type { ScrollViewProps } from 'react-native';
 
 // Base props that are common to both cases
@@ -39,6 +39,7 @@ type CoverListProps = {
   withShadow?: boolean;
   gap?: number; // flashlist don't handle gap on containerStyle
   extraData?: any; //any is taken from flashlistProps
+  maxCoverPlay?: number;
 };
 
 const CoverList = ({
@@ -54,6 +55,7 @@ const CoverList = ({
   onRefresh,
   gap = 10,
   extraData,
+  maxCoverPlay = 2,
 }: CoverListProps) => {
   const users = useFragment(
     graphql`
@@ -66,22 +68,45 @@ const CoverList = ({
     usersKey,
   );
 
+  const [viewableItems, setViewableItems] = useState<number[]>([]);
+
   const renderItem = useCallback(
     (param: ListRenderItemInfo<ArrayItemType<CoverList_users$data>>) => {
       if (customRenderItem) {
         return customRenderItem(param);
       }
-      const { item } = param;
+      const { item, index, extraData } = param;
+      const shouldPlay = extraData.viewableItems.some((v: any) => v === index);
       return (
         <CoverListItem
           webCard={item}
           withShadow={withShadow}
           coverWidth={coverWidth}
+          shouldPlayMedia={shouldPlay}
         />
       );
     },
     //those parameter will not change  from props, don't require to be in extraData for rerender
     [coverWidth, customRenderItem, withShadow],
+  );
+
+  //# region viewable to handle video preview
+  const onViewableItemChanged = useCallback(
+    (info: { viewableItems: ViewToken[]; changed: ViewToken[] }) => {
+      //we can only have two Item
+      const viewableRows = info.viewableItems
+        .filter(item => item != null && item.isViewable)
+        .map(item => item.index!)
+        .slice(0, maxCoverPlay);
+
+      // This is a basic implementation and might need adjustments
+      if (viewableRows.length >= 1) {
+        setViewableItems(viewableRows);
+      } else {
+        setViewableItems([]);
+      }
+    },
+    [maxCoverPlay],
   );
 
   return (
@@ -99,6 +124,7 @@ const CoverList = ({
       onRefresh={onRefresh}
       refreshing={refreshing}
       ListHeaderComponent={ListHeaderComponent}
+      onViewableItemsChanged={onViewableItemChanged}
       ItemSeparatorComponent={props => (
         <ItemSeparatorComponent {...props} gap={gap} horizontal={horizontal} />
       )}
@@ -110,9 +136,14 @@ const CoverList = ({
         right: 0,
       }}
       onEndReachedThreshold={0.3}
-      extraData={extraData}
+      extraData={{ ...extraData, viewableItems }}
+      viewabilityConfig={viewabilityConfig}
     />
   );
+};
+
+const viewabilityConfig = {
+  itemVisiblePercentThreshold: 89,
 };
 
 const OverflowScrollView = ({ style, ...rest }: ScrollViewProps) => (
@@ -147,10 +178,12 @@ const ItemList = ({
   webCard,
   withShadow,
   coverWidth,
+  shouldPlayMedia = false,
 }: {
   webCard: ArrayItemType<CoverList_users$data>;
   coverWidth: number;
   withShadow: boolean;
+  shouldPlayMedia?: boolean;
 }) => {
   const styles = useStyleSheet(styleSheet);
 
@@ -170,7 +203,12 @@ const ItemList = ({
   }, [coverWidth, styles.coverContainerStyle, withShadow]);
   return (
     <Container style={itemStyle}>
-      <CoverLink webCard={webCard} width={coverWidth} webCardId={webCard.id} />
+      <CoverLink
+        webCard={webCard}
+        width={coverWidth}
+        webCardId={webCard.id}
+        canPlay={shouldPlayMedia}
+      />
     </Container>
   );
 };
