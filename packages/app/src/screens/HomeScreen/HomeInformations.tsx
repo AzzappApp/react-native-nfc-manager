@@ -103,14 +103,13 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
     [primaryColorValue],
   );
 
-  const nbPosts = useSharedValue('-1');
-  const nbLikes = useSharedValue('-1');
-  const nbFollowers = useSharedValue('-1');
-  const nbFollowings = useSharedValue('-1');
-  const nbContacts = useSharedValue('-1');
-  const contactsTextColor = useSharedValue(getTextColor('#000000'));
-  const primaryColor = useSharedValue('#000000');
-
+  const nbPosts = useSharedValue('');
+  const nbLikes = useSharedValue('');
+  const nbFollowers = useSharedValue('');
+  const nbFollowings = useSharedValue('');
+  const nbContacts = useSharedValue('');
+  const contactsTextColor = useSharedValue(getTextColor('#00000000'));
+  const primaryColor = useSharedValue('#00000000');
   const { currentIndexSharedValue, currentIndexProfile, inputRange } =
     useHomeScreenContext();
   //using profiles object directly in animatedReaction causes error animatedHost(seems to be the case for all relay query result)
@@ -120,8 +119,15 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
     nbFollowings.value = format(nbFollowingsValue[currentIndexProfile.value]);
     nbFollowers.value = format(nbFollowersValue[currentIndexProfile.value]);
     nbContacts.value = format(nbContactsValue[currentIndexProfile.value]);
-    primaryColor.value = primaryColorValue[currentIndexProfile.value];
-    contactsTextColor.value = contactsTextColorValue[currentIndexProfile.value];
+
+    // in case of card removal of last contact card, primaryColorValue[currentIndexProfile.value] can be null
+    // it gives crash in react native skia
+    primaryColor.value =
+      primaryColorValue[currentIndexProfile.value] ||
+      primaryColorValue[primaryColorValue.length - 1];
+    contactsTextColor.value =
+      contactsTextColorValue[currentIndexProfile.value] ||
+      contactsTextColorValue[contactsTextColorValue.length - 1];
   }, [
     currentIndexProfile,
     nbFollowers,
@@ -309,7 +315,7 @@ export const format = (value: number) => {
   if (typeof value === 'number') {
     return Math.round(value).toString();
   }
-  return '-1';
+  return '';
 };
 
 const styles = StyleSheet.create({
