@@ -1,5 +1,6 @@
-## 0.9.10-canary.56
+## 0.9.10-canary.57
 
+* **feat:**  - CoverList video play ([#5381](https://github.com/AzzappApp/azzapp/pull/5381))
 * **fix:**  - make alerte dismisable ([#5378](https://github.com/AzzappApp/azzapp/pull/5378))
 * **fix:**  - make device id optionnal in add contact & fix add contact workflow ([#5371](https://github.com/AzzappApp/azzapp/pull/5371))
 * **fix:**  - **webCard:** [#5321](https://github.com/AzzappApp/azzapp/pull/5321) add stars on webCard ([#5370](https://github.com/AzzappApp/azzapp/pull/5370))
