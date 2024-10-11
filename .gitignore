@@ -158,3 +158,4 @@ packages/backoffice/.vscode/settings.json
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+packages/web/.env.prod

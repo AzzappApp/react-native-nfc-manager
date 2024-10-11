@@ -5,6 +5,7 @@ import {
   startTransition,
   useEffect,
   useRef,
+  memo,
 } from 'react';
 import { useIntl } from 'react-intl';
 import { View } from 'react-native';
@@ -24,24 +25,24 @@ import useToggleFollow from '#hooks/useToggleFollow';
 import CoverLink_webCardFragment from '#relayArtifacts/CoverLink_webCard.graphql';
 import Button from '#ui/Button';
 import type { CoverLinkProps } from '#components/CoverLink';
+import type { CoverList_users$data } from '#relayArtifacts/CoverList_users.graphql';
 import type { MediaSuggestionsWebCards_profile$key } from '#relayArtifacts/MediaSuggestionsWebCards_profile.graphql';
 import type { MediaSuggestionsWebCards_webCard$key } from '#relayArtifacts/MediaSuggestionsWebCards_webCard.graphql';
-import type { StyleProp, ViewStyle } from 'react-native';
+import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
+import type { ListRenderItemInfo } from '@shopify/flash-list';
 
 type MediaSuggestionsWebCardsProps = {
   profile: MediaSuggestionsWebCards_profile$key;
   webCard: MediaSuggestionsWebCards_webCard$key | null;
   isCurrentTab: boolean;
-  style?: StyleProp<ViewStyle>;
 };
 
-const NB_PROFILES = 6;
+const NB_PROFILES = 12;
 
 const MediaSuggestionsWebCards = ({
   profile,
   webCard,
   isCurrentTab,
-  style,
 }: MediaSuggestionsWebCardsProps) => {
   const { data, refetch, loadNext, hasNext, isLoadingNext } =
     usePaginationFragment(
@@ -112,26 +113,35 @@ const MediaSuggestionsWebCards = ({
 
   const styles = useStyleSheet(styleSheet);
 
+  const renderItem = useCallback(
+    ({
+      item,
+      extraData,
+    }: ListRenderItemInfo<ArrayItemType<CoverList_users$data>>) => (
+      <CoverLinkWithOptions
+        webCard={item}
+        isFollowing={extraData.followingMap.get(item.id) ?? false}
+        webCardId={item.id}
+        cardIsPublished={extraData.cardIsPublished}
+      />
+    ),
+    [],
+  );
+
   return (
-    <CoverList
-      users={users}
-      onEndReached={onEndReached}
-      containerStyle={styles.containerStyle}
-      initialNumToRender={NB_PROFILES}
-      style={style}
-      renderItem={({ item }) => (
-        <CoverLinkWithOptions
-          webCard={item}
-          isFollowing={followingMap.get(item.id) ?? false}
-          webCardId={item.id}
-          cardIsPublished={cardIsPublished}
-        />
-      )}
-    />
+    <View style={styles.containerStyle}>
+      <CoverList
+        users={users}
+        onEndReached={onEndReached}
+        renderItem={renderItem}
+        coverWidth={COVER_SUGGESTIONS_WIDTH + 2 * COVER_SUGGESTIONS_PADDING}
+        extraData={{ followingMap, cardIsPublished }}
+      />
+    </View>
   );
 };
 
-const CoverLinkWithOptions = ({
+const CoverLinkWithOptionsItem = ({
   isFollowing,
   cardIsPublished,
   ...props
@@ -204,6 +214,9 @@ const CoverLinkWithOptions = ({
     </Animated.View>
   );
 };
+
+const CoverLinkWithOptions = memo(CoverLinkWithOptionsItem);
+
 type FollowButtonProps = {
   onPress?: () => void;
   isFollowing: boolean;
@@ -260,18 +273,17 @@ export const COVER_SUGGESTIONS_PADDING = 5;
 
 const styleSheet = createStyleSheet(appearance => ({
   containerStyle: {
-    paddingHorizontal: 8,
     overflow: 'visible',
     zIndex: 1,
     paddingBottom: 20,
     paddingTop: 16.5,
-    gap: 10,
   },
   coverContainerStyle: {
     backgroundColor: appearance === 'light' ? colors.white : colors.black,
     padding: COVER_SUGGESTIONS_PADDING,
     gap: COVER_SUGGESTIONS_PADDING,
     borderRadius: 15,
+    overFlow: 'visible',
     ...shadow(appearance, 'bottom'),
   },
   coverContainerFallback: {

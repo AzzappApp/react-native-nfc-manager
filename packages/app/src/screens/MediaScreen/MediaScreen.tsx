@@ -107,7 +107,6 @@ const MediaScreen = ({
                     </Text>
                   }
                   webCard={profile?.webCard}
-                  style={styles.coverList}
                 />
 
                 <Text style={styles.postsTitleStyle} variant="large">
@@ -233,9 +232,6 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingHorizontal: 5,
     paddingVertical: 9,
-  },
-  coverList: {
-    overflow: 'visible',
   },
   coversTitleStyle: {
     marginHorizontal: 10,
