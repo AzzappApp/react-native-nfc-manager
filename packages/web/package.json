@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/web",
-  "version": "0.9.10-canary.52",
+  "version": "0.9.10-canary.53",
   "private": true,
   "scripts": {
     "lint": "eslint .",

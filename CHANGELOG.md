@@ -1,5 +1,6 @@
-## 0.9.10-canary.52
+## 0.9.10-canary.53
 
+* **fix:**  - **contact:** [#5363](https://github.com/AzzappApp/azzapp/pull/5363) make name clickable ([#5369](https://github.com/AzzappApp/azzapp/pull/5369))
 * **fix:**  - **contact:** [#5312](https://github.com/AzzappApp/azzapp/pull/5312) use common text component ([#5368](https://github.com/AzzappApp/azzapp/pull/5368))
 * **fix:**  - **contact:** [#5311](https://github.com/AzzappApp/azzapp/pull/5311) center header text in modal ([#5367](https://github.com/AzzappApp/azzapp/pull/5367))
 * **fix:**  - **contact:** [#5359](https://github.com/AzzappApp/azzapp/pull/5359) increment shareback counter ([#5366](https://github.com/AzzappApp/azzapp/pull/5366))
