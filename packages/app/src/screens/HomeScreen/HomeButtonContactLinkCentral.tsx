@@ -21,6 +21,7 @@ import { colors } from '#theme';
 
 import AnimatedText from '#components/AnimatedText';
 import { useAnimatedTextToPluralValue } from '#hooks/useAnimatedTextToPluralValue';
+import Text from '#ui/Text';
 import type { SharedValue } from 'react-native-reanimated';
 
 type HomeButtonContactLinkCentralProps = {
@@ -30,6 +31,8 @@ type HomeButtonContactLinkCentralProps = {
   onPress: () => void;
   count: SharedValue<string>;
 };
+
+const AnimatedTextComp = Animated.createAnimatedComponent(Text);
 
 export const HomeButtonContactLinkCentral = ({
   circleWidth,
@@ -117,7 +120,7 @@ export const HomeButtonContactLinkCentral = ({
           animatedTextColor={contactsTextColor}
         />
 
-        <Animated.Text style={[styles.text, textColorStyle]}>
+        <AnimatedTextComp variant="small" style={[styles.text, textColorStyle]}>
           <FormattedMessage
             defaultMessage="{isPlural, plural,
                                     =0 {contacts}
@@ -127,7 +130,7 @@ export const HomeButtonContactLinkCentral = ({
             description="HomeScreen - information panel - contacts label -- Note: the internal value is 0 for singular, 1 for plural "
             values={{ isPlural }}
           />
-        </Animated.Text>
+        </AnimatedTextComp>
       </View>
       <Pressable
         style={styles.circlePressable}
@@ -151,7 +154,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
   },
   circleCanvas: { flex: 1 },
-  textStyle: { position: 'absolute', width: '100%' },
+  textStyle: {
+    position: 'absolute',
+    width: '100%',
+    rowGap: 5,
+  },
   text: {
     color: colors.white,
     textAlign: 'center',

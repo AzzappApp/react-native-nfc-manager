@@ -1,4 +1,4 @@
-import { createElement } from 'react';
+import { createElement, forwardRef } from 'react';
 import { Text as NativeText } from 'react-native';
 import { colors, textStyles } from '#theme';
 import {
@@ -6,6 +6,7 @@ import {
   useVariantStyleSheet,
 } from '#helpers/createStyles';
 import type { ColorSchemeName } from '#helpers/createStyles';
+import type { ForwardedRef } from 'react';
 import type { TextProps as NativeTextProps } from 'react-native';
 
 export type TextVariant =
@@ -35,17 +36,24 @@ export type TextProps = NativeTextProps & {
  * A wrapper Text component that adds Azzapp's default styling whith dark mode support
  *
  */
-const Text = ({ variant = 'none', appearance, ...props }: TextProps) => {
-  const styles = useVariantStyleSheet(textStyleSheet, variant, appearance);
+// eslint-disable-next-line react/display-name
+const Text = forwardRef(
+  (
+    { variant = 'none', appearance, ...props }: TextProps,
+    ref: ForwardedRef<NativeText>,
+  ) => {
+    const styles = useVariantStyleSheet(textStyleSheet, variant, appearance);
 
-  return createElement(NativeText, {
-    ...props,
-    style: [styles.text, props.style],
-    maxFontSizeMultiplier: 1,
-    allowFontScaling: false,
-    accessible: true, // this is needed, accessible was lost with createElement
-  });
-};
+    return createElement(NativeText, {
+      ...props,
+      ref,
+      style: [styles.text, props.style],
+      maxFontSizeMultiplier: 1,
+      allowFontScaling: false,
+      accessible: true, // this is needed, accessible was lost with createElement
+    });
+  },
+);
 
 export const textStyleSheet = createVariantsStyleSheet(appearance => ({
   default: {
