@@ -74,46 +74,51 @@ const ContactSearchByNameItem = ({
   }, [contact, onShowContact]);
 
   const onMore = useCallback(() => {
-    Alert.alert(`${contact.firstName} ${contact.lastName}`, '', [
-      {
-        text: intl.formatMessage({
-          defaultMessage: 'View Contact',
-          description: 'ContactsScreen - More option alert - view',
-        }),
-        onPress: onShow,
-      },
-      // {
-      //   text: intl.formatMessage({
-      //     defaultMessage: 'Share Contact',
-      //     description: 'ContactsScreen - More option alert - share',
-      //   }),
-      //   onPress: () => {
-      //     // @TODO: how to share without a pre-generated URL?
-      //   },
-      // },
-      {
-        text: intl.formatMessage({
-          defaultMessage: "Save to my phone's Contact",
-          description: 'ContactsScreen - More option alert - save',
-        }),
-        onPress: onInvite,
-      },
-      {
-        text: intl.formatMessage({
-          defaultMessage: 'Remove contact',
-          description: 'ContactsScreen - More option alert - remove',
-        }),
-        style: 'destructive',
-        onPress: onRemoveContact,
-      },
-      {
-        text: intl.formatMessage({
-          defaultMessage: 'Cancel',
-          description: 'ContactsScreen - More option alert - cancel',
-        }),
-        style: 'cancel',
-      },
-    ]);
+    Alert.alert(
+      `${contact.firstName} ${contact.lastName}`,
+      '',
+      [
+        {
+          text: intl.formatMessage({
+            defaultMessage: 'View Contact',
+            description: 'ContactsScreen - More option alert - view',
+          }),
+          onPress: onShow,
+        },
+        // {
+        //   text: intl.formatMessage({
+        //     defaultMessage: 'Share Contact',
+        //     description: 'ContactsScreen - More option alert - share',
+        //   }),
+        //   onPress: () => {
+        //     // @TODO: how to share without a pre-generated URL?
+        //   },
+        // },
+        {
+          text: intl.formatMessage({
+            defaultMessage: "Save to my phone's Contact",
+            description: 'ContactsScreen - More option alert - save',
+          }),
+          onPress: onInvite,
+        },
+        {
+          text: intl.formatMessage({
+            defaultMessage: 'Remove contact',
+            description: 'ContactsScreen - More option alert - remove',
+          }),
+          style: 'destructive',
+          onPress: onRemoveContact,
+        },
+        {
+          text: intl.formatMessage({
+            defaultMessage: 'Cancel',
+            description: 'ContactsScreen - More option alert - cancel',
+          }),
+          style: 'cancel',
+        },
+      ],
+      { cancelable: true },
+    );
   }, [
     contact.firstName,
     contact.lastName,
