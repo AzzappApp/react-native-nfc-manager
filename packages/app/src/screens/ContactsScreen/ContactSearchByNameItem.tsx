@@ -125,35 +125,31 @@ const ContactSearchByNameItem = ({
 
   return (
     <View key={contact.id} style={styles.contact}>
-      <PressableNative onPress={onShow}>
+      <PressableNative onPress={onShow} style={styles.contactInfos}>
         <CoverRenderer
           style={styles.webcard}
           width={35}
           webCard={contact.webCard}
         />
-      </PressableNative>
-      <View style={styles.infos}>
-        {(contact.firstName || contact.lastName) && (
-          <Text variant="large" numberOfLines={1}>
-            {contact.firstName} {contact.lastName}
-          </Text>
-        )}
-        {!contact.firstName &&
-          !contact.lastName &&
-          contact.contactProfile?.webCard?.userName && (
+        <View style={styles.infos}>
+          {(contact.firstName || contact.lastName) && (
             <Text variant="large" numberOfLines={1}>
-              {contact.contactProfile.webCard.userName}
+              {contact.firstName} {contact.lastName}
             </Text>
           )}
-        {contact.company && (
-          <Text style={styles.company} numberOfLines={1}>
-            {contact.company}
+          {!contact.firstName &&
+            !contact.lastName &&
+            contact.contactProfile?.webCard?.userName && (
+              <Text variant="large" numberOfLines={1}>
+                {contact.contactProfile.webCard.userName}
+              </Text>
+            )}
+          {contact.company && <Text numberOfLines={1}>{contact.company}</Text>}
+          <Text style={(textStyles.small, styles.date)} numberOfLines={1}>
+            {new Date(contact.createdAt).toLocaleDateString()}
           </Text>
-        )}
-        <Text style={(textStyles.small, styles.date)} numberOfLines={1}>
-          {new Date(contact.createdAt).toLocaleDateString()}
-        </Text>
-      </View>
+        </View>
+      </PressableNative>
       <View style={styles.actions}>
         {showInvite && (
           <PressableNative onPress={onInvite}>
@@ -177,31 +173,35 @@ type ContactType = NonNullable<
   >['node']
 >;
 
+const GAP = 15;
+
 const styles = StyleSheet.create({
   contact: {
     marginVertical: 20,
     flexDirection: 'row',
+    columnGap: GAP,
+  },
+  contactInfos: {
+    flexDirection: 'row',
+    flex: 1,
+    columnGap: GAP,
   },
   date: {
     color: colors.grey400,
-    marginTop: 5,
-  },
-  company: {
-    marginTop: 5,
   },
   webcard: {
-    marginRight: 15,
+    columnGap: GAP,
   },
   infos: {
     justifyContent: 'center',
-    flex: 3.5,
+    flex: 1,
+    rowGap: 5,
   },
   actions: {
-    flex: 1,
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'center',
-    gap: 15,
+    gap: GAP,
   },
 });
 
