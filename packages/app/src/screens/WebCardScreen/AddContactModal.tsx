@@ -344,7 +344,7 @@ const AddContactModal = ({
         >
           <Header
             middleElement={
-              <Text variant="large">
+              <Text variant="large" style={styles.headerTitle}>
                 <FormattedMessage
                   defaultMessage="Add {userName} to your contacts"
                   description="Title for add contact modal"
@@ -547,6 +547,7 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: 0,
   },
+  headerTitle: { textAlign: 'center', paddingHorizontal: 5 },
 });
 
 export default AddContactModal;
