@@ -1,4 +1,4 @@
-## 0.9.10-canary.61
+## 0.9.10-canary.62
 
 * **fix:**  - contact avatar ([#5387](https://github.com/AzzappApp/azzapp/pull/5387))
 * **fix:**  - rollback rn permissions update ([#5386](https://github.com/AzzappApp/azzapp/pull/5386))
