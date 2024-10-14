@@ -1,5 +1,6 @@
-## 0.9.10-canary.63
+## 0.9.10-canary.64
 
+* **fix:**  - use Company activity as firstName in CoverTemplate ([#5397](https://github.com/AzzappApp/azzapp/pull/5397))
 * **fix:**  - 🐛 properly add title to generate vcard from contact ([#5395](https://github.com/AzzappApp/azzapp/pull/5395))
 * **fix:**  - contact avatar ([#5387](https://github.com/AzzappApp/azzapp/pull/5387))
 * **fix:**  - rollback rn permissions update ([#5386](https://github.com/AzzappApp/azzapp/pull/5386))
