@@ -1,0 +1,79 @@
+diff --git a/android/src/main/java/expo/modules/contacts/ContactsModule.kt b/android/src/main/java/expo/modules/contacts/ContactsModule.kt
+index d5b10a3f58a3309ec274c215c1655950e9766ef8..4461b9f5d90ec2fd37938eed1ff5ce63bda6b239 100644
+--- a/android/src/main/java/expo/modules/contacts/ContactsModule.kt
++++ b/android/src/main/java/expo/modules/contacts/ContactsModule.kt
+@@ -256,7 +256,7 @@ class ContactsModule : Module() {
+         presentEditForm(contact, promise)
+       }
+       // Create contact from supplied data.
+-      if (contactData != null) {
++      else if (contactData != null) {
+         val contact = mutateContact(null, contactData)
+         presentForm(contact, promise)
+       }
+@@ -315,6 +315,65 @@ class ContactsModule : Module() {
+     val intent = Intent(Intent.ACTION_EDIT)
+     intent.setDataAndType(selectedContactUri, ContactsContract.Contacts.CONTENT_ITEM_TYPE)
+     contactManipulationPromise = promise
++    /* map emails */
++    if (contact.emails.size >= 1) {
++      var email = contact.emails[0]
++      intent.putExtra(ContactsContract.Intents.Insert.EMAIL, email.data);
++      intent.putExtra(
++        ContactsContract.Intents.Insert.EMAIL_TYPE,
++        email.mapStringToType(email.type)
++      )
++      if (contact.emails.size >= 2) {
++        email = contact.emails[1]
++        intent.putExtra(ContactsContract.Intents.Insert.SECONDARY_EMAIL, email.data);
++        intent.putExtra(
++          ContactsContract.Intents.Insert.SECONDARY_EMAIL_TYPE,
++          email.mapStringToType(email.type)
++        )
++        if (contact.emails.size >= 3) {
++          email = contact.emails[2]
++          intent.putExtra(ContactsContract.Intents.Insert.SECONDARY_EMAIL, email.data);
++          intent.putExtra(
++            ContactsContract.Intents.Insert.TERTIARY_EMAIL_TYPE,
++            email.mapStringToType(email.type)
++          )
++        }
++      }
++    }
++    /* map phone numbers */
++    if (contact.phones.size >= 1) {
++      var phone = contact.phones[0]
++      intent.putExtra(ContactsContract.Intents.Insert.PHONE, phone.data);
++      intent.putExtra(
++        ContactsContract.Intents.Insert.PHONE_TYPE,
++        phone.mapStringToType(phone.type)
++      )
++      if (contact.phones.size >= 2) {
++        phone = contact.phones[1]
++        intent.putExtra(ContactsContract.Intents.Insert.SECONDARY_PHONE, phone.data);
++        intent.putExtra(
++          ContactsContract.Intents.Insert.SECONDARY_PHONE_TYPE,
++          phone.mapStringToType(phone.type)
++        )
++        if (contact.phones.size >= 3) {
++          phone = contact.phones[2]
++          intent.putExtra(ContactsContract.Intents.Insert.TERTIARY_PHONE, phone.data);
++          intent.putExtra(
++            ContactsContract.Intents.Insert.TERTIARY_PHONE_TYPE,
++            phone.mapStringToType(phone.type)
++          )
++        }
++      }
++    }
++    if (contact.jobTitle != null) {
++      intent.putExtra(ContactsContract.Intents.Insert.JOB_TITLE, contact.jobTitle);
++    }
++    if (contact.addresses.size > 0) {
++      intent.putExtra(ContactsContract.Intents.Insert.POSTAL, contact.addresses[0].data);
++    }
++    if (contact.company != null) {
++      intent.putExtra(ContactsContract.Intents.Insert.COMPANY, contact.company);
++    }
+     activity.startActivityForResult(intent, RC_EDIT_CONTACT)
+   }
+ 
