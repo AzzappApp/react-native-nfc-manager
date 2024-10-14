@@ -1,5 +1,6 @@
-## 0.9.10-canary.65
+## 0.9.10-canary.66
 
+* **fix:**  - remove deviceId from database ([#5405](https://github.com/AzzappApp/azzapp/pull/5405))
 * **fix:**  - **android:** add contact always open even if we edit contact ([#5404](https://github.com/AzzappApp/azzapp/pull/5404))
 * **fix:**  - use Company activity as firstName in CoverTemplate ([#5397](https://github.com/AzzappApp/azzapp/pull/5397))
 * **fix:**  - 🐛 properly add title to generate vcard from contact ([#5395](https://github.com/AzzappApp/azzapp/pull/5395))
