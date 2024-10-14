@@ -144,6 +144,10 @@ const CoverEditorCore = (
           firstName
           lastName
           companyName
+          companyActivity {
+            id
+            label
+          }
         }
       }
     `,
@@ -229,7 +233,9 @@ const CoverEditorCore = (
             textLayer.text === 'mainName'
               ? profile.webCard?.companyName || profile.webCard?.lastName
               : textLayer.text === 'firstName'
-                ? profile.webCard?.firstName
+                ? profile.webCard?.companyActivity?.id
+                  ? profile.webCard?.companyActivity?.label
+                  : profile.webCard?.firstName
                 : textLayer.text === 'custom'
                   ? customText
                   : null;
