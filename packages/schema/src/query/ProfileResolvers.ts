@@ -39,6 +39,7 @@ import {
 } from '#loaders';
 import {
   connectionFromDateSortedItems,
+  connectionFromSortedArray,
   cursorToDate,
   emptyConnection,
 } from '#helpers/connectionsHelpers';
@@ -340,25 +341,20 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
     if (!profileIsAssociatedToCurrentUser(profile)) {
       return emptyConnection;
     }
-    first = first ?? 50;
+    const limit = first ?? 50;
     const offset = after ? cursorToOffset(after) : 0;
 
-    const { contacts, count } = await searchContacts({
-      limit: first,
+    const contacts = await searchContacts({
+      limit: limit + 1,
       ownerProfileId: profile.id,
       name: name ?? undefined,
       offset,
       orderBy,
     });
-
-    return connectionFromArraySlice(
-      contacts,
-      { after, first },
-      {
-        sliceStart: offset,
-        arrayLength: count,
-      },
-    );
+    return connectionFromSortedArray(contacts.slice(0, limit), {
+      offset,
+      hasNextPage: contacts.length > limit,
+    });
   },
   searchWebCards: async (profile, { first, after, search }) => {
     if (!profileIsAssociatedToCurrentUser(profile)) {

@@ -6,7 +6,7 @@ import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useScreenInsets from '#hooks/useScreenInsets';
 import ContactSearchByDateSection from './ContactSearchByDateSection';
-import type { ContactsScreen_contacts$data } from '#relayArtifacts/ContactsScreen_contacts.graphql';
+import type { ContactsScreenLists_contacts$data } from '#relayArtifacts/ContactsScreenLists_contacts.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { ListRenderItemInfo } from 'react-native';
 import type { MMKV } from 'react-native-mmkv';
@@ -127,7 +127,9 @@ const stylesheet = createStyleSheet(theme => ({
 type ContactType = NonNullable<
   NonNullable<
     NonNullable<
-      ArrayItemType<ContactsScreen_contacts$data['searchContacts']['edges']>
+      ArrayItemType<
+        ContactsScreenLists_contacts$data['searchContacts']['edges']
+      >
     >
   >['node']
 >;

@@ -7,7 +7,7 @@ import { findLocalContact } from '#helpers/contactCardHelpers';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import ContactAvatar from './ContactAvatar';
-import type { ContactsScreen_contacts$data } from '#relayArtifacts/ContactsScreen_contacts.graphql';
+import type { ContactsScreenLists_contacts$data } from '#relayArtifacts/ContactsScreenLists_contacts.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { Contact } from 'expo-contacts';
 import type { MMKV } from 'react-native-mmkv';
@@ -157,7 +157,9 @@ const styles = StyleSheet.create({
 type ContactType = NonNullable<
   NonNullable<
     NonNullable<
-      ArrayItemType<ContactsScreen_contacts$data['searchContacts']['edges']>
+      ArrayItemType<
+        ContactsScreenLists_contacts$data['searchContacts']['edges']
+      >
     >
   >['node']
 >;

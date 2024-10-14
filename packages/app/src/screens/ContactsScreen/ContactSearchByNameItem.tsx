@@ -9,15 +9,15 @@ import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import ContactAvatar from './ContactAvatar';
-import type { ContactsScreen_contacts$data } from '#relayArtifacts/ContactsScreen_contacts.graphql';
+import type { ContactsScreenLists_contacts$data } from '#relayArtifacts/ContactsScreenLists_contacts.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { Contact } from 'expo-contacts';
 import type { MMKV } from 'react-native-mmkv';
 
 type Props = {
   contact: ContactType;
-  onRemoveContact: () => void;
-  onInviteContact: (onHideInvitation: () => void) => void;
+  onRemoveContact: (contacts: string[]) => void;
+  onInviteContact: (contact: ContactType, onHideInvitation: () => void) => void;
   onShowContact: (contact: ContactType) => void;
   storage: MMKV;
   localContacts: Contact[];
@@ -33,6 +33,10 @@ const ContactSearchByNameItem = ({
 }: Props) => {
   const [showInvite, setShowInvite] = useState(false);
   const intl = useIntl();
+
+  const onRemove = useCallback(() => {
+    onRemoveContact([contact.id]);
+  }, [contact.id, onRemoveContact]);
 
   useEffect(() => {
     const verifyInvitation = async () => {
@@ -67,8 +71,8 @@ const ContactSearchByNameItem = ({
   ]);
 
   const onInvite = useCallback(() => {
-    onInviteContact(() => setShowInvite(false));
-  }, [onInviteContact]);
+    onInviteContact(contact, () => setShowInvite(false));
+  }, [contact, onInviteContact]);
 
   const onShow = useCallback(() => {
     onShowContact(contact);
@@ -108,7 +112,7 @@ const ContactSearchByNameItem = ({
             description: 'ContactsScreen - More option alert - remove',
           }),
           style: 'destructive',
-          onPress: onRemoveContact,
+          onPress: onRemove,
         },
         {
           text: intl.formatMessage({
@@ -120,14 +124,7 @@ const ContactSearchByNameItem = ({
       ],
       { cancelable: true },
     );
-  }, [
-    contact.firstName,
-    contact.lastName,
-    intl,
-    onInvite,
-    onRemoveContact,
-    onShow,
-  ]);
+  }, [contact.firstName, contact.lastName, intl, onInvite, onRemove, onShow]);
 
   const avatarSource = useMemo(() => {
     if (contact.contactProfile?.avatar?.uri) {
@@ -235,7 +232,9 @@ const ContactSearchByNameItem = ({
 type ContactType = NonNullable<
   NonNullable<
     NonNullable<
-      ArrayItemType<ContactsScreen_contacts$data['searchContacts']['edges']>
+      ArrayItemType<
+        ContactsScreenLists_contacts$data['searchContacts']['edges']
+      >
     >
   >['node']
 >;

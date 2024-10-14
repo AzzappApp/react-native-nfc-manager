@@ -122,51 +122,32 @@ export const searchContacts = async (
     orderBy: 'date' | 'name';
   },
   withDeleted = false,
-): Promise<{ count: number; contacts: Contact[] }> => {
+): Promise<Contact[]> => {
   const orders =
     orderBy === 'name'
       ? [ContactTable.firstName, ContactTable.lastName]
       : [desc(ContactTable.createdAt)];
 
-  const [counter, contacts] = await Promise.all([
-    db()
-      .select({ count: count() })
-      .from(ContactTable)
-      .where(
-        and(
-          eq(ContactTable.ownerProfileId, ownerProfileId),
-          name
-            ? or(
-                like(ContactTable.firstName, `%${name}%`),
-                like(ContactTable.lastName, `%${name}%`),
-              )
-            : undefined,
-        ),
+  const contacts = await db()
+    .select()
+    .from(ContactTable)
+    .where(
+      and(
+        eq(ContactTable.ownerProfileId, ownerProfileId),
+        withDeleted ? undefined : eq(ContactTable.deleted, false),
+        name
+          ? or(
+              like(ContactTable.firstName, `%${name}%`),
+              like(ContactTable.lastName, `%${name}%`),
+            )
+          : undefined,
       ),
-    db()
-      .select()
-      .from(ContactTable)
-      .where(
-        and(
-          eq(ContactTable.ownerProfileId, ownerProfileId),
-          withDeleted ? undefined : eq(ContactTable.deleted, false),
-          name
-            ? or(
-                like(ContactTable.firstName, `%${name}%`),
-                like(ContactTable.lastName, `%${name}%`),
-              )
-            : undefined,
-        ),
-      )
-      .orderBy(...orders)
-      .limit(limit)
-      .offset(offset ?? 0),
-  ]);
+    )
+    .orderBy(...orders)
+    .limit(limit)
+    .offset(offset ?? 0);
 
-  return {
-    count: counter[0].count,
-    contacts,
-  };
+  return contacts;
 };
 
 export const searchContactsByWebcardId = async ({

@@ -1,29 +1,13 @@
-import {
-  addContactAsync,
-  Fields,
-  getContactsAsync,
-  presentFormAsync,
-  requestPermissionsAsync,
-  updateContactAsync,
-} from 'expo-contacts';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Suspense, useCallback, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Platform, View } from 'react-native';
+import { View } from 'react-native';
 import { MMKV } from 'react-native-mmkv';
-import Toast from 'react-native-toast-message';
-import {
-  graphql,
-  useMutation,
-  usePaginationFragment,
-  usePreloadedQuery,
-} from 'react-relay';
+import { graphql, usePreloadedQuery } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { colors } from '#theme';
-import { useOnFocus, useRouter } from '#components/NativeRouter';
-import { findLocalContact } from '#helpers/contactCardHelpers';
+import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import relayScreen from '#helpers/relayScreen';
-import useAuthState from '#hooks/useAuthState';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import Icon from '#ui/Icon';
@@ -32,13 +16,9 @@ import RoundedMenuComponent from '#ui/RoundedMenuComponent';
 import SafeAreaView from '#ui/SafeAreaView';
 import SearchBarStatic from '#ui/SearchBarStatic';
 import Text from '#ui/Text';
-import ContactsScreenSearchByDate from './ContactsScreenSearchByDate';
-import ContactsScreenSearchByName from './ContactsScreenSearchByName';
-import type { ContactsScreen_contacts$data } from '#relayArtifacts/ContactsScreen_contacts.graphql';
+
+import ContactScreenLists from './ContactsScreenLists';
 import type { ContactsScreenQuery } from '#relayArtifacts/ContactsScreenQuery.graphql';
-import type { ContactsScreenRemoveContactMutation } from '#relayArtifacts/ContactsScreenRemoveContactMutation.graphql';
-import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
-import type { Contact } from 'expo-contacts';
 import type { PreloadedQuery } from 'react-relay';
 
 export const storage = new MMKV({
@@ -50,7 +30,7 @@ const contactsScreenQuery = graphql`
     profile: node(id: $profileId) {
       ... on Profile {
         nbContacts
-        ...ContactsScreen_contacts
+        ...ContactsScreenLists_contacts
       }
     }
   }
@@ -70,316 +50,11 @@ const ContactsScreen = ({
 
   const styles = useStyleSheet(stylesheet);
 
-  const [searchBy, setSearchBy] = useState('name');
-  const [search, setSearch] = useState('');
+  const [searchBy, setSearchBy] = useState<'date' | 'name'>('name');
+  const [search, setSearch] = useState<string | undefined>(undefined);
   const [debounceSearch] = useDebounce(search, 500);
 
   const intl = useIntl();
-  const [localContacts, setLocalContacts] = useState<Contact[]>([]);
-
-  const [refreshing, setRefreshing] = useState(false);
-  const { data, loadNext, hasNext, isLoadingNext, refetch } =
-    usePaginationFragment(
-      graphql`
-        fragment ContactsScreen_contacts on Profile
-        @refetchable(queryName: "ContactsScreenListQuery")
-        @argumentDefinitions(
-          after: { type: String }
-          first: { type: Int, defaultValue: 10 }
-          name: { type: String, defaultValue: "" }
-          orderBy: { type: SearchContactOrderBy, defaultValue: name }
-          pixelRatio: {
-            type: "Float!"
-            provider: "CappedPixelRatio.relayprovider"
-          }
-        ) {
-          searchContacts(
-            after: $after
-            first: $first
-            name: $name
-            orderBy: $orderBy
-          ) @connection(key: "Profile_searchContacts") {
-            __id
-            edges {
-              node {
-                id
-                firstName
-                lastName
-                company
-                createdAt
-                deviceIds
-                emails {
-                  label
-                  address
-                }
-                phoneNumbers {
-                  label
-                  number
-                }
-                contactProfile {
-                  id
-                  avatar {
-                    id
-                    uri: uri(width: 61, pixelRatio: $pixelRatio)
-                  }
-                  contactCard {
-                    urls {
-                      address
-                      selected
-                    }
-                    socials {
-                      url
-                      label
-                      selected
-                    }
-                  }
-                  webCard {
-                    cardIsPublished
-                    userName
-                    hasCover
-                    ...CoverRenderer_webCard
-                  }
-                }
-                webCard {
-                  ...CoverRenderer_webCard
-                }
-              }
-            }
-          }
-        }
-      `,
-      profile,
-    );
-
-  const contacts = useMemo(() => {
-    return (
-      (data as ContactsScreen_contacts$data)?.searchContacts?.edges
-        ?.map(edge => edge?.node)
-        .filter(contact => !!contact) ?? []
-    );
-  }, [data]);
-
-  const onRefresh = useCallback(() => {
-    if (!isLoadingNext) {
-      setRefreshing(true);
-      refetch(
-        { name: debounceSearch, orderBy: searchBy },
-        { fetchPolicy: 'store-and-network' },
-      );
-      setRefreshing(false);
-    }
-  }, [isLoadingNext, refetch, debounceSearch, searchBy]);
-
-  // This code is used to refresh the screen when we come back to it.
-  // After a contact exchange, this screen shall be refreshed to ensure the new contact is well displayed
-  // Or not.
-  // In some case, the new contact shall be displayed, and during search for exemple we cannot infer if the new contact shall be displayed
-  // The safest way to implement it is to refresh the screen.
-  useOnFocus(onRefresh);
-
-  const onEndReached = useCallback(() => {
-    if (hasNext && !isLoadingNext) {
-      loadNext(50);
-    }
-  }, [hasNext, isLoadingNext, loadNext]);
-
-  useEffect(() => {
-    refetch(
-      { name: debounceSearch || undefined, orderBy: searchBy },
-      { fetchPolicy: 'store-and-network' },
-    );
-  }, [debounceSearch, refetch, searchBy]);
-
-  const { profileInfos } = useAuthState();
-
-  const [commitRemoveContact] =
-    useMutation<ContactsScreenRemoveContactMutation>(graphql`
-      mutation ContactsScreenRemoveContactMutation(
-        $profileId: ID!
-        $input: RemoveContactsInput!
-      ) {
-        removeContacts(profileId: $profileId, input: $input) {
-          removedContactIds
-        }
-      }
-    `);
-
-  const onRemoveContacts = (contactIds: string[]) => {
-    commitRemoveContact({
-      variables: {
-        profileId: profileInfos!.profileId,
-        input: {
-          contactIds,
-        },
-      },
-      updater: (store, response) => {
-        if (response?.removeContacts) {
-          response.removeContacts.removedContactIds.forEach(
-            removedContactId => {
-              store.delete(removedContactId);
-            },
-          );
-          const profile = store.get(profileInfos!.profileId);
-          const nbContacts = profile?.getValue('nbContacts');
-
-          if (typeof nbContacts === 'number') {
-            profile?.setValue(
-              nbContacts - response.removeContacts.removedContactIds.length,
-              'nbContacts',
-            );
-          }
-        }
-      },
-    });
-  };
-
-  const onInviteContact = useCallback(
-    async (contact: ContactType, onHideInvitation: () => void) => {
-      const socialProfiles =
-        contact.contactProfile?.contactCard?.socials
-          ?.filter(social => !!social.selected)
-          .map(({ label, url }) => ({ label, url })) ?? [];
-
-      const urlAddresses =
-        contact.contactProfile?.contactCard?.urls
-          ?.filter(url => !!url.selected)
-          .map(({ address }) => ({ label: '', url: address })) ?? [];
-
-      const contactToAdd = {
-        ...contact,
-        emails: contact.emails.map(({ label, address }) => ({
-          label,
-          email: address,
-        })),
-        phoneNumbers: contact.phoneNumbers.map(({ label, number }) => ({
-          label,
-          number,
-        })),
-        contactType: 'person' as const,
-        name: `${contact.firstName} ${contact.lastName}`,
-        socialProfiles,
-        urlAddresses,
-      };
-
-      try {
-        let messageToast = '';
-        const { status } = await requestPermissionsAsync();
-        if (status === 'granted') {
-          const foundContact = await findLocalContact(
-            storage,
-            contact.emails.map(({ address }) => address),
-            contact.phoneNumbers.map(({ number }) => number),
-            contact.deviceIds as string[],
-            localContacts,
-            contact.contactProfile?.id,
-          );
-
-          if (foundContact) {
-            if (Platform.OS === 'ios') {
-              await updateContactAsync({
-                ...contactToAdd,
-                id: foundContact.id,
-              });
-            } else {
-              await presentFormAsync(foundContact.id, contactToAdd);
-            }
-            messageToast = intl.formatMessage({
-              defaultMessage: 'The contact was updated successfully.',
-              description:
-                'Toast message when a contact is updated successfully',
-            });
-          } else {
-            const resultId = await addContactAsync(contactToAdd);
-
-            if (contact.contactProfile) {
-              storage.set(contact.contactProfile.id, resultId);
-            }
-            messageToast = intl.formatMessage({
-              defaultMessage: 'The contact was created successfully.',
-              description:
-                'Toast message when a contact is created successfully',
-            });
-          }
-
-          onHideInvitation();
-
-          Toast.show({
-            type: 'success',
-            text1: messageToast,
-          });
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    },
-    [intl, localContacts],
-  );
-
-  const onShowContact = useCallback(
-    async (contact: ContactType) => {
-      const { status } = await requestPermissionsAsync();
-
-      const socialProfiles =
-        contact.contactProfile?.contactCard?.socials
-          ?.filter(social => !!social.selected)
-          .map(({ label, url }) => ({ label, url })) ?? [];
-
-      const urlAddresses =
-        contact.contactProfile?.contactCard?.urls
-          ?.filter(url => !!url.selected)
-          .map(({ address }) => ({ label: '', url: address })) ?? [];
-
-      const contactToShow = {
-        ...contact,
-        emails: contact.emails.map(({ label, address }) => ({
-          label,
-          email: address,
-        })),
-        phoneNumbers: contact.phoneNumbers.map(({ label, number }) => ({
-          label,
-          number,
-        })),
-        contactType: 'person' as const,
-        name: `${contact.firstName} ${contact.lastName}`,
-        socialProfiles,
-        urlAddresses,
-      };
-
-      if (status === 'granted') {
-        const foundContact = await findLocalContact(
-          storage,
-          contact.emails.map(({ address }) => address),
-          contact.phoneNumbers.map(({ number }) => number),
-          contact.deviceIds as string[],
-          localContacts,
-          contact.contactProfile?.id,
-        );
-
-        if (foundContact) {
-          await presentFormAsync(foundContact.id, contactToShow, {
-            allowsActions: false,
-            allowsEditing: false,
-          });
-        } else {
-          await presentFormAsync(undefined, contactToShow, {
-            isNew: true,
-          });
-        }
-      }
-    },
-    [localContacts],
-  );
-
-  useEffect(() => {
-    const getLocalContacts = async () => {
-      const { data } = await getContactsAsync({
-        fields: [Fields.Emails, Fields.PhoneNumbers, Fields.ID],
-      });
-      setLocalContacts(data);
-    };
-
-    getLocalContacts();
-  }, []);
 
   return (
     <Container style={[styles.container]}>
@@ -436,32 +111,13 @@ const ContactsScreen = ({
           })}
           onChangeText={e => setSearch(e ?? '')}
         />
-        {profile && searchBy === 'name' && (
-          <ContactsScreenSearchByName
-            contacts={contacts}
-            onEndReached={onEndReached}
-            onRefresh={onRefresh}
-            refreshing={refreshing}
-            onRemoveContacts={onRemoveContacts}
-            onInviteContact={onInviteContact}
-            onShowContact={onShowContact}
-            storage={storage}
-            localContacts={localContacts}
+        <Suspense>
+          <ContactScreenLists
+            search={debounceSearch}
+            searchBy={searchBy}
+            profile={profile}
           />
-        )}
-        {profile && searchBy === 'date' && (
-          <ContactsScreenSearchByDate
-            contacts={contacts}
-            onEndReached={onEndReached}
-            onRefresh={onRefresh}
-            refreshing={refreshing}
-            onRemoveContacts={onRemoveContacts}
-            onInviteContact={onInviteContact}
-            onShowContact={onShowContact}
-            storage={storage}
-            localContacts={localContacts}
-          />
-        )}
+        </Suspense>
       </SafeAreaView>
     </Container>
   );
@@ -517,14 +173,6 @@ const stylesheet = createStyleSheet(theme => ({
     gap: 15,
   },
 }));
-
-type ContactType = NonNullable<
-  NonNullable<
-    NonNullable<
-      ArrayItemType<ContactsScreen_contacts$data['searchContacts']['edges']>
-    >
-  >['node']
->;
 
 export default relayScreen(ContactsScreen, {
   query: contactsScreenQuery,

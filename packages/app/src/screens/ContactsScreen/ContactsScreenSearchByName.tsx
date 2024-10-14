@@ -1,11 +1,12 @@
 import { useCallback, useMemo } from 'react';
 import { SectionList, View } from 'react-native';
+import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Text from '#ui/Text';
 import ContactSearchByNameItem from './ContactSearchByNameItem';
-import type { ContactsScreen_contacts$data } from '#relayArtifacts/ContactsScreen_contacts.graphql';
+import type { ContactsScreenLists_contacts$data } from '#relayArtifacts/ContactsScreenLists_contacts.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { Contact } from 'expo-contacts';
 import type { SectionListData, SectionListRenderItemInfo } from 'react-native';
@@ -58,7 +59,7 @@ const ContactsScreenSearchByName = ({
     );
   }, [contacts]);
 
-  const RenderHeaderSection = useCallback(
+  const renderHeaderSection = useCallback(
     ({
       section: { initial },
     }: {
@@ -67,12 +68,15 @@ const ContactsScreenSearchByName = ({
         { initial: string; data: ContactType[] }
       >;
     }) => {
-      return <Text style={styles.title}>{initial}</Text>;
+      if (isNotFalsyString(initial)) {
+        return <Text style={styles.title}>{initial}</Text>;
+      }
+      return null;
     },
     [styles.title],
   );
 
-  const RenderListItem = useCallback(
+  const renderListItem = useCallback(
     ({
       item,
     }: SectionListRenderItemInfo<
@@ -82,12 +86,8 @@ const ContactsScreenSearchByName = ({
       return (
         <ContactSearchByNameItem
           contact={item}
-          onRemoveContact={() => {
-            onRemoveContacts([item.id]);
-          }}
-          onInviteContact={onHideInvitation => {
-            onInviteContact(item, onHideInvitation);
-          }}
+          onRemoveContact={onRemoveContacts}
+          onInviteContact={onInviteContact}
           onShowContact={onShowContact}
           storage={storage}
           localContacts={localContacts}
@@ -102,14 +102,14 @@ const ContactsScreenSearchByName = ({
       accessibilityRole="list"
       sections={sections}
       keyExtractor={sectionKeyExtractor}
-      renderItem={RenderListItem}
-      renderSectionHeader={RenderHeaderSection}
+      renderItem={renderListItem}
+      renderSectionHeader={renderHeaderSection}
       showsVerticalScrollIndicator={false}
       onEndReached={onEndReached}
       refreshing={refreshing}
       onRefresh={onRefresh}
-      contentContainerStyle={[styles.section, { paddingBottom: bottom }]}
-      ItemSeparatorComponent={RenderItemSeparator}
+      contentContainerStyle={{ paddingBottom: bottom }}
+      ItemSeparatorComponent={ItemSeparator}
       onEndReachedThreshold={0.5}
       keyboardShouldPersistTaps="always"
     />
@@ -119,8 +119,7 @@ const ContactsScreenSearchByName = ({
 const sectionKeyExtractor = (item: { id: string }) => {
   return item.id;
 };
-
-const RenderItemSeparator = () => {
+const ItemSeparator = () => {
   const styles = useStyleSheet(stylesheet);
   return <View style={styles.separator} />;
 };
@@ -142,7 +141,9 @@ const stylesheet = createStyleSheet(theme => ({
 type ContactType = NonNullable<
   NonNullable<
     NonNullable<
-      ArrayItemType<ContactsScreen_contacts$data['searchContacts']['edges']>
+      ArrayItemType<
+        ContactsScreenLists_contacts$data['searchContacts']['edges']
+      >
     >
   >['node']
 >;

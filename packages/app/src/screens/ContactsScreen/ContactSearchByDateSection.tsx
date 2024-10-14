@@ -14,7 +14,7 @@ import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import ContactSearchByDateItem from './ContactSearchByDateItem';
-import type { ContactsScreen_contacts$data } from '#relayArtifacts/ContactsScreen_contacts.graphql';
+import type { ContactsScreenLists_contacts$data } from '#relayArtifacts/ContactsScreenLists_contacts.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { Contact } from 'expo-contacts';
 import type { AlertButton, ListRenderItemInfo } from 'react-native';
@@ -266,7 +266,9 @@ const styles = StyleSheet.create({
 type ContactType = NonNullable<
   NonNullable<
     NonNullable<
-      ArrayItemType<ContactsScreen_contacts$data['searchContacts']['edges']>
+      ArrayItemType<
+        ContactsScreenLists_contacts$data['searchContacts']['edges']
+      >
     >
   >['node']
 >;
