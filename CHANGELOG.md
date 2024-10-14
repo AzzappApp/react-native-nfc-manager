@@ -1,5 +1,6 @@
-## 0.9.10-canary.66
+## 0.9.10-canary.67
 
+* **fix:**  - MediaSuggestion placeHolder padding to match update CoverList ([#5399](https://github.com/AzzappApp/azzapp/pull/5399))
 * **fix:**  - remove deviceId from database ([#5405](https://github.com/AzzappApp/azzapp/pull/5405))
 * **fix:**  - **android:** add contact always open even if we edit contact ([#5404](https://github.com/AzzappApp/azzapp/pull/5404))
 * **fix:**  - use Company activity as firstName in CoverTemplate ([#5397](https://github.com/AzzappApp/azzapp/pull/5397))
