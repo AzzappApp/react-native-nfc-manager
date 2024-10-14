@@ -15,7 +15,6 @@ type Contact {
   phoneNumbers: [ContactPhoneNumber!]!
   emails: [ContactEmail!]!
   addresses: [ContactAddress!]!
-  deviceIds: [String!]!
   webCard: WebCard
   deleted: Boolean
 }

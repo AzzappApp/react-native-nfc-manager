@@ -39,10 +39,7 @@ const addContact: MutationResolvers['addContact'] = async (
     contact: input.profileId,
   });
 
-  const contactToCreate: Omit<
-    Contact,
-    'createdAt' | 'deletedAt' | 'deviceIds' | 'id'
-  > = {
+  const contactToCreate: Omit<Contact, 'createdAt' | 'deletedAt' | 'id'> = {
     addresses: input.addresses,
     contactProfileId: input.profileId,
     emails: input.emails,
@@ -60,35 +57,19 @@ const addContact: MutationResolvers['addContact'] = async (
   let contact: Contact;
 
   if (existingContact) {
-    const deviceIds = [...existingContact.deviceIds];
-
-    if (input.deviceId && !existingContact.deviceIds.includes(input.deviceId)) {
-      deviceIds.push(input.deviceId);
-    }
-
-    await updateContact(existingContact.id, {
-      ...contactToCreate,
-      deviceIds,
-    });
+    await updateContact(existingContact.id, contactToCreate);
 
     contact = {
       ...existingContact,
       ...contactToCreate,
-      deviceIds,
     };
   } else {
-    const newDeviceIds = input.deviceId ? [input.deviceId] : [];
-
-    const id = await createContact({
-      ...contactToCreate,
-      deviceIds: newDeviceIds,
-    });
+    const id = await createContact(contactToCreate);
 
     contact = {
       id,
       createdAt: new Date(),
       deletedAt: null,
-      deviceIds: newDeviceIds,
       ...contactToCreate,
     };
   }
@@ -131,7 +112,6 @@ const addContact: MutationResolvers['addContact'] = async (
           contactProfileId: profileId,
           createdAt: new Date(),
           type: 'shareback',
-          deviceIds: [],
           addresses: addresses ?? [],
           emails: emails ?? [],
           phoneNumbers: phoneNumbers ?? [],

@@ -79,7 +79,6 @@ const ContactsScreenLists = ({
                 company
                 title
                 createdAt
-                deviceIds
                 emails {
                   label
                   address
@@ -239,9 +238,8 @@ const ContactsScreenLists = ({
         if (status === 'granted') {
           const foundContact = await findLocalContact(
             storage,
-            contact.emails.map(({ address }) => address),
             contact.phoneNumbers.map(({ number }) => number),
-            contact.deviceIds as string[],
+            contact.emails.map(({ address }) => address),
             localContacts,
             contact.contactProfile?.id,
           );
@@ -321,9 +319,8 @@ const ContactsScreenLists = ({
       if (status === 'granted') {
         const foundContact = await findLocalContact(
           storage,
-          contact.emails.map(({ address }) => address),
           contact.phoneNumbers.map(({ number }) => number),
-          contact.deviceIds as string[],
+          contact.emails.map(({ address }) => address),
           localContacts,
           contact.contactProfile?.id,
         );

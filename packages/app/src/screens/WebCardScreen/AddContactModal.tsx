@@ -151,22 +151,6 @@ const AddContactModal = ({
     [scanned, viewer, withShareBack],
   );
 
-  /* will update existing */
-  const onAddContactToPhonebook = useCallback(
-    (deviceId: string) => {
-      if (!scanned || !viewer) return;
-      const input = getContactInput(deviceId);
-      if (!input) return;
-      commit({
-        variables: {
-          input,
-          profileId: viewer,
-        },
-      });
-    },
-    [scanned, viewer, getContactInput, commit],
-  );
-
   const onRequestAddContactToPhonebook = useCallback(() => {
     if (!scanned) return;
 
@@ -219,10 +203,8 @@ const AddContactModal = ({
                       ...scanned.contact,
                       id: foundContact.id,
                     });
-                    onAddContactToPhonebook(foundContact.id);
                   } else {
                     await presentFormAsync(foundContact.id, scanned.contact);
-                    onAddContactToPhonebook(foundContact.id);
                   }
                   messageToast = intl.formatMessage({
                     defaultMessage: 'The contact was updated successfully.',
@@ -231,7 +213,6 @@ const AddContactModal = ({
                   });
                 } else {
                   const resultId = await addContactAsync(scanned.contact);
-                  onAddContactToPhonebook(resultId);
                   if (scanned.profileId) {
                     storage.set(scanned.profileId, resultId);
                   }
@@ -279,7 +260,6 @@ const AddContactModal = ({
     scanned,
     webCard.userName,
     intl,
-    onAddContactToPhonebook,
     requestPhonebookPermissionAndRedirectToSettingsAsync,
   ]);
 

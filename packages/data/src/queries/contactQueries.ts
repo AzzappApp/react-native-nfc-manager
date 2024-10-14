@@ -96,7 +96,6 @@ export const saveShareBack = async (
     emails: [{ label: 'Main', address: newContact.email }],
     addresses: [],
     company: newContact.company,
-    deviceIds: [],
     type: 'shareback',
   };
 

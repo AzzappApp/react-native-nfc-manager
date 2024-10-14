@@ -231,28 +231,17 @@ export const findLocalContact = async (
   storage: MMKV,
   phoneNumbers: string[],
   emails: string[],
-  deviceIds: string[],
   localContacts: Contact[],
   profileId?: string,
 ): Promise<Contact | undefined> => {
   if (profileId && storage.contains(profileId)) {
     const internalId = storage.getString(profileId);
     if (internalId) {
-      const contactByInternalId = getContactByIdAsync(internalId);
+      const contactByInternalId = await getContactByIdAsync(internalId);
       if (contactByInternalId) {
         return contactByInternalId;
       }
     }
-  }
-
-  const contactsByDeviceId = await Promise.all(
-    deviceIds.map(deviceId => getContactByIdAsync(deviceId)),
-  );
-  const foundContactByDeviceId = contactsByDeviceId.find(
-    contactByDeviceId => !!contactByDeviceId,
-  );
-  if (foundContactByDeviceId) {
-    return foundContactByDeviceId;
   }
 
   const localContact = localContacts.find(localContact => {

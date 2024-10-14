@@ -45,9 +45,8 @@ const ContactSearchByNameItem = ({
       if (status === 'granted') {
         const foundContact = await findLocalContact(
           storage,
-          contact.emails.map(({ address }) => address),
           contact.phoneNumbers.map(({ number }) => number),
-          contact.deviceIds as string[],
+          contact.emails.map(({ address }) => address),
           localContacts,
           contact.contactProfile?.id,
         );
@@ -63,7 +62,6 @@ const ContactSearchByNameItem = ({
     verifyInvitation();
   }, [
     contact.contactProfile,
-    contact.deviceIds,
     contact.emails,
     contact.phoneNumbers,
     localContacts,
