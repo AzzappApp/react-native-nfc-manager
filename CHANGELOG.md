@@ -1,5 +1,6 @@
-## 0.9.10-canary.59
+## 0.9.10-canary.60
 
+* **fix:**  - rollback rn permissions update ([#5386](https://github.com/AzzappApp/azzapp/pull/5386))
 * **fix:**  - warning on OverflowScrollview ([#5385](https://github.com/AzzappApp/azzapp/pull/5385))
 * **perf:**  - replace ratelimiter with vercel firewall ([#5383](https://github.com/AzzappApp/azzapp/pull/5383))
 * **feat:**  - CoverList video play ([#5381](https://github.com/AzzappApp/azzapp/pull/5381))
