@@ -2070,7 +2070,7 @@ PODS:
     - Yoga
   - RNLocalize (3.2.1):
     - React-Core
-  - RNPermissions (5.0.0):
+  - RNPermissions (4.1.5):
     - React-Core
   - RNPurchases (8.2.3):
     - PurchasesHybridCommon (= 13.4.0)
@@ -2760,7 +2760,7 @@ SPEC CHECKSUMS:
   RNGestureHandler: 6dfe7692a191ee224748964127114edf057a1475
   RNKeychain: 18fc2d8f29dd957ccfc2989d9389f7d5888169f3
   RNLocalize: 4f22418187ecd5ca693231093ff1d912d1b3c9bc
-  RNPermissions: d1b578c21df23e056afda9ae73c1f1d816465d88
+  RNPermissions: 93708df705c7e7f23e935f6bf414952c3fbc1357
   RNPurchases: 441b4e0a0afea31df7578c3a222747a64c8a4893
   RNReactNativeHapticFeedback: 0d591ea1e150f36cb96d868d4e8d77272243d78a
   RNReanimated: 3a45999505a9ceefd298f284487a68f1dc88f4d9
