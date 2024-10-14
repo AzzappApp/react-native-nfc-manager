@@ -261,7 +261,7 @@ export default MediaSuggestionsWebCards;
 export const MediaSuggestionWebCardFallback = () => {
   const styles = useStyleSheet(styleSheet);
   return (
-    <View style={[styles.containerStyle, { flexDirection: 'row' }]}>
+    <View style={[styles.containerStyle, styles.suggestionContainer]}>
       {range(0, 4).map(index => (
         <View key={index} style={styles.coverContainerStyle}>
           <Skeleton style={styles.coverContainerFallback} key={index} />
@@ -311,4 +311,5 @@ const styleSheet = createStyleSheet(appearance => ({
     height: ACTION_BUTTON_HEIGHT, //fix on android
   },
   followButton: {},
+  suggestionContainer: { flexDirection: 'row', paddingLeft: 10 },
 }));
