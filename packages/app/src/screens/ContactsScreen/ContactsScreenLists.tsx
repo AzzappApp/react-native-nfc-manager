@@ -77,6 +77,7 @@ const ContactsScreenLists = ({
                 firstName
                 lastName
                 company
+                title
                 createdAt
                 deviceIds
                 emails {
@@ -229,6 +230,7 @@ const ContactsScreenLists = ({
         name: `${contact.firstName} ${contact.lastName}`,
         socialProfiles,
         urlAddresses,
+        jobTitle: contact.title,
       };
 
       try {
@@ -313,6 +315,7 @@ const ContactsScreenLists = ({
         name: `${contact.firstName} ${contact.lastName}`,
         socialProfiles,
         urlAddresses,
+        jobTitle: contact.title,
       };
 
       if (status === 'granted') {
