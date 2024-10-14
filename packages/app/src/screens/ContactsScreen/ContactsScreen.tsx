@@ -88,6 +88,10 @@ const ContactsScreen = ({
           first: { type: Int, defaultValue: 10 }
           name: { type: String, defaultValue: "" }
           orderBy: { type: SearchContactOrderBy, defaultValue: name }
+          pixelRatio: {
+            type: "Float!"
+            provider: "CappedPixelRatio.relayprovider"
+          }
         ) {
           searchContacts(
             after: $after
@@ -114,6 +118,10 @@ const ContactsScreen = ({
                 }
                 contactProfile {
                   id
+                  avatar {
+                    id
+                    uri: uri(width: 61, pixelRatio: $pixelRatio)
+                  }
                   contactCard {
                     urls {
                       address
@@ -126,7 +134,9 @@ const ContactsScreen = ({
                     }
                   }
                   webCard {
+                    cardIsPublished
                     userName
+                    hasCover
                     ...CoverRenderer_webCard
                   }
                 }

@@ -1,11 +1,12 @@
 import { requestPermissionsAsync } from 'expo-contacts';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { colors } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import { findLocalContact } from '#helpers/contactCardHelpers';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
+import ContactAvatar from './ContactAvatar';
 import type { ContactsScreen_contacts$data } from '#relayArtifacts/ContactsScreen_contacts.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { Contact } from 'expo-contacts';
@@ -70,10 +71,55 @@ const ContactSearchByDateItem = ({
     onShowContact(contact);
   }, [contact, onShowContact]);
 
+  const [firstname, lastname, name] = useMemo(() => {
+    if (contact.firstName || contact.lastName) {
+      return [
+        contact.firstName,
+        contact.lastName,
+        `${contact.firstName} ${contact.lastName}`,
+      ];
+    }
+
+    if (contact.contactProfile?.webCard?.userName) {
+      return [
+        contact.contactProfile.webCard.userName,
+        '',
+        contact.contactProfile.webCard.userName,
+      ];
+    }
+
+    return ['', '', ''];
+  }, [
+    contact.contactProfile?.webCard?.userName,
+    contact.firstName,
+    contact.lastName,
+  ]);
+
+  const avatarSource = useMemo(() => {
+    if (contact.contactProfile?.avatar?.uri) {
+      return {
+        uri: contact.contactProfile.avatar.uri,
+        mediaId: contact.contactProfile.avatar.id ?? '',
+        requestedSize: 26,
+      };
+    }
+    return null;
+  }, [contact.contactProfile?.avatar?.id, contact.contactProfile?.avatar?.uri]);
+
   return (
     <View style={styles.profile}>
       <PressableNative onPress={onShow}>
-        <CoverRenderer width={80} webCard={contact.webCard} />
+        {contact.contactProfile?.webCard?.cardIsPublished ? (
+          <CoverRenderer width={80} webCard={contact.webCard} />
+        ) : (
+          <ContactAvatar
+            firstName={firstname}
+            lastName={lastname}
+            name={name}
+            company={contact.company}
+            avatar={avatarSource}
+          />
+        )}
       </PressableNative>
       {showInvite && !invited && (
         <PressableNative style={styles.invite} onPress={onInvite}>

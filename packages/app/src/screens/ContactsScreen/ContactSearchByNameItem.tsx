@@ -1,5 +1,5 @@
 import { requestPermissionsAsync } from 'expo-contacts';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Alert, StyleSheet, View } from 'react-native';
 import { colors, textStyles } from '#theme';
@@ -8,6 +8,7 @@ import { findLocalContact } from '#helpers/contactCardHelpers';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
+import ContactAvatar from './ContactAvatar';
 import type { ContactsScreen_contacts$data } from '#relayArtifacts/ContactsScreen_contacts.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { Contact } from 'expo-contacts';
@@ -128,20 +129,81 @@ const ContactSearchByNameItem = ({
     onShow,
   ]);
 
+  const avatarSource = useMemo(() => {
+    if (contact.contactProfile?.avatar?.uri) {
+      return {
+        uri: contact.contactProfile.avatar.uri,
+        mediaId: contact.contactProfile.avatar.id ?? '',
+        requestedSize: 26,
+      };
+    }
+    return null;
+  }, [contact.contactProfile?.avatar?.id, contact.contactProfile?.avatar?.uri]);
+
+  const [firstname, lastname, name] = useMemo(() => {
+    if (contact.firstName || contact.lastName) {
+      return [
+        contact.firstName,
+        contact.lastName,
+        `${contact.firstName} ${contact.lastName}`,
+      ];
+    }
+
+    if (contact.contactProfile?.webCard?.userName) {
+      return [
+        contact.contactProfile.webCard.userName,
+        '',
+        contact.contactProfile.webCard.userName,
+      ];
+    }
+
+    return ['', '', ''];
+  }, [
+    contact.contactProfile?.webCard?.userName,
+    contact.firstName,
+    contact.lastName,
+  ]);
+
   return (
     <View key={contact.id} style={styles.contact}>
       <PressableNative onPress={onShow} style={styles.contactInfos}>
-        <CoverRenderer
-          style={styles.webcard}
-          width={35}
-          webCard={contact.webCard}
-        />
+        {contact.contactProfile?.webCard?.cardIsPublished ? (
+          <CoverRenderer
+            style={styles.webcard}
+            width={35}
+            webCard={contact.webCard}
+          />
+        ) : (
+          <ContactAvatar
+            style={styles.webcard}
+            firstName={firstname}
+            lastName={lastname}
+            name={name}
+            company={contact.company}
+            small
+            avatar={avatarSource}
+          />
+        )}
         <View style={styles.infos}>
           {(contact.firstName || contact.lastName) && (
             <Text variant="large" numberOfLines={1}>
               {contact.firstName} {contact.lastName}
             </Text>
           )}
+          {!contact.firstName &&
+            !contact.lastName &&
+            contact.contactProfile?.webCard?.userName && (
+              <Text variant="large" numberOfLines={1}>
+                {contact.firstName} {contact.lastName}
+              </Text>
+            )}
+          {!contact.firstName &&
+            !contact.lastName &&
+            contact.contactProfile?.webCard?.userName && (
+              <Text variant="large" numberOfLines={1}>
+                {contact.firstName} {contact.lastName}
+              </Text>
+            )}
           {!contact.firstName &&
             !contact.lastName &&
             contact.contactProfile?.webCard?.userName && (
