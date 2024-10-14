@@ -1,5 +1,5 @@
 import { FlashList } from '@shopify/flash-list';
-import { memo, useCallback, useMemo, useState } from 'react';
+import { forwardRef, memo, useCallback, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import {
@@ -17,6 +17,7 @@ import type {
 } from '#relayArtifacts/CoverList_users.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { ListRenderItemInfo, ViewToken } from '@shopify/flash-list';
+import type { ForwardedRef } from 'react';
 import type { ScrollViewProps } from 'react-native';
 
 // Base props that are common to both cases
@@ -146,8 +147,15 @@ const viewabilityConfig = {
   itemVisiblePercentThreshold: 89,
 };
 
-const OverflowScrollView = ({ style, ...rest }: ScrollViewProps) => (
-  <ScrollView {...rest} style={[style, scrollViewStyle.overflowScrollView]} />
+// eslint-disable-next-line react/display-name
+const OverflowScrollView = forwardRef(
+  ({ style, ...rest }: ScrollViewProps, ref: ForwardedRef<ScrollView>) => (
+    <ScrollView
+      ref={ref}
+      {...rest}
+      style={[style, scrollViewStyle.overflowScrollView]}
+    />
+  ),
 );
 
 const ItemSeparatorComponent = ({
