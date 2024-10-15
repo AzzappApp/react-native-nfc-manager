@@ -1,4 +1,4 @@
-## 0.9.10-canary.69
+## 0.9.10-canary.70
 
 * **fix:**  - 🐛 properly recreate shareback ([#5398](https://github.com/AzzappApp/azzapp/pull/5398))
 * **fix:**  - 🐛 display avatar first
