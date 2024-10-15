@@ -1,5 +1,7 @@
-## 0.9.10-canary.71
+## 0.9.10-canary.72
 
+* **fix:**  - allow post to be editable is owner ([#5427](https://github.com/AzzappApp/azzapp/pull/5427))
+* **feat:**  - 🎸 redesign contact button ([#5417](https://github.com/AzzappApp/azzapp/pull/5417))
 * **fix:**  - ensure value is not undefined
 * **fix:**  - add missing declaration
 * **fix:**  - ensure contacts are displayed read only when wlick on view contact ([#5424](https://github.com/AzzappApp/azzapp/pull/5424))
