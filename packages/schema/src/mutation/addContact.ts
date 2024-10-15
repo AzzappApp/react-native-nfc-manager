@@ -75,65 +75,73 @@ const addContact: MutationResolvers['addContact'] = async (
   }
 
   if (input.withShareBack) {
+    const addresses = profile.contactCard?.addresses
+      ?.filter(address => address.selected)
+      .map(address => ({
+        label: address.label,
+        address: address.address,
+      }));
+
+    const emails = profile.contactCard?.emails
+      ?.filter(email => email.selected)
+      .map(email => ({
+        label: email.label,
+        address: email.address,
+      }));
+
+    const phoneNumbers = profile.contactCard?.phoneNumbers
+      ?.filter(phoneNumber => phoneNumber.selected)
+      .map(phoneNumber => ({
+        label: phoneNumber.label,
+        number: phoneNumber.number,
+      }));
+
+    const birthday = profile.contactCard?.birthday?.selected
+      ? new Date(profile.contactCard.birthday.birthday)
+      : null;
+
+    const shareBackToCreate = {
+      ownerProfileId: input.profileId,
+      contactProfileId: profileId,
+      createdAt: new Date(),
+      type: 'shareback' as const,
+      addresses: addresses ?? [],
+      emails: emails ?? [],
+      phoneNumbers: phoneNumbers ?? [],
+      birthday,
+      company: profile.contactCard?.company ?? undefined,
+      firstName: profile.contactCard?.firstName ?? undefined,
+      lastName: profile.contactCard?.lastName ?? undefined,
+      title: profile.contactCard?.title ?? undefined,
+      deleted: false,
+    };
+
     const existingShareBack = await getContactByProfiles({
       owner: input.profileId,
       contact: profileId,
     });
 
     if (!existingShareBack) {
-      const addresses = profile.contactCard?.addresses
-        ?.filter(address => address.selected)
-        .map(address => ({
-          label: address.label,
-          address: address.address,
-        }));
-
-      const emails = profile.contactCard?.emails
-        ?.filter(email => email.selected)
-        .map(email => ({
-          label: email.label,
-          address: email.address,
-        }));
-
-      const phoneNumbers = profile.contactCard?.phoneNumbers
-        ?.filter(phoneNumber => phoneNumber.selected)
-        .map(phoneNumber => ({
-          label: phoneNumber.label,
-          number: phoneNumber.number,
-        }));
-
-      const birthday = profile.contactCard?.birthday?.selected
-        ? new Date(profile.contactCard.birthday.birthday)
-        : null;
-
       await transaction(async () => {
-        await createContact({
-          ownerProfileId: input.profileId,
-          contactProfileId: profileId,
-          createdAt: new Date(),
-          type: 'shareback',
-          addresses: addresses ?? [],
-          emails: emails ?? [],
-          phoneNumbers: phoneNumbers ?? [],
-          birthday,
-          company: profile.contactCard?.company ?? undefined,
-          firstName: profile.contactCard?.firstName ?? undefined,
-          lastName: profile.contactCard?.lastName ?? undefined,
-          title: profile.contactCard?.title ?? undefined,
-        });
-
+        await createContact(shareBackToCreate);
         await incrementShareBacksTotal(input.profileId);
         await incrementShareBacks(input.profileId, true);
       });
-
-      await sendPushNotification(profile.userId, {
-        type: 'shareBack',
-        mediaId: null,
-        sound: 'default',
-        deepLink: 'shareBack',
-        locale: guessLocale(user?.locale),
+    } else {
+      await transaction(async () => {
+        await updateContact(existingShareBack.id, shareBackToCreate);
+        await incrementShareBacksTotal(input.profileId);
+        await incrementShareBacks(input.profileId, true);
       });
     }
+
+    await sendPushNotification(profile.userId, {
+      type: 'shareBack',
+      mediaId: null,
+      sound: 'default',
+      deepLink: 'shareBack',
+      locale: guessLocale(user?.locale),
+    });
   }
 
   return {
