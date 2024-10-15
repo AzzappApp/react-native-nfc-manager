@@ -85,6 +85,7 @@ const ContactAvatar = ({
         {name && (
           <Text
             style={[textStyles.small, company ? styles.nameSmall : styles.name]}
+            numberOfLines={2}
           >
             {name}
           </Text>

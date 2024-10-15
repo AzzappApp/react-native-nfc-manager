@@ -162,7 +162,7 @@ const ContactSearchByNameItem = ({
   return (
     <View key={contact.id} style={styles.contact}>
       <PressableNative onPress={onShow} style={styles.contactInfos}>
-        {contact.contactProfile?.webCard?.cardIsPublished ? (
+        {contact.contactProfile?.webCard?.cardIsPublished && !avatarSource ? (
           <CoverRenderer
             style={styles.webcard}
             width={35}

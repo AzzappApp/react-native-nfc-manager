@@ -107,7 +107,7 @@ const ContactSearchByDateItem = ({
   return (
     <View style={styles.profile}>
       <PressableNative onPress={onShow}>
-        {contact.contactProfile?.webCard?.cardIsPublished ? (
+        {contact.contactProfile?.webCard?.cardIsPublished && !avatarSource ? (
           <CoverRenderer width={80} webCard={contact.webCard} />
         ) : (
           <ContactAvatar
