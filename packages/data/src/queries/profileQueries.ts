@@ -351,7 +351,10 @@ export const countWebCardProfiles = async (
     )
     .then(res => res[0].count);
 
-export const countDeletedWebCardProfiles = async (webCardId: string) =>
+export const countDeletedWebCardProfiles = async (
+  webCardId: string,
+  profileIds?: string[],
+) =>
   db()
     .select({ count: count() })
     .from(ProfileTable)
@@ -359,6 +362,7 @@ export const countDeletedWebCardProfiles = async (webCardId: string) =>
       and(
         eq(ProfileTable.webCardId, webCardId),
         eq(ProfileTable.deleted, true),
+        profileIds?.length ? inArray(ProfileTable.id, profileIds) : undefined,
       ),
     )
     .then(res => res[0].count);

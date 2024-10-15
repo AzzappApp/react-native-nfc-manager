@@ -402,6 +402,20 @@ export const deleteUnusedAccounts = async (
         eq(UserTable.invited, true),
       ),
     );
+
+  await db()
+    .delete(ProfileTable)
+    .where(
+      and(
+        inArray(ProfileTable.id, profileIdsToDelete),
+        notExists(
+          db()
+            .select()
+            .from(UserTable)
+            .where(eq(UserTable.id, ProfileTable.userId)), // No corresponding user
+        ),
+      ),
+    );
 };
 
 /**

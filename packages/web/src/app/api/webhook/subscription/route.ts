@@ -32,6 +32,7 @@ export const POST = withPluginsRoute(async (req: Request) => {
   if (data.status === 'OK') {
     await acknowledgeRecurringPayment(
       data.rebill_manager_external_reference,
+      data.rebill_manager_id,
       data.transaction_id,
       data.provider_response,
     );
