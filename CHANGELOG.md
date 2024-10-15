@@ -1,5 +1,8 @@
-## 0.9.10-canary.70
+## 0.9.10-canary.71
 
+* **fix:**  - ensure value is not undefined
+* **fix:**  - add missing declaration
+* **fix:**  - ensure contacts are displayed read only when wlick on view contact ([#5424](https://github.com/AzzappApp/azzapp/pull/5424))
 * **fix:**  - 🐛 properly recreate shareback ([#5398](https://github.com/AzzappApp/azzapp/pull/5398))
 * **fix:**  - 🐛 display avatar first
 * **fix:**  - MediaSuggestion placeHolder padding to match update CoverList ([#5399](https://github.com/AzzappApp/azzapp/pull/5399))
