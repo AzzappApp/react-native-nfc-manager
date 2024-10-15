@@ -506,8 +506,8 @@ export const PaymentTable = cols.table(
   table => {
     return {
       subscriptionIdIdx: cols
-        .index('subscriptionId_idx')
-        .on(table.subscriptionId),
+        .uniqueIndex('subscriptionId_transactionId_idx')
+        .on(table.subscriptionId, table.transactionId),
       webCardIdIdx: cols.index('webCardId_idx').on(table.webCardId),
     };
   },
