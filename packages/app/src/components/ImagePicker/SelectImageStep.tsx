@@ -303,18 +303,16 @@ const SelectImageStep = ({
         preventNavigation={!media}
         topPanel={
           pickerMode === 'gallery' ? (
-            media != null ? (
-              <ImagePickerMediaRenderer>
-                {!hideAspectRatio && forceAspectRatio == null && (
-                  <FloatingIconButton
-                    icon={aspectRatio === 1 ? 'reduce' : 'expand'}
-                    style={styles.adjustButton}
-                    size={40}
-                    onPress={onAspectRatioToggle}
-                  />
-                )}
-              </ImagePickerMediaRenderer>
-            ) : null
+            <ImagePickerMediaRenderer>
+              {!hideAspectRatio && forceAspectRatio == null && (
+                <FloatingIconButton
+                  icon={aspectRatio === 1 ? 'reduce' : 'expand'}
+                  style={styles.adjustButton}
+                  size={40}
+                  onPress={onAspectRatioToggle}
+                />
+              )}
+            </ImagePickerMediaRenderer>
           ) : cameraPermission === RESULTS.GRANTED &&
             (pickerMode === 'photo' || audioPermission === RESULTS.GRANTED) ? (
             <CameraView
