@@ -1,4 +1,4 @@
-## 0.9.10-canary.76
+## 0.9.10-canary.77
 
 * **fix:**  - image picker initial display ([#5437](https://github.com/AzzappApp/azzapp/pull/5437))
 * **fix:**  - send notification to the correct target when shareback from app:q ([#5432](https://github.com/AzzappApp/azzapp/pull/5432))
