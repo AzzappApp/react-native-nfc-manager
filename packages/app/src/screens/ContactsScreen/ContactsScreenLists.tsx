@@ -298,8 +298,8 @@ const ContactsScreenLists = ({
           localContacts,
           contact.contactProfile?.id,
         );
-        if (foundContact) {
-          await displayContactAsync(foundContact?.id);
+        if (foundContact?.id) {
+          await displayContactAsync(foundContact.id);
         }
         // FIXME open in app contact detail view
       }
