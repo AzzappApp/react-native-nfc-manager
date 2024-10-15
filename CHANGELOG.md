@@ -1,5 +1,6 @@
-## 0.9.10-canary.74
+## 0.9.10-canary.75
 
+* **feat:**  - 🎸 add avatar to generated local contact ([#5434](https://github.com/AzzappApp/azzapp/pull/5434))
 * **feat:**  - 🎸 add contact common information ([#5425](https://github.com/AzzappApp/azzapp/pull/5425))
 * **fix:**  - **payment:** [#5390](https://github.com/AzzappApp/azzapp/pull/5390) avoid double payment storage + create payment on … ([#5391](https://github.com/AzzappApp/azzapp/pull/5391))
 * **perf:**  - optimize auth store listener performance ([#5428](https://github.com/AzzappApp/azzapp/pull/5428))
