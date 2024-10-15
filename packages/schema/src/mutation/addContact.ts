@@ -27,7 +27,6 @@ const addContact: MutationResolvers['addContact'] = async (
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
   const profileId = fromGlobalId(gqlProfileId).id;
-  const user = await userLoader.load(userId);
   const profile = await profileLoader.load(profileId);
 
   if (!profile || profile.userId !== userId) {
@@ -135,13 +134,20 @@ const addContact: MutationResolvers['addContact'] = async (
       });
     }
 
-    await sendPushNotification(profile.userId, {
-      type: 'shareBack',
-      mediaId: null,
-      sound: 'default',
-      deepLink: 'shareBack',
-      locale: guessLocale(user?.locale),
-    });
+    const profileToNotify = await profileLoader.load(input.profileId);
+
+    if (profileToNotify) {
+      const userToNotify = await userLoader.load(profileToNotify?.userId);
+      if (userToNotify) {
+        await sendPushNotification(userToNotify.id, {
+          type: 'shareBack',
+          mediaId: null,
+          sound: 'default',
+          deepLink: 'shareBack',
+          locale: guessLocale(userToNotify?.locale),
+        });
+      }
+    }
   }
 
   return {
