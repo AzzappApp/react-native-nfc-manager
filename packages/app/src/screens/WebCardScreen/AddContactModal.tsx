@@ -1,7 +1,6 @@
 import * as Sentry from '@sentry/react-native';
 import {
   addContactAsync,
-  getContactByIdAsync,
   presentFormAsync,
   updateContactAsync,
   PermissionStatus as ContactPermissionStatus,
@@ -21,9 +20,12 @@ import {
   useMutation,
 } from 'react-relay';
 import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
+import { isDefined } from '@azzapp/shared/isDefined';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
+import { findLocalContact } from '#helpers/contactCardHelpers';
+import { getLocalContactsMap } from '#helpers/getLocalContactsMap';
 import { usePhonebookPermission } from '#hooks/usePhonebookPermission';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
@@ -189,13 +191,23 @@ const AddContactModal = ({
               const { status } =
                 await requestPhonebookPermissionAndRedirectToSettingsAsync();
               if (status === ContactPermissionStatus.GRANTED) {
-                let foundContact: Contact | undefined = undefined;
-                if (scanned.profileId && storage.contains(scanned.profileId)) {
-                  const internalId = storage.getString(scanned.profileId);
-                  if (internalId) {
-                    foundContact = await getContactByIdAsync(internalId);
-                  }
-                }
+                const localContacts = await getLocalContactsMap();
+                const phoneNumbers =
+                  scanned.contact.phoneNumbers
+                    ?.map(({ number }) => number)
+                    .filter(isDefined) || [];
+                const emails =
+                  scanned.contact.emails
+                    ?.map(({ email }) => email)
+                    .filter(isDefined) || [];
+
+                const foundContact = await findLocalContact(
+                  storage,
+                  phoneNumbers,
+                  emails,
+                  localContacts,
+                  scanned.profileId,
+                );
 
                 if (foundContact && foundContact.id) {
                   if (Platform.OS === 'ios') {

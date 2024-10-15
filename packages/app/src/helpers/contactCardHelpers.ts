@@ -244,16 +244,18 @@ export const findLocalContact = async (
     }
   }
 
-  const localContact = localContacts.find(localContact => {
-    const hasCommonPhoneNumber = localContact.phoneNumbers?.find(phoneNumber =>
-      phoneNumbers.some(ph => ph === phoneNumber.number),
+  const localContact = localContacts?.find(localContact => {
+    const hasCommonPhoneNumber = phoneNumbers?.find(phoneNumber =>
+      localContact.phoneNumbers?.some(ph => {
+        return ph.number === phoneNumber;
+      }),
     );
 
-    const hasCommonEmails = localContact.emails?.find(email =>
-      emails.some(em => em === email.email),
+    if (hasCommonPhoneNumber) return true;
+    const hasCommonEmails = emails?.find(email =>
+      localContact.emails?.some(em => email === em.email),
     );
-
-    return hasCommonPhoneNumber || hasCommonEmails;
+    return hasCommonEmails;
   });
 
   return localContact;

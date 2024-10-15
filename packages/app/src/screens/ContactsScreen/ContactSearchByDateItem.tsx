@@ -43,12 +43,7 @@ const ContactSearchByDateItem = ({
           localContacts,
           contact.contactProfile?.id,
         );
-
-        if (foundContact) {
-          return;
-        }
-
-        setShowInvite(true);
+        setShowInvite(!foundContact);
       }
     };
 

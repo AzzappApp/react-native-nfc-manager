@@ -1,6 +1,4 @@
 import {
-  getContactsAsync,
-  Fields,
   requestPermissionsAsync,
   updateContactAsync,
   presentFormAsync,
@@ -16,6 +14,7 @@ import { usePaginationFragment, graphql, useMutation } from 'react-relay';
 import { useOnFocus } from '#components/NativeRouter';
 import { findLocalContact } from '#helpers/contactCardHelpers';
 import { buildLocalContact } from '#helpers/contactListHelpers';
+import { getLocalContactsMap } from '#helpers/getLocalContactsMap';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import { storage } from '#hooks/useDeepLink';
 import ContactsScreenSearchByDate from './ContactsScreenSearchByDate';
@@ -37,20 +36,17 @@ const ContactsScreenLists = ({
   profile,
 }: ContactsScreenListsProps) => {
   const [refreshing, setRefreshing] = useState(false);
-  const [localContacts, setLocalContacts] = useState<Contact[]>([]);
+  const [localContacts, setLocalContacts] = useState<Contact[]>();
   const intl = useIntl();
   const profileInfos = useProfileInfos();
 
-  useEffect(() => {
-    const getLocalContacts = async () => {
-      const { data } = await getContactsAsync({
-        fields: [Fields.Emails, Fields.PhoneNumbers, Fields.ID],
-      });
-      setLocalContacts(data);
-    };
-
-    getLocalContacts();
+  const refreshLocalContacts = useCallback(async () => {
+    setLocalContacts(await getLocalContactsMap());
   }, []);
+
+  useEffect(() => {
+    refreshLocalContacts();
+  }, [refreshLocalContacts]);
 
   const { data, loadNext, hasNext, isLoadingNext, refetch } =
     usePaginationFragment(
@@ -162,13 +158,21 @@ const ContactsScreenLists = ({
   const onRefresh = useCallback(() => {
     if (!isLoadingNext && !refreshing) {
       setRefreshing(true);
+      refreshLocalContacts();
       refetch(
         { name: search, orderBy: searchBy },
         { fetchPolicy: 'store-and-network' },
       );
       setRefreshing(false);
     }
-  }, [search, isLoadingNext, refetch, refreshing, searchBy]);
+  }, [
+    isLoadingNext,
+    refreshing,
+    refreshLocalContacts,
+    refetch,
+    search,
+    searchBy,
+  ]);
 
   // This code is used to refresh the screen when we come back to it.
   // After a contact exchange, this screen shall be refreshed to ensure the new contact is well displayed
@@ -239,7 +243,7 @@ const ContactsScreenLists = ({
       try {
         let messageToast = '';
         const { status } = await requestPermissionsAsync();
-        if (status === 'granted') {
+        if (status === ContactPermissionStatus.GRANTED && localContacts) {
           const foundContact = await findLocalContact(
             storage,
             contact.phoneNumbers.map(({ number }) => number),
@@ -309,6 +313,10 @@ const ContactsScreenLists = ({
     [localContacts],
   );
 
+  if (localContacts === undefined) {
+    // no need to render before locaContacts is queried
+    return undefined;
+  }
   return (
     <View
       style={{
