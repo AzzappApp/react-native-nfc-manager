@@ -1,0 +1,21 @@
+diff --git a/build/Contacts.d.ts b/build/Contacts.d.ts
+index 6bbb8b720d7bfca7e8524392277ecd156e66190a..94ad3ad7148f278fdb497f41b15326ac77547095 100644
+--- a/build/Contacts.d.ts
++++ b/build/Contacts.d.ts
+@@ -632,6 +632,16 @@ export declare function writeContactToFileAsync(contactQuery?: ContactQuery): Pr
+  * ```
+  */
+ export declare function presentFormAsync(contactId?: string | null, contact?: Contact | null, formOptions?: FormOptions): Promise<any>;
++
++/**
++ * Displays contact details from contacts book
++ * @example
++ * ```js
++ * await Contacts.getContactsAsync(contactId);
++ *
++ * ```
++ */
++export declare function displayContactAsync(contactId: string): Promise<boolean>
+ /**
+  * Add a group to a container.
+  * @param groupId The group you want to target.
