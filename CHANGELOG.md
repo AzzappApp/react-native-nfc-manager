@@ -1,5 +1,6 @@
-## 0.9.10-canary.68
+## 0.9.10-canary.69
 
+* **fix:**  - 🐛 properly recreate shareback ([#5398](https://github.com/AzzappApp/azzapp/pull/5398))
 * **fix:**  - 🐛 display avatar first
 * **fix:**  - MediaSuggestion placeHolder padding to match update CoverList ([#5399](https://github.com/AzzappApp/azzapp/pull/5399))
 * **fix:**  - remove deviceId from database ([#5405](https://github.com/AzzappApp/azzapp/pull/5405))
