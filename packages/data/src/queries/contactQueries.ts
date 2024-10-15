@@ -12,7 +12,7 @@ import { db, transaction } from '../database';
 import { ContactTable, ProfileTable, WebCardTable } from '../schema';
 import { incrementShareBacksTotal } from './profileQueries';
 import { incrementShareBacks } from './profileStatisticQueries';
-import type { Contact } from '../schema';
+import type { Contact, Profile } from '../schema';
 
 export type ContactRow = InferInsertModel<typeof ContactTable>;
 
@@ -216,6 +216,24 @@ export const searchContactsByWebcardId = async ({
   };
 };
 
+export const getAllOwnerProfilesByWebcardId = async (
+  webcardId: string,
+  withDeleted: boolean = false,
+): Promise<Profile[]> => {
+  const result = await db()
+    .selectDistinct({ ownerProfile: ProfileTable })
+    .from(ContactTable)
+    .innerJoin(ProfileTable, eq(ContactTable.ownerProfileId, ProfileTable.id))
+    .where(
+      and(
+        eq(ProfileTable.webCardId, webcardId),
+        withDeleted ? undefined : eq(ContactTable.deleted, false),
+      ),
+    );
+
+  return result.map(({ ownerProfile }) => ownerProfile);
+};
+
 export const getContactCountWithWebcardId = (
   webcardId: string,
   withDeleted: boolean = false,
@@ -231,6 +249,7 @@ export const getContactCountWithWebcardId = (
         eq(ContactTable.deleted, withDeleted),
       ),
     )
+
     .then(res => res[0].count || 0);
 };
 

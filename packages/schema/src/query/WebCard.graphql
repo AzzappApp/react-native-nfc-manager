@@ -225,6 +225,15 @@ type WebCard implements Node {
   """
   nbContacts: Int!
   """
+  Return all distinct owner contact profiles
+  """
+  contactsOwnerPofiles(
+    """
+    When true, the query will add profile with deleted contacts
+    """
+    withDeleted: Boolean
+  ): [Profile!]
+  """
   Return number of deleted contact for a given profile
   """
   nbDeletedContacts: Int!

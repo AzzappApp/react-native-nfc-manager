@@ -22,6 +22,7 @@ import {
   countDeletedWebCardProfiles,
   searchContactsByWebcardId,
   getContactCountWithWebcardId,
+  getAllOwnerProfilesByWebcardId,
 } from '@azzapp/data';
 import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
 import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
@@ -434,6 +435,12 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
       return 1;
     }
     return getContactCountWithWebcardId(webCard.id);
+  },
+  contactsOwnerPofiles: async (webCard, { withDeleted }) => {
+    if (!(await hasWebCardProfileRight(webCard.id))) {
+      return [];
+    }
+    return getAllOwnerProfilesByWebcardId(webCard.id, !!withDeleted);
   },
   nbDeletedContacts: async (webCard, _) => {
     if (!(await hasWebCardProfileRight(webCard.id))) {

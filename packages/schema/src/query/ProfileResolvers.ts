@@ -261,7 +261,7 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
     return null;
   },
   nbContacts: async profile => {
-    if (!profileIsAssociatedToCurrentUser(profile)) {
+    if (!(await hasWebCardProfileRight(profile.webCardId))) {
       return 0;
     }
     return getContactCount(profile.id);
