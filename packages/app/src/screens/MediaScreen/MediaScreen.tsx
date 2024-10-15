@@ -40,6 +40,7 @@ const mediaScreenQuery = graphql`
           ...WebCardPostsList_webCard
             @arguments(viewerWebCardId: $viewerWebCardId)
           ...PostRendererFragment_author
+          ...PostList_author
           ...MediaFollowingsWebCards_webCard
           ...MediaFollowingsScreen_webCard
         }

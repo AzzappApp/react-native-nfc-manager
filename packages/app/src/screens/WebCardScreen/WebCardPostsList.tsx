@@ -41,6 +41,7 @@ const WebCardPostsList = ({
             ...WebCardPostsList_webCard
               @arguments(viewerWebCardId: $viewerWebCardId)
             ...PostRendererFragment_author
+            ...PostList_author
           }
         }
       }

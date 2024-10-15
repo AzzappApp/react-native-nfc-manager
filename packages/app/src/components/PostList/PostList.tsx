@@ -3,8 +3,10 @@ import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Alert, Dimensions, useColorScheme, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
+import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import PostRenderer from '#components/PostList/PostRenderer';
+import useAuthState from '#hooks/useAuthState';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { HEADER_HEIGHT } from '#ui/Header';
 import Icon from '#ui/Icon';
@@ -47,7 +49,7 @@ const { height: windowHeight, width: windowWidth } = Dimensions.get('window');
 // TODO docs and tests once this component is production ready
 const PostList = ({
   posts: postKey,
-  author,
+  author: authorKey,
   viewerWebCard: viewerWebCardKey,
   profile: profileKey,
   canPlay = true,
@@ -60,6 +62,7 @@ const PostList = ({
   firstItemVideoTime,
   ...props
 }: PostListProps) => {
+  const { profileInfos } = useAuthState();
   const posts = useFragment(
     graphql`
       fragment PostList_posts on Post
@@ -77,6 +80,7 @@ const PostList = ({
           @arguments(viewerWebCardId: $viewerWebCardId)
         webCard @include(if: $includeAuthor) {
           ...PostRendererFragment_author
+          ...PostList_author
         }
       }
     `,
@@ -105,15 +109,39 @@ const PostList = ({
     profileKey ?? null,
   );
 
-  const postActionEnabled = useMemo(
-    () =>
-      viewerWebCard?.cardIsPublished != null
-        ? !viewerProfile?.invited
-          ? !!viewerWebCard?.cardIsPublished
-          : false
-        : false,
-    [viewerProfile?.invited, viewerWebCard?.cardIsPublished],
+  const author = useFragment(
+    graphql`
+      fragment PostList_author on WebCard {
+        id
+      }
+    `,
+    authorKey,
   );
+
+  const postActionEnabled = useMemo(() => {
+    if (viewerWebCard?.cardIsPublished != null) {
+      if (!viewerProfile?.invited) {
+        //card is not published. We can do action only
+        // if we are the owner and we are displaying his own list of post (author is provided)
+        if (
+          profileHasAdminRight(profileInfos?.profileRole) &&
+          profileInfos.webCardId === author?.id
+        ) {
+          return true;
+        }
+        return !!viewerWebCard?.cardIsPublished;
+      }
+      return false;
+    } else {
+      return false;
+    }
+  }, [
+    author?.id,
+    profileInfos?.profileRole,
+    profileInfos?.webCardId,
+    viewerProfile?.invited,
+    viewerWebCard?.cardIsPublished,
+  ]);
 
   const onActionDisabled = useCallback(() => {
     if (!viewerWebCard?.cardIsPublished) {
@@ -249,7 +277,7 @@ const PostList = ({
           videoDisabled={!extraData.canPlay}
           width={windowWidth}
           onPressAuthor={onPressAuthor}
-          author={item.webCard ?? extraData.author!}
+          author={item.webCard ?? extraData.authorKey!}
           actionEnabled={extraData.postActionEnabled}
           onActionDisabled={onActionDisabled}
           showUnpublished={extraData.showUnpublished}
@@ -264,12 +292,18 @@ const PostList = ({
   const extraData = useMemo(
     () => ({
       canPlay,
-      author,
+      authorKey,
       firstItemVideoTime,
       postActionEnabled,
       showUnpublished,
     }),
-    [canPlay, author, postActionEnabled, firstItemVideoTime, showUnpublished],
+    [
+      canPlay,
+      authorKey,
+      postActionEnabled,
+      firstItemVideoTime,
+      showUnpublished,
+    ],
   );
 
   const ListFooterComponent = useMemo(
