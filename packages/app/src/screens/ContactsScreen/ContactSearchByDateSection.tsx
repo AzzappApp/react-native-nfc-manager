@@ -9,6 +9,7 @@ import { Alert, FlatList, Platform, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { colors } from '#theme';
 import { findLocalContact } from '#helpers/contactCardHelpers';
+import { buildLocalContact } from '#helpers/contactListHelpers';
 import { keyExtractor } from '#helpers/idHelpers';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
@@ -55,31 +56,7 @@ const ContactSearchByDateSection = ({
 
         await Promise.all(
           data.map(async contact => {
-            const socialProfiles =
-              contact.contactProfile?.contactCard?.socials
-                ?.filter(social => !!social.selected)
-                .map(({ label, url }) => ({ label, url })) ?? [];
-
-            const urlAddresses =
-              contact.contactProfile?.contactCard?.urls
-                ?.filter(url => !!url.selected)
-                .map(({ address }) => ({ label: '', url: address })) ?? [];
-
-            const contactToAdd: Contact = {
-              ...contact,
-              emails: contact.emails.map(({ label, address }) => ({
-                label,
-                email: address,
-              })),
-              phoneNumbers: contact.phoneNumbers.map(({ label, number }) => ({
-                label,
-                number,
-              })),
-              contactType: 'person' as const,
-              name: `${contact.firstName} ${contact.lastName}`,
-              socialProfiles,
-              urlAddresses,
-            };
+            const contactToAdd: Contact = buildLocalContact(contact);
 
             const foundContact = await findLocalContact(
               storage,

@@ -15,6 +15,7 @@ import Toast from 'react-native-toast-message';
 import { usePaginationFragment, graphql, useMutation } from 'react-relay';
 import { useOnFocus } from '#components/NativeRouter';
 import { findLocalContact } from '#helpers/contactCardHelpers';
+import { buildLocalContact } from '#helpers/contactListHelpers';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import { storage } from '#hooks/useDeepLink';
 import ContactsScreenSearchByDate from './ContactsScreenSearchByDate';
@@ -89,6 +90,10 @@ const ContactsScreenLists = ({
                   label
                   number
                 }
+                addresses {
+                  address
+                  label
+                }
                 contactProfile {
                   id
                   avatar {
@@ -111,6 +116,28 @@ const ContactsScreenLists = ({
                     userName
                     hasCover
                     ...CoverRenderer_webCard
+                    commonInformation {
+                      addresses {
+                        label
+                        address
+                      }
+                      company
+                      emails {
+                        label
+                        address
+                      }
+                      phoneNumbers {
+                        label
+                        number
+                      }
+                      socials {
+                        label
+                        url
+                      }
+                      urls {
+                        address
+                      }
+                    }
                   }
                 }
                 webCard {
@@ -207,32 +234,7 @@ const ContactsScreenLists = ({
 
   const onInviteContact = useCallback(
     async (contact: ContactType, onHideInvitation: () => void) => {
-      const socialProfiles =
-        contact.contactProfile?.contactCard?.socials
-          ?.filter(social => !!social.selected)
-          .map(({ label, url }) => ({ label, url })) ?? [];
-
-      const urlAddresses =
-        contact.contactProfile?.contactCard?.urls
-          ?.filter(url => !!url.selected)
-          .map(({ address }) => ({ label: '', url: address })) ?? [];
-
-      const contactToAdd = {
-        ...contact,
-        emails: contact.emails.map(({ label, address }) => ({
-          label,
-          email: address,
-        })),
-        phoneNumbers: contact.phoneNumbers.map(({ label, number }) => ({
-          label,
-          number,
-        })),
-        contactType: 'person' as const,
-        name: `${contact.firstName} ${contact.lastName}`,
-        socialProfiles,
-        urlAddresses,
-        jobTitle: contact.title,
-      };
+      const contactToAdd = buildLocalContact(contact);
 
       try {
         let messageToast = '';
