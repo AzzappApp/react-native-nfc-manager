@@ -92,7 +92,7 @@
     "expo-asset": "^10.0.10",
     "expo-blur": "^13.0.2",
     "expo-clipboard": "~6.0.3",
-    "expo-contacts": "patch:expo-contacts@patch%3Aexpo-contacts@patch%253Aexpo-contacts@patch%25253Aexpo-contacts@npm%2525253A13.0.5%252523./.yarn/patches/expo-contacts-npm-13.0.5-ee92319df7.patch%25253A%25253Aversion=13.0.5&hash=f61598&locator=%25252540azzapp%2525252Fmonorepo%25252540workspace%2525253A.%2523~/.yarn/patches/expo-contacts-patch-69121a9c2e.patch%253A%253Aversion=13.0.5&hash=410e55%23~/.yarn/patches/expo-contacts-patch-54b8b71ee4.patch%3A%3Aversion=13.0.5&hash=3fe629#~/.yarn/patches/expo-contacts-patch-a631db5d9f.patch",
+    "expo-contacts": "patch:expo-contacts@patch%3Aexpo-contacts@patch%253Aexpo-contacts@patch%25253Aexpo-contacts@patch%2525253Aexpo-contacts@npm%252525253A13.0.5%25252523./.yarn/patches/expo-contacts-npm-13.0.5-ee92319df7.patch%2525253A%2525253Aversion=13.0.5&hash=f61598&locator=%2525252540azzapp%252525252Fmonorepo%2525252540workspace%252525253A.%252523~/.yarn/patches/expo-contacts-patch-69121a9c2e.patch%25253A%25253Aversion=13.0.5&hash=410e55%2523~/.yarn/patches/expo-contacts-patch-54b8b71ee4.patch%253A%253Aversion=13.0.5&hash=3fe629%23~/.yarn/patches/expo-contacts-patch-a631db5d9f.patch%3A%3Aversion=13.0.5&hash=0fa8ad#~/.yarn/patches/expo-contacts-patch-7efb707995.patch",
     "expo-device": "^6.0.2",
     "expo-file-system": "^17.0.1",
     "expo-font": "^12.0.10",

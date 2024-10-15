@@ -5,6 +5,8 @@ import {
   updateContactAsync,
   presentFormAsync,
   addContactAsync,
+  displayContactAsync,
+  PermissionStatus as ContactPermissionStatus,
 } from 'expo-contacts';
 import { useMemo, useCallback, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -288,35 +290,7 @@ const ContactsScreenLists = ({
   const onShowContact = useCallback(
     async (contact: ContactType) => {
       const { status } = await requestPermissionsAsync();
-
-      const socialProfiles =
-        contact.contactProfile?.contactCard?.socials
-          ?.filter(social => !!social.selected)
-          .map(({ label, url }) => ({ label, url })) ?? [];
-
-      const urlAddresses =
-        contact.contactProfile?.contactCard?.urls
-          ?.filter(url => !!url.selected)
-          .map(({ address }) => ({ label: '', url: address })) ?? [];
-
-      const contactToShow = {
-        ...contact,
-        emails: contact.emails.map(({ label, address }) => ({
-          label,
-          email: address,
-        })),
-        phoneNumbers: contact.phoneNumbers.map(({ label, number }) => ({
-          label,
-          number,
-        })),
-        contactType: 'person' as const,
-        name: `${contact.firstName} ${contact.lastName}`,
-        socialProfiles,
-        urlAddresses,
-        jobTitle: contact.title,
-      };
-
-      if (status === 'granted') {
+      if (status === ContactPermissionStatus.GRANTED && localContacts) {
         const foundContact = await findLocalContact(
           storage,
           contact.phoneNumbers.map(({ number }) => number),
@@ -324,17 +298,10 @@ const ContactsScreenLists = ({
           localContacts,
           contact.contactProfile?.id,
         );
-
         if (foundContact) {
-          await presentFormAsync(foundContact.id, contactToShow, {
-            allowsActions: false,
-            allowsEditing: false,
-          });
-        } else {
-          await presentFormAsync(undefined, contactToShow, {
-            isNew: true,
-          });
+          await displayContactAsync(foundContact?.id);
         }
+        // FIXME open in app contact detail view
       }
     },
     [localContacts],
