@@ -1,5 +1,9 @@
-## 0.9.10-canary.75
+## 0.9.10-canary.76
 
+* **fix:**  - image picker initial display ([#5437](https://github.com/AzzappApp/azzapp/pull/5437))
+* **fix:**  - send notification to the correct target when shareback from app:q ([#5432](https://github.com/AzzappApp/azzapp/pull/5432))
+* **fix:**  - avoid duplicated payments with unique index ([#5436](https://github.com/AzzappApp/azzapp/pull/5436))
+* **fix:**  - improve contacts management (+) ([#5422](https://github.com/AzzappApp/azzapp/pull/5422))
 * **feat:**  - 🎸 add avatar to generated local contact ([#5434](https://github.com/AzzappApp/azzapp/pull/5434))
 * **feat:**  - 🎸 add contact common information ([#5425](https://github.com/AzzappApp/azzapp/pull/5425))
 * **fix:**  - **payment:** [#5390](https://github.com/AzzappApp/azzapp/pull/5390) avoid double payment storage + create payment on … ([#5391](https://github.com/AzzappApp/azzapp/pull/5391))

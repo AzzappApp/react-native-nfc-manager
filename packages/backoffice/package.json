@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/backoffice",
-  "version": "0.9.10-canary.75",
+  "version": "0.9.10-canary.76",
   "private": true,
   "scripts": {
     "lint": "eslint .",
