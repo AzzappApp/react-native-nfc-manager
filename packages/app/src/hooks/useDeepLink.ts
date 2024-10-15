@@ -3,7 +3,7 @@ import { Linking } from 'react-native';
 import { MMKV } from 'react-native-mmkv';
 import { useRouter } from '#components/NativeRouter';
 import { matchUrlWithRoute } from '#helpers/deeplinkHelpers';
-import useAuthState from './useAuthState';
+import { useIsAuthenticated } from './authStateHooks';
 import type { NativeRouter } from '#components/NativeRouter';
 
 export const storage = new MMKV({
@@ -13,7 +13,7 @@ export const storage = new MMKV({
 const ROUTE_KEY = '@azzapp/route';
 
 export const useDeepLink = (router: NativeRouter | null) => {
-  const { authenticated } = useAuthState();
+  const authenticated = useIsAuthenticated();
   const deepLinkHandler = useCallback(
     async (url: string) => {
       const route = await matchUrlWithRoute(url);

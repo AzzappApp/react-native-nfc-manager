@@ -36,7 +36,11 @@ import {
 import ShakeShare from '#components/ShakeShare';
 import Toast from '#components/Toast';
 import { analyticsLogScreenEvent } from '#helpers/analytics';
-import { getAuthState, init as initAuthStore } from '#helpers/authStore';
+import {
+  addAuthStateListener,
+  getAuthState,
+  init as initAuthStore,
+} from '#helpers/authStore';
 import { addGlobalEventListener } from '#helpers/globalEvents';
 import {
   init as initLocaleHelpers,
@@ -54,10 +58,10 @@ import {
   ScreenPrefetcherProvider,
   createScreenPrefetcher,
 } from '#helpers/ScreenPrefetcher';
+import { useIsAuthenticated } from '#hooks/authStateHooks';
 import useApplicationFonts, {
   loadSkiaTypeFonts,
 } from '#hooks/useApplicationFonts';
-import useAuthState from '#hooks/useAuthState';
 import { useDeepLink } from '#hooks/useDeepLink';
 import AboutScreen from '#screens/AboutScreen';
 import AccountDetailsScreen from '#screens/AccountDetailsScreen';
@@ -278,7 +282,7 @@ const AppRouter = () => {
   }, []);
 
   const { router, routerState } = useNativeRouter(initialRoutes);
-  const { authenticated, profileInfos } = useAuthState();
+  const authenticated = useIsAuthenticated();
 
   useEffect(() => {
     const currentRoute = router.getCurrentRoute()?.route;
@@ -292,23 +296,28 @@ const AppRouter = () => {
         router.replaceAll(mainRoutes(false));
       }
     }
-  }, [authenticated, profileInfos, router]);
+  }, [authenticated, router]);
   // #endregion
 
   // #region Sentry Routing Instrumentation
   useEffect(() => {
-    Sentry.setUser({
-      id: profileInfos?.userId,
-      username: profileInfos?.email ?? profileInfos?.phoneNumber ?? undefined,
-      email: profileInfos?.email ?? undefined,
-      phoneNumber: profileInfos?.phoneNumber,
-    });
-    Sentry.setTags({
-      profileId: profileInfos?.profileId,
-      webCardId: profileInfos?.webCardId,
-      profileRole: profileInfos?.profileRole,
-    });
-  }, [profileInfos]);
+    const setSentryUser = async () => {
+      const { profileInfos } = getAuthState();
+      Sentry.setUser({
+        id: profileInfos?.userId,
+        username: profileInfos?.email ?? profileInfos?.phoneNumber ?? undefined,
+        email: profileInfos?.email ?? undefined,
+        phoneNumber: profileInfos?.phoneNumber,
+      });
+      Sentry.setTags({
+        profileId: profileInfos?.profileId,
+        webCardId: profileInfos?.webCardId,
+        profileRole: profileInfos?.profileRole,
+      });
+    };
+    setSentryUser();
+    addAuthStateListener(setSentryUser);
+  }, []);
 
   useEffect(() => {
     const disposable = router.addRouteWillChangeListener(route => {

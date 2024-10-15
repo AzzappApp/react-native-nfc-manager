@@ -21,7 +21,7 @@ import { colors, shadow } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import useAuthState from '#hooks/useAuthState';
+import { useProfileInfos } from '#hooks/authStateHooks';
 import useQuitWebCard from '#hooks/useQuitWebCard';
 import { useSendReport } from '#hooks/useSendReport';
 import ActivityIndicator from '#ui/ActivityIndicator';
@@ -99,7 +99,7 @@ const WebCardMenu = ({
     webCardKey,
   );
   const isFollowing = webCard.WebCardMenu_isFollowing;
-  const { profileInfos } = useAuthState();
+  const profileInfos = useProfileInfos();
 
   const { width: windowsWith, height: windowsHeight } = useWindowDimensions();
   const { top } = useSafeAreaInsets();

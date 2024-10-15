@@ -6,7 +6,7 @@ import { graphql, useFragment } from 'react-relay';
 import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import PostRenderer from '#components/PostList/PostRenderer';
-import useAuthState from '#hooks/useAuthState';
+import { useProfileInfos } from '#hooks/authStateHooks';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { HEADER_HEIGHT } from '#ui/Header';
 import Icon from '#ui/Icon';
@@ -62,7 +62,7 @@ const PostList = ({
   firstItemVideoTime,
   ...props
 }: PostListProps) => {
-  const { profileInfos } = useAuthState();
+  const profileInfos = useProfileInfos();
   const posts = useFragment(
     graphql`
       fragment PostList_posts on Post

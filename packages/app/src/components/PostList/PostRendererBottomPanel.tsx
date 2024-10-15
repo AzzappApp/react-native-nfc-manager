@@ -11,7 +11,7 @@ import { buildPostUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import { relativeDateMinute } from '#helpers/dateHelpers';
-import useAuthState from '#hooks/useAuthState';
+import { useProfileInfos } from '#hooks/authStateHooks';
 import { useSendReport } from '#hooks/useSendReport';
 import useToggleFollow from '#hooks/useToggleFollow';
 import { POST_MAX_CONTENT_LENGTH } from '#screens/PostCreationScreen/PostContentPanel';
@@ -314,7 +314,7 @@ const PostRendererBottomPanel = ({
     updatePost({ allowLikes: !post.allowLikes });
   }, [post.allowLikes, updatePost]);
 
-  const { profileInfos } = useAuthState();
+  const profileInfos = useProfileInfos();
 
   const isViewer = profileInfos?.webCardId === post.webCard.id;
 

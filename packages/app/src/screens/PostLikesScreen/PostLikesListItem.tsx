@@ -5,7 +5,7 @@ import { graphql, useFragment } from 'react-relay';
 import CoverLinkRenderer from '#components/CoverLink/CoverLinkRenderer';
 import Link from '#components/Link';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import useAuthState from '#hooks/useAuthState';
+import { useProfileInfos } from '#hooks/authStateHooks';
 import useToggleFollow from '#hooks/useToggleFollow';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
@@ -16,7 +16,7 @@ type Props = {
 };
 
 const PostLikesListItem = ({ webcard: webcardKey }: Props) => {
-  const { profileInfos } = useAuthState();
+  const profileInfos = useProfileInfos();
   const webCard = useFragment(
     graphql`
       fragment PostLikesListItem_webCard on WebCard

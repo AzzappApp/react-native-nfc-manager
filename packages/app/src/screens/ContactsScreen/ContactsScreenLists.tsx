@@ -15,7 +15,7 @@ import Toast from 'react-native-toast-message';
 import { usePaginationFragment, graphql, useMutation } from 'react-relay';
 import { useOnFocus } from '#components/NativeRouter';
 import { findLocalContact } from '#helpers/contactCardHelpers';
-import useAuthState from '#hooks/useAuthState';
+import { useProfileInfos } from '#hooks/authStateHooks';
 import { storage } from '#hooks/useDeepLink';
 import ContactsScreenSearchByDate from './ContactsScreenSearchByDate';
 import ContactsScreenSearchByName from './ContactsScreenSearchByName';
@@ -38,7 +38,7 @@ const ContactsScreenLists = ({
   const [refreshing, setRefreshing] = useState(false);
   const [localContacts, setLocalContacts] = useState<Contact[]>([]);
   const intl = useIntl();
-  const { profileInfos } = useAuthState();
+  const profileInfos = useProfileInfos();
 
   useEffect(() => {
     const getLocalContacts = async () => {

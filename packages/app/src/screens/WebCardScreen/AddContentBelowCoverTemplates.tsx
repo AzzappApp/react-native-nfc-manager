@@ -4,7 +4,7 @@ import { FlatList, StyleSheet, useWindowDimensions, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import CardTemplate from '#components/CardTemplate';
 import { useRouter } from '#components/NativeRouter';
-import useAuthState from '#hooks/useAuthState';
+import { useProfileInfos } from '#hooks/authStateHooks';
 import useCardTemplates from '#hooks/useCardTemplates';
 import useLoadCardTemplateMutation from '#hooks/useLoadCardTemplateMutation';
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -22,7 +22,7 @@ type Props = {
 };
 
 const AddContentBelowCoverTemplates = ({ isPremium }: Props) => {
-  const { profileInfos } = useAuthState();
+  const profileInfos = useProfileInfos();
   const intl = useIntl();
   const router = useRouter();
 

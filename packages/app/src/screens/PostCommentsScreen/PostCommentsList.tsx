@@ -24,7 +24,7 @@ import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import AuthorCartouche from '#components/AuthorCartouche';
 import { useRouter } from '#components/NativeRouter';
-import useAuthState from '#hooks/useAuthState';
+import { useProfileInfos } from '#hooks/authStateHooks';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Container from '#ui/Container';
 import Input from '#ui/Input';
@@ -75,7 +75,7 @@ const PostCommentsList = ({
 
   const router = useRouter();
   const intl = useIntl();
-  const { profileInfos } = useAuthState();
+  const profileInfos = useProfileInfos();
 
   const { data, loadNext, refetch, hasNext, isLoadingNext } =
     usePaginationFragment(

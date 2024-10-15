@@ -11,7 +11,7 @@ import { graphql, useFragment } from 'react-relay';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import CoverRenderer from '#components/CoverRenderer';
 import { keyExtractor } from '#helpers/idHelpers';
-import useAuthState from '#hooks/useAuthState';
+import { useProfileInfos } from '#hooks/authStateHooks';
 import CarouselSelectList from '#ui/CarouselSelectList';
 import type {
   AddContactModalProfiles_user$data,
@@ -32,7 +32,7 @@ const AddContactModalProfiles = ({
   onSelectProfile,
   nativeGesture,
 }: Props) => {
-  const { profileInfos } = useAuthState();
+  const profileInfos = useProfileInfos();
 
   const { profiles } = useFragment(
     graphql`

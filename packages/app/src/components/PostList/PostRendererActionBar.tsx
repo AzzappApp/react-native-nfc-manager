@@ -10,7 +10,7 @@ import ERRORS from '@azzapp/shared/errors';
 import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import { buildPostUrl } from '@azzapp/shared/urlHelpers';
 import { useRouter } from '#components/NativeRouter';
-import useAuthState from '#hooks/useAuthState';
+import { useProfileInfos } from '#hooks/authStateHooks';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
@@ -94,7 +94,7 @@ const PostRendererActionBar = ({
     setCountReactions(counterReactions);
   }, [counterReactions]);
 
-  const { profileInfos } = useAuthState();
+  const profileInfos = useProfileInfos();
   const debouncedCommit = useDebouncedCallback(
     () => {
       if (!profileInfos) {

@@ -49,8 +49,8 @@ import { logEvent } from '#helpers/analytics';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import relayScreen from '#helpers/relayScreen';
 import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
+import { useProfileInfos } from '#hooks/authStateHooks';
 import useAnimatedState from '#hooks/useAnimatedState';
-import useAuthState from '#hooks/useAuthState';
 import {
   UPDATE_CONTACT_CARD_SCANS,
   useWebCardViewStatistic,
@@ -99,7 +99,7 @@ const WebCardScreen = ({
 
   const prefetchRoute = usePrefetchRoute();
 
-  const { profileInfos } = useAuthState();
+  const profileInfos = useProfileInfos();
   const isViewer = profileInfos?.webCardId === data.webCard?.id;
   const isWebCardOwner = isViewer && profileIsOwner(profileInfos?.profileRole);
   const canEdit = isViewer && profileHasEditorRight(profileInfos?.profileRole);

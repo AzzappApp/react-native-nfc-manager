@@ -20,7 +20,7 @@ import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import { logEvent } from '#helpers/analytics';
 import { getAuthState } from '#helpers/authStore';
 import { createId } from '#helpers/idHelpers';
-import useAuthState from '#hooks/useAuthState';
+import { useIsAuthenticated } from '#hooks/authStateHooks';
 import useScreenInsets from '#hooks/useScreenInsets';
 import BottomMenu from '#ui/BottomMenu';
 import Text from '#ui/Text';
@@ -88,7 +88,7 @@ const MainTabBar = ({
 
   const [, forceUpdate] = useState(0);
 
-  const { authenticated } = useAuthState();
+  const authenticated = useIsAuthenticated();
 
   const visibilityState =
     mainTabBarVisibilityStates.at(-1)?.state ?? authenticated;

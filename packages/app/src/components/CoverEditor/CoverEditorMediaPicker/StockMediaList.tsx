@@ -13,7 +13,7 @@ import { useDebounce } from 'use-debounce';
 import MediaGridList, {
   MediaGridListFallback,
 } from '#components/MediaGridList';
-import useAuthState from '#hooks/useAuthState';
+import { useProfileInfos } from '#hooks/authStateHooks';
 import PressableOpacity from '#ui/PressableOpacity';
 import SearchBarStatic from '#ui/SearchBarStatic';
 import Text from '#ui/Text';
@@ -38,7 +38,7 @@ const StockMediaList = ({
   style,
   ...props
 }: StockMediaListProps) => {
-  const { profileInfos } = useAuthState();
+  const profileInfos = useProfileInfos();
   const [search, setSearch] = useState<string | null>(null);
   const deferredSearch = useDeferredValue(search);
   const [debouncedSearch] = useDebounce(deferredSearch, 300);

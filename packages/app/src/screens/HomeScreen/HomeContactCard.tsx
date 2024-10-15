@@ -13,7 +13,7 @@ import ContactCard, {
 } from '#components/ContactCard/ContactCard';
 import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import useAuthState from '#hooks/useAuthState';
+import { useProfileInfos } from '#hooks/authStateHooks';
 import FingerHint from '#ui/FingerHint';
 import PressableNative from '#ui/PressableNative';
 import { useHomeScreenCurrentIndex } from './HomeScreenContext';
@@ -112,7 +112,7 @@ const ContactCardItem = ({ height, item, index }: ContactCardItemProps) => {
     item,
   );
 
-  const { profileInfos } = useAuthState();
+  const profileInfos = useProfileInfos();
   const router = useRouter();
   const disabled = profileInfos?.profileId !== profile.id;
 

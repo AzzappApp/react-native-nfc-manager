@@ -18,9 +18,13 @@ import {
   useScreenHasFocus,
   type ScreenOptions,
 } from '#components/NativeRouter';
-import useAuthState from '#hooks/useAuthState';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
+import {
+  addAuthStateListener,
+  getAuthState,
+  type ProfileInfos,
+} from './authStore';
 import {
   disposeQueryFor,
   getLoadQueryInfo,
@@ -136,19 +140,26 @@ function relayScreen<TRoute extends Route>(
       route: { params },
     } = props;
 
-    const { profileInfos } = useAuthState();
-
-    const oldProfileInfosRef = useRef(profileInfos);
+    const profileInfosRef = useRef<ProfileInfos | null>(null);
+    useEffect(() => {
+      profileInfosRef.current = profileBound
+        ? getAuthState().profileInfos
+        : null;
+    }, []);
 
     useEffect(() => {
-      if (
-        profileBound &&
-        !isEqual(oldProfileInfosRef.current ?? null, profileInfos ?? null)
-      ) {
-        oldProfileInfosRef.current = profileInfos;
-        disposeQueryFor(screenId);
-      }
-    }, [params, profileInfos, screenId]);
+      addAuthStateListener(() => {
+        const newProfileInfos = profileBound
+          ? getAuthState().profileInfos
+          : null;
+        if (
+          !isEqual(profileInfosRef.current ?? null, newProfileInfos ?? null)
+        ) {
+          disposeQueryFor(screenId);
+          profileInfosRef.current = newProfileInfos;
+        }
+      });
+    }, [params, screenId]);
 
     const { preloadedQuery } = useManagedQuery((props as any).screenId) ?? {};
 
@@ -162,13 +173,11 @@ function relayScreen<TRoute extends Route>(
 
     const environment = useRelayEnvironment();
 
-    const usedProfile = profileBound ? profileInfos : null;
-
     const refreshQuery = useCallback(() => {
       const { query, variables } = getLoadQueryInfo(
         options,
         params,
-        usedProfile,
+        profileInfosRef.current,
       );
       const { useOfflineCache } = options;
       fetchQuery(environment, query, variables, {
@@ -178,7 +187,7 @@ function relayScreen<TRoute extends Route>(
           metadata: { useOfflineCache },
         },
       });
-    }, [environment, params, usedProfile]);
+    }, [environment, params]);
 
     useEffect(() => {
       let currentTimeout: any;
@@ -195,7 +204,7 @@ function relayScreen<TRoute extends Route>(
               const { query, variables } = getLoadQueryInfo(
                 options,
                 params,
-                usedProfile,
+                profileInfosRef.current,
               );
               const { useOfflineCache } = options;
               currentSubscription = fetchQuery(environment, query, variables, {
@@ -236,7 +245,7 @@ function relayScreen<TRoute extends Route>(
         currentSubscription?.unsubscribe();
         clearTimeout(currentTimeout);
       };
-    }, [environment, params, usedProfile, props.hasFocus, screenId]);
+    }, [environment, params, props.hasFocus, screenId]);
 
     const intl = useIntl();
     const router = useRouter();

@@ -28,7 +28,7 @@ import {
 } from 'react-native-reanimated';
 import { graphql, useClientQuery } from 'react-relay';
 import { colors } from '#theme';
-import useAuthState from '#hooks/useAuthState';
+import { useProfileInfos } from '#hooks/authStateHooks';
 import useLatestCallback from '#hooks/useLatestCallback';
 import { get as qrCodeWidth } from '#relayProviders/qrCodeWidth.relayprovider';
 import ActivityIndicator from '#ui/ActivityIndicator';
@@ -38,7 +38,7 @@ import type { ShakeShareScreenQuery } from '#relayArtifacts/ShakeShareScreenQuer
 
 const ShakeShare = () => {
   const [mountScreen, setMountScreen] = useState(false);
-  const { profileInfos } = useAuthState();
+  const profileInfos = useProfileInfos();
 
   const dismount = useCallback(() => {
     setMountScreen(false);
@@ -87,7 +87,7 @@ const { width } = Dimensions.get('window');
 const QR_CODE_WIDTH = Math.round(width * 0.6);
 
 const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
-  const { profileInfos } = useAuthState();
+  const profileInfos = useProfileInfos();
 
   const { node } = useClientQuery<ShakeShareScreenQuery>(
     graphql`

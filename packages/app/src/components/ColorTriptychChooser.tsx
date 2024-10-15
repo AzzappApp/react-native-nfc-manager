@@ -8,7 +8,7 @@ import { colors, shadow } from '#theme';
 import ColorTriptychRenderer from '#components/ColorTriptychRenderer';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { keyExtractor } from '#helpers/idHelpers';
-import useAuthState from '#hooks/useAuthState';
+import { useProfileInfos } from '#hooks/authStateHooks';
 import Icon from '#ui/Icon';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
@@ -34,7 +34,7 @@ const ColorTriptychChooser = ({
   onEditColor,
   onUpdateColorPalette,
 }: ColorTriptychChooserProps) => {
-  const { profileInfos } = useAuthState();
+  const profileInfos = useProfileInfos();
   const { profile } = useLazyLoadQuery<ColorTriptychChooserQuery>(
     graphql`
       query ColorTriptychChooserQuery($profileId: ID!, $skip: Boolean!) {
