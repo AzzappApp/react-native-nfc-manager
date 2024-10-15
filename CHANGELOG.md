@@ -1,5 +1,7 @@
-## 0.9.10-canary.72
+## 0.9.10-canary.73
 
+* **fix:**  - **payment:** [#5390](https://github.com/AzzappApp/azzapp/pull/5390) avoid double payment storage + create payment on … ([#5391](https://github.com/AzzappApp/azzapp/pull/5391))
+* **perf:**  - optimize auth store listener performance ([#5428](https://github.com/AzzappApp/azzapp/pull/5428))
 * **fix:**  - allow post to be editable is owner ([#5427](https://github.com/AzzappApp/azzapp/pull/5427))
 * **feat:**  - 🎸 redesign contact button ([#5417](https://github.com/AzzappApp/azzapp/pull/5417))
 * **fix:**  - ensure value is not undefined
