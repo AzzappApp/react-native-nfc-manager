@@ -1,5 +1,6 @@
-## 0.9.10-canary.73
+## 0.9.10-canary.74
 
+* **feat:**  - 🎸 add contact common information ([#5425](https://github.com/AzzappApp/azzapp/pull/5425))
 * **fix:**  - **payment:** [#5390](https://github.com/AzzappApp/azzapp/pull/5390) avoid double payment storage + create payment on … ([#5391](https://github.com/AzzappApp/azzapp/pull/5391))
 * **perf:**  - optimize auth store listener performance ([#5428](https://github.com/AzzappApp/azzapp/pull/5428))
 * **fix:**  - allow post to be editable is owner ([#5427](https://github.com/AzzappApp/azzapp/pull/5427))
