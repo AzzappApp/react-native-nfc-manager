@@ -1,5 +1,5 @@
 import { style, keyframes } from '@vanilla-extract/css';
-import { convertHexToRGBA } from '#helpers';
+import { convertHexToRGBA } from '@azzapp/shared/colorsHelpers';
 import { vars } from '#app/[userName]/theme.css';
 
 const slideUp = keyframes({

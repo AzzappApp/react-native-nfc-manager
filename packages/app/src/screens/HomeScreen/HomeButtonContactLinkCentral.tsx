@@ -4,9 +4,10 @@ import {
   Circle,
   Group,
   ImageSVG,
+  LinearGradient,
   Paint,
-  Shadow,
   useSVG,
+  vec,
 } from '@shopify/react-native-skia';
 import { FormattedMessage } from 'react-intl';
 import { Pressable, StyleSheet, View } from 'react-native';
@@ -16,7 +17,9 @@ import Animated, {
   withSequence,
   withTiming,
   useAnimatedStyle,
+  useDerivedValue,
 } from 'react-native-reanimated';
+import { convertHexToRGBA } from '@azzapp/shared/colorsHelpers';
 import { colors } from '#theme';
 
 import AnimatedText from '#components/AnimatedText';
@@ -85,19 +88,49 @@ export const HomeButtonContactLinkCentral = ({
     return { color: contactsTextColor.value };
   });
 
+  const gradients = useDerivedValue(() => {
+    if (primaryColor.value.startsWith('rgba')) {
+      const opacity = parseInt(
+        primaryColor.value[primaryColor.value.length - 2],
+        10,
+      );
+
+      return [
+        primaryColor.value,
+        primaryColor.value.replace(`${opacity})`, `${opacity * 0.3})`),
+      ];
+    }
+
+    return [
+      convertHexToRGBA(primaryColor.value, 1),
+      convertHexToRGBA(primaryColor.value, 0.3),
+    ];
+  });
+
   return (
     <View style={containerStyle} pointerEvents="box-none">
-      <Canvas style={styles.circleCanvas}>
+      <Canvas style={[styles.circleCanvas]}>
         <Group>
           <Circle
             r={circleWidth / 2}
             cx={circleWidth / 2}
             cy={circleWidth / 2}
-            color={primaryColor}
+            color="rgba(255,255,255,0.18)"
             opacity={opacityValue}
+          />
+          <Circle
+            r={circleWidth / 2 - 2}
+            cx={circleWidth / 2}
+            cy={circleWidth / 2}
+            style="stroke"
           >
-            <Shadow dx={1} dy={1} blur={2} color="#FFFFFF50" inner />
-            <Shadow dx={-1} dy={-1} blur={2} color="#00000050" inner />
+            <Paint style="stroke" strokeWidth={1}>
+              <LinearGradient
+                start={vec(0, 0)}
+                end={vec(0, circleWidth - 2)}
+                colors={gradients}
+              />
+            </Paint>
           </Circle>
         </Group>
         <Group
