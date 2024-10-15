@@ -1,8 +1,11 @@
+import * as FileSystem from 'expo-file-system';
 import type { ContactsScreenLists_contacts$data } from '#relayArtifacts/ContactsScreenLists_contacts.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { Contact } from 'expo-contacts';
 
-export const buildLocalContact = (contact: ContactType): Contact => {
+export const buildLocalContact = async (
+  contact: ContactType,
+): Promise<Contact> => {
   const commonInformation = contact.contactProfile?.webCard?.commonInformation;
 
   const personal = {
@@ -42,6 +45,14 @@ export const buildLocalContact = (contact: ContactType): Contact => {
       })) ?? [],
   };
 
+  const avatarURI = contact.contactProfile?.avatar?.uri;
+  const avatar = avatarURI
+    ? await FileSystem.downloadAsync(
+        avatarURI,
+        FileSystem.cacheDirectory + 'avatar',
+      )
+    : null;
+
   return {
     ...contact,
     name: `${contact.firstName} ${contact.lastName}`,
@@ -53,6 +64,11 @@ export const buildLocalContact = (contact: ContactType): Contact => {
     phoneNumbers: common.phoneNumbers.concat(personal.phoneNumbers),
     socialProfiles: common.socialProfiles.concat(personal.socialProfiles),
     urlAddresses: common.urlAddresses.concat(personal.urlAddresses),
+    image: avatar
+      ? {
+          uri: avatar.uri,
+        }
+      : undefined,
   };
 };
 

@@ -234,7 +234,7 @@ const ContactsScreenLists = ({
 
   const onInviteContact = useCallback(
     async (contact: ContactType, onHideInvitation: () => void) => {
-      const contactToAdd = buildLocalContact(contact);
+      const contactToAdd = await buildLocalContact(contact);
 
       try {
         let messageToast = '';

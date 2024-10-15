@@ -56,7 +56,7 @@ const ContactSearchByDateSection = ({
 
         await Promise.all(
           data.map(async contact => {
-            const contactToAdd: Contact = buildLocalContact(contact);
+            const contactToAdd: Contact = await buildLocalContact(contact);
 
             const foundContact = await findLocalContact(
               storage,
