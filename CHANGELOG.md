@@ -1,5 +1,6 @@
-## 0.9.10-canary.67
+## 0.9.10-canary.68
 
+* **fix:**  - 🐛 display avatar first
 * **fix:**  - MediaSuggestion placeHolder padding to match update CoverList ([#5399](https://github.com/AzzappApp/azzapp/pull/5399))
 * **fix:**  - remove deviceId from database ([#5405](https://github.com/AzzappApp/azzapp/pull/5405))
 * **fix:**  - **android:** add contact always open even if we edit contact ([#5404](https://github.com/AzzappApp/azzapp/pull/5404))
