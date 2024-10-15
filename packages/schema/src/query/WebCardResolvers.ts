@@ -430,11 +430,14 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
       },
     );
   },
-  nbContacts: async (webCard, _) => {
+  nbContacts: async (webCard, { ownerProfileId }) => {
     if (!(await hasWebCardProfileRight(webCard.id))) {
       return 1;
     }
-    return getContactCountWithWebcardId(webCard.id);
+    const oid = ownerProfileId
+      ? fromGlobalIdWithType(ownerProfileId, 'Profile')
+      : ownerProfileId;
+    return getContactCountWithWebcardId(webCard.id, false, oid);
   },
   contactsOwnerPofiles: async (webCard, { withDeleted }) => {
     if (!(await hasWebCardProfileRight(webCard.id))) {
@@ -442,11 +445,14 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
     }
     return getAllOwnerProfilesByWebcardId(webCard.id, !!withDeleted);
   },
-  nbDeletedContacts: async (webCard, _) => {
+  nbDeletedContacts: async (webCard, { ownerProfileId }) => {
     if (!(await hasWebCardProfileRight(webCard.id))) {
       return 1;
     }
-    return getContactCountWithWebcardId(webCard.id, true);
+    const oid = ownerProfileId
+      ? fromGlobalIdWithType(ownerProfileId, 'Profile')
+      : ownerProfileId;
+    return getContactCountWithWebcardId(webCard.id, true, oid);
   },
   nextChangeUsernameAllowedAt: async webCard => {
     if (!(await hasWebCardProfileRight(webCard.id))) {

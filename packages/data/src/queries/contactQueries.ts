@@ -237,6 +237,7 @@ export const getAllOwnerProfilesByWebcardId = async (
 export const getContactCountWithWebcardId = (
   webcardId: string,
   withDeleted: boolean = false,
+  ownerProfileId?: string | null,
 ): Promise<number> => {
   return db()
     .select({ count: count() })
@@ -245,6 +246,9 @@ export const getContactCountWithWebcardId = (
     .innerJoin(WebCardTable, eq(ProfileTable.webCardId, WebCardTable.id))
     .where(
       and(
+        ownerProfileId
+          ? eq(ContactTable.ownerProfileId, ownerProfileId)
+          : undefined,
         eq(WebCardTable.id, webcardId),
         eq(ContactTable.deleted, withDeleted),
       ),

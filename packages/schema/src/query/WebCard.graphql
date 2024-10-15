@@ -223,7 +223,7 @@ type WebCard implements Node {
   """
   Return number of contact for a given profile
   """
-  nbContacts: Int!
+  nbContacts(ownerProfileId: String): Int!
   """
   Return all distinct owner contact profiles
   """
@@ -236,7 +236,7 @@ type WebCard implements Node {
   """
   Return number of deleted contact for a given profile
   """
-  nbDeletedContacts: Int!
+  nbDeletedContacts(ownerProfileId: String): Int!
 
   """
   The pending change ownership user if exist
