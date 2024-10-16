@@ -97,7 +97,7 @@ const ContactsScreenLists = ({
           after: { type: String }
           first: { type: Int, defaultValue: 12 }
           name: { type: String, defaultValue: "" }
-          orderBy: { type: SearchContactOrderBy, defaultValue: name }
+          orderBy: { type: SearchContactOrderBy, defaultValue: date }
           pixelRatio: {
             type: "Float!"
             provider: "CappedPixelRatio.relayprovider"

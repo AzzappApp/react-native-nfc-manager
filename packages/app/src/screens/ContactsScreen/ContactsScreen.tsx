@@ -50,7 +50,7 @@ const ContactsScreen = ({
 
   const styles = useStyleSheet(stylesheet);
 
-  const [searchBy, setSearchBy] = useState<'date' | 'name'>('name');
+  const [searchBy, setSearchBy] = useState<'date' | 'name'>('date');
   const [search, setSearch] = useState<string | undefined>(undefined);
   const [debounceSearch] = useDebounce(search, 500);
 
