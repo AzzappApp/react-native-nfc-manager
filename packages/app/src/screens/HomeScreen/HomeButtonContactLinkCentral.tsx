@@ -1,5 +1,4 @@
 import {
-  BlendColor,
   Canvas,
   Circle,
   Group,
@@ -16,7 +15,6 @@ import Animated, {
   Easing,
   withSequence,
   withTiming,
-  useAnimatedStyle,
   useDerivedValue,
 } from 'react-native-reanimated';
 import { convertHexToRGBA } from '@azzapp/shared/colorsHelpers';
@@ -30,7 +28,6 @@ import type { SharedValue } from 'react-native-reanimated';
 type HomeButtonContactLinkCentralProps = {
   circleWidth: number;
   primaryColor: SharedValue<string>;
-  contactsTextColor: SharedValue<string>;
   onPress: () => void;
   count: SharedValue<string>;
 };
@@ -42,7 +39,6 @@ export const HomeButtonContactLinkCentral = ({
   primaryColor,
   onPress,
   count,
-  contactsTextColor,
 }: HomeButtonContactLinkCentralProps) => {
   const opacityValue = useSharedValue(1);
 
@@ -83,10 +79,6 @@ export const HomeButtonContactLinkCentral = ({
   ];
 
   const isPlural = useAnimatedTextToPluralValue(count);
-
-  const textColorStyle = useAnimatedStyle(() => {
-    return { color: contactsTextColor.value };
-  });
 
   const gradients = useDerivedValue(() => {
     if (primaryColor.value.startsWith('rgba')) {
@@ -133,14 +125,7 @@ export const HomeButtonContactLinkCentral = ({
             </Paint>
           </Circle>
         </Group>
-        <Group
-          transform={contactCountTransform}
-          layer={
-            <Paint>
-              <BlendColor color={contactsTextColor} mode="srcIn" />
-            </Paint>
-          }
-        >
+        <Group transform={contactCountTransform}>
           <ImageSVG svg={svg} />
         </Group>
       </Canvas>
@@ -150,10 +135,9 @@ export const HomeButtonContactLinkCentral = ({
           text={count}
           appearance="dark"
           style={styles.textAlign}
-          animatedTextColor={contactsTextColor}
         />
 
-        <AnimatedTextComp variant="small" style={[styles.text, textColorStyle]}>
+        <AnimatedTextComp variant="small" style={[styles.text]}>
           <FormattedMessage
             defaultMessage="{isPlural, plural,
                                     =0 {contacts}
