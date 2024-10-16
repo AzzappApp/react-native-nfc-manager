@@ -1,7 +1,8 @@
 import { requestPermissionsAsync } from 'expo-contacts';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Alert, StyleSheet, View } from 'react-native';
+import { Alert, Platform, StyleSheet, View } from 'react-native';
+import { isDefined } from '@azzapp/shared/isDefined';
 import { colors, textStyles } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import { findLocalContact } from '#helpers/contactCardHelpers';
@@ -12,6 +13,7 @@ import ContactAvatar from './ContactAvatar';
 import type { ContactsScreenLists_contacts$data } from '#relayArtifacts/ContactsScreenLists_contacts.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { Contact } from 'expo-contacts';
+import type { AlertButton } from 'react-native';
 import type { MMKV } from 'react-native-mmkv';
 
 type Props = {
@@ -71,53 +73,58 @@ const ContactSearchByNameItem = ({
     onShowContact(contact);
   }, [contact, onShowContact]);
 
+  const buttonsList = useMemo<AlertButton[]>(() => {
+    return [
+      {
+        text: intl.formatMessage({
+          defaultMessage: 'View Contact',
+          description: 'ContactsScreen - More option alert - view',
+        }),
+        onPress: onShow,
+      } as AlertButton,
+      // {
+      //   text: intl.formatMessage({
+      //     defaultMessage: 'Share Contact',
+      //     description: 'ContactsScreen - More option alert - share',
+      //   }),
+      //   onPress: () => {
+      //     // @TODO: how to share without a pre-generated URL?
+      //   },
+      // },
+      showInvite
+        ? ({
+            text: intl.formatMessage({
+              defaultMessage: "Save to my phone's Contact",
+              description: 'ContactsScreen - More option alert - save',
+            }),
+            onPress: onInvite,
+          } as AlertButton)
+        : undefined,
+      {
+        text: intl.formatMessage({
+          defaultMessage: 'Remove contact',
+          description: 'ContactsScreen - More option alert - remove',
+        }),
+        style: 'destructive',
+        onPress: onRemove,
+      } as AlertButton,
+      Platform.OS === 'ios'
+        ? ({
+            text: intl.formatMessage({
+              defaultMessage: 'Cancel',
+              description: 'ContactsScreen - More option alert - cancel',
+            }),
+            style: 'cancel',
+          } as AlertButton)
+        : undefined,
+    ].filter(isDefined);
+  }, [intl, onInvite, onRemove, onShow, showInvite]);
+
   const onMore = useCallback(() => {
-    Alert.alert(
-      `${contact.firstName} ${contact.lastName}`,
-      '',
-      [
-        {
-          text: intl.formatMessage({
-            defaultMessage: 'View Contact',
-            description: 'ContactsScreen - More option alert - view',
-          }),
-          onPress: onShow,
-        },
-        // {
-        //   text: intl.formatMessage({
-        //     defaultMessage: 'Share Contact',
-        //     description: 'ContactsScreen - More option alert - share',
-        //   }),
-        //   onPress: () => {
-        //     // @TODO: how to share without a pre-generated URL?
-        //   },
-        // },
-        {
-          text: intl.formatMessage({
-            defaultMessage: "Save to my phone's Contact",
-            description: 'ContactsScreen - More option alert - save',
-          }),
-          onPress: onInvite,
-        },
-        {
-          text: intl.formatMessage({
-            defaultMessage: 'Remove contact',
-            description: 'ContactsScreen - More option alert - remove',
-          }),
-          style: 'destructive',
-          onPress: onRemove,
-        },
-        {
-          text: intl.formatMessage({
-            defaultMessage: 'Cancel',
-            description: 'ContactsScreen - More option alert - cancel',
-          }),
-          style: 'cancel',
-        },
-      ],
-      { cancelable: true },
-    );
-  }, [contact.firstName, contact.lastName, intl, onInvite, onRemove, onShow]);
+    Alert.alert(`${contact.firstName} ${contact.lastName}`, '', buttonsList, {
+      cancelable: true,
+    });
+  }, [buttonsList, contact.firstName, contact.lastName]);
 
   const avatarSource = useMemo(() => {
     if (contact.contactProfile?.avatar?.uri) {
