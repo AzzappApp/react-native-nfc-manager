@@ -1,12 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import {
-  Alert,
-  Keyboard,
-  RefreshControl,
-  StyleSheet,
-  View,
-} from 'react-native';
+import { Keyboard, RefreshControl, StyleSheet, View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Toast from 'react-native-toast-message';
@@ -152,18 +146,9 @@ const PostCommentsList = ({
 
   const onSubmit = () => {
     if (!profile.webCard?.cardIsPublished) {
-      Alert.alert(
-        intl.formatMessage(
-          {
-            defaultMessage: 'Unpublished WebCard{azzappA}.',
-            description:
-              'PostList - Alert Message title when the user is viewing a post (from deeplinking) with an unpublished WebCard',
-          },
-          {
-            azzappA: <Text variant="azzapp">a</Text>,
-          },
-        ) as string,
-        intl.formatMessage(
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage(
           {
             defaultMessage:
               'Oops, looks like your WebCard{azzappA} is not published. Publish it first!',
@@ -174,16 +159,7 @@ const PostCommentsList = ({
             azzappA: <Text variant="azzapp">a</Text>,
           },
         ) as string,
-        [
-          {
-            text: intl.formatMessage({
-              defaultMessage: 'Ok',
-              description:
-                'PostList - Alert button when the user is viewing a post (from deeplinking) with an unpublished WebCard',
-            }),
-          },
-        ],
-      );
+      });
 
       return;
     }
