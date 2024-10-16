@@ -1,4 +1,4 @@
-## 0.9.10-canary.78
+## 0.9.10-canary.79
 
 * **fix:**  - remove addToContact if already in phone contacts ([#5435](https://github.com/AzzappApp/azzapp/pull/5435))
 * **fix:**  - image picker initial display ([#5437](https://github.com/AzzappApp/azzapp/pull/5437))
