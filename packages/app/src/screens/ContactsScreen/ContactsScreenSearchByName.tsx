@@ -8,7 +8,10 @@ import Text from '#ui/Text';
 import ContactSearchByNameItem from './ContactSearchByNameItem';
 import type { ContactsScreenLists_contacts$data } from '#relayArtifacts/ContactsScreenLists_contacts.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
-import type { Contact } from 'expo-contacts';
+import type {
+  PermissionStatus as ContactPermissionStatus,
+  Contact,
+} from 'expo-contacts';
 import type { SectionListData, SectionListRenderItemInfo } from 'react-native';
 import type { MMKV } from 'react-native-mmkv';
 
@@ -22,6 +25,7 @@ type Props = {
   onShowContact: (contact: ContactType) => void;
   storage: MMKV;
   localContacts: Contact[];
+  contactsPermissionStatus: ContactPermissionStatus;
 };
 
 const ContactsScreenSearchByName = ({
@@ -34,6 +38,7 @@ const ContactsScreenSearchByName = ({
   onShowContact,
   storage,
   localContacts,
+  contactsPermissionStatus,
 }: Props) => {
   const { bottom } = useScreenInsets();
   const styles = useStyleSheet(stylesheet);
@@ -91,10 +96,18 @@ const ContactsScreenSearchByName = ({
           onShowContact={onShowContact}
           storage={storage}
           localContacts={localContacts}
+          contactsPermissionStatus={contactsPermissionStatus}
         />
       );
     },
-    [localContacts, onInviteContact, onRemoveContacts, onShowContact, storage],
+    [
+      contactsPermissionStatus,
+      localContacts,
+      onInviteContact,
+      onRemoveContacts,
+      onShowContact,
+      storage,
+    ],
   );
 
   return (

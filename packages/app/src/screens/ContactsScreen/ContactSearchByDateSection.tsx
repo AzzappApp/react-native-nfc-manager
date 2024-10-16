@@ -1,7 +1,7 @@
 import {
   addContactAsync,
-  requestPermissionsAsync,
   updateContactAsync,
+  PermissionStatus as ContactPermissionStatus,
 } from 'expo-contacts';
 import { useCallback, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -29,6 +29,7 @@ type Props = {
   localContacts: Contact[];
   onInviteContact: (contact: ContactType, onHideInvitation: () => void) => void;
   onShowContact: (contact: ContactType) => void;
+  contactsPermissionStatus: ContactPermissionStatus;
 };
 
 const ContactSearchByDateSection = ({
@@ -39,15 +40,14 @@ const ContactSearchByDateSection = ({
   localContacts,
   onInviteContact,
   onShowContact,
+  contactsPermissionStatus,
 }: Props) => {
   const intl = useIntl();
   const [invited, setInvited] = useState(false);
 
-  const onInvite = async () => {
+  const onInvite = useCallback(async () => {
     try {
-      const { status } = await requestPermissionsAsync();
-
-      if (status === 'granted') {
+      if (contactsPermissionStatus === ContactPermissionStatus.GRANTED) {
         const contactsToCreate: Array<{
           contact: Contact;
           profileId?: string;
@@ -105,7 +105,7 @@ const ContactSearchByDateSection = ({
     } catch (e) {
       console.error(e);
     }
-  };
+  }, [contactsPermissionStatus, data, intl, localContacts, storage]);
 
   const onRemove = () => {
     onRemoveContacts(data.map(({ id }) => id));
@@ -174,10 +174,18 @@ const ContactSearchByDateSection = ({
           storage={storage}
           localContacts={localContacts}
           invited={invited}
+          contactsPermissionStatus={contactsPermissionStatus}
         />
       );
     },
-    [invited, localContacts, onInviteContact, onShowContact, storage],
+    [
+      invited,
+      localContacts,
+      onInviteContact,
+      onShowContact,
+      storage,
+      contactsPermissionStatus,
+    ],
   );
 
   return (

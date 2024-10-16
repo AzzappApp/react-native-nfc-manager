@@ -1,4 +1,3 @@
-import { type Contact } from 'expo-contacts';
 import { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { FlatList, View } from 'react-native';
@@ -8,6 +7,10 @@ import useScreenInsets from '#hooks/useScreenInsets';
 import ContactSearchByDateSection from './ContactSearchByDateSection';
 import type { ContactsScreenLists_contacts$data } from '#relayArtifacts/ContactsScreenLists_contacts.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
+import type {
+  Contact,
+  PermissionStatus as ContactPermissionStatus,
+} from 'expo-contacts';
 import type { ListRenderItemInfo } from 'react-native';
 import type { MMKV } from 'react-native-mmkv';
 
@@ -21,6 +24,7 @@ type Props = {
   onShowContact: (contact: ContactType) => void;
   storage: MMKV;
   localContacts: Contact[];
+  contactsPermissionStatus: ContactPermissionStatus;
 };
 
 const ContactsScreenSearchByDate = ({
@@ -33,6 +37,7 @@ const ContactsScreenSearchByDate = ({
   onShowContact,
   storage,
   localContacts,
+  contactsPermissionStatus,
 }: Props) => {
   const { bottom } = useScreenInsets();
 
@@ -82,10 +87,18 @@ const ContactsScreenSearchByDate = ({
           onShowContact={onShowContact}
           storage={storage}
           title={item.title}
+          contactsPermissionStatus={contactsPermissionStatus}
         />
       );
     },
-    [localContacts, onInviteContact, onRemoveContacts, onShowContact, storage],
+    [
+      contactsPermissionStatus,
+      localContacts,
+      onInviteContact,
+      onRemoveContacts,
+      onShowContact,
+      storage,
+    ],
   );
 
   return (

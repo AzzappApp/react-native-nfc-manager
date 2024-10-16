@@ -1,5 +1,4 @@
 import {
-  requestPermissionsAsync,
   updateContactAsync,
   presentFormAsync,
   addContactAsync,
@@ -8,7 +7,7 @@ import {
 } from 'expo-contacts';
 import { useMemo, useCallback, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Platform, View } from 'react-native';
+import { AppState, Platform, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { usePaginationFragment, graphql, useMutation } from 'react-relay';
 import { useOnFocus } from '#components/NativeRouter';
@@ -17,6 +16,7 @@ import { buildLocalContact } from '#helpers/contactListHelpers';
 import { getLocalContactsMap } from '#helpers/getLocalContactsMap';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import { storage } from '#hooks/useDeepLink';
+import { usePhonebookPermission } from '#hooks/usePhonebookPermission';
 import ContactsScreenSearchByDate from './ContactsScreenSearchByDate';
 import ContactsScreenSearchByName from './ContactsScreenSearchByName';
 import type { ContactsScreenListQuery$data } from '#relayArtifacts/ContactsScreenListQuery.graphql';
@@ -39,14 +39,54 @@ const ContactsScreenLists = ({
   const [localContacts, setLocalContacts] = useState<Contact[]>();
   const intl = useIntl();
   const profileInfos = useProfileInfos();
+  const [contactsPermissionStatus, setContactsPermissionStatus] = useState(
+    ContactPermissionStatus.UNDETERMINED,
+  );
 
+  const { requestPhonebookPermissionAndRedirectToSettingsAsync } =
+    usePhonebookPermission();
+
+  // will setup the permission for this screen at first opening
+  useEffect(() => {
+    if (contactsPermissionStatus === ContactPermissionStatus.UNDETERMINED) {
+      const updatePermission = async () => {
+        const { status } =
+          await requestPhonebookPermissionAndRedirectToSettingsAsync();
+        setContactsPermissionStatus(status);
+      };
+      updatePermission();
+    }
+  }, [
+    contactsPermissionStatus,
+    requestPhonebookPermissionAndRedirectToSettingsAsync,
+  ]);
+
+  // refresh loca contact map
   const refreshLocalContacts = useCallback(async () => {
-    setLocalContacts(await getLocalContactsMap());
-  }, []);
+    if (contactsPermissionStatus === ContactPermissionStatus.GRANTED) {
+      setLocalContacts(await getLocalContactsMap());
+    } else if (contactsPermissionStatus === ContactPermissionStatus.DENIED) {
+      setLocalContacts([]);
+    } // else wait for permission update
+  }, [contactsPermissionStatus]);
 
   useEffect(() => {
     refreshLocalContacts();
   }, [refreshLocalContacts]);
+
+  // ensure we refresh contacts oon resume
+  useEffect(() => {
+    if (contactsPermissionStatus === ContactPermissionStatus.GRANTED) {
+      const subscription = AppState.addEventListener('change', state => {
+        if (state === 'active') {
+          refreshLocalContacts();
+        }
+      });
+      return () => {
+        subscription.remove();
+      };
+    }
+  }, [contactsPermissionStatus, refreshLocalContacts]);
 
   const { data, loadNext, hasNext, isLoadingNext, refetch } =
     usePaginationFragment(
@@ -242,8 +282,10 @@ const ContactsScreenLists = ({
 
       try {
         let messageToast = '';
-        const { status } = await requestPermissionsAsync();
-        if (status === ContactPermissionStatus.GRANTED && localContacts) {
+        if (
+          contactsPermissionStatus === ContactPermissionStatus.GRANTED &&
+          localContacts
+        ) {
           const foundContact = await findLocalContact(
             storage,
             contact.phoneNumbers.map(({ number }) => number),
@@ -290,13 +332,15 @@ const ContactsScreenLists = ({
         console.error(e);
       }
     },
-    [intl, localContacts],
+    [contactsPermissionStatus, intl, localContacts],
   );
 
   const onShowContact = useCallback(
     async (contact: ContactType) => {
-      const { status } = await requestPermissionsAsync();
-      if (status === ContactPermissionStatus.GRANTED && localContacts) {
+      if (
+        contactsPermissionStatus === ContactPermissionStatus.GRANTED &&
+        localContacts
+      ) {
         const foundContact = await findLocalContact(
           storage,
           contact.phoneNumbers.map(({ number }) => number),
@@ -310,13 +354,17 @@ const ContactsScreenLists = ({
         // FIXME open in app contact detail view
       }
     },
-    [localContacts],
+    [contactsPermissionStatus, localContacts],
   );
 
-  if (localContacts === undefined) {
+  if (
+    localContacts === undefined ||
+    contactsPermissionStatus === ContactPermissionStatus.UNDETERMINED
+  ) {
     // no need to render before locaContacts is queried
     return undefined;
   }
+
   return (
     <View
       style={{
@@ -335,6 +383,7 @@ const ContactsScreenLists = ({
           onShowContact={onShowContact}
           storage={storage}
           localContacts={localContacts}
+          contactsPermissionStatus={contactsPermissionStatus}
         />
       )}
       {profile && searchBy === 'date' && (
@@ -348,6 +397,7 @@ const ContactsScreenLists = ({
           onShowContact={onShowContact}
           storage={storage}
           localContacts={localContacts}
+          contactsPermissionStatus={contactsPermissionStatus}
         />
       )}
     </View>

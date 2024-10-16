@@ -1,4 +1,4 @@
-import { requestPermissionsAsync } from 'expo-contacts';
+import { PermissionStatus as ContactPermissionStatus } from 'expo-contacts';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { colors } from '#theme';
@@ -19,6 +19,7 @@ type Props = {
   onShowContact: (contact: ContactType) => void;
   localContacts: Contact[];
   invited: boolean;
+  contactsPermissionStatus: ContactPermissionStatus;
 };
 
 const ContactSearchByDateItem = ({
@@ -28,14 +29,13 @@ const ContactSearchByDateItem = ({
   onShowContact,
   localContacts,
   invited,
+  contactsPermissionStatus,
 }: Props) => {
   const [showInvite, setShowInvite] = useState(false);
 
   useEffect(() => {
     const verifyInvitation = async () => {
-      const { status } = await requestPermissionsAsync();
-
-      if (status === 'granted') {
+      if (contactsPermissionStatus === ContactPermissionStatus.GRANTED) {
         const foundContact = await findLocalContact(
           storage,
           contact.phoneNumbers.map(({ number }) => number),
@@ -49,6 +49,7 @@ const ContactSearchByDateItem = ({
 
     verifyInvitation();
   }, [
+    contactsPermissionStatus,
     contact.contactProfile,
     contact.emails,
     contact.phoneNumbers,
