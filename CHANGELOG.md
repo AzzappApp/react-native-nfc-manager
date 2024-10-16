@@ -1,5 +1,6 @@
-## 0.9.10-canary.81
+## 0.9.10-canary.82
 
+* **perf:**  - use direct hostname on fra1 ([#5451](https://github.com/AzzappApp/azzapp/pull/5451))
 * **fix:**  - **contact:** [#5439](https://github.com/AzzappApp/azzapp/pull/5439) remove contact icon ([#5449](https://github.com/AzzappApp/azzapp/pull/5449))
 * **fix:**  - ensure phone contacts are refreshed after app become active ([#5443](https://github.com/AzzappApp/azzapp/pull/5443))
 * **fix:**  - remove color handling in central button ([#5445](https://github.com/AzzappApp/azzapp/pull/5445))
