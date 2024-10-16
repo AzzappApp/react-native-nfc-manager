@@ -2,10 +2,8 @@ import {
   Canvas,
   Circle,
   Group,
-  ImageSVG,
   LinearGradient,
   Paint,
-  useSVG,
   vec,
 } from '@shopify/react-native-skia';
 import { FormattedMessage } from 'react-intl';
@@ -56,25 +54,12 @@ export const HomeButtonContactLinkCentral = ({
       }),
     );
   };
-  const svg = useSVG(require('#assets/home-contact.svg'));
-
-  const contactCountTransform = [
-    { translateY: circleWidth / 2 - (svg?.height() || 0) / 2 - 23 },
-    { translateX: circleWidth / 2 - (svg?.width() || 0) / 2 },
-  ];
 
   const containerStyle = [
     styles.container,
     {
       width: circleWidth,
       height: circleWidth,
-    },
-  ];
-
-  const textStyle = [
-    styles.textStyle,
-    {
-      top: 0.37 * circleWidth,
     },
   ];
 
@@ -125,11 +110,8 @@ export const HomeButtonContactLinkCentral = ({
             </Paint>
           </Circle>
         </Group>
-        <Group transform={contactCountTransform}>
-          <ImageSVG svg={svg} />
-        </Group>
       </Canvas>
-      <View style={textStyle}>
+      <View style={styles.textStyle}>
         <AnimatedText
           variant="xlarge"
           text={count}
@@ -174,7 +156,9 @@ const styles = StyleSheet.create({
   textStyle: {
     position: 'absolute',
     width: '100%',
-    rowGap: 5,
+    height: '100%',
+    justifyContent: 'center',
+    rowGap: 6,
   },
   text: {
     color: colors.white,
