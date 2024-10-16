@@ -1,4 +1,4 @@
-## 0.9.10-canary.82
+## 0.9.10-canary.83
 
 * **perf:**  - use direct hostname on fra1 ([#5451](https://github.com/AzzappApp/azzapp/pull/5451))
 * **fix:**  - **contact:** [#5439](https://github.com/AzzappApp/azzapp/pull/5439) remove contact icon ([#5449](https://github.com/AzzappApp/azzapp/pull/5449))
