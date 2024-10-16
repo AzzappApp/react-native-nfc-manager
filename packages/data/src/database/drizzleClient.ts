@@ -51,9 +51,13 @@ const databaseFetch = async (
 };
 
 export const createDrizzleClient = () => {
+  const currentRegion = process.env.VERCEL_REGION;
+  //to avoid latency
+  const isFra1 = currentRegion === 'fra1';
+
   // create the connection
   const connection = new Client({
-    host: process.env.DATABASE_HOST,
+    host: isFra1 ? 'eu-central.connect.psdb.cloud' : process.env.DATABASE_HOST,
     username: process.env.DATABASE_USERNAME,
     password: process.env.DATABASE_PASSWORD,
     fetch: databaseFetch,
@@ -63,7 +67,7 @@ export const createDrizzleClient = () => {
   const replicaHost = process.env.REPLICA_DATABASE_HOST;
   const replicaUsername = process.env.REPLICA_DATABASE_USERNAME;
   const replicaPassword = process.env.REPLICA_DATABASE_PASSWORD;
-  if (replicaHost && replicaUsername && replicaPassword) {
+  if (!isFra1 && replicaHost && replicaUsername && replicaPassword) {
     replica = new Client({
       host: replicaHost,
       username: replicaUsername,
