@@ -1,5 +1,7 @@
-## 0.9.10-canary.83
+## 0.9.10-canary.84
 
+* **fix:**  - **contacts:** [#5420](https://github.com/AzzappApp/azzapp/pull/5420) set date by default ([#5453](https://github.com/AzzappApp/azzapp/pull/5453))
+* **fix:**  - **post:** [#5442](https://github.com/AzzappApp/azzapp/pull/5442) can’t use `Text` in Alert ([#5447](https://github.com/AzzappApp/azzapp/pull/5447))
 * **perf:**  - use direct hostname on fra1 ([#5451](https://github.com/AzzappApp/azzapp/pull/5451))
 * **fix:**  - **contact:** [#5439](https://github.com/AzzappApp/azzapp/pull/5439) remove contact icon ([#5449](https://github.com/AzzappApp/azzapp/pull/5449))
 * **fix:**  - ensure phone contacts are refreshed after app become active ([#5443](https://github.com/AzzappApp/azzapp/pull/5443))
