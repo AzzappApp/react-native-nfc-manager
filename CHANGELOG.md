@@ -1,5 +1,6 @@
-## 0.9.10-canary.77
+## 0.9.10-canary.78
 
+* **fix:**  - remove addToContact if already in phone contacts ([#5435](https://github.com/AzzappApp/azzapp/pull/5435))
 * **fix:**  - image picker initial display ([#5437](https://github.com/AzzappApp/azzapp/pull/5437))
 * **fix:**  - send notification to the correct target when shareback from app:q ([#5432](https://github.com/AzzappApp/azzapp/pull/5432))
 * **fix:**  - avoid duplicated payments with unique index ([#5436](https://github.com/AzzappApp/azzapp/pull/5436))
