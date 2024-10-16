@@ -1,5 +1,7 @@
-## 0.9.10-canary.79
+## 0.9.10-canary.80
 
+* **fix:**  - ensure phone contacts are refreshed after app become active ([#5443](https://github.com/AzzappApp/azzapp/pull/5443))
+* **fix:**  - remove color handling in central button ([#5445](https://github.com/AzzappApp/azzapp/pull/5445))
 * **fix:**  - remove addToContact if already in phone contacts ([#5435](https://github.com/AzzappApp/azzapp/pull/5435))
 * **fix:**  - image picker initial display ([#5437](https://github.com/AzzappApp/azzapp/pull/5437))
 * **fix:**  - send notification to the correct target when shareback from app:q ([#5432](https://github.com/AzzappApp/azzapp/pull/5432))
