@@ -1,5 +1,8 @@
-## 0.9.10-canary.84
+## 0.9.10-canary.85
 
+* **fix:**  - open notification in android app ([#5454](https://github.com/AzzappApp/azzapp/pull/5454))
+* **fix:**  - 🐛 properly show forms on top of keyboard ([#5461](https://github.com/AzzappApp/azzapp/pull/5461))
+* **fix:**  - update contact without popup request on android ([#5455](https://github.com/AzzappApp/azzapp/pull/5455))
 * **fix:**  - **contacts:** [#5420](https://github.com/AzzappApp/azzapp/pull/5420) set date by default ([#5453](https://github.com/AzzappApp/azzapp/pull/5453))
 * **fix:**  - **post:** [#5442](https://github.com/AzzappApp/azzapp/pull/5442) can’t use `Text` in Alert ([#5447](https://github.com/AzzappApp/azzapp/pull/5447))
 * **perf:**  - use direct hostname on fra1 ([#5451](https://github.com/AzzappApp/azzapp/pull/5451))
