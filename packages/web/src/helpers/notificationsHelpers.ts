@@ -68,21 +68,21 @@ export const sendPushNotification = async (
             aps: {
               sound,
               'mutable-content': 1,
-              // category: 'NEW_MESSAGE_CATEGORY', // You can define a category for custom actions, to define later
             },
-            deep_link: deepLink, // Add deep link for iOS
+            deep_link: deepLink,
           },
           fcm_options: {
-            image: imageUrl, // Add image for iOS
+            image: imageUrl,
           },
         };
       } else if (fcm.deviceOS === 'android') {
         message.android = {
           notification: {
             sound,
-            click_action: deepLink,
             image: imageUrl,
-            channel_id: 'azzapp_default__channel',
+          },
+          data: {
+            deepLink,
           },
         };
       }
