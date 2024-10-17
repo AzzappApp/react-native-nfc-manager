@@ -1,4 +1,4 @@
-## 0.9.10-canary.87
+## 0.9.10-canary.88
 
 * **fix:**  - **contact:** missing imports
 * **feat:**  - 🎸 create contact detail modal ([#5457](https://github.com/AzzappApp/azzapp/pull/5457))
