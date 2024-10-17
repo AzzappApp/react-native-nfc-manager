@@ -1,5 +1,5 @@
 import { Image } from 'expo-image';
-import { forwardRef, useMemo } from 'react';
+import { useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Linking, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
