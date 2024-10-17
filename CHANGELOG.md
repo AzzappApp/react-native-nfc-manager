@@ -1,5 +1,6 @@
-## 0.9.10-canary.85
+## 0.9.10-canary.86
 
+* **fix:**  - move urls and socials on contact + debug shareback url ([#5467](https://github.com/AzzappApp/azzapp/pull/5467))
 * **fix:**  - open notification in android app ([#5454](https://github.com/AzzappApp/azzapp/pull/5454))
 * **fix:**  - 🐛 properly show forms on top of keyboard ([#5461](https://github.com/AzzappApp/azzapp/pull/5461))
 * **fix:**  - update contact without popup request on android ([#5455](https://github.com/AzzappApp/azzapp/pull/5455))
