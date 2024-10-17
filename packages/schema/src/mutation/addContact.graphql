@@ -14,6 +14,17 @@ input AddContactInput {
   addresses: [AddContactAddressInput!]!
   deviceId: String
   withShareBack: Boolean!
+  socials: [AddContactSocial!]
+  urls: [AddContactUrl!]
+}
+
+input AddContactSocial {
+  url: String!
+  label: String!
+}
+
+input AddContactUrl {
+  url: String!
 }
 
 input AddContactPhoneNumberInput {

@@ -15,7 +15,7 @@ import { sendPushNotification } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
 import { profileLoader, userLoader } from '#loaders';
 import type { MutationResolvers } from '#__generated__/types';
-import type { Contact } from '@azzapp/data';
+import type { Contact, ContactRow } from '@azzapp/data';
 
 const addContact: MutationResolvers['addContact'] = async (
   _,
@@ -51,6 +51,8 @@ const addContact: MutationResolvers['addContact'] = async (
     lastName: input.lastname,
     title: input.title,
     deleted: false,
+    urls: input.urls || null,
+    socials: input.socials || null,
   };
 
   let contact: Contact;
@@ -99,7 +101,16 @@ const addContact: MutationResolvers['addContact'] = async (
       ? new Date(profile.contactCard.birthday.birthday)
       : null;
 
-    const shareBackToCreate = {
+    const urls = profile.contactCard?.urls?.map(url => ({
+      url: url.address,
+    }));
+
+    const socials = profile.contactCard?.socials?.map(social => ({
+      label: social.label,
+      url: social.url,
+    }));
+
+    const shareBackToCreate: ContactRow = {
       ownerProfileId: input.profileId,
       contactProfileId: profileId,
       createdAt: new Date(),
@@ -113,6 +124,8 @@ const addContact: MutationResolvers['addContact'] = async (
       lastName: profile.contactCard?.lastName ?? undefined,
       title: profile.contactCard?.title ?? undefined,
       deleted: false,
+      urls,
+      socials,
     };
 
     const existingShareBack = await getContactByProfiles({

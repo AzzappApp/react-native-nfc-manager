@@ -109,51 +109,65 @@ const AddContactModal = ({
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
 
-  const getContactInput = useCallback(
-    (deviceId?: string) => {
-      if (!scanned || !viewer) return;
+  const getContactInput = useCallback(() => {
+    if (!scanned || !viewer) return;
 
-      const addresses = scanned.contact.addresses?.map(({ label, street }) => ({
+    const addresses = scanned.contact.addresses?.map(({ label, street }) => ({
+      label,
+      address: street ?? '',
+    }));
+
+    const emails = scanned.contact.emails?.map(({ label, email }) => ({
+      label,
+      address: email ?? '',
+    }));
+
+    const phoneNumbers = scanned.contact.phoneNumbers
+      ?.map(({ label, number }) => ({
         label,
-        address: street ?? '',
-      }));
+        number,
+      }))
+      .filter(({ number }) => !!number) as Array<{
+      label: string;
+      number: string;
+    }>;
 
-      const emails = scanned.contact.emails?.map(({ label, email }) => ({
-        label,
-        address: email ?? '',
-      }));
+    const socials = additionalContactData?.socials?.map(({ label, url }) => ({
+      label,
+      url,
+    }));
 
-      const phoneNumbers = scanned.contact.phoneNumbers
-        ?.map(({ label, number }) => ({
-          label,
-          number,
-        }))
-        .filter(({ number }) => !!number) as Array<{
-        label: string;
-        number: string;
-      }>;
-      return {
-        addresses: addresses ?? [],
-        company: scanned.contact.company ?? '',
-        emails: emails ?? [],
-        firstname: scanned.contact.firstName ?? '',
-        lastname: scanned.contact.lastName ?? '',
-        phoneNumbers: phoneNumbers ?? [],
-        profileId: scanned.profileId ?? '',
-        title: scanned.contact.jobTitle ?? '',
-        withShareBack: withShareBack === 'checked',
-        birthday: scanned.contact.birthday
-          ? new Date(
-              scanned.contact.birthday.year!,
-              scanned.contact.birthday.month!,
-              scanned.contact.birthday.day!,
-            )
-          : null,
-        deviceId,
-      };
-    },
-    [scanned, viewer, withShareBack],
-  );
+    const urls = additionalContactData?.urls?.map(url => {
+      return { url: url.address };
+    });
+
+    return {
+      addresses: addresses ?? [],
+      company: scanned.contact.company ?? '',
+      emails: emails ?? [],
+      firstname: scanned.contact.firstName ?? '',
+      lastname: scanned.contact.lastName ?? '',
+      phoneNumbers: phoneNumbers ?? [],
+      profileId: scanned.profileId ?? '',
+      title: scanned.contact.jobTitle ?? '',
+      withShareBack: withShareBack === 'checked',
+      birthday: scanned.contact.birthday
+        ? new Date(
+            scanned.contact.birthday.year!,
+            scanned.contact.birthday.month!,
+            scanned.contact.birthday.day!,
+          )
+        : null,
+      urls,
+      socials,
+    };
+  }, [
+    additionalContactData?.socials,
+    additionalContactData?.urls,
+    scanned,
+    viewer,
+    withShareBack,
+  ]);
 
   const onRequestAddContactToPhonebook = useCallback(async () => {
     if (!scanned) return;
@@ -231,6 +245,8 @@ const AddContactModal = ({
                 if (foundContact && foundContact.id) {
                   const updatedContact = {
                     ...scanned.contact,
+                    urls: additionalContactData?.urls,
+                    socials: additionalContactData?.socials,
                     id: foundContact.id,
                   };
                   await updateContactAsync(updatedContact);
@@ -240,7 +256,12 @@ const AddContactModal = ({
                       'Toast message when a contact is updated successfully',
                   });
                 } else {
-                  const resultId = await addContactAsync(scanned.contact);
+                  const newContact = {
+                    ...scanned.contact,
+                    urls: additionalContactData?.urls,
+                    socials: additionalContactData?.socials,
+                  };
+                  const resultId = await addContactAsync(newContact);
 
                   if (scanned.profileId) {
                     storage.set(scanned.profileId, resultId);
@@ -291,6 +312,8 @@ const AddContactModal = ({
     requestPhonebookPermissionAsync,
     intl,
     requestPhonebookPermissionAndRedirectToSettingsAsync,
+    additionalContactData?.urls,
+    additionalContactData?.socials,
   ]);
 
   const onAddContactToAzzapp = useCallback(() => {

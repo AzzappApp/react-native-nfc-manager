@@ -129,6 +129,13 @@ const ContactsScreenLists = ({
                   address
                   label
                 }
+                socials {
+                  label
+                  url
+                }
+                urls {
+                  url
+                }
                 contactProfile {
                   id
                   avatar {
@@ -277,8 +284,7 @@ const ContactsScreenLists = ({
 
   const onInviteContact = useCallback(
     async (contact: ContactType, onHideInvitation: () => void) => {
-      const contactToAdd = await buildLocalContact(contact);
-
+      const contactToAdd: Contact = await buildLocalContact(contact);
       try {
         let messageToast = '';
         if (

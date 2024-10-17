@@ -1017,6 +1017,10 @@ export const ContactTable = cols.table(
       .notNull(),
     deleted: cols.boolean('deleted').default(false).notNull(),
     deletedAt: cols.dateTime('deletedAt'),
+    urls: cols.json('urls').$type<Array<{ url: string }>>(),
+    socials: cols
+      .json('socials')
+      .$type<Array<{ url: string; label: string }>>(),
   },
   table => {
     return {

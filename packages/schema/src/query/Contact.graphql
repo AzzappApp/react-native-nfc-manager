@@ -16,7 +16,18 @@ type Contact {
   emails: [ContactEmail!]!
   addresses: [ContactAddress!]!
   webCard: WebCard
+  socials: [ContactSocial!]
+  urls: [ContactUrl!]
   deleted: Boolean
+}
+
+type ContactUrl {
+  url: String!
+}
+
+type ContactSocial {
+  url: String!
+  label: String!
 }
 
 type ContactPhoneNumber {

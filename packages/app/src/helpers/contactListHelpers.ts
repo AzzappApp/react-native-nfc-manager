@@ -9,7 +9,12 @@ export const buildLocalContact = async (
   const commonInformation = contact.contactProfile?.webCard?.commonInformation;
 
   const personal = {
-    addresses: [...contact.addresses],
+    addresses: contact.addresses.map(address => ({
+      label: address.label,
+      // note we need to duplicate this field of ios / android comaptibility with expo-contacts
+      street: address.address,
+      address: address.address,
+    })),
     emails: contact.emails.map(({ label, address }) => ({
       label,
       email: address,
@@ -19,13 +24,8 @@ export const buildLocalContact = async (
       number,
     })),
     socialProfiles:
-      contact.contactProfile?.contactCard?.socials
-        ?.filter(social => !!social.selected)
-        .map(({ label, url }) => ({ label, url })) ?? [],
-    urlAddresses:
-      contact.contactProfile?.contactCard?.urls
-        ?.filter(url => !!url.selected)
-        .map(({ address }) => ({ label: '', url: address })) ?? [],
+      contact.socials?.map(({ label, url }) => ({ label, url })) ?? [],
+    urlAddresses: contact?.urls?.map(({ url }) => ({ label: '', url })) ?? [],
   };
 
   const common = {
