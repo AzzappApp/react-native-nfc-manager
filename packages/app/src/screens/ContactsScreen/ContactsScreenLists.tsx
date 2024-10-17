@@ -3,10 +3,11 @@ import {
   addContactAsync,
   PermissionStatus as ContactPermissionStatus,
   displayContactAsync,
+  presentFormAsync,
 } from 'expo-contacts';
 import { useMemo, useCallback, useEffect, useState, useRef } from 'react';
 import { useIntl } from 'react-intl';
-import { AppState, View } from 'react-native';
+import { AppState, View, Platform } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { usePaginationFragment, graphql, useMutation } from 'react-relay';
 import { useOnFocus } from '#components/NativeRouter';
