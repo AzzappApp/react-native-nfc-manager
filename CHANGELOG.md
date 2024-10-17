@@ -1,5 +1,9 @@
-## 0.9.10-canary.88
+## 0.9.10-canary.89
 
+* **fix:**  - **payment:** [#5462](https://github.com/AzzappApp/azzapp/pull/5462) generate invoice for first payment ([#5463](https://github.com/AzzappApp/azzapp/pull/5463))
+* **fix:**  - **payment:** [#5472](https://github.com/AzzappApp/azzapp/pull/5472) wrong interval calculation ([#5473](https://github.com/AzzappApp/azzapp/pull/5473))
+* **fix:**  - **webCard:** [#5466](https://github.com/AzzappApp/azzapp/pull/5466) no need to send invite for owner ([#5468](https://github.com/AzzappApp/azzapp/pull/5468))
+* **feat:**  - add renew subscription mutation ([#5464](https://github.com/AzzappApp/azzapp/pull/5464))
 * **fix:**  - **contact:** missing imports
 * **feat:**  - 🎸 create contact detail modal ([#5457](https://github.com/AzzappApp/azzapp/pull/5457))
 * **fix:**  - move urls and socials on contact + debug shareback url ([#5467](https://github.com/AzzappApp/azzapp/pull/5467))
