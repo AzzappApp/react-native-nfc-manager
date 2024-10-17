@@ -231,4 +231,4 @@ export type ContactDetails = Contact & {
   profileId?: string;
 };
 
-export default forwardRef(ContactDetailsBody);
+export default ContactDetailsBody;

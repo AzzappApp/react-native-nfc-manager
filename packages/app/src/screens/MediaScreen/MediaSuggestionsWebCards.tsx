@@ -311,5 +311,5 @@ const styleSheet = createStyleSheet(appearance => ({
     height: ACTION_BUTTON_HEIGHT, //fix on android
   },
   followButton: {},
-  suggestionContainer: { flexDirection: 'row', paddingLeft: 10 },
+  suggestionContainer: { flexDirection: 'row', paddingLeft: 10, gap: 10 },
 }));

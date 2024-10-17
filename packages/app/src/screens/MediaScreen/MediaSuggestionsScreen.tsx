@@ -176,7 +176,7 @@ const PostSuggestionTitle = () => (
 export default MediaSuggestionsScreen;
 
 export const MediaSuggestionsScreenFallback = () => (
-  <View>
+  <View style={{ flex: 1 }}>
     <CoverSuggestionTitle />
     <MediaSuggestionWebCardFallback />
     <PostSuggestionTitle />
