@@ -68,8 +68,10 @@ const AddContactModal = ({
   const scrollerGesture = Gesture.Native();
   const checkBoxGesture = Gesture.Native();
 
-  const { requestPhonebookPermissionAndRedirectToSettingsAsync } =
-    usePhonebookPermission();
+  const {
+    requestPhonebookPermissionAndRedirectToSettingsAsync,
+    requestPhonebookPermissionAsync,
+  } = usePhonebookPermission();
   const nativeGestureItems = [checkBoxGesture, scrollerGesture];
 
   const webCard = useFragment(
@@ -153,8 +155,27 @@ const AddContactModal = ({
     [scanned, viewer, withShareBack],
   );
 
-  const onRequestAddContactToPhonebook = useCallback(() => {
+  const onRequestAddContactToPhonebook = useCallback(async () => {
     if (!scanned) return;
+
+    const findContact = async () => {
+      const localContacts = await getLocalContactsMap();
+      const phoneNumbers =
+        scanned.contact.phoneNumbers
+          ?.map(({ number }) => number)
+          .filter(isDefined) || [];
+      const emails =
+        scanned.contact.emails?.map(({ email }) => email).filter(isDefined) ||
+        [];
+
+      return findLocalContact(
+        storage,
+        phoneNumbers,
+        emails,
+        localContacts,
+        scanned.profileId,
+      );
+    };
 
     const name = `${
       `${scanned.contact.firstName ?? ''}  ${scanned.contact.lastName ?? ''}`.trim() ||
@@ -162,16 +183,29 @@ const AddContactModal = ({
       webCard.userName
     }`;
 
+    let foundContact: Contact | undefined = undefined;
+    const { status } = await requestPhonebookPermissionAsync();
+    if (status === ContactPermissionStatus.GRANTED) {
+      foundContact = await findContact();
+    }
+
+    const addOrUpdateText = foundContact
+      ? intl.formatMessage({
+          defaultMessage: 'Update',
+          description:
+            'confirmation button displayed to update an existing contact on phone',
+        })
+      : intl.formatMessage({
+          defaultMessage: 'Add',
+          description:
+            'confirmation button displayed to add an new contact on phone',
+        });
+
     Alert.alert(
-      intl.formatMessage(
-        {
-          defaultMessage: 'Add {name} to contacts?',
-          description: 'Alert title when adding a profile to contacts',
-        },
-        {
-          name,
-        },
-      ),
+      intl.formatMessage({
+        defaultMessage: 'Add to Phone contact',
+        description: 'Alert title when adding a profile to contacts',
+      }),
       intl.formatMessage(
         {
           defaultMessage: 'Add {name} to the contacts list of your phone',
@@ -183,7 +217,7 @@ const AddContactModal = ({
       ),
       [
         {
-          text: 'OK',
+          text: addOrUpdateText,
           onPress: async () => {
             try {
               let messageToast = '';
@@ -191,33 +225,15 @@ const AddContactModal = ({
               const { status } =
                 await requestPhonebookPermissionAndRedirectToSettingsAsync();
               if (status === ContactPermissionStatus.GRANTED) {
-                const localContacts = await getLocalContactsMap();
-                const phoneNumbers =
-                  scanned.contact.phoneNumbers
-                    ?.map(({ number }) => number)
-                    .filter(isDefined) || [];
-                const emails =
-                  scanned.contact.emails
-                    ?.map(({ email }) => email)
-                    .filter(isDefined) || [];
-
-                const foundContact = await findLocalContact(
-                  storage,
-                  phoneNumbers,
-                  emails,
-                  localContacts,
-                  scanned.profileId,
-                );
-
+                if (!foundContact) {
+                  foundContact = await findContact();
+                }
                 if (foundContact && foundContact.id) {
-                  if (Platform.OS === 'ios') {
-                    await updateContactAsync({
-                      ...scanned.contact,
-                      id: foundContact.id,
-                    });
-                  } else {
-                    await presentFormAsync(foundContact.id, scanned.contact);
-                  }
+                  const updatedContact = {
+                    ...scanned.contact,
+                    id: foundContact.id,
+                  };
+                  await updateContactAsync(updatedContact);
                   messageToast = intl.formatMessage({
                     defaultMessage: 'The contact was updated successfully.',
                     description:
@@ -225,6 +241,7 @@ const AddContactModal = ({
                   });
                 } else {
                   const resultId = await addContactAsync(scanned.contact);
+
                   if (scanned.profileId) {
                     storage.set(scanned.profileId, resultId);
                   }
@@ -271,6 +288,7 @@ const AddContactModal = ({
   }, [
     scanned,
     webCard.userName,
+    requestPhonebookPermissionAsync,
     intl,
     requestPhonebookPermissionAndRedirectToSettingsAsync,
   ]);

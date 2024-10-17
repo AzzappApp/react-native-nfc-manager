@@ -1,13 +1,12 @@
 import {
   updateContactAsync,
-  presentFormAsync,
   addContactAsync,
   displayContactAsync,
   PermissionStatus as ContactPermissionStatus,
 } from 'expo-contacts';
 import { useMemo, useCallback, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { AppState, Platform, View } from 'react-native';
+import { AppState, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { usePaginationFragment, graphql, useMutation } from 'react-relay';
 import { useOnFocus } from '#components/NativeRouter';
@@ -295,14 +294,10 @@ const ContactsScreenLists = ({
           );
 
           if (foundContact) {
-            if (Platform.OS === 'ios') {
-              await updateContactAsync({
-                ...contactToAdd,
-                id: foundContact.id,
-              });
-            } else {
-              await presentFormAsync(foundContact.id, contactToAdd);
-            }
+            await updateContactAsync({
+              ...contactToAdd,
+              id: foundContact.id,
+            });
             messageToast = intl.formatMessage({
               defaultMessage: 'The contact was updated successfully.',
               description:
