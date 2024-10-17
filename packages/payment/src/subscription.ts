@@ -628,3 +628,61 @@ export const updateCustomer = async (
     ...updates,
   };
 };
+
+export const renewUserSubscription = async (
+  userId: string,
+  webCardId: string,
+  subscriptionId: string,
+) => {
+  const subscription = await getSubscriptionById(subscriptionId);
+
+  if (!subscription) {
+    throw new Error('No subscription found');
+  }
+
+  if (subscription.webCardId !== webCardId) {
+    throw new Error('WebCard ids don’t match');
+  }
+
+  if (!subscription.paymentMeanId || !subscription.rebillManagerId) {
+    throw new Error('Nothing to resume');
+  }
+
+  if (subscription.endAt < new Date()) {
+    throw new Error('Subscription has already ended');
+  }
+
+  if (subscription.status === 'active') {
+    throw new Error('Subscription is already active');
+  }
+
+  const token = await login();
+
+  const rebillManagerId = subscription.rebillManagerId;
+
+  const result = await client.POST(
+    '/api/client-payment-requests/resume-rebill-manager',
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: {
+        rebillManagerId,
+        clientPaymentRequestUlid: subscription.paymentMeanId,
+        resumeReason: `resumed by user with id ${userId}`,
+      },
+    },
+  );
+
+  if (!result.data) {
+    throw new Error('Failed to resume rebill manager', {
+      cause: result.error,
+    });
+  }
+
+  await updateSubscription(subscription.id, {
+    canceledAt: null,
+    status: 'active',
+  });
+  return (await getSubscriptionById(subscription.id))!;
+};
