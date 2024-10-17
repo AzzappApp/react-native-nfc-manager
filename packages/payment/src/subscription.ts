@@ -263,7 +263,7 @@ export const updateExistingSubscription = async ({
     const currentDate = new Date();
 
     const intervalInMonths =
-      Math.floor(currentDate.getTime() - existingSubscription.endAt.getTime()) /
+      Math.floor(existingSubscription.endAt.getTime() - currentDate.getTime()) /
       MONTHLY_RECURRENCE;
 
     const intervalInMinutes = dateDiffInMinutes(
