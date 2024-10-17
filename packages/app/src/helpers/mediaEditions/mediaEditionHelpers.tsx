@@ -3,11 +3,13 @@ import * as mime from 'react-native-mime-types';
 import { getDecodingCapabilitiesFor } from '@azzapp/react-native-skia-video';
 import { typedEntries } from '@azzapp/shared/objectHelpers';
 import { getFileName } from '#helpers/fileHelpers';
+import type { Media } from '#helpers/mediaHelpers';
 import type {
   CropData,
   EditionParameters,
   ImageOrientation,
 } from './EditionParameters';
+import type { SkImage } from '@shopify/react-native-skia';
 
 const LAYOUT_PARAMETERS = ['cropData', 'orientation', 'roll'];
 
@@ -112,6 +114,22 @@ export const scaleCropData = (cropData: CropData, scale: number): CropData => {
   return Object.fromEntries(
     Object.entries(cropData).map(([key, value]) => [key, value * scale]),
   ) as CropData;
+};
+
+export const scaleCropDataIfNecessary = (
+  cropData: CropData,
+  media: Media,
+  skImage: SkImage | null,
+) => {
+  if (!skImage) {
+    return cropData;
+  }
+  if (media.width - skImage.width() <= 1) {
+    return cropData;
+  }
+
+  const scale = skImage.width() / media.width;
+  return scaleCropData(cropData, scale);
 };
 
 export const getDeviceMaxDecodingResolution = (

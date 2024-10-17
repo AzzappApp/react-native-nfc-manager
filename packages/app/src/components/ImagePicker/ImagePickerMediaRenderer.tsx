@@ -5,8 +5,11 @@ import { colors } from '#theme';
 import Cropper from '#components/Cropper';
 import TransformedImageRenderer from '#components/TransformedImageRenderer';
 import TransformedVideoRenderer from '#components/TransformedVideoRenderer';
+import {
+  scaleCropDataIfNecessary,
+  type CropData,
+} from '#helpers/mediaEditions';
 import { useImagePickerState } from './ImagePickerContext';
-import type { CropData } from '#helpers/mediaEditions';
 import type { LayoutChangeEvent } from 'react-native';
 
 type ImagePickerMediaRendererProps = {
@@ -101,7 +104,14 @@ const ImagePickerMediaRenderer = ({
                   image={skImage}
                   {...imageDimensions}
                   filter={mediaFilter}
-                  editionParameters={{ ...editionParameters, cropData }}
+                  editionParameters={{
+                    ...editionParameters,
+                    cropData: scaleCropDataIfNecessary(
+                      cropData,
+                      media,
+                      skImage.value,
+                    ),
+                  }}
                 />
               ) : (
                 <TransformedVideoRenderer
