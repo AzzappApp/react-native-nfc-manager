@@ -7,6 +7,7 @@ import {
   useBlurOnFulfill,
   useClearByFocusCell,
 } from 'react-native-confirmation-code-field';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
@@ -58,91 +59,93 @@ const ForgotPasswordConfirmationScreen = ({
   return (
     <Container style={styles.flex}>
       <View onTouchStart={keyboardDismiss} style={styles.container}>
-        <View style={styles.inner}>
-          <View style={styles.logoContainer}>
-            <Icon icon={isEmail ? 'mail_line' : 'sms'} style={styles.logo} />
-          </View>
-          <View style={styles.viewText}>
-            {isEmail ? (
-              <>
-                <Text style={styles.textForgot} variant="xlarge">
-                  <FormattedMessage
-                    defaultMessage="Check your emails!"
-                    description="ForgotPasswordScreen - Check your emails or messages!"
-                  />
-                </Text>
-                <Text style={styles.textForgotExplain} variant="medium">
-                  <FormattedMessage
-                    defaultMessage="We've sent a validation code to {email}. Please enter the code below to reset your password."
-                    description="ForgotPasswordScreen - message to inform the user an email has been sent to reset the password"
-                    values={{
-                      email: params.issuer,
-                    }}
-                  />
-                </Text>
-              </>
-            ) : (
-              <>
-                <Text style={styles.textForgot} variant="xlarge">
-                  <FormattedMessage
-                    defaultMessage="Check your messages!"
-                    description="ForgotPasswordScreen - Check your messages!"
-                  />
-                </Text>
-                <Text style={styles.textForgotExplain} variant="medium">
-                  <FormattedMessage
-                    defaultMessage="We've sent a validation code to {phoneNumber}. Please enter the code below to reset your password."
-                    description="ForgotPasswordScreen - message to inform the user an sms has been sent to reset the password"
-                    values={{
-                      phoneNumber: params.issuer,
-                    }}
-                  />
-                </Text>
-              </>
-            )}
-          </View>
+        <KeyboardAvoidingView behavior="padding" style={styles.container}>
+          <View style={styles.inner}>
+            <View style={styles.logoContainer}>
+              <Icon icon={isEmail ? 'mail_line' : 'sms'} style={styles.logo} />
+            </View>
+            <View style={styles.viewText}>
+              {isEmail ? (
+                <>
+                  <Text style={styles.textForgot} variant="xlarge">
+                    <FormattedMessage
+                      defaultMessage="Check your emails!"
+                      description="ForgotPasswordScreen - Check your emails or messages!"
+                    />
+                  </Text>
+                  <Text style={styles.textForgotExplain} variant="medium">
+                    <FormattedMessage
+                      defaultMessage="We've sent a validation code to {email}. Please enter the code below to reset your password."
+                      description="ForgotPasswordScreen - message to inform the user an email has been sent to reset the password"
+                      values={{
+                        email: params.issuer,
+                      }}
+                    />
+                  </Text>
+                </>
+              ) : (
+                <>
+                  <Text style={styles.textForgot} variant="xlarge">
+                    <FormattedMessage
+                      defaultMessage="Check your messages!"
+                      description="ForgotPasswordScreen - Check your messages!"
+                    />
+                  </Text>
+                  <Text style={styles.textForgotExplain} variant="medium">
+                    <FormattedMessage
+                      defaultMessage="We've sent a validation code to {phoneNumber}. Please enter the code below to reset your password."
+                      description="ForgotPasswordScreen - message to inform the user an sms has been sent to reset the password"
+                      values={{
+                        phoneNumber: params.issuer,
+                      }}
+                    />
+                  </Text>
+                </>
+              )}
+            </View>
 
-          <CodeField
-            ref={ref}
-            {...props}
-            value={code}
-            onChangeText={setCode}
-            cellCount={CELL_COUNT}
-            rootStyle={styles.codeFieldRoot}
-            keyboardType="number-pad"
-            textContentType="oneTimeCode"
-            autoComplete={Platform.select({
-              android: 'sms-otp' as const,
-              default: 'one-time-code' as const,
-            })}
-            caretHidden={code !== ''}
-            textInputStyle={styles.textInputStyle}
-            renderCell={({ index, symbol, isFocused }) => (
-              <View
-                style={[styles.cell, isFocused && styles.focusCell]}
-                onLayout={getCellOnLayoutHandler(index)}
-              >
-                <Text variant="large">
-                  {symbol || (isFocused ? <Cursor /> : null)}
-                </Text>
-              </View>
-            )}
-          />
-          <Button
-            label={intl.formatMessage({
-              defaultMessage: 'Reset password',
-              description: 'ForgotpasswordScreen - Reset password',
-            })}
-            accessibilityLabel={intl.formatMessage({
-              defaultMessage: 'Tap to reset your passward',
-              description:
-                'ForgotPassword Screen - AccessibilityLabel Reset password button',
-            })}
-            style={styles.button}
-            onPress={onSubmit}
-            disabled={!(code.length === CELL_COUNT)}
-          />
-        </View>
+            <CodeField
+              ref={ref}
+              {...props}
+              value={code}
+              onChangeText={setCode}
+              cellCount={CELL_COUNT}
+              rootStyle={styles.codeFieldRoot}
+              keyboardType="number-pad"
+              textContentType="oneTimeCode"
+              autoComplete={Platform.select({
+                android: 'sms-otp' as const,
+                default: 'one-time-code' as const,
+              })}
+              caretHidden={code !== ''}
+              textInputStyle={styles.textInputStyle}
+              renderCell={({ index, symbol, isFocused }) => (
+                <View
+                  style={[styles.cell, isFocused && styles.focusCell]}
+                  onLayout={getCellOnLayoutHandler(index)}
+                >
+                  <Text variant="large">
+                    {symbol || (isFocused ? <Cursor /> : null)}
+                  </Text>
+                </View>
+              )}
+            />
+            <Button
+              label={intl.formatMessage({
+                defaultMessage: 'Reset password',
+                description: 'ForgotpasswordScreen - Reset password',
+              })}
+              accessibilityLabel={intl.formatMessage({
+                defaultMessage: 'Tap to reset your passward',
+                description:
+                  'ForgotPassword Screen - AccessibilityLabel Reset password button',
+              })}
+              style={styles.button}
+              onPress={onSubmit}
+              disabled={!(code.length === CELL_COUNT)}
+            />
+          </View>
+        </KeyboardAvoidingView>
       </View>
       <View
         style={{
