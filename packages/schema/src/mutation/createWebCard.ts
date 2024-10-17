@@ -95,6 +95,7 @@ const createWebCardMutation: MutationResolvers['createWebCard'] = async (
         userId,
         contactCard,
         lastContactCardUpdate: new Date(),
+        inviteSent: true,
       });
     });
 
