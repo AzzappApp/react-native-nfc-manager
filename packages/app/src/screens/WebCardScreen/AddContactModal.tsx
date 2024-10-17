@@ -294,9 +294,21 @@ const AddContactModal = ({
             if (status !== ContactPermissionStatus.GRANTED) {
               return;
             }
-            await presentFormAsync(null, scanned.contact, {
-              isNew: true,
-            });
+
+            if (Platform.OS === 'ios') {
+              await presentFormAsync(null, scanned.contact, {
+                isNew: true,
+              });
+            } else {
+              router.push({
+                route: 'CONTACT_DETAILS',
+                params: {
+                  ...scanned.contact,
+                  createdAt: new Date(),
+                  profileId: scanned.profileId,
+                },
+              });
+            }
           },
         },
         { text: 'Cancel', style: 'cancel' },
@@ -314,6 +326,7 @@ const AddContactModal = ({
     requestPhonebookPermissionAndRedirectToSettingsAsync,
     additionalContactData?.urls,
     additionalContactData?.socials,
+    router,
   ]);
 
   const onAddContactToAzzapp = useCallback(() => {

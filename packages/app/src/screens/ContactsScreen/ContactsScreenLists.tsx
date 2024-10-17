@@ -1,10 +1,10 @@
 import {
   updateContactAsync,
   addContactAsync,
-  displayContactAsync,
   PermissionStatus as ContactPermissionStatus,
+  displayContactAsync,
 } from 'expo-contacts';
-import { useMemo, useCallback, useEffect, useState } from 'react';
+import { useMemo, useCallback, useEffect, useState, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import { AppState, View } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -16,11 +16,16 @@ import { getLocalContactsMap } from '#helpers/getLocalContactsMap';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import { storage } from '#hooks/useDeepLink';
 import { usePhonebookPermission } from '#hooks/usePhonebookPermission';
+import ContactDetailsModal from './ContactDetailsModal';
 import ContactsScreenSearchByDate from './ContactsScreenSearchByDate';
 import ContactsScreenSearchByName from './ContactsScreenSearchByName';
 import type { ContactsScreenListQuery$data } from '#relayArtifacts/ContactsScreenListQuery.graphql';
 import type { ContactsScreenLists_contacts$data } from '#relayArtifacts/ContactsScreenLists_contacts.graphql';
 import type { ContactsScreenListsMutation } from '#relayArtifacts/ContactsScreenListsMutation.graphql';
+import type {
+  ContactDetails,
+  ContactDetailsModalActions,
+} from './ContactDetailsModal';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { Contact } from 'expo-contacts';
 
@@ -41,6 +46,7 @@ const ContactsScreenLists = ({
   const [contactsPermissionStatus, setContactsPermissionStatus] = useState(
     ContactPermissionStatus.UNDETERMINED,
   );
+  const contactDetails = useRef<ContactDetailsModalActions>(null);
 
   const { requestPhonebookPermissionAndRedirectToSettingsAsync } =
     usePhonebookPermission();
@@ -284,7 +290,8 @@ const ContactsScreenLists = ({
 
   const onInviteContact = useCallback(
     async (contact: ContactType, onHideInvitation: () => void) => {
-      const contactToAdd: Contact = await buildLocalContact(contact);
+      const contactToAdd = await buildLocalContact(contact);
+
       try {
         let messageToast = '';
         if (
@@ -351,11 +358,84 @@ const ContactsScreenLists = ({
         );
         if (foundContact?.id) {
           await displayContactAsync(foundContact.id);
+          return;
         }
-        // FIXME open in app contact detail view
       }
+
+      const details = await buildLocalContact(contact);
+
+      contactDetails.current?.open({
+        ...details,
+        createdAt: contact.createdAt,
+        profileId: contact.contactProfile?.id,
+      });
     },
     [contactsPermissionStatus, localContacts],
+  );
+
+  const onInviteFromContactDetails = useCallback(
+    async (contact: ContactDetails) => {
+      try {
+        let messageToast = '';
+        if (
+          contactsPermissionStatus === ContactPermissionStatus.GRANTED &&
+          localContacts
+        ) {
+          const phoneNumbers =
+            contact.phoneNumbers
+              ?.filter(({ number }) => !!number)
+              .map(({ number }) => number) ?? [];
+
+          const emails =
+            contact.emails
+              ?.filter(({ email }) => !!email)
+              .map(({ email }) => email) ?? [];
+
+          const foundContact = await findLocalContact(
+            storage,
+            phoneNumbers as string[],
+            emails as string[],
+            localContacts,
+            contact.profileId,
+          );
+
+          if (foundContact) {
+            if (Platform.OS === 'ios') {
+              await updateContactAsync({
+                ...contact,
+                id: foundContact.id,
+              });
+            } else {
+              await presentFormAsync(foundContact.id, contact);
+            }
+            messageToast = intl.formatMessage({
+              defaultMessage: 'The contact was updated successfully.',
+              description:
+                'Toast message when a contact is updated successfully',
+            });
+          } else {
+            const resultId = await addContactAsync(contact);
+
+            if (contact.profileId) {
+              storage.set(contact.profileId, resultId);
+            }
+            messageToast = intl.formatMessage({
+              defaultMessage: 'The contact was created successfully.',
+              description:
+                'Toast message when a contact is created successfully',
+            });
+          }
+
+          Toast.show({
+            type: 'success',
+            text1: messageToast,
+          });
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    [contactsPermissionStatus, intl, localContacts],
   );
 
   if (
@@ -401,6 +481,10 @@ const ContactsScreenLists = ({
           contactsPermissionStatus={contactsPermissionStatus}
         />
       )}
+      <ContactDetailsModal
+        ref={contactDetails}
+        onInviteContact={onInviteFromContactDetails}
+      />
     </View>
   );
 };

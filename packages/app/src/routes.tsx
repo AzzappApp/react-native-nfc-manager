@@ -2,6 +2,7 @@ import { isEqual } from 'lodash';
 import type { ColorPaletteColor } from '@azzapp/shared/cardHelpers';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
+import type { Contact } from 'expo-contacts';
 import type { LayoutRectangle } from 'react-native';
 
 export type AboutRoute = {
@@ -250,6 +251,14 @@ export type ContactsRoute = {
   params?: never;
 };
 
+export type ContactDetailsRoute = {
+  route: 'CONTACT_DETAILS';
+  params: Contact & {
+    createdAt: Date;
+    profileId?: string;
+  };
+};
+
 export type Route =
   | AboutRoute
   | AccountDetailsRoute
@@ -259,6 +268,7 @@ export type Route =
   | ConfirmRegistrationRoute
   | ContactCardEditRoute
   | ContactCardRoute
+  | ContactDetailsRoute
   | ContactsRoute
   | CoverCreationRoute
   | CoverEditionRoute
