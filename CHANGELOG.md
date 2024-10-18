@@ -1,4 +1,4 @@
-## 0.9.10-canary.92
+## 0.9.10-canary.93
 
 * **fix:**  - handle plural/singular in remove contacts popup ([#5493](https://github.com/AzzappApp/azzapp/pull/5493))
 * **feat:**  - 🎸 allow access to profile avatar if in contact ([#5470](https://github.com/AzzappApp/azzapp/pull/5470))
