@@ -1,5 +1,7 @@
-## 0.9.10-canary.91
+## 0.9.10-canary.92
 
+* **fix:**  - handle plural/singular in remove contacts popup ([#5493](https://github.com/AzzappApp/azzapp/pull/5493))
+* **feat:**  - 🎸 allow access to profile avatar if in contact ([#5470](https://github.com/AzzappApp/azzapp/pull/5470))
 * **fix:**  - 🐛 properly display filter ([#5497](https://github.com/AzzappApp/azzapp/pull/5497))
 * **fix:**  - 🐛 use correct filter background in dark mode ([#5486](https://github.com/AzzappApp/azzapp/pull/5486))
 * **fix:**  - **payment:** [#5462](https://github.com/AzzappApp/azzapp/pull/5462) generate invoice for first payment ([#5463](https://github.com/AzzappApp/azzapp/pull/5463))
