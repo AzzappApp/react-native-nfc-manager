@@ -1,7 +1,8 @@
 import { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
-import { View, type ViewProps } from 'react-native';
+import { useColorScheme, View, type ViewProps } from 'react-native';
 import { typedEntries } from '@azzapp/shared/objectHelpers';
+import { colors } from '#theme';
 import { useFilterLabels } from '#helpers/mediaEditions';
 import BoxSelectionList from './BoxSelectionList';
 import TransformedImageRenderer from './TransformedImageRenderer';
@@ -34,6 +35,7 @@ const FilterSelectionList = ({
   ...props
 }: FilterSelectionListProps) => {
   const filters = typedEntries(useFilterLabels());
+  const colorScheme = useColorScheme();
 
   const filterListerCropData = useMemo(() => {
     let result = cropData;
@@ -68,10 +70,15 @@ const FilterSelectionList = ({
           editionParameters={{
             cropData: filterListerCropData,
           }}
+          imageStyle={
+            colorScheme === 'dark' && {
+              backgroundColor: colors.grey900,
+            }
+          }
         />
       );
     },
-    [skImage, filterListerCropData],
+    [skImage, filterListerCropData, colorScheme],
   );
 
   const onSelect = useCallback(

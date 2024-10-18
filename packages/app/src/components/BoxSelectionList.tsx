@@ -281,7 +281,7 @@ const styleSheet = createStyleSheet(appearance => ({
       position: 'absolute',
       top: 6,
       left: 6,
-      backgroundColor: appearance === 'dark' ? colors.black : colors.grey200,
+      backgroundColor: appearance === 'dark' ? colors.grey900 : colors.grey200,
       borderCurve: 'continuous',
     },
     Platform.select<ViewStyle>({
