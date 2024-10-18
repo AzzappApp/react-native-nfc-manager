@@ -13,7 +13,7 @@ import { guessLocale } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
 import { sendPushNotification } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
-import { profileLoader, userLoader } from '#loaders';
+import { profileLoader, userLoader, webCardLoader } from '#loaders';
 import type { MutationResolvers } from '#__generated__/types';
 import type { Contact, ContactRow } from '@azzapp/data';
 
@@ -76,56 +76,69 @@ const addContact: MutationResolvers['addContact'] = async (
   }
 
   if (input.withShareBack) {
-    const addresses = profile.contactCard?.addresses
-      ?.filter(address => address.selected)
-      .map(address => ({
-        label: address.label,
-        address: address.address,
-      }));
+    const webCard = await webCardLoader.load(profile.webCardId);
+    const commonInformation = webCard?.commonInformation;
+    const addresses =
+      profile.contactCard?.addresses
+        ?.filter(address => address.selected)
+        .map(address => ({
+          label: address.label,
+          address: address.address,
+        })) || [];
 
-    const emails = profile.contactCard?.emails
-      ?.filter(email => email.selected)
-      .map(email => ({
-        label: email.label,
-        address: email.address,
-      }));
+    const emails =
+      profile.contactCard?.emails
+        ?.filter(email => email.selected)
+        .map(email => ({
+          label: email.label,
+          address: email.address,
+        })) || [];
 
-    const phoneNumbers = profile.contactCard?.phoneNumbers
-      ?.filter(phoneNumber => phoneNumber.selected)
-      .map(phoneNumber => ({
-        label: phoneNumber.label,
-        number: phoneNumber.number,
-      }));
+    const phoneNumbers =
+      profile.contactCard?.phoneNumbers
+        ?.filter(phoneNumber => phoneNumber.selected)
+        .map(phoneNumber => ({
+          label: phoneNumber.label,
+          number: phoneNumber.number,
+        })) || [];
 
     const birthday = profile.contactCard?.birthday?.selected
       ? new Date(profile.contactCard.birthday.birthday)
       : null;
 
-    const urls = profile.contactCard?.urls?.map(url => ({
-      url: url.address,
-    }));
+    const urls =
+      profile.contactCard?.urls?.map(url => ({
+        url: url.address,
+      })) || [];
 
-    const socials = profile.contactCard?.socials?.map(social => ({
-      label: social.label,
-      url: social.url,
-    }));
+    const socials =
+      profile.contactCard?.socials?.map(social => ({
+        label: social.label,
+        url: social.url,
+      })) || [];
+
+    const commonUrls =
+      commonInformation?.urls?.map(url => ({
+        url: url.address,
+      })) || [];
 
     const shareBackToCreate: ContactRow = {
       ownerProfileId: input.profileId,
       contactProfileId: profileId,
       createdAt: new Date(),
       type: 'shareback' as const,
-      addresses: addresses ?? [],
-      emails: emails ?? [],
-      phoneNumbers: phoneNumbers ?? [],
+      addresses: commonInformation?.addresses?.concat(addresses) ?? [],
+      emails: commonInformation?.emails?.concat(emails) ?? [],
+      phoneNumbers: commonInformation?.phoneNumbers?.concat(phoneNumbers) ?? [],
       birthday,
-      company: profile.contactCard?.company ?? undefined,
+      company:
+        commonInformation?.company ?? profile.contactCard?.company ?? undefined,
       firstName: profile.contactCard?.firstName ?? undefined,
       lastName: profile.contactCard?.lastName ?? undefined,
       title: profile.contactCard?.title ?? undefined,
       deleted: false,
-      urls,
-      socials,
+      urls: commonUrls.concat(urls) ?? [],
+      socials: commonInformation?.socials?.concat(socials) ?? [],
     };
 
     const existingShareBack = await getContactByProfiles({

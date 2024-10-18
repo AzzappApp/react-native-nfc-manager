@@ -25,6 +25,7 @@ import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
 import { findLocalContact } from '#helpers/contactCardHelpers';
+import { reworkContactForDeviceInsert } from '#helpers/contactListHelpers';
 import { getLocalContactsMap } from '#helpers/getLocalContactsMap';
 import { usePhonebookPermission } from '#hooks/usePhonebookPermission';
 import BottomSheetModal from '#ui/BottomSheetModal';
@@ -243,12 +244,18 @@ const AddContactModal = ({
                   foundContact = await findContact();
                 }
                 if (foundContact && foundContact.id) {
-                  const updatedContact = {
+                  const updatedContact = reworkContactForDeviceInsert({
                     ...scanned.contact,
-                    urls: additionalContactData?.urls,
-                    socials: additionalContactData?.socials,
+                    urlAddresses:
+                      additionalContactData?.urls?.map(addr => {
+                        return { label: 'default', address: addr.address };
+                      }) || undefined,
+                    socialProfiles:
+                      additionalContactData?.socials?.map(social => {
+                        return { ...social, address: social.url };
+                      }) || undefined,
                     id: foundContact.id,
-                  };
+                  });
                   await updateContactAsync(updatedContact);
                   messageToast = intl.formatMessage({
                     defaultMessage: 'The contact was updated successfully.',
@@ -261,7 +268,9 @@ const AddContactModal = ({
                     urls: additionalContactData?.urls,
                     socials: additionalContactData?.socials,
                   };
-                  const resultId = await addContactAsync(newContact);
+                  const contactToAddReworked =
+                    reworkContactForDeviceInsert(newContact);
+                  const resultId = await addContactAsync(contactToAddReworked);
 
                   if (scanned.profileId) {
                     storage.set(scanned.profileId, resultId);

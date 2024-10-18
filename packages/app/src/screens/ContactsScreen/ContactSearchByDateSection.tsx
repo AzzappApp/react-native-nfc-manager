@@ -9,7 +9,10 @@ import { Alert, FlatList, Platform, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { colors } from '#theme';
 import { findLocalContact } from '#helpers/contactCardHelpers';
-import { buildLocalContact } from '#helpers/contactListHelpers';
+import {
+  buildLocalContact,
+  reworkContactForDeviceInsert,
+} from '#helpers/contactListHelpers';
 import { keyExtractor } from '#helpers/idHelpers';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
@@ -82,14 +85,19 @@ const ContactSearchByDateSection = ({
 
         await Promise.all([
           ...contactsToCreate.map(async contactToCreate => {
-            const resultId = await addContactAsync(contactToCreate.contact);
+            const contact = reworkContactForDeviceInsert(
+              contactToCreate.contact,
+            );
+
+            const resultId = await addContactAsync(contact);
             if (contactToCreate.profileId) {
               storage.set(contactToCreate.profileId, resultId);
             }
           }),
-          ...contactsToUpdate.map(contactToUpdate =>
-            updateContactAsync(contactToUpdate),
-          ),
+          ...contactsToUpdate.map(contactToUpdate => {
+            const contact = reworkContactForDeviceInsert(contactToUpdate);
+            return updateContactAsync(contact);
+          }),
         ]);
 
         setInvited(true);

@@ -72,6 +72,31 @@ export const buildLocalContact = async (
   };
 };
 
+const prefixWithHttp = (link?: string): string | undefined => {
+  if (!link || link.includes('://')) {
+    return link;
+  }
+  return `https://${link}`;
+};
+
+export const reworkContactForDeviceInsert = (contact: Contact): Contact => {
+  return {
+    ...contact,
+    urlAddresses: contact.urlAddresses?.map(addr => {
+      return {
+        ...addr,
+        url: prefixWithHttp(addr.url),
+      };
+    }),
+    socialProfiles: contact.socialProfiles?.map(social => {
+      return {
+        ...social,
+        url: prefixWithHttp(social.url),
+      };
+    }),
+  };
+};
+
 type ContactType = NonNullable<
   NonNullable<
     NonNullable<

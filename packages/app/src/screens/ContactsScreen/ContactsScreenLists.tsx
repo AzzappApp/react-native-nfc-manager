@@ -3,16 +3,18 @@ import {
   addContactAsync,
   PermissionStatus as ContactPermissionStatus,
   displayContactAsync,
-  presentFormAsync,
 } from 'expo-contacts';
 import { useMemo, useCallback, useEffect, useState, useRef } from 'react';
 import { useIntl } from 'react-intl';
-import { AppState, View, Platform } from 'react-native';
+import { AppState, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { usePaginationFragment, graphql, useMutation } from 'react-relay';
 import { useOnFocus } from '#components/NativeRouter';
 import { findLocalContact } from '#helpers/contactCardHelpers';
-import { buildLocalContact } from '#helpers/contactListHelpers';
+import {
+  buildLocalContact,
+  reworkContactForDeviceInsert,
+} from '#helpers/contactListHelpers';
 import { getLocalContactsMap } from '#helpers/getLocalContactsMap';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import { storage } from '#hooks/useDeepLink';
@@ -291,8 +293,7 @@ const ContactsScreenLists = ({
 
   const onInviteContact = useCallback(
     async (contact: ContactType, onHideInvitation: () => void) => {
-      const contactToAdd = await buildLocalContact(contact);
-
+      const contactToAdd: Contact = await buildLocalContact(contact);
       try {
         let messageToast = '';
         if (
@@ -308,17 +309,22 @@ const ContactsScreenLists = ({
           );
 
           if (foundContact) {
-            await updateContactAsync({
+            const contactToAddReworked = reworkContactForDeviceInsert({
               ...contactToAdd,
               id: foundContact.id,
             });
+
+            await updateContactAsync(contactToAddReworked);
             messageToast = intl.formatMessage({
               defaultMessage: 'The contact was updated successfully.',
               description:
                 'Toast message when a contact is updated successfully',
             });
           } else {
-            const resultId = await addContactAsync(contactToAdd);
+            const contactToAddReworked =
+              reworkContactForDeviceInsert(contactToAdd);
+
+            const resultId = await addContactAsync(contactToAddReworked);
 
             if (contact.contactProfile) {
               storage.set(contact.contactProfile.id, resultId);
@@ -401,21 +407,19 @@ const ContactsScreenLists = ({
           );
 
           if (foundContact) {
-            if (Platform.OS === 'ios') {
-              await updateContactAsync({
-                ...contact,
-                id: foundContact.id,
-              });
-            } else {
-              await presentFormAsync(foundContact.id, contact);
-            }
+            const contactToAddReworked = reworkContactForDeviceInsert({
+              ...contact,
+              id: foundContact.id,
+            });
+            await updateContactAsync(contactToAddReworked);
             messageToast = intl.formatMessage({
               defaultMessage: 'The contact was updated successfully.',
               description:
                 'Toast message when a contact is updated successfully',
             });
           } else {
-            const resultId = await addContactAsync(contact);
+            const contactToAddReworked = reworkContactForDeviceInsert(contact);
+            const resultId = await addContactAsync(contactToAddReworked);
 
             if (contact.profileId) {
               storage.set(contact.profileId, resultId);
