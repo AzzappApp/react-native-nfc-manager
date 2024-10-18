@@ -77,7 +77,9 @@ const addContact: MutationResolvers['addContact'] = async (
 
   if (input.withShareBack) {
     const webCard = await webCardLoader.load(profile.webCardId);
-    const commonInformation = webCard?.commonInformation;
+    const commonInformation = webCard?.isMultiUser
+      ? webCard?.commonInformation
+      : undefined;
     const addresses =
       profile.contactCard?.addresses
         ?.filter(address => address.selected)
@@ -117,28 +119,37 @@ const addContact: MutationResolvers['addContact'] = async (
         url: social.url,
       })) || [];
 
-    const commonUrls =
-      commonInformation?.urls?.map(url => ({
-        url: url.address,
-      })) || [];
+    const commonInformationToMerge = {
+      addresses: commonInformation?.addresses || [],
+      emails: commonInformation?.emails || [],
+      phoneNumbers: commonInformation?.phoneNumbers || [],
+      urls:
+        commonInformation?.urls?.map(url => ({
+          url: url.address,
+        })) || [],
+      company: commonInformation?.company,
+      socials: commonInformation?.socials || [],
+    };
 
     const shareBackToCreate: ContactRow = {
       ownerProfileId: input.profileId,
       contactProfileId: profileId,
       createdAt: new Date(),
       type: 'shareback' as const,
-      addresses: commonInformation?.addresses?.concat(addresses) ?? [],
-      emails: commonInformation?.emails?.concat(emails) ?? [],
-      phoneNumbers: commonInformation?.phoneNumbers?.concat(phoneNumbers) ?? [],
+      addresses: commonInformationToMerge.addresses.concat(addresses),
+      emails: commonInformationToMerge.emails.concat(emails),
+      phoneNumbers: commonInformationToMerge.phoneNumbers.concat(phoneNumbers),
       birthday,
       company:
-        commonInformation?.company ?? profile.contactCard?.company ?? undefined,
+        commonInformationToMerge.company ??
+        profile.contactCard?.company ??
+        undefined,
       firstName: profile.contactCard?.firstName ?? undefined,
       lastName: profile.contactCard?.lastName ?? undefined,
       title: profile.contactCard?.title ?? undefined,
       deleted: false,
-      urls: commonUrls.concat(urls) ?? [],
-      socials: commonInformation?.socials?.concat(socials) ?? [],
+      urls: commonInformationToMerge.urls.concat(urls),
+      socials: commonInformationToMerge.socials.concat(socials),
     };
 
     const existingShareBack = await getContactByProfiles({
