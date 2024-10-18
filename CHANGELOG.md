@@ -1,5 +1,6 @@
-## 0.9.10-canary.90
+## 0.9.10-canary.91
 
+* **fix:**  - 🐛 properly display filter ([#5497](https://github.com/AzzappApp/azzapp/pull/5497))
 * **fix:**  - 🐛 use correct filter background in dark mode ([#5486](https://github.com/AzzappApp/azzapp/pull/5486))
 * **fix:**  - **payment:** [#5462](https://github.com/AzzappApp/azzapp/pull/5462) generate invoice for first payment ([#5463](https://github.com/AzzappApp/azzapp/pull/5463))
 * **fix:**  - **payment:** [#5472](https://github.com/AzzappApp/azzapp/pull/5472) wrong interval calculation ([#5473](https://github.com/AzzappApp/azzapp/pull/5473))
