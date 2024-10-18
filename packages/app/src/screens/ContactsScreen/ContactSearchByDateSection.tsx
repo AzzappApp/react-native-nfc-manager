@@ -131,10 +131,15 @@ const ContactSearchByDateSection = ({
       //   },
       // },
       {
-        text: intl.formatMessage({
-          defaultMessage: 'Remove contacts',
-          description: 'ContactsScreen - More option alert - remove',
-        }),
+        text: intl.formatMessage(
+          {
+            defaultMessage: `{contacts, plural,
+                =1 {Remove contact}
+                other {Remove contacts}}`,
+            description: 'ContactsScreen - More option alert - remove',
+          },
+          { contacts: data.length },
+        ),
         style: 'destructive',
         onPress: onRemove,
       },
@@ -160,7 +165,9 @@ const ContactSearchByDateSection = ({
     Alert.alert(
       intl.formatMessage(
         {
-          defaultMessage: '{contacts} contacts',
+          defaultMessage: `{contacts, plural,
+                =1 {# contact}
+                other {# contacts}}`,
           description: 'ContactsScreenSearchByDate - Title for onMore alert',
         },
         { contacts: data.length },
