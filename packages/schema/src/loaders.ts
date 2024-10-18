@@ -10,6 +10,7 @@ import {
   getActiveUserSubscriptionForWebCard,
   getProfileByUserAndWebCard,
   isFollowing,
+  getContactsByUser,
 } from '@azzapp/data';
 import { ENTITY_TARGET } from '@azzapp/i18n';
 import {
@@ -153,6 +154,51 @@ export const followingsLoader = createSessionDataLoader(
   },
   {
     cacheKeyFn: key => key.join('-'),
+  },
+);
+
+export const profileInUserContactLoader = createSessionDataLoader(
+  'ProfileInUserContactLoader',
+  async (keys: ReadonlyArray<{ userId: string; profileId: string }>) => {
+    const profileIdsByUser = keys.reduce(
+      (accumulator, key) => {
+        if (accumulator[key.userId]) {
+          accumulator[key.userId].push(key.profileId);
+        } else {
+          accumulator[key.userId] = [key.profileId];
+        }
+
+        return accumulator;
+      },
+      {} as Record<string, string[]>,
+    );
+
+    const contacts = await Promise.all(
+      Object.entries(profileIdsByUser).map(([userId, profileIds]) =>
+        getContactsByUser(userId, profileIds),
+      ),
+    ).then(contactsByUsers => {
+      return contactsByUsers.reduce(
+        (accumulator, currentValue) => [...accumulator, ...currentValue],
+        [],
+      );
+    });
+
+    const contactsByProfile = contacts.reduce(
+      (accumulator: Record<string, string>, currentValue) => {
+        if (currentValue.profileId) {
+          accumulator[currentValue.profileId] = currentValue.id;
+        }
+
+        return accumulator;
+      },
+      {},
+    );
+
+    return keys.map(({ profileId }) => contactsByProfile[profileId] || null);
+  },
+  {
+    cacheKeyFn: key => `${key.userId}-${key.profileId}`,
   },
 );
 

@@ -9,12 +9,32 @@ import {
   inArray,
 } from 'drizzle-orm';
 import { db, transaction } from '../database';
-import { ContactTable, ProfileTable, WebCardTable } from '../schema';
+import { ContactTable, ProfileTable, UserTable, WebCardTable } from '../schema';
 import { incrementShareBacksTotal } from './profileQueries';
 import { incrementShareBacks } from './profileStatisticQueries';
 import type { Contact, Profile } from '../schema';
 
 export type ContactRow = InferInsertModel<typeof ContactTable>;
+
+export const getContactsByUser = async (
+  userId: string,
+  profileIds: string[],
+) => {
+  const res = await db()
+    .select({ id: ContactTable.id, profileId: ContactTable.contactProfileId })
+    .from(ContactTable)
+    .innerJoin(
+      ProfileTable,
+      and(
+        inArray(ContactTable.contactProfileId, profileIds),
+        eq(ProfileTable.id, ContactTable.ownerProfileId),
+      ),
+    )
+    .innerJoin(UserTable, eq(UserTable.id, ProfileTable.userId))
+    .where(eq(UserTable.id, userId));
+
+  return res;
+};
 
 export const getContactByProfiles = (profiles: {
   owner: string;

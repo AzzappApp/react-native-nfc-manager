@@ -31,6 +31,7 @@ import { getOrCreateSessionResource, getSessionInfos } from '#GraphQLContext';
 import {
   companyActivityLoader,
   labelLoader,
+  profileInUserContactLoader,
   profileLoader,
   profileStatisticsLoader,
   userLoader,
@@ -172,18 +173,26 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
     return user;
   },
   avatar: async profile => {
+    const { userId } = getSessionInfos();
+
     if (
-      !profileIsAssociatedToCurrentUser(profile) &&
-      !(await hasWebCardProfileRight(profile.webCardId))
+      profileIsAssociatedToCurrentUser(profile) ||
+      (await hasWebCardProfileRight(profile.webCardId)) ||
+      (userId &&
+        (await profileInUserContactLoader.load({
+          userId,
+          profileId: profile.id,
+        })))
     ) {
-      return null;
+      return profile.avatarId
+        ? {
+            media: profile.avatarId,
+            assetKind: 'contactCard',
+          }
+        : null;
     }
-    return profile.avatarId
-      ? {
-          media: profile.avatarId,
-          assetKind: 'contactCard',
-        }
-      : null;
+
+    return null;
   },
   logo: async profile => {
     if (
