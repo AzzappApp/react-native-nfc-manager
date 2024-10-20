@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -75,6 +75,13 @@ type SelectProps<ItemT, SectionT> = Omit<ViewProps, 'children'> &
     selectedItemContainerStyle?: StyleProp<ViewStyle>;
 
     avoidKeyboard?: boolean;
+
+    /**
+     * top right custom action confirguration
+     * Both field shall be defined to display the action
+     */
+    headerRightAction?: () => void;
+    headerRightComponent?: ReactElement;
   };
 
 /**
@@ -99,6 +106,8 @@ const SelectSection = <ItemT, SectionT>({
   style,
   ListHeaderComponent,
   avoidKeyboard,
+  headerRightAction,
+  headerRightComponent,
   ...props
 }: SelectProps<ItemT, SectionT>) => {
   const [showDropDown, setShowDropDown] = useState(false);
@@ -145,6 +154,18 @@ const SelectSection = <ItemT, SectionT>({
         contentContainerStyle={styles.bottomSheetContentContainer}
         onRequestClose={() => setShowDropDown(false)}
         nestedScroll
+        headerRightButton={
+          headerRightAction && headerRightComponent ? (
+            <Pressable
+              onPress={() => {
+                headerRightAction();
+                setShowDropDown(false);
+              }}
+            >
+              {headerRightComponent}
+            </Pressable>
+          ) : undefined
+        }
       >
         <SelectSectionList
           sections={sections}
