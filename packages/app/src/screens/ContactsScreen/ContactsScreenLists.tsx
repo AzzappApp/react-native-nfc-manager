@@ -455,7 +455,6 @@ const ContactsScreenLists = ({
   return (
     <View
       style={{
-        marginHorizontal: 10,
         flex: 1,
       }}
     >

@@ -103,11 +103,17 @@ const ContactSearchByDateSection = ({
         setInvited(true);
         Toast.show({
           type: 'success',
-          text1: intl.formatMessage({
-            defaultMessage: 'The contacts were invited successfully.',
-            description:
-              'Toast message when contacts were invited successfully',
-          }),
+          text1: intl.formatMessage(
+            {
+              defaultMessage: `{contacts, plural,
+                    =1 {The contact was saved successfully}
+                    other {The contacts were saved successfully}
+            }`,
+              description:
+                'Toast message when contacts were invited successfully',
+            },
+            { contacts: data.length },
+          ),
         });
       }
     } catch (e) {

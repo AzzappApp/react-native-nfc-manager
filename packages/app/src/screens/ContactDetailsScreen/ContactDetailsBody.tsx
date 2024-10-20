@@ -1,7 +1,7 @@
 import { Image } from 'expo-image';
 import { useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Linking, ScrollView, View } from 'react-native';
+import { Linking, Platform, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -198,13 +198,15 @@ const stylesheet = createStyleSheet(theme => ({
     alignItems: 'center',
     gap: 5,
   },
-  avatarContainer: {
+  avatarContainer: Platform.OS === 'ios' && {
     ...shadow(theme, 'bottom'),
   },
   avatarWrapper: {
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
+    ...shadow(theme, 'bottom'),
+    backgroundColor: 'white',
   },
   avatar: {
     width: AVATAR_WIDTH,

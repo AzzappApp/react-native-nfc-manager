@@ -121,7 +121,7 @@ const ContactsScreenSearchByName = ({
       onEndReached={onEndReached}
       refreshing={refreshing}
       onRefresh={onRefresh}
-      contentContainerStyle={{ paddingBottom: bottom }}
+      contentContainerStyle={[{ paddingBottom: bottom }, styles.content]}
       ItemSeparatorComponent={ItemSeparator}
       onEndReachedThreshold={0.5}
       keyboardShouldPersistTaps="always"
@@ -138,6 +138,9 @@ const ItemSeparator = () => {
 };
 
 const stylesheet = createStyleSheet(theme => ({
+  content: {
+    paddingHorizontal: 10,
+  },
   title: {
     marginVertical: 20,
   },

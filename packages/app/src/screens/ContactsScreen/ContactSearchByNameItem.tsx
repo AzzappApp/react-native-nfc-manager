@@ -165,11 +165,14 @@ const ContactSearchByNameItem = ({
     <View key={contact.id} style={styles.contact}>
       <PressableNative onPress={onShow} style={styles.contactInfos}>
         {contact.contactProfile?.webCard?.cardIsPublished && !avatarSource ? (
-          <CoverRenderer
-            style={styles.webcard}
-            width={35}
-            webCard={contact.webCard}
-          />
+          <View style={styles.cover}>
+            <CoverRenderer
+              style={styles.webcard}
+              width={35}
+              webCard={contact.webCard}
+              large
+            />
+          </View>
         ) : (
           <ContactAvatar
             style={styles.webcard}
@@ -254,6 +257,11 @@ const styles = StyleSheet.create({
   },
   date: {
     color: colors.grey400,
+  },
+  cover: {
+    width: 35,
+    borderRadius: 4,
+    overflow: 'hidden',
   },
   webcard: {
     columnGap: GAP,

@@ -40,6 +40,7 @@ const ContactsScreenSearchByDate = ({
   contactsPermissionStatus,
 }: Props) => {
   const { bottom } = useScreenInsets();
+  const styles = useStyleSheet(stylesheet);
 
   const intl = useIntl();
 
@@ -109,7 +110,7 @@ const ContactsScreenSearchByDate = ({
       onEndReached={onEndReached}
       refreshing={refreshing}
       onRefresh={onRefresh}
-      contentContainerStyle={[{ paddingBottom: bottom }]}
+      contentContainerStyle={[{ paddingBottom: bottom }, styles.content]}
       showsVerticalScrollIndicator={false}
       snapToAlignment="start"
       decelerationRate="fast"
@@ -130,6 +131,9 @@ const RenderSectionSeparator = () => {
 };
 
 const stylesheet = createStyleSheet(theme => ({
+  content: {
+    marginHorizontal: 10,
+  },
   separator: {
     height: 1,
     width: '100%',
