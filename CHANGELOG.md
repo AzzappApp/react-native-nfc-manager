@@ -1,5 +1,7 @@
-## 0.9.10-canary.93
+## 0.9.10-canary.94
 
+* **fix:**  - 🐛 display cover on android + success toast invite ([#5503](https://github.com/AzzappApp/azzapp/pull/5503))
+* **fix:**  - allow to have default button in top of compagny activity ([#5506](https://github.com/AzzappApp/azzapp/pull/5506))
 * **fix:**  - handle plural/singular in remove contacts popup ([#5493](https://github.com/AzzappApp/azzapp/pull/5493))
 * **feat:**  - 🎸 allow access to profile avatar if in contact ([#5470](https://github.com/AzzappApp/azzapp/pull/5470))
 * **fix:**  - 🐛 properly display filter ([#5497](https://github.com/AzzappApp/azzapp/pull/5497))
