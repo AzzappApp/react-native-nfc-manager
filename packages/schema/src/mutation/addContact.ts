@@ -45,7 +45,7 @@ const addContact: MutationResolvers['addContact'] = async (
     ownerProfileId: profileId,
     phoneNumbers: input.phoneNumbers,
     type: 'contact',
-    birthday: input.birthday,
+    birthday: input.birthday || null,
     company: input.company,
     firstName: input.firstname,
     lastName: input.lastname,
@@ -105,7 +105,7 @@ const addContact: MutationResolvers['addContact'] = async (
         })) || [];
 
     const birthday = profile.contactCard?.birthday?.selected
-      ? new Date(profile.contactCard.birthday.birthday)
+      ? profile.contactCard.birthday.birthday?.split('T')[0]
       : null;
 
     const urls =

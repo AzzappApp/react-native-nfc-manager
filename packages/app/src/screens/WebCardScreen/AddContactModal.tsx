@@ -142,6 +142,17 @@ const AddContactModal = ({
       return { url: url.address };
     });
 
+    const birthdayItem = scanned.contact?.dates?.find(
+      x => x.label === 'birthday',
+    );
+    const birthday =
+      birthdayItem &&
+      birthdayItem.year !== undefined &&
+      birthdayItem.month !== undefined &&
+      birthdayItem.day !== undefined
+        ? `${birthdayItem.year}-${birthdayItem.month}-${birthdayItem.day}`
+        : null;
+
     return {
       addresses: addresses ?? [],
       company: scanned.contact.company ?? '',
@@ -152,13 +163,7 @@ const AddContactModal = ({
       profileId: scanned.profileId ?? '',
       title: scanned.contact.jobTitle ?? '',
       withShareBack: withShareBack === 'checked',
-      birthday: scanned.contact.birthday
-        ? new Date(
-            scanned.contact.birthday.year!,
-            scanned.contact.birthday.month!,
-            scanned.contact.birthday.day!,
-          )
-        : null,
+      birthday,
       urls,
       socials,
     };
@@ -370,6 +375,9 @@ const AddContactModal = ({
         setIsOpen(false);
         router.pop(1);
         onRequestAddContactToPhonebook();
+      },
+      onError: e => {
+        console.warn('error adding contact', e);
       },
     });
   }, [

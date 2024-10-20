@@ -145,6 +145,7 @@ const ContactsScreenLists = ({
                 urls {
                   url
                 }
+                birthday
                 contactProfile {
                   id
                   avatar {

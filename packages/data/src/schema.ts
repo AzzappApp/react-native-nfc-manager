@@ -1002,7 +1002,7 @@ export const ContactTable = cols.table(
       .notNull()
       .default(DEFAULT_DATETIME_VALUE),
     type: cols.enum('type', ['contact', 'shareback']).notNull(),
-    birthday: cols.date('birthday'),
+    birthday: cols.date('birthday', { mode: 'string' }),
     phoneNumbers: cols
       .json('phoneNumbers')
       .$type<Array<{ label: string; number: string }>>()

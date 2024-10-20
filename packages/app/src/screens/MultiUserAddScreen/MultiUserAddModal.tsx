@@ -270,9 +270,9 @@ const MultiUserAddModal = (
               contact.birthday.year
                 ? {
                     birthday: new Date(
-                      contact.birthday.year!,
-                      contact.birthday.month!,
-                      contact.birthday.day!,
+                      contact.birthday.year,
+                      contact.birthday.month,
+                      contact.birthday.day,
                     ).toISOString(),
                   }
                 : undefined,

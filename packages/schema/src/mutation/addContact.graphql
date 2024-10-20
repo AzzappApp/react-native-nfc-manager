@@ -8,7 +8,7 @@ input AddContactInput {
   lastname: String!
   company: String!
   title: String!
-  birthday: DateTime
+  birthday: String
   phoneNumbers: [AddContactPhoneNumberInput!]!
   emails: [AddContactEmailInput!]!
   addresses: [AddContactAddressInput!]!

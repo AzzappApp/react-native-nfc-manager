@@ -11,7 +11,7 @@ type Contact {
   title: String!
   createdAt: DateTime!
   type: String!
-  birthday: DateTime
+  birthday: String
   phoneNumbers: [ContactPhoneNumber!]!
   emails: [ContactEmail!]!
   addresses: [ContactAddress!]!

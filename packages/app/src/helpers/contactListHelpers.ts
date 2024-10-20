@@ -45,6 +45,19 @@ export const buildLocalContact = async (
       })) ?? [],
   };
 
+  let updatedBirthDay = undefined;
+  if (contact.birthday) {
+    const birthday = new Date(contact.birthday);
+    updatedBirthDay = [
+      {
+        label: 'birthday',
+        year: birthday?.getFullYear(),
+        month: birthday?.getMonth(),
+        day: birthday?.getDate(),
+      },
+    ];
+  }
+
   const avatarURI = contact.contactProfile?.avatar?.uri;
   const avatar = avatarURI
     ? await FileSystem.downloadAsync(
@@ -64,11 +77,13 @@ export const buildLocalContact = async (
     phoneNumbers: common.phoneNumbers.concat(personal.phoneNumbers),
     socialProfiles: common.socialProfiles.concat(personal.socialProfiles),
     urlAddresses: common.urlAddresses.concat(personal.urlAddresses),
+    dates: updatedBirthDay || undefined,
     image: avatar
       ? {
           uri: avatar.uri,
         }
       : undefined,
+    birthday: undefined,
   };
 };
 
