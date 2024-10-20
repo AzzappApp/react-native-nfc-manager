@@ -145,6 +145,7 @@ const stylesheet = createStyleSheet(theme => ({
   container: {
     flex: 1,
     position: 'relative',
+    backgroundColor: theme === 'dark' ? colors.grey1000 : 'white',
   },
   close: {
     position: 'absolute',
@@ -186,7 +187,7 @@ const stylesheet = createStyleSheet(theme => ({
     ...shadow(theme, 'center'),
     marginTop: 20,
     padding: 14,
-    backgroundColor: 'white',
+    backgroundColor: theme === 'dark' ? colors.grey900 : colors.white,
     borderRadius: 12,
     justifyContent: 'space-between',
     flexDirection: 'row',
