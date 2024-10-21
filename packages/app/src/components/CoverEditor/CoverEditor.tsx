@@ -64,7 +64,7 @@ export type CoverEditorProps = Omit<ViewProps, 'children'> & {
   profile: CoverEditor_profile$key;
   coverTemplate: CoverEditor_coverTemplate$key | null;
   backgroundColor: string | null;
-  coverInitialSate?: Partial<CoverEditorState> | null;
+  coverInitialState?: Partial<CoverEditorState> | null;
   onCanSaveChange?: (canSave: boolean) => void;
   onCoverModified?: () => void;
   onCancel: () => void;
@@ -80,7 +80,7 @@ const CoverEditorWrapper = (
     coverTemplate,
     backgroundColor,
     onCanSaveChange,
-    coverInitialSate,
+    coverInitialState,
     style,
     ...props
   }: CoverEditorProps,
@@ -99,7 +99,7 @@ const CoverEditorWrapper = (
         coverTemplate={coverTemplate}
         backgroundColor={backgroundColor}
         onCanSaveChange={onCanSaveChange}
-        coverInitialSate={coverInitialSate}
+        coverInitialState={coverInitialState}
         style={style}
         placeholder={placeholder}
         {...props}
@@ -121,7 +121,7 @@ const CoverEditorCore = (
     backgroundColor,
     onCanSaveChange,
     onCoverModified,
-    coverInitialSate,
+    coverInitialState,
     style,
     placeholder,
     onCancel,
@@ -144,6 +144,10 @@ const CoverEditorCore = (
           firstName
           lastName
           companyName
+          companyActivity {
+            id
+            label
+          }
         }
       }
     `,
@@ -156,6 +160,7 @@ const CoverEditorCore = (
         id
         lottie
         data
+        previewPositionPercentage
         colorPalette {
           primary
           light
@@ -228,7 +233,9 @@ const CoverEditorCore = (
             textLayer.text === 'mainName'
               ? profile.webCard?.companyName || profile.webCard?.lastName
               : textLayer.text === 'firstName'
-                ? profile.webCard?.firstName
+                ? profile.webCard?.companyActivity?.id
+                  ? profile.webCard?.companyActivity?.label
+                  : profile.webCard?.firstName
                 : textLayer.text === 'custom'
                   ? customText
                   : null;
@@ -242,7 +249,7 @@ const CoverEditorCore = (
     textLayers = textLayers.filter(textLayer => !!textLayer.text);
 
     const overlayLayers = placeholder
-      ? (data?.overlayLayers as any)?.map((overlay: CoverEditorOverlayItem) =>
+      ? ((data?.overlayLayers as any)?.map((overlay: CoverEditorOverlayItem) =>
           placeholder.localUri
             ? {
                 ...overlay,
@@ -255,11 +262,11 @@ const CoverEditorCore = (
                 rotation: 0,
               }
             : overlay,
-        ) ?? []
+        ) ?? [])
       : [];
 
     let imagesScales =
-      coverInitialSate?.medias?.reduce((acc, mediaInfo) => {
+      coverInitialState?.medias?.reduce((acc, mediaInfo) => {
         if (mediaInfoIsImage(mediaInfo)) {
           return {
             ...acc,
@@ -269,8 +276,8 @@ const CoverEditorCore = (
         return acc;
       }, {}) ?? {};
 
-    if (coverInitialSate?.overlayLayers) {
-      imagesScales = coverInitialSate.overlayLayers.reduce((acc, overlay) => {
+    if (coverInitialState?.overlayLayers) {
+      imagesScales = coverInitialState.overlayLayers.reduce((acc, overlay) => {
         return {
           ...acc,
           [overlay.media.uri]: calculateImageScale(overlay.media),
@@ -280,6 +287,11 @@ const CoverEditorCore = (
 
     const cardColors =
       profile.webCard?.cardColors ?? coverTemplate?.colorPalette ?? {};
+
+    // if we create a new cover without a new template and there is no cover already done
+    // then we should interpolate the cover preview position
+    const shouldComputeCoverPreviewPositionPercentage =
+      !coverTemplate && !coverInitialState?.lottie;
 
     return {
       isModified: false,
@@ -309,8 +321,10 @@ const CoverEditorCore = (
       loadingRemoteMedia: false,
       loadingLocalMedia: false,
       loadingError: null,
+      coverPreviewPositionPercentage: coverTemplate?.previewPositionPercentage,
+      shouldComputeCoverPreviewPositionPercentage,
 
-      ...coverInitialSate,
+      ...coverInitialState,
     };
   });
 

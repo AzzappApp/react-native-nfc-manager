@@ -1,10 +1,10 @@
 import * as Sentry from '@sentry/nextjs';
 import * as bcrypt from 'bcrypt-ts';
 import { NextResponse } from 'next/server';
-import { withAxiom } from 'next-axiom';
 import { updateUser, getUserByPhoneNumber, getUserByEmail } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
+import { withPluginsRoute } from '#helpers/queries';
 import { checkTwilioVerificationCode } from '#helpers/twilioHelpers';
 
 type ChangePasswordBody = {
@@ -13,7 +13,7 @@ type ChangePasswordBody = {
   issuer: string;
 };
 
-export const POST = withAxiom(async (req: Request) => {
+export const POST = withPluginsRoute(async (req: Request) => {
   const { password, token, issuer } = (await req.json()) as ChangePasswordBody;
   if (!password || !token) {
     return NextResponse.json(

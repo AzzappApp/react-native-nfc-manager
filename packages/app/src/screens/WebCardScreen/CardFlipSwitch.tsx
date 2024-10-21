@@ -42,48 +42,44 @@ const CardFlipSwitch = forwardRef<CardFlipSwitchRef, CardFlipSwitchProps>(
 
     const cardRadius = COVER_CARD_RADIUS * windowWidth;
 
-    useImperativeHandle(
-      ref,
-      () => {
-        return {
-          triggerFlip: () => {
-            animationRunning.value = true;
-            const nextValue = !currentFlip.value;
-            startLeft.value = false;
-            clockFlipDirection.value = false;
-            flip.value = withTiming(
-              currentFlip.value ? 0 : 1,
-              {
-                duration: 1300,
-                easing: Easing.out(Easing.back(1)),
-              },
-              animated => {
-                if (animated) {
-                  runOnJS(onFlip)();
-                }
-                if (animated) {
-                  currentFlip.value = nextValue;
-                  clockFlipDirection.value = nextValue;
-                }
+    useImperativeHandle(ref, () => {
+      return {
+        triggerFlip: () => {
+          animationRunning.value = true;
+          const nextValue = !currentFlip.value;
+          startLeft.value = false;
+          clockFlipDirection.value = false;
+          flip.value = withTiming(
+            currentFlip.value ? 0 : 1,
+            {
+              duration: 1300,
+              easing: Easing.out(Easing.back(1)),
+            },
+            animated => {
+              if (animated) {
+                runOnJS(onFlip)();
+              }
+              if (animated) {
+                currentFlip.value = nextValue;
+                clockFlipDirection.value = nextValue;
+              }
 
-                animationRunning.value = false;
-              },
-            );
+              animationRunning.value = false;
+            },
+          );
 
-            currentFlip.value = nextValue;
-          },
-          animationRunning,
-        };
-      },
-      [
+          currentFlip.value = nextValue;
+        },
         animationRunning,
-        currentFlip,
-        startLeft,
-        clockFlipDirection,
-        flip,
-        onFlip,
-      ],
-    );
+      };
+    }, [
+      animationRunning,
+      currentFlip,
+      startLeft,
+      clockFlipDirection,
+      flip,
+      onFlip,
+    ]);
 
     const frontStyle = useAnimatedStyle(() => ({
       borderRadius: interpolate(

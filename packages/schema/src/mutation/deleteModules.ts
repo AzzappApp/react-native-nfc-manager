@@ -1,6 +1,7 @@
 import { GraphQLError } from 'graphql';
 import {
   getCardModulesByIds,
+  referencesMedias,
   removeCardModules,
   resetCardModulesPositions,
   transaction,
@@ -10,6 +11,7 @@ import { invalidateWebCard } from '#externals';
 import { webCardLoader } from '#loaders';
 import { checkWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
+import { MODULES_SAVE_RULES } from './ModulesMutationsResolvers';
 import type { MutationResolvers } from '#/__generated__/types';
 
 const deleteModules: MutationResolvers['deleteModules'] = async (
@@ -33,6 +35,19 @@ const deleteModules: MutationResolvers['deleteModules'] = async (
   try {
     await transaction(async () => {
       await removeCardModules(modulesIds);
+
+      const moduleMedias = modules.flatMap(m => {
+        if (m) {
+          const saveRules = MODULES_SAVE_RULES[m.kind];
+          if (saveRules && 'getMedias' in saveRules) {
+            return saveRules.getMedias?.(m.data as any) ?? [];
+          }
+        }
+        return [];
+      });
+
+      await referencesMedias([], moduleMedias);
+
       await resetCardModulesPositions(webCardId);
     });
   } catch (e) {

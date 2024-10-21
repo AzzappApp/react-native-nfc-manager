@@ -143,31 +143,17 @@ const HomeBottomPanelInvitation = ({
 export default HomeBottomPanelInvitation;
 
 const styles = StyleSheet.create({
-  panel: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'red',
-    borderWidth: 3,
-  },
   informationText: {
     textAlign: 'center',
     color: colors.white,
     marginHorizontal: 50,
     marginTop: 10,
   },
-  container: { flex: 1 },
   message: {
     color: colors.white,
   },
   icon: {
     color: colors.white,
-  },
-  warningIcon: {
-    tintColor: colors.white,
-    marginBottom: 20,
-    width: 20,
-    height: 20,
   },
   invitationPanelButton: {
     minWidth: 250,

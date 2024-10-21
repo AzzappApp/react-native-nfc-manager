@@ -10,14 +10,14 @@ import {
 } from 'react';
 
 import { useIntl } from 'react-intl';
-import { Alert, View } from 'react-native';
+import { View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import AuthorCartouche from '#components/AuthorCartouche';
+import { getAuthState } from '#helpers/authStore';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import useAuthState from '#hooks/useAuthState';
 import useToggle from '#hooks/useToggle';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
@@ -92,6 +92,8 @@ export type PostRendererProps = ViewProps & {
 
   actionEnabled?: boolean;
 
+  onActionDisabled?: () => void;
+
   showUnpublished?: boolean;
 };
 
@@ -112,6 +114,7 @@ const PostRenderer = (
     initialTime,
     onPressAuthor,
     actionEnabled = true,
+    onActionDisabled,
     showUnpublished = false,
     useAnimationSnapshot,
     ...props
@@ -167,8 +170,6 @@ const PostRenderer = (
     [],
   );
 
-  const { profileInfos } = useAuthState();
-
   const [showModal, toggleModal] = useToggle();
   const context = useContext(PostListContext);
   const shouldPlayVideo = context.played === post.id;
@@ -177,6 +178,7 @@ const PostRenderer = (
   const intl = useIntl();
 
   const openModal = useCallback(() => {
+    const { profileInfos } = getAuthState();
     if (profileHasEditorRight(profileInfos?.profileRole)) {
       toggleModal();
     } else {
@@ -189,36 +191,11 @@ const PostRenderer = (
         }),
       });
     }
-  }, [intl, profileInfos?.profileRole, toggleModal]);
-
-  const displayToastUnpublished = useCallback(() => {
-    Alert.alert(
-      intl.formatMessage({
-        defaultMessage: 'Unpublished WebCard.',
-        description:
-          'PostRenderer - Alert Message title when the user is viewing a post (from deeplinking) with an unpublished WebCard',
-      }),
-      intl.formatMessage({
-        defaultMessage:
-          'This action can only be done from a published WebCard.',
-        description:
-          'PostRenderer - AlertMessage when the user is viewing a post (from deeplinking) with an unpublished WebCard',
-      }),
-      [
-        {
-          text: intl.formatMessage({
-            defaultMessage: 'Ok',
-            description:
-              'PostRenderer - Alert button when the user is viewing a post (from deeplinking) with an unpublished WebCard',
-          }),
-        },
-      ],
-    );
-  }, [intl]);
+  }, [intl, toggleModal]);
 
   const handleOpenModal = () => {
     if (!actionEnabled) {
-      displayToastUnpublished();
+      onActionDisabled?.();
       return;
     }
 
@@ -272,6 +249,7 @@ const PostRenderer = (
           showModal={showModal}
           post={post}
           actionEnabled={actionEnabled}
+          onActionDisabled={onActionDisabled}
         />
       </Suspense>
     </View>

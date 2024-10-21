@@ -24,7 +24,7 @@ import TextInput from '#ui/TextInput';
 import type { SimpleButtonSettingsEditionPanel_webCard$key } from '#relayArtifacts/SimpleButtonSettingsEditionPanel_webCard.graphql';
 import type { CountryCodeListOption } from '#ui/CountryCodeListWithOptions';
 import type { CountryCode } from 'libphonenumber-js';
-import type { ViewProps } from 'react-native';
+import type { KeyboardType, ViewProps } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 
 type SimpleButtonSettingsEditionPanelProps = ViewProps & {
@@ -164,6 +164,17 @@ const SimpleButtonSettingsEditionPanel = ({
     [buttonColor, intl, webCard?.cardColors],
   );
 
+  const keyboardType: KeyboardType = useMemo(() => {
+    switch (actionType) {
+      case 'email':
+        return 'email-address';
+      case 'link':
+        return 'url';
+      default:
+        return 'phone-pad';
+    }
+  }, [actionType]);
+
   const SELECTORS: Array<CountryCodeListOption<'email' | 'link'>> = [
     {
       type: 'email',
@@ -289,6 +300,7 @@ const SimpleButtonSettingsEditionPanel = ({
             onBlur={onBlur}
             style={{ flex: 1 }}
             autoCapitalize="none"
+            keyboardType={keyboardType}
           />
         </View>
         <View style={styles.buttonContainer}>

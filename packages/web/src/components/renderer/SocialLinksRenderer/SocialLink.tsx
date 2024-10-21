@@ -45,6 +45,7 @@ const SocialLink = (props: SocialLinkProps) => {
           width={iconSize / LINKS_ELEMENT_WRAPPER_MULTIPLER}
           height={iconSize / LINKS_ELEMENT_WRAPPER_MULTIPLER}
           color={iconColor}
+          fill={iconColor}
         />
       </a>
     </div>

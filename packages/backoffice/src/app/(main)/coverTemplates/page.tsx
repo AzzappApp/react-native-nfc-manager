@@ -9,7 +9,7 @@ export type CoverTemplateItem = {
   status: boolean;
 };
 
-export type SortColumn = 'name' | 'type';
+export type SortColumn = 'mediaCount' | 'name' | 'type';
 export type StatusFilter = 'All' | 'Disabled' | 'Enabled';
 
 type CoverTemplatesPageProps = {
@@ -46,13 +46,23 @@ const CoverTemplatesPage = async ({
     enabled: statusFilter === 'All' ? undefined : statusFilter === 'Enabled',
   });
 
-  const coverTemplates = items.map(({ coverTemplate, typeLabel }) => ({
-    id: coverTemplate.id,
-    name: coverTemplate.name,
-    type: typeLabel,
-    mediaCount: coverTemplate.mediaCount,
-    status: coverTemplate.enabled,
-  }));
+  const coverTemplates = items
+    .sort(({ coverTemplate: c1 }, { coverTemplate: c2 }) => {
+      if (searchParams.sort !== 'mediaCount') {
+        return 0;
+      }
+
+      return sortOrder === 'asc'
+        ? c1.mediaCount - c2.mediaCount
+        : c2.mediaCount - c1.mediaCount;
+    })
+    .map(({ coverTemplate, typeLabel }) => ({
+      id: coverTemplate.id,
+      name: coverTemplate.name,
+      type: typeLabel,
+      mediaCount: coverTemplate.mediaCount,
+      status: coverTemplate.enabled,
+    }));
 
   return (
     <CoverTemplatesList
@@ -60,7 +70,7 @@ const CoverTemplatesPage = async ({
       count={count}
       page={page}
       pageSize={PAGE_SIZE}
-      sortField={sortField}
+      sortField={searchParams.sort === 'mediaCount' ? 'mediaCount' : sortField}
       sortOrder={sortOrder}
       search={search}
       statusFilter={statusFilter}

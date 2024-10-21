@@ -68,8 +68,8 @@ const CardTemplatesPage = async ({ searchParams = {} }: Props) => {
       id: cardTemplate.id,
       label: labelsMap.get(cardTemplate.id) ?? null,
       type: cardTemplate.cardTemplateTypeId
-        ? labelsMap.get(cardTemplate.cardTemplateTypeId) ??
-          cardTemplate.cardTemplateTypeId
+        ? (labelsMap.get(cardTemplate.cardTemplateTypeId) ??
+          cardTemplate.cardTemplateTypeId)
         : null,
       modules: cardTemplate.modules,
       personalEnabled: cardTemplate.personalEnabled,

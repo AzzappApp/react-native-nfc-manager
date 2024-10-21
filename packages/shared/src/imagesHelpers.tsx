@@ -38,7 +38,7 @@ export type UrLForSizeParam = {
   pixelRatio?: number | null;
   pregeneratedSizes?: number[] | null;
   format?: string | null;
-  videoDurationPercentage?: number | null;
+  previewPositionPercentage?: number | null;
 };
 
 /**
@@ -50,6 +50,7 @@ export type UrLForSizeParam = {
  * @param pixelRatio the desired pixeld density - default 1
  * @returns the url of a transformed image
  */
+
 export const getImageURLForSize = ({
   id,
   width,
@@ -121,7 +122,7 @@ export const getVideoThumbnailURL = ({
   height,
   pixelRatio = 1,
   pregeneratedSizes,
-  videoDurationPercentage,
+  previewPositionPercentage,
 }: UrLForSizeParam) => {
   assetNotRN('getVideoThumbnailURL');
   const transforms = resizeTransforms(
@@ -135,7 +136,7 @@ export const getVideoThumbnailURL = ({
     'video',
     transforms,
     'avif',
-    videoDurationPercentage,
+    previewPositionPercentage,
   );
 };
 

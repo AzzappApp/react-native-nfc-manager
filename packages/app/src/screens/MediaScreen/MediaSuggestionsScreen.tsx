@@ -46,7 +46,6 @@ const MediaSuggestionsScreen = ({
         <View>
           <CoverSuggestionTitle />
           <MediaSuggestionsWebCards
-            style={styles.coverList}
             profile={profile}
             webCard={profile.webCard}
             isCurrentTab={isCurrentTab}
@@ -177,7 +176,7 @@ const PostSuggestionTitle = () => (
 export default MediaSuggestionsScreen;
 
 export const MediaSuggestionsScreenFallback = () => (
-  <View>
+  <View style={{ flex: 1 }}>
     <CoverSuggestionTitle />
     <MediaSuggestionWebCardFallback />
     <PostSuggestionTitle />
@@ -186,9 +185,6 @@ export const MediaSuggestionsScreenFallback = () => (
 );
 
 const styles = StyleSheet.create({
-  coverList: {
-    overflow: 'visible',
-  },
   coversTitleStyle: {
     marginHorizontal: 10,
     marginTop: 6.5,

@@ -32,8 +32,13 @@ const CoverRenderer = ({
   priority,
   ...props
 }: CoverRendererProps) => {
-  const { cardColors, coverTexts, coverBackgroundColor, coverDynamicLinks } =
-    webCard;
+  const {
+    cardColors,
+    coverTexts,
+    coverBackgroundColor,
+    coverDynamicLinks,
+    coverPreviewPositionPercentage,
+  } = webCard;
 
   const coverWidth = width ? width * 2 : DEFAULT_COVER_WIDTH * 2;
   const coverHeight = coverWidth / COVER_RATIO;
@@ -100,7 +105,9 @@ const CoverRenderer = ({
             quality="auto:best"
             rawTransformations={
               staticCover
-                ? [`so_${DEFAULT_VIDEO_PERCENTAGE_THUMBNAIL}p`]
+                ? [
+                    `so_${coverPreviewPositionPercentage ?? DEFAULT_VIDEO_PERCENTAGE_THUMBNAIL}p`,
+                  ]
                 : undefined
             }
           />

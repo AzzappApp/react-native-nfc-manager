@@ -15,11 +15,12 @@ import {
   searchPosts,
   searchWebCards,
   getCardTemplatesForWebCardKind,
+  searchContacts,
+  getContactCount,
 } from '@azzapp/data';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import { shuffle } from '@azzapp/shared/arrayHelpers';
 import { serializeContactCard } from '@azzapp/shared/contactCardHelpers';
-import ERRORS from '@azzapp/shared/errors';
 import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
 import { simpleHash } from '@azzapp/shared/stringHelpers';
 import {
@@ -30,6 +31,7 @@ import { getOrCreateSessionResource, getSessionInfos } from '#GraphQLContext';
 import {
   companyActivityLoader,
   labelLoader,
+  profileInUserContactLoader,
   profileLoader,
   profileStatisticsLoader,
   userLoader,
@@ -38,6 +40,7 @@ import {
 } from '#loaders';
 import {
   connectionFromDateSortedItems,
+  connectionFromSortedArray,
   cursorToDate,
   emptyConnection,
 } from '#helpers/connectionsHelpers';
@@ -170,18 +173,26 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
     return user;
   },
   avatar: async profile => {
+    const { userId } = getSessionInfos();
+
     if (
-      !profileIsAssociatedToCurrentUser(profile) &&
-      !(await hasWebCardProfileRight(profile.webCardId))
+      profileIsAssociatedToCurrentUser(profile) ||
+      (await hasWebCardProfileRight(profile.webCardId)) ||
+      (userId &&
+        (await profileInUserContactLoader.load({
+          userId,
+          profileId: profile.id,
+        })))
     ) {
-      return null;
+      return profile.avatarId
+        ? {
+            media: profile.avatarId,
+            assetKind: 'contactCard',
+          }
+        : null;
     }
-    return profile.avatarId
-      ? {
-          media: profile.avatarId,
-          assetKind: 'contactCard',
-        }
-      : null;
+
+    return null;
   },
   logo: async profile => {
     if (
@@ -246,15 +257,23 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
     return result;
   },
   webCard: async profile => {
+    const webcard = await webCardLoader.load(profile.webCardId);
+
     if (
-      !profileIsAssociatedToCurrentUser(profile) &&
-      !(await hasWebCardProfileRight(profile.webCardId))
+      profileIsAssociatedToCurrentUser(profile) ||
+      (await hasWebCardProfileRight(profile.webCardId)) ||
+      webcard?.cardIsPublished
     ) {
-      // TODO schema error, the field should be nullable, but it's not until we
-      // can change the schema, we throw an error here
-      throw new Error(ERRORS.GRAPHQL_ERROR);
+      return webcard;
     }
-    return webCardLoader.load(profile.webCardId);
+
+    return null;
+  },
+  nbContacts: async profile => {
+    if (!(await hasWebCardProfileRight(profile.webCardId))) {
+      return 0;
+    }
+    return getContactCount(profile.id);
   },
   suggestedWebCards: async () => {
     return emptyConnection;
@@ -325,6 +344,25 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
       getDate: card => card.createdAt,
       hasNextPage: posts.length > first,
       hasPreviousPage: offset !== null,
+    });
+  },
+  searchContacts: async (profile, { first, after, name, orderBy }) => {
+    if (!profileIsAssociatedToCurrentUser(profile)) {
+      return emptyConnection;
+    }
+    const limit = first ?? 50;
+    const offset = after ? cursorToOffset(after) : 0;
+
+    const contacts = await searchContacts({
+      limit: limit + 1,
+      ownerProfileId: profile.id,
+      name: name ?? undefined,
+      offset,
+      orderBy,
+    });
+    return connectionFromSortedArray(contacts.slice(0, limit), {
+      offset,
+      hasNextPage: contacts.length > limit,
     });
   },
   searchWebCards: async (profile, { first, after, search }) => {
@@ -546,6 +584,9 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
       },
     );
   },
+  deleted: async profile => {
+    return profile.deleted;
+  },
 };
 
 export { ProfileResolverImpl as Profile };
@@ -556,8 +597,8 @@ const getActivityName = async (webCardId: string, locale: string) => {
     ? await companyActivityLoader.load(webcard.companyActivityId)
     : null;
   const activityName = activity?.id
-    ? (await labelLoader.load([activity.id, locale])) ??
-      (await labelLoader.load([activity.id, DEFAULT_LOCALE]))
+    ? ((await labelLoader.load([activity.id, locale])) ??
+      (await labelLoader.load([activity.id, DEFAULT_LOCALE])))
     : null;
   return activityName?.value;
 };

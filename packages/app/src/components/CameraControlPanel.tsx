@@ -238,18 +238,4 @@ const styles = StyleSheet.create({
   photoButtonDisabled: {
     opacity: 0.5,
   },
-  videoButton: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: colors.red400,
-  },
-
-  stopButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 8,
-    backgroundColor: colors.black,
-    transform: [{ scale: 1 }],
-  },
 });

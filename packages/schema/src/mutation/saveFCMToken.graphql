@@ -1,0 +1,13 @@
+extend type Mutation {
+  """
+  Mutation to save common information of a profile
+  """
+  saveFCMToken(input: SaveFCMTokenInput!): Boolean!
+}
+
+input SaveFCMTokenInput {
+  deviceId: ID!
+  fcmToken: String!
+  deviceType: String!
+  deviceOS: String!
+}

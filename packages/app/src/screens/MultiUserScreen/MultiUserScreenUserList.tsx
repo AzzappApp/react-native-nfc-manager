@@ -22,7 +22,7 @@ import { colors } from '#theme';
 import { MediaImageRenderer } from '#components/medias';
 import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import useAuthState from '#hooks/useAuthState';
+import { useProfileInfos } from '#hooks/authStateHooks';
 import { useFocusEffect } from '#hooks/useFocusEffect';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
@@ -235,7 +235,7 @@ const MultiUserScreenUserList = ({
 
   useFocusEffect(onRefresh);
 
-  const { profileInfos } = useAuthState();
+  const profileInfos = useProfileInfos();
 
   const { transferOwnerMode } = useContext(MultiUserTransferOwnerContext);
 
@@ -386,7 +386,7 @@ const SectionHeader = ({ title }: { title: string }) => {
 const ItemList = ({ item }: { item: Profile }) => {
   const styles = useStyleSheet(styleSheet);
 
-  const { profileInfos } = useAuthState();
+  const profileInfos = useProfileInfos();
   const { transferOwnerMode, selectedProfileId, setSelectedProfileId } =
     useContext(MultiUserTransferOwnerContext);
 

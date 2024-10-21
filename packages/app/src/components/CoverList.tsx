@@ -1,71 +1,63 @@
-import { useCallback, useMemo, useRef } from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
+import { forwardRef, memo, useCallback, useMemo, useState } from 'react';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import {
   COVER_BASE_WIDTH,
   COVER_CARD_RADIUS,
+  COVER_RATIO,
 } from '@azzapp/shared/coverHelpers';
-import { colors, shadow } from '#theme';
+import { shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import Container from '#ui/Container';
 import CoverLink from './CoverLink';
 import type {
   CoverList_users$data,
   CoverList_users$key,
 } from '#relayArtifacts/CoverList_users.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
-import type { ListRenderItemInfo, StyleProp, ViewStyle } from 'react-native';
+import type { ListRenderItemInfo, ViewToken } from '@shopify/flash-list';
+import type { ForwardedRef } from 'react';
+import type { ScrollViewProps } from 'react-native';
 
+// Base props that are common to both cases
 type CoverListProps = {
   users: CoverList_users$key;
+  coverWidth: number;
+  renderItem?: (
+    param: ListRenderItemInfo<ArrayItemType<CoverList_users$data>>,
+  ) => JSX.Element | null;
   onEndReached?: () => void;
-  style?: StyleProp<ViewStyle>;
-  containerStyle?: StyleProp<ViewStyle>;
-  coverStyle?: StyleProp<ViewStyle>;
-  columnWrapperStyle?: StyleProp<ViewStyle>;
   horizontal?: boolean;
   numColums?: number;
-  onReady?: () => void;
-  initialNumToRender?: number;
   ListHeaderComponent?:
     | React.ComponentType<any>
     | React.ReactElement
     | null
     | undefined;
-  renderItem?: (
-    info: ListRenderItemInfo<ArrayItemType<CoverList_users$data>>,
-  ) => React.ReactElement | null;
   onRefresh?: () => void;
   refreshing?: boolean;
   withShadow?: boolean;
+  gap?: number; // flashlist don't handle gap on containerStyle
+  extraData?: any; //any is taken from flashlistProps
+  maxCoverPlay?: number;
 };
-// TODO docs and tests once this component is production ready
+
 const CoverList = ({
   users: usersKey,
   onEndReached,
-  style,
-  coverStyle = {},
-  containerStyle,
-  withShadow,
+  coverWidth = COVER_BASE_WIDTH,
+  withShadow = false,
   horizontal = true,
   numColums = 1,
-  initialNumToRender = 5,
-  onReady,
   ListHeaderComponent,
   renderItem: customRenderItem,
-  columnWrapperStyle,
   refreshing,
   onRefresh,
+  gap = 10,
+  extraData,
+  maxCoverPlay = 2,
 }: CoverListProps) => {
-  const coverWidth = useMemo(() => {
-    //TODO: refactoring aka do it better :). number is required. flatten will give a string.
-    // not elegant but works
-    const flatStyles = StyleSheet.flatten(coverStyle);
-    if (typeof flatStyles?.width === 'number') {
-      return flatStyles.width;
-    }
-    return COVER_BASE_WIDTH;
-  }, [coverStyle]);
-
   const users = useFragment(
     graphql`
       fragment CoverList_users on WebCard @relay(plural: true) {
@@ -77,98 +69,155 @@ const CoverList = ({
     usersKey,
   );
 
-  const keyExtractor = useCallback(
-    (item: ArrayItemType<CoverList_users$data>) => item.id,
-    [],
-  );
-
-  const coversReady = useRef(0);
-  const onCoverReady = useCallback(() => {
-    coversReady.current++;
-    if (
-      coversReady.current >= initialNumToRender ||
-      coversReady.current === users.length
-    ) {
-      onReady?.();
-    }
-  }, [initialNumToRender, onReady, users.length]);
-
-  const styles = useStyleSheet(styleSheet);
+  const [viewableItems, setViewableItems] = useState<number[]>([]);
 
   const renderItem = useCallback(
-    ({ item }: ListRenderItemInfo<ArrayItemType<CoverList_users$data>>) => (
-      <View
-        style={
-          withShadow
-            ? {
-                ...styles.coverContainerStyle,
-                borderRadius: COVER_CARD_RADIUS * coverWidth,
-              }
-            : null
-        }
-      >
-        <CoverLink
+    (param: ListRenderItemInfo<ArrayItemType<CoverList_users$data>>) => {
+      if (customRenderItem) {
+        return customRenderItem(param);
+      }
+      const { item, index, extraData } = param;
+      const shouldPlay = extraData.viewableItems.some((v: any) => v === index);
+      return (
+        <CoverListItem
           webCard={item}
-          width={coverWidth}
-          webCardId={item.id}
-          style={coverStyle}
-          onReadyForDisplay={onCoverReady}
+          withShadow={withShadow}
+          coverWidth={coverWidth}
+          shouldPlayMedia={shouldPlay}
         />
-      </View>
-    ),
-    [
-      coverStyle,
-      coverWidth,
-      onCoverReady,
-      styles.coverContainerStyle,
-      withShadow,
-    ],
+      );
+    },
+    //those parameter will not change  from props, don't require to be in extraData for rerender
+    [coverWidth, customRenderItem, withShadow],
   );
 
-  //TODO: handle vertical layout with height instead of width
-  const getItemLayout = useCallback(
-    (_data: any, index: number) => ({
-      length: coverWidth,
-      offset: coverWidth * index,
-      index,
-    }),
-    [coverWidth],
+  //# region viewable to handle video preview
+  const onViewableItemChanged = useCallback(
+    (info: { viewableItems: ViewToken[]; changed: ViewToken[] }) => {
+      //we can only have two Item
+      const viewableRows = info.viewableItems
+        .filter(item => item != null && item.isViewable)
+        .map(item => item.index!)
+        .slice(0, maxCoverPlay);
+
+      // This is a basic implementation and might need adjustments
+      if (viewableRows.length >= 1) {
+        setViewableItems(viewableRows);
+      } else {
+        setViewableItems([]);
+      }
+    },
+    [maxCoverPlay],
   );
 
   return (
-    <FlatList
+    <FlashList
       testID="cover-list"
       accessibilityRole="list"
       data={users}
       keyExtractor={keyExtractor}
-      renderItem={customRenderItem ?? renderItem}
+      renderItem={renderItem}
+      estimatedItemSize={coverWidth}
       onEndReached={onEndReached}
-      onEndReachedThreshold={0.5}
       horizontal={horizontal}
       numColumns={horizontal ? 1 : numColums}
-      directionalLockEnabled
       showsHorizontalScrollIndicator={false}
-      contentContainerStyle={[styles.container, containerStyle]}
-      style={style}
-      getItemLayout={getItemLayout}
-      ListHeaderComponent={ListHeaderComponent}
-      initialNumToRender={initialNumToRender}
-      columnWrapperStyle={columnWrapperStyle}
       onRefresh={onRefresh}
       refreshing={refreshing}
+      ListHeaderComponent={ListHeaderComponent}
+      onViewableItemsChanged={onViewableItemChanged}
+      ItemSeparatorComponent={props => (
+        <ItemSeparatorComponent {...props} gap={gap} horizontal={horizontal} />
+      )}
+      renderScrollComponent={OverflowScrollView}
+      contentInset={{
+        top: horizontal ? 0 : gap,
+        left: horizontal ? gap : 0,
+        bottom: 0,
+        right: 0,
+      }}
+      onEndReachedThreshold={0.3}
+      extraData={{ ...extraData, viewableItems }}
+      viewabilityConfig={viewabilityConfig}
     />
   );
 };
 
-export default CoverList;
+const viewabilityConfig = {
+  itemVisiblePercentThreshold: 89,
+};
+
+// eslint-disable-next-line react/display-name
+const OverflowScrollView = forwardRef(
+  ({ style, ...rest }: ScrollViewProps, ref: ForwardedRef<ScrollView>) => (
+    <ScrollView
+      ref={ref}
+      {...rest}
+      style={[style, scrollViewStyle.overflowScrollView]}
+    />
+  ),
+);
+
+const ItemSeparatorComponent = ({
+  gap,
+  horizontal,
+}: {
+  gap: number;
+  horizontal: boolean;
+}) => (
+  <View style={{ width: horizontal ? gap : 0, height: horizontal ? 0 : gap }} />
+);
+
+const keyExtractor = (item: ArrayItemType<CoverList_users$data>) => item.id;
+
+export default memo(CoverList);
 
 const styleSheet = createStyleSheet(appearance => ({
-  container: {
-    flexGrow: 0,
-    gap: 5,
-  },
   coverContainerStyle: {
     ...shadow(appearance, 'center'),
-    backgroundColor: appearance === 'dark' ? colors.black : colors.white,
   },
 }));
+
+const scrollViewStyle = StyleSheet.create({
+  overflowScrollView: { overflow: 'visible' },
+});
+
+const ItemList = ({
+  webCard,
+  withShadow,
+  coverWidth,
+  shouldPlayMedia = false,
+}: {
+  webCard: ArrayItemType<CoverList_users$data>;
+  coverWidth: number;
+  withShadow: boolean;
+  shouldPlayMedia?: boolean;
+}) => {
+  const styles = useStyleSheet(styleSheet);
+
+  const itemStyle = useMemo(() => {
+    if (withShadow) {
+      return {
+        ...styles.coverContainerStyle,
+        borderRadius: COVER_CARD_RADIUS * coverWidth,
+        width: coverWidth,
+        aspectRatio: COVER_RATIO,
+      };
+    }
+    return {
+      width: coverWidth,
+      aspectRatio: COVER_RATIO,
+    };
+  }, [coverWidth, styles.coverContainerStyle, withShadow]);
+  return (
+    <Container style={itemStyle}>
+      <CoverLink
+        webCard={webCard}
+        width={coverWidth}
+        webCardId={webCard.id}
+        canPlay={shouldPlayMedia}
+      />
+    </Container>
+  );
+};
+const CoverListItem = memo(ItemList);

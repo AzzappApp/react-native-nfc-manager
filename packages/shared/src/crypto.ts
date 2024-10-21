@@ -11,7 +11,6 @@ import type { SealOptions, RawPassword } from 'iron-webcrypto';
  */
 export const getCrypto = (): Crypto => {
   if (process.env.NEXT_RUNTIME !== 'edge') {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     return require('node:crypto').webcrypto;
   }
   if (typeof globalThis.crypto?.subtle === 'object') {

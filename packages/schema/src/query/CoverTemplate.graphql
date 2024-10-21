@@ -15,4 +15,5 @@ type CoverTemplate implements Node {
   mediaCount: Int!
   colorPalette: ColorPalette
   backgroundColor: String
+  previewPositionPercentage: Int
 }

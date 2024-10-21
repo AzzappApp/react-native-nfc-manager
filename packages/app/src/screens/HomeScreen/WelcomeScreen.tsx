@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 import LottieView from 'lottie-react-native';
 import { useCallback, useEffect } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -11,7 +10,7 @@ import { useMainTabBarVisibilityController } from '#components/MainTabBar';
 import { useRouter } from '#components/NativeRouter';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import relayScreen from '#helpers/relayScreen';
-import useAuthState from '#hooks/useAuthState';
+import { useProfileInfos } from '#hooks/authStateHooks';
 import { useFocusEffect } from '#hooks/useFocusEffect';
 import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
@@ -39,7 +38,7 @@ const WelcomeScreen = ({
     dispatchGlobalEvent({ type: 'READY' });
   }, []);
 
-  const { profileInfos } = useAuthState();
+  const profileInfos = useProfileInfos();
 
   const router = useRouter();
 

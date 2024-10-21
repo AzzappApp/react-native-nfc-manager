@@ -41,6 +41,7 @@ jest.mock('react-native-share', () => ({ open: jest.fn() }));
 
 jest.mock('@shopify/react-native-skia', () => ({
   rect: jest.fn(),
+  useSVG: jest.fn(),
   Skia: {
     SVG: {
       MakeFromString: jest.fn(),

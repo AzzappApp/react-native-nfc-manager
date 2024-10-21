@@ -404,24 +404,6 @@ const styles = StyleSheet.create({
     maxHeight: 113,
     alignSelf: 'center',
   },
-  titleContainer: {
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  title: {
-    paddingHorizontal: 25,
-    backgroundColor: 'white',
-    zIndex: 1,
-  },
-  titleLine: {
-    position: 'absolute',
-    top: '50%',
-    left: 0,
-    width: '100%',
-    height: 1,
-    backgroundColor: 'colors.grey50',
-    transform: [{ translateY: -0.5 }],
-  },
   contentContainer: {
     flex: 1,
     marginTop: 10,

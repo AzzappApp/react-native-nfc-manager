@@ -184,8 +184,11 @@ export const createPaymentRequest = async ({
     if (subscription && subscription.status === 'active') {
       throw new Error('Subscription already active');
     }
+    const subscriptionId = createId();
 
     await createSubscription({
+      id: subscriptionId,
+      subscriptionId,
       userId,
       webCardId,
       issuer: 'web',
@@ -200,7 +203,6 @@ export const createPaymentRequest = async ({
       subscriberCountryCode: customer.countryCode,
       subscriberVatNumber: customer.vatNumber,
       startAt: date,
-      subscriptionId: createId(),
       subscriptionPlan,
       paymentMeanId: ulid,
       endAt: expirationDate,
@@ -271,7 +273,7 @@ export const createSubscriptionRequest = async ({
         clientPaymentRequestUlid: paymentMeanId,
         rebill_manager_fail_rule: generateRebillFailRule(),
         rebill_manager_external_reference: subscriptionId,
-        rebill_manager_callback_url: `${process.env.NEXT_PUBLIC_WEB_URL}/api/webhook/subscription`,
+        rebill_manager_callback_url: `${process.env.NEXT_PUBLIC_URL}api/webhook/subscription`,
       },
     },
   );
@@ -432,47 +434,81 @@ export const generateInvoice = async (webCardId: string, paymentId: string) => {
     throw new Error('Subscription not found');
   }
 
-  if (
-    !payment.rebillManagerId ||
-    !payment.paymentMeanId ||
-    !payment.transactionId
-  ) {
+  if (!payment.paymentMeanId || !payment.transactionId) {
     throw new Error('Missing payment data');
   }
 
-  const result = await client.POST(
-    '/api/client-payment-requests/create-rebill-manager-invoice',
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
+  const invoiceBody = {
+    clientPaymentRequestUlid: payment.paymentMeanId,
+    invoicingCompany: process.env.INVOICING_COMPANY ?? 'APPCORP',
+    invoicingEmail: process.env.INVOICING_EMAIL ?? 'contact@azzapp.com',
+    invoicingAddress1:
+      process.env.INVOICING_ADDRESS ?? '3-5 avenue des Citronniers',
+    invoicingAddress2: '',
+    invoicingCity: process.env.INVOICING_CITY ?? 'Monaco',
+    invoicingZip: process.env.INVOICING_ZIP ?? '98000',
+    invoicingCountry: process.env.INVOICING_COUNTRY ?? 'France',
+    invoicingVat: process.env.INVOICING_VAT ?? 'FR68923096283',
+    invoicedCompany: subscription.subscriberName ?? '',
+    invoicedFirstname: '',
+    invoicedLastname: '',
+    invoicedEmail: subscription.subscriberEmail ?? '',
+    invoicedAddress1: subscription.subscriberAddress,
+    invoicedAddress2: '',
+    invoicedCity: subscription.subscriberCity ?? '',
+    invoicedZip: subscription.subscriberZip ?? '',
+    invoicedCountry: subscription.subscriberCountry ?? '',
+    invoicedVat: subscription.subscriberVatNumber ?? '',
+    invoicedPhone: subscription.subscriberPhoneNumber ?? '',
+    invoicedProduct: 'Azzapp PRO',
+    hasVat: payment.taxes > 0 ? '1' : '0',
+    vatRate: `${Math.round((payment.taxes / payment.amount) * 100)}`,
+  };
+
+  let result;
+  if (payment.rebillManagerId) {
+    const rebillManager = await client.POST(
+      '/api/client-payment-requests/check-rebill-manager',
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: {
+          rebillManagerId: payment.rebillManagerId,
+          clientPaymentRequestUlid: payment.paymentMeanId,
+        },
       },
-      body: {
-        clientPaymentRequestUlid: payment.paymentMeanId,
-        rebillManagerId: payment.rebillManagerId,
-        rebillManagerTransactionId: payment.transactionId,
-        invoicingCompany: process.env.INVOICING_COMPANY ?? 'APPCORP',
-        invoicingEmail: process.env.INVOICING_EMAIL ?? 'contact@azzapp.com',
-        invoicingAddress1:
-          process.env.INVOICING_ADDRESS ?? '3-5 avenue des Citronniers',
-        invoicingAddress2: '',
-        invoicingCity: process.env.INVOICING_CITY ?? 'Monaco',
-        invoicingZip: process.env.INVOICING_ZIP ?? '98000',
-        invoicingCountry: process.env.INVOICING_COUNTRY ?? 'France',
-        invoicingVat: process.env.INVOICING_VAT ?? 'FR68923096283',
-        invoicedCompany: subscription.subscriberName ?? '',
-        invoicedFirstname: '',
-        invoicedLastname: '',
-        invoicedEmail: subscription.subscriberEmail ?? '',
-        invoicedAddress1: subscription.subscriberAddress,
-        invoicedAddress2: '',
-        invoicedCity: subscription.subscriberCity ?? '',
-        invoicedZip: subscription.subscriberZip ?? '',
-        invoicedCountry: subscription.subscriberCountry ?? '',
-        invoicedVat: subscription.subscriberVatNumber ?? '',
-        invoicedPhone: subscription.subscriberPhoneNumber ?? '',
+    );
+
+    const foundTransaction = rebillManager.data?.transactions?.find(
+      transaction => transaction.transaction_id === payment.transactionId,
+    );
+
+    result = await client.POST(
+      '/api/client-payment-requests/create-rebill-manager-invoice',
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: {
+          ...invoiceBody,
+          rebillManagerId: payment.rebillManagerId,
+          rebillManagerTransactionId:
+            foundTransaction?.rebill_manager_transaction_id ?? '',
+        } as any, //hasVat and vatRate types does not match the API,
       },
-    },
-  );
+    );
+  } else {
+    result = await client.POST(
+      '/api/client-payment-requests/create-bill-invoice',
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: { ...invoiceBody, transactionId: payment.transactionId } as any, //hasVat and vatRate types does not match the API,
+      },
+    );
+  }
 
   if (!result.data) {
     throw new Error('Invoice generation failed', { cause: result.error });

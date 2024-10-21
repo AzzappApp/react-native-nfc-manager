@@ -182,11 +182,11 @@ const CarouselRenderer = ({
     const imageHeightValue =
       typeof imageHeight === 'number'
         ? imageHeight
-        : imageHeight?.value ?? defaultImageHeight;
+        : (imageHeight?.value ?? defaultImageHeight);
     const marginVerticalValue =
       typeof marginVertical === 'number'
         ? marginVertical
-        : marginVertical?.value ?? 0;
+        : (marginVertical?.value ?? 0);
 
     return {
       height: imageHeightValue + marginVerticalValue * 2,
@@ -198,12 +198,12 @@ const CarouselRenderer = ({
       paddingVertical:
         typeof marginVertical === 'number'
           ? marginVertical
-          : marginVertical?.value ?? 0,
+          : (marginVertical?.value ?? 0),
       paddingHorizontal:
         typeof marginHorizontal === 'number'
           ? marginHorizontal
-          : marginHorizontal?.value ?? 0,
-      columnGap: typeof gap === 'number' ? gap : gap?.value ?? 0,
+          : (marginHorizontal?.value ?? 0),
+      columnGap: typeof gap === 'number' ? gap : (gap?.value ?? 0),
       height: '100%',
       flexDirection: 'row',
     };
@@ -214,13 +214,15 @@ const CarouselRenderer = ({
       height:
         typeof imageHeight === 'number'
           ? imageHeight
-          : imageHeight?.value ?? defaultImageHeight,
+          : (imageHeight?.value ?? defaultImageHeight),
       borderRadius:
         typeof borderRadius === 'number'
           ? borderRadius
-          : borderRadius?.value ?? 0,
+          : (borderRadius?.value ?? 0),
       borderWidth:
-        typeof borderWidth === 'number' ? borderWidth : borderWidth?.value ?? 0,
+        typeof borderWidth === 'number'
+          ? borderWidth
+          : (borderWidth?.value ?? 0),
     }),
     [imageHeight, borderRadius, borderWidth],
   );

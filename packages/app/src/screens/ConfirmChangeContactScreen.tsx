@@ -1,7 +1,7 @@
 import { type GraphQLError } from 'graphql';
 import { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Keyboard, Platform, View } from 'react-native';
+import { Platform, View } from 'react-native';
 import {
   CodeField,
   Cursor,
@@ -15,6 +15,7 @@ import { isValidEmail } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { keyboardDismiss } from '#helpers/keyboardHelper';
 import relayScreen from '#helpers/relayScreen';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
@@ -164,7 +165,7 @@ const ConfirmRegistrationScreen = ({
 
   return (
     <Container style={styles.flex}>
-      <View onTouchStart={Keyboard.dismiss} style={styles.container}>
+      <View onTouchStart={keyboardDismiss} style={styles.container}>
         <View style={styles.inner}>
           <View style={styles.logoContainer}>
             <Icon icon={isEmail ? 'mail_line' : 'sms'} style={styles.logo} />
@@ -222,7 +223,8 @@ const ConfirmRegistrationScreen = ({
               android: 'sms-otp' as const,
               default: 'one-time-code' as const,
             })}
-            caretHidden={true}
+            caretHidden={code !== ''}
+            textInputStyle={styles.textInputStyle}
             renderCell={({ index, symbol, isFocused }) => (
               <View
                 key={index}
@@ -332,6 +334,9 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   focusCell: {
     borderColor: appearance === 'light' ? colors.grey900 : colors.grey400,
+  },
+  textInputStyle: {
+    marginStart: 30,
   },
 }));
 

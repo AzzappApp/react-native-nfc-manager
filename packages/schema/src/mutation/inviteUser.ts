@@ -8,6 +8,7 @@ import {
   getUserByEmailPhoneNumber,
   referencesMedias,
   transaction,
+  updateProfile,
   updateWebCard,
 } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
@@ -18,7 +19,7 @@ import {
   isInternationalPhoneNumber,
   isValidEmail,
 } from '@azzapp/shared/stringHelpers';
-import { notifyUsers } from '#externals';
+import { notifyUsers, sendPushNotification } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
 import {
   profileLoader,
@@ -29,6 +30,7 @@ import {
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { checkSubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#__generated__/types';
+import type { Profile } from '@azzapp/data';
 
 const inviteUserMutation: MutationResolvers['inviteUser'] = async (
   _,
@@ -95,6 +97,7 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
       );
 
       let userId: string;
+      let existingProfile: Profile | null = null;
 
       if (!existingUser) {
         userId = await createUser({
@@ -104,14 +107,18 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
         });
         await createFreeSubscriptionForBetaPeriod([userId]);
       } else {
-        const existingProfile = await getProfileByUserAndWebCard(
+        userId = existingUser.id;
+
+        const foundProfile = await getProfileByUserAndWebCard(
           existingUser.id,
           webCard.id,
         );
-        if (existingProfile) {
+
+        if (foundProfile && !foundProfile.deleted) {
           throw new GraphQLError(ERRORS.PROFILE_ALREADY_EXISTS);
         }
-        userId = existingUser.id;
+
+        existingProfile = foundProfile;
       }
 
       const { displayedOnWebCard, isPrivate, avatarId, logoId, ...data } =
@@ -138,16 +145,43 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
         deletedAt: null,
         deletedBy: null,
       };
-      const createdProfileId = await createProfile(profileData);
-      await referencesMedias(addedMedia, []);
+      await referencesMedias(
+        addedMedia,
+        [
+          existingProfile?.avatarId ?? null,
+          existingProfile?.logoId ?? null,
+        ].filter(mediaId => mediaId),
+      );
 
-      return {
-        profile: {
-          ...profileData,
-          id: createdProfileId,
-        },
-        existingUser,
-      };
+      if (existingProfile) {
+        await updateProfile(existingProfile.id, profileData);
+        const locale = guessLocale(existingUser?.locale ?? user.locale);
+        await sendPushNotification(userId, {
+          type: 'multiuser_invitation',
+          mediaId: webCard.coverMediaId,
+          deepLink: 'multiuser_invitation',
+          localeParams: { userName: webCard.userName },
+          locale,
+        });
+
+        return {
+          profile: {
+            ...profileData,
+            id: existingProfile.id,
+          },
+          existingUser,
+        };
+      } else {
+        const createdProfileId = await createProfile(profileData);
+
+        return {
+          profile: {
+            ...profileData,
+            id: createdProfileId,
+          },
+          existingUser,
+        };
+      }
     });
 
     if (sendInvite) {

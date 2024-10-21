@@ -361,9 +361,6 @@ export default forwardRef(CameraView);
 const FOCUS_RING_SIZE = 100;
 
 const styles = StyleSheet.create({
-  camera: {
-    flex: 1,
-  },
   focusRing: {
     position: 'absolute',
     borderWidth: 1,

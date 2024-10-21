@@ -42,7 +42,6 @@ const ContactCardEditModalSocials = ({
             labelKey={`socials.${index}.label`}
             valueKey={`socials.${index}.url`}
             labelValues={labelValues}
-            selectedKey={`socials.${index}.selected`}
             deleteField={() => remove(index)}
             keyboardType="default"
             placeholder={intl.formatMessage({
@@ -70,7 +69,6 @@ const ContactCardEditModalSocials = ({
             append({
               url: SOCIAL_NETWORK_LINKS[0].mask,
               label: SOCIAL_NETWORK_LINKS[0].id,
-              selected: true,
             });
           }}
         >

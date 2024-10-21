@@ -60,7 +60,7 @@ const TypeListInput = ({
         getOptionLabel={option =>
           typeof option === 'string'
             ? option
-            : typesLabels.find(l => l.key === option.id)?.value ?? option.id
+            : (typesLabels.find(l => l.key === option.id)?.value ?? option.id)
         }
         renderInput={params => (
           <TextField
@@ -76,7 +76,8 @@ const TypeListInput = ({
           const label =
             typeof option === 'string'
               ? option
-              : typesLabels.find(l => l.key === option.id)?.value ?? option.id;
+              : (typesLabels.find(l => l.key === option.id)?.value ??
+                option.id);
           return (
             <li {...props} key={id}>
               {label}

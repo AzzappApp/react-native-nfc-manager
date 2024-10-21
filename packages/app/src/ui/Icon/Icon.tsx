@@ -221,6 +221,9 @@ const icons = {
   get height() {
     return require('./assets/height.png');
   },
+  get help() {
+    return require('./assets/help.png');
+  },
   get highlight() {
     return require('./assets/highlight.png');
   },

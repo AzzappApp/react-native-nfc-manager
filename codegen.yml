@@ -52,6 +52,7 @@ generates:
         RedirectWebCard: '@azzapp/data#RedirectWebCard as RedirectWebCard'
         PaymentMean: '@azzapp/data#PaymentMean as PaymentMeanModel'
         Payment: '@azzapp/data#Payment as PaymentModel'
+        Contact: '@azzapp/data#Contact as ContactModel'
       defaultMapper: 'Partial<{T}>'
       maybeValue: 'T extends PromiseLike<infer U> ? Promise<U | null> : T | null'
       scalars:

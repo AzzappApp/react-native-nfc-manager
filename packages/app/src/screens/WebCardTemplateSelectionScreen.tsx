@@ -3,7 +3,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, usePreloadedQuery } from 'react-relay';
-import { colors } from '#theme';
 import CardTemplateList from '#components/CardTemplateList';
 import { ApplyHeaderButton } from '#components/commonsButtons';
 import { useRouter } from '#components/NativeRouter';
@@ -212,14 +211,6 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  proText: {
-    color: colors.grey400,
-  },
-  proContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
   },
   applyButton: { width: 70, marginRight: 10 },
 });

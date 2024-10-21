@@ -4,7 +4,7 @@ import { TabBar, TabView } from 'react-native-tab-view';
 import { loadQuery, useRelayEnvironment } from 'react-relay';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import useAuthState from '#hooks/useAuthState';
+import { useProfileInfos } from '#hooks/authStateHooks';
 import TabBarMenuItem from '#ui/TabBarMenuItem';
 import Text from '#ui/Text';
 import SearchResultGlobal, {
@@ -80,7 +80,7 @@ const SearchTabContainer = ({
     ],
     [intl],
   );
-  const { profileInfos } = useAuthState();
+  const profileInfos = useProfileInfos();
   useEffect(() => {
     if (searchValue && environnement) {
       const queryReference = loadQuery(
@@ -190,7 +190,6 @@ const TabBarSearch = (
     }>;
   },
 ) => {
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const styles = useStyleSheet(styleSheet);
 
   return (

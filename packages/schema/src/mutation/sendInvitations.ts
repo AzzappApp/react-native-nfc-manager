@@ -1,7 +1,11 @@
 import * as Sentry from '@sentry/nextjs';
 import { GraphQLError } from 'graphql';
 import { toGlobalId } from 'graphql-relay';
-import { getUsersFromWebCard, updateWebCardProfiles } from '@azzapp/data';
+import {
+  countDeletedWebCardProfiles,
+  getUsersFromWebCard,
+  updateWebCardProfiles,
+} from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
 import { notifyUsers } from '#externals';
@@ -9,6 +13,7 @@ import { getSessionInfos } from '#GraphQLContext';
 import { userLoader, webCardLoader } from '#loaders';
 import { checkWebCardProfileAdminRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
+import { checkSubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 
 // to avoid sending too many invitations by SMS
@@ -32,6 +37,22 @@ const sendInvitations: MutationResolvers['sendInvitations'] = async (
       ? undefined
       : profileIds?.map(id => fromGlobalIdWithType(id, 'Profile')),
   );
+
+  const countDeletedProfiles = await countDeletedWebCardProfiles(
+    webCardId,
+    allProfiles ? undefined : users.map(({ profileId }) => profileId),
+  );
+
+  if (
+    countDeletedProfiles > 0 &&
+    !(await checkSubscription(
+      getSessionInfos().userId!,
+      webCardId,
+      countDeletedProfiles,
+    ))
+  ) {
+    throw new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED);
+  }
 
   const webCard = await webCardLoader.load(webCardId);
 
@@ -69,7 +90,13 @@ const sendInvitations: MutationResolvers['sendInvitations'] = async (
     if (withPhoneNumbers.length > 0 || withEmail.length > 0) {
       await updateWebCardProfiles(
         webCardId,
-        { inviteSent: true },
+        {
+          inviteSent: true,
+          invited: true,
+          deleted: false,
+          deletedAt: null,
+          deletedBy: null,
+        },
         withPhoneNumbers
           .map(({ profileId }) => profileId)
           .concat(withEmail.map(({ profileId }) => profileId)),

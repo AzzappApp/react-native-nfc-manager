@@ -6,7 +6,6 @@ import {
 import {
   getCompanyActivitiesByWebCardCategory,
   getWebCardPosts,
-  isFollowing,
   getLikedPosts,
   getFollowerProfiles,
   getFollowingsWebCard,
@@ -19,7 +18,13 @@ import {
   getLastSubscription,
   getFilterCoverTemplateTypes,
   getCoverTemplatesByTypesAndTag,
+  countWebCardPayments,
+  countDeletedWebCardProfiles,
+  searchContactsByWebcardId,
+  getContactCountWithWebcardId,
+  getAllOwnerProfilesByWebcardId,
 } from '@azzapp/data';
+import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
 import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { buildCoverAvatarUrl } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
@@ -28,6 +33,7 @@ import {
   cardModuleByWebCardLoader,
   companyActivityLoader,
   companyActivityTypeLoader,
+  followingsLoader,
   profileByWebCardIdAndUserIdLoader,
   webCardCategoryLoader,
   webCardOwnerLoader,
@@ -41,10 +47,14 @@ import {
 } from '#helpers/connectionsHelpers';
 import { labelResolver } from '#helpers/localeHelpers';
 import {
+  getWebCardProfile,
   hasWebCardProfileRight,
   type ProtectedResolver,
 } from '#helpers/permissionsHelpers';
-import { idResolver, maybeFromGlobalIdWithType } from '#helpers/relayIdHelpers';
+import fromGlobalIdWithType, {
+  idResolver,
+  maybeFromGlobalIdWithType,
+} from '#helpers/relayIdHelpers';
 import type {
   CompanyActivityResolvers,
   CompanyActivityTypeResolvers,
@@ -162,6 +172,7 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
     return webCard.coverMediaId
       ? {
           assetKind: 'cover',
+          previewPositionPercentage: webCard.coverPreviewPositionPercentage,
           media: webCard.coverMediaId,
         }
       : null;
@@ -237,7 +248,7 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
     );
 
     return maybeFollowingWebCardId
-      ? isFollowing(maybeFollowingWebCardId, webCard.id)
+      ? followingsLoader.load([maybeFollowingWebCardId, webCard.id])
       : false;
   },
   posts: async (webCard, args) => {
@@ -350,8 +361,13 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
     if (!(await hasWebCardProfileRight(webCard.id))) {
       return 1;
     }
-    const count = await countWebCardProfiles(webCard.id);
-    return count;
+    return countWebCardProfiles(webCard.id);
+  },
+  nbDeletedProfiles: async (webCard, _) => {
+    if (!(await hasWebCardProfileRight(webCard.id))) {
+      return 1;
+    }
+    return countDeletedWebCardProfiles(webCard.id);
   },
   profilePendingOwner: async webCard => {
     if (!(await hasWebCardProfileRight(webCard.id))) {
@@ -359,19 +375,20 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
     }
     return getWebCardPendingOwnerProfile(webCard.id);
   },
-  profiles: async (webCard, { first, after, search }) => {
+  profiles: async (webCard, { first, after, search, withDeleted }) => {
     if (!(await hasWebCardProfileRight(webCard.id))) {
       return emptyConnection;
     }
     const limit = first ?? 100;
     const offset = after ? cursorToOffset(after) : 0;
     const profiles = await getWebCardProfiles(webCard.id, {
+      withDeleted,
       limit,
       after: offset,
       search: search ?? null, //cannot be undefined
     });
     const result = profiles.slice(0, limit);
-    const count = await countWebCardProfiles(webCard.id);
+    const count = await countWebCardProfiles(webCard.id, withDeleted);
     return connectionFromArraySlice(
       result,
       { after, first },
@@ -383,6 +400,62 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
           count,
       },
     );
+  },
+  searchContacts: async (
+    webCard,
+    { first, after, search, withDeleted, ownerProfileId: oid },
+  ) => {
+    const ownerProfileId = oid ? fromGlobalIdWithType(oid, 'Profile') : oid;
+    const webCardProfile = await getWebCardProfile(webCard.id);
+    if (!webCardProfile || !profileHasAdminRight(webCardProfile.profileRole)) {
+      return emptyConnection;
+    }
+    const limit = first ?? 100;
+    const offset = after ? cursorToOffset(after) : 0;
+    const result = await searchContactsByWebcardId({
+      webcardId: webCard.id,
+      limit,
+      offset,
+      search: search ?? null, //cannot be undefined
+      ownerProfileId,
+      withDeleted,
+    });
+    const contacts = result.contacts.slice(0, limit);
+    return connectionFromArraySlice(
+      contacts,
+      { after, first },
+      {
+        sliceStart: offset,
+        arrayLength: result.count,
+      },
+    );
+  },
+  nbContacts: async (webCard, { ownerProfileId }) => {
+    if (!(await hasWebCardProfileRight(webCard.id))) {
+      return 1;
+    }
+    const oid = ownerProfileId
+      ? fromGlobalIdWithType(ownerProfileId, 'Profile')
+      : ownerProfileId;
+    return getContactCountWithWebcardId(webCard.id, false, oid);
+  },
+  contactsOwnerPofiles: async (webCard, { withDeleted, ownerProfileId }) => {
+    if (!(await hasWebCardProfileRight(webCard.id))) {
+      return [];
+    }
+    const oid = ownerProfileId
+      ? fromGlobalIdWithType(ownerProfileId, 'Profile')
+      : ownerProfileId;
+    return getAllOwnerProfilesByWebcardId(webCard.id, !!withDeleted, oid);
+  },
+  nbDeletedContacts: async (webCard, { ownerProfileId }) => {
+    if (!(await hasWebCardProfileRight(webCard.id))) {
+      return 1;
+    }
+    const oid = ownerProfileId
+      ? fromGlobalIdWithType(ownerProfileId, 'Profile')
+      : ownerProfileId;
+    return getContactCountWithWebcardId(webCard.id, true, oid);
   },
   nextChangeUsernameAllowedAt: async webCard => {
     if (!(await hasWebCardProfileRight(webCard.id))) {
@@ -441,7 +514,7 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
       { after, first },
       {
         sliceStart: offset,
-        arrayLength: await countWebCardProfiles(webCard.id),
+        arrayLength: await countWebCardPayments(webCard.id),
       },
     );
   },

@@ -232,7 +232,6 @@ const SignInScreen = () => {
               hasError={credentialInvalid}
               autoCapitalize="none"
               autoComplete="email"
-              keyboardType="email-address"
               autoCorrect={false}
               accessibilityLabel={intl.formatMessage({
                 defaultMessage: 'Enter your phone number or email address',

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { withAxiom } from 'next-axiom';
 import * as z from 'zod';
 import ERRORS from '@azzapp/shared/errors';
+import { withPluginsRoute } from '#helpers/queries';
 import { checkServerAuth } from '#helpers/tokens';
 import { checkTwilioVerificationCode } from '#helpers/twilioHelpers';
 
@@ -18,7 +18,7 @@ const ValidateSchema = z.union([
   }),
 ]);
 
-export const POST = withAxiom(async (req: Request) => {
+export const POST = withPluginsRoute(async (req: Request) => {
   try {
     checkServerAuth();
     const body = await req.json();

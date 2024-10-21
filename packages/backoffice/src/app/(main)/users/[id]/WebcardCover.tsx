@@ -1,26 +1,35 @@
 'use client';
 
+import { Star } from '@mui/icons-material';
 import {
   Button,
   Card,
   CardActions,
   CardContent,
   CardMedia,
+  IconButton,
   Typography,
 } from '@mui/material';
+import { yellow } from '@mui/material/colors';
 import { getImageURLForSize, getVideoURL } from '@azzapp/shared/imagesHelpers';
 import type { WebCard } from '@azzapp/data';
 
 type Props = {
   webcard: WebCard;
   role: string;
-  onRemoveWebcard: (webcardId: string) => void;
+  onRemoveWebCard: () => void;
+  onToggleStar: () => void;
 };
 
 const WIDTH = 276;
 const HEIGHT = 411;
 
-const WebcardCover = ({ webcard, role, onRemoveWebcard }: Props) => {
+const WebCardCover = ({
+  webcard,
+  role,
+  onRemoveWebCard,
+  onToggleStar,
+}: Props) => {
   return (
     <Card sx={{ minWidth: WIDTH, margin: 1 }}>
       {webcard.coverMediaId?.startsWith('v') ? (
@@ -54,15 +63,25 @@ const WebcardCover = ({ webcard, role, onRemoveWebcard }: Props) => {
           variant="contained"
           color="error"
           size="small"
-          onClick={() => {
-            onRemoveWebcard(webcard.id);
-          }}
+          onClick={onRemoveWebCard}
         >
           Remove
         </Button>
+        <IconButton
+          onClick={onToggleStar}
+          style={
+            webcard.starred
+              ? {
+                  color: yellow[600],
+                }
+              : {}
+          }
+        >
+          <Star />
+        </IconButton>
       </CardActions>
     </Card>
   );
 };
 
-export default WebcardCover;
+export default WebCardCover;

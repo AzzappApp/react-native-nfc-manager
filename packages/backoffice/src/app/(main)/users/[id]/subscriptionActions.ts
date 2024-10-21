@@ -8,6 +8,7 @@ import {
   updateSubscription,
   createId,
 } from '@azzapp/data';
+import type { UserSubscription } from '@azzapp/data';
 
 export const setLifetimeSubscription = async (
   userId: string,
@@ -43,11 +44,17 @@ export const setLifetimeSubscription = async (
 export const toggleSubscriptionStatusAction = async (
   userId: string,
   subscriptionId: string,
+  subscriptionPlan: UserSubscription['subscriptionPlan'],
   status: 'active' | 'canceled',
 ) => {
+  const cancelDate = new Date();
   await updateSubscription(subscriptionId, {
     status,
-    canceledAt: status === 'canceled' ? new Date() : null,
+    canceledAt: status === 'canceled' ? cancelDate : null,
+    endAt:
+      status === 'canceled' && subscriptionPlan === 'web.lifetime'
+        ? cancelDate
+        : undefined,
   });
   revalidatePath(`/users/${userId}`);
 };

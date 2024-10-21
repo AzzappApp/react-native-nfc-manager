@@ -243,7 +243,10 @@ const ColorListItem = ({
     >
       {(!linkedColor || canEdit) && (
         <Animated.View style={[layerStyle, editIconContainerStyle]}>
-          <Icon icon={linkedColor ? 'edit' : 'close'} />
+          <Icon
+            icon={linkedColor ? 'edit' : 'close'}
+            style={{ tintColor: getTextColor(color) }}
+          />
         </Animated.View>
       )}
       {linkedColor && (

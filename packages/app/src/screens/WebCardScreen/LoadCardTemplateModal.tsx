@@ -12,7 +12,7 @@ import {
   preventModalDismiss,
 } from '#components/NativeRouter';
 import WebCardBuilderSubtitle from '#components/WebCardBuilderSubtitle';
-import useAuthState from '#hooks/useAuthState';
+import { useProfileInfos } from '#hooks/authStateHooks';
 import useLoadCardTemplateMutation from '#hooks/useLoadCardTemplateMutation';
 import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
@@ -63,7 +63,7 @@ const LoadCardTemplateModal = ({
     `,
     webCardKey,
   );
-  const profileId = useAuthState().profileInfos?.profileId;
+  const profileId = useProfileInfos()?.profileId;
 
   const intl = useIntl();
   const insets = useScreenInsets();
@@ -327,15 +327,5 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  proContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  proText: {
-    color: colors.grey400,
-  },
-  badge: {
-    marginLeft: 5,
   },
 });

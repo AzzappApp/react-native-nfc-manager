@@ -10,7 +10,7 @@ import ERRORS from '@azzapp/shared/errors';
 import { getSessionInfos } from '#GraphQLContext';
 import { profileLoader, webCardLoader } from '#loaders';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
-import type { MutationResolvers } from '#/__generated__/types';
+import type { ContactCard, MutationResolvers } from '#/__generated__/types';
 import type { Profile } from '@azzapp/data';
 
 const saveContactCard: MutationResolvers['saveContactCard'] = async (
@@ -36,11 +36,23 @@ const saveContactCard: MutationResolvers['saveContactCard'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
+  const contactCardUpdates: Partial<ContactCard> = {
+    ...(profile.contactCard ??
+      (await buildDefaultContactCard(webCard, userId))),
+    ...contactCard,
+  };
+
   const updates: Partial<Profile> = {
     contactCard: {
-      ...(profile.contactCard ??
-        (await buildDefaultContactCard(webCard, userId))),
-      ...contactCard,
+      ...contactCardUpdates,
+      urls: [
+        ...(contactCardUpdates.urls?.map(u => ({ ...u, selected: true })) ||
+          []),
+      ],
+      socials: [
+        ...(contactCardUpdates.socials?.map(u => ({ ...u, selected: true })) ||
+          []),
+      ],
     },
   };
 

@@ -19,7 +19,14 @@ const saveCover: MutationResolvers['saveCover'] = async (
   _,
   {
     webCardId: gqlWebCardId,
-    input: { texts, mediaId, backgroundColor, cardColors, dynamicLinks },
+    input: {
+      texts,
+      mediaId,
+      backgroundColor,
+      cardColors,
+      dynamicLinks,
+      coverPreviewPositionPercentage,
+    },
   },
 ) => {
   const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
@@ -53,6 +60,7 @@ const saveCover: MutationResolvers['saveCover'] = async (
         cardColors,
         coverTexts: texts,
         coverDynamicLinks: dynamicLinks ?? undefined,
+        coverPreviewPositionPercentage,
         coverId: createId(),
       };
       await updateWebCard(webCard.id, updates);

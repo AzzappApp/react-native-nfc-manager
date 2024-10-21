@@ -3,6 +3,7 @@ import omit from 'lodash/omit';
 import {
   createCardModules,
   getCardModulesByIds,
+  referencesMedias,
   transaction,
   updateCardModulesPosition,
 } from '@azzapp/data';
@@ -11,6 +12,7 @@ import { invalidateWebCard } from '#externals';
 import { webCardLoader } from '#loaders';
 import { checkWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
+import { MODULES_SAVE_RULES } from './ModulesMutationsResolvers';
 import type { MutationResolvers } from '#/__generated__/types';
 
 const duplicateModule: MutationResolvers['duplicateModule'] = async (
@@ -41,6 +43,16 @@ const duplicateModule: MutationResolvers['duplicateModule'] = async (
           position: modules[modules.length - 1].position + index + 1,
         })),
       );
+
+      const moduleMedias = modules.flatMap(m => {
+        const saveRules = MODULES_SAVE_RULES[m.kind];
+        if (saveRules && 'getMedias' in saveRules) {
+          return saveRules.getMedias?.(m.data as any) ?? [];
+        }
+        return [];
+      });
+
+      await referencesMedias(moduleMedias, []);
 
       await updateCardModulesPosition(
         modules.map(module => module.id),

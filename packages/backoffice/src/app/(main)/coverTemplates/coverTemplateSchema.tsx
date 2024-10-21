@@ -78,6 +78,7 @@ export const coverTemplateSchema = z.object({
     linksLayer: socialLinksSchema,
   }),
   backgroundColor: z.string().optional(),
+  previewPositionPercentage: z.number().optional(),
 });
 
 export const coverTemplateSchemaWithoutfile = coverTemplateSchema

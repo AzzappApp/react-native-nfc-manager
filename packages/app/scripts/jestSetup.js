@@ -1,4 +1,3 @@
-/* eslint-disable import/order */
 const { jest } = require('@jest/globals');
 
 //#region Expect Extensions

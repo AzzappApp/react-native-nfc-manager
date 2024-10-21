@@ -18,35 +18,41 @@ struct ShareContactAppClipApp: App {
 }
 struct ContentView: View {
     var body: some View {
-          VStack{
-          }.onContinueUserActivity(NSUserActivityTypeBrowsingWeb, perform: handleUserActivity)
+      VStack {}
+      .onContinueUserActivity(NSUserActivityTypeBrowsingWeb, perform: handleUserActivity)
+      .onOpenURL(perform: handleURL)
     }
 
     private func handleUserActivity(_ userActivity: NSUserActivity) {
-        guard let webpageURL = userActivity.webpageURL else {
-            return
-        }
-      
-        // Extract the query parameter from the URL
-        guard let urlComponents = URLComponents(url: webpageURL, resolvingAgainstBaseURL: false),
-              let queryItems = urlComponents.queryItems,
-              let nestedURLString = queryItems.first(where: { $0.name == "url" })?.value,
-              let nestedURL = URL(string: nestedURLString) else {
-            closeAppClip()
-            return
-        }
-        handleURL(nestedURL)
-    }
-
-    private func handleURL(_ url: URL) {
-        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
-            let queryItems = components.queryItems,
-  
-            let compressedContactCard = queryItems.first(where: { $0.name == "c" })?.value else {
-        closeAppClip()
+      guard let webpageURL = userActivity.webpageURL else {
+          print("No webpage URL found in user activity")
+          closeAppClip()
           return
       }
 
+      // Check if the webpageURL starts with "https://appclip.apple.com"
+      if webpageURL.absoluteString.hasPrefix("https://appclip.apple.com") {
+          // Extract the "url" query parameter
+          guard let urlComponents = URLComponents(url: webpageURL, resolvingAgainstBaseURL: false),
+                let queryItems = urlComponents.queryItems,
+                let nestedURLString = queryItems.first(where: { $0.name == "url" })?.value,
+                let nestedURL = URL(string: nestedURLString) else {
+              closeAppClip()
+              return
+          }
+          handleURL(nestedURL)
+      } else {
+          handleURL(webpageURL)
+      } 
+    }
+
+    private func handleURL(_ url: URL) {
+      guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
+        let queryItems = components.queryItems,
+        let compressedContactCard = queryItems.first(where: { $0.name == "c" })?.value else {
+          closeAppClip()
+          return
+        }
         
       let path = components.path
       let username = path.hasPrefix("/") ? String(path.dropFirst()) : path
@@ -360,7 +366,7 @@ func verifySign(signature: String, data: String, salt: String, completion: @esca
 
 
 private func closeAppClip() {
-  UIApplication.shared.perform(#selector(NSXPCConnection.suspend))
+ UIApplication.shared.perform(#selector(NSXPCConnection.suspend))
 }
 
 

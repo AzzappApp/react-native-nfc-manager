@@ -1,6 +1,5 @@
 import * as Sentry from '@sentry/nextjs';
 import { NextResponse } from 'next/server';
-import { withAxiom } from 'next-axiom';
 import { getUserByEmail, getUserByPhoneNumber } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import {
@@ -8,6 +7,7 @@ import {
   isInternationalPhoneNumber,
   isValidEmail,
 } from '@azzapp/shared/stringHelpers';
+import { withPluginsRoute } from '#helpers/queries';
 import { sendTwilioVerificationCode } from '#helpers/twilioHelpers';
 
 type ForgotPasswordBody = {
@@ -15,7 +15,7 @@ type ForgotPasswordBody = {
   locale: string;
 };
 
-export const POST = withAxiom(async (req: Request) => {
+export const POST = withPluginsRoute(async (req: Request) => {
   const { credential, locale } = (await req.json()) as ForgotPasswordBody;
   if (!credential) {
     return NextResponse.json(

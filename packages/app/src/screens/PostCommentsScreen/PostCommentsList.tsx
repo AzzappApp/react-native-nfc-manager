@@ -1,12 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import {
-  Alert,
-  Keyboard,
-  RefreshControl,
-  StyleSheet,
-  View,
-} from 'react-native';
+import { Keyboard, RefreshControl, StyleSheet, View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Toast from 'react-native-toast-message';
@@ -24,7 +18,7 @@ import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import AuthorCartouche from '#components/AuthorCartouche';
 import { useRouter } from '#components/NativeRouter';
-import useAuthState from '#hooks/useAuthState';
+import { useProfileInfos } from '#hooks/authStateHooks';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Container from '#ui/Container';
 import Input from '#ui/Input';
@@ -35,7 +29,7 @@ import DeletableCommentItem from './DeletableCommentItem';
 import PostCommentsScreenHeader from './PostCommentsScreenHeader';
 import ReportableCommentItem from './ReportableCommentItem';
 import type { CommentItemFragment_comment$key } from '#relayArtifacts/CommentItemFragment_comment.graphql';
-import type { PostCommentsList_myWebCard$key } from '#relayArtifacts/PostCommentsList_myWebCard.graphql';
+import type { PostCommentsList_myProfile$key } from '#relayArtifacts/PostCommentsList_myProfile.graphql';
 import type { PostCommentsList_post$key } from '#relayArtifacts/PostCommentsList_post.graphql';
 import type {
   NativeSyntheticEvent,
@@ -48,7 +42,7 @@ type PostCommentsListProps = {
    *
    * @type {PostCommentsListQuery$key}
    */
-  webCard: PostCommentsList_myWebCard$key;
+  profile: PostCommentsList_myProfile$key;
   /**
    *
    *
@@ -64,7 +58,7 @@ type PostCommentsListProps = {
 };
 
 const PostCommentsList = ({
-  webCard: webCardKey,
+  profile: profileKey,
   post: postKey,
   postId,
 }: PostCommentsListProps) => {
@@ -75,7 +69,7 @@ const PostCommentsList = ({
 
   const router = useRouter();
   const intl = useIntl();
-  const auth = useAuthState();
+  const profileInfos = useProfileInfos();
 
   const { data, loadNext, refetch, hasNext, isLoadingNext } =
     usePaginationFragment(
@@ -105,15 +99,18 @@ const PostCommentsList = ({
       postKey,
     );
 
-  const viewerWebCard = useFragment(
+  const profile = useFragment(
     graphql`
-      fragment PostCommentsList_myWebCard on WebCard {
-        id
-        cardIsPublished
-        ...AuthorCartoucheFragment_webCard
+      fragment PostCommentsList_myProfile on Profile {
+        webCard {
+          id
+          cardIsPublished
+          ...AuthorCartoucheFragment_webCard
+        }
+        invited
       }
     `,
-    webCardKey,
+    profileKey,
   );
 
   const [comment, setComment] = useState<string>('');
@@ -148,19 +145,10 @@ const PostCommentsList = ({
   const [submitting, setSubmitting] = useState(false);
 
   const onSubmit = () => {
-    if (!viewerWebCard.cardIsPublished) {
-      Alert.alert(
-        intl.formatMessage(
-          {
-            defaultMessage: 'Unpublished WebCard{azzappA}.',
-            description:
-              'PostList - Alert Message title when the user is viewing a post (from deeplinking) with an unpublished WebCard',
-          },
-          {
-            azzappA: <Text variant="azzapp">a</Text>,
-          },
-        ) as string,
-        intl.formatMessage(
+    if (!profile.webCard?.cardIsPublished) {
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage(
           {
             defaultMessage:
               'Oops, looks like your WebCard{azzappA} is not published. Publish it first!',
@@ -171,16 +159,7 @@ const PostCommentsList = ({
             azzappA: <Text variant="azzapp">a</Text>,
           },
         ) as string,
-        [
-          {
-            text: intl.formatMessage({
-              defaultMessage: 'Ok',
-              description:
-                'PostList - Alert button when the user is viewing a post (from deeplinking) with an unpublished WebCard',
-            }),
-          },
-        ],
-      );
+      });
 
       return;
     }
@@ -188,10 +167,10 @@ const PostCommentsList = ({
     setSubmitting(true);
     if (!submitting) {
       Keyboard.dismiss();
-      if (profileHasEditorRight(auth.profileInfos?.profileRole)) {
+      if (profileHasEditorRight(profileInfos?.profileRole)) {
         commit({
           variables: {
-            webCardId: auth.profileInfos?.webCardId,
+            webCardId: profileInfos?.webCardId,
             input: { postId, comment },
             connections: [connectionID],
           },
@@ -237,6 +216,16 @@ const PostCommentsList = ({
               });
             }
           },
+        });
+      } else if (profile.invited) {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage:
+              'Oops, first you must accept the pending invitation to join the WebCard.',
+            description:
+              'PostCommentsList - AlertMessage when the user is viewing a post (from deeplinking) with an invited WebCard',
+          }),
         });
       } else {
         Toast.show({
@@ -289,12 +278,12 @@ const PostCommentsList = ({
     }: {
       item: CommentItemFragment_comment$key & { webCard: { id: string } };
     }) => {
-      if (auth.profileInfos?.webCardId !== item.webCard.id) {
+      if (profileInfos?.webCardId !== item.webCard.id) {
         return <ReportableCommentItem item={item} />;
       }
       return <DeletableCommentItem item={item} postId={postId} />;
     },
-    [auth.profileInfos?.webCardId, postId],
+    [profileInfos?.webCardId, postId],
   );
 
   const insets = useScreenInsets();
@@ -332,7 +321,7 @@ const PostCommentsList = ({
         />
         <View style={styles.inputContainer}>
           <AuthorCartouche
-            author={viewerWebCard}
+            author={profile.webCard!}
             variant="post"
             hideUserName
             style={{ height: 48 }}
@@ -386,14 +375,6 @@ const styles = StyleSheet.create({
   },
   keyboardAreaView: {
     flex: 1,
-  },
-  contentModal: {
-    padding: 10,
-  },
-  counter: {
-    marginTop: 5,
-    marginLeft: 12,
-    color: 'white',
   },
   list: { flex: 1 },
 });

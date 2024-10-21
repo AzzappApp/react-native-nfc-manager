@@ -117,8 +117,4 @@ const styles = StyleSheet.create({
     flex: 1,
     marginBottom: 20,
   },
-  slider: {
-    width: '90%',
-    alignSelf: 'center',
-  },
 });

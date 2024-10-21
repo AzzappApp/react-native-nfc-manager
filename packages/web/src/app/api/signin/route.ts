@@ -1,7 +1,6 @@
 import * as Sentry from '@sentry/nextjs';
 import * as bcrypt from 'bcrypt-ts';
 import { NextResponse } from 'next/server';
-import { withAxiom } from 'next-axiom';
 import {
   getUserByEmail,
   getUserByPhoneNumber,
@@ -17,12 +16,12 @@ import {
 } from '@azzapp/shared/stringHelpers';
 import { handleSignInAuthMethod } from '#helpers/auth';
 import cors from '#helpers/cors';
+import { withPluginsRoute } from '#helpers/queries';
 import type { Profile, User } from '@azzapp/data';
 
 type SignInBody = {
   credential?: string; //email or username or phone number
   password?: string;
-  authMethod?: 'cookie' | 'token';
 };
 
 const signin = async (req: Request) => {
@@ -82,4 +81,4 @@ const signin = async (req: Request) => {
   }
 };
 
-export const { POST, OPTIONS } = cors({ POST: withAxiom(signin) });
+export const { POST, OPTIONS } = cors({ POST: withPluginsRoute(signin) });

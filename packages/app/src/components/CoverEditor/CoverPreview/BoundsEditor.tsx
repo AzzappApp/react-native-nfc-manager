@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-unused-styles */
 import { PaintStyle, Skia } from '@shopify/react-native-skia';
 import { PixelRatio, StyleSheet, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';

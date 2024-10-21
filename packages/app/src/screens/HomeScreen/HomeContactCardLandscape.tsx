@@ -150,7 +150,11 @@ const HomeContactCardLandscape = ({
           transform: [{ scale }],
         }}
       >
-        <ContactCard profile={profile} height={smallContactCardHeight} />
+        <ContactCard
+          profile={profile}
+          height={smallContactCardHeight}
+          withRotationArrows
+        />
       </View>
     </Animated.View>
   );

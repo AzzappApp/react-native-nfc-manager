@@ -24,6 +24,10 @@ const container = style({
     [MediaQuery.Mobile]: {
       height: '100%',
       width: '100%',
+      paddingTop: '40px',
+      paddingBottom: '40px',
+      paddingLeft: '50px',
+      paddingRight: '50px',
     },
   },
 });
@@ -176,6 +180,47 @@ const tableButton = style({
   marginTop: '12px',
 });
 
+const mobileImageTv = style({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  alignSelf: 'center',
+  width: '97px',
+  height: '97px',
+  marginTop: '50px',
+});
+
+const mobileDescription = style({
+  fontFamily: 'Helvetica Neue',
+  fontSize: '14px',
+  fontWeight: 400,
+  textAlign: 'center',
+});
+
+const mobileMainDescription = style({
+  fontFamily: 'Helvetica Neue',
+  fontSize: '14px',
+  fontWeight: 400,
+  textAlign: 'center',
+  height: '100px',
+});
+
+const mobileBodyContainer = style({
+  alignItems: 'flex-start',
+  display: 'flex',
+  flexDirection: 'column',
+  marginLeft: 16,
+  marginRight: 16,
+});
+
+const mobileStepDesc = style({
+  fontFamily: 'Helvetica Neue',
+  fontSize: '14px',
+  fontWeight: 400,
+  textAlign: 'center',
+  paddingBottom: '30px',
+});
+
 const styles = {
   background,
   button,
@@ -193,6 +238,11 @@ const styles = {
   simpleButton,
   tableFull,
   tableButton,
+  mobileImageTv,
+  mobileDescription,
+  mobileMainDescription,
+  mobileBodyContainer,
+  mobileStepDesc,
 };
 
 export default styles;

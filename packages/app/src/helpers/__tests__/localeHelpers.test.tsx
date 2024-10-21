@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 import * as RNLocalize from 'react-native-localize';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import { act, renderHook } from '#helpers/testHelpers';

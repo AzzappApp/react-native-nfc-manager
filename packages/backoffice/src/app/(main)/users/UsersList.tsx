@@ -11,11 +11,12 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   useCallback,
   useDeferredValue,
   useEffect,
+  useMemo,
   useState,
   useTransition,
 } from 'react';
@@ -50,6 +51,11 @@ const UsersList = ({
   enabledFilter,
 }: UsersListProps) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const params = useMemo(
+    () => new URLSearchParams(searchParams),
+    [searchParams],
+  );
   const [loading, startTransition] = useTransition();
   const [currentSearch, setCurrentSearch] = useState(search ?? '');
   const [statusFilter, setStatusFilter] = useState(
@@ -61,72 +67,50 @@ const UsersList = ({
   );
   const deferredSearch = useDeferredValue(currentSearch);
 
-  const updateSearchParams = useCallback(
-    (
-      page: number,
-      sort: string,
-      order: string,
-      search: string | null,
-      status: string | null,
-    ) => {
-      startTransition(() => {
-        router.replace(
-          `/users?page=${page}&sort=${sort}&order=${order}&s=${search ?? ''}&status=${status}`,
-        );
-      });
-    },
-    [router, startTransition],
-  );
+  const updateSearchParams = useCallback(() => {
+    startTransition(() => {
+      router.replace(`/users?${params.toString()}`);
+    });
+  }, [params, router]);
 
   const onPageChange = useCallback(
     (model: GridPaginationModel) => {
-      updateSearchParams(
-        model.page + 1,
-        sortField,
-        sortOrder,
-        search,
-        statusFilter,
-      );
+      params.set('page', (model.page + 1).toString());
+      updateSearchParams();
     },
-    [search, sortField, sortOrder, statusFilter, updateSearchParams],
+    [params, updateSearchParams],
   );
 
   const onSortModelChange = useCallback(
     (model: GridSortModel) => {
-      updateSearchParams(
-        page,
-        model[0].field,
-        model[0].sort ?? 'asc',
-        search,
-        statusFilter,
-      );
+      params.set('sort', model[0].field);
+      params.set('order', model[0].sort ?? 'asc');
+      updateSearchParams();
     },
-    [page, search, statusFilter, updateSearchParams],
+    [params, updateSearchParams],
   );
 
   const onStatusChange = useCallback(
     (event: SelectChangeEvent) => {
       const newStatus = event.target.value as any;
       setStatusFilter(newStatus);
-      updateSearchParams(1, sortField, sortOrder, search, newStatus);
+      params.set('status', newStatus);
+      updateSearchParams();
     },
-    [search, sortField, sortOrder, updateSearchParams],
+    [params, updateSearchParams],
   );
 
   useEffect(() => {
     if (search === deferredSearch) {
       return;
     }
-    updateSearchParams(1, sortField, sortOrder, deferredSearch, statusFilter);
-  }, [
-    deferredSearch,
-    page,
-    search,
-    sortField,
-    sortOrder,
-    statusFilter,
-    updateSearchParams,
-  ]);
+    if (!deferredSearch) {
+      params.delete('s');
+    } else {
+      params.set('s', deferredSearch || '');
+    }
+    updateSearchParams();
+  }, [deferredSearch, params, search, updateSearchParams]);
 
   return (
     <Box
@@ -238,6 +222,7 @@ const columns: GridColDef[] = [
     field: 'status',
     headerName: 'Account Status',
     flex: 1,
+    sortable: false,
     renderCell: params => (
       <Chip
         color={params.value ? 'warning' : 'default'}

@@ -1,9 +1,9 @@
 import * as Sentry from '@sentry/nextjs';
 import { decompressFromEncodedURIComponent } from 'lz-string';
 import { NextResponse } from 'next/server';
-import { withAxiom } from 'next-axiom';
 import { verifyHmacWithPassword } from '@azzapp/shared/crypto';
 import { buildVCardFromShareBackContact } from '@azzapp/shared/vCardHelpers';
+import { withPluginsRoute } from '#helpers/queries';
 
 import { generateSaltFromValues } from '#helpers/shareBackHelper';
 import type { ShareBackContact } from '@azzapp/shared/vCardHelpers';
@@ -80,4 +80,4 @@ const shareBackVCard = async (req: NextRequest) => {
   });
 };
 
-export const { GET } = { GET: withAxiom(shareBackVCard) };
+export const { GET } = { GET: withPluginsRoute(shareBackVCard) };

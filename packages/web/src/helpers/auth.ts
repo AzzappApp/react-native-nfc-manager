@@ -47,5 +47,6 @@ export const handleSignInAuthMethod = async (
     userId: user.id,
     token,
     refreshToken,
+    roles: user.roles,
   });
 };

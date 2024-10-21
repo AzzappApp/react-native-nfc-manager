@@ -6,7 +6,7 @@ import { useDebounce } from 'use-debounce';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import WebCardList from '#components/WebCardList';
-import useAuthState from '#hooks/useAuthState';
+import { getAuthState } from '#helpers/authStore';
 import type {
   FollowersScreenList_removeFollowerMutation,
   FollowersScreenList_removeFollowerMutation$data,
@@ -83,10 +83,9 @@ const FollowersScreenList = ({
 
   const intl = useIntl();
 
-  const { profileInfos } = useAuthState();
-
   const removeFollower = useCallback(
     (removedFollowerId: string) => {
+      const { profileInfos } = getAuthState();
       if (!profileInfos) {
         return;
       }
@@ -133,7 +132,7 @@ const FollowersScreenList = ({
         });
       }
     },
-    [commit, currentWebCardId, data?.followers, intl, profileInfos],
+    [commit, currentWebCardId, data?.followers, intl],
   );
 
   const [searchValue, setSearchValue] = useState<string | undefined>('');

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
 import {
@@ -96,6 +95,7 @@ const createWebCardMutation: MutationResolvers['createWebCard'] = async (
         userId,
         contactCard,
         lastContactCardUpdate: new Date(),
+        inviteSent: true,
       });
     });
 

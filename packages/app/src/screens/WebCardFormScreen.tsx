@@ -92,6 +92,10 @@ const WebCardFormScreen = ({
     defaultMessage: 'Other',
     description: 'Default activity type label',
   });
+  const otherActivity = {
+    id: '__OtherActivityId__',
+    label: otherActivityType,
+  };
 
   const filteredCompanyActivities = useMemo(() => {
     if (!companyActivities) {
@@ -323,15 +327,17 @@ const WebCardFormScreen = ({
     }
     isSubmitting.current = true;
 
-    const defaultActivity = companyActivities?.[0];
-    const defaultActivityId = defaultActivity?.id;
+    const companyActivityId =
+      data.companyActivityId === otherActivity.id
+        ? undefined
+        : data.companyActivityId;
 
     commit({
       variables: {
         input: {
           ...data,
           webCardCategoryId: webCardCategoryId!,
-          companyActivityId: data.companyActivityId || defaultActivityId,
+          companyActivityId,
         },
       },
       updater: store => {
@@ -610,11 +616,19 @@ const WebCardFormScreen = ({
                       avoidKeyboard
                       bottomSheetHeight={windowHeight - 90 - insets.top}
                       inputLabel={
-                        value
-                          ? companyActivities.find(
-                              activity => activity.id === value,
-                            )?.label ?? undefined
-                          : undefined
+                        otherActivity.id === value
+                          ? otherActivity.label
+                          : value
+                            ? (companyActivities.find(
+                                activity => activity.id === value,
+                              )?.label ?? undefined)
+                            : undefined
+                      }
+                      headerRightAction={() => onChange(otherActivity.id)}
+                      headerRightComponent={
+                        <Text style={styles.headerButton}>
+                          {otherActivity.label}
+                        </Text>
                       }
                       onItemSelected={item => onChange(item.id)}
                       bottomSheetTitle={intl.formatMessage({
@@ -749,9 +763,6 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
   },
-  form: {
-    flex: 1,
-  },
   formElement: {
     marginHorizontal: 20,
   },
@@ -781,5 +792,9 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  headerButton: {
+    color: colors.grey400,
+    paddingHorizontal: 30,
   },
 });

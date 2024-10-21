@@ -36,7 +36,11 @@ import {
 import ShakeShare from '#components/ShakeShare';
 import Toast from '#components/Toast';
 import { analyticsLogScreenEvent } from '#helpers/analytics';
-import { getAuthState, init as initAuthStore } from '#helpers/authStore';
+import {
+  addAuthStateListener,
+  getAuthState,
+  init as initAuthStore,
+} from '#helpers/authStore';
 import { addGlobalEventListener } from '#helpers/globalEvents';
 import {
   init as initLocaleHelpers,
@@ -54,10 +58,10 @@ import {
   ScreenPrefetcherProvider,
   createScreenPrefetcher,
 } from '#helpers/ScreenPrefetcher';
+import { useIsAuthenticated } from '#hooks/authStateHooks';
 import useApplicationFonts, {
   loadSkiaTypeFonts,
 } from '#hooks/useApplicationFonts';
-import useAuthState from '#hooks/useAuthState';
 import { useDeepLink } from '#hooks/useDeepLink';
 import AboutScreen from '#screens/AboutScreen';
 import AccountDetailsScreen from '#screens/AccountDetailsScreen';
@@ -67,6 +71,8 @@ import ConfirmChangeContactScreen from '#screens/ConfirmChangeContactScreen';
 import ConfirmRegistrationScreen from '#screens/ConfirmRegistrationScreen';
 import ContactCardEditScreen from '#screens/ContactCardEditScreen';
 import ContactCardScreen from '#screens/ContactCardScreen';
+import ContactDetailsScreen from '#screens/ContactDetailsScreen';
+import ContactsScreen from '#screens/ContactsScreen';
 import CoverCreationScreen from '#screens/CoverCreationScreen';
 import CoverEditionScreen from '#screens/CoverEditionScreen';
 import CoverTemplateSelectionScreen from '#screens/CoverTemplateSelectionScreen';
@@ -109,21 +115,14 @@ import type { ROUTES } from '#routes';
 import type { ReactNode } from 'react';
 import type { IntlShape } from 'react-intl';
 
-const routingInstrumentation = new Sentry.RoutingInstrumentation();
-
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
   enabled: !__DEV__,
   environment: process.env.DEPLOYMENT_ENVIRONMENT,
   // TODO better configuration based on environment
-  integrations: [
-    new Sentry.ReactNativeTracing({
-      routingInstrumentation,
-      // WARNING: This option interferes with reanimated and creates flickering in some animations
-      // do not enable it unless it has been fixed
-      enableStallTracking: false,
-    }),
-  ],
+  // WARNING: This option interferes with reanimated and creates flickering in some animations
+  // do not enable it unless it has been fixed
+  enableStallTracking: false,
 });
 
 //initializing RC sneed to be done early
@@ -214,6 +213,8 @@ const screens = {
   CONTACT_CARD_EDIT: ContactCardEditScreen,
   CONFIRM_CHANGE_CONTACT: ConfirmChangeContactScreen,
   COMMON_INFORMATION: CommonInformationScreen,
+  CONTACTS: ContactsScreen,
+  CONTACT_DETAILS: ContactDetailsScreen,
   COVER_CREATION: CoverCreationScreen,
   COVER_EDITION: CoverEditionScreen,
   COVER_TEMPLATE_SELECTION: CoverTemplateSelectionScreen,
@@ -276,7 +277,7 @@ const AppRouter = () => {
   }, []);
 
   const { router, routerState } = useNativeRouter(initialRoutes);
-  const { authenticated, profileInfos } = useAuthState();
+  const authenticated = useIsAuthenticated();
 
   useEffect(() => {
     const currentRoute = router.getCurrentRoute()?.route;
@@ -290,43 +291,34 @@ const AppRouter = () => {
         router.replaceAll(mainRoutes(false));
       }
     }
-  }, [authenticated, profileInfos, router]);
+  }, [authenticated, router]);
   // #endregion
 
   // #region Sentry Routing Instrumentation
   useEffect(() => {
-    Sentry.setUser({
-      id: profileInfos?.userId,
-      username: profileInfos?.email ?? profileInfos?.phoneNumber ?? undefined,
-      email: profileInfos?.email ?? undefined,
-      phoneNumber: profileInfos?.phoneNumber,
-    });
-    Sentry.setTags({
-      profileId: profileInfos?.profileId,
-      webCardId: profileInfos?.webCardId,
-      profileRole: profileInfos?.profileRole,
-    });
-  }, [profileInfos]);
+    const setSentryUser = async () => {
+      const { profileInfos } = getAuthState();
+      Sentry.setUser({
+        id: profileInfos?.userId,
+        username: profileInfos?.email ?? profileInfos?.phoneNumber ?? undefined,
+        email: profileInfos?.email ?? undefined,
+        phoneNumber: profileInfos?.phoneNumber,
+      });
+      Sentry.setTags({
+        profileId: profileInfos?.profileId,
+        webCardId: profileInfos?.webCardId,
+        profileRole: profileInfos?.profileRole,
+      });
+    };
+    setSentryUser();
+    addAuthStateListener(setSentryUser);
+  }, []);
 
   useEffect(() => {
     const disposable = router.addRouteWillChangeListener(route => {
-      const previous = router.getCurrentRoute();
-
-      routingInstrumentation.onRouteWillChange({
+      Sentry.startIdleNavigationSpan({
         name: route.route,
         op: 'navigation',
-        data: {
-          route: {
-            name: route.route,
-            params: route.params,
-          },
-          previousRoute: previous
-            ? {
-                name: previous.route,
-                params: previous.params,
-              }
-            : null,
-        },
       });
       analyticsLogScreenEvent(route.route);
     });
@@ -356,7 +348,7 @@ const AppRouter = () => {
       createScreenPrefetcher(
         screens as Record<ROUTES, ScreenPrefetchOptions<any>>,
       ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
     [],
   );
 

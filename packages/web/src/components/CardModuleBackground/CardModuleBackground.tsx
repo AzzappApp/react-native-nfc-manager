@@ -1,7 +1,7 @@
 import cx from 'classnames';
 import { getCldImageUrl } from 'next-cloudinary';
 import { swapColor, type ColorPalette } from '@azzapp/shared/cardHelpers';
-import { convertHexToRGBA } from '#helpers';
+import { convertHexToRGBA } from '@azzapp/shared/colorsHelpers';
 import styles from './CardModuleBackground.css';
 
 type CardModuleBackgroundProps = React.HTMLProps<HTMLDivElement> & {

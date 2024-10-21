@@ -1,4 +1,4 @@
-import { and, asc, eq, inArray, ne, sql } from 'drizzle-orm';
+import { and, asc, count, eq, inArray, ne, sql } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/mysql-core';
 import { db, transaction } from '../database';
 import { MediaTable, ProfileTable, WebCardTable } from '../schema';
@@ -292,10 +292,12 @@ export const getProfilesByWebCard = async (
 export const getWebCardProfiles = async (
   webCardId: string,
   {
+    withDeleted = false,
     search,
     limit,
     after = 0,
   }: {
+    withDeleted?: boolean | null;
     search: string | null;
     limit: number;
     after: number;
@@ -313,7 +315,8 @@ export const getWebCardProfiles = async (
             OR JSON_EXTRACT(contactCard, '$.lastName') LIKE ${`%${search}%`}
             OR User.email LIKE ${`%${search}%`}
             OR User.phoneNumber LIKE ${`%${search}%`}
-          ) 
+          )
+          ${withDeleted ? sql`` : sql` AND Profile.deleted != true`} 
           ORDER BY 
             CASE 
                 WHEN profileRole = 'owner' THEN 1
@@ -333,11 +336,35 @@ export const getWebCardProfiles = async (
  *
  * @param webCardId - The id of the web card
  */
-export const countWebCardProfiles = async (webCardId: string) =>
+export const countWebCardProfiles = async (
+  webCardId: string,
+  withDeleted?: boolean | null,
+) =>
   db()
-    .select({ count: sql`count(*)`.mapWith(Number) })
+    .select({ count: count() })
     .from(ProfileTable)
-    .where(eq(ProfileTable.webCardId, webCardId))
+    .where(
+      and(
+        eq(ProfileTable.webCardId, webCardId),
+        withDeleted ? undefined : ne(ProfileTable.deleted, true),
+      ),
+    )
+    .then(res => res[0].count);
+
+export const countDeletedWebCardProfiles = async (
+  webCardId: string,
+  profileIds?: string[],
+) =>
+  db()
+    .select({ count: count() })
+    .from(ProfileTable)
+    .where(
+      and(
+        eq(ProfileTable.webCardId, webCardId),
+        eq(ProfileTable.deleted, true),
+        profileIds?.length ? inArray(ProfileTable.id, profileIds) : undefined,
+      ),
+    )
     .then(res => res[0].count);
 
 /**
@@ -365,7 +392,7 @@ export const getWebCardPendingOwnerProfile = async (
  *
  * @param id - The id of the profile
  */
-export const removeProfile = async (id: string) => {
+export const removeProfile = async (id: string, deletedBy: string) => {
   await transaction(async () => {
     const profile = await getProfileById(id);
 
@@ -383,7 +410,14 @@ export const removeProfile = async (id: string) => {
         .where(eq(MediaTable.id, profile.logoId));
     }
 
-    await db().delete(ProfileTable).where(eq(ProfileTable.id, id));
+    await db()
+      .update(ProfileTable)
+      .set({
+        deleted: true,
+        deletedAt: new Date(),
+        deletedBy,
+      })
+      .where(eq(ProfileTable.id, id));
   });
 };
 
@@ -405,7 +439,10 @@ const getAvatarAndLogo = async (profileIds: string[]) => {
  *
  * @param profileIds - The list of profile ids to delete
  */
-export const removeProfiles = async (profileIds: string[]) => {
+export const removeProfiles = async (
+  profileIds: string[],
+  deletedBy: string,
+) => {
   await transaction(async () => {
     const profiles = await getAvatarAndLogo(profileIds);
 
@@ -431,7 +468,14 @@ export const removeProfiles = async (profileIds: string[]) => {
         .where(inArray(MediaTable.id, logoIds));
     }
 
-    await db().delete(ProfileTable).where(inArray(ProfileTable.id, profileIds));
+    await db()
+      .update(ProfileTable)
+      .set({
+        deleted: true,
+        deletedAt: new Date(),
+        deletedBy,
+      })
+      .where(inArray(ProfileTable.id, profileIds));
   });
 };
 

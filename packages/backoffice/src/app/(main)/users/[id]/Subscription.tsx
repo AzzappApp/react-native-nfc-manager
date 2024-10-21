@@ -37,6 +37,7 @@ export const Subscription = ({
         await toggleSubscriptionStatusAction(
           userSubscription.userId,
           userSubscription.id,
+          userSubscription.subscriptionPlan,
           status ? 'active' : 'canceled',
         );
       } catch (e) {
@@ -134,7 +135,7 @@ export const Subscription = ({
           disabled={userSubscription.subscriptionPlan === 'web.monthly'}
           onChange={onUpdateFreeSeats}
         />
-        {userSubscription.canceledAt ? (
+        {userSubscription.canceledAt && (
           <TextField
             sx={{ width: 250 }}
             value={userSubscription.canceledAt.toDateString()}
@@ -146,19 +147,18 @@ export const Subscription = ({
               },
             }}
           />
-        ) : (
-          <TextField
-            sx={{ width: 250 }}
-            value={userSubscription.endAt.toDateString()}
-            label="End at"
-            inputProps={{
-              readOnly: true,
-              style: {
-                color: new Date() > userSubscription.endAt ? 'red' : 'black',
-              },
-            }}
-          />
         )}
+        <TextField
+          sx={{ width: 250 }}
+          value={userSubscription.endAt.toDateString()}
+          label="End at"
+          inputProps={{
+            readOnly: true,
+            style: {
+              color: new Date() > userSubscription.endAt ? 'red' : 'black',
+            },
+          }}
+        />
       </Box>
       <Backdrop
         sx={{ color: '#fff', zIndex: theme => theme.zIndex.drawer + 1 }}

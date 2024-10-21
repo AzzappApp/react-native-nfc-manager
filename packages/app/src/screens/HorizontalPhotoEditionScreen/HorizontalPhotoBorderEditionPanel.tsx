@@ -188,11 +188,6 @@ const styles = StyleSheet.create({
     rowGap: 15,
     justifyContent: 'flex-start',
   },
-  buttonContainer: {
-    alignSelf: 'center',
-    flexDirection: 'row',
-    columnGap: 15,
-  },
   slider: {
     width: '90%',
     alignSelf: 'center',

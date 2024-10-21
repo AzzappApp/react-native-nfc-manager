@@ -1,0 +1,76 @@
+"""
+Represent a Contact
+"""
+type Contact {
+  id: ID!
+  ownerProfile: Profile
+  contactProfile: Profile
+  firstName: String!
+  lastName: String!
+  company: String!
+  title: String!
+  createdAt: DateTime!
+  type: String!
+  birthday: String
+  phoneNumbers: [ContactPhoneNumber!]!
+  emails: [ContactEmail!]!
+  addresses: [ContactAddress!]!
+  webCard: WebCard
+  socials: [ContactSocial!]
+  urls: [ContactUrl!]
+  deleted: Boolean
+}
+
+type ContactUrl {
+  url: String!
+}
+
+type ContactSocial {
+  url: String!
+  label: String!
+}
+
+type ContactPhoneNumber {
+  label: String!
+  number: String!
+}
+
+type ContactEmail {
+  label: String!
+  address: String!
+}
+
+type ContactAddress {
+  label: String!
+  address: String!
+}
+
+"""
+An edge in a connection.
+"""
+type ContactEdge {
+  """
+  The item at the end of the edge
+  """
+  node: Contact
+
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+}
+
+"""
+A connection to a list of items.
+"""
+type ContactConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+
+  """
+  A list of edges.
+  """
+  edges: [ContactEdge]
+}

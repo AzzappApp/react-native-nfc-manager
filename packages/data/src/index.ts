@@ -37,6 +37,7 @@ export type {
   CoverTemplateType,
   CoverText,
   CoverTextType,
+  FCMToken,
   Follow,
   LocalizationMessage,
   Media,
@@ -57,4 +58,5 @@ export type {
   WebCard,
   WebCardCategory,
   WebCardStatistic,
+  Contact,
 } from './schema';

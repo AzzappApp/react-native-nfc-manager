@@ -66,7 +66,6 @@ jest.mock('#components/VideoTimelineEditor', () =>
 );
 
 jest.mock('#components/Cropper', () => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { View } = require('react-native');
   const Cropper = ({ children, ...props }: any) => (
     <View {...props} testID="cropper">

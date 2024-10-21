@@ -9,6 +9,7 @@ export type CoverInfos = Pick<
   CoverEditorState,
   | 'backgroundColor'
   | 'coverId'
+  | 'coverPreviewPositionPercentage'
   | 'coverTransition'
   | 'linksLayer'
   | 'lottie'
@@ -66,6 +67,7 @@ const saveCover = (webCardId: string, state: CoverEditorState) => {
         'overlayLayers',
         'lottie',
         'textLayers',
+        'coverPreviewPositionPercentage',
       ]),
     ),
   );

@@ -5,6 +5,7 @@ import {
   startTransition,
   useEffect,
   useRef,
+  memo,
 } from 'react';
 import { useIntl } from 'react-intl';
 import { View } from 'react-native';
@@ -18,30 +19,30 @@ import { colors, shadow } from '#theme';
 import CoverLink from '#components/CoverLink';
 import CoverList from '#components/CoverList';
 import Skeleton from '#components/Skeleton';
+import { getAuthState } from '#helpers/authStore';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import useAuthState from '#hooks/useAuthState';
 import useToggleFollow from '#hooks/useToggleFollow';
 import CoverLink_webCardFragment from '#relayArtifacts/CoverLink_webCard.graphql';
 import Button from '#ui/Button';
 import type { CoverLinkProps } from '#components/CoverLink';
+import type { CoverList_users$data } from '#relayArtifacts/CoverList_users.graphql';
 import type { MediaSuggestionsWebCards_profile$key } from '#relayArtifacts/MediaSuggestionsWebCards_profile.graphql';
 import type { MediaSuggestionsWebCards_webCard$key } from '#relayArtifacts/MediaSuggestionsWebCards_webCard.graphql';
-import type { StyleProp, ViewStyle } from 'react-native';
+import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
+import type { ListRenderItemInfo } from '@shopify/flash-list';
 
 type MediaSuggestionsWebCardsProps = {
   profile: MediaSuggestionsWebCards_profile$key;
   webCard: MediaSuggestionsWebCards_webCard$key | null;
   isCurrentTab: boolean;
-  style?: StyleProp<ViewStyle>;
 };
 
-const NB_PROFILES = 6;
+const NB_PROFILES = 12;
 
 const MediaSuggestionsWebCards = ({
   profile,
   webCard,
   isCurrentTab,
-  style,
 }: MediaSuggestionsWebCardsProps) => {
   const { data, refetch, loadNext, hasNext, isLoadingNext } =
     usePaginationFragment(
@@ -112,26 +113,41 @@ const MediaSuggestionsWebCards = ({
 
   const styles = useStyleSheet(styleSheet);
 
-  return (
-    <CoverList
-      users={users}
-      onEndReached={onEndReached}
-      containerStyle={styles.containerStyle}
-      initialNumToRender={NB_PROFILES}
-      style={style}
-      renderItem={({ item }) => (
+  const renderItem = useCallback(
+    ({
+      item,
+      index,
+      extraData,
+    }: ListRenderItemInfo<ArrayItemType<CoverList_users$data>>) => {
+      const shouldPlay = extraData.viewableItems.some((v: any) => v === index);
+
+      return (
         <CoverLinkWithOptions
           webCard={item}
-          isFollowing={followingMap.get(item.id) ?? false}
+          isFollowing={extraData.followingMap.get(item.id) ?? false}
           webCardId={item.id}
-          cardIsPublished={cardIsPublished}
+          cardIsPublished={extraData.cardIsPublished}
+          canPlay={shouldPlay}
         />
-      )}
-    />
+      );
+    },
+    [],
+  );
+
+  return (
+    <View style={styles.containerStyle}>
+      <CoverList
+        users={users}
+        onEndReached={onEndReached}
+        renderItem={renderItem}
+        coverWidth={COVER_SUGGESTIONS_WIDTH + 2 * COVER_SUGGESTIONS_PADDING}
+        extraData={{ followingMap, cardIsPublished }}
+      />
+    </View>
   );
 };
 
-const CoverLinkWithOptions = ({
+const CoverLinkWithOptionsItem = ({
   isFollowing,
   cardIsPublished,
   ...props
@@ -140,8 +156,6 @@ const CoverLinkWithOptions = ({
   cardIsPublished: boolean;
 }) => {
   const styles = useStyleSheet(styleSheet);
-
-  const { profileInfos } = useAuthState();
 
   const toggleFollow = useToggleFollow();
 
@@ -162,6 +176,8 @@ const CoverLinkWithOptions = ({
       });
       return;
     }
+
+    const { profileInfos } = getAuthState();
 
     if (profileHasEditorRight(profileInfos?.profileRole)) {
       startTransition(() => {
@@ -190,7 +206,6 @@ const CoverLinkWithOptions = ({
     cardIsPublished,
     intl,
     isFollowing,
-    profileInfos?.profileRole,
     props.webCardId,
     toggleFollow,
     userName,
@@ -205,6 +220,9 @@ const CoverLinkWithOptions = ({
     </Animated.View>
   );
 };
+
+const CoverLinkWithOptions = memo(CoverLinkWithOptionsItem);
+
 type FollowButtonProps = {
   onPress?: () => void;
   isFollowing: boolean;
@@ -243,7 +261,7 @@ export default MediaSuggestionsWebCards;
 export const MediaSuggestionWebCardFallback = () => {
   const styles = useStyleSheet(styleSheet);
   return (
-    <View style={[styles.containerStyle, { flexDirection: 'row' }]}>
+    <View style={[styles.containerStyle, styles.suggestionContainer]}>
       {range(0, 4).map(index => (
         <View key={index} style={styles.coverContainerStyle}>
           <Skeleton style={styles.coverContainerFallback} key={index} />
@@ -258,21 +276,27 @@ export const MediaSuggestionWebCardFallback = () => {
 
 export const COVER_SUGGESTIONS_WIDTH = 135;
 export const COVER_SUGGESTIONS_PADDING = 5;
+const ACTION_BUTTON_HEIGHT = 29;
 
 const styleSheet = createStyleSheet(appearance => ({
   containerStyle: {
-    paddingHorizontal: 8,
     overflow: 'visible',
     zIndex: 1,
     paddingBottom: 20,
     paddingTop: 16.5,
-    gap: 10,
   },
   coverContainerStyle: {
     backgroundColor: appearance === 'light' ? colors.white : colors.black,
     padding: COVER_SUGGESTIONS_PADDING,
     gap: COVER_SUGGESTIONS_PADDING,
     borderRadius: 15,
+    overFlow: 'visible',
+    width: COVER_SUGGESTIONS_WIDTH + 2 * COVER_SUGGESTIONS_PADDING,
+    height:
+      COVER_SUGGESTIONS_WIDTH / COVER_RATIO +
+      2 * COVER_SUGGESTIONS_PADDING +
+      2 * COVER_SUGGESTIONS_PADDING +
+      ACTION_BUTTON_HEIGHT, //required for android
     ...shadow(appearance, 'bottom'),
   },
   coverContainerFallback: {
@@ -282,9 +306,10 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   bottomActions: {
     flexDirection: 'row',
-    gap: 5,
     width: '100%',
     alignItems: 'center',
+    height: ACTION_BUTTON_HEIGHT, //fix on android
   },
   followButton: {},
+  suggestionContainer: { flexDirection: 'row', paddingLeft: 10, gap: 10 },
 }));

@@ -79,7 +79,6 @@ const CardTemplateTypeForm = ({
     e.preventDefault();
     setIsSaving(true);
     const result = await saveCardTemplateType(data as FormValue);
-    console.log(result);
 
     if (result.success) {
       setFormErrors(null);

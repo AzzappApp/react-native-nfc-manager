@@ -2,7 +2,7 @@ import * as Sentry from '@sentry/react-native';
 import { fromGlobalId } from 'graphql-relay';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View, StyleSheet, Share, Alert, Platform } from 'react-native';
+import { View, StyleSheet, Share, Platform } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useMutation, graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
@@ -10,7 +10,7 @@ import ERRORS from '@azzapp/shared/errors';
 import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import { buildPostUrl } from '@azzapp/shared/urlHelpers';
 import { useRouter } from '#components/NativeRouter';
-import useAuthState from '#hooks/useAuthState';
+import { useProfileInfos } from '#hooks/authStateHooks';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
@@ -25,10 +25,12 @@ import type { ViewProps } from 'react-native';
 export type PostRendererActionBarProps = ViewProps & {
   postKey: PostRendererActionBar_post$key;
   actionEnabled: boolean;
+  onActionDisabled?: () => void;
 };
 
 const PostRendererActionBar = ({
   actionEnabled,
+  onActionDisabled,
   postKey,
   style,
   ...props
@@ -92,7 +94,7 @@ const PostRendererActionBar = ({
     setCountReactions(counterReactions);
   }, [counterReactions]);
 
-  const { profileInfos } = useAuthState();
+  const profileInfos = useProfileInfos();
   const debouncedCommit = useDebouncedCallback(
     () => {
       if (!profileInfos) {
@@ -197,28 +199,7 @@ const PostRendererActionBar = ({
   // toggle the value locally
   const toggleReaction = useCallback(() => {
     if (!actionEnabled) {
-      Alert.alert(
-        intl.formatMessage({
-          defaultMessage: 'Unpublished WebCard.',
-          description:
-            'PostRendererActionBar - Alert Message title when the user is viewing a post (from deeplinking) with an unpublished WebCard',
-        }),
-        intl.formatMessage({
-          defaultMessage:
-            'This action can only be done from a published WebCard.',
-          description:
-            'PostRendererActionBar - AlertMessage when the user is viewing a post (from deeplinking) with an unpublished WebCard',
-        }),
-        [
-          {
-            text: intl.formatMessage({
-              defaultMessage: 'Ok',
-              description:
-                'PostRendererActionBar - Alert button when the user is viewing a post (from deeplinking) with an unpublished WebCard',
-            }),
-          },
-        ],
-      );
+      onActionDisabled?.();
 
       return;
     }
@@ -247,34 +228,14 @@ const PostRendererActionBar = ({
     countReactions,
     debouncedCommit,
     intl,
+    onActionDisabled,
     profileInfos?.profileRole,
     reaction,
   ]);
 
   const goToComments = () => {
     if (!actionEnabled) {
-      Alert.alert(
-        intl.formatMessage({
-          defaultMessage: 'Unpublished WebCard.',
-          description:
-            'PostRendererActionBar - Alert Message title when the user is viewing a post (from deeplinking) with an unpublished WebCard',
-        }),
-        intl.formatMessage({
-          defaultMessage:
-            'This action can only be done from a published WebCard.',
-          description:
-            'PostRendererActionBar - AlertMessage when the user is viewing a post (from deeplinking) with an unpublished WebCard',
-        }),
-        [
-          {
-            text: intl.formatMessage({
-              defaultMessage: 'Ok',
-              description:
-                'PostRendererActionBar - Alert button when the user is viewing a post (from deeplinking) with an unpublished WebCard',
-            }),
-          },
-        ],
-      );
+      onActionDisabled?.();
 
       return;
     }
@@ -294,29 +255,7 @@ const PostRendererActionBar = ({
 
   const onShare = async () => {
     if (!actionEnabled) {
-      Alert.alert(
-        intl.formatMessage({
-          defaultMessage: 'Unpublished WebCard.',
-          description:
-            'PostRendererActionBar - Alert Message title when the user is viewing a post (from deeplinking) with an unpublished WebCard',
-        }),
-        intl.formatMessage({
-          defaultMessage:
-            'This action can only be done from a published WebCard.',
-          description:
-            'PostRendererActionBar - AlertMessage when the user is viewing a post (from deeplinking) with an unpublished WebCard',
-        }),
-        [
-          {
-            text: intl.formatMessage({
-              defaultMessage: 'Ok',
-              description:
-                'PostRendererActionBar - Alert button when the user is viewing a post (from deeplinking) with an unpublished WebCard',
-            }),
-          },
-        ],
-      );
-
+      onActionDisabled?.();
       return;
     }
     // a quick share method using the native share component. If we want to make a custom share (like tiktok for example, when they are recompressiong the media etc) we can use react-native-shares

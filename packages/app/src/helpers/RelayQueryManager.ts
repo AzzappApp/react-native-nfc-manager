@@ -155,6 +155,16 @@ export type LoadQueryOptions<TParams> = {
    * The request fetch policy
    */
   fetchPolicy?: FetchPolicy | null | undefined;
+
+  /**
+   * If true, the query will be cached on the device and reused the next time the screen is displayed
+   */
+  useOfflineCache?: boolean;
+
+  /**
+   * If true, the query will be fetched only from the cache if available
+   */
+  cacheOnly?: boolean;
 };
 
 /**
@@ -196,9 +206,16 @@ export const loadQueryFor = <T>(
       params,
       profileInfos,
     );
+    const { useOfflineCache, cacheOnly } = options;
 
     const preloadedQuery = loadQuery(environment, query, variables, {
       fetchPolicy: options.fetchPolicy ?? 'store-and-network',
+      networkCacheConfig: {
+        metadata: {
+          useOfflineCache,
+          cacheOnly,
+        },
+      },
     });
     activeQueries.set(screenId, {
       preloadedQuery,

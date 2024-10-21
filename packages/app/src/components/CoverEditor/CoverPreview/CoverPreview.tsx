@@ -17,6 +17,10 @@ import Animated, {
   useDerivedValue,
   useSharedValue,
 } from 'react-native-reanimated';
+import {
+  captureSnapshot,
+  SnapshotRenderer,
+} from '@azzapp/react-native-snapshot-view';
 import { waitTime } from '@azzapp/shared/asyncHelpers';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
@@ -34,7 +38,6 @@ import {
   useScreenHasFocus,
   ScreenModal,
 } from '#components/NativeRouter';
-import SnapshotView, { snapshotView } from '#components/SnapshotView';
 import VideoCompositionRenderer from '#components/VideoCompositionRenderer';
 import useToggle from '#hooks/useToggle';
 import ActivityIndicator from '#ui/ActivityIndicator';
@@ -866,7 +869,7 @@ const CoverPreview = ({
    */
   const editedTextLayer =
     editionMode === 'textEdit' && selectedLayerIndex != null
-      ? textLayers[selectedLayerIndex] ?? null
+      ? (textLayers[selectedLayerIndex] ?? null)
       : null;
 
   /**
@@ -977,7 +980,7 @@ const CoverPreview = ({
       return;
     }
     try {
-      screenShotId = await snapshotView(compositionContainerRef.current as any);
+      screenShotId = await captureSnapshot(compositionContainerRef.current);
     } catch (e) {
       console.log('error', e);
       screenShotId = null;
@@ -1068,7 +1071,7 @@ const CoverPreview = ({
               collapsable={false}
             >
               {snapshotId && (
-                <SnapshotView
+                <SnapshotRenderer
                   snapshotID={snapshotId}
                   style={{ width: viewWidth, height: viewHeight }}
                 />

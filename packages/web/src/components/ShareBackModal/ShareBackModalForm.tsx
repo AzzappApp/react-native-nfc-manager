@@ -1,5 +1,6 @@
 import { getFormProps, getInputProps, useForm } from '@conform-to/react';
 import { parseWithZod } from '@conform-to/zod';
+import { sendGAEvent } from '@next/third-parties/google';
 import cx from 'classnames';
 import { useEffect, useRef } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
@@ -53,8 +54,13 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
   });
 
   useEffect(() => {
-    let timeout: NodeJS.Timeout | null = null;
+    let timeout: ReturnType<typeof setTimeout>;
     if (lastResult?.status === 'success') {
+      sendGAEvent('event', 'download_vcard', {
+        event_category: 'Form',
+        event_label: 'ShareBackForm',
+        value: 'Submit',
+      });
       timeout = setTimeout(() => {
         onSuccess();
       }, 2000);

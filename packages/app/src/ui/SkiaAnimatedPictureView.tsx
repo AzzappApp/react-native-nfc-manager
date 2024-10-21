@@ -11,6 +11,7 @@ import type {
   SkiaPictureViewProps,
   SkPicture,
 } from '@shopify/react-native-skia';
+import type { StyleProp, ViewStyle } from 'react-native';
 
 const NativeSkiaPictureView = SkiaPictureViewNativeComponent;
 
@@ -18,6 +19,7 @@ export type SkiaAnimatedPictureView = Omit<SkiaPictureViewProps, 'picture'> & {
   picture: DerivedValue<SkPicture | null>;
   width: number;
   height: number;
+  imageStyle?: StyleProp<ViewStyle>;
 };
 
 let idHelper = 10000;
@@ -30,6 +32,7 @@ const SkiaAnimatedPictureView = ({
   width,
   height,
   style,
+  imageStyle,
   ...viewProps
 }: SkiaAnimatedPictureView) => {
   const nativeId = useMemo(() => idHelper++, []);
@@ -56,15 +59,18 @@ const SkiaAnimatedPictureView = ({
         nativeID={`${nativeId}`}
         mode={mode ?? 'default'}
         debug={debug}
-        style={{
-          position: 'absolute',
-          left: 0,
-          top: 0,
-          width: width * pixelRatio,
-          height: height * pixelRatio,
-          transformOrigin: 'top left',
-          transform: [{ scaleX: 1 / pixelRatio }, { scaleY: 1 / pixelRatio }],
-        }}
+        style={[
+          {
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            width: width * pixelRatio,
+            height: height * pixelRatio,
+            transformOrigin: 'top left',
+            transform: [{ scaleX: 1 / pixelRatio }, { scaleY: 1 / pixelRatio }],
+          },
+          imageStyle,
+        ]}
       />
     </View>
   );

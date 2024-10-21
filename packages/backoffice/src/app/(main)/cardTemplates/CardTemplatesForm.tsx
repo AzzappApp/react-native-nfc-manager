@@ -347,7 +347,7 @@ const CardTemplateForm = ({
                     id: value,
                     kind: 'image' as const,
                   }
-                : value ?? null,
+                : (value ?? null),
           })}
         />
 

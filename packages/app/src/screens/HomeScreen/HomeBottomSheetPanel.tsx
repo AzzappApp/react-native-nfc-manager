@@ -21,6 +21,7 @@ import { colors } from '#theme';
 import Link from '#components/Link';
 import { logEvent } from '#helpers/analytics';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import { useDeleteNotifications } from '#hooks/useNotifications';
 import useQuitWebCard from '#hooks/useQuitWebCard';
 import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
@@ -78,6 +79,7 @@ const HomeBottomSheetPanel = ({
   );
 
   const intl = useIntl();
+  const deleteFcmToken = useDeleteNotifications();
 
   const [quitWebCard, isLoadingQuitWebCard] = useQuitWebCard(
     profile?.webCard?.id,
@@ -155,9 +157,13 @@ const HomeBottomSheetPanel = ({
   const [requestedLogout, toggleRequestLogout] = useToggle(false);
 
   //this code work on ios only
-  const onDismiss = () => {
+  const onDismiss = async () => {
     if (requestedLogout) {
-      void dispatchGlobalEvent({ type: 'SIGN_OUT' });
+      try {
+        await deleteFcmToken();
+      } finally {
+        void dispatchGlobalEvent({ type: 'SIGN_OUT' });
+      }
     }
   };
   //TODO: review Using onDismiss to logout (strange) but without it, the app is crashing in dev
@@ -168,9 +174,13 @@ const HomeBottomSheetPanel = ({
     close();
     if (Platform.OS === 'android') {
       //android is not crashing, but onDismiss is an ios feature only
-      void dispatchGlobalEvent({ type: 'SIGN_OUT' });
+      try {
+        await deleteFcmToken();
+      } finally {
+        void dispatchGlobalEvent({ type: 'SIGN_OUT' });
+      }
     }
-  }, [close, toggleRequestLogout]);
+  }, [close, deleteFcmToken, toggleRequestLogout]);
 
   const onShare = useCallback(async () => {
     if (profile?.webCard?.userName) {
@@ -352,6 +362,17 @@ const HomeBottomSheetPanel = ({
           onPress: () => {
             logEvent('open_mail_support');
             Linking.openURL('mailto:support@azzapp.com');
+          },
+        },
+        {
+          type: 'row',
+          icon: 'help',
+          text: intl.formatMessage({
+            defaultMessage: 'Help center',
+            description: 'Help center us message in Home bottom sheet panel',
+          }),
+          onPress: () => {
+            Linking.openURL(process.env.FAQ || '');
           },
         },
         {

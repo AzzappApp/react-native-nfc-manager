@@ -9,6 +9,8 @@ import {
   activeUserSubscription,
   getActiveUserSubscriptionForWebCard,
   getProfileByUserAndWebCard,
+  isFollowing,
+  getContactsByUser,
 } from '@azzapp/data';
 import { ENTITY_TARGET } from '@azzapp/i18n';
 import {
@@ -32,58 +34,39 @@ const createEntitiesBatchLoadFunction =
   (ids: readonly string[]) =>
     getEntitiesByIds(entity, ids);
 
-export const cardModuleLoader = createSessionDataLoader(
-  'CardModuleLoader',
-  createEntitiesBatchLoadFunction('CardModule'),
-);
-
-export const cardStyleLoader = createSessionDataLoader(
-  'CardStyleLoader',
+export const cardStyleLoader = createDataLoader(
   createEntitiesBatchLoadFunction('CardStyle'),
 );
 
-export const cardTemplateLoader = createSessionDataLoader(
-  'CardTemplateLoader',
+export const cardTemplateLoader = createDataLoader(
   createEntitiesBatchLoadFunction('CardTemplate'),
 );
 
-export const cardTemplateTypeLoader = createSessionDataLoader(
-  'CardTemplateTypeLoader',
+export const cardTemplateTypeLoader = createDataLoader(
   createEntitiesBatchLoadFunction('CardTemplateType'),
 );
 
-export const colorPaletteLoader = createSessionDataLoader(
-  'ColorPaletteLoader',
+export const colorPaletteLoader = createDataLoader(
   createEntitiesBatchLoadFunction('ColorPalette'),
 );
 
-export const companyActivityLoader = createSessionDataLoader(
-  'CompanyActivityLoader',
+export const companyActivityLoader = createDataLoader(
   createEntitiesBatchLoadFunction('CompanyActivity'),
 );
 
-export const companyActivityTypeLoader = createSessionDataLoader(
-  'CompanyActivityTypeLoader',
+export const companyActivityTypeLoader = createDataLoader(
   createEntitiesBatchLoadFunction('CompanyActivityType'),
 );
 
-export const coverTemplateLoader = createSessionDataLoader(
-  'CoverTemplateLoader',
+export const coverTemplateLoader = createDataLoader(
   createEntitiesBatchLoadFunction('CoverTemplate'),
 );
 
-export const coverTemplateTypeLoader = createSessionDataLoader(
-  'CoverTemplateTypeLoader',
+export const coverTemplateTypeLoader = createDataLoader(
   createEntitiesBatchLoadFunction('CoverTemplateType'),
 );
 
-export const coverTemplateTagLoader = createSessionDataLoader(
-  'CoverTemplateTagLoader',
-  createEntitiesBatchLoadFunction('CoverTemplateTag'),
-);
-
-export const mediaLoader = createSessionDataLoader(
-  'MediaLoader',
+export const mediaLoader = createDataLoader(
   createEntitiesBatchLoadFunction('Media'),
 );
 
@@ -97,8 +80,7 @@ export const postLoader = createSessionDataLoader(
   createEntitiesBatchLoadFunction('Post'),
 );
 
-export const webCardCategoryLoader = createSessionDataLoader(
-  'WebCardCategoryLoader',
+export const webCardCategoryLoader = createDataLoader(
   createEntitiesBatchLoadFunction('WebCardCategory'),
 );
 
@@ -112,8 +94,7 @@ export const webCardLoader = createSessionDataLoader(
   createEntitiesBatchLoadFunction('WebCard'),
 );
 
-export const moduleBackgroundLoader = createSessionDataLoader(
-  'ModuleBackgroundLoader',
+export const moduleBackgroundLoader = createDataLoader(
   createEntitiesBatchLoadFunction('ModuleBackground'),
 );
 
@@ -163,6 +144,61 @@ export const profileByWebCardIdAndUserIdLoader = createSessionDataLoader(
     ),
   {
     cacheKeyFn: key => `${key.userId}-${key.webCardId}`,
+  },
+);
+
+export const followingsLoader = createSessionDataLoader(
+  'FollowingsLoader',
+  async (keys: ReadonlyArray<[follower: string, following: string]>) => {
+    return Promise.all(keys.map(key => isFollowing(key[0], key[1])));
+  },
+  {
+    cacheKeyFn: key => key.join('-'),
+  },
+);
+
+export const profileInUserContactLoader = createSessionDataLoader(
+  'ProfileInUserContactLoader',
+  async (keys: ReadonlyArray<{ userId: string; profileId: string }>) => {
+    const profileIdsByUser = keys.reduce(
+      (accumulator, key) => {
+        if (accumulator[key.userId]) {
+          accumulator[key.userId].push(key.profileId);
+        } else {
+          accumulator[key.userId] = [key.profileId];
+        }
+
+        return accumulator;
+      },
+      {} as Record<string, string[]>,
+    );
+
+    const contacts = await Promise.all(
+      Object.entries(profileIdsByUser).map(([userId, profileIds]) =>
+        getContactsByUser(userId, profileIds),
+      ),
+    ).then(contactsByUsers => {
+      return contactsByUsers.reduce(
+        (accumulator, currentValue) => [...accumulator, ...currentValue],
+        [],
+      );
+    });
+
+    const contactsByProfile = contacts.reduce(
+      (accumulator: Record<string, string>, currentValue) => {
+        if (currentValue.profileId) {
+          accumulator[currentValue.profileId] = currentValue.id;
+        }
+
+        return accumulator;
+      },
+      {},
+    );
+
+    return keys.map(({ profileId }) => contactsByProfile[profileId] || null);
+  },
+  {
+    cacheKeyFn: key => `${key.userId}-${key.profileId}`,
   },
 );
 

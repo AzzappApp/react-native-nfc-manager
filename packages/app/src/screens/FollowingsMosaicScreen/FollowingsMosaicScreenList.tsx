@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { Dimensions, StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet, View } from 'react-native';
 import { graphql, usePaginationFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import CoverList from '#components/CoverList';
@@ -47,39 +47,34 @@ const FollowingsMosaicScreen = ({
   }, [data?.followings?.edges]);
 
   return (
-    <CoverList
-      users={users}
-      onEndReached={onEndReached}
-      containerStyle={styles.containerStyle}
-      coverStyle={styles.coverStyle}
-      horizontal={false}
-      numColums={2}
-      initialNumToRender={4}
-      columnWrapperStyle={styles.columnStyle}
-      onRefresh={() =>
-        refetch({
-          after: null,
-          first: 6,
-        })
-      }
-      refreshing={isLoadingPrevious}
-      withShadow
-    />
+    <View style={styles.containerStyle}>
+      <CoverList
+        users={users}
+        onEndReached={onEndReached}
+        coverWidth={COVER_WIDTH}
+        horizontal={false}
+        numColums={2}
+        gap={8}
+        onRefresh={() =>
+          refetch({
+            after: null,
+            first: 15,
+          })
+        }
+        refreshing={isLoadingPrevious}
+        withShadow
+      />
+    </View>
   );
 };
 
 const COVER_WIDTH = (Dimensions.get('window').width - 2 * 8) / 2;
 
 const styles = StyleSheet.create({
-  coverStyle: {
-    width: COVER_WIDTH,
-  },
   containerStyle: {
+    flex: 1,
     paddingHorizontal: 4,
     paddingVertical: 10,
-  },
-  columnStyle: {
-    gap: 8,
   },
 });
 

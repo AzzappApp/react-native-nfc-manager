@@ -23,15 +23,13 @@ type ShareBackModalProps = Omit<ModalProps, 'children'> & {
   token: string;
   userId: string;
   webcardId: string;
-  isMultiUser?: boolean;
   initials: string;
 };
 
 // eslint-disable-next-line react/display-name
 const ShareBackModal = forwardRef<ModalActions, ShareBackModalProps>(
   (props, ref) => {
-    const { name, avatarUrl, token, userId, webcardId, isMultiUser, initials } =
-      props;
+    const { name, avatarUrl, token, userId, webcardId, initials } = props;
 
     const internalRef = useRef<ModalActions>(null);
 
@@ -47,12 +45,7 @@ const ShareBackModal = forwardRef<ModalActions, ShareBackModalProps>(
     return (
       <AppIntlProvider>
         <Modal ref={internalRef}>
-          <div
-            className={cx(
-              styles.header,
-              isMultiUser ? styles.headerContainsAvatars : '',
-            )}
-          >
+          <div className={cx(styles.header)}>
             <div className={styles.avatarContainer}>
               <>
                 <Avatar variant="icon" icon={<ShareBackIcon />} />

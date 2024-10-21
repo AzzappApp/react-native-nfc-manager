@@ -1,0 +1,14 @@
+extend type Mutation {
+  removeContactsFromWebCard(
+    profileId: ID!
+    input: removeContactsFromWebCardInput!
+  ): removeContactsFromWebCardPayload
+}
+
+input removeContactsFromWebCardInput {
+  contactIds: [ID!]!
+}
+
+type removeContactsFromWebCardPayload {
+  removedContactIds: [ID!]!
+}

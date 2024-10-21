@@ -4,8 +4,8 @@ import Toast from 'react-native-toast-message';
 import { commitLocalUpdate, useRelayEnvironment } from 'react-relay';
 import ERRORS from '@azzapp/shared/errors';
 import { useRouter } from '#components/NativeRouter';
+import { getAuthState } from '#helpers/authStore';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
-import useAuthState from './useAuthState';
 import type { GraphQLError } from 'graphql';
 
 type GraphQLErrors = { response: { errors: GraphQLError[] } };
@@ -13,7 +13,6 @@ type GraphQLErrors = { response: { errors: GraphQLError[] } };
 const useHandleProfileActionError = (errorText: string) => {
   const intl = useIntl();
   const environment = useRelayEnvironment();
-  const { profileInfos } = useAuthState();
   const router = useRouter();
 
   const handleProfileActionError = useCallback(
@@ -21,7 +20,7 @@ const useHandleProfileActionError = (errorText: string) => {
       const error = (e as GraphQLErrors)?.response?.errors
         ? (e as GraphQLErrors).response.errors[0]
         : (e as Error);
-
+      const { profileInfos } = getAuthState();
       if (error.message === ERRORS.FORBIDDEN) {
         const role = (error as GraphQLError)?.extensions?.role as string;
 
@@ -81,7 +80,7 @@ const useHandleProfileActionError = (errorText: string) => {
         text1: errors[error.message] ?? errorText,
       });
     },
-    [environment, errorText, intl, profileInfos?.profileId, router],
+    [environment, errorText, intl, router],
   );
 
   return handleProfileActionError;

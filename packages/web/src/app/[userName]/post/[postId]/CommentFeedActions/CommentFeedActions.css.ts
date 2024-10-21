@@ -13,10 +13,10 @@ const wrapper = style({
   borderTopStyle: 'solid',
   '@media': {
     [MediaQuery.Desktop]: {
-      height: 145,
+      height: 130,
       position: 'absolute',
       bottom: 0,
-      padding: '20px 10px 10px 10px',
+      padding: '0px 10px 10px 10px',
     },
     [MediaQuery.Mobile]: {
       borderBottomColor: vars.color.grey100,
