@@ -115,21 +115,14 @@ import type { ROUTES } from '#routes';
 import type { ReactNode } from 'react';
 import type { IntlShape } from 'react-intl';
 
-const routingInstrumentation = new Sentry.RoutingInstrumentation();
-
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
   enabled: !__DEV__,
   environment: process.env.DEPLOYMENT_ENVIRONMENT,
   // TODO better configuration based on environment
-  integrations: [
-    new Sentry.ReactNativeTracing({
-      routingInstrumentation,
-      // WARNING: This option interferes with reanimated and creates flickering in some animations
-      // do not enable it unless it has been fixed
-      enableStallTracking: false,
-    }),
-  ],
+  // WARNING: This option interferes with reanimated and creates flickering in some animations
+  // do not enable it unless it has been fixed
+  enableStallTracking: false,
 });
 
 //initializing RC sneed to be done early
@@ -323,23 +316,9 @@ const AppRouter = () => {
 
   useEffect(() => {
     const disposable = router.addRouteWillChangeListener(route => {
-      const previous = router.getCurrentRoute();
-
-      routingInstrumentation.onRouteWillChange({
+      Sentry.startIdleNavigationSpan({
         name: route.route,
         op: 'navigation',
-        data: {
-          route: {
-            name: route.route,
-            params: route.params,
-          },
-          previousRoute: previous
-            ? {
-                name: previous.route,
-                params: previous.params,
-              }
-            : null,
-        },
       });
       analyticsLogScreenEvent(route.route);
     });
