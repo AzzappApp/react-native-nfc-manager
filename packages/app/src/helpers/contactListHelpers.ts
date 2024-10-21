@@ -1,4 +1,5 @@
 import * as FileSystem from 'expo-file-system';
+import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import type { ContactsScreenLists_contacts$data } from '#relayArtifacts/ContactsScreenLists_contacts.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { Contact } from 'expo-contacts';
@@ -27,7 +28,12 @@ export const buildLocalContact = async (
       contact.socials?.map(({ label, url }) => ({ label, url })) ?? [],
     urlAddresses: contact?.urls?.map(({ url }) => ({ label: '', url })) ?? [],
   };
-
+  if (contact.contactProfile?.webCard?.userName) {
+    personal.urlAddresses.push({
+      label: '',
+      url: buildUserUrl(contact.contactProfile?.webCard?.userName),
+    });
+  }
   const common = {
     addresses: commonInformation?.addresses ?? [],
     company: commonInformation?.company ?? undefined,

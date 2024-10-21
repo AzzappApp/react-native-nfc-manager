@@ -138,9 +138,16 @@ const AddContactModal = ({
       url,
     }));
 
-    const urls = additionalContactData?.urls?.map(url => {
-      return { url: url.address };
-    });
+    const urls =
+      additionalContactData?.urls?.map(url => {
+        return { url: url.address };
+      }) || [];
+
+    if (scanned.contact.id) {
+      urls.push({
+        url: buildUserUrl(scanned.contact.id),
+      });
+    }
 
     const birthdayItem = scanned.contact?.dates?.find(
       x => x.label === 'birthday',
