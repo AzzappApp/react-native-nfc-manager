@@ -53,11 +53,20 @@ const CoverTemplateConfirmationScreenModal = ({
           {/* //using margin on android  directly on the button create white area */}
           <View style={{ marginBottom: bottom, marginTop: 40 }}>
             <Button
-              label={intl.formatMessage({
-                defaultMessage: 'Use this template',
-                description:
-                  'CoverTemplateConfirmationScreenModal - confirmation button',
-              })}
+              label={intl.formatMessage(
+                {
+                  defaultMessage: `{mediaCount, plural,
+              =0 {Use this design (No media needed)}
+              =1 {Use this design (# media needed)}
+              other {Use this design (# media needed)}
+            }`,
+                  description:
+                    'CoverTemplateConfirmationScreenModal - confirmation button',
+                },
+                {
+                  mediaCount: template?.mediaCount,
+                },
+              )}
               variant="secondary"
               appearance="light"
               style={styles.button}
