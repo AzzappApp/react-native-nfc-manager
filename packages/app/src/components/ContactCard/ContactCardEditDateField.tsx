@@ -9,6 +9,7 @@ import {
 } from 'react-hook-form';
 import { FormattedMessage } from 'react-intl';
 import { Platform, View } from 'react-native';
+import { formatDateToYYYYMMDD } from '@azzapp/shared/timeHelpers';
 import { buildContactCardModalStyleSheet } from '#helpers/contactCardHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import PressableNative from '#ui/PressableNative';
@@ -75,7 +76,7 @@ const ContactCardEditDateField = <TFieldValues extends FieldValues>({
                           : new Date(Date.parse(value)),
                       onChange: (_, date) => {
                         if (date) {
-                          onChange(date.toISOString());
+                          onChange(formatDateToYYYYMMDD(date));
                         }
                       },
                       mode: 'date',
@@ -100,7 +101,11 @@ const ContactCardEditDateField = <TFieldValues extends FieldValues>({
                       ? new Date()
                       : new Date(Date.parse(value))
                   }
-                  onChange={(_, date) => date && onChange(date.toISOString())}
+                  onChange={(event, date) => {
+                    if (date) {
+                      onChange(formatDateToYYYYMMDD(date));
+                    }
+                  }}
                   style={styles.input}
                   mode="date"
                   display="default"
