@@ -439,11 +439,14 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
       : ownerProfileId;
     return getContactCountWithWebcardId(webCard.id, false, oid);
   },
-  contactsOwnerPofiles: async (webCard, { withDeleted }) => {
+  contactsOwnerPofiles: async (webCard, { withDeleted, ownerProfileId }) => {
     if (!(await hasWebCardProfileRight(webCard.id))) {
       return [];
     }
-    return getAllOwnerProfilesByWebcardId(webCard.id, !!withDeleted);
+    const oid = ownerProfileId
+      ? fromGlobalIdWithType(ownerProfileId, 'Profile')
+      : ownerProfileId;
+    return getAllOwnerProfilesByWebcardId(webCard.id, !!withDeleted, oid);
   },
   nbDeletedContacts: async (webCard, { ownerProfileId }) => {
     if (!(await hasWebCardProfileRight(webCard.id))) {

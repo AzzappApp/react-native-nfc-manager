@@ -229,6 +229,10 @@ type WebCard implements Node {
   """
   contactsOwnerPofiles(
     """
+    The query will return profile owned by this profileId
+    """
+    ownerProfileId: String
+    """
     When true, the query will add profile with deleted contacts
     """
     withDeleted: Boolean

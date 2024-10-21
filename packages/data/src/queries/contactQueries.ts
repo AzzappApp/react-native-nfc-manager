@@ -239,6 +239,7 @@ export const searchContactsByWebcardId = async ({
 export const getAllOwnerProfilesByWebcardId = async (
   webcardId: string,
   withDeleted: boolean = false,
+  ownerProfileId?: string | null,
 ): Promise<Profile[]> => {
   const result = await db()
     .selectDistinct({ ownerProfile: ProfileTable })
@@ -246,6 +247,9 @@ export const getAllOwnerProfilesByWebcardId = async (
     .innerJoin(ProfileTable, eq(ContactTable.ownerProfileId, ProfileTable.id))
     .where(
       and(
+        ownerProfileId
+          ? eq(ContactTable.ownerProfileId, ownerProfileId)
+          : undefined,
         eq(ProfileTable.webCardId, webcardId),
         withDeleted ? undefined : eq(ContactTable.deleted, false),
       ),
