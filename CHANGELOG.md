@@ -1,5 +1,9 @@
-## 0.9.10-canary.94
+## 0.9.10-canary.95
 
+* **build:**  - upgrade native deps ([#5511](https://github.com/AzzappApp/azzapp/pull/5511))
+* **fix:**  - 🐛 correctly order contact with empty name ([#5513](https://github.com/AzzappApp/azzapp/pull/5513))
+* **fix:**  - add azzapp url in shared contact ([#5512](https://github.com/AzzappApp/azzapp/pull/5512))
+* **fix:**  - **contactCard:** store date as yyyy-mm-dd ([#5508](https://github.com/AzzappApp/azzapp/pull/5508))
 * **fix:**  - 🐛 display cover on android + success toast invite ([#5503](https://github.com/AzzappApp/azzapp/pull/5503))
 * **fix:**  - allow to have default button in top of compagny activity ([#5506](https://github.com/AzzappApp/azzapp/pull/5506))
 * **fix:**  - handle plural/singular in remove contacts popup ([#5493](https://github.com/AzzappApp/azzapp/pull/5493))
