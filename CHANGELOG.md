@@ -1,5 +1,6 @@
-## 0.9.10-canary.95
+## 0.9.10-canary.96
 
+* **fix:**  - **mediaPicker:** [#5509](https://github.com/AzzappApp/azzapp/pull/5509) issue while switching media ([#5516](https://github.com/AzzappApp/azzapp/pull/5516))
 * **build:**  - upgrade native deps ([#5511](https://github.com/AzzappApp/azzapp/pull/5511))
 * **fix:**  - 🐛 correctly order contact with empty name ([#5513](https://github.com/AzzappApp/azzapp/pull/5513))
 * **fix:**  - add azzapp url in shared contact ([#5512](https://github.com/AzzappApp/azzapp/pull/5512))
