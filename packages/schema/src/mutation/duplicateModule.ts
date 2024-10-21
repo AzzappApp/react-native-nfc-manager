@@ -6,6 +6,7 @@ import {
   referencesMedias,
   transaction,
   updateCardModulesPosition,
+  getCardModulesByWebCard,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { invalidateWebCard } from '#externals';
@@ -37,6 +38,21 @@ const duplicateModule: MutationResolvers['duplicateModule'] = async (
   let createdModuleIds: string[] = [];
   try {
     await transaction(async () => {
+      const allModules = await getCardModulesByWebCard(webCardId);
+
+      // create holes in modules position list
+      for (let i = 0; i < modules.length; i++) {
+        const nextModulesIdx = allModules.findIndex(
+          module => module.id === modules[i].id,
+        );
+        const nextModules = allModules
+          .slice(nextModulesIdx + 1, allModules.length)
+          .map(m => m.id);
+
+        await updateCardModulesPosition(nextModules, 1);
+      }
+
+      // duplicate modules
       createdModuleIds = await createCardModules(
         modules.map((module, index) => ({
           ...omit(module, 'id'),
@@ -44,6 +60,7 @@ const duplicateModule: MutationResolvers['duplicateModule'] = async (
         })),
       );
 
+      // clean up media
       const moduleMedias = modules.flatMap(m => {
         const saveRules = MODULES_SAVE_RULES[m.kind];
         if (saveRules && 'getMedias' in saveRules) {
@@ -53,11 +70,6 @@ const duplicateModule: MutationResolvers['duplicateModule'] = async (
       });
 
       await referencesMedias(moduleMedias, []);
-
-      await updateCardModulesPosition(
-        modules.map(module => module.id),
-        modules.length,
-      );
     });
   } catch (e) {
     console.error(e);
