@@ -1,5 +1,8 @@
-## 0.9.11-canary.2
+## 0.9.11-canary.3
 
+* **fix:**  - ensure duplicated modules doesn't break order position ([#5515](https://github.com/AzzappApp/azzapp/pull/5515))
+* **fix:**  - improve template preview description ([#5507](https://github.com/AzzappApp/azzapp/pull/5507))
+* **fix:**  - improve media selection header ([#5505](https://github.com/AzzappApp/azzapp/pull/5505))
 * **fix:**  - **mediaPicker:** [#5509](https://github.com/AzzappApp/azzapp/pull/5509) issue while switching media ([#5516](https://github.com/AzzappApp/azzapp/pull/5516))
 * **build:**  - upgrade native deps ([#5511](https://github.com/AzzappApp/azzapp/pull/5511))
 * **fix:**  - 🐛 correctly order contact with empty name ([#5513](https://github.com/AzzappApp/azzapp/pull/5513))
