@@ -9,7 +9,6 @@ import type {
   EditionParameters,
   ImageOrientation,
 } from './EditionParameters';
-import type { SkImage } from '@shopify/react-native-skia';
 
 const LAYOUT_PARAMETERS = ['cropData', 'orientation', 'roll'];
 
@@ -119,16 +118,16 @@ export const scaleCropData = (cropData: CropData, scale: number): CropData => {
 export const scaleCropDataIfNecessary = (
   cropData: CropData,
   media: Media,
-  skImage: SkImage | null,
+  skImageWidth: number | null,
 ) => {
-  if (!skImage) {
+  if (!skImageWidth) {
     return cropData;
   }
-  if (media.width - skImage.width() <= 1) {
+  if (Math.abs(media.width - skImageWidth) <= 1) {
     return cropData;
   }
 
-  const scale = skImage.width() / media.width;
+  const scale = skImageWidth / media.width;
   return scaleCropData(cropData, scale);
 };
 

@@ -1,6 +1,7 @@
 import isEqual from 'lodash/isEqual';
 import { useCallback, useMemo, useState } from 'react';
 import { StyleSheet, useWindowDimensions, View } from 'react-native';
+import { runOnJS, useAnimatedReaction } from 'react-native-reanimated';
 import { colors } from '#theme';
 import Cropper from '#components/Cropper';
 import TransformedImageRenderer from '#components/TransformedImageRenderer';
@@ -77,6 +78,19 @@ const ImagePickerMediaRenderer = ({
 
   const { width: windowWidth } = useWindowDimensions();
 
+  const [skImageWidth, setSkImageWidth] = useState<number | null>(null);
+
+  useAnimatedReaction(
+    () => skImage.value,
+    skImage => {
+      if (skImage) {
+        runOnJS(setSkImageWidth)(skImage.width());
+      } else {
+        runOnJS(setSkImageWidth)(null);
+      }
+    },
+  );
+
   if (!media) {
     return null;
   }
@@ -109,7 +123,7 @@ const ImagePickerMediaRenderer = ({
                     cropData: scaleCropDataIfNecessary(
                       cropData,
                       media,
-                      skImage.value,
+                      skImageWidth,
                     ),
                   }}
                 />
