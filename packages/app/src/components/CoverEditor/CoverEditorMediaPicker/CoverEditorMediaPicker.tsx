@@ -408,10 +408,13 @@ const CoverEditorMediaPicker = ({
                   variant="icon"
                 />
               }
-              middleElement={intl.formatMessage({
-                defaultMessage: 'Select Medias',
-                description: 'Title of the Cover Editor Media picker',
-              })}
+              middleElement={intl.formatMessage(
+                {
+                  defaultMessage: 'Select {totalMediaNumber} media',
+                  description: 'Title of the Cover Editor Media picker',
+                },
+                { totalMediaNumber: maxMedias },
+              )}
             />
           ) : (
             <Header
