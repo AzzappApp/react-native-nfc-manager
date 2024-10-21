@@ -44,7 +44,7 @@ const ContactsScreenSearchByName = ({
   const styles = useStyleSheet(stylesheet);
 
   const sections = useMemo(() => {
-    return contacts?.reduce(
+    return contacts.reduce(
       (accumulator, contact) => {
         const initial =
           contact.firstName?.[0] ??
@@ -148,6 +148,7 @@ const stylesheet = createStyleSheet(theme => ({
   },
   title: {
     marginVertical: 20,
+    textTransform: 'uppercase',
   },
   section: {
     margin: 20,
