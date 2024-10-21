@@ -98,6 +98,7 @@ export type NewSharedContact = {
   phone: string;
   email: string;
   company: string;
+  title: string;
 };
 /**
  * Save a shareBack
@@ -116,6 +117,7 @@ export const saveShareBack = async (
     emails: [{ label: 'Main', address: newContact.email }],
     addresses: [],
     company: newContact.company,
+    title: newContact.title,
     type: 'shareback',
   };
 
