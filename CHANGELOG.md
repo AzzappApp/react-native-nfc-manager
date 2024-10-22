@@ -1,5 +1,7 @@
-## 0.9.11-canary.6
+## 0.9.11-canary.7
 
+* **fix:**  - ensure we don't handle message according to UI ([#5545](https://github.com/AzzappApp/azzapp/pull/5545))
+* **feat:**  - Add description in cover filters ([#5532](https://github.com/AzzappApp/azzapp/pull/5532))
 * **fix:**  - **payment:** add specific error for unsufficient seats ([#5549](https://github.com/AzzappApp/azzapp/pull/5549))
 * **fix:**  - **payment:** in inviteUserList case seats are already added in transaction
 * **fix:**  - **payment:** [#5472](https://github.com/AzzappApp/azzapp/pull/5472) manage specific case in subscription payments ([#5537](https://github.com/AzzappApp/azzapp/pull/5537))
