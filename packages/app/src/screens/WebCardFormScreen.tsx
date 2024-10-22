@@ -170,6 +170,11 @@ const WebCardFormScreen = ({
 
   const environment = useRelayEnvironment();
 
+  const lastErrorSend = useRef({
+    values: {},
+    errors: {},
+  });
+
   const {
     control,
     trigger,
@@ -198,15 +203,21 @@ const WebCardFormScreen = ({
               environment,
               graphql`
                 query WebCardFormScreenCheckUserNameQuery($userName: String!) {
-                  userNameAvailable(userName: $userName)
+                  userNameAvailable(userName: $userName) {
+                    available
+                    userName
+                  }
                 }
               `,
               { userName: data.userName },
             ).toPromise();
-            if (!res?.userNameAvailable) {
+            if (res?.userNameAvailable.userName !== data.userName) {
+              // form username changed during validation
+              return lastErrorSend.current;
+            }
+            if (!res?.userNameAvailable.available) {
               const { userName, ...values } = data;
-
-              return {
+              lastErrorSend.current = {
                 values,
                 errors: {
                   userName: {
@@ -215,18 +226,19 @@ const WebCardFormScreen = ({
                   },
                 },
               };
+              return lastErrorSend.current;
             }
           } catch {
             //waiting for submit
           }
         }
-
-        return {
+        lastErrorSend.current = {
           values: data,
           errors: {},
         };
+        return lastErrorSend.current;
       } else {
-        return {
+        lastErrorSend.current = {
           values: {},
           errors: Object.entries(result.error.formErrors.fieldErrors).reduce(
             (allErrors, [path, message]) => ({
@@ -239,6 +251,7 @@ const WebCardFormScreen = ({
             {},
           ),
         };
+        return lastErrorSend.current;
       }
     },
   });

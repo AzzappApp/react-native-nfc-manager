@@ -43,7 +43,7 @@ type Query {
     The user name of the profile
     """
     userName: String!
-  ): Boolean!
+  ): UserNameAvailableAnswer!
   """
   Return a list of profile categories
   """
@@ -60,4 +60,15 @@ type Query {
 
 type WebCardParameters {
   userNameChangeFrequencyDay: Int!
+}
+
+type UserNameAvailableAnswer {
+  """
+  the current user
+  """
+  available: Boolean!
+  """
+  the current user
+  """
+  userName: String!
 }

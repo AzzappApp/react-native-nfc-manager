@@ -36,16 +36,16 @@ export const Query: QueryResolvers = {
     const profile = await getWebCardByUserName(userName);
     const redirection = await getRedirectWebCardByUserName(userName);
     if (redirection.length === 0 && !profile) {
-      return true;
+      return { available: true, userName };
     } else if (redirection.length > 0 && !profile) {
       //check if redirection is passed
       const currentRedirection = redirection[0];
       if (currentRedirection.expiresAt < new Date()) {
         await deleteRedirection(redirection[0].fromUserName);
-        return true;
+        return { available: true, userName };
       }
     }
-    return false;
+    return { available: false, userName };
   },
 };
 
