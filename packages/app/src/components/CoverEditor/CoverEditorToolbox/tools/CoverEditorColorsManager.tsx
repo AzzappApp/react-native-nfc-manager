@@ -27,7 +27,7 @@ export type CoverEditorColorsManagerProps = {
 
 const CoverEditorColorsManager = ({
   visible,
-  height = 320,
+  height = 330,
   onRequestClose,
 }: CoverEditorColorsManagerProps) => {
   const {

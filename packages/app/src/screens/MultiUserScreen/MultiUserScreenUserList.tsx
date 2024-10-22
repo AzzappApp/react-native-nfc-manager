@@ -344,7 +344,9 @@ const MultiUserScreenUserList = ({
         }
       >
         <SectionList
-          ListHeaderComponent={searching ? undefined : ListHeaderComponent}
+          ListHeaderComponent={
+            searching || searchValue ? undefined : ListHeaderComponent
+          }
           accessibilityRole="list"
           sections={filteredSections}
           keyExtractor={sectionKeyExtractor}
