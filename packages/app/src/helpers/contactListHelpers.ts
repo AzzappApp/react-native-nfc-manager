@@ -50,7 +50,7 @@ export const buildLocalContact = async (
   const avatar = avatarURI
     ? await FileSystem.downloadAsync(
         avatarURI,
-        FileSystem.cacheDirectory + 'avatar',
+        FileSystem.cacheDirectory + contact.contactProfile.id,
       )
     : null;
 

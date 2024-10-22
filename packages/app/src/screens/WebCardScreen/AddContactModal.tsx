@@ -545,7 +545,7 @@ const buildContact = async (
     try {
       const avatar = await FileSystem.downloadAsync(
         additionalContactData.avatarUrl,
-        FileSystem.cacheDirectory + 'avatar',
+        FileSystem.cacheDirectory + profileId,
       );
       if (avatar.status >= 200 && avatar.status < 300) {
         image = {
