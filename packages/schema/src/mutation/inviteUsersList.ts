@@ -200,7 +200,8 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
       owner.id,
       webCard.id,
       createdProfiles.length,
-    );
+      true,
+    ); // seats are already added in the transaction, we just check that available seats are bigger or equal to 0
 
     if (!canBeAdded) {
       throw new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED);

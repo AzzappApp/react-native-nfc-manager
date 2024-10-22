@@ -32,6 +32,7 @@ export const checkSubscription = async (
   userId: string,
   webCardId: string,
   addedSeats: number,
+  alreadyAdded?: boolean,
 ) => {
   const userSubscription = await getActiveUserSubscriptionForWebCard(
     [userId],
@@ -53,6 +54,7 @@ export const checkSubscription = async (
   const store = userSubscription.find(
     subscription => subscription.issuer !== 'web',
   );
+
   if (lifetime) {
     return true;
   }
@@ -66,9 +68,13 @@ export const checkSubscription = async (
   }
 
   if (yearly) {
-    return (await calculateAvailableSeats(yearly)) >= addedSeats;
+    return (
+      (await calculateAvailableSeats(yearly)) >= (alreadyAdded ? 0 : addedSeats)
+    );
   } else if (store) {
-    return (await calculateAvailableSeats(store)) >= addedSeats;
+    return (
+      (await calculateAvailableSeats(store)) >= (alreadyAdded ? 0 : addedSeats)
+    );
   }
 
   return false;
