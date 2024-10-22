@@ -339,7 +339,9 @@ const WebCardParametersScreen = ({
           ) as { errors: GraphQLError[] } | undefined;
           if (
             response?.errors.some(
-              r => r.message === ERRORS.SUBSCRIPTION_REQUIRED,
+              r =>
+                r.message === ERRORS.SUBSCRIPTION_REQUIRED ||
+                r.message === ERRORS.SUBSCRIPTION_INSUFFICIENT_SEATS,
             )
           ) {
             router.push({ route: 'USER_PAY_WALL' });

@@ -474,8 +474,17 @@ const MultiUserAddModal = (
                 Toast.show({
                   type: 'error',
                   text1: intl.formatMessage({
+                    defaultMessage: 'Error, you don’t have a subscription',
+                    description:
+                      'Error toast message when inviting user without subscription from MultiUserAddModal',
+                  }),
+                });
+              } else if (e.message === ERRORS.SUBSCRIPTION_INSUFFICIENT_SEATS) {
+                Toast.show({
+                  type: 'error',
+                  text1: intl.formatMessage({
                     defaultMessage:
-                      'Error, you don’t have a subscription or you don’t have enough seats in your subscription to invite this user',
+                      'Error, you don’t have enough seats in your subscription to invite this user',
                     description:
                       'Error toast message when inviting user without correct subscription from MultiUserAddModal',
                   }),

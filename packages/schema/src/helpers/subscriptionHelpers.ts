@@ -28,12 +28,13 @@ export const calculateAvailableSeats = async (
   return userSubscription.totalSeats + userSubscription.freeSeats - totalUsed;
 };
 
-export const checkSubscription = async (
+const checkSubscription = async (
   userId: string,
   webCardId: string,
   addedSeats: number,
   alreadyAdded?: boolean,
 ) => {
+  const result = { hasActiveSubscription: false, hasEnoughSeats: false };
   const userSubscription = await getActiveUserSubscriptionForWebCard(
     [userId],
     [webCardId],
@@ -56,7 +57,10 @@ export const checkSubscription = async (
   );
 
   if (lifetime) {
-    return true;
+    return {
+      hasActiveSubscription: true,
+      hasEnoughSeats: true,
+    };
   }
 
   if (monthly && monthly.status === 'active') {
@@ -64,20 +68,51 @@ export const checkSubscription = async (
       userSubscription: monthly,
       totalSeats: monthly.totalSeats + addedSeats,
     });
-    return true;
+    return {
+      hasActiveSubscription: true,
+      hasEnoughSeats: true,
+    };
   }
 
   if (yearly) {
-    return (
-      (await calculateAvailableSeats(yearly)) >= (alreadyAdded ? 0 : addedSeats)
-    );
+    return {
+      hasActiveSubscription: true,
+      hasEnoughSeats:
+        (await calculateAvailableSeats(yearly)) >=
+        (alreadyAdded ? 0 : addedSeats),
+    };
   } else if (store) {
-    return (
-      (await calculateAvailableSeats(store)) >= (alreadyAdded ? 0 : addedSeats)
-    );
+    return {
+      hasActiveSubscription: true,
+      hasEnoughSeats:
+        (await calculateAvailableSeats(store)) >=
+        (alreadyAdded ? 0 : addedSeats),
+    };
   }
 
-  return false;
+  return result;
+};
+
+export const validateCurrentSubscription = async (
+  userId: string,
+  webCardId: string,
+  addedSeats: number,
+  alreadyAdded?: boolean,
+) => {
+  const { hasActiveSubscription, hasEnoughSeats } = await checkSubscription(
+    userId,
+    webCardId,
+    addedSeats,
+    alreadyAdded,
+  );
+
+  if (!hasActiveSubscription) {
+    throw new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED);
+  }
+
+  if (!hasEnoughSeats) {
+    throw new GraphQLError(ERRORS.SUBSCRIPTION_INSUFFICIENT_SEATS);
+  }
 };
 
 export const updateMonthlySubscription = async (

@@ -25,7 +25,7 @@ import {
   webCardOwnerLoader,
 } from '#loaders';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
-import { checkSubscription } from '#helpers/subscriptionHelpers';
+import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import type {
   InviteUserEmailInput,
   InviteUserRejected,
@@ -196,16 +196,12 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
 
-    const canBeAdded = await checkSubscription(
+    await validateCurrentSubscription(
       owner.id,
       webCard.id,
       createdProfiles.length,
       true,
     ); // seats are already added in the transaction, we just check that available seats are bigger or equal to 0
-
-    if (!canBeAdded) {
-      throw new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED);
-    }
 
     return { users, createdProfiles };
   });
