@@ -33,8 +33,10 @@ const SaturationValuePicker = ({
 
   const panGesture = useMemo(
     () =>
-      Gesture.Pan()
-        .blocksExternalGesture(modalPanGesture)
+      (modalPanGesture
+        ? Gesture.Pan().blocksExternalGesture(modalPanGesture)
+        : Gesture.Pan()
+      )
         .onBegin(e => {
           const { x, y } = e;
           if (!size) {
