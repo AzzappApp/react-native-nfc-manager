@@ -1,5 +1,6 @@
-## 0.9.11-canary.3
+## 0.9.11-canary.4
 
+* **fix:**  - **payment:** [#5472](https://github.com/AzzappApp/azzapp/pull/5472) manage specific case in subscription payments ([#5537](https://github.com/AzzappApp/azzapp/pull/5537))
 * **fix:**  - ensure duplicated modules doesn't break order position ([#5515](https://github.com/AzzappApp/azzapp/pull/5515))
 * **fix:**  - improve template preview description ([#5507](https://github.com/AzzappApp/azzapp/pull/5507))
 * **fix:**  - improve media selection header ([#5505](https://github.com/AzzappApp/azzapp/pull/5505))
