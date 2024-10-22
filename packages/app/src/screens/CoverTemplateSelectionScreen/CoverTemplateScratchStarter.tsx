@@ -75,7 +75,6 @@ const fromScratchText = (
 const styles = StyleSheet.create({
   container: {
     paddingLeft: 20,
-    paddingTop: 20,
   },
   scratchs: {
     paddingVertical: 10,

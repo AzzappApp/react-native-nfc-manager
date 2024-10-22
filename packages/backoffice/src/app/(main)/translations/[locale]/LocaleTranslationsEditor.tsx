@@ -100,7 +100,7 @@ const LocaleTranslationsEditor = ({
               return (
                 key.toLowerCase().includes(lowerCaseFilter) ||
                 description.toLowerCase().includes(lowerCaseFilter) ||
-                defaultMessage.toLowerCase().includes(lowerCaseFilter) ||
+                defaultMessage?.toLowerCase().includes(lowerCaseFilter) ||
                 currentMessage.toLowerCase().includes(lowerCaseFilter)
               );
             },

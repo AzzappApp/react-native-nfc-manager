@@ -23,14 +23,16 @@ import type { FormEvent } from 'react';
 
 type Props = {
   label?: string;
+  description?: string;
   coverTemplateTag: CoverTemplateTag | null;
   saved?: boolean;
 };
 
-type FormValue = CoverTemplateTag & { label: string };
+type FormValue = CoverTemplateTag & { label: string; description?: string };
 
 const CoverTemplateTagForm = ({
   label,
+  description,
   coverTemplateTag,
   saved = false,
 }: Props) => {
@@ -49,6 +51,7 @@ const CoverTemplateTagForm = ({
         ? {
             ...coverTemplateTag,
             label,
+            description,
           }
         : { enabled: true },
     formErrors?.fieldErrors,
@@ -126,6 +129,14 @@ const CoverTemplateTagForm = ({
             required
             fullWidth
             {...fieldProps('label')}
+          />
+          <TextField
+            name="fontSize"
+            label="description"
+            disabled={saving}
+            required
+            fullWidth
+            {...fieldProps('description')}
           />
           <Box display="flex" alignItems="center" gap={2} width="100%">
             <TextField

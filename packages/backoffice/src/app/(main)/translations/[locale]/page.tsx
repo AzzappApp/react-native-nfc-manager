@@ -11,6 +11,7 @@ import {
   getWebCardCategories,
 } from '@azzapp/data';
 import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
+import { TEMPLATE_COVERTAG_DESCRIPTION_PREFIX } from '@azzapp/shared/translationsContants';
 import {
   appMessages,
   langNames,
@@ -74,9 +75,13 @@ const TranslationLocalePage = async ({
       ),
     ),
     getCoverTemplateTags().then(coverTemplateTags =>
-      coverTemplateTags.map(
-        ({ id }) => ({ id, kind: 'CoverTemplateTag' }) as const,
-      ),
+      coverTemplateTags.flatMap(({ id }) => [
+        { id, kind: 'CoverTemplateTag' } as const,
+        {
+          id: TEMPLATE_COVERTAG_DESCRIPTION_PREFIX + id,
+          kind: 'CoverTemplateTagDescription',
+        },
+      ]),
     ),
     getCoverTemplateTypes().then(coverTemplateTypes =>
       coverTemplateTypes.map(

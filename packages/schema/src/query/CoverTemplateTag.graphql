@@ -7,4 +7,5 @@ type CoverTemplateTag implements Node {
   """
   id: ID!
   label: String
+  description: String
 }
