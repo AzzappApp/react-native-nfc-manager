@@ -1,5 +1,7 @@
-## 0.9.11-canary.7
+## 0.9.11-canary.8
 
+* **fix:**  - 🐛 try to find country code from number ([#5520](https://github.com/AzzappApp/azzapp/pull/5520))
+* **fix:**  - 🐛 android ui ([#5554](https://github.com/AzzappApp/azzapp/pull/5554))
 * **fix:**  - ensure we don't handle message according to UI ([#5545](https://github.com/AzzappApp/azzapp/pull/5545))
 * **feat:**  - Add description in cover filters ([#5532](https://github.com/AzzappApp/azzapp/pull/5532))
 * **fix:**  - **payment:** add specific error for unsufficient seats ([#5549](https://github.com/AzzappApp/azzapp/pull/5549))
