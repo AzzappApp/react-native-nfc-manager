@@ -1,5 +1,6 @@
-## 0.9.11-canary.4
+## 0.9.11-canary.5
 
+* **fix:**  - **payment:** in inviteUserList case seats are already added in transaction
 * **fix:**  - **payment:** [#5472](https://github.com/AzzappApp/azzapp/pull/5472) manage specific case in subscription payments ([#5537](https://github.com/AzzappApp/azzapp/pull/5537))
 * **fix:**  - ensure duplicated modules doesn't break order position ([#5515](https://github.com/AzzappApp/azzapp/pull/5515))
 * **fix:**  - improve template preview description ([#5507](https://github.com/AzzappApp/azzapp/pull/5507))
