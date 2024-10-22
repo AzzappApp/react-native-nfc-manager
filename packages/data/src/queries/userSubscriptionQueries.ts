@@ -119,15 +119,7 @@ export const activeUserSubscription = async (
       ),
     );
 
-  const map = subscriptions.reduce(
-    (acc, subscription) => {
-      acc[subscription.userId] = subscription;
-      return acc;
-    },
-    {} as Record<string, UserSubscription>,
-  );
-
-  return userIds.map(userId => map[userId] ?? null);
+  return subscriptions;
 };
 
 // TODO document this function properly

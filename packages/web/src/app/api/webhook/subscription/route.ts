@@ -34,6 +34,7 @@ export const POST = withPluginsRoute(async (req: Request) => {
       data.rebill_manager_external_reference,
       data.rebill_manager_id,
       data.transaction_id,
+      parseInt(data.amount_cnts, 10),
       data.provider_response,
     );
   } else {
