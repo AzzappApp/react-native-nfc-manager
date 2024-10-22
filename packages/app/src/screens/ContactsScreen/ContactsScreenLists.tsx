@@ -17,9 +17,9 @@ import {
 } from '#helpers/contactListHelpers';
 import { getLocalContactsMap } from '#helpers/getLocalContactsMap';
 import { useProfileInfos } from '#hooks/authStateHooks';
-import { storage } from '#hooks/useDeepLink';
 import { usePhonebookPermission } from '#hooks/usePhonebookPermission';
 import ContactDetailsModal from './ContactDetailsModal';
+import { storage } from './ContactsScreen';
 import ContactsScreenSearchByDate from './ContactsScreenSearchByDate';
 import ContactsScreenSearchByName from './ContactsScreenSearchByName';
 import type { ContactsScreenListQuery$data } from '#relayArtifacts/ContactsScreenListQuery.graphql';
