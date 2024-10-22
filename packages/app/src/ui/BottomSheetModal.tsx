@@ -121,9 +121,14 @@ const BottomSheetModalContext = createContext<{
   panGesture: PanGesture;
 } | null>(null);
 
-export const useBottomSheetModalContext = () => {
+export const useBottomSheetModalContext = (
+  allowedOutsideOfContext: boolean = false,
+) => {
   const context = useContext(BottomSheetModalContext);
   if (context === null) {
+    if (allowedOutsideOfContext) {
+      return { panGesture: undefined };
+    }
     throw new Error(
       'useBottomSheetModalContext must be used within a BottomSheetModalContext.Provider',
     );
