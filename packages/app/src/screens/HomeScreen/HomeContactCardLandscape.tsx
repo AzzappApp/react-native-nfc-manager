@@ -41,7 +41,9 @@ const HomeContactCardLandscape = ({
         webCard {
           id
           cardIsPublished
+          hasCover
         }
+        promotedAsOwner
         invited
       }
     `,
@@ -55,10 +57,22 @@ const HomeContactCardLandscape = ({
   );
   const orientationRef = useRef(orientation);
   const visibleSharedValue = useSharedValue(0);
-  const tabBarVisibleSharedValue = useDerivedValue(
-    () => 1 - visibleSharedValue.value,
-    [visibleSharedValue],
-  );
+
+  const tabBarVisibleSharedValue = useDerivedValue(() => {
+    if (!profile) {
+      return 0;
+    }
+    if (
+      profile?.webCard?.hasCover &&
+      profile?.webCard?.cardIsPublished &&
+      !profile?.invited &&
+      !profile.promotedAsOwner
+    ) {
+      return 1 - visibleSharedValue.value;
+    } else {
+      return 0;
+    }
+  }, [visibleSharedValue]);
 
   useEffect(() => {
     if (Platform.OS === 'android') {
