@@ -1,5 +1,7 @@
-## 0.9.11-canary.13
+## 0.9.11-canary.14
 
+* **fix:**  - white list mozilla for vcard download ([#5570](https://github.com/AzzappApp/azzapp/pull/5570))
+* **fix:**  - allow to restore position on remount of VideoCompositionRenderer ([#5571](https://github.com/AzzappApp/azzapp/pull/5571))
 * **feat:**  - 🎸 search webcard include first and last name ([#5568](https://github.com/AzzappApp/azzapp/pull/5568))
 * **feat:**  - 🎸 get default values based on cover background ([#5565](https://github.com/AzzappApp/azzapp/pull/5565))
 * **fix:**  - duplicate userNameAvailable for backward compatibility ([#5559](https://github.com/AzzappApp/azzapp/pull/5559))
