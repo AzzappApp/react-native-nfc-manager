@@ -312,10 +312,13 @@ const CoverEditorMediaPicker = ({
       Alert.alert(
         intl.formatMessage(
           {
-            defaultMessage:
-              '{mediaPickedNumber}/{totalMediaNumber} medias selected',
+            defaultMessage: `{mediaPickedNumber, plural,
+            =0 {#/{totalMediaNumber} media selected}
+            =1 {#/{totalMediaNumber} media selected}
+            other {#/{totalMediaNumber} media selected}
+    }`,
             description:
-              'Title of the permission picker in image picker wizard',
+              'Title of missing media in cover edition to propose duplication',
           },
           {
             mediaPickedNumber: selectedMedias.length,
