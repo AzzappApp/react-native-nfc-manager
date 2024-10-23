@@ -7,7 +7,6 @@ import { useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import * as z from 'zod';
 import { SOCIAL_LINKS_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
-import { isValidUrl } from '@azzapp/shared/stringHelpers';
 import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { useRouter } from '#components/NativeRouter';
 import useEditorLayout from '#hooks/useEditorLayout';
@@ -47,15 +46,13 @@ export type SocialLinksEditionScreenProps = ViewProps & {
 const socialLinkSchema = z
   .array(
     z.union([
-      z
-        .object({
-          socialId: z.literal('website'),
-          link: z.string().nonempty(),
-        })
-        .refine(item => isValidUrl(item.link)),
+      z.object({
+        socialId: z.literal('website'),
+        link: z.string().min(1),
+      }),
       z.object({
         socialId: z.custom<string>(value => value !== 'website'),
-        link: z.string().nonempty(),
+        link: z.string().min(1),
       }),
     ]),
   )
