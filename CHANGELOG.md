@@ -1,5 +1,7 @@
-## 0.9.11-canary.12
+## 0.9.11-canary.13
 
+* **feat:**  - 🎸 search webcard include first and last name ([#5568](https://github.com/AzzappApp/azzapp/pull/5568))
+* **feat:**  - 🎸 get default values based on cover background ([#5565](https://github.com/AzzappApp/azzapp/pull/5565))
 * **fix:**  - duplicate userNameAvailable for backward compatibility ([#5559](https://github.com/AzzappApp/azzapp/pull/5559))
 * **fix:**  - remove validaity control on URL link ([#5557](https://github.com/AzzappApp/azzapp/pull/5557))
 * **fix:**  - 🐛 show filter preview with right orientation ([#5518](https://github.com/AzzappApp/azzapp/pull/5518))
