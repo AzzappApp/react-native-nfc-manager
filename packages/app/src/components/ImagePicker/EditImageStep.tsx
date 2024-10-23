@@ -262,6 +262,7 @@ const EditImageStep = ({
                       media={media}
                       aspectRatio={aspectRatio}
                       cropData={editionParameters.cropData}
+                      orientation={editionParameters.orientation}
                       selectedFilter={mediaFilter}
                       onChange={onMediaFilterChange}
                       style={styles.filterSelectionStyle}

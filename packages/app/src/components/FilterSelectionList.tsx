@@ -6,7 +6,7 @@ import { colors } from '#theme';
 import { useFilterLabels } from '#helpers/mediaEditions';
 import BoxSelectionList from './BoxSelectionList';
 import TransformedImageRenderer from './TransformedImageRenderer';
-import type { CropData } from '#helpers/mediaEditions';
+import type { CropData, ImageOrientation } from '#helpers/mediaEditions';
 import type { Media } from '#helpers/mediaHelpers';
 import type { BoxButtonItemInfo } from './BoxSelectionList';
 import type { Filter } from '@azzapp/shared/filtersHelper';
@@ -22,6 +22,7 @@ type FilterSelectionListProps = ViewProps & {
   media: Media | null;
   onChange(value: Filter | null): void;
   isSkImageReady: boolean;
+  orientation?: ImageOrientation | null;
 };
 
 const FilterSelectionList = ({
@@ -29,6 +30,7 @@ const FilterSelectionList = ({
   aspectRatio,
   selectedFilter,
   cropData,
+  orientation,
   onChange,
   media,
   isSkImageReady,
@@ -69,6 +71,7 @@ const FilterSelectionList = ({
           filter={filter}
           editionParameters={{
             cropData: filterListerCropData,
+            orientation,
           }}
           imageStyle={
             colorScheme === 'dark' && {
@@ -78,7 +81,7 @@ const FilterSelectionList = ({
         />
       );
     },
-    [skImage, filterListerCropData, colorScheme],
+    [skImage, filterListerCropData, orientation, colorScheme],
   );
 
   const onSelect = useCallback(
