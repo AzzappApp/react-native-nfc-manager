@@ -10,6 +10,7 @@ import {
   CAROUSEL_DEFAULT_VALUES,
   MODULE_IMAGE_MAX_WIDTH,
   CAROUSEL_STYLE_VALUES,
+  getCarouselDefaultValues,
 } from '@azzapp/shared/cardModuleHelpers';
 import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
 import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
@@ -107,6 +108,7 @@ const CarouselEditionScreen = ({
         webCard {
           id
           cardIsPublished
+          coverBackgroundColor
           isPremium
           cardColors {
             primary
@@ -171,7 +173,9 @@ const CarouselEditionScreen = ({
       initialValue,
       cardStyle: profile?.webCard?.cardStyle,
       styleValuesMap: CAROUSEL_STYLE_VALUES,
-      defaultValues: CAROUSEL_DEFAULT_VALUES,
+      defaultValues: getCarouselDefaultValues(
+        profile.webCard?.coverBackgroundColor,
+      ),
     });
 
   const { images, squareRatio, borderColor, backgroundId, backgroundStyle } =

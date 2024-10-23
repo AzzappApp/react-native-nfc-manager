@@ -4,12 +4,12 @@ import { StyleSheet } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import {
-  SIMPLE_TEXT_DEFAULT_VALUES,
-  SIMPLE_TITLE_DEFAULT_VALUES,
   SIMPLE_TEXT_MAX_LENGTH,
   SIMPLE_TITLE_MAX_LENGTH,
   SIMPLE_TEXT_STYLE_VALUES,
   SIMPLE_TITLE_STYLE_VALUES,
+  getTextDefaultValues,
+  getTitleDefaultValues,
 } from '@azzapp/shared/cardModuleHelpers';
 import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { useRouter } from '#components/NativeRouter';
@@ -118,6 +118,7 @@ const SimpleTextEditionScreen = ({
         webCard {
           id
           cardIsPublished
+          coverBackgroundColor
           isPremium
           cardStyle {
             borderColor
@@ -182,8 +183,8 @@ const SimpleTextEditionScreen = ({
         : SIMPLE_TITLE_STYLE_VALUES,
     defaultValues:
       moduleKind === 'simpleText'
-        ? SIMPLE_TEXT_DEFAULT_VALUES
-        : SIMPLE_TITLE_DEFAULT_VALUES,
+        ? getTextDefaultValues(profile.webCard?.coverBackgroundColor)
+        : getTitleDefaultValues(profile.webCard?.coverBackgroundColor),
   });
 
   const {

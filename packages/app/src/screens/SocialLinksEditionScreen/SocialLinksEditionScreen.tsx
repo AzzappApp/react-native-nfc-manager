@@ -6,7 +6,10 @@ import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import * as z from 'zod';
-import { SOCIAL_LINKS_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
+import {
+  getSocialLinksDefaultValues,
+  SOCIAL_LINKS_DEFAULT_VALUES,
+} from '@azzapp/shared/cardModuleHelpers';
 import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { useRouter } from '#components/NativeRouter';
 import useEditorLayout from '#hooks/useEditorLayout';
@@ -110,6 +113,7 @@ const SocialLinksEditionScreen = ({
           id
           isPremium
           cardIsPublished
+          coverBackgroundColor
           cardColors {
             primary
             light
@@ -150,7 +154,9 @@ const SocialLinksEditionScreen = ({
       initialValue,
       cardStyle: null,
       styleValuesMap: null,
-      defaultValues: SOCIAL_LINKS_DEFAULT_VALUES,
+      defaultValues: getSocialLinksDefaultValues(
+        profile.webCard?.coverBackgroundColor,
+      ),
     });
 
   const { links, iconColor, arrangement, backgroundId, backgroundStyle } = data;

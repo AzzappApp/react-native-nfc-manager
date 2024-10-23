@@ -6,7 +6,7 @@ import { useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import * as z from 'zod';
 import {
-  SIMPLE_BUTTON_DEFAULT_VALUES,
+  getButtonDefaultValues,
   SIMPLE_BUTTON_STYLE_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
 import { isValidUrl, isPhoneNumber } from '@azzapp/shared/stringHelpers';
@@ -122,6 +122,7 @@ const SimpleButtonEditionScreen = ({
           resizeMode
         }
         webCard {
+          coverBackgroundColor
           id
           cardIsPublished
           isPremium
@@ -183,7 +184,9 @@ const SimpleButtonEditionScreen = ({
     initialValue,
     cardStyle: profile?.webCard?.cardStyle,
     styleValuesMap: SIMPLE_BUTTON_STYLE_VALUES,
-    defaultValues: SIMPLE_BUTTON_DEFAULT_VALUES,
+    defaultValues: getButtonDefaultValues(
+      profile.webCard?.coverBackgroundColor,
+    ),
   });
 
   const {

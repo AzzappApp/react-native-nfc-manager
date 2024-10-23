@@ -9,6 +9,7 @@ import {
   BLOCK_TEXT_DEFAULT_VALUES,
   BLOCK_TEXT_MAX_LENGTH,
   BLOCK_TEXT_STYLE_VALUES,
+  getBlockTextDefaultValues,
 } from '@azzapp/shared/cardModuleHelpers';
 import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { useRouter } from '#components/NativeRouter';
@@ -103,6 +104,7 @@ const BlockTextEditionScreen = ({
         webCard {
           id
           cardIsPublished
+          coverBackgroundColor
           isPremium
           cardColors {
             primary
@@ -160,7 +162,9 @@ const BlockTextEditionScreen = ({
     initialValue,
     cardStyle: profile?.webCard?.cardStyle,
     styleValuesMap: BLOCK_TEXT_STYLE_VALUES,
-    defaultValues: BLOCK_TEXT_DEFAULT_VALUES,
+    defaultValues: getBlockTextDefaultValues(
+      profile.webCard?.coverBackgroundColor,
+    ),
   });
 
   const {

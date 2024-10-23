@@ -7,6 +7,7 @@ import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { Observable } from 'relay-runtime';
 import {
+  getHorizontalPhotoDefaultValues,
   HORIZONTAL_PHOTO_DEFAULT_VALUES,
   HORIZONTAL_PHOTO_STYLE_VALUES,
   MODULE_IMAGE_MAX_WIDTH,
@@ -120,6 +121,7 @@ const HorizontalPhotoEditionScreen = ({
         webCard {
           id
           cardIsPublished
+          coverBackgroundColor
           cardColors {
             primary
             light
@@ -170,7 +172,9 @@ const HorizontalPhotoEditionScreen = ({
     initialValue,
     cardStyle: profile?.webCard?.cardStyle,
     styleValuesMap: HORIZONTAL_PHOTO_STYLE_VALUES,
-    defaultValues: HORIZONTAL_PHOTO_DEFAULT_VALUES,
+    defaultValues: getHorizontalPhotoDefaultValues(
+      profile.webCard?.coverBackgroundColor,
+    ),
   });
 
   const { borderColor, backgroundId, backgroundStyle, image } = data;
