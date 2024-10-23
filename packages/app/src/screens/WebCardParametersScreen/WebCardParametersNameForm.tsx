@@ -69,7 +69,7 @@ const WebcardParametersNameForm = ({
               environment,
               graphql`
                 query WebCardParametersNameFormQuery($userName: String!) {
-                  userNameAvailable(userName: $userName) {
+                  isUserNameAvailable(userName: $userName) {
                     available
                     userName
                   }
@@ -78,11 +78,11 @@ const WebcardParametersNameForm = ({
               { userName: data.userName },
             ).toPromise();
 
-            if (res?.userNameAvailable.userName !== data.userName) {
+            if (res?.isUserNameAvailable.userName !== data.userName) {
               // form username changed during validation
               return lastErrorSend.current;
             }
-            if (!res?.userNameAvailable && userName === webCard.userName) {
+            if (!res?.isUserNameAvailable && userName === webCard.userName) {
               lastErrorSend.current = {
                 values: {},
                 errors: {

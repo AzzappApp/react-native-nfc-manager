@@ -203,7 +203,7 @@ const WebCardFormScreen = ({
               environment,
               graphql`
                 query WebCardFormScreenCheckUserNameQuery($userName: String!) {
-                  userNameAvailable(userName: $userName) {
+                  isUserNameAvailable(userName: $userName) {
                     available
                     userName
                   }
@@ -211,11 +211,11 @@ const WebCardFormScreen = ({
               `,
               { userName: data.userName },
             ).toPromise();
-            if (res?.userNameAvailable.userName !== data.userName) {
+            if (res?.isUserNameAvailable.userName !== data.userName) {
               // form username changed during validation
               return lastErrorSend.current;
             }
-            if (!res?.userNameAvailable.available) {
+            if (!res?.isUserNameAvailable.available) {
               const { userName, ...values } = data;
               lastErrorSend.current = {
                 values,
