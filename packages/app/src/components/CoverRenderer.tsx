@@ -1,5 +1,5 @@
 import { forwardRef, useMemo, useState } from 'react';
-import { Dimensions, Image, View } from 'react-native';
+import { Dimensions, Image, Platform, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
@@ -278,7 +278,7 @@ const CoverRenderer = (
                 transform: [
                   { rotate: `${coverDynamicLinks.rotation}rad` },
                   // Fixes https://github.com/AzzappApp/azzapp/issues/4423 (When a parent element has a rotateY with a value of 0, it creates this bug on Android)
-                  { rotateY: '0.1deg' },
+                  { rotateY: `${Platform.OS === 'android' ? '0.1' : '0'}deg` },
                 ],
                 top:
                   (coverDynamicLinks.position.y * layout.height) / 100 -
