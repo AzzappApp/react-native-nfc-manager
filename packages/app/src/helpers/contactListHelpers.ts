@@ -26,12 +26,6 @@ export const buildLocalContact = async (
       contact.socials?.map(({ label, url }) => ({ label, url })) ?? [],
     urlAddresses: contact?.urls?.map(({ url }) => ({ label: '', url })) ?? [],
   };
-  if (contact.contactProfile?.webCard?.userName) {
-    personal.urlAddresses.push({
-      label: '',
-      url: buildUserUrl(contact.contactProfile?.webCard?.userName),
-    });
-  }
 
   let updatedBirthDay = undefined;
   if (contact.birthday) {
