@@ -1,5 +1,7 @@
-## 0.9.11-canary.8
+## 0.9.11-canary.9
 
+* **fix:**  - 🐛 avoid blurry link on iOS ([#5517](https://github.com/AzzappApp/azzapp/pull/5517))
+* **fix:**  - Don't override mainTabBar visibliity on landscape if already hidden ([#5556](https://github.com/AzzappApp/azzapp/pull/5556))
 * **fix:**  - 🐛 try to find country code from number ([#5520](https://github.com/AzzappApp/azzapp/pull/5520))
 * **fix:**  - 🐛 android ui ([#5554](https://github.com/AzzappApp/azzapp/pull/5554))
 * **fix:**  - ensure we don't handle message according to UI ([#5545](https://github.com/AzzappApp/azzapp/pull/5545))
