@@ -34,16 +34,9 @@ jobs:
       - name: Pull translations
         uses: ./.github/actions/i18n-pull
         with:
-          database-host: ${{ vars.DATABASE_HOST }}
-          database-username: ${{ vars.DATABASE_USERNAME }}
-          database-password: ${{ secrets.DATABASE_PASSWORD }}
-
-      - name: Purge translations key that are not used
-        run: yarn i18n:purge
-        env:
-          DATABASE_HOST: ${{ vars.DATABASE_HOST }}
-          DATABASE_USERNAME: ${{ vars.DATABASE_USERNAME }}
-          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+          NEXT_PUBLIC_PLATFORM: ${{ vars.NEXT_PUBLIC_PLATFORM }}
+          API_SERVER_TOKEN: ${{ secrets.API_SERVER_TOKEN }}
+          TRANSLATION_APP_API_ENDPOINT: https://translations.azzapp.com/api
 
       - name: JavaScript build
         run: yarn build-app-dependencies
@@ -289,9 +282,9 @@ jobs:
       - name: Pull translations
         uses: ./.github/actions/i18n-pull
         with:
-          database-host: ${{ vars.DATABASE_HOST }}
-          database-username: ${{ vars.DATABASE_USERNAME }}
-          database-password: ${{ secrets.DATABASE_PASSWORD }}
+          NEXT_PUBLIC_PLATFORM: ${{ vars.NEXT_PUBLIC_PLATFORM }}
+          API_SERVER_TOKEN: ${{ secrets.API_SERVER_TOKEN }}
+          TRANSLATION_APP_API_ENDPOINT: https://translations.azzapp.com/api
 
       - name: JavaScript build
         run: yarn build-app-dependencies
@@ -386,9 +379,9 @@ jobs:
       - name: Pull translations
         uses: ./.github/actions/i18n-pull
         with:
-          database-host: ${{ vars.DATABASE_HOST }}
-          database-username: ${{ vars.DATABASE_USERNAME }}
-          database-password: ${{ secrets.DATABASE_PASSWORD }}
+          NEXT_PUBLIC_PLATFORM: ${{ vars.NEXT_PUBLIC_PLATFORM }}
+          API_SERVER_TOKEN: ${{ secrets.API_SERVER_TOKEN }}
+          TRANSLATION_APP_API_ENDPOINT: https://translations.azzapp.com/api
 
       - name: JavaScript build
         run: yarn build-app-dependencies
