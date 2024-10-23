@@ -1,5 +1,6 @@
-## 0.9.11-canary.9
+## 0.9.11-canary.10
 
+* **fix:**  - 🐛 show filter preview with right orientation ([#5518](https://github.com/AzzappApp/azzapp/pull/5518))
 * **fix:**  - 🐛 avoid blurry link on iOS ([#5517](https://github.com/AzzappApp/azzapp/pull/5517))
 * **fix:**  - Don't override mainTabBar visibliity on landscape if already hidden ([#5556](https://github.com/AzzappApp/azzapp/pull/5556))
 * **fix:**  - 🐛 try to find country code from number ([#5520](https://github.com/AzzappApp/azzapp/pull/5520))
