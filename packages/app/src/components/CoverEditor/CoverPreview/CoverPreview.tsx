@@ -1033,6 +1033,8 @@ const CoverPreview = ({
     };
   });
 
+  const restorePositionOnMountRef = useRef(-1);
+
   return (
     <>
       <View
@@ -1087,6 +1089,7 @@ const CoverPreview = ({
                   width={viewWidth}
                   height={viewHeight}
                   drawFrame={drawFrame}
+                  restorePositionOnMountRef={restorePositionOnMountRef}
                 />
               )}
               <Pressable

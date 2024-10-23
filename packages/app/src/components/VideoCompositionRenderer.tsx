@@ -9,6 +9,7 @@ import type {
   VideoComposition,
 } from '@azzapp/react-native-skia-video';
 import type { SkCanvas, SkiaDomView } from '@shopify/react-native-skia';
+import type { MutableRefObject } from 'react';
 
 export type VideoCompositionRendererProps = Exclude<ViewProps, 'children'> & {
   composition: VideoComposition | null;
@@ -16,6 +17,8 @@ export type VideoCompositionRendererProps = Exclude<ViewProps, 'children'> & {
   drawFrame: FrameDrawer;
   width: number;
   height: number;
+  // This value store position on umount and restore it on mount
+  restorePositionOnMountRef?: MutableRefObject<number>;
 };
 
 const VideoCompositionRenderer = ({
@@ -25,6 +28,7 @@ const VideoCompositionRenderer = ({
   width,
   height,
   style,
+  restorePositionOnMountRef,
   ...props
 }: VideoCompositionRendererProps) => {
   const framesExtractor = useMemo(() => {
@@ -39,11 +43,23 @@ const VideoCompositionRenderer = ({
   useEffect(() => {
     if (framesExtractor) {
       framesExtractor.isLooping = true;
+
+      if (
+        restorePositionOnMountRef &&
+        restorePositionOnMountRef.current !== null &&
+        restorePositionOnMountRef.current > 0
+      ) {
+        framesExtractor.seekTo(restorePositionOnMountRef.current);
+        restorePositionOnMountRef.current = -1;
+      }
     }
     return () => {
+      if (restorePositionOnMountRef) {
+        restorePositionOnMountRef.current = framesExtractor?.currentTime || 0;
+      }
       framesExtractor?.dispose();
     };
-  }, [framesExtractor]);
+  }, [framesExtractor, restorePositionOnMountRef]);
 
   useEffect(() => {
     if (framesExtractor) {
