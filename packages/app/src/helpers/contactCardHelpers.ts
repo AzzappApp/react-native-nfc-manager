@@ -238,8 +238,23 @@ export const findLocalContact = async (
     const internalId = storage.getString(profileId);
     if (internalId) {
       const contactByInternalId = await getContactByIdAsync(internalId);
+
       if (contactByInternalId) {
-        return contactByInternalId;
+        //temporary patch: we have remarked that contacts are mixed, I think it's due to internal id that are reused by the OS
+        let hasCommonInfo = phoneNumbers?.find(phoneNumber =>
+          contactByInternalId.phoneNumbers?.some(ph => {
+            return ph.number === phoneNumber;
+          }),
+        );
+
+        hasCommonInfo =
+          hasCommonInfo ||
+          emails?.find(email =>
+            contactByInternalId.emails?.some(em => email === em.email),
+          );
+        if (hasCommonInfo) {
+          return contactByInternalId;
+        }
       }
     }
   }
