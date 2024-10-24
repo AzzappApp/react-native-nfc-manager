@@ -1,4 +1,4 @@
-import { Switch as RNSwitch } from 'react-native';
+import { Switch as RNSwitch, useColorScheme } from 'react-native';
 import { colors } from '#theme';
 import {
   createVariantsStyleSheet,
@@ -9,10 +9,19 @@ import type { SwitchProps as RNSwitchProps } from 'react-native';
 export type SwitchProps = Omit<RNSwitchProps, 'onChange' | 'onValueChange'> & {
   variant?: 'large' | 'small';
   onValueChange?: (value: boolean) => void;
+  appearance?: 'dark' | 'light';
 };
 
-const Switch = ({ variant = 'small', style, ...props }: SwitchProps) => {
-  const variantStyle = useVariantStyleSheet(computedStyle, variant);
+const Switch = ({
+  variant = 'small',
+  style,
+  appearance,
+  ...props
+}: SwitchProps) => {
+  const colorScheme = useColorScheme();
+  appearance = appearance ?? colorScheme ?? 'light';
+  const variantStyle = useVariantStyleSheet(computedStyle, variant, appearance);
+
   return (
     <RNSwitch
       {...props}

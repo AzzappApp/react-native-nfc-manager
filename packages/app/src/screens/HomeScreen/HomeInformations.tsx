@@ -5,15 +5,15 @@ import {
   useAnimatedReaction,
   interpolate,
   useSharedValue,
+  interpolateColor,
 } from 'react-native-reanimated';
 import { useFragment, graphql } from 'react-relay';
-import { colors } from '#theme';
-import AnimatedText from '#components/AnimatedText';
 import { useRouter } from '#components/NativeRouter';
-import PressableOpacity from '#ui/PressableOpacity';
-import Text from '#ui/Text';
+import { HomeButtonContactLink } from './HomeButtonContactLink';
+import { HomeButtonContactLinkCentral } from './HomeButtonContactLinkCentral';
 import { useHomeScreenContext } from './HomeScreenContext';
 import type { HomeInformations_user$key } from '#relayArtifacts/HomeInformations_user.graphql';
+
 type HomeInformationsProps = {
   user: HomeInformations_user$key;
   height: number;
@@ -33,6 +33,7 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
       fragment HomeInformations_user on User {
         profiles {
           id
+          nbContacts
           webCard {
             id
             userName
@@ -41,11 +42,21 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
             nbFollowings
             nbFollowers
             nbPostsLiked
+            cardColors {
+              primary
+            }
           }
         }
       }
     `,
     user,
+  );
+
+  const circleWidth = 86;
+
+  const nbContactsValue = useMemo(
+    () => [0, ...(profiles?.map(({ nbContacts }) => nbContacts ?? 0) ?? [])],
+    [profiles],
   );
 
   const nbLikesValue = useMemo(
@@ -76,11 +87,22 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
     [profiles],
   );
 
-  const nbPosts = useSharedValue('-1');
-  const nbLikes = useSharedValue('-1');
-  const nbFollowers = useSharedValue('-1');
-  const nbFollowings = useSharedValue('-1');
+  const primaryColorValue = useMemo(
+    () => [
+      '#000000',
+      ...(profiles?.map(
+        ({ webCard }) => webCard?.cardColors?.primary ?? '#000000',
+      ) ?? []),
+    ],
+    [profiles],
+  );
 
+  const nbPosts = useSharedValue('');
+  const nbLikes = useSharedValue('');
+  const nbFollowers = useSharedValue('');
+  const nbFollowings = useSharedValue('');
+  const nbContacts = useSharedValue('');
+  const primaryColor = useSharedValue('#00000000');
   const { currentIndexSharedValue, currentIndexProfile, inputRange } =
     useHomeScreenContext();
   //using profiles object directly in animatedReaction causes error animatedHost(seems to be the case for all relay query result)
@@ -89,6 +111,13 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
     nbLikes.value = format(nbLikesValue[currentIndexProfile.value]);
     nbFollowings.value = format(nbFollowingsValue[currentIndexProfile.value]);
     nbFollowers.value = format(nbFollowersValue[currentIndexProfile.value]);
+    nbContacts.value = format(nbContactsValue[currentIndexProfile.value]);
+
+    // in case of card removal of last contact card, primaryColorValue[currentIndexProfile.value] can be null
+    // it gives crash in react native skia
+    primaryColor.value =
+      primaryColorValue[currentIndexProfile.value] ||
+      primaryColorValue[primaryColorValue.length - 1];
   }, [
     currentIndexProfile,
     nbFollowers,
@@ -99,6 +128,10 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
     nbLikesValue,
     nbPosts,
     nbPostsValue,
+    nbContacts,
+    nbContactsValue,
+    primaryColor,
+    primaryColorValue,
   ]);
 
   useAnimatedReaction(
@@ -117,11 +150,21 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
         nbFollowings.value = format(
           interpolate(actual, inputRange.value, nbFollowingsValue),
         );
+        nbContacts.value = format(
+          interpolate(actual, inputRange.value, nbContactsValue),
+        );
+        primaryColor.value = interpolateColor(
+          actual,
+          inputRange.value,
+          primaryColorValue,
+        );
       } else if (actual >= 0) {
         nbPosts.value = format(nbPostsValue[actual]);
         nbLikes.value = format(nbLikesValue[actual]);
         nbFollowers.value = format(nbFollowersValue[actual]);
         nbFollowings.value = format(nbFollowingsValue[actual]);
+        nbContacts.value = format(nbContactsValue[actual]);
+        primaryColor.value = primaryColorValue[actual];
       }
     },
   );
@@ -159,52 +202,89 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
     });
   }, [router]);
 
+  const goToContacts = useCallback(() => {
+    router.push({
+      route: 'CONTACTS',
+    });
+  }, [router]);
+
   return (
     <View style={[styles.container, { height }]}>
-      <View style={styles.row}>
-        <PressableOpacity style={styles.square} onPress={goToPosts}>
-          <AnimatedText variant="xlarge" text={nbPosts} appearance="dark" />
-          <Text variant="small" style={styles.text}>
+      <View style={styles.row} pointerEvents="box-none">
+        <HomeButtonContactLink
+          count={nbPosts}
+          onPress={goToPosts}
+          isTop
+          isLeft
+          renderMessageComponent={isPlural => (
             <FormattedMessage
-              defaultMessage="Posts"
+              defaultMessage="{isPlural, plural,
+      =0 {Posts}
+      =1 {Post}
+      other {Posts}
+    }"
               description="HomeScreen - information panel - Post label"
+              values={{ isPlural }}
             />
-          </Text>
-        </PressableOpacity>
-        <PressableOpacity style={styles.square} onPress={goToLikedPost}>
-          <AnimatedText variant="xlarge" text={nbLikes} appearance="dark" />
-          <Text variant="small" style={styles.text}>
+          )}
+        />
+        <HomeButtonContactLink
+          count={nbLikes}
+          onPress={goToLikedPost}
+          isTop
+          renderMessageComponent={isPlural => (
             <FormattedMessage
-              defaultMessage="Likes"
+              defaultMessage="{isPlural, plural,
+      =0 {Likes}
+      =1 {Like}
+      other {Likes}
+    }"
               description="HomeScreen - information panel - Likes label"
+              values={{ isPlural }}
             />
-          </Text>
-        </PressableOpacity>
+          )}
+        />
       </View>
       <View style={styles.row}>
-        <PressableOpacity style={styles.square} onPress={goToFollower}>
-          <AnimatedText variant="xlarge" text={nbFollowers} appearance="dark" />
-          <Text variant="small" style={styles.text}>
+        <HomeButtonContactLink
+          count={nbFollowers}
+          onPress={goToFollower}
+          isLeft
+          renderMessageComponent={isPlural => (
             <FormattedMessage
-              defaultMessage="Followers"
+              defaultMessage="{isPlural, plural,
+    =0 {Followers}
+    =1 {Follower}
+    other {Followers}
+    }"
               description="HomeScreen - information panel - Followers label"
+              values={{ isPlural }}
             />
-          </Text>
-        </PressableOpacity>
-        <PressableOpacity style={styles.square} onPress={goToFollowing}>
-          <AnimatedText
-            variant="xlarge"
-            text={nbFollowings}
-            appearance="dark"
-          />
-          <Text variant="small" style={styles.text}>
+          )}
+        />
+        <HomeButtonContactLink
+          count={nbFollowings}
+          onPress={goToFollowing}
+          renderMessageComponent={isPlural => (
             <FormattedMessage
-              defaultMessage="Followings"
+              defaultMessage="{isPlural, plural,
+    =0 {Following}
+    =1 {Following}
+    other {Following}
+    }"
               description="HomeScreen - information panel - Followings label"
+              values={{ isPlural }}
             />
-          </Text>
-        </PressableOpacity>
+          )}
+        />
       </View>
+      {/* central circle */}
+      <HomeButtonContactLinkCentral
+        circleWidth={circleWidth}
+        onPress={goToContacts}
+        primaryColor={primaryColor}
+        count={nbContacts}
+      />
     </View>
   );
 };
@@ -216,7 +296,7 @@ export const format = (value: number) => {
   if (typeof value === 'number') {
     return Math.round(value).toString();
   }
-  return '-1';
+  return '';
 };
 
 const styles = StyleSheet.create({
@@ -224,22 +304,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingVertical: 15,
-    rowGap: 12,
   },
   row: {
     flexDirection: 'row',
     flex: 1,
-    columnGap: 12,
-  },
-  square: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 12,
-    flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.18)',
-  },
-  text: {
-    color: colors.white,
   },
 });

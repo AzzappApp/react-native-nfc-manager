@@ -45,7 +45,6 @@ export const mockReactComponent = (
   additionalProps: any,
   mockRef?: () => any,
 ) => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const react = require('react');
   const Component = (props: any, ref: any) => {
     if (mockRef) {

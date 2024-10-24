@@ -125,7 +125,7 @@ const ActivityListInput = ({
         getOptionLabel={option =>
           typeof option === 'string'
             ? option
-            : labelsMap[option.id] ?? option.id
+            : (labelsMap[option.id] ?? option.id)
         }
         renderInput={params => (
           <TextField {...params} inputRef={inputRef} label="Add an activity" />
@@ -134,7 +134,7 @@ const ActivityListInput = ({
         renderOption={(props, option) => {
           const id = typeof option === 'string' ? option : option.id;
           const label =
-            typeof option === 'string' ? option : labelsMap[id] ?? id;
+            typeof option === 'string' ? option : (labelsMap[id] ?? id);
           return (
             <li {...props} key={id}>
               {label}
@@ -259,7 +259,7 @@ export const SortableItem: React.FC<SortableItemProps> = ({
       </Box>
 
       <Typography variant="body1" sx={{ flex: 1 }}>
-        {typeof item === 'string' ? item : labelsMap[item.id] ?? item.id}
+        {typeof item === 'string' ? item : (labelsMap[item.id] ?? item.id)}
       </Typography>
       <IconButton
         onClick={() => onDelete?.(item)}

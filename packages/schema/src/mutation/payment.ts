@@ -9,6 +9,7 @@ import {
   endSubscription as endExistingSubscription,
   updateSubscriptionForWebCard,
   updateCustomer,
+  renewUserSubscription,
 } from '@azzapp/payment';
 import ERRORS from '@azzapp/shared/errors';
 import { getSessionInfos } from '#GraphQLContext';
@@ -214,3 +215,24 @@ export const updateSubscriptionCustomer: MutationResolvers['updateSubscriptionCu
 
     return updateCustomer(webCardId, subscriptionId, customer);
   };
+
+export const renewSubscription: MutationResolvers['renewSubscription'] = async (
+  _,
+  { webCardId: gqlWebCardId, subscriptionId: gqlSubscriptionId },
+) => {
+  const { userId } = getSessionInfos();
+
+  if (!userId) {
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
+  }
+
+  const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
+  const subscriptionId = fromGlobalIdWithType(
+    gqlSubscriptionId,
+    'UserSubscription',
+  );
+
+  await checkWebCardOwnerProfile(webCardId);
+
+  return renewUserSubscription(userId, webCardId, subscriptionId);
+};

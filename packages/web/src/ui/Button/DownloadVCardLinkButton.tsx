@@ -13,7 +13,7 @@ type ButtonProps = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
 };
 
 const DownloadVCardLinkButton = (props: ButtonProps) => {
-  const { download, href, userName, ...others } = props;
+  const { download, href, userName, onClick, ...others } = props;
 
   const [isDownloadSupported, setIsDownloadSupported] = useState(false);
   const [compressedContactCard, setCompressedContactCard] = useState<
@@ -49,6 +49,7 @@ const DownloadVCardLinkButton = (props: ButtonProps) => {
         tempLink.href = href ?? '';
         tempLink.download = download ?? '';
         tempLink.click();
+        onClick?.(e);
         return;
       }
 
@@ -60,8 +61,16 @@ const DownloadVCardLinkButton = (props: ButtonProps) => {
         `${process.env.NEXT_PUBLIC_API_ENDPOINT}/downloadVCard?c=${compressedContactCard}.vcf&u=${userName}`,
         download ?? 'azzapp-contact.vcf',
       );
+      onClick?.(e);
     },
-    [compressedContactCard, download, href, isDownloadSupported, userName],
+    [
+      compressedContactCard,
+      download,
+      href,
+      isDownloadSupported,
+      onClick,
+      userName,
+    ],
   );
 
   return <LinkButton {...others} onClick={handleDownload} />;

@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/schema",
-  "version": "0.9.10",
+  "version": "0.9.12",
   "private": true,
   "exports": {
     ".": {
@@ -13,6 +13,7 @@
     }
   },
   "scripts": {
+    "lint": "eslint .",
     "generate-test-migration": "SQL_ENV=SQLITE drizzle-kit generate:sqlite --config ./testing/drizzle-test.config.ts",
     "build": "yarn compile && yarn definition",
     "dev": "yarn compile:watch & yarn definition:watch",
@@ -48,8 +49,10 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@babel/cli": "^7.25.6",
-    "@types/lodash": "4.17.0",
+    "@babel/cli": "^7.25.7",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/lodash": "^4.17.10",
+    "eslint": "^9.12.0",
     "typescript": "^5.6.2"
   }
 }

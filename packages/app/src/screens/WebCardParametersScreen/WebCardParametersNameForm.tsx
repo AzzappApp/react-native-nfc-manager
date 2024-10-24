@@ -48,7 +48,7 @@ const WebcardParametersNameForm = ({
     watch,
     trigger,
     formState: { isSubmitting, errors },
-    reset,
+    setValue,
   } = useForm<UserNameForm>({
     defaultValues: {
       userName: webCard.userName,
@@ -106,9 +106,9 @@ const WebcardParametersNameForm = ({
 
   useEffect(() => {
     if (visible) {
-      reset();
+      setValue('userName', webCard.userName);
     }
-  }, [reset, visible]);
+  }, [setValue, visible, webCard.userName]);
 
   const intl = useIntl();
 

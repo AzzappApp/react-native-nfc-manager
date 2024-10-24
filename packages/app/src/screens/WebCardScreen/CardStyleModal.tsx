@@ -20,7 +20,7 @@ import { ScreenModal } from '#components/NativeRouter';
 import WebCardPreview from '#components/WebCardPreview';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { keyExtractor } from '#helpers/idHelpers';
-import useAuthState from '#hooks/useAuthState';
+import { useProfileInfos } from '#hooks/authStateHooks';
 import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
@@ -55,7 +55,7 @@ type CardStyleItem = CardStyle & {
  * A modal that allows the user to select a card style.
  */
 const CardStyleModal = ({ visible, onRequestClose }: CardStyleModalProps) => {
-  const { profileInfos } = useAuthState();
+  const profileInfos = useProfileInfos();
   const { profile } = useLazyLoadQuery<CardStyleModalQuery>(
     graphql`
       query CardStyleModalQuery($profileId: ID!) {

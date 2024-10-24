@@ -2,7 +2,15 @@ import {
   CameraRoll,
   progressUpdateEventEmitter,
 } from '@react-native-camera-roll/camera-roll';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+  forwardRef,
+} from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
   AppState,
@@ -30,6 +38,7 @@ import type {
   PhotoIdentifier,
 } from '@react-native-camera-roll/camera-roll';
 import type { ContentStyle } from '@shopify/flash-list';
+import type { ForwardedRef } from 'react';
 import type { ViewProps } from 'react-native';
 
 type PhotoGalleryMediaListProps = Omit<ViewProps, 'children'> & {
@@ -63,21 +72,28 @@ type PhotoGalleryMediaListProps = Omit<ViewProps, 'children'> & {
   contentContainerStyle?: ContentStyle;
 };
 
+export type PhotoGalleryMediaListActions = {
+  load: () => void;
+};
+
 /**
  * A component that displays a list of media from the camera roll
  * and allows the user to select one of them.
  */
-const PhotoGalleryMediaList = ({
-  selectedMediaId,
-  selectedMediasIds,
-  album,
-  kind,
-  onMediaSelected,
-  autoSelectFirstItem = true,
-  numColumns = 4,
-  contentContainerStyle,
-  ...props
-}: PhotoGalleryMediaListProps) => {
+const PhotoGalleryMediaList = (
+  {
+    selectedMediaId,
+    selectedMediasIds,
+    album,
+    kind,
+    onMediaSelected,
+    autoSelectFirstItem = true,
+    numColumns = 4,
+    contentContainerStyle,
+    ...props
+  }: PhotoGalleryMediaListProps,
+  ref: ForwardedRef<PhotoGalleryMediaListActions>,
+) => {
   const styles = useStyleSheet(styleSheet);
   const [medias, setMedias] = useState<PhotoIdentifier[]>([]);
   const [hasNext, setHasNext] = useState(true);
@@ -133,6 +149,10 @@ const PhotoGalleryMediaList = ({
     },
     [album?.title, album?.type, kind, lastPhotoTimestamp],
   );
+
+  useImperativeHandle(ref, () => ({
+    load: () => load(true),
+  }));
 
   useEffect(() => {
     void load(true);
@@ -330,6 +350,7 @@ const PhotoGalleryMediaList = ({
                 //it not waiting the modal ios will not be displayed
                 await openPhotoPicker();
                 toggleManageAccessMediaVisible();
+                load(true);
               }}
             >
               <FormattedMessage
@@ -375,7 +396,7 @@ const getPhotoDuration = (item: PhotoIdentifier) =>
     ? item.node.image.playableDuration
     : undefined;
 
-export default PhotoGalleryMediaList;
+export default forwardRef(PhotoGalleryMediaList);
 
 const styleSheet = createStyleSheet(appearance => ({
   container: {

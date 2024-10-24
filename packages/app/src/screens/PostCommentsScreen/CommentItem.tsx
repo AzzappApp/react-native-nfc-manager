@@ -9,7 +9,7 @@ import AuthorCartouche from '#components/AuthorCartouche';
 import Link from '#components/Link';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { relativeDateMinute } from '#helpers/dateHelpers';
-import useAuthState from '#hooks/useAuthState';
+import { useProfileInfos } from '#hooks/authStateHooks';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 
@@ -39,7 +39,7 @@ const CommentItem = ({ item }: CommentItemProps) => {
   );
 
   const styles = useStyleSheet(styleSheet);
-  const { profileInfos } = useAuthState();
+  const profileInfos = useProfileInfos();
 
   if (!postComment) return null;
 

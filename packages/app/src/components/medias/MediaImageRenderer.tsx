@@ -11,9 +11,12 @@ import {
   useState,
 } from 'react';
 import { StyleSheet, View } from 'react-native';
-import SnapshotView, { snapshotView } from '#components/SnapshotView';
+import {
+  captureSnapshot,
+  SnapshotRenderer,
+} from '@azzapp/react-native-snapshot-view';
 import { useLocalCachedMediaFile } from '#helpers/mediaHelpers/LocalMediaCache';
-import type { ImageErrorEventData } from 'expo-image';
+import type { ImageContentFit, ImageErrorEventData } from 'expo-image';
 import type { ForwardedRef } from 'react';
 import type { ViewProps } from 'react-native';
 
@@ -63,6 +66,14 @@ export type MediaImageRendererProps = ViewProps & {
    * During the loading of the video
    */
   useAnimationSnapshot?: boolean;
+  /**
+   * Define how the image should fit
+   */
+  fit?: ImageContentFit;
+  /**
+   * Define the image blur
+   */
+  blurRadius?: number;
 };
 
 /**
@@ -79,6 +90,8 @@ const MediaImageRenderer = (
     style,
     tintColor,
     useAnimationSnapshot,
+    fit,
+    blurRadius,
     ...props
   }: MediaImageRendererProps,
   ref: ForwardedRef<MediaImageRendererHandle>,
@@ -87,7 +100,7 @@ const MediaImageRenderer = (
   const sourceRef = useRef(source);
   const localFile = useLocalCachedMediaFile(source.mediaId, 'image');
   const [snapshotID, setSnapshotID] = useState(() =>
-    useAnimationSnapshot ? _imageSnapshots.get(source.mediaId) ?? null : null,
+    useAnimationSnapshot ? (_imageSnapshots.get(source.mediaId) ?? null) : null,
   );
   const [thumbnail, setThumbnail] = useState(
     () => getThumbnail(source.mediaId, source.requestedSize) ?? null,
@@ -109,7 +122,7 @@ const MediaImageRenderer = (
       setThumbnail(getThumbnail(source.mediaId, source.requestedSize) ?? null);
       setSnapshotID(
         useAnimationSnapshotRef.current
-          ? _imageSnapshots.get(source.mediaId) ?? null
+          ? (_imageSnapshots.get(source.mediaId) ?? null)
           : null,
       );
     }
@@ -123,7 +136,7 @@ const MediaImageRenderer = (
         if (containerRef.current) {
           _imageSnapshots.set(
             sourceRef.current.mediaId,
-            await snapshotView(containerRef.current),
+            await captureSnapshot(containerRef.current),
           );
         }
       },
@@ -188,9 +201,10 @@ const MediaImageRenderer = (
         onLoad={onImageLoad}
         tintColor={tintColor}
         onError={onErrorInner}
-        placeholderContentFit="fill"
-        contentFit="fill"
+        placeholderContentFit={fit ?? 'fill'}
+        contentFit={fit ?? 'fill'}
         style={StyleSheet.absoluteFill}
+        blurRadius={blurRadius}
       />
       {thumbnail && (
         <Image
@@ -201,14 +215,14 @@ const MediaImageRenderer = (
           onLoad={onThumbnailLoad}
           tintColor={tintColor}
           onError={onErrorInner}
-          placeholderContentFit="fill"
-          contentFit="fill"
+          placeholderContentFit={fit ?? 'fill'}
+          contentFit={fit ?? 'fill'}
           style={StyleSheet.absoluteFill}
+          blurRadius={blurRadius}
         />
       )}
       {snapshotID && (
-        <SnapshotView
-          clearOnUnmount
+        <SnapshotRenderer
           snapshotID={snapshotID}
           style={StyleSheet.absoluteFill}
         />

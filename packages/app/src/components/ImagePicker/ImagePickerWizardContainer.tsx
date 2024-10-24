@@ -277,9 +277,6 @@ const styles = StyleSheet.create({
   activityIndicator: {
     marginRight: 10,
   },
-  topPanel: {
-    flex: 1,
-  },
   bottomMenuContainer: {
     position: 'absolute',
     alignItems: 'center',

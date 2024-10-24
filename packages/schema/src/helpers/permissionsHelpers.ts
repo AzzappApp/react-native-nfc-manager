@@ -12,7 +12,7 @@ export type ProtectedResolver<T> = {
   [P in Exclude<keyof T, '__isTypeOf'>]-?: T[P];
 };
 
-const getWebCardProfile = async (webCardId: string) => {
+export const getWebCardProfile = async (webCardId: string) => {
   const { userId } = getSessionInfos();
   if (!userId) {
     return null;

@@ -1,4 +1,3 @@
-/* eslint-disable no-alert */
 import * as Sentry from '@sentry/react-native';
 import * as Clipboard from 'expo-clipboard';
 import { fromGlobalId } from 'graphql-relay';
@@ -12,7 +11,7 @@ import { buildPostUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import { relativeDateMinute } from '#helpers/dateHelpers';
-import useAuthState from '#hooks/useAuthState';
+import { useProfileInfos } from '#hooks/authStateHooks';
 import { useSendReport } from '#hooks/useSendReport';
 import useToggleFollow from '#hooks/useToggleFollow';
 import { POST_MAX_CONTENT_LENGTH } from '#screens/PostCreationScreen/PostContentPanel';
@@ -59,6 +58,8 @@ type PostRendererBottomPanelProps = {
    * @type {boolean}
    */
   actionEnabled: boolean;
+
+  onActionDisabled?: () => void;
 };
 
 const PostRendererBottomPanel = ({
@@ -66,6 +67,7 @@ const PostRendererBottomPanel = ({
   toggleModal,
   post: postKey,
   actionEnabled,
+  onActionDisabled,
 }: PostRendererBottomPanelProps) => {
   const router = useRouter();
   const post = useFragment(
@@ -312,7 +314,7 @@ const PostRendererBottomPanel = ({
     updatePost({ allowLikes: !post.allowLikes });
   }, [post.allowLikes, updatePost]);
 
-  const { profileInfos } = useAuthState();
+  const profileInfos = useProfileInfos();
 
   const isViewer = profileInfos?.webCardId === post.webCard.id;
 
@@ -432,6 +434,7 @@ const PostRendererBottomPanel = ({
           style={{ marginTop: 10 }}
           postKey={postKey}
           actionEnabled={actionEnabled}
+          onActionDisabled={onActionDisabled}
         />
         {!!post.content && (
           <ExpendableText

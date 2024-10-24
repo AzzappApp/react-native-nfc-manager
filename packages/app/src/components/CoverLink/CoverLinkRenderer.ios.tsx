@@ -24,6 +24,7 @@ const CoverLink = ({
   coverStyle,
   prefetch = false,
   onPress,
+  onLongPress,
   ...props
 }: CoverLinkRendererProps) => {
   const ref = useRef<View | null>(null);
@@ -81,6 +82,7 @@ const CoverLink = ({
   return (
     <PressableScaleHighlight
       onPress={onPressInner}
+      onLongPress={onLongPress}
       ref={ref}
       style={[
         style,

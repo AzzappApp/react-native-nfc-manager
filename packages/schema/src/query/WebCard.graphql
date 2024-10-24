@@ -169,6 +169,10 @@ type WebCard implements Node {
   """
   nbProfiles: Int!
   """
+  The number of removed profiles associated to the webCard
+  """
+  nbDeletedProfiles: Int!
+  """
   The associated profiles to the WebCard
   """
   profiles(
@@ -185,7 +189,58 @@ type WebCard implements Node {
     Returns the first n items from the list.
     """
     first: Int @max(value: 50)
+    """
+    When true, the query will return the profiles that have been deleted
+    """
+    withDeleted: Boolean
   ): ProfileConnection!
+
+  """
+  Return a list of contacts that match the search query
+  """
+  searchContacts(
+    """
+    The search query
+    """
+    search: String
+    """
+    Returns the items in the list that come after the specified cursor.
+    """
+    after: String
+    """
+    Returns the first n items from the list.
+    """
+    first: Int @max(value: 50)
+    """
+    The query will return the contact owned by this profileId
+    """
+    ownerProfileId: String
+    """
+    When true, the query will return the contacts that have been deleted
+    """
+    withDeleted: Boolean
+  ): ContactConnection!
+  """
+  Return number of contact for a given profile
+  """
+  nbContacts(ownerProfileId: String): Int!
+  """
+  Return all distinct owner contact profiles
+  """
+  contactsOwnerPofiles(
+    """
+    The query will return profile owned by this profileId
+    """
+    ownerProfileId: String
+    """
+    When true, the query will add profile with deleted contacts
+    """
+    withDeleted: Boolean
+  ): [Profile!]
+  """
+  Return number of deleted contact for a given profile
+  """
+  nbDeletedContacts(ownerProfileId: String): Int!
 
   """
   The pending change ownership user if exist

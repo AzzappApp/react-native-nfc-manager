@@ -1,7 +1,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import { graphql, useClientQuery } from 'react-relay';
 import { addGlobalEventListener } from '#helpers/globalEvents';
-import useAuthState from '#hooks/useAuthState';
+import { useProfileInfos } from '#hooks/authStateHooks';
 import CoverRenderer from './CoverRenderer';
 import type { HomeIconQuery } from '#relayArtifacts/HomeIconQuery.graphql';
 
@@ -27,7 +27,7 @@ const HomeCoverIcon = ({ webCardId }: HomeIconProps) => {
 };
 
 export const HomeIcon = () => {
-  const { profileInfos } = useAuthState();
+  const profileInfos = useProfileInfos();
   const [ready, setReady] = useState(false);
 
   useEffect(() => {

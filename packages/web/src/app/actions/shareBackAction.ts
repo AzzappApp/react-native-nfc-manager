@@ -10,6 +10,7 @@ import {
   getUserById,
   saveShareBack,
 } from '@azzapp/data';
+import { guessLocale } from '@azzapp/i18n';
 import { buildVCardFromShareBackContact } from '@azzapp/shared/vCardHelpers';
 import { ShareBackFormSchema } from '#components/ShareBackModal/shareBackFormSchema';
 import {
@@ -18,6 +19,7 @@ import {
 } from '#helpers/contactMethodsHelpers';
 import { sendEmail } from '#helpers/emailHelpers';
 import { getServerIntl } from '#helpers/i18nHelpers';
+import { sendPushNotification } from '#helpers/notificationsHelpers';
 import {
   getValuesFromSubmitData,
   shareBackSignature,
@@ -25,6 +27,7 @@ import {
 } from '#helpers/shareBackHelper';
 import { sendTwilioSMS } from '#helpers/twilioHelpers';
 import type { EmailAttachment } from '#helpers/emailHelpers';
+import type { NewSharedContact } from '@azzapp/data';
 import type { SubmissionResult } from '@conform-to/react';
 import type { JwtPayload } from 'jwt-decode';
 
@@ -137,9 +140,14 @@ export const processShareBackSubmission = async (
       description: 'Email body for new contact share back',
     });
 
-    await saveShareBack({
-      profileId: profile.id,
-      ...submission.payload,
+    await saveShareBack(profile.id, submission.payload as NewSharedContact);
+
+    await sendPushNotification(profile.userId, {
+      type: 'shareBack',
+      mediaId: null,
+      sound: 'default',
+      deepLink: 'shareBack',
+      locale: guessLocale(user?.locale),
     });
 
     if (contactMethod.method === CONTACT_METHODS.SMS) {

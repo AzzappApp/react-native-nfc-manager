@@ -2,13 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useCallback, useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
-import {
-  View,
-  StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
-  Keyboard,
-} from 'react-native';
+import { View, StyleSheet, KeyboardAvoidingView, Keyboard } from 'react-native';
 import Toast from 'react-native-toast-message';
 import * as z from 'zod';
 import { REGEX_PWD } from '@azzapp/shared/stringHelpers';
@@ -111,7 +105,7 @@ const ResetPasswordScreen = ({
         }}
       >
         <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          behavior="padding"
           keyboardVerticalOffset={-VERTICAL_OFFSET}
           style={{ flex: 1, rowGap: 20 }}
         >

@@ -6,7 +6,6 @@ import Animated, {
   useDerivedValue,
 } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
-import { colors } from '#theme';
 import { CONTACT_CARD_RATIO } from '#components/ContactCard/ContactCard';
 import { useMainTabBarVisibilityController } from '#components/MainTabBar';
 import HomeBottomPanelMessage from './HomeBottomPanelMessage';
@@ -162,12 +161,6 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
 };
 
 const styles = StyleSheet.create({
-  informationText: {
-    textAlign: 'center',
-    color: colors.white,
-    marginHorizontal: 50,
-    marginTop: 10,
-  },
   informationPanel: {
     ...StyleSheet.absoluteFillObject,
     flex: 1,
@@ -177,17 +170,6 @@ const styles = StyleSheet.create({
   bottomPanel: {
     overflow: 'visible',
     flex: 1,
-  },
-  informationPanelButton: {
-    marginTop: 30,
-  },
-  invitationButtons: { rowGap: 15, marginTop: 35 },
-  invitationPanelButton: {
-    minWidth: 250,
-  },
-
-  message: {
-    color: colors.white,
   },
 });
 

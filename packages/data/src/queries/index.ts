@@ -27,4 +27,5 @@ export * from './webCardQueries';
 export * from './reportQueries';
 export * from './paymentQueries';
 export * from './paymentMeanQueries';
-export * from './shareBackQueries';
+export * from './contactQueries';
+export * from './fcmTokenQueries';

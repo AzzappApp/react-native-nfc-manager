@@ -1,7 +1,6 @@
 import * as Sentry from '@sentry/nextjs';
 import * as bcrypt from 'bcrypt-ts';
 import { NextResponse } from 'next/server';
-import { withAxiom } from 'next-axiom';
 import * as z from 'zod';
 import {
   createUser,
@@ -19,6 +18,7 @@ import {
   isInternationalPhoneNumber,
 } from '@azzapp/shared/stringHelpers';
 import { handleSignInAuthMethod } from '#helpers/auth';
+import { withPluginsRoute } from '#helpers/queries';
 import { sendTwilioVerificationCode } from '#helpers/twilioHelpers';
 import type { User } from '@azzapp/data';
 
@@ -76,7 +76,7 @@ const handleExistingUser = async (user: User, password: string) => {
   );
 };
 
-export const POST = withAxiom(async (req: Request) => {
+export const POST = withPluginsRoute(async (req: Request) => {
   const result = SignupSchema.safeParse(await req.json());
 
   if (result.success === false) {

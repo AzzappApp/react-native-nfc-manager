@@ -8,10 +8,10 @@ import {
 } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
-  Easing,
   FadeIn,
   FadeOut,
   interpolate,
+  LinearTransition,
   runOnJS,
   useAnimatedReaction,
   useAnimatedStyle,
@@ -30,9 +30,9 @@ import {
 } from './webCardScreenHelpers';
 import {
   useEditTransition,
+  useEditTransitionListener,
   useSelectionModeTransition,
 } from './WebCardScreenTransitions';
-import type { LayoutAnimationsValues } from 'react-native-reanimated';
 
 export type ProfileBlockContainerProps = {
   /**
@@ -167,6 +167,20 @@ const WebCardBlockContainer = ({
   const iconSize = 24 / editScale;
 
   const editingTransition = useEditTransition();
+  const isCover = id === 'cover';
+  const [enableLayoutTransition, setEnableLayoutTransition] = useState(
+    !isCover && editing,
+  );
+  useEditTransitionListener({
+    onStart: () => {
+      setEnableLayoutTransition(false);
+    },
+    onEnd: () => {
+      setTimeout(() => {
+        setEnableLayoutTransition(!isCover && editing);
+      }, 200);
+    },
+  });
 
   const dragX = useSharedValue(0);
   const dragRightLimit = (windowWidth * (1 - editScale)) / 2;
@@ -328,55 +342,19 @@ const WebCardBlockContainer = ({
     opacity: Math.max(0, dragX.value / dragLeftLimit),
   }));
 
-  const layoutTransition = useMemo(
-    () => (values: LayoutAnimationsValues) => {
-      'worklet';
-      if (editingTransition?.value !== 1) {
-        return {
-          initialValues: {},
-          animations: {},
-        };
-      }
-
-      return {
-        initialValues: {
-          originX: values.currentOriginX,
-          originY: values.currentOriginY,
-          width: values.currentWidth,
-          height: values.currentHeight,
-        },
-        animations: {
-          originX: withTiming(values.targetOriginX, {
-            duration: EDIT_TRANSITION_DURATION,
-            easing: Easing.linear,
-          }),
-          originY: withTiming(values.targetOriginY, {
-            duration: EDIT_TRANSITION_DURATION,
-            easing: Easing.linear,
-          }),
-          width: withTiming(values.targetWidth, {
-            duration: EDIT_TRANSITION_DURATION,
-            easing: Easing.linear,
-          }),
-          height: withTiming(values.targetHeight, {
-            duration: EDIT_TRANSITION_DURATION,
-            easing: Easing.linear,
-          }),
-        },
-      };
-    },
-    [editingTransition],
-  );
-
   return (
     <Animated.View
       entering={
-        id !== 'cover' ? FadeIn.duration(EDIT_TRANSITION_DURATION) : undefined
+        enableLayoutTransition
+          ? FadeIn.duration(EDIT_TRANSITION_DURATION)
+          : undefined
       }
       exiting={
-        id !== 'cover' ? FadeOut.duration(EDIT_TRANSITION_DURATION) : undefined
+        enableLayoutTransition
+          ? FadeOut.duration(EDIT_TRANSITION_DURATION)
+          : undefined
       }
-      layout={layoutTransition}
+      layout={enableLayoutTransition ? LinearTransition : undefined}
     >
       <Animated.View style={blockStyle}>
         <GestureDetector gesture={Gesture.Race(tapGesture, panGesture)}>

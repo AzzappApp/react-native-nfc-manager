@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { withAxiom } from 'next-axiom';
 import * as z from 'zod';
 import { getProfileWithWebCardById, getUserById } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
@@ -9,6 +8,7 @@ import { buildEmailSignatureGenerationUrl } from '@azzapp/shared/urlHelpers';
 import { buildAvatarUrl } from '#helpers/avatar';
 import cors from '#helpers/cors';
 import { sendTemplateEmail } from '#helpers/emailHelpers';
+import { withPluginsRoute } from '#helpers/queries';
 import { getSessionData } from '#helpers/tokens';
 import type { NextRequest } from 'next/server';
 
@@ -115,5 +115,5 @@ const generateEmailSignature = async (req: NextRequest) => {
 };
 
 export const { POST, OPTIONS } = cors({
-  POST: withAxiom(generateEmailSignature),
+  POST: withPluginsRoute(generateEmailSignature),
 });

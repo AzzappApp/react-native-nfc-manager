@@ -77,11 +77,6 @@ const styles = StyleSheet.create({
     rowGap: 15,
     justifyContent: 'center',
   },
-  buttonContainer: {
-    alignSelf: 'center',
-    flexDirection: 'row',
-    columnGap: 15,
-  },
   slider: {
     width: '90%',
     alignSelf: 'center',

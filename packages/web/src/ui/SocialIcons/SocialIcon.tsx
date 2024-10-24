@@ -41,8 +41,9 @@ import yelp from './assets/yelp.svg';
 import youtube from './assets/youtube.svg';
 import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
 import type { ImageProps } from 'next/image';
+import type { SVGProps } from 'react';
 
-type SocialIconProps = Omit<ImageProps, 'alt' | 'src'> & {
+type SocialIconProps = Omit<SVGProps<ImageProps>, 'alt' | 'src'> & {
   icon: SocialLinkId;
 };
 

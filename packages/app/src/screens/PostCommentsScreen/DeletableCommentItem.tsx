@@ -4,7 +4,7 @@ import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
-import useAuthState from '#hooks/useAuthState';
+import { getAuthState } from '#helpers/authStore';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import SwipeableRow, { SwipeableRowRightAction } from '#ui/SwipeableRow';
@@ -48,11 +48,10 @@ const DeletableCommentItem = (props: DeletableCommentItemProps) => {
     progress,
     onClose,
   }: SwipeableRowActionsProps) => {
-    const { profileInfos } = useAuthState();
-
     const intl = useIntl();
 
     const onDelete = () => {
+      const { profileInfos } = getAuthState();
       if (
         profileHasEditorRight(profileInfos?.profileRole) &&
         profileInfos?.webCardId

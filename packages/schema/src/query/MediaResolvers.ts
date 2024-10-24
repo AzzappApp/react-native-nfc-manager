@@ -1,17 +1,11 @@
-import { MODULE_IMAGES_SIZES } from '@azzapp/shared/cardModuleHelpers';
-import { CONTACTCARD_ASSET_SIZES } from '@azzapp/shared/contactCardHelpers';
-import { COVER_ASSET_SIZES } from '@azzapp/shared/coverHelpers';
 import {
-  getCloudinaryAssetURL,
   getImageURLForSize,
   getVideoThumbnailURL,
   getVideoUrlForSize,
 } from '@azzapp/shared/imagesHelpers';
-import {
-  POST_IMAGES_SIZES,
-  POST_VIDEO_SIZES,
-} from '@azzapp/shared/postHelpers';
+
 import { mediaLoader } from '#loaders';
+import { getDeferredMedia, uriResolver } from '#helpers/mediaHelpers';
 import type {
   MediaImageResolvers,
   MediaResolvers,
@@ -21,26 +15,18 @@ import type { Media as MediaModel } from '@azzapp/data';
 
 export type DeferredMedia = MediaModel | string;
 
-export type MediaWithAssetKind = {
-  media: DeferredMedia;
-  assetKind:
-    | 'contactCard'
-    | 'cover'
-    | 'coverPreview'
-    | 'logo'
-    | 'module'
-    | 'post'
-    | 'rawCover';
-};
+export type MediaWithAssetKind =
+  | {
+      media: DeferredMedia;
+      assetKind: 'contactCard' | 'logo' | 'module' | 'post';
+    }
+  | {
+      media: DeferredMedia;
+      previewPositionPercentage?: number | null;
+      assetKind: 'cover' | 'coverPreview' | 'rawCover';
+    };
 
 export type MediaResolverBaseType = DeferredMedia | MediaWithAssetKind;
-
-const getDeferredMedia = (media: MediaResolverBaseType) => {
-  if (typeof media === 'object' && 'assetKind' in media) {
-    return media.media;
-  }
-  return media;
-};
 
 const getActualMedia = async (media: MediaResolverBaseType) => {
   media = getDeferredMedia(media);
@@ -53,13 +39,6 @@ const getActualMedia = async (media: MediaResolverBaseType) => {
   } else {
     return media;
   }
-};
-
-const getAssetKind = (media: MediaResolverBaseType) => {
-  if (typeof media === 'object' && 'assetKind' in media) {
-    return media.assetKind;
-  }
-  return null;
 };
 
 const MediaResolversBase = {
@@ -102,52 +81,6 @@ export const Media: MediaResolvers = {
     }
   },
 };
-
-const uriResolver =
-  (kind: 'image' | 'video', uriGenerator: typeof getImageURLForSize) =>
-  (
-    media: MediaResolverBaseType,
-    {
-      width,
-      height,
-      pixelRatio,
-      raw,
-      videoDurationPercentage,
-    }: {
-      width?: number | null;
-      height?: number | null;
-      pixelRatio?: number | null;
-      raw?: boolean | null;
-      videoDurationPercentage?: number | null;
-    },
-  ) => {
-    const assetKind = getAssetKind(media);
-    media = getDeferredMedia(media);
-    const id = typeof media === 'string' ? media : media.id;
-    if (raw) {
-      return getCloudinaryAssetURL(id, kind);
-    }
-    const pregeneratedSizes =
-      assetKind === 'cover' || assetKind === 'rawCover'
-        ? COVER_ASSET_SIZES
-        : assetKind === 'module'
-          ? MODULE_IMAGES_SIZES
-          : assetKind === 'contactCard'
-            ? CONTACTCARD_ASSET_SIZES
-            : assetKind === 'post'
-              ? kind === 'image'
-                ? POST_IMAGES_SIZES
-                : POST_VIDEO_SIZES
-              : null;
-    return uriGenerator({
-      id,
-      width,
-      height,
-      pixelRatio,
-      pregeneratedSizes,
-      videoDurationPercentage,
-    });
-  };
 
 export const MediaImage: MediaImageResolvers = {
   uri: uriResolver('image', getImageURLForSize),

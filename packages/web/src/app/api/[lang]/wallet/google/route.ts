@@ -15,6 +15,7 @@ import {
 import ERRORS from '@azzapp/shared/errors';
 import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
 import { buildUserUrlWithContactCard } from '@azzapp/shared/urlHelpers';
+import { withPluginsRoute } from '#helpers/queries';
 import { getSessionData } from '#helpers/tokens';
 import type {
   GenericClass,
@@ -111,11 +112,11 @@ const getGoogleWalletPass = async (
           defaultValue: {
             language: lang,
             value:
-              (`${contactCard?.firstName ?? ''} ${
+              `${contactCard?.firstName ?? ''} ${
                 contactCard?.lastName ?? ''
               }`.trim() ||
-                webCard?.commonInformation?.company ||
-                contactCard?.company) ??
+              webCard?.commonInformation?.company?.trim() ||
+              contactCard?.company?.trim() ||
               webCard?.userName, // empty string is not allowed
           },
         },
@@ -202,6 +203,6 @@ const getGoogleWalletPass = async (
   return NextResponse.json({ message: ERRORS.NOT_FOUND }, { status: 404 });
 };
 
-export const { GET } = { GET: getGoogleWalletPass };
+export const { GET } = { GET: withPluginsRoute(getGoogleWalletPass) };
 
 export const runtime = 'nodejs';

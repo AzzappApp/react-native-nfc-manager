@@ -1,4 +1,4 @@
-import { eq, desc, count } from 'drizzle-orm';
+import { eq, desc, count, and } from 'drizzle-orm';
 import { db } from '../database';
 import { PaymentTable } from '../schema';
 import type { Payment } from '../schema';
@@ -56,6 +56,20 @@ export const getWebCardPayments = async (
   }
   return query;
 };
+
+export const getPaymentByTransactionId = async (
+  subscriptionId: string,
+  transactionId: string,
+): Promise<Payment[]> =>
+  db()
+    .select()
+    .from(PaymentTable)
+    .where(
+      and(
+        eq(PaymentTable.subscriptionId, subscriptionId),
+        eq(PaymentTable.transactionId, transactionId),
+      ),
+    );
 
 /**
  * Count the number of payments for a web card.

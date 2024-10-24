@@ -1,13 +1,8 @@
 import { parsePhoneNumber } from 'libphonenumber-js';
 import { useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import {
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  View,
-} from 'react-native';
+import { Keyboard, StyleSheet, View } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { isPhoneNumber, isValidEmail } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import EmailOrPhoneInput from '#components/EmailOrPhoneInput';
@@ -86,64 +81,63 @@ const ForgotPasswordScreen = () => {
 
   return (
     <Container style={styles.flex}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={styles.flex}
-      >
-        <View onTouchStart={Keyboard.dismiss} style={styles.container}>
-          <View style={styles.inner}>
-            <View style={styles.logoContainer}>
-              <Icon icon="unlock_line" style={styles.logo} />
-            </View>
-            <View style={styles.viewText}>
-              <Text style={styles.textForgot} variant="xlarge">
-                <FormattedMessage
-                  defaultMessage="Forgot your password?"
-                  description="ForgotPasswordScreen - Forgot your password title"
+      <View onTouchStart={Keyboard.dismiss} style={styles.container}>
+        <KeyboardAvoidingView behavior="padding">
+          <View style={styles.container}>
+            <View style={styles.inner}>
+              <View style={styles.logoContainer}>
+                <Icon icon="unlock_line" style={styles.logo} />
+              </View>
+              <View style={styles.viewText}>
+                <Text style={styles.textForgot} variant="xlarge">
+                  <FormattedMessage
+                    defaultMessage="Forgot your password?"
+                    description="ForgotPasswordScreen - Forgot your password title"
+                  />
+                </Text>
+                <Text style={styles.textForgotExplain} variant="medium">
+                  <FormattedMessage
+                    defaultMessage="Enter your email address or phone number and we'll send you a link to create a new password"
+                    description="ForgotPasswordScreen - Forgot your password description"
+                  />
+                </Text>
+              </View>
+              <View style={styles.input}>
+                <EmailOrPhoneInput
+                  input={contact}
+                  onChange={setContact}
+                  hasError={error}
                 />
-              </Text>
-              <Text style={styles.textForgotExplain} variant="medium">
-                <FormattedMessage
-                  defaultMessage="Enter your email address or phone number and we'll send you a link to create a new password"
-                  description="ForgotPasswordScreen - Forgot your password description"
-                />
-              </Text>
-            </View>
-            <View style={styles.input}>
-              <EmailOrPhoneInput
-                input={contact}
-                onChange={setContact}
-                hasError={error}
+              </View>
+              {error && (
+                <Text variant="error" style={styles.error}>
+                  {intl.formatMessage({
+                    defaultMessage:
+                      'Invalid email/phone number or no account found',
+                    description:
+                      'ForgotpasswordScreen - Invalid email or phone number error',
+                  })}
+                </Text>
+              )}
+              <Button
+                label={intl.formatMessage({
+                  defaultMessage: 'Reset password',
+                  description: 'ForgotpasswordScreen - Reset password',
+                })}
+                accessibilityLabel={intl.formatMessage({
+                  defaultMessage: 'Tap to reset your password',
+                  description:
+                    'ForgotPassword Screen - AccessibilityLabel Reset password button',
+                })}
+                style={styles.button}
+                onPress={onSubmit}
+                disabled={!isValidMailOrPhone}
+                loading={isSubmitted}
               />
             </View>
-            {error && (
-              <Text variant="error" style={styles.error}>
-                {intl.formatMessage({
-                  defaultMessage:
-                    'Invalid email/phone number or no account found',
-                  description:
-                    'ForgotpasswordScreen - Invalid email or phone number error',
-                })}
-              </Text>
-            )}
-            <Button
-              label={intl.formatMessage({
-                defaultMessage: 'Reset password',
-                description: 'ForgotpasswordScreen - Reset password',
-              })}
-              accessibilityLabel={intl.formatMessage({
-                defaultMessage: 'Tap to reset your password',
-                description:
-                  'ForgotPassword Screen - AccessibilityLabel Reset password button',
-              })}
-              style={styles.button}
-              onPress={onSubmit}
-              disabled={!isValidMailOrPhone}
-              loading={isSubmitted}
-            />
           </View>
-        </View>
-      </KeyboardAvoidingView>
+        </KeyboardAvoidingView>
+      </View>
       <View
         style={{
           bottom: insets.bottom,
@@ -190,7 +184,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 100,
     paddingHorizontal: 15,
   },
   logoContainer: {

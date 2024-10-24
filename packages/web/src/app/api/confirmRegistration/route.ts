@@ -1,6 +1,5 @@
 import * as Sentry from '@sentry/nextjs';
 import { NextResponse } from 'next/server';
-import { withAxiom } from 'next-axiom';
 import {
   getUserByEmail,
   getUserByPhoneNumber,
@@ -10,6 +9,7 @@ import {
 import ERRORS from '@azzapp/shared/errors';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
 import { handleSignInAuthMethod } from '#helpers/auth';
+import { withPluginsRoute } from '#helpers/queries';
 import { checkTwilioVerificationCode } from '#helpers/twilioHelpers';
 
 type ConfirmRegistrationBody = {
@@ -17,7 +17,7 @@ type ConfirmRegistrationBody = {
   issuer?: string;
 };
 
-export const POST = withAxiom(async (req: Request) => {
+export const POST = withPluginsRoute(async (req: Request) => {
   const { token, issuer } = (await req.json()) as ConfirmRegistrationBody;
 
   if (!token || !issuer) {

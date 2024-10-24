@@ -12,6 +12,8 @@ import {
   getUserProfilesWithWebCard,
   markUserAsDeleted,
   markUserAsActive,
+  getWebCardById,
+  updateWebCard,
 } from '@azzapp/data';
 import { AZZAPP_SERVER_HEADER } from '@azzapp/shared/urlHelpers';
 import { ADMIN } from '#roles';
@@ -41,7 +43,7 @@ export const toggleRole = async (userId: string, role: string) => {
   revalidatePath(`/users/${userId}`);
 };
 
-export const removeWebcard = async (userId: string, webcardId: string) => {
+export const removeWebCard = async (userId: string, webcardId: string) => {
   const session = await getSession();
 
   const profile = await getProfileByUserAndWebCard(userId, webcardId);
@@ -117,6 +119,24 @@ export const updateNote = async (userId: string, note: string) => {
     Sentry.captureException(e);
     throw e;
   }
+
+  revalidatePath(`/users/${userId}`);
+};
+
+export const toggleStar = async (userId: string, webCardId: string) => {
+  if (!(await currentUserHasRole(ADMIN))) {
+    return null;
+  }
+
+  const webCard = await getWebCardById(webCardId);
+
+  if (!webCard) {
+    return null;
+  }
+
+  await updateWebCard(webCardId, {
+    starred: !webCard.starred,
+  });
 
   revalidatePath(`/users/${userId}`);
 };

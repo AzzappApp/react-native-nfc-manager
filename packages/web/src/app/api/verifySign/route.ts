@@ -1,13 +1,14 @@
 import { SignJWT } from 'jose';
 
 import { NextResponse } from 'next/server';
-import { withAxiom } from 'next-axiom';
 import { getProfileById, getWebCardById, createId } from '@azzapp/data';
 import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
 import { verifyHmacWithPassword } from '@azzapp/shared/crypto';
 import ERRORS from '@azzapp/shared/errors';
 import { buildAvatarUrl } from '#helpers/avatar';
+import { displayName } from '#helpers/contactCardHelpers';
 import cors from '#helpers/cors';
+import { withPluginsRoute } from '#helpers/queries';
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
@@ -19,19 +20,22 @@ const verifySignApi = async (req: Request) => {
     return new Response('Invalid request', { status: 400 });
   }
 
-  const isValid = await verifyHmacWithPassword(
-    process.env.CONTACT_CARD_SIGNATURE_SECRET ?? '',
-    signature,
-    decodeURIComponent(data),
-    { salt },
-  );
+  const decodedData = decodeURIComponent(data);
+
+  const foundContactCard = parseContactCard(decodedData);
+
+  const [isValid, storedProfile, webCard] = await Promise.all([
+    verifyHmacWithPassword(
+      process.env.CONTACT_CARD_SIGNATURE_SECRET ?? '',
+      signature,
+      decodedData,
+      { salt },
+    ),
+    getProfileById(foundContactCard.profileId),
+    getWebCardById(foundContactCard.webCardId),
+  ]);
+
   if (isValid) {
-    const foundContactCard = parseContactCard(decodeURIComponent(data));
-
-    const storedProfile = await getProfileById(foundContactCard.profileId);
-
-    const webCard = await getWebCardById(foundContactCard.webCardId);
-
     const avatarUrl =
       storedProfile && (await buildAvatarUrl(storedProfile, webCard));
 
@@ -39,10 +43,10 @@ const verifySignApi = async (req: Request) => {
       avatarUrl,
       userId: storedProfile?.userId,
       isMultiUser: webCard?.isMultiUser,
-      firstName: foundContactCard.firstName || webCard?.firstName,
-      lastName: foundContactCard.lastName || webCard?.lastName,
-      companyName: foundContactCard.company || webCard?.companyName,
-      userName: foundContactCard.company || webCard?.companyName,
+      firstName: foundContactCard.firstName,
+      lastName: foundContactCard.lastName,
+      company: foundContactCard.company,
+      userName: webCard?.userName,
     })
       .setJti(createId())
       .setIssuer('azzapp')
@@ -55,14 +59,13 @@ const verifySignApi = async (req: Request) => {
     return NextResponse.json(
       {
         urls: (webCard?.commonInformation?.urls ?? []).concat(
-          storedProfile?.contactCard?.urls?.filter(url => url.selected) ?? [],
+          storedProfile?.contactCard?.urls || [],
         ),
         socials: (webCard?.commonInformation?.socials ?? []).concat(
-          storedProfile?.contactCard?.socials?.filter(
-            social => social.selected,
-          ) ?? [],
+          storedProfile?.contactCard?.socials || [],
         ),
         avatarUrl,
+        displayName: displayName(foundContactCard, webCard),
         token,
       },
       { status: 200 },
@@ -75,4 +78,6 @@ const verifySignApi = async (req: Request) => {
   }
 };
 
-export const { POST, OPTIONS } = cors({ POST: withAxiom(verifySignApi) });
+export const { POST, OPTIONS } = cors({
+  POST: withPluginsRoute(verifySignApi),
+});

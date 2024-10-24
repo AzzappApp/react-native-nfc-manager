@@ -1,8 +1,6 @@
-import { sendGAEvent } from '@next/third-parties/google';
 import * as Sentry from '@sentry/nextjs';
 import { decompressFromEncodedURIComponent } from 'lz-string';
 import { NextResponse } from 'next/server';
-import { withAxiom } from 'next-axiom';
 import { getProfileById, getWebCardById } from '@azzapp/data';
 import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
 import { verifyHmacWithPassword } from '@azzapp/shared/crypto';
@@ -10,6 +8,7 @@ import { buildVCardFromSerializedContact } from '@azzapp/shared/vCardHelpers';
 
 import { buildAvatarUrl } from '#helpers/avatar';
 import cors from '#helpers/cors';
+import { withPluginsRoute } from '#helpers/queries';
 import { shareBackVCardFilename } from '#helpers/shareBackHelper';
 import type { NextRequest } from 'next/server';
 
@@ -78,11 +77,10 @@ const downloadVCard = async (req: NextRequest) => {
 
   const additionalData = {
     urls: (webCard?.commonInformation?.urls ?? []).concat(
-      storedProfile?.contactCard?.urls?.filter(url => url.selected) ?? [],
+      storedProfile?.contactCard?.urls || [],
     ),
     socials: (webCard?.commonInformation?.socials ?? []).concat(
-      storedProfile?.contactCard?.socials?.filter(social => social.selected) ??
-        [],
+      storedProfile?.contactCard?.socials || [],
     ),
     avatarUrl,
     avatar: undefined as { type: string; base64: string } | undefined,
@@ -108,11 +106,6 @@ const downloadVCard = async (req: NextRequest) => {
   const vCardContactString = vCard.toString();
 
   const vCardFileName = shareBackVCardFilename(buildVCardContact);
-  sendGAEvent('event', 'download_vcard', {
-    event_category: 'Form',
-    event_label: 'ShareBackForm',
-    value: 'Submit',
-  });
 
   return new Response(vCardContactString, {
     headers: {
@@ -122,4 +115,6 @@ const downloadVCard = async (req: NextRequest) => {
   });
 };
 
-export const { GET, OPTIONS } = cors({ GET: withAxiom(downloadVCard) });
+export const { GET, OPTIONS } = cors({
+  GET: withPluginsRoute(downloadVCard),
+});

@@ -50,7 +50,6 @@ export const connectionFromSortedArray = <Item>(
   },
 ): Connection<Item> => {
   const { hasNextPage, offset } = meta;
-
   const edges = entities.map((entity, index) => ({
     cursor: offsetToCursor(offset + index),
     node: entity,

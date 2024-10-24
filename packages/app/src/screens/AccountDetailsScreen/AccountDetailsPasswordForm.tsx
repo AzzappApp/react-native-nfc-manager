@@ -107,7 +107,7 @@ const AccountDetailsPasswordForm = ({
       <Header
         rightElement={
           <Button
-            disabled={isSubmitSuccessful || isLoading}
+            disabled={!errors.root && (isSubmitSuccessful || isLoading)}
             loading={isSubmitting || isLoading}
             label={intl.formatMessage({
               defaultMessage: 'Save',

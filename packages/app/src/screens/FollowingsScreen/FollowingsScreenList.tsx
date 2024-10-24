@@ -6,7 +6,7 @@ import { useDebounce } from 'use-debounce';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import WebCardList from '#components/WebCardList';
-import useAuthState from '#hooks/useAuthState';
+import { getAuthState } from '#helpers/authStore';
 import useToggleFollow from '#hooks/useToggleFollow';
 import type { FollowingsScreenList_webCard$key } from '#relayArtifacts/FollowingsScreenList_webCard.graphql';
 
@@ -80,10 +80,9 @@ const FollowingsScreenList = ({ webCard: webCardKey }: FollowingsListProps) => {
     }
   }, [debouncedSearch, refetch]);
 
-  const { profileInfos } = useAuthState();
-
   const onToggleFollow = useCallback(
     (profileId: string, profileUserName: string) => {
+      const { profileInfos } = getAuthState();
       if (profileHasEditorRight(profileInfos?.profileRole)) {
         toggleFollow(profileId, profileUserName, false);
       } else {
@@ -97,7 +96,7 @@ const FollowingsScreenList = ({ webCard: webCardKey }: FollowingsListProps) => {
         });
       }
     },
-    [profileInfos, intl, toggleFollow],
+    [intl, toggleFollow],
   );
 
   return (

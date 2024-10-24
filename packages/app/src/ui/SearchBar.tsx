@@ -182,7 +182,7 @@ const SearchBar = ({
               returnKeyType="search"
               onSubmitEditing={onSubmitEditingLocal}
               autoFocus={autoFocus}
-              placeholderTextColor={styles.input.color}
+              placeholderTextColor={styles.placeHolder.color}
             />
             {isNotFalsyString(searchValue) && (
               <PressableNative
@@ -235,7 +235,10 @@ const styleSheet = createStyleSheet(appearance => ({
   input: {
     flex: 1,
     height: 46,
-    color: appearance === 'light' ? colors.black : colors.white, //TODO: darkmode input color is not defined waiting for design team
+    color: appearance === 'light' ? colors.black : colors.white,
+  },
+  placeHolder: {
+    color: colors.grey400,
   },
   wrapper: {
     flexDirection: 'row',

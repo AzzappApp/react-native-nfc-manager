@@ -51,7 +51,7 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
             onChangeLabel={onChangeLabel}
             deleteField={deleteField}
             selectedKey={selectedKey}
-            errorMessage={error ? errorMessage ?? error.message : undefined}
+            errorMessage={error ? (errorMessage ?? error.message) : undefined}
           >
             <TextInput
               value={value as string}

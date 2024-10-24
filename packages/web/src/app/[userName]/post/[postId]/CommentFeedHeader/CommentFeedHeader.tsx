@@ -34,7 +34,7 @@ const CommentFeedHeader = (props: CommentFeedHeaderProps) => {
               />
             </div>
           )}
-          <span>{webCard.userName}</span>
+          <span className={styles.userName}>{webCard.userName}</span>
         </Link>
         <Button onClick={() => download.current?.open()} size="small">
           <FormattedMessage

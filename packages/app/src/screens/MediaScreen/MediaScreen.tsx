@@ -40,6 +40,7 @@ const mediaScreenQuery = graphql`
           ...WebCardPostsList_webCard
             @arguments(viewerWebCardId: $viewerWebCardId)
           ...PostRendererFragment_author
+          ...PostList_author
           ...MediaFollowingsWebCards_webCard
           ...MediaFollowingsScreen_webCard
         }
@@ -107,7 +108,6 @@ const MediaScreen = ({
                     </Text>
                   }
                   webCard={profile?.webCard}
-                  style={styles.coverList}
                 />
 
                 <Text style={styles.postsTitleStyle} variant="large">
@@ -226,7 +226,6 @@ const MediaScreenFallback = () => {
 };
 
 const styles = StyleSheet.create({
-  tabsContainer: { flex: 1, paddingTop: 20 },
   tabBarContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -234,16 +233,6 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingHorizontal: 5,
     paddingVertical: 9,
-  },
-  tab: {
-    width: 83,
-    height: 32,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 33,
-  },
-  coverList: {
-    overflow: 'visible',
   },
   coversTitleStyle: {
     marginHorizontal: 10,

@@ -412,8 +412,6 @@ const ContactCardEditScreen = ({
 };
 
 const styles = StyleSheet.create({
-  bottomSheetContainerStyle: { paddingHorizontal: 0 },
-  headerStyle: { paddingHorizontal: 10 },
   headerButton: { paddingHorizontal: 5, minWidth: 74 },
   container: { flex: 1 },
 });

@@ -67,6 +67,11 @@ type Profile implements Node {
   webCard: WebCard
 
   """
+  Return number of contact for a given profile
+  """
+  nbContacts: Int!
+
+  """
   Return a list of suggested web cards for a given profile
   """
   suggestedWebCards(
@@ -147,6 +152,28 @@ type Profile implements Node {
   ): PostConnection!
 
   """
+  Return a list of contacts that match the search query
+  """
+  searchContacts(
+    """
+    The search query
+    """
+    name: String
+    """
+    The ordering
+    """
+    orderBy: SearchContactOrderBy!
+    """
+    Returns the items in the list that come after the specified cursor.
+    """
+    after: String
+    """
+    Returns the first n items from the list.
+    """
+    first: Int @max(value: 50)
+  ): ContactConnection!
+
+  """
   Return a list of profiles that match the search query
   """
   searchWebCards(
@@ -182,6 +209,7 @@ type Profile implements Node {
   Fetches cover template type
   """
   coverTemplateTypes: [CoverTemplateType!]!
+    @deprecated(reason: "Unused in version 0.9.5-canary.13")
 
   """
   Fetches card styles
@@ -220,6 +248,8 @@ type Profile implements Node {
     first: Int @max(value: 100)
     after: String
   ): StockVideoConnection!
+
+  deleted: Boolean!
 }
 
 """
@@ -340,4 +370,9 @@ type ProfileEdge {
   A cursor for use in pagination
   """
   cursor: String!
+}
+
+enum SearchContactOrderBy {
+  name
+  date
 }

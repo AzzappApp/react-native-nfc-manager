@@ -278,6 +278,7 @@ export const CoverTemplateTable = cols.table('CoverTemplate', {
   enabled: cols.boolean('enabled').default(true).notNull(),
   params: cols.json('params').$type<CoverTemplateParams>(),
   backgroundColor: cols.defaultVarchar('backgroundColor'),
+  previewPositionPercentage: cols.int('previewPositionPercentage'),
 });
 
 export type CoverTextType = 'custom' | 'firstName' | 'mainName';
@@ -505,8 +506,8 @@ export const PaymentTable = cols.table(
   table => {
     return {
       subscriptionIdIdx: cols
-        .index('subscriptionId_idx')
-        .on(table.subscriptionId),
+        .uniqueIndex('subscriptionId_transactionId_idx')
+        .on(table.subscriptionId, table.transactionId),
       webCardIdIdx: cols.index('webCardId_idx').on(table.webCardId),
     };
   },
@@ -788,12 +789,12 @@ export const UserSubscriptionTable = cols.table(
     id: cols.cuid('id').primaryKey().notNull().$defaultFn(createId),
     userId: cols.cuid('userId').notNull(),
     webCardId: cols.cuid('webCardId'),
-    subscriptionId: cols.text('subscriptionId').notNull(),
     subscriptionPlan: cols.enum('subscriptionPlan', [
       'web.monthly',
       'web.yearly',
       'web.lifetime',
     ]),
+    subscriptionId: cols.text('subscriptionId').notNull(),
     totalSeats: cols.int('totalSeats').default(0).notNull(),
     freeSeats: cols.int('freeSeats').default(0).notNull(),
     revenueCatId: cols.text('revenueCatId'),
@@ -829,6 +830,7 @@ export const UserSubscriptionTable = cols.table(
       userIdWebCardIDIdx: cols
         .index('userId_webCardId_idx')
         .on(table.userId, table.webCardId),
+      webCardIDIdx: cols.index('webCardId_idx').on(table.webCardId),
       statusExpirationDate: cols
         .index('status_expiration_date')
         .on(table.status, table.endAt, table.invalidatedAt),
@@ -922,6 +924,7 @@ export const WebCardTable = cols.table(
         rotation: 0,
         shadow: false,
       }),
+    coverPreviewPositionPercentage: cols.int('coverPreviewPositionPercentage'),
 
     /* Social medias infos */
     nbFollowers: cols.int('nbFollowers').default(0).notNull(),
@@ -930,6 +933,7 @@ export const WebCardTable = cols.table(
     nbPostsLiked: cols.int('nbPostsLiked').default(0).notNull(), // this is the informations postLiked
     nbLikes: cols.int('nbLikes').default(0).notNull(), //this is the stats TotalLikes (number of likes received)
     nbWebCardViews: cols.int('nbWebCardViews').default(0).notNull(),
+    starred: cols.boolean('starred').default(false).notNull(),
 
     /* Deletion infos */
     deleted: cols.boolean('deleted').default(false).notNull(),
@@ -982,21 +986,77 @@ export const WebCardStatisticTable = cols.table(
 export type WebCardStatistic = InferSelectModel<typeof WebCardStatisticTable>;
 //#endregion
 
-// #region ShareBack
+// #region ContactTable
+export const ContactTable = cols.table(
+  'Contact',
+  {
+    id: cols.cuid('id').primaryKey().$defaultFn(createId),
+    ownerProfileId: cols.cuid('ownerProfileId').notNull(),
+    contactProfileId: cols.cuid('contactProfileId'),
+    firstName: cols.defaultVarchar('firstName').default('').notNull(),
+    lastName: cols.defaultVarchar('lastName').default('').notNull(),
+    company: cols.defaultVarchar('company').default('').notNull(),
+    title: cols.defaultVarchar('title').default('').notNull(),
+    createdAt: cols
+      .dateTime('createdAt')
+      .notNull()
+      .default(DEFAULT_DATETIME_VALUE),
+    type: cols.enum('type', ['contact', 'shareback']).notNull(),
+    birthday: cols.date('birthday', { mode: 'string' }),
+    phoneNumbers: cols
+      .json('phoneNumbers')
+      .$type<Array<{ label: string; number: string }>>()
+      .notNull(),
+    emails: cols
+      .json('emails')
+      .$type<Array<{ label: string; address: string }>>()
+      .notNull(),
+    addresses: cols
+      .json('addresses')
+      .$type<Array<{ label: string; address: string }>>()
+      .notNull(),
+    deleted: cols.boolean('deleted').default(false).notNull(),
+    deletedAt: cols.dateTime('deletedAt'),
+    urls: cols.json('urls').$type<Array<{ url: string }>>(),
+    socials: cols
+      .json('socials')
+      .$type<Array<{ url: string; label: string }>>(),
+  },
+  table => {
+    return {
+      profilesKey: cols
+        .uniqueIndex('Contact_profiles_key')
+        .on(table.ownerProfileId, table.contactProfileId),
+    };
+  },
+);
+export type Contact = InferSelectModel<typeof ContactTable>;
+//#endregion
 
-export const ShareBackTable = cols.table('ShareBack', {
-  id: cols.cuid('id').primaryKey().$defaultFn(createId),
-  profileId: cols.cuid('profileId').notNull(),
-  email: cols.defaultVarchar('email').default(''),
-  phone: cols.defaultVarchar('phone').default(''),
-  firstName: cols.defaultVarchar('firstName').default(''),
-  lastName: cols.defaultVarchar('lastName').default(''),
-  company: cols.defaultVarchar('company').default(''),
-  title: cols.defaultVarchar('title').default(''),
-  createdAt: cols
-    .dateTime('createdAt')
-    .notNull()
-    .default(DEFAULT_DATETIME_VALUE),
-});
-export type ShareBack = InferSelectModel<typeof ShareBackTable>;
+// #region FCMToken
+export const FCMTokenTable = cols.table(
+  'FCMToken',
+  {
+    deviceId: cols.defaultVarchar('deviceId').notNull(),
+    userId: cols.cuid('userId').notNull(),
+    fcmToken: cols.defaultVarchar('fcmToken').notNull(),
+    deviceOS: cols.defaultVarchar('deviceOS').notNull(),
+    deviceType: cols.defaultVarchar('deviceType').notNull(),
+    createdAt: cols
+      .dateTime('createdAt')
+      .notNull()
+      .default(DEFAULT_DATETIME_VALUE),
+    updatedAt: cols
+      .dateTime('updatedAt')
+      .notNull()
+      .default(DEFAULT_DATETIME_VALUE), //to help catch OLD fcm token
+  },
+  table => {
+    return {
+      id: cols.primaryKey({ columns: [table.userId, table.deviceId] }),
+    };
+  },
+);
+export type FCMToken = InferSelectModel<typeof FCMTokenTable>;
+
 //#endregion

@@ -66,6 +66,22 @@ export const getLocalizationMessagesByLocaleAndTarget = async (
 };
 
 /**
+ * Retrieve a list of localization messages for a specific target.
+ *
+ * @param target - The target by which to filter the list of localization messages
+ *
+ * @returns a list of localization messages for the specified target
+ */
+export const getLocalizationMessagesByTarget = async (
+  target: string,
+): Promise<LocalizationMessage[]> => {
+  return db()
+    .select()
+    .from(LocalizationMessageTable)
+    .where(and(eq(LocalizationMessageTable.target, target)));
+};
+
+/**
  * Retrieve a list of localization messages for a specific locale.
  *
  * @param locale - The locale by which to filter the list of localization messages

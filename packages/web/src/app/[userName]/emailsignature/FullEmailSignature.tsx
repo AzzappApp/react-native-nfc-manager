@@ -3,6 +3,7 @@ import { decompressFromEncodedURIComponent } from 'lz-string';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
+import { useIntl } from 'react-intl';
 import { colors, getTextColor } from '@azzapp/shared/colorsHelpers';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { parseEmailSignature } from '@azzapp/shared/emailSignatureHelpers';
@@ -31,9 +32,11 @@ const FullEmailSignature = ({
   media: Media | null;
   companyLogo: string | null;
 }) => {
+  const intl = useIntl();
   const searchParams = useSearchParams();
   const [contact, setContact] = useState<EmailSignatureParsed | undefined>();
   const [coverWidth, setCoverWidth] = useState(0);
+
   useEffect(() => {
     const handleResize = () => {
       setCoverWidth(Math.min(200, (window.innerWidth * 35) / 100));
@@ -125,7 +128,11 @@ const FullEmailSignature = ({
     return (
       <React.Fragment>
         <div className={styles.title}>
-          Add “Save my contact” button to your email
+          {intl.formatMessage({
+            defaultMessage: 'Add “Save my contact” button to your email',
+            id: 'BadFyG',
+            description: 'Signature web link / title',
+          })}
         </div>
         <div className={styles.pageContainer}>
           <div style={{ width: coverWidth, height: coverWidth / COVER_RATIO }}>
@@ -153,27 +160,45 @@ const FullEmailSignature = ({
           className={styles.text}
           style={{ marginTop: 50, textAlign: 'center' }}
         >
-          Incorporate this button into your current signature, enabling your
-          recipients to effortlessly save your contact information with just a
-          single click.
+          {intl.formatMessage({
+            defaultMessage:
+              'Incorporate this button into your current signature, enabling your recipients to effortlessly save your contact information with just a single click.',
+            id: 'Pm7HPS',
+            description: 'Signature web link / description',
+          })}
         </div>
         <Button
           onClick={() => handleCopySignature('simple')}
           className={styles.button}
           style={{ marginBottom: 90, marginTop: 50 }}
         >
-          Copy My Button
+          {intl.formatMessage({
+            defaultMessage: 'Copy My Button',
+            id: 'bGra2i',
+            description: 'Signature web link / copy button',
+          })}
         </Button>
         {mode && <CommonExplanation mode={mode!} />}
       </React.Fragment>
     );
   }
+
   return (
     <React.Fragment>
       <div className={styles.title}>
         {mode === 'simple '
-          ? `Add "Save my contact" button to your email`
-          : `Add this signature to your emails`}
+          ? intl.formatMessage({
+              defaultMessage: `Add "Save my contact" button to your email`,
+              id: 'x5GviQ',
+              description:
+                'Signature web link / Simple Mode / add save my contact',
+            })
+          : intl.formatMessage({
+              defaultMessage: `Add this signature to your emails`,
+              id: 'uZbSQo',
+              description:
+                'Signature web link / Normal Mode / add save my contact',
+            })}
       </div>
       <table
         border={0}
@@ -267,7 +292,11 @@ const FullEmailSignature = ({
                         ),
                       }}
                     >
-                      Save my contact
+                      {intl.formatMessage({
+                        defaultMessage: 'Save my contact',
+                        id: 'YdhsiU',
+                        description: 'Signature web link / save my contact',
+                      })}
                     </td>
                   </tr>
                 </tbody>
@@ -370,15 +399,23 @@ const FullEmailSignature = ({
         className={styles.text}
         style={{ marginTop: 50, textAlign: 'center' }}
       >
-        Incorporate this signature to your emails, enabling your recipients to
-        effortlessly save your contact information with just a single click.
+        {intl.formatMessage({
+          defaultMessage:
+            'Incorporate this signature to your emails, enabling your recipients to effortlessly save your contact information with just a single click.',
+          id: 'PmoqJ7',
+          description: 'Signature web link / footer',
+        })}
       </div>
       <Button
         onClick={() => handleCopySignature('full')}
         className={styles.button}
         style={{ marginBottom: 90, marginTop: 50 }}
       >
-        Copy my email signature
+        {intl.formatMessage({
+          defaultMessage: 'Copy my email signature',
+          id: 'TebGlz',
+          description: 'Signature web link / copy signature button',
+        })}
       </Button>
       {mode && <CommonExplanation mode={mode!} />}
     </React.Fragment>
@@ -386,6 +423,7 @@ const FullEmailSignature = ({
 };
 
 const CommonExplanation = ({ mode }: { mode: string }) => {
+  const intl = useIntl();
   return (
     <div
       style={{
@@ -398,33 +436,98 @@ const CommonExplanation = ({ mode }: { mode: string }) => {
     >
       <div className={styles.title}>
         {mode === 'simple'
-          ? 'How to add the button to your email signature'
-          : 'How to add the signature to your email signature'}
+          ? intl.formatMessage({
+              defaultMessage: 'How to add the button to your email signature',
+              id: 'bOv1NW',
+              description:
+                'Signature web link / simple explanation / description header',
+            })
+          : intl.formatMessage({
+              defaultMessage:
+                'How to add the signature to your email signature',
+              id: 'd/BVbO',
+              description:
+                'Signature web link / normal explanation / description header',
+            })}
       </div>
-      <div className={styles.stepText}>STEP 1</div>
-      <div className={styles.stepDesc}>
-        {mode === 'simple' ? 'Copy the button' : 'Copy the signature'}
+      <div className={styles.stepText}>
+        {intl.formatMessage({
+          defaultMessage: 'STEP 1',
+          id: 'r7RTwK',
+          description: 'Signature web link / explanation / description step 1',
+        })}
       </div>
-      <div className={styles.separator} />
-      <div className={styles.stepText}>STEP 2</div>
-      <div className={styles.stepDesc}>
-        Within your Gmail account, click the gear icon on the top right, select
-        the “See all settings” option and scroll down to the “Signature” section
-      </div>
-      <div className={styles.separator} />
-      <div className={styles.stepText}>STEP 3</div>
       <div className={styles.stepDesc}>
         {mode === 'simple'
-          ? `Select the “Create new” option and paste your button into the text
-            box, or paste the button in an existing signature`
-          : `Select the “Create new” option and paste your signature into the text box.`}
+          ? intl.formatMessage({
+              defaultMessage: 'Copy the button',
+              id: 'GcLC3e',
+              description:
+                'Signature web link / simple explanation / description step 1 details',
+            })
+          : intl.formatMessage({
+              defaultMessage: 'Copy the signature',
+              id: 'YJ9lYH',
+              description:
+                'Signature web link / normal explanation / description step 1 details',
+            })}
       </div>
       <div className={styles.separator} />
-      <div className={styles.stepText}>STEP 4</div>
+      <div className={styles.stepText}>
+        {intl.formatMessage({
+          defaultMessage: 'STEP 2',
+          id: 'BqY1R+',
+          description: 'Signature web link / explanation / description step 2',
+        })}
+      </div>
       <div className={styles.stepDesc}>
-        In the “Signature Defaults” subsection, select your newly created
-        signature as default and then scroll down to the very bottom of the page
-        and select the “Save” button
+        {intl.formatMessage({
+          defaultMessage:
+            'Within your Gmail account, click the gear icon on the top right, select the “See all settings” option and scroll down to the “Signature” section',
+          id: '0NaUVp',
+          description:
+            'Signature web link / explanation / description step 2 details',
+        })}
+      </div>
+      <div className={styles.separator} />
+      <div className={styles.stepText}>
+        {intl.formatMessage({
+          defaultMessage: 'STEP 3',
+          id: 'c3TCgL',
+          description: 'Signature web link / explanation / description step 3',
+        })}
+      </div>
+      <div className={styles.stepDesc}>
+        {mode === 'simple'
+          ? intl.formatMessage({
+              defaultMessage: `Select the “Create new” option and paste your button into the text box, or paste the button in an existing signature`,
+              id: 'TX89WF',
+              description:
+                'Signature web link / simple explanation / description step 3 details',
+            })
+          : intl.formatMessage({
+              defaultMessage: `Select the “Create new” option and paste your signature into the text box.`,
+              id: 'o/dCiC',
+              description:
+                'Signature web link / normal explanation / description step 3 details',
+            })}
+      </div>
+      <div className={styles.separator} />
+      <div className={styles.stepText}>
+        {intl.formatMessage({
+          defaultMessage: 'STEP 4',
+          id: 'b5Pyzb',
+          description: 'Signature web link / explanation / description step 4',
+        })}
+      </div>
+      <div className={styles.stepDesc}>
+        {intl.formatMessage({
+          defaultMessage:
+            'In the “Signature Defaults” subsection, select your newly created signature as default and then scroll down to the very bottom of the page and select the “Save” button',
+          id: '+LeqWU',
+          description:
+            'Signature web link / explanation / description step 4 details',
+        })}
       </div>
       <div className={styles.separator} />
     </div>

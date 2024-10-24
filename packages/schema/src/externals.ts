@@ -30,3 +30,19 @@ export const buildCoverAvatarUrl = externalFunction<
 export const validateMailOrPhone = externalFunction<
   (type: 'email' | 'phone', issuer: string, token: string) => Promise<void>
 >('validateMailOrPhone');
+
+type MessageType = {
+  type: 'multiuser_invitation' | 'shareBack';
+  mediaId?: string | null;
+  sound?: string;
+  deepLink?: string; //maybe we could merge type and deepLink...
+  locale: Locale;
+  localeParams?: Record<string, string>;
+};
+
+export const sendPushNotification = externalFunction<
+  (
+    targetUserId: string,
+    { type, mediaId, sound, deepLink, locale, localeParams }: MessageType,
+  ) => Promise<void>
+>('sendPushNotification');

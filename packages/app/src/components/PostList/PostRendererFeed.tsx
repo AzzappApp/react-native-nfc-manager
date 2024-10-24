@@ -138,19 +138,9 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderRadius: POST_RENDERER_RADIUS,
   },
-  playIcon: {
-    position: 'absolute',
-    top: 10,
-    end: 10,
-    height: 24,
-    width: 24,
-  },
   smallAuthorCartouche: {
     position: 'absolute',
     bottom: 5,
     left: 5,
-  },
-  text: {
-    fontSize: 12,
   },
 });

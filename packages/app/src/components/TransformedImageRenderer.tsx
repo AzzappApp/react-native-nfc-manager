@@ -1,5 +1,5 @@
 import { createPicture, Skia } from '@shopify/react-native-skia';
-import { PixelRatio, type ViewProps } from 'react-native';
+import { PixelRatio } from 'react-native';
 import { useDerivedValue, type DerivedValue } from 'react-native-reanimated';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -12,6 +12,7 @@ import {
 import SkiaAnimatedPictureView from '#ui/SkiaAnimatedPictureView';
 import type { Filter } from '@azzapp/shared/filtersHelper';
 import type { SkImage } from '@shopify/react-native-skia';
+import type { StyleProp, ViewStyle, ViewProps } from 'react-native';
 
 export type TransformedImageRendererProps = Exclude<ViewProps, 'children'> & {
   image: DerivedValue<SkImage | null>;
@@ -19,6 +20,7 @@ export type TransformedImageRendererProps = Exclude<ViewProps, 'children'> & {
   filter?: Filter | null;
   width: number;
   height: number;
+  imageStyle?: StyleProp<ViewStyle>;
 };
 
 const TransformedImageRenderer = ({

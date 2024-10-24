@@ -38,6 +38,10 @@ export type CoverEditorState = {
   loadingRemoteMedia: boolean;
   loadingLocalMedia: boolean;
   loadingError: any;
+
+  // cover preview informations
+  coverPreviewPositionPercentage?: number | null;
+  shouldComputeCoverPreviewPositionPercentage: boolean;
 };
 
 export type CardColors = Readonly<

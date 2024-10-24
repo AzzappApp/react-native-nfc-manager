@@ -1,9 +1,10 @@
-import { memo, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { runOnJS, useAnimatedReaction } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { getAuthState } from '#helpers/authStore';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import useNotifications from '#hooks/useNotifications';
 import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
@@ -19,9 +20,13 @@ import type { HomeScreenContent_user$key } from '#relayArtifacts/HomeScreenConte
 
 type HomeScreenContentProps = {
   user: HomeScreenContent_user$key;
+  refreshQuery: (() => void) | undefined;
 };
 
-const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
+const HomeScreenContent = ({
+  user: userKey,
+  refreshQuery,
+}: HomeScreenContentProps) => {
   // #regions data
   const user = useFragment(
     graphql`
@@ -46,7 +51,31 @@ const HomeScreenContent = ({ user: userKey }: HomeScreenContentProps) => {
     userKey,
   );
 
+  const onDeepLink = useCallback(
+    (deepLink: string) => {
+      if (deepLink === 'multiuser_invitation') {
+        refreshQuery?.();
+      }
+    },
+    [refreshQuery],
+  );
+
+  const { notificationAuthorized, requestNotificationPermission } =
+    useNotifications(onDeepLink);
+
+  //TODO: improve the way to ask for notificatino permission, for now, we are asking for notification permission if the user has a published card
+  useEffect(() => {
+    if (!notificationAuthorized && user?.profiles && user.profiles.length > 0) {
+      const hasPublishedCard = user.profiles.some(
+        profile => profile.webCard?.cardIsPublished,
+      );
+      if (hasPublishedCard) {
+        requestNotificationPermission();
+      }
+    }
+  }, [notificationAuthorized, requestNotificationPermission, user.profiles]);
   //#endregion
+
   const { bottom } = useScreenInsets();
   //#region profile switch
 

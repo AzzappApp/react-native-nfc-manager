@@ -44,12 +44,13 @@ import {
   useRouter,
   useScreenOptionsUpdater,
 } from '#components/NativeRouter';
+import WebCardMenu from '#components/WebCardMenu';
 import { logEvent } from '#helpers/analytics';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import relayScreen from '#helpers/relayScreen';
 import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
+import { useProfileInfos } from '#hooks/authStateHooks';
 import useAnimatedState from '#hooks/useAnimatedState';
-import useAuthState from '#hooks/useAuthState';
 import {
   UPDATE_CONTACT_CARD_SCANS,
   useWebCardViewStatistic,
@@ -57,11 +58,10 @@ import {
 import useToggle from '#hooks/useToggle';
 import useToggleFollow from '#hooks/useToggleFollow';
 import Container from '#ui/Container';
+import AddContactModal from './AddContactModal';
 import WebCardBackground from './WebCardBackground';
-import WebCardModal from './WebCardModal';
 import WebCardPostsList from './WebCardPostsList';
 import WebCardScreenButtonBar from './WebCardScreenButtonBar';
-import WebCardScreenContactDownloader from './WebCardScreenContactDownloader';
 import WebCardScreenContent from './WebCardScreenContent';
 import WebCardScreenPublishHelper from './WebCardScreenPublishHelper';
 import { WebCardScreenTransitionsProvider } from './WebCardScreenTransitions';
@@ -99,7 +99,7 @@ const WebCardScreen = ({
 
   const prefetchRoute = usePrefetchRoute();
 
-  const { profileInfos } = useAuthState();
+  const profileInfos = useProfileInfos();
   const isViewer = profileInfos?.webCardId === data.webCard?.id;
   const isWebCardOwner = isViewer && profileIsOwner(profileInfos?.profileRole);
   const canEdit = isViewer && profileHasEditorRight(profileInfos?.profileRole);
@@ -386,7 +386,7 @@ const WebCardScreen = ({
   //   );
   // }, [intl, router]);
 
-  if (!data.webCard || !data.node?.viewerWebCard) {
+  if (!data.webCard || !data.profile?.webCard) {
     return null;
   }
 
@@ -428,7 +428,7 @@ const WebCardScreen = ({
                   webCardId={data.webCard.id}
                   hasFocus={hasFocus && showPost && ready}
                   userName={data.webCard.userName!}
-                  viewerWebCard={data.node.viewerWebCard}
+                  viewerWebCard={data.profile.webCard}
                 />
               </Suspense>
             </Animated.View>
@@ -436,7 +436,7 @@ const WebCardScreen = ({
         </GestureDetector>
         <WebCardScreenButtonBar
           webCard={data.webCard}
-          viewerWebCard={data.node.viewerWebCard}
+          profile={data.profile}
           isViewer={isViewer}
           editing={editing}
           onHome={router.backToTop}
@@ -447,15 +447,17 @@ const WebCardScreen = ({
           onShowWebcardModal={onShowWebcardModal}
         />
       </WebCardScreenTransitionsProvider>
-      <WebCardScreenContactDownloader
-        userName={data.webCard.userName}
-        webCard={data.webCard}
-        contactData={params.contactData}
-        additionalContactData={params.additionalContactData}
-      />
+      <Suspense>
+        <AddContactModal
+          user={data.currentUser!}
+          webCard={data.webCard}
+          contactData={params.contactData}
+          additionalContactData={params.additionalContactData}
+        />
+      </Suspense>
       <Suspense fallback={null}>
         <WebCardScreenPublishHelper webCard={data.webCard} editMode={editing} />
-        <WebCardModal
+        <WebCardMenu
           visible={showWebcardModal}
           webCard={data.webCard}
           close={toggleWebcardModal}
@@ -472,7 +474,11 @@ const getQuery = (params: WebCardRoute['params']) =>
   params.webCardId ? webCardScreenByIdQuery : webCardScreenByNameQuery;
 
 const webCardScreenByIdQuery = graphql`
-  query WebCardScreenByIdQuery($webCardId: ID!, $viewerWebCardId: ID!) {
+  query WebCardScreenByIdQuery(
+    $webCardId: ID!
+    $viewerWebCardId: ID!
+    $profileId: ID!
+  ) {
     webCard: node(id: $webCardId) {
       id
       ... on WebCard {
@@ -483,13 +489,20 @@ const webCardScreenByIdQuery = graphql`
         @arguments(viewerWebCardId: $viewerWebCardId)
       ...WebCardScreenPublishHelper_webCard
       ...WebCardBackground_webCard
-      ...WebCardModal_webCard @arguments(viewerWebCardId: $viewerWebCardId)
+      ...WebCardMenu_webCard @arguments(viewerWebCardId: $viewerWebCardId)
+      ...AddContactModal_webCard
     }
-    node(id: $viewerWebCardId) {
-      ... on WebCard @alias(as: "viewerWebCard") {
-        ...WebCardScreenButtonBar_viewerWebCard
-        ...PostList_viewerWebCard
+    profile: node(id: $profileId) {
+      ... on Profile {
+        ...WebCardScreenButtonBar_profile
+        webCard {
+          ...PostList_viewerWebCard
+        }
+        invited
       }
+    }
+    currentUser {
+      ...AddContactModalProfiles_user
     }
   }
 `;
@@ -498,6 +511,7 @@ const webCardScreenByNameQuery = graphql`
   query WebCardScreenByUserNameQuery(
     $userName: String!
     $viewerWebCardId: ID!
+    $profileId: ID!
   ) {
     webCard(userName: $userName) {
       id
@@ -507,13 +521,20 @@ const webCardScreenByNameQuery = graphql`
         @arguments(viewerWebCardId: $viewerWebCardId)
       ...WebCardScreenPublishHelper_webCard
       ...WebCardBackground_webCard
-      ...WebCardModal_webCard @arguments(viewerWebCardId: $viewerWebCardId)
+      ...WebCardMenu_webCard @arguments(viewerWebCardId: $viewerWebCardId)
+      ...AddContactModal_webCard
     }
-    node(id: $viewerWebCardId) {
-      ... on WebCard @alias(as: "viewerWebCard") {
-        ...WebCardScreenButtonBar_viewerWebCard
-        ...PostList_viewerWebCard
+    profile: node(id: $profileId) {
+      ... on Profile {
+        ...WebCardScreenButtonBar_profile
+        webCard {
+          ...PostList_viewerWebCard
+        }
+        invited
       }
+    }
+    currentUser {
+      ...AddContactModalProfiles_user
     }
   }
 `;
@@ -557,8 +578,16 @@ export default relayScreen(WebCardScreen, {
   query: getQuery,
   getVariables: ({ userName, webCardId }, profileInfos) =>
     webCardId
-      ? { webCardId, viewerWebCardId: profileInfos?.webCardId ?? '' }
-      : { userName, viewerWebCardId: profileInfos?.webCardId ?? '' },
+      ? {
+          webCardId,
+          viewerWebCardId: profileInfos?.webCardId ?? '',
+          profileId: profileInfos?.profileId,
+        }
+      : {
+          userName,
+          viewerWebCardId: profileInfos?.webCardId ?? '',
+          profileId: profileInfos?.profileId,
+        },
   fetchPolicy: 'store-and-network',
 });
 

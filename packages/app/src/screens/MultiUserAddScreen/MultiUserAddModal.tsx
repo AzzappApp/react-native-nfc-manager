@@ -21,13 +21,13 @@ import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
 import { ScreenModal } from '#components/NativeRouter';
+import { getAuthState } from '#helpers/authStore';
 import { CardPhoneLabels } from '#helpers/contactCardHelpers';
 import { getFileName } from '#helpers/fileHelpers';
 import { createId } from '#helpers/idHelpers';
 import { getLocales, useCurrentLocale } from '#helpers/localeHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
-import useAuthState from '#hooks/useAuthState';
 import ContactCardEditForm from '#screens/ContactCardEditScreen/ContactCardEditForm';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -270,9 +270,9 @@ const MultiUserAddModal = (
               contact.birthday.year
                 ? {
                     birthday: new Date(
-                      contact.birthday.year!,
-                      contact.birthday.month!,
-                      contact.birthday.day!,
+                      contact.birthday.year,
+                      contact.birthday.month,
+                      contact.birthday.day,
                     ).toISOString(),
                   }
                 : undefined,
@@ -324,9 +324,9 @@ const MultiUserAddModal = (
     `,
   );
 
-  const { profileInfos } = useAuthState();
   const submit = handleSubmit(
     async value => {
+      const { profileInfos } = getAuthState();
       if (profileInfos) {
         Keyboard.dismiss();
 

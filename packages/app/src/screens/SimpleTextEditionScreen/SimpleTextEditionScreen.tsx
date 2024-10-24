@@ -106,8 +106,8 @@ const SimpleTextEditionScreen = ({
 
   if (
     moduleData?.id &&
-    ((moduleKind === 'simpleText' && !moduleData.simpleText == null) ||
-      (moduleKind === 'simpleTitle' && !moduleData.simpleTitle == null))
+    ((moduleKind === 'simpleText' && moduleData.simpleText !== null) ||
+      (moduleKind === 'simpleTitle' && moduleData.simpleTitle !== null))
   ) {
     // TODO error ?
   }

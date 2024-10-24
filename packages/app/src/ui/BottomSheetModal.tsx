@@ -43,7 +43,7 @@ import Button from './Button';
 import Header from './Header';
 import type { HeaderProps } from './Header';
 import type { ModalProps, StyleProp, ViewStyle } from 'react-native';
-import type { PanGesture } from 'react-native-gesture-handler';
+import type { GestureType, PanGesture } from 'react-native-gesture-handler';
 
 export type BottomSheetModalProps = Omit<
   ModalProps,
@@ -110,6 +110,8 @@ export type BottomSheetModalProps = Omit<
    * @default false
    */
   lazy?: boolean;
+
+  nativeGestureItems?: GestureType[];
 };
 
 // TODO in the actual implementation, the height of the bottomsheet is actually the given height + insets.bottom
@@ -119,9 +121,14 @@ const BottomSheetModalContext = createContext<{
   panGesture: PanGesture;
 } | null>(null);
 
-export const useBottomSheetModalContext = () => {
+export const useBottomSheetModalContext = (
+  allowedOutsideOfContext: boolean = false,
+) => {
   const context = useContext(BottomSheetModalContext);
   if (context === null) {
+    if (allowedOutsideOfContext) {
+      return { panGesture: undefined };
+    }
     throw new Error(
       'useBottomSheetModalContext must be used within a BottomSheetModalContext.Provider',
     );
@@ -148,6 +155,7 @@ const BottomSheetModal = ({
   nestedScroll = false,
   avoidKeyboard,
   lazy = false,
+  nativeGestureItems = [],
   ...props
 }: BottomSheetModalProps) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -228,6 +236,7 @@ const BottomSheetModal = ({
   const panGesture = useMemo(
     () =>
       Gesture.Pan()
+        .simultaneousWithExternalGesture(...nativeGestureItems)
         .enabled(!disableGestureInteractionRef.current)
         .onChange(e => {
           panTranslationY.value = Math.max(0, e.translationY) / height;
@@ -239,8 +248,7 @@ const BottomSheetModal = ({
             panTranslationY.value = withSpring(0);
           }
         }),
-
-    [height, panTranslationY],
+    [height, panTranslationY, nativeGestureItems],
   );
 
   useAnimatedReaction(

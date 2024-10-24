@@ -1,0 +1,13 @@
+diff --git a/ios/Decoding.swift b/ios/Decoding.swift
+index 38c5d9a9a978384c1090dbd2e4b7f4807db6ea01..aea3b9d7dc6fbe6cf0b62228d6a78630fd70747e 100644
+--- a/ios/Decoding.swift
++++ b/ios/Decoding.swift
+@@ -109,6 +109,8 @@ func decodeDates(_ input: [ContactDate]?) -> [CNLabeledValue<NSDateComponents>]?
+       val.year = year
+     }
+ 
++    val.calendar = Calendar.current
++
+     let labeledValue = CNLabeledValue(label: label, value: val)
+     output.append(labeledValue)
+   }

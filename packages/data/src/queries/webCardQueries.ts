@@ -1,4 +1,15 @@
-import { eq, sql, lt, desc, and, ne, inArray, isNull, like } from 'drizzle-orm';
+import {
+  eq,
+  sql,
+  lt,
+  desc,
+  and,
+  ne,
+  inArray,
+  isNull,
+  like,
+  count,
+} from 'drizzle-orm';
 import { db, transaction } from '../database';
 import { createId } from '../helpers/createId';
 import {
@@ -291,7 +302,7 @@ export const getWebCardByProfileId = (id: string): Promise<WebCard | null> => {
 
 export const getWebCardProfilesCount = async (webCardId: string) =>
   db()
-    .select({ count: sql`count(*)`.mapWith(Number) })
+    .select({ count: count() })
     .from(ProfileTable)
 
     .where(
@@ -326,7 +337,7 @@ export const getRecommendedWebCards = async (
         eq(WebCardTable.deleted, false),
       ),
     )
-    .orderBy(desc(WebCardTable.createdAt))
+    .orderBy(desc(WebCardTable.starred), desc(WebCardTable.createdAt))
     .then(res => res.map(({ WebCard }) => WebCard));
 };
 

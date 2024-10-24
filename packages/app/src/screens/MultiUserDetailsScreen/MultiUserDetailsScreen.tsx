@@ -23,7 +23,7 @@ import { keyExtractor } from '#helpers/idHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import relayScreen from '#helpers/relayScreen';
-import useAuthState from '#hooks/useAuthState';
+import { useProfileInfos } from '#hooks/authStateHooks';
 import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';
 import ContactCardEditForm from '#screens/ContactCardEditScreen/ContactCardEditForm';
 import HomeStatistics from '#screens/HomeScreen/HomeStatistics';
@@ -55,7 +55,7 @@ export type MultiUserDetailFormValues = ContactCardEditFormValues & {
 const MultiUserDetailsScreen = ({
   preloadedQuery,
 }: RelayScreenProps<MultiUserDetailRoute, MultiUserDetailsScreenQuery>) => {
-  const { profileInfos } = useAuthState();
+  const profileInfos = useProfileInfos();
   const intl = useIntl();
   const styles = useStyleSheet(styleSheet);
 

@@ -1,10 +1,12 @@
 import acceptInvitation from './acceptInvitation';
 import acceptOwnership from './acceptOwnership';
+import addContact from './addContact';
 import cancelTransferOwnership from './cancelTransferOwnership';
 import createPost from './createPost';
 import createPostCommentMutation from './createPostComment';
 import createWebCard from './createWebCard';
 import declineOwnership from './declineOwnership';
+import deleteFCMToken from './deleteFCMToken';
 import deleteModules from './deleteModules';
 import deletePost from './deletePost';
 import deletePostComment from './deletePostComment';
@@ -30,12 +32,15 @@ import {
   endSubscription,
   estimateSubscriptionCost,
   generatePaymentInvoice,
+  renewSubscription,
   updateSubscription,
   updateSubscriptionCustomer,
   upgradeSubscriptionPlan,
 } from './payment';
 import togglePostReaction from './postReaction';
 import quitWebCard from './quitWebCard';
+import removeContacts from './removeContacts';
+import removeContactsFromWebCard from './removeContactsFromWebCard';
 import removeFollower from './removeFollower';
 import removeUsersFromWebCard from './removeUsersFromWebCard';
 import reorderModules from './reorderModules';
@@ -44,6 +49,7 @@ import saveCardStyle from './saveCardStyle';
 import saveCommonInformation from './saveCommonInformation';
 import saveContactCard from './saveContactCard';
 import saveCover from './saveCover';
+import saveFCMToken from './saveFCMToken';
 import sendInvitations from './sendInvitations';
 import sendReport from './sendReport';
 import toggleFollowing from './toggleFollowing';
@@ -115,7 +121,13 @@ export const Mutation: MutationResolvers = {
   endSubscription,
   deletePost,
   updateSubscriptionCustomer,
+  renewSubscription,
   deleteUser,
+  addContact,
+  removeContacts,
+  removeContactsFromWebCard,
+  saveFCMToken,
+  deleteFCMToken,
 };
 
 export default Mutation;

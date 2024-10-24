@@ -35,10 +35,17 @@ const feedHeaderProfileCover = style({
   position: 'relative',
 });
 
+const userName = style({
+  maxWidth: 160,
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+});
+
 const styles = {
   feedHeader,
   feedHeaderProfile,
   feedHeaderProfileCover,
+  userName,
 };
 
 export default styles;

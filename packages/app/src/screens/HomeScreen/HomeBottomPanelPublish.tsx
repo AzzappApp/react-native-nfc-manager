@@ -181,20 +181,12 @@ const HomeBottomPanelPublish = ({ profile }: HomeBottomPanelPublishProps) => {
 export default HomeBottomPanelPublish;
 
 const styles = StyleSheet.create({
-  panel: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'red',
-    borderWidth: 3,
-  },
   informationText: {
     textAlign: 'center',
     color: colors.white,
     marginHorizontal: 50,
     marginTop: 10,
   },
-  container: { flex: 1 },
   message: {
     color: colors.white,
   },

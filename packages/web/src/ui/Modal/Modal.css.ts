@@ -1,5 +1,5 @@
 import { style, keyframes } from '@vanilla-extract/css';
-import { convertHexToRGBA } from '#helpers';
+import { convertHexToRGBA } from '@azzapp/shared/colorsHelpers';
 import { vars } from '#app/[userName]/theme.css';
 
 const slideUp = keyframes({
@@ -43,7 +43,6 @@ const modal = style({
   maxHeight: '100%',
   boxShadow: '0px 1px 25px 0px rgba(0, 0, 0, 0.45)',
   animation: `${slideUp} 0.3s ease-out`,
-  overflow: 'hidden',
   display: 'flex',
   flexDirection: 'column',
 });

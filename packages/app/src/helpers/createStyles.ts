@@ -103,7 +103,7 @@ const composeStyles = <T extends ComposableNamedStyles<T>>(
     const value = styles[key as keyof T];
     result[key as keyof T] = Array.isArray(value)
       ? StyleSheet.flatten(styles[key as keyof T] as any)
-      : value ?? {};
+      : (value ?? {});
   });
   return result as any;
 };

@@ -21,7 +21,7 @@ const useInterval = (func: () => void, time: number, leading = false) => {
         timeoutId = setTimeout(play, time);
       };
 
-      if (!lastPlayTimeRef.current != null && leading) {
+      if (lastPlayTimeRef.current === null && leading) {
         play();
       } else if (lastPlayTimeRef.current) {
         const ellapsedTime = Date.now() - lastPlayTimeRef.current;

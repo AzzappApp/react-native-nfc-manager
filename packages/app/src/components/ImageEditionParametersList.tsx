@@ -70,9 +70,6 @@ const styles = StyleSheet.create({
     width: 80,
     alignItems: 'center',
   },
-  paramsButton: {
-    alignItems: 'center',
-  },
   paramIcon: {
     width: 26,
     height: 26,

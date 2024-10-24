@@ -1,0 +1,14 @@
+extend type Mutation {
+  removeContacts(
+    profileId: ID!
+    input: RemoveContactsInput!
+  ): RemoveContactPayload
+}
+
+input RemoveContactsInput {
+  contactIds: [ID!]!
+}
+
+type RemoveContactPayload {
+  removedContactIds: [ID!]!
+}

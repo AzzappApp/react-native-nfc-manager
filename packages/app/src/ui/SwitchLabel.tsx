@@ -34,12 +34,18 @@ const SwitchLabel = ({
   style,
   labelID,
   labelPosition = 'right',
+  appearance,
   ...props
 }: SwitchLabelProps) => {
   return (
     <View style={[styles.root, style]}>
       {labelPosition === 'left' && (
-        <Text variant="smallbold" style={styles.text} nativeID={labelID}>
+        <Text
+          variant="smallbold"
+          style={styles.text}
+          nativeID={labelID}
+          appearance={appearance}
+        >
           {label}
         </Text>
       )}
@@ -48,6 +54,7 @@ const SwitchLabel = ({
         accessibilityRole="switch"
         accessibilityState={{ selected: props.value, disabled: props.disabled }}
         accessibilityLabelledBy={labelID}
+        appearance={appearance}
       />
       {labelPosition === 'right' && (
         <Text variant="smallbold" style={styles.text} nativeID={labelID}>

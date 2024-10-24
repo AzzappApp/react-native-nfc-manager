@@ -72,17 +72,17 @@ const SearchResultProfiles = ({
   }, [isLoadingNext, hasNext, loadNext]);
 
   return (
-    <CoverList
-      users={users}
-      onEndReached={onEndReached}
-      containerStyle={styles.containerStyle}
-      coverStyle={styles.coverStyle}
-      horizontal={false}
-      numColums={2}
-      initialNumToRender={4}
-      columnWrapperStyle={styles.columnStyle}
-      withShadow
-    />
+    <View style={styles.containerStyle}>
+      <CoverList
+        users={users}
+        onEndReached={onEndReached}
+        coverWidth={COVER_WIDTH}
+        horizontal={false}
+        numColums={2}
+        gap={8}
+        withShadow
+      />
+    </View>
   );
 };
 
@@ -119,14 +119,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginTop: 8,
   },
-  coverStyle: {
-    width: COVER_WIDTH,
-  },
   containerStyle: {
+    flex: 1,
     padding: 4,
-  },
-  columnStyle: {
-    gap: 8,
   },
   profilePlaceHolder: {
     width: COVER_WIDTH - 8,

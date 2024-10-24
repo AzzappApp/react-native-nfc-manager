@@ -34,7 +34,6 @@ const ContactCardEditModalUrls = ({
           <ContactCardEditModalField
             control={control}
             valueKey={`urls.${index}.address`}
-            selectedKey={`urls.${index}.selected`}
             deleteField={() => remove(index)}
             keyboardType="url"
             autoCapitalize="none"
@@ -57,7 +56,7 @@ const ContactCardEditModalUrls = ({
         <PressableNative
           style={styles.addButton}
           onPress={() => {
-            append({ address: '', selected: true });
+            append({ address: '' });
           }}
         >
           <Icon icon="add_filled" style={{ tintColor: colors.green }} />

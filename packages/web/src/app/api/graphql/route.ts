@@ -1,6 +1,9 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { useLogger, useErrorHandler } from '@envelop/core';
-import { UnauthenticatedError, useGenericAuth } from '@envelop/generic-auth';
+import {
+  createUnauthenticatedError,
+  useGenericAuth,
+} from '@envelop/generic-auth';
 import { useParserCache } from '@envelop/parser-cache';
 import { useSentry } from '@envelop/sentry';
 import { useValidationCache } from '@envelop/validation-cache';
@@ -8,8 +11,8 @@ import { maxAliasesPlugin } from '@escape.tech/graphql-armor-max-aliases';
 import { maxTokensPlugin } from '@escape.tech/graphql-armor-max-tokens';
 import { useDisableIntrospection } from '@graphql-yoga/plugin-disable-introspection';
 import { usePersistedOperations } from '@graphql-yoga/plugin-persisted-operations';
+import { waitUntil } from '@vercel/functions';
 import { createYoga } from 'graphql-yoga';
-import { withAxiom } from 'next-axiom';
 import { compare } from 'semver';
 import {
   getDatabaseConnectionsInfos,
@@ -21,6 +24,8 @@ import ERRORS from '@azzapp/shared/errors';
 import { AZZAPP_SERVER_HEADER } from '@azzapp/shared/urlHelpers';
 import queryMap from '#persisted-query-map.json';
 import { buildCoverAvatarUrl } from '#helpers/avatar';
+import { sendPushNotification } from '#helpers/notificationsHelpers';
+import { withPluginsRoute } from '#helpers/queries';
 import { notifyUsers } from '#helpers/sendMessages';
 import { getSessionData } from '#helpers/tokens';
 import packageJSON from '../../../../package.json';
@@ -84,9 +89,8 @@ function useRevalidatePages(): YogaPlugin<GraphQLContext> {
           const cards = getInvalidatedWebCards();
           const posts = getInvalidatedPosts();
           if (cards.length || posts.length) {
-            const res = await fetch(
-              `${process.env.NEXT_PUBLIC_API_ENDPOINT}/revalidate`,
-              {
+            waitUntil(
+              fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/revalidate`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
@@ -96,11 +100,8 @@ function useRevalidatePages(): YogaPlugin<GraphQLContext> {
                   cards,
                   posts,
                 }),
-              },
+              }),
             );
-            if (!res.ok) {
-              console.error('Error revalidating pages');
-            }
           }
         },
       };
@@ -149,6 +150,7 @@ const { handleRequest } = createYoga({
       notifyUsers,
       validateMailOrPhone,
       buildCoverAvatarUrl,
+      sendPushNotification,
     };
   },
   plugins: [
@@ -185,10 +187,7 @@ const { handleRequest } = createYoga({
     useErrorHandler(({ errors }) => {
       console.log({ errors });
       errors
-        .filter(
-          err =>
-            (err as GraphQLError).extensions?.code !== ERRORS.INVALID_TOKEN,
-        )
+        .filter(err => (err as GraphQLError).message !== ERRORS.INVALID_TOKEN)
         .map(err => console.error(err));
     }),
     useParserCache(),
@@ -242,10 +241,9 @@ const { handleRequest } = createYoga({
       },
       validateUser: params => {
         if (!params.user?.userId) {
-          return new UnauthenticatedError(ERRORS.INVALID_TOKEN, {
-            extensions: {
-              code: ERRORS.INVALID_TOKEN,
-            },
+          return createUnauthenticatedError({
+            message: ERRORS.INVALID_TOKEN,
+            statusCode: 200,
           });
         }
       },
@@ -260,7 +258,7 @@ const { handleRequest } = createYoga({
   ],
 });
 
-const handleRequestWithAxiom = withAxiom(handleRequest);
+const handleRequestWithAxiom = withPluginsRoute(handleRequest);
 
 export { handleRequestWithAxiom as GET, handleRequestWithAxiom as POST };
 
@@ -289,3 +287,5 @@ const validateMailOrPhone = async (
     throw new Error('Error validating mail or phone');
   }
 };
+
+//export const runtime = 'nodejs';

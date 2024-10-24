@@ -33,9 +33,9 @@ const fetchWithAuthTokens =
       if (
         (
           res as {
-            errors?: Array<{ extensions: { code: string } }>;
+            errors?: Array<{ message: string }>;
           }
-        ).errors?.some(e => e.extensions?.code === ERRORS.INVALID_TOKEN)
+        ).errors?.some(e => e.message === ERRORS.INVALID_TOKEN)
       ) {
         throw new Error(ERRORS.INVALID_TOKEN);
       }

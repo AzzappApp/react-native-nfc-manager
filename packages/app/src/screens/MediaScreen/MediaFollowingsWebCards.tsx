@@ -8,17 +8,14 @@ import Link from '#components/Link';
 import Button from '#ui/Button';
 import type { CoverList_users$key } from '#relayArtifacts/CoverList_users.graphql';
 import type { MediaFollowingsWebCards_webCard$key } from '#relayArtifacts/MediaFollowingsWebCards_webCard.graphql';
-import type { StyleProp, ViewStyle } from 'react-native';
 
 type MediaFollowingsWebCardsProps = {
   webCard: MediaFollowingsWebCards_webCard$key;
-  style?: StyleProp<ViewStyle>;
   header?: React.ReactNode;
 };
 
 const MediaFollowingsWebCards = ({
   webCard,
-  style,
   header,
 }: MediaFollowingsWebCardsProps) => {
   const { data, loadNext, hasNext, isLoadingNext } = usePaginationFragment(
@@ -60,15 +57,15 @@ const MediaFollowingsWebCards = ({
     <View>
       {header}
       <View>
-        <CoverList
-          users={users}
-          onEndReached={onEndReached}
-          containerStyle={styles.containerStyle}
-          coverStyle={styles.coverStyle}
-          initialNumToRender={10}
-          withShadow
-          style={style}
-        />
+        <View style={styles.containerStyle}>
+          <CoverList
+            users={users}
+            onEndReached={onEndReached}
+            coverWidth={80}
+            withShadow
+            gap={5}
+          />
+        </View>
         <View style={styles.seeAll}>
           <Link route="FOLLOWINGS_MOSAIC">
             <Button
@@ -89,7 +86,6 @@ export default MediaFollowingsWebCards;
 
 const styles = StyleSheet.create({
   containerStyle: {
-    paddingHorizontal: 8,
     paddingBottom: 20,
     paddingTop: 16.5,
   },

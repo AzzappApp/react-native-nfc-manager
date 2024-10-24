@@ -150,22 +150,24 @@ const renderItem = ({
   item,
   columnIndex,
   extraData: { itemWidth, canPlay, videoToPlays },
-}: MasonryListRenderItemInfo<Post>) => {
+}: MasonryListRenderItemInfo<Post | null>) => {
   return (
-    <View
-      style={[
-        columnIndex === 0
-          ? { paddingLeft: 8, paddingRight: 4 }
-          : { paddingLeft: 4, paddingRight: 8 },
-        { paddingBottom: 8 },
-      ]}
-    >
-      <MemoPostRenderer
-        item={item}
-        width={itemWidth}
-        videoDisabled={!canPlay || !videoToPlays.includes(item.id)}
-      />
-    </View>
+    item && (
+      <View
+        style={[
+          columnIndex === 0
+            ? { paddingLeft: 8, paddingRight: 4 }
+            : { paddingLeft: 4, paddingRight: 8 },
+          { paddingBottom: 8 },
+        ]}
+      >
+        <MemoPostRenderer
+          item={item}
+          width={itemWidth}
+          videoDisabled={!canPlay || !videoToPlays.includes(item.id)}
+        />
+      </View>
+    )
   );
 };
 
@@ -189,12 +191,12 @@ const overrideItemLayout = (
 
 export default PostsGrid;
 
-const getItemType = (post: Post, index: number) => {
+const getItemType = (post: Post | null, index: number) => {
   // allow to prevent blanking when scroll to top see: https://github.com/Shopify/flash-list/issues/76#issuecomment-1257642374
   if (Platform.OS === 'ios' && index < 10) {
     return 'fixed';
   }
-  if (post.media?.__typename === 'MediaVideo') {
+  if (post?.media?.__typename === 'MediaVideo') {
     return 'video';
   } else {
     return 'image';

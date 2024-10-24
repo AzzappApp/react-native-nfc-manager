@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { graphql, useMutation } from 'react-relay';
-import useAuthState from './useAuthState';
+import { getAuthState } from '#helpers/authStore';
 
 const UPDATE_WEB_CARD_VIEWS = graphql`
   mutation useStatisticsWebcardViewsMutation($input: UpdateWebCardViewsInput!) {
@@ -18,13 +18,12 @@ export const UPDATE_CONTACT_CARD_SCANS = graphql`
 
 export function useWebCardViewStatistic(webCardId: string | undefined) {
   const [commit] = useMutation(UPDATE_WEB_CARD_VIEWS);
-  const { profileInfos } = useAuthState();
   useEffect(() => {
     if (webCardId) {
+      const { profileInfos } = getAuthState();
       commit({
         variables: { input: { webCardId, profileId: profileInfos?.profileId } },
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [webCardId]);
+  }, [commit, webCardId]);
 }

@@ -12,10 +12,11 @@ export const CoverTemplate: CoverTemplateResolvers = {
     return coverTemplateTypeLoader.load(typeId);
   },
   data: async ({ params }) => params,
-  preview: async ({ previewId }) => {
+  preview: async ({ previewId, previewPositionPercentage }) => {
     return {
       media: previewId,
       assetKind: 'coverPreview',
+      previewPositionPercentage,
     };
   },
   lottie: async ({ lottieId }) => getCloudinaryAssetURL(lottieId, 'raw'),

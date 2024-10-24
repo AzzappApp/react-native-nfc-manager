@@ -1,10 +1,12 @@
 import { FlashList } from '@shopify/flash-list';
 import { useCallback, useMemo, useState } from 'react';
-import { FormattedMessage } from 'react-intl';
-import { Dimensions, useColorScheme, View } from 'react-native';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { Alert, Dimensions, useColorScheme, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
+import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import PostRenderer from '#components/PostList/PostRenderer';
+import { useProfileInfos } from '#hooks/authStateHooks';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { HEADER_HEIGHT } from '#ui/Header';
 import Icon from '#ui/Icon';
@@ -47,7 +49,7 @@ const { height: windowHeight, width: windowWidth } = Dimensions.get('window');
 // TODO docs and tests once this component is production ready
 const PostList = ({
   posts: postKey,
-  author,
+  author: authorKey,
   viewerWebCard: viewerWebCardKey,
   profile: profileKey,
   canPlay = true,
@@ -60,6 +62,7 @@ const PostList = ({
   firstItemVideoTime,
   ...props
 }: PostListProps) => {
+  const profileInfos = useProfileInfos();
   const posts = useFragment(
     graphql`
       fragment PostList_posts on Post
@@ -77,11 +80,14 @@ const PostList = ({
           @arguments(viewerWebCardId: $viewerWebCardId)
         webCard @include(if: $includeAuthor) {
           ...PostRendererFragment_author
+          ...PostList_author
         }
       }
     `,
     postKey,
   );
+
+  const intl = useIntl();
 
   const viewerWebCard = useFragment(
     graphql`
@@ -103,15 +109,91 @@ const PostList = ({
     profileKey ?? null,
   );
 
-  const postActionEnabled = useMemo(
-    () =>
-      viewerWebCard?.cardIsPublished != null
-        ? !viewerProfile?.invited
-          ? !!viewerWebCard?.cardIsPublished
-          : false
-        : false,
-    [viewerProfile?.invited, viewerWebCard?.cardIsPublished],
+  const author = useFragment(
+    graphql`
+      fragment PostList_author on WebCard {
+        id
+      }
+    `,
+    authorKey,
   );
+
+  const postActionEnabled = useMemo(() => {
+    if (viewerWebCard?.cardIsPublished != null) {
+      if (!viewerProfile?.invited) {
+        //card is not published. We can do action only
+        // if we are the owner and we are displaying his own list of post (author is provided)
+        if (
+          profileHasAdminRight(profileInfos?.profileRole) &&
+          profileInfos.webCardId === author?.id
+        ) {
+          return true;
+        }
+        return !!viewerWebCard?.cardIsPublished;
+      }
+      return false;
+    } else {
+      return false;
+    }
+  }, [
+    author?.id,
+    profileInfos?.profileRole,
+    profileInfos?.webCardId,
+    viewerProfile?.invited,
+    viewerWebCard?.cardIsPublished,
+  ]);
+
+  const onActionDisabled = useCallback(() => {
+    if (!viewerWebCard?.cardIsPublished) {
+      Alert.alert(
+        intl.formatMessage({
+          defaultMessage: 'Unpublished WebCard.',
+          description:
+            'PostList - Alert Message title when the user is viewing a post (from deeplinking) with an unpublished WebCard',
+        }),
+        intl.formatMessage({
+          defaultMessage:
+            'This action can only be done from a published WebCard.',
+          description:
+            'PostList - AlertMessage when the user is viewing a post (from deeplinking) with an unpublished WebCard',
+        }),
+        [
+          {
+            text: intl.formatMessage({
+              defaultMessage: 'Ok',
+              description:
+                'PostList - Alert button when the user is viewing a post (from deeplinking) with an unpublished WebCard',
+            }),
+          },
+        ],
+      );
+    }
+
+    if (viewerProfile?.invited) {
+      Alert.alert(
+        intl.formatMessage({
+          defaultMessage: 'Invitation pending.',
+          description:
+            'PostList - Alert Message title when the user is viewing a post (from deeplinking) with an invited WebCard',
+        }),
+        intl.formatMessage({
+          defaultMessage:
+            'Oops, first you must accept the pending invitation to join the WebCard.',
+          description:
+            'PostList - AlertMessage when the user is viewing a post (from deeplinking) with an invited WebCard',
+        }),
+        [
+          {
+            text: intl.formatMessage({
+              defaultMessage: 'Ok',
+              description:
+                'PostList - Alert button when the user is viewing a post (from deeplinking) with an invited WebCard',
+            }),
+          },
+        ],
+      );
+    }
+  }, [intl, viewerProfile?.invited, viewerWebCard?.cardIsPublished]);
 
   const [visiblePostIds, setVisiblePostIds] = useState<{
     played: string | null;
@@ -195,26 +277,33 @@ const PostList = ({
           videoDisabled={!extraData.canPlay}
           width={windowWidth}
           onPressAuthor={onPressAuthor}
-          author={item.webCard ?? extraData.author!}
+          author={item.webCard ?? extraData.authorKey!}
           actionEnabled={extraData.postActionEnabled}
+          onActionDisabled={onActionDisabled}
           showUnpublished={extraData.showUnpublished}
           useAnimationSnapshot={index === 0}
           initialTime={index === 0 ? extraData.firstItemVideoTime : undefined}
         />
       ) : null;
     },
-    [onPressAuthor],
+    [onActionDisabled, onPressAuthor],
   );
 
   const extraData = useMemo(
     () => ({
       canPlay,
-      author,
+      authorKey,
       firstItemVideoTime,
       postActionEnabled,
       showUnpublished,
     }),
-    [canPlay, author, postActionEnabled, firstItemVideoTime, showUnpublished],
+    [
+      canPlay,
+      authorKey,
+      postActionEnabled,
+      firstItemVideoTime,
+      showUnpublished,
+    ],
   );
 
   const ListFooterComponent = useMemo(

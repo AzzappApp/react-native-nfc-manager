@@ -174,7 +174,8 @@ const WheelSelector = ({
               height: 20,
               width: 6,
               borderRadius: 3,
-              backgroundColor: colors.black,
+              backgroundColor:
+                colorScheme === 'light' ? colors.black : colors.white,
               pointerEvents: 'box-none',
             }}
           />

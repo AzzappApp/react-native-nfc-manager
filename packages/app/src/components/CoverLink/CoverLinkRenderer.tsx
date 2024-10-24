@@ -13,6 +13,7 @@ const CoverLink = ({
   coverStyle,
   prefetch = false,
   onPress,
+  onLongPress,
   disabled,
   ...props
 }: CoverLinkRendererProps) => {
@@ -35,7 +36,11 @@ const CoverLink = ({
       prefetch={prefetch}
       disabled={disabled}
     >
-      <PressableScaleHighlight style={containerStyle} onPress={onPress}>
+      <PressableScaleHighlight
+        style={containerStyle}
+        onPress={onPress}
+        onLongPress={onLongPress}
+      >
         <CoverRenderer {...props} style={coverStyle} />
       </PressableScaleHighlight>
     </Link>

@@ -13,7 +13,7 @@ import ContactCard, {
 } from '#components/ContactCard/ContactCard';
 import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import useAuthState from '#hooks/useAuthState';
+import { useProfileInfos } from '#hooks/authStateHooks';
 import FingerHint from '#ui/FingerHint';
 import PressableNative from '#ui/PressableNative';
 import { useHomeScreenCurrentIndex } from './HomeScreenContext';
@@ -112,9 +112,9 @@ const ContactCardItem = ({ height, item, index }: ContactCardItemProps) => {
     item,
   );
 
-  const authState = useAuthState();
+  const profileInfos = useProfileInfos();
   const router = useRouter();
-  const disabled = authState.profileInfos?.profileId !== profile.id;
+  const disabled = profileInfos?.profileId !== profile.id;
 
   const onPressContactCard = useCallback(() => {
     if (!disabled) {
@@ -163,6 +163,7 @@ const ContactCardItem = ({ height, item, index }: ContactCardItemProps) => {
                 profile={profile}
                 height={Math.min(height, maxHeight)}
                 style={styles.card}
+                withRotationArrows
               />
             </PressableNative>
           </View>

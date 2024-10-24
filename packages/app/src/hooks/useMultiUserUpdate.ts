@@ -3,7 +3,7 @@ import { useIntl } from 'react-intl';
 import Toast from 'react-native-toast-message';
 import { graphql, useMutation } from 'react-relay';
 import ERRORS from '@azzapp/shared/errors';
-import useAuthState from './useAuthState';
+import { getAuthState } from '#helpers/authStore';
 import type { useMultiUserUpdateMutation } from '#relayArtifacts/useMultiUserUpdateMutation.graphql';
 
 export const useMultiUserUpdate = (onCompleted?: () => void) => {
@@ -24,10 +24,9 @@ export const useMultiUserUpdate = (onCompleted?: () => void) => {
 
   const intl = useIntl();
 
-  const { profileInfos } = useAuthState();
-
   const setAllowMultiUser = useCallback(
     (value: boolean) => {
+      const { profileInfos } = getAuthState();
       commit({
         variables: {
           webCardId: profileInfos?.webCardId ?? '',
@@ -83,13 +82,7 @@ export const useMultiUserUpdate = (onCompleted?: () => void) => {
         },
       });
     },
-    [
-      commit,
-      intl,
-      onCompleted,
-      profileInfos?.profileId,
-      profileInfos?.webCardId,
-    ],
+    [commit, intl, onCompleted],
   );
 
   return setAllowMultiUser;

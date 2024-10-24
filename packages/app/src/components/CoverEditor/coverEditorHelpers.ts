@@ -281,3 +281,16 @@ export const getMaxAllowedVideosPerCover = (hasLottie: boolean) =>
     : MEMORY_SIZE < 6
       ? 2
       : 3;
+
+export const calculateBoxSize = (options: {
+  height: number;
+  hasLabel: boolean;
+  ratio: number;
+  fixedItemWidth?: number;
+}) => {
+  const itemHeight = options.height - 12 - (options.hasLabel ? 25 : 0);
+  const itemWidth = itemHeight * options.ratio;
+  const width = options.fixedItemWidth ?? itemWidth + 12;
+
+  return { itemHeight, itemWidth, width };
+};

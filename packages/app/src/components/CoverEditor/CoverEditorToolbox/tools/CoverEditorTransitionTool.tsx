@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 import {
   Canvas,
   FilterMode,
@@ -21,6 +20,7 @@ import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import BoxSelectionList from '#components/BoxSelectionList';
 import { DoneHeaderButton } from '#components/commonsButtons';
+import { keyExtractor } from '#helpers/idHelpers';
 import useToggle from '#hooks/useToggle';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Text from '#ui/Text';
@@ -180,8 +180,6 @@ const CoverEditorTransitionTool = () => {
 };
 
 export default memo(CoverEditorTransitionTool);
-
-const keyExtractor = (item: CoverTransitionsListItem) => item.id;
 
 const PAUSE_TIME = 1;
 const ANIMATION_TIME_SCALE = 2;

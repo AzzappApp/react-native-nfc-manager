@@ -1,18 +1,18 @@
 {
   "name": "@azzapp/i18n",
-  "version": "0.9.10",
+  "version": "0.9.12",
   "private": true,
   "types": "index.d.ts",
   "main": "index.js",
   "scripts": {
+    "lint": "eslint .",
     "prepare": "node ./scripts/prepare.js",
     "build:app": "formatjs compile-folder --format simple --ast src/app compiled/app",
     "build:web": "formatjs compile-folder --format simple --ast src/web compiled/web",
     "extract:app": "formatjs extract '../app/src/**/*.ts*' --out-file src/appMessages.json --id-interpolation-pattern '[sha1:contenthash:base64:6]'",
     "extract:web": "formatjs extract '../web/src/**/*.ts*' --out-file src/webMessages.json --id-interpolation-pattern '[sha1:contenthash:base64:6]'",
     "extract": "yarn extract:app && yarn extract:web",
-    "purge": "node ./scripts/purgeTranslationsKey.js",
-    "pull": "node ./scripts/pullTranslations.js",
+    "pull": "node ./scripts/fetchMessages.js",
     "clean": "rm -rf node_modules && rm -rf compiled"
   },
   "dependencies": {

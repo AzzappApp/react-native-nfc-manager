@@ -18,9 +18,13 @@ import {
   useScreenHasFocus,
   type ScreenOptions,
 } from '#components/NativeRouter';
-import useAuthState from '#hooks/useAuthState';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
+import {
+  addAuthStateListener,
+  getAuthState,
+  type ProfileInfos,
+} from './authStore';
 import {
   disposeQueryFor,
   getLoadQueryInfo,
@@ -67,6 +71,11 @@ export type RelayScreenOptions<TRoute extends Route> = LoadQueryOptions<
      * @default true
      */
     stopPollingWhenNotFocused?: boolean;
+    /**
+     * If true, the screen will refresh the query when it gains focus.
+     * @default false
+     */
+    refreshOnFocus?: boolean;
   };
 
 /**
@@ -80,6 +89,10 @@ export type RelayScreenProps<
    * The preloaded query.
    */
   preloadedQuery: PreloadedQuery<P>;
+  /**
+   * A function to refresh the query.
+   */
+  refreshQuery?: () => void;
 };
 
 /**
@@ -109,6 +122,7 @@ function relayScreen<TRoute extends Route>(
     profileBound = true,
     pollInterval,
     stopPollingWhenNotFocused = true,
+    refreshOnFocus = false,
     ...options
   }: RelayScreenOptions<TRoute> & {
     getScreenOptions?: (
@@ -126,19 +140,26 @@ function relayScreen<TRoute extends Route>(
       route: { params },
     } = props;
 
-    const { profileInfos } = useAuthState();
-
-    const oldProfileInfosRef = useRef(profileInfos);
+    const profileInfosRef = useRef<ProfileInfos | null>(null);
+    useEffect(() => {
+      profileInfosRef.current = profileBound
+        ? getAuthState().profileInfos
+        : null;
+    }, []);
 
     useEffect(() => {
-      if (
-        profileBound &&
-        !isEqual(oldProfileInfosRef.current ?? null, profileInfos ?? null)
-      ) {
-        oldProfileInfosRef.current = profileInfos;
-        disposeQueryFor(screenId);
-      }
-    }, [params, profileInfos, screenId]);
+      addAuthStateListener(() => {
+        const newProfileInfos = profileBound
+          ? getAuthState().profileInfos
+          : null;
+        if (
+          !isEqual(profileInfosRef.current ?? null, newProfileInfos ?? null)
+        ) {
+          disposeQueryFor(screenId);
+          profileInfosRef.current = newProfileInfos;
+        }
+      });
+    }, [params, screenId]);
 
     const { preloadedQuery } = useManagedQuery((props as any).screenId) ?? {};
 
@@ -151,6 +172,23 @@ function relayScreen<TRoute extends Route>(
     }, [screenId, params, preloadedQuery, hasFocus]);
 
     const environment = useRelayEnvironment();
+
+    const refreshQuery = useCallback(() => {
+      const { query, variables } = getLoadQueryInfo(
+        options,
+        params,
+        profileInfosRef.current,
+      );
+      const { useOfflineCache } = options;
+      fetchQuery(environment, query, variables, {
+        fetchPolicy: 'network-only',
+        networkCacheConfig: {
+          force: true,
+          metadata: { useOfflineCache },
+        },
+      });
+    }, [environment, params]);
+
     useEffect(() => {
       let currentTimeout: any;
       let currentSubscription: Subscription | null;
@@ -160,38 +198,45 @@ function relayScreen<TRoute extends Route>(
         Number.isInteger(pollInterval) &&
         (props.hasFocus || !stopPollingWhenNotFocused)
       ) {
-        const poll = () => {
-          currentTimeout = setTimeout(() => {
-            const { query, variables } = getLoadQueryInfo(
-              options,
-              params,
-              profileInfos,
-            );
-            currentSubscription = fetchQuery(environment, query, variables, {
-              fetchPolicy: 'network-only',
-              networkCacheConfig: { force: true },
-            }).subscribe({
-              complete: () => {
-                retryCount = 0;
-                if (cancelled) {
-                  return;
-                }
-                poll();
-              },
-              error: () => {
-                retryCount += 1;
-                setTimeout(
-                  () => {
-                    if (cancelled) {
-                      return;
-                    }
-                    poll();
-                  },
-                  2 ** Math.min(retryCount, 5) * 1000,
-                );
-              },
-            });
-          }, pollInterval);
+        const poll = (interval?: number) => {
+          currentTimeout = setTimeout(
+            () => {
+              const { query, variables } = getLoadQueryInfo(
+                options,
+                params,
+                profileInfosRef.current,
+              );
+              const { useOfflineCache } = options;
+              currentSubscription = fetchQuery(environment, query, variables, {
+                fetchPolicy: 'network-only',
+                networkCacheConfig: {
+                  force: true,
+                  metadata: { useOfflineCache },
+                },
+              }).subscribe({
+                complete: () => {
+                  retryCount = 0;
+                  if (cancelled) {
+                    return;
+                  }
+                  poll(pollInterval);
+                },
+                error: () => {
+                  retryCount += 1;
+                  setTimeout(
+                    () => {
+                      if (cancelled) {
+                        return;
+                      }
+                      poll(pollInterval);
+                    },
+                    2 ** Math.min(retryCount, 5) * 1000,
+                  );
+                },
+              });
+            },
+            interval ?? (refreshOnFocus ? 0 : pollInterval),
+          );
         };
         poll();
       }
@@ -200,7 +245,7 @@ function relayScreen<TRoute extends Route>(
         currentSubscription?.unsubscribe();
         clearTimeout(currentTimeout);
       };
-    }, [environment, params, profileInfos, props.hasFocus, screenId]);
+    }, [environment, params, props.hasFocus, screenId]);
 
     const intl = useIntl();
     const router = useRouter();
@@ -264,7 +309,11 @@ function relayScreen<TRoute extends Route>(
     const inner = (
       <Suspense fallback={Fallback ? <Fallback {...props} /> : null}>
         {preloadedQuery && (
-          <Component {...props} preloadedQuery={preloadedQuery} />
+          <Component
+            {...props}
+            preloadedQuery={preloadedQuery}
+            refreshQuery={refreshQuery}
+          />
         )}
       </Suspense>
     );

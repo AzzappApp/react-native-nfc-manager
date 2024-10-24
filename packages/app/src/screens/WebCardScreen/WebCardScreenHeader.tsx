@@ -121,8 +121,12 @@ const WebCardScreenHeader = ({
               <Text variant="large">
                 {selectionMode ? (
                   <FormattedMessage
-                    defaultMessage="{nbSelectedModules} selected"
-                    description="Webcard builder header title in module edition mode"
+                    defaultMessage="{nbSelectedModules, plural,
+              =0 {# selected}
+              =1 {# selected}
+              other {# selected}
+      }"
+                    description="Webcard builder header title in module edition mode with selected modules"
                     values={{
                       nbSelectedModules,
                     }}
@@ -230,9 +234,6 @@ const WebCardScreenHeader = ({
 export default WebCardScreenHeader;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   closeButton: {
     position: 'absolute',
     start: 15,

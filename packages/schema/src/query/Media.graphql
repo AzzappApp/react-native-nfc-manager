@@ -20,8 +20,9 @@ type MediaVideo implements Media {
     pixelRatio: Float
     height: Float
     width: Float
-    videoDurationPercentage: Int
+    videoDurationPercentage: Int @deprecated(reason: "Use coverPreviewPositionPercentage instead")
   ): String!
+  coverPreviewPositionPercentage: Int
 }
 
 """

@@ -4,7 +4,6 @@ import { act, fireEvent, render, screen } from '#helpers/testHelpers';
 import { SearchScreen } from '../SearchScreen';
 
 jest.mock('../SearchTabContainer', () => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { createElement } = require('react');
   function SearchTabContainer({
     searchValue,

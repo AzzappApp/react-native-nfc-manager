@@ -80,11 +80,11 @@ const SearchResultGlobalListHeader = ({
         <CoverList
           users={users}
           onEndReached={onEndReachedCover}
-          containerStyle={styles.containerStyle}
-          coverStyle={styles.coverStyle}
-          style={styles.coverListStyle}
+          coverWidth={80}
           withShadow
+          gap={5}
         />
+
         <View style={styles.seeAll}>
           <Button
             variant="little_round"
@@ -135,14 +135,12 @@ export const SearchResultGlobalListHeaderPlaceholder = () => {
 };
 
 const styles = StyleSheet.create({
-  flexOne: { flex: 1 },
   titleSection: {
     marginTop: 17,
     marginBottom: 7,
     marginLeft: 10,
   },
-  coverStyle: { width: 80 },
-  containerStyle: { paddingLeft: 3 },
+
   profilePlaceHolder: {
     width: 80,
     aspectRatio: COVER_RATIO,
@@ -151,10 +149,6 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     marginRight: 2.5,
     backgroundColor: colors.grey50,
-  },
-  coverListStyle: {
-    height: 128,
-    overflow: 'visible',
   },
   seeAll: {
     position: 'absolute',

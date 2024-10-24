@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from 'react';
 import Purchases from 'react-native-purchases';
 import { graphql, useLazyLoadQuery } from 'react-relay';
-import useAuthState from './useAuthState';
+import { useProfileInfos } from './authStateHooks';
 import type { useSetRevenueCatUserInfoQuery } from '#relayArtifacts/useSetRevenueCatUserInfoQuery.graphql';
 const setRevenueCatUserInfoQuery = graphql`
   query useSetRevenueCatUserInfoQuery {
@@ -20,7 +20,7 @@ export function useSetRevenueCatUserInfo() {
     { fetchPolicy: 'store-and-network' },
   );
 
-  const { profileInfos } = useAuthState();
+  const profileInfos = useProfileInfos();
 
   const setUserInfo = useCallback(async () => {
     const appUserId = await Purchases.getAppUserID();

@@ -1,6 +1,6 @@
 import { memo, useCallback } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { FlatList, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -11,6 +11,7 @@ import SearchBar from '#ui/SearchBar';
 import Text from '#ui/Text';
 import CoverLinkRenderer from './CoverLink/CoverLinkRenderer';
 import Link from './Link';
+import type { ColorSchemeName } from '#helpers/createStyles';
 import type {
   WebCardList_webCard$data,
   WebCardList_webCard$key,
@@ -152,41 +153,39 @@ const WebCardList = ({
 
 export default WebCardList;
 
-const styleSheet = createStyleSheet(appareance =>
-  StyleSheet.create({
-    container: {
-      flexGrow: 1,
-      rowGap: SEPARATOR_HEIGHT,
-    },
-    header: { paddingHorizontal: 10 },
-    item: {
-      paddingRight: 10,
-      columnGap: 15.5,
-      flexDirection: 'row',
-      alignItems: 'center',
-      width: '100%',
-    },
-    profile: {
-      paddingLeft: 20.5,
-      columnGap: 15.5,
-      flexDirection: 'row',
-      alignItems: 'center',
-      flex: 1,
-    },
-    deleteIconButton: {
-      marginLeft: 'auto',
-    },
-    deleteIcon: {
-      tintColor: appareance === 'dark' ? '#fff' : '#000',
-    },
-    empty: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    footer: {
-      height: 10,
-      width: '100%',
-    },
-  }),
-);
+const styleSheet = createStyleSheet((appareance: ColorSchemeName) => ({
+  container: {
+    flexGrow: 1,
+    rowGap: SEPARATOR_HEIGHT,
+  },
+  header: { paddingHorizontal: 10 },
+  item: {
+    paddingRight: 10,
+    columnGap: 15.5,
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+  },
+  profile: {
+    paddingLeft: 20.5,
+    columnGap: 15.5,
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  deleteIconButton: {
+    marginLeft: 'auto',
+  },
+  deleteIcon: {
+    tintColor: appareance === 'dark' ? '#fff' : '#000',
+  },
+  empty: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  footer: {
+    height: 10,
+    width: '100%',
+  },
+}));
