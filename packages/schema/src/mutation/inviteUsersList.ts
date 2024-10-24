@@ -16,7 +16,7 @@ import { guessLocale } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
 import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
-import { notifyUsers } from '#externals';
+import { notifyUsers, sendPushNotification } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
 import {
   profileLoader,
@@ -181,6 +181,16 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
     }
     for (const { id, ...profile } of profilesToUpdate) {
       await updateProfile(id, profile);
+      const existingUser = users.find(user => user.id === profile.userId);
+      if (existingUser) {
+        await sendPushNotification(existingUser.id, {
+          type: 'multiuser_invitation',
+          mediaId: webCard.coverMediaId,
+          deepLink: 'multiuser_invitation',
+          localeParams: { userName: webCard.userName },
+          locale: guessLocale(existingUser?.locale),
+        });
+      }
     }
 
     const createdProfiles = (
