@@ -1,5 +1,6 @@
-## 0.9.11-canary.14
+## 0.9.11-canary.15
 
+* **fix:**  - 🐛 correctly save with module style ([#5575](https://github.com/AzzappApp/azzapp/pull/5575))
 * **fix:**  - white list mozilla for vcard download ([#5570](https://github.com/AzzappApp/azzapp/pull/5570))
 * **fix:**  - allow to restore position on remount of VideoCompositionRenderer ([#5571](https://github.com/AzzappApp/azzapp/pull/5571))
 * **feat:**  - 🎸 search webcard include first and last name ([#5568](https://github.com/AzzappApp/azzapp/pull/5568))
