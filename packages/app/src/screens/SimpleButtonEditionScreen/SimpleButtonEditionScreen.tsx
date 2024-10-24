@@ -332,7 +332,7 @@ const SimpleButtonEditionScreen = ({
     }
 
     const input: SaveSimpleButtonModuleInput = {
-      ...value,
+      ...data,
       moduleId: simpleButton?.id,
       buttonLabel: value.buttonLabel!,
       actionType: value.actionType!,
@@ -364,6 +364,7 @@ const SimpleButtonEditionScreen = ({
     profile.webCard,
     cardModulesCount,
     value,
+    data,
     simpleButton?.id,
     fontSize.value,
     borderWidth.value,

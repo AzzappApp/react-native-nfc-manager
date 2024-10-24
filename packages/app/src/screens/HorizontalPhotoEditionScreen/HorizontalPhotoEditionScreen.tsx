@@ -324,7 +324,7 @@ const HorizontalPhotoEditionScreen = ({
 
     setProgressIndicator(Observable.from(0));
 
-    const { image: updateMedia, ...rest } = value;
+    const { image: updateMedia } = value;
 
     let mediaId = updateMedia?.id;
     if (!mediaId && updateMedia?.uri) {
@@ -366,9 +366,9 @@ const HorizontalPhotoEditionScreen = ({
     }
 
     const input: SaveHorizontalPhotoModuleInput = {
+      ...data,
       moduleId: horizontalPhoto?.id,
       image: mediaId ?? value.image!.id,
-      ...rest,
       marginHorizontal: marginHorizontal.value,
       marginVertical: marginVertical.value,
       borderWidth: borderWidth.value,
@@ -400,6 +400,7 @@ const HorizontalPhotoEditionScreen = ({
     cardModulesCount,
     profile.webCard,
     value,
+    data,
     horizontalPhoto?.id,
     marginHorizontal.value,
     marginVertical.value,

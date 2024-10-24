@@ -430,7 +430,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
 
     setProgressIndicator(Observable.from(0));
 
-    const { image: updateImage, ...rest } = value;
+    const { image: updateImage } = value;
     let mediaId = updateImage?.id;
 
     if (!mediaId && updateImage?.uri) {
@@ -470,8 +470,8 @@ const PhotoWithTextAndTitleEditionScreen = ({
     }
 
     const input: SavePhotoWithTextAndTitleModuleInput = {
+      ...data,
       moduleId: photoWithTextAndTitle?.id,
-      ...rest,
       titleFontSize: titleFontSize.value,
       titleVerticalSpacing: titleVerticalSpacing.value,
       contentFontSize: contentFontSize.value,
@@ -511,9 +511,10 @@ const PhotoWithTextAndTitleEditionScreen = ({
     });
   }, [
     canSave,
-    cardModulesCount,
     profile.webCard,
+    cardModulesCount,
     value,
+    data,
     photoWithTextAndTitle?.id,
     titleFontSize.value,
     titleVerticalSpacing.value,

@@ -314,7 +314,7 @@ const SimpleTextEditionScreen = ({
       variables: {
         webCardId: profile.webCard?.id,
         input: {
-          ...value,
+          ...data,
           fontSize: fontSize.value,
           verticalSpacing: verticalSpacing.value,
           marginHorizontal: marginHorizontal.value,
@@ -339,6 +339,7 @@ const SimpleTextEditionScreen = ({
     cardModulesCount,
     commit,
     value,
+    data,
     fontSize.value,
     verticalSpacing.value,
     marginHorizontal.value,

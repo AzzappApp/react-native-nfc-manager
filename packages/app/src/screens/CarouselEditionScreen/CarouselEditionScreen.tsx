@@ -353,7 +353,7 @@ const CarouselEditionScreen = ({
 
     setProgressIndicator(Observable.from(0));
 
-    const { images, ...rest } = value;
+    const { images } = value;
 
     let mediasMap: Record<
       string,
@@ -432,6 +432,7 @@ const CarouselEditionScreen = ({
       variables: {
         webCardId: profile.webCard.id,
         input: {
+          ...data,
           images: images!.map(image => {
             if ('local' in image) {
               return mediasMap[image.uri].id;
@@ -439,7 +440,6 @@ const CarouselEditionScreen = ({
             return image.id;
           }),
           moduleId: carousel?.id,
-          ...rest,
           borderWidth: borderWidth.value,
           borderRadius: borderRadius.value,
           imageHeight: imageHeight.value,
@@ -467,6 +467,7 @@ const CarouselEditionScreen = ({
     profile.webCard?.isPremium,
     profile.webCard?.id,
     value,
+    data,
     commit,
     carousel?.id,
     borderWidth.value,

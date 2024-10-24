@@ -892,7 +892,7 @@ export const SIMPLE_TEXT_DEFAULT_VALUES_PRIMARY = {
     backgroundColor: 'primary',
     patternColor: 'light',
   },
-  fontColor: 'primary',
+  fontColor: 'light',
 } as const;
 
 export const getTextDefaultValues = (

@@ -301,7 +301,7 @@ const BlockTextEditionScreen = ({
     }
 
     const input: SaveBlockTextModuleInput = {
-      ...value,
+      ...data,
       moduleId: blockText?.id,
       text: value.text!,
       textMarginHorizontal: textMarginHorizontal.value,
@@ -332,6 +332,7 @@ const BlockTextEditionScreen = ({
     profile.webCard?.isPremium,
     profile.webCard?.id,
     value,
+    data,
     blockText?.id,
     textMarginHorizontal.value,
     textMarginVertical.value,
