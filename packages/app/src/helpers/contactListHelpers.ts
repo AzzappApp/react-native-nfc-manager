@@ -1,5 +1,4 @@
 import * as FileSystem from 'expo-file-system';
-import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import type { ContactsScreenLists_contacts$data } from '#relayArtifacts/ContactsScreenLists_contacts.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { Contact } from 'expo-contacts';
