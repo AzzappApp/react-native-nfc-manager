@@ -79,8 +79,7 @@ const styles = StyleSheet.create({
     left: 0,
     flex: 1,
     width: '100%',
-    // Special cases when styled height is not correctly calculated: force background to take all available space
-    height: '100.1%',
+    height: '100%',
     zIndex: -1,
   },
 });

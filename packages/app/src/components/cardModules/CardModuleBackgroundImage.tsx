@@ -69,6 +69,7 @@ const CardModuleBackgroundImage = (props: CardModuleBackgroundImageProps) => {
   }
   const svgWidth = svg.width();
   const svgHeight = svg.height();
+
   if (resizeMode === 'repeat') {
     const numberOfColumns = Math.ceil(layout.width / svgWidth);
     const numberOfRows = Math.ceil(layout.height / svgHeight);
@@ -114,7 +115,7 @@ const CardModuleBackgroundImage = (props: CardModuleBackgroundImageProps) => {
 
   return (
     svg && (
-      <Canvas style={styles.container}>
+      <Canvas style={[styles.container, { height: Math.ceil(dst.height) }]}>
         <Group
           opacity={backgroundOpacity}
           transform={fitbox(
@@ -150,7 +151,6 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     width: '100%',
-    height: '100%',
     zIndex: -1,
     pointerEvents: 'none',
   },
