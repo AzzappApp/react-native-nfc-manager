@@ -1,5 +1,6 @@
-## 0.9.11-canary.16
+## 0.9.11-canary.17
 
+* **fix:**  - sendNotification on batch invites user ([#5584](https://github.com/AzzappApp/azzapp/pull/5584))
 * **fix:**  - bottom white line appearing on some module background - proper way removint 100.1% hack ([#5578](https://github.com/AzzappApp/azzapp/pull/5578))
 * **fix:**  - 🐛 correctly save with module style ([#5575](https://github.com/AzzappApp/azzapp/pull/5575))
 * **fix:**  - white list mozilla for vcard download ([#5570](https://github.com/AzzappApp/azzapp/pull/5570))
