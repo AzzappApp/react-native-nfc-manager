@@ -65,12 +65,12 @@ const fetchMessages = async (sourceId, messagesDir, appMessages) => {
 
 (async () => {
   await fetchMessages(
-    'azzapp-app',
+    'app',
     path.resolve(__dirname, '..', 'src', 'app'),
     require('../src/appMessages.json'),
   );
   await fetchMessages(
-    'azzapp-web',
+    'web',
     path.resolve(__dirname, '..', 'src', 'web'),
     require('../src/webMessages.json'),
   );
