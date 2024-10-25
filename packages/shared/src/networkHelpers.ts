@@ -32,6 +32,8 @@ export const fetchJSON = async <JSON>(
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',
+      'x-vercel-protection-bypass':
+        process.env.AZZAPP_API_VERCEL_PROTECTION_BYPASS ?? '',
       ...init?.headers,
     },
   };
