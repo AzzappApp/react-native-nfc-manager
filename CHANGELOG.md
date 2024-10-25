@@ -1,5 +1,6 @@
-## 1.4.0-canary.10
+## 1.4.0-canary.11
 
+* **fix:**  - move protection to be called only on azzapp api
 * **fix:**  - unit test
 * **build:**  - add vercel protection bypass ([#5603](https://github.com/AzzappApp/azzapp/pull/5603))
 * **fix:**  - avoid infinite loop on query ([#5602](https://github.com/AzzappApp/azzapp/pull/5602))
