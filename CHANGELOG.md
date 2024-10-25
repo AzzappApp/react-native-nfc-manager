@@ -1,4 +1,4 @@
-## 1.4.0-canary.4
+## 1.4.0-canary.5
 
 * **fix:**  - scroll to active profile when a new profile comes from invitation ([#5577](https://github.com/AzzappApp/azzapp/pull/5577))
 * **fix:**  - **contact:** [#5579](https://github.com/AzzappApp/azzapp/pull/5579) add webcard url ([#5582](https://github.com/AzzappApp/azzapp/pull/5582))
