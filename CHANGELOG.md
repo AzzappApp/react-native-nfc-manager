@@ -1,5 +1,6 @@
-## 1.4.0-canary.5
+## 1.4.0-canary.6
 
+* **fix:**  - **home:** cache is clear when notification token is registered ([#5592](https://github.com/AzzappApp/azzapp/pull/5592))
 * **fix:**  - scroll to active profile when a new profile comes from invitation ([#5577](https://github.com/AzzappApp/azzapp/pull/5577))
 * **fix:**  - **contact:** [#5579](https://github.com/AzzappApp/azzapp/pull/5579) add webcard url ([#5582](https://github.com/AzzappApp/azzapp/pull/5582))
 * **fix:**  - 🐛 add hard image size limit ([#5586](https://github.com/AzzappApp/azzapp/pull/5586))
