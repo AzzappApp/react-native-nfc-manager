@@ -1,4 +1,4 @@
-## 1.3.0-canary.1
+## 1.4.0-canary.2
 
 * **fix:**  - 🐛 add hard image size limit ([#5586](https://github.com/AzzappApp/azzapp/pull/5586))
 * **fix:**  - sendNotification on batch invites user ([#5584](https://github.com/AzzappApp/azzapp/pull/5584))
