@@ -1,5 +1,6 @@
-## 1.4.0-canary.2
+## 1.4.0-canary.3
 
+* **fix:**  - **contact:** [#5579](https://github.com/AzzappApp/azzapp/pull/5579) add webcard url ([#5582](https://github.com/AzzappApp/azzapp/pull/5582))
 * **fix:**  - 🐛 add hard image size limit ([#5586](https://github.com/AzzappApp/azzapp/pull/5586))
 * **fix:**  - sendNotification on batch invites user ([#5584](https://github.com/AzzappApp/azzapp/pull/5584))
 * **fix:**  - bottom white line appearing on some module background - proper way removint 100.1% hack ([#5578](https://github.com/AzzappApp/azzapp/pull/5578))
