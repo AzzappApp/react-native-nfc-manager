@@ -7,7 +7,7 @@ import {
   checkNotifications,
   requestNotifications,
 } from 'react-native-permissions';
-import { useMutation, graphql } from 'react-relay';
+import { useMutation, graphql, commitMutation } from 'react-relay';
 import type { PermissionStatus } from 'react-native-permissions';
 const useNotifications = (onDeepLink?: ((deepLink: string) => void) | null) => {
   const [status, setStatus] = useState<PermissionStatus>('unavailable');
@@ -25,11 +25,21 @@ const useNotifications = (onDeepLink?: ((deepLink: string) => void) | null) => {
     setStatus(res.status);
   }, []);
 
-  const [commit] = useMutation(graphql`
-    mutation useNotificationsMutation($input: SaveFCMTokenInput!) {
-      saveFCMToken(input: $input)
-    }
-  `);
+  const [commit] = useMutation(
+    graphql`
+      mutation useNotificationsMutation($input: SaveFCMTokenInput!) {
+        saveFCMToken(input: $input)
+      }
+    `,
+    (env, config) => {
+      return commitMutation(env, {
+        ...config,
+        cacheConfig: {
+          metadata: { eraseCache: false },
+        },
+      });
+    },
+  );
 
   const saveTokenToDatabase = useCallback(
     async (fcmToken: string) => {

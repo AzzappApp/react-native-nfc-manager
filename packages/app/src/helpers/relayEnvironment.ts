@@ -165,7 +165,11 @@ export const createNetwork = () => {
         }
       }
 
-      if (request.operationKind === 'mutation') {
+      if (
+        request.operationKind === 'mutation' &&
+        cacheConfig?.metadata?.eraseCache !== false
+      ) {
+        console.warn(request);
         offlineCache.reset();
       }
 
