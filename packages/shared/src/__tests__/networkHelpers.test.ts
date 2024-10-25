@@ -54,6 +54,7 @@ describe('networkHelpers', () => {
             fakeHeader: 'foo',
             'Content-Type': 'application/json',
             Accept: 'application/json',
+            'x-vercel-protection-bypass': '',
           },
         }),
       );
