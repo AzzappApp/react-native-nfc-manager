@@ -1,5 +1,7 @@
-## 1.4.0-canary.9
+## 1.4.0-canary.10
 
+* **fix:**  - unit test
+* **build:**  - add vercel protection bypass ([#5603](https://github.com/AzzappApp/azzapp/pull/5603))
 * **fix:**  - avoid infinite loop on query ([#5602](https://github.com/AzzappApp/azzapp/pull/5602))
 * **fix:**  - **android:** [#5101](https://github.com/AzzappApp/azzapp/pull/5101) detect that phone is not in hands ([#5590](https://github.com/AzzappApp/azzapp/pull/5590))
 * **fix:**  - **home:** cache is clear when notification token is registered ([#5592](https://github.com/AzzappApp/azzapp/pull/5592))
