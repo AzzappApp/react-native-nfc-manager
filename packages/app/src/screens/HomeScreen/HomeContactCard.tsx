@@ -12,8 +12,8 @@ import ContactCard, {
   CONTACT_CARD_RATIO,
 } from '#components/ContactCard/ContactCard';
 import { useRouter } from '#components/NativeRouter';
+import { getAuthState } from '#helpers/authStore';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { useProfileInfos } from '#hooks/authStateHooks';
 import FingerHint from '#ui/FingerHint';
 import PressableNative from '#ui/PressableNative';
 import { useHomeScreenCurrentIndex } from './HomeScreenContext';
@@ -112,17 +112,16 @@ const ContactCardItem = ({ height, item, index }: ContactCardItemProps) => {
     item,
   );
 
-  const profileInfos = useProfileInfos();
   const router = useRouter();
-  const disabled = profileInfos?.profileId !== profile.id;
 
   const onPressContactCard = useCallback(() => {
-    if (!disabled) {
+    const { profileInfos } = getAuthState();
+    if (profileInfos?.profileId === profile.id) {
       router.push({
         route: 'CONTACT_CARD',
       });
     }
-  }, [disabled, router]);
+  }, [profile.id, router]);
 
   const showUpdateContactHint =
     profile.lastContactCardUpdate <= profile.createdAt;

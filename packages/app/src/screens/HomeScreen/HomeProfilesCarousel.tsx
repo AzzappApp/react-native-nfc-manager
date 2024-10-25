@@ -75,6 +75,7 @@ const HomeProfilesCarousel = ({ user: userKey }: HomeProfilesCarouselProps) => {
     currentIndexSharedValue,
     currentIndexProfile,
     initialProfileIndex,
+    scrollToIndex: globalScrollToIndex,
   } = useHomeScreenContext();
 
   const { width: windowWidth } = useWindowDimensions();
@@ -132,6 +133,10 @@ const HomeProfilesCarousel = ({ user: userKey }: HomeProfilesCarouselProps) => {
     },
     [onSelectedIndexChange],
   );
+
+  // globalScrollToIndex is available in Context to allow scrolling
+  // when a new card is added via invitation
+  globalScrollToIndex.current = scrollToIndex;
 
   useOnFocus(() => {
     const { profileInfos } = getAuthState();

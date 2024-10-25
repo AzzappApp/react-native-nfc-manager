@@ -19,7 +19,7 @@ import {
 import { getRelayEnvironment } from '#helpers/relayEnvironment';
 import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
 import type { HomeScreenContext_user$key } from '#relayArtifacts/HomeScreenContext_user.graphql';
-import type { ReactNode } from 'react';
+import type { MutableRefObject, ReactNode } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
 import type { Disposable } from 'react-relay';
 
@@ -29,6 +29,7 @@ type HomeScreenContextType = {
   onCurrentProfileIndexChange: (index: number) => void;
   initialProfileIndex: number;
   inputRange: SharedValue<number[]>;
+  scrollToIndex: MutableRefObject<(index: number, animated?: boolean) => void>;
 };
 
 const HomeScreenContext = React.createContext<
@@ -102,13 +103,28 @@ export const HomeScreenProvider = ({
   const focus = useScreenHasFocus();
 
   useEffect(() => {
+    const currentProfileId = getAuthState().profileInfos?.profileId;
+
     if (
       focus &&
       user?.profiles &&
       profilesRef.current &&
-      user?.profiles?.length < profilesRef.current.length
+      user?.profiles?.length !== profilesRef.current.length
     ) {
-      const newProfile = user.profiles?.[0];
+      let newProfile = user?.profiles?.find(
+        profile => profile.id === currentProfileId,
+      );
+      if (!newProfile) newProfile = user.profiles?.[0];
+
+      const newProfileIndex = user?.profiles?.findIndex(
+        profile => profile.id === newProfile.id,
+      );
+
+      setTimeout(() => {
+        // we need to wait for a render in case of new
+        // profile added, scroll doesn't work as new card may not be added
+        scrollToIndex.current(newProfileIndex + 1);
+      });
       if (newProfile?.webCard?.id) {
         onChangeWebCard({
           profileId: newProfile.id,
@@ -189,6 +205,8 @@ export const HomeScreenProvider = ({
     [user.profiles?.length],
   );
 
+  const scrollToIndex = useRef((_index: number, _animated?: boolean) => {});
+
   const value = useMemo(
     () => ({
       currentIndexSharedValue,
@@ -196,6 +214,7 @@ export const HomeScreenProvider = ({
       currentIndexProfile,
       onCurrentProfileIndexChange,
       inputRange,
+      scrollToIndex,
     }),
     [
       currentIndexProfile,
@@ -203,6 +222,7 @@ export const HomeScreenProvider = ({
       initialProfileIndex,
       onCurrentProfileIndexChange,
       inputRange,
+      scrollToIndex,
     ],
   );
 
