@@ -192,6 +192,8 @@ export const createNetwork = () => {
         Accept: 'application/json',
         'Content-Type': 'application/json',
         'azzapp-appVersion': APP_VERSION,
+        'x-vercel-protection-bypass':
+          process.env.AZZAPP_API_VERCEL_PROTECTION_BYPASS ?? '',
       };
 
       const locale = getCurrentLocale();
