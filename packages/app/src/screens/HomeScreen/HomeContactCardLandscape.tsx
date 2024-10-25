@@ -78,22 +78,28 @@ const HomeContactCardLandscape = ({
     if (Platform.OS === 'android') {
       Accelerometer.setUpdateInterval(1000);
     }
+
     const subscription =
       Platform.OS === 'android'
         ? Accelerometer.addListener(accelerometerData => {
             const { x, y, z } = accelerometerData;
             let orientation = DeviceMotionOrientation.Portrait;
-            if (z < 1) {
+
+            // Check if the device is flat by looking for z values near ±9.8
+            const isFlat = Math.abs(z) > 1; // Adjust as needed for tolerance
+
+            if (!isFlat) {
+              // Only calculate orientation when not flat
               if (Math.abs(x) > Math.abs(y)) {
-                if (x > 0) {
-                  orientation = DeviceMotionOrientation.RightLandscape;
-                } else {
-                  orientation = DeviceMotionOrientation.LeftLandscape;
-                }
-              } else if (y > 0) {
-                orientation = DeviceMotionOrientation.UpsideDown;
+                orientation =
+                  x > 0
+                    ? DeviceMotionOrientation.RightLandscape
+                    : DeviceMotionOrientation.LeftLandscape;
               } else {
-                orientation = DeviceMotionOrientation.Portrait;
+                orientation =
+                  y > 0
+                    ? DeviceMotionOrientation.UpsideDown
+                    : DeviceMotionOrientation.Portrait;
               }
             }
 
