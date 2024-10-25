@@ -194,20 +194,6 @@ const ContactSearchByNameItem = ({
             !contact.lastName &&
             contact.contactProfile?.webCard?.userName && (
               <Text variant="large" numberOfLines={1}>
-                {contact.firstName} {contact.lastName}
-              </Text>
-            )}
-          {!contact.firstName &&
-            !contact.lastName &&
-            contact.contactProfile?.webCard?.userName && (
-              <Text variant="large" numberOfLines={1}>
-                {contact.firstName} {contact.lastName}
-              </Text>
-            )}
-          {!contact.firstName &&
-            !contact.lastName &&
-            contact.contactProfile?.webCard?.userName && (
-              <Text variant="large" numberOfLines={1}>
                 {contact.contactProfile.webCard.userName}
               </Text>
             )}

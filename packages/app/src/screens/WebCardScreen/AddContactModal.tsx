@@ -138,16 +138,18 @@ const AddContactModal = ({
       url,
     }));
 
-    const urls =
+    const scannAddresses =
+      scanned.contact.urlAddresses
+        ?.map(url => {
+          return url.url ? { url: url.url } : undefined;
+        })
+        ?.filter(isDefined) || [];
+
+    const urls = (
       additionalContactData?.urls?.map(url => {
         return { url: url.address };
-      }) || [];
-
-    if (scanned.contact.id) {
-      urls.push({
-        url: buildUserUrl(scanned.contact.id),
-      });
-    }
+      }) || []
+    ).concat(scannAddresses);
 
     const birthdayItem = scanned.contact?.dates?.find(
       x => x.label === 'birthday',
@@ -545,7 +547,7 @@ const buildContact = async (
     try {
       const avatar = await FileSystem.downloadAsync(
         additionalContactData.avatarUrl,
-        FileSystem.cacheDirectory + 'avatar',
+        FileSystem.cacheDirectory + profileId,
       );
       if (avatar.status >= 200 && avatar.status < 300) {
         image = {

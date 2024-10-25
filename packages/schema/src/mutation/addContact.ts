@@ -38,7 +38,7 @@ const addContact: MutationResolvers['addContact'] = async (
     contact: input.profileId,
   });
 
-  const contactToCreate: Omit<Contact, 'createdAt' | 'deletedAt' | 'id'> = {
+  const contactToCreate: Omit<Contact, 'deletedAt' | 'id'> = {
     addresses: input.addresses,
     contactProfileId: input.profileId,
     emails: input.emails,
@@ -53,6 +53,7 @@ const addContact: MutationResolvers['addContact'] = async (
     deleted: false,
     urls: input.urls || null,
     socials: input.socials || null,
+    createdAt: new Date(),
   };
 
   let contact: Contact;
@@ -69,7 +70,6 @@ const addContact: MutationResolvers['addContact'] = async (
 
     contact = {
       id,
-      createdAt: new Date(),
       deletedAt: null,
       ...contactToCreate,
     };

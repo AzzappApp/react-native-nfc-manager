@@ -15,7 +15,7 @@ In addition developers should install the followings dependencies:
 - [ruby](https://www.ruby-lang.org/fr/) version **2.7.6** (recommended install through **brew**)
 - [bundler](https://bundler.io/) (should come along ruby)
 
-In addition one should follow the react-native-cli setup instruction of the [React Native documentation](https://reactnative.dev/docs/0.69/getting-started).
+In addition one should follow the *react-native-cli* setup instruction of the [React Native documentation](https://reactnative.dev/docs/0.69/getting-started).
 
 The sources of this project should be edited through [Visual Studio Code](https://code.visualstudio.com/). A recommended extensions list has been committed in the sources and should be prompted for installation the first time the project is open in the code editor.
 

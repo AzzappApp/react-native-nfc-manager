@@ -2,30 +2,31 @@ name: Pull translations
 description: Pull translations from the database and extract keys
 
 inputs:
-  database-host:
-    description: Hostname of the database
+  NEXT_PUBLIC_PLATFORM:
+    description: dev, staging or production
     required: true
-  database-username:
-    description: Username of the database
+  API_SERVER_TOKEN:
+    description: token to call translations api
     required: true
-  database-password:
-    description: Password of the database
+  TRANSLATION_APP_API_ENDPOINT:
+    description: endpoint of the translations api
     required: true
 
 
 runs:
   using: composite
   steps:
-    - name: Pull translations
-      run: yarn i18n:pull
-      env:
-        DATABASE_HOST: ${{ inputs.database-host }}
-        DATABASE_USERNAME: ${{ inputs.database-username }}
-        DATABASE_PASSWORD: ${{ inputs.database-password }}
-      shell: bash
-
     - name: Extract translations keys
       run: yarn i18n:extract
       shell: bash
+    - name: Pull translations
+      run: yarn i18n:pull
+      env:
+        NEXT_PUBLIC_PLATFORM: ${{ inputs.NEXT_PUBLIC_PLATFORM }}
+        API_SERVER_TOKEN: ${{ inputs.API_SERVER_TOKEN }}
+        TRANSLATION_APP_API_ENDPOINT: ${{ inputs.TRANSLATION_APP_API_ENDPOINT }}
+      shell: bash
+
+ 
 
    
