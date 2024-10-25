@@ -11,6 +11,7 @@ import {
 } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
+import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { sendPushNotification } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
 import { profileLoader, userLoader, webCardLoader } from '#loaders';
@@ -108,10 +109,13 @@ const addContact: MutationResolvers['addContact'] = async (
       ? profile.contactCard.birthday.birthday?.split('T')[0]
       : null;
 
-    const urls =
+    const urls = (
+      webCard?.userName ? [{ url: buildUserUrl(webCard.userName) }] : []
+    ).concat(
       profile.contactCard?.urls?.map(url => ({
         url: url.address,
-      })) || [];
+      })) || [],
+    );
 
     const socials =
       profile.contactCard?.socials?.map(social => ({
