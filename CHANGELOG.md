@@ -1,4 +1,4 @@
-## 1.4.0-canary.6
+## 1.4.0-canary.7
 
 * **fix:**  - **home:** cache is clear when notification token is registered ([#5592](https://github.com/AzzappApp/azzapp/pull/5592))
 * **fix:**  - scroll to active profile when a new profile comes from invitation ([#5577](https://github.com/AzzappApp/azzapp/pull/5577))
