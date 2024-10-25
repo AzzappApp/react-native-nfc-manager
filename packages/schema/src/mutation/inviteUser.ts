@@ -142,6 +142,7 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
         deleted: false,
         deletedAt: null,
         deletedBy: null,
+        lastContactViewAt: new Date(),
       };
       await referencesMedias(
         addedMedia,

@@ -8,15 +8,18 @@ import {
   interpolateColor,
 } from 'react-native-reanimated';
 import { useFragment, graphql } from 'react-relay';
+import { getTextColorPrimaryForBackground } from '@azzapp/shared/colorsHelpers';
 import { useRouter } from '#components/NativeRouter';
 import { HomeButtonContactLink } from './HomeButtonContactLink';
 import { HomeButtonContactLinkCentral } from './HomeButtonContactLinkCentral';
 import { useHomeScreenContext } from './HomeScreenContext';
 import type { HomeInformations_user$key } from '#relayArtifacts/HomeInformations_user.graphql';
+import type { SharedValue } from 'react-native-reanimated';
 
 type HomeInformationsProps = {
   user: HomeInformations_user$key;
   height: number;
+  notificationColor: SharedValue<string>;
 };
 /**
  *
@@ -27,13 +30,18 @@ type HomeInformationsProps = {
  * }
  * @return {*}
  */
-const HomeInformations = ({ height, user }: HomeInformationsProps) => {
+const HomeInformations = ({
+  height,
+  user,
+  notificationColor,
+}: HomeInformationsProps) => {
   const { profiles } = useFragment(
     graphql`
       fragment HomeInformations_user on User {
         profiles {
           id
           nbContacts
+          nbNewContacts
           webCard {
             id
             userName
@@ -44,6 +52,7 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
             nbPostsLiked
             cardColors {
               primary
+              dark
             }
           }
         }
@@ -56,6 +65,14 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
 
   const nbContactsValue = useMemo(
     () => [0, ...(profiles?.map(({ nbContacts }) => nbContacts ?? 0) ?? [])],
+    [profiles],
+  );
+
+  const nbNewContactsValue = useMemo(
+    () => [
+      0,
+      ...(profiles?.map(({ nbNewContacts }) => nbNewContacts ?? 0) ?? []),
+    ],
     [profiles],
   );
 
@@ -97,12 +114,27 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
     [profiles],
   );
 
+  const notificationColorValue = useMemo(
+    () => [
+      '#000000',
+      ...(profiles?.map(({ webCard }) =>
+        getTextColorPrimaryForBackground(
+          webCard?.cardColors?.primary ?? '#000000',
+          webCard?.cardColors?.dark ?? '#000000',
+        ),
+      ) ?? []),
+    ],
+    [profiles],
+  );
+
   const nbPosts = useSharedValue('');
   const nbLikes = useSharedValue('');
   const nbFollowers = useSharedValue('');
   const nbFollowings = useSharedValue('');
   const nbContacts = useSharedValue('');
+  const nbNewContacts = useSharedValue('');
   const primaryColor = useSharedValue('#00000000');
+
   const { currentIndexSharedValue, currentIndexProfile, inputRange } =
     useHomeScreenContext();
   //using profiles object directly in animatedReaction causes error animatedHost(seems to be the case for all relay query result)
@@ -112,12 +144,19 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
     nbFollowings.value = format(nbFollowingsValue[currentIndexProfile.value]);
     nbFollowers.value = format(nbFollowersValue[currentIndexProfile.value]);
     nbContacts.value = format(nbContactsValue[currentIndexProfile.value]);
+    nbNewContacts.value =
+      nbNewContactsValue[currentIndexProfile.value] > 0
+        ? '+' + format(nbNewContactsValue[currentIndexProfile.value])
+        : '';
 
     // in case of card removal of last contact card, primaryColorValue[currentIndexProfile.value] can be null
     // it gives crash in react native skia
     primaryColor.value =
       primaryColorValue[currentIndexProfile.value] ||
       primaryColorValue[primaryColorValue.length - 1];
+    notificationColor.value =
+      notificationColorValue[currentIndexProfile.value] ||
+      notificationColorValue[notificationColorValue.length - 1];
   }, [
     currentIndexProfile,
     nbFollowers,
@@ -132,6 +171,10 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
     nbContactsValue,
     primaryColor,
     primaryColorValue,
+    nbNewContacts,
+    nbNewContactsValue,
+    notificationColor,
+    notificationColorValue,
   ]);
 
   useAnimatedReaction(
@@ -153,10 +196,21 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
         nbContacts.value = format(
           interpolate(actual, inputRange.value, nbContactsValue),
         );
+        nbNewContacts.value =
+          nbNewContactsValue[currentIndexProfile.value] > 0
+            ? '+' +
+              format(interpolate(actual, inputRange.value, nbNewContactsValue))
+            : '';
+
         primaryColor.value = interpolateColor(
           actual,
           inputRange.value,
           primaryColorValue,
+        );
+        notificationColor.value = interpolateColor(
+          actual,
+          inputRange.value,
+          notificationColorValue,
         );
       } else if (actual >= 0) {
         nbPosts.value = format(nbPostsValue[actual]);
@@ -164,7 +218,12 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
         nbFollowers.value = format(nbFollowersValue[actual]);
         nbFollowings.value = format(nbFollowingsValue[actual]);
         nbContacts.value = format(nbContactsValue[actual]);
+        nbNewContacts.value =
+          nbNewContactsValue[actual] > 0
+            ? '+' + format(nbNewContactsValue[actual])
+            : '';
         primaryColor.value = primaryColorValue[actual];
+        notificationColor.value = notificationColorValue[actual];
       }
     },
   );
@@ -281,8 +340,10 @@ const HomeInformations = ({ height, user }: HomeInformationsProps) => {
       {/* central circle */}
       <HomeButtonContactLinkCentral
         circleWidth={circleWidth}
+        nbNewContacts={nbNewContacts}
         onPress={goToContacts}
         primaryColor={primaryColor}
+        notificationColor={notificationColor}
         count={nbContacts}
       />
     </View>

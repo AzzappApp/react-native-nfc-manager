@@ -23,7 +23,8 @@ type TextProps = RNTextProps & {
     | 'smallbold'
     | 'textField'
     | 'xlarge'
-    | 'xsmall';
+    | 'xsmall'
+    | 'xxsmallextrabold';
   /**
    * Manually set the appearance of the component
    *

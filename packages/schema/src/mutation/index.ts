@@ -55,6 +55,7 @@ import sendReport from './sendReport';
 import toggleFollowing from './toggleFollowing';
 import toggleWebCardPublished from './toggleWebCardPublished';
 import transferOwnership from './transferOwnership';
+import updateContactsLastView from './updateContactsLastView';
 import updateModulesVisibility from './updateModulesVisibility';
 import updateMultiUser from './updateMultiUser';
 import updatePost from './updatePost';
@@ -128,6 +129,7 @@ export const Mutation: MutationResolvers = {
   removeContactsFromWebCard,
   saveFCMToken,
   deleteFCMToken,
+  updateContactsLastView,
 };
 
 export default Mutation;

@@ -55,6 +55,11 @@ export const textStyles = StyleSheet.create({
   button: { ...fontFamilies.semibold, fontSize: 14, lineHeight: 17 },
   smallbold: { ...fontFamilies.semibold, fontSize: 12, lineHeight: 15 },
   xsmall: { ...fontFamilies.semibold, fontSize: 11, lineHeight: 14 },
+  xxsmallextrabold: {
+    ...fontFamilies.extrabold,
+    fontSize: 11,
+    lineHeight: 12.6,
+  },
   medium: { ...fontFamilies.medium, fontSize: 14, lineHeight: 18 },
   small: { ...fontFamilies.regular, fontSize: 12, lineHeight: 15 },
   hyperLink: {

@@ -26,8 +26,10 @@ import type { SharedValue } from 'react-native-reanimated';
 type HomeButtonContactLinkCentralProps = {
   circleWidth: number;
   primaryColor: SharedValue<string>;
+  nbNewContacts: SharedValue<string>;
   onPress: () => void;
   count: SharedValue<string>;
+  notificationColor: SharedValue<string>;
 };
 
 const AnimatedTextComp = Animated.createAnimatedComponent(Text);
@@ -37,6 +39,8 @@ export const HomeButtonContactLinkCentral = ({
   primaryColor,
   onPress,
   count,
+  nbNewContacts,
+  notificationColor,
 }: HomeButtonContactLinkCentralProps) => {
   const opacityValue = useSharedValue(1);
 
@@ -113,6 +117,14 @@ export const HomeButtonContactLinkCentral = ({
       </Canvas>
       <View style={styles.textStyle}>
         <AnimatedText
+          variant="xxsmallextrabold"
+          text={nbNewContacts}
+          appearance="dark"
+          style={styles.nbNewContacts}
+          animatedTextColor={notificationColor}
+        />
+
+        <AnimatedText
           variant="xlarge"
           text={count}
           appearance="dark"
@@ -166,4 +178,10 @@ const styles = StyleSheet.create({
     top: -7,
   },
   textAlign: { textAlign: 'center' },
+  nbNewContacts: {
+    top: -6,
+    width: '100%',
+    textAlign: 'center',
+    position: 'absolute',
+  },
 });

@@ -21,6 +21,10 @@ type Profile implements Node {
   """
   nbShareBacks: Int
   """
+  the number of new contact unread since last contact view open
+  """
+  nbNewContacts: Int!
+  """
   The related user
   """
   user: User

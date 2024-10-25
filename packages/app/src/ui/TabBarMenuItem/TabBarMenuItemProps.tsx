@@ -1,5 +1,5 @@
 import type { Icons } from '../Icon';
-import type { PropsWithChildren } from 'react';
+import type { PropsWithChildren, ReactNode } from 'react';
 import type { StyleProp, TextStyle, ViewStyle } from 'react-native';
 
 type TabBarMenuItemProps = PropsWithChildren<{
@@ -56,6 +56,8 @@ type TabBarMenuItemProps = PropsWithChildren<{
    * @type {boolean}
    */
   disabled?: boolean;
+
+  notificationIcon?: ReactNode;
 }>;
 
 export default TabBarMenuItemProps;

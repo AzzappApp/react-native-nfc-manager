@@ -370,6 +370,11 @@ const AddContactModal = ({
             profile?.setValue(nbContacts + 1, 'nbContacts');
           }
 
+          const nbNewContacts = profile?.getValue('nbNewContacts');
+          if (typeof nbNewContacts === 'number') {
+            profile?.setValue(nbNewContacts + 1, 'nbNewContacts');
+          }
+
           if (profile) {
             ConnectionHandler.getConnection(
               profile,

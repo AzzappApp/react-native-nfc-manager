@@ -21,7 +21,8 @@ export type TextVariant =
   | 'smallbold'
   | 'textField'
   | 'xlarge'
-  | 'xsmall';
+  | 'xsmall'
+  | 'xxsmallextrabold';
 
 export type TextProps = NativeTextProps & {
   variant?: TextVariant;
@@ -94,6 +95,11 @@ export const textStyleSheet = createVariantsStyleSheet(appearance => ({
   xsmall: {
     text: {
       ...textStyles.xsmall,
+    },
+  },
+  xxsmallextrabold: {
+    text: {
+      ...textStyles.xxsmallextrabold,
     },
   },
   medium: {

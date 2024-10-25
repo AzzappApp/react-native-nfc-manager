@@ -1,7 +1,12 @@
-import { and, asc, count, eq, inArray, ne, sql } from 'drizzle-orm';
+import { and, asc, count, eq, gt, inArray, ne, sql } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/mysql-core';
 import { db, transaction } from '../database';
-import { MediaTable, ProfileTable, WebCardTable } from '../schema';
+import {
+  ContactTable,
+  MediaTable,
+  ProfileTable,
+  WebCardTable,
+} from '../schema';
 import { getEntitiesByIds } from './entitiesQueries';
 import type { Profile, WebCard } from '../schema';
 import type { InferInsertModel } from 'drizzle-orm';
@@ -535,4 +540,23 @@ export const getCommonWebCardProfiles = async (
         {} as Record<string, string[]>,
       ),
     );
+};
+
+/**
+ * Delete all profiles associated to a web card except the owner
+ *
+ * @param webCardId - The id of the web card
+ */
+export const getNbNewContacts = async (profileId: string, date: Date) => {
+  return db()
+    .select({ count: count() })
+    .from(ContactTable)
+    .where(
+      and(
+        eq(ContactTable.ownerProfileId, profileId),
+        eq(ContactTable.deleted, false),
+        gt(ContactTable.createdAt, date),
+      ),
+    )
+    .then(res => res[0].count);
 };

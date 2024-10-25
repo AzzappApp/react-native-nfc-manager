@@ -17,6 +17,7 @@ import {
   getCardTemplatesForWebCardKind,
   searchContacts,
   getContactCount,
+  getNbNewContacts,
 } from '@azzapp/data';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import { shuffle } from '@azzapp/shared/arrayHelpers';
@@ -139,6 +140,20 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
       return null;
     }
     return profile.nbShareBacks;
+  },
+  nbNewContacts: async profile => {
+    if (
+      !profileIsAssociatedToCurrentUser(profile) &&
+      !(await hasWebCardProfileRight(profile.webCardId))
+    ) {
+      return 0;
+    }
+    // profile.lastContactCardUpdate;
+    const nbNewContacts = await getNbNewContacts(
+      profile.id,
+      profile.lastContactViewAt,
+    );
+    return nbNewContacts;
   },
   promotedAsOwner: async profile => {
     if (

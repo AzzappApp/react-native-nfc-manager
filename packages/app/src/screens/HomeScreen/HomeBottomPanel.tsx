@@ -4,6 +4,7 @@ import Animated, {
   interpolate,
   useAnimatedStyle,
   useDerivedValue,
+  useSharedValue,
 } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { CONTACT_CARD_RATIO } from '#components/ContactCard/ContactCard';
@@ -36,6 +37,7 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
           invited
           profileRole
           promotedAsOwner
+          nbNewContacts
           webCard {
             id
             userName
@@ -119,6 +121,15 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
   useMainTabBarVisibilityController(mainTabBarVisible);
   //#endregion
 
+  const { currentIndexProfile } = useHomeScreenContext();
+  const newContactsOpacity = useDerivedValue(() => {
+    return (user?.profiles?.[currentIndexProfile?.value - 1]?.nbNewContacts ||
+      0) > 0
+      ? 1
+      : 0;
+  }, [user?.profiles]);
+  const notificationColor = useSharedValue('#00000000');
+
   return (
     <View style={containerHeight}>
       <View style={styles.informationPanel}>
@@ -128,7 +139,12 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
         style={[styles.bottomPanel, bottomPanelStyle]}
         collapsable={false}
       >
-        <HomeMenu selected={selectedPanel} setSelected={setSelectedPanel} />
+        <HomeMenu
+          selected={selectedPanel}
+          setSelected={setSelectedPanel}
+          newContactsOpacity={newContactsOpacity}
+          notificationColor={notificationColor}
+        />
         <View
           style={{
             flex: 1,
@@ -153,7 +169,11 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
             display: selectedPanel === 'INFORMATION' ? 'flex' : 'none',
           }}
         >
-          <HomeInformations user={user} height={panelHeight} />
+          <HomeInformations
+            user={user}
+            height={panelHeight}
+            notificationColor={notificationColor}
+          />
         </View>
       </Animated.View>
     </View>

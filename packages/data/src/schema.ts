@@ -651,6 +651,10 @@ export const ProfileTable = cols.table(
     deleted: cols.boolean('deleted').default(false).notNull(),
     deletedAt: cols.dateTime('deletedAt'),
     deletedBy: cols.cuid('deletedBy'),
+    lastContactViewAt: cols
+      .dateTime('lastContactViewAt')
+      .default(DEFAULT_DATETIME_VALUE)
+      .notNull(),
   },
   table => {
     return {
