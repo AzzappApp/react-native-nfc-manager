@@ -217,7 +217,10 @@ const { handleRequest } = createYoga({
         return (queryMap as any)[id];
       },
       allowArbitraryOperations: request => {
-        if (process.env.NODE_ENV !== 'production') {
+        if (
+          process.env.NODE_ENV !== 'production' ||
+          process.env.NEXT_PUBLIC_PLATFORM === 'development'
+        ) {
           return true;
         }
         if (process.env.API_SERVER_TOKEN) {
