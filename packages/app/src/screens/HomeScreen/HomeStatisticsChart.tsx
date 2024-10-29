@@ -62,11 +62,18 @@ const HomeStatisticsChart = ({
   const chartsData = useMemo(() => {
     if (profiles) {
       const result = Array.from({ length: 30 }, (_, i) => {
-        const d = new Date(new Date().toISOString().split('T')[0]);
-        d.setDate(d.getDate() - 30 + i + 1);
+        const date = new Date();
+        date.setUTCDate(date.getUTCDate() - 29 + i); // Adjust the date to get the last 30 days
+        const utcDate = new Date(
+          Date.UTC(
+            date.getUTCFullYear(),
+            date.getUTCMonth(),
+            date.getUTCDate(),
+          ),
+        );
 
         return {
-          day: d.toISOString(),
+          day: utcDate.toISOString(),
           data: Array(profiles?.length ?? 0).fill({
             contactCardScans: 0,
             webCardViews: 0,
@@ -108,7 +115,6 @@ const HomeStatisticsChart = ({
     }
     return [];
   }, [profiles]);
-
   const chartBarWidth = useMemo(() => {
     return width / 30;
   }, [width]);
