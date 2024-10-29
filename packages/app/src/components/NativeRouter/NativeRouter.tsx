@@ -1,4 +1,5 @@
-import { isEqual, pick } from 'lodash';
+import isEqual from 'lodash/isEqual';
+import pick from 'lodash/pick';
 import { useMemo, useCallback, useRef, useEffect, useReducer } from 'react';
 import { BackHandler } from 'react-native';
 import { type Route } from '#routes';

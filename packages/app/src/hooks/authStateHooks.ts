@@ -1,4 +1,4 @@
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import { useCallback, useMemo, useSyncExternalStore } from 'react';
 import { addAuthStateListener, getAuthState } from '#helpers/authStore';
 

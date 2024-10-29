@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/react-native';
 import { GraphQLError } from 'graphql';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import React, { Suspense, useCallback, useEffect, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import { Alert, Appearance } from 'react-native';

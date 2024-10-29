@@ -12,7 +12,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { omit } from 'lodash';
+import omit from 'lodash/omit';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { intParser, useForm } from '#helpers/formHelpers';

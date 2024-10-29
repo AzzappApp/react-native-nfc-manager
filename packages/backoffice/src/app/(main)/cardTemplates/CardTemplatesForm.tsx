@@ -19,7 +19,7 @@ import {
   Typography,
   Link,
 } from '@mui/material';
-import { omit } from 'lodash';
+import omit from 'lodash/omit';
 import { useMemo, useState, useTransition } from 'react';
 import { uploadMedia } from '@azzapp/shared/WebAPI';
 import { getSignedUpload } from '#app/mediaActions';

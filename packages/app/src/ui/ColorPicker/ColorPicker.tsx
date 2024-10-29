@@ -1,4 +1,4 @@
-import { uniq } from 'lodash';
+import uniq from 'lodash/uniq';
 import { useCallback, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { useWindowDimensions } from 'react-native';

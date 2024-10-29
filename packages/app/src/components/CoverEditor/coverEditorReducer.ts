@@ -1,5 +1,5 @@
 /* eslint-disable no-case-declarations */
-import { clamp } from 'lodash';
+import clamp from 'lodash/clamp';
 import {
   COVER_IMAGE_DEFAULT_DURATION,
   COVER_MAX_MEDIA_DURATION,

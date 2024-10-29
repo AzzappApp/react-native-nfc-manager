@@ -1,4 +1,4 @@
-import { capitalize } from 'lodash';
+import capitalize from 'lodash/capitalize';
 import { notFound, redirect } from 'next/navigation';
 import { getCldOgImageUrl } from 'next-cloudinary';
 import {

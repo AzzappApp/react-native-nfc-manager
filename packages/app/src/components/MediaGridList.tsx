@@ -1,6 +1,7 @@
 import { FlashList } from '@shopify/flash-list';
 import { Image } from 'expo-image';
-import { memoize, range } from 'lodash';
+import memoize from 'lodash/memoize';
+import range from 'lodash/range';
 import { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, useColorScheme, View } from 'react-native';

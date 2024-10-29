@@ -1,5 +1,5 @@
 import { Image } from 'expo-image';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import {
   forwardRef,
   useCallback,

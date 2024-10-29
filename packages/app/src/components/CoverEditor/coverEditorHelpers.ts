@@ -1,5 +1,5 @@
 import * as Device from 'expo-device';
-import { memoize } from 'lodash';
+import memoize from 'lodash/memoize';
 import { Dimensions, PixelRatio } from 'react-native';
 import { createSkottieTemplatePlayer } from 'react-native-skottie-template-player';
 import {

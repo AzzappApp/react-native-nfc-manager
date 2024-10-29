@@ -24,7 +24,7 @@ import {
   createFilterOptions,
   Paper,
 } from '@mui/material';
-import { uniqBy } from 'lodash';
+import uniqBy from 'lodash/uniqBy';
 import { useMemo, useRef, useState } from 'react';
 import type { CompanyActivity, LocalizationMessage } from '@azzapp/data';
 import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core';
