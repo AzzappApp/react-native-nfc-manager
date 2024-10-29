@@ -1,0 +1,13 @@
+diff --git a/lib/explore.js b/lib/explore.js
+index d04fa30a95f1da82e686388a42e4bd9e746f5b80..2e5c77c9c5e2f8c32d79a193d213ad55cef82c93 100644
+--- a/lib/explore.js
++++ b/lib/explore.js
+@@ -121,7 +121,7 @@ function computeFileSizes(sourceMapData, options, coverageRanges) {
+   const { consumer, codeFileContent: fileContent } = sourceMapData;
+   const sourceMapComment = getSourceMapComment(fileContent);
+   const sourceContent = fileContent.replace(sourceMapComment, '').trim();
+-  const eol = helpers_1.detectEOL(fileContent);
++  const eol = '\n'; // helpers_1.detectEOL(fileContent);
+   const lines = sourceContent.split(eol);
+   const mappingRanges = [];
+   const context = {
