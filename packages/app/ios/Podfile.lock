@@ -2183,7 +2183,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNSentry (6.0.0):
+  - RNSentry (6.1.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2204,7 +2204,7 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - Sentry/HybridSDK (= 8.37.0)
+    - Sentry/HybridSDK (= 8.38.0)
     - Yoga
   - RNShare (11.0.4):
     - DoubleConversion
@@ -2240,7 +2240,7 @@ PODS:
   - SDWebImageWebPCoder (0.14.6):
     - libwebp (~> 1.0)
     - SDWebImage/Core (~> 5.17)
-  - Sentry/HybridSDK (8.37.0)
+  - Sentry/HybridSDK (8.38.0)
   - SocketRocket (0.7.0)
   - SPTPersistentCache (1.1.0)
   - VisionCamera (4.5.2):
@@ -2636,7 +2636,7 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
-  azzapp-react-native-skia-video: 81bd4b0f431c4cf8840d2e520358f45753967c9e
+  azzapp-react-native-skia-video: e97c7be3b8742abaf067b5b2935ee8b4f9431beb
   azzapp-react-native-snapshot-view: 9555fc6434e7d41ae76865a6985e763a1efb66ae
   boost: 4cb898d0bf20404aab1850c656dcea009429d6c1
   DoubleConversion: 76ab83afb40bddeeee456813d9c04f67f78771b5
@@ -2719,7 +2719,7 @@ SPEC CHECKSUMS:
   react-native-quick-base64: f98f17faf04c9779faf726921a2b389d4775e8b6
   react-native-safe-area-context: 5141f11858b033636f1788b14f32eaba92cee810
   react-native-skia: 00e92fdc3e2e9e7d6df254296d2f3e8c548224af
-  react-native-skottie-template-player: 1796ae03e1225d7c5fdaaeda5ce63792c3122e31
+  react-native-skottie-template-player: 6de6b5b1c416761528123fd739db542fa951bc76
   react-native-video: a96d25e6b25541e60c22fd3fd2c91d5898ea707a
   react-native-webview: 926d2665cf3196e39c4449a72d136d0a53b9df8a
   React-nativeconfig: 8c83d992b9cc7d75b5abe262069eaeea4349f794
@@ -2765,14 +2765,14 @@ SPEC CHECKSUMS:
   RNReactNativeHapticFeedback: 0d591ea1e150f36cb96d868d4e8d77272243d78a
   RNReanimated: 3a45999505a9ceefd298f284487a68f1dc88f4d9
   RNScreens: 19719a9c326e925498ac3b2d35c4e50fe87afc06
-  RNSentry: a7660b72556d6574867d488e60c4b4b0be7422d8
+  RNSentry: 4580b02d92932a15deb7adfd582feff799c7d289
   RNShare: eaeb5e7dc1618d19db6234da1af91fc60dd6bc0f
   RNSVG: 8b1a777d54096b8c2a0fd38fc9d5a454332bbb4d
   SDWebImage: 8a6b7b160b4d710e2a22b6900e25301075c34cb3
   SDWebImageAVIFCoder: 00310d246aab3232ce77f1d8f0076f8c4b021d90
   SDWebImageSVGCoder: 15a300a97ec1c8ac958f009c02220ac0402e936c
   SDWebImageWebPCoder: e38c0a70396191361d60c092933e22c20d5b1380
-  Sentry: ee060c09b2f7ec1240e95c766ab44c04c7bdb052
+  Sentry: 205813e7e758b53df157cedb8c55b31a14300645
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   SPTPersistentCache: df36ea46762d7cf026502bbb86a8b79d0080dff4
   VisionCamera: b08345ad559243834112380d3fd2a839de794215
