@@ -1,4 +1,4 @@
-## 1.4.0-canary.13
+## 1.4.0-canary.14
 
 * **fix:**  - new contacts counter position ([#5608](https://github.com/AzzappApp/azzapp/pull/5608))
 * **fix:**  - move protection to be called only on azzapp api
