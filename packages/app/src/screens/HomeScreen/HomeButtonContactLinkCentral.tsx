@@ -7,7 +7,7 @@ import {
   vec,
 } from '@shopify/react-native-skia';
 import { FormattedMessage } from 'react-intl';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, View } from 'react-native';
 import Animated, {
   useSharedValue,
   Easing,
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
   },
   textAlign: { textAlign: 'center' },
   nbNewContacts: {
-    top: -6,
+    top: Platform.OS === 'android' ? -13 : -6,
     width: '100%',
     textAlign: 'center',
     position: 'absolute',
