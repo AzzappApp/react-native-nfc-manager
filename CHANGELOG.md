@@ -1,5 +1,6 @@
-## 1.4.0-canary.11
+## 1.4.0-canary.12
 
+* **fix:**  - new contacts counter position ([#5608](https://github.com/AzzappApp/azzapp/pull/5608))
 * **fix:**  - move protection to be called only on azzapp api
 * **fix:**  - unit test
 * **build:**  - add vercel protection bypass ([#5603](https://github.com/AzzappApp/azzapp/pull/5603))
