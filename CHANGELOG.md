@@ -1,5 +1,6 @@
-## 1.4.0-canary.15
+## 1.4.0-canary.16
 
+* **fix:**  - stats graph with winter time ([#5610](https://github.com/AzzappApp/azzapp/pull/5610))
 * **fix:**  - align phonenumber-js deps ([#5607](https://github.com/AzzappApp/azzapp/pull/5607))
 * **fix:**  - new contacts counter position ([#5608](https://github.com/AzzappApp/azzapp/pull/5608))
 * **fix:**  - move protection to be called only on azzapp api
