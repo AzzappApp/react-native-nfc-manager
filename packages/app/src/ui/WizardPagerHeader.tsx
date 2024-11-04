@@ -4,8 +4,7 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import IconButton from '#ui/IconButton';
 import Text from '#ui/Text';
 import type { Icons } from '#ui/Icon';
-import type { ColorSchemeName } from 'react-native';
-import type { ViewProps } from 'react-native';
+import type { ColorSchemeName, ViewProps } from 'react-native';
 
 export type WizardPagerHeaderProps = Omit<ViewProps, 'children'> & {
   title: React.ReactNode;

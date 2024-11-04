@@ -1,4 +1,5 @@
 import { useContext, useEffect, useRef, useState } from 'react';
+import { Platform } from 'react-native';
 import useLatestCallback from '#hooks/useLatestCallback';
 import { RouterContext, ScreenRendererContext } from './routerContexts';
 import type { NativeNavigationEvent } from './routerTypes';
@@ -41,6 +42,11 @@ export const useNativeNavigationEvent = (
   event: NativeNavigationEvent,
   handler: () => void,
 ) => {
+  if (Platform.OS !== 'ios') {
+    console.warn(
+      'useNativeNavigationEvent is buggy on Android, use it with caution',
+    );
+  }
   const { navigationEventEmitter } = useContext(ScreenRendererContext);
   const handlerRef = useRef(handler);
   handlerRef.current = handler;

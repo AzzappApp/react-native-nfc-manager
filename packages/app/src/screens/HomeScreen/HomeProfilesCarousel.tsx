@@ -9,14 +9,7 @@ import {
   useState,
 } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import {
-  View,
-  StyleSheet,
-  Platform,
-  Pressable,
-  PixelRatio,
-  useWindowDimensions,
-} from 'react-native';
+import { View, StyleSheet, Platform, Pressable } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import {
@@ -37,25 +30,25 @@ import {
 import WebCardMenu from '#components/WebCardMenu';
 import { logEvent } from '#helpers/analytics';
 import { getAuthState } from '#helpers/authStore';
-import useToggle from '#hooks/useToggle';
+import useBoolean from '#hooks/useBoolean';
 import useToggleFollow from '#hooks/useToggleFollow';
 import CarouselSelectList from '#ui/CarouselSelectList';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import PressableOpacity from '#ui/PressableOpacity';
 import { useHomeScreenContext } from './HomeScreenContext';
+import useCoverPlayPermission from './useCoverPlayPermision';
 import type {
   HomeProfilesCarousel_user$key,
   HomeProfilesCarousel_user$data,
 } from '#relayArtifacts/HomeProfilesCarousel_user.graphql';
 import type { HomeProfilesCarouselItem_profile$key } from '#relayArtifacts/HomeProfilesCarouselItem_profile.graphql';
-import type { CarouselSelectListHandle } from '#ui/CarouselSelectList';
-import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type {
-  LayoutChangeEvent,
-  ListRenderItemInfo,
-  ViewStyle,
-} from 'react-native';
+  CarouselSelectListHandle,
+  CarouselSelectListRenderItemInfo,
+} from '#ui/CarouselSelectList';
+import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
+import type { ViewStyle } from 'react-native';
 
 type HomeProfilesCarouselProps = {
   /**
@@ -69,31 +62,14 @@ type HomeProfilesCarouselProps = {
 };
 
 const HomeProfilesCarousel = ({ user: userKey }: HomeProfilesCarouselProps) => {
-  const [coverWidth, setCoverWidth] = useState(0);
   const {
     onCurrentProfileIndexChange,
     currentIndexSharedValue,
-    currentIndexProfile,
+    currentIndexProfileSharedValue,
     initialProfileIndex,
     scrollToIndex: globalScrollToIndex,
   } = useHomeScreenContext();
 
-  const { width: windowWidth } = useWindowDimensions();
-
-  const onLayout = useCallback(
-    ({ nativeEvent: { layout } }: LayoutChangeEvent) => {
-      setCoverWidth(
-        Math.min(
-          windowWidth / 2,
-          Math.trunc(
-            PixelRatio.roundToNearestPixel(layout.height * COVER_RATIO),
-          ),
-        ),
-      );
-    },
-    [windowWidth],
-  );
-  const coverHeight = useMemo(() => coverWidth / COVER_RATIO, [coverWidth]);
   const { profiles } = useFragment(
     graphql`
       fragment HomeProfilesCarousel_user on User {
@@ -146,7 +122,7 @@ const HomeProfilesCarousel = ({ user: userKey }: HomeProfilesCarouselProps) => {
     if (
       authProfileIndex !== undefined &&
       authProfileIndex !== -1 &&
-      authProfileIndex + 1 !== currentIndexProfile.value
+      authProfileIndex + 1 !== currentIndexProfileSharedValue.value
     ) {
       carouselRef.current?.scrollToIndex(authProfileIndex + 1, false);
     }
@@ -161,19 +137,24 @@ const HomeProfilesCarousel = ({ user: userKey }: HomeProfilesCarouselProps) => {
         dataSize.current = profiles?.length ?? 0;
       }
     }
-  }, [focus, profiles?.length, currentIndexProfile, scrollToIndex]);
+  }, [focus, profiles?.length, currentIndexProfileSharedValue, scrollToIndex]);
 
   const carouselRef = useRef<CarouselSelectListHandle | null>(null);
   const [selectedIndex, setSelectedIndex] = useState(initialProfileIndex);
 
   const renderItem = useCallback(
-    ({ item, index }: ListRenderItemInfo<ProfileType | null>) => {
+    ({
+      item,
+      index,
+      width,
+      height,
+    }: CarouselSelectListRenderItemInfo<ProfileType | null>) => {
       if (item) {
         return (
           <ItemRender
             item={item}
-            coverHeight={coverHeight}
-            coverWidth={coverWidth}
+            coverHeight={height}
+            coverWidth={width}
             index={index}
             scrollToIndex={scrollToIndex}
             isCurrent={index === selectedIndex}
@@ -181,11 +162,9 @@ const HomeProfilesCarousel = ({ user: userKey }: HomeProfilesCarouselProps) => {
         );
       }
 
-      return (
-        <CreateItemMemo coverHeight={coverHeight} coverWidth={coverWidth} />
-      );
+      return <CreateItemMemo coverHeight={height} coverWidth={width} />;
     },
-    [coverWidth, coverHeight, scrollToIndex, selectedIndex],
+    [scrollToIndex, selectedIndex],
   );
 
   if (profiles == null) {
@@ -193,29 +172,27 @@ const HomeProfilesCarousel = ({ user: userKey }: HomeProfilesCarouselProps) => {
   }
 
   return (
-    <View style={styles.container} onLayout={onLayout}>
-      {coverWidth > 0 && (
-        <CarouselSelectList
-          ref={carouselRef}
-          data={data}
-          keyExtractor={keyExtractor}
-          renderItem={renderItem}
-          width={windowWidth}
-          height={coverHeight}
-          itemWidth={coverWidth}
-          scaleRatio={SCALE_RATIO}
-          style={styles.carousel}
-          itemContainerStyle={styles.carouselContentContainer}
-          onSelectedIndexChange={onSelectedIndexChange}
-          currentProfileIndexSharedValue={currentIndexSharedValue}
-          initialScrollIndex={initialProfileIndex}
-        />
-      )}
+    <View style={styles.container}>
+      <CarouselSelectList
+        ref={carouselRef}
+        data={data}
+        keyExtractor={keyExtractor}
+        renderItem={renderItem}
+        itemRatio={COVER_RATIO}
+        scaleRatio={SCALE_RATIO}
+        style={styles.carousel}
+        itemContainerStyle={styles.carouselContentContainer}
+        onSelectedIndexChange={onSelectedIndexChange}
+        currentProfileIndexSharedValue={currentIndexSharedValue}
+        initialScrollIndex={initialProfileIndex}
+      />
     </View>
   );
 };
 
 const SCALE_RATIO = 108 / 291;
+
+const MARGIN_VERTICAL = 15;
 
 const keyExtractor = (item: ProfileType | null, index: number) =>
   item?.webCard?.id ?? `new_${index}`;
@@ -266,7 +243,8 @@ const ItemRenderComponent = ({
   const onToggleFollow = useToggleFollow();
   const [ready, setReady] = useState(!profile?.webCard?.hasCover);
   const [loadingFailed, setLoadingFailed] = useState(false);
-  const [showWebcardModal, toggleWebcardModal] = useToggle(false);
+  const [showWebcardModal, openWebcardModal, closeWebcardModal] =
+    useBoolean(false);
   const onReady = useCallback(() => {
     setReady(true);
   }, []);
@@ -299,7 +277,7 @@ const ItemRenderComponent = ({
     }
   }, [router, profile.profileRole, profile.webCard]);
 
-  const hasFocus = useScreenHasFocus();
+  const { paused, canPlay } = useCoverPlayPermission();
 
   const containerStyle = useMemo(
     () => [
@@ -361,10 +339,11 @@ const ItemRenderComponent = ({
               webCard={profile.webCard}
               width={coverWidth}
               webCardId={profile.webCard.id}
-              canPlay={isCurrent && hasFocus}
+              canPlay={isCurrent && canPlay}
+              paused={paused}
               onReadyForDisplay={onReady}
               onError={onError}
-              onLongPress={toggleWebcardModal}
+              onLongPress={openWebcardModal}
             />
             {profile.webCard.isMultiUser && (
               <PressableNative
@@ -418,7 +397,7 @@ const ItemRenderComponent = ({
           <WebCardMenu
             visible={showWebcardModal}
             webCard={profile.webCard}
-            close={toggleWebcardModal}
+            close={closeWebcardModal}
             onToggleFollow={onToggleFollow}
             isViewer
             isOwner={profileIsOwner(profile.profileRole)}
@@ -468,17 +447,14 @@ const CreateItemMemo = memo(CreateItem);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginVertical: 15,
-    justifyContent: 'center',
-    alignItems: 'center',
+    paddingVertical: MARGIN_VERTICAL,
   },
   carousel: {
-    flexGrow: 0,
+    flex: 1,
     overflow: 'visible',
-    alignSelf: 'center',
   },
   carouselContentContainer: {
-    flexGrow: 0,
+    flexGrow: 1,
     overflow: 'visible',
   },
   coverShadow: Platform.select<ViewStyle>({

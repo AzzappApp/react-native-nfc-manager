@@ -9,7 +9,6 @@ import {
   Alert,
 } from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ShareCommand from 'react-native-share';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
@@ -101,8 +100,7 @@ const WebCardMenu = ({
   const isFollowing = webCard.WebCardMenu_isFollowing;
   const profileInfos = useProfileInfos();
 
-  const { width: windowsWith, height: windowsHeight } = useWindowDimensions();
-  const { top } = useSafeAreaInsets();
+  const { width: windowsWith } = useWindowDimensions();
   const intl = useIntl();
 
   const onShare = async () => {
@@ -363,12 +361,7 @@ const WebCardMenu = ({
   }, [intl, isOwner, quitWebCard]);
 
   return (
-    <BottomSheetModal
-      height={Math.min(650, windowsHeight - top + 50)}
-      visible={visible}
-      onRequestClose={close}
-      contentContainerStyle={styles.bottomSheetContentContainer}
-    >
+    <BottomSheetModal visible={visible} onDismiss={close}>
       <Container>
         <Header
           leftElement={
@@ -381,6 +374,7 @@ const WebCardMenu = ({
           }
           middleElement={<Text variant="large">{webCard.userName}</Text>}
           rightElement={null}
+          style={styles.headerBottom}
         />
         <View
           style={{
@@ -607,7 +601,6 @@ const WebCardMenu = ({
 export default WebCardMenu;
 
 const stylesheet = createStyleSheet(appearance => ({
-  bottomSheetContentContainer: { paddingHorizontal: 0 },
   countersContainer: {
     flexDirection: 'row',
     columnGap: 12,
@@ -649,4 +642,5 @@ const stylesheet = createStyleSheet(appearance => ({
     ...shadow(appearance, 'bottom'),
   },
   loader: { height: 25 },
+  headerBottom: { paddingLeft: 16, paddingRight: 16 },
 }));

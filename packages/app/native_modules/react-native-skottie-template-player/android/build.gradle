@@ -179,10 +179,3 @@ if (isNewArchitectureEnabled()) {
     codegenJavaPackageName = "com.skiaskottie"
   }
 }
-
-if (isNewArchitectureEnabled()) {
-  // TODO: AND reanimated is used:
-  tasks.named('generateCodegenSchemaFromJavaScript') {
-  dependsOn ':react-native-reanimated:prepareHeadersForPrefab'
-  }
-}

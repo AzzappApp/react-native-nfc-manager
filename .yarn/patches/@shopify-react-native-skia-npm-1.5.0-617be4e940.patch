@@ -1,0 +1,144 @@
+diff --git a/cpp/rnskia/RNSkDomView.h b/cpp/rnskia/RNSkDomView.h
+index 8f6bfec12bb77a2879f0f9604b3d49cfd9773014..4df0dbf939d5913ddc4f18fafd5c20384b022ebf 100644
+--- a/cpp/rnskia/RNSkDomView.h
++++ b/cpp/rnskia/RNSkDomView.h
+@@ -10,6 +10,7 @@
+ #include <jsi/jsi.h>
+ 
+ #include "JsiValueWrapper.h"
++#include "JsiSkCanvas.h"
+ #include "RNSkView.h"
+ 
+ #include "JsiDomRenderNode.h"
+@@ -98,5 +99,20 @@ public:
+       }
+     }
+   }
++
++  jsi::Value callJsiMethod(jsi::Runtime &runtime,
++                           const std::string &name,
++                           const jsi::Value *arguments, size_t count) override {
++    if (name == "renderToCanvas") {
++      auto callback = std::make_shared<jsi::Function>(
++          arguments[0].asObject(runtime).asFunction(runtime));
++      getCanvasProvider()->renderToCanvas([=, &runtime](SkCanvas *canvas) {
++        auto jsiCanvas = jsi::Object::createFromHostObject(
++            runtime, std::make_shared<JsiSkCanvas>(getPlatformContext(), canvas));
++        callback->call(runtime, jsiCanvas);
++      });
++    }
++    return jsi::Value::undefined();
++  }
+ };
+ } // namespace RNSkia
+diff --git a/cpp/rnskia/RNSkJsiViewApi.h b/cpp/rnskia/RNSkJsiViewApi.h
+index c1f920e1ab209c023cacc445d88a6a823d13a6db..4344555af3d2e2002c9ddf1418323be758a1b78f 100644
+--- a/cpp/rnskia/RNSkJsiViewApi.h
++++ b/cpp/rnskia/RNSkJsiViewApi.h
+@@ -189,7 +189,54 @@ public:
+         });
+   }
+ 
++   /**
++   Calls a custom command / method on a view by the view id.
++   */
++  JSI_HOST_FUNCTION(callJsiMethod) {
++    if (count < 2) {
++      _platformContext->raiseError(
++          std::string("callCustomCommand: Expected at least 2 arguments, got " +
++                      std::to_string(count) + "."));
++
++      return jsi::Value::undefined();
++    }
++
++    if (!arguments[0].isNumber()) {
++      _platformContext->raiseError(
++          "callCustomCommand: First argument must be a number");
++
++      return jsi::Value::undefined();
++    }
++
++    if (!arguments[1].isString()) {
++      _platformContext->raiseError("callCustomCommand: Second argument must be "
++                                   "the name of the action to call.");
++
++      return jsi::Value::undefined();
++    }
++
++    auto nativeId = arguments[0].asNumber();
++    auto action = arguments[1].asString(runtime).utf8(runtime);
++
++    auto info = getEnsuredViewInfo(nativeId);
++
++    if (info->view == nullptr) {
++      throw jsi::JSError(
++          runtime, std::string("callCustomCommand: Could not call action " +
++                               action + " on view - view not ready.")
++                       .c_str());
++
++      return jsi::Value::undefined();
++    }
++
++    // Get arguments
++    size_t paramsCount = count - 2;
++    const jsi::Value *params = paramsCount > 0 ? &arguments[2] : nullptr;
++    return info->view->callJsiMethod(runtime, action, params, paramsCount);
++  }
++
+   JSI_EXPORT_FUNCTIONS(JSI_EXPORT_FUNC(RNSkJsiViewApi, setJsiProperty),
++                       JSI_EXPORT_FUNC(RNSkJsiViewApi, callJsiMethod),
+                        JSI_EXPORT_FUNC(RNSkJsiViewApi, requestRedraw),
+                        JSI_EXPORT_FUNC(RNSkJsiViewApi, makeImageSnapshotAsync),
+                        JSI_EXPORT_FUNC(RNSkJsiViewApi, makeImageSnapshot))
+diff --git a/cpp/rnskia/RNSkView.h b/cpp/rnskia/RNSkView.h
+index 1ec4a267bbc525df9af850d5f03023ebf0120fb2..4c5eef9cbb6f19f4c9aa1baf93734bbb35013c10 100644
+--- a/cpp/rnskia/RNSkView.h
++++ b/cpp/rnskia/RNSkView.h
+@@ -163,6 +163,17 @@ public:
+     // Nothing here...
+   }
+ 
++  /**
++   Calls a custom action.
++   */
++  virtual jsi::Value callJsiMethod(jsi::Runtime &runtime,
++                                   const std::string &name,
++                                   const jsi::Value *arguments, size_t count) {
++    throw std::runtime_error(
++        "The base Skia View does not support any commands. Command " + name +
++        " not found.");
++  }
++
+   /**
+    * Repaints the Skia view using the underlying context and the drawcallback.
+    * This method schedules a draw request that will be run on the correct
+diff --git a/src/views/SkiaDomView.tsx b/src/views/SkiaDomView.tsx
+index 9997713db68443e6ecf5d008d730592899863164..d36734f640ad78d0a9e3c7b3001b1c13e0300495 100644
+--- a/src/views/SkiaDomView.tsx
++++ b/src/views/SkiaDomView.tsx
+@@ -95,7 +95,8 @@ const assertSkiaViewApi = () => {
+     SkiaViewApi === null ||
+     SkiaViewApi.setJsiProperty === null ||
+     SkiaViewApi.requestRedraw === null ||
+-    SkiaViewApi.makeImageSnapshot === null
++    SkiaViewApi.makeImageSnapshot === null ||
++    SkiaViewApi.callJsiMethod === null 
+   ) {
+     throw Error("Skia View Api was not found.");
+   }
+diff --git a/src/views/types.ts b/src/views/types.ts
+index 603f8c8a968f50382e6bbe1b452f04cc419298d7..541148525628d11342c73365393523162218b259 100644
+--- a/src/views/types.ts
++++ b/src/views/types.ts
+@@ -20,6 +20,11 @@ export interface DrawingInfo {
+ export interface ISkiaViewApi {
+   setJsiProperty: <T>(nativeId: number, name: string, value: T) => void;
+   requestRedraw: (nativeId: number) => void;
++  callJsiMethod: <T extends Array<unknown>>(
++    nativeId: number,
++    name: string,
++    ...args: T
++  ) => void;
+   makeImageSnapshot: (nativeId: number, rect?: SkRect) => SkImage;
+   makeImageSnapshotAsync: (nativeId: number, rect?: SkRect) => Promise<SkImage>;
+ }

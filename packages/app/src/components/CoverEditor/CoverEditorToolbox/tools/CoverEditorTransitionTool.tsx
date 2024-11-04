@@ -9,7 +9,7 @@ import {
   useImage,
 } from '@shopify/react-native-skia';
 import { memo, useCallback, useMemo, useState } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
 import { Image, View } from 'react-native';
 import {
   useDerivedValue,
@@ -21,8 +21,9 @@ import { colors } from '#theme';
 import BoxSelectionList from '#components/BoxSelectionList';
 import { DoneHeaderButton } from '#components/commonsButtons';
 import { keyExtractor } from '#helpers/idHelpers';
-import useToggle from '#hooks/useToggle';
+import useBoolean from '#hooks/useBoolean';
 import BottomSheetModal from '#ui/BottomSheetModal';
+import Header from '#ui/Header';
 import Text from '#ui/Text';
 import coverTransitions, {
   useCoverTransitionsList,
@@ -37,7 +38,7 @@ import type {
 import type { SkShader } from '@shopify/react-native-skia';
 
 const CoverEditorTransitionTool = () => {
-  const [show, toggleBottomSheet] = useToggle(false);
+  const [show, open, close] = useBoolean(false);
   const { coverEditorState } = useCoverEditorContext();
 
   const { dispatch } = useCoverEditorContext();
@@ -140,25 +141,13 @@ const CoverEditorTransitionTool = () => {
           defaultMessage: 'Transitions',
           description: 'Cover Edition Transition Tool Button - Transitions',
         })}
-        onPress={toggleBottomSheet}
+        onPress={open}
       />
-      <BottomSheetModal
-        lazy
-        onRequestClose={toggleBottomSheet}
-        visible={show}
-        height={276}
-        headerTitle={
-          <Text variant="large">
-            <FormattedMessage
-              defaultMessage="Transitions"
-              description="CoverEditor Transitions Tool - Title"
-            />
-          </Text>
-        }
-        headerRightButton={<DoneHeaderButton onPress={toggleBottomSheet} />}
-        contentContainerStyle={{ paddingHorizontal: 0 }}
-        headerStyle={{ paddingHorizontal: 20 }}
-      >
+      <BottomSheetModal lazy onDismiss={close} visible={show} height={276}>
+        <Header
+          middleElement={<Text variant="large">Transitions</Text>}
+          rightElement={<DoneHeaderButton onPress={close} />}
+        />
         <BoxSelectionList
           data={transitions}
           renderItem={renderItem}

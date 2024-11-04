@@ -1,25 +1,8 @@
 import { Skia } from '@shopify/react-native-skia';
 import { Platform } from 'react-native';
 import { runOnUI } from 'react-native-reanimated';
-import { getJSIModule } from '#helpers/azzappJSIModules';
+import BufferLoader from '@azzapp/react-native-buffer-loader';
 import type { SkImage } from '@shopify/react-native-skia';
-
-type BufferLoader = {
-  loadImage: (
-    uri: string,
-    maximumSize: { width: number; height: number } | null | undefined,
-    callback: (error: any, buffer: bigint | null) => void,
-  ) => void;
-  loadVideoFrame: (
-    uri: string,
-    time: number,
-    maximumSize: { width: number; height: number } | null | undefined,
-    callback: (error: any, buffer: bigint | null) => void,
-  ) => void;
-  unrefBuffer(buffer: bigint): void;
-};
-
-const getBufferLoader = () => getJSIModule('BufferLoader') as BufferLoader;
 
 // would be cool to have weak ref and finalization registry here to clean up images
 // we will do it manually for now waiting for react-native 0.75
@@ -35,7 +18,7 @@ const scheduleCleanUp = () => {
     for (const [key, ref] of buffers) {
       if (ref.refCount <= 0) {
         buffers.delete(key);
-        getBufferLoader().unrefBuffer(ref.buffer);
+        BufferLoader.unrefBuffer(ref.buffer);
       }
     }
     if (isAndroid) {
@@ -112,7 +95,7 @@ const loadImage = (
   return {
     key,
     promise: loadImageWithCache(key, callback =>
-      getBufferLoader().loadImage(uri, maximumSize, callback),
+      BufferLoader.loadImage(uri, maximumSize, callback),
     ),
   };
 };
@@ -130,7 +113,7 @@ const loadVideoThumbnail = (
   return {
     key,
     promise: loadImageWithCache(key, callback =>
-      getBufferLoader().loadVideoFrame(uri, time, maximumSize, callback),
+      BufferLoader.loadVideoFrame(uri, time, maximumSize, callback),
     ),
   };
 };

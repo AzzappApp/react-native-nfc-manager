@@ -23,7 +23,9 @@ const HomeCoverIcon = ({ webCardId }: HomeIconProps) => {
     },
   );
 
-  return <CoverRenderer webCard={data.node} width={COVER_WIDTH} />;
+  return (
+    <CoverRenderer webCard={data.node} width={COVER_WIDTH} canPlay={false} />
+  );
 };
 
 export const HomeIcon = () => {

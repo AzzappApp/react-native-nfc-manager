@@ -979,6 +979,11 @@ const CoverPreview = ({
     if (!compositionContainerRef.current) {
       return;
     }
+    if (
+      (lottieInfo?.assetsInfos.length ?? 1) > coverEditorState.medias.length
+    ) {
+      return;
+    }
     try {
       screenShotId = await captureSnapshot(compositionContainerRef.current);
     } catch (e) {

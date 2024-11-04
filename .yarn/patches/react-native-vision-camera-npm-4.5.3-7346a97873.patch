@@ -1,0 +1,13 @@
+diff --git a/android/CMakeLists.txt b/android/CMakeLists.txt
+index 1460dbd7729f1375852876f13af0e89c46c1382e..098fc7f876410178290b595ebb329fd001d17c0f 100644
+--- a/android/CMakeLists.txt
++++ b/android/CMakeLists.txt
+@@ -60,7 +60,7 @@ target_link_libraries(
+         ${LOG_LIB}                          # <-- Logcat logger
+         android                             # <-- Android JNI core
+         ReactAndroid::jsi                   # <-- RN: JSI
+-        ReactAndroid::reactnativejni        # <-- RN: React Native JNI bindings
++        ReactAndroid::reactnative           # <-- RN: React Native JNI bindings
+         fbjni::fbjni                        # <-- fbjni
+ )
+ 

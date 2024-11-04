@@ -2,7 +2,7 @@ import { useCallback, useEffect } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
-import useToggle from '#hooks/useToggle';
+import useBoolean from '#hooks/useBoolean';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -26,7 +26,7 @@ const CoverEditorSizeTool = ({ title }: Props) => {
   const linksLayer = useCoverEditorLinksLayer();
   const { dispatch } = useCoverEditorContext();
 
-  const [show, toggleBottomSheet] = useToggle(false);
+  const [show, open, close] = useBoolean(false);
 
   const size = textLayer?.fontSize ?? linksLayer?.size ?? 12;
   const onSizeChange = useCallback(
@@ -60,21 +60,16 @@ const CoverEditorSizeTool = ({ title }: Props) => {
             <Text variant="small">pt</Text>
           </View>
         }
-        onPress={() => toggleBottomSheet()}
+        onPress={open}
       />
 
-      <BottomSheetModal
-        lazy
-        visible={show}
-        onRequestClose={toggleBottomSheet}
-        height={165}
-      >
-        <Container>
+      <BottomSheetModal lazy visible={show} onDismiss={close}>
+        <Container style={styles.bottomSheetContainer}>
           <Header
             middleElement={<Text variant="large">{title}</Text>}
             rightElement={
               <View style={styles.done}>
-                <Button label="Done" onPress={toggleBottomSheet} />
+                <Button label="Done" onPress={close} />
               </View>
             }
           />
@@ -95,6 +90,7 @@ const CoverEditorSizeTool = ({ title }: Props) => {
 };
 
 const styles = StyleSheet.create({
+  bottomSheetContainer: { paddingHorizontal: 30 },
   done: {
     position: 'relative',
     left: 30,

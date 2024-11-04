@@ -24,9 +24,11 @@ const TextInput = (
   { isErrored, onFocus, onBlur, style, ...props }: TextInputProps,
   ref: ForwardedRef<NativeTextInput>,
 ) => {
+  //#region hooks
   const styles = useStyleSheet(styleSheet);
   const scheme = useColorScheme();
   const [isFocused, setIsFocused] = useState(false);
+  //#endregion
 
   const onFocusInner = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
     setIsFocused(true);

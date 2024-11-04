@@ -29,7 +29,6 @@ import { colors } from '#theme';
 import { ScreenModal, preventModalDismiss } from '#components/NativeRouter';
 import { NativeBufferLoader, loadAllLUTShaders } from '#helpers/mediaEditions';
 import { getVideoLocalPath } from '#helpers/mediaHelpers';
-import useToggle from '#hooks/useToggle';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Text from '#ui/Text';
@@ -576,20 +575,15 @@ const CoverEditorCore = (
   // #endregion
 
   // #region Initial Media picking
-  const [showImagePicker, toggleImagePicker] = useToggle(false);
-  useEffect(() => {
+  const showImagePicker = useMemo(() => {
     const lottieInfo = extractLottieInfoMemoized(coverEditorState.lottie);
     if (lottieInfo && lottieInfo.assetsInfos.length === 0) {
-      return;
+      return false;
     }
     if (coverEditorState.medias.length === 0) {
-      toggleImagePicker();
+      return true;
     }
-  }, [
-    coverEditorState.lottie,
-    coverEditorState.medias.length,
-    toggleImagePicker,
-  ]);
+  }, [coverEditorState.lottie, coverEditorState.medias.length]);
 
   const durations = useMemo(() => {
     const lottieInfo = extractLottieInfoMemoized(coverEditorState.lottie);
@@ -622,9 +616,8 @@ const CoverEditorCore = (
         type: 'UPDATE_MEDIAS',
         payload: medias,
       });
-      toggleImagePicker();
     },
-    [coverEditorState.providedMedias, toggleImagePicker],
+    [coverEditorState.providedMedias, dispatch],
   );
 
   // #region Layout and styles
@@ -696,6 +689,30 @@ const CoverEditorCore = (
     return initial;
   }, [coverEditorState.providedMedias, durations?.length]);
 
+  const imagePicker = (
+    <ScreenModal
+      key="imagePicker"
+      visible={showImagePicker}
+      animationType="slide"
+      onRequestDismiss={onCancel}
+    >
+      <CoverEditorMediaPicker
+        initialMedias={initialMedias}
+        durations={durations}
+        durationsFixed={!!coverEditorState.lottie}
+        maxSelectableVideos={getMaxAllowedVideosPerCover(
+          !!coverEditorState.lottie,
+        )}
+        onFinished={onMediasPicked}
+        onClose={onCancel}
+      />
+    </ScreenModal>
+  );
+
+  if (showImagePicker) {
+    return imagePicker;
+  }
+
   return (
     <>
       <CoverEditorContextProvider value={contextValue}>
@@ -749,22 +766,6 @@ const CoverEditorCore = (
           </Text>
           <Button onPress={reset} label="Ok" />
         </Container>
-      </ScreenModal>
-      <ScreenModal
-        visible={showImagePicker}
-        animationType="slide"
-        onRequestDismiss={onCancel}
-      >
-        <CoverEditorMediaPicker
-          initialMedias={initialMedias}
-          durations={durations}
-          durationsFixed={!!coverEditorState.lottie}
-          maxSelectableVideos={getMaxAllowedVideosPerCover(
-            !!coverEditorState.lottie,
-          )}
-          onFinished={onMediasPicked}
-          onClose={onCancel}
-        />
       </ScreenModal>
       <ScreenModal
         visible={loadingRemoteMedia}
@@ -821,6 +822,7 @@ const CoverEditorCore = (
           </View>
         </Container>
       </ScreenModal>
+      {imagePicker}
     </>
   );
 };

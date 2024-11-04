@@ -9,12 +9,12 @@ import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import {
-  ScreenDidAppear,
   useCurrentRoute,
   useRouter,
   useScreenHasFocus,
 } from '#components/NativeRouter';
 import WebCardBackground from '#components/WebCardBackgroundPreview';
+import useBoolean from '#hooks/useBoolean';
 import useToggle from '#hooks/useToggle';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import AddContentBelowCoverModal from './AddContentBelowCoverModal';
@@ -146,16 +146,11 @@ const WebCardScreenContent = ({
   // #endregion
 
   // #region Color picker
-  const [showWebcardColorPicker, setShowWebcardColorPicker] = useState(false);
-  const onRequestWebcardColorPicker = useCallback(() => {
-    Toast.hide();
-    setShowWebcardColorPicker(true);
-  }, []);
-
-  const onClosWebcardColorPicker = useCallback(() => {
-    setShowWebcardColorPicker(false);
-  }, []);
-
+  const [
+    showWebcardColorPicker,
+    openWebcardColorPicker,
+    closeWebcardColorPicker,
+  ] = useBoolean(false);
   // #endregion
 
   // #region New Module
@@ -397,28 +392,15 @@ const WebCardScreenContent = ({
               </View>
             }
           >
-            {/* TODO: We need to wrap the body in a ScreenDidAppear component
-             * To avoid a reanimated bug preventing layout transition
-             * if web card block are mounted during the transition
-             * @see https://github.com/software-mansion/react-native-reanimated/issues/4516
-             *
-             * Could be solved directly in WebCardBlockContainer once this PR is merged :
-             * https://github.com/software-mansion/react-native-reanimated/pull/5371
-             *
-             * update 19/01/2023: the PR is merged, we need to wait for the next reanimated release
-             * update 02/02/2023: the version 3.6.2 is released, but changing the layout transition doesn't seems to fix the issue
-             */}
-            <ScreenDidAppear>
-              <WebCardScreenBody
-                ref={webCardBodyRef}
-                webCard={webCard}
-                editing={editing}
-                selectionMode={selectionMode}
-                onEditModule={onEditModule}
-                onSelectionStateChange={onSelectionStateChange}
-                onLoad={onProfileBodyLoad}
-              />
-            </ScreenDidAppear>
+            <WebCardScreenBody
+              ref={webCardBodyRef}
+              webCard={webCard}
+              editing={editing}
+              selectionMode={selectionMode}
+              onEditModule={onEditModule}
+              onSelectionStateChange={onSelectionStateChange}
+              onLoad={onProfileBodyLoad}
+            />
           </Suspense>
         </WebCardScreenScrollView>
         <Suspense fallback={null}>
@@ -429,7 +411,7 @@ const WebCardScreenContent = ({
             selectionContainsHiddenModules={selectionContainsHiddenModules}
             webCard={webCard}
             onRequestNewModule={onRequestNewModule}
-            onRequestColorPicker={onRequestWebcardColorPicker}
+            onRequestColorPicker={openWebcardColorPicker}
             onRequestWebCardStyle={openCardStyleModal}
             onRequestPreview={openPreviewModal}
             onDelete={onDeleteSelectedModules}
@@ -479,7 +461,7 @@ const WebCardScreenContent = ({
             <WebCardColorsManager
               webCard={webCard}
               visible={showWebcardColorPicker}
-              onRequestClose={onClosWebcardColorPicker}
+              onRequestClose={closeWebcardColorPicker}
             />
             <AddContentBelowCoverModal
               onClose={toggleShowContentModal}

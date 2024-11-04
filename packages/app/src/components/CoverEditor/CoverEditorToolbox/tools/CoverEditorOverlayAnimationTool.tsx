@@ -6,7 +6,7 @@ import {
 } from '@shopify/react-native-skia';
 import { memo, useCallback, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import {
   useSharedValue,
   useFrameCallback,
@@ -34,9 +34,10 @@ import {
   useLutShader,
   useNativeBuffer,
 } from '#helpers/mediaEditions';
-import useToggle from '#hooks/useToggle';
+import useBoolean from '#hooks/useBoolean';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import DoubleSlider from '#ui/DoubleSlider';
+import Header from '#ui/Header';
 import Text from '#ui/Text';
 import {
   useCoverEditorContext,
@@ -58,7 +59,7 @@ const CoverEditorOverlayImageAnimationTool = () => {
   const activeOverlay = useCoverEditorOverlayLayer();
   const totalDuration = getCoverDuration(coverEditorState);
 
-  const [show, toggleBottomSheet] = useToggle(false);
+  const [show, open, close] = useBoolean(false);
 
   const animations = useOverlayAnimationList();
 
@@ -187,24 +188,21 @@ const CoverEditorOverlayImageAnimationTool = () => {
           description:
             'Cover Edition Image Overlay animation Tool Button - Animations',
         })}
-        onPress={toggleBottomSheet}
+        onPress={open}
       />
       {activeOverlay != null && (
-        <BottomSheetModal
-          lazy
-          onRequestClose={toggleBottomSheet}
-          visible={show}
-          height={selectionHeight + 110}
-          headerTitle={
-            <Text variant="large">
-              <FormattedMessage
-                defaultMessage="Animations "
-                description="CoverEditor Animations Tool - Title"
-              />
-            </Text>
-          }
-          headerRightButton={<DoneHeaderButton onPress={toggleBottomSheet} />}
-        >
+        <BottomSheetModal lazy onDismiss={close} visible={show}>
+          <Header
+            middleElement={
+              <Text variant="large">
+                <FormattedMessage
+                  defaultMessage="Animations "
+                  description="CoverEditor Animations Tool - Title"
+                />
+              </Text>
+            }
+            rightElement={<DoneHeaderButton onPress={close} />}
+          />
           <View style={{ height: selectionHeight }}>
             <BoxSelectionList
               data={animations}
@@ -221,15 +219,19 @@ const CoverEditorOverlayImageAnimationTool = () => {
               fixedItemWidth={80}
             />
           </View>
-          <DoubleSlider
-            minimumValue={0}
-            maximumValue={totalDuration}
-            value={[
-              ((activeOverlay.startPercentageTotal ?? 0) * totalDuration) / 100,
-              ((activeOverlay.endPercentageTotal ?? 100) * totalDuration) / 100,
-            ]}
-            onValueChange={onChangeAnimationDuration}
-          />
+          <View style={styles.doubleSliderContainer}>
+            <DoubleSlider
+              minimumValue={0}
+              maximumValue={totalDuration}
+              value={[
+                ((activeOverlay.startPercentageTotal ?? 0) * totalDuration) /
+                  100,
+                ((activeOverlay.endPercentageTotal ?? 100) * totalDuration) /
+                  100,
+              ]}
+              onValueChange={onChangeAnimationDuration}
+            />
+          </View>
         </BottomSheetModal>
       )}
     </>
@@ -310,3 +312,7 @@ const SELECTION_MINIMUM_IMAGE_RATIO = 0.5;
 const SELECTION_MAXIMUM_IMAGE_RATIO = 2;
 const SELECTION_MAXIMUM_HEIGHT = 140;
 const SELECTION_IMAGE_STEP_HEIGHT = 26;
+
+const styles = StyleSheet.create({
+  doubleSliderContainer: { paddingHorizontal: 20 },
+});

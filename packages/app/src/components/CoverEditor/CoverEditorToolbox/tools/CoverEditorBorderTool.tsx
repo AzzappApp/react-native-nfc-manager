@@ -3,9 +3,10 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import { DoneHeaderButton } from '#components/commonsButtons';
-import useToggle from '#hooks/useToggle';
+import useBoolean from '#hooks/useBoolean';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import ColorPreview from '#ui/ColorPreview';
+import Header from '#ui/Header';
 import LabeledWheelSelector from '#ui/LabeledWheelSelector';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
@@ -18,8 +19,10 @@ import CoverEditorColorPicker from './CoverEditorColorPicker';
 
 const CoverEditorBorderTool = () => {
   const intl = useIntl();
-  const [showBottomSheet, toggleBottomSheet] = useToggle(false);
-  const [showColorPicker, toggleShowColorPicker] = useToggle(false);
+  const [showBottomSheet, openBottomSheet, closeBottomSheet] =
+    useBoolean(false);
+  const [showColorPicker, openColorPicker, closeColorPicker] =
+    useBoolean(false);
   const {
     coverEditorState: { cardColors },
     dispatch,
@@ -64,26 +67,27 @@ const CoverEditorBorderTool = () => {
           defaultMessage: 'Borders',
           description: 'Cover Edition Overlay Tool Button- Borders',
         })}
-        onPress={toggleBottomSheet}
+        onPress={openBottomSheet}
       />
       {layer != null && (
         <>
           <BottomSheetModal
+            onDismiss={closeBottomSheet}
+            visible={showBottomSheet}
             lazy
-            onRequestClose={toggleBottomSheet}
-            visible={showBottomSheet && !showColorPicker}
-            height={BORDER_MODAL_HEIGHT}
-            headerTitle={
-              <Text variant="large">
-                <FormattedMessage
-                  defaultMessage="Borders"
-                  description="CoverEditor Borders Tool - Title"
-                />
-              </Text>
-            }
-            headerRightButton={<DoneHeaderButton onPress={toggleBottomSheet} />}
           >
             <View style={{ rowGap: 10 }}>
+              <Header
+                middleElement={
+                  <Text variant="large">
+                    <FormattedMessage
+                      defaultMessage="Borders"
+                      description="CoverEditor Borders Tool - Title"
+                    />
+                  </Text>
+                }
+                rightElement={<DoneHeaderButton onPress={closeBottomSheet} />}
+              />
               <LabeledWheelSelector
                 min={0}
                 max={100}
@@ -109,7 +113,7 @@ const CoverEditorBorderTool = () => {
                 })}
               />
               <PressableOpacity
-                onPress={toggleShowColorPicker}
+                onPress={openColorPicker}
                 style={styles.colorPickerContainer}
               >
                 <Text variant="small">
@@ -135,7 +139,7 @@ const CoverEditorBorderTool = () => {
             selectedColor={layer.borderColor}
             canEditPalette
             onColorChange={onColorChange}
-            onRequestClose={toggleShowColorPicker}
+            onRequestClose={closeColorPicker}
           />
         </>
       )}
@@ -143,8 +147,7 @@ const CoverEditorBorderTool = () => {
   );
 };
 
-const BORDER_MODAL_HEIGHT = 250;
-const BORDER_MODAL_COLOR_PICKER_HEIGHT = 300;
+const BORDER_MODAL_COLOR_PICKER_HEIGHT = 380;
 
 export default memo(CoverEditorBorderTool);
 

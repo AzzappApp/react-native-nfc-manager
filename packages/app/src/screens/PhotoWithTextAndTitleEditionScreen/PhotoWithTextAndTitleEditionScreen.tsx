@@ -1,5 +1,5 @@
 import omit from 'lodash/omit';
-import { useCallback, useMemo, useState } from 'react';
+import { startTransition, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Platform, StyleSheet } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
@@ -544,12 +544,14 @@ const PhotoWithTextAndTitleEditionScreen = ({
 
   const onCurrentTabChange = useCallback(
     (currentTab: string) => {
-      // TODO: Specific case for modal tab
-      if (currentTab === 'editor') {
-        setShowContentModal(true);
-      } else {
-        setCurrentTab(currentTab);
-      }
+      startTransition(() => {
+        // TODO: Specific case for modal tab
+        if (currentTab === 'editor') {
+          setShowContentModal(true);
+        } else {
+          setCurrentTab(currentTab);
+        }
+      });
     },
     [setCurrentTab],
   );
@@ -741,7 +743,6 @@ const PhotoWithTextAndTitleEditionScreen = ({
             onContentChange('');
           }
         }}
-        closeOnBlur={false}
         ItemTopComponent={
           <>
             <TextInput

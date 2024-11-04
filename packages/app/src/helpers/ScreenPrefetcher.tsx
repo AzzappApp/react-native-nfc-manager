@@ -1,5 +1,4 @@
 import { createContext, useCallback, useContext } from 'react';
-import { useCurrentScreenID } from '#components/NativeRouter';
 import { getAuthState } from './authStore';
 import fetchQueryAndRetain from './fetchQueryAndRetain';
 import type { ROUTES, Route } from '#routes';
@@ -127,14 +126,6 @@ export const ScreenPrefetcherProvider =
  * @returns A function that can be used to prefetch data and images for a given route
  */
 export const usePrefetchRoute = () => {
-  const screenId = useCurrentScreenID();
-
-  if (!screenId) {
-    throw new Error(
-      'useScreenPrefetcher must be used on native platforms only',
-    );
-  }
-
   const screenPrefetcher = useContext(ScreenPrefetcherContext);
   if (!screenPrefetcher) {
     throw new Error(

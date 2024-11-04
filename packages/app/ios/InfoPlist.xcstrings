@@ -8,12 +8,12 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Azzapp"
+            "value" : "Azzapp - Dev"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Azzapp"
           }
         }
@@ -26,12 +26,12 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "azzapp"
+            "value" : "azzapp-dev"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "azzapp"
           }
         }
@@ -44,12 +44,12 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "azzapp needs access to your camera to capture photos and videos for sharing within the app."
+            "value" : "azzapp-dev needs access to your camera to capture photos and videos for sharing\n\t\twithin the app."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "azzapp a besoin d’accéder à votre caméra pour capturer des photos et des vidéos et les partager dans l’application."
           }
         }
@@ -62,12 +62,12 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Allow azzapp to access your contacts to easily invite friends to join a multi-user WebCard."
+            "value" : "Allow azzapp-dev to access your contacts to easily invite friends to join a\n\t\tmulti-user WebCard."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Autorisez azzapp à accéder à vos contacts pour inviter facilement des amis à rejoindre une WebCard multi-utilisateurs."
           }
         }
@@ -80,12 +80,12 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "azzapp needs access to your microphone to record audio for video content within the app."
+            "value" : "azzapp-dev needs access to your microphone to record audio for video content within\n\t\tthe app."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "azzapp a besoin d’accéder à votre microphone pour enregistrer de l’audio pour du contenu vidéo dans l’application."
           }
         }
@@ -98,12 +98,12 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "azzapp uses motion detection to optimize the display of your contact card based on your device’s orientation."
+            "value" : "azzapp-dev uses motion detection to optimize the display of your contact card based\n\t\ton your device’s orientation."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "azzapp utilise la détection de mouvement pour optimiser l’affichage de votre ContactCard en fonction de l’orientation de votre appareil."
           }
         }
@@ -116,12 +116,12 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "azzapp requires access to your photo library to upload and share photos within the app."
+            "value" : "azzapp-dev requires access to your photo library, in order to create your WebCard,\n\t\tshare and upload media."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "azzapp nécessite l’accès à votre bibliothèque de photos pour télécharger et partager des photos dans l’application."
           }
         }

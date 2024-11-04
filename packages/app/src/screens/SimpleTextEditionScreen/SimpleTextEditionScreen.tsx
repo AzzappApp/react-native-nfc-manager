@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { startTransition, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
@@ -366,11 +366,13 @@ const SimpleTextEditionScreen = ({
 
   const onCurrentTabChange = useCallback(
     (currentTab: string) => {
-      if (currentTab === 'edit') {
-        setShowContentModal(true);
-      } else {
-        setCurrentTab(currentTab);
-      }
+      startTransition(() => {
+        if (currentTab === 'edit') {
+          setShowContentModal(true);
+        } else {
+          setCurrentTab(currentTab);
+        }
+      });
     },
     [setCurrentTab],
   );

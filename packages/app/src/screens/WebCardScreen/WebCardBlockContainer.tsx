@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
+  Easing,
   FadeIn,
   FadeOut,
   interpolate,
@@ -354,7 +355,13 @@ const WebCardBlockContainer = ({
           ? FadeOut.duration(EDIT_TRANSITION_DURATION)
           : undefined
       }
-      layout={enableLayoutTransition ? LinearTransition : undefined}
+      layout={
+        enableLayoutTransition
+          ? LinearTransition.easing(Easing.inOut(Easing.ease)).duration(
+              EDIT_TRANSITION_DURATION,
+            )
+          : undefined
+      }
     >
       <Animated.View style={blockStyle}>
         <GestureDetector gesture={Gesture.Race(tapGesture, panGesture)}>

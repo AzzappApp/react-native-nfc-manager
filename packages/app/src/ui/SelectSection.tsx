@@ -1,12 +1,14 @@
-import { useCallback, useState } from 'react';
-import { Pressable, View } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import { useCallback } from 'react';
+import { View } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import useBoolean from '#hooks/useBoolean';
 import Text from '#ui/Text';
 import BottomSheetModal from './BottomSheetModal';
+import Header from './Header';
 import Icon from './Icon';
 import PressableNative from './PressableNative';
+import PressableOpacity from './PressableOpacity';
 import SelectSectionList from './SelectSectionList';
 import type { SelectSectionListProps } from './SelectSectionList';
 import type { ReactElement } from 'react';
@@ -73,15 +75,13 @@ type SelectProps<ItemT, SectionT> = Omit<ViewProps, 'children'> &
      * Style of the item container when it is selected in the dropdown list
      */
     selectedItemContainerStyle?: StyleProp<ViewStyle>;
-
-    avoidKeyboard?: boolean;
-
     /**
      * top right custom action confirguration
      * Both field shall be defined to display the action
      */
     headerRightAction?: () => void;
     headerRightComponent?: ReactElement;
+    dismissKeyboardOnOpening?: boolean;
   };
 
 /**
@@ -105,26 +105,25 @@ const SelectSection = <ItemT, SectionT>({
   isErrored,
   style,
   ListHeaderComponent,
-  avoidKeyboard,
   headerRightAction,
   headerRightComponent,
   ...props
 }: SelectProps<ItemT, SectionT>) => {
-  const [showDropDown, setShowDropDown] = useState(false);
+  const [showDropDown, openDropDown, closeDropDown] = useBoolean(false);
 
   const styles = useStyleSheet(styleSheet);
 
   const onSelectListItemSelected = useCallback(
     (item: ItemT) => {
-      setShowDropDown(false);
+      closeDropDown();
       onItemSelected(item);
     },
-    [onItemSelected],
+    [closeDropDown, onItemSelected],
   );
   return (
     <>
       <PressableNative
-        onPress={() => setShowDropDown(true)}
+        onPress={openDropDown}
         style={[styles.input, isErrored && styles.error, style]}
         accessibilityRole="combobox"
         {...props}
@@ -148,30 +147,31 @@ const SelectSection = <ItemT, SectionT>({
       </PressableNative>
       <BottomSheetModal
         visible={showDropDown}
-        headerTitle={bottomSheetTitle}
         height={bottomSheetHeight}
         variant="modal"
-        contentContainerStyle={styles.bottomSheetContentContainer}
-        onRequestClose={() => setShowDropDown(false)}
+        onDismiss={closeDropDown}
         nestedScroll
-        headerRightButton={
-          headerRightAction && headerRightComponent ? (
-            <Pressable
-              onPress={() => {
-                headerRightAction();
-                setShowDropDown(false);
-              }}
-            >
-              {headerRightComponent}
-            </Pressable>
-          ) : undefined
-        }
+        dismissKeyboardOnOpening
       >
+        {bottomSheetTitle && (
+          <Header
+            middleElement={bottomSheetTitle}
+            rightElement={
+              headerRightAction && headerRightComponent ? (
+                <PressableOpacity
+                  onPress={() => {
+                    headerRightAction();
+                    closeDropDown();
+                  }}
+                >
+                  {headerRightComponent}
+                </PressableOpacity>
+              ) : undefined
+            }
+          />
+        )}
         <SelectSectionList
           sections={sections}
-          renderScrollComponent={props => (
-            <KeyboardAwareScrollView enabled={avoidKeyboard} {...props} />
-          )}
           keyExtractor={keyExtractor}
           selectedItemKey={selectedItemKey}
           renderItem={renderItem}

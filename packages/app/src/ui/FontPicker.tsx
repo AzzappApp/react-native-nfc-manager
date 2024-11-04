@@ -5,6 +5,7 @@ import { APPLICATIONS_FONTS } from '@azzapp/shared/fontHelpers';
 import Text from '#ui/Text';
 import BottomSheetModal from './BottomSheetModal';
 import Button from './Button';
+import Header from './Header';
 import SelectList from './SelectList';
 
 const FontPicker = ({
@@ -17,9 +18,9 @@ const FontPicker = ({
 }: {
   title: string;
   value: string;
-  onChange: (value: string) => void;
-  visible: boolean;
   height: number;
+  visible: boolean;
+  onChange: (value: string) => void;
   onRequestClose: () => void;
 }) => {
   const renderItem = useCallback(({ item }: FontItemProps) => {
@@ -28,23 +29,27 @@ const FontPicker = ({
   const intl = useIntl();
   return (
     <BottomSheetModal
-      visible={visible}
-      onRequestClose={onRequestClose}
-      nestedScroll
       height={height}
-      headerTitle={title}
-      headerRightButton={
-        <Button
-          label={intl.formatMessage({
-            defaultMessage: 'Done',
-            description: 'FontPicker component Done button label',
-          })}
-          onPress={onRequestClose}
-          variant="primary"
-        />
-      }
-      contentContainerStyle={{ paddingBottom: 0 }}
+      visible={visible}
+      onDismiss={onRequestClose}
+      nestedScroll
+      enableContentPanningGesture={false}
     >
+      {title && (
+        <Header
+          middleElement={title}
+          rightElement={
+            <Button
+              label={intl.formatMessage({
+                defaultMessage: 'Done',
+                description: 'FontPicker component Done button label',
+              })}
+              onPress={onRequestClose}
+              variant="primary"
+            />
+          }
+        />
+      )}
       <SelectList
         data={APPLICATIONS_FONTS}
         selectedItemKey={value}

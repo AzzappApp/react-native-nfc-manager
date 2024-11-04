@@ -2,6 +2,7 @@ import { forwardRef, useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { ScrollView, Share, StyleSheet, View } from 'react-native';
 import ColorTriptychRenderer from '#components/ColorTriptychRenderer';
+import useBoolean from '#hooks/useBoolean';
 import useToggle from '#hooks/useToggle';
 import { useCoverEditorContext } from '../CoverEditorContext';
 import { extractLottieInfoMemoized } from '../coverEditorHelpers';
@@ -24,8 +25,12 @@ const CoverEditorToolbox = (
   ref: ForwardedRef<CoverEditorLinksToolActions>,
 ) => {
   const [textModalVisible, toggleTextModalVisible] = useToggle();
-  const [colorPickerVisible, toggleColorPickerVisible] = useToggle();
-  const [showOverlayImagePicker, toggleOverlayImagePicker] = useToggle(false);
+  const [colorPickerVisible, showColorPicker, closeColorPicker] = useBoolean();
+  const [
+    showOverlayImagePicker,
+    openOverlayImagePicker,
+    closeOverlayImagePicker,
+  ] = useBoolean(false);
   const { coverEditorState, dispatch } = useCoverEditorContext();
 
   const { editionMode, cardColors } = coverEditorState;
@@ -84,7 +89,7 @@ const CoverEditorToolbox = (
               description: 'Cover Edition - Toolbox overlay',
             })}
             icon="overlay"
-            onPress={toggleOverlayImagePicker}
+            onPress={openOverlayImagePicker}
           />
           {(!lottieInfo || lottieInfo.assetsInfos.length > 0) && (
             <ToolBoxSection
@@ -114,7 +119,7 @@ const CoverEditorToolbox = (
                 <ColorTriptychRenderer {...cardColors} width={16} height={16} />
               </View>
             }
-            onPress={toggleColorPickerVisible}
+            onPress={showColorPicker}
           />
           {process.env.DEPLOYMENT_ENVIRONMENT !== 'production' && (
             <ToolBoxSection
@@ -155,10 +160,10 @@ const CoverEditorToolbox = (
       />
       <CoverEditorColorsManager
         visible={colorPickerVisible}
-        onRequestClose={toggleColorPickerVisible}
+        onRequestClose={closeColorPicker}
       />
       <CoverEditorAddOverlay
-        onClose={toggleOverlayImagePicker}
+        onClose={closeOverlayImagePicker}
         open={showOverlayImagePicker}
       />
     </View>

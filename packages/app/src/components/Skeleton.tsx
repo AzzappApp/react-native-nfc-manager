@@ -1,53 +1,54 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, View } from 'react-native';
+import { useCallback, useEffect } from 'react';
+import { View } from 'react-native';
+import Animated, {
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from 'react-native-reanimated';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import type { ViewProps, LayoutChangeEvent } from 'react-native';
 
 const Skeleton = ({ style }: ViewProps) => {
   const styles = useStyleSheet(styleSheet);
-  const animation = useRef(new Animated.Value(-1)).current;
-  const [width, setWidth] = useState(0);
-  const onLayout = useCallback((event: LayoutChangeEvent) => {
-    setWidth(event.nativeEvent.layout.width);
-  }, []);
+  const animationSharedValue = useSharedValue(-1);
+  const widthSharedValue = useSharedValue(0);
 
   useEffect(() => {
-    const loop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(animation, {
-          toValue: -1,
-          duration: 0,
-          useNativeDriver: true,
-        }),
-        Animated.timing(animation, {
-          toValue: 1,
-          duration: 1000,
-          useNativeDriver: true,
-        }),
-      ]),
+    animationSharedValue.value = withRepeat(
+      withTiming(1, { duration: 1000 }),
+      -1,
+      false,
     );
-    loop.start();
-    return () => loop.stop();
+  }, [animationSharedValue]);
+
+  const onLayout = useCallback(
+    (event: LayoutChangeEvent) => {
+      widthSharedValue.value = event.nativeEvent.layout.width;
+    },
+    [widthSharedValue],
+  );
+
+  const animatedStyle = useAnimatedStyle(() => {
+    const width = widthSharedValue.value;
+    return {
+      transform: [
+        {
+          translateX: interpolate(
+            animationSharedValue.value,
+            [-1, 1],
+            [-300, width > 300 ? width : 300],
+          ),
+        },
+      ],
+    };
   });
 
   return (
     <View style={[styles.skeleton, style]} onLayout={onLayout}>
-      <Animated.View
-        style={[
-          styles.skeletonAnimation,
-          {
-            transform: [
-              {
-                translateX: animation.interpolate({
-                  inputRange: [-1, 1],
-                  outputRange: [-300, width > 300 ? width : 300],
-                }),
-              },
-            ],
-          },
-        ]}
-      />
+      <Animated.View style={[styles.skeletonAnimation, animatedStyle]} />
     </View>
   );
 };

@@ -10,8 +10,6 @@ type LineDividerPreviewProps = Pick<
    * A callback that is called when the module preview is pressed.
    */
   onPreviewPress?: () => void;
-
-  animatedData: object;
 };
 
 /**
@@ -31,7 +29,7 @@ const LineDividerPreview = ({
         colorPalette={colorPalette}
         cardStyle={cardStyle}
         data={data}
-        animatedData={animatedData}
+        animatedData={animatedData!}
       />
     </EditorScaledPreview>
   );

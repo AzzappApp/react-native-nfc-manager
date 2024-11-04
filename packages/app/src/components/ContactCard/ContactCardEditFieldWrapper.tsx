@@ -14,6 +14,7 @@ import {
   buildContactCardModalStyleSheet,
 } from '#helpers/contactCardHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import useBoolean from '#hooks/useBoolean';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
@@ -91,7 +92,7 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
 
   const label = useWatch(watchable);
 
-  const [visible, setVisible] = useState(false);
+  const [visible, open, close] = useBoolean(false);
 
   const styles = useStyleSheet(stylesheet);
 
@@ -100,12 +101,6 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
       <Animated.View
         style={[styles.field, style]}
         onLayout={event => setLayout(event.nativeEvent.layout)}
-        // TODO reenable once RANIMATED3 see: https://github.com/software-mansion/react-native-reanimated/issues/3124
-
-        // entering={FadeInDown}
-        // exiting={FadeOutUp.withInitialValues({
-        //   originX: -50,
-        // }).withCallback(callback)}
       >
         <View
           style={{
@@ -134,10 +129,7 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
               }}
             />
             {labelValues && labelValues.length > 0 && (
-              <PressableNative
-                style={styles.labelSelector}
-                onPress={() => setVisible(true)}
-              >
+              <PressableNative style={styles.labelSelector} onPress={open}>
                 <Text variant="smallbold">
                   {labelValues.find(
                     l => typeof label === 'string' && l.key === label,
@@ -183,28 +175,27 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
       {labelKey && (
         <BottomSheetModal
           visible={visible}
-          onRequestClose={() => setVisible(false)}
+          onDismiss={close}
+          style={styles.bottomSheetStyle}
           nestedScroll
         >
-          <View>
-            <Controller
-              name={labelKey}
-              control={control}
-              render={({ field: { onChange, value } }) => (
-                <SelectList
-                  keyExtractor={item => item.key}
-                  data={labelValues}
-                  onItemSelected={item => {
-                    onChange(item.key);
-                    onChangeLabel?.(item.key);
-                    setVisible(false);
-                  }}
-                  selectedItemKey={value as string}
-                  labelField="value"
-                />
-              )}
-            />
-          </View>
+          <Controller
+            name={labelKey}
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <SelectList
+                keyExtractor={item => item.key}
+                data={labelValues}
+                onItemSelected={item => {
+                  onChange(item.key);
+                  onChangeLabel?.(item.key);
+                  close();
+                }}
+                selectedItemKey={value as string}
+                labelField="value"
+              />
+            )}
+          />
         </BottomSheetModal>
       )}
     </>
@@ -231,6 +222,7 @@ const stylesheet = createStyleSheet(appearance => ({
     alignItems: 'center',
     columnGap: 5,
   },
+  bottomSheetStyle: { padding: 16 },
   switch: { marginRight: -8 },
   ...buildContactCardModalStyleSheet(appearance),
 }));

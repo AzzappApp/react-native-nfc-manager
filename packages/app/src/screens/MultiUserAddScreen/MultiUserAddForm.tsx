@@ -9,6 +9,7 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { keyExtractor } from '#helpers/idHelpers';
 import useToggle from '#hooks/useToggle';
 import BottomSheetModal from '#ui/BottomSheetModal';
+import Header from '#ui/Header';
 import PressableOpacity from '#ui/PressableOpacity';
 import Select from '#ui/Select';
 import SelectList from '#ui/SelectList';
@@ -123,17 +124,18 @@ const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
               contacts.length * BOTTOM_SHEET_HEIGHT_ITEM
             }
             variant="modal"
-            contentContainerStyle={styles.bottomSheetContentContainer}
-            onRequestClose={toggleShowAvailableInfo}
+            onDismiss={toggleShowAvailableInfo}
             nestedScroll
-            headerTitle={
-              intl.formatMessage({
-                defaultMessage: 'Available Info',
-                description:
-                  'MultiUserAddForm - Available Info BottomSheet - Title',
-              }) as string
-            }
           >
+            <Header
+              middleElement={
+                intl.formatMessage({
+                  defaultMessage: 'Available Infoss',
+                  description:
+                    'MultiUserAddForm - Available Info BottomSheet - Title',
+                }) as string
+              }
+            />
             <SelectList
               data={contacts}
               keyExtractor={contact => contact.id}

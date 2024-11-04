@@ -2,7 +2,7 @@ import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import { Image } from 'expo-image';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { FlatList, Modal, StyleSheet, View } from 'react-native';
+import { FlatList, StyleSheet, View } from 'react-native';
 import { colors } from '#theme';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Container from '#ui/Container';
@@ -12,6 +12,7 @@ import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
+import { ScreenModal } from './NativeRouter';
 import type { Album } from '@react-native-camera-roll/camera-roll';
 import type { IntlShape } from 'react-intl';
 import type { ViewProps, ListRenderItemInfo } from 'react-native';
@@ -57,16 +58,16 @@ const AlbumPicker = ({
         </Text>
         <Icon icon="arrow_down" style={styles.arrowIcon} />
       </PressableNative>
-      <Modal
+      <ScreenModal
         animationType="slide"
-        onRequestClose={onModalClose}
+        onRequestDismiss={onModalClose}
         visible={showModal}
       >
         <AlbumPickerScreen
           onSelectAlbum={onSelectAlbum}
           onClose={onModalClose}
         />
-      </Modal>
+      </ScreenModal>
     </>
   );
 };

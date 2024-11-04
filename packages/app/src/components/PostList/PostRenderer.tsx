@@ -18,7 +18,7 @@ import { colors } from '#theme';
 import AuthorCartouche from '#components/AuthorCartouche';
 import { getAuthState } from '#helpers/authStore';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import useToggle from '#hooks/useToggle';
+import useBoolean from '#hooks/useBoolean';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 
@@ -170,17 +170,17 @@ const PostRenderer = (
     [],
   );
 
-  const [showModal, toggleModal] = useToggle();
+  const [showModal, openModal, closeModal] = useBoolean(false);
   const context = useContext(PostListContext);
   const shouldPlayVideo = context.played === post.id;
   const shouldPauseVideo = context.paused.includes(post.id) && !shouldPlayVideo;
 
   const intl = useIntl();
 
-  const openModal = useCallback(() => {
+  const safeOpenModal = useCallback(() => {
     const { profileInfos } = getAuthState();
     if (profileHasEditorRight(profileInfos?.profileRole)) {
-      toggleModal();
+      openModal();
     } else {
       Toast.show({
         type: 'error',
@@ -191,16 +191,19 @@ const PostRenderer = (
         }),
       });
     }
-  }, [intl, toggleModal]);
+  }, [intl, openModal]);
 
-  const handleOpenModal = () => {
+  const handleOpenModal = useCallback(() => {
     if (!actionEnabled) {
       onActionDisabled?.();
       return;
     }
+    safeOpenModal();
+  }, [actionEnabled, onActionDisabled, safeOpenModal]);
 
-    openModal();
-  };
+  const handleCloseModal = useCallback(() => {
+    closeModal();
+  }, [closeModal]);
 
   const showUnpublishedOverlay = useMemo(() => {
     if (showUnpublished) return false;
@@ -245,7 +248,8 @@ const PostRenderer = (
       </View>
       <Suspense fallback={<PostRendererBottomPanelSkeleton />}>
         <PostRendererBottomPanel
-          toggleModal={handleOpenModal}
+          openModal={handleOpenModal}
+          closeModal={handleCloseModal}
           showModal={showModal}
           post={post}
           actionEnabled={actionEnabled}

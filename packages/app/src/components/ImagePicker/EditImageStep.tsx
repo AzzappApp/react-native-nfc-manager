@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { startTransition, useCallback, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, useWindowDimensions, View } from 'react-native';
 import { useDebouncedCallback } from 'use-debounce';
@@ -73,27 +73,39 @@ const EditImageStep = ({
     selectedTab ?? 'filter',
   );
 
+  const onMenuItemPress = useCallback((tab: string) => {
+    startTransition(() => {
+      setCurrentTab(tab as 'edit' | 'filter' | 'timeRange');
+    });
+  }, []);
+
   const onEditionStart = useCallback(
     (param: keyof EditionParameters) => {
-      previousParameters.current = editionParameters;
-      previousTimeRange.current = timeRange;
-      setEditedParam(param);
+      startTransition(() => {
+        previousParameters.current = editionParameters;
+        previousTimeRange.current = timeRange;
+        setEditedParam(param);
+      });
     },
     [editionParameters, timeRange],
   );
 
   const onEditionSave = useCallback(() => {
-    previousParameters.current = editionParameters;
-    previousTimeRange.current = timeRange;
-    setEditedParam(null);
+    startTransition(() => {
+      previousParameters.current = editionParameters;
+      previousTimeRange.current = timeRange;
+      setEditedParam(null);
+    });
     onEditionSaveProp?.(editionParameters);
   }, [editionParameters, onEditionSaveProp, timeRange]);
 
   const onEditionCancel = useCallback(() => {
-    onEditionParametersChange(previousParameters.current);
-    onTimeRangeChange(previousTimeRange.current);
-    setEditedParam(null);
-    onEditionCancelProp?.();
+    startTransition(() => {
+      onEditionParametersChange(previousParameters.current);
+      onTimeRangeChange(previousTimeRange.current);
+      setEditedParam(null);
+      onEditionCancelProp?.();
+    });
   }, [onEditionParametersChange, onEditionCancelProp, onTimeRangeChange]);
 
   const onCurrentParamChange = useCallback(
@@ -360,7 +372,7 @@ const EditImageStep = ({
         !isEditing && showTabs
           ? {
               currentTab,
-              onItemPress: setCurrentTab as any,
+              onItemPress: onMenuItemPress,
               tabs,
             }
           : null

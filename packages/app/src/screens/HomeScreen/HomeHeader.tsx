@@ -105,8 +105,12 @@ const HomeHeader = ({ openPanel, user: userKey }: HomeHeaderProps) => {
     userKey,
   );
 
-  const { currentIndexSharedValue, currentIndexProfile, inputRange } =
-    useHomeScreenContext();
+  const {
+    currentIndexSharedValue,
+    currentIndexProfileSharedValue,
+    initialProfileIndex,
+    inputRange,
+  } = useHomeScreenContext();
   const readableColors = useMemo(
     () => [
       colors.white,
@@ -117,17 +121,6 @@ const HomeHeader = ({ openPanel, user: userKey }: HomeHeaderProps) => {
       }) ?? []),
     ],
     [profiles],
-  );
-
-  const [currentWebCard, setCurrentWebCard] = useState(
-    profiles?.[currentIndexProfile.value - 1]?.webCard,
-  );
-  useAnimatedReaction(
-    () => currentIndexProfile.value,
-    index => {
-      const cProfile = profiles?.[index - 1];
-      runOnJS(setCurrentWebCard)(cProfile?.webCard);
-    },
   );
 
   const colorValue = useDerivedValue<ColorValue>(() => {
@@ -148,6 +141,17 @@ const HomeHeader = ({ openPanel, user: userKey }: HomeHeaderProps) => {
   const iconStyles = useAnimatedStyle(() => ({
     tintColor: colorValue.value,
   }));
+
+  const [currentWebCard, setCurrentWebCard] = useState(
+    profiles?.[initialProfileIndex - 1]?.webCard,
+  );
+  useAnimatedReaction(
+    () => currentIndexProfileSharedValue.value,
+    index => {
+      const cProfile = profiles?.[index - 1];
+      runOnJS(setCurrentWebCard)(cProfile?.webCard);
+    },
+  );
 
   return (
     <Header

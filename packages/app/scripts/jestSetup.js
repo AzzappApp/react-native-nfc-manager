@@ -49,14 +49,6 @@ jest.mock('#components/medias');
 require('@shopify/flash-list/jestSetup');
 //#endregion
 
-//#region ReactNativeBlobUtil
-jest.mock('react-native-blob-util', () => {});
-//#endregion
-
-//#region ReactNativeSkia video
-jest.mock('@azzapp/react-native-skia-video', () => {});
-//#endregion
-
 //#region Sentry
 jest.mock('@sentry/react-native', () => ({
   init: () => jest.fn(),
@@ -85,3 +77,18 @@ jest.mock('@react-native-firebase/analytics', () => {
     logSignUp: jest.fn(),
   });
 });
+
+jest.mock('@gorhom/bottom-sheet', () => {
+  const { ScrollView, TextInput } = jest.requireActual('react-native');
+
+  return {
+    ...require('@gorhom/bottom-sheet/mock'),
+    __esModule: true,
+    BottomSheetScrollView: ScrollView,
+    BottomSheetTextInput: TextInput,
+  };
+});
+
+jest.mock('@azzapp/react-native-skia-video', () => ({}));
+jest.mock('@azzapp/react-native-buffer-loader', () => ({}));
+jest.mock('react-native-blob-util', () => ({}));

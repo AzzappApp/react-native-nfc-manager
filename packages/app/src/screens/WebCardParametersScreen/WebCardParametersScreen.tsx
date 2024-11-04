@@ -684,7 +684,6 @@ const WebCardParametersScreen = ({
                     />
                   </View>
                 }
-                avoidKeyboard
                 accessibilityLabelledBy="activitiesLabel"
                 sections={activities ?? []}
                 selectedItemKey={webCard.companyActivity?.id}
@@ -695,6 +694,7 @@ const WebCardParametersScreen = ({
                   ),
                   600,
                 )}
+                dismissKeyboardOnOpening
                 keyExtractor={keyExtractor}
                 onItemSelected={updateProfileActivity}
                 bottomSheetTitle={intl.formatMessage({

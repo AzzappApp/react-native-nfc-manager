@@ -1,4 +1,10 @@
-import { Suspense, useEffect, useState } from 'react';
+import {
+  startTransition,
+  Suspense,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
 import { FormattedMessage } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
@@ -57,6 +63,11 @@ const MediaScreen = ({
   const profile = node?.profile;
   const { top } = useScreenInsets();
   const [tab, setTab] = useState<TAB>('SUGGESTIONS');
+  const onTabChange = useCallback((newTab: TAB) => {
+    startTransition(() => {
+      setTab(newTab);
+    });
+  }, []);
 
   const router = useRouter();
 
@@ -139,7 +150,7 @@ const MediaScreen = ({
 
   return (
     <Container style={{ flex: 1, marginTop: top }}>
-      <MediaScreenTabBar currentTab={tab} setTab={setTab} />
+      <MediaScreenTabBar currentTab={tab} setTab={onTabChange} />
       <TabView style={{ flex: 1 }} currentTab={tab} tabs={tabs} />
     </Container>
   );

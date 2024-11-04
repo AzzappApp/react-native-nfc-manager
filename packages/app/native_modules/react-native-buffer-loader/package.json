@@ -1,0 +1,21 @@
+{
+  "name": "@azzapp/react-native-buffer-loader",
+  "version": "0.1.0",
+  "main": "src/index",
+  "description": "Load Native Buffer usable in @shopify/react-native-skia from image or video frame",
+  "author": "François de Campredon <francois@azzapp.com> (https://github.com/AzzappApp)",
+  "license": "private",
+  "homepage": "https://github.com/AzzappApp",
+  "peerDependencies": {
+    "react": "*",
+    "react-native": ">=0.71.0"
+  },
+  "codegenConfig": {
+    "name": "AzzappRNBufferLoaderSpec",
+    "type": "modules",
+    "jsSrcsDir": "./src",
+    "android": {
+      "javaPackageName": "com.azzapp.bufferloader"
+    }
+  }
+}

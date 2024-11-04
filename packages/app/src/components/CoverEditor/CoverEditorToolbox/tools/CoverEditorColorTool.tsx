@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import { swapColor } from '@azzapp/shared/cardHelpers';
-import useToggle from '#hooks/useToggle';
+import useBoolean from '#hooks/useBoolean';
 import Icon from '#ui/Icon';
 import {
   useCoverEditorContext,
@@ -18,7 +18,7 @@ type Props = {
 
 const CoverEditorColorTool = ({ title }: Props) => {
   const intl = useIntl();
-  const [show, toggleBottomSheet] = useToggle(false);
+  const [show, open, close] = useBoolean(false);
 
   const textLayer = useCoverEditorTextLayer();
   const linksLayer = useCoverEditorLinksLayer();
@@ -58,7 +58,7 @@ const CoverEditorColorTool = ({ title }: Props) => {
             />
           </>
         }
-        onPress={toggleBottomSheet}
+        onPress={open}
       />
 
       <CoverEditorColorPicker
@@ -68,7 +68,7 @@ const CoverEditorColorTool = ({ title }: Props) => {
         selectedColor={selectedColor}
         canEditPalette
         onColorChange={onColorChange}
-        onRequestClose={toggleBottomSheet}
+        onRequestClose={close}
       />
     </>
   );
@@ -80,6 +80,6 @@ const styles = StyleSheet.create({
   },
 });
 
-const COLOR_PICKER_HEIGHT = 300;
+const COLOR_PICKER_HEIGHT = 380;
 
 export default CoverEditorColorTool;

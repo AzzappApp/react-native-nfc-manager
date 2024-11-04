@@ -1,6 +1,13 @@
 import isEqual from 'lodash/isEqual';
 import pick from 'lodash/pick';
-import { useMemo, useCallback, useRef, useEffect, useReducer } from 'react';
+import {
+  useMemo,
+  useCallback,
+  useRef,
+  useEffect,
+  useReducer,
+  startTransition,
+} from 'react';
 import { BackHandler } from 'react-native';
 import { type Route } from '#routes';
 import { createId } from '#helpers/idHelpers';
@@ -103,35 +110,38 @@ export const useNativeRouter = (init: RouterInit) => {
 
   const dispatch = useCallback(
     (action: RouterAction) => {
-      const currentRoute = getCurrentRouteFromState(routerStateRef.current);
-      const nextState = nativeRouterReducer(routerStateRef.current, action);
-      const nextRoute = getCurrentRouteFromState(nextState);
-      if (nextRoute && !isEqual(routerStateRef.current, nextState)) {
-        if (nextRoute.id !== currentRoute?.id && nextRoute) {
-          dispatchToListeners(routeWillChangeListeners, nextRoute.state);
-        }
-        const previousRoutes = getAllRoutesFromStack(
-          routerStateRef.current.stack,
-        );
-        const nextRoutes = getAllRoutesFromStack(nextState.stack);
-        const screenRemoved = previousRoutes.filter(
-          route => !nextRoutes.find(nextRoute => nextRoute.id === route.id),
-        );
-        dispatchToListeners(
-          screenWillBeRemovedListeners,
-          screenRemoved.map(({ id, state: route }) => ({ id, route })),
-        );
-        const newRoutes = nextRoutes.filter(
-          route => !previousRoutes.find(prevRoute => prevRoute.id === route.id),
-        );
-        dispatchToListeners(
-          screenWillBePushedListeners,
-          newRoutes.map(({ id, state: route }) => ({ id, route })),
-        );
+      startTransition(() => {
+        const currentRoute = getCurrentRouteFromState(routerStateRef.current);
+        const nextState = nativeRouterReducer(routerStateRef.current, action);
+        const nextRoute = getCurrentRouteFromState(nextState);
+        if (nextRoute && !isEqual(routerStateRef.current, nextState)) {
+          if (nextRoute.id !== currentRoute?.id && nextRoute) {
+            dispatchToListeners(routeWillChangeListeners, nextRoute.state);
+          }
+          const previousRoutes = getAllRoutesFromStack(
+            routerStateRef.current.stack,
+          );
+          const nextRoutes = getAllRoutesFromStack(nextState.stack);
+          const screenRemoved = previousRoutes.filter(
+            route => !nextRoutes.find(nextRoute => nextRoute.id === route.id),
+          );
+          dispatchToListeners(
+            screenWillBeRemovedListeners,
+            screenRemoved.map(({ id, state: route }) => ({ id, route })),
+          );
+          const newRoutes = nextRoutes.filter(
+            route =>
+              !previousRoutes.find(prevRoute => prevRoute.id === route.id),
+          );
+          dispatchToListeners(
+            screenWillBePushedListeners,
+            newRoutes.map(({ id, state: route }) => ({ id, route })),
+          );
 
-        routerStateRef.current = nextState;
-        dispatchToReducer(action);
-      }
+          routerStateRef.current = nextState;
+          dispatchToReducer(action);
+        }
+      });
     },
     [
       routeWillChangeListeners,

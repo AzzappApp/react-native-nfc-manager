@@ -10,7 +10,6 @@ type BlockTextPreviewProps = Pick<
    * A callback that is called when the module preview is pressed.
    */
   onPreviewPress?: () => void;
-  animatedData: object;
 };
 
 /**
@@ -28,7 +27,7 @@ const BlockTextPreview = ({
     <EditorScaledPreview onPreviewPress={onPreviewPress} {...props}>
       <BlockTextRenderer
         data={data}
-        animatedData={animatedData}
+        animatedData={animatedData!}
         cardStyle={cardStyle}
         colorPalette={colorPalette}
       />

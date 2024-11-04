@@ -336,11 +336,8 @@ const PhotoGalleryMediaList = (
         {...props}
       />
       <BottomSheetModal
-        lazy
-        showGestureIndicator={false}
-        height={200}
+        showHandleIndicator={false}
         visible={manageAccessMediaVisible}
-        onRequestClose={toggleManageAccessMediaVisible}
       >
         <View style={styles.bottomContainer}>
           <PressableOpacity>
@@ -417,6 +414,7 @@ const styleSheet = createStyleSheet(appearance => ({
     alignItems: 'center',
     rowGap: 30,
     paddingTop: 20,
+    paddingBottom: 20,
   },
   cancelButton: {
     color: appearance === 'light' ? colors.grey400 : colors.grey600,

@@ -42,7 +42,7 @@ export type LineDividerRendererData = NullableFields<
 >;
 
 type LineDividerRendererAnimatedData = {
-  [K in AnimatedProps]: SharedValue<LineDividerRendererData[K]>;
+  [K in AnimatedProps]: SharedValue<NonNullable<LineDividerRendererData[K]>>;
 };
 
 export type LineDividerRendererProps = ViewProps & {

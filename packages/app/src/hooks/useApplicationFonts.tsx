@@ -1,5 +1,3 @@
-// expo-font @expo-google-fonts/anton @expo-google-fonts/archivo @expo-google-fonts/cinzel @expo-google-fonts/inter @expo-google-fonts/jost @expo-google-fonts/koulen @expo-google-fonts/limelight @expo-google-fonts/lora @expo-google-fonts/manrope @expo-google-fonts/monoton @expo-google-fonts/montserrat @expo-google-fonts/poppins @expo-google-fonts/raleway @expo-google-fonts/righteous @expo-google-fonts/rye
-
 import {
   AmaticSC_700Bold,
   AmaticSC_400Regular,
@@ -49,6 +47,7 @@ import { Outfit_500Medium } from '@expo-google-fonts/outfit';
 import { PlayfairDisplay_700Bold } from '@expo-google-fonts/playfair-display';
 import {
   PlusJakartaSans_300Light,
+  PlusJakartaSans_400Regular,
   PlusJakartaSans_800ExtraBold,
 } from '@expo-google-fonts/plus-jakarta-sans';
 import {
@@ -67,7 +66,7 @@ import { SourceSansPro_400Regular } from '@expo-google-fonts/source-sans-pro';
 import { Ultra_400Regular } from '@expo-google-fonts/ultra';
 import { WaterBrush_400Regular } from '@expo-google-fonts/water-brush';
 import { YesevaOne_400Regular } from '@expo-google-fonts/yeseva-one';
-import { Skia } from '@shopify/react-native-skia';
+import { matchFont, Skia } from '@shopify/react-native-skia';
 import { useFonts } from 'expo-font';
 import { Image } from 'react-native';
 import type { ApplicationFonts } from '@azzapp/shared/fontHelpers';
@@ -136,29 +135,60 @@ const fontMap: Record<ApplicationFonts, any> = {
 export const skiaFontManager: SkTypefaceFontProvider =
   Skia.TypefaceFontProvider.Make();
 
+const skiaFonts = {
+  ...fontMap,
+  PlusJakartaSans_Regular: PlusJakartaSans_400Regular,
+};
+
+const priorityFonts = [
+  'PlusJakartaSans_Regular',
+  'Plus-Jakarta_Light',
+  'Plus-Jakarta_ExtraBold',
+];
+
+const reversedSkiaFonts = Object.fromEntries(
+  Object.entries(skiaFonts).map(([key, value]) => [value, key]),
+);
+const loadedSkiaFonts = new Set<string>();
+const fontsPromise = new Map<string, Promise<any>>();
+
 let skiaFontManagerLoadingInitialized = false;
 export const loadSkiaTypeFonts = () => {
   if (skiaFontManagerLoadingInitialized) {
     return;
   }
   skiaFontManagerLoadingInitialized = true;
-  Object.entries(fontMap).map(([familyName, typefaceToLoad]) => {
-    const uri = Image.resolveAssetSource(typefaceToLoad).uri;
-    return Skia.Data.fromURI(uri).then(
-      data => {
-        const tf = Skia.Typeface.MakeFreeTypeFaceFromData(data);
-        if (tf === null) {
-          console.warn(`Couldn't create typeface for ${familyName}`);
+  Object.entries(skiaFonts)
+    .sort(([familyNameA], [familyNameB]) => {
+      if (priorityFonts.includes(familyNameA)) {
+        return -1;
+      }
+      if (priorityFonts.includes(familyNameB)) {
+        return 1;
+      }
+      return 0;
+    })
+    .forEach(([familyName, typefaceToLoad]) => {
+      const uri = Image.resolveAssetSource(typefaceToLoad).uri;
+      const promise = Skia.Data.fromURI(uri).then(
+        data => {
+          const tf = Skia.Typeface.MakeFreeTypeFaceFromData(data);
+          if (tf === null) {
+            console.warn(`Couldn't create typeface for ${familyName}`);
+            return null;
+          }
+          skiaFontManager.registerFont(tf, familyName);
+          loadedSkiaFonts.add(familyName);
+          fontsPromise.delete(familyName);
+        },
+        err => {
+          console.warn('Failed to load typeface', err);
+          fontsPromise.delete(familyName);
           return null;
-        }
-        skiaFontManager.registerFont(tf, familyName);
-      },
-      err => {
-        console.warn('Failed to load typeface', err);
-        return null;
-      },
-    );
-  });
+        },
+      );
+      fontsPromise.set(familyName, promise);
+    });
 };
 
 const useApplicationFonts = () => {
@@ -166,3 +196,17 @@ const useApplicationFonts = () => {
 };
 
 export default useApplicationFonts;
+
+export const useApplicationSkiaFont = (font: number, fontSize: number) => {
+  const fontFamily = reversedSkiaFonts[font];
+  if (!fontFamily) {
+    throw new Error(`Font ${font} not found`);
+  }
+  if (loadedSkiaFonts.has(fontFamily)) {
+    return matchFont({ fontFamily, fontSize }, skiaFontManager);
+  }
+  if (!fontsPromise.has(fontFamily)) {
+    throw new Error(`Font ${fontFamily} not found`);
+  }
+  throw fontsPromise.get(fontFamily);
+};

@@ -4,7 +4,6 @@ import { useCallback, useMemo, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { clamp, runOnJS } from 'react-native-reanimated';
-import { useBottomSheetModalContext } from '#ui/BottomSheetModal';
 import type { StyleProp, ViewStyle, LayoutChangeEvent } from 'react-native';
 
 type SaturationValuePickerProps = {
@@ -29,14 +28,9 @@ const SaturationValuePicker = ({
     setSize([width, height]);
   }, []);
 
-  const { panGesture: modalPanGesture } = useBottomSheetModalContext();
-
   const panGesture = useMemo(
     () =>
-      (modalPanGesture
-        ? Gesture.Pan().blocksExternalGesture(modalPanGesture)
-        : Gesture.Pan()
-      )
+      Gesture.Pan()
         .onBegin(e => {
           const { x, y } = e;
           if (!size) {
@@ -61,7 +55,7 @@ const SaturationValuePicker = ({
             clamp(1 - y / height, 0, 1),
           ]);
         }),
-    [modalPanGesture, onChange, size],
+    [onChange, size],
   );
 
   let { borderRadius } = StyleSheet.flatten(style);

@@ -626,7 +626,7 @@ const WebCardFormScreen = ({
                       sections={filteredCompanyActivities}
                       selectedItemKey={value}
                       keyExtractor={keyExtractor}
-                      avoidKeyboard
+                      dismissKeyboardOnOpening
                       bottomSheetHeight={windowHeight - 90 - insets.top}
                       inputLabel={
                         otherActivity.id === value

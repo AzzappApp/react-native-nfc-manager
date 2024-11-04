@@ -1,14 +1,17 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback, startTransition } from 'react';
 import { StyleSheet, useWindowDimensions, View } from 'react-native';
 import Animated, {
   interpolate,
+  interpolateColor,
   useAnimatedStyle,
   useDerivedValue,
-  useSharedValue,
 } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
+import { getTextColorPrimaryForBackground } from '@azzapp/shared/colorsHelpers';
+import { colors } from '#theme';
 import { CONTACT_CARD_RATIO } from '#components/ContactCard/ContactCard';
 import { useMainTabBarVisibilityController } from '#components/MainTabBar';
+import TabView from '#ui/TabView';
 import HomeBottomPanelMessage from './HomeBottomPanelMessage';
 import HomeContactCard from './HomeContactCard';
 import HomeInformations from './HomeInformations';
@@ -16,7 +19,6 @@ import HomeMenu, { HOME_MENU_HEIGHT } from './HomeMenu';
 import { useHomeScreenContext } from './HomeScreenContext';
 import HomeStatistics from './HomeStatistics';
 import type { HomeBottomPanel_user$key } from '#relayArtifacts/HomeBottomPanel_user.graphql';
-
 import type { HOME_TAB } from './HomeMenu';
 
 type HomeBottomPanelProps = {
@@ -54,6 +56,10 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
               kind
             }
             webCardKind
+            cardColors {
+              primary
+              dark
+            }
           }
           ...HomeStatistics_profiles
           ...HomeBottomPanelMessage_profiles
@@ -63,13 +69,26 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
     userKey,
   );
   const { profiles } = user;
-  const [selectedPanel, setSelectedPanel] = useState<HOME_TAB>('CONTACT_CARD');
-  const { currentIndexSharedValue, inputRange } = useHomeScreenContext();
   //#endregion
 
-  const { width: windowWidth } = useWindowDimensions();
-  const panelHeight = (windowWidth - 40) / CONTACT_CARD_RATIO;
+  //#region Tab
+  const [selectedPanel, setSelectedPanel] = useState<HOME_TAB>('CONTACT_CARD');
+  const { currentIndexSharedValue, inputRange } = useHomeScreenContext();
 
+  const onSelectedPanelChange = useCallback((tab: HOME_TAB) => {
+    startTransition(() => {
+      setSelectedPanel(tab);
+    });
+  }, []);
+  //#endregion
+
+  //#region Layout
+  const { width: windowWidth } = useWindowDimensions();
+  const panelWidth = windowWidth - 40;
+  const panelHeight = panelWidth / CONTACT_CARD_RATIO;
+  //#endregion
+
+  //#region MainTabBar and panel visibility
   const bottomPanelVisible = useDerivedValue(() => {
     const res =
       profiles?.map(profile => {
@@ -121,14 +140,59 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
   useMainTabBarVisibilityController(mainTabBarVisible);
   //#endregion
 
-  const { currentIndexProfile } = useHomeScreenContext();
-  const newContactsOpacity = useDerivedValue(() => {
-    return (user?.profiles?.[currentIndexProfile?.value - 1]?.nbNewContacts ||
-      0) > 0
-      ? 1
-      : 0;
-  }, [user?.profiles]);
-  const notificationColor = useSharedValue('#00000000');
+  // # region NewContacts notification
+  const profilesInfos = useMemo(
+    () => [
+      {
+        nbNewContacts: 0,
+        notificationColor: colors.red400,
+      },
+      ...(profiles?.map(({ nbNewContacts, webCard }) => {
+        return {
+          nbNewContacts,
+          notificationColor: getTextColorPrimaryForBackground(
+            webCard?.cardColors?.primary ?? colors.red400,
+            webCard?.cardColors?.dark ?? '#000000',
+          ),
+        };
+      }) ?? []),
+    ],
+    [profiles],
+  );
+  const nbNewContactsDerivedValue = useDerivedValue(() => {
+    const actual = currentIndexSharedValue.value;
+    if (actual >= 0 && inputRange && inputRange.value.length > 1) {
+      return interpolate(
+        actual,
+        inputRange.value,
+        profilesInfos.map(profile => profile.nbNewContacts),
+      );
+    } else if (actual >= 0) {
+      return profilesInfos[0].nbNewContacts;
+    }
+    return 0;
+  }, [currentIndexSharedValue]);
+
+  const notificationColor = useDerivedValue(() => {
+    const actual = currentIndexSharedValue.value;
+    if (actual >= 0 && inputRange && inputRange.value.length > 1) {
+      return interpolateColor(
+        actual,
+        inputRange.value,
+        profilesInfos.map(({ notificationColor }) => notificationColor),
+      );
+    } else if (actual >= 0) {
+      const { notificationColor } = profilesInfos[0];
+      return notificationColor;
+    }
+    return colors.red400;
+  }, [currentIndexSharedValue]);
+
+  const newContactsOpacity = useDerivedValue(
+    () => Math.min(nbNewContactsDerivedValue.value, 1),
+    [nbNewContactsDerivedValue],
+  );
+  // #endregion
 
   return (
     <View style={containerHeight}>
@@ -141,40 +205,44 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
       >
         <HomeMenu
           selected={selectedPanel}
-          setSelected={setSelectedPanel}
+          setSelected={onSelectedPanelChange}
           newContactsOpacity={newContactsOpacity}
           notificationColor={notificationColor}
         />
-        <View
-          style={{
-            flex: 1,
-            display: selectedPanel === 'CONTACT_CARD' ? 'flex' : 'none',
-          }}
-        >
-          <HomeContactCard height={panelHeight} user={user} />
-        </View>
-
-        <View
-          style={{
-            flex: 1,
-            display: selectedPanel === 'STATS' ? 'flex' : 'none',
-          }}
-        >
-          <HomeStatistics user={profiles!} height={panelHeight} />
-        </View>
-
-        <View
-          style={{
-            flex: 1,
-            display: selectedPanel === 'INFORMATION' ? 'flex' : 'none',
-          }}
-        >
-          <HomeInformations
-            user={user}
-            height={panelHeight}
-            notificationColor={notificationColor}
-          />
-        </View>
+        <TabView
+          style={{ flex: 1, height: panelHeight }}
+          currentTab={selectedPanel}
+          mountOnlyCurrentTab
+          tabs={[
+            {
+              id: 'CONTACT_CARD',
+              element: <HomeContactCard height={panelHeight} user={user} />,
+            },
+            {
+              id: 'INFORMATION',
+              element: (
+                <View style={{ paddingHorizontal: 20, height: panelHeight }}>
+                  <HomeInformations
+                    user={user}
+                    height={panelHeight}
+                    width={panelWidth}
+                    notificationColor={notificationColor}
+                    nbNewContacts={nbNewContactsDerivedValue}
+                    newContactsOpacity={newContactsOpacity}
+                  />
+                </View>
+              ),
+            },
+            {
+              id: 'STATS',
+              element: (
+                <View style={{ paddingHorizontal: 20, height: panelHeight }}>
+                  <HomeStatistics user={profiles!} height={panelHeight} />
+                </View>
+              ),
+            },
+          ]}
+        />
       </Animated.View>
     </View>
   );

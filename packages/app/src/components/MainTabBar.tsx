@@ -25,11 +25,7 @@ import useScreenInsets from '#hooks/useScreenInsets';
 import BottomMenu from '#ui/BottomMenu';
 import Text from '#ui/Text';
 import { HomeIcon } from './HomeIcon';
-import {
-  useNativeNavigationEvent,
-  useRouter,
-  useScreenHasFocus,
-} from './NativeRouter';
+import { useRouter, useScreenHasFocus } from './NativeRouter';
 import type { SharedValue } from 'react-native-reanimated';
 
 const mainTabBarVisibilityStates: Array<{
@@ -43,19 +39,11 @@ export const useMainTabBarVisibilityController = (
   active = true,
 ) => {
   const hasFocus = useScreenHasFocus();
-  const [controlVisibility, setControlVisibility] = useState(hasFocus);
 
   const id = useMemo(() => createId(), []);
 
-  useNativeNavigationEvent('disappear', () => {
-    setControlVisibility(false);
-  });
-
-  useNativeNavigationEvent('willAppear', () => {
-    setControlVisibility(true);
-  });
   useLayoutEffect(() => {
-    if (controlVisibility && active) {
+    if (hasFocus && active) {
       mainTabBarVisibilityStates.push({ id, state: visibilityState });
       mainTabBarVisibleListeners.forEach(listener => listener());
     }
@@ -68,7 +56,7 @@ export const useMainTabBarVisibilityController = (
         mainTabBarVisibleListeners.forEach(listener => listener());
       }
     };
-  }, [controlVisibility, id, visibilityState, active]);
+  }, [hasFocus, id, visibilityState, active]);
 };
 
 /**

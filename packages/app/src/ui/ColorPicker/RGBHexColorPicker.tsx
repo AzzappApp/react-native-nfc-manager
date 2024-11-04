@@ -2,8 +2,8 @@ import chroma from 'chroma-js';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
+import BottomSheetTextInput from '#ui/BottomSheetTextInput';
 import Label from '#ui/Label';
-import TextInput from '#ui/TextInput';
 import HexColorTextInput from '../HexColorTextInput';
 
 type RGBHexColorPickerProps = {
@@ -168,7 +168,7 @@ const RGBHexColorPicker = ({
         showError={false}
         style={styles.flex}
       >
-        <TextInput
+        <BottomSheetTextInput
           testID="red"
           accessibilityLabelledBy="RGB"
           value={localColor.red}
@@ -182,7 +182,7 @@ const RGBHexColorPicker = ({
         />
       </Label>
       <View style={styles.viewgb}>
-        <TextInput
+        <BottomSheetTextInput
           testID="green"
           accessibilityLabelledBy="RGB"
           value={localColor.green}
@@ -194,7 +194,7 @@ const RGBHexColorPicker = ({
           autoCorrect={false}
           style={styles.textInputStyle}
         />
-        <TextInput
+        <BottomSheetTextInput
           testID="blue"
           accessibilityLabelledBy="RGB"
           value={localColor.blue}

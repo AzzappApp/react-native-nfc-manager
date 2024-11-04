@@ -64,7 +64,9 @@ export type HorizontalPhotoRendererData = NullableFields<
 >;
 
 type HorizontalPhotoRendererAnimatedData = {
-  [K in AnimatedProps]: SharedValue<HorizontalPhotoRendererData[K]>;
+  [K in AnimatedProps]: SharedValue<
+    NonNullable<HorizontalPhotoRendererData[K]>
+  >;
 };
 
 export type HorizontalPhotoRendererProps = ViewProps & {

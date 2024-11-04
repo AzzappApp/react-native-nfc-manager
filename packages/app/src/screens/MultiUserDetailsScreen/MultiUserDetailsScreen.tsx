@@ -1,10 +1,16 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { fromGlobalId } from 'graphql-relay';
 import { parsePhoneNumber } from 'libphonenumber-js';
-import { useCallback, useEffect, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, type ReactNode } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Alert, StyleSheet, View, useColorScheme } from 'react-native';
+import {
+  Alert,
+  StyleSheet,
+  View,
+  useColorScheme,
+  useWindowDimensions,
+} from 'react-native';
 import * as mime from 'react-native-mime-types';
 import Toast from 'react-native-toast-message';
 import {
@@ -17,6 +23,7 @@ import ERRORS from '@azzapp/shared/errors';
 import { colors } from '#theme';
 import { CancelHeaderButton } from '#components/commonsButtons';
 import { useRouter, type ScreenOptions } from '#components/NativeRouter';
+import ProfileStatisticsChart from '#components/ProfileStatisticsChart';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getFileName } from '#helpers/fileHelpers';
 import { keyExtractor } from '#helpers/idHelpers';
@@ -26,7 +33,6 @@ import relayScreen from '#helpers/relayScreen';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';
 import ContactCardEditForm from '#screens/ContactCardEditScreen/ContactCardEditForm';
-import HomeStatistics from '#screens/HomeScreen/HomeStatistics';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -164,6 +170,9 @@ const MultiUserDetailsScreen = ({
               phoneNumber
             }
             profileRole
+            statsSummary {
+              contactCardScans
+            }
           }
         }
       }
@@ -414,6 +423,31 @@ const MultiUserDetailsScreen = ({
   }, [intl, onRemoveUser]);
 
   const colorScheme = useColorScheme();
+  const { width: windowWidth } = useWindowDimensions();
+
+  const chartData = useMemo(() => {
+    if (!profile?.statsSummary) {
+      return [];
+    }
+    const result = Array.from({ length: 30 }, (_, i) => {
+      const d = new Date(new Date().toISOString().split('T')[0]);
+      d.setDate(d.getDate() - 30 + i + 1);
+
+      return {
+        day: d.toISOString(),
+        data: 0,
+      };
+    });
+    profile.statsSummary?.forEach(stats => {
+      if (stats) {
+        const index = result.findIndex(item => item.day === stats.day);
+        if (index !== -1) {
+          result[index].data = stats.contactCardScans ?? 0;
+        }
+      }
+    });
+    return result.map(item => item.data);
+  }, [profile?.statsSummary]);
 
   if (!profileInfos?.profileId || profile == null) return null;
 
@@ -592,13 +626,26 @@ const MultiUserDetailsScreen = ({
               </Text>
             )}
             <View style={styles.stats}>
-              <HomeStatistics
-                user={[profile]}
-                height={250}
-                variant={colorScheme === 'dark' ? 'dark' : 'light'}
-                initialStatsIndex={1}
-                mode="compact"
+              <ProfileStatisticsChart
+                width={windowWidth}
+                height={170}
+                data={chartData}
+                variant={colorScheme ?? 'dark'}
               />
+              <View style={styles.statsLabelContainer}>
+                <Text variant="xlarge" style={styles.statsLabel}>
+                  {profile.nbContactCardScans}
+                </Text>
+                <Text variant="smallbold" style={styles.statsLabel}>
+                  <FormattedMessage
+                    defaultMessage="Contact card{azzappA} views"
+                    description="Multi users statistics - Contact card views label"
+                    values={{
+                      azzappA: <Text variant="azzapp">a</Text>,
+                    }}
+                  />
+                </Text>
+              </View>
             </View>
           </View>
         </ContactCardEditForm>
@@ -680,9 +727,16 @@ const styleSheet = createStyleSheet(appearance => ({
   stats: {
     marginBottom: 50,
     flex: 1,
-    flexDirection: 'row',
     justifyContent: 'center',
     overflow: 'visible',
+    gap: 5,
+  },
+  statsLabelContainer: {
+    rowGap: 10,
+    alignItems: 'center',
+  },
+  statsLabel: {
+    textAlign: 'center',
   },
   name: {
     maxWidth: '50%',
@@ -769,7 +823,6 @@ const multiUserDetailsScreenQuery = graphql`
             selected
           }
         }
-        ...HomeStatistics_profiles
         avatar {
           id
           uri: uri(width: 112, pixelRatio: $pixelRatio)
@@ -818,6 +871,11 @@ const multiUserDetailsScreenQuery = graphql`
             uri: uri(width: 180, pixelRatio: $pixelRatio)
           }
           isMultiUser
+        }
+        nbContactCardScans
+        statsSummary {
+          day
+          contactCardScans
         }
       }
     }

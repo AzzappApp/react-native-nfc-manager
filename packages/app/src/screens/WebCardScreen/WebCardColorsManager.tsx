@@ -18,10 +18,12 @@ import {
 } from '@azzapp/shared/cardHelpers';
 import ColorTriptychChooser from '#components/ColorTriptychChooser';
 import { useWebCardColorsFragment } from '#components/WebCardColorPicker';
+import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
 import ColorChooser from '#ui/ColorPicker/ColorChooser';
+import Header from '#ui/Header';
 import Text from '#ui/Text';
 import type { WebCardColorPicker_webCard$key } from '#relayArtifacts/WebCardColorPicker_webCard.graphql';
 import type { StoreUpdater, OptimisticUpdateFunction } from 'relay-runtime';
@@ -48,7 +50,7 @@ export type WebCardColorsManagerProps = {
 const WebCardColorsManager = ({
   webCard: webCardKey,
   visible,
-  height = 320,
+  height = 340,
   onRequestClose,
 }: WebCardColorsManagerProps) => {
   const {
@@ -259,94 +261,98 @@ const WebCardColorsManager = ({
       setEditedColor(null);
     }
   }, [editedColor, onSave]);
-
+  const { bottom } = useScreenInsets();
   return (
     <BottomSheetModal
-      height={height}
+      height={height + bottom}
       visible={visible}
-      headerTitle={
-        <Text variant="large">
-          {editedColor ? (
-            <FormattedMessage
-              defaultMessage="Edit linked color"
-              description="Webcard ColorPicker component header Edit"
-            />
-          ) : (
-            <FormattedMessage
-              defaultMessage="Webcard{azzappA} colors"
-              description="Webcard ColorPicker component hearder title"
-              values={{
-                azzappA: <Text variant="azzapp">a</Text>,
-              }}
-            />
-          )}
-        </Text>
-      }
-      headerLeftButton={
-        <Button
-          label={intl.formatMessage({
-            defaultMessage: 'Cancel',
-            description: 'Webcard ColorPicker component Cancel button label',
-          })}
-          onPress={onCancelInner}
-          variant="secondary"
-          disabled={saving}
-        />
-      }
-      headerRightButton={
-        <Button
-          label={
-            editedColor
-              ? intl.formatMessage({
-                  defaultMessage: 'Done',
-                  description:
-                    'Webcard ColorPicker component Done button label',
-                })
-              : intl.formatMessage({
-                  defaultMessage: 'Save',
-                  description:
-                    'Webcard olorPicker component Save Color button label',
-                })
-          }
-          onPress={onDone}
-          variant="primary"
-          loading={saving}
-        />
-      }
-      disableGestureInteraction
-      showGestureIndicator={false}
-      onRequestClose={onRequestCloseInner}
-      avoidKeyboard={true}
+      showHandleIndicator={false}
+      onDismiss={onRequestCloseInner}
+      dismissKeyboardOnOpening
     >
-      {editedColor ? (
-        <ColorChooser
-          value={colorPalette[editedColor]}
-          onColorChange={onChangeColorInPalette}
-        />
-      ) : (
-        <Suspense
-          fallback={
-            <View
-              style={{
-                flex: 1,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <ActivityIndicator />
-            </View>
-          }
-        >
-          <ColorTriptychChooser
-            size={86}
-            colorPalette={colorPalette}
-            currentPalette={currentPalette}
-            onUpdateColorPalette={onUpdateColorPalette}
-            onEditColor={onEditColor}
-            saving={saving}
+      <Header
+        middleElement={
+          <Text variant="large">
+            {editedColor ? (
+              <FormattedMessage
+                defaultMessage="Edit linked color"
+                description="Webcard ColorPicker component header Edit"
+              />
+            ) : (
+              <FormattedMessage
+                defaultMessage="Webcard{azzappA} colors"
+                description="Webcard ColorPicker component hearder title"
+                values={{
+                  azzappA: <Text variant="azzapp">a</Text>,
+                }}
+              />
+            )}
+          </Text>
+        }
+        leftElement={
+          <Button
+            label={intl.formatMessage({
+              defaultMessage: 'Cancel',
+              description: 'Webcard ColorPicker component Cancel button label',
+            })}
+            onPress={onCancelInner}
+            variant="secondary"
+            disabled={saving}
           />
-        </Suspense>
-      )}
+        }
+        rightElement={
+          <Button
+            label={
+              editedColor
+                ? intl.formatMessage({
+                    defaultMessage: 'Done',
+                    description:
+                      'Webcard ColorPicker component Done button label',
+                  })
+                : intl.formatMessage({
+                    defaultMessage: 'Save',
+                    description:
+                      'Webcard olorPicker component Save Color button label',
+                  })
+            }
+            onPress={onDone}
+            variant="primary"
+            loading={saving}
+          />
+        }
+        style={{ marginBottom: 20 }}
+      />
+      <View style={{ paddingHorizontal: 16 }}>
+        {editedColor ? (
+          <ColorChooser
+            value={colorPalette[editedColor]}
+            onColorChange={onChangeColorInPalette}
+          />
+        ) : (
+          <Suspense
+            fallback={
+              <View
+                style={{
+                  flex: 1,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <ActivityIndicator />
+              </View>
+            }
+          >
+            <ColorTriptychChooser
+              size={86}
+              colorPalette={colorPalette}
+              currentPalette={currentPalette}
+              onUpdateColorPalette={onUpdateColorPalette}
+              onEditColor={onEditColor}
+              saving={saving}
+            />
+          </Suspense>
+        )}
+      </View>
     </BottomSheetModal>
   );
 };

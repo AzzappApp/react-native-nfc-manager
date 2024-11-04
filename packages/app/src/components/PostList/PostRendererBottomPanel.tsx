@@ -44,7 +44,8 @@ type PostRendererBottomPanelProps = {
    * Toggle the display modal action visibility
    * @type {() => void}
    */
-  toggleModal: () => void;
+  openModal: () => void;
+  closeModal: () => void;
   /**
    * The post to display
    *
@@ -64,7 +65,8 @@ type PostRendererBottomPanelProps = {
 
 const PostRendererBottomPanel = ({
   showModal,
-  toggleModal,
+  openModal,
+  closeModal,
   post: postKey,
   actionEnabled,
   onActionDisabled,
@@ -99,7 +101,7 @@ const PostRendererBottomPanel = ({
 
   const intl = useIntl();
   const copyLink = useCallback(() => {
-    toggleModal();
+    closeModal();
 
     Clipboard.setStringAsync(
       buildPostUrl(post.webCard.userName, fromGlobalId(post.id).id),
@@ -124,7 +126,7 @@ const PostRendererBottomPanel = ({
         });
       }, MODAL_ANIMATION_TIME);
     });
-  }, [intl, post.id, post.webCard.userName, toggleModal]);
+  }, [intl, post.id, post.webCard.userName, closeModal]);
 
   const onShare = async () => {
     // a quick share method using the native share component. If we want to make a custom share (like tiktok for example, when they are recompressiong the media etc) we can use react-native-shares
@@ -154,17 +156,17 @@ const PostRendererBottomPanel = ({
     }
   };
 
-  const goToComments = () => {
+  const goToComments = useCallback(() => {
     router.push({
       route: 'POST_COMMENTS',
       params: { postId: post.id },
     });
-  };
+  }, [post.id, router]);
 
-  const addComment = () => {
+  const addComment = useCallback(() => {
     goToComments();
-    toggleModal();
-  };
+    closeModal();
+  }, [closeModal, goToComments]);
 
   const [commitUpdatePostComments] =
     useMutation<PostRendererBottomPanelUpdatePostAllowCommentsMutation>(graphql`
@@ -215,10 +217,12 @@ const PostRendererBottomPanel = ({
   const [showEdit, setShowEdit] = useState(false);
   const openEditcontent = useCallback(() => {
     setShowEdit(true);
-  }, []);
+    closeModal();
+  }, [closeModal]);
   const onCloseEditContent = useCallback(() => {
     setShowEdit(false);
-  }, []);
+    openModal();
+  }, [openModal]);
 
   const editPostContent = useCallback(
     (text: string) => {
@@ -371,7 +375,7 @@ const PostRendererBottomPanel = ({
           postId: post.id,
         },
         onCompleted() {
-          toggleModal();
+          closeModal();
         },
       });
     } else {
@@ -389,7 +393,7 @@ const PostRendererBottomPanel = ({
     post.id,
     profileInfos?.profileRole,
     profileInfos?.webCardId,
-    toggleModal,
+    closeModal,
   ]);
 
   const [sendReport, commitSendReportLoading] = useSendReport(
@@ -403,7 +407,7 @@ const PostRendererBottomPanel = ({
             description:
               'Success toast message when sending report on post succeeds.',
           }),
-          onHide: toggleModal,
+          onHide: closeModal,
         });
       } else {
         Toast.show({
@@ -413,7 +417,7 @@ const PostRendererBottomPanel = ({
             description:
               'Info toast message when sending report on post is already done.',
           }),
-          onHide: toggleModal,
+          onHide: closeModal,
         });
       }
     },
@@ -486,12 +490,10 @@ const PostRendererBottomPanel = ({
       </View>
       <BottomSheetModal
         visible={showModal}
-        height={post.allowComments ? MODAL_HEIGHT : SMALL_MODAL_HEIGHT}
         variant="modal"
-        onRequestClose={toggleModal}
-        contentContainerStyle={styles.bottomSheetContainer}
+        onDismiss={closeModal}
       >
-        <View style={{ flex: 1, justifyContent: 'space-evenly' }}>
+        <View style={{ justifyContent: 'space-evenly' }}>
           {isViewer && (
             <View style={styles.modalLine}>
               <Text variant="medium">
@@ -615,26 +617,25 @@ const PostRendererBottomPanel = ({
             </PressableNative>
           )}
         </View>
-        <TextAreaModal
-          visible={showEdit}
-          value={post.content ?? ''}
-          headerTitle={intl.formatMessage({
-            defaultMessage: 'Edit description',
-            description:
-              'Title for text area header modal in post content edition screen',
-          })}
-          placeholder={intl.formatMessage({
-            defaultMessage: 'Enter description',
-            description:
-              'Placeholder for text area in post content edition screen',
-          })}
-          maxLength={POST_MAX_CONTENT_LENGTH}
-          onClose={onCloseEditContent}
-          closeOnBlur={false}
-          onChangeText={editPostContent}
-          loading={isLoadingUpdatePostContent}
-        />
       </BottomSheetModal>
+      <TextAreaModal
+        visible={showEdit}
+        value={post.content ?? ''}
+        headerTitle={intl.formatMessage({
+          defaultMessage: 'Edit description',
+          description:
+            'Title for text area header modal in post content edition screen',
+        })}
+        placeholder={intl.formatMessage({
+          defaultMessage: 'Enter description',
+          description:
+            'Placeholder for text area in post content edition screen',
+        })}
+        maxLength={POST_MAX_CONTENT_LENGTH}
+        onClose={onCloseEditContent}
+        onChangeText={editPostContent}
+        loading={isLoadingUpdatePostContent}
+      />
     </>
   );
 };
@@ -644,9 +645,6 @@ export default PostRendererBottomPanel;
 const styles = StyleSheet.create({
   bottomContainerPost: { marginHorizontal: 20, rowGap: 10 },
 
-  bottomSheetContainer: {
-    paddingHorizontal: 0,
-  },
   modalLine: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -677,5 +675,6 @@ export const PostRendererBottomPanelSkeleton = () => {
 
 const TOAST_BOTTOM_OFFSET = 50;
 const MODAL_ANIMATION_TIME = 800;
-const MODAL_HEIGHT = 284;
-const SMALL_MODAL_HEIGHT = 242;
+// Keep thos value here until this is clearly not required(Octobre2024)
+// const MODAL_HEIGHT = 284;
+// const SMALL_MODAL_HEIGHT = 242;

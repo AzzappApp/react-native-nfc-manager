@@ -1,8 +1,8 @@
+import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import chroma from 'chroma-js';
 import { memo, useCallback } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { View, StyleSheet, useColorScheme } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
 import Animated, {
   interpolateColor,
   useAnimatedStyle,
@@ -53,7 +53,7 @@ const ColorList = ({
   const itemWidth = (width - ITEM_MARGIN * (ITEM_PER_ROW - 1)) / ITEM_PER_ROW;
 
   return (
-    <ScrollView
+    <BottomSheetScrollView
       bounces={false}
       style={[styles.root, style]}
       contentContainerStyle={styles.container}
@@ -140,7 +140,7 @@ const ColorList = ({
           ))}
         </View>
       </View>
-    </ScrollView>
+    </BottomSheetScrollView>
   );
 };
 

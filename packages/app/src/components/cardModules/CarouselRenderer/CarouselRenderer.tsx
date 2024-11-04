@@ -80,7 +80,7 @@ export type CarouselRendererData = NullableFields<
 type CarouselRendererAnimatedData = {
   [K in AnimatedProps]:
     | CarouselViewRendererData[K]
-    | SharedValue<CarouselViewRendererData[K]>;
+    | SharedValue<NonNullable<CarouselViewRendererData[K]>>;
 };
 
 export type CarouselRendererProps = ViewProps & {

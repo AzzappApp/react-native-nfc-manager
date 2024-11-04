@@ -71,7 +71,7 @@ export type BlockTextRendererData = NullableFields<
 >;
 
 type BlockTextRendererAnimatedData = {
-  [K in AnimatedProps]: SharedValue<BlockTextRendererData[K]>;
+  [K in AnimatedProps]: SharedValue<NonNullable<BlockTextRendererData[K]>>;
 };
 
 export type BlockTextRendererProps = ViewProps & {

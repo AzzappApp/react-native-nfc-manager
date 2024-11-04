@@ -172,6 +172,8 @@ const MediaItemRenderer = ({
         aspectRatio: 1,
         height,
         position: 'relative',
+        backgroundColor:
+          appearance === 'light' ? colors.grey200 : colors.grey900,
       }}
       accessibilityRole="button"
       accessibilityHint={intl.formatMessage({

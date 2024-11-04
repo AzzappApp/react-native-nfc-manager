@@ -1,23 +1,26 @@
 import { useCallback, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import {
-  KeyboardAvoidingView,
-  Modal,
-  Platform,
-  SafeAreaView, //we want to use this one here on purpose
-} from 'react-native';
+import { KeyboardAvoidingView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '#theme';
+import { ScreenModal } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Header from './Header';
 import HeaderButton from './HeaderButton';
 import Text from './Text';
 import TextInput from './TextInput';
-import type { ModalProps, TextInput as TextInputBase } from 'react-native';
+import type { ReactNode } from 'react';
+import type { TextInput as TextInputBase } from 'react-native';
 
-export type TextAreaModalProps = Omit<
-  ModalProps,
-  'onRequestClose' | 'transparent'
-> & {
+export type TextAreaModalProps = {
+  /**
+   * If true, display the modal. Defaults to false.
+   */
+  visible?: boolean;
+  /**
+   * The content of the modal.
+   */
+  children?: ReactNode | null;
   /**
    * The current value of the textarea
    */
@@ -46,10 +49,6 @@ export type TextAreaModalProps = Omit<
    * A Item component to render on top of the modal, under the header
    */
   ItemTopComponent?: React.ReactElement;
-  /**
-   * If true, the modal will close when the textInput onBlur is called
-   */
-  closeOnBlur?: boolean;
 
   onFocus?: () => void;
 
@@ -67,9 +66,9 @@ const TextAreaModal = ({
   onChangeText,
   onClose,
   ItemTopComponent,
-  closeOnBlur = true,
   onFocus,
   loading,
+  visible,
   ...props
 }: TextAreaModalProps) => {
   const intl = useIntl();
@@ -81,32 +80,16 @@ const TextAreaModal = ({
     onClose();
   }, [onClose, value]);
 
-  const onBlur = useCallback(() => {
-    if (closeOnBlur) {
-      onClose();
-    }
-  }, [closeOnBlur, onClose]);
-
-  const onShow = useCallback(() => {
-    // hack - on android autofocus doesn't open the keyboard
-    if (Platform.OS === 'android') {
-      setTimeout(() => {
-        textInputRef.current?.focus();
-      }, 150);
-    }
-  }, []);
-
   const textInputRef = useRef<TextInputBase>(null);
 
   return (
-    <Modal
-      onRequestClose={onClose}
-      transparent
+    <ScreenModal
+      onRequestDismiss={onCancel}
       animationType="fade"
+      visible={visible}
       {...props}
-      onShow={onShow}
     >
-      <SafeAreaView style={styles.modal}>
+      <SafeAreaView style={[{ flex: 1 }, styles.modal]}>
         <Header
           style={styles.header}
           leftElement={
@@ -147,10 +130,9 @@ const TextAreaModal = ({
             placeholder={placeholder}
             value={text}
             onChangeText={setText}
-            autoFocus={Platform.OS === 'ios'}
+            autoFocus
             onFocus={onFocus}
             maxLength={maxLength}
-            onBlur={onBlur}
             style={styles.textInput}
             ref={textInputRef}
             readOnly={loading}
@@ -170,7 +152,7 @@ const TextAreaModal = ({
           )}
         </KeyboardAvoidingView>
       </SafeAreaView>
-    </Modal>
+    </ScreenModal>
   );
 };
 
@@ -178,7 +160,6 @@ export default TextAreaModal;
 
 const styleSheet = createStyleSheet(appearance => ({
   modal: {
-    flex: 1,
     backgroundColor: appearance === 'light' ? colors.white : colors.black,
   },
   header: {

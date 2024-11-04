@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { TextInput, View } from 'react-native';
 import Animated, { useAnimatedProps } from 'react-native-reanimated';
 import { useVariantStyleSheet } from '#helpers/createStyles';
@@ -42,6 +43,7 @@ const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 // This is the only hack found as Text cannot be animated (virtual)
 //this is more laggy
 const AnimatedText = ({
+  // Only used in counter so we set a devault value to 0
   variant = 'none',
   containerStyle,
   appearance,
@@ -52,6 +54,14 @@ const AnimatedText = ({
   const styles = useVariantStyleSheet(textStyleSheet, variant, appearance);
 
   const { text, style } = { style: {}, ...props };
+  const [defaultValue, setDefaultValue] = useState<string | null>(null);
+  useEffect(() => {
+    setDefaultValue(
+      !maxLength || text.value.length < maxLength
+        ? text.value
+        : `${text.value.slice(0, maxLength)}...`,
+    );
+  }, [maxLength, text]);
 
   const animatedProps = useAnimatedProps(() => {
     let result = {
@@ -70,19 +80,15 @@ const AnimatedText = ({
   return (
     <View pointerEvents="box-only" style={containerStyle}>
       <AnimatedTextInput
+        defaultValue={defaultValue ?? undefined}
         accessible={false}
         accessibilityRole="text"
         underlineColorAndroid="transparent"
         editable={false}
-        defaultValue={
-          !maxLength || text.value.length < maxLength
-            ? text.value
-            : `${text.value.slice(0, maxLength)}...`
-        }
         allowFontScaling={false}
         style={[styles.text, { padding: 0 }, style]}
         pointerEvents="none"
-        {...{ animatedProps }}
+        animatedProps={animatedProps}
       />
     </View>
   );

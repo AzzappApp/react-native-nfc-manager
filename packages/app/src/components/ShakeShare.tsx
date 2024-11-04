@@ -259,7 +259,7 @@ const useShakeDetector = (callback: () => void, activated: boolean) => {
         reset();
       }
     },
-    [callbackRef, lastShakeTimestamp.value, numShakes.value, reset],
+    [callbackRef, lastShakeTimestamp, numShakes, reset],
   );
 
   const sensorValue = useDerivedValue(() => {

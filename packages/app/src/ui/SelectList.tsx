@@ -1,9 +1,8 @@
+import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import { memo, useCallback } from 'react';
-import { FlatList } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Text from '#ui/Text';
-
 import PressableNative from './PressableNative';
 import type {
   StyleProp,
@@ -77,7 +76,7 @@ function SelectList<ItemT>({
     ],
   );
   return (
-    <FlatList
+    <BottomSheetFlatList
       accessibilityRole="list"
       data={data}
       keyExtractor={keyExtractor}

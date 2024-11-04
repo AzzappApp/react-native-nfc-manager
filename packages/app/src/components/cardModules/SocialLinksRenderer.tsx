@@ -70,7 +70,7 @@ export type SocialLinksRendererData = NullableFields<
 >;
 
 type SocialLinksRendererAnimatedData = {
-  [K in AnimatedProps]: SharedValue<SocialLinksRendererData[K]>;
+  [K in AnimatedProps]: SharedValue<NonNullable<SocialLinksRendererData[K]>>;
 };
 
 export type SocialLinksRendererProps = ViewProps & {
@@ -383,7 +383,7 @@ const SocialLinkRenderer = ({
   first?: boolean;
   last?: boolean;
   icon: SocialLinkId;
-  marginHorizontal?: SharedValue<number | null> | number | null;
+  marginHorizontal?: SharedValue<number> | number | null;
 }) => {
   const animatedPressableStyle = useAnimatedStyle(() => {
     if (typeof marginHorizontal === 'number') {

@@ -1,4 +1,4 @@
-import { forwardRef, useMemo, useState } from 'react';
+import { forwardRef, useMemo } from 'react';
 import { Dimensions, Image, Platform, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
@@ -44,6 +44,11 @@ export type CoverRendererProps = {
    */
   canPlay?: boolean;
   /**
+   * if true, the cover will play the cover animations if any or the video if any
+   * @default false
+   */
+  paused?: boolean;
+  /**
    * A ref to the media renderer of the cover
    */
   mediaRef?: ForwardedRef<MediaImageRendererHandle | MediaVideoRendererHandle>;
@@ -77,7 +82,8 @@ const CoverRenderer = (
     width = 125,
     large,
     style,
-    canPlay,
+    canPlay = true,
+    paused = false,
     useAnimationSnapshot,
     mediaRef,
     onReadyForDisplay,
@@ -182,16 +188,11 @@ const CoverRenderer = (
     [styles.root, borderRadius, width, coverBackgroundColor, cardColors, style],
   );
 
-  const [layout, setLayout] = useState<{
-    width: number;
-    height: number;
-  } | null>(null);
+  const showLinks = coverDynamicLinks && coverDynamicLinks.links.length > 0;
 
-  const showLinks =
-    layout && coverDynamicLinks && coverDynamicLinks.links.length > 0;
-
+  const height = width / COVER_RATIO;
   const linksSize = useMemo(() => {
-    if (!layout || !coverDynamicLinks)
+    if (!coverDynamicLinks)
       return {
         width: 0,
         height: 0,
@@ -201,16 +202,16 @@ const CoverRenderer = (
       coverDynamicLinks.links.length,
       coverDynamicLinks.size,
       {
-        viewHeight: layout.height,
-        viewWidth: layout.width,
+        viewHeight: height,
+        viewWidth: width,
       },
     );
 
     return {
-      width: (linksSizePercent.width * layout.width) / 100,
-      height: (linksSizePercent.height * layout.height) / 100,
+      width: (linksSizePercent.width * width) / 100,
+      height: (linksSizePercent.height * height) / 100,
     };
-  }, [coverDynamicLinks, layout]);
+  }, [coverDynamicLinks, width, height]);
 
   const shadowStyle = useMemo(
     () => [{ borderRadius }, styles.shadow],
@@ -220,18 +221,7 @@ const CoverRenderer = (
   return useMemo(
     () => (
       <View style={large ? undefined : shadowStyle}>
-        <View
-          ref={forwardRef}
-          style={containerStyle}
-          testID="cover-renderer"
-          onLayout={e => {
-            const { width, height } = e.nativeEvent.layout;
-            setLayout({
-              height,
-              width,
-            });
-          }}
-        >
+        <View ref={forwardRef} style={containerStyle} testID="cover-renderer">
           {coverSource ? (
             isVideoMedia ? (
               <MediaVideoRenderer
@@ -243,7 +233,7 @@ const CoverRenderer = (
                 videoEnabled={canPlay}
                 onError={onError}
                 style={styles.layer}
-                paused={!canPlay}
+                paused={paused}
                 useAnimationSnapshot={useAnimationSnapshot}
               />
             ) : (
@@ -281,12 +271,12 @@ const CoverRenderer = (
                   { rotateY: `${Platform.OS === 'android' ? '0.1' : '0'}deg` },
                 ],
                 top:
-                  (coverDynamicLinks.position.y * layout.height) / 100 -
+                  (coverDynamicLinks.position.y * height) / 100 -
                   linksSize.height / 2,
                 left:
-                  (coverDynamicLinks.position.x * layout.width) / 100 -
+                  (coverDynamicLinks.position.x * width) / 100 -
                   linksSize.width / 2,
-                gap: convertToBaseCanvasRatio(LINKS_GAP, layout.width),
+                gap: convertToBaseCanvasRatio(LINKS_GAP, width),
                 zIndex: 1,
               }}
             >
@@ -299,7 +289,7 @@ const CoverRenderer = (
                   link={link}
                   shadow={coverDynamicLinks.shadow}
                   size={coverDynamicLinks.size}
-                  viewWidth={layout.width}
+                  viewWidth={width}
                 />
               ))}
             </View>
@@ -308,29 +298,30 @@ const CoverRenderer = (
       </View>
     ),
     [
-      canPlay,
-      cardColors,
-      containerStyle,
-      coverDynamicLinks,
-      coverSource,
-      forwardRef,
-      isSmallCover,
-      isVideoMedia,
       large,
-      layout,
-      linksSize.height,
-      linksSize.width,
-      mediaRef,
-      onError,
-      onReadyForDisplay,
       shadowStyle,
-      showLinks,
+      forwardRef,
+      containerStyle,
+      coverSource,
+      isVideoMedia,
+      mediaRef,
+      isSmallCover,
       smallThumbnail,
-      styles.coverPlaceHolder,
-      styles.layer,
       thumbnail,
+      onReadyForDisplay,
+      canPlay,
+      onError,
+      styles.layer,
+      styles.coverPlaceHolder,
+      paused,
       useAnimationSnapshot,
       width,
+      showLinks,
+      coverDynamicLinks,
+      height,
+      linksSize.height,
+      linksSize.width,
+      cardColors,
     ],
   );
 };

@@ -27,7 +27,6 @@ class MainActivity : ReactActivity() {
    * DefaultReactActivityDelegate} which allows you to easily enable Fabric and Concurrent React
    * (aka React 18) with two boolean flags.
    */
-  override fun createReactActivityDelegate(): ReactActivityDelegate = ReactActivityDelegateWrapper(this, BuildConfig.IS_NEW_ARCHITECTURE_ENABLED, DefaultReactActivityDelegate(this, mainComponentName, fabricEnabled))
-
-
+  override fun createReactActivityDelegate(): ReactActivityDelegate =
+    ReactActivityDelegateWrapper(this, BuildConfig.IS_NEW_ARCHITECTURE_ENABLED, DefaultReactActivityDelegate(this, mainComponentName, fabricEnabled))
 }

@@ -16,7 +16,7 @@ import type { StyleProp, ViewStyle } from 'react-native';
 const NativeSkiaPictureView = SkiaPictureViewNativeComponent;
 
 export type SkiaAnimatedPictureView = Omit<SkiaPictureViewProps, 'picture'> & {
-  picture: DerivedValue<SkPicture | null>;
+  picture: DerivedValue<SkPicture>;
   width: number;
   height: number;
   imageStyle?: StyleProp<ViewStyle>;

@@ -100,6 +100,7 @@ export const ScreensRenderer = ({
                     : 'slide_from_bottom'
               }
               hideKeyboardOnSwipe
+              style={StyleSheet.absoluteFill}
             >
               <GestureHandlerRootView style={styles.flex}>
                 {children}
@@ -423,11 +424,9 @@ const ScreenRenderer = ({
       style={StyleSheet.absoluteFill}
       hideKeyboardOnSwipe
     >
-      <GestureHandlerRootView style={styles.flex}>
-        <ScreenRendererContext.Provider value={screenContextValue}>
-          {content}
-        </ScreenRendererContext.Provider>
-      </GestureHandlerRootView>
+      <ScreenRendererContext.Provider value={screenContextValue}>
+        {content}
+      </ScreenRendererContext.Provider>
     </Screen>
   );
 };

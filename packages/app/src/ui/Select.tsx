@@ -1,9 +1,11 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import { View } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import useBoolean from '#hooks/useBoolean';
 import Text from '#ui/Text';
 import BottomSheetModal from './BottomSheetModal';
+import Header from './Header';
 import Icon from './Icon';
 import PressableNative from './PressableNative';
 import SelectList from './SelectList';
@@ -94,7 +96,7 @@ type SelectProps<ItemT> = Omit<ViewProps, 'children'> & {
    */
   disabled?: boolean;
 
-  avoidKeyboard?: boolean;
+  dismissKeyboardOnOpening?: boolean;
 };
 
 /**
@@ -117,10 +119,10 @@ const Select = <ItemT,>({
   inputTextStyle,
   style,
   ListHeaderComponent,
-  avoidKeyboard,
+  dismissKeyboardOnOpening,
   ...props
 }: SelectProps<ItemT>) => {
-  const [showDropDown, setShowDropDown] = useState(false);
+  const [showDropDown, openDropDown, closeDropDown] = useBoolean(false);
 
   const selectedItemIndex = data.findIndex(
     (item, index) => selectedItemKey === keyExtractor(item, index),
@@ -157,16 +159,16 @@ const Select = <ItemT,>({
 
   const onSelectListItemSelected = useCallback(
     (item: ItemT) => {
-      setShowDropDown(false);
+      closeDropDown();
       onItemSelected(item);
     },
-    [onItemSelected],
+    [closeDropDown, onItemSelected],
   );
 
   return (
     <>
       <PressableNative
-        onPress={() => setShowDropDown(true)}
+        onPress={openDropDown}
         style={[styles.input, isErrored && styles.error, style]}
         accessibilityRole="combobox"
         {...props}
@@ -194,14 +196,13 @@ const Select = <ItemT,>({
       </PressableNative>
       <BottomSheetModal
         visible={showDropDown}
-        headerTitle={bottomSheetTitle}
         height={bottomSheetHeight}
         variant="modal"
-        contentContainerStyle={styles.bottomSheetContentContainer}
-        onRequestClose={() => setShowDropDown(false)}
+        onDismiss={closeDropDown}
         nestedScroll
-        avoidKeyboard={avoidKeyboard}
+        dismissKeyboardOnOpening={dismissKeyboardOnOpening}
       >
+        {bottomSheetTitle && <Header middleElement={bottomSheetTitle} />}
         <SelectList
           data={data}
           keyExtractor={keyExtractor}

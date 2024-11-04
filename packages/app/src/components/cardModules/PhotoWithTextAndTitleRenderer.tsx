@@ -97,7 +97,9 @@ export type PhotoWithTextAndTitleRendererData = NullableFields<
 >;
 
 type PhotoWithTextAndTitleRendererAnimatedData = {
-  [K in AnimatedProps]: SharedValue<PhotoWithTextAndTitleRendererData[K]>;
+  [K in AnimatedProps]: SharedValue<
+    NonNullable<PhotoWithTextAndTitleRendererData[K]>
+  >;
 };
 
 export type PhotoWithTextAndTitleRendererProps = ViewProps & {

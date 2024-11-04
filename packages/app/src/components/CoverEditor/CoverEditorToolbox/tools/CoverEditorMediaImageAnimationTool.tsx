@@ -32,8 +32,9 @@ import {
   useLutShader,
   useNativeBuffer,
 } from '#helpers/mediaEditions';
-import useToggle from '#hooks/useToggle';
+import useBoolean from '#hooks/useBoolean';
 import BottomSheetModal from '#ui/BottomSheetModal';
+import Header from '#ui/Header';
 import LabeledWheelSelector from '#ui/LabeledWheelSelector';
 import Text from '#ui/Text';
 import mediaAnimations, {
@@ -55,7 +56,7 @@ import type { SkImage, SkShader } from '@shopify/react-native-skia';
 import type { DerivedValue } from 'react-native-reanimated';
 
 const CoverEditorMediaImageAnimationTool = () => {
-  const [show, toggleBottomSheet] = useToggle(false);
+  const [show, open, close] = useBoolean(false);
   const activeMedia = useCoverEditorActiveImageMedia();
   const hasMultipleMedias =
     useCoverEditorContext().coverEditorState.medias.filter(media =>
@@ -168,7 +169,7 @@ const CoverEditorMediaImageAnimationTool = () => {
               defaultMessage: 'No',
               description: 'Button to not apply the animation to all images',
             }),
-            onPress: toggleBottomSheet,
+            onPress: close,
           },
           {
             text: intl.formatMessage({
@@ -183,7 +184,7 @@ const CoverEditorMediaImageAnimationTool = () => {
                   duration: activeMedia.duration,
                 },
               });
-              toggleBottomSheet();
+              close();
             },
             isPreferred: true,
           },
@@ -191,9 +192,9 @@ const CoverEditorMediaImageAnimationTool = () => {
       );
     } else {
       hasChanges.current = false;
-      toggleBottomSheet();
+      close();
     }
-  }, [activeMedia, dispatch, hasMultipleMedias, intl, toggleBottomSheet]);
+  }, [activeMedia, dispatch, hasMultipleMedias, intl, close]);
 
   return (
     <>
@@ -204,24 +205,21 @@ const CoverEditorMediaImageAnimationTool = () => {
           description:
             'Cover Edition Image Media animation Tool Button - Animations',
         })}
-        onPress={toggleBottomSheet}
+        onPress={open}
       />
       {activeMedia != null && (
-        <BottomSheetModal
-          lazy
-          onRequestClose={toggleBottomSheet}
-          visible={show}
-          height={210 + 80 / COVER_RATIO}
-          headerTitle={
-            <Text variant="large">
-              <FormattedMessage
-                defaultMessage="Animations "
-                description="CoverEditor Animations Tool - Title"
-              />
-            </Text>
-          }
-          headerRightButton={<DoneHeaderButton onPress={onFinished} />}
-        >
+        <BottomSheetModal lazy onDismiss={open} visible={show}>
+          <Header
+            middleElement={
+              <Text variant="large">
+                <FormattedMessage
+                  defaultMessage="Animations "
+                  description="CoverEditor Animations Tool - Title"
+                />
+              </Text>
+            }
+            rightElement={<DoneHeaderButton onPress={onFinished} />}
+          />
           <View style={styles.boxContainer}>
             <BoxSelectionList
               data={animations}
@@ -248,6 +246,7 @@ const CoverEditorMediaImageAnimationTool = () => {
               defaultMessage: 'Duration: ',
               description: 'Duration label in cover edition animation',
             })}
+            style={styles.wheelSelectorStyle}
           />
         </BottomSheetModal>
       )}
@@ -330,5 +329,6 @@ const AnimationPreview = ({
 };
 
 const styles = StyleSheet.create({
+  wheelSelectorStyle: { paddingHorizontal: 20 },
   boxContainer: { height: 80 / COVER_RATIO + 70 },
 });

@@ -26,7 +26,7 @@ import type { Disposable } from 'react-relay';
 
 type HomeScreenContextType = {
   currentIndexSharedValue: SharedValue<number>;
-  currentIndexProfile: SharedValue<number>;
+  currentIndexProfileSharedValue: SharedValue<number>;
   onCurrentProfileIndexChange: (index: number) => void;
   initialProfileIndex: number;
   inputRange: SharedValue<number[]>;
@@ -140,14 +140,14 @@ export const HomeScreenProvider = ({
 
   const currentIndexSharedValue = useSharedValue(initialProfileIndex);
 
-  const currentIndexProfile = useDerivedValue(() => {
+  const currentIndexProfileSharedValue = useDerivedValue(() => {
     return Math.round(currentIndexSharedValue.value);
-  }, [currentIndexSharedValue.value]);
+  }, [currentIndexSharedValue]);
 
   //wondering if we really need this. Force to a fix number when HOME change
   useRouteWillChange('HOME', () => {
-    if (currentIndexProfile.value !== currentIndexSharedValue.value)
-      currentIndexSharedValue.value = currentIndexProfile.value;
+    if (currentIndexProfileSharedValue.value !== currentIndexSharedValue.value)
+      currentIndexSharedValue.value = currentIndexProfileSharedValue.value;
   });
 
   // #region prefetch
@@ -157,7 +157,7 @@ export const HomeScreenProvider = ({
 
   useEffect(() => {
     let disposable: Disposable | undefined;
-    if (currentIndexProfile.value === 0) {
+    if (currentIndexProfileSharedValue.value === 0) {
       disposable = prefetchRoute(getRelayEnvironment(), {
         route: 'WEBCARD_KIND_SELECTION',
       });
@@ -165,7 +165,7 @@ export const HomeScreenProvider = ({
     return () => {
       disposable?.dispose();
     };
-  }, [currentIndexProfile, prefetchRoute]);
+  }, [currentIndexProfileSharedValue, prefetchRoute]);
 
   // we need to keep a ref to the profiles to avoid prefetching when the user `profiles` field changes
   const profilesRef = useRef(user.profiles);
@@ -281,13 +281,13 @@ export const HomeScreenProvider = ({
     () => ({
       currentIndexSharedValue,
       initialProfileIndex,
-      currentIndexProfile,
+      currentIndexProfileSharedValue,
       onCurrentProfileIndexChange,
       inputRange,
       scrollToIndex,
     }),
     [
-      currentIndexProfile,
+      currentIndexProfileSharedValue,
       currentIndexSharedValue,
       initialProfileIndex,
       onCurrentProfileIndexChange,

@@ -1,3 +1,4 @@
+import { startTransition } from 'react';
 import { MMKV } from 'react-native-mmkv';
 import ERRORS from '@azzapp/shared/errors';
 import { clearRecentSearch } from '#screens/SearchScreen/useRecentSearch';
@@ -233,9 +234,11 @@ export const addAuthStateListener = (listener: (state: AuthState) => void) => {
 
 const emitAuthState = () => {
   const state = getAuthState();
-  for (const listener of authStateListener.values()) {
-    listener(state);
-  }
+  startTransition(() => {
+    for (const listener of authStateListener.values()) {
+      listener(state);
+    }
+  });
 };
 
 /**

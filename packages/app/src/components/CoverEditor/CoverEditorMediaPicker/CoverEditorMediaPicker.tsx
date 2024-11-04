@@ -1,7 +1,7 @@
 import { Image } from 'expo-image';
-import { useCallback, useMemo, useState } from 'react';
+import { startTransition, useCallback, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View, Alert, Modal, useWindowDimensions } from 'react-native';
+import { View, Alert, useWindowDimensions } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { RESULTS } from 'react-native-permissions';
 import Toast from 'react-native-toast-message';
@@ -19,6 +19,7 @@ import {
   SaveHeaderButton,
 } from '#components/commonsButtons';
 import { MediaGridListFallback } from '#components/MediaGridList';
+import { ScreenModal } from '#components/NativeRouter';
 import PermissionModal from '#components/PermissionModal';
 import PhotoGalleryMediaList from '#components/PhotoGalleryMediaList';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -93,11 +94,13 @@ const CoverEditorMediaPicker = ({
 
   const onTabPress = useCallback(
     (tab: string) => {
-      if (tab === 'gallery' && selectedTab === 'gallery') {
-        toggleShowAlbumModal();
-      } else {
-        setSelectedTab(tab);
-      }
+      startTransition(() => {
+        if (tab === 'gallery' && selectedTab === 'gallery') {
+          toggleShowAlbumModal();
+        } else {
+          setSelectedTab(tab);
+        }
+      });
     },
     [selectedTab, toggleShowAlbumModal],
   );
@@ -448,6 +451,7 @@ const CoverEditorMediaPicker = ({
         <TabView
           style={styles.content}
           currentTab={selectedTab}
+          mountOnlyCurrentTab
           tabs={[
             {
               id: 'gallery',
@@ -474,7 +478,6 @@ const CoverEditorMediaPicker = ({
                   kind="image"
                   selectedMediasIds={selectedMediasIds}
                   onMediaSelected={handleMediaSelected}
-                  displayList={selectedTab === 'stock_photo'}
                 />
               ),
             },
@@ -485,7 +488,6 @@ const CoverEditorMediaPicker = ({
                   kind="video"
                   selectedMediasIds={selectedMediasIds}
                   onMediaSelected={handleMediaSelected}
-                  displayList={selectedTab === 'stock_video'}
                 />
               ),
             },
@@ -586,16 +588,16 @@ const CoverEditorMediaPicker = ({
       />
       {(mediaPermission === RESULTS.GRANTED ||
         mediaPermission === RESULTS.LIMITED) && (
-        <Modal
+        <ScreenModal
           visible={showAlbumModal}
-          onRequestClose={toggleShowAlbumModal}
+          onRequestDismiss={toggleShowAlbumModal}
           animationType="slide"
         >
           <AlbumPickerScreen
             onSelectAlbum={onSelectAlbum}
             onClose={toggleShowAlbumModal}
           />
-        </Modal>
+        </ScreenModal>
       )}
     </>
   );

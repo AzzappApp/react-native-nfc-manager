@@ -1,5 +1,5 @@
 import omit from 'lodash/omit';
-import { useCallback, useMemo, useState } from 'react';
+import { startTransition, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
@@ -323,6 +323,14 @@ const SocialLinksEditionScreen = ({
   // #region tabs
 
   const [currentTab, setCurrentTab] = useState('links');
+  const onMenuItemPressed = useCallback(
+    (tab: string) => {
+      startTransition(() => {
+        setCurrentTab(tab);
+      });
+    },
+    [setCurrentTab],
+  );
 
   // #endregion
 
@@ -463,7 +471,7 @@ const SocialLinksEditionScreen = ({
       </KeyboardAvoidingView>
       <SocialLinksEditionBottomMenu
         currentTab={currentTab}
-        onItemPress={setCurrentTab}
+        onItemPress={onMenuItemPressed}
         style={[
           styles.tabsBar,
           { bottom: insetBottom, width: windowWidth - 20 },

@@ -22,9 +22,10 @@ import {
   percentRectToRect,
 } from '#components/CoverEditor/coverEditorHelpers';
 import { keyExtractor } from '#helpers/idHelpers';
-import useToggle from '#hooks/useToggle';
+import useBoolean from '#hooks/useBoolean';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import DoubleSlider from '#ui/DoubleSlider';
+import Header from '#ui/Header';
 import Text from '#ui/Text';
 import {
   useCoverEditorContext,
@@ -48,7 +49,7 @@ const CoverEditorTextImageAnimationTool = () => {
 
   const animations = useCoverTextAnimationList();
 
-  const [show, toggleBottomSheet] = useToggle(false);
+  const [show, open, close] = useBoolean(false);
 
   const onChangeAnimationDuration = useCallback(
     (value: number[], index: number) => {
@@ -134,24 +135,21 @@ const CoverEditorTextImageAnimationTool = () => {
           description:
             'Cover Edition Image Text animation Tool Button - Animations',
         })}
-        onPress={toggleBottomSheet}
+        onPress={open}
       />
       {activeTextLayer != null && (
-        <BottomSheetModal
-          lazy
-          onRequestClose={toggleBottomSheet}
-          visible={show}
-          height={210 + 80 / COVER_RATIO}
-          headerTitle={
-            <Text variant="large">
-              <FormattedMessage
-                defaultMessage="Animations "
-                description="CoverEditor Animations Tool - Title"
-              />
-            </Text>
-          }
-          headerRightButton={<DoneHeaderButton onPress={toggleBottomSheet} />}
-        >
+        <BottomSheetModal lazy onDismiss={close} visible={show}>
+          <Header
+            middleElement={
+              <Text variant="large">
+                <FormattedMessage
+                  defaultMessage="Animations "
+                  description="CoverEditor Animations Tool - Title"
+                />
+              </Text>
+            }
+            rightElement={<DoneHeaderButton onPress={close} />}
+          />
           <View style={styles.boxContainer}>
             <BoxSelectionList
               data={animations}
@@ -168,15 +166,17 @@ const CoverEditorTextImageAnimationTool = () => {
               }
             />
           </View>
-          <DoubleSlider
-            minimumValue={0}
-            maximumValue={coverDuration}
-            value={[
-              (activeTextLayer.startPercentageTotal * coverDuration) / 100,
-              (activeTextLayer.endPercentageTotal * coverDuration) / 100,
-            ]}
-            onValueChange={onChangeAnimationDuration}
-          />
+          <View style={styles.doubleSliderContainer}>
+            <DoubleSlider
+              minimumValue={0}
+              maximumValue={coverDuration}
+              value={[
+                (activeTextLayer.startPercentageTotal * coverDuration) / 100,
+                (activeTextLayer.endPercentageTotal * coverDuration) / 100,
+              ]}
+              onValueChange={onChangeAnimationDuration}
+            />
+          </View>
         </BottomSheetModal>
       )}
     </>
@@ -264,4 +264,5 @@ const AnimationPreview = ({
 
 const styles = StyleSheet.create({
   boxContainer: { height: 80 / COVER_RATIO + 70 },
+  doubleSliderContainer: { paddingHorizontal: 20 },
 });

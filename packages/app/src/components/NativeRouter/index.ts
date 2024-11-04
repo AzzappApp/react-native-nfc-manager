@@ -6,7 +6,6 @@ export {
   type ScreenMap,
   type ScreensRendererProps,
 } from './ScreensRenderer';
-export { ScreenDidAppear } from './ScreensDidAppear';
 export {
   default as ScreenModal,
   preventModalDismiss,

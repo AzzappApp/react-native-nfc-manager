@@ -1,7 +1,7 @@
 import { IntlErrorCode } from '@formatjs/intl';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { addEventListener } from '@react-native-community/netinfo';
 import * as Sentry from '@sentry/react-native';
-import { StatusBar } from 'expo-status-bar';
 import {
   Component,
   Fragment,
@@ -13,8 +13,9 @@ import {
   useState,
 } from 'react';
 import { FormattedMessage, IntlProvider, injectIntl } from 'react-intl';
-import { Platform, useColorScheme } from 'react-native';
+import { Platform, useColorScheme, StyleSheet } from 'react-native';
 import { hide as hideSplashScreen } from 'react-native-bootsplash';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import Purchases from 'react-native-purchases';
 import {
@@ -33,7 +34,6 @@ import {
   ScreensRenderer,
   RouterProvider,
 } from '#components/NativeRouter';
-//import ShakeShare from '#components/ShakeShare';
 import ShakeShare from '#components/ShakeShare';
 import Toast from '#components/Toast';
 import { analyticsLogScreenEvent } from '#helpers/analytics';
@@ -190,7 +190,6 @@ const App = () => {
 
   return (
     <>
-      {Platform.OS === 'android' && <StatusBar style="auto" translucent />}
       <AppIntlProvider>
         <ErrorBoundary>
           <PermissionProvider>
@@ -460,17 +459,24 @@ const AppRouter = () => {
     <RelayEnvironmentProvider environment={environment}>
       <ScreenPrefetcherProvider value={screenPrefetcher}>
         <SafeAreaProvider
-          initialMetrics={initialWindowMetrics}
+          initialMetrics={Platform.select({
+            android: null,
+            default: initialWindowMetrics,
+          })}
           style={safeAreaBackgroundStyle}
         >
           <RouterProvider value={router}>
-            <ScreensRenderer
-              routerState={routerState}
-              screens={screens}
-              tabs={tabs}
-              onFinishTransitioning={onFinishTransitioning}
-              onScreenHasBeenDismissed={disposeScreens}
-            />
+            <GestureHandlerRootView style={styles.flex}>
+              <BottomSheetModalProvider>
+                <ScreensRenderer
+                  routerState={routerState}
+                  screens={screens}
+                  tabs={tabs}
+                  onFinishTransitioning={onFinishTransitioning}
+                  onScreenHasBeenDismissed={disposeScreens}
+                />
+              </BottomSheetModalProvider>
+            </GestureHandlerRootView>
           </RouterProvider>
           <Toast />
           <Suspense>
@@ -565,3 +571,7 @@ class _AppErrorBoundary extends Component<{
 }
 
 const AppErrorBoundary = injectIntl(_AppErrorBoundary);
+
+const styles = StyleSheet.create({
+  flex: { flex: 1 },
+});

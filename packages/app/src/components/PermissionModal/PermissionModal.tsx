@@ -1,17 +1,11 @@
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
-import {
-  StyleSheet,
-  View,
-  SafeAreaView,
-  Linking,
-  useWindowDimensions,
-} from 'react-native';
+import { StyleSheet, View, SafeAreaView, Linking } from 'react-native';
 import { RESULTS } from 'react-native-permissions';
 
 import { colors } from '#theme';
+import { ScreenModal } from '#components/NativeRouter';
 import { usePermissionContext } from '#helpers/PermissionContext';
-import BottomSheetModal from '#ui/BottomSheetModal';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
@@ -23,10 +17,6 @@ type CameraModalProps = {
    * The permission to request.
    */
   permissionsFor: 'gallery' | 'photo' | 'video';
-  /**
-   * @see https://reactnative.dev/docs/modal#visible
-   */
-  visible?: boolean;
   /**
    * @see https://reactnative.dev/docs/modal#onrequestclose
    */
@@ -114,15 +104,10 @@ const PermissionModal = ({
     }
   };
 
-  const { height } = useWindowDimensions();
-
   return (
-    <BottomSheetModal
-      lazy
-      showGestureIndicator={false}
-      height={height}
+    <ScreenModal
       visible={showPermissionModal && autoFocus}
-      onRequestClose={onRequestClose}
+      onRequestDismiss={onRequestClose}
     >
       <Container style={styles.container}>
         <SafeAreaView style={styles.root}>
@@ -200,7 +185,7 @@ const PermissionModal = ({
           )}
         </SafeAreaView>
       </Container>
-    </BottomSheetModal>
+    </ScreenModal>
   );
 };
 

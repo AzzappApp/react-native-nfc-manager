@@ -1,5 +1,5 @@
 import omit from 'lodash/omit';
-import { useCallback, useMemo, useState } from 'react';
+import { startTransition, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
@@ -418,12 +418,11 @@ const HorizontalPhotoEditionScreen = ({
   // #region tabs
 
   const [currentTab, setCurrentTab] = useState('settings');
-  const onCurrentTabChange = useCallback(
-    (currentTab: string) => {
+  const onCurrentTabChange = useCallback((currentTab: string) => {
+    startTransition(() => {
       setCurrentTab(currentTab);
-    },
-    [setCurrentTab],
-  );
+    });
+  }, []);
 
   // #endregion
 

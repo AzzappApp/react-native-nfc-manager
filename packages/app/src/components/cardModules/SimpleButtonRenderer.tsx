@@ -69,7 +69,7 @@ export type SimpleButtonRendererData = NullableFields<
 >;
 
 type SimpleButtonRendererAnimatedData = {
-  [K in AnimatedProps]: SharedValue<SimpleButtonRendererData[K]>;
+  [K in AnimatedProps]: SharedValue<NonNullable<SimpleButtonRendererData[K]>>;
 };
 
 export type SimpleButtonRendererProps = ViewProps & {

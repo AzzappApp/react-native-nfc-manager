@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useBottomSheetInternal } from '@gorhom/bottom-sheet';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { TextInput as NativeTextInput, View } from 'react-native';
 import { isValidHex } from '@azzapp/shared/stringHelpers';
@@ -10,7 +11,7 @@ import type {
   StyleProp,
   NativeSyntheticEvent,
   TextInputFocusEventData,
-  TextStyle,
+  ViewStyle,
 } from 'react-native';
 
 type HexColorTextInputProps = Omit<
@@ -42,28 +43,48 @@ const HexColorTextInput = ({
     setColorValue(value);
   }, [value]);
 
-  const [focusedStyle, setFocusedStyle] = useState<StyleProp<TextStyle>>({});
+  const [focusedStyle, setFocusedStyle] = useState<StyleProp<ViewStyle>>({});
+  //#region hooks
+  const { shouldHandleKeyboardEvents } = useBottomSheetInternal();
+  //#endregion
 
   const focus = () => {
     //setting setTimeout fix a know bug where input will blur just after calling focus
     setTimeout(() => textInputRef.current?.focus(), 100);
   };
 
-  const onInputFocus = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
-    setFocusedStyle({
-      borderColor: colors.grey900,
-    });
-    if (onFocus) {
-      onFocus(e);
-    }
-  };
+  const onInputFocus = useCallback(
+    (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
+      setFocusedStyle({
+        borderColor: colors.grey900,
+      });
+      shouldHandleKeyboardEvents.value = true;
+      if (onFocus) {
+        onFocus(e);
+      }
+    },
+    [onFocus, shouldHandleKeyboardEvents],
+  );
 
-  const onInputBlur = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
-    setFocusedStyle({});
-    if (onBlur) {
-      onBlur(e);
-    }
-  };
+  const onInputBlur = useCallback(
+    (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
+      setFocusedStyle({});
+      shouldHandleKeyboardEvents.value = false;
+      if (onBlur) {
+        onBlur(e);
+      }
+    },
+    [onBlur, shouldHandleKeyboardEvents],
+  );
+
+  //#region effects
+  useEffect(() => {
+    return () => {
+      // Reset the flag on unmount
+      shouldHandleKeyboardEvents.value = false;
+    };
+  }, [shouldHandleKeyboardEvents]);
+  //#endregion
 
   const onChangeText = (text: string) => {
     const newColor = '#' + text.replace(/([^0-9A-F]+)/gi, '').substring(0, 6);

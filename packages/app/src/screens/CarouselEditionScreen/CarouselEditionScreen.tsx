@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { startTransition, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
@@ -244,6 +244,12 @@ const CarouselEditionScreen = ({
   // #region Fields edition handlers
   const [showImagePicker, setShowImagePicker] = useState(images.length === 0);
   const [currentTab, setCurrentTab] = useState('images');
+
+  const onMenuItemPress = useCallback((tabId: string) => {
+    startTransition(() => {
+      setCurrentTab(tabId);
+    });
+  }, []);
 
   const onShowImagePicker = useCallback(() => {
     setShowImagePicker(true);
@@ -615,7 +621,7 @@ const CarouselEditionScreen = ({
       />
       <CarouselEditionBottomMenu
         currentTab={currentTab}
-        onItemPress={setCurrentTab}
+        onItemPress={onMenuItemPress}
         style={[
           styles.tabsBar,
           { bottom: insetBottom, width: windowWidth - 20 },

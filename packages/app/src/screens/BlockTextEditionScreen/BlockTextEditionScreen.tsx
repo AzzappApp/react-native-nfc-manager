@@ -1,5 +1,5 @@
 import omit from 'lodash/omit';
-import { useCallback, useMemo, useState } from 'react';
+import { startTransition, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Platform, StyleSheet } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
@@ -358,11 +358,13 @@ const BlockTextEditionScreen = ({
 
   const onCurrentTabChange = useCallback(
     (currentTab: string) => {
-      if (currentTab === 'editor') {
-        setShowContentModal(true);
-      } else {
-        setCurrentTab(currentTab);
-      }
+      startTransition(() => {
+        if (currentTab === 'editor') {
+          setShowContentModal(true);
+        } else {
+          setCurrentTab(currentTab);
+        }
+      });
     },
     [setCurrentTab],
   );

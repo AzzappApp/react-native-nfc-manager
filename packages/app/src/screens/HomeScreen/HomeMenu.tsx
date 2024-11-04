@@ -4,19 +4,19 @@ import { View, StyleSheet } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   withTiming,
-  type SharedValue,
 } from 'react-native-reanimated';
 import { colors } from '#theme';
 import TabBarMenuItem from '#ui/TabBarMenuItem';
 import Text from '#ui/Text';
+import type { DerivedValue } from 'react-native-reanimated';
 
 export type HOME_TAB = 'CONTACT_CARD' | 'INFORMATION' | 'STATS';
 
 type HomeMenuProps = {
   selected: HOME_TAB;
   setSelected: (section: HOME_TAB) => void;
-  newContactsOpacity: SharedValue<number>;
-  notificationColor: SharedValue<string>;
+  newContactsOpacity: DerivedValue<number>;
+  notificationColor: DerivedValue<string>;
 };
 
 const circleSize = 4.5;

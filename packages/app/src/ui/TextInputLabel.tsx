@@ -11,12 +11,13 @@ import type {
   TextInput as NativeTextInput,
   StyleProp,
   TextStyle,
+  ViewStyle,
 } from 'react-native';
 
 export type TextInputLabelProps = Omit<TextInputProps, 'style'> & {
   label: string;
   labelID: string;
-  labelStyle?: StyleProp<TextStyle> | undefined;
+  labelStyle?: StyleProp<ViewStyle> | undefined;
   inputStyle?: StyleProp<TextStyle> | undefined;
 };
 

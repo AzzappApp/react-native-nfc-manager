@@ -4,9 +4,9 @@ import { runOnJS, useAnimatedReaction } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { getAuthState } from '#helpers/authStore';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import useBoolean from '#hooks/useBoolean';
 import useNotifications from '#hooks/useNotifications';
 import useScreenInsets from '#hooks/useScreenInsets';
-import useToggle from '#hooks/useToggle';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import HomeBackground from './HomeBackground';
 import HomeBottomPanel from './HomeBottomPanel';
@@ -76,16 +76,16 @@ const HomeScreenContent = ({
   }, [notificationAuthorized, requestNotificationPermission, user.profiles]);
   //#endregion
 
-  const { bottom } = useScreenInsets();
   //#region profile switch
 
-  const { currentIndexProfile } = useHomeScreenContext();
+  const { currentIndexProfileSharedValue, initialProfileIndex } =
+    useHomeScreenContext();
 
   const [currentProfile, setCurrentProfile] = useState(
-    user.profiles?.[currentIndexProfile.value - 1],
+    user.profiles?.[initialProfileIndex - 1],
   );
   useAnimatedReaction(
-    () => currentIndexProfile.value,
+    () => currentIndexProfileSharedValue.value,
     index => {
       const cProfile = user.profiles?.[index - 1];
       runOnJS(setCurrentProfile)(cProfile);
@@ -110,26 +110,27 @@ const HomeScreenContent = ({
   //#endregion
 
   // #region bottomMenu
-  const [showMenu, toggleShowMenu] = useToggle(false);
+  const [showMenu, , closeMenu, toggleMenu] = useBoolean(false);
 
   // #endregion
   const insets = useScreenInsets();
   const homeContentContainerStyle = useMemo(
     () => [
-      styles.contentContainer,
+      styles.container,
       {
-        paddingBottom: bottom + BOTTOM_MENU_HEIGHT + 15,
-        paddingTop: insets.top + 15,
+        marginTop: insets.top + HOME_SCREEN_CONTENT_PADDING,
+        marginBottom:
+          insets.bottom + BOTTOM_MENU_HEIGHT + HOME_SCREEN_CONTENT_PADDING,
       },
     ],
-    [bottom, insets.top],
+    [insets.bottom, insets.top],
   );
 
   return (
     <View style={styles.container}>
       <HomeBackground user={user} />
       <View style={homeContentContainerStyle}>
-        <HomeHeader openPanel={toggleShowMenu} user={user} />
+        <HomeHeader openPanel={toggleMenu} user={user} />
         <HomeProfileLink user={user} />
         <HomeProfilesCarousel user={user} />
         <HomeBottomPanel user={user} />
@@ -137,7 +138,7 @@ const HomeScreenContent = ({
       <HomeContactCardLandscape profile={currentProfile ?? null} />
       <HomeBottomSheetPanel
         visible={showMenu}
-        close={toggleShowMenu}
+        close={closeMenu}
         profile={currentProfile ?? null}
       />
     </View>
@@ -146,12 +147,9 @@ const HomeScreenContent = ({
 //usage of memo tested with whyDidYouRender, reducing render due to context change
 export default memo(HomeScreenContent);
 
+export const HOME_SCREEN_CONTENT_PADDING = 15;
+
 const styles = StyleSheet.create({
-  contentContainer: {
-    flex: 1,
-    justifyContent: 'flex-start',
-    overflow: 'visible',
-  },
   container: {
     flex: 1,
   },

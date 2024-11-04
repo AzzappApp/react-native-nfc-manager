@@ -35,7 +35,7 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
     userKey,
   );
 
-  const { currentIndexProfile, currentIndexSharedValue } =
+  const { currentIndexProfileSharedValue, currentIndexSharedValue } =
     useHomeScreenContext();
 
   const userNames = useDerivedValue(
@@ -57,12 +57,14 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
         Math.round(currentIndexSharedValue.value),
       pointerEvents: 'auto',
     };
-  }, [currentIndexProfile.value, currentIndexSharedValue.value]);
+  }, [currentIndexProfileSharedValue.value, currentIndexSharedValue.value]);
 
   const intl = useIntl();
   const onPress = () => {
     Clipboard.setStringAsync(
-      buildUserUrl(userNames.value[currentIndexProfile.value - 1] ?? ''),
+      buildUserUrl(
+        userNames.value[currentIndexProfileSharedValue.value - 1] ?? '',
+      ),
     )
       .then(() => {
         Toast.show({

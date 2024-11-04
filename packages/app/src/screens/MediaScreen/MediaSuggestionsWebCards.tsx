@@ -35,6 +35,7 @@ type MediaSuggestionsWebCardsProps = {
   profile: MediaSuggestionsWebCards_profile$key;
   webCard: MediaSuggestionsWebCards_webCard$key | null;
   isCurrentTab: boolean;
+  canPlay: boolean;
 };
 
 const NB_PROFILES = 12;
@@ -43,6 +44,7 @@ const MediaSuggestionsWebCards = ({
   profile,
   webCard,
   isCurrentTab,
+  canPlay,
 }: MediaSuggestionsWebCardsProps) => {
   const { data, refetch, loadNext, hasNext, isLoadingNext } =
     usePaginationFragment(
@@ -119,7 +121,9 @@ const MediaSuggestionsWebCards = ({
       index,
       extraData,
     }: ListRenderItemInfo<ArrayItemType<CoverList_users$data>>) => {
-      const shouldPlay = extraData.viewableItems.some((v: any) => v === index);
+      const shouldPlay =
+        extraData.canPlay &&
+        extraData.viewableItems.some((v: any) => v === index);
 
       return (
         <CoverLinkWithOptions
@@ -134,6 +138,11 @@ const MediaSuggestionsWebCards = ({
     [],
   );
 
+  const extraData = useMemo(
+    () => ({ followingMap, cardIsPublished, canPlay }),
+    [canPlay, cardIsPublished, followingMap],
+  );
+
   return (
     <View style={styles.containerStyle}>
       <CoverList
@@ -141,7 +150,7 @@ const MediaSuggestionsWebCards = ({
         onEndReached={onEndReached}
         renderItem={renderItem}
         coverWidth={COVER_SUGGESTIONS_WIDTH + 2 * COVER_SUGGESTIONS_PADDING}
-        extraData={{ followingMap, cardIsPublished }}
+        extraData={extraData}
       />
     </View>
   );

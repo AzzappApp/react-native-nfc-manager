@@ -1,6 +1,8 @@
-import { StyleSheet, type ViewProps } from 'react-native';
+import { useEffect } from 'react';
+import { Platform, StyleSheet, type ViewProps } from 'react-native';
 import Animated, {
   useAnimatedStyle,
+  useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
 import { TOOLBOX_SECTION_HEIGHT } from './ToolBoxSection';
@@ -11,14 +13,24 @@ const ToolBarContainer = ({
   destroyOnHide = false,
   ...props
 }: ViewProps & { visible: boolean; destroyOnHide?: boolean }) => {
-  const animatedStyle = useAnimatedStyle(() => {
-    const translation = withTiming(visible ? 0 : TOOLBOX_SECTION_HEIGHT, {
+  const translation = useSharedValue(visible ? 0 : TOOLBOX_SECTION_HEIGHT);
+  useEffect(() => {
+    translation.value = withTiming(visible ? 0 : TOOLBOX_SECTION_HEIGHT, {
       duration: 300,
     });
+  }, [translation, visible]);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    if (Platform.OS === 'android') {
+      // see @https://github.com/facebook/react-native/issues/44768
+      return {
+        top: translation.value,
+      };
+    }
     return {
-      transform: [{ translateY: translation }],
+      transform: [{ translateY: translation.value }],
     };
-  }, [visible]);
+  });
 
   return (
     <Animated.View style={[styles.layerContainer, style, animatedStyle]}>
@@ -34,5 +46,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     height: TOOLBOX_SECTION_HEIGHT,
     width: '100%',
+    left: 0,
+    top: 0,
   },
 });

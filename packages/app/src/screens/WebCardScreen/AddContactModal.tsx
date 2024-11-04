@@ -10,7 +10,6 @@ import { fromGlobalId } from 'graphql-relay';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Alert, Platform, StyleSheet, View } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { MMKV } from 'react-native-mmkv';
 import Toast from 'react-native-toast-message';
 import {
@@ -27,15 +26,15 @@ import { useRouter } from '#components/NativeRouter';
 import { findLocalContact } from '#helpers/contactCardHelpers';
 import { reworkContactForDeviceInsert } from '#helpers/contactListHelpers';
 import { getLocalContactsMap } from '#helpers/getLocalContactsMap';
+import useBoolean from '#hooks/useBoolean';
 import { usePhonebookPermission } from '#hooks/usePhonebookPermission';
+import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
 import CheckBox from '#ui/CheckBox';
-import Container from '#ui/Container';
 import Header from '#ui/Header';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
-import SafeAreaView from '#ui/SafeAreaView';
 import Text from '#ui/Text';
 import AddContactModalProfiles from './AddContactModalProfiles';
 import type { AddContactModal_webCard$key } from '#relayArtifacts/AddContactModal_webCard.graphql';
@@ -66,14 +65,10 @@ const AddContactModal = ({
   user: userKey,
 }: Props) => {
   const [viewer, setViewer] = useState<string | null>(null);
-  const scrollerGesture = Gesture.Native();
-  const checkBoxGesture = Gesture.Native();
-
   const {
     requestPhonebookPermissionAndRedirectToSettingsAsync,
     requestPhonebookPermissionAsync,
   } = usePhonebookPermission();
-  const nativeGestureItems = [checkBoxGesture, scrollerGesture];
 
   const webCard = useFragment(
     graphql`
@@ -107,7 +102,7 @@ const AddContactModal = ({
     profileId: string;
   } | null>(null);
 
-  const [isOpen, setIsOpen] = useState(false);
+  const [show, open, close] = useBoolean(false);
   const router = useRouter();
 
   const getContactInput = useCallback(() => {
@@ -386,7 +381,7 @@ const AddContactModal = ({
         }
       },
       onCompleted: () => {
-        setIsOpen(false);
+        close();
         router.pop(1);
         onRequestAddContactToPhonebook();
       },
@@ -399,15 +394,16 @@ const AddContactModal = ({
     viewer,
     getContactInput,
     commit,
+    close,
     router,
     onRequestAddContactToPhonebook,
   ]);
 
   const onClose = useCallback(() => {
-    setIsOpen(false);
+    close();
     router.pop(1);
     onRequestAddContactToPhonebook();
-  }, [onRequestAddContactToPhonebook, router]);
+  }, [close, onRequestAddContactToPhonebook, router]);
 
   useEffect(() => {
     (async () => {
@@ -419,11 +415,11 @@ const AddContactModal = ({
         );
         if (webCardId === fromGlobalId(webCard.id).id) {
           setScanned({ contact, profileId });
-          setIsOpen(true);
+          open();
         }
       }
     })();
-  }, [contactData, webCard, additionalContactData, scanned]);
+  }, [contactData, webCard, additionalContactData, scanned, open]);
 
   const onShowContact = useCallback(() => {
     if (!scanned) return;
@@ -456,74 +452,65 @@ const AddContactModal = ({
     return webCard.userName;
   }, [scanned, webCard.userName]);
 
+  const { bottom } = useScreenInsets();
+
   return (
     <BottomSheetModal
-      visible={isOpen}
-      onRequestClose={onClose}
-      height={650}
-      nativeGestureItems={nativeGestureItems}
-      lazy={true}
+      visible={show}
+      onDismiss={onClose}
+      height={675 + bottom}
+      lazy
+      enableContentPanningGesture={false}
     >
-      <Container style={styles.container}>
-        <SafeAreaView
-          style={styles.container}
-          edges={{ bottom: 'off', top: 'additive' }}
-        >
-          <Header
-            middleElement={
-              <Text variant="large" style={styles.headerTitle}>
-                <FormattedMessage
-                  defaultMessage="Add {userName} to your contacts"
-                  description="Title for add contact modal"
-                  values={{
-                    userName,
-                  }}
-                />
-              </Text>
-            }
-            leftElement={
-              <PressableNative onPress={onClose}>
-                <Icon icon="close" />
-              </PressableNative>
-            }
-            middleElementStyle={styles.middleElement}
-            style={styles.header}
-          />
-          <View style={styles.section}>
-            <CoverRenderer webCard={webCard} width={120} canPlay={false} />
-          </View>
-          <View style={styles.separator}>
-            <Icon icon="arrow_down" />
-            <Icon icon="arrow_up" style={{ marginLeft: 10 }} />
-          </View>
-          <AddContactModalProfiles
-            user={userKey}
-            onSelectProfile={setViewer}
-            nativeGesture={scrollerGesture}
-          />
-          <GestureDetector gesture={checkBoxGesture}>
-            <CheckBox
-              label={intl.formatMessage({
-                defaultMessage: 'Share back your contact details',
-                description: 'AddContactModal - shareback title',
-              })}
-              labelStyle={styles.label}
-              style={styles.checkbox}
-              status={withShareBack}
-              onValueChange={setWithShareBack}
+      <Header
+        middleElement={
+          <Text variant="large">
+            <FormattedMessage
+              defaultMessage="Add {userName} to your contacts"
+              description="Title for add contact modal"
+              values={{
+                userName,
+              }}
             />
-          </GestureDetector>
-          <Button
-            loading={saving}
-            style={styles.button}
-            label={intl.formatMessage({
-              defaultMessage: 'Add to my WebCard contacts',
-              description: 'AddContactModal - Submit title',
-            })}
-            onPress={onShowContact}
-          />
-        </SafeAreaView>
-      </Container>
+          </Text>
+        }
+        leftElement={
+          <PressableNative onPress={onClose}>
+            <Icon icon="close" />
+          </PressableNative>
+        }
+        style={styles.header}
+      />
+      <View style={styles.section}>
+        <CoverRenderer webCard={webCard} width={120} canPlay={false} />
+      </View>
+      <View style={styles.separator}>
+        <Icon icon="arrow_down" />
+        <Icon icon="arrow_up" style={{ marginLeft: 10 }} />
+      </View>
+      <AddContactModalProfiles user={userKey} onSelectProfile={setViewer} />
+
+      <View style={{ paddingHorizontal: 20 }}>
+        <CheckBox
+          label={intl.formatMessage({
+            defaultMessage: 'Share back your contact details',
+            description: 'AddContactModal - shareback title',
+          })}
+          labelStyle={styles.label}
+          style={styles.checkbox}
+          status={withShareBack}
+          onValueChange={setWithShareBack}
+        />
+        <Button
+          loading={saving}
+          style={styles.button}
+          label={intl.formatMessage({
+            defaultMessage: 'Add to my WebCard contacts',
+            description: 'AddContactModal - Submit title',
+          })}
+          onPress={onShowContact}
+        />
+      </View>
     </BottomSheetModal>
   );
 };
@@ -646,9 +633,6 @@ const buildContact = async (
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   section: {
     marginTop: 20,
     alignItems: 'center',
@@ -667,14 +651,10 @@ const styles = StyleSheet.create({
   button: {
     marginTop: 20,
   },
-  middleElement: {
-    left: '6%',
-    width: '90%',
-  },
+
   header: {
-    paddingHorizontal: 0,
+    height: 36,
   },
-  headerTitle: { textAlign: 'center', paddingHorizontal: 5 },
 });
 
 export default AddContactModal;

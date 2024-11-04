@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { startTransition, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
@@ -383,6 +383,14 @@ const SimpleButtonEditionScreen = ({
   // #region tabs
 
   const [currentTab, setCurrentTab] = useState('settings');
+  const onMenuItemPressed = useCallback(
+    (tab: string) => {
+      startTransition(() => {
+        setCurrentTab(tab);
+      });
+    },
+    [setCurrentTab],
+  );
 
   const {
     bottomPanelHeight,
@@ -535,7 +543,7 @@ const SimpleButtonEditionScreen = ({
       </KeyboardAvoidingView>
       <SimpleButtonEditionBottomMenu
         currentTab={currentTab}
-        onItemPress={setCurrentTab}
+        onItemPress={onMenuItemPressed}
         style={[
           styles.tabsBar,
           { bottom: insetBottom, width: windowWidth - 20 },

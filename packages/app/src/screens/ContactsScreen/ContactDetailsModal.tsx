@@ -1,6 +1,5 @@
 import { useCallback, useImperativeHandle, useState, forwardRef } from 'react';
 import { Platform, useWindowDimensions } from 'react-native';
-import { Gesture, type NativeGesture } from 'react-native-gesture-handler';
 import useScreenInsets from '#hooks/useScreenInsets';
 import ContactDetailsBody from '#screens/ContactDetailsScreen/ContactDetailsBody';
 import BottomSheetModal from '#ui/BottomSheetModal';
@@ -20,10 +19,6 @@ const ContactDetailsModal = (
   ref: ForwardedRef<ContactDetailsModalActions>,
 ) => {
   const [details, setDetails] = useState<ContactDetails | null>(null);
-
-  const scrollListGesture = Gesture.Native();
-
-  const nativeGestureItems: NativeGesture[] = [scrollListGesture];
 
   const { height } = useWindowDimensions();
   const { top, bottom } = useScreenInsets();
@@ -48,13 +43,11 @@ const ContactDetailsModal = (
     <BottomSheetModal
       height={height - top - bottom - (Platform.OS === 'ios' ? 0 : 100)}
       visible={!!details}
-      onRequestClose={onClose}
-      contentContainerStyle={{ paddingHorizontal: 0 }}
-      nativeGestureItems={nativeGestureItems}
+      onDismiss={onClose}
+      nestedScroll
     >
       {details && (
         <ContactDetailsBody
-          scrollListGesture={scrollListGesture}
           details={details}
           onClose={onClose}
           onSave={onSave}

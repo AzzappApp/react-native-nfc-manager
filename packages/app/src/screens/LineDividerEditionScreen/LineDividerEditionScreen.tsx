@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { startTransition, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
@@ -249,17 +249,16 @@ const LineDividerEditionScreen = ({
   const [colorMode, setColorMode] = useState<'colorBottom' | 'colorTop'>(
     'colorTop',
   );
-  const onCurrentTabChange = useCallback(
-    (currentTab: string) => {
+  const onCurrentTabChange = useCallback((currentTab: string) => {
+    startTransition(() => {
       if (currentTab === 'colorBottom' || currentTab === 'colorTop') {
         setColorMode(currentTab);
         setShowContentModal(true);
       } else {
         setCurrentTab(currentTab);
       }
-    },
-    [setCurrentTab],
-  );
+    });
+  }, []);
   // #endregion
 
   const {

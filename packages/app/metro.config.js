@@ -5,18 +5,12 @@
  * @format
  */
 const path = require('path');
-const { mergeConfig } = require('@react-native/metro-config');
+const { mergeConfig, getDefaultConfig } = require('@react-native/metro-config');
 
 const { getSentryExpoConfig } = require('@sentry/react-native/metro');
-const {
-  getMetroAndroidAssetsResolutionFix,
-} = require('react-native-monorepo-tools');
 
-const androidAssetsResolutionFix = getMetroAndroidAssetsResolutionFix();
-
-module.exports = mergeConfig(getSentryExpoConfig(__dirname), {
+const config = {
   transformer: {
-    publicPath: androidAssetsResolutionFix.publicPath,
     assetPlugins: ['expo-asset/tools/hashAssetFiles'],
     getTransformOptions: async () => ({
       transform: {
@@ -26,10 +20,13 @@ module.exports = mergeConfig(getSentryExpoConfig(__dirname), {
     }),
   },
   server: {
-    // ...and to the server middleware.
-    enhanceMiddleware: middleware => {
-      return androidAssetsResolutionFix.applyMiddleware(middleware);
-    },
+    unstable_serverRoot: __dirname,
   },
   watchFolders: [path.resolve(__dirname, '../../')],
-});
+};
+
+module.exports = mergeConfig(
+  getDefaultConfig(__dirname),
+  getSentryExpoConfig(__dirname),
+  config,
+);

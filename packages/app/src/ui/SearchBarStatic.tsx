@@ -6,11 +6,14 @@ import IconButton from './IconButton';
 import type {
   GestureResponderEvent,
   NativeSyntheticEvent,
+  StyleProp,
   TextInputFocusEventData,
   TextInputProps,
+  ViewStyle,
 } from 'react-native';
 
 type SearchBarStaticProps = TextInputProps & {
+  style?: StyleProp<ViewStyle>;
   onChangeText: (text: string | undefined) => void;
   onSubmitEditing?: (text: string | undefined) => void;
 };

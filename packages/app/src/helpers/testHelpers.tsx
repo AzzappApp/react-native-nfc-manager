@@ -1,3 +1,4 @@
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { render } from '@testing-library/react-native';
 import React from 'react';
 import { IntlProvider } from 'react-intl';
@@ -39,14 +40,16 @@ const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <RouterProvider value={router}>
-      <IntlProvider
-        textComponent={Text}
-        locale="fr"
-        defaultLocale="fr"
-        messages={{}}
-      >
-        <SafeAreaProvider>{children}</SafeAreaProvider>
-      </IntlProvider>
+      <BottomSheetModalProvider>
+        <IntlProvider
+          textComponent={Text}
+          locale="fr"
+          defaultLocale="fr"
+          messages={{}}
+        >
+          <SafeAreaProvider>{children}</SafeAreaProvider>
+        </IntlProvider>
+      </BottomSheetModalProvider>
     </RouterProvider>
   );
 };

@@ -23,7 +23,6 @@ import { logEvent } from '#helpers/analytics';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { useDeleteNotifications } from '#hooks/useNotifications';
 import useQuitWebCard from '#hooks/useQuitWebCard';
-import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Icon from '#ui/Icon';
@@ -153,11 +152,10 @@ const HomeBottomSheetPanel = ({
     ]);
   }, [intl, profile?.profileRole, quitWebCard]);
 
-  const { bottom } = useScreenInsets();
   const [requestedLogout, toggleRequestLogout] = useToggle(false);
 
   //this code work on ios only
-  const onDismiss = async () => {
+  const onDismiss = useCallback(async () => {
     if (requestedLogout) {
       try {
         await deleteFcmToken();
@@ -165,7 +163,8 @@ const HomeBottomSheetPanel = ({
         void dispatchGlobalEvent({ type: 'SIGN_OUT' });
       }
     }
-  };
+    close();
+  }, [close, deleteFcmToken, requestedLogout]);
   //TODO: review Using onDismiss to logout (strange) but without it, the app is crashing in dev
   const onLogout = useCallback(async () => {
     if (Platform.OS === 'ios') {
@@ -416,52 +415,41 @@ const HomeBottomSheetPanel = ({
     [close, intl, onLogout, onShare, profile, userIsPremium],
   );
 
-  const modalHeight = useMemo(() => {
-    const separatorHeight =
-      elements.filter(element => element.type === 'separator').length * 25;
-    const rowHeight =
-      elements.filter(element => element.type === 'row').length *
-      (ROW_HEIGHT + 10);
-    return 20 + rowHeight + separatorHeight + 30;
-  }, [elements]);
-
   return (
     <BottomSheetModal
+      index={0}
       visible={visible}
-      height={bottom + modalHeight}
-      contentContainerStyle={styles.bottomSheetContainer}
       onDismiss={onDismiss}
-      onRequestClose={close}
+      enablePanDownToClose
     >
-      <View style={styles.bottomSheetOptionsContainer}>
-        {elements.map((element, index) => {
-          if (element.type === 'separator') {
-            return <View key={`separator_${index}`} style={styles.separator} />;
-          }
-          return <HomeBottomSheetPanelOption key={index} {...element} />;
-        })}
-        {profile && !profileIsOwner(profile?.profileRole) && (
-          <PressableNative
-            style={styles.removeButton}
-            onPress={handleConfirmationQuitWebCard}
-            disabled={isLoadingQuitWebCard}
-          >
-            <Text variant="button" style={styles.removeText}>
-              <FormattedMessage
-                defaultMessage="Quit this WebCard{azzappA}"
-                description="label for button to quit a webcard (multi-user)"
-                values={{
-                  azzappA: (
-                    <Text style={styles.removeText} variant="azzapp">
-                      a
-                    </Text>
-                  ),
-                }}
-              />
-            </Text>
-          </PressableNative>
-        )}
-      </View>
+      {elements.map((element, index) => {
+        if (element.type === 'separator') {
+          return <View key={`separator_${index}`} style={styles.separator} />;
+        }
+        return <HomeBottomSheetPanelOption key={index} {...element} />;
+      })}
+      {profile && !profileIsOwner(profile?.profileRole) && (
+        <PressableNative
+          style={styles.removeButton}
+          onPress={handleConfirmationQuitWebCard}
+          disabled={isLoadingQuitWebCard}
+        >
+          <Text variant="button" style={styles.removeText}>
+            <FormattedMessage
+              defaultMessage="Quit this WebCard{azzappA}"
+              description="label for button to quit a webcard (multi-user)"
+              values={{
+                azzappA: (
+                  <Text style={styles.removeText} variant="azzapp">
+                    a
+                  </Text>
+                ),
+              }}
+            />
+          </Text>
+        </PressableNative>
+      )}
+      <View style={styles.extraBottom} collapsable={false} />
     </BottomSheetModal>
   );
 };
@@ -510,13 +498,7 @@ const HomeBottomSheetPanelOption = ({
 const ROW_HEIGHT = 42;
 const styles = StyleSheet.create({
   separator: { height: 25 },
-  bottomSheetContainer: {
-    marginTop: 10,
-    paddingHorizontal: 0,
-  },
-  bottomSheetOptionsContainer: {
-    paddingTop: 20,
-  },
+  extraBottom: { height: 50 },
   bottomSheetOptionButton: {
     paddingVertical: 5,
     paddingHorizontal: 20,
