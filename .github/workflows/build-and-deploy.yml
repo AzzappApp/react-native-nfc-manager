@@ -363,7 +363,7 @@ jobs:
   buid-android:
     environment: ${{(github.ref_name == 'stable' && 'Production') || (github.ref_name == 'staging' && 'Staging') || 'Development' }}
     name: Build native Android application
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-m
     env:
       RUBYOPT: -rostruct
     needs:
