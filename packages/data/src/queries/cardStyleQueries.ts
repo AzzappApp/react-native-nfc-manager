@@ -1,5 +1,5 @@
 import { sql, eq, and, like, count, asc, desc } from 'drizzle-orm';
-import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import { db } from '../database';
 import {
   CardStyleTable,
@@ -92,7 +92,6 @@ export const getCardStylesWithLabel = async ({
       LocalizationMessageTable,
       and(
         eq(CardStyleTable.id, LocalizationMessageTable.key),
-        eq(LocalizationMessageTable.target, ENTITY_TARGET),
         eq(LocalizationMessageTable.locale, locale),
       ),
     )
@@ -107,7 +106,6 @@ export const getCardStylesWithLabel = async ({
       LocalizationMessageTable,
       and(
         eq(CardStyleTable.id, LocalizationMessageTable.key),
-        eq(LocalizationMessageTable.target, ENTITY_TARGET),
         eq(LocalizationMessageTable.locale, locale),
       ),
     )

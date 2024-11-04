@@ -3,7 +3,7 @@ import {
   getCoverTemplateTagById,
   getLocalizationMessagesByKeys,
 } from '@azzapp/data';
-import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import { TEMPLATE_COVERTAG_DESCRIPTION_PREFIX } from '@azzapp/shared/translationsContants';
 import CoverTemplateTagForm from '../CoverTemplateTagsForm';
 
@@ -28,12 +28,10 @@ const CoverTemplateTagPage = async ({
   const [message] = await getLocalizationMessagesByKeys(
     [coverTemplateTag.id],
     DEFAULT_LOCALE,
-    ENTITY_TARGET,
   );
   const [description] = await getLocalizationMessagesByKeys(
     [TEMPLATE_COVERTAG_DESCRIPTION_PREFIX + coverTemplateTag.id],
     DEFAULT_LOCALE,
-    ENTITY_TARGET,
   );
 
   return (

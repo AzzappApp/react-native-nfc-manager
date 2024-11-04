@@ -3,10 +3,10 @@ import {
   getCardTemplateTypes,
   getCompanyActivities,
   getCompanyActivitiesByWebCardCategory,
-  getLocalizationMessagesByLocaleAndTarget,
+  getLocalizationMessagesByLocale,
   getWebCardCategoryById,
 } from '@azzapp/data';
-import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import WebCardCategoryForm from '../WebCardCategoryForm';
 
 type WebCardCategoryPageProps = {
@@ -41,7 +41,7 @@ const WebCardCategoryPage = async ({
     getCompanyActivitiesByWebCardCategory(id).then(activities =>
       activities.map(activity => activity.id),
     ),
-    getLocalizationMessagesByLocaleAndTarget(DEFAULT_LOCALE, ENTITY_TARGET),
+    getLocalizationMessagesByLocale(DEFAULT_LOCALE),
   ]);
 
   return (

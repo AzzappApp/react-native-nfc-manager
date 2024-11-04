@@ -20,7 +20,6 @@ export const DEFAULT_LOCALE: Locale = 'en-US';
 export const TRANSLATION_TARGETS = ['app', 'web', 'entity'] as const;
 export const APP_TARGET = 'app';
 export const WEB_TARGET = 'web';
-export const ENTITY_TARGET = 'entity';
 
 export type Locale = (typeof SUPPORTED_LOCALES)[number];
 

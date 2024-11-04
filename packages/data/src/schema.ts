@@ -388,15 +388,13 @@ export const LocalizationMessageTable = cols.table(
   {
     key: cols.defaultVarchar('key').notNull(),
     locale: cols.defaultVarchar('locale').notNull(),
-    target: cols.defaultVarchar('target').notNull(),
     value: cols.text('value').notNull(),
   },
   table => {
     return {
       localizationMessageId: cols.primaryKey({
-        columns: [table.key, table.locale, table.target],
+        columns: [table.key, table.locale],
       }),
-      targetKey: cols.index('LocalizationMessage_key').on(table.target),
     };
   },
 );

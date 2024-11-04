@@ -3,9 +3,9 @@ import {
   getAllCardStyles,
   getCardTemplateById,
   getCardTemplateTypes,
-  getLocalizationMessagesByLocaleAndTarget,
+  getLocalizationMessagesByLocale,
 } from '@azzapp/data';
-import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import CardTemplatesForm from '../CardTemplatesForm';
 
 type CardTemplatePageProps = {
@@ -31,10 +31,7 @@ const CardTemplatePage = async (props: CardTemplatePageProps) => {
     type => type.enabled || type.id === template.cardTemplateTypeId,
   );
 
-  const labels = await getLocalizationMessagesByLocaleAndTarget(
-    DEFAULT_LOCALE,
-    ENTITY_TARGET,
-  );
+  const labels = await getLocalizationMessagesByLocale(DEFAULT_LOCALE);
 
   return (
     <CardTemplatesForm

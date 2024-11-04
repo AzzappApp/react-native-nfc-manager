@@ -1,15 +1,15 @@
 import { Box, TextField, Typography } from '@mui/material';
 import {
   getCompanyActivities,
-  getLocalizationMessagesByLocaleAndTarget,
+  getLocalizationMessagesByLocale,
 } from '@azzapp/data';
-import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import CompanyActivitiesList from './CompanyActivitiesList';
 
 const CompanyActivitiesPage = async () => {
   const [companyActivities, labels] = await Promise.all([
     getCompanyActivities(),
-    getLocalizationMessagesByLocaleAndTarget(DEFAULT_LOCALE, ENTITY_TARGET),
+    getLocalizationMessagesByLocale(DEFAULT_LOCALE),
   ]);
   return (
     <Box

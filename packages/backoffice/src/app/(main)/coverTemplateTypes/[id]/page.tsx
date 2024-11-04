@@ -3,7 +3,7 @@ import {
   getCoverTemplateTypeById,
   getLocalizationMessagesByKeys,
 } from '@azzapp/data';
-import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import CoverTemplateTypeForm from '../CoverTemplateTypeForm';
 
 type CoverTemplateTypePageProps = {
@@ -27,7 +27,6 @@ const CoverTemplateTypePage = async ({
   const [message] = await getLocalizationMessagesByKeys(
     [coverTemplateType.id],
     DEFAULT_LOCALE,
-    ENTITY_TARGET,
   );
   return (
     <CoverTemplateTypeForm

@@ -2,17 +2,14 @@ import {
   getColorPalettes,
   getCoverTemplateTags,
   getCoverTemplateTypes,
-  getLocalizationMessagesByLocaleAndTarget,
+  getLocalizationMessagesByLocale,
 } from '@azzapp/data';
-import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import CoverTemplateForm from '../CoverTemplatesForm';
 
 const NewCoverTemplatePage = async () => {
   const labelsMap = (
-    await getLocalizationMessagesByLocaleAndTarget(
-      DEFAULT_LOCALE,
-      ENTITY_TARGET,
-    )
+    await getLocalizationMessagesByLocale(DEFAULT_LOCALE)
   ).reduce(
     (acc, message) => {
       acc[message.key] = message.value;

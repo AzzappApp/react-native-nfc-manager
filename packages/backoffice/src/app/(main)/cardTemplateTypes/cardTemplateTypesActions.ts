@@ -6,7 +6,7 @@ import {
   transaction,
   updateCardTemplateType,
 } from '@azzapp/data';
-import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import { cardTemplateTypeSchema } from './cardTemplateTypeSchema';
 import type {
   CardTemplateType,
@@ -47,7 +47,6 @@ export const saveCardTemplateType = async (
           key: id,
           value: validation.data.label,
           locale: DEFAULT_LOCALE,
-          target: ENTITY_TARGET,
         });
       });
 
@@ -64,7 +63,6 @@ export const saveCardTemplateType = async (
           key: id,
           value: validation.data.label,
           locale: DEFAULT_LOCALE,
-          target: ENTITY_TARGET,
         });
         return id;
       });

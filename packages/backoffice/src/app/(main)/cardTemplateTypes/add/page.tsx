@@ -1,13 +1,13 @@
 import {
-  getLocalizationMessagesByLocaleAndTarget,
+  getLocalizationMessagesByLocale,
   getWebCardCategories,
 } from '@azzapp/data';
-import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import CardTemplateTypesForm from '../CardTemplateTypesForm';
 const NewCardTemplateTypePage = async () => {
   const [webCardCategories, labels] = await Promise.all([
     getWebCardCategories(),
-    getLocalizationMessagesByLocaleAndTarget(DEFAULT_LOCALE, ENTITY_TARGET),
+    getLocalizationMessagesByLocale(DEFAULT_LOCALE),
   ]);
 
   return (

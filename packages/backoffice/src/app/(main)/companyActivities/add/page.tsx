@@ -1,9 +1,9 @@
 import {
   getCardTemplateTypes,
   getCompanyActivityTypes,
-  getLocalizationMessagesByLocaleAndTarget,
+  getLocalizationMessagesByLocale,
 } from '@azzapp/data';
-import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import CompanyActivityForm from '../CompanyActivityForm';
 const NewCompanyActivityPage = async () => {
   const [cardTemplateTypes, companyActivitiesTypes] = await Promise.all([
@@ -11,10 +11,7 @@ const NewCompanyActivityPage = async () => {
     getCompanyActivityTypes(),
   ]);
 
-  const labels = await getLocalizationMessagesByLocaleAndTarget(
-    DEFAULT_LOCALE,
-    ENTITY_TARGET,
-  );
+  const labels = await getLocalizationMessagesByLocale(DEFAULT_LOCALE);
   return (
     <CompanyActivityForm
       cardTemplateTypes={cardTemplateTypes}

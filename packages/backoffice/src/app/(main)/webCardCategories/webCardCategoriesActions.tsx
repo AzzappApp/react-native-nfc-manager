@@ -14,7 +14,7 @@ import {
   createLocalizationMessages,
   createWebCardCategoryCompanyActivities,
 } from '@azzapp/data';
-import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import { ADMIN } from '#roles';
 import { currentUserHasRole } from '#helpers/roleHelpers';
 import { webCardCategorySchema } from './webCardCategorySchema';
@@ -88,7 +88,6 @@ export const saveWebCardCategory = async (
         key: webCardCategoryId,
         value: label,
         locale: DEFAULT_LOCALE,
-        target: ENTITY_TARGET,
       });
       await referencesMedias(webCardCategoryData.medias, previousMedias);
 
@@ -120,7 +119,6 @@ export const saveWebCardCategory = async (
             key: activity.id,
             value: activity.label,
             locale: DEFAULT_LOCALE,
-            target: ENTITY_TARGET,
           }));
           await createLocalizationMessages(labels);
         }

@@ -3,7 +3,7 @@ import {
   getCoverTemplateTagsWithTemplatesCount,
   getLocalizationMessagesByKeys,
 } from '@azzapp/data';
-import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { TEMPLATE_COVERTAG_DESCRIPTION_PREFIX } from '@azzapp/shared/translationsContants';
 import CoverTemplateTagsList from './CoverTemplateTagsList';
@@ -21,7 +21,6 @@ const CoverTemplateTagsPage = async () => {
   const labels = await getLocalizationMessagesByKeys(
     coverTemplateTags.map(({ coverTemplateTag }) => coverTemplateTag.id),
     DEFAULT_LOCALE,
-    ENTITY_TARGET,
   );
   const descriptions = await getLocalizationMessagesByKeys(
     coverTemplateTags
@@ -31,7 +30,6 @@ const CoverTemplateTagsPage = async () => {
       )
       .filter(isDefined),
     DEFAULT_LOCALE,
-    ENTITY_TARGET,
   );
 
   const labelsMap = labels.reduce((acc, label) => {

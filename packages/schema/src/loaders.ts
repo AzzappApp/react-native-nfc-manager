@@ -12,7 +12,6 @@ import {
   isFollowing,
   getContactsByUser,
 } from '@azzapp/data';
-import { ENTITY_TARGET } from '@azzapp/i18n';
 import {
   createDataLoader,
   createSessionDataLoader,
@@ -225,7 +224,7 @@ export const labelLoader = createDataLoader<
       await Promise.all(
         Object.entries(labelsByLocale).map(async ([locale, keys]) => [
           locale,
-          await getLocalizationMessagesByKeys(keys, locale, ENTITY_TARGET),
+          await getLocalizationMessagesByKeys(keys, locale),
         ]),
       ),
     );

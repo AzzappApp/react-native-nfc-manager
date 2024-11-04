@@ -3,7 +3,7 @@ import {
   getCoverTemplateTypesWithTemplatesCount,
   getLocalizationMessagesByKeys,
 } from '@azzapp/data';
-import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import CoverTemplateTypesList from './CoverTemplateTypesList';
 
 export type CoverTemplateTypeItem = {
@@ -18,7 +18,6 @@ const CoverTemplateTypesPage = async () => {
   const labels = await getLocalizationMessagesByKeys(
     coverTemplateTypes.map(({ coverTemplateType }) => coverTemplateType.id),
     DEFAULT_LOCALE,
-    ENTITY_TARGET,
   );
   const labelsMap = labels.reduce(
     (acc, message) => {

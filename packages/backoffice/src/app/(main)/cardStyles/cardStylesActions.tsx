@@ -7,7 +7,7 @@ import {
   updateCardStyle,
   transaction,
 } from '@azzapp/data';
-import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import { ADMIN } from '#roles';
 import { currentUserHasRole } from '#helpers/roleHelpers';
 import { cardStyleSchema } from './cardStyleSchema';
@@ -35,7 +35,6 @@ export const saveCardStyle = async (
         key: cardStyleId as string,
         value: label,
         locale: DEFAULT_LOCALE,
-        target: ENTITY_TARGET,
       });
     });
   } else {
@@ -45,7 +44,6 @@ export const saveCardStyle = async (
         key: cardStyleId as string,
         value: label,
         locale: DEFAULT_LOCALE,
-        target: ENTITY_TARGET,
       });
     });
   }

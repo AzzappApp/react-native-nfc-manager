@@ -3,7 +3,7 @@ import {
   getCompanyActivityTypes,
   getLocalizationMessagesByKeys,
 } from '@azzapp/data';
-import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import CompanyActivitiesTypesList from './CompanyActivitiesTypesList';
 
 export type CompanyActivityTypeItem = {
@@ -16,7 +16,6 @@ const CompanyActivitiesTypesPage = async () => {
   const labels = await getLocalizationMessagesByKeys(
     companyActivitiesTypes.map(cat => cat.id),
     DEFAULT_LOCALE,
-    ENTITY_TARGET,
   );
 
   const labelsMap = labels.reduce(

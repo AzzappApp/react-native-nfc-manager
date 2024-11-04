@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { getCardStyleById, getLocalizationMessagesByKeys } from '@azzapp/data';
-import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import CardStyleForm from '../CardStyleForm';
 
 type CardStylePageProps = {
@@ -21,11 +21,7 @@ const CardStylePage = async ({
   if (!cardStyle) {
     return notFound();
   }
-  const [label] = await getLocalizationMessagesByKeys(
-    [id],
-    DEFAULT_LOCALE,
-    ENTITY_TARGET,
-  );
+  const [label] = await getLocalizationMessagesByKeys([id], DEFAULT_LOCALE);
 
   return (
     <CardStyleForm

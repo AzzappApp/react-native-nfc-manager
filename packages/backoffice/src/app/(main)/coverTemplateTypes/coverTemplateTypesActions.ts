@@ -7,7 +7,7 @@ import {
   updateCoverTemplateType,
   createCoverTemplateType,
 } from '@azzapp/data';
-import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import { ADMIN } from '#roles';
 import { currentUserHasRole } from '#helpers/roleHelpers';
 import { coverTemplateTypesSchema } from './coverTemplateTypesSchema';
@@ -57,7 +57,6 @@ export const saveCoverTemplateType = async (
         key: coverTemplateTypeId,
         value: label,
         locale: DEFAULT_LOCALE,
-        target: ENTITY_TARGET,
       });
 
       return coverTemplateTypeId;
