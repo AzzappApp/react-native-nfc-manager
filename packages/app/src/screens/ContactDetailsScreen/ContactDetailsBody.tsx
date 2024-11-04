@@ -242,6 +242,8 @@ const stylesheet = createStyleSheet(theme => ({
     color: colors.grey300,
     fontSize: 50,
     fontWeight: 500,
+    lineHeight: 60,
+    textTransform: 'uppercase',
   },
 }));
 
