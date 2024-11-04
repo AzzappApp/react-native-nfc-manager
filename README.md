@@ -8,7 +8,7 @@ Developing and building the project requires **MacOS version 12+**.
 In addition developers should install the followings dependencies:
 
 - [Node.js](https://nodejs.org/en/) version **20** (recommended install through [nvm](https://github.com/nvm-sh/nvm))
-- [yarn](https://yarnpkg.com/)
+- [yarn](https://yarnpkg.com/) v4 (embedded)
 - [XCode](https://apps.apple.com/fr/app/xcode/id497799835?mt=12) version **15+**
 - [Android Studio](https://developer.android.com/studio)
 - [watchman](https://facebook.github.io/watchman/)
