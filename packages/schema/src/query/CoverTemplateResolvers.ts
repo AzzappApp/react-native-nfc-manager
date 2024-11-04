@@ -23,4 +23,13 @@ export const CoverTemplate: CoverTemplateResolvers = {
   colorPalette: async ({ colorPaletteId }) => {
     return colorPaletteId ? colorPaletteLoader.load(colorPaletteId) : null;
   },
+  medias: ({ medias }) => {
+    return (
+      medias?.map(media => ({
+        media: media.id,
+        index: media.index,
+        editable: media.editable,
+      })) ?? []
+    );
+  },
 };

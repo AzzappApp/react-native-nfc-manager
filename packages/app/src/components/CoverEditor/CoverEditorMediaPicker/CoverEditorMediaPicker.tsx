@@ -43,7 +43,7 @@ import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 type CoverEditorMediaPickerProps = Omit<ViewProps, 'children'> & {
   durations: number[] | null;
   durationsFixed?: boolean;
-  initialMedias: Media[] | null;
+  initialMedias: Array<Media | null> | null;
   onFinished: (results: Media[]) => void;
   maxSelectableVideos?: number;
   onClose: () => void;
@@ -73,7 +73,7 @@ const CoverEditorMediaPicker = ({
   allowVideo = true,
   ...props
 }: CoverEditorMediaPickerProps) => {
-  const [selectedMedias, setSelectedMedias] = useState<Media[]>(
+  const [selectedMedias, setSelectedMedias] = useState<Array<Media | null>>(
     initialMedias ?? [],
   );
   const [selectedTab, setSelectedTab] = useState('gallery');
@@ -142,13 +142,17 @@ const CoverEditorMediaPicker = ({
 
   // remove Media by index
   const handleRemoveMedia = (index: number) => {
-    setSelectedMedias(mediasPicked =>
-      mediasPicked.filter((_, i) => i !== index),
-    );
+    setSelectedMedias(prevSelectedMedias => [
+      ...prevSelectedMedias.filter((_, i) => i !== index),
+      null,
+    ]);
   };
 
   const selectedMediasIds = useMemo(
-    () => selectedMedias?.map(getMediaId) ?? [],
+    () =>
+      selectedMedias
+        ?.filter(selectedMedia => !!selectedMedia)
+        .map(getMediaId) ?? [],
     [selectedMedias],
   );
 
@@ -161,12 +165,12 @@ const CoverEditorMediaPicker = ({
       }
       const disableVideoSelection = maxSelectableVideos
         ? maxSelectableVideos -
-            (selectedMedias?.filter(m => m.kind === 'video').length ?? 0) ===
+            (selectedMedias?.filter(m => m?.kind === 'video').length ?? 0) ===
           0
         : false;
 
       const index = selectedMedias.findIndex(
-        value => getMediaId(value) === getMediaId(media),
+        value => value && getMediaId(value) === getMediaId(media),
       );
 
       if (disableVideoSelection && index === -1 && media.kind === 'video') {
@@ -182,12 +186,17 @@ const CoverEditorMediaPicker = ({
       }
 
       if (index !== -1) {
-        setSelectedMedias(selectedMedias.filter((_, i) => i !== index));
+        handleRemoveMedia(index);
         return;
       }
-      if (selectedMedias.length < maxMedias) {
+
+      const indexToReplace = selectedMedias.findIndex(
+        selectedMedia => !selectedMedia,
+      );
+
+      if (indexToReplace >= 0) {
         const expectedDuration =
-          durations?.[selectedMedias.length] ?? COVER_IMAGE_DEFAULT_DURATION;
+          durations?.[indexToReplace] ?? COVER_IMAGE_DEFAULT_DURATION;
 
         if (media.kind === 'video' && media.duration < expectedDuration) {
           Toast.show({
@@ -203,29 +212,26 @@ const CoverEditorMediaPicker = ({
           });
           return;
         }
-        setSelectedMedias([...selectedMedias, media]);
+        setSelectedMedias(prevSelectedMedias => {
+          const newSelectedMedias = [...prevSelectedMedias];
+          newSelectedMedias[indexToReplace] = media;
+          return newSelectedMedias;
+        });
       }
     },
-    [
-      durations,
-      intl,
-      maxMedias,
-      maxSelectableVideos,
-      multiSelection,
-      selectedMedias,
-    ],
+    [durations, intl, maxSelectableVideos, multiSelection, selectedMedias],
   );
 
   const handleDuplicateMedia = () => {
     if (
       durations &&
-      selectedMedias.length > 0 &&
-      selectedMedias.length < durations.length
+      selectedMediasIds.length > 0 &&
+      selectedMediasIds.length < durations.length
     ) {
-      const lastSelectedIndex = selectedMedias.length - 1;
+      const lastSelectedIndex = selectedMediasIds.length - 1;
       const lastSelected = selectedMedias[lastSelectedIndex];
 
-      if (lastSelected.kind === 'video') {
+      if (lastSelected?.kind === 'video') {
         const longerDuration = durations.find(
           (duration, i) =>
             i > lastSelectedIndex && duration > lastSelected.duration,
@@ -249,8 +255,7 @@ const CoverEditorMediaPicker = ({
       }
     }
 
-    const missingMedia =
-      maxMedias - selectedMedias.filter(m => m !== null).length;
+    const missingMedia = maxMedias - selectedMediasIds.length;
 
     if (missingMedia > 0) {
       const selected = selectedMedias.filter(
@@ -304,11 +309,11 @@ const CoverEditorMediaPicker = ({
       return;
     }
     if (!multiSelection) {
-      onFinished(selectedMedias);
+      onFinished(selectedMedias as Media[]);
       return;
     }
 
-    if (durationsFixed && selectedMedias.length < maxMedias) {
+    if (durationsFixed && selectedMediasIds.length < maxMedias) {
       Alert.alert(
         intl.formatMessage(
           {
@@ -321,7 +326,7 @@ const CoverEditorMediaPicker = ({
               'Title of missing media in cover edition to propose duplication',
           },
           {
-            mediaPickedNumber: selectedMedias.length,
+            mediaPickedNumber: selectedMediasIds.length,
             totalMediaNumber: maxMedias,
           },
         ),
@@ -356,7 +361,7 @@ const CoverEditorMediaPicker = ({
       return;
     }
 
-    onFinished(selectedMedias);
+    onFinished(selectedMedias as Media[]);
   };
 
   const mediasOrSlot: Array<Media | null> = durationsFixed
@@ -377,7 +382,7 @@ const CoverEditorMediaPicker = ({
           description:
             'Medias selection label for fixed number multi selection of media in cover edition',
         },
-        { count: selectedMedias.length, max: maxMedias },
+        { count: selectedMediasIds.length, max: maxMedias },
       )
     : intl.formatMessage(
         {
@@ -389,7 +394,7 @@ const CoverEditorMediaPicker = ({
           description:
             'Medias selection label for free multi selection of media in cover edition',
         },
-        { count: selectedMedias.length, max: COVER_MAX_MEDIA },
+        { count: selectedMediasIds.length, max: COVER_MAX_MEDIA },
       );
 
   const { top, bottom } = useScreenInsets();

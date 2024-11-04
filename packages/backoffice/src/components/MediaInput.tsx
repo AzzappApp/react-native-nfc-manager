@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { getImageURL, getVideoURL } from '@azzapp/shared/imagesHelpers';
 import type { BoxProps } from '@mui/material';
 import type { Variant } from '@mui/material/styles/createTypography';
-import type { ChangeEvent } from 'react';
+import type { ChangeEvent, CSSProperties } from 'react';
 
 type MediasListInputProps = Omit<BoxProps, 'onChange'> & {
   name: string;
@@ -16,6 +16,7 @@ type MediasListInputProps = Omit<BoxProps, 'onChange'> & {
   helperText?: string | null;
   buttonLabel?: string;
   onChange: (media: File | null | undefined) => void;
+  buttonStyle?: CSSProperties;
 };
 
 const MediaInput = ({
@@ -28,6 +29,8 @@ const MediaInput = ({
   buttonLabel,
   onChange,
   titleVariant = 'h6',
+  style,
+  buttonStyle,
   ...props
 }: MediasListInputProps) => {
   const handleImageUpload = (event: ChangeEvent<HTMLInputElement>) => {
@@ -69,11 +72,20 @@ const MediaInput = ({
       </Typography>
       {error && <Typography color="error">{helperText}</Typography>}
       <Box style={{ position: 'relative' }} mb={2}>
-        {kind === 'video' ? (
-          <video src={src!} style={{ maxWidth: 120 }} />
-        ) : (
-          <img src={src!} style={{ maxWidth: 120 }} />
-        )}
+        <div style={{ maxWidth: 120, ...style }}>
+          {kind === 'video' && src && (
+            <video
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              src={src!}
+            />
+          )}
+          {kind === 'image' && src && (
+            <img
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              src={src!}
+            />
+          )}
+        </div>
         {value && (
           <IconButton
             onClick={handleImageDelete}
@@ -89,7 +101,7 @@ const MediaInput = ({
           </IconButton>
         )}
       </Box>
-      <Button component="label" variant="outlined">
+      <Button component="label" variant="outlined" style={buttonStyle}>
         {buttonLabel || 'Add Media'}
         <input
           name={name}

@@ -69,6 +69,13 @@ export const coverTemplateSchema = z.object({
   typeId: z.string(),
   lottie: z.instanceof(File).optional(),
   mediaCount: z.number(),
+  medias: z
+    .object({
+      index: z.number(),
+      editable: z.boolean(),
+      id: z.string(),
+    })
+    .array(),
   lottieId: z.string().optional(),
   colorPaletteId: z.string(),
   enabled: z.string(),
@@ -85,6 +92,7 @@ export const coverTemplateSchemaWithoutfile = coverTemplateSchema
   .omit({
     lottie: true,
     preview: true,
+    medias: true,
   })
   .merge(
     z.object({

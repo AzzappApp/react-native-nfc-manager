@@ -273,6 +273,7 @@ export const CoverTemplateTable = cols.table('CoverTemplate', {
   typeId: cols.cuid('typeId').notNull(),
   lottieId: cols.cuid('lottieId').notNull(),
   mediaCount: cols.int('mediaCount').notNull(),
+  medias: cols.json('medias').$type<CoverTemplateMedia[]>(),
   previewId: cols.cuid('previewId').notNull(),
   colorPaletteId: cols.cuid('colorPaletteId').notNull(),
   enabled: cols.boolean('enabled').default(true).notNull(),
@@ -331,6 +332,12 @@ export type CoverTemplateParams = {
   textLayers: CoverText[];
   overlayLayers: CoverOverlay[];
   linksLayer: SocialLinks;
+};
+
+export type CoverTemplateMedia = {
+  id: string;
+  index: number;
+  editable: boolean;
 };
 
 export type CoverTemplate = InferSelectModel<typeof CoverTemplateTable>;

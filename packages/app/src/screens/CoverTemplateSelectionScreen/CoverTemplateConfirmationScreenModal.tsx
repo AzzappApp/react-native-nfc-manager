@@ -23,6 +23,11 @@ const CoverTemplateConfirmationScreenModal = ({
   const intl = useIntl();
 
   const { bottom } = useScreenInsets();
+  const mediaCount = template
+    ? template.mediaCount -
+      template.medias.filter(media => !media.editable).length
+    : 0;
+
   return (
     <ScreenModal visible={!!template} onRequestDismiss={onClose}>
       <SafeAreaView style={styles.container}>
@@ -64,7 +69,7 @@ const CoverTemplateConfirmationScreenModal = ({
                     'CoverTemplateConfirmationScreenModal - confirmation button',
                 },
                 {
-                  mediaCount: template?.mediaCount,
+                  mediaCount,
                 },
               )}
               variant="secondary"

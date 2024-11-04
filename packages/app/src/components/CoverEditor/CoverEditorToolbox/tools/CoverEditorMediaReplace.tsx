@@ -20,7 +20,7 @@ const CoverEditorMediaReplace = () => {
   const intl = useIntl();
   const [show, toggleScreenModal] = useToggle(false);
   const {
-    coverEditorState: { lottie, editionMode, medias },
+    coverEditorState: { lottie, editionMode, medias, providedMedias },
     dispatch,
   } = useCoverEditorContext();
 
@@ -28,8 +28,16 @@ const CoverEditorMediaReplace = () => {
     const lottieInfo = extractLottieInfoMemoized(lottie);
     if (!lottieInfo) return null;
 
-    return getLottieMediasDurations(lottieInfo);
-  }, [lottie]);
+    const infos = getLottieMediasDurations(lottieInfo);
+
+    providedMedias.forEach(media => {
+      if (!media.editable) {
+        infos?.splice(media.index, 1);
+      }
+    });
+
+    return infos;
+  }, [lottie, providedMedias]);
 
   const activeMedia = useCoverEditorActiveMedia();
 

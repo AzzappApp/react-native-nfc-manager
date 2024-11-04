@@ -15,6 +15,7 @@ export type CoverEditorState = {
   lottie: JSON | null;
   backgroundColor: string | null;
 
+  providedMedias: CoverEditionProvidedMedia[];
   medias: MediaInfo[];
   coverTransition: CoverTransitions | null;
 
@@ -77,6 +78,12 @@ export type CoverEditionMode =
   | 'overlay'
   | 'text'
   | 'textEdit';
+
+export type CoverEditionProvidedMedia = {
+  media: MediaInfo;
+  index: number;
+  editable: boolean;
+};
 
 export type CoverEditorTextLayerItem = {
   text: string;

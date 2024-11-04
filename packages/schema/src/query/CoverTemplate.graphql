@@ -13,7 +13,14 @@ type CoverTemplate implements Node {
   preview: Media!
   lottie: String!
   mediaCount: Int!
+  medias: [CoverTemplateMedia!]!
   colorPalette: ColorPalette
   backgroundColor: String
   previewPositionPercentage: Int
+}
+
+type CoverTemplateMedia {
+  media: Media!
+  index: Int!
+  editable: Boolean!
 }

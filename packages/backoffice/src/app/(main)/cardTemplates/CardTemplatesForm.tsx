@@ -340,6 +340,7 @@ const CardTemplateForm = ({
           label="Preview Media"
           name="previewMedia"
           kind="image"
+          buttonLabel="UPLOAD AN IMAGE"
           {...fieldProps('previewMediaId', {
             format: (value: File | string | null | undefined) =>
               typeof value === 'string'

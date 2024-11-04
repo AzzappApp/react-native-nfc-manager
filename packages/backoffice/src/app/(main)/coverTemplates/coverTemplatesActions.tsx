@@ -29,6 +29,12 @@ export const saveCoverTemplate = async (
     throw new Error('Unauthorized');
   }
 
+  const medias = JSON.parse(formData.get('medias') as string) as Array<{
+    id: string;
+    editable: boolean;
+    index: number;
+  }>;
+
   const submission = parseWithZod(formData, {
     schema: coverTemplateSchemaWithoutfile,
   });
@@ -38,11 +44,15 @@ export const saveCoverTemplate = async (
   }
 
   try {
-    await checkMedias([submission.value.previewId]);
+    await checkMedias([
+      submission.value.previewId,
+      ...medias.map(media => media.id),
+    ]);
 
     const result = await transaction(async () => {
       const data = {
         ...submission.value,
+        medias,
         enabled: submission.value.enabled === 'true',
       };
       const previousPreviewIds: string[] = [];

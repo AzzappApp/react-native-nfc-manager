@@ -22,7 +22,7 @@ const CoverEditorMediaToolbox = () => {
 
   const {
     dispatch,
-    coverEditorState: { medias, lottie },
+    coverEditorState: { medias: baseMedias, lottie, providedMedias },
   } = useCoverEditorContext();
 
   const onClose = () => {
@@ -35,14 +35,34 @@ const CoverEditorMediaToolbox = () => {
     });
   };
 
+  const medias = useMemo(() => {
+    const availableMedias = [...baseMedias];
+
+    providedMedias.forEach(media => {
+      if (!media.editable) {
+        availableMedias?.splice(media.index, 1);
+      }
+    });
+
+    return availableMedias;
+  }, [baseMedias, providedMedias]);
+
   const durations = useMemo(() => {
     const lottieInfo = extractLottieInfoMemoized(lottie);
-    return lottieInfo
+    const infos = lottieInfo
       ? lottieInfo.assetsInfos.map(
           assetInfo => assetInfo.endTime - assetInfo.startTime,
         )
       : null;
-  }, [lottie]);
+
+    providedMedias.forEach(media => {
+      if (!media.editable) {
+        infos?.splice(media.index, 1);
+      }
+    });
+
+    return infos;
+  }, [lottie, providedMedias]);
 
   const displayedMedias = useMemo(() => {
     const data = durations
