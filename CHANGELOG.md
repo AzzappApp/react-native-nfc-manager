@@ -1,4 +1,4 @@
-## 1.4.0-canary.22
+## 1.4.0-canary.23
 
 * **feat:**  - offline mode ([#5585](https://github.com/AzzappApp/azzapp/pull/5585))
 * **docs:**  - Update README.md
