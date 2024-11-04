@@ -37,7 +37,7 @@ import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import PressableOpacity from '#ui/PressableOpacity';
 import { useHomeScreenContext } from './HomeScreenContext';
-import useCoverPlayPermission from './useCoverPlayPermision';
+import useCoverPlayPermission from './useCoverPlayPermission';
 import type {
   HomeProfilesCarousel_user$key,
   HomeProfilesCarousel_user$data,

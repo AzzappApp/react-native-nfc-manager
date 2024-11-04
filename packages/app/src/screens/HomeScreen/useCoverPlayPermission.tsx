@@ -7,18 +7,15 @@ const useCoverPlayPermission = () => {
 
   useNativeNavigationEvent('willDisappear', () => {
     setPaused(true);
-    console.log('willDisappear');
   });
 
   useNativeNavigationEvent('disappear', () => {
     setCanPlay(false);
-    console.log('disappear');
   });
 
   useNativeNavigationEvent('willAppear', () => {
     setPaused(false);
     setCanPlay(true);
-    console.log('willAppear');
   });
 
   return { paused, canPlay };
