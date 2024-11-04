@@ -16,6 +16,7 @@ import {
   getAuthState,
   onChangeWebCard,
 } from '#helpers/authStore';
+import { saveOfflineVCard } from '#helpers/offlineVCard';
 import { getRelayEnvironment } from '#helpers/relayEnvironment';
 import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
 import type { HomeScreenContext_user$key } from '#relayArtifacts/HomeScreenContext_user.graphql';
@@ -54,12 +55,81 @@ export const HomeScreenProvider = ({
           webCard {
             id
             userName
+            isMultiUser
+            isPremium
+            cardIsPublished
+            commonInformation {
+              company
+              addresses {
+                address
+                label
+              }
+              emails {
+                label
+                address
+              }
+              phoneNumbers {
+                label
+                number
+              }
+              urls {
+                address
+              }
+              socials {
+                label
+                url
+              }
+            }
+            cardColors {
+              dark
+              primary
+            }
+            cardIsPublished
+          }
+          contactCard {
+            firstName
+            lastName
+            title
+            company
+            emails {
+              label
+              address
+              selected
+            }
+            phoneNumbers {
+              label
+              number
+              selected
+            }
+            urls {
+              address
+              selected
+            }
+            addresses {
+              address
+              label
+              selected
+            }
+            birthday {
+              birthday
+              selected
+            }
+            socials {
+              url
+              label
+              selected
+            }
           }
         }
       }
     `,
     userKey,
   );
+
+  useEffect(() => {
+    saveOfflineVCard(user);
+  }, [user]);
+
   const [initialProfileIndex, setInitialProfileIndex] = useState(() => {
     const index = user?.profiles?.findIndex(
       profile => profile.id === getAuthState().profileInfos?.profileId,

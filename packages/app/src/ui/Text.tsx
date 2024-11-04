@@ -5,9 +5,11 @@ import {
   createVariantsStyleSheet,
   useVariantStyleSheet,
 } from '#helpers/createStyles';
-import type { ColorSchemeName } from '#helpers/createStyles';
 import type { ForwardedRef } from 'react';
-import type { TextProps as NativeTextProps } from 'react-native';
+import type {
+  ColorSchemeName,
+  TextProps as NativeTextProps,
+} from 'react-native';
 
 export type TextVariant =
   | 'azzapp'

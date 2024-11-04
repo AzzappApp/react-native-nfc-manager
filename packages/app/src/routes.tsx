@@ -259,6 +259,13 @@ export type ContactDetailsRoute = {
   };
 };
 
+export type OfflineVCardRoute = {
+  route: 'OFFLINE_VCARD';
+  params?: {
+    canGoBack?: boolean;
+  };
+};
+
 export type Route =
   | AboutRoute
   | AccountDetailsRoute
@@ -287,6 +294,7 @@ export type Route =
   | MultiUserDetailRoute
   | MultiUserRoute
   | NewPostRoute
+  | OfflineVCardRoute
   | OnboardingRoute
   | PostCommentsRoute
   | PostLikesRoute

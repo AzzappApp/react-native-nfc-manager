@@ -1,7 +1,6 @@
 const esModules = [
   'react-native',
   '@react-native(-community)?',
-  'react-native-qrcode-svg',
   'react-native-reanimated',
   'validator',
   'use-debounce',

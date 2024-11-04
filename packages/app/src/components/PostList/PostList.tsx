@@ -1,17 +1,15 @@
 import { FlashList } from '@shopify/flash-list';
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Alert, Dimensions, useColorScheme, View } from 'react-native';
+import { Alert, Dimensions, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
-import { colors } from '#theme';
 import PostRenderer from '#components/PostList/PostRenderer';
+import EmptyContent from '#components/ui/EmptyContent';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { HEADER_HEIGHT } from '#ui/Header';
-import Icon from '#ui/Icon';
 import ListLoadingFooter from '#ui/ListLoadingFooter';
-import Text from '#ui/Text';
 import { PostListContext } from './PostListsContext';
 import type {
   PostList_posts$data,
@@ -311,7 +309,6 @@ const PostList = ({
     [loading],
   );
 
-  const colorScheme = useColorScheme();
   const insets = useScreenInsets();
   const ListEmptyComponent = useMemo(
     () => (
@@ -322,36 +319,23 @@ const PostList = ({
           justifyContent: 'center',
         }}
       >
-        <View style={{ alignItems: 'center', width: 200 }}>
-          <Icon
-            style={{
-              width: 60,
-              height: 60,
-              marginBottom: 20,
-              tintColor:
-                colorScheme === 'dark' ? colors.grey800 : colors.grey200,
-            }}
-            icon="empty"
-          />
-          <Text
-            variant="xlarge"
-            style={{ marginBottom: 10, textAlign: 'center' }}
-          >
+        <EmptyContent
+          message={
             <FormattedMessage
               defaultMessage="No posts yet"
               description="Empty post list message title"
             />
-          </Text>
-          <Text variant="medium" style={{ textAlign: 'center' }}>
+          }
+          description={
             <FormattedMessage
               defaultMessage="Seems like there is no post on this feed..."
               description="Empty post list message content"
             />
-          </Text>
-        </View>
+          }
+        />
       </View>
     ),
-    [colorScheme, insets.bottom, insets.top],
+    [insets.bottom, insets.top],
   );
 
   return (

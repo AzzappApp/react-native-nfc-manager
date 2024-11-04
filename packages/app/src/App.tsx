@@ -1,4 +1,5 @@
 import { IntlErrorCode } from '@formatjs/intl';
+import { addEventListener } from '@react-native-community/netinfo';
 import * as Sentry from '@sentry/react-native';
 import { StatusBar } from 'expo-status-bar';
 import {
@@ -73,6 +74,7 @@ import ContactCardEditScreen from '#screens/ContactCardEditScreen';
 import ContactCardScreen from '#screens/ContactCardScreen';
 import ContactDetailsScreen from '#screens/ContactDetailsScreen';
 import ContactsScreen from '#screens/ContactsScreen';
+import OfflineVCardScreen from '#screens/ContactsScreen/OfflineVCardScreen';
 import CoverCreationScreen from '#screens/CoverCreationScreen';
 import CoverEditionScreen from '#screens/CoverEditionScreen';
 import CoverTemplateSelectionScreen from '#screens/CoverTemplateSelectionScreen';
@@ -214,6 +216,7 @@ const screens = {
   CONFIRM_CHANGE_CONTACT: ConfirmChangeContactScreen,
   COMMON_INFORMATION: CommonInformationScreen,
   CONTACTS: ContactsScreen,
+  OFFLINE_VCARD: OfflineVCardScreen,
   CONTACT_DETAILS: ContactDetailsScreen,
   COVER_CREATION: CoverCreationScreen,
   COVER_EDITION: CoverEditionScreen,
@@ -427,6 +430,25 @@ const AppRouter = () => {
       backgroundColor: colorScheme === 'light' ? colors.white : colors.black,
     };
   }, [colorScheme]);
+
+  const wasConnected = useRef<boolean | null>(true);
+
+  useEffect(() => {
+    // Subscribe
+    const unsubscribe = addEventListener(state => {
+      if (wasConnected.current && !state.isConnected) {
+        if (router.getCurrentRoute()?.route !== 'OFFLINE_VCARD') {
+          router.push({
+            route: 'OFFLINE_VCARD',
+          });
+        }
+      }
+      wasConnected.current = state.isConnected;
+    });
+    return () => {
+      unsubscribe();
+    };
+  }, [router]);
 
   // TODO handle errors
   const [fontLoaded] = useApplicationFonts();

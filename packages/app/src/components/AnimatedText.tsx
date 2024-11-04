@@ -2,8 +2,11 @@ import { TextInput, View } from 'react-native';
 import Animated, { useAnimatedProps } from 'react-native-reanimated';
 import { useVariantStyleSheet } from '#helpers/createStyles';
 import { textStyleSheet } from '#ui/Text';
-import type { ColorSchemeName } from '#helpers/createStyles';
-import type { TextProps as RNTextProps, ViewStyle } from 'react-native';
+import type {
+  ColorSchemeName,
+  TextProps as RNTextProps,
+  ViewStyle,
+} from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 
 Animated.addWhitelistedNativeProps({ text: true });

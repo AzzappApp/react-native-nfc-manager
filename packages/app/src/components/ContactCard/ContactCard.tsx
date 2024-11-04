@@ -33,6 +33,7 @@ type ContactCardProps = {
   height: number;
   withRotationArrows?: boolean;
 };
+
 const ContactCard = ({
   profile: profileKey,
   height,
@@ -66,6 +67,54 @@ const ContactCard = ({
     `,
     profileKey,
   );
+
+  return (
+    <ContactCardComponent
+      webCard={webCard}
+      height={height}
+      style={style}
+      withRotationArrows={withRotationArrows}
+      contactCard={contactCard}
+      contactCardQrCode={contactCardQrCode}
+    />
+  );
+};
+
+type WebCard = {
+  readonly cardColors: {
+    readonly primary: string;
+  } | null;
+  readonly commonInformation: {
+    readonly company: string | null;
+  } | null;
+  readonly isMultiUser: boolean;
+  readonly userName: string;
+};
+
+type ContactCard = {
+  readonly company: string | null;
+  readonly firstName: string | null;
+  readonly lastName: string | null;
+  readonly title: string | null;
+};
+
+type ContactCardComponentProps = {
+  webCard?: WebCard | null;
+  height: number;
+  style?: StyleProp<ViewStyle>;
+  withRotationArrows?: boolean;
+  contactCard?: ContactCard | null;
+  contactCardQrCode?: string;
+};
+
+export const ContactCardComponent = ({
+  webCard,
+  height,
+  style,
+  withRotationArrows = false,
+  contactCard,
+  contactCardQrCode,
+}: ContactCardComponentProps) => {
   const { userName, cardColors, commonInformation, isMultiUser } =
     webCard ?? {};
 

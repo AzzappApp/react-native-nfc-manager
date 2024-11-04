@@ -1,9 +1,8 @@
 import { View } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import type { ColorSchemeName } from '#helpers/createStyles';
 
-import type { ViewProps } from 'react-native';
+import type { ColorSchemeName, ViewProps } from 'react-native';
 
 type ContainerProps = ViewProps & {
   /**

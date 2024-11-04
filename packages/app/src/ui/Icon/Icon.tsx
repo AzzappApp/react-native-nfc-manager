@@ -485,6 +485,9 @@ const icons = {
   get font_color_dash() {
     return require('./assets/font_color_dash.png');
   },
+  get offline() {
+    return require('./assets/offline.png');
+  },
 } as const;
 
 export type Icons = keyof typeof icons;

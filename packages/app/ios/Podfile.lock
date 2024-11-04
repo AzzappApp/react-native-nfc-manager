@@ -1585,6 +1585,8 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
+  - react-native-netinfo (11.4.1):
+    - React-Core
   - react-native-pager-view (6.4.1):
     - DoubleConversion
     - glog
@@ -2318,6 +2320,7 @@ DEPENDENCIES:
   - "react-native-cameraroll (from `../../../node_modules/@react-native-camera-roll/camera-roll`)"
   - react-native-keyboard-controller (from `../../../node_modules/react-native-keyboard-controller`)
   - react-native-mmkv (from `../../../node_modules/react-native-mmkv`)
+  - "react-native-netinfo (from `../../../node_modules/@react-native-community/netinfo`)"
   - react-native-pager-view (from `../../../node_modules/react-native-pager-view`)
   - "react-native-passkit (from `../../../node_modules/@reeq/react-native-passkit`)"
   - react-native-quick-base64 (from `../../../node_modules/react-native-quick-base64`)
@@ -2524,6 +2527,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-keyboard-controller"
   react-native-mmkv:
     :path: "../../../node_modules/react-native-mmkv"
+  react-native-netinfo:
+    :path: "../../../node_modules/@react-native-community/netinfo"
   react-native-pager-view:
     :path: "../../../node_modules/react-native-pager-view"
   react-native-passkit:
@@ -2714,6 +2719,7 @@ SPEC CHECKSUMS:
   react-native-cameraroll: b3395629565d1663b4f340c7314e7c04e88c9b3c
   react-native-keyboard-controller: 29054d1bd59d692dc672c45199bb3cdd52aefb4e
   react-native-mmkv: 7d0b6c2a79e73100b933f2947a9c8741d664e18b
+  react-native-netinfo: f0a9899081c185db1de5bb2fdc1c88c202a059ac
   react-native-pager-view: c476f76d54f946df5147645e902d3d7173688187
   react-native-passkit: aaf4f946eb981b872104192aadaa7d6c94011f86
   react-native-quick-base64: f98f17faf04c9779faf726921a2b389d4775e8b6

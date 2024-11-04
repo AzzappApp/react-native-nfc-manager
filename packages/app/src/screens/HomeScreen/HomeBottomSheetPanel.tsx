@@ -264,6 +264,22 @@ const HomeBottomSheetPanel = ({
           },
           onPress: close,
         },
+        {
+          type: 'row',
+          icon: 'offline',
+          text: intl.formatMessage({
+            defaultMessage: 'Offline mode',
+            description: 'Link to open offline mode ',
+          }),
+          linkProps: {
+            route: 'OFFLINE_VCARD',
+            params: { canGoBack: true },
+          },
+          onPress: () => {
+            logEvent('open_webcard_parameters', { source: 'home' });
+            close();
+          },
+        },
         profile?.webCard?.isPremium && !profile?.webCard.isWebSubscription
           ? {
               type: 'row',
