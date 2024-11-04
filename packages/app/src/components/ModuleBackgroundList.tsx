@@ -22,9 +22,7 @@ import type {
 } from '#relayArtifacts/ModuleBackgroundList_ModuleBackgrounds.graphql';
 import type { BoxButtonItemInfo } from './BoxSelectionList';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
-import type { ColorValue } from 'react-native';
-
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
+import type { ColorValue, ViewProps } from 'react-native';
 
 type ModuleBackgroundListProps = ViewProps & {
   /**

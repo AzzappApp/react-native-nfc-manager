@@ -9,7 +9,7 @@ import CoverRendererFragment from '#relayArtifacts/CoverRenderer_webCard.graphql
 import CoverRenderer from './CoverRenderer';
 import type { ModuleRenderInfo } from '#components/cardModules/CardModuleRenderer';
 import type { CoverRenderer_webCard$key } from '#relayArtifacts/CoverRenderer_webCard.graphql';
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
+import type { ViewProps } from 'react-native';
 
 export type CoverRendererPreviewDesktopProps = ViewProps & {
   /**

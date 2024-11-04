@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Animated, Easing, View } from 'react-native';
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
+import type { ViewProps } from 'react-native';
 
 type InfiniteCarouselProps<T = any> = Omit<ViewProps, 'children'> & {
   items: readonly T[];

@@ -9,7 +9,7 @@ import {
 import type { WebCardBackgroundPreview_webCard$key } from '#relayArtifacts/WebCardBackgroundPreview_webCard.graphql';
 import type { CardStyle } from '@azzapp/shared/cardHelpers';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
+import type { ViewProps } from 'react-native';
 
 type WebCardBackgroundProps = ViewProps & {
   webCard: WebCardBackgroundPreview_webCard$key;

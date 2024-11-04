@@ -12,7 +12,7 @@ import {
 } from '@azzapp/shared/cardModuleHelpers';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TitleWithLine from '#ui/TitleWithLine';
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
+import type { ViewProps } from 'react-native';
 
 type HorizontalPhotoMarginsEditionPanelProps = ViewProps & {
   /**

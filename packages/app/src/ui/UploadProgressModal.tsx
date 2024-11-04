@@ -6,7 +6,7 @@ import { colors } from '#theme';
 import Text from '#ui/Text';
 import Button from './Button';
 import ProgressBar from './ProgressBar';
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
+import type { ViewProps } from 'react-native';
 import type { Subscription, Observable } from 'relay-runtime';
 
 const UploadProgressModal = ({

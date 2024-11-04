@@ -15,8 +15,7 @@ import PressableNative from './PressableNative';
 import Text from './Text';
 import type { Icons } from './Icon';
 import type { ReactNode } from 'react';
-import type { StyleProp, ViewStyle } from 'react-native';
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
+import type { StyleProp, ViewProps, ViewStyle } from 'react-native';
 
 export type BottomMenuItem = {
   /** unique tab key */

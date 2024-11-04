@@ -38,7 +38,7 @@ import useMediaLimitedSelectionAlert from '../useMediaLimitedSelectionAlert';
 import StockMediaList from './StockMediaList';
 import type { Media } from '#helpers/mediaHelpers';
 import type { Album } from '@react-native-camera-roll/camera-roll';
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
+import type { ViewProps } from 'react-native';
 
 type CoverEditorMediaPickerProps = Omit<ViewProps, 'children'> & {
   durations: number[] | null;

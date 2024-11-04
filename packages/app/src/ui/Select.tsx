@@ -8,8 +8,7 @@ import Icon from './Icon';
 import PressableNative from './PressableNative';
 import SelectList from './SelectList';
 import type { SelectListItemInfo } from './SelectList';
-import type { StyleProp, TextStyle, ViewStyle } from 'react-native';
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
+import type { StyleProp, TextStyle, ViewProps, ViewStyle } from 'react-native';
 
 export type SelectItemInfo<ItemT> = SelectListItemInfo<ItemT> & {
   /**

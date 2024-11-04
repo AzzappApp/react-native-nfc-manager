@@ -51,8 +51,8 @@ import type {
   ListRenderItem,
   NativeScrollEvent,
   NativeSyntheticEvent,
+  ViewProps,
 } from 'react-native';
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type CardTemplateListProps = Omit<ViewProps, 'children'> & {
   profileId: string;

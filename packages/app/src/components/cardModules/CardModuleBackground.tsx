@@ -4,8 +4,11 @@ import { StyleSheet, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { colors } from '#theme';
 import CardModuleBackgroundImage from './CardModuleBackgroundImage';
-import type { LayoutChangeEvent, LayoutRectangle } from 'react-native';
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
+import type {
+  LayoutChangeEvent,
+  LayoutRectangle,
+  ViewProps,
+} from 'react-native';
 
 type CardModuleBackgroundProps = ViewProps & {
   backgroundUri?: string | null;

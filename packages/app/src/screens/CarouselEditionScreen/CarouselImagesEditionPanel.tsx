@@ -10,8 +10,8 @@ import IconButton from '#ui/IconButton';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import PressableNative from '#ui/PressableNative';
 import TitleWithLine from '#ui/TitleWithLine';
+import type { ViewProps } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type CarouselImagesEditionPanelProps = Omit<ViewProps, 'children'> & {
   /**

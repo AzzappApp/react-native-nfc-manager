@@ -7,9 +7,9 @@ import type {
   LayoutChangeEvent,
   LayoutRectangle,
   StyleProp,
+  ViewProps,
   ViewStyle,
 } from 'react-native';
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type EditorScaledPreviewProps = ViewProps & {
   /**

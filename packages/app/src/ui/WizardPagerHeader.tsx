@@ -5,7 +5,7 @@ import IconButton from '#ui/IconButton';
 import Text from '#ui/Text';
 import type { Icons } from '#ui/Icon';
 import type { ColorSchemeName } from 'react-native';
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
+import type { ViewProps } from 'react-native';
 
 export type WizardPagerHeaderProps = Omit<ViewProps, 'children'> & {
   title: React.ReactNode;
