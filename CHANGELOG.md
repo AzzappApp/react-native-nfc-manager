@@ -1,5 +1,6 @@
-## 1.4.0-canary.21
+## 1.4.0-canary.22
 
+* **feat:**  - offline mode ([#5585](https://github.com/AzzappApp/azzapp/pull/5585))
 * **docs:**  - Update README.md
 * **fix:**  - put back translation messages paths ([#5632](https://github.com/AzzappApp/azzapp/pull/5632))
 * **feat:**  - editable media ([#5615](https://github.com/AzzappApp/azzapp/pull/5615))
