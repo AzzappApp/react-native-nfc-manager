@@ -1,5 +1,6 @@
-## 1.4.0-canary.17
+## 1.4.0-canary.18
 
+* **feat:**  - editable media ([#5615](https://github.com/AzzappApp/azzapp/pull/5615))
 * **fix:**  - stats graph with winter time ([#5610](https://github.com/AzzappApp/azzapp/pull/5610))
 * **fix:**  - align phonenumber-js deps ([#5607](https://github.com/AzzappApp/azzapp/pull/5607))
 * **fix:**  - new contacts counter position ([#5608](https://github.com/AzzappApp/azzapp/pull/5608))
