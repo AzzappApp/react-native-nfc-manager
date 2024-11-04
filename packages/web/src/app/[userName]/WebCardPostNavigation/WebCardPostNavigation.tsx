@@ -1,5 +1,6 @@
 import cn from 'classnames';
 import { type HTMLAttributes, useEffect, useRef } from 'react';
+import { FormattedMessage } from 'react-intl';
 import { ArrowRightIcon, ShareIcon } from '#assets';
 import { generateShareProfileLink } from '#helpers';
 import { ButtonIcon } from '#ui';
@@ -77,7 +78,18 @@ const ProfilePostNavigation = (props: WebCardPostNavigationProps) => {
               </div>
             </div>
           </div>
-          <span className={styles.text}>Posts</span>
+          <span className={styles.text}>
+            <FormattedMessage
+              defaultMessage="{isPlural, plural,
+      =0 {Posts}
+      =1 {Post}
+      other {Posts}
+    }"
+              id="I8SF0v"
+              description="WebCardPostNavigation - Post label"
+              values={{ isPlural: webCard.nbPosts }}
+            />
+          </span>
         </button>
         <button
           className={styles.coverContainer}
@@ -96,7 +108,13 @@ const ProfilePostNavigation = (props: WebCardPostNavigationProps) => {
           className={styles.clickable}
           onClick={() => modal.current?.open()}
         >
-          <span className={styles.text}>Share</span>
+          <span className={styles.text}>
+            <FormattedMessage
+              defaultMessage="Share"
+              id="wMpjsx"
+              description="WebCardPostNavigation - Share label"
+            />
+          </span>
         </ButtonIcon>
       </div>
       <ShareModal
