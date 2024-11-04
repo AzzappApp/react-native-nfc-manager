@@ -60,7 +60,7 @@ const useMediaCarousel = (
   }, [gap, height, medias]);
 
   const getIndexToNextPosition = () => {
-    const currentPosition = carousel.current?.scrollLeft ?? 0;
+    const currentPosition = Math.round(carousel.current?.scrollLeft ?? 0);
 
     const indexToNextPosition = positions.findIndex(
       position => currentPosition <= position,
