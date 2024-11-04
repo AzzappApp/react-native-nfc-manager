@@ -171,7 +171,7 @@ const SimpleButtonSettingsEditionPanel = ({
       case 'link':
         return 'url';
       default:
-        return 'phone-pad';
+        return 'number-pad';
     }
   }, [actionType]);
 
@@ -301,6 +301,7 @@ const SimpleButtonSettingsEditionPanel = ({
             style={{ flex: 1 }}
             autoCapitalize="none"
             keyboardType={keyboardType}
+            enterKeyHint="done"
           />
         </View>
         <View style={styles.buttonContainer}>
