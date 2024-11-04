@@ -1,4 +1,4 @@
-## 1.4.0-canary.16
+## 1.4.0-canary.17
 
 * **fix:**  - stats graph with winter time ([#5610](https://github.com/AzzappApp/azzapp/pull/5610))
 * **fix:**  - align phonenumber-js deps ([#5607](https://github.com/AzzappApp/azzapp/pull/5607))
