@@ -116,6 +116,7 @@ const formButton = style({
       margin: '25px auto 0',
       backgroundColor: vars.color.green,
       border: `2px solid ${vars.color.green}`,
+      marginBottom: 20,
     },
   },
 });
