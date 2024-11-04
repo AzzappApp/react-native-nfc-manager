@@ -1,5 +1,6 @@
-## 1.4.0-canary.18
+## 1.4.0-canary.19
 
+* **fix:**  - put back translation messages paths ([#5632](https://github.com/AzzappApp/azzapp/pull/5632))
 * **feat:**  - editable media ([#5615](https://github.com/AzzappApp/azzapp/pull/5615))
 * **fix:**  - stats graph with winter time ([#5610](https://github.com/AzzappApp/azzapp/pull/5610))
 * **fix:**  - align phonenumber-js deps ([#5607](https://github.com/AzzappApp/azzapp/pull/5607))
