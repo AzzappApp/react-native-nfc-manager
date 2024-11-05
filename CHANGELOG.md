@@ -1,5 +1,6 @@
-## 1.4.0-canary.26
+## 1.4.0-canary.27
 
+* **fix:**  - **home:** [#5649](https://github.com/AzzappApp/azzapp/pull/5649) radial gradient is hidden ([#5656](https://github.com/AzzappApp/azzapp/pull/5656))
 * **fix:**  - enable no single element in styles ([#5641](https://github.com/AzzappApp/azzapp/pull/5641))
 * **fix:**  - remove ignored prop statusBarTranslucent ([#5647](https://github.com/AzzappApp/azzapp/pull/5647))
 * **feat:**  - offline mode ([#5585](https://github.com/AzzappApp/azzapp/pull/5585))
