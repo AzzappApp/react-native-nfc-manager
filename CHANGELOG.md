@@ -1,5 +1,9 @@
-## 1.4.0-canary.30
+## 1.4.0-canary.31
 
+* **fix:**  - **CoverEdition:** keyboard animation on text edition ([#5674](https://github.com/AzzappApp/azzapp/pull/5674))
+* **fix:**  - manage modules duplication in the same way UI do it ([#5675](https://github.com/AzzappApp/azzapp/pull/5675))
+* **fix:**  - **Home:** add max carousel height ([#5683](https://github.com/AzzappApp/azzapp/pull/5683))
+* **fix:**  - **cover:** [#5660](https://github.com/AzzappApp/azzapp/pull/5660) scroll to current value on mount ([#5677](https://github.com/AzzappApp/azzapp/pull/5677))
 * **fix:**  - **welcome:** [#5652](https://github.com/AzzappApp/azzapp/pull/5652) close bottom sheet menu ([#5668](https://github.com/AzzappApp/azzapp/pull/5668))
 * **fix:**  - enable no-raw-text-rule ([#5658](https://github.com/AzzappApp/azzapp/pull/5658))
 * **fix:**  - remove state from animatedText ([#5639](https://github.com/AzzappApp/azzapp/pull/5639))
