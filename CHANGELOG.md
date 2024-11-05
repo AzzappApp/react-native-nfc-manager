@@ -1,4 +1,4 @@
-## 1.4.0-canary.31
+## 1.4.0-canary.32
 
 * **fix:**  - **CoverEdition:** keyboard animation on text edition ([#5674](https://github.com/AzzappApp/azzapp/pull/5674))
 * **fix:**  - manage modules duplication in the same way UI do it ([#5675](https://github.com/AzzappApp/azzapp/pull/5675))
