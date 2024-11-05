@@ -110,12 +110,15 @@ const VideoTimelineEditor = ({
       secondPixel,
   );
 
-  const dispatchChange = useCallback(() => {
-    onChange({
-      startTime: leftPosition.value / secondPixel,
-      duration: (rightPosition.value - leftPosition.value) / secondPixel,
-    });
-  }, [leftPosition.value, onChange, rightPosition.value, secondPixel]);
+  const dispatchChange = useCallback(
+    (left: number, right: number) => {
+      onChange({
+        startTime: left / secondPixel,
+        duration: (right - left) / secondPixel,
+      });
+    },
+    [onChange, secondPixel],
+  );
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -188,10 +191,10 @@ const VideoTimelineEditor = ({
         ctx.right = false;
       },
       onFinish: () => {
-        runOnJS(dispatchChange)();
+        runOnJS(dispatchChange)(leftPosition.value, rightPosition.value);
       },
     },
-    [leftPosition.value, rightPosition.value],
+    [leftPosition, rightPosition],
   );
 
   const [buffers, setBuffers] = useState<bigint[]>([]);
