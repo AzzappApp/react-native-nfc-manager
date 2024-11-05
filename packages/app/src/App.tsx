@@ -193,7 +193,7 @@ const App = () => {
       <AppIntlProvider>
         <ErrorBoundary>
           <PermissionProvider>
-            <KeyboardProvider statusBarTranslucent>
+            <KeyboardProvider>
               <AppRouter />
             </KeyboardProvider>
           </PermissionProvider>

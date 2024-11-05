@@ -132,7 +132,7 @@ const WizardTransitioner = ({
           >
             {/* if we don't enclose the element in another KeyboardProvider,
                the Animations seems to be "eaten" by the ScreenContainer */}
-            <KeyboardProvider statusBarTranslucent>{element}</KeyboardProvider>
+            <KeyboardProvider>{element}</KeyboardProvider>
           </TransitionScreen>
         ))}
       </ScreenContainer>
