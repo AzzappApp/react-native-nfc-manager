@@ -1531,6 +1531,49 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
+  - react-native-animateable-text (0.14.1):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.01.01.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - react-native-animateable-text/common (= 0.14.1)
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
+  - react-native-animateable-text/common (0.14.1):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.01.01.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
   - react-native-blob-jsi-helper (0.3.1):
     - React
     - React-Core
@@ -2647,6 +2690,7 @@ DEPENDENCIES:
   - React-logger (from `../../../node_modules/react-native/ReactCommon/logger`)
   - React-Mapbuffer (from `../../../node_modules/react-native/ReactCommon`)
   - React-microtasksnativemodule (from `../../../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
+  - react-native-animateable-text (from `../../../node_modules/react-native-animateable-text`)
   - react-native-blob-jsi-helper (from `../../../node_modules/react-native-blob-jsi-helper`)
   - react-native-blob-util (from `../../../node_modules/react-native-blob-util`)
   - "react-native-cameraroll (from `../../../node_modules/@react-native-camera-roll/camera-roll`)"
@@ -2849,6 +2893,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native/ReactCommon"
   React-microtasksnativemodule:
     :path: "../../../node_modules/react-native/ReactCommon/react/nativemodule/microtasks"
+  react-native-animateable-text:
+    :path: "../../../node_modules/react-native-animateable-text"
   react-native-blob-jsi-helper:
     :path: "../../../node_modules/react-native-blob-jsi-helper"
   react-native-blob-util:
@@ -3047,6 +3093,7 @@ SPEC CHECKSUMS:
   React-logger: 97c9dafae1f1a638001a9d1d0e93d431f2f9cb7b
   React-Mapbuffer: 3146a13424f9fec2ea1f1462d49d566e4d69b732
   React-microtasksnativemodule: 02d218c79c72d373a92a8552183f4ead0d1c6e05
+  react-native-animateable-text: 516be3d8cb78a3feb56ee45fa645d7537d30d249
   react-native-blob-jsi-helper: c51309b88c3a2fb3e16d041f662e0551055d2bfc
   react-native-blob-util: e6a3b23a99ac2c3d9fa48722db049a1e1808efc2
   react-native-cameraroll: 6407cec6b16f9c00404bb34bd1d80c4752b31673

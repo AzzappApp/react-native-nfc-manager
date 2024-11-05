@@ -102,7 +102,6 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
             numberOfLines={1}
             style={styles.url}
             text={text}
-            containerStyle={{ flex: 1 }}
             maxLength={windowWidth.width / 13}
           />
           <View style={styles.emptyViewCenter} />

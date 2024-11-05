@@ -16,7 +16,6 @@ import Animated, {
   interpolate,
   useAnimatedScrollHandler,
   useAnimatedStyle,
-  useDerivedValue,
   useSharedValue,
 } from 'react-native-reanimated';
 import useIsForeground from '#hooks/useIsForeground';
@@ -348,33 +347,26 @@ const AnimatedItemWrapper = ({
   width: number;
   height: number;
 }) => {
-  const translateX = useDerivedValue(() => {
-    return interpolate(
-      scrollIndex.value,
-      [index - 1, index, index + 1],
-      [-offset + offsetCenter / 2, 0, offset - offsetCenter / 2],
-      Extrapolation.EXTEND,
-    );
-  });
-
-  const scale = useDerivedValue(() => {
-    return interpolate(
+  const animatedStyle = useAnimatedStyle(() => {
+    const scale = interpolate(
       scrollIndex.value,
       [index - 1, index, index + 1],
       [scaleRatio, 1, scaleRatio],
       Extrapolation.CLAMP,
     );
-  });
-
-  const animatedStyle = useAnimatedStyle(() => {
+    const translateX = interpolate(
+      scrollIndex.value,
+      [index - 1, index, index + 1],
+      [-offset - offsetCenter / 2, 0, offset + offsetCenter / 2],
+      Extrapolation.EXTEND,
+    );
     return {
-      width,
-      transform: [{ translateX: translateX.value }, { scale: scale.value }],
+      transform: [{ scale }, { translateX }],
     };
   });
 
   return (
-    <Animated.View style={[animatedStyle, containerStyle]}>
+    <Animated.View style={[{ width }, animatedStyle, containerStyle]}>
       {renderChildren({ ...info, width, height })}
     </Animated.View>
   );

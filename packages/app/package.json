@@ -121,6 +121,7 @@
     "react-hook-form": "^7.53.1",
     "react-intl": "6.6.8",
     "react-native": "patch:react-native@npm%3A0.76.1#~/.yarn/patches/react-native-npm-0.76.1-c738a2fa39.patch",
+    "react-native-animateable-text": "^0.14.1",
     "react-native-blob-jsi-helper": "^0.3.1",
     "react-native-blob-util": "^0.19.11",
     "react-native-bootsplash": "^6.2.6",

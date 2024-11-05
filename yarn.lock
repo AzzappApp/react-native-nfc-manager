@@ -187,6 +187,7 @@ __metadata:
     react-hook-form: "npm:^7.53.1"
     react-intl: "npm:6.6.8"
     react-native: "patch:react-native@npm%3A0.76.1#~/.yarn/patches/react-native-npm-0.76.1-c738a2fa39.patch"
+    react-native-animateable-text: "npm:^0.14.1"
     react-native-blob-jsi-helper: "npm:^0.3.1"
     react-native-blob-util: "npm:^0.19.11"
     react-native-bootsplash: "npm:^6.2.6"
@@ -10576,6 +10577,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-native/normalize-color@npm:*":
+  version: 2.1.0
+  resolution: "@react-native/normalize-color@npm:2.1.0"
+  checksum: 10/a72b98538e6b7e265fb0669b8767d5f788777fb1a0ac1df7b0c82d8b3a804c8122aa7b819688c5e36fcf90b5ba93050b0070e29d3f0d70ab9530c2abd2bb9f9e
+  languageName: node
+  linkType: hard
+
 "@react-native/normalize-colors@npm:0.76.0":
   version: 0.76.0
   resolution: "@react-native/normalize-colors@npm:0.76.0"
@@ -15219,6 +15227,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"deprecated-react-native-prop-types@npm:^2.3.0":
+  version: 2.3.0
+  resolution: "deprecated-react-native-prop-types@npm:2.3.0"
+  dependencies:
+    "@react-native/normalize-color": "npm:*"
+    invariant: "npm:*"
+    prop-types: "npm:*"
+  checksum: 10/5abbad5b6d6830ca92151167f42611256ada1e8991b5066ed3659f3bbe909ae87949f3e7f075f1b685256138cad81423222220f4c6d5740376db19cb9f793312
+  languageName: node
+  linkType: hard
+
 "deprecation@npm:^2.0.0":
   version: 2.3.1
   resolution: "deprecation@npm:2.3.1"
@@ -18826,7 +18845,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"invariant@npm:2.2.4, invariant@npm:^2.2.4":
+"invariant@npm:*, invariant@npm:2.2.4, invariant@npm:^2.2.4":
   version: 2.2.4
   resolution: "invariant@npm:2.2.4"
   dependencies:
@@ -23358,7 +23377,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prop-types@npm:15.8.1, prop-types@npm:^15.6.2, prop-types@npm:^15.7.2, prop-types@npm:^15.8.1":
+"prop-types@npm:*, prop-types@npm:15.8.1, prop-types@npm:^15.6.2, prop-types@npm:^15.7.2, prop-types@npm:^15.8.1":
   version: 15.8.1
   resolution: "prop-types@npm:15.8.1"
   dependencies:
@@ -23657,6 +23676,20 @@ __metadata:
   peerDependencies:
     react: ">=15.0.0"
   checksum: 10/fc3d8f49ad43059820993ed01190ea924340c9a43c16b4c45ccce68ac6fdface04169e3de7c19381e51e16fa42638f8331cd2a8bc9e29c79d2c0ed9e9dd46eed
+  languageName: node
+  linkType: hard
+
+"react-native-animateable-text@npm:^0.14.1":
+  version: 0.14.1
+  resolution: "react-native-animateable-text@npm:0.14.1"
+  dependencies:
+    deprecated-react-native-prop-types: "npm:^2.3.0"
+    nullthrows: "npm:^1.1.1"
+  peerDependencies:
+    react: "*"
+    react-native: ">=0.74.0"
+    react-native-reanimated: ">=3"
+  checksum: 10/14cfaa13c931fe43c191ad19d3ff501691f6ab149b2bd6f5df31409c1277d7337460049274e456c15c255c9304797cc8c4a1591fa96a7dbd302e9517f0695b5f
   languageName: node
   linkType: hard
 
