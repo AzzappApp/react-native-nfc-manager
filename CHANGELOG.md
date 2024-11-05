@@ -1,5 +1,7 @@
-## 1.4.0-canary.34
+## 1.4.0-canary.35
 
+* **fix:**  - shadow on android ([#5707](https://github.com/AzzappApp/azzapp/pull/5707))
+* **fix:**  - [#5671](https://github.com/AzzappApp/azzapp/pull/5671) error on accessibility value when using float ([#5705](https://github.com/AzzappApp/azzapp/pull/5705))
 * **fix:**  - **cover:** [#5663](https://github.com/AzzappApp/azzapp/pull/5663) don’t drag on slider + improve perf on slider chang… ([#5698](https://github.com/AzzappApp/azzapp/pull/5698))
 * **fix:**  - offline vCard out of screen ([#5699](https://github.com/AzzappApp/azzapp/pull/5699))
 * **fix:**  - **Home:** reduce animation stutering ([#5696](https://github.com/AzzappApp/azzapp/pull/5696))
