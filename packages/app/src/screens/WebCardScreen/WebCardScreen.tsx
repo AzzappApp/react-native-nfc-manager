@@ -70,7 +70,6 @@ import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { WebCardScreenByIdQuery } from '#relayArtifacts/WebCardScreenByIdQuery.graphql';
 import type { WebCardScreenByUserNameQuery } from '#relayArtifacts/WebCardScreenByUserNameQuery.graphql';
 import type { WebCardRoute } from '#routes';
-import type { CardFlipSwitchRef } from './CardFlipSwitch';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 import type { Disposable } from 'react-relay';
 
@@ -211,8 +210,6 @@ const WebCardScreen = ({
     [intl, onToggleFollow, profileInfos?.profileRole],
   );
 
-  const ref = useRef<CardFlipSwitchRef>(null);
-
   // #region Flip Animation
   //Restoring it in single file, "is" more performant on android
   const { width: windowWidth } = useWindowDimensions();
@@ -334,9 +331,7 @@ const WebCardScreen = ({
 
   const onEdit = useCallback(() => {
     if (profileHasEditorRight(profileInfos?.profileRole)) {
-      if (!ref.current?.animationRunning.value) {
-        toggleEditing();
-      }
+      toggleEditing();
     } else {
       Toast.show({
         type: 'error',
