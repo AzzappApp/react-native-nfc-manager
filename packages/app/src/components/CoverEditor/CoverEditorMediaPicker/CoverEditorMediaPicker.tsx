@@ -220,9 +220,21 @@ const CoverEditorMediaPicker = ({
           newSelectedMedias[indexToReplace] = media;
           return newSelectedMedias;
         });
+      } else if (
+        (!initialMedias || initialMedias.length === 0) &&
+        selectedMedias.length < COVER_MAX_MEDIA
+      ) {
+        setSelectedMedias(prevSelectedMedias => [...prevSelectedMedias, media]);
       }
     },
-    [durations, intl, maxSelectableVideos, multiSelection, selectedMedias],
+    [
+      durations,
+      initialMedias,
+      intl,
+      maxSelectableVideos,
+      multiSelection,
+      selectedMedias,
+    ],
   );
 
   const handleDuplicateMedia = () => {
