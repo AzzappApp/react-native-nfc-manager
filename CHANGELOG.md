@@ -1,4 +1,4 @@
-## 1.4.0-canary.36
+## 1.4.0-canary.37
 
 * **fix:**  - shadow on android ([#5707](https://github.com/AzzappApp/azzapp/pull/5707))
 * **fix:**  - [#5671](https://github.com/AzzappApp/azzapp/pull/5671) error on accessibility value when using float ([#5705](https://github.com/AzzappApp/azzapp/pull/5705))
