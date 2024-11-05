@@ -137,6 +137,7 @@ export function coverEditorReducer(
           linksLayer: {
             ...linksLayer,
             links: [],
+            position: { x: 50, y: 50 },
           },
         };
       }
