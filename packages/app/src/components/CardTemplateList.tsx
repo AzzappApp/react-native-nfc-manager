@@ -477,7 +477,7 @@ const CardTemplateList = (
               renderItem={renderItem}
               onScroll={onScroll}
               onEndReached={onEndReached}
-              style={[styles.cardTemplateList]}
+              style={styles.cardTemplateList}
               contentContainerStyle={styles.cardTemplateListContentContainer}
               horizontal
               showsHorizontalScrollIndicator={false}

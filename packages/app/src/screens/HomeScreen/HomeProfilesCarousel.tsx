@@ -363,14 +363,12 @@ const ItemRenderComponent = ({
         ) : (
           <Link route="COVER_TEMPLATE_SELECTION" params={{ fromHome: true }}>
             <PressableOpacity
-              style={[
-                {
-                  width: coverWidth,
-                  height: coverHeight,
-                  borderRadius: coverWidth * COVER_CARD_RADIUS,
-                  overflow: 'visible',
-                },
-              ]}
+              style={{
+                width: coverWidth,
+                height: coverHeight,
+                borderRadius: coverWidth * COVER_CARD_RADIUS,
+                overflow: 'visible',
+              }}
               accessibilityLabel={intl.formatMessage({
                 defaultMessage: 'Create a new WebCard',
                 description: 'Start new profile creation from account screen',

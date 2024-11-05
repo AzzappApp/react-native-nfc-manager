@@ -302,7 +302,7 @@ const OfflineVCardScreen = () => {
   };
 
   return (
-    <Container style={[styles.container]}>
+    <Container style={styles.container}>
       <SafeAreaView
         style={styles.container}
         edges={{ bottom: 'off', top: 'additive' }}

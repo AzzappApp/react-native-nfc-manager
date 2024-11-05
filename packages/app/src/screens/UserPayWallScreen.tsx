@@ -353,7 +353,7 @@ const UserPayWallScreen = ({ route }: NativeScreenProps<UserPayWallRoute>) => {
         onPress={() => router.back()}
         size={50}
       />
-      <View style={[styles.content]}>
+      <View style={styles.content}>
         <View style={styles.contaienrLogo}>
           <Image
             source={require('#assets/logo-full.png')}

@@ -111,18 +111,16 @@ const ColorList = ({
             ]}
           >
             <View
-              style={[
-                {
-                  borderWidth: 1,
-                  borderStyle: 'dashed',
-                  borderColor: colors.grey200,
-                  width: itemWidth,
-                  height: itemWidth,
-                  borderRadius: itemWidth / 2,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                },
-              ]}
+              style={{
+                borderWidth: 1,
+                borderStyle: 'dashed',
+                borderColor: colors.grey200,
+                width: itemWidth,
+                height: itemWidth,
+                borderRadius: itemWidth / 2,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
             >
               <Icon icon="add" />
             </View>

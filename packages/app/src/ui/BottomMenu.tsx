@@ -229,7 +229,7 @@ const BottomMenuItemRenderer = ({
             })}
         </View>
         {showLabel && (
-          <View style={[styles.labelDecoration]}>
+          <View style={styles.labelDecoration}>
             <Text
               variant="xsmall"
               style={[styles.label, isSelected && styles.activeLabel]}

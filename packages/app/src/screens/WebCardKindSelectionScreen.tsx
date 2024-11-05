@@ -164,7 +164,7 @@ const WebCardKindSelectionScreen = ({
               description: 'WebCardKindStep - Category image alt',
             })}
             source={{ mediaId: media.id, requestedSize: 300, uri: media.uri }}
-            style={[mediaStyle]}
+            style={mediaStyle}
           />
         </View>
       ) : null;

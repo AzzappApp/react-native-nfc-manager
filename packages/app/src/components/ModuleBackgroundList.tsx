@@ -169,15 +169,13 @@ const ModuleBackgroundListItem = ({
 }: ModuleBackgroundListItemProps) => {
   return (
     <View
-      style={[
-        {
-          height: '100%',
-          borderRadius: width * COVER_CARD_RADIUS,
-          overflow: 'hidden',
-          aspectRatio: imageRatio,
-          backgroundColor,
-        },
-      ]}
+      style={{
+        height: '100%',
+        borderRadius: width * COVER_CARD_RADIUS,
+        overflow: 'hidden',
+        aspectRatio: imageRatio,
+        backgroundColor,
+      }}
     >
       {item && (
         <CardModuleBackgroundImage

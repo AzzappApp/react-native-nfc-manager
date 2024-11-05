@@ -271,11 +271,11 @@ const VideoTimelineEditor = ({
             return (
               <View key={`timeraouge_${index}`} style={{ height: 25 }}>
                 <View
-                  style={[
+                  style={
                     index % (NUMBER_INTERCALAR_TICK + 1) === 0
                       ? styles.stepmarker
-                      : styles.smallMarker,
-                  ]}
+                      : styles.smallMarker
+                  }
                 />
                 {(index % (NUMBER_INTERCALAR_TICK + 1) === 0 ||
                   index === NUMBER_INTERCALAR_TICK * NUMBER_MAX_TICK - 1) && (

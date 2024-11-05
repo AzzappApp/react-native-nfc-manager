@@ -96,7 +96,7 @@ const HexColorTextInput = ({
   const styles = useStyleSheet(styleSheet);
 
   return (
-    <View onTouchStart={focus} style={[styles.container]}>
+    <View onTouchStart={focus} style={styles.container}>
       <Text style={styles.text}>
         <FormattedMessage
           defaultMessage="Hex"

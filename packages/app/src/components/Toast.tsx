@@ -84,7 +84,7 @@ const Toast = ({
       success: (successProps: ToastConfigParams<ToastProps>) => (
         <BaseToast
           {...successProps}
-          style={[styles.baseToast]}
+          style={styles.baseToast}
           contentContainerStyle={styles.contentContainerToast}
           renderLeadingIcon={() => (
             <Icon icon="check_round" style={styles.successToastIcon} />
@@ -99,7 +99,7 @@ const Toast = ({
       error: (errorProps: ToastConfigParams<ToastProps>) => (
         <ErrorToast
           {...errorProps}
-          style={[styles.baseToast]}
+          style={styles.baseToast}
           contentContainerStyle={styles.contentContainerToast}
           renderLeadingIcon={() => (
             <Icon icon="warning" style={styles.errorToastIcon} />

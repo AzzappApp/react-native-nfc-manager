@@ -27,7 +27,7 @@ const TextInputLabel = (
 ) => {
   return (
     <Label style={labelStyle} label={label} labelID={labelID}>
-      <TextInput style={[inputStyle]} {...props} ref={ref} />
+      <TextInput style={inputStyle} {...props} ref={ref} />
     </Label>
   );
 };

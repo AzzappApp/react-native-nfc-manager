@@ -108,7 +108,7 @@ const CheckBox = ({
           )}
         </Svg>
         {typeof label === 'string' ? (
-          <Text variant="medium" style={[labelStyle]}>
+          <Text variant="medium" style={labelStyle}>
             {label}
           </Text>
         ) : (

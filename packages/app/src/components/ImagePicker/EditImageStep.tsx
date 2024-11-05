@@ -224,7 +224,7 @@ const EditImageStep = ({
               {timeRange &&
                 timeRange?.duration < media.duration &&
                 !(media.duration > maxVideoDuration) && (
-                  <View style={[styles.durationView]}>
+                  <View style={styles.durationView}>
                     <Text variant="xsmall" style={styles.duration}>
                       {formatDuration(media.duration)}
                     </Text>

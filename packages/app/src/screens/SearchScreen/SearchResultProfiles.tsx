@@ -92,14 +92,14 @@ export const SearchResultProfilesPlaceHolder = () => {
   return (
     <View style={styles.viewPlaceholder}>
       <View style={[styles.viewColumn, { paddingRight: 3 }]}>
-        <SkeletonPlaceholder style={[styles.profilePlaceHolder]} />
-        <SkeletonPlaceholder style={[styles.profilePlaceHolder]} />
-        <SkeletonPlaceholder style={[styles.profilePlaceHolder]} />
+        <SkeletonPlaceholder style={styles.profilePlaceHolder} />
+        <SkeletonPlaceholder style={styles.profilePlaceHolder} />
+        <SkeletonPlaceholder style={styles.profilePlaceHolder} />
       </View>
       <View style={[styles.viewColumn, { paddingLeft: 3 }]}>
-        <SkeletonPlaceholder style={[styles.profilePlaceHolder]} />
-        <SkeletonPlaceholder style={[styles.profilePlaceHolder]} />
-        <SkeletonPlaceholder style={[styles.profilePlaceHolder]} />
+        <SkeletonPlaceholder style={styles.profilePlaceHolder} />
+        <SkeletonPlaceholder style={styles.profilePlaceHolder} />
+        <SkeletonPlaceholder style={styles.profilePlaceHolder} />
       </View>
     </View>
   );
