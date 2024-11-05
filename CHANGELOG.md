@@ -1,5 +1,7 @@
-## 1.4.0-canary.27
+## 1.4.0-canary.28
 
+* **fix:**  - remove state from animatedText ([#5639](https://github.com/AzzappApp/azzapp/pull/5639))
+* **fix:**  - 🐛 properly select media from start cover ([#5667](https://github.com/AzzappApp/azzapp/pull/5667))
 * **fix:**  - **home:** [#5649](https://github.com/AzzappApp/azzapp/pull/5649) radial gradient is hidden ([#5656](https://github.com/AzzappApp/azzapp/pull/5656))
 * **fix:**  - enable no single element in styles ([#5641](https://github.com/AzzappApp/azzapp/pull/5641))
 * **fix:**  - remove ignored prop statusBarTranslucent ([#5647](https://github.com/AzzappApp/azzapp/pull/5647))
