@@ -11,9 +11,9 @@ import { useRouter } from '#components/NativeRouter';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import relayScreen from '#helpers/relayScreen';
 import { useProfileInfos } from '#hooks/authStateHooks';
+import useBoolean from '#hooks/useBoolean';
 import { useFocusEffect } from '#hooks/useFocusEffect';
 import useScreenInsets from '#hooks/useScreenInsets';
-import useToggle from '#hooks/useToggle';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
 import IconButton from '#ui/IconButton';
@@ -32,7 +32,7 @@ const WelcomeScreen = ({
   const intl = useIntl();
   useMainTabBarVisibilityController(false, true);
 
-  const [showMenu, toggleShowMenu] = useToggle(false);
+  const [showMenu, open, close] = useBoolean(false);
 
   useEffect(() => {
     dispatchGlobalEvent({ type: 'READY' });
@@ -66,7 +66,7 @@ const WelcomeScreen = ({
           icon="menu"
           style={styles.menu}
           iconStyle={{ tintColor: colors.black }}
-          onPress={toggleShowMenu}
+          onPress={open}
         />
       </View>
       <LottieView
@@ -117,7 +117,7 @@ const WelcomeScreen = ({
       </View>
       <HomeBottomSheetPanel
         visible={showMenu}
-        close={toggleShowMenu}
+        close={close}
         userIsPremium={currentUser?.isPremium}
       />
     </View>
