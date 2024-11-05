@@ -1,18 +1,8 @@
 import { clamp } from '@shopify/react-native-skia';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-  Platform,
-  Pressable,
-  StyleSheet,
-  TextInput,
-  View,
-  useWindowDimensions,
-} from 'react-native';
-import { useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller';
+import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 import Animated, {
-  interpolate,
   runOnJS,
-  useAnimatedReaction,
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
@@ -64,7 +54,6 @@ import type { SkRect } from '@shopify/react-native-skia';
 import type {
   GestureResponderEvent,
   LayoutChangeEvent,
-  LayoutRectangle,
   ViewProps,
 } from 'react-native';
 
@@ -78,12 +67,12 @@ type CoverPreviewProps = Exclude<ViewProps, 'children'> & {
    */
   height: number;
   /**
-   * A callback to update the translation of the preview when the keyboard is displayed
-   * this function must be a worklet
+   * Called when the edited text input center position changes
    *
-   * @param translateY The translation to apply to the preview
+   * @param y The new center position of the edited text input
+   *
    */
-  onKeyboardTranslateWorklet: (translateY: number) => void;
+  onEditedInputPositionChange: (y: number) => void;
   /**
    * A callback to open the links modal
    */
@@ -98,7 +87,7 @@ const CoverPreview = ({
   width: viewWidth,
   height: viewHeight,
   style,
-  onKeyboardTranslateWorklet,
+  onEditedInputPositionChange,
   onOpenLinksModal,
   ...props
 }: CoverPreviewProps) => {
@@ -915,58 +904,14 @@ const CoverPreview = ({
   //#
   //##############################################################################
 
-  const {
-    height: keyboardHeightSharedValue,
-    progress: keyboardProgressSharedValue,
-  } = useReanimatedKeyboardAnimation();
-  const { height: windowHeight } = useWindowDimensions();
-  const pageYSharedValue = useSharedValue(0);
-  const inputSize = useSharedValue<LayoutRectangle | null>(null);
-
-  const containerRef = useCallback(
-    (ref: View | null) => {
-      ref?.measureInWindow((_, y) => {
-        pageYSharedValue.value = y;
-      });
-    },
-    [pageYSharedValue],
-  );
-
   const handleTextInputLayout = useCallback(
     (event: LayoutChangeEvent) => {
-      inputSize.value = event.nativeEvent.layout;
+      const { y, height } = event.nativeEvent.layout;
+      onEditedInputPositionChange(y + height / 2);
     },
-    [inputSize],
+    [onEditedInputPositionChange],
   );
-  useAnimatedReaction(
-    () =>
-      [
-        inputSize.value,
-        pageYSharedValue.value,
-        keyboardProgressSharedValue.value,
-        keyboardHeightSharedValue.value,
-      ] as const,
-    ([inputSize, pageY, keyboardProgress, keyboardHeight]) => {
-      if (!inputSize) {
-        onKeyboardTranslateWorklet(0);
-        return;
-      }
-      const { y, height } = inputSize;
-      const editionInputCenter = pageY + y + height / 2;
-      //we need a local variable to avoid keyboard issue
-      const res = interpolate(
-        keyboardProgress,
-        [0, 1],
-        [
-          0,
-          (Platform.OS === 'android' ? keyboardHeight / 2 : keyboardHeight) +
-            windowHeight / 2 -
-            editionInputCenter,
-        ],
-      );
-      return onKeyboardTranslateWorklet(res);
-    },
-  );
+
   // #endregion
 
   // #region Screen shot replacement
@@ -1054,7 +999,6 @@ const CoverPreview = ({
         ]}
       >
         <View
-          ref={containerRef}
           style={[
             style,
             {

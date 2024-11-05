@@ -10,8 +10,10 @@ import {
   useState,
 } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View, Platform } from 'react-native';
+import { StyleSheet, View, Platform, useWindowDimensions } from 'react-native';
+import { useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller';
 import Animated, {
+  interpolate,
   useAnimatedStyle,
   useSharedValue,
 } from 'react-native-reanimated';
@@ -636,20 +638,40 @@ const CoverEditorCore = (
     [],
   );
 
-  const translateYSharedValue = useSharedValue(0);
-  const onKeyboardTranslateWorklet = useCallback(
-    (translateY: number) => {
-      'worklet';
-      translateYSharedValue.value = translateY;
+  const editedInputPosition = useSharedValue(0);
+  const onEditedInputPositionChange = useCallback(
+    (y: number) => {
+      editedInputPosition.value = y;
     },
-    [translateYSharedValue],
+    [editedInputPosition],
   );
 
-  const animatedStyle = useAnimatedStyle(() => {
+  const {
+    progress: keyboardProgressSharedValue,
+    height: keyboardHeightSharedValue,
+  } = useReanimatedKeyboardAnimation();
+
+  const { height: windowHeight } = useWindowDimensions();
+
+  const coverPreviewAnimatedStyle = useAnimatedStyle(() => {
     return {
-      transform: [{ translateY: translateYSharedValue.value }],
+      transform: [
+        {
+          translateY: interpolate(
+            keyboardProgressSharedValue.value,
+            [0, 1],
+            [
+              0,
+              keyboardHeightSharedValue.value +
+                windowHeight / 2 -
+                editedInputPosition.value,
+            ],
+          ),
+        },
+      ],
     };
   });
+
   // #endregion
 
   const toolbox = useRef<CoverEditorLinksToolActions>(null);
@@ -715,28 +737,28 @@ const CoverEditorCore = (
 
   return (
     <>
-      <CoverEditorContextProvider value={contextValue}>
-        <Animated.View
-          style={[styles.container, style, animatedStyle]}
-          {...props}
-        >
-          <Container style={styles.container}>
-            <View style={styles.content} onLayout={onContentLayout}>
-              {contentSize && (
-                <CoverPreview
-                  width={contentSize.width}
-                  height={contentSize.height}
-                  style={styles.coverPreview}
-                  onKeyboardTranslateWorklet={onKeyboardTranslateWorklet}
-                  onOpenLinksModal={onOpenLinksModal}
-                />
-              )}
-            </View>
-            <View style={{ height: 50 }} />
+      <View style={[styles.container, style]} {...props}>
+        <CoverEditorContextProvider value={contextValue}>
+          <Animated.View style={[styles.container, coverPreviewAnimatedStyle]}>
+            <Container style={styles.container}>
+              <View style={styles.content} onLayout={onContentLayout}>
+                {contentSize && (
+                  <CoverPreview
+                    width={contentSize.width}
+                    height={contentSize.height}
+                    style={styles.coverPreview}
+                    onEditedInputPositionChange={onEditedInputPositionChange}
+                    onOpenLinksModal={onOpenLinksModal}
+                  />
+                )}
+              </View>
+            </Container>
+          </Animated.View>
+          <Container style={styles.toolBoxContainer}>
             <CoverEditorToolbox ref={toolbox} />
           </Container>
-        </Animated.View>
-      </CoverEditorContextProvider>
+        </CoverEditorContextProvider>
+      </View>
 
       <ScreenModal
         visible={savingStatus != null}
@@ -845,5 +867,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     left: 0,
+  },
+  toolBoxContainer: {
+    paddingTop: 50,
   },
 });
