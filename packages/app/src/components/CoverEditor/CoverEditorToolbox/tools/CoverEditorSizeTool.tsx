@@ -1,7 +1,6 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
-import { useSharedValue } from 'react-native-reanimated';
 import useBoolean from '#hooks/useBoolean';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
@@ -38,12 +37,6 @@ const CoverEditorSizeTool = ({ title }: Props) => {
     },
     [dispatch],
   );
-
-  const currentFontSize = useSharedValue(size);
-
-  useEffect(() => {
-    currentFontSize.value = size;
-  }, [currentFontSize, size]);
 
   return (
     <>

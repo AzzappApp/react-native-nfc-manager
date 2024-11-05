@@ -51,20 +51,20 @@ const CoverEditorTextImageAnimationTool = () => {
 
   const [show, open, close] = useBoolean(false);
 
+  const hasActiveTextLayer = activeTextLayer !== null;
+
   const onChangeAnimationDuration = useCallback(
-    (value: number[], index: number) => {
-      if (activeTextLayer) {
+    (value: number[]) => {
+      if (hasActiveTextLayer) {
         //duration should be at minimum COVER_MIN_MEDIA_DURATION
         const duration = value[1] - value[0];
         let start = value[0];
         let end = value[1];
         if (duration < COVER_MIN_MEDIA_DURATION) {
-          if (index === 0) {
-            //left slider is moving
-            start = Math.min(end - MIN_DURATION_ANIMATION, start);
-          } else {
-            end = Math.max(start + MIN_DURATION_ANIMATION, end);
-          }
+          //left slider is moving
+          start = Math.min(end - MIN_DURATION_ANIMATION, start);
+
+          end = Math.max(start + MIN_DURATION_ANIMATION, end);
         }
 
         const startPercent = (start / coverDuration) * 100;
@@ -79,7 +79,7 @@ const CoverEditorTextImageAnimationTool = () => {
         });
       }
     },
-    [activeTextLayer, dispatch, coverDuration],
+    [hasActiveTextLayer, dispatch, coverDuration],
   );
 
   const onSelect = useCallback(
@@ -126,6 +126,18 @@ const CoverEditorTextImageAnimationTool = () => {
     [activeTextLayer, cardColors],
   );
 
+  const sliderValue = useMemo(
+    () => [
+      ((activeTextLayer?.startPercentageTotal ?? 0) * coverDuration) / 100,
+      ((activeTextLayer?.endPercentageTotal ?? 0) * coverDuration) / 100,
+    ],
+    [
+      activeTextLayer?.startPercentageTotal,
+      activeTextLayer?.endPercentageTotal,
+      coverDuration,
+    ],
+  );
+
   return (
     <>
       <ToolBoxSection
@@ -137,13 +149,18 @@ const CoverEditorTextImageAnimationTool = () => {
         })}
         onPress={open}
       />
-      {activeTextLayer != null && (
-        <BottomSheetModal lazy onDismiss={close} visible={show}>
+      {hasActiveTextLayer && (
+        <BottomSheetModal
+          lazy
+          onDismiss={close}
+          visible={show}
+          enableContentPanningGesture={false}
+        >
           <Header
             middleElement={
               <Text variant="large">
                 <FormattedMessage
-                  defaultMessage="Animations "
+                  defaultMessage="Animations"
                   description="CoverEditor Animations Tool - Title"
                 />
               </Text>
@@ -170,10 +187,7 @@ const CoverEditorTextImageAnimationTool = () => {
             <DoubleSlider
               minimumValue={0}
               maximumValue={coverDuration}
-              value={[
-                (activeTextLayer.startPercentageTotal * coverDuration) / 100,
-                (activeTextLayer.endPercentageTotal * coverDuration) / 100,
-              ]}
+              value={sliderValue}
               onValueChange={onChangeAnimationDuration}
             />
           </View>

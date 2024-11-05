@@ -63,20 +63,18 @@ const CoverEditorOverlayImageAnimationTool = () => {
 
   const animations = useOverlayAnimationList();
 
+  const hasActiveOverlay = activeOverlay !== null;
+
   const onChangeAnimationDuration = useCallback(
-    (value: number[], index: number) => {
-      if (activeOverlay) {
+    (value: number[]) => {
+      if (hasActiveOverlay) {
         //duration should be at minimum COVER_MIN_MEDIA_DURATION
         const duration = value[1] - value[0];
         let start = value[0];
         let end = value[1];
         if (duration < COVER_MIN_MEDIA_DURATION) {
-          if (index === 0) {
-            //left slider is moving
-            start = Math.min(end - MIN_DURATION_ANIMATION, start);
-          } else {
-            end = Math.max(start + MIN_DURATION_ANIMATION, end);
-          }
+          start = Math.min(end - MIN_DURATION_ANIMATION, start);
+          end = Math.max(start + MIN_DURATION_ANIMATION, end);
         }
 
         const startPercent = (start / totalDuration) * 100;
@@ -91,7 +89,7 @@ const CoverEditorOverlayImageAnimationTool = () => {
         });
       }
     },
-    [activeOverlay, dispatch, totalDuration],
+    [hasActiveOverlay, dispatch, totalDuration],
   );
 
   const onSelect = useCallback(
@@ -179,6 +177,18 @@ const CoverEditorOverlayImageAnimationTool = () => {
     );
   }, [limitedImageRatio]);
 
+  const sliderValue = useMemo(
+    () => [
+      ((activeOverlay?.startPercentageTotal ?? 0) * totalDuration) / 100,
+      ((activeOverlay?.endPercentageTotal ?? 100) * totalDuration) / 100,
+    ],
+    [
+      activeOverlay?.startPercentageTotal,
+      activeOverlay?.endPercentageTotal,
+      totalDuration,
+    ],
+  );
+
   return (
     <>
       <ToolBoxSection
@@ -191,7 +201,12 @@ const CoverEditorOverlayImageAnimationTool = () => {
         onPress={open}
       />
       {activeOverlay != null && (
-        <BottomSheetModal lazy onDismiss={close} visible={show}>
+        <BottomSheetModal
+          lazy
+          onDismiss={close}
+          visible={show}
+          enableContentPanningGesture={false}
+        >
           <Header
             middleElement={
               <Text variant="large">
@@ -223,12 +238,7 @@ const CoverEditorOverlayImageAnimationTool = () => {
             <DoubleSlider
               minimumValue={0}
               maximumValue={totalDuration}
-              value={[
-                ((activeOverlay.startPercentageTotal ?? 0) * totalDuration) /
-                  100,
-                ((activeOverlay.endPercentageTotal ?? 100) * totalDuration) /
-                  100,
-              ]}
+              value={sliderValue}
               onValueChange={onChangeAnimationDuration}
             />
           </View>
