@@ -1,5 +1,6 @@
-## 1.4.0-canary.33
+## 1.4.0-canary.34
 
+* **fix:**  - **cover:** [#5663](https://github.com/AzzappApp/azzapp/pull/5663) don’t drag on slider + improve perf on slider chang… ([#5698](https://github.com/AzzappApp/azzapp/pull/5698))
 * **fix:**  - offline vCard out of screen ([#5699](https://github.com/AzzappApp/azzapp/pull/5699))
 * **fix:**  - **Home:** reduce animation stutering ([#5696](https://github.com/AzzappApp/azzapp/pull/5696))
 * **fix:**  - **CoverEdition:** keyboard animation on text edition ([#5674](https://github.com/AzzappApp/azzapp/pull/5674))
