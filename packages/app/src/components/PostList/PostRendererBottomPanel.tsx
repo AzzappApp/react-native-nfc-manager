@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/react-native';
 import * as Clipboard from 'expo-clipboard';
 import { fromGlobalId } from 'graphql-relay';
-import { useCallback, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { FormattedMessage, FormattedRelativeTime, useIntl } from 'react-intl';
 import { View, StyleSheet, Share, Platform } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -310,14 +310,6 @@ const PostRendererBottomPanel = ({
     ],
   );
 
-  const setAllowComments = useCallback(() => {
-    updatePost({ allowComments: !post.allowComments });
-  }, [post.allowComments, updatePost]);
-
-  const setAllowLikes = useCallback(() => {
-    updatePost({ allowLikes: !post.allowLikes });
-  }, [post.allowLikes, updatePost]);
-
   const profileInfos = useProfileInfos();
 
   const isViewer = profileInfos?.webCardId === post.webCard.id;
@@ -495,34 +487,11 @@ const PostRendererBottomPanel = ({
       >
         <View style={{ justifyContent: 'space-evenly' }}>
           {isViewer && (
-            <View style={styles.modalLine}>
-              <Text variant="medium">
-                <FormattedMessage
-                  defaultMessage="Likes"
-                  description="PostItem Modal - Likes switch Label"
-                />
-              </Text>
-              <Switch
-                variant="large"
-                value={post.allowLikes}
-                onValueChange={setAllowLikes}
-              />
-            </View>
-          )}
-          {isViewer && (
-            <View style={styles.modalLine}>
-              <Text variant="medium">
-                <FormattedMessage
-                  defaultMessage="Comments"
-                  description="PostItem Modal - Comments switch Label"
-                />
-              </Text>
-              <Switch
-                variant="large"
-                value={post.allowComments}
-                onValueChange={setAllowComments}
-              />
-            </View>
+            <PostConfiguration
+              allowLikes={post.allowLikes}
+              allowComments={post.allowComments}
+              updatePost={updatePost}
+            />
           )}
           {isViewer && (
             <PressableNative onPress={openEditcontent} style={styles.modalLine}>
@@ -678,3 +647,45 @@ const MODAL_ANIMATION_TIME = 800;
 // Keep thos value here until this is clearly not required(Octobre2024)
 // const MODAL_HEIGHT = 284;
 // const SMALL_MODAL_HEIGHT = 242;
+type PostConfigurationProps = {
+  allowLikes: boolean;
+  allowComments: boolean;
+  updatePost: (
+    input: { allowComments: boolean } | { allowLikes: boolean },
+  ) => void;
+};
+const PostConfigurationComponent = ({
+  allowLikes,
+  allowComments,
+  updatePost,
+}: PostConfigurationProps) => {
+  const [like, setLike] = useState(allowLikes);
+  const [comment, setComment] = useState(allowComments);
+  useEffect(() => {
+    updatePost({ allowComments: comment, allowLikes: like });
+  }, [like, comment, updatePost]);
+  return (
+    <>
+      <View style={styles.modalLine}>
+        <Text variant="medium">
+          <FormattedMessage
+            defaultMessage="Likes"
+            description="PostItem Modal - Likes switch Label"
+          />
+        </Text>
+        <Switch variant="large" value={like} onValueChange={setLike} />
+      </View>
+
+      <View style={styles.modalLine}>
+        <Text variant="medium">
+          <FormattedMessage
+            defaultMessage="Comments"
+            description="PostItem Modal - Comments switch Label"
+          />
+        </Text>
+        <Switch variant="large" value={comment} onValueChange={setComment} />
+      </View>
+    </>
+  );
+};
+const PostConfiguration = memo(PostConfigurationComponent);
