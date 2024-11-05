@@ -37,6 +37,7 @@ import WebCardMenu from '#components/WebCardMenu';
 import { logEvent } from '#helpers/analytics';
 import { getAuthState } from '#helpers/authStore';
 import useBoolean from '#hooks/useBoolean';
+import useLatestCallback from '#hooks/useLatestCallback';
 import useToggleFollow from '#hooks/useToggleFollow';
 import CarouselSelectList from '#ui/CarouselSelectList';
 import Icon from '#ui/Icon';
@@ -91,27 +92,28 @@ const HomeProfilesCarousel = ({ user: userKey }: HomeProfilesCarouselProps) => {
     userKey,
   );
 
-  const data = useMemo(
-    () => (profiles ? [null, ...profiles] : [null]),
-    [profiles],
-  );
-
-  const dataSize = useRef(profiles?.length ?? 0);
-
   const focus = useScreenHasFocus();
 
+  const changeIndexTimeout = useRef<any | null>(null);
+  const onCurrentProfileIndexChangeLatest = useLatestCallback(
+    onCurrentProfileIndexChange,
+  );
   const onSelectedIndexChange = useCallback(
     (index: number) => {
+      clearTimeout(changeIndexTimeout.current);
       setSelectedIndex(index);
-      onCurrentProfileIndexChange(index);
+      onCurrentProfileIndexChangeLatest(index);
     },
-    [onCurrentProfileIndexChange],
+    [onCurrentProfileIndexChangeLatest],
   );
 
   const scrollToIndex = useCallback(
     (index: number, animated?: boolean) => {
       carouselRef.current?.scrollToIndex(index, animated);
-      onSelectedIndexChange(index);
+      // On android onMomentumScrollEnd is not called when scrollToIndex is called
+      changeIndexTimeout.current = setTimeout(() => {
+        onSelectedIndexChange(index);
+      }, 300);
     },
     [onSelectedIndexChange],
   );
@@ -134,6 +136,25 @@ const HomeProfilesCarousel = ({ user: userKey }: HomeProfilesCarouselProps) => {
     }
   });
 
+  const carouselRef = useRef<CarouselSelectListHandle | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState(initialProfileIndex);
+
+  const data = useMemo(
+    () =>
+      profiles
+        ? [
+            { profile: null, isCurrent: selectedIndex === 0 },
+            ...profiles.map((profile, i) => ({
+              profile,
+              isCurrent: selectedIndex === i + 1,
+            })),
+          ]
+        : [{ profile: null, isCurrent: true }],
+    [profiles, selectedIndex],
+  );
+
+  const dataSize = useRef(profiles?.length ?? 0);
+
   useEffect(() => {
     if (focus) {
       if (dataSize.current > (profiles?.length ?? 0)) {
@@ -145,32 +166,32 @@ const HomeProfilesCarousel = ({ user: userKey }: HomeProfilesCarouselProps) => {
     }
   }, [focus, profiles?.length, currentIndexProfileSharedValue, scrollToIndex]);
 
-  const carouselRef = useRef<CarouselSelectListHandle | null>(null);
-  const [selectedIndex, setSelectedIndex] = useState(initialProfileIndex);
-
   const renderItem = useCallback(
     ({
-      item,
+      item: { profile, isCurrent },
       index,
       width,
       height,
-    }: CarouselSelectListRenderItemInfo<ProfileType | null>) => {
-      if (item) {
+    }: CarouselSelectListRenderItemInfo<{
+      profile: ProfileType | null;
+      isCurrent: boolean;
+    }>) => {
+      if (profile) {
         return (
           <ItemRender
-            item={item}
+            item={profile}
             coverHeight={height}
             coverWidth={width}
             index={index}
             scrollToIndex={scrollToIndex}
-            isCurrent={index === selectedIndex}
+            isCurrent={isCurrent}
           />
         );
       }
 
       return <CreateItemMemo coverHeight={height} coverWidth={width} />;
     },
-    [scrollToIndex, selectedIndex],
+    [scrollToIndex],
   );
 
   const { width: windowWidth } = useWindowDimensions();
@@ -204,8 +225,8 @@ const SCALE_RATIO = 108 / 291;
 
 const MARGIN_VERTICAL = 15;
 
-const keyExtractor = (item: ProfileType | null, index: number) =>
-  item?.webCard?.id ?? `new_${index}`;
+const keyExtractor = (item: { profile: ProfileType | null }, index: number) =>
+  item.profile?.webCard?.id ?? `new_${index}`;
 
 export default HomeProfilesCarousel;
 

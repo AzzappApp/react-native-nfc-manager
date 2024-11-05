@@ -340,6 +340,7 @@ const ScreenRenderer = ({
   const Component: any = screens[route];
 
   const navigationEventEmitter = useRef(new EventEmitter()).current;
+  navigationEventEmitter.setMaxListeners(Infinity);
   const safeArea = useSafeAreaInsets();
 
   useEffect(

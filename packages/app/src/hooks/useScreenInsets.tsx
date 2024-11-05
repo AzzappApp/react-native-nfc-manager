@@ -14,7 +14,7 @@ const useScreenInsets = () => {
     }),
     bottom: Platform.select({
       default: Math.max(insets.bottom, 16),
-      android: Math.max(insets.bottom, 16),
+      android: 16 + Math.max(insets.bottom, 0),
     }),
   };
 };

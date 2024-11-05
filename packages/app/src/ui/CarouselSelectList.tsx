@@ -1,3 +1,4 @@
+import isEqual from 'lodash/isEqual';
 import {
   forwardRef,
   useCallback,
@@ -19,7 +20,7 @@ import Animated, {
   useSharedValue,
 } from 'react-native-reanimated';
 import useIsForeground from '#hooks/useIsForeground';
-import type { ForwardedRef, ReactElement, ReactNode, Ref } from 'react';
+import type { ForwardedRef, ReactElement, Ref } from 'react';
 import type {
   StyleProp,
   ViewStyle,
@@ -265,9 +266,10 @@ function CarouselSelectList<TItem = any>(
           offset={offset}
           offsetCenter={offsetCenter}
           width={itemWidth ?? 0}
-        >
-          {renderItem({ ...info, width: itemWidth!, height: containerHeight! })}
-        </AnimatedItem>
+          height={containerHeight ?? 0}
+          renderChildren={renderItem}
+          info={info}
+        />
       );
     },
     [
@@ -277,8 +279,8 @@ function CarouselSelectList<TItem = any>(
       offset,
       offsetCenter,
       itemWidth,
-      renderItem,
       containerHeight,
+      renderItem,
     ],
   );
 
@@ -330,17 +332,21 @@ const AnimatedItemWrapper = ({
   offset,
   offsetCenter,
   containerStyle,
-  children,
+  renderChildren,
+  info,
   width,
+  height,
 }: {
   index: number;
   scrollIndex: SharedValue<number>;
   offset: number;
   offsetCenter: number;
   scaleRatio: number;
-  children: ReactNode;
+  renderChildren: CarouselSelectListRenderItem<any>;
+  info: ListRenderItemInfo<any>;
   containerStyle: StyleProp<ViewStyle>;
   width: number;
+  height: number;
 }) => {
   const translateX = useDerivedValue(() => {
     return interpolate(
@@ -369,9 +375,11 @@ const AnimatedItemWrapper = ({
 
   return (
     <Animated.View style={[animatedStyle, containerStyle]}>
-      {children}
+      {renderChildren({ ...info, width, height })}
     </Animated.View>
   );
 };
 
-const AnimatedItem = memo(AnimatedItemWrapper);
+const AnimatedItem = memo(AnimatedItemWrapper, (prev, next) =>
+  isEqual(prev, next),
+);
