@@ -361,7 +361,6 @@ const AnimatedItemWrapper = ({
   });
 
   const animatedStyle = useAnimatedStyle(() => {
-    'worklet';
     return {
       width,
       transform: [{ translateX: translateX.value }, { scale: scale.value }],

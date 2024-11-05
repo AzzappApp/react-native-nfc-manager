@@ -77,7 +77,6 @@ const ContactCardItem = ({ height, item, index }: ContactCardItemProps) => {
   const { width: windowWidth } = useWindowDimensions();
 
   const translateX = useDerivedValue(() => {
-    'worklet';
     return (index - (currentIndexSharedValue?.value ?? 0) + 1) * windowWidth;
   }, [index, windowWidth]);
 

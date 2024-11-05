@@ -249,8 +249,6 @@ export const HomeScreenProvider = ({
 
   const onCurrentProfileIndexChange = useCallback(
     (index: number) => {
-      'worklet';
-      currentIndexSharedValue.value = index;
       const newProfile = user.profiles?.[index - 1];
       if (newProfile) {
         onChangeWebCard({
@@ -260,7 +258,7 @@ export const HomeScreenProvider = ({
         });
       }
     },
-    [currentIndexSharedValue, user.profiles],
+    [user.profiles],
   );
 
   //updating the initialProfileIndex to avoid warning(not sure needed in production)
