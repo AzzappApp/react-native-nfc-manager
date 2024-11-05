@@ -53,10 +53,7 @@ export const AnimatedHomeHeaderCentralComponent = ({
     tintColor: colorValue.value,
   }));
 
-  const skiaColor = useDerivedValue(
-    () => Skia.Color(colorValue.value),
-    [colorValue.value],
-  );
+  const skiaColor = useDerivedValue(() => Skia.Color(colorValue.value));
 
   return (
     <>

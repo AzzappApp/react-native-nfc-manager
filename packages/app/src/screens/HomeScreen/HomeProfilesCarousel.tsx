@@ -130,7 +130,7 @@ const HomeProfilesCarousel = ({ user: userKey }: HomeProfilesCarouselProps) => {
     if (
       authProfileIndex !== undefined &&
       authProfileIndex !== -1 &&
-      authProfileIndex + 1 !== currentIndexProfileSharedValue.value
+      authProfileIndex + 1 !== currentIndexProfileSharedValue.get()
     ) {
       carouselRef.current?.scrollToIndex(authProfileIndex + 1, false);
     }

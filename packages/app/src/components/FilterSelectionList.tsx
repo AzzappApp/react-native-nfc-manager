@@ -57,7 +57,7 @@ const FilterSelectionList = ({
       };
     }
     return result;
-  }, [cropData, isSkImageReady, media, skImage.value]);
+  }, [cropData, isSkImageReady, media, skImage]);
 
   const renderItem = useCallback(
     ({ item, height, width }: BoxButtonItemInfo<[Filter, string] | null>) => {
