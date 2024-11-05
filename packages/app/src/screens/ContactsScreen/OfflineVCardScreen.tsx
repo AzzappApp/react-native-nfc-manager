@@ -27,6 +27,7 @@ import { useRouter } from '#components/NativeRouter';
 import EmptyContent from '#components/ui/EmptyContent';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getOfflineVCard } from '#helpers/offlineVCard';
+import useScreenInsets from '#hooks/useScreenInsets';
 import { HomeBackgroundComponent } from '#screens/HomeScreen/HomeBackground';
 import { AnimatedHomeHeaderCentralComponent } from '#screens/HomeScreen/HomeHeader';
 import Container from '#ui/Container';
@@ -65,10 +66,13 @@ const OfflineVCardScreen = () => {
   );
 
   const [currentIndex, setCurrentIndex] = useState(0);
+  const { top } = useScreenInsets();
 
   const onClose = router.back;
 
-  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
+  const { width: windowWidth, height: fullWindowHeight } =
+    useWindowDimensions();
+  const windowHeight = fullWindowHeight - top;
 
   const itemMargin = (windowWidth * 5) / 100;
   const itemWidth = (windowWidth * 90) / 100;
