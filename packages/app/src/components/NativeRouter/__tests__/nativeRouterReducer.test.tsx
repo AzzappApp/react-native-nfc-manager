@@ -1,4 +1,3 @@
-/* eslint-disable react-native/no-raw-text */
 import React from 'react';
 import nativeRouterReducer from '../nativeRouterReducer';
 import type { Route } from '#routes';
