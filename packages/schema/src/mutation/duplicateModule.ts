@@ -41,23 +41,30 @@ const duplicateModule: MutationResolvers['duplicateModule'] = async (
       const allModules = await getCardModulesByWebCard(webCardId);
 
       // create holes in modules position list
-      for (let i = 0; i < modules.length; i++) {
-        const nextModulesIdx = allModules.findIndex(
-          module => module.id === modules[i].id,
-        );
-        const nextModules = allModules
-          .slice(nextModulesIdx + 1, allModules.length)
-          .map(m => m.id);
+      // 1 find the last index of old modules
+      const lastLodule = modules[modules.length - 1];
 
-        await updateCardModulesPosition(nextModules, 1);
-      }
+      // 2 Append create Hole
+      const nextModulesIdx = allModules.findIndex(
+        module => module.id === lastLodule.id,
+      );
+      const nextModules = allModules
+        .slice(nextModulesIdx + 1, allModules.length)
+        .map(m => m.id);
+
+      await updateCardModulesPosition(webCardId, nextModules, modules.length);
+
+      // 3 add the new modules in the Hole
+      const modulesToCreate = modules.map((m, index) => ({
+        ...omit(m, 'id'),
+        position: index + nextModulesIdx + 1,
+      }));
 
       // duplicate modules
       createdModuleIds = await createCardModules(
-        modules.map((module, index) => ({
-          ...omit(module, 'id'),
-          position: modules[modules.length - 1].position + index + 1,
-        })),
+        modulesToCreate.map(module => {
+          return module;
+        }),
       );
 
       // clean up media
