@@ -177,6 +177,7 @@ export default [
       'formatjs/no-multiple-whitespaces': 'error',
       'react-native/no-unused-styles': 2,
       'react-native/no-single-element-style-arrays': 2,
+      'react-native/no-raw-text': 2,
     },
   },
   ...fixupConfigRules(

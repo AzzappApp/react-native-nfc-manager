@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-raw-text */
 import { renderHook, act } from '@testing-library/react-hooks';
 import { BackHandler } from 'react-native';
 import { createDeferred } from '@azzapp/shared/asyncHelpers';
