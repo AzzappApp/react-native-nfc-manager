@@ -226,7 +226,12 @@ const styleSheet = createStyleSheet(appearance => ({
     borderTopRightRadius: 16,
     paddingTop: 16,
   },
-  modalContainer: [shadow(appearance, 'top')],
+  modalContainer: {
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    borderWidth: 0,
+    ...shadow(appearance, 'top'),
+  },
 }));
 
 const CustomBackdrop = ({
