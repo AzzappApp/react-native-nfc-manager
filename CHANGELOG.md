@@ -1,4 +1,4 @@
-## 1.4.0-canary.29
+## 1.4.0-canary.30
 
 * **fix:**  - **welcome:** [#5652](https://github.com/AzzappApp/azzapp/pull/5652) close bottom sheet menu ([#5668](https://github.com/AzzappApp/azzapp/pull/5668))
 * **fix:**  - enable no-raw-text-rule ([#5658](https://github.com/AzzappApp/azzapp/pull/5658))
