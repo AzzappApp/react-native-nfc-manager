@@ -163,6 +163,7 @@ const WheelSelector = ({
               onScroll={onScroll}
               onMomentumScrollEnd={onScroll}
               getItemLayout={getItemLayout}
+              initialScrollIndex={steps.indexOf(value)}
             />
           </MemoizedLinearGradient>
           <View
