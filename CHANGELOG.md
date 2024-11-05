@@ -1,5 +1,7 @@
-## 1.4.0-canary.25
+## 1.4.0-canary.26
 
+* **fix:**  - enable no single element in styles ([#5641](https://github.com/AzzappApp/azzapp/pull/5641))
+* **fix:**  - remove ignored prop statusBarTranslucent ([#5647](https://github.com/AzzappApp/azzapp/pull/5647))
 * **feat:**  - offline mode ([#5585](https://github.com/AzzappApp/azzapp/pull/5585))
 * **docs:**  - Update README.md
 * **fix:**  - put back translation messages paths ([#5632](https://github.com/AzzappApp/azzapp/pull/5632))
