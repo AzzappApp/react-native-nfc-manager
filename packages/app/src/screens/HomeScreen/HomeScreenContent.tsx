@@ -152,5 +152,6 @@ export const HOME_SCREEN_CONTENT_PADDING = 15;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: 'space-around',
   },
 });

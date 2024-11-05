@@ -9,7 +9,13 @@ import {
   useState,
 } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View, StyleSheet, Platform, Pressable } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Platform,
+  Pressable,
+  useWindowDimensions,
+} from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import {
@@ -167,12 +173,16 @@ const HomeProfilesCarousel = ({ user: userKey }: HomeProfilesCarouselProps) => {
     [scrollToIndex, selectedIndex],
   );
 
+  const { width: windowWidth } = useWindowDimensions();
+
   if (profiles == null) {
     return null;
   }
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[styles.container, { maxHeight: windowWidth / (2 * COVER_RATIO) }]}
+    >
       <CarouselSelectList
         ref={carouselRef}
         data={data}
