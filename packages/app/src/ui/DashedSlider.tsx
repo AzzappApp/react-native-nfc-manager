@@ -134,7 +134,11 @@ const DashedSlider = ({
             variant === 'small' && { width: '50%' },
           ]}
           accessibilityRole="adjustable"
-          accessibilityValue={{ min, max, now: pan.value }}
+          accessibilityValue={{
+            min: Math.round(min),
+            max: Math.round(max),
+            now: Math.round(pan.value),
+          }}
         >
           <Animated.View style={[styles.dashContainer, dashContainerStyle]}>
             {steps.map(step => (
