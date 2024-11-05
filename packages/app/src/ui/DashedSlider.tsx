@@ -9,6 +9,7 @@ import Animated, {
   clamp,
   interpolate,
   runOnJS,
+  useAnimatedProps,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -118,6 +119,14 @@ const DashedSlider = ({
     ],
   }));
 
+  const animatedProps = useAnimatedProps(() => ({
+    accessibilityValue: {
+      min: Math.round(min),
+      max: Math.round(max),
+      now: Math.round(pan.value),
+    },
+  }));
+
   return (
     <MemoizedLinearGradient
       colors={colorsGradient}
@@ -134,11 +143,7 @@ const DashedSlider = ({
             variant === 'small' && { width: '50%' },
           ]}
           accessibilityRole="adjustable"
-          accessibilityValue={{
-            min: Math.round(min),
-            max: Math.round(max),
-            now: Math.round(pan.value),
-          }}
+          animatedProps={animatedProps}
         >
           <Animated.View style={[styles.dashContainer, dashContainerStyle]}>
             {steps.map(step => (
