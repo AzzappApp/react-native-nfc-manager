@@ -1,5 +1,7 @@
-## 1.4.0-canary.38
+## 1.4.0-canary.39
 
+* **fix:**  - **cardModules:** avoid reanimated value used in render ([#5646](https://github.com/AzzappApp/azzapp/pull/5646))
+* **fix:**  - performane issue on swtich ([#5711](https://github.com/AzzappApp/azzapp/pull/5711))
 * **fix:**  - **simpleText:** don’t use reanimated values in render ([#5679](https://github.com/AzzappApp/azzapp/pull/5679))
 * **fix:**  - reanimated value access in JS thread ([#5664](https://github.com/AzzappApp/azzapp/pull/5664))
 * **fix:**  - shadow on android ([#5707](https://github.com/AzzappApp/azzapp/pull/5707))
