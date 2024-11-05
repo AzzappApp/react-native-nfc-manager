@@ -71,7 +71,7 @@ export const SearchScreen = ({ hasFocus = true }: { hasFocus: boolean }) => {
     return {
       opacity: showRecent.value,
     };
-  }, [showRecent]);
+  });
 
   return (
     <Container style={[styles.flexOne, { paddingTop: insets.top }]}>

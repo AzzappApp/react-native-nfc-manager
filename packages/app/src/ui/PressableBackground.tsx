@@ -74,7 +74,7 @@ const PressableBackground = (
         [bgColor, highColor],
       ),
     };
-  }, [pressed, bgColor]);
+  });
 
   const onPressIn = useCallback(() => {
     pressed.value = withTiming(1, {

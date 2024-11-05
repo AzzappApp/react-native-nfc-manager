@@ -191,7 +191,7 @@ const CarouselRenderer = ({
     return {
       height: imageHeightValue + marginVerticalValue * 2,
     };
-  }, [imageHeight, marginVertical]);
+  });
 
   const containerStyle = useAnimatedStyle(() => {
     return {
@@ -207,25 +207,20 @@ const CarouselRenderer = ({
       height: '100%',
       flexDirection: 'row',
     };
-  }, [marginVertical, marginHorizontal, gap]);
+  });
 
-  const imageStyle = useAnimatedStyle(
-    () => ({
-      height:
-        typeof imageHeight === 'number'
-          ? imageHeight
-          : (imageHeight?.value ?? defaultImageHeight),
-      borderRadius:
-        typeof borderRadius === 'number'
-          ? borderRadius
-          : (borderRadius?.value ?? 0),
-      borderWidth:
-        typeof borderWidth === 'number'
-          ? borderWidth
-          : (borderWidth?.value ?? 0),
-    }),
-    [imageHeight, borderRadius, borderWidth],
-  );
+  const imageStyle = useAnimatedStyle(() => ({
+    height:
+      typeof imageHeight === 'number'
+        ? imageHeight
+        : (imageHeight?.value ?? defaultImageHeight),
+    borderRadius:
+      typeof borderRadius === 'number'
+        ? borderRadius
+        : (borderRadius?.value ?? 0),
+    borderWidth:
+      typeof borderWidth === 'number' ? borderWidth : (borderWidth?.value ?? 0),
+  }));
 
   // const modal = useRef<CarouselFullscrenActions>(null);
 

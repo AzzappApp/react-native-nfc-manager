@@ -86,7 +86,7 @@ const PressableScaleHighlight = (
         { scale: interpolate(pressed.value, [0, 1], [scale, activeScale]) },
       ],
     };
-  }, [pressed, highlightColor, scale, activeScale, opacity, activeOpacity]);
+  });
 
   return (
     <PressableAnimated

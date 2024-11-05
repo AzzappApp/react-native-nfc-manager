@@ -117,7 +117,7 @@ const WebCardScreenScrollView = (
         },
       ],
     };
-  }, [editTransition, editScale]);
+  });
 
   const mergedRefs = useMemo(
     () => mergeRefs([scrollViewRef, forwardedRef]),

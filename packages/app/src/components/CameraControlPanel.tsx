@@ -195,14 +195,14 @@ const RecordingButton = ({
         [colors.red400, colors.black],
       ),
     };
-  }, []);
+  });
 
   const pressTiming = useAnimatedState(pressed, { duration: 120 });
   const pressedAnimationStyle = useAnimatedStyle(() => {
     return {
       transform: [{ scale: interpolate(pressTiming.value, [0, 1], [1, 1.1]) }],
     };
-  }, [pressTiming]);
+  });
 
   return (
     <Animated.View

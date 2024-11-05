@@ -13,12 +13,10 @@ import type { SharedValue } from 'react-native-reanimated';
 
 type OfflineHeaderProps = {
   userNames: string[];
-  currentIndexProfile: SharedValue<number>;
   currentIndexSharedValue: SharedValue<number>;
 };
 const OfflineHeader = ({
   userNames,
-  currentIndexProfile,
   currentIndexSharedValue,
 }: OfflineHeaderProps) => {
   const maxLength = useWindowDimensions().width / 13;
@@ -34,7 +32,7 @@ const OfflineHeader = ({
         currentIndexSharedValue.value +
         Math.round(currentIndexSharedValue.value),
     };
-  }, [currentIndexProfile.value, currentIndexSharedValue.value]);
+  });
 
   const text = useDerivedValue(() => {
     return animatedUserNames.value[Math.round(currentIndexSharedValue.value)];

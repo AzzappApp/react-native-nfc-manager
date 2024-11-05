@@ -35,7 +35,7 @@ const HomeMenu = ({
         { duration: 300 },
       ),
     };
-  }, [selected]);
+  });
 
   return (
     <View style={styles.container} accessibilityRole="tablist">

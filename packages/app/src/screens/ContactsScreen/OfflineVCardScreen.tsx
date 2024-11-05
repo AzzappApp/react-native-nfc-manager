@@ -332,7 +332,6 @@ const OfflineVCardScreen = () => {
         {userNames.length ? (
           <OfflineHeader
             userNames={userNames}
-            currentIndexProfile={currentIndexSharedValue}
             currentIndexSharedValue={currentIndexSharedValue}
           />
         ) : (

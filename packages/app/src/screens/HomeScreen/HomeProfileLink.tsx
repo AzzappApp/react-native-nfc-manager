@@ -57,7 +57,7 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
         Math.round(currentIndexSharedValue.value),
       pointerEvents: 'auto',
     };
-  }, [currentIndexProfileSharedValue.value, currentIndexSharedValue.value]);
+  });
 
   const intl = useIntl();
   const onPress = () => {

@@ -175,7 +175,7 @@ const TransitionScreen = ({
         },
       ],
     };
-  }, [transitionProgress, transitionKind]);
+  });
 
   const layoutStyle = { width, height };
 

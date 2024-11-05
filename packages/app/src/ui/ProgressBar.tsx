@@ -24,7 +24,7 @@ const ProgressBar = ({
     return {
       width: withTiming(progress * width),
     };
-  }, [progress, width]);
+  });
 
   return (
     <View

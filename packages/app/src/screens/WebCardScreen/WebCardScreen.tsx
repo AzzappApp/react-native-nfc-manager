@@ -233,39 +233,33 @@ const WebCardScreen = ({
     easing: Easing.out(Easing.back(1)),
   });
 
-  const borderRadiusStyle = useAnimatedStyle(
-    () => ({
-      borderRadius: interpolate(
-        Math.abs(flip.value + manualFlip.value) % 1,
-        [0, 0.1, 0.9, 1],
-        [0, cardRadius, cardRadius, 0],
-      ),
-    }),
-    [flip, manualFlip],
-  );
+  const borderRadiusStyle = useAnimatedStyle(() => ({
+    borderRadius: interpolate(
+      Math.abs(flip.value + manualFlip.value) % 1,
+      [0, 0.1, 0.9, 1],
+      [0, cardRadius, cardRadius, 0],
+    ),
+  }));
 
-  const frontStyle = useAnimatedStyle(
-    () => ({
-      transform: [
-        { perspective: 900 },
-        {
-          rotateY: `${interpolate(
-            (flip.value + manualFlip.value) % 2,
-            [0, 1, 2],
-            [0, Math.PI, 2 * Math.PI],
-          )}rad`,
-        },
-        {
-          scale: interpolate(
-            Math.abs(flip.value + manualFlip.value) % 1,
-            [0, 0.5, 1],
-            [1, 0.7, 1],
-          ),
-        },
-      ],
-    }),
-    [flip, manualFlip],
-  );
+  const frontStyle = useAnimatedStyle(() => ({
+    transform: [
+      { perspective: 900 },
+      {
+        rotateY: `${interpolate(
+          (flip.value + manualFlip.value) % 2,
+          [0, 1, 2],
+          [0, Math.PI, 2 * Math.PI],
+        )}rad`,
+      },
+      {
+        scale: interpolate(
+          Math.abs(flip.value + manualFlip.value) % 1,
+          [0, 0.5, 1],
+          [1, 0.7, 1],
+        ),
+      },
+    ],
+  }));
 
   const backStyle = useAnimatedStyle(() => {
     return {
@@ -287,7 +281,7 @@ const WebCardScreen = ({
         },
       ],
     };
-  }, [flip, manualFlip]);
+  });
 
   const initialManualGesture = useSharedValue(0);
 

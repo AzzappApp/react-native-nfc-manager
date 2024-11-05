@@ -197,7 +197,7 @@ const ColorListItem = ({
       ),
       borderWidth: selectedSharedValue.value * 3,
     };
-  }, [selectedSharedValue]);
+  });
 
   const editSharedValue = useAnimatedState(editMode, { duration: 150 });
   const editIconContainerStyle = useAnimatedStyle(() => {
@@ -209,13 +209,13 @@ const ColorListItem = ({
       ),
       opacity: editSharedValue.value,
     };
-  }, [selectedSharedValue]);
+  });
 
   const linkIconContainerStyle = useAnimatedStyle(() => {
     return {
       opacity: 1 - editSharedValue.value,
     };
-  }, [selectedSharedValue]);
+  });
 
   const layerStyle: ViewStyle = {
     position: 'absolute',

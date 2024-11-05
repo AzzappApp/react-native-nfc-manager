@@ -387,7 +387,7 @@ export const StatisticItems = ({
         },
       ],
     };
-  }, [scrollIndex]);
+  });
 
   const animatedOpacity = useAnimatedStyle(() => {
     return {
@@ -397,7 +397,7 @@ export const StatisticItems = ({
         [0.3, 1, 0.3],
       ),
     };
-  }, [scrollIndex]);
+  });
 
   const onPress = () => {
     onSelect(index);

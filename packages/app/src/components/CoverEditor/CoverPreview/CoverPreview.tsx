@@ -469,7 +469,7 @@ const CoverPreview = ({
   const handleLayerGestureStart = useCallback(() => {
     'worklet';
     gestureOffset.value = activeLayerBounds.value;
-  }, [activeLayerBounds.value, gestureOffset]);
+  }, [activeLayerBounds, gestureOffset]);
 
   /**
    * Callback to handle the translation of the layer currently being edited
@@ -515,7 +515,7 @@ const CoverPreview = ({
         rotation,
       };
     },
-    [activeLayerBounds, gestureOffset.value, viewHeight, viewWidth],
+    [activeLayerBounds, gestureOffset, viewHeight, viewWidth],
   );
 
   /**
@@ -598,7 +598,7 @@ const CoverPreview = ({
         rotation: newRotation,
       };
     },
-    [activeLayerBounds, gestureOffset.value],
+    [activeLayerBounds, gestureOffset],
   );
 
   /**
@@ -689,7 +689,7 @@ const CoverPreview = ({
       activeLayer.kind,
       activeLayer.layer,
       activeLayerBounds,
-      gestureOffset.value,
+      gestureOffset,
       viewHeight,
       viewWidth,
     ],

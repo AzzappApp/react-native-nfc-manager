@@ -101,7 +101,7 @@ const WebCardScreenButtonBar = ({
         [1, 0.1, 0.0, 0],
       ),
     };
-  }, [editTransition?.value]);
+  });
 
   return (
     <Animated.View

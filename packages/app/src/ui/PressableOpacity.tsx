@@ -38,7 +38,7 @@ const PressableOpacity = (
     return {
       opacity: opacityValue.value,
     };
-  }, [opacityValue]);
+  });
 
   const onFadeIn = () => {
     opacityValue.value = withTiming(activeOpacity, {

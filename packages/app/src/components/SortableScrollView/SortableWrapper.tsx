@@ -226,7 +226,7 @@ const SortableWrapper = ({
       zIndex: moving ? 1 : 0,
       shadowOpacity: withSpring(moving ? 0.2 : 0),
     };
-  }, [moving]);
+  });
 
   return (
     <Animated.View style={[styles.root, animatedStyle]}>

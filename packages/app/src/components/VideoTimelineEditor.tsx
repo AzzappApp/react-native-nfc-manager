@@ -124,7 +124,7 @@ const VideoTimelineEditor = ({
       right: sliderWidth - rightPosition.value,
       height: imagesHeight + 4,
     };
-  }, [leftPosition.value, rightPosition.value]);
+  });
 
   const eventHandler = useAnimatedGestureHandler<
     PanGestureHandlerGestureEvent,

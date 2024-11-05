@@ -150,10 +150,9 @@ export const ContactCardComponent = ({
     layoutWidth.value = nativeEvent.layout.width - 40; // remove the margins
   };
 
-  const animatedFooterWidth = useAnimatedStyle(
-    () => ({ width: layoutWidth.value }),
-    [],
-  );
+  const animatedFooterWidth = useAnimatedStyle(() => ({
+    width: layoutWidth.value,
+  }));
 
   if (!contactCard || !webCard) {
     return null;

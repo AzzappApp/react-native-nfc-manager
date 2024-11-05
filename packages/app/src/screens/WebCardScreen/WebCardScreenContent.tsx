@@ -323,7 +323,7 @@ const WebCardScreenContent = ({
     return {
       opacity: editTransition?.value ? 0 : 1,
     };
-  }, []);
+  });
 
   const hasFocus = useScreenHasFocus();
 

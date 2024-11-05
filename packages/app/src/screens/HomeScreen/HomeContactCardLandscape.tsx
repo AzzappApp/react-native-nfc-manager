@@ -124,12 +124,9 @@ const HomeContactCardLandscape = ({
     return () => subscription.remove();
   }, [visibleSharedValue]);
 
-  const animatedStyle = useAnimatedStyle(
-    () => ({
-      opacity: profile?.invited ? 0 : visibleSharedValue.value,
-    }),
-    [profile?.invited],
-  );
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: profile?.invited ? 0 : visibleSharedValue.value,
+  }));
 
   useMainTabBarVisibilityController(
     tabBarVisibleSharedValue,

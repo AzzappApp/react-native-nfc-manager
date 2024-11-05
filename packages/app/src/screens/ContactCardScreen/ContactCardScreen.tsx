@@ -118,57 +118,44 @@ export const ContactCardScreen = ({
     setTopCardY(topYAfterScale);
   };
 
-  const animatedContactCardStyle = useAnimatedStyle(
-    () => ({
-      zIndex: 10,
-      transform: [
-        {
-          scale: interpolate(
-            sharedRotationState.value,
-            [0, 1],
-            [1, fullScreenCardWidth / cardHeight],
-          ),
-        },
-        {
-          translateY: interpolate(
-            sharedRotationState.value,
-            [0, 1],
-            [0, topCardY / 2 + (height - fullScreenCardHeight) / 4],
-          ),
-        },
-        {
-          rotate: `${interpolate(
-            sharedRotationState.value,
-            [0, 1],
-            [0, -90],
-          )}deg`,
-        },
-      ],
-    }),
-    [sharedRotationState.value, cardWidth, width, topCardY],
-  );
+  const animatedContactCardStyle = useAnimatedStyle(() => ({
+    zIndex: 10,
+    transform: [
+      {
+        scale: interpolate(
+          sharedRotationState.value,
+          [0, 1],
+          [1, fullScreenCardWidth / cardHeight],
+        ),
+      },
+      {
+        translateY: interpolate(
+          sharedRotationState.value,
+          [0, 1],
+          [0, topCardY / 2 + (height - fullScreenCardHeight) / 4],
+        ),
+      },
+      {
+        rotate: `${interpolate(
+          sharedRotationState.value,
+          [0, 1],
+          [0, -90],
+        )}deg`,
+      },
+    ],
+  }));
 
-  const footerStyle = useAnimatedStyle(
-    () => ({
-      transform: [
-        {
-          translateY: interpolate(
-            sharedRotationState.value,
-            [0, 1],
-            [0, height],
-          ),
-        },
-      ],
-    }),
-    [sharedRotationState.value],
-  );
+  const footerStyle = useAnimatedStyle(() => ({
+    transform: [
+      {
+        translateY: interpolate(sharedRotationState.value, [0, 1], [0, height]),
+      },
+    ],
+  }));
 
-  const headerStyle = useAnimatedStyle(
-    () => ({
-      opacity: interpolate(sharedRotationState.value, [0, 1], [1, 0]),
-    }),
-    [sharedRotationState.value],
-  );
+  const headerStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(sharedRotationState.value, [0, 1], [1, 0]),
+  }));
 
   const ref = useRef<View>(null);
   const generateEmail = useCallback(async () => {
