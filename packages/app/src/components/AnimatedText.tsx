@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { TextInput, View } from 'react-native';
 import Animated, { useAnimatedProps } from 'react-native-reanimated';
 import { useVariantStyleSheet } from '#helpers/createStyles';
@@ -49,27 +48,20 @@ const AnimatedText = ({
   appearance,
   maxLength,
   animatedTextColor,
-  ...props
+  text,
+  style,
 }: TextProps) => {
   const styles = useVariantStyleSheet(textStyleSheet, variant, appearance);
 
-  const { text, style } = { style: {}, ...props };
-  const [defaultValue, setDefaultValue] = useState<string | null>(null);
-  useEffect(() => {
-    setDefaultValue(
+  const animatedProps = useAnimatedProps(() => {
+    const textValue =
       !maxLength || text.value.length < maxLength
         ? text.value
-        : `${text.value.slice(0, maxLength)}...`,
-    );
-  }, [maxLength, text]);
-
-  const animatedProps = useAnimatedProps(() => {
+        : `${text.value.slice(0, maxLength)}...`;
+    // Here we use any because the text prop is not available in the type
     let result = {
-      text:
-        !maxLength || text.value.length < maxLength
-          ? text.value
-          : `${text.value.slice(0, maxLength)}...`,
-      // Here we use any because the text prop is not available in the type
+      text: textValue,
+      defaultValue: textValue,
     } as any;
     if (animatedTextColor) {
       result = { ...result, color: animatedTextColor?.value };
@@ -80,7 +72,6 @@ const AnimatedText = ({
   return (
     <View pointerEvents="box-only" style={containerStyle}>
       <AnimatedTextInput
-        defaultValue={defaultValue ?? undefined}
         accessible={false}
         accessibilityRole="text"
         underlineColorAndroid="transparent"
