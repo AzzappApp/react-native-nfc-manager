@@ -51,6 +51,7 @@ import relayScreen from '#helpers/relayScreen';
 import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import useAnimatedState from '#hooks/useAnimatedState';
+import useBoolean from '#hooks/useBoolean';
 import {
   UPDATE_CONTACT_CARD_SCANS,
   useWebCardViewStatistic,
@@ -154,12 +155,13 @@ const WebCardScreen = ({
 
   const [editing, toggleEditing] = useToggle(canEdit && params.editing);
   const [selectionMode, toggleSelectionMode] = useToggle(false);
-  const [showWebcardModal, toggleWebcardModal] = useToggle(false);
+  const [showWebcardModal, openWebcardModal, closeWebcardModal] =
+    useBoolean(false);
 
   const onShowWebcardModal = useCallback(() => {
     Toast.hide();
-    toggleWebcardModal();
-  }, [toggleWebcardModal]);
+    openWebcardModal();
+  }, [openWebcardModal]);
 
   const [isAtTop, setIsAtTop] = useState(true);
   const onContentPositionChange = useCallback((atTop: boolean) => {
@@ -449,7 +451,7 @@ const WebCardScreen = ({
         <WebCardMenu
           visible={showWebcardModal}
           webCard={data.webCard}
-          close={toggleWebcardModal}
+          close={closeWebcardModal}
           onToggleFollow={toggleFollow}
           isViewer={isViewer}
           isOwner={isWebCardOwner}
