@@ -1,5 +1,7 @@
-## 1.4.0-canary.43
+## 1.4.0-canary.44
 
+* **fix:**  - 🐛 properly display bottomsheet for font color & family ([#5725](https://github.com/AzzappApp/azzapp/pull/5725))
+* **fix:**  - add missing fields in offline vcard and restore color set ([#5720](https://github.com/AzzappApp/azzapp/pull/5720))
 * **fix:**  - don't play video cover in cartouche ([#5722](https://github.com/AzzappApp/azzapp/pull/5722))
 * **fix:**  - add an option to open select Webcard in offline mode ([#5719](https://github.com/AzzappApp/azzapp/pull/5719))
 * **fix:**  - review thread access to avoid bad usage of shared Values ([#5715](https://github.com/AzzappApp/azzapp/pull/5715))
