@@ -1,5 +1,7 @@
-## 1.4.0-canary.44
+## 1.4.0-canary.45
 
+* **fix:**  - **android:** [#5684](https://github.com/AzzappApp/azzapp/pull/5684) keyboard mgmt on contact card edit form ([#5729](https://github.com/AzzappApp/azzapp/pull/5729))
+* **fix:**  - **android:** [#5681](https://github.com/AzzappApp/azzapp/pull/5681) use gestureHandler pressable for button on android ([#5727](https://github.com/AzzappApp/azzapp/pull/5727))
 * **fix:**  - 🐛 properly display bottomsheet for font color & family ([#5725](https://github.com/AzzappApp/azzapp/pull/5725))
 * **fix:**  - add missing fields in offline vcard and restore color set ([#5720](https://github.com/AzzappApp/azzapp/pull/5720))
 * **fix:**  - don't play video cover in cartouche ([#5722](https://github.com/AzzappApp/azzapp/pull/5722))
