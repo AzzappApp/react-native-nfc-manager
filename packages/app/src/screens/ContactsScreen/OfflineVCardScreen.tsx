@@ -336,15 +336,14 @@ const OfflineVCardScreen = () => {
 
   const getItemLayout = useCallback(
     (_data: unknown, index: number) => ({
-      length: itemWidth + itemMargin,
-      offset: (itemWidth + itemMargin) * index,
+      length: itemWidth + itemMargin / 2,
+      offset: (itemWidth + itemMargin / 2) * index,
       index,
     }),
     [itemMargin, itemWidth],
   );
   const snapToOffsets = useMemo(
-    () =>
-      vcardList.map((_, index) => (itemWidth + itemMargin / 2) * (index + 1)),
+    () => vcardList.map((_, index) => (itemWidth + itemMargin / 2) * index),
     [itemMargin, itemWidth, vcardList],
   );
 
@@ -488,7 +487,6 @@ const OfflineVCardScreen = () => {
             keyExtractor={keyExtractor}
             getItemLayout={getItemLayout}
             scrollEventThrottle={16}
-            snapToInterval={itemWidth}
             decelerationRate="fast"
             snapToAlignment="start"
             disableIntervalMomentum
