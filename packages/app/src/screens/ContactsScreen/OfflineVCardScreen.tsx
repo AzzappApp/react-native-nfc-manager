@@ -113,12 +113,17 @@ const OfflineVCardScreen = () => {
           const webCard = data.webCard;
           if (!webCard || !webCard.cardIsPublished) return undefined;
           const vCard = new VCard();
-          const name =
-            `${contactCard.firstName} ${contactCard.lastName}`.trim();
-          if (name.length) {
-            vCard.addName(name);
-          }
+          vCard.addName(
+            contactCard.lastName ?? undefined,
+            contactCard.firstName ?? undefined,
+          );
 
+          if (contactCard.title) {
+            vCard.addJobtitle(contactCard.title);
+          }
+          if (contactCard.birthday && contactCard.birthday?.selected) {
+            vCard.addBirthday(contactCard.birthday?.birthday.toString());
+          }
           contactCard.phoneNumbers?.forEach(number => {
             if (number.selected)
               vCard.addPhoneNumber(number.number, number.label || '');
@@ -130,7 +135,13 @@ const OfflineVCardScreen = () => {
           contactCard.urls?.forEach(url => {
             if (url.selected) vCard.addURL(url.address);
           });
-
+          contactCard?.socials?.forEach(social => {
+            if (social.selected)
+              vCard.addSocial(social.url, social.label || '');
+          });
+          contactCard?.addresses?.forEach(addr => {
+            if (addr.selected) vCard.addAddress(addr.address, addr.label || '');
+          });
           if (webCard?.isMultiUser) {
             webCard?.commonInformation?.phoneNumbers?.forEach(number => {
               vCard.addPhoneNumber(number.number, number.label || '');
@@ -141,8 +152,13 @@ const OfflineVCardScreen = () => {
             webCard?.commonInformation?.urls?.forEach(url => {
               vCard.addURL(url.address);
             });
+            webCard?.commonInformation?.socials?.forEach(social => {
+              vCard.addSocial(social.url, social.label || '');
+            });
+            webCard?.commonInformation?.addresses?.forEach(addr => {
+              vCard.addAddress(addr.address, addr.label || '');
+            });
           }
-
           if (webCard?.userName) vCard.addURL(buildUserUrl(webCard?.userName));
 
           const company =
@@ -455,6 +471,10 @@ const QRCode = ({ value, width }: { width: number; value: string }) => {
         type: 'svg',
         width,
         margin: 0,
+        color: {
+          dark: colors.white,
+          light: colors.black,
+        },
       });
       setQrCode(qrCode);
     };
