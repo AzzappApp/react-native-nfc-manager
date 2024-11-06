@@ -356,7 +356,7 @@ const ContactCardEditScreen = ({
     <Container style={styles.container}>
       <SafeAreaView
         style={{ flex: 1 }}
-        edges={{ bottom: 'off', top: 'additive' }}
+        edges={{ bottom: 'additive', top: 'additive' }}
       >
         <Header
           middleElement={

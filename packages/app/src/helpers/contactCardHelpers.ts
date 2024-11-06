@@ -40,7 +40,6 @@ export const buildContactCardModalStyleSheet = (appareance: ColorSchemeName) =>
     },
     sectionsContainer: {
       rowGap: 1,
-      paddingBottom: 20,
     },
     input: {
       flex: 1,

@@ -2,6 +2,7 @@ import LottieView from 'lottie-react-native';
 import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { View, StyleSheet, useWindowDimensions } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '#theme';
 import Text from '#ui/Text';
 import Button from './Button';
@@ -36,6 +37,9 @@ const UploadProgressModal = ({
   const nbProgressPars = progressIndicators?.length ?? 1;
   const elementsWidth =
     (windowWidth * 0.62 - (nbProgressPars - 1) * 2) / nbProgressPars;
+
+  const { bottom } = useSafeAreaInsets();
+
   return (
     <View style={styles.container}>
       <LottieView
@@ -69,7 +73,7 @@ const UploadProgressModal = ({
         )}
       </View>
       {onCancel && (
-        <View style={styles.cancelButtonContainer}>
+        <View style={[styles.cancelButtonContainer, { bottom: bottom + 42 }]}>
           <Button
             variant="secondary"
             onPress={onCancel}
@@ -140,7 +144,6 @@ const styles = StyleSheet.create({
     lineHeight: 36,
   },
   cancelButtonContainer: {
-    bottom: 42,
     left: 0,
     width: '100%',
     alignItems: 'center',
