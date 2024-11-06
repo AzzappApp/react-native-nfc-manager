@@ -82,7 +82,7 @@ const CoverRenderer = (
     width = 125,
     large,
     style,
-    canPlay = true,
+    canPlay = false,
     paused = false,
     useAnimationSnapshot,
     mediaRef,
