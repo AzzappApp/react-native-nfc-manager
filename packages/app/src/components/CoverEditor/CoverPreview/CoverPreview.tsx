@@ -687,12 +687,8 @@ const CoverPreview = ({
   /**
    * Dispatch the result of a gesture on a layer
    */
-  const dispatchGestureResult = useCallback(() => {
-    if (!activeLayerBounds.value) {
-      return;
-    }
-    const { bounds, rotation } = activeLayerBounds.value;
-    runOnJS(() => {
+  const dispatchGestureResult = useCallback(
+    (bounds: SkRect, rotation: number) => {
       if (activeLayer.kind === 'overlay') {
         dispatch({
           type: 'UPDATE_OVERLAY_LAYER',
@@ -728,8 +724,9 @@ const CoverPreview = ({
           },
         });
       }
-    })();
-  }, [activeLayer, activeLayerBounds, dispatch, editedTextFontSize]);
+    },
+    [activeLayer, dispatch, editedTextFontSize],
+  );
 
   /**
    * Callback to handle the end of a gesture on a layer
@@ -737,8 +734,12 @@ const CoverPreview = ({
   const handleLayerGestureEnd = useCallback(() => {
     'worklet';
     // we need to define the function outside of the worklet to avoid reanimated error
-    runOnJS(dispatchGestureResult)();
-  }, [dispatchGestureResult]);
+    if (!activeLayerBounds.value) {
+      return;
+    }
+    const { bounds, rotation } = activeLayerBounds.value;
+    runOnJS(dispatchGestureResult)(bounds, rotation);
+  }, [activeLayerBounds, dispatchGestureResult]);
 
   /**
    * The position of the gesture handler used to capture the gestures
