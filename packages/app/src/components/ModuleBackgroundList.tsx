@@ -10,7 +10,6 @@ import {
 import { graphql, useFragment } from 'react-relay';
 import {
   COVER_ANIMATION_DURATION,
-  COVER_CARD_RADIUS,
   COVER_RATIO,
 } from '@azzapp/shared/coverHelpers';
 import { keyExtractor } from '#helpers/idHelpers';
@@ -170,9 +169,7 @@ const ModuleBackgroundListItem = ({
   return (
     <View
       style={{
-        height: '100%',
-        borderRadius: width * COVER_CARD_RADIUS,
-        overflow: 'hidden',
+        flex: 1,
         aspectRatio: imageRatio,
         backgroundColor,
       }}
