@@ -1,4 +1,4 @@
-## 1.4.0-canary.45
+## 1.4.0-canary.46
 
 * **fix:**  - **android:** [#5684](https://github.com/AzzappApp/azzapp/pull/5684) keyboard mgmt on contact card edit form ([#5729](https://github.com/AzzappApp/azzapp/pull/5729))
 * **fix:**  - **android:** [#5681](https://github.com/AzzappApp/azzapp/pull/5681) use gestureHandler pressable for button on android ([#5727](https://github.com/AzzappApp/azzapp/pull/5727))
