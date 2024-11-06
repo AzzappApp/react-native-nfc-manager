@@ -1,5 +1,6 @@
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Platform } from 'react-native';
+import { createDeferred } from '@azzapp/shared/asyncHelpers';
 import useLatestCallback from '#hooks/useLatestCallback';
 import { RouterContext, ScreenRendererContext } from './routerContexts';
 import type { NativeNavigationEvent } from './routerTypes';
@@ -110,4 +111,17 @@ export const useModalInterceptor = (callback: () => Promise<void>) => {
 export const useDidAppear = () => {
   const { didAppear } = useContext(ScreenRendererContext);
   return didAppear;
+};
+
+export const useSuspendUntilAppear = (enabled = true) => {
+  const didAppear = useDidAppear();
+  const deferred = useMemo(() => createDeferred<boolean>(), []);
+  useEffect(() => {
+    if (didAppear || !enabled) {
+      deferred.resolve(true);
+    }
+  }, [didAppear, deferred, enabled]);
+  if (!didAppear && enabled) {
+    throw deferred.promise;
+  }
 };

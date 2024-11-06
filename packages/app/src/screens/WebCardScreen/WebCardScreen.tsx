@@ -413,14 +413,16 @@ const WebCardScreen = ({
               pointerEvents={showPost ? 'box-none' : 'none'}
             >
               <Suspense>
-                <WebCardPostsList
-                  toggleFlip={toggleFlip}
-                  isViewer={isViewer}
-                  webCardId={data.webCard.id}
-                  hasFocus={hasFocus && showPost && ready}
-                  userName={data.webCard.userName!}
-                  viewerWebCard={data.profile.webCard}
-                />
+                {(showPost || ready) && (
+                  <WebCardPostsList
+                    toggleFlip={toggleFlip}
+                    isViewer={isViewer}
+                    webCardId={data.webCard.id}
+                    hasFocus={hasFocus && showPost && ready}
+                    userName={data.webCard.userName!}
+                    viewerWebCard={data.profile.webCard}
+                  />
+                )}
               </Suspense>
             </Animated.View>
           </View>
