@@ -692,11 +692,12 @@ const CoverEditorCore = (
       length: durations?.length ?? 0,
     }).fill(null);
 
+    let nonEditableCount = 0;
     coverEditorState.providedMedias.forEach(providedMedia => {
       if (providedMedia.editable) {
         const { media } = providedMedia.media;
 
-        initial[providedMedia.index] =
+        initial[providedMedia.index - nonEditableCount] =
           (providedMedia.index,
           0,
           {
@@ -705,6 +706,8 @@ const CoverEditorCore = (
             uri: media.uri,
             width: media.width,
           });
+      } else {
+        nonEditableCount++;
       }
     });
 

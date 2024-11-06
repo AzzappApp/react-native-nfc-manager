@@ -310,7 +310,8 @@ const CoverEditorMediaPicker = ({
   };
 
   const handleOnFinished = () => {
-    if (selectedMedias.length === 0) {
+    const validMediaCount = selectedMedias.filter(Boolean).length;
+    if (validMediaCount === 0) {
       Alert.alert(
         intl.formatMessage({
           defaultMessage: 'No media selected',
