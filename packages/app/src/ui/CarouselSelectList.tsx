@@ -130,7 +130,7 @@ function CarouselSelectList<TItem = any>(
   }: CarouselSelectListProps<TItem>,
   ref: ForwardedRef<CarouselSelectListHandle>,
 ) {
-  const scrollIndex = useSharedValue(0);
+  const scrollIndex = useSharedValue(props.initialScrollIndex ?? 0);
 
   const containerRef = useRef<View | null>(null);
   const [containerHeight, setContainerHeight] = useState<number | null>(null);
@@ -176,6 +176,15 @@ function CarouselSelectList<TItem = any>(
     }),
     [itemWidth],
   );
+
+  useEffect(() => {
+    if (itemWidth != null) {
+      listRef.current?.scrollToOffset({
+        offset: scrollIndex.value * itemWidth,
+        animated: false,
+      });
+    }
+  }, [itemWidth, scrollIndex]);
 
   const isForeground = useIsForeground();
   const prevIsForeground = useRef(isForeground);
