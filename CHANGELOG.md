@@ -1,5 +1,8 @@
-## 1.4.0-canary.46
+## 1.4.0-canary.47
 
+* **fix:**  - webCard bottom sheet don't close from bottom sheet header button ([#5741](https://github.com/AzzappApp/azzapp/pull/5741))
+* **fix:**  - **web:** [#5697](https://github.com/AzzappApp/azzapp/pull/5697) bypass vercel protection on revalidate ([#5732](https://github.com/AzzappApp/azzapp/pull/5732))
+* **fix:**  - 🐛 properly use insets ([#5731](https://github.com/AzzappApp/azzapp/pull/5731))
 * **fix:**  - **android:** [#5684](https://github.com/AzzappApp/azzapp/pull/5684) keyboard mgmt on contact card edit form ([#5729](https://github.com/AzzappApp/azzapp/pull/5729))
 * **fix:**  - **android:** [#5681](https://github.com/AzzappApp/azzapp/pull/5681) use gestureHandler pressable for button on android ([#5727](https://github.com/AzzappApp/azzapp/pull/5727))
 * **fix:**  - 🐛 properly display bottomsheet for font color & family ([#5725](https://github.com/AzzappApp/azzapp/pull/5725))
