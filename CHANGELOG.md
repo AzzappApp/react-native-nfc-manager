@@ -1,5 +1,6 @@
-## 1.4.0-canary.52
+## 1.4.0-canary.53
 
+* **fix:**  - links edition ([#5700](https://github.com/AzzappApp/azzapp/pull/5700))
 * **fix:**  - snapToOff computation & itemLayout to fix long list bad position ([#5753](https://github.com/AzzappApp/azzapp/pull/5753))
 * **fix:**  - **WebCardScreen:** apparition perf on android ([#5751](https://github.com/AzzappApp/azzapp/pull/5751))
 * **fix:**  - add useCallback in permission hook to avoid useEffect recall ([#5750](https://github.com/AzzappApp/azzapp/pull/5750))
