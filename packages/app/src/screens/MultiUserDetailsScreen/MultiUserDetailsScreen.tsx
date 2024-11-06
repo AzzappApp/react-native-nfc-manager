@@ -23,7 +23,9 @@ import ERRORS from '@azzapp/shared/errors';
 import { colors } from '#theme';
 import { CancelHeaderButton } from '#components/commonsButtons';
 import { useRouter, type ScreenOptions } from '#components/NativeRouter';
-import ProfileStatisticsChart from '#components/ProfileStatisticsChart';
+import ProfileStatisticsChart, {
+  normalizeArray,
+} from '#components/ProfileStatisticsChart';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getFileName } from '#helpers/fileHelpers';
 import { keyExtractor } from '#helpers/idHelpers';
@@ -430,11 +432,14 @@ const MultiUserDetailsScreen = ({
       return [];
     }
     const result = Array.from({ length: 30 }, (_, i) => {
-      const d = new Date(new Date().toISOString().split('T')[0]);
-      d.setDate(d.getDate() - 30 + i + 1);
+      const date = new Date();
+      date.setUTCDate(date.getUTCDate() - 29 + i); // Adjust the date to get the last 30 days
+      const utcDate = new Date(
+        Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()),
+      );
 
       return {
-        day: d.toISOString(),
+        day: utcDate.toISOString(),
         data: 0,
       };
     });
@@ -446,7 +451,7 @@ const MultiUserDetailsScreen = ({
         }
       }
     });
-    return result.map(item => item.data);
+    return normalizeArray(result.map(item => item.data));
   }, [profile?.statsSummary]);
 
   if (!profileInfos?.profileId || profile == null) return null;

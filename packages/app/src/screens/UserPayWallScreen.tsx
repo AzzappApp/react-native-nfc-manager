@@ -107,51 +107,40 @@ const UserPayWallScreen = ({ route }: NativeScreenProps<UserPayWallRoute>) => {
 
   const processOrder = useCallback(async () => {
     const { profileInfos } = getAuthState();
-    if (selectedPurchasePackage && profileInfos) {
-      try {
-        setProcessing(true);
+    const webCardId = profileInfos?.webCardId;
+    if (!selectedPurchasePackage || !webCardId) {
+      return;
+    }
+    try {
+      setProcessing(true);
 
-        const res = await Purchases.purchasePackage(selectedPurchasePackage!);
-        // Update Relay cache temporary
-        if (res.customerInfo.entitlements.active?.multiuser?.isActive) {
-          if (route.params?.activateFeature === 'MULTI_USER') {
-            setAllowMultiUser(true);
-          }
-          commitLocalUpdate(getRelayEnvironment(), store => {
-            store.get(profileInfos.webCardId)?.setValue(true, 'isPremium');
-          });
+      const res = await Purchases.purchasePackage(selectedPurchasePackage!);
+      // Update Relay cache temporary
+      if (res.customerInfo.entitlements.active?.multiuser?.isActive) {
+        if (route.params?.activateFeature === 'MULTI_USER') {
+          setAllowMultiUser(true);
         }
-        setProcessing(false);
-        router.back();
-      } catch (error) {
-        //display error message
-        setProcessing(false);
-        //@ts-expect-error error code is not in the type
-        const errorCode = error?.code;
-        if (errorCode === '6') {
-          //This product is already active for the user
-          return;
-        }
-        if (errorCode === '1') {
-          //purchase was cancelled
-          return;
-        }
-        if (errorCode === '7') {
-          // There is already another active subscriber using the same receipt.
-          Alert.alert(
-            intl.formatMessage({
-              defaultMessage: 'Error during processing payment',
-              description: 'Title of the payment process error alert',
-            }),
-            intl.formatMessage({
-              defaultMessage:
-                'There is already a subscription from your Apple or Google account associated to another azzapp account. You need to cancel the subscription from the other account to proceed.',
-              description: 'Description of the payment process error alert',
-            }),
-          );
-          return;
-        }
-
+        commitLocalUpdate(getRelayEnvironment(), store => {
+          store.get(webCardId)?.setValue(true, 'isPremium');
+        });
+      }
+      setProcessing(false);
+      router.back();
+    } catch (error) {
+      //display error message
+      setProcessing(false);
+      //@ts-expect-error error code is not in the type
+      const errorCode = error?.code;
+      if (errorCode === '6') {
+        //This product is already active for the user
+        return;
+      }
+      if (errorCode === '1') {
+        //purchase was cancelled
+        return;
+      }
+      if (errorCode === '7') {
+        // There is already another active subscriber using the same receipt.
         Alert.alert(
           intl.formatMessage({
             defaultMessage: 'Error during processing payment',
@@ -159,12 +148,25 @@ const UserPayWallScreen = ({ route }: NativeScreenProps<UserPayWallRoute>) => {
           }),
           intl.formatMessage({
             defaultMessage:
-              'There was an error during the payment process, please try again later.',
+              'There is already a subscription from your Apple or Google account associated to another azzapp account. You need to cancel the subscription from the other account to proceed.',
             description: 'Description of the payment process error alert',
           }),
         );
-        Sentry.captureException(error, { data: 'userPayWallScreen' });
+        return;
       }
+
+      Alert.alert(
+        intl.formatMessage({
+          defaultMessage: 'Error during processing payment',
+          description: 'Title of the payment process error alert',
+        }),
+        intl.formatMessage({
+          defaultMessage:
+            'There was an error during the payment process, please try again later.',
+          description: 'Description of the payment process error alert',
+        }),
+      );
+      Sentry.captureException(error, { data: 'userPayWallScreen' });
     }
   }, [
     intl,
@@ -188,7 +190,7 @@ const UserPayWallScreen = ({ route }: NativeScreenProps<UserPayWallRoute>) => {
     const restore = await Purchases.restorePurchases();
     if (restore.entitlements.active?.multiuser?.isActive) {
       commitLocalUpdate(getRelayEnvironment(), store => {
-        if (profileInfos)
+        if (profileInfos?.webCardId)
           store.get(profileInfos.webCardId)?.setValue(true, 'isPremium');
       });
     }

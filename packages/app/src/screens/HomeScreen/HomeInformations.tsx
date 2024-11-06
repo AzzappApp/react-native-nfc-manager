@@ -12,11 +12,11 @@ import {
   Text,
   vec,
 } from '@shopify/react-native-skia';
+import concat from 'lodash/concat';
 import React, { memo, Suspense, useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { Pressable, View } from 'react-native';
 import Animated, {
-  interpolate,
   interpolateColor,
   useAnimatedProps,
   useDerivedValue,
@@ -27,6 +27,7 @@ import { useFragment, graphql } from 'react-relay';
 import { convertHexToRGBA } from '@azzapp/shared/colorsHelpers';
 import { useRouter } from '#components/NativeRouter';
 import { useApplicationSkiaFont } from '#hooks/useApplicationFonts';
+import { useIndexInterpolation } from './homeHelpers';
 import { useHomeScreenContext } from './HomeScreenContext';
 import type { HomeInformations_user$key } from '#relayArtifacts/HomeInformations_user.graphql';
 import type { IntlShape } from 'react-intl';
@@ -82,127 +83,86 @@ const HomeInformations = ({
     user,
   );
 
-  const nbContactsValue = useMemo(
-    () => [0, ...(profiles?.map(({ nbContacts }) => nbContacts ?? 0) ?? [])],
-    [profiles],
-  );
-
-  const nbLikesValue = useMemo(
-    () => [
-      0,
-      ...(profiles?.map(({ webCard }) => webCard?.nbPostsLiked ?? 0) ?? []),
-    ],
-    [profiles],
-  );
-  const nbFollowersValue = useMemo(
-    () => [
-      0,
-      ...(profiles?.map(({ webCard }) => webCard?.nbFollowers ?? 0) ?? []),
-    ],
-    [profiles],
-  );
-
-  const nbFollowingsValue = useMemo(
-    () => [
-      0,
-      ...(profiles?.map(({ webCard }) => webCard?.nbFollowings ?? 0) ?? []),
-    ],
-    [profiles],
-  );
-
-  const nbPostsValue = useMemo(
-    () => [0, ...(profiles?.map(({ webCard }) => webCard?.nbPosts ?? 0) ?? [])],
-    [profiles],
-  );
-
-  const primaryColorValue = useMemo(
-    () => [
-      '#000000',
-      ...(profiles?.map(
-        ({ webCard }) => webCard?.cardColors?.primary ?? '#000000',
-      ) ?? []),
-    ],
-    [profiles],
-  );
-  const {
-    currentIndexSharedValue,
-    currentIndexProfileSharedValue,
-    inputRange,
-  } = useHomeScreenContext();
-
-  const animatedData = useDerivedValue(() => {
-    const actual = currentIndexSharedValue.value;
-    if (actual >= 0 && inputRange && inputRange.value.length > 1) {
-      return {
-        nbLikes: interpolate(actual, inputRange.value, nbLikesValue),
-        nbPosts: interpolate(actual, inputRange.value, nbPostsValue),
-        nbFollowers: interpolate(actual, inputRange.value, nbFollowersValue),
-        nbFollowings: interpolate(actual, inputRange.value, nbFollowingsValue),
-        nbContacts: interpolate(actual, inputRange.value, nbContactsValue),
-        primaryColor: interpolateColor(
-          actual,
-          inputRange.value,
-          primaryColorValue,
-        ),
-      };
-    } else if (actual >= 0) {
-      return {
-        nbPosts: nbPostsValue[actual],
-        nbLikes: nbLikesValue[actual],
-        nbFollowers: nbFollowersValue[actual],
-        nbFollowings: nbFollowingsValue[actual],
-        nbContacts: nbContactsValue[actual],
-        primaryColor: primaryColorValue[actual],
-      };
-    }
-    return {
-      nbPosts: 0,
-      nbLikes: 0,
-      nbFollowers: 0,
-      nbFollowings: 0,
-      nbContacts: 0,
-      primaryColor: '#00000000',
-    };
-  });
-
   const intl = useIntl();
 
-  const nbPosts = useDerivedValue(() => format(animatedData.value.nbPosts));
+  const { currentIndexProfileSharedValue, currentIndexSharedValue } =
+    useHomeScreenContext();
+
+  const nbPosts = useIndexInterpolation(
+    currentIndexSharedValue,
+    concat(0, profiles?.map(profile => profile.webCard?.nbPosts ?? 0) ?? []),
+    0,
+  );
+  const nbPostsLabel = useDerivedValue(() => format(nbPosts.value));
   const computePostLabels = usePrecomputedLabels(intl, getPostsLabel);
   const postsLabel = useDerivedValue(() =>
-    computePostLabels(Math.round(animatedData.value.nbPosts)),
+    computePostLabels(Math.round(nbPosts.value)),
   );
 
-  const nbLikes = useDerivedValue(() => format(animatedData.value.nbLikes));
+  const nbLikes = useIndexInterpolation(
+    currentIndexSharedValue,
+    concat(
+      0,
+      profiles?.map(profile => profile.webCard?.nbPostsLiked ?? 0) ?? [],
+    ),
+    0,
+  );
+  const nbLikesLabel = useDerivedValue(() => format(nbLikes.value));
   const computeLikesLabels = usePrecomputedLabels(intl, getLikesLabel);
   const likesLabel = useDerivedValue(() =>
-    computeLikesLabels(Math.round(animatedData.value.nbLikes)),
+    computeLikesLabels(Math.round(nbLikes.value)),
   );
 
-  const nbFollowers = useDerivedValue(() =>
-    format(animatedData.value.nbFollowers),
+  const nbFollowers = useIndexInterpolation(
+    currentIndexSharedValue,
+    concat(
+      0,
+      profiles?.map(profile => profile.webCard?.nbFollowers ?? 0) ?? [],
+    ),
+    0,
   );
+  const nbFollowersLabel = useDerivedValue(() => format(nbFollowers.value));
   const computeFollowersLabels = usePrecomputedLabels(intl, getFollowersLabel);
   const followersLabel = useDerivedValue(() =>
-    computeFollowersLabels(Math.round(animatedData.value.nbFollowers)),
+    computeFollowersLabels(Math.round(nbFollowers.value)),
   );
 
-  const nbFollowings = useDerivedValue(() =>
-    format(animatedData.value.nbFollowings),
+  const nbFollowings = useIndexInterpolation(
+    currentIndexSharedValue,
+    concat(
+      0,
+      profiles?.map(profile => profile.webCard?.nbFollowings ?? 0) ?? [],
+    ),
+    0,
   );
+  const nbFollowingsLabel = useDerivedValue(() => format(nbFollowings.value));
   const computeFollowingsLabels = usePrecomputedLabels(intl, getFollowingLabel);
   const followingsLabel = useDerivedValue(() =>
-    computeFollowingsLabels(Math.round(animatedData.value.nbFollowings)),
+    computeFollowingsLabels(Math.round(nbFollowings.value)),
   );
 
-  const nbContacts = useDerivedValue(() =>
-    format(animatedData.value.nbContacts),
+  const nbContacts = useIndexInterpolation(
+    currentIndexSharedValue,
+    concat(0, profiles?.map(profile => profile.nbContacts ?? 0) ?? []),
+    0,
   );
+  const nbContactsLabel = useDerivedValue(() => format(nbContacts.value));
   const computeContactsLabels = usePrecomputedLabels(intl, getContactsLabel);
   const contactsLabel = useDerivedValue(() =>
-    computeContactsLabels(Math.round(animatedData.value.nbContacts)),
+    computeContactsLabels(Math.round(nbContacts.value)),
   );
-  const primaryColor = useDerivedValue(() => animatedData.value.primaryColor);
+
+  const primaryColor = useIndexInterpolation<string>(
+    currentIndexSharedValue,
+    concat(
+      '#000000',
+      profiles?.map(
+        profile => profile.webCard?.cardColors?.primary ?? '#000000',
+      ) ?? [],
+    ),
+    '#000000',
+    interpolateColor,
+  );
 
   const router = useRouter();
   const goToPosts = useCallback(() => {
@@ -256,7 +216,7 @@ const HomeInformations = ({
           y={0}
           width={rectWidth}
           height={rectHeight}
-          value={nbPosts}
+          value={nbPostsLabel}
           label={postsLabel}
           onPress={goToPosts}
           renderBackground={({ color, width, height }) => (
@@ -275,7 +235,7 @@ const HomeInformations = ({
           y={0}
           width={rectWidth}
           height={rectHeight}
-          value={nbLikes}
+          value={nbLikesLabel}
           label={likesLabel}
           onPress={goToLikedPost}
           renderBackground={({ color, width, height }) => (
@@ -294,7 +254,7 @@ const HomeInformations = ({
           y={bottomRowY}
           width={rectWidth}
           height={rectHeight}
-          value={nbFollowers}
+          value={nbFollowersLabel}
           label={followersLabel}
           onPress={goToFollower}
           renderBackground={({ color, width, height }) => (
@@ -313,7 +273,7 @@ const HomeInformations = ({
           y={bottomRowY}
           width={rectWidth}
           height={rectHeight}
-          value={nbFollowings}
+          value={nbFollowingsLabel}
           label={followingsLabel}
           onPress={goToFollowing}
           renderBackground={({ color, width, height }) => (
@@ -333,7 +293,7 @@ const HomeInformations = ({
           y={height / 2 - CONTACT_BUTTON_RADIUS}
           width={CONTACT_BUTTON_RADIUS * 2}
           height={CONTACT_BUTTON_RADIUS * 2}
-          value={nbContacts}
+          value={nbContactsLabel}
           label={contactsLabel}
           onPress={goToContacts}
           radius={CONTACT_BUTTON_RADIUS}

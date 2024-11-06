@@ -28,19 +28,15 @@ export type ProfileInfos = {
   /**
    * the current user profile id
    */
-  profileId: string;
+  profileId: string | null;
   /**
    * the current user web card id
    */
-  webCardId: string;
+  webCardId: string | null;
   /**
    * the current user profile role
    */
-  profileRole: string;
-  /**
-   * the current user userName
-   */
-  userName: string;
+  profileRole: string | null;
   /**
    * the current user email
    */
@@ -253,11 +249,18 @@ export const getTokens = () => authTokens;
 export const hasBeenSignedIn = () =>
   storage.getBoolean(MMKVS_HAS_BEEN_SIGNED_IN);
 
-export const onChangeWebCard = async ({
-  profileId,
-  webCardId,
-  profileRole,
-}: any) => {
+export const onChangeWebCard = async (
+  infos?: {
+    profileId: string | null;
+    webCardId: string | null;
+    profileRole: string | null;
+  } | null,
+) => {
+  const { profileId, webCardId, profileRole } = infos ?? {
+    profileId: null,
+    webCardId: null,
+    profileRole: null,
+  };
   const profileInfos = getAuthState().profileInfos;
   if (
     profileInfos == null ||

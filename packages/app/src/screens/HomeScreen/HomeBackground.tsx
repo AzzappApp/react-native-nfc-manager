@@ -1,61 +1,15 @@
 import { memo, useMemo } from 'react';
-import {
-  interpolateColor,
-  useDerivedValue,
-  convertToRGBA,
-} from 'react-native-reanimated';
+import { interpolateColor } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
 import WebCardBackground from '#components/WebCardBackground';
+import { useIndexInterpolation } from './homeHelpers';
 import { useHomeScreenContext } from './HomeScreenContext';
 import type { HomeBackground_user$key } from '#relayArtifacts/HomeBackground_user.graphql';
 import type { SharedValue } from 'react-native-reanimated';
 
 type HomeBackgroundProps = {
   user: HomeBackground_user$key;
-};
-
-type HomeBackgroundComponentProps = {
-  darkColors: string[];
-  primaryColors: string[];
-  currentIndexSharedValue: SharedValue<number>;
-};
-
-export const HomeBackgroundComponent = ({
-  primaryColors,
-  darkColors,
-  currentIndexSharedValue,
-}: HomeBackgroundComponentProps) => {
-  const inputRange = useDerivedValue(
-    () => Array.from({ length: primaryColors.length ?? 0 }, (_, i) => i),
-    [primaryColors.length],
-  );
-  const skiaGradient = useDerivedValue(() => {
-    if (primaryColors.length > 1) {
-      return [
-        convertToRGBA(
-          interpolateColor(
-            currentIndexSharedValue.value,
-            inputRange.value,
-            primaryColors,
-          ),
-        ),
-        convertToRGBA(
-          interpolateColor(
-            currentIndexSharedValue.value,
-            inputRange.value,
-            darkColors,
-          ),
-        ),
-      ];
-    }
-    if (primaryColors.length > 0) {
-      return [primaryColors[0], darkColors[0]];
-    }
-    return ['#45444b', '#45444b'];
-  });
-
-  return <WebCardBackground colors={skiaGradient} />;
 };
 
 const HomeBackground = ({ user: userKey }: HomeBackgroundProps) => {
@@ -78,36 +32,56 @@ const HomeBackground = ({ user: userKey }: HomeBackgroundProps) => {
 
   const { currentIndexSharedValue } = useHomeScreenContext();
 
-  const primaryColors = useMemo(
+  const gradientColors = useMemo(
     () => [
-      colors.black,
-      ...(user.profiles ?? []).map(({ webCard }) => {
-        if (webCard?.cardColors?.primary) {
-          return webCard?.cardColors?.primary;
-        }
-        return '#45444b';
-      }),
-    ],
-    [user],
-  );
-
-  const darkColors = useMemo(
-    () => [
-      colors.black,
-      ...(user.profiles ?? []).map(
-        ({ webCard }) => webCard?.cardColors?.dark ?? colors.black,
-      ),
+      ['#45444b', colors.black],
+      ...(user.profiles ?? []).map(({ webCard }) => [
+        webCard?.cardColors?.primary ?? '#45444b',
+        webCard?.cardColors?.dark ?? colors.black,
+      ]),
     ],
     [user],
   );
 
   return (
     <HomeBackgroundComponent
-      primaryColors={primaryColors}
-      darkColors={darkColors}
+      gradientColors={gradientColors}
       currentIndexSharedValue={currentIndexSharedValue}
     />
   );
 };
 
 export default memo(HomeBackground);
+
+type HomeBackgroundComponentProps = {
+  gradientColors: string[][];
+  currentIndexSharedValue: SharedValue<number>;
+};
+
+export const HomeBackgroundComponent = ({
+  gradientColors,
+  currentIndexSharedValue,
+}: HomeBackgroundComponentProps) => {
+  const skiaGradient = useIndexInterpolation(
+    currentIndexSharedValue,
+    gradientColors,
+    ['#45444b', colors.black],
+    (value, inputRange, outputRange) => {
+      'worklet';
+      return [
+        interpolateColor(
+          value,
+          inputRange,
+          outputRange.map(c => c[0] ?? '#45444b'),
+        ),
+        interpolateColor(
+          value,
+          inputRange,
+          outputRange.map(c => c[1] ?? colors.black),
+        ),
+      ];
+    },
+  );
+
+  return <WebCardBackground colors={skiaGradient} />;
+};

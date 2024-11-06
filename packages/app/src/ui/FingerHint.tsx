@@ -8,7 +8,7 @@ type FingerHintProps = {
 };
 const FingerHint = ({ color, style }: FingerHintProps) => {
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, style]}>
       <LottieView
         source={
           color === 'dark'
@@ -17,7 +17,7 @@ const FingerHint = ({ color, style }: FingerHintProps) => {
         }
         autoPlay
         loop
-        style={[styles.lottie, style]}
+        style={styles.lottie}
       />
     </View>
   );
@@ -25,11 +25,13 @@ const FingerHint = ({ color, style }: FingerHintProps) => {
 
 export default memo(FingerHint);
 
+export const FINGER_HINT_HEIGHT = 187.5;
+export const FINGER_HINT_WIDTH = 150;
+
 const styles = StyleSheet.create({
   container: {
     width: 150,
     height: 187.5,
-    position: 'absolute',
     pointerEvents: 'none',
   },
   lottie: {

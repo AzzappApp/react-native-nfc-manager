@@ -263,13 +263,16 @@ const ContactsScreenLists = ({
     );
 
   useEffect(() => {
-    if (!profileInfos) return;
+    const profileId = profileInfos?.profileId;
+    if (!profileId) {
+      return;
+    }
     commitContactsLastView({
       variables: {
-        profileId: profileInfos.profileId,
+        profileId,
       },
       updater: store => {
-        const profile = store.get(profileInfos!.profileId);
+        const profile = store.get(profileId);
         profile?.setValue(0, 'nbNewContacts');
       },
     });
@@ -289,9 +292,13 @@ const ContactsScreenLists = ({
   );
 
   const onRemoveContacts = (contactIds: string[]) => {
+    const profileId = profileInfos?.profileId;
+    if (!profileId) {
+      return;
+    }
     commitRemoveContact({
       variables: {
-        profileId: profileInfos!.profileId,
+        profileId,
         input: {
           contactIds,
         },
@@ -303,7 +310,7 @@ const ContactsScreenLists = ({
               store.delete(removedContactId);
             },
           );
-          const profile = store.get(profileInfos!.profileId);
+          const profile = store.get(profileId);
           const nbContacts = profile?.getValue('nbContacts');
 
           if (typeof nbContacts === 'number') {

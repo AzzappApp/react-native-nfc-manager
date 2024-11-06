@@ -18,9 +18,21 @@ import Text from '#ui/Text';
 import type { DerivedValue } from 'react-native-reanimated';
 
 type ProfileStatisticsChartProps = {
+  /**
+   * The data to display in the chart, must be normalized between 0 and 1
+   */
   data: DerivedValue<number[]> | number[];
+  /**
+   * The width of the chart
+   */
   width: number;
+  /**
+   * The height of the chart
+   */
   height: number;
+  /**
+   * The variant of the chart (dark or light)
+   */
   variant?: 'dark' | 'light';
 };
 
@@ -67,7 +79,6 @@ const BarChart = ({
 }) => {
   const picture = useDerivedValue(() => {
     const data = Array.isArray(propData) ? propData : propData.value;
-    const maxValue = Math.max(...data);
     const barWidth =
       (width - CHART_BAR_SEPARATOR * (data.length - 1)) / data.length;
 
@@ -89,7 +100,7 @@ const BarChart = ({
         );
 
         data.forEach((value, index) => {
-          const barHeight = 5 + (value / maxValue) * (height - 5);
+          const barHeight = 5 + value * (height - 5);
           const x = index * (barWidth + CHART_BAR_SEPARATOR);
           const y = height - barHeight;
           canvas.drawRRect(
@@ -214,3 +225,14 @@ const stylesheet = createVariantsStyleSheet(() => ({
     },
   },
 }));
+
+/**
+ * A function to normalize an array of numbers, transforming them into a range between 0 and 1
+ * @param values The array of numbers to normalize
+ * @returns The normalized array
+ */
+export const normalizeArray = (values: number[]) => {
+  'worklet';
+  const maxValue = Math.max(...values);
+  return values.map(value => value / maxValue);
+};

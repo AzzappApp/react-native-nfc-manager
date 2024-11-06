@@ -1,5 +1,11 @@
+import { useEffect } from 'react';
 import { MMKV } from 'react-native-mmkv';
-import type { HomeScreenContext_user$data } from '#relayArtifacts/HomeScreenContext_user.graphql';
+import { useFragment } from 'react-relay';
+import { OfflineVCardScreenProfilesFragment } from '#screens/ContactsScreen/OfflineVCardScreen';
+import type {
+  OfflineVCardScreen_profiles$data,
+  OfflineVCardScreen_profiles$key,
+} from '#relayArtifacts/OfflineVCardScreen_profiles.graphql';
 
 /**
  * this module is used to manage Offline VCards
@@ -9,12 +15,18 @@ export const storage = new MMKV();
 
 const VCardDataKey = 'vcardData';
 
-export const saveOfflineVCard = async (data: HomeScreenContext_user$data) => {
-  const profiles: string = JSON.stringify(data);
-  storage.set(VCardDataKey, profiles);
+export const useSaveOfflineVCard = (
+  profilesKey: OfflineVCardScreen_profiles$key | null | undefined,
+) => {
+  const profiles = useFragment(OfflineVCardScreenProfilesFragment, profilesKey);
+  useEffect(() => {
+    if (profiles) {
+      storage.set(VCardDataKey, JSON.stringify(profiles));
+    }
+  }, [profiles]);
 };
 
-export const getOfflineVCard = (): HomeScreenContext_user$data => {
+export const getOfflineVCard = (): OfflineVCardScreen_profiles$data => {
   const data = storage.getString(VCardDataKey);
   return data ? JSON.parse(data) : undefined;
 };

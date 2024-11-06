@@ -13,6 +13,7 @@ import Animated, {
   useSharedValue,
 } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { graphql } from 'react-relay';
 import VCard from 'vcard-creator';
 import { getTextColor } from '@azzapp/shared/colorsHelpers';
 import { isDefined } from '@azzapp/shared/isDefined';
@@ -31,13 +32,13 @@ import { useProfileInfos } from '#hooks/authStateHooks';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { HomeBackgroundComponent } from '#screens/HomeScreen/HomeBackground';
 import { AnimatedHomeHeaderCentralComponent } from '#screens/HomeScreen/HomeHeader';
+import { useIndexInterpolation } from '#screens/HomeScreen/homeHelpers';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import { PageProgress } from '#ui/WizardPagerHeader';
 import OfflineHeader from './OfflineHeader';
-import type { HomeScreenContext_user$data } from '#relayArtifacts/HomeScreenContext_user.graphql';
 import type { OfflineVCardRoute } from '#routes';
 import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
 
@@ -58,6 +59,80 @@ type vCardData = {
 type renderItemProps = {
   item: vCardData;
 };
+
+export const OfflineVCardScreenProfilesFragment = graphql`
+  fragment OfflineVCardScreen_profiles on Profile @relay(plural: true) {
+    id
+    webCard {
+      id
+      isMultiUser
+      userName
+      cardIsPublished
+      commonInformation {
+        company
+        addresses {
+          address
+          label
+        }
+        emails {
+          label
+          address
+        }
+        phoneNumbers {
+          label
+          number
+        }
+        urls {
+          address
+        }
+        socials {
+          label
+          url
+        }
+      }
+      cardColors {
+        dark
+        primary
+        light
+      }
+      isPremium
+    }
+    contactCard {
+      firstName
+      lastName
+      title
+      company
+      emails {
+        label
+        address
+        selected
+      }
+      phoneNumbers {
+        label
+        number
+        selected
+      }
+      urls {
+        address
+        selected
+      }
+      addresses {
+        address
+        label
+        selected
+      }
+      birthday {
+        birthday
+        selected
+      }
+      socials {
+        url
+        label
+        selected
+      }
+    }
+  }
+`;
 
 const OfflineVCardScreen = () => {
   const router = useRouter();
@@ -104,10 +179,10 @@ const OfflineVCardScreen = () => {
   }, []);
 
   const vcardList: vCardData[] = useMemo(() => {
-    const offlineData: HomeScreenContext_user$data = getOfflineVCard();
+    const profiles = getOfflineVCard();
 
     return (
-      offlineData?.profiles
+      profiles
         ?.map(data => {
           const contactCard = data.contactCard as ContactCard;
           const webCard = data.webCard;
@@ -196,23 +271,16 @@ const OfflineVCardScreen = () => {
     return foundVCardId === -1 ? 0 : foundVCardId;
   }, [profileInfos?.webCardId, vcardList]);
 
-  const primaryColors = useMemo(
-    () =>
-      vcardList.length === 0
-        ? [colors.black]
-        : vcardList.map(({ primaryColor }) => primaryColor),
-    [vcardList],
-  );
   const userNames = useMemo(
     () => vcardList.map(({ name }) => name || ''),
     [vcardList],
   );
 
-  const darkColors = useMemo(
+  const gradientColors = useMemo(
     () =>
       vcardList.length === 0
-        ? [colors.black]
-        : vcardList.map(({ dark }) => dark),
+        ? [['#45444b', colors.black]]
+        : vcardList.map(({ primaryColor, dark }) => [primaryColor, dark]),
     [vcardList],
   );
 
@@ -292,25 +360,18 @@ const OfflineVCardScreen = () => {
     [vcardList],
   );
 
-  const inputRange = useDerivedValue(
-    () => Array.from({ length: readableColors.length ?? 0 }, (_, i) => i),
-    [readableColors.length],
+  const colorValue = useIndexInterpolation<string>(
+    currentIndexSharedValue,
+    readableColors,
+    colors.white,
+    interpolateColor,
   );
 
-  const colorValue = useDerivedValue<string>(() => {
-    const currentProfileIndex = currentIndexSharedValue.value;
-    if (inputRange.value.length > 1) {
-      return interpolateColor(
-        currentProfileIndex,
-        inputRange.value,
-        readableColors,
-      );
-    }
-    if (readableColors.length > 0) {
-      return readableColors[0];
-    }
-    return colors.white;
-  }, [readableColors]);
+  const isPremium = useIndexInterpolation(
+    currentIndexSharedValue,
+    vcardList.map(card => (card?.isPremium ? 1 : 0) as number),
+    0,
+  );
 
   const animatedIconsColor = useAnimatedStyle(() => {
     return { tintColor: colorValue.value };
@@ -340,8 +401,7 @@ const OfflineVCardScreen = () => {
         edges={{ bottom: 'off', top: 'additive' }}
       >
         <HomeBackgroundComponent
-          primaryColors={primaryColors}
-          darkColors={darkColors}
+          gradientColors={gradientColors}
           currentIndexSharedValue={currentIndexSharedValue}
         />
         <Header
@@ -354,9 +414,8 @@ const OfflineVCardScreen = () => {
           }
           middleElement={
             <AnimatedHomeHeaderCentralComponent
-              isPremium={!!vcardList[currentIndex]?.isPremium}
-              currentIndexSharedValue={currentIndexSharedValue}
-              readableColors={readableColors}
+              isPremium={isPremium}
+              color={colorValue}
             />
           }
           style={styles.header}

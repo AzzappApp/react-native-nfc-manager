@@ -1,3 +1,4 @@
+import concat from 'lodash/concat';
 import { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { Pressable, ScrollView, View, useWindowDimensions } from 'react-native';
@@ -12,11 +13,14 @@ import Animated, {
 import { useFragment, graphql } from 'react-relay';
 import { colors, fontFamilies } from '#theme';
 import AnimatedText from '#components/AnimatedText';
-import ProfileStatisticsChart from '#components/ProfileStatisticsChart';
+import ProfileStatisticsChart, {
+  normalizeArray,
+} from '#components/ProfileStatisticsChart';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Text from '#ui/Text';
+import { useIndexInterpolation } from './homeHelpers';
 import { format } from './HomeInformations';
-import { useHomeScreenCurrentIndex } from './HomeScreenContext';
+import { useHomeScreenContext } from './HomeScreenContext';
 import type { HomeStatistics_profiles$key } from '#relayArtifacts/HomeStatistics_profiles.graphql';
 import type { DerivedValue } from 'react-native-reanimated';
 
@@ -60,7 +64,7 @@ const HomeStatistics = ({
     user,
   );
 
-  const currentIndexSharedValue = useHomeScreenCurrentIndex();
+  const { currentIndexSharedValue } = useHomeScreenContext();
 
   const { width } = useWindowDimensions();
   const intl = useIntl();
@@ -69,107 +73,43 @@ const HomeStatistics = ({
   const scrollHandler = useAnimatedScrollHandler(event => {
     scrollIndexOffset.value = event.contentOffset.x / BOX_NUMBER_WIDTH;
   });
-  // cant use the context until we are splitting this screen from the multiuser
-  const inputRange = useDerivedValue(
-    () => Array.from({ length: (profiles?.length ?? 0) + 1 }, (_, i) => i),
-    [profiles?.length],
-  );
-
-  const animatedData = useDerivedValue(() => {
-    const likes = [
-      0,
-      ...(profiles?.map(profile => profile.webCard?.nbLikes ?? 0) ?? []),
-    ];
-    const contactCardScans = [
-      0,
-      ...(profiles?.map(profile => profile.nbContactCardScans ?? 0) ?? []),
-    ];
-    const shareBacks = [
-      0,
-      ...(profiles?.map(profile => profile.nbShareBacks ?? 0) ?? []),
-    ];
-    const webCardViews = [
-      0,
-      ...(profiles?.map(profile => profile.webCard?.nbWebCardViews ?? 0) ?? []),
-    ];
-    const actual = currentIndexSharedValue?.value ?? 1;
-    if (actual >= 0 && inputRange && inputRange.value.length > 1) {
-      return {
-        totalLikes: likes[Math.round(currentIndexSharedValue?.value ?? 0)],
-        totalScans:
-          contactCardScans[Math.round(currentIndexSharedValue?.value ?? 0)],
-        totalViews:
-          webCardViews[Math.round(currentIndexSharedValue?.value ?? 0)],
-        totalShareBacks:
-          shareBacks[Math.round(currentIndexSharedValue?.value ?? 0)],
-      };
-    } else if (actual >= 0) {
-      return {
-        totalLikes: likes[actual],
-        totalScans: contactCardScans[actual],
-        totalViews: webCardViews[actual],
-        totalShareBacks: shareBacks[actual],
-      };
-    }
-    return {
-      totalLikes: 0,
-      totalScans: 0,
-      totalViews: 0,
-      totalShareBacks: 0,
-    };
-  });
 
   const chartsData = useMemo(() => {
-    if (profiles) {
-      const result = Array.from({ length: 30 }, (_, i) => {
-        const date = new Date();
-        date.setUTCDate(date.getUTCDate() - 29 + i); // Adjust the date to get the last 30 days
-        const utcDate = new Date(
-          Date.UTC(
-            date.getUTCFullYear(),
-            date.getUTCMonth(),
-            date.getUTCDate(),
-          ),
-        );
-        return {
-          day: utcDate.toISOString(),
-          data: Array.from({ length: profiles?.length ?? 0 }, () => ({
-            contactCardScans: 0,
-            webCardViews: 0,
-            likes: 0,
-            shareBacks: 0,
-          })),
-        };
-      });
-
-      profiles.forEach((profile, indexProfile) => {
-        profile.statsSummary?.forEach(stats => {
-          if (stats) {
-            const index = result.findIndex(item => item.day === stats.day);
-            if (index !== -1) {
-              Object.assign(result[index].data[indexProfile], {
-                ...stats,
-              });
-            }
-          }
-        });
-        profile.webCard?.statsSummary?.forEach(stats => {
-          if (stats) {
-            const index = result.findIndex(item => item.day === stats.day);
-
-            if (index !== -1) {
-              result[index].data[indexProfile] = {
-                ...result[index].data[indexProfile],
-                webCardViews: stats.webCardViews,
-                likes: stats.likes,
-              };
-            }
-          }
-        });
-      });
-      return result;
+    if (!profiles) {
+      return [];
     }
-    return [];
+    const days = dayRange.map(i => {
+      const date = new Date();
+      date.setUTCDate(date.getUTCDate() - 29 + i); // Adjust the date to get the last 30 days
+      const utcDate = new Date(
+        Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()),
+      );
+      return utcDate.toISOString();
+    });
+
+    return profiles?.map(profile => {
+      const profileStatsByDays = days.map(day =>
+        profile.statsSummary?.find(stats => stats.day === day),
+      );
+      const webCardStatsByDay = days.map(day =>
+        profile.webCard?.statsSummary?.find(stats => stats.day === day),
+      );
+
+      return {
+        contactCardScans: normalizeArray(
+          profileStatsByDays.map(stats => stats?.contactCardScans ?? 0),
+        ),
+        webCardViews: normalizeArray(
+          webCardStatsByDay.map(stats => stats?.webCardViews ?? 0),
+        ),
+        likes: normalizeArray(
+          webCardStatsByDay.map(stats => stats?.likes ?? 0),
+        ),
+        shareBacks: normalizeArray(
+          profileStatsByDays.map(stats => stats?.shareBacks ?? 0),
+        ),
+      };
+    });
   }, [profiles]);
 
   const animatedChartData = useDerivedValue(() => {
@@ -195,23 +135,41 @@ const HomeStatistics = ({
     const previousScrollIndexProp = STATISTICS_ORDER[previousScrollIndex];
     const nextScrollIndexProp = STATISTICS_ORDER[nextScrollIndex];
 
-    return chartsData.map(item => {
-      const previousProfileData = item.data[previousProfileIndex];
-      const nextProfileData = item.data[nextProfileIndex];
+    const previousProfileData = chartsData[previousProfileIndex];
+    const nextProfileData = chartsData[nextProfileIndex];
+
+    if (!previousProfileData || !nextProfileData) {
+      const data = previousProfileData ?? nextProfileData;
+      if (!data) {
+        return dayRange.map(() => 0);
+      }
+      return dayRange.map(index => {
+        return interpolate(
+          profileIndexInterPolationValue,
+          [0, 1],
+          [
+            data[previousScrollIndexProp][index],
+            data[nextScrollIndexProp][index],
+          ],
+        );
+      });
+    }
+
+    return dayRange.map(index => {
       const previousProfileValue = interpolate(
         scrollIndexInterPolationValue,
         [0, 1],
         [
-          previousProfileData[previousScrollIndexProp],
-          previousProfileData[nextScrollIndexProp],
+          previousProfileData[previousScrollIndexProp][index],
+          previousProfileData[nextScrollIndexProp][index],
         ],
       );
       const nextProfileValue = interpolate(
         scrollIndexInterPolationValue,
         [0, 1],
         [
-          nextProfileData[previousScrollIndexProp],
-          nextProfileData[nextScrollIndexProp],
+          nextProfileData[previousScrollIndexProp][index],
+          nextProfileData[nextScrollIndexProp][index],
         ],
       );
       return interpolate(
@@ -222,17 +180,34 @@ const HomeStatistics = ({
     });
   });
 
-  const totalLikes = useDerivedValue(
-    () => format(animatedData.value.totalLikes) ?? '0',
+  const totalLikes = useIndexInterpolation(
+    currentIndexSharedValue,
+    concat(0, profiles?.map(profile => profile.webCard?.nbLikes ?? 0) ?? []),
+    0,
   );
-  const totalScans = useDerivedValue(
-    () => format(animatedData.value.totalScans) ?? '0',
+  const totalLikesLabel = useDerivedValue(() => format(totalLikes.value));
+  const totalScans = useIndexInterpolation(
+    currentIndexSharedValue,
+    concat(0, profiles?.map(profile => profile.nbContactCardScans ?? 0) ?? []),
+    0,
   );
-  const totalViews = useDerivedValue(
-    () => format(animatedData.value.totalViews) ?? '0',
+  const totalScansLabel = useDerivedValue(() => format(totalScans.value));
+  const totalViews = useIndexInterpolation(
+    currentIndexSharedValue,
+    concat(
+      0,
+      profiles?.map(profile => profile.webCard?.nbWebCardViews ?? 0) ?? [],
+    ),
+    0,
   );
-  const totalShareBacks = useDerivedValue(
-    () => format(animatedData.value.totalShareBacks) ?? '0',
+  const totalViewsLabel = useDerivedValue(() => format(totalViews.value));
+  const totalShareBacks = useIndexInterpolation(
+    currentIndexSharedValue,
+    concat(0, profiles?.map(profile => profile.nbShareBacks ?? 0) ?? []),
+    0,
+  );
+  const totalShareBacksLabel = useDerivedValue(() =>
+    format(totalShareBacks.value),
   );
 
   const scrollViewRef = useAnimatedRef<Animated.ScrollView>();
@@ -281,7 +256,7 @@ const HomeStatistics = ({
         overScrollMode="never"
       >
         <StatisticItems
-          value={totalViews}
+          value={totalViewsLabel}
           title={
             intl.formatMessage(
               {
@@ -302,7 +277,7 @@ const HomeStatistics = ({
           onSelect={onSelectStat}
         />
         <StatisticItems
-          value={totalScans}
+          value={totalScansLabel}
           title={
             intl.formatMessage(
               {
@@ -323,7 +298,7 @@ const HomeStatistics = ({
           onSelect={onSelectStat}
         />
         <StatisticItems
-          value={totalShareBacks}
+          value={totalShareBacksLabel}
           title={intl.formatMessage({
             defaultMessage: 'ShareBacks',
             description: 'Home statistics - Share backs label',
@@ -333,7 +308,7 @@ const HomeStatistics = ({
           onSelect={onSelectStat}
         />
         <StatisticItems
-          value={totalLikes}
+          value={totalLikesLabel}
           title={intl.formatMessage({
             defaultMessage: 'Total Likes',
             description: 'Home statistics - Total Likes',
@@ -352,6 +327,8 @@ const PADDING_HORIZONTAL = 20;
 const BOX_NUMBER_WIDTH = 140;
 
 export default HomeStatistics;
+
+const dayRange = Array.from({ length: 30 }, (_, i) => i);
 
 type StatisticItemsProps = {
   value: DerivedValue<string>;

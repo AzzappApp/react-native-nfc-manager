@@ -33,6 +33,7 @@ const AddContentBelowCoverModal = ({
       fragment AddContentBelowCoverModal_webCard on WebCard {
         ...CoverRenderer_webCard
         isPremium
+        userName
       }
     `,
     webCardKey,
@@ -131,7 +132,10 @@ const AddContentBelowCoverModal = ({
           />
           {currentTab === 'sections' && <AddContentBelowCoverSections />}
           {currentTab === 'templates' && (
-            <AddContentBelowCoverTemplates isPremium={webCard.isPremium} />
+            <AddContentBelowCoverTemplates
+              isPremium={webCard.isPremium}
+              userName={webCard.userName}
+            />
           )}
         </SafeAreaView>
       </Container>
