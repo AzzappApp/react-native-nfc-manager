@@ -1,5 +1,6 @@
-## 1.4.0-canary.39
+## 1.4.0-canary.40
 
+* **fix:**  - add small padding in the bottomSheet ([#5692](https://github.com/AzzappApp/azzapp/pull/5692))
 * **fix:**  - **cardModules:** avoid reanimated value used in render ([#5646](https://github.com/AzzappApp/azzapp/pull/5646))
 * **fix:**  - performane issue on swtich ([#5711](https://github.com/AzzappApp/azzapp/pull/5711))
 * **fix:**  - **simpleText:** don’t use reanimated values in render ([#5679](https://github.com/AzzappApp/azzapp/pull/5679))
