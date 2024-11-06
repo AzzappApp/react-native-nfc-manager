@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import Animated, {
   useAnimatedStyle,
@@ -222,6 +223,40 @@ const SimpleTextRenderer = ({
 
   const textColor = swapColor(fontColor, colorPalette);
 
+  const defaultText = useMemo(() => {
+    if (data.kind === 'simpleTitle') {
+      return intl.formatMessage(
+        {
+          defaultMessage:
+            'Add section contents here. To edit the text, simply open the editor and start typing. You can also change the font style, size, color, and alignment using the editing tools provided. Adjust the margins and the background for this section to match the design and branding of your WebCard{azzappA}.',
+          description: 'Default text for the simple title module',
+        },
+        {
+          azzappA: (
+            <Text variant="azzapp" style={{ color: textColor }}>
+              a
+            </Text>
+          ),
+        },
+      );
+    } else {
+      return intl.formatMessage(
+        {
+          defaultMessage:
+            'Add section contents here. To edit the text, simply open the editor and start typing. You can also change the font style, size, color, and alignment using the editing tools provided. Adjust the margins and the background for this section to match the design and branding of your WebCard{azzappA}.',
+          description: 'Default text for the simple text module',
+        },
+        {
+          azzappA: (
+            <Text variant="azzapp" style={{ color: textColor }}>
+              a
+            </Text>
+          ),
+        },
+      );
+    }
+  }, [data.kind, intl, textColor]);
+
   return (
     <CardModuleBackground
       {...props}
@@ -235,48 +270,36 @@ const SimpleTextRenderer = ({
       resizeMode={background?.resizeMode}
       style={[style, cardModuleBackgroundStyle, { flexShrink: 0 }]}
     >
-      <Animated.Text
-        style={[
-          {
-            textAlign: textAlignmentOrDefault(textAlign),
-            color: textColor,
-            fontFamily,
-          },
-          textStyle,
-          contentStyle,
-        ]}
-      >
-        {text ||
-          (data.kind === 'simpleTitle'
-            ? intl.formatMessage(
-                {
-                  defaultMessage:
-                    'Add section contents here. To edit the text, simply open the editor and start typing. You can also change the font style, size, color, and alignment using the editing tools provided. Adjust the margins and the background for this section to match the design and branding of your WebCard{azzappA}.',
-                  description: 'Default text for the simple title module',
-                },
-                {
-                  azzappA: (
-                    <Text variant="azzapp" style={{ color: textColor }}>
-                      a
-                    </Text>
-                  ),
-                },
-              )
-            : intl.formatMessage(
-                {
-                  defaultMessage:
-                    'Add section contents here. To edit the text, simply open the editor and start typing. You can also change the font style, size, color, and alignment using the editing tools provided. Adjust the margins and the background for this section to match the design and branding of your WebCard{azzappA}.',
-                  description: 'Default text for the simple text module',
-                },
-                {
-                  azzappA: (
-                    <Text variant="azzapp" style={{ color: textColor }}>
-                      a
-                    </Text>
-                  ),
-                },
-              ))}
-      </Animated.Text>
+      {text && (
+        <Animated.Text
+          style={[
+            {
+              textAlign: textAlignmentOrDefault(textAlign),
+              color: textColor,
+              fontFamily,
+            },
+            textStyle,
+            contentStyle,
+          ]}
+        >
+          {text}
+        </Animated.Text>
+      )}
+      {!text && (
+        <Animated.Text
+          style={[
+            {
+              textAlign: textAlignmentOrDefault(textAlign),
+              color: textColor,
+              fontFamily,
+            },
+            textStyle,
+            contentStyle,
+          ]}
+        >
+          {defaultText}
+        </Animated.Text>
+      )}
     </CardModuleBackground>
   );
 };
