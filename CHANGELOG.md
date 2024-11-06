@@ -1,5 +1,6 @@
-## 1.4.0-canary.51
+## 1.4.0-canary.52
 
+* **fix:**  - snapToOff computation & itemLayout to fix long list bad position ([#5753](https://github.com/AzzappApp/azzapp/pull/5753))
 * **fix:**  - **WebCardScreen:** apparition perf on android ([#5751](https://github.com/AzzappApp/azzapp/pull/5751))
 * **fix:**  - add useCallback in permission hook to avoid useEffect recall ([#5750](https://github.com/AzzappApp/azzapp/pull/5750))
 * **fix:**  - **Home:** apply 5% min and max on chat bars ([#5748](https://github.com/AzzappApp/azzapp/pull/5748))
