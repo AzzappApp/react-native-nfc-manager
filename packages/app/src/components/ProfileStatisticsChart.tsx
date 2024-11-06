@@ -100,7 +100,7 @@ const BarChart = ({
         );
 
         data.forEach((value, index) => {
-          const barHeight = 5 + value * (height - 5);
+          const barHeight = 0.05 * height + value * (height * 0.9);
           const x = index * (barWidth + CHART_BAR_SEPARATOR);
           const y = height - barHeight;
           canvas.drawRRect(
