@@ -1,5 +1,6 @@
-## 1.4.0-canary.49
+## 1.4.0-canary.50
 
+* **fix:**  - add useCallback in permission hook to avoid useEffect recall ([#5750](https://github.com/AzzappApp/azzapp/pull/5750))
 * **fix:**  - **Home:** apply 5% min and max on chat bars ([#5748](https://github.com/AzzappApp/azzapp/pull/5748))
 * **fix:**  - **Home:** initial scrollIndex on android ([#5747](https://github.com/AzzappApp/azzapp/pull/5747))
 * **fix:**  - [#5670](https://github.com/AzzappApp/azzapp/pull/5670) ([#5745](https://github.com/AzzappApp/azzapp/pull/5745))
