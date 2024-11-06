@@ -1,5 +1,6 @@
-## 1.4.0-canary.47
+## 1.4.0-canary.48
 
+* **fix:**  - 🐛 properly display background thumbnail ([#5742](https://github.com/AzzappApp/azzapp/pull/5742))
 * **fix:**  - webCard bottom sheet don't close from bottom sheet header button ([#5741](https://github.com/AzzappApp/azzapp/pull/5741))
 * **fix:**  - **web:** [#5697](https://github.com/AzzappApp/azzapp/pull/5697) bypass vercel protection on revalidate ([#5732](https://github.com/AzzappApp/azzapp/pull/5732))
 * **fix:**  - 🐛 properly use insets ([#5731](https://github.com/AzzappApp/azzapp/pull/5731))
