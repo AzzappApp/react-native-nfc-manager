@@ -27,6 +27,7 @@ import { useRouter } from '#components/NativeRouter';
 import EmptyContent from '#components/ui/EmptyContent';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getOfflineVCard } from '#helpers/offlineVCard';
+import { useProfileInfos } from '#hooks/authStateHooks';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { HomeBackgroundComponent } from '#screens/HomeScreen/HomeBackground';
 import { AnimatedHomeHeaderCentralComponent } from '#screens/HomeScreen/HomeHeader';
@@ -51,6 +52,7 @@ type vCardData = {
   title: string | null | undefined;
   compagny: string | null | undefined;
   isPremium: boolean;
+  id: string;
 };
 
 type renderItemProps = {
@@ -60,6 +62,7 @@ type renderItemProps = {
 const OfflineVCardScreen = () => {
   const router = useRouter();
   const styles = useStyleSheet(stylesheet);
+  const profileInfos = useProfileInfos();
 
   const [canLeaveScreen, setCanLeaveScreen] = useState(
     (router.getCurrentRoute() as OfflineVCardRoute)?.params?.canGoBack,
@@ -162,11 +165,20 @@ const OfflineVCardScreen = () => {
             title: contactCard.title,
             compagny: company || null,
             isPremium: webCard?.isPremium,
+            id: webCard.id,
           };
         })
         .filter(isDefined) || []
     );
   }, []);
+
+  const defaultIndex = useMemo(() => {
+    if (!profileInfos?.webCardId) return 0;
+    const foundVCardId = vcardList.findIndex(
+      vcard => vcard.id === profileInfos?.webCardId,
+    );
+    return foundVCardId === -1 ? 0 : foundVCardId;
+  }, [profileInfos?.webCardId, vcardList]);
 
   const primaryColors = useMemo(
     () =>
@@ -416,6 +428,7 @@ const OfflineVCardScreen = () => {
             snapToOffsets={snapToOffsets}
             ItemSeparatorComponent={renderSeparator}
             contentContainerStyle={contentContainerStyle}
+            initialScrollIndex={defaultIndex}
           />
         </View>
         <View
