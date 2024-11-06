@@ -1,5 +1,6 @@
-## 1.4.0-canary.41
+## 1.4.0-canary.42
 
+* **fix:**  - add an option to open select Webcard in offline mode ([#5719](https://github.com/AzzappApp/azzapp/pull/5719))
 * **fix:**  - review thread access to avoid bad usage of shared Values ([#5715](https://github.com/AzzappApp/azzapp/pull/5715))
 * **fix:**  - add small padding in the bottomSheet ([#5692](https://github.com/AzzappApp/azzapp/pull/5692))
 * **fix:**  - **cardModules:** avoid reanimated value used in render ([#5646](https://github.com/AzzappApp/azzapp/pull/5646))
