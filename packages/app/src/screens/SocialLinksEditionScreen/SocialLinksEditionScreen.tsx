@@ -277,7 +277,7 @@ const SocialLinksEditionScreen = ({
     }
 
     const input: SaveSocialLinksModuleInput = {
-      ...data,
+      ...value,
       iconSize: iconSize.value,
       borderWidth: borderWidth.value,
       columnGap: columnGap.value,
@@ -305,7 +305,6 @@ const SocialLinksEditionScreen = ({
     cardModulesCount,
     profile.webCard,
     value,
-    data,
     iconSize,
     borderWidth,
     columnGap,

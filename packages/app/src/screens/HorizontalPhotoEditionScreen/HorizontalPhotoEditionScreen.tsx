@@ -324,7 +324,7 @@ const HorizontalPhotoEditionScreen = ({
 
     setProgressIndicator(Observable.from(0));
 
-    const { image: updateMedia } = value;
+    const { image: updateMedia, ...rest } = value;
 
     let mediaId = updateMedia?.id;
     if (!mediaId && updateMedia?.uri) {
@@ -369,6 +369,7 @@ const HorizontalPhotoEditionScreen = ({
       ...data,
       moduleId: horizontalPhoto?.id,
       image: mediaId ?? value.image!.id,
+      ...rest,
       marginHorizontal: marginHorizontal.value,
       marginVertical: marginVertical.value,
       borderWidth: borderWidth.value,

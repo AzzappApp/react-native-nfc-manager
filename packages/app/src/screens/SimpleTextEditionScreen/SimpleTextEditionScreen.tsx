@@ -309,12 +309,11 @@ const SimpleTextEditionScreen = ({
       router.push({ route: 'USER_PAY_WALL' });
       return;
     }
-
     commit({
       variables: {
         webCardId: profile.webCard?.id,
         input: {
-          ...data,
+          ...value,
           fontSize: fontSize.value,
           verticalSpacing: verticalSpacing.value,
           marginHorizontal: marginHorizontal.value,
@@ -339,7 +338,6 @@ const SimpleTextEditionScreen = ({
     cardModulesCount,
     commit,
     value,
-    data,
     fontSize,
     verticalSpacing,
     marginHorizontal,
