@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
-import { Dimensions } from 'react-native';
+import { Dimensions, Platform } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HEADER_HEIGHT } from '#ui/Header';
 import useScreenInsets from './useScreenInsets';
 
@@ -38,6 +39,7 @@ const useEditorLayout = ({
   topPanelAspectRatio = null,
 }: EditorLayoutConfig = {}) => {
   const inset = useScreenInsets();
+  const { bottom } = useSafeAreaInsets();
 
   const insetTop = inset.top;
   const insetBottom = inset.bottom;
@@ -56,8 +58,10 @@ const useEditorLayout = ({
   }, [bottomPanelMinHeight, contentHeight, topPanelAspectRatio]);
 
   const bottomPanelHeight = useMemo(() => {
-    return contentHeight - topPanelHeight;
-  }, [contentHeight, topPanelHeight]);
+    return (
+      contentHeight - topPanelHeight + (Platform.OS === 'android' ? bottom : 0)
+    );
+  }, [contentHeight, topPanelHeight, bottom]);
 
   return {
     windowWidth,

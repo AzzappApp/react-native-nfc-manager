@@ -1,6 +1,7 @@
 import { memo, useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { APPLICATIONS_FONTS } from '@azzapp/shared/fontHelpers';
 import Text from '#ui/Text';
 import BottomSheetModal from './BottomSheetModal';
@@ -27,6 +28,8 @@ const FontPicker = ({
     return <MemoFontItem item={item} />;
   }, []);
   const intl = useIntl();
+  const { bottom } = useSafeAreaInsets();
+
   return (
     <BottomSheetModal
       height={height}
@@ -57,7 +60,7 @@ const FontPicker = ({
         renderItem={renderItem}
         keyExtractor={keyExtractor}
         getItemLayout={getItemLayout}
-        contentInset={{ bottom: 15 }}
+        contentContainerStyle={{ paddingBottom: bottom }}
       />
     </BottomSheetModal>
   );
