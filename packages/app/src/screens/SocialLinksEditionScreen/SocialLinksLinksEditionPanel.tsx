@@ -1,7 +1,13 @@
-import { memo, useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet, View, useColorScheme } from 'react-native';
+import { StyleSheet, View, useColorScheme, Platform } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
+import { useKeyboardHandler } from 'react-native-keyboard-controller';
+import Animated, {
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+} from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { useDebouncedCallback } from 'use-debounce';
 import { SOCIAL_LINKS } from '@azzapp/shared/socialLinkHelpers';
@@ -60,34 +66,37 @@ const SocialLinksLinksEditionPanel = ({
   const intl = useIntl();
   const { insetBottom } = useEditorLayout();
 
-  const onChangeLink = (id: SocialLinkId, value: string) => {
-    if (isNotFalsyString(value)) {
-      const item = links.find(link => link?.socialId === id);
+  const onChangeLink = useCallback(
+    (id: SocialLinkId, value: string) => {
+      if (isNotFalsyString(value)) {
+        const item = links.find(link => link?.socialId === id);
 
-      //add value to item link
-      if (item) {
-        const newLinks = links.map(link => {
-          if (link?.socialId === id) {
-            return {
-              ...link,
-              link: value,
-            };
-          }
-          return link;
-        });
-        onLinksChange(newLinks);
+        //add value to item link
+        if (item) {
+          const newLinks = links.map(link => {
+            if (link?.socialId === id) {
+              return {
+                ...link,
+                link: value,
+              };
+            }
+            return link;
+          });
+          onLinksChange(newLinks);
+        } else {
+          onLinksChange([
+            ...links,
+            { socialId: id, link: value, position: links.length },
+          ]);
+        }
       } else {
-        onLinksChange([
-          ...links,
-          { socialId: id, link: value, position: links.length },
-        ]);
+        onLinksChange(links.filter(link => link?.socialId !== id));
       }
-    } else {
-      onLinksChange(links.filter(link => link?.socialId !== id));
-    }
-  };
+    },
+    [links, onLinksChange],
+  );
 
-  const data = useMemo(() => {
+  const getLinks = useCallback(() => {
     // consolidate a list of link merged with the selected value
     const consolidatedLinks = [];
     for (let index = 0; index < SOCIAL_LINKS.length; index++) {
@@ -137,36 +146,48 @@ const SocialLinksLinksEditionPanel = ({
         placeholder,
       });
     }
-    return consolidatedLinks.sort((a, b) => {
+
+    return consolidatedLinks;
+  }, [intl, links]);
+
+  const [data, setData] = useState(
+    getLinks().sort((a, b) => {
       if (a.position !== b.position) {
         return a.position - b.position;
       }
       return 0;
-    });
-  }, [intl, links]);
+    }),
+  );
 
-  const renderItem = (
-    item: {
-      id: SocialLinkId;
-      link?: string | undefined;
-      position: number;
-      mask: string;
-      placeholder?: string;
+  useEffect(() => {
+    setData(getLinks());
+  }, [getLinks]);
+
+  const renderItem = useCallback(
+    (
+      item: {
+        id: SocialLinkId;
+        link?: string | undefined;
+        position: number;
+        mask: string;
+        placeholder?: string;
+      },
+      panGesture: PanGesture,
+    ) => {
+      const value = links.find(link => link?.socialId === item.id)?.link ?? '';
+      return (
+        <SocialInput
+          icon={item.id}
+          mask={item.mask}
+          placeholder={item.placeholder}
+          value={value}
+          onChangeLink={onChangeLink}
+          panGesture={panGesture}
+        />
+      );
     },
-    panGesture: PanGesture,
-  ) => {
-    const value = links.find(link => link?.socialId === item.id)?.link ?? '';
-    return (
-      <SocialInput
-        icon={item.id}
-        mask={item.mask}
-        placeholder={item.placeholder}
-        value={value}
-        onChangeLink={onChangeLink}
-        panGesture={panGesture}
-      />
-    );
-  };
+    [links, onChangeLink],
+  );
 
   const onChangeOrder = (
     arr: Array<{
@@ -195,8 +216,32 @@ const SocialLinksLinksEditionPanel = ({
     setScrollHeight(event.nativeEvent.layout.height);
   }, []);
 
+  const keyboardOffset = useSharedValue(0);
+
+  useKeyboardHandler(
+    {
+      onMove: e => {
+        'worklet';
+        keyboardOffset.value = interpolate(
+          e.progress,
+          [0, 1],
+          [0, OFFSET_WITH_KEYBOARD],
+        );
+      },
+    },
+    [],
+  );
+
+  const animatedStyle = useAnimatedStyle(() => {
+    if (Platform.OS === 'android') return {};
+    return {
+      position: 'relative',
+      top: keyboardOffset.value,
+    };
+  });
+
   return (
-    <View style={[styles.root, style]} {...props}>
+    <Animated.View style={[styles.root, style, animatedStyle]} {...props}>
       <TitleWithLine
         title={intl.formatMessage({
           defaultMessage: 'Links',
@@ -219,13 +264,13 @@ const SocialLinksLinksEditionPanel = ({
               SOCIAL_LINK_PANEL_ITEM_HEIGHT * SOCIAL_LINKS.length +
               insetBottom +
               BOTTOM_MENU_HEIGHT +
-              20,
+              90,
           }
         }
         onLayout={onLayout}
         onChangeOrder={onChangeOrder}
       />
-    </View>
+    </Animated.View>
   );
 };
 
@@ -384,3 +429,5 @@ const styles = StyleSheet.create({
 const NO_POSITION_INDEX = 100;
 
 export const SOCIAL_LINK_PANEL_ITEM_HEIGHT = 56;
+
+const OFFSET_WITH_KEYBOARD = 100;
