@@ -1,5 +1,9 @@
-## 1.4.0-canary.48
+## 1.4.0-canary.49
 
+* **fix:**  - **Home:** apply 5% min and max on chat bars ([#5748](https://github.com/AzzappApp/azzapp/pull/5748))
+* **fix:**  - **Home:** initial scrollIndex on android ([#5747](https://github.com/AzzappApp/azzapp/pull/5747))
+* **fix:**  - [#5670](https://github.com/AzzappApp/azzapp/pull/5670) ([#5745](https://github.com/AzzappApp/azzapp/pull/5745))
+* **fix:**  - revert default canPlay on Cover
 * **fix:**  - 🐛 properly display background thumbnail ([#5742](https://github.com/AzzappApp/azzapp/pull/5742))
 * **fix:**  - webCard bottom sheet don't close from bottom sheet header button ([#5741](https://github.com/AzzappApp/azzapp/pull/5741))
 * **fix:**  - **web:** [#5697](https://github.com/AzzappApp/azzapp/pull/5697) bypass vercel protection on revalidate ([#5732](https://github.com/AzzappApp/azzapp/pull/5732))
