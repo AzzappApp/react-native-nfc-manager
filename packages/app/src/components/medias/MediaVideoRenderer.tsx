@@ -10,7 +10,7 @@ import {
   useState,
 } from 'react';
 import { StyleSheet, View } from 'react-native';
-import Video from 'react-native-video';
+import Video, { ViewType } from 'react-native-video';
 import {
   captureSnapshot,
   SnapshotRenderer,
@@ -264,7 +264,7 @@ const MediaVideoRenderer = (
           repeat
           style={StyleSheet.absoluteFill}
           resizeMode="contain"
-          useTextureView
+          viewType={ViewType.SURFACE}
           onReadyForDisplay={onVideoReadyForDisplay}
           playInBackground={false}
           onError={onError}
