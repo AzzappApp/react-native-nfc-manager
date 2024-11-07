@@ -1,4 +1,4 @@
-## 1.4.0-canary.63
+## 1.4.0-canary.64
 
 * **fix:**  - review color picker look & feel ([#5795](https://github.com/AzzappApp/azzapp/pull/5795))
 * **fix:**  - add missing bottom inset in transition editor ([#5797](https://github.com/AzzappApp/azzapp/pull/5797))
