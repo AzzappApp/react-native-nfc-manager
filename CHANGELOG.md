@@ -1,5 +1,7 @@
-## 1.4.0-canary.62
+## 1.4.0-canary.63
 
+* **fix:**  - review color picker look & feel ([#5795](https://github.com/AzzappApp/azzapp/pull/5795))
+* **fix:**  - add missing bottom inset in transition editor ([#5797](https://github.com/AzzappApp/azzapp/pull/5797))
 * **fix:**  - fix carousel animation moving translate after scale ([#5775](https://github.com/AzzappApp/azzapp/pull/5775))
 * **fix:**  - enable buffer cache on android ([#5765](https://github.com/AzzappApp/azzapp/pull/5765))
 * **fix:**  - remove text area modal state ([#5737](https://github.com/AzzappApp/azzapp/pull/5737))
