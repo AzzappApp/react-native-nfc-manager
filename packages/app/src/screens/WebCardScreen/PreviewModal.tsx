@@ -38,9 +38,7 @@ const PreviewModal = ({
     graphql`
       fragment PreviewModal_webCard on WebCard {
         id
-        ...CoverRenderer_webCard
-        ...WebCardBackgroundPreview_webCard
-        ...WebCardBackground_webCard
+        ...WebCardPreview_webCard
         cardStyle {
           borderColor
           borderRadius

@@ -5,8 +5,8 @@ import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { graphql, readInlineData } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
-  SOCIAL_LINKS_DEFAULT_VALUES,
   getModuleDataValues,
+  getSocialLinksDefaultValues,
 } from '@azzapp/shared/cardModuleHelpers';
 import { SOCIAL_LINKS } from '@azzapp/shared/socialLinkHelpers';
 import { SocialIcon } from '#ui/Icon';
@@ -91,6 +91,10 @@ export type SocialLinksRendererProps = ViewProps & {
    * Whether the social links are disabled
    */
   disabled?: boolean;
+  /**
+   * The cover background color
+   */
+  coverBackgroundColor?: string | null | undefined;
 } & (
     | {
         /**
@@ -135,6 +139,7 @@ const SocialLinksRenderer = ({
   multilineStyle,
   animatedData,
   disabled,
+  coverBackgroundColor,
   ...props
 }: SocialLinksRendererProps) => {
   const {
@@ -147,7 +152,7 @@ const SocialLinksRenderer = ({
   } = getModuleDataValues({
     data,
     cardStyle,
-    defaultValues: SOCIAL_LINKS_DEFAULT_VALUES,
+    defaultValues: getSocialLinksDefaultValues(coverBackgroundColor),
     styleValuesMap: null,
   });
 

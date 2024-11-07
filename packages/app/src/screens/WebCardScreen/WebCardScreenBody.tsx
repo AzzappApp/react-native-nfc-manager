@@ -117,10 +117,12 @@ const WebCardScreenBody = (
     cardStyle,
     cardIsPublished,
     isPremium,
+    coverBackgroundColor,
   } = useFragment(
     graphql`
       fragment WebCardScreenBody_webCard on WebCard {
         id
+        coverBackgroundColor
         cardModules {
           id
           visible
@@ -709,6 +711,7 @@ const WebCardScreenBody = (
           module={module}
           colorPalette={cardColors}
           cardStyle={cardStyle}
+          coverBackgroundColor={coverBackgroundColor}
         />
         {blockId.includes(TEMP_ID_PREFIX) && (
           <View style={styles.loadingContainer}>

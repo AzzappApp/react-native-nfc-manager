@@ -42,9 +42,7 @@ import type {
   CardTemplateList_cardTemplates$key,
 } from '#relayArtifacts/CardTemplateList_cardTemplates.graphql';
 import type { CardTemplateListQuery } from '#relayArtifacts/CardTemplateListQuery.graphql';
-import type { CoverRenderer_webCard$key } from '#relayArtifacts/CoverRenderer_webCard.graphql';
-import type { WebCardBackground_webCard$key } from '#relayArtifacts/WebCardBackground_webCard.graphql';
-import type { WebCardBackgroundPreview_webCard$key } from '#relayArtifacts/WebCardBackgroundPreview_webCard.graphql';
+import type { WebCardPreview_webCard$key } from '#relayArtifacts/WebCardPreview_webCard.graphql';
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { ForwardedRef, ReactNode } from 'react';
 import type {
@@ -101,9 +99,7 @@ const CardTemplateList = (
             }
             webCard {
               id
-              ...CoverRenderer_webCard
-              ...WebCardBackground_webCard
-              ...WebCardBackgroundPreview_webCard
+              ...WebCardPreview_webCard
               cardColors {
                 primary
                 dark
@@ -576,11 +572,7 @@ export type CardTemplateItem = NonNullable<
 
 type CoverTemplatePreviewModalProps = {
   visible: boolean;
-  webCard:
-    | (CoverRenderer_webCard$key &
-        WebCardBackground_webCard$key &
-        WebCardBackgroundPreview_webCard$key)
-    | null;
+  webCard: WebCardPreview_webCard$key | null;
   template: CardTemplateItem | null;
   cardColors: ColorPalette;
   loading: boolean;

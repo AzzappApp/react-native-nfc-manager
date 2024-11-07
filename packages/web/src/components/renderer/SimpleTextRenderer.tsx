@@ -1,10 +1,10 @@
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
-  SIMPLE_TEXT_DEFAULT_VALUES,
   SIMPLE_TEXT_STYLE_VALUES,
-  SIMPLE_TITLE_DEFAULT_VALUES,
   SIMPLE_TITLE_STYLE_VALUES,
   getModuleDataValues,
+  getTextDefaultValues,
+  getTitleDefaultValues,
 } from '@azzapp/shared/cardModuleHelpers';
 import { fontsMap } from '#helpers/fonts';
 import CardModuleBackground from '../CardModuleBackground';
@@ -19,6 +19,7 @@ const SimpleTextRenderer = ({
   cardStyle,
   colorPalette,
   style,
+  coverBackgroundColor,
   ...props
 }: SimpleTextRendererProps) => {
   const {
@@ -41,8 +42,8 @@ const SimpleTextRenderer = ({
         : SIMPLE_TITLE_STYLE_VALUES,
     defaultValues:
       module.kind === 'simpleText'
-        ? SIMPLE_TEXT_DEFAULT_VALUES
-        : SIMPLE_TITLE_DEFAULT_VALUES,
+        ? getTextDefaultValues(coverBackgroundColor)
+        : getTitleDefaultValues(coverBackgroundColor),
   });
 
   return (

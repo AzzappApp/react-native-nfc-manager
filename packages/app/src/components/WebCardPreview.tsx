@@ -2,6 +2,7 @@ import { forwardRef, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { View, useWindowDimensions } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
+import { graphql, useFragment } from 'react-relay';
 import {
   swapColor,
   type CardStyle,
@@ -14,9 +15,7 @@ import CardModuleRenderer from './cardModules/CardModuleRenderer';
 import CoverRenderer from './CoverRenderer';
 import CoverRendererPreviewDesktop from './CoverRendererPreviewDesktop';
 import WebCardBackground from './WebCardBackgroundPreview';
-import type { CoverRenderer_webCard$key } from '#relayArtifacts/CoverRenderer_webCard.graphql';
-import type { WebCardBackground_webCard$key } from '#relayArtifacts/WebCardBackground_webCard.graphql';
-import type { WebCardBackgroundPreview_webCard$key } from '#relayArtifacts/WebCardBackgroundPreview_webCard.graphql';
+import type { WebCardPreview_webCard$key } from '#relayArtifacts/WebCardPreview_webCard.graphql';
 import type { ModuleRenderInfo } from './cardModules/CardModuleRenderer';
 import type { ForwardedRef } from 'react';
 import type { LayoutRectangle, PointProp, ViewProps } from 'react-native';
@@ -26,9 +25,7 @@ export type WebCardPreviewProps = Omit<ViewProps, 'children'> & {
    * The webCard to render.
    * Contains the cover informations.
    */
-  webCard: CoverRenderer_webCard$key &
-    WebCardBackground_webCard$key &
-    WebCardBackgroundPreview_webCard$key;
+  webCard: WebCardPreview_webCard$key;
   /**
    * The card style to use.
    */
@@ -68,7 +65,7 @@ export type WebCardPreviewProps = Omit<ViewProps, 'children'> & {
  */
 const WebCardPreview = (
   {
-    webCard,
+    webCard: webCardKey,
     cardModules,
     cardColors,
     cardStyle,
@@ -90,6 +87,18 @@ const WebCardPreview = (
     viewMode === 'mobile' ? windowWidth : DESKTOP_PREVIEW_WIDTH;
   const webCardOuterHeight = height - SWITCH_TOGGLE_SECTION_HEIGHT;
   const webCardHeight = webCardOuterHeight / scale;
+
+  const webCard = useFragment(
+    graphql`
+      fragment WebCardPreview_webCard on WebCard {
+        coverBackgroundColor
+        ...CoverRenderer_webCard
+        ...WebCardBackground_webCard
+        ...WebCardBackgroundPreview_webCard
+      }
+    `,
+    webCardKey,
+  );
 
   const intl = useIntl();
 

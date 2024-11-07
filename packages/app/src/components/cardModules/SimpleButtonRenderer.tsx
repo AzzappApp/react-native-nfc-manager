@@ -7,6 +7,7 @@ import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
   SIMPLE_BUTTON_DEFAULT_VALUES,
   SIMPLE_BUTTON_STYLE_VALUES,
+  getButtonDefaultValues,
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
 import PressableOpacity from '#ui/PressableOpacity';
@@ -89,6 +90,10 @@ export type SimpleButtonRendererProps = ViewProps & {
    * Whether the button is disabled
    */
   disabled?: boolean;
+  /**
+   * The cover background color
+   */
+  coverBackgroundColor?: string | null | undefined;
 } & (
     | {
         /**
@@ -125,6 +130,7 @@ export const SimpleButtonRenderer = ({
   style,
   contentStyle,
   disabled,
+  coverBackgroundColor,
   ...props
 }: SimpleButtonRendererProps) => {
   const {
@@ -142,7 +148,7 @@ export const SimpleButtonRenderer = ({
     data,
     cardStyle,
     styleValuesMap: SIMPLE_BUTTON_STYLE_VALUES,
-    defaultValues: SIMPLE_BUTTON_DEFAULT_VALUES,
+    defaultValues: getButtonDefaultValues(coverBackgroundColor),
   });
   const onPress = useCallback(async () => {
     if (actionLink) {

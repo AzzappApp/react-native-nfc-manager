@@ -151,6 +151,7 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
           key={module.id}
           colorPalette={cardColors}
           cardStyle={webCard.cardStyle ?? DEFAULT_CARD_STYLE}
+          coverBackgroundColor={webCard.coverBackgroundColor}
         />
       ))}
     </WebCardPageLayout>

@@ -2,8 +2,8 @@ import cx from 'classnames';
 import { parsePhoneNumber } from 'libphonenumber-js';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
-  SIMPLE_BUTTON_DEFAULT_VALUES,
   SIMPLE_BUTTON_STYLE_VALUES,
+  getButtonDefaultValues,
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
 import { fontsMap } from '#helpers/fonts';
@@ -24,6 +24,7 @@ const SimpleButtonRenderer = ({
   colorPalette,
   cardStyle,
   style,
+  coverBackgroundColor,
   ...props
 }: SimpleButtonRendererProps) => {
   const {
@@ -47,7 +48,7 @@ const SimpleButtonRenderer = ({
     data: module.data,
     cardStyle,
     styleValuesMap: SIMPLE_BUTTON_STYLE_VALUES,
-    defaultValues: SIMPLE_BUTTON_DEFAULT_VALUES,
+    defaultValues: getButtonDefaultValues(coverBackgroundColor),
   });
 
   let href: string | undefined;

@@ -7,8 +7,8 @@ import Animated, {
 import { graphql, readInlineData } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
-  BLOCK_TEXT_DEFAULT_VALUES,
   BLOCK_TEXT_STYLE_VALUES,
+  getBlockTextDefaultValues,
   getModuleDataValues,
   textAlignmentOrDefault,
 } from '@azzapp/shared/cardModuleHelpers';
@@ -87,6 +87,10 @@ export type BlockTextRendererProps = ViewProps & {
    * The wrapped content style
    */
   contentStyle?: StyleProp<ViewStyle>;
+  /**
+   * The cover background color
+   */
+  coverBackgroundColor?: string | null | undefined;
 } & (
     | {
         /**
@@ -117,6 +121,7 @@ const BlockTextRenderer = ({
   colorPalette,
   cardStyle,
   contentStyle,
+  coverBackgroundColor,
   ...props
 }: BlockTextRendererProps) => {
   const {
@@ -132,7 +137,7 @@ const BlockTextRenderer = ({
   } = getModuleDataValues({
     data,
     cardStyle,
-    defaultValues: BLOCK_TEXT_DEFAULT_VALUES,
+    defaultValues: getBlockTextDefaultValues(coverBackgroundColor),
     styleValuesMap: BLOCK_TEXT_STYLE_VALUES,
   });
 

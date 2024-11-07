@@ -182,6 +182,10 @@ export type CardModuleRendererProps<T extends ModuleRenderInfo> = ViewProps & {
    * @default 'mobile'
    */
   viewMode?: 'desktop' | 'mobile';
+  /**
+   * The cover background color
+   */
+  coverBackgroundColor?: string | null | undefined;
 };
 
 const CardModuleRenderer = <T extends ModuleRenderInfo>({

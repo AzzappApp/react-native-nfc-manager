@@ -8,8 +8,8 @@ import Animated, {
 import { graphql, readInlineData } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
-  CAROUSEL_DEFAULT_VALUES,
   CAROUSEL_STYLE_VALUES,
+  getCarouselDefaultValues,
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
 import CardModuleBackground from '../CardModuleBackground';
@@ -100,6 +100,10 @@ export type CarouselRendererProps = ViewProps & {
    * the card style
    */
   cardStyle: CardStyle | null | undefined;
+  /**
+   * The cover background color
+   */
+  coverBackgroundColor?: string | null | undefined;
 };
 
 export type CarouselViewRendererProps = Omit<
@@ -150,6 +154,7 @@ const CarouselRenderer = ({
   colorPalette,
   cardStyle,
   style,
+  coverBackgroundColor,
   ...props
 }: CarouselRendererProps) => {
   const {
@@ -162,7 +167,7 @@ const CarouselRenderer = ({
   } = getModuleDataValues({
     data,
     cardStyle,
-    defaultValues: CAROUSEL_DEFAULT_VALUES,
+    defaultValues: getCarouselDefaultValues(coverBackgroundColor),
     styleValuesMap: CAROUSEL_STYLE_VALUES,
   });
 

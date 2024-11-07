@@ -277,9 +277,7 @@ const CardStylePreview = ({
     graphql`
       fragment CardStyleModal_webCard on WebCard {
         id
-        ...CoverRenderer_webCard
-        ...WebCardBackgroundPreview_webCard
-        ...WebCardBackground_webCard
+        ...WebCardPreview_webCard
         cardModules {
           id
           kind

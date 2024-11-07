@@ -9,9 +9,9 @@ import Animated, {
 import { graphql, readInlineData } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
-  PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
   PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES,
   getModuleDataValues,
+  getPhotoWithTextAndTitleDefaultValues,
 } from '@azzapp/shared/cardModuleHelpers';
 import Text from '#ui/Text';
 import CardModuleBackground from './CardModuleBackground';
@@ -115,6 +115,10 @@ export type PhotoWithTextAndTitleRendererProps = ViewProps & {
    * the card style
    */
   cardStyle: CardStyle | null | undefined;
+  /**
+   * The cover background color
+   */
+  coverBackgroundColor?: string | null | undefined;
 } & (
     | {
         /**
@@ -148,6 +152,7 @@ const PhotoWithTextAndTitleRenderer = ({
   style,
   animatedData,
   viewMode,
+  coverBackgroundColor,
   ...props
 }: PhotoWithTextAndTitleRendererProps) => {
   const {
@@ -170,7 +175,7 @@ const PhotoWithTextAndTitleRenderer = ({
     data,
     cardStyle,
     styleValuesMap: PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES,
-    defaultValues: PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
+    defaultValues: getPhotoWithTextAndTitleDefaultValues(coverBackgroundColor),
   });
 
   const [layout, setLayout] = useState<LayoutRectangle | null>(null);
