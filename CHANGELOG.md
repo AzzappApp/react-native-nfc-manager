@@ -1,5 +1,6 @@
-## 1.4.0-canary.55
+## 1.4.0-canary.56
 
+* **fix:**  - update bottom sheet to 5.0.5 ([#5767](https://github.com/AzzappApp/azzapp/pull/5767))
 * **fix:**  - 🐛 correctly use default values ([#5755](https://github.com/AzzappApp/azzapp/pull/5755))
 * **fix:**  - **android:** [#5684](https://github.com/AzzappApp/azzapp/pull/5684) weird behaviour with focused input without keyboard ([#5757](https://github.com/AzzappApp/azzapp/pull/5757))
 * **fix:**  - **SignIng:** fix jumpy keyboard ([#5756](https://github.com/AzzappApp/azzapp/pull/5756))
