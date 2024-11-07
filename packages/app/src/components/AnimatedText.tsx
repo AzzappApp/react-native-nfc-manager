@@ -1,13 +1,17 @@
 import AnimateableText from 'react-native-animateable-text';
-import { useAnimatedProps } from 'react-native-reanimated';
+import { useAnimatedProps, useAnimatedStyle } from 'react-native-reanimated';
 import { useVariantStyleSheet } from '#helpers/createStyles';
 import { textStyleSheet } from '#ui/Text';
-import type { ColorSchemeName, TextProps as RNTextProps } from 'react-native';
-import type { SharedValue } from 'react-native-reanimated';
+import type {
+  ColorSchemeName,
+  TextProps as RNTextProps,
+  TextStyle,
+} from 'react-native';
+import type { DerivedValue, SharedValue } from 'react-native-reanimated';
 
 type TextProps = RNTextProps & {
   text: SharedValue<string>;
-  animatedTextColor?: SharedValue<string>;
+  animatedTextColor?: DerivedValue<string | undefined> | DerivedValue<string>;
   variant?:
     | 'button'
     | 'error'
@@ -47,22 +51,26 @@ const AnimatedText = ({
       !maxLength || text.value.length < maxLength
         ? text.value
         : `${text.value.slice(0, maxLength)}...`;
-    // Here we use any because the text prop is not available in the type
-    let result = {
+    return {
       text: textValue,
     } as any;
-    if (animatedTextColor) {
-      result = { ...result, color: animatedTextColor?.value };
-    }
-    return result;
   }, [text]);
+
+  const colorStyle = useAnimatedStyle(() => {
+    return {
+      color:
+        animatedTextColor?.value ||
+        (style as TextStyle)?.color ||
+        (styles.text as TextStyle)?.color,
+    };
+  });
 
   return (
     <AnimateableText
       accessible={false}
       accessibilityRole="text"
       allowFontScaling={false}
-      style={[styles.text, { padding: 0 }, style]}
+      style={[styles.text, { padding: 0 }, style, colorStyle]}
       animatedProps={animatedProps}
       {...props}
     />
