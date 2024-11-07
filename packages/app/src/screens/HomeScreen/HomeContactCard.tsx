@@ -191,7 +191,6 @@ const ContactCardItem = ({
         <FingerHint
           color={readableColor === colors.black ? 'dark' : 'light'}
           style={{
-            position: 'absolute',
             top: height / 2 - FINGER_HINT_HEIGHT / 2,
             left: width / 2 - FINGER_HINT_WIDTH / 2,
           }}

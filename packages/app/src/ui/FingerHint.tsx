@@ -30,12 +30,13 @@ export const FINGER_HINT_WIDTH = 150;
 
 const styles = StyleSheet.create({
   container: {
-    width: 150,
-    height: 187.5,
+    width: FINGER_HINT_WIDTH,
+    height: FINGER_HINT_HEIGHT,
     pointerEvents: 'none',
+    position: 'absolute',
   },
   lottie: {
-    width: 150,
-    height: 187.5,
+    width: FINGER_HINT_WIDTH,
+    height: FINGER_HINT_HEIGHT,
   },
 });
