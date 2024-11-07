@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
@@ -84,21 +84,19 @@ const AddContactModalProfiles = ({ user: userKey, onSelectProfile }: Props) => {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <CarouselSelectList<(typeof data)[number]>
-        ref={carouselRef}
-        data={data}
-        keyExtractor={keyExtractor}
-        renderItem={renderItem}
-        itemRatio={COVER_WIDTH / COVER_HEIGHT}
-        scaleRatio={SCALE_RATIO}
-        style={styles.carousel}
-        itemContainerStyle={styles.carouselContentContainer}
-        onSelectedIndexChange={onSelectedIndexChange}
-        currentProfileIndexSharedValue={currentIndexSharedValue}
-        initialScrollIndex={initialProfileIndex}
-      />
-    </View>
+    <CarouselSelectList<(typeof data)[number]>
+      ref={carouselRef}
+      data={data}
+      keyExtractor={keyExtractor}
+      renderItem={renderItem}
+      itemRatio={COVER_WIDTH / COVER_HEIGHT}
+      scaleRatio={SCALE_RATIO}
+      style={styles.carousel}
+      itemContainerStyle={styles.carouselContentContainer}
+      onSelectedIndexChange={onSelectedIndexChange}
+      currentProfileIndexSharedValue={currentIndexSharedValue}
+      initialScrollIndex={initialProfileIndex}
+    />
   );
 };
 
@@ -107,16 +105,13 @@ type ProfileType = ArrayItemType<AddContactModalProfiles_user$data['profiles']>;
 const SCALE_RATIO = 108 / 291;
 
 const styles = StyleSheet.create({
-  container: {
-    marginVertical: 15,
-    height: COVER_HEIGHT,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   carousel: {
-    flexGrow: 0,
-    overflow: 'visible',
     alignSelf: 'center',
+    width: '100%',
+    height: COVER_HEIGHT,
+    marginVertical: 15,
+    maxWidth: COVER_WIDTH * 2.25,
+    overflow: 'visible',
   },
   carouselContentContainer: {
     flexGrow: 0,
