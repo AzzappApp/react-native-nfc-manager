@@ -1,5 +1,9 @@
-## 1.4.0-canary.57
+## 1.4.0-canary.58
 
+* **fix:**  - CoverLink: restore the itemSeparator properly. ([#5785](https://github.com/AzzappApp/azzapp/pull/5785))
+* **fix:**  - **android:** [#5706](https://github.com/AzzappApp/azzapp/pull/5706) share back carousel is back ([#5778](https://github.com/AzzappApp/azzapp/pull/5778))
+* **fix:**  - 1px misplacement of coverREnderer due to transparent border ([#5780](https://github.com/AzzappApp/azzapp/pull/5780))
+* **fix:**  - finger hint position ([#5784](https://github.com/AzzappApp/azzapp/pull/5784))
 * **perf:**  - replace useMemo by memo ([#5773](https://github.com/AzzappApp/azzapp/pull/5773))
 * **fix:**  - update bottom sheet to 5.0.5 ([#5767](https://github.com/AzzappApp/azzapp/pull/5767))
 * **fix:**  - 🐛 correctly use default values ([#5755](https://github.com/AzzappApp/azzapp/pull/5755))
