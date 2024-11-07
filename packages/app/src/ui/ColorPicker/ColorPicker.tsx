@@ -287,5 +287,8 @@ export default ColorPicker;
 
 const styles = StyleSheet.create({
   bottomHeader: { marginBottom: 16, paddingLeft: 0, paddingRight: 0 },
-  bottomContainerView: { padding: 14, flex: 1 },
+  bottomContainerView: {
+    paddingHorizontal: 14,
+    flex: 1,
+  },
 });

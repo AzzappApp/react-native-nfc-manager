@@ -58,10 +58,13 @@ const useEditorLayout = ({
   }, [bottomPanelMinHeight, contentHeight, topPanelAspectRatio]);
 
   const bottomPanelHeight = useMemo(() => {
-    return (
-      contentHeight - topPanelHeight + (Platform.OS === 'android' ? bottom : 0)
-    );
-  }, [contentHeight, topPanelHeight, bottom]);
+    const expectedHeight =
+      contentHeight - topPanelHeight + (Platform.OS === 'android' ? bottom : 0);
+    if (expectedHeight > bottomPanelMinHeight) {
+      return expectedHeight;
+    }
+    return bottomPanelMinHeight;
+  }, [contentHeight, topPanelHeight, bottom, bottomPanelMinHeight]);
 
   return {
     windowWidth,

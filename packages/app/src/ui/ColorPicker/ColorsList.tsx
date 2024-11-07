@@ -14,6 +14,7 @@ import {
 import { getTextColor } from '@azzapp/shared/colorsHelpers';
 import { colors } from '#theme';
 import useAnimatedState from '#hooks/useAnimatedState';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Icon from '#ui/Icon/Icon';
 import PressableNative from '#ui/PressableNative';
 
@@ -51,6 +52,9 @@ const ColorList = ({
   style,
 }: ColorListProps) => {
   const itemWidth = (width - ITEM_MARGIN * (ITEM_PER_ROW - 1)) / ITEM_PER_ROW;
+
+  const { bottom } = useScreenInsets();
+  const bottomPadding = { height: bottom };
 
   return (
     <BottomSheetScrollView
@@ -138,6 +142,7 @@ const ColorList = ({
           ))}
         </View>
       </View>
+      <View style={bottomPadding} />
     </BottomSheetScrollView>
   );
 };
