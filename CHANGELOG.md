@@ -1,5 +1,6 @@
-## 1.4.0-canary.61
+## 1.4.0-canary.62
 
+* **fix:**  - fix carousel animation moving translate after scale ([#5775](https://github.com/AzzappApp/azzapp/pull/5775))
 * **fix:**  - enable buffer cache on android ([#5765](https://github.com/AzzappApp/azzapp/pull/5765))
 * **fix:**  - remove text area modal state ([#5737](https://github.com/AzzappApp/azzapp/pull/5737))
 * **fix:**  - Carousel - restore overflow ([#5789](https://github.com/AzzappApp/azzapp/pull/5789))
