@@ -1,5 +1,7 @@
-## 1.4.0-canary.53
+## 1.4.0-canary.54
 
+* **fix:**  - **android:** [#5684](https://github.com/AzzappApp/azzapp/pull/5684) weird behaviour with focused input without keyboard ([#5757](https://github.com/AzzappApp/azzapp/pull/5757))
+* **fix:**  - **SignIng:** fix jumpy keyboard ([#5756](https://github.com/AzzappApp/azzapp/pull/5756))
 * **fix:**  - links edition ([#5700](https://github.com/AzzappApp/azzapp/pull/5700))
 * **fix:**  - snapToOff computation & itemLayout to fix long list bad position ([#5753](https://github.com/AzzappApp/azzapp/pull/5753))
 * **fix:**  - **WebCardScreen:** apparition perf on android ([#5751](https://github.com/AzzappApp/azzapp/pull/5751))
