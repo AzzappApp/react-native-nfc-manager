@@ -124,6 +124,10 @@ const CoverList = ({
     }),
     [gap, horizontal],
   );
+  const Separator = useCallback(
+    () => <ItemSeparator gap={gap} horizontal={horizontal} />,
+    [gap, horizontal],
+  );
 
   return (
     <FlashList
@@ -141,7 +145,7 @@ const CoverList = ({
       refreshing={refreshing}
       ListHeaderComponent={ListHeaderComponent}
       onViewableItemsChanged={onViewableItemChanged}
-      ItemSeparatorComponent={ItemSeparatorComponent}
+      ItemSeparatorComponent={Separator}
       renderScrollComponent={OverflowScrollView}
       contentInset={contentInset}
       onEndReachedThreshold={0.3}
@@ -175,6 +179,8 @@ const ItemSeparatorComponent = ({
 }) => (
   <View style={{ width: horizontal ? gap : 0, height: horizontal ? 0 : gap }} />
 );
+
+const ItemSeparator = memo(ItemSeparatorComponent);
 
 const keyExtractor = (item: ArrayItemType<CoverList_users$data>) => item.id;
 
