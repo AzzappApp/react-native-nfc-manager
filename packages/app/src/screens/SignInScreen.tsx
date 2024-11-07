@@ -10,8 +10,8 @@ import {
   useWindowDimensions,
   StyleSheet,
 } from 'react-native';
-import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { setSharedWebCredentials } from 'react-native-keychain';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { waitTime } from '@azzapp/shared/asyncHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import {
@@ -25,6 +25,7 @@ import { useNativeNavigationEvent, useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { signin } from '#helpers/MobileWebAPI';
+import useKeyboardHeight from '#hooks/useKeyboardHeight';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import PressableOpacity from '#ui/PressableOpacity';
@@ -175,6 +176,13 @@ const SignInScreen = () => {
     [height],
   );
 
+  const keyboardHeight = useKeyboardHeight();
+  const keyboardAvoidAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      paddingBottom: keyboardHeight.value - insets.bottom + 16,
+    };
+  });
+
   return (
     <View style={styles.root}>
       <View style={styles.background}>
@@ -199,7 +207,7 @@ const SignInScreen = () => {
           style={styles.logo}
         />
       </View>
-      <KeyboardAvoidingView behavior="padding" style={styles.content}>
+      <Animated.View style={[styles.content, keyboardAvoidAnimatedStyle]}>
         <View onLayout={onLayout}>
           <View style={styles.header}>
             <Text variant="xlarge">
@@ -338,7 +346,7 @@ const SignInScreen = () => {
             </View>
           </View>
         </View>
-      </KeyboardAvoidingView>
+      </Animated.View>
     </View>
   );
 };
