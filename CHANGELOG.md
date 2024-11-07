@@ -1,5 +1,7 @@
-## 1.4.0-canary.60
+## 1.4.0-canary.61
 
+* **fix:**  - enable buffer cache on android ([#5765](https://github.com/AzzappApp/azzapp/pull/5765))
+* **fix:**  - remove text area modal state ([#5737](https://github.com/AzzappApp/azzapp/pull/5737))
 * **fix:**  - Carousel - restore overflow ([#5789](https://github.com/AzzappApp/azzapp/pull/5789))
 * **fix:**  - CoverLink: restore the itemSeparator properly. ([#5785](https://github.com/AzzappApp/azzapp/pull/5785))
 * **fix:**  - **android:** [#5706](https://github.com/AzzappApp/azzapp/pull/5706) share back carousel is back ([#5778](https://github.com/AzzappApp/azzapp/pull/5778))
