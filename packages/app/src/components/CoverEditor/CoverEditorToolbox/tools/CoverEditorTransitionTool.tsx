@@ -22,6 +22,7 @@ import BoxSelectionList from '#components/BoxSelectionList';
 import { DoneHeaderButton } from '#components/commonsButtons';
 import { keyExtractor } from '#helpers/idHelpers';
 import useBoolean from '#hooks/useBoolean';
+import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Header from '#ui/Header';
 import Text from '#ui/Text';
@@ -133,6 +134,9 @@ const CoverEditorTransitionTool = () => {
     [previewIn, previewOut],
   );
 
+  const { bottom } = useScreenInsets();
+  const height = 276 + bottom;
+
   return (
     <>
       <ToolBoxSection
@@ -143,7 +147,7 @@ const CoverEditorTransitionTool = () => {
         })}
         onPress={open}
       />
-      <BottomSheetModal lazy onDismiss={close} visible={show} height={276}>
+      <BottomSheetModal lazy onDismiss={close} visible={show} height={height}>
         <Header
           middleElement={<Text variant="large">Transitions</Text>}
           rightElement={<DoneHeaderButton onPress={close} />}
