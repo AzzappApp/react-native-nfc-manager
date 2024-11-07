@@ -1,4 +1,4 @@
-import { forwardRef, useMemo } from 'react';
+import { forwardRef, memo, useMemo } from 'react';
 import { Dimensions, Image, Platform, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
@@ -218,115 +218,87 @@ const CoverRenderer = (
     [borderRadius, styles.shadow],
   );
 
-  return useMemo(
-    () => (
-      <View style={large ? undefined : shadowStyle}>
-        <View ref={forwardRef} style={containerStyle} testID="cover-renderer">
-          {coverSource ? (
-            isVideoMedia ? (
-              <MediaVideoRenderer
-                ref={mediaRef as any}
-                testID="CoverRenderer_media"
-                source={coverSource}
-                thumbnailURI={isSmallCover ? smallThumbnail : thumbnail}
-                onReadyForDisplay={onReadyForDisplay}
-                videoEnabled={canPlay}
-                onError={onError}
-                style={styles.layer}
-                paused={paused}
-                useAnimationSnapshot={useAnimationSnapshot}
-              />
-            ) : (
-              <MediaImageRenderer
-                ref={mediaRef as any}
-                testID="CoverRenderer_media"
-                source={coverSource}
-                onReadyForDisplay={onReadyForDisplay}
-                onError={onError}
-                style={styles.layer}
-                useAnimationSnapshot={useAnimationSnapshot}
-              />
-            )
+  return (
+    <View style={large ? undefined : shadowStyle}>
+      <View ref={forwardRef} style={containerStyle} testID="cover-renderer">
+        {coverSource ? (
+          isVideoMedia ? (
+            <MediaVideoRenderer
+              ref={mediaRef as any}
+              testID="CoverRenderer_media"
+              source={coverSource}
+              thumbnailURI={isSmallCover ? smallThumbnail : thumbnail}
+              onReadyForDisplay={onReadyForDisplay}
+              videoEnabled={canPlay}
+              onError={onError}
+              style={styles.layer}
+              paused={paused}
+              useAnimationSnapshot={useAnimationSnapshot}
+            />
           ) : (
-            <View style={styles.coverPlaceHolder}>
-              <Image
-                source={require('#assets/webcard/logo-substract-full.png')}
-                style={{
-                  width: width / 2,
-                  height: width / 2,
-                }}
-                resizeMode="contain"
-              />
-            </View>
-          )}
-          {showLinks && (
-            <View
+            <MediaImageRenderer
+              ref={mediaRef as any}
+              testID="CoverRenderer_media"
+              source={coverSource}
+              onReadyForDisplay={onReadyForDisplay}
+              onError={onError}
+              style={styles.layer}
+              useAnimationSnapshot={useAnimationSnapshot}
+            />
+          )
+        ) : (
+          <View style={styles.coverPlaceHolder}>
+            <Image
+              source={require('#assets/webcard/logo-substract-full.png')}
               style={{
-                flexDirection: 'row',
-                position: 'absolute',
-                transformOrigin: 'center',
-                transform: [
-                  { rotate: `${coverDynamicLinks.rotation}rad` },
-                  // Fixes https://github.com/AzzappApp/azzapp/issues/4423 (When a parent element has a rotateY with a value of 0, it creates this bug on Android)
-                  { rotateY: `${Platform.OS === 'android' ? '0.1' : '0'}deg` },
-                ],
-                top:
-                  (coverDynamicLinks.position.y * height) / 100 -
-                  linksSize.height / 2,
-                left:
-                  (coverDynamicLinks.position.x * width) / 100 -
-                  linksSize.width / 2,
-                gap: convertToBaseCanvasRatio(LINKS_GAP, width),
-                zIndex: 1,
+                width: width / 2,
+                height: width / 2,
               }}
-            >
-              {coverDynamicLinks.links.map(link => (
-                <DynamicLinkRenderer
-                  key={link.socialId}
-                  as={large ? PressableNative : View}
-                  cardColors={cardColors}
-                  color={coverDynamicLinks.color}
-                  link={link}
-                  shadow={coverDynamicLinks.shadow}
-                  size={coverDynamicLinks.size}
-                  viewWidth={width}
-                />
-              ))}
-            </View>
-          )}
-        </View>
+              resizeMode="contain"
+            />
+          </View>
+        )}
+        {showLinks && (
+          <View
+            style={{
+              flexDirection: 'row',
+              position: 'absolute',
+              transformOrigin: 'center',
+              transform: [
+                { rotate: `${coverDynamicLinks.rotation}rad` },
+                // Fixes https://github.com/AzzappApp/azzapp/issues/4423 (When a parent element has a rotateY with a value of 0, it creates this bug on Android)
+                { rotateY: `${Platform.OS === 'android' ? '0.1' : '0'}deg` },
+              ],
+              top:
+                (coverDynamicLinks.position.y * height) / 100 -
+                linksSize.height / 2,
+              left:
+                (coverDynamicLinks.position.x * width) / 100 -
+                linksSize.width / 2,
+              gap: convertToBaseCanvasRatio(LINKS_GAP, width),
+              zIndex: 1,
+            }}
+          >
+            {coverDynamicLinks.links.map(link => (
+              <DynamicLinkRenderer
+                key={link.socialId}
+                as={large ? PressableNative : View}
+                cardColors={cardColors}
+                color={coverDynamicLinks.color}
+                link={link}
+                shadow={coverDynamicLinks.shadow}
+                size={coverDynamicLinks.size}
+                viewWidth={width}
+              />
+            ))}
+          </View>
+        )}
       </View>
-    ),
-    [
-      large,
-      shadowStyle,
-      forwardRef,
-      containerStyle,
-      coverSource,
-      isVideoMedia,
-      mediaRef,
-      isSmallCover,
-      smallThumbnail,
-      thumbnail,
-      onReadyForDisplay,
-      canPlay,
-      onError,
-      styles.layer,
-      styles.coverPlaceHolder,
-      paused,
-      useAnimationSnapshot,
-      width,
-      showLinks,
-      coverDynamicLinks,
-      height,
-      linksSize.height,
-      linksSize.width,
-      cardColors,
-    ],
+    </View>
   );
 };
 
-export default forwardRef(CoverRenderer);
+export default memo(forwardRef(CoverRenderer));
 
 const stylesheet = createStyleSheet(theme => ({
   root: {
