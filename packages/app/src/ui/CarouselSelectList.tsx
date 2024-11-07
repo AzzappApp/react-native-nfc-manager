@@ -331,7 +331,7 @@ export default memo(forwardRef(CarouselSelectList)) as <T>(
   p: CarouselSelectListProps<T> & { ref?: Ref<CarouselSelectListHandle> },
 ) => ReactElement;
 
-const styles = StyleSheet.create({ list: { flex: 1 } });
+const styles = StyleSheet.create({ list: { flex: 1, overflow: 'visible' } });
 
 const AnimatedItemWrapper = ({
   index,
