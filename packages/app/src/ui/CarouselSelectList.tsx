@@ -10,7 +10,7 @@ import {
   useState,
   useLayoutEffect,
 } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { PixelRatio, StyleSheet, View } from 'react-native';
 import Animated, {
   Extrapolation,
   interpolate,
@@ -136,7 +136,9 @@ function CarouselSelectList<TItem = any>(
   const [containerHeight, setContainerHeight] = useState<number | null>(null);
   const [containerWidth, setContainerWidth] = useState<number | null>(null);
   const itemWidth =
-    containerHeight != null ? containerHeight * itemRatio : null;
+    containerHeight != null
+      ? PixelRatio.roundToNearestPixel(containerHeight * itemRatio)
+      : null;
 
   useLayoutEffect(() => {
     if (!containerRef.current) {
@@ -245,13 +247,6 @@ function CarouselSelectList<TItem = any>(
     [itemWidth],
   );
 
-  const offset =
-    itemWidth != null ? (itemWidth - itemWidth * scaleRatio) / 2 : 0;
-  const offsetCenter =
-    itemWidth != null && containerWidth != null
-      ? (containerWidth - itemWidth) / 2 - itemWidth * scaleRatio
-      : 0;
-
   const ccstyle = useMemo(() => {
     return [
       {
@@ -271,12 +266,11 @@ function CarouselSelectList<TItem = any>(
           scrollIndex={scrollIndex}
           scaleRatio={scaleRatio}
           containerStyle={itemContainerStyle}
-          offset={offset}
-          offsetCenter={offsetCenter}
           width={itemWidth ?? 0}
           height={containerHeight ?? 0}
           renderChildren={renderItem}
           info={info}
+          containerWidth={containerWidth ?? 0}
         />
       );
     },
@@ -284,11 +278,10 @@ function CarouselSelectList<TItem = any>(
       scrollIndex,
       scaleRatio,
       itemContainerStyle,
-      offset,
-      offsetCenter,
       itemWidth,
       containerHeight,
       renderItem,
+      containerWidth,
     ],
   );
 
@@ -337,24 +330,22 @@ const AnimatedItemWrapper = ({
   index,
   scrollIndex,
   scaleRatio,
-  offset,
-  offsetCenter,
   containerStyle,
   renderChildren,
   info,
   width,
   height,
+  containerWidth,
 }: {
   index: number;
   scrollIndex: SharedValue<number>;
-  offset: number;
-  offsetCenter: number;
   scaleRatio: number;
   renderChildren: CarouselSelectListRenderItem<any>;
   info: ListRenderItemInfo<any>;
   containerStyle: StyleProp<ViewStyle>;
   width: number;
   height: number;
+  containerWidth: number;
 }) => {
   const animatedStyle = useAnimatedStyle(() => {
     const scale = interpolate(
@@ -363,6 +354,8 @@ const AnimatedItemWrapper = ({
       [scaleRatio, 1, scaleRatio],
       Extrapolation.CLAMP,
     );
+    const offset = (width - width * scale) / 2;
+    const offsetCenter = (containerWidth - width - width * scale) / 2;
     const translateX = interpolate(
       scrollIndex.value,
       [index - 1, index, index + 1],
@@ -373,7 +366,6 @@ const AnimatedItemWrapper = ({
       transform: [{ scale }, { translateX }],
     };
   });
-
   return (
     <Animated.View style={[{ width }, animatedStyle, containerStyle]}>
       {renderChildren({ ...info, width, height })}

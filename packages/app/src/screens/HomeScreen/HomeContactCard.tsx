@@ -1,5 +1,5 @@
 import { memo, useCallback, useMemo } from 'react';
-import { Platform, View } from 'react-native';
+import { View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { useFragment, graphql } from 'react-relay';
 import { getTextColor } from '@azzapp/shared/colorsHelpers';
@@ -55,16 +55,11 @@ const HomeContactCard = ({
 
   const { currentIndexSharedValue } = useHomeScreenContext();
 
-  const isAndroid = Platform.OS === 'android';
   const animatedStyle = useAnimatedStyle(() => {
-    let value = currentIndexSharedValue.value;
-    if (isAndroid && Math.abs(value - Math.round(value)) < 0.02) {
-      value = Math.round(value);
-    }
     return {
       transform: [
         {
-          translateX: -(value - 1) * (width + gap),
+          translateX: -(currentIndexSharedValue.value - 1) * (width + gap),
         },
       ],
     };
