@@ -1,5 +1,6 @@
-## 1.4.0-canary.54
+## 1.4.0-canary.55
 
+* **fix:**  - 🐛 correctly use default values ([#5755](https://github.com/AzzappApp/azzapp/pull/5755))
 * **fix:**  - **android:** [#5684](https://github.com/AzzappApp/azzapp/pull/5684) weird behaviour with focused input without keyboard ([#5757](https://github.com/AzzappApp/azzapp/pull/5757))
 * **fix:**  - **SignIng:** fix jumpy keyboard ([#5756](https://github.com/AzzappApp/azzapp/pull/5756))
 * **fix:**  - links edition ([#5700](https://github.com/AzzappApp/azzapp/pull/5700))
