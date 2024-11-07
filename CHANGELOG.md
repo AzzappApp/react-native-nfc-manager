@@ -1,5 +1,6 @@
-## 1.4.0-canary.58
+## 1.4.0-canary.59
 
+* **fix:**  - Carousel - restore overflow ([#5789](https://github.com/AzzappApp/azzapp/pull/5789))
 * **fix:**  - CoverLink: restore the itemSeparator properly. ([#5785](https://github.com/AzzappApp/azzapp/pull/5785))
 * **fix:**  - **android:** [#5706](https://github.com/AzzappApp/azzapp/pull/5706) share back carousel is back ([#5778](https://github.com/AzzappApp/azzapp/pull/5778))
 * **fix:**  - 1px misplacement of coverREnderer due to transparent border ([#5780](https://github.com/AzzappApp/azzapp/pull/5780))
