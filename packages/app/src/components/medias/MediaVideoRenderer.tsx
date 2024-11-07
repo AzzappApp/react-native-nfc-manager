@@ -9,7 +9,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import Video, { ViewType } from 'react-native-video';
 import {
   captureSnapshot,
@@ -254,7 +254,22 @@ const MediaVideoRenderer = (
           style={StyleSheet.absoluteFill}
         />
       )}
-      {!!videoEnabled && (
+      {!!videoEnabled && Platform.OS === 'android' ? (
+        thumbnailSource ? (
+          <MediaImageRenderer
+            source={thumbnailSource}
+            testID="thumbnail"
+            alt={alt}
+            onReadyForDisplay={onVideoReadyForDisplay}
+            style={StyleSheet.absoluteFill}
+          />
+        ) : (
+          <View
+            style={[StyleSheet.absoluteFill, { backgroundColor: 'red' }]}
+            onLayout={onVideoReadyForDisplay}
+          />
+        )
+      ) : (
         <Video
           ref={videoRef}
           source={videoSource}
@@ -268,7 +283,7 @@ const MediaVideoRenderer = (
           repeat
           style={StyleSheet.absoluteFill}
           resizeMode="contain"
-          viewType={ViewType.SURFACE}
+          viewType={ViewType.TEXTURE}
           onReadyForDisplay={onVideoReadyForDisplay}
           playInBackground={false}
           onError={onError}
