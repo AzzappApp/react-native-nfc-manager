@@ -73,7 +73,7 @@
     "@formatjs/intl-locale": "^4.2.3",
     "@formatjs/intl-pluralrules": "^5.3.3",
     "@formatjs/intl-relativetimeformat": "^11.4.3",
-    "@gorhom/bottom-sheet": "^5",
+    "@gorhom/bottom-sheet": "^5.0.5",
     "@hookform/resolvers": "^3.9.1",
     "@lottiefiles/lottie-js": "0.4.2",
     "@miblanchard/react-native-slider": "2.6.0",
