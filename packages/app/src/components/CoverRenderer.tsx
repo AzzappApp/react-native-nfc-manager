@@ -308,8 +308,6 @@ const stylesheet = createStyleSheet(theme => ({
   },
   shadow: {
     ...shadow(theme, 'bottom'),
-    borderWidth: 1,
-    borderColor: 'transparent',
   },
   layer: {
     position: 'absolute',
