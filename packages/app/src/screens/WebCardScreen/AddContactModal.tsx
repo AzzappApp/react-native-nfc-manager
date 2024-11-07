@@ -380,30 +380,17 @@ const AddContactModal = ({
           console.warn('fail to add contact ?');
         }
       },
-      onCompleted: () => {
-        close();
-        router.pop(1);
-        onRequestAddContactToPhonebook();
-      },
+      onCompleted: close,
       onError: e => {
         console.warn('error adding contact', e);
       },
     });
-  }, [
-    scanned,
-    viewer,
-    getContactInput,
-    commit,
-    close,
-    router,
-    onRequestAddContactToPhonebook,
-  ]);
+  }, [scanned, viewer, getContactInput, commit, close]);
 
-  const onClose = useCallback(() => {
-    close();
+  const onDismiss = useCallback(() => {
     router.pop(1);
     onRequestAddContactToPhonebook();
-  }, [close, onRequestAddContactToPhonebook, router]);
+  }, [onRequestAddContactToPhonebook, router]);
 
   useEffect(() => {
     (async () => {
@@ -457,7 +444,7 @@ const AddContactModal = ({
   return (
     <BottomSheetModal
       visible={show}
-      onDismiss={onClose}
+      onDismiss={onDismiss}
       height={675 + bottom}
       lazy
       enableContentPanningGesture={false}
@@ -475,7 +462,7 @@ const AddContactModal = ({
           </Text>
         }
         leftElement={
-          <PressableNative onPress={onClose}>
+          <PressableNative onPress={close}>
             <Icon icon="close" />
           </PressableNative>
         }
