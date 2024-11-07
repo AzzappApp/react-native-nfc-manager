@@ -239,6 +239,10 @@ const MediaVideoRenderer = (
     [style],
   );
 
+  // configure cache size to avoid downloading video content on every playback
+  // This configuration is android only
+  const bufferConfig = { cacheSizeMB: 100 };
+
   return (
     <View style={containerStyle} ref={containerRef} {...props}>
       {thumbnailSource && !currentTime && !snapshotID && (
@@ -272,6 +276,7 @@ const MediaVideoRenderer = (
           hideShutterView
           shutterColor="transparent"
           onLoad={onLoadEnd}
+          bufferConfig={bufferConfig}
         />
       )}
       {snapshotID && (
