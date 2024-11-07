@@ -1,4 +1,4 @@
-## 1.4.0-canary.59
+## 1.4.0-canary.60
 
 * **fix:**  - Carousel - restore overflow ([#5789](https://github.com/AzzappApp/azzapp/pull/5789))
 * **fix:**  - CoverLink: restore the itemSeparator properly. ([#5785](https://github.com/AzzappApp/azzapp/pull/5785))
