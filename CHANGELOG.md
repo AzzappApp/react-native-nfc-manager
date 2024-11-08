@@ -1,5 +1,7 @@
-## 1.4.0-canary.68
+## 1.4.0-canary.69
 
+* **fix:**  - 🐛 properly downsize cropped image ([#5810](https://github.com/AzzappApp/azzapp/pull/5810))
+* **fix:**  - **Home:** AnimatedText color ([#5816](https://github.com/AzzappApp/azzapp/pull/5816))
 * **fix:**  - bad index computation with margins ([#5807](https://github.com/AzzappApp/azzapp/pull/5807))
 * **fix:**  - fix order when cloned modules are at the end ([#5802](https://github.com/AzzappApp/azzapp/pull/5802))
 * **fix:**  - allow scrolling in color panel editor mode ([#5803](https://github.com/AzzappApp/azzapp/pull/5803))
