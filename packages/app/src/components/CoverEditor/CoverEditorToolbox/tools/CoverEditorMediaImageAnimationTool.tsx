@@ -208,7 +208,7 @@ const CoverEditorMediaImageAnimationTool = () => {
         onPress={open}
       />
       {activeMedia != null && (
-        <BottomSheetModal lazy onDismiss={open} visible={show}>
+        <BottomSheetModal lazy onDismiss={close} visible={show}>
           <Header
             middleElement={
               <Text variant="large">
