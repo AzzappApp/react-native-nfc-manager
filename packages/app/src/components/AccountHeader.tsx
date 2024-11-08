@@ -15,7 +15,7 @@ const AccountHeader = ({
   title,
 }: {
   webCard: AccountHeader_webCard$key | null;
-  title: string;
+  title: React.ReactNode;
 }) => {
   const webCard = useFragment(
     graphql`

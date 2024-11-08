@@ -96,7 +96,7 @@ const HomeBottomSheetPanel = ({
           {
             azzappA: <Text variant="azzapp">a</Text>,
           },
-        ) as string,
+        ) as unknown as string,
       });
     },
   );

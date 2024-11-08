@@ -346,7 +346,7 @@ const ContactCardEditScreen = ({
             {
               azzappA: <Text variant="azzapp">a</Text>,
             },
-          ) as string,
+          ) as unknown as string,
         });
       },
     });
@@ -359,17 +359,15 @@ const ContactCardEditScreen = ({
         edges={{ bottom: 'additive', top: 'additive' }}
       >
         <Header
-          middleElement={
-            intl.formatMessage(
-              {
-                defaultMessage: 'Edit Contact Card{azzappA}',
-                description: 'Edit Contact Card Modal title',
-              },
-              {
-                azzappA: <Text variant="azzapp">a</Text>,
-              },
-            ) as string
-          }
+          middleElement={intl.formatMessage(
+            {
+              defaultMessage: 'Edit Contact Card{azzappA}',
+              description: 'Edit Contact Card Modal title',
+            },
+            {
+              azzappA: <Text variant="azzapp">a</Text>,
+            },
+          )}
           leftElement={
             <Button
               label={intl.formatMessage({

@@ -158,7 +158,7 @@ const PostCommentsList = ({
           {
             azzappA: <Text variant="azzapp">a</Text>,
           },
-        ) as string,
+        ) as unknown as string,
       });
 
       return;
@@ -202,7 +202,7 @@ const PostCommentsList = ({
                   {
                     azzappA: <Text variant="azzapp">a</Text>,
                   },
-                ) as string,
+                ) as unknown as string,
               });
             } else {
               console.error(error);

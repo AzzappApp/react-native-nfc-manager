@@ -172,7 +172,7 @@ const PostRendererActionBar = ({
                   {
                     azzappA: <Text variant="azzapp">a</Text>,
                   },
-                ) as string,
+                ) as unknown as string,
               });
             } else {
               //add manual capture exception for testing issue

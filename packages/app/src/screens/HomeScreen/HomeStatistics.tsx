@@ -22,6 +22,7 @@ import { useIndexInterpolation } from './homeHelpers';
 import { format } from './HomeInformations';
 import { useHomeScreenContext } from './HomeScreenContext';
 import type { HomeStatistics_profiles$key } from '#relayArtifacts/HomeStatistics_profiles.graphql';
+import type { ReactNode } from 'react';
 import type { DerivedValue } from 'react-native-reanimated';
 
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
@@ -257,42 +258,38 @@ const HomeStatistics = ({
       >
         <StatisticItems
           value={totalViewsLabel}
-          title={
-            intl.formatMessage(
-              {
-                defaultMessage: 'Webcard{azzappA} Views',
-                description: 'Home statistics - webcardView label',
-              },
-              {
-                azzappA: (
-                  <Text style={styles.icon} variant="azzapp">
-                    a
-                  </Text>
-                ),
-              },
-            ) as string
-          }
+          title={intl.formatMessage(
+            {
+              defaultMessage: 'Webcard{azzappA} Views',
+              description: 'Home statistics - webcardView label',
+            },
+            {
+              azzappA: (
+                <Text style={styles.icon} variant="azzapp">
+                  a
+                </Text>
+              ),
+            },
+          )}
           scrollIndex={scrollIndexOffset}
           index={0}
           onSelect={onSelectStat}
         />
         <StatisticItems
           value={totalScansLabel}
-          title={
-            intl.formatMessage(
-              {
-                defaultMessage: 'Contact card{azzappA} views',
-                description: 'Home statistics - Contact card views label',
-              },
-              {
-                azzappA: (
-                  <Text variant="azzapp" style={styles.icon}>
-                    a
-                  </Text>
-                ),
-              },
-            ) as string
-          }
+          title={intl.formatMessage(
+            {
+              defaultMessage: 'Contact card{azzappA} views',
+              description: 'Home statistics - Contact card views label',
+            },
+            {
+              azzappA: (
+                <Text variant="azzapp" style={styles.icon}>
+                  a
+                </Text>
+              ),
+            },
+          )}
           scrollIndex={scrollIndexOffset}
           index={1}
           onSelect={onSelectStat}
@@ -333,7 +330,7 @@ const dayRange = Array.from({ length: 30 }, (_, i) => i);
 type StatisticItemsProps = {
   value: DerivedValue<string>;
   scrollIndex: DerivedValue<number>;
-  title: string;
+  title: ReactNode;
   index: number;
   onSelect: (index: number) => void;
 };

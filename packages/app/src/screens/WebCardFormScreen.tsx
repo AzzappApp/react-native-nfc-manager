@@ -155,7 +155,7 @@ const WebCardFormScreen = ({
     {
       azzappA: <Text variant="azzapp">a</Text>,
     },
-  ) as string;
+  ) as unknown as string;
 
   const userNameInvalidError = intl.formatMessage(
     {

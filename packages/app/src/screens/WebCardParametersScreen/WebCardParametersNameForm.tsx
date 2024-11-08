@@ -140,7 +140,7 @@ const WebcardParametersNameForm = ({
     {
       azzappA: <Text variant="azzapp">a</Text>,
     },
-  ) as string;
+  );
 
   const environment = useRelayEnvironment();
 
@@ -195,7 +195,7 @@ const WebcardParametersNameForm = ({
                   </Text>
                 ),
               },
-            ) as string,
+            ) as unknown as string,
           });
         } else if (
           response?.errors.some(
@@ -227,7 +227,7 @@ const WebcardParametersNameForm = ({
                     )}`
                   : 'unknown date',
               },
-            ) as string,
+            ) as unknown as string,
           });
         } else {
           setError('root.server', {

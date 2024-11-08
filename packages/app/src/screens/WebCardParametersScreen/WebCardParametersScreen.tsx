@@ -254,7 +254,7 @@ const WebCardParametersScreen = ({
               {
                 azzappA: <Text variant="azzapp">a</Text>,
               },
-            ) as string,
+            ) as unknown as string,
           });
         },
       });
@@ -312,7 +312,7 @@ const WebCardParametersScreen = ({
             {
               azzappA: <Text variant="azzapp">a</Text>,
             },
-          ) as string,
+          ) as unknown as string,
         });
       }
     },
@@ -358,7 +358,7 @@ const WebCardParametersScreen = ({
                 {
                   azzappA: <Text variant="azzapp">a</Text>,
                 },
-              ) as string,
+              ) as unknown as string,
             });
           }
         },
@@ -391,7 +391,7 @@ const WebCardParametersScreen = ({
               {
                 azzappA: <Text variant="azzapp">a</Text>,
               },
-            ) as string,
+            ) as unknown as string,
           });
         },
       });
@@ -431,7 +431,7 @@ const WebCardParametersScreen = ({
           {
             azzappA: <Text variant="azzapp">a</Text>,
           },
-        ) as string,
+        ) as unknown as string,
         text2: intl.formatMessage(
           {
             defaultMessage: 'The {dateChange} at {timeChange}',

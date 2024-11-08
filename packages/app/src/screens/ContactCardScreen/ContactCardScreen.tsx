@@ -250,7 +250,7 @@ export const ContactCardScreen = ({
               description: 'Error toast message',
             },
             { azzappA: <Text variant="azzapp">a</Text> },
-          ) as string,
+          ) as unknown as string,
           android: intl.formatMessage(
             {
               defaultMessage:
@@ -258,8 +258,8 @@ export const ContactCardScreen = ({
               description: 'Error toast message',
             },
             { azzappA: <Text variant="azzapp">a</Text> },
-          ),
-        }) as string,
+          ) as unknown as string,
+        }),
         type: 'error',
       });
     } finally {
@@ -290,17 +290,15 @@ export const ContactCardScreen = ({
           <Button
             variant="secondary"
             style={styles.editContactCardButton}
-            label={
-              intl.formatMessage(
-                {
-                  defaultMessage: 'Edit ContactCard{azzappA} details',
-                  description: 'Edit card details button label',
-                },
-                {
-                  azzappA: <Text variant="azzapp">a</Text>,
-                },
-              ) as string
-            }
+            label={intl.formatMessage(
+              {
+                defaultMessage: 'Edit ContactCard{azzappA} details',
+                description: 'Edit card details button label',
+              },
+              {
+                azzappA: <Text variant="azzapp">a</Text>,
+              },
+            )}
             onPress={() => {
               router.push({
                 route: 'CONTACT_CARD_EDIT',
@@ -467,18 +465,16 @@ const ContactCardScreenHeader = ({
   return (
     <AccountHeader
       webCard={webCard}
-      title={
-        intl.formatMessage(
-          {
-            defaultMessage: 'Contact Card{azzappA}',
-            description:
-              'Title of the contact card screen where user can edit their contact card.',
-          },
-          {
-            azzappA: <Text variant="azzapp">a</Text>,
-          },
-        ) as string
-      }
+      title={intl.formatMessage(
+        {
+          defaultMessage: 'Contact Card{azzappA}',
+          description:
+            'Title of the contact card screen where user can edit their contact card.',
+        },
+        {
+          azzappA: <Text variant="azzapp">a</Text>,
+        },
+      )}
     />
   );
 };

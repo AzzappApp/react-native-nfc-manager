@@ -149,7 +149,7 @@ const useToggleFollow = (userNameFilter?: string) => {
             {
               azzappA: <Text variant="azzapp">a</Text>,
             },
-          )) as string,
+          )) as unknown as string,
     });
 
     // currentProfileId is undefined when user is anonymous so we can't follow

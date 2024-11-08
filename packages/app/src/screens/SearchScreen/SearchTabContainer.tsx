@@ -176,6 +176,14 @@ const SearchTabContainer = ({
       renderScene={renderScene}
       onIndexChange={onIndexTabChange}
       style={styles.tabViewstyle}
+      commonOptions={{
+        label: ({ route }) =>
+          typeof route.label === 'string' ? (
+            <Text>{route.label}</Text>
+          ) : (
+            route.label
+          ),
+      }}
     />
   );
 };
@@ -201,7 +209,7 @@ const TabBarSearch = (
         gap: 10,
         paddingLeft: 10,
       }}
-      renderTabBarItem={({ route, labelStyle, renderLabel, onPress }) => {
+      renderTabBarItem={({ route, labelStyle, onPress, label }) => {
         return (
           <TabBarMenuItem
             selected={
@@ -212,7 +220,7 @@ const TabBarSearch = (
             labelStyle={labelStyle}
             style={styles.tabItemContainerStyle}
           >
-            {renderLabel?.({
+            {label?.({
               route,
               focused:
                 props.navigationState.routes[props.navigationState.index]
@@ -222,13 +230,6 @@ const TabBarSearch = (
           </TabBarMenuItem>
         );
       }}
-      renderLabel={({ route }) =>
-        typeof route.label === 'string' ? (
-          <Text>{route.label}</Text>
-        ) : (
-          route.label
-        )
-      }
     />
   );
 };
