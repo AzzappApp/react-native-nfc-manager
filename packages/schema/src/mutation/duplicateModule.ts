@@ -42,30 +42,30 @@ const duplicateModule: MutationResolvers['duplicateModule'] = async (
 
       // create holes in modules position list
       // 1 find the last index of old modules
-      const lastLodule = modules[modules.length - 1];
+      const lastModule = modules[modules.length - 1];
 
       // 2 Append create Hole
       const nextModulesIdx = allModules.findIndex(
-        module => module.id === lastLodule.id,
+        module => module.id === lastModule.id,
       );
-      const nextModules = allModules
-        .slice(nextModulesIdx + 1, allModules.length)
-        .map(m => m.id);
+      const lastModulePosition = allModules[nextModulesIdx].position;
 
-      await updateCardModulesPosition(webCardId, nextModules, modules.length);
+      if (nextModulesIdx !== allModules.length) {
+        // do not put hole at the end of the list
+        const nextModules = allModules
+          .slice(nextModulesIdx + 1, allModules.length)
+          .map(m => m.id);
+        await updateCardModulesPosition(webCardId, nextModules, modules.length);
+      }
 
       // 3 add the new modules in the Hole
       const modulesToCreate = modules.map((m, index) => ({
         ...omit(m, 'id'),
-        position: index + nextModulesIdx + 1,
+        position: index + lastModulePosition + 1,
       }));
 
       // duplicate modules
-      createdModuleIds = await createCardModules(
-        modulesToCreate.map(module => {
-          return module;
-        }),
-      );
+      createdModuleIds = await createCardModules(modulesToCreate);
 
       // clean up media
       const moduleMedias = modules.flatMap(m => {
@@ -75,8 +75,9 @@ const duplicateModule: MutationResolvers['duplicateModule'] = async (
         }
         return [];
       });
-
-      await referencesMedias(moduleMedias, []);
+      if (moduleMedias.length) {
+        await referencesMedias(moduleMedias, []);
+      }
     });
   } catch (e) {
     console.error(e);
