@@ -1,4 +1,4 @@
-## 1.4.0-canary.69
+## 1.4.0-canary.70
 
 * **fix:**  - 🐛 properly downsize cropped image ([#5810](https://github.com/AzzappApp/azzapp/pull/5810))
 * **fix:**  - **Home:** AnimatedText color ([#5816](https://github.com/AzzappApp/azzapp/pull/5816))
