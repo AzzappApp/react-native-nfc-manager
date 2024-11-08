@@ -1,5 +1,8 @@
-## 1.4.0-canary.66
+## 1.4.0-canary.67
 
+* **fix:**  - bad index computation with margins ([#5807](https://github.com/AzzappApp/azzapp/pull/5807))
+* **fix:**  - fix order when cloned modules are at the end ([#5802](https://github.com/AzzappApp/azzapp/pull/5802))
+* **fix:**  - allow scrolling in color panel editor mode ([#5803](https://github.com/AzzappApp/azzapp/pull/5803))
 * **fix:**  - animation edition reopening ([#5798](https://github.com/AzzappApp/azzapp/pull/5798))
 * **fix:**  - review color picker look & feel ([#5795](https://github.com/AzzappApp/azzapp/pull/5795))
 * **fix:**  - add missing bottom inset in transition editor ([#5797](https://github.com/AzzappApp/azzapp/pull/5797))
