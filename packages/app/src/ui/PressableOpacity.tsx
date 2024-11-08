@@ -36,7 +36,7 @@ const PressableOpacity = (
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
-      opacity: opacityValue.value,
+      opacity: disabled ? disabledOpacity : opacityValue.value,
     };
   });
 
@@ -61,7 +61,7 @@ const PressableOpacity = (
       onPressIn={onFadeIn}
       onPressOut={onFadeOut}
       disabled={disabled}
-      style={[style, disabled ? { opacity: disabledOpacity } : animatedStyle]}
+      style={[style, animatedStyle]}
     />
   );
 };
