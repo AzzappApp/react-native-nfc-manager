@@ -1,4 +1,4 @@
-## 1.4.0-canary.67
+## 1.4.0-canary.68
 
 * **fix:**  - bad index computation with margins ([#5807](https://github.com/AzzappApp/azzapp/pull/5807))
 * **fix:**  - fix order when cloned modules are at the end ([#5802](https://github.com/AzzappApp/azzapp/pull/5802))
