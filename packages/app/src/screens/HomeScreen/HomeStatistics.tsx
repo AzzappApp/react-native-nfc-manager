@@ -382,10 +382,9 @@ export const StatisticItems = ({
   return (
     <Animated.View style={[styles.boxContainer, animatedOpacity]}>
       <Pressable onPress={onPress} style={{ overflow: 'visible' }}>
-        <AnimatedText
-          style={[styles.largeText, animatedTextStyle]}
-          text={value}
-        />
+        <Animated.View style={animatedTextStyle}>
+          <AnimatedText style={styles.largeText} text={value} />
+        </Animated.View>
         <Text variant="smallbold" style={styles.smallText}>
           {title}
         </Text>
