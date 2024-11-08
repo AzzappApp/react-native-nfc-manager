@@ -187,7 +187,9 @@ const ColorPicker = ({
   return (
     <BottomSheetModal
       visible={visible}
-      enableContentPanningGesture={state !== 'colorChooser'}
+      enableContentPanningGesture={
+        state !== 'colorChooser' && state !== 'editing'
+      }
       onDismiss={onClose}
       height={height}
       automaticBottomPadding={false}
