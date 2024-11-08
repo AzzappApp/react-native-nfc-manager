@@ -88,13 +88,11 @@ const MediaScreen = ({
     {
       id: 'SUGGESTIONS',
       element: (
-        <Suspense fallback={<MediaSuggestionsScreenFallback />}>
-          <MediaSuggestionsScreen
-            profile={profile}
-            isCurrentTab={tab === 'SUGGESTIONS'}
-            canPlay={hasFocus && tab === 'SUGGESTIONS'}
-          />
-        </Suspense>
+        <MediaSuggestionsScreen
+          profile={profile}
+          isCurrentTab={tab === 'SUGGESTIONS'}
+          canPlay={hasFocus && tab === 'SUGGESTIONS'}
+        />
       ),
     },
     {
