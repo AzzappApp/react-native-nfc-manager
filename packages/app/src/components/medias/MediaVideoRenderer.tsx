@@ -9,7 +9,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Video, { ViewType } from 'react-native-video';
 import {
   captureSnapshot,
