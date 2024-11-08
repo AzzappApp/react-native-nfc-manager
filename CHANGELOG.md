@@ -1,5 +1,6 @@
-## 1.4.0-canary.64
+## 1.4.0-canary.65
 
+* **fix:**  - animation edition reopening ([#5798](https://github.com/AzzappApp/azzapp/pull/5798))
 * **fix:**  - review color picker look & feel ([#5795](https://github.com/AzzappApp/azzapp/pull/5795))
 * **fix:**  - add missing bottom inset in transition editor ([#5797](https://github.com/AzzappApp/azzapp/pull/5797))
 * **fix:**  - fix carousel animation moving translate after scale ([#5775](https://github.com/AzzappApp/azzapp/pull/5775))
