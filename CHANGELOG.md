@@ -1,5 +1,7 @@
-## 1.4.0-canary.70
+## 1.4.0-canary.71
 
+* **fix:**  - stat text color ([#5820](https://github.com/AzzappApp/azzapp/pull/5820))
+* **fix:**  - animated opacity not taken into account when changing from style to animated style ([#5824](https://github.com/AzzappApp/azzapp/pull/5824))
 * **fix:**  - 🐛 properly downsize cropped image ([#5810](https://github.com/AzzappApp/azzapp/pull/5810))
 * **fix:**  - **Home:** AnimatedText color ([#5816](https://github.com/AzzappApp/azzapp/pull/5816))
 * **fix:**  - bad index computation with margins ([#5807](https://github.com/AzzappApp/azzapp/pull/5807))
