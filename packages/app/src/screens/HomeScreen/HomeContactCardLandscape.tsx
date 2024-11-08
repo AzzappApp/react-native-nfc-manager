@@ -75,7 +75,6 @@ const HomeContactCardLandscape = ({
   }, [visibleSharedValue]);
 
   useEffect(() => {
-    return;
     if (Platform.OS === 'android') {
       Accelerometer.setUpdateInterval(1000);
     }
