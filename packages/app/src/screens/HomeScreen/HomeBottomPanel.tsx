@@ -174,7 +174,6 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
         <TabView
           style={{ flex: 1, height: panelHeight }}
           currentTab={selectedPanel}
-          mountOnlyCurrentTab
           tabs={[
             {
               id: 'CONTACT_CARD',
