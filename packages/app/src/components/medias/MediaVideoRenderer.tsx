@@ -1,3 +1,4 @@
+import { ResizeMode, Video } from 'expo-av';
 import isEqual from 'lodash/isEqual';
 import {
   forwardRef,
@@ -10,7 +11,6 @@ import {
   useState,
 } from 'react';
 import { StyleSheet, View } from 'react-native';
-import Video, { ViewType } from 'react-native-video';
 import {
   captureSnapshot,
   SnapshotRenderer,
@@ -18,13 +18,9 @@ import {
 import { useLocalCachedMediaFile } from '#helpers/mediaHelpers/LocalMediaCache';
 import { DelayedActivityIndicator } from '#ui/ActivityIndicator/ActivityIndicator';
 import MediaImageRenderer from './MediaImageRenderer';
+import type { AVPlaybackStatus } from 'expo-av';
 import type { ForwardedRef } from 'react';
 import type { ViewProps } from 'react-native';
-import type {
-  OnProgressData,
-  VideoRef,
-  ReactVideoProps,
-} from 'react-native-video';
 
 export type MediaVideoRendererProps = ViewProps & {
   /**
@@ -140,7 +136,7 @@ const MediaVideoRenderer = (
     }
   }, [useAnimationSnapshot]);
 
-  const videoRef = useRef<VideoRef>(null);
+  const videoRef = useRef<Video>(null);
   const containerRef = useRef<any>(null);
 
   useImperativeHandle(
@@ -148,7 +144,13 @@ const MediaVideoRenderer = (
     () => ({
       async getPlayerCurrentTime() {
         if (videoRef.current) {
-          return videoRef.current.getCurrentPosition().catch(() => null);
+          // return videoRef.current.getCurrentPosition().catch(() => null);
+          videoRef.current.getStatusAsync().then(status => {
+            if (!status.isLoaded) {
+              return null;
+            }
+            return status.positionMillis;
+          });
         }
         return null;
       },
@@ -198,10 +200,13 @@ const MediaVideoRenderer = (
   }, [dispatchReady, onVideoReady, cleanSnapshots]);
 
   const onPlaybackStatusUpdate = useCallback(
-    (status: OnProgressData) => {
+    (status: AVPlaybackStatus) => {
+      if (!status.isLoaded) {
+        return;
+      }
       onProgress?.({
-        currentTime: status.currentTime,
-        duration: status.playableDuration,
+        currentTime: status.positionMillis,
+        duration: status.durationMillis ?? 0,
       });
     },
     [onProgress],
@@ -211,16 +216,10 @@ const MediaVideoRenderer = (
     setLoading(false);
   }, []);
 
-  const videoSource: ReactVideoProps['source'] = useMemo(() => {
-    const startPosition = currentTime ? currentTime * 1000 : undefined;
-    if (localVideoFile) {
-      return {
-        uri: localVideoFile,
-        startPosition,
-      };
-    }
-    return { uri: source.uri, startPosition };
-  }, [localVideoFile, source, currentTime]);
+  const videoSource = useMemo(
+    () => ({ uri: localVideoFile ?? source.uri }),
+    [localVideoFile, source.uri],
+  );
 
   const thumbnailSource = useMemo(
     () =>
@@ -239,10 +238,6 @@ const MediaVideoRenderer = (
     [style],
   );
 
-  // configure cache size to avoid downloading video content on every playback
-  // This configuration is android only
-  const bufferConfig = { cacheSizeMB: 100 };
-
   return (
     <View style={containerStyle} ref={containerRef} {...props}>
       {thumbnailSource && !currentTime && !snapshotID && (
@@ -258,25 +253,19 @@ const MediaVideoRenderer = (
         <Video
           ref={videoRef}
           source={videoSource}
-          muted={muted}
-          paused={paused}
-          disableFocus={true}
-          onProgress={onPlaybackStatusUpdate}
-          preventsDisplaySleepDuringVideoPlayback={false}
-          onEnd={onEnd}
+          isMuted={muted}
+          shouldPlay={!paused}
+          resizeMode={ResizeMode.COVER}
+          onPlaybackStatusUpdate={onPlaybackStatusUpdate}
+          positionMillis={currentTime ?? 0}
+          // onEnd={onEnd}
           accessibilityLabel={alt}
-          repeat
-          style={StyleSheet.absoluteFill}
-          resizeMode="contain"
-          viewType={ViewType.TEXTURE}
+          isLooping
+          style={{ position: 'absolute', width: '100%', height: '100%' }}
           onReadyForDisplay={onVideoReadyForDisplay}
-          playInBackground={false}
           onError={onError}
-          progressUpdateInterval={onProgress ? 50 : undefined}
-          hideShutterView
-          shutterColor="transparent"
+          progressUpdateIntervalMillis={onProgress ? 50 : undefined}
           onLoad={onLoadEnd}
-          bufferConfig={bufferConfig}
         />
       )}
       {snapshotID && (

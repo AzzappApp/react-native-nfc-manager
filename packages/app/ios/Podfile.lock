@@ -73,6 +73,9 @@ PODS:
   - boost (1.84.0)
   - DoubleConversion (1.1.6)
   - DVAssetLoaderDelegate (0.3.3)
+  - EXAV (15.0.1):
+    - ExpoModulesCore
+    - ReactCommon/turbomodule/core
   - EXConstants (17.0.2):
     - ExpoModulesCore
   - Expo (52.0.0-preview.10):
@@ -1827,73 +1830,6 @@ PODS:
     - React
     - React-Core
     - react-native-skia
-  - react-native-video (6.7.0):
-    - DoubleConversion
-    - glog
-    - hermes-engine
-    - RCT-Folly (= 2024.01.01.00)
-    - RCTRequired
-    - RCTTypeSafety
-    - React-Core
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-ImageManager
-    - react-native-video/Video (= 6.7.0)
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-rendererdebug
-    - React-utils
-    - ReactCodegen
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
-    - Yoga
-  - react-native-video/Fabric (6.7.0):
-    - DoubleConversion
-    - glog
-    - hermes-engine
-    - RCT-Folly (= 2024.01.01.00)
-    - RCTRequired
-    - RCTTypeSafety
-    - React-Core
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-ImageManager
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-rendererdebug
-    - React-utils
-    - ReactCodegen
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
-    - Yoga
-  - react-native-video/Video (6.7.0):
-    - DoubleConversion
-    - DVAssetLoaderDelegate (~> 0.3.1)
-    - glog
-    - hermes-engine
-    - RCT-Folly (= 2024.01.01.00)
-    - RCTRequired
-    - RCTTypeSafety
-    - React-Core
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-ImageManager
-    - react-native-video/Fabric
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-rendererdebug
-    - React-utils
-    - ReactCodegen
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
-    - SPTPersistentCache (~> 1.1.0)
-    - Yoga
   - react-native-webview (13.12.3):
     - DoubleConversion
     - glog
@@ -2634,6 +2570,7 @@ DEPENDENCIES:
   - boost (from `../../../node_modules/react-native/third-party-podspecs/boost.podspec`)
   - DoubleConversion (from `../../../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - DVAssetLoaderDelegate
+  - EXAV (from `../../../node_modules/expo-av/ios`)
   - EXConstants (from `../../../node_modules/expo-constants/ios`)
   - Expo (from `../../../node_modules/expo`)
   - ExpoAsset (from `../../../node_modules/expo-asset/ios`)
@@ -2703,7 +2640,6 @@ DEPENDENCIES:
   - react-native-safe-area-context (from `../../../node_modules/react-native-safe-area-context`)
   - "react-native-skia (from `../../../node_modules/@shopify/react-native-skia`)"
   - react-native-skottie-template-player (from `../../../node_modules/react-native-skottie-template-player`)
-  - react-native-video (from `../../../node_modules/react-native-video`)
   - react-native-webview (from `../../../node_modules/react-native-webview`)
   - React-nativeconfig (from `../../../node_modules/react-native/ReactCommon`)
   - React-NativeModulesApple (from `../../../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
@@ -2794,6 +2730,8 @@ EXTERNAL SOURCES:
     :podspec: "../../../node_modules/react-native/third-party-podspecs/boost.podspec"
   DoubleConversion:
     :podspec: "../../../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec"
+  EXAV:
+    :path: "../../../node_modules/expo-av/ios"
   EXConstants:
     :path: "../../../node_modules/expo-constants/ios"
   Expo:
@@ -2919,8 +2857,6 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/@shopify/react-native-skia"
   react-native-skottie-template-player:
     :path: "../../../node_modules/react-native-skottie-template-player"
-  react-native-video:
-    :path: "../../../node_modules/react-native-video"
   react-native-webview:
     :path: "../../../node_modules/react-native-webview"
   React-nativeconfig:
@@ -3027,6 +2963,7 @@ SPEC CHECKSUMS:
   boost: 1dca942403ed9342f98334bf4c3621f011aa7946
   DoubleConversion: f16ae600a246532c4020132d54af21d0ddb2a385
   DVAssetLoaderDelegate: 0caec20e4e08b8560b691131539e9180024d4bce
+  EXAV: 9773c9799767c9925547b05e41a26a0240bb8ef2
   EXConstants: 33cb635065c7c1fe09a0fce5c8ddde8a0a2860c4
   Expo: 58f7ac68c4cee818e08035bea0f397f2d6498494
   ExpoAsset: 9de2f325e8c97a4c6c2bc85e507ae7f0809c91aa
@@ -3106,7 +3043,6 @@ SPEC CHECKSUMS:
   react-native-safe-area-context: 2500e4fe998caad50ad3bc51ec23ef951308569e
   react-native-skia: 425a5610939828363e0681b8b3e994dd4f18b711
   react-native-skottie-template-player: 4abf4dc0370aa2fef5fdd3c26c1809ffcf8c38ec
-  react-native-video: 2d290c0edcb46efc0e5ce0588e8e92edbc3dd9b6
   react-native-webview: 8039cbb0aa6ad2fd7918e23aebb5586f127d3e91
   React-nativeconfig: 93fe8c85a8c40820c57814e30f3e44b94c995a7b
   React-NativeModulesApple: b3e076fd0d7b73417fe1e8c8b26e3c57ae9b74aa
