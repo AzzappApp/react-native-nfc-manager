@@ -462,6 +462,7 @@ const WebCardScreenContent = ({
               webCard={webCard}
               visible={showWebcardColorPicker}
               onRequestClose={closeWebcardColorPicker}
+              onCloseCanceled={openWebcardColorPicker}
             />
             <AddContentBelowCoverModal
               onClose={toggleShowContentModal}

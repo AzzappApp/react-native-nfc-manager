@@ -1,4 +1,4 @@
-import { Suspense, useCallback, useRef, useState } from 'react';
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Alert, View, StyleSheet } from 'react-native';
 import ColorTriptychChooser from '#components/ColorTriptychChooser';
@@ -18,18 +18,17 @@ export type CoverEditorColorsManagerProps = {
    */
   visible: boolean;
   /**
-   * The height of the bottomsheet @default 320
-   */
-  height?: number;
-  /**
    * Called when the user close the bottomsheet
    */
   onRequestClose: () => void;
+
+  onCloseCanceled: () => void;
 };
 
 const CoverEditorColorsManager = ({
   visible,
   onRequestClose,
+  onCloseCanceled,
 }: CoverEditorColorsManagerProps) => {
   const {
     coverEditorState: { cardColors },
@@ -42,7 +41,13 @@ const CoverEditorColorsManager = ({
 
   const savedColors = useRef(cardColors);
   const hasChanges = useRef(false);
+  const closeRequested = useRef(false);
 
+  useEffect(() => {
+    if (visible) {
+      closeRequested.current = false;
+    }
+  }, [visible]);
   const revertColors = useCallback(() => {
     if (hasChanges.current) {
       dispatch({
@@ -96,6 +101,7 @@ const CoverEditorColorsManager = ({
   );
 
   const onCancelInner = useCallback(() => {
+    closeRequested.current = true;
     if (!editedColor) {
       revertColors();
       onRequestClose();
@@ -116,6 +122,10 @@ const CoverEditorColorsManager = ({
 
   const intl = useIntl();
   const onDismiss = useCallback(() => {
+    onRequestClose();
+    if (closeRequested.current) {
+      return;
+    }
     if (hasChanges.current || editedColor) {
       Alert.alert(
         intl.formatMessage({
@@ -136,7 +146,7 @@ const CoverEditorColorsManager = ({
               description:
                 'Webcard ColorPicker component unsaved changes alert Cancel button label',
             }),
-            onPress: () => void 0,
+            onPress: onCloseCanceled,
             style: 'cancel',
           },
           {
@@ -152,13 +162,11 @@ const CoverEditorColorsManager = ({
           },
         ],
       );
-
-      return;
     }
-    onRequestClose();
-  }, [editedColor, intl, onRequestClose, revertColors]);
+  }, [editedColor, intl, onCloseCanceled, onRequestClose, revertColors]);
 
   const onDone = useCallback(() => {
+    closeRequested.current = true;
     if (!editedColor) {
       savedColors.current = cardColors;
       onRequestClose();

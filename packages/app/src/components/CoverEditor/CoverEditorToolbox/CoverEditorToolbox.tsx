@@ -161,6 +161,7 @@ const CoverEditorToolbox = (
       <CoverEditorColorsManager
         visible={colorPickerVisible}
         onRequestClose={closeColorPicker}
+        onCloseCanceled={showColorPicker}
       />
       <CoverEditorAddOverlay
         onClose={closeOverlayImagePicker}

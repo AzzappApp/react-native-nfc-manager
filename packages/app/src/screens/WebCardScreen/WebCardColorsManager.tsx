@@ -45,6 +45,8 @@ export type WebCardColorsManagerProps = {
    * Called when the user close the bottomsheet
    */
   onRequestClose: () => void;
+
+  onCloseCanceled: () => void;
 };
 
 const WebCardColorsManager = ({
@@ -52,6 +54,7 @@ const WebCardColorsManager = ({
   visible,
   height = 340,
   onRequestClose,
+  onCloseCanceled,
 }: WebCardColorsManagerProps) => {
   const {
     webCard,
@@ -209,6 +212,8 @@ const WebCardColorsManager = ({
     if (saving) {
       return;
     }
+    onRequestClose();
+
     if (optimisticUpdate.current || editedColor) {
       Alert.alert(
         intl.formatMessage({
@@ -229,7 +234,7 @@ const WebCardColorsManager = ({
               description:
                 'Webcard ColorPicker component unsaved changes alert Cancel button label',
             }),
-            onPress: () => void 0,
+            onPress: onCloseCanceled,
             style: 'cancel',
           },
           {
@@ -248,11 +253,8 @@ const WebCardColorsManager = ({
           },
         ],
       );
-
-      return;
     }
-    onRequestClose();
-  }, [editedColor, environment, intl, onRequestClose, saving]);
+  }, [editedColor, environment, intl, onCloseCanceled, onRequestClose, saving]);
 
   const onDone = useCallback(() => {
     if (!editedColor) {
