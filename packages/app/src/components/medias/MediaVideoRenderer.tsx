@@ -254,47 +254,31 @@ const MediaVideoRenderer = (
           style={StyleSheet.absoluteFill}
         />
       )}
-      {!!videoEnabled &&
-        (Platform.OS === 'android' ? (
-          thumbnailSource ? (
-            <MediaImageRenderer
-              source={thumbnailSource}
-              testID="thumbnail"
-              alt={alt}
-              onReadyForDisplay={onVideoReadyForDisplay}
-              style={StyleSheet.absoluteFill}
-            />
-          ) : (
-            <View
-              style={[StyleSheet.absoluteFill, { backgroundColor: 'red' }]}
-              onLayout={onVideoReadyForDisplay}
-            />
-          )
-        ) : (
-          <Video
-            ref={videoRef}
-            source={videoSource}
-            muted={muted}
-            paused={paused}
-            disableFocus={true}
-            onProgress={onPlaybackStatusUpdate}
-            preventsDisplaySleepDuringVideoPlayback={false}
-            onEnd={onEnd}
-            accessibilityLabel={alt}
-            repeat
-            style={StyleSheet.absoluteFill}
-            resizeMode="contain"
-            viewType={ViewType.TEXTURE}
-            onReadyForDisplay={onVideoReadyForDisplay}
-            playInBackground={false}
-            onError={onError}
-            progressUpdateInterval={onProgress ? 50 : undefined}
-            hideShutterView
-            shutterColor="transparent"
-            onLoad={onLoadEnd}
-            bufferConfig={bufferConfig}
-          />
-        ))}
+      {!!videoEnabled && (
+        <Video
+          ref={videoRef}
+          source={videoSource}
+          muted={muted}
+          paused={paused}
+          disableFocus={true}
+          onProgress={onPlaybackStatusUpdate}
+          preventsDisplaySleepDuringVideoPlayback={false}
+          onEnd={onEnd}
+          accessibilityLabel={alt}
+          repeat
+          style={StyleSheet.absoluteFill}
+          resizeMode="contain"
+          viewType={ViewType.TEXTURE}
+          onReadyForDisplay={onVideoReadyForDisplay}
+          playInBackground={false}
+          onError={onError}
+          progressUpdateInterval={onProgress ? 50 : undefined}
+          hideShutterView
+          shutterColor="transparent"
+          onLoad={onLoadEnd}
+          bufferConfig={bufferConfig}
+        />
+      )}
       {snapshotID && (
         <SnapshotRenderer
           snapshotID={snapshotID}
