@@ -1,5 +1,6 @@
-## 1.4.0-canary.71
+## 1.4.0-canary.72
 
+* **fix:**  - **MediaScreen:** blinking when tab switching on android
 * **fix:**  - stat text color ([#5820](https://github.com/AzzappApp/azzapp/pull/5820))
 * **fix:**  - animated opacity not taken into account when changing from style to animated style ([#5824](https://github.com/AzzappApp/azzapp/pull/5824))
 * **fix:**  - 🐛 properly downsize cropped image ([#5810](https://github.com/AzzappApp/azzapp/pull/5810))
