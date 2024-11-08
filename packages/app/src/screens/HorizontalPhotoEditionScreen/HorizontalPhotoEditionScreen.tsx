@@ -253,7 +253,11 @@ const HorizontalPhotoEditionScreen = ({
     editionParameters,
     filter,
   }: ImagePickerResult) => {
-    const size = downScaleImage(width, height, MODULE_IMAGE_MAX_WIDTH);
+    const size = downScaleImage(
+      editionParameters.cropData?.width ?? width,
+      editionParameters.cropData?.height ?? height,
+      MODULE_IMAGE_MAX_WIDTH,
+    );
     const exportPath = await saveTransformedImageToFile({
       uri,
       resolution: size,
