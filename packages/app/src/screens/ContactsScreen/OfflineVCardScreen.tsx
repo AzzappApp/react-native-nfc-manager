@@ -153,6 +153,7 @@ const OfflineVCardScreen = () => {
   const windowHeight = fullWindowHeight - top;
 
   const itemMargin = (windowWidth * 5) / 100;
+  const halfMargin = itemMargin / 2;
   const itemWidth = (windowWidth * 90) / 100;
   const itemHeight = itemWidth / CONTACT_CARD_RATIO;
 
@@ -328,7 +329,7 @@ const OfflineVCardScreen = () => {
 
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: event => {
-      const index = event.contentOffset.x / itemWidth;
+      const index = event.contentOffset.x / (itemWidth + halfMargin);
       currentIndexSharedValue.value = index;
       runOnJS(setCurrentIndex)(Math.round(index));
     },
@@ -336,15 +337,15 @@ const OfflineVCardScreen = () => {
 
   const getItemLayout = useCallback(
     (_data: unknown, index: number) => ({
-      length: itemWidth + itemMargin / 2,
-      offset: (itemWidth + itemMargin / 2) * index,
+      length: itemWidth + halfMargin,
+      offset: (itemWidth + halfMargin) * index,
       index,
     }),
-    [itemMargin, itemWidth],
+    [halfMargin, itemWidth],
   );
   const snapToOffsets = useMemo(
-    () => vcardList.map((_, index) => (itemWidth + itemMargin / 2) * index),
-    [itemMargin, itemWidth, vcardList],
+    () => vcardList.map((_, index) => (itemWidth + halfMargin) * index),
+    [halfMargin, itemWidth, vcardList],
   );
 
   const readableColors = useMemo(
@@ -384,7 +385,7 @@ const OfflineVCardScreen = () => {
 
   const offlineModeText = useDerivedValue(() => offlineText);
 
-  const renderSeparator = () => <View style={{ width: itemMargin / 2 }} />;
+  const renderSeparator = () => <View style={{ width: halfMargin }} />;
 
   const contentContainerStyle = {
     top: flatListPositionInSwipableZone,
@@ -507,11 +508,13 @@ const OfflineVCardScreen = () => {
         <View
           style={[styles.progress, { top: -flatListPositionInSwipableZone }]}
         >
-          <PageProgress
-            nbPages={vcardList.length}
-            currentPage={currentIndex}
-            appearance="dark"
-          />
+          {vcardList.length > 1 ? (
+            <PageProgress
+              nbPages={vcardList.length}
+              currentPage={currentIndex}
+              appearance="dark"
+            />
+          ) : undefined}
         </View>
       </SafeAreaView>
     </Container>
