@@ -17,8 +17,10 @@ import {
   profileIsOwner,
 } from '@azzapp/shared/profileHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
+import { signInRoutes } from '#mobileRoutes';
 import { colors } from '#theme';
 import Link from '#components/Link';
+import { useRouter } from '#components/NativeRouter';
 import { logEvent } from '#helpers/analytics';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { useDeleteNotifications } from '#hooks/useNotifications';
@@ -154,32 +156,26 @@ const HomeBottomSheetPanel = ({
 
   const [requestedLogout, toggleRequestLogout] = useToggle(false);
 
-  //this code work on ios only
+  const router = useRouter();
+
   const onDismiss = useCallback(async () => {
     if (requestedLogout) {
-      try {
-        await deleteFcmToken();
-      } finally {
-        void dispatchGlobalEvent({ type: 'SIGN_OUT' });
-      }
+      setTimeout(() => {
+        try {
+          deleteFcmToken();
+        } finally {
+          void dispatchGlobalEvent({ type: 'SIGN_OUT' });
+        }
+      });
     }
     close();
   }, [close, deleteFcmToken, requestedLogout]);
-  //TODO: review Using onDismiss to logout (strange) but without it, the app is crashing in dev
+
   const onLogout = useCallback(async () => {
-    if (Platform.OS === 'ios') {
-      toggleRequestLogout();
-    }
+    router.replaceAll(signInRoutes);
+    toggleRequestLogout();
     close();
-    if (Platform.OS === 'android') {
-      //android is not crashing, but onDismiss is an ios feature only
-      try {
-        await deleteFcmToken();
-      } finally {
-        void dispatchGlobalEvent({ type: 'SIGN_OUT' });
-      }
-    }
-  }, [close, deleteFcmToken, toggleRequestLogout]);
+  }, [close, router, toggleRequestLogout]);
 
   const onShare = useCallback(async () => {
     if (profile?.webCard?.userName) {
