@@ -1,10 +1,14 @@
-import { useCallback, useState } from 'react';
-import { View } from 'react-native';
+import Animated, {
+  measure,
+  useAnimatedRef,
+  useAnimatedStyle,
+  useFrameCallback,
+  useSharedValue,
+} from 'react-native-reanimated';
 import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import PressableNative from '#ui/PressableNative';
 import type {
-  LayoutChangeEvent,
   LayoutRectangle,
   StyleProp,
   ViewProps,
@@ -28,74 +32,91 @@ type EditorScaledPreviewProps = ViewProps & {
  */
 const EditorScaledPreview = ({
   onPreviewPress,
-  onLayout: onLayoutProp,
+  onLayout,
   children,
   moduleContainerStyle,
   style,
   ...props
 }: EditorScaledPreviewProps) => {
-  const [layout, setLayout] = useState<LayoutRectangle | null>(null);
-  const onLayout = useCallback(
-    (event: LayoutChangeEvent) => {
-      onLayoutProp?.(event);
-      setLayout(event.nativeEvent.layout);
-    },
-    [onLayoutProp],
-  );
-
-  const [moduleContainerLayout, setModuleContainerLayout] =
-    useState<LayoutRectangle | null>(null);
-
-  const onModuleContainerLayout = useCallback((event: LayoutChangeEvent) => {
-    setModuleContainerLayout(event.nativeEvent.layout);
-  }, []);
-
-  const scale =
-    layout && moduleContainerLayout
-      ? Math.min(layout.height / moduleContainerLayout?.height, 1)
-      : 1;
-
   const styles = useStyleSheet(styleSheet);
 
+  const containerRef = useAnimatedRef();
+
+  const containerValue = useSharedValue<LayoutRectangle | null>(null);
+
+  const moduleRef = useAnimatedRef();
+
+  const moduleLayout = useSharedValue<LayoutRectangle | null>(null);
+
+  useFrameCallback(() => {
+    if (!containerValue.value) {
+      const measured = measure(containerRef);
+      if (measured) {
+        containerValue.value = measured;
+      }
+    }
+
+    const measured = measure(moduleRef);
+    if (measured) {
+      moduleLayout.value = measured;
+    }
+  });
+
+  const scaledViewAnimatedStyle = useAnimatedStyle(() => {
+    const scale =
+      containerValue.value && moduleLayout.value
+        ? Math.min(containerValue.value.height / moduleLayout.value.height, 1)
+        : 1;
+
+    return {
+      opacity: containerValue.value ? 1 : 0,
+      top:
+        containerValue.value && moduleLayout.value
+          ? containerValue.value.height / 2 - moduleLayout.value.height / 2
+          : 0,
+      left:
+        containerValue.value && moduleLayout.value
+          ? containerValue.value.width / 2 - moduleLayout.value.width / 2
+          : 0,
+      transform: containerValue.value ? [{ scale }] : undefined,
+    };
+  });
+
   return (
-    <View {...props} style={style} onLayout={onLayout}>
-      <PressableNative
-        onPress={onPreviewPress}
-        onLayout={onModuleContainerLayout}
-        disabledOpacity={onPreviewPress != null ? 0.3 : 1}
-        disabled={onPreviewPress == null}
-        style={[
-          styles.moduleContainer,
-          {
-            opacity: layout ? 1 : 0,
-            top:
-              layout && moduleContainerLayout
-                ? layout.height / 2 - moduleContainerLayout.height / 2
-                : 0,
-            left:
-              layout && moduleContainerLayout
-                ? layout.width / 2 - moduleContainerLayout.width / 2
-                : 0,
-            transform: layout ? [{ scale }] : undefined,
-          },
-          moduleContainerStyle,
-        ]}
+    <Animated.View
+      {...props}
+      onLayout={onLayout}
+      style={style}
+      ref={containerRef}
+    >
+      <Animated.View
+        ref={moduleRef}
+        style={[styles.moduleContainer, moduleContainerStyle]}
       >
-        {children}
-      </PressableNative>
-    </View>
+        <PressableNative
+          onPress={onPreviewPress}
+          disabledOpacity={onPreviewPress != null ? 0.3 : 1}
+          disabled={onPreviewPress == null}
+          style={[styles.previewContainer, scaledViewAnimatedStyle]}
+        >
+          {children}
+        </PressableNative>
+      </Animated.View>
+    </Animated.View>
   );
 };
 
 export default EditorScaledPreview;
 
-const styleSheet = createStyleSheet(apperance => ({
-  moduleContainer: [
+const styleSheet = createStyleSheet(appearance => ({
+  moduleContainer: {
+    position: 'absolute',
+    width: '100%',
+  },
+  previewContainer: [
     {
-      position: 'absolute',
-      width: '100%',
       backgroundColor: colors.white,
     },
-    shadow(apperance),
+    shadow(appearance),
   ],
 }));
