@@ -127,7 +127,6 @@ const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
               bottom
             }
             variant="modal"
-            onDismiss={toggleShowAvailableInfo}
             nestedScroll
           >
             <Header
