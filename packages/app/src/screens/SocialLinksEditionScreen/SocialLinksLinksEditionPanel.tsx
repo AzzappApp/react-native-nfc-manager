@@ -51,6 +51,7 @@ type SocialLinksLinksEditionPanelProps = ViewProps & {
    */
   onLinksChange: (links: Array<SocialLinkInput | null>) => void;
   contentContainerStyle?: StyleProp<ViewStyle>;
+  ignoreKeyboard?: boolean;
 };
 
 /**
@@ -61,6 +62,7 @@ const SocialLinksLinksEditionPanel = ({
   onLinksChange,
   style,
   contentContainerStyle,
+  ignoreKeyboard,
   ...props
 }: SocialLinksLinksEditionPanelProps) => {
   const intl = useIntl();
@@ -233,7 +235,7 @@ const SocialLinksLinksEditionPanel = ({
   );
 
   const animatedStyle = useAnimatedStyle(() => {
-    if (Platform.OS === 'android') return {};
+    if (Platform.OS === 'android' || ignoreKeyboard) return {};
     return {
       position: 'relative',
       top: keyboardOffset.value,

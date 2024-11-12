@@ -108,6 +108,7 @@ const CoverEditorLinksModal = ({
             )}
           </View>
           <SocialLinksLinksEditionPanel
+            ignoreKeyboard
             links={links}
             onLinksChange={setLinks}
             style={styles.linksEditor}
