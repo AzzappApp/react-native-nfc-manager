@@ -93,14 +93,16 @@ const EditorScaledPreview = ({
         ref={moduleRef}
         style={[styles.moduleContainer, moduleContainerStyle]}
       >
-        <PressableNative
-          onPress={onPreviewPress}
-          disabledOpacity={onPreviewPress != null ? 0.3 : 1}
-          disabled={onPreviewPress == null}
-          style={[styles.previewContainer, scaledViewAnimatedStyle]}
-        >
-          {children}
-        </PressableNative>
+        <Animated.View style={scaledViewAnimatedStyle}>
+          <PressableNative
+            onPress={onPreviewPress}
+            disabledOpacity={onPreviewPress != null ? 0.3 : 1}
+            disabled={onPreviewPress == null}
+            style={styles.previewContainer}
+          >
+            {children}
+          </PressableNative>
+        </Animated.View>
       </Animated.View>
     </Animated.View>
   );
