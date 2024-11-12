@@ -1,5 +1,7 @@
-## 1.4.0-canary.73
+## 1.4.0-canary.74
 
+* **fix:**  - provide good contact label in offline mode ([#5854](https://github.com/AzzappApp/azzapp/pull/5854))
+* **fix:**  - end directly subscription on payment error ([#5856](https://github.com/AzzappApp/azzapp/pull/5856))
 * **fix:**  - **modules:** [#5736](https://github.com/AzzappApp/azzapp/pull/5736) onLayout is not fired on resize ([#5843](https://github.com/AzzappApp/azzapp/pull/5843))
 * **fix:**  - **MediaScreen:** blinking when tab switching on android
 * **fix:**  - stat text color ([#5820](https://github.com/AzzappApp/azzapp/pull/5820))
