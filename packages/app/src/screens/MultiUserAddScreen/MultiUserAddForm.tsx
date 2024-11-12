@@ -3,6 +3,7 @@ import { useCallback, type ReactNode } from 'react';
 import { Controller, useController } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '#theme';
 import EmailOrPhoneInput from '#components/EmailOrPhoneInput';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -42,6 +43,7 @@ type MultiUserAddFormProps = {
 const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
   const styles = useStyleSheet(styleSheet);
   const [showAvailableInfo, toggleShowAvailableInfo] = useToggle(false);
+  const { bottom } = useSafeAreaInsets();
 
   const { field } = useController({ control, name: 'role' });
   const intl = useIntl();
@@ -121,7 +123,8 @@ const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
             visible={showAvailableInfo}
             height={
               BOTTOM_SHEET_HEIGHT_BASE +
-              contacts.length * BOTTOM_SHEET_HEIGHT_ITEM
+              contacts.length * BOTTOM_SHEET_HEIGHT_ITEM +
+              bottom
             }
             variant="modal"
             onDismiss={toggleShowAvailableInfo}
@@ -130,7 +133,7 @@ const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
             <Header
               middleElement={
                 intl.formatMessage({
-                  defaultMessage: 'Available Infoss',
+                  defaultMessage: 'Available Infos',
                   description:
                     'MultiUserAddForm - Available Info BottomSheet - Title',
                 }) as string
@@ -298,7 +301,7 @@ const styleSheet = createStyleSheet(appearance => ({
   },
 }));
 
-const BOTTOM_SHEET_HEIGHT_BASE = 100;
+const BOTTOM_SHEET_HEIGHT_BASE = 80;
 const BOTTOM_SHEET_HEIGHT_ITEM = 40;
 
 export default MultiUserAddForm;

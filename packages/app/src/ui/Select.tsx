@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useBoolean from '#hooks/useBoolean';
@@ -123,6 +124,7 @@ const Select = <ItemT,>({
   ...props
 }: SelectProps<ItemT>) => {
   const [showDropDown, openDropDown, closeDropDown] = useBoolean(false);
+  const { bottom } = useSafeAreaInsets();
 
   const selectedItemIndex = data.findIndex(
     (item, index) => selectedItemKey === keyExtractor(item, index),
@@ -196,7 +198,7 @@ const Select = <ItemT,>({
       </PressableNative>
       <BottomSheetModal
         visible={showDropDown}
-        height={bottomSheetHeight}
+        height={bottomSheetHeight ? bottomSheetHeight + bottom : undefined}
         variant="modal"
         onDismiss={closeDropDown}
         nestedScroll
