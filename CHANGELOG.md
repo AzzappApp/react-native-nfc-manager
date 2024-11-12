@@ -1,5 +1,6 @@
-## 1.4.0-canary.76
+## 1.4.0-canary.77
 
+* **fix:**  - **android:** [#5859](https://github.com/AzzappApp/azzapp/pull/5859) pressable is not animated ([#5871](https://github.com/AzzappApp/azzapp/pull/5871))
 * **fix:**  - adapt Input & onContentSizeChange management to match new react native version ([#5864](https://github.com/AzzappApp/azzapp/pull/5864))
 * **fix:**  - 🐛 avoid available info reapppear ([#5870](https://github.com/AzzappApp/azzapp/pull/5870))
 * **fix:**  - 🐛 properly add bottom margin on select sheet ([#5863](https://github.com/AzzappApp/azzapp/pull/5863))
