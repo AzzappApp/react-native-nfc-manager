@@ -180,7 +180,6 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
           visible={visible}
           onDismiss={close}
           style={styles.bottomSheetStyle}
-          nestedScroll
         >
           <Controller
             name={labelKey}
