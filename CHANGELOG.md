@@ -1,5 +1,6 @@
-## 1.4.0-canary.72
+## 1.4.0-canary.73
 
+* **fix:**  - **modules:** [#5736](https://github.com/AzzappApp/azzapp/pull/5736) onLayout is not fired on resize ([#5843](https://github.com/AzzappApp/azzapp/pull/5843))
 * **fix:**  - **MediaScreen:** blinking when tab switching on android
 * **fix:**  - stat text color ([#5820](https://github.com/AzzappApp/azzapp/pull/5820))
 * **fix:**  - animated opacity not taken into account when changing from style to animated style ([#5824](https://github.com/AzzappApp/azzapp/pull/5824))
