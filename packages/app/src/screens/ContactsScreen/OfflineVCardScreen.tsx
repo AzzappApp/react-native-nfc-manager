@@ -18,6 +18,11 @@ import VCard from 'vcard-creator';
 import { getTextColor } from '@azzapp/shared/colorsHelpers';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
+import {
+  addressLabelToVCardLabel,
+  emailLabelToVCardLabel,
+  phoneLabelToVCardLabel,
+} from '@azzapp/shared/vCardHelpers';
 import { colors } from '#theme';
 import AnimatedText from '#components/AnimatedText';
 import {
@@ -202,11 +207,17 @@ const OfflineVCardScreen = () => {
           }
           contactCard.phoneNumbers?.forEach(number => {
             if (number.selected)
-              vCard.addPhoneNumber(number.number, number.label || '');
+              vCard.addPhoneNumber(
+                number.number,
+                phoneLabelToVCardLabel(number.label) || '',
+              );
           });
           contactCard.emails?.forEach(email => {
             if (email.selected)
-              vCard.addEmail(email.address, email.label || '');
+              vCard.addEmail(
+                email.address,
+                emailLabelToVCardLabel(email.label) || '',
+              );
           });
           contactCard.urls?.forEach(url => {
             if (url.selected) vCard.addURL(url.address);
@@ -216,14 +227,24 @@ const OfflineVCardScreen = () => {
               vCard.addSocial(social.url, social.label || '');
           });
           contactCard?.addresses?.forEach(addr => {
-            if (addr.selected) vCard.addAddress(addr.address, addr.label || '');
+            if (addr.selected)
+              vCard.addAddress(
+                addr.address,
+                addressLabelToVCardLabel(addr.label) || '',
+              );
           });
           if (webCard?.isMultiUser) {
             webCard?.commonInformation?.phoneNumbers?.forEach(number => {
-              vCard.addPhoneNumber(number.number, number.label || '');
+              vCard.addPhoneNumber(
+                number.number,
+                phoneLabelToVCardLabel(number.label) || '',
+              );
             });
             webCard?.commonInformation?.emails?.forEach(email => {
-              vCard.addEmail(email.address, email.label || '');
+              vCard.addEmail(
+                email.address,
+                emailLabelToVCardLabel(email.label) || '',
+              );
             });
             webCard?.commonInformation?.urls?.forEach(url => {
               vCard.addURL(url.address);
@@ -232,7 +253,10 @@ const OfflineVCardScreen = () => {
               vCard.addSocial(social.url, social.label || '');
             });
             webCard?.commonInformation?.addresses?.forEach(addr => {
-              vCard.addAddress(addr.address, addr.label || '');
+              vCard.addAddress(
+                addr.address,
+                addressLabelToVCardLabel(addr.label) || '',
+              );
             });
           }
           if (webCard?.userName) vCard.addURL(buildUserUrl(webCard?.userName));
