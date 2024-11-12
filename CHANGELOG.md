@@ -1,5 +1,8 @@
-## 1.4.0-canary.77
+## 1.4.0-canary.78
 
+* **fix:**  - 🐛 properly display module and background colors ([#5861](https://github.com/AzzappApp/azzapp/pull/5861))
+* **fix:**  - ensure we replace root before logout ([#5868](https://github.com/AzzappApp/azzapp/pull/5868))
+* **fix:**  - workaround missing border on android ([#5872](https://github.com/AzzappApp/azzapp/pull/5872))
 * **fix:**  - **android:** [#5859](https://github.com/AzzappApp/azzapp/pull/5859) pressable is not animated ([#5871](https://github.com/AzzappApp/azzapp/pull/5871))
 * **fix:**  - adapt Input & onContentSizeChange management to match new react native version ([#5864](https://github.com/AzzappApp/azzapp/pull/5864))
 * **fix:**  - 🐛 avoid available info reapppear ([#5870](https://github.com/AzzappApp/azzapp/pull/5870))
