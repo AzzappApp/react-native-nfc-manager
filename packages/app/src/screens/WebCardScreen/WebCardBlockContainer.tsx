@@ -380,7 +380,11 @@ const WebCardBlockContainer = ({
                   : undefined
               }
             >
-              <View pointerEvents={editing ? 'none' : 'box-none'}>
+              <View
+                pointerEvents={editing ? 'none' : 'box-none'}
+                // DO NOT REMOVE TO AVOID flash of unstyled content on Android
+                collapsable={false}
+              >
                 {children}
               </View>
               {!visible && (

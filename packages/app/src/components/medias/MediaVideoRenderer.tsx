@@ -62,10 +62,6 @@ export type MediaVideoRendererProps = ViewProps & {
    */
   onError?: (error: any) => void;
   /**
-   * A callback called when the video has reached the end (before looping)
-   */
-  onEnd?: () => void;
-  /**
    * A callback called while the video is playing, allowing to track the current time
    */
   onProgress?: (event: { currentTime: number; duration: number }) => void;
@@ -108,7 +104,6 @@ const MediaVideoRenderer = (
     paused = false,
     currentTime,
     onProgress,
-    onEnd,
     onReadyForDisplay,
     onVideoReady,
     videoEnabled,
@@ -125,6 +120,12 @@ const MediaVideoRenderer = (
   const localVideoFile = useLocalCachedMediaFile(source.mediaId, 'video');
   const [snapshotID, setSnapshotID] = useState(() =>
     useAnimationSnapshot ? (_videoSnapshots.get(source.mediaId) ?? null) : null,
+  );
+  // we don't want to display the thumbnail if the video had a snapshot during
+  // the video loading
+  const hasSnapshot = useMemo(
+    () => _videoSnapshots.has(source.mediaId),
+    [source.mediaId],
   );
 
   const useAnimationSnapshotRef = useRef(useAnimationSnapshot);
@@ -240,7 +241,7 @@ const MediaVideoRenderer = (
 
   return (
     <View style={containerStyle} ref={containerRef} {...props}>
-      {thumbnailSource && !currentTime && !snapshotID && (
+      {thumbnailSource && !currentTime && !hasSnapshot && (
         <MediaImageRenderer
           source={thumbnailSource}
           testID="thumbnail"
@@ -258,10 +259,9 @@ const MediaVideoRenderer = (
           resizeMode={ResizeMode.COVER}
           onPlaybackStatusUpdate={onPlaybackStatusUpdate}
           positionMillis={currentTime ?? 0}
-          // onEnd={onEnd}
           accessibilityLabel={alt}
           isLooping
-          style={{ position: 'absolute', width: '100%', height: '100%' }}
+          style={StyleSheet.absoluteFill}
           onReadyForDisplay={onVideoReadyForDisplay}
           onError={onError}
           progressUpdateIntervalMillis={onProgress ? 50 : undefined}
