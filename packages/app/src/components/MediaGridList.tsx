@@ -155,6 +155,8 @@ type MediaItemRendererProps = {
   onPress: () => void;
 };
 
+const selectedBorderWidth = 2;
+
 const MediaItemRenderer = ({
   uri,
   duration,
@@ -166,6 +168,7 @@ const MediaItemRenderer = ({
 }: MediaItemRendererProps) => {
   const intl = useIntl();
   const appearance = useColorScheme();
+
   return (
     <PressableNative
       style={{
@@ -185,9 +188,8 @@ const MediaItemRenderer = ({
       activeOpacity={0.7}
       disabled={disabled}
     >
-      <Image
-        accessibilityRole="image"
-        accessibilityIgnoresInvertColors={true}
+      {/* intermediate view added to workaround: https://github.com/expo/expo/issues/32814 */}
+      <View
         style={[
           {
             width: height,
@@ -196,16 +198,33 @@ const MediaItemRenderer = ({
               appearance === 'light' ? colors.grey200 : colors.grey900,
           },
           selected && {
-            borderWidth: 2,
+            borderWidth: selectedBorderWidth,
             borderColor: colors.black,
             borderRadius: 8,
             transformOrigin: 'center',
             transform: [{ scale: 0.95 }],
           },
         ]}
-        source={{ uri, width: height, height }}
-        recyclingKey={uri}
-      />
+      >
+        <Image
+          accessibilityRole="image"
+          accessibilityIgnoresInvertColors={true}
+          style={
+            selected
+              ? {
+                  width: height - 2 * selectedBorderWidth,
+                  height: height - 2 * selectedBorderWidth,
+                  borderRadius: 6,
+                }
+              : {
+                  width: height,
+                  height,
+                }
+          }
+          source={{ uri, width: height, height }}
+          recyclingKey={uri}
+        />
+      </View>
       {isLoading && (
         <View style={styles.loader}>
           <ActivityIndicator color="white" />
