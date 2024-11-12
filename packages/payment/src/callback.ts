@@ -172,6 +172,7 @@ export const rejectFirstPayment = async (
     const taxes = subscription.taxes;
 
     if (webCardId && subscription.subscriptionPlan && amount && taxes) {
+      const errorDate = new Date();
       await transaction(async () => {
         await createPayment({
           status: 'failed',
@@ -191,7 +192,8 @@ export const rejectFirstPayment = async (
 
         await updateSubscriptionByPaymentMeanId(paymentMeanId, {
           status: 'canceled',
-          canceledAt: new Date(),
+          canceledAt: errorDate,
+          endAt: errorDate,
           lastPaymentError: true,
         });
       });
