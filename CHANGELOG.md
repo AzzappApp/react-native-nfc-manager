@@ -1,5 +1,11 @@
-## 1.4.0-canary.75
+## 1.4.0-canary.76
 
+* **fix:**  - adapt Input & onContentSizeChange management to match new react native version ([#5864](https://github.com/AzzappApp/azzapp/pull/5864))
+* **fix:**  - 🐛 avoid available info reapppear ([#5870](https://github.com/AzzappApp/azzapp/pull/5870))
+* **fix:**  - 🐛 properly add bottom margin on select sheet ([#5863](https://github.com/AzzappApp/azzapp/pull/5863))
+* **fix:**  - **WebCard:** android fouc on edit transition ([#5860](https://github.com/AzzappApp/azzapp/pull/5860))
+* **fix:**  - **android:** [#5837](https://github.com/AzzappApp/azzapp/pull/5837) link with embedded button case ([#5857](https://github.com/AzzappApp/azzapp/pull/5857))
+* **fix:**  - 🐛 ignore keyboard position on cover links as we already scroll ([#5828](https://github.com/AzzappApp/azzapp/pull/5828))
 * **fix:**  - fix display of contact fields configurations ([#5852](https://github.com/AzzappApp/azzapp/pull/5852))
 * **fix:**  - provide good contact label in offline mode ([#5854](https://github.com/AzzappApp/azzapp/pull/5854))
 * **fix:**  - end directly subscription on payment error ([#5856](https://github.com/AzzappApp/azzapp/pull/5856))
