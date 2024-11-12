@@ -2,7 +2,7 @@ import { View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
-  MODULES_DEFAULT_VALUES,
+  MODULES_DEFAULT_VALUES_GETTERS,
   MODULES_STYLES_VALUES,
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
@@ -113,12 +113,16 @@ const WebCardBackground = ({
   if (lastModule && kind && kind in MODULES_STYLES_VALUES) {
     const stylesMap =
       MODULES_STYLES_VALUES[kind as keyof typeof MODULES_STYLES_VALUES];
-    const defaultValues =
-      MODULES_DEFAULT_VALUES[kind as keyof typeof MODULES_STYLES_VALUES];
+    const getDefaultValues =
+      MODULES_DEFAULT_VALUES_GETTERS[
+        kind as keyof typeof MODULES_STYLES_VALUES
+      ];
 
     const lasModuleData = getModuleDataValues({
       data: lastModuleData,
-      defaultValues,
+      defaultValues: getDefaultValues
+        ? getDefaultValues(coverBackgroundColor)
+        : {},
       cardStyle: overrideCardStyle ?? cardStyle,
       styleValuesMap: stylesMap,
     });

@@ -95,6 +95,7 @@ const WebCardPreview = (
         ...CoverRenderer_webCard
         ...WebCardBackground_webCard
         ...WebCardBackgroundPreview_webCard
+        coverBackgroundColor
       }
     `,
     webCardKey,
@@ -212,6 +213,7 @@ const WebCardPreview = (
                 colorPalette={cardColors}
                 cardStyle={cardStyle}
                 viewMode={viewMode}
+                coverBackgroundColor={webCard.coverBackgroundColor}
               />
             ))}
           </View>

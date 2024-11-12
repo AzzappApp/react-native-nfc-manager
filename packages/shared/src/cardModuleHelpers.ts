@@ -1191,6 +1191,24 @@ export const MODULES_DEFAULT_VALUES = {
   [MODULE_KIND_WEB_CARDS_CAROUSEL]: {},
 } as const;
 
+export const MODULES_DEFAULT_VALUES_GETTERS = {
+  [MODULE_KIND_BLOCK_TEXT]: getBlockTextDefaultValues,
+  [MODULE_KIND_CAROUSEL]: getCarouselDefaultValues,
+  [MODULE_KIND_HORIZONTAL_PHOTO]: getHorizontalPhotoDefaultValues,
+  [MODULE_KIND_IMAGEGRID]: () => ({}),
+  [MODULE_KIND_LINE_DIVIDER]: () => LINE_DIVIDER_DEFAULT_VALUES,
+  [MODULE_KIND_PARALLAX]: () => ({}),
+  [MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE]:
+    getPhotoWithTextAndTitleDefaultValues,
+  [MODULE_KIND_SCHEDULE]: () => ({}),
+  [MODULE_KIND_SIMPLE_BUTTON]: getButtonDefaultValues,
+  [MODULE_KIND_SIMPLE_TEXT]: getTextDefaultValues,
+  [MODULE_KIND_SIMPLE_TITLE]: getTitleDefaultValues,
+  [MODULE_KIND_SOCIAL_LINKS]: getSocialLinksDefaultValues,
+  [MODULE_KIND_VIDEO]: () => ({}),
+  [MODULE_KIND_WEB_CARDS_CAROUSEL]: () => ({}),
+};
+
 export type ModuleKind = (typeof MODULE_KINDS)[number];
 
 export type ModuleBackgroundStyle = {

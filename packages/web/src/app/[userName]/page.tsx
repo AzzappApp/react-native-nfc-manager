@@ -14,6 +14,7 @@ import {
 } from '@azzapp/shared/cardHelpers';
 import {
   MODULES_DEFAULT_VALUES,
+  MODULES_DEFAULT_VALUES_GETTERS,
   MODULES_STYLES_VALUES,
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
@@ -74,10 +75,12 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
   const lastModule = modules.at(-1);
 
   if (lastModule) {
+    const getDefaultValues = MODULES_DEFAULT_VALUES_GETTERS[lastModule.kind];
+
     const lastModuleData = getModuleDataValues({
       data: lastModule.data as any,
       cardStyle: webCard.cardStyle ?? DEFAULT_CARD_STYLE,
-      defaultValues: MODULES_DEFAULT_VALUES[lastModule.kind],
+      defaultValues: getDefaultValues?.(webCard.coverBackgroundColor) ?? {},
       styleValuesMap: MODULES_STYLES_VALUES[lastModule.kind],
     });
 
@@ -108,8 +111,8 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
   }
 
   const linearGradientEndColor = modules.length
-    ? firstModuleBackgroundColor
-    : swapColor(webCard.coverBackgroundColor, cardColors);
+    ? swapColor(webCard.coverBackgroundColor, cardColors)
+    : firstModuleBackgroundColor;
 
   return (
     <WebCardPageLayout
