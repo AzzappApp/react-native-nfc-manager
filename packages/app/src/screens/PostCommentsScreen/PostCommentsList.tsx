@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Keyboard, RefreshControl, StyleSheet, View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
@@ -114,14 +114,29 @@ const PostCommentsList = ({
   );
 
   const [comment, setComment] = useState<string>('');
+
+  // save the initial input height
+  // when we clear the input, we receive incohenrent onContentSizeChange calls
+  const defaultInputSize = useRef(0);
+
   const [inputHeight, setInputHeight] = useState<number>(68);
-  const onContentSizeChange = (
-    e: NativeSyntheticEvent<TextInputContentSizeChangeEventData>,
-  ) => {
-    setInputHeight(
-      Math.max(47, Math.min(e.nativeEvent.contentSize.height + 15, 92)),
-    );
-  };
+  const onContentSizeChange = useCallback(
+    (e: NativeSyntheticEvent<TextInputContentSizeChangeEventData>) => {
+      const expectedInputSize = Math.max(
+        47,
+        Math.min(e.nativeEvent.contentSize.height + 15, 92),
+      );
+      if (defaultInputSize.current === 0) {
+        defaultInputSize.current = expectedInputSize;
+      }
+      if (!comment) {
+        setInputHeight(defaultInputSize.current);
+      } else {
+        setInputHeight(expectedInputSize);
+      }
+    },
+    [comment],
+  );
 
   const [commit] = useMutation(graphql`
     mutation PostCommentsListMutation(

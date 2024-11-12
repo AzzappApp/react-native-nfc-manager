@@ -104,8 +104,8 @@ const Input = (
 };
 
 const styleSheet = createStyleSheet(appearance => ({
-  rightElement: { marginRight: 13.5 },
-  leftElement: { marginLeft: 16 },
+  rightElement: { marginRight: 13.5, justifyContent: 'center' },
+  leftElement: { marginLeft: 16, justifyContent: 'center' },
   errored: {
     borderColor: colors.red400,
   },
@@ -118,12 +118,12 @@ const styleSheet = createStyleSheet(appearance => ({
     borderColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
     borderRadius: 12,
     flexDirection: 'row',
-    alignItems: 'center',
     height: 47,
     flex: 1,
   },
   input: {
     ...textStyles.textField,
+    justifyContent: 'center',
     flex: 1,
     flexGrow: 1,
     paddingHorizontal: 15,
