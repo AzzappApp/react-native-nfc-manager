@@ -68,17 +68,23 @@ const WebCardKindSelectionScreen = ({
   const [webCardCategoryId, setWebCardCategoryId] = useState<string | null>(
     webCardCategories?.[0]?.id ?? null,
   );
+  const intl = useIntl();
+  const styles = useStyleSheet(styleSheet);
 
-  const [cardWidth, setCardWidth] = useState(0);
+  const [cardHeight, setCardHeight] = useState(0);
+  const cardWidth = cardHeight * COVER_RATIO;
+
   const onMediaListLayout = useCallback(
     ({
       nativeEvent: {
         layout: { height },
       },
     }: LayoutChangeEvent) => {
-      setCardWidth(height * COVER_RATIO);
+      setCardHeight(
+        height - styles.mediasList.paddingTop - styles.mediasList.paddingBottom,
+      );
     },
-    [],
+    [styles.mediasList.paddingBottom, styles.mediasList.paddingTop],
   );
 
   const router = useRouter();
@@ -113,9 +119,6 @@ const WebCardKindSelectionScreen = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const intl = useIntl();
-  const styles = useStyleSheet(styleSheet);
-
   const borderRadius = COVER_CARD_RADIUS * cardWidth;
 
   const mediaStyle = useMemo(
@@ -130,14 +133,13 @@ const WebCardKindSelectionScreen = ({
     [styles.mediaImage, cardWidth, borderRadius],
   );
 
-  const linearGradientWidth = useMemo(() => {
-    return (mediaStyle[1] as { width: number }).width + 2;
-  }, [mediaStyle]);
-
   const mediaImageContainerStyle = useMemo(
     () => [
       styles.mediaImageContainer,
-      { borderRadius, position: 'relative' as const },
+      {
+        borderRadius,
+        position: 'relative' as const,
+      },
     ],
     [styles.mediaImageContainer, borderRadius],
   );
@@ -147,13 +149,15 @@ const WebCardKindSelectionScreen = ({
       return cardWidth > 0 ? (
         <View style={mediaImageContainerStyle}>
           <LinearGradient
-            colors={['rgba(255,255,255,0)', '#FFF']}
+            colors={['rgba(255,255,255,0)', styles.gradientColor.color]}
             start={{ x: 0, y: 0 }}
             end={{ x: 0, y: 1 }}
             locations={[0, 0.95]}
             style={[
               mediaStyle,
-              { width: linearGradientWidth },
+              {
+                width: cardWidth,
+              },
               styles.mediaLinear,
             ]}
           />
@@ -163,7 +167,11 @@ const WebCardKindSelectionScreen = ({
               defaultMessage: 'Category image',
               description: 'WebCardKindStep - Category image alt',
             })}
-            source={{ mediaId: media.id, requestedSize: 300, uri: media.uri }}
+            source={{
+              mediaId: media.id,
+              requestedSize: 300,
+              uri: media.uri,
+            }}
             style={mediaStyle}
           />
         </View>
@@ -172,9 +180,9 @@ const WebCardKindSelectionScreen = ({
     [
       cardWidth,
       intl,
-      linearGradientWidth,
       mediaImageContainerStyle,
       mediaStyle,
+      styles.gradientColor.color,
       styles.mediaLinear,
     ],
   );
@@ -271,7 +279,7 @@ const WebCardKindSelectionScreen = ({
             items={selectedCategory.medias ?? []}
             keyExtractor={keyExtractor}
             renderItem={renderMediasItem}
-            itemWidth={cardWidth + 20}
+            itemWidth={cardWidth + styles.mediasList.paddingRight}
             style={styles.mediasList}
             onLayout={onMediaListLayout}
           />
@@ -358,7 +366,7 @@ type WebCardCategory = ArrayItemType<
 >;
 type Media = ArrayItemType<WebCardCategory['medias']>;
 
-const styleSheet = createStyleSheet(() => ({
+const styleSheet = createStyleSheet(appearance => ({
   content: {
     flex: 1,
   },
@@ -368,12 +376,13 @@ const styleSheet = createStyleSheet(() => ({
     paddingBottom: 20,
     paddingRight: 20,
   },
-  mediaImageContainer: [
-    {
-      marginLeft: 20,
-      backgroundColor: colors.grey200,
-    },
-  ],
+  gradientColor: {
+    color: appearance === 'dark' ? colors.black : colors.white,
+  },
+  mediaImageContainer: {
+    marginLeft: 20,
+    backgroundColor: colors.grey200,
+  },
   mediaImage: {
     aspectRatio: COVER_RATIO,
   },
@@ -399,7 +408,5 @@ const styleSheet = createStyleSheet(() => ({
   mediaLinear: {
     position: 'absolute',
     zIndex: 1,
-    top: -1,
-    left: -1,
   },
 }));
