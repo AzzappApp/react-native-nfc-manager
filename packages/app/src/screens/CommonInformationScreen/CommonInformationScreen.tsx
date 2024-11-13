@@ -303,6 +303,7 @@ export const CommonInformationScreen = ({
     <Container
       style={{
         paddingTop: insets.top,
+        paddingBottom: insets.bottom,
         flex: 1,
       }}
     >
