@@ -1,4 +1,4 @@
-## 1.4.0-canary.83
+## 1.4.0-canary.84
 
 * **fix:**  - 🐛 avoid NaN data when all values are 0 ([#5901](https://github.com/AzzappApp/azzapp/pull/5901))
 * **fix:**  - common information modal padding issue ([#5897](https://github.com/AzzappApp/azzapp/pull/5897))
