@@ -234,5 +234,8 @@ const stylesheet = createVariantsStyleSheet(() => ({
 export const normalizeArray = (values: number[]) => {
   'worklet';
   const maxValue = Math.max(...values);
+
+  if (maxValue === 0) return values;
+
   return values.map(value => value / maxValue);
 };
