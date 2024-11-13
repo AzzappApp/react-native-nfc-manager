@@ -1,5 +1,6 @@
-## 1.4.0-canary.80
+## 1.4.0-canary.81
 
+* **build:**  - upgrade expo sdk to 52 ([#5892](https://github.com/AzzappApp/azzapp/pull/5892))
 * **fix:**  - cover creation screen ([#5890](https://github.com/AzzappApp/azzapp/pull/5890))
 * **fix:**  - remove forced text color / issue in dark mode ([#5889](https://github.com/AzzappApp/azzapp/pull/5889))
 * **fix:**  - 🐛 properly display module and background colors ([#5861](https://github.com/AzzappApp/azzapp/pull/5861))
