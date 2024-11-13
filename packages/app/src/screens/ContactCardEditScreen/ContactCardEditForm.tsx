@@ -7,6 +7,7 @@ import { Pressable, View } from 'react-native';
 import ImageSize from 'react-native-image-size';
 import * as mime from 'react-native-mime-types';
 import { AVATAR_MAX_WIDTH } from '@azzapp/shared/contactCardHelpers';
+import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors, shadow } from '#theme';
 import FormDeleteFieldOverlay from '#components/ContactCard/FormDeleteFieldOverlay';
 import ImagePicker, {
@@ -462,6 +463,22 @@ const ContactCardEditForm = ({
             ))}
           <ContactCardEditModalEmails control={control} />
           <Separation />
+          {webCard?.userName && (
+            <View style={styles.fieldCommon}>
+              <View style={styles.fieldTitleWithLock}>
+                <Icon icon="locked" />
+                <Text variant="smallbold" style={styles.azzappUrlHeader}>
+                  <FormattedMessage
+                    defaultMessage="azzapp"
+                    description="contactCard edit screen / azzapp url row header"
+                  />
+                </Text>
+              </View>
+              <Text variant="medium" style={{ flex: 1 }}>
+                {buildUserUrl(webCard?.userName || '')}
+              </Text>
+            </View>
+          )}
           {webCard?.isMultiUser &&
             commonInformation?.urls?.map((url, index) => (
               <Fragment key={index}>
@@ -641,6 +658,13 @@ const styleSheet = createStyleSheet(appearance => ({
     borderWidth: 1,
     borderColor: colors.grey100,
     borderRadius: 5,
+  },
+  azzappUrlHeader: {
+    flexDirection: 'row',
+    gap: 5,
+    alignItems: 'center',
+    marginLeft: 5,
+    marginRight: 16,
   },
   ...buildContactCardModalStyleSheet(appearance),
 }));

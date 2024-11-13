@@ -40,6 +40,7 @@ const contactCardEditScreenQuery = graphql`
       ... on Profile @alias(as: "profile") {
         id
         webCard {
+          userName
           isMultiUser
           commonInformation {
             company

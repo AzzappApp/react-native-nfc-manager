@@ -147,6 +147,7 @@ const MultiUserAddModal = (
       ) {
         id
         isMultiUser
+        userName
         commonInformation {
           company
           addresses {

@@ -842,6 +842,7 @@ const multiUserDetailsScreenQuery = graphql`
         }
         webCard {
           id
+          userName
           profilePendingOwner {
             id
             user {
