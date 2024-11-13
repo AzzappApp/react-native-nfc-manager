@@ -1,5 +1,6 @@
-## 1.4.0-canary.84
+## 1.4.0-canary.85
 
+* **fix:**  - **android:** [#5875](https://github.com/AzzappApp/azzapp/pull/5875) temporary remove withTiming function that freezes… ([#5888](https://github.com/AzzappApp/azzapp/pull/5888))
 * **fix:**  - 🐛 avoid NaN data when all values are 0 ([#5901](https://github.com/AzzappApp/azzapp/pull/5901))
 * **fix:**  - common information modal padding issue ([#5897](https://github.com/AzzappApp/azzapp/pull/5897))
 * **fix:**  - move ContactCardEditFieldWrapper into a scrollView ([#5877](https://github.com/AzzappApp/azzapp/pull/5877))
