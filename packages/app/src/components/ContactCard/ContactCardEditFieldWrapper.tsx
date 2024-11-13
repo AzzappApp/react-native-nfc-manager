@@ -15,7 +15,6 @@ import {
 } from '#helpers/contactCardHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useBoolean from '#hooks/useBoolean';
-import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
@@ -96,8 +95,6 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
   const [visible, open, close] = useBoolean(false);
 
   const styles = useStyleSheet(stylesheet);
-
-  const { bottom: bottomPadding } = useScreenInsets();
 
   return (
     <>
@@ -180,6 +177,7 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
           visible={visible}
           onDismiss={close}
           style={styles.bottomSheetStyle}
+          nestedScroll
         >
           <Controller
             name={labelKey}
@@ -198,7 +196,6 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
               />
             )}
           />
-          <View style={{ height: bottomPadding }} />
         </BottomSheetModal>
       )}
     </>

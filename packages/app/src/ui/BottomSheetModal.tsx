@@ -5,6 +5,7 @@ import {
 } from '@gorhom/bottom-sheet';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Keyboard } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import {
   Extrapolation,
   interpolate,
@@ -124,7 +125,7 @@ const BottomSheetModal = ({
           : showHandleIndicator,
       style: [styles.modalContainer, style],
     };
-    if (height != null && height > 0) {
+    if (height !== null && height !== undefined && height > 0) {
       return {
         index: 0,
         snapPoints: [height],
@@ -180,22 +181,23 @@ const BottomSheetModal = ({
       {...dynamicProps}
       {...props}
     >
-      {nestedScroll ? (
-        children
-      ) : (
-        <BottomSheetView
-          style={[
-            styles.container,
-            {
-              height: height ? height : undefined,
-              paddingBottom: automaticBottomPadding ? paddingBottom : 0,
-              paddingTop: showHandleIndicator ? 0 : 16,
-            },
-          ]}
-        >
-          {children}
-        </BottomSheetView>
-      )}
+      <BottomSheetView
+        style={[
+          styles.container,
+          {
+            height: height ? height : undefined,
+            paddingBottom: automaticBottomPadding ? paddingBottom : 0,
+            paddingTop: showHandleIndicator ? 0 : 16,
+          },
+        ]}
+      >
+        {/*
+        we had wrap the view inside <BottomSheetView in order to workaround following issue:
+        https://github.com/gorhom/react-native-bottom-sheet/issues/2020
+        Keep it nested, I wrapped it inside a ScrollView
+        */}
+        {nestedScroll ? <ScrollView>{children}</ScrollView> : children}
+      </BottomSheetView>
       <Toast />
     </BottomSheetModalG>
   );

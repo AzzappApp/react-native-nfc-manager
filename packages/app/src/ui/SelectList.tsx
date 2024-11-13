@@ -75,6 +75,7 @@ function SelectList<ItemT>({
       labelField,
     ],
   );
+
   return (
     <BottomSheetFlatList
       accessibilityRole="list"
