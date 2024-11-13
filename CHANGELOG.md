@@ -1,5 +1,8 @@
-## 1.4.0-canary.81
+## 1.4.0-canary.82
 
+* **fix:**  - common information modal padding issue ([#5897](https://github.com/AzzappApp/azzapp/pull/5897))
+* **fix:**  - move ContactCardEditFieldWrapper into a scrollView ([#5877](https://github.com/AzzappApp/azzapp/pull/5877))
+* **feat:**  - add azzapp url in contactCard edit Screen ([#5891](https://github.com/AzzappApp/azzapp/pull/5891))
 * **build:**  - upgrade expo sdk to 52 ([#5892](https://github.com/AzzappApp/azzapp/pull/5892))
 * **fix:**  - cover creation screen ([#5890](https://github.com/AzzappApp/azzapp/pull/5890))
 * **fix:**  - remove forced text color / issue in dark mode ([#5889](https://github.com/AzzappApp/azzapp/pull/5889))
