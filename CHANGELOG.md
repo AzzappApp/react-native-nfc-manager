@@ -1,5 +1,6 @@
-## 1.4.0-canary.82
+## 1.4.0-canary.83
 
+* **fix:**  - 🐛 avoid NaN data when all values are 0 ([#5901](https://github.com/AzzappApp/azzapp/pull/5901))
 * **fix:**  - common information modal padding issue ([#5897](https://github.com/AzzappApp/azzapp/pull/5897))
 * **fix:**  - move ContactCardEditFieldWrapper into a scrollView ([#5877](https://github.com/AzzappApp/azzapp/pull/5877))
 * **feat:**  - add azzapp url in contactCard edit Screen ([#5891](https://github.com/AzzappApp/azzapp/pull/5891))
