@@ -50,8 +50,12 @@ const WheelSelector = ({
   const colorsGradient = useMemo(
     () =>
       colorScheme === 'light'
-        ? ['rgba(245, 245, 246, 0)', colors.grey50, 'rgba(245, 245, 246, 0)']
-        : ['rgba(0, 0, 0, 0)', '#1E1E1E', 'rgba(0, 0, 0, 0)'],
+        ? ([
+            'rgba(245, 245, 246, 0)',
+            colors.grey50,
+            'rgba(245, 245, 246, 0)',
+          ] as const)
+        : (['rgba(0, 0, 0, 0)', '#1E1E1E', 'rgba(0, 0, 0, 0)'] as const),
     [colorScheme],
   );
 
@@ -190,7 +194,7 @@ const keyExtractor = (item: number) => item.toString();
 
 export default WheelSelector;
 const WHEEL_HEIGHT = 20;
-const gradientLocation = [0.0, 0.5, 1];
+const gradientLocation = [0.0, 0.5, 1] as const;
 const gradientStart = { x: 0, y: 1 };
 const gradientEnd = { x: 1, y: 1 };
 

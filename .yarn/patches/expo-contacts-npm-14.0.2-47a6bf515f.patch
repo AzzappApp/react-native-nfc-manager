@@ -1,0 +1,195 @@
+diff --git a/android/src/main/java/expo/modules/contacts/Contact.kt b/android/src/main/java/expo/modules/contacts/Contact.kt
+index 190df9ae9e9cb95130c54d85b32b08f1503135d5..7c2353ca3942844acac15d95d1d597439452f6c4 100644
+--- a/android/src/main/java/expo/modules/contacts/Contact.kt
++++ b/android/src/main/java/expo/modules/contacts/Contact.kt
+@@ -2,15 +2,18 @@ package expo.modules.contacts
+ 
+ import android.content.ContentProviderOperation
+ import android.content.ContentValues
++import android.content.Context
+ import android.database.Cursor
+ import android.graphics.Bitmap
+-import android.graphics.BitmapFactory
++import android.graphics.ImageDecoder
+ import android.net.Uri
++import android.os.Build
+ import android.os.Bundle
+ import android.provider.ContactsContract
+ import android.provider.ContactsContract.CommonDataKinds
+ import android.provider.ContactsContract.CommonDataKinds.StructuredName
+ import android.provider.ContactsContract.RawContacts
++import android.provider.MediaStore
+ import android.text.TextUtils
+ import android.util.Log
+ import expo.modules.contacts.models.BaseModel
+@@ -28,8 +31,9 @@ import java.text.SimpleDateFormat
+ import java.util.Calendar
+ import java.util.Locale
+ 
++
+ // TODO: MaidenName Nickname
+-class Contact(var contactId: String) {
++class Contact(var contactId: String, val context: Context) {
+   private var rawContactId: String? = null
+   var lookupKey: String? = null
+   private var displayName: String? = null
+@@ -512,7 +516,12 @@ class Contact(var contactId: String) {
+     }
+ 
+   private fun getThumbnailBitmap(photoUri: String?): Bitmap {
+-    val path = Uri.parse(photoUri).path
+-    return BitmapFactory.decodeFile(path)
++    val uri = Uri.parse(photoUri)
++    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
++      ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.contentResolver, uri))
++    } else {
++      @Suppress("DEPRECATION")
++      MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
++    }
+   }
+ }
+\ No newline at end of file
+diff --git a/android/src/main/java/expo/modules/contacts/ContactsModule.kt b/android/src/main/java/expo/modules/contacts/ContactsModule.kt
+index 0e491b193c68fe9382736f9752e29119f6c621c4..e0131b5170748627924c5e4fc787c6d6e21f3088 100644
+--- a/android/src/main/java/expo/modules/contacts/ContactsModule.kt
++++ b/android/src/main/java/expo/modules/contacts/ContactsModule.kt
+@@ -247,6 +247,17 @@ class ContactsModule : Module() {
+       uri.toString()
+     }
+ 
++    AsyncFunction("displayContactAsync") { contactId: String, promise: Promise ->
++      val uri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_URI, contactId)
++      val intent = Intent(Intent.ACTION_VIEW).apply {
++        setData(uri)
++      }
++
++
++      currentActivity.startActivity(intent)
++      promise.resolve(true)
++    }
++
+     AsyncFunction("presentFormAsync") { contactId: String?, contactData: Map<String, Any>?, _: Map<String, Any?>?, promise: Promise ->
+       ensureReadPermission()
+ 
+@@ -325,7 +336,7 @@ class ContactsModule : Module() {
+     get() = (appContext.reactContext ?: throw Exceptions.ReactContextLost()).contentResolver
+ 
+   private fun mutateContact(initContact: Contact?, data: Map<String, Any>): Contact {
+-    val contact = initContact ?: Contact(UUID.randomUUID().toString())
++    val contact = initContact ?: Contact(UUID.randomUUID().toString(), currentActivity)
+ 
+     data.safeGet<String>("firstName")?.let { contact.firstName = it }
+     data.safeGet<String>("middleName")?.let { contact.middleName = it }
+@@ -655,7 +666,7 @@ class ContactsModule : Module() {
+       val contactId = cursor.getString(columnIndex)
+ 
+       // add or update existing contact for iterating data based on contact id
+-      val contact = map.getOrPut(contactId) { Contact(contactId) }
++      val contact = map.getOrPut(contactId) { Contact(contactId, currentActivity) }
+       contact.fromCursor(cursor)
+     }
+     return map
+diff --git a/build/Contacts.d.ts b/build/Contacts.d.ts
+index d73457560f11233f88021da44f8a789173f6c620..596448b14344c42e8bc04012f352cb7effb725d6 100644
+--- a/build/Contacts.d.ts
++++ b/build/Contacts.d.ts
+@@ -581,6 +581,15 @@ export declare function getContactByIdAsync(id: string, fields?: FieldType[]): P
+  * ```
+  */
+ export declare function addContactAsync(contact: Contact, containerId?: string): Promise<string>;
++/**
++ * Displays contact details from contacts book
++ * @example
++ * ```js
++ * await Contacts.getContactsAsync(contactId);
++ *
++ * ```
++ */
++export declare function displayContactAsync(contactId: string): Promise<boolean>
+ /**
+  * Mutate the information of an existing contact. Due to an iOS bug, `nonGregorianBirthday` field cannot be modified.
+  * > **info** On Android, you can use [`presentFormAsync`](#contactspresentformasynccontactid-contact-formoptions) to make edits to contacts.
+diff --git a/ios/ContactsModule.swift b/ios/ContactsModule.swift
+index cfa92965fae0aac77986cf516af95429bb7213a3..793bcf67df692b81c09cd8bce3f08925605df3b8 100644
+--- a/ios/ContactsModule.swift
++++ b/ios/ContactsModule.swift
+@@ -73,6 +73,41 @@ public class ContactsModule: Module, OnContactPickingResultHandler {
+       }
+     }.runOnQueue(.main)
+ 
++
++    AsyncFunction("displayContactAsync") { (contactId: String, promise: Promise) -> Void in
++      // swiftlint:enable closure_body_length
++      var controller: ContactsViewController?
++      if let foundContact = try? getContact(withId: contactId) {
++        controller = ContactsViewController.init(for: foundContact)
++      }
++      guard let controller else {
++        promise.reject(FailedToCreateViewControllerException())
++        return
++      }
++      controller.contactStore = contactStore
++      controller.delegate = delegate
++      controller.allowsEditing = false
++      controller.allowsActions = true
++      controller.shouldShowLinkedContacts = true
++      let parent = appContext?.utilities?.currentViewController()
++      let navController = UINavigationController(rootViewController: controller)
++        if #available(iOS 16.0, *) {
++            controller.navigationItem.backAction = UIAction(handler: { [] action in
++                controller.dismiss(animated: true)
++            })
++        } else {
++            controller.navigationItem.hidesBackButton = false
++        }
++      presentingViewController = navController
++      let animated = true
++      controller.onViewDisappeared = {
++        promise.resolve(true)
++        self.contactManipulationPromise = nil
++      }
++      contactManipulationPromise = promise
++      parent?.present(navController, animated: animated)
++    }.runOnQueue(.main)
++
+     // swiftlint:disable closure_body_length
+     AsyncFunction("presentFormAsync") { (identifier: String?, data: Contact?, options: FormOptions, promise: Promise) in
+       // swiftlint:enable closure_body_length
+diff --git a/ios/Decoding.swift b/ios/Decoding.swift
+index 2f6f500041a80fa86d0a7398896949c4370ec39c..b0f3c68540c2ce0abc00ce212109b2cde1ac7c56 100644
+--- a/ios/Decoding.swift
++++ b/ios/Decoding.swift
+@@ -38,7 +38,7 @@ func decodeSocialProfiles(_ input: [SocialProfile]?) -> [CNLabeledValue<CNSocial
+     let username = item.username
+     let userId = item.userId
+     let service = item.service
+-    let profile = CNSocialProfile(urlString: urlString?.path, username: username, userIdentifier: userId, service: service)
++    let profile = CNSocialProfile(urlString: urlString?.absoluteString, username: username, userIdentifier: userId, service: service)
+     output.append(CNLabeledValue(label: label, value: profile))
+   }
+   return output
+diff --git a/src/Contacts.ts b/src/Contacts.ts
+index f745da292f222eaf9cfe7c30534c00501861fac9..b25a8bcfd20dce677e5c4c4a8a9dd5f0be1fa03d 100644
+--- a/src/Contacts.ts
++++ b/src/Contacts.ts
+@@ -558,6 +558,20 @@ export type Container = {
+ 
+ export { PermissionStatus, PermissionResponse, PermissionExpiration };
+ 
++/**
++  * Displays contact details from contacts book
++  * @example
++  * ```js
++  * await Contacts.displayContactAsync(contactId);
++  * ```
++  */
++export async function displayContactAsync(contactId: string): Promise<boolean> {
++  if (!ExpoContacts.displayContactAsync) {
++    throw new UnavailabilityError('Contacts', 'displayContactAsync');
++  }
++  return await ExpoContacts.displayContactAsync(contactId);
++}
++
+ /**
+  * Returns whether the Contacts API is enabled on the current device. This method does not check the app permissions.
+  * @returns A promise that fulfills with a `boolean`, indicating whether the Contacts API is available on the current device. It always resolves to `false` on web.
