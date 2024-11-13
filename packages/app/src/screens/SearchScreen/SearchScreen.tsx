@@ -6,6 +6,7 @@ import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useAnimatedState from '#hooks/useAnimatedState';
+import useBoolean from '#hooks/useBoolean';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Container from '#ui/Container';
 import IconButton from '#ui/IconButton';
@@ -24,42 +25,35 @@ export const SearchScreen = ({ hasFocus = true }: { hasFocus: boolean }) => {
     string | undefined
   >(undefined);
   const [showTabView, setShowTabView] = useState(false);
-  const [searchBarHasFocus, setSearchBarHasFocus] = useState(false);
 
-  const onFocus = () => setSearchBarHasFocus(true);
-  const onBlur = () => setSearchBarHasFocus(false);
-  const onCancel = () => {
+  const [searchBarHasFocus, setSearchBarHasFocus, removeSearchBarHasFocus] =
+    useBoolean(false);
+
+  const onCancel = useCallback(() => {
     setShowTabView(false);
-    setSearchBarHasFocus(false);
-  };
+    removeSearchBarHasFocus();
+  }, [removeSearchBarHasFocus]);
 
   // we are doing the type on value for the search recent, inside the recent search local storage
-  const onChangeText = (text: string | undefined) => {
+  const onChangeText = useCallback((text: string | undefined) => {
     setSearchValue(text);
 
     if (text == null) {
       setShowTabView(false);
     }
-  };
+  }, []);
 
   // search hook logic is here in order to catch the onSubmitEnding for searchBar
   const { recentSearch, addRecentSearchItem, removeRecentSearchItem } =
     useRecentSearch();
 
   // searchOnSubmit button is used to trigger the search.  (can change to on typing text wiht debounce if needed)
-  const onSubmittedSearch = useCallback(
-    async (search: string | undefined) => {
-      setShowTabView(true);
-      const searchTrimmed = search?.trim();
-      setSearchValueSubmitted(searchTrimmed);
-      addRecentSearchItem(searchTrimmed);
-      if (search !== searchValue) {
-        // used in case the search value is press on recent search
-        setSearchValue(search);
-      }
-    },
-    [addRecentSearchItem, searchValue],
-  );
+  const onSubmittedSearch = useCallback(async () => {
+    setShowTabView(true);
+    const searchTrimmed = searchValue?.trim();
+    setSearchValueSubmitted(searchTrimmed);
+    addRecentSearchItem(searchTrimmed);
+  }, [addRecentSearchItem, searchValue]);
 
   const insets = useScreenInsets();
 
@@ -84,15 +78,15 @@ export const SearchScreen = ({ hasFocus = true }: { hasFocus: boolean }) => {
             style={styles.backButton}
           />
         )}
-        <View style={{ flex: 1 }}>
+        <View style={styles.flexOne}>
           <SearchBar
             placeholder={intl.formatMessage({
               defaultMessage: 'Search for WebCards, posts...',
               description: 'SearchScreen - search bar placeholder',
             })}
             onChangeText={onChangeText}
-            onFocus={onFocus}
-            onBlur={onBlur}
+            onFocus={setSearchBarHasFocus}
+            onBlur={removeSearchBarHasFocus}
             onCancel={onCancel}
             onSubmitEditing={onSubmittedSearch}
             animationDuration={ANIMATION_DURATION}
@@ -140,7 +134,6 @@ const styleSheet = createStyleSheet(appearance => ({
     height: '100%',
     width: '100%',
   },
-
   flexOne: { flex: 1 },
   searchBarContainer: {
     paddingTop: Platform.OS === 'android' ? 5 : 0,

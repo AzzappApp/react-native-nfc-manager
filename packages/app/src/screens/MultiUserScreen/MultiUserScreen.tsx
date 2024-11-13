@@ -282,6 +282,21 @@ const MultiUserScreen = ({
     transferOwnerMode,
   ]);
 
+  const contextValue = useMemo(
+    () => ({
+      selectedProfileId,
+      setSelectedProfileId,
+      transferOwnerMode,
+      toggleTransferOwnerMode,
+    }),
+    [
+      selectedProfileId,
+      setSelectedProfileId,
+      transferOwnerMode,
+      toggleTransferOwnerMode,
+    ],
+  );
+
   if (!profile) {
     return null;
   }
@@ -366,14 +381,7 @@ const MultiUserScreen = ({
                 </View>
               }
             >
-              <MultiUserTransferOwnerContext.Provider
-                value={{
-                  selectedProfileId,
-                  setSelectedProfileId,
-                  transferOwnerMode,
-                  toggleTransferOwnerMode,
-                }}
-              >
+              <MultiUserTransferOwnerContext.Provider value={contextValue}>
                 <MultiUserScreenUserList
                   Header={ScrollableHeader}
                   webCard={profile.webCard}

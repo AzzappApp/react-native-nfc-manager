@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import { TextInput, View, useColorScheme } from 'react-native';
 import Animated, {
@@ -6,11 +6,11 @@ import Animated, {
   interpolateColor,
   useAnimatedStyle,
   useSharedValue,
+  // withTiming,
 } from 'react-native-reanimated';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import useAnimatedState from '#hooks/useAnimatedState';
 import Button from './Button';
 import Container from './Container';
 import Icon from './Icon';
@@ -30,9 +30,9 @@ type SearchBarProps = {
   onChangeText: (text?: string) => void;
   onFocus?: (e: NativeSyntheticEvent<TextInputFocusEventData>) => void;
   onBlur?: (e: NativeSyntheticEvent<TextInputFocusEventData>) => void;
-  onSubmitEditing?: (search: string | undefined) => void;
+  onSubmitEditing?: () => void;
   placeholder?: string;
-  animationDuration?: number;
+  animationDuration?: number; // not used right now - withTiming freezes on android
   value?: string;
   autoFocus?: boolean;
 };
@@ -46,40 +46,25 @@ const SearchBar = ({
   onSubmitEditing,
   placeholder,
   value,
-  animationDuration = 300,
   autoFocus,
+  //animationDuration = 300,
 }: SearchBarProps) => {
-  const [searchValue, setSearchValue] = useState<string>();
   const textInputRef = useRef<TextInput>(null);
 
-  useEffect(() => {
-    setSearchValue(value);
-  }, [value]);
-
-  const onSetValueText = (text: string) => {
-    setSearchValue(text);
-    onChangeText(text);
-  };
-
-  const onPressClear = () => {
-    setSearchValue(undefined);
+  const onPressClear = useCallback(() => {
     onChangeText(undefined);
-  };
+  }, [onChangeText]);
 
-  const onPressCancel = () => {
-    setSearchValue(undefined);
+  const onPressCancel = useCallback(() => {
     onChangeText(undefined);
     if (onCancel) {
       onCancel();
     }
     textInputRef.current?.blur();
-  };
-
-  const onSubmitEditingLocal = () => {
-    onSubmitEditing?.(searchValue);
-  };
+  }, [onCancel, onChangeText]);
 
   const containerWidth = useSharedValue(0);
+
   const onLayout = useCallback(
     (e: LayoutChangeEvent) => {
       containerWidth.value = e.nativeEvent.layout.width;
@@ -91,60 +76,68 @@ const SearchBar = ({
   const cancelButtonWidth = useSharedValue(0);
   const onButtonLayout = useCallback(
     (e: LayoutChangeEvent) => {
-      cancelButtonWidth.value = e.nativeEvent.layout.width;
+      if (!cancelButtonWidth.value) {
+        cancelButtonWidth.value = e.nativeEvent.layout.width;
+      }
     },
     [cancelButtonWidth],
   );
 
-  const focus = (event: GestureResponderEvent) => {
+  const focus = useCallback((event: GestureResponderEvent) => {
     event.preventDefault();
     textInputRef.current?.focus();
-  };
+  }, []);
 
   const styles = useStyleSheet(styleSheet);
 
-  const [isFocused, setIsFocused] = useState(false);
-  const timing = useAnimatedState(isFocused, { duration: animationDuration });
+  const isFocused = useSharedValue(0);
 
   const onInputFocus = useCallback(
     (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
-      setIsFocused(true);
       onFocus?.(e);
+      // isFocused.value = withTiming(1, { duration: animationDuration }); // freezes on android
+      isFocused.value = 1;
     },
-    [onFocus],
+    [isFocused, onFocus],
   );
 
   const onInputBlur = useCallback(
     (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
-      setIsFocused(false);
-      if (onBlur) {
-        onBlur(e);
-      }
+      onBlur?.(e);
+      // isFocused.value = withTiming(0, { duration: animationDuration }); // freezes on android
+      isFocused.value = 0;
     },
-    [onBlur],
+    [isFocused, onBlur],
   );
 
   const intl = useIntl();
   const colorScheme = useColorScheme();
+
   const animatedStyle = useAnimatedStyle(() => {
     return {
       width: interpolate(
-        timing.value,
+        isFocused.value,
         [0, 1],
         [
           containerWidth.value,
           containerWidth.value - cancelButtonWidth.value - MARGIN_LEFT_BUTTON,
         ],
       ),
-      borderWidth: timing.value,
+      borderWidth: isFocused.value,
       borderColor: interpolateColor(
-        timing.value,
+        isFocused.value,
         [0, 1],
         [
           colorScheme === 'light' ? colors.grey50 : colors.grey1000,
           colorScheme === 'light' ? colors.grey900 : colors.grey400,
         ],
       ),
+    };
+  });
+
+  const wrapperStyle = useAnimatedStyle(() => {
+    return {
+      opacity: containerWidth.value ? 1 : 0,
     };
   });
 
@@ -155,7 +148,7 @@ const SearchBar = ({
         style={styles.container}
         onLayout={onLayout}
       >
-        <View style={styles.wrapper}>
+        <Animated.View style={[styles.wrapper, wrapperStyle]}>
           <Animated.View
             testID="azzapp__SearchBar__view-inputcontainer"
             style={[styles.innerSearchBarView, animatedStyle]}
@@ -163,7 +156,11 @@ const SearchBar = ({
           >
             <Icon
               icon="search"
-              style={[styles.lensIcon, isFocused && styles.lensIconFocuses]}
+              style={
+                isFocused
+                  ? [styles.lensIcon, styles.lensIconFocuses]
+                  : styles.lensIcon
+              }
             />
             <TextInput
               testID="azzapp__searchbar__textInput"
@@ -176,15 +173,15 @@ const SearchBar = ({
               onFocus={onInputFocus}
               onBlur={onInputBlur}
               style={styles.input}
-              value={searchValue}
-              onChangeText={onSetValueText}
+              defaultValue={value}
+              onChangeText={onChangeText}
               selectionColor={colors.primary400}
               returnKeyType="search"
-              onSubmitEditing={onSubmitEditingLocal}
+              onSubmitEditing={onSubmitEditing}
               autoFocus={autoFocus}
               placeholderTextColor={styles.placeHolder.color}
             />
-            {isNotFalsyString(searchValue) && (
+            {isNotFalsyString(value) && (
               <PressableNative
                 accessibilityRole="button"
                 accessibilityLabel={intl.formatMessage({
@@ -199,6 +196,7 @@ const SearchBar = ({
               </PressableNative>
             )}
           </Animated.View>
+
           <Button
             accessibilityRole="button"
             accessibilityLabel={intl.formatMessage({
@@ -214,7 +212,7 @@ const SearchBar = ({
               description: 'SearchBar - Cancel button',
             })}
           />
-        </View>
+        </Animated.View>
       </View>
     </Container>
   );
