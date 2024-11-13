@@ -1,5 +1,6 @@
-## 1.4.0-canary.79
+## 1.4.0-canary.80
 
+* **fix:**  - cover creation screen ([#5890](https://github.com/AzzappApp/azzapp/pull/5890))
 * **fix:**  - remove forced text color / issue in dark mode ([#5889](https://github.com/AzzappApp/azzapp/pull/5889))
 * **fix:**  - 🐛 properly display module and background colors ([#5861](https://github.com/AzzappApp/azzapp/pull/5861))
 * **fix:**  - ensure we replace root before logout ([#5868](https://github.com/AzzappApp/azzapp/pull/5868))
