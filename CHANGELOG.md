@@ -1,5 +1,7 @@
-## 1.4.0-canary.85
+## 1.4.0-canary.86
 
+* **fix:**  - clear image when pressing BACK ([#5886](https://github.com/AzzappApp/azzapp/pull/5886))
+* **fix:**  - 🐛 properly display webcard background ([#5916](https://github.com/AzzappApp/azzapp/pull/5916))
 * **fix:**  - **android:** [#5875](https://github.com/AzzappApp/azzapp/pull/5875) temporary remove withTiming function that freezes… ([#5888](https://github.com/AzzappApp/azzapp/pull/5888))
 * **fix:**  - 🐛 avoid NaN data when all values are 0 ([#5901](https://github.com/AzzappApp/azzapp/pull/5901))
 * **fix:**  - common information modal padding issue ([#5897](https://github.com/AzzappApp/azzapp/pull/5897))
