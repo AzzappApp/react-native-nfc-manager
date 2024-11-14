@@ -166,6 +166,7 @@ const CoverEditorTransitionTool = () => {
               item => item.id === coverEditorState.coverTransition,
             ) ?? null
           }
+          fixedItemHeight={180}
         />
       </BottomSheetModal>
     </>
