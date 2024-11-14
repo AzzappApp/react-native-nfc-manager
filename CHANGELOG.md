@@ -1,5 +1,6 @@
-## 1.4.0-canary.87
+## 1.4.0-canary.88
 
+* **fix:**  - **android:** adapt contact card landscape behaviour on samsung devices ([#5926](https://github.com/AzzappApp/azzapp/pull/5926))
 * **fix:**  - allow to define fixed height to BoxSelectionList ([#5895](https://github.com/AzzappApp/azzapp/pull/5895))
 * **fix:**  - **multiUser:** [#5918](https://github.com/AzzappApp/azzapp/pull/5918) move searchBar from result list ([#5921](https://github.com/AzzappApp/azzapp/pull/5921))
 * **fix:**  - 🐛 properly scroll to botto on post list ([#5919](https://github.com/AzzappApp/azzapp/pull/5919))
