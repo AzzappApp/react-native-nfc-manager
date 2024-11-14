@@ -332,6 +332,20 @@ const WebCardScreenContent = ({
   return (
     <>
       <View style={styles.flex}>
+        <Animated.View style={[styles.background, backgroundStyle]}>
+          <Suspense
+            fallback={
+              <View
+                style={{
+                  flex: 1,
+                  backgroundColor: coverBackgroundColor,
+                }}
+              />
+            }
+          >
+            <WebCardBackground webCard={webCard} style={styles.flex} />
+          </Suspense>
+        </Animated.View>
         <Suspense>
           <WebCardScreenHeader
             webCard={webCard}
@@ -419,20 +433,6 @@ const WebCardScreenContent = ({
             onToggleVisibility={onToggleSelectedModulesVisibility}
           />
         </Suspense>
-        <Animated.View style={[styles.background, backgroundStyle]}>
-          <Suspense
-            fallback={
-              <View
-                style={{
-                  flex: 1,
-                  backgroundColor: coverBackgroundColor,
-                }}
-              />
-            }
-          >
-            <WebCardBackground webCard={webCard} style={styles.flex} />
-          </Suspense>
-        </Animated.View>
       </View>
 
       {isViewer && (
@@ -486,7 +486,6 @@ const styles = StyleSheet.create({
     left: 0,
     width: '100%',
     height: '100%',
-    zIndex: -1,
   },
 });
 
