@@ -135,12 +135,12 @@ const HomeScreenContent = ({
         <HomeProfilesCarousel user={user} />
         <HomeBottomPanel user={user} />
       </View>
-      <HomeContactCardLandscape profile={currentProfile ?? null} />
       <HomeBottomSheetPanel
         visible={showMenu}
         close={closeMenu}
         profile={currentProfile ?? null}
       />
+      <HomeContactCardLandscape profile={currentProfile ?? null} />
     </View>
   );
 };

@@ -83,10 +83,11 @@ const HomeContactCardLandscape = ({
       Platform.OS === 'android'
         ? Accelerometer.addListener(accelerometerData => {
             const { x, y, z } = accelerometerData;
+
             let orientation = DeviceMotionOrientation.Portrait;
 
             // Check if the device is flat by looking for z values near ±9.8
-            const isFlat = Math.abs(z) > 1; // Adjust as needed for tolerance
+            const isFlat = Math.abs(z) < 1.02 && Math.abs(z) > 0.99; // Adjust as needed for tolerance
 
             if (!isFlat) {
               // Only calculate orientation when not flat
