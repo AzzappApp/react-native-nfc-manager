@@ -1,5 +1,9 @@
-## 1.4.0-canary.86
+## 1.4.0-canary.87
 
+* **fix:**  - allow to define fixed height to BoxSelectionList ([#5895](https://github.com/AzzappApp/azzapp/pull/5895))
+* **fix:**  - **multiUser:** [#5918](https://github.com/AzzappApp/azzapp/pull/5918) move searchBar from result list ([#5921](https://github.com/AzzappApp/azzapp/pull/5921))
+* **fix:**  - 🐛 properly scroll to botto on post list ([#5919](https://github.com/AzzappApp/azzapp/pull/5919))
+* **fix:**  - 🐛 replace native pressable with gesture handler ([#5924](https://github.com/AzzappApp/azzapp/pull/5924))
 * **fix:**  - clear image when pressing BACK ([#5886](https://github.com/AzzappApp/azzapp/pull/5886))
 * **fix:**  - 🐛 properly display webcard background ([#5916](https://github.com/AzzappApp/azzapp/pull/5916))
 * **fix:**  - **android:** [#5875](https://github.com/AzzappApp/azzapp/pull/5875) temporary remove withTiming function that freezes… ([#5888](https://github.com/AzzappApp/azzapp/pull/5888))
