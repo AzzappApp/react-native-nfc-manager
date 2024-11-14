@@ -1,11 +1,9 @@
-import { forwardRef, useState } from 'react';
-import { Pressable } from 'react-native';
+import { forwardRef, useState, type ForwardedRef } from 'react';
+import { Pressable, type PressableProps } from 'react-native-gesture-handler';
 import { colors } from '#theme';
-import type { ForwardedRef } from 'react';
 import type {
-  PressableProps,
-  PressableAndroidRippleConfig,
   LayoutChangeEvent,
+  PressableAndroidRippleConfig,
   View,
 } from 'react-native';
 
@@ -28,14 +26,19 @@ const PressableNative = (
   if (!androidRiple.radius && androidRiple.borderless) {
     androidRiple.radius = width / 2 + 2;
   }
-  return (
-    <Pressable
-      ref={ref}
-      android_ripple={androidRiple}
-      onLayout={onLayout}
-      {...props}
-    />
-  );
+
+  if (androidRiple.radius) {
+    androidRiple.radius = Math.round(androidRiple.radius);
+  }
+
+  const pressableProps = {
+    ref,
+    android_ripple: androidRiple,
+    onLayout,
+    ...props,
+  } as const;
+
+  return <Pressable {...pressableProps} />;
 };
 
 export default forwardRef(PressableNative);
