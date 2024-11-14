@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/react-native';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import { RESULTS } from 'react-native-permissions';
@@ -277,6 +277,11 @@ const SelectImageStep = ({
     }),
     [insetBottom],
   );
+
+  useEffect(() => {
+    // ensure media is cleared once we display the Image selection Screen
+    clearMedia();
+  }, [clearMedia]);
 
   return (
     <>
