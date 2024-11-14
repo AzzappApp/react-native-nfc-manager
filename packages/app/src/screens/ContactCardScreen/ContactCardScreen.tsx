@@ -41,6 +41,7 @@ import Button from '#ui/Button';
 import Container from '#ui/Container';
 import FingerHint from '#ui/FingerHint';
 import Icon from '#ui/Icon';
+import LoadingView from '#ui/LoadingView';
 import PressableAnimated from '#ui/PressableAnimated';
 import PressableNative from '#ui/PressableNative';
 import SafeAreaView from '#ui/SafeAreaView';
@@ -483,9 +484,7 @@ const ContactCardScreenFallback = () => (
   <Container style={{ flex: 1 }}>
     <SafeAreaView style={{ flex: 1 }}>
       <ContactCardScreenHeader webCard={null} />
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <ActivityIndicator />
-      </View>
+      <LoadingView />
     </SafeAreaView>
   </Container>
 );

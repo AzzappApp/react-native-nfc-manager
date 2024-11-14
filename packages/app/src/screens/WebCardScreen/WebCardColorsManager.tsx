@@ -19,11 +19,11 @@ import {
 import ColorTriptychChooser from '#components/ColorTriptychChooser';
 import { useWebCardColorsFragment } from '#components/WebCardColorPicker';
 import useScreenInsets from '#hooks/useScreenInsets';
-import ActivityIndicator from '#ui/ActivityIndicator';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
 import ColorChooser from '#ui/ColorPicker/ColorChooser';
 import Header from '#ui/Header';
+import LoadingView from '#ui/LoadingView';
 import Text from '#ui/Text';
 import type { WebCardColorPicker_webCard$key } from '#relayArtifacts/WebCardColorPicker_webCard.graphql';
 import type { StoreUpdater, OptimisticUpdateFunction } from 'relay-runtime';
@@ -331,19 +331,7 @@ const WebCardColorsManager = ({
             onColorChange={onChangeColorInPalette}
           />
         ) : (
-          <Suspense
-            fallback={
-              <View
-                style={{
-                  flex: 1,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <ActivityIndicator />
-              </View>
-            }
-          >
+          <Suspense fallback={<LoadingView />}>
             <ColorTriptychChooser
               size={86}
               colorPalette={colorPalette}

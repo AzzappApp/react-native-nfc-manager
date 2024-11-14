@@ -22,15 +22,13 @@ import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { keyExtractor } from '#helpers/idHelpers';
 import { useProfileInfos } from '#hooks/authStateHooks';
-import useBoolean from '#hooks/useBoolean';
 import { useFocusEffect } from '#hooks/useFocusEffect';
-import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';
+import LoadingView from '#ui/LoadingView';
 import PressableNative from '#ui/PressableNative';
 import RadioButton from '#ui/RadioButton';
-import SearchBar from '#ui/SearchBar';
 import Text from '#ui/Text';
 import Avatar, { AVATAR_WIDTH } from './Avatar';
 import MultiUserPendingProfileOwner from './MultiUserPendingProfileOwner';
@@ -45,11 +43,15 @@ import type { ListRenderItem, SectionListData } from 'react-native';
 export type MultiUserScreenListProps = {
   webCard: MultiUserScreenUserList_webCard$key;
   Header: React.ReactElement;
+  searching?: boolean;
+  searchValue?: string;
 };
 
 const MultiUserScreenUserList = ({
   webCard: webCardKey,
   Header,
+  searching,
+  searchValue,
 }: MultiUserScreenListProps) => {
   const intl = useIntl();
 
@@ -215,7 +217,6 @@ const MultiUserScreenUserList = ({
   }, [hasNext, isLoadingNext, loadNext]);
 
   //#region Search
-  const [searchValue, setSearchValue] = useState<string | undefined>('');
   const [debounceText] = useDebounce(searchValue, 500);
 
   const [refreshing, setRefreshing] = useState(false);
@@ -235,8 +236,6 @@ const MultiUserScreenUserList = ({
   const profileInfos = useProfileInfos();
 
   const { transferOwnerMode } = useContext(MultiUserTransferOwnerContext);
-
-  const [searching, setSearchMode, removeSearchMode] = useBoolean(false);
 
   const renderListItem = useCallback<ListRenderItem<Profile>>(
     ({ item }) => {
@@ -282,23 +281,7 @@ const MultiUserScreenUserList = ({
 
   return (
     <View style={styles.content}>
-      <SearchBar
-        placeholder={intl.formatMessage({
-          defaultMessage: 'Search for a user',
-          description: 'MultiScreen - search bar placeholder',
-        })}
-        onChangeText={setSearchValue}
-        value={searchValue}
-        onFocus={setSearchMode}
-        onBlur={removeSearchMode}
-      />
-      <Suspense
-        fallback={
-          <View style={styles.fallbackContainer}>
-            <ActivityIndicator />
-          </View>
-        }
-      >
+      <Suspense fallback={<LoadingView />}>
         <SectionList
           ListHeaderComponent={
             searching || searchValue ? null : (
@@ -495,11 +478,6 @@ const styleSheet = createStyleSheet(appearance => ({
     color: appearance === 'light' ? colors.grey600 : colors.grey300,
     textTransform: 'uppercase',
     textAlign: 'center',
-  },
-  fallbackContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 }));
 

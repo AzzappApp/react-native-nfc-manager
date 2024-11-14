@@ -18,8 +18,7 @@ import {
   useScreenHasFocus,
   type ScreenOptions,
 } from '#components/NativeRouter';
-import ActivityIndicator from '#ui/ActivityIndicator';
-import Container from '#ui/Container';
+import LoadingView from '#ui/LoadingView';
 import {
   addAuthStateListener,
   getAuthState,
@@ -116,7 +115,7 @@ export const isRelayScreen = (
 function relayScreen<TRoute extends Route>(
   Component: ComponentType<RelayScreenProps<TRoute, any>>,
   {
-    fallback: Fallback = RelayScreenFallback,
+    fallback: Fallback = LoadingView,
     errorFallback: ErrorFallback,
     canGoBack = true,
     profileBound = true,
@@ -398,13 +397,3 @@ export class RelayScreenErrorBoundary extends React.Component<
     return children;
   }
 }
-
-export const RelayScreenFallback = () => {
-  return (
-    <Container
-      style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
-    >
-      <ActivityIndicator />
-    </Container>
-  );
-};

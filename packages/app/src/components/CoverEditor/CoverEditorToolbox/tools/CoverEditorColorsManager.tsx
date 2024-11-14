@@ -4,11 +4,11 @@ import { Alert, View, StyleSheet } from 'react-native';
 import ColorTriptychChooser from '#components/ColorTriptychChooser';
 import { useCoverEditorContext } from '#components/CoverEditor/CoverEditorContext';
 import useScreenInsets from '#hooks/useScreenInsets';
-import ActivityIndicator from '#ui/ActivityIndicator';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
 import ColorChooser from '#ui/ColorPicker/ColorChooser';
 import Header from '#ui/Header';
+import LoadingView from '#ui/LoadingView';
 import Text from '#ui/Text';
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 
@@ -239,19 +239,7 @@ const CoverEditorColorsManager = ({
             onColorChange={onChangeColorInPalette}
           />
         ) : (
-          <Suspense
-            fallback={
-              <View
-                style={{
-                  flex: 1,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <ActivityIndicator />
-              </View>
-            }
-          >
+          <Suspense fallback={<LoadingView />}>
             <ColorTriptychChooser
               size={86}
               colorPalette={cardColors}

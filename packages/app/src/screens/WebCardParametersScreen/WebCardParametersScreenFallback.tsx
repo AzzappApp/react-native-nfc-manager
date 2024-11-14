@@ -1,6 +1,5 @@
-import { View } from 'react-native';
-import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
+import LoadingView from '#ui/LoadingView';
 import SafeAreaView from '#ui/SafeAreaView';
 import WebCardParametersHeader from './WebCardParametersHeader';
 
@@ -13,9 +12,7 @@ const WebCardParametersScreenFallback = () => (
       }}
     >
       <WebCardParametersHeader webCard={null} />
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <ActivityIndicator />
-      </View>
+      <LoadingView />
     </SafeAreaView>
   </Container>
 );

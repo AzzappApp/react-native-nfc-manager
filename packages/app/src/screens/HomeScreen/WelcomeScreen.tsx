@@ -14,9 +14,9 @@ import { useProfileInfos } from '#hooks/authStateHooks';
 import useBoolean from '#hooks/useBoolean';
 import { useFocusEffect } from '#hooks/useFocusEffect';
 import useScreenInsets from '#hooks/useScreenInsets';
-import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
 import IconButton from '#ui/IconButton';
+import LoadingView from '#ui/LoadingView';
 import Text from '#ui/Text';
 import HomeBottomSheetPanel from './HomeBottomSheetPanel';
 import type { ScreenOptions } from '#components/NativeRouter';
@@ -52,9 +52,7 @@ const WelcomeScreen = ({
   const { width } = useWindowDimensions();
   const { top } = useScreenInsets();
   return profileInfos?.profileId ? (
-    <View style={styles.containerLoading}>
-      <ActivityIndicator />
-    </View>
+    <LoadingView />
   ) : (
     <View style={[styles.container, { paddingTop: top }]}>
       <View style={styles.header}>
@@ -148,7 +146,6 @@ export default WelcomeRelayScreen;
 const BOTTOM_HEIGHT = 280;
 
 const styles = StyleSheet.create({
-  containerLoading: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   container: {
     flex: 1,
     justifyContent: 'space-between',

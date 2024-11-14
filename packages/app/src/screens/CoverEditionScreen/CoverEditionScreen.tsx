@@ -13,10 +13,10 @@ import PremiumIndicator from '#components/PremiumIndicator';
 import relayScreen from '#helpers/relayScreen';
 import useLatestCallback from '#hooks/useLatestCallback';
 import useScreenInsets from '#hooks/useScreenInsets';
-import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
+import LoadingView from '#ui/LoadingView';
 import Text from '#ui/Text';
 import useLocalCover from './useLocalCover';
 import type { CoverEditorHandle } from '#components/CoverEditor';
@@ -188,9 +188,7 @@ const CoverEditionScreen = ({
           />
         </View>
       ) : (
-        <View style={styles.loaderContainer}>
-          <ActivityIndicator />
-        </View>
+        <LoadingView />
       )}
     </Container>
   );
@@ -225,11 +223,6 @@ export default relayScreen(CoverEditionScreen, {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  loaderContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   changeCover: { paddingHorizontal: 50, paddingTop: 30 },
   saveButton: { width: 70, marginRight: 10 },

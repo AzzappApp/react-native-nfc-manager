@@ -1,13 +1,12 @@
 import { Suspense } from 'react';
 import { useIntl } from 'react-intl';
-import { View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { useRouter } from '#components/NativeRouter';
 import relayScreen from '#helpers/relayScreen';
-import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
+import LoadingView from '#ui/LoadingView';
 import SafeAreaView from '#ui/SafeAreaView';
 import FollowingsMosaicScreenList from './FollowingsMosaicScreenList';
 import type { RelayScreenProps } from '#helpers/relayScreen';
@@ -46,19 +45,7 @@ const FollowingsMosaicScreen = ({
             description: 'Title of the screen listing followed profiles',
           })}
         />
-        <Suspense
-          fallback={
-            <View
-              style={{
-                flex: 1,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <ActivityIndicator />
-            </View>
-          }
-        >
+        <Suspense fallback={<LoadingView />}>
           <FollowingsMosaicScreenInner preloadedQuery={preloadedQuery} />
         </Suspense>
       </SafeAreaView>

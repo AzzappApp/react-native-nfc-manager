@@ -22,18 +22,20 @@ import {
 import PremiumIndicator from '#components/PremiumIndicator';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import relayScreen, { RelayScreenErrorBoundary } from '#helpers/relayScreen';
+import useBoolean from '#hooks/useBoolean';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import { useMultiUserUpdate } from '#hooks/useMultiUserUpdate';
 import useToggle from '#hooks/useToggle';
-import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
+import LoadingView from '#ui/LoadingView';
 import PressableNative from '#ui/PressableNative';
 import SafeAreaView from '#ui/SafeAreaView';
+import SearchBar from '#ui/SearchBar';
 import Switch from '#ui/Switch';
 import Text from '#ui/Text';
 import MultiUserScreenUserList from './MultiUserScreenUserList';
@@ -296,6 +298,8 @@ const MultiUserScreen = ({
       toggleTransferOwnerMode,
     ],
   );
+  const [searchValue, setSearchValue] = useState<string | undefined>('');
+  const [searching, setSearchMode, removeSearchMode] = useBoolean(false);
 
   if (!profile) {
     return null;
@@ -365,31 +369,33 @@ const MultiUserScreen = ({
             }
           />
         )}
-
         <View style={styles.content}>
           {profile.webCard?.isMultiUser ? (
-            <Suspense
-              fallback={
-                <View
-                  style={{
-                    flex: 1,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <ActivityIndicator />
-                </View>
-              }
-            >
-              <MultiUserTransferOwnerContext.Provider value={contextValue}>
-                <MultiUserScreenUserList
-                  Header={ScrollableHeader}
-                  webCard={profile.webCard}
-                />
-              </MultiUserTransferOwnerContext.Provider>
-            </Suspense>
+            <>
+              <SearchBar
+                placeholder={intl.formatMessage({
+                  defaultMessage: 'Search for a user',
+                  description: 'MultiScreen - search bar placeholder',
+                })}
+                onChangeText={setSearchValue}
+                value={searchValue}
+                onFocus={setSearchMode}
+                onBlur={removeSearchMode}
+                containerStyle={styles.searchBar}
+              />
+              <Suspense fallback={<LoadingView />}>
+                <MultiUserTransferOwnerContext.Provider value={contextValue}>
+                  <MultiUserScreenUserList
+                    Header={ScrollableHeader}
+                    webCard={profile.webCard}
+                    searching={searching}
+                    searchValue={searchValue}
+                  />
+                </MultiUserTransferOwnerContext.Provider>
+              </Suspense>
+            </>
           ) : (
-            <>{ScrollableHeader}</>
+            ScrollableHeader
           )}
         </View>
       </SafeAreaView>
@@ -460,6 +466,12 @@ const styleSheet = createStyleSheet(appearance => ({
     padding: 10,
     flex: 1,
   },
+  loaderContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  searchBar: { width: '100%' },
   description: {
     textAlign: 'center',
     paddingHorizontal: 50,

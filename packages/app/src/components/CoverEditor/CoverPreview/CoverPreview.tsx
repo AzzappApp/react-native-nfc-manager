@@ -30,9 +30,8 @@ import {
 } from '#components/NativeRouter';
 import VideoCompositionRenderer from '#components/VideoCompositionRenderer';
 import useToggle from '#hooks/useToggle';
-import ActivityIndicator from '#ui/ActivityIndicator';
-import Container from '#ui/Container';
 import IconButton from '#ui/IconButton';
+import LoadingView from '#ui/LoadingView';
 import coverDrawer from '../coverDrawer';
 import { createParagraph } from '../coverDrawer/coverTextDrawer';
 import { useCoverEditorContext, useCurrentLayer } from '../CoverEditorContext';
@@ -1013,9 +1012,7 @@ const CoverPreview = ({
         >
           {/* Not rendering when modal are displayed reduce memory usage */}
           {loadingRemoteMedia || (!hasFocus && !snapshotId) ? (
-            <Container style={styles.loadingContainer}>
-              <ActivityIndicator />
-            </Container>
+            <LoadingView />
           ) : (
             <View
               ref={compositionContainerRef}
@@ -1302,11 +1299,6 @@ const styles = StyleSheet.create({
   root: {
     backgroundColor: colors.grey300,
     ...shadow('light'),
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   overlayControls: {
     gap: 15,

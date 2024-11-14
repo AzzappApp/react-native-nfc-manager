@@ -1,4 +1,3 @@
-import { View } from 'react-native';
 import { CancelHeaderButton } from '#components/commonsButtons';
 import { useRouter } from '#components/NativeRouter';
 import relayScreen from '#helpers/relayScreen';
@@ -10,7 +9,7 @@ import PhotoWithTextAndTitleEditionMobileScreenNode from '#relayArtifacts/PhotoW
 import SimpleButtonEditionMobileScreenNode from '#relayArtifacts/SimpleButtonEditionMobileScreenQuery.graphql';
 import SimpleTextEditionMobileScreenNode from '#relayArtifacts/SimpleTextEditionMobileScreenQuery.graphql';
 import SocialLinksEditionMobileScreenNode from '#relayArtifacts/SocialLinksEditionMobileScreenQuery.graphql';
-import ActivityIndicator from '#ui/ActivityIndicator';
+import LoadingScreen from '#screens/LoadingScreen';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import SafeAreaView from '#ui/SafeAreaView';
@@ -156,11 +155,7 @@ const CardModuleEditionScreenFallback = () => {
     <Container style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 1 }}>
         <Header leftElement={<CancelHeaderButton onPress={onCancel} />} />
-        <View
-          style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
-        >
-          <ActivityIndicator />
-        </View>
+        <LoadingScreen />
       </SafeAreaView>
     </Container>
   );
