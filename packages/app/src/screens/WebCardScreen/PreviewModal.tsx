@@ -24,7 +24,7 @@ type PreviewModalProps = {
   onRequestClose: () => void;
 };
 
-const { height: windowHeight } = Dimensions.get('window');
+const { height: windowHeight } = Dimensions.get('screen');
 
 /**
  * A modal that allows the user to preview his webcard.
