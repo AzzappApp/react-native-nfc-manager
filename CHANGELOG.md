@@ -1,5 +1,7 @@
-## 1.4.0-canary.94
+## 1.4.0-canary.95
 
+* **fix:**  - not clickable Toast on android ([#5945](https://github.com/AzzappApp/azzapp/pull/5945))
+* **fix:**  - reapply preview border radius ([#5947](https://github.com/AzzappApp/azzapp/pull/5947))
 * **fix:**  - **android:** [#5925](https://github.com/AzzappApp/azzapp/pull/5925) wrong height size ([#5944](https://github.com/AzzappApp/azzapp/pull/5944))
 * **fix:**  - **android:** [#5930](https://github.com/AzzappApp/azzapp/pull/5930) avoid cut on button on android
 * **fix:**  - 🐛 make show password icon touchable for android ([#5938](https://github.com/AzzappApp/azzapp/pull/5938))
