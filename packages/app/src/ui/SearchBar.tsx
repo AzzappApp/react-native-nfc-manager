@@ -227,7 +227,6 @@ const styleSheet = createStyleSheet(appearance => ({
     borderRadius: 12,
     fontSize: 16,
     color: appearance === 'light' ? colors.black : colors.grey400,
-    flex: 1,
   },
   input: {
     flex: 1,
@@ -242,7 +241,6 @@ const styleSheet = createStyleSheet(appearance => ({
     justifyContent: 'flex-start',
     overflow: 'hidden',
     columnGap: 10,
-    paddingHorizontal: 5,
   },
   container: {
     overflow: 'hidden',
