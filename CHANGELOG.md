@@ -1,5 +1,6 @@
-## 1.4.0-canary.92
+## 1.4.0-canary.93
 
+* **fix:**  - **android:** [#5930](https://github.com/AzzappApp/azzapp/pull/5930) avoid cut on button on android
 * **fix:**  - 🐛 make show password icon touchable for android ([#5938](https://github.com/AzzappApp/azzapp/pull/5938))
 * **fix:**  - 🐛 avoid searchbar overflow ([#5939](https://github.com/AzzappApp/azzapp/pull/5939))
 * **fix:**  - **android:** [#5904](https://github.com/AzzappApp/azzapp/pull/5904) fix freezes on reanimated with allowRecursiveCommitsWithSynchronousMountOnAndroid feature flag ([#5933](https://github.com/AzzappApp/azzapp/pull/5933))
