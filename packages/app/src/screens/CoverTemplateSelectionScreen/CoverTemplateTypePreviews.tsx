@@ -224,6 +224,7 @@ const styleSheet = createStyleSheet(appearance => ({
     width: 150,
     height: 240,
     flexShrink: 0,
+    borderRadius: 24,
   },
   badge: {
     position: 'absolute',
