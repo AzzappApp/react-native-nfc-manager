@@ -1,4 +1,4 @@
-## 1.4.0-canary.91
+## 1.4.0-canary.92
 
 * **fix:**  - 🐛 make show password icon touchable for android ([#5938](https://github.com/AzzappApp/azzapp/pull/5938))
 * **fix:**  - 🐛 avoid searchbar overflow ([#5939](https://github.com/AzzappApp/azzapp/pull/5939))
