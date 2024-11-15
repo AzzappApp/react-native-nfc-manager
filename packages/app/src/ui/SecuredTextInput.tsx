@@ -3,7 +3,7 @@ import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 
 import Icon from './Icon';
-import PressableNative from './PressableNative';
+import PressableOpacity from './PressableOpacity';
 import TextInput from './TextInput';
 import type { TextInputProps } from './TextInput';
 import type { ForwardedRef } from 'react';
@@ -55,7 +55,7 @@ const SecuredTextInput = (
         secureTextEntry={!showPassword}
         textContentType="password"
       />
-      <PressableNative
+      <PressableOpacity
         style={styles.buttonSecure}
         onPress={onPressShowPassword}
         accessibilityRole="togglebutton"
@@ -75,7 +75,7 @@ const SecuredTextInput = (
             marginRight: 10,
           }}
         />
-      </PressableNative>
+      </PressableOpacity>
     </View>
   );
 };
