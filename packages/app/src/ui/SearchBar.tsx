@@ -118,7 +118,10 @@ const SearchBar = ({
         [0, 1],
         [
           containerWidth.value,
-          containerWidth.value - cancelButtonWidth.value - MARGIN_LEFT_BUTTON,
+          containerWidth.value -
+            cancelButtonWidth.value -
+            MARGIN_LEFT_BUTTON -
+            1,
         ],
       ),
       borderWidth: isFocused.value,
