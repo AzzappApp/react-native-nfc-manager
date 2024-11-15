@@ -1,5 +1,6 @@
-## 1.4.0-canary.88
+## 1.4.0-canary.89
 
+* **fix:**  - **android:** [#5904](https://github.com/AzzappApp/azzapp/pull/5904) fix freezes on reanimated with allowRecursiveCommitsWithSynchronousMountOnAndroid feature flag ([#5933](https://github.com/AzzappApp/azzapp/pull/5933))
 * **fix:**  - **android:** adapt contact card landscape behaviour on samsung devices ([#5926](https://github.com/AzzappApp/azzapp/pull/5926))
 * **fix:**  - allow to define fixed height to BoxSelectionList ([#5895](https://github.com/AzzappApp/azzapp/pull/5895))
 * **fix:**  - **multiUser:** [#5918](https://github.com/AzzappApp/azzapp/pull/5918) move searchBar from result list ([#5921](https://github.com/AzzappApp/azzapp/pull/5921))
