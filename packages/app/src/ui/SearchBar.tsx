@@ -6,7 +6,7 @@ import Animated, {
   interpolateColor,
   useAnimatedStyle,
   useSharedValue,
-  // withTiming,
+  withTiming,
 } from 'react-native-reanimated';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
@@ -47,7 +47,7 @@ const SearchBar = ({
   placeholder,
   value,
   autoFocus,
-  //animationDuration = 300,
+  animationDuration = 300,
 }: SearchBarProps) => {
   const textInputRef = useRef<TextInput>(null);
 
@@ -95,19 +95,17 @@ const SearchBar = ({
   const onInputFocus = useCallback(
     (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
       onFocus?.(e);
-      // isFocused.value = withTiming(1, { duration: animationDuration }); // freezes on android
-      isFocused.value = 1;
+      isFocused.value = withTiming(1, { duration: animationDuration }); // freezes on android
     },
-    [isFocused, onFocus],
+    [animationDuration, isFocused, onFocus],
   );
 
   const onInputBlur = useCallback(
     (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
       onBlur?.(e);
-      // isFocused.value = withTiming(0, { duration: animationDuration }); // freezes on android
-      isFocused.value = 0;
+      isFocused.value = withTiming(0, { duration: animationDuration }); // freezes on android
     },
-    [isFocused, onBlur],
+    [animationDuration, isFocused, onBlur],
   );
 
   const intl = useIntl();
