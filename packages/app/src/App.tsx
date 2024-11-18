@@ -1,6 +1,5 @@
 import { IntlErrorCode } from '@formatjs/intl';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import { addEventListener } from '@react-native-community/netinfo';
 import * as Sentry from '@sentry/react-native';
 import {
   Component,
@@ -27,6 +26,9 @@ import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
 import { isNetworkError } from '@azzapp/shared/networkHelpers';
 import { mainRoutes, signInRoutes, signUpRoutes } from '#mobileRoutes';
+import NetworkAvailableContextProvider, {
+  useNetworkAvailableFetcher,
+} from '#networkAvailableContext';
 import { colors } from '#theme';
 import MainTabBar from '#components/MainTabBar';
 import {
@@ -430,24 +432,17 @@ const AppRouter = () => {
     };
   }, [colorScheme]);
 
-  const wasConnected = useRef<boolean | null>(true);
+  const isConnected = useNetworkAvailableFetcher();
 
   useEffect(() => {
-    // Subscribe
-    const unsubscribe = addEventListener(state => {
-      if (wasConnected.current && !state.isConnected) {
-        if (router.getCurrentRoute()?.route !== 'OFFLINE_VCARD') {
-          router.push({
-            route: 'OFFLINE_VCARD',
-          });
-        }
+    if (!isConnected) {
+      if (router.getCurrentRoute()?.route !== 'OFFLINE_VCARD') {
+        router.push({
+          route: 'OFFLINE_VCARD',
+        });
       }
-      wasConnected.current = state.isConnected;
-    });
-    return () => {
-      unsubscribe();
-    };
-  }, [router]);
+    }
+  }, [isConnected, router]);
 
   // TODO handle errors
   const [fontLoaded] = useApplicationFonts();
@@ -456,36 +451,38 @@ const AppRouter = () => {
   }
 
   return (
-    <RelayEnvironmentProvider environment={environment}>
-      <ScreenPrefetcherProvider value={screenPrefetcher}>
-        <SafeAreaProvider
-          initialMetrics={Platform.select({
-            android: null,
-            default: initialWindowMetrics,
-          })}
-          style={safeAreaBackgroundStyle}
-        >
-          <RouterProvider value={router}>
-            <GestureHandlerRootView style={styles.flex}>
-              <BottomSheetModalProvider>
-                <ScreensRenderer
-                  routerState={routerState}
-                  screens={screens}
-                  tabs={tabs}
-                  onFinishTransitioning={onFinishTransitioning}
-                  onScreenHasBeenDismissed={disposeScreens}
-                />
-              </BottomSheetModalProvider>
-            </GestureHandlerRootView>
-          </RouterProvider>
-          <Toast />
-          <Suspense>
-            <ShakeShare />
-          </Suspense>
-          {showLoadingScreen && <LoadingScreen />}
-        </SafeAreaProvider>
-      </ScreenPrefetcherProvider>
-    </RelayEnvironmentProvider>
+    <NetworkAvailableContextProvider value={isConnected}>
+      <RelayEnvironmentProvider environment={environment}>
+        <ScreenPrefetcherProvider value={screenPrefetcher}>
+          <SafeAreaProvider
+            initialMetrics={Platform.select({
+              android: null,
+              default: initialWindowMetrics,
+            })}
+            style={safeAreaBackgroundStyle}
+          >
+            <RouterProvider value={router}>
+              <GestureHandlerRootView style={styles.flex}>
+                <BottomSheetModalProvider>
+                  <ScreensRenderer
+                    routerState={routerState}
+                    screens={screens}
+                    tabs={tabs}
+                    onFinishTransitioning={onFinishTransitioning}
+                    onScreenHasBeenDismissed={disposeScreens}
+                  />
+                </BottomSheetModalProvider>
+              </GestureHandlerRootView>
+            </RouterProvider>
+            <Toast />
+            <Suspense>
+              <ShakeShare />
+            </Suspense>
+            {showLoadingScreen && <LoadingScreen />}
+          </SafeAreaProvider>
+        </ScreenPrefetcherProvider>
+      </RelayEnvironmentProvider>
+    </NetworkAvailableContextProvider>
   );
 };
 

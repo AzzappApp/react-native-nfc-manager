@@ -8,7 +8,11 @@ import {
   Environment,
 } from 'relay-runtime';
 import ERRORS from '@azzapp/shared/errors';
-import { fetchJSON, isAbortError } from '@azzapp/shared/networkHelpers';
+import {
+  fetchJSON,
+  isAbortError,
+  isNetworkError,
+} from '@azzapp/shared/networkHelpers';
 import { version as APP_VERSION } from '../../package.json';
 import { addAuthStateListener, getAuthState } from './authStore';
 import fetchWithAuthTokens from './fetchWithAuthTokens';
@@ -238,7 +242,7 @@ export const createNetwork = () => {
             if (sink.closed) {
               return;
             }
-            if (isAbortError(error)) {
+            if (isAbortError(error) || isNetworkError(error)) {
               sink.complete();
             } else {
               sink.error(error);

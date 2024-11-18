@@ -1,4 +1,3 @@
-import { addEventListener } from '@react-native-community/netinfo';
 import { Canvas, ImageSVG, Skia } from '@shopify/react-native-skia';
 import { toString } from 'qrcode';
 import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
@@ -23,6 +22,7 @@ import {
   emailLabelToVCardLabel,
   phoneLabelToVCardLabel,
 } from '@azzapp/shared/vCardHelpers';
+import { useNetworkAvailableContext } from '#networkAvailableContext';
 import { colors } from '#theme';
 import AnimatedText from '#components/AnimatedText';
 import {
@@ -174,15 +174,11 @@ const OfflineVCardScreen = () => {
   const swipableZoneHeight = qrCodeContainerSize + itemHeight + 30;
   const flatListPositionInSwipableZone = qrCodeContainerSize + 30;
 
+  const isConnected = useNetworkAvailableContext();
+
   useEffect(() => {
-    // Subscribe
-    const unsubscribe = addEventListener(state => {
-      setCanLeaveScreen(!!state.isConnected);
-    });
-    return () => {
-      unsubscribe();
-    };
-  }, []);
+    setCanLeaveScreen(isConnected);
+  }, [isConnected]);
 
   const vcardList: vCardData[] = useMemo(() => {
     const profiles = getOfflineVCard();
