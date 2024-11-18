@@ -32,7 +32,7 @@ const HomeScreenPrefetcher = ({ user: userKey }: HomeScreenPrefetcherProps) => {
   useEffect(() => {
     let disposable: Disposable | undefined;
     const timeout = setTimeout(() => {
-      if (currentIndexProfileSharedValue.value === 0) {
+      if (currentIndexProfileSharedValue.get() === 0) {
         disposable = prefetchRoute(getRelayEnvironment(), {
           route: 'WEBCARD_KIND_SELECTION',
         });

@@ -170,6 +170,7 @@ function CarouselSelectList<TItem = any>(
         if (itemWidth == null) {
           return;
         }
+        scrollIndex.value = index;
         listRef.current?.scrollToOffset({
           offset: index * itemWidth,
           animated,
@@ -193,21 +194,21 @@ function CarouselSelectList<TItem = any>(
 
   useEffect(() => {
     if (isForeground !== prevIsForeground.current && itemWidth != null) {
+      const scrollIndexValue = scrollIndex.get();
       if (
         !prevIsForeground.current &&
         isForeground &&
-        scrollIndex.value !== Math.round(scrollIndex.value)
+        scrollIndexValue !== Math.round(scrollIndexValue)
       ) {
         listRef.current?.scrollToOffset({
-          offset: Math.round(scrollIndex.value) * itemWidth,
+          offset: Math.round(scrollIndexValue) * itemWidth,
           animated: false,
         });
       }
 
       prevIsForeground.current = isForeground;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isForeground, itemWidth]);
+  }, [isForeground, itemWidth, scrollIndex]);
 
   // Animation
   const scrollHandler = useAnimatedScrollHandler({
