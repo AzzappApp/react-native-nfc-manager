@@ -247,6 +247,7 @@ const WebCardColorsManager = ({
               if (optimisticUpdate.current) {
                 environment.revertUpdate(optimisticUpdate.current);
                 optimisticUpdate.current = null;
+                setEditedColor(null);
               }
               onRequestClose();
             },
