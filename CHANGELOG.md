@@ -1,5 +1,8 @@
-## 1.4.0-canary.101
+## 1.4.0-canary.102
 
+* **feat:**  - 🎸 correctly display webcard conver in tab bar ([#5958](https://github.com/AzzappApp/azzapp/pull/5958))
+* **fix:**  - 🐛 reset edited color on close picker/editor ([#5957](https://github.com/AzzappApp/azzapp/pull/5957))
+* **fix:**  - **android:** [#5822](https://github.com/AzzappApp/azzapp/pull/5822) wrong index on webcard list update ([#5956](https://github.com/AzzappApp/azzapp/pull/5956))
 * **fix:**  - disable shake & share when offline ([#5955](https://github.com/AzzappApp/azzapp/pull/5955))
 * **fix:**  - replace maximum with additive
 * **fix:**  - bottom padding issue on MultiUserScreen ([#5952](https://github.com/AzzappApp/azzapp/pull/5952))
