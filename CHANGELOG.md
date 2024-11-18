@@ -1,5 +1,6 @@
-## 1.4.0-canary.102
+## 1.4.0-canary.103
 
+* **fix:**  - **Navigation:** prevent navigating to the same route ([#5962](https://github.com/AzzappApp/azzapp/pull/5962))
 * **feat:**  - 🎸 correctly display webcard conver in tab bar ([#5958](https://github.com/AzzappApp/azzapp/pull/5958))
 * **fix:**  - 🐛 reset edited color on close picker/editor ([#5957](https://github.com/AzzappApp/azzapp/pull/5957))
 * **fix:**  - **android:** [#5822](https://github.com/AzzappApp/azzapp/pull/5822) wrong index on webcard list update ([#5956](https://github.com/AzzappApp/azzapp/pull/5956))
