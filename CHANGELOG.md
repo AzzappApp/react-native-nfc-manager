@@ -1,4 +1,4 @@
-## 1.4.0-canary.96
+## 1.4.0-canary.97
 
 * **feat:**  - Copy cover media locally during edition ([#5900](https://github.com/AzzappApp/azzapp/pull/5900))
 * **fix:**  - not clickable Toast on android ([#5945](https://github.com/AzzappApp/azzapp/pull/5945))
