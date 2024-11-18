@@ -1,5 +1,6 @@
-## 1.4.0-canary.97
+## 1.4.0-canary.98
 
+* **fix:**  - increase timeouts for offline detection ([#5911](https://github.com/AzzappApp/azzapp/pull/5911))
 * **feat:**  - Copy cover media locally during edition ([#5900](https://github.com/AzzappApp/azzapp/pull/5900))
 * **fix:**  - not clickable Toast on android ([#5945](https://github.com/AzzappApp/azzapp/pull/5945))
 * **fix:**  - reapply preview border radius ([#5947](https://github.com/AzzappApp/azzapp/pull/5947))
