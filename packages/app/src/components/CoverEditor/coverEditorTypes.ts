@@ -1,5 +1,9 @@
 import type { EditionParameters } from '#helpers/mediaEditions';
-import type { MediaVideo, MediaImage, TimeRange } from '#helpers/mediaHelpers';
+import type {
+  SourceMediaVideo,
+  SourceMediaImage,
+  TimeRange,
+} from '#helpers/mediaHelpers';
 import type { CoverTextAnimations } from './coverDrawer/coverTextAnimations';
 import type { CoverTransitions } from './coverDrawer/coverTransitions';
 import type { MediaAnimations } from './coverDrawer/mediaAnimations';
@@ -16,7 +20,7 @@ export type CoverEditorState = {
   backgroundColor: string | null;
 
   providedMedias: CoverEditionProvidedMedia[];
-  medias: MediaInfo[];
+  medias: CoverMedia[];
   coverTransition: CoverTransitions | null;
 
   overlayLayers: CoverEditorOverlayItem[];
@@ -32,7 +36,7 @@ export type CoverEditorState = {
   // Resources used for displaying/updating the cover
   images: Record<string, bigint | null>;
   imagesScales: Record<string, number>;
-  videoPaths: Record<string, string>;
+  localPaths: Record<string, string>;
   lutShaders: Partial<Record<Filter, SkShader>>;
 
   // Loading state
@@ -51,23 +55,23 @@ export type CardColors = Readonly<
   }
 >;
 
-export type MediaInfoBase = {
+export type CoverMediaBase = {
   filter: Filter | null;
   editionParameters: EditionParameters | null;
 };
 
-export type MediaInfoVideo = MediaInfoBase & {
-  media: MediaVideo;
-  timeRange: TimeRange;
-};
+export type CoverMediaVideo = CoverMediaBase &
+  SourceMediaVideo & {
+    timeRange: TimeRange;
+  };
 
-export type MediaInfoImage = MediaInfoBase & {
-  media: MediaImage;
-  animation: MediaAnimations | null;
-  duration: number;
-};
+export type CoverMediaImage = CoverMediaBase &
+  SourceMediaImage & {
+    animation: MediaAnimations | null;
+    duration: number;
+  };
 
-export type MediaInfo = MediaInfoImage | MediaInfoVideo;
+export type CoverMedia = CoverMediaImage | CoverMediaVideo;
 
 export type CoverEditionMode =
   | 'colors'
@@ -79,8 +83,7 @@ export type CoverEditionMode =
   | 'text'
   | 'textEdit';
 
-export type CoverEditionProvidedMedia = {
-  media: MediaInfo;
+export type CoverEditionProvidedMedia = CoverMediaImage & {
   index: number;
   editable: boolean;
 };
@@ -100,8 +103,7 @@ export type CoverEditorTextLayerItem = {
   endPercentageTotal: number;
 };
 
-export type CoverEditorOverlayItem = {
-  media: MediaImage;
+export type CoverEditorOverlayItem = SourceMediaImage & {
   borderRadius: number;
   borderWidth: number;
   borderColor: string;

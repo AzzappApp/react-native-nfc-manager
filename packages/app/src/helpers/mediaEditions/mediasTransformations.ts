@@ -48,7 +48,7 @@ export const imageFrameFromVideoFrame = (
   frame: VideoFrame,
 ): ImageFrame | null => {
   'worklet';
-  const image = createImageFromNativeBuffer(frame?.buffer, false);
+  const image = createImageFromNativeBuffer(frame?.buffer);
   if (image == null) {
     return null;
   }

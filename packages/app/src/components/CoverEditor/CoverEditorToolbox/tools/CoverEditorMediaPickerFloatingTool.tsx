@@ -5,7 +5,7 @@ import useToggle from '#hooks/useToggle';
 import IconButton from '#ui/IconButton';
 import { useCoverEditorContext } from '../../CoverEditorContext';
 import CoverEditorMediaPicker from '../../CoverEditorMediaPicker';
-import type { Media } from '#helpers/mediaHelpers';
+import type { SourceMedia } from '#helpers/mediaHelpers';
 
 type Props = {
   durations: number[] | null;
@@ -20,7 +20,7 @@ const CoverEditorMediaPickerFloatingTool = ({
   const { dispatch, coverEditorState: cover } = useCoverEditorContext();
 
   const onMediasPicked = useCallback(
-    (medias: Media[]) => {
+    (medias: SourceMedia[]) => {
       dispatch({
         type: 'UPDATE_MEDIAS',
         payload: medias,
@@ -55,7 +55,7 @@ const CoverEditorMediaPickerFloatingTool = ({
       >
         {showImagePicker && (
           <CoverEditorMediaPicker
-            initialMedias={cover.medias.map(({ media }) => media)}
+            initialMedias={cover.medias}
             onFinished={onMediasPicked}
             durations={durations}
             durationsFixed={durationsFixed}

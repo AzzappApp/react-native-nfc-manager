@@ -112,6 +112,23 @@ index 1ec4a267bbc525df9af850d5f03023ebf0120fb2..4c5eef9cbb6f19f4c9aa1baf93734bbb
    /**
     * Repaints the Skia view using the underlying context and the drawcallback.
     * This method schedules a draw request that will be run on the correct
+diff --git a/ios/RNSkia-iOS/SkiaMetalSurfaceFactory.h b/ios/RNSkia-iOS/SkiaMetalSurfaceFactory.h
+index a7099fb083d585aa49086ce489fed4cbac753ef5..7e7d7e286817bbdb1b8f1b8db7f6c517cca5585c 100644
+--- a/ios/RNSkia-iOS/SkiaMetalSurfaceFactory.h
++++ b/ios/RNSkia-iOS/SkiaMetalSurfaceFactory.h
+@@ -18,6 +18,12 @@
+ using SkiaMetalContext = struct SkiaMetalContext {
+   id<MTLCommandQueue> commandQueue = nullptr;
+   sk_sp<GrDirectContext> skContext = nullptr;
++
++  ~SkiaMetalContext() {
++    if (commandQueue != nullptr) {
++      CFRelease((CFTypeRef) commandQueue);
++    }
++  }
+ };
+ 
+ class ThreadContextHolder {
 diff --git a/src/views/SkiaDomView.tsx b/src/views/SkiaDomView.tsx
 index 9997713db68443e6ecf5d008d730592899863164..d36734f640ad78d0a9e3c7b3001b1c13e0300495 100644
 --- a/src/views/SkiaDomView.tsx

@@ -22,7 +22,7 @@ import {
   type EditionParameters,
   type ImageOrientation,
 } from '#helpers/mediaEditions';
-import type { Media, TimeRange } from '#helpers/mediaHelpers';
+import type { SourceMedia, TimeRange } from '#helpers/mediaHelpers';
 import type { Filter } from '@azzapp/shared/filtersHelper';
 import type { SkImage } from '@shopify/react-native-skia';
 import type { ReactNode, ForwardedRef } from 'react';
@@ -55,7 +55,7 @@ export type ImagePickerState = {
   /**
    * the selected media
    */
-  media: Media | null;
+  media: SourceMedia | null;
   /**
    * The SkImage of the media
    */
@@ -90,7 +90,10 @@ export type ImagePickerState = {
    * @param media the selected media
    * @param aspectRatio the aspect ratio of the media to force (usefull is difference between gallery and camera)
    */
-  onMediaChange(media: Media, aspectRatio?: number | null | undefined): void;
+  onMediaChange(
+    media: SourceMedia,
+    aspectRatio?: number | null | undefined,
+  ): void;
   /**
    * a emthod to clear the selected media
    *
@@ -176,14 +179,14 @@ type ImagePickerContextProviderProps = {
    * Dispatched when the media is changed
    * @param media the selected media
    */
-  onMediaChange?(media: Media | null): void;
+  onMediaChange?(media: SourceMedia | null): void;
 
   cameraButtonsLeftRightPosition?: number;
   /**
    * Initial data for the picker
    */
   initialData?: {
-    media: Media;
+    media: SourceMedia;
     editionParameters: EditionParameters | null;
     filter: Filter | null;
     timeRange?: TimeRange | null;
@@ -205,7 +208,9 @@ const _ImagePickerContextProvider = (
   }: ImagePickerContextProviderProps,
   forwardedRef: ForwardedRef<ImagePickerState>,
 ) => {
-  const [media, setMedia] = useState<Media | null>(initialData?.media ?? null);
+  const [media, setMedia] = useState<SourceMedia | null>(
+    initialData?.media ?? null,
+  );
   const [aspectRatio, setAspectRatio] = useState(
     typeof forceAspectRatio === 'number' ? forceAspectRatio : null,
   );
@@ -237,7 +242,7 @@ const _ImagePickerContextProvider = (
   }, [maxVideoDuration, media]);
 
   const onMediaChange = useCallback(
-    (media: Media, aspectRatio: number | null | undefined = null) => {
+    (media: SourceMedia, aspectRatio: number | null | undefined = null) => {
       setMedia(media);
       onMediaChangeProps?.(media);
       setAspectRatio(forceAspectRatio ?? aspectRatio ?? null);
@@ -311,7 +316,7 @@ const _ImagePickerContextProvider = (
     if (!nativeBuffer) {
       return null;
     }
-    return createImageFromNativeBuffer(nativeBuffer, true);
+    return createImageFromNativeBuffer(nativeBuffer);
   }, [nativeBuffer]);
 
   const [isSkImageReady, setIsSkImageReady] = useState(false);
@@ -404,7 +409,7 @@ export const ImagePickerContextProvider = forwardRef(
 );
 
 const getMediaAspectRatio = (
-  media: Media,
+  media: SourceMedia,
   orientation?: ImageOrientation | null,
 ) => {
   const aspectRatio = media.width / media.height;

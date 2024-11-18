@@ -23,8 +23,7 @@ const CoverEditorMediaEditToolbox = () => {
     dispatch,
     coverEditorState: { lottie },
   } = useCoverEditorContext();
-  const mediaInfos = useCoverEditorMedia();
-  const { media } = mediaInfos ?? {};
+  const media = useCoverEditorMedia();
   const hasTemplate = !!lottie;
 
   const onClose = () => {

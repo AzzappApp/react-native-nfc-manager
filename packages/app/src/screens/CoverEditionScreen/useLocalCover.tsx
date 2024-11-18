@@ -32,17 +32,26 @@ const useLocalCover = (
         });
         return;
       }
-      const medias = [
-        ...(cover.medias?.map(({ media }) => media) ?? []),
-        ...(cover.overlayLayers?.map(o => o.media) ?? []),
-      ];
+      const { localPaths, medias: coverMedias, overlayLayers } = cover;
+      const medias = [...(coverMedias ?? []), ...(overlayLayers ?? [])];
       const fileExists = (
         await Promise.all(
           medias.map(async media => {
-            if (media.uri.startsWith('http')) {
-              return true;
-            }
             try {
+              if (localPaths?.[media.id]) {
+                if (await ReactNativeBlobUtil.fs.exists(localPaths[media.id])) {
+                  return true;
+                } else {
+                  // the media has been deleted from the device
+                  // we need to redownload it
+                  delete localPaths[media.id];
+                }
+              }
+
+              if (media.uri.startsWith('http')) {
+                return true;
+              }
+
               return ReactNativeBlobUtil.fs.exists(
                 media.uri.replace('file://', ''),
               );

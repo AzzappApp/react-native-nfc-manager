@@ -9,10 +9,7 @@ import PressableNative from '#ui/PressableNative';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
 import { useCoverEditorContext } from '../CoverEditorContext';
-import {
-  mediaInfoIsImage,
-  extractLottieInfoMemoized,
-} from '../coverEditorHelpers';
+import { extractLottieInfoMemoized } from '../coverEditorHelpers';
 import CoverEditorMediaPickerFloatingTool from './tools/CoverEditorMediaPickerFloatingTool';
 import CoverEditorTransitionTool from './tools/CoverEditorTransitionTool';
 import { TOOLBOX_SECTION_HEIGHT } from './ui/ToolBoxSection';
@@ -75,9 +72,8 @@ const CoverEditorMediaToolbox = () => {
         })
       : medias.map(media => ({
           media,
-          duration: mediaInfoIsImage(media)
-            ? media.duration
-            : media.timeRange.duration,
+          duration:
+            media.kind === 'image' ? media.duration : media.timeRange.duration,
         }));
 
     return data.map(({ media, duration }, index) => {
@@ -98,13 +94,11 @@ const CoverEditorMediaToolbox = () => {
         );
       }
 
-      const {
-        media: { galleryUri, uri, thumbnail },
-      } = media;
+      const { galleryUri, uri, thumbnail } = media;
 
       return (
         <PressableNative
-          key={`${media.media.uri}-${index}`}
+          key={`${media.id}-${index}`}
           onPress={() => {
             dispatch({
               type: 'SET_EDITION_MODE',

@@ -3,7 +3,7 @@ import * as mime from 'react-native-mime-types';
 import { getDecodingCapabilitiesFor } from '@azzapp/react-native-skia-video';
 import { typedEntries } from '@azzapp/shared/objectHelpers';
 import { getFileName } from '#helpers/fileHelpers';
-import type { Media } from '#helpers/mediaHelpers';
+import type { SourceMedia } from '#helpers/mediaHelpers';
 import type {
   CropData,
   EditionParameters,
@@ -117,7 +117,7 @@ export const scaleCropData = (cropData: CropData, scale: number): CropData => {
 
 export const scaleCropDataIfNecessary = (
   cropData: CropData,
-  media: Media,
+  media: SourceMedia,
   skImageWidth: number | null,
 ) => {
   if (!skImageWidth) {

@@ -1,5 +1,9 @@
 import type { EditionParameters } from '#helpers/mediaEditions';
-import type { MediaImage, Media, TimeRange } from '#helpers/mediaHelpers';
+import type {
+  SourceMediaImage,
+  SourceMedia,
+  TimeRange,
+} from '#helpers/mediaHelpers';
 import type { CoverTransitions } from './coverDrawer/coverTransitions';
 import type { MediaAnimations } from './coverDrawer/mediaAnimations';
 import type {
@@ -56,7 +60,7 @@ export type UpdateCardColorsAction = {
 // #region Medias
 export type UpdateMediasAction = {
   type: 'UPDATE_MEDIAS';
-  payload: Media[];
+  payload: SourceMedia[];
 };
 
 export type UpdateMediaImageAnimationAction = {
@@ -96,7 +100,7 @@ export type UpdateAllMediasEditionParameters = {
 
 export type UpdateActiveMediaAction = {
   type: 'UPDATE_ACTIVE_MEDIA';
-  payload: Media;
+  payload: SourceMedia;
 };
 
 export type UpdateMediasTransitionAction = {
@@ -132,7 +136,7 @@ export type UpdateTextLayerAction = {
 // #region OverlayLayer
 export type AddOverlayLayerAction = {
   type: 'ADD_OVERLAY_LAYER';
-  payload: MediaImage;
+  payload: SourceMediaImage;
 };
 
 export type UpdateOverlayLayerAction = {
@@ -180,7 +184,7 @@ export type LoadingSuccessAction = {
   payload: {
     lutShaders: Partial<Record<Filter, SkShader>>;
     images: Record<string, bigint | null>;
-    videoPaths: Record<string, string>;
+    localPaths: Record<string, string>;
   };
 };
 

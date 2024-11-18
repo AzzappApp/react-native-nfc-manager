@@ -30,18 +30,17 @@ import {
 import { colors } from '#theme';
 import { ScreenModal, preventModalDismiss } from '#components/NativeRouter';
 import { NativeBufferLoader, loadAllLUTShaders } from '#helpers/mediaEditions';
-import { getVideoLocalPath } from '#helpers/mediaHelpers';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Text from '#ui/Text';
 import UploadProgressModal from '#ui/UploadProgressModal';
 import CoverEditorContextProvider from './CoverEditorContext';
 import {
-  mediaInfoIsImage,
   extractLottieInfoMemoized,
   calculateImageScale,
   getMaxAllowedVideosPerCover,
   getLottieMediasDurations,
+  copyCoverMediaToCacheDir,
 } from './coverEditorHelpers';
 import CoverEditorMediaPicker from './CoverEditorMediaPicker';
 import { coverEditorReducer } from './coverEditorReducer';
@@ -50,7 +49,7 @@ import CoverEditorToolbox from './CoverEditorToolbox';
 import CoverPreview from './CoverPreview';
 import useLottie from './useLottie';
 import useSaveCover from './useSaveCover';
-import type { Media, MediaImage } from '#helpers/mediaHelpers';
+import type { SourceMedia } from '#helpers/mediaHelpers';
 import type { CoverEditor_coverTemplate$key } from '#relayArtifacts/CoverEditor_coverTemplate.graphql';
 import type { CoverEditor_profile$key } from '#relayArtifacts/CoverEditor_profile.graphql';
 import type { CoverEditorAction } from './coverEditorActions';
@@ -174,6 +173,7 @@ const CoverEditorCore = (
         }
         medias {
           media {
+            id
             uri
             width
             height
@@ -264,28 +264,28 @@ const CoverEditorCore = (
     textLayers = textLayers.filter(textLayer => !!textLayer.text);
 
     const overlayLayers = placeholder
-      ? ((data?.overlayLayers as any)?.map((overlay: CoverEditorOverlayItem) =>
-          placeholder.localUri
-            ? {
-                ...overlay,
-                media: {
+      ? ((data?.overlayLayers as any)?.map(
+          (overlay: CoverEditorOverlayItem, i: number) =>
+            placeholder.localUri
+              ? {
+                  ...overlay,
+                  id: 'overlay_placeholder-' + i,
                   uri: isAndroidRelease ? ANDROID_ASSET_PATH : placeholder.uri,
                   kind: 'image',
                   width: placeholder.width,
                   height: placeholder.height,
-                },
-                rotation: 0,
-              }
-            : overlay,
+                  rotation: 0,
+                }
+              : overlay,
         ) ?? [])
       : [];
 
     let imagesScales =
-      coverInitialState?.medias?.reduce((acc, mediaInfo) => {
-        if (mediaInfoIsImage(mediaInfo)) {
+      coverInitialState?.medias?.reduce((acc, media) => {
+        if (media.kind === 'image') {
           return {
             ...acc,
-            [mediaInfo.media.uri]: calculateImageScale(mediaInfo.media),
+            [media.id]: calculateImageScale(media),
           };
         }
         return acc;
@@ -295,7 +295,7 @@ const CoverEditorCore = (
       imagesScales = coverInitialState.overlayLayers.reduce((acc, overlay) => {
         return {
           ...acc,
-          [overlay.media.uri]: calculateImageScale(overlay.media),
+          [overlay.id]: calculateImageScale(overlay),
         };
       }, imagesScales);
     }
@@ -313,18 +313,14 @@ const CoverEditorCore = (
 
     const providedMedias: CoverEditionProvidedMedia[] =
       coverTemplate?.medias.map(({ media, index, editable }) => ({
+        ...media,
         index,
         editable,
-        media: {
-          media: {
-            ...media,
-            kind: 'image',
-          },
-          filter: null,
-          animation: null,
-          editionParameters: null,
-          duration: durations ? durations[index] : COVER_IMAGE_DEFAULT_DURATION,
-        },
+        kind: 'image',
+        filter: null,
+        animation: null,
+        editionParameters: null,
+        duration: durations ? durations[index] : COVER_IMAGE_DEFAULT_DURATION,
       })) ?? [];
 
     return {
@@ -350,7 +346,7 @@ const CoverEditorCore = (
 
       images: {},
       imagesScales,
-      videoPaths: {},
+      localPaths: {},
       lutShaders: {},
 
       loadingRemoteMedia: false,
@@ -383,41 +379,38 @@ const CoverEditorCore = (
   useEffect(() => {
     let canceled = false;
     const abortController = new AbortController();
-    const imagesToLoad: MediaImage[] = [];
-    const videoToLoad: string[] = [];
-    const fontsToLoad: string[] = [];
-    for (const mediaInfo of coverEditorState.medias) {
-      const {
-        media: { uri },
-      } = mediaInfo;
-      if (mediaInfoIsImage(mediaInfo)) {
-        if (!coverEditorState.images[uri]) {
-          imagesToLoad.push(mediaInfo.media);
-        }
-      } else if (!coverEditorState.videoPaths[uri]) {
-        videoToLoad.push(uri);
+    const mediasToLoad: SourceMedia[] = [];
+    for (const media of coverEditorState.medias) {
+      const { id, kind } = media;
+      if (
+        !coverEditorState.localPaths[id] ||
+        (kind === 'image' && !coverEditorState.images[id])
+      ) {
+        mediasToLoad.push(media);
       }
     }
     for (const overlayLayer of coverEditorState.overlayLayers) {
-      const { media } = overlayLayer;
-      if (!coverEditorState.images[media.uri]) {
-        imagesToLoad.push(media);
+      if (
+        !coverEditorState.images[overlayLayer.id] ||
+        !coverEditorState.localPaths[overlayLayer.id]
+      ) {
+        mediasToLoad.push(overlayLayer);
       }
     }
 
+    let lutShaders = coverEditorState.lutShaders;
+    let localPaths = coverEditorState.localPaths;
+    let images = coverEditorState.images;
+
     const lutShadersLoaded = !!Object.keys(coverEditorState.lutShaders).length;
-    if (
-      imagesToLoad.length === 0 &&
-      videoToLoad.length === 0 &&
-      fontsToLoad.length === 0 &&
-      lutShadersLoaded
-    ) {
+    if (mediasToLoad.length === 0 && lutShadersLoaded) {
       return () => {};
     }
 
-    const loadingRemoteMedia =
-      imagesToLoad.some(({ uri }) => uri.startsWith('http')) ||
-      videoToLoad.some(uri => uri.startsWith('http'));
+    const loadingRemoteMedia = mediasToLoad.some(
+      ({ uri, id }) =>
+        uri.startsWith('http') && !coverEditorState.localPaths[id],
+    );
     dispatch({
       type: 'LOADING_START',
       payload: {
@@ -425,9 +418,6 @@ const CoverEditorCore = (
       },
     });
     const promises: Array<Promise<void>> = [];
-    let lutShaders = coverEditorState.lutShaders;
-    let images = coverEditorState.images;
-    let videoPaths = coverEditorState.videoPaths;
     if (!lutShadersLoaded) {
       promises.push(
         loadAllLUTShaders().then(result => {
@@ -441,14 +431,34 @@ const CoverEditorCore = (
 
     const imagesScales = coverEditorState.imagesScales;
 
-    if (imagesToLoad.length > 0) {
-      promises.push(
-        ...imagesToLoad.map(async media => {
-          const scale = imagesScales[media.uri] ?? 1;
-          const { key, promise } = NativeBufferLoader.loadImage(media.uri, {
-            width: media.width * scale,
-            height: media.height * scale,
-          });
+    promises.push(
+      ...mediasToLoad.map(async media => {
+        if (!localPaths[media.id]) {
+          const path = await copyCoverMediaToCacheDir(
+            media,
+            abortController.signal,
+          );
+          if (canceled) {
+            return;
+          }
+          if (!path) {
+            throw new Error('Video not found for uri ' + media.uri);
+          }
+          localPaths = {
+            ...localPaths,
+            [media.id]: path,
+          };
+        }
+        if (media.kind === 'image') {
+          const path = localPaths[media.id];
+          const scale = imagesScales[media.id] ?? 1;
+          const { key, promise } = NativeBufferLoader.loadImage(
+            `file://${path}`,
+            {
+              width: media.width * scale,
+              height: media.height * scale,
+            },
+          );
 
           const buffer = await promise;
           if (canceled) {
@@ -456,30 +466,12 @@ const CoverEditorCore = (
           }
           images = {
             ...images,
-            [media.uri]: buffer,
+            [media.id]: buffer,
           };
-          imageRefKeys.current[media.uri] = key;
-        }),
-      );
-    }
-    if (videoToLoad.length > 0) {
-      promises.push(
-        ...videoToLoad.map(uri =>
-          getVideoLocalPath(uri, abortController.signal).then(path => {
-            if (canceled) {
-              return;
-            }
-            if (!path) {
-              throw new Error('Video not found for uri ' + uri);
-            }
-            videoPaths = {
-              ...videoPaths,
-              [uri]: path,
-            };
-          }),
-        ),
-      );
-    }
+          imageRefKeys.current[media.id] = key;
+        }
+      }),
+    );
 
     Promise.all(promises).then(
       () => {
@@ -491,11 +483,12 @@ const CoverEditorCore = (
           payload: {
             lutShaders,
             images,
-            videoPaths,
+            localPaths,
           },
         });
       },
       error => {
+        console.error(error);
         if (canceled) {
           return;
         }
@@ -516,7 +509,7 @@ const CoverEditorCore = (
     coverEditorState.medias,
     coverEditorState.lutShaders,
     coverEditorState.images,
-    coverEditorState.videoPaths,
+    coverEditorState.localPaths,
     coverEditorState.overlayLayers,
     coverEditorState.imagesScales,
     coverEditorState.providedMedias,
@@ -530,12 +523,12 @@ const CoverEditorCore = (
 
   useEffect(() => {
     const keys = imageRefKeys.current;
-    Object.keys(coverEditorState.images).forEach(uri => {
-      NativeBufferLoader.ref(keys[uri]);
+    Object.keys(coverEditorState.images).forEach(id => {
+      NativeBufferLoader.ref(keys[id]);
     });
     return () => {
-      Object.keys(coverEditorState.images).forEach(uri => {
-        NativeBufferLoader.unref(keys[uri]);
+      Object.keys(coverEditorState.images).forEach(id => {
+        NativeBufferLoader.unref(keys[id]);
       });
     };
   }, [coverEditorState.images]);
@@ -605,12 +598,12 @@ const CoverEditorCore = (
   }, [coverEditorState.lottie, coverTemplate?.medias]);
 
   const onMediasPicked = useCallback(
-    (baseMedias: Media[]) => {
+    (baseMedias: SourceMedia[]) => {
       const medias = [...baseMedias];
 
       coverEditorState.providedMedias.forEach(providedMedia => {
         if (!providedMedia.editable) {
-          medias.splice(providedMedia.index, 0, providedMedia.media.media);
+          medias.splice(providedMedia.index, 0, providedMedia);
         }
       });
 
@@ -688,23 +681,22 @@ const CoverEditorCore = (
   );
 
   const initialMedias = useMemo(() => {
-    const initial = Array.from<Media | null>({
+    const initial = Array.from<SourceMedia | null>({
       length: durations?.length ?? 0,
     }).fill(null);
 
     let nonEditableCount = 0;
     coverEditorState.providedMedias.forEach(providedMedia => {
       if (providedMedia.editable) {
-        const { media } = providedMedia.media;
-
         initial[providedMedia.index - nonEditableCount] =
           (providedMedia.index,
           0,
           {
-            height: media.height,
+            id: providedMedia.id,
+            height: providedMedia.height,
             kind: 'image',
-            uri: media.uri,
-            width: media.width,
+            uri: providedMedia.uri,
+            width: providedMedia.width,
           });
       } else {
         nonEditableCount++;

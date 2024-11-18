@@ -25,7 +25,7 @@ const BufferImage = ({ buffer, ...props }: DeferredSkImageRendererProps) => {
           ? buffer
           : buffer.value;
 
-    return createImageFromNativeBuffer(bufValue, true);
+    return createImageFromNativeBuffer(bufValue);
   });
 
   return <Image {...props} image={skImage} />;

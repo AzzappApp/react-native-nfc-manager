@@ -1,33 +1,27 @@
 import * as Device from 'expo-device';
 import memoize from 'lodash/memoize';
 import { Dimensions, PixelRatio } from 'react-native';
+import ReactNativeBlobUtil from 'react-native-blob-util';
 import { createSkottieTemplatePlayer } from 'react-native-skottie-template-player';
 import {
   COVER_RATIO,
   LOTTIE_REPLACE_COLORS,
 } from '@azzapp/shared/coverHelpers';
 import { extractLottieInfo, replaceColors } from '@azzapp/shared/lottieHelpers';
+import { getFileExtension } from '#helpers/fileHelpers';
 import {
   getDeviceMaxDecodingResolution,
   reduceVideoResolutionIfNecessary,
 } from '#helpers/mediaEditions';
+import {
+  downloadRemoteFileToLocalCache,
+  type SourceMedia,
+} from '#helpers/mediaHelpers';
 import { coverTransitions } from './coverDrawer';
-import type {
-  MediaInfo,
-  MediaInfoImage,
-  CardColors,
-  CoverEditorState,
-} from './coverEditorTypes';
+import type { CardColors, CoverEditorState } from './coverEditorTypes';
 import type { VideoCompositionItem } from '@azzapp/react-native-skia-video';
 import type { LottieInfo } from '@azzapp/shared/lottieHelpers';
 import type { SkRect } from '@shopify/react-native-skia';
-
-export const mediaInfoIsImage = (
-  mediaInfo: MediaInfo,
-): mediaInfo is MediaInfoImage => {
-  'worklet';
-  return mediaInfo.media.kind === 'image';
-};
 
 export const percentRectToRect = (
   rect: SkRect,
@@ -48,25 +42,24 @@ export const createCoverVideoComposition = (
   maxDecoderResolution: number,
   isPreview: boolean = false,
 ) => {
-  const { medias, videoPaths, lottie, coverTransition } = state;
+  const { medias, localPaths, lottie, coverTransition } = state;
 
   const videoScales: Record<string, number> = {};
   const resolutions: Record<
     string,
     { width: number; height: number } | undefined
   > = {};
-  for (const mediaInfo of medias) {
-    if (!mediaInfoIsImage(mediaInfo)) {
-      const { media } = mediaInfo;
-      const path = videoPaths[media.uri];
+  for (const media of medias) {
+    if (media.kind === 'video') {
+      const path = localPaths[media.id];
       const { resolution, videoScale } = reduceVideoResolutionIfNecessary(
         media.width,
         media.height,
         media.rotation,
         getDeviceMaxDecodingResolution(path, maxDecoderResolution),
       );
-      videoScales[media.uri] = videoScale;
-      resolutions[media.uri] = resolution;
+      videoScales[media.id] = videoScale;
+      resolutions[media.id] = resolution;
     }
   }
 
@@ -77,23 +70,22 @@ export const createCoverVideoComposition = (
   if (lottieInfo) {
     let i = 0;
     duration = lottieInfo?.duration;
-    for (const mediaInfo of medias) {
+    for (const media of medias) {
       const asset = lottieInfo.assetsInfos[i];
       if (!asset) {
         // something really wrong happened
         console.error("Too many medias for the template's assets");
         break;
       }
-      if (!mediaInfoIsImage(mediaInfo)) {
-        const { media, timeRange } = mediaInfo;
-        const path = videoPaths[media.uri];
+      if (media.kind === 'video') {
+        const path = localPaths[media.id];
         items.push({
           id: asset.id,
           path,
           compositionStartTime: asset.startTime,
-          startTime: timeRange.startTime,
-          duration: timeRange.duration,
-          resolution: resolutions[media.uri],
+          startTime: media.timeRange.startTime,
+          duration: media.timeRange.duration,
+          resolution: resolutions[media.id],
         });
       }
       i++;
@@ -101,21 +93,21 @@ export const createCoverVideoComposition = (
   } else {
     const transitionDuration =
       (coverTransition && coverTransitions[coverTransition]?.duration) || 0;
-    for (const mediaInfo of medias) {
+    for (const media of medias) {
       duration = Math.max(0, duration - transitionDuration);
-      if (mediaInfoIsImage(mediaInfo)) {
-        duration += mediaInfo.duration;
+      if (media.kind === 'image') {
+        duration += media.duration;
       } else {
-        const { media, timeRange } = mediaInfo;
-        const path = videoPaths[media.uri];
+        const { timeRange } = media;
+        const path = localPaths[media.id];
         const itemDuration = timeRange.duration;
         items.push({
-          id: media.uri,
+          id: media.id,
           path,
           startTime: timeRange.startTime,
           compositionStartTime: duration,
           duration: itemDuration,
-          resolution: resolutions[media.uri],
+          resolution: resolutions[media.id],
         });
         duration += itemDuration;
       }
@@ -165,9 +157,7 @@ export const isCoverDynamic = (state: CoverEditorState) => {
   const { lottie, medias, overlayLayers, textLayers } = state;
   return (
     !!lottie ||
-    medias.some(
-      mediaInfo => !mediaInfoIsImage(mediaInfo) || mediaInfo.animation != null,
-    ) ||
+    medias.some(media => media.kind === 'video' || media.animation != null) ||
     overlayLayers.some(
       overlayLayer =>
         overlayLayer.animation != null ||
@@ -194,11 +184,9 @@ export const getCoverDuration = (state: CoverEditorState) => {
   } else {
     return (
       state.medias.reduce(
-        (duration, mediaInfo) =>
+        (duration, media) =>
           duration +
-          (mediaInfoIsImage(mediaInfo)
-            ? mediaInfo.duration
-            : mediaInfo.timeRange.duration),
+          (media.kind === 'image' ? media.duration : media.timeRange.duration),
         0,
       ) -
       (state.coverTransition
@@ -292,4 +280,102 @@ export const calculateBoxSize = (options: {
   const width = options.fixedItemWidth ?? itemWidth + 12;
 
   return { itemHeight, itemWidth, width };
+};
+
+/**
+ * Duplicates selected media items to fill all the designated slots in a media template.
+ * This function ensures that the number of media items meets the required total number of slots
+ * by duplicating existing media items cyclically until the total slot count is reached.
+ *
+ * @param totalSlots The total number of media slots that need to be filled in the template.
+ * @param selectedMedias An array of media items (of generic type T) currently selected. These items can be of any type, typically strings, objects, etc.
+ * @returns An array of media items of type T, where the number of items is equal to `totalSlots`. If the initial number of selected media items is less than `totalSlots`, it duplicates items from the `selectedMedias` cyclically to fill the gap.
+ *
+ * @example
+ * Simple example:
+ * ```ts
+ * // Example of using duplicateMediaToFillSlots with strings as the media type.
+ * const totalMediaSlots = 5;
+ * const currentSelectedMedias = ['Media A', 'Media B', 'Media C'];
+ * const finalMediaList = duplicateMediaToFillSlots<string>(totalMediaSlots, currentSelectedMedias);
+ * console.log(finalMediaList); // Outputs: ['Media A', 'Media B', 'Media C', 'Media A', 'Media B']
+ * ```
+ */
+export const duplicateMediaToFillSlots = (
+  totalSlots: number,
+  selectedMedias: SourceMedia[],
+  maxSelectableVideos?: number | undefined,
+): SourceMedia[] => {
+  if (selectedMedias.length >= totalSlots) {
+    return selectedMedias;
+  }
+
+  const filledMediaSlots = [...selectedMedias];
+  let filledSlots = 0;
+
+  const selectableMedia = [...selectedMedias];
+
+  while (filledMediaSlots.length < totalSlots && selectableMedia.length) {
+    const index = filledSlots % selectableMedia.length;
+
+    const addedMedia = selectableMedia[index];
+
+    if (
+      addedMedia.kind === 'video' &&
+      maxSelectableVideos !== undefined &&
+      filledMediaSlots.filter(media => media.kind === 'video').length >=
+        maxSelectableVideos
+    ) {
+      selectableMedia.splice(index, 1);
+      continue;
+    }
+
+    // Add to the list the media to be duplicated.
+    // The media to be duplicated is from the initial list of selected medias, cycling through them.
+    filledMediaSlots.push(
+      selectableMedia[filledSlots % selectableMedia.length],
+    );
+    filledSlots++;
+  }
+
+  return filledMediaSlots;
+};
+
+export const replaceURIWithLocalPath = <T extends SourceMedia>(
+  media: T,
+  localPaths: Record<string, string>,
+) => ({
+  ...media,
+  uri: `file://${localPaths[media.id]}`,
+});
+
+const COVER_CACHE_DIR = `${ReactNativeBlobUtil.fs.dirs.CacheDir}/covers`;
+
+export const copyCoverMediaToCacheDir = async (
+  media: SourceMedia,
+  abortSignal?: AbortSignal,
+): Promise<string | null> => {
+  if (!(await ReactNativeBlobUtil.fs.isDir(COVER_CACHE_DIR))) {
+    await ReactNativeBlobUtil.fs.mkdir(COVER_CACHE_DIR);
+  }
+  const ext = getFileExtension(media.uri);
+  const sanitizedId = media.id.replace(/[^a-z0-9]/gi, '_');
+  const resultPath = `${COVER_CACHE_DIR}/${sanitizedId}${ext ? `.${ext}` : ''}`;
+  if (await ReactNativeBlobUtil.fs.exists(resultPath)) {
+    return resultPath;
+  }
+  let oldPath;
+  if (media.uri && media.uri.startsWith('file://')) {
+    oldPath = media.uri.replace('file://', '');
+    if (!(await ReactNativeBlobUtil.fs.exists(oldPath))) {
+      return null;
+    }
+  } else {
+    oldPath = await downloadRemoteFileToLocalCache(media.uri, abortSignal);
+    if (!oldPath) {
+      return null;
+    }
+  }
+  await ReactNativeBlobUtil.fs.cp(oldPath, resultPath);
+  return resultPath;
 };

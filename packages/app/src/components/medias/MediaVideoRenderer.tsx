@@ -15,7 +15,7 @@ import {
   captureSnapshot,
   SnapshotRenderer,
 } from '@azzapp/react-native-snapshot-view';
-import { useLocalCachedMediaFile } from '#helpers/mediaHelpers/LocalMediaCache';
+import { useLocalCachedMediaFile } from '#helpers/mediaHelpers/remoteMediaCache';
 import { DelayedActivityIndicator } from '#ui/ActivityIndicator/ActivityIndicator';
 import MediaImageRenderer from './MediaImageRenderer';
 import type { AVPlaybackStatus } from 'expo-av';

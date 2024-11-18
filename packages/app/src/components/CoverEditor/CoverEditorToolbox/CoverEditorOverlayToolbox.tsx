@@ -40,7 +40,7 @@ const CoverEditorOverlayToolbox = () => {
         <Icon icon="arrow_down" />
         {layer ? (
           <Image
-            source={{ uri: layer.media.uri }}
+            source={{ uri: layer.galleryUri ?? layer.thumbnail ?? layer.uri }}
             style={styles.previewContent}
           />
         ) : (

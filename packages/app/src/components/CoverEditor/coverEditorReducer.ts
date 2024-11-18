@@ -10,13 +10,17 @@ import {
 import { colors } from '#theme';
 import { cropDataForAspectRatio } from '#helpers/mediaEditions';
 import {
-  mediaInfoIsImage,
   extractLottieInfoMemoized,
   getLottieMediasDurations,
   calculateImageScale,
 } from './coverEditorHelpers';
 import type { CoverEditorAction } from './coverEditorActions';
-import type { CoverEditorState, MediaInfo } from './coverEditorTypes';
+import type {
+  CoverEditorState,
+  CoverMedia,
+  CoverMediaImage,
+  CoverMediaVideo,
+} from './coverEditorTypes';
 
 export function coverEditorReducer(
   state: CoverEditorState,
@@ -204,16 +208,16 @@ export function coverEditorReducer(
     // #endregion
 
     // #region Medias Actions
-    case 'UPDATE_MEDIAS':
-      const medias: MediaInfo[] = [];
+    case 'UPDATE_MEDIAS': {
+      const medias: CoverMedia[] = [];
       let imagesScales = state.imagesScales;
 
       payload.forEach((media, index) => {
-        const mediaInfo = state.medias.find(
-          info => info.media.uri === media.uri,
+        const currentMedia = state.medias.find(
+          currentMedia => currentMedia.id === media.id,
         );
-        if (mediaInfo) {
-          medias.push(mediaInfo);
+        if (currentMedia) {
+          medias.push(currentMedia);
           return;
         }
         let aspectRatio = COVER_RATIO;
@@ -234,10 +238,10 @@ export function coverEditorReducer(
         if (media.kind === 'image') {
           imagesScales = {
             ...imagesScales,
-            [media.uri]: calculateImageScale(media),
+            [media.id]: calculateImageScale(media),
           };
           medias.push({
-            media,
+            ...media,
             filter: null,
             animation: null,
             editionParameters: { cropData },
@@ -251,9 +255,8 @@ export function coverEditorReducer(
           const duration = durations ? durations[index] : null;
 
           medias.push({
-            media,
+            ...media,
             filter: null,
-            animation: null,
             editionParameters: { cropData },
             timeRange: {
               startTime: 0,
@@ -264,19 +267,28 @@ export function coverEditorReducer(
           });
         }
       });
+      let localPaths = state.localPaths;
+      Object.keys(localPaths).forEach(id => {
+        if (!medias.find(media => media.id === id)) {
+          localPaths = { ...localPaths };
+          delete localPaths[id];
+        }
+      });
 
       return {
         ...state,
         medias,
         imagesScales,
+        localPaths,
       };
+    }
     case 'UPDATE_MEDIA_IMAGE_DURATION': {
       if (
         state.editionMode === 'mediaEdit' &&
         state.selectedItemIndex != null
       ) {
         const media = state.medias[state.selectedItemIndex];
-        if (mediaInfoIsImage(media)) {
+        if (media.kind === 'image') {
           const medias = [...state.medias];
           medias[state.selectedItemIndex] = {
             ...medias[state.selectedItemIndex],
@@ -302,10 +314,10 @@ export function coverEditorReducer(
       ) {
         //add a control to only update animation for Image media
         const media = state.medias[state.selectedItemIndex];
-        if (mediaInfoIsImage(media)) {
+        if (media.kind === 'image') {
           const medias = [...state.medias];
           medias[state.selectedItemIndex] = {
-            ...medias[state.selectedItemIndex],
+            ...(medias[state.selectedItemIndex] as CoverMediaImage),
             animation: payload,
           };
           return {
@@ -322,7 +334,7 @@ export function coverEditorReducer(
         return {
           ...state,
           medias: state.medias.map(media => {
-            if (mediaInfoIsImage(media)) {
+            if (media.kind === 'image') {
               return {
                 ...media,
                 animation: payload.animation,
@@ -439,7 +451,7 @@ export function coverEditorReducer(
       ) {
         const medias = [...state.medias];
         medias[state.selectedItemIndex] = {
-          ...medias[state.selectedItemIndex],
+          ...(medias[state.selectedItemIndex] as CoverMediaVideo),
           timeRange: payload,
         };
         return {
@@ -460,9 +472,7 @@ export function coverEditorReducer(
         const overlayLayers = [...state.overlayLayers];
         overlayLayers[state.selectedItemIndex] = {
           ...overlayLayers[state.selectedItemIndex],
-          //TODO: type as any as quick n dirty because the type was changed compare to initial creation.
-          // MediaInfoImage is not applicable to overlay for duration and animation, but the reducer type was updated without taking this acion in account
-          media: payload,
+          ...payload,
         };
         return {
           ...state,
@@ -497,20 +507,20 @@ export function coverEditorReducer(
       if (payload.kind === 'image') {
         imagesScales = {
           ...imagesScales,
-          [payload.uri]: calculateImageScale(payload),
+          [payload.id]: calculateImageScale(payload),
         };
 
         medias[state.selectedItemIndex] = {
-          media: payload,
+          ...payload,
           filter: updatedMedia.filter,
-          animation: mediaInfoIsImage(updatedMedia)
-            ? updatedMedia.animation
-            : null,
+          animation:
+            updatedMedia.kind === 'image' ? updatedMedia.animation : null,
           editionParameters: { ...updatedMedia.editionParameters, cropData },
 
-          duration: mediaInfoIsImage(updatedMedia)
-            ? updatedMedia.duration
-            : COVER_MAX_MEDIA_DURATION,
+          duration:
+            updatedMedia.kind === 'image'
+              ? updatedMedia.duration
+              : COVER_MAX_MEDIA_DURATION,
         };
       } else {
         const lottieInfo = extractLottieInfoMemoized(state.lottie);
@@ -520,9 +530,8 @@ export function coverEditorReducer(
         const duration = durations ? durations[index] : null;
 
         medias[state.selectedItemIndex] = {
-          media: payload,
+          ...payload,
           filter: updatedMedia.filter,
-          animation: null,
           editionParameters: { ...updatedMedia.editionParameters, cropData },
           timeRange: {
             startTime: 0,
@@ -532,10 +541,18 @@ export function coverEditorReducer(
           },
         };
       }
+      let localPaths = state.localPaths;
+      Object.keys(localPaths).forEach(id => {
+        if (!medias.find(media => media.id === id)) {
+          localPaths = { ...localPaths };
+          delete localPaths[id];
+        }
+      });
       return {
         ...state,
         medias,
         imagesScales,
+        localPaths,
       };
     }
     case 'UPDATE_MEDIA_TRANSITION': {
@@ -596,14 +613,14 @@ export function coverEditorReducer(
         ...state,
         imagesScales: {
           ...state.imagesScales,
-          [payload.uri]: calculateImageScale(payload),
+          [payload.id]: calculateImageScale(payload),
         },
         editionMode: 'overlay',
         selectedItemIndex: state.overlayLayers.length,
         overlayLayers: [
           ...state.overlayLayers,
           {
-            media: payload,
+            ...payload,
             borderColor: colors.black,
             borderRadius: 0,
             borderWidth: 0,
@@ -641,7 +658,7 @@ export function coverEditorReducer(
         const cropDataAspectRatio = cropData
           ? cropData.width / cropData.height
           : null;
-        const naturalAspectRatio = layer.media.width / layer.media.height;
+        const naturalAspectRatio = layer.width / layer.height;
 
         if (
           (cropDataAspectRatio != null &&
@@ -650,8 +667,8 @@ export function coverEditorReducer(
             naturalAspectRatio !== boundsAspectRatio)
         ) {
           cropData = cropDataForAspectRatio(
-            layer.media.width,
-            layer.media.height,
+            layer.width,
+            layer.height,
             boundsAspectRatio,
           );
           layer.editionParameters = {
@@ -765,7 +782,7 @@ export function coverEditorReducer(
         loadingRemoteMedia: false,
       };
     case 'LOADING_SUCCESS':
-      const { images, lutShaders, videoPaths } = payload;
+      const { images, lutShaders, localPaths } = payload;
       return {
         ...state,
         loadingError: null,
@@ -773,7 +790,7 @@ export function coverEditorReducer(
         loadingLocalMedia: false,
         images,
         lutShaders,
-        videoPaths,
+        localPaths,
       };
     // #endregion
 

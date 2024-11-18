@@ -20,7 +20,6 @@ import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadSign } from '#helpers/MobileWebAPI';
 import coverDrawer, { coverTransitions } from './coverDrawer';
 import {
-  mediaInfoIsImage,
   createCoverSkottieWithColorReplacement,
   createCoverVideoComposition,
   extractLottieInfoMemoized,
@@ -34,9 +33,9 @@ import coverLocalStore from './coversLocalStore';
 import type { useSaveCoverMutation } from '#relayArtifacts/useSaveCoverMutation.graphql';
 import type {
   CoverEditorState,
-  MediaInfo,
-  MediaInfoImage,
-  MediaInfoVideo,
+  CoverMedia,
+  CoverMediaImage,
+  CoverMediaVideo,
 } from './coverEditorTypes';
 import type { Sink } from 'relay-runtime/lib/network/RelayObservable';
 
@@ -52,9 +51,9 @@ type ProgressCallback = (progress: {
   nbFrames: number;
 }) => void;
 
-const getMediaDuration = (media: MediaInfo) => {
-  const imgInfo = media as MediaInfoImage;
-  const vidInfo = media as MediaInfoVideo;
+const getMediaDuration = (media: CoverMedia) => {
+  const imgInfo = media as CoverMediaImage;
+  const vidInfo = media as CoverMediaVideo;
   return (imgInfo?.duration || 0) + (vidInfo?.timeRange?.duration || 0);
 };
 
@@ -264,13 +263,13 @@ const isCoverEditorStateValid = (coverEditorState: CoverEditorState) => {
     loadingRemoteMedia,
     images,
     lottie,
-    videoPaths,
+    localPaths,
   } = coverEditorState;
   if (lottie) {
     const extract = extractLottieInfoMemoized(lottie);
     if (extract?.assetsInfos.length === 0) {
       return overlayLayers.every(
-        overlayLayer => images[overlayLayer.media.uri] != null,
+        overlayLayer => images[overlayLayer.id] != null,
       );
     }
   }
@@ -279,14 +278,14 @@ const isCoverEditorStateValid = (coverEditorState: CoverEditorState) => {
     medias.length > 0 &&
     !loadingLocalMedia &&
     !loadingRemoteMedia &&
-    medias.every(mediaInfo => {
-      if (mediaInfoIsImage(mediaInfo)) {
-        return images[mediaInfo.media.uri] != null;
+    medias.every(media => {
+      if (media.kind === 'image') {
+        return images[media.id] != null;
       } else {
-        return videoPaths[mediaInfo.media.uri] != null;
+        return localPaths[media.id] != null;
       }
     }) &&
-    overlayLayers.every(overlayLayer => images[overlayLayer.media.uri] != null)
+    overlayLayers.every(overlayLayer => images[overlayLayer.id] != null)
   );
 };
 

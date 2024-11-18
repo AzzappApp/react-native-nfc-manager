@@ -32,7 +32,7 @@ import Container from '#ui/Container';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
 import MediaGridList from './MediaGridList';
-import type { Media } from '#helpers/mediaHelpers';
+import type { SourceMedia } from '#helpers/mediaHelpers';
 import type {
   Album,
   PhotoIdentifier,
@@ -66,7 +66,7 @@ type PhotoGalleryMediaListProps = Omit<ViewProps, 'children'> & {
    * Called when the user selects a media.
    * @param media The media that was selected.
    */
-  onMediaSelected: (media: Media) => void;
+  onMediaSelected: (media: SourceMedia) => void;
   /**autoSelectFirstItem */
   autoSelectFirstItem?: boolean;
   contentContainerStyle?: ContentStyle;
@@ -227,9 +227,10 @@ const PhotoGalleryMediaList = (
           ({ width, height, rotation } = await getVideoSize(uri));
         }
         onMediaSelected({
-          galleryUri: asset.node.image.uri,
+          id: asset.node.id,
           kind: 'video',
           uri,
+          galleryUri: asset.node.image.uri,
           width,
           height,
           rotation,
@@ -240,9 +241,10 @@ const PhotoGalleryMediaList = (
           ({ width, height } = await getImageSize(uri));
         }
         onMediaSelected({
-          galleryUri: asset.node.image.uri,
+          id: asset.node.id,
           kind: 'image',
           uri,
+          galleryUri: asset.node.image.uri,
           width,
           height,
         });
@@ -327,7 +329,7 @@ const PhotoGalleryMediaList = (
         numColumns={numColumns}
         width={windowWidth}
         contentContainerStyle={contentContainerStyle}
-        getItemId={getPhotoUri}
+        getItemId={getPhotoId}
         getItemUri={getPhotoUri}
         getItemDuration={getPhotoDuration}
         onSelect={onMediaPress}
@@ -385,6 +387,8 @@ const PhotoGalleryMediaList = (
     </Container>
   );
 };
+
+const getPhotoId = (item: PhotoIdentifier) => item.node.id;
 
 const getPhotoUri = (item: PhotoIdentifier) => item.node.image.uri;
 

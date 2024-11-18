@@ -36,7 +36,9 @@ const coverOverlayDrawer = ({
     return;
   }
   const {
-    media,
+    id,
+    width: overlayWidth,
+    height: overlayHeight,
     filter,
     bounds,
     editionParameters,
@@ -48,7 +50,7 @@ const coverOverlayDrawer = ({
     startPercentageTotal,
     endPercentageTotal,
   } = overlayLayer;
-  const image = createImageFromNativeBuffer(images[media.uri], true);
+  const image = createImageFromNativeBuffer(images[id]);
   if (!image) {
     return;
   }
@@ -79,8 +81,8 @@ const coverOverlayDrawer = ({
     Math.abs(cropData.width / cropData.height - imageWidth / imageHeight) > 0.02
   ) {
     cropData = cropDataForAspectRatio(
-      media.width,
-      media.height,
+      overlayWidth,
+      overlayHeight,
       imageWidth / imageHeight,
     );
     roll = 0;
@@ -92,7 +94,7 @@ const coverOverlayDrawer = ({
       height: imageHeight,
       editionParameters: {
         ...editionParameters,
-        cropData: scaleCropData(cropData, imagesScales[media.uri] ?? 1),
+        cropData: scaleCropData(cropData, imagesScales[id] ?? 1),
         roll,
       },
       lutShader: filter ? lutShaders[filter] : null,

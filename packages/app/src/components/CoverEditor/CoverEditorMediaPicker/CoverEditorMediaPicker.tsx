@@ -23,7 +23,6 @@ import { ScreenModal } from '#components/NativeRouter';
 import PermissionModal from '#components/PermissionModal';
 import PhotoGalleryMediaList from '#components/PhotoGalleryMediaList';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { duplicateMediaToFillSlots, getMediaId } from '#helpers/mediaHelpers';
 import { usePermissionContext } from '#helpers/PermissionContext';
 import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
@@ -35,17 +34,18 @@ import IconButton from '#ui/IconButton';
 import TabsBar from '#ui/TabsBar';
 import TabView from '#ui/TabView';
 import Text from '#ui/Text';
+import { duplicateMediaToFillSlots } from '../coverEditorHelpers';
 import useMediaLimitedSelectionAlert from '../useMediaLimitedSelectionAlert';
 import StockMediaList from './StockMediaList';
-import type { Media } from '#helpers/mediaHelpers';
+import type { SourceMedia } from '#helpers/mediaHelpers';
 import type { Album } from '@react-native-camera-roll/camera-roll';
 import type { ViewProps } from 'react-native';
 
 type CoverEditorMediaPickerProps = Omit<ViewProps, 'children'> & {
   durations: number[] | null;
   durationsFixed?: boolean;
-  initialMedias: Array<Media | null> | null;
-  onFinished: (results: Media[]) => void;
+  initialMedias: Array<SourceMedia | null> | null;
+  onFinished: (results: SourceMedia[]) => void;
   maxSelectableVideos?: number;
   onClose: () => void;
   /**
@@ -74,9 +74,9 @@ const CoverEditorMediaPicker = ({
   allowVideo = true,
   ...props
 }: CoverEditorMediaPickerProps) => {
-  const [selectedMedias, setSelectedMedias] = useState<Array<Media | null>>(
-    initialMedias ?? [],
-  );
+  const [selectedMedias, setSelectedMedias] = useState<
+    Array<SourceMedia | null>
+  >(initialMedias ?? []);
   const [selectedTab, setSelectedTab] = useState('gallery');
   const [selectedAlbum, setSelectedAlbum] = useState<Album | null>(null);
   const [showAlbumModal, toggleShowAlbumModal] = useToggle(false);
@@ -155,13 +155,13 @@ const CoverEditorMediaPicker = ({
     () =>
       selectedMedias
         ?.filter(selectedMedia => !!selectedMedia)
-        .map(getMediaId) ?? [],
+        .map(media => media.id) ?? [],
     [selectedMedias],
   );
 
   // @todo better define the expected type according to the evolution of the new cover
   const handleMediaSelected = useCallback(
-    (media: Media) => {
+    (media: SourceMedia) => {
       if (!multiSelection) {
         setSelectedMedias([media]);
         return;
@@ -173,7 +173,7 @@ const CoverEditorMediaPicker = ({
         : false;
 
       const index = selectedMedias.findIndex(
-        value => value && getMediaId(value) === getMediaId(media),
+        value => value && value.id === media.id,
       );
 
       if (disableVideoSelection && index === -1 && media.kind === 'video') {
@@ -275,7 +275,7 @@ const CoverEditorMediaPicker = ({
     if (missingMedia > 0) {
       const selected = selectedMedias.filter(
         media => media !== null,
-      ) as Media[];
+      ) as SourceMedia[];
       const duplicatedMedias = duplicateMediaToFillSlots(
         maxMedias,
         selected,
@@ -325,7 +325,7 @@ const CoverEditorMediaPicker = ({
       return;
     }
     if (!multiSelection) {
-      onFinished(selectedMedias as Media[]);
+      onFinished(selectedMedias as SourceMedia[]);
       return;
     }
 
@@ -334,10 +334,10 @@ const CoverEditorMediaPicker = ({
         intl.formatMessage(
           {
             defaultMessage: `{mediaPickedNumber, plural,
-            =0 {#/{totalMediaNumber} media selected}
-            =1 {#/{totalMediaNumber} media selected}
-            other {#/{totalMediaNumber} media selected}
-    }`,
+              =0 {#/{totalMediaNumber} media selected}
+              =1 {#/{totalMediaNumber} media selected}
+              other {#/{totalMediaNumber} media selected}
+            }`,
             description:
               'Title of missing media in cover edition to propose duplication',
           },
@@ -377,10 +377,10 @@ const CoverEditorMediaPicker = ({
       return;
     }
 
-    onFinished(selectedMedias as Media[]);
+    onFinished(selectedMedias as SourceMedia[]);
   };
 
-  const mediasOrSlot: Array<Media | null> = durationsFixed
+  const mediasOrSlot: Array<SourceMedia | null> = durationsFixed
     ? Array.from(
         { length: maxMedias },
         (_, index) => selectedMedias[index] ?? null,

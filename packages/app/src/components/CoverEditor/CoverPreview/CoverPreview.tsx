@@ -36,13 +36,13 @@ import coverDrawer from '../coverDrawer';
 import { createParagraph } from '../coverDrawer/coverTextDrawer';
 import { useCoverEditorContext, useCurrentLayer } from '../CoverEditorContext';
 import {
-  mediaInfoIsImage,
   percentRectToRect,
   isCoverDynamic,
   createCoverSkottieWithColorReplacement,
   createCoverVideoComposition,
   extractLottieInfoMemoized,
   MAX_DISPLAY_DECODER_RESOLUTION,
+  replaceURIWithLocalPath,
 } from '../coverEditorHelpers';
 import { BoundsEditorGestureHandler, drawBoundsEditor } from './BoundsEditor';
 import { DynamicLinkRenderer } from './DynamicLinkRenderer';
@@ -101,7 +101,7 @@ const CoverPreview = ({
     linksLayer,
     cardColors,
     images,
-    videoPaths,
+    localPaths,
     lutShaders,
     loadingLocalMedia,
     loadingRemoteMedia,
@@ -128,13 +128,13 @@ const CoverPreview = ({
     loadingRemoteMedia,
     isDynamic,
     medias
-      .map(mediaInfo =>
-        mediaInfoIsImage(mediaInfo)
-          ? `${mediaInfo.media.uri}-${mediaInfo.duration}`
-          : `${mediaInfo.media.uri}-${mediaInfo.timeRange.startTime}-${mediaInfo.timeRange.duration}`,
+      .map(media =>
+        media.kind === 'image'
+          ? `${media.id}-${media.duration}`
+          : `${media.id}-${media.timeRange.startTime}-${media.timeRange.duration}`,
       )
       .join(''),
-    videoPaths,
+    localPaths,
   ];
 
   /**
@@ -144,9 +144,9 @@ const CoverPreview = ({
    */
   const { composition, videoScales } = useMemo(() => {
     const allItemsLoaded = medias.every(
-      ({ media }) =>
-        (media.kind === 'image' && images[media.uri]) ||
-        (media.kind === 'video' && videoPaths[media.uri]),
+      media =>
+        (media.kind === 'image' && images[media.id]) ||
+        (media.kind === 'video' && localPaths[media.id]),
     );
     if (loadingLocalMedia || loadingRemoteMedia || !allItemsLoaded) {
       return { composition: null, videoScales: {} };
@@ -1236,7 +1236,11 @@ const CoverPreview = ({
           onRequestDismiss={toggleShowOverlayCropper}
         >
           <ImagePicker
-            initialData={activeLayer.layer}
+            initialData={{
+              filter: activeLayer.layer.filter,
+              editionParameters: activeLayer.layer.editionParameters,
+              media: replaceURIWithLocalPath(activeLayer.layer, localPaths),
+            }}
             additionalData={{
               selectedParameter: 'cropData',
               selectedTab: 'edit',

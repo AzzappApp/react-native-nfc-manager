@@ -1,7 +1,10 @@
 import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
-import { extractLottieInfoMemoized } from '#components/CoverEditor/coverEditorHelpers';
+import {
+  extractLottieInfoMemoized,
+  replaceURIWithLocalPath,
+} from '#components/CoverEditor/coverEditorHelpers';
 import ImagePicker, { EditImageStep } from '#components/ImagePicker';
 import { ScreenModal } from '#components/NativeRouter';
 import useToggle from '#hooks/useToggle';
@@ -16,7 +19,7 @@ const CoverEditorCropTool = () => {
   const intl = useIntl();
   const [show, toggleScreenModal] = useToggle(false);
   const {
-    coverEditorState: { lottie, selectedItemIndex },
+    coverEditorState: { lottie, selectedItemIndex, localPaths },
     dispatch,
   } = useCoverEditorContext();
 
@@ -62,7 +65,15 @@ const CoverEditorCropTool = () => {
         >
           {show && (
             <ImagePicker
-              initialData={activeMedia}
+              initialData={{
+                editionParameters: activeMedia.editionParameters,
+                filter: activeMedia.filter,
+                media: replaceURIWithLocalPath(activeMedia, localPaths),
+                timeRange:
+                  activeMedia.kind === 'video'
+                    ? activeMedia.timeRange
+                    : undefined,
+              }}
               additionalData={{
                 selectedParameter: 'cropData',
                 selectedTab: 'edit',

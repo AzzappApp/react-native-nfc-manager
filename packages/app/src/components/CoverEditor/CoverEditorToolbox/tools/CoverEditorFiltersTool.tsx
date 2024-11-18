@@ -3,6 +3,7 @@ import { useIntl } from 'react-intl';
 import { Alert } from 'react-native';
 import { COVER_MAX_MEDIA_DURATION } from '@azzapp/shared/coverHelpers';
 
+import { replaceURIWithLocalPath } from '#components/CoverEditor/coverEditorHelpers';
 import ImagePicker, { EditImageStep } from '#components/ImagePicker';
 import { ScreenModal } from '#components/NativeRouter';
 import useToggle from '#hooks/useToggle';
@@ -19,15 +20,14 @@ const CoverEditorFiltersTool = () => {
   const mediaInfo = useCoverEditorActiveMedia();
   const {
     dispatch,
-    coverEditorState: { editionMode, medias },
+    coverEditorState: { editionMode, medias, localPaths },
   } = useCoverEditorContext();
   const activeMedia = useCoverEditorActiveMedia();
   const cropData = activeMedia?.editionParameters?.cropData;
-  const media = activeMedia?.media;
   const mediaAspectRatio = cropData
     ? cropData.width / cropData.height
-    : media
-      ? media.width / media.height
+    : activeMedia
+      ? activeMedia.width / activeMedia.height
       : 1;
 
   const intl = useIntl();
@@ -118,7 +118,19 @@ const CoverEditorFiltersTool = () => {
         >
           {show && (
             <ImagePicker
-              initialData={activeMedia}
+              initialData={
+                activeMedia
+                  ? {
+                      editionParameters: activeMedia.editionParameters,
+                      filter: activeMedia.filter,
+                      media: replaceURIWithLocalPath(activeMedia, localPaths),
+                      timeRange:
+                        activeMedia.kind === 'video'
+                          ? activeMedia.timeRange
+                          : undefined,
+                    }
+                  : null
+              }
               additionalData={{ selectedTab: 'filter', showTabs: false }}
               forceAspectRatio={mediaAspectRatio}
               steps={[EditImageStep]}

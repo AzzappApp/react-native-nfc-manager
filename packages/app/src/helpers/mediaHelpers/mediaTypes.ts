@@ -1,17 +1,20 @@
-type MediaBase = {
+type SourceMediaBase = {
   /**
-   * The URI of the media in the device photo library.
-   * might be a ph-asset:// uri on iOS
+   * The id of the media.
    */
-  galleryUri?: string;
+  id: string;
   /**
    * The URI of the media.
    */
   uri: string;
   /**
-   * The URI of the media.
+   * A thumbnail of the media.
    */
   thumbnail?: string | null;
+  /**
+   * The original URI of the media in the phone gallery. (if it was imported from the gallery)
+   */
+  galleryUri?: string | null;
   /**
    * The width of the media.
    */
@@ -25,12 +28,12 @@ type MediaBase = {
 /**
  * a local image
  */
-export type MediaImage = MediaBase & { kind: 'image' };
+export type SourceMediaImage = SourceMediaBase & { kind: 'image' };
 
 /**
  * a local video
  */
-export type MediaVideo = MediaBase & {
+export type SourceMediaVideo = SourceMediaBase & {
   kind: 'video';
   duration: number;
   rotation: number;
@@ -39,7 +42,7 @@ export type MediaVideo = MediaBase & {
 /**
  * a local media
  */
-export type Media = MediaImage | MediaVideo;
+export type SourceMedia = SourceMediaImage | SourceMediaVideo;
 
 /**
  * A time range

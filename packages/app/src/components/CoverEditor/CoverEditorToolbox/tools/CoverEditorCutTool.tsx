@@ -7,7 +7,7 @@ import {
 import {
   extractLottieInfoMemoized,
   getLottieMediasDurations,
-  mediaInfoIsImage,
+  replaceURIWithLocalPath,
 } from '#components/CoverEditor/coverEditorHelpers';
 import ImagePicker, { EditImageStep } from '#components/ImagePicker';
 import { ScreenModal } from '#components/NativeRouter';
@@ -20,11 +20,17 @@ const CoverEditorCutTool = () => {
   const intl = useIntl();
   const [show, toggleScreenModal] = useToggle(false);
   const {
-    coverEditorState: { editionMode, medias, selectedItemIndex, lottie },
+    coverEditorState: {
+      editionMode,
+      medias,
+      selectedItemIndex,
+      lottie,
+      localPaths,
+    },
     dispatch,
   } = useCoverEditorContext();
 
-  const mediaInfo =
+  const media =
     editionMode === 'mediaEdit' && selectedItemIndex != null
       ? medias[selectedItemIndex]
       : null;
@@ -37,7 +43,7 @@ const CoverEditorCutTool = () => {
     toggleScreenModal();
   };
 
-  const cropData = mediaInfo?.editionParameters?.cropData;
+  const cropData = media?.editionParameters?.cropData;
   const aspectRatio = cropData ? cropData.width / cropData.height : undefined;
 
   const expectedDuration = useMemo(() => {
@@ -58,7 +64,7 @@ const CoverEditorCutTool = () => {
         })}
         onPress={toggleScreenModal}
       />
-      {mediaInfo != null && !mediaInfoIsImage(mediaInfo) && (
+      {media != null && media.kind === 'video' && (
         <ScreenModal
           visible={show}
           animationType="slide"
@@ -67,10 +73,10 @@ const CoverEditorCutTool = () => {
           {show && (
             <ImagePicker
               initialData={{
-                media: mediaInfo.media,
-                timeRange: mediaInfo.timeRange,
-                editionParameters: mediaInfo.editionParameters,
-                filter: mediaInfo.filter,
+                media: replaceURIWithLocalPath(media, localPaths),
+                timeRange: media.timeRange,
+                editionParameters: media.editionParameters,
+                filter: media.filter,
               }}
               forceAspectRatio={aspectRatio}
               additionalData={{ selectedTab: 'timeRange', showTabs: false }}

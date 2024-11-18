@@ -103,15 +103,15 @@ const CoverEditorOverlayImageAnimationTool = () => {
   );
 
   const buffer = useNativeBuffer({
-    uri: activeOverlay?.media?.uri,
-    kind: activeOverlay?.media?.kind,
+    uri: activeOverlay?.uri,
+    kind: activeOverlay?.kind,
   });
 
   const skImage = useDerivedValue(() => {
     if (!buffer) {
       return null;
     }
-    return createImageFromNativeBuffer(buffer, true);
+    return createImageFromNativeBuffer(buffer);
   }, [buffer]);
 
   const intl = useIntl();

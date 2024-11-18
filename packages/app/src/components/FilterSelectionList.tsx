@@ -7,7 +7,7 @@ import { useFilterLabels } from '#helpers/mediaEditions';
 import BoxSelectionList from './BoxSelectionList';
 import TransformedImageRenderer from './TransformedImageRenderer';
 import type { CropData, ImageOrientation } from '#helpers/mediaEditions';
-import type { Media } from '#helpers/mediaHelpers';
+import type { SourceMedia } from '#helpers/mediaHelpers';
 import type { BoxButtonItemInfo } from './BoxSelectionList';
 import type { Filter } from '@azzapp/shared/filtersHelper';
 import type { SkImage } from '@shopify/react-native-skia';
@@ -19,7 +19,7 @@ type FilterSelectionListProps = ViewProps & {
   selectedFilter: string | null;
   cropData?: CropData | null;
   cardRadius?: number;
-  media: Media | null;
+  media: SourceMedia | null;
   onChange(value: Filter | null): void;
   isSkImageReady: boolean;
   orientation?: ImageOrientation | null;

@@ -19,7 +19,6 @@ import {
 } from '@azzapp/shared/coverHelpers';
 import BoxSelectionList from '#components/BoxSelectionList';
 import { DoneHeaderButton } from '#components/commonsButtons';
-import { mediaInfoIsImage } from '#components/CoverEditor/coverEditorHelpers';
 import TransformedImageRenderer from '#components/TransformedImageRenderer';
 import { keyExtractor } from '#helpers/idHelpers';
 import {
@@ -59,8 +58,8 @@ const CoverEditorMediaImageAnimationTool = () => {
   const [show, open, close] = useBoolean(false);
   const activeMedia = useCoverEditorActiveImageMedia();
   const hasMultipleMedias =
-    useCoverEditorContext().coverEditorState.medias.filter(media =>
-      mediaInfoIsImage(media),
+    useCoverEditorContext().coverEditorState.medias.filter(
+      media => media.kind === 'image',
     ).length > 1;
   const { dispatch } = useCoverEditorContext();
   const animations = useMediaAnimationList();
@@ -77,15 +76,15 @@ const CoverEditorMediaImageAnimationTool = () => {
   );
 
   const buffer = useNativeBuffer({
-    uri: activeMedia?.media?.uri,
-    kind: activeMedia?.media?.kind,
+    uri: activeMedia?.uri,
+    kind: activeMedia?.kind,
   });
 
   const skImage = useDerivedValue(() => {
     if (!buffer) {
       return null;
     }
-    return createImageFromNativeBuffer(buffer, true);
+    return createImageFromNativeBuffer(buffer);
   }, [buffer]);
 
   const onChangeDurationSlider = useCallback(

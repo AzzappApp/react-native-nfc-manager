@@ -21,7 +21,7 @@ import PhotoGalleryMediaList from '../PhotoGalleryMediaList';
 import { useImagePickerState } from './ImagePickerContext';
 import ImagePickerMediaRenderer from './ImagePickerMediaRenderer';
 import { ImagePickerStep } from './ImagePickerWizardContainer';
-import type { Media } from '#helpers/mediaHelpers';
+import type { SourceMedia } from '#helpers/mediaHelpers';
 import type { BottomMenuItem } from '#ui/BottomMenu';
 import type { CameraViewHandle } from '../CameraView';
 import type { PhotoGalleryMediaListActions } from '../PhotoGalleryMediaList';
@@ -61,7 +61,7 @@ const SelectImageStep = ({
   } = useImagePickerState();
 
   const onGalleryMediaSelected = (
-    media: Media,
+    media: SourceMedia,
     aspectRatio?: number | null | undefined,
   ) => {
     if (
@@ -156,6 +156,7 @@ const SelectImageStep = ({
 
     onMediaChange(
       {
+        id: uri,
         kind: 'image',
         uri,
         height,
@@ -191,6 +192,7 @@ const SelectImageStep = ({
           const { width, height, rotation } = await getVideoSize(uri);
           onMediaChange(
             {
+              id: uri,
               kind: 'video',
               uri,
               height,
@@ -337,7 +339,7 @@ const SelectImageStep = ({
             mediaPermission === RESULTS.GRANTED ||
             mediaPermission === RESULTS.LIMITED ? (
               <PhotoGalleryMediaList
-                selectedMediaId={media?.galleryUri}
+                selectedMediaId={media?.id}
                 album={selectedAlbum}
                 onMediaSelected={onGalleryMediaSelected}
                 kind={kind}

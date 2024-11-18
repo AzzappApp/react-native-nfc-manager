@@ -10,7 +10,7 @@ import { useProfileInfos } from '#hooks/authStateHooks';
 import PressableOpacity from '#ui/PressableOpacity';
 import SearchBarStatic from '#ui/SearchBarStatic';
 import Text from '#ui/Text';
-import type { Media } from '#helpers/mediaHelpers';
+import type { SourceMedia } from '#helpers/mediaHelpers';
 import type { StockMediaList_photos$key } from '#relayArtifacts/StockMediaList_photos.graphql';
 import type { StockMediaList_video$key } from '#relayArtifacts/StockMediaList_video.graphql';
 import type { StockMediaListQuery } from '#relayArtifacts/StockMediaListQuery.graphql';
@@ -19,7 +19,7 @@ import type { ViewProps } from 'react-native';
 type StockMediaListProps = Omit<ViewProps, 'children'> & {
   kind: 'image' | 'video';
   selectedMediasIds: string[];
-  onMediaSelected: (media: Media) => void;
+  onMediaSelected: (media: SourceMedia) => void;
 };
 
 const StockMediaList = ({
@@ -47,20 +47,22 @@ const StockMediaList = ({
     (media: StockPhoto | StockVideo) => {
       if (media.__typename === 'StockImage') {
         onMediaSelected({
+          id: media.id,
           kind: 'image',
-          height: media.height,
           uri: media.url,
           thumbnail: media.thumbnail,
           width: media.width,
+          height: media.height,
         });
       } else {
         onMediaSelected({
+          id: media.id,
           kind: 'video',
-          duration: media.duration,
-          height: media.height,
           uri: media.url,
           thumbnail: media.thumbnail,
           width: media.width,
+          height: media.height,
+          duration: media.duration,
           rotation: 0,
         });
       }
@@ -308,7 +310,7 @@ type StockVideo = {
   readonly width: number;
 };
 
-const getItemId = (item: StockPhoto | StockVideo) => item.url;
+const getItemId = (item: StockPhoto | StockVideo) => item.id;
 
 const getItemUri = (item: StockPhoto | StockVideo) => item.thumbnail;
 

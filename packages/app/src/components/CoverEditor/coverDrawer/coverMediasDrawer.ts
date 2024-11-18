@@ -10,7 +10,6 @@ import {
   imageFrameToShaderFrame,
   scaleCropData,
 } from '#helpers/mediaEditions';
-import { mediaInfoIsImage } from '../coverEditorHelpers';
 import coverTransitions from './coverTransitions';
 import mediaAnimations from './mediaAnimations';
 import type { ImageFrame } from '#helpers/mediaEditions';
@@ -37,14 +36,14 @@ const coverMediasDrawer = ({
   let outShader: SkShader | null = null;
   let transitionTime = 0;
   for (let i = 0; i < medias.length; i++) {
-    const mediaInfo = medias[i];
+    const media = medias[i];
     const isLast = i === medias.length - 1;
     let mediaDuration: number;
 
-    if (mediaInfoIsImage(mediaInfo)) {
-      mediaDuration = mediaInfo.duration;
+    if (media.kind === 'image') {
+      mediaDuration = media.duration;
     } else {
-      mediaDuration = mediaInfo.timeRange.duration;
+      mediaDuration = media.timeRange.duration;
     }
     mediaDuration = Math.min(mediaDuration, COVER_MAX_MEDIA_DURATION);
 
@@ -55,23 +54,21 @@ const coverMediasDrawer = ({
       compositionStartTime <= currentTime &&
       currentTime < compositionEndTime
     ) {
-      const { media, filter, editionParameters } = mediaInfo;
+      const { filter, editionParameters } = media;
       let imageFrame: ImageFrame | null = null;
       let scale = 1;
       let animation: MediaAnimation | null = null;
-      if (mediaInfoIsImage(mediaInfo)) {
-        const image = createImageFromNativeBuffer(images[media.uri], true);
+      if (media.kind === 'image') {
+        const image = createImageFromNativeBuffer(images[media.id]);
         if (!image) {
           continue;
         }
-        scale = imagesScales[media.uri] ?? 1;
+        scale = imagesScales[media.id] ?? 1;
         imageFrame = imageFrameFromImage(image);
-        animation = mediaInfo.animation
-          ? mediaAnimations[mediaInfo.animation]
-          : null;
+        animation = media.animation ? mediaAnimations[media.animation] : null;
       } else {
-        const frame = frames[media.uri];
-        scale = videoScales[media.uri] ?? 1;
+        const frame = frames[media.id];
+        scale = videoScales[media.id] ?? 1;
         const imageFrame = imageFrameFromVideoFrame(frame);
         if (!imageFrame) {
           continue;

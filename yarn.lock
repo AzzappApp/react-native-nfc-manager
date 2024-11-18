@@ -11504,7 +11504,7 @@ __metadata:
 
 "@shopify/react-native-skia@patch:@shopify/react-native-skia@npm%3A1.5.0#~/.yarn/patches/@shopify-react-native-skia-npm-1.5.0-617be4e940.patch":
   version: 1.5.0
-  resolution: "@shopify/react-native-skia@patch:@shopify/react-native-skia@npm%3A1.5.0#~/.yarn/patches/@shopify-react-native-skia-npm-1.5.0-617be4e940.patch::version=1.5.0&hash=3e64c2"
+  resolution: "@shopify/react-native-skia@patch:@shopify/react-native-skia@npm%3A1.5.0#~/.yarn/patches/@shopify-react-native-skia-npm-1.5.0-617be4e940.patch::version=1.5.0&hash=ce39df"
   dependencies:
     canvaskit-wasm: "npm:0.39.1"
     react-reconciler: "npm:0.27.0"
@@ -11519,7 +11519,7 @@ __metadata:
       optional: true
   bin:
     setup-skia-web: ./scripts/setup-canvaskit.js
-  checksum: 10/08e2e2a928ebe35e01b9ad6ba9277eed665735296689a9fc8e16ecc13a9e7343aafdab7e9a13b55bf68c9a737b476a3a2ed05e29af0507f37abed4741a8af5ca
+  checksum: 10/adc0d0383951e3937d31a56a77245239e9547199d90b9123ac2041b16c23df9960ee03c2d40fcdc50f3c56a2c81eca164adf8af095b7838ae73d9b43a413f77b
   languageName: node
   linkType: hard
 

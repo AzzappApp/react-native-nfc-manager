@@ -6,7 +6,6 @@ import {
   imageFrameTransformations,
   scaleCropData,
 } from '#helpers/mediaEditions';
-import { mediaInfoIsImage } from '../coverEditorHelpers';
 import type { ImageFrame } from '#helpers/mediaEditions';
 import type { CoverDrawerOptions } from './coverDrawerTypes';
 import type { SkImage, SkMatrix } from '@shopify/react-native-skia';
@@ -35,7 +34,7 @@ const coverSkottieDrawer = ({
     }
   > = {};
   for (let i = 0; i < medias.length; i++) {
-    const mediaInfo = medias[i];
+    const media = medias[i];
     const asset = lottieInfo.assetsInfos[i];
     if (!asset) {
       console.error("Too many medias for the template's assets");
@@ -43,21 +42,18 @@ const coverSkottieDrawer = ({
     }
     let imageFrame: ImageFrame | null = null;
     let scale = 1;
-    if (mediaInfoIsImage(mediaInfo)) {
-      const image = createImageFromNativeBuffer(
-        images[mediaInfo.media.uri],
-        true,
-      );
-      scale = imagesScales[mediaInfo.media.uri] ?? 1;
+    if (media.kind === 'image') {
+      const image = createImageFromNativeBuffer(images[media.id]);
+      scale = imagesScales[media.id] ?? 1;
       imageFrame = image ? imageFrameFromImage(image) : null;
     } else {
       imageFrame = imageFrameFromVideoFrame(frames[asset.id]) ?? null;
-      scale = videoScales[mediaInfo.media.uri] ?? 1;
+      scale = videoScales[media.id] ?? 1;
     }
     if (!imageFrame) {
       continue;
     }
-    const { editionParameters } = mediaInfo;
+    const { editionParameters } = media;
     const { orientation, roll } = editionParameters ?? {};
     let cropData = editionParameters?.cropData;
     if (cropData && scale !== 1) {
