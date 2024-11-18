@@ -1,6 +1,5 @@
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense } from 'react';
 import { graphql, useClientQuery } from 'react-relay';
-import { addGlobalEventListener } from '#helpers/globalEvents';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import CoverRenderer from './CoverRenderer';
 import type { HomeIconQuery } from '#relayArtifacts/HomeIconQuery.graphql';
@@ -30,15 +29,8 @@ const HomeCoverIcon = ({ webCardId }: HomeIconProps) => {
 
 export const HomeIcon = () => {
   const profileInfos = useProfileInfos();
-  const [ready, setReady] = useState(false);
 
-  useEffect(() => {
-    addGlobalEventListener('READY', () => {
-      setReady(true);
-    });
-  }, []);
-
-  if (!profileInfos?.webCardId || !ready) {
+  if (!profileInfos?.webCardId) {
     return <CoverRenderer width={COVER_WIDTH} webCard={null} />;
   }
 
