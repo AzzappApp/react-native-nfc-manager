@@ -193,7 +193,7 @@ type ImagePickerContextProviderProps = {
   } | null;
 };
 
-const _ImagePickerContextProvider = (
+const ImagePickerContextProviderInner = (
   {
     kind,
     maxVideoDuration,
@@ -405,7 +405,7 @@ export const MAX_VIDEO_THUMBNAIL_SIZE = {
  * it also manages the display of the picker steps.
  */
 export const ImagePickerContextProvider = forwardRef(
-  _ImagePickerContextProvider,
+  ImagePickerContextProviderInner,
 );
 
 const getMediaAspectRatio = (
