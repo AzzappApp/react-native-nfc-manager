@@ -1,5 +1,6 @@
-## 1.4.0-canary.95
+## 1.4.0-canary.96
 
+* **feat:**  - Copy cover media locally during edition ([#5900](https://github.com/AzzappApp/azzapp/pull/5900))
 * **fix:**  - not clickable Toast on android ([#5945](https://github.com/AzzappApp/azzapp/pull/5945))
 * **fix:**  - reapply preview border radius ([#5947](https://github.com/AzzappApp/azzapp/pull/5947))
 * **fix:**  - **android:** [#5925](https://github.com/AzzappApp/azzapp/pull/5925) wrong height size ([#5944](https://github.com/AzzappApp/azzapp/pull/5944))
