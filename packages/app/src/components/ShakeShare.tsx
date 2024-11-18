@@ -27,6 +27,7 @@ import {
   useSharedValue,
 } from 'react-native-reanimated';
 import { graphql, useClientQuery } from 'react-relay';
+import { useNetworkAvailableContext } from '#networkAvailableContext';
 import { colors } from '#theme';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import useLatestCallback from '#hooks/useLatestCallback';
@@ -38,6 +39,7 @@ import type { ShakeShareScreenQuery } from '#relayArtifacts/ShakeShareScreenQuer
 
 const ShakeShare = () => {
   const [mountScreen, setMountScreen] = useState(false);
+  const isConnected = useNetworkAvailableContext();
   const profileInfos = useProfileInfos();
 
   const dismount = useCallback(() => {
@@ -58,7 +60,7 @@ const ShakeShare = () => {
     .runOnJS(true)
     .onBegin(dismount); //seems to be a bug, only work with onBegin
 
-  if (!mountScreen) {
+  if (!mountScreen || !isConnected) {
     return null;
   }
   return (
