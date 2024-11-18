@@ -1,4 +1,4 @@
-## 1.4.0-canary.98
+## 1.4.0-canary.99
 
 * **fix:**  - increase timeouts for offline detection ([#5911](https://github.com/AzzappApp/azzapp/pull/5911))
 * **feat:**  - Copy cover media locally during edition ([#5900](https://github.com/AzzappApp/azzapp/pull/5900))
