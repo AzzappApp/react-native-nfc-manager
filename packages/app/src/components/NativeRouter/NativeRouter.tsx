@@ -9,7 +9,7 @@ import {
   startTransition,
 } from 'react';
 import { BackHandler } from 'react-native';
-import { type Route } from '#routes';
+import { type Route, isRouteEqual } from '#routes';
 import { createId } from '#helpers/idHelpers';
 import nativeRouterReducer from './nativeRouterReducer';
 import {
@@ -46,7 +46,7 @@ export type NativeRouter = {
   canGoBack(): boolean;
 
   // navigation
-  push<T extends Route>(route: T): void;
+  push<T extends Route>(route: T, allowDuplicate?: boolean): void;
   back(): boolean;
   pop(num: number): void;
   replace(route: Route): void;
@@ -240,9 +240,15 @@ export const useNativeRouter = (init: RouterInit) => {
           !!routerStateRef.current.modals.length
         );
       },
-      push(route) {
+      push(route, allowDuplicate = false) {
         if (setTabIfExists(route)) {
           return;
+        }
+        if (!allowDuplicate) {
+          const currentRoute = getCurrentRouteFromState(routerStateRef.current);
+          if (currentRoute && isRouteEqual(currentRoute?.state, route)) {
+            return;
+          }
         }
         splice(route, 0);
       },
