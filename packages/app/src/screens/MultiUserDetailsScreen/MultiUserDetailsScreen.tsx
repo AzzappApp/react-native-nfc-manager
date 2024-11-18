@@ -460,7 +460,7 @@ const MultiUserDetailsScreen = ({
     <Container style={{ flex: 1 }}>
       <SafeAreaView
         style={{ flex: 1 }}
-        edges={{ bottom: 'off', top: 'additive' }}
+        edges={{ bottom: 'maximum', top: 'additive' }}
       >
         <Header
           leftElement={
