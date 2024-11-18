@@ -49,6 +49,7 @@ const mediaScreenQuery = graphql`
           ...PostList_author
           ...MediaFollowingsWebCards_webCard
           ...MediaFollowingsScreen_webCard
+          ...PostList_viewerWebCard
         }
       }
     }
@@ -138,6 +139,7 @@ const MediaScreen = ({
           <Suspense>
             <ProfilePostsList
               webCard={profile.webCard}
+              viewerWebCard={profile.webCard}
               canPlay={hasFocus && tab === 'MY_POSTS'}
             />
           </Suspense>
