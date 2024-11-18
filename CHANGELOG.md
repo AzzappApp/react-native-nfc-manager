@@ -1,5 +1,8 @@
-## 1.4.0-canary.100
+## 1.4.0-canary.101
 
+* **fix:**  - disable shake & share when offline ([#5955](https://github.com/AzzappApp/azzapp/pull/5955))
+* **fix:**  - replace maximum with additive
+* **fix:**  - bottom padding issue on MultiUserScreen ([#5952](https://github.com/AzzappApp/azzapp/pull/5952))
 * **fix:**  - fix bad modal display ([#5954](https://github.com/AzzappApp/azzapp/pull/5954))
 * **fix:**  - increase timeouts for offline detection ([#5911](https://github.com/AzzappApp/azzapp/pull/5911))
 * **feat:**  - Copy cover media locally during edition ([#5900](https://github.com/AzzappApp/azzapp/pull/5900))
