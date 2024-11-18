@@ -31,6 +31,8 @@ export const createRandomFilePath = (ext: string) =>
  */
 export const getFileExtension = (path: string) => {
   const ext =
-    path.indexOf('.') !== -1 ? path.split('.').pop()?.split('?')[0] : null;
+    path && path.indexOf('.') !== -1
+      ? path.split('.').pop()?.split('?')[0]
+      : null;
   return ext && ext.length <= 5 ? ext : null;
 };

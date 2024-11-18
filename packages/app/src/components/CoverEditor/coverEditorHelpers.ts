@@ -1,5 +1,6 @@
 import * as Device from 'expo-device';
 import memoize from 'lodash/memoize';
+import { useMemo } from 'react';
 import { Dimensions, PixelRatio } from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import { createSkottieTemplatePlayer } from 'react-native-skottie-template-player';
@@ -7,6 +8,7 @@ import {
   COVER_RATIO,
   LOTTIE_REPLACE_COLORS,
 } from '@azzapp/shared/coverHelpers';
+import { isDefined } from '@azzapp/shared/isDefined';
 import { extractLottieInfo, replaceColors } from '@azzapp/shared/lottieHelpers';
 import { getFileExtension } from '#helpers/fileHelpers';
 import {
@@ -197,7 +199,14 @@ export const getCoverDuration = (state: CoverEditorState) => {
   }
 };
 
-export const getLottieMediasDurations = (lottie: LottieInfo) => {
+export const useLottieMediaDurations = (lottie?: JSON | null) => {
+  return useMemo(() => {
+    const lottieInfo = lottie ? extractLottieInfo(lottie) : undefined;
+    return getLottieMediasDurations(lottieInfo);
+  }, [lottie]);
+};
+
+export const getLottieMediasDurations = (lottie?: LottieInfo) => {
   return lottie
     ? lottie.assetsInfos.map(
         assetInfo => assetInfo.endTime - assetInfo.startTime,
@@ -302,43 +311,58 @@ export const calculateBoxSize = (options: {
  * ```
  */
 export const duplicateMediaToFillSlots = (
-  totalSlots: number,
-  selectedMedias: SourceMedia[],
+  selectedMedias: Array<SourceMedia | null>,
   maxSelectableVideos?: number | undefined,
-): SourceMedia[] => {
-  if (selectedMedias.length >= totalSlots) {
-    return selectedMedias;
-  }
+): Array<SourceMedia | null> => {
+  const maxVideo =
+    maxSelectableVideos === undefined ? 2000 : maxSelectableVideos;
 
-  const filledMediaSlots = [...selectedMedias];
-  let filledSlots = 0;
+  const validMedia = selectedMedias.filter(isDefined);
+  const validMediaImage = validMedia.filter(m => m?.kind === 'image');
+  let mediaVideoLength = validMedia.filter(m => m?.kind === 'video').length; // initial VideoCount
 
-  const selectableMedia = [...selectedMedias];
-
-  while (filledMediaSlots.length < totalSlots && selectableMedia.length) {
-    const index = filledSlots % selectableMedia.length;
-
-    const addedMedia = selectableMedia[index];
-
-    if (
-      addedMedia.kind === 'video' &&
-      maxSelectableVideos !== undefined &&
-      filledMediaSlots.filter(media => media.kind === 'video').length >=
-        maxSelectableVideos
-    ) {
-      selectableMedia.splice(index, 1);
-      continue;
+  let validMediaIndex = 0;
+  const filledMedia = selectedMedias.map(media => {
+    if (media) {
+      return media;
+    } else if (mediaVideoLength >= maxVideo) {
+      if (validMediaImage.length === 0) {
+        // It is not be possible to find media to duplicate
+        return null;
+      }
+      // no more video available to insert, insert only images
+      const mediaToInsert =
+        validMediaImage[validMediaIndex++ % validMediaImage.length];
+      return mediaToInsert;
+    } else {
+      // insert any content
+      const mediaToInsert = validMedia[validMediaIndex++ % validMedia.length];
+      if (mediaToInsert.kind === 'video') {
+        mediaVideoLength++;
+        if (mediaVideoLength >= maxVideo) {
+          // find next Image in list
+          const nextImage = validMedia.find(
+            (m, idx) => idx > validMediaIndex && m.kind === 'image',
+          );
+          if (nextImage) {
+            // find the index of next image in image list
+            validMediaIndex = validMediaImage.findIndex(
+              media => media.id === nextImage?.id,
+            );
+            // not found should not happen
+            if (validMediaIndex === -1) {
+              console.warn('next image not found, it should not happen');
+              validMediaIndex = 0;
+            }
+          } else {
+            validMediaIndex = 0;
+          }
+        }
+      }
+      return mediaToInsert;
     }
-
-    // Add to the list the media to be duplicated.
-    // The media to be duplicated is from the initial list of selected medias, cycling through them.
-    filledMediaSlots.push(
-      selectableMedia[filledSlots % selectableMedia.length],
-    );
-    filledSlots++;
-  }
-
-  return filledMediaSlots;
+  });
+  return filledMedia;
 };
 
 export const replaceURIWithLocalPath = <T extends SourceMedia>(

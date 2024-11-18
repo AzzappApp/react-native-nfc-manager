@@ -1,4 +1,6 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
+import { StyleSheet } from 'react-native';
+import { maximumCoverFromScratch } from '#components/CoverEditor/CoverEditor';
 import { getMaxAllowedVideosPerCover } from '#components/CoverEditor/coverEditorHelpers';
 import { ScreenModal } from '#components/NativeRouter';
 import useToggle from '#hooks/useToggle';
@@ -30,22 +32,23 @@ const CoverEditorMediaPickerFloatingTool = ({
     [dispatch, toggleShowImage],
   );
 
+  const initialMedia = useMemo(() => {
+    if (cover.lottie) return cover.medias;
+    else {
+      return [
+        ...cover.medias,
+        ...new Array(maximumCoverFromScratch - cover.medias.length).fill(null),
+      ];
+    }
+  }, [cover.lottie, cover.medias]);
+
   return (
     <>
       <IconButton
         icon="add"
         size={35}
-        style={{
-          position: 'absolute',
-          right: 20,
-          top: 15,
-          padding: 0,
-          backgroundColor: 'black',
-          borderRadius: 10,
-        }}
-        iconStyle={{
-          tintColor: 'white',
-        }}
+        style={styles.iconContainer}
+        iconStyle={styles.icon}
         onPress={toggleShowImage}
       />
       <ScreenModal
@@ -55,7 +58,7 @@ const CoverEditorMediaPickerFloatingTool = ({
       >
         {showImagePicker && (
           <CoverEditorMediaPicker
-            initialMedias={cover.medias}
+            initialMedias={initialMedia}
             onFinished={onMediasPicked}
             durations={durations}
             durationsFixed={durationsFixed}
@@ -67,5 +70,17 @@ const CoverEditorMediaPickerFloatingTool = ({
     </>
   );
 };
-
+const styles = StyleSheet.create({
+  icon: {
+    tintColor: 'white',
+  },
+  iconContainer: {
+    position: 'absolute',
+    right: 20,
+    top: 15,
+    padding: 0,
+    backgroundColor: 'black',
+    borderRadius: 10,
+  },
+});
 export default CoverEditorMediaPickerFloatingTool;

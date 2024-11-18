@@ -5,7 +5,6 @@ import ColorTriptychRenderer from '#components/ColorTriptychRenderer';
 import useBoolean from '#hooks/useBoolean';
 import useToggle from '#hooks/useToggle';
 import { useCoverEditorContext } from '../CoverEditorContext';
-import { extractLottieInfoMemoized } from '../coverEditorHelpers';
 import CoverEditorLinksToolbox from './CoverEditorLinkToolbox';
 import CoverEditorMediaEditToolbox from './CoverEditorMediaEditToolbox';
 import CoverEditorMediaToolbox from './CoverEditorMediaToolbox';
@@ -33,7 +32,7 @@ const CoverEditorToolbox = (
   ] = useBoolean(false);
   const { coverEditorState, dispatch } = useCoverEditorContext();
 
-  const { editionMode, cardColors } = coverEditorState;
+  const { editionMode, cardColors, medias } = coverEditorState;
 
   const setCurrentEditionMode = useCallback(
     (mode: CoverEditionMode) => {
@@ -63,9 +62,9 @@ const CoverEditorToolbox = (
     };
   }
 
-  const lottieInfo = extractLottieInfoMemoized(coverEditorState.lottie);
-
   const intl = useIntl();
+
+  const canEditMedia = medias.findIndex(m => m === null || m.editable) !== -1;
 
   return (
     <View style={{ height: TOOLBOX_SECTION_HEIGHT, overflow: 'hidden' }}>
@@ -91,7 +90,7 @@ const CoverEditorToolbox = (
             icon="overlay"
             onPress={openOverlayImagePicker}
           />
-          {(!lottieInfo || lottieInfo.assetsInfos.length > 0) && (
+          {canEditMedia && (
             <ToolBoxSection
               label={intl.formatMessage({
                 defaultMessage: 'Media',
@@ -146,9 +145,11 @@ const CoverEditorToolbox = (
         <CoverEditorLinksToolbox ref={ref} />
       </ToolBarContainer>
 
-      <ToolBarContainer destroyOnHide visible={editionMode === 'media'}>
-        <CoverEditorMediaToolbox />
-      </ToolBarContainer>
+      {canEditMedia ? (
+        <ToolBarContainer destroyOnHide visible={editionMode === 'media'}>
+          <CoverEditorMediaToolbox />
+        </ToolBarContainer>
+      ) : undefined}
 
       <ToolBarContainer destroyOnHide visible={editionMode === 'mediaEdit'}>
         <CoverEditorMediaEditToolbox />

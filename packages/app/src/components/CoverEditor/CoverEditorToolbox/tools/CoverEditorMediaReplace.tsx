@@ -1,9 +1,7 @@
-import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import {
-  extractLottieInfoMemoized,
-  getLottieMediasDurations,
   getMaxAllowedVideosPerCover,
+  useLottieMediaDurations,
 } from '#components/CoverEditor/coverEditorHelpers';
 import CoverEditorMediaPicker from '#components/CoverEditor/CoverEditorMediaPicker';
 
@@ -20,25 +18,11 @@ const CoverEditorMediaReplace = () => {
   const intl = useIntl();
   const [show, toggleScreenModal] = useToggle(false);
   const {
-    coverEditorState: { lottie, editionMode, medias, providedMedias },
+    coverEditorState: { lottie, editionMode, medias },
     dispatch,
   } = useCoverEditorContext();
 
-  const durations = useMemo(() => {
-    const lottieInfo = extractLottieInfoMemoized(lottie);
-    if (!lottieInfo) return null;
-
-    const infos = getLottieMediasDurations(lottieInfo);
-
-    providedMedias.forEach(media => {
-      if (!media.editable) {
-        infos?.splice(media.index, 1);
-      }
-    });
-
-    return infos;
-  }, [lottie, providedMedias]);
-
+  const durations = useLottieMediaDurations(lottie);
   const activeMedia = useCoverEditorActiveMedia();
 
   const onFinished = (medias: SourceMedia[]) => {

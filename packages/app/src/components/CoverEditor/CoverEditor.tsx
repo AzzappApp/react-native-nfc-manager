@@ -41,6 +41,7 @@ import {
   getMaxAllowedVideosPerCover,
   getLottieMediasDurations,
   copyCoverMediaToCacheDir,
+  useLottieMediaDurations,
 } from './coverEditorHelpers';
 import CoverEditorMediaPicker from './CoverEditorMediaPicker';
 import { coverEditorReducer } from './coverEditorReducer';
@@ -55,7 +56,6 @@ import type { CoverEditor_profile$key } from '#relayArtifacts/CoverEditor_profil
 import type { CoverEditorAction } from './coverEditorActions';
 import type { CoverEditorLinksToolActions } from './CoverEditorToolbox/tools/CoverEditorLinksTool';
 import type {
-  CoverEditionProvidedMedia,
   CoverEditorLinksLayerItem,
   CoverEditorOverlayItem,
   CoverEditorState,
@@ -118,6 +118,8 @@ const ANDROID_ASSET_PATH =
   'file:///android_asset/cover_overlay_placeholder_logo.png';
 
 const isAndroidRelease = Platform.OS === 'android' && !__DEV__;
+
+export const maximumCoverFromScratch = 5;
 
 const CoverEditorCore = (
   {
@@ -309,23 +311,31 @@ const CoverEditorCore = (
       !coverTemplate && !coverInitialState?.lottie;
 
     const lottieInfo = extractLottieInfoMemoized(lottie);
-    const durations = lottieInfo ? getLottieMediasDurations(lottieInfo) : [];
+    const durations = getLottieMediasDurations(lottieInfo);
 
-    const providedMedias: CoverEditionProvidedMedia[] =
-      coverTemplate?.medias.map(({ media, index, editable }) => ({
-        ...media,
-        index,
-        editable,
-        kind: 'image',
-        filter: null,
-        animation: null,
-        editionParameters: null,
-        duration: durations ? durations[index] : COVER_IMAGE_DEFAULT_DURATION,
-      })) ?? [];
+    let initialMediaToPick = undefined;
+    if (!coverInitialState?.medias?.length) {
+      initialMediaToPick = new Array(
+        lottie ? durations?.length : maximumCoverFromScratch,
+      ).fill(null);
+
+      coverTemplate?.medias.forEach(({ media, index, editable }) => {
+        initialMediaToPick[index] = {
+          editable,
+          kind: 'image',
+          filter: null,
+          animation: null,
+          editionParameters: null,
+          duration: durations ? durations[index] : COVER_IMAGE_DEFAULT_DURATION,
+          ...media,
+        };
+      });
+    }
 
     return {
       isModified: false,
       lottie,
+
       cardColors: {
         ...DEFAULT_COLOR_PALETTE,
         otherColors: [...DEFAULT_COLOR_LIST],
@@ -334,7 +344,6 @@ const CoverEditorCore = (
       backgroundColor: backgroundColor ?? 'light',
 
       medias: [],
-      providedMedias,
       coverTransition: 'fade',
 
       overlayLayers,
@@ -355,6 +364,7 @@ const CoverEditorCore = (
       coverPreviewPositionPercentage: coverTemplate?.previewPositionPercentage,
       shouldComputeCoverPreviewPositionPercentage,
 
+      initialMediaToPick,
       ...coverInitialState,
     };
   });
@@ -512,7 +522,6 @@ const CoverEditorCore = (
     coverEditorState.localPaths,
     coverEditorState.overlayLayers,
     coverEditorState.imagesScales,
-    coverEditorState.providedMedias,
     // here to force the effect to run again when the reloadCount changes
     reloadCount,
   ]);
@@ -547,7 +556,7 @@ const CoverEditorCore = (
 
   useEffect(() => {
     if (error) {
-      console.error(error);
+      console.error('', error);
     }
   }, [error]);
 
@@ -571,48 +580,59 @@ const CoverEditorCore = (
 
   // #region Initial Media picking
   const showImagePicker = useMemo(() => {
+    if (!coverEditorState.lottie && coverEditorState.medias.length === 0) {
+      //cover from scratch
+      return true;
+    }
     const lottieInfo = extractLottieInfoMemoized(coverEditorState.lottie);
     if (lottieInfo && lottieInfo.assetsInfos.length === 0) {
       return false;
     }
-    if (coverEditorState.medias.length === 0) {
+
+    if (
+      !!coverEditorState.lottie &&
+      coverEditorState.initialMediaToPick?.length
+    ) {
+      // ensure media picker is open when we build from scratch
       return true;
     }
-  }, [coverEditorState.lottie, coverEditorState.medias.length]);
+    const hasMissingId =
+      coverEditorState.medias.findIndex(
+        media => media === null || media.id === '',
+      ) !== -1;
+    if (hasMissingId) {
+      return true;
+    }
+  }, [
+    coverEditorState.initialMediaToPick,
+    coverEditorState.lottie,
+    coverEditorState.medias,
+  ]);
+
+  const allDuration = useLottieMediaDurations(coverEditorState.lottie);
 
   const durations = useMemo(() => {
-    const lottieInfo = extractLottieInfoMemoized(coverEditorState.lottie);
-    const infos = lottieInfo
-      ? lottieInfo.assetsInfos.map(
-          assetInfo => assetInfo.endTime - assetInfo.startTime,
-        )
-      : null;
-
-    coverTemplate?.medias.forEach(media => {
-      if (!media.editable) {
-        infos?.splice(media.index, 1);
-      }
-    });
-
-    return infos;
-  }, [coverEditorState.lottie, coverTemplate?.medias]);
+    const mediaList =
+      coverEditorState.initialMediaToPick || coverEditorState.medias;
+    const durationArray = mediaList.map(
+      (m, index) =>
+        m?.duration || allDuration?.[index] || COVER_IMAGE_DEFAULT_DURATION,
+    );
+    return durationArray;
+  }, [
+    allDuration,
+    coverEditorState.initialMediaToPick,
+    coverEditorState.medias,
+  ]);
 
   const onMediasPicked = useCallback(
     (baseMedias: SourceMedia[]) => {
-      const medias = [...baseMedias];
-
-      coverEditorState.providedMedias.forEach(providedMedia => {
-        if (!providedMedia.editable) {
-          medias.splice(providedMedia.index, 0, providedMedia);
-        }
-      });
-
       dispatch({
         type: 'UPDATE_MEDIAS',
-        payload: medias,
+        payload: baseMedias,
       });
     },
-    [coverEditorState.providedMedias, dispatch],
+    [dispatch],
   );
 
   // #region Layout and styles
@@ -680,32 +700,6 @@ const CoverEditorCore = (
     200,
   );
 
-  const initialMedias = useMemo(() => {
-    const initial = Array.from<SourceMedia | null>({
-      length: durations?.length ?? 0,
-    }).fill(null);
-
-    let nonEditableCount = 0;
-    coverEditorState.providedMedias.forEach(providedMedia => {
-      if (providedMedia.editable) {
-        initial[providedMedia.index - nonEditableCount] =
-          (providedMedia.index,
-          0,
-          {
-            id: providedMedia.id,
-            height: providedMedia.height,
-            kind: 'image',
-            uri: providedMedia.uri,
-            width: providedMedia.width,
-          });
-      } else {
-        nonEditableCount++;
-      }
-    });
-
-    return initial;
-  }, [coverEditorState.providedMedias, durations?.length]);
-
   const imagePicker = (
     <ScreenModal
       key="imagePicker"
@@ -714,7 +708,9 @@ const CoverEditorCore = (
       onRequestDismiss={onCancel}
     >
       <CoverEditorMediaPicker
-        initialMedias={initialMedias}
+        initialMedias={
+          coverEditorState.initialMediaToPick || coverEditorState.medias
+        }
         durations={durations}
         durationsFixed={!!coverEditorState.lottie}
         maxSelectableVideos={getMaxAllowedVideosPerCover(

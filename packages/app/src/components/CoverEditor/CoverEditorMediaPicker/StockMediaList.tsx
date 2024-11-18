@@ -53,6 +53,7 @@ const StockMediaList = ({
           thumbnail: media.thumbnail,
           width: media.width,
           height: media.height,
+          editable: true,
         });
       } else {
         onMediaSelected({
@@ -64,6 +65,7 @@ const StockMediaList = ({
           height: media.height,
           duration: media.duration,
           rotation: 0,
+          editable: true,
         });
       }
     },

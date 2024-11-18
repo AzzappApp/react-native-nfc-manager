@@ -212,6 +212,9 @@ export function coverEditorReducer(
       const medias: CoverMedia[] = [];
       let imagesScales = state.imagesScales;
 
+      const lottieInfo = extractLottieInfoMemoized(state.lottie);
+      const durations = getLottieMediasDurations(lottieInfo);
+
       payload.forEach((media, index) => {
         const currentMedia = state.medias.find(
           currentMedia => currentMedia.id === media.id,
@@ -221,8 +224,7 @@ export function coverEditorReducer(
           return;
         }
         let aspectRatio = COVER_RATIO;
-        if (state.lottie) {
-          const lottieInfo = extractLottieInfoMemoized(state.lottie);
+        if (lottieInfo) {
           const asset = lottieInfo?.assetsInfos[index];
           if (!asset) {
             console.error("Too many medias for the template's assets");
@@ -248,10 +250,6 @@ export function coverEditorReducer(
             duration: COVER_IMAGE_DEFAULT_DURATION,
           });
         } else {
-          const lottieInfo = extractLottieInfoMemoized(state.lottie);
-          const durations = lottieInfo
-            ? getLottieMediasDurations(lottieInfo)
-            : null;
           const duration = durations ? durations[index] : null;
 
           medias.push({
@@ -274,12 +272,12 @@ export function coverEditorReducer(
           delete localPaths[id];
         }
       });
-
       return {
         ...state,
         medias,
         imagesScales,
         localPaths,
+        initialMediaToPick: undefined,
       };
     }
     case 'UPDATE_MEDIA_IMAGE_DURATION': {

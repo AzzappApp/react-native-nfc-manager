@@ -235,6 +235,7 @@ const PhotoGalleryMediaList = (
           height,
           rotation,
           duration: asset.node.image.playableDuration,
+          editable: true,
         });
       } else {
         if (width == null || height == null) {
@@ -247,6 +248,7 @@ const PhotoGalleryMediaList = (
           galleryUri: asset.node.image.uri,
           width,
           height,
+          editable: true,
         });
       }
     },

@@ -9,7 +9,7 @@ import PressableNative from '#ui/PressableNative';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
 import { useCoverEditorContext } from '../CoverEditorContext';
-import { extractLottieInfoMemoized } from '../coverEditorHelpers';
+import { useLottieMediaDurations } from '../coverEditorHelpers';
 import CoverEditorMediaPickerFloatingTool from './tools/CoverEditorMediaPickerFloatingTool';
 import CoverEditorTransitionTool from './tools/CoverEditorTransitionTool';
 import { TOOLBOX_SECTION_HEIGHT } from './ui/ToolBoxSection';
@@ -19,7 +19,7 @@ const CoverEditorMediaToolbox = () => {
 
   const {
     dispatch,
-    coverEditorState: { medias: baseMedias, lottie, providedMedias },
+    coverEditorState: { medias, lottie },
   } = useCoverEditorContext();
 
   const onClose = () => {
@@ -32,34 +32,7 @@ const CoverEditorMediaToolbox = () => {
     });
   };
 
-  const medias = useMemo(() => {
-    const availableMedias = [...baseMedias];
-
-    providedMedias.forEach(media => {
-      if (!media.editable) {
-        availableMedias?.splice(media.index, 1);
-      }
-    });
-
-    return availableMedias;
-  }, [baseMedias, providedMedias]);
-
-  const durations = useMemo(() => {
-    const lottieInfo = extractLottieInfoMemoized(lottie);
-    const infos = lottieInfo
-      ? lottieInfo.assetsInfos.map(
-          assetInfo => assetInfo.endTime - assetInfo.startTime,
-        )
-      : null;
-
-    providedMedias.forEach(media => {
-      if (!media.editable) {
-        infos?.splice(media.index, 1);
-      }
-    });
-
-    return infos;
-  }, [lottie, providedMedias]);
+  const durations = useLottieMediaDurations(lottie);
 
   const displayedMedias = useMemo(() => {
     const data = durations
@@ -68,15 +41,18 @@ const CoverEditorMediaToolbox = () => {
           return {
             media,
             duration,
+            editable: media?.editable,
           };
         })
       : medias.map(media => ({
           media,
           duration:
             media.kind === 'image' ? media.duration : media.timeRange.duration,
+          editable: media?.editable,
         }));
 
-    return data.map(({ media, duration }, index) => {
+    return data.map(({ media, duration, editable }, index) => {
+      if (!editable) return undefined;
       if (!media) {
         return (
           <View key={index} style={styles.previewContent}>

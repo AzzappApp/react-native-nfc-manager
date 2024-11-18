@@ -19,8 +19,8 @@ export type CoverEditorState = {
   lottie: JSON | null;
   backgroundColor: string | null;
 
-  providedMedias: CoverEditionProvidedMedia[];
   medias: CoverMedia[];
+  initialMediaToPick?: Array<CoverMedia | null>;
   coverTransition: CoverTransitions | null;
 
   overlayLayers: CoverEditorOverlayItem[];
@@ -58,6 +58,7 @@ export type CardColors = Readonly<
 export type CoverMediaBase = {
   filter: Filter | null;
   editionParameters: EditionParameters | null;
+  editable: boolean;
 };
 
 export type CoverMediaVideo = CoverMediaBase &

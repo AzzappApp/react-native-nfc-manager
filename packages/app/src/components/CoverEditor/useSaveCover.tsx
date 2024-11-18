@@ -22,12 +22,12 @@ import coverDrawer, { coverTransitions } from './coverDrawer';
 import {
   createCoverSkottieWithColorReplacement,
   createCoverVideoComposition,
-  extractLottieInfoMemoized,
   isCoverDynamic,
   MAX_EXPORT_DECODER_RESOLUTION,
   COVER_EXPORT_VIDEO_RESOLUTION,
   COVER_VIDEO_BITRATE,
   COVER_VIDEO_FRAME_RATE,
+  extractLottieInfoMemoized,
 } from './coverEditorHelpers';
 import coverLocalStore from './coversLocalStore';
 import type { useSaveCoverMutation } from '#relayArtifacts/useSaveCoverMutation.graphql';
@@ -177,7 +177,10 @@ const useSaveCover = (
         return acc + getMediaDuration(media);
       }, 0);
       // duration of first cover
-      const firstMediaDuration = getMediaDuration(coverEditorState.medias[0]);
+      const firstMediaDuration = coverEditorState.medias[0]
+        ? getMediaDuration(coverEditorState.medias[0])
+        : 0;
+
       // remove transition duration
       const transitionDuration =
         (coverTransition && coverTransitions[coverTransition].duration) || 0;

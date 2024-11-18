@@ -1,5 +1,11 @@
 import { Image } from 'expo-image';
-import { startTransition, useCallback, useMemo, useState } from 'react';
+import {
+  startTransition,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, Alert, useWindowDimensions } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -9,6 +15,7 @@ import {
   COVER_IMAGE_DEFAULT_DURATION,
   COVER_MAX_MEDIA,
 } from '@azzapp/shared/coverHelpers';
+import { isDefined } from '@azzapp/shared/isDefined';
 import { colors, shadow } from '#theme';
 import {
   AlbumPickerScreen,
@@ -63,9 +70,9 @@ type CoverEditorMediaPickerProps = Omit<ViewProps, 'children'> & {
 };
 
 const CoverEditorMediaPicker = ({
-  durations,
+  durations: initialDurationsUnfiltered,
   durationsFixed,
-  initialMedias,
+  initialMedias: initialMediaUnfiltered,
   onFinished,
   style,
   maxSelectableVideos,
@@ -76,7 +83,17 @@ const CoverEditorMediaPicker = ({
 }: CoverEditorMediaPickerProps) => {
   const [selectedMedias, setSelectedMedias] = useState<
     Array<SourceMedia | null>
-  >(initialMedias ?? []);
+  >(initialMediaUnfiltered?.filter(media => !media || media.editable) ?? []);
+
+  const durations = useMemo(() => {
+    return initialDurationsUnfiltered?.filter((_d, idx) => {
+      return (
+        !initialMediaUnfiltered?.[idx] ||
+        initialMediaUnfiltered?.[idx]?.editable === true
+      );
+    });
+  }, [initialDurationsUnfiltered, initialMediaUnfiltered]);
+
   const [selectedTab, setSelectedTab] = useState('gallery');
   const [selectedAlbum, setSelectedAlbum] = useState<Album | null>(null);
   const [showAlbumModal, toggleShowAlbumModal] = useToggle(false);
@@ -146,8 +163,9 @@ const CoverEditorMediaPicker = ({
   // remove Media by index
   const handleRemoveMedia = (index: number) => {
     setSelectedMedias(prevSelectedMedias => [
-      ...prevSelectedMedias.filter((_, i) => i !== index),
+      ...prevSelectedMedias.slice(0, index),
       null,
+      ...prevSelectedMedias.slice(index + 1, prevSelectedMedias.length),
     ]);
   };
 
@@ -221,23 +239,21 @@ const CoverEditorMediaPicker = ({
           return newSelectedMedias;
         });
       } else if (
-        (!initialMedias || initialMedias.length === 0) &&
+        (!selectedMedias || selectedMedias.length === 0) &&
         selectedMedias.length < COVER_MAX_MEDIA
       ) {
-        setSelectedMedias(prevSelectedMedias => [...prevSelectedMedias, media]);
+        const idx = selectedMedias.findIndex(media => media === null);
+        setSelectedMedias(prevSelectedMedias => {
+          const newSelectedMedias = [...prevSelectedMedias];
+          newSelectedMedias[idx] = media;
+          return newSelectedMedias;
+        });
       }
     },
-    [
-      durations,
-      initialMedias,
-      intl,
-      maxSelectableVideos,
-      multiSelection,
-      selectedMedias,
-    ],
+    [durations, selectedMedias, intl, maxSelectableVideos, multiSelection],
   );
 
-  const handleDuplicateMedia = () => {
+  const handleDuplicateMedia = useCallback(() => {
     if (
       durations &&
       selectedMediasIds.length > 0 &&
@@ -270,20 +286,16 @@ const CoverEditorMediaPicker = ({
       }
     }
 
-    const missingMedia = maxMedias - selectedMediasIds.length;
+    const missingMedia = selectedMedias.filter(m => m === null).length;
 
     if (missingMedia > 0) {
-      const selected = selectedMedias.filter(
-        media => media !== null,
-      ) as SourceMedia[];
       const duplicatedMedias = duplicateMediaToFillSlots(
-        maxMedias,
-        selected,
+        selectedMedias,
         maxSelectableVideos,
       );
       setSelectedMedias(duplicatedMedias);
 
-      if (duplicatedMedias.length < maxMedias) {
+      if (duplicatedMedias.findIndex(m => m === null) !== -1) {
         Toast.show({
           type: 'error',
           text1: intl.formatMessage({
@@ -295,7 +307,7 @@ const CoverEditorMediaPicker = ({
         return null;
       }
 
-      return duplicatedMedias;
+      return duplicatedMedias.filter(isDefined);
     } else {
       Toast.show({
         type: 'error',
@@ -307,10 +319,43 @@ const CoverEditorMediaPicker = ({
       });
       return null;
     }
+  }, [
+    durations,
+    intl,
+    maxSelectableVideos,
+    selectedMedias,
+    selectedMediasIds.length,
+  ]);
+
+  /** Helper funcrtion to re add uneditable media to the result */
+  const mapResultWithNonEditable = (inputMedia: Array<SourceMedia | null>) => {
+    let selectedMediaIdx = 0;
+
+    return initialMediaUnfiltered?.map(media => {
+      if (!media || media.editable) {
+        return inputMedia[selectedMediaIdx++];
+      } else {
+        return media;
+      }
+    });
   };
 
   const handleOnFinished = () => {
-    const validMediaCount = selectedMedias.filter(Boolean).length;
+    // rebuild result data
+    const resultMedia = multiSelection
+      ? mapResultWithNonEditable(selectedMedias)
+      : selectedMedias;
+
+    if (selectedMedias.length === 0) {
+      onFinished(initialMediaUnfiltered?.filter(isDefined) || []);
+      return;
+    }
+    const resultMediaId =
+      resultMedia
+        ?.filter(selectedMedia => !!selectedMedia)
+        .map(media => media.id) ?? [];
+
+    const validMediaCount = resultMedia?.filter(Boolean).length;
     if (validMediaCount === 0) {
       Alert.alert(
         intl.formatMessage({
@@ -325,11 +370,11 @@ const CoverEditorMediaPicker = ({
       return;
     }
     if (!multiSelection) {
-      onFinished(selectedMedias as SourceMedia[]);
+      onFinished(resultMedia?.filter(isDefined) || []);
       return;
     }
 
-    if (durationsFixed && selectedMediasIds.length < maxMedias) {
+    if (durationsFixed && resultMediaId.length < maxMedias) {
       Alert.alert(
         intl.formatMessage(
           {
@@ -342,7 +387,7 @@ const CoverEditorMediaPicker = ({
               'Title of missing media in cover edition to propose duplication',
           },
           {
-            mediaPickedNumber: selectedMediasIds.length,
+            mediaPickedNumber: selectedMedias.filter(m => m !== null).length,
             totalMediaNumber: maxMedias,
           },
         ),
@@ -360,7 +405,10 @@ const CoverEditorMediaPicker = ({
             }),
             onPress: () => {
               const medias = handleDuplicateMedia();
-              if (medias) onFinished(medias);
+              if (medias) {
+                const resultMedia = mapResultWithNonEditable(medias);
+                if (resultMedia) onFinished(resultMedia.filter(isDefined));
+              }
             },
           },
           {
@@ -377,8 +425,16 @@ const CoverEditorMediaPicker = ({
       return;
     }
 
-    onFinished(selectedMedias as SourceMedia[]);
+    onFinished(resultMedia?.filter(isDefined) || []);
   };
+
+  useEffect(() => {
+    if (multiSelection && selectedMedias.length === 0) {
+      // no editable media, let's finish now
+      handleOnFinished();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [onFinished, selectedMedias.length]);
 
   const mediasOrSlot: Array<SourceMedia | null> = durationsFixed
     ? Array.from(
@@ -517,7 +573,7 @@ const CoverEditorMediaPicker = ({
                   <Text variant="small" style={styles.labelMediaSelected}>
                     <FormattedMessage
                       defaultMessage={`{max, plural, =1 {{max} video max} other {{max} videos max}}`}
-                      values={{ max: maxSelectableVideos }}
+                      values={{ max: Math.min(maxSelectableVideos, maxMedias) }}
                       description="CoverEditorMediaPicker - max videos"
                     />
                   </Text>
@@ -557,10 +613,7 @@ const CoverEditorMediaPicker = ({
                                     media.thumbnail ??
                                     media.uri,
                                 }}
-                                style={{
-                                  width: '100%',
-                                  height: '100%',
-                                }}
+                                style={styles.image}
                               />
                             </View>
                             <IconButton
@@ -708,5 +761,9 @@ const stylesheet = createStyleSheet(appearance => ({
   arrowIcon: {
     width: 12,
     marginTop: 3,
+  },
+  image: {
+    width: '100%',
+    height: '100%',
   },
 }));
