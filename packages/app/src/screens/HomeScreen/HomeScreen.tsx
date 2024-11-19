@@ -4,7 +4,7 @@ import { useColorScheme } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { replaceColors } from '@azzapp/shared/lottieHelpers';
 import { mainRoutes } from '#mobileRoutes';
-import { useMainTabBarVisibilityController } from '#components/MainTabBar';
+import { setMainTabBarOpacity } from '#components/MainTabBar';
 import { useRouter } from '#components/NativeRouter';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { useSaveOfflineVCard } from '#helpers/offlineVCard';
@@ -86,7 +86,9 @@ const HomeScreen = ({
 const lottie = require('./assets/home-loader.json');
 
 const HomeScreenFallback = () => {
-  useMainTabBarVisibilityController(false);
+  useEffect(() => {
+    setMainTabBarOpacity(0);
+  }, []);
   const colorScheme = useColorScheme() ?? 'light';
 
   const source = useMemo(

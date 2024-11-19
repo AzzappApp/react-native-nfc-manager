@@ -9,7 +9,7 @@ import { FormattedMessage } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import Link from '#components/Link';
-import { useMainTabBarVisibilityController } from '#components/MainTabBar';
+import { setMainTabBarOpacity } from '#components/MainTabBar';
 import { useRouter } from '#components/NativeRouter';
 import ProfilePostsList from '#components/WebCardPostsList';
 import relayScreen from '#helpers/relayScreen';
@@ -72,7 +72,11 @@ const MediaScreen = ({
 
   const router = useRouter();
 
-  useMainTabBarVisibilityController(true);
+  useEffect(() => {
+    if (hasFocus) {
+      setMainTabBarOpacity(1);
+    }
+  }, [hasFocus]);
 
   useEffect(() => {
     if (profile?.invited || !profile?.webCard?.cardIsPublished) {

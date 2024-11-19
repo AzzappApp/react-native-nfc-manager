@@ -6,7 +6,7 @@ import { graphql, usePreloadedQuery } from 'react-relay';
 import { mainRoutes } from '#mobileRoutes';
 import { colors } from '#theme';
 import Link from '#components/Link';
-import { useMainTabBarVisibilityController } from '#components/MainTabBar';
+import { setMainTabBarOpacity } from '#components/MainTabBar';
 import { useRouter } from '#components/NativeRouter';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import relayScreen from '#helpers/relayScreen';
@@ -30,7 +30,9 @@ const WelcomeScreen = ({
   const { currentUser } = usePreloadedQuery(welcomeScreenQuery, preloadedQuery);
 
   const intl = useIntl();
-  useMainTabBarVisibilityController(false, true);
+  useEffect(() => {
+    setMainTabBarOpacity(0);
+  }, []);
 
   const [showMenu, open, close] = useBoolean(false);
 

@@ -13,7 +13,6 @@ import {
 } from 'react-native';
 import Animated, {
   useAnimatedStyle,
-  useDerivedValue,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
@@ -22,7 +21,7 @@ import { colors } from '#theme';
 import ContactCard, {
   CONTACT_CARD_RATIO,
 } from '#components/ContactCard/ContactCard';
-import { useMainTabBarVisibilityController } from '#components/MainTabBar';
+import { setMainTabBarOpacity } from '#components/MainTabBar';
 import { useCurrentRoute } from '#components/NativeRouter';
 import type { HomeContactCardLandscape_profile$key } from '#relayArtifacts/HomeContactCardLandscape_profile.graphql';
 
@@ -58,21 +57,23 @@ const HomeContactCardLandscape = ({
   const orientationRef = useRef(orientation);
   const visibleSharedValue = useSharedValue(0);
 
-  const tabBarVisibleSharedValue = useDerivedValue(() => {
-    if (!profile) {
-      return 0;
+  const shouldShow =
+    profile?.webCard?.hasCover &&
+    profile?.webCard?.cardIsPublished &&
+    !profile?.invited &&
+    !profile.promotedAsOwner &&
+    currentRoute?.route === 'HOME' &&
+    Math.abs(orientation) === 90;
+
+  useEffect(() => {
+    if (!shouldShow) {
+      return () => {};
     }
-    if (
-      profile?.webCard?.hasCover &&
-      profile?.webCard?.cardIsPublished &&
-      !profile?.invited &&
-      !profile.promotedAsOwner
-    ) {
-      return 1 - visibleSharedValue.value;
-    } else {
-      return 0;
-    }
-  }, [visibleSharedValue]);
+    setMainTabBarOpacity(0);
+    return () => {
+      setMainTabBarOpacity(1);
+    };
+  }, [shouldShow]);
 
   useEffect(() => {
     if (Platform.OS === 'android') {
@@ -129,10 +130,6 @@ const HomeContactCardLandscape = ({
     opacity: profile?.invited ? 0 : visibleSharedValue.value,
   }));
 
-  useMainTabBarVisibilityController(
-    tabBarVisibleSharedValue,
-    Math.abs(orientation) === 90 && currentRoute?.route === 'HOME',
-  );
   const appearance = useColorScheme();
 
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();

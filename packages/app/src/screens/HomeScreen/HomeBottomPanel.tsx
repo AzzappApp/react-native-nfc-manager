@@ -3,6 +3,7 @@ import { useState, useMemo, useCallback, startTransition } from 'react';
 import { StyleSheet, useWindowDimensions, View } from 'react-native';
 import Animated, {
   interpolateColor,
+  useAnimatedReaction,
   useAnimatedStyle,
   useDerivedValue,
 } from 'react-native-reanimated';
@@ -10,7 +11,7 @@ import { graphql, useFragment } from 'react-relay';
 import { getTextColorPrimaryForBackground } from '@azzapp/shared/colorsHelpers';
 import { colors } from '#theme';
 import { CONTACT_CARD_RATIO } from '#components/ContactCard/ContactCard';
-import { useMainTabBarVisibilityController } from '#components/MainTabBar';
+import { setMainTabBarOpacity } from '#components/MainTabBar';
 import TabView from '#ui/TabView';
 import HomeBottomPanelMessage from './HomeBottomPanelMessage';
 import HomeContactCard from './HomeContactCard';
@@ -125,7 +126,13 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
     [panelHeight],
   );
 
-  useMainTabBarVisibilityController(mainTabBarVisible);
+  useAnimatedReaction(
+    () => mainTabBarVisible.value,
+    value => {
+      setMainTabBarOpacity(value);
+    },
+  );
+
   //#endregion
 
   // # region NewContacts notification

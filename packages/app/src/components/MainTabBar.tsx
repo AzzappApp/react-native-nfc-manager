@@ -1,10 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useState,
-} from 'react';
+import { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import {
   useWindowDimensions,
@@ -12,6 +6,7 @@ import {
   type ViewStyle,
 } from 'react-native';
 import Animated, {
+  makeMutable,
   useAnimatedProps,
   useAnimatedStyle,
 } from 'react-native-reanimated';
@@ -19,44 +14,33 @@ import Toast from 'react-native-toast-message';
 import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import { logEvent } from '#helpers/analytics';
 import { getAuthState } from '#helpers/authStore';
-import { createId } from '#helpers/idHelpers';
-import { useIsAuthenticated } from '#hooks/authStateHooks';
 import useScreenInsets from '#hooks/useScreenInsets';
 import BottomMenu from '#ui/BottomMenu';
 import Text from '#ui/Text';
 import { HomeIcon } from './HomeIcon';
-import { useRouter, useScreenHasFocus } from './NativeRouter';
-import type { SharedValue } from 'react-native-reanimated';
+import { useRouter } from './NativeRouter';
 
-const mainTabBarVisibilityStates: Array<{
-  id: string;
-  state: SharedValue<number> | false | true;
-}> = [];
+const mainTabBarOpacity = makeMutable(1);
 
-const mainTabBarVisibleListeners = new Set<() => void>();
-export const useMainTabBarVisibilityController = (
-  visibilityState: SharedValue<number> | false | true,
-  active = true,
-) => {
-  const hasFocus = useScreenHasFocus();
+/**
+ * Set the opacity of the main tab bar.
+ * This will not trigger a re-render of the component.
+ *
+ * @param opacity The opacity to set.
+ */
+export const setMainTabBarOpacity = (opacity: number) => {
+  'worklet';
+  mainTabBarOpacity.value = opacity;
+};
 
-  const id = useMemo(() => createId(), []);
-
-  useLayoutEffect(() => {
-    if (hasFocus && active) {
-      mainTabBarVisibilityStates.push({ id, state: visibilityState });
-      mainTabBarVisibleListeners.forEach(listener => listener());
-    }
-    return () => {
-      const index = mainTabBarVisibilityStates.findIndex(
-        item => item.id === id,
-      );
-      if (index !== -1) {
-        mainTabBarVisibilityStates.splice(index, 1);
-        mainTabBarVisibleListeners.forEach(listener => listener());
-      }
-    };
-  }, [hasFocus, id, visibilityState, active]);
+/**
+ * Retrieve the opacity of the main tab bar.
+ *
+ * @returns The opacity of the main tab bar.
+ */
+export const getMainTabBarOpacity = () => {
+  'worklet';
+  return mainTabBarOpacity.value;
 };
 
 /**
@@ -74,49 +58,27 @@ const MainTabBar = ({
   const insets = useScreenInsets();
   const { width } = useWindowDimensions();
 
-  const [, forceUpdate] = useState(0);
-
-  const authenticated = useIsAuthenticated();
-
-  const visibilityState =
-    mainTabBarVisibilityStates.at(-1)?.state ?? authenticated;
-
   const visibilityStyle = useAnimatedStyle(() => {
-    const visible =
-      visibilityState === true
-        ? 1
-        : visibilityState === false
-          ? 0
-          : visibilityState?.value;
     return {
-      opacity: visible,
+      opacity: mainTabBarOpacity.value,
     };
-  }, [visibilityState]);
+  }, []);
 
   const animatedProps = useAnimatedProps((): {
     pointerEvents: 'auto' | 'box-none' | 'box-only' | 'none' | undefined;
   } => {
-    const pointerEvents =
-      visibilityState === true
-        ? 'box-none'
-        : visibilityState === false
-          ? 'none'
-          : visibilityState?.value === 0
-            ? 'none'
-            : 'box-none';
+    const pointerEvents = mainTabBarOpacity?.value === 0 ? 'none' : 'box-none';
 
     return {
       pointerEvents,
     };
-  }, [visibilityState]);
+  }, []);
 
   const intl = useIntl();
 
   const onItemPress = useCallback(
     (key: string) => {
-      const hasFinishedTransition =
-        visibilityState === true ||
-        (visibilityState as SharedValue<number>).value > 0.99;
+      const hasFinishedTransition = mainTabBarOpacity.value > 0.99;
 
       if (!hasFinishedTransition) return;
 
@@ -138,18 +100,8 @@ const MainTabBar = ({
         });
       }
     },
-    [intl, router, visibilityState],
+    [intl, router],
   );
-
-  useEffect(() => {
-    const listener = () => {
-      forceUpdate(v => v + 1);
-    };
-    mainTabBarVisibleListeners.add(listener);
-    return () => {
-      mainTabBarVisibleListeners.delete(listener);
-    };
-  }, []);
 
   const tabs = useMemo(
     () =>
