@@ -34,12 +34,18 @@ type ProfileStatisticsChartProps = {
    * The variant of the chart (dark or light)
    */
   variant?: 'dark' | 'light';
+
+  /**
+   * Wether the chart is visible or not
+   */
+  visible?: boolean;
 };
 
 const ProfileStatisticsChart = ({
   data,
   width,
   height,
+  visible = true,
   variant = 'dark',
 }: ProfileStatisticsChartProps) => {
   // For the moment we always display the last 30 days
@@ -52,7 +58,11 @@ const ProfileStatisticsChart = ({
   }, []);
   return (
     <View style={{ width, height }}>
-      <BarChart variant={variant} data={data} width={width} height={height} />
+      {visible ? (
+        <BarChart variant={variant} data={data} width={width} height={height} />
+      ) : (
+        <View style={{ width, height }} />
+      )}
       <BarChartLegend
         variant={variant}
         nbDates={30}
@@ -86,7 +96,6 @@ const BarChart = ({
       canvas => {
         canvas.clear(Skia.Color('#00000000'));
         const paint = Skia.Paint();
-        // paint.setColor(Skia.Color('#ffffff'));
         paint.setShader(
           Skia.Shader.MakeLinearGradient(
             { x: 0, y: 0 },
@@ -122,7 +131,7 @@ const BarChart = ({
         height,
       },
     );
-  }, [propData, width, height]);
+  });
 
   return (
     <Canvas style={{ width, height }}>

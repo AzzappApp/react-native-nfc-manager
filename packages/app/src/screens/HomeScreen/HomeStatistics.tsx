@@ -30,12 +30,14 @@ const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 type HomeStatisticsProps = {
   user: HomeStatistics_profiles$key;
   height: number;
+  focused: boolean;
   initialStatsIndex?: number;
 };
 
 const HomeStatistics = ({
   user,
   height,
+  focused,
   initialStatsIndex = 0,
 }: HomeStatisticsProps) => {
   const profiles = useFragment(
@@ -229,6 +231,7 @@ const HomeStatistics = ({
         height={height - BOX_NUMBER_HEIGHT - 5}
         data={animatedChartData}
         variant="dark"
+        visible={focused}
       />
       <AnimatedScrollView
         ref={scrollViewRef}

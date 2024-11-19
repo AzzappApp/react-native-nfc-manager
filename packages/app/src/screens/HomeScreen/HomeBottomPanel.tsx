@@ -207,7 +207,11 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
               id: 'STATS',
               element: (
                 <View style={{ paddingHorizontal: 20, height: panelHeight }}>
-                  <HomeStatistics user={profiles!} height={panelHeight} />
+                  <HomeStatistics
+                    user={profiles!}
+                    height={panelHeight}
+                    focused={selectedPanel === 'STATS'}
+                  />
                 </View>
               ),
             },
