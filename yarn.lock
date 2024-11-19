@@ -218,7 +218,7 @@ __metadata:
     react-native-svg: "npm:^15.9.0"
     react-native-tab-view: "npm:^4.0.1"
     react-native-toast-message: "patch:react-native-toast-message@npm%3A2.2.1#~/.yarn/patches/react-native-toast-message-npm-2.2.1-82329f0933.patch"
-    react-native-vision-camera: "patch:react-native-vision-camera@npm%3A4.5.3#~/.yarn/patches/react-native-vision-camera-npm-4.5.3-7346a97873.patch"
+    react-native-vision-camera: "npm:^4.6.1"
     react-native-webview: "npm:13.12.3"
     react-relay: "npm:^18.1.0"
     react-test-renderer: "npm:^18.3.1"
@@ -23613,9 +23613,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-vision-camera@npm:4.5.3":
-  version: 4.5.3
-  resolution: "react-native-vision-camera@npm:4.5.3"
+"react-native-vision-camera@npm:^4.6.1":
+  version: 4.6.1
+  resolution: "react-native-vision-camera@npm:4.6.1"
   peerDependencies:
     "@shopify/react-native-skia": "*"
     react: "*"
@@ -23629,27 +23629,7 @@ __metadata:
       optional: true
     react-native-worklets-core:
       optional: true
-  checksum: 10/5f2533cd606bb86878f8f2b382d64e8743dc98a5b7ff37f18999cc7cf22dda04a5f7d5994be7a9ff36bb91d98f3a11f8403c4784de0e5f5e9db37614994b54fe
-  languageName: node
-  linkType: hard
-
-"react-native-vision-camera@patch:react-native-vision-camera@npm%3A4.5.3#~/.yarn/patches/react-native-vision-camera-npm-4.5.3-7346a97873.patch":
-  version: 4.5.3
-  resolution: "react-native-vision-camera@patch:react-native-vision-camera@npm%3A4.5.3#~/.yarn/patches/react-native-vision-camera-npm-4.5.3-7346a97873.patch::version=4.5.3&hash=b9efe0"
-  peerDependencies:
-    "@shopify/react-native-skia": "*"
-    react: "*"
-    react-native: "*"
-    react-native-reanimated: "*"
-    react-native-worklets-core: "*"
-  peerDependenciesMeta:
-    "@shopify/react-native-skia":
-      optional: true
-    react-native-reanimated:
-      optional: true
-    react-native-worklets-core:
-      optional: true
-  checksum: 10/9117f1363619f7a56ee78ae4ba5a57d832075321b2b87a5cb474dfaddf7fcef5ecdd1752d51d93f68392f7fe3cfc4e465318b60b25dae34d0c7c2e0b91d73903
+  checksum: 10/742f11a74ca9e3eb3a41c65ba8ac588925b539d6e232f6a2c9c60b2ebcf07997d9a1bca0ef3ac471bf2b6d7eb99a81985a352a73755f8f0ee4aba1898c3b10d1
   languageName: node
   linkType: hard
 

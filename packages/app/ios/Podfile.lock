@@ -2555,11 +2555,11 @@ PODS:
   - Sentry/HybridSDK (8.38.0)
   - SocketRocket (0.7.1)
   - SPTPersistentCache (1.1.0)
-  - VisionCamera (4.5.3):
-    - VisionCamera/Core (= 4.5.3)
-    - VisionCamera/React (= 4.5.3)
-  - VisionCamera/Core (4.5.3)
-  - VisionCamera/React (4.5.3):
+  - VisionCamera (4.6.1):
+    - VisionCamera/Core (= 4.6.1)
+    - VisionCamera/React (= 4.6.1)
+  - VisionCamera/Core (4.6.1)
+  - VisionCamera/React (4.6.1):
     - React-Core
   - Yoga (0.0.0)
 
@@ -2958,7 +2958,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   azzapp-react-native-buffer-loader: f85ec38f698535c0884d76a592b828b755cde3ae
-  azzapp-react-native-skia-video: 8c3c85e089d29a36df78a44535b903ed1d7209c0
+  azzapp-react-native-skia-video: 2b36612bf83bad0ee9b6c7a4a3a77bfa9dd75893
   azzapp-react-native-snapshot-view: ec5ac33dae592e7bb678b4563e5c4108895af284
   boost: 1dca942403ed9342f98334bf4c3621f011aa7946
   DoubleConversion: f16ae600a246532c4020132d54af21d0ddb2a385
@@ -3042,7 +3042,7 @@ SPEC CHECKSUMS:
   react-native-quick-base64: 6ddd4121d8dcb412ad32ca5fa67633dbea8d3761
   react-native-safe-area-context: 2500e4fe998caad50ad3bc51ec23ef951308569e
   react-native-skia: 425a5610939828363e0681b8b3e994dd4f18b711
-  react-native-skottie-template-player: 4abf4dc0370aa2fef5fdd3c26c1809ffcf8c38ec
+  react-native-skottie-template-player: 5a8020f3b50c106209396647b0d1e4c17c826ea8
   react-native-webview: 8039cbb0aa6ad2fd7918e23aebb5586f127d3e91
   React-nativeconfig: 470fce6d871c02dc5eff250a362d56391b7f52d6
   React-NativeModulesApple: 6297fc3136c1fd42884795c51d7207de6312b606
@@ -3097,8 +3097,8 @@ SPEC CHECKSUMS:
   Sentry: 205813e7e758b53df157cedb8c55b31a14300645
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   SPTPersistentCache: df36ea46762d7cf026502bbb86a8b79d0080dff4
-  VisionCamera: afc1c534aee4ab3c48d8c015f6919c8a6117ecb0
-  Yoga: c5b0e913b5b3b4cde588227c1402e747797061f3
+  VisionCamera: 8931fe38c221f2ed42c91367495c2a46111431d7
+  Yoga: 96872ee462cfc43866ad013c8160d4ff6b85709b
 
 PODFILE CHECKSUM: 8b1082a96e754e1d604aa2041d2a2dbe70c3dfcb
 
