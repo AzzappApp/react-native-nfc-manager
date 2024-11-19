@@ -1,5 +1,6 @@
-## 1.4.0-canary.111
+## 1.4.0-canary.112
 
+* **fix:**  - **android:** [#5787](https://github.com/AzzappApp/azzapp/pull/5787) get lower video size ([#5983](https://github.com/AzzappApp/azzapp/pull/5983))
 * **fix:**  - **CoverEditor:** prevent double copy of the same media ([#5981](https://github.com/AzzappApp/azzapp/pull/5981))
 * **fix:**  - ensure No media selected is computed on the good prop ([#5979](https://github.com/AzzappApp/azzapp/pull/5979))
 * **fix:**  - **Home:** revert translate after sclae ([#5976](https://github.com/AzzappApp/azzapp/pull/5976))
