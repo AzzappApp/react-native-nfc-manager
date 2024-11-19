@@ -1,5 +1,6 @@
-## 1.4.0-canary.108
+## 1.4.0-canary.109
 
+* **fix:**  - **Home:** revert translate after sclae ([#5976](https://github.com/AzzappApp/azzapp/pull/5976))
 * **build:**  - remove vision camera patch ([#5972](https://github.com/AzzappApp/azzapp/pull/5972))
 * **fix:**  - Add workaround to avoid screen blinking when changing navigation tab ([#5975](https://github.com/AzzappApp/azzapp/pull/5975))
 * **fix:**  - **android:** [#5694](https://github.com/AzzappApp/azzapp/pull/5694) wrong height on android on webCard content ([#5961](https://github.com/AzzappApp/azzapp/pull/5961))
