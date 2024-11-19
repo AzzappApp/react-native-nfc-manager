@@ -1,5 +1,4 @@
 import { useMemo, useRef, forwardRef } from 'react';
-import { Platform, StatusBar, useWindowDimensions } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import Animated, {
   FadeIn,
@@ -8,6 +7,7 @@ import Animated, {
   useAnimatedStyle,
 } from 'react-native-reanimated';
 import { mergeRefs } from '#helpers/mergeRefs';
+import useScreenDimensions from '#hooks/useScreenDimensions';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import { HEADER_HEIGHT } from '#ui/Header';
@@ -18,7 +18,6 @@ import {
 import { useEditTransition } from './WebCardScreenTransitions';
 import type { ForwardedRef, ReactNode } from 'react';
 import type { ScrollViewProps } from 'react-native';
-import useScreenDimensions from '#hooks/useScreenDimensions';
 
 export type WebCardScreenScrollViewProps = Omit<ScrollViewProps, 'hitSlop'> & {
   /**

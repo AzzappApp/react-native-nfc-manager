@@ -6,9 +6,9 @@ import {
   vec,
 } from '@shopify/react-native-skia';
 import { StyleSheet, View } from 'react-native';
+import useScreenDimensions from '#hooks/useScreenDimensions';
 import type { Color } from '@shopify/react-native-skia';
 import type { DerivedValue, ParsedColorArray } from 'react-native-reanimated';
-import useScreenDimensions from '#hooks/useScreenDimensions';
 
 const WebCardBackground = ({
   colors,

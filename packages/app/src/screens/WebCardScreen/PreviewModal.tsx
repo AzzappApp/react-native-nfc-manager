@@ -1,17 +1,17 @@
 import { Suspense } from 'react';
 import { useIntl } from 'react-intl';
-import { Platform, StatusBar, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { useModulesData } from '#components/cardModules/ModuleData';
 import { ScreenModal } from '#components/NativeRouter';
 import WebCardPreview from '#components/WebCardPreview';
+import useScreenDimensions from '#hooks/useScreenDimensions';
 import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import type { PreviewModal_webCard$key } from '#relayArtifacts/PreviewModal_webCard.graphql';
-import useScreenDimensions from '#hooks/useScreenDimensions';
 
 type PreviewModalProps = {
   webCard: PreviewModal_webCard$key;
