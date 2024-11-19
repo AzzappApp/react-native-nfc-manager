@@ -61,13 +61,28 @@ const SearchTabContainer = ({
       {
         key: 'searchProfiles',
         label: (
-          <Text>
+          <Text
+            style={{
+              color: 'none',
+            }}
+          >
             {intl.formatMessage(
               {
                 defaultMessage: 'Webcards{azzappA}',
                 description: 'Search screen tab label : webcard',
               },
-              { azzappA: <Text variant="azzapp">a</Text> },
+              {
+                azzappA: (
+                  <Text
+                    variant="azzapp"
+                    style={{
+                      color: 'none',
+                    }}
+                  >
+                    a
+                  </Text>
+                ),
+              },
             )}
           </Text>
         ),
@@ -183,7 +198,13 @@ const SearchTabContainer = ({
       commonOptions={{
         label: ({ route }) =>
           typeof route.label === 'string' ? (
-            <Text>{route.label}</Text>
+            <Text
+              style={{
+                color: 'none',
+              }}
+            >
+              {route.label}
+            </Text>
           ) : (
             route.label
           ),
