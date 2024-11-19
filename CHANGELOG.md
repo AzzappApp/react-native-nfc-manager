@@ -1,4 +1,4 @@
-## 1.4.0-canary.113
+## 1.4.0-canary.114
 
 * **fix:**  - **payment:** [#5971](https://github.com/AzzappApp/azzapp/pull/5971) check that user has at least one active subscription ([#5988](https://github.com/AzzappApp/azzapp/pull/5988))
 * **fix:**  - **mediaPicker:** wrong seconds duration ([#5982](https://github.com/AzzappApp/azzapp/pull/5982))
