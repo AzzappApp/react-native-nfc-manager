@@ -105,7 +105,7 @@ const WebCardScreenScrollView = (
 
   const footerStyle = useAnimatedStyle(() => {
     return {
-      opacity: editTransition?.value ?? 0,
+      opacity: editing ? (editTransition?.value ?? 0) : 0,
       width: windowWidth,
       transform: [
         {
@@ -141,14 +141,12 @@ const WebCardScreenScrollView = (
       >
         <Animated.View style={contentContainerStyle}>
           {children}
-          {editing && (
-            <Animated.View
-              entering={FadeIn.duration(EDIT_TRANSITION_DURATION)}
-              exiting={FadeOut.duration(EDIT_TRANSITION_DURATION)}
-            >
-              <Animated.View style={footerStyle}>{editFooter}</Animated.View>
-            </Animated.View>
-          )}
+          <Animated.View
+            entering={FadeIn.duration(EDIT_TRANSITION_DURATION)}
+            exiting={FadeOut.duration(EDIT_TRANSITION_DURATION)}
+          >
+            <Animated.View style={footerStyle}>{editFooter}</Animated.View>
+          </Animated.View>
         </Animated.View>
       </ScrollView>
     </Animated.View>
