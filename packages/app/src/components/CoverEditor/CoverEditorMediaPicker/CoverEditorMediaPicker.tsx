@@ -355,7 +355,7 @@ const CoverEditorMediaPicker = ({
         ?.filter(selectedMedia => !!selectedMedia)
         .map(media => media.id) ?? [];
 
-    const validMediaCount = resultMedia?.filter(Boolean).length;
+    const validMediaCount = selectedMedias?.filter(Boolean).length;
     if (validMediaCount === 0) {
       Alert.alert(
         intl.formatMessage({
