@@ -237,7 +237,7 @@ type ItemRenderProps = {
   item: ProfileType;
   coverWidth: number;
   coverHeight: number;
-  scrollToIndex: (index: number) => void;
+  scrollToIndex: (index: number, animated?: boolean) => void;
   isCurrent: boolean;
 };
 
@@ -325,7 +325,7 @@ const ItemRenderComponent = ({
 
   const onContainerPress = useCallback(() => {
     if (!isCurrent) {
-      scrollToIndex(index);
+      scrollToIndex(index, true);
     }
   }, [scrollToIndex, isCurrent, index]);
 

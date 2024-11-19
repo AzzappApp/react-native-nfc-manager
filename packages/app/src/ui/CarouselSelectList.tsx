@@ -170,7 +170,9 @@ function CarouselSelectList<TItem = any>(
         if (itemWidth == null) {
           return;
         }
-        scrollIndex.value = index;
+        if (!animated) {
+          scrollIndex.value = index;
+        }
         listRef.current?.scrollToOffset({
           offset: index * itemWidth,
           animated,
