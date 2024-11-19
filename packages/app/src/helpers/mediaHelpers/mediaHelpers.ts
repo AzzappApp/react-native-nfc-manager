@@ -30,10 +30,11 @@ export const display2digit = (n: number) => (n >= 10 ? `${n}` : `0${n}`);
  * @returns A string in the form of hh:mm:ss or mm:ss if the time is less than an hour.
  */
 export const formatVideoTime = (timeInSeconds = 0) => {
-  const seconds = Math.floor(timeInSeconds);
+  let seconds = Math.floor(timeInSeconds);
   let minutes = Math.floor(timeInSeconds / 60);
   const hours = Math.floor(minutes / 60);
   minutes = minutes % 60;
+  seconds = seconds % 60;
   if (hours) {
     return `${display2digit(hours)}:${display2digit(minutes)}:${display2digit(
       seconds,
