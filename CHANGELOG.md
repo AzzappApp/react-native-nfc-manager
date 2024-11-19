@@ -1,5 +1,6 @@
-## 1.4.0-canary.105
+## 1.4.0-canary.106
 
+* **fix:**  - **android:** [#5694](https://github.com/AzzappApp/azzapp/pull/5694) wrong height on android on webCard content ([#5961](https://github.com/AzzappApp/azzapp/pull/5961))
 * **fix:**  - 🐛 force bottom panel height ([#5960](https://github.com/AzzappApp/azzapp/pull/5960))
 * **fix:**  - sometimes webcard build footer is not displayed ([#5959](https://github.com/AzzappApp/azzapp/pull/5959))
 * **fix:**  - **android:** glitch when tap on previous/next cover ([#5966](https://github.com/AzzappApp/azzapp/pull/5966))
