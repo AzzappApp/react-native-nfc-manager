@@ -351,22 +351,24 @@ const AnimatedItemWrapper = ({
   containerWidth: number;
 }) => {
   const animatedStyle = useAnimatedStyle(() => {
+    const offset = (width - width * scaleRatio) / 2;
+    const offsetCenter = (containerWidth - width) / 2 - width * scaleRatio;
+    const translateX = interpolate(
+      scrollIndex.value,
+      [index - 1, index, index + 1],
+      [-offset + offsetCenter / 2, 0, offset - offsetCenter / 2],
+      Extrapolation.EXTEND,
+    );
+
     const scale = interpolate(
       scrollIndex.value,
       [index - 1, index, index + 1],
       [scaleRatio, 1, scaleRatio],
       Extrapolation.CLAMP,
     );
-    const offset = (width - width * scale) / 2;
-    const offsetCenter = (containerWidth - width - width * scale) / 2;
-    const translateX = interpolate(
-      scrollIndex.value,
-      [index - 1, index, index + 1],
-      [-offset - offsetCenter / 2, 0, offset + offsetCenter / 2],
-      Extrapolation.EXTEND,
-    );
+
     return {
-      transform: [{ scale }, { translateX }],
+      transform: [{ translateX }, { scale }],
     };
   });
   return (
