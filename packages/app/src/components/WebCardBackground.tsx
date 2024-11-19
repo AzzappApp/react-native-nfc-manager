@@ -5,11 +5,10 @@ import {
   Rect,
   vec,
 } from '@shopify/react-native-skia';
-import { Dimensions, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import type { Color } from '@shopify/react-native-skia';
 import type { DerivedValue, ParsedColorArray } from 'react-native-reanimated';
-
-const { width, height } = Dimensions.get('screen');
+import useScreenDimensions from '#hooks/useScreenDimensions';
 
 const WebCardBackground = ({
   colors,
@@ -19,6 +18,7 @@ const WebCardBackground = ({
     | DerivedValue<ParsedColorArray[] | string[]>
     | DerivedValue<string[]>;
 }) => {
+  const { width, height } = useScreenDimensions();
   return (
     <View style={StyleSheet.absoluteFill}>
       <Canvas style={{ flex: 1 }}>

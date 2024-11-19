@@ -1,5 +1,5 @@
 import { useMemo, useRef, forwardRef } from 'react';
-import { useWindowDimensions } from 'react-native';
+import { Platform, StatusBar, useWindowDimensions } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import Animated, {
   FadeIn,
@@ -18,6 +18,7 @@ import {
 import { useEditTransition } from './WebCardScreenTransitions';
 import type { ForwardedRef, ReactNode } from 'react';
 import type { ScrollViewProps } from 'react-native';
+import useScreenDimensions from '#hooks/useScreenDimensions';
 
 export type WebCardScreenScrollViewProps = Omit<ScrollViewProps, 'hitSlop'> & {
   /**
@@ -58,8 +59,10 @@ const WebCardScreenScrollView = (
 
   const scrollViewRef = useRef<ScrollView>(null);
 
-  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
+  const { width: screenWidth, height: screenHeight } = useScreenDimensions();
+
   const insets = useScreenInsets();
+
   const containerStyle = useAnimatedStyle(() => {
     const editProgress = editTransition?.value ?? 0;
     const editToGap = insets.top + HEADER_HEIGHT;
@@ -69,17 +72,17 @@ const WebCardScreenScrollView = (
       left: interpolate(
         editProgress,
         [0, 1],
-        [0, (windowWidth - windowWidth / editScale) / 2],
+        [0, (screenWidth - screenWidth / editScale) / 2],
       ),
       height: interpolate(
         editProgress,
         [0, 1],
-        [windowHeight, (windowHeight - editToGap) / editScale],
+        [screenHeight, (screenHeight - editToGap) / editScale],
       ),
       width: interpolate(
         editProgress,
         [0, 1],
-        [windowWidth, windowWidth / editScale],
+        [screenWidth, screenWidth / editScale],
       ),
       transform: [
         {
@@ -98,7 +101,7 @@ const WebCardScreenScrollView = (
     return {
       paddingVertical: editProgress * 20,
       marginBottom:
-        (insets.bottom + BOTTOM_MENU_HEIGHT + 20) *
+        (insets.bottom + BOTTOM_MENU_HEIGHT) *
         (1 + (editProgress * 1) / editScale),
     };
   });
@@ -106,7 +109,7 @@ const WebCardScreenScrollView = (
   const footerStyle = useAnimatedStyle(() => {
     return {
       opacity: editing ? (editTransition?.value ?? 0) : 0,
-      width: windowWidth,
+      width: screenWidth,
       transform: [
         {
           scale: interpolate(
