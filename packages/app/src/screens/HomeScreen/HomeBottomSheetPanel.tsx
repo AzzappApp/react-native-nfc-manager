@@ -9,6 +9,7 @@ import {
   Alert,
   Linking,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
@@ -79,6 +80,7 @@ const HomeBottomSheetPanel = ({
     profileKey ?? null,
   );
 
+  const { bottom } = useSafeAreaInsets();
   const intl = useIntl();
   const deleteFcmToken = useDeleteNotifications();
 
@@ -411,12 +413,32 @@ const HomeBottomSheetPanel = ({
     [close, intl, onLogout, onShare, profile, userIsPremium],
   );
 
+  const hasQuitWebcard = profile && !profileIsOwner(profile?.profileRole);
+
+  const height = useMemo(() => {
+    const QUIT_WEBCARD_HEIGHT = hasQuitWebcard ? 30 : 0;
+
+    return elements.reduce(
+      (accumulator, currentValue) => {
+        if (currentValue.type === 'separator') {
+          accumulator += SEPARATOR_HEIGHT;
+        } else {
+          accumulator += ELEMENT_HEIGHT;
+        }
+
+        return accumulator;
+      },
+      bottom + HANDLE_HEIGHT + QUIT_WEBCARD_HEIGHT,
+    );
+  }, [bottom, elements, hasQuitWebcard]);
+
   return (
     <BottomSheetModal
       index={0}
       visible={visible}
       onDismiss={onDismiss}
       enablePanDownToClose
+      height={height}
     >
       {elements.map((element, index) => {
         if (element.type === 'separator') {
@@ -424,7 +446,7 @@ const HomeBottomSheetPanel = ({
         }
         return <HomeBottomSheetPanelOption key={index} {...element} />;
       })}
-      {profile && !profileIsOwner(profile?.profileRole) && (
+      {hasQuitWebcard && (
         <PressableNative
           style={styles.removeButton}
           onPress={handleConfirmationQuitWebCard}
@@ -445,7 +467,6 @@ const HomeBottomSheetPanel = ({
           </Text>
         </PressableNative>
       )}
-      <View style={styles.extraBottom} collapsable={false} />
     </BottomSheetModal>
   );
 };
@@ -491,10 +512,13 @@ const HomeBottomSheetPanelOption = ({
   return inner;
 };
 
+const SEPARATOR_HEIGHT = 25;
+const ELEMENT_HEIGHT = 42;
+const HANDLE_HEIGHT = 50;
+
 const ROW_HEIGHT = 42;
 const styles = StyleSheet.create({
   separator: { height: 25 },
-  extraBottom: { height: 50 },
   bottomSheetOptionButton: {
     paddingVertical: 5,
     paddingHorizontal: 20,
