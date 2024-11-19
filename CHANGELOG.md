@@ -1,4 +1,4 @@
-## 1.4.0-canary.106
+## 1.4.0-canary.107
 
 * **fix:**  - **android:** [#5694](https://github.com/AzzappApp/azzapp/pull/5694) wrong height on android on webCard content ([#5961](https://github.com/AzzappApp/azzapp/pull/5961))
 * **fix:**  - 🐛 force bottom panel height ([#5960](https://github.com/AzzappApp/azzapp/pull/5960))
