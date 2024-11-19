@@ -578,10 +578,24 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
     const { data, count } = result;
     return connectionFromArraySlice(
       data.map(video => {
-        const videoFile = video.video_files.find(
-          ({ quality, width, height }) =>
-            quality === 'hd' && width != null && height != null,
-        );
+        const videoFile = video.video_files
+          .filter(
+            ({ quality, width, height }) =>
+              quality === 'hd' && width != null && height != null,
+          )
+          .reduce((lowest: Video['video_files'][number] | null, current) => {
+            // Compare based on width or height
+            if (
+              !lowest?.width ||
+              !lowest?.height ||
+              (current.width &&
+                current.height &&
+                current.width * current.height < lowest.width * lowest.height)
+            ) {
+              return current;
+            }
+            return lowest;
+          }, null);
 
         return {
           id: `pexels_v_${video.id}`,
