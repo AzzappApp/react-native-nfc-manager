@@ -755,7 +755,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
                 description:
                   'Title placeholder in PhotoWithTextAndTitle module',
               })}
-              value={title ?? ''}
+              defaultValue={title ?? ''}
               onChangeText={onTitleChange}
               onFocus={() => {
                 if (title === undefined) {
