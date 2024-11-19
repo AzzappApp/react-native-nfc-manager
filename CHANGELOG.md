@@ -1,5 +1,9 @@
-## 1.4.0-canary.103
+## 1.4.0-canary.104
 
+* **fix:**  - sometimes webcard build footer is not displayed ([#5959](https://github.com/AzzappApp/azzapp/pull/5959))
+* **fix:**  - **android:** glitch when tap on previous/next cover ([#5966](https://github.com/AzzappApp/azzapp/pull/5966))
+* **fix:**  - **Home:** refactor MainTabBar opacity control ([#5967](https://github.com/AzzappApp/azzapp/pull/5967))
+* **fix:**  - **Home:** rerender chart when appearing ([#5970](https://github.com/AzzappApp/azzapp/pull/5970))
 * **fix:**  - **Navigation:** prevent navigating to the same route ([#5962](https://github.com/AzzappApp/azzapp/pull/5962))
 * **feat:**  - 🎸 correctly display webcard conver in tab bar ([#5958](https://github.com/AzzappApp/azzapp/pull/5958))
 * **fix:**  - 🐛 reset edited color on close picker/editor ([#5957](https://github.com/AzzappApp/azzapp/pull/5957))
