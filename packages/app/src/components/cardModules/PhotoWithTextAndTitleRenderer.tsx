@@ -257,6 +257,7 @@ const PhotoWithTextAndTitleRenderer = ({
           'marginHorizontal' in rest && imageMargin !== 'width_full'
             ? rest.marginHorizontal
             : 0,
+        borderRadius: 'borderRadius' in rest ? rest.borderRadius : 0,
       };
     }
 
