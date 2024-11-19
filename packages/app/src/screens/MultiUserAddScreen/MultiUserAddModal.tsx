@@ -595,7 +595,7 @@ const MultiUserAddModal = (
       <Container style={{ flex: 1 }}>
         <SafeAreaView
           style={{ flex: 1 }}
-          edges={{ bottom: 'off', top: 'additive' }}
+          edges={{ bottom: 'additive', top: 'additive' }}
         >
           <Header
             middleElement={
