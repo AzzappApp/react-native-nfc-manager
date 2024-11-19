@@ -179,7 +179,7 @@ function CarouselSelectList<TItem = any>(
         });
       },
     }),
-    [itemWidth],
+    [itemWidth, scrollIndex],
   );
 
   useEffect(() => {
