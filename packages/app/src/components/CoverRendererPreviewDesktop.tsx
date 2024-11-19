@@ -110,6 +110,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     width: '100%',
+    // TODO remove aspect ratio
     aspectRatio: COVER_RATIO,
   },
   cover: { alignSelf: 'center', borderRadius: 35 },

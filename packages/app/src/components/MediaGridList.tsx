@@ -172,7 +172,7 @@ const MediaItemRenderer = ({
   return (
     <PressableNative
       style={{
-        aspectRatio: 1,
+        width: height,
         height,
         position: 'relative',
         backgroundColor:

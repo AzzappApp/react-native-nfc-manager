@@ -268,6 +268,8 @@ const PhotoWithTextAndTitleRenderer = ({
           : imageMargin === 'width_full'
             ? 0
             : animatedData.marginHorizontal.value,
+
+      // TODO remove aspectRatio
       aspectRatio: animatedData.aspectRatio.value ?? 1,
       borderRadius: animatedData.borderRadius.value ?? 0,
     };

@@ -1,7 +1,6 @@
 import { FormattedMessage } from 'react-intl';
 import { View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import {
   createVariantsStyleSheet,
@@ -201,7 +200,6 @@ const stylesheet = createVariantsStyleSheet(appearance => ({
       borderCurve: 'continuous',
       marginRight: 10,
       backgroundColor: appearance === 'light' ? colors.grey200 : colors.grey200,
-      aspectRatio: COVER_RATIO,
       overflow: 'hidden',
     },
   },

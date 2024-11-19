@@ -116,6 +116,7 @@ const styles = StyleSheet.create({
   template: {
     width: '100%',
     borderRadius: 40,
+    // TODO remove aspect ratio
     aspectRatio: COVER_RATIO,
     overflow: 'hidden',
   },

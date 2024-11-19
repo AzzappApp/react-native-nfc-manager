@@ -852,6 +852,7 @@ const styles = StyleSheet.create({
     flex: 1,
     margin: 40,
     alignSelf: 'center',
+    // TODO remove aspectRatio
     aspectRatio: COVER_RATIO,
   },
   coverPreview: {

@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
 
   profilePlaceHolder: {
     width: 80,
-    aspectRatio: COVER_RATIO,
+    height: 80 / COVER_RATIO,
     padding: '5%',
     borderRadius: COVER_CARD_RADIUS * 80,
     marginLeft: 5,

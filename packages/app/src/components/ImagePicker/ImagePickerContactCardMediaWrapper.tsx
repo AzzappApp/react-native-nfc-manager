@@ -41,6 +41,7 @@ const styleSheet = createStyleSheet(appearance => ({
   shadowBox: [
     {
       flex: 1,
+      // TODO remove aspectRatio
       aspectRatio: 1,
     },
     shadow(appearance, 'bottom'),

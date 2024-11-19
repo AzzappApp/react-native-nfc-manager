@@ -386,6 +386,7 @@ const stylesheet = createStyleSheet(appearance => ({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
+    // TODO remove aspect ratio
     aspectRatio: 1,
   },
   buttonContainerCommon: {

@@ -342,6 +342,7 @@ const ImagePickerContextProviderInner = (
       minVideoDuration,
       media,
       skImage,
+      // TODO remove aspectRatio
       aspectRatio:
         aspectRatio ??
         (media != null

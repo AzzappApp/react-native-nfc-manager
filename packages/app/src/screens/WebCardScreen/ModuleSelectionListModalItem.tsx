@@ -123,6 +123,7 @@ const styleSheet = createStyleSheet(appearance => ({
     flex: 1,
     backgroundColor: appearance === 'light' ? colors.white : colors.grey900,
     borderRadius: 10,
+    //TODO remove aspect ratio
     aspectRatio: RATIO_MODULE,
     marginHorizontal: 5,
     ...shadow(appearance, 'bottom'),

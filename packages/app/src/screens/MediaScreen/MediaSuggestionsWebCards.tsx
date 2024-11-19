@@ -310,8 +310,8 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   coverContainerFallback: {
     width: COVER_SUGGESTIONS_WIDTH,
+    height: COVER_SUGGESTIONS_WIDTH / COVER_RATIO,
     borderRadius: COVER_SUGGESTIONS_WIDTH * COVER_CARD_RADIUS,
-    aspectRatio: COVER_RATIO,
   },
   bottomActions: {
     flexDirection: 'row',

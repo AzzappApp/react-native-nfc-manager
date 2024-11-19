@@ -222,7 +222,7 @@ const PostRenderer = ({
       width={width}
       style={{
         width,
-        aspectRatio: ratio,
+        height: width / ratio,
       }}
       videoDisabled={videoDisabled}
       muted

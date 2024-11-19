@@ -215,12 +215,12 @@ const ItemList = ({
         ...styles.coverContainerStyle,
         borderRadius: COVER_CARD_RADIUS * coverWidth,
         width: coverWidth,
-        aspectRatio: COVER_RATIO,
+        height: coverWidth / COVER_RATIO,
       };
     }
     return {
       width: coverWidth,
-      aspectRatio: COVER_RATIO,
+      height: coverWidth / COVER_RATIO,
     };
   }, [coverWidth, styles.coverContainerStyle, withShadow]);
 

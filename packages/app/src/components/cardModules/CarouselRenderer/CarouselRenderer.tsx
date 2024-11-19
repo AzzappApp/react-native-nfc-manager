@@ -256,6 +256,7 @@ const CarouselRenderer = ({
                 imageStyle,
                 {
                   borderColor: swapColor(borderColor, colorPalette),
+                  // TODO remove aspectRatio
                   aspectRatio: squareRatio ? 1 : image.aspectRatio,
                   resizeMode: 'cover',
                 },

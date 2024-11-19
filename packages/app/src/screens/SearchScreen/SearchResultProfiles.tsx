@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
   },
   profilePlaceHolder: {
     width: COVER_WIDTH - 8,
-    aspectRatio: COVER_RATIO,
+    height: (COVER_WIDTH - 8) / COVER_RATIO,
     borderRadius: (COVER_WIDTH - 4) * COVER_CARD_RADIUS,
     marginBottom: 8,
   },

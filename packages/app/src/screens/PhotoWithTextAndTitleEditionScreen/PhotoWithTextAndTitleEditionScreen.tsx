@@ -484,6 +484,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
       borderRadius: borderRadius.value,
       marginVertical: marginVertical.value,
       gap: gap.value,
+      // TODO remove aspectRatio
       aspectRatio: aspectRatio.value,
       image: mediaId ?? value.image!.id,
     };

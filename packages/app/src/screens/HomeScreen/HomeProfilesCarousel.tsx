@@ -351,7 +351,7 @@ const ItemRenderComponent = ({
           <View
             style={{
               width: coverWidth,
-              aspectRatio: 0.625,
+              height: coverWidth / COVER_RATIO,
               justifyContent: 'center',
               alignItems: 'center',
               borderRadius: coverWidth * COVER_CARD_RADIUS,

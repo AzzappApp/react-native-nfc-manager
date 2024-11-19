@@ -101,6 +101,7 @@ const AVATAR_DEFAULT_WIDTH = 80;
 const styleSheet = createStyleSheet(appearance => ({
   placeholder: {
     backgroundColor: colors.grey1000,
+    // TODO remove aspect ratio
     aspectRatio: COVER_RATIO,
     paddingTop: 20,
     paddingHorizontal: 10,

@@ -1,6 +1,5 @@
 import EditImageStep from './EditImageStep';
 import ImagePicker from './ImagePicker';
-import ImagePickerCardMediaWrapper from './ImagePickerCardMediaWrapper';
 import ImagePickerContactCardMediaWrapper from './ImagePickerContactCardMediaWrapper';
 import { useImagePickerState } from './ImagePickerContext';
 import ImagePickerMediaRenderer from './ImagePickerMediaRenderer';
@@ -20,7 +19,6 @@ export {
   SelectImageStepWithFrontCameraByDefault,
   VideoTimeRangeStep,
   ImagePickerMediaRenderer,
-  ImagePickerCardMediaWrapper,
   ImagePickerContactCardMediaWrapper,
   useImagePickerState,
 };

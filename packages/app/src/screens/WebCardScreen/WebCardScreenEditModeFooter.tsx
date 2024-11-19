@@ -169,6 +169,7 @@ const stylesheet = createStyleSheet(theme => ({
   },
   lottie: {
     width: '60%',
+    //TODO remove aspect ratio
     aspectRatio: 2.5,
     borderRadius: 15,
     overflow: 'hidden',
