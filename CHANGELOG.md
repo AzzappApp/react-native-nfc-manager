@@ -1,5 +1,6 @@
-## 1.4.0-canary.104
+## 1.4.0-canary.105
 
+* **fix:**  - 🐛 force bottom panel height ([#5960](https://github.com/AzzappApp/azzapp/pull/5960))
 * **fix:**  - sometimes webcard build footer is not displayed ([#5959](https://github.com/AzzappApp/azzapp/pull/5959))
 * **fix:**  - **android:** glitch when tap on previous/next cover ([#5966](https://github.com/AzzappApp/azzapp/pull/5966))
 * **fix:**  - **Home:** refactor MainTabBar opacity control ([#5967](https://github.com/AzzappApp/azzapp/pull/5967))
