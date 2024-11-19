@@ -7,10 +7,10 @@ import {
   getWebCardsOwnerUsers,
   getCardModulesByWebCards,
   activeUserSubscription,
-  getActiveUserSubscriptionForWebCard,
   getProfileByUserAndWebCard,
   isFollowing,
   getContactsByUser,
+  getUserSubscriptionForUserOrWebCard,
 } from '@azzapp/data';
 import {
   createDataLoader,
@@ -276,7 +276,7 @@ export const activeSubscriptionsForWebCardLoader = createSessionDataLoader(
     const webCardIds = keys.map(k => k.webCardId);
     const userIds = keys.map(k => k.userId);
 
-    const userSubscriptions = await getActiveUserSubscriptionForWebCard(
+    const userSubscriptions = await getUserSubscriptionForUserOrWebCard(
       userIds,
       webCardIds,
     );

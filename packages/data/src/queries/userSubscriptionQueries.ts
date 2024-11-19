@@ -157,6 +157,34 @@ export const getActiveUserSubscriptionForWebCard = async (
     );
 };
 
+export const getUserSubscriptionForUserOrWebCard = async (
+  userIds: string[],
+  webCardIds: string[],
+) => {
+  const currentDate = new Date();
+  return db()
+    .select()
+    .from(UserSubscriptionTable)
+    .where(
+      and(
+        webCardIds.length
+          ? or(
+              and(inArray(UserSubscriptionTable.userId, [...new Set(userIds)])),
+              inArray(UserSubscriptionTable.webCardId, webCardIds),
+            )
+          : and(inArray(UserSubscriptionTable.userId, userIds)),
+        or(
+          eq(UserSubscriptionTable.status, 'active'),
+          gte(UserSubscriptionTable.endAt, currentDate),
+        ),
+      ),
+    )
+    .orderBy(
+      asc(UserSubscriptionTable.status),
+      desc(UserSubscriptionTable.webCardId),
+    );
+};
+
 /**
  * Retrieve the active user subscription for a given web card id
  *
