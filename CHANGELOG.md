@@ -1,5 +1,10 @@
-## 1.4.0-canary.112
+## 1.4.0-canary.113
 
+* **fix:**  - **payment:** [#5971](https://github.com/AzzappApp/azzapp/pull/5971) check that user has at least one active subscription ([#5988](https://github.com/AzzappApp/azzapp/pull/5988))
+* **fix:**  - **mediaPicker:** wrong seconds duration ([#5982](https://github.com/AzzappApp/azzapp/pull/5982))
+* **fix:**  - **CoverEditor:** use pressable native , revert Android animaton ([#5985](https://github.com/AzzappApp/azzapp/pull/5985))
+* **fix:**  - fix title typing issue ([#5986](https://github.com/AzzappApp/azzapp/pull/5986))
+* **fix:**  - overlap with system bar MultiUserAdd ([#5987](https://github.com/AzzappApp/azzapp/pull/5987))
 * **fix:**  - **android:** [#5787](https://github.com/AzzappApp/azzapp/pull/5787) get lower video size ([#5983](https://github.com/AzzappApp/azzapp/pull/5983))
 * **fix:**  - **CoverEditor:** prevent double copy of the same media ([#5981](https://github.com/AzzappApp/azzapp/pull/5981))
 * **fix:**  - ensure No media selected is computed on the good prop ([#5979](https://github.com/AzzappApp/azzapp/pull/5979))
