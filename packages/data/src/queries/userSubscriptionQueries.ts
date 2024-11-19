@@ -124,8 +124,8 @@ export const activeUserSubscription = async (
 
 // TODO document this function properly
 export const getActiveUserSubscriptionForWebCard = async (
-  userIds: string[],
-  webCardIds: string[],
+  userId: string,
+  webCardId: string,
 ) => {
   const currentDate = new Date();
   return db()
@@ -133,18 +133,13 @@ export const getActiveUserSubscriptionForWebCard = async (
     .from(UserSubscriptionTable)
     .where(
       and(
-        webCardIds.length
-          ? or(
-              and(
-                inArray(UserSubscriptionTable.userId, [...new Set(userIds)]),
-                isNull(UserSubscriptionTable.webCardId),
-              ),
-              inArray(UserSubscriptionTable.webCardId, webCardIds),
-            )
-          : and(
-              inArray(UserSubscriptionTable.userId, userIds),
-              isNull(UserSubscriptionTable.webCardId),
-            ),
+        or(
+          and(
+            eq(UserSubscriptionTable.userId, userId),
+            isNull(UserSubscriptionTable.webCardId),
+          ),
+          eq(UserSubscriptionTable.webCardId, webCardId),
+        ),
         or(
           eq(UserSubscriptionTable.status, 'active'),
           gte(UserSubscriptionTable.endAt, currentDate),

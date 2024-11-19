@@ -36,8 +36,8 @@ const checkSubscription = async (
 ) => {
   const result = { hasActiveSubscription: false, hasEnoughSeats: false };
   const userSubscription = await getActiveUserSubscriptionForWebCard(
-    [userId],
-    [webCardId],
+    userId,
+    webCardId,
   );
 
   const lifetime = userSubscription.find(
@@ -119,7 +119,7 @@ export const updateMonthlySubscription = async (
   userId: string,
   webCardId: string,
 ) => {
-  const subs = await getActiveUserSubscriptionForWebCard([userId], [webCardId]);
+  const subs = await getActiveUserSubscriptionForWebCard(userId, webCardId);
 
   const monthly = subs.find(
     subscription => subscription.subscriptionPlan === 'web.monthly',
