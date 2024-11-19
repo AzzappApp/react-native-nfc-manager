@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import {
+  useColorScheme,
   useWindowDimensions,
   type StyleProp,
   type ViewStyle,
@@ -10,15 +11,13 @@ import Animated, {
   useAnimatedProps,
   useAnimatedStyle,
 } from 'react-native-reanimated';
-import Toast from 'react-native-toast-message';
-import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
-import { logEvent } from '#helpers/analytics';
-import { getAuthState } from '#helpers/authStore';
+import { colors } from '#theme';
 import useScreenInsets from '#hooks/useScreenInsets';
 import BottomMenu from '#ui/BottomMenu';
 import Text from '#ui/Text';
 import { HomeIcon } from './HomeIcon';
 import { useRouter } from './NativeRouter';
+import { openShakeShare } from './ShakeShare';
 
 const mainTabBarOpacity = makeMutable(1);
 
@@ -82,26 +81,18 @@ const MainTabBar = ({
 
       if (!hasFinishedTransition) return;
 
-      const { profileInfos } = getAuthState();
-
-      if (
-        key !== 'NEW_POST' ||
-        profileHasEditorRight(profileInfos?.profileRole)
-      ) {
-        logEvent('create_post', { source: 'tab' });
-        router.push({ route: key as any });
+      if (key === 'SHARE') {
+        openShakeShare();
       } else {
-        Toast.show({
-          type: 'error',
-          text1: intl.formatMessage({
-            defaultMessage: 'Your role does not permit this action',
-            description: 'Error message when trying to create a post',
-          }),
-        });
+        router.push({ route: key as any });
       }
     },
-    [intl, router],
+    [router],
   );
+
+  const appearance = useColorScheme() ?? 'light';
+
+  const currentRoute = ['HOME', 'MEDIA'][currentIndex];
 
   const tabs = useMemo(
     () =>
@@ -114,29 +105,53 @@ const MainTabBar = ({
               description: 'Main tab bar title for webcards',
             },
             {
-              azzappA: <Text variant="azzapp">a</Text>,
+              azzappA: (
+                <Text
+                  variant="azzapp"
+                  style={{
+                    color:
+                      currentRoute === 'HOME'
+                        ? appearance === 'light'
+                          ? colors.black
+                          : colors.white
+                        : appearance === 'light'
+                          ? colors.grey200
+                          : colors.grey400,
+                  }}
+                >
+                  a
+                </Text>
+              ),
             },
           ),
           IconComponent: <HomeIcon />,
         },
         {
-          key: 'NEW_POST',
+          key: 'SHARE',
           label: intl.formatMessage({
-            defaultMessage: 'New Post',
-            description: 'Main tab bar title for new post',
+            defaultMessage: 'Share',
+            description: 'Main tab bar title for share',
           }),
-          icon: 'add_filled',
+          icon: 'share_main',
+        },
+        {
+          key: 'CONTACTS',
+          label: intl.formatMessage({
+            defaultMessage: 'Contacts',
+            description: 'Main tab bar title for contacts',
+          }),
+          icon: 'contact',
         },
         {
           key: 'MEDIA',
           label: intl.formatMessage({
-            defaultMessage: 'Media',
-            description: 'Main tab bar title for media',
+            defaultMessage: 'Community',
+            description: 'Main tab bar title for community',
           }),
-          icon: 'media',
+          icon: 'community',
         },
       ] as const,
-    [intl],
+    [intl, currentRoute, appearance],
   );
 
   return (
@@ -157,7 +172,7 @@ const MainTabBar = ({
       animatedProps={animatedProps}
     >
       <BottomMenu
-        currentTab={['HOME', 'MEDIA'][currentIndex]}
+        currentTab={currentRoute}
         iconSize={28}
         tabs={tabs}
         onItemPress={onItemPress}

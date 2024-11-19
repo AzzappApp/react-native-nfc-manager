@@ -1,4 +1,5 @@
 /* eslint-disable no-bitwise */
+import EventEmitter from 'events';
 import {
   BlendColor,
   Canvas,
@@ -31,11 +32,18 @@ import { useNetworkAvailableContext } from '#networkAvailableContext';
 import { colors } from '#theme';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import useLatestCallback from '#hooks/useLatestCallback';
+import useScreenInsets from '#hooks/useScreenInsets';
 import { get as qrCodeWidth } from '#relayProviders/qrCodeWidth.relayprovider';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import IconButton from '#ui/IconButton';
 import CoverRenderer from './CoverRenderer';
 import type { ShakeShareScreenQuery } from '#relayArtifacts/ShakeShareScreenQuery.graphql';
+
+const _shakeShareEventHandler = new EventEmitter();
+
+export const openShakeShare = () => {
+  _shakeShareEventHandler.emit('open');
+};
 
 const ShakeShare = () => {
   const [mountScreen, setMountScreen] = useState(false);
@@ -53,6 +61,13 @@ const ShakeShare = () => {
   }, []);
 
   useShakeDetector(activateDetector, hasProfile);
+
+  useEffect(() => {
+    _shakeShareEventHandler.on('open', activateDetector);
+    return () => {
+      _shakeShareEventHandler.off('open', activateDetector);
+    };
+  }, [activateDetector]);
 
   //Gesture to close on swipe
   const fling = Gesture.Fling()
@@ -127,6 +142,8 @@ const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
   const src = rect(0, 0, svg?.width() ?? 0, svg?.height() ?? 0);
   const dst = rect(0, 0, QR_CODE_WIDTH, QR_CODE_WIDTH);
 
+  const insets = useScreenInsets();
+
   if (!profile?.webCard?.cardIsPublished) {
     return null;
   }
@@ -148,7 +165,9 @@ const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
           style={styles.linear}
         />
         {svg && (
-          <View style={styles.qrCodeContainer}>
+          <View
+            style={[styles.qrCodeContainer, { bottom: 123 + insets.bottom }]}
+          >
             <Canvas style={styles.canvas}>
               <Group
                 layer={
@@ -168,7 +187,7 @@ const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
           icon="close"
           onPress={onClose}
           iconStyle={styles.iconStyle}
-          style={styles.iconContainerStyle}
+          style={[styles.iconContainerStyle, { bottom: insets.bottom + 35 }]}
         />
       </View>
     </>
@@ -178,7 +197,6 @@ const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
 const styles = StyleSheet.create({
   iconContainerStyle: {
     position: 'absolute',
-    bottom: 35,
     borderColor: 'white',
   },
   qrCodeContainer: {
@@ -186,7 +204,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     borderRadius: 34,
     padding: 17,
-    bottom: 123,
   },
   canvas: { width: QR_CODE_WIDTH, height: QR_CODE_WIDTH },
   linear: {

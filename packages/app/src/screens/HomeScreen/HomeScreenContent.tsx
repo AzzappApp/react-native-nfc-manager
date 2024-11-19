@@ -11,7 +11,6 @@ import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import HomeBackground from './HomeBackground';
 import HomeBottomPanel from './HomeBottomPanel';
 import HomeBottomSheetPanel from './HomeBottomSheetPanel';
-import HomeContactCardLandscape from './HomeContactCardLandscape';
 import HomeHeader from './HomeHeader';
 import HomeProfileLink from './HomeProfileLink';
 import HomeProfilesCarousel from './HomeProfilesCarousel';
@@ -38,7 +37,6 @@ const HomeScreenContent = ({
           webCard {
             cardIsPublished
           }
-          ...HomeContactCardLandscape_profile
           ...HomeBottomSheetPanel_profile
         }
         ...HomeBackground_user
@@ -140,7 +138,6 @@ const HomeScreenContent = ({
         close={closeMenu}
         profile={currentProfile ?? null}
       />
-      <HomeContactCardLandscape profile={currentProfile ?? null} />
     </View>
   );
 };
