@@ -1,5 +1,6 @@
-## 1.4.0-canary.109
+## 1.4.0-canary.110
 
+* **fix:**  - ensure No media selected is computed on the good prop ([#5979](https://github.com/AzzappApp/azzapp/pull/5979))
 * **fix:**  - **Home:** revert translate after sclae ([#5976](https://github.com/AzzappApp/azzapp/pull/5976))
 * **build:**  - remove vision camera patch ([#5972](https://github.com/AzzappApp/azzapp/pull/5972))
 * **fix:**  - Add workaround to avoid screen blinking when changing navigation tab ([#5975](https://github.com/AzzappApp/azzapp/pull/5975))
