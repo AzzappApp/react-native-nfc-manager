@@ -1,5 +1,6 @@
-## 1.4.0-canary.115
+## 1.4.0-canary.116
 
+* **feat:**  - New main menu ([#5991](https://github.com/AzzappApp/azzapp/pull/5991))
 * **fix:**  - **payment:** [#5971](https://github.com/AzzappApp/azzapp/pull/5971) check that user has at least one active subscription ([#5988](https://github.com/AzzappApp/azzapp/pull/5988))
 * **fix:**  - **mediaPicker:** wrong seconds duration ([#5982](https://github.com/AzzappApp/azzapp/pull/5982))
 * **fix:**  - **CoverEditor:** use pressable native , revert Android animaton ([#5985](https://github.com/AzzappApp/azzapp/pull/5985))
