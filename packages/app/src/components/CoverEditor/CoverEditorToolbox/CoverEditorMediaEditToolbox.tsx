@@ -3,7 +3,7 @@ import { ScrollView, View } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
-import PressableOpacity from '#ui/PressableOpacity';
+import PressableNative from '#ui/PressableNative';
 import {
   useCoverEditorContext,
   useCoverEditorMedia,
@@ -40,7 +40,7 @@ const CoverEditorMediaEditToolbox = () => {
 
   return (
     <View style={styles.container}>
-      <PressableOpacity style={styles.previewButton} onPress={onClose}>
+      <PressableNative style={styles.previewButton} onPress={onClose}>
         <Icon icon="arrow_down" />
         {media ? (
           <Image
@@ -50,7 +50,7 @@ const CoverEditorMediaEditToolbox = () => {
         ) : (
           <View style={styles.previewContent} />
         )}
-      </PressableOpacity>
+      </PressableNative>
       <ScrollView
         horizontal
         contentContainerStyle={styles.scrollContentContainer}

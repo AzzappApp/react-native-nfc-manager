@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Platform, StyleSheet, type ViewProps } from 'react-native';
+import { StyleSheet, type ViewProps } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -21,12 +21,6 @@ const ToolBarContainer = ({
   }, [translation, visible]);
 
   const animatedStyle = useAnimatedStyle(() => {
-    if (Platform.OS === 'android') {
-      // see @https://github.com/facebook/react-native/issues/44768
-      return {
-        top: translation.value,
-      };
-    }
     return {
       transform: [{ translateY: translation.value }],
     };

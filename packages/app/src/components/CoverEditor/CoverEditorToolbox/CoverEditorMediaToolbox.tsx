@@ -6,7 +6,6 @@ import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
-import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
 import { useCoverEditorContext } from '../CoverEditorContext';
 import { useLottieMediaDurations } from '../coverEditorHelpers';
@@ -105,9 +104,9 @@ const CoverEditorMediaToolbox = () => {
 
   return (
     <View style={styles.container}>
-      <PressableOpacity style={styles.previewButton} onPress={onClose}>
+      <PressableNative style={styles.previewButton} onPress={onClose}>
         <Icon icon="arrow_down" />
-      </PressableOpacity>
+      </PressableNative>
       <ScrollView
         horizontal
         contentContainerStyle={styles.scrollContentContainer}

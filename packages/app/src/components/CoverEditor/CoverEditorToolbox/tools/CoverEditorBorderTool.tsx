@@ -8,7 +8,7 @@ import BottomSheetModal from '#ui/BottomSheetModal';
 import ColorPreview from '#ui/ColorPreview';
 import Header from '#ui/Header';
 import LabeledWheelSelector from '#ui/LabeledWheelSelector';
-import PressableOpacity from '#ui/PressableOpacity';
+import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import {
   useCoverEditorContext,
@@ -112,7 +112,7 @@ const CoverEditorBorderTool = () => {
                   description: 'Border radius label in cover edition border',
                 })}
               />
-              <PressableOpacity
+              <PressableNative
                 onPress={openColorPicker}
                 style={styles.colorPickerContainer}
               >
@@ -126,7 +126,7 @@ const CoverEditorBorderTool = () => {
                   color={swapColor(layer.borderColor, cardColors)}
                   colorSize={20}
                 />
-              </PressableOpacity>
+              </PressableNative>
             </View>
           </BottomSheetModal>
           <CoverEditorColorPicker
