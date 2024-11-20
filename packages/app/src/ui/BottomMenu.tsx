@@ -6,7 +6,7 @@
  *
  * **/
 import React, { cloneElement, useCallback } from 'react';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { shadow, colors, fontFamilies } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Container from './Container';
@@ -260,16 +260,28 @@ const styleSheet = createStyleSheet(appearance => ({
     borderColor: 'transparent',
     borderRadius: 20,
   },
-  firstTabContainer: {
-    borderTopStartRadius: BOTTOM_MENU_HEIGHT / 2,
-    borderBottomStartRadius: BOTTOM_MENU_HEIGHT / 2,
-    minWidth: 60,
-  },
-  lastTabContainer: {
-    borderTopEndRadius: BOTTOM_MENU_HEIGHT / 2,
-    borderBottomEndRadius: BOTTOM_MENU_HEIGHT / 2,
-    minWidth: 60,
-  },
+  firstTabContainer: [
+    // :warning: this is a workaround for the ios that cause the strange #5735 issue
+    Platform.select({
+      android: {
+        borderTopStartRadius: BOTTOM_MENU_HEIGHT / 2,
+        borderBottomStartRadius: BOTTOM_MENU_HEIGHT / 2,
+      },
+      default: {},
+    }),
+    { minWidth: 60 },
+  ],
+  lastTabContainer: [
+    // :warning: this is a workaround for the ios that cause the strange #5735 issue
+    Platform.select({
+      android: {
+        borderTopEndRadius: BOTTOM_MENU_HEIGHT / 2,
+        borderBottomEndRadius: BOTTOM_MENU_HEIGHT / 2,
+      },
+      default: {},
+    }),
+    { minWidth: 60 },
+  ],
   tab: {
     flex: 1,
     alignItems: 'center',
