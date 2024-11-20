@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 import { maximumCoverFromScratch } from '#components/CoverEditor/CoverEditor';
 import { getMaxAllowedVideosPerCover } from '#components/CoverEditor/coverEditorHelpers';
 import { ScreenModal } from '#components/NativeRouter';
-import useToggle from '#hooks/useToggle';
+import useBoolean from '#hooks/useBoolean';
 import IconButton from '#ui/IconButton';
 import { useCoverEditorContext } from '../../CoverEditorContext';
 import CoverEditorMediaPicker from '../../CoverEditorMediaPicker';
@@ -18,7 +18,7 @@ const CoverEditorMediaPickerFloatingTool = ({
   durations,
   durationsFixed = false,
 }: Props) => {
-  const [showImagePicker, toggleShowImage] = useToggle();
+  const [imagePickerVisible, showImagePicker, hideImagePicker] = useBoolean();
   const { dispatch, coverEditorState: cover } = useCoverEditorContext();
 
   const onMediasPicked = useCallback(
@@ -27,9 +27,9 @@ const CoverEditorMediaPickerFloatingTool = ({
         type: 'UPDATE_MEDIAS',
         payload: medias,
       });
-      toggleShowImage();
+      hideImagePicker();
     },
-    [dispatch, toggleShowImage],
+    [dispatch, hideImagePicker],
   );
 
   const initialMedia = useMemo(() => {
@@ -49,21 +49,21 @@ const CoverEditorMediaPickerFloatingTool = ({
         size={35}
         style={styles.iconContainer}
         iconStyle={styles.icon}
-        onPress={toggleShowImage}
+        onPress={showImagePicker}
       />
       <ScreenModal
-        visible={showImagePicker}
+        visible={imagePickerVisible}
         animationType="slide"
-        onRequestDismiss={toggleShowImage}
+        onRequestDismiss={hideImagePicker}
       >
-        {showImagePicker && (
+        {imagePickerVisible && (
           <CoverEditorMediaPicker
             initialMedias={initialMedia}
             onFinished={onMediasPicked}
             durations={durations}
             durationsFixed={durationsFixed}
             maxSelectableVideos={getMaxAllowedVideosPerCover(!!cover.lottie)}
-            onClose={toggleShowImage}
+            onClose={hideImagePicker}
           />
         )}
       </ScreenModal>
