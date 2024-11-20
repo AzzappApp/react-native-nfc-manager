@@ -178,7 +178,7 @@ const MediaScreen = ({
   ];
 
   return (
-    <Container style={{ flex: 1, marginTop: top }}>
+    <Container style={{ flex: 1, paddingTop: top }}>
       <MediaScreenTabBar currentTab={tab} setTab={onTabChange} />
       <TabView style={{ flex: 1 }} currentTab={tab} tabs={tabs} />
       <View
@@ -272,14 +272,8 @@ const MediaScreenTabBar = ({
 
 const MediaScreenFallback = () => {
   const { top } = useScreenInsets();
-
   return (
-    <Container
-      style={{
-        flex: 1,
-        marginTop: top,
-      }}
-    >
+    <Container style={{ flex: 1, paddingTop: top }}>
       <MediaScreenTabBar disabled />
       <MediaSuggestionsScreenFallback />
     </Container>
