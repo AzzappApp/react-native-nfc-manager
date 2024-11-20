@@ -621,7 +621,6 @@ const styles = StyleSheet.create({
     bottom: 20,
     height: 30,
   },
-  // TODO remove aspectRatio
   featureContainer: { flex: 1, marginBottom: -20, aspectRatio: 1 },
   container: { flex: 1, backgroundColor: 'transparent' },
   priceItem: {

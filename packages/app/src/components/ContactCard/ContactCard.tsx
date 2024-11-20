@@ -161,7 +161,7 @@ export const ContactCardComponent = ({
   return (
     <View
       style={[
-        styles.contactCardContainer,
+        styles.webCardContainer,
         {
           backgroundColor,
           height,
@@ -176,7 +176,6 @@ export const ContactCardComponent = ({
           styles.webCardBackground,
           {
             height,
-            width: height * CONTACT_CARD_RATIO,
             borderRadius: height * CONTACT_CARD_RADIUS_HEIGHT,
           },
         ]}
@@ -294,9 +293,10 @@ export default memo(ContactCard);
 export const CONTACT_CARD_ASPECT_RATIO = 0.6;
 
 const stylesheet = createStyleSheet(appearance => ({
-  contactCardContainer: {
+  webCardContainer: {
     paddingVertical: 10,
     paddingHorizontal: 20,
+    aspectRatio: CONTACT_CARD_RATIO,
     overflow: 'visible',
     flexDirection: 'row',
     borderCurve: 'continuous',

@@ -126,8 +126,8 @@ const WebCardKindSelectionScreen = ({
       styles.mediaImage,
       {
         width: cardWidth,
-        height: cardWidth / COVER_RATIO,
         borderRadius,
+        aspectRatio: COVER_RATIO,
       },
     ],
     [styles.mediaImage, cardWidth, borderRadius],

@@ -1,26 +1,30 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { View } from 'react-native';
+import { COVER_RATIO, COVER_CARD_RADIUS } from '@azzapp/shared/coverHelpers';
 import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import type { ReactNode } from 'react';
 import type { LayoutChangeEvent } from 'react-native';
 
-const ImagePickerContactCardMediaWrapper = ({
-  children,
-}: {
-  children: ReactNode;
-}) => {
+const ImagePickerCardMediaWrapper = ({ children }: { children: ReactNode }) => {
   const [height, setHeight] = useState(0);
-  const onLayout = ({ nativeEvent }: LayoutChangeEvent) => {
+  const onLayout = useCallback(({ nativeEvent }: LayoutChangeEvent) => {
     setHeight(nativeEvent.layout.height);
-  };
+  }, []);
 
   const styles = useStyleSheet(styleSheet);
 
   return (
     <View style={styles.container} onLayout={onLayout}>
       <View style={[styles.shadowBox, { height }]}>
-        <View style={[styles.radiusBox, { borderRadius: height / 2 }]}>
+        <View
+          style={[
+            styles.radiusBox,
+            {
+              borderRadius: height * COVER_RATIO * COVER_CARD_RADIUS,
+            },
+          ]}
+        >
           {children}
         </View>
       </View>
@@ -28,27 +32,25 @@ const ImagePickerContactCardMediaWrapper = ({
   );
 };
 
-export default ImagePickerContactCardMediaWrapper;
+export default ImagePickerCardMediaWrapper;
 
-const styleSheet = createStyleSheet(appearance => ({
+const styleSheet = createStyleSheet(apperance => ({
   radiusBox: {
     flex: 1,
     overflow: 'hidden',
     backgroundColor: colors.grey100,
-    borderWidth: 4,
-    borderColor: appearance === 'dark' ? colors.black : colors.white,
   },
   shadowBox: [
     {
       flex: 1,
-      aspectRatio: 1,
+      aspectRatio: COVER_RATIO,
     },
-    shadow(appearance, 'bottom'),
+    shadow(apperance, 'center'),
   ],
   container: {
     flex: 1,
-    maxHeight: 300,
-    marginBottom: 20,
+    marginBottom: 39,
+    marginTop: 17,
     justifyContent: 'center',
     alignItems: 'center',
   },

@@ -282,7 +282,6 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   unpublishedOverlay: {
     width: '100%',
-    // TODO remove aspectRatio
     aspectRatio: 3 / 2,
     justifyContent: 'center',
     alignItems: 'center',

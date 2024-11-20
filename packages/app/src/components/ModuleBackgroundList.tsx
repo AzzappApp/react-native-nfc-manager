@@ -170,7 +170,6 @@ const ModuleBackgroundListItem = ({
     <View
       style={{
         flex: 1,
-        // TODO remove aspectRatio
         aspectRatio: imageRatio,
         backgroundColor,
       }}

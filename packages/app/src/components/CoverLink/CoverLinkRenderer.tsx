@@ -1,9 +1,5 @@
 import { memo, useMemo } from 'react';
-import {
-  COVER_BASE_WIDTH,
-  COVER_CARD_RADIUS,
-  COVER_RATIO,
-} from '@azzapp/shared/coverHelpers';
+import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
 import CoverRenderer from '../CoverRenderer';
 import Link from '../Link';
@@ -19,21 +15,18 @@ const CoverLink = ({
   onPress,
   onLongPress,
   disabled,
-  width,
   ...props
 }: CoverLinkRendererProps) => {
-  width = width ?? COVER_BASE_WIDTH;
   const containerStyle = useMemo(
     () => [
       style,
       {
         overflow: 'hidden' as const,
-        borderRadius: COVER_CARD_RADIUS * width,
-        width,
-        height: width / COVER_RATIO,
+        borderRadius: COVER_CARD_RADIUS * (props.width as number),
+        aspectRatio: COVER_RATIO,
       },
     ],
-    [style, width],
+    [style, props.width],
   );
 
   return (
@@ -44,7 +37,7 @@ const CoverLink = ({
       disabled={disabled}
     >
       <PressableScaleHighlight style={containerStyle} onLongPress={onLongPress}>
-        <CoverRenderer {...props} width={width} style={coverStyle} />
+        <CoverRenderer {...props} style={coverStyle} />
       </PressableScaleHighlight>
     </Link>
   );

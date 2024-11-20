@@ -375,7 +375,6 @@ const PostCreationScreenFallback = () => {
     <Container style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 1 }}>
         <Header leftElement={<CancelHeaderButton onPress={router.back} />} />
-        {/* TODO remove aspectRatio */}
         <View style={{ aspectRatio: 1, backgroundColor: colors.grey100 }} />
         <LoadingView />
       </SafeAreaView>

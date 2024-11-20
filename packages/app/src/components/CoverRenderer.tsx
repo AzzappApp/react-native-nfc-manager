@@ -1,5 +1,5 @@
 import { forwardRef, memo, useMemo } from 'react';
-import { Dimensions, Image, Platform, StyleSheet, View } from 'react-native';
+import { Dimensions, Image, Platform, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
@@ -79,7 +79,7 @@ export type CoverRendererProps = {
 const CoverRenderer = (
   {
     webCard: coverKey,
-    width = COVER_BASE_WIDTH,
+    width = 125,
     large,
     style,
     canPlay = false,
@@ -175,6 +175,18 @@ const CoverRenderer = (
   );
 
   const styles = useStyleSheet(stylesheet);
+  const containerStyle = useMemo(
+    () => [
+      styles.root,
+      {
+        borderRadius,
+        width,
+        backgroundColor: swapColor(coverBackgroundColor, cardColors) as any,
+      },
+      style,
+    ],
+    [styles.root, borderRadius, width, coverBackgroundColor, cardColors, style],
+  );
 
   const showLinks = coverDynamicLinks && coverDynamicLinks.links.length > 0;
 
@@ -201,22 +213,14 @@ const CoverRenderer = (
     };
   }, [coverDynamicLinks, width, height]);
 
+  const shadowStyle = useMemo(
+    () => [{ borderRadius }, styles.shadow],
+    [borderRadius, styles.shadow],
+  );
+
   return (
-    <View style={large ? undefined : [{ borderRadius }, styles.shadow]}>
-      <View
-        ref={forwardRef}
-        style={[
-          styles.root,
-          {
-            borderRadius,
-            width,
-            backgroundColor: swapColor(coverBackgroundColor, cardColors) as any,
-            height: width / COVER_RATIO,
-          },
-          style,
-        ]}
-        testID="cover-renderer"
-      >
+    <View style={large ? undefined : shadowStyle}>
+      <View ref={forwardRef} style={containerStyle} testID="cover-renderer">
         {coverSource ? (
           isVideoMedia ? (
             <MediaVideoRenderer
@@ -243,15 +247,7 @@ const CoverRenderer = (
             />
           )
         ) : (
-          <View
-            style={[
-              styles.coverPlaceHolder,
-              {
-                width,
-                height: width / COVER_RATIO,
-              },
-            ]}
-          >
+          <View style={styles.coverPlaceHolder}>
             <Image
               source={require('#assets/webcard/logo-substract-full.png')}
               style={{
@@ -306,15 +302,24 @@ export default memo(forwardRef(CoverRenderer));
 
 const stylesheet = createStyleSheet(theme => ({
   root: {
+    aspectRatio: COVER_RATIO,
     overflow: 'hidden',
     borderCurve: 'continuous',
   },
   shadow: {
     ...shadow(theme, 'bottom'),
   },
-  layer: StyleSheet.absoluteFillObject,
+  layer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    aspectRatio: COVER_RATIO,
+  },
   coverPlaceHolder: {
     backgroundColor: colors.black,
+    aspectRatio: COVER_RATIO,
     alignItems: 'center',
     justifyContent: 'center',
   },

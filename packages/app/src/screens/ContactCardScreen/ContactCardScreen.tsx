@@ -575,7 +575,7 @@ const styleSheet = createStyleSheet(appearance => ({
     overflow: 'visible',
   },
   googleWalletButton: {
-    width: 47 * (283 / 50), // derived from google wallet logo svg
+    aspectRatio: 283 / 50, // derived from google wallet logo svg
     height: 47,
     alignSelf: 'center',
   },
