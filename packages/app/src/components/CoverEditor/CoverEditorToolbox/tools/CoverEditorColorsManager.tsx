@@ -157,6 +157,7 @@ const CoverEditorColorsManager = ({
             }),
             onPress: () => {
               revertColors();
+              setEditedColor(null);
               onRequestClose();
             },
           },
