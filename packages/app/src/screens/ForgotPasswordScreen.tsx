@@ -81,14 +81,17 @@ const ForgotPasswordScreen = () => {
 
   return (
     <Container style={styles.flex}>
-      <View onTouchStart={Keyboard.dismiss} style={styles.container}>
+      <View style={styles.container}>
         <KeyboardAvoidingView behavior="padding">
           <View style={styles.container}>
             <View style={styles.inner}>
-              <View style={styles.logoContainer}>
+              <View
+                style={styles.logoContainer}
+                onTouchStart={Keyboard.dismiss}
+              >
                 <Icon icon="unlock_line" style={styles.logo} />
               </View>
-              <View style={styles.viewText}>
+              <View style={styles.viewText} onTouchStart={Keyboard.dismiss}>
                 <Text style={styles.textForgot} variant="xlarge">
                   <FormattedMessage
                     defaultMessage="Forgot your password?"
@@ -120,6 +123,7 @@ const ForgotPasswordScreen = () => {
                 </Text>
               )}
               <Button
+                onTouchStart={Keyboard.dismiss}
                 label={intl.formatMessage({
                   defaultMessage: 'Reset password',
                   description: 'ForgotpasswordScreen - Reset password',
