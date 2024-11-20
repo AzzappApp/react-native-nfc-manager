@@ -1,6 +1,12 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Keyboard, RefreshControl, StyleSheet, View } from 'react-native';
+import {
+  Keyboard,
+  Platform,
+  RefreshControl,
+  StyleSheet,
+  View,
+} from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Toast from 'react-native-toast-message';
@@ -15,7 +21,7 @@ import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
-import { colors } from '#theme';
+import { colors, textStyles } from '#theme';
 import AuthorCartouche from '#components/AuthorCartouche';
 import { useRouter } from '#components/NativeRouter';
 import { useProfileInfos } from '#hooks/authStateHooks';
@@ -352,6 +358,12 @@ const PostCommentsList = ({
             onContentSizeChange={onContentSizeChange}
             maxLength={MAX_COMMENT_LENGHT}
             style={{ height: inputHeight }}
+            inputStyle={{
+              paddingTop:
+                Platform.OS === 'ios'
+                  ? inputHeight / 2 - textStyles.textField.fontSize + 1
+                  : undefined,
+            }}
             rightElement={
               <PressableOpacity
                 onPress={onSubmit}
