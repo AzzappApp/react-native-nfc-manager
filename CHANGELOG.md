@@ -1,5 +1,6 @@
-## 1.4.0-canary.119
+## 1.4.0-canary.120
 
+* **fix:**  - 🐛 use right placeholder on android ([#6006](https://github.com/AzzappApp/azzapp/pull/6006))
 * **fix:**  - **IOS:** disable bottomenu item radius on ios
 * **feat:**  - New main menu ([#5991](https://github.com/AzzappApp/azzapp/pull/5991))
 * **fix:**  - **payment:** [#5971](https://github.com/AzzappApp/azzapp/pull/5971) check that user has at least one active subscription ([#5988](https://github.com/AzzappApp/azzapp/pull/5988))
