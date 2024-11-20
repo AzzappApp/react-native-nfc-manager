@@ -28,9 +28,12 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
       return '';
     }
 
-    const lowercase = new Date(details.createdAt).toLocaleDateString('fr', {
-      dateStyle: 'long',
-    });
+    const lowercase = new Date(details.createdAt).toLocaleDateString(
+      undefined,
+      {
+        dateStyle: 'long',
+      },
+    );
 
     return lowercase
       .split(' ')
