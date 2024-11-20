@@ -1,5 +1,6 @@
-## 1.4.0-canary.118
+## 1.4.0-canary.119
 
+* **fix:**  - **IOS:** disable bottomenu item radius on ios
 * **feat:**  - New main menu ([#5991](https://github.com/AzzappApp/azzapp/pull/5991))
 * **fix:**  - **payment:** [#5971](https://github.com/AzzappApp/azzapp/pull/5971) check that user has at least one active subscription ([#5988](https://github.com/AzzappApp/azzapp/pull/5988))
 * **fix:**  - **mediaPicker:** wrong seconds duration ([#5982](https://github.com/AzzappApp/azzapp/pull/5982))
