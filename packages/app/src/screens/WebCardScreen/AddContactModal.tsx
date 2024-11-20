@@ -128,23 +128,22 @@ const AddContactModal = ({
       number: string;
     }>;
 
-    const socials = additionalContactData?.socials?.map(({ label, url }) => ({
-      label,
-      url,
-    }));
+    const socials = (scanned.contact?.socialProfiles
+      ?.filter(({ url }) => url)
+      .map(({ label, url }) => ({
+        label,
+        url,
+      })) ?? []) as Array<{
+      label: string;
+      url: string;
+    }>;
 
-    const scannAddresses =
+    const urls =
       scanned.contact.urlAddresses
         ?.map(url => {
           return url.url ? { url: url.url } : undefined;
         })
         ?.filter(isDefined) || [];
-
-    const urls = (
-      additionalContactData?.urls?.map(url => {
-        return { url: url.address };
-      }) || []
-    ).concat(scannAddresses);
 
     const birthdayItem = scanned.contact?.dates?.find(
       x => x.label === 'birthday',
@@ -171,13 +170,7 @@ const AddContactModal = ({
       urls,
       socials,
     };
-  }, [
-    additionalContactData?.socials,
-    additionalContactData?.urls,
-    scanned,
-    viewer,
-    withShareBack,
-  ]);
+  }, [scanned, viewer, withShareBack]);
 
   const onRequestAddContactToPhonebook = useCallback(async () => {
     if (!scanned) return;
