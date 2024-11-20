@@ -1,5 +1,11 @@
-## 1.4.0-canary.120
+## 1.4.0-canary.121
 
+* **fix:**  - home icon ([#6011](https://github.com/AzzappApp/azzapp/pull/6011))
+* **fix:**  - do not force dates format ([#6010](https://github.com/AzzappApp/azzapp/pull/6010))
+* **fix:**  - 🐛 reset color on cover editor ([#6007](https://github.com/AzzappApp/azzapp/pull/6007))
+* **fix:**  - remplace marging by padding to avoid blinks ([#6004](https://github.com/AzzappApp/azzapp/pull/6004))
+* **fix:**  - workaround crash on Back press in search results ([#5990](https://github.com/AzzappApp/azzapp/pull/5990))
+* **fix:**  - **contact:** [#6000](https://github.com/AzzappApp/azzapp/pull/6000) duplicated common informations in stored contact ([#6001](https://github.com/AzzappApp/azzapp/pull/6001))
 * **fix:**  - 🐛 use right placeholder on android ([#6006](https://github.com/AzzappApp/azzapp/pull/6006))
 * **fix:**  - **IOS:** disable bottomenu item radius on ios
 * **feat:**  - New main menu ([#5991](https://github.com/AzzappApp/azzapp/pull/5991))
