@@ -1,4 +1,4 @@
-## 1.4.0-canary.117
+## 1.4.0-canary.118
 
 * **feat:**  - New main menu ([#5991](https://github.com/AzzappApp/azzapp/pull/5991))
 * **fix:**  - **payment:** [#5971](https://github.com/AzzappApp/azzapp/pull/5971) check that user has at least one active subscription ([#5988](https://github.com/AzzappApp/azzapp/pull/5988))
