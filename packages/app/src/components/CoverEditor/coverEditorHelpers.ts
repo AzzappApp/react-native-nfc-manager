@@ -401,7 +401,11 @@ const copyCoverMediaToCacheDirInternal = async (
     return resultPath;
   }
   let oldPath;
-  if (media.uri && media.uri.startsWith('file://')) {
+  if (media.uri && media.uri.startsWith('file:///android_asset')) {
+    oldPath = ReactNativeBlobUtil.fs.asset(
+      media.uri.replace('file:///android_asset/', ''),
+    );
+  } else if (media.uri && media.uri.startsWith('file://')) {
     oldPath = media.uri.replace('file://', '');
     if (!(await ReactNativeBlobUtil.fs.exists(oldPath))) {
       return null;
