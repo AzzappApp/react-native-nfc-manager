@@ -4,7 +4,8 @@ import { maximumCoverFromScratch } from '#components/CoverEditor/CoverEditor';
 import { getMaxAllowedVideosPerCover } from '#components/CoverEditor/coverEditorHelpers';
 import { ScreenModal } from '#components/NativeRouter';
 import useBoolean from '#hooks/useBoolean';
-import IconButton from '#ui/IconButton';
+import Icon from '#ui/Icon';
+import PressableNative from '#ui/PressableNative';
 import { useCoverEditorContext } from '../../CoverEditorContext';
 import CoverEditorMediaPicker from '../../CoverEditorMediaPicker';
 import type { SourceMedia } from '#helpers/mediaHelpers';
@@ -44,13 +45,13 @@ const CoverEditorMediaPickerFloatingTool = ({
 
   return (
     <>
-      <IconButton
-        icon="add"
-        size={35}
-        style={styles.iconContainer}
-        iconStyle={styles.icon}
+      <PressableNative
+        accessibilityRole="button"
         onPress={showImagePicker}
-      />
+        style={styles.iconContainer}
+      >
+        <Icon icon="add" size={24} style={styles.icon} />
+      </PressableNative>
       <ScreenModal
         visible={imagePickerVisible}
         animationType="slide"
@@ -81,6 +82,10 @@ const styles = StyleSheet.create({
     padding: 0,
     backgroundColor: 'black',
     borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 35,
+    height: 35,
   },
 });
 export default CoverEditorMediaPickerFloatingTool;
