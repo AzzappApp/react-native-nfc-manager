@@ -263,9 +263,7 @@ const { handleRequest } = createYoga({
   ],
 });
 
-const handleRequestWithAxiom = withPluginsRoute(handleRequest);
-
-export { handleRequestWithAxiom as GET, handleRequestWithAxiom as POST };
+export default withPluginsRoute(handleRequest);
 
 const removePreRelease = (version: string) => {
   const versionParts = version.split('-');
@@ -292,5 +290,3 @@ const validateMailOrPhone = async (
     throw new Error('Error validating mail or phone');
   }
 };
-
-//export const runtime = 'nodejs';
