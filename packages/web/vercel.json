@@ -13,6 +13,7 @@
       ]
     }
   ],
+  "regions": ["fra1", "iad1", "sin1"],
   "crons": [
     {
       "path": "/api/cron/cancelPayments",
