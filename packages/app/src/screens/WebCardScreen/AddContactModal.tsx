@@ -444,7 +444,7 @@ const AddContactModal = ({
     >
       <Header
         middleElement={
-          <Text variant="large">
+          <Text variant="large" style={styles.headerText}>
             <FormattedMessage
               defaultMessage="Add {userName} to your contacts"
               description="Title for add contact modal"
@@ -459,7 +459,6 @@ const AddContactModal = ({
             <Icon icon="close" />
           </PressableNative>
         }
-        style={styles.header}
       />
       <View style={styles.section}>
         <CoverRenderer webCard={webCard} width={120} canPlay={false} />
@@ -631,9 +630,8 @@ const styles = StyleSheet.create({
   button: {
     marginTop: 20,
   },
-
-  header: {
-    height: 36,
+  headerText: {
+    textAlign: 'center',
   },
 });
 
