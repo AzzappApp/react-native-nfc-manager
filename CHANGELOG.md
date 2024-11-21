@@ -1,4 +1,4 @@
-## 1.4.0-canary.123
+## 1.4.0-canary.124
 
 * **fix:**  - 🐛 properly handle android assets ([#6033](https://github.com/AzzappApp/azzapp/pull/6033))
 * **fix:**  - 🐛 properly display contact modal text ([#6023](https://github.com/AzzappApp/azzapp/pull/6023))
