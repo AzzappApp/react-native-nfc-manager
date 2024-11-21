@@ -1,5 +1,7 @@
-## 1.4.0-canary.121
+## 1.4.0-canary.122
 
+* **fix:**  - 🐛 properly display contact modal text ([#6023](https://github.com/AzzappApp/azzapp/pull/6023))
+* **fix:**  - **CoverEditor:** replace IconButton by PressableNative ([#6022](https://github.com/AzzappApp/azzapp/pull/6022))
 * **fix:**  - home icon ([#6011](https://github.com/AzzappApp/azzapp/pull/6011))
 * **fix:**  - do not force dates format ([#6010](https://github.com/AzzappApp/azzapp/pull/6010))
 * **fix:**  - 🐛 reset color on cover editor ([#6007](https://github.com/AzzappApp/azzapp/pull/6007))
