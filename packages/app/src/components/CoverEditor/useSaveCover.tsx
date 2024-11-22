@@ -75,6 +75,10 @@ const useSaveCover = (
           hasCover
           coverId
           ...CoverRenderer_webCard
+          coverMedia {
+            __typename
+            uriDownload: uri
+          }
         }
       }
     }

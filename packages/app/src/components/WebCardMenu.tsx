@@ -167,6 +167,7 @@ const WebCardMenu = ({
 
       localPath = await stateFullPromise;
     } catch (error) {
+      console.warn('error during cover sharing', error);
       if (!(error instanceof ReactNativeBlobUtil.CanceledFetchError)) {
         Toast.show({
           type: 'error',
