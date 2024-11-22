@@ -7,7 +7,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { Pressable, View } from 'react-native';
 import ImageSize from 'react-native-image-size';
 import * as mime from 'react-native-mime-types';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
 import { Observable } from 'relay-runtime';
@@ -32,6 +31,7 @@ import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import Icon from '#ui/Icon';
+import SafeAreaView from '#ui/SafeAreaView';
 import Separation from '#ui/Separation';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
@@ -302,10 +302,7 @@ export const CommonInformationScreen = ({
         flex: 1,
       }}
     >
-      <SafeAreaView
-        style={{ flex: 1 }}
-        edges={{ bottom: 'additive', top: 'additive' }}
-      >
+      <SafeAreaView style={{ flex: 1 }}>
         <Header
           middleElement={intl.formatMessage({
             defaultMessage: 'Common information',

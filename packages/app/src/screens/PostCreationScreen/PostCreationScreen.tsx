@@ -3,7 +3,6 @@ import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { View } from 'react-native';
 import * as mime from 'react-native-mime-types';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import {
   ConnectionHandler,
@@ -46,6 +45,7 @@ import { get as ScreenWidth } from '#relayProviders/ScreenWidth.relayprovider';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import LoadingView from '#ui/LoadingView';
+import SafeAreaView from '#ui/SafeAreaView';
 import UploadProgressModal from '#ui/UploadProgressModal';
 import PostContentStep from './PostContentStep';
 import PostCreationScreenContext from './PostCreationScreenContext';

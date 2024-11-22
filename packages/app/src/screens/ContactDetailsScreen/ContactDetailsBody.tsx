@@ -2,9 +2,9 @@ import { Image } from 'expo-image';
 import { useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Linking, Platform, ScrollView, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';
@@ -19,7 +19,7 @@ type Props = {
 };
 
 const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
-  const { bottom } = useSafeAreaInsets();
+  const { bottom } = useScreenInsets();
   const intl = useIntl();
   const styles = useStyleSheet(stylesheet);
 

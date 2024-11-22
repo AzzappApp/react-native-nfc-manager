@@ -11,7 +11,6 @@ import Animated, {
   useDerivedValue,
   useSharedValue,
 } from 'react-native-reanimated';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { graphql } from 'react-relay';
 import VCard from 'vcard-creator';
 import { getTextColor } from '@azzapp/shared/colorsHelpers';
@@ -42,6 +41,7 @@ import Container from '#ui/Container';
 import Header from '#ui/Header';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
+import SafeAreaView from '#ui/SafeAreaView';
 import { PageProgress } from '#ui/WizardPagerHeader';
 import OfflineHeader from './OfflineHeader';
 import type { OfflineVCardRoute } from '#routes';
@@ -416,10 +416,7 @@ const OfflineVCardScreen = () => {
 
   return (
     <Container style={styles.container}>
-      <SafeAreaView
-        style={styles.container}
-        edges={{ bottom: 'off', top: 'additive' }}
-      >
+      <SafeAreaView style={styles.container}>
         <HomeBackgroundComponent
           gradientColors={gradientColors}
           currentIndexSharedValue={currentIndexSharedValue}

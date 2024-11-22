@@ -1,9 +1,9 @@
 import { useCallback, useMemo } from 'react';
 import { View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useBoolean from '#hooks/useBoolean';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Text from '#ui/Text';
 import BottomSheetModal from './BottomSheetModal';
 import Header from './Header';
@@ -124,7 +124,7 @@ const Select = <ItemT,>({
   ...props
 }: SelectProps<ItemT>) => {
   const [showDropDown, openDropDown, closeDropDown] = useBoolean(false);
-  const { bottom } = useSafeAreaInsets();
+  const { bottom } = useScreenInsets();
 
   const selectedItemIndex = data.findIndex(
     (item, index) => selectedItemKey === keyExtractor(item, index),

@@ -18,7 +18,6 @@ import {
   StatusBar,
   TouchableOpacity,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useLazyLoadQuery, usePaginationFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { DEFAULT_COLOR_PALETTE } from '@azzapp/shared/cardHelpers';
@@ -349,7 +348,7 @@ const CardTemplateList = (
     return item.id;
   };
 
-  const { top } = useSafeAreaInsets();
+  const { top } = useScreenInsets();
 
   const [selectedCardTemplateType, setSelectedCardTemplateType] = useState<
     { id: string; title: string } | undefined

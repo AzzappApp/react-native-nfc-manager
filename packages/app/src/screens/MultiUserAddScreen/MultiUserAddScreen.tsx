@@ -114,10 +114,7 @@ const MultiUserAddScreen = ({
   return (
     <>
       <Container style={{ flex: 1 }}>
-        <SafeAreaView
-          edges={{ bottom: 'off', top: 'additive' }}
-          style={styles.container}
-        >
+        <SafeAreaView style={styles.container}>
           <Header
             middleElement={intl.formatMessage({
               defaultMessage: 'Add a user',

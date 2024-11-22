@@ -70,10 +70,7 @@ const AddContentBelowCoverModal = ({
       onRequestDismiss={onClose}
     >
       <Container style={{ flex: 1 }}>
-        <SafeAreaView
-          style={{ flex: 1 }}
-          edges={{ bottom: 'off', top: 'additive' }}
-        >
+        <SafeAreaView style={{ flex: 1 }}>
           <Header
             middleElement={
               <View style={{ flexDirection: 'column', alignItems: 'center' }}>

@@ -2,8 +2,8 @@ import LottieView from 'lottie-react-native';
 import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { View, StyleSheet, useWindowDimensions } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '#theme';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Text from '#ui/Text';
 import Button from './Button';
 import ProgressBar from './ProgressBar';
@@ -38,7 +38,7 @@ const UploadProgressModal = ({
   const elementsWidth =
     (windowWidth * 0.62 - (nbProgressPars - 1) * 2) / nbProgressPars;
 
-  const { bottom } = useSafeAreaInsets();
+  const { bottom } = useScreenInsets();
 
   return (
     <View style={styles.container}>

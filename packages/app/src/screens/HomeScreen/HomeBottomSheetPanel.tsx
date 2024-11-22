@@ -9,7 +9,6 @@ import {
   Alert,
   Linking,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
@@ -26,6 +25,7 @@ import { logEvent } from '#helpers/analytics';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { useDeleteNotifications } from '#hooks/useNotifications';
 import useQuitWebCard from '#hooks/useQuitWebCard';
+import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Icon from '#ui/Icon';
@@ -80,7 +80,7 @@ const HomeBottomSheetPanel = ({
     profileKey ?? null,
   );
 
-  const { bottom } = useSafeAreaInsets();
+  const { bottom } = useScreenInsets();
   const intl = useIntl();
   const deleteFcmToken = useDeleteNotifications();
 

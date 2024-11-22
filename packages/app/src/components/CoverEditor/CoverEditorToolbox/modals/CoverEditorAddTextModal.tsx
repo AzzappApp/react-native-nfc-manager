@@ -89,10 +89,7 @@ const CoverEditorAddTextModal = (props: Props) => {
     >
       {open && (
         <Container style={styles.container}>
-          <SafeAreaView
-            style={styles.container}
-            edges={{ bottom: 'off', top: 'additive' }}
-          >
+          <SafeAreaView style={styles.container}>
             <Header
               middleElement={
                 <Text variant="large" style={styles.header}>

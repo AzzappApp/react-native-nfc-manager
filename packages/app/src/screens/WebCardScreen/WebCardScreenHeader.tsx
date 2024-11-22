@@ -216,7 +216,7 @@ const WebCardScreenHeader = ({
         />
       </Animated.View>
       <Animated.View
-        style={[styles.closeButton, { top: inset.top + 16 }, closeStyle]}
+        style={[styles.closeButton, { top: inset.top }, closeStyle]}
         pointerEvents={editing ? 'none' : 'auto'}
       >
         <FloatingIconButton

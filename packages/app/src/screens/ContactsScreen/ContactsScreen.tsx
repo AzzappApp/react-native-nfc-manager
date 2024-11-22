@@ -58,10 +58,7 @@ const ContactsScreen = ({
 
   return (
     <Container style={styles.container}>
-      <SafeAreaView
-        style={styles.container}
-        edges={{ bottom: 'off', top: 'additive' }}
-      >
+      <SafeAreaView style={styles.container}>
         <Header
           middleElement={
             <Text variant="large">

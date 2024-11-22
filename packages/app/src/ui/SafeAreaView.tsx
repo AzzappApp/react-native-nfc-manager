@@ -1,5 +1,16 @@
-import { SafeAreaView as BaseSafeAreaView } from 'react-native-safe-area-context';
+import { View } from 'react-native';
+import useScreenInsets from '#hooks/useScreenInsets';
+import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
-const SafeAreaView = BaseSafeAreaView;
+const SafeAreaView = ({ style, ...props }: ViewProps) => {
+  const insets = useScreenInsets();
+
+  return (
+    <View
+      style={[{ paddingTop: insets.top, paddingBottom: insets.bottom }, style]}
+      {...props}
+    />
+  );
+};
 
 export default SafeAreaView;

@@ -6,8 +6,8 @@ import { MediaVideoRenderer } from '#components/medias';
 import { ScreenModal } from '#components/NativeRouter';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
+import Container from '#ui/Container';
 import IconButton from '#ui/IconButton';
-import SafeAreaView from '#ui/SafeAreaView';
 import type { CoverTemplate } from './CoverTemplateTypePreviews';
 type CoverTemplateConfirmationScreenModalProps = {
   template: CoverTemplate | null;
@@ -22,16 +22,17 @@ const CoverTemplateConfirmationScreenModal = ({
 }: CoverTemplateConfirmationScreenModalProps) => {
   const intl = useIntl();
 
-  const { bottom } = useScreenInsets();
   const mediaCount = template
     ? template.mediaCount -
       template.medias.filter(media => !media.editable).length
     : 0;
 
+  const insets = useScreenInsets();
+
   return (
     <ScreenModal visible={!!template} onRequestDismiss={onClose}>
-      <SafeAreaView style={styles.container}>
-        <View style={styles.close}>
+      <Container style={styles.container}>
+        <View style={[styles.close, { top: insets.top }]}>
           <IconButton
             icon="close"
             iconStyle={styles.closeIcon}
@@ -55,8 +56,7 @@ const CoverTemplateConfirmationScreenModal = ({
               thumbnailURI={template.preview?.thumbnail}
             />
           )}
-          {/* //using margin on android  directly on the button create white area */}
-          <View style={{ marginBottom: bottom, marginTop: 40 }}>
+          <View style={{ marginBottom: insets.bottom, marginTop: 40 }}>
             <Button
               label={intl.formatMessage(
                 {
@@ -79,7 +79,7 @@ const CoverTemplateConfirmationScreenModal = ({
             />
           </View>
         </View>
-      </SafeAreaView>
+      </Container>
     </ScreenModal>
   );
 };
@@ -109,9 +109,10 @@ const styles = StyleSheet.create({
     height: 48,
     justifyContent: 'center',
     alignItems: 'center',
-    position: 'relative',
-    top: -12,
-    left: -12,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    zIndex: 1,
   },
   template: {
     width: '100%',

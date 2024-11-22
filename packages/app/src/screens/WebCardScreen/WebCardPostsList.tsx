@@ -57,10 +57,7 @@ const WebCardPostsList = ({
 
   return (
     <Container style={{ flex: 1 }}>
-      <SafeAreaView
-        style={{ flex: 1 }}
-        edges={{ bottom: 'additive', top: 'additive' }}
-      >
+      <SafeAreaView style={{ flex: 1 }}>
         <Header
           middleElement={
             isViewer

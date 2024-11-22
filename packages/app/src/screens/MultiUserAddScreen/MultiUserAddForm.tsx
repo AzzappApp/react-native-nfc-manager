@@ -3,11 +3,11 @@ import { useCallback, type ReactNode } from 'react';
 import { Controller, useController } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '#theme';
 import EmailOrPhoneInput from '#components/EmailOrPhoneInput';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { keyExtractor } from '#helpers/idHelpers';
+import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Header from '#ui/Header';
@@ -43,7 +43,7 @@ type MultiUserAddFormProps = {
 const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
   const styles = useStyleSheet(styleSheet);
   const [showAvailableInfo, toggleShowAvailableInfo] = useToggle(false);
-  const { bottom } = useSafeAreaInsets();
+  const { bottom } = useScreenInsets();
 
   const { field } = useController({ control, name: 'role' });
   const intl = useIntl();

@@ -10,7 +10,6 @@ import {
 import { FormattedMessage, useIntl } from 'react-intl';
 import { SectionList, View } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useFragment, usePaginationFragment } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { type ArrayItemType } from '@azzapp/shared/arrayHelpers';
@@ -23,6 +22,7 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { keyExtractor } from '#helpers/idHelpers';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import { useFocusEffect } from '#hooks/useFocusEffect';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';
@@ -272,7 +272,7 @@ const MultiUserScreenUserList = ({
   }, [debounceText, refetch]);
   //#endregion
 
-  const { bottom } = useSafeAreaInsets();
+  const { bottom } = useScreenInsets();
 
   const contentContainerStyle = useMemo(
     () => ({ paddingBottom: 40 + bottom }),

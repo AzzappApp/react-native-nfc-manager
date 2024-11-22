@@ -307,10 +307,7 @@ const MultiUserScreen = ({
 
   return (
     <Container style={{ flex: 1 }}>
-      <SafeAreaView
-        style={{ flex: 1 }}
-        edges={{ bottom: 'off', top: 'additive' }}
-      >
+      <SafeAreaView style={{ flex: 1 }}>
         {transferOwnerMode ? (
           <Header
             middleElement={intl.formatMessage({

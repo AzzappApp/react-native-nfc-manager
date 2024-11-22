@@ -593,10 +593,7 @@ const MultiUserAddModal = (
       onRequestDismiss={onClose}
     >
       <Container style={{ flex: 1 }}>
-        <SafeAreaView
-          style={{ flex: 1 }}
-          edges={{ bottom: 'additive', top: 'additive' }}
-        >
+        <SafeAreaView style={{ flex: 1 }}>
           <Header
             middleElement={
               <Text variant="large" style={styles.name}>
