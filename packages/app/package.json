@@ -102,7 +102,7 @@
     "expo-av": "^15.0.1",
     "expo-blur": "14.0.1",
     "expo-clipboard": "~7.0.0",
-    "expo-contacts": "patch:expo-contacts@npm%3A14.0.2#~/.yarn/patches/expo-contacts-npm-14.0.2-47a6bf515f.patch",
+    "expo-contacts": "patch:expo-contacts@patch%3Aexpo-contacts@npm%253A14.0.2%23~/.yarn/patches/expo-contacts-npm-14.0.2-47a6bf515f.patch%3A%3Aversion=14.0.2&hash=20e638#~/.yarn/patches/expo-contacts-patch-0d7f995ace.patch",
     "expo-device": "7.0.1",
     "expo-file-system": "^18.0.3",
     "expo-font": "~13.0.1",
