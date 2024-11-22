@@ -1,5 +1,6 @@
-## 1.4.0-canary.126
+## 1.4.0-canary.127
 
+* **fix:**  - all insets of the applications screen ([#6045](https://github.com/AzzappApp/azzapp/pull/6045))
 * **fix:**  - contacts missing patch ([#6044](https://github.com/AzzappApp/azzapp/pull/6044))
 * **fix:**  - **TextBlock:** refactor animatedData edition ([#6041](https://github.com/AzzappApp/azzapp/pull/6041))
 * **fix:**  - share cover was not working after cover creation ([#5984](https://github.com/AzzappApp/azzapp/pull/5984))
