@@ -209,7 +209,7 @@ const stockVideoFragment = graphql`
   @argumentDefinitions(
     search: { type: "String" }
     after: { type: String }
-    first: { type: Int, defaultValue: 50 }
+    first: { type: Int, defaultValue: 52 }
   ) {
     searchStockVideos(search: $search, after: $after, first: $first)
       @connection(key: "StockMediaList_searchStockVideos") {
@@ -249,7 +249,7 @@ const StockMediaListGridRenderer = ({
 
   const onEndReached = useCallback(() => {
     if (hasNext && !isLoadingNext) {
-      loadNext(50);
+      loadNext(52);
     }
   }, [hasNext, isLoadingNext, loadNext]);
 

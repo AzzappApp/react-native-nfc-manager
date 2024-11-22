@@ -12,13 +12,7 @@ import {
   forwardRef,
 } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import {
-  AppState,
-  Platform,
-  View,
-  unstable_batchedUpdates,
-  useWindowDimensions,
-} from 'react-native';
+import { AppState, Platform, View, useWindowDimensions } from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import { openPhotoPicker, openSettings } from 'react-native-permissions';
 import { colors } from '#theme';
@@ -96,26 +90,32 @@ const PhotoGalleryMediaList = (
 ) => {
   const styles = useStyleSheet(styleSheet);
   const [medias, setMedias] = useState<PhotoIdentifier[]>([]);
-  const [hasNext, setHasNext] = useState(true);
-  const lastPhotoTimestamp = useRef<number | undefined>(undefined);
 
   const { mediaPermission } = usePermissionContext();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const mediaLength = useRef(0);
+  const lastPageInfo = useRef<{
+    hasNextPage: boolean;
+    endCursor: string | undefined;
+  } | null>(null);
+
+  const isLoading = useRef(false);
 
   const load = useCallback(
     async (refreshing = false, updatePictures = false) => {
-      unstable_batchedUpdates(() => {
-        setIsLoadingMore(true);
-        setIsRefreshing(refreshing);
-      });
+      if (isLoading.current) {
+        return;
+      }
+      setIsLoadingMore(true);
+      isLoading.current = true;
+      setIsRefreshing(refreshing);
 
       try {
         const result = await CameraRoll.getPhotos({
-          first: updatePictures ? mediaLength.current || 48 : 48, //multiple of items per row
-          toTime: refreshing ? undefined : lastPhotoTimestamp.current,
+          first: updatePictures ? mediaLength.current || 52 : 52,
+          after: refreshing ? undefined : lastPageInfo.current?.endCursor,
           assetType:
             kind === 'mixed' ? 'All' : kind === 'image' ? 'Photos' : 'Videos',
           groupTypes: album?.type,
@@ -123,31 +123,26 @@ const PhotoGalleryMediaList = (
           include: ['playableDuration'],
         });
 
-        const hasNextPage = result.page_info.has_next_page;
         const assets = result.edges;
-        const endTimestamp = assets[assets.length - 1]?.node.timestamp;
-
+        lastPageInfo.current = {
+          hasNextPage: result.page_info.has_next_page,
+          endCursor: result.page_info.end_cursor,
+        };
         setMedias(previous => {
           const result = refreshing ? assets : [...previous, ...assets];
           mediaLength.current = result.length;
           return result;
         });
-
-        if (endTimestamp) {
-          lastPhotoTimestamp.current = Math.round(endTimestamp * 1000) - 1;
-        }
-        setHasNext(hasNextPage);
       } catch (e) {
         console.log(e);
         return;
       } finally {
-        unstable_batchedUpdates(() => {
-          setIsLoadingMore(false);
-          setIsRefreshing(false);
-        });
+        isLoading.current = false;
+        setIsLoadingMore(false);
+        setIsRefreshing(false);
       }
     },
-    [album?.title, album?.type, kind, lastPhotoTimestamp],
+    [album?.title, album?.type, kind],
   );
 
   useImperativeHandle(ref, () => ({
@@ -256,10 +251,10 @@ const PhotoGalleryMediaList = (
   );
 
   const onEndReached = useCallback(() => {
-    if (hasNext && !isLoadingMore) {
+    if (lastPageInfo.current?.hasNextPage && !isLoadingMore) {
       void load();
     }
-  }, [hasNext, isLoadingMore, load]);
+  }, [isLoadingMore, load]);
 
   //should select the first media when the list if no media is selected
   useEffect(() => {

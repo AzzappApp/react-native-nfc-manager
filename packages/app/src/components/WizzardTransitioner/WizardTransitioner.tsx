@@ -1,9 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import {
-  unstable_batchedUpdates,
-  type StyleProp,
-  type ViewStyle,
-} from 'react-native';
+import { type StyleProp, type ViewStyle } from 'react-native';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import Animated, {
   Easing,
@@ -67,16 +63,14 @@ const WizardTransitioner = ({
     }
     const transitionKind =
       currentStepIndex > previousStepIndex.current ? 'forward' : 'back';
-    unstable_batchedUpdates(() => {
-      setNextStepIndex(currentStepIndex);
-      setTransitionInformation({
-        transitionKind,
-        transitioningPage:
-          transitionKind === 'forward'
-            ? currentStepIndex
-            : previousStepIndex.current,
-        disappearingPage: previousStepIndex.current,
-      });
+    setNextStepIndex(currentStepIndex);
+    setTransitionInformation({
+      transitionKind,
+      transitioningPage:
+        transitionKind === 'forward'
+          ? currentStepIndex
+          : previousStepIndex.current,
+      disappearingPage: previousStepIndex.current,
     });
     previousStepIndex.current = currentStepIndex;
     let transitionValue = withTiming(

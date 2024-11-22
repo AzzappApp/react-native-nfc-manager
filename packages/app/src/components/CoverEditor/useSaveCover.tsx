@@ -5,7 +5,7 @@ import {
 } from '@shopify/react-native-skia';
 import { FileSystemUploadType, UploadTask } from 'expo-file-system';
 import { useCallback, useState } from 'react';
-import { Platform, unstable_batchedUpdates } from 'react-native';
+import { Platform } from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import * as mime from 'react-native-mime-types';
 import { graphql, useMutation } from 'react-relay';
@@ -109,12 +109,10 @@ const useSaveCover = (
         },
       ));
     } catch (error) {
-      unstable_batchedUpdates(() => {
-        setSavingStatus('error');
-        setError(error);
-        setExportProgressIndicator(null);
-        setUploadProgressIndicator(null);
-      });
+      setSavingStatus('error');
+      setError(error);
+      setExportProgressIndicator(null);
+      setUploadProgressIndicator(null);
       throw error;
     }
 
@@ -150,10 +148,8 @@ const useSaveCover = (
       },
     );
 
-    unstable_batchedUpdates(() => {
-      setSavingStatus('uploading');
-      setUploadProgressIndicator(uploadProgress);
-    });
+    setSavingStatus('uploading');
+    setUploadProgressIndicator(uploadProgress);
     const result = await uploadTask.uploadAsync();
     if (!result) {
       throw new Error('Error uploading media');
@@ -225,28 +221,22 @@ const useSaveCover = (
         });
       });
     } catch (error) {
-      unstable_batchedUpdates(() => {
-        setSavingStatus('error');
-        setError(error);
-        setExportProgressIndicator(null);
-        setUploadProgressIndicator(null);
-      });
-      throw error;
-    }
-    unstable_batchedUpdates(() => {
-      setSavingStatus('complete');
+      setSavingStatus('error');
+      setError(error);
       setExportProgressIndicator(null);
       setUploadProgressIndicator(null);
-    });
+      throw error;
+    }
+    setSavingStatus('complete');
+    setExportProgressIndicator(null);
+    setUploadProgressIndicator(null);
   }, [commit, coverEditorState, webCardId]);
 
   const reset = useCallback(() => {
-    unstable_batchedUpdates(() => {
-      setSavingStatus(null);
-      setError(null);
-      setExportProgressIndicator(null);
-      setUploadProgressIndicator(null);
-    });
+    setSavingStatus(null);
+    setError(null);
+    setExportProgressIndicator(null);
+    setUploadProgressIndicator(null);
   }, []);
 
   return {
