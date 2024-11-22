@@ -90,7 +90,11 @@ const ContactAvatar = ({
             {name}
           </Text>
         )}
-        {company && <Text style={styles.company}>{company}</Text>}
+        {company && (
+          <Text numberOfLines={1} style={styles.company}>
+            {company}
+          </Text>
+        )}
       </View>
     </View>
   );
