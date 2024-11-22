@@ -1,5 +1,6 @@
-## 1.4.0-canary.128
+## 1.4.0-canary.129
 
+* **fix:**  - **PhotoGalleryMediaList:** id collision ([#6053](https://github.com/AzzappApp/azzapp/pull/6053))
 * **fix:**  - move company name on 1 line ([#6048](https://github.com/AzzappApp/azzapp/pull/6048))
 * **fix:**  - 🐛 properly show links with keyboard + scroll ([#6051](https://github.com/AzzappApp/azzapp/pull/6051))
 * **fix:**  - 🐛 take pexel video closest to hd without quality ([#6052](https://github.com/AzzappApp/azzapp/pull/6052))
