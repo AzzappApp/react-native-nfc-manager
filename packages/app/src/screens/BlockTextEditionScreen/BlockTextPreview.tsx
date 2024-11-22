@@ -4,7 +4,7 @@ import type { BlockTextRendererProps } from '#components/cardModules/BlockTextRe
 
 type BlockTextPreviewProps = Pick<
   BlockTextRendererProps,
-  'animatedData' | 'cardStyle' | 'colorPalette' | 'data' | 'style'
+  'cardStyle' | 'colorPalette' | 'data' | 'style'
 > & {
   /**
    * A callback that is called when the module preview is pressed.
@@ -20,14 +20,12 @@ const BlockTextPreview = ({
   colorPalette,
   cardStyle,
   onPreviewPress,
-  animatedData,
   ...props
 }: BlockTextPreviewProps) => {
   return (
     <EditorScaledPreview onPreviewPress={onPreviewPress} {...props}>
       <BlockTextRenderer
         data={data}
-        animatedData={animatedData!}
         cardStyle={cardStyle}
         colorPalette={colorPalette}
       />

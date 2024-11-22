@@ -2,7 +2,7 @@ import omit from 'lodash/omit';
 import { startTransition, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Platform, StyleSheet } from 'react-native';
-import { useSharedValue } from 'react-native-reanimated';
+import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment, useMutation } from 'react-relay';
 
 import {
@@ -12,6 +12,7 @@ import {
   getBlockTextDefaultValues,
 } from '@azzapp/shared/cardModuleHelpers';
 import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
+import AnimatedDataOverride from '#components/AnimatedDataOverride';
 import { useRouter } from '#components/NativeRouter';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
@@ -273,6 +274,15 @@ const BlockTextEditionScreen = ({
     data.marginVertical ?? BLOCK_TEXT_DEFAULT_VALUES.marginVertical,
   );
 
+  const animatedData = useDerivedValue(() => ({
+    fontSize: fontSize.value,
+    verticalSpacing: verticalSpacing.value,
+    textMarginVertical: textMarginVertical.value,
+    textMarginHorizontal: textMarginHorizontal.value,
+    marginHorizontal: marginHorizontal.value,
+    marginVertical: marginVertical.value,
+  }));
+
   const onTextBackgroundChange = fieldUpdateHandler('textBackgroundId');
 
   const onTextBackgroundStyleChange = fieldUpdateHandler('textBackgroundStyle');
@@ -416,21 +426,17 @@ const BlockTextEditionScreen = ({
           />
         }
       />
-      <BlockTextPreview
-        style={{ height: topPanelHeight - 20, marginVertical: 10 }}
-        data={previewData}
-        animatedData={{
-          fontSize,
-          verticalSpacing,
-          marginHorizontal,
-          marginVertical,
-          textMarginVertical,
-          textMarginHorizontal,
-        }}
-        onPreviewPress={onPreviewPress}
-        colorPalette={profile?.webCard?.cardColors}
-        cardStyle={profile?.webCard?.cardStyle}
-      />
+      <AnimatedDataOverride data={previewData} animatedData={animatedData}>
+        {data => (
+          <BlockTextPreview
+            style={{ height: topPanelHeight - 20, marginVertical: 10 }}
+            data={data}
+            onPreviewPress={onPreviewPress}
+            colorPalette={profile?.webCard?.cardColors}
+            cardStyle={profile?.webCard?.cardStyle}
+          />
+        )}
+      </AnimatedDataOverride>
       <TabView
         style={{
           height: bottomPanelHeight,
