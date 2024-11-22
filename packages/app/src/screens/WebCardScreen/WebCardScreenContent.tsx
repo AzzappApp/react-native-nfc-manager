@@ -368,12 +368,16 @@ const WebCardScreenContent = ({
           allBlockLoaded={allBlockLoaded}
           onScroll={onScroll}
           editFooter={
-            <WebCardScreenEditModeFooter
-              fromCreation={fromCreation}
-              onAddContent={onAddContent}
-              onSkip={onDone}
-              webcard={webCard}
-            />
+            isViewer ? (
+              <Suspense>
+                <WebCardScreenEditModeFooter
+                  fromCreation={fromCreation}
+                  onAddContent={onAddContent}
+                  onSkip={onDone}
+                  webcard={webCard}
+                />
+              </Suspense>
+            ) : null
           }
           editFooterHeight={WEBCARD_SCREEN_EDIT_MODE_FOOTER_HEIGHT}
         >
