@@ -1,5 +1,8 @@
-## 1.4.0-canary.125
+## 1.4.0-canary.126
 
+* **fix:**  - contacts missing patch ([#6044](https://github.com/AzzappApp/azzapp/pull/6044))
+* **fix:**  - **TextBlock:** refactor animatedData edition ([#6041](https://github.com/AzzappApp/azzapp/pull/6041))
+* **fix:**  - share cover was not working after cover creation ([#5984](https://github.com/AzzappApp/azzapp/pull/5984))
 * **fix:**  - **WebCardScreen:** fix reveal animation ([#6035](https://github.com/AzzappApp/azzapp/pull/6035))
 * **fix:**  - 🐛 properly handle android assets ([#6033](https://github.com/AzzappApp/azzapp/pull/6033))
 * **fix:**  - 🐛 properly display contact modal text ([#6023](https://github.com/AzzappApp/azzapp/pull/6023))
