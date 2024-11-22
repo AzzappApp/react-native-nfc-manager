@@ -578,7 +578,7 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
     const { data, count } = result;
     return connectionFromArraySlice(
       data.map(video => {
-        const videoFile = video.video_files
+        let videoFile = video.video_files
           .filter(
             ({ quality, width, height }) =>
               quality === 'hd' && width != null && height != null,
@@ -596,6 +596,29 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
             }
             return lowest;
           }, null);
+
+        // In some cases, video_files don't include "quality", hence we find the closest to HD (Width of 720)
+        if (!videoFile) {
+          videoFile = video.video_files.reduce((closestToHD, current) => {
+            if (!current.width) {
+              return closestToHD;
+            }
+
+            if (!closestToHD.width && current.width) {
+              return current;
+            }
+
+            if (
+              closestToHD.width &&
+              current.width &&
+              Math.abs(closestToHD.width - 720) > Math.abs(current.width - 720)
+            ) {
+              return current;
+            }
+
+            return closestToHD;
+          }, video.video_files[0]);
+        }
 
         return {
           id: `pexels_v_${video.id}`,
