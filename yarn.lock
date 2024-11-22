@@ -165,7 +165,7 @@ __metadata:
     expo-av: "npm:^15.0.1"
     expo-blur: "npm:14.0.1"
     expo-clipboard: "npm:~7.0.0"
-    expo-contacts: "patch:expo-contacts@npm%3A14.0.2#~/.yarn/patches/expo-contacts-npm-14.0.2-47a6bf515f.patch"
+    expo-contacts: "patch:expo-contacts@patch%3Aexpo-contacts@npm%253A14.0.2%23~/.yarn/patches/expo-contacts-npm-14.0.2-47a6bf515f.patch%3A%3Aversion=14.0.2&hash=20e638#~/.yarn/patches/expo-contacts-patch-0d7f995ace.patch"
     expo-device: "npm:7.0.1"
     expo-file-system: "npm:^18.0.3"
     expo-font: "npm:~13.0.1"
@@ -16420,13 +16420,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-contacts@patch:expo-contacts@npm%3A14.0.2#~/.yarn/patches/expo-contacts-npm-14.0.2-47a6bf515f.patch":
+"expo-contacts@patch:expo-contacts@npm%3A14.0.2#~/.yarn/patches/expo-contacts-npm-14.0.2-47a6bf515f.patch::version=14.0.2&hash=20e638":
   version: 14.0.2
   resolution: "expo-contacts@patch:expo-contacts@npm%3A14.0.2#~/.yarn/patches/expo-contacts-npm-14.0.2-47a6bf515f.patch::version=14.0.2&hash=20e638"
   peerDependencies:
     expo: "*"
     react-native: "*"
   checksum: 10/13e4b294a4bf226112571afd219d74f9daeb638eec5a293f4ac8f0bc20730c30bbc5dc89816ff749daaa7eed46cdb6468924662eceb899ab44226f9de2ca9a19
+  languageName: node
+  linkType: hard
+
+"expo-contacts@patch:expo-contacts@patch%3Aexpo-contacts@npm%253A14.0.2%23~/.yarn/patches/expo-contacts-npm-14.0.2-47a6bf515f.patch%3A%3Aversion=14.0.2&hash=20e638#~/.yarn/patches/expo-contacts-patch-0d7f995ace.patch":
+  version: 14.0.2
+  resolution: "expo-contacts@patch:expo-contacts@patch%3Aexpo-contacts@npm%253A14.0.2%23~/.yarn/patches/expo-contacts-npm-14.0.2-47a6bf515f.patch%3A%3Aversion=14.0.2&hash=20e638#~/.yarn/patches/expo-contacts-patch-0d7f995ace.patch::version=14.0.2&hash=799bc9"
+  peerDependencies:
+    expo: "*"
+    react-native: "*"
+  checksum: 10/e779f68be92397402d0592cf1aaab6da6c7c245cf1ce84c0ecabbb97204f3b1ccad04cda969d35c9563e8b46f2ef199b070bd2f922e5a149d8a0c3030e0d56ec
   languageName: node
   linkType: hard
 
