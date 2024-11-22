@@ -1,5 +1,6 @@
-## 1.4.0-canary.124
+## 1.4.0-canary.125
 
+* **fix:**  - **WebCardScreen:** fix reveal animation ([#6035](https://github.com/AzzappApp/azzapp/pull/6035))
 * **fix:**  - 🐛 properly handle android assets ([#6033](https://github.com/AzzappApp/azzapp/pull/6033))
 * **fix:**  - 🐛 properly display contact modal text ([#6023](https://github.com/AzzappApp/azzapp/pull/6023))
 * **fix:**  - **CoverEditor:** replace IconButton by PressableNative ([#6022](https://github.com/AzzappApp/azzapp/pull/6022))
