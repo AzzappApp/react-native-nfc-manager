@@ -1,5 +1,8 @@
-## 1.4.0-canary.127
+## 1.4.0-canary.128
 
+* **fix:**  - move company name on 1 line ([#6048](https://github.com/AzzappApp/azzapp/pull/6048))
+* **fix:**  - 🐛 properly show links with keyboard + scroll ([#6051](https://github.com/AzzappApp/azzapp/pull/6051))
+* **fix:**  - 🐛 take pexel video closest to hd without quality ([#6052](https://github.com/AzzappApp/azzapp/pull/6052))
 * **fix:**  - all insets of the applications screen ([#6045](https://github.com/AzzappApp/azzapp/pull/6045))
 * **fix:**  - contacts missing patch ([#6044](https://github.com/AzzappApp/azzapp/pull/6044))
 * **fix:**  - **TextBlock:** refactor animatedData edition ([#6041](https://github.com/AzzappApp/azzapp/pull/6041))
