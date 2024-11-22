@@ -1,13 +1,7 @@
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet, View, useColorScheme, Platform } from 'react-native';
+import { StyleSheet, View, useColorScheme } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
-import { useKeyboardHandler } from 'react-native-keyboard-controller';
-import Animated, {
-  interpolate,
-  useAnimatedStyle,
-  useSharedValue,
-} from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { useDebouncedCallback } from 'use-debounce';
 import { SOCIAL_LINKS } from '@azzapp/shared/socialLinkHelpers';
@@ -218,32 +212,8 @@ const SocialLinksLinksEditionPanel = ({
     setScrollHeight(event.nativeEvent.layout.height);
   }, []);
 
-  const keyboardOffset = useSharedValue(0);
-
-  useKeyboardHandler(
-    {
-      onMove: e => {
-        'worklet';
-        keyboardOffset.value = interpolate(
-          e.progress,
-          [0, 1],
-          [0, OFFSET_WITH_KEYBOARD],
-        );
-      },
-    },
-    [],
-  );
-
-  const animatedStyle = useAnimatedStyle(() => {
-    if (Platform.OS === 'android' || ignoreKeyboard) return {};
-    return {
-      position: 'relative',
-      top: keyboardOffset.value,
-    };
-  });
-
   return (
-    <Animated.View style={[styles.root, style, animatedStyle]} {...props}>
+    <View style={[styles.root, style]} {...props}>
       <TitleWithLine
         title={intl.formatMessage({
           defaultMessage: 'Links',
@@ -272,7 +242,7 @@ const SocialLinksLinksEditionPanel = ({
         onLayout={onLayout}
         onChangeOrder={onChangeOrder}
       />
-    </Animated.View>
+    </View>
   );
 };
 
@@ -431,5 +401,3 @@ const styles = StyleSheet.create({
 const NO_POSITION_INDEX = 100;
 
 export const SOCIAL_LINK_PANEL_ITEM_HEIGHT = 56;
-
-const OFFSET_WITH_KEYBOARD = 100;

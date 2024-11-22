@@ -49,16 +49,14 @@ const EditorScaledPreview = ({
   const moduleLayout = useSharedValue<LayoutRectangle | null>(null);
 
   useFrameCallback(() => {
-    if (!containerValue.value) {
-      const measured = measure(containerRef);
-      if (measured) {
-        containerValue.value = measured;
-      }
+    const containerSize = measure(containerRef);
+    if (containerSize) {
+      containerValue.value = containerSize;
     }
 
-    const measured = measure(moduleRef);
-    if (measured) {
-      moduleLayout.value = measured;
+    const moduleSize = measure(moduleRef);
+    if (moduleSize) {
+      moduleLayout.value = moduleSize;
     }
   });
 
