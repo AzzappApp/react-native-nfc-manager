@@ -127,6 +127,8 @@ Sentry.init({
   // WARNING: This option interferes with reanimated and creates flickering in some animations
   // do not enable it unless it has been fixed
   enableStallTracking: false,
+  tracesSampleRate:
+    process.env.DEPLOYMENT_ENVIRONMENT === 'production' ? 0.1 : 1,
 });
 
 //initializing RC sneed to be done early
@@ -323,6 +325,15 @@ const AppRouter = () => {
       Sentry.startIdleNavigationSpan({
         name: route.route,
         op: 'navigation',
+      });
+      Sentry.addBreadcrumb({
+        category: 'navigation',
+        type: 'navigation',
+        message: `Navigating to ${route.route}`,
+        data: {
+          to: route.route,
+          params: route.params,
+        },
       });
       analyticsLogScreenEvent(route.route);
     });
