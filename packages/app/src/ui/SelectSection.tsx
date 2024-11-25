@@ -150,7 +150,6 @@ const SelectSection = <ItemT, SectionT>({
         height={bottomSheetHeight}
         variant="modal"
         onDismiss={closeDropDown}
-        nestedScroll
         dismissKeyboardOnOpening
       >
         {bottomSheetTitle && (

@@ -35,7 +35,6 @@ const FontPicker = ({
       height={height}
       visible={visible}
       onDismiss={onRequestClose}
-      nestedScroll
       enableContentPanningGesture={false}
     >
       {title && (

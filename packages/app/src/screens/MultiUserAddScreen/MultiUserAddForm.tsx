@@ -55,7 +55,6 @@ const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
     name: 'selectedContact',
   });
   const { value: selectedContact, onChange: setSelectedContact } = fieldContact;
-
   const updateSelectedContact = useCallback(
     (info: {
       id: string;
@@ -127,7 +126,6 @@ const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
               bottom
             }
             variant="modal"
-            nestedScroll
           >
             <Header
               middleElement={
@@ -144,6 +142,7 @@ const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
               renderItem={renderAvailableInfo}
               onItemSelected={updateSelectedContact}
               itemContainerStyle={styles.selectItemContainerStyle}
+              useFlatList={false}
             />
           </BottomSheetModal>
         )}
@@ -185,15 +184,13 @@ const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
             keyExtractor={keyExtractor}
             onItemSelected={item => onChange(item.id)}
             itemContainerStyle={[styles.selectItemContainerStyle]}
-            bottomSheetHeight={
-              BOTTOM_SHEET_HEIGHT_BASE + roles.length * BOTTOM_SHEET_HEIGHT_ITEM
-            }
             bottomSheetTitle={
               intl.formatMessage({
                 defaultMessage: 'Select a role',
                 description: 'MultiUserAddForm - Role BottomSheet - Title',
               }) as string
             }
+            useFlatList={false}
           />
         )}
       />

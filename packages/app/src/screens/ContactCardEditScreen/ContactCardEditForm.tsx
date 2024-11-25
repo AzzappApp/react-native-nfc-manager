@@ -17,7 +17,6 @@ import ImagePicker, {
   SelectImageStepWithFrontCameraByDefault,
 } from '#components/ImagePicker';
 import { ScreenModal } from '#components/NativeRouter';
-
 import {
   MAX_FIELD_HEIGHT,
   buildContactCardModalStyleSheet,

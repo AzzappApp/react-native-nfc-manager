@@ -177,7 +177,6 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
           visible={visible}
           onDismiss={close}
           style={styles.bottomSheetStyle}
-          nestedScroll
         >
           <Controller
             name={labelKey}
@@ -193,6 +192,7 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
                 }}
                 selectedItemKey={value as string}
                 labelField="value"
+                useFlatList={false}
               />
             )}
           />

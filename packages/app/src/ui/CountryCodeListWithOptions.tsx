@@ -98,7 +98,6 @@ const CountryCodeListWithOptions = <T extends string>({
         visible={showDropdown}
         height={windowHeight - 120}
         onDismiss={onRequestClose}
-        nestedScroll
         dismissKeyboardOnOpening
       >
         <CountrySelector

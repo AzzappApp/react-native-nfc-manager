@@ -44,7 +44,6 @@ const ContactDetailsModal = (
       height={height - top - bottom - (Platform.OS === 'ios' ? 0 : 100)}
       visible={!!details}
       onDismiss={onClose}
-      nestedScroll
     >
       {details && (
         <ContactDetailsBody

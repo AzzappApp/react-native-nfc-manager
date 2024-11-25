@@ -98,6 +98,11 @@ type SelectProps<ItemT> = Omit<ViewProps, 'children'> & {
   disabled?: boolean;
 
   dismissKeyboardOnOpening?: boolean;
+  /**
+   * If false the list will be displayed in a plain react view instead of a FlatList
+   * @default true
+   */
+  useFlatList?: boolean;
 };
 
 /**
@@ -121,6 +126,7 @@ const Select = <ItemT,>({
   style,
   ListHeaderComponent,
   dismissKeyboardOnOpening,
+  useFlatList,
   ...props
 }: SelectProps<ItemT>) => {
   const [showDropDown, openDropDown, closeDropDown] = useBoolean(false);
@@ -201,7 +207,6 @@ const Select = <ItemT,>({
         height={bottomSheetHeight ? bottomSheetHeight + bottom : undefined}
         variant="modal"
         onDismiss={closeDropDown}
-        nestedScroll
         dismissKeyboardOnOpening={dismissKeyboardOnOpening}
       >
         {bottomSheetTitle && <Header middleElement={bottomSheetTitle} />}
@@ -215,6 +220,7 @@ const Select = <ItemT,>({
           itemContainerStyle={itemContainerStyle}
           selectedItemContainerStyle={selectedItemContainerStyle}
           ListHeaderComponent={ListHeaderComponent}
+          useFlatList={useFlatList}
         />
       </BottomSheetModal>
     </>

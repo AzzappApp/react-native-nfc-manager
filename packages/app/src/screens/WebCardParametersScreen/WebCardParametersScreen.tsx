@@ -601,10 +601,7 @@ const WebCardParametersScreen = ({
               data={webCardCategories ?? []}
               selectedItemKey={webCard.webCardCategory?.id}
               keyExtractor={keyExtractor}
-              bottomSheetHeight={Math.min(
-                (webCardCategories.length ?? 0) * 50 + 80,
-                bottomSheetMaxHeight,
-              )}
+              useFlatList={false}
               onItemSelected={updateWebCardCategory}
               bottomSheetTitle={
                 intl.formatMessage({

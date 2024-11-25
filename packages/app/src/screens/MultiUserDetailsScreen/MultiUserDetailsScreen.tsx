@@ -563,10 +563,6 @@ const MultiUserDetailsScreen = ({
                     keyExtractor={keyExtractor}
                     onItemSelected={item => onChange(item.id)}
                     itemContainerStyle={styles.selectItemContainerStyle}
-                    bottomSheetHeight={
-                      BOTTOM_SHEET_HEIGHT_BASE +
-                      roles.length * BOTTOM_SHEET_HEIGHT_ITEM
-                    }
                     bottomSheetTitle={
                       intl.formatMessage({
                         defaultMessage: 'Select a role',
@@ -574,6 +570,7 @@ const MultiUserDetailsScreen = ({
                           'MultiUserDetailForm - Role BottomSheet - Title',
                       }) as string
                     }
+                    useFlatList={false}
                   />
                 </View>
               )}
@@ -659,9 +656,6 @@ const MultiUserDetailsScreen = ({
     </Container>
   );
 };
-
-const BOTTOM_SHEET_HEIGHT_BASE = 100;
-const BOTTOM_SHEET_HEIGHT_ITEM = 40;
 
 const roles: Array<{ id: ProfileRole; label: ReactNode }> = [
   {

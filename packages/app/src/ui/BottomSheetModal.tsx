@@ -5,7 +5,6 @@ import {
 } from '@gorhom/bottom-sheet';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Keyboard } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
 import {
   Extrapolation,
   interpolate,
@@ -54,13 +53,6 @@ export type Props = BottomSheetModalProps & {
    */
   automaticBottomPadding?: boolean;
   /**
-   * this props enable the resizing of the bottom sheet on its content when scrolling
-   * Thiis used in addition with SnapPoint props that need to contain at least 2 values
-   *
-   * @type {boolean}
-   */
-  nestedScroll?: boolean;
-  /**
    * If true, create a backdrop that allow te be touched in order to close the bottom
    *
    * @type {boolean}
@@ -90,7 +82,6 @@ const BottomSheetModal = ({
   height,
   automaticBottomPadding = true,
   enableContentPanningGesture,
-  nestedScroll = false,
   closeOnBackdropTouch = true,
   variant,
   dismissKeyboardOnOpening = false,
@@ -191,12 +182,7 @@ const BottomSheetModal = ({
           },
         ]}
       >
-        {/*
-        we had wrap the view inside <BottomSheetView in order to workaround following issue:
-        https://github.com/gorhom/react-native-bottom-sheet/issues/2020
-        Keep it nested, I wrapped it inside a ScrollView
-        */}
-        {nestedScroll ? <ScrollView>{children}</ScrollView> : children}
+        {children}
       </BottomSheetView>
       <Toast />
     </BottomSheetModalG>
