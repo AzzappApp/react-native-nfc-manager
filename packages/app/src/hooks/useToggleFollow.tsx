@@ -1,8 +1,8 @@
 import { useIntl } from 'react-intl';
 import Toast from 'react-native-toast-message';
 import { useMutation, graphql, ConnectionHandler } from 'react-relay';
+import { getAuthState } from '#helpers/authStore';
 import Text from '#ui/Text';
-import { useProfileInfos } from './authStateHooks';
 import type {
   useToggleFollowMutation,
   useToggleFollowMutation$data,
@@ -99,8 +99,6 @@ const updater = (
 };
 
 const useToggleFollow = (userNameFilter?: string) => {
-  const profileInfos = useProfileInfos();
-  const currentWebCardId = profileInfos?.webCardId;
   const [commit, toggleFollowingActive] = useMutation<useToggleFollowMutation>(
     graphql`
       mutation useToggleFollowMutation(
@@ -129,6 +127,8 @@ const useToggleFollow = (userNameFilter?: string) => {
     if (toggleFollowingActive) {
       return;
     }
+    const profileInfos = getAuthState().profileInfos;
+    const currentWebCardId = profileInfos?.webCardId;
 
     Toast.show({
       text1: (follow

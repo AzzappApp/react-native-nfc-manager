@@ -6,7 +6,7 @@ import {
   useSVG,
 } from '@shopify/react-native-skia';
 import concat from 'lodash/concat';
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
   interpolateColor,
@@ -105,7 +105,7 @@ const HomeHeader = ({ openPanel, user: userKey }: HomeHeaderProps) => {
   );
 };
 
-export default HomeHeader;
+export default memo(HomeHeader);
 
 export const HOME_HEADER_HEIGHT = 28;
 

@@ -1,5 +1,5 @@
 import concat from 'lodash/concat';
-import { useState, useMemo, useCallback, startTransition } from 'react';
+import { useState, useMemo, useCallback, startTransition, memo } from 'react';
 import { StyleSheet, useWindowDimensions, View } from 'react-native';
 import Animated, {
   interpolateColor,
@@ -242,4 +242,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeBottomPanel;
+export default memo(HomeBottomPanel);
