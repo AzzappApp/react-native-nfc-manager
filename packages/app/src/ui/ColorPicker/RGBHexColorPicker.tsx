@@ -36,13 +36,24 @@ const RGBHexColorPicker = ({
   useEffect(() => {
     const chromCol = chroma.hsv(hue, saturation, value).rgb();
     // chroma object will always return a new reference,  caompare it with the hex value
-    if (chromCol && chromaColorRgb.current !== chromCol) {
+    if (
+      chromCol &&
+      (chromaColorRgb.current[0] !== chromCol[0] ||
+        chromaColorRgb.current[1] !== chromCol[1] ||
+        chromaColorRgb.current[2] !== chromCol[2])
+    ) {
       chromaColorRgb.current = chromCol;
-      setLocalColor({
-        red: String(chromCol[0]),
-        green: String(chromCol[1]),
-        blue: String(chromCol[2]),
-      });
+      setLocalColor(localColor =>
+        localColor.red !== String(chromCol[0]) &&
+        localColor.green !== String(chromCol[1]) &&
+        localColor.blue !== String(chromCol[2])
+          ? {
+              red: String(chromCol[0]),
+              green: String(chromCol[1]),
+              blue: String(chromCol[2]),
+            }
+          : localColor,
+      );
     }
   }, [hue, saturation, value]);
 
@@ -59,6 +70,8 @@ const RGBHexColorPicker = ({
           setLocalColor(prev => ({ ...prev, red: String(red) }));
           return;
         }
+        setLocalColor(prev => ({ ...prev, red: String(red) }));
+        chromaColorRgb.current[0] = red;
         onChange(
           chroma
             .rgb(
@@ -93,6 +106,8 @@ const RGBHexColorPicker = ({
           setLocalColor(prev => ({ ...prev, green: String(green) }));
           return;
         }
+        setLocalColor(prev => ({ ...prev, green: String(green) }));
+        chromaColorRgb.current[1] = green;
         onChange(
           chroma
             .rgb(
@@ -127,6 +142,8 @@ const RGBHexColorPicker = ({
           setLocalColor(prev => ({ ...prev, blue: String(blue) }));
           return;
         }
+        setLocalColor(prev => ({ ...prev, blue: String(blue) }));
+        chromaColorRgb.current[2] = blue;
         onChange(
           chroma
             .rgb(
