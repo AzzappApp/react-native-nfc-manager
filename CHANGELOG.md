@@ -1,4 +1,4 @@
-## 1.4.0-canary.135
+## 1.4.0-canary.136
 
 * **fix:**  - ensure bottomSheet are not too big and fix scrolling on long List ([#6063](https://github.com/AzzappApp/azzapp/pull/6063))
 * **fix:**  - improve fast navigation on Home ([#6069](https://github.com/AzzappApp/azzapp/pull/6069))
