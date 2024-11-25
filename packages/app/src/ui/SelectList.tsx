@@ -1,4 +1,3 @@
-import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import map from 'lodash/map';
 import { memo, useCallback } from 'react';
 import {
@@ -8,6 +7,7 @@ import {
   type FlatListProps,
   View,
 } from 'react-native';
+import { FlatList } from 'react-native-gesture-handler';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Text from '#ui/Text';
@@ -106,14 +106,21 @@ function SelectList<ItemT>({
     );
   }
 
+  /**
+   * according to: https://github.com/gorhom/react-native-bottom-sheet/issues/377
+   * we need to use FlatList, not BottomSheetFlatList
+   */
   return (
-    <BottomSheetFlatList
+    <FlatList
       accessibilityRole="list"
       data={data}
       keyExtractor={keyExtractor}
       renderItem={renderListItem}
       contentContainerStyle={contentContainerStyle}
       style={style}
+      scrollEnabled={true}
+      overScrollMode={'always'}
+      nestedScrollEnabled={true}
       {...props}
     />
   );

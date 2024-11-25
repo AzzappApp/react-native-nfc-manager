@@ -15,6 +15,8 @@ import {
 } from '#helpers/contactCardHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useBoolean from '#hooks/useBoolean';
+import useScreenDimensions from '#hooks/useScreenDimensions';
+import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
@@ -95,6 +97,24 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
   const [visible, open, close] = useBoolean(false);
 
   const styles = useStyleSheet(stylesheet);
+
+  // compute max height of the bottomSheet (2/3 of screen)
+  const { height: screenHeight } = useScreenDimensions();
+  const insets = useScreenInsets();
+  const visibleHeight = screenHeight - insets.top - insets.bottom;
+  const maxHeight = (visibleHeight * 2) / 3;
+
+  // estimate size of the bottomSheet
+  const expectedHeight =
+    (labelValues?.length || 0) * 30 +
+    10 + // size of the header
+    2 * styles.bottomSheetStyle.padding +
+    insets.bottom; // max height is 2/3 of screen size
+
+  const useFlatList = expectedHeight > maxHeight;
+  const bottomSheetHeight = useFlatList
+    ? Math.min(expectedHeight, maxHeight)
+    : undefined;
 
   return (
     <>
@@ -177,6 +197,7 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
           visible={visible}
           onDismiss={close}
           style={styles.bottomSheetStyle}
+          height={bottomSheetHeight}
         >
           <Controller
             name={labelKey}
@@ -192,7 +213,7 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
                 }}
                 selectedItemKey={value as string}
                 labelField="value"
-                useFlatList={false}
+                useFlatList={useFlatList}
               />
             )}
           />
