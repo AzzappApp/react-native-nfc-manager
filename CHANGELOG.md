@@ -1,5 +1,6 @@
-## 1.4.0-canary.130
+## 1.4.0-canary.131
 
+* **fix:**  - **android:** [#6005](https://github.com/AzzappApp/azzapp/pull/6005) blink on color picker ([#6056](https://github.com/AzzappApp/azzapp/pull/6056))
 * **fix:**  - **BottomSheet:** Don't use flat list in simple select list ([#6049](https://github.com/AzzappApp/azzapp/pull/6049))
 * **fix:**  - **PhotoGalleryMediaList:** id collision ([#6053](https://github.com/AzzappApp/azzapp/pull/6053))
 * **fix:**  - move company name on 1 line ([#6048](https://github.com/AzzappApp/azzapp/pull/6048))
