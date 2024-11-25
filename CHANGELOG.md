@@ -1,5 +1,6 @@
-## 1.4.0-canary.136
+## 1.4.0-canary.137
 
+* **fix:**  - put back navigation in sentry breadcrumb ([#6074](https://github.com/AzzappApp/azzapp/pull/6074))
 * **fix:**  - ensure bottomSheet are not too big and fix scrolling on long List ([#6063](https://github.com/AzzappApp/azzapp/pull/6063))
 * **fix:**  - improve fast navigation on Home ([#6069](https://github.com/AzzappApp/azzapp/pull/6069))
 * **fix:**  - 🐛 remove rotation arrow on contact card home ([#6062](https://github.com/AzzappApp/azzapp/pull/6062))
