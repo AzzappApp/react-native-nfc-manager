@@ -96,6 +96,7 @@ const formInput = style({
   '::placeholder': {
     color: vars.color.grey200,
   },
+  textOverflow: 'ellipsis',
 });
 
 const formButtonSuccess = style({});
