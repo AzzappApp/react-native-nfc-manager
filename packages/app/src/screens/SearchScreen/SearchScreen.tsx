@@ -55,6 +55,13 @@ export const SearchScreen = ({ hasFocus = true }: { hasFocus: boolean }) => {
     addRecentSearchItem(searchTrimmed);
   }, [addRecentSearchItem, searchValue]);
 
+  const onSearch = useCallback(async (search: string) => {
+    setShowTabView(true);
+    setSearchValue(search);
+    const searchTrimmed = search?.trim();
+    setSearchValueSubmitted(searchTrimmed);
+  }, []);
+
   const insets = useScreenInsets();
 
   const showRecent = useAnimatedState(searchBarHasFocus, {
@@ -136,7 +143,7 @@ export const SearchScreen = ({ hasFocus = true }: { hasFocus: boolean }) => {
             searchValue={searchValue}
             recentSearch={recentSearch}
             removeSearch={removeRecentSearchItem}
-            search={onSubmittedSearch}
+            search={onSearch}
           />
         </Animated.View>
       </View>
