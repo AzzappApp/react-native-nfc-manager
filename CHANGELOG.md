@@ -1,5 +1,6 @@
-## 1.4.0-canary.129
+## 1.4.0-canary.130
 
+* **fix:**  - **BottomSheet:** Don't use flat list in simple select list ([#6049](https://github.com/AzzappApp/azzapp/pull/6049))
 * **fix:**  - **PhotoGalleryMediaList:** id collision ([#6053](https://github.com/AzzappApp/azzapp/pull/6053))
 * **fix:**  - move company name on 1 line ([#6048](https://github.com/AzzappApp/azzapp/pull/6048))
 * **fix:**  - 🐛 properly show links with keyboard + scroll ([#6051](https://github.com/AzzappApp/azzapp/pull/6051))
