@@ -8,7 +8,7 @@ import {
 } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
-import { notifyUsers } from '#externals';
+import { notifyUsers, sendPushNotification } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
 import { userLoader, webCardLoader } from '#loaders';
 import { checkWebCardProfileAdminRight } from '#helpers/permissionsHelpers';
@@ -118,6 +118,18 @@ const sendInvitations: MutationResolvers['sendInvitations'] = async (
         'invitation',
         guessLocale(user?.locale),
       );
+    }
+    for (let i = 0; i < users.length; i++) {
+      const userToNotify = users[i].user;
+      if (userToNotify) {
+        await sendPushNotification(userToNotify.id, {
+          type: 'multiuser_invitation',
+          mediaId: webCard.coverMediaId,
+          deepLink: 'multiuser_invitation',
+          localeParams: { userName: webCard.userName },
+          locale: guessLocale(userToNotify.locale),
+        });
+      }
     }
   } catch (e) {
     Sentry.captureException(e);
