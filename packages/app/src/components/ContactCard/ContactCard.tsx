@@ -1,15 +1,12 @@
 import {
   BlendColor,
   Canvas,
-  ColorMatrix,
   Group,
   ImageSVG,
-  OpacityMatrix,
   Paint,
   Skia,
   fitbox,
   rect,
-  useSVG,
 } from '@shopify/react-native-skia';
 import { memo, useMemo } from 'react';
 import { Image, View } from 'react-native';
@@ -38,7 +35,6 @@ const ContactCard = ({
   profile: profileKey,
   height,
   style,
-  withRotationArrows = false,
 }: ContactCardProps) => {
   const { contactCard, contactCardQrCode, webCard } = useFragment(
     graphql`
@@ -73,7 +69,6 @@ const ContactCard = ({
       webCard={webCard}
       height={height}
       style={style}
-      withRotationArrows={withRotationArrows}
       contactCard={contactCard}
       contactCardQrCode={contactCardQrCode}
     />
@@ -102,7 +97,6 @@ type ContactCardComponentProps = {
   webCard?: WebCard | null;
   height: number;
   style?: StyleProp<ViewStyle>;
-  withRotationArrows?: boolean;
   contactCard?: ContactCard | null;
   contactCardQrCode?: string;
 };
@@ -111,7 +105,6 @@ export const ContactCardComponent = ({
   webCard,
   height,
   style,
-  withRotationArrows = false,
   contactCard,
   contactCardQrCode,
 }: ContactCardComponentProps) => {
@@ -119,8 +112,6 @@ export const ContactCardComponent = ({
     webCard ?? {};
 
   const styles = useStyleSheet(stylesheet);
-  const rotateArrowLeft = useSVG(require('#assets/rotateArrowLeft.svg'));
-  const rotateArrowRight = useSVG(require('#assets/rotateArrowRight.svg'));
 
   const backgroundColor = cardColors?.primary ?? colors.black;
 
@@ -256,19 +247,6 @@ export const ContactCardComponent = ({
       <View style={styles.qrCodeContainer}>
         {svg ? (
           <Canvas style={styles.qrCodeCanvas}>
-            {withRotationArrows && (
-              <Group
-                layer={
-                  <Paint>
-                    <BlendColor color={readableColor} mode="srcATop" />
-                    <ColorMatrix matrix={OpacityMatrix(0.5)} />
-                  </Paint>
-                }
-              >
-                <ImageSVG x={90} y={3} svg={rotateArrowLeft} />
-                <ImageSVG x={7} y={95} svg={rotateArrowRight} />
-              </Group>
-            )}
             <Group
               layer={
                 <Paint>
