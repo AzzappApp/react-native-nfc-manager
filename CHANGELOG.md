@@ -1,5 +1,6 @@
-## 1.4.0-canary.134
+## 1.4.0-canary.135
 
+* **fix:**  - ensure bottomSheet are not too big and fix scrolling on long List ([#6063](https://github.com/AzzappApp/azzapp/pull/6063))
 * **fix:**  - improve fast navigation on Home ([#6069](https://github.com/AzzappApp/azzapp/pull/6069))
 * **fix:**  - 🐛 remove rotation arrow on contact card home ([#6062](https://github.com/AzzappApp/azzapp/pull/6062))
 * **fix:**  - 🐛 properly search ([#6060](https://github.com/AzzappApp/azzapp/pull/6060))
