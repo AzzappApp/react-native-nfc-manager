@@ -31,8 +31,8 @@ import { useIndexInterpolation } from './homeHelpers';
 import { useHomeScreenContext } from './HomeScreenContext';
 import type { HomeInformations_user$key } from '#relayArtifacts/HomeInformations_user.graphql';
 import type { IntlShape } from 'react-intl';
+import type { ViewProps } from 'react-native';
 import type { DerivedValue } from 'react-native-reanimated';
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type HomeInformationsProps = {
   user: HomeInformations_user$key;

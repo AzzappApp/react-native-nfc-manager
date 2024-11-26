@@ -1,6 +1,6 @@
 import { View } from 'react-native';
 import useScreenInsets from '#hooks/useScreenInsets';
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
+import type { ViewProps } from 'react-native';
 
 const SafeAreaView = ({ style, ...props }: ViewProps) => {
   const insets = useScreenInsets();
