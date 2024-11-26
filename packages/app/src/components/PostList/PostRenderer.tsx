@@ -95,6 +95,8 @@ export type PostRendererProps = ViewProps & {
   onActionDisabled?: () => void;
 
   showUnpublished?: boolean;
+
+  onDeleted?: () => void;
 };
 
 export type PostRendererHandle = {
@@ -117,6 +119,7 @@ const PostRenderer = (
     onActionDisabled,
     showUnpublished = false,
     useAnimationSnapshot,
+    onDeleted,
     ...props
   }: PostRendererProps,
   forwardedRef: ForwardedRef<PostRendererHandle>,
@@ -254,6 +257,7 @@ const PostRenderer = (
           post={post}
           actionEnabled={actionEnabled}
           onActionDisabled={onActionDisabled}
+          onDeleted={onDeleted}
         />
       </Suspense>
     </View>

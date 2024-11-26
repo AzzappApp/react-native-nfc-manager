@@ -61,6 +61,8 @@ type PostRendererBottomPanelProps = {
   actionEnabled: boolean;
 
   onActionDisabled?: () => void;
+
+  onDeleted?: () => void;
 };
 
 const PostRendererBottomPanel = ({
@@ -70,6 +72,7 @@ const PostRendererBottomPanel = ({
   post: postKey,
   actionEnabled,
   onActionDisabled,
+  onDeleted,
 }: PostRendererBottomPanelProps) => {
   const router = useRouter();
   const post = useFragment(
@@ -368,6 +371,7 @@ const PostRendererBottomPanel = ({
         },
         onCompleted() {
           closeModal();
+          onDeleted?.();
         },
       });
     } else {
@@ -380,12 +384,13 @@ const PostRendererBottomPanel = ({
       });
     }
   }, [
-    commit,
-    intl,
-    post.id,
     profileInfos?.profileRole,
     profileInfos?.webCardId,
+    commit,
+    post.id,
     closeModal,
+    onDeleted,
+    intl,
   ]);
 
   const [sendReport, commitSendReportLoading] = useSendReport(

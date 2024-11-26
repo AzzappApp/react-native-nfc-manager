@@ -36,6 +36,7 @@ type PostListProps = ViewProps & {
   onPressAuthor?: () => void;
   showUnpublished?: boolean;
   firstItemVideoTime?: number | null;
+  onPostDeleted?: () => void;
 };
 
 const viewabilityConfig = {
@@ -58,6 +59,7 @@ const PostList = ({
   onPressAuthor,
   showUnpublished = false,
   firstItemVideoTime,
+  onPostDeleted,
   ...props
 }: PostListProps) => {
   const profileInfos = useProfileInfos();
@@ -281,10 +283,11 @@ const PostList = ({
           showUnpublished={extraData.showUnpublished}
           useAnimationSnapshot={index === 0}
           initialTime={index === 0 ? extraData.firstItemVideoTime : undefined}
+          onDeleted={onPostDeleted}
         />
       ) : null;
     },
-    [onActionDisabled, onPressAuthor],
+    [onActionDisabled, onPostDeleted, onPressAuthor],
   );
 
   const extraData = useMemo(
