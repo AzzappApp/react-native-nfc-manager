@@ -1,4 +1,4 @@
-## 1.4.0-canary.137
+## 1.4.0-canary.138
 
 * **fix:**  - put back navigation in sentry breadcrumb ([#6074](https://github.com/AzzappApp/azzapp/pull/6074))
 * **fix:**  - ensure bottomSheet are not too big and fix scrolling on long List ([#6063](https://github.com/AzzappApp/azzapp/pull/6063))
