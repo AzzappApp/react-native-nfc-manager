@@ -4,7 +4,7 @@ Source code of the client React Native application.
 
 # Code structure
 
-The app package is a React Native applications, so it retains the same directory structure thatn every RN application.
+The app package is a React Native applications, so it retains the same directory structure that every RN application.
 
 - `android` contains Android native source code
 - `ios` contains the IOS native source code
