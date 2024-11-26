@@ -298,7 +298,7 @@ const styleSheet = createStyleSheet(appearance => ({
     backgroundColor: appearance === 'light' ? colors.white : colors.black,
     padding: COVER_SUGGESTIONS_PADDING,
     gap: COVER_SUGGESTIONS_PADDING,
-    borderRadius: 15,
+    borderRadius: 18,
     overFlow: 'visible',
     width: COVER_SUGGESTIONS_WIDTH + 2 * COVER_SUGGESTIONS_PADDING,
     height:
@@ -314,6 +314,7 @@ const styleSheet = createStyleSheet(appearance => ({
     aspectRatio: COVER_RATIO,
   },
   bottomActions: {
+    flex: 1,
     flexDirection: 'row',
     width: '100%',
     alignItems: 'center',
