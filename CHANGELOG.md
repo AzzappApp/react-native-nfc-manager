@@ -1,5 +1,6 @@
-## 1.4.1-canary.2
+## 1.4.1-canary.3
 
+* **fix:**  - fix spacing and card border radius ([#6070](https://github.com/AzzappApp/azzapp/pull/6070))
 * **perf:**  - **android:** improve social links behaviour ([#6088](https://github.com/AzzappApp/azzapp/pull/6088))
 * **fix:**  - put back navigation in sentry breadcrumb ([#6074](https://github.com/AzzappApp/azzapp/pull/6074))
 * **fix:**  - ensure bottomSheet are not too big and fix scrolling on long List ([#6063](https://github.com/AzzappApp/azzapp/pull/6063))
