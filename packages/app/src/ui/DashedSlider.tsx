@@ -56,12 +56,12 @@ const DashedSlider = ({
   const previousValue = useRef<number | null>(null);
 
   useInterval(() => {
-    const nextValue = Math.round(pan.value / step) * step;
+    const nextValue = Math.round(pan.get() / step) * step;
     if (previousValue.current === nextValue || !onChange) {
       return;
     }
 
-    onChange(Math.round(pan.value / step) * step);
+    onChange(Math.round(pan.get() / step) * step);
     previousValue.current = nextValue;
   }, 16);
 

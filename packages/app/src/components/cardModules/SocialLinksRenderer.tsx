@@ -1,4 +1,5 @@
-import { useEffect } from 'react';
+import { memoize } from 'lodash';
+import { useCallback, useEffect, useMemo } from 'react';
 import { LayoutAnimation, Linking, Platform, UIManager } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
@@ -392,7 +393,10 @@ const SocialLinkRenderer = ({
 }) => {
   const animatedPressableStyle = useAnimatedStyle(() => {
     if (typeof marginHorizontal === 'number') {
-      return {};
+      return {
+        marginLeft: first ? marginHorizontal : 0,
+        marginRight: last ? marginHorizontal : 0,
+      };
     }
 
     return {
@@ -402,19 +406,8 @@ const SocialLinkRenderer = ({
     };
   });
 
-  const staticPressableStyle =
-    typeof marginHorizontal === 'number'
-      ? {
-          marginLeft: first ? marginHorizontal : 0,
-          marginRight: last ? marginHorizontal : 0,
-        }
-      : {};
-
   return (
-    <PressableOpacity
-      style={[style, animatedPressableStyle, staticPressableStyle]}
-      {...props}
-    >
+    <PressableOpacity style={[style, animatedPressableStyle]} {...props}>
       <SocialIcon icon={icon} style={iconStyle} />
     </PressableOpacity>
   );

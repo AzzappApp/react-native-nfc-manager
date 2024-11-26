@@ -278,12 +278,12 @@ const SocialLinksEditionScreen = ({
 
     const input: SaveSocialLinksModuleInput = {
       ...value,
-      iconSize: iconSize.value,
-      borderWidth: borderWidth.value,
-      columnGap: columnGap.value,
-      marginTop: marginTop.value,
-      marginBottom: marginBottom.value,
-      marginHorizontal: marginHorizontal.value,
+      iconSize: iconSize.get(),
+      borderWidth: borderWidth.get(),
+      columnGap: columnGap.get(),
+      marginTop: marginTop.get(),
+      marginBottom: marginBottom.get(),
+      marginHorizontal: marginHorizontal.get(),
       moduleId: socialLinks?.id,
       links: value.links!,
     };
@@ -336,6 +336,120 @@ const SocialLinksEditionScreen = ({
   const { bottomPanelHeight, insetBottom, insetTop, windowWidth } =
     useEditorLayout({ bottomPanelMinHeight: 400 });
 
+  const animatedData = useMemo(
+    () => ({
+      iconSize,
+      borderWidth,
+      columnGap,
+      marginTop,
+      marginBottom,
+      marginHorizontal,
+    }),
+    [
+      iconSize,
+      borderWidth,
+      columnGap,
+      marginTop,
+      marginBottom,
+      marginHorizontal,
+    ],
+  );
+
+  const tabs = useMemo(
+    () => [
+      {
+        id: 'links',
+        element: (
+          <SocialLinksLinksEditionPanel
+            links={links}
+            onLinksChange={onLinksChange}
+            style={{
+              minHeight: bottomPanelHeight,
+              flex: 1,
+              marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
+            }}
+          />
+        ),
+      },
+      {
+        id: 'settings',
+        element: (
+          <SocialLinksSettingsEditionPanel
+            webCard={profile?.webCard ?? null}
+            iconColor={iconColor}
+            onIconColorChange={onIconColorChange}
+            arrangement={arrangement}
+            onArrangementChange={onArrangementChange}
+            iconSize={iconSize}
+            borderWidth={borderWidth}
+            columnGap={columnGap}
+            style={{
+              flex: 1,
+              marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
+            }}
+            bottomSheetHeight={bottomPanelHeight}
+            onTouched={onTouched}
+          />
+        ),
+      },
+      {
+        id: 'margins',
+        element: (
+          <SocialLinksMarginsEditionPanel
+            marginTop={marginTop}
+            marginBottom={marginBottom}
+            marginHorizontal={marginHorizontal ?? 0}
+            style={{
+              flex: 1,
+              marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
+            }}
+            bottomSheetHeight={bottomPanelHeight}
+            onTouched={onTouched}
+          />
+        ),
+      },
+      {
+        id: 'background',
+        element: (
+          <SocialLinksBackgroundEditionPanel
+            profile={profile}
+            backgroundId={backgroundId}
+            backgroundStyle={backgroundStyle}
+            onBackgroundChange={onBackgroundChange}
+            onBackgroundStyleChange={onBackgroundStyleChange}
+            bottomSheetHeight={bottomPanelHeight}
+            style={{
+              flex: 1,
+              marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
+            }}
+          />
+        ),
+      },
+    ],
+    [
+      arrangement,
+      backgroundId,
+      backgroundStyle,
+      borderWidth,
+      bottomPanelHeight,
+      columnGap,
+      iconColor,
+      iconSize,
+      insetBottom,
+      links,
+      marginBottom,
+      marginHorizontal,
+      marginTop,
+      onArrangementChange,
+      onBackgroundChange,
+      onBackgroundStyleChange,
+      onIconColorChange,
+      onLinksChange,
+      onTouched,
+      profile,
+    ],
+  );
+
   return (
     <Container style={[styles.root, { paddingTop: insetTop }]}>
       <Header
@@ -372,100 +486,21 @@ const SocialLinksEditionScreen = ({
         }
       />
       <KeyboardAvoidingView
-        style={{ flex: 1, justifyContent: 'flex-end' }}
+        style={styles.keyboardView}
         behavior="padding"
         keyboardVerticalOffset={-insetBottom - BOTTOM_MENU_HEIGHT}
       >
         <SocialLinksPreview
-          style={{
-            flex: 1,
-            marginVertical: 10,
-          }}
+          style={styles.preview}
           colorPalette={profile.webCard?.cardColors}
           cardStyle={null}
-          animatedData={{
-            iconSize,
-            borderWidth,
-            columnGap,
-            marginTop,
-            marginBottom,
-            marginHorizontal,
-          }}
+          animatedData={animatedData}
           data={previewData}
         />
         <TabView
           style={{ height: bottomPanelHeight }}
           currentTab={currentTab}
-          tabs={[
-            {
-              id: 'links',
-              element: (
-                <SocialLinksLinksEditionPanel
-                  links={links}
-                  onLinksChange={onLinksChange}
-                  style={{
-                    minHeight: bottomPanelHeight,
-                    flex: 1,
-                    marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                  }}
-                />
-              ),
-            },
-            {
-              id: 'settings',
-              element: (
-                <SocialLinksSettingsEditionPanel
-                  webCard={profile?.webCard ?? null}
-                  iconColor={iconColor}
-                  onIconColorChange={onIconColorChange}
-                  arrangement={arrangement}
-                  onArrangementChange={onArrangementChange}
-                  iconSize={iconSize}
-                  borderWidth={borderWidth}
-                  columnGap={columnGap}
-                  style={{
-                    flex: 1,
-                    marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                  }}
-                  bottomSheetHeight={bottomPanelHeight}
-                  onTouched={onTouched}
-                />
-              ),
-            },
-            {
-              id: 'margins',
-              element: (
-                <SocialLinksMarginsEditionPanel
-                  marginTop={marginTop}
-                  marginBottom={marginBottom}
-                  marginHorizontal={marginHorizontal ?? 0}
-                  style={{
-                    flex: 1,
-                    marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                  }}
-                  bottomSheetHeight={bottomPanelHeight}
-                  onTouched={onTouched}
-                />
-              ),
-            },
-            {
-              id: 'background',
-              element: (
-                <SocialLinksBackgroundEditionPanel
-                  profile={profile}
-                  backgroundId={backgroundId}
-                  backgroundStyle={backgroundStyle}
-                  onBackgroundChange={onBackgroundChange}
-                  onBackgroundStyleChange={onBackgroundStyleChange}
-                  bottomSheetHeight={bottomPanelHeight}
-                  style={{
-                    flex: 1,
-                    marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                  }}
-                />
-              ),
-            },
-          ]}
+          tabs={tabs}
         />
       </KeyboardAvoidingView>
       <SocialLinksEditionBottomMenu
@@ -491,4 +526,9 @@ const styles = StyleSheet.create({
     left: 10,
     right: 10,
   },
+  preview: {
+    flex: 1,
+    marginVertical: 10,
+  },
+  keyboardView: { flex: 1, justifyContent: 'flex-end' },
 });

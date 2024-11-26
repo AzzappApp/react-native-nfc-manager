@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { useWindowDimensions, StyleSheet } from 'react-native';
 import Animated, {
   scrollTo,
@@ -68,16 +69,16 @@ const SortableList = <T extends SortableListItem>({
   const scrollViewRef = useAnimatedRef<Animated.ScrollView>();
   const dimensions = useWindowDimensions();
 
-  const onDragEnd = () => {
+  const onDragEnd = useCallback(() => {
     onChangeOrder(
       items.map(item => {
         return {
           ...item,
-          position: positions.value[item.id],
+          position: positions.get()[item.id],
         };
       }),
     );
-  };
+  }, [items, onChangeOrder, positions]);
 
   useAnimatedReaction(
     () => scrollY.value,

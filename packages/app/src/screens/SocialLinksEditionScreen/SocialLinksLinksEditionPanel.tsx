@@ -1,4 +1,5 @@
-import { memo, useCallback, useEffect, useState } from 'react';
+import _ from 'lodash';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View, useColorScheme } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
@@ -137,27 +138,33 @@ const SocialLinksLinksEditionPanel = ({
 
       consolidatedLinks.push({
         ...link,
-        position: NO_POSITION_INDEX, //required for reordering
-        ...value,
+        position: value?.position ?? NO_POSITION_INDEX, //required for reordering
         placeholder,
       });
     }
 
-    return consolidatedLinks;
-  }, [intl, links]);
-
-  const [data, setData] = useState(
-    getLinks().sort((a, b) => {
+    return consolidatedLinks.sort((a, b) => {
       if (a.position !== b.position) {
         return a.position - b.position;
       }
       return 0;
-    }),
-  );
+    });
+  }, [intl, links]);
+
+  const [data, setData] = useState(getLinks);
 
   useEffect(() => {
-    setData(getLinks());
+    setData(data => {
+      const newData = getLinks();
+      if (_.isEqual(data, newData)) {
+        return data;
+      } else {
+        return newData;
+      }
+    });
   }, [getLinks]);
+
+  const initialLinks = useRef(links);
 
   const renderItem = useCallback(
     (
@@ -170,7 +177,9 @@ const SocialLinksLinksEditionPanel = ({
       },
       panGesture: PanGesture,
     ) => {
-      const value = links.find(link => link?.socialId === item.id)?.link ?? '';
+      const value =
+        initialLinks.current.find(link => link?.socialId === item.id)?.link ??
+        '';
       return (
         <SocialInput
           icon={item.id}
@@ -182,7 +191,7 @@ const SocialLinksLinksEditionPanel = ({
         />
       );
     },
-    [links, onChangeLink],
+    [onChangeLink],
   );
 
   const onChangeOrder = (
@@ -339,35 +348,34 @@ const SocialInputComponent = ({
     [icon, intl, onChangeLink],
   );
 
-  return (
-    <View
-      key={icon}
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        height: 56,
-      }}
-    >
-      <SocialIcon
-        icon={icon}
-        style={{
-          width: 30,
-          height: 30,
-          tintColor: isNotFalsyString(value)
-            ? colorScheme === 'dark'
-              ? colors.white
-              : colors.black
-            : colors.grey400,
-        }}
-      />
+  const leftElement = useMemo(
+    () => (
+      <Text variant="textField" style={{ color: colors.grey400 }}>
+        {mask}
+      </Text>
+    ),
+    [mask],
+  );
 
+  const socialIconStyle = useMemo(
+    () => ({
+      width: 30,
+      height: 30,
+      tintColor: isNotFalsyString(localValue)
+        ? colorScheme === 'dark'
+          ? colors.white
+          : colors.black
+        : colors.grey400,
+    }),
+    [colorScheme, localValue],
+  );
+
+  return (
+    <View key={icon} style={styles.inputContainer}>
+      <SocialIcon icon={icon} style={socialIconStyle} />
       <Input
-        style={{ flex: 1, marginLeft: 5, marginRight: 5 }}
-        leftElement={
-          <Text variant="textField" style={{ color: colors.grey400 }}>
-            {mask}
-          </Text>
-        }
+        style={styles.input}
+        leftElement={leftElement}
         placeholder={placeholder}
         clearButtonMode="always"
         value={localValue}
@@ -396,6 +404,12 @@ const styles = StyleSheet.create({
     rowGap: 15,
     justifyContent: 'flex-start',
   },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 56,
+  },
+  input: { flex: 1, marginLeft: 5, marginRight: 5 },
 });
 
 const NO_POSITION_INDEX = 100;

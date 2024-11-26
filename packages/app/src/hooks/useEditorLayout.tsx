@@ -63,15 +63,19 @@ const useEditorLayout = ({
     return bottomPanelMinHeight;
   }, [contentHeight, topPanelHeight, inset, bottomPanelMinHeight]);
 
-  return {
-    windowWidth,
-    windowHeight,
-    contentHeight,
-    bottomPanelHeight,
-    topPanelHeight,
-    insetTop,
-    insetBottom,
-  };
+  const result = useMemo(
+    () => ({
+      windowWidth,
+      windowHeight,
+      contentHeight,
+      bottomPanelHeight,
+      topPanelHeight,
+      insetTop,
+      insetBottom,
+    }),
+    [contentHeight, bottomPanelHeight, topPanelHeight, insetTop, insetBottom],
+  );
+  return result;
 };
 
 export default useEditorLayout;
