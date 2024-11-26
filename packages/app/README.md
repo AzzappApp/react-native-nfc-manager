@@ -18,8 +18,7 @@ The typescript source code has the following directory structure :
 - `components`: contains React components **reused** by different screens of the application, contrary to components in `ui` those components may contains application related logic
 - `helpers`: contains helpers functions that are **only used in the clients** source code (otherwise they should be placed in the `@azzapp/shared` package)
 - `hooks`: contains custom react hooks reused accros the application
-- `screens`: contains React components that represents a top level screen of the application, since those components will be reused on the web client they should not contains any native specific code.
-- `mobileScreens`: contains the specialized version of `screens` component used only by the native application
+- `screens`: contains the specialized version of `screens` component used only by the native application
 
 
 # Native Routing
