@@ -304,7 +304,7 @@ const styleSheet = createStyleSheet(appearance => ({
     ...fontFamilies.semibold,
     lineHeight: 14,
     fontSize: 11,
-    color: appearance === 'light' ? colors.grey200 : colors.grey400,
+    color: appearance === 'light' ? colors.grey300 : colors.grey500,
   },
   image: {
     tintColor: appearance === 'light' ? colors.grey200 : colors.grey400,

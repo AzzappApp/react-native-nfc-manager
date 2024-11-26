@@ -173,7 +173,7 @@ const MainTabBar = ({
     >
       <BottomMenu
         currentTab={currentRoute}
-        iconSize={28}
+        iconSize={24}
         tabs={tabs}
         onItemPress={onItemPress}
         showLabel

@@ -54,4 +54,4 @@ export const HomeIcon = () => {
   );
 };
 
-const COVER_WIDTH = 18;
+const COVER_WIDTH = 15;
