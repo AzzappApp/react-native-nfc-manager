@@ -1,5 +1,4 @@
-import { memoize } from 'lodash';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { LayoutAnimation, Linking, Platform, UIManager } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
