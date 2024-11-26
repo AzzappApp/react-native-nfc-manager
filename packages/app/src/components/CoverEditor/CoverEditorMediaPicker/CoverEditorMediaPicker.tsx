@@ -1,3 +1,4 @@
+import { ResizeMode, Video } from 'expo-av';
 import { Image } from 'expo-image';
 import {
   startTransition,
@@ -606,15 +607,25 @@ const CoverEditorMediaPicker = ({
                               style={styles.mediaPicked}
                               testID="image-picker-Media-image"
                             >
-                              <Image
-                                source={{
-                                  uri:
-                                    media?.galleryUri ??
-                                    media.thumbnail ??
-                                    media.uri,
-                                }}
-                                style={styles.image}
-                              />
+                              {media.kind === 'image' ||
+                              media.galleryUri ||
+                              media.thumbnail ? (
+                                <Image
+                                  source={{
+                                    uri:
+                                      media?.galleryUri ??
+                                      media.thumbnail ??
+                                      media.uri,
+                                  }}
+                                  style={styles.image}
+                                />
+                              ) : (
+                                <Video
+                                  source={{ uri: media.uri }}
+                                  style={styles.image}
+                                  resizeMode={ResizeMode.COVER}
+                                />
+                              )}
                             </View>
                             <IconButton
                               icon="close"

@@ -322,7 +322,7 @@ const CoverEditorCore = (
       coverTemplate?.medias.forEach(({ media, index, editable }) => {
         initialMediaToPick[index] = {
           editable,
-          kind: 'image',
+          kind: media.id.startsWith('v_') ? 'video' : 'image',
           filter: null,
           animation: null,
           editionParameters: null,

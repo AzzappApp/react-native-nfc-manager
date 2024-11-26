@@ -193,7 +193,10 @@ const CoverTemplatesParametersForm = ({
         const uploadedMedias = await Promise.all(
           medias.map(async media => {
             if (media.id instanceof File) {
-              const { public_id } = await uploadMedia(media.id, 'image');
+              const { public_id } = await uploadMedia(
+                media.id,
+                media.id.type.startsWith('image') ? 'image' : 'video',
+              );
               return {
                 ...media,
                 id: public_id,
@@ -502,13 +505,18 @@ const CoverTemplatesParametersForm = ({
             const media = medias.find(media => media.index === index);
             const value =
               typeof media?.id === 'string'
-                ? { id: media.id, kind: 'image' as const }
+                ? {
+                    id: media.id,
+                    kind: media.id.startsWith('v_')
+                      ? ('video' as const)
+                      : ('image' as const),
+                  }
                 : (media?.id ?? null);
 
             return (
               <Box key={index} display="flex" flexDirection="column">
                 <MediaInput
-                  buttonLabel="UPLOAD AN IMAGE"
+                  buttonLabel="UPLOAD A MEDIA"
                   buttonStyle={{
                     paddingLeft: 0,
                     paddingRight: 0,
@@ -516,7 +524,7 @@ const CoverTemplatesParametersForm = ({
                   }}
                   label={`Media #${index}`}
                   name={`media-${index}`}
-                  kind="image"
+                  kind="mixed"
                   onChange={file => {
                     onMediaChange({
                       id: file,

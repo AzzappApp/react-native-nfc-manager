@@ -76,6 +76,7 @@ export const getCoverTemplatesByTypesAndTag = async (
         tagIdJson ? sql`JSON_CONTAINS(tags, ${tagIdJson})` : undefined,
       ),
     )
+    .orderBy(CoverTemplateTable.order, CoverTemplateTable.name)
     .then(rows =>
       rows.map(row => ({
         ...row.CoverTemplateTable,
