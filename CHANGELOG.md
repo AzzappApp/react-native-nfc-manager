@@ -1,4 +1,4 @@
-## 1.4.1-canary.4
+## 1.4.1-canary.5
 
 * **fix:**  - 🐛 go back on deleted post ([#6086](https://github.com/AzzappApp/azzapp/pull/6086))
 * **fix:**  - 🐛 return ordered templates + accept videos ([#6085](https://github.com/AzzappApp/azzapp/pull/6085))
