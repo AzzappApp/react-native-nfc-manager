@@ -121,6 +121,7 @@ const HomeProfilesCarousel = ({ user: userKey }: HomeProfilesCarouselProps) => {
   // globalScrollToIndex is available in Context to allow scrolling
   // when a new card is added via invitation
   globalScrollToIndex.current = scrollToIndex;
+  const onFocusScrollTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
   useOnFocus(() => {
     const { profileInfos } = getAuthState();
@@ -132,9 +133,21 @@ const HomeProfilesCarousel = ({ user: userKey }: HomeProfilesCarouselProps) => {
       authProfileIndex !== -1 &&
       authProfileIndex + 1 !== currentIndexProfileSharedValue.get()
     ) {
-      carouselRef.current?.scrollToIndex(authProfileIndex + 1, false);
+      if (Platform.OS === 'ios') {
+        clearTimeout(onFocusScrollTimeoutRef.current);
+        // This timeout is a workaround for: https://github.com/AzzappApp/azzapp/issues/6071
+        onFocusScrollTimeoutRef.current = setTimeout(() => {
+          carouselRef.current?.scrollToIndex(authProfileIndex + 1, false);
+        }, 2000);
+      } else {
+        carouselRef.current?.scrollToIndex(authProfileIndex + 1, false);
+      }
     }
   });
+
+  useEffect(() => {
+    return () => clearTimeout(onFocusScrollTimeoutRef.current);
+  }, []);
 
   const carouselRef = useRef<CarouselSelectListHandle | null>(null);
   const [selectedIndex, setSelectedIndex] = useState(initialProfileIndex);
