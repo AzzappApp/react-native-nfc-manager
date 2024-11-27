@@ -60,7 +60,6 @@ const ModuleSelectionListModalItem = ({
         <Text
           variant="button"
           style={{ paddingTop: 10, paddingBottom: 10 }}
-          adjustsFontSizeToFit
           numberOfLines={1}
         >
           {module.label}
