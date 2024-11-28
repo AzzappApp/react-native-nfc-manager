@@ -1,5 +1,7 @@
-## 1.4.1-canary.5
+## 1.4.1-canary.6
 
+* **fix:**  - add missing fields on phone synchro ([#6101](https://github.com/AzzappApp/azzapp/pull/6101))
+* **fix:**  - enable shaow on android in BoxSelectionList ([#6098](https://github.com/AzzappApp/azzapp/pull/6098))
 * **fix:**  - 🐛 go back on deleted post ([#6086](https://github.com/AzzappApp/azzapp/pull/6086))
 * **fix:**  - 🐛 return ordered templates + accept videos ([#6085](https://github.com/AzzappApp/azzapp/pull/6085))
 * **fix:**  - fix spacing and card border radius ([#6070](https://github.com/AzzappApp/azzapp/pull/6070))
