@@ -375,12 +375,6 @@ const CoverEditorCore = (
     }
   }, [coverEditorState.isModified, onCoverModified]);
 
-  const contextValue = useMemo(() => {
-    return {
-      coverEditorState,
-      dispatch,
-    };
-  }, [coverEditorState, dispatch]);
   // #endregion
 
   const imageRefKeys = useRef<Record<string, string>>({});
@@ -729,7 +723,10 @@ const CoverEditorCore = (
   return (
     <>
       <View style={[styles.container, style]} {...props}>
-        <CoverEditorContextProvider value={contextValue}>
+        <CoverEditorContextProvider
+          value={coverEditorState}
+          dispatch={dispatch}
+        >
           <Animated.View style={[styles.container, coverPreviewAnimatedStyle]}>
             <Container style={styles.container}>
               <View style={styles.content} onLayout={onContentLayout}>
