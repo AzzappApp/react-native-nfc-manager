@@ -1,5 +1,6 @@
-## 1.4.1-canary.7
+## 1.4.1-canary.8
 
+* **fix:**  - allow to comment on unpublished webCard ([#6125](https://github.com/AzzappApp/azzapp/pull/6125))
 * **fix:**  - use a View for huePicker Gesture as hitSlop doesn't work on android ([#6096](https://github.com/AzzappApp/azzapp/pull/6096))
 * **fix:**  - split invited Prop ([#6107](https://github.com/AzzappApp/azzapp/pull/6107))
 * **fix:**  - 🐛 display comment with expand ([#6119](https://github.com/AzzappApp/azzapp/pull/6119))
