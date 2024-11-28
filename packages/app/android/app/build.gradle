@@ -88,8 +88,8 @@ android {
         applicationId "com.azzapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 10401009
-        versionName "1.4.1-rc.9"
+        versionCode 10401010
+        versionName "1.4.1-rc.10"
     }
 
     flavorDimensions "env"
