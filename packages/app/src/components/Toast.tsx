@@ -1,15 +1,15 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { memo, useCallback, useMemo } from 'react';
-import ExternalToast, {
-  BaseToast,
-  ErrorToast,
-} from 'react-native-toast-message';
+import { Pressable, View } from 'react-native';
+import ExternalToast from 'react-native-toast-message';
 import { textStyles, shadow, colors } from '#theme';
 import { useStyleSheet, createStyleSheet } from '#helpers/createStyles';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
+import Text from '#ui/Text';
 import type {
+  BaseToastProps,
   ToastProps as ExternalToastProps,
   ToastConfigParams,
 } from 'react-native-toast-message';
@@ -97,7 +97,7 @@ const Toast = ({
         />
       ),
       error: (errorProps: ToastConfigParams<ToastProps>) => (
-        <ErrorToast
+        <BaseToast
           {...errorProps}
           style={styles.baseToast}
           contentContainerStyle={styles.contentContainerToast}
@@ -163,6 +163,59 @@ const Toast = ({
       visibilityTime={visibilityTime}
       {...props}
     />
+  );
+};
+
+const BaseToast = ({
+  text1,
+  text2,
+  onPress,
+  activeOpacity = 1,
+  style,
+  touchableContainerProps,
+  contentContainerStyle,
+  contentContainerProps,
+  text1Style,
+  text1NumberOfLines = 1,
+  text1Props,
+  text2Style,
+  text2NumberOfLines = 1,
+  text2Props,
+  renderLeadingIcon,
+  renderTrailingIcon,
+}: BaseToastProps) => {
+  return (
+    <Pressable
+      onPress={onPress}
+      activeOpacity={activeOpacity}
+      style={[style, { flexDirection: 'row' }]}
+      {...touchableContainerProps}
+    >
+      {renderLeadingIcon && renderLeadingIcon()}
+      <View style={contentContainerStyle} {...contentContainerProps}>
+        {(text1?.length ?? 0) > 0 && (
+          <Text
+            style={text1Style}
+            numberOfLines={text1NumberOfLines}
+            ellipsizeMode="tail"
+            {...text1Props}
+          >
+            {text1}
+          </Text>
+        )}
+        {(text2?.length ?? 0) > 0 && (
+          <Text
+            style={text2Style}
+            numberOfLines={text2NumberOfLines}
+            ellipsizeMode="tail"
+            {...text2Props}
+          >
+            {text2}
+          </Text>
+        )}
+      </View>
+      {renderTrailingIcon && renderTrailingIcon()}
+    </Pressable>
   );
 };
 
