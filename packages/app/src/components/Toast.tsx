@@ -4,6 +4,7 @@ import { Pressable, View } from 'react-native';
 import ExternalToast from 'react-native-toast-message';
 import { textStyles, shadow, colors } from '#theme';
 import { useStyleSheet, createStyleSheet } from '#helpers/createStyles';
+import useScreenInsets from '#hooks/useScreenInsets';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
@@ -79,12 +80,14 @@ const Toast = ({
     [styles.closeToastIcon, styles.leftToastIconContainer],
   );
 
+  const insets = useScreenInsets();
+
   const toastConfig = useMemo(() => {
     return {
       success: (successProps: ToastConfigParams<ToastProps>) => (
         <BaseToast
           {...successProps}
-          style={styles.baseToast}
+          style={[styles.baseToast, { marginBottom: insets.bottom }]}
           contentContainerStyle={styles.contentContainerToast}
           renderLeadingIcon={() => (
             <Icon icon="check_round" style={styles.successToastIcon} />
@@ -99,7 +102,7 @@ const Toast = ({
       error: (errorProps: ToastConfigParams<ToastProps>) => (
         <BaseToast
           {...errorProps}
-          style={styles.baseToast}
+          style={[styles.baseToast, { marginBottom: insets.bottom }]}
           contentContainerStyle={styles.contentContainerToast}
           renderLeadingIcon={() => (
             <Icon icon="warning" style={styles.errorToastIcon} />
@@ -128,7 +131,7 @@ const Toast = ({
           />
           <BaseToast
             {...infoProps}
-            style={styles.baseToast}
+            style={[styles.baseToast, { marginBottom: insets.bottom }]}
             contentContainerStyle={styles.contentContainerToast}
             renderLeadingIcon={() => (
               <Icon icon="tips" style={styles.successToastIcon} />
@@ -146,6 +149,7 @@ const Toast = ({
     };
   }, [
     bottomOffset,
+    insets.bottom,
     renderTrailingIcon,
     styles.baseToast,
     styles.contentContainerToast,
