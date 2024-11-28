@@ -84,14 +84,16 @@ const CoverEditorMediaPicker = ({
 }: CoverEditorMediaPickerProps) => {
   const [selectedMedias, setSelectedMedias] = useState<
     Array<SourceMedia | null>
-  >(initialMediaUnfiltered?.filter(media => !media || media.editable) ?? []);
+  >(
+    initialMediaUnfiltered?.filter(
+      media => !media || ('editable' in media && media.editable),
+    ) ?? [],
+  );
 
   const durations = useMemo(() => {
     return initialDurationsUnfiltered?.filter((_d, idx) => {
-      return (
-        !initialMediaUnfiltered?.[idx] ||
-        initialMediaUnfiltered?.[idx]?.editable === true
-      );
+      const media = initialMediaUnfiltered?.[idx];
+      return !media || ('editable' in media && media.editable);
     });
   }, [initialDurationsUnfiltered, initialMediaUnfiltered]);
 
@@ -333,7 +335,7 @@ const CoverEditorMediaPicker = ({
     let selectedMediaIdx = 0;
 
     return initialMediaUnfiltered?.map(media => {
-      if (!media || media.editable) {
+      if (!media || ('editable' in media && media.editable)) {
         return inputMedia[selectedMediaIdx++];
       } else {
         return media;

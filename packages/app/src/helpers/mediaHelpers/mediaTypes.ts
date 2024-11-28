@@ -23,11 +23,6 @@ type SourceMediaBase = {
    * The height of the media.
    */
   height: number;
-
-  /**
-   * can be edited or fixed media.
-   */
-  editable: boolean;
 };
 
 /**

@@ -161,7 +161,6 @@ const SelectImageStep = ({
         uri,
         height,
         width,
-        editable: true,
       },
       forceCameraRatio,
     );
@@ -200,7 +199,6 @@ const SelectImageStep = ({
               width,
               rotation,
               duration: duration as number,
-              editable: true,
             },
             forceCameraRatio,
           );
