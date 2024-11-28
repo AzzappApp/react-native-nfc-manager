@@ -1,5 +1,8 @@
-## 1.4.1-canary.6
+## 1.4.1-canary.7
 
+* **fix:**  - use a View for huePicker Gesture as hitSlop doesn't work on android ([#6096](https://github.com/AzzappApp/azzapp/pull/6096))
+* **fix:**  - split invited Prop ([#6107](https://github.com/AzzappApp/azzapp/pull/6107))
+* **fix:**  - 🐛 display comment with expand ([#6119](https://github.com/AzzappApp/azzapp/pull/6119))
 * **fix:**  - add missing fields on phone synchro ([#6101](https://github.com/AzzappApp/azzapp/pull/6101))
 * **fix:**  - enable shaow on android in BoxSelectionList ([#6098](https://github.com/AzzappApp/azzapp/pull/6098))
 * **fix:**  - 🐛 go back on deleted post ([#6086](https://github.com/AzzappApp/azzapp/pull/6086))
