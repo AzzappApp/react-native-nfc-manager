@@ -4,7 +4,10 @@ import { ScrollView, Share, StyleSheet, View } from 'react-native';
 import ColorTriptychRenderer from '#components/ColorTriptychRenderer';
 import useBoolean from '#hooks/useBoolean';
 import useToggle from '#hooks/useToggle';
-import { useCoverEditorContext } from '../CoverEditorContext';
+import {
+  useCoverEditorContext,
+  useCoverEditorEditContext,
+} from '../CoverEditorContext';
 import CoverEditorLinksToolbox from './CoverEditorLinkToolbox';
 import CoverEditorMediaEditToolbox from './CoverEditorMediaEditToolbox';
 import CoverEditorMediaToolbox from './CoverEditorMediaToolbox';
@@ -30,7 +33,8 @@ const CoverEditorToolbox = (
     openOverlayImagePicker,
     closeOverlayImagePicker,
   ] = useBoolean(false);
-  const { coverEditorState, dispatch } = useCoverEditorContext();
+  const coverEditorState = useCoverEditorContext();
+  const dispatch = useCoverEditorEditContext();
 
   const { editionMode, cardColors, medias } = coverEditorState;
 
