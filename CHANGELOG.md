@@ -1,5 +1,7 @@
-## 1.4.1-canary.8
+## 1.4.1-canary.9
 
+* **feat:**  - add magnetic thresold on cover overlay creation ([#6130](https://github.com/AzzappApp/azzapp/pull/6130))
+* **fix:**  - remove editable from SourceMediaBase ([#6112](https://github.com/AzzappApp/azzapp/pull/6112))
 * **fix:**  - allow to comment on unpublished webCard ([#6125](https://github.com/AzzappApp/azzapp/pull/6125))
 * **fix:**  - use a View for huePicker Gesture as hitSlop doesn't work on android ([#6096](https://github.com/AzzappApp/azzapp/pull/6096))
 * **fix:**  - split invited Prop ([#6107](https://github.com/AzzappApp/azzapp/pull/6107))
