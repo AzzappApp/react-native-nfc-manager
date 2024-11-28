@@ -8,7 +8,7 @@ import {
   useState,
 } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { SectionList, View } from 'react-native';
+import { Platform, SectionList, View } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { graphql, useFragment, usePaginationFragment } from 'react-relay';
 import { useDebounce } from 'use-debounce';
@@ -398,7 +398,10 @@ const ItemList = ({ item }: { item: Profile }) => {
   const isCurrentUser = item.id === profileInfos?.profileId;
 
   return (
-    <Animated.View entering={FadeIn} exiting={FadeOut}>
+    <Animated.View
+      entering={FadeIn}
+      exiting={Platform.OS === 'ios' ? undefined : FadeOut} // commented to fix crash: https://github.com/AzzappApp/azzapp/issues/6116
+    >
       <PressableNative onPress={onPressItem} style={styles.user}>
         {avatarSource ? (
           <MediaImageRenderer source={avatarSource} style={styles.avatar} />
