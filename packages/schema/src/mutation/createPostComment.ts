@@ -25,10 +25,6 @@ const createPostCommentMutation: MutationResolvers['createPostComment'] =
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
 
-    if (!webCard.cardIsPublished) {
-      throw new GraphQLError(ERRORS.UNPUBLISHED_WEB_CARD);
-    }
-
     try {
       const postComment = {
         webCardId,

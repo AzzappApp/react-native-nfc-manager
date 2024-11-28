@@ -18,7 +18,6 @@ import {
   usePaginationFragment,
 } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-import ERRORS from '@azzapp/shared/errors';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors, textStyles } from '#theme';
 import AuthorCartouche from '#components/AuthorCartouche';
@@ -166,27 +165,8 @@ const PostCommentsList = ({
   const [submitting, setSubmitting] = useState(false);
 
   const onSubmit = () => {
-    if (!profile.webCard?.cardIsPublished) {
-      Toast.show({
-        type: 'error',
-        text1: intl.formatMessage(
-          {
-            defaultMessage:
-              'Oops, looks like your WebCard{azzappA} is not published. Publish it first!',
-            description:
-              'PostList - AlertMessage when the user is viewing a post (from deeplinking) with an unpublished WebCard',
-          },
-          {
-            azzappA: <Text variant="azzapp">a</Text>,
-          },
-        ) as unknown as string,
-      });
-
-      return;
-    }
-
-    setSubmitting(true);
     if (!submitting) {
+      setSubmitting(true);
       Keyboard.dismiss();
       if (profileInfoHasEditorRight(profileInfos)) {
         commit({
@@ -210,32 +190,16 @@ const PostCommentsList = ({
             }
           },
           onError(error) {
-            if (error.message === ERRORS.UNPUBLISHED_WEB_CARD) {
-              Toast.show({
-                type: 'error',
-                text1: intl.formatMessage(
-                  {
-                    defaultMessage:
-                      'Oops, this WebCard{azzappA} is not published.',
-                    description:
-                      'Error when a user tries to comment a post from an unpublished webCard',
-                  },
-                  {
-                    azzappA: <Text variant="azzapp">a</Text>,
-                  },
-                ) as unknown as string,
-              });
-            } else {
-              console.error(error);
-              Toast.show({
-                type: 'error',
-                text1: intl.formatMessage({
-                  defaultMessage:
-                    'Error, could not save your comment, try again later',
-                  description: 'Post comment screen - error toast',
-                }),
-              });
-            }
+            setSubmitting(false);
+            console.error(error);
+            Toast.show({
+              type: 'error',
+              text1: intl.formatMessage({
+                defaultMessage:
+                  'Error, could not save your comment, try again later',
+                description: 'Post comment screen - error toast',
+              }),
+            });
           },
         });
       } else if (profile.invited) {
