@@ -31,6 +31,7 @@ export const homeScreenQuery = graphql`
       ...HomeScreenContent_user
       ...HomeScreenContext_user
       ...HomeScreenPrefetcher_user
+      ...HomeBottomPanel_user
     }
   }
 `;
