@@ -49,9 +49,10 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
       : null,
   ]);
 
-  const backgroundIds = convertToNonNullArray(
-    modules.map(module => (module.data as any).backgroundId),
-  );
+  const backgroundIds = convertToNonNullArray([
+    ...modules.map(module => (module.data as any).backgroundId),
+    ...modules.map(module => (module.data as any).textBackgroundId),
+  ]);
 
   const backgrounds = backgroundIds.length
     ? await getModuleBackgroundsByIds(backgroundIds)
