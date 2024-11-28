@@ -447,12 +447,15 @@ const PostRendererBottomPanel = ({
         )}
         <PressableNative onPress={goToComments}>
           {post.allowComments && post.previewComment && (
-            <Text variant="small" numberOfLines={2} ellipsizeMode="tail">
-              <Text variant="smallbold">
-                {post.previewComment.webCard.userName}{' '}
-              </Text>
-              {post.previewComment.comment}
-            </Text>
+            <ExpendableText
+              numberOfLines={2}
+              label={post.previewComment.comment}
+              variant="small"
+              prefix={{
+                label: `${post.previewComment.webCard.userName} `,
+                variant: 'smallbold',
+              }}
+            />
           )}
           {post.allowComments && post.counterComments > 0 && (
             <PressableNative onPress={goToComments}>

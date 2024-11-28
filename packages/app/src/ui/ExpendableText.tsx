@@ -12,11 +12,15 @@ type ExpendableTextProps = Omit<
 > & {
   numberOfLines: number; //mandatory numberOfLines
   label: string;
+  prefix?: TextProps & {
+    label: string;
+  };
 };
 
 const ExpendableText = ({
   label,
   numberOfLines,
+  prefix,
   ...props
 }: ExpendableTextProps) => {
   const [expanded, setExpanded] = useState(false);
@@ -77,7 +81,10 @@ const ExpendableText = ({
     if (clippedText) {
       return (
         <>
-          {clippedText.substring(0, clippedText.length - 9)}
+          {clippedText.substring(
+            prefix?.label.length ?? 0,
+            clippedText.length - 9,
+          )}
           <Text {...props} style={[props.style, { color: colors.grey400 }]}>
             <FormattedMessage
               defaultMessage="... more"
@@ -88,7 +95,7 @@ const ExpendableText = ({
       );
     }
     return label;
-  }, [clippedText, expanded, label, props]);
+  }, [clippedText, expanded, label, prefix?.label.length, props]);
 
   return (
     //using a pressable without feedback to avoid the ripple effect on all the text container
@@ -102,6 +109,7 @@ const ExpendableText = ({
           expanded ? undefined : clippedText ? numberOfLines : numberOfLines + 1
         }
       >
+        {prefix && <Text {...prefix}>{prefix.label}</Text>}
         {text}
       </Text>
     </Pressable>
