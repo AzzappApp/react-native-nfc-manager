@@ -7,7 +7,10 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import { useCoverEditorContext } from '../CoverEditorContext';
+import {
+  useCoverEditorContext,
+  useCoverEditorEditContext,
+} from '../CoverEditorContext';
 import { useLottieMediaDurations } from '../coverEditorHelpers';
 import CoverEditorMediaPickerFloatingTool from './tools/CoverEditorMediaPickerFloatingTool';
 import CoverEditorTransitionTool from './tools/CoverEditorTransitionTool';
@@ -16,10 +19,8 @@ import { TOOLBOX_SECTION_HEIGHT } from './ui/ToolBoxSection';
 const CoverEditorMediaToolbox = () => {
   const styles = useStyleSheet(styleSheet);
 
-  const {
-    dispatch,
-    coverEditorState: { medias, lottie },
-  } = useCoverEditorContext();
+  const { medias, lottie } = useCoverEditorContext();
+  const dispatch = useCoverEditorEditContext();
 
   const onClose = () => {
     dispatch({

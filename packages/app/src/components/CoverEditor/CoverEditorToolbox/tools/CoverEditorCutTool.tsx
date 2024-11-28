@@ -12,23 +12,20 @@ import {
 import ImagePicker, { EditImageStep } from '#components/ImagePicker';
 import { ScreenModal } from '#components/NativeRouter';
 import useToggle from '#hooks/useToggle';
-import { useCoverEditorContext } from '../../CoverEditorContext';
+import {
+  useCoverEditorContext,
+  useCoverEditorEditContext,
+} from '../../CoverEditorContext';
 import ToolBoxSection from '../ui/ToolBoxSection';
 import type { ImagePickerResult } from '#components/ImagePicker';
 
 const CoverEditorCutTool = () => {
   const intl = useIntl();
   const [show, toggleScreenModal] = useToggle(false);
-  const {
-    coverEditorState: {
-      editionMode,
-      medias,
-      selectedItemIndex,
-      lottie,
-      localPaths,
-    },
-    dispatch,
-  } = useCoverEditorContext();
+  const { editionMode, medias, selectedItemIndex, lottie, localPaths } =
+    useCoverEditorContext();
+
+  const dispatch = useCoverEditorEditContext();
 
   const media =
     editionMode === 'mediaEdit' && selectedItemIndex != null

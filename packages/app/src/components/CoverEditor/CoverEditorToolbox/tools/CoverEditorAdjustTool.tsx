@@ -9,6 +9,7 @@ import useToggle from '#hooks/useToggle';
 import {
   useCoverEditorActiveMedia,
   useCoverEditorContext,
+  useCoverEditorEditContext,
 } from '../../CoverEditorContext';
 import ToolBoxSection from '../ui/ToolBoxSection';
 import type { ImagePickerResult } from '#components/ImagePicker';
@@ -17,10 +18,8 @@ import type { EditionParameters } from '#helpers/mediaEditions';
 const CoverEditorAdjustTool = () => {
   const intl = useIntl();
   const [show, toggleScreenModal] = useToggle(false);
-  const {
-    coverEditorState: { editionMode, medias, localPaths },
-    dispatch,
-  } = useCoverEditorContext();
+  const { editionMode, medias, localPaths } = useCoverEditorContext();
+  const dispatch = useCoverEditorEditContext();
 
   const activeMedia = useCoverEditorActiveMedia();
   const cropData = activeMedia?.editionParameters?.cropData;

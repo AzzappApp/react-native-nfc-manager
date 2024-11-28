@@ -10,6 +10,7 @@ import useToggle from '#hooks/useToggle';
 import {
   useCoverEditorContext,
   useCoverEditorActiveMedia,
+  useCoverEditorEditContext,
 } from '../../CoverEditorContext';
 import ToolBoxSection from '../ui/ToolBoxSection';
 import type { ImagePickerResult } from '#components/ImagePicker';
@@ -18,10 +19,8 @@ import type { Filter } from '@azzapp/shared/filtersHelper';
 const CoverEditorFiltersTool = () => {
   const [show, toggleScreenModal] = useToggle(false);
   const mediaInfo = useCoverEditorActiveMedia();
-  const {
-    dispatch,
-    coverEditorState: { editionMode, medias, localPaths },
-  } = useCoverEditorContext();
+  const { editionMode, medias, localPaths } = useCoverEditorContext();
+  const dispatch = useCoverEditorEditContext();
   const activeMedia = useCoverEditorActiveMedia();
   const cropData = activeMedia?.editionParameters?.cropData;
   const mediaAspectRatio = cropData

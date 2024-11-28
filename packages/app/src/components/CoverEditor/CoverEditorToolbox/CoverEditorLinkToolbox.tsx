@@ -5,7 +5,7 @@ import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
-import { useCoverEditorContext } from '../CoverEditorContext';
+import { useCoverEditorEditContext } from '../CoverEditorContext';
 import CoverEditorColorTool from './tools/CoverEditorColorTool';
 import CoverEditorDeleteTool from './tools/CoverEditorDeleteTool';
 import CoverEditorLinksTool from './tools/CoverEditorLinksTool';
@@ -22,7 +22,7 @@ const CoverEditorLinksToolbox = (
   const styles = useStyleSheet(styleSheet);
 
   const intl = useIntl();
-  const { dispatch } = useCoverEditorContext();
+  const dispatch = useCoverEditorEditContext();
 
   const onClose = () => {
     dispatch({

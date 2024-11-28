@@ -4,7 +4,7 @@ import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
-import { useCoverEditorContext } from '../CoverEditorContext';
+import { useCoverEditorEditContext } from '../CoverEditorContext';
 import CoverEditorAlignmentTool from './tools/CoverEditorAligmentTool';
 import CoverEditorColorTool from './tools/CoverEditorColorTool';
 import CoverEditorDeleteTool from './tools/CoverEditorDeleteTool';
@@ -19,7 +19,7 @@ const CoverEditorTextToolbox = () => {
   const styles = useStyleSheet(styleSheet);
 
   const intl = useIntl();
-  const { dispatch } = useCoverEditorContext();
+  const dispatch = useCoverEditorEditContext();
 
   const onClose = () => {
     dispatch({

@@ -5,7 +5,7 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import {
-  useCoverEditorContext,
+  useCoverEditorEditContext,
   useCoverEditorOverlayLayer,
 } from '../CoverEditorContext';
 import CoverEditorAdjustTool from './tools/CoverEditorAdjustTool';
@@ -21,7 +21,7 @@ import { TOOLBOX_SECTION_HEIGHT } from './ui/ToolBoxSection';
 const CoverEditorOverlayToolbox = () => {
   const styles = useStyleSheet(styleSheet);
 
-  const { dispatch } = useCoverEditorContext();
+  const dispatch = useCoverEditorEditContext();
   const layer = useCoverEditorOverlayLayer();
 
   const onClose = () => {

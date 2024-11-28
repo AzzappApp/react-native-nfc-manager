@@ -12,6 +12,7 @@ import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import {
   useCoverEditorContext,
+  useCoverEditorEditContext,
   useCoverEditorOverlayLayer,
 } from '../../CoverEditorContext';
 import ToolBoxSection from '../ui/ToolBoxSection';
@@ -23,10 +24,8 @@ const CoverEditorBorderTool = () => {
     useBoolean(false);
   const [showColorPicker, openColorPicker, closeColorPicker] =
     useBoolean(false);
-  const {
-    coverEditorState: { cardColors },
-    dispatch,
-  } = useCoverEditorContext();
+  const { cardColors } = useCoverEditorContext();
+  const dispatch = useCoverEditorEditContext();
 
   const layer = useCoverEditorOverlayLayer();
   const onChangeBorderRadius = useCallback(

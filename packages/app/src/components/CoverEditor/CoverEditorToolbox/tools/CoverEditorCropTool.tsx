@@ -11,6 +11,7 @@ import useToggle from '#hooks/useToggle';
 import {
   useCoverEditorActiveMedia,
   useCoverEditorContext,
+  useCoverEditorEditContext,
 } from '../../CoverEditorContext';
 import ToolBoxSection from '../ui/ToolBoxSection';
 import type { EditionParameters } from '#helpers/mediaEditions';
@@ -18,10 +19,9 @@ import type { EditionParameters } from '#helpers/mediaEditions';
 const CoverEditorCropTool = () => {
   const intl = useIntl();
   const [show, toggleScreenModal] = useToggle(false);
-  const {
-    coverEditorState: { lottie, selectedItemIndex, localPaths },
-    dispatch,
-  } = useCoverEditorContext();
+
+  const { lottie, selectedItemIndex, localPaths } = useCoverEditorContext();
+  const dispatch = useCoverEditorEditContext();
 
   const asset =
     selectedItemIndex != null

@@ -6,7 +6,10 @@ import { ScreenModal } from '#components/NativeRouter';
 import useBoolean from '#hooks/useBoolean';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
-import { useCoverEditorContext } from '../../CoverEditorContext';
+import {
+  useCoverEditorContext,
+  useCoverEditorEditContext,
+} from '../../CoverEditorContext';
 import CoverEditorMediaPicker from '../../CoverEditorMediaPicker';
 import type { SourceMedia } from '#helpers/mediaHelpers';
 
@@ -20,7 +23,8 @@ const CoverEditorMediaPickerFloatingTool = ({
   durationsFixed = false,
 }: Props) => {
   const [imagePickerVisible, showImagePicker, hideImagePicker] = useBoolean();
-  const { dispatch, coverEditorState: cover } = useCoverEditorContext();
+  const cover = useCoverEditorContext();
+  const dispatch = useCoverEditorEditContext();
 
   const onMediasPicked = useCallback(
     (medias: SourceMedia[]) => {

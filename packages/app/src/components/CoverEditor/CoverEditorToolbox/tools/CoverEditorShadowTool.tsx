@@ -1,13 +1,13 @@
 import { memo } from 'react';
 import { useIntl } from 'react-intl';
 import {
-  useCoverEditorContext,
+  useCoverEditorEditContext,
   useCurrentLayer,
 } from '../../CoverEditorContext';
 import ToolBoxSection from '../ui/ToolBoxSection';
 
 const CoverEditorShadowTool = () => {
-  const { dispatch } = useCoverEditorContext();
+  const dispatch = useCoverEditorEditContext();
   const { kind, layer } = useCurrentLayer();
 
   const hasShadow =

@@ -29,7 +29,10 @@ import Text from '#ui/Text';
 import coverTransitions, {
   useCoverTransitionsList,
 } from '../../coverDrawer/coverTransitions';
-import { useCoverEditorContext } from '../../CoverEditorContext';
+import {
+  useCoverEditorContext,
+  useCoverEditorEditContext,
+} from '../../CoverEditorContext';
 import ToolBoxSection from '../ui/ToolBoxSection';
 import type { BoxButtonItemInfo } from '#components/BoxSelectionList';
 import type {
@@ -40,9 +43,9 @@ import type { SkShader } from '@shopify/react-native-skia';
 
 const CoverEditorTransitionTool = () => {
   const [show, open, close] = useBoolean(false);
-  const { coverEditorState } = useCoverEditorContext();
+  const coverEditorState = useCoverEditorContext();
 
-  const { dispatch } = useCoverEditorContext();
+  const dispatch = useCoverEditorEditContext();
 
   const onSelect = useCallback(
     (transition: CoverTransitionsListItem | null) => {

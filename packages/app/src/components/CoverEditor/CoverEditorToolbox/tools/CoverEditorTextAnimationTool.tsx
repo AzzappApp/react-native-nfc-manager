@@ -29,6 +29,7 @@ import Header from '#ui/Header';
 import Text from '#ui/Text';
 import {
   useCoverEditorContext,
+  useCoverEditorEditContext,
   useCoverEditorTextLayer,
 } from '../../CoverEditorContext';
 import ToolBoxSection from '../ui/ToolBoxSection';
@@ -42,7 +43,8 @@ import type { CoverEditorTextLayerItem } from '#components/CoverEditor/coverEdit
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 
 const CoverEditorTextImageAnimationTool = () => {
-  const { coverEditorState, dispatch } = useCoverEditorContext();
+  const coverEditorState = useCoverEditorContext();
+  const dispatch = useCoverEditorEditContext();
   const activeTextLayer = useCoverEditorTextLayer();
   const coverDuration = getCoverDuration(coverEditorState);
   const { cardColors } = coverEditorState;
