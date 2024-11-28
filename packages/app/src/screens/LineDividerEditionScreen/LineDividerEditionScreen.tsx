@@ -337,10 +337,7 @@ const LineDividerEditionScreen = ({
                 marginBottom={marginBottom}
                 marginTop={marginTop}
                 onTouched={onTouched}
-                style={{
-                  flex: 1,
-                  marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                }}
+                style={styles.tabStyle}
               />
             ),
           },
@@ -396,5 +393,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 10,
     right: 10,
+  },
+  tabStyle: {
+    flex: 1,
+    marginBottom: BOTTOM_MENU_HEIGHT,
   },
 });

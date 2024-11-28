@@ -460,10 +460,7 @@ const SimpleTextEditionScreen = ({
                 onFontFamilyChange={onFontFamilyChange}
                 onTextAlignmentChange={onTextAlignChange}
                 bottomSheetHeight={bottomPanelHeight}
-                style={{
-                  flex: 1,
-                  marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                }}
+                style={styles.tabStyle}
                 onTouched={onTouched}
               />
             ),
@@ -475,10 +472,7 @@ const SimpleTextEditionScreen = ({
                 moduleKind={moduleKind}
                 marginHorizontal={marginHorizontal}
                 marginVertical={marginVertical}
-                style={{
-                  flex: 1,
-                  marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                }}
+                style={styles.tabStyle}
                 onTouched={onTouched}
               />
             ),
@@ -493,10 +487,7 @@ const SimpleTextEditionScreen = ({
                 onBackgroundChange={onBackgroundChange}
                 onBackgroundStyleChange={onBackgroundStyleChange}
                 bottomSheetHeight={bottomPanelHeight}
-                style={{
-                  flex: 1,
-                  marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                }}
+                style={styles.tabStyle}
               />
             ),
           },
@@ -548,5 +539,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 10,
     right: 10,
+  },
+  tabStyle: {
+    flex: 1,
+    marginBottom: BOTTOM_MENU_HEIGHT,
   },
 });

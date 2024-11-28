@@ -242,6 +242,7 @@ export default SocialLinksSettingsEditionPanel;
 const styles = StyleSheet.create({
   root: {
     paddingHorizontal: 20,
+    paddingBottom: 25,
     rowGap: 15,
     justifyContent: 'flex-start',
   },

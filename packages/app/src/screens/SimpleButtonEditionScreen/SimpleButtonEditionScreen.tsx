@@ -477,10 +477,7 @@ const SimpleButtonEditionScreen = ({
                   fontSize={fontSize}
                   buttonColor={buttonColor}
                   onButtonColorChange={onButtonColorChange}
-                  style={{
-                    flex: 1,
-                    marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                  }}
+                  style={styles.tabStyle}
                   bottomSheetHeight={bottomPanelHeight}
                   onTouched={onTouched}
                 />
@@ -495,10 +492,7 @@ const SimpleButtonEditionScreen = ({
                   onBorderColorChange={onBordercolorChange}
                   borderWidth={borderWidth}
                   borderRadius={borderRadius}
-                  style={{
-                    flex: 1,
-                    marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                  }}
+                  style={styles.tabStyle}
                   bottomSheetHeight={bottomPanelHeight}
                   onTouched={onTouched}
                 />
@@ -512,10 +506,7 @@ const SimpleButtonEditionScreen = ({
                   marginBottom={marginBottom}
                   width={width}
                   height={height}
-                  style={{
-                    flex: 1,
-                    marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                  }}
+                  style={styles.tabStyle}
                   onTouched={onTouched}
                 />
               ),
@@ -530,10 +521,7 @@ const SimpleButtonEditionScreen = ({
                   onBackgroundChange={onBackgroundChange}
                   onBackgroundStyleChange={onBackgroundStyleChange}
                   bottomSheetHeight={bottomPanelHeight}
-                  style={{
-                    flex: 1,
-                    marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                  }}
+                  style={styles.tabStyle}
                 />
               ),
             },
@@ -562,5 +550,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 10,
     right: 10,
+  },
+  tabStyle: {
+    flex: 1,
+    marginBottom: BOTTOM_MENU_HEIGHT,
   },
 });

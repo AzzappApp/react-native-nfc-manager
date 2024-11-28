@@ -366,7 +366,7 @@ const SocialLinksEditionScreen = ({
             style={{
               minHeight: bottomPanelHeight,
               flex: 1,
-              marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
+              marginBottom: BOTTOM_MENU_HEIGHT,
             }}
           />
         ),
@@ -383,10 +383,7 @@ const SocialLinksEditionScreen = ({
             iconSize={iconSize}
             borderWidth={borderWidth}
             columnGap={columnGap}
-            style={{
-              flex: 1,
-              marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-            }}
+            style={styles.tabStyle}
             bottomSheetHeight={bottomPanelHeight}
             onTouched={onTouched}
           />
@@ -399,10 +396,7 @@ const SocialLinksEditionScreen = ({
             marginTop={marginTop}
             marginBottom={marginBottom}
             marginHorizontal={marginHorizontal ?? 0}
-            style={{
-              flex: 1,
-              marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-            }}
+            style={styles.tabStyle}
             bottomSheetHeight={bottomPanelHeight}
             onTouched={onTouched}
           />
@@ -418,10 +412,7 @@ const SocialLinksEditionScreen = ({
             onBackgroundChange={onBackgroundChange}
             onBackgroundStyleChange={onBackgroundStyleChange}
             bottomSheetHeight={bottomPanelHeight}
-            style={{
-              flex: 1,
-              marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-            }}
+            style={styles.tabStyle}
           />
         ),
       },
@@ -435,7 +426,6 @@ const SocialLinksEditionScreen = ({
       columnGap,
       iconColor,
       iconSize,
-      insetBottom,
       links,
       marginBottom,
       marginHorizontal,
@@ -531,4 +521,8 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   keyboardView: { flex: 1, justifyContent: 'flex-end' },
+  tabStyle: {
+    flex: 1,
+    marginBottom: BOTTOM_MENU_HEIGHT,
+  },
 });

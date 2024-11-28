@@ -559,10 +559,7 @@ const CarouselEditionScreen = ({
                 onSquareRatioChange={onSquareRatioChange}
                 imageHeight={imageHeight}
                 onTouched={onTouched}
-                style={{
-                  flex: 1,
-                  marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                }}
+                style={styles.tabStyle}
               />
             ),
           },
@@ -577,10 +574,7 @@ const CarouselEditionScreen = ({
                 bottomSheetHeight={bottomPanelHeight}
                 onBorderColorChange={onBorderColorChange}
                 onTouched={onTouched}
-                style={{
-                  flex: 1,
-                  marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                }}
+                style={styles.tabStyle}
               />
             ),
           },
@@ -592,10 +586,7 @@ const CarouselEditionScreen = ({
                 marginHorizontal={marginHorizontal}
                 gap={gap}
                 onTouched={onTouched}
-                style={{
-                  flex: 1,
-                  marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                }}
+                style={styles.tabStyle}
               />
             ),
           },
@@ -609,10 +600,7 @@ const CarouselEditionScreen = ({
                 onBackgroundChange={onBackgroundChange}
                 onBackgroundStyleChange={onBackgroundStyleChange}
                 bottomSheetHeight={bottomPanelHeight}
-                style={{
-                  flex: 1,
-                  marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                }}
+                style={styles.tabStyle}
               />
             ),
           },
@@ -658,6 +646,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 10,
     right: 10,
+  },
+  tabStyle: {
+    flex: 1,
+    marginBottom: BOTTOM_MENU_HEIGHT,
   },
 });
 
