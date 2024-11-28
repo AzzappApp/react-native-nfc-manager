@@ -9,11 +9,11 @@ import Animated, {
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
-import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import { logEvent } from '#helpers/analytics';
 import { getAuthState } from '#helpers/authStore';
+import { profileInfoHasEditorRight } from '#helpers/profileRoleHelper';
 import useScreenInsets from '#hooks/useScreenInsets';
 import BlurredFloatingButton, {
   BlurredFloatingIconButton,
@@ -258,10 +258,7 @@ const WebCardScreenButtonActionButton = ({
       return;
     }
     const { profileInfos } = getAuthState();
-    if (
-      profileInfos?.profileRole &&
-      profileHasEditorRight(profileInfos.profileRole)
-    ) {
+    if (profileInfoHasEditorRight(profileInfos)) {
       onToggleFollow(webCard.id, webCard.userName, !isFollowing);
     } else if (isFollowing) {
       Toast.show({
@@ -286,10 +283,7 @@ const WebCardScreenButtonActionButton = ({
 
   const onCreateNewPost = useCallback(() => {
     const { profileInfos } = getAuthState();
-    if (
-      profileInfos?.profileRole &&
-      profileHasEditorRight(profileInfos?.profileRole)
-    ) {
+    if (profileInfoHasEditorRight(profileInfos)) {
       logEvent('create_post', { source: 'webcard' });
       router.push({ route: 'NEW_POST', params: { fromProfile: true } });
     } else {

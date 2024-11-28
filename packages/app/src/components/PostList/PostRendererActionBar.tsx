@@ -7,9 +7,9 @@ import Toast from 'react-native-toast-message';
 import { useMutation, graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
 import ERRORS from '@azzapp/shared/errors';
-import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import { buildPostUrl } from '@azzapp/shared/urlHelpers';
 import { useRouter } from '#components/NativeRouter';
+import { profileInfoHasEditorRight } from '#helpers/profileRoleHelper';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
@@ -205,7 +205,7 @@ const PostRendererActionBar = ({
       return;
     }
 
-    if (profileHasEditorRight(profileInfos?.profileRole)) {
+    if (profileInfoHasEditorRight(profileInfos)) {
       if (reaction) {
         setCountReactions(countReactions - 1);
         setReaction(null);
@@ -230,7 +230,7 @@ const PostRendererActionBar = ({
     debouncedCommit,
     intl,
     onActionDisabled,
-    profileInfos?.profileRole,
+    profileInfos,
     reaction,
   ]);
 

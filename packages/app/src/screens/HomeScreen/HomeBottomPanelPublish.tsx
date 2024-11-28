@@ -3,11 +3,11 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, commitMutation } from 'react-relay';
-import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import PremiumIndicator from '#components/PremiumIndicator';
 import { getAuthState } from '#helpers/authStore';
+import { profileInfoHasAdminRight } from '#helpers/profileRoleHelper';
 import { getRelayEnvironment } from '#helpers/relayEnvironment';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import Button from '#ui/Button';
@@ -50,7 +50,7 @@ const HomeBottomPanelPublish = ({ profile }: HomeBottomPanelPublishProps) => {
     // using disable state with current profile show a disabled style during maybe one secdon
     // (currentProfile is not animated so need to be updated)
     // avoid adding a new interpolation by using this condition
-    if (!profileHasAdminRight(profile.profileRole)) {
+    if (!profileInfoHasAdminRight(profile)) {
       return;
     }
 
@@ -145,7 +145,7 @@ const HomeBottomPanelPublish = ({ profile }: HomeBottomPanelPublishProps) => {
           }}
         />
       </Text>
-      {profileHasAdminRight(profile?.profileRole) && (
+      {profileInfoHasAdminRight(profile) && (
         <Button
           variant="secondary"
           appearance="dark"

@@ -54,7 +54,7 @@ const ShakeShare = () => {
     setMountScreen(false);
   }, []);
 
-  const hasProfile = !!(profileInfos && profileInfos.profileRole !== 'invited');
+  const hasProfile = !!(profileInfos && !profileInfos.invited);
 
   const activateDetector = useCallback(() => {
     setMountScreen(true);

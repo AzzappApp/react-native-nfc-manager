@@ -14,13 +14,13 @@ import Toast from 'react-native-toast-message';
 import { graphql, useFragment, usePaginationFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
-import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import { colors, shadow } from '#theme';
 import CoverLink from '#components/CoverLink';
 import CoverList from '#components/CoverList';
 import Skeleton from '#components/Skeleton';
 import { getAuthState } from '#helpers/authStore';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { profileInfoHasEditorRight } from '#helpers/profileRoleHelper';
 import useToggleFollow from '#hooks/useToggleFollow';
 import CoverLink_webCardFragment from '#relayArtifacts/CoverLink_webCard.graphql';
 import Button from '#ui/Button';
@@ -188,7 +188,7 @@ const CoverLinkWithOptionsItem = ({
 
     const { profileInfos } = getAuthState();
 
-    if (profileHasEditorRight(profileInfos?.profileRole)) {
+    if (profileInfoHasEditorRight(profileInfos)) {
       startTransition(() => {
         toggleFollow(props.webCardId, userName, !isFollowing);
       });

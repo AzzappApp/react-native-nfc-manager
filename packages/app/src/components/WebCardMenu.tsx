@@ -14,12 +14,12 @@ import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
 import ERRORS from '@azzapp/shared/errors';
-import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors, shadow } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { profileInfoHasAdminRight } from '#helpers/profileRoleHelper';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import useQuitWebCard from '#hooks/useQuitWebCard';
 import { useSendReport } from '#hooks/useSendReport';
@@ -423,7 +423,7 @@ const WebCardMenu = ({
           </View>
         </View>
         <View style={styles.bottomSheetOptionsContainer}>
-          {isViewer && profileHasAdminRight(profileInfos?.profileRole) && (
+          {isViewer && profileInfoHasAdminRight(profileInfos) && (
             <PressableNative
               style={styles.bottomSheetOptionButton}
               onPress={onWebCardParameters}
@@ -442,7 +442,7 @@ const WebCardMenu = ({
               </View>
             </PressableNative>
           )}
-          {isViewer && profileHasAdminRight(profileInfos?.profileRole) && (
+          {isViewer && profileInfoHasAdminRight(profileInfos) && (
             <PressableNative
               style={styles.bottomSheetOptionButton}
               onPress={onMultiUser}

@@ -97,7 +97,7 @@ const WebCardParametersScreen = ({
 
   const isWebCardOwner = useMemo(() => {
     return profileIsOwner(profile?.profileRole);
-  }, [profile?.profileRole]);
+  }, [profile]);
 
   const webCard = useFragment(
     graphql`

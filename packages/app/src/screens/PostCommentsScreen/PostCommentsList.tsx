@@ -19,11 +19,11 @@ import {
 } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import ERRORS from '@azzapp/shared/errors';
-import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors, textStyles } from '#theme';
 import AuthorCartouche from '#components/AuthorCartouche';
 import { useRouter } from '#components/NativeRouter';
+import { profileInfoHasEditorRight } from '#helpers/profileRoleHelper';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Container from '#ui/Container';
@@ -188,7 +188,7 @@ const PostCommentsList = ({
     setSubmitting(true);
     if (!submitting) {
       Keyboard.dismiss();
-      if (profileHasEditorRight(profileInfos?.profileRole)) {
+      if (profileInfoHasEditorRight(profileInfos)) {
         commit({
           variables: {
             webCardId: profileInfos?.webCardId,

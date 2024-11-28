@@ -45,6 +45,10 @@ export type ProfileInfos = {
    * the current user phoneNumber
    */
   phoneNumber: string | null;
+  /**
+   * The user in invited and had not yet validate the invitation
+   */
+  invited: boolean;
 };
 
 /**
@@ -250,16 +254,16 @@ export const hasBeenSignedIn = () =>
   storage.getBoolean(MMKVS_HAS_BEEN_SIGNED_IN);
 
 export const onChangeWebCard = async (
-  infos?: {
-    profileId: string | null;
-    webCardId: string | null;
-    profileRole: string | null;
-  } | null,
+  infos?: Pick<
+    ProfileInfos,
+    'invited' | 'profileId' | 'profileRole' | 'webCardId'
+  > | null,
 ) => {
-  const { profileId, webCardId, profileRole } = infos ?? {
+  const { profileId, webCardId, profileRole, invited } = infos ?? {
     profileId: null,
     webCardId: null,
     profileRole: null,
+    invited: false,
   };
   const profileInfos = getAuthState().profileInfos;
   if (
@@ -273,6 +277,7 @@ export const onChangeWebCard = async (
         profileId,
         webCardId,
         profileRole,
+        invited,
       }),
     );
     emitAuthState();

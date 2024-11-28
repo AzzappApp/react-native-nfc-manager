@@ -9,7 +9,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, usePreloadedQuery } from 'react-relay';
-import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import Link from '#components/Link';
 import { setMainTabBarOpacity } from '#components/MainTabBar';
@@ -17,6 +16,7 @@ import { useRouter } from '#components/NativeRouter';
 import ProfilePostsList from '#components/WebCardPostsList';
 import { logEvent } from '#helpers/analytics';
 import { getAuthState } from '#helpers/authStore';
+import { profileInfoHasEditorRight } from '#helpers/profileRoleHelper';
 import relayScreen from '#helpers/relayScreen';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
@@ -95,7 +95,7 @@ const MediaScreen = ({
 
   const onCreatePost = useCallback(() => {
     const { profileInfos } = getAuthState();
-    if (profileHasEditorRight(profileInfos?.profileRole)) {
+    if (profileInfoHasEditorRight(profileInfos)) {
       logEvent('create_post', { source: 'community' });
       router.push({ route: 'NEW_POST' });
     } else {

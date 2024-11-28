@@ -18,10 +18,6 @@ import {
 } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
-import {
-  profileHasAdminRight,
-  profileIsOwner,
-} from '@azzapp/shared/profileHelpers';
 import { colors, shadow } from '#theme';
 import CoverErrorRenderer from '#components/CoverErrorRenderer';
 import CoverLink from '#components/CoverLink';
@@ -36,6 +32,10 @@ import {
 import WebCardMenu from '#components/WebCardMenu';
 import { logEvent } from '#helpers/analytics';
 import { getAuthState } from '#helpers/authStore';
+import {
+  profileInfoHasAdminRight,
+  profileInfoIsOwner,
+} from '#helpers/profileRoleHelper';
 import useBoolean from '#hooks/useBoolean';
 import useLatestCallback from '#hooks/useLatestCallback';
 import useToggleFollow from '#hooks/useToggleFollow';
@@ -293,7 +293,7 @@ const ItemRenderComponent = ({
   const router = useRouter();
 
   const onPressMultiUser = useCallback(() => {
-    if (profileHasAdminRight(profile.profileRole)) {
+    if (profileInfoHasAdminRight(profile)) {
       router.push({
         route: 'MULTI_USER',
       });
@@ -306,7 +306,7 @@ const ItemRenderComponent = ({
         },
       });
     }
-  }, [router, profile.profileRole, profile.webCard]);
+  }, [profile, router]);
 
   const { paused, canPlay } = useCoverPlayPermission();
 
@@ -429,7 +429,7 @@ const ItemRenderComponent = ({
             close={closeWebcardModal}
             onToggleFollow={onToggleFollow}
             isViewer
-            isOwner={profileIsOwner(profile.profileRole)}
+            isOwner={profileInfoIsOwner(profile)}
           />
         </Suspense>
       )}

@@ -13,11 +13,11 @@ import { useIntl } from 'react-intl';
 import { View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
-import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import AuthorCartouche from '#components/AuthorCartouche';
 import { getAuthState } from '#helpers/authStore';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { profileInfoHasEditorRight } from '#helpers/profileRoleHelper';
 import useBoolean from '#hooks/useBoolean';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
@@ -182,7 +182,7 @@ const PostRenderer = (
 
   const safeOpenModal = useCallback(() => {
     const { profileInfos } = getAuthState();
-    if (profileHasEditorRight(profileInfos?.profileRole)) {
+    if (profileInfoHasEditorRight(profileInfos)) {
       openModal();
     } else {
       Toast.show({

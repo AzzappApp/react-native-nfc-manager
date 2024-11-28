@@ -6,11 +6,11 @@ import { FormattedMessage, FormattedRelativeTime, useIntl } from 'react-intl';
 import { View, StyleSheet, Share, Platform } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
-import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import { buildPostUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import { relativeDateMinute } from '#helpers/dateHelpers';
+import { profileInfoHasEditorRight } from '#helpers/profileRoleHelper';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import { useSendReport } from '#hooks/useSendReport';
 import useToggleFollow from '#hooks/useToggleFollow';
@@ -320,7 +320,7 @@ const PostRendererBottomPanel = ({
   const toggleFollow = useToggleFollow();
 
   const onToggleFollow = () => {
-    if (profileHasEditorRight(profileInfos?.profileRole)) {
+    if (profileInfoHasEditorRight(profileInfos)) {
       toggleFollow(
         post.webCard.id,
         post.webCard.userName,
@@ -360,10 +360,7 @@ const PostRendererBottomPanel = ({
     `);
 
   const deletePost = useCallback(() => {
-    if (
-      profileHasEditorRight(profileInfos?.profileRole) &&
-      profileInfos?.webCardId
-    ) {
+    if (profileInfoHasEditorRight(profileInfos) && profileInfos?.webCardId) {
       commit({
         variables: {
           webCardId: profileInfos?.webCardId,
@@ -383,15 +380,7 @@ const PostRendererBottomPanel = ({
         }),
       });
     }
-  }, [
-    profileInfos?.profileRole,
-    profileInfos?.webCardId,
-    commit,
-    post.id,
-    closeModal,
-    onDeleted,
-    intl,
-  ]);
+  }, [profileInfos, commit, post.id, closeModal, onDeleted, intl]);
 
   const [sendReport, commitSendReportLoading] = useSendReport(
     post.id,

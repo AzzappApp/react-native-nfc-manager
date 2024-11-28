@@ -12,10 +12,6 @@ import {
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-import {
-  profileHasAdminRight,
-  profileIsOwner,
-} from '@azzapp/shared/profileHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { signInRoutes } from '#mobileRoutes';
 import { colors } from '#theme';
@@ -23,6 +19,10 @@ import Link from '#components/Link';
 import { useRouter } from '#components/NativeRouter';
 import { logEvent } from '#helpers/analytics';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import {
+  profileInfoHasAdminRight,
+  profileInfoIsOwner,
+} from '#helpers/profileRoleHelper';
 import { useDeleteNotifications } from '#hooks/useNotifications';
 import useQuitWebCard from '#hooks/useQuitWebCard';
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -106,7 +106,7 @@ const HomeBottomSheetPanel = ({
   );
 
   const handleConfirmationQuitWebCard = useCallback(() => {
-    const isOwner = profileIsOwner(profile?.profileRole);
+    const isOwner = profileInfoIsOwner(profile);
 
     const titleMsg = isOwner
       ? intl.formatMessage({
@@ -154,7 +154,7 @@ const HomeBottomSheetPanel = ({
         onPress: quitWebCard,
       },
     ]);
-  }, [intl, profile?.profileRole, quitWebCard]);
+  }, [intl, profile, quitWebCard]);
 
   const [requestedLogout, toggleRequestLogout] = useToggle(false);
 
@@ -293,7 +293,7 @@ const HomeBottomSheetPanel = ({
             }
           : null,
         { type: 'separator' },
-        profileHasAdminRight(profile?.profileRole) && !profile?.invited
+        profileInfoHasAdminRight(profile)
           ? {
               type: 'row',
               icon: 'parameters',
@@ -315,7 +315,7 @@ const HomeBottomSheetPanel = ({
             }
           : null,
         !profile?.invited &&
-        profileHasAdminRight(profile?.profileRole) &&
+        profileInfoHasAdminRight(profile) &&
         profile?.webCard?.hasCover
           ? {
               type: 'row',
@@ -413,7 +413,7 @@ const HomeBottomSheetPanel = ({
     [close, intl, onLogout, onShare, profile, userIsPremium],
   );
 
-  const hasQuitWebcard = profile && !profileIsOwner(profile?.profileRole);
+  const hasQuitWebcard = profile && !profileInfoIsOwner(profile);
 
   const height = useMemo(() => {
     const QUIT_WEBCARD_HEIGHT = hasQuitWebcard ? 30 : 0;

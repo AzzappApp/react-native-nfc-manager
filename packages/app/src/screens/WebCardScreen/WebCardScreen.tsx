@@ -36,10 +36,6 @@ import { MODULE_KINDS } from '@azzapp/shared/cardModuleHelpers';
 import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import {
-  profileHasEditorRight,
-  profileIsOwner,
-} from '@azzapp/shared/profileHelpers';
-import {
   useDidAppear,
   useRouter,
   useScreenOptionsUpdater,
@@ -47,6 +43,10 @@ import {
 import WebCardMenu from '#components/WebCardMenu';
 import { logEvent } from '#helpers/analytics';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import {
+  profileInfoHasEditorRight,
+  profileInfoIsOwner,
+} from '#helpers/profileRoleHelper';
 import relayScreen from '#helpers/relayScreen';
 import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
 import { useProfileInfos } from '#hooks/authStateHooks';
@@ -101,8 +101,8 @@ const WebCardScreen = ({
 
   const profileInfos = useProfileInfos();
   const isViewer = profileInfos?.webCardId === data.webCard?.id;
-  const isWebCardOwner = isViewer && profileIsOwner(profileInfos?.profileRole);
-  const canEdit = isViewer && profileHasEditorRight(profileInfos?.profileRole);
+  const isWebCardOwner = isViewer && profileInfoIsOwner(profileInfos);
+  const canEdit = isViewer && profileInfoHasEditorRight(profileInfos);
 
   const environment = useRelayEnvironment();
 
@@ -186,10 +186,7 @@ const WebCardScreen = ({
 
   const toggleFollow = useCallback(
     (webCardId: string, userName: string, follow: boolean) => {
-      if (
-        profileInfos?.profileRole &&
-        profileHasEditorRight(profileInfos.profileRole)
-      ) {
+      if (profileInfoHasEditorRight(profileInfos)) {
         onToggleFollow(webCardId, userName, follow);
       } else if (follow) {
         Toast.show({
@@ -209,7 +206,7 @@ const WebCardScreen = ({
         });
       }
     },
-    [intl, onToggleFollow, profileInfos?.profileRole],
+    [intl, onToggleFollow, profileInfos],
   );
 
   // #region Flip Animation
@@ -332,7 +329,7 @@ const WebCardScreen = ({
   // #end region
 
   const onEdit = useCallback(() => {
-    if (profileHasEditorRight(profileInfos?.profileRole)) {
+    if (profileInfoHasEditorRight(profileInfos)) {
       toggleEditing();
     } else {
       Toast.show({
@@ -344,7 +341,7 @@ const WebCardScreen = ({
         }),
       });
     }
-  }, [profileInfos?.profileRole, toggleEditing, intl]);
+  }, [profileInfos, toggleEditing, intl]);
 
   // const viewerWebCardUnpublish =
   //   profileInfos?.webCardId !== data.webCard?.id &&
