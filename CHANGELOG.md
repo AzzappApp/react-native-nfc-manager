@@ -1,5 +1,6 @@
-## 1.4.1-canary.9
+## 1.4.1-canary.10
 
+* **fix:**  - poll user statistics with home screen ([#6135](https://github.com/AzzappApp/azzapp/pull/6135))
 * **feat:**  - add magnetic thresold on cover overlay creation ([#6130](https://github.com/AzzappApp/azzapp/pull/6130))
 * **fix:**  - remove editable from SourceMediaBase ([#6112](https://github.com/AzzappApp/azzapp/pull/6112))
 * **fix:**  - allow to comment on unpublished webCard ([#6125](https://github.com/AzzappApp/azzapp/pull/6125))
