@@ -534,6 +534,7 @@ export default relayScreen(
       profileId: profileInfos?.profileId ?? '',
     }),
     fetchPolicy: 'store-and-network',
+    pollInterval: 30000,
   },
 );
 
