@@ -56,7 +56,7 @@ const useEditorLayout = ({
   }, [bottomPanelMinHeight, contentHeight, topPanelAspectRatio]);
 
   const bottomPanelHeight = useMemo(() => {
-    const expectedHeight = contentHeight - topPanelHeight + inset.bottom;
+    const expectedHeight = contentHeight - topPanelHeight - inset.bottom;
     if (expectedHeight > bottomPanelMinHeight) {
       return expectedHeight;
     }

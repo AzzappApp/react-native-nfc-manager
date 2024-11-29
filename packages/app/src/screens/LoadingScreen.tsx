@@ -1,4 +1,4 @@
-import { Dimensions, Image, StyleSheet } from 'react-native';
+import { Dimensions, Image, Platform, StyleSheet } from 'react-native';
 import Animated, { Easing, FadeOut } from 'react-native-reanimated';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import { ACTIVITY_INDICATOR_WIDTH } from '#ui/ActivityIndicator/ActivityIndicator';
@@ -9,7 +9,10 @@ const exiting = FadeOut.duration(500).easing(Easing.ease);
 
 const LoadingScreen = () => {
   return (
-    <Animated.View exiting={exiting} style={styles.container}>
+    <Animated.View
+      exiting={Platform.OS !== 'ios' ? exiting : undefined}
+      style={styles.container}
+    >
       <Image source={require('#assets/logo-full.png')} style={styles.logo} />
       <ActivityIndicator style={styles.indicator} />
     </Animated.View>
