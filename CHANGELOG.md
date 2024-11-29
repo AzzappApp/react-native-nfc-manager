@@ -1,5 +1,10 @@
-## 1.4.1-canary.10
+## 1.4.1-canary.11
 
+* **fix:**  - **modules:** [#6099](https://github.com/AzzappApp/azzapp/pull/6099) wrong bottom panel calculation ([#6122](https://github.com/AzzappApp/azzapp/pull/6122))
+* **fix:**  - cover tool box ([#6127](https://github.com/AzzappApp/azzapp/pull/6127))
+* **fix:**  - 🐛 include resize mode from text background ([#6129](https://github.com/AzzappApp/azzapp/pull/6129))
+* **fix:**  - **android:** [#6128](https://github.com/AzzappApp/azzapp/pull/6128) don’t cut shadow on android ([#6133](https://github.com/AzzappApp/azzapp/pull/6133))
+* **fix:**  - **android:** [#6065](https://github.com/AzzappApp/azzapp/pull/6065) missing shadow on module edition ([#6136](https://github.com/AzzappApp/azzapp/pull/6136))
 * **fix:**  - poll user statistics with home screen ([#6135](https://github.com/AzzappApp/azzapp/pull/6135))
 * **feat:**  - add magnetic thresold on cover overlay creation ([#6130](https://github.com/AzzappApp/azzapp/pull/6130))
 * **fix:**  - remove editable from SourceMediaBase ([#6112](https://github.com/AzzappApp/azzapp/pull/6112))
@@ -7,10 +12,18 @@
 * **fix:**  - use a View for huePicker Gesture as hitSlop doesn't work on android ([#6096](https://github.com/AzzappApp/azzapp/pull/6096))
 * **fix:**  - split invited Prop ([#6107](https://github.com/AzzappApp/azzapp/pull/6107))
 * **fix:**  - 🐛 display comment with expand ([#6119](https://github.com/AzzappApp/azzapp/pull/6119))
+* **fix:**  - cover edit case
+* **perf:**  - **android:** [#6097](https://github.com/AzzappApp/azzapp/pull/6097) split cover editor context ([#6114](https://github.com/AzzappApp/azzapp/pull/6114))
 * **fix:**  - add missing fields on phone synchro ([#6101](https://github.com/AzzappApp/azzapp/pull/6101))
 * **fix:**  - enable shaow on android in BoxSelectionList ([#6098](https://github.com/AzzappApp/azzapp/pull/6098))
+* **fix:**  - **android:** [#6105](https://github.com/AzzappApp/azzapp/pull/6105) toast is behind navigation bar ([#6109](https://github.com/AzzappApp/azzapp/pull/6109))
+* **fix:**  - **android:** wrong text display on android with a letter ([#6111](https://github.com/AzzappApp/azzapp/pull/6111))
+* **fix:**  - **android:** [#6106](https://github.com/AzzappApp/azzapp/pull/6106) don’t use pressable opacity to avoid issue ([#6108](https://github.com/AzzappApp/azzapp/pull/6108))
+* **fix:**  - try to fix random text size issue ([#6102](https://github.com/AzzappApp/azzapp/pull/6102))
 * **fix:**  - 🐛 go back on deleted post ([#6086](https://github.com/AzzappApp/azzapp/pull/6086))
 * **fix:**  - 🐛 return ordered templates + accept videos ([#6085](https://github.com/AzzappApp/azzapp/pull/6085))
+* **doc:**  - fix typo
+* **docs:**  - update app README
 * **fix:**  - fix spacing and card border radius ([#6070](https://github.com/AzzappApp/azzapp/pull/6070))
 * **perf:**  - **android:** improve social links behaviour ([#6088](https://github.com/AzzappApp/azzapp/pull/6088))
 * **fix:**  - put back navigation in sentry breadcrumb ([#6074](https://github.com/AzzappApp/azzapp/pull/6074))
