@@ -22,8 +22,10 @@ import ContactDetailsModal from './ContactDetailsModal';
 import { storage } from './ContactsScreen';
 import ContactsScreenSearchByDate from './ContactsScreenSearchByDate';
 import ContactsScreenSearchByName from './ContactsScreenSearchByName';
-import type { ContactsScreenListQuery$data } from '#relayArtifacts/ContactsScreenListQuery.graphql';
-import type { ContactsScreenLists_contacts$data } from '#relayArtifacts/ContactsScreenLists_contacts.graphql';
+import type {
+  ContactsScreenLists_contacts$data,
+  ContactsScreenLists_contacts$key,
+} from '#relayArtifacts/ContactsScreenLists_contacts.graphql';
 import type { ContactsScreenListsMutation } from '#relayArtifacts/ContactsScreenListsMutation.graphql';
 import type { ContactsScreenListsMutationUpdateContactsLastViewMutation } from '#relayArtifacts/ContactsScreenListsMutationUpdateContactsLastViewMutation.graphql';
 import type {
@@ -36,7 +38,7 @@ import type { Contact } from 'expo-contacts';
 type ContactsScreenListsProps = {
   search: string | undefined;
   searchBy: 'date' | 'name';
-  profile: ContactsScreenListQuery$data['node'];
+  profile: ContactsScreenLists_contacts$key;
 };
 const ContactsScreenLists = ({
   search,

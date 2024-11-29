@@ -47,8 +47,8 @@ const ContactSearchByNameItem = ({
       if (contactsPermissionStatus === ContactPermissionStatus.GRANTED) {
         const foundContact = await findLocalContact(
           storage,
-          contact.phoneNumbers.map(({ number }) => number),
-          contact.emails.map(({ address }) => address),
+          contact.phoneNumbers.map(({ number }) => number) ?? [],
+          contact.emails.map(({ address }) => address) ?? [],
           localContacts,
           contact.contactProfile?.id,
         );
