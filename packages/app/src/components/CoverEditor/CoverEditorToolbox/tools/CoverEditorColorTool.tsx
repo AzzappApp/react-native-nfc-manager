@@ -6,6 +6,7 @@ import useBoolean from '#hooks/useBoolean';
 import Icon from '#ui/Icon';
 import {
   useCoverEditorContext,
+  useCoverEditorEditContext,
   useCoverEditorLinksLayer,
   useCoverEditorTextLayer,
 } from '../../CoverEditorContext';
@@ -23,7 +24,8 @@ const CoverEditorColorTool = ({ title }: Props) => {
   const textLayer = useCoverEditorTextLayer();
   const linksLayer = useCoverEditorLinksLayer();
 
-  const { dispatch, coverEditorState } = useCoverEditorContext();
+  const coverEditorState = useCoverEditorContext();
+  const dispatch = useCoverEditorEditContext();
 
   const onColorChange = useCallback(
     (color: string) => {

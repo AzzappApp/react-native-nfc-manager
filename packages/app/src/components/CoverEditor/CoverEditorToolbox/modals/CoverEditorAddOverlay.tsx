@@ -1,4 +1,7 @@
-import { useCoverEditorContext } from '#components/CoverEditor/CoverEditorContext';
+import {
+  useCoverEditorContext,
+  useCoverEditorEditContext,
+} from '#components/CoverEditor/CoverEditorContext';
 import CoverEditorMediaPicker from '#components/CoverEditor/CoverEditorMediaPicker';
 import { ScreenModal } from '#components/NativeRouter';
 import type { SourceMedia } from '#helpers/mediaHelpers';
@@ -9,7 +12,8 @@ type Props = {
 };
 
 const CoverEditorAddOverlay = ({ open, onClose }: Props) => {
-  const { dispatch, coverEditorState } = useCoverEditorContext();
+  const coverEditorState = useCoverEditorContext();
+  const dispatch = useCoverEditorEditContext();
 
   const onFinish = (medias: SourceMedia[]) => {
     if (medias.length > 0) {

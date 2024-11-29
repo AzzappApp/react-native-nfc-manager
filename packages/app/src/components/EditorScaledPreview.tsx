@@ -1,3 +1,10 @@
+import {
+  View,
+  type LayoutRectangle,
+  type StyleProp,
+  type ViewProps,
+  type ViewStyle,
+} from 'react-native';
 import Animated, {
   measure,
   useAnimatedRef,
@@ -8,12 +15,6 @@ import Animated, {
 import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import PressableNative from '#ui/PressableNative';
-import type {
-  LayoutRectangle,
-  StyleProp,
-  ViewProps,
-  ViewStyle,
-} from 'react-native';
 
 type EditorScaledPreviewProps = ViewProps & {
   /**
@@ -92,14 +93,15 @@ const EditorScaledPreview = ({
         style={[styles.moduleContainer, moduleContainerStyle]}
       >
         <Animated.View style={scaledViewAnimatedStyle}>
-          <PressableNative
-            onPress={onPreviewPress}
-            disabledOpacity={onPreviewPress != null ? 0.3 : 1}
-            disabled={onPreviewPress == null}
-            style={styles.previewContainer}
-          >
-            {children}
-          </PressableNative>
+          <View style={styles.previewContainer}>
+            <PressableNative
+              onPress={onPreviewPress}
+              disabledOpacity={onPreviewPress != null ? 0.3 : 1}
+              disabled={onPreviewPress == null}
+            >
+              {children}
+            </PressableNative>
+          </View>
         </Animated.View>
       </Animated.View>
     </Animated.View>
@@ -113,10 +115,8 @@ const styleSheet = createStyleSheet(appearance => ({
     position: 'absolute',
     width: '100%',
   },
-  previewContainer: [
-    {
-      backgroundColor: colors.white,
-    },
-    shadow(appearance),
-  ],
+  previewContainer: {
+    backgroundColor: colors.white,
+    ...shadow(appearance),
+  },
 }));

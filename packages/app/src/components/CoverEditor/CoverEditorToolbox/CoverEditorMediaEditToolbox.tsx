@@ -6,6 +6,7 @@ import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import {
   useCoverEditorContext,
+  useCoverEditorEditContext,
   useCoverEditorMedia,
 } from '../CoverEditorContext';
 import CoverEditorAdjustTool from './tools/CoverEditorAdjustTool';
@@ -19,10 +20,9 @@ import { TOOLBOX_SECTION_HEIGHT } from './ui/ToolBoxSection';
 
 const CoverEditorMediaEditToolbox = () => {
   const styles = useStyleSheet(styleSheet);
-  const {
-    dispatch,
-    coverEditorState: { lottie },
-  } = useCoverEditorContext();
+  const { lottie } = useCoverEditorContext();
+  const dispatch = useCoverEditorEditContext();
+
   const media = useCoverEditorMedia();
   const hasTemplate = !!lottie;
 

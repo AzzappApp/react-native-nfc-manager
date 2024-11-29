@@ -41,6 +41,7 @@ import Header from '#ui/Header';
 import Text from '#ui/Text';
 import {
   useCoverEditorContext,
+  useCoverEditorEditContext,
   useCoverEditorOverlayLayer,
 } from '../../CoverEditorContext';
 import ToolBoxSection from '../ui/ToolBoxSection';
@@ -55,7 +56,8 @@ import type { SkImage, SkShader } from '@shopify/react-native-skia';
 import type { DerivedValue } from 'react-native-reanimated';
 
 const CoverEditorOverlayImageAnimationTool = () => {
-  const { coverEditorState, dispatch } = useCoverEditorContext();
+  const coverEditorState = useCoverEditorContext();
+  const dispatch = useCoverEditorEditContext();
   const activeOverlay = useCoverEditorOverlayLayer();
   const totalDuration = getCoverDuration(coverEditorState);
 

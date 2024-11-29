@@ -9,26 +9,30 @@ import type {
   CoverMediaImage,
 } from './coverEditorTypes';
 
-export type CoverEditorContextType = {
-  coverEditorState: CoverEditorState;
-  dispatch: React.Dispatch<CoverEditorAction>;
-};
+export type CoverEditorContextType = CoverEditorState;
 
 const CoverEditorContext = createContext<CoverEditorContextType | null>(null);
 
+const CoverEditorEditContext =
+  createContext<React.Dispatch<CoverEditorAction> | null>(null);
+
 export type CoverEditorContextProviderProps = {
   value: CoverEditorContextType;
+  dispatch: React.Dispatch<CoverEditorAction>;
   children: React.ReactNode;
 };
 
 const CoverEditorContextProvider = ({
   value,
+  dispatch,
   children,
 }: CoverEditorContextProviderProps) => {
   return (
-    <CoverEditorContext.Provider value={value}>
-      {children}
-    </CoverEditorContext.Provider>
+    <CoverEditorEditContext.Provider value={dispatch}>
+      <CoverEditorContext.Provider value={value}>
+        {children}
+      </CoverEditorContext.Provider>
+    </CoverEditorEditContext.Provider>
   );
 };
 
@@ -43,6 +47,15 @@ export const useCoverEditorContext = () => {
   return context;
 };
 
+export const useCoverEditorEditContext = () => {
+  const context = useContext(CoverEditorEditContext);
+  if (context === null) {
+    throw new Error('Using CoverEditorEditContext without provider');
+  }
+
+  return context;
+};
+
 type UseCurrentLayerReturnType =
   | { kind: 'links'; layer: CoverEditorLinksLayerItem }
   | { kind: 'media'; layer: CoverMedia }
@@ -52,14 +65,12 @@ type UseCurrentLayerReturnType =
 
 export const useCurrentLayer = (): UseCurrentLayerReturnType => {
   const {
-    coverEditorState: {
-      editionMode,
-      selectedItemIndex,
-      overlayLayers,
-      textLayers,
-      medias,
-      linksLayer,
-    },
+    editionMode,
+    selectedItemIndex,
+    overlayLayers,
+    textLayers,
+    medias,
+    linksLayer,
   } = useCoverEditorContext();
 
   if (selectedItemIndex == null) {
@@ -114,9 +125,8 @@ export const useCoverEditorActiveMedia = ():
   | CoverEditorOverlayItem
   | CoverMedia
   | null => {
-  const {
-    coverEditorState: { editionMode, overlayLayers, medias, selectedItemIndex },
-  } = useCoverEditorContext();
+  const { editionMode, overlayLayers, medias, selectedItemIndex } =
+    useCoverEditorContext();
   if (editionMode === 'overlay' && selectedItemIndex != null) {
     const overlay = overlayLayers[selectedItemIndex];
     return overlay ?? null;
@@ -127,9 +137,7 @@ export const useCoverEditorActiveMedia = ():
 };
 
 export const useCoverEditorActiveImageMedia = (): CoverMediaImage | null => {
-  const {
-    coverEditorState: { editionMode, medias, selectedItemIndex },
-  } = useCoverEditorContext();
+  const { editionMode, medias, selectedItemIndex } = useCoverEditorContext();
   if (editionMode === 'mediaEdit' && selectedItemIndex != null) {
     const media = medias[selectedItemIndex];
     if (!media || media.kind !== 'image') {

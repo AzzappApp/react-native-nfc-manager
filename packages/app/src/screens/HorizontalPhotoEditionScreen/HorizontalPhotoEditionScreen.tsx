@@ -512,10 +512,7 @@ const HorizontalPhotoEditionScreen = ({
             element: (
               <HorizontalPhotoSettingsEditionPanel
                 height={imageHeight}
-                style={{
-                  flex: 1,
-                  marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                }}
+                style={styles.tabStyle}
                 onTouched={onTouched}
               />
             ),
@@ -530,10 +527,7 @@ const HorizontalPhotoEditionScreen = ({
                 onBorderColorChange={onBordercolorChange}
                 webCard={profile?.webCard ?? null}
                 bottomSheetHeight={bottomPanelHeight}
-                style={{
-                  flex: 1,
-                  marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                }}
+                style={styles.tabStyle}
                 onTouched={onTouched}
               />
             ),
@@ -545,10 +539,7 @@ const HorizontalPhotoEditionScreen = ({
                 marginHorizontal={marginHorizontal}
                 marginVertical={marginVertical}
                 onTouched={onTouched}
-                style={{
-                  flex: 1,
-                  marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                }}
+                style={styles.tabStyle}
               />
             ),
           },
@@ -562,10 +553,7 @@ const HorizontalPhotoEditionScreen = ({
                 onBackgroundChange={onBackgroundChange}
                 onBackgroundStyleChange={onBackgroundStyleChange}
                 bottomSheetHeight={bottomPanelHeight}
-                style={{
-                  flex: 1,
-                  marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                }}
+                style={styles.tabStyle}
               />
             ),
           },
@@ -615,5 +603,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 10,
     right: 10,
+  },
+  tabStyle: {
+    flex: 1,
+    marginBottom: BOTTOM_MENU_HEIGHT,
   },
 });

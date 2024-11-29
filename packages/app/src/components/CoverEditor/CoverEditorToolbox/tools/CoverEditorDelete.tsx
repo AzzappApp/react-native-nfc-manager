@@ -1,10 +1,10 @@
 import { memo } from 'react';
 import { useIntl } from 'react-intl';
-import { useCoverEditorContext } from '../../CoverEditorContext';
+import { useCoverEditorEditContext } from '../../CoverEditorContext';
 import ToolBoxSection from '../ui/ToolBoxSection';
 
 const CoverEditorDelete = () => {
-  const { dispatch } = useCoverEditorContext();
+  const dispatch = useCoverEditorEditContext();
   const intl = useIntl();
   const onDelete = () => {
     dispatch({ type: 'DELETE_CURRENT_LAYER' });

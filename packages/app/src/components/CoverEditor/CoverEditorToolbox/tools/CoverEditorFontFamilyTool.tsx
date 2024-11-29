@@ -3,7 +3,7 @@ import { useIntl } from 'react-intl';
 import useBoolean from '#hooks/useBoolean';
 import FontPicker from '#ui/FontPicker';
 import {
-  useCoverEditorContext,
+  useCoverEditorEditContext,
   useCoverEditorTextLayer,
 } from '../../CoverEditorContext';
 import ToolBoxSection from '../ui/ToolBoxSection';
@@ -11,7 +11,7 @@ import ToolBoxSection from '../ui/ToolBoxSection';
 const CoverEditorFontFamilyTool = () => {
   const intl = useIntl();
   const layer = useCoverEditorTextLayer();
-  const { dispatch } = useCoverEditorContext();
+  const dispatch = useCoverEditorEditContext();
 
   const [show, open, close] = useBoolean(false);
 

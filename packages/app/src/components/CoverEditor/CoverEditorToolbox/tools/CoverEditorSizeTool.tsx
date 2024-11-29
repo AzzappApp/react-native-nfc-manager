@@ -9,7 +9,7 @@ import Header from '#ui/Header';
 import LabeledWheelSelector from '#ui/LabeledWheelSelector';
 import Text from '#ui/Text';
 import {
-  useCoverEditorContext,
+  useCoverEditorEditContext,
   useCoverEditorLinksLayer,
   useCoverEditorTextLayer,
 } from '../../CoverEditorContext';
@@ -23,7 +23,7 @@ const CoverEditorSizeTool = ({ title }: Props) => {
   const intl = useIntl();
   const textLayer = useCoverEditorTextLayer();
   const linksLayer = useCoverEditorLinksLayer();
-  const { dispatch } = useCoverEditorContext();
+  const dispatch = useCoverEditorEditContext();
 
   const [show, open, close] = useBoolean(false);
 

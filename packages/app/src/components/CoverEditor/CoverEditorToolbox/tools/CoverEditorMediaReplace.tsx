@@ -10,6 +10,7 @@ import useToggle from '#hooks/useToggle';
 import {
   useCoverEditorActiveMedia,
   useCoverEditorContext,
+  useCoverEditorEditContext,
 } from '../../CoverEditorContext';
 import ToolBoxSection from '../ui/ToolBoxSection';
 import type { SourceMedia } from '#helpers/mediaHelpers';
@@ -17,10 +18,9 @@ import type { SourceMedia } from '#helpers/mediaHelpers';
 const CoverEditorMediaReplace = () => {
   const intl = useIntl();
   const [show, toggleScreenModal] = useToggle(false);
-  const {
-    coverEditorState: { lottie, editionMode, medias },
-    dispatch,
-  } = useCoverEditorContext();
+
+  const { lottie, editionMode, medias } = useCoverEditorContext();
+  const dispatch = useCoverEditorEditContext();
 
   const durations = useLottieMediaDurations(lottie);
   const activeMedia = useCoverEditorActiveMedia();

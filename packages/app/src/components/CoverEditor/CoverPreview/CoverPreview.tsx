@@ -34,7 +34,11 @@ import IconButton from '#ui/IconButton';
 import LoadingView from '#ui/LoadingView';
 import coverDrawer from '../coverDrawer';
 import { createParagraph } from '../coverDrawer/coverTextDrawer';
-import { useCoverEditorContext, useCurrentLayer } from '../CoverEditorContext';
+import {
+  useCoverEditorContext,
+  useCoverEditorEditContext,
+  useCurrentLayer,
+} from '../CoverEditorContext';
 import {
   percentRectToRect,
   isCoverDynamic,
@@ -94,7 +98,8 @@ const CoverPreview = ({
   ...props
 }: CoverPreviewProps) => {
   // #region Data and state
-  const { dispatch, coverEditorState } = useCoverEditorContext();
+  const coverEditorState = useCoverEditorContext();
+  const dispatch = useCoverEditorEditContext();
   const {
     lottie,
     coverTransition,

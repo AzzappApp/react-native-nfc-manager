@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import {
-  useCoverEditorContext,
+  useCoverEditorEditContext,
   useCoverEditorTextLayer,
 } from '../../CoverEditorContext';
 import ToolBoxSection from '../ui/ToolBoxSection';
@@ -9,7 +9,7 @@ import ToolBoxSection from '../ui/ToolBoxSection';
 const CoverEditorAlignmentTool = () => {
   const intl = useIntl();
 
-  const { dispatch } = useCoverEditorContext();
+  const dispatch = useCoverEditorEditContext();
   const layer = useCoverEditorTextLayer();
   const alignment = layer?.textAlign ?? 'left';
 

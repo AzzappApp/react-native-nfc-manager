@@ -42,6 +42,7 @@ import mediaAnimations, {
 import {
   useCoverEditorActiveImageMedia,
   useCoverEditorContext,
+  useCoverEditorEditContext,
 } from '../../CoverEditorContext';
 import ToolBoxSection from '../ui/ToolBoxSection';
 
@@ -57,11 +58,10 @@ import type { DerivedValue } from 'react-native-reanimated';
 const CoverEditorMediaImageAnimationTool = () => {
   const [show, open, close] = useBoolean(false);
   const activeMedia = useCoverEditorActiveImageMedia();
+  const { medias } = useCoverEditorContext();
   const hasMultipleMedias =
-    useCoverEditorContext().coverEditorState.medias.filter(
-      media => media.kind === 'image',
-    ).length > 1;
-  const { dispatch } = useCoverEditorContext();
+    medias.filter(media => media.kind === 'image').length > 1;
+  const dispatch = useCoverEditorEditContext();
   const animations = useMediaAnimationList();
   const hasChanges = useRef(false);
   const onSelect = useCallback(

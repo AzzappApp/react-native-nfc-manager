@@ -2,7 +2,10 @@ import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Alert, View, StyleSheet } from 'react-native';
 import ColorTriptychChooser from '#components/ColorTriptychChooser';
-import { useCoverEditorContext } from '#components/CoverEditor/CoverEditorContext';
+import {
+  useCoverEditorContext,
+  useCoverEditorEditContext,
+} from '#components/CoverEditor/CoverEditorContext';
 import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
@@ -30,10 +33,8 @@ const CoverEditorColorsManager = ({
   onRequestClose,
   onCloseCanceled,
 }: CoverEditorColorsManagerProps) => {
-  const {
-    coverEditorState: { cardColors },
-    dispatch,
-  } = useCoverEditorContext();
+  const { cardColors } = useCoverEditorContext();
+  const dispatch = useCoverEditorEditContext();
 
   const [editedColor, setEditedColor] = useState<
     'dark' | 'light' | 'primary' | null

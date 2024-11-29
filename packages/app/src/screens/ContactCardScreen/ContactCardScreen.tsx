@@ -4,13 +4,7 @@ import { Image } from 'expo-image';
 import { fromGlobalId } from 'graphql-relay';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import {
-  View,
-  useWindowDimensions,
-  useColorScheme,
-  Platform,
-  ScrollView,
-} from 'react-native';
+import { View, useColorScheme, Platform, ScrollView } from 'react-native';
 import { getArrayBufferForBlob } from 'react-native-blob-jsi-helper';
 import { fromByteArray } from 'react-native-quick-base64';
 import Animated, {
@@ -35,6 +29,7 @@ import {
 } from '#helpers/MobileWebAPI';
 import relayScreen from '#helpers/relayScreen';
 import useAnimatedState from '#hooks/useAnimatedState';
+import useScreenDimensions from '#hooks/useScreenDimensions';
 import useToggle from '#hooks/useToggle';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
@@ -94,7 +89,7 @@ export const ContactCardScreen = ({
     contactCardMobileScreenQuery,
     preloadedQuery,
   );
-  const { width, height } = useWindowDimensions();
+  const { width, height } = useScreenDimensions();
   const profile = node?.profile;
   const webCard = profile?.webCard;
   const intl = useIntl();
@@ -120,7 +115,6 @@ export const ContactCardScreen = ({
   };
 
   const animatedContactCardStyle = useAnimatedStyle(() => ({
-    zIndex: 10,
     transform: [
       {
         scale: interpolate(
@@ -501,10 +495,13 @@ const styleSheet = createStyleSheet(appearance => ({
   container: {
     flex: 1,
     justifyContent: 'flex-start',
-    gap: 20,
+    gap: 10,
   },
   contactCard: {
     alignSelf: 'center',
+    zIndex: 10,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
   },
   editContactCardButton: {
     borderRadius: 27,

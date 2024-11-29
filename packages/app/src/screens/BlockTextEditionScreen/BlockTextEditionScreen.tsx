@@ -460,9 +460,7 @@ const BlockTextEditionScreen = ({
                 style={{
                   flex: 1,
                   marginBottom:
-                    insetBottom +
-                    BOTTOM_MENU_HEIGHT +
-                    (Platform.OS === 'android' ? 15 : 0),
+                    BOTTOM_MENU_HEIGHT + (Platform.OS === 'android' ? 15 : 0),
                 }}
                 bottomSheetHeight={bottomPanelHeight}
                 onTouched={onTouched}
@@ -498,9 +496,7 @@ const BlockTextEditionScreen = ({
                 style={{
                   flex: 1,
                   marginBottom:
-                    insetBottom +
-                    BOTTOM_MENU_HEIGHT +
-                    (Platform.OS === 'android' ? 15 : 0),
+                    BOTTOM_MENU_HEIGHT + (Platform.OS === 'android' ? 15 : 0),
                 }}
                 onTouched={onTouched}
               />
@@ -518,7 +514,7 @@ const BlockTextEditionScreen = ({
                 bottomSheetHeight={bottomPanelHeight}
                 style={{
                   flex: 1,
-                  marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
+                  marginBottom: BOTTOM_MENU_HEIGHT,
                 }}
               />
             ),
