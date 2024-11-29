@@ -169,15 +169,19 @@ export async function generateMetadata({
   const userName = params.userName.toLowerCase();
   const webCard = await cachedGetWebCardByUserName(userName);
 
+  const imageUrlOption = webCard?.updatedAt
+    ? `?t=${webCard.updatedAt.getTime()}`
+    : '';
+
   const meta = getMetaData({
     url: params.userName,
     title: capitalize(params.userName),
-    ogImage: `/api/og/${params.userName}?t=${webCard.updatedAt.getTime()}`,
+    ogImage: `/api/og/${params.userName}${imageUrlOption}`,
     description: `${params.userName} | Azzapp WebCard`,
     other: {
       twitter: {
         card: 'summary_large_image',
-        images: `/api/og/${params.userName}?t=${webCard.updatedAt.getTime()}`,
+        images: `/api/og/${params.userName}${imageUrlOption}`,
       },
     },
   });
