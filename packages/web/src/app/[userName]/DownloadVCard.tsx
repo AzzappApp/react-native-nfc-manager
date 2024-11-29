@@ -6,7 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { buildVCardFromSerializedContact } from '@azzapp/shared/vCardHelpers';
-import { CloseIcon } from '#assets';
+import { CloseIcon, InviteIcon } from '#assets';
 import { ButtonIcon } from '#ui';
 import { updateContactCardScanCounter } from '#app/actions/statisticsAction';
 
@@ -251,6 +251,28 @@ const DownloadVCard = ({
           />
         </div>
       </div>
+      {contact && !opened && !contact.avatarUrl && (
+        <ButtonIcon
+          Icon={InviteIcon}
+          size={24}
+          height={50}
+          width={50}
+          className={styles.addContact}
+          aria-label="Add contact"
+          onClick={() => {
+            setOpened(true);
+          }}
+        />
+      )}
+      {contact && !opened && contact.avatarUrl && (
+        <img
+          className={styles.addContactAvatar}
+          src={contact.avatarUrl}
+          onClick={() => {
+            setOpened(true);
+          }}
+        />
+      )}
     </AppIntlProvider>
   );
 };
