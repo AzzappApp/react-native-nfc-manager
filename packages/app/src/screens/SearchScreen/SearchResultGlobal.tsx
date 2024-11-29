@@ -36,12 +36,14 @@ type SearchResultGlobalProps = {
   queryReference: PreloadedQuery<SearchResultGlobalQuery>;
   hasFocus: boolean;
   goToProfilesTab: () => void;
+  renderNoResultComponent: (query: string) => JSX.Element;
 };
 
 const SearchResultGlobal = ({
   queryReference,
   hasFocus,
   goToProfilesTab,
+  renderNoResultComponent,
 }: SearchResultGlobalProps) => {
   const { profile } = usePreloadedQuery<SearchResultGlobalQuery>(
     searchResultGlobalQuery,
@@ -124,6 +126,9 @@ const SearchResultGlobal = ({
 
   if (!profile) {
     return null;
+  }
+  if (posts.length === 0) {
+    return renderNoResultComponent(queryReference.variables.search);
   }
   return (
     <PostsGrid

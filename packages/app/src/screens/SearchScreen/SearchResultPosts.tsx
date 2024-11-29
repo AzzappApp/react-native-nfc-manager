@@ -24,11 +24,13 @@ export const searchResultPostsQuery = graphql`
 type SearchResultPostsProps = {
   queryReference: PreloadedQuery<any>;
   hasFocus: boolean;
+  renderNoResultComponent: (query: string) => JSX.Element;
 };
 
 const SearchResultPosts = ({
   queryReference,
   hasFocus,
+  renderNoResultComponent,
 }: SearchResultPostsProps) => {
   const preloadedQuery = usePreloadedQuery<SearchResultPostsQuery>(
     searchResultPostsQuery,
@@ -105,6 +107,9 @@ const SearchResultPosts = ({
     return <ListLoadingFooter loading={showLoadingIndicatorDebounced} />;
   }, [showLoadingIndicatorDebounced]);
 
+  if (posts.length === 0) {
+    return renderNoResultComponent(queryReference.variables.search);
+  }
   return (
     <PostsGrid
       posts={posts}
