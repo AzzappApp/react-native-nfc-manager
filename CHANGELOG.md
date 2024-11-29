@@ -1,5 +1,7 @@
-## 1.4.1-canary.15
+## 1.4.1-canary.16
 
+* **fix:**  - workaround ripple color issue ([#6145](https://github.com/AzzappApp/azzapp/pull/6145))
+* **fix:**  - increase cover size on desktop ([#6149](https://github.com/AzzappApp/azzapp/pull/6149))
 * **fix:**  - implement no result screen ion search ([#6146](https://github.com/AzzappApp/azzapp/pull/6146))
 * **feat:**  - 🎸 save default colors based on cover ([#6104](https://github.com/AzzappApp/azzapp/pull/6104))
 * **fix:**  - 🐛 refresh multi user after 30s ([#6131](https://github.com/AzzappApp/azzapp/pull/6131))
