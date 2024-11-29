@@ -1,5 +1,8 @@
-## 1.4.1-canary.17
+## 1.4.1-canary.18
 
+* **fix:**  - more not always displayed in ExpendableText after an update ([#6126](https://github.com/AzzappApp/azzapp/pull/6126))
+* **feat:**  - 🎸 add contact floating button ([#6115](https://github.com/AzzappApp/azzapp/pull/6115))
+* **fix:**  - another try to fix missing elipsis ([#6151](https://github.com/AzzappApp/azzapp/pull/6151))
 * **fix:**  - workaround ripple color issue ([#6145](https://github.com/AzzappApp/azzapp/pull/6145))
 * **fix:**  - increase cover size on desktop ([#6149](https://github.com/AzzappApp/azzapp/pull/6149))
 * **fix:**  - implement no result screen ion search ([#6146](https://github.com/AzzappApp/azzapp/pull/6146))
