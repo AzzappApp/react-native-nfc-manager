@@ -7,7 +7,7 @@ import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { Observable } from 'relay-runtime';
 import {
-  getPhotoWithTextAndTitleDefaultValues,
+  getPhotoWithTextAndTitleDefaultColors,
   MODULE_IMAGE_MAX_WIDTH,
   PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
   PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES,
@@ -200,17 +200,19 @@ const PhotoWithTextAndTitleEditionScreen = ({
       backgroundId: photoWithTextAndTitle?.background?.id ?? null,
       backgroundStyle: photoWithTextAndTitle?.backgroundStyle ?? null,
       aspectRatio: photoWithTextAndTitle?.aspectRatio ?? null,
+      ...getPhotoWithTextAndTitleDefaultColors(
+        profile.webCard?.coverBackgroundColor,
+        photoWithTextAndTitle,
+      ),
     };
-  }, [photoWithTextAndTitle]);
+  }, [photoWithTextAndTitle, profile.webCard?.coverBackgroundColor]);
 
   const { data, value, fieldUpdateHandler, updateFields, dirty } =
     useModuleDataEditor({
       initialValue,
       cardStyle: profile?.webCard?.cardStyle,
       styleValuesMap: PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES,
-      defaultValues: getPhotoWithTextAndTitleDefaultValues(
-        profile.webCard?.coverBackgroundColor,
-      ),
+      defaultValues: PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
     });
 
   const {

@@ -98,10 +98,20 @@ export const BLOCK_TEXT_DEFAULT_VALUES_PRIMARY = {
   fontColor: 'light',
 } as const;
 
-export const getBlockTextDefaultValues = (
+export const getBlockTextDefaultColors = (
   coverBackgroundColor: string | null | undefined,
+  data?: Pick<
+    CardModuleBlockTextData,
+    'backgroundStyle' | 'fontColor' | 'textBackgroundStyle'
+  > | null,
 ) => {
-  if (!coverBackgroundColor) return BLOCK_TEXT_DEFAULT_VALUES;
+  if (
+    !coverBackgroundColor ||
+    data?.backgroundStyle ||
+    data?.fontColor ||
+    data?.textBackgroundStyle
+  )
+    return {};
 
   const defaultValues: Record<string, Partial<CardModuleBlockTextData>> = {
     dark: BLOCK_TEXT_DEFAULT_VALUES_DARK,
@@ -109,10 +119,7 @@ export const getBlockTextDefaultValues = (
     primary: BLOCK_TEXT_DEFAULT_VALUES_PRIMARY,
   };
 
-  return Object.assign(
-    { ...BLOCK_TEXT_DEFAULT_VALUES },
-    defaultValues[coverBackgroundColor],
-  );
+  return defaultValues[coverBackgroundColor];
 };
 
 /**
@@ -227,10 +234,11 @@ export const CAROUSEL_DEFAULT_VALUES_PRIMARY = {
   },
 } as const;
 
-export const getCarouselDefaultValues = (
+export const getCarouselDefaultColors = (
   coverBackgroundColor: string | null | undefined,
+  data?: Pick<CardModuleHorizontalPhotoData, 'backgroundStyle'> | null,
 ) => {
-  if (!coverBackgroundColor) return CAROUSEL_DEFAULT_VALUES;
+  if (!coverBackgroundColor || data?.backgroundStyle) return {};
 
   const defaultValues: Record<
     string,
@@ -241,10 +249,7 @@ export const getCarouselDefaultValues = (
     primary: CAROUSEL_DEFAULT_VALUES_PRIMARY,
   };
 
-  return Object.assign(
-    { ...CAROUSEL_DEFAULT_VALUES },
-    defaultValues[coverBackgroundColor],
-  );
+  return defaultValues[coverBackgroundColor];
 };
 /**
  * The maximum image height for the carousel module
@@ -349,24 +354,22 @@ export const HORIZONTAL_PHOTO_DEFAULT_VALUES_PRIMARY = {
   },
 } as const;
 
-export const getHorizontalPhotoDefaultValues = (
+export const getHorizontalPhotoDefaultColors = (
   coverBackgroundColor: string | null | undefined,
+  data?: Pick<CardModuleHorizontalPhotoData, 'backgroundStyle'> | null,
 ) => {
-  if (!coverBackgroundColor) return HORIZONTAL_PHOTO_DEFAULT_VALUES;
+  if (!coverBackgroundColor || data?.backgroundStyle) return {};
 
   const defaultValues: Record<
     string,
-    Partial<CardModuleHorizontalPhotoData>
+    Pick<CardModuleHorizontalPhotoData, 'backgroundStyle'>
   > = {
     dark: HORIZONTAL_PHOTO_DEFAULT_VALUES_DARK,
     light: HORIZONTAL_PHOTO_DEFAULT_VALUES_LIGHT,
     primary: HORIZONTAL_PHOTO_DEFAULT_VALUES_PRIMARY,
   };
 
-  return Object.assign(
-    { ...HORIZONTAL_PHOTO_DEFAULT_VALUES },
-    defaultValues[coverBackgroundColor],
-  );
+  return defaultValues[coverBackgroundColor];
 };
 /**
  * The maximum image height for the horizontal photo module
@@ -585,24 +588,34 @@ export const PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES_PRIMARY = {
   contentFontColor: 'light',
 } as const;
 
-export const getPhotoWithTextAndTitleDefaultValues = (
+export const getPhotoWithTextAndTitleDefaultColors = (
   coverBackgroundColor: string | null | undefined,
+  data?: Pick<
+    CardModulePhotoWithTextAndTitleData,
+    'backgroundStyle' | 'contentFontColor' | 'titleFontColor'
+  > | null,
 ) => {
-  if (!coverBackgroundColor) return PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES;
+  if (
+    !coverBackgroundColor ||
+    data?.backgroundStyle ||
+    data?.titleFontColor ||
+    data?.contentFontColor
+  )
+    return {};
 
   const defaultValues: Record<
     string,
-    Partial<CardModulePhotoWithTextAndTitleData>
+    Pick<
+      CardModulePhotoWithTextAndTitleData,
+      'backgroundStyle' | 'contentFontColor' | 'titleFontColor'
+    >
   > = {
     dark: PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES_DARK,
     light: PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES_LIGHT,
     primary: PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES_PRIMARY,
   };
 
-  return Object.assign(
-    { ...PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES },
-    defaultValues[coverBackgroundColor],
-  );
+  return defaultValues[coverBackgroundColor];
 };
 /**
  * The maximum content length for the photo with text and title module
@@ -750,10 +763,20 @@ export const SIMPLE_BUTTON_DEFAULT_VALUES_PRIMARY = {
   fontColor: 'light',
 } as const;
 
-export const getButtonDefaultValues = (
+export const getButtonDefaultColors = (
   coverBackgroundColor: string | null | undefined,
+  data?: Pick<
+    CardModuleSimpleButtonData,
+    'backgroundStyle' | 'buttonColor' | 'fontColor'
+  > | null,
 ) => {
-  if (!coverBackgroundColor) return SIMPLE_BUTTON_DEFAULT_VALUES;
+  if (
+    !coverBackgroundColor ||
+    data?.backgroundStyle ||
+    data?.buttonColor ||
+    data?.fontColor
+  )
+    return {};
 
   const defaultValues: Record<string, Partial<CardModuleSimpleButtonData>> = {
     dark: SIMPLE_BUTTON_DEFAULT_VALUES_DARK,
@@ -761,10 +784,7 @@ export const getButtonDefaultValues = (
     primary: SIMPLE_BUTTON_DEFAULT_VALUES_PRIMARY,
   };
 
-  return Object.assign(
-    { ...SIMPLE_BUTTON_DEFAULT_VALUES },
-    defaultValues[coverBackgroundColor],
-  );
+  return defaultValues[coverBackgroundColor];
 };
 
 /**
@@ -897,8 +917,10 @@ export const SIMPLE_TEXT_DEFAULT_VALUES_PRIMARY = {
 
 export const getTextDefaultValues = (
   coverBackgroundColor: string | null | undefined,
+  data?: Pick<CardModuleSimpleTextData, 'backgroundStyle' | 'fontColor'> | null,
 ) => {
-  if (!coverBackgroundColor) return SIMPLE_TEXT_DEFAULT_VALUES;
+  if (!coverBackgroundColor || data?.backgroundStyle || data?.fontColor)
+    return {};
 
   const defaultValues: Record<string, Partial<CardModuleSimpleTextData>> = {
     dark: SIMPLE_TEXT_DEFAULT_VALUES_DARK,
@@ -906,10 +928,7 @@ export const getTextDefaultValues = (
     primary: SIMPLE_TEXT_DEFAULT_VALUES_PRIMARY,
   };
 
-  return Object.assign(
-    { ...SIMPLE_TEXT_DEFAULT_VALUES },
-    defaultValues[coverBackgroundColor],
-  );
+  return defaultValues[coverBackgroundColor];
 };
 
 /**
@@ -968,8 +987,10 @@ export const SIMPLE_TITLE_DEFAULT_VALUES = {
 
 export const getTitleDefaultValues = (
   coverBackgroundColor: string | null | undefined,
+  data?: Pick<CardModuleSimpleTextData, 'backgroundStyle' | 'fontColor'> | null,
 ) => {
-  if (!coverBackgroundColor) return SIMPLE_TITLE_DEFAULT_VALUES;
+  if (!coverBackgroundColor || data?.backgroundStyle || data?.fontColor)
+    return {};
 
   const defaultValues: Record<string, Partial<CardModuleSimpleTextData>> = {
     dark: SIMPLE_TEXT_DEFAULT_VALUES_DARK,
@@ -977,10 +998,7 @@ export const getTitleDefaultValues = (
     primary: SIMPLE_TEXT_DEFAULT_VALUES_PRIMARY,
   };
 
-  return Object.assign(
-    { ...SIMPLE_TITLE_DEFAULT_VALUES },
-    defaultValues[coverBackgroundColor],
-  );
+  return defaultValues[coverBackgroundColor];
 };
 
 export const SIMPLE_TITLE_MAX_LENGTH = 300;
@@ -1076,24 +1094,23 @@ export const SOCIAL_LINKS_DEFAULT_VALUES_PRIMARY = {
   iconColor: 'light',
 } as const;
 
-export const getSocialLinksDefaultValues = (
+export const getSocialLinksDefaultColors = (
   coverBackgroundColor: string | null | undefined,
+  data?: Pick<
+    CardModuleSocialLinksData,
+    'backgroundStyle' | 'iconColor'
+  > | null,
 ) => {
-  if (!coverBackgroundColor) return SOCIAL_LINKS_DEFAULT_VALUES;
+  if (!coverBackgroundColor || data?.backgroundStyle || data?.iconColor)
+    return {};
 
-  const defaultValues: Record<
-    string,
-    Partial<CardModulePhotoWithTextAndTitleData>
-  > = {
+  const defaultValues: Record<string, Partial<CardModuleSocialLinksData>> = {
     dark: SOCIAL_LINKS_DEFAULT_VALUES_DARK,
     light: SOCIAL_LINKS_DEFAULT_VALUES_LIGHT,
     primary: SOCIAL_LINKS_DEFAULT_VALUES_PRIMARY,
   };
 
-  return Object.assign(
-    { ...SOCIAL_LINKS_DEFAULT_VALUES },
-    defaultValues[coverBackgroundColor],
-  );
+  return defaultValues[coverBackgroundColor];
 };
 /**
  * The maximum icon size for the social links module
@@ -1190,24 +1207,6 @@ export const MODULES_DEFAULT_VALUES = {
   [MODULE_KIND_VIDEO]: {},
   [MODULE_KIND_WEB_CARDS_CAROUSEL]: {},
 } as const;
-
-export const MODULES_DEFAULT_VALUES_GETTERS = {
-  [MODULE_KIND_BLOCK_TEXT]: getBlockTextDefaultValues,
-  [MODULE_KIND_CAROUSEL]: getCarouselDefaultValues,
-  [MODULE_KIND_HORIZONTAL_PHOTO]: getHorizontalPhotoDefaultValues,
-  [MODULE_KIND_IMAGEGRID]: () => ({}),
-  [MODULE_KIND_LINE_DIVIDER]: () => LINE_DIVIDER_DEFAULT_VALUES,
-  [MODULE_KIND_PARALLAX]: () => ({}),
-  [MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE]:
-    getPhotoWithTextAndTitleDefaultValues,
-  [MODULE_KIND_SCHEDULE]: () => ({}),
-  [MODULE_KIND_SIMPLE_BUTTON]: getButtonDefaultValues,
-  [MODULE_KIND_SIMPLE_TEXT]: getTextDefaultValues,
-  [MODULE_KIND_SIMPLE_TITLE]: getTitleDefaultValues,
-  [MODULE_KIND_SOCIAL_LINKS]: getSocialLinksDefaultValues,
-  [MODULE_KIND_VIDEO]: () => ({}),
-  [MODULE_KIND_WEB_CARDS_CAROUSEL]: () => ({}),
-};
 
 export type ModuleKind = (typeof MODULE_KINDS)[number];
 

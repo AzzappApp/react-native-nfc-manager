@@ -6,7 +6,7 @@ import { graphql, readInlineData } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
   getModuleDataValues,
-  getSocialLinksDefaultValues,
+  SOCIAL_LINKS_DEFAULT_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
 import { SOCIAL_LINKS } from '@azzapp/shared/socialLinkHelpers';
 import { SocialIcon } from '#ui/Icon';
@@ -152,7 +152,7 @@ const SocialLinksRenderer = ({
   } = getModuleDataValues({
     data,
     cardStyle,
-    defaultValues: getSocialLinksDefaultValues(coverBackgroundColor),
+    defaultValues: SOCIAL_LINKS_DEFAULT_VALUES,
     styleValuesMap: null,
   });
 

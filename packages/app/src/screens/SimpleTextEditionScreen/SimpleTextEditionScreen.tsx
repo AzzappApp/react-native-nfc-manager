@@ -8,8 +8,10 @@ import {
   SIMPLE_TITLE_MAX_LENGTH,
   SIMPLE_TEXT_STYLE_VALUES,
   SIMPLE_TITLE_STYLE_VALUES,
-  getTextDefaultValues,
-  getTitleDefaultValues,
+  getTextDefaultValues as getTextDefaultColors,
+  getTitleDefaultValues as getTitleDefaultColors,
+  SIMPLE_TEXT_DEFAULT_VALUES,
+  SIMPLE_TITLE_DEFAULT_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
 import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { useRouter } from '#components/NativeRouter';
@@ -171,8 +173,11 @@ const SimpleTextEditionScreen = ({
       text: data?.text ?? null,
       textAlign: data?.textAlign ?? null,
       verticalSpacing: data?.verticalSpacing ?? null,
+      ...(moduleKind === 'simpleText'
+        ? getTextDefaultColors(profile.webCard?.coverBackgroundColor, data)
+        : getTitleDefaultColors(profile.webCard?.coverBackgroundColor, data)),
     };
-  }, [moduleData]);
+  }, [moduleData, profile.webCard?.coverBackgroundColor, moduleKind]);
 
   const { data, value, fieldUpdateHandler, dirty } = useModuleDataEditor({
     initialValue,
@@ -183,8 +188,8 @@ const SimpleTextEditionScreen = ({
         : SIMPLE_TITLE_STYLE_VALUES,
     defaultValues:
       moduleKind === 'simpleText'
-        ? getTextDefaultValues(profile.webCard?.coverBackgroundColor)
-        : getTitleDefaultValues(profile.webCard?.coverBackgroundColor),
+        ? SIMPLE_TEXT_DEFAULT_VALUES
+        : SIMPLE_TITLE_DEFAULT_VALUES,
   });
 
   const {

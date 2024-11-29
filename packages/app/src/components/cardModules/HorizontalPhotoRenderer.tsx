@@ -6,8 +6,8 @@ import Animated, {
 import { graphql, readInlineData } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
+  HORIZONTAL_PHOTO_DEFAULT_VALUES,
   HORIZONTAL_PHOTO_STYLE_VALUES,
-  getHorizontalPhotoDefaultValues,
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
 import CardModuleBackground from './CardModuleBackground';
@@ -123,7 +123,7 @@ const HorizontalPhotoRenderer = ({
     getModuleDataValues({
       data,
       cardStyle,
-      defaultValues: getHorizontalPhotoDefaultValues(coverBackgroundColor),
+      defaultValues: HORIZONTAL_PHOTO_DEFAULT_VALUES,
       styleValuesMap: HORIZONTAL_PHOTO_STYLE_VALUES,
     });
 

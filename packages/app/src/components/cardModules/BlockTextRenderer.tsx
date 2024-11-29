@@ -8,8 +8,8 @@ import {
 import { graphql, readInlineData } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
+  BLOCK_TEXT_DEFAULT_VALUES,
   BLOCK_TEXT_STYLE_VALUES,
-  getBlockTextDefaultValues,
   getModuleDataValues,
   textAlignmentOrDefault,
 } from '@azzapp/shared/cardModuleHelpers';
@@ -114,7 +114,7 @@ const BlockTextRenderer = ({
   } = getModuleDataValues({
     data,
     cardStyle,
-    defaultValues: getBlockTextDefaultValues(coverBackgroundColor),
+    defaultValues: BLOCK_TEXT_DEFAULT_VALUES,
     styleValuesMap: BLOCK_TEXT_STYLE_VALUES,
   });
 

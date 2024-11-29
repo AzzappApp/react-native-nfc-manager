@@ -1,7 +1,7 @@
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
+  HORIZONTAL_PHOTO_DEFAULT_VALUES,
   HORIZONTAL_PHOTO_STYLE_VALUES,
-  getHorizontalPhotoDefaultValues,
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
 import CloudinaryImage from '#ui/CloudinaryImage';
@@ -38,7 +38,7 @@ const HorizontalPhotoRenderer = async ({
     data: module.data,
     cardStyle,
     styleValuesMap: HORIZONTAL_PHOTO_STYLE_VALUES,
-    defaultValues: getHorizontalPhotoDefaultValues(coverBackgroundColor),
+    defaultValues: HORIZONTAL_PHOTO_DEFAULT_VALUES,
   });
 
   return (

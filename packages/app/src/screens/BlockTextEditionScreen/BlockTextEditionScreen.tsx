@@ -9,7 +9,7 @@ import {
   BLOCK_TEXT_DEFAULT_VALUES,
   BLOCK_TEXT_MAX_LENGTH,
   BLOCK_TEXT_STYLE_VALUES,
-  getBlockTextDefaultValues,
+  getBlockTextDefaultColors,
 } from '@azzapp/shared/cardModuleHelpers';
 import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import AnimatedDataOverride from '#components/AnimatedDataOverride';
@@ -156,16 +156,18 @@ const BlockTextEditionScreen = ({
       textBackgroundStyle: blockText?.textBackgroundStyle ?? null,
       backgroundId: blockText?.background?.id ?? null,
       backgroundStyle: blockText?.backgroundStyle ?? null,
+      ...getBlockTextDefaultColors(
+        profile.webCard?.coverBackgroundColor,
+        blockText,
+      ),
     };
-  }, [blockText]);
+  }, [blockText, profile.webCard?.coverBackgroundColor]);
 
   const { data, value, fieldUpdateHandler, dirty } = useModuleDataEditor({
     initialValue,
     cardStyle: profile?.webCard?.cardStyle,
     styleValuesMap: BLOCK_TEXT_STYLE_VALUES,
-    defaultValues: getBlockTextDefaultValues(
-      profile.webCard?.coverBackgroundColor,
-    ),
+    defaultValues: BLOCK_TEXT_DEFAULT_VALUES,
   });
 
   const {

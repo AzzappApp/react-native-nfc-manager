@@ -10,10 +10,9 @@ import {
   MODULE_KIND_SIMPLE_TITLE,
   SIMPLE_TEXT_DEFAULT_VALUES,
   SIMPLE_TEXT_STYLE_VALUES,
+  SIMPLE_TITLE_DEFAULT_VALUES,
   SIMPLE_TITLE_STYLE_VALUES,
   getModuleDataValues,
-  getTextDefaultValues,
-  getTitleDefaultValues,
   textAlignmentOrDefault,
 } from '@azzapp/shared/cardModuleHelpers';
 import Text from '#ui/Text';
@@ -172,8 +171,8 @@ const SimpleTextRenderer = ({
     cardStyle,
     defaultValues:
       data.kind === MODULE_KIND_SIMPLE_TITLE
-        ? getTitleDefaultValues(coverBackgroundColor)
-        : getTextDefaultValues(coverBackgroundColor),
+        ? SIMPLE_TITLE_DEFAULT_VALUES
+        : SIMPLE_TEXT_DEFAULT_VALUES,
   });
 
   const cardModuleBackgroundStyle = useAnimatedStyle(() => {

@@ -7,7 +7,7 @@ import { useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import * as z from 'zod';
 import {
-  getSocialLinksDefaultValues,
+  getSocialLinksDefaultColors,
   SOCIAL_LINKS_DEFAULT_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
 import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
@@ -146,17 +146,19 @@ const SocialLinksEditionScreen = ({
       marginHorizontal: socialLinks?.marginHorizontal ?? null,
       backgroundId: socialLinks?.background?.id ?? null,
       backgroundStyle: socialLinks?.backgroundStyle ?? null,
+      ...getSocialLinksDefaultColors(
+        profile.webCard?.coverBackgroundColor,
+        socialLinks,
+      ),
     };
-  }, [socialLinks]);
+  }, [socialLinks, profile.webCard?.coverBackgroundColor]);
 
   const { data, value, fieldUpdateHandler, updateFields, dirty } =
     useModuleDataEditor({
       initialValue,
       cardStyle: null,
       styleValuesMap: null,
-      defaultValues: getSocialLinksDefaultValues(
-        profile.webCard?.coverBackgroundColor,
-      ),
+      defaultValues: SOCIAL_LINKS_DEFAULT_VALUES,
     });
 
   const { links, iconColor, arrangement, backgroundId, backgroundStyle } = data;
