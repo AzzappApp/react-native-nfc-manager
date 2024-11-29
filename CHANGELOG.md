@@ -1,5 +1,6 @@
-## 1.4.1-canary.13
+## 1.4.1-canary.14
 
+* **feat:**  - 🎸 save default colors based on cover ([#6104](https://github.com/AzzappApp/azzapp/pull/6104))
 * **fix:**  - 🐛 refresh multi user after 30s ([#6131](https://github.com/AzzappApp/azzapp/pull/6131))
 * **fix:**  - disable exiting animation on ios to fix crash ([#6142](https://github.com/AzzappApp/azzapp/pull/6142))
 * **fix:**  - **iOS:** [#6099](https://github.com/AzzappApp/azzapp/pull/6099) missing part of the fix in previous commit ([#6141](https://github.com/AzzappApp/azzapp/pull/6141))
