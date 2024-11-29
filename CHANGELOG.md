@@ -1,4 +1,4 @@
-## 1.4.1-canary.16
+## 1.4.1-canary.17
 
 * **fix:**  - workaround ripple color issue ([#6145](https://github.com/AzzappApp/azzapp/pull/6145))
 * **fix:**  - increase cover size on desktop ([#6149](https://github.com/AzzappApp/azzapp/pull/6149))
