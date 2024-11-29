@@ -7,7 +7,6 @@ import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
   SIMPLE_BUTTON_DEFAULT_VALUES,
   SIMPLE_BUTTON_STYLE_VALUES,
-  getButtonDefaultValues,
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
 import PressableOpacity from '#ui/PressableOpacity';
@@ -148,7 +147,7 @@ export const SimpleButtonRenderer = ({
     data,
     cardStyle,
     styleValuesMap: SIMPLE_BUTTON_STYLE_VALUES,
-    defaultValues: getButtonDefaultValues(coverBackgroundColor),
+    defaultValues: SIMPLE_BUTTON_DEFAULT_VALUES,
   });
   const onPress = useCallback(async () => {
     if (actionLink) {

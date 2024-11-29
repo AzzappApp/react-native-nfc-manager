@@ -1,7 +1,7 @@
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
+  BLOCK_TEXT_DEFAULT_VALUES,
   BLOCK_TEXT_STYLE_VALUES,
-  getBlockTextDefaultValues,
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
 import { fontsMap } from '#helpers/fonts';
@@ -41,7 +41,7 @@ const BlockTextRenderer = ({
     data: module.data,
     cardStyle,
     styleValuesMap: BLOCK_TEXT_STYLE_VALUES,
-    defaultValues: getBlockTextDefaultValues(coverBackgroundColor),
+    defaultValues: BLOCK_TEXT_DEFAULT_VALUES,
   });
 
   return (

@@ -7,7 +7,7 @@ import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { Observable } from 'relay-runtime';
 import {
-  getHorizontalPhotoDefaultValues,
+  getHorizontalPhotoDefaultColors,
   HORIZONTAL_PHOTO_DEFAULT_VALUES,
   HORIZONTAL_PHOTO_STYLE_VALUES,
   MODULE_IMAGE_MAX_WIDTH,
@@ -165,16 +165,18 @@ const HorizontalPhotoEditionScreen = ({
       backgroundId: horizontalPhoto?.background?.id ?? null,
       backgroundStyle: horizontalPhoto?.backgroundStyle ?? null,
       image: horizontalPhoto?.image ?? null,
+      ...getHorizontalPhotoDefaultColors(
+        profile.webCard?.coverBackgroundColor,
+        horizontalPhoto,
+      ),
     };
-  }, [horizontalPhoto]);
+  }, [horizontalPhoto, profile.webCard?.coverBackgroundColor]);
 
   const { data, value, fieldUpdateHandler, dirty } = useModuleDataEditor({
     initialValue,
     cardStyle: profile?.webCard?.cardStyle,
     styleValuesMap: HORIZONTAL_PHOTO_STYLE_VALUES,
-    defaultValues: getHorizontalPhotoDefaultValues(
-      profile.webCard?.coverBackgroundColor,
-    ),
+    defaultValues: HORIZONTAL_PHOTO_DEFAULT_VALUES,
   });
 
   const { borderColor, backgroundId, backgroundStyle, image } = data;

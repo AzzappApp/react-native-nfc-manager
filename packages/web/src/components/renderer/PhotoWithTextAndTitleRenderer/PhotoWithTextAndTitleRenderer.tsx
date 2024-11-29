@@ -1,9 +1,9 @@
 import cn from 'classnames';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
+  PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
   PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES,
   getModuleDataValues,
-  getPhotoWithTextAndTitleDefaultValues,
 } from '@azzapp/shared/cardModuleHelpers';
 import { fontsMap } from '#helpers/fonts';
 import CloudinaryImage from '#ui/CloudinaryImage';
@@ -55,7 +55,7 @@ const PhotoWithTextAndTitleRenderer = ({
     data: module.data,
     cardStyle,
     styleValuesMap: PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES,
-    defaultValues: getPhotoWithTextAndTitleDefaultValues(coverBackgroundColor),
+    defaultValues: PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
   });
 
   const classnames = cn(styles.wrapper, {
