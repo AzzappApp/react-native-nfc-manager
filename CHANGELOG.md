@@ -1,5 +1,6 @@
-## 1.4.1-canary.14
+## 1.4.1-canary.15
 
+* **fix:**  - implement no result screen ion search ([#6146](https://github.com/AzzappApp/azzapp/pull/6146))
 * **feat:**  - 🎸 save default colors based on cover ([#6104](https://github.com/AzzappApp/azzapp/pull/6104))
 * **fix:**  - 🐛 refresh multi user after 30s ([#6131](https://github.com/AzzappApp/azzapp/pull/6131))
 * **fix:**  - disable exiting animation on ios to fix crash ([#6142](https://github.com/AzzappApp/azzapp/pull/6142))
