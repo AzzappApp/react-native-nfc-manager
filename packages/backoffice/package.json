@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/backoffice",
-  "version": "1.4.1-rc.11",
+  "version": "1.4.1-rc.12",
   "private": true,
   "scripts": {
     "lint": "eslint .",
