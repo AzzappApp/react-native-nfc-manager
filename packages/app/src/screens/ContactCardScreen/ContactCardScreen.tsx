@@ -115,6 +115,10 @@ export const ContactCardScreen = ({
   };
 
   const animatedContactCardStyle = useAnimatedStyle(() => ({
+    alignSelf: 'center', //styles are intentionally put here to fix an issue with the fullscreen card that was not fully tappable on android
+    zIndex: 10,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
     transform: [
       {
         scale: interpolate(
@@ -275,7 +279,7 @@ export const ContactCardScreen = ({
 
         <PressableAnimated
           onPress={setFullscreen}
-          style={[styles.contactCard, animatedContactCardStyle]}
+          style={animatedContactCardStyle}
           onLayout={onLayout}
         >
           <ContactCard profile={profile} height={cardHeight} />
@@ -496,12 +500,6 @@ const styleSheet = createStyleSheet(appearance => ({
     flex: 1,
     justifyContent: 'flex-start',
     gap: 10,
-  },
-  contactCard: {
-    alignSelf: 'center',
-    zIndex: 10,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
   },
   editContactCardButton: {
     borderRadius: 27,
