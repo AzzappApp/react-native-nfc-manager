@@ -41,14 +41,22 @@ const ExpendableText = ({
 
       if (lines.length > numberOfLines) {
         //we need to clip
-        const clippedText = lines
+        let clippedText = lines
           .splice(0, numberOfLines)
           .map(line => line.text)
           .join('');
-        setClippedText(clippedText);
+        clippedText = clippedText.substring(
+          prefix?.label.length ?? 0,
+          clippedText.length - 9,
+        );
+        setTimeout(() => {
+          // setTimeout added for fabric.
+          // We receive onTextLayout before useEffect which reset clippedText
+          setClippedText(clippedText);
+        });
       }
     },
-    [numberOfLines],
+    [numberOfLines, prefix?.label.length],
   );
 
   const toggleExpand = () => {
@@ -81,10 +89,7 @@ const ExpendableText = ({
     if (clippedText) {
       return (
         <>
-          {clippedText.substring(
-            prefix?.label.length ?? 0,
-            clippedText.length - 9,
-          )}
+          {clippedText}
           <Text {...props} style={[props.style, { color: colors.grey400 }]}>
             <FormattedMessage
               defaultMessage="... more"
@@ -95,7 +100,7 @@ const ExpendableText = ({
       );
     }
     return label;
-  }, [clippedText, expanded, label, prefix?.label.length, props]);
+  }, [clippedText, expanded, label, props]);
 
   return (
     //using a pressable without feedback to avoid the ripple effect on all the text container
