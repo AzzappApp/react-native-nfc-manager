@@ -41,6 +41,8 @@ type ProfileStatisticsChartProps = {
   visible?: boolean;
 };
 
+const NB_DAY_TO_DISPLAY = 30;
+
 const ProfileStatisticsChart = ({
   data,
   width,
@@ -53,7 +55,7 @@ const ProfileStatisticsChart = ({
   // we can make startDate and nbDates as props and eventually NB_DATE_DISPLAYED
   const startDate = useMemo(() => {
     const startDate = new Date(new Date().toISOString().split('T')[0]);
-    startDate.setDate(startDate.getDate() - 30 + 5);
+    startDate.setDate(startDate.getDate() - NB_DAY_TO_DISPLAY + 1);
     return startDate.getTime();
   }, []);
   return (
@@ -65,7 +67,7 @@ const ProfileStatisticsChart = ({
       )}
       <BarChartLegend
         variant={variant}
-        nbDates={30}
+        nbDates={NB_DAY_TO_DISPLAY}
         startDate={startDate}
         width={width}
         height={height}
@@ -161,16 +163,17 @@ const BarChartLegend = ({
     const result = [];
     const dayInterval = nbDates / NB_DATE_DISPLAYED;
     for (let index = 0; index < NB_DATE_DISPLAYED; index++) {
+      const currentDate = startDate.getDate();
       if (
         (index * dayInterval) % ((NB_DATE_DISPLAYED / 2) * dayInterval) ===
         0
       ) {
         const currentMonth = intl.formatDate(startDate, { month: 'short' });
-        result.push(`${startDate.getDate()}${currentMonth}`);
+        result.push(`${currentDate}${currentMonth}`);
       } else {
-        result.push(`${startDate.getDate()}`);
+        result.push(`${currentDate}`);
       }
-      startDate.setDate(startDate.getDate() + dayInterval);
+      startDate.setDate(currentDate + dayInterval);
     }
 
     return result;
