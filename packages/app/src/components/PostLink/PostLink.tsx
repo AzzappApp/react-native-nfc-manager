@@ -9,6 +9,7 @@ import type { PostLinkProps } from './postLinkTypes';
  * triggers a reaveal animation when pressed
  */
 const PostLink = ({
+  onLike,
   postId,
   style,
   postRendererStyle,
@@ -16,7 +17,10 @@ const PostLink = ({
 }: PostLinkProps) => {
   return (
     <Link route="POST" params={{ postId }}>
-      <PressableScaleHighlight style={[style, styles.pressableStyle]}>
+      <PressableScaleHighlight
+        style={[style, styles.pressableStyle]}
+        onDoublePress={onLike}
+      >
         {({ pressed }) => (
           <PostRendererFeed
             {...props}

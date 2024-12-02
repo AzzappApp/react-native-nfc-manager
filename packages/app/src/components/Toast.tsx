@@ -146,6 +146,34 @@ const Toast = ({
           />
         </>
       ),
+      like: (successProps: ToastConfigParams<ToastProps>) => (
+        <BaseToast
+          {...successProps}
+          style={styles.baseToast}
+          contentContainerStyle={styles.contentContainerToast}
+          renderLeadingIcon={() => (
+            <Icon icon="like_filled" style={styles.successToastIcon} />
+          )}
+          text1Style={[textStyles.smallbold, styles.toastText]}
+          text1Props={{
+            adjustsFontSizeToFit: true,
+          }}
+        />
+      ),
+      unlike: (successProps: ToastConfigParams<ToastProps>) => (
+        <BaseToast
+          {...successProps}
+          style={styles.baseToast}
+          contentContainerStyle={styles.contentContainerToast}
+          renderLeadingIcon={() => (
+            <Icon icon="like" style={styles.successToastIcon} />
+          )}
+          text1Style={[textStyles.smallbold, styles.toastText]}
+          text1Props={{
+            adjustsFontSizeToFit: true,
+          }}
+        />
+      ),
     };
   }, [
     bottomOffset,

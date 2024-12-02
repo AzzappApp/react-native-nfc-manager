@@ -1,9 +1,15 @@
-import { forwardRef } from 'react';
+import { forwardRef, useRef } from 'react';
 import { Pressable } from 'react-native';
 import Animated from 'react-native-reanimated';
 
 import type { ForwardedRef } from 'react';
-import type { PressableProps, StyleProp, View, ViewStyle } from 'react-native';
+import type {
+  GestureResponderEvent,
+  PressableProps,
+  StyleProp,
+  View,
+  ViewStyle,
+} from 'react-native';
 import type {
   AnimatedProps,
   AnimatedStyle,
@@ -29,14 +35,34 @@ export type PressableAnimatedProps = Exclude<PressableProps, 'style'> & {
     | EntryExitAnimationFunction
     | Keyframe
     | typeof BaseAnimationBuilder;
+  onDoublePress?: () => void;
 };
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
+const TIMEOUT = 200;
+
 const PressableAnimated = (
-  { disabled, ...props }: PressableAnimatedProps,
+  { disabled, onDoublePress, ...props }: PressableAnimatedProps,
   ref: ForwardedRef<View>,
 ) => {
+  const timer = useRef<NodeJS.Timeout | null>(null);
+
+  const onPress = (e: GestureResponderEvent) => {
+    if (timer.current && onDoublePress) {
+      clearTimeout(timer.current);
+      timer.current = null;
+      onDoublePress();
+    } else if (onDoublePress) {
+      timer.current = setTimeout(() => {
+        timer.current = null;
+        props.onPress?.(e);
+      }, TIMEOUT);
+    } else {
+      props.onPress?.(e);
+    }
+  };
+
   return (
     // @ts-expect-error - AnimateProps is hard to type
     <AnimatedPressable
@@ -44,6 +70,7 @@ const PressableAnimated = (
       accessibilityState={{ disabled: disabled ?? false }}
       disabled={disabled}
       {...props}
+      onPress={onPress}
     />
   );
 };

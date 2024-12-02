@@ -4,13 +4,12 @@ import { memo, useCallback, useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet, Share, Platform } from 'react-native';
 import Toast from 'react-native-toast-message';
-import { useMutation, graphql, useFragment } from 'react-relay';
-import { useDebouncedCallback } from 'use-debounce';
-import ERRORS from '@azzapp/shared/errors';
+import { graphql, useFragment } from 'react-relay';
 import { buildPostUrl } from '@azzapp/shared/urlHelpers';
 import { useRouter } from '#components/NativeRouter';
 import { profileInfoHasEditorRight } from '#helpers/profileRoleHelper';
 import { useProfileInfos } from '#hooks/authStateHooks';
+import useToggleLikePost from '#hooks/useToggleLikePost';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
@@ -19,7 +18,6 @@ import type {
   PostRendererActionBar_post$key,
   ReactionKind,
 } from '#relayArtifacts/PostRendererActionBar_post.graphql';
-import type { PostRendererActionBarReactionMutation } from '#relayArtifacts/PostRendererActionBarReactionMutation.graphql';
 import type { ViewProps } from 'react-native';
 
 export type PostRendererActionBarProps = ViewProps & {
@@ -64,21 +62,6 @@ const PostRendererActionBar = ({
     postKey,
   );
 
-  const [commit] = useMutation<PostRendererActionBarReactionMutation>(graphql`
-    mutation PostRendererActionBarReactionMutation(
-      $webCardId: ID!
-      $input: TogglePostReactionInput!
-    ) {
-      togglePostReaction(webCardId: $webCardId, input: $input) {
-        post {
-          id
-          postReaction(webCardId: $webCardId)
-          counterReactions
-        }
-      }
-    }
-  `);
-
   const [reaction, setReaction] = useState<ReactionKind | null>(
     viewerPostReaction,
   );
@@ -95,106 +78,50 @@ const PostRendererActionBar = ({
   }, [counterReactions]);
 
   const profileInfos = useProfileInfos();
-  const debouncedCommit = useDebouncedCallback(
-    () => {
-      const webCardId = profileInfos?.webCardId;
-      if (!webCardId) {
-        return;
-      }
-      if (viewerPostReaction !== reaction) {
-        const add = viewerPostReaction !== reaction;
-        commit({
-          variables: {
+  const add = viewerPostReaction !== reaction;
+
+  const toggleLikePost = useToggleLikePost(
+    {
+      optimisticResponse: {
+        togglePostReaction: {
+          post: {
+            id: postId,
+            postReaction: add ? reaction : null,
+            counterReactions: Math.max(0, countReactions),
+          },
+        },
+      },
+      updater: (store, response) => {
+        const webCardId = profileInfos?.webCardId;
+        if (!response || !webCardId) {
+          return;
+        }
+        const reaction = response.togglePostReaction;
+        const added = response.togglePostReaction.post.postReaction != null;
+
+        const post = store.get<{ counterReactions: number }>(reaction.post.id);
+        if (post) {
+          const counter = post?.getValue('counterReactions');
+
+          if (typeof counter === 'number') {
+            post?.setValue(reaction.post.counterReactions, 'counterReactions');
+          }
+          post.setValue(reaction.post.postReaction, 'postReaction', {
             webCardId,
-            input: {
-              postId,
-              reactionKind: 'like',
-            },
-          },
-          optimisticResponse: {
-            togglePostReaction: {
-              post: {
-                id: postId,
-                postReaction: add ? reaction : null,
-                counterReactions: Math.max(0, countReactions),
-              },
-            },
-          },
-          updater: (store, response) => {
-            if (!response) {
-              return;
-            }
-            const reaction = response.togglePostReaction;
-            const added = response.togglePostReaction.post.postReaction != null;
-
-            const post = store.get<{ counterReactions: number }>(
-              reaction.post.id,
-            );
-            if (post) {
-              const counter = post?.getValue('counterReactions');
-
-              if (typeof counter === 'number') {
-                post?.setValue(
-                  reaction.post.counterReactions,
-                  'counterReactions',
-                );
-              }
-              post.setValue(reaction.post.postReaction, 'postReaction', {
-                webCardId: profileInfos.webCardId,
-              });
-            }
-            const webCard = store.get(webCardId);
-            const counter = webCard?.getValue('nbPostsLiked');
-            if (typeof counter === 'number') {
-              webCard?.setValue(
-                Math.max(counter + (added ? 1 : -1), 0),
-                'nbPostsLiked',
-              );
-            }
-          },
-          onError: error => {
-            console.log(error);
-
-            setCountReactions(prevReactions =>
-              add ? prevReactions - 1 : prevReactions + 1,
-            );
-
-            if (error.message === ERRORS.UNPUBLISHED_WEB_CARD) {
-              Toast.show({
-                type: 'error',
-                text1: intl.formatMessage(
-                  {
-                    defaultMessage:
-                      'Oops, this WebCard{azzappA} is not published.',
-                    description:
-                      'Error when a user tries to like a post from an unpublished webCard',
-                  },
-                  {
-                    azzappA: <Text variant="azzapp">a</Text>,
-                  },
-                ) as unknown as string,
-              });
-            } else {
-              //add manual capture exception for testing issue
-              Sentry.captureException(error, {
-                extra: { tag: 'PostReaction' },
-              });
-
-              Toast.show({
-                type: 'error',
-                text1: intl.formatMessage({
-                  defaultMessage: 'Error, we were unable to like this post',
-                  description: 'Error toast message when liking a post failed.',
-                }),
-              });
-            }
-          },
-        });
-      }
+          });
+        }
+        const webCard = store.get(webCardId);
+        const counter = webCard?.getValue('nbPostsLiked');
+        if (typeof counter === 'number') {
+          webCard?.setValue(
+            Math.max(counter + (added ? 1 : -1), 0),
+            'nbPostsLiked',
+          );
+        }
+      },
     },
-    // delay in ms
+    () => viewerPostReaction !== reaction,
     700,
-    { trailing: true, leading: false },
   );
 
   // toggle the value locally
@@ -213,7 +140,7 @@ const PostRendererActionBar = ({
         setCountReactions(countReactions + 1);
         setReaction('like');
       }
-      debouncedCommit();
+      toggleLikePost(postId);
     } else {
       Toast.show({
         type: 'error',
@@ -227,11 +154,12 @@ const PostRendererActionBar = ({
   }, [
     actionEnabled,
     countReactions,
-    debouncedCommit,
     intl,
     onActionDisabled,
+    postId,
     profileInfos,
     reaction,
+    toggleLikePost,
   ]);
 
   const goToComments = () => {
