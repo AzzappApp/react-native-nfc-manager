@@ -1,4 +1,4 @@
-## 1.4.1-canary.18
+## 1.4.1-canary.19
 
 * **fix:**  - more not always displayed in ExpendableText after an update ([#6126](https://github.com/AzzappApp/azzapp/pull/6126))
 * **feat:**  - 🎸 add contact floating button ([#6115](https://github.com/AzzappApp/azzapp/pull/6115))
