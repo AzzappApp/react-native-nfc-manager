@@ -1,6 +1,5 @@
 import SkiaPictureViewNativeComponent from '@shopify/react-native-skia/src/specs/SkiaPictureViewNativeComponent';
 import { SkiaViewApi } from '@shopify/react-native-skia/src/views/api';
-
 import { useEffect, useMemo } from 'react';
 import { PixelRatio, View } from 'react-native';
 import {
@@ -8,14 +7,17 @@ import {
   type DerivedValue,
 } from 'react-native-reanimated';
 import type {
-  SkiaPictureViewProps,
+  SkiaPictureViewNativeProps,
   SkPicture,
 } from '@shopify/react-native-skia';
 import type { StyleProp, ViewStyle } from 'react-native';
 
 const NativeSkiaPictureView = SkiaPictureViewNativeComponent;
 
-export type SkiaAnimatedPictureView = Omit<SkiaPictureViewProps, 'picture'> & {
+export type SkiaAnimatedPictureView = Omit<
+  SkiaPictureViewNativeProps,
+  'picture'
+> & {
   picture: DerivedValue<SkPicture>;
   width: number;
   height: number;
@@ -28,7 +30,6 @@ const SkiaAnimatedPictureView = ({
   picture,
   onSize,
   debug,
-  mode,
   width,
   height,
   style,
@@ -57,7 +58,6 @@ const SkiaAnimatedPictureView = ({
       <NativeSkiaPictureView
         collapsable={false}
         nativeID={`${nativeId}`}
-        mode={mode ?? 'default'}
         debug={debug}
         style={[
           {
