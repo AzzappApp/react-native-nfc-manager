@@ -16,7 +16,10 @@ const acceptInvitationMutation: MutationResolvers['acceptInvitation'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  await updateProfile(profileId, { invited: false });
+  await updateProfile(profileId, {
+    invited: false,
+    lastContactCardUpdate: profile.createdAt,
+  });
 
   return {
     profile: {
