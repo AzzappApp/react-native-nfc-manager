@@ -78,7 +78,7 @@ __metadata:
   dependencies:
     "@azzapp/i18n": "workspace:^"
     "@azzapp/react-native-buffer-loader": "workspace:^"
-    "@azzapp/react-native-skia-video": "npm:v0.7.0"
+    "@azzapp/react-native-skia-video": "patch:@azzapp/react-native-skia-video@https%3A//github.com/AzzappApp/react-native-skia-video.git%23commit=5a9b0e5285f2831a98c4aebd1cf2253d8f1374e3#~/.yarn/patches/@azzapp-react-native-skia-video-https-0ebaca4ab8.patch"
     "@azzapp/react-native-snapshot-view": "npm:^0.1.4"
     "@azzapp/shared": "workspace:^"
     "@expo-google-fonts/amatic-sc": "npm:^0.2.3"
@@ -151,7 +151,7 @@ __metadata:
     "@sentry/types": "npm:^8.40.0"
     "@sentry/utils": "npm:^8.40.0"
     "@shopify/flash-list": "npm:^1.7.2"
-    "@shopify/react-native-skia": "patch:@shopify/react-native-skia@npm%3A1.5.0#~/.yarn/patches/@shopify-react-native-skia-npm-1.5.0-617be4e940.patch"
+    "@shopify/react-native-skia": "patch:@shopify/react-native-skia@npm%3A1.6.0#~/.yarn/patches/@shopify-react-native-skia-npm-1.6.0-07b164b681.patch"
     "@testing-library/react-native": "npm:^12.8.1"
     "@types/chroma-js": "npm:^2.4.4"
     "@types/qrcode": "npm:^1.5.5"
@@ -390,15 +390,27 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@azzapp/react-native-skia-video@npm:v0.7.0":
+"@azzapp/react-native-skia-video@https://github.com/AzzappApp/react-native-skia-video.git#commit=5a9b0e5285f2831a98c4aebd1cf2253d8f1374e3":
   version: 0.7.0
-  resolution: "@azzapp/react-native-skia-video@npm:0.7.0"
+  resolution: "@azzapp/react-native-skia-video@https://github.com/AzzappApp/react-native-skia-video.git#commit=5a9b0e5285f2831a98c4aebd1cf2253d8f1374e3"
   peerDependencies:
-    "@shopify/react-native-skia": ">= 1.5.0"
+    "@shopify/react-native-skia": ">= 1.6.0"
     react: "*"
     react-native: "*"
     react-native-reanimated: ">= 3.16.1"
-  checksum: 10/84ea546f8f406d43f6ee252d821ad9637f302b1afb05d5fbec65223ae5b090b991260514f8927cc70bfbfea154093c20413ace22b1b69ef5dcac2e16e56d349c
+  checksum: 10/f2ce188189689a4b0b3c9d902edc9758f8cd0bc132c6636d0d40b9472e4644809ff2e670345c8576a7937194804b8ad931ac43617043821ae886bbe29de860b7
+  languageName: node
+  linkType: hard
+
+"@azzapp/react-native-skia-video@patch:@azzapp/react-native-skia-video@https%3A//github.com/AzzappApp/react-native-skia-video.git%23commit=5a9b0e5285f2831a98c4aebd1cf2253d8f1374e3#~/.yarn/patches/@azzapp-react-native-skia-video-https-0ebaca4ab8.patch":
+  version: 0.7.0
+  resolution: "@azzapp/react-native-skia-video@patch:@azzapp/react-native-skia-video@https%3A//github.com/AzzappApp/react-native-skia-video.git%23commit=5a9b0e5285f2831a98c4aebd1cf2253d8f1374e3#~/.yarn/patches/@azzapp-react-native-skia-video-https-0ebaca4ab8.patch::version=0.7.0&hash=30fee5"
+  peerDependencies:
+    "@shopify/react-native-skia": ">= 1.6.0"
+    react: "*"
+    react-native: "*"
+    react-native-reanimated: ">= 3.16.1"
+  checksum: 10/acd5cbecae2b80e10f528c0ad6acc39b548952b4c41bde9e13ced46b37d5f2434d7b31e8b0660185257bac9eafe031065961f185b9dc4f5fddb3430ce3a1d161
   languageName: node
   linkType: hard
 
@@ -10845,9 +10857,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@shopify/react-native-skia@npm:1.5.0":
-  version: 1.5.0
-  resolution: "@shopify/react-native-skia@npm:1.5.0"
+"@shopify/react-native-skia@npm:1.6.0":
+  version: 1.6.0
+  resolution: "@shopify/react-native-skia@npm:1.6.0"
   dependencies:
     canvaskit-wasm: "npm:0.39.1"
     react-reconciler: "npm:0.27.0"
@@ -10862,13 +10874,13 @@ __metadata:
       optional: true
   bin:
     setup-skia-web: ./scripts/setup-canvaskit.js
-  checksum: 10/899dfb184f14e3e07eef310881afa467ba0732a2a6b51e92fb00e831ad1f7adddb86fdc4d89da7d95a0d2f5aa356eba4c118d4e04bf57d659a32a3834de636dd
+  checksum: 10/d2df5faac6697a6cb983493dd8bb681b435a6a1a8cb954cfc906ff29f65810e44558a3597445ad99be84de45019e0831082a98c29ff290541ee5c4e81ca8a53e
   languageName: node
   linkType: hard
 
-"@shopify/react-native-skia@patch:@shopify/react-native-skia@npm%3A1.5.0#~/.yarn/patches/@shopify-react-native-skia-npm-1.5.0-617be4e940.patch":
-  version: 1.5.0
-  resolution: "@shopify/react-native-skia@patch:@shopify/react-native-skia@npm%3A1.5.0#~/.yarn/patches/@shopify-react-native-skia-npm-1.5.0-617be4e940.patch::version=1.5.0&hash=ce39df"
+"@shopify/react-native-skia@patch:@shopify/react-native-skia@npm%3A1.6.0#~/.yarn/patches/@shopify-react-native-skia-npm-1.6.0-07b164b681.patch":
+  version: 1.6.0
+  resolution: "@shopify/react-native-skia@patch:@shopify/react-native-skia@npm%3A1.6.0#~/.yarn/patches/@shopify-react-native-skia-npm-1.6.0-07b164b681.patch::version=1.6.0&hash=876398"
   dependencies:
     canvaskit-wasm: "npm:0.39.1"
     react-reconciler: "npm:0.27.0"
@@ -10883,7 +10895,7 @@ __metadata:
       optional: true
   bin:
     setup-skia-web: ./scripts/setup-canvaskit.js
-  checksum: 10/adc0d0383951e3937d31a56a77245239e9547199d90b9123ac2041b16c23df9960ee03c2d40fcdc50f3c56a2c81eca164adf8af095b7838ae73d9b43a413f77b
+  checksum: 10/1aef961cdf007b397c379f2a9ebccf8cb4a1c55880cbe976f83bbe29059d391d74f8d1d19a2b192a0d8636622cea145fae248105a2b78cdd4d638bc7167706de
   languageName: node
   linkType: hard
 

@@ -136,7 +136,7 @@ const BarChart = ({
   });
 
   return (
-    <Canvas style={{ width, height }}>
+    <Canvas style={{ width, height }} opaque>
       <Picture picture={picture} />
     </Canvas>
   );

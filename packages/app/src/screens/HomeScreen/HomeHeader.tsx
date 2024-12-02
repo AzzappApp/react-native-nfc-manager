@@ -139,6 +139,7 @@ export const AnimatedHomeHeaderCentralComponent = ({
         style={{ width: 136, height: 28 }}
         accessibilityLabel="azzapp"
         accessibilityRole="text"
+        opaque
       >
         <Mask
           mode="alpha"
