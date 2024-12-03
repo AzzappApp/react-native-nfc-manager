@@ -143,15 +143,17 @@ const SocialLinksLinksEditionPanel = ({
       });
     }
 
-    return consolidatedLinks.sort((a, b) => {
+    return consolidatedLinks;
+  }, [intl, links]);
+
+  const [data, setData] = useState(() =>
+    getLinks().sort((a, b) => {
       if (a.position !== b.position) {
         return a.position - b.position;
       }
       return 0;
-    });
-  }, [intl, links]);
-
-  const [data, setData] = useState(getLinks);
+    }),
+  );
 
   useEffect(() => {
     setData(data => {
