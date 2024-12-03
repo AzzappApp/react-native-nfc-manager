@@ -1,16 +1,9 @@
 import {
   CameraRoll,
+  cameraRollEventEmitter,
   progressUpdateEventEmitter,
 } from '@react-native-camera-roll/camera-roll';
-import {
-  useCallback,
-  useEffect,
-  useImperativeHandle,
-  useMemo,
-  useRef,
-  useState,
-  forwardRef,
-} from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { AppState, Platform, View, useWindowDimensions } from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
@@ -32,7 +25,6 @@ import type {
   PhotoIdentifier,
 } from '@react-native-camera-roll/camera-roll';
 import type { ContentStyle } from '@shopify/flash-list';
-import type { ForwardedRef } from 'react';
 import type { ViewProps } from 'react-native';
 
 type PhotoGalleryMediaListProps = Omit<ViewProps, 'children'> & {
@@ -66,28 +58,21 @@ type PhotoGalleryMediaListProps = Omit<ViewProps, 'children'> & {
   contentContainerStyle?: ContentStyle;
 };
 
-export type PhotoGalleryMediaListActions = {
-  load: () => void;
-};
-
 /**
  * A component that displays a list of media from the camera roll
  * and allows the user to select one of them.
  */
-const PhotoGalleryMediaList = (
-  {
-    selectedMediaId,
-    selectedMediasIds,
-    album,
-    kind,
-    onMediaSelected,
-    autoSelectFirstItem = true,
-    numColumns = 4,
-    contentContainerStyle,
-    ...props
-  }: PhotoGalleryMediaListProps,
-  ref: ForwardedRef<PhotoGalleryMediaListActions>,
-) => {
+const PhotoGalleryMediaList = ({
+  selectedMediaId,
+  selectedMediasIds,
+  album,
+  kind,
+  onMediaSelected,
+  autoSelectFirstItem = true,
+  numColumns = 4,
+  contentContainerStyle,
+  ...props
+}: PhotoGalleryMediaListProps) => {
   const styles = useStyleSheet(styleSheet);
   const [medias, setMedias] = useState<PhotoIdentifier[]>([]);
 
@@ -144,10 +129,6 @@ const PhotoGalleryMediaList = (
     },
     [album?.title, album?.type, kind],
   );
-
-  useImperativeHandle(ref, () => ({
-    load: () => load(true),
-  }));
 
   useEffect(() => {
     void load(true);
@@ -262,6 +243,19 @@ const PhotoGalleryMediaList = (
   }, [autoSelectFirstItem, medias, onMediaPress, selectedMediaId]);
 
   useEffect(() => {
+    const subscription = cameraRollEventEmitter.addListener(
+      'onLibrarySelectionChange',
+      _event => {
+        load(true);
+      },
+    );
+
+    return () => {
+      subscription.remove();
+    };
+  }, [load]);
+
+  useEffect(() => {
     const subscription = AppState.addEventListener(
       'change',
       async nextAppState => {
@@ -344,7 +338,6 @@ const PhotoGalleryMediaList = (
                 //it not waiting the modal ios will not be displayed
                 await openPhotoPicker();
                 toggleManageAccessMediaVisible();
-                load(true);
               }}
             >
               <FormattedMessage
@@ -392,7 +385,7 @@ const getPhotoDuration = (item: PhotoIdentifier) =>
     ? item.node.image.playableDuration
     : undefined;
 
-export default forwardRef(PhotoGalleryMediaList);
+export default PhotoGalleryMediaList;
 
 const styleSheet = createStyleSheet(appearance => ({
   container: {
