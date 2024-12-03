@@ -1,11 +1,16 @@
-## 1.4.1-canary.20
+## 1.4.1-canary.21
 
+* **fix:**  - **android:** [#6169](https://github.com/AzzappApp/azzapp/pull/6169) avoid random crashed on android ([#6170](https://github.com/AzzappApp/azzapp/pull/6170))
+* **fix:**  - **loading:** [#6094](https://github.com/AzzappApp/azzapp/pull/6094) avoid partially rendered logo ([#6153](https://github.com/AzzappApp/azzapp/pull/6153))
+* **fix:**  - **contact:** [#6148](https://github.com/AzzappApp/azzapp/pull/6148) phoneNumbers and emails may be undefined ([#6152](https://github.com/AzzappApp/azzapp/pull/6152))
 * **fix:**  - more not always displayed in ExpendableText after an update ([#6126](https://github.com/AzzappApp/azzapp/pull/6126))
 * **feat:**  - 🎸 add contact floating button ([#6115](https://github.com/AzzappApp/azzapp/pull/6115))
 * **fix:**  - another try to fix missing elipsis ([#6151](https://github.com/AzzappApp/azzapp/pull/6151))
+* **feat:**  - 🎸 save default colors based on cover ([#6104](https://github.com/AzzappApp/azzapp/pull/6104))
 * **fix:**  - workaround ripple color issue ([#6145](https://github.com/AzzappApp/azzapp/pull/6145))
 * **fix:**  - increase cover size on desktop ([#6149](https://github.com/AzzappApp/azzapp/pull/6149))
 * **fix:**  - implement no result screen ion search ([#6146](https://github.com/AzzappApp/azzapp/pull/6146))
+* **fix:**  - **android:** [#6139](https://github.com/AzzappApp/azzapp/pull/6139) bottom part of the contact card is not tappable ([#6143](https://github.com/AzzappApp/azzapp/pull/6143))
 * **feat:**  - 🎸 save default colors based on cover ([#6104](https://github.com/AzzappApp/azzapp/pull/6104))
 * **fix:**  - 🐛 refresh multi user after 30s ([#6131](https://github.com/AzzappApp/azzapp/pull/6131))
 * **fix:**  - disable exiting animation on ios to fix crash ([#6142](https://github.com/AzzappApp/azzapp/pull/6142))
