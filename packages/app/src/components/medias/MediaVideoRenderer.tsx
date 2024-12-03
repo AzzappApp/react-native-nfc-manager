@@ -121,12 +121,6 @@ const MediaVideoRenderer = (
   const [snapshotID, setSnapshotID] = useState(() =>
     useAnimationSnapshot ? (_videoSnapshots.get(source.mediaId) ?? null) : null,
   );
-  // we don't want to display the thumbnail if the video had a snapshot during
-  // the video loading
-  const hasSnapshot = useMemo(
-    () => _videoSnapshots.has(source.mediaId),
-    [source.mediaId],
-  );
 
   const useAnimationSnapshotRef = useRef(useAnimationSnapshot);
   useEffect(() => {
@@ -241,15 +235,19 @@ const MediaVideoRenderer = (
 
   return (
     <View style={containerStyle} ref={containerRef} {...props}>
-      {thumbnailSource && !currentTime && !hasSnapshot && (
-        <MediaImageRenderer
-          source={thumbnailSource}
-          testID="thumbnail"
-          alt={alt}
-          onReadyForDisplay={onThumbnailReadyForDisplay}
-          style={StyleSheet.absoluteFill}
-        />
-      )}
+      {
+        // we don't want to display the thumbnail if the video had a snapshot during
+        // the video loading
+        thumbnailSource && !currentTime && !snapshotID && (
+          <MediaImageRenderer
+            source={thumbnailSource}
+            testID="thumbnail"
+            alt={alt}
+            onReadyForDisplay={onThumbnailReadyForDisplay}
+            style={StyleSheet.absoluteFill}
+          />
+        )
+      }
       {!!videoEnabled && (
         <Video
           ref={videoRef}

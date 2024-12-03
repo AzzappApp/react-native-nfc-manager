@@ -8,14 +8,11 @@ import { MODULE_KINDS } from '@azzapp/shared/cardModuleHelpers';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
-import {
-  useCurrentRoute,
-  useRouter,
-  useScreenHasFocus,
-} from '#components/NativeRouter';
+import { useCurrentRoute, useRouter } from '#components/NativeRouter';
 import WebCardBackground from '#components/WebCardBackgroundPreview';
 import useBoolean from '#hooks/useBoolean';
 import useToggle from '#hooks/useToggle';
+import useCoverPlayPermission from '#screens/HomeScreen/useCoverPlayPermission';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import AddContentBelowCoverModal from './AddContentBelowCoverModal';
 import CardStyleModal from './CardStyleModal';
@@ -325,9 +322,9 @@ const WebCardScreenContent = ({
     };
   });
 
-  const hasFocus = useScreenHasFocus();
-
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();
+
+  const { canPlay, paused } = useCoverPlayPermission();
 
   return (
     <>
@@ -391,7 +388,8 @@ const WebCardScreenContent = ({
             <CoverRenderer
               webCard={webCard}
               width={windowWidth}
-              canPlay={ready && hasFocus}
+              canPlay={ready && canPlay}
+              paused={paused}
               large
               useAnimationSnapshot
             />
