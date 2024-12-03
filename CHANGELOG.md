@@ -1,4 +1,4 @@
-## 1.4.1-canary.21
+## 1.4.1-canary.22
 
 * **fix:**  - **android:** [#6169](https://github.com/AzzappApp/azzapp/pull/6169) avoid random crashed on android ([#6170](https://github.com/AzzappApp/azzapp/pull/6170))
 * **fix:**  - **loading:** [#6094](https://github.com/AzzappApp/azzapp/pull/6094) avoid partially rendered logo ([#6153](https://github.com/AzzappApp/azzapp/pull/6153))
