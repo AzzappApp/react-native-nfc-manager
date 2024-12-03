@@ -9,10 +9,7 @@ import { useIntl } from 'react-intl';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { DEFAULT_COLOR_PALETTE, swapColor } from '@azzapp/shared/cardHelpers';
-import {
-  swapModuleColor,
-  type CardModuleColor,
-} from '@azzapp/shared/cardModuleHelpers';
+import { type CardModuleColor } from '@azzapp/shared/cardModuleHelpers';
 import CardModuleBottomBar from '#components/cardModules/CardModuleBottomBar';
 import { type CardModuleMedia } from '#components/cardModules/cardModuleEditorType';
 import CardModulePreviewContainer from '#components/cardModules/tool/CardModulePreviewContainer';
@@ -211,14 +208,20 @@ const MediaModuleWebCardScreen = (
   // #endRegion
   useEffect(() => {
     if (
-      data?.cardModuleColor?.background !== selectedCardModuleColor?.background
+      data?.cardModuleColor?.background !==
+        selectedCardModuleColor?.background ||
+      data?.variant !== variant
     ) {
       setCanSave(true);
+    } else {
+      setCanSave(false);
     }
   }, [
     data?.cardModuleColor?.background,
+    data?.variant,
     selectedCardModuleColor?.background,
     setCanSave,
+    variant,
   ]);
 
   return (
@@ -234,10 +237,7 @@ const MediaModuleWebCardScreen = (
       >
         <MediaModuleRenderer
           data={{
-            cardModuleColor: swapModuleColor(
-              selectedCardModuleColor,
-              webCard.cardColors,
-            ),
+            cardModuleColor: selectedCardModuleColor,
             cardModuleMedias,
           }}
           cardStyle={webCard.cardStyle}

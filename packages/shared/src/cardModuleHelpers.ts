@@ -1308,7 +1308,13 @@ export const textAlignmentOrDefault = (
  * Swap colors in a CardModuleColor object with their values in a color palette
  */
 export const swapModuleColor = (
-  cardModuleColor: CardModuleColor,
+  cardModuleColor: {
+    readonly background: string;
+    readonly content: string;
+    readonly graphic: string;
+    readonly text: string;
+    readonly title: string;
+  },
   colorPalette:
     | {
         primary: string;

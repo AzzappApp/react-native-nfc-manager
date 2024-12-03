@@ -10,10 +10,7 @@ import { useIntl } from 'react-intl';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { DEFAULT_COLOR_PALETTE, swapColor } from '@azzapp/shared/cardHelpers';
-import {
-  swapModuleColor,
-  type CardModuleColor,
-} from '@azzapp/shared/cardModuleHelpers';
+import { type CardModuleColor } from '@azzapp/shared/cardModuleHelpers';
 import CardModuleBottomBar from '#components/cardModules/CardModuleBottomBar';
 import MediaTextModuleRenderer from '#components/cardModules/CardModuleMediaText/MediaTextModuleRenderer';
 import CardModulePreviewContainer from '#components/cardModules/tool/CardModulePreviewContainer';
@@ -79,7 +76,7 @@ const MediaTextModuleWebCardEditionScreen = (
   /** @type {*} */
   const data = useFragment(
     graphql`
-      fragment MediaTextModuleWebCardEditionScreen_module on CardModuleMedia
+      fragment MediaTextModuleWebCardEditionScreen_module on CardModuleMediaText
       @argumentDefinitions(
         screenWidth: { type: "Float!", provider: "ScreenWidth.relayprovider" }
         pixelRatio: { type: "Float!", provider: "PixelRatio.relayprovider" }
@@ -213,28 +210,22 @@ const MediaTextModuleWebCardEditionScreen = (
     save,
   }));
 
-  const checkedCanSave = useCallback(
-    (save: boolean) => {
-      if (canSave(cardModuleMedias)) {
-        setCanSave(save);
-      } else {
-        setCanSave(false);
-      }
-    },
-    [cardModuleMedias, setCanSave],
-  );
-
   // #endRegion
   useEffect(() => {
-    if (!isEqual(data?.cardModuleColor, selectedCardModuleColor)) {
-      setCanSave(canSave(cardModuleMedias));
+    if (
+      !isEqual(data, { selectedCardModuleColor, cardModuleMedias, variant })
+    ) {
+      //from Nico, we allow to save even if the user has not define text/title per media
+      setCanSave(true);
     }
   }, [
     cardModuleMedias,
+    data,
     data?.cardModuleColor,
     selectedCardModuleColor,
     selectedCardModuleColor.background,
     setCanSave,
+    variant,
   ]);
 
   return (
@@ -250,10 +241,7 @@ const MediaTextModuleWebCardEditionScreen = (
       >
         <MediaTextModuleRenderer
           data={{
-            cardModuleColor: swapModuleColor(
-              selectedCardModuleColor,
-              webCard.cardColors,
-            ),
+            cardModuleColor: selectedCardModuleColor,
             cardModuleMedias,
           }}
           cardStyle={webCard.cardStyle}
@@ -273,7 +261,7 @@ const MediaTextModuleWebCardEditionScreen = (
         webCard={webCard}
         module={{ moduleKind: MODULE_KIND, variant }}
         setVariant={setVariant}
-        setCanSave={checkedCanSave}
+        setCanSave={setCanSave}
         editableItemIndex={editableItemIndex}
         setEditableItemIndex={setEditableItemIndex}
       />
@@ -290,13 +278,3 @@ export default withWebCardSection(
     moduleKind: MODULE_KIND,
   },
 );
-
-const canSave = (cardModuleMedia: CardModuleMedia[]) => {
-  //title and text are mandatory
-  for (const media of cardModuleMedia) {
-    if (!media.title || !media.text) {
-      return false;
-    }
-  }
-  return true;
-};

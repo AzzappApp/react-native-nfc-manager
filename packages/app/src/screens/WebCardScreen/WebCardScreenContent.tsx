@@ -20,7 +20,6 @@ import useBoolean from '#hooks/useBoolean';
 import useToggle from '#hooks/useToggle';
 import useCoverPlayPermission from '#screens/HomeScreen/useCoverPlayPermission';
 import ActivityIndicator from '#ui/ActivityIndicator';
-
 import AddModuleSectionModal from './AddModuleSection/AddModuleSectionModal';
 import CardStyleModal from './CardStyleModal';
 import LoadCardTemplateModal from './LoadCardTemplateModal';
@@ -312,7 +311,7 @@ const WebCardScreenContent = ({
       }
     },
   });
-  
+
   const { canPlay, paused } = useCoverPlayPermission();
 
   return (

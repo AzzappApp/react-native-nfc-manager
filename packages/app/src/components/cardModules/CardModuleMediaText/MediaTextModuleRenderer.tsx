@@ -1,4 +1,9 @@
+import { useMemo } from 'react';
 import { graphql, readInlineData } from 'react-relay';
+import {
+  swapModuleColor,
+  type CardModuleColor,
+} from '@azzapp/shared/cardModuleHelpers';
 import CardModuleEditionScrollHandler from '../CardModuleEditionScrollHandler';
 import CardModuleMediaTextAlternation from './CardModuleMediaTextAlternation';
 import CardModuleMediaTextParallax from './CardModuleMediaTextParallax';
@@ -10,7 +15,6 @@ import type {
   CardModuleMedia,
   CommonModuleRendererProps,
 } from '../cardModuleEditorType';
-import type { CardModuleColor } from '@azzapp/shared/cardModuleHelpers';
 import type { NullableFields } from '@azzapp/shared/objectHelpers';
 
 /**
@@ -57,11 +61,11 @@ export type MediaTextModuleRendererData = NullableFields<
   Omit<
     MediaTextModuleRenderer_module$data,
     ' $fragmentType' | 'cardModuleColor' | 'cardModuleMedias'
-  > & {
-    cardModuleMedias: CardModuleMedia[];
-    cardModuleColor: CardModuleColor;
-  }
->;
+  >
+> & {
+  cardModuleMedias: CardModuleMedia[];
+  cardModuleColor: CardModuleColor;
+};
 
 export const readMediaTextModuleData = (
   module: MediaTextModuleRenderer_module$key,
@@ -77,9 +81,15 @@ const MediaTextModuleRenderer = ({
   variant,
   scrollPosition,
   disableAnimation,
+  colorPalette,
   viewMode,
   ...props
 }: MediaTextModuleRendererProps) => {
+  const swapedColor = useMemo(
+    () => swapModuleColor(data.cardModuleColor, colorPalette),
+    [colorPalette, data.cardModuleColor],
+  );
+
   if ((data.cardModuleMedias?.length ?? 0) < 1) {
     return null;
   }
@@ -90,7 +100,7 @@ const MediaTextModuleRenderer = ({
         <CardModuleEditionScrollHandler>
           <CardModuleMediaTextAlternation
             cardModuleMedias={data.cardModuleMedias!}
-            cardModuleColor={data.cardModuleColor!}
+            cardModuleColor={swapedColor}
             viewMode={viewMode}
             {...props}
           />
@@ -100,8 +110,8 @@ const MediaTextModuleRenderer = ({
       return (
         <CardModuleEditionScrollHandler scrollPosition={scrollPosition}>
           <CardModuleMediaTextParallax
-            cardModuleMedias={data.cardModuleMedias!}
-            cardModuleColor={data.cardModuleColor!}
+            cardModuleMedias={data.cardModuleMedias}
+            cardModuleColor={swapedColor}
             viewMode={viewMode}
             scrollPosition={scrollPosition}
             disableParallax={disableAnimation}

@@ -79,8 +79,14 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
     const firstModuleData = getModuleDataValues({
       data: firstModule.data as any,
       cardStyle: webCard.cardStyle ?? DEFAULT_CARD_STYLE,
-      defaultValues: MODULES_DEFAULT_VALUES[firstModule.kind],
-      styleValuesMap: MODULES_STYLES_VALUES[firstModule.kind],
+      defaultValues:
+        MODULES_DEFAULT_VALUES[
+          firstModule.kind as keyof typeof MODULES_DEFAULT_VALUES
+        ],
+      styleValuesMap:
+        MODULES_STYLES_VALUES[
+          firstModule.kind as keyof typeof MODULES_DEFAULT_VALUES
+        ],
     });
 
     cardBackgroundColor = swapColor(

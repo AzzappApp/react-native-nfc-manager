@@ -1,4 +1,9 @@
+import { useMemo } from 'react';
 import { graphql, readInlineData } from 'react-relay';
+import {
+  swapModuleColor,
+  type CardModuleColor,
+} from '@azzapp/shared/cardModuleHelpers';
 import CardModuleEditionScrollHandler from '../CardModuleEditionScrollHandler';
 import CardModuleMediaParallax from './CardModuleMediaParallax';
 import CardModuleMediaSlideshow from './CardModuleMediaSlideshow';
@@ -10,7 +15,6 @@ import type {
   CardModuleMedia,
   CommonModuleRendererProps,
 } from '../cardModuleEditorType';
-import type { CardModuleColor } from '@azzapp/shared/cardModuleHelpers';
 import type { NullableFields } from '@azzapp/shared/objectHelpers';
 /**
  * Render a SimpleButton module
@@ -54,11 +58,11 @@ export type MediaModuleRendererData = NullableFields<
   Omit<
     MediaModuleRenderer_module$data,
     ' $fragmentType' | 'cardModuleColor' | 'cardModuleMedias'
-  > & {
-    cardModuleMedias: CardModuleMedia[];
-    cardModuleColor: CardModuleColor;
-  }
->;
+  >
+> & {
+  cardModuleMedias: CardModuleMedia[];
+  cardModuleColor: CardModuleColor;
+};
 
 export const readMediaModuleData = (module: MediaModuleRenderer_module$key) =>
   readInlineData(MediaModuleRendererFragment, module);
@@ -76,8 +80,13 @@ const MediaModuleRenderer = ({
   onLayout,
   disableAnimation,
   webCardEditing = false,
+  colorPalette,
   ...props
 }: MediaModuleRendererProps) => {
+  const swapedColor = useMemo(
+    () => swapModuleColor(data.cardModuleColor, colorPalette),
+    [colorPalette, data.cardModuleColor],
+  );
   if ((data?.cardModuleMedias?.length ?? 0) < 1) {
     return null;
   }
@@ -86,8 +95,8 @@ const MediaModuleRenderer = ({
     case 'slideshow':
       return (
         <CardModuleMediaSlideshow
-          medias={data.cardModuleMedias!}
-          cardModuleColor={data.cardModuleColor!}
+          medias={data.cardModuleMedias}
+          cardModuleColor={swapedColor}
           viewMode={viewMode}
           disableScroll={webCardEditing}
           {...props}
@@ -97,8 +106,8 @@ const MediaModuleRenderer = ({
       return (
         <CardModuleEditionScrollHandler scrollPosition={scrollPosition}>
           <CardModuleMediaParallax
-            medias={data.cardModuleMedias!}
-            cardModuleColor={data.cardModuleColor!}
+            medias={data.cardModuleMedias}
+            cardModuleColor={swapedColor}
             onLayout={onLayout}
             viewMode={viewMode}
             disableParallax={disableAnimation}

@@ -91,14 +91,16 @@ const CardModuleBottomBar = <T extends ModuleKindAndVariant>({
   const onUpdateMedia = useCallback(
     (cardModuleMedia: CardModuleMedia) => {
       if (cardModuleMedias && setCardModuleMedias) {
-        const updateCardMedies = [...cardModuleMedias];
-        updateCardMedies[editableItemIndex!] = {
+        const updateCardMedias = [...cardModuleMedias];
+        updateCardMedias[editableItemIndex!] = {
           ...cardModuleMedia,
           needDbUpdate: true,
         };
-        setCardModuleMedias(updateCardMedies);
+        setCardModuleMedias(updateCardMedias);
         setEditableItemIndex(null);
-        setCanSave(updateCardMedies.length !== 0);
+        if (updateCardMedias.length === 0) {
+          setCanSave(false);
+        }
       }
     },
     [

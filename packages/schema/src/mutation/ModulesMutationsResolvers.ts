@@ -120,7 +120,7 @@ const createModuleSavingMutation =
           await referencesMedias(newMedias, previousMedias);
         }
         if (module) {
-          await updateCardModule(module.id, { data });
+          await updateCardModule(module.id, { data, variant });
         } else {
           await createCardModule({
             webCardId,
