@@ -42,6 +42,8 @@ generates:
         CardModuleSocialLinks: '@azzapp/data#CardModuleSocialLinks as CardModuleSocialLinksModel'
         CardModuleBlockText: '@azzapp/data#CardModuleBlockText as CardModuleBlockTextModel'
         CardModuleLineDivider: '@azzapp/data#CardModuleLineDivider as CardModuleLineDividerModel'
+        CardModuleMedia: '@azzapp/data#CardModuleMedia as CardModuleMediaModel'
+        CardModuleMediaText: '@azzapp/data#CardModuleMediaText as CardModuleMediaTextModel'
         CardStyle: '@azzapp/data#CardStyle as CardStyleModel'
         ColorPalette: '@azzapp/data#ColorPalette as ColorPaletteModel'
         WebCardStatistic: '@azzapp/data#WebCardStatistic as WebCardStatisticModel'

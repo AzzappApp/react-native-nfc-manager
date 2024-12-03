@@ -1,5 +1,5 @@
 import uniq from 'lodash/uniq';
-import { getValuesFromStyle, type CardStyle } from './cardHelpers';
+import { getValuesFromStyle, swapColor, type CardStyle } from './cardHelpers';
 
 //#region BlockText
 /**
@@ -453,38 +453,6 @@ export const LINE_DIVIDER_MAX_MARGIN_BOTTOM = 200;
  */
 export const LINE_DIVIDER_MAX_MARGIN_TOP = 200;
 
-//#endregion
-
-//#region Schedule
-/**
- * Schedule module kind
- */
-export const MODULE_KIND_SCHEDULE = 'schedule';
-// TODO add Schedule type
-//#endregion
-
-//#region Parrallax
-/**
- * Parrallax module kind
- */
-export const MODULE_KIND_PARALLAX = 'parallax';
-// TODO add parallax type
-//#endregion
-
-//#region Video
-/**
- * Video module kind
- */
-export const MODULE_KIND_VIDEO = 'video';
-// TODO add video type
-//#endregion
-
-//#region Image Grid
-/**
- * Image Grid module kind
- */
-export const MODULE_KIND_IMAGEGRID = 'imageGrid';
-// TODO add Image Grid type
 //#endregion
 
 //#region PhotoWithTextAndTitle
@@ -1149,63 +1117,87 @@ export const SOCIAL_LINKS_MAX_COLUMN_GAP = 100;
 
 //#endregion
 
-//#region WebCardsCarousel
-export const MODULE_KIND_WEB_CARDS_CAROUSEL = 'webCardsCarousel';
-//TODO add web cards carousel type
-//#endregion
+//#region Media
+export const MODULE_KIND_MEDIA = 'media';
+
+export type CardModuleColor = {
+  background: string;
+  content: string;
+  title: string;
+  text: string;
+  graphic: string;
+};
+
+// those 2 types are here to define a common way to define the V2 module
+// will help to have always the same structure/attribute naming
+type CardModuleCommon = {
+  cardModuleColor?: CardModuleColor;
+};
+
+type CardModuleWithMedia = {
+  cardModuleMedias: Array<{
+    media: { id: string };
+    text?: string;
+    title?: string;
+    link?: string;
+  }>;
+};
+export type CardModuleMediaData = CardModuleCommon & CardModuleWithMedia;
+
+// #endregion
+
+//#region Media Text
+export const MODULE_KIND_MEDIA_TEXT = 'mediaText';
+
+export type CardModuleMediaTextData = CardModuleCommon & CardModuleWithMedia;
+
+// #endregion
+
+// #Add new module here
 
 //#region Commons
 export const MODULE_KINDS = [
   MODULE_KIND_BLOCK_TEXT,
   MODULE_KIND_CAROUSEL,
   MODULE_KIND_HORIZONTAL_PHOTO,
-  MODULE_KIND_IMAGEGRID,
   MODULE_KIND_LINE_DIVIDER,
-  MODULE_KIND_PARALLAX,
   MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE,
-  MODULE_KIND_SCHEDULE,
   MODULE_KIND_SIMPLE_BUTTON,
   MODULE_KIND_SIMPLE_TEXT,
   MODULE_KIND_SIMPLE_TITLE,
   MODULE_KIND_SOCIAL_LINKS,
-  MODULE_KIND_VIDEO,
-  MODULE_KIND_WEB_CARDS_CAROUSEL,
+  MODULE_KIND_MEDIA,
+  MODULE_KIND_MEDIA_TEXT,
 ] as const;
 
 export const MODULES_STYLES_VALUES = {
   [MODULE_KIND_BLOCK_TEXT]: BLOCK_TEXT_STYLE_VALUES,
   [MODULE_KIND_CAROUSEL]: CAROUSEL_STYLE_VALUES,
   [MODULE_KIND_HORIZONTAL_PHOTO]: HORIZONTAL_PHOTO_STYLE_VALUES,
-  [MODULE_KIND_IMAGEGRID]: {},
   [MODULE_KIND_LINE_DIVIDER]: {},
-  [MODULE_KIND_PARALLAX]: {},
   [MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE]:
     PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES,
-  [MODULE_KIND_SCHEDULE]: {},
   [MODULE_KIND_SIMPLE_BUTTON]: SIMPLE_BUTTON_STYLE_VALUES,
   [MODULE_KIND_SIMPLE_TEXT]: SIMPLE_TEXT_STYLE_VALUES,
   [MODULE_KIND_SIMPLE_TITLE]: SIMPLE_TITLE_STYLE_VALUES,
   [MODULE_KIND_SOCIAL_LINKS]: {},
-  [MODULE_KIND_VIDEO]: {},
-  [MODULE_KIND_WEB_CARDS_CAROUSEL]: {},
+  [MODULE_KIND_MEDIA]: {},
+  [MODULE_KIND_MEDIA_TEXT]: {},
 } as const;
 
 export const MODULES_DEFAULT_VALUES = {
   [MODULE_KIND_BLOCK_TEXT]: BLOCK_TEXT_DEFAULT_VALUES,
   [MODULE_KIND_CAROUSEL]: CAROUSEL_DEFAULT_VALUES,
   [MODULE_KIND_HORIZONTAL_PHOTO]: HORIZONTAL_PHOTO_DEFAULT_VALUES,
-  [MODULE_KIND_IMAGEGRID]: {},
   [MODULE_KIND_LINE_DIVIDER]: LINE_DIVIDER_DEFAULT_VALUES,
-  [MODULE_KIND_PARALLAX]: {},
   [MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE]:
     PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
-  [MODULE_KIND_SCHEDULE]: {},
   [MODULE_KIND_SIMPLE_BUTTON]: SIMPLE_BUTTON_DEFAULT_VALUES,
   [MODULE_KIND_SIMPLE_TEXT]: SIMPLE_TEXT_DEFAULT_VALUES,
   [MODULE_KIND_SIMPLE_TITLE]: SIMPLE_TITLE_DEFAULT_VALUES,
   [MODULE_KIND_SOCIAL_LINKS]: SOCIAL_LINKS_DEFAULT_VALUES,
-  [MODULE_KIND_VIDEO]: {},
-  [MODULE_KIND_WEB_CARDS_CAROUSEL]: {},
+  [MODULE_KIND_MEDIA]: {},
+  [MODULE_KIND_MEDIA_TEXT]: {},
 } as const;
 
 export type ModuleKind = (typeof MODULE_KINDS)[number];
@@ -1227,6 +1219,11 @@ export type TextAlignment = 'center' | 'justify' | 'left' | 'right';
  * the max width of the module images
  */
 export const MODULE_IMAGE_MAX_WIDTH = 2048;
+
+/**
+ * the max width of the module videos
+ */
+export const MODULE_VIDEO_MAX_WIDTH = 1920;
 /**
  * the list of possible post images pregenerated sizes
  */
@@ -1306,3 +1303,26 @@ export const textAlignmentOrDefault = (
   return 'center';
 };
 // #endregion
+
+/**
+ * Swap colors in a CardModuleColor object with their values in a color palette
+ */
+export const swapModuleColor = (
+  cardModuleColor: CardModuleColor,
+  colorPalette:
+    | {
+        primary: string;
+        light: string;
+        dark: string;
+      }
+    | null
+    | undefined,
+): CardModuleColor => {
+  return {
+    background: swapColor(cardModuleColor.background, colorPalette),
+    content: swapColor(cardModuleColor.content, colorPalette),
+    title: swapColor(cardModuleColor.title, colorPalette),
+    text: swapColor(cardModuleColor.text, colorPalette),
+    graphic: swapColor(cardModuleColor.graphic, colorPalette),
+  };
+};

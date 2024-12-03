@@ -34,6 +34,7 @@ import {
   useEditTransitionListener,
   useSelectionModeTransition,
 } from './WebCardScreenTransitions';
+import type { LayoutChangeEvent } from 'react-native';
 
 export type ProfileBlockContainerProps = {
   /**
@@ -129,6 +130,8 @@ export type ProfileBlockContainerProps = {
    * Called when the user select the block
    */
   onSelect?: (selected: boolean) => void;
+
+  onLayout?: (event: LayoutChangeEvent) => void;
 };
 
 /**
@@ -157,6 +160,7 @@ const WebCardBlockContainer = ({
   onDuplicate,
   onToggleVisibility,
   onSelect,
+  onLayout,
 }: ProfileBlockContainerProps) => {
   const intl = useIntl();
 
@@ -362,6 +366,7 @@ const WebCardBlockContainer = ({
             )
           : undefined
       }
+      onLayout={onLayout}
     >
       <Animated.View style={blockStyle}>
         <GestureDetector gesture={Gesture.Race(tapGesture, panGesture)}>

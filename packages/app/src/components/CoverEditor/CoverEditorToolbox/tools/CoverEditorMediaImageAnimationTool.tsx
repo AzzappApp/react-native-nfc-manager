@@ -36,6 +36,7 @@ import BottomSheetModal from '#ui/BottomSheetModal';
 import Header from '#ui/Header';
 import LabeledWheelSelector from '#ui/LabeledWheelSelector';
 import Text from '#ui/Text';
+import ToolBoxSection from '../../../Toolbar/ToolBoxSection';
 import mediaAnimations, {
   useMediaAnimationList,
 } from '../../coverDrawer/mediaAnimations';
@@ -44,7 +45,6 @@ import {
   useCoverEditorContext,
   useCoverEditorEditContext,
 } from '../../CoverEditorContext';
-import ToolBoxSection from '../ui/ToolBoxSection';
 
 import type { BoxButtonItemInfo } from '#components/BoxSelectionList';
 import type { EditionParameters } from '#helpers/mediaEditions';

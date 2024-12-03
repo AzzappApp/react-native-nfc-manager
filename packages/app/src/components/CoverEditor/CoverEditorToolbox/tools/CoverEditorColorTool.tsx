@@ -4,13 +4,13 @@ import { StyleSheet } from 'react-native';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import useBoolean from '#hooks/useBoolean';
 import Icon from '#ui/Icon';
+import ToolBoxSection from '../../../Toolbar/ToolBoxSection';
 import {
   useCoverEditorContext,
   useCoverEditorEditContext,
   useCoverEditorLinksLayer,
   useCoverEditorTextLayer,
 } from '../../CoverEditorContext';
-import ToolBoxSection from '../ui/ToolBoxSection';
 import CoverEditorColorPicker from './CoverEditorColorPicker';
 
 type Props = {

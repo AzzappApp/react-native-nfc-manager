@@ -3,42 +3,81 @@ extend type Mutation {
   Save a block text module, create it if it doesn't exist, update it otherwise
   :warning: Every field that is not specified will be set to null
   """
-  saveBlockTextModule(webCardId: ID!, input: SaveBlockTextModuleInput!): SaveModulePayload!
+  saveBlockTextModule(
+    webCardId: ID!
+    input: SaveBlockTextModuleInput!
+  ): SaveModulePayload!
   """
   Save a carousel module, create it if it doesn't exist, update it otherwise
   :warning: Every field that is not specified will be set to null
   """
-  saveCarouselModule(webCardId: ID!,input: SaveCarouselModuleInput!): SaveModulePayload!
+  saveCarouselModule(
+    webCardId: ID!
+    input: SaveCarouselModuleInput!
+  ): SaveModulePayload!
   """
   Save an horizontal photo module, create it if it doesn't exist, update it otherwise
   :warning: Every field that is not specified will be set to null
   """
-  saveHorizontalPhotoModule(webCardId: ID!,input: SaveHorizontalPhotoModuleInput!): SaveModulePayload!
+  saveHorizontalPhotoModule(
+    webCardId: ID!
+    input: SaveHorizontalPhotoModuleInput!
+  ): SaveModulePayload!
   """
   Save a line divider module, create it if it doesn't exist, update it otherwise
   :warning: Every field that is not specified will be set to null
   """
-  saveLineDividerModule(webCardId: ID!,input: SaveLineDividerModuleInput!): SaveModulePayload!
+  saveLineDividerModule(
+    webCardId: ID!
+    input: SaveLineDividerModuleInput!
+  ): SaveModulePayload!
   """
   Save a line photoWithTextAndTitle module, create it if it doesn't exist, update it otherwise
   :warning: Every field that is not specified will be set to null
   """
-  savePhotoWithTextAndTitleModule(webCardId: ID!,input: SavePhotoWithTextAndTitleModuleInput!): SaveModulePayload!
+  savePhotoWithTextAndTitleModule(
+    webCardId: ID!
+    input: SavePhotoWithTextAndTitleModuleInput!
+  ): SaveModulePayload!
   """
   Save a simple button module, create it if it doesn't exist, update it otherwise
   :warning: Every field that is not specified will be set to null
   """
-  saveSimpleButtonModule(webCardId: ID!,input: SaveSimpleButtonModuleInput!): SaveModulePayload!
+  saveSimpleButtonModule(
+    webCardId: ID!
+    input: SaveSimpleButtonModuleInput!
+  ): SaveModulePayload!
   """
   Save a simple text module, create it if it doesn't exist, update it otherwise
   :warning: Every field that is not specified will be set to null
   """
-  saveSimpleTextModule(webCardId: ID!,input: SaveSimpleTextModuleInput!): SaveModulePayload!
+  saveSimpleTextModule(
+    webCardId: ID!
+    input: SaveSimpleTextModuleInput!
+  ): SaveModulePayload!
   """
   Save a social links module, create it if it doesn't exist, update it otherwise
   :warning: Every field that is not specified will be set to null
   """
-  saveSocialLinksModule(webCardId: ID!,input: SaveSocialLinksModuleInput!): SaveModulePayload!
+  saveSocialLinksModule(
+    webCardId: ID!
+    input: SaveSocialLinksModuleInput!
+  ): SaveModulePayload!
+  """
+  Save a media section, create it if it doesn't exist, update it otherwise
+  """
+  saveMediaModule(
+    webCardId: ID!
+    input: SaveMediaModuleInput!
+  ): SaveModulePayload!
+
+  """
+  Save a media section, create it if it doesn't exist, update it otherwise
+  """
+  saveMediaTextModule(
+    webCardId: ID!
+    input: SaveMediaTextModuleInput!
+  ): SaveModulePayload!
 }
 
 type SaveModulePayload {
@@ -62,7 +101,6 @@ input SaveBlockTextModuleInput {
   textBackgroundId: ID
   textBackgroundStyle: ModuleTextBackgroundInputStyle
 }
-
 
 input SaveCarouselModuleInput {
   moduleId: ID
@@ -109,13 +147,13 @@ input SavePhotoWithTextAndTitleModuleInput {
   image: String!
   contentFontFamily: String
   contentFontColor: String
-  contentTextAlign:TextAlignment
+  contentTextAlign: TextAlignment
   contentFontSize: Int
-  contentVerticalSpacing:Int
+  contentVerticalSpacing: Int
   content: String
   titleFontFamily: String
   titleFontColor: String
-  titleTextAlign:TextAlignment
+  titleTextAlign: TextAlignment
   titleFontSize: Int
   titleVerticalSpacing: Int
   title: String
@@ -149,6 +187,38 @@ input SaveSimpleButtonModuleInput {
   height: Int
   backgroundId: ID
   backgroundStyle: ModuleBackgroundInputStyle
+}
+
+input MediaModuleMedia {
+  id: String!
+}
+input MediaModuleInput {
+  media: MediaModuleMedia!
+  title: String
+  text: String
+}
+
+input CardModuleColorInput {
+  background: String
+  content: String
+  graphic: String
+  title: String
+  text: String
+}
+
+input SaveMediaModuleInput {
+  moduleId: ID
+  variant: String!
+  cardModuleMedias: [MediaModuleInput!]!
+  #some module don't have color
+  cardModuleColor: CardModuleColorInput
+}
+
+input SaveMediaTextModuleInput {
+  moduleId: ID
+  variant: String!
+  cardModuleMedias: [MediaModuleInput!]!
+  cardModuleColor: CardModuleColorInput!
 }
 
 input SaveSimpleTextModuleInput {

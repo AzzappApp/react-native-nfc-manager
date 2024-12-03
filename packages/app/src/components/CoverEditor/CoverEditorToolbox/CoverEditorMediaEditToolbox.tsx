@@ -4,19 +4,18 @@ import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
+import { TOOLBOX_SECTION_HEIGHT } from '../../Toolbar/ToolBoxSection';
 import {
   useCoverEditorContext,
   useCoverEditorEditContext,
   useCoverEditorMedia,
 } from '../CoverEditorContext';
 import CoverEditorAdjustTool from './tools/CoverEditorAdjustTool';
-// import CoverEditorAnimationTool from './tools/CoverEditorAnimationTool';
 import CoverEditorCropTool from './tools/CoverEditorCropTool';
 import CoverEditorCutTool from './tools/CoverEditorCutTool';
 import CoverEditorFiltersTool from './tools/CoverEditorFiltersTool';
 import CoverEditorMediaImageAnimationTool from './tools/CoverEditorMediaImageAnimationTool';
 import CoverEditorMediaReplace from './tools/CoverEditorMediaReplace';
-import { TOOLBOX_SECTION_HEIGHT } from './ui/ToolBoxSection';
 
 const CoverEditorMediaEditToolbox = () => {
   const styles = useStyleSheet(styleSheet);

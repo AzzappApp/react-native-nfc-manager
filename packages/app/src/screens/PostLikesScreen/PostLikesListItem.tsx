@@ -2,6 +2,7 @@ import { memo } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
+import { colors } from '#theme';
 import CoverLinkRenderer from '#components/CoverLink/CoverLinkRenderer';
 import Link from '#components/Link';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -109,7 +110,7 @@ const stylesheet = createStyleSheet(theme => ({
     alignItems: 'center',
   },
   unfollow: {
-    color: theme === 'light' ? '#C8C7CA' : '#54535B',
+    color: theme === 'light' ? colors.grey200 : colors.grey800,
   },
 }));
 

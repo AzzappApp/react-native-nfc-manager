@@ -2,6 +2,7 @@ import { useCallback, useMemo } from 'react';
 import { StyleSheet } from 'react-native';
 import { maximumCoverFromScratch } from '#components/CoverEditor/CoverEditor';
 import { getMaxAllowedVideosPerCover } from '#components/CoverEditor/coverEditorHelpers';
+import CoverEditorMediaPicker from '#components/CoverEditor/CoverEditorMediaPicker';
 import { ScreenModal } from '#components/NativeRouter';
 import useBoolean from '#hooks/useBoolean';
 import Icon from '#ui/Icon';
@@ -10,7 +11,6 @@ import {
   useCoverEditorContext,
   useCoverEditorEditContext,
 } from '../../CoverEditorContext';
-import CoverEditorMediaPicker from '../../CoverEditorMediaPicker';
 import type { SourceMedia } from '#helpers/mediaHelpers';
 
 type Props = {

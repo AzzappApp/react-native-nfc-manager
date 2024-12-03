@@ -1,6 +1,15 @@
 import CameraControlPanel from '#components/CameraControlPanel';
 import { fireEvent, render, screen } from '#helpers/testHelpers';
 
+jest.mock('react-native-blob-util', () => ({
+  fs: {
+    writeFile: jest.fn(),
+    dirs: {
+      CacheDir: 'CacheDir',
+    },
+  },
+}));
+
 describe('CameraControlPanel', () => {
   test('Should render a shutter button in photo mode', () => {
     const onTakePhoto = jest.fn();

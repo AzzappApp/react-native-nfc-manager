@@ -91,7 +91,9 @@ import WelcomeScreen from '#screens/HomeScreen/WelcomeScreen';
 import InviteFriendsScreen from '#screens/InviteFriendsScreen';
 import LikedPostsScreen from '#screens/LikedPostsScreen';
 import LoadingScreen from '#screens/LoadingScreen';
+import MediaModuleWebCardEditionScreen from '#screens/MediaModuleWebCardEditionScreen';
 import MediaScreen from '#screens/MediaScreen';
+import MediaTextModuleWebCardEditionScreen from '#screens/MediaTextModuleWebCardEditionScreen';
 import MultiUserAddScreen from '#screens/MultiUserAddScreen';
 import MultiUserDetailsScreen from '#screens/MultiUserDetailsScreen';
 import MultiUserScreen from '#screens/MultiUserScreen';
@@ -214,6 +216,8 @@ const screens = {
   ABOUT: AboutScreen,
   ACCOUNT_DETAILS: AccountDetailsScreen,
   CARD_MODULE_EDITION: CardModuleEditionScreen,
+  CARD_MODULE_MEDIA_EDITION: MediaModuleWebCardEditionScreen,
+  CARD_MODULE_MEDIA_TEXT_EDITION: MediaTextModuleWebCardEditionScreen,
   CONTACT_CARD: ContactCardScreen,
   CONTACT_CARD_EDIT: ContactCardEditScreen,
   CONFIRM_CHANGE_CONTACT: ConfirmChangeContactScreen,

@@ -1,0 +1,113 @@
+import { graphql, readInlineData } from 'react-relay';
+import CardModuleEditionScrollHandler from '../CardModuleEditionScrollHandler';
+import CardModuleMediaParallax from './CardModuleMediaParallax';
+import CardModuleMediaSlideshow from './CardModuleMediaSlideshow';
+import type {
+  MediaModuleRenderer_module$key,
+  MediaModuleRenderer_module$data,
+} from '#relayArtifacts/MediaModuleRenderer_module.graphql';
+import type {
+  CardModuleMedia,
+  CommonModuleRendererProps,
+} from '../cardModuleEditorType';
+import type { CardModuleColor } from '@azzapp/shared/cardModuleHelpers';
+import type { NullableFields } from '@azzapp/shared/objectHelpers';
+/**
+ * Render a SimpleButton module
+ */
+export const MediaModuleRendererFragment = graphql`
+  fragment MediaModuleRenderer_module on CardModuleMedia
+  @inline
+  @argumentDefinitions(
+    screenWidth: { type: "Float!", provider: "ScreenWidth.relayprovider" }
+    pixelRatio: { type: "Float!", provider: "PixelRatio.relayprovider" }
+    cappedPixelRatio: {
+      type: "Float!"
+      provider: "CappedPixelRatio.relayprovider"
+    }
+  ) {
+    cardModuleColor {
+      background
+      content
+      graphic
+      text
+      title
+    }
+    cardModuleMedias {
+      media {
+        id
+        uri(width: $screenWidth, pixelRatio: $pixelRatio)
+        ... on MediaVideo {
+          #will be use when we are gonna stop playing a video. still TODO
+          thumbnail(width: $screenWidth, pixelRatio: $pixelRatio)
+          smallThumbnail: thumbnail(
+            width: 66 #use for the small preview in toolbox
+            pixelRatio: $cappedPixelRatio
+          )
+        }
+      }
+    }
+  }
+`;
+
+export type MediaModuleRendererData = NullableFields<
+  Omit<
+    MediaModuleRenderer_module$data,
+    ' $fragmentType' | 'cardModuleColor' | 'cardModuleMedias'
+  > & {
+    cardModuleMedias: CardModuleMedia[];
+    cardModuleColor: CardModuleColor;
+  }
+>;
+
+export const readMediaModuleData = (module: MediaModuleRenderer_module$key) =>
+  readInlineData(MediaModuleRendererFragment, module);
+
+export type MediaModuleRendererProps = CommonModuleRendererProps<
+  MediaModuleRendererData,
+  'media'
+>;
+
+const MediaModuleRenderer = ({
+  data,
+  viewMode = 'mobile',
+  variant,
+  scrollPosition,
+  onLayout,
+  disableAnimation,
+  webCardEditing = false,
+  ...props
+}: MediaModuleRendererProps) => {
+  if ((data?.cardModuleMedias?.length ?? 0) < 1) {
+    return null;
+  }
+
+  switch (variant) {
+    case 'slideshow':
+      return (
+        <CardModuleMediaSlideshow
+          medias={data.cardModuleMedias!}
+          cardModuleColor={data.cardModuleColor!}
+          viewMode={viewMode}
+          disableScroll={webCardEditing}
+          {...props}
+        />
+      );
+    case 'parallax':
+      return (
+        <CardModuleEditionScrollHandler scrollPosition={scrollPosition}>
+          <CardModuleMediaParallax
+            medias={data.cardModuleMedias!}
+            cardModuleColor={data.cardModuleColor!}
+            onLayout={onLayout}
+            viewMode={viewMode}
+            disableParallax={disableAnimation}
+            scrollPosition={scrollPosition}
+            {...props}
+          />
+        </CardModuleEditionScrollHandler>
+      );
+  }
+};
+
+export default MediaModuleRenderer;

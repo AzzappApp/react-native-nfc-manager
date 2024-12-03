@@ -1,9 +1,9 @@
 import { forwardRef, useImperativeHandle } from 'react';
 import { useIntl } from 'react-intl';
 import useToggle from '#hooks/useToggle';
+import ToolBoxSection from '../../../Toolbar/ToolBoxSection';
 import { useCoverEditorContext } from '../../CoverEditorContext';
 import CoverEditorLinksModal from '../../CoverEditorToolbox/modals/CoverEditorLinksModal';
-import ToolBoxSection from '../ui/ToolBoxSection';
 import type { ForwardedRef } from 'react';
 
 export type CoverEditorLinksToolActions = {

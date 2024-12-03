@@ -26,6 +26,7 @@ import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Header from '#ui/Header';
 import Text from '#ui/Text';
+import ToolBoxSection from '../../../Toolbar/ToolBoxSection';
 import coverTransitions, {
   useCoverTransitionsList,
 } from '../../coverDrawer/coverTransitions';
@@ -33,7 +34,6 @@ import {
   useCoverEditorContext,
   useCoverEditorEditContext,
 } from '../../CoverEditorContext';
-import ToolBoxSection from '../ui/ToolBoxSection';
 import type { BoxButtonItemInfo } from '#components/BoxSelectionList';
 import type {
   CoverTransitions,

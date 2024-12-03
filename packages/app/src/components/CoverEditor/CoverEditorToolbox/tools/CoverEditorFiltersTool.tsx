@@ -7,12 +7,12 @@ import { replaceURIWithLocalPath } from '#components/CoverEditor/coverEditorHelp
 import ImagePicker, { EditImageStep } from '#components/ImagePicker';
 import { ScreenModal } from '#components/NativeRouter';
 import useToggle from '#hooks/useToggle';
+import ToolBoxSection from '../../../Toolbar/ToolBoxSection';
 import {
   useCoverEditorContext,
   useCoverEditorActiveMedia,
   useCoverEditorEditContext,
 } from '../../CoverEditorContext';
-import ToolBoxSection from '../ui/ToolBoxSection';
 import type { ImagePickerResult } from '#components/ImagePicker';
 import type { Filter } from '@azzapp/shared/filtersHelper';
 

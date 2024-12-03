@@ -1,5 +1,4 @@
 import { useMemo, useRef, forwardRef } from 'react';
-import { ScrollView } from 'react-native-gesture-handler';
 import Animated, {
   FadeIn,
   FadeOut,
@@ -18,6 +17,7 @@ import {
 import { useEditTransition } from './WebCardScreenTransitions';
 import type { ForwardedRef, ReactNode } from 'react';
 import type { ScrollViewProps } from 'react-native';
+import type { AnimatedScrollView } from 'react-native-reanimated/lib/typescript/component/ScrollView';
 
 export type WebCardScreenScrollViewProps = Omit<ScrollViewProps, 'hitSlop'> & {
   /**
@@ -51,12 +51,12 @@ const WebCardScreenScrollView = (
     editFooterHeight,
     ...props
   }: WebCardScreenScrollViewProps,
-  forwardedRef: ForwardedRef<ScrollView>,
+  forwardedRef: ForwardedRef<AnimatedScrollView>,
 ) => {
   const editScale = useWebCardEditScale();
   const editTransition = useEditTransition();
 
-  const scrollViewRef = useRef<ScrollView>(null);
+  const scrollViewRef = useRef<AnimatedScrollView>(null);
 
   const { width: screenWidth, height: screenHeight } = useScreenDimensions();
 
@@ -128,7 +128,7 @@ const WebCardScreenScrollView = (
 
   return (
     <Animated.View style={[containerStyle, { transformOrigin: 'top' }]}>
-      <ScrollView
+      <Animated.ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{
           flexGrow: 1,
@@ -150,7 +150,7 @@ const WebCardScreenScrollView = (
             <Animated.View style={footerStyle}>{editFooter}</Animated.View>
           </Animated.View>
         </Animated.View>
-      </ScrollView>
+      </Animated.ScrollView>
     </Animated.View>
   );
 };

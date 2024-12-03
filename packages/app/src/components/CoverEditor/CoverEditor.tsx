@@ -30,6 +30,11 @@ import {
 import { colors } from '#theme';
 import { ScreenModal, preventModalDismiss } from '#components/NativeRouter';
 import { NativeBufferLoader, loadAllLUTShaders } from '#helpers/mediaEditions';
+import {
+  copyCoverMediaToCacheDir,
+  COVER_CACHE_DIR,
+  type SourceMedia,
+} from '#helpers/mediaHelpers';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Text from '#ui/Text';
@@ -40,7 +45,6 @@ import {
   calculateImageScale,
   getMaxAllowedVideosPerCover,
   getLottieMediasDurations,
-  copyCoverMediaToCacheDir,
   useLottieMediaDurations,
 } from './coverEditorHelpers';
 import CoverEditorMediaPicker from './CoverEditorMediaPicker';
@@ -50,7 +54,6 @@ import CoverEditorToolbox from './CoverEditorToolbox';
 import CoverPreview from './CoverPreview';
 import useLottie from './useLottie';
 import useSaveCover from './useSaveCover';
-import type { SourceMedia } from '#helpers/mediaHelpers';
 import type { CoverEditor_coverTemplate$key } from '#relayArtifacts/CoverEditor_coverTemplate.graphql';
 import type { CoverEditor_profile$key } from '#relayArtifacts/CoverEditor_profile.graphql';
 import type { CoverEditorAction } from './coverEditorActions';
@@ -440,6 +443,7 @@ const CoverEditorCore = (
         if (!localPaths[media.id]) {
           const path = await copyCoverMediaToCacheDir(
             media,
+            COVER_CACHE_DIR,
             abortController.signal,
           );
           if (canceled) {

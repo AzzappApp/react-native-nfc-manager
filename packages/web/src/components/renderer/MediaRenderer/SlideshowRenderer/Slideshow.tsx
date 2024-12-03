@@ -1,0 +1,109 @@
+'use client';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { ArrowRightIcon } from '#assets';
+import CloudinaryImage from '#ui/CloudinaryImage';
+import styles from './Slideshow.css';
+import useSlideshow from './useSlideshow';
+import type { Media } from '@azzapp/data';
+import type { CSSProperties } from 'react';
+
+type Props = {
+  medias: Media[];
+  style?: CSSProperties;
+  square?: boolean;
+};
+
+const Slideshow = ({ medias: baseMedias, style, square }: Props) => {
+  const [size, setSize] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
+
+  const slideshow = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const current = slideshow.current;
+
+    const onSlideshowSizeChange = () => {
+      if (current) {
+        setSize({
+          width: slideshow.current.clientWidth,
+          height: slideshow.current.clientHeight,
+        });
+      }
+    };
+
+    onSlideshowSizeChange();
+    window?.addEventListener('resize', onSlideshowSizeChange);
+    return () => {
+      window?.removeEventListener('resize', onSlideshowSizeChange);
+    };
+  }, []);
+
+  const medias = useMemo(() => {
+    if (square) {
+      return baseMedias.map(baseMedia => {
+        const size = Math.min(baseMedia.height, baseMedia.width);
+
+        return {
+          ...baseMedia,
+          height: size,
+          width: size,
+        };
+      });
+    }
+
+    return baseMedias;
+  }, [baseMedias, square]);
+
+  const { slides, onNext, onPrev } = useSlideshow(
+    medias,
+    size?.width ?? 0,
+    size?.height ?? 0,
+    -50,
+  );
+
+  return (
+    <div className={styles.container} style={style}>
+      <div ref={slideshow} className={styles.slideshow}>
+        <div
+          className={styles.arrow}
+          style={{ left: 10, rotate: '180deg' }}
+          onClick={onPrev}
+        >
+          <ArrowRightIcon className={styles.arrowIcon} />
+        </div>
+        <div className={styles.arrow} style={{ right: 10 }} onClick={onNext}>
+          <ArrowRightIcon className={styles.arrowIcon} />
+        </div>
+        {size &&
+          medias.map((media, i) => {
+            return (
+              <div
+                key={media.id}
+                className={styles.media}
+                style={{
+                  aspectRatio: media.height / media.width,
+                  ...slides[i],
+                }}
+              >
+                <CloudinaryImage
+                  mediaId={media.id}
+                  draggable={false}
+                  alt="todo"
+                  fill
+                  format="auto"
+                  quality="auto:best"
+                  style={{
+                    objectFit: 'cover',
+                  }}
+                />
+              </div>
+            );
+          })}
+      </div>
+    </div>
+  );
+};
+
+export default Slideshow;

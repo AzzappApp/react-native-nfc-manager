@@ -2,11 +2,11 @@ import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import useBoolean from '#hooks/useBoolean';
 import FontPicker from '#ui/FontPicker';
+import ToolBoxSection from '../../../Toolbar/ToolBoxSection';
 import {
   useCoverEditorEditContext,
   useCoverEditorTextLayer,
 } from '../../CoverEditorContext';
-import ToolBoxSection from '../ui/ToolBoxSection';
 
 const CoverEditorFontFamilyTool = () => {
   const intl = useIntl();

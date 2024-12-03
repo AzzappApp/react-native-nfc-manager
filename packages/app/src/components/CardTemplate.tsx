@@ -95,8 +95,6 @@ const stylesheet = createStyleSheet(theme => ({
   },
   webCardContainerRadius: {
     borderRadius: ITEM_RADIUS,
-    borderCurve: 'continuous',
-    overflow: 'hidden',
     flex: 1,
   },
 }));

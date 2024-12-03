@@ -78,8 +78,14 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
     const lastModuleData = getModuleDataValues({
       data: lastModule.data as any,
       cardStyle: webCard.cardStyle ?? DEFAULT_CARD_STYLE,
-      defaultValues: MODULES_DEFAULT_VALUES[lastModule.kind],
-      styleValuesMap: MODULES_STYLES_VALUES[lastModule.kind],
+      defaultValues:
+        MODULES_DEFAULT_VALUES[
+          lastModule.kind as keyof typeof MODULES_DEFAULT_VALUES
+        ],
+      styleValuesMap:
+        MODULES_STYLES_VALUES[
+          lastModule.kind as keyof typeof MODULES_DEFAULT_VALUES
+        ],
     });
 
     lastModuleBackgroundColor = swapColor(
@@ -96,8 +102,14 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
     const firstModuleData = getModuleDataValues({
       data: firstModule.data as any,
       cardStyle: webCard.cardStyle ?? DEFAULT_CARD_STYLE,
-      defaultValues: MODULES_DEFAULT_VALUES[firstModule.kind],
-      styleValuesMap: MODULES_STYLES_VALUES[firstModule.kind],
+      defaultValues:
+        MODULES_DEFAULT_VALUES[
+          firstModule.kind as keyof typeof MODULES_DEFAULT_VALUES
+        ],
+      styleValuesMap:
+        MODULES_STYLES_VALUES[
+          firstModule.kind as keyof typeof MODULES_DEFAULT_VALUES
+        ],
     });
 
     firstModuleBackgroundColor = swapColor(

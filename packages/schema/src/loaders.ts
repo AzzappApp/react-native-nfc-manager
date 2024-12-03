@@ -112,6 +112,11 @@ export const paymentMeanLoader = createSessionDataLoader(
   createEntitiesBatchLoadFunction('PaymentMean'),
 );
 
+export const cardModuleLoader = createSessionDataLoader(
+  'CardModuleLoader',
+  createEntitiesBatchLoadFunction('CardModule'),
+);
+
 export const webCardStatisticsLoader = createSessionDataLoader(
   'WebCardStatisticsLoader',
   async (keys: readonly string[]) => {

@@ -17,6 +17,8 @@ import {
   MODULE_KIND_CAROUSEL,
   MODULE_KIND_HORIZONTAL_PHOTO,
   MODULE_KIND_LINE_DIVIDER,
+  MODULE_KIND_MEDIA,
+  MODULE_KIND_MEDIA_TEXT,
   MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE,
   MODULE_KIND_SIMPLE_BUTTON,
   MODULE_KIND_SIMPLE_TEXT,
@@ -42,16 +44,16 @@ const createModuleSavingMutation =
     _: unknown,
     {
       webCardId: gqlWebCardId,
-      input: { moduleId, ...data },
+      input: { moduleId, variant, ...data },
     }: {
       webCardId: string;
       input: TModule['data'] & {
         moduleId?: string | null;
+        variant?: string | null;
       };
     },
   ) => {
     const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
-
     await checkWebCardProfileEditorRight(webCardId);
 
     let webCard = await webCardLoader.load(webCardId);
@@ -83,6 +85,7 @@ const createModuleSavingMutation =
 
     let module: CardModule | null = null;
     let previousMedias: string[] | null = null;
+
     if (validator) {
       const { success } = validator.safeParse(data);
       if (!success) {
@@ -125,6 +128,7 @@ const createModuleSavingMutation =
             position: await getCardModuleNextPosition(webCardId),
             data,
             visible: true,
+            variant,
           });
         }
       });
@@ -158,13 +162,13 @@ export const MODULES_SAVE_RULES: {
     validator: z.object({
       images: z.array(z.string()).min(1),
     }),
-    getMedias: ({ images }) => images,
+    getMedias: ({ images }: { images: string[] }) => images,
   },
   [MODULE_KIND_HORIZONTAL_PHOTO]: {
     validator: z.object({
       image: z.string(),
     }),
-    getMedias: ({ image }) => (image ? [image] : null),
+    getMedias: ({ image }: { image: string }) => (image ? [image] : null),
   },
   [MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE]: {
     validator: z
@@ -178,7 +182,7 @@ export const MODULES_SAVE_RULES: {
           title: z.string().min(1),
         }),
       ),
-    getMedias: ({ image }) => (image ? [image] : null),
+    getMedias: ({ image }: { image: string }) => (image ? [image] : null),
   },
   [MODULE_KIND_SIMPLE_TEXT]: {
     validator: z.object({
@@ -203,6 +207,21 @@ export const MODULES_SAVE_RULES: {
       // TODO better validation
       actionLink: z.string().min(1),
     }),
+  },
+  [MODULE_KIND_MEDIA]: {
+    validator: z.object({
+      cardModuleMedias: z
+        .array(z.object({ media: z.object({ id: z.string() }) }))
+        .min(1),
+    }),
+    getMedias: (module: {
+      cardModuleMedias: Array<{ media: { id: string } }>;
+    }) => {
+      const { cardModuleMedias } = module;
+      return cardModuleMedias
+        .map(mediaModules => mediaModules.media.id)
+        .filter(n => n !== null);
+    },
   },
 };
 
@@ -236,3 +255,9 @@ export const saveSimpleButtonModule: MutationResolvers['saveSimpleButtonModule']
 
 export const saveSocialLinksModule: MutationResolvers['saveSocialLinksModule'] =
   createModuleSavingMutation(MODULE_KIND_SOCIAL_LINKS);
+
+export const saveMediaModule: MutationResolvers['saveMediaModule'] =
+  createModuleSavingMutation(MODULE_KIND_MEDIA);
+
+export const saveMediaTextModule: MutationResolvers['saveMediaTextModule'] =
+  createModuleSavingMutation(MODULE_KIND_MEDIA_TEXT);

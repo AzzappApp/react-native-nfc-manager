@@ -1,6 +1,7 @@
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import ImageSize from 'react-native-image-size';
 import { getFileExtension } from '#helpers/fileHelpers';
+import type { SourceMedia } from './mediaTypes';
 import type {
   FetchBlobResponse,
   StatefulPromise,
@@ -108,4 +109,71 @@ export const downloadRemoteFileToLocalCache = (
   };
 
   return innerFetch();
+};
+
+export const COVER_CACHE_DIR = `${ReactNativeBlobUtil.fs.dirs.CacheDir}/covers`;
+export const MODULES_CACHE_DIR = `${ReactNativeBlobUtil.fs.dirs.CacheDir}/modules`;
+
+let checkMediaCacheDirPromise: Promise<void> | null = null;
+const checkMediaCacheDir = (cacheDir: string) => {
+  if (!checkMediaCacheDirPromise) {
+    checkMediaCacheDirPromise = (async () => {
+      if (!(await ReactNativeBlobUtil.fs.isDir(cacheDir))) {
+        await ReactNativeBlobUtil.fs.mkdir(cacheDir);
+      }
+    })();
+  }
+  return checkMediaCacheDirPromise;
+};
+
+const copyPromises: Record<string, Promise<string | null>> = {};
+
+const copyCoverMediaToCacheDirInternal = async (
+  media: SourceMedia,
+  cacheDir: string,
+  abortSignal?: AbortSignal,
+): Promise<string | null> => {
+  await checkMediaCacheDir(cacheDir);
+  const ext = getFileExtension(media.uri);
+  const sanitizedId = media.id.replace(/[^a-z0-9]/gi, '_');
+  const resultPath = `${cacheDir}/${sanitizedId}${ext ? `.${ext}` : ''}`;
+  if (await ReactNativeBlobUtil.fs.exists(resultPath)) {
+    return resultPath;
+  }
+  let oldPath;
+  if (media.uri && media.uri.startsWith('file:///android_asset')) {
+    oldPath = ReactNativeBlobUtil.fs.asset(
+      media.uri.replace('file:///android_asset/', ''),
+    );
+  } else if (media.uri && media.uri.startsWith('file://')) {
+    oldPath = media.uri.replace('file://', '');
+    if (!(await ReactNativeBlobUtil.fs.exists(oldPath))) {
+      return null;
+    }
+  } else {
+    oldPath = await downloadRemoteFileToLocalCache(media.uri, abortSignal);
+    if (!oldPath) {
+      return null;
+    }
+  }
+  await ReactNativeBlobUtil.fs.cp(oldPath, resultPath);
+  return resultPath;
+};
+
+export const copyCoverMediaToCacheDir = (
+  media: SourceMedia,
+  cacheDir: string = COVER_CACHE_DIR,
+  abortSignal?: AbortSignal,
+): Promise<string | null> => {
+  if (!copyPromises[media.id]) {
+    copyPromises[media.id] = copyCoverMediaToCacheDirInternal(
+      media,
+      cacheDir,
+      abortSignal,
+    );
+    copyPromises[media.id].finally(() => {
+      delete copyPromises[media.id];
+    });
+  }
+  return copyPromises[media.id];
 };

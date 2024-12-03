@@ -2,6 +2,8 @@ import BlockTextRenderer from './BlockTextRenderer';
 import CarouselRenderer from './CarouselRenderer';
 import HorizontalPhotoRenderer from './HorizontalPhotoRenderer';
 import LineDividerRenderer from './LineDividerRenderer';
+import MediaRenderer from './MediaRenderer';
+import MediaTextRenderer from './MediaTextRenderer';
 import PhotoWithTextAndTitleRenderer from './PhotoWithTextAndTitleRenderer';
 import SimpleButtonRenderer from './SimpleButtonRenderer';
 import SimpleTextRenderer from './SimpleTextRenderer';
@@ -57,6 +59,8 @@ const renderers: {
   simpleTitle: SimpleTextRenderer,
   simpleText: SimpleTextRenderer,
   socialLinks: SocialLinksRenderer,
+  media: MediaRenderer,
+  mediaText: MediaTextRenderer,
   schedule: () => null,
   video: () => null,
   webCardsCarousel: () => null,
