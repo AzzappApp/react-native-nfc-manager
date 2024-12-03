@@ -4,14 +4,7 @@ import { Alert, Platform } from 'react-native';
 import { openPhotoPicker, RESULTS } from 'react-native-permissions';
 import type { PermissionStatus } from 'react-native-permissions';
 
-type Options = {
-  onSelectedMorePhotos?: () => void;
-};
-
-const useMediaLimitedSelectionAlert = (
-  mediaPermission: PermissionStatus,
-  options: Options = {},
-) => {
+const useMediaLimitedSelectionAlert = (mediaPermission: PermissionStatus) => {
   const intl = useIntl();
   const initialMediaPermission = useRef(mediaPermission);
 
@@ -38,11 +31,7 @@ const useMediaLimitedSelectionAlert = (
               description:
                 'Button to open the permission picker in image picker wizard',
             }),
-            onPress: () => {
-              openPhotoPicker().then(() => {
-                options.onSelectedMorePhotos?.();
-              });
-            },
+            onPress: openPhotoPicker,
           },
           {
             text: intl.formatMessage({
@@ -56,7 +45,6 @@ const useMediaLimitedSelectionAlert = (
         ],
       );
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [intl]);
 };
 
