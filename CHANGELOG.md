@@ -1,5 +1,10 @@
-## 1.4.1-canary.22
+## 1.4.1-canary.23
 
+* **fix:**  - some issue on new module  ([#6190](https://github.com/AzzappApp/azzapp/pull/6190))
+* **fix:**  - **mediaPicker:** [#5084](https://github.com/AzzappApp/azzapp/pull/5084) listen to selection update ([#6188](https://github.com/AzzappApp/azzapp/pull/6188))
+* **fix:**  - **iOS:** [#6171](https://github.com/AzzappApp/azzapp/pull/6171) display thumbnail when snapshot is removed
+* **feat:**  - 🎸 use top section color as background ([#6175](https://github.com/AzzappApp/azzapp/pull/6175))
+* **fix:**  - 🐛 avoid unwanted blur when editing social links ([#6174](https://github.com/AzzappApp/azzapp/pull/6174))
 * **fix:**  - **android:** [#6169](https://github.com/AzzappApp/azzapp/pull/6169) avoid random crashed on android ([#6170](https://github.com/AzzappApp/azzapp/pull/6170))
 * **fix:**  - **loading:** [#6094](https://github.com/AzzappApp/azzapp/pull/6094) avoid partially rendered logo ([#6153](https://github.com/AzzappApp/azzapp/pull/6153))
 * **fix:**  - **contact:** [#6148](https://github.com/AzzappApp/azzapp/pull/6148) phoneNumbers and emails may be undefined ([#6152](https://github.com/AzzappApp/azzapp/pull/6152))
