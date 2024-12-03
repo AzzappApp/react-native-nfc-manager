@@ -507,7 +507,7 @@ const MultiUserDetailsScreen = ({
             )
           }
         >
-          <View style={{ paddingHorizontal: 10 }}>
+          <View style={styles.contentPaddingHorizontal}>
             <Controller
               control={control}
               name="selectedContact"
@@ -626,7 +626,11 @@ const MultiUserDetailsScreen = ({
             )}
             <View style={styles.stats}>
               <ProfileStatisticsChart
-                width={windowWidth}
+                width={
+                  windowWidth -
+                  styles.contentPaddingHorizontal.paddingHorizontal * 2 -
+                  styles.stats.paddingHorizontal * 2
+                }
                 height={170}
                 data={chartData}
                 variant={colorScheme ?? 'dark'}
@@ -725,6 +729,7 @@ const styleSheet = createStyleSheet(appearance => ({
     flex: 1,
     justifyContent: 'center',
     overflow: 'visible',
+    paddingHorizontal: 10,
     gap: 5,
   },
   statsLabelContainer: {
@@ -758,6 +763,9 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   cancelButton: {
     width: 136,
+  },
+  contentPaddingHorizontal: {
+    paddingHorizontal: 10,
   },
 }));
 

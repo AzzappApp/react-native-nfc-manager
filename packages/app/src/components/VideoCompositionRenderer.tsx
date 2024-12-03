@@ -118,6 +118,7 @@ const VideoCompositionRenderer = ({
       ref={skiaViewRef}
       style={[{ width, height }, style]}
       {...props}
+      opaque
     />
   );
 };

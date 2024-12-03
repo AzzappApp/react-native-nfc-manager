@@ -1,0 +1,709 @@
+diff --git a/android/cpp/rnskia-android/OpenGLContext.h b/android/cpp/rnskia-android/OpenGLContext.h
+index 8f1d7156c1a323dc26210796cde9e9d206cae1e0..f08b879e021a86cf9eedc3cc47c30a83ab23eb3d 100644
+--- a/android/cpp/rnskia-android/OpenGLContext.h
++++ b/android/cpp/rnskia-android/OpenGLContext.h
+@@ -28,15 +28,21 @@ public:
+ 
+   gl::Display *getDisplay() { return _glDisplay.get(); }
+   gl::Context *getContext() { return _glContext.get(); }
++  gl::Surface *getSurface() { return _glSurface.get(); };
++  EGLConfig getConfig() { return _glConfig; }
+ 
+ private:
+   std::unique_ptr<gl::Display> _glDisplay;
+   std::unique_ptr<gl::Context> _glContext;
++  std::unique_ptr<gl::Surface> _glSurface;
++  EGLConfig _glConfig;
+ 
+   OpenGLSharedContext() {
+     _glDisplay = std::make_unique<gl::Display>();
+-    auto glConfig = _glDisplay->chooseConfig();
+-    _glContext = _glDisplay->makeContext(glConfig, nullptr);
++    _glConfig = _glDisplay->chooseConfig();
++    _glContext = _glDisplay->makeContext(_glConfig, nullptr);
++    _glSurface = _glDisplay->makePixelBufferSurface(_glConfig, 1, 1);
++    _glContext->makeCurrent(_glSurface.get());
+   }
+ };
+ 
+@@ -156,11 +162,13 @@ public:
+   std::unique_ptr<WindowContext> MakeWindow(ANativeWindow *window, int width,
+                                             int height) {
+     auto display = OpenGLSharedContext::getInstance().getDisplay();
+-    return std::make_unique<OpenGLWindowContext>(_directContext.get(), display,
+-                                                 _glContext.get(), window);
++    return std::make_unique<OpenGLWindowContext>(
++        _directContext.get(), display, _glContext.get(), window,
++        OpenGLSharedContext::getInstance().getConfig());
+   }
+ 
+   GrDirectContext *getDirectContext() { return _directContext.get(); }
++  void makeCurrent() { _glContext->makeCurrent(_glSurface.get()); }
+ 
+ private:
+   std::unique_ptr<gl::Context> _glContext;
+@@ -170,7 +178,7 @@ private:
+   OpenGLContext() {
+     auto display = OpenGLSharedContext::getInstance().getDisplay();
+     auto sharedContext = OpenGLSharedContext::getInstance().getContext();
+-    auto glConfig = display->chooseConfig();
++    auto glConfig = OpenGLSharedContext::getInstance().getConfig();
+     _glContext = display->makeContext(glConfig, sharedContext);
+     _glSurface = display->makePixelBufferSurface(glConfig, 1, 1);
+     _glContext->makeCurrent(_glSurface.get());
+diff --git a/android/cpp/rnskia-android/OpenGLWindowContext.h b/android/cpp/rnskia-android/OpenGLWindowContext.h
+index 5759ba96425e94795383cf2d102918a4fc7102f0..223648d1ed80abbbf9745b8ce7bf3a032622a792 100644
+--- a/android/cpp/rnskia-android/OpenGLWindowContext.h
++++ b/android/cpp/rnskia-android/OpenGLWindowContext.h
+@@ -34,11 +34,11 @@ namespace RNSkia {
+ class OpenGLWindowContext : public WindowContext {
+ public:
+   OpenGLWindowContext(GrDirectContext *directContext, gl::Display *display,
+-                      gl::Context *glContext, ANativeWindow *window)
++                      gl::Context *glContext, ANativeWindow *window,
++                      EGLConfig config)
+       : _directContext(directContext), _display(display), _glContext(glContext),
+         _window(window) {
+     ANativeWindow_acquire(_window);
+-    auto config = display->chooseConfig();
+     _glSurface = display->makeWindowSurface(config, _window);
+   }
+ 
+diff --git a/android/cpp/rnskia-android/RNSkAndroidPlatformContext.h b/android/cpp/rnskia-android/RNSkAndroidPlatformContext.h
+index d8f71eeae05f59e47529968b0cd37d050cef618e..856c635e59117d7df86702fde9564e7182075ca6 100644
+--- a/android/cpp/rnskia-android/RNSkAndroidPlatformContext.h
++++ b/android/cpp/rnskia-android/RNSkAndroidPlatformContext.h
+@@ -78,6 +78,42 @@ public:
+ #endif
+   }
+ 
++  sk_sp<SkImage> makeImageFromNativeTexture(jsi::Runtime &runtime,
++                                            jsi::Value jsiTextureInfo,
++                                            int width, int height,
++                                            bool mipMapped) override {
++    if (!jsiTextureInfo.isObject()) {
++      throw new std::runtime_error("Invalid textureInfo");
++    }
++    auto jsiTextureInfoObj = jsiTextureInfo.asObject(runtime);
++
++    GrGLTextureInfo textureInfo;
++    textureInfo.fTarget =
++        (GrGLenum)jsiTextureInfoObj.getProperty(runtime, "fTarget").asNumber();
++    textureInfo.fID =
++        (GrGLuint)jsiTextureInfoObj.getProperty(runtime, "fID").asNumber();
++    textureInfo.fFormat =
++        (GrGLenum)jsiTextureInfoObj.getProperty(runtime, "fFormat").asNumber();
++    textureInfo.fProtected =
++        jsiTextureInfoObj.getProperty(runtime, "fProtected").asBool()
++            ? skgpu::Protected::kYes
++            : skgpu::Protected::kNo;
++
++    OpenGLContext::getInstance().makeCurrent();
++    if (glIsTexture(textureInfo.fID) == GL_FALSE) {
++      throw new std::runtime_error("Invalid textureInfo");
++    }
++
++    GrBackendTexture backendTexture = GrBackendTextures::MakeGL(
++        width, height,
++        mipMapped ? skgpu::Mipmapped::kYes : skgpu::Mipmapped::kNo,
++        textureInfo);
++    return SkImages::BorrowTextureFrom(
++        OpenGLContext::getInstance().getDirectContext(), backendTexture,
++        kTopLeft_GrSurfaceOrigin, kRGBA_8888_SkColorType, kUnpremul_SkAlphaType,
++        nullptr);
++  }
++
+   std::shared_ptr<RNSkVideo> createVideo(const std::string &url) override {
+     auto jniVideo = _jniPlatformContext->createVideo(url);
+     return std::make_shared<RNSkAndroidVideo>(jniVideo);
+@@ -149,6 +185,45 @@ public:
+ #endif
+   }
+ 
++  jsi::Value getImageBackendTexture(jsi::Runtime &runtime,
++                                    sk_sp<SkImage> image) override {
++    GrBackendTexture texture;
++    if (!SkImages::GetBackendTextureFromImage(image, &texture, true)) {
++      return jsi::Value::null();
++    }
++    return getJSITextureInfo(runtime, texture);
++  }
++
++  jsi::Value getSurfaceBackendTexture(jsi::Runtime &runtime,
++                                      sk_sp<SkSurface> surface) override {
++    GrBackendTexture texture = SkSurfaces::GetBackendTexture(
++        surface.get(), SkSurface::BackendHandleAccess::kFlushRead);
++    return getJSITextureInfo(runtime, texture);
++  }
++
++  static jsi::Value getJSITextureInfo(jsi::Runtime &runtime,
++                                      const GrBackendTexture &texture) {
++    if (!texture.isValid()) {
++      return jsi::Value::null();
++    }
++    GrGLTextureInfo textureInfo;
++    if (!GrBackendTextures::GetGLTextureInfo(texture, &textureInfo)) {
++      return jsi::Value::null();
++    }
++
++    OpenGLContext::getInstance().makeCurrent();
++    glFlush();
++
++    jsi::Object jsiTextureInfo = jsi::Object(runtime);
++    jsiTextureInfo.setProperty(runtime, "fTarget", (int)textureInfo.fTarget);
++    jsiTextureInfo.setProperty(runtime, "fFormat", (int)textureInfo.fFormat);
++    jsiTextureInfo.setProperty(runtime, "fID", (int)textureInfo.fID);
++    jsiTextureInfo.setProperty(runtime, "fProtected",
++                               (bool)textureInfo.fProtected);
++
++    return jsiTextureInfo;
++  }
++
+ #if !defined(SK_GRAPHITE)
+   GrDirectContext *getDirectContext() override {
+     return OpenGLContext::getInstance().getDirectContext();
+diff --git a/android/cpp/rnskia-android/gl/Display.h b/android/cpp/rnskia-android/gl/Display.h
+index cce0b65f62f08b00cb2012b56bb7be0339dc6bb7..da2b6aa0568de218f52717db00fd959a61099d40 100644
+--- a/android/cpp/rnskia-android/gl/Display.h
++++ b/android/cpp/rnskia-android/gl/Display.h
+@@ -43,6 +43,8 @@ public:
+ 
+     EGLint att[] = {EGL_RENDERABLE_TYPE,
+                     EGL_OPENGL_ES2_BIT,
++                    EGL_SURFACE_TYPE,
++                    EGL_WINDOW_BIT | EGL_PBUFFER_BIT,
+                     EGL_ALPHA_SIZE,
+                     8,
+                     EGL_BLUE_SIZE,
+diff --git a/cpp/api/JsiSkImage.h b/cpp/api/JsiSkImage.h
+index 8737007e9b536f4e8cd8fbb28996d11d28f398d6..7e32933de6b1427ef24b0c63eda30bda5afbaf02 100644
+--- a/cpp/api/JsiSkImage.h
++++ b/cpp/api/JsiSkImage.h
+@@ -215,6 +215,14 @@ public:
+         runtime, std::make_shared<JsiSkImage>(getContext(), rasterImage));
+   }
+ 
++  JSI_HOST_FUNCTION(getBackendTexture) {
++    auto image = getObject();
++    if (!image->isTextureBacked()) {
++      return jsi::Value::null();
++    }
++    return getContext()->getImageBackendTexture(runtime, image);
++  }
++
+   EXPORT_JSI_API_TYPENAME(JsiSkImage, Image)
+ 
+   JSI_EXPORT_FUNCTIONS(JSI_EXPORT_FUNC(JsiSkImage, width),
+@@ -226,6 +234,7 @@ public:
+                        JSI_EXPORT_FUNC(JsiSkImage, encodeToBase64),
+                        JSI_EXPORT_FUNC(JsiSkImage, readPixels),
+                        JSI_EXPORT_FUNC(JsiSkImage, makeNonTextureImage),
++                       JSI_EXPORT_FUNC(JsiSkImage, getBackendTexture),
+                        JSI_EXPORT_FUNC(JsiSkImage, dispose))
+ 
+   JsiSkImage(std::shared_ptr<RNSkPlatformContext> context,
+diff --git a/cpp/api/JsiSkImageFactory.h b/cpp/api/JsiSkImageFactory.h
+index 14e0da7dbe3b7bab5eb5d228616495a0dd59f43a..24fe8f8b18b9c573b7a219b197ec08686d99e390 100644
+--- a/cpp/api/JsiSkImageFactory.h
++++ b/cpp/api/JsiSkImageFactory.h
+@@ -78,10 +78,23 @@ public:
+         });
+   }
+ 
++  JSI_HOST_FUNCTION(MakeImageFromNativeTexture) {
++    auto image = getContext()->makeImageFromNativeTexture(
++        runtime, jsi::Value(runtime, arguments[0]), arguments[1].asNumber(),
++        arguments[2].asNumber(), count > 3 && arguments[3].asBool());
++    if (image == nullptr) {
++      throw std::runtime_error("Failed to convert native texture to SkImage!");
++    }
++    return jsi::Object::createFromHostObject(
++        runtime, std::make_shared<JsiSkImage>(getContext(), std::move(image)));
++  }
++
+   JSI_EXPORT_FUNCTIONS(JSI_EXPORT_FUNC(JsiSkImageFactory, MakeImageFromEncoded),
+                        JSI_EXPORT_FUNC(JsiSkImageFactory, MakeImageFromViewTag),
+                        JSI_EXPORT_FUNC(JsiSkImageFactory,
+                                        MakeImageFromNativeBuffer),
++                       JSI_EXPORT_FUNC(JsiSkImageFactory,
++                                       MakeImageFromNativeTexture),
+                        JSI_EXPORT_FUNC(JsiSkImageFactory, MakeImage))
+ 
+   explicit JsiSkImageFactory(std::shared_ptr<RNSkPlatformContext> context)
+diff --git a/cpp/api/JsiSkSurface.h b/cpp/api/JsiSkSurface.h
+index 30739c8337e2529ca8a93b85a4db33f0afa6f160..c4a183142fe73d0593cfcd157628ad73fe129c4f 100644
+--- a/cpp/api/JsiSkSurface.h
++++ b/cpp/api/JsiSkSurface.h
+@@ -78,11 +78,16 @@ public:
+         runtime, std::make_shared<JsiSkImage>(getContext(), std::move(image)));
+   }
+ 
++  JSI_HOST_FUNCTION(getBackendTexture) {
++    return getContext()->getSurfaceBackendTexture(runtime, getObject());
++  }
++
+   JSI_EXPORT_FUNCTIONS(JSI_EXPORT_FUNC(JsiSkSurface, width),
+                        JSI_EXPORT_FUNC(JsiSkSurface, height),
+                        JSI_EXPORT_FUNC(JsiSkSurface, getCanvas),
+                        JSI_EXPORT_FUNC(JsiSkSurface, makeImageSnapshot),
+                        JSI_EXPORT_FUNC(JsiSkSurface, flush),
++                       JSI_EXPORT_FUNC(JsiSkSurface, getBackendTexture),
+                        JSI_EXPORT_FUNC(JsiSkSurface, dispose))
+ };
+ 
+diff --git a/cpp/rnskia/RNSkDomView.h b/cpp/rnskia/RNSkDomView.h
+index 0c953f6308f78ba8eaa9ac1805366562edfee847..17f7abcc3b1d727ae8f151e7b67b6a641d207743 100644
+--- a/cpp/rnskia/RNSkDomView.h
++++ b/cpp/rnskia/RNSkDomView.h
+@@ -10,6 +10,7 @@
+ #include <jsi/jsi.h>
+ 
+ #include "JsiValueWrapper.h"
++#include "JsiSkCanvas.h"
+ #include "RNSkView.h"
+ 
+ #include "JsiDomRenderNode.h"
+@@ -96,5 +97,20 @@ public:
+       }
+     }
+   }
++  
++  jsi::Value callJsiMethod(jsi::Runtime &runtime,
++                           const std::string &name,
++                           const jsi::Value *arguments, size_t count) override {
++    if (name == "renderToCanvas") {
++      auto callback = std::make_shared<jsi::Function>(
++          arguments[0].asObject(runtime).asFunction(runtime));
++      getCanvasProvider()->renderToCanvas([=, &runtime](SkCanvas *canvas) {
++        auto jsiCanvas = jsi::Object::createFromHostObject(
++            runtime, std::make_shared<JsiSkCanvas>(getPlatformContext(), canvas));
++        callback->call(runtime, jsiCanvas);
++      });
++    }
++    return jsi::Value::undefined();
++  }
+ };
+ } // namespace RNSkia
+diff --git a/cpp/rnskia/RNSkJsiViewApi.h b/cpp/rnskia/RNSkJsiViewApi.h
+index c1f920e1ab209c023cacc445d88a6a823d13a6db..f2075e9589a7419b954fbcecd0ee583e9b9c5ea7 100644
+--- a/cpp/rnskia/RNSkJsiViewApi.h
++++ b/cpp/rnskia/RNSkJsiViewApi.h
+@@ -70,6 +70,54 @@ public:
+     return jsi::Value::undefined();
+   }
+ 
++
++   /**
++   Calls a custom command / method on a view by the view id.
++   */
++  JSI_HOST_FUNCTION(callJsiMethod) {
++    if (count < 2) {
++      _platformContext->raiseError(
++          std::string("callCustomCommand: Expected at least 2 arguments, got " +
++                      std::to_string(count) + "."));
++
++      return jsi::Value::undefined();
++    }
++
++    if (!arguments[0].isNumber()) {
++      _platformContext->raiseError(
++          "callCustomCommand: First argument must be a number");
++
++      return jsi::Value::undefined();
++    }
++
++    if (!arguments[1].isString()) {
++      _platformContext->raiseError("callCustomCommand: Second argument must be "
++                                   "the name of the action to call.");
++
++      return jsi::Value::undefined();
++    }
++
++    auto nativeId = arguments[0].asNumber();
++    auto action = arguments[1].asString(runtime).utf8(runtime);
++
++    auto info = getEnsuredViewInfo(nativeId);
++
++    if (info->view == nullptr) {
++      throw jsi::JSError(
++          runtime, std::string("callCustomCommand: Could not call action " +
++                               action + " on view - view not ready.")
++                       .c_str());
++
++      return jsi::Value::undefined();
++    }
++
++    // Get arguments
++    size_t paramsCount = count - 2;
++    const jsi::Value *params = paramsCount > 0 ? &arguments[2] : nullptr;
++    return info->view->callJsiMethod(runtime, action, params, paramsCount);
++  }
++
++
+   JSI_HOST_FUNCTION(requestRedraw) {
+     if (count != 1) {
+       _platformContext->raiseError(
+@@ -192,6 +240,7 @@ public:
+   JSI_EXPORT_FUNCTIONS(JSI_EXPORT_FUNC(RNSkJsiViewApi, setJsiProperty),
+                        JSI_EXPORT_FUNC(RNSkJsiViewApi, requestRedraw),
+                        JSI_EXPORT_FUNC(RNSkJsiViewApi, makeImageSnapshotAsync),
++                       JSI_EXPORT_FUNC(RNSkJsiViewApi, callJsiMethod),
+                        JSI_EXPORT_FUNC(RNSkJsiViewApi, makeImageSnapshot))
+ 
+   /**
+diff --git a/cpp/rnskia/RNSkPlatformContext.h b/cpp/rnskia/RNSkPlatformContext.h
+index 8303d327e0849c524665df314e26bdc1dde6c7b3..7414b8b57618e81b67838b3b666594c8fb62ea7b 100644
+--- a/cpp/rnskia/RNSkPlatformContext.h
++++ b/cpp/rnskia/RNSkPlatformContext.h
+@@ -107,6 +107,11 @@ public:
+    */
+   virtual sk_sp<SkImage> makeImageFromNativeBuffer(void *buffer) = 0;
+ 
++  virtual sk_sp<SkImage> makeImageFromNativeTexture(jsi::Runtime &runtime,
++                                                    jsi::Value textureInfo,
++                                                    int width, int height,
++                                                    bool mipMapped) = 0;
++
+ #if !defined(SK_GRAPHITE)
+   virtual GrDirectContext *getDirectContext() = 0;
+ #endif
+@@ -115,6 +120,12 @@ public:
+ 
+   virtual uint64_t makeNativeBuffer(sk_sp<SkImage> image) = 0;
+ 
++  virtual jsi::Value getSurfaceBackendTexture(jsi::Runtime &runtime,
++                                              sk_sp<SkSurface> image) = 0;
++
++  virtual jsi::Value getImageBackendTexture(jsi::Runtime &runtime,
++                                            sk_sp<SkImage> image) = 0;
++
+   virtual std::shared_ptr<RNSkVideo> createVideo(const std::string &url) = 0;
+ 
+   /**
+diff --git a/cpp/rnskia/RNSkView.h b/cpp/rnskia/RNSkView.h
+index d3ab09c09184c95d00eb9b4793778baf21d18d3f..91ceacef18cf7085af7c6e53eaaabcaf568b47d9 100644
+--- a/cpp/rnskia/RNSkView.h
++++ b/cpp/rnskia/RNSkView.h
+@@ -176,6 +176,18 @@ public:
+     _redrawRequested = false;
+   }
+ 
++  /**
++   Calls a custom action.
++   */
++  virtual jsi::Value callJsiMethod(jsi::Runtime &runtime,
++                                   const std::string &name,
++                                   const jsi::Value *arguments, size_t count) {
++    throw std::runtime_error(
++        "The base Skia View does not support any commands. Command " + name +
++        " not found.");
++  }
++
++
+   /**
+    Sets the native id of the view
+    */
+diff --git a/ios/RNSkia-iOS/RNSkiOSPlatformContext.h b/ios/RNSkia-iOS/RNSkiOSPlatformContext.h
+index 0ee6bda0b6c53d65f9f7c9ad7b219d272adcc4d0..aae12aff4de75538a14dac17390d69d2b377ed4f 100644
+--- a/ios/RNSkia-iOS/RNSkiOSPlatformContext.h
++++ b/ios/RNSkia-iOS/RNSkiOSPlatformContext.h
+@@ -56,8 +56,19 @@ public:
+ 
+   sk_sp<SkImage> makeImageFromNativeBuffer(void *buffer) override;
+ 
++  sk_sp<SkImage> makeImageFromNativeTexture(jsi::Runtime &runtime,
++                                            jsi::Value textureInfo, int width,
++                                            int height,
++                                            bool mipMapped) override;
++
+   uint64_t makeNativeBuffer(sk_sp<SkImage> image) override;
+ 
++  jsi::Value getSurfaceBackendTexture(jsi::Runtime &runtime,
++                                      sk_sp<SkSurface> image) override;
++
++  jsi::Value getImageBackendTexture(jsi::Runtime &runtime,
++                                    sk_sp<SkImage> image) override;
++
+   void releaseNativeBuffer(uint64_t pointer) override;
+ 
+   std::shared_ptr<RNSkVideo> createVideo(const std::string &url) override;
+@@ -80,6 +91,8 @@ public:
+ 
+ private:
+   ViewScreenshotService *_screenshotService;
++
++  SkColorType mtlPixelFormatToSkColorType(MTLPixelFormat pixelFormat);
+ };
+ 
+ static void handleNotification(CFNotificationCenterRef center, void *observer,
+diff --git a/ios/RNSkia-iOS/RNSkiOSPlatformContext.mm b/ios/RNSkia-iOS/RNSkiOSPlatformContext.mm
+index 5e39eb670ab0750f55d148954572e3227ac03909..136654e27509d5b90f21397e83b18b1889ff755d 100644
+--- a/ios/RNSkia-iOS/RNSkiOSPlatformContext.mm
++++ b/ios/RNSkia-iOS/RNSkiOSPlatformContext.mm
+@@ -1,6 +1,7 @@
+ #import "RNSkiOSPlatformContext.h"
+ 
+ #import <CoreMedia/CMSampleBuffer.h>
++#include <Metal/Metal.h>
+ #import <React/RCTUtils.h>
+ #include <thread>
+ #include <utility>
+@@ -155,6 +156,40 @@
+   return reinterpret_cast<uint64_t>(pixelBuffer);
+ }
+ 
++jsi::Value
++RNSkiOSPlatformContext::getImageBackendTexture(jsi::Runtime &runtime,
++                                               sk_sp<SkImage> image) {
++  GrBackendTexture texture;
++  if (!SkImages::GetBackendTextureFromImage(image, &texture, true)) {
++    return jsi::Value::null();
++  }
++  if (!texture.isValid()) {
++    return jsi::Value::null();
++  }
++  GrMtlTextureInfo textureInfo;
++  if (!GrBackendTextures::GetMtlTextureInfo(texture, &textureInfo)) {
++    return jsi::Value::null();
++  }
++  auto pointer = reinterpret_cast<uint64_t>(textureInfo.fTexture.get());
++  return jsi::BigInt::fromUint64(runtime, pointer);
++}
++
++jsi::Value
++RNSkiOSPlatformContext::getSurfaceBackendTexture(jsi::Runtime &runtime,
++                                                 sk_sp<SkSurface> surface) {
++  GrBackendTexture texture = SkSurfaces::GetBackendTexture(
++      surface.get(), SkSurfaces::BackendHandleAccess::kFlushRead);
++  if (!texture.isValid()) {
++    return jsi::Value::null();
++  }
++  GrMtlTextureInfo textureInfo;
++  if (!GrBackendTextures::GetMtlTextureInfo(texture, &textureInfo)) {
++    return jsi::Value::null();
++  }
++  auto pointer = reinterpret_cast<uint64_t>(textureInfo.fTexture.get());
++  return jsi::BigInt::fromUint64(runtime, pointer);
++}
++
+ std::shared_ptr<RNSkVideo>
+ RNSkiOSPlatformContext::createVideo(const std::string &url) {
+   return std::make_shared<RNSkiOSVideo>(url, this);
+@@ -192,6 +227,64 @@
+ #endif
+ }
+ 
++sk_sp<SkImage> RNSkiOSPlatformContext::makeImageFromNativeTexture(
++    jsi::Runtime &runtime, jsi::Value jsiTextureInfo, int width, int height,
++    bool mipMapped) {
++  if (!jsiTextureInfo.isBigInt()) {
++    throw std::runtime_error("Invalid textureInfo");
++  }
++  auto pointer = (void *)jsiTextureInfo.asBigInt(runtime).asUint64(runtime);
++  id<MTLTexture> mtlTexture = (__bridge id<MTLTexture>)(pointer);
++
++  SkColorType colorType = mtlPixelFormatToSkColorType(mtlTexture.pixelFormat);
++  if (colorType == SkColorType::kUnknown_SkColorType) {
++    throw std::runtime_error("Unsupported pixelFormat");
++  }
++
++  GrMtlTextureInfo textureInfo;
++  textureInfo.fTexture.retain((__bridge const void *)mtlTexture);
++
++  GrBackendTexture texture = GrBackendTextures::MakeMtl(
++      width, height, mipMapped ? skgpu::Mipmapped::kYes : skgpu::Mipmapped::kNo,
++      textureInfo);
++
++  return SkImages::BorrowTextureFrom(getDirectContext(), texture,
++                                     kTopLeft_GrSurfaceOrigin, colorType,
++                                     kPremul_SkAlphaType, nullptr);
++}
++
++SkColorType RNSkiOSPlatformContext::mtlPixelFormatToSkColorType(
++    MTLPixelFormat pixelFormat) {
++  switch (pixelFormat) {
++  case MTLPixelFormatRGBA8Unorm:
++    return kRGBA_8888_SkColorType;
++  case MTLPixelFormatBGRA8Unorm:
++    return kBGRA_8888_SkColorType;
++  case MTLPixelFormatRGB10A2Unorm:
++    return kRGBA_1010102_SkColorType;
++  case MTLPixelFormatR8Unorm:
++    return kGray_8_SkColorType;
++  case MTLPixelFormatRGBA16Float:
++    return kRGBA_F16_SkColorType;
++  case MTLPixelFormatRG8Unorm:
++    return kR8G8_unorm_SkColorType;
++  case MTLPixelFormatR16Float:
++    return kA16_float_SkColorType;
++  case MTLPixelFormatRG16Float:
++    return kR16G16_float_SkColorType;
++  case MTLPixelFormatR16Unorm:
++    return kA16_unorm_SkColorType;
++  case MTLPixelFormatRG16Unorm:
++    return kR16G16_unorm_SkColorType;
++  case MTLPixelFormatRGBA16Unorm:
++    return kR16G16B16A16_unorm_SkColorType;
++  case MTLPixelFormatRGBA8Unorm_sRGB:
++    return kSRGBA_8888_SkColorType;
++  default:
++    return kUnknown_SkColorType;
++  }
++}
++
+ #if !defined(SK_GRAPHITE)
+ GrDirectContext *RNSkiOSPlatformContext::getDirectContext() {
+   return MetalContext::getInstance().getDirectContext();
+diff --git a/src/skia/types/Image/Image.ts b/src/skia/types/Image/Image.ts
+index 2179999cb014d706b31829a98027ae20b596c3d8..4f2010feccc5d1e646221e90f696db8a90234d80 100644
+--- a/src/skia/types/Image/Image.ts
++++ b/src/skia/types/Image/Image.ts
+@@ -48,6 +48,17 @@ export interface SkImage extends SkJSIInstance<"Image"> {
+    */
+   getImageInfo(): ImageInfo;
+ 
++  /**
++   * Returns the backend texture of the image.
++   * The returned object can be used to create a Skia Image object.
++   * The returned object is backend specific and should be used with caution.
++   * It is the caller's responsibility to ensure that the texture is not used after the image is deleted.
++   * The returned object may be null if the image does not have a backend texture.
++   *
++   * @return backend texture of the image or null
++   */
++  getBackendTexture(): unknown;
++
+   /**
+    * Returns this image as a shader with the specified tiling. It will use cubic sampling.
+    * @param tx - tile mode in the x direction.
+diff --git a/src/skia/types/Image/ImageFactory.ts b/src/skia/types/Image/ImageFactory.ts
+index 61623cb22374d5a40638d1b268e5d917afa18963..10debc259bbe1bc57502e773e036b2f9e5653ce4 100644
+--- a/src/skia/types/Image/ImageFactory.ts
++++ b/src/skia/types/Image/ImageFactory.ts
+@@ -49,6 +49,30 @@ export interface ImageFactory {
+    */
+   MakeImageFromNativeBuffer: (nativeBuffer: NativeBuffer) => SkImage;
+ 
++  /**
++   *
++   * Return an Image backed by a given native texture.
++   *
++   * The native texture must be a valid owning reference.
++   *
++   * This API might be used to integrate with other libraries using gpu textures,
++   * or to transfer images between different threads.
++   *
++   * @param texture A native texture handle
++   * @param width The width of the texture
++   * @param height The height of the texture
++   * @param mipmapped Whether the texture is mipmapped
++   * @throws Throws an error if the Image could not be created, for example when the given native texture is invalid.
++   *
++   * @returns Returns a valid SkImage, if the texture is invalid, an error is thrown.
++   */
++  MakeImageFromNativeTexture: (
++    texture: unknown,
++    width: number,
++    height: number,
++    mipmapped?: boolean
++  ) => SkImage;
++
+   /**
+    * Returns an image that will be a screenshot of the view represented by
+    * the view tag
+diff --git a/src/skia/types/Surface/Surface.ts b/src/skia/types/Surface/Surface.ts
+index 7f850880568dcdb287b738587c5fd28ce5f54145..a6fa3f74e6f896e8070dcaf04d82240bf94157e1 100644
+--- a/src/skia/types/Surface/Surface.ts
++++ b/src/skia/types/Surface/Surface.ts
+@@ -14,6 +14,18 @@ export interface SkSurface extends SkJSIInstance<"Surface"> {
+   */
+   getCanvas(): SkCanvas;
+ 
++  /**
++   * Returns the backend texture of the surface.
++   * The returned object can be used to create a Skia Image object.
++   * The returned object is backend specific and should be used with caution.
++   * It is the caller's responsibility to ensure that the texture is not used after the surface is deleted
++   * or draw operations are performed on the surface.
++   * The returned object may be null if the surface does not have a backend texture.
++   *
++   * @return backend texture of the surface or null
++   */
++  getBackendTexture(): unknown;
++
+   /** Returns Image capturing Surface contents. Subsequent drawing to
+      Surface contents are not captured.
+ 
+diff --git a/src/skia/web/JsiSkImage.ts b/src/skia/web/JsiSkImage.ts
+index 650c719914e03395e1991bcb77b04e9e0c81b814..f5c406c6817cc33444909036657f6e9244a765fc 100644
+--- a/src/skia/web/JsiSkImage.ts
++++ b/src/skia/web/JsiSkImage.ts
+@@ -170,4 +170,9 @@ export class JsiSkImage extends HostObject<Image, "Image"> implements SkImage {
+     }
+     return new JsiSkImage(this.CanvasKit, img);
+   }
++
++  getBackendTexture(): unknown {
++    console.warn("getBackendTexture is not implemented on Web");
++    return null;
++  }
+ }
+diff --git a/src/skia/web/JsiSkImageFactory.ts b/src/skia/web/JsiSkImageFactory.ts
+index 09b652154241534ba0d3a68f0666be75a561c6d3..23a31288e1ad66c91ce853c7b00cf89c9d07085f 100644
+--- a/src/skia/web/JsiSkImageFactory.ts
++++ b/src/skia/web/JsiSkImageFactory.ts
+@@ -75,6 +75,10 @@ export class JsiSkImageFactory extends Host implements ImageFactory {
+     return new JsiSkImage(this.CanvasKit, image);
+   }
+ 
++  MakeImageFromNativeTexture(): SkImage {
++    throw new Error("MakeImageFromNativeTexture is not implemented on web");
++  }
++
+   MakeImage(info: ImageInfo, data: SkData, bytesPerRow: number) {
+     // see toSkImageInfo() from canvaskit
+     const image = this.CanvasKit.MakeImage(
+diff --git a/src/skia/web/JsiSkSurface.ts b/src/skia/web/JsiSkSurface.ts
+index c1b024ff68d81a8b3fea9165b0b33deb506b9a97..12a9f38114089e42531ebea71c97b96c77af3381 100644
+--- a/src/skia/web/JsiSkSurface.ts
++++ b/src/skia/web/JsiSkSurface.ts
+@@ -43,4 +43,9 @@ export class JsiSkSurface
+     );
+     return new JsiSkImage(this.CanvasKit, image);
+   }
++
++  getBackendTexture(): unknown {
++    console.warn("getBackendTexture is not implemented on Web");
++    return null;
++  }
+ }
+diff --git a/src/views/SkiaDomView.tsx b/src/views/SkiaDomView.tsx
+index baad65a810ea93cff8c6ab43563e0001561bfacc..91fc07f1dbedc8cf0c992909f5cbc358ca1305f9 100644
+--- a/src/views/SkiaDomView.tsx
++++ b/src/views/SkiaDomView.tsx
+@@ -115,7 +115,8 @@ const assertSkiaViewApi = () => {
+     SkiaViewApi === null ||
+     SkiaViewApi.setJsiProperty === null ||
+     SkiaViewApi.requestRedraw === null ||
+-    SkiaViewApi.makeImageSnapshot === null
++    SkiaViewApi.makeImageSnapshot === null || 
++    SkiaViewApi.callJsiMethod === null 
+   ) {
+     throw Error("Skia View Api was not found.");
+   }
+diff --git a/src/views/types.ts b/src/views/types.ts
+index fb90840a7995e53b7341fdd1c349e86031676a8b..8e02d8c0d503525d2bf1d0ee9da95d9361eb8370 100644
+--- a/src/views/types.ts
++++ b/src/views/types.ts
+@@ -18,6 +18,11 @@ export interface DrawingInfo {
+ export interface ISkiaViewApi {
+   setJsiProperty: <T>(nativeId: number, name: string, value: T) => void;
+   requestRedraw: (nativeId: number) => void;
++  callJsiMethod: <T extends Array<unknown>>(
++    nativeId: number,
++    name: string,
++    ...args: T
++  ) => void;
+   makeImageSnapshot: (nativeId: number, rect?: SkRect) => SkImage;
+   makeImageSnapshotAsync: (nativeId: number, rect?: SkRect) => Promise<SkImage>;
+ }

@@ -83,7 +83,7 @@ const CardModuleBackgroundImage = (props: CardModuleBackgroundImageProps) => {
       });
 
     return (
-      <Canvas style={styles.container}>
+      <Canvas style={styles.container} opaque>
         <Group
           opacity={backgroundOpacity}
           layer={

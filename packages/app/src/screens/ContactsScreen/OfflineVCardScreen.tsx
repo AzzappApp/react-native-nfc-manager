@@ -567,6 +567,7 @@ const QRCode = ({ value, width }: { width: number; value: string }) => {
         width,
         height: width,
       }}
+      opaque
     >
       <ImageSVG svg={svg} />
     </Canvas>

@@ -242,7 +242,7 @@ const TransitionPreview = ({
 
   return (
     <View style={{ height, width }}>
-      <Canvas style={{ width, height }}>
+      <Canvas style={{ width, height }} opaque>
         <Picture picture={picture} />
       </Canvas>
     </View>

@@ -240,7 +240,7 @@ const VideoTimelineEditor = ({
   return (
     <View {...props}>
       <View style={styles.root}>
-        <Canvas style={{ height: imagesHeight, width: sliderWidth }}>
+        <Canvas style={{ height: imagesHeight, width: sliderWidth }} opaque>
           {buffers.map((buffer, index) => (
             <BufferImage
               fit={'cover'}

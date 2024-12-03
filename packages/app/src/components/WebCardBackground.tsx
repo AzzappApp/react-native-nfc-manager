@@ -21,7 +21,7 @@ const WebCardBackground = ({
   const { width, height } = useScreenDimensions();
   return (
     <View style={StyleSheet.absoluteFill}>
-      <Canvas style={{ flex: 1 }}>
+      <Canvas style={{ flex: 1 }} opaque>
         <Rect x={0} y={0} width={width} height={height}>
           <LinearGradient
             start={vec(width / 2, 0)}

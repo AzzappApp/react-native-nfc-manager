@@ -168,7 +168,7 @@ const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
           <View
             style={[styles.qrCodeContainer, { bottom: 123 + insets.bottom }]}
           >
-            <Canvas style={styles.canvas}>
+            <Canvas style={styles.canvas} opaque>
               <Group
                 layer={
                   <Paint>

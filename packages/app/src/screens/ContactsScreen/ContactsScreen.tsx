@@ -109,11 +109,13 @@ const ContactsScreen = ({
           onChangeText={e => setSearch(e ?? '')}
         />
         <Suspense>
-          <ContactScreenLists
-            search={debounceSearch}
-            searchBy={searchBy}
-            profile={profile}
-          />
+          {profile && (
+            <ContactScreenLists
+              search={debounceSearch}
+              searchBy={searchBy}
+              profile={profile}
+            />
+          )}
         </Suspense>
       </SafeAreaView>
     </Container>
