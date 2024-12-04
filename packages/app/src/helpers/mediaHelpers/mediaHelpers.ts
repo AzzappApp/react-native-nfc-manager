@@ -134,7 +134,11 @@ const copyCoverMediaToCacheDirInternal = async (
   abortSignal?: AbortSignal,
 ): Promise<string | null> => {
   await checkMediaCacheDir(cacheDir);
-  const ext = getFileExtension(media.uri);
+  let ext = getFileExtension(media.uri);
+
+  if (!ext && media.kind === 'video') {
+    ext = 'mp4';
+  }
   const sanitizedId = media.id.replace(/[^a-z0-9]/gi, '_');
   const resultPath = `${cacheDir}/${sanitizedId}${ext ? `.${ext}` : ''}`;
   if (await ReactNativeBlobUtil.fs.exists(resultPath)) {
