@@ -31,6 +31,7 @@ const SignaturePreview = ({ profile: profileKey }: SignaturePreviewProps) => {
         webCard {
           id
           userName
+          isMultiUser
           cardColors {
             primary
           }
@@ -87,7 +88,8 @@ const SignaturePreview = ({ profile: profileKey }: SignaturePreviewProps) => {
 
   const company = webCard?.commonInformation?.company || contactCard?.company;
 
-  const logo = webCard?.logo ?? profileLogo;
+  const logo =
+    webCard?.isMultiUser && webCard?.logo ? webCard?.logo : profileLogo;
 
   return (
     <>

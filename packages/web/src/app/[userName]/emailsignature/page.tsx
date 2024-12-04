@@ -53,7 +53,11 @@ const EmailSignature = async ({ params }: EmailSignatureProps) => {
           <FullSignature
             webCard={webCard}
             media={media}
-            companyLogo={webCard.logoId ?? profile.logoId}
+            companyLogo={
+              webCard.isMultiUser && webCard.logoId != null
+                ? webCard.logoId
+                : profile.logoId
+            }
           />
         )}
 
