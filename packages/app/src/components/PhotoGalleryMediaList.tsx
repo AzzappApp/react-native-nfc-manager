@@ -248,14 +248,16 @@ const PhotoGalleryMediaList = ({
     const subscription = cameraRollEventEmitter.addListener(
       'onLibrarySelectionChange',
       _event => {
-        load(true);
+        if (mediaPermission === 'limited') {
+          load(true, true);
+        }
       },
     );
 
     return () => {
       subscription.remove();
     };
-  }, [load]);
+  }, [load, mediaPermission]);
 
   useEffect(() => {
     const subscription = AppState.addEventListener(
