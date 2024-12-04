@@ -1,5 +1,7 @@
-## 1.4.1-canary.25
+## 1.4.1-canary.26
 
+* **fix:**  - **mediaPicker:** avoid onLibraryChange triggers when permission are full
+* **fix:**  - scrolling and contact details height ([#6176](https://github.com/AzzappApp/azzapp/pull/6176))
 * **fix:**  - some issue on new module  ([#6190](https://github.com/AzzappApp/azzapp/pull/6190))
 * **fix:**  - **mediaPicker:** [#5084](https://github.com/AzzappApp/azzapp/pull/5084) listen to selection update ([#6188](https://github.com/AzzappApp/azzapp/pull/6188))
 * **fix:**  - **iOS:** [#6171](https://github.com/AzzappApp/azzapp/pull/6171) display thumbnail when snapshot is removed
