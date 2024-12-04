@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/data",
-  "version": "1.4.1-rc.21",
+  "version": "1.4.1-rc.22",
   "private": true,
   "main": "src/index.ts",
   "scripts": {
