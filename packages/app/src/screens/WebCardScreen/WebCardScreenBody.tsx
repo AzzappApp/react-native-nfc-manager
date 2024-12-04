@@ -749,6 +749,7 @@ const WebCardModule = ({
   return (
     <WebCardBlockContainerMemo
       id={module.id}
+      editing={editing}
       {...props}
       onLayout={onLayout}
       // @ts-expect-error this extraData is used to trigger a re-render when the module data change

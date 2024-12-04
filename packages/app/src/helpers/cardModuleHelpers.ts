@@ -52,7 +52,8 @@ export const handleUploadCardModuleMedia = async (
 
   for (const moduleMedia of cardModuleMedias) {
     const { media } = moduleMedia;
-    if (moduleMedia.needDbUpdate) {
+    //be sure the media need to be updated, and the uri is not online one
+    if (moduleMedia.needDbUpdate && !moduleMedia.media.uri.startsWith('http')) {
       if (media.kind === 'image') {
         const exportWidth = Math.min(MODULE_IMAGE_MAX_WIDTH, media.width);
         const exportHeight = (exportWidth / media.width) * media.height;
@@ -188,9 +189,9 @@ export const convertModuleMediaRelay = (mediaRelay: any) => {
             width: media.width ?? 0,
             height: media.height ?? 0,
           },
-          needUpdate: false,
+          needDbUpdate: false,
           ...rest,
-        } as unknown as CardModuleMedia;
+        };
       }
       return null;
     })

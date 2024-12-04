@@ -1,10 +1,7 @@
-import { useMemo } from 'react';
 import { graphql, readInlineData } from 'react-relay';
-import {
-  swapModuleColor,
-  type CardModuleColor,
-} from '@azzapp/shared/cardModuleHelpers';
+import { type CardModuleColor } from '@azzapp/shared/cardModuleHelpers';
 import CardModuleEditionScrollHandler from '../CardModuleEditionScrollHandler';
+import withSwapCardModuleColor from '../withSwapCardModuleColor';
 import CardModuleMediaParallax from './CardModuleMediaParallax';
 import CardModuleMediaSlideshow from './CardModuleMediaSlideshow';
 import type {
@@ -83,10 +80,6 @@ const MediaModuleRenderer = ({
   colorPalette,
   ...props
 }: MediaModuleRendererProps) => {
-  const swapedColor = useMemo(
-    () => swapModuleColor(data.cardModuleColor, colorPalette),
-    [colorPalette, data.cardModuleColor],
-  );
   if ((data?.cardModuleMedias?.length ?? 0) < 1) {
     return null;
   }
@@ -96,7 +89,7 @@ const MediaModuleRenderer = ({
       return (
         <CardModuleMediaSlideshow
           medias={data.cardModuleMedias}
-          cardModuleColor={swapedColor}
+          cardModuleColor={data.cardModuleColor}
           viewMode={viewMode}
           disableScroll={webCardEditing}
           {...props}
@@ -107,7 +100,7 @@ const MediaModuleRenderer = ({
         <CardModuleEditionScrollHandler scrollPosition={scrollPosition}>
           <CardModuleMediaParallax
             medias={data.cardModuleMedias}
-            cardModuleColor={swapedColor}
+            cardModuleColor={data.cardModuleColor}
             onLayout={onLayout}
             viewMode={viewMode}
             disableParallax={disableAnimation}
@@ -119,4 +112,6 @@ const MediaModuleRenderer = ({
   }
 };
 
-export default MediaModuleRenderer;
+export default withSwapCardModuleColor<MediaModuleRendererData, 'media'>(
+  MediaModuleRenderer,
+);

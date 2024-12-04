@@ -4,6 +4,7 @@ import { memo, useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { useColorScheme, View } from 'react-native';
 import { colors } from '#theme';
+import { DoneHeaderButton } from '#components/commonsButtons';
 import ToolBoxSection from '#components/Toolbar/ToolBoxSection';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import {
@@ -71,6 +72,7 @@ const CardModuleDesignTool = <T extends ModuleKindAndVariant>({
             defaultMessage: 'Design',
             description: 'CardModuleDesignTool - Bottom Sheet header',
           })}
+          rightElement={<DoneHeaderButton onPress={close} />}
           style={styles.headerStyle}
         />
         <FlashList

@@ -16,15 +16,11 @@ import type { CardTemplatesList_webCard$key } from '#relayArtifacts/CardTemplate
 
 type Props = {
   open: boolean;
-  onClose: () => void;
+  close: () => void;
   webCard: CardTemplatesList_webCard$key;
 };
 
-const AddModuleSectionModal = ({
-  open,
-  onClose,
-  webCard: webCardKey,
-}: Props) => {
+const AddModuleSectionModal = ({ open, close, webCard: webCardKey }: Props) => {
   const intl = useIntl();
 
   const [currentTab, setCurrentTab] = useState<string>('sections');
@@ -50,11 +46,7 @@ const AddModuleSectionModal = ({
   );
 
   return (
-    <ScreenModal
-      visible={open}
-      animationType="slide"
-      onRequestDismiss={onClose}
-    >
+    <ScreenModal visible={open} animationType="slide" onRequestDismiss={close}>
       <Container style={{ flex: 1 }}>
         <SafeAreaView style={{ flex: 1 }}>
           <Header
@@ -75,7 +67,7 @@ const AddModuleSectionModal = ({
               </View>
             }
             leftElement={
-              <PressableNative onPress={onClose}>
+              <PressableNative onPress={close}>
                 <Icon icon="arrow_down" />
               </PressableNative>
             }
@@ -86,7 +78,9 @@ const AddModuleSectionModal = ({
             tabs={tabs}
             decoration="underline"
           />
-          {currentTab === 'sections' && <AddContentBelowCoverSections />}
+          {currentTab === 'sections' && (
+            <AddContentBelowCoverSections close={close} />
+          )}
           {currentTab === 'templates' && (
             <CardTemplatesList webCardKey={webCardKey} />
           )}

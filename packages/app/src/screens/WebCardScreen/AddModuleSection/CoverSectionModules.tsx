@@ -16,7 +16,15 @@ import type {
 } from '#helpers/webcardModuleHelpers';
 import type { ListRenderItemInfo } from 'react-native';
 
-const CoverSectionModules = (section: ModuleKindSection) => {
+type CoverSectionModules = {
+  section: ModuleKindSection;
+  closeModuleList: () => void;
+};
+
+const CoverSectionModules = ({
+  section,
+  closeModuleList,
+}: CoverSectionModules) => {
   const styles = useStyleSheet(stylesheet);
   const renderItem = useCallback(
     ({ item }: ListRenderItemInfo<string>) => {
@@ -28,9 +36,9 @@ const CoverSectionModules = (section: ModuleKindSection) => {
               variant: item,
             }
       ) as ModuleKindWithVariant;
-      return <VariantItem {...props} />;
+      return <VariantItem {...props} closeModuleList={closeModuleList} />;
     },
-    [section],
+    [closeModuleList, section.section],
   );
 
   return (
@@ -80,13 +88,17 @@ const stylesheet = createStyleSheet(appearance => ({
 
 export default CoverSectionModules;
 
-const Item = (props: ModuleKindWithVariant) => {
+const Item = ({
+  closeModuleList,
+  ...props
+}: ModuleKindWithVariant & { closeModuleList: () => void }) => {
   const router = useRouter();
   const styles = useStyleSheet(stylesheet);
 
   const onSelectModuleKind = useCallback(() => {
     router.push(getRouteForCardModule({ ...props, isNew: true }));
-  }, [props, router]);
+    closeModuleList();
+  }, [closeModuleList, props, router]);
 
   const uri = useModuleVariantsPreviewImage(props);
   const label = useModuleVariantsLabel(props);

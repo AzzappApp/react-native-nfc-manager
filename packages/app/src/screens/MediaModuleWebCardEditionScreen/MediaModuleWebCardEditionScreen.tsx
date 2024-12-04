@@ -172,7 +172,6 @@ const MediaModuleWebCardScreen = (
         },
         onCompleted(_, error) {
           handleOnCompletedModuleSave(moduleMedias, router, error);
-          router.back();
         },
         onError(e) {
           throw e;

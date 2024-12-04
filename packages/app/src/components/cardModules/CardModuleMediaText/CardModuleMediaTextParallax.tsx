@@ -21,6 +21,7 @@ type CardModuleMediaTextParallaxProps = CardModuleVariantType & {
 };
 
 const CardModuleMediaTextParallax = ({
+  viewMode,
   cardModuleMedias,
   cardModuleColor,
   dimension: providedDimension,
@@ -57,6 +58,10 @@ const CardModuleMediaTextParallax = ({
               index={index}
               key={`${cardModuleMedia.media.id}_{index}`}
               disableParallax={disableParallax}
+              style={{
+                opacity: 0.8,
+                backgroundColor: cardModuleColor.background,
+              }}
             >
               <View style={styles.textContainer}>
                 <Text
@@ -64,6 +69,7 @@ const CardModuleMediaTextParallax = ({
                   style={[
                     getTitleStyle(cardStyle, cardModuleColor),
                     styles.textStyle,
+                    viewMode === 'desktop' && { maxWidth: 400 },
                   ]}
                 >
                   {cardModuleMedia.title ??

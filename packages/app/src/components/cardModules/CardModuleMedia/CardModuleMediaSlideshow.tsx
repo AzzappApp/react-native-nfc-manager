@@ -156,6 +156,7 @@ const CardModuleMediaSlideshow = ({
         contentContainerStyle={ccstyle}
         onTouchStart={stopAutoPlay}
         onTouchEnd={startAutoPlay}
+        onMomentumScrollEnd={startAutoPlay} //onTouchEnd sometimes is not properly catch
       />
     </Animated.View>
   );

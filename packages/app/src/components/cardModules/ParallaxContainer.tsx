@@ -11,6 +11,7 @@ import type {
   CardModuleSourceMedia,
 } from './cardModuleEditorType';
 import type { ReactNode } from 'react';
+import type { ViewStyle } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 
 type ParallaxContainerProps = {
@@ -21,6 +22,7 @@ type ParallaxContainerProps = {
   disableParallax?: boolean;
   modulePosition?: SharedValue<number>;
   children?: ReactNode | undefined;
+  style?: ViewStyle; // some variant need opacity and backgroundcolor (mediaText) but not other (media)
 };
 
 const PARALLAX_RATIO = 0.2;
@@ -33,6 +35,7 @@ const ParallaxContainer = ({
   modulePosition,
   disableParallax,
   children,
+  style,
 }: ParallaxContainerProps) => {
   const imageContainerStyle = useAnimatedStyle(() => {
     const itemStartY = (modulePosition?.value ?? 0) + index * dimension.height;
@@ -45,7 +48,11 @@ const ParallaxContainer = ({
     const translateY = interpolate(
       scrollY.value,
       [itemStartY - dimension.height, itemStartY, itemEndY],
-      [-dimension.height * PARALLAX_RATIO, 0, 0],
+      [
+        -dimension.height * PARALLAX_RATIO,
+        0,
+        dimension.height * PARALLAX_RATIO,
+      ],
     );
 
     const containerRatio = dimension.width / dimension.height;
@@ -58,7 +65,7 @@ const ParallaxContainer = ({
 
   return (
     <View style={[styles.container, dimension]}>
-      <Animated.View style={imageContainerStyle}>
+      <Animated.View style={[imageContainerStyle, style]}>
         <CardModuleMediaItem
           media={media}
           dimension={dimension}

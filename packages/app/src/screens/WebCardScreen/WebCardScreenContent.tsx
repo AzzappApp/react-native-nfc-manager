@@ -17,7 +17,6 @@ import { useCurrentRoute, useRouter } from '#components/NativeRouter';
 import WebCardBackground from '#components/WebCardBackgroundPreview';
 import { getRouteForCardModule } from '#helpers/cardModuleRouterHelpers';
 import useBoolean from '#hooks/useBoolean';
-import useToggle from '#hooks/useToggle';
 import useCoverPlayPermission from '#screens/HomeScreen/useCoverPlayPermission';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import AddModuleSectionModal from './AddModuleSection/AddModuleSectionModal';
@@ -155,19 +154,13 @@ const WebCardScreenContent = ({
   // #endregion
 
   // #region New Module
-  const [showContentModal, toggleShowContentModal] = useToggle(false);
-
-  const onAddContent = useCallback(() => {
-    // @TODO: restore when templates are ready to be used instead of module picker
-    toggleShowContentModal();
-
-    Toast.hide();
-  }, [toggleShowContentModal]);
+  const [showContentModal, openContentModal, closeContentModal] =
+    useBoolean(false);
 
   const onRequestNewModule = useCallback(() => {
     Toast.hide();
-    toggleShowContentModal();
-  }, [toggleShowContentModal]);
+    openContentModal();
+  }, [openContentModal]);
 
   // #endregion
 
@@ -357,7 +350,7 @@ const WebCardScreenContent = ({
               <Suspense>
                 <WebCardScreenEditModeFooter
                   fromCreation={fromCreation}
-                  onAddContent={onAddContent}
+                  onAddContent={openContentModal}
                   onSkip={onDone}
                   webcard={webCard}
                 />
@@ -450,7 +443,7 @@ const WebCardScreenContent = ({
               onCloseCanceled={openWebcardColorPicker}
             />
             <AddModuleSectionModal
-              onClose={toggleShowContentModal}
+              close={closeContentModal}
               open={showContentModal}
               webCard={webCard}
             />
