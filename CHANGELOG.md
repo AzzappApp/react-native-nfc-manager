@@ -1,4 +1,4 @@
-## 1.4.1-canary.26
+## 1.4.1-canary.27
 
 * **fix:**  - **mediaPicker:** avoid onLibraryChange triggers when permission are full
 * **fix:**  - scrolling and contact details height ([#6176](https://github.com/AzzappApp/azzapp/pull/6176))
