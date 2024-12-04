@@ -1,4 +1,4 @@
-## 1.4.1-canary.24
+## 1.4.1-canary.25
 
 * **fix:**  - some issue on new module  ([#6190](https://github.com/AzzappApp/azzapp/pull/6190))
 * **fix:**  - **mediaPicker:** [#5084](https://github.com/AzzappApp/azzapp/pull/5084) listen to selection update ([#6188](https://github.com/AzzappApp/azzapp/pull/6188))
