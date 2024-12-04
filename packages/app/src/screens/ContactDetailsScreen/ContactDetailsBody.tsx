@@ -1,7 +1,8 @@
 import { Image } from 'expo-image';
 import { useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Linking, Platform, ScrollView, View } from 'react-native';
+import { Linking, Platform, View } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useScreenInsets from '#hooks/useScreenInsets';
