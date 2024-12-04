@@ -105,9 +105,11 @@ const addContact: MutationResolvers['addContact'] = async (
           number: phoneNumber.number,
         })) || [];
 
-    const birthday = profile.contactCard?.birthday?.selected
-      ? profile.contactCard.birthday.birthday?.split('T')[0]
-      : null;
+    const birthday =
+      profile.contactCard?.birthday?.birthday &&
+      profile.contactCard?.birthday.selected
+        ? profile.contactCard.birthday.birthday?.split('T')[0]
+        : null;
 
     const urls = (
       webCard?.userName ? [{ url: buildUserUrl(webCard.userName) }] : []

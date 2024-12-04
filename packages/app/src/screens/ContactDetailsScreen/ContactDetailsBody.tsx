@@ -8,9 +8,10 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
-import Icon from '#ui/Icon';
+import Icon, { SocialIcon } from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
+import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
 import type { Contact } from 'expo-contacts';
 
 type Props = {
@@ -43,6 +44,18 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
   }, [details]);
 
   const avatar = details?.image?.uri;
+
+  const birthday = details.birthday
+    ? new Date(
+        details.birthday.year ?? 0,
+        details.birthday.month,
+        details.birthday.day,
+      ).toLocaleDateString(undefined, {
+        year: details.birthday.year ? 'numeric' : undefined,
+        month: 'long',
+        day: 'numeric',
+      })
+    : null;
 
   return (
     <Container style={styles.container}>
@@ -107,7 +120,9 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
                 <Icon icon="mobile" />
                 <Text variant="smallbold">{phoneNumber.label}</Text>
               </View>
-              <Text>{phoneNumber.number}</Text>
+              <Text numberOfLines={1} style={styles.itemText}>
+                {phoneNumber.number}
+              </Text>
             </PressableNative>
           ))}
           {details.emails?.map(email => (
@@ -122,7 +137,9 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
                 <Icon icon="mail_line" />
                 <Text variant="smallbold">{email.label}</Text>
               </View>
-              <Text>{email.email}</Text>
+              <Text numberOfLines={1} style={styles.itemText}>
+                {email.email}
+              </Text>
             </PressableNative>
           ))}
           <View style={styles.item}>
@@ -135,8 +152,85 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
                 />
               </Text>
             </View>
-            <Text>{date}</Text>
+            <Text numberOfLines={1} style={styles.itemText}>
+              {date}
+            </Text>
           </View>
+          {details.urlAddresses?.map(urlAddress => (
+            <PressableNative
+              key={urlAddress.url}
+              style={styles.item}
+              onPress={() => {
+                if (urlAddress.url) {
+                  Linking.openURL(urlAddress.url);
+                }
+              }}
+            >
+              <View style={styles.label}>
+                <Icon icon="link" />
+                <Text variant="smallbold">
+                  {urlAddress.label || (
+                    <FormattedMessage
+                      defaultMessage="Url"
+                      description="ContactDetailsBody - Title for item URL with empty label"
+                    />
+                  )}
+                </Text>
+              </View>
+              <Text numberOfLines={1} style={styles.itemText}>
+                {urlAddress.url}
+              </Text>
+            </PressableNative>
+          ))}
+          {details.addresses?.map(address => (
+            <PressableNative key={address.street} style={styles.item}>
+              <View style={styles.label}>
+                <Icon icon="location" />
+                <Text variant="smallbold">{address.label}</Text>
+              </View>
+              <Text numberOfLines={1} style={styles.itemText}>
+                {address.street}
+              </Text>
+            </PressableNative>
+          ))}
+          {birthday && (
+            <PressableNative style={styles.item}>
+              <View style={styles.label}>
+                <Icon icon="calendar" />
+                <Text variant="smallbold">
+                  <FormattedMessage
+                    defaultMessage="Birthday"
+                    description="ContactDetailsBody - Title for birthday"
+                  />
+                </Text>
+              </View>
+              <Text numberOfLines={1} style={styles.itemText}>
+                {birthday}
+              </Text>
+            </PressableNative>
+          )}
+          {details.socialProfiles?.map(social => (
+            <PressableNative
+              key={social.url}
+              style={styles.item}
+              onPress={() => {
+                if (social.url) {
+                  Linking.openURL(social.url);
+                }
+              }}
+            >
+              <View style={styles.label}>
+                <SocialIcon
+                  icon={social.label as SocialLinkId}
+                  style={styles.social}
+                />
+                <Text variant="smallbold">{social.label}</Text>
+              </View>
+              <Text numberOfLines={1} style={styles.itemText}>
+                {social.url}
+              </Text>
+            </PressableNative>
+          ))}
         </ScrollView>
       </View>
     </Container>
@@ -196,6 +290,11 @@ const stylesheet = createStyleSheet(theme => ({
     justifyContent: 'space-between',
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 10,
+  },
+  itemText: {
+    flex: 1,
+    textAlign: 'right',
   },
   label: {
     flexDirection: 'row',
@@ -230,6 +329,10 @@ const stylesheet = createStyleSheet(theme => ({
     fontWeight: 500,
     lineHeight: 60,
     textTransform: 'uppercase',
+  },
+  social: {
+    width: 24,
+    height: 24,
   },
 }));
 

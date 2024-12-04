@@ -293,6 +293,9 @@ const icons = {
   get link() {
     return require('./assets/link.png');
   },
+  get location() {
+    return require('./assets/location_line.png');
+  },
   get locked() {
     return require('./assets/locked.png');
   },
