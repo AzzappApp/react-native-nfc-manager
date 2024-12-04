@@ -67,6 +67,15 @@ const useToggleLikePost = (
                   },
                 ) as unknown as string,
               });
+            } else if (error.message === ERRORS.REACTION_NOT_ALLOWED) {
+              Toast.show({
+                type: 'error',
+                text1: intl.formatMessage({
+                  defaultMessage: 'Likes are not allowed for this post',
+                  description:
+                    'Error when a user tries to like a post where likes are not allowed',
+                }) as unknown as string,
+              });
             } else {
               //add manual capture exception for testing issue
               Sentry.captureException(error, {

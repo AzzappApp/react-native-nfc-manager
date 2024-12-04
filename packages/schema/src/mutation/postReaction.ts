@@ -21,6 +21,10 @@ const togglePostReactionMutation: MutationResolvers['togglePostReaction'] =
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
 
+    if (reactionKind === 'like' && !post.allowLikes) {
+      throw new GraphQLError(ERRORS.REACTION_NOT_ALLOWED);
+    }
+
     const webCard = await webCardLoader.load(post.webCardId);
 
     if (!webCard) {

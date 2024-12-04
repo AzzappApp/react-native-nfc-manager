@@ -132,6 +132,10 @@ const ERRORS = {
    * The webCard cover media is missing
    */
   MISSING_COVER: 'MISSING_COVER',
+  /**
+   * The reaction is not allowed
+   */
+  REACTION_NOT_ALLOWED: 'REACTION_NOT_ALLOWED',
 } as const;
 
 export default ERRORS;
