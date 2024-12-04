@@ -1,5 +1,7 @@
-## 1.4.1-canary.28
+## 1.4.1-canary.29
 
+* **fix:**  - provided media ios ([#6196](https://github.com/AzzappApp/azzapp/pull/6196))
+* **feat:**  - show contact card elements ([#6180](https://github.com/AzzappApp/azzapp/pull/6180))
 * **fix:**  - **mediaPicker:** avoid onLibraryChange triggers when permission are full
 * **fix:**  - scrolling and contact details height ([#6176](https://github.com/AzzappApp/azzapp/pull/6176))
 * **fix:**  - some issue on new module  ([#6190](https://github.com/AzzappApp/azzapp/pull/6190))
