@@ -18,7 +18,7 @@ export type CloudinaryVideoProps = Omit<
   | 'width'
 > & {
   media: Media;
-  assetKind: 'cover' | 'post';
+  assetKind: 'cover' | 'module' | 'post';
   autoPlay?: boolean;
   loop?: boolean;
   alt: string;

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import CloudinaryImage from '#ui/CloudinaryImage';
+import CloudinaryVideo from '#ui/CloudinaryVideo';
 import styles from './Parallax.css';
 import type { Media } from '@azzapp/data';
 import type { ReactNode } from 'react';
@@ -64,20 +65,38 @@ const Parallax = ({
         return (
           <div key={media.id} className={styles.parallaxContainer}>
             <div key={media.id} className={styles.parallaxItem}>
-              <CloudinaryImage
-                mediaId={media.id}
-                draggable={false}
-                alt="parallax"
-                fill
-                format="auto"
-                quality="auto:best"
-                style={{
-                  objectFit: 'cover', // Ensures the image covers the container
-                  objectPosition: 'center', // Center the content
-                  transition: 'transform 0.1s ease-out',
-                  transform: `translateY(${offset}px)`, // Apply calculated offset
-                }}
-              />
+              {media.kind === 'video' ? (
+                <CloudinaryVideo
+                  assetKind="module"
+                  media={media}
+                  alt="cover"
+                  fluid
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover', // Ensures the video covers the container
+                    objectPosition: 'center', // Center the content
+                    transition: 'transform 0.1s ease-out',
+                    transform: `translateY(${offset}px)`,
+                  }}
+                  autoPlay={true}
+                />
+              ) : (
+                <CloudinaryImage
+                  mediaId={media.id}
+                  draggable={false}
+                  alt="parallax"
+                  fill
+                  format="auto"
+                  quality="auto:best"
+                  style={{
+                    objectFit: 'cover', // Ensures the image covers the container
+                    objectPosition: 'center', // Center the content
+                    transition: 'transform 0.1s ease-out',
+                    transform: `translateY(${offset}px)`, // Apply calculated offset
+                  }}
+                />
+              )}
             </div>
             {children?.({ mediaId: media.id })}
           </div>
