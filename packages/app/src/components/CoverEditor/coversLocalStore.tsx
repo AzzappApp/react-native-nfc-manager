@@ -33,8 +33,9 @@ const getCoverStore = () => {
   if (!userId) {
     return null;
   }
-  if (!coverStore) {
+  if (!coverStore || coverStore.getString('userId') !== userId) {
     coverStore = new MMKV({ id: `coverStore_${userId}` });
+    coverStore.set('userId', userId);
   }
   return coverStore;
 };
