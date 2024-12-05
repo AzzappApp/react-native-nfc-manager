@@ -1,5 +1,6 @@
-## 1.4.1-canary.30
+## 1.4.1-canary.31
 
+* **feat:**  - add alternation animation ([#6213](https://github.com/AzzappApp/azzapp/pull/6213))
 * **feat:**  - **modules:** [#5596](https://github.com/AzzappApp/azzapp/pull/5596) add alternation variant on web ([#6205](https://github.com/AzzappApp/azzapp/pull/6205))
 * **fix:**  - provided media ios ([#6196](https://github.com/AzzappApp/azzapp/pull/6196))
 * **feat:**  - show contact card elements ([#6180](https://github.com/AzzappApp/azzapp/pull/6180))
