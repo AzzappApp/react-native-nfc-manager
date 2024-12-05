@@ -292,11 +292,10 @@ const SocialInputComponent = ({
           filterText = filterText.substring(0, endIndex);
         }
       }
-
       if (
         isNotFalsyString(filterText) &&
         icon === 'website' &&
-        !localValue.includes('http')
+        !filterText.includes('http')
       ) {
         filterText = 'https://' + (filterText === 'h' ? '' : filterText);
       }
@@ -305,7 +304,7 @@ const SocialInputComponent = ({
         debouncedChangeLink(icon, filterText);
       }
     },
-    [debouncedChangeLink, icon, localValue, mask],
+    [debouncedChangeLink, icon, mask],
   );
 
   const intl = useIntl();
