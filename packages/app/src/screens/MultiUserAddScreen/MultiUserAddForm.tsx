@@ -257,6 +257,11 @@ const roles: Array<{ id: ProfileRole; label: ReactNode }> = [
   },
 ];
 
+const BOTTOM_SHEET_HEIGHT_BASE = 80;
+const ITEM_MARGIN_BOTTOM = 18;
+const ITEM_HEIGHT = 30;
+const BOTTOM_SHEET_HEIGHT_ITEM = ITEM_HEIGHT + ITEM_MARGIN_BOTTOM;
+
 const styleSheet = createStyleSheet(appearance => ({
   form: {
     paddingHorizontal: 10,
@@ -264,7 +269,7 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   selectItemContainerStyle: {
     paddingHorizontal: 30,
-    marginBottom: 18,
+    marginBottom: ITEM_MARGIN_BOTTOM,
   },
   selectTitle: {
     paddingBottom: 10,
@@ -281,7 +286,8 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   inputText: {
     color: appearance === 'light' ? colors.black : colors.white,
-    height: 30,
+    height: ITEM_HEIGHT,
+    verticalAlign: 'middle',
   },
   emailAdressContainer: {
     flexDirection: 'row',
@@ -296,8 +302,5 @@ const styleSheet = createStyleSheet(appearance => ({
     textDecorationLine: 'underline',
   },
 }));
-
-const BOTTOM_SHEET_HEIGHT_BASE = 80;
-const BOTTOM_SHEET_HEIGHT_ITEM = 40;
 
 export default MultiUserAddForm;
