@@ -89,11 +89,13 @@ const MediaTextModuleRenderer = ({
   switch (variant) {
     case 'alternation':
       return (
-        <CardModuleEditionScrollHandler>
+        <CardModuleEditionScrollHandler scrollPosition={scrollPosition}>
           <CardModuleMediaTextAlternation
             cardModuleMedias={data.cardModuleMedias!}
             cardModuleColor={data.cardModuleColor}
             viewMode={viewMode}
+            scrollPosition={scrollPosition}
+            disableAnimation={disableAnimation}
             {...props}
           />
         </CardModuleEditionScrollHandler>

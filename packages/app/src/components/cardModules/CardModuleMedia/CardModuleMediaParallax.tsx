@@ -1,9 +1,12 @@
+import { useCallback } from 'react';
 import { View } from 'react-native';
 import useScreenDimensions from '#hooks/useScreenDimensions';
 import ParallaxContainer from '../ParallaxContainer';
 import CardModulePressableTool from '../tool/CardModulePressableTool';
 import type {
+  CardModuleDimension,
   CardModuleMedia,
+  CardModuleSourceMedia,
   CardModuleVariantType,
 } from '../cardModuleEditorType';
 import type { LayoutChangeEvent } from 'react-native';
@@ -37,24 +40,54 @@ const CardModuleMediaParallax = ({
     <View onLayout={onLayout}>
       {medias.map(({ media }, index) => {
         return (
-          <CardModulePressableTool
-            onPress={setEditableItemIndex}
+          <ParallaxItem
+            key={`${media.id}_${index}`}
+            media={media}
+            dimension={dimension}
             index={index}
-            key={media.id}
-          >
-            <ParallaxContainer
-              key={media.id}
-              media={media}
-              dimension={dimension}
-              index={index}
-              scrollY={scrollPosition}
-              modulePosition={modulePosition}
-              disableParallax={disableParallax}
-            />
-          </CardModulePressableTool>
+            disableParallax={disableParallax}
+            setEditableItemIndex={setEditableItemIndex}
+            scrollPosition={scrollPosition}
+            modulePosition={modulePosition}
+          />
         );
       })}
     </View>
+  );
+};
+
+const ParallaxItem = ({
+  media,
+  dimension,
+  index,
+  scrollPosition,
+  modulePosition,
+  disableParallax,
+  setEditableItemIndex,
+}: {
+  media: CardModuleSourceMedia;
+  dimension: CardModuleDimension;
+  index: number;
+  scrollPosition: SharedValue<number>;
+  modulePosition?: SharedValue<number>;
+  disableParallax?: boolean;
+  setEditableItemIndex?: (index: number) => void;
+}) => {
+  const onPress = useCallback(() => {
+    setEditableItemIndex?.(index);
+  }, [index, setEditableItemIndex]);
+
+  return (
+    <CardModulePressableTool active={!!setEditableItemIndex} onPress={onPress}>
+      <ParallaxContainer
+        media={media}
+        dimension={dimension}
+        index={index}
+        scrollY={scrollPosition}
+        modulePosition={modulePosition}
+        disableParallax={disableParallax}
+      />
+    </CardModulePressableTool>
   );
 };
 

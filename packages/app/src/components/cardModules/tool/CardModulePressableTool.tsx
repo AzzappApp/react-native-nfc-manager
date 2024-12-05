@@ -1,22 +1,25 @@
-import { memo, useCallback } from 'react';
+import { memo } from 'react';
 import PressableNative from '#ui/PressableNative';
+import type { LayoutChangeEvent } from 'react-native';
 
 type CardModulePressableToolProps = {
-  onPress?: (index: number) => void;
-  index: number;
+  onPress?: () => void;
   children: React.ReactNode;
+  onLayout?: (event: LayoutChangeEvent) => void;
+  active: boolean;
 };
 const CardModulePressableTool = ({
   onPress,
   children,
-  index,
+  onLayout,
+  active,
 }: CardModulePressableToolProps) => {
-  const onPressItem = useCallback(() => {
-    onPress?.(index);
-  }, [index, onPress]);
-
-  if (onPress) {
-    return <PressableNative onPress={onPressItem}>{children}</PressableNative>;
+  if (active) {
+    return (
+      <PressableNative onLayout={onLayout} onPress={onPress}>
+        {children}
+      </PressableNative>
+    );
   }
   return children;
 };

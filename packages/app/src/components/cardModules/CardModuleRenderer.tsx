@@ -387,7 +387,10 @@ const CardModuleRenderer = <T extends ModuleRenderInfo>({
           }}
           scrollPosition={scrollPosition}
           modulePosition={modulePosition}
-          disableAnimation={viewMode === 'desktop' || editing === true}
+          disableAnimation={
+            viewMode === 'desktop' ||
+            (module.variant === 'parallax' && editing === true)
+          }
         />
       );
   }

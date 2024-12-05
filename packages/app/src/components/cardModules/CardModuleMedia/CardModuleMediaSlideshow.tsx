@@ -51,8 +51,14 @@ const CardModuleMediaSlideshow = ({
 
   const renderItem = useCallback(
     ({ item, index }: ListRenderItemInfo<CardModuleMedia>) => {
+      const onPress = setEditableItemIndex
+        ? () => setEditableItemIndex(index)
+        : undefined;
       return (
-        <CardModulePressableTool onPress={setEditableItemIndex} index={index}>
+        <CardModulePressableTool
+          active={!!setEditableItemIndex}
+          onPress={onPress}
+        >
           <SlideshowItem
             cardModuleMedia={item}
             index={index}
