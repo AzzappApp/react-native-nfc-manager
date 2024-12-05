@@ -1,4 +1,4 @@
-## 1.4.1-canary.34
+## 1.4.1-canary.35
 
 * **feat:**  - web - add video parallax ([#6216](https://github.com/AzzappApp/azzapp/pull/6216))
 * **fix:**  - 🐛 change mmkv store on auth change ([#6214](https://github.com/AzzappApp/azzapp/pull/6214))
