@@ -16,6 +16,7 @@ const Parallax = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const [startPosition, setStartPosition] = useState<number>(0);
   const [scrollY, setScrollY] = useState(0);
+  const [viewportHeight, setViewportHeight] = useState<number>(0);
 
   useEffect(() => {
     const updateStartPosition = () => {
@@ -24,11 +25,16 @@ const Parallax = ({
       setStartPosition(containerRef.current?.offsetTop ?? 0);
     };
 
+    const updateViewportHeight = () => {
+      setViewportHeight(window.innerHeight);
+    };
+
     const handleScroll = () => {
       setScrollY(window.scrollY);
     };
 
     updateStartPosition();
+    updateViewportHeight();
     handleScroll();
     window.addEventListener('resize', updateStartPosition);
     window.addEventListener('scroll', handleScroll);
@@ -40,7 +46,6 @@ const Parallax = ({
   }, []);
 
   const parallaxRatio = 0.2;
-  const viewportHeight = window.innerHeight;
 
   return (
     <div ref={containerRef} className={styles.moduleContainer}>

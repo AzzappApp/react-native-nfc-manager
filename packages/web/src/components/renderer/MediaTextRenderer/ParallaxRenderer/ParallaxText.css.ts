@@ -1,11 +1,7 @@
 import { style } from '@vanilla-extract/css';
 
 const textItem = style({
-  whiteSpace: 'pre-wrap',
-  wordBreak: 'break-word',
-  fontSize: 34,
   lineHeight: '1.2em',
-  margin: 0,
 });
 
 const textContainer = style({

@@ -19,6 +19,7 @@ export type ParallaxRendererProps = ModuleRendererProps<
   };
 
 const ParallaxRenderer = async ({
+  cardStyle,
   module,
   colorPalette,
   coverBackgroundColor,
@@ -44,6 +45,7 @@ const ParallaxRenderer = async ({
         medias={medias}
         data={module.data}
         colorPalette={colorPalette}
+        cardStyle={cardStyle}
       />
     </div>
   );
