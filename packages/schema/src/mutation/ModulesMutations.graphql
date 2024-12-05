@@ -72,12 +72,22 @@ extend type Mutation {
   ): SaveModulePayload!
 
   """
-  Save a media section, create it if it doesn't exist, update it otherwise
+  Save a media text section, create it if it doesn't exist, update it otherwise
   """
   saveMediaTextModule(
     webCardId: ID!
     input: SaveMediaTextModuleInput!
   ): SaveModulePayload!
+
+  """
+  Save a media text link section, create it if it doesn't exist, update it otherwise
+  """
+  saveMediaTextLinkModule(
+    webCardId: ID!
+    input: SaveMediaTextLinkModuleInput!
+  ): SaveModulePayload!
+
+  #INSERT_MODULE
 }
 
 type SaveModulePayload {
@@ -196,6 +206,12 @@ input MediaModuleInput {
   media: MediaModuleMedia!
   title: String
   text: String
+  link: ModuleMediaLinkInput
+}
+
+input ModuleMediaLinkInput {
+  label: String
+  url: String
 }
 
 input CardModuleColorInput {
@@ -215,6 +231,13 @@ input SaveMediaModuleInput {
 }
 
 input SaveMediaTextModuleInput {
+  moduleId: ID
+  variant: String!
+  cardModuleMedias: [MediaModuleInput!]!
+  cardModuleColor: CardModuleColorInput!
+}
+
+input SaveMediaTextLinkModuleInput {
   moduleId: ID
   variant: String!
   cardModuleMedias: [MediaModuleInput!]!

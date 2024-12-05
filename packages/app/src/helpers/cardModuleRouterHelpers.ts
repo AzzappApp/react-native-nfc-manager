@@ -1,6 +1,7 @@
 import {
   MODULE_KIND_MEDIA,
   MODULE_KIND_MEDIA_TEXT,
+  MODULE_KIND_MEDIA_TEXT_LINK,
 } from '@azzapp/shared/cardModuleHelpers';
 import type { Route } from '#routes';
 import type { ModuleKindWithVariant, Variant } from './webcardModuleHelpers';
@@ -31,6 +32,15 @@ export function getRouteForCardModule({
           variant: variant as Variant<typeof MODULE_KIND_MEDIA_TEXT>,
         },
       };
+    case MODULE_KIND_MEDIA_TEXT_LINK:
+      return {
+        route: 'CARD_MODULE_MEDIA_TEXT_LINK_EDITION',
+        params: {
+          moduleId,
+          variant: variant as Variant<typeof MODULE_KIND_MEDIA_TEXT_LINK>,
+        },
+      };
+    //INSERT_MODULE
     case 'photoWithTextAndTitle':
     case 'socialLinks':
     case 'blockText':

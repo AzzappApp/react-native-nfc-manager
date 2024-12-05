@@ -19,6 +19,7 @@ import {
   MODULE_KIND_LINE_DIVIDER,
   MODULE_KIND_MEDIA,
   MODULE_KIND_MEDIA_TEXT,
+  MODULE_KIND_MEDIA_TEXT_LINK,
   MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE,
   MODULE_KIND_SIMPLE_BUTTON,
   MODULE_KIND_SIMPLE_TEXT,
@@ -223,6 +224,44 @@ export const MODULES_SAVE_RULES: {
         .filter(n => n !== null);
     },
   },
+  [MODULE_KIND_MEDIA_TEXT]: {
+    validator: z.object({
+      cardModuleMedias: z
+        .array(
+          z.object({
+            media: z.object({ id: z.string() }),
+          }),
+        )
+        .min(1),
+    }),
+    getMedias: (module: {
+      cardModuleMedias: Array<{ media: { id: string } }>;
+    }) => {
+      const { cardModuleMedias } = module;
+      return cardModuleMedias
+        .map(mediaModules => mediaModules.media.id)
+        .filter(n => n !== null);
+    },
+  },
+  [MODULE_KIND_MEDIA_TEXT_LINK]: {
+    validator: z.object({
+      cardModuleMedias: z
+        .array(
+          z.object({
+            media: z.object({ id: z.string() }),
+          }),
+        )
+        .min(1),
+    }),
+    getMedias: (module: {
+      cardModuleMedias: Array<{ media: { id: string } }>;
+    }) => {
+      const { cardModuleMedias } = module;
+      return cardModuleMedias
+        .map(mediaModules => mediaModules.media.id)
+        .filter(n => n !== null);
+    },
+  },
 };
 
 export const saveBlockTextModule: MutationResolvers['saveBlockTextModule'] =
@@ -261,3 +300,8 @@ export const saveMediaModule: MutationResolvers['saveMediaModule'] =
 
 export const saveMediaTextModule: MutationResolvers['saveMediaTextModule'] =
   createModuleSavingMutation(MODULE_KIND_MEDIA_TEXT);
+
+export const saveMediaTextLinkModule: MutationResolvers['saveMediaTextLinkModule'] =
+  createModuleSavingMutation(MODULE_KIND_MEDIA_TEXT_LINK);
+
+//INSERT_MODULE

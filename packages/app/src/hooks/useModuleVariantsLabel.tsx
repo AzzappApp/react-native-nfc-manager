@@ -82,6 +82,20 @@ export function useVariantLabel({
             description: 'useModuleVariant - Module media text Parallax',
           });
       }
+      break;
+    case 'mediaTextLink':
+      switch (variant) {
+        case 'alternation':
+          return intl.formatMessage({
+            defaultMessage: 'Alternation',
+            description: 'useModuleVariant - Module media text Alternation',
+          });
+        case 'parallax':
+          return intl.formatMessage({
+            defaultMessage: 'Parallax',
+            description: 'useModuleVariant - Module media text Parallax',
+          });
+      }
     //INSERT_MODULE
   }
 }
@@ -105,6 +119,12 @@ export function useModuleLabel(section: ModuleKindSectionName) {
       return intl.formatMessage({
         defaultMessage: 'Media with text',
         description: 'useModuleVariant - Module media text',
+      });
+    case 'mediaTextLink':
+      return intl.formatMessage({
+        defaultMessage: 'Media with text & link',
+        description:
+          'CardModuleHeader - Media Text & link section header title',
       });
     //INSERT_MODULE
   }

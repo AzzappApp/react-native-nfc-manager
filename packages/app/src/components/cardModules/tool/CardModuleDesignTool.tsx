@@ -179,6 +179,20 @@ export const getPictureUri = (
         default:
           return null;
       }
+    case 'mediaTextLink':
+      switch (module.variant) {
+        case 'alternation':
+          return colorScheme === 'light'
+            ? require('./assets/media_text_link_alternation_light.png')
+            : require('./assets/media_text_link_alternation_dark.png');
+
+        case 'parallax':
+          return colorScheme === 'light'
+            ? require('./assets/media_text_link_parallax_light.png')
+            : require('./assets/media_text_link_parallax_dark.png');
+        default:
+          return null;
+      }
     default:
       return null;
   }

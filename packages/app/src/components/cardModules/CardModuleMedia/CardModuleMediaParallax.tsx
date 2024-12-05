@@ -33,7 +33,7 @@ const CardModuleMediaParallax = ({
   const dimension = providedDimension ?? screenDimension;
   if (!scrollPosition) {
     throw new Error(
-      'CardModuleParallax : the parallax component require a scrollPosition',
+      'CardModuleMediaParallax : the parallax component require a scrollPosition',
     );
   }
   return (

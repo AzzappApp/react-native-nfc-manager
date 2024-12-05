@@ -38,6 +38,7 @@ enum CardModuleKind {
   socialLinks
   media
   mediaText
+  mediaTextLink
   #INSERT_MODULE: add new module kind here
 }
 
@@ -468,12 +469,48 @@ type CardModuleMediaText implements CardModule {
   cardModuleColor: CardModuleColor!
 }
 
+"""
+User Card module : Media
+"""
+type CardModuleMediaTextLink implements CardModule {
+  """
+  User Card module id, unique between all modules (but not a node id)
+  """
+  id: ID!
+
+  """
+  User Card module kind
+  """
+  kind: CardModuleKind!
+
+  """
+  User Card module visibility
+  """
+  visible: Boolean!
+  """
+  The variant design of the module
+  """
+  variant: String
+
+  cardModuleMedias: [ModuleMedia!]!
+  """
+  The cardModule color , in some case it can be null (parallax media)
+  """
+  cardModuleColor: CardModuleColor!
+}
+
 #INSERT_MODULE: add new module kind  type here
 
 type ModuleMedia {
   media: Media!
   title: String
   text: String
+  link: ModuleMediaLink
+}
+
+type ModuleMediaLink {
+  label: String!
+  url: String!
 }
 
 # this represent the 5 circle layer of color choice, someModule will only use one of them, some will use multiple

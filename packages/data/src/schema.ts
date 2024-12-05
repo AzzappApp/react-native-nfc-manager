@@ -12,6 +12,7 @@ import type {
   CardModuleLineDividerData,
   CardModuleMediaData,
   CardModuleMediaTextData,
+  CardModuleMediaTextLinkData,
 } from '@azzapp/shared/cardModuleHelpers';
 import type {
   CommonInformation,
@@ -83,6 +84,12 @@ export type CardModuleMediaText = CardModuleBase & {
   data: CardModuleMediaTextData;
 };
 
+export type CardModuleMediaTextLink = CardModuleBase & {
+  data: CardModuleMediaTextLinkData;
+};
+
+//INSERT_MODULE : new type
+
 export type CardModule =
   | CardModuleBlockText
   | CardModuleCarousel
@@ -90,11 +97,12 @@ export type CardModule =
   | CardModuleLineDivider
   | CardModuleMedia
   | CardModuleMediaText
+  | CardModuleMediaTextLink
   | CardModulePhotoWithTextAndTitle
   | CardModuleSimpleButton
   | CardModuleSimpleText
   | CardModuleSocialLinks;
-//INSERT_MODULE: add more section here
+//INSERT_MODULE
 
 // #endregion
 

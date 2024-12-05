@@ -10,7 +10,15 @@ export type MediaTextSectionRoute = {
   params: { variant: Variant<'mediaText'>; moduleId?: string };
 };
 
-export type SectionsRoute = MediaSectionRoute | MediaTextSectionRoute;
+export type MediaTextLinkSectionRoute = {
+  route: 'CARD_MODULE_MEDIA_TEXT_LINK_EDITION';
+  params: { variant: Variant<'mediaTextLink'>; moduleId?: string };
+};
+
+export type SectionsRoute =
+  | MediaSectionRoute
+  | MediaTextLinkSectionRoute
+  | MediaTextSectionRoute;
 /**
  * The type `MediaSectionRoute` represents a route for editing media content within a card module.
  * @property route - The `route` property in the `MediaSectionRoute` type specifies the specific route

@@ -12,7 +12,7 @@ import { graphql, useFragment, useMutation } from 'react-relay';
 import { DEFAULT_COLOR_PALETTE, swapColor } from '@azzapp/shared/cardHelpers';
 import { type CardModuleColor } from '@azzapp/shared/cardModuleHelpers';
 import CardModuleBottomBar from '#components/cardModules/CardModuleBottomBar';
-import MediaTextModuleRenderer from '#components/cardModules/CardModuleMediaText/MediaTextModuleRenderer';
+import MediaTextLinkModuleRenderer from '#components/cardModules/CardModuleMediaTextLink/MediaTextLinkModuleRenderer';
 import CardModulePreviewContainer from '#components/cardModules/tool/CardModulePreviewContainer';
 import { useRouter } from '#components/NativeRouter';
 import { getInitalDyptichColor } from '#helpers/cardModuleColorsHelpers';
@@ -23,16 +23,17 @@ import {
 } from '#helpers/cardModuleHelpers';
 import withWebCardSection from '../../components/cardModules/withCardModule';
 import type { CardModuleMedia } from '#components/cardModules/cardModuleEditorType';
-import type { MediaTextModuleWebCardEditionScreen_module$key } from '#relayArtifacts/MediaTextModuleWebCardEditionScreen_module.graphql';
-import type { MediaTextModuleWebCardEditionScreenMutation } from '#relayArtifacts/MediaTextModuleWebCardEditionScreenMutation.graphql';
+import type { MediaTextLinkModuleWebCardEditionScreen_module$key } from '#relayArtifacts/MediaTextLinkModuleWebCardEditionScreen_module.graphql';
+import type { MediaTextLinkModuleWebCardEditionScreenMutation } from '#relayArtifacts/MediaTextLinkModuleWebCardEditionScreenMutation.graphql';
+
 import type {
   CardModuleProps,
   ModuleWebCardScreenHandle,
 } from '../../components/cardModules/withCardModule';
 import type { ForwardedRef } from 'react';
 
-const mediaTextModuleWebCardEditionScreenQuery = graphql`
-  query MediaTextModuleWebCardEditionScreenQuery($profileId: ID!) {
+const mediaTextLinkModuleWebCardEditionScreenQuery = graphql`
+  query MediaTextLinkModuleWebCardEditionScreenQuery($profileId: ID!) {
     profile: node(id: $profileId) {
       ... on Profile {
         webCard {
@@ -42,7 +43,7 @@ const mediaTextModuleWebCardEditionScreenQuery = graphql`
             # and relay is not able to find it properly
             # module: cardModule(moduleId: $moduleId) {
             id
-            ...MediaTextModuleWebCardEditionScreen_module
+            ...MediaTextLinkModuleWebCardEditionScreen_module
           }
         }
       }
@@ -50,11 +51,11 @@ const mediaTextModuleWebCardEditionScreenQuery = graphql`
   }
 `;
 
-type MediaTextModuleWebCardEditionScreenProps = CardModuleProps<
-  'mediaText',
-  MediaTextModuleWebCardEditionScreen_module$key
+type MediaTextLinkModuleWebCardEditionScreenProps = CardModuleProps<
+  'mediaTextLink',
+  MediaTextLinkModuleWebCardEditionScreen_module$key
 >;
-const MediaTextModuleWebCardEditionScreen = (
+const MediaTextLinkModuleWebCardEditionScreen = (
   {
     webCard,
     setCanSave,
@@ -66,7 +67,7 @@ const MediaTextModuleWebCardEditionScreen = (
     scaleFactor,
     editableItemIndex,
     setEditableItemIndex,
-  }: MediaTextModuleWebCardEditionScreenProps,
+  }: MediaTextLinkModuleWebCardEditionScreenProps,
   ref: ForwardedRef<ModuleWebCardScreenHandle>,
 ) => {
   // #region hook
@@ -76,7 +77,7 @@ const MediaTextModuleWebCardEditionScreen = (
   /** @type {*} */
   const data = useFragment(
     graphql`
-      fragment MediaTextModuleWebCardEditionScreen_module on CardModuleMediaText
+      fragment MediaTextLinkModuleWebCardEditionScreen_module on CardModuleMediaTextLink
       @argumentDefinitions(
         screenWidth: { type: "Float!", provider: "ScreenWidth.relayprovider" }
         pixelRatio: { type: "Float!", provider: "PixelRatio.relayprovider" }
@@ -97,6 +98,10 @@ const MediaTextModuleWebCardEditionScreen = (
         cardModuleMedias {
           text
           title
+          link {
+            url
+            label
+          }
           media {
             id
             ... on MediaImage {
@@ -105,7 +110,8 @@ const MediaTextModuleWebCardEditionScreen = (
             }
             ... on MediaVideo {
               #will be use when we are gonna stop playing a video. still TODO
-              thumbnail(
+              thumbnail(width: $screenWidth, pixelRatio: $pixelRatio)
+              smallThumbnail: thumbnail(
                 width: 125 #use for the small preview in toolbox
                 pixelRatio: $cappedPixelRatio
               )
@@ -128,13 +134,13 @@ const MediaTextModuleWebCardEditionScreen = (
   );
 
   // #region Mutations and saving logic
-  const [commit] = useMutation<MediaTextModuleWebCardEditionScreenMutation>(
+  const [commit] = useMutation<MediaTextLinkModuleWebCardEditionScreenMutation>(
     graphql`
-      mutation MediaTextModuleWebCardEditionScreenMutation(
+      mutation MediaTextLinkModuleWebCardEditionScreenMutation(
         $webCardId: ID!
-        $input: SaveMediaTextModuleInput!
+        $input: SaveMediaTextLinkModuleInput!
       ) {
-        saveMediaTextModule(webCardId: $webCardId, input: $input) {
+        saveMediaTextLinkModule(webCardId: $webCardId, input: $input) {
           webCard {
             id
             requiresSubscription
@@ -142,7 +148,7 @@ const MediaTextModuleWebCardEditionScreen = (
               id
               kind
               visible
-              ...MediaTextModuleWebCardEditionScreen_module
+              ...MediaTextLinkModuleWebCardEditionScreen_module
             }
           }
         }
@@ -162,6 +168,7 @@ const MediaTextModuleWebCardEditionScreen = (
             cardModuleMedias: moduleMedias.map(mediaMod => ({
               text: mediaMod.text,
               title: mediaMod.title,
+              link: mediaMod.link,
               media: {
                 id: mediaMod.media.id,
               },
@@ -191,7 +198,7 @@ const MediaTextModuleWebCardEditionScreen = (
         type: 'error',
         text1: intl.formatMessage({
           defaultMessage:
-            'Could not save your Media Text module, medias upload failed',
+            'Could not save your Media Text & link module, medias upload failed',
           description:
             'Error toast message when saving a carousel module failed because medias upload failed.',
         }),
@@ -243,7 +250,7 @@ const MediaTextModuleWebCardEditionScreen = (
         )}
         scaleFactor={scaleFactor}
       >
-        <MediaTextModuleRenderer
+        <MediaTextLinkModuleRenderer
           data={{
             cardModuleColor: selectedCardModuleColor,
             cardModuleMedias,
@@ -273,12 +280,12 @@ const MediaTextModuleWebCardEditionScreen = (
   );
 };
 
-const MODULE_KIND = 'mediaText';
+const MODULE_KIND = 'mediaTextLink';
 
 export default withWebCardSection(
-  forwardRef(MediaTextModuleWebCardEditionScreen),
+  forwardRef(MediaTextLinkModuleWebCardEditionScreen),
   {
-    query: mediaTextModuleWebCardEditionScreenQuery,
+    query: mediaTextLinkModuleWebCardEditionScreenQuery,
     moduleKind: MODULE_KIND,
   },
 );

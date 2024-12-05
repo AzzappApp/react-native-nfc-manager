@@ -1139,7 +1139,7 @@ type CardModuleWithMedia = {
     media: { id: string };
     text?: string;
     title?: string;
-    link?: string;
+    link?: { url: string; label: string };
   }>;
 };
 export type CardModuleMediaData = CardModuleCommon & CardModuleWithMedia;
@@ -1153,7 +1153,15 @@ export type CardModuleMediaTextData = CardModuleCommon & CardModuleWithMedia;
 
 // #endregion
 
-// #Add new module here
+//#region Media Text
+export const MODULE_KIND_MEDIA_TEXT_LINK = 'mediaTextLink';
+
+export type CardModuleMediaTextLinkData = CardModuleCommon &
+  CardModuleWithMedia;
+
+// #endregion
+
+// #INSERT_MODOLE
 
 //#region Commons
 export const MODULE_KINDS = [
@@ -1168,6 +1176,8 @@ export const MODULE_KINDS = [
   MODULE_KIND_SOCIAL_LINKS,
   MODULE_KIND_MEDIA,
   MODULE_KIND_MEDIA_TEXT,
+  MODULE_KIND_MEDIA_TEXT_LINK,
+  //INSERT_MODULE
 ] as const;
 
 export const MODULES_STYLES_VALUES = {
@@ -1183,6 +1193,7 @@ export const MODULES_STYLES_VALUES = {
   [MODULE_KIND_SOCIAL_LINKS]: {},
   [MODULE_KIND_MEDIA]: {},
   [MODULE_KIND_MEDIA_TEXT]: {},
+  [MODULE_KIND_MEDIA_TEXT_LINK]: {},
 } as const;
 
 export const MODULES_DEFAULT_VALUES = {
@@ -1198,6 +1209,7 @@ export const MODULES_DEFAULT_VALUES = {
   [MODULE_KIND_SOCIAL_LINKS]: SOCIAL_LINKS_DEFAULT_VALUES,
   [MODULE_KIND_MEDIA]: {},
   [MODULE_KIND_MEDIA_TEXT]: {},
+  [MODULE_KIND_MEDIA_TEXT_LINK]: {},
 } as const;
 
 export type ModuleKind = (typeof MODULE_KINDS)[number];

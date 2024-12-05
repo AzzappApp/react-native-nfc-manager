@@ -1,8 +1,11 @@
 import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet, View } from 'react-native';
+import { Linking, View } from 'react-native';
+import { shadow } from '#theme';
 import { getTextStyle, getTitleStyle } from '#helpers/cardModuleHelpers';
+import { useStyleSheet, createStyleSheet } from '#helpers/createStyles';
 import useScreenDimensions from '#hooks/useScreenDimensions';
+import Button from '#ui/Button';
 import Text from '#ui/Text';
 import ParallaxContainer from '../ParallaxContainer';
 import CardModulePressableTool from '../tool/CardModulePressableTool';
@@ -16,7 +19,7 @@ import type { CardModuleColor } from '@azzapp/shared/cardModuleHelpers';
 import type { LayoutChangeEvent } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 
-type CardModuleMediaTextParallaxProps = CardModuleVariantType & {
+type CardModuleMediaTextLinkParallaxProps = CardModuleVariantType & {
   cardModuleMedias: CardModuleMedia[];
   onLayout?: (event: LayoutChangeEvent) => void;
   disableParallax?: boolean;
@@ -24,8 +27,7 @@ type CardModuleMediaTextParallaxProps = CardModuleVariantType & {
   modulePosition?: SharedValue<number>;
 };
 
-const CardModuleMediaTextParallax = ({
-  viewMode,
+const CardModuleMediaTextLinkParallax = ({
   cardModuleMedias,
   cardModuleColor,
   dimension: providedDimension,
@@ -35,18 +37,16 @@ const CardModuleMediaTextParallax = ({
   cardStyle,
   disableParallax,
   setEditableItemIndex,
-}: CardModuleMediaTextParallaxProps) => {
+  viewMode,
+}: CardModuleMediaTextLinkParallaxProps) => {
   const screenDimension = useScreenDimensions();
   const dimension = providedDimension ?? screenDimension;
 
   if (!scrollPosition) {
     throw new Error(
-      'CardModuleMediaTextParallax : the parallax component require a scrollPosition',
+      'CardModuleMediaTextLinkParallax : the parallax component require a scrollPosition',
     );
   }
-  // the background color is set with an opacity of 0.8 have to be applied
-  // on both view and container. if not on view in webcard preview
-
   return (
     <View onLayout={onLayout}>
       {cardModuleMedias.map((cardModuleMedia, index) => {
@@ -93,9 +93,16 @@ const ParallaxItem = ({
   modulePosition?: SharedValue<number>;
   viewMode: 'desktop' | 'mobile';
 }) => {
+  const styles = useStyleSheet(stylesheet);
   const onPress = useCallback(() => {
     setEditableItemIndex?.(index);
   }, [index, setEditableItemIndex]);
+
+  const openLink = () => {
+    if (cardModuleMedia.link?.url) {
+      Linking.openURL(cardModuleMedia.link?.url ?? '');
+    }
+  };
 
   const intl = useIntl();
 
@@ -107,9 +114,12 @@ const ParallaxItem = ({
         dimension={dimension}
         media={cardModuleMedia.media}
         index={index}
+        key={`${cardModuleMedia.media.id}_{index}`}
         disableParallax={disableParallax}
         imageStyle={styles.opacityImage}
-        imageContainerStyle={{ backgroundColor: cardModuleColor.background }}
+        imageContainerStyle={{
+          backgroundColor: cardModuleColor.background,
+        }}
       >
         <View style={styles.textContainer}>
           <Text
@@ -138,13 +148,32 @@ const ParallaxItem = ({
                   'Card Module Media Text - Media default description',
               })}
           </Text>
+          <Button
+            label={
+              cardModuleMedia.link?.label ??
+              intl.formatMessage({
+                defaultMessage: 'Open',
+                description:
+                  'CardModuleTextLinkAlternation - defaut action button label',
+              })
+            }
+            style={[
+              {
+                borderRadius: cardStyle?.buttonRadius,
+                backgroundColor: cardModuleColor.content,
+              },
+              styles.buttonLink,
+            ]}
+            textStyle={{ color: cardModuleColor.graphic }}
+            onPress={openLink}
+          />
         </View>
       </ParallaxContainer>
     </CardModulePressableTool>
   );
 };
 
-const styles = StyleSheet.create({
+const stylesheet = createStyleSheet(appearance => ({
   opacityImage: { opacity: 0.8 },
   textContainer: {
     justifyContent: 'center',
@@ -156,11 +185,20 @@ const styles = StyleSheet.create({
     left: 0,
     width: '100%',
     height: '100%',
-    backgroundColor: 'transparent',
   },
   textStyle: {
     textAlign: 'center',
   },
-});
+  buttonLink: {
+    ...shadow(appearance, 'bottom'), //need specification on shadow
+    overflow: 'visible',
+    height: 54,
+  },
+  bottomContainer: {
+    justifyContent: 'center',
+    flex: 1,
+    rowGap: 20,
+  },
+}));
 
-export default CardModuleMediaTextParallax;
+export default CardModuleMediaTextLinkParallax;

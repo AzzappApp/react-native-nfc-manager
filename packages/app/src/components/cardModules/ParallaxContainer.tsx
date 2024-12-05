@@ -22,7 +22,8 @@ type ParallaxContainerProps = {
   disableParallax?: boolean;
   modulePosition?: SharedValue<number>;
   children?: ReactNode | undefined;
-  style?: ViewStyle; // some variant need opacity and backgroundcolor (mediaText) but not other (media)
+  imageStyle?: ViewStyle; // some variant need opacity and backgroundcolor (mediaText) but not other (media)
+  imageContainerStyle?: ViewStyle; // some variant need opacity and backgroundcolor (mediaText) but not other (media)
 };
 
 const PARALLAX_RATIO = 0.2;
@@ -35,9 +36,10 @@ const ParallaxContainer = ({
   modulePosition,
   disableParallax,
   children,
-  style,
+  imageStyle,
+  imageContainerStyle,
 }: ParallaxContainerProps) => {
-  const imageContainerStyle = useAnimatedStyle(() => {
+  const animatedImageContainerStyle = useAnimatedStyle(() => {
     const itemStartY = (modulePosition?.value ?? 0) + index * dimension.height;
     const itemEndY = itemStartY + dimension.height;
 
@@ -65,13 +67,14 @@ const ParallaxContainer = ({
 
   return (
     <View style={[styles.container, dimension]}>
-      <Animated.View style={[imageContainerStyle, style]}>
+      <Animated.View style={[animatedImageContainerStyle, imageContainerStyle]}>
         <CardModuleMediaItem
           media={media}
           dimension={dimension}
           imageStyle={{
             width: dimension.width,
             height: dimension.height * (1 + PARALLAX_RATIO),
+            ...imageStyle,
           }}
         />
       </Animated.View>

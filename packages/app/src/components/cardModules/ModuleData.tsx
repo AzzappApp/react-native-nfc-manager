@@ -6,6 +6,7 @@ import {
   MODULE_KIND_LINE_DIVIDER,
   MODULE_KIND_MEDIA,
   MODULE_KIND_MEDIA_TEXT,
+  MODULE_KIND_MEDIA_TEXT_LINK,
   MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE,
   MODULE_KIND_SIMPLE_BUTTON,
   MODULE_KIND_SIMPLE_TEXT,
@@ -16,6 +17,7 @@ import { isDefined } from '@azzapp/shared/isDefined';
 import { readMediaModuleData } from '#components/cardModules/CardModuleMedia/MediaModuleRenderer';
 import { readBlockTextData } from './BlockTextRenderer';
 import { readMediaTextModuleData } from './CardModuleMediaText/MediaTextModuleRenderer';
+import { readMediaTextLinkModuleData } from './CardModuleMediaTextLink/MediaTextLinkModuleRenderer';
 import { readCarouselData } from './CarouselRenderer/CarouselRenderer';
 import { readHorizontalPhotoData } from './HorizontalPhotoRenderer';
 import { readLineDividerData } from './LineDividerRenderer';
@@ -28,6 +30,7 @@ import type { CarouselRenderer_module$key } from '#relayArtifacts/CarouselRender
 import type { HorizontalPhotoRenderer_module$key } from '#relayArtifacts/HorizontalPhotoRenderer_module.graphql';
 import type { LineDividerRenderer_module$key } from '#relayArtifacts/LineDividerRenderer_module.graphql';
 import type { MediaModuleRenderer_module$key } from '#relayArtifacts/MediaModuleRenderer_module.graphql';
+import type { MediaTextLinkModuleRenderer_module$key } from '#relayArtifacts/MediaTextLinkModuleRenderer_module.graphql';
 import type { MediaTextModuleRenderer_module$key } from '#relayArtifacts/MediaTextModuleRenderer_module.graphql';
 import type { ModuleData_cardModules$key } from '#relayArtifacts/ModuleData_cardModules.graphql';
 import type { PhotoWithTextAndTitleRenderer_module$key } from '#relayArtifacts/PhotoWithTextAndTitleRenderer_module.graphql';
@@ -51,6 +54,9 @@ export type ModuleReadInfo =
       kind: typeof MODULE_KIND_LINE_DIVIDER;
     })
   | (MediaModuleRenderer_module$key & { kind: typeof MODULE_KIND_MEDIA })
+  | (MediaTextLinkModuleRenderer_module$key & {
+      kind: typeof MODULE_KIND_MEDIA_TEXT_LINK;
+    })
   | (MediaTextModuleRenderer_module$key & {
       kind: typeof MODULE_KIND_MEDIA_TEXT;
     })
@@ -95,6 +101,8 @@ export const readModuleData = (module: ModuleReadInfo) => {
       return readMediaModuleData(module);
     case MODULE_KIND_MEDIA_TEXT:
       return readMediaTextModuleData(module);
+    case MODULE_KIND_MEDIA_TEXT_LINK:
+      return readMediaTextLinkModuleData(module);
     //INSERT_MODULE: add more case here
   }
 };
@@ -116,6 +124,7 @@ const ModulesDataFragment = graphql`
     ...CarouselRenderer_module
     ...MediaModuleRenderer_module
     ...MediaTextModuleRenderer_module
+    ...MediaTextLinkModuleRenderer_module
     #INSERT_MODULE: add more case here
   }
 `;

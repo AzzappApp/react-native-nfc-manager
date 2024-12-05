@@ -35,6 +35,7 @@ export type CardModuleMedia = {
   media: CardModuleSourceMedia; //editable has nothing to do in the SourceMediaImage
   title?: string;
   text?: string;
+  link?: { url: string; label: string };
   // this boolean will tell us we need to update the new media in the database
   // we can't use anymore the existence of id for this, because we can have a new media with the ID local/ pexel etc
   needDbUpdate?: boolean;

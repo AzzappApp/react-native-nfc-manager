@@ -18,7 +18,6 @@ const withSwapCardModuleColor = <
 ) => {
   const WithSwappedColors = (props: WithSwappedColorsProps<T, V>) => {
     const { data, colorPalette } = props;
-
     const swappedColor = useMemo(
       () => swapModuleColor(data.cardModuleColor, colorPalette),
       [colorPalette, data.cardModuleColor],

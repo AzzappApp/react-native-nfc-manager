@@ -10,7 +10,7 @@ import PressableNative from '#ui/PressableNative';
 import SafeAreaView from '#ui/SafeAreaView';
 import TabsBar from '#ui/TabsBar';
 import Text from '#ui/Text';
-import AddContentBelowCoverSections from './CardModuleSectionList';
+import CardModuleSectionList from './CardModuleSectionList';
 import CardTemplatesList from './CardTemplatesList';
 import type { CardTemplatesList_webCard$key } from '#relayArtifacts/CardTemplatesList_webCard.graphql';
 
@@ -78,9 +78,7 @@ const AddModuleSectionModal = ({ open, close, webCard: webCardKey }: Props) => {
             tabs={tabs}
             decoration="underline"
           />
-          {currentTab === 'sections' && (
-            <AddContentBelowCoverSections close={close} />
-          )}
+          {currentTab === 'sections' && <CardModuleSectionList close={close} />}
           {currentTab === 'templates' && (
             <CardTemplatesList webCardKey={webCardKey} />
           )}

@@ -129,9 +129,147 @@ export const dyptichByModuleVariant = (
           ];
       }
       break;
+    case 'mediaTextLink':
+      switch (module.variant) {
+        case 'alternation':
+          return [
+            {
+              background: 'light',
+              content: 'primary',
+              title: 'dark',
+              text: 'dark',
+              graphic: 'light',
+            },
+            {
+              background: 'light',
+              content: 'dark',
+              title: 'dark',
+              text: 'dark',
+              graphic: 'light',
+            },
+            {
+              background: 'light',
+              content: 'dark',
+              title: 'primary',
+              text: 'dark',
+              graphic: 'light',
+            },
+            {
+              background: 'dark',
+              content: 'primary',
+              title: 'light',
+              text: 'light',
+              graphic: 'light',
+            },
+            {
+              background: 'dark',
+              content: 'light',
+              title: 'light',
+              text: 'light',
+              graphic: 'dark',
+            },
+            {
+              background: 'dark',
+              content: 'light',
+              title: 'primary',
+              text: 'light',
+              graphic: 'dark',
+            },
+            {
+              background: 'primary',
+              content: 'light',
+              title: 'light',
+              text: 'light',
+              graphic: 'dark',
+            },
+            {
+              background: 'primary',
+              content: 'dark',
+              title: 'light',
+              text: 'light',
+              graphic: 'light',
+            },
+            {
+              background: 'primary',
+              content: 'dark',
+              title: 'dark',
+              text: 'dark',
+              graphic: 'light',
+            },
+            {
+              background: 'primary',
+              content: 'light',
+              title: 'dark',
+              text: 'dark',
+              graphic: 'dark',
+            },
+          ];
+        case 'parallax':
+          return [
+            {
+              background: 'dark',
+              content: 'light',
+              title: 'light',
+              text: 'light',
+              graphic: 'dark',
+            },
+            {
+              background: 'dark',
+              content: 'primary',
+              title: 'light',
+              text: 'light',
+              graphic: 'light',
+            },
+            {
+              background: 'light',
+              content: 'dark',
+              title: 'dark',
+              text: 'dark',
+              graphic: 'light',
+            },
+            {
+              background: 'light',
+              content: 'primary',
+              title: 'dark',
+              text: 'dark',
+              graphic: 'light',
+            },
+            {
+              background: 'primary',
+              content: 'dark',
+              title: 'dark',
+              text: 'dark',
+              graphic: 'light',
+            },
+            {
+              background: 'primary',
+              content: 'light',
+              title: 'dark',
+              text: 'dark',
+              graphic: 'dark',
+            },
+            {
+              background: 'primary',
+              content: 'light',
+              title: 'light',
+              text: 'light',
+              graphic: 'dark',
+            },
+            {
+              background: 'primary',
+              content: 'dark',
+              title: 'light',
+              text: 'light',
+              graphic: 'light',
+            },
+          ];
+      }
+      break;
+
     default:
       break;
   }
+
   return [
     {
       background: 'light',
@@ -226,6 +364,54 @@ export const getInitalDyptichColor = (
         title: 'light',
         text: 'light',
         graphic: 'transparent',
+      };
+    case 'mediaTextLink,alternation,light':
+      return {
+        background: 'light',
+        content: 'primary',
+        title: 'dark',
+        text: 'dark',
+        graphic: 'light',
+      };
+    case 'mediaTextLink,alternation,dark':
+      return {
+        background: 'dark',
+        content: 'primary',
+        title: 'light',
+        text: 'light',
+        graphic: 'light',
+      };
+    case 'mediaTextLink,alternation,primary':
+      return {
+        background: 'primary',
+        content: 'light',
+        title: 'light',
+        text: 'light',
+        graphic: 'dark',
+      };
+    case 'mediaTextLink,parallax,light':
+      return {
+        background: 'light',
+        content: 'dark',
+        title: 'dark',
+        text: 'dark',
+        graphic: 'light',
+      };
+    case 'mediaTextLink,parallax,dark':
+      return {
+        background: 'dark',
+        content: 'light',
+        title: 'light',
+        text: 'light',
+        graphic: 'dark',
+      };
+    case 'mediaTextLink,parallax,primary':
+      return {
+        background: 'primary',
+        content: 'dark',
+        title: 'dark',
+        text: 'dark',
+        graphic: 'light',
       };
 
     default:

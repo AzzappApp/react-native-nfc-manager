@@ -93,6 +93,7 @@ import LikedPostsScreen from '#screens/LikedPostsScreen';
 import LoadingScreen from '#screens/LoadingScreen';
 import MediaModuleWebCardEditionScreen from '#screens/MediaModuleWebCardEditionScreen';
 import MediaScreen from '#screens/MediaScreen';
+import MediaTextLinkModuleWebCardEditionScreen from '#screens/MediaTextLinkModuleWebCardEditionScreen';
 import MediaTextModuleWebCardEditionScreen from '#screens/MediaTextModuleWebCardEditionScreen';
 import MultiUserAddScreen from '#screens/MultiUserAddScreen';
 import MultiUserDetailsScreen from '#screens/MultiUserDetailsScreen';
@@ -218,6 +219,7 @@ const screens = {
   CARD_MODULE_EDITION: CardModuleEditionScreen,
   CARD_MODULE_MEDIA_EDITION: MediaModuleWebCardEditionScreen,
   CARD_MODULE_MEDIA_TEXT_EDITION: MediaTextModuleWebCardEditionScreen,
+  CARD_MODULE_MEDIA_TEXT_LINK_EDITION: MediaTextLinkModuleWebCardEditionScreen,
   CONTACT_CARD: ContactCardScreen,
   CONTACT_CARD_EDIT: ContactCardEditScreen,
   CONFIRM_CHANGE_CONTACT: ConfirmChangeContactScreen,

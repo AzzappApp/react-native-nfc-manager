@@ -24,6 +24,7 @@ import type {
   Variant,
 } from '#helpers/webcardModuleHelpers';
 import type { MediaModuleWebCardEditionScreenQuery } from '#relayArtifacts/MediaModuleWebCardEditionScreenQuery.graphql';
+import type { MediaTextLinkModuleWebCardEditionScreenQuery } from '#relayArtifacts/MediaTextLinkModuleWebCardEditionScreenQuery.graphql';
 import type { MediaTextModuleWebCardEditionScreenQuery } from '#relayArtifacts/MediaTextModuleWebCardEditionScreenQuery.graphql';
 import type {
   withCardModule_webCard$data,
@@ -36,7 +37,9 @@ import type { GraphQLTaggedNode } from 'react-relay';
 // don't have a better way right now to type this without listing all....
 type MediaQueryKey =
   | MediaModuleWebCardEditionScreenQuery
+  | MediaTextLinkModuleWebCardEditionScreenQuery
   | MediaTextModuleWebCardEditionScreenQuery;
+//INSERT_MODULE
 
 export type CardModuleProps<T extends ModuleKindHasVariants, V> = {
   moduleKey: V | null;
@@ -169,6 +172,8 @@ const withCardModule = <T extends ModuleKindHasVariants, V>(
               module: moduleKind,
             },
           });
+          setSaving(false);
+        } finally {
           setSaving(false);
         }
       }

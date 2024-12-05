@@ -1,9 +1,12 @@
 import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet, View } from 'react-native';
-import { useSharedValue, type SharedValue } from 'react-native-reanimated';
+import { Linking, View } from 'react-native';
+import { useSharedValue } from 'react-native-reanimated';
+import { shadow } from '#theme';
 import { getTextStyle, getTitleStyle } from '#helpers/cardModuleHelpers';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useScreenDimensions from '#hooks/useScreenDimensions';
+import Button from '#ui/Button';
 import Text from '#ui/Text';
 import AlternationContainer from '../AlternationContainer';
 import CardModulePressableTool from '../tool/CardModulePressableTool';
@@ -15,8 +18,9 @@ import type {
 import type { CardStyle } from '@azzapp/shared/cardHelpers';
 import type { CardModuleColor } from '@azzapp/shared/cardModuleHelpers';
 import type { LayoutChangeEvent } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 
-type CardModuleMediaTextAlternationProps = CardModuleVariantType & {
+type CardModuleMediaTextLinkAlternationProps = CardModuleVariantType & {
   cardModuleMedias: CardModuleMedia[];
   onLayout?: (event: LayoutChangeEvent) => void;
   scrollPosition?: SharedValue<number>;
@@ -24,7 +28,7 @@ type CardModuleMediaTextAlternationProps = CardModuleVariantType & {
   disableAnimation?: boolean;
 };
 
-const CardModuleMediaTextAlternation = ({
+const CardModuleMediaTextLinkAlternation = ({
   cardModuleMedias,
   cardModuleColor,
   dimension: providedDimension,
@@ -35,13 +39,13 @@ const CardModuleMediaTextAlternation = ({
   scrollPosition,
   modulePosition,
   disableAnimation,
-}: CardModuleMediaTextAlternationProps) => {
+}: CardModuleMediaTextLinkAlternationProps) => {
   const screenDimension = useScreenDimensions();
   const dimension = providedDimension ?? screenDimension;
 
   if (!scrollPosition) {
     throw new Error(
-      'CardModuleMediaTextAlternation : the alternation component require a scrollPosition',
+      'CardModuleMediaTextLinkAlternation : the alternation component require a scrollPosition',
     );
   }
 
@@ -71,6 +75,18 @@ const CardModuleMediaTextAlternation = ({
   );
 };
 
+type AlternationItemProps = {
+  cardModuleMedia: CardModuleMedia;
+  cardModuleColor: CardModuleColor;
+  dimension: CardModuleDimension;
+  viewMode: 'desktop' | 'mobile';
+  cardStyle?: CardStyle | null;
+  setEditableItemIndex?: (index: number) => void;
+  scrollPosition: SharedValue<number>;
+  modulePosition?: SharedValue<number>;
+  index: number;
+  disableAnimation?: boolean;
+};
 const AlternationItem = ({
   cardModuleMedia,
   cardModuleColor,
@@ -82,18 +98,8 @@ const AlternationItem = ({
   modulePosition,
   index,
   disableAnimation,
-}: {
-  cardModuleMedia: CardModuleMedia;
-  cardModuleColor: CardModuleColor;
-  dimension: CardModuleDimension;
-  viewMode: 'desktop' | 'mobile';
-  cardStyle?: CardStyle | null;
-  setEditableItemIndex?: (index: number) => void;
-  scrollPosition: SharedValue<number>;
-  modulePosition?: SharedValue<number>;
-  index: number;
-  disableAnimation?: boolean;
-}) => {
+}: AlternationItemProps) => {
+  const styles = useStyleSheet(stylesheet);
   const parentY = useSharedValue(0);
 
   const onLayout = useCallback(
@@ -108,6 +114,12 @@ const AlternationItem = ({
   const onPressItem = useCallback(() => {
     setEditableItemIndex?.(index);
   }, [index, setEditableItemIndex]);
+
+  const openLink = () => {
+    if (cardModuleMedia.link?.url) {
+      Linking.openURL(cardModuleMedia.link?.url ?? '');
+    }
+  };
 
   return (
     <CardModulePressableTool
@@ -147,18 +159,42 @@ const AlternationItem = ({
                   'Card Module Media Text - Media default description',
               })}
           </Text>
+          <Button
+            label={
+              cardModuleMedia.link?.label ??
+              intl.formatMessage({
+                defaultMessage: 'Open',
+                description:
+                  'CardModuleTextLinkAlternation - defaut action button label',
+              })
+            }
+            style={[
+              {
+                borderRadius: cardStyle?.buttonRadius,
+                backgroundColor: cardModuleColor.content,
+              },
+              styles.buttonLink,
+            ]}
+            textStyle={{ color: cardModuleColor.graphic }}
+            onPress={openLink}
+          />
         </View>
       </AlternationContainer>
     </CardModulePressableTool>
   );
 };
 
-const styles = StyleSheet.create({
+const stylesheet = createStyleSheet(appearance => ({
+  buttonLink: {
+    ...shadow(appearance, 'bottom'), //need specification on shadow
+    overflow: 'visible',
+    height: 54,
+  },
   bottomContainer: {
     justifyContent: 'center',
     flex: 1,
     rowGap: 20,
   },
-});
+}));
 
-export default CardModuleMediaTextAlternation;
+export default CardModuleMediaTextLinkAlternation;

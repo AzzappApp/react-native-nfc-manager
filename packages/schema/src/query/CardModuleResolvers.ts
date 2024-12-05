@@ -13,6 +13,7 @@ import type {
   CardModuleLineDividerResolvers,
   CardModuleMediaResolvers,
   CardModuleMediaTextResolvers,
+  CardModuleMediaTextLinkResolvers,
 } from '#/__generated__/types';
 import type { CardModule as CardModuleModel } from '@azzapp/data';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
@@ -216,3 +217,16 @@ export const CardModuleMediaText: CardModuleMediaTextResolvers = {
     }));
   },
 };
+
+export const CardModuleMediaTextLink: CardModuleMediaTextLinkResolvers = {
+  cardModuleColor: module => module.data.cardModuleColor ?? {},
+  cardModuleMedias: async ({ data }) => {
+    return data.cardModuleMedias?.map(({ media, text, title, link }) => ({
+      media: { media: media.id, assetKind: 'module' },
+      text,
+      title,
+      link,
+    }));
+  },
+};
+//INSERT_MODULE

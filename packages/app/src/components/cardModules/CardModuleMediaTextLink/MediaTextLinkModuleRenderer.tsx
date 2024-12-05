@@ -1,23 +1,25 @@
 import { graphql, readInlineData } from 'react-relay';
-import { type CardModuleColor } from '@azzapp/shared/cardModuleHelpers';
 import CardModuleEditionScrollHandler from '../CardModuleEditionScrollHandler';
 import withSwapCardModuleColor from '../withSwapCardModuleColor';
-import CardModuleMediaParallax from './CardModuleMediaParallax';
-import CardModuleMediaSlideshow from './CardModuleMediaSlideshow';
+import CardModuleMediaTextLinkAlternation from './CardModuleMediaTextLinkAlternation';
+import CardModuleMediaTextLinkParallax from './CardModuleMediaTextLinkParallax';
 import type {
-  MediaModuleRenderer_module$key,
-  MediaModuleRenderer_module$data,
-} from '#relayArtifacts/MediaModuleRenderer_module.graphql';
+  MediaTextLinkModuleRenderer_module$data,
+  MediaTextLinkModuleRenderer_module$key,
+} from '#relayArtifacts/MediaTextLinkModuleRenderer_module.graphql';
+
 import type {
   CardModuleMedia,
   CommonModuleRendererProps,
 } from '../cardModuleEditorType';
+import type { CardModuleColor } from '@azzapp/shared/cardModuleHelpers';
 import type { NullableFields } from '@azzapp/shared/objectHelpers';
 
-//TODO: check if we need to duplicated this from MediaModuleWebCardEditionScreen jsut because onf the @inline
-// this was duplicate in all V1 module (custom)
-export const MediaModuleRendererFragment = graphql`
-  fragment MediaModuleRenderer_module on CardModuleMedia
+/**
+ * Render a SimpleButton module
+ */
+export const MediaTextLinkModuleRendererFragment = graphql`
+  fragment MediaTextLinkModuleRenderer_module on CardModuleMediaTextLink
   @inline
   @argumentDefinitions(
     screenWidth: { type: "Float!", provider: "ScreenWidth.relayprovider" }
@@ -35,6 +37,12 @@ export const MediaModuleRendererFragment = graphql`
       title
     }
     cardModuleMedias {
+      text
+      title
+      link {
+        url
+        label
+      }
       media {
         id
         ... on MediaImage {
@@ -54,9 +62,9 @@ export const MediaModuleRendererFragment = graphql`
   }
 `;
 
-export type MediaModuleRendererData = NullableFields<
+export type MediaTextLinkModuleRendererData = NullableFields<
   Omit<
-    MediaModuleRenderer_module$data,
+    MediaTextLinkModuleRenderer_module$data,
     ' $fragmentType' | 'cardModuleColor' | 'cardModuleMedias'
   >
 > & {
@@ -64,50 +72,48 @@ export type MediaModuleRendererData = NullableFields<
   cardModuleColor: CardModuleColor;
 };
 
-export const readMediaModuleData = (module: MediaModuleRenderer_module$key) =>
-  readInlineData(MediaModuleRendererFragment, module);
+export const readMediaTextLinkModuleData = (
+  module: MediaTextLinkModuleRenderer_module$key,
+) => readInlineData(MediaTextLinkModuleRendererFragment, module);
 
-export type MediaModuleRendererProps = CommonModuleRendererProps<
-  MediaModuleRendererData,
-  'media'
+export type MediaTextLinkModuleRendererProps = CommonModuleRendererProps<
+  MediaTextLinkModuleRendererData,
+  'mediaTextLink'
 >;
 
-const MediaModuleRenderer = ({
+const MediaTextLinkModuleRenderer = ({
   data,
-  viewMode = 'mobile',
   variant,
   scrollPosition,
-  onLayout,
   disableAnimation,
-  webCardEditing = false,
-  colorPalette,
+  viewMode,
   ...props
-}: MediaModuleRendererProps) => {
-  if ((data?.cardModuleMedias?.length ?? 0) < 1) {
+}: MediaTextLinkModuleRendererProps) => {
+  if ((data.cardModuleMedias?.length ?? 0) < 1) {
     return null;
   }
 
   switch (variant) {
-    case 'slideshow':
+    case 'alternation':
       return (
-        <CardModuleMediaSlideshow
-          medias={data.cardModuleMedias}
-          cardModuleColor={data.cardModuleColor}
-          viewMode={viewMode}
-          disableScroll={webCardEditing}
-          {...props}
-        />
+        <CardModuleEditionScrollHandler>
+          <CardModuleMediaTextLinkAlternation
+            cardModuleMedias={data.cardModuleMedias!}
+            cardModuleColor={data.cardModuleColor!}
+            viewMode={viewMode}
+            {...props}
+          />
+        </CardModuleEditionScrollHandler>
       );
     case 'parallax':
       return (
         <CardModuleEditionScrollHandler scrollPosition={scrollPosition}>
-          <CardModuleMediaParallax
-            medias={data.cardModuleMedias}
-            cardModuleColor={data.cardModuleColor}
-            onLayout={onLayout}
+          <CardModuleMediaTextLinkParallax
+            cardModuleMedias={data.cardModuleMedias!}
+            cardModuleColor={data.cardModuleColor!}
             viewMode={viewMode}
-            disableParallax={disableAnimation}
             scrollPosition={scrollPosition}
+            disableParallax={disableAnimation}
             {...props}
           />
         </CardModuleEditionScrollHandler>
@@ -115,6 +121,7 @@ const MediaModuleRenderer = ({
   }
 };
 
-export default withSwapCardModuleColor<MediaModuleRendererData, 'media'>(
-  MediaModuleRenderer,
-);
+export default withSwapCardModuleColor<
+  MediaTextLinkModuleRendererData,
+  'mediaTextLink'
+>(MediaTextLinkModuleRenderer);

@@ -40,12 +40,15 @@ export const MediaTextModuleRendererFragment = graphql`
       title
       media {
         id
-        uri(width: $screenWidth, pixelRatio: $pixelRatio)
+        ... on MediaImage {
+          uri(width: $screenWidth, pixelRatio: $pixelRatio)
+          smallThumbnail: uri(width: 125, pixelRatio: $cappedPixelRatio)
+        }
         ... on MediaVideo {
           #will be use when we are gonna stop playing a video. still TODO
           thumbnail(width: $screenWidth, pixelRatio: $pixelRatio)
           smallThumbnail: thumbnail(
-            width: 66 #use for the small preview in toolbox
+            width: 125 #use for the small preview in toolbox
             pixelRatio: $cappedPixelRatio
           )
         }

@@ -1,6 +1,7 @@
 import {
   MODULE_KIND_MEDIA,
   MODULE_KIND_MEDIA_TEXT,
+  MODULE_KIND_MEDIA_TEXT_LINK,
 } from '@azzapp/shared/cardModuleHelpers';
 
 export const MODULE_KIND_WITH_VARIANTS = [
@@ -12,6 +13,11 @@ export const MODULE_KIND_WITH_VARIANTS = [
     moduleKind: MODULE_KIND_MEDIA_TEXT,
     variants: ['parallax', 'alternation'],
   },
+  {
+    moduleKind: MODULE_KIND_MEDIA_TEXT_LINK,
+    variants: ['alternation', 'parallax'],
+  },
+  //INSERT_MODULE
 ] as const;
 
 export const MODULE_KIND_WITHOUT_VARIANTS = [
@@ -25,6 +31,15 @@ export const MODULE_KIND_WITHOUT_VARIANTS = [
   'simpleText',
   'blockText',
 ] as const;
+
+/* old module (V1 with full customisation)  */
+export const isCustomModule = (
+  moduleKind: string,
+): moduleKind is ModuleKindWithoutVariants => {
+  return MODULE_KIND_WITHOUT_VARIANTS.includes(
+    moduleKind as ModuleKindWithoutVariants,
+  );
+};
 
 export type ModuleKindWithVariants = (typeof MODULE_KIND_WITH_VARIANTS)[number];
 export type ModuleKindWithoutVariants =

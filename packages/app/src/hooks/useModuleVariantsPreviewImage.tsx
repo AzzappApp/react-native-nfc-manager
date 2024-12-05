@@ -70,6 +70,20 @@ function useModuleVariantsPreviewImage({
           return notFoundAsset;
       }
     }
+    case 'mediaTextLink': {
+      switch (variant) {
+        case 'alternation':
+          return colorScheme === 'light'
+            ? require('#assets/module/media_text_link_alternation_light.png')
+            : require('#assets/module/media_text_link_alternation_dark.png');
+        case 'parallax':
+          return colorScheme === 'light'
+            ? require('#assets/module/media_text_link_parallax_light.png')
+            : require('#assets/module/media_text_link_parallax_dark.png');
+        default:
+          return notFoundAsset;
+      }
+    }
     default:
       return notFoundAsset;
   }

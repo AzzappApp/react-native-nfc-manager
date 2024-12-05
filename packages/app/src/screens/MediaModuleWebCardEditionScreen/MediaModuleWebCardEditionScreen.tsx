@@ -1,3 +1,4 @@
+import isEqual from 'lodash/isEqual';
 import {
   forwardRef,
   useCallback,
@@ -98,12 +99,15 @@ const MediaModuleWebCardScreen = (
         cardModuleMedias {
           media {
             id
-            uri
+            ... on MediaImage {
+              uri(width: $screenWidth, pixelRatio: $pixelRatio)
+              smallThumbnail: uri(width: 125, pixelRatio: $cappedPixelRatio)
+            }
             ... on MediaVideo {
               #will be use when we are gonna stop playing a video. still TODO
               thumbnail(width: $screenWidth, pixelRatio: $pixelRatio)
               smallThumbnail: thumbnail(
-                width: 66 #use for the small preview in toolbox
+                width: 125 #use for the small preview in toolbox
                 pixelRatio: $cappedPixelRatio
               )
             }
@@ -209,14 +213,18 @@ const MediaModuleWebCardScreen = (
     if (
       data?.cardModuleColor?.background !==
         selectedCardModuleColor?.background ||
-      data?.variant !== variant
+      data?.variant !== variant ||
+      (!isEqual(data.cardModuleMedias, cardModuleMedias) &&
+        cardModuleMedias.length > 0)
     ) {
       setCanSave(true);
     } else {
       setCanSave(false);
     }
   }, [
+    cardModuleMedias,
     data?.cardModuleColor?.background,
+    data?.cardModuleMedias,
     data?.variant,
     selectedCardModuleColor?.background,
     setCanSave,
