@@ -1,5 +1,6 @@
-## 1.4.1-canary.33
+## 1.4.1-canary.34
 
+* **feat:**  - web - add video parallax ([#6216](https://github.com/AzzappApp/azzapp/pull/6216))
 * **fix:**  - 🐛 change mmkv store on auth change ([#6214](https://github.com/AzzappApp/azzapp/pull/6214))
 * **feat:**  - 🎸 increase body size limit ([#6212](https://github.com/AzzappApp/azzapp/pull/6212))
 * **feat:**  - add alternation animation ([#6213](https://github.com/AzzappApp/azzapp/pull/6213))
