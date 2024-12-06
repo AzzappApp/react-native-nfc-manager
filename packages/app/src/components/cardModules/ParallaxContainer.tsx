@@ -26,7 +26,7 @@ type ParallaxContainerProps = {
   imageContainerStyle?: ViewStyle; // some variant need opacity and backgroundcolor (mediaText) but not other (media)
 };
 
-const PARALLAX_RATIO = 0.2;
+const PARALLAX_RATIO = 0.8;
 
 const ParallaxContainer = ({
   media,
@@ -43,25 +43,22 @@ const ParallaxContainer = ({
     const itemStartY = (modulePosition?.value ?? 0) + index * dimension.height;
     const itemEndY = itemStartY + dimension.height;
 
-    const animatedHeight = withTiming(dimension.height * (1 + PARALLAX_RATIO), {
+    const animatedHeight = withTiming(dimension.height, {
       duration: PREVIEW_ANIMATION_DURATION,
     });
 
-    const translateY = interpolate(
-      scrollY.value,
-      [itemStartY - dimension.height, itemStartY, itemEndY],
-      [
-        -dimension.height * PARALLAX_RATIO,
-        0,
-        dimension.height * PARALLAX_RATIO,
-      ],
-    );
+    const translateY = disableParallax
+      ? 0
+      : interpolate(
+          scrollY.value,
+          [itemStartY - dimension.height, itemStartY, itemEndY],
+          [-dimension.height, 0, dimension.height],
+        );
 
-    const containerRatio = dimension.width / dimension.height;
     return {
-      height: dimension.height * (1 + PARALLAX_RATIO),
-      width: animatedHeight * (1 + PARALLAX_RATIO) * containerRatio,
-      transform: disableParallax ? [{ translateY: 0 }] : [{ translateY }],
+      height: animatedHeight * PARALLAX_RATIO,
+      width: dimension.width,
+      transform: [{ translateY }],
     };
   });
 
@@ -73,7 +70,7 @@ const ParallaxContainer = ({
           dimension={dimension}
           imageStyle={{
             width: dimension.width,
-            height: dimension.height * (1 + PARALLAX_RATIO),
+            height: dimension.height,
             ...imageStyle,
           }}
         />
@@ -86,6 +83,7 @@ const ParallaxContainer = ({
 const styles = StyleSheet.create({
   container: {
     overflow: 'hidden',
+    backgroundColor: 'green',
   },
 });
 
