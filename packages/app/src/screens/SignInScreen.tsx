@@ -2,14 +2,7 @@ import { parsePhoneNumber } from 'libphonenumber-js';
 import LottieView from 'lottie-react-native';
 import { useCallback, useState, useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import {
-  Image,
-  View,
-  Keyboard,
-  Platform,
-  useWindowDimensions,
-  StyleSheet,
-} from 'react-native';
+import { Image, View, Keyboard, Platform, StyleSheet } from 'react-native';
 import { setSharedWebCredentials } from 'react-native-keychain';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { waitTime } from '@azzapp/shared/asyncHelpers';
@@ -26,6 +19,7 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { signin } from '#helpers/MobileWebAPI';
 import useKeyboardHeight from '#hooks/useKeyboardHeight';
+import useScreenDimensions from '#hooks/useScreenDimensions';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import PressableOpacity from '#ui/PressableOpacity';
@@ -167,7 +161,7 @@ const SignInScreen = () => {
     setClearPassword(false);
   });
 
-  const { height } = useWindowDimensions();
+  const { height } = useScreenDimensions();
   const [panelHeight, setPanelHeight] = useState(height - 353);
   const onLayout = useCallback(
     (event: LayoutChangeEvent) => {
