@@ -1,5 +1,7 @@
-## 1.4.1-canary.42
+## 1.4.1-canary.43
 
+* **fix:**  - 🐛 properly display birthday ([#6242](https://github.com/AzzappApp/azzapp/pull/6242))
+* **fix:**  - web cover ([#6241](https://github.com/AzzappApp/azzapp/pull/6241))
 * **fix:**  - **modules:** [#6224](https://github.com/AzzappApp/azzapp/pull/6224) ensure 20px padding on alternation ([#6239](https://github.com/AzzappApp/azzapp/pull/6239))
 * **fix:**  - **modules:** [#6224](https://github.com/AzzappApp/azzapp/pull/6224) ensure no scroll on mobile when slideshow is added ([#6240](https://github.com/AzzappApp/azzapp/pull/6240))
 * **feat:**  - add a toast when maximum number of media is reached on card module picker ([#6228](https://github.com/AzzappApp/azzapp/pull/6228))
