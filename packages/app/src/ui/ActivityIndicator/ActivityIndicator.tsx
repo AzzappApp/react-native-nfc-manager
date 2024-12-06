@@ -1,7 +1,11 @@
 import Lottie from 'lottie-react-native';
 import { useEffect, useState } from 'react';
 import { useColorScheme } from 'react-native';
-import Animated, { FadeIn } from 'react-native-reanimated';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 import {
   createVariantsStyleSheet,
   useVariantStyleSheet,
@@ -69,19 +73,28 @@ export const DelayedActivityIndicator = ({
 }: ActivityIndicatorProps & { delay: number }) => {
   const [visible, setVisible] = useState(false);
 
+  const opacity = useSharedValue(0);
+
   useEffect(() => {
     const timeout = setTimeout(() => {
       setVisible(true);
+      opacity.value = 1;
     }, delay);
 
     return () => {
       clearTimeout(timeout);
     };
-  }, [delay]);
+  }, [delay, opacity]);
+
+  const style = useAnimatedStyle(() => {
+    return {
+      opacity: withTiming(opacity.value, { duration: 500 }),
+    };
+  });
 
   return (
     visible && (
-      <Animated.View entering={FadeIn.duration(500)}>
+      <Animated.View style={style}>
         <ActivityIndicator {...props} />
       </Animated.View>
     )
