@@ -1,4 +1,4 @@
-## 1.4.1-canary.37
+## 1.4.1-canary.38
 
 * **feat:**  - **modules:** change parallax effect on mobile ([#6230](https://github.com/AzzappApp/azzapp/pull/6230))
 * **fix:**  - center color diptyique display if scroll is not required (not enough item) ([#6221](https://github.com/AzzappApp/azzapp/pull/6221))
