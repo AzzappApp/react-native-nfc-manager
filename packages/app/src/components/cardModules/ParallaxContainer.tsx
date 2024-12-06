@@ -43,7 +43,7 @@ const ParallaxContainer = ({
     const itemStartY = (modulePosition?.value ?? 0) + index * dimension.height;
     const itemEndY = itemStartY + dimension.height;
 
-    const animatedHeight = withTiming(dimension.height, {
+    const animatedHeight = withTiming(dimension.height * PARALLAX_RATIO, {
       duration: PREVIEW_ANIMATION_DURATION,
     });
 
@@ -52,11 +52,15 @@ const ParallaxContainer = ({
       : interpolate(
           scrollY.value,
           [itemStartY - dimension.height, itemStartY, itemEndY],
-          [-dimension.height, 0, dimension.height],
+          [
+            -dimension.height * PARALLAX_RATIO,
+            0,
+            dimension.height * PARALLAX_RATIO,
+          ],
         );
 
     return {
-      height: animatedHeight * PARALLAX_RATIO,
+      height: animatedHeight,
       width: dimension.width,
       transform: [{ translateY }],
     };
@@ -83,7 +87,6 @@ const ParallaxContainer = ({
 const styles = StyleSheet.create({
   container: {
     overflow: 'hidden',
-    backgroundColor: 'green',
   },
 });
 
