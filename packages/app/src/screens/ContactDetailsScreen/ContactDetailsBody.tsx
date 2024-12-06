@@ -45,17 +45,7 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
 
   const avatar = details?.image?.uri;
 
-  const birthday = details.birthday
-    ? new Date(
-        details.birthday.year ?? 0,
-        details.birthday.month,
-        details.birthday.day,
-      ).toLocaleDateString(undefined, {
-        year: details.birthday.year ? 'numeric' : undefined,
-        month: 'long',
-        day: 'numeric',
-      })
-    : null;
+  const birthday = details.dates?.find(date => date.label === 'birthday');
 
   return (
     <Container style={styles.container}>
@@ -156,6 +146,30 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
               {date}
             </Text>
           </View>
+          {birthday && (
+            <PressableNative style={styles.item}>
+              <View style={styles.label}>
+                <Icon icon="calendar" />
+                <Text variant="smallbold">
+                  <FormattedMessage
+                    defaultMessage="Birthday"
+                    description="ContactDetailsBody - Title for birthday"
+                  />
+                </Text>
+              </View>
+              <Text numberOfLines={1} style={styles.itemText}>
+                {new Date(
+                  birthday.year ?? 0,
+                  birthday.month,
+                  birthday.day,
+                ).toLocaleDateString(undefined, {
+                  year: birthday.year ? 'numeric' : undefined,
+                  month: 'long',
+                  day: 'numeric',
+                })}
+              </Text>
+            </PressableNative>
+          )}
           {details.urlAddresses?.map(urlAddress => (
             <PressableNative
               key={urlAddress.url}
@@ -193,22 +207,6 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
               </Text>
             </PressableNative>
           ))}
-          {birthday && (
-            <PressableNative style={styles.item}>
-              <View style={styles.label}>
-                <Icon icon="calendar" />
-                <Text variant="smallbold">
-                  <FormattedMessage
-                    defaultMessage="Birthday"
-                    description="ContactDetailsBody - Title for birthday"
-                  />
-                </Text>
-              </View>
-              <Text numberOfLines={1} style={styles.itemText}>
-                {birthday}
-              </Text>
-            </PressableNative>
-          )}
           {details.socialProfiles?.map(social => (
             <PressableNative
               key={social.url}
