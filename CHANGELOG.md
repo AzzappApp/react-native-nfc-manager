@@ -1,5 +1,9 @@
-## 1.4.1-canary.45
+## 1.4.1-canary.46
 
+* **fix:**  - [#6169](https://github.com/AzzappApp/azzapp/pull/6169) DelayedActivityIndicator entering causes crashes ([#6247](https://github.com/AzzappApp/azzapp/pull/6247))
+* **fix:**  - **modules:** [#6224](https://github.com/AzzappApp/azzapp/pull/6224) ensure image and text have same sizes on alternation ([#6243](https://github.com/AzzappApp/azzapp/pull/6243))
+* **fix:**  - [#6169](https://github.com/AzzappApp/azzapp/pull/6169) DelayedActivityIndicator entering causes crashes ([#6247](https://github.com/AzzappApp/azzapp/pull/6247))
+* **feat:**  - add eslint rule to avoid prop={true} in JSX ([#6248](https://github.com/AzzappApp/azzapp/pull/6248))
 * **fix:**  - **modules:** [#6224](https://github.com/AzzappApp/azzapp/pull/6224) apply good fontFamily ([#6246](https://github.com/AzzappApp/azzapp/pull/6246))
 * **fix:**  - add missing clear timeout ([#6244](https://github.com/AzzappApp/azzapp/pull/6244))
 * **fix:**  - 🐛 properly display birthday ([#6242](https://github.com/AzzappApp/azzapp/pull/6242))
@@ -10,12 +14,16 @@
 * **feat:**  - **modules:** update parallax on web ([#6237](https://github.com/AzzappApp/azzapp/pull/6237))
 * **fix:**  - **modules:** onLayout recalculation breaks parallax on webcard edit ([#6236](https://github.com/AzzappApp/azzapp/pull/6236))
 * **feat:**  - **modules:** change parallax effect on mobile ([#6230](https://github.com/AzzappApp/azzapp/pull/6230))
+* **fix:**  - use the correct TTL ([#6225](https://github.com/AzzappApp/azzapp/pull/6225))
 * **fix:**  - center color diptyique display if scroll is not required (not enough item) ([#6221](https://github.com/AzzappApp/azzapp/pull/6221))
 * **fix:**  - reduce gap above, not under ([#6223](https://github.com/AzzappApp/azzapp/pull/6223))
 * **feat:**  - web - add video parallax ([#6216](https://github.com/AzzappApp/azzapp/pull/6216))
 * **fix:**  - 🐛 change mmkv store on auth change ([#6214](https://github.com/AzzappApp/azzapp/pull/6214))
 * **feat:**  - 🎸 increase body size limit ([#6212](https://github.com/AzzappApp/azzapp/pull/6212))
+* **fix:**  - **socialLinks:** [#6178](https://github.com/AzzappApp/azzapp/pull/6178) don’t add http on value containing http ([#6209](https://github.com/AzzappApp/azzapp/pull/6209))
 * **feat:**  - add alternation animation ([#6213](https://github.com/AzzappApp/azzapp/pull/6213))
+* **fix:**  - **android:** [#6189](https://github.com/AzzappApp/azzapp/pull/6189) wrong calculation of item height ([#6208](https://github.com/AzzappApp/azzapp/pull/6208))
+* **fix:**  - **android:** [#5105](https://github.com/AzzappApp/azzapp/pull/5105) wrong height dimension calculation ([#6206](https://github.com/AzzappApp/azzapp/pull/6206))
 * **feat:**  - **modules:** [#5596](https://github.com/AzzappApp/azzapp/pull/5596) add alternation variant on web ([#6205](https://github.com/AzzappApp/azzapp/pull/6205))
 * **fix:**  - provided media ios ([#6196](https://github.com/AzzappApp/azzapp/pull/6196))
 * **feat:**  - show contact card elements ([#6180](https://github.com/AzzappApp/azzapp/pull/6180))
