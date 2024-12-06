@@ -1,5 +1,8 @@
-## 1.4.1-canary.41
+## 1.4.1-canary.42
 
+* **fix:**  - **modules:** [#6224](https://github.com/AzzappApp/azzapp/pull/6224) ensure 20px padding on alternation ([#6239](https://github.com/AzzappApp/azzapp/pull/6239))
+* **fix:**  - **modules:** [#6224](https://github.com/AzzappApp/azzapp/pull/6224) ensure no scroll on mobile when slideshow is added ([#6240](https://github.com/AzzappApp/azzapp/pull/6240))
+* **feat:**  - add a toast when maximum number of media is reached on card module picker ([#6228](https://github.com/AzzappApp/azzapp/pull/6228))
 * **feat:**  - **modules:** update parallax on web ([#6237](https://github.com/AzzappApp/azzapp/pull/6237))
 * **fix:**  - **modules:** onLayout recalculation breaks parallax on webcard edit ([#6236](https://github.com/AzzappApp/azzapp/pull/6236))
 * **feat:**  - **modules:** change parallax effect on mobile ([#6230](https://github.com/AzzappApp/azzapp/pull/6230))
