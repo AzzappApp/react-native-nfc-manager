@@ -285,7 +285,7 @@ const CardModuleRenderer = <T extends ModuleRenderInfo>({
           viewMode={viewMode}
           dimension={{
             width: viewMode === 'desktop' ? DESKTOP_PREVIEW_WIDTH : width,
-            height: editing ? height / 4 : height,
+            height: editing ? height / 2 : height,
           }}
           scrollPosition={scrollPosition}
           modulePosition={modulePosition}

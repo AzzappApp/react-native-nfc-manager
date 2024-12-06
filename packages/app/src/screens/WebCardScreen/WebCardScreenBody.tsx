@@ -738,20 +738,13 @@ const WebCardModule = ({
   editing: boolean;
 }) => {
   const modulePosition = useSharedValue(0);
-  const onLayout = useCallback(
-    (event: LayoutChangeEvent) => {
-      const { y } = event.nativeEvent.layout;
-      modulePosition.set(y);
-    },
-    [modulePosition],
-  );
 
   return (
     <WebCardBlockContainerMemo
       id={module.id}
       editing={editing}
       {...props}
-      onLayout={onLayout}
+      modulePosition={modulePosition}
       // @ts-expect-error this extraData is used to trigger a re-render when the module data change
       extraData={{
         cardStyle,
