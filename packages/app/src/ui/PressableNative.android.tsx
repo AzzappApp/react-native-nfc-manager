@@ -1,4 +1,10 @@
-import { forwardRef, useRef, useState, type ForwardedRef } from 'react';
+import {
+  forwardRef,
+  useEffect,
+  useRef,
+  useState,
+  type ForwardedRef,
+} from 'react';
 import { Pressable, type PressableProps } from 'react-native-gesture-handler';
 import { colors } from '#theme';
 import type {
@@ -57,6 +63,11 @@ const PressableNative = (
       props.onPress?.(e);
     }
   };
+  useEffect(() => {
+    return () => {
+      if (timer.current) clearTimeout(timer.current);
+    };
+  });
 
   return <Pressable onPress={onPress} {...pressableProps} />;
 };

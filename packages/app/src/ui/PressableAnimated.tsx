@@ -1,4 +1,4 @@
-import { forwardRef, useRef } from 'react';
+import { forwardRef, useEffect, useRef } from 'react';
 import { Pressable } from 'react-native';
 import Animated from 'react-native-reanimated';
 
@@ -62,6 +62,12 @@ const PressableAnimated = (
       props.onPress?.(e);
     }
   };
+
+  useEffect(() => {
+    return () => {
+      if (timer.current) clearTimeout(timer.current);
+    };
+  }, []);
 
   return (
     // @ts-expect-error - AnimateProps is hard to type
