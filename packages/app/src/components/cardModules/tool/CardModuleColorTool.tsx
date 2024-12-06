@@ -4,6 +4,7 @@ import ToolBoxSection from '#components/Toolbar/ToolBoxSection';
 import {
   getInitalDyptichColor,
   EMPTY_CARD_MODULE_COLOR,
+  dyptichByModuleVariant,
 } from '#helpers/cardModuleColorsHelpers';
 import useBoolean from '#hooks/useBoolean';
 import BottomSheetModal from '#ui/BottomSheetModal';
@@ -31,9 +32,11 @@ const CardModuleColorTool = ({
 }: CardModuleColorToolProps) => {
   const intl = useIntl();
   const [show, open, close] = useBoolean(false);
-  if (!isVisible(module)) {
+  const variantColor = dyptichByModuleVariant(module);
+  if (!isVisible(module) || !variantColor) {
     return null;
   }
+
   return (
     <>
       <ToolBoxSection
@@ -57,7 +60,7 @@ const CardModuleColorTool = ({
           cardColors={cardColors}
           cardModuleColor={cardModuleColor}
           onModuleColorChange={onModuleColorChange}
-          module={module}
+          variantColor={variantColor}
         />
       </BottomSheetModal>
     </>

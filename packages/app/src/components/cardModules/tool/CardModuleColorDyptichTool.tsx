@@ -1,14 +1,11 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { ScrollView, View } from 'react-native';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import { colors } from '#theme';
-import {
-  areCardModuleColorEqual,
-  dyptichByModuleVariant,
-} from '#helpers/cardModuleColorsHelpers';
+import { areCardModuleColorEqual } from '#helpers/cardModuleColorsHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import useScreenDimensions from '#hooks/useScreenDimensions';
 import PressableOpacity from '#ui/PressableOpacity';
-import type { ModuleKindAndVariant } from '#helpers/webcardModuleHelpers';
 import type { CardModuleColor } from '@azzapp/shared/cardModuleHelpers';
 
 type CardModuleColorToolProps = {
@@ -19,39 +16,61 @@ type CardModuleColorToolProps = {
   };
   cardModuleColor: CardModuleColor;
   onModuleColorChange: (moduleColor: CardModuleColor) => void;
-  module: ModuleKindAndVariant;
+  variantColor: CardModuleColor[];
 };
 
 const CardModuleColorDyptichTool = ({
   cardColors,
   cardModuleColor,
   onModuleColorChange,
-  module,
+  variantColor,
 }: CardModuleColorToolProps) => {
   const styles = useStyleSheet(stylesheet);
-  const variantColor = dyptichByModuleVariant(module);
-  if (variantColor === null) {
-    return null;
+  const { width } = useScreenDimensions();
+
+  const totalWidth =
+    variantColor.length * ITEM_SIZE + (ITEM_SIZE - 1) * ITEM_GAP - 32; //32 is for safety margin
+
+  const content = useMemo(() => {
+    return variantColor.map((dyptich, index) => {
+      return (
+        <DyptichItem
+          key={`cardmodulecolor-dyptichtool-${index}`}
+          dyptich={dyptich}
+          cardColors={cardColors}
+          cardModuleColor={cardModuleColor}
+          onModuleColorChange={onModuleColorChange}
+        />
+      );
+    });
+  }, [cardColors, cardModuleColor, onModuleColorChange, variantColor]);
+
+  if (totalWidth < width) {
+    return (
+      <View
+        style={{
+          width,
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: 'red',
+        }}
+      >
+        {content}
+      </View>
+    );
   }
+
   return (
     <ScrollView
       horizontal
-      contentContainerStyle={styles.contentContainerStyle}
+      contentContainerStyle={[styles.contentContainerStyle]}
       showsHorizontalScrollIndicator={false}
-      contentOffset={{ x: -20, y: 0 }}
-      style={styles.scrollViewStyle} // get place for more readability
+      contentOffset={{ x: 0, y: 0 }}
+      contentInset={{ left: 16, right: 16 }}
+      style={[styles.scrollViewStyle, { width }]} // get place for more readability
     >
-      {variantColor.map((dyptich, index) => {
-        return (
-          <DyptichItem
-            key={`cardmodulecolor-dyptichtool-${index}`}
-            dyptich={dyptich}
-            cardColors={cardColors}
-            cardModuleColor={cardModuleColor}
-            onModuleColorChange={onModuleColorChange}
-          />
-        );
-      })}
+      {content}
     </ScrollView>
   );
 };
@@ -132,6 +151,8 @@ const EXTERNAL_BORDER_SIZE = 1;
 const CENTER_CIRCLE = 16;
 const CIRCLE_INCREMENT = 9;
 const ITEM_SIZE = CIRCLE_INCREMENT * 5 + CENTER_CIRCLE;
+const ITEM_GAP = 10;
+
 const stylesheet = createStyleSheet(appearance => ({
   container: {
     width: ITEM_SIZE + 2 * (SELECTED_BORDER_SIZE + EXTERNAL_BORDER_SIZE),
@@ -161,6 +182,6 @@ const stylesheet = createStyleSheet(appearance => ({
   contentContainerStyle: {
     flexDirection: 'row',
     height: 67,
-    gap: 10,
+    gap: ITEM_GAP,
   },
 }));

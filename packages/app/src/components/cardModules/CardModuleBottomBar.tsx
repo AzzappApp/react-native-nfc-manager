@@ -93,6 +93,7 @@ const CardModuleBottomBar = <T extends ModuleKindAndVariant>({
       if (cardModuleMedias && setCardModuleMedias) {
         const updateCardMedias = [...cardModuleMedias];
         updateCardMedias[editableItemIndex!] = {
+          ...cardModuleMedias[editableItemIndex!],
           ...cardModuleMedia,
           needDbUpdate: true,
         };
