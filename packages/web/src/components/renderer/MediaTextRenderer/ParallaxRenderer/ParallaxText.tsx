@@ -33,12 +33,11 @@ const ParallaxText = ({
             <h3
               style={{
                 color: swapColor(data.cardModuleColor?.title, colorPalette),
-                fontFamily: cardStyle.titleFontFamily,
               }}
               className={cn(
                 styles.textItem,
                 commonStyles.title,
-                fontsMap[cardStyle.fontFamily].className,
+                fontsMap[cardStyle.titleFontFamily].className,
               )}
             >
               {mediaData?.title}
@@ -46,7 +45,6 @@ const ParallaxText = ({
             <p
               style={{
                 color: swapColor(data.cardModuleColor?.text, colorPalette),
-                fontFamily: cardStyle.fontFamily,
               }}
               className={cn(
                 styles.textItem,

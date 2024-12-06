@@ -3,8 +3,17 @@ import { useEffect, useRef, useState } from 'react';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import styles from './AlternationRenderer.css';
 import type { Media } from '@azzapp/data';
+import type { CardStyle } from '@azzapp/shared/cardHelpers';
 
-const AlternationImage = ({ media, even }: { media: Media; even: boolean }) => {
+const AlternationImage = ({
+  media,
+  even,
+  cardStyle,
+}: {
+  media: Media;
+  even: boolean;
+  cardStyle: CardStyle;
+}) => {
   const pictureRef = useRef<HTMLDivElement>(null);
 
   const [isVisible, setIsVisible] = useState(false);
@@ -52,6 +61,9 @@ const AlternationImage = ({ media, even }: { media: Media; even: boolean }) => {
         quality="auto:best"
         crop="fill"
         className={styles.image}
+        style={{
+          borderRadius: cardStyle?.borderRadius ?? 0,
+        }}
       />
     </div>
   );

@@ -61,12 +61,16 @@ const AlternationRender = async ({
                   : styles.sectionContainer
               }
             >
-              <AlternationImage media={media} even={index % 2 === 0} />
+              <AlternationImage
+                media={media}
+                even={index % 2 === 0}
+                cardStyle={cardStyle}
+              />
               <section className={styles.sectionTextContainer}>
                 <h3
                   className={cn(
                     commonStyles.title,
-                    fontsMap[cardStyle.fontFamily].className,
+                    fontsMap[cardStyle.titleFontFamily].className,
                   )}
                   style={{
                     color: swapColor(cardModuleColor?.title, colorPalette),

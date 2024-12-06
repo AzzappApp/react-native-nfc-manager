@@ -44,7 +44,6 @@ const container = style({
 });
 
 const image = style({
-  borderRadius: 20,
   maxWidth: 'min(max(100vw - 40px, 1px), 480px)',
   width: '100%',
   height: '100%',
