@@ -9,7 +9,7 @@ const parallaxContainer = style({
 });
 
 const parallaxItem = style({
-  height: '120vh',
+  height: '100vh',
   width: '100%',
   overflow: 'hidden',
   position: 'absolute',

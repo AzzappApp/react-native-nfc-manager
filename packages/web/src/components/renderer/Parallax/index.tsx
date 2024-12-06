@@ -5,48 +5,40 @@ import CloudinaryImage from '#ui/CloudinaryImage';
 import CloudinaryVideo from '#ui/CloudinaryVideo';
 import styles from './Parallax.css';
 import type { Media } from '@azzapp/data';
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
+
+const PARALLAX_RATIO = 0.8;
 
 const Parallax = ({
   medias,
   children,
+  imageStyle,
 }: {
   medias: Media[];
   children?: (props: { mediaId: string }) => ReactNode;
+  imageStyle?: CSSProperties;
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [startPosition, setStartPosition] = useState<number>(0);
+  const [startPosition, setStartPosition] = useState(0);
   const [scrollY, setScrollY] = useState(0);
-  const [viewportHeight, setViewportHeight] = useState<number>(0);
+  const [viewportHeight, setViewportHeight] = useState(0);
 
   useEffect(() => {
-    const updateStartPosition = () => {
-      if (!containerRef.current) return;
-
-      setStartPosition(containerRef.current?.offsetTop ?? 0);
-    };
-
-    const updateViewportHeight = () => {
-      setViewportHeight(window.innerHeight);
-    };
-
     const handleScroll = () => {
+      setStartPosition(containerRef.current?.offsetTop ?? 0);
+      setViewportHeight(window.innerHeight);
       setScrollY(window.scrollY);
     };
 
-    updateStartPosition();
-    updateViewportHeight();
     handleScroll();
-    window.addEventListener('resize', updateStartPosition);
+    window.addEventListener('resize', handleScroll);
     window.addEventListener('scroll', handleScroll);
 
     return () => {
-      window.removeEventListener('resize', updateStartPosition);
+      window.removeEventListener('resize', handleScroll);
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
-
-  const parallaxRatio = 0.2;
 
   return (
     <div ref={containerRef} className={styles.moduleContainer}>
@@ -60,11 +52,20 @@ const Parallax = ({
           scrollY >= startPosition + elementStartY - viewportHeight &&
           scrollY <= startPosition + elementStartY + viewportHeight;
 
-        const offset = isVisible ? distanceFromStart * parallaxRatio : 0;
+        const offset = isVisible
+          ? Math.round(distanceFromStart * PARALLAX_RATIO)
+          : 0;
 
         return (
           <div key={media.id} className={styles.parallaxContainer}>
-            <div key={media.id} className={styles.parallaxItem}>
+            <div
+              key={media.id}
+              className={styles.parallaxItem}
+              style={{
+                transform: `translateY(${offset}px)`,
+                willChange: 'transform',
+              }}
+            >
               {media.kind === 'video' ? (
                 <CloudinaryVideo
                   assetKind="module"
@@ -76,8 +77,7 @@ const Parallax = ({
                     height: '100%',
                     objectFit: 'cover', // Ensures the video covers the container
                     objectPosition: 'center', // Center the content
-                    transition: 'transform 0.1s ease-out',
-                    transform: `translateY(${offset}px)`,
+                    ...imageStyle,
                   }}
                   autoPlay={true}
                 />
@@ -92,8 +92,7 @@ const Parallax = ({
                   style={{
                     objectFit: 'cover', // Ensures the image covers the container
                     objectPosition: 'center', // Center the content
-                    transition: 'transform 0.1s ease-out',
-                    transform: `translateY(${offset}px)`, // Apply calculated offset
+                    ...imageStyle,
                   }}
                 />
               )}

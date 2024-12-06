@@ -1,6 +1,5 @@
 'use client';
 
-import { style } from '@vanilla-extract/css';
 import cn from 'classnames';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import Parallax from '#components/renderer/Parallax';
@@ -23,7 +22,7 @@ const ParallaxText = ({
   cardStyle: CardStyle;
 }) => {
   return (
-    <Parallax medias={medias}>
+    <Parallax medias={medias} imageStyle={{ opacity: 0.8 }}>
       {({ mediaId }) => {
         const mediaData = data.cardModuleMedias.find(
           ({ media }) => media.id === mediaId,
@@ -37,7 +36,8 @@ const ParallaxText = ({
                 fontFamily: cardStyle.titleFontFamily,
               }}
               className={cn(
-                style([styles.textItem, commonStyles.title]),
+                styles.textItem,
+                commonStyles.title,
                 fontsMap[cardStyle.fontFamily].className,
               )}
             >
@@ -49,7 +49,8 @@ const ParallaxText = ({
                 fontFamily: cardStyle.fontFamily,
               }}
               className={cn(
-                style([styles.textItem, commonStyles.text]),
+                styles.textItem,
+                commonStyles.text,
                 fontsMap[cardStyle.fontFamily].className,
               )}
             >
