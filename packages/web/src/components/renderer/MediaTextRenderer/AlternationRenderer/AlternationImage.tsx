@@ -47,8 +47,9 @@ const AlternationImage = ({
           : even
             ? 'translateX(150px)'
             : 'translateX(-150px)',
-        transition: 'all 1s ease-out',
+        transition: 'opacity,transform 1s ease-out',
       }}
+      className={styles.sectionPartContainer}
       ref={pictureRef}
     >
       <CloudinaryImage

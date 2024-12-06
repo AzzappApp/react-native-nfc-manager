@@ -15,6 +15,7 @@ const sectionContainer = style({
       paddingBottom: 20,
       gap: 20,
       overflow: 'hidden',
+      alignItems: 'flex-start',
     },
   },
 });
@@ -26,12 +27,19 @@ const sectionContainerEven = style([
   },
 ]);
 
-const sectionTextContainer = style({
-  flexGrow: 1,
-  rowGap: 20,
-  display: 'flex',
-  flexDirection: 'column',
+const sectionPartContainer = style({
+  maxWidth: 'min(max(100vw - 40px, 1px), 480px)',
+  flex: 1,
 });
+
+const sectionTextContainer = style([
+  sectionPartContainer,
+  {
+    display: 'flex',
+    flexDirection: 'column',
+    rowGap: 20,
+  },
+]);
 
 const container = style({
   display: 'flex',
@@ -40,11 +48,10 @@ const container = style({
   maxWidth: 'min(100vw, 1000px)',
   padding: '0 20px',
   margin: '0 auto',
-  flexGrow: 1,
+  flex: 1,
 });
 
 const image = style({
-  maxWidth: 'min(max(100vw - 40px, 1px), 480px)',
   width: '100%',
   height: '100%',
 });
@@ -53,6 +60,7 @@ export default {
   container,
   sectionContainer,
   sectionContainerEven,
+  sectionPartContainer,
   sectionTextContainer,
   image,
 };
