@@ -1,5 +1,6 @@
-## 1.4.1-canary.40
+## 1.4.1-canary.41
 
+* **feat:**  - **modules:** update parallax on web ([#6237](https://github.com/AzzappApp/azzapp/pull/6237))
 * **fix:**  - **modules:** onLayout recalculation breaks parallax on webcard edit ([#6236](https://github.com/AzzappApp/azzapp/pull/6236))
 * **feat:**  - **modules:** change parallax effect on mobile ([#6230](https://github.com/AzzappApp/azzapp/pull/6230))
 * **fix:**  - center color diptyique display if scroll is not required (not enough item) ([#6221](https://github.com/AzzappApp/azzapp/pull/6221))
