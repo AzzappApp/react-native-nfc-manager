@@ -11,7 +11,8 @@ const sectionContainer = style({
   '@media': {
     [MediaQuery.Mobile]: {
       flexDirection: 'column',
-      padding: 20,
+      paddingTop: 20,
+      paddingBottom: 20,
       gap: 20,
       overflow: 'hidden',
     },
@@ -37,6 +38,7 @@ const container = style({
   flexDirection: 'column',
   alignItems: 'center',
   maxWidth: 'min(100vw, 1000px)',
+  padding: '0 20px',
   margin: '0 auto',
   flexGrow: 1,
 });
