@@ -29,7 +29,7 @@ export const verifyToken = (token: string): Promise<SessionData> =>
 
 export const refreshTokens = async (refreshToken: string) => {
   const data: any = await unseal(refreshToken, REFRESH_TOKEN_SECRET, {
-    ttl: TOKEN_EXP_TIME,
+    ttl: REFRESH_TOKEN_EXP_TIME,
   });
 
   if (typeof data !== 'object' || typeof data?.userId !== 'string') {
