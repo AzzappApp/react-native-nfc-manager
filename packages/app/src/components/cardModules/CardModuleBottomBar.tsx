@@ -1,4 +1,5 @@
 import { useCallback, useMemo } from 'react';
+import { useIntl } from 'react-intl';
 import { View, ScrollView, StyleSheet } from 'react-native';
 import { ScreenModal } from '#components/NativeRouter';
 import ToolBarContainer from '#components/Toolbar/ToolBarTransitioner';
@@ -23,6 +24,7 @@ import type {
 import type { withCardModule_webCard$data } from '#relayArtifacts/withCardModule_webCard.graphql';
 import type { CardModuleMedia } from './cardModuleEditorType';
 import type { CardModuleColor } from '@azzapp/shared/cardModuleHelpers';
+import type { IntlShape } from 'react-intl';
 
 type CardModuleBottomBarProps<T extends ModuleKindAndVariant> = {
   /**
@@ -84,6 +86,7 @@ const CardModuleBottomBar = <T extends ModuleKindAndVariant>({
   setEditableItemIndex,
 }: CardModuleBottomBarProps<T>) => {
   // #region CardModuleMediaManagement
+  const intl = useIntl();
   const [showImagePicker, , closeImagePicker] = useBoolean(displayInitialModal); //this can be decided based on ModuleKind/Variant
   const [showMediaToolbox, openMediaToolbox, closeMediaToolbox] =
     useBoolean(false);
@@ -138,6 +141,7 @@ const CardModuleBottomBar = <T extends ModuleKindAndVariant>({
                     startTime: 0,
                   },
                 },
+                ...getDefaultModuleMediaContent(module, intl),
                 needDbUpdate: true,
               });
             } else {
@@ -147,6 +151,7 @@ const CardModuleBottomBar = <T extends ModuleKindAndVariant>({
                   filter: null,
                   editionParameters: null,
                 },
+                ...getDefaultModuleMediaContent(module, intl),
                 needDbUpdate: true,
               });
             }
@@ -157,7 +162,14 @@ const CardModuleBottomBar = <T extends ModuleKindAndVariant>({
         closeImagePicker();
       }
     },
-    [cardModuleMedias, setCardModuleMedias, closeImagePicker, setCanSave],
+    [
+      cardModuleMedias,
+      setCardModuleMedias,
+      closeImagePicker,
+      setCanSave,
+      module,
+      intl,
+    ],
   );
   // removing media can be handle here, common to all module
   const handleRemoveMedia = (index: number) => {
@@ -309,3 +321,37 @@ const getMaxMedia = (_module: ModuleKindAndVariant) => {
 };
 
 export default CardModuleBottomBar;
+
+//provide the default value for text, link etc to allow to save with default text
+//Lorem Ipsum on purpose, not have to save it
+const getDefaultModuleMediaContent = (
+  module: ModuleKindAndVariant,
+  intl: IntlShape,
+) => {
+  const { moduleKind } = module;
+  switch (moduleKind) {
+    case 'mediaText': {
+      return {
+        title: DEFAULT_CARD_MODULE_TITLE,
+        text: DEFAULT_CARD_MODULE_TEXT,
+      };
+    }
+    case 'mediaTextLink':
+      return {
+        title: DEFAULT_CARD_MODULE_TITLE,
+        DEFAULT_CARD_MODULE_TEXT,
+        link: {
+          url: '',
+          label: intl.formatMessage({
+            defaultMessage: 'Open',
+            description:
+              'CardModuleTextLink - default message for button action',
+          }),
+        },
+      };
+  }
+  return '';
+};
+
+export const DEFAULT_CARD_MODULE_TITLE = 'Lorem Ipsum';
+export const DEFAULT_CARD_MODULE_TEXT = 'Lorem Ipsum';

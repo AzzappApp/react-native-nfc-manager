@@ -143,41 +143,32 @@ const AlternationItem = ({
             variant="large"
             style={getTitleStyle(cardStyle, cardModuleColor)}
           >
-            {cardModuleMedia.title ??
-              intl.formatMessage({
-                defaultMessage:
-                  'Select your media in the bottom bar to edit the title',
-                description: 'Card Module Media Text - Media default Title',
-              })}
+            {cardModuleMedia.title}
           </Text>
           <Text style={getTextStyle(cardStyle, cardModuleColor)}>
-            {cardModuleMedia.text ??
-              intl.formatMessage({
-                defaultMessage:
-                  'Select your media in the bottom bar to edit the description',
-                description:
-                  'Card Module Media Text - Media default description',
-              })}
+            {cardModuleMedia.text}
           </Text>
-          <Button
-            label={
-              cardModuleMedia.link?.label ??
-              intl.formatMessage({
-                defaultMessage: 'Open',
-                description:
-                  'CardModuleTextLinkAlternation - defaut action button label',
-              })
-            }
-            style={[
-              {
-                borderRadius: cardStyle?.buttonRadius,
-                backgroundColor: cardModuleColor.content,
-              },
-              styles.buttonLink,
-            ]}
-            textStyle={{ color: cardModuleColor.graphic }}
-            onPress={openLink}
-          />
+          <View style={styles.buttonCenter}>
+            <Button
+              label={
+                cardModuleMedia.link?.label ??
+                intl.formatMessage({
+                  defaultMessage: 'Open',
+                  description:
+                    'CardModuleTextLinkAlternation - defaut action button label',
+                })
+              }
+              style={[
+                {
+                  borderRadius: cardStyle?.buttonRadius,
+                  backgroundColor: cardModuleColor.content,
+                },
+                styles.buttonLink,
+              ]}
+              textStyle={{ color: cardModuleColor.graphic }}
+              onPress={openLink}
+            />
+          </View>
         </View>
       </AlternationContainer>
     </CardModulePressableTool>
@@ -189,12 +180,16 @@ const stylesheet = createStyleSheet(appearance => ({
     ...shadow(appearance, 'bottom'), //need specification on shadow
     overflow: 'visible',
     height: 54,
+    flexGrow: 0,
+    minWidth: 150,
+    marginTop: 20,
   },
   bottomContainer: {
     justifyContent: 'center',
     flex: 1,
     rowGap: 20,
   },
+  buttonCenter: { alignItems: 'flex-start' },
 }));
 
 export default CardModuleMediaTextLinkAlternation;

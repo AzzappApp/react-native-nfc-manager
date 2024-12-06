@@ -1,5 +1,4 @@
 import { useCallback } from 'react';
-import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { useSharedValue, type SharedValue } from 'react-native-reanimated';
 import { getTextStyle, getTitleStyle } from '#helpers/cardModuleHelpers';
@@ -103,8 +102,6 @@ const AlternationItem = ({
     [parentY],
   );
 
-  const intl = useIntl();
-
   const onPressItem = useCallback(() => {
     setEditableItemIndex?.(index);
   }, [index, setEditableItemIndex]);
@@ -131,21 +128,10 @@ const AlternationItem = ({
             variant="large"
             style={getTitleStyle(cardStyle, cardModuleColor)}
           >
-            {cardModuleMedia.title ??
-              intl.formatMessage({
-                defaultMessage:
-                  'Select your media in the bottom bar to edit the title',
-                description: 'Card Module Media Text - Media default Title',
-              })}
+            {cardModuleMedia.title}
           </Text>
           <Text style={getTextStyle(cardStyle, cardModuleColor)}>
-            {cardModuleMedia.text ??
-              intl.formatMessage({
-                defaultMessage:
-                  'Select your media in the bottom bar to edit the description',
-                description:
-                  'Card Module Media Text - Media default description',
-              })}
+            {cardModuleMedia.text}
           </Text>
         </View>
       </AlternationContainer>

@@ -1,5 +1,4 @@
 import { useCallback } from 'react';
-import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { getTextStyle, getTitleStyle } from '#helpers/cardModuleHelpers';
 import useScreenDimensions from '#hooks/useScreenDimensions';
@@ -97,8 +96,6 @@ const ParallaxItem = ({
     setEditableItemIndex?.(index);
   }, [index, setEditableItemIndex]);
 
-  const intl = useIntl();
-
   return (
     <CardModulePressableTool active={!!setEditableItemIndex} onPress={onPress}>
       <ParallaxContainer
@@ -120,23 +117,12 @@ const ParallaxItem = ({
               viewMode === 'desktop' && { maxWidth: 400 },
             ]}
           >
-            {cardModuleMedia.title ??
-              intl.formatMessage({
-                defaultMessage:
-                  'Select your media in the bottom bar to edit the title',
-                description: 'Card Module Media Text - Media default Title',
-              })}
+            {cardModuleMedia.title}
           </Text>
           <Text
             style={[getTextStyle(cardStyle, cardModuleColor), styles.textStyle]}
           >
-            {cardModuleMedia.text ??
-              intl.formatMessage({
-                defaultMessage:
-                  'Select your media in the bottom bar to edit the description',
-                description:
-                  'Card Module Media Text - Media default description',
-              })}
+            {cardModuleMedia.text}
           </Text>
         </View>
       </ParallaxContainer>

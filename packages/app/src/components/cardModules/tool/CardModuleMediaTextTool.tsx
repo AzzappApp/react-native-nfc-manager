@@ -9,6 +9,10 @@ import BottomSheetModal from '#ui/BottomSheetModal';
 import BottomSheetTextInput from '#ui/BottomSheetTextInput';
 import Header from '#ui/Header';
 import Text from '#ui/Text';
+import {
+  DEFAULT_CARD_MODULE_TEXT,
+  DEFAULT_CARD_MODULE_TITLE,
+} from '../CardModuleBottomBar';
 import type { ModuleKindAndVariant } from '#helpers/webcardModuleHelpers';
 import type { CardModuleMedia } from '../cardModuleEditorType';
 
@@ -134,6 +138,7 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
             defaultValue={title.current}
             onChangeText={onChangeTitle}
             style={styles.titleStyle}
+            clearTextOnFocus={title.current === DEFAULT_CARD_MODULE_TITLE}
           />
           <BottomSheetTextInput
             multiline
@@ -145,6 +150,7 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
             defaultValue={text.current}
             onChangeText={onChangeText}
             style={styles.textStyle}
+            clearTextOnFocus={title.current === DEFAULT_CARD_MODULE_TEXT}
           />
           {module.moduleKind === 'mediaTextLink' && (
             <>

@@ -76,6 +76,18 @@ const CardModuleMediaPicker = ({
       const index = selectedMedias.findIndex(
         value => value && value.media.id === media.id,
       );
+      //do not show the toast in case of replacing a media
+      if (index >= 0 && selectedMedias.length >= maxMedia) {
+        //show a tost message
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'Maximum number of media reached',
+            description: 'Error message when trying to add more media',
+          }),
+          visibilityTime: 2000,
+        });
+      }
       const disableVideoSelection = maxVideo
         ? maxVideo -
             (selectedMedias?.filter(m => m.media.kind === 'video').length ??

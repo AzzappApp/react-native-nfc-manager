@@ -130,23 +130,12 @@ const ParallaxItem = ({
               viewMode === 'desktop' && { maxWidth: 400 },
             ]}
           >
-            {cardModuleMedia.title ??
-              intl.formatMessage({
-                defaultMessage:
-                  'Select your media in the bottom bar to edit the title',
-                description: 'Card Module Media Text - Media default Title',
-              })}
+            {cardModuleMedia.title}
           </Text>
           <Text
             style={[getTextStyle(cardStyle, cardModuleColor), styles.textStyle]}
           >
-            {cardModuleMedia.text ??
-              intl.formatMessage({
-                defaultMessage:
-                  'Select your media in the bottom bar to edit the description',
-                description:
-                  'Card Module Media Text - Media default description',
-              })}
+            {cardModuleMedia.text}
           </Text>
           <Button
             label={
