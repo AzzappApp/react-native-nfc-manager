@@ -261,6 +261,7 @@ const MediaTextLinkModuleWebCardEditionScreen = (
           variant={variant}
           dimension={dimension}
           setEditableItemIndex={setEditableItemIndex}
+          moduleEditing
         />
       </CardModulePreviewContainer>
       <CardModuleBottomBar

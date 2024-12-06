@@ -87,6 +87,7 @@ const MediaTextLinkModuleRenderer = ({
   scrollPosition,
   disableAnimation,
   viewMode,
+  moduleEditing = false,
   ...props
 }: MediaTextLinkModuleRendererProps) => {
   if ((data.cardModuleMedias?.length ?? 0) < 1) {
@@ -102,6 +103,7 @@ const MediaTextLinkModuleRenderer = ({
             cardModuleColor={data.cardModuleColor!}
             scrollPosition={scrollPosition}
             viewMode={viewMode}
+            moduleEditing={moduleEditing}
             {...props}
           />
         </CardModuleEditionScrollHandler>
@@ -115,6 +117,7 @@ const MediaTextLinkModuleRenderer = ({
             viewMode={viewMode}
             scrollPosition={scrollPosition}
             disableParallax={disableAnimation}
+            moduleEditing={moduleEditing}
             {...props}
           />
         </CardModuleEditionScrollHandler>

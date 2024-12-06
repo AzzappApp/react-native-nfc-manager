@@ -26,6 +26,7 @@ type CardModuleMediaTextLinkAlternationProps = CardModuleVariantType & {
   scrollPosition?: SharedValue<number>;
   modulePosition?: SharedValue<number>;
   disableAnimation?: boolean;
+  moduleEditing: boolean;
 };
 
 const CardModuleMediaTextLinkAlternation = ({
@@ -39,6 +40,7 @@ const CardModuleMediaTextLinkAlternation = ({
   scrollPosition,
   modulePosition,
   disableAnimation,
+  moduleEditing,
 }: CardModuleMediaTextLinkAlternationProps) => {
   const screenDimension = useScreenDimensions();
   const dimension = providedDimension ?? screenDimension;
@@ -68,6 +70,7 @@ const CardModuleMediaTextLinkAlternation = ({
             modulePosition={modulePosition}
             index={index}
             disableAnimation={disableAnimation}
+            moduleEditing={moduleEditing}
           />
         );
       })}
@@ -86,6 +89,7 @@ type AlternationItemProps = {
   modulePosition?: SharedValue<number>;
   index: number;
   disableAnimation?: boolean;
+  moduleEditing: boolean;
 };
 const AlternationItem = ({
   cardModuleMedia,
@@ -98,6 +102,7 @@ const AlternationItem = ({
   modulePosition,
   index,
   disableAnimation,
+  moduleEditing,
 }: AlternationItemProps) => {
   const styles = useStyleSheet(stylesheet);
   const parentY = useSharedValue(0);
@@ -116,7 +121,7 @@ const AlternationItem = ({
   }, [index, setEditableItemIndex]);
 
   const openLink = () => {
-    if (cardModuleMedia.link?.url) {
+    if (!moduleEditing && cardModuleMedia.link?.url) {
       Linking.openURL(cardModuleMedia.link?.url ?? '');
     }
   };

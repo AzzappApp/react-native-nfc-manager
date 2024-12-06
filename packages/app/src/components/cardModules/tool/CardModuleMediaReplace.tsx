@@ -50,6 +50,7 @@ const CardModuleMediaReplace = ({
             allowVideo={allowVideo}
             onFinished={onFinished}
             onClose={toggleScreenModal}
+            replacing
           />
         )}
       </ScreenModal>

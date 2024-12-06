@@ -37,9 +37,11 @@ type CardModuleMediaPickerProps = Omit<ViewProps, 'children'> & {
    */
   allowVideo?: boolean;
   maxMedia: number;
+  replacing?: boolean;
 };
 
 const CardModuleMediaPicker = ({
+  replacing = false,
   initialMedias,
   onFinished,
   style,
@@ -77,7 +79,7 @@ const CardModuleMediaPicker = ({
         value => value && value.media.id === media.id,
       );
       //do not show the toast in case of replacing a media
-      if (index >= 0 && selectedMedias.length >= maxMedia) {
+      if (!replacing && selectedMedias.length >= maxMedia) {
         //show a tost message
         Toast.show({
           type: 'error',

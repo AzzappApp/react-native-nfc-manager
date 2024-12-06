@@ -25,6 +25,7 @@ type CardModuleMediaTextLinkParallaxProps = CardModuleVariantType & {
   disableParallax?: boolean;
   scrollPosition?: SharedValue<number>;
   modulePosition?: SharedValue<number>;
+  moduleEditing: boolean;
 };
 
 const CardModuleMediaTextLinkParallax = ({
@@ -38,6 +39,7 @@ const CardModuleMediaTextLinkParallax = ({
   disableParallax,
   setEditableItemIndex,
   viewMode,
+  moduleEditing,
 }: CardModuleMediaTextLinkParallaxProps) => {
   const screenDimension = useScreenDimensions();
   const dimension = providedDimension ?? screenDimension;
@@ -63,6 +65,7 @@ const CardModuleMediaTextLinkParallax = ({
             scrollPosition={scrollPosition}
             modulePosition={modulePosition}
             viewMode={viewMode}
+            moduleEditing={moduleEditing}
           />
         );
       })}
@@ -81,6 +84,7 @@ const ParallaxItem = ({
   scrollPosition,
   modulePosition,
   viewMode,
+  moduleEditing,
 }: {
   cardModuleMedia: CardModuleMedia;
   cardModuleColor: CardModuleColor;
@@ -92,6 +96,7 @@ const ParallaxItem = ({
   scrollPosition: SharedValue<number>;
   modulePosition?: SharedValue<number>;
   viewMode: 'desktop' | 'mobile';
+  moduleEditing: boolean;
 }) => {
   const styles = useStyleSheet(stylesheet);
   const onPress = useCallback(() => {
@@ -99,7 +104,7 @@ const ParallaxItem = ({
   }, [index, setEditableItemIndex]);
 
   const openLink = () => {
-    if (cardModuleMedia.link?.url) {
+    if (!moduleEditing && cardModuleMedia.link?.url) {
       Linking.openURL(cardModuleMedia.link?.url ?? '');
     }
   };

@@ -122,8 +122,14 @@ export type CommonModuleRendererProps<T, V extends ModuleKindHasVariants> = {
   setEditableItemIndex?: (index: number) => void;
 
   disableAnimation?: boolean;
-
+  /* 
+  when we are editing the webcard with splitteed view
+  */
   webCardEditing?: boolean;
+  /* 
+  when we are editing the module
+  */
+  moduleEditing?: boolean;
 };
 
 export type CardModuleDimension = {

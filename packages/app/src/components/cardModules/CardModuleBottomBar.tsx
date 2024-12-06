@@ -339,7 +339,7 @@ const getDefaultModuleMediaContent = (
     case 'mediaTextLink':
       return {
         title: DEFAULT_CARD_MODULE_TITLE,
-        DEFAULT_CARD_MODULE_TEXT,
+        text: DEFAULT_CARD_MODULE_TEXT,
         link: {
           url: '',
           label: intl.formatMessage({

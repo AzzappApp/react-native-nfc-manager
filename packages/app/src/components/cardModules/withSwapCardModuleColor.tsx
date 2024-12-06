@@ -10,6 +10,7 @@ type WithSwappedColorsProps<
   T,
   V extends ModuleKindHasVariants,
 > = CommonModuleRendererProps<T, V>;
+
 const withSwapCardModuleColor = <
   T extends { cardModuleColor: CardModuleColor },
   V extends ModuleKindHasVariants,
