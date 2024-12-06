@@ -292,7 +292,7 @@ export const PostRendererActionBarSkeleton = () => {
   return (
     <View style={[styles.container, { marginTop: 10 }]}>
       <View style={{ flexDirection: 'row' }}>
-        <IconButton icon={'like'} style={styles.icon} variant="icon" />
+        <IconButton icon="like" style={styles.icon} variant="icon" />
         <Icon icon="comment" style={styles.icon} />
         <Icon icon="share" style={styles.icon} />
       </View>

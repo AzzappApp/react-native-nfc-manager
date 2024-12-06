@@ -53,9 +53,7 @@ const CompanyActivitiesTypesPage = async () => {
         multiline
         rows={1}
         maxRows={3}
-        value={
-          'Activities types are used to group different activities in the activity list view'
-        }
+        value="Activities types are used to group different activities in the activity list view"
       />
       <CompanyActivitiesTypesList companyActivitiesTypes={items} />
     </Box>

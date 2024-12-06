@@ -114,9 +114,7 @@ const CardTemplatesPage = async ({ searchParams = {} }: Props) => {
         multiline
         rows={1}
         maxRows={3}
-        value={
-          'WebCard templates are associated to a template type, and displayed horizontally in the “load template” view'
-        }
+        value="WebCard templates are associated to a template type, and displayed horizontally in the “load template” view"
       />
       <CardTemplatesList
         cardTemplates={items.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)}

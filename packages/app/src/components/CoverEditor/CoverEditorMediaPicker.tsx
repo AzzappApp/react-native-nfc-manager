@@ -475,7 +475,7 @@ const CoverEditorMediaPicker = ({
                 {maxSelectableVideos ? (
                   <Text variant="small" style={styles.labelMediaSelected}>
                     <FormattedMessage
-                      defaultMessage={`{max, plural, =1 {{max} video max} other {{max} videos max}}`}
+                      defaultMessage="{max, plural, =1 {{max} video max} other {{max} videos max}}"
                       values={{ max: maxSelectableVideos }}
                       description="MediaPicker - max videos"
                     />

@@ -33,7 +33,7 @@ const CoverEditorLinksTool = (
           },
           { links: linksLayer.links.length },
         )}
-        icon={`link`}
+        icon="link"
         onPress={toggleLinksModalVisible}
       />
 

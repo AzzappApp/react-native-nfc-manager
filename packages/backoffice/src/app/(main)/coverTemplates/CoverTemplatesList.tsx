@@ -171,9 +171,9 @@ const CoverTemplatesList = ({
               label="Personal status"
               onChange={onStatusChange}
             >
-              <MenuItem value={'All'}>All</MenuItem>
-              <MenuItem value={'Enabled'}>Enabled</MenuItem>
-              <MenuItem value={'Disabled'}>Disabled</MenuItem>
+              <MenuItem value="All">All</MenuItem>
+              <MenuItem value="Enabled">Enabled</MenuItem>
+              <MenuItem value="Disabled">Disabled</MenuItem>
             </Select>
           </FormControl>
         </Box>

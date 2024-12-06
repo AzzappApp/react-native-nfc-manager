@@ -119,7 +119,7 @@ function SelectList<ItemT>({
       contentContainerStyle={contentContainerStyle}
       style={style}
       scrollEnabled
-      overScrollMode={'always'}
+      overScrollMode="always"
       nestedScrollEnabled
       {...props}
     />

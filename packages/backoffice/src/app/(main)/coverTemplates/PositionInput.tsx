@@ -17,7 +17,7 @@ const PositionInput = ({ field }: Props) => {
   return (
     <>
       <TextField
-        label={'X'}
+        label="X"
         sx={{ flex: 1 }}
         required
         error={!!field.errors}
@@ -31,7 +31,7 @@ const PositionInput = ({ field }: Props) => {
         key={fields.x.key}
       />
       <TextField
-        label={'Y'}
+        label="Y"
         sx={{ flex: 1 }}
         required
         error={!!field.errors}

@@ -228,16 +228,14 @@ const CardModuleMediaPicker = ({
           =1 {1/{max} (max) media selected}
           other {#/{max} (max) media selected}
         }`}
-                      description={
-                        'Medias selection label for free multi selection of media in cover edition'
-                      }
+                      description="Medias selection label for free multi selection of media in cover edition"
                       values={{ count: selectedMedias.length, max: maxMedia }}
                     />
                   </Text>
                   {maxVideo ? (
                     <Text variant="small" style={styles.labelMediaSelected}>
                       <FormattedMessage
-                        defaultMessage={`{max, plural, =1 {{max} video max} other {{max} videos max}}`}
+                        defaultMessage="{max, plural, =1 {{max} video max} other {{max} videos max}}"
                         values={{ max: maxVideo }}
                         description="CardModuleMediaPickerMediaPicker - max videos"
                       />

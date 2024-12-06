@@ -20,7 +20,7 @@ describe('ChangePasswordScreen Screen', () => {
   const renderAccountDetailsEmailForm = () => {
     return render(
       <ResetPasswordScreen
-        screenId={'id'}
+        screenId="id"
         hasFocus
         route={{
           route: 'RESET_PASSWORD',

@@ -78,7 +78,7 @@ const CoverTemplateTagsPage = async () => {
         multiline
         rows={1}
         maxRows={3}
-        value={'Cover filters are displayed at the top of the cover list view'}
+        value="Cover filters are displayed at the top of the cover list view"
       />
       <CoverTemplateTagsList coverTemplateTags={items} />
     </Box>

@@ -176,6 +176,7 @@ export default [
       'formatjs/enforce-placeholders': 'error',
       'formatjs/no-multiple-whitespaces': 'error',
       'react/jsx-boolean-value': 'warn',
+      'react/jsx-curly-brace-presence': 'warn',
       'react-native/no-unused-styles': 2,
       'react-native/no-single-element-style-arrays': 2,
     },

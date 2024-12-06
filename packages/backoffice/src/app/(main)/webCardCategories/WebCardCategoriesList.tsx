@@ -105,9 +105,9 @@ const WebCardCategoriesList = ({
               label="Status"
               onChange={onStatusChange}
             >
-              <MenuItem value={'all'}>All</MenuItem>
-              <MenuItem value={'enabled'}>Enabled</MenuItem>
-              <MenuItem value={'disabled'}>Disabled</MenuItem>
+              <MenuItem value="all">All</MenuItem>
+              <MenuItem value="enabled">Enabled</MenuItem>
+              <MenuItem value="disabled">Disabled</MenuItem>
             </Select>
           </FormControl>
         </Box>

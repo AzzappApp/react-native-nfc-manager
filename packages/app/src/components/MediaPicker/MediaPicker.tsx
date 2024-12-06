@@ -179,7 +179,7 @@ const MediaPicker = ({
         {BottomPanel}
       </Container>
       <PermissionModal
-        permissionsFor={'gallery'}
+        permissionsFor="gallery"
         autoFocus
         onRequestClose={onClose}
       />

@@ -294,9 +294,7 @@ const PhotoGalleryMediaList = ({
             numberOfLines={2}
           >
             <FormattedMessage
-              defaultMessage={
-                'You’ve given azzapp access to a selected number of photos and videos'
-              }
+              defaultMessage="You’ve given azzapp access to a selected number of photos and videos"
               description="ImagePicker Media library - Message when user did not authorize access to media or partially authorize"
             />
           </Text>

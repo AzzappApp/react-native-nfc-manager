@@ -367,7 +367,7 @@ const CoverTemplatesParametersForm = ({
               Cover template type
             </InputLabel>
             <Select
-              labelId={'coverTemplateType-label'}
+              labelId="coverTemplateType-label"
               label="Cover template type"
               {...getSelectProps(fields.typeId)}
               key={fields.typeId.key}
@@ -392,7 +392,7 @@ const CoverTemplatesParametersForm = ({
               Background
             </InputLabel>
             <Select
-              labelId={'coverTemplateBackground-label'}
+              labelId="coverTemplateBackground-label"
               label="Background"
               {...getSelectProps(fields.backgroundColor)}
               key={fields.backgroundColor.key}
@@ -419,7 +419,7 @@ const CoverTemplatesParametersForm = ({
           >
             <InputLabel id="order-label">Order</InputLabel>
             <Select
-              labelId={'order-label'}
+              labelId="order-label"
               label="Cover template type"
               {...getSelectProps(fields.order)}
               key={fields.order.key}
@@ -440,7 +440,7 @@ const CoverTemplatesParametersForm = ({
           >
             <InputLabel id="colorPalette-label">Color Palette</InputLabel>
             <Select
-              labelId={'colorPalette-label'}
+              labelId="colorPalette-label"
               label="Color Palette"
               {...getSelectProps(fields.colorPaletteId)}
               key={fields.colorPaletteId.key}

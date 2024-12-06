@@ -104,7 +104,7 @@ const CoverEditorLinksModal = ({
             {shownLinks.length > 0 && (
               <Text variant="medium" style={styles.linksPreviewCount}>
                 <FormattedMessage
-                  defaultMessage={'{links}/4 links'}
+                  defaultMessage="{links}/4 links"
                   description="CoverEditorLinksModal - Links count"
                   values={{ links: shownLinks.length }}
                 />

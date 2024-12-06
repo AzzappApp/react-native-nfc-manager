@@ -195,9 +195,9 @@ const CardTemplatesList = ({
               label="Business status"
               onChange={onBusinessStatusChange}
             >
-              <MenuItem value={'All'}>All</MenuItem>
-              <MenuItem value={'Enabled'}>Enabled</MenuItem>
-              <MenuItem value={'Disabled'}>Disabled</MenuItem>
+              <MenuItem value="All">All</MenuItem>
+              <MenuItem value="Enabled">Enabled</MenuItem>
+              <MenuItem value="Disabled">Disabled</MenuItem>
             </Select>
           </FormControl>
           <FormControl sx={{ width: 130 }}>
@@ -209,9 +209,9 @@ const CardTemplatesList = ({
               label="Personal status"
               onChange={onPersonalStatusChange}
             >
-              <MenuItem value={'All'}>All</MenuItem>
-              <MenuItem value={'Enabled'}>Enabled</MenuItem>
-              <MenuItem value={'Disabled'}>Disabled</MenuItem>
+              <MenuItem value="All">All</MenuItem>
+              <MenuItem value="Enabled">Enabled</MenuItem>
+              <MenuItem value="Disabled">Disabled</MenuItem>
             </Select>
           </FormControl>
         </Box>

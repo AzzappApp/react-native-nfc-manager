@@ -86,13 +86,13 @@ const CoverTextForm = ({ field }: TextFormProps) => {
           key={textFields.text.key}
           onChange={onChangeText}
         >
-          <MenuItem key={'firstName'} value={'firstName'}>
+          <MenuItem key="firstName" value="firstName">
             <Typography>First name</Typography>
           </MenuItem>
-          <MenuItem key={'mainName'} value={'mainName'}>
+          <MenuItem key="mainName" value="mainName">
             <Typography>Last name / Company name / name</Typography>
           </MenuItem>
-          <MenuItem key={'custom'} value={'custom'}>
+          <MenuItem key="custom" value="custom">
             <Typography>Custom label</Typography>
           </MenuItem>
         </TextField>
@@ -115,7 +115,7 @@ const CoverTextForm = ({ field }: TextFormProps) => {
         >
           <InputLabel id="fontFamily-label">Font family</InputLabel>
           <Select
-            labelId={'fontFamily-label'}
+            labelId="fontFamily-label"
             label="Font family"
             {...getSelectProps(textFields.fontFamily)}
             key={textFields.fontFamily.key}
@@ -164,7 +164,7 @@ const CoverTextForm = ({ field }: TextFormProps) => {
         >
           <InputLabel id="animation-label">Animation</InputLabel>
           <Select
-            labelId={'animation-label'}
+            labelId="animation-label"
             label="Animation"
             {...getSelectProps(textFields.animation)}
             key={textFields.animation.key}
@@ -216,20 +216,20 @@ const CoverTextForm = ({ field }: TextFormProps) => {
           sx={{ flex: 1 }}
           select
           required
-          defaultValue={'left'}
+          defaultValue="left"
           error={!!textFields.textAlign.errors}
           {...getInputProps(textFields.textAlign, {
             type: 'text',
           })}
           key={textFields.textAlign.key}
         >
-          <MenuItem key={'left'} value={'left'}>
+          <MenuItem key="left" value="left">
             <Typography>Left</Typography>
           </MenuItem>
-          <MenuItem key={'right'} value={'right'}>
+          <MenuItem key="right" value="right">
             <Typography>Right</Typography>
           </MenuItem>
-          <MenuItem key={'center'} value={'center'}>
+          <MenuItem key="center" value="center">
             <Typography>Center</Typography>
           </MenuItem>
         </TextField>
