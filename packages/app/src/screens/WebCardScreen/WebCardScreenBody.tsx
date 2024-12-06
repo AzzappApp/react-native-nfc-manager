@@ -43,7 +43,6 @@ import type { WebCardScreenBodyUpdateModulesVisibilityMutation } from '#relayArt
 import type { ProfileBlockContainerProps } from './WebCardBlockContainer';
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { ForwardedRef } from 'react';
-import type { LayoutChangeEvent } from 'react-native';
 import type { Disposable } from 'react-relay';
 import type { StoreUpdater, RecordSourceSelectorProxy } from 'relay-runtime';
 
