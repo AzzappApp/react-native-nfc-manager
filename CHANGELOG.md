@@ -1,5 +1,6 @@
-## 1.4.1-canary.36
+## 1.4.1-canary.37
 
+* **feat:**  - **modules:** change parallax effect on mobile ([#6230](https://github.com/AzzappApp/azzapp/pull/6230))
 * **fix:**  - center color diptyique display if scroll is not required (not enough item) ([#6221](https://github.com/AzzappApp/azzapp/pull/6221))
 * **fix:**  - reduce gap above, not under ([#6223](https://github.com/AzzappApp/azzapp/pull/6223))
 * **feat:**  - web - add video parallax ([#6216](https://github.com/AzzappApp/azzapp/pull/6216))
