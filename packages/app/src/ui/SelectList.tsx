@@ -118,9 +118,9 @@ function SelectList<ItemT>({
       renderItem={renderListItem}
       contentContainerStyle={contentContainerStyle}
       style={style}
-      scrollEnabled={true}
+      scrollEnabled
       overScrollMode={'always'}
-      nestedScrollEnabled={true}
+      nestedScrollEnabled
       {...props}
     />
   );

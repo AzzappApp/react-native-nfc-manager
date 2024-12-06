@@ -154,7 +154,7 @@ const BottomSheetModal = ({
           />
         );
       }
-      return <CustomBackdrop closeOnBackdropTouch={true} {...props} />;
+      return <CustomBackdrop closeOnBackdropTouch {...props} />;
     },
     [closeOnBackdropTouch, variant],
   );
@@ -162,7 +162,7 @@ const BottomSheetModal = ({
   return (
     <BottomSheetModalG
       ref={bottomSheetModalRef}
-      enableDismissOnClose={true}
+      enableDismissOnClose
       handleIndicatorStyle={styles.gestureInteractionIndicator}
       handleStyle={styles.handleStyle}
       backgroundStyle={styles.backgroundStyle}

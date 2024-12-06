@@ -8,10 +8,10 @@ describe('Animated Circle Hint component', () => {
     const { queryByTestId } = render(
       <AnimatedCircleHint
         testID="animated-circle"
-        animating={true}
+        animating
         duration={1000}
         easing={Easing.linear}
-        hidesWhenStopped={true}
+        hidesWhenStopped
       >
         <Animated.View testID="child-view" />
       </AnimatedCircleHint>,
@@ -27,7 +27,7 @@ describe('Animated Circle Hint component', () => {
         animating={false}
         duration={1000}
         easing={Easing.linear}
-        hidesWhenStopped={true}
+        hidesWhenStopped
       >
         <Animated.View testID="child-view" />
       </AnimatedCircleHint>,

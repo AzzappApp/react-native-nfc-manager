@@ -151,7 +151,7 @@ const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
           width={width}
           webCard={webCard}
           style={styles.coverStyle}
-          canPlay={true}
+          canPlay
         />
         <LinearGradient
           colors={['rgba(14, 18, 22,0)', 'rgba(0, 0, 0, 1)']}

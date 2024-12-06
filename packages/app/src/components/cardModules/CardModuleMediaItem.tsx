@@ -61,7 +61,7 @@ const CardModuleMediaItem = ({
           ...imageStyle,
         }}
         thumbnailURI={media.thumbnail}
-        videoEnabled={true}
+        videoEnabled
         paused={false}
       />
     );

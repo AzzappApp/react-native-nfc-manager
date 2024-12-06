@@ -72,7 +72,7 @@ const renderScreen = () => {
   });
 
   const TestRenderer = () => {
-    return <SearchScreen hasFocus={true} />;
+    return <SearchScreen hasFocus />;
   };
 
   const component = render(

@@ -1,11 +1,11 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { fixupConfigRules, fixupPluginRules } from '@eslint/compat';
+import { FlatCompat } from '@eslint/eslintrc';
+import js from '@eslint/js';
 import formatjs from 'eslint-plugin-formatjs';
 import reactNative from 'eslint-plugin-react-native';
 import globals from 'globals';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import js from '@eslint/js';
-import { FlatCompat } from '@eslint/eslintrc';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -175,6 +175,7 @@ export default [
       'formatjs/enforce-default-message': 'error',
       'formatjs/enforce-placeholders': 'error',
       'formatjs/no-multiple-whitespaces': 'error',
+      'react/jsx-boolean-value': 'warn',
       'react-native/no-unused-styles': 2,
       'react-native/no-single-element-style-arrays': 2,
     },
