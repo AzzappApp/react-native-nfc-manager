@@ -71,6 +71,7 @@ const CoverTemplatesParametersForm = ({
   const [enabled, setEnabled] = useState(
     coverTemplate ? coverTemplate.enabled : true,
   );
+  const [uploading, setUploading] = useState(false);
 
   const [form, fields] = useForm<CoverTemplateFormValue>({
     defaultValue: {
@@ -114,11 +115,27 @@ const CoverTemplatesParametersForm = ({
     Array<{ id: File | string; editable: boolean; index: number }>
   >(coverTemplate?.medias ?? []);
 
-  const onMediaChange = (media: {
+  const onMediaChange = async (media: {
     id: File | string | null | undefined;
     editable: boolean;
     index: number;
   }) => {
+    if (media.id instanceof File) {
+      setUploading(true);
+      try {
+        const { public_id } = await uploadMedia(
+          media.id,
+          media.id.type.startsWith('image') ? 'image' : 'video',
+        );
+
+        media.id = public_id;
+        setUploading(false);
+      } catch (e) {
+        setUploading(false);
+        throw e;
+      }
+    }
+
     setMedias(prevMedias => {
       const previousMediaIndex = prevMedias.findIndex(
         prevMedia => prevMedia.index === media.index,
@@ -717,6 +734,24 @@ const CoverTemplatesParametersForm = ({
       >
         <CircularProgress color="inherit" />
       </Backdrop>
+      {uploading && (
+        <Box
+          position="fixed"
+          top={0}
+          left={0}
+          width="100%"
+          height="100%"
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          zIndex={10000}
+          sx={{
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          }}
+        >
+          <CircularProgress color="inherit" />
+        </Box>
+      )}
     </>
   );
 };

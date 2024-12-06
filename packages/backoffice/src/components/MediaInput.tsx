@@ -88,6 +88,8 @@ const MediaInput = ({
               src={src!}
               autoPlay
               loop
+              playsInline
+              muted
             />
           )}
           {isImage && src && (

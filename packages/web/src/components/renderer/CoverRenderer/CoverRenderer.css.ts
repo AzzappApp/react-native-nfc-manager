@@ -48,7 +48,7 @@ const backgroundMedia = style({
     },
     [MediaQuery.Desktop]: {
       display: 'block',
-      height: '966px',
+      height: '870px',
     },
   },
 });
