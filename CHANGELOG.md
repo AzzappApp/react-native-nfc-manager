@@ -1,5 +1,6 @@
-## 1.4.1-canary.44
+## 1.4.1-canary.45
 
+* **fix:**  - **modules:** [#6224](https://github.com/AzzappApp/azzapp/pull/6224) apply good fontFamily ([#6246](https://github.com/AzzappApp/azzapp/pull/6246))
 * **fix:**  - add missing clear timeout ([#6244](https://github.com/AzzappApp/azzapp/pull/6244))
 * **fix:**  - 🐛 properly display birthday ([#6242](https://github.com/AzzappApp/azzapp/pull/6242))
 * **fix:**  - web cover ([#6241](https://github.com/AzzappApp/azzapp/pull/6241))
