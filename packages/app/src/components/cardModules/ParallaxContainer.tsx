@@ -43,7 +43,7 @@ const ParallaxContainer = ({
     const itemStartY = (modulePosition?.value ?? 0) + index * dimension.height;
     const itemEndY = itemStartY + dimension.height;
 
-    const animatedHeight = withTiming(dimension.height * PARALLAX_RATIO, {
+    const animatedHeight = withTiming(dimension.height, {
       duration: PREVIEW_ANIMATION_DURATION,
     });
 
