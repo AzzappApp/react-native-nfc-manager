@@ -1,5 +1,11 @@
-## 1.4.1-canary.50
+## 1.4.1-canary.51
 
+* **fix:**  - missing results "header" result when no post available ([#6164](https://github.com/AzzappApp/azzapp/pull/6164))
+* **fix:**  - add margin top to allow cross access ([#6268](https://github.com/AzzappApp/azzapp/pull/6268))
+* **fix:**  - allow like not correctly updated and avoid updating posts when w… ([#6262](https://github.com/AzzappApp/azzapp/pull/6262))
+* **fix:**  - move date of contact at the end ([#6269](https://github.com/AzzappApp/azzapp/pull/6269))
+* **fix:**  - contentInset is not supported on flashlist, use contentContainerStyle ([#6271](https://github.com/AzzappApp/azzapp/pull/6271))
+* **fix:**  - move specific android contact rework just before adding it to phonebook ([#6273](https://github.com/AzzappApp/azzapp/pull/6273))
 * **fix:**  - **modules:** [#6224](https://github.com/AzzappApp/azzapp/pull/6224) autoplay on chrome ([#6261](https://github.com/AzzappApp/azzapp/pull/6261))
 * **fix:**  - **modules:** [#6224](https://github.com/AzzappApp/azzapp/pull/6224) wrong image size on slideshow ([#6251](https://github.com/AzzappApp/azzapp/pull/6251))
 * **perf:**  - animate on currentIndexProfileSharedValue instead of currentIndexSharedValue ([#6252](https://github.com/AzzappApp/azzapp/pull/6252))
