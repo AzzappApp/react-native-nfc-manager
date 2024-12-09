@@ -551,9 +551,7 @@ const buildContact = async (
     phoneNumbers: phoneNumbers.map(phone => ({
       label:
         Platform.OS === 'android' && phone[0] !== 'Main'
-          ? phone[0] === 'Fax'
-            ? 'workFax'
-            : phone[0].toLowerCase()
+          ? phone[0].toLowerCase()
           : phone[0],
       number: phone[1],
       isPrimary: phone[0] === 'Main',
