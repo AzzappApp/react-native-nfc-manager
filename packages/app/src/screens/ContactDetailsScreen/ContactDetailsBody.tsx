@@ -153,7 +153,7 @@ const stylesheet = createStyleSheet(theme => ({
   },
   close: {
     position: 'absolute',
-    top: 0,
+    top: 20,
     left: 20,
   },
   share: {
