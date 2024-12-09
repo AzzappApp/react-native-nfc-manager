@@ -81,14 +81,9 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
   };
 
   const text = useDerivedValue(() => {
-    if (currentIndexSharedValue.value > 0.5) {
-      return (
-        'azzapp.com/' +
-        userNames.value[Math.round(currentIndexSharedValue.value - 1)]
-      );
-    }
-
-    return 'azzapp.com';
+    // index 0 will be hidden, no need to update it
+    const displayedItem = (currentIndexProfileSharedValue.value || 1) - 1;
+    return 'azzapp.com/' + userNames.value[displayedItem];
   });
 
   return (
