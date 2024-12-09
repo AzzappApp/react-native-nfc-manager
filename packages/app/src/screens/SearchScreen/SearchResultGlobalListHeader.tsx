@@ -1,7 +1,7 @@
 import { useMemo, useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
-import { usePaginationFragment, graphql } from 'react-relay';
+import { graphql, usePaginationFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 
@@ -11,7 +11,6 @@ import SkeletonPlaceholder from '#components/Skeleton';
 import Button from '#ui/Button';
 import Text from '#ui/Text';
 import type { CoverList_users$key } from '#relayArtifacts/CoverList_users.graphql';
-
 import type { SearchResultGlobalListHeader_profile$key } from '#relayArtifacts/SearchResultGlobalListHeader_profile.graphql';
 
 type SearchResultGlobalListHeaderProps = {
@@ -19,35 +18,37 @@ type SearchResultGlobalListHeaderProps = {
   goToProfilesTab: () => void;
 };
 
+export const SearchResultGlobalListHeaderFragment = graphql`
+  fragment SearchResultGlobalListHeader_profile on Profile
+  @refetchable(queryName: "SearchGlobalProfilesListQuery")
+  @argumentDefinitions(
+    after: { type: String }
+    first: { type: Int, defaultValue: 8 }
+    search: { type: "String!" }
+    useLocation: { type: "Boolean!" }
+  ) {
+    searchWebCards(
+      after: $after
+      first: $first
+      search: $search
+      useLocation: $useLocation
+    ) @connection(key: "ViewerGlobal_searchWebCards") {
+      edges {
+        node {
+          id
+          ...CoverList_users
+        }
+      }
+    }
+  }
+`;
+
 const SearchResultGlobalListHeader = ({
   profile,
   goToProfilesTab,
 }: SearchResultGlobalListHeaderProps) => {
   const { data, loadNext, isLoadingNext, hasNext } = usePaginationFragment(
-    graphql`
-      fragment SearchResultGlobalListHeader_profile on Profile
-      @refetchable(queryName: "SearchGlobalProfilesListQuery")
-      @argumentDefinitions(
-        after: { type: String }
-        first: { type: Int, defaultValue: 8 }
-        search: { type: "String!" }
-        useLocation: { type: "Boolean!" }
-      ) {
-        searchWebCards(
-          after: $after
-          first: $first
-          search: $search
-          useLocation: $useLocation
-        ) @connection(key: "ViewerGlobal_searchWebCards") {
-          edges {
-            node {
-              id
-              ...CoverList_users
-            }
-          }
-        }
-      }
-    `,
+    SearchResultGlobalListHeaderFragment,
     profile,
   );
 
@@ -59,7 +60,7 @@ const SearchResultGlobalListHeader = ({
 
   const users: CoverList_users$key = useMemo(() => {
     return convertToNonNullArray(
-      data.searchWebCards?.edges?.map(edge => edge?.node) ?? [],
+      data?.searchWebCards?.edges?.map(edge => edge?.node) ?? [],
     );
   }, [data]);
 

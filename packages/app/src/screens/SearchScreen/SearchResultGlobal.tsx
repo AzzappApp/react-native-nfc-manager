@@ -9,12 +9,15 @@ import PostsGrid from '#components/PostList/PostsGrid';
 import SkeletonPlaceholder from '#components/Skeleton';
 import ListLoadingFooter from '#ui/ListLoadingFooter';
 import SearchResultGlobalListHeader, {
+  SearchResultGlobalListHeaderFragment,
   SearchResultGlobalListHeaderPlaceholder,
 } from './SearchResultGlobalListHeader';
 
 import type { PostsGrid_posts$key } from '#relayArtifacts/PostsGrid_posts.graphql';
+import type { SearchResultGlobalListHeader_profile$data } from '#relayArtifacts/SearchResultGlobalListHeader_profile.graphql';
 import type { SearchResultGlobalPosts_profile$key } from '#relayArtifacts/SearchResultGlobalPosts_profile.graphql';
 import type { SearchResultGlobalQuery } from '#relayArtifacts/SearchResultGlobalQuery.graphql';
+import type { ViewStyle } from 'react-native';
 import type { PreloadedQuery } from 'react-relay';
 
 export const searchResultGlobalQuery = graphql`
@@ -124,10 +127,17 @@ const SearchResultGlobal = ({
     [showLoadingIndicatorDebounced],
   );
 
-  if (!profile) {
-    return null;
-  }
-  if (posts.length === 0) {
+  // header query is done here as we must know number of post to display the "no result" banner
+  const { data: headerData } = usePaginationFragment(
+    SearchResultGlobalListHeaderFragment,
+    profile,
+  );
+
+  const nbWebCard =
+    (headerData as SearchResultGlobalListHeader_profile$data)?.searchWebCards
+      ?.edges?.length || 0;
+
+  if ((nbWebCard === 0 && posts.length === 0) || !profile) {
     return renderNoResultComponent(queryReference.variables.search);
   }
   return (
@@ -152,50 +162,16 @@ export const SearchResultGlobalPlaceHolder = () => {
   return (
     <View>
       <SearchResultGlobalListHeaderPlaceholder />
-      <View
-        style={{
-          marginLeft: 8,
-          marginRight: 8,
-          flexDirection: 'row',
-        }}
-      >
-        <View
-          style={{
-            flex: 1,
-            justifyContent: 'flex-start',
-            alignItems: 'center',
-            width: WIDTH_POST,
-            paddingRight: 5,
-          }}
-        >
-          <SkeletonPlaceholder
-            style={[styles.postPlaceHolder, { height: 80 }]}
-          />
-          <SkeletonPlaceholder
-            style={[styles.postPlaceHolder, { height: 210 }]}
-          />
-          <SkeletonPlaceholder
-            style={[styles.postPlaceHolder, { height: 100 }]}
-          />
+      <View style={styles.placeHolderContainer}>
+        <View style={styles.placeHolderHeaderContainer}>
+          <SkeletonPlaceholder style={styles.placeHolder80} />
+          <SkeletonPlaceholder style={styles.placeHolder210} />
+          <SkeletonPlaceholder style={styles.placeHolder100} />
         </View>
-        <View
-          style={{
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-            width: WIDTH_POST,
-            paddingLeft: 5,
-          }}
-        >
-          <SkeletonPlaceholder
-            style={[styles.postPlaceHolder, { height: 130 }]}
-          />
-          <SkeletonPlaceholder
-            style={[styles.postPlaceHolder, { height: 75 }]}
-          />
-          <SkeletonPlaceholder
-            style={[styles.postPlaceHolder, { height: 210 }]}
-          />
+        <View style={styles.placeHolderBodyContainer}>
+          <SkeletonPlaceholder style={styles.placeHolder130} />
+          <SkeletonPlaceholder style={styles.placeHolder75} />
+          <SkeletonPlaceholder style={styles.placeHolder210} />
         </View>
       </View>
     </View>
@@ -204,11 +180,52 @@ export const SearchResultGlobalPlaceHolder = () => {
 const { width } = Dimensions.get('window');
 
 const WIDTH_POST = (width - 16) / 2;
+
+const postPlaceHolder: ViewStyle = {
+  width: '100%',
+  marginBottom: 5,
+  borderRadius: 16,
+  backgroundColor: colors.grey50,
+};
+
 const styles = StyleSheet.create({
-  postPlaceHolder: {
-    width: '100%',
-    marginBottom: 5,
-    borderRadius: 16,
-    backgroundColor: colors.grey50,
+  placeHolderContainer: {
+    marginLeft: 8,
+    marginRight: 8,
+    flexDirection: 'row',
+  },
+  placeHolderHeaderContainer: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    width: WIDTH_POST,
+    paddingRight: 5,
+  },
+  placeHolderBodyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: WIDTH_POST,
+    paddingLeft: 5,
+  },
+  placeHolder80: {
+    ...postPlaceHolder,
+    height: 80,
+  },
+  placeHolder210: {
+    ...postPlaceHolder,
+    height: 210,
+  },
+  placeHolder100: {
+    ...postPlaceHolder,
+    height: 100,
+  },
+  placeHolder130: {
+    ...postPlaceHolder,
+    height: 130,
+  },
+  placeHolder75: {
+    ...postPlaceHolder,
+    height: 75,
   },
 });
