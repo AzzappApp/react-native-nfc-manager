@@ -17,8 +17,8 @@ import {
   type DerivedValue,
 } from 'react-native-reanimated';
 import {
-  createImageFromNativeBuffer,
-  useNativeBuffer,
+  createImageFromNativeTexture,
+  useNativeTexture,
   type EditionParameters,
   type ImageOrientation,
 } from '#helpers/mediaEditions';
@@ -305,7 +305,7 @@ const ImagePickerContextProviderInner = (
     [],
   );
 
-  const nativeBuffer = useNativeBuffer({
+  const textureInfo = useNativeTexture({
     uri: media?.uri,
     kind: media?.kind,
     time: timeRange?.startTime,
@@ -313,11 +313,18 @@ const ImagePickerContextProviderInner = (
   });
 
   const skImage = useDerivedValue(() => {
-    if (!nativeBuffer) {
+    if (!textureInfo) {
       return null;
     }
-    return createImageFromNativeBuffer(nativeBuffer);
-  }, [nativeBuffer]);
+    return createImageFromNativeTexture(textureInfo);
+  }, [textureInfo]);
+
+  useAnimatedReaction(
+    () => skImage.value,
+    (_, previous) => {
+      previous?.dispose();
+    },
+  );
 
   const [isSkImageReady, setIsSkImageReady] = useState(false);
 

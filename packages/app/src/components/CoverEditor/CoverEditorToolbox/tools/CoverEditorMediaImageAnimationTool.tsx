@@ -24,12 +24,12 @@ import { keyExtractor } from '#helpers/idHelpers';
 import {
   applyImageFrameTransformations,
   applyShaderTransformations,
-  createImageFromNativeBuffer,
+  createImageFromNativeTexture,
   getTransformsForEditionParameters,
   imageFrameFromImage,
   imageFrameToShaderFrame,
   useLutShader,
-  useNativeBuffer,
+  useNativeTexture,
 } from '#helpers/mediaEditions';
 import useBoolean from '#hooks/useBoolean';
 import BottomSheetModal from '#ui/BottomSheetModal';
@@ -75,17 +75,17 @@ const CoverEditorMediaImageAnimationTool = () => {
     [dispatch],
   );
 
-  const buffer = useNativeBuffer({
+  const textureInfo = useNativeTexture({
     uri: activeMedia?.uri,
     kind: activeMedia?.kind,
   });
 
   const skImage = useDerivedValue(() => {
-    if (!buffer) {
+    if (!textureInfo) {
       return null;
     }
-    return createImageFromNativeBuffer(buffer);
-  }, [buffer]);
+    return createImageFromNativeTexture(textureInfo);
+  }, [textureInfo]);
 
   const onChangeDurationSlider = useCallback(
     (duration: number) => {

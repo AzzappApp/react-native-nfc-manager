@@ -12,10 +12,11 @@ import Animated, {
 import { formatDuration } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { NativeBufferLoader } from '#helpers/mediaEditions';
-import BufferImage from '#ui/BufferImage';
+import { NativeTextureLoader } from '#helpers/mediaEditions';
 import Icon from '#ui/Icon';
 import Text from '#ui/Text';
+import TextureImage from '#ui/TextureImage';
+import type { TextureInfo } from '#helpers/mediaEditions/NativeTextureLoader';
 import type { ViewProps } from 'react-native';
 import type { PanGestureHandlerGestureEvent } from 'react-native-gesture-handler';
 
@@ -197,26 +198,26 @@ const VideoTimelineEditor = ({
     [leftPosition, rightPosition],
   );
 
-  const [buffers, setBuffers] = useState<bigint[]>([]);
+  const [texturesInfos, setTexturesInfos] = useState<TextureInfo[]>([]);
   useEffect(() => {
     let canceled = false;
     let keys: string[] = [];
     const thumbnails = range(0, video.duration, video.duration / nbImage).map(
       second =>
-        NativeBufferLoader.loadVideoThumbnail(video.uri, second, {
+        NativeTextureLoader.loadVideoThumbnail(video.uri, second, {
           width: 256,
           height: 256,
         }),
     );
     Promise.all(thumbnails.map(video => video.promise))
-      .then(setBuffers)
+      .then(setTexturesInfos)
       .then(
         () => {
           if (canceled) {
             return;
           }
           keys = thumbnails.map(video => video.key);
-          keys.forEach(NativeBufferLoader.ref);
+          keys.forEach(NativeTextureLoader.ref);
         },
         () => {
           console.warn('error loading images');
@@ -224,7 +225,7 @@ const VideoTimelineEditor = ({
       );
     return () => {
       canceled = true;
-      keys.forEach(NativeBufferLoader.unref);
+      keys.forEach(NativeTextureLoader.unref);
     };
   }, [video.uri, video.duration, nbImage]);
 
@@ -241,11 +242,11 @@ const VideoTimelineEditor = ({
     <View {...props}>
       <View style={styles.root}>
         <Canvas style={{ height: imagesHeight, width: sliderWidth }} opaque>
-          {buffers.map((buffer, index) => (
-            <BufferImage
+          {texturesInfos.map((textureInfo, index) => (
+            <TextureImage
               fit={'cover'}
               key={index}
-              buffer={buffer}
+              textureInfo={textureInfo}
               y={0}
               x={index * itemWidth}
               width={itemWidth}

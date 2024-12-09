@@ -1,3 +1,4 @@
+import type { TextureInfo } from '#helpers/mediaEditions/NativeTextureLoader';
 import type { CoverEditorState } from '../coverEditorTypes';
 import type {
   VideoComposition,
@@ -15,7 +16,7 @@ export type CoverDrawerOptions = {
   height: number;
   coverEditorState: CoverEditorState;
   frames: Record<string, VideoFrame>;
-  images: Record<string, bigint | null>;
+  images: Record<string, TextureInfo>;
   lutShaders: Record<string, SkShader>;
   videoScales: Record<string, number>;
   skottiePlayer?: SkottieTemplatePlayer | null;

@@ -2,8 +2,12 @@
 #include "BufferLoader.h"
 #include "JNIHelpers.h"
 #include <android/log.h>
+#include <EGL/egl.h>
+#include <GLES/gl.h>
 #include <map>
 #include <thread>
+
+#define GR_GL_RGBA8 0x8058
 
 namespace azzapp {
 
@@ -30,23 +34,17 @@ std::string JBufferLoader::loadVideoFrame(std::string uri, double width, double 
 }
 
 void JBufferLoader::postTaskResult(jni::alias_ref<jni::JClass>, jlong bufferLoaderPtr,
-                                     std::string taskId, jni::alias_ref<jobject> jbuffer,
-                                     std::string errorMessage) {
+                                   std::string taskId, jint textureId, jint width, jint height,
+                                   std::string errorMessage) {
   auto receiver = reinterpret_cast<BufferLoaderHostObject*>(bufferLoaderPtr);
-  AHardwareBuffer* buffer = nullptr;
-  if (jbuffer != nullptr) {
-    buffer = AHardwareBuffer_fromHardwareBuffer(
-        jni::Environment::current(), jbuffer.get());
-  }
-  receiver->handleTaskResult(taskId, buffer, errorMessage);
+  receiver->handleTaskResult(taskId, textureId, width, height, errorMessage);
 }
 
-void JBufferLoader::releaseBuffer(std::string bufferId) {
+void JBufferLoader::releaseBuffer(int texId) {
   static const auto loadVideoFrameMethod =
-      getClass()->getMethod<void(std::string)>("releaseBuffer");
-  loadVideoFrameMethod(self(), bufferId);
+      getClass()->getMethod<void(jint)>("releaseBuffer");
+  loadVideoFrameMethod(self(), texId);
 }
-
 
 BufferLoaderHostObject::BufferLoaderHostObject(jsi::Runtime &runtime) {
   jbufferLoader = jni::make_global(JBufferLoader::create((jlong)this));
@@ -58,7 +56,7 @@ std::vector<jsi::PropNameID> BufferLoaderHostObject::getPropertyNames(jsi::Runti
   result.push_back(
       jsi::PropNameID::forUtf8(rt, std::string("loadImage")));
   result.push_back(jsi::PropNameID::forUtf8(rt, std::string("loadVideoFrame")));
-  result.push_back(jsi::PropNameID::forUtf8(rt, std::string("unrefBuffer")));
+  result.push_back(jsi::PropNameID::forUtf8(rt, std::string("unrefTexture")));
   return result;
 }
 
@@ -107,22 +105,19 @@ jsi::Value BufferLoaderHostObject::get(jsi::Runtime& runtime,
           tasks[taskId] = callback;
           return jsi::Value::undefined();
         });
-  } else if (propName == "unrefBuffer") {
+  } else if (propName == "unrefTexture") {
     return jsi::Function::createFromHostFunction(
-        runtime, jsi::PropNameID::forAscii(runtime, "unrefBuffer"), 1,
+        runtime, jsi::PropNameID::forAscii(runtime, "unrefTexture"), 1,
         [this](jsi::Runtime &runtime, const jsi::Value &thisValue,
            const jsi::Value *arguments, size_t count) -> jsi::Value {
-          auto bufferAddress = arguments[0].asBigInt(runtime).asUint64(runtime);
           try {
-            AHardwareBuffer_release(reinterpret_cast<AHardwareBuffer *>(bufferAddress));
+            auto texture = arguments[0].asObject(runtime);
+            int textureId = (int)texture.getProperty(runtime, "fID").asNumber();
+            jbufferLoader->releaseBuffer(textureId);
           } catch(...) {
             __android_log_print(
                 ANDROID_LOG_DEBUG, "BufferLoaderHostObject",
                 "unrefBuffer failed to release");
-          }
-          if (buffers.count(bufferAddress) > 0) {
-            auto taskId = buffers[bufferAddress];
-            jbufferLoader->releaseBuffer(taskId);
           }
           return jsi::Value::undefined();
         });
@@ -130,33 +125,27 @@ jsi::Value BufferLoaderHostObject::get(jsi::Runtime& runtime,
   return jsi::Value::undefined();
 }
 
-void BufferLoaderHostObject::handleTaskResult(std::string taskId, AHardwareBuffer *buffer,
-                                              std::string errorMessage) {
+void BufferLoaderHostObject::handleTaskResult(const std::string& taskId, int texId,
+                                              int width, int height, std::string errorMessage) {
   if (tasks.count(taskId) == 0) {
     return;
   }
   auto callback = tasks[taskId];
   tasks.erase(taskId);
-  uintptr_t bufferAddress = -1;
-  if (buffer == nullptr) {
-    if (errorMessage.size() == 0) {
-      errorMessage = "Failed to retrieve buffer";
-    }
-  } else {
-    AHardwareBuffer_acquire(buffer);
-    bufferAddress = reinterpret_cast<uintptr_t>(buffer);
-    buffers[bufferAddress] = taskId;
-  }
   JNIHelpers::getCallInvoker()->invokeAsync([=]() {
-    if (bufferAddress == -1) {
+    if (!errorMessage.empty()) {
       auto error = jsi::Object(*runtime);
       error.setProperty(
         *runtime, "message",
         jsi::String::createFromUtf8(*runtime, errorMessage));
       callback->call(*runtime, error, jsi::Value::null());
     } else {
-      auto jsBuffer = jsi::BigInt::fromUint64(*runtime, bufferAddress);
-      callback->call(*runtime, jsi::Value::null(), jsBuffer);
+      jsi::Object jsiTextureInfo = jsi::Object(*runtime);
+      jsiTextureInfo.setProperty(*runtime, "glTarget", (int)GL_TEXTURE_2D);
+      jsiTextureInfo.setProperty(*runtime, "glFormat", (int)GR_GL_RGBA8);
+      jsiTextureInfo.setProperty(*runtime, "glID", texId);
+      jsiTextureInfo.setProperty(*runtime, "glProtected", 0);
+      callback->call(*runtime, jsi::Value::null(), jsiTextureInfo, width, height);
     }
   });
 }

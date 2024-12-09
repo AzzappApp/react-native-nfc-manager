@@ -1,63 +1,48 @@
 #import "BufferLoader.h"
-#import <CoreMedia/CMTime.h>
+#import <CoreImage/CoreImage.h>
 
 namespace azzapp {
-BufferLoaderHostObject::BufferLoaderHostObject(std::shared_ptr<react::CallInvoker> callInvoker):
- callInvoker(callInvoker) {
-  ciContext = [CIContext contextWithOptions:nil];
+
+BufferLoaderHostObject::BufferLoaderHostObject(std::shared_ptr<react::CallInvoker> callInvoker)
+  : callInvoker(callInvoker) {
+  metalDevice = MTLCreateSystemDefaultDevice();
+  if (!metalDevice) {
+    throw std::runtime_error("Failed to create MTLDevice");
+  }
+  commandQueue = [metalDevice newCommandQueue];
   colorSpace = CGColorSpaceCreateDeviceRGB();
+  ciContext = [CIContext contextWithMTLDevice:metalDevice];
 }
 
 BufferLoaderHostObject::~BufferLoaderHostObject() {
-  ciContext = nil;
-  CGColorSpaceRelease(colorSpace);
   colorSpace = nil;
+  ciContext = nil;
+  commandQueue = nil;
+  metalDevice = nil;
 }
 
-CVPixelBufferRef BufferLoaderHostObject::ciImageToPixelBuffer(CIImage *ciImage) {
-  CVPixelBufferRef pixelBuffer = NULL;
-  NSDictionary* attributes = @{
-    (NSString*)kCVPixelBufferPixelFormatTypeKey : @(kCVPixelFormatType_32BGRA),
-    (NSString*)kCVPixelBufferWidthKey : @(ciImage.extent.size.width),
-    (NSString*)kCVPixelBufferHeightKey : @(ciImage.extent.size.height),
-    (NSString*)kCVPixelBufferMetalCompatibilityKey : @YES,
-  };
-  CVReturn status = CVPixelBufferCreate(
-      kCFAllocatorDefault, ciImage.extent.size.width, ciImage.extent.size.height, kCVPixelFormatType_32BGRA,
-      (__bridge CFDictionaryRef)attributes, &pixelBuffer);
 
-  if (status != kCVReturnSuccess) {
-    throw std::runtime_error("Failed to create CVPixelBuffer");
-  }
-
-  
-  [ciContext render:ciImage toCVPixelBuffer:pixelBuffer bounds:ciImage.extent colorSpace:colorSpace];
-  CVPixelBufferRetain(pixelBuffer);
-  return pixelBuffer;
-}
-std::vector<jsi::PropNameID>
-  BufferLoaderHostObject::getPropertyNames(jsi::Runtime& rt) {
+std::vector<jsi::PropNameID> BufferLoaderHostObject::getPropertyNames(jsi::Runtime& rt) {
     std::vector<jsi::PropNameID> result;
-    result.push_back(
-        jsi::PropNameID::forUtf8(rt, std::string("loadImage")));
+    result.push_back(jsi::PropNameID::forUtf8(rt, std::string("loadImage")));
     result.push_back(jsi::PropNameID::forUtf8(rt, std::string("loadVideoFrame")));
-    result.push_back(jsi::PropNameID::forUtf8(rt, std::string("unrefBuffer")));
+    result.push_back(jsi::PropNameID::forUtf8(rt, std::string("unrefTexture")));
     return result;
-  }
+}
 
-jsi::Value BufferLoaderHostObject::get(jsi::Runtime& runtime,
-                                      const jsi::PropNameID& propNameId) {
-  auto propName = propNameId.utf8(runtime);
 
-  if (propName == "loadImage") {
-    return jsi::Function::createFromHostFunction(
-      runtime, jsi::PropNameID::forAscii(runtime, "loadImage"), 3,
+jsi::Value BufferLoaderHostObject::get(jsi::Runtime &runtime, const jsi::PropNameID &name) {
+  auto propName = name.utf8(runtime);
+
+ if (propName == "loadImage") {
+  return jsi::Function::createFromHostFunction(
+    runtime, jsi::PropNameID::forAscii(runtime, "loadImage"), 3,
       [this](jsi::Runtime &runtime, const jsi::Value &thisValue,
-          const jsi::Value *arguments, size_t count) -> jsi::Value {
-        NSString* url = [NSString stringWithUTF8String:arguments[0]
-                                                      .asString(runtime)
-                                                      .utf8(runtime)
-                                                      .c_str()];
+             const jsi::Value *arguments, size_t count) -> jsi::Value {
+        NSString *url = [NSString stringWithUTF8String:arguments[0]
+                                                     .asString(runtime)
+                                                     .utf8(runtime)
+                                                     .c_str()];
         CGSize maxSize = CGSizeZero;
         if (arguments[1].isObject()) {
           auto size = arguments[1].asObject(runtime);
@@ -65,46 +50,35 @@ jsi::Value BufferLoaderHostObject::get(jsi::Runtime& runtime,
           maxSize.height = size.getProperty(runtime, "height").asNumber();
         }
         auto callback = std::make_shared<jsi::Function>(arguments[2].asObject(runtime).asFunction(runtime));
-        [AZPCIImageLoader
-          loadImageWithUrl:url
-          maxSize: maxSize
-          onSuccess:^(CIImage* _Nonnull ciImage) {
-              
-            CVPixelBufferRef pixelBuffer;
-            try {
-              pixelBuffer = ciImageToPixelBuffer(ciImage);
-            } catch(...){}
-            
-            callInvoker->invokeAsync(
-              [&runtime, pixelBuffer, callback]() -> void {
-                if (pixelBuffer == nullptr) {
-                  callback->call(runtime, jsi::String::createFromUtf8(runtime, "Failed to create pixelBuffer"));
-                  return;
-                }
-                auto jsBuffer = jsi::BigInt::fromUint64(runtime, reinterpret_cast<uintptr_t>(pixelBuffer));
-                callback->call(runtime, jsi::Value::null(), jsBuffer);
-              });
-            }
-          onError:^(NSError * _Nullable error) {
-            callInvoker->invokeAsync(
-              [&runtime, error, callback]() -> void {
-                auto jsError = jsi::Object(runtime);
-                auto message = error != nil ? [error localizedDescription] : @"Failed to load image";
-                callback->call(runtime, jsi::String::createFromUtf8(runtime, [message UTF8String]));
-              });
-          }];
+
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+          loadTexture(callback, runtime, [&]() -> id<MTLTexture> {
+            NSURL *imageURL = [NSURL URLWithString:url];
+            if (!imageURL) throw std::runtime_error("Invalid image URL");
+
+            CIImage *ciImage = [[CIImage alloc] initWithContentsOfURL:imageURL options:@{
+              kCIImageApplyOrientationProperty: @YES
+            }];
+            if (!ciImage) throw std::runtime_error("Failed to load image");
+
+            return createMTLTextureFromCIImage(ciImage, maxSize);
+          });
+        });
 
         return jsi::Value::undefined();
       });
-  } else if(propName == "loadVideoFrame") {
+  }
+
+  
+  if (propName == "loadVideoFrame") {
     return jsi::Function::createFromHostFunction(
-      runtime, jsi::PropNameID::forAscii(runtime, "loadVideoFrame"), 3,
+      runtime, jsi::PropNameID::forAscii(runtime, "loadVideoFrame"), 4,
       [this](jsi::Runtime &runtime, const jsi::Value &thisValue,
-          const jsi::Value *arguments, size_t count) -> jsi::Value {
-        NSString* url = [NSString stringWithUTF8String:arguments[0]
-                                                      .asString(runtime)
-                                                      .utf8(runtime)
-                                                      .c_str()];
+             const jsi::Value *arguments, size_t count) -> jsi::Value {
+        NSString *url = [NSString stringWithUTF8String:arguments[0]
+                                                     .asString(runtime)
+                                                     .utf8(runtime)
+                                                     .c_str()];
         double time = arguments[1].asNumber();
         CGSize maxSize = CGSizeZero;
         if (arguments[2].isObject()) {
@@ -114,156 +88,132 @@ jsi::Value BufferLoaderHostObject::get(jsi::Runtime& runtime,
         }
         auto callback = std::make_shared<jsi::Function>(arguments[3].asObject(runtime).asFunction(runtime));
 
-        [AZPCIImageLoader
-          loadVideoThumbnailWithUrl:url
-          time:CMTimeMakeWithSeconds(time, NSEC_PER_SEC)
-          maxSize:maxSize
-          onSuccess:^(CIImage* _Nonnull ciImage) {
-              
-            CVPixelBufferRef pixelBuffer;
-            try {
-              pixelBuffer = ciImageToPixelBuffer(ciImage);
-            } catch(...){}
-            
-            callInvoker->invokeAsync(
-              [&runtime, pixelBuffer, callback]() -> void {
-                if (pixelBuffer == nullptr) {
-                  callback->call(runtime, jsi::String::createFromUtf8(runtime, "Failed to create pixelBuffer"));
-                  return;
-                }
-                auto jsBuffer = jsi::BigInt::fromUint64(runtime, reinterpret_cast<uintptr_t>(pixelBuffer));
-                callback->call(runtime, jsi::Value::null(), jsBuffer);
-              });
-            }
-          onError:^(NSError * _Nullable error) {
-            callInvoker->invokeAsync(
-              [&runtime, error, callback]() -> void {
-                auto jsError = jsi::Object(runtime);
-                auto message = error != nil ? [error localizedDescription] : @"Failed to load image";
-                callback->call(runtime, jsi::String::createFromUtf8(runtime, [message UTF8String]));
-              });
-          }];
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+          loadTexture(callback, runtime, [&]() -> id<MTLTexture> {
+            NSURL *videoURL = [NSURL URLWithString:url];
+            if (!videoURL) throw std::runtime_error("Invalid video URL");
 
-        return jsi::Value::undefined();
-      });
-  } else if (propName == "unrefBuffer") {
-    return jsi::Function::createFromHostFunction(
-        runtime, jsi::PropNameID::forAscii(runtime, "unrefBuffer"), 1,
-        [](jsi::Runtime &runtime, const jsi::Value &thisValue,
-               const jsi::Value *arguments, size_t
-                count) -> jsi::Value {
-          try {
-            auto bigint = arguments[0].asBigInt(runtime).asUint64(runtime);
-            auto buffer= reinterpret_cast<CVPixelBufferRef>(bigint);
-            CVPixelBufferRelease(buffer);
-          } catch(...) {
-            NSLog(@"BufferLoaderHostObject unrefBuffer failed to release");
-          }
-          return jsi::Value::undefined();
-        });
-  }
-  
-  return jsi::Value::undefined();
-}
-}
-
-
-@implementation AZPCIImageLoader
-
-+ (void)loadImageWithUrl:(NSString * _Nonnull)url
-                 maxSize:(CGSize)maxSize
-               onSuccess:(void (^ _Nonnull __strong)(CIImage * _Nonnull __strong))onSuccess
-                 onError:(void (^ _Nonnull __strong)(NSError * _Nullable __strong))onError {
-    
-    NSURL *imageURL = [NSURL URLWithString:url];
-    if (!imageURL) {
-        NSError *error = [NSError errorWithDomain:@"com.azzapp.app"
-                                             code:0
-                                         userInfo:@{NSLocalizedDescriptionKey: @"Failed to parse url"}];
-        onError(error);
-        return;
-    }
-    
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        @try {
-            CIImage *ciImage = [[CIImage alloc] initWithContentsOfURL:imageURL options:@{
-              kCIImageApplyOrientationProperty: @YES
-            }];
-            if (!ciImage) {
-                NSError *error = [NSError errorWithDomain:@"com.azzapp.app"
-                                                     code:0
-                                                 userInfo:@{NSLocalizedDescriptionKey: @"Failed to handle image"}];
-                onError(error);
-                return;
-            }
-            
-            if (!CGSizeEqualToSize(maxSize, CGSizeZero)) {
-                CGFloat aspectRatio = ciImage.extent.size.width / ciImage.extent.size.height;
-                if (aspectRatio > 1) {
-                    ciImage = [ciImage imageByApplyingTransform:CGAffineTransformMakeScale(maxSize.width / ciImage.extent.size.width, maxSize.width / ciImage.extent.size.width)];
-                } else {
-                    ciImage = [ciImage imageByApplyingTransform:CGAffineTransformMakeScale(maxSize.height / ciImage.extent.size.height, maxSize.height / ciImage.extent.size.height)];
-                }
-            }
-            
-            onSuccess(ciImage);
-        }
-        @catch (NSException *exception) {
-            NSError *error = [NSError errorWithDomain:@"com.azzapp.app"
-                                                 code:0
-                                             userInfo:@{NSLocalizedDescriptionKey: @"Failed to load image data"}];
-            onError(error);
-        }
-    });
-}
-
-
-+ (void)loadVideoThumbnailWithUrl:(NSString * _Nonnull)url
-                             time:(CMTime)time
-                          maxSize:(CGSize)maxSize
-                        onSuccess:(void (^ _Nonnull __strong)(CIImage * _Nonnull __strong))onSuccess
-                          onError:(void (^ _Nonnull __strong)(NSError * _Nullable __strong))onError {
-    
-    NSURL *videoURL = [NSURL URLWithString:url];
-    if (!videoURL) {
-        NSError *error = [NSError errorWithDomain:@"com.azzapp.app"
-                                             code:0
-                                         userInfo:@{NSLocalizedDescriptionKey: @"Failed to parse url"}];
-        onError(error);
-        return;
-    }
-    
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        @try {
             AVAsset *asset = [AVAsset assetWithURL:videoURL];
             AVAssetImageGenerator *generator = [[AVAssetImageGenerator alloc] initWithAsset:asset];
             generator.appliesPreferredTrackTransform = YES;
-            
+
             if (!CGSizeEqualToSize(maxSize, CGSizeZero)) {
-                generator.maximumSize = maxSize;
+              generator.maximumSize = maxSize;
             }
-            
-            NSError *generationError = nil;
-            CGImageRef cgiImage = [generator copyCGImageAtTime:time actualTime:NULL error:&generationError];
-            
-            if (generationError) {
-                onError(generationError);
-                return;
-            }
-            
-            CIImage *ciImage = [CIImage imageWithCGImage:cgiImage];
-            CGImageRelease(cgiImage);
-            onSuccess(ciImage);
+
+            NSError *error = nil;
+            CGImageRef cgImage = [generator copyCGImageAtTime:CMTimeMakeWithSeconds(time, 600)
+                                                 actualTime:nil
+                                                      error:&error];
+            if (error || !cgImage) throw std::runtime_error("Failed to generate video frame");
+
+            CIImage *ciImage = [CIImage imageWithCGImage:cgImage];
+            id<MTLTexture> texture = createMTLTextureFromCIImage(ciImage, maxSize);
+            CGImageRelease(cgImage);
+
+            return texture;
+          });
+        });
+
+        return jsi::Value::undefined();
+      });
+  }
+
+  if (propName == "unrefTexture") {
+    return jsi::Function::createFromHostFunction(
+      runtime, jsi::PropNameID::forAscii(runtime, "unrefTexture"), 1,
+      [this](jsi::Runtime &runtime, const jsi::Value &thisValue,
+             const jsi::Value *arguments, size_t count) -> jsi::Value {
+        try {
+          uint64_t textureKey = arguments[0].asObject(runtime)
+            .getProperty(runtime, "mtlTexture")
+            .asBigInt(runtime).asUint64(runtime);
+          auto it = textureCache.find(textureKey);
+          if (it != textureCache.end()) {
+            id<MTLTexture> texture = it->second;
+            [texture setPurgeableState:MTLPurgeableStateEmpty];
+            textureCache.erase(it);
+          }
+        } catch (...) {
+          NSLog(@"BufferLoaderHostObject: unrefTexture failed to release");
         }
-        @catch (NSException *exception) {
-            NSError *error = [NSError errorWithDomain:@"com.azzapp.app"
-                                                 code:0
-                                             userInfo:@{NSLocalizedDescriptionKey: exception.reason}];
-            onError(error);
-        }
+        return jsi::Value::undefined();
+      });
+  }
+
+  return jsi::Value::undefined();
+}
+
+id<MTLTexture> BufferLoaderHostObject::createMTLTextureFromCIImage(CIImage *image, CGSize maxSize) {
+  if (!CGSizeEqualToSize(maxSize, CGSizeZero)) {
+    CGFloat aspectRatio = image.extent.size.width / image.extent.size.height;
+    if (aspectRatio > 1) {
+      image = [image imageByApplyingTransform:CGAffineTransformMakeScale(
+        maxSize.width / image.extent.size.width,
+        maxSize.width / image.extent.size.width)];
+    } else {
+      image = [image imageByApplyingTransform:CGAffineTransformMakeScale(
+        maxSize.height / image.extent.size.height,
+        maxSize.height / image.extent.size.height)];
+    }
+  }
+
+  CGSize imageSize = image.extent.size;
+
+  MTLTextureDescriptor *descriptor = [[MTLTextureDescriptor alloc] init];
+  descriptor.pixelFormat = MTLPixelFormatBGRA8Unorm;
+  descriptor.width = imageSize.width;
+  descriptor.height = imageSize.height;
+  descriptor.usage = MTLTextureUsageShaderRead | MTLTextureUsageShaderWrite;
+  descriptor.storageMode = MTLStorageModePrivate;
+
+  id<MTLTexture> texture = [metalDevice newTextureWithDescriptor:descriptor];
+  if (!texture) {
+    throw std::runtime_error("Failed to create Metal texture");
+  }
+
+  CGAffineTransform transform = CGAffineTransformMakeTranslation(0, imageSize.height);
+  transform = CGAffineTransformScale(transform, 1.0, -1.0);
+  CIImage *flippedImage = [image imageByApplyingTransform:transform];
+
+  [ciContext render:flippedImage toMTLTexture:texture commandBuffer:nil bounds:image.extent colorSpace:colorSpace];
+
+  return texture;
+}
+
+void BufferLoaderHostObject::loadTexture(
+  std::shared_ptr<jsi::Function> callback, jsi::Runtime &runtime,
+  const std::function<id<MTLTexture>  _Nonnull ()> &textureCreator) {
+  bool hasError = false;
+  std::string error =" Failed to load texture";
+  try {
+    // Crée la texture à partir de la fonction passée
+    id<MTLTexture> texture = textureCreator();
+    if (!texture) throw std::runtime_error("Failed to create texture");
+
+    // Ajoute la texture au cache
+    CGSize size = CGSizeMake(texture.width, texture.height);
+    uint64_t textureKey = reinterpret_cast<uint64_t>(texture);
+    textureCache[textureKey] = texture;
+
+    // Invoque le callback avec les informations de texture
+    callInvoker->invokeAsync([&runtime, callback, textureKey, size]() {
+      jsi::Object texInfo = jsi::Object(runtime);
+      texInfo.setProperty(runtime, "mtlTexture", jsi::BigInt::fromUint64(runtime, textureKey));
+      callback->call(runtime, jsi::Value::null(), texInfo, size.width, size.height);
     });
+  } catch (const std::exception &e) {
+    hasError = true;
+    error = e.what();
+  } catch(...) {
+    hasError = true;
+  }
+  if (hasError) {
+    callInvoker->invokeAsync([&runtime, callback, error]() {
+      callback->call(runtime, jsi::String::createFromUtf8(runtime, error));
+    });
+  }
 }
 
 
-
-@end
+} // namespace azzapp

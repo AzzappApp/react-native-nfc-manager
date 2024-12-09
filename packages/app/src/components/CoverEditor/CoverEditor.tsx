@@ -29,7 +29,7 @@ import {
 } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import { ScreenModal, preventModalDismiss } from '#components/NativeRouter';
-import { NativeBufferLoader, loadAllLUTShaders } from '#helpers/mediaEditions';
+import { NativeTextureLoader, loadAllLUTShaders } from '#helpers/mediaEditions';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Text from '#ui/Text';
@@ -456,7 +456,7 @@ const CoverEditorCore = (
         if (media.kind === 'image') {
           const path = localPaths[media.id];
           const scale = imagesScales[media.id] ?? 1;
-          const { key, promise } = NativeBufferLoader.loadImage(
+          const { key, promise } = NativeTextureLoader.loadImage(
             `file://${path}`,
             {
               width: media.width * scale,
@@ -527,11 +527,11 @@ const CoverEditorCore = (
   useEffect(() => {
     const keys = imageRefKeys.current;
     Object.keys(coverEditorState.images).forEach(id => {
-      NativeBufferLoader.ref(keys[id]);
+      NativeTextureLoader.ref(keys[id]);
     });
     return () => {
       Object.keys(coverEditorState.images).forEach(id => {
-        NativeBufferLoader.unref(keys[id]);
+        NativeTextureLoader.unref(keys[id]);
       });
     };
   }, [coverEditorState.images]);

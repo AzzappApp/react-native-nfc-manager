@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import useLatestCallback from '#hooks/useLatestCallback';
-import NativeBufferLoader from './NativeBufferLoader';
+import NativeTextureLoader from './NativeTextureLoader';
 
-const useNativeBuffer = ({
+const useNativeTexture = ({
   uri,
   kind,
   maxSize,
@@ -17,26 +17,30 @@ const useNativeBuffer = ({
   onLoad?: () => void;
   onError?: (error?: Error) => void;
 }) => {
-  const [image, setImage] = useState<bigint | null>(null);
+  const [textureInfo, setTextureInfo] = useState<{
+    texture: unknown;
+    width: number;
+    height: number;
+  } | null>(null);
   const onLoadInner = useLatestCallback(onLoad);
   const onErrorInner = useLatestCallback(onError);
   useEffect(() => {
     let canceled = false;
-    setImage(null);
+    setTextureInfo(null);
     let refKey: string | null = null;
     if (uri && kind) {
       const { key, promise } =
         kind === 'image'
-          ? NativeBufferLoader.loadImage(uri, maxSize)
-          : NativeBufferLoader.loadVideoThumbnail(uri, time ?? 0, maxSize);
+          ? NativeTextureLoader.loadImage(uri, maxSize)
+          : NativeTextureLoader.loadVideoThumbnail(uri, time ?? 0, maxSize);
       promise.then(
         image => {
           if (canceled) {
             return;
           }
           refKey = key;
-          NativeBufferLoader.ref(key);
-          setImage(image);
+          NativeTextureLoader.ref(key);
+          setTextureInfo(image);
           onLoadInner();
         },
         err => {
@@ -50,12 +54,12 @@ const useNativeBuffer = ({
     return () => {
       canceled = true;
       if (refKey) {
-        NativeBufferLoader.unref(refKey);
+        NativeTextureLoader.unref(refKey);
       }
     };
   }, [uri, kind, time, onLoadInner, onErrorInner, maxSize]);
 
-  return image;
+  return textureInfo;
 };
 
-export default useNativeBuffer;
+export default useNativeTexture;

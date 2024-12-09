@@ -8,6 +8,11 @@ import android.media.Image;
 import android.media.ImageReader;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
+import android.opengl.EGL14;
+import android.opengl.GLES20;
+import android.opengl.GLUtils;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import com.bumptech.glide.Glide;
@@ -16,16 +21,26 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class BufferLoader {
-  private final ExecutorService executorService = Executors.newCachedThreadPool();
+import javax.microedition.khronos.egl.EGL10;
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.egl.EGLContext;
+import javax.microedition.khronos.egl.EGLDisplay;
+import javax.microedition.khronos.egl.EGLSurface;
 
-  private final HashMap<String, BufferResources> bufferResources = new HashMap<>();
+public class BufferLoader {
+  private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
   private final long bufferLoaderPtr;
+  private EGLContext sharedContext;
+  private EGL10 egl  = null;
+  private EGLContext context = null;
+  private EGLSurface surface = null;
+  private EGLDisplay display = null;
 
   public BufferLoader(long bufferLoaderPtr) {
     this.bufferLoaderPtr = bufferLoaderPtr;
@@ -60,101 +75,153 @@ public class BufferLoader {
     });
   }
 
-  public void releaseBuffer(String bufferId) {
-    BufferResources resources = bufferResources.get(bufferId);
-    if (resources == null) {
-      Log.w("BufferLoaderHostObject", "Cleaning buffer that is not registered");
-      return;
-    }
-    try {
-      resources.hardwareBuffer.close();
-      resources.image.close();
-      resources.imageReader.close();
-    } catch (Exception e) {
-      Log.w("BufferLoaderHostObject", "Error while disposing resources", e);
-    }
-    bufferResources.remove(bufferId);
+  public void releaseBuffer(int texId) {
+    executorService.execute(() -> {
+      if (context == null) {
+        return;
+      }
+      egl.eglMakeCurrent(display, surface, surface, context);
+      int[] textures = {texId};
+      GLES20.glDeleteTextures(1, textures, 0);
+    });
   }
 
   private String enqueueTask(double width, double height, BitmapLoader loader) {
     String taskId = UUID.randomUUID().toString();
+    if(sharedContext == null) {
+      Handler mainHandler = new Handler(Looper.getMainLooper());
+      CompletableFuture<Void> completableFuture = new CompletableFuture<>();
+      mainHandler.post(() -> {
+        sharedContext = ((EGL10) EGLContext.getEGL()).eglGetCurrentContext();
+        if (sharedContext == EGL10.EGL_NO_CONTEXT) {
+          completableFuture.completeExceptionally(new RuntimeException("Skia context is not initialized"));
+        } else {
+          completableFuture.complete(null);
+        }
+      });
+      try {
+        completableFuture.get();
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    }
     executorService.execute(() -> {
       Bitmap bitmap = null;
       try {
         bitmap = loader.load();
       } catch (Exception e) {
-        postTaskResult(bufferLoaderPtr, taskId, null, e.getMessage());
+        postFailure(taskId, e.getMessage());
       }
       if (bitmap == null) {
-        postTaskResult(bufferLoaderPtr, taskId, null, "Failed to retrieve bitmap");
+        postFailure(taskId, "Failed to retrieve bitmap");
         return;
       }
-      if (width != 0 && height != 0 && bitmap != null &&
-        (bitmap.getWidth() > width || bitmap.getHeight() > height)) {
+      int textureWidth = bitmap.getWidth();
+      int textureHeight = bitmap.getHeight();
+      if (width != 0 && height != 0 &&
+        (textureWidth > width || textureHeight > height)) {
         double aspectRatio = (double) bitmap.getWidth() / bitmap.getHeight();
         if (aspectRatio > width / height) {
           bitmap = Bitmap.createScaledBitmap(bitmap, (int) width, (int) (width / aspectRatio), true);
         } else {
           bitmap = Bitmap.createScaledBitmap(bitmap, (int) (height * aspectRatio), (int) height, true);
         }
-      }
-      ImageReader imageReader;
-      if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-        imageReader = ImageReader.newInstance(
-          bitmap.getWidth(), bitmap.getHeight(),
-          PixelFormat.RGBA_8888, 1,
-          HardwareBuffer.USAGE_GPU_SAMPLED_IMAGE
-        );
-      } else {
-        imageReader = ImageReader.newInstance(
-          bitmap.getWidth(), bitmap.getHeight(),
-          PixelFormat.RGBA_8888, 1
-        );
+        textureWidth = bitmap.getWidth();
+        textureHeight = bitmap.getHeight();
       }
 
-      Canvas canvas = null;
-      try {
-        canvas = imageReader.getSurface().lockCanvas(null);
-        canvas.drawBitmap(bitmap, 0, 0, null);
-      } finally {
-        if (canvas != null) {
-          imageReader.getSurface().unlockCanvasAndPost(canvas);
+      if (context == null) {
+        egl = (EGL10) EGLContext.getEGL();
+        display = egl.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY);
+
+        EGLConfig[] configs = new EGLConfig[1];
+        int[] numConfigs = new int[1];
+        int[] configAttributes = new int[]{
+          EGL10.EGL_RED_SIZE, 8,
+          EGL10.EGL_GREEN_SIZE, 8,
+          EGL10.EGL_BLUE_SIZE, 8,
+          EGL10.EGL_ALPHA_SIZE, 8,
+          EGL10.EGL_DEPTH_SIZE, 0,
+          EGL10.EGL_STENCIL_SIZE, 0,
+          EGL10.EGL_RENDERABLE_TYPE, EGL14.EGL_OPENGL_ES2_BIT,
+          EGL14.EGL_CONFIG_CAVEAT, EGL14.EGL_NONE,
+          EGL14.EGL_SURFACE_TYPE, EGL14.EGL_PBUFFER_BIT,
+          EGL10.EGL_NONE
+        };
+        boolean success =
+          egl.eglChooseConfig(
+            display,
+            configAttributes,
+            configs,
+            1,
+            numConfigs
+          );
+
+        if (!success) {
+          throw new RuntimeException("No egl config found");
         }
+        EGLConfig config = configs[0];
+
+        int[] glAttributes = new int[]{EGL14.EGL_CONTEXT_CLIENT_VERSION, 2, EGL10.EGL_NONE};
+        context = egl.eglCreateContext(display, config, sharedContext, glAttributes);
+
+        int[] surfaceAttributes = {
+          EGL10.EGL_WIDTH,
+          1,
+          EGL10.EGL_HEIGHT,
+          1,
+          EGL10.EGL_NONE
+        };
+        surface = egl.eglCreatePbufferSurface(display, config, surfaceAttributes);
+      }
+      egl.eglMakeCurrent(display, surface, surface, context);
+
+      int[] textureIds = new int[1];
+      GLES20.glGenTextures(1, textureIds, 0);
+      int textureId = textureIds[0];
+      if (textureId == 0) {
+        postFailure(taskId, "Failed to generate texture");
+        return;
       }
 
-      Image image = imageReader.acquireLatestImage();
-      if (image == null) {
-        imageReader.close();
-        postTaskResult(bufferLoaderPtr, taskId, null, "Failed to retrieve image");
-        return;
-      }
-      HardwareBuffer buffer = image.getHardwareBuffer();
-      if (buffer == null) {
-        image.close();
-        imageReader.close();
-        postTaskResult(bufferLoaderPtr, taskId, null, "Failed to retrieve buffer");
-        return;
-      }
-      bufferResources.put(taskId, new BufferResources(
-        imageReader,
-        image,
-        buffer
-      ));
-      postTaskResult(bufferLoaderPtr, taskId, buffer, null);
+      GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureId);
+      GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+      GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+      GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+      GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+
+      // Charge le bitmap dans la texture OpenGL
+      GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
+
+      postTaskResult(bufferLoaderPtr, taskId, textureId, textureWidth, textureHeight, null);
     });
     return taskId;
   }
 
-  private static native void postTaskResult(long bufferLoaderPtr, String taskId, Object buffer, String e);
+  public void release() {
+    if (surface != null) {
+      egl.eglDestroySurface(display, surface);
+    }
+    if (context != null) {
+      egl.eglDestroyContext(display, context);
+    }
+  }
+
+
+  private void postFailure(String taskId, String errorMessage) {
+    postTaskResult(bufferLoaderPtr,taskId, -1, 0, 0, errorMessage);
+  }
+
+  private static native void postTaskResult(
+    long bufferLoaderPtr,
+    String taskId,
+    int texId,
+    int width,
+    int height,
+    String e
+  );
 
   private interface BitmapLoader {
     Bitmap load() throws IOException, ExecutionException, InterruptedException;
-  }
-
-  private record BufferResources(
-    ImageReader imageReader,
-    Image image,
-    HardwareBuffer hardwareBuffer
-  ) {
   }
 }

@@ -3,7 +3,7 @@ import { COVER_MAX_MEDIA_DURATION } from '@azzapp/shared/coverHelpers';
 import {
   applyImageFrameTransformations,
   applyShaderTransformations,
-  createImageFromNativeBuffer,
+  createImageFromNativeTexture,
   getTransformsForEditionParameters,
   imageFrameFromImage,
   imageFrameFromVideoFrame,
@@ -59,7 +59,7 @@ const coverMediasDrawer = ({
       let scale = 1;
       let animation: MediaAnimation | null = null;
       if (media.kind === 'image') {
-        const image = createImageFromNativeBuffer(images[media.id]);
+        const image = createImageFromNativeTexture(images[media.id]);
         if (!image) {
           continue;
         }

@@ -1,6 +1,6 @@
 import {
   applyImageFrameTransformations,
-  createImageFromNativeBuffer,
+  createImageFromNativeTexture,
   imageFrameFromImage,
   imageFrameFromVideoFrame,
   imageFrameTransformations,
@@ -43,7 +43,7 @@ const coverSkottieDrawer = ({
     let imageFrame: ImageFrame | null = null;
     let scale = 1;
     if (media.kind === 'image') {
-      const image = createImageFromNativeBuffer(images[media.id]);
+      const image = createImageFromNativeTexture(images[media.id]);
       scale = imagesScales[media.id] ?? 1;
       imageFrame = image ? imageFrameFromImage(image) : null;
     } else {
