@@ -4,7 +4,7 @@ import BufferLoader from '@azzapp/react-native-buffer-loader';
 import type { SkImage } from '@shopify/react-native-skia';
 
 // would be cool to have weak ref and finalization registry here to clean up images
-// we will do it manually for now waiting for react-native 0.75
+// we will do it manually for now waiting for react-native
 
 export type TextureInfo = {
   texture: unknown;
@@ -18,18 +18,32 @@ const loadImageTasks = new Map<
 >();
 const textures = new Map<
   string,
-  { texture: unknown; width: number; height: number; refCount: number }
+  {
+    texture: unknown;
+    width: number;
+    height: number;
+    refCount: number;
+    _timeToDelete?: number;
+  }
 >();
 
 let cleanupTimeout: any = null;
 const scheduleCleanUp = () => {
   clearTimeout(cleanupTimeout);
   cleanupTimeout = setTimeout(() => {
+    let reschedule = false;
     for (const [key, ref] of textures) {
       if (ref.refCount <= 0) {
-        textures.delete(key);
-        BufferLoader.unrefTexture(ref.texture);
+        if (ref._timeToDelete != null && ref._timeToDelete > Date.now()) {
+          reschedule = true;
+        } else {
+          textures.delete(key);
+          BufferLoader.unrefTexture(ref.texture);
+        }
       }
+    }
+    if (reschedule) {
+      scheduleCleanUp();
     }
   }, 1000);
 };
@@ -69,6 +83,7 @@ const loadImageWithCache = async (
             refCount: 0,
             width,
             height,
+            _timeToDelete: Date.now() + 180000,
           });
           scheduleCleanUp();
           resolve({
@@ -126,6 +141,7 @@ const loadVideoThumbnail = (
 const ref = (key: string) => {
   const ref = textures.get(key);
   if (ref) {
+    delete ref?._timeToDelete;
     ref.refCount++;
   }
   scheduleCleanUp();
@@ -133,6 +149,7 @@ const ref = (key: string) => {
 
 const unref = (key: string) => {
   const ref = textures.get(key);
+  delete ref?._timeToDelete;
   if (ref && ref.refCount > 0) {
     ref.refCount--;
   }
