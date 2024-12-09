@@ -1,5 +1,6 @@
-## 1.4.1-canary.47
+## 1.4.1-canary.48
 
+* **fix:**  - **modules:** [#6224](https://github.com/AzzappApp/azzapp/pull/6224) wrong image size on slideshow ([#6251](https://github.com/AzzappApp/azzapp/pull/6251))
 * **perf:**  - animate on currentIndexProfileSharedValue instead of currentIndexSharedValue ([#6252](https://github.com/AzzappApp/azzapp/pull/6252))
 * **perf:**  - do not render HomeBottomPanelMessage if not needed ([#6254](https://github.com/AzzappApp/azzapp/pull/6254))
 * **perf:**  - fix memoization in webCardMenu ([#6253](https://github.com/AzzappApp/azzapp/pull/6253))
