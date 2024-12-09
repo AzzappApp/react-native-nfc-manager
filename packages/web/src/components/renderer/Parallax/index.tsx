@@ -79,7 +79,10 @@ const Parallax = ({
                     objectPosition: 'center', // Center the content
                     ...imageStyle,
                   }}
+                  playsInline
                   autoPlay
+                  muted
+                  loop
                 />
               ) : (
                 <CloudinaryImage
