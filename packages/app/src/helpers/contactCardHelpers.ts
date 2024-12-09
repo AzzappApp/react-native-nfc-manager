@@ -218,7 +218,7 @@ export const useSocialLinkLabels = () => {
     () =>
       SOCIAL_NETWORK_LINKS.map(socialLink => ({
         key: socialLink.id as string,
-        value: 'label' in socialLink ? socialLink.label : socialLink.id,
+        value: socialLink.label,
       })),
     [],
   );

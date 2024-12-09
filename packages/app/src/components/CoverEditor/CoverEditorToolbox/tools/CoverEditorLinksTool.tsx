@@ -1,13 +1,13 @@
 import { forwardRef, useImperativeHandle } from 'react';
 import { useIntl } from 'react-intl';
-import useToggle from '#hooks/useToggle';
+import useBoolean from '#hooks/useBoolean';
 import ToolBoxSection from '../../../Toolbar/ToolBoxSection';
 import { useCoverEditorContext } from '../../CoverEditorContext';
 import CoverEditorLinksModal from '../../CoverEditorToolbox/modals/CoverEditorLinksModal';
 import type { ForwardedRef } from 'react';
 
 export type CoverEditorLinksToolActions = {
-  toggleLinksModal: () => void;
+  openLinksModal: () => void;
 };
 
 const CoverEditorLinksTool = (
@@ -16,11 +16,12 @@ const CoverEditorLinksTool = (
 ) => {
   const intl = useIntl();
 
-  const [linksModalVisible, toggleLinksModalVisible] = useToggle();
+  const [linksModalVisible, openLinksModalVisible, closeLinksModalVisible] =
+    useBoolean(false);
   const { linksLayer } = useCoverEditorContext();
 
   useImperativeHandle(ref, () => ({
-    toggleLinksModal: toggleLinksModalVisible,
+    openLinksModal: openLinksModalVisible,
   }));
 
   return (
@@ -34,12 +35,12 @@ const CoverEditorLinksTool = (
           { links: linksLayer.links.length },
         )}
         icon="link"
-        onPress={toggleLinksModalVisible}
+        onPress={openLinksModalVisible}
       />
 
       <CoverEditorLinksModal
         visible={linksModalVisible}
-        onClose={toggleLinksModalVisible}
+        onClose={closeLinksModalVisible}
       />
     </>
   );

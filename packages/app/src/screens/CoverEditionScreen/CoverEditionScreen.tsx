@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   changeCover: { paddingHorizontal: 50, paddingTop: 30 },
-  saveButton: { width: 70, marginRight: 10 },
+  saveButton: { width: 70 },
   headerTextContainer: {
     display: 'flex',
     alignItems: 'center',

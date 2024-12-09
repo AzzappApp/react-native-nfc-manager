@@ -1077,7 +1077,7 @@ const CoverPreview = ({
                 >
                   {linksLayer.links.map(link => (
                     <DynamicLinkRenderer
-                      key={link.socialId}
+                      key={`${link.socialId}${link.position}`}
                       as={View}
                       cardColors={cardColors}
                       color={linksLayer.color}

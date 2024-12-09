@@ -688,7 +688,7 @@ const CoverEditorCore = (
   const toolbox = useRef<CoverEditorLinksToolActions>(null);
 
   const onOpenLinksModal = useCallback(() => {
-    toolbox.current?.toggleLinksModal();
+    toolbox.current?.openLinksModal();
   }, []);
 
   const intl = useIntl();

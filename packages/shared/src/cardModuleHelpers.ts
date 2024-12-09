@@ -1,5 +1,6 @@
 import uniq from 'lodash/uniq';
 import { getValuesFromStyle, swapColor, type CardStyle } from './cardHelpers';
+import type { SocialLinkItem } from './socialLinkHelpers';
 
 //#region BlockText
 /**
@@ -1007,7 +1008,7 @@ export const MODULE_KIND_SOCIAL_LINKS = 'socialLinks';
  * The data type for the social links module
  */
 export type CardModuleSocialLinksData = {
-  links: Array<{ socialId: string; link: string; position: number }>;
+  links: SocialLinkItem[];
   iconColor?: string | null;
   arrangement?: 'inline' | 'multiline' | null;
   iconSize?: number | null;
