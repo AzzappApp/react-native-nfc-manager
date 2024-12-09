@@ -117,10 +117,10 @@ const CoverList = ({
 
   const contentInset = useMemo(
     () => ({
-      top: horizontal ? 0 : gap,
-      left: horizontal ? gap : 0,
-      bottom: 0,
-      right: 0,
+      paddingTop: horizontal ? 0 : gap,
+      paddingLeft: horizontal ? gap : 0,
+      paddingBottom: 0,
+      paddingRight: 0,
     }),
     [gap, horizontal],
   );
@@ -147,10 +147,10 @@ const CoverList = ({
       onViewableItemsChanged={onViewableItemChanged}
       ItemSeparatorComponent={Separator}
       renderScrollComponent={OverflowScrollView}
-      contentInset={contentInset}
       onEndReachedThreshold={0.3}
       extraData={extraDataInner}
       viewabilityConfig={viewabilityConfig}
+      contentContainerStyle={contentInset}
     />
   );
 };
