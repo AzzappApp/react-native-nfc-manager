@@ -132,20 +132,6 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
               </Text>
             </PressableNative>
           ))}
-          <View style={styles.item}>
-            <View style={styles.label}>
-              <Icon icon="calendar" />
-              <Text variant="smallbold">
-                <FormattedMessage
-                  defaultMessage="Date"
-                  description="ContactDetailsModal - Label for date item"
-                />
-              </Text>
-            </View>
-            <Text numberOfLines={1} style={styles.itemText}>
-              {date}
-            </Text>
-          </View>
           {birthday && (
             <PressableNative style={styles.item}>
               <View style={styles.label}>
@@ -229,6 +215,20 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
               </Text>
             </PressableNative>
           ))}
+          <View style={styles.item}>
+            <View style={styles.label}>
+              <Icon icon="calendar" />
+              <Text variant="smallbold">
+                <FormattedMessage
+                  defaultMessage="Date"
+                  description="ContactDetailsModal - Label for date item"
+                />
+              </Text>
+            </View>
+            <Text numberOfLines={1} style={styles.itemText}>
+              {date}
+            </Text>
+          </View>
         </ScrollView>
       </View>
     </Container>
