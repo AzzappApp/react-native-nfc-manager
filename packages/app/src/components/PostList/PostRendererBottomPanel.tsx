@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/react-native';
 import * as Clipboard from 'expo-clipboard';
 import { fromGlobalId } from 'graphql-relay';
-import { memo, useCallback, useEffect, useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 import { FormattedMessage, FormattedRelativeTime, useIntl } from 'react-intl';
 import { View, StyleSheet, Share, Platform } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -180,7 +180,9 @@ const PostRendererBottomPanel = ({
         updatePost(webCardId: $webCardId, input: $input) {
           post {
             id
+            allowLikes
             allowComments
+            content
           }
         }
       }
@@ -196,6 +198,8 @@ const PostRendererBottomPanel = ({
           post {
             id
             allowLikes
+            allowComments
+            content
           }
         }
       }
@@ -210,6 +214,8 @@ const PostRendererBottomPanel = ({
         updatePost(webCardId: $webCardId, input: $input) {
           post {
             id
+            allowLikes
+            allowComments
             content
           }
         }
@@ -241,6 +247,8 @@ const PostRendererBottomPanel = ({
           updatePost: {
             post: {
               id: post.id,
+              allowLikes: post.allowLikes,
+              allowComments: post.allowComments,
               content: text,
             },
           },
@@ -259,13 +267,7 @@ const PostRendererBottomPanel = ({
         },
       });
     },
-    [
-      commitUpdatePostContent,
-      intl,
-      onCloseEditContent,
-      post.id,
-      post.webCard.id,
-    ],
+    [commitUpdatePostContent, intl, onCloseEditContent, post],
   );
 
   const updatePost = useCallback(
@@ -287,6 +289,9 @@ const PostRendererBottomPanel = ({
           updatePost: {
             post: {
               id: post.id,
+              allowLikes: post.allowLikes,
+              allowComments: post.allowComments,
+              content: post.content,
               ...input,
             },
           },
@@ -304,13 +309,7 @@ const PostRendererBottomPanel = ({
         },
       });
     },
-    [
-      commitUpdatePostComments,
-      commitUpdatePostLikes,
-      intl,
-      post.id,
-      post.webCard.id,
-    ],
+    [commitUpdatePostComments, commitUpdatePostLikes, intl, post],
   );
 
   const profileInfos = useProfileInfos();
@@ -658,9 +657,23 @@ const PostConfigurationComponent = ({
 }: PostConfigurationProps) => {
   const [like, setLike] = useState(allowLikes);
   const [comment, setComment] = useState(allowComments);
-  useEffect(() => {
-    updatePost({ allowComments: comment, allowLikes: like });
-  }, [like, comment, updatePost]);
+
+  const setLikeInner = useCallback(
+    (value: boolean) => {
+      setLike(value);
+      updatePost({ allowComments: comment, allowLikes: value });
+    },
+    [comment, updatePost],
+  );
+
+  const setCommentInner = useCallback(
+    (value: boolean) => {
+      setComment(value);
+      updatePost({ allowComments: value, allowLikes: like });
+    },
+    [like, updatePost],
+  );
+
   return (
     <>
       <View style={styles.modalLine}>
@@ -670,7 +683,7 @@ const PostConfigurationComponent = ({
             description="PostItem Modal - Likes switch Label"
           />
         </Text>
-        <Switch variant="large" value={like} onValueChange={setLike} />
+        <Switch variant="large" value={like} onValueChange={setLikeInner} />
       </View>
 
       <View style={styles.modalLine}>
@@ -680,7 +693,11 @@ const PostConfigurationComponent = ({
             description="PostItem Modal - Comments switch Label"
           />
         </Text>
-        <Switch variant="large" value={comment} onValueChange={setComment} />
+        <Switch
+          variant="large"
+          value={comment}
+          onValueChange={setCommentInner}
+        />
       </View>
     </>
   );
