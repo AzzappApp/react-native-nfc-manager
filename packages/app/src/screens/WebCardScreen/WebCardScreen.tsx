@@ -44,6 +44,7 @@ import { logEvent } from '#helpers/analytics';
 import { getRouteForCardModule } from '#helpers/cardModuleRouterHelpers';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import {
+  profileInfoHasAdminRight,
   profileInfoHasEditorRight,
   profileInfoIsOwner,
 } from '#helpers/profileRoleHelper';
@@ -103,6 +104,7 @@ const WebCardScreen = ({
   const isViewer = profileInfos?.webCardId === data.webCard?.id;
   const isWebCardOwner = isViewer && profileInfoIsOwner(profileInfos);
   const canEdit = isViewer && profileInfoHasEditorRight(profileInfos);
+  const isAdmin = isViewer && profileInfoHasAdminRight(profileInfos);
 
   const environment = useRelayEnvironment();
 
@@ -466,6 +468,7 @@ const WebCardScreen = ({
           onToggleFollow={toggleFollow}
           isViewer={isViewer}
           isOwner={isWebCardOwner}
+          isAdmin={isAdmin}
         />
       </Suspense>
     </View>

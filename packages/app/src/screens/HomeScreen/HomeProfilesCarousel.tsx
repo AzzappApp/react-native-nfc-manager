@@ -430,6 +430,7 @@ const ItemRenderComponent = ({
             onToggleFollow={onToggleFollow}
             isViewer
             isOwner={profileInfoIsOwner(profile)}
+            isAdmin={profileInfoHasAdminRight(profile)}
           />
         </Suspense>
       )}
