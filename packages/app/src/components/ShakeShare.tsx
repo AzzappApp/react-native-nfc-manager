@@ -155,9 +155,9 @@ const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
         />
         <LinearGradient
           colors={['rgba(14, 18, 22,0)', 'rgba(0, 0, 0, 1)']}
-          start={{ x: 0.5, y: 0 }}
-          end={{ x: 0.5, y: 1 }}
-          locations={[0.22, 0.66]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+          locations={[0.2, 0.55]}
           style={styles.linear}
         />
         {svg && (
@@ -218,14 +218,20 @@ const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
           </View>
         )}
       </ScrollView>
-      <View style={[styles.closeButtonContainer, { bottom: 0 }]}>
+      <LinearGradient
+        colors={['rgba(0, 0, 0,0)', 'rgba(0, 0, 0, 1)']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        locations={[0, 0.7]}
+        style={styles.closeButtonContainer}
+      >
         <IconButton
           icon="close"
           onPress={onClose}
           iconStyle={styles.iconStyle}
           style={styles.iconContainerStyle}
         />
-      </View>
+      </LinearGradient>
       <ToastUi />
     </View>
   );
@@ -233,6 +239,8 @@ const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
 
 const styles = StyleSheet.create({
   iconContainerStyle: {
+    position: 'absolute',
+    bottom: 40,
     borderColor: 'white',
     width: 24,
   },
@@ -284,16 +292,16 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     width: '100%',
     position: 'absolute',
-    bottom: -25,
+    bottom: -40,
     margin: 'auto',
     alignSelf: 'center',
   },
   closeButtonContainer: {
     position: 'absolute',
+    bottom: 0,
     paddingTop: 10,
     width: '100%',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    height: 100,
+    height: 200,
     alignItems: 'center',
   },
   button: {
