@@ -24,7 +24,7 @@ import {
   useSharedValue,
 } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
-import { graphql, useClientQuery } from 'react-relay';
+import { graphql, useLazyLoadQuery } from 'react-relay';
 import { useNetworkAvailableContext } from '#networkAvailableContext';
 import { colors } from '#theme';
 import AddToWalletButton from '#components/AddToWalletButton';
@@ -99,7 +99,7 @@ const QR_CODE_WIDTH = Math.round(width * 0.6);
 const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
   const profileInfos = useProfileInfos();
 
-  const { node } = useClientQuery<ShakeShareScreenQuery>(
+  const { node } = useLazyLoadQuery<ShakeShareScreenQuery>(
     graphql`
       query ShakeShareScreenQuery($profileId: ID!, $width: Int!) {
         node(id: $profileId) {
