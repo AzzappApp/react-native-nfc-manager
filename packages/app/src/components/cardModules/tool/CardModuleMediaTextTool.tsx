@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { DoneHeaderButton } from '#components/commonsButtons';
@@ -33,25 +33,10 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
   //keep a local ref value, don't commit to the data until the user press done(avoid rerender/blink/side effect)
   //this is far more better that using the value props in textInput, juste use defaultValue for initial setrting
   // in this case just save on close, text is hidden by the modal
-  const text = useRef(cardModuleMedia.text);
-  const title = useRef(cardModuleMedia.title);
-  const linkUrl = useRef(cardModuleMedia.link?.url);
-  const linkAction = useRef(cardModuleMedia.link?.label);
-  const onChangeText = (value: string) => {
-    text.current = value;
-  };
-
-  const onChangeTitle = (value: string) => {
-    title.current = value;
-  };
-
-  const onChangeUrl = (value: string) => {
-    linkUrl.current = value;
-  };
-
-  const onChangeAction = (value: string) => {
-    linkAction.current = value;
-  };
+  const [text, setText] = useState(cardModuleMedia.text);
+  const [title, setTitle] = useState(cardModuleMedia.title);
+  const [linkUrl, setLinkUrl] = useState(cardModuleMedia.link?.url);
+  const [linkAction, setLinkAction] = useState(cardModuleMedia.link?.label);
 
   const actionLabel = intl.formatMessage({
     defaultMessage: 'Open',
@@ -61,14 +46,12 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
   const onDismiss = () => {
     onUpdateMedia({
       ...cardModuleMedia,
-      text: text.current,
-      title: title.current,
-      link: linkUrl.current
-        ? {
-            url: linkUrl.current,
-            label: linkAction.current ?? actionLabel,
-          }
-        : undefined,
+      text,
+      title,
+      link: {
+        url: linkUrl ?? '',
+        label: linkAction ?? actionLabel,
+      },
     });
     close();
   };
@@ -117,9 +100,11 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
                   defaultMessage: 'Enter your url',
                   description: 'Url placeholder in design module text tool',
                 })}
-                defaultValue={linkUrl.current}
-                onChangeText={onChangeUrl}
+                defaultValue={linkUrl}
+                onChangeText={setLinkUrl}
                 style={{ flex: 1 }}
+                autoCorrect={false}
+                keyboardType="url"
               />
             </View>
           )}
@@ -135,10 +120,10 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
               defaultMessage: 'Enter your title',
               description: 'Title placeholder in design module text tool',
             })}
-            defaultValue={title.current}
-            onChangeText={onChangeTitle}
+            defaultValue={title}
+            onChangeText={setTitle}
             style={styles.titleStyle}
-            clearTextOnFocus={title.current === DEFAULT_CARD_MODULE_TITLE}
+            clearTextOnFocus={title === DEFAULT_CARD_MODULE_TITLE}
           />
           <BottomSheetTextInput
             multiline
@@ -147,10 +132,10 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
               description:
                 'Text description placeholder in design module text tool',
             })}
-            defaultValue={text.current}
-            onChangeText={onChangeText}
+            defaultValue={text}
+            onChangeText={setText}
             style={styles.textStyle}
-            clearTextOnFocus={title.current === DEFAULT_CARD_MODULE_TEXT}
+            clearTextOnFocus={title === DEFAULT_CARD_MODULE_TEXT}
           />
           {module.moduleKind === 'mediaTextLink' && (
             <>
@@ -162,9 +147,10 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
               </Text>
               <BottomSheetTextInput
                 placeholder={actionLabel}
-                defaultValue={linkAction.current}
-                onChangeText={onChangeAction}
+                defaultValue={linkAction}
+                onChangeText={setLinkAction}
                 style={styles.titleStyle}
+                autoCorrect={false}
               />
             </>
           )}

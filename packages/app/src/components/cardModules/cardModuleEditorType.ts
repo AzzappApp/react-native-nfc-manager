@@ -72,6 +72,8 @@ export type CardModuleVariantType = {
   callback when a item renderer is pressed, return the index of the item in case of list 
   */
   setEditableItemIndex?: (index: number) => void;
+
+  webCardEditing?: boolean;
 };
 
 export type CommonModuleRendererProps<T, V extends ModuleKindHasVariants> = {

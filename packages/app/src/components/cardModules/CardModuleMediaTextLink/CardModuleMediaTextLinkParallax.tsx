@@ -40,6 +40,7 @@ const CardModuleMediaTextLinkParallax = ({
   setEditableItemIndex,
   viewMode,
   moduleEditing,
+  webCardEditing,
 }: CardModuleMediaTextLinkParallaxProps) => {
   const screenDimension = useScreenDimensions();
   const dimension = providedDimension ?? screenDimension;
@@ -51,24 +52,41 @@ const CardModuleMediaTextLinkParallax = ({
   }
   return (
     <View onLayout={onLayout}>
-      {cardModuleMedias.map((cardModuleMedia, index) => {
-        return (
-          <ParallaxItem
-            key={`${cardModuleMedia.media.id}_${index}`}
-            cardModuleMedia={cardModuleMedia}
-            cardModuleColor={cardModuleColor}
-            cardStyle={cardStyle}
-            dimension={dimension}
-            index={index}
-            disableParallax={disableParallax}
-            setEditableItemIndex={setEditableItemIndex}
-            scrollPosition={scrollPosition}
-            modulePosition={modulePosition}
-            viewMode={viewMode}
-            moduleEditing={moduleEditing}
-          />
-        );
-      })}
+      {webCardEditing && cardModuleMedias.length > 0 ? (
+        <ParallaxItem
+          key={`${cardModuleMedias[0].media.id}_${0}`}
+          cardModuleMedia={cardModuleMedias[0]}
+          cardModuleColor={cardModuleColor}
+          cardStyle={cardStyle}
+          dimension={dimension}
+          index={0}
+          disableParallax={disableParallax}
+          setEditableItemIndex={setEditableItemIndex}
+          scrollPosition={scrollPosition}
+          modulePosition={modulePosition}
+          viewMode={viewMode}
+          moduleEditing={moduleEditing}
+        />
+      ) : (
+        cardModuleMedias.map((cardModuleMedia, index) => {
+          return (
+            <ParallaxItem
+              key={`${cardModuleMedia.media.id}_${index}`}
+              cardModuleMedia={cardModuleMedia}
+              cardModuleColor={cardModuleColor}
+              cardStyle={cardStyle}
+              dimension={dimension}
+              index={index}
+              disableParallax={disableParallax}
+              setEditableItemIndex={setEditableItemIndex}
+              scrollPosition={scrollPosition}
+              modulePosition={modulePosition}
+              viewMode={viewMode}
+              moduleEditing={moduleEditing}
+            />
+          );
+        })
+      )}
     </View>
   );
 };
@@ -187,6 +205,7 @@ const stylesheet = createStyleSheet(appearance => ({
     ...shadow(appearance, 'bottom'), //need specification on shadow
     overflow: 'visible',
     height: 54,
+    minWidth: 150,
   },
   bottomContainer: {
     justifyContent: 'center',

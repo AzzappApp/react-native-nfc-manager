@@ -138,7 +138,7 @@ const CardModuleMediaPicker = ({
         setSelectedMedias([...selectedMedias, mediaModule]);
       }
     },
-    [intl, maxMedia, maxVideo, selectedMedias],
+    [intl, maxMedia, maxVideo, replacing, selectedMedias],
   );
 
   const [downloading, setDownloading] = useState(false);

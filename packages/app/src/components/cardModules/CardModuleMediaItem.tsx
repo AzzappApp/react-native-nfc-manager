@@ -63,6 +63,7 @@ const CardModuleMediaItem = ({
         thumbnailURI={media.thumbnail}
         videoEnabled
         paused={false}
+        muted
       />
     );
   }

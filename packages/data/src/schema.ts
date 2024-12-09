@@ -137,7 +137,7 @@ export const CardTemplateTable = cols.table('CardTemplate', {
 });
 
 export type CardTemplate = InferSelectModel<typeof CardTemplateTable>;
-export type CardModuleTemplate = Pick<CardModule, 'data' | 'kind'>;
+export type CardModuleTemplate = Pick<CardModule, 'data' | 'kind' | 'variant'>;
 // #endregion
 
 // #region CardTemplateType

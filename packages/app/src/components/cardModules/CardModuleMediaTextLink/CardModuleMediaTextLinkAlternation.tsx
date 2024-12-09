@@ -41,6 +41,7 @@ const CardModuleMediaTextLinkAlternation = ({
   modulePosition,
   disableAnimation,
   moduleEditing,
+  webCardEditing,
 }: CardModuleMediaTextLinkAlternationProps) => {
   const screenDimension = useScreenDimensions();
   const dimension = providedDimension ?? screenDimension;
@@ -56,24 +57,41 @@ const CardModuleMediaTextLinkAlternation = ({
       onLayout={onLayout}
       style={{ backgroundColor: cardModuleColor.background }}
     >
-      {cardModuleMedias.map((cardModuleMedia, index) => {
-        return (
-          <AlternationItem
-            key={`${cardModuleMedia.media.id}_${index}`}
-            cardModuleMedia={cardModuleMedia}
-            cardModuleColor={cardModuleColor}
-            dimension={dimension}
-            viewMode={viewMode}
-            cardStyle={cardStyle}
-            setEditableItemIndex={setEditableItemIndex}
-            scrollPosition={scrollPosition}
-            modulePosition={modulePosition}
-            index={index}
-            disableAnimation={disableAnimation}
-            moduleEditing={moduleEditing}
-          />
-        );
-      })}
+      {webCardEditing && cardModuleMedias.length > 0 ? (
+        <AlternationItem
+          key={`${cardModuleMedias[0].media.id}`}
+          cardModuleMedia={cardModuleMedias[0]}
+          cardModuleColor={cardModuleColor}
+          dimension={dimension}
+          viewMode={viewMode}
+          cardStyle={cardStyle}
+          setEditableItemIndex={setEditableItemIndex}
+          scrollPosition={scrollPosition}
+          modulePosition={modulePosition}
+          index={0}
+          disableAnimation={disableAnimation}
+          moduleEditing={moduleEditing}
+        />
+      ) : (
+        cardModuleMedias.map((cardModuleMedia, index) => {
+          return (
+            <AlternationItem
+              key={`${cardModuleMedia.media.id}_${index}`}
+              cardModuleMedia={cardModuleMedia}
+              cardModuleColor={cardModuleColor}
+              dimension={dimension}
+              viewMode={viewMode}
+              cardStyle={cardStyle}
+              setEditableItemIndex={setEditableItemIndex}
+              scrollPosition={scrollPosition}
+              modulePosition={modulePosition}
+              index={index}
+              disableAnimation={disableAnimation}
+              moduleEditing={moduleEditing}
+            />
+          );
+        })
+      )}
     </View>
   );
 };
@@ -169,6 +187,7 @@ const AlternationItem = ({
                   backgroundColor: cardModuleColor.content,
                 },
                 styles.buttonLink,
+                viewMode === 'mobile' && { width: '100%' },
               ]}
               textStyle={{ color: cardModuleColor.graphic }}
               onPress={openLink}

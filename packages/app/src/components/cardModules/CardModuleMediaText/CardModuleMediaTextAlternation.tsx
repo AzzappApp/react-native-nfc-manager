@@ -34,6 +34,7 @@ const CardModuleMediaTextAlternation = ({
   scrollPosition,
   modulePosition,
   disableAnimation,
+  webCardEditing,
 }: CardModuleMediaTextAlternationProps) => {
   const screenDimension = useScreenDimensions();
   const dimension = providedDimension ?? screenDimension;
@@ -49,23 +50,39 @@ const CardModuleMediaTextAlternation = ({
       onLayout={onLayout}
       style={{ backgroundColor: cardModuleColor.background }}
     >
-      {cardModuleMedias.map((cardModuleMedia, index) => {
-        return (
-          <AlternationItem
-            key={`${cardModuleMedia.media.id}_${index}`}
-            cardModuleMedia={cardModuleMedia}
-            cardModuleColor={cardModuleColor}
-            dimension={dimension}
-            viewMode={viewMode}
-            cardStyle={cardStyle}
-            setEditableItemIndex={setEditableItemIndex}
-            scrollPosition={scrollPosition}
-            modulePosition={modulePosition}
-            index={index}
-            disableAnimation={disableAnimation}
-          />
-        );
-      })}
+      {webCardEditing && cardModuleMedias.length > 0 ? (
+        <AlternationItem
+          key={`${cardModuleMedias[0].media.id}`}
+          cardModuleMedia={cardModuleMedias[0]}
+          cardModuleColor={cardModuleColor}
+          dimension={dimension}
+          viewMode={viewMode}
+          cardStyle={cardStyle}
+          setEditableItemIndex={setEditableItemIndex}
+          scrollPosition={scrollPosition}
+          modulePosition={modulePosition}
+          index={0}
+          disableAnimation={disableAnimation}
+        />
+      ) : (
+        cardModuleMedias.map((cardModuleMedia, index) => {
+          return (
+            <AlternationItem
+              key={`${cardModuleMedia.media.id}_${index}`}
+              cardModuleMedia={cardModuleMedia}
+              cardModuleColor={cardModuleColor}
+              dimension={dimension}
+              viewMode={viewMode}
+              cardStyle={cardStyle}
+              setEditableItemIndex={setEditableItemIndex}
+              scrollPosition={scrollPosition}
+              modulePosition={modulePosition}
+              index={index}
+              disableAnimation={disableAnimation}
+            />
+          );
+        })
+      )}
     </View>
   );
 };

@@ -30,6 +30,7 @@ const CardModuleMediaTextParallax = ({
   dimension: providedDimension,
   scrollPosition,
   modulePosition,
+  webCardEditing,
   onLayout,
   cardStyle,
   disableParallax,
@@ -48,23 +49,39 @@ const CardModuleMediaTextParallax = ({
 
   return (
     <View onLayout={onLayout}>
-      {cardModuleMedias.map((cardModuleMedia, index) => {
-        return (
-          <ParallaxItem
-            key={`${cardModuleMedia.media.id}_${index}`}
-            cardModuleMedia={cardModuleMedia}
-            cardModuleColor={cardModuleColor}
-            cardStyle={cardStyle}
-            dimension={dimension}
-            index={index}
-            disableParallax={disableParallax}
-            setEditableItemIndex={setEditableItemIndex}
-            scrollPosition={scrollPosition}
-            modulePosition={modulePosition}
-            viewMode={viewMode}
-          />
-        );
-      })}
+      {webCardEditing && cardModuleMedias.length > 0 ? (
+        <ParallaxItem
+          key={`${cardModuleMedias[0].media.id}_${0}`}
+          cardModuleMedia={cardModuleMedias[0]}
+          cardModuleColor={cardModuleColor}
+          cardStyle={cardStyle}
+          dimension={dimension}
+          index={0}
+          disableParallax={disableParallax}
+          setEditableItemIndex={setEditableItemIndex}
+          scrollPosition={scrollPosition}
+          modulePosition={modulePosition}
+          viewMode={viewMode}
+        />
+      ) : (
+        cardModuleMedias.map((cardModuleMedia, index) => {
+          return (
+            <ParallaxItem
+              key={`${cardModuleMedia.media.id}_${index}`}
+              cardModuleMedia={cardModuleMedia}
+              cardModuleColor={cardModuleColor}
+              cardStyle={cardStyle}
+              dimension={dimension}
+              index={index}
+              disableParallax={disableParallax}
+              setEditableItemIndex={setEditableItemIndex}
+              scrollPosition={scrollPosition}
+              modulePosition={modulePosition}
+              viewMode={viewMode}
+            />
+          );
+        })
+      )}
     </View>
   );
 };

@@ -301,11 +301,11 @@ const CardModuleRenderer = <T extends ModuleRenderInfo>({
           viewMode={viewMode}
           dimension={{
             width: viewMode === 'desktop' ? DESKTOP_PREVIEW_WIDTH : width,
-            height:
-              editing && module.variant === 'parallax' ? height / 2 : height,
+            height,
           }}
           scrollPosition={scrollPosition}
           modulePosition={modulePosition}
+          webCardEditing={editing}
           disableAnimation={viewMode === 'desktop' || editing === true}
         />
       );
@@ -317,11 +317,11 @@ const CardModuleRenderer = <T extends ModuleRenderInfo>({
           viewMode={viewMode}
           dimension={{
             width: viewMode === 'desktop' ? DESKTOP_PREVIEW_WIDTH : width,
-            height:
-              editing && module.variant === 'parallax' ? height / 2 : height,
+            height,
           }}
           scrollPosition={scrollPosition}
           modulePosition={modulePosition}
+          webCardEditing={editing}
           disableAnimation={
             viewMode === 'desktop' ||
             (module.variant === 'parallax' && editing === true)

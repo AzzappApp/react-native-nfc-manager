@@ -260,6 +260,5 @@ const stylesheet = createStyleSheet(appearance => ({
   container: {
     flex: 1,
     backgroundColor: appearance === 'light' ? colors.white : colors.black,
-    paddingBottom: 16,
   },
 }));
