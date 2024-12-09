@@ -80,7 +80,7 @@ const Slideshow = ({ medias: baseMedias, style, square }: Props) => {
           medias.map((media, i) => {
             return (
               <div
-                key={media.id}
+                key={`${media.id}_${i}`}
                 className={styles.media}
                 style={{
                   aspectRatio: media.height / media.width,

@@ -1,4 +1,5 @@
 import { style } from '@vanilla-extract/css';
+import { MediaQuery } from '#app/[userName]/theme.css';
 
 const container = style({
   display: 'flex',
@@ -11,10 +12,14 @@ const slideshow = style({
   maxWidth: '900px',
   display: 'flex',
   flexDirection: 'row',
-  aspectRatio: '3',
+  aspectRatio: '10/7',
   position: 'relative',
   zIndex: 1,
-  overflow: 'hidden',
+  '@media': {
+    [MediaQuery.Mobile]: {
+      overflow: 'hidden',
+    },
+  },
 });
 
 const arrow = style({
