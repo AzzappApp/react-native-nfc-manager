@@ -1,5 +1,8 @@
-## 1.4.1-canary.46
+## 1.4.1-canary.47
 
+* **perf:**  - animate on currentIndexProfileSharedValue instead of currentIndexSharedValue ([#6252](https://github.com/AzzappApp/azzapp/pull/6252))
+* **perf:**  - do not render HomeBottomPanelMessage if not needed ([#6254](https://github.com/AzzappApp/azzapp/pull/6254))
+* **perf:**  - fix memoization in webCardMenu ([#6253](https://github.com/AzzappApp/azzapp/pull/6253))
 * **fix:**  - [#6169](https://github.com/AzzappApp/azzapp/pull/6169) DelayedActivityIndicator entering causes crashes ([#6247](https://github.com/AzzappApp/azzapp/pull/6247))
 * **fix:**  - **modules:** [#6224](https://github.com/AzzappApp/azzapp/pull/6224) ensure image and text have same sizes on alternation ([#6243](https://github.com/AzzappApp/azzapp/pull/6243))
 * **fix:**  - [#6169](https://github.com/AzzappApp/azzapp/pull/6169) DelayedActivityIndicator entering causes crashes ([#6247](https://github.com/AzzappApp/azzapp/pull/6247))
