@@ -145,40 +145,42 @@ jsi::Value BufferLoaderHostObject::get(jsi::Runtime &runtime, const jsi::PropNam
 }
 
 id<MTLTexture> BufferLoaderHostObject::createMTLTextureFromCIImage(CIImage *image, CGSize maxSize) {
-  if (!CGSizeEqualToSize(maxSize, CGSizeZero)) {
-    CGFloat aspectRatio = image.extent.size.width / image.extent.size.height;
-    if (aspectRatio > 1) {
-      image = [image imageByApplyingTransform:CGAffineTransformMakeScale(
-        maxSize.width / image.extent.size.width,
-        maxSize.width / image.extent.size.width)];
-    } else {
-      image = [image imageByApplyingTransform:CGAffineTransformMakeScale(
-        maxSize.height / image.extent.size.height,
-        maxSize.height / image.extent.size.height)];
+  @autoreleasepool {
+    if (!CGSizeEqualToSize(maxSize, CGSizeZero)) {
+      CGFloat aspectRatio = image.extent.size.width / image.extent.size.height;
+      if (aspectRatio > 1) {
+        image = [image imageByApplyingTransform:CGAffineTransformMakeScale(
+          maxSize.width / image.extent.size.width,
+          maxSize.width / image.extent.size.width)];
+      } else {
+        image = [image imageByApplyingTransform:CGAffineTransformMakeScale(
+          maxSize.height / image.extent.size.height,
+          maxSize.height / image.extent.size.height)];
+      }
     }
+
+    CGSize imageSize = image.extent.size;
+
+    MTLTextureDescriptor *descriptor = [[MTLTextureDescriptor alloc] init];
+    descriptor.pixelFormat = MTLPixelFormatBGRA8Unorm;
+    descriptor.width = imageSize.width;
+    descriptor.height = imageSize.height;
+    descriptor.usage = MTLTextureUsageShaderRead | MTLTextureUsageShaderWrite;
+    descriptor.storageMode = MTLStorageModePrivate;
+
+    id<MTLTexture> texture = [metalDevice newTextureWithDescriptor:descriptor];
+    if (!texture) {
+      throw std::runtime_error("Failed to create Metal texture");
+    }
+
+    CGAffineTransform transform = CGAffineTransformMakeTranslation(0, imageSize.height);
+    transform = CGAffineTransformScale(transform, 1.0, -1.0);
+    image = [image imageByApplyingTransform:transform];
+
+    [ciContext render:image toMTLTexture:texture commandBuffer:nil bounds:image.extent colorSpace:colorSpace];
+
+    return texture;
   }
-
-  CGSize imageSize = image.extent.size;
-
-  MTLTextureDescriptor *descriptor = [[MTLTextureDescriptor alloc] init];
-  descriptor.pixelFormat = MTLPixelFormatBGRA8Unorm;
-  descriptor.width = imageSize.width;
-  descriptor.height = imageSize.height;
-  descriptor.usage = MTLTextureUsageShaderRead | MTLTextureUsageShaderWrite;
-  descriptor.storageMode = MTLStorageModePrivate;
-
-  id<MTLTexture> texture = [metalDevice newTextureWithDescriptor:descriptor];
-  if (!texture) {
-    throw std::runtime_error("Failed to create Metal texture");
-  }
-
-  CGAffineTransform transform = CGAffineTransformMakeTranslation(0, imageSize.height);
-  transform = CGAffineTransformScale(transform, 1.0, -1.0);
-  CIImage *flippedImage = [image imageByApplyingTransform:transform];
-
-  [ciContext render:flippedImage toMTLTexture:texture commandBuffer:nil bounds:image.extent colorSpace:colorSpace];
-
-  return texture;
 }
 
 void BufferLoaderHostObject::loadTexture(
@@ -187,16 +189,13 @@ void BufferLoaderHostObject::loadTexture(
   bool hasError = false;
   std::string error =" Failed to load texture";
   try {
-    // Crée la texture à partir de la fonction passée
     id<MTLTexture> texture = textureCreator();
     if (!texture) throw std::runtime_error("Failed to create texture");
 
-    // Ajoute la texture au cache
     CGSize size = CGSizeMake(texture.width, texture.height);
     uint64_t textureKey = reinterpret_cast<uint64_t>(texture);
     textureCache[textureKey] = texture;
 
-    // Invoque le callback avec les informations de texture
     callInvoker->invokeAsync([&runtime, callback, textureKey, size]() {
       jsi::Object texInfo = jsi::Object(runtime);
       texInfo.setProperty(runtime, "mtlTexture", jsi::BigInt::fromUint64(runtime, textureKey));
