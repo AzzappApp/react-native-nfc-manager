@@ -1,11 +1,10 @@
 import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
-import { Linking, View } from 'react-native';
+import { Linking, Pressable, View } from 'react-native';
 import { shadow } from '#theme';
 import { getTextStyle, getTitleStyle } from '#helpers/cardModuleHelpers';
 import { useStyleSheet, createStyleSheet } from '#helpers/createStyles';
 import useScreenDimensions from '#hooks/useScreenDimensions';
-import Button from '#ui/Button';
 import Text from '#ui/Text';
 import ParallaxContainer from '../ParallaxContainer';
 import CardModulePressableTool from '../tool/CardModulePressableTool';
@@ -122,7 +121,9 @@ const ParallaxItem = ({
   }, [index, setEditableItemIndex]);
 
   const openLink = () => {
-    if (!moduleEditing && cardModuleMedia.link?.url) {
+    if (moduleEditing) {
+      setEditableItemIndex?.(index);
+    } else if (!moduleEditing && cardModuleMedia.link?.url) {
       Linking.openURL(cardModuleMedia.link?.url ?? '');
     }
   };
@@ -160,15 +161,7 @@ const ParallaxItem = ({
           >
             {cardModuleMedia.text}
           </Text>
-          <Button
-            label={
-              cardModuleMedia.link?.label ??
-              intl.formatMessage({
-                defaultMessage: 'Open',
-                description:
-                  'CardModuleTextLinkAlternation - defaut action button label',
-              })
-            }
+          <Pressable
             style={[
               {
                 borderRadius: cardStyle?.buttonRadius,
@@ -176,9 +169,17 @@ const ParallaxItem = ({
               },
               styles.buttonLink,
             ]}
-            textStyle={{ color: cardModuleColor.graphic }}
             onPress={openLink}
-          />
+          >
+            <Text variant="button" style={{ color: cardModuleColor.graphic }}>
+              {cardModuleMedia.link?.label ??
+                intl.formatMessage({
+                  defaultMessage: 'Open',
+                  description:
+                    'CardModuleTextLinkParallax - defaut action button label',
+                })}
+            </Text>
+          </Pressable>
         </View>
       </ParallaxContainer>
     </CardModulePressableTool>
@@ -206,6 +207,11 @@ const stylesheet = createStyleSheet(appearance => ({
     overflow: 'visible',
     height: 54,
     minWidth: 150,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 12,
+    borderCurve: 'continuous',
+    paddingHorizontal: 20,
   },
   bottomContainer: {
     justifyContent: 'center',

@@ -1,12 +1,11 @@
 import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
-import { Linking, View } from 'react-native';
+import { Linking, Pressable, View } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
 import { shadow } from '#theme';
 import { getTextStyle, getTitleStyle } from '#helpers/cardModuleHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useScreenDimensions from '#hooks/useScreenDimensions';
-import Button from '#ui/Button';
 import Text from '#ui/Text';
 import AlternationContainer from '../AlternationContainer';
 import CardModulePressableTool from '../tool/CardModulePressableTool';
@@ -139,7 +138,9 @@ const AlternationItem = ({
   }, [index, setEditableItemIndex]);
 
   const openLink = () => {
-    if (!moduleEditing && cardModuleMedia.link?.url) {
+    if (moduleEditing) {
+      setEditableItemIndex?.(index);
+    } else if (!moduleEditing && cardModuleMedia.link?.url) {
       Linking.openURL(cardModuleMedia.link?.url ?? '');
     }
   };
@@ -172,26 +173,25 @@ const AlternationItem = ({
             {cardModuleMedia.text}
           </Text>
           <View style={styles.buttonCenter}>
-            <Button
-              label={
-                cardModuleMedia.link?.label ??
-                intl.formatMessage({
-                  defaultMessage: 'Open',
-                  description:
-                    'CardModuleTextLinkAlternation - defaut action button label',
-                })
-              }
+            <Pressable
               style={[
                 {
                   borderRadius: cardStyle?.buttonRadius,
                   backgroundColor: cardModuleColor.content,
                 },
                 styles.buttonLink,
-                viewMode === 'mobile' && { width: '100%' },
               ]}
-              textStyle={{ color: cardModuleColor.graphic }}
               onPress={openLink}
-            />
+            >
+              <Text variant="button" style={{ color: cardModuleColor.graphic }}>
+                {cardModuleMedia.link?.label ??
+                  intl.formatMessage({
+                    defaultMessage: 'Open',
+                    description:
+                      'CardModuleTextLinkAlternation - defaut action button label',
+                  })}
+              </Text>
+            </Pressable>
           </View>
         </View>
       </AlternationContainer>
@@ -204,9 +204,12 @@ const stylesheet = createStyleSheet(appearance => ({
     ...shadow(appearance, 'bottom'), //need specification on shadow
     overflow: 'visible',
     height: 54,
-    flexGrow: 0,
     minWidth: 150,
-    marginTop: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 12,
+    borderCurve: 'continuous',
+    paddingHorizontal: 20,
   },
   bottomContainer: {
     justifyContent: 'center',
