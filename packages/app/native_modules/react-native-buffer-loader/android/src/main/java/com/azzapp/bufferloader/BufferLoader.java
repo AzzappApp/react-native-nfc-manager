@@ -1,15 +1,11 @@
 package com.azzapp.bufferloader;
 
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.PixelFormat;
-import android.hardware.HardwareBuffer;
-import android.media.Image;
-import android.media.ImageReader;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.opengl.EGL14;
 import android.opengl.GLES20;
+import android.opengl.GLU;
 import android.opengl.GLUtils;
 import android.os.Handler;
 import android.os.Looper;
@@ -75,14 +71,16 @@ public class BufferLoader {
     });
   }
 
-  public void releaseBuffer(int texId) {
+  public void releaseTexture(int texId) {
     executorService.execute(() -> {
       if (context == null) {
         return;
       }
       egl.eglMakeCurrent(display, surface, surface, context);
+      purgeOpenGLError();
       int[] textures = {texId};
       GLES20.glDeleteTextures(1, textures, 0);
+      checkGlError("glDeleteTextures");
     });
   }
 
@@ -128,6 +126,9 @@ public class BufferLoader {
         }
         textureWidth = bitmap.getWidth();
         textureHeight = bitmap.getHeight();
+      }
+      if (bitmap.getConfig() != Bitmap.Config.ARGB_8888) {
+        bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
       }
 
       if (context == null) {
@@ -224,4 +225,45 @@ public class BufferLoader {
   private interface BitmapLoader {
     Bitmap load() throws IOException, ExecutionException, InterruptedException;
   }
+
+  private static void purgeOpenGLError() {
+    int i = 0;
+    while (true) {
+      if (GLES20.glGetError() == GLES20.GL_NO_ERROR || i >= 9) {
+        break;
+      }
+      i++;
+    }
+  }
+
+  /**
+   * Check for OpenGL errors and throw an exception if an error is found.
+   *
+   * @param prefix the prefix to add to the error message
+   */
+  private static void checkGlError(String prefix) {
+    StringBuilder errorMessageBuilder = new StringBuilder();
+    boolean foundError = false;
+    int error;
+    if (prefix != null) {
+      errorMessageBuilder.append(prefix).append(": ");
+    }
+    while ((error = GLES20.glGetError()) != GLES20.GL_NO_ERROR) {
+      if (foundError) {
+        errorMessageBuilder.append('\n');
+      }
+      String errorString = GLU.gluErrorString(error);
+      if (errorString == null) {
+        errorString = "error code: 0x" + Integer.toHexString(error);
+      } else {
+        errorString = "error code: 0x" + Integer.toHexString(error) + " " + errorString;
+      }
+      errorMessageBuilder.append("glError: ").append(errorString);
+      foundError = true;
+    }
+    if (foundError) {
+      Log.e("RNSkiaVideo", errorMessageBuilder.toString());
+    }
+  }
+
 }

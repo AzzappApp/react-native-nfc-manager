@@ -20,7 +20,7 @@ public:
 
   std::string loadImage(std::string uri, double width, double height);
   std::string loadVideoFrame(std::string uri, double width, double height, double time);
-  void releaseBuffer(int texId);
+  void releaseTexture(int texId);
 
   static void postTaskResult(jni::alias_ref<jni::JClass>, jlong bufferLoaderPtr,
                              std::string taskId, jint textureId, int width, int height,

@@ -40,9 +40,9 @@ void JBufferLoader::postTaskResult(jni::alias_ref<jni::JClass>, jlong bufferLoad
   receiver->handleTaskResult(taskId, textureId, width, height, errorMessage);
 }
 
-void JBufferLoader::releaseBuffer(int texId) {
+void JBufferLoader::releaseTexture(int texId) {
   static const auto loadVideoFrameMethod =
-      getClass()->getMethod<void(jint)>("releaseBuffer");
+      getClass()->getMethod<void(jint)>("releaseTexture");
   loadVideoFrameMethod(self(), texId);
 }
 
@@ -112,8 +112,8 @@ jsi::Value BufferLoaderHostObject::get(jsi::Runtime& runtime,
            const jsi::Value *arguments, size_t count) -> jsi::Value {
           try {
             auto texture = arguments[0].asObject(runtime);
-            int textureId = (int)texture.getProperty(runtime, "fID").asNumber();
-            jbufferLoader->releaseBuffer(textureId);
+            int textureId = (int)texture.getProperty(runtime, "glID").asNumber();
+            jbufferLoader->releaseTexture(textureId);
           } catch(...) {
             __android_log_print(
                 ANDROID_LOG_DEBUG, "BufferLoaderHostObject",
