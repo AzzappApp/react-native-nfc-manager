@@ -1,5 +1,6 @@
-## 1.4.1-canary.51
+## 1.4.1-canary.52
 
+* **fix:**  - TextLink module  bouton should not have a pressable animation on button, and select the media in toolbox during module edition ([#6276](https://github.com/AzzappApp/azzapp/pull/6276))
 * **fix:**  - missing results "header" result when no post available ([#6164](https://github.com/AzzappApp/azzapp/pull/6164))
 * **fix:**  - add margin top to allow cross access ([#6268](https://github.com/AzzappApp/azzapp/pull/6268))
 * **fix:**  - allow like not correctly updated and avoid updating posts when w… ([#6262](https://github.com/AzzappApp/azzapp/pull/6262))
