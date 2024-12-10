@@ -112,6 +112,7 @@ const VideoCompositionRenderer = ({
     const currentTime = framesExtractor.currentTime;
     const frames = framesExtractor.decodeCompositionFrames();
     drawFrame({
+      context: undefined,
       canvas,
       width: width * pixelRatio,
       height: height * pixelRatio,
@@ -126,6 +127,7 @@ const VideoCompositionRenderer = ({
       width * pixelRatio,
       height * pixelRatio,
     );
+    global.gc?.();
   }, true);
 
   return (

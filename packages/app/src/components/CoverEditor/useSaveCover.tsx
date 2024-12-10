@@ -368,13 +368,11 @@ const createCoverMedia = async (
     );
 
     const lottieInfo = extractLottieInfoMemoized(lottie);
-    await exportVideoComposition(
-      composition,
-      {
-        outPath,
-        ...encoderConfigs,
-      },
-      infos => {
+    await exportVideoComposition({
+      videoComposition: composition,
+      outPath,
+      ...encoderConfigs,
+      drawFrame: infos => {
         'worklet';
         coverDrawer({
           ...infos,
@@ -386,10 +384,14 @@ const createCoverMedia = async (
           lottieInfo,
         });
       },
-      ({ framesCompleted, nbFrames }) => {
+      after() {
+        'worklet';
+        global.gc?.();
+      },
+      onProgress: ({ framesCompleted, nbFrames }) => {
         progressCallback({ framesCompleted, nbFrames });
       },
-    );
+    });
     skottiePlayer?.dispose();
   }
 

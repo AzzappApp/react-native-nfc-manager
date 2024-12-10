@@ -23,7 +23,7 @@
   "dependencies": {
     "@azzapp/i18n": "workspace:^",
     "@azzapp/react-native-buffer-loader": "workspace:^",
-    "@azzapp/react-native-skia-video": "patch:@azzapp/react-native-skia-video@https%3A//github.com/AzzappApp/react-native-skia-video.git%23commit=bc9be61353c9368e6b7696cdcd1293b9fcb0a819#~/.yarn/patches/@azzapp-react-native-skia-video-https-25607de6da.patch",
+    "@azzapp/react-native-skia-video": "patch:@azzapp/react-native-skia-video@https%3A//github.com/AzzappApp/react-native-skia-video.git%23commit=c8af754cf0c4f00647b2581d467abc8958ed6805#~/.yarn/patches/@azzapp-react-native-skia-video-https-cff8ca5bda.patch",
     "@azzapp/react-native-snapshot-view": "^0.1.4",
     "@azzapp/shared": "workspace:^",
     "@expo-google-fonts/amatic-sc": "^0.2.3",

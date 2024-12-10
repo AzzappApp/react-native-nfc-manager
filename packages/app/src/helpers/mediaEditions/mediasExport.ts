@@ -170,14 +170,12 @@ export const saveTransformedVideoToFile = async ({
 
   const encoderConfigs = validConfigs[0]!;
 
-  await exportVideoComposition(
+  await exportVideoComposition({
     videoComposition,
-    {
-      outPath,
-      ...encoderConfigs,
-    },
     drawFrame,
-  );
+    outPath,
+    ...encoderConfigs,
+  });
   return outPath;
 };
 

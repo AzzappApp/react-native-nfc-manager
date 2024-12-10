@@ -78,7 +78,7 @@ __metadata:
   dependencies:
     "@azzapp/i18n": "workspace:^"
     "@azzapp/react-native-buffer-loader": "workspace:^"
-    "@azzapp/react-native-skia-video": "patch:@azzapp/react-native-skia-video@https%3A//github.com/AzzappApp/react-native-skia-video.git%23commit=bc9be61353c9368e6b7696cdcd1293b9fcb0a819#~/.yarn/patches/@azzapp-react-native-skia-video-https-25607de6da.patch"
+    "@azzapp/react-native-skia-video": "patch:@azzapp/react-native-skia-video@https%3A//github.com/AzzappApp/react-native-skia-video.git%23commit=c8af754cf0c4f00647b2581d467abc8958ed6805#~/.yarn/patches/@azzapp-react-native-skia-video-https-cff8ca5bda.patch"
     "@azzapp/react-native-snapshot-view": "npm:^0.1.4"
     "@azzapp/shared": "workspace:^"
     "@expo-google-fonts/amatic-sc": "npm:^0.2.3"
@@ -390,27 +390,27 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@azzapp/react-native-skia-video@https://github.com/AzzappApp/react-native-skia-video.git#commit=bc9be61353c9368e6b7696cdcd1293b9fcb0a819":
+"@azzapp/react-native-skia-video@https://github.com/AzzappApp/react-native-skia-video.git#commit=c8af754cf0c4f00647b2581d467abc8958ed6805":
   version: 0.7.0
-  resolution: "@azzapp/react-native-skia-video@https://github.com/AzzappApp/react-native-skia-video.git#commit=bc9be61353c9368e6b7696cdcd1293b9fcb0a819"
+  resolution: "@azzapp/react-native-skia-video@https://github.com/AzzappApp/react-native-skia-video.git#commit=c8af754cf0c4f00647b2581d467abc8958ed6805"
   peerDependencies:
     "@shopify/react-native-skia": ">= 1.7.0"
     react: "*"
     react-native: "*"
     react-native-reanimated: ">= 3.16.1"
-  checksum: 10/21a93fb7948b26bde43e732867097b91bc144c4eefd4b96728f8f64d8120433d4e784d7a388fc78e2c86a4b63eab218205dc5a5c18df0e4cbc714e24b23110c5
+  checksum: 10/136743739757368594b8bfc739a577adefb55e4f6397c6d493b1ac9f4b2fb7621804f019aa5b9a89ac5a036f1eaa4a2ecbd44c1a78a71b84746cca311aa59420
   languageName: node
   linkType: hard
 
-"@azzapp/react-native-skia-video@patch:@azzapp/react-native-skia-video@https%3A//github.com/AzzappApp/react-native-skia-video.git%23commit=bc9be61353c9368e6b7696cdcd1293b9fcb0a819#~/.yarn/patches/@azzapp-react-native-skia-video-https-25607de6da.patch":
+"@azzapp/react-native-skia-video@patch:@azzapp/react-native-skia-video@https%3A//github.com/AzzappApp/react-native-skia-video.git%23commit=c8af754cf0c4f00647b2581d467abc8958ed6805#~/.yarn/patches/@azzapp-react-native-skia-video-https-cff8ca5bda.patch":
   version: 0.7.0
-  resolution: "@azzapp/react-native-skia-video@patch:@azzapp/react-native-skia-video@https%3A//github.com/AzzappApp/react-native-skia-video.git%23commit=bc9be61353c9368e6b7696cdcd1293b9fcb0a819#~/.yarn/patches/@azzapp-react-native-skia-video-https-25607de6da.patch::version=0.7.0&hash=225763"
+  resolution: "@azzapp/react-native-skia-video@patch:@azzapp/react-native-skia-video@https%3A//github.com/AzzappApp/react-native-skia-video.git%23commit=c8af754cf0c4f00647b2581d467abc8958ed6805#~/.yarn/patches/@azzapp-react-native-skia-video-https-cff8ca5bda.patch::version=0.7.0&hash=225763"
   peerDependencies:
     "@shopify/react-native-skia": ">= 1.7.0"
     react: "*"
     react-native: "*"
     react-native-reanimated: ">= 3.16.1"
-  checksum: 10/c9f09706bd84775e923f17b059fa91ae637c1e3a06d5cea68ab873e9927476563a6038721aeadc11a8a9a2021cfd92136b940c3f0e942b6738c6b4a32e0c174f
+  checksum: 10/cb05ba02d756ab25fa24f83d46a6afeb4f03dee75ab6cb1c77955f448506598933a9893a729f476d6ced03837124f0a2be6fe1cfbbecaaa897e9f9c536f7d8b2
   languageName: node
   linkType: hard
 
