@@ -142,7 +142,7 @@ const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
               renderItem={renderAvailableInfo}
               onItemSelected={updateSelectedContact}
               itemContainerStyle={styles.selectItemContainerStyle}
-              useFlatList={false}
+              useFlatList
             />
           </BottomSheetModal>
         )}
