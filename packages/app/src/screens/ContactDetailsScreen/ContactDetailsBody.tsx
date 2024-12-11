@@ -1,9 +1,14 @@
+import { type Contact } from 'expo-contacts';
+import * as FileSystem from 'expo-file-system';
 import { Image } from 'expo-image';
+import { shareAsync } from 'expo-sharing';
 import { useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Linking, Platform, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
+
 import { colors, shadow } from '#theme';
+import { buildVCardFromExpoContact } from '#helpers/contactCardHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
@@ -12,7 +17,6 @@ import Icon, { SocialIcon } from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
-import type { Contact } from 'expo-contacts';
 
 type Props = {
   details: ContactDetails;
@@ -47,14 +51,34 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
 
   const birthday = details.dates?.find(date => date.label === 'birthday');
 
+  const onShare = async () => {
+    const vcardData = await buildVCardFromExpoContact(details);
+    const contactName = (
+      (details.firstName || '') +
+      ' ' +
+      (details.lastName || '')
+    ).trim();
+    const filePath =
+      FileSystem.cacheDirectory +
+      (contactName.length ? contactName : 'contact') +
+      '.vcf';
+    // generate file
+    await FileSystem.writeAsStringAsync(filePath, vcardData.toString());
+    // share the file
+    await shareAsync(filePath, { mimeType: 'text/x-vcard' });
+    // clean up file afterward
+    await FileSystem.deleteAsync(filePath);
+    // }
+  };
+
   return (
     <Container style={styles.container}>
       <PressableNative style={styles.close} onPress={onClose}>
         <Icon icon="close" size={24} />
       </PressableNative>
-      {/* <PressableNative style={styles.share}>
-            <Icon icon="share" size={24} />
-          </PressableNative> */}
+      <PressableNative style={styles.share} onPress={onShare}>
+        <Icon icon="share" size={24} style={styles.shareIcon} />
+      </PressableNative>
       <View style={styles.content}>
         <View style={styles.avatarContainer}>
           <View style={[styles.avatar, styles.avatarWrapper]}>
@@ -98,9 +122,9 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
             styles.scroll,
           ]}
         >
-          {details.phoneNumbers?.map(phoneNumber => (
+          {details.phoneNumbers?.map((phoneNumber, index) => (
             <PressableNative
-              key={phoneNumber.number}
+              key={'phone' + index + '' + phoneNumber.number}
               style={styles.item}
               onPress={() => {
                 Linking.openURL(`tel:${phoneNumber.number}`);
@@ -115,9 +139,9 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
               </Text>
             </PressableNative>
           ))}
-          {details.emails?.map(email => (
+          {details.emails?.map((email, index) => (
             <PressableNative
-              key={email.email}
+              key={'email' + index + '' + email.email}
               style={styles.item}
               onPress={() => {
                 Linking.openURL(`mailto:${email.email}`);
@@ -133,7 +157,7 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
             </PressableNative>
           ))}
           {birthday && (
-            <PressableNative style={styles.item}>
+            <PressableNative style={styles.item} key="birthday">
               <View style={styles.label}>
                 <Icon icon="calendar" />
                 <Text variant="smallbold">
@@ -156,9 +180,9 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
               </Text>
             </PressableNative>
           )}
-          {details.urlAddresses?.map(urlAddress => (
+          {details.urlAddresses?.map((urlAddress, index) => (
             <PressableNative
-              key={urlAddress.url}
+              key={'url' + index + '' + urlAddress.url}
               style={styles.item}
               onPress={() => {
                 if (urlAddress.url) {
@@ -182,8 +206,11 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
               </Text>
             </PressableNative>
           ))}
-          {details.addresses?.map(address => (
-            <PressableNative key={address.street} style={styles.item}>
+          {details.addresses?.map((address, index) => (
+            <PressableNative
+              key={'street' + index + '' + address.street}
+              style={styles.item}
+            >
               <View style={styles.label}>
                 <Icon icon="location" />
                 <Text variant="smallbold">{address.label}</Text>
@@ -193,9 +220,9 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
               </Text>
             </PressableNative>
           ))}
-          {details.socialProfiles?.map(social => (
+          {details.socialProfiles?.map((social, index) => (
             <PressableNative
-              key={social.url}
+              key={'social' + index + '' + social.url}
               style={styles.item}
               onPress={() => {
                 if (social.url) {
@@ -215,7 +242,7 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
               </Text>
             </PressableNative>
           ))}
-          <View style={styles.item}>
+          <View style={styles.item} key="scanDate">
             <View style={styles.label}>
               <Icon icon="calendar" />
               <Text variant="smallbold">
@@ -250,9 +277,10 @@ const stylesheet = createStyleSheet(theme => ({
   },
   share: {
     position: 'absolute',
-    top: 0,
+    top: 20,
     right: 20,
   },
+  shareIcon: { transform: [{ rotateZ: '30deg' }] },
   name: {
     marginTop: 20,
   },

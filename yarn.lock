@@ -173,6 +173,7 @@ __metadata:
     expo-image: "npm:^2.0.2"
     expo-linear-gradient: "npm:~14.0.1"
     expo-sensors: "npm:14.0.1"
+    expo-sharing: "npm:^13.0.0"
     graphql: "npm:^16.9.0"
     graphql-relay: "npm:^0.10.2"
     i18n-iso-countries: "npm:^7.13.0"
@@ -16650,6 +16651,15 @@ __metadata:
     expo: "*"
     react-native: "*"
   checksum: 10/171d5f428aca7da501c144a0c57c4225c399f8d3a8e0e3de91864a9e6a2422a90c26b410e91f0a0b512ea9c9eb96de3e1a109cef4240d16ffc42f63b5058148e
+  languageName: node
+  linkType: hard
+
+"expo-sharing@npm:^13.0.0":
+  version: 13.0.0
+  resolution: "expo-sharing@npm:13.0.0"
+  peerDependencies:
+    expo: "*"
+  checksum: 10/f0ac8e5970cfdd50ff7c4bc6e4dc04596d5b416cf321ee9c0c2b4504186d5cacfc8b078d432d064befdeee9d2bb00618a175ca18527a5b71aa84fb1689c35d3b
   languageName: node
   linkType: hard
 

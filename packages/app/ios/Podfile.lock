@@ -129,6 +129,8 @@ PODS:
     - Yoga
   - ExpoSensors (14.0.1):
     - ExpoModulesCore
+  - ExpoSharing (13.0.0):
+    - ExpoModulesCore
   - FBLazyVector (0.76.2)
   - Firebase (11.5.0):
     - Firebase/Core (= 11.5.0)
@@ -2584,6 +2586,7 @@ DEPENDENCIES:
   - ExpoLinearGradient (from `../../../node_modules/expo-linear-gradient/ios`)
   - ExpoModulesCore (from `../../../node_modules/expo-modules-core`)
   - ExpoSensors (from `../../../node_modules/expo-sensors/ios`)
+  - ExpoSharing (from `../../../node_modules/expo-sharing/ios`)
   - FBLazyVector (from `../../../node_modules/react-native/Libraries/FBLazyVector`)
   - Firebase
   - FirebaseAnalytics
@@ -2760,6 +2763,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/expo-modules-core"
   ExpoSensors:
     :path: "../../../node_modules/expo-sensors/ios"
+  ExpoSharing:
+    :path: "../../../node_modules/expo-sharing/ios"
   FBLazyVector:
     :path: "../../../node_modules/react-native/Libraries/FBLazyVector"
   fmt:
@@ -2977,6 +2982,7 @@ SPEC CHECKSUMS:
   ExpoLinearGradient: 7ca3b1d1625a1ab85c129abce4a3cdc78a9500a3
   ExpoModulesCore: bb3f481a7912159f2289a653e4195146170f0a00
   ExpoSensors: 55eef9972309aa8ec26bf5922040453e4c5cf7df
+  ExpoSharing: 39a198e64bf522948fe60e270e49a0c7757912c1
   FBLazyVector: bc70dcb22ad30ce734a7cce7210791dc737e230f
   Firebase: 7a56fe4f56b5ab81b86a6822f5b8f909ae6fc7e2
   FirebaseAnalytics: 2f4a11eeb7a0e9c6fcf642d4e6aaca7fa4d38c28
