@@ -1,5 +1,6 @@
-## 1.4.1-canary.58
+## 1.4.1-canary.59
 
+* **fix:**  - browser webcard should use correct background for new module ([#6312](https://github.com/AzzappApp/azzapp/pull/6312))
 * **fix:**  - **modules:** [#6224](https://github.com/AzzappApp/azzapp/pull/6224) add media with text and link ([#6307](https://github.com/AzzappApp/azzapp/pull/6307))
 * **fix:**  - **modules:** [#6224](https://github.com/AzzappApp/azzapp/pull/6224) add maxWidth on parallaxText ([#6304](https://github.com/AzzappApp/azzapp/pull/6304))
 * **feat:**  - remove token associated to the device when adding a new token (userId, device) ([#6293](https://github.com/AzzappApp/azzapp/pull/6293))
