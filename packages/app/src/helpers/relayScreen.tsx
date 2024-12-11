@@ -18,6 +18,7 @@ import {
   useScreenHasFocus,
   type ScreenOptions,
 } from '#components/NativeRouter';
+import { useAppState } from '#hooks/useAppState';
 import LoadingView from '#ui/LoadingView';
 import {
   addAuthStateListener,
@@ -177,6 +178,14 @@ function relayScreen<TRoute extends Route>(
       //TODO: should we had a param to refresh only when hasFocus. in case of push notification it should refresh even if the screen is not focused
       loadQueryFor(screenId, options, params, true);
     }, [params, screenId]);
+
+    // refresh the query when the screen gains focus (going from background to foreground)
+    const appState = useAppState();
+    useEffect(() => {
+      if (appState === 'active' && refreshOnFocus) {
+        refreshQuery();
+      }
+    }, [appState, refreshQuery]);
 
     useEffect(() => {
       let currentTimeout: any;
