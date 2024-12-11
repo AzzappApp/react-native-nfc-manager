@@ -63,17 +63,55 @@ const Slideshow = ({ medias: baseMedias, style, square }: Props) => {
     -50,
   );
 
+  const [isAutoPlay, setAutoplay] = useState(true);
+
+  const startAutoPlay = () => {
+    setAutoplay(true);
+  };
+
+  const stopAutoPlay = () => {
+    setAutoplay(false);
+  };
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isAutoPlay) {
+      interval = setInterval(() => {
+        onNext();
+      }, 1500);
+    }
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [isAutoPlay, onNext]);
+
   return (
     <div className={styles.container} style={style}>
       <div ref={slideshow} className={styles.slideshow}>
         <div
+          role="button"
           className={styles.arrow}
           style={{ left: 10, rotate: '180deg' }}
           onClick={onPrev}
+          onTouchStart={stopAutoPlay}
+          onTouchEnd={startAutoPlay}
+          onMouseOver={stopAutoPlay}
+          onMouseOut={startAutoPlay}
         >
           <ArrowRightIcon className={styles.arrowIcon} />
         </div>
-        <div className={styles.arrow} style={{ right: 10 }} onClick={onNext}>
+        <div
+          role="button"
+          className={styles.arrow}
+          style={{ right: 10 }}
+          onClick={onNext}
+          onTouchStart={stopAutoPlay}
+          onTouchEnd={startAutoPlay}
+          onMouseOver={stopAutoPlay}
+          onMouseOut={startAutoPlay}
+        >
           <ArrowRightIcon className={styles.arrowIcon} />
         </div>
         {size &&
