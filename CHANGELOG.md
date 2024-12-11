@@ -1,5 +1,8 @@
-## 1.4.1-canary.53
+## 1.4.1-canary.54
 
+* **feat:**  - remove token associated to the device when adding a new token (userId, device) ([#6293](https://github.com/AzzappApp/azzapp/pull/6293))
+* **feat:**  - handle ShareBack notification (open contact screen if open app,… ([#6275](https://github.com/AzzappApp/azzapp/pull/6275))
+* **fix:**  - Module small adjustment (slideshow desktop preview) ([#6289](https://github.com/AzzappApp/azzapp/pull/6289))
 * **fix:**  - 🐛 reset input on file reset ([#6277](https://github.com/AzzappApp/azzapp/pull/6277))
 * **fit:**  - add link to url on store button ([#6292](https://github.com/AzzappApp/azzapp/pull/6292))
 * **fix:**  - center and resize text on create ([#6291](https://github.com/AzzappApp/azzapp/pull/6291))
