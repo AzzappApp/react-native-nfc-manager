@@ -4,8 +4,11 @@ const moduleContainer = style({ position: 'relative', overflow: 'hidden' });
 
 const parallaxContainer = style({
   height: '100vh',
+  width: '100%',
   position: 'relative',
   overflow: 'hidden',
+  display: 'flex',
+  justifyContent: 'center',
 });
 
 const parallaxItem = style({
@@ -13,6 +16,7 @@ const parallaxItem = style({
   width: '100%',
   overflow: 'hidden',
   position: 'absolute',
+  willChange: 'transform',
 });
 
 export default { parallaxContainer, parallaxItem, moduleContainer };

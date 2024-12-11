@@ -12,6 +12,8 @@ const textContainer = style({
   justifyContent: 'center',
   alignItems: 'center',
   flexDirection: 'column',
+  maxWidth: '600px',
+  padding: '0 20px',
 });
 
 export default {
