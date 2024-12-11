@@ -69,7 +69,7 @@ export const sendPushNotification = async (
               sound,
               'mutable-content': 1,
             },
-            deep_link: deepLink,
+            deepLink,
           },
           fcm_options: {
             image: imageUrl,

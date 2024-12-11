@@ -8,6 +8,7 @@ import {
   requestNotifications,
 } from 'react-native-permissions';
 import { useMutation, graphql, commitMutation } from 'react-relay';
+import { useRouter } from '#components/NativeRouter';
 import type { PermissionStatus } from 'react-native-permissions';
 import type { Environment } from 'react-relay';
 import type { MutationConfig, MutationParameters } from 'relay-runtime';
@@ -87,22 +88,26 @@ const useNotifications = (onDeepLink?: ((deepLink: string) => void) | null) => {
     (deepLink: object | string) => {
       if (typeof deepLink === 'string') {
         onDeepLink?.(deepLink);
-        if (deepLink === 'shareBack') {
-          //TODO; find the correct route
-        }
       }
     },
     [onDeepLink],
   );
 
+  const router = useRouter();
   useEffect(() => {
+    //on opening the app in background
     const unsubscribe = messaging().onNotificationOpenedApp(remoteMessage => {
       if (remoteMessage.data?.deepLink) {
         handleDeepLink(remoteMessage.data?.deepLink);
       }
-      // Handle the notification event here
+      if (remoteMessage.data?.deepLink === 'shareBack') {
+        //open the router
+        router.push({
+          route: 'CONTACTS',
+        });
+      }
     });
-
+    // this is call when the app is in quit mode (kill)
     messaging()
       .getInitialNotification()
       .then(remoteMessage => {
@@ -112,6 +117,17 @@ const useNotifications = (onDeepLink?: ((deepLink: string) => void) | null) => {
           }
         }
       });
+
+    return unsubscribe;
+  }, [handleDeepLink, router]);
+
+  useEffect(() => {
+    //on opening the app in background
+    const unsubscribe = messaging().onMessage(remoteMessage => {
+      if (remoteMessage.data?.deepLink) {
+        handleDeepLink(remoteMessage.data?.deepLink);
+      }
+    });
 
     return unsubscribe;
   }, [handleDeepLink]);
