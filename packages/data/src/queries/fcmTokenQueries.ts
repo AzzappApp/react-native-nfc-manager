@@ -1,10 +1,10 @@
-import { and, eq } from 'drizzle-orm';
+import { and, eq, ne } from 'drizzle-orm';
 import { db } from '../database';
 import { FCMTokenTable } from '../schema';
 
 export const updateFCMToken = async (
-  deviceId: string,
   userId: string,
+  deviceId: string,
   deviceType: string,
   deviceOS: string,
   fcmToken: string,
@@ -45,6 +45,23 @@ export const deleteFCMToken = async (deviceId: string, userId: string) => {
       and(
         eq(FCMTokenTable.deviceId, deviceId),
         eq(FCMTokenTable.userId, userId),
+      ),
+    );
+};
+
+/*
+ * Remove all FCM tokens for a device except the current user's token
+ */
+export const clearTokenForDeviceExceptUser = async (
+  userId: string,
+  deviceId: string,
+) => {
+  await db()
+    .delete(FCMTokenTable)
+    .where(
+      and(
+        eq(FCMTokenTable.deviceId, deviceId),
+        ne(FCMTokenTable.userId, userId),
       ),
     );
 };
