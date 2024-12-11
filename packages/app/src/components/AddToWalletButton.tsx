@@ -18,18 +18,20 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getAppleWalletPass, getGoogleWalletPass } from '#helpers/MobileWebAPI';
 import PressableNative from '../ui/PressableNative';
 import Text from '../ui/Text';
-import type { ViewStyle } from 'react-native';
+import type { ColorSchemeName, ViewStyle } from 'react-native';
 
 type Props = {
   webCardId?: string | null;
   style?: ViewStyle;
+  appearance?: ColorSchemeName;
 };
 
-const AddToWalletButton = ({ webCardId, style }: Props) => {
+const AddToWalletButton = ({ webCardId, style, appearance }: Props) => {
   const intl = useIntl();
-  const styles = useStyleSheet(styleSheet);
   const [loadingPass, setLoadingPass] = useState(false);
-  const colorScheme = useColorScheme();
+  const scheme = useColorScheme();
+  const colorScheme = appearance || scheme;
+  const styles = useStyleSheet(styleSheet, colorScheme);
 
   const generateLoadingPass = useCallback(async () => {
     try {

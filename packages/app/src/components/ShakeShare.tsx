@@ -191,9 +191,14 @@ const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
               />
             )}
             {webCard && (
-              <AddToWalletButton webCardId={webCard.id} style={styles.button} />
+              <AddToWalletButton
+                webCardId={webCard.id}
+                style={styles.button}
+                appearance="light"
+              />
             )}
             <LargeButton
+              appearance="light"
               icon="link"
               title={intl.formatMessage({
                 defaultMessage: 'Copy card link',
