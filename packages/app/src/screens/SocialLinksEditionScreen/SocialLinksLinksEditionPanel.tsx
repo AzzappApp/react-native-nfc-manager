@@ -1,14 +1,18 @@
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View, ScrollView } from 'react-native';
+import { View } from 'react-native';
+import { GestureDetector } from 'react-native-gesture-handler';
 import { colors } from '#theme';
+import SortableList from '#components/SortableScrollView/SortableScrollView';
 import { SocialLinkIconButton } from '#components/ui/SocialLinkIconButton';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import useScreenDimensions from '#hooks/useScreenDimensions';
+import useScreenInsets from '#hooks/useScreenInsets';
 import IconButton from '#ui/IconButton';
 import Text from '#ui/Text';
 import TitleWithLine from '#ui/TitleWithLine';
 import type { SocialLinkItem } from '@azzapp/shared/socialLinkHelpers';
 import type { ViewProps, StyleProp, ViewStyle } from 'react-native';
-// import type { PanGesture } from 'react-native-gesture-handler';
+import type { PanGestureType } from 'react-native-gesture-handler/lib/typescript/handlers/gestures/panGesture';
 
 type SocialLinksLinksEditionPanelProps = ViewProps & {
   /**
@@ -20,6 +24,7 @@ type SocialLinksLinksEditionPanelProps = ViewProps & {
    */
   onDeleteLink: (links: SocialLinkItem) => void;
   onItemPress: (link: SocialLinkItem) => void;
+  onOrderChange: (links: SocialLinkItem[]) => void;
   onAddLink: () => void;
   contentContainerStyle?: StyleProp<ViewStyle>;
   ignoreKeyboard?: boolean;
@@ -35,6 +40,7 @@ const SocialLinksLinksEditionPanel = ({
   onDeleteLink,
   onAddLink,
   onItemPress,
+  onOrderChange,
   style,
   contentContainerStyle,
   ignoreKeyboard,
@@ -45,35 +51,57 @@ const SocialLinksLinksEditionPanel = ({
   const intl = useIntl();
   const styles = useStyleSheet(styleSheet);
 
-  //   return consolidatedLinks.sort((a, b) => {
-  //     if (a.position !== b.position) {
-  //       return a.position - b.position;
-  //     }
-  //     return 0;
-  //   });
-  // }, [intl, links]);
+  const onChangeOrder = (arr: SocialLinkItem[]) => {
+    const orderedList: SocialLinkItem[] = arr
+      .sort((a, b) => a.position - b.position)
+      // filterout keyId
+      .map(item => ({
+        link: item.link,
+        position: item.position,
+        socialId: item.socialId,
+      }));
+    onOrderChange(orderedList);
+  };
 
-  // const onChangeOrder = (
-  //   arr: Array<{
-  //     id: string;
-  //     link?: string | undefined;
-  //     position: number;
-  //     mask: string;
-  //   }>,
-  // ) => {
-  //   //update the position of items in link
-  //   const newLinks = links.map(link => {
-  //     const item = arr.find(item => item.id === link?.socialId);
-  //     if (item && link) {
-  //       return {
-  //         ...link,
-  //         position: item.position,
-  //       };
-  //     }
-  //     return link;
-  //   });
-  //   onLinksChange(newLinks);
-  // };
+  const sortableLinks = links
+    .sort((a, b) => a.position - b.position)
+    .map((l, index) => {
+      return { ...l, position: index, keyId: `${l.link}${l.socialId}${index}` };
+    });
+
+  const { width } = useScreenDimensions();
+  const visibleDimension = width;
+  const { bottom } = useScreenInsets();
+
+  const scrollableStyle: ViewStyle = {
+    overflow: 'visible',
+    paddingBottom: maxLink <= 0 ? 30 : 0,
+    paddingTop: maxLink <= 0 ? 30 : 0,
+    maxHeight: 172 - bottom,
+  };
+
+  const renderItem = (
+    item: {
+      position: number;
+      keyId: string;
+      socialId: string;
+      link: string;
+    },
+    panGesture: PanGestureType,
+  ) => {
+    return (
+      <GestureDetector gesture={panGesture}>
+        <View style={styles.itemContainer}>
+          <SocialLinkIconButton
+            item={item}
+            onPress={onItemPress}
+            showDelete
+            onDeletePress={onDeleteLink}
+          />
+        </View>
+      </GestureDetector>
+    );
+  };
 
   return (
     <View style={[styles.root, style]} {...props}>
@@ -85,27 +113,18 @@ const SocialLinksLinksEditionPanel = ({
           })}
         />
       ) : undefined}
-      <ScrollView
-        contentContainerStyle={{
-          flexGrow: 1,
-          paddingBottom: maxLink <= 0 ? 60 : 0,
-        }}
-        style={styles.scrollView}
+      <SortableList
+        items={sortableLinks}
+        itemDimension={90}
+        visibleDimension={visibleDimension}
         showsHorizontalScrollIndicator={false}
         horizontal
-      >
-        {links.map(link => {
-          return (
-            <SocialLinkIconButton
-              key={`${link.socialId}${link.position}`}
-              item={link}
-              onPress={onItemPress}
-              showDelete
-              onDeletePress={onDeleteLink}
-            />
-          );
-        })}
-      </ScrollView>
+        contentContainerStyle={styles.scrollableListContainer}
+        style={scrollableStyle}
+        activateAfterLongPress
+        renderItem={renderItem}
+        onChangeOrder={onChangeOrder}
+      />
       {maxLink > 0 && (
         <Text variant="medium" style={styles.linksPreviewCount}>
           <FormattedMessage
@@ -130,7 +149,6 @@ export default SocialLinksLinksEditionPanel;
 
 const styleSheet = createStyleSheet(appearance => ({
   root: {
-    paddingHorizontal: 20,
     rowGap: 15,
     justifyContent: 'flex-start',
   },
@@ -140,12 +158,10 @@ const styleSheet = createStyleSheet(appearance => ({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  scrollView: {
-    flexGrow: 0,
-    width: '100%',
-    paddingHorizontal: 5,
-    paddingTop: 20,
-    overflow: 'visible',
+  scrollableListContainer: {
+    alignContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
   },
   pressableSocialIcon: {
     paddingHorizontal: 5,
@@ -153,6 +169,12 @@ const styleSheet = createStyleSheet(appearance => ({
   linksPreviewCount: {
     textAlign: 'center',
     color: appearance === 'light' ? colors.grey400 : colors.grey600,
+  },
+  itemContainer: {
+    width: 90,
+    height: 90,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 }));
 

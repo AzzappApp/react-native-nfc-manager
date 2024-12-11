@@ -118,7 +118,9 @@ const CoverEditorLinksModal = ({
             onDeleteLink={onDeleteLink}
             onItemPress={onLinkItemPress}
             onAddLink={openAddLink}
+            onOrderChange={onLinksChange}
             maxLink={4}
+            style={styles.editionPanel}
           />
         </Container>
       </BottomSheetModal>
@@ -173,6 +175,10 @@ const styleSheet = createStyleSheet(appearance => ({
     height: 30,
   },
   linksEditor: {
+    flex: 1,
+  },
+  editionPanel: {
+    minHeight: 200,
     flex: 1,
   },
 }));

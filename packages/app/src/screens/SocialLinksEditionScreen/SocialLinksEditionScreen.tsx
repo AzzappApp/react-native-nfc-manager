@@ -182,7 +182,17 @@ const SocialLinksEditionScreen = ({
     backgroundStyle,
   } = data;
 
-  const links = useMemo(() => [...readOnlyLinks], [readOnlyLinks]);
+  const links = useMemo(
+    () =>
+      readOnlyLinks
+        .sort((a, b) => a.position - b.position)
+        .map((item, index) => ({
+          link: item.link,
+          position: index,
+          socialId: item.socialId,
+        })),
+    [readOnlyLinks],
+  );
 
   const previewData = {
     ...omit(data, 'backgroundId'),
@@ -419,6 +429,7 @@ const SocialLinksEditionScreen = ({
             onDeleteLink={onDeleteLink}
             onAddLink={openAddLink}
             onItemPress={onLinkItemPress}
+            onOrderChange={onLinksChange}
             style={{
               minHeight: bottomPanelHeight,
               flex: 1,
@@ -493,6 +504,7 @@ const SocialLinksEditionScreen = ({
       onDeleteLink,
       onIconColorChange,
       onLinkItemPress,
+      onLinksChange,
       onTouched,
       openAddLink,
       profile,

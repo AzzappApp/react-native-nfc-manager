@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useWindowDimensions, StyleSheet } from 'react-native';
 import Animated, {
   scrollTo,
@@ -13,7 +13,7 @@ import type { ScrollViewProps } from 'react-native';
 import type { PanGesture } from 'react-native-gesture-handler';
 
 export type SortableListItem = {
-  id: string;
+  keyId: string;
   position: number;
 };
 export type SortableListProps<T extends SortableListItem> = ScrollViewProps & {
@@ -24,11 +24,11 @@ export type SortableListProps<T extends SortableListItem> = ScrollViewProps & {
    */
   items: T[];
   /**
-   * h-the height of the item
+   * the height or width of the item
    *
    * @type {number}
    */
-  itemHeight: number;
+  itemDimension: number;
   /**
    * Methd to render the item. The panGesture is optional and have to be applied on the area use to drop and drop the image
    * otherwise there will be a conflict with the scrollview
@@ -40,12 +40,22 @@ export type SortableListProps<T extends SortableListItem> = ScrollViewProps & {
    *
    * @type {number}
    */
-  visibleHeight?: number;
+  visibleDimension?: number;
   /**
    * callback when the order change
    *
    */
   onChangeOrder: (items: T[]) => void;
+
+  /**
+   * Need a long press to activate drag & drop
+   */
+  activateAfterLongPress?: boolean;
+
+  /**
+   * Indicates if scrollList is horizontal
+   */
+  horizontal?: boolean;
 };
 
 /**
@@ -54,45 +64,58 @@ export type SortableListProps<T extends SortableListItem> = ScrollViewProps & {
  * @return {*}
  */
 const SortableList = <T extends SortableListItem>({
-  itemHeight,
+  itemDimension,
   items,
   renderItem,
   style,
   contentContainerStyle,
-  visibleHeight,
+  visibleDimension,
   onChangeOrder,
+  horizontal,
+  activateAfterLongPress,
   ...props
 }: SortableListProps<T>) => {
-  const positions = useSharedValue(arrayToObjectPosition(items));
-  const scrollY = useSharedValue(0);
+  const objectPosition = arrayToObjectPosition(items);
+  const positions = useSharedValue(objectPosition);
+  const scroll = useSharedValue(0);
   const autoScroll = useSharedValue(ScrollDirection.None);
   const scrollViewRef = useAnimatedRef<Animated.ScrollView>();
   const dimensions = useWindowDimensions();
+
+  useEffect(() => {
+    positions.value = arrayToObjectPosition(items);
+  }, [items, positions]);
 
   const onDragEnd = useCallback(() => {
     onChangeOrder(
       items.map(item => {
         return {
           ...item,
-          position: positions.get()[item.id],
+          position: positions.get()[item.keyId],
         };
       }),
     );
   }, [items, onChangeOrder, positions]);
 
   useAnimatedReaction(
-    () => scrollY.value,
+    () => scroll.value,
     scrolling => {
-      scrollTo(scrollViewRef, 0, scrolling, false);
+      scrollTo(
+        scrollViewRef,
+        horizontal ? scrolling : 0,
+        scrolling ? 0 : scrolling,
+        false,
+      );
     },
   );
 
   const handleScroll = useAnimatedScrollHandler(event => {
-    scrollY.value = event.contentOffset.y;
+    scroll.value = horizontal ? event.contentOffset.x : event.contentOffset.y;
   });
 
-  const containerHeight = visibleHeight ?? dimensions.height;
-  const contentHeight = items.length * itemHeight;
+  const containerDimension =
+    visibleDimension ?? (horizontal ? dimensions.width : dimensions.height);
+  const contentDimension = items.length * itemDimension;
 
   return (
     <Animated.ScrollView
@@ -100,27 +123,38 @@ const SortableList = <T extends SortableListItem>({
       onScroll={handleScroll}
       scrollEventThrottle={16}
       showsVerticalScrollIndicator={false}
+      showsHorizontalScrollIndicator={false}
       {...props}
+      horizontal={horizontal}
       style={[styles.scrollViewStyle, style]}
       contentContainerStyle={[
         {
-          height: contentHeight,
+          width: horizontal ? contentDimension : undefined,
+          height: horizontal ? undefined : contentDimension,
+          left:
+            contentDimension < containerDimension
+              ? (containerDimension - contentDimension) / 2
+              : 0,
         },
         contentContainerStyle,
       ]}
     >
       {items.map(item => {
+        const initialPosition = objectPosition[item.keyId] * itemDimension;
         return (
           <SortableWrapper
-            key={item.id}
-            id={item.id}
+            key={item.keyId}
+            id={item.keyId}
             positions={positions}
-            lowerBound={scrollY}
+            lowerBound={scroll}
             autoScrollDirection={autoScroll}
             itemCount={items.length}
-            itemHeight={itemHeight}
-            containerHeight={containerHeight}
+            itemDimension={itemDimension}
+            containerDimension={containerDimension}
             onDragEnd={onDragEnd}
+            horizontal={horizontal}
+            activateAfterLongPress={activateAfterLongPress}
+            initialPosition={initialPosition}
           >
             {panGesture => {
               return renderItem(item, panGesture);
@@ -140,7 +174,7 @@ export const arrayToObjectPosition = <T extends SortableListItem>(
   const object: { [id: string]: number } = {};
 
   for (let i = 0; i < values.length; i++) {
-    object[values[i].id] = i;
+    object[values[i].keyId] = i;
   }
   return object;
 };
