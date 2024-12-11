@@ -1,5 +1,8 @@
-## 1.4.1-canary.52
+## 1.4.1-canary.53
 
+* **fix:**  - 🐛 reset input on file reset ([#6277](https://github.com/AzzappApp/azzapp/pull/6277))
+* **fit:**  - add link to url on store button ([#6292](https://github.com/AzzappApp/azzapp/pull/6292))
+* **fix:**  - center and resize text on create ([#6291](https://github.com/AzzappApp/azzapp/pull/6291))
 * **fix:**  - TextLink module  bouton should not have a pressable animation on button, and select the media in toolbox during module edition ([#6276](https://github.com/AzzappApp/azzapp/pull/6276))
 * **fix:**  - missing results "header" result when no post available ([#6164](https://github.com/AzzappApp/azzapp/pull/6164))
 * **fix:**  - add margin top to allow cross access ([#6268](https://github.com/AzzappApp/azzapp/pull/6268))
