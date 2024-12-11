@@ -91,6 +91,7 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
 
     cardBackgroundColor = swapColor(
       firstModuleData.backgroundStyle?.backgroundColor ??
+        firstModuleData.cardModuleColor?.background ??
         firstModuleData.colorBottom,
       cardColors,
     );
@@ -114,6 +115,7 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
 
     lastModuleBackgroundColor = swapColor(
       lastModuleData.backgroundStyle?.backgroundColor ??
+        lastModuleData.cardModuleColor?.background ??
         lastModuleData.colorBottom,
       cardColors,
     );
