@@ -1,4 +1,4 @@
-## 1.4.1-canary.55
+## 1.4.1-canary.56
 
 * **fix:**  - **modules:** [#6224](https://github.com/AzzappApp/azzapp/pull/6224) add maxWidth on parallaxText ([#6304](https://github.com/AzzappApp/azzapp/pull/6304))
 * **feat:**  - remove token associated to the device when adding a new token (userId, device) ([#6293](https://github.com/AzzappApp/azzapp/pull/6293))
