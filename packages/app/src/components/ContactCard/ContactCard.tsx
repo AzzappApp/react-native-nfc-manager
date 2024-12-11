@@ -21,7 +21,10 @@ import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Text from '#ui/Text';
-import type { ContactCard_profile$key } from '#relayArtifacts/ContactCard_profile.graphql';
+import type {
+  ContactCard_profile$data,
+  ContactCard_profile$key,
+} from '#relayArtifacts/ContactCard_profile.graphql';
 import type { LayoutChangeEvent, StyleProp, ViewStyle } from 'react-native';
 
 type ContactCardProps = {
@@ -75,23 +78,8 @@ const ContactCard = ({
   );
 };
 
-type WebCard = {
-  readonly cardColors: {
-    readonly primary: string;
-  } | null;
-  readonly commonInformation: {
-    readonly company: string | null;
-  } | null;
-  readonly isMultiUser: boolean;
-  readonly userName: string;
-};
-
-type ContactCard = {
-  readonly company: string | null;
-  readonly firstName: string | null;
-  readonly lastName: string | null;
-  readonly title: string | null;
-};
+type WebCard = ContactCard_profile$data['webCard'];
+type ContactCard = ContactCard_profile$data['contactCard'];
 
 type ContactCardComponentProps = {
   webCard?: WebCard | null;
