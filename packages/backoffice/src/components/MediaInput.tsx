@@ -129,6 +129,7 @@ const MediaInput = ({
           onChange={handleImageUpload}
           multiple
           hidden
+          value={value instanceof File ? undefined : ''}
         />
       </Button>
     </Box>
