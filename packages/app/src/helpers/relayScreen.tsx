@@ -18,6 +18,7 @@ import {
   useScreenHasFocus,
   type ScreenOptions,
 } from '#components/NativeRouter';
+import { useAppState } from '#hooks/useAppState';
 import LoadingView from '#ui/LoadingView';
 import {
   addAuthStateListener,
@@ -187,6 +188,14 @@ function relayScreen<TRoute extends Route>(
         },
       });
     }, [environment, params]);
+
+    // refresh the query when the screen gains focus (going from background to foreground)
+    const appState = useAppState();
+    useEffect(() => {
+      if (appState === 'active' && refreshOnFocus) {
+        refreshQuery();
+      }
+    }, [appState, refreshQuery]);
 
     useEffect(() => {
       let currentTimeout: any;
