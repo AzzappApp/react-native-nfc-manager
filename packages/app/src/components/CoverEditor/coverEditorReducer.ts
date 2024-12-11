@@ -570,8 +570,8 @@ export function coverEditorReducer(
           ...state.textLayers,
           {
             ...payload,
-            width: 40,
-            position: { x: 30, y: 50 },
+            width: 80,
+            position: { x: 50, y: 50 },
             rotation: 0,
             shadow: false,
             animation: null,
