@@ -1,17 +1,18 @@
 import { getMediasByIds, type CardModuleBase } from '@azzapp/data';
 import { swapColor } from '@azzapp/shared/cardHelpers';
-import {
-  getCarouselDefaultColors,
-  type CardModuleMediaTextData,
-} from '@azzapp/shared/cardModuleHelpers';
-import ParallaxText from './ParallaxText';
+import { getCarouselDefaultColors } from '@azzapp/shared/cardModuleHelpers';
+import ParallaxTextLink from './ParallaxTextLink';
 
 import type { ModuleRendererProps } from '../../ModuleRenderer';
+import type {
+  CardModuleMediaTextData,
+  CardModuleMediaTextLinkData,
+} from '@azzapp/shared/cardModuleHelpers';
 import type { ReactNode } from 'react';
 
 export type ParallaxRendererProps = ModuleRendererProps<
   CardModuleBase & {
-    data: CardModuleMediaTextData;
+    data: CardModuleMediaTextData | CardModuleMediaTextLinkData;
   }
 > &
   Omit<React.HTMLProps<HTMLDivElement>, 'children'> & {
@@ -41,7 +42,7 @@ const ParallaxRenderer = async ({
         ),
       }}
     >
-      <ParallaxText
+      <ParallaxTextLink
         medias={medias}
         data={module.data}
         colorPalette={colorPalette}

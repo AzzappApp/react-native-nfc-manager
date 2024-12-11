@@ -3,7 +3,7 @@ import CarouselRenderer from './CarouselRenderer';
 import HorizontalPhotoRenderer from './HorizontalPhotoRenderer';
 import LineDividerRenderer from './LineDividerRenderer';
 import MediaRenderer from './MediaRenderer';
-import MediaTextRenderer from './MediaTextRenderer';
+import MediaTextLinkRenderer from './MediaTextLinkRenderer';
 import PhotoWithTextAndTitleRenderer from './PhotoWithTextAndTitleRenderer';
 import SimpleButtonRenderer from './SimpleButtonRenderer';
 import SimpleTextRenderer from './SimpleTextRenderer';
@@ -60,7 +60,8 @@ const renderers: {
   simpleText: SimpleTextRenderer,
   socialLinks: SocialLinksRenderer,
   media: MediaRenderer,
-  mediaText: MediaTextRenderer,
+  mediaText: MediaTextLinkRenderer, // mediaText and mediaTextLink are very close in terms of rendering
+  mediaTextLink: MediaTextLinkRenderer,
   schedule: () => null,
   video: () => null,
   webCardsCarousel: () => null,

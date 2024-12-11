@@ -38,8 +38,15 @@ const sectionTextContainer = style([
     display: 'flex',
     flexDirection: 'column',
     rowGap: 20,
+    alignItems: 'flex-start',
   },
 ]);
+
+const section = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 20,
+});
 
 const container = style({
   display: 'flex',
@@ -56,11 +63,21 @@ const image = style({
   height: '100%',
 });
 
+const link = style({
+  justifyContent: 'center',
+  alignItems: 'center',
+  padding: '15px 20px',
+  textDecoration: 'none',
+  display: 'flex',
+});
+
 export default {
   container,
   sectionContainer,
+  section,
   sectionContainerEven,
   sectionPartContainer,
   sectionTextContainer,
   image,
+  link,
 };

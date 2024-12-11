@@ -15,7 +15,17 @@ const text = style({
   wordBreak: 'break-word',
 });
 
+const link = style({
+  justifyContent: 'center',
+  alignItems: 'center',
+  padding: '15px 20px',
+  textDecoration: 'none',
+  display: 'flex',
+  minWidth: 150,
+});
+
 export default {
   title,
   text,
+  link,
 };
