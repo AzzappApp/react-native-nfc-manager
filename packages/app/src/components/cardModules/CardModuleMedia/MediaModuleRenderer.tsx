@@ -91,7 +91,7 @@ const MediaModuleRenderer = ({
     case 'slideshow':
       return (
         <CardModuleMediaSlideshow
-          medias={data.cardModuleMedias}
+          cardModuleMedias={data.cardModuleMedias}
           cardModuleColor={data.cardModuleColor}
           viewMode={viewMode}
           disableScroll={webCardEditing}
@@ -102,12 +102,13 @@ const MediaModuleRenderer = ({
       return (
         <CardModuleEditionScrollHandler scrollPosition={scrollPosition}>
           <CardModuleMediaParallax
-            medias={data.cardModuleMedias}
+            cardModuleMedias={data.cardModuleMedias}
             cardModuleColor={data.cardModuleColor}
             onLayout={onLayout}
             viewMode={viewMode}
             disableParallax={disableAnimation}
             scrollPosition={scrollPosition}
+            webCardEditing={webCardEditing}
             {...props}
           />
         </CardModuleEditionScrollHandler>

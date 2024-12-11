@@ -110,7 +110,7 @@ const withCardModule = <T extends ModuleKindHasVariants, V>(
         height:
           viewMode === 'mobile'
             ? containerHeight + 40
-            : (DESKTOP_PREVIEW_WIDTH / 0.6) * desktopScaleFactor, //0.6 arbitray value to make landscape design
+            : getDisplayPreviewHeight(moduleKind, desktopScaleFactor),
       };
     }, [bottom, desktopScaleFactor, height, top, viewMode, width]);
 
@@ -252,6 +252,21 @@ const withCardModule = <T extends ModuleKindHasVariants, V>(
 
 const getDisplayName = (WrappedComponent: React.ComponentType<any>) => {
   return WrappedComponent.displayName || WrappedComponent.name || 'Component';
+};
+
+//0.6 arbitray value to make landscape design
+const getDisplayPreviewHeight = (
+  module: ModuleKindHasVariants,
+  desktopScaleFactor: number,
+) => {
+  if (module === 'media') {
+    //sepcific case for slideshow preview (70% height+ margin)
+    return Math.max(
+      (DESKTOP_PREVIEW_WIDTH / 0.6) * desktopScaleFactor,
+      DESKTOP_PREVIEW_WIDTH * 0.7 + 40,
+    );
+  }
+  return (DESKTOP_PREVIEW_WIDTH / 0.6) * desktopScaleFactor;
 };
 
 export default withCardModule;

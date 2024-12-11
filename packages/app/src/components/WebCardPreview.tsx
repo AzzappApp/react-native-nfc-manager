@@ -269,4 +269,4 @@ export default WebCardPreview;
 
 const SWITCH_TOGGLE_SECTION_HEIGHT = 52;
 
-export const DESKTOP_PREVIEW_WIDTH = 1000;
+export const DESKTOP_PREVIEW_WIDTH = 900;

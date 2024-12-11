@@ -13,7 +13,7 @@ import type { LayoutChangeEvent } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 
 type CardModuleMediaParallaxProps = CardModuleVariantType & {
-  medias: CardModuleMedia[];
+  cardModuleMedias: CardModuleMedia[];
   onLayout?: (event: LayoutChangeEvent) => void;
   disableParallax?: boolean;
   scrollPosition?: SharedValue<number>;
@@ -25,9 +25,10 @@ const CardModuleMediaParallax = ({
   modulePosition,
   disableParallax,
   onLayout,
-  medias,
+  cardModuleMedias,
   dimension: providedDimension,
   setEditableItemIndex,
+  webCardEditing,
 }: CardModuleMediaParallaxProps & {}) => {
   const screenDimension = useScreenDimensions();
   const dimension = providedDimension ?? screenDimension;
@@ -38,20 +39,33 @@ const CardModuleMediaParallax = ({
   }
   return (
     <View onLayout={onLayout}>
-      {medias.map(({ media }, index) => {
-        return (
-          <ParallaxItem
-            key={`${media.id}_${index}`}
-            media={media}
-            dimension={dimension}
-            index={index}
-            disableParallax={disableParallax}
-            setEditableItemIndex={setEditableItemIndex}
-            scrollPosition={scrollPosition}
-            modulePosition={modulePosition}
-          />
-        );
-      })}
+      {webCardEditing && cardModuleMedias.length > 0 ? (
+        <ParallaxItem
+          key={`${cardModuleMedias[0].media.id}_${0}`}
+          media={cardModuleMedias[0].media}
+          dimension={dimension}
+          index={0}
+          disableParallax={disableParallax}
+          setEditableItemIndex={setEditableItemIndex}
+          scrollPosition={scrollPosition}
+          modulePosition={modulePosition}
+        />
+      ) : (
+        cardModuleMedias.map(({ media }, index) => {
+          return (
+            <ParallaxItem
+              key={`${media.id}_${index}`}
+              media={media}
+              dimension={dimension}
+              index={index}
+              disableParallax={disableParallax}
+              setEditableItemIndex={setEditableItemIndex}
+              scrollPosition={scrollPosition}
+              modulePosition={modulePosition}
+            />
+          );
+        })
+      )}
     </View>
   );
 };

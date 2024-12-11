@@ -19,14 +19,14 @@ import type { ListRenderItemInfo } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 
 type CardModuleMediaSlideshowProps = CardModuleVariantType & {
-  medias: CardModuleMedia[];
+  cardModuleMedias: CardModuleMedia[];
   disableScroll: boolean;
 };
 
 //Simple component to render, not bind to any relay fragment
 const CardModuleMediaSlideshow = ({
   cardModuleColor,
-  medias,
+  cardModuleMedias,
   cardStyle,
   viewMode,
   dimension,
@@ -119,8 +119,8 @@ const CardModuleMediaSlideshow = ({
   useInterval(() => {
     if (isAutoPlay) {
       let nextIndex = scrollIndex.value + direction;
-      if (nextIndex >= medias.length) {
-        nextIndex = medias.length - 1;
+      if (nextIndex >= cardModuleMedias.length) {
+        nextIndex = cardModuleMedias.length - 1;
         setDirection(-1);
       } else if (nextIndex < 0) {
         nextIndex = 0;
@@ -148,7 +148,7 @@ const CardModuleMediaSlideshow = ({
     >
       <Animated.FlatList
         ref={listRef}
-        data={medias}
+        data={cardModuleMedias}
         renderItem={renderItem}
         keyExtractor={keyExtractor}
         horizontal
