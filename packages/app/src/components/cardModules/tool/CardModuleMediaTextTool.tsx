@@ -135,7 +135,7 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
             defaultValue={text}
             onChangeText={setText}
             style={styles.textStyle}
-            clearTextOnFocus={title === DEFAULT_CARD_MODULE_TEXT}
+            clearTextOnFocus={text === DEFAULT_CARD_MODULE_TEXT}
           />
           {module.moduleKind === 'mediaTextLink' && (
             <>
