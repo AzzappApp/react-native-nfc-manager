@@ -2,7 +2,7 @@ import omit from 'lodash/omit';
 import pick from 'lodash/pick';
 import { MMKV } from 'react-native-mmkv';
 import { getAuthState } from '#helpers/authStore';
-import { COVER_CACHE_DIR } from '#helpers/mediaHelpers';
+import { COVER_CACHE_DIR } from './coverEditorHelpers';
 import type { CoverEditorState } from './coverEditorTypes';
 
 let coverStore: MMKV | null = null;
