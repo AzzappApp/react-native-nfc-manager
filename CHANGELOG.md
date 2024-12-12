@@ -1,5 +1,9 @@
-## 1.4.1-canary.63
+## 1.4.1-canary.64
 
+* **fix:**  - button font new module based on card style ([#6336](https://github.com/AzzappApp/azzapp/pull/6336))
+* **fix:**  -  card module reset text properly ([#6332](https://github.com/AzzappApp/azzapp/pull/6332))
+* **fix:**  - add a confirm message on save button when editin cover ([#6328](https://github.com/AzzappApp/azzapp/pull/6328))
+* **fix:**  - 🐛 avoid overlap add contact header ([#6334](https://github.com/AzzappApp/azzapp/pull/6334))
 * **fix:**  - CardModule Button radius comes from cardstyle ([#6330](https://github.com/AzzappApp/azzapp/pull/6330))
 * **fix:**  - close button on shake'n share ([#6344](https://github.com/AzzappApp/azzapp/pull/6344))
 * **fix:**  - 🐛 avoid crash from invalid number in cover link edition ([#6338](https://github.com/AzzappApp/azzapp/pull/6338))
