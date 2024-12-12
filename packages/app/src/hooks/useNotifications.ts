@@ -100,12 +100,14 @@ const useNotifications = (onDeepLink?: ((deepLink: string) => void) | null) => {
       if (remoteMessage.data?.deepLink) {
         handleDeepLink(remoteMessage.data?.deepLink);
       }
-      if (remoteMessage.data?.deepLink === 'shareBack') {
-        //open the router
-        router.push({
-          route: 'CONTACTS',
-        });
-      }
+      // deactivate this part for now, as the wrong user is selected
+      // changing the active user does not really work when opening app with the home
+      // if (remoteMessage.data?.deepLink === 'shareBack') {
+      //   //open the router
+      //   // router.push({
+      //   //   route: 'CONTACTS',
+      //   // });
+      // }
     });
     // this is call when the app is in quit mode (kill)
     messaging()
