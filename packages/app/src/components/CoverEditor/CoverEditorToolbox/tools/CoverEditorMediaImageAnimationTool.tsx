@@ -279,7 +279,7 @@ const AnimationPreview = ({
 
   useFrameCallback(() => {
     animationStateSharedValue.value =
-      ((Date.now() - startTime) / 1000) % duration;
+      (((Date.now() - startTime) / 1000) % duration) / duration;
   });
 
   const picture = useDerivedValue(() =>
