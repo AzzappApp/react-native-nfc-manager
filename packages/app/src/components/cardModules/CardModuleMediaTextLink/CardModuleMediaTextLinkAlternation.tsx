@@ -207,7 +207,6 @@ const stylesheet = createStyleSheet(appearance => ({
     minWidth: 150,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 12,
     borderCurve: 'continuous',
     paddingHorizontal: 20,
   },
