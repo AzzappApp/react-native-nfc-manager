@@ -252,7 +252,7 @@ const EditImageStep = ({
           style={{
             flex: 1,
             marginTop: 20,
-            marginBottom: insetBottom + BOTTOM_MENU_HEIGHT + 15,
+            marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
           }}
           mountOnlyCurrentTab
           tabs={[
