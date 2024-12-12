@@ -43,7 +43,7 @@ const CoverEditionScreen = ({
     profile?.webCard?.coverId,
   );
   const router = useRouter();
-
+  const intl = useIntl();
   const onCancel = useCallback(() => {
     router.back();
   }, [router]);
@@ -63,6 +63,35 @@ const CoverEditionScreen = ({
     }
   }, [canSave, router]);
 
+  const onConfirm = useCallback(() => {
+    Alert.alert(
+      intl.formatMessage({
+        defaultMessage: 'Save this cover ?',
+        description: 'Cover Edition confirm save title',
+      }),
+      intl.formatMessage({
+        defaultMessage: 'Do you want to save this cover now ?',
+        description: 'Cover Edition confirm save subtitle',
+      }),
+      [
+        {
+          text: intl.formatMessage({
+            defaultMessage: 'Continue editing',
+            description: 'Cover Edition eation cancel save button label',
+          }),
+        },
+        {
+          text: intl.formatMessage({
+            defaultMessage: 'Save now',
+            description: 'Cover Edition confirm save button label',
+          }),
+          onPress: onSave,
+          style: 'cancel',
+        },
+      ],
+    );
+  }, [intl, onSave]);
+
   const onNewCover = useCallback(() => {
     router.replace({
       route: 'COVER_TEMPLATE_SELECTION',
@@ -80,7 +109,6 @@ const CoverEditionScreen = ({
     setCoverModified(true);
   }, []);
 
-  const intl = useIntl();
   const hasCover = !!savedCoverState;
   const onCancelRef = useLatestCallback(onCancel);
   useEffect(() => {
@@ -157,7 +185,7 @@ const CoverEditionScreen = ({
         rightElement={
           <SaveHeaderButton
             disabled={!canSave || !coverModified}
-            onPress={onSave}
+            onPress={onConfirm}
             style={styles.saveButton}
           />
         }
