@@ -171,7 +171,13 @@ const ParallaxItem = ({
             ]}
             onPress={openLink}
           >
-            <Text variant="button" style={{ color: cardModuleColor.graphic }}>
+            <Text
+              variant="button"
+              style={[
+                getTextStyle(cardStyle, cardModuleColor),
+                { color: cardModuleColor.graphic },
+              ]}
+            >
               {cardModuleMedia.link?.label ??
                 intl.formatMessage({
                   defaultMessage: 'Open',
