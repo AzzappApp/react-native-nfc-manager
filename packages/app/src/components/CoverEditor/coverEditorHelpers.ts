@@ -397,9 +397,10 @@ const copyCoverMediaToCacheDirInternal = async (
   await checkMediaCacheDir();
   const ext = getFileExtension(media.uri);
   const sanitizedId = media.id.replace(/[^a-z0-9]/gi, '_');
-  const resultPath = `${COVER_CACHE_DIR}/${sanitizedId}${ext ? `.${ext}` : ''}`;
+  const filename = `${sanitizedId}${ext ? `.${ext}` : ''}`;
+  const resultPath = `${COVER_CACHE_DIR}/${filename}`;
   if (await ReactNativeBlobUtil.fs.exists(resultPath)) {
-    return resultPath;
+    return filename;
   }
   let oldPath;
   if (media.uri && media.uri.startsWith('file:///android_asset')) {
@@ -418,7 +419,7 @@ const copyCoverMediaToCacheDirInternal = async (
     }
   }
   await ReactNativeBlobUtil.fs.cp(oldPath, resultPath);
-  return resultPath;
+  return filename;
 };
 
 export const copyCoverMediaToCacheDir = (
