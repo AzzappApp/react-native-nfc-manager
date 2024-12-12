@@ -1,5 +1,5 @@
 import LottieView from 'lottie-react-native';
-import { Suspense, useEffect, useMemo } from 'react';
+import { Suspense, useEffect, useMemo, useRef } from 'react';
 import { useColorScheme } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { replaceColors } from '@azzapp/shared/lottieHelpers';
@@ -19,6 +19,7 @@ import HomeScreenPrefetcher from './HomeScreenPrefetcher';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { HomeScreenQuery } from '#relayArtifacts/HomeScreenQuery.graphql';
 import type { HomeRoute } from '#routes';
+import type { CarouselSelectListHandle } from '#ui/CarouselSelectList';
 
 export const homeScreenQuery = graphql`
   query HomeScreenQuery {
@@ -68,6 +69,12 @@ const HomeScreen = ({
 
   useSaveOfflineVCard(currentUser?.profiles);
 
+  const ref = useRef<CarouselSelectListHandle | null>(null);
+
+  const onIndexChange = (index: number) => {
+    ref.current?.scrollToIndex(index, false);
+  };
+
   if (!currentUser) {
     // should never happen
     return null;
@@ -75,8 +82,12 @@ const HomeScreen = ({
 
   return (
     <Suspense>
-      <HomeScreenProvider userKey={currentUser}>
-        <HomeScreenContent user={currentUser} refreshQuery={refreshQuery} />
+      <HomeScreenProvider userKey={currentUser} onIndexChange={onIndexChange}>
+        <HomeScreenContent
+          user={currentUser}
+          selectListRef={ref}
+          refreshQuery={refreshQuery}
+        />
         <HomeScreenPrefetcher user={currentUser} />
       </HomeScreenProvider>
     </Suspense>

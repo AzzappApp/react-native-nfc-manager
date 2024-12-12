@@ -1,9 +1,11 @@
 import { BlurView } from 'expo-blur';
 import {
+  forwardRef,
   memo,
   Suspense,
   useCallback,
   useEffect,
+  useImperativeHandle,
   useMemo,
   useRef,
   useState,
@@ -55,6 +57,7 @@ import type {
   CarouselSelectListRenderItemInfo,
 } from '#ui/CarouselSelectList';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
+import type { ForwardedRef } from 'react';
 import type { ViewStyle } from 'react-native';
 
 type HomeProfilesCarouselProps = {
@@ -68,13 +71,15 @@ type HomeProfilesCarouselProps = {
   initialProfileIndex?: number;
 };
 
-const HomeProfilesCarousel = ({ user: userKey }: HomeProfilesCarouselProps) => {
+const HomeProfilesCarousel = (
+  { user: userKey }: HomeProfilesCarouselProps,
+  forwardedRef: ForwardedRef<CarouselSelectListHandle>,
+) => {
   const {
     onCurrentProfileIndexChange,
     currentIndexSharedValue,
     currentIndexProfileSharedValue,
     initialProfileIndex,
-    scrollToIndex: globalScrollToIndex,
   } = useHomeScreenContext();
 
   const { profiles } = useFragment(
@@ -107,20 +112,19 @@ const HomeProfilesCarousel = ({ user: userKey }: HomeProfilesCarouselProps) => {
     [onCurrentProfileIndexChangeLatest],
   );
 
+  const onSelectedIndexChangeLatest = useLatestCallback(onSelectedIndexChange);
   const scrollToIndex = useCallback(
     (index: number, animated?: boolean) => {
       carouselRef.current?.scrollToIndex(index, animated);
       // On android onMomentumScrollEnd is not called when scrollToIndex is called
       changeIndexTimeout.current = setTimeout(() => {
-        onSelectedIndexChange(index);
+        onSelectedIndexChangeLatest(index);
       }, 300);
     },
-    [onSelectedIndexChange],
+    [onSelectedIndexChangeLatest],
   );
 
-  // globalScrollToIndex is available in Context to allow scrolling
-  // when a new card is added via invitation
-  globalScrollToIndex.current = scrollToIndex;
+  useImperativeHandle(forwardedRef, () => ({ scrollToIndex }), [scrollToIndex]);
 
   useOnFocus(() => {
     const { profileInfos } = getAuthState();
@@ -228,7 +232,7 @@ const MARGIN_VERTICAL = 15;
 const keyExtractor = (item: { profile: ProfileType | null }, index: number) =>
   item.profile?.webCard?.id ?? `new_${index}`;
 
-export default HomeProfilesCarousel;
+export default forwardRef(HomeProfilesCarousel);
 
 type ProfileType = ArrayItemType<HomeProfilesCarousel_user$data['profiles']>;
 
