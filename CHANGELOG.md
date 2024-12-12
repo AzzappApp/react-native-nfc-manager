@@ -1,5 +1,6 @@
-## 1.4.1-canary.61
+## 1.4.1-canary.62
 
+* **fix:**  - close button on shake'n share ([#6344](https://github.com/AzzappApp/azzapp/pull/6344))
 * **fix:**  - 🐛 avoid crash from invalid number in cover link edition ([#6338](https://github.com/AzzappApp/azzapp/pull/6338))
 * **fix:**  - force refresh  query on going foreground ([#6314](https://github.com/AzzappApp/azzapp/pull/6314))
 * **fix:**  - browser webcard should use correct background for new module ([#6312](https://github.com/AzzappApp/azzapp/pull/6312))
