@@ -1,5 +1,6 @@
-## 1.4.1-canary.60
+## 1.4.1-canary.61
 
+* **fix:**  - 🐛 avoid crash from invalid number in cover link edition ([#6338](https://github.com/AzzappApp/azzapp/pull/6338))
 * **fix:**  - force refresh  query on going foreground ([#6314](https://github.com/AzzappApp/azzapp/pull/6314))
 * **fix:**  - browser webcard should use correct background for new module ([#6312](https://github.com/AzzappApp/azzapp/pull/6312))
 * **fix:**  - **modules:** [#6224](https://github.com/AzzappApp/azzapp/pull/6224) add media with text and link ([#6307](https://github.com/AzzappApp/azzapp/pull/6307))
