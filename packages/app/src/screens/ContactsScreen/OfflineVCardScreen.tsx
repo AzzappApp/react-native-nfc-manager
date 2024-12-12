@@ -6,6 +6,7 @@ import { useWindowDimensions, View } from 'react-native';
 import Animated, {
   interpolateColor,
   runOnJS,
+  useAnimatedReaction,
   useAnimatedScrollHandler,
   useAnimatedStyle,
   useDerivedValue,
@@ -351,9 +352,16 @@ const OfflineVCardScreen = () => {
     onScroll: event => {
       const index = event.contentOffset.x / (itemWidth + halfMargin);
       currentIndexSharedValue.value = index;
-      runOnJS(setCurrentIndex)(Math.round(index));
     },
   });
+
+  useAnimatedReaction(
+    () => Math.round(currentIndexSharedValue.value),
+    index => {
+      runOnJS(setCurrentIndex)(index);
+    },
+    [],
+  );
 
   const getItemLayout = useCallback(
     (_data: unknown, index: number) => ({
@@ -568,6 +576,7 @@ const QRCode = ({ value, width }: { width: number; value: string }) => {
         height: width,
       }}
       opaque
+      key={qrCode}
     >
       <ImageSVG svg={svg} />
     </Canvas>
