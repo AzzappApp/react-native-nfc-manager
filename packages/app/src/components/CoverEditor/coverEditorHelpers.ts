@@ -374,7 +374,7 @@ export const getMediaWithLocalFile = <T extends SourceMedia>(
   uri: `file://${getCoverLocalMediaPath(localFilenames[media.id])}`,
 });
 
-const COVER_CACHE_DIR = `${ReactNativeBlobUtil.fs.dirs.CacheDir}/covers`;
+export const COVER_CACHE_DIR = `${ReactNativeBlobUtil.fs.dirs.CacheDir}/covers`;
 
 let checkMediaCacheDirPromise: Promise<void> | null = null;
 const checkMediaCacheDir = () => {
