@@ -185,7 +185,7 @@ export type LoadingSuccessAction = {
   payload: {
     lutShaders: Partial<Record<Filter, SkShader>>;
     images: Record<string, TextureInfo>;
-    localPaths: Record<string, string>;
+    localFilenames: Record<string, string>;
   };
 };
 

@@ -260,7 +260,7 @@ const isCoverEditorStateValid = (coverEditorState: CoverEditorState) => {
     loadingRemoteMedia,
     images,
     lottie,
-    localPaths,
+    localFilenames,
   } = coverEditorState;
   if (lottie) {
     const extract = extractLottieInfoMemoized(lottie);
@@ -279,7 +279,7 @@ const isCoverEditorStateValid = (coverEditorState: CoverEditorState) => {
       if (media.kind === 'image') {
         return images[media.id] != null;
       } else {
-        return localPaths[media.id] != null;
+        return localFilenames[media.id] != null;
       }
     }) &&
     overlayLayers.every(overlayLayer => images[overlayLayer.id] != null)

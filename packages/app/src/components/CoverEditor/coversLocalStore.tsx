@@ -2,11 +2,12 @@ import omit from 'lodash/omit';
 import pick from 'lodash/pick';
 import { MMKV } from 'react-native-mmkv';
 import { getAuthState } from '#helpers/authStore';
+import { COVER_CACHE_DIR } from '#helpers/mediaHelpers';
 import type { CoverEditorState } from './coverEditorTypes';
 
 let coverStore: MMKV | null = null;
 
-const COVER_STORE_VERSION = 2;
+const COVER_STORE_VERSION = 3;
 
 const SAVED_COVER_FIELDS = [
   'backgroundColor',
@@ -14,7 +15,7 @@ const SAVED_COVER_FIELDS = [
   'coverPreviewPositionPercentage',
   'coverTransition',
   'linksLayer',
-  'localPaths',
+  'localFilenames',
   'lottie',
   'medias',
   'overlayLayers',
@@ -84,6 +85,10 @@ const saveCover = (webCardId: string, state: CoverEditorState) => {
 const coverLocalStore = {
   getSavedCover,
   saveCover,
+};
+
+export const getCoverLocalMediaPath = (filename: string) => {
+  return `${COVER_CACHE_DIR}/${filename}`;
 };
 
 export default coverLocalStore;

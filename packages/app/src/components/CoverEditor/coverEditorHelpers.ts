@@ -20,6 +20,7 @@ import {
   type SourceMedia,
 } from '#helpers/mediaHelpers';
 import { coverTransitions } from './coverDrawer';
+import { getCoverLocalMediaPath } from './coversLocalStore';
 import type { CardColors, CoverEditorState } from './coverEditorTypes';
 import type { VideoCompositionItem } from '@azzapp/react-native-skia-video';
 import type { LottieInfo } from '@azzapp/shared/lottieHelpers';
@@ -44,7 +45,7 @@ export const createCoverVideoComposition = (
   maxDecoderResolution: number,
   isPreview: boolean = false,
 ) => {
-  const { medias, localPaths, lottie, coverTransition } = state;
+  const { medias, localFilenames, lottie, coverTransition } = state;
 
   const videoScales: Record<string, number> = {};
   const resolutions: Record<
@@ -53,7 +54,7 @@ export const createCoverVideoComposition = (
   > = {};
   for (const media of medias) {
     if (media.kind === 'video') {
-      const path = localPaths[media.id];
+      const path = getCoverLocalMediaPath(localFilenames[media.id]);
       const { resolution, videoScale } = reduceVideoResolutionIfNecessary(
         media.width,
         media.height,
@@ -80,7 +81,7 @@ export const createCoverVideoComposition = (
         break;
       }
       if (media.kind === 'video') {
-        const path = localPaths[media.id];
+        const path = getCoverLocalMediaPath(localFilenames[media.id]);
         items.push({
           id: asset.id,
           path,
@@ -101,7 +102,7 @@ export const createCoverVideoComposition = (
         duration += media.duration;
       } else {
         const { timeRange } = media;
-        const path = localPaths[media.id];
+        const path = getCoverLocalMediaPath(localFilenames[media.id]);
         const itemDuration = timeRange.duration;
         items.push({
           id: media.id,
@@ -365,12 +366,12 @@ export const duplicateMediaToFillSlots = (
   return filledMedia;
 };
 
-export const replaceURIWithLocalPath = <T extends SourceMedia>(
+export const getMediaWithLocalFile = <T extends SourceMedia>(
   media: T,
-  localPaths: Record<string, string>,
+  localFilenames: Record<string, string>,
 ) => ({
   ...media,
-  uri: `file://${localPaths[media.id]}`,
+  uri: `file://${getCoverLocalMediaPath(localFilenames[media.id])}`,
 });
 
 const COVER_CACHE_DIR = `${ReactNativeBlobUtil.fs.dirs.CacheDir}/covers`;

@@ -3,7 +3,7 @@ import { useIntl } from 'react-intl';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import {
   extractLottieInfoMemoized,
-  replaceURIWithLocalPath,
+  getMediaWithLocalFile,
 } from '#components/CoverEditor/coverEditorHelpers';
 import ImagePicker, { EditImageStep } from '#components/ImagePicker';
 import { ScreenModal } from '#components/NativeRouter';
@@ -20,7 +20,7 @@ const CoverEditorCropTool = () => {
   const intl = useIntl();
   const [show, toggleScreenModal] = useToggle(false);
 
-  const { lottie, selectedItemIndex, localPaths } = useCoverEditorContext();
+  const { lottie, selectedItemIndex, localFilenames } = useCoverEditorContext();
   const dispatch = useCoverEditorEditContext();
 
   const asset =
@@ -68,7 +68,7 @@ const CoverEditorCropTool = () => {
               initialData={{
                 editionParameters: activeMedia.editionParameters,
                 filter: activeMedia.filter,
-                media: replaceURIWithLocalPath(activeMedia, localPaths),
+                media: getMediaWithLocalFile(activeMedia, localFilenames),
                 timeRange:
                   activeMedia.kind === 'video'
                     ? activeMedia.timeRange

@@ -265,18 +265,18 @@ export function coverEditorReducer(
           });
         }
       });
-      let localPaths = state.localPaths;
-      Object.keys(localPaths).forEach(id => {
+      let localFilenames = state.localFilenames;
+      Object.keys(localFilenames).forEach(id => {
         if (!medias.find(media => media.id === id)) {
-          localPaths = { ...localPaths };
-          delete localPaths[id];
+          localFilenames = { ...localFilenames };
+          delete localFilenames[id];
         }
       });
       return {
         ...state,
         medias,
         imagesScales,
-        localPaths,
+        localFilenames,
         initialMediaToPick: undefined,
       };
     }
@@ -539,18 +539,18 @@ export function coverEditorReducer(
           },
         };
       }
-      let localPaths = state.localPaths;
-      Object.keys(localPaths).forEach(id => {
+      let localFilenames = state.localFilenames;
+      Object.keys(localFilenames).forEach(id => {
         if (!medias.find(media => media.id === id)) {
-          localPaths = { ...localPaths };
-          delete localPaths[id];
+          localFilenames = { ...localFilenames };
+          delete localFilenames[id];
         }
       });
       return {
         ...state,
         medias,
         imagesScales,
-        localPaths,
+        localFilenames,
       };
     }
     case 'UPDATE_MEDIA_TRANSITION': {
@@ -780,7 +780,7 @@ export function coverEditorReducer(
         loadingRemoteMedia: false,
       };
     case 'LOADING_SUCCESS':
-      const { images, lutShaders, localPaths } = payload;
+      const { images, lutShaders, localFilenames } = payload;
       return {
         ...state,
         loadingError: null,
@@ -788,7 +788,7 @@ export function coverEditorReducer(
         loadingLocalMedia: false,
         images,
         lutShaders,
-        localPaths,
+        localFilenames,
       };
     // #endregion
 
