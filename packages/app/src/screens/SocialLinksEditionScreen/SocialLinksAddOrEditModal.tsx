@@ -350,7 +350,7 @@ export const SocialLinksAddOrEditModal = ({
               <SocialLinkInputPhone
                 linkType={pickedItemType}
                 onChangeLink={onLinkUrlChanged}
-                defaultValue={pickedItem.link}
+                defaultValue={pickedItem.link ?? ''}
                 isErrored={!!error}
                 onCountryCodeChange={onCountryCodeChange}
               />
