@@ -1,6 +1,6 @@
 import { parsePhoneNumber } from 'libphonenumber-js';
 import { useCallback } from 'react';
-import { Linking } from 'react-native';
+import { Linking, Pressable } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { graphql, readInlineData } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
@@ -9,7 +9,6 @@ import {
   SIMPLE_BUTTON_STYLE_VALUES,
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
-import PressableOpacity from '#ui/PressableOpacity';
 import CardModuleBackground from './CardModuleBackground';
 import type {
   SimpleButtonRenderer_module$data,
@@ -212,12 +211,7 @@ export const SimpleButtonRenderer = ({
       resizeMode={background?.resizeMode}
       style={[style, { alignItems: 'center' }]}
     >
-      <PressableOpacity
-        onPress={onPress}
-        style={contentStyle}
-        disabled={disabled}
-        disabledOpacity={1}
-      >
+      <Pressable onPress={onPress} style={contentStyle} disabled={disabled}>
         <Animated.View
           style={[
             {
@@ -245,7 +239,7 @@ export const SimpleButtonRenderer = ({
             {buttonLabel}
           </Animated.Text>
         </Animated.View>
-      </PressableOpacity>
+      </Pressable>
     </CardModuleBackground>
   );
 };
