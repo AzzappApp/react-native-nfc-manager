@@ -272,6 +272,15 @@ export const SocialLinksAddOrEditModal = ({
           });
         }
       },
+      sms: (text: string) => {
+        if (!isPhoneNumber(text, countryCodeRef.current!)) {
+          return intl.formatMessage({
+            defaultMessage: 'The phone number is not valid.',
+            description:
+              'Error toast message when an phone number is not valid.',
+          });
+        }
+      },
     } as Partial<Record<SocialLinkId, (text: string) => string | undefined>>;
 
     const validator = validators[pickedItem.socialId];
