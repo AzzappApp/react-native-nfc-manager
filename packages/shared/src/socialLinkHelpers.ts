@@ -232,8 +232,8 @@ export type SocialLinkItem = {
 };
 
 // bluesky & parler & Weibo can also be added
-
-export const SocialLinksByCategory = [
+export type SocialLinkCategory = { id: string; item: SocialLinkItemType[] };
+export const SocialLinksByCategory: SocialLinkCategory[] = [
   {
     id: 'URL',
     item: [socialLinkWebsite, socialLinkLink],

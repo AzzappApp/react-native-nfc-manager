@@ -79,7 +79,7 @@ export const SocialLinkIconButton = <
     </PressableOpacity>
   );
 };
-
+export const SOCIAL_LINK_ICON_BUTTON_HEIGHT = 72;
 const styleSheet = createStyleSheet(appearance => ({
   containtContainer: {
     height: 72,
@@ -119,7 +119,7 @@ const styleSheet = createStyleSheet(appearance => ({
     borderColor: appearance === 'light' ? colors.grey100 : colors.grey800,
   },
   mainPressableStyle: {
-    height: 72,
+    height: SOCIAL_LINK_ICON_BUTTON_HEIGHT,
     paddingHorizontal: 5,
   },
 }));

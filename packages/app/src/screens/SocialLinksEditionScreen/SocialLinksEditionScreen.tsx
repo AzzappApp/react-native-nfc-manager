@@ -330,6 +330,7 @@ const SocialLinksEditionScreen = ({
         router.back();
       },
       onError(e) {
+        console.log(e);
         handleProfileActionError(e);
       },
     });
@@ -387,8 +388,8 @@ const SocialLinksEditionScreen = ({
 
   const onLinkItemPress = useCallback(
     (link: SocialLinkItem) => {
-      openAddLink();
       setPickedItem(link);
+      openAddLink();
     },
     [openAddLink],
   );

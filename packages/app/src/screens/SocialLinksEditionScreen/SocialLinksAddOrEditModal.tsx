@@ -18,7 +18,10 @@ import {
 } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import { DoneHeaderButton } from '#components/commonsButtons';
-import { SocialLinkIconButton } from '#components/ui/SocialLinkIconButton';
+import {
+  SOCIAL_LINK_ICON_BUTTON_HEIGHT,
+  SocialLinkIconButton,
+} from '#components/ui/SocialLinkIconButton';
 import SocialLinkInput from '#components/ui/SocialLinkInput';
 import SocialLinkInputPhone from '#components/ui/SocialLinkInputPhone';
 import { useSocialMediaName } from '#hooks/ui/useSocialMediaName';
@@ -28,11 +31,13 @@ import { SocialIcon } from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import Text from '#ui/Text';
 import type {
+  SocialLinkCategory,
   SocialLinkCategoryId,
   SocialLinkId,
   SocialLinkItem,
   SocialLinkItemType,
 } from '@azzapp/shared/socialLinkHelpers';
+import type { ListRenderItemInfo } from 'react-native';
 
 type LinkItemPickerProps = {
   onPress: (arg: SocialLinkItemType) => void;
@@ -45,68 +50,105 @@ const LinkItemPicker = ({ onPress }: LinkItemPickerProps) => {
   const intl = useIntl();
 
   // local translations management
-  const formatHeaderFromId = (id: SocialLinkCategoryId) => {
-    switch (id) {
-      case 'URL':
-        return intl.formatMessage({
-          defaultMessage: 'URL',
-          description: 'category of social link / Url',
-        });
-      case 'Contact':
-        return intl.formatMessage({
-          defaultMessage: 'Contact',
-          description: 'category of social link / Contact',
-        });
-      case 'Social':
-        return intl.formatMessage({
-          defaultMessage: 'Social',
-          description: 'category of social link / Social',
-        });
-      case 'Creative Platforms':
-        return intl.formatMessage({
-          defaultMessage: 'Creative Platforms',
-          description: 'category of social link / Creative Platforms',
-        });
-      case 'Entertainment':
-        return intl.formatMessage({
-          defaultMessage: 'Entertainment',
-          description: 'category of social link / Entertainment',
-        });
-      case 'Professional/Business':
-        return intl.formatMessage({
-          defaultMessage: 'Professional/Business',
-          description: 'category of social link / Professional/Business',
-        });
-    }
-  };
+  const formatHeaderFromId = useCallback(
+    (id: SocialLinkCategoryId) => {
+      switch (id) {
+        case 'URL':
+          return intl.formatMessage({
+            defaultMessage: 'URL',
+            description: 'category of social link / Url',
+          });
+        case 'Contact':
+          return intl.formatMessage({
+            defaultMessage: 'Contact',
+            description: 'category of social link / Contact',
+          });
+        case 'Social':
+          return intl.formatMessage({
+            defaultMessage: 'Social',
+            description: 'category of social link / Social',
+          });
+        case 'Creative Platforms':
+          return intl.formatMessage({
+            defaultMessage: 'Creative Platforms',
+            description: 'category of social link / Creative Platforms',
+          });
+        case 'Entertainment':
+          return intl.formatMessage({
+            defaultMessage: 'Entertainment',
+            description: 'category of social link / Entertainment',
+          });
+        case 'Professional/Business':
+          return intl.formatMessage({
+            defaultMessage: 'Professional/Business',
+            description: 'category of social link / Professional/Business',
+          });
+      }
+    },
+    [intl],
+  );
+
+  const renderSocialLinksItem = useCallback(
+    ({ item }: ListRenderItemInfo<SocialLinkItemType>) => {
+      return <SocialLinkIconButton item={item} onPress={onPress} />;
+    },
+    [onPress],
+  );
+
+  const renderFlatListItem = useCallback(
+    ({ item }: ListRenderItemInfo<SocialLinkCategory>) => {
+      const links = item.item;
+      return (
+        <View style={styles.lineContainer}>
+          <Text variant="large" style={styles.lineLabel}>
+            {formatHeaderFromId(item.id)}
+          </Text>
+          <FlatList
+            showsHorizontalScrollIndicator={false}
+            horizontal
+            data={links}
+            style={styles.categoryLine}
+            renderItem={renderSocialLinksItem}
+            keyExtractor={keyExtractorLinks}
+            getItemLayout={getItemLayoutLinks}
+          />
+        </View>
+      );
+    },
+    [formatHeaderFromId, renderSocialLinksItem],
+  );
 
   return (
     <FlatList
       style={styles.flatlistContainer}
-      keyExtractor={item => item.id}
+      keyExtractor={keyExtractor}
       showsVerticalScrollIndicator={false}
-      renderItem={({ item }) => {
-        return (
-          <View key={item.id} style={styles.lineContainer}>
-            <Text variant="large" style={styles.lineLabel}>
-              {formatHeaderFromId(item.id)}
-            </Text>
-            <FlatList
-              showsHorizontalScrollIndicator={false}
-              horizontal
-              data={item.item}
-              style={styles.categoryLine}
-              renderItem={({ item }) => {
-                return <SocialLinkIconButton item={item} onPress={onPress} />;
-              }}
-            />
-          </View>
-        );
-      }}
+      renderItem={renderFlatListItem}
       data={SocialLinksByCategory}
+      getItemLayout={getItemLayout}
     />
   );
 };
+
+const keyExtractor = (item: { id: string }) => item.id;
+const getItemLayout = (
+  _: ArrayLike<SocialLinkCategory> | null | undefined,
+  index: number,
+) => ({
+  length: FLATLIST_ITEM_HEIGHT,
+  offset: FLATLIST_ITEM_HEIGHT * index,
+  index,
+});
+
+const keyExtractorLinks = (item: { id: string }) => item.id;
+const getItemLayoutLinks = (
+  _: ArrayLike<SocialLinkItemType> | null | undefined,
+  index: number,
+) => ({
+  length: SOCIAL_LINK_ICON_BUTTON_HEIGHT,
+  offset: SOCIAL_LINK_ICON_BUTTON_HEIGHT * index,
+  index,
+});
 
 type SocialLinksAddOrEditModalProps = {
   links: SocialLinkItem[];
@@ -374,6 +416,7 @@ export const SocialLinksAddOrEditModal = ({
   );
 };
 
+const FLATLIST_ITEM_HEIGHT = 127;
 const styles = StyleSheet.create({
   container: { rowGap: 10, overflow: 'visible', paddingBottom: 40 },
   flatlistContainer: {
@@ -381,7 +424,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   lineContainer: {
-    height: 127,
+    height: FLATLIST_ITEM_HEIGHT,
     width: '100%',
     overflow: 'visible',
   },

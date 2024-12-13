@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
@@ -80,28 +81,44 @@ const SocialLinksLinksEditionPanel = ({
     maxHeight: 172 - bottom,
   };
 
-  const renderItem = (
-    item: {
+  const onPress = useCallback(
+    (item: {
       position: number;
       keyId: string;
       socialId: string;
       link: string;
+    }) => {
+      const { keyId, ...rest } = item;
+      onItemPress(rest);
     },
-    panGesture: PanGestureType,
-  ) => {
-    return (
-      <GestureDetector gesture={panGesture}>
-        <View style={styles.itemContainer}>
-          <SocialLinkIconButton
-            item={item}
-            onPress={onItemPress}
-            showDelete
-            onDeletePress={onDeleteLink}
-          />
-        </View>
-      </GestureDetector>
-    );
-  };
+    [onItemPress],
+  );
+
+  const renderItem = useCallback(
+    (
+      item: {
+        position: number;
+        keyId: string;
+        socialId: string;
+        link: string;
+      },
+      panGesture: PanGestureType,
+    ) => {
+      return (
+        <GestureDetector gesture={panGesture}>
+          <View style={styles.itemContainer}>
+            <SocialLinkIconButton
+              item={item}
+              onPress={onPress}
+              showDelete
+              onDeletePress={onDeleteLink}
+            />
+          </View>
+        </GestureDetector>
+      );
+    },
+    [onDeleteLink, onPress, styles.itemContainer],
+  );
 
   return (
     <View style={[styles.root, style]} {...props}>
