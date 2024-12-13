@@ -1,4 +1,5 @@
-import { memo, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
+import ReactNativeBlobUtil from 'react-native-blob-util';
 import {
   runOnJS,
   useAnimatedReaction,
@@ -8,14 +9,16 @@ import { MAX_VIDEO_THUMBNAIL_SIZE } from '#components/ImagePicker/ImagePickerCon
 import TransformedImageRenderer from '#components/TransformedImageRenderer';
 import TransformedVideoRenderer from '#components/TransformedVideoRenderer';
 import {
-  createImageFromNativeBuffer,
+  createImageFromNativeTexture,
+  NativeTextureLoader,
   scaleCropDataIfNecessary,
-  useNativeBuffer,
 } from '#helpers/mediaEditions';
+import { copyCoverMediaToCacheDir } from '#helpers/mediaHelpers';
 import {
   CARD_MEDIA_VIDEO_DEFAULT_DURATION,
   MAX_IMAGE_CARD_MODULE_PREVIEW_SIZE,
 } from './cardModuleEditorType';
+import type { TextureInfo } from '#helpers/mediaEditions/NativeTextureLoader';
 import type { CardModuleSourceMedia } from './cardModuleEditorType';
 
 type CardModuleMediaEditPreviewProps = {
@@ -65,21 +68,59 @@ const ImageRender = ({
   itemHeight: number;
 }) => {
   const { cropData, ...editionParameters } = media.editionParameters ?? {};
-  const nativeBuffer = useNativeBuffer({
-    uri: media.uri,
-    kind: media.kind,
-    time: media?.kind === 'video' ? media.timeRange?.startTime : null,
-    maxSize:
-      media?.kind === 'video'
-        ? MAX_VIDEO_THUMBNAIL_SIZE
-        : MAX_IMAGE_CARD_MODULE_PREVIEW_SIZE,
-  });
+
+  const [textureInfo, setTextureInfo] = useState<TextureInfo | null>(null);
+
+  useEffect(() => {
+    const canceled = false;
+    const abortController = new AbortController();
+    let refKey: string | null = null;
+    (async () => {
+      const cacheDir = `${ReactNativeBlobUtil.fs.dirs.CacheDir}/modules`;
+      const filename = await copyCoverMediaToCacheDir(
+        media,
+        cacheDir,
+        abortController.signal,
+      );
+
+      const { key, promise } =
+        media.kind === 'video'
+          ? NativeTextureLoader.loadVideoThumbnail(
+              `file://${cacheDir}/${filename}`,
+              media.timeRange?.startTime,
+              MAX_VIDEO_THUMBNAIL_SIZE,
+            )
+          : NativeTextureLoader.loadImage(
+              `file://${cacheDir}/${filename}`,
+              MAX_IMAGE_CARD_MODULE_PREVIEW_SIZE,
+            );
+      refKey = key;
+
+      const buffer = await promise;
+
+      NativeTextureLoader.ref(refKey);
+
+      setTextureInfo(buffer);
+
+      if (canceled) {
+        return;
+      }
+    })();
+
+    return () => {
+      if (refKey) {
+        NativeTextureLoader.unref(refKey);
+      }
+      abortController.abort();
+    };
+  }, [media]);
+
   const skImage = useDerivedValue(() => {
-    if (!nativeBuffer) {
+    if (!textureInfo) {
       return null;
     }
-    return createImageFromNativeBuffer(nativeBuffer);
-  }, [nativeBuffer]);
+    return createImageFromNativeTexture(textureInfo);
+  }, [textureInfo]);
 
   const [skImageWidth, setSkImageWidth] = useState<number | null>(null);
 
@@ -94,7 +135,7 @@ const ImageRender = ({
     },
   );
 
-  if (!media || !skImage || !nativeBuffer) {
+  if (!media || !skImage || !textureInfo) {
     return null;
   }
 
