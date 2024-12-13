@@ -690,8 +690,8 @@ const CoverEditorCore = (
 
   const intl = useIntl();
 
-  const [loadingRemoteMedia] = useDebounce(
-    coverEditorState.loadingRemoteMedia,
+  const [loadingMedia] = useDebounce(
+    coverEditorState.loadingRemoteMedia || coverEditorState.loadingLocalMedia,
     200,
   );
 
@@ -779,7 +779,7 @@ const CoverEditorCore = (
         </Container>
       </ScreenModal>
       <ScreenModal
-        visible={loadingRemoteMedia}
+        visible={loadingMedia}
         animationType="slide"
         onRequestDismiss={onCancel}
       >
