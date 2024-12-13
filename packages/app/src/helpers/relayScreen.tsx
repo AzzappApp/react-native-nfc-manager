@@ -187,14 +187,6 @@ function relayScreen<TRoute extends Route>(
       }
     }, [appState, refreshQuery]);
 
-    // refresh the query when the screen gains focus (going from background to foreground)
-    const appState = useAppState();
-    useEffect(() => {
-      if (appState === 'active' && refreshOnFocus) {
-        refreshQuery();
-      }
-    }, [appState, refreshQuery]);
-
     useEffect(() => {
       let currentTimeout: any;
       let currentSubscription: Subscription | null;
