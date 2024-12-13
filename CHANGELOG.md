@@ -1,5 +1,6 @@
-## 1.4.1-canary.65
+## 1.4.1-canary.66
 
+* **fix:**  - **modules:** [#6224](https://github.com/AzzappApp/azzapp/pull/6224) wrong background position ([#6349](https://github.com/AzzappApp/azzapp/pull/6349))
 * **fix:**  - add SMS validator on social Input ([#6345](https://github.com/AzzappApp/azzapp/pull/6345))
 * **fix:**  - SimpleButton remove pressable effect (upmitt request) ([#6335](https://github.com/AzzappApp/azzapp/pull/6335))
 * **fix:**  - updating SocialIcon return error ([#6341](https://github.com/AzzappApp/azzapp/pull/6341))
