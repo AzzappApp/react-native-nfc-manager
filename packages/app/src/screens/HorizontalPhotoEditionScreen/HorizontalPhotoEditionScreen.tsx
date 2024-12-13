@@ -2,7 +2,7 @@ import omit from 'lodash/omit';
 import { startTransition, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
-import { useSharedValue } from 'react-native-reanimated';
+import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { Observable } from 'relay-runtime';
@@ -13,6 +13,7 @@ import {
   MODULE_IMAGE_MAX_WIDTH,
 } from '@azzapp/shared/cardModuleHelpers';
 import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
+import AnimatedDataOverride from '#components/AnimatedDataOverride';
 import { CameraButton } from '#components/commonsButtons';
 import ImagePicker, {
   EditImageStep,
@@ -309,6 +310,14 @@ const HorizontalPhotoEditionScreen = ({
 
   const onImageChange = fieldUpdateHandler('image');
 
+  const animatedData = useDerivedValue(() => ({
+    borderWidth: borderWidth.value,
+    borderRadius: borderRadius.value,
+    marginHorizontal: marginHorizontal.value,
+    marginVertical: marginVertical.value,
+    imageHeight: imageHeight.value,
+  }));
+
   const onSave = useCallback(async () => {
     if (!canSave || !profile.webCard) {
       return;
@@ -479,19 +488,16 @@ const HorizontalPhotoEditionScreen = ({
         }
       />
       <PressableOpacity onPress={onPickImage}>
-        <HorizontalPhotoPreview
-          style={{ height: topPanelHeight - 110, marginVertical: 10 }}
-          data={previewData}
-          animatedData={{
-            borderWidth,
-            borderRadius,
-            marginHorizontal,
-            marginVertical,
-            imageHeight,
-          }}
-          colorPalette={profile?.webCard?.cardColors}
-          cardStyle={profile?.webCard?.cardStyle}
-        />
+        <AnimatedDataOverride data={previewData} animatedData={animatedData}>
+          {data => (
+            <HorizontalPhotoPreview
+              style={{ height: topPanelHeight - 110, marginVertical: 10 }}
+              data={data}
+              colorPalette={profile?.webCard?.cardColors}
+              cardStyle={profile?.webCard?.cardStyle}
+            />
+          )}
+        </AnimatedDataOverride>
       </PressableOpacity>
       <View
         style={{

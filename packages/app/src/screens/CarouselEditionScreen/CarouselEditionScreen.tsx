@@ -1,7 +1,7 @@
 import { startTransition, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
-import { useSharedValue } from 'react-native-reanimated';
+import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { Observable } from 'relay-runtime';
@@ -14,6 +14,7 @@ import {
 } from '@azzapp/shared/cardModuleHelpers';
 import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
 import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
+import AnimatedDataOverride from '#components/AnimatedDataOverride';
 import ImagePicker from '#components/ImagePicker';
 import {
   useRouter,
@@ -340,6 +341,15 @@ const CarouselEditionScreen = ({
 
   const onBackgroundStyleChange = fieldUpdateHandler('backgroundStyle');
 
+  const animatedData = useDerivedValue(() => ({
+    borderRadius: borderRadius.value,
+    borderWidth: borderWidth.value,
+    marginVertical: marginVertical.value,
+    marginHorizontal: marginHorizontal.value,
+    imageHeight: imageHeight.value,
+    gap: gap.value,
+  }));
+
   const onSave = useCallback(async () => {
     if (!canSave || !profile.webCard?.id) {
       return;
@@ -532,20 +542,16 @@ const CarouselEditionScreen = ({
           />
         }
       />
-      <CarouselPreview
-        data={previewData}
-        animatedData={{
-          borderRadius,
-          borderWidth,
-          marginVertical,
-          marginHorizontal,
-          imageHeight,
-          gap,
-        }}
-        style={{ height: topPanelHeight - 40, marginVertical: 20 }}
-        colorPalette={profile?.webCard?.cardColors}
-        cardStyle={profile?.webCard?.cardStyle}
-      />
+      <AnimatedDataOverride data={previewData} animatedData={animatedData}>
+        {data => (
+          <CarouselPreview
+            data={data}
+            style={{ height: topPanelHeight - 40, marginVertical: 20 }}
+            colorPalette={profile?.webCard?.cardColors}
+            cardStyle={profile?.webCard?.cardStyle}
+          />
+        )}
+      </AnimatedDataOverride>
       <TabView
         style={{ height: bottomPanelHeight }}
         currentTab={currentTab}

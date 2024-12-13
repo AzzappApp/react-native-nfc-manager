@@ -1,7 +1,8 @@
+import omit from 'lodash/omit';
 import { startTransition, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
-import { useSharedValue } from 'react-native-reanimated';
+import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import {
   SIMPLE_TEXT_MAX_LENGTH,
@@ -14,6 +15,7 @@ import {
   SIMPLE_TITLE_DEFAULT_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
 import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
+import AnimatedDataOverride from '#components/AnimatedDataOverride';
 import { useRouter } from '#components/NativeRouter';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
@@ -203,27 +205,14 @@ const SimpleTextEditionScreen = ({
 
   const previewData = useMemo(
     () => ({
-      text,
-      textAlign,
-      fontColor,
-      fontFamily,
-      backgroundStyle,
+      ...omit(data, 'backgroundId'),
       kind: moduleKind,
       background:
         profile.moduleBackgrounds.find(
           background => background.id === backgroundId,
         ) ?? null,
     }),
-    [
-      backgroundId,
-      backgroundStyle,
-      fontColor,
-      fontFamily,
-      moduleKind,
-      profile.moduleBackgrounds,
-      text,
-      textAlign,
-    ],
+    [backgroundId, data, moduleKind, profile.moduleBackgrounds],
   );
   // #endregion
 
@@ -295,6 +284,13 @@ const SimpleTextEditionScreen = ({
   const onBackgroundChange = fieldUpdateHandler('backgroundId');
 
   const onBackgroundStyleChange = fieldUpdateHandler('backgroundStyle');
+
+  const animatedData = useDerivedValue(() => ({
+    fontSize: fontSize.value,
+    verticalSpacing: verticalSpacing.value,
+    marginHorizontal: marginHorizontal.value,
+    marginVertical: marginVertical.value,
+  }));
 
   const onSave = useCallback(() => {
     if (!canSave || !profile.webCard) {
@@ -433,19 +429,18 @@ const SimpleTextEditionScreen = ({
           />
         }
       />
-      <SimpleTextPreview
-        style={{ height: topPanelHeight - 20, marginVertical: 10 }}
-        data={previewData}
-        animatedData={{
-          fontSize,
-          verticalSpacing,
-          marginHorizontal,
-          marginVertical,
-        }}
-        onPreviewPress={onPreviewPress}
-        colorPalette={profile?.webCard?.cardColors}
-        cardStyle={profile?.webCard?.cardStyle}
-      />
+      <AnimatedDataOverride data={previewData} animatedData={animatedData}>
+        {data => (
+          <SimpleTextPreview
+            style={{ height: topPanelHeight - 20, marginVertical: 10 }}
+            data={data}
+            onPreviewPress={onPreviewPress}
+            colorPalette={profile?.webCard?.cardColors}
+            cardStyle={profile?.webCard?.cardStyle}
+          />
+        )}
+      </AnimatedDataOverride>
+
       <TabView
         style={{ height: bottomPanelHeight }}
         currentTab={currentTab}

@@ -1,8 +1,11 @@
 import { Image } from 'expo-image';
-import Animated, {
-  useAnimatedStyle,
-  type SharedValue,
-} from 'react-native-reanimated';
+import { useMemo } from 'react';
+import {
+  View,
+  type StyleProp,
+  type ViewProps,
+  type ViewStyle,
+} from 'react-native';
 import { graphql, readInlineData } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
@@ -17,7 +20,6 @@ import type {
 } from '#relayArtifacts/HorizontalPhotoRenderer_module.graphql';
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { NullableFields } from '@azzapp/shared/objectHelpers';
-import type { StyleProp, ViewProps, ViewStyle } from 'react-native';
 
 const HorizontalPhotoRendererFragment = graphql`
   fragment HorizontalPhotoRenderer_module on CardModuleHorizontalPhoto
@@ -48,13 +50,6 @@ const HorizontalPhotoRendererFragment = graphql`
   }
 `;
 
-type AnimatedProps =
-  | 'borderRadius'
-  | 'borderWidth'
-  | 'imageHeight'
-  | 'marginHorizontal'
-  | 'marginVertical';
-
 export const readHorizontalPhotoData = (
   module: HorizontalPhotoRenderer_module$key,
 ) => readInlineData(HorizontalPhotoRendererFragment, module);
@@ -62,12 +57,6 @@ export const readHorizontalPhotoData = (
 export type HorizontalPhotoRendererData = NullableFields<
   Omit<HorizontalPhotoRenderer_module$data, ' $fragmentType'>
 >;
-
-type HorizontalPhotoRendererAnimatedData = {
-  [K in AnimatedProps]: SharedValue<
-    NonNullable<HorizontalPhotoRendererData[K]>
-  >;
-};
 
 export type HorizontalPhotoRendererProps = ViewProps & {
   /**
@@ -86,32 +75,18 @@ export type HorizontalPhotoRendererProps = ViewProps & {
    * The cover background color
    */
   coverBackgroundColor?: string | null | undefined;
-} & (
-    | {
-        /**
-         * The data for the BlockText module
-         */
-        data: Omit<HorizontalPhotoRendererData, AnimatedProps>;
-        /**
-         * The animated data for the BlockText module
-         */
-        animatedData: HorizontalPhotoRendererAnimatedData;
-      }
-    | {
-        /**
-         * The data for the HorizontalPhoto module
-         */
-        data: HorizontalPhotoRendererData;
-        animatedData: null;
-      }
-  );
+
+  /**
+   * The data for the module
+   */
+  data: HorizontalPhotoRendererData;
+};
 
 /**
  * Render a HorizontalPhoto module
  */
 const HorizontalPhotoRenderer = ({
   data,
-  animatedData,
   colorPalette,
   cardStyle,
   style,
@@ -119,37 +94,38 @@ const HorizontalPhotoRenderer = ({
   coverBackgroundColor,
   ...props
 }: HorizontalPhotoRendererProps) => {
-  const { borderColor, background, backgroundStyle, image, ...rest } =
-    getModuleDataValues({
-      data,
-      cardStyle,
-      defaultValues: HORIZONTAL_PHOTO_DEFAULT_VALUES,
-      styleValuesMap: HORIZONTAL_PHOTO_STYLE_VALUES,
-    });
-
-  const containerStyle = useAnimatedStyle(() => {
-    if (animatedData === null) {
-      if ('imageHeight' in rest) {
-        return {
-          height: rest.imageHeight,
-          borderWidth: rest.borderWidth ?? 0,
-          borderRadius: rest.borderRadius ?? 0,
-          marginHorizontal: rest.marginHorizontal,
-          marginVertical: rest.marginVertical,
-        };
-      }
-
-      return {};
-    }
-
-    return {
-      height: animatedData.imageHeight.value,
-      borderWidth: animatedData.borderWidth.value ?? 0,
-      borderRadius: animatedData.borderRadius.value ?? 0,
-      marginHorizontal: animatedData.marginHorizontal.value,
-      marginVertical: animatedData.marginVertical.value,
-    };
+  const {
+    borderColor,
+    background,
+    backgroundStyle,
+    image,
+    imageHeight,
+    borderWidth,
+    borderRadius,
+    marginHorizontal,
+    marginVertical,
+  } = getModuleDataValues({
+    data,
+    cardStyle,
+    defaultValues: HORIZONTAL_PHOTO_DEFAULT_VALUES,
+    styleValuesMap: HORIZONTAL_PHOTO_STYLE_VALUES,
   });
+
+  const containerStyle = useMemo(() => {
+    return {
+      height: imageHeight,
+      borderWidth,
+      borderRadius,
+      marginHorizontal,
+      marginVertical,
+    };
+  }, [
+    imageHeight,
+    borderWidth,
+    borderRadius,
+    marginHorizontal,
+    marginVertical,
+  ]);
 
   return (
     <CardModuleBackground
@@ -164,7 +140,7 @@ const HorizontalPhotoRenderer = ({
       style={style}
     >
       {image?.uri && (
-        <Animated.View
+        <View
           style={[
             {
               borderColor: swapColor(borderColor, colorPalette),
@@ -179,7 +155,7 @@ const HorizontalPhotoRenderer = ({
             style={{ flex: 1 }}
             contentFit="cover"
           />
-        </Animated.View>
+        </View>
       )}
     </CardModuleBackground>
   );

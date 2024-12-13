@@ -1,8 +1,9 @@
+import omit from 'lodash/omit';
 import { startTransition, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
-import { useSharedValue } from 'react-native-reanimated';
+import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import * as z from 'zod';
 import {
@@ -12,6 +13,7 @@ import {
 } from '@azzapp/shared/cardModuleHelpers';
 import { isValidUrl, isPhoneNumber } from '@azzapp/shared/stringHelpers';
 import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
+import AnimatedDataOverride from '#components/AnimatedDataOverride';
 import { useRouter } from '#components/NativeRouter';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
@@ -206,31 +208,13 @@ const SimpleButtonEditionScreen = ({
 
   const previewData = useMemo(
     () => ({
-      buttonLabel,
-      actionType,
-      actionLink,
-      fontFamily,
-      fontColor,
-      buttonColor,
-      borderColor,
-      backgroundStyle,
+      ...omit(data, ['backgroundId']),
       background:
         profile.moduleBackgrounds.find(
           background => background.id === backgroundId,
         ) ?? null,
     }),
-    [
-      buttonLabel,
-      actionType,
-      actionLink,
-      fontFamily,
-      fontColor,
-      buttonColor,
-      borderColor,
-      backgroundStyle,
-      backgroundId,
-      profile.moduleBackgrounds,
-    ],
+    [data, profile.moduleBackgrounds, backgroundId],
   );
   // #endregion
 
@@ -314,6 +298,16 @@ const SimpleButtonEditionScreen = ({
   const onBackgroundChange = fieldUpdateHandler('backgroundId');
 
   const onBackgroundStyleChange = fieldUpdateHandler('backgroundStyle');
+
+  const animatedData = useDerivedValue(() => ({
+    fontSize: fontSize.value,
+    borderWidth: borderWidth.value,
+    borderRadius: borderRadius.value,
+    marginTop: marginTop.value,
+    marginBottom: marginBottom.value,
+    width: width.value,
+    height: height.value,
+  }));
 
   const onSave = useCallback(async () => {
     if (!canSave || !profile.webCard) {
@@ -443,21 +437,16 @@ const SimpleButtonEditionScreen = ({
         behavior="position"
         keyboardVerticalOffset={-insetBottom - BOTTOM_MENU_HEIGHT}
       >
-        <SimpleButtonPreview
-          style={{ height: topPanelHeight - 20, marginVertical: 10 }}
-          data={previewData}
-          animatedData={{
-            fontSize,
-            borderWidth,
-            borderRadius,
-            marginTop,
-            marginBottom,
-            width,
-            height,
-          }}
-          colorPalette={profile?.webCard?.cardColors}
-          cardStyle={profile?.webCard?.cardStyle}
-        />
+        <AnimatedDataOverride data={previewData} animatedData={animatedData}>
+          {data => (
+            <SimpleButtonPreview
+              style={{ height: topPanelHeight - 20, marginVertical: 10 }}
+              data={data}
+              colorPalette={profile?.webCard?.cardColors}
+              cardStyle={profile?.webCard?.cardStyle}
+            />
+          )}
+        </AnimatedDataOverride>
         <TabView
           style={{ height: bottomPanelHeight }}
           currentTab={currentTab}
