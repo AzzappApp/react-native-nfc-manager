@@ -1,7 +1,5 @@
 #pragma once
 
-#include <android/hardware_buffer_jni.h>
-#include <android/bitmap.h>
 #include <fbjni/fbjni.h>
 #include <jsi/jsi.h>
 #include <future>
@@ -22,10 +20,10 @@ public:
 
   std::string loadImage(std::string uri, double width, double height);
   std::string loadVideoFrame(std::string uri, double width, double height, double time);
-  void releaseBuffer(std::string bufferId);
+  void releaseTexture(int texId);
 
   static void postTaskResult(jni::alias_ref<jni::JClass>, jlong bufferLoaderPtr,
-                             std::string taskId, jni::alias_ref<jobject> jbuffer,
+                             std::string taskId, jint textureId, int width, int height,
                              std::string errorMessage);
 
 };
@@ -33,11 +31,11 @@ public:
 
 class JSI_EXPORT BufferLoaderHostObject: public jsi::HostObject {
 public:
-  BufferLoaderHostObject(jsi::Runtime &runtime);
+  explicit BufferLoaderHostObject(jsi::Runtime &runtime);
   std::vector<jsi::PropNameID> getPropertyNames(facebook::jsi::Runtime &rt) override;
   jsi::Value get(facebook::jsi::Runtime &, const facebook::jsi::PropNameID &name) override;
 
-  void handleTaskResult(std::string taskId, AHardwareBuffer *buffer, std::string errorMessage);
+  void handleTaskResult(const std::string& taskId, int texId, int width, int height, std::string errorMessage);
 
 private:
   jni::global_ref<JBufferLoader> jbufferLoader;

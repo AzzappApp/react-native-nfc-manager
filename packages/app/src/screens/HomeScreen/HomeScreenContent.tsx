@@ -16,14 +16,18 @@ import HomeProfileLink from './HomeProfileLink';
 import HomeProfilesCarousel from './HomeProfilesCarousel';
 import { useHomeScreenContext } from './HomeScreenContext';
 import type { HomeScreenContent_user$key } from '#relayArtifacts/HomeScreenContent_user.graphql';
+import type { CarouselSelectListHandle } from '#ui/CarouselSelectList';
+import type { Ref } from 'react';
 
 type HomeScreenContentProps = {
   user: HomeScreenContent_user$key;
+  selectListRef: Ref<CarouselSelectListHandle>;
   refreshQuery: (() => void) | undefined;
 };
 
 const HomeScreenContent = ({
   user: userKey,
+  selectListRef,
   refreshQuery,
 }: HomeScreenContentProps) => {
   // #regions data
@@ -130,7 +134,7 @@ const HomeScreenContent = ({
       <View style={homeContentContainerStyle}>
         <HomeHeader openPanel={toggleMenu} user={user} />
         <HomeProfileLink user={user} />
-        <HomeProfilesCarousel user={user} />
+        <HomeProfilesCarousel ref={selectListRef} user={user} />
         <HomeBottomPanel user={user} />
       </View>
       <HomeBottomSheetPanel

@@ -3,7 +3,7 @@ import { useIntl } from 'react-intl';
 import { Alert } from 'react-native';
 import { COVER_MAX_MEDIA_DURATION } from '@azzapp/shared/coverHelpers';
 
-import { replaceURIWithLocalPath } from '#components/CoverEditor/coverEditorHelpers';
+import { getMediaWithLocalFile } from '#components/CoverEditor/coverEditorHelpers';
 import ImagePicker, { EditImageStep } from '#components/ImagePicker';
 import { ScreenModal } from '#components/NativeRouter';
 import useToggle from '#hooks/useToggle';
@@ -19,7 +19,7 @@ import type { Filter } from '@azzapp/shared/filtersHelper';
 const CoverEditorFiltersTool = () => {
   const [show, toggleScreenModal] = useToggle(false);
   const mediaInfo = useCoverEditorActiveMedia();
-  const { editionMode, medias, localPaths } = useCoverEditorContext();
+  const { editionMode, medias, localFilenames } = useCoverEditorContext();
   const dispatch = useCoverEditorEditContext();
   const activeMedia = useCoverEditorActiveMedia();
   const cropData = activeMedia?.editionParameters?.cropData;
@@ -122,7 +122,7 @@ const CoverEditorFiltersTool = () => {
                   ? {
                       editionParameters: activeMedia.editionParameters,
                       filter: activeMedia.filter,
-                      media: replaceURIWithLocalPath(activeMedia, localPaths),
+                      media: getMediaWithLocalFile(activeMedia, localFilenames),
                       timeRange:
                         activeMedia.kind === 'video'
                           ? activeMedia.timeRange

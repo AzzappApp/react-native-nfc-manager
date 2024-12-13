@@ -3,6 +3,7 @@ import { useCallback, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { useWindowDimensions, View, StyleSheet } from 'react-native';
 import { swapColor, type ColorPalette } from '@azzapp/shared/cardHelpers';
+import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
 import Header from '#ui/Header';
@@ -183,6 +184,7 @@ const ColorPicker = ({
   const intl = useIntl();
 
   const { width: windowWidth } = useWindowDimensions();
+  const { bottom } = useScreenInsets();
 
   return (
     <BottomSheetModal
@@ -191,7 +193,7 @@ const ColorPicker = ({
         state !== 'colorChooser' && state !== 'editing'
       }
       onDismiss={onClose}
-      height={height}
+      height={height ? height + bottom + 10 : undefined}
       automaticBottomPadding={false}
       showHandleIndicator={false}
       dismissKeyboardOnOpening

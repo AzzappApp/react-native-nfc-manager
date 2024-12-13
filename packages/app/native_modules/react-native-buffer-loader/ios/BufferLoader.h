@@ -2,7 +2,7 @@
 
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
-#import <CoreImage/CoreImage.h>
+#import <MetalKit/MetalKit.h>
 #import <ReactCommon/CallInvoker.h>
 #import <jsi/jsi.h>
 
@@ -14,25 +14,24 @@ class JSI_EXPORT BufferLoaderHostObject: public jsi::HostObject {
 public:
   BufferLoaderHostObject(std::shared_ptr<react::CallInvoker> callInvoker);
   ~BufferLoaderHostObject();
+
   std::vector<jsi::PropNameID> getPropertyNames(facebook::jsi::Runtime &rt) override;
   jsi::Value get(facebook::jsi::Runtime &, const facebook::jsi::PropNameID &name) override;
+
 private:
-  CVPixelBufferRef _Nullable ciImageToPixelBuffer(CIImage * _Nonnull image);
-  CIContext * _Nonnull ciContext;
+  id<MTLDevice> _Nonnull metalDevice;
+  id<MTLCommandQueue> _Nonnull commandQueue;
   CGColorSpaceRef _Nonnull colorSpace;
+  CIContext *_Nullable ciContext;
   std::shared_ptr<react::CallInvoker> callInvoker;
+  std::unordered_map<uint64_t, id<MTLTexture>> textureCache;
+
+  _Nullable id<MTLTexture> createMTLTextureFromCIImage(CIImage *_Nonnull image, CGSize maxSize);
+  _Nullable id<MTLTexture> createMTLTextureFromCGImage(CGImageRef _Nonnull image);
+  void loadTexture(
+    std::shared_ptr<jsi::Function> callback,
+    jsi::Runtime &runtime,
+    const std::function<_Nonnull id<MTLTexture>()> &textureCreator);
 };
-}
 
-
-@interface AZPCIImageLoader : NSObject
-+ (void)loadImageWithUrl:(NSString * _Nonnull)url 
-  maxSize:(CGSize)size 
-  onSuccess:(void (^ _Nonnull)(CIImage * _Nonnull))onSuccess 
-  onError:(void (^ _Nonnull)(NSError * _Nullable))onError;
-  
-+ (void)loadVideoThumbnailWithUrl:(NSString * _Nonnull)url
-  time:(CMTime)time maxSize:(CGSize)size 
-  onSuccess:(void (^ _Nonnull)(CIImage * _Nonnull))onSuccess 
-  onError:(void (^ _Nonnull)(NSError * _Nullable))onError;
-@end
+} // namespace azzapp

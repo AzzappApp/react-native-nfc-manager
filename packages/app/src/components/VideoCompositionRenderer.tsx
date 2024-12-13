@@ -1,14 +1,17 @@
-import { Canvas, Skia } from '@shopify/react-native-skia';
-import { SkiaViewApi } from '@shopify/react-native-skia/src/views/api';
-import { useCallback, useEffect, useMemo } from 'react';
+import { Canvas, Image, Skia } from '@shopify/react-native-skia';
+import { useEffect, useMemo, useRef } from 'react';
 import { PixelRatio, type ViewProps } from 'react-native';
-import { useFrameCallback, useSharedValue } from 'react-native-reanimated';
+import {
+  runOnUI,
+  useFrameCallback,
+  useSharedValue,
+} from 'react-native-reanimated';
 import { __RNSkiaVideoPrivateAPI } from '@azzapp/react-native-skia-video';
 import type {
   FrameDrawer,
   VideoComposition,
 } from '@azzapp/react-native-skia-video';
-import type { SkCanvas, SkiaDomView } from '@shopify/react-native-skia';
+import type { SkSurface, SkImage } from '@shopify/react-native-skia';
 import type { MutableRefObject } from 'react';
 
 export type VideoCompositionRendererProps = Exclude<ViewProps, 'children'> & {
@@ -41,6 +44,12 @@ const VideoCompositionRenderer = ({
   }, [composition]);
 
   useEffect(() => {
+    runOnUI(() => {
+      framesExtractor?.prepare();
+    })();
+  }, [framesExtractor]);
+
+  useEffect(() => {
     if (framesExtractor) {
       framesExtractor.isLooping = true;
 
@@ -71,55 +80,60 @@ const VideoCompositionRenderer = ({
     }
   }, [framesExtractor, pause]);
 
-  const nativeId = useSharedValue<number | null>(null);
-  const skiaViewRef = useCallback(
-    (ref: SkiaDomView) => {
-      nativeId.value = ref?.nativeId;
-    },
-    [nativeId],
-  );
   const pixelRatio = PixelRatio.get();
+  const surfaceShared = useSharedValue<SkSurface | null>(null);
+  const image = useSharedValue<SkImage | null>(null);
+
+  const widthRef = useRef(width);
+  const heightRef = useRef(height);
+  useEffect(() => {
+    if (widthRef.current !== width || heightRef.current !== height) {
+      console.error(
+        'Changing width and height of VideoCompositionRenderer is not supported',
+      );
+    }
+  }, [width, height]);
 
   useFrameCallback(() => {
     'worklet';
-    if (!nativeId.value) {
+    if (!surfaceShared.value) {
+      surfaceShared.value = Skia.Surface.MakeOffscreen(
+        width * pixelRatio,
+        height * pixelRatio,
+      );
+    }
+    const surface = surfaceShared.value!;
+    const canvas = surface.getCanvas();
+    canvas.clear(Skia.Color('#00000000'));
+
+    if (!composition || !framesExtractor) {
       return;
     }
+    const currentTime = framesExtractor.currentTime;
+    const frames = framesExtractor.decodeCompositionFrames();
+    drawFrame({
+      context: undefined,
+      canvas,
+      width: width * pixelRatio,
+      height: height * pixelRatio,
+      currentTime,
+      frames,
+      videoComposition: composition,
+    });
+    surface.flush();
 
-    try {
-      SkiaViewApi.callJsiMethod(
-        nativeId.value,
-        'renderToCanvas',
-        (canvas: SkCanvas) => {
-          canvas.clear(Skia.Color('#00000000'));
-          if (!composition || !framesExtractor) {
-            return;
-          }
-          const currentTime = framesExtractor.currentTime;
-          const frames = framesExtractor.decodeCompositionFrames();
-          drawFrame({
-            canvas,
-            width: width * pixelRatio,
-            height: height * pixelRatio,
-            currentTime,
-            frames,
-            videoComposition: composition,
-          });
-        },
-      );
-    } catch {
-      // sometimes the canvas is not ready yet
-    }
+    image.value = Skia.Image.MakeImageFromNativeTextureUnstable(
+      surface.getNativeTextureUnstable(),
+      width * pixelRatio,
+      height * pixelRatio,
+    );
+    global.gc?.();
   }, true);
 
   return (
-    <Canvas
-      //@ts-expect-error - `ref` is not a valid prop for Canvas
-      ref={skiaViewRef}
-      style={[{ width, height }, style]}
-      {...props}
-      opaque
-    />
+    <Canvas style={[{ width, height }, style]} {...props} opaque>
+      <Image x={0} y={0} width={width} height={height} image={image} />
+    </Canvas>
   );
 };
 

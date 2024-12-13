@@ -260,7 +260,7 @@ const isCoverEditorStateValid = (coverEditorState: CoverEditorState) => {
     loadingRemoteMedia,
     images,
     lottie,
-    localPaths,
+    localFilenames,
   } = coverEditorState;
   if (lottie) {
     const extract = extractLottieInfoMemoized(lottie);
@@ -279,7 +279,7 @@ const isCoverEditorStateValid = (coverEditorState: CoverEditorState) => {
       if (media.kind === 'image') {
         return images[media.id] != null;
       } else {
-        return localPaths[media.id] != null;
+        return localFilenames[media.id] != null;
       }
     }) &&
     overlayLayers.every(overlayLayer => images[overlayLayer.id] != null)
@@ -368,13 +368,11 @@ const createCoverMedia = async (
     );
 
     const lottieInfo = extractLottieInfoMemoized(lottie);
-    await exportVideoComposition(
-      composition,
-      {
-        outPath,
-        ...encoderConfigs,
-      },
-      infos => {
+    await exportVideoComposition({
+      videoComposition: composition,
+      outPath,
+      ...encoderConfigs,
+      drawFrame: infos => {
         'worklet';
         coverDrawer({
           ...infos,
@@ -386,10 +384,14 @@ const createCoverMedia = async (
           lottieInfo,
         });
       },
-      ({ framesCompleted, nbFrames }) => {
+      after() {
+        'worklet';
+        global.gc?.();
+      },
+      onProgress: ({ framesCompleted, nbFrames }) => {
         progressCallback({ framesCompleted, nbFrames });
       },
-    );
+    });
     skottiePlayer?.dispose();
   }
 

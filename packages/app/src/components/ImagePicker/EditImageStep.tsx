@@ -246,13 +246,13 @@ const EditImageStep = ({
           )}
         </ImagePickerMediaRenderer>
       }
-      bottomPanel={({ insetBottom }) => (
+      bottomPanel={
         <TabView
           currentTab={editedParameter ? 'edit-parameter' : currentTab}
           style={{
             flex: 1,
             marginTop: 20,
-            marginBottom: insetBottom + BOTTOM_MENU_HEIGHT + 15,
+            marginBottom: BOTTOM_MENU_HEIGHT,
           }}
           mountOnlyCurrentTab
           tabs={[
@@ -367,7 +367,7 @@ const EditImageStep = ({
             },
           ]}
         />
-      )}
+      }
       menuBarProps={
         !isEditing && showTabs
           ? {

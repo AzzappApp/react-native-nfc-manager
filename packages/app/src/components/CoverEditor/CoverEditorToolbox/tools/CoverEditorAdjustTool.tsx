@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { Alert } from 'react-native';
 import { COVER_MAX_MEDIA_DURATION } from '@azzapp/shared/coverHelpers';
-import { replaceURIWithLocalPath } from '#components/CoverEditor/coverEditorHelpers';
+import { getMediaWithLocalFile } from '#components/CoverEditor/coverEditorHelpers';
 import ImagePicker, { EditImageStep } from '#components/ImagePicker';
 import { ScreenModal } from '#components/NativeRouter';
 import useToggle from '#hooks/useToggle';
@@ -18,7 +18,7 @@ import type { EditionParameters } from '#helpers/mediaEditions';
 const CoverEditorAdjustTool = () => {
   const intl = useIntl();
   const [show, toggleScreenModal] = useToggle(false);
-  const { editionMode, medias, localPaths } = useCoverEditorContext();
+  const { editionMode, medias, localFilenames } = useCoverEditorContext();
   const dispatch = useCoverEditorEditContext();
 
   const activeMedia = useCoverEditorActiveMedia();
@@ -117,7 +117,7 @@ const CoverEditorAdjustTool = () => {
           {show && (
             <ImagePicker
               initialData={{
-                media: replaceURIWithLocalPath(activeMedia, localPaths),
+                media: getMediaWithLocalFile(activeMedia, localFilenames),
                 editionParameters: activeMedia.editionParameters,
                 filter: activeMedia.filter,
                 timeRange:

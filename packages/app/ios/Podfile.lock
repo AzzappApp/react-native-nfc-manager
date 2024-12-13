@@ -1803,7 +1803,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-skia (1.6.0):
+  - react-native-skia (1.7.0):
     - DoubleConversion
     - glog
     - hermes-engine

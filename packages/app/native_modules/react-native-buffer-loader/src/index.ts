@@ -4,15 +4,25 @@ export type BufferLoader = {
   loadImage: (
     uri: string,
     maximumSize: { width: number; height: number } | null | undefined,
-    callback: (error: any, buffer: bigint | null) => void,
+    callback: (
+      error: any,
+      buffer: unknown,
+      width: number,
+      height: number,
+    ) => void,
   ) => void;
   loadVideoFrame: (
     uri: string,
     time: number,
     maximumSize: { width: number; height: number } | null | undefined,
-    callback: (error: any, buffer: bigint | null) => void,
+    callback: (
+      error: any,
+      texture: unknown,
+      width: number,
+      height: number,
+    ) => void,
   ) => void;
-  unrefBuffer(buffer: bigint): void;
+  unrefTexture(texture: unknown): void;
 };
 
 //@ts-expect-error __turboModuleProxy is not defined in react-native

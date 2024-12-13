@@ -20,9 +20,9 @@ import {
   scaleCropData,
 } from './mediaEditionHelpers';
 import { imageFrameFromImage, transformImage } from './mediasTransformations';
-import NativeBufferLoader, {
-  createImageFromNativeBuffer,
-} from './NativeBufferLoader';
+import NativeTextureLoader, {
+  createImageFromNativeTexture,
+} from './NativeTextureLoader';
 import {
   createSingleVideoComposition,
   createSingleVideoFrameDrawer,
@@ -46,14 +46,14 @@ export const saveTransformedImageToFile = async ({
   filter?: Filter | null;
   editionParameters?: EditionParameters | null;
 }) => {
-  const { key, promise } = NativeBufferLoader.loadImage(uri);
-  const sourceImage = createImageFromNativeBuffer(await promise);
+  const { key, promise } = NativeTextureLoader.loadImage(uri);
+  const sourceImage = createImageFromNativeTexture(await promise);
   if (!sourceImage) {
     throw new Error('Image not found');
   }
-  NativeBufferLoader.ref(key);
+  NativeTextureLoader.ref(key);
   if (!sourceImage) {
-    NativeBufferLoader.unref(key);
+    NativeTextureLoader.unref(key);
     throw new Error('Image not found');
   }
   const lutShader = filter ? await getLutShader(filter) : null;
@@ -82,7 +82,7 @@ export const saveTransformedImageToFile = async ({
   const path = createRandomFilePath(ext);
   await ReactNativeBlobUtil.fs.writeFile(path, blob, 'base64');
 
-  NativeBufferLoader.unref(uri);
+  NativeTextureLoader.unref(uri);
 
   return path;
 };
@@ -170,14 +170,12 @@ export const saveTransformedVideoToFile = async ({
 
   const encoderConfigs = validConfigs[0]!;
 
-  await exportVideoComposition(
+  await exportVideoComposition({
     videoComposition,
-    {
-      outPath,
-      ...encoderConfigs,
-    },
     drawFrame,
-  );
+    outPath,
+    ...encoderConfigs,
+  });
   return outPath;
 };
 

@@ -6,7 +6,7 @@ import {
 } from '@shopify/react-native-skia';
 import { EditionParametersSkiaEffects } from './EditionParameters';
 import { applyLutFilter } from './LUTFilters';
-import { createImageFromNativeBuffer } from './NativeBufferLoader';
+import { createImageFromNativeTexture } from './NativeTextureLoader';
 import type {
   CropData,
   ImageOrientation,
@@ -48,7 +48,7 @@ export const imageFrameFromVideoFrame = (
   frame: VideoFrame,
 ): ImageFrame | null => {
   'worklet';
-  const image = createImageFromNativeBuffer(frame?.buffer);
+  const image = createImageFromNativeTexture(frame);
   if (image == null) {
     return null;
   }

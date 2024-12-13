@@ -29,7 +29,7 @@ import {
 } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import { ScreenModal, preventModalDismiss } from '#components/NativeRouter';
-import { NativeBufferLoader, loadAllLUTShaders } from '#helpers/mediaEditions';
+import { NativeTextureLoader, loadAllLUTShaders } from '#helpers/mediaEditions';
 import {
   copyCoverMediaToCacheDir,
   COVER_CACHE_DIR,
@@ -52,6 +52,7 @@ import { coverEditorReducer } from './coverEditorReducer';
 import CoverEditorSaveModal from './CoverEditorSaveModal';
 import CoverEditorToolbox from './CoverEditorToolbox';
 import CoverPreview from './CoverPreview';
+import { getCoverLocalMediaPath } from './coversLocalStore';
 import useLottie from './useLottie';
 import useSaveCover from './useSaveCover';
 import type { CoverEditor_coverTemplate$key } from '#relayArtifacts/CoverEditor_coverTemplate.graphql';
@@ -358,7 +359,7 @@ const CoverEditorCore = (
 
       images: {},
       imagesScales,
-      localPaths: {},
+      localFilenames: {},
       lutShaders: {},
 
       loadingRemoteMedia: false,
@@ -390,7 +391,7 @@ const CoverEditorCore = (
     for (const media of coverEditorState.medias) {
       const { id, kind } = media;
       if (
-        !coverEditorState.localPaths[id] ||
+        !coverEditorState.localFilenames[id] ||
         (kind === 'image' && !coverEditorState.images[id])
       ) {
         mediasToLoad.push(media);
@@ -399,14 +400,14 @@ const CoverEditorCore = (
     for (const overlayLayer of coverEditorState.overlayLayers) {
       if (
         !coverEditorState.images[overlayLayer.id] ||
-        !coverEditorState.localPaths[overlayLayer.id]
+        !coverEditorState.localFilenames[overlayLayer.id]
       ) {
         mediasToLoad.push(overlayLayer);
       }
     }
 
     let lutShaders = coverEditorState.lutShaders;
-    let localPaths = coverEditorState.localPaths;
+    let localFilenames = coverEditorState.localFilenames;
     let images = coverEditorState.images;
 
     const lutShadersLoaded = !!Object.keys(coverEditorState.lutShaders).length;
@@ -416,7 +417,7 @@ const CoverEditorCore = (
 
     const loadingRemoteMedia = mediasToLoad.some(
       ({ uri, id }) =>
-        uri.startsWith('http') && !coverEditorState.localPaths[id],
+        uri.startsWith('http') && !coverEditorState.localFilenames[id],
     );
     dispatch({
       type: 'LOADING_START',
@@ -440,8 +441,8 @@ const CoverEditorCore = (
 
     promises.push(
       ...mediasToLoad.map(async media => {
-        if (!localPaths[media.id]) {
-          const path = await copyCoverMediaToCacheDir(
+        if (!localFilenames[media.id]) {
+          const filename = await copyCoverMediaToCacheDir(
             media,
             COVER_CACHE_DIR,
             abortController.signal,
@@ -449,18 +450,18 @@ const CoverEditorCore = (
           if (canceled) {
             return;
           }
-          if (!path) {
+          if (!filename) {
             throw new Error('Video not found for uri ' + media.uri);
           }
-          localPaths = {
-            ...localPaths,
-            [media.id]: path,
+          localFilenames = {
+            ...localFilenames,
+            [media.id]: filename,
           };
         }
         if (media.kind === 'image') {
-          const path = localPaths[media.id];
+          const path = getCoverLocalMediaPath(localFilenames[media.id]);
           const scale = imagesScales[media.id] ?? 1;
-          const { key, promise } = NativeBufferLoader.loadImage(
+          const { key, promise } = NativeTextureLoader.loadImage(
             `file://${path}`,
             {
               width: media.width * scale,
@@ -491,7 +492,7 @@ const CoverEditorCore = (
           payload: {
             lutShaders,
             images,
-            localPaths,
+            localFilenames,
           },
         });
       },
@@ -517,7 +518,7 @@ const CoverEditorCore = (
     coverEditorState.medias,
     coverEditorState.lutShaders,
     coverEditorState.images,
-    coverEditorState.localPaths,
+    coverEditorState.localFilenames,
     coverEditorState.overlayLayers,
     coverEditorState.imagesScales,
     // here to force the effect to run again when the reloadCount changes
@@ -531,11 +532,11 @@ const CoverEditorCore = (
   useEffect(() => {
     const keys = imageRefKeys.current;
     Object.keys(coverEditorState.images).forEach(id => {
-      NativeBufferLoader.ref(keys[id]);
+      NativeTextureLoader.ref(keys[id]);
     });
     return () => {
       Object.keys(coverEditorState.images).forEach(id => {
-        NativeBufferLoader.unref(keys[id]);
+        NativeTextureLoader.unref(keys[id]);
       });
     };
   }, [coverEditorState.images]);
@@ -693,8 +694,8 @@ const CoverEditorCore = (
 
   const intl = useIntl();
 
-  const [loadingRemoteMedia] = useDebounce(
-    coverEditorState.loadingRemoteMedia,
+  const [loadingMedia] = useDebounce(
+    coverEditorState.loadingRemoteMedia || coverEditorState.loadingLocalMedia,
     200,
   );
 
@@ -782,7 +783,7 @@ const CoverEditorCore = (
         </Container>
       </ScreenModal>
       <ScreenModal
-        visible={loadingRemoteMedia}
+        visible={loadingMedia}
         animationType="slide"
         onRequestDismiss={onCancel}
       >

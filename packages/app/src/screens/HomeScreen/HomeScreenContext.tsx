@@ -1,16 +1,11 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
-import { useScreenHasFocus } from '#components/NativeRouter';
 import { getAuthState, onChangeWebCard } from '#helpers/authStore';
+import { useProfileInfos } from '#hooks/authStateHooks';
+import useLatestCallback from '#hooks/useLatestCallback';
 import type { HomeScreenContext_user$key } from '#relayArtifacts/HomeScreenContext_user.graphql';
-import type { MutableRefObject, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
 
 type HomeScreenContextType = {
@@ -18,7 +13,6 @@ type HomeScreenContextType = {
   currentIndexProfileSharedValue: SharedValue<number>;
   onCurrentProfileIndexChange: (index: number) => void;
   initialProfileIndex: number;
-  scrollToIndex: MutableRefObject<(index: number, animated?: boolean) => void>;
 };
 
 const HomeScreenContext = React.createContext<
@@ -28,10 +22,12 @@ const HomeScreenContext = React.createContext<
 type HomeScreenProviderProps = {
   children: ReactNode;
   userKey: HomeScreenContext_user$key;
+  onIndexChange: (index: number) => void;
 };
 
 export const HomeScreenProvider = ({
   children,
+  onIndexChange,
   userKey,
 }: HomeScreenProviderProps) => {
   const user = useFragment(
@@ -60,7 +56,7 @@ export const HomeScreenProvider = ({
   //updating the initialProfileIndex to avoid warning(not sure needed in production)
   useEffect(() => {
     if (user?.profiles && user?.profiles?.length < initialProfileIndex) {
-      setInitialProfileIndex(1);
+      setInitialProfileIndex(user?.profiles?.length ?? 0);
     }
   }, [initialProfileIndex, user?.profiles]);
 
@@ -69,42 +65,25 @@ export const HomeScreenProvider = ({
     return Math.round(currentIndexSharedValue.value);
   }, [currentIndexSharedValue]);
 
-  const profilesRef = useRef(user.profiles);
-  const focus = useScreenHasFocus();
+  const currentProfile = useProfileInfos();
+  const onIndexChangeLatest = useLatestCallback(onIndexChange);
   useEffect(() => {
-    const currentProfileId = getAuthState().profileInfos?.profileId;
-
-    if (
-      focus &&
-      user?.profiles &&
-      profilesRef.current &&
-      user?.profiles?.length !== profilesRef.current.length
-    ) {
-      let newProfile = user?.profiles?.find(
-        profile => profile.id === currentProfileId,
-      );
-      if (!newProfile) newProfile = user.profiles?.[0];
-
-      const newProfileIndex = user?.profiles?.findIndex(
-        profile => profile.id === newProfile.id,
-      );
-
+    const nextProfileIndex = user.profiles?.findIndex(
+      profile => profile.id === currentProfile?.profileId,
+    );
+    if (nextProfileIndex !== undefined && nextProfileIndex !== -1) {
       setTimeout(() => {
-        // we need to wait for a render in case of new
-        // profile added, scroll doesn't work as new card may not be added
-        scrollToIndex.current(newProfileIndex + 1);
+        if (nextProfileIndex + 1 !== currentIndexSharedValue.value) {
+          onIndexChangeLatest(nextProfileIndex + 1);
+        }
       });
-      if (newProfile?.webCard?.id) {
-        onChangeWebCard({
-          profileId: newProfile.id,
-          webCardId: newProfile.webCard.id,
-          profileRole: newProfile.profileRole,
-          invited: newProfile.invited,
-        });
-      }
     }
-    profilesRef.current = user.profiles;
-  }, [focus, user.profiles]);
+  }, [
+    currentIndexSharedValue,
+    currentProfile?.profileId,
+    onIndexChangeLatest,
+    user.profiles,
+  ]);
 
   useEffect(() => {
     if (!user.profiles?.length) {
@@ -127,22 +106,18 @@ export const HomeScreenProvider = ({
     [user.profiles],
   );
 
-  const scrollToIndex = useRef((_index: number, _animated?: boolean) => {});
-
   const value = useMemo(
     () => ({
       currentIndexSharedValue,
       initialProfileIndex,
       currentIndexProfileSharedValue,
       onCurrentProfileIndexChange,
-      scrollToIndex,
     }),
     [
       currentIndexProfileSharedValue,
       currentIndexSharedValue,
       initialProfileIndex,
       onCurrentProfileIndexChange,
-      scrollToIndex,
     ],
   );
 

@@ -6,7 +6,7 @@ import { convertToBaseCanvasRatio } from '@azzapp/shared/coverHelpers';
 import {
   applyImageFrameTransformations,
   applyShaderTransformations,
-  createImageFromNativeBuffer,
+  createImageFromNativeTexture,
   cropDataForAspectRatio,
   getTransformsForEditionParameters,
   imageFrameFromImage,
@@ -50,7 +50,7 @@ const coverOverlayDrawer = ({
     startPercentageTotal,
     endPercentageTotal,
   } = overlayLayer;
-  const image = createImageFromNativeBuffer(images[id]);
+  const image = createImageFromNativeTexture(images[id]);
   if (!image) {
     return;
   }

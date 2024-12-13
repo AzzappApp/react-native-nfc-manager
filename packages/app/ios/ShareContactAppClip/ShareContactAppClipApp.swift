@@ -17,10 +17,27 @@ struct ShareContactAppClipApp: App {
     }
 }
 struct ContentView: View {
+    @State var contactData: String?
+    @State var username: String?
+    @State var step: String?
+
     var body: some View {
-      VStack {}
+      VStack {
+        Spacer()
+         if let contactData = contactData {
+            Text("Contact Data: \(contactData)")
+        } else {
+            Text("Contact Data: Not available")
+        }
+
+        if let username = username {
+            Text("Username: \(username)")
+        } else {
+            Text("Username: Not available")
+        }
+        Text(": \(step ?? "Not available")").padding()
+      }
       .onContinueUserActivity(NSUserActivityTypeBrowsingWeb, perform: handleUserActivity)
-      .onOpenURL(perform: handleURL)
     }
 
     private func handleUserActivity(_ userActivity: NSUserActivity) {
@@ -29,69 +46,61 @@ struct ContentView: View {
           closeAppClip()
           return
       }
+      self.step = "10 \(webpageURL)"
 
       // Check if the webpageURL starts with "https://appclip.apple.com"
       if webpageURL.absoluteString.hasPrefix("https://appclip.apple.com") {
           // Extract the "url" query parameter
           guard let urlComponents = URLComponents(url: webpageURL, resolvingAgainstBaseURL: false),
-                let queryItems = urlComponents.queryItems,
-                let nestedURLString = queryItems.first(where: { $0.name == "url" })?.value,
-                let nestedURL = URL(string: nestedURLString) else {
+            let queryItems = urlComponents.queryItems,
+            let compressedContactCard = queryItems.first(where: { $0.name == "c" })?.value,
+            let username = queryItems.first(where: { $0.name == "u" })?.value else {
               closeAppClip()
               return
-          }
-          handleURL(nestedURL)
+            }
+          handleContactData(compressedContactCard: compressedContactCard, username: username)
       } else {
-          handleURL(webpageURL)
+             closeAppClip()
       } 
     }
 
-    private func handleURL(_ url: URL) {
-      guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
-        let queryItems = components.queryItems,
-        let compressedContactCard = queryItems.first(where: { $0.name == "c" })?.value else {
-          closeAppClip()
-          return
-        }
-        
-      let path = components.path
-      let username = path.hasPrefix("/") ? String(path.dropFirst()) : path
 
-
-      // Decode URI component
-      guard let decodedURI = compressedContactCard.removingPercentEncoding else {
-          print("Failed to decode URI component.")
-          return
-      }
-
-      let decompressedContactCard = decompressFromEncodedURIComponent(input:decodedURI)
+  
+    private func handleContactData(compressedContactCard: String, username: String) {
+      self.contactData = compressedContactCard
+      self.username = username
+      let decompressedContactCard = decompressFromEncodedURIComponent(input:compressedContactCard)
       guard let jsonData = decompressedContactCard.data(using: .utf8) else {
             print("Failed to convert cleaned string to data.")
             return
       }
-
+     self.step = "1  \(decompressedContactCard)"
       do {
         // Parse the JSON array
         guard let jsonArray = try JSONSerialization.jsonObject(with: jsonData, options: []) as? [Any] else {
           print("Failed to parse JSON array.")
+          self.step = "2"
           return
         }
         
         guard jsonArray.count == 2 else {
           print("Invalid JSON structure: Expected 2 elements, found \(jsonArray.count).")
+             self.step = "3"
           return
         }
         
         guard let contactDataString = jsonArray[0] as? String else {
           print("Invalid JSON structure: First element is not a string.")
+             self.step = "4"
           return
         }
         
         guard let signature = jsonArray[1] as? String else {
           print("Invalid JSON structure: Second element is not a string.")
+             self.step = "5"
           return
         }
-        
+           self.step = "6"
         // Remove outer quotes and unescape characters
         let cleanedContactDataString = contactDataString
           .replacingOccurrences(of: "\r", with: "")
@@ -100,7 +109,7 @@ struct ContentView: View {
           .replacingOccurrences(of: "]\"", with: "]")
           .replacingOccurrences(of: "\"\"", with: "\"")
         
-        
+        self.step = "7  \(cleanedContactDataString)"
         
         verifySign(signature: signature, data: contactDataString, salt: username) { result in
           switch result {
@@ -108,18 +117,20 @@ struct ContentView: View {
 
             guard let contactDataJSONData = cleanedContactDataString.data(using: .utf8) else {
               print("Failed to convert contact data string to data.")
+               self.step = "8"
               return
             }
             do {
             // Parse the cleaned JSON string (or does notcompile if not using a do block
               guard let contactDataArray = try JSONSerialization.jsonObject(with: contactDataJSONData, options: []) as? [Any] else {
                 print("Failed to parse contact data JSON array.")
+                   self.step = "9"
                 return
               }
               
               // Map the JSON array to ContactData
               var contactData = mapToContactData(from: contactDataArray)
-              
+                 self.step = "10"
               if let avatarUrl = additionalContactData["avatarUrl"] as? String {
                 contactData.avatarUrl = avatarUrl
               }
@@ -128,7 +139,7 @@ struct ContentView: View {
                   var socials: [Social] = []
                   for socialDict in socialsArray {
                       if let label = socialDict["label"] as? String,
-                         let url = socialDict["url"] as? String{
+                        let url = socialDict["url"] as? String{
                           socials.append(Social(label: label, url: url))
                       }
                   }
@@ -144,20 +155,26 @@ struct ContentView: View {
                   }
                   contactData.urls = urls
               }
-               DispatchQueue.main.async {
+              DispatchQueue.main.async {
+                   self.step = "13"
                 addContact(contactData, username: username)
                 }
             } catch {
+                 self.step = "14  \(error)"
               print("Error parsing contact data JSON: \(error)")
           }
           case .failure(let error):
+           self.step = "15 \(error.localizedDescription)"
             print("Error verifying sign-in: \(error.localizedDescription)")
           }
         }
       } catch {
+        self.step = "16 \(error)"
         print("Failed to decode contact data: \(error)")
       }
     }
+
+
 
   private func addContact(_ contactData: ContactData, username :String) {
     let contact = CNMutableContact()

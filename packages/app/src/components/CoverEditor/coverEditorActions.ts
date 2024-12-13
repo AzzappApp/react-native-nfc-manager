@@ -1,4 +1,5 @@
 import type { EditionParameters } from '#helpers/mediaEditions';
+import type { TextureInfo } from '#helpers/mediaEditions/NativeTextureLoader';
 import type {
   SourceMediaImage,
   SourceMedia,
@@ -184,8 +185,8 @@ export type LoadingSuccessAction = {
   type: 'LOADING_SUCCESS';
   payload: {
     lutShaders: Partial<Record<Filter, SkShader>>;
-    images: Record<string, bigint | null>;
-    localPaths: Record<string, string>;
+    images: Record<string, TextureInfo>;
+    localFilenames: Record<string, string>;
   };
 };
 

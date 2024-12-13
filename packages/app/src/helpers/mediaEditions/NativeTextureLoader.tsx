@@ -1,57 +1,96 @@
 import { Skia } from '@shopify/react-native-skia';
+import pick from 'lodash/pick';
 import BufferLoader from '@azzapp/react-native-buffer-loader';
 import type { SkImage } from '@shopify/react-native-skia';
 
 // would be cool to have weak ref and finalization registry here to clean up images
-// we will do it manually for now waiting for react-native 0.75
+// we will do it manually for now waiting for react-native
 
-const loadImageTasks = new Map<string, Promise<bigint>>();
-const buffers = new Map<string, { buffer: bigint; refCount: number }>();
+export type TextureInfo = {
+  texture: unknown;
+  width: number;
+  height: number;
+};
+
+const loadImageTasks = new Map<
+  string,
+  Promise<{ texture: unknown; width: number; height: number }>
+>();
+const textures = new Map<
+  string,
+  {
+    texture: unknown;
+    width: number;
+    height: number;
+    refCount: number;
+    _timeToDelete?: number;
+  }
+>();
 
 let cleanupTimeout: any = null;
 const scheduleCleanUp = () => {
   clearTimeout(cleanupTimeout);
   cleanupTimeout = setTimeout(() => {
-    for (const [key, ref] of buffers) {
+    let reschedule = false;
+    for (const [key, ref] of textures) {
       if (ref.refCount <= 0) {
-        buffers.delete(key);
-        BufferLoader.unrefBuffer(ref.buffer);
+        if (ref._timeToDelete != null && ref._timeToDelete > Date.now()) {
+          reschedule = true;
+        } else {
+          textures.delete(key);
+          BufferLoader.unrefTexture(ref.texture);
+        }
       }
+    }
+    if (reschedule) {
+      scheduleCleanUp();
     }
   }, 1000);
 };
 
 type ImageLoader = (
-  callback: (error: any, buffer: bigint | null) => void,
+  callback: (
+    error: any,
+    texture: unknown,
+    width: number,
+    height: number,
+  ) => void,
 ) => void;
 
 const loadImageWithCache = async (
   key: string,
   loader: ImageLoader,
-): Promise<bigint> => {
-  if (buffers.has(key)) {
-    const ref = buffers.get(key)!;
-    return ref.buffer;
+): Promise<TextureInfo> => {
+  if (textures.has(key)) {
+    const ref = textures.get(key)!;
+    return pick(ref, ['texture', 'width', 'height']);
   }
   if (!loadImageTasks.has(key)) {
     loadImageTasks.set(
       key,
       new Promise((resolve, reject) => {
-        loader((error, buffer) => {
+        loader((error, texture, width, height) => {
           if (error) {
             reject(new Error(error));
           }
           loadImageTasks.delete(key);
-          if (!buffer) {
-            reject(new Error('Failed to create image from buffer'));
+          if (!texture) {
+            reject(new Error('Failed to load texture'));
             return;
           }
-          buffers.set(key, {
-            buffer,
+          textures.set(key, {
+            texture,
             refCount: 0,
+            width,
+            height,
+            _timeToDelete: Date.now() + 180000,
           });
           scheduleCleanUp();
-          resolve(buffer);
+          resolve({
+            texture,
+            width,
+            height,
+          });
         });
       }),
     );
@@ -62,7 +101,10 @@ const loadImageWithCache = async (
 const loadImage = (
   uri: string,
   maximumSize?: { width: number; height: number } | null,
-): { key: string; promise: Promise<bigint> } => {
+): {
+  key: string;
+  promise: Promise<TextureInfo>;
+} => {
   const key = [
     uri,
     maximumSize ? `${maximumSize.width}-${maximumSize.height}` : 'full',
@@ -79,7 +121,10 @@ const loadVideoThumbnail = (
   uri: string,
   time = 0,
   maximumSize?: { width: number; height: number } | null,
-): { key: string; promise: Promise<bigint> } => {
+): {
+  key: string;
+  promise: Promise<TextureInfo>;
+} => {
   const key = [
     uri,
     time,
@@ -94,48 +139,57 @@ const loadVideoThumbnail = (
 };
 
 const ref = (key: string) => {
-  const ref = buffers.get(key);
+  const ref = textures.get(key);
   if (ref) {
+    delete ref?._timeToDelete;
     ref.refCount++;
   }
   scheduleCleanUp();
 };
 
 const unref = (key: string) => {
-  const ref = buffers.get(key);
+  const ref = textures.get(key);
+  delete ref?._timeToDelete;
   if (ref && ref.refCount > 0) {
     ref.refCount--;
   }
   scheduleCleanUp();
 };
 
-const NativeBufferLoader = {
+const NativeTextureLoader = {
   loadImage,
   loadVideoThumbnail,
   ref,
   unref,
 };
 
-export default NativeBufferLoader;
+export default NativeTextureLoader;
 
 /**
  * Converts a native buffer to a SkImage
- * @param buffer the native buffer
- * @param fromBufferLoader if the buffer was loaded from the NativeBufferLoader (it will induce a cache)
+ * @param texture the native buffer
  * @returns the SkImage or null if the buffer is null or the image could not be created
  */
-export const createImageFromNativeBuffer = (
-  buffer: bigint | null | undefined,
+export const createImageFromNativeTexture = (
+  textureInfo: TextureInfo | null,
 ): SkImage | null => {
   'worklet';
-  if (buffer == null) {
+  if (textureInfo == null) {
+    return null;
+  }
+  const { texture, width, height } = textureInfo;
+  if (!texture) {
     return null;
   }
   let image: SkImage | null = null;
   try {
-    image = Skia.Image.MakeImageFromNativeBuffer(buffer);
+    image = Skia.Image.MakeImageFromNativeTextureUnstable(
+      texture,
+      width,
+      height,
+    );
   } catch (e) {
-    console.warn('Error creating image from native buffer', e);
+    console.warn('Error creating image from native texture', e);
     return null;
   }
   return image ?? null;

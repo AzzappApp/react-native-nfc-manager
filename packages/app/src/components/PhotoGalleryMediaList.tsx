@@ -80,7 +80,6 @@ const PhotoGalleryMediaList = ({
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-  const mediaLength = useRef(0);
   const lastPageInfo = useRef<{
     hasNextPage: boolean;
     endCursor: string | undefined;
@@ -89,7 +88,7 @@ const PhotoGalleryMediaList = ({
   const isLoading = useRef(false);
 
   const load = useCallback(
-    async (refreshing = false, updatePictures = false) => {
+    async (refreshing = false) => {
       if (isLoading.current) {
         return;
       }
@@ -99,7 +98,7 @@ const PhotoGalleryMediaList = ({
 
       try {
         const result = await CameraRoll.getPhotos({
-          first: updatePictures ? mediaLength.current || 52 : 52,
+          first: 52,
           after: refreshing ? undefined : lastPageInfo.current?.endCursor,
           assetType:
             kind === 'mixed' ? 'All' : kind === 'image' ? 'Photos' : 'Videos',
@@ -114,9 +113,7 @@ const PhotoGalleryMediaList = ({
           endCursor: result.page_info.end_cursor,
         };
         setMedias(previous => {
-          const result = refreshing ? assets : [...previous, ...assets];
-          mediaLength.current = result.length;
-          return result;
+          return refreshing ? assets : previous.concat(assets);
         });
       } catch (e) {
         console.log(e);
@@ -247,7 +244,7 @@ const PhotoGalleryMediaList = ({
       'onLibrarySelectionChange',
       _event => {
         if (mediaPermission === 'limited') {
-          load(true, true);
+          load(true);
         }
       },
     );
@@ -262,7 +259,7 @@ const PhotoGalleryMediaList = ({
       'change',
       async nextAppState => {
         if (nextAppState === 'active') {
-          load(true, true);
+          load(true);
         }
       },
     );

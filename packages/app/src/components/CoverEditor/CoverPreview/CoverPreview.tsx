@@ -46,7 +46,7 @@ import {
   createCoverVideoComposition,
   extractLottieInfoMemoized,
   MAX_DISPLAY_DECODER_RESOLUTION,
-  replaceURIWithLocalPath,
+  getMediaWithLocalFile,
 } from '../coverEditorHelpers';
 import { BoundsEditorGestureHandler, drawBoundsEditor } from './BoundsEditor';
 import { DynamicLinkRenderer } from './DynamicLinkRenderer';
@@ -109,7 +109,7 @@ const CoverPreview = ({
     linksLayer,
     cardColors,
     images,
-    localPaths,
+    localFilenames,
     lutShaders,
     loadingLocalMedia,
     loadingRemoteMedia,
@@ -142,7 +142,7 @@ const CoverPreview = ({
           : `${media.id}-${media.timeRange.startTime}-${media.timeRange.duration}`,
       )
       .join(''),
-    localPaths,
+    localFilenames,
   ];
 
   /**
@@ -154,7 +154,7 @@ const CoverPreview = ({
     const allItemsLoaded = medias.every(
       media =>
         (media.kind === 'image' && images[media.id]) ||
-        (media.kind === 'video' && localPaths[media.id]),
+        (media.kind === 'video' && localFilenames[media.id]),
     );
     if (loadingLocalMedia || loadingRemoteMedia || !allItemsLoaded) {
       return { composition: null, videoScales: {} };
@@ -1250,7 +1250,7 @@ const CoverPreview = ({
             initialData={{
               filter: activeLayer.layer.filter,
               editionParameters: activeLayer.layer.editionParameters,
-              media: replaceURIWithLocalPath(activeLayer.layer, localPaths),
+              media: getMediaWithLocalFile(activeLayer.layer, localFilenames),
             }}
             additionalData={{
               selectedParameter: 'cropData',

@@ -7,7 +7,7 @@ import {
 import {
   extractLottieInfoMemoized,
   getLottieMediasDurations,
-  replaceURIWithLocalPath,
+  getMediaWithLocalFile,
 } from '#components/CoverEditor/coverEditorHelpers';
 import ImagePicker, { EditImageStep } from '#components/ImagePicker';
 import { ScreenModal } from '#components/NativeRouter';
@@ -22,7 +22,7 @@ import type { ImagePickerResult } from '#components/ImagePicker';
 const CoverEditorCutTool = () => {
   const intl = useIntl();
   const [show, toggleScreenModal] = useToggle(false);
-  const { editionMode, medias, selectedItemIndex, lottie, localPaths } =
+  const { editionMode, medias, selectedItemIndex, lottie, localFilenames } =
     useCoverEditorContext();
 
   const dispatch = useCoverEditorEditContext();
@@ -70,7 +70,7 @@ const CoverEditorCutTool = () => {
           {show && (
             <ImagePicker
               initialData={{
-                media: replaceURIWithLocalPath(media, localPaths),
+                media: getMediaWithLocalFile(media, localFilenames),
                 timeRange: media.timeRange,
                 editionParameters: media.editionParameters,
                 filter: media.filter,

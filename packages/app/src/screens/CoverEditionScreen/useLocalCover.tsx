@@ -1,7 +1,9 @@
 import * as Sentry from '@sentry/react-native';
 import { useEffect, useState } from 'react';
 import ReactNativeBlobUtil from 'react-native-blob-util';
-import coverLocalStore from '#components/CoverEditor/coversLocalStore';
+import coverLocalStore, {
+  getCoverLocalMediaPath,
+} from '#components/CoverEditor/coversLocalStore';
 import type { CoverEditorState } from '#components/CoverEditor';
 
 const useLocalCover = (
@@ -32,19 +34,23 @@ const useLocalCover = (
         });
         return;
       }
-      const { localPaths, medias: coverMedias, overlayLayers } = cover;
+      const { localFilenames, medias: coverMedias, overlayLayers } = cover;
       const medias = [...(coverMedias ?? []), ...(overlayLayers ?? [])];
       const fileExists = (
         await Promise.all(
           medias.map(async media => {
             try {
-              if (localPaths?.[media.id]) {
-                if (await ReactNativeBlobUtil.fs.exists(localPaths[media.id])) {
+              if (localFilenames?.[media.id]) {
+                if (
+                  await ReactNativeBlobUtil.fs.exists(
+                    getCoverLocalMediaPath(localFilenames[media.id]),
+                  )
+                ) {
                   return true;
                 } else {
                   // the media has been deleted from the device
                   // we need to redownload it
-                  delete localPaths[media.id];
+                  delete localFilenames[media.id];
                 }
               }
 

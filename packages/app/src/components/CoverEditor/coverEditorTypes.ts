@@ -1,4 +1,5 @@
 import type { EditionParameters } from '#helpers/mediaEditions';
+import type { TextureInfo } from '#helpers/mediaEditions/NativeTextureLoader';
 import type {
   SourceMediaVideo,
   SourceMediaImage,
@@ -34,9 +35,9 @@ export type CoverEditorState = {
   selectedItemIndex: number | null;
 
   // Resources used for displaying/updating the cover
-  images: Record<string, bigint | null>;
+  images: Record<string, TextureInfo>;
   imagesScales: Record<string, number>;
-  localPaths: Record<string, string>;
+  localFilenames: Record<string, string>;
   lutShaders: Partial<Record<Filter, SkShader>>;
 
   // Loading state
