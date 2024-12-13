@@ -1,5 +1,8 @@
-## 1.4.1-canary.64
+## 1.4.1-canary.65
 
+* **fix:**  - add SMS validator on social Input ([#6345](https://github.com/AzzappApp/azzapp/pull/6345))
+* **fix:**  - SimpleButton remove pressable effect (upmitt request) ([#6335](https://github.com/AzzappApp/azzapp/pull/6335))
+* **fix:**  - updating SocialIcon return error ([#6341](https://github.com/AzzappApp/azzapp/pull/6341))
 * **fix:**  - button font new module based on card style ([#6336](https://github.com/AzzappApp/azzapp/pull/6336))
 * **fix:**  -  card module reset text properly ([#6332](https://github.com/AzzappApp/azzapp/pull/6332))
 * **fix:**  - add a confirm message on save button when editin cover ([#6328](https://github.com/AzzappApp/azzapp/pull/6328))
