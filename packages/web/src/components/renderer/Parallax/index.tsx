@@ -13,10 +13,12 @@ const Parallax = ({
   medias,
   children,
   imageStyle,
+  backgroundStyle,
 }: {
   medias: Media[];
   children?: (props: { mediaId: string }) => ReactNode;
   imageStyle?: CSSProperties;
+  backgroundStyle?: CSSProperties;
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [startPosition, setStartPosition] = useState(0);
@@ -57,7 +59,11 @@ const Parallax = ({
           : 0;
 
         return (
-          <div key={media.id} className={styles.parallaxContainer}>
+          <div
+            key={media.id}
+            className={styles.parallaxContainer}
+            style={backgroundStyle}
+          >
             <div
               key={media.id}
               className={styles.parallaxItem}

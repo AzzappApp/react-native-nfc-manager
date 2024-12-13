@@ -2,6 +2,7 @@ import { style } from '@vanilla-extract/css';
 
 const textItem = style({
   lineHeight: '1.2em',
+  textAlign: 'center',
 });
 
 const container = style({
@@ -22,6 +23,7 @@ const textContainer = style({
   justifyContent: 'center',
   alignItems: 'center',
   flexDirection: 'column',
+  gap: 20,
 });
 
 export default {

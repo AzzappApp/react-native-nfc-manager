@@ -28,8 +28,14 @@ const sectionContainerEven = style([
 ]);
 
 const sectionPartContainer = style({
-  maxWidth: 'min(max(100vw - 40px, 1px), 480px)',
+  width: 'min(max(100vw - 40px, 1px), 480px)',
   flex: 1,
+});
+
+const imageContainer = style({
+  width: '100%',
+  height: 480,
+  position: 'relative',
 });
 
 const sectionTextContainer = style([
@@ -74,6 +80,7 @@ const link = style({
 export default {
   container,
   sectionContainer,
+  imageContainer,
   section,
   sectionContainerEven,
   sectionPartContainer,

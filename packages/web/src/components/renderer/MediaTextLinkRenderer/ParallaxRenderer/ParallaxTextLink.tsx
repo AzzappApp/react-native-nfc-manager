@@ -17,14 +17,22 @@ const ParallaxText = ({
   data,
   colorPalette,
   cardStyle,
+  backgroundColor,
 }: {
   medias: Media[];
   data: CardModuleMediaTextLinkData;
   colorPalette: ColorPalette;
   cardStyle: CardStyle;
+  backgroundColor?: string;
 }) => {
   return (
-    <Parallax medias={medias} imageStyle={{ opacity: 0.8 }}>
+    <Parallax
+      medias={medias}
+      imageStyle={{ opacity: 0.8 }}
+      backgroundStyle={{
+        backgroundColor,
+      }}
+    >
       {({ mediaId }) => {
         const mediaData = data.cardModuleMedias.find(
           ({ media }) => media.id === mediaId,

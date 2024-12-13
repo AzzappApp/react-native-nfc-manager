@@ -1,10 +1,12 @@
 'use client';
+import cn from 'classnames';
 import { FormattedMessage } from 'react-intl';
 import {
   swapColor,
   type CardStyle,
   type ColorPalette,
 } from '@azzapp/shared/cardHelpers';
+import { fontsMap } from '#helpers/fonts';
 import styles from './MediaTextLink.css';
 import type { CardModuleMediaTextLinkData } from '@azzapp/shared/cardModuleHelpers';
 
@@ -28,7 +30,7 @@ const Link = ({
     mediaData?.link && (
       <a
         href={mediaData.link?.url}
-        className={styles.link}
+        className={cn(styles.link, fontsMap[cardStyle.fontFamily].className)}
         style={{
           backgroundColor: swapColor(
             data.cardModuleColor?.content,

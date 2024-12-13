@@ -39,33 +39,39 @@ const AlternationImage = ({
   }, []);
 
   return (
-    <div
-      style={{
-        opacity: isVisible ? 1 : 0,
-        transform: isVisible
-          ? 'translateX(0)'
-          : even
-            ? 'translateX(150px)'
-            : 'translateX(-150px)',
-        transition: 'opacity 1s ease-in-out,transform 1s ease-out',
-      }}
-      className={styles.sectionPartContainer}
-      ref={pictureRef}
-    >
-      <CloudinaryImage
-        mediaId={media.id}
-        draggable={false}
-        alt="alternation"
-        format="auto"
-        width={480}
-        height={480}
-        quality="auto:best"
-        crop="fill"
-        className={styles.image}
-        style={{
-          borderRadius: cardStyle?.borderRadius ?? 0,
-        }}
-      />
+    <div className={styles.sectionPartContainer} ref={pictureRef}>
+      <div className={styles.imageContainer}>
+        <div
+          style={{
+            position: 'absolute',
+            opacity: isVisible ? 1 : 0,
+            transform: isVisible
+              ? 'translateX(0)'
+              : even
+                ? 'translateX(150px)'
+                : 'translateX(-150px)',
+            transition: 'opacity 1s ease-in-out,transform 1s ease-out',
+            overflow: 'visible',
+            width: '100%',
+            height: '100%',
+          }}
+        >
+          <CloudinaryImage
+            mediaId={media.id}
+            draggable={false}
+            alt="alternation"
+            format="auto"
+            width={480}
+            height={480}
+            quality="auto:best"
+            crop="fill"
+            className={styles.image}
+            style={{
+              borderRadius: cardStyle?.borderRadius ?? 0,
+            }}
+          />
+        </div>
+      </div>
     </div>
   );
 };

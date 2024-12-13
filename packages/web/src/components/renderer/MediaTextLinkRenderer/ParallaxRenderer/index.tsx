@@ -32,23 +32,18 @@ const ParallaxRenderer = async ({
   ).filter(media => media !== null);
 
   return (
-    <div
-      style={{
-        backgroundColor: swapColor(
-          cardModuleColor?.background ??
-            getCarouselDefaultColors(coverBackgroundColor)?.backgroundStyle
-              ?.backgroundColor,
-          colorPalette,
-        ),
-      }}
-    >
-      <ParallaxTextLink
-        medias={medias}
-        data={module.data}
-        colorPalette={colorPalette}
-        cardStyle={cardStyle}
-      />
-    </div>
+    <ParallaxTextLink
+      backgroundColor={swapColor(
+        cardModuleColor?.background ??
+          getCarouselDefaultColors(coverBackgroundColor)?.backgroundStyle
+            ?.backgroundColor,
+        colorPalette,
+      )}
+      medias={medias}
+      data={module.data}
+      colorPalette={colorPalette}
+      cardStyle={cardStyle}
+    />
   );
 };
 
