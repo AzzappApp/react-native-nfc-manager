@@ -1,5 +1,6 @@
-## 1.4.1-canary.67
+## 1.4.1-canary.68
 
+* **fix:**  - **modules:** [#6224](https://github.com/AzzappApp/azzapp/pull/6224) don’t distord image ([#6356](https://github.com/AzzappApp/azzapp/pull/6356))
 * **fix:**  - import of cache dir
 * **fix:**  - **cover:** [#6168](https://github.com/AzzappApp/azzapp/pull/6168) display media loader when you have only local media ([#6347](https://github.com/AzzappApp/azzapp/pull/6347))
 * **fix:**  - **android:** [#6287](https://github.com/AzzappApp/azzapp/pull/6287) wrong selection list height ([#6353](https://github.com/AzzappApp/azzapp/pull/6353))
