@@ -7,7 +7,6 @@ import { colors } from '#theme';
 import {
   editionParametersSettings,
   useEditionParametersDisplayInfos,
-  preloadLUTShaders,
 } from '#helpers/mediaEditions';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Icon from '#ui/Icon';
@@ -382,7 +381,6 @@ const EditImageStep = ({
 };
 
 EditImageStep.STEP_ID = 'EDIT_IMAGE';
-EditImageStep.preload = () => preloadLUTShaders();
 
 export default EditImageStep;
 

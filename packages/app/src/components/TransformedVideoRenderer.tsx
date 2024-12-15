@@ -1,17 +1,13 @@
-import { Skia } from '@shopify/react-native-skia';
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 import { type ViewProps } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import {
-  useLutShader,
+  useLutTexture,
   createSingleVideoComposition,
-  SINGLE_VIDEO_COMPOSITION_ITEM_ID,
   reduceVideoResolutionIfNecessary,
-  scaleCropData,
   getDeviceMaxDecodingResolution,
-  imageFrameFromVideoFrame,
-  transformImage,
+  createSingleVideoFrameDrawer,
 } from '#helpers/mediaEditions';
 import { useVideoLocalPath } from '#helpers/mediaHelpers';
 import VideoCompositionRenderer from './VideoCompositionRenderer';
@@ -53,7 +49,7 @@ const TransformedVideoRenderer = ({
   maxResolution,
   ...props
 }: TransformedVideoRendererProps) => {
-  const lutShader = useLutShader(filter);
+  const lutTexture = useLutTexture(filter);
   const styles = useStyleSheet(styleSheet);
 
   const videoPath = useVideoLocalPath(video?.uri ?? null, onLoad, onError);
@@ -91,39 +87,10 @@ const TransformedVideoRenderer = ({
   const composition = infos?.composition ?? null;
   const videoScale = infos?.videoScale ?? 1;
 
-  const drawFrame = useCallback<FrameDrawer>(
-    ({ canvas, frames, width, height }) => {
-      'worklet';
-      const frame = frames[SINGLE_VIDEO_COMPOSITION_ITEM_ID];
-      if (!frame) {
-        return;
-      }
-      const imageFrame = imageFrameFromVideoFrame(frame);
-      if (!imageFrame) {
-        return;
-      }
-      const paint = Skia.Paint();
-      const cropData = editionParameters?.cropData;
-      const shader = transformImage({
-        imageFrame,
-        width,
-        height,
-        editionParameters: {
-          ...editionParameters,
-          cropData: cropData ? scaleCropData(cropData, videoScale) : undefined,
-        },
-        lutShader,
-      });
-      if (!shader) {
-        return;
-      }
-      if (!shader) {
-        return;
-      }
-      paint.setShader(shader);
-      canvas.drawPaint(paint);
-    },
-    [editionParameters, lutShader, videoScale],
+  const drawFrame = useMemo<FrameDrawer>(
+    () =>
+      createSingleVideoFrameDrawer(editionParameters, lutTexture, videoScale),
+    [editionParameters, lutTexture, videoScale],
   );
 
   return (

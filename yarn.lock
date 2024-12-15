@@ -151,7 +151,7 @@ __metadata:
     "@sentry/types": "npm:^8.40.0"
     "@sentry/utils": "npm:^8.40.0"
     "@shopify/flash-list": "npm:^1.7.2"
-    "@shopify/react-native-skia": "npm:1.7.0"
+    "@shopify/react-native-skia": "patch:@shopify/react-native-skia@npm%3A1.7.0#~/.yarn/patches/@shopify-react-native-skia-npm-1.7.0-853dfa58b2.patch"
     "@testing-library/react-native": "npm:^12.8.1"
     "@types/chroma-js": "npm:^2.4.4"
     "@types/qrcode": "npm:^1.5.5"
@@ -10875,6 +10875,27 @@ __metadata:
   bin:
     setup-skia-web: ./scripts/setup-canvaskit.js
   checksum: 10/44806b3ef4a8236c7e27cafc757a5c11b171013b10641a8d49655dcd12770bef9bf0a1f5bda2047a1814e618f298ed662e3d81d2dc1ed1b1ac54ff35a839e1cc
+  languageName: node
+  linkType: hard
+
+"@shopify/react-native-skia@patch:@shopify/react-native-skia@npm%3A1.7.0#~/.yarn/patches/@shopify-react-native-skia-npm-1.7.0-853dfa58b2.patch":
+  version: 1.7.0
+  resolution: "@shopify/react-native-skia@patch:@shopify/react-native-skia@npm%3A1.7.0#~/.yarn/patches/@shopify-react-native-skia-npm-1.7.0-853dfa58b2.patch::version=1.7.0&hash=4cc339"
+  dependencies:
+    canvaskit-wasm: "npm:0.39.1"
+    react-reconciler: "npm:0.27.0"
+  peerDependencies:
+    react: ">=18.0"
+    react-native: ">=0.64"
+    react-native-reanimated: ">=2.0.0"
+  peerDependenciesMeta:
+    react-native:
+      optional: true
+    react-native-reanimated:
+      optional: true
+  bin:
+    setup-skia-web: ./scripts/setup-canvaskit.js
+  checksum: 10/7e1f8767f890185fc99fa77852bdc665e371fbcec761e68d6c17d633a1d9a15ab172e9979fcdadba1659d9c056df60c8231743efd6e8e2331059170683d90e63
   languageName: node
   linkType: hard
 

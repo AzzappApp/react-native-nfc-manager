@@ -780,14 +780,14 @@ export function coverEditorReducer(
         loadingRemoteMedia: false,
       };
     case 'LOADING_SUCCESS':
-      const { images, lutShaders, localFilenames } = payload;
+      const { images, lutTextures, localFilenames } = payload;
       return {
         ...state,
         loadingError: null,
         loadingRemoteMedia: false,
         loadingLocalMedia: false,
         images,
-        lutShaders,
+        lutTextures,
         localFilenames,
       };
     // #endregion

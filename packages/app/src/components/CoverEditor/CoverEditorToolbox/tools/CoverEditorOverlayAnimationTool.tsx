@@ -25,13 +25,9 @@ import { getCoverDuration } from '#components/CoverEditor/coverEditorHelpers';
 import TransformedImageRenderer from '#components/TransformedImageRenderer';
 import { keyExtractor } from '#helpers/idHelpers';
 import {
-  applyImageFrameTransformations,
-  applyShaderTransformations,
   createImageFromNativeTexture,
-  getTransformsForEditionParameters,
-  imageFrameFromImage,
-  imageFrameToShaderFrame,
-  useLutShader,
+  transformImage,
+  useLutTexture,
   useNativeTexture,
 } from '#helpers/mediaEditions';
 import useBoolean from '#hooks/useBoolean';
@@ -52,7 +48,8 @@ import type {
   OverlayAnimations,
 } from '#components/CoverEditor/coverDrawer/overlayAnimations';
 import type { EditionParameters } from '#helpers/mediaEditions';
-import type { SkImage, SkShader } from '@shopify/react-native-skia';
+import type { TextureInfo } from '#helpers/mediaEditions/NativeTextureLoader';
+import type { SkImage } from '@shopify/react-native-skia';
 import type { DerivedValue } from 'react-native-reanimated';
 
 const CoverEditorOverlayImageAnimationTool = () => {
@@ -128,7 +125,7 @@ const CoverEditorOverlayImageAnimationTool = () => {
     [intl],
   );
 
-  const lutShader = useLutShader(activeOverlay?.filter);
+  const lutTexture = useLutTexture(activeOverlay?.filter);
 
   const renderItem = useCallback(
     ({
@@ -144,7 +141,7 @@ const CoverEditorOverlayImageAnimationTool = () => {
             width={width}
             skImage={skImage}
             editionParameters={activeOverlay.editionParameters}
-            lutShader={lutShader}
+            lutTexture={lutTexture}
           />
         );
       }
@@ -159,7 +156,7 @@ const CoverEditorOverlayImageAnimationTool = () => {
         />
       );
     },
-    [activeOverlay, lutShader, skImage],
+    [activeOverlay, lutTexture, skImage],
   );
 
   const imageRatio = activeOverlay
@@ -260,14 +257,14 @@ const AnimationPreview = ({
   width,
   skImage,
   editionParameters,
-  lutShader,
+  lutTexture,
 }: {
   animationId: OverlayAnimations;
   height: number;
   width: number;
   skImage: DerivedValue<SkImage | null> | null;
   editionParameters?: EditionParameters | null;
-  lutShader?: SkShader | null;
+  lutTexture?: TextureInfo | null;
 }) => {
   const animation = overlayAnimations[animationId];
 
@@ -283,27 +280,23 @@ const AnimationPreview = ({
       if (!animation || !skImage?.value) {
         return;
       }
-      const { imageTransformations, shaderTransformations } =
-        getTransformsForEditionParameters({
-          width,
-          height,
-          lutShader,
-          editionParameters,
-        });
       const { animateCanvas, animatePaint } = animation(
         animationStateSharedValue.value,
       );
-      const { shader } = applyShaderTransformations(
-        imageFrameToShaderFrame(
-          applyImageFrameTransformations(
-            imageFrameFromImage(skImage.value),
-            imageTransformations,
-          ),
-        ),
-        shaderTransformations,
-      );
       const paint = Skia.Paint();
-      paint.setShader(shader);
+      const imageFilter = transformImage({
+        image: skImage.value,
+        imageInfo: {
+          width: skImage.value.width(),
+          height: skImage.value.height(),
+          matrix: Skia.Matrix(),
+        },
+        targetWidth: width,
+        targetHeight: height,
+        editionParameters,
+        lutTexture,
+      });
+      paint.setImageFilter(imageFilter);
       const rect = { x: 0, y: 0, width, height };
       animateCanvas?.(canvas, rect);
       animatePaint?.(paint, rect);

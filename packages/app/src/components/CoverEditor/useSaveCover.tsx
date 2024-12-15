@@ -293,7 +293,7 @@ const createCoverMedia = async (
   const {
     lottie,
     images,
-    lutShaders,
+    lutTextures,
     loadingLocalMedia,
     loadingRemoteMedia,
     cardColors,
@@ -320,7 +320,7 @@ const createCoverMedia = async (
 
           coverEditorState,
           images,
-          lutShaders,
+          lutTextures,
           videoComposition: { duration: 0, items: [] },
         });
       }),
@@ -378,7 +378,7 @@ const createCoverMedia = async (
           ...infos,
           coverEditorState,
           images,
-          lutShaders,
+          lutTextures,
           videoScales,
           skottiePlayer,
           lottieInfo,

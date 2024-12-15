@@ -11,7 +11,7 @@ import type { MediaAnimations } from './coverDrawer/mediaAnimations';
 import type { OverlayAnimations } from './coverDrawer/overlayAnimations';
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { Filter } from '@azzapp/shared/filtersHelper';
-import type { SkPoint, SkRect, SkShader } from '@shopify/react-native-skia';
+import type { SkPoint, SkRect } from '@shopify/react-native-skia';
 
 export type CoverEditorState = {
   // Cover data
@@ -38,7 +38,7 @@ export type CoverEditorState = {
   images: Record<string, TextureInfo>;
   imagesScales: Record<string, number>;
   localFilenames: Record<string, string>;
-  lutShaders: Partial<Record<Filter, SkShader>>;
+  lutTextures: Partial<Record<Filter, TextureInfo>>;
 
   // Loading state
   loadingRemoteMedia: boolean;

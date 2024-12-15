@@ -29,7 +29,11 @@ import {
 } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import { ScreenModal, preventModalDismiss } from '#components/NativeRouter';
-import { NativeTextureLoader, loadAllLUTShaders } from '#helpers/mediaEditions';
+import {
+  FILTERS,
+  getLutURI,
+  NativeTextureLoader,
+} from '#helpers/mediaEditions';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Text from '#ui/Text';
@@ -51,6 +55,7 @@ import CoverPreview from './CoverPreview';
 import { getCoverLocalMediaPath } from './coversLocalStore';
 import useLottie from './useLottie';
 import useSaveCover from './useSaveCover';
+import type { TextureInfo } from '#helpers/mediaEditions/NativeTextureLoader';
 import type { SourceMedia } from '#helpers/mediaHelpers';
 import type { CoverEditor_coverTemplate$key } from '#relayArtifacts/CoverEditor_coverTemplate.graphql';
 import type { CoverEditor_profile$key } from '#relayArtifacts/CoverEditor_profile.graphql';
@@ -62,6 +67,7 @@ import type {
   CoverEditorState,
   CoverEditorTextLayerItem,
 } from './coverEditorTypes';
+import type { Filter } from '@azzapp/shared/filtersHelper';
 import type { Asset } from 'expo-asset';
 import type { ForwardedRef, Reducer } from 'react';
 import type { LayoutChangeEvent, ViewProps } from 'react-native';
@@ -357,7 +363,7 @@ const CoverEditorCore = (
       images: {},
       imagesScales,
       localFilenames: {},
-      lutShaders: {},
+      lutTextures: {},
 
       loadingRemoteMedia: false,
       loadingLocalMedia: false,
@@ -379,6 +385,7 @@ const CoverEditorCore = (
   // #endregion
 
   const imageRefKeys = useRef<Record<string, string>>({});
+  const lutKeys = useRef<string[]>([]);
   const [reloadCount, setReloadCount] = useState(0);
   // #region Resources loading
   useEffect(() => {
@@ -403,12 +410,13 @@ const CoverEditorCore = (
       }
     }
 
-    let lutShaders = coverEditorState.lutShaders;
+    let lutTextures = coverEditorState.lutTextures;
     let localFilenames = coverEditorState.localFilenames;
     let images = coverEditorState.images;
 
-    const lutShadersLoaded = !!Object.keys(coverEditorState.lutShaders).length;
-    if (mediasToLoad.length === 0 && lutShadersLoaded) {
+    const lutTexturesLoaded = !!Object.keys(coverEditorState.lutTextures)
+      .length;
+    if (mediasToLoad.length === 0 && lutTexturesLoaded) {
       return () => {};
     }
 
@@ -423,13 +431,33 @@ const CoverEditorCore = (
       },
     });
     const promises: Array<Promise<void>> = [];
-    if (!lutShadersLoaded) {
+    if (!lutTexturesLoaded) {
       promises.push(
-        loadAllLUTShaders().then(result => {
-          if (canceled) {
-            return;
-          }
-          lutShaders = result;
+        Promise.all(
+          Object.keys(FILTERS).map(async key => {
+            const filter = key as Filter;
+            const filterUri = getLutURI(filter);
+            if (filterUri) {
+              const { key, promise } = NativeTextureLoader.loadImage(filterUri);
+              const textureInfo = await promise;
+              if (!lutKeys.current.includes(key)) {
+                lutKeys.current.push(key);
+                NativeTextureLoader.ref(key);
+              }
+              return { filter, textureInfo };
+            }
+            return null;
+          }),
+        ).then(loadedTextures => {
+          lutTextures = loadedTextures.reduce(
+            (lutTextures, loadedTexture) => {
+              if (loadedTexture) {
+                lutTextures[loadedTexture.filter] = loadedTexture.textureInfo;
+              }
+              return lutTextures;
+            },
+            {} as Partial<Record<Filter, TextureInfo>>,
+          );
         }),
       );
     }
@@ -486,7 +514,7 @@ const CoverEditorCore = (
         dispatch({
           type: 'LOADING_SUCCESS',
           payload: {
-            lutShaders,
+            lutTextures,
             images,
             localFilenames,
           },
@@ -512,7 +540,7 @@ const CoverEditorCore = (
     };
   }, [
     coverEditorState.medias,
-    coverEditorState.lutShaders,
+    coverEditorState.lutTextures,
     coverEditorState.images,
     coverEditorState.localFilenames,
     coverEditorState.overlayLayers,
@@ -536,6 +564,15 @@ const CoverEditorCore = (
       });
     };
   }, [coverEditorState.images]);
+
+  useEffect(
+    () => () => {
+      lutKeys.current.forEach(key => {
+        NativeTextureLoader.unref(key);
+      });
+    },
+    [],
+  );
   // #endregion
 
   // #region Saving

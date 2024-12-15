@@ -1,17 +1,13 @@
 /* eslint-disable prefer-const */
-import { BlurStyle, Skia } from '@shopify/react-native-skia';
+import { BlurStyle, ClipOp, Skia } from '@shopify/react-native-skia';
 import { interpolate } from 'react-native-reanimated';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import { convertToBaseCanvasRatio } from '@azzapp/shared/coverHelpers';
 import {
-  applyImageFrameTransformations,
-  applyShaderTransformations,
   createImageFromNativeTexture,
   cropDataForAspectRatio,
-  getTransformsForEditionParameters,
-  imageFrameFromImage,
-  imageFrameToShaderFrame,
   scaleCropData,
+  transformImage,
 } from '#helpers/mediaEditions';
 import { percentRectToRect } from '../coverEditorHelpers';
 import { inflateRRect } from './coverDrawerHelpers';
@@ -26,7 +22,7 @@ const coverOverlayDrawer = ({
   coverEditorState: { overlayLayers, cardColors, imagesScales },
   index,
   images,
-  lutShaders,
+  lutTextures,
   currentTime,
   videoComposition: { duration },
 }: CoverDrawerOptions & { index: number }) => {
@@ -67,38 +63,12 @@ const coverOverlayDrawer = ({
     width: imageWidth,
     height: imageHeight,
   } = percentRectToRect(bounds, width, height);
+
   canvas.save();
   canvas.translate(x - imageWidth / 2, y - imageHeight / 2);
   if (rotation) {
     canvas.rotate((rotation * 180) / Math.PI, imageWidth / 2, imageHeight / 2);
   }
-  let cropData = editionParameters?.cropData;
-  let roll = editionParameters?.roll;
-  if (
-    !cropData ||
-    // minor difference is allowed since canvas aspect ration might not be exactly
-    // the same as the COVER_ASPECT_RATIO
-    Math.abs(cropData.width / cropData.height - imageWidth / imageHeight) > 0.02
-  ) {
-    cropData = cropDataForAspectRatio(
-      overlayWidth,
-      overlayHeight,
-      imageWidth / imageHeight,
-    );
-    roll = 0;
-  }
-  const imageFrame = imageFrameFromImage(image);
-  const { imageTransformations, shaderTransformations } =
-    getTransformsForEditionParameters({
-      width: imageWidth,
-      height: imageHeight,
-      editionParameters: {
-        ...editionParameters,
-        cropData: scaleCropData(cropData, imagesScales[id] ?? 1),
-        roll,
-      },
-      lutShader: filter ? lutShaders[filter] : null,
-    });
 
   const animation = overlayLayer.animation
     ? overlayAnimations[overlayLayer.animation]
@@ -121,19 +91,14 @@ const coverOverlayDrawer = ({
     ({ animateCanvas, animatePaint } = transformations);
   }
 
-  const { shader } = applyShaderTransformations(
-    imageFrameToShaderFrame(
-      applyImageFrameTransformations(imageFrame, imageTransformations),
-    ),
-    shaderTransformations,
-  );
-
   const overlayRect = {
     x: 0,
     y: 0,
     height: imageHeight,
     width: imageWidth,
   };
+
+  animateCanvas?.(canvas, overlayRect);
   const borderWidthPx = convertToBaseCanvasRatio(borderWidth, width);
 
   const outerRect = {
@@ -151,19 +116,64 @@ const coverOverlayDrawer = ({
     rx: (borderRadius * width - borderWidthPx) / 200,
     ry: (borderRadius * width - borderWidthPx) / 200,
   };
-  animateCanvas?.(canvas, overlayRect);
 
-  if (shadow && borderWidth > 0) {
-    const shadowPaint = Skia.Paint();
-    shadowPaint.setColor(Skia.Color('#00000099'));
-    animatePaint?.(shadowPaint, overlayRect);
-    shadowPaint.setMaskFilter(
-      Skia.MaskFilter.MakeBlur(
-        BlurStyle.Normal,
-        convertToBaseCanvasRatio(8, width),
-        true,
-      ),
+  let cropData = editionParameters?.cropData;
+  let roll = editionParameters?.roll;
+  if (
+    !cropData ||
+    // minor difference is allowed since canvas aspect ration might not be exactly
+    // the same as the COVER_ASPECT_RATIO
+    Math.abs(cropData.width / cropData.height - imageWidth / imageHeight) > 0.02
+  ) {
+    cropData = cropDataForAspectRatio(
+      overlayWidth,
+      overlayHeight,
+      imageWidth / imageHeight,
     );
+    roll = 0;
+  }
+  let imageFilter = transformImage({
+    image,
+    imageInfo: {
+      matrix: Skia.Matrix(),
+      width: image.width(),
+      height: image.height(),
+    },
+    targetWidth: imageWidth,
+    targetHeight: imageHeight,
+    editionParameters: {
+      ...editionParameters,
+      cropData: scaleCropData(cropData, imagesScales[id] ?? 1),
+      roll,
+    },
+    lutTexture: filter ? lutTextures[filter] : null,
+  });
+
+  // We will clip the inner rect with border radius so we need to draw the shadow
+  if (shadow) {
+    const shadowPaint = Skia.Paint();
+    if (borderWidth > 0) {
+      shadowPaint.setColor(Skia.Color('#00000099'));
+      shadowPaint.setMaskFilter(
+        Skia.MaskFilter.MakeBlur(
+          BlurStyle.Normal,
+          convertToBaseCanvasRatio(8, width),
+          true,
+        ),
+      );
+    } else {
+      shadowPaint.setImageFilter(
+        Skia.ImageFilter.MakeDropShadowOnly(
+          0,
+          convertToBaseCanvasRatio(4, width),
+          convertToBaseCanvasRatio(8, width),
+          convertToBaseCanvasRatio(8, width),
+          Skia.Color('#00000099'),
+          imageFilter,
+        ),
+      );
+    }
+    animatePaint?.(shadowPaint, overlayRect);
     canvas.drawRRect(
       inflateRRect(
         outerRect,
@@ -177,21 +187,12 @@ const coverOverlayDrawer = ({
   }
 
   const paint = Skia.Paint();
-  paint.setShader(shader);
-  if (shadow && borderWidth === 0) {
-    paint.setImageFilter(
-      Skia.ImageFilter.MakeDropShadow(
-        0,
-        convertToBaseCanvasRatio(4, width),
-        convertToBaseCanvasRatio(8, width),
-        convertToBaseCanvasRatio(8, width),
-        Skia.Color('#00000099'),
-        null,
-      ),
-    );
-  }
+  paint.setImageFilter(imageFilter);
   animatePaint?.(paint, overlayRect);
+  canvas.save();
+  canvas.clipRRect(innerRect, ClipOp.Intersect, true);
   canvas.drawRRect(innerRect, paint);
+  canvas.restore();
 
   if (borderWidth > 0) {
     const borderPaint = Skia.Paint();

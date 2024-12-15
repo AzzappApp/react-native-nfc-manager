@@ -1,4 +1,4 @@
-import { compileEffect } from '#helpers/mediaEditions/shaderUtils';
+import { compileEffect } from '#helpers/mediaEditions';
 import { createTransition } from './createTransition';
 
 const effect = compileEffect(`
@@ -82,6 +82,6 @@ const steps = 50;
 const horizontalHexagons = 20;
 export default {
   id: 'hexagonalize' as const,
-  transition: createTransition(effect, duration, [steps, horizontalHexagons]),
+  transition: createTransition(effect, duration, { steps, horizontalHexagons }),
   duration,
 };

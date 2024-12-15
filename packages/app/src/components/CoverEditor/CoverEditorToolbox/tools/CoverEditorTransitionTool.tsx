@@ -1,17 +1,14 @@
 import {
   Canvas,
-  FilterMode,
-  MipmapMode,
-  Picture,
   Skia,
-  TileMode,
-  createPicture,
   useImage,
+  Image as SkiaImage,
 } from '@shopify/react-native-skia';
-import { memo, useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Image, View } from 'react-native';
+import { Image, PixelRatio } from 'react-native';
 import {
+  runOnUI,
   useDerivedValue,
   useFrameCallback,
   useSharedValue,
@@ -39,7 +36,7 @@ import type {
   CoverTransitions,
   CoverTransitionsListItem,
 } from '../../coverDrawer/coverTransitions';
-import type { SkShader } from '@shopify/react-native-skia';
+import type { SkImageFilter, SkSurface } from '@shopify/react-native-skia';
 
 const CoverEditorTransitionTool = () => {
   const [show, open, close] = useBoolean(false);
@@ -76,8 +73,8 @@ const CoverEditorTransitionTool = () => {
   const previewOutImage = useImage(require('./assets/preview_1.png'));
 
   const [{ previewIn, previewOut }, setShaders] = useState<{
-    previewIn: SkShader | null;
-    previewOut: SkShader | null;
+    previewIn: SkImageFilter | null;
+    previewOut: SkImageFilter | null;
   }>({
     previewIn: null,
     previewOut: null,
@@ -89,21 +86,16 @@ const CoverEditorTransitionTool = () => {
         return;
       }
       // 38 for label height very rough estimate
-      const scale = (height - 38) / previewInImage.height();
+      const scale =
+        ((height - 38) / previewInImage.height()) * PixelRatio.get();
       setShaders({
-        previewIn: previewInImage.makeShaderOptions(
-          TileMode.Clamp,
-          TileMode.Clamp,
-          FilterMode.Linear,
-          MipmapMode.None,
+        previewIn: Skia.ImageFilter.MakeMatrixTransform(
           Skia.Matrix().scale(scale, scale),
+          Skia.ImageFilter.MakeImage(previewInImage),
         ),
-        previewOut: previewOutImage.makeShaderOptions(
-          TileMode.Clamp,
-          TileMode.Clamp,
-          FilterMode.Linear,
-          MipmapMode.None,
+        previewOut: Skia.ImageFilter.MakeMatrixTransform(
           Skia.Matrix().scale(scale, scale),
+          Skia.ImageFilter.MakeImage(previewOutImage),
         ),
       });
     },
@@ -191,8 +183,8 @@ const TransitionPreview = ({
   transitionId: CoverTransitions;
   height: number;
   width: number;
-  previewIn: SkShader | null;
-  previewOut: SkShader | null;
+  previewIn: SkImageFilter | null;
+  previewOut: SkImageFilter | null;
 }) => {
   const { duration, transition } = coverTransitions[transitionId];
 
@@ -222,29 +214,48 @@ const TransitionPreview = ({
     animationStateSharedValue.value = { animationTime, isPaused, reversed };
   });
 
-  const picture = useDerivedValue(() =>
-    createPicture(canvas => {
-      if (!previewIn || !previewOut) {
-        return;
+  const pixelRatio = PixelRatio.get();
+  const surfaceShared = useSharedValue<SkSurface | null>(null);
+  useEffect(() => {
+    runOnUI(() => {
+      surfaceShared.value?.dispose();
+      surfaceShared.value = Skia.Surface.MakeOffscreen(
+        width * pixelRatio,
+        height * pixelRatio,
+      );
+      if (!surfaceShared.value) {
+        console.error('Failed to create surface');
       }
-      const { animationTime, reversed } = animationStateSharedValue.value;
+    })();
+  }, [height, pixelRatio, surfaceShared, width]);
 
-      transition({
-        canvas,
-        time: animationTime / ANIMATION_TIME_SCALE,
-        inShader: reversed ? previewIn : previewOut,
-        outShader: reversed ? previewOut : previewIn,
-        width,
-        height,
-      });
-    }),
-  );
+  const image = useDerivedValue(() => {
+    const surface = surfaceShared.value;
+    if (!previewIn || !previewOut || !surface) {
+      return null;
+    }
+    const canvas = surface.getCanvas();
+    canvas.clear(Skia.Color('#00000000'));
+    const { animationTime, reversed } = animationStateSharedValue.value;
+    transition({
+      canvas,
+      time: animationTime / ANIMATION_TIME_SCALE,
+      inImage: reversed ? previewIn : previewOut,
+      outImage: reversed ? previewOut : previewIn,
+      width: width * pixelRatio,
+      height: height * pixelRatio,
+    });
+    surface.flush();
+    return Skia.Image.MakeImageFromNativeTextureUnstable(
+      surface.getNativeTextureUnstable(),
+      width * pixelRatio,
+      height * pixelRatio,
+    );
+  });
 
   return (
-    <View style={{ height, width }}>
-      <Canvas style={{ width, height }} opaque>
-        <Picture picture={picture} />
-      </Canvas>
-    </View>
+    <Canvas style={{ width, height }} opaque>
+      <SkiaImage image={image} x={0} y={0} width={width} height={height} />
+    </Canvas>
   );
 };
