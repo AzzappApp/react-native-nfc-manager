@@ -68,6 +68,7 @@ const AlternationImage = ({
             className={styles.image}
             style={{
               borderRadius: cardStyle?.borderRadius ?? 0,
+              objectFit: 'cover',
             }}
           />
         </div>
