@@ -148,7 +148,7 @@ export const SimpleButtonRenderer = ({
   }, [height, width, marginBottom, marginTop, borderRadius, borderWidth]);
 
   const textStyle = useMemo(() => {
-    return { fontSize };
+    return { fontSize, lineHeight: fontSize * 1.5 };
   }, [fontSize]);
 
   return (
@@ -175,7 +175,6 @@ export const SimpleButtonRenderer = ({
               backgroundColor: swapColor(buttonColor, colorPalette),
               alignItems: 'center',
               justifyContent: 'center',
-
               borderColor: swapColor(borderColor, colorPalette),
               overflow: 'hidden',
             },
