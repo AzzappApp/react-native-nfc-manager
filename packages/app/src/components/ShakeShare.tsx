@@ -31,6 +31,7 @@ import AddToWalletButton from '#components/AddToWalletButton';
 import ToastUi from '#components/Toast';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import useLatestCallback from '#hooks/useLatestCallback';
+import useScreenInsets from '#hooks/useScreenInsets';
 import { get as qrCodeWidth } from '#relayProviders/qrCodeWidth.relayprovider';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import IconButton from '#ui/IconButton';
@@ -98,6 +99,7 @@ const QR_CODE_WIDTH = Math.round(width * 0.5);
 
 const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
   const profileInfos = useProfileInfos();
+  const { bottom } = useScreenInsets();
 
   const { node } = useLazyLoadQuery<ShakeShareScreenQuery>(
     graphql`
@@ -235,7 +237,7 @@ const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
           icon="close"
           onPress={onClose}
           iconStyle={styles.iconStyle}
-          style={styles.iconContainerStyle}
+          style={[styles.iconContainerStyle, { bottom }]}
         />
       </LinearGradient>
       <ToastUi />
@@ -246,7 +248,6 @@ const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
 const styles = StyleSheet.create({
   iconContainerStyle: {
     position: 'absolute',
-    bottom: 40,
     borderColor: 'white',
     width: 24,
   },
