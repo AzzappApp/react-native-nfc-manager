@@ -129,6 +129,8 @@ Sentry.init({
   enableStallTracking: false,
   tracesSampleRate:
     process.env.DEPLOYMENT_ENVIRONMENT === 'production' ? 0.1 : 1,
+  profilesSampleRate:
+    process.env.DEPLOYMENT_ENVIRONMENT === 'production' ? 0.1 : 1,
 });
 
 //initializing RC sneed to be done early
