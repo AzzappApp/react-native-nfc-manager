@@ -3,7 +3,6 @@ import Animated, {
   Extrapolation,
   interpolate,
   useAnimatedStyle,
-  withTiming,
 } from 'react-native-reanimated';
 import { shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -28,6 +27,16 @@ const CardModulePreviewContainer = ({
 }: CardModulePreviewContainerProps) => {
   // #region hook
   const styles = useStyleSheet(styleSheet);
+  //using animatedState to not have a defined a sharedValue, to animate with the new value(handle by the hook)
+  const animatedWidth = useAnimatedState(dimension.width, {
+    duration: PREVIEW_ANIMATION_DURATION,
+  });
+  const animatedHeight = useAnimatedState(dimension.height, {
+    duration: PREVIEW_ANIMATION_DURATION,
+  });
+  const animatedScaledFactor = useAnimatedState(scaleFactor, {
+    duration: PREVIEW_ANIMATION_DURATION,
+  });
   const viewModeTimer = useAnimatedState(viewMode === 'mobile' ? 0 : 1, {
     duration: PREVIEW_ANIMATION_DURATION,
   });
@@ -35,13 +44,14 @@ const CardModulePreviewContainer = ({
   // #region ui
   const scaleViewStyle = useAnimatedStyle(() => {
     return {
+      height: animatedHeight.value,
+      width: animatedWidth.value,
+
       transform: [
         {
-          scale: interpolate(
-            viewModeTimer.value,
-            [0, 1],
-            [0.55, scaleFactor * 0.8],
-          ),
+          scale:
+            animatedScaledFactor.value *
+            interpolate(viewModeTimer.value, [0, 1], [0.55, 0.8]),
         },
       ],
     };
@@ -53,16 +63,9 @@ const CardModulePreviewContainer = ({
       [1, 1 / 0.8],
       Extrapolation.CLAMP,
     );
-    const animatedHeight = withTiming(dimension.height, {
-      duration: PREVIEW_ANIMATION_DURATION,
-    });
-
-    const animatedWidth = withTiming(dimension.width, {
-      duration: PREVIEW_ANIMATION_DURATION,
-    });
     return {
-      height: animatedHeight,
-      width: animatedWidth,
+      height: animatedHeight.value,
+      width: animatedWidth.value,
       transform: [{ scale: oppositeScale }],
     };
   });
@@ -105,6 +108,7 @@ const styleSheet = createStyleSheet(appearance => ({
   deviceEmulated: {
     overflow: 'hidden', //do not remove this, it will cause the module to be cut off in some case '(desktop mainly)
     justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 24,
   },
 }));
