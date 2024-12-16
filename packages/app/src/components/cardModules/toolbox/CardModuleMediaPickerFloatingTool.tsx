@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { StyleSheet } from 'react-native';
 import { ScreenModal } from '#components/NativeRouter';
-import useToggle from '#hooks/useToggle';
+import useBoolean from '#hooks/useBoolean';
 import IconButton from '#ui/IconButton';
 import CardModuleMediaPicker from '../tool/CardModuleMediaPicker';
 import type { CardModuleMedia } from '../cardModuleEditorType';
@@ -19,14 +19,14 @@ const CardModuleMediaPickerFloatingTool = ({
   maxVideo,
   onUpdateMedia,
 }: CardModuleMediaPickerFloatingToolProps) => {
-  const [showImagePicker, toggleShowImage] = useToggle();
+  const [showImagePicker, openImagePicker, closeImagePicker] = useBoolean();
 
   const onMediasPicked = useCallback(
     (cardModuleMedia: CardModuleMedia[]) => {
       onUpdateMedia(cardModuleMedia);
-      toggleShowImage();
+      closeImagePicker();
     },
-    [onUpdateMedia, toggleShowImage],
+    [onUpdateMedia, closeImagePicker],
   );
 
   return (
@@ -36,18 +36,18 @@ const CardModuleMediaPickerFloatingTool = ({
         size={35}
         style={styles.iconButton}
         iconStyle={styles.iconTint}
-        onPress={toggleShowImage}
+        onPress={openImagePicker}
       />
       <ScreenModal
         visible={showImagePicker}
         animationType="slide"
-        onRequestDismiss={toggleShowImage}
+        onRequestDismiss={closeImagePicker}
       >
         {showImagePicker && (
           <CardModuleMediaPicker
             initialMedias={cardModuleMedias}
             onFinished={onMediasPicked}
-            onClose={toggleShowImage}
+            onClose={closeImagePicker}
             maxMedia={maxMedia}
             maxVideo={maxVideo}
           />

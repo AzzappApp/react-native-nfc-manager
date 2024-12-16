@@ -72,7 +72,6 @@ const CardModuleMediaPicker = ({
     );
   };
 
-  // @todo better define the expected type according to the evolution of the new cover
   const handleMediaSelected = useCallback(
     (media: SourceMedia) => {
       const index = selectedMedias.findIndex(

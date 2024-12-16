@@ -1,7 +1,7 @@
 import { useIntl } from 'react-intl';
 import { ScreenModal } from '#components/NativeRouter';
 import ToolBoxSection from '#components/Toolbar/ToolBoxSection';
-import useToggle from '#hooks/useToggle';
+import useBoolean from '#hooks/useBoolean';
 import CardModuleMediaPicker from './CardModuleMediaPicker';
 import type { CardModuleMedia } from '../cardModuleEditorType';
 
@@ -20,11 +20,11 @@ const CardModuleMediaReplace = ({
   onUpdateMedia,
 }: CardModuleMediaReplaceProps) => {
   const intl = useIntl();
-  const [show, toggleScreenModal] = useToggle(false);
+  const [show, openModal, closeModal] = useBoolean(false);
 
   const onFinished = (medias: CardModuleMedia[]) => {
     onUpdateMedia(medias[0]);
-    toggleScreenModal();
+    closeModal();
   };
 
   return (
@@ -35,12 +35,12 @@ const CardModuleMediaReplace = ({
           defaultMessage: 'Replace',
           description: 'Card Module Media Edition Button- Replace',
         })}
-        onPress={toggleScreenModal}
+        onPress={openModal}
       />
       <ScreenModal
         visible={show}
         animationType="slide"
-        onRequestDismiss={toggleScreenModal}
+        onRequestDismiss={closeModal}
       >
         {show && (
           <CardModuleMediaPicker
@@ -49,7 +49,7 @@ const CardModuleMediaReplace = ({
             maxMedia={1}
             allowVideo={allowVideo}
             onFinished={onFinished}
-            onClose={toggleScreenModal}
+            onClose={closeModal}
             replacing
           />
         )}
