@@ -1,5 +1,6 @@
-## 1.4.1-canary.69
+## 1.4.1-canary.70
 
+* **feat:**  - improve module animation container ([#6378](https://github.com/AzzappApp/azzapp/pull/6378))
 * **fix:**  - Filtered Image/video cannot be resizeMode. Stretch result if container is not the same ratio. Manually calculate the cropData for display only. Compression is working fine ([#6366](https://github.com/AzzappApp/azzapp/pull/6366))
 * **fix:**  - **modules:** [#6224](https://github.com/AzzappApp/azzapp/pull/6224) don’t distord image ([#6356](https://github.com/AzzappApp/azzapp/pull/6356))
 * **fix:**  - import of cache dir
