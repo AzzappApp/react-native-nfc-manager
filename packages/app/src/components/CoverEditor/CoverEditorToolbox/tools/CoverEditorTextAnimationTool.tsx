@@ -1,12 +1,8 @@
-import { createPicture, Canvas, Picture } from '@shopify/react-native-skia';
+import { Canvas, Image } from '@shopify/react-native-skia';
 import { memo, useCallback, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
-import {
-  useSharedValue,
-  useFrameCallback,
-  useDerivedValue,
-} from 'react-native-reanimated';
+import { useSharedValue, useFrameCallback } from 'react-native-reanimated';
 import {
   COVER_MIN_MEDIA_DURATION,
   COVER_RATIO,
@@ -22,6 +18,7 @@ import {
   percentRectToRect,
 } from '#components/CoverEditor/coverEditorHelpers';
 import { keyExtractor } from '#helpers/idHelpers';
+import { drawOffScreen, useOffScreenSurface } from '#helpers/skiaHelpers';
 import useBoolean from '#hooks/useBoolean';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import DoubleSlider from '#ui/DoubleSlider';
@@ -41,6 +38,7 @@ import type {
 } from '#components/CoverEditor/coverDrawer/coverTextAnimations';
 import type { CoverEditorTextLayerItem } from '#components/CoverEditor/coverEditorTypes';
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
+import type { SkImage } from '@shopify/react-native-skia';
 
 const CoverEditorTextImageAnimationTool = () => {
   const coverEditorState = useCoverEditorContext();
@@ -219,14 +217,10 @@ const AnimationPreview = ({
   const animation = animationId ? textAnimations[animationId] : null;
 
   const startTime = useMemo(() => Date.now(), []);
-  const animationSharedValue = useSharedValue(0);
-
+  const image = useSharedValue<SkImage | null>(null);
+  const surface = useOffScreenSurface(width, height);
   useFrameCallback(() => {
-    animationSharedValue.value = ((Date.now() - startTime) % 3000) / 3000;
-  });
-
-  const picture = useDerivedValue(() =>
-    createPicture(canvas => {
+    image.value = drawOffScreen(surface, (canvas, width, height) => {
       const paragraph = createParagraph({
         layer: activeTextLayer,
         canvasWidth: width,
@@ -255,7 +249,7 @@ const AnimationPreview = ({
 
       if (animation) {
         animation({
-          progress: animationSharedValue.value,
+          progress: ((Date.now() - startTime) % 3000) / 3000,
           paragraph,
           textLayer: activeTextLayer,
           canvas,
@@ -266,13 +260,13 @@ const AnimationPreview = ({
       } else {
         paragraph.paint(canvas, -textWidth / 2, -paragraph.getHeight() / 2);
       }
-    }),
-  );
+    });
+  }, true);
 
   return (
     <View style={{ height, width }}>
       <Canvas style={{ width, height }} opaque>
-        <Picture picture={picture} />
+        <Image image={image} x={0} y={0} width={width} height={height} />
       </Canvas>
     </View>
   );

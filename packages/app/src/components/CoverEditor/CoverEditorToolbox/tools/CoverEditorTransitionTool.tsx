@@ -4,11 +4,10 @@ import {
   useImage,
   Image as SkiaImage,
 } from '@shopify/react-native-skia';
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Image, PixelRatio } from 'react-native';
 import {
-  runOnUI,
   useDerivedValue,
   useFrameCallback,
   useSharedValue,
@@ -18,6 +17,7 @@ import { colors } from '#theme';
 import BoxSelectionList from '#components/BoxSelectionList';
 import { DoneHeaderButton } from '#components/commonsButtons';
 import { keyExtractor } from '#helpers/idHelpers';
+import { drawOffScreen, useOffScreenSurface } from '#helpers/skiaHelpers';
 import useBoolean from '#hooks/useBoolean';
 import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
@@ -36,7 +36,7 @@ import type {
   CoverTransitions,
   CoverTransitionsListItem,
 } from '../../coverDrawer/coverTransitions';
-import type { SkImageFilter, SkSurface } from '@shopify/react-native-skia';
+import type { SkImageFilter } from '@shopify/react-native-skia';
 
 const CoverEditorTransitionTool = () => {
   const [show, open, close] = useBoolean(false);
@@ -214,43 +214,23 @@ const TransitionPreview = ({
     animationStateSharedValue.value = { animationTime, isPaused, reversed };
   });
 
-  const pixelRatio = PixelRatio.get();
-  const surfaceShared = useSharedValue<SkSurface | null>(null);
-  useEffect(() => {
-    runOnUI(() => {
-      surfaceShared.value?.dispose();
-      surfaceShared.value = Skia.Surface.MakeOffscreen(
-        width * pixelRatio,
-        height * pixelRatio,
-      );
-      if (!surfaceShared.value) {
-        console.error('Failed to create surface');
-      }
-    })();
-  }, [height, pixelRatio, surfaceShared, width]);
-
+  const surface = useOffScreenSurface(width, height);
   const image = useDerivedValue(() => {
-    const surface = surfaceShared.value;
     if (!previewIn || !previewOut || !surface) {
       return null;
     }
-    const canvas = surface.getCanvas();
-    canvas.clear(Skia.Color('#00000000'));
-    const { animationTime, reversed } = animationStateSharedValue.value;
-    transition({
-      canvas,
-      time: animationTime / ANIMATION_TIME_SCALE,
-      inImage: reversed ? previewIn : previewOut,
-      outImage: reversed ? previewOut : previewIn,
-      width: width * pixelRatio,
-      height: height * pixelRatio,
+    return drawOffScreen(surface, (canvas, width, height) => {
+      canvas.clear(Skia.Color('#00000000'));
+      const { animationTime, reversed } = animationStateSharedValue.value;
+      transition({
+        canvas,
+        time: animationTime / ANIMATION_TIME_SCALE,
+        inImage: reversed ? previewIn : previewOut,
+        outImage: reversed ? previewOut : previewIn,
+        width,
+        height,
+      });
     });
-    surface.flush();
-    return Skia.Image.MakeImageFromNativeTextureUnstable(
-      surface.getNativeTextureUnstable(),
-      width * pixelRatio,
-      height * pixelRatio,
-    );
   });
 
   return (

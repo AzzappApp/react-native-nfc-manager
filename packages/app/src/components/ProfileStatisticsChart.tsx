@@ -1,10 +1,4 @@
-import {
-  Canvas,
-  createPicture,
-  Picture,
-  Skia,
-  TileMode,
-} from '@shopify/react-native-skia';
+import { Canvas, Image, Skia, TileMode } from '@shopify/react-native-skia';
 import { memo, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { View } from 'react-native';
@@ -14,6 +8,7 @@ import {
   createVariantsStyleSheet,
   useVariantStyleSheet,
 } from '#helpers/createStyles';
+import { drawOffScreen, useOffScreenSurface } from '#helpers/skiaHelpers';
 import Text from '#ui/Text';
 import type { DerivedValue } from 'react-native-reanimated';
 
@@ -89,55 +84,48 @@ const BarChart = ({
   height: number;
   variant?: 'dark' | 'light';
 }) => {
-  const picture = useDerivedValue(() => {
-    const data = Array.isArray(propData) ? propData : propData.value;
-    const barWidth =
-      (width - CHART_BAR_SEPARATOR * (data.length - 1)) / data.length;
+  const surface = useOffScreenSurface(width, height);
+  const image = useDerivedValue(() => {
+    return drawOffScreen(surface, (canvas, width, height) => {
+      const data = Array.isArray(propData) ? propData : propData.value;
+      const barWidth =
+        (width - CHART_BAR_SEPARATOR * (data.length - 1)) / data.length;
 
-    return createPicture(
-      canvas => {
-        canvas.clear(Skia.Color('#00000000'));
-        const paint = Skia.Paint();
-        paint.setShader(
-          Skia.Shader.MakeLinearGradient(
-            { x: 0, y: 0 },
-            { x: 0, y: height },
-            variant === 'dark'
-              ? [Skia.Color('#FFFFFFFF'), Skia.Color('#FFFFFF00')]
-              : [Skia.Color(colors.black), Skia.Color('#FFFFFFFF')],
-            null,
-            TileMode.Clamp,
-          ),
+      canvas.clear(Skia.Color('#00000000'));
+      const paint = Skia.Paint();
+      paint.setShader(
+        Skia.Shader.MakeLinearGradient(
+          { x: 0, y: 0 },
+          { x: 0, y: height },
+          variant === 'dark'
+            ? [Skia.Color('#FFFFFFFF'), Skia.Color('#FFFFFF00')]
+            : [Skia.Color(colors.black), Skia.Color('#FFFFFFFF')],
+          null,
+          TileMode.Clamp,
+        ),
+      );
+
+      data.forEach((value, index) => {
+        const barHeight = 0.05 * height + value * (height * 0.9);
+        const x = index * (barWidth + CHART_BAR_SEPARATOR);
+        const y = height - barHeight;
+        canvas.drawRRect(
+          {
+            rect: { x, y, width: barWidth, height: barHeight },
+            topLeft: { x: barWidth / 2, y: barWidth / 2 },
+            topRight: { x: barWidth / 2, y: barWidth / 2 },
+            bottomLeft: { x: 0, y: 0 },
+            bottomRight: { x: 0, y: 0 },
+          },
+          paint,
         );
-
-        data.forEach((value, index) => {
-          const barHeight = 0.05 * height + value * (height * 0.9);
-          const x = index * (barWidth + CHART_BAR_SEPARATOR);
-          const y = height - barHeight;
-          canvas.drawRRect(
-            {
-              rect: { x, y, width: barWidth, height: barHeight },
-              topLeft: { x: barWidth / 2, y: barWidth / 2 },
-              topRight: { x: barWidth / 2, y: barWidth / 2 },
-              bottomLeft: { x: 0, y: 0 },
-              bottomRight: { x: 0, y: 0 },
-            },
-            paint,
-          );
-        });
-      },
-      {
-        x: 0,
-        y: 0,
-        width,
-        height,
-      },
-    );
+      });
+    });
   });
 
   return (
     <Canvas style={{ width, height }} opaque>
-      <Picture picture={picture} />
+      <Image image={image} x={0} y={0} width={width} height={height} />
     </Canvas>
   );
 };

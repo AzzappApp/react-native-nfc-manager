@@ -1,9 +1,4 @@
-import {
-  createPicture,
-  Canvas,
-  Picture,
-  Skia,
-} from '@shopify/react-native-skia';
+import { Canvas, Skia, Image } from '@shopify/react-native-skia';
 import { memo, useCallback, useMemo, useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet, Alert } from 'react-native';
@@ -27,6 +22,7 @@ import {
   useLutTexture,
   useNativeTexture,
 } from '#helpers/mediaEditions';
+import { drawOffScreen, useOffScreenSurface } from '#helpers/skiaHelpers';
 import useBoolean from '#hooks/useBoolean';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Header from '#ui/Header';
@@ -272,25 +268,25 @@ const AnimationPreview = ({
   const imageAnimation = mediaAnimations[animationId];
 
   const startTime = useMemo(() => Date.now(), []);
-  const animationStateSharedValue = useSharedValue(0);
 
+  const image = useSharedValue<SkImage | null>(null);
+  const surface = useOffScreenSurface(width, height);
   useFrameCallback(() => {
-    animationStateSharedValue.value =
-      (((Date.now() - startTime) / 1000) % duration) / duration;
-  });
-
-  const picture = useDerivedValue(() =>
-    createPicture(canvas => {
-      if (!imageAnimation || !skImage?.value) {
-        return;
-      }
-      const imageInfo = imageAnimation(animationStateSharedValue.value)({
+    const sourceImage = skImage?.value;
+    if (!sourceImage) {
+      image.value = null;
+      return;
+    }
+    image.value = drawOffScreen(surface, (canvas, width, height) => {
+      const progress =
+        (((Date.now() - startTime) / 1000) % duration) / duration;
+      const imageInfo = imageAnimation(progress)({
         matrix: Skia.Matrix(),
-        width: skImage.value.width(),
-        height: skImage.value.height(),
+        width: sourceImage.width(),
+        height: sourceImage.height(),
       });
       const imageFilter = transformImage({
-        image: skImage.value,
+        image: sourceImage,
         imageInfo,
         targetWidth: width,
         targetHeight: height,
@@ -300,13 +296,13 @@ const AnimationPreview = ({
       const paint = Skia.Paint();
       paint.setImageFilter(imageFilter);
       canvas.drawPaint(paint);
-    }),
-  );
+    });
+  }, true);
 
   return (
     <View style={{ height, width }}>
       <Canvas style={{ width, height }} opaque>
-        <Picture picture={picture} />
+        <Image image={image} x={0} y={0} width={width} height={height} />
       </Canvas>
     </View>
   );

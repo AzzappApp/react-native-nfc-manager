@@ -1,9 +1,4 @@
-import {
-  createPicture,
-  Canvas,
-  Picture,
-  Skia,
-} from '@shopify/react-native-skia';
+import { Canvas, Skia, Image } from '@shopify/react-native-skia';
 import { memo, useCallback, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
@@ -30,6 +25,7 @@ import {
   useLutTexture,
   useNativeTexture,
 } from '#helpers/mediaEditions';
+import { drawOffScreen, useOffScreenSurface } from '#helpers/skiaHelpers';
 import useBoolean from '#hooks/useBoolean';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import DoubleSlider from '#ui/DoubleSlider';
@@ -269,26 +265,24 @@ const AnimationPreview = ({
   const animation = overlayAnimations[animationId];
 
   const startTime = useMemo(() => Date.now(), []);
-  const animationStateSharedValue = useSharedValue(0);
-
+  const image = useSharedValue<SkImage | null>(null);
+  const surface = useOffScreenSurface(width, height);
   useFrameCallback(() => {
-    animationStateSharedValue.value = ((Date.now() - startTime) % 3000) / 3000;
-  });
-
-  const picture = useDerivedValue(() =>
-    createPicture(canvas => {
-      if (!animation || !skImage?.value) {
-        return;
-      }
+    const sourceImage = skImage?.value;
+    if (!sourceImage) {
+      image.value = null;
+      return;
+    }
+    image.value = drawOffScreen(surface, (canvas, width, height) => {
       const { animateCanvas, animatePaint } = animation(
-        animationStateSharedValue.value,
+        ((Date.now() - startTime) % 3000) / 3000,
       );
       const paint = Skia.Paint();
       const imageFilter = transformImage({
-        image: skImage.value,
+        image: sourceImage,
         imageInfo: {
-          width: skImage.value.width(),
-          height: skImage.value.height(),
+          width: sourceImage.width(),
+          height: sourceImage.height(),
           matrix: Skia.Matrix(),
         },
         targetWidth: width,
@@ -301,13 +295,13 @@ const AnimationPreview = ({
       animateCanvas?.(canvas, rect);
       animatePaint?.(paint, rect);
       canvas.drawPaint(paint);
-    }),
-  );
+    });
+  }, true);
 
   return (
     <View style={{ height, width }}>
       <Canvas style={{ width, height }} opaque>
-        <Picture picture={picture} />
+        <Image image={image} x={0} y={0} width={width} height={height} />
       </Canvas>
     </View>
   );

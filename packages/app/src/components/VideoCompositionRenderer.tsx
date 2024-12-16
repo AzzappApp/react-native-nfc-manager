@@ -1,17 +1,18 @@
 import { Canvas, Image, Skia } from '@shopify/react-native-skia';
 import { useEffect, useMemo, useRef } from 'react';
-import { PixelRatio, type ViewProps } from 'react-native';
+import { type ViewProps } from 'react-native';
 import {
   runOnUI,
   useFrameCallback,
   useSharedValue,
 } from 'react-native-reanimated';
 import { __RNSkiaVideoPrivateAPI } from '@azzapp/react-native-skia-video';
+import { drawOffScreen, useOffScreenSurface } from '#helpers/skiaHelpers';
 import type {
   FrameDrawer,
   VideoComposition,
 } from '@azzapp/react-native-skia-video';
-import type { SkSurface, SkImage } from '@shopify/react-native-skia';
+import type { SkImage } from '@shopify/react-native-skia';
 import type { MutableRefObject } from 'react';
 
 export type VideoCompositionRendererProps = Exclude<ViewProps, 'children'> & {
@@ -80,8 +81,7 @@ const VideoCompositionRenderer = ({
     }
   }, [framesExtractor, pause]);
 
-  const pixelRatio = PixelRatio.get();
-  const surfaceShared = useSharedValue<SkSurface | null>(null);
+  const surface = useOffScreenSurface(width, height);
   const image = useSharedValue<SkImage | null>(null);
 
   const widthRef = useRef(width);
@@ -96,37 +96,24 @@ const VideoCompositionRenderer = ({
 
   useFrameCallback(() => {
     'worklet';
-    if (!surfaceShared.value) {
-      surfaceShared.value = Skia.Surface.MakeOffscreen(
-        width * pixelRatio,
-        height * pixelRatio,
-      );
-    }
-    const surface = surfaceShared.value!;
-    const canvas = surface.getCanvas();
-    canvas.clear(Skia.Color('#00000000'));
+    image.value = drawOffScreen(surface, (canvas, width, height) => {
+      canvas.clear(Skia.Color('#00000000'));
 
-    if (!composition || !framesExtractor) {
-      return;
-    }
-    const currentTime = framesExtractor.currentTime;
-    const frames = framesExtractor.decodeCompositionFrames();
-    drawFrame({
-      context: undefined,
-      canvas,
-      width: width * pixelRatio,
-      height: height * pixelRatio,
-      currentTime,
-      frames,
-      videoComposition: composition,
+      if (!composition || !framesExtractor) {
+        return;
+      }
+      const currentTime = framesExtractor.currentTime;
+      const frames = framesExtractor.decodeCompositionFrames();
+      drawFrame({
+        context: undefined,
+        canvas,
+        width,
+        height,
+        currentTime,
+        frames,
+        videoComposition: composition,
+      });
     });
-    surface.flush();
-
-    image.value = Skia.Image.MakeImageFromNativeTextureUnstable(
-      surface.getNativeTextureUnstable(),
-      width * pixelRatio,
-      height * pixelRatio,
-    );
     global.gc?.();
   }, true);
 
