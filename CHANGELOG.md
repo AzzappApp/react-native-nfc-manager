@@ -1,4 +1,4 @@
-## 1.4.1-canary.71
+## 1.4.1-canary.72
 
 * **fix:**  - [module] potential done bouton not closing the picker ([#6375](https://github.com/AzzappApp/azzapp/pull/6375))
 * **feat:**  - improve module animation container ([#6378](https://github.com/AzzappApp/azzapp/pull/6378))
