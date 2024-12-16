@@ -1,5 +1,6 @@
-## 1.4.1-canary.72
+## 1.4.1-canary.73
 
+* **fix:**  - textLink button only full with for alternation mobile ([#6386](https://github.com/AzzappApp/azzapp/pull/6386))
 * **fix:**  - [module] potential done bouton not closing the picker ([#6375](https://github.com/AzzappApp/azzapp/pull/6375))
 * **feat:**  - improve module animation container ([#6378](https://github.com/AzzappApp/azzapp/pull/6378))
 * **fix:**  - Filtered Image/video cannot be resizeMode. Stretch result if container is not the same ratio. Manually calculate the cropData for display only. Compression is working fine ([#6366](https://github.com/AzzappApp/azzapp/pull/6366))
