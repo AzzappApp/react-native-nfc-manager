@@ -18,9 +18,9 @@ import TransformedImageRenderer from '#components/TransformedImageRenderer';
 import { keyExtractor } from '#helpers/idHelpers';
 import {
   createImageFromNativeTexture,
+  scaleCropData,
   transformImage,
   useLutTexture,
-  useNativeTexture,
 } from '#helpers/mediaEditions';
 import { drawOffScreen, useOffScreenSurface } from '#helpers/skiaHelpers';
 import useBoolean from '#hooks/useBoolean';
@@ -37,7 +37,6 @@ import {
   useCoverEditorEditContext,
 } from '../../CoverEditorContext';
 import ToolBoxSection from '../ui/ToolBoxSection';
-
 import type { BoxButtonItemInfo } from '#components/BoxSelectionList';
 import type { EditionParameters } from '#helpers/mediaEditions';
 import type { TextureInfo } from '#helpers/mediaEditions/NativeTextureLoader';
@@ -50,6 +49,7 @@ import type { DerivedValue } from 'react-native-reanimated';
 
 const CoverEditorMediaImageAnimationTool = () => {
   const [show, open, close] = useBoolean(false);
+  const coverEditorState = useCoverEditorContext();
   const activeMedia = useCoverEditorActiveImageMedia();
   const { medias } = useCoverEditorContext();
   const hasMultipleMedias =
@@ -68,10 +68,9 @@ const CoverEditorMediaImageAnimationTool = () => {
     [dispatch],
   );
 
-  const textureInfo = useNativeTexture({
-    uri: activeMedia?.uri,
-    kind: activeMedia?.kind,
-  });
+  const textureInfo = useMemo(() => {
+    return activeMedia ? coverEditorState.images[activeMedia.id] : null;
+  }, [activeMedia, coverEditorState.images]);
 
   const skImage = useDerivedValue(() => {
     if (!textureInfo) {
@@ -79,6 +78,16 @@ const CoverEditorMediaImageAnimationTool = () => {
     }
     return createImageFromNativeTexture(textureInfo);
   }, [textureInfo]);
+
+  const imageScale = coverEditorState.imagesScales[activeMedia?.id ?? ''] ?? 1;
+  const editionParameters = useMemo(() => {
+    return {
+      ...activeMedia?.editionParameters,
+      cropData: activeMedia?.editionParameters?.cropData
+        ? scaleCropData(activeMedia.editionParameters.cropData, imageScale)
+        : undefined,
+    };
+  }, [activeMedia?.editionParameters, imageScale]);
 
   const onChangeDurationSlider = useCallback(
     (duration: number) => {
@@ -121,7 +130,7 @@ const CoverEditorMediaImageAnimationTool = () => {
             height={height}
             width={width}
             skImage={skImage}
-            editionParameters={activeMedia?.editionParameters}
+            editionParameters={editionParameters}
             duration={activeMedia?.duration}
             lutTexture={lutTexture}
           />
@@ -134,11 +143,11 @@ const CoverEditorMediaImageAnimationTool = () => {
           height={height}
           width={width}
           filter={activeMedia?.filter}
-          editionParameters={activeMedia?.editionParameters}
+          editionParameters={editionParameters}
         />
       );
     },
-    [activeMedia, lutTexture, skImage],
+    [activeMedia, editionParameters, lutTexture, skImage],
   );
 
   const onFinished = useCallback(() => {

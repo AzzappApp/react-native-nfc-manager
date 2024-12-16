@@ -21,9 +21,9 @@ import TransformedImageRenderer from '#components/TransformedImageRenderer';
 import { keyExtractor } from '#helpers/idHelpers';
 import {
   createImageFromNativeTexture,
+  scaleCropData,
   transformImage,
   useLutTexture,
-  useNativeTexture,
 } from '#helpers/mediaEditions';
 import { drawOffScreen, useOffScreenSurface } from '#helpers/skiaHelpers';
 import useBoolean from '#hooks/useBoolean';
@@ -97,10 +97,20 @@ const CoverEditorOverlayImageAnimationTool = () => {
     [dispatch],
   );
 
-  const textureInfo = useNativeTexture({
-    uri: activeOverlay?.uri,
-    kind: activeOverlay?.kind,
-  });
+  const textureInfo = useMemo(() => {
+    return activeOverlay ? coverEditorState.images[activeOverlay.id] : null;
+  }, [activeOverlay, coverEditorState.images]);
+
+  const imageScale =
+    coverEditorState.imagesScales[activeOverlay?.id ?? ''] ?? 1;
+  const editionParameters = useMemo(() => {
+    return {
+      ...activeOverlay?.editionParameters,
+      cropData: activeOverlay?.editionParameters?.cropData
+        ? scaleCropData(activeOverlay.editionParameters.cropData, imageScale)
+        : undefined,
+    };
+  }, [activeOverlay?.editionParameters, imageScale]);
 
   const skImage = useDerivedValue(() => {
     if (!textureInfo) {
@@ -136,7 +146,7 @@ const CoverEditorOverlayImageAnimationTool = () => {
             height={height}
             width={width}
             skImage={skImage}
-            editionParameters={activeOverlay.editionParameters}
+            editionParameters={editionParameters}
             lutTexture={lutTexture}
           />
         );
@@ -148,11 +158,11 @@ const CoverEditorOverlayImageAnimationTool = () => {
           height={height}
           width={width}
           filter={activeOverlay?.filter}
-          editionParameters={activeOverlay?.editionParameters}
+          editionParameters={editionParameters}
         />
       );
     },
-    [activeOverlay, lutTexture, skImage],
+    [activeOverlay, editionParameters, lutTexture, skImage],
   );
 
   const imageRatio = activeOverlay

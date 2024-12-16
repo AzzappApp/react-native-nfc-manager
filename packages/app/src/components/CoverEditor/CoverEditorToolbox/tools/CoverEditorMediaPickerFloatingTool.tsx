@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import { StyleSheet } from 'react-native';
 import { maximumCoverFromScratch } from '#components/CoverEditor/CoverEditor';
-import { getMaxAllowedVideosPerCover } from '#components/CoverEditor/coverEditorHelpers';
+import { MAX_ALLOWED_VIDEOS_BY_COVER } from '#components/CoverEditor/coverEditorHelpers';
 import { ScreenModal } from '#components/NativeRouter';
 import useBoolean from '#hooks/useBoolean';
 import Icon from '#ui/Icon';
@@ -67,7 +67,7 @@ const CoverEditorMediaPickerFloatingTool = ({
             onFinished={onMediasPicked}
             durations={durations}
             durationsFixed={durationsFixed}
-            maxSelectableVideos={getMaxAllowedVideosPerCover(!!cover.lottie)}
+            maxSelectableVideos={MAX_ALLOWED_VIDEOS_BY_COVER}
             onClose={hideImagePicker}
           />
         )}

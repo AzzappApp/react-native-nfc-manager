@@ -46,6 +46,7 @@ import {
   getLottieMediasDurations,
   copyCoverMediaToCacheDir,
   useLottieMediaDurations,
+  MAX_ALLOWED_VIDEOS_BY_COVER,
 } from './coverEditorHelpers';
 import CoverEditorMediaPicker from './CoverEditorMediaPicker';
 import { coverEditorReducer } from './coverEditorReducer';
@@ -745,9 +746,7 @@ const CoverEditorCore = (
         }
         durations={durations}
         durationsFixed={!!coverEditorState.lottie}
-        maxSelectableVideos={getMaxAllowedVideosPerCover(
-          !!coverEditorState.lottie,
-        )}
+        maxSelectableVideos={MAX_ALLOWED_VIDEOS_BY_COVER}
         onFinished={onMediasPicked}
         onClose={onCancel}
       />
