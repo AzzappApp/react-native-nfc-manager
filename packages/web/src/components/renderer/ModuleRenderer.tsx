@@ -51,9 +51,7 @@ const renderers: {
   blockText: BlockTextRenderer,
   carousel: CarouselRenderer,
   horizontalPhoto: HorizontalPhotoRenderer,
-  imageGrid: () => null,
   lineDivider: LineDividerRenderer,
-  parallax: () => null,
   photoWithTextAndTitle: PhotoWithTextAndTitleRenderer,
   simpleButton: SimpleButtonRenderer,
   simpleTitle: SimpleTextRenderer,
@@ -62,9 +60,6 @@ const renderers: {
   media: MediaRenderer,
   mediaText: MediaTextLinkRenderer, // mediaText and mediaTextLink are very close in terms of rendering
   mediaTextLink: MediaTextLinkRenderer,
-  schedule: () => null,
-  video: () => null,
-  webCardsCarousel: () => null,
 };
 
 export default ModuleRenderer;

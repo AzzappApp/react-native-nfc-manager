@@ -51,6 +51,7 @@ export const MediaTextLinkModuleRendererFragment = graphql`
         }
         ... on MediaVideo {
           #will be use when we are gonna stop playing a video. still TODO
+          uri(width: $screenWidth, pixelRatio: $pixelRatio)
           thumbnail(width: $screenWidth, pixelRatio: $pixelRatio)
           smallThumbnail: thumbnail(
             width: 125 #use for the small preview in toolbox

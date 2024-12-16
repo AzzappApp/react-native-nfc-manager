@@ -1,25 +1,17 @@
 import { memo, useEffect, useState } from 'react';
-import ReactNativeBlobUtil from 'react-native-blob-util';
-import {
-  runOnJS,
-  useAnimatedReaction,
-  useDerivedValue,
-} from 'react-native-reanimated';
-import { MAX_VIDEO_THUMBNAIL_SIZE } from '#components/ImagePicker/ImagePickerContext';
+import { useDerivedValue } from 'react-native-reanimated';
 import TransformedImageRenderer from '#components/TransformedImageRenderer';
 import TransformedVideoRenderer from '#components/TransformedVideoRenderer';
 import {
   createImageFromNativeTexture,
-  NativeTextureLoader,
-  scaleCropDataIfNecessary,
+  useNativeTexture,
 } from '#helpers/mediaEditions';
-import { copyCoverMediaToCacheDir } from '#helpers/mediaHelpers';
-import {
-  CARD_MEDIA_VIDEO_DEFAULT_DURATION,
-  MAX_IMAGE_CARD_MODULE_PREVIEW_SIZE,
+import { CARD_MEDIA_VIDEO_DEFAULT_DURATION } from './cardModuleEditorType';
+import type { CropData } from '#helpers/mediaEditions';
+import type {
+  CardModuleSourceMedia,
+  CardModuleVideo,
 } from './cardModuleEditorType';
-import type { TextureInfo } from '#helpers/mediaEditions/NativeTextureLoader';
-import type { CardModuleSourceMedia } from './cardModuleEditorType';
 
 type CardModuleMediaEditPreviewProps = {
   media: CardModuleSourceMedia;
@@ -32,14 +24,41 @@ const CardModuleMediaEditPreview = ({
   itemWidth,
   itemHeight,
 }: CardModuleMediaEditPreviewProps) => {
-  const { cropData, ...editionParameters } = media.editionParameters ?? {};
-
   if (!media) {
     return null;
   }
 
   return media.kind === 'video' ? (
+    <VideoRender media={media} itemWidth={itemWidth} itemHeight={itemHeight} />
+  ) : (
+    <ImageRender media={media} itemWidth={itemWidth} itemHeight={itemHeight} />
+  );
+};
+
+const VideoRender = ({
+  media,
+  itemWidth,
+  itemHeight,
+}: {
+  media: CardModuleVideo;
+  itemWidth: number;
+  itemHeight: number;
+}) => {
+  // ATTENTION: Video does not handle resize in real time(changing height and width).
+  // something that is happning with desktop/mobile preview mode switching
+  // We will need to re-render the component to apply the new size.
+  // if you have a better way, please let me know
+  const { cropData, ...editionParameters } = media.editionParameters ?? {};
+  const [renderKey, setRenderKey] = useState(0);
+
+  useEffect(() => {
+    // Force re-render when itemWidth or itemHeight changes. hate doing this
+    setRenderKey(prevKey => prevKey + 1);
+  }, [itemWidth, itemHeight]);
+
+  return (
     <TransformedVideoRenderer
+      key={renderKey}
       testID="card-module-media-edit-preview-video"
       video={media}
       width={itemWidth}
@@ -47,14 +66,14 @@ const CardModuleMediaEditPreview = ({
       filter={media.filter}
       editionParameters={{
         ...editionParameters,
-        cropData,
+        cropData: cropData
+          ? calculateCropData(cropData, itemWidth, itemHeight)
+          : null,
       }}
       startTime={media.timeRange?.startTime ?? 0}
       duration={media.timeRange?.duration ?? CARD_MEDIA_VIDEO_DEFAULT_DURATION}
       maxResolution={itemWidth * 2}
     />
-  ) : (
-    <ImageRender media={media} itemWidth={itemWidth} itemHeight={itemHeight} />
   );
 };
 
@@ -69,51 +88,10 @@ const ImageRender = ({
 }) => {
   const { cropData, ...editionParameters } = media.editionParameters ?? {};
 
-  const [textureInfo, setTextureInfo] = useState<TextureInfo | null>(null);
-
-  useEffect(() => {
-    const canceled = false;
-    const abortController = new AbortController();
-    let refKey: string | null = null;
-    (async () => {
-      const cacheDir = `${ReactNativeBlobUtil.fs.dirs.CacheDir}/modules`;
-      const filename = await copyCoverMediaToCacheDir(
-        media,
-        cacheDir,
-        abortController.signal,
-      );
-
-      const { key, promise } =
-        media.kind === 'video'
-          ? NativeTextureLoader.loadVideoThumbnail(
-              `file://${cacheDir}/${filename}`,
-              media.timeRange?.startTime,
-              MAX_VIDEO_THUMBNAIL_SIZE,
-            )
-          : NativeTextureLoader.loadImage(
-              `file://${cacheDir}/${filename}`,
-              MAX_IMAGE_CARD_MODULE_PREVIEW_SIZE,
-            );
-      refKey = key;
-
-      const buffer = await promise;
-
-      NativeTextureLoader.ref(refKey);
-
-      setTextureInfo(buffer);
-
-      if (canceled) {
-        return;
-      }
-    })();
-
-    return () => {
-      if (refKey) {
-        NativeTextureLoader.unref(refKey);
-      }
-      abortController.abort();
-    };
-  }, [media]);
+  const textureInfo = useNativeTexture({
+    uri: media?.uri,
+    kind: media?.kind,
+  });
 
   const skImage = useDerivedValue(() => {
     if (!textureInfo) {
@@ -121,19 +99,6 @@ const ImageRender = ({
     }
     return createImageFromNativeTexture(textureInfo);
   }, [textureInfo]);
-
-  const [skImageWidth, setSkImageWidth] = useState<number | null>(null);
-
-  useAnimatedReaction(
-    () => skImage.value,
-    skImage => {
-      if (skImage) {
-        runOnJS(setSkImageWidth)(skImage.width());
-      } else {
-        runOnJS(setSkImageWidth)(null);
-      }
-    },
-  );
 
   if (!media || !skImage || !textureInfo) {
     return null;
@@ -149,11 +114,45 @@ const ImageRender = ({
       editionParameters={{
         ...editionParameters,
         cropData: cropData
-          ? scaleCropDataIfNecessary(cropData, media, skImageWidth)
+          ? calculateCropData(cropData, itemWidth, itemHeight)
           : null,
       }}
     />
   );
 };
 
+const calculateCropData = (
+  cropData: CropData,
+  itemWidth: number,
+  itemHeight: number,
+) => {
+  const imageAspectRatio = cropData.width / cropData.height;
+  const itemAspectRatio = itemWidth / itemHeight;
+
+  let cropWidth;
+  let cropHeight;
+  let originX;
+  let originY;
+
+  if (imageAspectRatio > itemAspectRatio) {
+    // Image is wider than the container
+    cropHeight = cropData.height;
+    cropWidth = cropHeight * itemAspectRatio;
+    originX = (cropData.width - cropWidth) / 2;
+    originY = 0;
+  } else {
+    // Image is taller than the container
+    cropWidth = cropData.width;
+    cropHeight = cropWidth / itemAspectRatio;
+    originX = 0;
+    originY = (cropData.height - cropHeight) / 2;
+  }
+
+  return {
+    width: cropWidth,
+    height: cropHeight,
+    originX,
+    originY,
+  };
+};
 export default memo(CardModuleMediaEditPreview);

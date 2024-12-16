@@ -168,6 +168,7 @@ const ParallaxItem = ({
                 backgroundColor: cardModuleColor.content,
               },
               styles.buttonLink,
+              viewMode === 'mobile' && { width: '100%' },
             ]}
             onPress={openLink}
           >

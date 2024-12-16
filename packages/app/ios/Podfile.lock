@@ -2961,7 +2961,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   azzapp-react-native-buffer-loader: f85ec38f698535c0884d76a592b828b755cde3ae
-  azzapp-react-native-skia-video: 969094d0764270f7cdffa09b0bfd2dfa9519793a
+  azzapp-react-native-skia-video: 88c368da25f2015bc03e8098e5fdb2922cd7bdf4
   azzapp-react-native-snapshot-view: ec5ac33dae592e7bb678b4563e5c4108895af284
   boost: 1dca942403ed9342f98334bf4c3621f011aa7946
   DoubleConversion: f16ae600a246532c4020132d54af21d0ddb2a385
@@ -3045,7 +3045,7 @@ SPEC CHECKSUMS:
   react-native-passkit: 7c6871f610512070594e764443e253a45d7ea0cb
   react-native-quick-base64: 6ddd4121d8dcb412ad32ca5fa67633dbea8d3761
   react-native-safe-area-context: 2500e4fe998caad50ad3bc51ec23ef951308569e
-  react-native-skia: 70f4f32da1158e3c196cfa62f4c8e8b961fe9a32
+  react-native-skia: bcbabbd748dd4c9ec02f33df07fa49d1d76fc8c0
   react-native-skottie-template-player: f941ab87bf4695ed69350a1ccb6cbf9642efc49d
   react-native-webview: 0bd56be54d01756f20eb942dad37a2cd22a6def2
   React-nativeconfig: 470fce6d871c02dc5eff250a362d56391b7f52d6
