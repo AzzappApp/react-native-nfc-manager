@@ -42,7 +42,6 @@ import CoverEditorContextProvider from './CoverEditorContext';
 import {
   extractLottieInfoMemoized,
   calculateImageScale,
-  getMaxAllowedVideosPerCover,
   getLottieMediasDurations,
   copyCoverMediaToCacheDir,
   useLottieMediaDurations,
