@@ -3,29 +3,37 @@ import { useIntl } from 'react-intl';
 import { Image } from 'react-native';
 import useNativeTexture from './useNativeTexture';
 import type { Filter } from '@azzapp/shared/filtersHelper';
+import type { ImageSourcePropType } from 'react-native';
 
-export const FILTERS: Record<Filter, any> = {
-  nah: require('./assets/nah.png'),
-  once: require('./assets/once.png'),
-  passing_by: require('./assets/passing_by.png'),
-  serenity: require('./assets/serenity.png'),
-  solar: require('./assets/solar.png'),
-  undeniable: require('./assets/undeniable.png'),
-  undeniable2: require('./assets/undeniable2.png'),
-  you_can_do_it: require('./assets/you_can_do_it.png'),
-  pure: require('./assets/pure.png'),
-  syrah: require('./assets/syrah.png'),
-  paper: require('./assets/paper.png'),
-  rock: require('./assets/rock.png'),
-  vouzon: require('./assets/vouzon.png'),
+const getUri = (source: ImageSourcePropType) => {
+  // Question mark for jest
+  return Image.resolveAssetSource(source)?.uri;
+};
+
+export const FILTERS: Record<Filter, string> = {
+  nah: getUri(require('./assets/nah.png')),
+  once: getUri(require('./assets/once.png')),
+  passing_by: getUri(require('./assets/passing_by.png')),
+  serenity: getUri(require('./assets/serenity.png')),
+  solar: getUri(require('./assets/solar.png')),
+  undeniable: getUri(require('./assets/undeniable.png')),
+  undeniable2: getUri(require('./assets/undeniable2.png')),
+  you_can_do_it: getUri(require('./assets/you_can_do_it.png')),
+  pure: getUri(require('./assets/pure.png')),
+  syrah: getUri(require('./assets/syrah.png')),
+  paper: getUri(require('./assets/paper.png')),
+  rock: getUri(require('./assets/rock.png')),
+  vouzon: getUri(require('./assets/vouzon.png')),
   // BIG UP @mlecoq
-  transparency: require('./assets/transparency.png'),
-  autumn: require('./assets/autumn.png'),
-  one_of_us: require('./assets/one_of_us.png'),
-  bourbon: require('./assets/bourbon.png'),
-  black_and_white_light: require('./assets/black_and_white_light.png'),
-  black_and_white_neutral: require('./assets/black_and_white_neutral.png'),
-  black_and_white_old: require('./assets/black_and_white_old.png'),
+  transparency: getUri(require('./assets/transparency.png')),
+  autumn: getUri(require('./assets/autumn.png')),
+  one_of_us: getUri(require('./assets/one_of_us.png')),
+  bourbon: getUri(require('./assets/bourbon.png')),
+  black_and_white_light: getUri(require('./assets/black_and_white_light.png')),
+  black_and_white_neutral: getUri(
+    require('./assets/black_and_white_neutral.png'),
+  ),
+  black_and_white_old: getUri(require('./assets/black_and_white_old.png')),
 } as const;
 
 // create an array to have filter in the same order as the designer want
@@ -281,7 +289,7 @@ export const getLutURI = (filter: Filter) => {
   if (process.env.JEST_WORKER_ID) {
     return null;
   }
-  const filterImage = Image.resolveAssetSource(FILTERS[filter])?.uri;
+  const filterImage = FILTERS[filter];
   if (!filterImage) {
     console.warn(`Unknown filter ${filter}`);
     return null;

@@ -42,14 +42,29 @@ public class BufferLoader {
     this.bufferLoaderPtr = bufferLoaderPtr;
   }
 
-  public String loadImage(String uri, double width, double height) {
-    return enqueueTask(width, height, () ->
-      Glide
-        .with(AzzappRNBufferLoaderModule.currentReactApplicationContext())
-        .asBitmap()
-        .load(uri)
-        .submit()
-        .get()
+  public String loadImage(String uriStr, double width, double height) {
+    return enqueueTask(width, height, () -> {
+        Uri uri = Uri.parse(uriStr);
+        if (uriStr != null && (uri == null || uri.getScheme() == null)) {
+          int resId = AzzappRNBufferLoaderModule.currentReactApplicationContext()
+            .getResources()
+            .getIdentifier(uriStr, "drawable",
+              AzzappRNBufferLoaderModule.currentReactApplicationContext().getPackageName());
+          if (resId != 0) {
+            uri = Uri.parse("android.resource://"
+              + AzzappRNBufferLoaderModule.currentReactApplicationContext().getPackageName()
+              + "/" + resId);
+          } else {
+            throw new IllegalArgumentException("Invalid URI or asset ID: " + uriStr);
+          }
+        }
+        return Glide
+          .with(AzzappRNBufferLoaderModule.currentReactApplicationContext())
+          .asBitmap()
+          .load(uri)
+          .submit()
+          .get();
+      }
     );
   }
 

@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react-native';
 import { useAssets } from 'expo-asset';
 import {
   forwardRef,
@@ -525,6 +526,7 @@ const CoverEditorCore = (
         if (canceled) {
           return;
         }
+        Sentry.captureException(error);
         dispatch({
           type: 'LOADING_ERROR',
           payload: {
