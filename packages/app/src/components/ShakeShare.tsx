@@ -94,7 +94,7 @@ export default ShakeShare;
 
 const { width } = Dimensions.get('window');
 
-const QR_CODE_WIDTH = Math.round(width * 0.6);
+const QR_CODE_WIDTH = Math.round(width * 0.5);
 
 const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
   const profileInfos = useProfileInfos();
@@ -175,51 +175,52 @@ const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
                   <ImageSVG svg={svg} />
                 </Group>
               </Canvas>
-              <Text style={styles.subtitle} appearance="dark">
+              <Text style={styles.subtitle} appearance="dark" variant="button">
                 <FormattedMessage
                   defaultMessage="Point your camera at the QR Code to save the ContactCard"
                   description="Shake and share subtitle"
                 />
               </Text>
             </View>
-
-            {profile && (
-              <ContactCardExportVcf
-                profile={profile}
-                appearance="dark"
-                style={styles.button}
-              />
-            )}
-            {webCard && (
-              <AddToWalletButton
-                webCardId={webCard.id}
-                style={styles.button}
+            <View style={styles.buttonContainer}>
+              {profile && (
+                <ContactCardExportVcf
+                  profile={profile}
+                  appearance="dark"
+                  style={styles.button}
+                />
+              )}
+              {webCard && (
+                <AddToWalletButton
+                  webCardId={webCard.id}
+                  style={styles.button}
+                  appearance="light"
+                />
+              )}
+              <LargeButton
                 appearance="light"
+                icon="link"
+                title={intl.formatMessage({
+                  defaultMessage: 'Copy card link',
+                  description: 'Copy card link button label',
+                })}
+                style={styles.button}
+                onPress={() => {
+                  Clipboard.setStringAsync(profile?.contactCardUrl ?? '').then(
+                    () => {
+                      Toast.show({
+                        type: 'info',
+                        text1: intl.formatMessage({
+                          defaultMessage: 'Copied to clipboard',
+                          description:
+                            'Toast info message that appears when the user copies the contact card url to the clipboard',
+                        }),
+                      });
+                    },
+                  );
+                }}
               />
-            )}
-            <LargeButton
-              appearance="light"
-              icon="link"
-              title={intl.formatMessage({
-                defaultMessage: 'Copy card link',
-                description: 'Copy card link button label',
-              })}
-              style={styles.button}
-              onPress={() => {
-                Clipboard.setStringAsync(profile?.contactCardUrl ?? '').then(
-                  () => {
-                    Toast.show({
-                      type: 'info',
-                      text1: intl.formatMessage({
-                        defaultMessage: 'Copied to clipboard',
-                        description:
-                          'Toast info message that appears when the user copies the contact card url to the clipboard',
-                      }),
-                    });
-                  },
-                );
-              }}
-            />
+            </View>
           </View>
         )}
       </ScrollView>
@@ -259,15 +260,14 @@ const styles = StyleSheet.create({
   },
   qrCodeContainer: {
     position: 'absolute',
-    top: -350,
+    top: -250,
     backgroundColor: 'rgba(0,0,0,0.8)',
     borderRadius: 23,
     borderCurve: 'continuous',
-    padding: 20,
     width: QR_CODE_WIDTH + 40,
     height: QR_CODE_WIDTH + 40,
   },
-  canvas: { width: QR_CODE_WIDTH, height: QR_CODE_WIDTH },
+  canvas: { width: QR_CODE_WIDTH, height: QR_CODE_WIDTH, margin: 20 },
   linear: {
     height: '100%',
     position: 'absolute',
@@ -297,9 +297,15 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     width: '100%',
     position: 'absolute',
-    bottom: -40,
+    bottom: -35,
+    padding: 5,
     margin: 'auto',
     alignSelf: 'center',
+  },
+  buttonContainer: {
+    width: '100%',
+    gap: 10,
+    marginTop: 40,
   },
   closeButtonContainer: {
     position: 'absolute',
