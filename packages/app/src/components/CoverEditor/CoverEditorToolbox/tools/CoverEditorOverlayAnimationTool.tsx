@@ -274,7 +274,7 @@ const AnimationPreview = ({
       return;
     }
     image.value = drawOffScreen(surface, (canvas, width, height) => {
-      const { animateCanvas, animatePaint } = animation(
+      const { animateCanvas, animatePaint, animateImageFilter } = animation(
         ((Date.now() - startTime) % 3000) / 3000,
       );
       const paint = Skia.Paint();
@@ -290,7 +290,9 @@ const AnimationPreview = ({
         editionParameters,
         lutTexture,
       });
-      paint.setImageFilter(imageFilter);
+      paint.setImageFilter(
+        animateImageFilter ? animateImageFilter(imageFilter) : imageFilter,
+      );
       const rect = { x: 0, y: 0, width, height };
       animateCanvas?.(canvas, rect);
       animatePaint?.(paint, rect);

@@ -13,7 +13,11 @@ import { percentRectToRect } from '../coverEditorHelpers';
 import { inflateRRect } from './coverDrawerHelpers';
 import overlayAnimations from './overlayAnimations';
 import type { CoverDrawerOptions } from './coverDrawerTypes';
-import type { CanvasAnimation, PaintAnimation } from './overlayAnimations';
+import type {
+  CanvasAnimation,
+  ImageFilterAnimation,
+  PaintAnimation,
+} from './overlayAnimations';
 
 const coverOverlayDrawer = ({
   canvas,
@@ -76,6 +80,7 @@ const coverOverlayDrawer = ({
 
   let animateCanvas: CanvasAnimation | undefined = undefined;
   let animatePaint: PaintAnimation | undefined = undefined;
+  let animateImageFilter: ImageFilterAnimation | undefined = undefined;
 
   if (animation) {
     const progress = interpolate(
@@ -88,7 +93,7 @@ const coverOverlayDrawer = ({
       [0, 1],
     );
     const transformations = animation(progress);
-    ({ animateCanvas, animatePaint } = transformations);
+    ({ animateCanvas, animatePaint, animateImageFilter } = transformations);
   }
 
   const overlayRect = {
@@ -162,16 +167,18 @@ const coverOverlayDrawer = ({
         ),
       );
     } else {
-      shadowPaint.setImageFilter(
-        Skia.ImageFilter.MakeDropShadowOnly(
-          0,
-          convertToBaseCanvasRatio(4, width),
-          convertToBaseCanvasRatio(8, width),
-          convertToBaseCanvasRatio(8, width),
-          Skia.Color('#00000099'),
-          imageFilter,
-        ),
+      let shadowFilter = Skia.ImageFilter.MakeDropShadowOnly(
+        0,
+        convertToBaseCanvasRatio(4, width),
+        convertToBaseCanvasRatio(8, width),
+        convertToBaseCanvasRatio(8, width),
+        Skia.Color('#00000099'),
+        imageFilter,
       );
+      if (animateImageFilter) {
+        shadowFilter = animateImageFilter(shadowFilter);
+      }
+      shadowPaint.setImageFilter(shadowFilter);
     }
     animatePaint?.(shadowPaint, overlayRect);
     canvas.drawRRect(
@@ -184,6 +191,10 @@ const coverOverlayDrawer = ({
       ),
       shadowPaint,
     );
+  }
+
+  if (animateImageFilter) {
+    imageFilter = animateImageFilter(imageFilter);
   }
 
   const paint = Skia.Paint();
