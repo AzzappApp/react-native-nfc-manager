@@ -1,5 +1,7 @@
-## 1.4.1-canary.73
+## 1.4.1-canary.74
 
+* **fix:**  - 🐛 scroll to initial index on layout with no height ([#6350](https://github.com/AzzappApp/azzapp/pull/6350))
+* **fix:**  - 🐛 make close button clickable ([#6340](https://github.com/AzzappApp/azzapp/pull/6340))
 * **fix:**  - textLink button only full with for alternation mobile ([#6386](https://github.com/AzzappApp/azzapp/pull/6386))
 * **fix:**  - [module] potential done bouton not closing the picker ([#6375](https://github.com/AzzappApp/azzapp/pull/6375))
 * **feat:**  - improve module animation container ([#6378](https://github.com/AzzappApp/azzapp/pull/6378))
