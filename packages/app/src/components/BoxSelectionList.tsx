@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
@@ -49,6 +49,7 @@ const BoxSelectionList = <T,>({
 }: BoxSelectionListProps<T>) => {
   const styles = useStyleSheet(styleSheet);
 
+  const list = useRef<FlatList>(null);
   const [height, setHeight] = useState<number | null>(fixedItemHeight ?? null);
 
   const onLayoutInner = useCallback(
@@ -149,9 +150,18 @@ const BoxSelectionList = <T,>({
     return innerData.indexOf(selectedItem);
   }, [innerData, selectedItem]);
 
+  const prevHeight = useRef(height);
+  useEffect(() => {
+    if (height !== prevHeight.current) {
+      list.current?.scrollToIndex({ index: initialScrollIndex });
+      prevHeight.current = height;
+    }
+  }, [height, initialScrollIndex]);
+
   return (
     <FlatList
       {...props}
+      ref={list}
       data={innerData}
       renderItem={renderButton}
       keyExtractor={innerKeyExtractor}
