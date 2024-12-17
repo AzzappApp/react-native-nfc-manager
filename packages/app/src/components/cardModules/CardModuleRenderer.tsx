@@ -24,7 +24,7 @@ import type { Variant } from '#helpers/webcardModuleHelpers';
 import type { BlockTextRendererData } from './BlockTextRenderer';
 import type { MediaTextModuleRendererData } from './CardModuleMediaText/MediaTextModuleRenderer';
 import type { MediaTextLinkModuleRendererData } from './CardModuleMediaTextLink/MediaTextLinkModuleRenderer';
-import type { CarouselViewRendererData } from './CarouselRenderer';
+import type { CarouselRendererData } from './CarouselRenderer';
 import type { HorizontalPhotoRendererData } from './HorizontalPhotoRenderer';
 import type { LineDividerRendererData } from './LineDividerRenderer';
 import type { PhotoWithTextAndTitleRendererData } from './PhotoWithTextAndTitleRenderer';
@@ -54,7 +54,7 @@ export type ModuleRenderInfo =
     }
   | {
       kind: typeof MODULE_KIND_CAROUSEL;
-      data: CarouselViewRendererData;
+      data: CarouselRendererData;
       variant: never;
     }
   | {
