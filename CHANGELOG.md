@@ -1,12 +1,22 @@
-## 1.4.1-canary.74
+## 1.4.1-canary.75
 
 * **fix:**  - 🐛 scroll to initial index on layout with no height ([#6350](https://github.com/AzzappApp/azzapp/pull/6350))
 * **fix:**  - 🐛 make close button clickable ([#6340](https://github.com/AzzappApp/azzapp/pull/6340))
+* **fix:**  - **modules:** [#6372](https://github.com/AzzappApp/azzapp/pull/6372) text background is not visible ([#6390](https://github.com/AzzappApp/azzapp/pull/6390))
+* **fix:**  - **modules:** [#6370](https://github.com/AzzappApp/azzapp/pull/6370) fallback to react-native-svg when module is tall ([#6389](https://github.com/AzzappApp/azzapp/pull/6389))
+* **fix:**  - **modules:** [#6351](https://github.com/AzzappApp/azzapp/pull/6351) invisible background in repeat mode ([#6387](https://github.com/AzzappApp/azzapp/pull/6387))
 * **fix:**  - textLink button only full with for alternation mobile ([#6386](https://github.com/AzzappApp/azzapp/pull/6386))
+* **feat:**  - **TextureLoader:** support packaged assets
 * **fix:**  - [module] potential done bouton not closing the picker ([#6375](https://github.com/AzzappApp/azzapp/pull/6375))
+* **fix:**  - **android:** [#6359](https://github.com/AzzappApp/azzapp/pull/6359) wrong text position on button module ([#6363](https://github.com/AzzappApp/azzapp/pull/6363))
+* **fix:**  - **web:** [#6358](https://github.com/AzzappApp/azzapp/pull/6358) wrong display of long text on button ([#6364](https://github.com/AzzappApp/azzapp/pull/6364))
+* **fix:**  - **multiUser:** [#6354](https://github.com/AzzappApp/azzapp/pull/6354) bottom sheet is sometimes too high on ios ([#6365](https://github.com/AzzappApp/azzapp/pull/6365))
+* **fix:**  - **CoverEditor:** reenable overlay fade animaton ([#6380](https://github.com/AzzappApp/azzapp/pull/6380))
 * **feat:**  - improve module animation container ([#6378](https://github.com/AzzappApp/azzapp/pull/6378))
 * **fix:**  - Filtered Image/video cannot be resizeMode. Stretch result if container is not the same ratio. Manually calculate the cropData for display only. Compression is working fine ([#6366](https://github.com/AzzappApp/azzapp/pull/6366))
+* **fix:**  - **simpleButton:** [#6357](https://github.com/AzzappApp/azzapp/pull/6357) wrong validation on email ([#6362](https://github.com/AzzappApp/azzapp/pull/6362))
 * **fix:**  - **modules:** [#6224](https://github.com/AzzappApp/azzapp/pull/6224) don’t distord image ([#6356](https://github.com/AzzappApp/azzapp/pull/6356))
+* **fix:**  - remove inner reanimated code in module renderer ([#6355](https://github.com/AzzappApp/azzapp/pull/6355))
 * **fix:**  - import of cache dir
 * **fix:**  - **cover:** [#6168](https://github.com/AzzappApp/azzapp/pull/6168) display media loader when you have only local media ([#6347](https://github.com/AzzappApp/azzapp/pull/6347))
 * **fix:**  - **android:** [#6287](https://github.com/AzzappApp/azzapp/pull/6287) wrong selection list height ([#6353](https://github.com/AzzappApp/azzapp/pull/6353))
