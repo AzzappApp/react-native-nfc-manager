@@ -65,6 +65,7 @@ const close = style({
   position: 'absolute',
   top: '20px',
   right: '20px',
+  zIndex: 999,
 });
 
 const styles = {
