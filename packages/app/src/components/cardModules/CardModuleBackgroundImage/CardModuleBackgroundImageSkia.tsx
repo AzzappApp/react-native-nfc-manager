@@ -11,18 +11,12 @@ import {
 } from '@shopify/react-native-skia';
 import { useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
+import type { CardModuleBackgroundImageProps } from './types';
 import type { SkSVG } from '@shopify/react-native-skia';
-import type { ColorValue } from 'react-native';
 
-type CardModuleBackgroundImageProps = {
-  layout: { width: number; height: number };
-  resizeMode: string | null | undefined;
-  backgroundUri: string | null | undefined;
-  patternColor: ColorValue | string | null | undefined;
-  backgroundOpacity: number;
-};
-
-const CardModuleBackgroundImage = (props: CardModuleBackgroundImageProps) => {
+const CardModuleBackgroundImageSkia = (
+  props: CardModuleBackgroundImageProps,
+) => {
   const { layout, resizeMode, backgroundUri, patternColor, backgroundOpacity } =
     props;
 
@@ -101,8 +95,8 @@ const CardModuleBackgroundImage = (props: CardModuleBackgroundImageProps) => {
               svg={svg}
               x={s.x}
               y={s.y}
-              width={svg.width()}
-              height={svg.height()}
+              width={svgWidth}
+              height={svgHeight}
             />
           ))}
         </Group>
@@ -115,7 +109,15 @@ const CardModuleBackgroundImage = (props: CardModuleBackgroundImageProps) => {
 
   return (
     svg && (
-      <Canvas style={[styles.container, { height: Math.ceil(dst.height) }]}>
+      <Canvas
+        style={[
+          styles.container,
+          {
+            height: Math.ceil(dst.height),
+          },
+        ]}
+        opaque
+      >
         <Group
           opacity={backgroundOpacity}
           transform={fitbox(
@@ -156,4 +158,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CardModuleBackgroundImage;
+export default CardModuleBackgroundImageSkia;
