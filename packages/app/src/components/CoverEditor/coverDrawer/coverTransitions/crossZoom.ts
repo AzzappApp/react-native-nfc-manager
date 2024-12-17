@@ -1,4 +1,4 @@
-import { compileEffect } from '#helpers/mediaEditions/shaderUtils';
+import { compileEffect } from '#helpers/mediaEditions';
 import { createTransition } from './createTransition';
 
 const effect = compileEffect(`
@@ -67,6 +67,6 @@ const strength = 0.4;
 
 export default {
   id: 'crossZoom' as const,
-  transition: createTransition(effect, duration, [strength]),
+  transition: createTransition(effect, duration, { strength }),
   duration,
 };

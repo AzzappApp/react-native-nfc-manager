@@ -4,7 +4,7 @@ import type { HorizontalPhotoRendererProps } from '#components/cardModules/Horiz
 
 type HorizontalPhotoPreviewProps = Pick<
   HorizontalPhotoRendererProps,
-  'animatedData' | 'cardStyle' | 'colorPalette' | 'data' | 'style'
+  'cardStyle' | 'colorPalette' | 'data' | 'style'
 > & {
   /**
    * A callback that is called when the module preview is pressed.
@@ -20,7 +20,6 @@ const HorizontalPhotoPreview = ({
   colorPalette,
   cardStyle,
   onPreviewPress,
-  animatedData,
   ...props
 }: HorizontalPhotoPreviewProps) => {
   return (
@@ -29,7 +28,6 @@ const HorizontalPhotoPreview = ({
         data={data}
         colorPalette={colorPalette}
         cardStyle={cardStyle}
-        animatedData={animatedData!}
       />
     </EditorScaledPreview>
   );

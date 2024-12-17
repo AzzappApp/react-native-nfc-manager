@@ -1,9 +1,4 @@
-import {
-  createPicture,
-  Canvas,
-  Picture,
-  Skia,
-} from '@shopify/react-native-skia';
+import { Canvas, Skia, Image } from '@shopify/react-native-skia';
 import { memo, useCallback, useMemo, useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet, Alert } from 'react-native';
@@ -22,21 +17,17 @@ import { DoneHeaderButton } from '#components/commonsButtons';
 import TransformedImageRenderer from '#components/TransformedImageRenderer';
 import { keyExtractor } from '#helpers/idHelpers';
 import {
-  applyImageFrameTransformations,
-  applyShaderTransformations,
   createImageFromNativeTexture,
-  getTransformsForEditionParameters,
-  imageFrameFromImage,
-  imageFrameToShaderFrame,
-  useLutShader,
-  useNativeTexture,
+  scaleCropData,
+  transformImage,
+  useLutTexture,
 } from '#helpers/mediaEditions';
+import { drawOffScreen, useOffScreenSurface } from '#helpers/skiaHelpers';
 import useBoolean from '#hooks/useBoolean';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Header from '#ui/Header';
 import LabeledWheelSelector from '#ui/LabeledWheelSelector';
 import Text from '#ui/Text';
-import ToolBoxSection from '../../../Toolbar/ToolBoxSection';
 import mediaAnimations, {
   useMediaAnimationList,
 } from '../../coverDrawer/mediaAnimations';
@@ -45,18 +36,20 @@ import {
   useCoverEditorContext,
   useCoverEditorEditContext,
 } from '../../CoverEditorContext';
-
+import ToolBoxSection from '../ui/ToolBoxSection';
 import type { BoxButtonItemInfo } from '#components/BoxSelectionList';
 import type { EditionParameters } from '#helpers/mediaEditions';
+import type { TextureInfo } from '#helpers/mediaEditions/NativeTextureLoader';
 import type {
   MediaAnimationListItem,
   MediaAnimations,
 } from '../../coverDrawer/mediaAnimations';
-import type { SkImage, SkShader } from '@shopify/react-native-skia';
+import type { SkImage } from '@shopify/react-native-skia';
 import type { DerivedValue } from 'react-native-reanimated';
 
 const CoverEditorMediaImageAnimationTool = () => {
   const [show, open, close] = useBoolean(false);
+  const coverEditorState = useCoverEditorContext();
   const activeMedia = useCoverEditorActiveImageMedia();
   const { medias } = useCoverEditorContext();
   const hasMultipleMedias =
@@ -75,10 +68,9 @@ const CoverEditorMediaImageAnimationTool = () => {
     [dispatch],
   );
 
-  const textureInfo = useNativeTexture({
-    uri: activeMedia?.uri,
-    kind: activeMedia?.kind,
-  });
+  const textureInfo = useMemo(() => {
+    return activeMedia ? coverEditorState.images[activeMedia.id] : null;
+  }, [activeMedia, coverEditorState.images]);
 
   const skImage = useDerivedValue(() => {
     if (!textureInfo) {
@@ -86,6 +78,16 @@ const CoverEditorMediaImageAnimationTool = () => {
     }
     return createImageFromNativeTexture(textureInfo);
   }, [textureInfo]);
+
+  const imageScale = coverEditorState.imagesScales[activeMedia?.id ?? ''] ?? 1;
+  const editionParameters = useMemo(() => {
+    return {
+      ...activeMedia?.editionParameters,
+      cropData: activeMedia?.editionParameters?.cropData
+        ? scaleCropData(activeMedia.editionParameters.cropData, imageScale)
+        : undefined,
+    };
+  }, [activeMedia?.editionParameters, imageScale]);
 
   const onChangeDurationSlider = useCallback(
     (duration: number) => {
@@ -113,7 +115,7 @@ const CoverEditorMediaImageAnimationTool = () => {
     [intl],
   );
 
-  const lutShader = useLutShader(activeMedia?.filter);
+  const lutTexture = useLutTexture(activeMedia?.filter);
 
   const renderItem = useCallback(
     ({
@@ -128,9 +130,9 @@ const CoverEditorMediaImageAnimationTool = () => {
             height={height}
             width={width}
             skImage={skImage}
-            editionParameters={activeMedia?.editionParameters}
+            editionParameters={editionParameters}
             duration={activeMedia?.duration}
-            lutShader={lutShader}
+            lutTexture={lutTexture}
           />
         );
       }
@@ -141,11 +143,11 @@ const CoverEditorMediaImageAnimationTool = () => {
           height={height}
           width={width}
           filter={activeMedia?.filter}
-          editionParameters={activeMedia?.editionParameters}
+          editionParameters={editionParameters}
         />
       );
     },
-    [activeMedia, lutShader, skImage],
+    [activeMedia, editionParameters, lutTexture, skImage],
   );
 
   const onFinished = useCallback(() => {
@@ -262,7 +264,7 @@ const AnimationPreview = ({
   duration,
   skImage,
   editionParameters,
-  lutShader,
+  lutTexture,
 }: {
   animationId: MediaAnimations;
   height: number;
@@ -270,58 +272,46 @@ const AnimationPreview = ({
   duration: number;
   skImage: DerivedValue<SkImage | null> | null;
   editionParameters?: EditionParameters | null;
-  lutShader?: SkShader | null;
+  lutTexture?: TextureInfo | null;
 }) => {
   const imageAnimation = mediaAnimations[animationId];
 
   const startTime = useMemo(() => Date.now(), []);
-  const animationStateSharedValue = useSharedValue(0);
 
+  const image = useSharedValue<SkImage | null>(null);
+  const surface = useOffScreenSurface(width, height);
   useFrameCallback(() => {
-    animationStateSharedValue.value =
-      (((Date.now() - startTime) / 1000) % duration) / duration;
-  });
-
-  const picture = useDerivedValue(() =>
-    createPicture(canvas => {
-      if (!imageAnimation || !skImage?.value) {
-        return;
-      }
-      const { imageTransformations, shaderTransformations } =
-        getTransformsForEditionParameters({
-          width,
-          height,
-          lutShader,
-          editionParameters,
-        });
-      const { imageTransform, shaderTransform } = imageAnimation(
-        animationStateSharedValue.value,
-      );
-      if (imageTransform) {
-        imageTransformations.push(imageTransform);
-      }
-      if (shaderTransform) {
-        shaderTransformations.push(shaderTransform);
-      }
-      const { shader } = applyShaderTransformations(
-        imageFrameToShaderFrame(
-          applyImageFrameTransformations(
-            imageFrameFromImage(skImage.value),
-            imageTransformations,
-          ),
-        ),
-        shaderTransformations,
-      );
+    const sourceImage = skImage?.value;
+    if (!sourceImage) {
+      image.value = null;
+      return;
+    }
+    image.value = drawOffScreen(surface, (canvas, width, height) => {
+      const progress =
+        (((Date.now() - startTime) / 1000) % duration) / duration;
+      const imageInfo = imageAnimation(progress)({
+        matrix: Skia.Matrix(),
+        width: sourceImage.width(),
+        height: sourceImage.height(),
+      });
+      const imageFilter = transformImage({
+        image: sourceImage,
+        imageInfo,
+        targetWidth: width,
+        targetHeight: height,
+        editionParameters,
+        lutTexture,
+      });
       const paint = Skia.Paint();
-      paint.setShader(shader);
+      paint.setImageFilter(imageFilter);
       canvas.drawPaint(paint);
-    }),
-  );
+    });
+  }, true);
 
   return (
     <View style={{ height, width }}>
       <Canvas style={{ width, height }} opaque>
-        <Picture picture={picture} />
+        <Image image={image} x={0} y={0} width={width} height={height} />
       </Canvas>
     </View>
   );

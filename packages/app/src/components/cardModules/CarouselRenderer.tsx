@@ -1,10 +1,8 @@
 // import { useRef } from 'react';
 import { Image } from 'expo-image';
+import { useMemo } from 'react';
+import { View, type ViewProps } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import Animated, {
-  type SharedValue,
-  useAnimatedStyle,
-} from 'react-native-reanimated';
 import { graphql, readInlineData } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
@@ -12,14 +10,13 @@ import {
   CAROUSEL_STYLE_VALUES,
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
-import CardModuleBackground from '../CardModuleBackground';
+import CardModuleBackground from './CardModuleBackground';
 import type {
   CarouselRenderer_module$data,
   CarouselRenderer_module$key,
 } from '#relayArtifacts/CarouselRenderer_module.graphql';
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { NullableFields } from '@azzapp/shared/objectHelpers';
-import type { ViewProps } from 'react-native';
 
 /**
  * Render a carousel module
@@ -55,43 +52,18 @@ const CarouselRendererFragment = graphql`
   }
 `;
 
-type AnimatedProps =
-  | 'borderRadius'
-  | 'borderWidth'
-  | 'gap'
-  | 'imageHeight'
-  | 'marginHorizontal'
-  | 'marginVertical';
-
-const AnimatedImage = Animated.createAnimatedComponent(Image);
-
 export const readCarouselData = (module: CarouselRenderer_module$key) =>
   readInlineData(CarouselRendererFragment, module);
 
-export type CarouselViewRendererData = Omit<
-  CarouselRenderer_module$data,
-  ' $fragmentType'
->;
-
 export type CarouselRendererData = NullableFields<
-  Omit<CarouselViewRendererData, AnimatedProps>
+  Omit<CarouselRenderer_module$data, ' $fragmentType'>
 >;
-
-type CarouselRendererAnimatedData = {
-  [K in AnimatedProps]:
-    | CarouselViewRendererData[K]
-    | SharedValue<NonNullable<CarouselViewRendererData[K]>>;
-};
 
 export type CarouselRendererProps = ViewProps & {
   /**
    * The data for the carousel module
    */
   data: CarouselRendererData;
-  /**
-   * the animated data for the carousel module
-   */
-  animatedData: CarouselRendererAnimatedData;
   /**
    * the color palette
    */
@@ -106,43 +78,6 @@ export type CarouselRendererProps = ViewProps & {
   coverBackgroundColor?: string | null | undefined;
 };
 
-export type CarouselViewRendererProps = Omit<
-  CarouselRendererProps,
-  'animatedData' | 'data'
-> & {
-  data: CarouselViewRendererData;
-};
-
-export const CarouselViewRenderer = ({
-  data,
-  ...rest
-}: CarouselViewRendererProps) => {
-  const {
-    borderRadius,
-    borderWidth,
-    marginVertical,
-    marginHorizontal,
-    imageHeight,
-    gap,
-    ...restData
-  } = data;
-
-  return (
-    <CarouselRenderer
-      {...rest}
-      data={restData}
-      animatedData={{
-        borderRadius,
-        borderWidth,
-        marginVertical,
-        marginHorizontal,
-        imageHeight,
-        gap,
-      }}
-    />
-  );
-};
-
 /**
  *  implementation of the carousel module
  * This component takes the data directly instead of a relay fragment reference
@@ -150,7 +85,6 @@ export const CarouselViewRenderer = ({
  */
 const CarouselRenderer = ({
   data,
-  animatedData,
   colorPalette,
   cardStyle,
   style,
@@ -163,7 +97,12 @@ const CarouselRenderer = ({
     borderColor,
     background,
     backgroundStyle,
-    ...rest
+    borderRadius,
+    borderWidth,
+    marginVertical,
+    marginHorizontal,
+    imageHeight,
+    gap,
   } = getModuleDataValues({
     data,
     cardStyle,
@@ -171,61 +110,30 @@ const CarouselRenderer = ({
     styleValuesMap: CAROUSEL_STYLE_VALUES,
   });
 
-  const {
-    borderRadius,
-    borderWidth,
-    marginVertical,
-    marginHorizontal,
-    imageHeight,
-    gap,
-  } = animatedData;
-
-  const defaultImageHeight =
-    'imageHeight' in rest ? (rest['imageHeight'] as number) : 0;
-
-  const cardModuleBackgroundStyle = useAnimatedStyle(() => {
-    const imageHeightValue =
-      typeof imageHeight === 'number'
-        ? imageHeight
-        : (imageHeight?.value ?? defaultImageHeight);
-    const marginVerticalValue =
-      typeof marginVertical === 'number'
-        ? marginVertical
-        : (marginVertical?.value ?? 0);
-
+  const cardModuleBackgroundStyle = useMemo(() => {
     return {
-      height: imageHeightValue + marginVerticalValue * 2,
+      height: imageHeight + marginVertical * 2,
     };
-  });
+  }, [imageHeight, marginVertical]);
 
-  const containerStyle = useAnimatedStyle(() => {
+  const containerStyle = useMemo(() => {
     return {
-      paddingVertical:
-        typeof marginVertical === 'number'
-          ? marginVertical
-          : (marginVertical?.value ?? 0),
-      paddingHorizontal:
-        typeof marginHorizontal === 'number'
-          ? marginHorizontal
-          : (marginHorizontal?.value ?? 0),
-      columnGap: typeof gap === 'number' ? gap : (gap?.value ?? 0),
+      paddingVertical: marginVertical,
+      paddingHorizontal: marginHorizontal,
+      columnGap: gap,
       height: '100%',
       flexDirection: 'row',
-    };
-  });
+    } as const;
+  }, [marginHorizontal, marginVertical, gap]);
 
-  const imageStyle = useAnimatedStyle(() => ({
-    height:
-      typeof imageHeight === 'number'
-        ? imageHeight
-        : (imageHeight?.value ?? defaultImageHeight),
-    borderRadius:
-      typeof borderRadius === 'number'
-        ? borderRadius
-        : (borderRadius?.value ?? 0),
-    borderWidth:
-      typeof borderWidth === 'number' ? borderWidth : (borderWidth?.value ?? 0),
-  }));
+  const imageStyle = useMemo(
+    () => ({
+      height: imageHeight,
+      borderRadius,
+      borderWidth,
+    }),
+    [imageHeight, borderRadius, borderWidth],
+  );
 
   // const modal = useRef<CarouselFullscrenActions>(null);
 
@@ -247,9 +155,9 @@ const CarouselRenderer = ({
         style={{ height: '100%' }}
         contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
       >
-        <Animated.View style={containerStyle}>
+        <View style={containerStyle}>
           {images?.map(image => (
-            <AnimatedImage
+            <Image
               key={image.id}
               source={{ uri: image.uri }}
               style={[
@@ -262,7 +170,7 @@ const CarouselRenderer = ({
               ]}
             />
           ))}
-        </Animated.View>
+        </View>
       </ScrollView>
     </CardModuleBackground>
   );

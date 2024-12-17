@@ -2,7 +2,7 @@ import omit from 'lodash/omit';
 import { startTransition, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Platform, StyleSheet } from 'react-native';
-import { useSharedValue } from 'react-native-reanimated';
+import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { Observable } from 'relay-runtime';
@@ -16,6 +16,7 @@ import {
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { colors } from '#theme';
+import AnimatedDataOverride from '#components/AnimatedDataOverride';
 import ImagePicker, {
   EditImageStep,
   SelectImageStep,
@@ -415,6 +416,18 @@ const PhotoWithTextAndTitleEditionScreen = ({
 
   const onBackgroundStyleChange = fieldUpdateHandler('backgroundStyle');
 
+  const animatedData = useDerivedValue(() => ({
+    aspectRatio: aspectRatio.value,
+    borderRadius: borderRadius.value,
+    gap: gap.value,
+    marginHorizontal: marginHorizontal.value,
+    marginVertical: marginVertical.value,
+    titleFontSize: titleFontSize.value,
+    titleVerticalSpacing: titleVerticalSpacing.value,
+    contentFontSize: contentFontSize.value,
+    contentVerticalSpacing: contentVerticalSpacing.value,
+  }));
+
   const onSave = useCallback(async () => {
     if (!canSave || !profile.webCard) {
       return;
@@ -608,23 +621,16 @@ const PhotoWithTextAndTitleEditionScreen = ({
         }
       />
       <PressableOpacity onPress={onPickImage}>
-        <PhotoWithTextAndTitlePreview
-          style={{ height: topPanelHeight - 20, marginVertical: 10 }}
-          data={previewData}
-          animatedData={{
-            aspectRatio,
-            borderRadius,
-            gap,
-            marginHorizontal,
-            marginVertical,
-            titleFontSize,
-            titleVerticalSpacing,
-            contentFontSize,
-            contentVerticalSpacing,
-          }}
-          colorPalette={profile?.webCard?.cardColors}
-          cardStyle={profile?.webCard?.cardStyle}
-        />
+        <AnimatedDataOverride data={previewData} animatedData={animatedData}>
+          {data => (
+            <PhotoWithTextAndTitlePreview
+              style={{ height: topPanelHeight - 20, marginVertical: 10 }}
+              data={data}
+              colorPalette={profile?.webCard?.cardColors}
+              cardStyle={profile?.webCard?.cardStyle}
+            />
+          )}
+        </AnimatedDataOverride>
       </PressableOpacity>
       <TabView
         style={{ height: bottomPanelHeight, flex: 1 }}

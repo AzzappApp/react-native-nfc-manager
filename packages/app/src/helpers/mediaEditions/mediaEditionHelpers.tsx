@@ -1,37 +1,9 @@
 import { Platform } from 'react-native';
 import * as mime from 'react-native-mime-types';
 import { getDecodingCapabilitiesFor } from '@azzapp/react-native-skia-video';
-import { typedEntries } from '@azzapp/shared/objectHelpers';
 import { getFileName } from '#helpers/fileHelpers';
 import type { SourceMedia } from '#helpers/mediaHelpers';
-import type {
-  CropData,
-  EditionParameters,
-  ImageOrientation,
-} from './EditionParameters';
-
-const LAYOUT_PARAMETERS = ['cropData', 'orientation', 'roll'];
-
-export const extractLayoutParameters = (
-  parameters: EditionParameters | null | undefined,
-): [
-  layoutParameters: EditionParameters,
-  otherParameters: EditionParameters,
-] => {
-  const layoutParameters: EditionParameters = {};
-  const otherParameters: EditionParameters = {};
-  if (!parameters) {
-    return [layoutParameters, otherParameters];
-  }
-  typedEntries(parameters).forEach(([key, value]) => {
-    if (LAYOUT_PARAMETERS.includes(key)) {
-      layoutParameters[key] = value as any;
-    } else {
-      otherParameters[key] = value as any;
-    }
-  });
-  return [layoutParameters, otherParameters];
-};
+import type { CropData } from './EditionParameters';
 
 export const cropDataForAspectRatio = (
   mediaWidth: number,
@@ -53,22 +25,6 @@ export const cropDataForAspectRatio = (
       height: mediaWidth / aspectRatio,
       width: mediaWidth,
     };
-  }
-};
-
-export const getNextOrientation = (
-  orientation?: string | null,
-): ImageOrientation => {
-  switch (orientation) {
-    case 'LEFT':
-      return 'DOWN';
-    case 'DOWN':
-      return 'RIGHT';
-    case 'RIGHT':
-      return 'UP';
-    case 'UP':
-    default:
-      return 'LEFT';
   }
 };
 

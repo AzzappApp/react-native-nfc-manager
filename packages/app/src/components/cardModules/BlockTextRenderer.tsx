@@ -133,7 +133,9 @@ const BlockTextRenderer = ({
       patternColor={swapColor(backgroundStyle?.patternColor, colorPalette)}
       resizeMode={background?.resizeMode}
     >
-      <View style={[{ marginVertical, marginHorizontal }, contentStyle]}>
+      <View
+        style={[{ marginVertical, marginHorizontal, zIndex: 1 }, contentStyle]}
+      >
         <CardModuleBackground
           backgroundUri={textBackground?.uri}
           backgroundOpacity={textBackgroundStyle?.opacity}

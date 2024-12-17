@@ -1,15 +1,13 @@
-import { createPicture, Skia } from '@shopify/react-native-skia';
-import { PixelRatio } from 'react-native';
+import { Canvas, Image, Skia } from '@shopify/react-native-skia';
 import { useDerivedValue, type DerivedValue } from 'react-native-reanimated';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import {
-  imageFrameFromImage,
   transformImage,
-  useLutShader,
+  useLutTexture,
   type EditionParameters,
 } from '#helpers/mediaEditions';
-import SkiaAnimatedPictureView from '#ui/SkiaAnimatedPictureView';
+import { drawOffScreen, useOffScreenSurface } from '#helpers/skiaHelpers';
 import type { Filter } from '@azzapp/shared/filtersHelper';
 import type { SkImage } from '@shopify/react-native-skia';
 import type { StyleProp, ViewStyle, ViewProps } from 'react-native';
@@ -24,47 +22,63 @@ export type TransformedImageRendererProps = Exclude<ViewProps, 'children'> & {
 };
 
 const TransformedImageRenderer = ({
-  image,
+  image: imageSharedValue,
   editionParameters,
   filter,
   width,
   height,
   ...props
 }: TransformedImageRendererProps) => {
-  const lutShader = useLutShader(filter);
+  const lutTexture = useLutTexture(filter);
 
-  const pixelRatio = PixelRatio.get();
-  const picture = useDerivedValue(
-    () =>
-      createPicture(canvas => {
-        if (!image.value) {
-          return;
-        }
-        const paint = Skia.Paint();
-        paint.setShader(
-          transformImage({
-            imageFrame: imageFrameFromImage(image.value),
-            width: width * pixelRatio,
-            height: height * pixelRatio,
-            editionParameters,
-            lutShader,
-          }),
-        );
-        canvas.drawPaint(paint);
-      }),
-    [image, editionParameters, width, height, lutShader],
-  );
+  const surface = useOffScreenSurface(width, height);
+
+  const transformedImage = useDerivedValue(() => {
+    const image = imageSharedValue.value;
+    if (!image) {
+      return null;
+    }
+    return drawOffScreen(surface, (canvas, width, height) => {
+      'worklet';
+      canvas.clear(Skia.Color('#00000000'));
+      const imageFilter = transformImage({
+        image,
+        imageInfo: {
+          width: image.width(),
+          height: image.height(),
+          matrix: Skia.Matrix(),
+        },
+        targetWidth: width,
+        targetHeight: height,
+        editionParameters,
+        lutTexture,
+      });
+      const paint = Skia.Paint();
+      paint.setImageFilter(imageFilter);
+      canvas.drawRect(
+        {
+          x: 0,
+          y: 0,
+          width,
+          height,
+        },
+        paint,
+      );
+    });
+  });
 
   const styles = useStyleSheet(styleSheet);
 
   return (
-    <SkiaAnimatedPictureView
-      picture={picture}
-      width={width}
-      height={height}
-      style={[styles.picture, props.style]}
-      {...props}
-    />
+    <Canvas style={[styles.picture, { width, height }, props.style]} {...props}>
+      <Image
+        x={0}
+        y={0}
+        width={width}
+        height={height}
+        image={transformedImage}
+      />
+    </Canvas>
   );
 };
 

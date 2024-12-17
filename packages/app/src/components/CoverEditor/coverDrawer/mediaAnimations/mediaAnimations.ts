@@ -9,15 +9,11 @@ import smoothZoomIn from './smoothZoomIn';
 import smoothZoomOut from './smoothZoomOut';
 import softZoomIn from './softZoomIn';
 import softZoomOut from './softZoomOut';
-import type {
-  ImageFrameTransformation,
-  ShaderFrameTransformation,
-} from '#helpers/mediaEditions';
+import type { ImageInfo } from '#helpers/mediaEditions';
 
-export type MediaAnimation = (progress: number) => {
-  imageTransform?: ImageFrameTransformation;
-  shaderTransform?: ShaderFrameTransformation;
-};
+export type MediaAnimation = (
+  progress: number,
+) => (imageInfo: ImageInfo) => ImageInfo;
 
 //we can use direclty matrix animation for now. update if we are merging matrix and shader animation
 const mediaAnimations = {

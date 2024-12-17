@@ -1,4 +1,4 @@
-import { compileEffect } from '#helpers/mediaEditions/shaderUtils';
+import { compileEffect } from '#helpers/mediaEditions';
 import { createTransition } from './createTransition';
 
 const effect = compileEffect(`
@@ -20,10 +20,10 @@ const effect = compileEffect(`
   }
  `);
 
-const SQUARE_MIN = 20;
-const STEP = 50;
+const squaresMin = 20;
+const steps = 50;
 export default {
   id: 'pixelize' as const,
-  transition: createTransition(effect, 0.5, [SQUARE_MIN, STEP]),
+  transition: createTransition(effect, 0.5, { squaresMin, steps }),
   duration: 0.5,
 };

@@ -18,7 +18,7 @@ import { readMediaModuleData } from '#components/cardModules/CardModuleMedia/Med
 import { readBlockTextData } from './BlockTextRenderer';
 import { readMediaTextModuleData } from './CardModuleMediaText/MediaTextModuleRenderer';
 import { readMediaTextLinkModuleData } from './CardModuleMediaTextLink/MediaTextLinkModuleRenderer';
-import { readCarouselData } from './CarouselRenderer/CarouselRenderer';
+import { readCarouselData } from './CarouselRenderer';
 import { readHorizontalPhotoData } from './HorizontalPhotoRenderer';
 import { readLineDividerData } from './LineDividerRenderer';
 import { readPhotoWithTextAndTitleData } from './PhotoWithTextAndTitleRenderer';

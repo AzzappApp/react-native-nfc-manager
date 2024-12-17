@@ -4,7 +4,7 @@ import type { LineDividerRendererProps } from '#components/cardModules/LineDivid
 
 type LineDividerPreviewProps = Pick<
   LineDividerRendererProps,
-  'animatedData' | 'cardStyle' | 'colorPalette' | 'data' | 'style'
+  'cardStyle' | 'colorPalette' | 'data' | 'style'
 > & {
   /**
    * A callback that is called when the module preview is pressed.
@@ -20,7 +20,6 @@ const LineDividerPreview = ({
   colorPalette,
   cardStyle,
   onPreviewPress,
-  animatedData,
   ...props
 }: LineDividerPreviewProps) => {
   return (
@@ -29,7 +28,6 @@ const LineDividerPreview = ({
         colorPalette={colorPalette}
         cardStyle={cardStyle}
         data={data}
-        animatedData={animatedData!}
       />
     </EditorScaledPreview>
   );

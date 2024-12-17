@@ -23,12 +23,12 @@ import wipeDown from './wipeDown';
 import wipeLeft from './wipeLeft';
 import wipeRight from './wipeRight';
 import wipeUp from './wipeUp';
-import type { SkShader, SkCanvas } from '@shopify/react-native-skia';
+import type { SkCanvas, SkImageFilter } from '@shopify/react-native-skia';
 
 export type CoverTransition = (args: {
   canvas: SkCanvas;
-  inShader: SkShader;
-  outShader: SkShader;
+  inImage: SkImageFilter;
+  outImage: SkImageFilter;
   time: number;
   width: number;
   height: number;

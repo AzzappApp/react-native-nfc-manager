@@ -1,9 +1,4 @@
-import {
-  createPicture,
-  Canvas,
-  Picture,
-  Skia,
-} from '@shopify/react-native-skia';
+import { Canvas, Skia, Image } from '@shopify/react-native-skia';
 import { memo, useCallback, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
@@ -25,15 +20,12 @@ import { getCoverDuration } from '#components/CoverEditor/coverEditorHelpers';
 import TransformedImageRenderer from '#components/TransformedImageRenderer';
 import { keyExtractor } from '#helpers/idHelpers';
 import {
-  applyImageFrameTransformations,
-  applyShaderTransformations,
   createImageFromNativeTexture,
-  getTransformsForEditionParameters,
-  imageFrameFromImage,
-  imageFrameToShaderFrame,
-  useLutShader,
-  useNativeTexture,
+  scaleCropData,
+  transformImage,
+  useLutTexture,
 } from '#helpers/mediaEditions';
+import { drawOffScreen, useOffScreenSurface } from '#helpers/skiaHelpers';
 import useBoolean from '#hooks/useBoolean';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import DoubleSlider from '#ui/DoubleSlider';
@@ -52,7 +44,8 @@ import type {
   OverlayAnimations,
 } from '#components/CoverEditor/coverDrawer/overlayAnimations';
 import type { EditionParameters } from '#helpers/mediaEditions';
-import type { SkImage, SkShader } from '@shopify/react-native-skia';
+import type { TextureInfo } from '#helpers/mediaEditions/NativeTextureLoader';
+import type { SkImage } from '@shopify/react-native-skia';
 import type { DerivedValue } from 'react-native-reanimated';
 
 const CoverEditorOverlayImageAnimationTool = () => {
@@ -104,10 +97,20 @@ const CoverEditorOverlayImageAnimationTool = () => {
     [dispatch],
   );
 
-  const textureInfo = useNativeTexture({
-    uri: activeOverlay?.uri,
-    kind: activeOverlay?.kind,
-  });
+  const textureInfo = useMemo(() => {
+    return activeOverlay ? coverEditorState.images[activeOverlay.id] : null;
+  }, [activeOverlay, coverEditorState.images]);
+
+  const imageScale =
+    coverEditorState.imagesScales[activeOverlay?.id ?? ''] ?? 1;
+  const editionParameters = useMemo(() => {
+    return {
+      ...activeOverlay?.editionParameters,
+      cropData: activeOverlay?.editionParameters?.cropData
+        ? scaleCropData(activeOverlay.editionParameters.cropData, imageScale)
+        : undefined,
+    };
+  }, [activeOverlay?.editionParameters, imageScale]);
 
   const skImage = useDerivedValue(() => {
     if (!textureInfo) {
@@ -128,7 +131,7 @@ const CoverEditorOverlayImageAnimationTool = () => {
     [intl],
   );
 
-  const lutShader = useLutShader(activeOverlay?.filter);
+  const lutTexture = useLutTexture(activeOverlay?.filter);
 
   const renderItem = useCallback(
     ({
@@ -143,8 +146,8 @@ const CoverEditorOverlayImageAnimationTool = () => {
             height={height}
             width={width}
             skImage={skImage}
-            editionParameters={activeOverlay.editionParameters}
-            lutShader={lutShader}
+            editionParameters={editionParameters}
+            lutTexture={lutTexture}
           />
         );
       }
@@ -155,11 +158,11 @@ const CoverEditorOverlayImageAnimationTool = () => {
           height={height}
           width={width}
           filter={activeOverlay?.filter}
-          editionParameters={activeOverlay?.editionParameters}
+          editionParameters={editionParameters}
         />
       );
     },
-    [activeOverlay, lutShader, skImage],
+    [activeOverlay, editionParameters, lutTexture, skImage],
   );
 
   const imageRatio = activeOverlay
@@ -260,61 +263,57 @@ const AnimationPreview = ({
   width,
   skImage,
   editionParameters,
-  lutShader,
+  lutTexture,
 }: {
   animationId: OverlayAnimations;
   height: number;
   width: number;
   skImage: DerivedValue<SkImage | null> | null;
   editionParameters?: EditionParameters | null;
-  lutShader?: SkShader | null;
+  lutTexture?: TextureInfo | null;
 }) => {
   const animation = overlayAnimations[animationId];
 
   const startTime = useMemo(() => Date.now(), []);
-  const animationStateSharedValue = useSharedValue(0);
-
+  const image = useSharedValue<SkImage | null>(null);
+  const surface = useOffScreenSurface(width, height);
   useFrameCallback(() => {
-    animationStateSharedValue.value = ((Date.now() - startTime) % 3000) / 3000;
-  });
-
-  const picture = useDerivedValue(() =>
-    createPicture(canvas => {
-      if (!animation || !skImage?.value) {
-        return;
-      }
-      const { imageTransformations, shaderTransformations } =
-        getTransformsForEditionParameters({
-          width,
-          height,
-          lutShader,
-          editionParameters,
-        });
-      const { animateCanvas, animatePaint } = animation(
-        animationStateSharedValue.value,
-      );
-      const { shader } = applyShaderTransformations(
-        imageFrameToShaderFrame(
-          applyImageFrameTransformations(
-            imageFrameFromImage(skImage.value),
-            imageTransformations,
-          ),
-        ),
-        shaderTransformations,
+    const sourceImage = skImage?.value;
+    if (!sourceImage) {
+      image.value = null;
+      return;
+    }
+    image.value = drawOffScreen(surface, (canvas, width, height) => {
+      const { animateCanvas, animatePaint, animateImageFilter } = animation(
+        ((Date.now() - startTime) % 3000) / 3000,
       );
       const paint = Skia.Paint();
-      paint.setShader(shader);
+      const imageFilter = transformImage({
+        image: sourceImage,
+        imageInfo: {
+          width: sourceImage.width(),
+          height: sourceImage.height(),
+          matrix: Skia.Matrix(),
+        },
+        targetWidth: width,
+        targetHeight: height,
+        editionParameters,
+        lutTexture,
+      });
+      paint.setImageFilter(
+        animateImageFilter ? animateImageFilter(imageFilter) : imageFilter,
+      );
       const rect = { x: 0, y: 0, width, height };
       animateCanvas?.(canvas, rect);
       animatePaint?.(paint, rect);
       canvas.drawPaint(paint);
-    }),
-  );
+    });
+  }, true);
 
   return (
     <View style={{ height, width }}>
       <Canvas style={{ width, height }} opaque>
-        <Picture picture={picture} />
+        <Image image={image} x={0} y={0} width={width} height={height} />
       </Canvas>
     </View>
   );

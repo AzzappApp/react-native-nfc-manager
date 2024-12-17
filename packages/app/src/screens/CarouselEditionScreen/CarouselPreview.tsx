@@ -2,11 +2,11 @@ import { shadow } from '#theme';
 import CarouselRenderer from '#components/cardModules/CarouselRenderer';
 import EditorScaledPreview from '#components/EditorScaledPreview';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import type { CarouselRendererProps } from '#components/cardModules/CarouselRenderer/CarouselRenderer';
+import type { CarouselRendererProps } from '#components/cardModules/CarouselRenderer';
 
 type CarouselPreviewProps = Pick<
   CarouselRendererProps,
-  'animatedData' | 'cardStyle' | 'colorPalette' | 'data' | 'style'
+  'cardStyle' | 'colorPalette' | 'data' | 'style'
 > & {
   /**
    * A callback that is called when the module preview is pressed.
@@ -21,7 +21,6 @@ const CarouselPreview = ({
   data,
   colorPalette,
   cardStyle,
-  animatedData,
   ...props
 }: CarouselPreviewProps) => {
   const styles = useStyleSheet(styleSheet);
@@ -29,7 +28,6 @@ const CarouselPreview = ({
     <EditorScaledPreview {...props}>
       <CarouselRenderer
         data={data}
-        animatedData={animatedData}
         colorPalette={colorPalette}
         cardStyle={cardStyle}
         style={styles.module}

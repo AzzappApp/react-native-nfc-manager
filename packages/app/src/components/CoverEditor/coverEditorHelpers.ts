@@ -254,7 +254,7 @@ export const COVER_EXPORT_VIDEO_RESOLUTION = {
   height: MAX_VIDEO_SIZE,
 };
 
-const MAX_IMAGE_SIZE = MEMORY_SIZE < 6 ? 1280 : MEMORY_SIZE < 8 ? 1920 : 3840;
+const MAX_IMAGE_SIZE = MEMORY_SIZE < 6 ? 1280 : MEMORY_SIZE < 8 ? 1920 : 2560;
 
 export const MAX_EXPORT_DECODER_RESOLUTION = MAX_VIDEO_SIZE;
 
@@ -263,16 +263,7 @@ export const MAX_DISPLAY_DECODER_RESOLUTION = Math.min(
   1920,
 );
 
-export const getMaxAllowedVideosPerCover = (hasLottie: boolean) =>
-  hasLottie
-    ? MEMORY_SIZE < 6
-      ? 1
-      : MEMORY_SIZE < 8
-        ? 2
-        : 3
-    : MEMORY_SIZE < 6
-      ? 2
-      : 3;
+export const MAX_ALLOWED_VIDEOS_BY_COVER = MEMORY_SIZE < 6 ? 2 : 3;
 
 export const calculateBoxSize = (options: {
   height: number;

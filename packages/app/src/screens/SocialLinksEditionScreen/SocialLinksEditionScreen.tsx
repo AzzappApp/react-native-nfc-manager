@@ -9,7 +9,7 @@ import {
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
-import { useSharedValue } from 'react-native-reanimated';
+import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import * as z from 'zod';
 import {
@@ -17,6 +17,7 @@ import {
   SOCIAL_LINKS_DEFAULT_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
 import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
+import AnimatedDataOverride from '#components/AnimatedDataOverride';
 import { useOnFocus, useRouter } from '#components/NativeRouter';
 import useBoolean from '#hooks/useBoolean';
 import useEditorLayout from '#hooks/useEditorLayout';
@@ -401,24 +402,14 @@ const SocialLinksEditionScreen = ({
     }
   });
 
-  const animatedData = useMemo(
-    () => ({
-      iconSize,
-      borderWidth,
-      columnGap,
-      marginTop,
-      marginBottom,
-      marginHorizontal,
-    }),
-    [
-      iconSize,
-      borderWidth,
-      columnGap,
-      marginTop,
-      marginBottom,
-      marginHorizontal,
-    ],
-  );
+  const animatedData = useDerivedValue(() => ({
+    iconSize: iconSize.value,
+    borderWidth: borderWidth.value,
+    columnGap: columnGap.value,
+    marginTop: marginTop.value,
+    marginBottom: marginBottom.value,
+    marginHorizontal: marginHorizontal.value,
+  }));
 
   const tabs = useMemo(
     () => [
@@ -552,13 +543,16 @@ const SocialLinksEditionScreen = ({
         behavior="padding"
         keyboardVerticalOffset={-insetBottom - BOTTOM_MENU_HEIGHT}
       >
-        <SocialLinksPreview
-          style={styles.preview}
-          colorPalette={profile.webCard?.cardColors}
-          cardStyle={null}
-          animatedData={animatedData}
-          data={previewData}
-        />
+        <AnimatedDataOverride data={previewData} animatedData={animatedData}>
+          {data => (
+            <SocialLinksPreview
+              style={styles.preview}
+              colorPalette={profile.webCard?.cardColors}
+              cardStyle={null}
+              data={data}
+            />
+          )}
+        </AnimatedDataOverride>
         <TabView
           style={{ height: bottomPanelHeight }}
           currentTab={currentTab}

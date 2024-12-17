@@ -110,7 +110,7 @@ const CoverPreview = ({
     cardColors,
     images,
     localFilenames,
-    lutShaders,
+    lutTextures,
     loadingLocalMedia,
     loadingRemoteMedia,
     editionMode,
@@ -276,7 +276,7 @@ const CoverPreview = ({
   const drawFrame = useCallback<FrameDrawer>(
     infos => {
       'worklet';
-      if (!lutShaders) {
+      if (!lutTextures) {
         return;
       }
       let state = coverEditorState;
@@ -342,7 +342,7 @@ const CoverPreview = ({
         ...infos,
         coverEditorState: state,
         images,
-        lutShaders,
+        lutTextures,
         videoScales,
         skottiePlayer,
         lottieInfo,
@@ -362,7 +362,7 @@ const CoverPreview = ({
       }
     },
     [
-      lutShaders,
+      lutTextures,
       lottieInfo,
       skottiePlayer,
       coverEditorState,

@@ -7,6 +7,7 @@ import { colors } from '#theme';
 import EmailOrPhoneInput from '#components/EmailOrPhoneInput';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { keyExtractor } from '#helpers/idHelpers';
+import useScreenDimensions from '#hooks/useScreenDimensions';
 import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
 import BottomSheetModal from '#ui/BottomSheetModal';
@@ -43,7 +44,7 @@ type MultiUserAddFormProps = {
 const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
   const styles = useStyleSheet(styleSheet);
   const [showAvailableInfo, toggleShowAvailableInfo] = useToggle(false);
-  const { bottom } = useScreenInsets();
+  const { bottom, top } = useScreenInsets();
 
   const { field } = useController({ control, name: 'role' });
   const intl = useIntl();
@@ -79,6 +80,8 @@ const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
     },
     [setSelectedContact, toggleShowAvailableInfo],
   );
+
+  const { height } = useScreenDimensions();
 
   const renderAvailableInfo = (
     itemInfo: SelectListItemInfo<{
@@ -120,11 +123,12 @@ const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
         {contacts?.length > 0 && (
           <BottomSheetModal
             visible={showAvailableInfo}
-            height={
+            height={Math.min(
               BOTTOM_SHEET_HEIGHT_BASE +
-              contacts.length * BOTTOM_SHEET_HEIGHT_ITEM +
-              bottom
-            }
+                contacts.length * BOTTOM_SHEET_HEIGHT_ITEM +
+                bottom,
+              height - top,
+            )}
             variant="modal"
           >
             <Header

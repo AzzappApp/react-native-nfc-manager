@@ -11,7 +11,7 @@ import useScreenDimensions from '#hooks/useScreenDimensions';
 import BlockTextRenderer from './BlockTextRenderer';
 import MediaTextModuleRenderer from './CardModuleMediaText/MediaTextModuleRenderer';
 import MediaTextLinkModuleRenderer from './CardModuleMediaTextLink/MediaTextLinkModuleRenderer';
-import { CarouselViewRenderer } from './CarouselRenderer/CarouselRenderer';
+import CarouselViewRenderer from './CarouselRenderer';
 import HorizontalPhotoRenderer from './HorizontalPhotoRenderer';
 import LineDividerRenderer from './LineDividerRenderer';
 import PhotoWithTextAndTitleRenderer from './PhotoWithTextAndTitleRenderer';
@@ -24,7 +24,7 @@ import type { Variant } from '#helpers/webcardModuleHelpers';
 import type { BlockTextRendererData } from './BlockTextRenderer';
 import type { MediaTextModuleRendererData } from './CardModuleMediaText/MediaTextModuleRenderer';
 import type { MediaTextLinkModuleRendererData } from './CardModuleMediaTextLink/MediaTextLinkModuleRenderer';
-import type { CarouselViewRendererData } from './CarouselRenderer/CarouselRenderer';
+import type { CarouselViewRendererData } from './CarouselRenderer';
 import type { HorizontalPhotoRendererData } from './HorizontalPhotoRenderer';
 import type { LineDividerRendererData } from './LineDividerRenderer';
 import type { PhotoWithTextAndTitleRendererData } from './PhotoWithTextAndTitleRenderer';
@@ -180,7 +180,6 @@ const CardModuleRenderer = <T extends ModuleRenderInfo>({
         <HorizontalPhotoRenderer
           {...module}
           {...props}
-          animatedData={null}
           contentStyle={
             viewMode === 'desktop'
               ? {
@@ -196,13 +195,12 @@ const CardModuleRenderer = <T extends ModuleRenderInfo>({
       );
     }
     case 'lineDivider':
-      return <LineDividerRenderer {...module} {...props} animatedData={null} />;
+      return <LineDividerRenderer {...module} {...props} />;
     case 'photoWithTextAndTitle':
       return (
         <PhotoWithTextAndTitleRenderer
           {...module}
           {...props}
-          animatedData={null}
           viewMode={viewMode}
         />
       );
@@ -211,7 +209,6 @@ const CardModuleRenderer = <T extends ModuleRenderInfo>({
         <SimpleButtonRenderer
           {...module}
           {...props}
-          animatedData={null}
           contentStyle={
             viewMode === 'desktop'
               ? {
@@ -227,7 +224,6 @@ const CardModuleRenderer = <T extends ModuleRenderInfo>({
         <SimpleTextRenderer
           {...module}
           {...props}
-          animatedData={null}
           contentStyle={
             viewMode === 'desktop'
               ? {
@@ -244,7 +240,6 @@ const CardModuleRenderer = <T extends ModuleRenderInfo>({
         <SimpleTextRenderer
           {...module}
           {...props}
-          animatedData={null}
           contentStyle={
             viewMode === 'desktop'
               ? {
@@ -261,7 +256,6 @@ const CardModuleRenderer = <T extends ModuleRenderInfo>({
         <SocialLinksRenderer
           {...module}
           {...props}
-          animatedData={null}
           multilineStyle={
             viewMode === 'desktop'
               ? {

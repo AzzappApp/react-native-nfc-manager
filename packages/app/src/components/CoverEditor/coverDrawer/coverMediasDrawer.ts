@@ -1,18 +1,18 @@
-import { Skia, type SkShader } from '@shopify/react-native-skia';
+import {
+  Skia,
+  type SkImageFilter,
+  type SkImage,
+} from '@shopify/react-native-skia';
 import { COVER_MAX_MEDIA_DURATION } from '@azzapp/shared/coverHelpers';
 import {
-  applyImageFrameTransformations,
-  applyShaderTransformations,
   createImageFromNativeTexture,
-  getTransformsForEditionParameters,
-  imageFrameFromImage,
-  imageFrameFromVideoFrame,
-  imageFrameToShaderFrame,
+  createImageFromVideoFrame,
   scaleCropData,
+  transformImage,
 } from '#helpers/mediaEditions';
 import coverTransitions from './coverTransitions';
 import mediaAnimations from './mediaAnimations';
-import type { ImageFrame } from '#helpers/mediaEditions';
+import type { ImageInfo } from '#helpers/mediaEditions';
 import type { CoverDrawerOptions } from './coverDrawerTypes';
 import type { MediaAnimation } from './mediaAnimations';
 
@@ -23,7 +23,7 @@ const coverMediasDrawer = ({
   coverEditorState: { coverTransition, medias, imagesScales },
   currentTime,
   images,
-  lutShaders,
+  lutTextures,
   frames,
   videoScales,
 }: CoverDrawerOptions) => {
@@ -32,8 +32,8 @@ const coverMediasDrawer = ({
   const { transition, duration: transitionDuration } = (coverTransition &&
     coverTransitions[coverTransition]) || { transition: null, duration: 0 };
 
-  let inShader: SkShader | null = null;
-  let outShader: SkShader | null = null;
+  let inImage: SkImageFilter | null = null;
+  let outImage: SkImageFilter | null = null;
   let transitionTime = 0;
   for (let i = 0; i < medias.length; i++) {
     const media = medias[i];
@@ -55,83 +55,82 @@ const coverMediasDrawer = ({
       currentTime < compositionEndTime
     ) {
       const { filter, editionParameters } = media;
-      let imageFrame: ImageFrame | null = null;
+      let image: SkImage | null = null;
+      let imageInfo: ImageInfo | null = null;
       let scale = 1;
       let animation: MediaAnimation | null = null;
       if (media.kind === 'image') {
-        const image = createImageFromNativeTexture(images[media.id]);
+        image = createImageFromNativeTexture(images[media.id]);
         if (!image) {
           continue;
         }
+        imageInfo = {
+          matrix: Skia.Matrix(),
+          width: images[media.id].width,
+          height: images[media.id].height,
+        };
         scale = imagesScales[media.id] ?? 1;
-        imageFrame = imageFrameFromImage(image);
         animation = media.animation ? mediaAnimations[media.animation] : null;
       } else {
         const frame = frames[media.id];
         scale = videoScales[media.id] ?? 1;
-        const imageFrame = imageFrameFromVideoFrame(frame);
-        if (!imageFrame) {
+        ({ image, imageInfo } = createImageFromVideoFrame(frame) ?? {
+          image: null,
+          imageInfo: null,
+        });
+        if (!image) {
           continue;
         }
       }
-      if (!imageFrame) {
+      if (!image || !imageInfo) {
         continue;
       }
 
-      const { imageTransformations, shaderTransformations } =
-        getTransformsForEditionParameters({
-          width,
-          height,
-          lutShader: filter ? lutShaders[filter] : null,
-          editionParameters: {
-            ...editionParameters,
-            cropData: editionParameters?.cropData
-              ? scaleCropData(editionParameters.cropData, scale)
-              : undefined,
-          },
-        });
-
       if (animation) {
         const progress = (currentTime - compositionStartTime) / mediaDuration;
-        const { imageTransform, shaderTransform } = animation(progress);
-        if (imageTransform) {
-          imageTransformations.push(imageTransform);
-        }
-        if (shaderTransform) {
-          shaderTransformations.push(shaderTransform);
+        const transform = animation(progress);
+        if (transform) {
+          imageInfo = transform(imageInfo);
         }
       }
 
-      const { shader } = applyShaderTransformations(
-        imageFrameToShaderFrame(
-          applyImageFrameTransformations(imageFrame, imageTransformations),
-        ),
-        shaderTransformations,
-      );
+      const imageFilter = transformImage({
+        image,
+        targetWidth: width,
+        targetHeight: height,
+        imageInfo,
+        editionParameters: {
+          ...editionParameters,
+          cropData: editionParameters?.cropData
+            ? scaleCropData(editionParameters.cropData, scale)
+            : undefined,
+        },
+        lutTexture: filter ? lutTextures[filter] : undefined,
+      });
 
       if (currentTime >= compositionEndTime - transitionDuration && !isLast) {
-        outShader = shader;
+        outImage = imageFilter;
         transitionTime =
           currentTime - (compositionEndTime - transitionDuration);
       } else {
-        inShader = shader;
+        inImage = imageFilter;
       }
     }
     duration = Math.max(0, duration - transitionDuration);
     duration += mediaDuration;
   }
-  if (inShader && outShader && transition) {
+  if (inImage && outImage && transition) {
     transition({
       canvas,
-      inShader,
-      outShader,
+      inImage,
+      outImage,
       time: transitionTime,
       width,
       height,
     });
-  } else if (inShader) {
+  } else if (inImage) {
     const paint = Skia.Paint();
-    paint.setShader(inShader);
+    paint.setImageFilter(inImage);
 
     canvas.drawRect(
       {

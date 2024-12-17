@@ -1,7 +1,6 @@
 import chroma from 'chroma-js';
-import { useCallback, useMemo, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
-import Animated from 'react-native-reanimated';
+import { useCallback, useState } from 'react';
+import { View } from 'react-native';
 import { colors } from '#theme';
 import CardModuleBackgroundImage from './CardModuleBackgroundImage';
 import type {
@@ -42,24 +41,22 @@ const CardModuleBackground = ({
     ? chroma(backgroundColor).alpha(backgroundOpacity).hex()
     : colors.white;
 
-  const backgroundImageStyle = useMemo(
-    () =>
-      backgroundColor
-        ? [styles.background, { backgroundColor }]
-        : styles.background,
-    [backgroundColor],
-  );
   return (
-    <View style={{ width: '100%', position: 'relative', overflow: 'hidden' }}>
-      <Animated.View
-        {...props}
-        style={[{ opacity: layout ? 1 : 0 }, style]}
-        onLayout={onLayout}
-      >
-        {children}
-      </Animated.View>
+    <View style={[{ opacity: layout ? 1 : 0 }, style]} onLayout={onLayout}>
+      {children}
       {layout && (
-        <View style={backgroundImageStyle} pointerEvents="none">
+        <View
+          style={{
+            position: 'absolute',
+            zIndex: -1,
+            backgroundColor,
+            top: 0,
+            left: 0,
+            width: layout.width,
+            height: layout.height,
+          }}
+          pointerEvents="none"
+        >
           <CardModuleBackgroundImage
             backgroundOpacity={backgroundOpacity}
             backgroundUri={backgroundUri}
@@ -74,15 +71,3 @@ const CardModuleBackground = ({
 };
 
 export default CardModuleBackground;
-
-const styles = StyleSheet.create({
-  background: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    flex: 1,
-    width: '100%',
-    height: '100%',
-    zIndex: -1,
-  },
-});

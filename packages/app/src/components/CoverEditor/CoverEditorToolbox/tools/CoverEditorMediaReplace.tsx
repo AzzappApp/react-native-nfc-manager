@@ -1,6 +1,6 @@
 import { useIntl } from 'react-intl';
 import {
-  getMaxAllowedVideosPerCover,
+  MAX_ALLOWED_VIDEOS_BY_COVER,
   useLottieMediaDurations,
 } from '#components/CoverEditor/coverEditorHelpers';
 import CoverEditorMediaPicker from '#components/CoverEditor/CoverEditorMediaPicker';
@@ -37,7 +37,7 @@ const CoverEditorMediaReplace = () => {
     activeMedia?.kind === 'video'
       ? false
       : !(
-          getMaxAllowedVideosPerCover(!!lottie) >
+          MAX_ALLOWED_VIDEOS_BY_COVER >
           medias.filter(media => media.kind === 'video').length
         );
 

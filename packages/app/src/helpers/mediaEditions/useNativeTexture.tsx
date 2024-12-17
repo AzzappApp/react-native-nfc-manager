@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import useLatestCallback from '#hooks/useLatestCallback';
 import NativeTextureLoader from './NativeTextureLoader';
+import type { TextureInfo } from './NativeTextureLoader';
 
 const useNativeTexture = ({
   uri,
@@ -17,11 +18,7 @@ const useNativeTexture = ({
   onLoad?: () => void;
   onError?: (error?: Error) => void;
 }) => {
-  const [textureInfo, setTextureInfo] = useState<{
-    texture: unknown;
-    width: number;
-    height: number;
-  } | null>(null);
+  const [textureInfo, setTextureInfo] = useState<TextureInfo | null>(null);
   const onLoadInner = useLatestCallback(onLoad);
   const onErrorInner = useLatestCallback(onError);
   useEffect(() => {

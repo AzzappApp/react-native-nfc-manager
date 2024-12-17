@@ -1,4 +1,4 @@
-import { compileEffect } from '#helpers/mediaEditions/shaderUtils';
+import { compileEffect } from '#helpers/mediaEditions';
 import { createTransition } from './createTransition';
 
 const effect = compileEffect(`
@@ -37,6 +37,6 @@ const scale = 1.2;
 
 export default {
   id: 'dreamyZoom' as const,
-  transition: createTransition(effect, duration, [rotation, scale]),
+  transition: createTransition(effect, duration, { rotation, scale }),
   duration,
 };

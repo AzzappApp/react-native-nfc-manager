@@ -7,7 +7,7 @@ import EditorScaledPreview from '#components/EditorScaledPreview';
 
 type SimpleButtonPreviewProps = Pick<
   SimpleButtonRendererProps,
-  'animatedData' | 'cardStyle' | 'colorPalette' | 'data' | 'style'
+  'cardStyle' | 'colorPalette' | 'data' | 'style'
 > & {
   /**
    * A callback that is called when the module preview is pressed.
@@ -20,7 +20,6 @@ type SimpleButtonPreviewProps = Pick<
  */
 const SimpleButtonPreview = ({
   data,
-  animatedData,
   colorPalette,
   cardStyle,
   onPreviewPress,
@@ -43,7 +42,6 @@ const SimpleButtonPreview = ({
         cardStyle={cardStyle}
         colorPalette={colorPalette}
         data={moduleData}
-        animatedData={animatedData!}
         disabled
       />
     </EditorScaledPreview>

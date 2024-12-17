@@ -4,7 +4,7 @@ import type { SocialLinksRendererProps } from '#components/cardModules/SocialLin
 
 type SocialLinksPreviewProps = Pick<
   SocialLinksRendererProps,
-  'animatedData' | 'cardStyle' | 'colorPalette' | 'data' | 'style'
+  'cardStyle' | 'colorPalette' | 'data' | 'style'
 > & {
   /**
    * A callback that is called when the module preview is pressed.
@@ -28,7 +28,6 @@ const SocialLinksPreview = ({
         colorPalette={colorPalette}
         cardStyle={cardStyle}
         data={data}
-        animatedData={props.animatedData!}
         disabled
       />
     </EditorScaledPreview>

@@ -9,3 +9,4 @@ export {
   createImageFromNativeTexture,
 } from './NativeTextureLoader';
 export { default as useNativeTexture } from './useNativeTexture';
+export { compileEffect } from './imageFilterTransforms';

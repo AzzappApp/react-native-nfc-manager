@@ -1,10 +1,11 @@
 import { startTransition, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
-import { useSharedValue } from 'react-native-reanimated';
+import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { LINE_DIVIDER_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
 import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
+import AnimatedDataOverride from '#components/AnimatedDataOverride';
 import { useRouter } from '#components/NativeRouter';
 import WebCardColorPicker from '#components/WebCardColorPicker';
 import useEditorLayout from '#hooks/useEditorLayout';
@@ -187,6 +188,14 @@ const LineDividerEditionScreen = ({
   const cardModulesCount =
     (webCard?.cardModules.length ?? 0) + (lineDivider ? 0 : 1);
 
+  const animatedData = useDerivedValue(() => {
+    return {
+      height: height.value,
+      marginTop: marginTop.value,
+      marginBottom: marginBottom.value,
+    };
+  });
+
   const onSave = useCallback(() => {
     if (!canSave || !webCard) {
       return;
@@ -304,17 +313,16 @@ const LineDividerEditionScreen = ({
           />
         }
       />
-      <LineDividerPreview
-        style={{ height: topPanelHeight - 20, marginVertical: 10 }}
-        data={data}
-        colorPalette={webCard?.cardColors}
-        cardStyle={webCard?.cardStyle}
-        animatedData={{
-          height,
-          marginTop,
-          marginBottom,
-        }}
-      />
+      <AnimatedDataOverride data={data} animatedData={animatedData}>
+        {data => (
+          <LineDividerPreview
+            style={{ height: topPanelHeight - 20, marginVertical: 10 }}
+            data={data}
+            colorPalette={webCard?.cardColors}
+            cardStyle={webCard?.cardStyle}
+          />
+        )}
+      </AnimatedDataOverride>
       <TabView
         style={{ height: bottomPanelHeight }}
         currentTab={currentTab}

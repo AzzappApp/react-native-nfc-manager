@@ -1,47 +1,39 @@
-import {
-  FilterMode,
-  MipmapMode,
-  Skia,
-  TileMode,
-  loadData,
-} from '@shopify/react-native-skia';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { Image } from 'react-native';
-import { typedEntries } from '@azzapp/shared/objectHelpers';
-import { compileEffect } from './shaderUtils';
+import useNativeTexture from './useNativeTexture';
 import type { Filter } from '@azzapp/shared/filtersHelper';
-import type { SkShader } from '@shopify/react-native-skia';
 import type { ImageSourcePropType } from 'react-native';
 
-const getUri = (source: ImageSourcePropType) =>
-  // question mark for jest
-  Image.resolveAssetSource(source)?.uri;
+const getUri = (source: ImageSourcePropType) => {
+  // Question mark for jest
+  return Image.resolveAssetSource(source)?.uri;
+};
 
-export const FILTERS: Record<Filter, any> = {
-  nah: require('./assets/nah.png'),
-  once: require('./assets/once.png'),
-  passing_by: require('./assets/passing_by.png'),
-  serenity: require('./assets/serenity.png'),
-  solar: require('./assets/solar.png'),
-  undeniable: require('./assets/undeniable.png'),
-  undeniable2: require('./assets/undeniable2.png'),
-  you_can_do_it: require('./assets/you_can_do_it.png'),
-  pure: require('./assets/pure.png'),
-  syrah: require('./assets/syrah.png'),
-  paper: require('./assets/paper.png'),
-  rock: require('./assets/rock.png'),
-  vouzon: require('./assets/vouzon.png'),
+export const FILTERS: Record<Filter, string> = {
+  nah: getUri(require('./assets/nah.png')),
+  once: getUri(require('./assets/once.png')),
+  passing_by: getUri(require('./assets/passing_by.png')),
+  serenity: getUri(require('./assets/serenity.png')),
+  solar: getUri(require('./assets/solar.png')),
+  undeniable: getUri(require('./assets/undeniable.png')),
+  undeniable2: getUri(require('./assets/undeniable2.png')),
+  you_can_do_it: getUri(require('./assets/you_can_do_it.png')),
+  pure: getUri(require('./assets/pure.png')),
+  syrah: getUri(require('./assets/syrah.png')),
+  paper: getUri(require('./assets/paper.png')),
+  rock: getUri(require('./assets/rock.png')),
+  vouzon: getUri(require('./assets/vouzon.png')),
   // BIG UP @mlecoq
-  transparency: require('./assets/transparency.png'),
-  autumn: require('./assets/autumn.png'),
-  one_of_us: require('./assets/one_of_us.png'),
-  bourbon: require('./assets/bourbon.png'),
-  black_and_white_light: require('./assets/black_and_white_light.png'),
+  transparency: getUri(require('./assets/transparency.png')),
+  autumn: getUri(require('./assets/autumn.png')),
+  one_of_us: getUri(require('./assets/one_of_us.png')),
+  bourbon: getUri(require('./assets/bourbon.png')),
+  black_and_white_light: getUri(require('./assets/black_and_white_light.png')),
   black_and_white_neutral: getUri(
     require('./assets/black_and_white_neutral.png'),
   ),
-  black_and_white_old: require('./assets/black_and_white_old.png'),
+  black_and_white_old: getUri(require('./assets/black_and_white_old.png')),
 } as const;
 
 // create an array to have filter in the same order as the designer want
@@ -293,151 +285,25 @@ export const useFilterLabels = (): Record<Filter, string> => {
   );
 };
 
-const lutShaderCache = new Map<Filter, SkShader>();
-
-export const getLutShader = (filter: Filter) => {
+export const getLutURI = (filter: Filter) => {
   if (process.env.JEST_WORKER_ID) {
-    return Promise.resolve(null);
-  }
-  if (lutShaderCache.has(filter)) {
-    return Promise.resolve(lutShaderCache.get(filter)!);
+    return null;
   }
   const filterImage = FILTERS[filter];
   if (!filterImage) {
     console.warn(`Unknown filter ${filter}`);
-    return Promise.resolve(null);
+    return null;
   }
-  return loadData(
-    filterImage,
-    Skia.Image.MakeImageFromEncoded.bind(Skia.Image),
-  ).then(image => {
-    const shader = image?.makeShaderOptions(
-      TileMode.Clamp,
-      TileMode.Clamp,
-      FilterMode.Nearest,
-      MipmapMode.None,
-      Skia.Matrix(),
-    );
-    if (shader) {
-      lutShaderCache.set(filter, shader);
-    }
-    return shader ?? null;
-  });
+  return filterImage;
 };
 
-export const loadAllLUTShaders = async () => {
-  const record: Record<Filter, SkShader> = {} as any;
-  const shaders = await Promise.all(
-    typedEntries(FILTERS).map(async ([filter]) => ({
-      filter,
-      shader: await getLutShader(filter),
-    })),
-  );
-  shaders.forEach(({ filter, shader }) => {
-    if (shader) {
-      record[filter] = shader;
-    }
-  });
-  return record;
-};
-
-export const preloadLUTShaders = () => {
-  for (const filter of Object.keys(FILTERS) as Filter[]) {
-    getLutShader(filter).catch(err =>
-      console.warn(`Could not preload shader for ${filter}`, err),
-    );
-  }
-};
-
-export const useLutShader = (
+export const useLutTexture = (
   filter: Filter | null | undefined,
-  onError?: (err: Error) => void,
+  onError?: (err?: Error) => void,
 ) => {
-  const [lutShader, setLutShader] = useState<SkShader | null>(null);
-  useMemo(() => {
-    if (filter) {
-      getLutShader(filter)
-        .then(shader => setLutShader(shader))
-        .catch(onError);
-    } else {
-      setLutShader(null);
-    }
-  }, [filter, onError, setLutShader]);
-
-  return lutShader;
-};
-
-const ColorLUTEffect = compileEffect(`
-  uniform shader image;
-  uniform shader lut;
-
-  float lutSize = 64.0;
-
-  float4 getLutColor(float x, float y, float z) {
-    float lineIndex = floor(y / sqrt(lutSize));
-    float colIndex = y - lineIndex * sqrt(lutSize);
-
-    return lut.eval(
-      float2(
-        (x + colIndex * lutSize),
-        (z * sqrt(lutSize) + lineIndex)
-      )
-    );
-  }
-
-  float4 main(float2 xy) {
-    float4 color = image.eval(xy);
-
-    float x = color.r * (lutSize - 1.0);
-    float y = color.g * (lutSize - 1.0);
-    float z = color.b * (lutSize - 1.0);
-    
-    vec4 lutColor = mix( 
-      mix(
-        mix(
-          getLutColor(floor(x), floor(y), floor(z)),
-          getLutColor(ceil(x), floor(y), floor(z)),
-          fract(x)
-        ),
-        mix(
-          getLutColor(floor(x), ceil(y), floor(z)),
-          getLutColor(ceil(x), ceil(y), floor(z)),
-          fract(x)
-        ),
-        fract(y)
-      ),
-      mix(
-        mix(
-          getLutColor(floor(x), floor(y), ceil(z)),
-          getLutColor(ceil(x), floor(y), ceil(z)),
-          fract(x)
-        ),
-        mix(
-          getLutColor(floor(x), ceil(y), ceil(z)),
-          getLutColor(ceil(x), ceil(y), ceil(z)),
-          fract(x)
-        ),
-        fract(y)
-      ), 
-      fract(z)
-    );
-
-    if (color.a == 0.0) {
-      return color;
-    }
-    return float4(lutColor.rgb, color.a);
-  }
-`);
-
-export const applyLutFilter = (shader: SkShader, lutShader: SkShader) => {
-  'worklet';
-  if (!ColorLUTEffect) {
-    console.warn('Could not compile LUT effect');
-    return shader;
-  }
-  return ColorLUTEffect.makeShaderWithChildren(
-    [],
-    [shader, lutShader],
-    Skia.Matrix(),
-  );
+  return useNativeTexture({
+    uri: filter ? getLutURI(filter) : null,
+    kind: 'image',
+    onError,
+  });
 };

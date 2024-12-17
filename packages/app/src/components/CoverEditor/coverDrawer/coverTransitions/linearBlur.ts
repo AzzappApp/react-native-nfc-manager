@@ -1,4 +1,4 @@
-import { compileEffect } from '#helpers/mediaEditions/shaderUtils';
+import { compileEffect } from '#helpers/mediaEditions';
 import { createTransition } from './createTransition';
 
 const effect = compileEffect(`
@@ -37,6 +37,6 @@ const intensity = 0.1;
 
 export default {
   id: 'linearBlur' as const,
-  transition: createTransition(effect, duration, [intensity]),
+  transition: createTransition(effect, duration, { intensity }),
   duration,
 };

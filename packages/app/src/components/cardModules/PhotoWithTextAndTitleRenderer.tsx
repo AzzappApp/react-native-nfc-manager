@@ -1,11 +1,7 @@
 import { Image } from 'expo-image';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
-import { Platform } from 'react-native';
-import Animated, {
-  useAnimatedStyle,
-  useDerivedValue,
-} from 'react-native-reanimated';
+import { Platform, View } from 'react-native';
 import { graphql, readInlineData } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
@@ -29,9 +25,6 @@ import type {
   TextStyle,
   ViewStyle,
 } from 'react-native';
-import type { SharedValue } from 'react-native-reanimated';
-
-const AnimatedImage = Animated.createAnimatedComponent(Image);
 
 const PhotoWithTextAndTitleRendererFragment = graphql`
   fragment PhotoWithTextAndTitleRenderer_module on CardModulePhotoWithTextAndTitle
@@ -81,26 +74,9 @@ export const readPhotoWithTextAndTitleData = (
   module: PhotoWithTextAndTitleRenderer_module$key,
 ) => readInlineData(PhotoWithTextAndTitleRendererFragment, module);
 
-type AnimatedProps =
-  | 'aspectRatio'
-  | 'borderRadius'
-  | 'contentFontSize'
-  | 'contentVerticalSpacing'
-  | 'gap'
-  | 'marginHorizontal'
-  | 'marginVertical'
-  | 'titleFontSize'
-  | 'titleVerticalSpacing';
-
 export type PhotoWithTextAndTitleRendererData = NullableFields<
   Omit<PhotoWithTextAndTitleRenderer_module$data, ' $fragmentType'>
 >;
-
-type PhotoWithTextAndTitleRendererAnimatedData = {
-  [K in AnimatedProps]: SharedValue<
-    NonNullable<PhotoWithTextAndTitleRendererData[K]>
-  >;
-};
 
 export type PhotoWithTextAndTitleRendererProps = ViewProps & {
   /**
@@ -119,28 +95,11 @@ export type PhotoWithTextAndTitleRendererProps = ViewProps & {
    * The cover background color
    */
   coverBackgroundColor?: string | null | undefined;
-} & (
-    | {
-        /**
-         * The data for the PhotoWithTextAndTitle module
-         */
-        data: Omit<PhotoWithTextAndTitleRendererData, AnimatedProps>;
-        /**
-         * The animated data for the PhotoWithTextAndTitle module
-         */
-        animatedData: PhotoWithTextAndTitleRendererAnimatedData;
-      }
-    | {
-        /**
-         * The data for the PhotoWithTextAndTitle module
-         */
-        data: PhotoWithTextAndTitleRendererData;
-        /**
-         * The animated data for the PhotoWithTextAndTitle module
-         */
-        animatedData: null;
-      }
-  );
+  /**
+   * The data for the PhotoWithTextAndTitle module
+   */
+  data: PhotoWithTextAndTitleRendererData;
+};
 
 /**
  * Render a PhotoWithTextAndTitle module
@@ -150,7 +109,6 @@ const PhotoWithTextAndTitleRenderer = ({
   colorPalette,
   cardStyle,
   style,
-  animatedData,
   viewMode,
   coverBackgroundColor,
   ...props
@@ -170,7 +128,15 @@ const PhotoWithTextAndTitleRenderer = ({
     horizontalArrangement,
     background,
     backgroundStyle,
-    ...rest
+    aspectRatio,
+    borderRadius,
+    contentFontSize,
+    contentVerticalSpacing,
+    gap,
+    marginHorizontal,
+    marginVertical,
+    titleFontSize,
+    titleVerticalSpacing,
   } = getModuleDataValues({
     data,
     cardStyle,
@@ -194,24 +160,14 @@ const PhotoWithTextAndTitleRenderer = ({
         ? 'ios'
         : Platform.OS;
 
-  const widthMargin = useDerivedValue(
-    () =>
-      (layout?.width ?? 0) -
-      2 *
-        (animatedData === null
-          ? 'marginHorizontal' in rest
-            ? rest.marginHorizontal
-            : 0
-          : (animatedData?.marginHorizontal.value ?? 0)),
-  );
+  const widthMargin = (layout?.width ?? 0) - 2 * marginHorizontal;
 
-  const imageWidth = useDerivedValue(() =>
+  const imageWidth =
     os === 'web'
-      ? widthMargin.value / 2
+      ? widthMargin / 2
       : imageMargin === 'width_full'
         ? (layout?.width ?? 0)
-        : widthMargin.value,
-  );
+        : widthMargin;
 
   const flexDirection: ViewStyle['flexDirection'] =
     os === 'web'
@@ -222,143 +178,71 @@ const PhotoWithTextAndTitleRenderer = ({
         ? 'column'
         : 'column-reverse';
 
-  const containerStyle = useAnimatedStyle(() => {
-    if (animatedData === null) {
-      if ('gap' in rest) {
-        return {
-          marginVertical: rest.marginVertical,
-          flexDirection,
-          rowGap: rest.gap ?? 0,
-          columnGap: rest.gap ?? 0,
-          width: os === 'web' ? widthMargin.value : (layout?.width ?? 0),
-          marginHorizontal: os === 'web' ? (rest.marginHorizontal ?? 0) : 0,
-        };
-      }
-      return {
-        marginHorizontal: 0,
-      };
-    }
-    const gapValue = animatedData.gap.value ?? 0;
-    return {
-      marginVertical: animatedData.marginVertical.value,
+  const containerStyle = useMemo(
+    () => ({
+      marginVertical,
       flexDirection,
-      rowGap: gapValue,
-      columnGap: gapValue,
-      width: os === 'web' ? widthMargin.value : (layout?.width ?? 0),
-      marginHorizontal:
-        os === 'web' ? (animatedData.marginHorizontal.value ?? 0) : 0,
-    };
-  });
-
-  const imageContainerStyle = useAnimatedStyle(() => {
-    if (animatedData === null) {
-      return {
-        marginHorizontal:
-          'marginHorizontal' in rest && imageMargin !== 'width_full'
-            ? rest.marginHorizontal
-            : 0,
-        borderRadius: 'borderRadius' in rest ? rest.borderRadius : 0,
-      };
-    }
-
-    return {
-      marginHorizontal:
-        os === 'web'
-          ? 0
-          : imageMargin === 'width_full'
-            ? 0
-            : animatedData.marginHorizontal.value,
-      aspectRatio: animatedData.aspectRatio.value ?? 1,
-      borderRadius: animatedData.borderRadius.value ?? 0,
-    };
-  });
-
-  const imageStyle = useAnimatedStyle(() =>
-    animatedData === null
-      ? 'aspectRatio' in rest
-        ? {
-            aspectRatio: rest.aspectRatio ?? 1,
-            width: imageWidth.value,
-          }
-        : { width: imageWidth.value }
-      : {
-          aspectRatio: animatedData.aspectRatio.value ?? 1,
-          width: imageWidth.value,
-        },
+      rowGap: gap ?? 0,
+      columnGap: gap ?? 0,
+      width: os === 'web' ? widthMargin : (layout?.width ?? 0),
+      marginHorizontal: os === 'web' ? (marginHorizontal ?? 0) : 0,
+    }),
+    [
+      marginVertical,
+      flexDirection,
+      gap,
+      os,
+      widthMargin,
+      layout?.width,
+      marginHorizontal,
+    ],
   );
 
-  const textContainerStyle = useAnimatedStyle(() => {
-    return animatedData === null
-      ? 'marginHorizontal' in rest
-        ? {
-            width:
-              os === 'web'
-                ? widthMargin.value / 2 - (rest.gap ?? 0)
-                : undefined,
-            marginHorizontal: os === 'web' ? 0 : (rest.marginHorizontal ?? 0),
-            justifyContent: viewMode === 'desktop' ? 'center' : undefined,
-          }
-        : {}
-      : {
-          width:
-            os === 'web'
-              ? widthMargin.value / 2 - (animatedData?.gap.value ?? 0)
-              : undefined,
-          marginHorizontal:
-            os === 'web' ? 0 : (animatedData?.marginHorizontal.value ?? 0),
-          justifyContent: viewMode === 'desktop' ? 'center' : undefined,
-        };
-  });
+  const imageContainerStyle = useMemo(
+    () => ({
+      marginHorizontal: imageMargin !== 'width_full' ? marginHorizontal : 0,
+      borderRadius,
+    }),
+    [imageMargin, marginHorizontal, borderRadius],
+  );
 
-  const titleStyle = useAnimatedStyle(() => {
-    if (animatedData === null) {
-      if ('titleFontSize' in rest) {
-        return {
-          lineHeight:
-            rest.titleFontSize && rest.titleVerticalSpacing
-              ? rest.titleFontSize * 1.2 + rest.titleVerticalSpacing
-              : undefined,
-          fontSize: rest.titleFontSize,
-        };
-      }
-      return {};
-    }
+  const imageStyle = useMemo(
+    () => ({
+      aspectRatio: aspectRatio ?? 1,
+      width: imageWidth,
+    }),
+    [aspectRatio, imageWidth],
+  );
 
-    const fontSizeValue = animatedData.titleFontSize.value;
-    const verticalSpacingValue = animatedData.titleVerticalSpacing.value;
+  const textContainerStyle = useMemo(
+    () =>
+      ({
+        width: os === 'web' ? widthMargin / 2 - (gap ?? 0) : undefined,
+        marginHorizontal: os === 'web' ? 0 : (marginHorizontal ?? 0),
+        justifyContent: viewMode === 'desktop' ? 'center' : undefined,
+      }) as const,
+    [os, widthMargin, gap, marginHorizontal, viewMode],
+  );
+
+  const titleStyle = useMemo(() => {
     return {
-      fontSize: fontSizeValue ?? undefined,
       lineHeight:
-        fontSizeValue && verticalSpacingValue
-          ? fontSizeValue * 1.2 + verticalSpacingValue
+        titleFontSize && titleVerticalSpacing
+          ? titleFontSize * 1.2 + titleVerticalSpacing
           : undefined,
+      fontSize: titleFontSize,
     };
-  });
+  }, [titleFontSize, titleVerticalSpacing]);
 
-  const contentStyle = useAnimatedStyle(() => {
-    if (animatedData === null) {
-      if ('contentFontSize' in rest) {
-        return {
-          lineHeight:
-            rest.contentFontSize && rest.contentVerticalSpacing
-              ? rest.contentFontSize * 1.2 + rest.contentVerticalSpacing
-              : undefined,
-          fontSize: rest.contentFontSize,
-        };
-      }
-      return {};
-    }
-
-    const fontSizeValue = animatedData.contentFontSize.value;
-    const verticalSpacingValue = animatedData.contentVerticalSpacing.value;
+  const contentStyle = useMemo(() => {
     return {
-      fontSize: fontSizeValue ?? undefined,
       lineHeight:
-        fontSizeValue && verticalSpacingValue
-          ? fontSizeValue * 1.2 + verticalSpacingValue
+        contentFontSize && contentVerticalSpacing
+          ? contentFontSize * 1.2 + contentVerticalSpacing
           : undefined,
+      fontSize: contentFontSize,
     };
-  });
+  }, [contentFontSize, contentVerticalSpacing]);
 
   const intl = useIntl();
 
@@ -377,20 +261,20 @@ const PhotoWithTextAndTitleRenderer = ({
       style={style}
       onLayout={onLayout}
     >
-      <Animated.View style={containerStyle}>
-        <Animated.View style={[imageContainerStyle, { overflow: 'hidden' }]}>
+      <View style={containerStyle}>
+        <View style={[imageContainerStyle, { overflow: 'hidden' }]}>
           {image && (
-            <AnimatedImage
+            <Image
               source={{ uri: image.uri }}
               style={imageStyle}
               contentFit="cover"
             />
           )}
-        </Animated.View>
+        </View>
 
-        <Animated.View style={textContainerStyle}>
+        <View style={textContainerStyle}>
           {title !== '' && (
-            <Animated.Text
+            <Text
               style={[
                 titleStyle,
                 {
@@ -405,11 +289,11 @@ const PhotoWithTextAndTitleRenderer = ({
                   defaultMessage: 'Add section Title here',
                   description: 'PhotoWithTextAndTitle default module title',
                 })}
-            </Animated.Text>
+            </Text>
           )}
 
           {content !== '' && (
-            <Animated.Text
+            <Text
               style={[
                 contentStyle,
                 {
@@ -435,10 +319,10 @@ const PhotoWithTextAndTitleRenderer = ({
                     ),
                   },
                 )}
-            </Animated.Text>
+            </Text>
           )}
-        </Animated.View>
-      </Animated.View>
+        </View>
+      </View>
     </CardModuleBackground>
   );
 };

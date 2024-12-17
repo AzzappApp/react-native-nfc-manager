@@ -1,16 +1,12 @@
 import {
   Canvas,
-  FilterMode,
-  MipmapMode,
-  Picture,
   Skia,
-  TileMode,
-  createPicture,
   useImage,
+  Image as SkiaImage,
 } from '@shopify/react-native-skia';
 import { memo, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Image, View } from 'react-native';
+import { Image, PixelRatio } from 'react-native';
 import {
   useDerivedValue,
   useFrameCallback,
@@ -21,6 +17,7 @@ import { colors } from '#theme';
 import BoxSelectionList from '#components/BoxSelectionList';
 import { DoneHeaderButton } from '#components/commonsButtons';
 import { keyExtractor } from '#helpers/idHelpers';
+import { drawOffScreen, useOffScreenSurface } from '#helpers/skiaHelpers';
 import useBoolean from '#hooks/useBoolean';
 import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
@@ -39,7 +36,7 @@ import type {
   CoverTransitions,
   CoverTransitionsListItem,
 } from '../../coverDrawer/coverTransitions';
-import type { SkShader } from '@shopify/react-native-skia';
+import type { SkImageFilter } from '@shopify/react-native-skia';
 
 const CoverEditorTransitionTool = () => {
   const [show, open, close] = useBoolean(false);
@@ -76,8 +73,8 @@ const CoverEditorTransitionTool = () => {
   const previewOutImage = useImage(require('./assets/preview_1.png'));
 
   const [{ previewIn, previewOut }, setShaders] = useState<{
-    previewIn: SkShader | null;
-    previewOut: SkShader | null;
+    previewIn: SkImageFilter | null;
+    previewOut: SkImageFilter | null;
   }>({
     previewIn: null,
     previewOut: null,
@@ -89,21 +86,16 @@ const CoverEditorTransitionTool = () => {
         return;
       }
       // 38 for label height very rough estimate
-      const scale = (height - 38) / previewInImage.height();
+      const scale =
+        ((height - 38) / previewInImage.height()) * PixelRatio.get();
       setShaders({
-        previewIn: previewInImage.makeShaderOptions(
-          TileMode.Clamp,
-          TileMode.Clamp,
-          FilterMode.Linear,
-          MipmapMode.None,
+        previewIn: Skia.ImageFilter.MakeMatrixTransform(
           Skia.Matrix().scale(scale, scale),
+          Skia.ImageFilter.MakeImage(previewInImage),
         ),
-        previewOut: previewOutImage.makeShaderOptions(
-          TileMode.Clamp,
-          TileMode.Clamp,
-          FilterMode.Linear,
-          MipmapMode.None,
+        previewOut: Skia.ImageFilter.MakeMatrixTransform(
           Skia.Matrix().scale(scale, scale),
+          Skia.ImageFilter.MakeImage(previewOutImage),
         ),
       });
     },
@@ -191,8 +183,8 @@ const TransitionPreview = ({
   transitionId: CoverTransitions;
   height: number;
   width: number;
-  previewIn: SkShader | null;
-  previewOut: SkShader | null;
+  previewIn: SkImageFilter | null;
+  previewOut: SkImageFilter | null;
 }) => {
   const { duration, transition } = coverTransitions[transitionId];
 
@@ -222,29 +214,28 @@ const TransitionPreview = ({
     animationStateSharedValue.value = { animationTime, isPaused, reversed };
   });
 
-  const picture = useDerivedValue(() =>
-    createPicture(canvas => {
-      if (!previewIn || !previewOut) {
-        return;
-      }
+  const surface = useOffScreenSurface(width, height);
+  const image = useDerivedValue(() => {
+    if (!previewIn || !previewOut || !surface) {
+      return null;
+    }
+    return drawOffScreen(surface, (canvas, width, height) => {
+      canvas.clear(Skia.Color('#00000000'));
       const { animationTime, reversed } = animationStateSharedValue.value;
-
       transition({
         canvas,
         time: animationTime / ANIMATION_TIME_SCALE,
-        inShader: reversed ? previewIn : previewOut,
-        outShader: reversed ? previewOut : previewIn,
+        inImage: reversed ? previewIn : previewOut,
+        outImage: reversed ? previewOut : previewIn,
         width,
         height,
       });
-    }),
-  );
+    });
+  });
 
   return (
-    <View style={{ height, width }}>
-      <Canvas style={{ width, height }} opaque>
-        <Picture picture={picture} />
-      </Canvas>
-    </View>
+    <Canvas style={{ width, height }} opaque>
+      <SkiaImage image={image} x={0} y={0} width={width} height={height} />
+    </Canvas>
   );
 };

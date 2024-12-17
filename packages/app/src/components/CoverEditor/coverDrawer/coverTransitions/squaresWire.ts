@@ -1,4 +1,4 @@
-import { compileEffect } from '#helpers/mediaEditions/shaderUtils';
+import { compileEffect } from '#helpers/mediaEditions';
 import { createTransition } from './createTransition';
 
 const effect = compileEffect(`
@@ -30,6 +30,6 @@ const duration = 0.5;
 const smoothness = 1.6;
 export default {
   id: 'squaresWire' as const,
-  transition: createTransition(effect, duration, [smoothness]),
+  transition: createTransition(effect, duration, { smoothness }),
   duration,
 };
