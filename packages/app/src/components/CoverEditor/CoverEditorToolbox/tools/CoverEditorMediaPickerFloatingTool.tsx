@@ -10,8 +10,8 @@ import {
   useCoverEditorContext,
   useCoverEditorEditContext,
 } from '../../CoverEditorContext';
-import type { SourceMedia } from '#helpers/mediaHelpers';
 import CoverEditorMediaPicker from '../../CoverEditorMediaPicker';
+import type { SourceMedia } from '#helpers/mediaHelpers';
 
 type Props = {
   durations: number[] | null;

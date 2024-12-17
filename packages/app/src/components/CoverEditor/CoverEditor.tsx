@@ -35,6 +35,11 @@ import {
   getLutURI,
   NativeTextureLoader,
 } from '#helpers/mediaEditions';
+import {
+  copyCoverMediaToCacheDir,
+  COVER_CACHE_DIR,
+  type SourceMedia,
+} from '#helpers/mediaHelpers';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Text from '#ui/Text';
@@ -56,7 +61,6 @@ import { getCoverLocalMediaPath } from './coversLocalStore';
 import useLottie from './useLottie';
 import useSaveCover from './useSaveCover';
 import type { TextureInfo } from '#helpers/mediaEditions/NativeTextureLoader';
-import { copyCoverMediaToCacheDir, COVER_CACHE_DIR, type SourceMedia } from '#helpers/mediaHelpers';
 import type { CoverEditor_coverTemplate$key } from '#relayArtifacts/CoverEditor_coverTemplate.graphql';
 import type { CoverEditor_profile$key } from '#relayArtifacts/CoverEditor_profile.graphql';
 import type { CoverEditorAction } from './coverEditorActions';
