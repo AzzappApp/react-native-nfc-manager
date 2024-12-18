@@ -1,2 +1,3 @@
-## 1.5.2-canary.2
+## 1.5.2-canary.3
 
+* **build:**  - upgrade blob-util causing android build issue
