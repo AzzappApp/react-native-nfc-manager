@@ -99,9 +99,10 @@ const loadCardTemplateMutation: MutationResolvers['loadCardTemplate'] = async (
       }
 
       await createCardModules(
-        cardTemplate.modules.map(({ kind, data }, index) => ({
+        cardTemplate.modules.map(({ kind, variant, data }, index) => ({
           kind,
           data,
+          variant,
           webCardId: profile.webCardId,
           position: index,
         })),

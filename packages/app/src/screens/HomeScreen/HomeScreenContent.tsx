@@ -55,7 +55,7 @@ const HomeScreenContent = ({
 
   const onDeepLink = useCallback(
     (deepLink: string) => {
-      if (deepLink === 'multiuser_invitation') {
+      if (deepLink === 'multiuser_invitation' || deepLink === 'shareBack') {
         refreshQuery?.();
       }
     },

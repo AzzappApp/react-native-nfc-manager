@@ -4,6 +4,10 @@ import { ScrollView, Share, StyleSheet, View } from 'react-native';
 import ColorTriptychRenderer from '#components/ColorTriptychRenderer';
 import useBoolean from '#hooks/useBoolean';
 import useToggle from '#hooks/useToggle';
+import ToolBarContainer from '../../Toolbar/ToolBarTransitioner';
+import ToolBoxSection, {
+  TOOLBOX_SECTION_HEIGHT,
+} from '../../Toolbar/ToolBoxSection';
 import {
   useCoverEditorContext,
   useCoverEditorEditContext,
@@ -16,8 +20,6 @@ import CoverEditorTextToolbox from './CoverEditorTextToolbox';
 import CoverEditorAddOverlay from './modals/CoverEditorAddOverlay';
 import CoverEditorAddTextModal from './modals/CoverEditorAddTextModal';
 import CoverEditorColorsManager from './tools/CoverEditorColorsManager';
-import ToolBarContainer from './ui/ToolBarTransitioner';
-import ToolBoxSection, { TOOLBOX_SECTION_HEIGHT } from './ui/ToolBoxSection';
 import type { CoverEditionMode } from '../coverEditorTypes';
 import type { CoverEditorLinksToolActions } from './tools/CoverEditorLinksTool';
 import type { ForwardedRef } from 'react';

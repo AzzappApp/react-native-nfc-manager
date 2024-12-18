@@ -208,7 +208,7 @@ const MediaItemRenderer = ({
       >
         <Image
           accessibilityRole="image"
-          accessibilityIgnoresInvertColors={true}
+          accessibilityIgnoresInvertColors
           style={
             selected
               ? {

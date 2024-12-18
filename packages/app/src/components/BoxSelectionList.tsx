@@ -1,5 +1,5 @@
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors, shadow } from '#theme';
@@ -11,7 +11,6 @@ import type {
   LayoutChangeEvent,
   ListRenderItemInfo,
   ViewProps,
-  ViewStyle,
 } from 'react-native';
 
 export type BoxButtonItemInfo<T> = {
@@ -50,6 +49,7 @@ const BoxSelectionList = <T,>({
 }: BoxSelectionListProps<T>) => {
   const styles = useStyleSheet(styleSheet);
 
+  const list = useRef<FlatList>(null);
   const [height, setHeight] = useState<number | null>(fixedItemHeight ?? null);
 
   const onLayoutInner = useCallback(
@@ -150,9 +150,18 @@ const BoxSelectionList = <T,>({
     return innerData.indexOf(selectedItem);
   }, [innerData, selectedItem]);
 
+  const prevHeight = useRef(height);
+  useEffect(() => {
+    if (height !== prevHeight.current) {
+      list.current?.scrollToIndex({ index: initialScrollIndex });
+      prevHeight.current = height;
+    }
+  }, [height, initialScrollIndex]);
+
   return (
     <FlatList
       {...props}
+      ref={list}
       data={innerData}
       renderItem={renderButton}
       keyExtractor={innerKeyExtractor}
@@ -293,19 +302,9 @@ const styleSheet = createStyleSheet(appearance => ({
       left: 6,
       backgroundColor: appearance === 'dark' ? colors.grey900 : colors.grey200,
       borderCurve: 'continuous',
+      overflow: 'visible',
+      ...shadow(appearance),
     },
-    Platform.select<ViewStyle>({
-      default: {
-        overflow: 'visible',
-        ...shadow(appearance),
-      },
-      android: {
-        borderWidth: StyleSheet.hairlineWidth,
-        borderColor: appearance === 'dark' ? colors.grey800 : colors.grey100,
-        overflow: 'hidden',
-        elevation: 0,
-      },
-    }),
   ],
   buttonInnerBorder: {
     position: 'absolute',

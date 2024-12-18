@@ -296,7 +296,7 @@ describe('CameraView', () => {
     });
     render(
       <CameraView
-        initialCameraPosition={'front'}
+        initialCameraPosition="front"
         onInitialized={() => void 0}
         onError={() => void 0}
       />,

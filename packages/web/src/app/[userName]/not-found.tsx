@@ -16,7 +16,7 @@ export default function NotFound() {
           removed.
         </p>
       </div>
-      <Link href={'/'} className={styles.logoWrapper}>
+      <Link href="/" className={styles.logoWrapper}>
         <Image src={logo} alt="azzap logo" className={styles.logo} />
       </Link>
     </div>

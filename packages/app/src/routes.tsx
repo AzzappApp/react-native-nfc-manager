@@ -1,10 +1,10 @@
 import isEqual from 'lodash/isEqual';
+import type { SectionsRoute } from './sectionsRoutes';
 import type { ColorPaletteColor } from '@azzapp/shared/cardHelpers';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
 import type { Contact } from 'expo-contacts';
 import type { LayoutRectangle } from 'react-native';
-
 export type AboutRoute = {
   route: 'ABOUT';
   params?: never;
@@ -301,6 +301,7 @@ export type Route =
   | PostRoute
   | ResetPasswordRoute
   | SearchRoute
+  | SectionsRoute
   | SignInRoute
   | SignUpRoute
   | UserPayWallRoute

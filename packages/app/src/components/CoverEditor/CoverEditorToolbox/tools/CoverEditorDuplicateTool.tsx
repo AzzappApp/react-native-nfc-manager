@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
-import { useCoverEditorEditContext } from '../../CoverEditorContext';
-import ToolBoxSection from '../ui/ToolBoxSection';
+import { useCoverEditorEditContext } from '#components/CoverEditor/CoverEditorContext';
+import ToolBoxSection from '../../../Toolbar/ToolBoxSection';
 
 const CoverEditorDuplicateTool = () => {
   const intl = useIntl();

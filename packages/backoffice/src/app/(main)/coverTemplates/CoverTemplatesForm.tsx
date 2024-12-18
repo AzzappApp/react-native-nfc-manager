@@ -69,12 +69,12 @@ const CoverTemplateForm = ({
           <Tabs value={selectedTab} onChange={handleChange}>
             <Tab
               label="Configuration"
-              id={'configuration'}
+              id="configuration"
               aria-controls="configuration"
             />
             <Tab
               label="Activities Previews"
-              id={'previews'}
+              id="previews"
               aria-controls="previews"
             />
           </Tabs>

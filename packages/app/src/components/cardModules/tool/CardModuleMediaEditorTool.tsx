@@ -1,0 +1,87 @@
+import { memo, useCallback } from 'react';
+import { useIntl } from 'react-intl';
+import ImagePicker, { EditImageStep } from '#components/ImagePicker';
+import { ScreenModal } from '#components/NativeRouter';
+import ToolBoxSection from '#components/Toolbar/ToolBoxSection';
+import useToggle from '#hooks/useToggle';
+
+import {
+  CARD_MEDIA_VIDEO_DEFAULT_DURATION,
+  type CardModuleMedia,
+} from '../cardModuleEditorType';
+import type { ImagePickerResult } from '#components/ImagePicker';
+
+type CardModuleMediaEditorToolProps = {
+  cardModuleMedia: CardModuleMedia;
+  onFinish: (media: CardModuleMedia) => void;
+};
+const CardModuleMediaEditorTool = ({
+  cardModuleMedia,
+  onFinish,
+}: CardModuleMediaEditorToolProps) => {
+  const [show, toggleScreenModal] = useToggle(false);
+  const { media } = cardModuleMedia;
+  const cropData = media?.editionParameters?.cropData;
+  const mediaAspectRatio = cropData
+    ? cropData.width / cropData.height
+    : media
+      ? media.width / media.height
+      : 1;
+
+  const intl = useIntl();
+
+  const onFinished = useCallback(
+    ({ filter, editionParameters }: ImagePickerResult) => {
+      //update the media through props drilling
+      onFinish({
+        ...cardModuleMedia,
+        media: { ...media, filter, editionParameters },
+      });
+    },
+    [cardModuleMedia, media, onFinish],
+  );
+
+  return (
+    <>
+      <ToolBoxSection
+        icon="filters"
+        label={intl.formatMessage({
+          defaultMessage: 'Effects',
+          description: 'Cover Edition Overlay Tool Button- Effect',
+        })}
+        onPress={toggleScreenModal}
+      />
+      {media != null && (
+        <ScreenModal
+          visible={show}
+          animationType="slide"
+          onRequestDismiss={toggleScreenModal}
+        >
+          {show && (
+            <ImagePicker
+              initialData={
+                media
+                  ? {
+                      editionParameters: media.editionParameters,
+                      filter: media.filter,
+                      media,
+                      timeRange:
+                        media.kind === 'video' ? media.timeRange : undefined,
+                    }
+                  : null
+              }
+              // additionalData={{ selectedTab: 'filter', showTabs: false }}
+              forceAspectRatio={mediaAspectRatio}
+              steps={[EditImageStep]}
+              onCancel={toggleScreenModal}
+              onFinished={onFinished}
+              maxVideoDuration={CARD_MEDIA_VIDEO_DEFAULT_DURATION}
+            />
+          )}
+        </ScreenModal>
+      )}
+    </>
+  );
+};
+
+export default memo(CardModuleMediaEditorTool);

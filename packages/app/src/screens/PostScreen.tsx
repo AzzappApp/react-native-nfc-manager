@@ -179,6 +179,7 @@ const PostScreen = ({
         onEndReached={onEndReached}
         loading={loading}
         firstItemVideoTime={videoTime}
+        onPostDeleted={router.back}
       />
       <Suspense>
         <RelatedPostLoader

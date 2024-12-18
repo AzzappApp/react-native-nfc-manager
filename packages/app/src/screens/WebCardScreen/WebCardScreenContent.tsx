@@ -1,6 +1,11 @@
 import { Suspense, memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useWindowDimensions, View, StyleSheet } from 'react-native';
-import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import Animated, {
+  runOnJS,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
+} from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
@@ -10,14 +15,13 @@ import { colors } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import { useCurrentRoute, useRouter } from '#components/NativeRouter';
 import WebCardBackground from '#components/WebCardBackgroundPreview';
+import { getRouteForCardModule } from '#helpers/cardModuleRouterHelpers';
 import useBoolean from '#hooks/useBoolean';
-import useToggle from '#hooks/useToggle';
 import useCoverPlayPermission from '#screens/HomeScreen/useCoverPlayPermission';
 import ActivityIndicator from '#ui/ActivityIndicator';
-import AddContentBelowCoverModal from './AddContentBelowCoverModal';
+import AddModuleSectionModal from './AddModuleSection/AddModuleSectionModal';
 import CardStyleModal from './CardStyleModal';
 import LoadCardTemplateModal from './LoadCardTemplateModal';
-import ModuleSelectionListModal from './ModuleSelectionListModal';
 import PreviewModal from './PreviewModal';
 import WebCardBlockContainer from './WebCardBlockContainer';
 import WebCardColorsManager from './WebCardColorsManager';
@@ -29,14 +33,13 @@ import WebCardScreenFooter from './WebCardScreenFooter';
 import WebCardScreenHeader from './WebCardScreenHeader';
 import WebCardScreenScrollView from './WebCardScreenScrollView';
 import { useEditTransition } from './WebCardScreenTransitions';
+import type { ModuleKindWithVariant } from '#helpers/webcardModuleHelpers';
 import type { WebCardScreenContent_webCard$key } from '#relayArtifacts/WebCardScreenContent_webCard.graphql';
 import type {
   WebCardBodyHandle,
   ModuleSelectionInfos,
 } from './WebCardScreenBody';
-import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
-import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
-import type { ScrollView } from 'react-native-gesture-handler';
+import type { AnimatedScrollView } from 'react-native-reanimated/lib/typescript/component/ScrollView';
 
 type WebCardScreenContentProps = {
   /**
@@ -102,7 +105,7 @@ const WebCardScreenContent = ({
         ...WebCardBackgroundPreview_webCard
         ...PreviewModal_webCard
         ...LoadCardTemplateModal_webCard
-        ...AddContentBelowCoverModal_webCard
+        ...CardTemplatesList_webCard
         ...WebCardScreenEditModeFooter_webCard
         ...WebCardScreenFooter_webCard
         coverBackgroundColor
@@ -151,36 +154,14 @@ const WebCardScreenContent = ({
   // #endregion
 
   // #region New Module
-  const [showContentModal, toggleShowContentModal] = useToggle(false);
+  const [showContentModal, openContentModal, closeContentModal] =
+    useBoolean(false);
 
-  const onAddContent = useCallback(() => {
-    // @TODO: restore when templates are ready to be used instead of module picker
-    // toggleShowContentModal()
-
-    Toast.hide();
-    setShowModulePicker(true);
-  }, []);
-
-  const [showModulePicker, setShowModulePicker] = useState(false);
   const onRequestNewModule = useCallback(() => {
     Toast.hide();
-    setShowModulePicker(true);
-  }, []);
+    openContentModal();
+  }, [openContentModal]);
 
-  const onCloseModulePicker = useCallback(() => {
-    setShowModulePicker(false);
-  }, []);
-
-  const onSelectModuleKind = useCallback(
-    (module: ModuleKind) => {
-      setShowModulePicker(false);
-      router.push({
-        route: 'CARD_MODULE_EDITION',
-        params: { module, isNew: true },
-      });
-    },
-    [router],
-  );
   // #endregion
 
   // #region Module edition
@@ -195,20 +176,14 @@ const WebCardScreenContent = ({
   }, []);
 
   const onEditModule = useCallback(
-    (module: ModuleKind, moduleId: string) => {
-      if (!MODULE_KINDS.includes(module)) {
+    (module: ModuleKindWithVariant & { moduleId: string }) => {
+      if (!MODULE_KINDS.includes(module.moduleKind)) {
         // unhanded module kind could be a future addition
         return;
       }
       //TODO: find a better way but with our router, the Toast is keep to(not an autohide toast)
       Toast.hide();
-      router.push({
-        route: 'CARD_MODULE_EDITION',
-        params: {
-          module,
-          moduleId,
-        },
-      });
+      router.push(getRouteForCardModule(module));
     },
     [router],
   );
@@ -269,7 +244,7 @@ const WebCardScreenContent = ({
 
   //#region Load template
 
-  const scrollViewRef = useRef<ScrollView>(null);
+  const scrollViewRef = useRef<AnimatedScrollView>(null);
   const [loadTemplate, setLoadTemplate] = useState(false);
   const onTemplateModalClose = useCallback((templateLoaded: boolean) => {
     if (templateLoaded) {
@@ -301,13 +276,7 @@ const WebCardScreenContent = ({
   }, []);
   // #endregion
 
-  const onScroll = useCallback(
-    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-      const atTop = event.nativeEvent.contentOffset.y < 5;
-      onContentPositionChange?.(atTop);
-    },
-    [onContentPositionChange],
-  );
+  const scrollPosition = useSharedValue(0);
 
   const coverBackgroundColor =
     swapColor(webCard.coverBackgroundColor, webCard.cardColors) ??
@@ -323,6 +292,18 @@ const WebCardScreenContent = ({
   });
 
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();
+
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: event => {
+      scrollPosition.value = event.contentOffset.y;
+    },
+    onEndDrag(event) {
+      const atTop = event.contentOffset.y < 5;
+      if (onContentPositionChange) {
+        runOnJS(onContentPositionChange)(atTop);
+      }
+    },
+  });
 
   const { canPlay, paused } = useCoverPlayPermission();
 
@@ -363,13 +344,13 @@ const WebCardScreenContent = ({
           editing={editing}
           ref={scrollViewRef}
           allBlockLoaded={allBlockLoaded}
-          onScroll={onScroll}
+          onScroll={scrollHandler}
           editFooter={
             isViewer ? (
               <Suspense>
                 <WebCardScreenEditModeFooter
                   fromCreation={fromCreation}
-                  onAddContent={onAddContent}
+                  onAddContent={openContentModal}
                   onSkip={onDone}
                   webcard={webCard}
                 />
@@ -416,6 +397,7 @@ const WebCardScreenContent = ({
               onEditModule={onEditModule}
               onSelectionStateChange={onSelectionStateChange}
               onLoad={onProfileBodyLoad}
+              scrollPosition={scrollPosition}
             />
           </Suspense>
         </WebCardScreenScrollView>
@@ -439,12 +421,6 @@ const WebCardScreenContent = ({
 
       {isViewer && (
         <>
-          <ModuleSelectionListModal
-            visible={showModulePicker}
-            onRequestClose={onCloseModulePicker}
-            onSelectModuleKind={onSelectModuleKind}
-            animationType="slide"
-          />
           <Suspense fallback={null}>
             <PreviewModal
               visible={showPreviewModal}
@@ -466,8 +442,8 @@ const WebCardScreenContent = ({
               onRequestClose={closeWebcardColorPicker}
               onCloseCanceled={openWebcardColorPicker}
             />
-            <AddContentBelowCoverModal
-              onClose={toggleShowContentModal}
+            <AddModuleSectionModal
+              close={closeContentModal}
               open={showContentModal}
               webCard={webCard}
             />

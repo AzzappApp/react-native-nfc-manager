@@ -28,11 +28,11 @@ type SortableWrapperProps = {
    */
   children: (panGesture: PanGesture) => React.ReactNode;
   /**
-   * the total height of the container
+   * the total Dimension of the container (height or width)
    *
    * @type {number}
    */
-  containerHeight: number;
+  containerDimension: number;
   /**
    * Sahre value array of id: position
    *
@@ -52,11 +52,11 @@ type SortableWrapperProps = {
    */
   autoScrollDirection: SharedValue<ScrollDirection>;
   /**
-   * the height of the item (important to calculate the position)
+   * the height(vertical)/width(horizontal)) of the item (important to calculate the position)
    *
    * @type {number}
    */
-  itemHeight: number;
+  itemDimension: number;
   /**
    * the number of item in the list
    *
@@ -68,7 +68,22 @@ type SortableWrapperProps = {
    * @type {() => void}
    */
   onDragEnd: () => void;
+  /**
+   * Need a long press to activate drag & drop
+   */
+  horizontal?: boolean;
+  /**
+   * Need a long press to activate drag & drop
+   */
+  activateAfterLongPress?: boolean;
+  /**
+   * Initial position of the item, used only at mount
+   */
+  initialPosition: number;
 };
+
+const scrollDuration = 3000;
+
 /**
  *  SortableWrapper for sortable list. Multiple part were inspired from diff gist
  *  Could have maybe written using a HOC
@@ -77,38 +92,50 @@ const SortableWrapper = ({
   id,
   children,
   positions,
-  containerHeight,
+  containerDimension,
   lowerBound,
   autoScrollDirection,
   itemCount,
-  itemHeight,
+  itemDimension,
   onDragEnd,
+  horizontal,
+  activateAfterLongPress,
+  initialPosition,
 }: SortableWrapperProps) => {
   const styles = useStyleSheet(styleSheet);
   const [moving, setMoving] = useState(false);
-  const positionY = useSharedValue(positions.get()[id] * itemHeight);
-  const top = useSharedValue(positions.get()[id] * itemHeight);
-  const upperBound = useDerivedValue(() => lowerBound.get() + containerHeight);
+  const position = useSharedValue(initialPosition);
+  const top = useSharedValue(initialPosition);
+
+  // empiric value, may need to be generic in the futur
+  const scrollThreshold = itemDimension / 3;
+
+  const upperBound = useDerivedValue(
+    () =>
+      lowerBound.get() + containerDimension - itemDimension - scrollThreshold,
+  );
+
   const targetLowerBound = useSharedValue(lowerBound.get());
+
   const diffScrolling = useSharedValue(0);
 
   // move the position of the row
   useAnimatedReaction(
-    () => positionY.value,
-    (positionYValue, previousValue) => {
+    () => position.value,
+    (positionValue, previousValue) => {
       if (
-        positionYValue !== null &&
+        positionValue !== null &&
         previousValue !== null &&
-        positionYValue !== previousValue
+        positionValue !== previousValue
       ) {
         if (moving) {
-          top.value = positionYValue;
-          setPosition(positionYValue, itemCount, positions, id, itemHeight);
+          top.value = positionValue;
+          setPosition(positionValue, itemCount, positions, id, itemDimension);
           setAutoScroll(
-            positionYValue,
+            positionValue,
             lowerBound.value,
             upperBound.value,
-            itemHeight,
+            scrollThreshold,
             autoScrollDirection,
           );
         }
@@ -127,7 +154,7 @@ const SortableWrapper = ({
       ) {
         //does not apply to the current moving item, but other
         if (!moving) {
-          top.value = withSpring(currentPosition * itemHeight);
+          top.value = withSpring(currentPosition * itemDimension);
         }
       }
     },
@@ -161,17 +188,22 @@ const SortableWrapper = ({
         scrollDirection !== previousValue
       ) {
         switch (scrollDirection) {
-          case ScrollDirection.Up: {
+          case ScrollDirection.Backward: {
             targetLowerBound.value = lowerBound.value;
-            targetLowerBound.value = withTiming(0, { duration: 1500 });
+            targetLowerBound.value = withTiming(0, {
+              duration: scrollDuration,
+            });
             break;
           }
-          case ScrollDirection.Down: {
-            const contentHeight = itemCount * itemHeight;
-            const maxScroll = contentHeight - containerHeight + 300;
+          case ScrollDirection.Forward: {
+            const contentHeight = itemCount * itemDimension;
+            const maxScroll =
+              contentHeight - containerDimension + itemDimension;
 
             targetLowerBound.value = lowerBound.value;
-            targetLowerBound.value = withTiming(maxScroll, { duration: 1500 });
+            targetLowerBound.value = withTiming(maxScroll, {
+              duration: scrollDuration,
+            });
             break;
           }
           case ScrollDirection.None: {
@@ -198,23 +230,28 @@ const SortableWrapper = ({
       }
     },
   );
-  const startY = useSharedValue(0);
+  const start = useSharedValue(0);
 
   const panGesture = Gesture.Pan()
+    .runOnJS(false)
     .onBegin(() => {
-      positionY.value = positions.value[id] * itemHeight;
-      startY.value = positions.value[id] * itemHeight;
+      position.value = positions.value[id] * itemDimension;
+      start.value = positions.value[id] * itemDimension;
       runOnJS(setMoving)(true);
       runOnJS(trigger)('impactLight');
     })
     .onUpdate(event => {
-      positionY.value = startY.value + event.translationY - diffScrolling.value;
+      position.value =
+        start.value +
+        (horizontal ? event.translationX : event.translationY) -
+        diffScrolling.value;
     })
     .onEnd(() => {
-      const finishPosition = positions.value[id] * itemHeight;
+      const finishPosition = positions.value[id] * itemDimension;
       top.value = withTiming(finishPosition);
       diffScrolling.value = 0;
     })
+    .activateAfterLongPress(activateAfterLongPress ? 300 : 0)
     .onFinalize(() => {
       runOnJS(setMoving)(false);
       runOnJS(onDragEnd)();
@@ -222,7 +259,8 @@ const SortableWrapper = ({
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
-      top: top.value,
+      top: horizontal ? undefined : top.value,
+      left: horizontal ? top.value : undefined,
       zIndex: moving ? 1 : 0,
       shadowOpacity: withSpring(moving ? 0.2 : 0),
     };
@@ -247,16 +285,16 @@ const styleSheet = createStyleSheet(appearance => ({
 }));
 
 function setPosition(
-  positionY: number,
+  position: number,
   count: number,
   positions: SharedValue<{ [id: string]: number }>,
   id: string,
-  itemHeight: number,
+  itemDimension: number,
 ) {
   'worklet';
   const newPosition = Math.max(
     0,
-    Math.min(Math.round(positionY / itemHeight), count - 1),
+    Math.min(Math.round(position / itemDimension), count - 1),
   );
 
   if (newPosition !== positions.value[id]) {
@@ -271,17 +309,17 @@ function setPosition(
 }
 
 function setAutoScroll(
-  positionY: number,
+  position: number,
   lowerBound: number,
   upperBound: number,
   scrollThreshold: number,
   autoScroll: SharedValue<ScrollDirection>,
 ) {
   'worklet';
-  if (positionY <= lowerBound + scrollThreshold) {
-    autoScroll.value = ScrollDirection.Up;
-  } else if (positionY >= upperBound - scrollThreshold) {
-    autoScroll.value = ScrollDirection.Down;
+  if (position <= lowerBound + scrollThreshold) {
+    autoScroll.value = ScrollDirection.Backward;
+  } else if (position >= upperBound - scrollThreshold) {
+    autoScroll.value = ScrollDirection.Forward;
   } else {
     autoScroll.value = ScrollDirection.None;
   }

@@ -3,12 +3,12 @@ import { FormattedRelativeTime, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
-import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import AuthorCartouche from '#components/AuthorCartouche';
 import Link from '#components/Link';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { relativeDateMinute } from '#helpers/dateHelpers';
+import { profileInfoHasEditorRight } from '#helpers/profileRoleHelper';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
@@ -56,7 +56,7 @@ const CommentItem = ({ item }: CommentItemProps) => {
         <View style={{ flexDirection: 'row' }}>
           <Text variant="small">
             {postComment.webCard.cardIsPublished ||
-            (profileHasEditorRight(profileInfos?.profileRole) &&
+            (profileInfoHasEditorRight(profileInfos) &&
               profileInfos?.webCardId === postComment.webCard.id) ? (
               <Link
                 route="WEBCARD"

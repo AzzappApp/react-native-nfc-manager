@@ -8,12 +8,12 @@ import Container from '#ui/Container';
 import Header from '#ui/Header';
 import LabeledWheelSelector from '#ui/LabeledWheelSelector';
 import Text from '#ui/Text';
+import ToolBoxSection from '../../../Toolbar/ToolBoxSection';
 import {
   useCoverEditorEditContext,
   useCoverEditorLinksLayer,
   useCoverEditorTextLayer,
 } from '../../CoverEditorContext';
-import ToolBoxSection from '../ui/ToolBoxSection';
 
 type Props = {
   title: string;

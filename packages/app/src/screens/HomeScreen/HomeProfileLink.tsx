@@ -81,14 +81,9 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
   };
 
   const text = useDerivedValue(() => {
-    if (currentIndexSharedValue.value > 0.5) {
-      return (
-        'azzapp.com/' +
-        userNames.value[Math.round(currentIndexSharedValue.value - 1)]
-      );
-    }
-
-    return 'azzapp.com';
+    // index 0 will be hidden, no need to update it
+    const displayedItem = (currentIndexProfileSharedValue.value || 1) - 1;
+    return 'azzapp.com/' + userNames.value[displayedItem];
   });
 
   return (
@@ -98,16 +93,16 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
         accessibilityRole="button"
         onPress={onPress}
       >
-        <Icon icon="earth" style={styles.iconLink} />
-
-        <AnimatedText
-          variant="button"
-          numberOfLines={1}
-          style={styles.url}
-          text={text}
-          maxLength={windowWidth.width / 13}
-        />
-        <View style={styles.emptyViewCenter} />
+        <Icon icon="link" style={styles.iconLink} />
+        <View style={styles.animatedContainer}>
+          <AnimatedText
+            variant="button"
+            numberOfLines={1}
+            style={styles.url}
+            text={text}
+            maxLength={windowWidth.width / 5}
+          />
+        </View>
       </PressableNative>
     </Animated.View>
   );
@@ -121,26 +116,25 @@ export const PROFILE_LINK_MARGIN_TOP = 21;
 
 const styles = StyleSheet.create({
   container: {
-    height: PROFILE_LINK_HEIGHT,
     width: '100%',
+    height: PROFILE_LINK_HEIGHT,
     alignItems: 'center',
     marginTop: PROFILE_LINK_MARGIN_TOP,
   },
-  emptyViewCenter: {
-    marginRight: 13,
-    height: 18,
-    width: 18,
+  url: {
+    color: colors.white,
+    lineHeight: 14,
+    paddingLeft: 5,
+    paddingRight: 10,
   },
-  url: { color: colors.white, flex: 1, textAlign: 'center' },
   iconLink: {
     tintColor: colors.white,
-    marginLeft: 13,
+    marginLeft: 10,
     height: 18,
     width: 18,
   },
   containerText: {
     height: PROFILE_LINK_HEIGHT,
-    width: '82%',
     borderWidth: 1,
     borderRadius: 14,
     justifyContent: 'center',
@@ -148,5 +142,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: 'rgba(0, 0, 0, 0.2)',
     borderColor: 'rgba(255, 255, 255, 0.4)',
+  },
+  animatedContainer: {
+    maxWidth: '80%',
   },
 });

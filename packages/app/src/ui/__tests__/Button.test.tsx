@@ -63,7 +63,7 @@ describe('Button component', () => {
         label={label}
         style={style}
         variant="secondary"
-        disabled={true}
+        disabled
         testID="button_testId"
       />,
     );
@@ -76,9 +76,7 @@ describe('Button component', () => {
   // TODO: reenable this test when `toHaveAnimatedStyle` is fixed
   xtest('pressed style should apply correctly when the `button`is touch', () => {
     mockedUseColorScheme.mockReturnValue('light');
-    render(
-      <Button label={label} testOnly_pressed={true} testID="button_testId" />,
-    );
+    render(<Button label={label} testOnly_pressed testID="button_testId" />);
     act(() => {
       fireEvent(screen.getByTestId('button_testId'), 'pressIn');
     });
@@ -104,7 +102,7 @@ describe('Button component', () => {
       <Button
         label={label}
         onPress={onPress}
-        disabled={true}
+        disabled
         testID="button_testId"
       />,
     );

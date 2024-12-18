@@ -97,6 +97,7 @@ const formInput = style({
     color: vars.color.grey200,
   },
   textOverflow: 'ellipsis',
+  width: '100%',
 });
 
 const formButtonSuccess = style({});

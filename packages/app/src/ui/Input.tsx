@@ -1,6 +1,7 @@
 import { forwardRef, useState } from 'react';
 import {
   TextInput as NativeTextInput,
+  Platform,
   useColorScheme,
   View,
 } from 'react-native';
@@ -105,7 +106,11 @@ const Input = (
 
 const styleSheet = createStyleSheet(appearance => ({
   rightElement: { marginRight: 13.5, justifyContent: 'center' },
-  leftElement: { marginLeft: 16, justifyContent: 'center' },
+  leftElement: {
+    marginLeft: 16,
+    justifyContent: 'center',
+    right: Platform.OS === 'android' ? -4 : undefined, // workaround for android gap
+  },
   errored: {
     borderColor: colors.red400,
   },

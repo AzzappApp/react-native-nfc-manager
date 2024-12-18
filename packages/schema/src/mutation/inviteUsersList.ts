@@ -162,7 +162,7 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
         createdAt,
       };
 
-      if (existingProfile) {
+      if (existingProfile?.deleted) {
         profilesToUpdate.push({
           id: existingProfile.id,
           deletedAt: null,
@@ -170,7 +170,7 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
           deleted: false,
           ...payload,
         });
-      } else {
+      } else if (!existingProfile) {
         profileToCreate.push(payload);
       }
     }

@@ -2,7 +2,6 @@ import * as Device from 'expo-device';
 import memoize from 'lodash/memoize';
 import { useMemo } from 'react';
 import { Dimensions, PixelRatio } from 'react-native';
-import ReactNativeBlobUtil from 'react-native-blob-util';
 import { createSkottieTemplatePlayer } from 'react-native-skottie-template-player';
 import {
   COVER_RATIO,
@@ -10,15 +9,11 @@ import {
 } from '@azzapp/shared/coverHelpers';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { extractLottieInfo, replaceColors } from '@azzapp/shared/lottieHelpers';
-import { getFileExtension } from '#helpers/fileHelpers';
 import {
   getDeviceMaxDecodingResolution,
   reduceVideoResolutionIfNecessary,
 } from '#helpers/mediaEditions';
-import {
-  downloadRemoteFileToLocalCache,
-  type SourceMedia,
-} from '#helpers/mediaHelpers';
+import { type SourceMedia } from '#helpers/mediaHelpers';
 import { coverTransitions } from './coverDrawer';
 import { getCoverLocalMediaPath } from './coversLocalStore';
 import type { CardColors, CoverEditorState } from './coverEditorTypes';
@@ -364,67 +359,3 @@ export const getMediaWithLocalFile = <T extends SourceMedia>(
   ...media,
   uri: `file://${getCoverLocalMediaPath(localFilenames[media.id])}`,
 });
-
-export const COVER_CACHE_DIR = `${ReactNativeBlobUtil.fs.dirs.CacheDir}/covers`;
-
-let checkMediaCacheDirPromise: Promise<void> | null = null;
-const checkMediaCacheDir = () => {
-  if (!checkMediaCacheDirPromise) {
-    checkMediaCacheDirPromise = (async () => {
-      if (!(await ReactNativeBlobUtil.fs.isDir(COVER_CACHE_DIR))) {
-        await ReactNativeBlobUtil.fs.mkdir(COVER_CACHE_DIR);
-      }
-    })();
-  }
-  return checkMediaCacheDirPromise;
-};
-
-const copyPromises: Record<string, Promise<string | null>> = {};
-
-const copyCoverMediaToCacheDirInternal = async (
-  media: SourceMedia,
-  abortSignal?: AbortSignal,
-): Promise<string | null> => {
-  await checkMediaCacheDir();
-  const ext = getFileExtension(media.uri);
-  const sanitizedId = media.id.replace(/[^a-z0-9]/gi, '_');
-  const filename = `${sanitizedId}${ext ? `.${ext}` : ''}`;
-  const resultPath = `${COVER_CACHE_DIR}/${filename}`;
-  if (await ReactNativeBlobUtil.fs.exists(resultPath)) {
-    return filename;
-  }
-  let oldPath;
-  if (media.uri && media.uri.startsWith('file:///android_asset')) {
-    oldPath = ReactNativeBlobUtil.fs.asset(
-      media.uri.replace('file:///android_asset/', ''),
-    );
-  } else if (media.uri && media.uri.startsWith('file://')) {
-    oldPath = media.uri.replace('file://', '');
-    if (!(await ReactNativeBlobUtil.fs.exists(oldPath))) {
-      return null;
-    }
-  } else {
-    oldPath = await downloadRemoteFileToLocalCache(media.uri, abortSignal);
-    if (!oldPath) {
-      return null;
-    }
-  }
-  await ReactNativeBlobUtil.fs.cp(oldPath, resultPath);
-  return filename;
-};
-
-export const copyCoverMediaToCacheDir = (
-  media: SourceMedia,
-  abortSignal?: AbortSignal,
-): Promise<string | null> => {
-  if (!copyPromises[media.id]) {
-    copyPromises[media.id] = copyCoverMediaToCacheDirInternal(
-      media,
-      abortSignal,
-    );
-    copyPromises[media.id].finally(() => {
-      delete copyPromises[media.id];
-    });
-  }
-  return copyPromises[media.id];
-};

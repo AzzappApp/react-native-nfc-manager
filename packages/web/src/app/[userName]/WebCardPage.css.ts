@@ -146,7 +146,7 @@ const postNavigationHidden = style({
 const coverContainer = style({
   '@media': {
     [MediaQuery.Desktop]: {
-      padding: '50px 0',
+      padding: '20px 0 50px 0',
       backdropFilter: 'blur(15px)',
     },
   },

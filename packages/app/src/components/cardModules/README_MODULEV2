@@ -1,0 +1,10 @@
+MODULE V2
+- a module is defined with a moduleKind  and a variant (design)
+- cardModuleMedia is an object composed with a Media, and optional data associated to it (text,link, title )
+- graphQL api will always return [CardModuleMedia]
+- cardModuleColor will define the combination of colors for the 5 ring color (dyptick). It will be never NULL or UNDEFINED becasue we are using transparent value(ex : Media=> Parallax). Not having it null simplify the dev and unify 
+- ALL new module Kind should implement the HOC (withCardModule)
+- the CardModulePreviewContainer will help to display the ratio, scale for switching desktop/mobile during edition
+- the desktop view mode should always be defined with the DESKTOP_WIDTH defined as a constnant (currenlty 900px), the preview container will do the job for displaying it properly;
+- A component CardModuleBottom will be used (Composition). Based on module/variant, the design, option provided will change/ Try to keep it nice and clean
+-- please do not refactor, we can all discuss about it before

@@ -78,6 +78,7 @@ const HomeBottomPanelMessage = ({ user }: HomeBottomPanelMessageProps) => {
   return (
     <View style={styles.container}>
       {(bottomContent ?? []).map((content, index) => {
+        if (!content?.type) return null;
         return <MessageItem key={index} content={content} index={index} />;
       })}
     </View>

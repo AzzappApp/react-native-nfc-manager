@@ -1,16 +1,19 @@
 import { MasonryFlashList } from '@shopify/flash-list';
 import isEqual from 'lodash/isEqual';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
+import { useIntl } from 'react-intl';
 import {
   Platform,
   useWindowDimensions,
   RefreshControl,
   View,
 } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import PostLink from '#components/PostLink';
 import Skeleton from '#components/Skeleton';
 import { keyExtractor } from '#helpers/idHelpers';
+import useToggleLikePost from '#hooks/useToggleLikePost';
 import { POST_RENDERER_RADIUS } from './PostRendererFeed';
 import type {
   PostsGrid_posts$data,
@@ -35,6 +38,7 @@ type PostsGrid = {
   ListFooterComponent?: ReactElement<any> | null;
   onRefresh?: () => void;
   onEndReached?: () => void;
+  webcardId?: string;
   style?: StyleProp<ViewStyle>;
   nestedScrollEnabled?: boolean;
   extraData?: any;
@@ -214,9 +218,37 @@ const PostRenderer = ({
   videoDisabled?: boolean;
   width: number;
 }) => {
+  const intl = useIntl();
   const ratio = item.media?.aspectRatio ?? 1;
+  const toggleLikePost = useToggleLikePost({
+    onCompleted(response) {
+      if (response?.togglePostReaction.post.postReaction) {
+        Toast.show({
+          type: 'like',
+          text1: intl.formatMessage({
+            defaultMessage: 'liked',
+            description: 'Toggle like post success in post grid',
+          }) as unknown as string,
+        });
+      } else {
+        Toast.show({
+          type: 'unlike',
+          text1: intl.formatMessage({
+            defaultMessage: 'unliked',
+            description: 'Toggle unlike post success in post grid',
+          }) as unknown as string,
+        });
+      }
+    },
+  });
+
+  const onToggleLikePost = () => {
+    toggleLikePost(item.id);
+  };
+
   return (
     <PostLink
+      onLike={onToggleLikePost}
       postId={item.id}
       post={item}
       width={width}

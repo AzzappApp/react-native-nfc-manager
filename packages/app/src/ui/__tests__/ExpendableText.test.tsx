@@ -11,6 +11,7 @@ describe('ExpendableText', () => {
   });
 
   test('text should be clipped if exceeding the numbeOfLines', async () => {
+    jest.useFakeTimers();
     const { getByTestId } = render(
       <ExpendableText label={lorem} numberOfLines={3} testID="clippedTextId" />,
     );
@@ -22,6 +23,7 @@ describe('ExpendableText', () => {
         },
       });
     });
+    jest.runAllTimers();
 
     expect(textComponent).toHaveTextContent(
       "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took ... more",

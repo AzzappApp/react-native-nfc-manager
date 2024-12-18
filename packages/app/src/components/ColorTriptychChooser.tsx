@@ -201,7 +201,7 @@ const ColorTriptychChooser = ({
               left: (size - size / RATIO_PRESS) / 2,
             }}
             color={colorPalette.primary}
-            testID={'primary-color-button'}
+            testID="primary-color-button"
             disabled={saving}
             disabledOpacity={1}
           />
@@ -213,7 +213,7 @@ const ColorTriptychChooser = ({
               left: -size / RATIO_PRESS / 2 - size / RATIO_PRESS / 10,
             }}
             color={colorPalette.dark}
-            testID={'dark-color-button'}
+            testID="dark-color-button"
             disabled={saving}
             disabledOpacity={1}
           />
@@ -225,7 +225,7 @@ const ColorTriptychChooser = ({
               right: -size / RATIO_PRESS / 2 - size / RATIO_PRESS / 10,
             }}
             color={colorPalette.light}
-            testID={'light-color-button'}
+            testID="light-color-button"
             disabled={saving}
             disabledOpacity={1}
           />

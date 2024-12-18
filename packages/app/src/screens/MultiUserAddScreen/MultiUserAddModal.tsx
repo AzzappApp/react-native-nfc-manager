@@ -40,7 +40,7 @@ import type { MultiUserAddModal_InviteUserMutation } from '#relayArtifacts/Multi
 import type { MultiUserAddModal_webCard$key } from '#relayArtifacts/MultiUserAddModal_webCard.graphql';
 import type { ContactCardEditFormValues } from '#screens/ContactCardEditScreen/ContactCardEditModalSchema';
 import type { MultiUserAddFormValues } from './MultiUserAddForm';
-import type { Contact } from 'expo-contacts';
+import type { Address, Contact } from 'expo-contacts';
 import type { CountryCode } from 'libphonenumber-js';
 import type { ForwardedRef } from 'react';
 import type { Control } from 'react-hook-form';
@@ -246,6 +246,24 @@ const MultiUserAddModal = (
             value: ctc[0].id,
           };
         }
+        const formatExpoAddress = (addr: Address) => {
+          let formatedAddress = '';
+          if (addr.street?.length) {
+            formatedAddress = addr.street;
+          }
+          if (addr.postalCode?.length) {
+            if (formatedAddress?.length) {
+              formatedAddress += ` ${addr.postalCode}`;
+            }
+          }
+          if (addr.country?.length) {
+            if (formatedAddress?.length) {
+              formatedAddress += ` ${addr.country}`;
+            }
+          }
+          return formatedAddress;
+        };
+
         reset(
           {
             role: 'user',
@@ -256,15 +274,21 @@ const MultiUserAddModal = (
               contact.phoneNumbers?.map(a => ({
                 label: normalizePhoneMailLabel(a.label),
                 number: a.number,
+                selected: true,
               })) ?? [],
             emails:
               contact.emails?.map(a => ({
                 label: normalizePhoneMailLabel(a.label),
                 address: a.email,
+                selected: true,
               })) ?? [],
             title: contact.jobTitle,
             company: contact.company ?? undefined,
-            urls: contact.urlAddresses?.map(a => ({ address: a.url })) ?? [],
+            urls:
+              contact.urlAddresses?.map(a => ({
+                address: a.url,
+                selected: true,
+              })) ?? [],
             birthday:
               contact.birthday?.day &&
               contact.birthday.month &&
@@ -275,6 +299,7 @@ const MultiUserAddModal = (
                       contact.birthday.month,
                       contact.birthday.day,
                     ).toISOString(),
+                    selected: true,
                   }
                 : undefined,
             avatar: contact?.image?.uri
@@ -284,6 +309,20 @@ const MultiUserAddModal = (
                   local: true,
                 }
               : undefined,
+            addresses: contact.addresses?.map(addr => {
+              return {
+                label: addr.label,
+                address: formatExpoAddress(addr),
+                selected: true,
+              };
+            }),
+            socials: contact.socialProfiles?.map(social => {
+              return {
+                url: social.url,
+                label: social.label,
+                selected: true,
+              };
+            }),
           },
           { keepDirty: true },
         );

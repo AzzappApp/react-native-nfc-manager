@@ -13,9 +13,12 @@ import Animated, {
   FadeOut,
   interpolate,
   LinearTransition,
+  measure,
   runOnJS,
   useAnimatedReaction,
+  useAnimatedRef,
   useAnimatedStyle,
+  useFrameCallback,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
@@ -34,6 +37,7 @@ import {
   useEditTransitionListener,
   useSelectionModeTransition,
 } from './WebCardScreenTransitions';
+import type { SharedValue } from 'react-native-reanimated';
 
 export type ProfileBlockContainerProps = {
   /**
@@ -129,6 +133,8 @@ export type ProfileBlockContainerProps = {
    * Called when the user select the block
    */
   onSelect?: (selected: boolean) => void;
+
+  modulePosition?: SharedValue<number>;
 };
 
 /**
@@ -157,6 +163,7 @@ const WebCardBlockContainer = ({
   onDuplicate,
   onToggleVisibility,
   onSelect,
+  modulePosition,
 }: ProfileBlockContainerProps) => {
   const intl = useIntl();
 
@@ -343,6 +350,17 @@ const WebCardBlockContainer = ({
     opacity: Math.max(0, dragX.value / dragLeftLimit),
   }));
 
+  const animatedRef = useAnimatedRef();
+
+  useFrameCallback(() => {
+    if (modulePosition) {
+      const measured = measure(animatedRef);
+      if (measured) {
+        modulePosition.value = measured.y;
+      }
+    }
+  });
+
   return (
     <Animated.View
       entering={
@@ -362,6 +380,7 @@ const WebCardBlockContainer = ({
             )
           : undefined
       }
+      ref={animatedRef}
     >
       <Animated.View style={blockStyle}>
         <GestureDetector gesture={Gesture.Race(tapGesture, panGesture)}>

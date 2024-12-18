@@ -52,13 +52,14 @@ const HuePicker = ({ value, onChange, style }: HuePickerProps) => {
   return (
     <View style={[styles.container, style]} onLayout={onLayout}>
       <GestureDetector gesture={panGesture}>
-        <LinearGradient
-          style={[styles.innerGradient, { borderRadius }]}
-          colors={HUE_COLORS}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          hitSlop={{ left: 8, right: 8, top: 10, bottom: 10 }}
-        />
+        <View style={styles.gesture}>
+          <LinearGradient
+            style={[styles.innerGradient, { borderRadius }]}
+            colors={HUE_COLORS}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+          />
+        </View>
       </GestureDetector>
       {width && (
         <View
@@ -95,10 +96,17 @@ const styles = StyleSheet.create({
   },
   innerGradient: {
     position: 'absolute',
-    top: 0,
+    top: 10,
     left: 0,
     width: '100%',
-    height: '100%',
+    height: 8,
+  },
+  gesture: {
+    height: 28,
+    // put negative value to put touchable view over previous view.
+    // This is a workaround for hitSlop issue, not working on android
+    top: -10,
+    width: '100%',
   },
   slider: {
     width: 16,

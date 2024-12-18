@@ -30,7 +30,7 @@ const SizeInput = ({ field }: Props) => {
   return (
     <>
       <TextField
-        label={'Size'}
+        label="Size"
         sx={{ flex: 1 }}
         select
         required

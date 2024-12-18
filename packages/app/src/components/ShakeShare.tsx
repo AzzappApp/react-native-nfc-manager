@@ -1,4 +1,3 @@
-/* eslint-disable no-bitwise */
 import EventEmitter from 'events';
 import {
   BlendColor,
@@ -10,15 +9,12 @@ import {
   fitbox,
   rect,
 } from '@shopify/react-native-skia';
+import * as Clipboard from 'expo-clipboard';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Suspense, useCallback, useEffect, useState } from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
-import {
-  Directions,
-  Gesture,
-  GestureDetector,
-  GestureHandlerRootView,
-} from 'react-native-gesture-handler';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { View, StyleSheet, Dimensions, ScrollView } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import {
   SensorType,
   runOnJS,
@@ -27,15 +23,21 @@ import {
   useDerivedValue,
   useSharedValue,
 } from 'react-native-reanimated';
-import { graphql, useClientQuery } from 'react-relay';
+import Toast from 'react-native-toast-message';
+import { graphql, useLazyLoadQuery } from 'react-relay';
 import { useNetworkAvailableContext } from '#networkAvailableContext';
 import { colors } from '#theme';
+import AddToWalletButton from '#components/AddToWalletButton';
+import ToastUi from '#components/Toast';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import useLatestCallback from '#hooks/useLatestCallback';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { get as qrCodeWidth } from '#relayProviders/qrCodeWidth.relayprovider';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import IconButton from '#ui/IconButton';
+import LargeButton from '#ui/LargeButton';
+import Text from '#ui/Text';
+import ContactCardExportVcf from './ContactCardExportVcf';
 import CoverRenderer from './CoverRenderer';
 import type { ShakeShareScreenQuery } from '#relayArtifacts/ShakeShareScreenQuery.graphql';
 
@@ -54,7 +56,7 @@ const ShakeShare = () => {
     setMountScreen(false);
   }, []);
 
-  const hasProfile = !!(profileInfos && profileInfos.profileRole !== 'invited');
+  const hasProfile = !!(profileInfos && !profileInfos.invited);
 
   const activateDetector = useCallback(() => {
     setMountScreen(true);
@@ -69,30 +71,22 @@ const ShakeShare = () => {
     };
   }, [activateDetector]);
 
-  //Gesture to close on swipe
-  const fling = Gesture.Fling()
-    .direction(Directions.DOWN | Directions.RIGHT)
-    .runOnJS(true)
-    .onBegin(dismount); //seems to be a bug, only work with onBegin
-
   if (!mountScreen || !isConnected) {
     return null;
   }
   return (
     <GestureHandlerRootView style={StyleSheet.absoluteFillObject}>
-      <GestureDetector gesture={fling}>
-        <View style={styles.safeArea}>
-          <Suspense
-            fallback={
-              <View style={styles.activityIndicatorContainer}>
-                <ActivityIndicator color="white" />
-              </View>
-            }
-          >
-            <ShakeShareDisplay onClose={dismount} />
-          </Suspense>
-        </View>
-      </GestureDetector>
+      <View style={styles.safeArea}>
+        <Suspense
+          fallback={
+            <View style={styles.activityIndicatorContainer}>
+              <ActivityIndicator color="white" />
+            </View>
+          }
+        >
+          <ShakeShareDisplay onClose={dismount} />
+        </Suspense>
+      </View>
     </GestureHandlerRootView>
   );
 };
@@ -101,22 +95,26 @@ export default ShakeShare;
 
 const { width } = Dimensions.get('window');
 
-const QR_CODE_WIDTH = Math.round(width * 0.6);
+const QR_CODE_WIDTH = Math.round(width * 0.5);
 
 const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
   const profileInfos = useProfileInfos();
+  const { bottom } = useScreenInsets();
 
-  const { node } = useClientQuery<ShakeShareScreenQuery>(
+  const { node } = useLazyLoadQuery<ShakeShareScreenQuery>(
     graphql`
       query ShakeShareScreenQuery($profileId: ID!, $width: Int!) {
         node(id: $profileId) {
           ... on Profile @alias(as: "profile") {
             webCard {
+              id
               cardIsPublished
               userName
               ...CoverRenderer_webCard
             }
+            contactCardUrl
             contactCardQrCode(width: $width)
+            ...ContactCardExportVcf_card
           }
         }
       }
@@ -128,12 +126,13 @@ const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
   );
 
   const profile = node?.profile;
+  const webCard = profile?.webCard;
 
   useEffect(() => {
-    if (!profile?.webCard?.cardIsPublished) {
+    if (!webCard?.cardIsPublished) {
       onClose();
     }
-  }, [onClose, profile?.webCard?.cardIsPublished]);
+  }, [onClose, webCard?.cardIsPublished]);
 
   const svg = profile?.contactCardQrCode
     ? Skia.SVG.MakeFromString(profile?.contactCardQrCode)
@@ -141,56 +140,108 @@ const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
 
   const src = rect(0, 0, svg?.width() ?? 0, svg?.height() ?? 0);
   const dst = rect(0, 0, QR_CODE_WIDTH, QR_CODE_WIDTH);
+  const intl = useIntl();
 
-  const insets = useScreenInsets();
-
-  if (!profile?.webCard?.cardIsPublished) {
+  if (!webCard?.cardIsPublished) {
     return null;
   }
 
   return (
-    <>
-      <View style={styles.container}>
+    <View style={styles.container}>
+      <ScrollView>
         <CoverRenderer
           width={width}
-          webCard={profile?.webCard}
+          webCard={webCard}
           style={styles.coverStyle}
-          canPlay={true}
+          canPlay
         />
         <LinearGradient
           colors={['rgba(14, 18, 22,0)', 'rgba(0, 0, 0, 1)']}
-          start={{ x: 0.5, y: 0 }}
-          end={{ x: 0.5, y: 1 }}
-          locations={[0.22, 0.66]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+          locations={[0.2, 0.55]}
           style={styles.linear}
         />
         {svg && (
-          <View
-            style={[styles.qrCodeContainer, { bottom: 123 + insets.bottom }]}
-          >
-            <Canvas style={styles.canvas} opaque>
-              <Group
-                layer={
-                  <Paint>
-                    <BlendColor color="white" mode="srcATop" />
-                  </Paint>
-                }
-                transform={fitbox('contain', src, dst)}
-              >
-                <ImageSVG svg={svg} />
-              </Group>
-            </Canvas>
+          <View style={styles.actionContainer}>
+            <View style={styles.qrCodeContainer}>
+              <Canvas style={styles.canvas} opaque>
+                <Group
+                  layer={
+                    <Paint>
+                      <BlendColor color="white" mode="srcATop" />
+                    </Paint>
+                  }
+                  transform={fitbox('contain', src, dst)}
+                >
+                  <ImageSVG svg={svg} />
+                </Group>
+              </Canvas>
+              <Text style={styles.subtitle} appearance="dark" variant="button">
+                <FormattedMessage
+                  defaultMessage="Point your camera at the QR Code to save the ContactCard"
+                  description="Shake and share subtitle"
+                />
+              </Text>
+            </View>
+            <View style={styles.buttonContainer}>
+              {profile && (
+                <ContactCardExportVcf
+                  profile={profile}
+                  appearance="dark"
+                  style={styles.button}
+                />
+              )}
+              {webCard && (
+                <AddToWalletButton
+                  webCardId={webCard.id}
+                  style={styles.button}
+                  appearance="light"
+                />
+              )}
+              <LargeButton
+                appearance="light"
+                icon="link"
+                title={intl.formatMessage({
+                  defaultMessage: 'Copy card link',
+                  description: 'Copy card link button label',
+                })}
+                style={styles.button}
+                onPress={() => {
+                  Clipboard.setStringAsync(profile?.contactCardUrl ?? '').then(
+                    () => {
+                      Toast.show({
+                        type: 'info',
+                        text1: intl.formatMessage({
+                          defaultMessage: 'Copied to clipboard',
+                          description:
+                            'Toast info message that appears when the user copies the contact card url to the clipboard',
+                        }),
+                      });
+                    },
+                  );
+                }}
+              />
+            </View>
           </View>
         )}
-
+      </ScrollView>
+      <LinearGradient
+        colors={['rgba(0, 0, 0,0)', 'rgba(0, 0, 0, 1)']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        locations={[0, 0.7]}
+        style={styles.closeButtonContainer}
+      >
         <IconButton
           icon="close"
           onPress={onClose}
           iconStyle={styles.iconStyle}
-          style={[styles.iconContainerStyle, { bottom: insets.bottom + 35 }]}
+          style={[styles.iconContainerStyle, { bottom }]}
         />
-      </View>
-    </>
+      </LinearGradient>
+      <ToastUi />
+    </View>
   );
 };
 
@@ -198,14 +249,26 @@ const styles = StyleSheet.create({
   iconContainerStyle: {
     position: 'absolute',
     borderColor: 'white',
+    width: 24,
+  },
+  actionContainer: {
+    position: 'relative',
+    gap: 10,
+    alignItems: 'center',
+    width: '100%',
+    padding: 10,
+    marginBottom: 200,
   },
   qrCodeContainer: {
-    backgroundColor: 'black',
     position: 'absolute',
-    borderRadius: 34,
-    padding: 17,
+    top: -250,
+    backgroundColor: 'rgba(0,0,0,0.8)',
+    borderRadius: 23,
+    borderCurve: 'continuous',
+    width: QR_CODE_WIDTH + 40,
+    height: QR_CODE_WIDTH + 40,
   },
-  canvas: { width: QR_CODE_WIDTH, height: QR_CODE_WIDTH },
+  canvas: { width: QR_CODE_WIDTH, height: QR_CODE_WIDTH, margin: 20 },
   linear: {
     height: '100%',
     position: 'absolute',
@@ -225,8 +288,39 @@ const styles = StyleSheet.create({
   iconStyle: {
     tintColor: colors.white,
   },
-  coverStyle: { marginBottom: 50, borderRadius: 0 },
-  container: { flex: 1, alignItems: 'center', justifyContent: 'flex-start' },
+  coverStyle: { marginBottom: 0, borderRadius: 0 },
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+  },
+  subtitle: {
+    textAlign: 'center',
+    width: '100%',
+    position: 'absolute',
+    bottom: -35,
+    padding: 5,
+    margin: 'auto',
+    alignSelf: 'center',
+  },
+  buttonContainer: {
+    width: '100%',
+    gap: 10,
+    marginTop: 40,
+  },
+  closeButtonContainer: {
+    position: 'absolute',
+    bottom: 0,
+    paddingTop: 10,
+    width: '100%',
+    height: 200,
+    alignItems: 'center',
+    pointerEvents: 'box-none',
+  },
+  button: {
+    borderWidth: 1,
+    borderColor: colors.white,
+  },
 });
 
 // This code is transposed from https://github.com/facebook/react-native/blob/184b295a019e2af6712d34276c741e0dae78f798/packages/react-native/ReactAndroid/src/main/java/com/facebook/react/common/ShakeDetector.java#L45

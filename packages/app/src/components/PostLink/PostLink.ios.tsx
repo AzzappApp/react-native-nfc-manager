@@ -14,6 +14,7 @@ const PostLink = ({
   postId,
   style,
   postRendererStyle,
+  onLike,
   ...props
 }: PostLinkProps) => {
   const postRef = useRef<PostRendererFeedHandle | null>(null);
@@ -51,6 +52,7 @@ const PostLink = ({
   return (
     <PressableScaleHighlight
       onPress={onPress}
+      onDoublePress={onLike}
       ref={ref}
       accessibilityRole="link"
       style={[style, { borderRadius: 16, overflow: 'hidden' }]}

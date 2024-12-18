@@ -1,4 +1,5 @@
 import * as FileSystem from 'expo-file-system';
+import { Platform } from 'react-native';
 import type { ContactsScreenLists_contacts$data } from '#relayArtifacts/ContactsScreenLists_contacts.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { Contact } from 'expo-contacts';
@@ -88,6 +89,15 @@ export const reworkContactForDeviceInsert = (contact: Contact): Contact => {
       return {
         ...social,
         url: prefixWithHttp(social.url),
+      };
+    }),
+    phoneNumbers: contact.phoneNumbers?.map(number => {
+      return {
+        ...number,
+        label:
+          Platform.OS === 'android' && number.label === 'fax'
+            ? 'otherFax'
+            : number.label,
       };
     }),
   };

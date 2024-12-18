@@ -2,6 +2,7 @@
 import * as Sentry from '@sentry/nextjs';
 import cn from 'classnames';
 import { jwtDecode } from 'jwt-decode';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { colors } from '@azzapp/shared/colorsHelpers';
 import { FlipIcon } from '#assets';
@@ -104,6 +105,9 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const searchParams = useSearchParams();
+  const hasContactCard = !!searchParams.get('c');
+
   return (
     <>
       <div className={styles.wrapper}>
@@ -187,7 +191,7 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
           </aside>
         )}
 
-        {hasPosts && (
+        {hasPosts && !hasContactCard && (
           <ButtonIcon
             Icon={FlipIcon}
             size={24}

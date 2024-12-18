@@ -42,7 +42,7 @@ const ColorInput = ({ field, label }: Props) => {
         onChange={onChangeColor}
         value={borderColor}
       >
-        <MenuItem value={'custom'}>
+        <MenuItem value="custom">
           <Typography
             style={{
               textTransform: 'capitalize',

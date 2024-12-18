@@ -302,15 +302,13 @@ const CardTemplateForm = ({
             sx={{ width: 250 }}
             {...fieldProps('cardTemplateType')}
           />
-          {
-            <TextField
-              name="modules"
-              label="Modules"
-              disabled
-              sx={{ width: 250 }}
-              value={data.modules?.length || 0}
-            />
-          }
+          <TextField
+            name="modules"
+            label="Modules"
+            disabled
+            sx={{ width: 250 }}
+            value={data.modules?.length || 0}
+          />
           <FormControl
             fullWidth
             error={fields.cardStyle.error}
@@ -318,7 +316,7 @@ const CardTemplateForm = ({
           >
             <InputLabel id="cardStyle-label">Card Style</InputLabel>
             <Select
-              labelId={'cardStyle-label'}
+              labelId="cardStyle-label"
               id="cardStyle"
               name="cardStyle"
               value={fields.cardStyle.value}

@@ -14,6 +14,7 @@ import type {
   CoverEditorTextLayerItem,
   CardColors,
   CoverEditorLinksLayerItem,
+  CoverMedia,
 } from './coverEditorTypes';
 import type { Filter } from '@azzapp/shared/filtersHelper';
 
@@ -60,7 +61,7 @@ export type UpdateCardColorsAction = {
 // #region Medias
 export type UpdateMediasAction = {
   type: 'UPDATE_MEDIAS';
-  payload: SourceMedia[];
+  payload: Array<CoverMedia | SourceMedia>;
 };
 
 export type UpdateMediaImageAnimationAction = {
@@ -100,7 +101,7 @@ export type UpdateAllMediasEditionParameters = {
 
 export type UpdateActiveMediaAction = {
   type: 'UPDATE_ACTIVE_MEDIA';
-  payload: SourceMedia;
+  payload: CoverEditorOverlayItem | SourceMedia;
 };
 
 export type UpdateMediasTransitionAction = {

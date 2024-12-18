@@ -32,6 +32,11 @@ const config = {
   images: {
     remotePatterns,
   },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '50mb',
+    },
+  },
 };
 
 // Injected content via Sentry wizard below

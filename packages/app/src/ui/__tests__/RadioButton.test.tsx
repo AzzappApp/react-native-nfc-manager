@@ -23,9 +23,7 @@ describe('RadioButton', () => {
   });
 
   it('renders as checked when checked prop is true', () => {
-    const { getByRole } = render(
-      <RadioButton checked={true} onChange={onChange} />,
-    );
+    const { getByRole } = render(<RadioButton checked onChange={onChange} />);
     const radio = getByRole('radio');
     expect(radio.props.accessibilityState.checked).toBe(true);
   });

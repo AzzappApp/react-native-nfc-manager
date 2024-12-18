@@ -132,9 +132,7 @@ const UsersList = ({
         multiline
         rows={1}
         maxRows={3}
-        value={
-          'The number of WebCards in this table may be affected by the current search. Open the account details to view the total number of WebCards.'
-        }
+        value="The number of WebCards in this table may be affected by the current search. Open the account details to view the total number of WebCards."
       />
       <Box display="flex" gap={2} alignItems="center">
         <TextField
@@ -162,9 +160,9 @@ const UsersList = ({
             label="Status"
             onChange={onStatusChange}
           >
-            <MenuItem value={'All'}>All</MenuItem>
-            <MenuItem value={'Active'}>Active</MenuItem>
-            <MenuItem value={'Suspended'}>Suspended</MenuItem>
+            <MenuItem value="All">All</MenuItem>
+            <MenuItem value="Active">Active</MenuItem>
+            <MenuItem value="Suspended">Suspended</MenuItem>
           </Select>
         </FormControl>
       </Box>

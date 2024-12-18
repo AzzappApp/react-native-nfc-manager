@@ -111,7 +111,7 @@ const HomeBottomPanelTransfertOwner = ({
       </Text>
       <Text variant="medium" style={styles.text}>
         <FormattedMessage
-          defaultMessage={`{email} wants to transfer the ownership of this WebCard{azzappA} to your`}
+          defaultMessage="{email} wants to transfer the ownership of this WebCard{azzappA} to your"
           description="Home bottom panel transfer ownership request"
           values={{
             email:

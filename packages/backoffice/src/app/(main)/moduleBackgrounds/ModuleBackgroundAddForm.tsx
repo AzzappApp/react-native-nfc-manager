@@ -77,7 +77,7 @@ const ModuleBackgroundAddForm = ({
           <FormControl sx={{ maxWidth: 300 }}>
             <InputLabel id="webCardKind-label">Resize Mode</InputLabel>
             <Select
-              labelId={'resizeMode-label'}
+              labelId="resizeMode-label"
               id="resizeMode"
               name="resizeMode"
               value={resizeMode}

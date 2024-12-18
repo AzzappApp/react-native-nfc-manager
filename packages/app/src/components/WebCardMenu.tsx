@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/react-native';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
   View,
@@ -14,13 +14,11 @@ import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
 import ERRORS from '@azzapp/shared/errors';
-import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors, shadow } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { useProfileInfos } from '#hooks/authStateHooks';
 import useQuitWebCard from '#hooks/useQuitWebCard';
 import { useSendReport } from '#hooks/useSendReport';
 import ActivityIndicator from '#ui/ActivityIndicator';
@@ -52,6 +50,10 @@ type WebCardMenuProps = {
    * true when the viewer the owner of the webCard
    */
   isOwner: boolean;
+  /*
+   * is admin of the webcard
+   */
+  isAdmin: boolean;
   /**
    *
    *
@@ -76,6 +78,7 @@ const WebCardMenu = ({
   close,
   isViewer,
   isOwner,
+  isAdmin,
 }: WebCardMenuProps) => {
   const webCard = useFragment(
     graphql`
@@ -98,7 +101,6 @@ const WebCardMenu = ({
     webCardKey,
   );
   const isFollowing = webCard.WebCardMenu_isFollowing;
-  const profileInfos = useProfileInfos();
 
   const { width: windowsWith } = useWindowDimensions();
   const intl = useIntl();
@@ -423,7 +425,7 @@ const WebCardMenu = ({
           </View>
         </View>
         <View style={styles.bottomSheetOptionsContainer}>
-          {isViewer && profileHasAdminRight(profileInfos?.profileRole) && (
+          {isViewer && isAdmin && (
             <PressableNative
               style={styles.bottomSheetOptionButton}
               onPress={onWebCardParameters}
@@ -442,7 +444,7 @@ const WebCardMenu = ({
               </View>
             </PressableNative>
           )}
-          {isViewer && profileHasAdminRight(profileInfos?.profileRole) && (
+          {isViewer && isAdmin && (
             <PressableNative
               style={styles.bottomSheetOptionButton}
               onPress={onMultiUser}
@@ -599,7 +601,7 @@ const WebCardMenu = ({
   );
 };
 
-export default WebCardMenu;
+export default memo(WebCardMenu);
 
 const stylesheet = createStyleSheet(appearance => ({
   countersContainer: {

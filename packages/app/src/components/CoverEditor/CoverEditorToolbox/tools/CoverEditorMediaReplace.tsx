@@ -4,15 +4,14 @@ import {
   useLottieMediaDurations,
 } from '#components/CoverEditor/coverEditorHelpers';
 import CoverEditorMediaPicker from '#components/CoverEditor/CoverEditorMediaPicker';
-
 import { ScreenModal } from '#components/NativeRouter';
 import useToggle from '#hooks/useToggle';
+import ToolBoxSection from '../../../Toolbar/ToolBoxSection';
 import {
   useCoverEditorActiveMedia,
   useCoverEditorContext,
   useCoverEditorEditContext,
 } from '../../CoverEditorContext';
-import ToolBoxSection from '../ui/ToolBoxSection';
 import type { SourceMedia } from '#helpers/mediaHelpers';
 
 const CoverEditorMediaReplace = () => {

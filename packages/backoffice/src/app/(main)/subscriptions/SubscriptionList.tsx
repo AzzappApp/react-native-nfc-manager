@@ -198,10 +198,10 @@ const SubscriptionList = ({
               label="Status"
               onChange={onStatusChange}
             >
-              <MenuItem value={'all'}>all</MenuItem>
-              <MenuItem value={'active'}>Active</MenuItem>
-              <MenuItem value={'canceled'}>Canceled</MenuItem>
-              <MenuItem value={'waiting_payment'}>Waiting Payment</MenuItem>
+              <MenuItem value="all">all</MenuItem>
+              <MenuItem value="active">Active</MenuItem>
+              <MenuItem value="canceled">Canceled</MenuItem>
+              <MenuItem value="waiting_payment">Waiting Payment</MenuItem>
             </Select>
           </FormControl>
           <FormControl sx={{ width: 130 }}>
@@ -213,10 +213,10 @@ const SubscriptionList = ({
               label="Type"
               onChange={onTypeChange}
             >
-              <MenuItem value={'all'}>all</MenuItem>
-              <MenuItem value={'web.monthly'}>Monthly</MenuItem>
-              <MenuItem value={'web.yearly'}>Yearly</MenuItem>
-              <MenuItem value={'web.lifetime'}>LifeTime</MenuItem>
+              <MenuItem value="all">all</MenuItem>
+              <MenuItem value="web.monthly">Monthly</MenuItem>
+              <MenuItem value="web.yearly">Yearly</MenuItem>
+              <MenuItem value="web.lifetime">LifeTime</MenuItem>
             </Select>
           </FormControl>
         </Box>

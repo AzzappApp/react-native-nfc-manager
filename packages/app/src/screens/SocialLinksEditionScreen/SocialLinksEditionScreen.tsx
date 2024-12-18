@@ -1,5 +1,11 @@
 import omit from 'lodash/omit';
-import { startTransition, useCallback, useMemo, useState } from 'react';
+import {
+  startTransition,
+  Suspense,
+  useCallback,
+  useMemo,
+  useState,
+} from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
@@ -12,16 +18,20 @@ import {
 } from '@azzapp/shared/cardModuleHelpers';
 import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import AnimatedDataOverride from '#components/AnimatedDataOverride';
-import { useRouter } from '#components/NativeRouter';
+import { useOnFocus, useRouter } from '#components/NativeRouter';
+import useBoolean from '#hooks/useBoolean';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
+import useScreenDimensions from '#hooks/useScreenDimensions';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
+import BottomSheetModal from '#ui/BottomSheetModal';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
 import ModuleEditionScreenTitle from '#ui/ModuleEditionScreenTitle';
 import TabView from '#ui/TabView';
+import { SocialLinksAddOrEditModal } from './SocialLinksAddOrEditModal';
 import SocialLinksBackgroundEditionPanel from './SocialLinksBackgroundEditionPanel';
 import SocialLinksEditionBottomMenu from './SocialLinksEditionBottomMenu';
 import SocialLinksLinksEditionPanel from './SocialLinksLinksEditionPanel';
@@ -34,6 +44,7 @@ import type {
   SocialLinksEditionScreenUpdateModuleMutation,
   SaveSocialLinksModuleInput,
 } from '#relayArtifacts/SocialLinksEditionScreenUpdateModuleMutation.graphql';
+import type { SocialLinkItem } from '@azzapp/shared/socialLinkHelpers';
 import type { ViewProps } from 'react-native';
 
 export type SocialLinksEditionScreenProps = ViewProps & {
@@ -101,6 +112,8 @@ const SocialLinksEditionScreen = ({
     module,
   );
 
+  const [addLinkVisible, openAddLink, closeAddLink] = useBoolean(false);
+
   const profile = useFragment(
     graphql`
       fragment SocialLinksEditionScreen_profile on Profile {
@@ -136,7 +149,7 @@ const SocialLinksEditionScreen = ({
   // #region Data edition
   const initialValue = useMemo(() => {
     return {
-      links: socialLinks?.links ?? [],
+      links: [...(socialLinks?.links || [])],
       iconColor: socialLinks?.iconColor ?? null,
       arrangement: socialLinks?.arrangement ?? null,
       borderWidth: socialLinks?.borderWidth ?? null,
@@ -162,7 +175,25 @@ const SocialLinksEditionScreen = ({
       defaultValues: SOCIAL_LINKS_DEFAULT_VALUES,
     });
 
-  const { links, iconColor, arrangement, backgroundId, backgroundStyle } = data;
+  const {
+    links: readOnlyLinks,
+    iconColor,
+    arrangement,
+    backgroundId,
+    backgroundStyle,
+  } = data;
+
+  const links = useMemo(
+    () =>
+      readOnlyLinks
+        .sort((a, b) => a.position - b.position)
+        .map((item, index) => ({
+          link: item.link,
+          position: index,
+          socialId: item.socialId,
+        })),
+    [readOnlyLinks],
+  );
 
   const previewData = {
     ...omit(data, 'backgroundId'),
@@ -300,6 +331,7 @@ const SocialLinksEditionScreen = ({
         router.back();
       },
       onError(e) {
+        console.log(e);
         handleProfileActionError(e);
       },
     });
@@ -339,6 +371,37 @@ const SocialLinksEditionScreen = ({
   const { bottomPanelHeight, insetBottom, insetTop, windowWidth } =
     useEditorLayout({ bottomPanelMinHeight: 400 });
 
+  const { height: screenHeight } = useScreenDimensions();
+
+  const [pickedItem, setPickedItem] = useState<SocialLinkItem>();
+
+  const onCloseAddLink = () => {
+    setPickedItem(undefined);
+    closeAddLink();
+  };
+
+  const onDeleteLink = useCallback(
+    (item: SocialLinkItem) => {
+      onLinksChange(links.filter(l => l?.position !== item.position));
+    },
+    [links, onLinksChange],
+  );
+
+  const onLinkItemPress = useCallback(
+    (link: SocialLinkItem) => {
+      setPickedItem(link);
+      openAddLink();
+    },
+    [openAddLink],
+  );
+
+  useOnFocus(() => {
+    // allow to open the link selection panel when we start from empty link list
+    if (links.length === 0) {
+      openAddLink();
+    }
+  });
+
   const animatedData = useDerivedValue(() => ({
     iconSize: iconSize.value,
     borderWidth: borderWidth.value,
@@ -355,12 +418,16 @@ const SocialLinksEditionScreen = ({
         element: (
           <SocialLinksLinksEditionPanel
             links={links}
-            onLinksChange={onLinksChange}
+            onDeleteLink={onDeleteLink}
+            onAddLink={openAddLink}
+            onItemPress={onLinkItemPress}
+            onOrderChange={onLinksChange}
             style={{
               minHeight: bottomPanelHeight,
               flex: 1,
               marginBottom: BOTTOM_MENU_HEIGHT,
             }}
+            showTitleWithLineHeader
           />
         ),
       },
@@ -426,9 +493,12 @@ const SocialLinksEditionScreen = ({
       onArrangementChange,
       onBackgroundChange,
       onBackgroundStyleChange,
+      onDeleteLink,
       onIconColorChange,
+      onLinkItemPress,
       onLinksChange,
       onTouched,
+      openAddLink,
       profile,
     ],
   );
@@ -497,6 +567,23 @@ const SocialLinksEditionScreen = ({
           { bottom: insetBottom, width: windowWidth - 20 },
         ]}
       />
+      <Suspense>
+        <BottomSheetModal
+          onDismiss={onCloseAddLink}
+          visible={addLinkVisible}
+          enableContentPanningGesture={false}
+          height={screenHeight}
+          showHandleIndicator={false}
+        >
+          <SocialLinksAddOrEditModal
+            links={links}
+            pickedItem={pickedItem}
+            setPickedItem={setPickedItem}
+            closeAddLink={closeAddLink}
+            onLinksChange={onLinksChange}
+          />
+        </BottomSheetModal>
+      </Suspense>
     </Container>
   );
 };

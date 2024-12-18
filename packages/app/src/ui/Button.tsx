@@ -10,7 +10,12 @@ import ActivityIndicator from './ActivityIndicator';
 import PressableBackground from './PressableBackground';
 import PressableOpacity from './PressableOpacity';
 import type { ForwardedRef, ReactNode } from 'react';
-import type { PressableProps, StyleProp, ViewStyle } from 'react-native';
+import type {
+  PressableProps,
+  StyleProp,
+  TextStyle,
+  ViewStyle,
+} from 'react-native';
 
 export type ButtonProps = PressableProps & {
   label: ReactNode;
@@ -19,6 +24,7 @@ export type ButtonProps = PressableProps & {
   style?: StyleProp<ViewStyle>;
   loading?: boolean;
   rightElement?: ReactNode;
+  textStyle?: TextStyle;
 };
 
 const Button = (
@@ -30,6 +36,7 @@ const Button = (
     disabled,
     style,
     rightElement,
+    textStyle,
     ...props
   }: ButtonProps,
   forwardedRef: ForwardedRef<View>,
@@ -62,7 +69,11 @@ const Button = (
       <ActivityIndicator color={color} />
     ) : (
       <View style={variantStyles.labelContainer}>
-        <Text variant="button" style={variantStyles.label} numberOfLines={1}>
+        <Text
+          variant="button"
+          style={[variantStyles.label, textStyle]}
+          numberOfLines={1}
+        >
           {label}
         </Text>
         {rightElement}

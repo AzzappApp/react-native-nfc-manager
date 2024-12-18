@@ -11,6 +11,9 @@ import type {
   CardModuleSocialLinksResolvers,
   CardModuleBlockTextResolvers,
   CardModuleLineDividerResolvers,
+  CardModuleMediaResolvers,
+  CardModuleMediaTextResolvers,
+  CardModuleMediaTextLinkResolvers,
 } from '#/__generated__/types';
 import type { CardModule as CardModuleModel } from '@azzapp/data';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
@@ -22,7 +25,7 @@ export const CardModule: CardModuleResolvers = {
   __resolveType: cardModule => {
     const { kind } = cardModule;
 
-    if (isKnownModule(kind) && kind !== 'webCardsCarousel') {
+    if (isKnownModule(kind)) {
       const capitalized = (kind.charAt(0).toUpperCase() +
         kind.slice(1)) as Capitalize<typeof kind>;
 
@@ -192,3 +195,38 @@ export const CardModuleBlockText: CardModuleBlockTextResolvers = {
       ? moduleBackgroundLoader.load(module.data.textBackgroundId)
       : null,
 };
+
+export const CardModuleMedia: CardModuleMediaResolvers = {
+  cardModuleColor: module => module.data.cardModuleColor ?? {},
+  cardModuleMedias: async ({ data }) => {
+    return data.cardModuleMedias?.map(({ media, text, title }) => ({
+      media: { media: media.id, assetKind: 'module' },
+      text,
+      title,
+    }));
+  },
+};
+
+export const CardModuleMediaText: CardModuleMediaTextResolvers = {
+  cardModuleColor: module => module.data.cardModuleColor ?? {},
+  cardModuleMedias: async ({ data }) => {
+    return data.cardModuleMedias?.map(({ media, text, title }) => ({
+      media: { media: media.id, assetKind: 'module' },
+      text,
+      title,
+    }));
+  },
+};
+
+export const CardModuleMediaTextLink: CardModuleMediaTextLinkResolvers = {
+  cardModuleColor: module => module.data.cardModuleColor ?? {},
+  cardModuleMedias: async ({ data }) => {
+    return data.cardModuleMedias?.map(({ media, text, title, link }) => ({
+      media: { media: media.id, assetKind: 'module' },
+      text,
+      title,
+      link,
+    }));
+  },
+};
+//INSERT_MODULE

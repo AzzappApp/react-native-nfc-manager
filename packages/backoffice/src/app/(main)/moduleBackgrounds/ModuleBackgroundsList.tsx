@@ -160,7 +160,7 @@ const ModuleBackgroundsList = ({
         onSetEnabled={onSetEnabled}
       />
       <ModuleBackgroundAddForm
-        label={`Add Module Backgrounds`}
+        label="Add Module Backgrounds"
         open={showForm}
         handleClose={() => setShowForm(false)}
         onAdd={saveMedias}

@@ -576,7 +576,7 @@ const OfferItem = ({
               currency={offer.product.currencyCode}
             />
             <FormattedMessage
-              defaultMessage={' / month'}
+              defaultMessage=" / month"
               description="MultiUser Paywall Screen - number of seat offer"
             />
           </Text>

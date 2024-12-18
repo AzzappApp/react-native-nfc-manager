@@ -2,9 +2,9 @@ import Animated from 'react-native-reanimated';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
-import type { ImageProps } from 'react-native';
+import type { ImageProps, ImageSourcePropType } from 'react-native';
 
-const socialIcons = {
+const socialIcons: Record<SocialLinkId, ImageSourcePropType> = {
   get behance() {
     return require('./assets/social/behance.png');
   },
@@ -43,6 +43,9 @@ const socialIcons = {
   },
   get letterboxd() {
     return require('./assets/social/letterboxd.png');
+  },
+  get link() {
+    return require('./assets/link.png');
   },
   get linkedin() {
     return require('./assets/social/linkedin.png');

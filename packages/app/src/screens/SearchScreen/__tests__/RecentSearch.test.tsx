@@ -57,7 +57,7 @@ describe('Recent Search component', () => {
   test('should display full history `recentSearch` list when `searchValue is falsy', async () => {
     render(
       <RecentSearch
-        searchValue={''}
+        searchValue=""
         recentSearch={['azzapp', 'testing', 'android is bad']}
         removeSearch={removeSearch}
         search={search}

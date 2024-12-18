@@ -1,10 +1,10 @@
 import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
+import ToolBoxSection from '../../../Toolbar/ToolBoxSection';
 import {
   useCoverEditorEditContext,
   useCoverEditorTextLayer,
 } from '../../CoverEditorContext';
-import ToolBoxSection from '../ui/ToolBoxSection';
 
 const CoverEditorAlignmentTool = () => {
   const intl = useIntl();

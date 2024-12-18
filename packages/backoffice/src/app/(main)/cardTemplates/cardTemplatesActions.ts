@@ -27,7 +27,7 @@ export const getModulesData = async (profileUserName: string) => {
   if (modules.length === 0) {
     return null;
   }
-  return modules.map(({ data, kind }) => ({ kind, data }));
+  return modules.map(({ data, variant, kind }) => ({ kind, variant, data }));
 };
 
 export const saveCardTemplate = async (

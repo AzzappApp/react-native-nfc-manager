@@ -384,7 +384,7 @@ const createCoverMedia = async (
           lottieInfo,
         });
       },
-      after() {
+      afterDrawFrame() {
         'worklet';
         global.gc?.();
       },

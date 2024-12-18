@@ -248,6 +248,7 @@ export function coverEditorReducer(
             animation: null,
             editionParameters: { cropData },
             duration: COVER_IMAGE_DEFAULT_DURATION,
+            editable: 'editable' in media ? media.editable : true,
           });
         } else {
           const duration = durations ? durations[index] : null;
@@ -262,6 +263,7 @@ export function coverEditorReducer(
                 duration ??
                 Math.min(COVER_VIDEO_DEFAULT_DURATION, media.duration),
             },
+            editable: 'editable' in media ? media.editable : true,
           });
         }
       });
@@ -519,6 +521,7 @@ export function coverEditorReducer(
             updatedMedia.kind === 'image'
               ? updatedMedia.duration
               : COVER_MAX_MEDIA_DURATION,
+          editable: updatedMedia.editable,
         };
       } else {
         const lottieInfo = extractLottieInfoMemoized(state.lottie);
@@ -537,6 +540,7 @@ export function coverEditorReducer(
               duration ??
               Math.min(COVER_VIDEO_DEFAULT_DURATION, payload.duration),
           },
+          editable: updatedMedia.editable,
         };
       }
       let localFilenames = state.localFilenames;
@@ -566,8 +570,8 @@ export function coverEditorReducer(
           ...state.textLayers,
           {
             ...payload,
-            width: 40,
-            position: { x: 30, y: 50 },
+            width: 80,
+            position: { x: 50, y: 50 },
             rotation: 0,
             shadow: false,
             animation: null,

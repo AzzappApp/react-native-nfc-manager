@@ -1,7 +1,14 @@
 import { getContactByIdAsync } from 'expo-contacts';
+import * as FileSystem from 'expo-file-system';
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
+import VCard from 'vcard-creator';
 import { SOCIAL_NETWORK_LINKS } from '@azzapp/shared/socialLinkHelpers';
+import {
+  addressLabelToVCardLabel,
+  emailLabelToVCardLabel,
+  phoneLabelToVCardLabel,
+} from '@azzapp/shared/vCardHelpers';
 import { textStyles } from '#theme';
 import { createStyleSheet } from '#helpers/createStyles';
 import type { Contact } from 'expo-contacts';
@@ -218,7 +225,7 @@ export const useSocialLinkLabels = () => {
     () =>
       SOCIAL_NETWORK_LINKS.map(socialLink => ({
         key: socialLink.id as string,
-        value: 'label' in socialLink ? socialLink.label : socialLink.id,
+        value: socialLink.label,
       })),
     [],
   );
@@ -273,4 +280,57 @@ export const findLocalContact = async (
   });
 
   return localContact;
+};
+
+export const buildVCardFromExpoContact = async (contact: Contact) => {
+  const vCard = new VCard();
+  vCard.addName(contact.lastName ?? undefined, contact.firstName ?? undefined);
+
+  if (contact.jobTitle) {
+    vCard.addJobtitle(contact.jobTitle);
+  }
+  if (contact.birthday && contact.birthday) {
+    vCard.addBirthday(contact.birthday.toString());
+  }
+  if (contact.company) {
+    vCard.addCompany(contact.company);
+  }
+
+  contact.phoneNumbers?.forEach(number => {
+    vCard.addPhoneNumber(
+      `${number.number}`,
+      phoneLabelToVCardLabel(number.label) || '',
+    );
+  });
+  contact.emails?.forEach(email => {
+    if (email.email)
+      vCard.addEmail(email.email, emailLabelToVCardLabel(email.label) || '');
+  });
+  contact.urlAddresses?.forEach(url => {
+    if (url.url) vCard.addURL(url.url);
+  });
+  contact.socialProfiles?.forEach(social => {
+    if (social.url) vCard.addSocial(social.url, social.label || '');
+  });
+  contact.addresses?.forEach(addr => {
+    let fullAdress = addr.street || '';
+    if (fullAdress.length) fullAdress += ' ';
+    fullAdress += addr.postalCode || '';
+    if (fullAdress.length) fullAdress += ' ';
+    fullAdress += addr.city || '';
+    if (fullAdress.length) fullAdress = fullAdress + ' ';
+    fullAdress += addr.country || '';
+
+    if (fullAdress.length)
+      vCard.addAddress(fullAdress, addressLabelToVCardLabel(addr.label) || '');
+  });
+  if (contact?.image?.uri) {
+    const image = await FileSystem.readAsStringAsync(contact?.image?.uri, {
+      encoding: FileSystem.EncodingType.Base64,
+    });
+    if (image) {
+      vCard.addPhoto(image);
+    }
+  }
+  return vCard;
 };

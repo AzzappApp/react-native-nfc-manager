@@ -10,12 +10,12 @@ import Header from '#ui/Header';
 import LabeledWheelSelector from '#ui/LabeledWheelSelector';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
+import ToolBoxSection from '../../../Toolbar/ToolBoxSection';
 import {
   useCoverEditorContext,
   useCoverEditorEditContext,
   useCoverEditorOverlayLayer,
 } from '../../CoverEditorContext';
-import ToolBoxSection from '../ui/ToolBoxSection';
 import CoverEditorColorPicker from './CoverEditorColorPicker';
 
 const CoverEditorBorderTool = () => {

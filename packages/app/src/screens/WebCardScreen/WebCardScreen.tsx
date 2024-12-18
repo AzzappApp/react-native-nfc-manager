@@ -32,13 +32,8 @@ import {
   usePreloadedQuery,
   useRelayEnvironment,
 } from 'react-relay';
-import { MODULE_KINDS } from '@azzapp/shared/cardModuleHelpers';
 import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
-import {
-  profileHasEditorRight,
-  profileIsOwner,
-} from '@azzapp/shared/profileHelpers';
 import {
   useDidAppear,
   useRouter,
@@ -46,9 +41,16 @@ import {
 } from '#components/NativeRouter';
 import WebCardMenu from '#components/WebCardMenu';
 import { logEvent } from '#helpers/analytics';
+import { getRouteForCardModule } from '#helpers/cardModuleRouterHelpers';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import {
+  profileInfoHasAdminRight,
+  profileInfoHasEditorRight,
+  profileInfoIsOwner,
+} from '#helpers/profileRoleHelper';
 import relayScreen from '#helpers/relayScreen';
 import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
+import { MODULE_VARIANT_SECTION } from '#helpers/webcardModuleHelpers';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import useAnimatedState from '#hooks/useAnimatedState';
 import useBoolean from '#hooks/useBoolean';
@@ -68,12 +70,11 @@ import WebCardScreenPublishHelper from './WebCardScreenPublishHelper';
 import { WebCardScreenTransitionsProvider } from './WebCardScreenTransitions';
 import type { ScreenOptions } from '#components/NativeRouter';
 import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { ModuleKindWithVariant } from '#helpers/webcardModuleHelpers';
 import type { WebCardScreenByIdQuery } from '#relayArtifacts/WebCardScreenByIdQuery.graphql';
 import type { WebCardScreenByUserNameQuery } from '#relayArtifacts/WebCardScreenByUserNameQuery.graphql';
 import type { WebCardRoute } from '#routes';
-import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 import type { Disposable } from 'react-relay';
-
 /**
  * Display a Web card.
  */
@@ -101,8 +102,9 @@ const WebCardScreen = ({
 
   const profileInfos = useProfileInfos();
   const isViewer = profileInfos?.webCardId === data.webCard?.id;
-  const isWebCardOwner = isViewer && profileIsOwner(profileInfos?.profileRole);
-  const canEdit = isViewer && profileHasEditorRight(profileInfos?.profileRole);
+  const isWebCardOwner = isViewer && profileInfoIsOwner(profileInfos);
+  const canEdit = isViewer && profileInfoHasEditorRight(profileInfos);
+  const isAdmin = isViewer && profileInfoHasAdminRight(profileInfos);
 
   const environment = useRelayEnvironment();
 
@@ -135,16 +137,28 @@ const WebCardScreen = ({
   useEffect(() => {
     let disposables: Disposable[];
     if (canEdit) {
-      const modules: ModuleKind[] = [...MODULE_KINDS];
       disposables = [
         prefetchRoute(environment, {
           route: 'COVER_EDITION',
         }),
-        ...modules.map(module =>
-          prefetchRoute(environment, {
-            route: 'CARD_MODULE_EDITION',
-            params: { module },
-          }),
+        ...MODULE_VARIANT_SECTION.flatMap(module =>
+          module.section === 'custom'
+            ? module.moduleKind.map(moduleKind => {
+                const module = { moduleKind } as ModuleKindWithVariant;
+                return prefetchRoute(
+                  environment,
+                  getRouteForCardModule(module),
+                );
+              })
+            : module.variants.map(v =>
+                prefetchRoute(
+                  environment,
+                  getRouteForCardModule({
+                    moduleKind: module.section,
+                    variant: v,
+                  } as ModuleKindWithVariant),
+                ),
+              ),
         ),
       ];
     }
@@ -186,10 +200,7 @@ const WebCardScreen = ({
 
   const toggleFollow = useCallback(
     (webCardId: string, userName: string, follow: boolean) => {
-      if (
-        profileInfos?.profileRole &&
-        profileHasEditorRight(profileInfos.profileRole)
-      ) {
+      if (profileInfoHasEditorRight(profileInfos)) {
         onToggleFollow(webCardId, userName, follow);
       } else if (follow) {
         Toast.show({
@@ -209,7 +220,7 @@ const WebCardScreen = ({
         });
       }
     },
-    [intl, onToggleFollow, profileInfos?.profileRole],
+    [intl, onToggleFollow, profileInfos],
   );
 
   // #region Flip Animation
@@ -332,7 +343,7 @@ const WebCardScreen = ({
   // #end region
 
   const onEdit = useCallback(() => {
-    if (profileHasEditorRight(profileInfos?.profileRole)) {
+    if (profileInfoHasEditorRight(profileInfos)) {
       toggleEditing();
     } else {
       Toast.show({
@@ -344,7 +355,7 @@ const WebCardScreen = ({
         }),
       });
     }
-  }, [profileInfos?.profileRole, toggleEditing, intl]);
+  }, [profileInfos, toggleEditing, intl]);
 
   // const viewerWebCardUnpublish =
   //   profileInfos?.webCardId !== data.webCard?.id &&
@@ -457,6 +468,7 @@ const WebCardScreen = ({
           onToggleFollow={toggleFollow}
           isViewer={isViewer}
           isOwner={isWebCardOwner}
+          isAdmin={isAdmin}
         />
       </Suspense>
     </View>

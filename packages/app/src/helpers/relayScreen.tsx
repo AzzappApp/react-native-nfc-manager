@@ -173,21 +173,11 @@ function relayScreen<TRoute extends Route>(
 
     const environment = useRelayEnvironment();
 
+    //this method is used to force refresh, mainly in case of push notification
     const refreshQuery = useCallback(() => {
-      const { query, variables } = getLoadQueryInfo(
-        options,
-        params,
-        profileInfosRef.current,
-      );
-      const { useOfflineCache } = options;
-      fetchQuery(environment, query, variables, {
-        fetchPolicy: 'network-only',
-        networkCacheConfig: {
-          force: true,
-          metadata: { useOfflineCache },
-        },
-      });
-    }, [environment, params]);
+      //TODO: should we had a param to refresh only when hasFocus. in case of push notification it should refresh even if the screen is not focused
+      loadQueryFor(screenId, options, params, true);
+    }, [params, screenId]);
 
     // refresh the query when the screen gains focus (going from background to foreground)
     const appState = useAppState();

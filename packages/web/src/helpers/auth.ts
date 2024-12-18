@@ -38,8 +38,9 @@ export const handleSignInAuthMethod = async (
     profileInfos: profile
       ? {
           profileId: toGlobalId('Profile', profile.id),
-          profileRole: profile.invited ? 'invited' : profile.profileRole,
+          profileRole: profile.profileRole,
           webCardId: toGlobalId('WebCard', profile.webCardId),
+          invited: profile.invited,
         }
       : null,
     email: user.email,

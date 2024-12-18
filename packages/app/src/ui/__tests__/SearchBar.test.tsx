@@ -47,7 +47,7 @@ describe('SearchBar component', () => {
       <SearchBar
         placeholder={placeholder}
         onChangeText={onChangeText}
-        value={'searchText'}
+        value="searchText"
         onCancel={onCancel}
       />,
     );

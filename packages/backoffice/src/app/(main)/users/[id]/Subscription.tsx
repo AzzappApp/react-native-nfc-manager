@@ -122,9 +122,9 @@ export const Subscription = ({
             label="Type"
             onChange={() => {}}
           >
-            <MenuItem value={'web.monthly'}>Monthly</MenuItem>
-            <MenuItem value={'web.yearly'}>Yearly</MenuItem>
-            <MenuItem value={'web.lifetime'}>LifeTime</MenuItem>
+            <MenuItem value="web.monthly">Monthly</MenuItem>
+            <MenuItem value="web.yearly">Yearly</MenuItem>
+            <MenuItem value="web.lifetime">LifeTime</MenuItem>
           </Select>
         </FormControl>
         <TextField

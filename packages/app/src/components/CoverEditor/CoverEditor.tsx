@@ -35,6 +35,11 @@ import {
   getLutURI,
   NativeTextureLoader,
 } from '#helpers/mediaEditions';
+import {
+  copyCoverMediaToCacheDir,
+  COVER_CACHE_DIR,
+  type SourceMedia,
+} from '#helpers/mediaHelpers';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Text from '#ui/Text';
@@ -44,7 +49,6 @@ import {
   extractLottieInfoMemoized,
   calculateImageScale,
   getLottieMediasDurations,
-  copyCoverMediaToCacheDir,
   useLottieMediaDurations,
   MAX_ALLOWED_VIDEOS_BY_COVER,
 } from './coverEditorHelpers';
@@ -57,7 +61,6 @@ import { getCoverLocalMediaPath } from './coversLocalStore';
 import useLottie from './useLottie';
 import useSaveCover from './useSaveCover';
 import type { TextureInfo } from '#helpers/mediaEditions/NativeTextureLoader';
-import type { SourceMedia } from '#helpers/mediaHelpers';
 import type { CoverEditor_coverTemplate$key } from '#relayArtifacts/CoverEditor_coverTemplate.graphql';
 import type { CoverEditor_profile$key } from '#relayArtifacts/CoverEditor_profile.graphql';
 import type { CoverEditorAction } from './coverEditorActions';
@@ -330,7 +333,7 @@ const CoverEditorCore = (
       coverTemplate?.medias.forEach(({ media, index, editable }) => {
         initialMediaToPick[index] = {
           editable,
-          kind: 'image',
+          kind: media.id.startsWith('v_') ? 'video' : 'image',
           filter: null,
           animation: null,
           editionParameters: null,
@@ -470,6 +473,7 @@ const CoverEditorCore = (
         if (!localFilenames[media.id]) {
           const filename = await copyCoverMediaToCacheDir(
             media,
+            COVER_CACHE_DIR,
             abortController.signal,
           );
           if (canceled) {
@@ -724,7 +728,7 @@ const CoverEditorCore = (
   const toolbox = useRef<CoverEditorLinksToolActions>(null);
 
   const onOpenLinksModal = useCallback(() => {
-    toolbox.current?.toggleLinksModal();
+    toolbox.current?.openLinksModal();
   }, []);
 
   const intl = useIntl();

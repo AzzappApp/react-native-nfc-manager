@@ -103,7 +103,7 @@ const LottieInput = ({
         ref={inputRef}
         {...getInputProps(lottieField, { type: 'file' })}
         key={lottieField.key}
-        accept={'.json'}
+        accept=".json"
         style={{
           display: 'none',
         }}

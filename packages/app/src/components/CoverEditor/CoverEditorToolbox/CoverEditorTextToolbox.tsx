@@ -4,6 +4,7 @@ import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
+import { TOOLBOX_SECTION_HEIGHT } from '../../Toolbar/ToolBoxSection';
 import { useCoverEditorEditContext } from '../CoverEditorContext';
 import CoverEditorAlignmentTool from './tools/CoverEditorAligmentTool';
 import CoverEditorColorTool from './tools/CoverEditorColorTool';
@@ -13,7 +14,6 @@ import CoverEditorFontFamilyTool from './tools/CoverEditorFontFamilyTool';
 import CoverEditorShadowTool from './tools/CoverEditorShadowTool';
 import CoverEditorSizeTool from './tools/CoverEditorSizeTool';
 import CoverEditorTextAnimationTool from './tools/CoverEditorTextAnimationTool';
-import { TOOLBOX_SECTION_HEIGHT } from './ui/ToolBoxSection';
 
 const CoverEditorTextToolbox = () => {
   const styles = useStyleSheet(styleSheet);

@@ -146,7 +146,8 @@ const ContactCardItem = ({
   }, [profile.id, router]);
 
   const showUpdateContactHint =
-    profile.lastContactCardUpdate <= profile.createdAt;
+    profile.lastContactCardUpdate <= profile.createdAt &&
+    profile.webCard?.cardIsPublished;
 
   const readableColor = useMemo(
     () => getTextColor(profile.webCard?.cardColors?.primary ?? colors.black),
@@ -177,6 +178,7 @@ const ContactCardItem = ({
                 profile={profile}
                 height={Math.min(height, height)}
                 style={styles.card}
+                edit
               />
             </PressableNative>
           </View>

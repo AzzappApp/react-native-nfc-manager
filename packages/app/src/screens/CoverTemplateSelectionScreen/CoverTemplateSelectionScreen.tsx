@@ -1,4 +1,4 @@
-import { Suspense, useCallback, useMemo, useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import {
@@ -47,7 +47,9 @@ const query = graphql`
       ... on Profile {
         webCard {
           webCardKind
+          cardIsPublished
         }
+        invited
       }
     }
   }
@@ -67,6 +69,12 @@ const CoverTemplateSelectionScreen = ({
 
   const { profile, currentUser } =
     usePreloadedQuery<CoverTemplateSelectionScreenQuery>(query, preloadedQuery);
+
+  useEffect(() => {
+    if (profile?.invited || !profile?.webCard?.cardIsPublished) {
+      router.backToTop();
+    }
+  }, [profile?.invited, profile?.webCard?.cardIsPublished, router]);
 
   const webCardKind = profile?.webCard?.webCardKind;
 

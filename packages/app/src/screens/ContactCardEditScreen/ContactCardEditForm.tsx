@@ -335,7 +335,7 @@ const ContactCardEditForm = ({
             <View style={styles.logoField}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <View style={styles.logoButton}>
-                  <Icon icon={'locked'} style={{}} />
+                  <Icon icon="locked" style={{}} />
                   <Text variant="smallbold">
                     <FormattedMessage
                       defaultMessage="Logo"

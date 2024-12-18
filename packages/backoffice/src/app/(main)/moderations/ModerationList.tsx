@@ -136,9 +136,9 @@ const ModerationsList = ({
             label="Status"
             onChange={onStatusChange}
           >
-            <MenuItem value={'all'}>All</MenuItem>
-            <MenuItem value={'open'}>Opened</MenuItem>
-            <MenuItem value={'closed'}>Closed</MenuItem>
+            <MenuItem value="all">All</MenuItem>
+            <MenuItem value="open">Opened</MenuItem>
+            <MenuItem value="closed">Closed</MenuItem>
           </Select>
         </FormControl>
         <FormControl sx={{ width: 130 }}>
@@ -150,10 +150,10 @@ const ModerationsList = ({
             label="Kind"
             onChange={onKindChange}
           >
-            <MenuItem value={'all'}>All</MenuItem>
-            <MenuItem value={'webCard'}>webCard</MenuItem>
-            <MenuItem value={'post'}>post</MenuItem>
-            <MenuItem value={'comment'}>comment</MenuItem>
+            <MenuItem value="all">All</MenuItem>
+            <MenuItem value="webCard">webCard</MenuItem>
+            <MenuItem value="post">post</MenuItem>
+            <MenuItem value="comment">comment</MenuItem>
           </Select>
         </FormControl>
       </Box>

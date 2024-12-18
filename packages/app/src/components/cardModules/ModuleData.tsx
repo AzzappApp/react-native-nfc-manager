@@ -1,17 +1,23 @@
 import { graphql, useFragment } from 'react-relay';
-import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
   MODULE_KIND_BLOCK_TEXT,
   MODULE_KIND_CAROUSEL,
   MODULE_KIND_HORIZONTAL_PHOTO,
   MODULE_KIND_LINE_DIVIDER,
+  MODULE_KIND_MEDIA,
+  MODULE_KIND_MEDIA_TEXT,
+  MODULE_KIND_MEDIA_TEXT_LINK,
   MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE,
   MODULE_KIND_SIMPLE_BUTTON,
   MODULE_KIND_SIMPLE_TEXT,
   MODULE_KIND_SIMPLE_TITLE,
   MODULE_KIND_SOCIAL_LINKS,
 } from '@azzapp/shared/cardModuleHelpers';
+import { isDefined } from '@azzapp/shared/isDefined';
+import { readMediaModuleData } from '#components/cardModules/CardModuleMedia/MediaModuleRenderer';
 import { readBlockTextData } from './BlockTextRenderer';
+import { readMediaTextModuleData } from './CardModuleMediaText/MediaTextModuleRenderer';
+import { readMediaTextLinkModuleData } from './CardModuleMediaTextLink/MediaTextLinkModuleRenderer';
 import { readCarouselData } from './CarouselRenderer';
 import { readHorizontalPhotoData } from './HorizontalPhotoRenderer';
 import { readLineDividerData } from './LineDividerRenderer';
@@ -23,6 +29,9 @@ import type { BlockTextRenderer_module$key } from '#relayArtifacts/BlockTextRend
 import type { CarouselRenderer_module$key } from '#relayArtifacts/CarouselRenderer_module.graphql';
 import type { HorizontalPhotoRenderer_module$key } from '#relayArtifacts/HorizontalPhotoRenderer_module.graphql';
 import type { LineDividerRenderer_module$key } from '#relayArtifacts/LineDividerRenderer_module.graphql';
+import type { MediaModuleRenderer_module$key } from '#relayArtifacts/MediaModuleRenderer_module.graphql';
+import type { MediaTextLinkModuleRenderer_module$key } from '#relayArtifacts/MediaTextLinkModuleRenderer_module.graphql';
+import type { MediaTextModuleRenderer_module$key } from '#relayArtifacts/MediaTextModuleRenderer_module.graphql';
 import type { ModuleData_cardModules$key } from '#relayArtifacts/ModuleData_cardModules.graphql';
 import type { PhotoWithTextAndTitleRenderer_module$key } from '#relayArtifacts/PhotoWithTextAndTitleRenderer_module.graphql';
 import type { SimpleButtonRenderer_module$key } from '#relayArtifacts/SimpleButtonRenderer_module.graphql';
@@ -44,6 +53,13 @@ export type ModuleReadInfo =
   | (LineDividerRenderer_module$key & {
       kind: typeof MODULE_KIND_LINE_DIVIDER;
     })
+  | (MediaModuleRenderer_module$key & { kind: typeof MODULE_KIND_MEDIA })
+  | (MediaTextLinkModuleRenderer_module$key & {
+      kind: typeof MODULE_KIND_MEDIA_TEXT_LINK;
+    })
+  | (MediaTextModuleRenderer_module$key & {
+      kind: typeof MODULE_KIND_MEDIA_TEXT;
+    })
   | (PhotoWithTextAndTitleRenderer_module$key & {
       kind: typeof MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE;
     })
@@ -59,6 +75,7 @@ export type ModuleReadInfo =
   | (SocialLinksRenderer_module$key & {
       kind: typeof MODULE_KIND_SOCIAL_LINKS;
     });
+//INSERT_MODULE: add more case here
 
 export const readModuleData = (module: ModuleReadInfo) => {
   switch (module.kind) {
@@ -80,6 +97,13 @@ export const readModuleData = (module: ModuleReadInfo) => {
       return readSimpleTitleData(module);
     case MODULE_KIND_SOCIAL_LINKS:
       return readSocialLinksData(module);
+    case MODULE_KIND_MEDIA:
+      return readMediaModuleData(module);
+    case MODULE_KIND_MEDIA_TEXT:
+      return readMediaTextModuleData(module);
+    case MODULE_KIND_MEDIA_TEXT_LINK:
+      return readMediaTextLinkModuleData(module);
+    //INSERT_MODULE: add more case here
   }
 };
 
@@ -88,6 +112,7 @@ const ModulesDataFragment = graphql`
     id
     kind
     visible
+    variant
     ...BlockTextRenderer_module
     ...PhotoWithTextAndTitleRenderer_module
     ...SocialLinksRenderer_module
@@ -97,6 +122,10 @@ const ModulesDataFragment = graphql`
     ...SimpleTextRenderer_simpleTextModule
     ...LineDividerRenderer_module
     ...CarouselRenderer_module
+    ...MediaModuleRenderer_module
+    ...MediaTextModuleRenderer_module
+    ...MediaTextLinkModuleRenderer_module
+    #INSERT_MODULE: add more case here
   }
 `;
 
@@ -115,8 +144,8 @@ export const useModulesData = (
   if (!modules) {
     return [];
   }
-  return convertToNonNullArray(
-    modules.map(module => {
+  return modules
+    .map(module => {
       if (module) {
         if (visible && !module.visible) {
           return null;
@@ -125,10 +154,11 @@ export const useModulesData = (
           id: module.id,
           kind: module.kind,
           visible: module.visible,
+          variant: module.variant,
           data: readModuleData(module as any),
-        } as ModuleRenderInfo & { id: string; visible: boolean };
+        } as unknown as ModuleRenderInfo & { id: string; visible: boolean };
       }
       return null;
-    }),
-  );
+    })
+    .filter(isDefined);
 };

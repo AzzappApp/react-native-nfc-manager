@@ -79,12 +79,19 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
     const firstModuleData = getModuleDataValues({
       data: firstModule.data as any,
       cardStyle: webCard.cardStyle ?? DEFAULT_CARD_STYLE,
-      defaultValues: MODULES_DEFAULT_VALUES[firstModule.kind],
-      styleValuesMap: MODULES_STYLES_VALUES[firstModule.kind],
+      defaultValues:
+        MODULES_DEFAULT_VALUES[
+          firstModule.kind as keyof typeof MODULES_DEFAULT_VALUES
+        ],
+      styleValuesMap:
+        MODULES_STYLES_VALUES[
+          firstModule.kind as keyof typeof MODULES_DEFAULT_VALUES
+        ],
     });
 
     cardBackgroundColor = swapColor(
       firstModuleData.backgroundStyle?.backgroundColor ??
+        firstModuleData.cardModuleColor?.background ??
         firstModuleData.colorBottom,
       cardColors,
     );
@@ -96,12 +103,19 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
     const lastModuleData = getModuleDataValues({
       data: lastModule.data as any,
       cardStyle: webCard.cardStyle ?? DEFAULT_CARD_STYLE,
-      defaultValues: MODULES_DEFAULT_VALUES[lastModule.kind],
-      styleValuesMap: MODULES_STYLES_VALUES[lastModule.kind],
+      defaultValues:
+        MODULES_DEFAULT_VALUES[
+          lastModule.kind as keyof typeof MODULES_DEFAULT_VALUES
+        ],
+      styleValuesMap:
+        MODULES_STYLES_VALUES[
+          lastModule.kind as keyof typeof MODULES_DEFAULT_VALUES
+        ],
     });
 
     lastModuleBackgroundColor = swapColor(
       lastModuleData.backgroundStyle?.backgroundColor ??
+        lastModuleData.cardModuleColor?.background ??
         lastModuleData.colorBottom,
       cardColors,
     );
@@ -164,15 +178,19 @@ export async function generateMetadata({
   const userName = params.userName.toLowerCase();
   const webCard = await cachedGetWebCardByUserName(userName);
 
+  const imageUrlOption = webCard?.updatedAt
+    ? `?t=${webCard.updatedAt.getTime()}`
+    : '';
+
   const meta = getMetaData({
     url: params.userName,
     title: capitalize(params.userName),
-    ogImage: `/api/og/${params.userName}?t=${webCard.updatedAt.getTime()}`,
+    ogImage: `/api/og/${params.userName}${imageUrlOption}`,
     description: `${params.userName} | Azzapp WebCard`,
     other: {
       twitter: {
         card: 'summary_large_image',
-        images: `/api/og/${params.userName}?t=${webCard.updatedAt.getTime()}`,
+        images: `/api/og/${params.userName}${imageUrlOption}`,
       },
     },
   });

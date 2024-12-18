@@ -165,7 +165,7 @@ const PostRendererMedia = (
             ref={forwardedRef as any}
             source={source}
             // TODO alt generation by cloudinary AI ? include text in small format ?
-            alt={`This is a video posted`}
+            alt="This is a video posted"
             thumbnailURI={small ? smallThumbnail : largeThumbnail}
             style={style}
             muted={muted}
@@ -183,7 +183,7 @@ const PostRendererMedia = (
           ref={forwardedRef as any}
           source={source}
           // TODO alt generation by cloudinary AI ? include text in small format ?
-          alt={`This is an image posted`}
+          alt="This is an image posted"
           style={style}
           onReadyForDisplay={onReady}
           testID="PostRendererMedia_media"

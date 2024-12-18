@@ -1,52 +1,36 @@
-import _ from 'lodash';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useIntl } from 'react-intl';
-import { StyleSheet, View, useColorScheme } from 'react-native';
+import { useCallback } from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { View } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
-import Toast from 'react-native-toast-message';
-import { useDebouncedCallback } from 'use-debounce';
-import { SOCIAL_LINKS } from '@azzapp/shared/socialLinkHelpers';
-import {
-  isNotFalsyString,
-  isValidEmail,
-  isValidUrl,
-} from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import SortableList from '#components/SortableScrollView/SortableScrollView';
-import useEditorLayout from '#hooks/useEditorLayout';
-import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
-import Icon from '#ui/Icon';
-import SocialIcon from '#ui/Icon/SocialIcon';
-import Input from '#ui/Input';
+import { SocialLinkIconButton } from '#components/ui/SocialLinkIconButton';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import useScreenDimensions from '#hooks/useScreenDimensions';
+import useScreenInsets from '#hooks/useScreenInsets';
+import IconButton from '#ui/IconButton';
 import Text from '#ui/Text';
 import TitleWithLine from '#ui/TitleWithLine';
-import type { SocialLinkInput } from '#relayArtifacts/SocialLinksEditionScreenUpdateModuleMutation.graphql';
-import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
-import type {
-  ViewProps,
-  LayoutChangeEvent,
-  TextInputEndEditingEventData,
-  NativeSyntheticEvent,
-  StyleProp,
-  ViewStyle,
-} from 'react-native';
-import type { PanGesture } from 'react-native-gesture-handler';
+import type { SocialLinkItem } from '@azzapp/shared/socialLinkHelpers';
+import type { ViewProps, StyleProp, ViewStyle } from 'react-native';
+import type { PanGestureType } from 'react-native-gesture-handler/lib/typescript/handlers/gestures/panGesture';
 
 type SocialLinksLinksEditionPanelProps = ViewProps & {
   /**
    * The links currently set on the module
    */
-  links: ReadonlyArray<{
-    readonly socialId: string;
-    readonly link: string;
-    readonly position: number;
-  } | null>;
+  links: SocialLinkItem[];
   /**
    * A callback called when the user update the links
    */
-  onLinksChange: (links: Array<SocialLinkInput | null>) => void;
+  onDeleteLink: (links: SocialLinkItem) => void;
+  onItemPress: (link: SocialLinkItem) => void;
+  onOrderChange: (links: SocialLinkItem[]) => void;
+  onAddLink: () => void;
   contentContainerStyle?: StyleProp<ViewStyle>;
   ignoreKeyboard?: boolean;
+  showTitleWithLineHeader?: boolean;
+  maxLink?: number;
 };
 
 /**
@@ -54,365 +38,161 @@ type SocialLinksLinksEditionPanelProps = ViewProps & {
  */
 const SocialLinksLinksEditionPanel = ({
   links,
-  onLinksChange,
+  onDeleteLink,
+  onAddLink,
+  onItemPress,
+  onOrderChange,
   style,
   contentContainerStyle,
   ignoreKeyboard,
+  showTitleWithLineHeader,
+  maxLink = -1,
   ...props
 }: SocialLinksLinksEditionPanelProps) => {
   const intl = useIntl();
-  const { insetBottom } = useEditorLayout();
+  const styles = useStyleSheet(styleSheet);
 
-  const onChangeLink = useCallback(
-    (id: SocialLinkId, value: string) => {
-      if (isNotFalsyString(value)) {
-        const item = links.find(link => link?.socialId === id);
+  const onChangeOrder = (arr: SocialLinkItem[]) => {
+    const orderedList: SocialLinkItem[] = arr
+      .sort((a, b) => a.position - b.position)
+      // filterout keyId
+      .map(item => ({
+        link: item.link,
+        position: item.position,
+        socialId: item.socialId,
+      }));
+    onOrderChange(orderedList);
+  };
 
-        //add value to item link
-        if (item) {
-          const newLinks = links.map(link => {
-            if (link?.socialId === id) {
-              return {
-                ...link,
-                link: value,
-              };
-            }
-            return link;
-          });
-          onLinksChange(newLinks);
-        } else {
-          onLinksChange([
-            ...links,
-            { socialId: id, link: value, position: links.length },
-          ]);
-        }
-      } else {
-        onLinksChange(links.filter(link => link?.socialId !== id));
-      }
-    },
-    [links, onLinksChange],
-  );
-
-  const getLinks = useCallback(() => {
-    // consolidate a list of link merged with the selected value
-    const consolidatedLinks = [];
-    for (let index = 0; index < SOCIAL_LINKS.length; index++) {
-      const link = SOCIAL_LINKS[index];
-      const value = links.find(item => item?.socialId === link.id);
-
-      let placeholder: string | undefined = undefined;
-
-      if (link.id === 'website') {
-        placeholder = intl.formatMessage({
-          defaultMessage: 'Enter an URL',
-          description: 'Placeholder for the website link',
-        });
-      }
-
-      if (link.id === 'phone') {
-        placeholder = intl.formatMessage({
-          defaultMessage: 'Enter a phone number',
-          description: 'Placeholder for the phone link',
-        });
-      }
-
-      if (link.id === 'sms') {
-        placeholder = intl.formatMessage({
-          defaultMessage: 'Enter a phone number',
-          description: 'Placeholder for the sms link',
-        });
-      }
-
-      if (link.id === 'mail') {
-        placeholder = intl.formatMessage({
-          defaultMessage: 'Enter an email',
-          description: 'Placeholder for the mail link',
-        });
-      }
-      if (link.id === 'website') {
-        placeholder = intl.formatMessage({
-          defaultMessage: 'Enter a website url',
-          description: 'Placeholder for the website link',
-        });
-      }
-
-      consolidatedLinks.push({
-        ...link,
-        position: value?.position ?? NO_POSITION_INDEX, //required for reordering
-        placeholder,
-      });
-    }
-
-    return consolidatedLinks;
-  }, [intl, links]);
-
-  const [data, setData] = useState(() =>
-    getLinks().sort((a, b) => {
-      if (a.position !== b.position) {
-        return a.position - b.position;
-      }
-      return 0;
-    }),
-  );
-
-  useEffect(() => {
-    setData(data => {
-      const newData = getLinks();
-      if (_.isEqual(data, newData)) {
-        return data;
-      } else {
-        return newData;
-      }
+  const sortableLinks = links
+    .sort((a, b) => a.position - b.position)
+    .map((l, index) => {
+      return { ...l, position: index, keyId: `${l.link}${l.socialId}${index}` };
     });
-  }, [getLinks]);
 
-  const initialLinks = useRef(links);
+  const { width } = useScreenDimensions();
+  const visibleDimension = width;
+  const { bottom } = useScreenInsets();
+
+  const scrollableStyle: ViewStyle = {
+    overflow: 'visible',
+    paddingBottom: maxLink <= 0 ? 30 : 0,
+    paddingTop: maxLink <= 0 ? 30 : 0,
+    maxHeight: 172 - bottom,
+  };
+
+  const onPress = useCallback(
+    (item: {
+      position: number;
+      keyId: string;
+      socialId: string;
+      link: string;
+    }) => {
+      const { keyId, ...rest } = item;
+      onItemPress(rest);
+    },
+    [onItemPress],
+  );
 
   const renderItem = useCallback(
     (
       item: {
-        id: SocialLinkId;
-        link?: string | undefined;
         position: number;
-        mask: string;
-        placeholder?: string;
+        keyId: string;
+        socialId: string;
+        link: string;
       },
-      panGesture: PanGesture,
+      panGesture: PanGestureType,
     ) => {
-      const value =
-        initialLinks.current.find(link => link?.socialId === item.id)?.link ??
-        '';
       return (
-        <SocialInput
-          icon={item.id}
-          mask={item.mask}
-          placeholder={item.placeholder}
-          value={value}
-          onChangeLink={onChangeLink}
-          panGesture={panGesture}
-        />
+        <GestureDetector gesture={panGesture}>
+          <View style={styles.itemContainer}>
+            <SocialLinkIconButton
+              item={item}
+              onPress={onPress}
+              showDelete
+              onDeletePress={onDeleteLink}
+            />
+          </View>
+        </GestureDetector>
       );
     },
-    [onChangeLink],
+    [onDeleteLink, onPress, styles.itemContainer],
   );
-
-  const onChangeOrder = (
-    arr: Array<{
-      id: string;
-      link?: string | undefined;
-      position: number;
-      mask: string;
-    }>,
-  ) => {
-    //update the position of items in link
-    const newLinks = links.map(link => {
-      const item = arr.find(item => item.id === link?.socialId);
-      if (item && link) {
-        return {
-          ...link,
-          position: item.position,
-        };
-      }
-      return link;
-    });
-    onLinksChange(newLinks);
-  };
-
-  const [scrollHeight, setScrollHeight] = useState(0);
-  const onLayout = useCallback((event: LayoutChangeEvent) => {
-    setScrollHeight(event.nativeEvent.layout.height);
-  }, []);
 
   return (
     <View style={[styles.root, style]} {...props}>
-      <TitleWithLine
-        title={intl.formatMessage({
-          defaultMessage: 'Links',
-          description: 'Title of the Links section in SocialLinks edition',
-        })}
-      />
-      <SortableList<{
-        id: SocialLinkId;
-        link?: string | undefined;
-        position: number;
-        mask: string;
-      }>
-        items={data}
-        itemHeight={SOCIAL_LINK_PANEL_ITEM_HEIGHT}
+      {showTitleWithLineHeader ? (
+        <TitleWithLine
+          title={intl.formatMessage({
+            defaultMessage: 'Links',
+            description: 'Title of the Links section in SocialLinks edition',
+          })}
+        />
+      ) : undefined}
+      <SortableList
+        items={sortableLinks}
+        itemDimension={90}
+        visibleDimension={visibleDimension}
+        showsHorizontalScrollIndicator={false}
+        horizontal
+        contentContainerStyle={styles.scrollableListContainer}
+        style={scrollableStyle}
+        activateAfterLongPress
         renderItem={renderItem}
-        visibleHeight={scrollHeight - BOTTOM_MENU_HEIGHT - insetBottom}
-        contentContainerStyle={
-          contentContainerStyle ?? {
-            height:
-              SOCIAL_LINK_PANEL_ITEM_HEIGHT * SOCIAL_LINKS.length +
-              insetBottom +
-              BOTTOM_MENU_HEIGHT +
-              90,
-          }
-        }
-        onLayout={onLayout}
         onChangeOrder={onChangeOrder}
       />
+      {maxLink > 0 && (
+        <Text variant="medium" style={styles.linksPreviewCount}>
+          <FormattedMessage
+            defaultMessage="{links}/{maxLink} links"
+            description="CoverEditorLinksModal - Links count"
+            values={{ links: links.length, maxLink }}
+          />
+        </Text>
+      )}
+      <View style={styles.iconContainer}>
+        <IconButton
+          icon="add"
+          onPress={onAddLink}
+          disabled={maxLink > 0 && links.length >= maxLink}
+        />
+      </View>
     </View>
   );
 };
-
-const SocialInputComponent = ({
-  icon,
-  mask,
-  value,
-  onChangeLink,
-  panGesture,
-  placeholder,
-}: {
-  icon: SocialLinkId;
-  mask: string;
-  placeholder?: string;
-  value: string;
-  onChangeLink: (id: SocialLinkId, value: string) => void;
-  panGesture: PanGesture;
-}) => {
-  const colorScheme = useColorScheme();
-  const [localValue, setLocalValue] = useState(value);
-
-  const debouncedChangeLink = useDebouncedCallback(onChangeLink, 500, {
-    leading: true,
-  });
-
-  const onChangeText = useCallback(
-    (value: string) => {
-      value = value.trim();
-      //handle copy paste from the user with complete link
-      let filterText = value;
-      if (value.includes(mask)) {
-        const index = value.indexOf(mask);
-        filterText = value.substring(index + mask.length);
-        const endIndex = filterText.indexOf('?');
-        if (endIndex !== -1) {
-          filterText = filterText.substring(0, endIndex);
-        }
-      }
-      if (
-        isNotFalsyString(filterText) &&
-        icon === 'website' &&
-        !filterText.includes('http')
-      ) {
-        filterText = 'https://' + (filterText === 'h' ? '' : filterText);
-      }
-      setLocalValue(filterText);
-      if (icon !== 'mail') {
-        debouncedChangeLink(icon, filterText);
-      }
-    },
-    [debouncedChangeLink, icon, mask],
-  );
-
-  const intl = useIntl();
-
-  const onEndEditing = useCallback(
-    async (e: NativeSyntheticEvent<TextInputEndEditingEventData>) => {
-      const validators = {
-        website: (text: string) => {
-          if (!isValidUrl(text)) {
-            return intl.formatMessage({
-              defaultMessage: 'The Website url is not valid.',
-              description:
-                'Error toast message when a website url sociallink is not valid.',
-            });
-          }
-        },
-        mail: (text: string) => {
-          if (!isValidEmail(text)) {
-            return intl.formatMessage({
-              defaultMessage: 'The email is not valid.',
-              description:
-                'Error toast message when an email sociallink is not valid.',
-            });
-          }
-        },
-      } as Partial<Record<SocialLinkId, (text: string) => string | undefined>>;
-
-      const validator = validators[icon];
-      if (validator && e.nativeEvent.text) {
-        const error = validator(e.nativeEvent.text);
-
-        if (error) {
-          return Toast.show({
-            type: 'error',
-            text1: error,
-          });
-        }
-      }
-
-      onChangeLink(icon, e.nativeEvent.text);
-    },
-    [icon, intl, onChangeLink],
-  );
-
-  const leftElement = useMemo(
-    () => (
-      <Text variant="textField" style={{ color: colors.grey400 }}>
-        {mask}
-      </Text>
-    ),
-    [mask],
-  );
-
-  const socialIconStyle = useMemo(
-    () => ({
-      width: 30,
-      height: 30,
-      tintColor: isNotFalsyString(localValue)
-        ? colorScheme === 'dark'
-          ? colors.white
-          : colors.black
-        : colors.grey400,
-    }),
-    [colorScheme, localValue],
-  );
-
-  return (
-    <View key={icon} style={styles.inputContainer}>
-      <SocialIcon icon={icon} style={socialIconStyle} />
-      <Input
-        style={styles.input}
-        leftElement={leftElement}
-        placeholder={placeholder}
-        clearButtonMode="always"
-        value={localValue}
-        onChangeText={onChangeText}
-        onEndEditing={onEndEditing}
-        autoCapitalize="none"
-        autoCorrect={false}
-        inputStyle={styles.inputStyleSocial}
-        keyboardType={['phone', 'sms'].includes(icon) ? 'phone-pad' : 'default'}
-      />
-      <GestureDetector gesture={panGesture}>
-        <Icon icon="menu" style={{ tintColor: colors.grey400 }} />
-      </GestureDetector>
-    </View>
-  );
-};
-
-const SocialInput = memo(SocialInputComponent);
 
 export default SocialLinksLinksEditionPanel;
 
-const styles = StyleSheet.create({
-  inputStyleSocial: { paddingLeft: 0 },
+const styleSheet = createStyleSheet(appearance => ({
   root: {
-    paddingHorizontal: 20,
     rowGap: 15,
     justifyContent: 'flex-start',
   },
-  inputContainer: {
-    flexDirection: 'row',
+  iconContainer: {
+    width: '100%',
+    alignContent: 'center',
     alignItems: 'center',
-    height: 56,
+    justifyContent: 'center',
   },
-  input: { flex: 1, marginLeft: 5, marginRight: 5 },
-});
-
-const NO_POSITION_INDEX = 100;
+  scrollableListContainer: {
+    alignContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  pressableSocialIcon: {
+    paddingHorizontal: 5,
+  },
+  linksPreviewCount: {
+    textAlign: 'center',
+    color: appearance === 'light' ? colors.grey400 : colors.grey600,
+  },
+  itemContainer: {
+    width: 90,
+    height: 90,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+}));
 
 export const SOCIAL_LINK_PANEL_ITEM_HEIGHT = 56;

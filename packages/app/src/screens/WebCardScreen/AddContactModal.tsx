@@ -444,7 +444,7 @@ const AddContactModal = ({
     >
       <Header
         middleElement={
-          <Text variant="large" style={styles.headerText}>
+          <Text variant="large" style={styles.headerText} numberOfLines={3}>
             <FormattedMessage
               defaultMessage="Add {userName} to your contacts"
               description="Title for add contact modal"
@@ -551,9 +551,7 @@ const buildContact = async (
     phoneNumbers: phoneNumbers.map(phone => ({
       label:
         Platform.OS === 'android' && phone[0] !== 'Main'
-          ? phone[0] === 'Fax'
-            ? 'workFax'
-            : phone[0].toLowerCase()
+          ? phone[0].toLowerCase()
           : phone[0],
       number: phone[1],
       isPrimary: phone[0] === 'Main',
@@ -632,6 +630,7 @@ const styles = StyleSheet.create({
   },
   headerText: {
     textAlign: 'center',
+    marginHorizontal: 25,
   },
 });
 

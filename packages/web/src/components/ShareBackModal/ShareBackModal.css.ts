@@ -26,10 +26,16 @@ const avatarContainer = style({
   zIndex: 1,
 });
 
+const shareBackModal = style({
+  marginTop: AVATAR_CONTAINER_TOP_POSITION,
+  maxHeight: `calc(100% - ${AVATAR_CONTAINER_TOP_POSITION}px)`,
+});
+
 const styles = {
   header,
   avatarContainer,
   title,
+  shareBackModal,
 };
 
 export default styles;

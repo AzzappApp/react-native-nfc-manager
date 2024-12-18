@@ -13,13 +13,13 @@ import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { graphql, useFragment, usePaginationFragment } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { type ArrayItemType } from '@azzapp/shared/arrayHelpers';
-import { profileIsOwner } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import Link from '#components/Link';
 import { MediaImageRenderer } from '#components/medias';
 import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { keyExtractor } from '#helpers/idHelpers';
+import { profileInfoIsOwner } from '#helpers/profileRoleHelper';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import { useFocusEffect } from '#hooks/useFocusEffect';
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -242,7 +242,7 @@ const MultiUserScreenUserList = ({
       if (
         item.id === profileInfos?.profileId &&
         webCard.nbProfiles > 1 &&
-        profileIsOwner(item.profileRole)
+        profileInfoIsOwner(item)
       ) {
         return (
           <View>

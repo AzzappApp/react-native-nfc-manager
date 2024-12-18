@@ -13,6 +13,7 @@ import {
 } from 'react';
 import { useIntl } from 'react-intl';
 import { Platform, StyleSheet, View } from 'react-native';
+import { useSharedValue, type SharedValue } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import {
   graphql,
@@ -29,6 +30,8 @@ import { useRouter, useSuspendUntilAppear } from '#components/NativeRouter';
 import { createId } from '#helpers/idHelpers';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import WebCardBlockContainer from './WebCardBlockContainer';
+import type { ModuleRenderInfo } from '#components/cardModules/CardModuleRenderer';
+import type { ModuleKindWithVariant } from '#helpers/webcardModuleHelpers';
 import type { WebCardScreenBody_webCard$key } from '#relayArtifacts/WebCardScreenBody_webCard.graphql';
 import type { WebCardScreenBodyDeleteModuleMutation } from '#relayArtifacts/WebCardScreenBodyDeleteModuleMutation.graphql';
 import type {
@@ -37,7 +40,8 @@ import type {
 } from '#relayArtifacts/WebCardScreenBodyDuplicateModuleMutation.graphql';
 import type { WebCardScreenBodySwapModulesMutation } from '#relayArtifacts/WebCardScreenBodySwapModulesMutation.graphql';
 import type { WebCardScreenBodyUpdateModulesVisibilityMutation } from '#relayArtifacts/WebCardScreenBodyUpdateModulesVisibilityMutation.graphql';
-import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
+import type { ProfileBlockContainerProps } from './WebCardBlockContainer';
+import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { ForwardedRef } from 'react';
 import type { Disposable } from 'react-relay';
 import type { StoreUpdater, RecordSourceSelectorProxy } from 'relay-runtime';
@@ -73,7 +77,7 @@ export type WebCardScreenBodyProps = {
   /**
    * A callback called when the user press a module block in edit mode
    */
-  onEditModule: (module: ModuleKind, moduleId: string) => void;
+  onEditModule: (module: ModuleKindWithVariant & { moduleId: string }) => void;
   /**
    * A callback called when the selection state change
    */
@@ -82,6 +86,8 @@ export type WebCardScreenBodyProps = {
    * A callback called when the body is loaded
    */
   onLoad: () => void;
+
+  scrollPosition: SharedValue<number>;
 };
 
 export type WebCardBodyHandle = {
@@ -106,6 +112,7 @@ const WebCardScreenBody = (
     onEditModule,
     onSelectionStateChange,
     onLoad,
+    scrollPosition,
   }: WebCardScreenBodyProps,
   forwardedRef: ForwardedRef<WebCardBodyHandle>,
 ): any => {
@@ -643,30 +650,30 @@ const WebCardScreenBody = (
   // see @ProfileBlockContainerMemo
   const getModuleCallbacks = useMemo(
     () =>
-      memoize((id: string, kind: ModuleKind) => ({
+      memoize((module: ModuleKindWithVariant & { moduleId: string }) => ({
         onModulePress() {
-          if (!id.includes(TEMP_ID_PREFIX)) {
+          if (!module.moduleId.includes(TEMP_ID_PREFIX)) {
             Toast.hide();
-            onEditModule(kind, id);
+            onEditModule(module);
           }
         },
         onDuplicate() {
-          onDuplicateModule(id);
+          onDuplicateModule(module.moduleId);
         },
         onRemove() {
-          onRemoveModule(id);
+          onRemoveModule(module.moduleId);
         },
         onMoveUp() {
-          onMoveModule(id, 'up');
+          onMoveModule(module.moduleId, 'up');
         },
         onMoveDown() {
-          onMoveModule(id, 'down');
+          onMoveModule(module.moduleId, 'down');
         },
         onToggleVisibility(visible: boolean) {
-          onToggleModuleVisibility(id, visible);
+          onToggleModuleVisibility(module.moduleId, visible);
         },
         onSelect(selected: boolean) {
-          onSelectModule(id, selected);
+          onSelectModule(module.moduleId, selected);
         },
       })),
     [
@@ -685,9 +692,9 @@ const WebCardScreenBody = (
     const blockId = module.id;
 
     return (
-      <WebCardBlockContainerMemo
+      <WebCardModule
         key={blockId}
-        id={blockId}
+        module={module}
         editing={editing}
         canMove={canReorder}
         canDelete={canDelete}
@@ -699,28 +706,67 @@ const WebCardScreenBody = (
         selectionMode={selectionMode}
         selected={!!selectedModules[module.id]}
         backgroundColor={cardColors?.light ?? '#fff'}
-        // @ts-expect-error this extraData is used to trigger a re-render when the module data change
-        extraData={{
-          cardStyle,
-          cardColors,
-          module,
-        }}
-        {...getModuleCallbacks(module.id, module.kind as ModuleKind)}
-      >
-        <CardModuleRenderer
-          module={module}
-          colorPalette={cardColors}
-          cardStyle={cardStyle}
-          coverBackgroundColor={coverBackgroundColor}
-        />
-        {blockId.includes(TEMP_ID_PREFIX) && (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator color="white" style={styles.loading} />
-          </View>
-        )}
-      </WebCardBlockContainerMemo>
+        cardColors={cardColors}
+        cardStyle={cardStyle}
+        coverBackgroundColor={coverBackgroundColor}
+        scrollPosition={scrollPosition}
+        {...getModuleCallbacks({
+          moduleId: module.id,
+          moduleKind: module.kind,
+          variant: module.variant,
+        } as ModuleKindWithVariant & { moduleId: string })}
+      />
     );
   });
+};
+
+const WebCardModule = ({
+  module,
+  cardColors,
+  cardStyle,
+  coverBackgroundColor,
+  scrollPosition,
+  editing,
+  ...props
+}: Omit<ProfileBlockContainerProps, 'children' | 'id'> & {
+  module: ModuleRenderInfo & { id: string; visible: boolean };
+  cardColors?: ColorPalette | null;
+  cardStyle?: CardStyle | null;
+  coverBackgroundColor?: string | null;
+  scrollPosition: SharedValue<number>;
+  editing: boolean;
+}) => {
+  const modulePosition = useSharedValue(0);
+
+  return (
+    <WebCardBlockContainerMemo
+      id={module.id}
+      editing={editing}
+      {...props}
+      modulePosition={modulePosition}
+      // @ts-expect-error this extraData is used to trigger a re-render when the module data change
+      extraData={{
+        cardStyle,
+        cardColors,
+        module,
+      }}
+    >
+      <CardModuleRenderer
+        module={module}
+        colorPalette={cardColors}
+        cardStyle={cardStyle}
+        coverBackgroundColor={coverBackgroundColor}
+        scrollPosition={scrollPosition}
+        modulePosition={modulePosition}
+        editing={editing}
+      />
+      {module.id.includes(TEMP_ID_PREFIX) && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator color="white" style={styles.loading} />
+        </View>
+      )}
+    </WebCardBlockContainerMemo>
+  );
 };
 
 export default memo(forwardRef(WebCardScreenBody));

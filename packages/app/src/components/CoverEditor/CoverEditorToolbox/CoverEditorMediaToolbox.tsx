@@ -7,6 +7,7 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
+import { TOOLBOX_SECTION_HEIGHT } from '../../Toolbar/ToolBoxSection';
 import {
   useCoverEditorContext,
   useCoverEditorEditContext,
@@ -14,7 +15,6 @@ import {
 import { useLottieMediaDurations } from '../coverEditorHelpers';
 import CoverEditorMediaPickerFloatingTool from './tools/CoverEditorMediaPickerFloatingTool';
 import CoverEditorTransitionTool from './tools/CoverEditorTransitionTool';
-import { TOOLBOX_SECTION_HEIGHT } from './ui/ToolBoxSection';
 
 const CoverEditorMediaToolbox = () => {
   const styles = useStyleSheet(styleSheet);

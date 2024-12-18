@@ -76,7 +76,7 @@ const CloudinaryVideoPlayer = (
       <CloudinaryVideo
         ref={video}
         {...others}
-        loop={true}
+        loop
         onClick={togglePlaying}
         muted={muted}
         autoPlay={autoPlay}

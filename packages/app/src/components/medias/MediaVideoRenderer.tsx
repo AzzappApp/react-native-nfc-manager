@@ -30,7 +30,7 @@ export type MediaVideoRendererProps = ViewProps & {
   /**
    * the thumbnail URI of the video to display while the video is loading
    */
-  thumbnailURI?: string;
+  thumbnailURI?: string | null;
   /**
    * The source containing the uri of the media, the cacheId and the requestedSize
    */
