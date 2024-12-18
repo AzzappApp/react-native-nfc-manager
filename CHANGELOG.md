@@ -1,5 +1,7 @@
-## 1.4.1-canary.75
+## 1.4.1-canary.76
 
+* **fix:**  - **modules:** parallax effect on safari (deactivated on iOS) ([#6385](https://github.com/AzzappApp/azzapp/pull/6385))
+* **fix:**  - **modules:** [#6224](https://github.com/AzzappApp/azzapp/pull/6224) ensure image aspect ratio ([#6391](https://github.com/AzzappApp/azzapp/pull/6391))
 * **fix:**  - 🐛 scroll to initial index on layout with no height ([#6350](https://github.com/AzzappApp/azzapp/pull/6350))
 * **fix:**  - 🐛 make close button clickable ([#6340](https://github.com/AzzappApp/azzapp/pull/6340))
 * **fix:**  - **modules:** [#6372](https://github.com/AzzappApp/azzapp/pull/6372) text background is not visible ([#6390](https://github.com/AzzappApp/azzapp/pull/6390))
