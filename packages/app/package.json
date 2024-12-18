@@ -110,7 +110,6 @@
     "expo-image": "^2.0.2",
     "expo-linear-gradient": "~14.0.1",
     "expo-sensors": "14.0.1",
-    "expo-sharing": "^13.0.0",
     "graphql": "^16.9.0",
     "graphql-relay": "^0.10.2",
     "i18n-iso-countries": "^7.13.0",

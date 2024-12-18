@@ -1,11 +1,11 @@
 import { type Contact } from 'expo-contacts';
 import * as FileSystem from 'expo-file-system';
 import { Image } from 'expo-image';
-import { shareAsync } from 'expo-sharing';
 import { useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Linking, Platform, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
+import ShareCommand from 'react-native-share';
 
 import { colors, shadow } from '#theme';
 import { buildVCardFromExpoContact } from '#helpers/contactCardHelpers';
@@ -65,10 +65,12 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
     // generate file
     await FileSystem.writeAsStringAsync(filePath, vcardData.toString());
     // share the file
-    await shareAsync(filePath, { mimeType: 'text/x-vcard' });
+    await ShareCommand.open({
+      url: filePath,
+      type: 'text/x-vcard',
+    });
     // clean up file afterward
     await FileSystem.deleteAsync(filePath);
-    // }
   };
 
   return (
