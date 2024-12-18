@@ -1578,7 +1578,7 @@ PODS:
   - react-native-blob-jsi-helper (0.3.1):
     - React
     - React-Core
-  - react-native-blob-util (0.21.1):
+  - react-native-blob-util (0.21.2):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -3008,7 +3008,7 @@ SPEC CHECKSUMS:
   React-microtasksnativemodule: 7a69a9b8fded72ea3cf81923ecf75cad5558ed26
   react-native-animateable-text: 8baa4ade1a52ed9b17c5f64becf0d48e5218b13b
   react-native-blob-jsi-helper: c51309b88c3a2fb3e16d041f662e0551055d2bfc
-  react-native-blob-util: 88693f43e80d444bf7c598247f50d0ce6713b266
+  react-native-blob-util: caa7203c370bbf76ae63b67300d1b489b1a62511
   react-native-cameraroll: c71058d31a5e8088c9d42ff20bfe9cbc6752d36a
   react-native-keyboard-controller: 3428e4761623fd6a242d9bf3573112f8ebe92238
   react-native-mmkv: 21d0f6ed2d9532f2370cef81eca4ccbef7350441
