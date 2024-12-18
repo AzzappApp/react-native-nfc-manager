@@ -10,7 +10,7 @@ import { fontsMap } from '#helpers/fonts';
 import { DEFAULT_MODULE_TEXT, DEFAULT_MODULE_TITLE } from '#helpers/modules';
 import Link from '../Link';
 import commonStyles from '../MediaTextLink.css';
-import AlternationImage from './AlternationImage';
+import AlternationMedia from './AlternationMedia';
 import styles from './AlternationRenderer.css';
 
 import type { ModuleRendererProps } from '../../ModuleRenderer';
@@ -64,7 +64,7 @@ const AlternationRender = async ({
                   : styles.sectionContainer
               }
             >
-              <AlternationImage
+              <AlternationMedia
                 media={media}
                 even={index % 2 === 0}
                 cardStyle={cardStyle}

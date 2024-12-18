@@ -34,7 +34,8 @@ const sectionPartContainer = style({
 
 const imageContainer = style({
   width: '100%',
-  height: 480,
+  maxHeight: 480,
+  aspectRatio: '1',
   position: 'relative',
 });
 
@@ -64,7 +65,7 @@ const container = style({
   flex: 1,
 });
 
-const image = style({
+const media = style({
   width: '100%',
   height: '100%',
 });
@@ -85,6 +86,6 @@ export default {
   sectionContainerEven,
   sectionPartContainer,
   sectionTextContainer,
-  image,
+  media,
   link,
 };

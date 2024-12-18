@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import CloudinaryImage from '#ui/CloudinaryImage';
+import CloudinaryVideo from '#ui/CloudinaryVideo';
 import styles from './AlternationRenderer.css';
 import type { Media } from '@azzapp/data';
 import type { CardStyle } from '@azzapp/shared/cardHelpers';
@@ -56,21 +57,41 @@ const AlternationImage = ({
             height: '100%',
           }}
         >
-          <CloudinaryImage
-            mediaId={media.id}
-            draggable={false}
-            alt="alternation"
-            format="auto"
-            width={480}
-            height={480}
-            quality="auto:best"
-            crop="fill"
-            className={styles.image}
-            style={{
-              borderRadius: cardStyle?.borderRadius ?? 0,
-              objectFit: 'cover',
-            }}
-          />
+          {media.kind === 'video' ? (
+            <CloudinaryVideo
+              assetKind="module"
+              media={media}
+              alt="cover"
+              width={480}
+              height={480}
+              className={styles.media}
+              style={{
+                borderRadius: cardStyle?.borderRadius ?? 0,
+                objectFit: 'cover',
+                width: '100%',
+              }}
+              playsInline
+              autoPlay
+              muted
+              loop
+            />
+          ) : (
+            <CloudinaryImage
+              mediaId={media.id}
+              draggable={false}
+              alt="alternation"
+              width={480}
+              height={480}
+              format="auto"
+              crop="fill"
+              quality="auto:best"
+              className={styles.media}
+              style={{
+                borderRadius: cardStyle?.borderRadius ?? 0,
+                objectFit: 'cover',
+              }}
+            />
+          )}
         </div>
       </div>
     </div>
