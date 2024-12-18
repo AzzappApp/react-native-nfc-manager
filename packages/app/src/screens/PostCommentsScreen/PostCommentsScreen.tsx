@@ -1,9 +1,8 @@
-import { View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { useRouter } from '#components/NativeRouter';
 import relayScreen from '#helpers/relayScreen';
-import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
+import LoadingView from '#ui/LoadingView';
 import SafeAreaView from '#ui/SafeAreaView';
 import PostCommentsList from './PostCommentsList';
 import PostCommentsScreenHeader from './PostCommentsScreenHeader';
@@ -51,11 +50,7 @@ const PostCommentsScreenFallback = () => {
     <Container style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 1 }}>
         <PostCommentsScreenHeader onClose={onBack} />
-        <View
-          style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
-        >
-          <ActivityIndicator />
-        </View>
+        <LoadingView />
       </SafeAreaView>
     </Container>
   );

@@ -11,7 +11,7 @@ import {
   transaction,
   updateCardTemplate,
 } from '@azzapp/data';
-import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import {
   cardTemplateSchema,
   type CardTemplateFormValue,
@@ -71,7 +71,6 @@ export const saveCardTemplate = async (
           key: id,
           value: validation.data.label,
           locale: DEFAULT_LOCALE,
-          target: ENTITY_TARGET,
         });
       } else {
         const id = await createCardTemplate(template);
@@ -79,7 +78,6 @@ export const saveCardTemplate = async (
           key: id,
           value: validation.data.label,
           locale: DEFAULT_LOCALE,
-          target: ENTITY_TARGET,
         });
       }
       await referencesMedias([template.previewMediaId], [previousMediaId]);

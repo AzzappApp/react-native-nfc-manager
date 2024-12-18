@@ -1,4 +1,4 @@
-import { Platform, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import type { ReactElement } from 'react';
 import type { ViewProps } from 'react-native';
 
@@ -17,8 +17,7 @@ const TabView = ({
 }: TabViewProps) => (
   <View {...props} style={[{ overflow: 'hidden' }, style]}>
     {tabs.map(({ id, element }) =>
-      (Platform.OS === 'android' || mountOnlyCurrentTab) &&
-      id !== currentTab ? null : (
+      mountOnlyCurrentTab && id !== currentTab ? null : (
         <View
           key={id}
           style={[

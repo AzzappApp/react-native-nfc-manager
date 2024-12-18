@@ -1,8 +1,10 @@
-import { useState, useCallback } from 'react';
-import Animated, {
-  useAnimatedStyle,
-  type SharedValue,
-} from 'react-native-reanimated';
+import { useState, useCallback, useMemo } from 'react';
+import {
+  type ViewProps,
+  type LayoutChangeEvent,
+  type LayoutRectangle,
+  View,
+} from 'react-native';
 import { graphql, readInlineData } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
@@ -15,11 +17,6 @@ import type {
 } from '#relayArtifacts/LineDividerRenderer_module.graphql';
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { NullableFields } from '@azzapp/shared/objectHelpers';
-import type {
-  ViewProps,
-  LayoutChangeEvent,
-  LayoutRectangle,
-} from 'react-native';
 
 const LineDividerRendererFragment = graphql`
   fragment LineDividerRenderer_module on CardModuleLineDivider @inline {
@@ -35,15 +32,9 @@ const LineDividerRendererFragment = graphql`
 export const readLineDividerData = (module: LineDividerRenderer_module$key) =>
   readInlineData(LineDividerRendererFragment, module);
 
-type AnimatedProps = 'height' | 'marginBottom' | 'marginTop';
-
 export type LineDividerRendererData = NullableFields<
   Omit<LineDividerRenderer_module$data, ' $fragmentType'>
 >;
-
-type LineDividerRendererAnimatedData = {
-  [K in AnimatedProps]: SharedValue<LineDividerRendererData[K]>;
-};
 
 export type LineDividerRendererProps = ViewProps & {
   /**
@@ -54,26 +45,11 @@ export type LineDividerRendererProps = ViewProps & {
    * the card style
    */
   cardStyle: CardStyle | null | undefined;
-} & (
-    | {
-        /**
-         * The data for the line divider module
-         */
-        data: LineDividerRendererData;
-        animatedData: null;
-      }
-    | {
-        /**
-         * The data for the line divider module
-         */
-        data: Omit<LineDividerRendererData, AnimatedProps>;
-        /**
-         * The animated data for the line divider module
-         */
-        animatedData: LineDividerRendererAnimatedData;
-      }
-  );
-
+  /**
+   * the data for the module
+   */
+  data: LineDividerRendererData;
+};
 /**
  * Render a LineDivider module
  */
@@ -82,10 +58,16 @@ const LineDividerRenderer = ({
   colorPalette,
   cardStyle,
   style,
-  animatedData,
   ...props
 }: LineDividerRendererProps) => {
-  const { orientation, colorTop, colorBottom, ...rest } = getModuleDataValues({
+  const {
+    orientation,
+    colorTop,
+    colorBottom,
+    height,
+    marginBottom,
+    marginTop,
+  } = getModuleDataValues({
     data,
     cardStyle,
     defaultValues: LINE_DIVIDER_DEFAULT_VALUES,
@@ -101,76 +83,27 @@ const LineDividerRenderer = ({
     [props],
   );
 
-  const containerStyle = useAnimatedStyle(() => {
-    if (animatedData === null) {
-      if ('height' in rest) {
-        return {
-          height:
-            (rest.height ?? 0) +
-            (rest.marginBottom ?? 0) +
-            (rest.marginTop ?? 0),
-        };
-      }
-      return {};
-    }
-
+  const containerStyle = useMemo(() => {
     return {
-      height:
-        (animatedData.height.value ?? 0) +
-        (animatedData.marginBottom.value ?? 0) +
-        (animatedData.marginTop.value ?? 0),
-    };
-  });
+      height: height + (marginBottom ?? 0) + (marginTop ?? 0),
+    } as const;
+  }, [height, marginBottom, marginTop]);
 
-  const elementTop = useAnimatedStyle(() => {
-    if (animatedData === null) {
-      if ('marginTop' in rest) {
-        return {
-          height: rest.marginTop ?? 0,
-          display: rest.marginTop ? 'flex' : 'none',
-        };
-      }
-      return {};
-    }
+  const elementTop = useMemo(() => {
     return {
-      height: (animatedData.marginTop.value ?? 0) + 1,
-      display: animatedData.marginTop.value ? 'flex' : 'none',
-    };
-  });
+      height: marginTop,
+      display: marginTop ? 'flex' : 'none',
+    } as const;
+  }, [marginTop]);
 
-  const elementBottom = useAnimatedStyle(() => {
-    if (animatedData === null) {
-      if ('marginBottom' in rest) {
-        return {
-          height: rest.marginBottom ?? 0,
-          display: rest.marginBottom ? 'flex' : 'none',
-        };
-      }
-      return {};
-    }
+  const elementBottom = useMemo(() => {
     return {
-      height: (animatedData.marginBottom.value ?? 0) + 1,
-      display: animatedData.marginBottom.value ? 'flex' : 'none',
-    };
-  });
+      height: marginBottom,
+      display: marginBottom ? 'flex' : 'none',
+    } as const;
+  }, [marginBottom]);
 
-  const dividerStyle = useAnimatedStyle(() => {
-    if (animatedData === null) {
-      if ('height' in rest) {
-        return {
-          height: (rest.height ?? 0) + 2,
-          maxHeight: (rest.height ?? 0) + 2,
-          marginTop: -1,
-          marginBottom: -1,
-          zIndex: 1,
-          borderTopWidth: rest.height ?? 0,
-        };
-      }
-      return {};
-    }
-
-    const height = animatedData.height.value ?? 0;
-
+  const dividerStyle = useMemo(() => {
     return {
       height: height + 2,
       maxHeight: height + 2,
@@ -179,15 +112,11 @@ const LineDividerRenderer = ({
       zIndex: 1,
       borderTopWidth: height,
     };
-  });
+  }, [height]);
 
   return (
-    <Animated.View
-      {...props}
-      style={[containerStyle, style]}
-      onLayout={onLayout}
-    >
-      <Animated.View
+    <View {...props} style={[containerStyle, style]} onLayout={onLayout}>
+      <View
         style={[
           elementTop,
           {
@@ -196,7 +125,7 @@ const LineDividerRenderer = ({
         ]}
       />
 
-      <Animated.View
+      <View
         style={[
           dividerStyle,
           {
@@ -209,15 +138,13 @@ const LineDividerRenderer = ({
         ]}
       />
 
-      <Animated.View
+      <View
         style={[
           elementBottom,
-          {
-            backgroundColor: swapColor(colorBottom, colorPalette),
-          },
+          { backgroundColor: swapColor(colorBottom, colorPalette) },
         ]}
       />
-    </Animated.View>
+    </View>
   );
 };
 

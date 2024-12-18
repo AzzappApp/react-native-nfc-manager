@@ -1,12 +1,17 @@
 import type { EditionParameters } from '#helpers/mediaEditions';
-import type { MediaVideo, MediaImage, TimeRange } from '#helpers/mediaHelpers';
+import type { TextureInfo } from '#helpers/mediaEditions/NativeTextureLoader';
+import type {
+  SourceMediaVideo,
+  SourceMediaImage,
+  TimeRange,
+} from '#helpers/mediaHelpers';
 import type { CoverTextAnimations } from './coverDrawer/coverTextAnimations';
 import type { CoverTransitions } from './coverDrawer/coverTransitions';
 import type { MediaAnimations } from './coverDrawer/mediaAnimations';
 import type { OverlayAnimations } from './coverDrawer/overlayAnimations';
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { Filter } from '@azzapp/shared/filtersHelper';
-import type { SkPoint, SkRect, SkShader } from '@shopify/react-native-skia';
+import type { SkPoint, SkRect } from '@shopify/react-native-skia';
 
 export type CoverEditorState = {
   // Cover data
@@ -15,7 +20,8 @@ export type CoverEditorState = {
   lottie: JSON | null;
   backgroundColor: string | null;
 
-  medias: MediaInfo[];
+  medias: CoverMedia[];
+  initialMediaToPick?: Array<CoverMedia | null>;
   coverTransition: CoverTransitions | null;
 
   overlayLayers: CoverEditorOverlayItem[];
@@ -29,10 +35,10 @@ export type CoverEditorState = {
   selectedItemIndex: number | null;
 
   // Resources used for displaying/updating the cover
-  images: Record<string, bigint | null>;
+  images: Record<string, TextureInfo>;
   imagesScales: Record<string, number>;
-  videoPaths: Record<string, string>;
-  lutShaders: Partial<Record<Filter, SkShader>>;
+  localFilenames: Record<string, string>;
+  lutTextures: Partial<Record<Filter, TextureInfo>>;
 
   // Loading state
   loadingRemoteMedia: boolean;
@@ -50,23 +56,24 @@ export type CardColors = Readonly<
   }
 >;
 
-export type MediaInfoBase = {
+export type CoverMediaBase = {
   filter: Filter | null;
   editionParameters: EditionParameters | null;
+  editable: boolean;
 };
 
-export type MediaInfoVideo = MediaInfoBase & {
-  media: MediaVideo;
-  timeRange: TimeRange;
-};
+export type CoverMediaVideo = CoverMediaBase &
+  SourceMediaVideo & {
+    timeRange: TimeRange;
+  };
 
-export type MediaInfoImage = MediaInfoBase & {
-  media: MediaImage;
-  animation: MediaAnimations | null;
-  duration: number;
-};
+export type CoverMediaImage = CoverMediaBase &
+  SourceMediaImage & {
+    animation: MediaAnimations | null;
+    duration: number;
+  };
 
-export type MediaInfo = MediaInfoImage | MediaInfoVideo;
+export type CoverMedia = CoverMediaImage | CoverMediaVideo;
 
 export type CoverEditionMode =
   | 'colors'
@@ -77,6 +84,11 @@ export type CoverEditionMode =
   | 'overlay'
   | 'text'
   | 'textEdit';
+
+export type CoverEditionProvidedMedia = CoverMediaImage & {
+  index: number;
+  editable: boolean;
+};
 
 export type CoverEditorTextLayerItem = {
   text: string;
@@ -93,8 +105,7 @@ export type CoverEditorTextLayerItem = {
   endPercentageTotal: number;
 };
 
-export type CoverEditorOverlayItem = {
-  media: MediaImage;
+export type CoverEditorOverlayItem = SourceMediaImage & {
   borderRadius: number;
   borderWidth: number;
   borderColor: string;

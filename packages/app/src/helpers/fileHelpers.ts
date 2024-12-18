@@ -25,3 +25,14 @@ export const isFileURL = (url: string) => {
  */
 export const createRandomFilePath = (ext: string) =>
   `${ReactNativeBlobUtil.fs.dirs.CacheDir}/${createId()}.${ext}`;
+
+/**
+ * Get file extension from path or url
+ */
+export const getFileExtension = (path: string) => {
+  const ext =
+    path && path.indexOf('.') !== -1
+      ? path.split('.').pop()?.split('?')[0]
+      : null;
+  return ext && ext.length <= 5 ? ext : null;
+};

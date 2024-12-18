@@ -7,8 +7,11 @@ import { colors } from '#theme';
 import EmailOrPhoneInput from '#components/EmailOrPhoneInput';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { keyExtractor } from '#helpers/idHelpers';
+import useScreenDimensions from '#hooks/useScreenDimensions';
+import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
 import BottomSheetModal from '#ui/BottomSheetModal';
+import Header from '#ui/Header';
 import PressableOpacity from '#ui/PressableOpacity';
 import Select from '#ui/Select';
 import SelectList from '#ui/SelectList';
@@ -41,6 +44,7 @@ type MultiUserAddFormProps = {
 const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
   const styles = useStyleSheet(styleSheet);
   const [showAvailableInfo, toggleShowAvailableInfo] = useToggle(false);
+  const { bottom, top } = useScreenInsets();
 
   const { field } = useController({ control, name: 'role' });
   const intl = useIntl();
@@ -52,7 +56,6 @@ const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
     name: 'selectedContact',
   });
   const { value: selectedContact, onChange: setSelectedContact } = fieldContact;
-
   const updateSelectedContact = useCallback(
     (info: {
       id: string;
@@ -77,6 +80,8 @@ const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
     },
     [setSelectedContact, toggleShowAvailableInfo],
   );
+
+  const { height } = useScreenDimensions();
 
   const renderAvailableInfo = (
     itemInfo: SelectListItemInfo<{
@@ -118,28 +123,30 @@ const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
         {contacts?.length > 0 && (
           <BottomSheetModal
             visible={showAvailableInfo}
-            height={
+            height={Math.min(
               BOTTOM_SHEET_HEIGHT_BASE +
-              contacts.length * BOTTOM_SHEET_HEIGHT_ITEM
-            }
+                contacts.length * BOTTOM_SHEET_HEIGHT_ITEM +
+                bottom,
+              height - top,
+            )}
             variant="modal"
-            contentContainerStyle={styles.bottomSheetContentContainer}
-            onRequestClose={toggleShowAvailableInfo}
-            nestedScroll
-            headerTitle={
-              intl.formatMessage({
-                defaultMessage: 'Available Info',
-                description:
-                  'MultiUserAddForm - Available Info BottomSheet - Title',
-              }) as string
-            }
           >
+            <Header
+              middleElement={
+                intl.formatMessage({
+                  defaultMessage: 'Available Infos',
+                  description:
+                    'MultiUserAddForm - Available Info BottomSheet - Title',
+                }) as string
+              }
+            />
             <SelectList
               data={contacts}
               keyExtractor={contact => contact.id}
               renderItem={renderAvailableInfo}
               onItemSelected={updateSelectedContact}
               itemContainerStyle={styles.selectItemContainerStyle}
+              useFlatList
             />
           </BottomSheetModal>
         )}
@@ -181,15 +188,13 @@ const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
             keyExtractor={keyExtractor}
             onItemSelected={item => onChange(item.id)}
             itemContainerStyle={[styles.selectItemContainerStyle]}
-            bottomSheetHeight={
-              BOTTOM_SHEET_HEIGHT_BASE + roles.length * BOTTOM_SHEET_HEIGHT_ITEM
-            }
             bottomSheetTitle={
               intl.formatMessage({
                 defaultMessage: 'Select a role',
                 description: 'MultiUserAddForm - Role BottomSheet - Title',
               }) as string
             }
+            useFlatList={false}
           />
         )}
       />
@@ -256,6 +261,11 @@ const roles: Array<{ id: ProfileRole; label: ReactNode }> = [
   },
 ];
 
+const BOTTOM_SHEET_HEIGHT_BASE = 80;
+const ITEM_MARGIN_BOTTOM = 18;
+const ITEM_HEIGHT = 30;
+const BOTTOM_SHEET_HEIGHT_ITEM = ITEM_HEIGHT + ITEM_MARGIN_BOTTOM;
+
 const styleSheet = createStyleSheet(appearance => ({
   form: {
     paddingHorizontal: 10,
@@ -263,7 +273,7 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   selectItemContainerStyle: {
     paddingHorizontal: 30,
-    marginBottom: 18,
+    marginBottom: ITEM_MARGIN_BOTTOM,
   },
   selectTitle: {
     paddingBottom: 10,
@@ -280,7 +290,8 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   inputText: {
     color: appearance === 'light' ? colors.black : colors.white,
-    height: 30,
+    height: ITEM_HEIGHT,
+    verticalAlign: 'middle',
   },
   emailAdressContainer: {
     flexDirection: 'row',
@@ -295,8 +306,5 @@ const styleSheet = createStyleSheet(appearance => ({
     textDecorationLine: 'underline',
   },
 }));
-
-const BOTTOM_SHEET_HEIGHT_BASE = 100;
-const BOTTOM_SHEET_HEIGHT_ITEM = 40;
 
 export default MultiUserAddForm;

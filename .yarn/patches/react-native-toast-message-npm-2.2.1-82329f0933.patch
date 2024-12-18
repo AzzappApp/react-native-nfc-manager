@@ -1,0 +1,13 @@
+diff --git a/lib/src/hooks/useSlideAnimation.js b/lib/src/hooks/useSlideAnimation.js
+index 16941885ef83ceb4e36e35affbd5ca6a88f290bb..93f5404f6d7390ff94b485f0e7099f14b5ac07c4 100644
+--- a/lib/src/hooks/useSlideAnimation.js
++++ b/lib/src/hooks/useSlideAnimation.js
+@@ -19,7 +19,7 @@ export function useSlideAnimation({ position, height, topOffset, bottomOffset, k
+     const animate = React.useCallback((toValue) => {
+         Animated.spring(animatedValue.current, {
+             toValue,
+-            useNativeDriver,
++            useNativeDriver: true,
+             friction: 8
+         }).start();
+     }, []);

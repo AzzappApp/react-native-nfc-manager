@@ -1,5 +1,4 @@
 import { useMemo, useRef, forwardRef } from 'react';
-import { useWindowDimensions } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import Animated, {
   FadeIn,
@@ -8,6 +7,7 @@ import Animated, {
   useAnimatedStyle,
 } from 'react-native-reanimated';
 import { mergeRefs } from '#helpers/mergeRefs';
+import useScreenDimensions from '#hooks/useScreenDimensions';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import { HEADER_HEIGHT } from '#ui/Header';
@@ -58,8 +58,10 @@ const WebCardScreenScrollView = (
 
   const scrollViewRef = useRef<ScrollView>(null);
 
-  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
+  const { width: screenWidth, height: screenHeight } = useScreenDimensions();
+
   const insets = useScreenInsets();
+
   const containerStyle = useAnimatedStyle(() => {
     const editProgress = editTransition?.value ?? 0;
     const editToGap = insets.top + HEADER_HEIGHT;
@@ -69,17 +71,17 @@ const WebCardScreenScrollView = (
       left: interpolate(
         editProgress,
         [0, 1],
-        [0, (windowWidth - windowWidth / editScale) / 2],
+        [0, (screenWidth - screenWidth / editScale) / 2],
       ),
       height: interpolate(
         editProgress,
         [0, 1],
-        [windowHeight, (windowHeight - editToGap) / editScale],
+        [screenHeight, (screenHeight - editToGap) / editScale],
       ),
       width: interpolate(
         editProgress,
         [0, 1],
-        [windowWidth, windowWidth / editScale],
+        [screenWidth, screenWidth / editScale],
       ),
       transform: [
         {
@@ -98,15 +100,15 @@ const WebCardScreenScrollView = (
     return {
       paddingVertical: editProgress * 20,
       marginBottom:
-        (insets.bottom + BOTTOM_MENU_HEIGHT + 20) *
+        (insets.bottom + BOTTOM_MENU_HEIGHT) *
         (1 + (editProgress * 1) / editScale),
     };
   });
 
   const footerStyle = useAnimatedStyle(() => {
     return {
-      opacity: editTransition?.value ?? 0,
-      width: windowWidth,
+      opacity: editing ? (editTransition?.value ?? 0) : 0,
+      width: screenWidth,
       transform: [
         {
           scale: interpolate(
@@ -117,7 +119,7 @@ const WebCardScreenScrollView = (
         },
       ],
     };
-  }, [editTransition, editScale]);
+  });
 
   const mergedRefs = useMemo(
     () => mergeRefs([scrollViewRef, forwardedRef]),
@@ -141,14 +143,12 @@ const WebCardScreenScrollView = (
       >
         <Animated.View style={contentContainerStyle}>
           {children}
-          {editing && (
-            <Animated.View
-              entering={FadeIn.duration(EDIT_TRANSITION_DURATION)}
-              exiting={FadeOut.duration(EDIT_TRANSITION_DURATION)}
-            >
-              <Animated.View style={footerStyle}>{editFooter}</Animated.View>
-            </Animated.View>
-          )}
+          <Animated.View
+            entering={FadeIn.duration(EDIT_TRANSITION_DURATION)}
+            exiting={FadeOut.duration(EDIT_TRANSITION_DURATION)}
+          >
+            <Animated.View style={footerStyle}>{editFooter}</Animated.View>
+          </Animated.View>
         </Animated.View>
       </ScrollView>
     </Animated.View>

@@ -138,13 +138,16 @@ const DownloadVCard = ({
   const showAppClip = useCallback(
     async (e: React.MouseEvent<HTMLAnchorElement>) => {
       e.preventDefault();
-      const appClipUrl = `${process.env.NEXT_PUBLIC_APPLE_APP_CLIP_URL}&url=${encodeURIComponent(window.location.href)}`;
-
+      const compressedContactCard = searchParams.get('c');
+      if (!compressedContactCard) {
+        return;
+      }
+      const appClipUrl = `${process.env.NEXT_PUBLIC_APPLE_APP_CLIP_URL}&u=${webCard.userName}&c=${compressedContactCard}`;
       // Open the App Clip URL
       setAppClipWasOpen(true);
       window.location.href = appClipUrl;
     },
-    [],
+    [searchParams, webCard.userName],
   );
   useEffect(() => {
     const handleVisibilityChange = () => {

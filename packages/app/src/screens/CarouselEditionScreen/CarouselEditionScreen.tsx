@@ -1,7 +1,7 @@
-import { useCallback, useMemo, useState } from 'react';
+import { startTransition, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
-import { useSharedValue } from 'react-native-reanimated';
+import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { Observable } from 'relay-runtime';
@@ -10,9 +10,11 @@ import {
   CAROUSEL_DEFAULT_VALUES,
   MODULE_IMAGE_MAX_WIDTH,
   CAROUSEL_STYLE_VALUES,
+  getCarouselDefaultColors,
 } from '@azzapp/shared/cardModuleHelpers';
 import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
 import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
+import AnimatedDataOverride from '#components/AnimatedDataOverride';
 import ImagePicker from '#components/ImagePicker';
 import {
   useRouter,
@@ -107,6 +109,7 @@ const CarouselEditionScreen = ({
         webCard {
           id
           cardIsPublished
+          coverBackgroundColor
           isPremium
           cardColors {
             primary
@@ -163,8 +166,12 @@ const CarouselEditionScreen = ({
       gap: carousel?.gap ?? null,
       backgroundId: carousel?.background?.id ?? null,
       backgroundStyle: carousel?.backgroundStyle ?? null,
+      ...getCarouselDefaultColors(
+        profile.webCard?.coverBackgroundColor,
+        carousel,
+      ),
     };
-  }, [carousel]);
+  }, [carousel, profile.webCard?.coverBackgroundColor]);
 
   const { data, value, updateFields, fieldUpdateHandler, dirty } =
     useModuleDataEditor({
@@ -240,6 +247,12 @@ const CarouselEditionScreen = ({
   // #region Fields edition handlers
   const [showImagePicker, setShowImagePicker] = useState(images.length === 0);
   const [currentTab, setCurrentTab] = useState('images');
+
+  const onMenuItemPress = useCallback((tabId: string) => {
+    startTransition(() => {
+      setCurrentTab(tabId);
+    });
+  }, []);
 
   const onShowImagePicker = useCallback(() => {
     setShowImagePicker(true);
@@ -327,6 +340,15 @@ const CarouselEditionScreen = ({
   const onBackgroundChange = fieldUpdateHandler('backgroundId');
 
   const onBackgroundStyleChange = fieldUpdateHandler('backgroundStyle');
+
+  const animatedData = useDerivedValue(() => ({
+    borderRadius: borderRadius.value,
+    borderWidth: borderWidth.value,
+    marginVertical: marginVertical.value,
+    marginHorizontal: marginHorizontal.value,
+    imageHeight: imageHeight.value,
+    gap: gap.value,
+  }));
 
   const onSave = useCallback(async () => {
     if (!canSave || !profile.webCard?.id) {
@@ -465,12 +487,12 @@ const CarouselEditionScreen = ({
     value,
     commit,
     carousel?.id,
-    borderWidth.value,
-    borderRadius.value,
-    imageHeight.value,
-    marginHorizontal.value,
-    marginVertical.value,
-    gap.value,
+    borderWidth,
+    borderRadius,
+    imageHeight,
+    marginHorizontal,
+    marginVertical,
+    gap,
     router,
     intl,
     handleProfileActionError,
@@ -520,20 +542,16 @@ const CarouselEditionScreen = ({
           />
         }
       />
-      <CarouselPreview
-        data={previewData}
-        animatedData={{
-          borderRadius,
-          borderWidth,
-          marginVertical,
-          marginHorizontal,
-          imageHeight,
-          gap,
-        }}
-        style={{ height: topPanelHeight - 40, marginVertical: 20 }}
-        colorPalette={profile?.webCard?.cardColors}
-        cardStyle={profile?.webCard?.cardStyle}
-      />
+      <AnimatedDataOverride data={previewData} animatedData={animatedData}>
+        {data => (
+          <CarouselPreview
+            data={data}
+            style={{ height: topPanelHeight - 40, marginVertical: 20 }}
+            colorPalette={profile?.webCard?.cardColors}
+            cardStyle={profile?.webCard?.cardStyle}
+          />
+        )}
+      </AnimatedDataOverride>
       <TabView
         style={{ height: bottomPanelHeight }}
         currentTab={currentTab}
@@ -549,10 +567,7 @@ const CarouselEditionScreen = ({
                 onSquareRatioChange={onSquareRatioChange}
                 imageHeight={imageHeight}
                 onTouched={onTouched}
-                style={{
-                  flex: 1,
-                  marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                }}
+                style={styles.tabStyle}
               />
             ),
           },
@@ -567,10 +582,7 @@ const CarouselEditionScreen = ({
                 bottomSheetHeight={bottomPanelHeight}
                 onBorderColorChange={onBorderColorChange}
                 onTouched={onTouched}
-                style={{
-                  flex: 1,
-                  marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                }}
+                style={styles.tabStyle}
               />
             ),
           },
@@ -582,10 +594,7 @@ const CarouselEditionScreen = ({
                 marginHorizontal={marginHorizontal}
                 gap={gap}
                 onTouched={onTouched}
-                style={{
-                  flex: 1,
-                  marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                }}
+                style={styles.tabStyle}
               />
             ),
           },
@@ -599,10 +608,7 @@ const CarouselEditionScreen = ({
                 onBackgroundChange={onBackgroundChange}
                 onBackgroundStyleChange={onBackgroundStyleChange}
                 bottomSheetHeight={bottomPanelHeight}
-                style={{
-                  flex: 1,
-                  marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                }}
+                style={styles.tabStyle}
               />
             ),
           },
@@ -610,7 +616,7 @@ const CarouselEditionScreen = ({
       />
       <CarouselEditionBottomMenu
         currentTab={currentTab}
-        onItemPress={setCurrentTab}
+        onItemPress={onMenuItemPress}
         style={[
           styles.tabsBar,
           { bottom: insetBottom, width: windowWidth - 20 },
@@ -648,6 +654,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 10,
     right: 10,
+  },
+  tabStyle: {
+    flex: 1,
+    marginBottom: BOTTOM_MENU_HEIGHT,
   },
 });
 

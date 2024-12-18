@@ -155,7 +155,7 @@ const WebCardFormScreen = ({
     {
       azzappA: <Text variant="azzapp">a</Text>,
     },
-  ) as string;
+  ) as unknown as string;
 
   const userNameInvalidError = intl.formatMessage(
     {
@@ -169,6 +169,11 @@ const WebCardFormScreen = ({
   );
 
   const environment = useRelayEnvironment();
+
+  const lastErrorSend = useRef({
+    values: {},
+    errors: {},
+  });
 
   const {
     control,
@@ -198,15 +203,21 @@ const WebCardFormScreen = ({
               environment,
               graphql`
                 query WebCardFormScreenCheckUserNameQuery($userName: String!) {
-                  userNameAvailable(userName: $userName)
+                  isUserNameAvailable(userName: $userName) {
+                    available
+                    userName
+                  }
                 }
               `,
               { userName: data.userName },
             ).toPromise();
-            if (!res?.userNameAvailable) {
+            if (res?.isUserNameAvailable.userName !== data.userName) {
+              // form username changed during validation
+              return lastErrorSend.current;
+            }
+            if (!res?.isUserNameAvailable.available) {
               const { userName, ...values } = data;
-
-              return {
+              lastErrorSend.current = {
                 values,
                 errors: {
                   userName: {
@@ -215,18 +226,19 @@ const WebCardFormScreen = ({
                   },
                 },
               };
+              return lastErrorSend.current;
             }
           } catch {
             //waiting for submit
           }
         }
-
-        return {
+        lastErrorSend.current = {
           values: data,
           errors: {},
         };
+        return lastErrorSend.current;
       } else {
-        return {
+        lastErrorSend.current = {
           values: {},
           errors: Object.entries(result.error.formErrors.fieldErrors).reduce(
             (allErrors, [path, message]) => ({
@@ -239,6 +251,7 @@ const WebCardFormScreen = ({
             {},
           ),
         };
+        return lastErrorSend.current;
       }
     },
   });
@@ -613,7 +626,7 @@ const WebCardFormScreen = ({
                       sections={filteredCompanyActivities}
                       selectedItemKey={value}
                       keyExtractor={keyExtractor}
-                      avoidKeyboard
+                      dismissKeyboardOnOpening
                       bottomSheetHeight={windowHeight - 90 - insets.top}
                       inputLabel={
                         otherActivity.id === value

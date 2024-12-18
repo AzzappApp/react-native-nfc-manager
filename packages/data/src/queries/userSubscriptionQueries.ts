@@ -119,19 +119,40 @@ export const activeUserSubscription = async (
       ),
     );
 
-  const map = subscriptions.reduce(
-    (acc, subscription) => {
-      acc[subscription.userId] = subscription;
-      return acc;
-    },
-    {} as Record<string, UserSubscription>,
-  );
-
-  return userIds.map(userId => map[userId] ?? null);
+  return subscriptions;
 };
 
 // TODO document this function properly
 export const getActiveUserSubscriptionForWebCard = async (
+  userId: string,
+  webCardId: string,
+) => {
+  const currentDate = new Date();
+  return db()
+    .select()
+    .from(UserSubscriptionTable)
+    .where(
+      and(
+        or(
+          and(
+            eq(UserSubscriptionTable.userId, userId),
+            isNull(UserSubscriptionTable.webCardId),
+          ),
+          eq(UserSubscriptionTable.webCardId, webCardId),
+        ),
+        or(
+          eq(UserSubscriptionTable.status, 'active'),
+          gte(UserSubscriptionTable.endAt, currentDate),
+        ),
+      ),
+    )
+    .orderBy(
+      asc(UserSubscriptionTable.status),
+      desc(UserSubscriptionTable.webCardId),
+    );
+};
+
+export const getUserSubscriptionForUserOrWebCard = async (
   userIds: string[],
   webCardIds: string[],
 ) => {
@@ -143,16 +164,10 @@ export const getActiveUserSubscriptionForWebCard = async (
       and(
         webCardIds.length
           ? or(
-              and(
-                inArray(UserSubscriptionTable.userId, [...new Set(userIds)]),
-                isNull(UserSubscriptionTable.webCardId),
-              ),
+              and(inArray(UserSubscriptionTable.userId, [...new Set(userIds)])),
               inArray(UserSubscriptionTable.webCardId, webCardIds),
             )
-          : and(
-              inArray(UserSubscriptionTable.userId, userIds),
-              isNull(UserSubscriptionTable.webCardId),
-            ),
+          : and(inArray(UserSubscriptionTable.userId, userIds)),
         or(
           eq(UserSubscriptionTable.status, 'active'),
           gte(UserSubscriptionTable.endAt, currentDate),

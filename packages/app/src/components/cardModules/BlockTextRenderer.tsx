@@ -1,9 +1,10 @@
 import { useIntl } from 'react-intl';
-import { type ViewProps, type StyleProp, type ViewStyle } from 'react-native';
-import Animated, {
-  useAnimatedStyle,
-  type SharedValue,
-} from 'react-native-reanimated';
+import {
+  type ViewProps,
+  type StyleProp,
+  type ViewStyle,
+  View,
+} from 'react-native';
 import { graphql, readInlineData } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
@@ -55,24 +56,12 @@ const BlockTextRendererFragment = graphql`
   }
 `;
 
-type AnimatedProps =
-  | 'fontSize'
-  | 'marginHorizontal'
-  | 'marginVertical'
-  | 'textMarginHorizontal'
-  | 'textMarginVertical'
-  | 'verticalSpacing';
-
 export const readBlockTextData = (module: BlockTextRenderer_module$key) =>
   readInlineData(BlockTextRendererFragment, module);
 
 export type BlockTextRendererData = NullableFields<
   Omit<BlockTextRenderer_module$data, ' $fragmentType'>
 >;
-
-type BlockTextRendererAnimatedData = {
-  [K in AnimatedProps]: SharedValue<BlockTextRendererData[K]>;
-};
 
 export type BlockTextRendererProps = ViewProps & {
   /**
@@ -87,36 +76,24 @@ export type BlockTextRendererProps = ViewProps & {
    * The wrapped content style
    */
   contentStyle?: StyleProp<ViewStyle>;
-} & (
-    | {
-        /**
-         * The data for the BlockText module
-         */
-        data: BlockTextRendererData;
-
-        animatedData: null;
-      }
-    | {
-        /**
-         * The data for the BlockText module
-         */
-        data: Omit<BlockTextRendererData, AnimatedProps>;
-        /**
-         * The animated data for the BlockText module
-         */
-        animatedData: BlockTextRendererAnimatedData;
-      }
-  );
-
+  /**
+   * The cover background color
+   */
+  coverBackgroundColor?: string | null | undefined;
+  /**
+   * The data for the BlockText module
+   */
+  data: BlockTextRendererData;
+};
 /**
  * Render a BlockText module
  */
 const BlockTextRenderer = ({
   data,
-  animatedData,
   colorPalette,
   cardStyle,
   contentStyle,
+  coverBackgroundColor,
   ...props
 }: BlockTextRendererProps) => {
   const {
@@ -128,63 +105,17 @@ const BlockTextRenderer = ({
     textBackgroundStyle,
     background,
     backgroundStyle,
-    ...rest
+    fontSize,
+    marginHorizontal,
+    marginVertical,
+    textMarginHorizontal,
+    textMarginVertical,
+    verticalSpacing,
   } = getModuleDataValues({
     data,
     cardStyle,
     defaultValues: BLOCK_TEXT_DEFAULT_VALUES,
     styleValuesMap: BLOCK_TEXT_STYLE_VALUES,
-  });
-
-  const containerStyle = useAnimatedStyle(() =>
-    animatedData !== null
-      ? {
-          marginVertical: animatedData.marginVertical.value,
-          marginHorizontal: animatedData.marginHorizontal.value,
-        }
-      : 'marginVertical' in rest
-        ? {
-            marginVertical: rest.marginVertical,
-            marginHorizontal: rest.marginHorizontal,
-          }
-        : {},
-  );
-
-  const textStyle = useAnimatedStyle(() => {
-    if (animatedData === null) {
-      if ('fontSize' in rest) {
-        return {
-          paddingVertical: rest.textMarginVertical,
-          paddingHorizontal: rest.textMarginHorizontal,
-          fontSize: rest.fontSize ?? undefined,
-          lineHeight:
-            rest.fontSize && rest.verticalSpacing != null
-              ? rest.fontSize * 1.2 + rest.verticalSpacing
-              : undefined,
-        };
-      }
-      return {};
-    }
-
-    const {
-      fontSize,
-      verticalSpacing,
-      textMarginVertical,
-      textMarginHorizontal,
-    } = animatedData;
-
-    const fontSizeValue = fontSize?.value;
-
-    const verticalSpacingValue = verticalSpacing?.value;
-    return {
-      paddingVertical: textMarginVertical?.value,
-      paddingHorizontal: textMarginHorizontal?.value ?? 0,
-      fontSize: fontSizeValue ?? undefined,
-      lineHeight:
-        fontSizeValue && verticalSpacingValue != null
-          ? fontSizeValue * 1.2 + verticalSpacingValue
-          : undefined,
-    };
   });
 
   const intl = useIntl();
@@ -202,7 +133,9 @@ const BlockTextRenderer = ({
       patternColor={swapColor(backgroundStyle?.patternColor, colorPalette)}
       resizeMode={background?.resizeMode}
     >
-      <Animated.View style={[containerStyle, contentStyle]}>
+      <View
+        style={[{ marginVertical, marginHorizontal, zIndex: 1 }, contentStyle]}
+      >
         <CardModuleBackground
           backgroundUri={textBackground?.uri}
           backgroundOpacity={textBackgroundStyle?.opacity}
@@ -216,15 +149,19 @@ const BlockTextRenderer = ({
           )}
           resizeMode={textBackground?.resizeMode}
         >
-          <Animated.Text
-            style={[
-              {
-                textAlign: textAlignmentOrDefault(textAlign),
-                color: textColor,
-                fontFamily,
-              },
-              textStyle,
-            ]}
+          <Text
+            style={{
+              textAlign: textAlignmentOrDefault(textAlign),
+              color: textColor,
+              fontFamily,
+              paddingVertical: textMarginVertical ?? 0,
+              paddingHorizontal: textMarginHorizontal ?? 0,
+              fontSize,
+              lineHeight:
+                fontSize != null && verticalSpacing != null
+                  ? fontSize * 1.2 + verticalSpacing
+                  : undefined,
+            }}
           >
             {text ||
               intl.formatMessage(
@@ -241,9 +178,9 @@ const BlockTextRenderer = ({
                   ),
                 },
               )}
-          </Animated.Text>
+          </Text>
         </CardModuleBackground>
-      </Animated.View>
+      </View>
     </CardModuleBackground>
   );
 };

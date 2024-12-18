@@ -1,3 +1,4 @@
+import isEqual from 'lodash/isEqual';
 import {
   forwardRef,
   useCallback,
@@ -6,30 +7,40 @@ import {
   memo,
   useRef,
   useEffect,
+  useState,
+  useLayoutEffect,
 } from 'react';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { PixelRatio, StyleSheet, View } from 'react-native';
 import Animated, {
   Extrapolation,
   interpolate,
   useAnimatedScrollHandler,
   useAnimatedStyle,
-  useDerivedValue,
   useSharedValue,
 } from 'react-native-reanimated';
 import useIsForeground from '#hooks/useIsForeground';
-import type { ForwardedRef, ReactElement, ReactNode, Ref } from 'react';
+import type { ForwardedRef, ReactElement, Ref } from 'react';
 import type {
-  FlatList,
-  ListRenderItem,
   StyleProp,
   ViewStyle,
   ViewProps,
   NativeScrollEvent,
   NativeSyntheticEvent,
   ListRenderItemInfo,
+  FlatList,
+  LayoutChangeEvent,
 } from 'react-native';
-import type { GestureType } from 'react-native-gesture-handler';
 import type { SharedValue } from 'react-native-reanimated';
+
+export type CarouselSelectListRenderItemInfo<ItemT> =
+  ListRenderItemInfo<ItemT> & {
+    width: number;
+    height: number;
+  };
+
+export type CarouselSelectListRenderItem<ItemT> = (
+  info: CarouselSelectListRenderItemInfo<ItemT>,
+) => React.ReactElement | null;
 
 export type CarouselSelectListProps<TItem = any> = Omit<
   ViewProps,
@@ -46,19 +57,11 @@ export type CarouselSelectListProps<TItem = any> = Omit<
   /**
    * @see https://reactnative.dev/docs/flatlist#renderitem
    */
-  renderItem: ListRenderItem<TItem>;
+  renderItem: CarouselSelectListRenderItem<TItem>;
   /**
-   * The width of the carousel
+   * The aspect ratio of the item
    */
-  width: number;
-  /**
-   * The height of the carousel
-   */
-  height: number;
-  /**
-   * The width of an item
-   */
-  itemWidth: number;
+  itemRatio: number;
   /**
    * the index of the item to display first
    */
@@ -98,8 +101,6 @@ export type CarouselSelectListProps<TItem = any> = Omit<
    * stick it here and treat it immutably.
    */
   extraData?: any | undefined;
-
-  nativeGesture?: GestureType;
 };
 
 export type CarouselSelectListHandle = {
@@ -117,9 +118,7 @@ function CarouselSelectList<TItem = any>(
     data,
     keyExtractor,
     renderItem,
-    width,
-    height,
-    itemWidth,
+    itemRatio,
     style,
     itemContainerStyle,
     contentContainerStyle,
@@ -127,48 +126,98 @@ function CarouselSelectList<TItem = any>(
     extraData,
     currentProfileIndexSharedValue,
     onSelectedIndexChange,
-    nativeGesture = Gesture.Native(),
     ...props
   }: CarouselSelectListProps<TItem>,
   ref: ForwardedRef<CarouselSelectListHandle>,
 ) {
+  const scrollIndex = useSharedValue(props.initialScrollIndex ?? 0);
+
+  const containerRef = useRef<View | null>(null);
+  const [containerHeight, setContainerHeight] = useState<number | null>(null);
+  const [containerWidth, setContainerWidth] = useState<number | null>(null);
+  const itemWidth =
+    containerHeight != null
+      ? PixelRatio.roundToNearestPixel(containerHeight * itemRatio)
+      : null;
+
+  useLayoutEffect(() => {
+    if (!containerRef.current) {
+      console.warn('CarouselSelectList : containerRef.value is null');
+    }
+    containerRef.current?.measureInWindow((_x, _y, width, height) => {
+      //on first render android might return 0 for height and width ... so we need to wait for the next render
+      if (height !== 0 && width !== 0) {
+        setContainerHeight(height);
+        setContainerWidth(width);
+      }
+    });
+  }, []);
+
+  const onLayout = useCallback((e: LayoutChangeEvent) => {
+    const { height, width } = e.nativeEvent.layout;
+    //on first render android might return 0 for height and width ... so we need to wait for the next render
+    if (height !== 0 && width !== 0) {
+      setContainerHeight(height);
+      setContainerWidth(width);
+    }
+  }, []);
+
   const listRef = useRef<FlatList>(null);
+  useImperativeHandle(
+    ref,
+    () => ({
+      scrollToIndex: (index: number, animated = true) => {
+        if (itemWidth == null) {
+          return;
+        }
+        if (!animated) {
+          scrollIndex.value = index;
+        }
+        listRef.current?.scrollToOffset({
+          offset: index * itemWidth,
+          animated,
+        });
+      },
+    }),
+    [itemWidth, scrollIndex],
+  );
 
-  const scrollIndex = useSharedValue(0);
-
-  useImperativeHandle(ref, () => ({
-    scrollToIndex: (index: number, animated = true) => {
+  useEffect(() => {
+    if (itemWidth != null) {
       listRef.current?.scrollToOffset({
-        offset: index * itemWidth,
-        animated,
+        offset: scrollIndex.value * itemWidth,
+        animated: false,
       });
-    },
-  }));
+    }
+  }, [itemWidth, scrollIndex]);
 
   const isForeground = useIsForeground();
   const prevIsForeground = useRef(isForeground);
 
   useEffect(() => {
-    if (isForeground !== prevIsForeground.current) {
+    if (isForeground !== prevIsForeground.current && itemWidth != null) {
+      const scrollIndexValue = scrollIndex.get();
       if (
         !prevIsForeground.current &&
         isForeground &&
-        scrollIndex.value !== Math.round(scrollIndex.value)
+        scrollIndexValue !== Math.round(scrollIndexValue)
       ) {
         listRef.current?.scrollToOffset({
-          offset: Math.round(scrollIndex.value) * itemWidth,
+          offset: Math.round(scrollIndexValue) * itemWidth,
           animated: false,
         });
       }
 
       prevIsForeground.current = isForeground;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isForeground, itemWidth]);
+  }, [isForeground, itemWidth, scrollIndex]);
 
   // Animation
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: event => {
+      if (itemWidth == null) {
+        return;
+      }
       const index = event.contentOffset.x / itemWidth;
       scrollIndex.value = index;
       if (currentProfileIndexSharedValue) {
@@ -180,7 +229,7 @@ function CarouselSelectList<TItem = any>(
   const onMomentumScrollEnd = useCallback(
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
       'worklet';
-      const index = event.nativeEvent.contentOffset.x / itemWidth;
+      const index = event.nativeEvent.contentOffset.x / itemWidth!;
       onSelectedIndexChange?.(Math.round(index));
       if (
         currentProfileIndexSharedValue &&
@@ -194,31 +243,23 @@ function CarouselSelectList<TItem = any>(
 
   const getItemLayout = useCallback(
     (_data: unknown, index: number) => ({
-      length: itemWidth,
-      offset: itemWidth * index,
+      length: itemWidth!,
+      offset: itemWidth! * index,
       index,
     }),
     [itemWidth],
   );
 
-  const offset = useMemo(
-    () => (itemWidth - itemWidth * scaleRatio) / 2,
-    [itemWidth, scaleRatio],
-  );
-  const offsetCenter = useMemo(
-    () => (width - itemWidth) / 2 - itemWidth * scaleRatio,
-    [itemWidth, scaleRatio, width],
-  );
   const ccstyle = useMemo(() => {
     return [
       {
-        paddingLeft: (width - itemWidth) / 2,
-        paddingRight: (width - itemWidth) / 2,
-        height,
+        paddingLeft: (containerWidth! - itemWidth!) / 2,
+        paddingRight: (containerWidth! - itemWidth!) / 2,
+        height: containerHeight,
       },
       contentContainerStyle,
     ];
-  }, [contentContainerStyle, height, itemWidth, width]);
+  }, [itemWidth, containerWidth, containerHeight, contentContainerStyle]);
 
   const renderAnimatedItem = useCallback(
     (info: ListRenderItemInfo<TItem>) => {
@@ -228,60 +269,57 @@ function CarouselSelectList<TItem = any>(
           scrollIndex={scrollIndex}
           scaleRatio={scaleRatio}
           containerStyle={itemContainerStyle}
-          offset={offset}
-          offsetCenter={offsetCenter}
-          width={itemWidth}
-        >
-          {renderItem(info)}
-        </AnimatedItem>
+          width={itemWidth ?? 0}
+          height={containerHeight ?? 0}
+          renderChildren={renderItem}
+          info={info}
+          containerWidth={containerWidth ?? 0}
+        />
       );
     },
     [
       scrollIndex,
       scaleRatio,
       itemContainerStyle,
-      offset,
-      offsetCenter,
       itemWidth,
+      containerHeight,
       renderItem,
+      containerWidth,
     ],
   );
 
-  const computedStyle = useMemo(
-    () => [{ width, height }, style as any],
-    [height, style, width],
-  );
-
   return (
-    <GestureDetector gesture={nativeGesture}>
-      <Animated.FlatList
-        ref={listRef}
-        data={data}
-        horizontal
-        renderItem={renderAnimatedItem}
-        keyExtractor={keyExtractor}
-        getItemLayout={getItemLayout}
-        scrollEventThrottle={16}
-        snapToInterval={itemWidth}
-        decelerationRate="fast"
-        snapToAlignment="start"
-        disableIntervalMomentum
-        //removeClippedSubviews removing this to avoid blank (was use to improve perf)
-        pagingEnabled
-        bounces={false}
-        onScroll={scrollHandler}
-        showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}
-        style={computedStyle}
-        onMomentumScrollEnd={onMomentumScrollEnd}
-        initialNumToRender={7}
-        windowSize={11}
-        maxToRenderPerBatch={11}
-        extraData={extraData}
-        contentContainerStyle={ccstyle}
-        {...props}
-      />
-    </GestureDetector>
+    <View ref={containerRef} style={style} onLayout={onLayout}>
+      {itemWidth != null && (
+        <Animated.FlatList
+          ref={listRef}
+          data={data}
+          horizontal
+          renderItem={renderAnimatedItem}
+          keyExtractor={keyExtractor}
+          getItemLayout={getItemLayout}
+          scrollEventThrottle={16}
+          snapToInterval={itemWidth ?? undefined}
+          decelerationRate="fast"
+          snapToAlignment="start"
+          disableIntervalMomentum
+          //removeClippedSubviews removing this to avoid blank (was use to improve perf)
+          pagingEnabled
+          bounces={false}
+          onScroll={scrollHandler}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={styles.list}
+          onMomentumScrollEnd={onMomentumScrollEnd}
+          initialNumToRender={7}
+          windowSize={11}
+          maxToRenderPerBatch={11}
+          extraData={extraData}
+          contentContainerStyle={ccstyle}
+          {...props}
+        />
+      )}
+    </View>
   );
 }
 
@@ -289,56 +327,57 @@ export default memo(forwardRef(CarouselSelectList)) as <T>(
   p: CarouselSelectListProps<T> & { ref?: Ref<CarouselSelectListHandle> },
 ) => ReactElement;
 
+const styles = StyleSheet.create({ list: { flex: 1, overflow: 'visible' } });
+
 const AnimatedItemWrapper = ({
   index,
   scrollIndex,
   scaleRatio,
-  offset,
-  offsetCenter,
   containerStyle,
-  children,
+  renderChildren,
+  info,
   width,
+  height,
+  containerWidth,
 }: {
   index: number;
   scrollIndex: SharedValue<number>;
-  offset: number;
-  offsetCenter: number;
   scaleRatio: number;
-  children: ReactNode;
+  renderChildren: CarouselSelectListRenderItem<any>;
+  info: ListRenderItemInfo<any>;
   containerStyle: StyleProp<ViewStyle>;
   width: number;
+  height: number;
+  containerWidth: number;
 }) => {
-  const translateX = useDerivedValue(() => {
-    return interpolate(
+  const animatedStyle = useAnimatedStyle(() => {
+    const offset = (width - width * scaleRatio) / 2;
+    const offsetCenter = (containerWidth - width) / 2 - width * scaleRatio;
+    const translateX = interpolate(
       scrollIndex.value,
       [index - 1, index, index + 1],
       [-offset + offsetCenter / 2, 0, offset - offsetCenter / 2],
       Extrapolation.EXTEND,
     );
-  });
 
-  const scale = useDerivedValue(() => {
-    return interpolate(
+    const scale = interpolate(
       scrollIndex.value,
       [index - 1, index, index + 1],
       [scaleRatio, 1, scaleRatio],
       Extrapolation.CLAMP,
     );
-  });
 
-  const animatedStyle = useAnimatedStyle(() => {
-    'worklet';
     return {
-      width,
-      transform: [{ translateX: translateX.value }, { scale: scale.value }],
+      transform: [{ translateX }, { scale }],
     };
   });
-
   return (
-    <Animated.View style={[animatedStyle, containerStyle]}>
-      {children}
+    <Animated.View style={[{ width }, animatedStyle, containerStyle]}>
+      {renderChildren({ ...info, width, height })}
     </Animated.View>
   );
 };
 
-const AnimatedItem = memo(AnimatedItemWrapper);
+const AnimatedItem = memo(AnimatedItemWrapper, (prev, next) =>
+  isEqual(prev, next),
+);

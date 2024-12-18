@@ -32,7 +32,7 @@ export const useRevenueCat = (userId: string | null | undefined) => {
       commitLocalUpdate(getRelayEnvironment(), store => {
         const { profileInfos } = getAuthState(); //need to refrehs it inside the callback
         if (
-          profileInfos &&
+          profileInfos?.webCardId &&
           customerInfo.entitlements.active?.multiuser?.isActive
         ) {
           store.get(profileInfos.webCardId)?.setValue(true, 'isPremium');

@@ -1,18 +1,42 @@
 import { memo } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  withTiming,
+} from 'react-native-reanimated';
 import { colors } from '#theme';
 import TabBarMenuItem from '#ui/TabBarMenuItem';
 import Text from '#ui/Text';
+import type { DerivedValue } from 'react-native-reanimated';
 
 export type HOME_TAB = 'CONTACT_CARD' | 'INFORMATION' | 'STATS';
 
 type HomeMenuProps = {
   selected: HOME_TAB;
   setSelected: (section: HOME_TAB) => void;
+  newContactsOpacity: DerivedValue<number>;
+  notificationColor: DerivedValue<string>;
 };
 
-const HomeMenu = ({ selected, setSelected }: HomeMenuProps) => {
+const circleSize = 4.5;
+
+const HomeMenu = ({
+  selected,
+  setSelected,
+  newContactsOpacity,
+  notificationColor,
+}: HomeMenuProps) => {
+  const circleAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      backgroundColor: notificationColor.value,
+      opacity: withTiming(
+        selected === 'INFORMATION' ? 0 : newContactsOpacity.value,
+        { duration: 300 },
+      ),
+    };
+  });
+
   return (
     <View style={styles.container} accessibilityRole="tablist">
       <TabBarMenuItem
@@ -61,6 +85,7 @@ const HomeMenu = ({ selected, setSelected }: HomeMenuProps) => {
           description="Home Screen menu - Information"
         />
       </TabBarMenuItem>
+      <Animated.View style={[styles.circle, circleAnimatedStyle]} />
     </View>
   );
 };
@@ -84,5 +109,14 @@ const styles = StyleSheet.create({
   },
   menuLabelStyle: {
     color: colors.white,
+  },
+  circle: {
+    width: circleSize * 2,
+    height: circleSize * 2,
+    borderRadius: circleSize,
+    flex: 1,
+    top: 4,
+    right: 6,
+    position: 'absolute',
   },
 });

@@ -1,4 +1,4 @@
-import { compileEffect } from '#helpers/mediaEditions/shaderUtils';
+import { compileEffect } from '#helpers/mediaEditions';
 import { createTransition } from './createTransition';
 
 const effect = compileEffect(`
@@ -30,6 +30,6 @@ const zoom_quickness = 0.5;
 
 export default {
   id: 'simpleZoom' as const,
-  transition: createTransition(effect, 0.5, [zoom_quickness]),
+  transition: createTransition(effect, 0.5, { zoom_quickness }),
   duration: 0.5,
 };

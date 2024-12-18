@@ -21,6 +21,7 @@ const HorizontalPhotoRenderer = async ({
   colorPalette,
   cardStyle,
   style,
+  coverBackgroundColor,
   ...props
 }: HorizontalPhotoRendererProps) => {
   const {

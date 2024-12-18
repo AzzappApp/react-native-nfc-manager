@@ -1,12 +1,13 @@
 import LottieView from 'lottie-react-native';
-import { Suspense, useEffect, useMemo } from 'react';
+import { Suspense, useEffect, useMemo, useRef } from 'react';
 import { useColorScheme } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { replaceColors } from '@azzapp/shared/lottieHelpers';
 import { mainRoutes } from '#mobileRoutes';
-import { useMainTabBarVisibilityController } from '#components/MainTabBar';
+import { setMainTabBarOpacity } from '#components/MainTabBar';
 import { useRouter } from '#components/NativeRouter';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import { useSaveOfflineVCard } from '#helpers/offlineVCard';
 import relayScreen from '#helpers/relayScreen';
 import { useDeepLinkStoredRoute } from '#hooks/useDeepLink';
 import { useRevenueCat } from '#hooks/useRevenueCat';
@@ -14,9 +15,11 @@ import { useSetRevenueCatUserInfo } from '#hooks/useSetRevenueCatUserInfo';
 import Container from '#ui/Container';
 import HomeScreenContent from './HomeScreenContent';
 import { HomeScreenProvider } from './HomeScreenContext';
+import HomeScreenPrefetcher from './HomeScreenPrefetcher';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { HomeScreenQuery } from '#relayArtifacts/HomeScreenQuery.graphql';
 import type { HomeRoute } from '#routes';
+import type { CarouselSelectListHandle } from '#ui/CarouselSelectList';
 
 export const homeScreenQuery = graphql`
   query HomeScreenQuery {
@@ -24,9 +27,11 @@ export const homeScreenQuery = graphql`
       id
       profiles {
         id
+        ...OfflineVCardScreen_profiles
       }
       ...HomeScreenContent_user
       ...HomeScreenContext_user
+      ...HomeScreenPrefetcher_user
     }
   }
 `;
@@ -62,6 +67,14 @@ const HomeScreen = ({
     }
   }, [hasProfile, router]);
 
+  useSaveOfflineVCard(currentUser?.profiles);
+
+  const ref = useRef<CarouselSelectListHandle | null>(null);
+
+  const onIndexChange = (index: number) => {
+    ref.current?.scrollToIndex(index, false);
+  };
+
   if (!currentUser) {
     // should never happen
     return null;
@@ -69,8 +82,13 @@ const HomeScreen = ({
 
   return (
     <Suspense>
-      <HomeScreenProvider userKey={currentUser}>
-        <HomeScreenContent user={currentUser} refreshQuery={refreshQuery} />
+      <HomeScreenProvider userKey={currentUser} onIndexChange={onIndexChange}>
+        <HomeScreenContent
+          user={currentUser}
+          selectListRef={ref}
+          refreshQuery={refreshQuery}
+        />
+        <HomeScreenPrefetcher user={currentUser} />
       </HomeScreenProvider>
     </Suspense>
   );
@@ -79,7 +97,9 @@ const HomeScreen = ({
 const lottie = require('./assets/home-loader.json');
 
 const HomeScreenFallback = () => {
-  useMainTabBarVisibilityController(false);
+  useEffect(() => {
+    setMainTabBarOpacity(0);
+  }, []);
   const colorScheme = useColorScheme() ?? 'light';
 
   const source = useMemo(

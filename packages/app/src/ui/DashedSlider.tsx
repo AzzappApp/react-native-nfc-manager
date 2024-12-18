@@ -9,6 +9,7 @@ import Animated, {
   clamp,
   interpolate,
   runOnJS,
+  useAnimatedProps,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -55,12 +56,12 @@ const DashedSlider = ({
   const previousValue = useRef<number | null>(null);
 
   useInterval(() => {
-    const nextValue = Math.round(pan.value / step) * step;
+    const nextValue = Math.round(pan.get() / step) * step;
     if (previousValue.current === nextValue || !onChange) {
       return;
     }
 
-    onChange(Math.round(pan.value / step) * step);
+    onChange(Math.round(pan.get() / step) * step);
     previousValue.current = nextValue;
   }, 16);
 
@@ -97,8 +98,12 @@ const DashedSlider = ({
   const colorsGradient = useMemo(
     () =>
       colorScheme === 'light'
-        ? ['rgba(245, 245, 246, 0)', colors.grey50, 'rgba(245, 245, 246, 0)']
-        : ['rgba(0, 0, 0, 0)', '#1E1E1E', 'rgba(0, 0, 0, 0)'],
+        ? ([
+            'rgba(245, 245, 246, 0)',
+            colors.grey50,
+            'rgba(245, 245, 246, 0)',
+          ] as const)
+        : (['rgba(0, 0, 0, 0)', '#1E1E1E', 'rgba(0, 0, 0, 0)'] as const),
     [colorScheme],
   );
 
@@ -118,6 +123,14 @@ const DashedSlider = ({
     ],
   }));
 
+  const animatedProps = useAnimatedProps(() => ({
+    accessibilityValue: {
+      min: Math.round(min),
+      max: Math.round(max),
+      now: Math.round(pan.value),
+    },
+  }));
+
   return (
     <MemoizedLinearGradient
       colors={colorsGradient}
@@ -134,7 +147,7 @@ const DashedSlider = ({
             variant === 'small' && { width: '50%' },
           ]}
           accessibilityRole="adjustable"
-          accessibilityValue={{ min, max, now: pan.value }}
+          animatedProps={animatedProps}
         >
           <Animated.View style={[styles.dashContainer, dashContainerStyle]}>
             {steps.map(step => (
@@ -151,7 +164,7 @@ const DashedSlider = ({
 
 export default DashedSlider;
 
-const gradientLocation = [0.0, 0.5, 1];
+const gradientLocation = [0.0, 0.5, 1] as const;
 const gradientStart = { x: 0, y: 1 };
 const gradientEnd = { x: 1, y: 1 };
 

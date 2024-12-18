@@ -15,12 +15,14 @@ export type ModuleRendererProps<TModule extends CardModule> = {
   cardStyle: CardStyle;
   colorPalette: ColorPalette;
   resizeModes: Map<string, string>;
+  coverBackgroundColor: string | null;
 };
 
 const ModuleRenderer = <TModule extends CardModule>({
   module,
   cardStyle,
   colorPalette,
+  coverBackgroundColor,
   resizeModes,
 }: ModuleRendererProps<TModule>) => {
   const Renderer = renderers[module.kind] as any;
@@ -34,6 +36,7 @@ const ModuleRenderer = <TModule extends CardModule>({
       cardStyle={cardStyle}
       colorPalette={colorPalette}
       resizeModes={resizeModes}
+      coverBackgroundColor={coverBackgroundColor}
     />
   );
 };

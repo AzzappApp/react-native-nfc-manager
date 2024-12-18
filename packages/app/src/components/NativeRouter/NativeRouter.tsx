@@ -1,7 +1,15 @@
-import { isEqual, pick } from 'lodash';
-import { useMemo, useCallback, useRef, useEffect, useReducer } from 'react';
+import isEqual from 'lodash/isEqual';
+import pick from 'lodash/pick';
+import {
+  useMemo,
+  useCallback,
+  useRef,
+  useEffect,
+  useReducer,
+  startTransition,
+} from 'react';
 import { BackHandler } from 'react-native';
-import { type Route } from '#routes';
+import { type Route, isRouteEqual } from '#routes';
 import { createId } from '#helpers/idHelpers';
 import nativeRouterReducer from './nativeRouterReducer';
 import {
@@ -38,7 +46,7 @@ export type NativeRouter = {
   canGoBack(): boolean;
 
   // navigation
-  push<T extends Route>(route: T): void;
+  push<T extends Route>(route: T, allowDuplicate?: boolean): void;
   back(): boolean;
   pop(num: number): void;
   replace(route: Route): void;
@@ -102,35 +110,38 @@ export const useNativeRouter = (init: RouterInit) => {
 
   const dispatch = useCallback(
     (action: RouterAction) => {
-      const currentRoute = getCurrentRouteFromState(routerStateRef.current);
-      const nextState = nativeRouterReducer(routerStateRef.current, action);
-      const nextRoute = getCurrentRouteFromState(nextState);
-      if (nextRoute && !isEqual(routerStateRef.current, nextState)) {
-        if (nextRoute.id !== currentRoute?.id && nextRoute) {
-          dispatchToListeners(routeWillChangeListeners, nextRoute.state);
-        }
-        const previousRoutes = getAllRoutesFromStack(
-          routerStateRef.current.stack,
-        );
-        const nextRoutes = getAllRoutesFromStack(nextState.stack);
-        const screenRemoved = previousRoutes.filter(
-          route => !nextRoutes.find(nextRoute => nextRoute.id === route.id),
-        );
-        dispatchToListeners(
-          screenWillBeRemovedListeners,
-          screenRemoved.map(({ id, state: route }) => ({ id, route })),
-        );
-        const newRoutes = nextRoutes.filter(
-          route => !previousRoutes.find(prevRoute => prevRoute.id === route.id),
-        );
-        dispatchToListeners(
-          screenWillBePushedListeners,
-          newRoutes.map(({ id, state: route }) => ({ id, route })),
-        );
+      startTransition(() => {
+        const currentRoute = getCurrentRouteFromState(routerStateRef.current);
+        const nextState = nativeRouterReducer(routerStateRef.current, action);
+        const nextRoute = getCurrentRouteFromState(nextState);
+        if (nextRoute && !isEqual(routerStateRef.current, nextState)) {
+          if (nextRoute.id !== currentRoute?.id && nextRoute) {
+            dispatchToListeners(routeWillChangeListeners, nextRoute.state);
+          }
+          const previousRoutes = getAllRoutesFromStack(
+            routerStateRef.current.stack,
+          );
+          const nextRoutes = getAllRoutesFromStack(nextState.stack);
+          const screenRemoved = previousRoutes.filter(
+            route => !nextRoutes.find(nextRoute => nextRoute.id === route.id),
+          );
+          dispatchToListeners(
+            screenWillBeRemovedListeners,
+            screenRemoved.map(({ id, state: route }) => ({ id, route })),
+          );
+          const newRoutes = nextRoutes.filter(
+            route =>
+              !previousRoutes.find(prevRoute => prevRoute.id === route.id),
+          );
+          dispatchToListeners(
+            screenWillBePushedListeners,
+            newRoutes.map(({ id, state: route }) => ({ id, route })),
+          );
 
-        routerStateRef.current = nextState;
-        dispatchToReducer(action);
-      }
+          routerStateRef.current = nextState;
+          dispatchToReducer(action);
+        }
+      });
     },
     [
       routeWillChangeListeners,
@@ -229,9 +240,15 @@ export const useNativeRouter = (init: RouterInit) => {
           !!routerStateRef.current.modals.length
         );
       },
-      push(route) {
+      push(route, allowDuplicate = false) {
         if (setTabIfExists(route)) {
           return;
+        }
+        if (!allowDuplicate) {
+          const currentRoute = getCurrentRouteFromState(routerStateRef.current);
+          if (currentRoute && isRouteEqual(currentRoute?.state, route)) {
+            return;
+          }
         }
         splice(route, 0);
       },

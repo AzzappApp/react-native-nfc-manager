@@ -1,18 +1,8 @@
 import { clamp } from '@shopify/react-native-skia';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-  Platform,
-  Pressable,
-  StyleSheet,
-  TextInput,
-  View,
-  useWindowDimensions,
-} from 'react-native';
-import { useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller';
+import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 import Animated, {
-  interpolate,
   runOnJS,
-  useAnimatedReaction,
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
@@ -40,20 +30,23 @@ import {
 } from '#components/NativeRouter';
 import VideoCompositionRenderer from '#components/VideoCompositionRenderer';
 import useToggle from '#hooks/useToggle';
-import ActivityIndicator from '#ui/ActivityIndicator';
-import Container from '#ui/Container';
 import IconButton from '#ui/IconButton';
+import LoadingView from '#ui/LoadingView';
 import coverDrawer from '../coverDrawer';
 import { createParagraph } from '../coverDrawer/coverTextDrawer';
-import { useCoverEditorContext, useCurrentLayer } from '../CoverEditorContext';
 import {
-  mediaInfoIsImage,
+  useCoverEditorContext,
+  useCoverEditorEditContext,
+  useCurrentLayer,
+} from '../CoverEditorContext';
+import {
   percentRectToRect,
   isCoverDynamic,
   createCoverSkottieWithColorReplacement,
   createCoverVideoComposition,
   extractLottieInfoMemoized,
   MAX_DISPLAY_DECODER_RESOLUTION,
+  getMediaWithLocalFile,
 } from '../coverEditorHelpers';
 import { BoundsEditorGestureHandler, drawBoundsEditor } from './BoundsEditor';
 import { DynamicLinkRenderer } from './DynamicLinkRenderer';
@@ -64,7 +57,6 @@ import type { SkRect } from '@shopify/react-native-skia';
 import type {
   GestureResponderEvent,
   LayoutChangeEvent,
-  LayoutRectangle,
   ViewProps,
 } from 'react-native';
 
@@ -78,12 +70,12 @@ type CoverPreviewProps = Exclude<ViewProps, 'children'> & {
    */
   height: number;
   /**
-   * A callback to update the translation of the preview when the keyboard is displayed
-   * this function must be a worklet
+   * Called when the edited text input center position changes
    *
-   * @param translateY The translation to apply to the preview
+   * @param y The new center position of the edited text input
+   *
    */
-  onKeyboardTranslateWorklet: (translateY: number) => void;
+  onEditedInputPositionChange: (y: number) => void;
   /**
    * A callback to open the links modal
    */
@@ -98,12 +90,13 @@ const CoverPreview = ({
   width: viewWidth,
   height: viewHeight,
   style,
-  onKeyboardTranslateWorklet,
+  onEditedInputPositionChange,
   onOpenLinksModal,
   ...props
 }: CoverPreviewProps) => {
   // #region Data and state
-  const { dispatch, coverEditorState } = useCoverEditorContext();
+  const coverEditorState = useCoverEditorContext();
+  const dispatch = useCoverEditorEditContext();
   const {
     lottie,
     coverTransition,
@@ -113,8 +106,8 @@ const CoverPreview = ({
     linksLayer,
     cardColors,
     images,
-    videoPaths,
-    lutShaders,
+    localFilenames,
+    lutTextures,
     loadingLocalMedia,
     loadingRemoteMedia,
     editionMode,
@@ -140,13 +133,13 @@ const CoverPreview = ({
     loadingRemoteMedia,
     isDynamic,
     medias
-      .map(mediaInfo =>
-        mediaInfoIsImage(mediaInfo)
-          ? `${mediaInfo.media.uri}-${mediaInfo.duration}`
-          : `${mediaInfo.media.uri}-${mediaInfo.timeRange.startTime}-${mediaInfo.timeRange.duration}`,
+      .map(media =>
+        media.kind === 'image'
+          ? `${media.id}-${media.duration}`
+          : `${media.id}-${media.timeRange.startTime}-${media.timeRange.duration}`,
       )
       .join(''),
-    videoPaths,
+    localFilenames,
   ];
 
   /**
@@ -156,9 +149,9 @@ const CoverPreview = ({
    */
   const { composition, videoScales } = useMemo(() => {
     const allItemsLoaded = medias.every(
-      ({ media }) =>
-        (media.kind === 'image' && images[media.uri]) ||
-        (media.kind === 'video' && videoPaths[media.uri]),
+      media =>
+        (media.kind === 'image' && images[media.id]) ||
+        (media.kind === 'video' && localFilenames[media.id]),
     );
     if (loadingLocalMedia || loadingRemoteMedia || !allItemsLoaded) {
       return { composition: null, videoScales: {} };
@@ -280,7 +273,7 @@ const CoverPreview = ({
   const drawFrame = useCallback<FrameDrawer>(
     infos => {
       'worklet';
-      if (!lutShaders) {
+      if (!lutTextures) {
         return;
       }
       let state = coverEditorState;
@@ -346,7 +339,7 @@ const CoverPreview = ({
         ...infos,
         coverEditorState: state,
         images,
-        lutShaders,
+        lutTextures,
         videoScales,
         skottiePlayer,
         lottieInfo,
@@ -366,7 +359,7 @@ const CoverPreview = ({
       }
     },
     [
-      lutShaders,
+      lutTextures,
       lottieInfo,
       skottiePlayer,
       coverEditorState,
@@ -469,7 +462,7 @@ const CoverPreview = ({
   const handleLayerGestureStart = useCallback(() => {
     'worklet';
     gestureOffset.value = activeLayerBounds.value;
-  }, [activeLayerBounds.value, gestureOffset]);
+  }, [activeLayerBounds, gestureOffset]);
 
   /**
    * Callback to handle the translation of the layer currently being edited
@@ -515,7 +508,7 @@ const CoverPreview = ({
         rotation,
       };
     },
-    [activeLayerBounds, gestureOffset.value, viewHeight, viewWidth],
+    [activeLayerBounds, gestureOffset, viewHeight, viewWidth],
   );
 
   /**
@@ -598,7 +591,7 @@ const CoverPreview = ({
         rotation: newRotation,
       };
     },
-    [activeLayerBounds, gestureOffset.value],
+    [activeLayerBounds, gestureOffset],
   );
 
   /**
@@ -689,7 +682,7 @@ const CoverPreview = ({
       activeLayer.kind,
       activeLayer.layer,
       activeLayerBounds,
-      gestureOffset.value,
+      gestureOffset,
       viewHeight,
       viewWidth,
     ],
@@ -698,12 +691,8 @@ const CoverPreview = ({
   /**
    * Dispatch the result of a gesture on a layer
    */
-  const dispatchGestureResult = useCallback(() => {
-    if (!activeLayerBounds.value) {
-      return;
-    }
-    const { bounds, rotation } = activeLayerBounds.value;
-    runOnJS(() => {
+  const dispatchGestureResult = useCallback(
+    (bounds: SkRect, rotation: number) => {
       if (activeLayer.kind === 'overlay') {
         dispatch({
           type: 'UPDATE_OVERLAY_LAYER',
@@ -739,8 +728,9 @@ const CoverPreview = ({
           },
         });
       }
-    })();
-  }, [activeLayer, activeLayerBounds, dispatch, editedTextFontSize]);
+    },
+    [activeLayer, dispatch, editedTextFontSize],
+  );
 
   /**
    * Callback to handle the end of a gesture on a layer
@@ -748,8 +738,12 @@ const CoverPreview = ({
   const handleLayerGestureEnd = useCallback(() => {
     'worklet';
     // we need to define the function outside of the worklet to avoid reanimated error
-    runOnJS(dispatchGestureResult)();
-  }, [dispatchGestureResult]);
+    if (!activeLayerBounds.value) {
+      return;
+    }
+    const { bounds, rotation } = activeLayerBounds.value;
+    runOnJS(dispatchGestureResult)(bounds, rotation);
+  }, [activeLayerBounds, dispatchGestureResult]);
 
   /**
    * The position of the gesture handler used to capture the gestures
@@ -915,58 +909,14 @@ const CoverPreview = ({
   //#
   //##############################################################################
 
-  const {
-    height: keyboardHeightSharedValue,
-    progress: keyboardProgressSharedValue,
-  } = useReanimatedKeyboardAnimation();
-  const { height: windowHeight } = useWindowDimensions();
-  const pageYSharedValue = useSharedValue(0);
-  const inputSize = useSharedValue<LayoutRectangle | null>(null);
-
-  const containerRef = useCallback(
-    (ref: View | null) => {
-      ref?.measureInWindow((_, y) => {
-        pageYSharedValue.value = y;
-      });
-    },
-    [pageYSharedValue],
-  );
-
   const handleTextInputLayout = useCallback(
     (event: LayoutChangeEvent) => {
-      inputSize.value = event.nativeEvent.layout;
+      const { y, height } = event.nativeEvent.layout;
+      onEditedInputPositionChange(y + height / 2);
     },
-    [inputSize],
+    [onEditedInputPositionChange],
   );
-  useAnimatedReaction(
-    () =>
-      [
-        inputSize.value,
-        pageYSharedValue.value,
-        keyboardProgressSharedValue.value,
-        keyboardHeightSharedValue.value,
-      ] as const,
-    ([inputSize, pageY, keyboardProgress, keyboardHeight]) => {
-      if (!inputSize) {
-        onKeyboardTranslateWorklet(0);
-        return;
-      }
-      const { y, height } = inputSize;
-      const editionInputCenter = pageY + y + height / 2;
-      //we need a local variable to avoid keyboard issue
-      const res = interpolate(
-        keyboardProgress,
-        [0, 1],
-        [
-          0,
-          (Platform.OS === 'android' ? keyboardHeight / 2 : keyboardHeight) +
-            windowHeight / 2 -
-            editionInputCenter,
-        ],
-      );
-      return onKeyboardTranslateWorklet(res);
-    },
-  );
+
   // #endregion
 
   // #region Screen shot replacement
@@ -977,6 +927,11 @@ const CoverPreview = ({
   useModalInterceptor(async () => {
     let screenShotId: string | null;
     if (!compositionContainerRef.current) {
+      return;
+    }
+    if (
+      (lottieInfo?.assetsInfos.length ?? 1) > coverEditorState.medias.length
+    ) {
       return;
     }
     try {
@@ -1033,6 +988,8 @@ const CoverPreview = ({
     };
   });
 
+  const restorePositionOnMountRef = useRef(-1);
+
   return (
     <>
       <View
@@ -1047,7 +1004,6 @@ const CoverPreview = ({
         ]}
       >
         <View
-          ref={containerRef}
           style={[
             style,
             {
@@ -1061,9 +1017,7 @@ const CoverPreview = ({
         >
           {/* Not rendering when modal are displayed reduce memory usage */}
           {loadingRemoteMedia || (!hasFocus && !snapshotId) ? (
-            <Container style={styles.loadingContainer}>
-              <ActivityIndicator />
-            </Container>
+            <LoadingView />
           ) : (
             <View
               ref={compositionContainerRef}
@@ -1087,6 +1041,7 @@ const CoverPreview = ({
                   width={viewWidth}
                   height={viewHeight}
                   drawFrame={drawFrame}
+                  restorePositionOnMountRef={restorePositionOnMountRef}
                 />
               )}
               <Pressable
@@ -1286,7 +1241,11 @@ const CoverPreview = ({
           onRequestDismiss={toggleShowOverlayCropper}
         >
           <ImagePicker
-            initialData={activeLayer.layer}
+            initialData={{
+              filter: activeLayer.layer.filter,
+              editionParameters: activeLayer.layer.editionParameters,
+              media: getMediaWithLocalFile(activeLayer.layer, localFilenames),
+            }}
             additionalData={{
               selectedParameter: 'cropData',
               selectedTab: 'edit',
@@ -1349,11 +1308,6 @@ const styles = StyleSheet.create({
   root: {
     backgroundColor: colors.grey300,
     ...shadow('light'),
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   overlayControls: {
     gap: 15,

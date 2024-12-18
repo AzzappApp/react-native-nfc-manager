@@ -16,8 +16,8 @@ import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TitleWithLine from '#ui/TitleWithLine';
 import type { TextAlignment } from '#relayArtifacts/SimpleTextEditionScreen_module.graphql';
 import type { SimpleTextStyleEditionPanel_webCard$key } from '#relayArtifacts/SimpleTextStyleEditionPanel_webCard.graphql';
+import type { ViewProps } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type SimpleTextStyleEditionPanelProps = ViewProps & {
   /**

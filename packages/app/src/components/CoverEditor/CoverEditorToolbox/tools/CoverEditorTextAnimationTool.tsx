@@ -1,12 +1,8 @@
-import { createPicture, Canvas, Picture } from '@shopify/react-native-skia';
+import { Canvas, Image } from '@shopify/react-native-skia';
 import { memo, useCallback, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
-import {
-  useSharedValue,
-  useFrameCallback,
-  useDerivedValue,
-} from 'react-native-reanimated';
+import { useSharedValue, useFrameCallback } from 'react-native-reanimated';
 import {
   COVER_MIN_MEDIA_DURATION,
   COVER_RATIO,
@@ -22,12 +18,15 @@ import {
   percentRectToRect,
 } from '#components/CoverEditor/coverEditorHelpers';
 import { keyExtractor } from '#helpers/idHelpers';
-import useToggle from '#hooks/useToggle';
+import { drawOffScreen, useOffScreenSurface } from '#helpers/skiaHelpers';
+import useBoolean from '#hooks/useBoolean';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import DoubleSlider from '#ui/DoubleSlider';
+import Header from '#ui/Header';
 import Text from '#ui/Text';
 import {
   useCoverEditorContext,
+  useCoverEditorEditContext,
   useCoverEditorTextLayer,
 } from '../../CoverEditorContext';
 import ToolBoxSection from '../ui/ToolBoxSection';
@@ -39,31 +38,33 @@ import type {
 } from '#components/CoverEditor/coverDrawer/coverTextAnimations';
 import type { CoverEditorTextLayerItem } from '#components/CoverEditor/coverEditorTypes';
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
+import type { SkImage } from '@shopify/react-native-skia';
 
 const CoverEditorTextImageAnimationTool = () => {
-  const { coverEditorState, dispatch } = useCoverEditorContext();
+  const coverEditorState = useCoverEditorContext();
+  const dispatch = useCoverEditorEditContext();
   const activeTextLayer = useCoverEditorTextLayer();
   const coverDuration = getCoverDuration(coverEditorState);
   const { cardColors } = coverEditorState;
 
   const animations = useCoverTextAnimationList();
 
-  const [show, toggleBottomSheet] = useToggle(false);
+  const [show, open, close] = useBoolean(false);
+
+  const hasActiveTextLayer = activeTextLayer !== null;
 
   const onChangeAnimationDuration = useCallback(
-    (value: number[], index: number) => {
-      if (activeTextLayer) {
+    (value: number[]) => {
+      if (hasActiveTextLayer) {
         //duration should be at minimum COVER_MIN_MEDIA_DURATION
         const duration = value[1] - value[0];
         let start = value[0];
         let end = value[1];
         if (duration < COVER_MIN_MEDIA_DURATION) {
-          if (index === 0) {
-            //left slider is moving
-            start = Math.min(end - MIN_DURATION_ANIMATION, start);
-          } else {
-            end = Math.max(start + MIN_DURATION_ANIMATION, end);
-          }
+          //left slider is moving
+          start = Math.min(end - MIN_DURATION_ANIMATION, start);
+
+          end = Math.max(start + MIN_DURATION_ANIMATION, end);
         }
 
         const startPercent = (start / coverDuration) * 100;
@@ -78,7 +79,7 @@ const CoverEditorTextImageAnimationTool = () => {
         });
       }
     },
-    [activeTextLayer, dispatch, coverDuration],
+    [hasActiveTextLayer, dispatch, coverDuration],
   );
 
   const onSelect = useCallback(
@@ -125,6 +126,18 @@ const CoverEditorTextImageAnimationTool = () => {
     [activeTextLayer, cardColors],
   );
 
+  const sliderValue = useMemo(
+    () => [
+      ((activeTextLayer?.startPercentageTotal ?? 0) * coverDuration) / 100,
+      ((activeTextLayer?.endPercentageTotal ?? 0) * coverDuration) / 100,
+    ],
+    [
+      activeTextLayer?.startPercentageTotal,
+      activeTextLayer?.endPercentageTotal,
+      coverDuration,
+    ],
+  );
+
   return (
     <>
       <ToolBoxSection
@@ -134,24 +147,26 @@ const CoverEditorTextImageAnimationTool = () => {
           description:
             'Cover Edition Image Text animation Tool Button - Animations',
         })}
-        onPress={toggleBottomSheet}
+        onPress={open}
       />
-      {activeTextLayer != null && (
+      {hasActiveTextLayer && (
         <BottomSheetModal
           lazy
-          onRequestClose={toggleBottomSheet}
+          onDismiss={close}
           visible={show}
-          height={210 + 80 / COVER_RATIO}
-          headerTitle={
-            <Text variant="large">
-              <FormattedMessage
-                defaultMessage="Animations "
-                description="CoverEditor Animations Tool - Title"
-              />
-            </Text>
-          }
-          headerRightButton={<DoneHeaderButton onPress={toggleBottomSheet} />}
+          enableContentPanningGesture={false}
         >
+          <Header
+            middleElement={
+              <Text variant="large">
+                <FormattedMessage
+                  defaultMessage="Animations"
+                  description="CoverEditor Animations Tool - Title"
+                />
+              </Text>
+            }
+            rightElement={<DoneHeaderButton onPress={close} />}
+          />
           <View style={styles.boxContainer}>
             <BoxSelectionList
               data={animations}
@@ -168,15 +183,14 @@ const CoverEditorTextImageAnimationTool = () => {
               }
             />
           </View>
-          <DoubleSlider
-            minimumValue={0}
-            maximumValue={coverDuration}
-            value={[
-              (activeTextLayer.startPercentageTotal * coverDuration) / 100,
-              (activeTextLayer.endPercentageTotal * coverDuration) / 100,
-            ]}
-            onValueChange={onChangeAnimationDuration}
-          />
+          <View style={styles.doubleSliderContainer}>
+            <DoubleSlider
+              minimumValue={0}
+              maximumValue={coverDuration}
+              value={sliderValue}
+              onValueChange={onChangeAnimationDuration}
+            />
+          </View>
         </BottomSheetModal>
       )}
     </>
@@ -203,14 +217,10 @@ const AnimationPreview = ({
   const animation = animationId ? textAnimations[animationId] : null;
 
   const startTime = useMemo(() => Date.now(), []);
-  const animationSharedValue = useSharedValue(0);
-
+  const image = useSharedValue<SkImage | null>(null);
+  const surface = useOffScreenSurface(width, height);
   useFrameCallback(() => {
-    animationSharedValue.value = ((Date.now() - startTime) % 3000) / 3000;
-  });
-
-  const picture = useDerivedValue(() =>
-    createPicture(canvas => {
+    image.value = drawOffScreen(surface, (canvas, width, height) => {
       const paragraph = createParagraph({
         layer: activeTextLayer,
         canvasWidth: width,
@@ -239,7 +249,7 @@ const AnimationPreview = ({
 
       if (animation) {
         animation({
-          progress: animationSharedValue.value,
+          progress: ((Date.now() - startTime) % 3000) / 3000,
           paragraph,
           textLayer: activeTextLayer,
           canvas,
@@ -250,13 +260,13 @@ const AnimationPreview = ({
       } else {
         paragraph.paint(canvas, -textWidth / 2, -paragraph.getHeight() / 2);
       }
-    }),
-  );
+    });
+  }, true);
 
   return (
     <View style={{ height, width }}>
-      <Canvas style={{ width, height }}>
-        <Picture picture={picture} />
+      <Canvas style={{ width, height }} opaque>
+        <Image image={image} x={0} y={0} width={width} height={height} />
       </Canvas>
     </View>
   );
@@ -264,4 +274,5 @@ const AnimationPreview = ({
 
 const styles = StyleSheet.create({
   boxContainer: { height: 80 / COVER_RATIO + 70 },
+  doubleSliderContainer: { paddingHorizontal: 20 },
 });

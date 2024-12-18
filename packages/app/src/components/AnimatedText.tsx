@@ -1,17 +1,17 @@
-import { TextInput, View } from 'react-native';
-import Animated, { useAnimatedProps } from 'react-native-reanimated';
+import AnimateableText from 'react-native-animateable-text';
+import { useAnimatedProps, useAnimatedStyle } from 'react-native-reanimated';
 import { useVariantStyleSheet } from '#helpers/createStyles';
 import { textStyleSheet } from '#ui/Text';
-import type { ColorSchemeName } from '#helpers/createStyles';
-import type { TextProps as RNTextProps, ViewStyle } from 'react-native';
-import type { SharedValue } from 'react-native-reanimated';
-
-Animated.addWhitelistedNativeProps({ text: true });
+import type {
+  ColorSchemeName,
+  TextProps as RNTextProps,
+  TextStyle,
+} from 'react-native';
+import type { DerivedValue, SharedValue } from 'react-native-reanimated';
 
 type TextProps = RNTextProps & {
   text: SharedValue<string>;
-  animatedTextColor?: SharedValue<string>;
-  containerStyle?: ViewStyle;
+  animatedTextColor?: DerivedValue<string | undefined> | DerivedValue<string>;
   variant?:
     | 'button'
     | 'error'
@@ -23,7 +23,8 @@ type TextProps = RNTextProps & {
     | 'smallbold'
     | 'textField'
     | 'xlarge'
-    | 'xsmall';
+    | 'xsmall'
+    | 'xxsmallextrabold';
   /**
    * Manually set the appearance of the component
    *
@@ -33,54 +34,46 @@ type TextProps = RNTextProps & {
   maxLength?: number;
 };
 
-const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
-//TODO: switch to skia text if ok (with rea3k not rea2, more complexity for few gain because with rea2, some part still use js thread)
-// This is the only hack found as Text cannot be animated (virtual)
-//this is more laggy
 const AnimatedText = ({
+  // Only used in counter so we set a devault value to 0
   variant = 'none',
-  containerStyle,
   appearance,
   maxLength,
   animatedTextColor,
+  text,
+  style,
   ...props
 }: TextProps) => {
   const styles = useVariantStyleSheet(textStyleSheet, variant, appearance);
 
-  const { text, style } = { style: {}, ...props };
-
   const animatedProps = useAnimatedProps(() => {
-    let result = {
-      text:
-        !maxLength || text.value.length < maxLength
-          ? text.value
-          : `${text.value.slice(0, maxLength)}...`,
-      // Here we use any because the text prop is not available in the type
+    const textValue =
+      !maxLength || text.value.length < maxLength
+        ? text.value
+        : `${text.value.slice(0, maxLength)}...`;
+    return {
+      text: textValue,
     } as any;
-    if (animatedTextColor) {
-      result = { ...result, color: animatedTextColor?.value };
-    }
-    return result;
   }, [text]);
 
+  const colorStyle = useAnimatedStyle(() => {
+    return {
+      color:
+        animatedTextColor?.value ||
+        (style as TextStyle)?.color ||
+        (styles.text as TextStyle)?.color,
+    };
+  });
+
   return (
-    <View pointerEvents="box-only" style={containerStyle}>
-      <AnimatedTextInput
-        accessible={false}
-        accessibilityRole="text"
-        underlineColorAndroid="transparent"
-        editable={false}
-        defaultValue={
-          !maxLength || text.value.length < maxLength
-            ? text.value
-            : `${text.value.slice(0, maxLength)}...`
-        }
-        allowFontScaling={false}
-        style={[styles.text, { padding: 0 }, style]}
-        pointerEvents="none"
-        {...{ animatedProps }}
-      />
-    </View>
+    <AnimateableText
+      accessible={false}
+      accessibilityRole="text"
+      allowFontScaling={false}
+      style={[styles.text, { padding: 0 }, style, colorStyle]}
+      animatedProps={animatedProps}
+      {...props}
+    />
   );
 };
 

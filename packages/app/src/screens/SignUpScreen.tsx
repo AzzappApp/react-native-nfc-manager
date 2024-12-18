@@ -2,17 +2,10 @@ import { parsePhoneNumber } from 'libphonenumber-js';
 import LottieView from 'lottie-react-native';
 import { useCallback, useState, useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import {
-  View,
-  Image,
-  Keyboard,
-  Platform,
-  useWindowDimensions,
-  StyleSheet,
-} from 'react-native';
-import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
+import { View, Image, Keyboard, Platform, StyleSheet } from 'react-native';
 import { setSharedWebCredentials } from 'react-native-keychain';
 import { getLocales } from 'react-native-localize';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { waitTime } from '@azzapp/shared/asyncHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import {
@@ -28,6 +21,8 @@ import { logEvent } from '#helpers/analytics';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { signup } from '#helpers/MobileWebAPI';
+import useKeyboardHeight from '#hooks/useKeyboardHeight';
+import useScreenDimensions from '#hooks/useScreenDimensions';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import CheckBox from '#ui/CheckBox';
@@ -207,7 +202,7 @@ const SignUpScreen = () => {
     setClearPassword(false);
   });
 
-  const { height } = useWindowDimensions();
+  const { height } = useScreenDimensions();
   const [panelHeight, setPanelHeight] = useState(height - 353);
   const onLayout = useCallback(
     (event: LayoutChangeEvent) => {
@@ -217,6 +212,12 @@ const SignUpScreen = () => {
   );
 
   const insets = useScreenInsets();
+  const keyboardHeight = useKeyboardHeight();
+  const keyboardAvoidAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      paddingBottom: keyboardHeight.value - insets.bottom + 16,
+    };
+  });
   return (
     <View style={styles.root}>
       <View style={styles.background}>
@@ -241,7 +242,7 @@ const SignUpScreen = () => {
           style={styles.logo}
         />
       </View>
-      <KeyboardAvoidingView behavior="padding" style={styles.body}>
+      <Animated.View style={[styles.body, keyboardAvoidAnimatedStyle]}>
         <View
           style={[styles.form, { marginBottom: insets.bottom }]}
           onLayout={onLayout}
@@ -397,7 +398,7 @@ const SignUpScreen = () => {
             </PressableOpacity>
           </View>
         </View>
-      </KeyboardAvoidingView>
+      </Animated.View>
     </View>
   );
 };

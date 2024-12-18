@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import { forwardRef, useCallback } from 'react';
 import {
   Easing,
   useAnimatedStyle,
@@ -36,23 +36,23 @@ const PressableOpacity = (
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
-      opacity: opacityValue.value,
+      opacity: disabled ? disabledOpacity : opacityValue.value,
     };
-  }, [opacityValue]);
+  });
 
-  const onFadeIn = () => {
+  const onFadeIn = useCallback(() => {
     opacityValue.value = withTiming(activeOpacity, {
       duration: animationDuration,
       easing,
     });
-  };
+  }, [activeOpacity, animationDuration, easing, opacityValue]);
 
-  const onFadeOut = () => {
+  const onFadeOut = useCallback(() => {
     opacityValue.value = withTiming(1, {
       duration: animationDuration,
       easing,
     });
-  };
+  }, [animationDuration, easing, opacityValue]);
 
   return (
     <PressableAnimated
@@ -61,7 +61,7 @@ const PressableOpacity = (
       onPressIn={onFadeIn}
       onPressOut={onFadeOut}
       disabled={disabled}
-      style={[style, disabled ? { opacity: disabledOpacity } : animatedStyle]}
+      style={[style, animatedStyle]}
     />
   );
 };

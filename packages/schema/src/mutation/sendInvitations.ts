@@ -8,12 +8,12 @@ import {
 } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
-import { notifyUsers } from '#externals';
+import { notifyUsers, sendPushNotification } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
 import { userLoader, webCardLoader } from '#loaders';
 import { checkWebCardProfileAdminRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
-import { checkSubscription } from '#helpers/subscriptionHelpers';
+import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 
 // to avoid sending too many invitations by SMS
@@ -43,15 +43,12 @@ const sendInvitations: MutationResolvers['sendInvitations'] = async (
     allProfiles ? undefined : users.map(({ profileId }) => profileId),
   );
 
-  if (
-    countDeletedProfiles > 0 &&
-    !(await checkSubscription(
+  if (countDeletedProfiles > 0) {
+    await validateCurrentSubscription(
       getSessionInfos().userId!,
       webCardId,
       countDeletedProfiles,
-    ))
-  ) {
-    throw new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED);
+    );
   }
 
   const webCard = await webCardLoader.load(webCardId);
@@ -121,6 +118,18 @@ const sendInvitations: MutationResolvers['sendInvitations'] = async (
         'invitation',
         guessLocale(user?.locale),
       );
+    }
+    for (let i = 0; i < users.length; i++) {
+      const userToNotify = users[i].user;
+      if (userToNotify) {
+        await sendPushNotification(userToNotify.id, {
+          type: 'multiuser_invitation',
+          mediaId: webCard.coverMediaId,
+          deepLink: 'multiuser_invitation',
+          localeParams: { userName: webCard.userName },
+          locale: guessLocale(userToNotify.locale),
+        });
+      }
     }
   } catch (e) {
     Sentry.captureException(e);

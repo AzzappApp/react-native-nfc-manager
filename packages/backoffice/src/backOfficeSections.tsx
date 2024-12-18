@@ -1,4 +1,4 @@
-import { ADMIN, TRANSLATOR } from '#roles';
+import { ADMIN } from '#roles';
 
 export type SubSection = {
   id: string;
@@ -136,12 +136,6 @@ const backOfficeSections: Array<Section | SubSection> = [
         roles: [ADMIN],
       },
     ],
-  },
-  {
-    id: 'translations',
-    text: 'Translations',
-    href: '/translations',
-    roles: [ADMIN, TRANSLATOR],
   },
 ];
 

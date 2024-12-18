@@ -19,6 +19,7 @@ const SimpleTextRenderer = ({
   cardStyle,
   colorPalette,
   style,
+  coverBackgroundColor,
   ...props
 }: SimpleTextRendererProps) => {
   const {

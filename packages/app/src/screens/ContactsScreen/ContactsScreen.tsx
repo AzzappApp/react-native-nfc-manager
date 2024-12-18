@@ -57,11 +57,8 @@ const ContactsScreen = ({
   const intl = useIntl();
 
   return (
-    <Container style={[styles.container]}>
-      <SafeAreaView
-        style={styles.container}
-        edges={{ bottom: 'off', top: 'additive' }}
-      >
+    <Container style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <Header
           middleElement={
             <Text variant="large">
@@ -112,11 +109,13 @@ const ContactsScreen = ({
           onChangeText={e => setSearch(e ?? '')}
         />
         <Suspense>
-          <ContactScreenLists
-            search={debounceSearch}
-            searchBy={searchBy}
-            profile={profile}
-          />
+          {profile && (
+            <ContactScreenLists
+              search={debounceSearch}
+              searchBy={searchBy}
+              profile={profile}
+            />
+          )}
         </Suspense>
       </SafeAreaView>
     </Container>

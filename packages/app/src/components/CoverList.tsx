@@ -110,6 +110,25 @@ const CoverList = ({
     [maxCoverPlay],
   );
 
+  const extraDataInner = useMemo(
+    () => ({ ...extraData, viewableItems }),
+    [extraData, viewableItems],
+  );
+
+  const contentInset = useMemo(
+    () => ({
+      top: horizontal ? 0 : gap,
+      left: horizontal ? gap : 0,
+      bottom: 0,
+      right: 0,
+    }),
+    [gap, horizontal],
+  );
+  const Separator = useCallback(
+    () => <ItemSeparator gap={gap} horizontal={horizontal} />,
+    [gap, horizontal],
+  );
+
   return (
     <FlashList
       testID="cover-list"
@@ -126,18 +145,11 @@ const CoverList = ({
       refreshing={refreshing}
       ListHeaderComponent={ListHeaderComponent}
       onViewableItemsChanged={onViewableItemChanged}
-      ItemSeparatorComponent={props => (
-        <ItemSeparatorComponent {...props} gap={gap} horizontal={horizontal} />
-      )}
+      ItemSeparatorComponent={Separator}
       renderScrollComponent={OverflowScrollView}
-      contentInset={{
-        top: horizontal ? 0 : gap,
-        left: horizontal ? gap : 0,
-        bottom: 0,
-        right: 0,
-      }}
+      contentInset={contentInset}
       onEndReachedThreshold={0.3}
-      extraData={{ ...extraData, viewableItems }}
+      extraData={extraDataInner}
       viewabilityConfig={viewabilityConfig}
     />
   );
@@ -167,6 +179,8 @@ const ItemSeparatorComponent = ({
 }) => (
   <View style={{ width: horizontal ? gap : 0, height: horizontal ? 0 : gap }} />
 );
+
+const ItemSeparator = memo(ItemSeparatorComponent);
 
 const keyExtractor = (item: ArrayItemType<CoverList_users$data>) => item.id;
 
@@ -209,6 +223,7 @@ const ItemList = ({
       aspectRatio: COVER_RATIO,
     };
   }, [coverWidth, styles.coverContainerStyle, withShadow]);
+
   return (
     <Container style={itemStyle}>
       <CoverLink

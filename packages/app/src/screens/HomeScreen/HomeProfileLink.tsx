@@ -12,7 +12,7 @@ import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import AnimatedText from '#components/AnimatedText';
 import Icon from '#ui/Icon';
-import PressableOpacity from '#ui/PressableOpacity';
+import PressableNative from '#ui/PressableNative';
 import { useHomeScreenContext } from './HomeScreenContext';
 import type { HomeProfileLink_user$key } from '#relayArtifacts/HomeProfileLink_user.graphql';
 
@@ -35,7 +35,7 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
     userKey,
   );
 
-  const { currentIndexProfile, currentIndexSharedValue } =
+  const { currentIndexProfileSharedValue, currentIndexSharedValue } =
     useHomeScreenContext();
 
   const userNames = useDerivedValue(
@@ -57,12 +57,14 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
         Math.round(currentIndexSharedValue.value),
       pointerEvents: 'auto',
     };
-  }, [currentIndexProfile.value, currentIndexSharedValue.value]);
+  });
 
   const intl = useIntl();
   const onPress = () => {
     Clipboard.setStringAsync(
-      buildUserUrl(userNames.value[currentIndexProfile.value - 1] ?? ''),
+      buildUserUrl(
+        userNames.value[currentIndexProfileSharedValue.value - 1] ?? '',
+      ),
     )
       .then(() => {
         Toast.show({
@@ -91,21 +93,22 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
 
   return (
     <Animated.View style={[styles.container, opacityStyle]}>
-      <PressableOpacity accessibilityRole="button" onPress={onPress}>
-        <View style={styles.containerText}>
-          <Icon icon="earth" style={styles.iconLink} />
+      <PressableNative
+        style={styles.containerText}
+        accessibilityRole="button"
+        onPress={onPress}
+      >
+        <Icon icon="earth" style={styles.iconLink} />
 
-          <AnimatedText
-            variant="button"
-            numberOfLines={1}
-            style={styles.url}
-            text={text}
-            containerStyle={{ flex: 1 }}
-            maxLength={windowWidth.width / 13}
-          />
-          <View style={styles.emptyViewCenter} />
-        </View>
-      </PressableOpacity>
+        <AnimatedText
+          variant="button"
+          numberOfLines={1}
+          style={styles.url}
+          text={text}
+          maxLength={windowWidth.width / 13}
+        />
+        <View style={styles.emptyViewCenter} />
+      </PressableNative>
     </Animated.View>
   );
 };

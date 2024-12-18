@@ -1,5 +1,5 @@
 /* eslint-disable no-case-declarations */
-import { clamp } from 'lodash';
+import clamp from 'lodash/clamp';
 import {
   COVER_IMAGE_DEFAULT_DURATION,
   COVER_MAX_MEDIA_DURATION,
@@ -10,13 +10,17 @@ import {
 import { colors } from '#theme';
 import { cropDataForAspectRatio } from '#helpers/mediaEditions';
 import {
-  mediaInfoIsImage,
   extractLottieInfoMemoized,
   getLottieMediasDurations,
   calculateImageScale,
 } from './coverEditorHelpers';
 import type { CoverEditorAction } from './coverEditorActions';
-import type { CoverEditorState, MediaInfo } from './coverEditorTypes';
+import type {
+  CoverEditorState,
+  CoverMedia,
+  CoverMediaImage,
+  CoverMediaVideo,
+} from './coverEditorTypes';
 
 export function coverEditorReducer(
   state: CoverEditorState,
@@ -137,6 +141,7 @@ export function coverEditorReducer(
           linksLayer: {
             ...linksLayer,
             links: [],
+            position: { x: 50, y: 50 },
           },
         };
       }
@@ -203,21 +208,23 @@ export function coverEditorReducer(
     // #endregion
 
     // #region Medias Actions
-    case 'UPDATE_MEDIAS':
-      const medias: MediaInfo[] = [];
+    case 'UPDATE_MEDIAS': {
+      const medias: CoverMedia[] = [];
       let imagesScales = state.imagesScales;
 
+      const lottieInfo = extractLottieInfoMemoized(state.lottie);
+      const durations = getLottieMediasDurations(lottieInfo);
+
       payload.forEach((media, index) => {
-        const mediaInfo = state.medias.find(
-          info => info.media.uri === media.uri,
+        const currentMedia = state.medias.find(
+          currentMedia => currentMedia.id === media.id,
         );
-        if (mediaInfo) {
-          medias.push(mediaInfo);
+        if (currentMedia) {
+          medias.push(currentMedia);
           return;
         }
         let aspectRatio = COVER_RATIO;
-        if (state.lottie) {
-          const lottieInfo = extractLottieInfoMemoized(state.lottie);
+        if (lottieInfo) {
           const asset = lottieInfo?.assetsInfos[index];
           if (!asset) {
             console.error("Too many medias for the template's assets");
@@ -233,26 +240,21 @@ export function coverEditorReducer(
         if (media.kind === 'image') {
           imagesScales = {
             ...imagesScales,
-            [media.uri]: calculateImageScale(media),
+            [media.id]: calculateImageScale(media),
           };
           medias.push({
-            media,
+            ...media,
             filter: null,
             animation: null,
             editionParameters: { cropData },
             duration: COVER_IMAGE_DEFAULT_DURATION,
           });
         } else {
-          const lottieInfo = extractLottieInfoMemoized(state.lottie);
-          const durations = lottieInfo
-            ? getLottieMediasDurations(lottieInfo)
-            : null;
           const duration = durations ? durations[index] : null;
 
           medias.push({
-            media,
+            ...media,
             filter: null,
-            animation: null,
             editionParameters: { cropData },
             timeRange: {
               startTime: 0,
@@ -263,19 +265,28 @@ export function coverEditorReducer(
           });
         }
       });
-
+      let localFilenames = state.localFilenames;
+      Object.keys(localFilenames).forEach(id => {
+        if (!medias.find(media => media.id === id)) {
+          localFilenames = { ...localFilenames };
+          delete localFilenames[id];
+        }
+      });
       return {
         ...state,
         medias,
         imagesScales,
+        localFilenames,
+        initialMediaToPick: undefined,
       };
+    }
     case 'UPDATE_MEDIA_IMAGE_DURATION': {
       if (
         state.editionMode === 'mediaEdit' &&
         state.selectedItemIndex != null
       ) {
         const media = state.medias[state.selectedItemIndex];
-        if (mediaInfoIsImage(media)) {
+        if (media.kind === 'image') {
           const medias = [...state.medias];
           medias[state.selectedItemIndex] = {
             ...medias[state.selectedItemIndex],
@@ -301,10 +312,10 @@ export function coverEditorReducer(
       ) {
         //add a control to only update animation for Image media
         const media = state.medias[state.selectedItemIndex];
-        if (mediaInfoIsImage(media)) {
+        if (media.kind === 'image') {
           const medias = [...state.medias];
           medias[state.selectedItemIndex] = {
-            ...medias[state.selectedItemIndex],
+            ...(medias[state.selectedItemIndex] as CoverMediaImage),
             animation: payload,
           };
           return {
@@ -321,7 +332,7 @@ export function coverEditorReducer(
         return {
           ...state,
           medias: state.medias.map(media => {
-            if (mediaInfoIsImage(media)) {
+            if (media.kind === 'image') {
               return {
                 ...media,
                 animation: payload.animation,
@@ -438,7 +449,7 @@ export function coverEditorReducer(
       ) {
         const medias = [...state.medias];
         medias[state.selectedItemIndex] = {
-          ...medias[state.selectedItemIndex],
+          ...(medias[state.selectedItemIndex] as CoverMediaVideo),
           timeRange: payload,
         };
         return {
@@ -459,9 +470,7 @@ export function coverEditorReducer(
         const overlayLayers = [...state.overlayLayers];
         overlayLayers[state.selectedItemIndex] = {
           ...overlayLayers[state.selectedItemIndex],
-          //TODO: type as any as quick n dirty because the type was changed compare to initial creation.
-          // MediaInfoImage is not applicable to overlay for duration and animation, but the reducer type was updated without taking this acion in account
-          media: payload,
+          ...payload,
         };
         return {
           ...state,
@@ -496,20 +505,20 @@ export function coverEditorReducer(
       if (payload.kind === 'image') {
         imagesScales = {
           ...imagesScales,
-          [payload.uri]: calculateImageScale(payload),
+          [payload.id]: calculateImageScale(payload),
         };
 
         medias[state.selectedItemIndex] = {
-          media: payload,
+          ...payload,
           filter: updatedMedia.filter,
-          animation: mediaInfoIsImage(updatedMedia)
-            ? updatedMedia.animation
-            : null,
+          animation:
+            updatedMedia.kind === 'image' ? updatedMedia.animation : null,
           editionParameters: { ...updatedMedia.editionParameters, cropData },
 
-          duration: mediaInfoIsImage(updatedMedia)
-            ? updatedMedia.duration
-            : COVER_MAX_MEDIA_DURATION,
+          duration:
+            updatedMedia.kind === 'image'
+              ? updatedMedia.duration
+              : COVER_MAX_MEDIA_DURATION,
         };
       } else {
         const lottieInfo = extractLottieInfoMemoized(state.lottie);
@@ -519,9 +528,8 @@ export function coverEditorReducer(
         const duration = durations ? durations[index] : null;
 
         medias[state.selectedItemIndex] = {
-          media: payload,
+          ...payload,
           filter: updatedMedia.filter,
-          animation: null,
           editionParameters: { ...updatedMedia.editionParameters, cropData },
           timeRange: {
             startTime: 0,
@@ -531,10 +539,18 @@ export function coverEditorReducer(
           },
         };
       }
+      let localFilenames = state.localFilenames;
+      Object.keys(localFilenames).forEach(id => {
+        if (!medias.find(media => media.id === id)) {
+          localFilenames = { ...localFilenames };
+          delete localFilenames[id];
+        }
+      });
       return {
         ...state,
         medias,
         imagesScales,
+        localFilenames,
       };
     }
     case 'UPDATE_MEDIA_TRANSITION': {
@@ -595,14 +611,14 @@ export function coverEditorReducer(
         ...state,
         imagesScales: {
           ...state.imagesScales,
-          [payload.uri]: calculateImageScale(payload),
+          [payload.id]: calculateImageScale(payload),
         },
         editionMode: 'overlay',
         selectedItemIndex: state.overlayLayers.length,
         overlayLayers: [
           ...state.overlayLayers,
           {
-            media: payload,
+            ...payload,
             borderColor: colors.black,
             borderRadius: 0,
             borderWidth: 0,
@@ -640,7 +656,7 @@ export function coverEditorReducer(
         const cropDataAspectRatio = cropData
           ? cropData.width / cropData.height
           : null;
-        const naturalAspectRatio = layer.media.width / layer.media.height;
+        const naturalAspectRatio = layer.width / layer.height;
 
         if (
           (cropDataAspectRatio != null &&
@@ -649,8 +665,8 @@ export function coverEditorReducer(
             naturalAspectRatio !== boundsAspectRatio)
         ) {
           cropData = cropDataForAspectRatio(
-            layer.media.width,
-            layer.media.height,
+            layer.width,
+            layer.height,
             boundsAspectRatio,
           );
           layer.editionParameters = {
@@ -764,15 +780,15 @@ export function coverEditorReducer(
         loadingRemoteMedia: false,
       };
     case 'LOADING_SUCCESS':
-      const { images, lutShaders, videoPaths } = payload;
+      const { images, lutTextures, localFilenames } = payload;
       return {
         ...state,
         loadingError: null,
         loadingRemoteMedia: false,
         loadingLocalMedia: false,
         images,
-        lutShaders,
-        videoPaths,
+        lutTextures,
+        localFilenames,
       };
     // #endregion
 

@@ -1,12 +1,12 @@
 import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
-import { useCoverEditorContext } from '../../CoverEditorContext';
+import { useCoverEditorEditContext } from '../../CoverEditorContext';
 import ToolBoxSection from '../ui/ToolBoxSection';
 
 const CoverEditorDeleteTool = () => {
   const intl = useIntl();
 
-  const { dispatch } = useCoverEditorContext();
+  const dispatch = useCoverEditorEditContext();
 
   const onDeletePress = useCallback(() => {
     dispatch({

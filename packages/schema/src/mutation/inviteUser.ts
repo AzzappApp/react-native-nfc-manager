@@ -28,7 +28,7 @@ import {
   webCardOwnerLoader,
 } from '#loaders';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
-import { checkSubscription } from '#helpers/subscriptionHelpers';
+import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#__generated__/types';
 import type { Profile } from '@azzapp/data';
 
@@ -77,9 +77,7 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  if (!(await checkSubscription(owner.id, webCard.id, 1))) {
-    throw new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED);
-  }
+  await validateCurrentSubscription(owner.id, webCard.id, 1);
 
   try {
     const { avatarId, logoId } = invited.contactCard ?? {};
@@ -144,6 +142,7 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
         deleted: false,
         deletedAt: null,
         deletedBy: null,
+        lastContactViewAt: new Date(),
       };
       await referencesMedias(
         addedMedia,

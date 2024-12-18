@@ -1,7 +1,13 @@
 import { Image } from 'expo-image';
-import { useCallback, useMemo, useState } from 'react';
+import {
+  startTransition,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View, Alert, Modal, useWindowDimensions } from 'react-native';
+import { View, Alert, useWindowDimensions } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { RESULTS } from 'react-native-permissions';
 import Toast from 'react-native-toast-message';
@@ -9,6 +15,7 @@ import {
   COVER_IMAGE_DEFAULT_DURATION,
   COVER_MAX_MEDIA,
 } from '@azzapp/shared/coverHelpers';
+import { isDefined } from '@azzapp/shared/isDefined';
 import { colors, shadow } from '#theme';
 import {
   AlbumPickerScreen,
@@ -19,10 +26,10 @@ import {
   SaveHeaderButton,
 } from '#components/commonsButtons';
 import { MediaGridListFallback } from '#components/MediaGridList';
+import { ScreenModal } from '#components/NativeRouter';
 import PermissionModal from '#components/PermissionModal';
 import PhotoGalleryMediaList from '#components/PhotoGalleryMediaList';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { duplicateMediaToFillSlots, getMediaId } from '#helpers/mediaHelpers';
 import { usePermissionContext } from '#helpers/PermissionContext';
 import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
@@ -34,17 +41,18 @@ import IconButton from '#ui/IconButton';
 import TabsBar from '#ui/TabsBar';
 import TabView from '#ui/TabView';
 import Text from '#ui/Text';
+import { duplicateMediaToFillSlots } from '../coverEditorHelpers';
 import useMediaLimitedSelectionAlert from '../useMediaLimitedSelectionAlert';
 import StockMediaList from './StockMediaList';
-import type { Media } from '#helpers/mediaHelpers';
+import type { SourceMedia } from '#helpers/mediaHelpers';
 import type { Album } from '@react-native-camera-roll/camera-roll';
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
+import type { ViewProps } from 'react-native';
 
 type CoverEditorMediaPickerProps = Omit<ViewProps, 'children'> & {
   durations: number[] | null;
   durationsFixed?: boolean;
-  initialMedias: Media[] | null;
-  onFinished: (results: Media[]) => void;
+  initialMedias: Array<SourceMedia | null> | null;
+  onFinished: (results: SourceMedia[]) => void;
   maxSelectableVideos?: number;
   onClose: () => void;
   /**
@@ -62,9 +70,9 @@ type CoverEditorMediaPickerProps = Omit<ViewProps, 'children'> & {
 };
 
 const CoverEditorMediaPicker = ({
-  durations,
+  durations: initialDurationsUnfiltered,
   durationsFixed,
-  initialMedias,
+  initialMedias: initialMediaUnfiltered,
   onFinished,
   style,
   maxSelectableVideos,
@@ -73,9 +81,19 @@ const CoverEditorMediaPicker = ({
   allowVideo = true,
   ...props
 }: CoverEditorMediaPickerProps) => {
-  const [selectedMedias, setSelectedMedias] = useState<Media[]>(
-    initialMedias ?? [],
-  );
+  const [selectedMedias, setSelectedMedias] = useState<
+    Array<SourceMedia | null>
+  >(initialMediaUnfiltered?.filter(media => !media || media.editable) ?? []);
+
+  const durations = useMemo(() => {
+    return initialDurationsUnfiltered?.filter((_d, idx) => {
+      return (
+        !initialMediaUnfiltered?.[idx] ||
+        initialMediaUnfiltered?.[idx]?.editable === true
+      );
+    });
+  }, [initialDurationsUnfiltered, initialMediaUnfiltered]);
+
   const [selectedTab, setSelectedTab] = useState('gallery');
   const [selectedAlbum, setSelectedAlbum] = useState<Album | null>(null);
   const [showAlbumModal, toggleShowAlbumModal] = useToggle(false);
@@ -93,11 +111,13 @@ const CoverEditorMediaPicker = ({
 
   const onTabPress = useCallback(
     (tab: string) => {
-      if (tab === 'gallery' && selectedTab === 'gallery') {
-        toggleShowAlbumModal();
-      } else {
-        setSelectedTab(tab);
-      }
+      startTransition(() => {
+        if (tab === 'gallery' && selectedTab === 'gallery') {
+          toggleShowAlbumModal();
+        } else {
+          setSelectedTab(tab);
+        }
+      });
     },
     [selectedTab, toggleShowAlbumModal],
   );
@@ -142,31 +162,36 @@ const CoverEditorMediaPicker = ({
 
   // remove Media by index
   const handleRemoveMedia = (index: number) => {
-    setSelectedMedias(mediasPicked =>
-      mediasPicked.filter((_, i) => i !== index),
-    );
+    setSelectedMedias(prevSelectedMedias => [
+      ...prevSelectedMedias.slice(0, index),
+      null,
+      ...prevSelectedMedias.slice(index + 1, prevSelectedMedias.length),
+    ]);
   };
 
   const selectedMediasIds = useMemo(
-    () => selectedMedias?.map(getMediaId) ?? [],
+    () =>
+      selectedMedias
+        ?.filter(selectedMedia => !!selectedMedia)
+        .map(media => media.id) ?? [],
     [selectedMedias],
   );
 
   // @todo better define the expected type according to the evolution of the new cover
   const handleMediaSelected = useCallback(
-    (media: Media) => {
+    (media: SourceMedia) => {
       if (!multiSelection) {
         setSelectedMedias([media]);
         return;
       }
       const disableVideoSelection = maxSelectableVideos
         ? maxSelectableVideos -
-            (selectedMedias?.filter(m => m.kind === 'video').length ?? 0) ===
+            (selectedMedias?.filter(m => m?.kind === 'video').length ?? 0) ===
           0
         : false;
 
       const index = selectedMedias.findIndex(
-        value => getMediaId(value) === getMediaId(media),
+        value => value && value.id === media.id,
       );
 
       if (disableVideoSelection && index === -1 && media.kind === 'video') {
@@ -182,12 +207,17 @@ const CoverEditorMediaPicker = ({
       }
 
       if (index !== -1) {
-        setSelectedMedias(selectedMedias.filter((_, i) => i !== index));
+        handleRemoveMedia(index);
         return;
       }
-      if (selectedMedias.length < maxMedias) {
+
+      const indexToReplace = selectedMedias.findIndex(
+        selectedMedia => !selectedMedia,
+      );
+
+      if (indexToReplace >= 0) {
         const expectedDuration =
-          durations?.[selectedMedias.length] ?? COVER_IMAGE_DEFAULT_DURATION;
+          durations?.[indexToReplace] ?? COVER_IMAGE_DEFAULT_DURATION;
 
         if (media.kind === 'video' && media.duration < expectedDuration) {
           Toast.show({
@@ -203,29 +233,36 @@ const CoverEditorMediaPicker = ({
           });
           return;
         }
-        setSelectedMedias([...selectedMedias, media]);
+        setSelectedMedias(prevSelectedMedias => {
+          const newSelectedMedias = [...prevSelectedMedias];
+          newSelectedMedias[indexToReplace] = media;
+          return newSelectedMedias;
+        });
+      } else if (
+        (!selectedMedias || selectedMedias.length === 0) &&
+        selectedMedias.length < COVER_MAX_MEDIA
+      ) {
+        const idx = selectedMedias.findIndex(media => media === null);
+        setSelectedMedias(prevSelectedMedias => {
+          const newSelectedMedias = [...prevSelectedMedias];
+          newSelectedMedias[idx] = media;
+          return newSelectedMedias;
+        });
       }
     },
-    [
-      durations,
-      intl,
-      maxMedias,
-      maxSelectableVideos,
-      multiSelection,
-      selectedMedias,
-    ],
+    [durations, selectedMedias, intl, maxSelectableVideos, multiSelection],
   );
 
-  const handleDuplicateMedia = () => {
+  const handleDuplicateMedia = useCallback(() => {
     if (
       durations &&
-      selectedMedias.length > 0 &&
-      selectedMedias.length < durations.length
+      selectedMediasIds.length > 0 &&
+      selectedMediasIds.length < durations.length
     ) {
-      const lastSelectedIndex = selectedMedias.length - 1;
+      const lastSelectedIndex = selectedMediasIds.length - 1;
       const lastSelected = selectedMedias[lastSelectedIndex];
 
-      if (lastSelected.kind === 'video') {
+      if (lastSelected?.kind === 'video') {
         const longerDuration = durations.find(
           (duration, i) =>
             i > lastSelectedIndex && duration > lastSelected.duration,
@@ -249,21 +286,16 @@ const CoverEditorMediaPicker = ({
       }
     }
 
-    const missingMedia =
-      maxMedias - selectedMedias.filter(m => m !== null).length;
+    const missingMedia = selectedMedias.filter(m => m === null).length;
 
     if (missingMedia > 0) {
-      const selected = selectedMedias.filter(
-        media => media !== null,
-      ) as Media[];
       const duplicatedMedias = duplicateMediaToFillSlots(
-        maxMedias,
-        selected,
+        selectedMedias,
         maxSelectableVideos,
       );
       setSelectedMedias(duplicatedMedias);
 
-      if (duplicatedMedias.length < maxMedias) {
+      if (duplicatedMedias.findIndex(m => m === null) !== -1) {
         Toast.show({
           type: 'error',
           text1: intl.formatMessage({
@@ -275,7 +307,7 @@ const CoverEditorMediaPicker = ({
         return null;
       }
 
-      return duplicatedMedias;
+      return duplicatedMedias.filter(isDefined);
     } else {
       Toast.show({
         type: 'error',
@@ -287,10 +319,44 @@ const CoverEditorMediaPicker = ({
       });
       return null;
     }
+  }, [
+    durations,
+    intl,
+    maxSelectableVideos,
+    selectedMedias,
+    selectedMediasIds.length,
+  ]);
+
+  /** Helper funcrtion to re add uneditable media to the result */
+  const mapResultWithNonEditable = (inputMedia: Array<SourceMedia | null>) => {
+    let selectedMediaIdx = 0;
+
+    return initialMediaUnfiltered?.map(media => {
+      if (!media || media.editable) {
+        return inputMedia[selectedMediaIdx++];
+      } else {
+        return media;
+      }
+    });
   };
 
   const handleOnFinished = () => {
+    // rebuild result data
+    const resultMedia = multiSelection
+      ? mapResultWithNonEditable(selectedMedias)
+      : selectedMedias;
+
     if (selectedMedias.length === 0) {
+      onFinished(initialMediaUnfiltered?.filter(isDefined) || []);
+      return;
+    }
+    const resultMediaId =
+      resultMedia
+        ?.filter(selectedMedia => !!selectedMedia)
+        .map(media => media.id) ?? [];
+
+    const validMediaCount = selectedMedias?.filter(Boolean).length;
+    if (validMediaCount === 0) {
       Alert.alert(
         intl.formatMessage({
           defaultMessage: 'No media selected',
@@ -304,24 +370,24 @@ const CoverEditorMediaPicker = ({
       return;
     }
     if (!multiSelection) {
-      onFinished(selectedMedias);
+      onFinished(resultMedia?.filter(isDefined) || []);
       return;
     }
 
-    if (durationsFixed && selectedMedias.length < maxMedias) {
+    if (durationsFixed && resultMediaId.length < maxMedias) {
       Alert.alert(
         intl.formatMessage(
           {
             defaultMessage: `{mediaPickedNumber, plural,
-            =0 {#/{totalMediaNumber} media selected}
-            =1 {#/{totalMediaNumber} media selected}
-            other {#/{totalMediaNumber} media selected}
-    }`,
+              =0 {#/{totalMediaNumber} media selected}
+              =1 {#/{totalMediaNumber} media selected}
+              other {#/{totalMediaNumber} media selected}
+            }`,
             description:
               'Title of missing media in cover edition to propose duplication',
           },
           {
-            mediaPickedNumber: selectedMedias.length,
+            mediaPickedNumber: selectedMedias.filter(m => m !== null).length,
             totalMediaNumber: maxMedias,
           },
         ),
@@ -339,7 +405,10 @@ const CoverEditorMediaPicker = ({
             }),
             onPress: () => {
               const medias = handleDuplicateMedia();
-              if (medias) onFinished(medias);
+              if (medias) {
+                const resultMedia = mapResultWithNonEditable(medias);
+                if (resultMedia) onFinished(resultMedia.filter(isDefined));
+              }
             },
           },
           {
@@ -356,10 +425,18 @@ const CoverEditorMediaPicker = ({
       return;
     }
 
-    onFinished(selectedMedias);
+    onFinished(resultMedia?.filter(isDefined) || []);
   };
 
-  const mediasOrSlot: Array<Media | null> = durationsFixed
+  useEffect(() => {
+    if (multiSelection && selectedMedias.length === 0) {
+      // no editable media, let's finish now
+      handleOnFinished();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [onFinished, selectedMedias.length]);
+
+  const mediasOrSlot: Array<SourceMedia | null> = durationsFixed
     ? Array.from(
         { length: maxMedias },
         (_, index) => selectedMedias[index] ?? null,
@@ -377,7 +454,7 @@ const CoverEditorMediaPicker = ({
           description:
             'Medias selection label for fixed number multi selection of media in cover edition',
         },
-        { count: selectedMedias.length, max: maxMedias },
+        { count: selectedMediasIds.length, max: maxMedias },
       )
     : intl.formatMessage(
         {
@@ -389,7 +466,7 @@ const CoverEditorMediaPicker = ({
           description:
             'Medias selection label for free multi selection of media in cover edition',
         },
-        { count: selectedMedias.length, max: COVER_MAX_MEDIA },
+        { count: selectedMediasIds.length, max: COVER_MAX_MEDIA },
       );
 
   const { top, bottom } = useScreenInsets();
@@ -411,10 +488,13 @@ const CoverEditorMediaPicker = ({
                   variant="icon"
                 />
               }
-              middleElement={intl.formatMessage({
-                defaultMessage: 'Select Medias',
-                description: 'Title of the Cover Editor Media picker',
-              })}
+              middleElement={intl.formatMessage(
+                {
+                  defaultMessage: 'Select {totalMediaNumber} media',
+                  description: 'Title of the Cover Editor Media picker',
+                },
+                { totalMediaNumber: maxMedias },
+              )}
             />
           ) : (
             <Header
@@ -440,6 +520,7 @@ const CoverEditorMediaPicker = ({
         <TabView
           style={styles.content}
           currentTab={selectedTab}
+          mountOnlyCurrentTab
           tabs={[
             {
               id: 'gallery',
@@ -466,7 +547,6 @@ const CoverEditorMediaPicker = ({
                   kind="image"
                   selectedMediasIds={selectedMediasIds}
                   onMediaSelected={handleMediaSelected}
-                  displayList={selectedTab === 'stock_photo'}
                 />
               ),
             },
@@ -477,7 +557,6 @@ const CoverEditorMediaPicker = ({
                   kind="video"
                   selectedMediasIds={selectedMediasIds}
                   onMediaSelected={handleMediaSelected}
-                  displayList={selectedTab === 'stock_video'}
                 />
               ),
             },
@@ -494,7 +573,7 @@ const CoverEditorMediaPicker = ({
                   <Text variant="small" style={styles.labelMediaSelected}>
                     <FormattedMessage
                       defaultMessage={`{max, plural, =1 {{max} video max} other {{max} videos max}}`}
-                      values={{ max: maxSelectableVideos }}
+                      values={{ max: Math.min(maxSelectableVideos, maxMedias) }}
                       description="CoverEditorMediaPicker - max videos"
                     />
                   </Text>
@@ -534,10 +613,7 @@ const CoverEditorMediaPicker = ({
                                     media.thumbnail ??
                                     media.uri,
                                 }}
-                                style={{
-                                  width: '100%',
-                                  height: '100%',
-                                }}
+                                style={styles.image}
                               />
                             </View>
                             <IconButton
@@ -578,16 +654,16 @@ const CoverEditorMediaPicker = ({
       />
       {(mediaPermission === RESULTS.GRANTED ||
         mediaPermission === RESULTS.LIMITED) && (
-        <Modal
+        <ScreenModal
           visible={showAlbumModal}
-          onRequestClose={toggleShowAlbumModal}
+          onRequestDismiss={toggleShowAlbumModal}
           animationType="slide"
         >
           <AlbumPickerScreen
             onSelectAlbum={onSelectAlbum}
             onClose={toggleShowAlbumModal}
           />
-        </Modal>
+        </ScreenModal>
       )}
     </>
   );
@@ -685,5 +761,9 @@ const stylesheet = createStyleSheet(appearance => ({
   arrowIcon: {
     width: 12,
     marginTop: 3,
+  },
+  image: {
+    width: '100%',
+    height: '100%',
   },
 }));

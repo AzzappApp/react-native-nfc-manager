@@ -154,7 +154,6 @@ const CameraView = (
         return new Promise((resolve, reject) => {
           camera.current?.startRecording({
             flash: flash === 'auto' ? 'off' : flash,
-            videoBitRate: 'low',
             onRecordingError(error) {
               reject(error);
             },
@@ -272,6 +271,7 @@ const CameraView = (
             audio={hasMicrophonePermission}
             outputOrientation="preview"
             exposure={0}
+            videoBitRate="low"
             photoQualityBalance={
               Platform.OS === 'android' ? 'speed' : 'balanced'
             }

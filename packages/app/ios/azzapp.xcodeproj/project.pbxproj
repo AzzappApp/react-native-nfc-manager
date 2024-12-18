@@ -76,7 +76,7 @@
 		FD1404462A03FDA800CCA6B9 /* MediaHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1404442A03FDA700CCA6B9 /* MediaHelpers.swift */; };
 		FD292EAE2A94BDC300D880E8 /* Azzapp.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BCEB3A032A74063A0010EEEE /* Azzapp.ttf */; };
 		FD292EAF2A94BDC700D880E8 /* Azzapp.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BCEB3A032A74063A0010EEEE /* Azzapp.ttf */; };
-		FD39DA9A2A52AB5F00C49A82 /* AZPCustomReavealTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = FD5BFC3628C8EF8D0010B34E /* AZPCustomReavealTransition.m */; };
+		FD39DA9A2A52AB5F00C49A82 /* AZPCustomReavealTransition.mm in Sources */ = {isa = PBXBuildFile; fileRef = FD5BFC3628C8EF8D0010B34E /* AZPCustomReavealTransition.mm */; };
 		FD39DAA32A52AB5F00C49A82 /* AZPMediaHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = FD8F774528EC310F00E27551 /* AZPMediaHelpers.m */; };
 		FD39DAA52A52AB5F00C49A82 /* MediaHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1404442A03FDA700CCA6B9 /* MediaHelpers.swift */; };
 		FD39DAAB2A52AB5F00C49A82 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
@@ -88,7 +88,7 @@
 		FD39DABE2A52AB5F00C49A82 /* PlusJakartaSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96678DE029D5CFF80073D683 /* PlusJakartaSans-SemiBold.ttf */; };
 		FD39DABF2A52AB5F00C49A82 /* PlusJakartaSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96678DDE29D5CFF80073D683 /* PlusJakartaSans-Regular.ttf */; };
 		FD39DAC02A52AB5F00C49A82 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
-		FD39DAD12A52AC2100C49A82 /* AZPCustomReavealTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = FD5BFC3628C8EF8D0010B34E /* AZPCustomReavealTransition.m */; };
+		FD39DAD12A52AC2100C49A82 /* AZPCustomReavealTransition.mm in Sources */ = {isa = PBXBuildFile; fileRef = FD5BFC3628C8EF8D0010B34E /* AZPCustomReavealTransition.mm */; };
 		FD39DADA2A52AC2100C49A82 /* AZPMediaHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = FD8F774528EC310F00E27551 /* AZPMediaHelpers.m */; };
 		FD39DADC2A52AC2100C49A82 /* MediaHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1404442A03FDA700CCA6B9 /* MediaHelpers.swift */; };
 		FD39DAE22A52AC2100C49A82 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
@@ -104,21 +104,12 @@
 		FD4BD5472AA626F100DDDB54 /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FD4BD5452AA626F100DDDB54 /* BootSplash.storyboard */; };
 		FD4BD5482AA626F100DDDB54 /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FD4BD5452AA626F100DDDB54 /* BootSplash.storyboard */; };
 		FD4BD5492AA626F100DDDB54 /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FD4BD5452AA626F100DDDB54 /* BootSplash.storyboard */; };
-		FD52718E2BF112BB00140A12 /* CIImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD52718D2BF112BB00140A12 /* CIImageLoader.swift */; };
-		FD5BFC3728C8EF8D0010B34E /* AZPCustomReavealTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = FD5BFC3628C8EF8D0010B34E /* AZPCustomReavealTransition.m */; };
-		FD5BFC3828C8EF8D0010B34E /* AZPCustomReavealTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = FD5BFC3628C8EF8D0010B34E /* AZPCustomReavealTransition.m */; };
+		FD5BFC3728C8EF8D0010B34E /* AZPCustomReavealTransition.mm in Sources */ = {isa = PBXBuildFile; fileRef = FD5BFC3628C8EF8D0010B34E /* AZPCustomReavealTransition.mm */; };
+		FD5BFC3828C8EF8D0010B34E /* AZPCustomReavealTransition.mm in Sources */ = {isa = PBXBuildFile; fileRef = FD5BFC3628C8EF8D0010B34E /* AZPCustomReavealTransition.mm */; };
 		FD79CACC2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD79CACB2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift */; };
 		FD79CACD2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD79CACB2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift */; };
 		FD79CACE2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD79CACB2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift */; };
 		FD79CACF2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD79CACB2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift */; };
-		FD7AA9DF2BF4DA1500BEC0E9 /* AZPJSIModulesInstaller.mm in Sources */ = {isa = PBXBuildFile; fileRef = FD7AA9DE2BF4DA1500BEC0E9 /* AZPJSIModulesInstaller.mm */; };
-		FD7AA9E32BF4DAE800BEC0E9 /* BufferLoader.mm in Sources */ = {isa = PBXBuildFile; fileRef = FD7AA9E22BF4DAE800BEC0E9 /* BufferLoader.mm */; };
-		FD7BAE642C008CE600427FE0 /* CIImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD52718D2BF112BB00140A12 /* CIImageLoader.swift */; };
-		FD7BAE652C008D1C00427FE0 /* AZPJSIModulesInstaller.mm in Sources */ = {isa = PBXBuildFile; fileRef = FD7AA9DE2BF4DA1500BEC0E9 /* AZPJSIModulesInstaller.mm */; };
-		FD7BAE662C008D2300427FE0 /* BufferLoader.mm in Sources */ = {isa = PBXBuildFile; fileRef = FD7AA9E22BF4DAE800BEC0E9 /* BufferLoader.mm */; };
-		FD7BAE672C008D3000427FE0 /* CIImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD52718D2BF112BB00140A12 /* CIImageLoader.swift */; };
-		FD7BAE682C008D3800427FE0 /* BufferLoader.mm in Sources */ = {isa = PBXBuildFile; fileRef = FD7AA9E22BF4DAE800BEC0E9 /* BufferLoader.mm */; };
-		FD7BAE692C008D4900427FE0 /* AZPJSIModulesInstaller.mm in Sources */ = {isa = PBXBuildFile; fileRef = FD7AA9DE2BF4DA1500BEC0E9 /* AZPJSIModulesInstaller.mm */; };
 		FD8F774628EC310F00E27551 /* AZPMediaHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = FD8F774528EC310F00E27551 /* AZPMediaHelpers.m */; };
 		FD8F774728EC310F00E27551 /* AZPMediaHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = FD8F774528EC310F00E27551 /* AZPMediaHelpers.m */; };
 /* End PBXBuildFile section */
@@ -301,14 +292,9 @@
 		FD39DAC92A52AB5F00C49A82 /* azzapp-dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "azzapp-dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FD39DB002A52AC2100C49A82 /* azzapp-staging.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "azzapp-staging.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FD4BD5452AA626F100DDDB54 /* BootSplash.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = BootSplash.storyboard; path = azzapp/BootSplash.storyboard; sourceTree = "<group>"; };
-		FD52718D2BF112BB00140A12 /* CIImageLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CIImageLoader.swift; sourceTree = "<group>"; };
 		FD5BFC3528C8EF8D0010B34E /* AZPCustomReavealTransition.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AZPCustomReavealTransition.h; path = azzapp/AZPCustomReavealTransition.h; sourceTree = "<group>"; };
-		FD5BFC3628C8EF8D0010B34E /* AZPCustomReavealTransition.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AZPCustomReavealTransition.m; path = azzapp/AZPCustomReavealTransition.m; sourceTree = "<group>"; };
+		FD5BFC3628C8EF8D0010B34E /* AZPCustomReavealTransition.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = AZPCustomReavealTransition.mm; path = azzapp/AZPCustomReavealTransition.mm; sourceTree = "<group>"; };
 		FD79CACB2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGImagePropertyOrientation+init_uiOrientation.swift"; sourceTree = "<group>"; };
-		FD7AA9DD2BF4DA1500BEC0E9 /* AZPJSIModulesInstaller.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AZPJSIModulesInstaller.h; sourceTree = "<group>"; };
-		FD7AA9DE2BF4DA1500BEC0E9 /* AZPJSIModulesInstaller.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AZPJSIModulesInstaller.mm; sourceTree = "<group>"; };
-		FD7AA9E12BF4DAE800BEC0E9 /* BufferLoader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BufferLoader.h; sourceTree = "<group>"; };
-		FD7AA9E22BF4DAE800BEC0E9 /* BufferLoader.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = BufferLoader.mm; sourceTree = "<group>"; };
 		FD8F774528EC310F00E27551 /* AZPMediaHelpers.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AZPMediaHelpers.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -403,7 +389,6 @@
 				9613FE732AFE7F410053AFD4 /* azzapp-devRelease.entitlements */,
 				FDA79D3A29DD9A6600E16407 /* Extensions */,
 				FD14042F2A0298A900CCA6B9 /* Medias */,
-				FD7AA9E02BF4DA8E00BEC0E9 /* jsi */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -415,7 +400,7 @@
 				FD1EA60D28B8D7F300916DBC /* azzapp-Bridging-Header.h */,
 				FD1EA60E28B8D7F300916DBC /* azzappTests-Bridging-Header.h */,
 				FD5BFC3528C8EF8D0010B34E /* AZPCustomReavealTransition.h */,
-				FD5BFC3628C8EF8D0010B34E /* AZPCustomReavealTransition.m */,
+				FD5BFC3628C8EF8D0010B34E /* AZPCustomReavealTransition.mm */,
 				96DD310E2B6CEFB100FB36A2 /* IAPDevStorekit.storekit */,
 				96DD310F2B6CF1FE00FB36A2 /* StoreKitTestCertificate.cer */,
 				FB58ADB2576D4F2277CBDD50 /* PrivacyInfo.xcprivacy */,
@@ -622,19 +607,6 @@
 			);
 			name = Medias;
 			path = azzapp/Medias;
-			sourceTree = "<group>";
-		};
-		FD7AA9E02BF4DA8E00BEC0E9 /* jsi */ = {
-			isa = PBXGroup;
-			children = (
-				FD7AA9DD2BF4DA1500BEC0E9 /* AZPJSIModulesInstaller.h */,
-				FD7AA9DE2BF4DA1500BEC0E9 /* AZPJSIModulesInstaller.mm */,
-				FD52718D2BF112BB00140A12 /* CIImageLoader.swift */,
-				FD7AA9E12BF4DAE800BEC0E9 /* BufferLoader.h */,
-				FD7AA9E22BF4DAE800BEC0E9 /* BufferLoader.mm */,
-			);
-			name = jsi;
-			path = azzapp/jsi;
 			sourceTree = "<group>";
 		};
 		FDA79D3A29DD9A6600E16407 /* Extensions */ = {
@@ -1026,7 +998,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-azzapp/expo-configure-project.sh\"\n";
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target' 'Support' 'Files/Pods-common-azzapp/expo-configure-project.sh\"\n";
 		};
 		355241B54A76788E06605077 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1096,7 +1068,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-azzapp/expo-configure-project.sh\"\n";
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target' 'Support' 'Files/Pods-common-azzapp-staging/expo-configure-project.sh\"\n";
 		};
 		49DB3617F8C176E2E1FAAAC2 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1232,7 +1204,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-azzapp/expo-configure-project.sh\"\n";
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target' 'Support' 'Files/Pods-common-azzapp-dev/expo-configure-project.sh\"\n";
 		};
 		B7B8B42F9921CD1F7D0C7538 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1304,7 +1276,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-azzapp/expo-configure-project.sh\"\n";
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target' 'Support' 'Files/Pods-common-azzappTests/expo-configure-project.sh\"\n";
 		};
 		FD10A7F022414F080027D42C /* Start Packager */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1432,7 +1404,7 @@
 			files = (
 				FD8F774728EC310F00E27551 /* AZPMediaHelpers.m in Sources */,
 				FD79CACF2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift in Sources */,
-				FD5BFC3828C8EF8D0010B34E /* AZPCustomReavealTransition.m in Sources */,
+				FD5BFC3828C8EF8D0010B34E /* AZPCustomReavealTransition.mm in Sources */,
 				FD1404462A03FDA800CCA6B9 /* MediaHelpers.swift in Sources */,
 				00E356F31AD99517003FC87E /* azzappTests.m in Sources */,
 				485B1058089E3E6317DED749 /* ExpoModulesProvider.swift in Sources */,
@@ -1444,15 +1416,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FD52718E2BF112BB00140A12 /* CIImageLoader.swift in Sources */,
-				FD7AA9DF2BF4DA1500BEC0E9 /* AZPJSIModulesInstaller.mm in Sources */,
-				FD5BFC3728C8EF8D0010B34E /* AZPCustomReavealTransition.m in Sources */,
+				FD5BFC3728C8EF8D0010B34E /* AZPCustomReavealTransition.mm in Sources */,
 				FD8F774628EC310F00E27551 /* AZPMediaHelpers.m in Sources */,
 				FD1404452A03FDA800CCA6B9 /* MediaHelpers.swift in Sources */,
 				FD79CACC2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
-				FD7AA9E32BF4DAE800BEC0E9 /* BufferLoader.mm in Sources */,
 				92A812FC3DCC67A8944B9ED9 /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1488,10 +1457,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FD7BAE662C008D2300427FE0 /* BufferLoader.mm in Sources */,
-				FD7BAE652C008D1C00427FE0 /* AZPJSIModulesInstaller.mm in Sources */,
-				FD7BAE642C008CE600427FE0 /* CIImageLoader.swift in Sources */,
-				FD39DA9A2A52AB5F00C49A82 /* AZPCustomReavealTransition.m in Sources */,
+				FD39DA9A2A52AB5F00C49A82 /* AZPCustomReavealTransition.mm in Sources */,
 				FD39DAA32A52AB5F00C49A82 /* AZPMediaHelpers.m in Sources */,
 				FD39DAA52A52AB5F00C49A82 /* MediaHelpers.swift in Sources */,
 				FD79CACD2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift in Sources */,
@@ -1505,10 +1471,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FD7BAE692C008D4900427FE0 /* AZPJSIModulesInstaller.mm in Sources */,
-				FD7BAE682C008D3800427FE0 /* BufferLoader.mm in Sources */,
-				FD7BAE672C008D3000427FE0 /* CIImageLoader.swift in Sources */,
-				FD39DAD12A52AC2100C49A82 /* AZPCustomReavealTransition.m in Sources */,
+				FD39DAD12A52AC2100C49A82 /* AZPCustomReavealTransition.mm in Sources */,
 				FD39DADA2A52AC2100C49A82 /* AZPMediaHelpers.m in Sources */,
 				FD39DADC2A52AC2100C49A82 /* MediaHelpers.swift in Sources */,
 				FD79CACE2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift in Sources */,

@@ -1,0 +1,24 @@
+diff --git a/build/Contacts.js b/build/Contacts.js
+index 70b7a29936ff88c6230dc3212f6fa579ce8803f3..840eceae2cec9f053a598af32c2f0705fdfe8632 100644
+--- a/build/Contacts.js
++++ b/build/Contacts.js
+@@ -25,6 +25,19 @@ export async function shareContactAsync(contactId, message, shareOptions = {}) {
+     }
+     return await ExpoContacts.shareContactAsync(contactId, message);
+ }
++/**
++  * Displays contact details from contacts book
++  * @example
++  * ```js
++  * await Contacts.displayContactAsync(contactId);
++  * ```
++  */
++export async function displayContactAsync(contactId) {
++    if (!ExpoContacts.displayContactAsync) {
++      throw new UnavailabilityError('Contacts', 'displayContactAsync');
++    }
++    return await ExpoContacts.displayContactAsync(contactId);
++}
+ /**
+  * Return a list of contacts that fit a given criteria. You can get all of the contacts by passing no criteria.
+  * @param contactQuery Object used to query contacts.

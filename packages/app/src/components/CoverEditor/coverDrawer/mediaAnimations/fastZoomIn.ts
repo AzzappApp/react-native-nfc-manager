@@ -4,18 +4,16 @@ import type { MediaAnimation } from './mediaAnimations';
 
 const fastZoomIn: MediaAnimation = progress => {
   'worklet';
-  return {
-    imageTransform: imageFrame => {
-      'worklet';
-      const { image, matrix, width, height } = imageFrame;
-      progress = Easing.out(Easing.cubic)(progress);
-      const scale = interpolate(progress, [0, 1], [1, 1.4]);
+  return imageInfo => {
+    'worklet';
+    const { matrix, width, height } = imageInfo;
+    progress = Easing.out(Easing.cubic)(progress);
+    const scale = interpolate(progress, [0, 1], [1, 1.4]);
 
-      matrix.postTranslate(-width / 2, -height / 2);
-      matrix.postScale(scale, scale);
-      matrix.postTranslate(width / 2, height / 2);
-      return { image, matrix, width, height };
-    },
+    matrix.postTranslate(-width / 2, -height / 2);
+    matrix.postScale(scale, scale);
+    matrix.postTranslate(width / 2, height / 2);
+    return { matrix, width, height };
   };
 };
 

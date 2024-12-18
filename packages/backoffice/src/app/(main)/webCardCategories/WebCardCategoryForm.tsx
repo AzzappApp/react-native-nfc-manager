@@ -19,7 +19,7 @@ import {
   Breadcrumbs,
   Link,
 } from '@mui/material';
-import { omit } from 'lodash';
+import omit from 'lodash/omit';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';

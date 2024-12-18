@@ -2,9 +2,12 @@ import { forwardRef, useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { ScrollView, Share, StyleSheet, View } from 'react-native';
 import ColorTriptychRenderer from '#components/ColorTriptychRenderer';
+import useBoolean from '#hooks/useBoolean';
 import useToggle from '#hooks/useToggle';
-import { useCoverEditorContext } from '../CoverEditorContext';
-import { extractLottieInfoMemoized } from '../coverEditorHelpers';
+import {
+  useCoverEditorContext,
+  useCoverEditorEditContext,
+} from '../CoverEditorContext';
 import CoverEditorLinksToolbox from './CoverEditorLinkToolbox';
 import CoverEditorMediaEditToolbox from './CoverEditorMediaEditToolbox';
 import CoverEditorMediaToolbox from './CoverEditorMediaToolbox';
@@ -24,11 +27,16 @@ const CoverEditorToolbox = (
   ref: ForwardedRef<CoverEditorLinksToolActions>,
 ) => {
   const [textModalVisible, toggleTextModalVisible] = useToggle();
-  const [colorPickerVisible, toggleColorPickerVisible] = useToggle();
-  const [showOverlayImagePicker, toggleOverlayImagePicker] = useToggle(false);
-  const { coverEditorState, dispatch } = useCoverEditorContext();
+  const [colorPickerVisible, showColorPicker, closeColorPicker] = useBoolean();
+  const [
+    showOverlayImagePicker,
+    openOverlayImagePicker,
+    closeOverlayImagePicker,
+  ] = useBoolean(false);
+  const coverEditorState = useCoverEditorContext();
+  const dispatch = useCoverEditorEditContext();
 
-  const { editionMode, cardColors } = coverEditorState;
+  const { editionMode, cardColors, medias } = coverEditorState;
 
   const setCurrentEditionMode = useCallback(
     (mode: CoverEditionMode) => {
@@ -58,9 +66,9 @@ const CoverEditorToolbox = (
     };
   }
 
-  const lottieInfo = extractLottieInfoMemoized(coverEditorState.lottie);
-
   const intl = useIntl();
+
+  const canEditMedia = medias.findIndex(m => m === null || m.editable) !== -1;
 
   return (
     <View style={{ height: TOOLBOX_SECTION_HEIGHT, overflow: 'hidden' }}>
@@ -84,9 +92,9 @@ const CoverEditorToolbox = (
               description: 'Cover Edition - Toolbox overlay',
             })}
             icon="overlay"
-            onPress={toggleOverlayImagePicker}
+            onPress={openOverlayImagePicker}
           />
-          {(!lottieInfo || lottieInfo.assetsInfos.length > 0) && (
+          {canEditMedia && (
             <ToolBoxSection
               label={intl.formatMessage({
                 defaultMessage: 'Media',
@@ -114,7 +122,7 @@ const CoverEditorToolbox = (
                 <ColorTriptychRenderer {...cardColors} width={16} height={16} />
               </View>
             }
-            onPress={toggleColorPickerVisible}
+            onPress={showColorPicker}
           />
           {process.env.DEPLOYMENT_ENVIRONMENT !== 'production' && (
             <ToolBoxSection
@@ -141,9 +149,11 @@ const CoverEditorToolbox = (
         <CoverEditorLinksToolbox ref={ref} />
       </ToolBarContainer>
 
-      <ToolBarContainer destroyOnHide visible={editionMode === 'media'}>
-        <CoverEditorMediaToolbox />
-      </ToolBarContainer>
+      {canEditMedia ? (
+        <ToolBarContainer destroyOnHide visible={editionMode === 'media'}>
+          <CoverEditorMediaToolbox />
+        </ToolBarContainer>
+      ) : undefined}
 
       <ToolBarContainer destroyOnHide visible={editionMode === 'mediaEdit'}>
         <CoverEditorMediaEditToolbox />
@@ -155,10 +165,11 @@ const CoverEditorToolbox = (
       />
       <CoverEditorColorsManager
         visible={colorPickerVisible}
-        onRequestClose={toggleColorPickerVisible}
+        onRequestClose={closeColorPicker}
+        onCloseCanceled={showColorPicker}
       />
       <CoverEditorAddOverlay
-        onClose={toggleOverlayImagePicker}
+        onClose={closeOverlayImagePicker}
         open={showOverlayImagePicker}
       />
     </View>

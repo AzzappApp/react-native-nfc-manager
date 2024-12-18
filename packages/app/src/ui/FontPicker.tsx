@@ -2,9 +2,11 @@ import { memo, useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
 import { APPLICATIONS_FONTS } from '@azzapp/shared/fontHelpers';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Text from '#ui/Text';
 import BottomSheetModal from './BottomSheetModal';
 import Button from './Button';
+import Header from './Header';
 import SelectList from './SelectList';
 
 const FontPicker = ({
@@ -17,34 +19,39 @@ const FontPicker = ({
 }: {
   title: string;
   value: string;
-  onChange: (value: string) => void;
-  visible: boolean;
   height: number;
+  visible: boolean;
+  onChange: (value: string) => void;
   onRequestClose: () => void;
 }) => {
   const renderItem = useCallback(({ item }: FontItemProps) => {
     return <MemoFontItem item={item} />;
   }, []);
   const intl = useIntl();
+  const { bottom } = useScreenInsets();
+
   return (
     <BottomSheetModal
-      visible={visible}
-      onRequestClose={onRequestClose}
-      nestedScroll
       height={height}
-      headerTitle={title}
-      headerRightButton={
-        <Button
-          label={intl.formatMessage({
-            defaultMessage: 'Done',
-            description: 'FontPicker component Done button label',
-          })}
-          onPress={onRequestClose}
-          variant="primary"
-        />
-      }
-      contentContainerStyle={{ paddingBottom: 0 }}
+      visible={visible}
+      onDismiss={onRequestClose}
+      enableContentPanningGesture={false}
     >
+      {title && (
+        <Header
+          middleElement={title}
+          rightElement={
+            <Button
+              label={intl.formatMessage({
+                defaultMessage: 'Done',
+                description: 'FontPicker component Done button label',
+              })}
+              onPress={onRequestClose}
+              variant="primary"
+            />
+          }
+        />
+      )}
       <SelectList
         data={APPLICATIONS_FONTS}
         selectedItemKey={value}
@@ -52,7 +59,7 @@ const FontPicker = ({
         renderItem={renderItem}
         keyExtractor={keyExtractor}
         getItemLayout={getItemLayout}
-        contentInset={{ bottom: 15 }}
+        contentContainerStyle={{ paddingBottom: bottom }}
       />
     </BottomSheetModal>
   );

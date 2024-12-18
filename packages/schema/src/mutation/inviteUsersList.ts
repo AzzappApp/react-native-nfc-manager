@@ -16,7 +16,7 @@ import { guessLocale } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
 import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
-import { notifyUsers } from '#externals';
+import { notifyUsers, sendPushNotification } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
 import {
   profileLoader,
@@ -25,7 +25,7 @@ import {
   webCardOwnerLoader,
 } from '#loaders';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
-import { checkSubscription } from '#helpers/subscriptionHelpers';
+import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import type {
   InviteUserEmailInput,
   InviteUserRejected,
@@ -181,6 +181,16 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
     }
     for (const { id, ...profile } of profilesToUpdate) {
       await updateProfile(id, profile);
+      const existingUser = users.find(user => user.id === profile.userId);
+      if (existingUser) {
+        await sendPushNotification(existingUser.id, {
+          type: 'multiuser_invitation',
+          mediaId: webCard.coverMediaId,
+          deepLink: 'multiuser_invitation',
+          localeParams: { userName: webCard.userName },
+          locale: guessLocale(existingUser?.locale),
+        });
+      }
     }
 
     const createdProfiles = (
@@ -196,15 +206,12 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
 
-    const canBeAdded = await checkSubscription(
+    await validateCurrentSubscription(
       owner.id,
       webCard.id,
       createdProfiles.length,
-    );
-
-    if (!canBeAdded) {
-      throw new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED);
-    }
+      true,
+    ); // seats are already added in the transaction, we just check that available seats are bigger or equal to 0
 
     return { users, createdProfiles };
   });

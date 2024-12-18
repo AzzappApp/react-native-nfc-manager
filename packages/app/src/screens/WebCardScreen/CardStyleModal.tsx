@@ -1,4 +1,4 @@
-import { pick } from 'lodash';
+import pick from 'lodash/pick';
 import { Suspense, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { View, useWindowDimensions } from 'react-native';
@@ -277,9 +277,7 @@ const CardStylePreview = ({
     graphql`
       fragment CardStyleModal_webCard on WebCard {
         id
-        ...CoverRenderer_webCard
-        ...WebCardBackgroundPreview_webCard
-        ...WebCardBackground_webCard
+        ...WebCardPreview_webCard
         cardModules {
           id
           kind

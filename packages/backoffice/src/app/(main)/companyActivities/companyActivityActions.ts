@@ -6,7 +6,7 @@ import {
   transaction,
   updateCompanyActivity,
 } from '@azzapp/data';
-import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import { companyActivitySchema } from './companyActivitySchema';
 
 export const saveCompanyActivity = async (data: {
@@ -43,7 +43,6 @@ export const saveCompanyActivity = async (data: {
           key: data.id,
           value: validation.data.label,
           locale: DEFAULT_LOCALE,
-          target: ENTITY_TARGET,
         });
 
         companyActivityId = data.id;
@@ -57,7 +56,6 @@ export const saveCompanyActivity = async (data: {
           key: id,
           value: validation.data.label,
           locale: DEFAULT_LOCALE,
-          target: ENTITY_TARGET,
         });
 
         companyActivityId = id;

@@ -1,4 +1,5 @@
-import { Dimensions, Image, StyleSheet } from 'react-native';
+import { Image } from 'expo-image';
+import { Dimensions, Platform, StyleSheet } from 'react-native';
 import Animated, { Easing, FadeOut } from 'react-native-reanimated';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import { ACTIVITY_INDICATOR_WIDTH } from '#ui/ActivityIndicator/ActivityIndicator';
@@ -9,8 +10,15 @@ const exiting = FadeOut.duration(500).easing(Easing.ease);
 
 const LoadingScreen = () => {
   return (
-    <Animated.View exiting={exiting} style={styles.container}>
-      <Image source={require('#assets/logo-full.png')} style={styles.logo} />
+    <Animated.View
+      exiting={Platform.OS !== 'ios' ? exiting : undefined}
+      style={styles.container}
+    >
+      <Image
+        source={require('#assets/logo-full.png')}
+        style={styles.logo}
+        contentFit="contain"
+      />
       <ActivityIndicator style={styles.indicator} />
     </Animated.View>
   );
@@ -31,9 +39,8 @@ const styles = StyleSheet.create({
   logo: {
     width: 180,
     height: 38,
-    zIndex: 1000,
+    zIndex: 1,
     overflow: 'visible',
-    resizeMode: 'contain',
   },
   indicator: {
     position: 'absolute',

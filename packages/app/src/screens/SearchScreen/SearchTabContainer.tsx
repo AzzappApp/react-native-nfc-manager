@@ -60,12 +60,31 @@ const SearchTabContainer = ({
       },
       {
         key: 'searchProfiles',
-        label: intl.formatMessage(
-          {
-            defaultMessage: 'Webcards{azzappA}',
-            description: 'Search screen tab label : webcard',
-          },
-          { azzappA: <Text variant="azzapp">a</Text> },
+        label: (
+          <Text
+            style={{
+              color: 'none',
+            }}
+          >
+            {intl.formatMessage(
+              {
+                defaultMessage: 'Webcards{azzappA}',
+                description: 'Search screen tab label : webcard',
+              },
+              {
+                azzappA: (
+                  <Text
+                    variant="azzapp"
+                    style={{
+                      color: 'none',
+                    }}
+                  >
+                    a
+                  </Text>
+                ),
+              },
+            )}
+          </Text>
         ),
         query: searchResultProfilesQuery,
       },
@@ -176,6 +195,20 @@ const SearchTabContainer = ({
       renderScene={renderScene}
       onIndexChange={onIndexTabChange}
       style={styles.tabViewstyle}
+      commonOptions={{
+        label: ({ route }) =>
+          typeof route.label === 'string' ? (
+            <Text
+              style={{
+                color: 'none',
+              }}
+            >
+              {route.label}
+            </Text>
+          ) : (
+            route.label
+          ),
+      }}
     />
   );
 };
@@ -201,7 +234,7 @@ const TabBarSearch = (
         gap: 10,
         paddingLeft: 10,
       }}
-      renderTabBarItem={({ route, labelStyle, renderLabel, onPress }) => {
+      renderTabBarItem={({ route, labelStyle, onPress, label }) => {
         return (
           <TabBarMenuItem
             selected={
@@ -212,7 +245,7 @@ const TabBarSearch = (
             labelStyle={labelStyle}
             style={styles.tabItemContainerStyle}
           >
-            {renderLabel?.({
+            {label?.({
               route,
               focused:
                 props.navigationState.routes[props.navigationState.index]
@@ -222,13 +255,6 @@ const TabBarSearch = (
           </TabBarMenuItem>
         );
       }}
-      renderLabel={({ route }) =>
-        typeof route.label === 'string' ? (
-          <Text>{route.label}</Text>
-        ) : (
-          route.label
-        )
-      }
     />
   );
 };

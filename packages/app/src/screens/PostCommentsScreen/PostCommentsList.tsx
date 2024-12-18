@@ -1,6 +1,12 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Keyboard, RefreshControl, StyleSheet, View } from 'react-native';
+import {
+  Keyboard,
+  Platform,
+  RefreshControl,
+  StyleSheet,
+  View,
+} from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Toast from 'react-native-toast-message';
@@ -15,7 +21,7 @@ import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
-import { colors } from '#theme';
+import { colors, textStyles } from '#theme';
 import AuthorCartouche from '#components/AuthorCartouche';
 import { useRouter } from '#components/NativeRouter';
 import { useProfileInfos } from '#hooks/authStateHooks';
@@ -114,14 +120,29 @@ const PostCommentsList = ({
   );
 
   const [comment, setComment] = useState<string>('');
+
+  // save the initial input height
+  // when we clear the input, we receive incohenrent onContentSizeChange calls
+  const defaultInputSize = useRef(0);
+
   const [inputHeight, setInputHeight] = useState<number>(68);
-  const onContentSizeChange = (
-    e: NativeSyntheticEvent<TextInputContentSizeChangeEventData>,
-  ) => {
-    setInputHeight(
-      Math.max(47, Math.min(e.nativeEvent.contentSize.height + 15, 92)),
-    );
-  };
+  const onContentSizeChange = useCallback(
+    (e: NativeSyntheticEvent<TextInputContentSizeChangeEventData>) => {
+      const expectedInputSize = Math.max(
+        47,
+        Math.min(e.nativeEvent.contentSize.height + 15, 92),
+      );
+      if (defaultInputSize.current === 0) {
+        defaultInputSize.current = expectedInputSize;
+      }
+      if (!comment) {
+        setInputHeight(defaultInputSize.current);
+      } else {
+        setInputHeight(expectedInputSize);
+      }
+    },
+    [comment],
+  );
 
   const [commit] = useMutation(graphql`
     mutation PostCommentsListMutation(
@@ -158,7 +179,7 @@ const PostCommentsList = ({
           {
             azzappA: <Text variant="azzapp">a</Text>,
           },
-        ) as string,
+        ) as unknown as string,
       });
 
       return;
@@ -202,7 +223,7 @@ const PostCommentsList = ({
                   {
                     azzappA: <Text variant="azzapp">a</Text>,
                   },
-                ) as string,
+                ) as unknown as string,
               });
             } else {
               console.error(error);
@@ -337,6 +358,12 @@ const PostCommentsList = ({
             onContentSizeChange={onContentSizeChange}
             maxLength={MAX_COMMENT_LENGHT}
             style={{ height: inputHeight }}
+            inputStyle={{
+              paddingTop:
+                Platform.OS === 'ios'
+                  ? inputHeight / 2 - textStyles.textField.fontSize + 1
+                  : undefined,
+            }}
             rightElement={
               <PressableOpacity
                 onPress={onSubmit}

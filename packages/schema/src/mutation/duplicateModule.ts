@@ -6,6 +6,7 @@ import {
   referencesMedias,
   transaction,
   updateCardModulesPosition,
+  getCardModulesByWebCard,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { invalidateWebCard } from '#externals';
@@ -37,13 +38,36 @@ const duplicateModule: MutationResolvers['duplicateModule'] = async (
   let createdModuleIds: string[] = [];
   try {
     await transaction(async () => {
-      createdModuleIds = await createCardModules(
-        modules.map((module, index) => ({
-          ...omit(module, 'id'),
-          position: modules[modules.length - 1].position + index + 1,
-        })),
-      );
+      const allModules = await getCardModulesByWebCard(webCardId);
 
+      // create holes in modules position list
+      // 1 find the last index of old modules
+      const lastModule = modules[modules.length - 1];
+
+      // 2 Append create Hole
+      const nextModulesIdx = allModules.findIndex(
+        module => module.id === lastModule.id,
+      );
+      const lastModulePosition = allModules[nextModulesIdx].position;
+
+      if (nextModulesIdx !== allModules.length) {
+        // do not put hole at the end of the list
+        const nextModules = allModules
+          .slice(nextModulesIdx + 1, allModules.length)
+          .map(m => m.id);
+        await updateCardModulesPosition(webCardId, nextModules, modules.length);
+      }
+
+      // 3 add the new modules in the Hole
+      const modulesToCreate = modules.map((m, index) => ({
+        ...omit(m, 'id'),
+        position: index + lastModulePosition + 1,
+      }));
+
+      // duplicate modules
+      createdModuleIds = await createCardModules(modulesToCreate);
+
+      // clean up media
       const moduleMedias = modules.flatMap(m => {
         const saveRules = MODULES_SAVE_RULES[m.kind];
         if (saveRules && 'getMedias' in saveRules) {
@@ -51,13 +75,9 @@ const duplicateModule: MutationResolvers['duplicateModule'] = async (
         }
         return [];
       });
-
-      await referencesMedias(moduleMedias, []);
-
-      await updateCardModulesPosition(
-        modules.map(module => module.id),
-        modules.length,
-      );
+      if (moduleMedias.length) {
+        await referencesMedias(moduleMedias, []);
+      }
     });
   } catch (e) {
     console.error(e);

@@ -7,12 +7,11 @@ import {
   getWebCardsOwnerUsers,
   getCardModulesByWebCards,
   activeUserSubscription,
-  getActiveUserSubscriptionForWebCard,
   getProfileByUserAndWebCard,
   isFollowing,
   getContactsByUser,
+  getUserSubscriptionForUserOrWebCard,
 } from '@azzapp/data';
-import { ENTITY_TARGET } from '@azzapp/i18n';
 import {
   createDataLoader,
   createSessionDataLoader,
@@ -225,7 +224,7 @@ export const labelLoader = createDataLoader<
       await Promise.all(
         Object.entries(labelsByLocale).map(async ([locale, keys]) => [
           locale,
-          await getLocalizationMessagesByKeys(keys, locale, ENTITY_TARGET),
+          await getLocalizationMessagesByKeys(keys, locale),
         ]),
       ),
     );
@@ -277,7 +276,7 @@ export const activeSubscriptionsForWebCardLoader = createSessionDataLoader(
     const webCardIds = keys.map(k => k.webCardId);
     const userIds = keys.map(k => k.userId);
 
-    const userSubscriptions = await getActiveUserSubscriptionForWebCard(
+    const userSubscriptions = await getUserSubscriptionForUserOrWebCard(
       userIds,
       webCardIds,
     );

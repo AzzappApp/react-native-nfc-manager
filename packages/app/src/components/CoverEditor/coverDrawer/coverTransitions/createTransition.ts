@@ -5,22 +5,37 @@ import type { SkRuntimeEffect } from '@shopify/react-native-skia';
 export const createTransition = (
   effect: SkRuntimeEffect | null,
   duration: number,
-  extraUniforms?: number[],
+  extraUniforms?: Record<string, number[] | number>,
 ): CoverTransition => {
-  return ({ canvas, inShader, outShader, time, width, height }) => {
+  return ({
+    canvas,
+    inImage: inShader,
+    outImage: outShader,
+    time,
+    width,
+    height,
+  }) => {
     'worklet';
     const progress = time / duration;
     const paint = Skia.Paint();
-    const shader = effect?.makeShaderWithChildren(
-      [progress, width, height, ...(extraUniforms ?? [])],
-      [outShader, inShader],
-      Skia.Matrix(),
-    );
-    if (!shader) {
-      console.error('no shader');
+    const builder = effect ? Skia.RuntimeShaderBuilder(effect) : null;
+    if (!builder) {
+      console.error('no builder');
       return;
     }
-    paint.setShader(shader);
+    Object.entries({
+      ...extraUniforms,
+      progress,
+      iResolution: [width, height],
+    }).forEach(([key, value]) => {
+      builder.setUniform(key, Array.isArray(value) ? value : [value]);
+    });
+    const filter = Skia.ImageFilter.MakeRuntimeShaderWithChildren(
+      builder,
+      ['imageOut', 'imageIn'],
+      [outShader, inShader],
+    );
+    paint.setImageFilter(filter);
     canvas.drawPaint(paint);
   };
 };

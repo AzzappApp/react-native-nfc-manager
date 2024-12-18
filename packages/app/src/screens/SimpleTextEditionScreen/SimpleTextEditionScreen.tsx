@@ -1,17 +1,21 @@
-import { useCallback, useMemo, useState } from 'react';
+import omit from 'lodash/omit';
+import { startTransition, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
-import { useSharedValue } from 'react-native-reanimated';
+import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import {
-  SIMPLE_TEXT_DEFAULT_VALUES,
-  SIMPLE_TITLE_DEFAULT_VALUES,
   SIMPLE_TEXT_MAX_LENGTH,
   SIMPLE_TITLE_MAX_LENGTH,
   SIMPLE_TEXT_STYLE_VALUES,
   SIMPLE_TITLE_STYLE_VALUES,
+  getTextDefaultValues as getTextDefaultColors,
+  getTitleDefaultValues as getTitleDefaultColors,
+  SIMPLE_TEXT_DEFAULT_VALUES,
+  SIMPLE_TITLE_DEFAULT_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
 import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
+import AnimatedDataOverride from '#components/AnimatedDataOverride';
 import { useRouter } from '#components/NativeRouter';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
@@ -118,6 +122,7 @@ const SimpleTextEditionScreen = ({
         webCard {
           id
           cardIsPublished
+          coverBackgroundColor
           isPremium
           cardStyle {
             borderColor
@@ -170,8 +175,11 @@ const SimpleTextEditionScreen = ({
       text: data?.text ?? null,
       textAlign: data?.textAlign ?? null,
       verticalSpacing: data?.verticalSpacing ?? null,
+      ...(moduleKind === 'simpleText'
+        ? getTextDefaultColors(profile.webCard?.coverBackgroundColor, data)
+        : getTitleDefaultColors(profile.webCard?.coverBackgroundColor, data)),
     };
-  }, [moduleData]);
+  }, [moduleData, profile.webCard?.coverBackgroundColor, moduleKind]);
 
   const { data, value, fieldUpdateHandler, dirty } = useModuleDataEditor({
     initialValue,
@@ -197,27 +205,14 @@ const SimpleTextEditionScreen = ({
 
   const previewData = useMemo(
     () => ({
-      text,
-      textAlign,
-      fontColor,
-      fontFamily,
-      backgroundStyle,
+      ...omit(data, 'backgroundId'),
       kind: moduleKind,
       background:
         profile.moduleBackgrounds.find(
           background => background.id === backgroundId,
         ) ?? null,
     }),
-    [
-      backgroundId,
-      backgroundStyle,
-      fontColor,
-      fontFamily,
-      moduleKind,
-      profile.moduleBackgrounds,
-      text,
-      textAlign,
-    ],
+    [backgroundId, data, moduleKind, profile.moduleBackgrounds],
   );
   // #endregion
 
@@ -290,6 +285,13 @@ const SimpleTextEditionScreen = ({
 
   const onBackgroundStyleChange = fieldUpdateHandler('backgroundStyle');
 
+  const animatedData = useDerivedValue(() => ({
+    fontSize: fontSize.value,
+    verticalSpacing: verticalSpacing.value,
+    marginHorizontal: marginHorizontal.value,
+    marginVertical: marginVertical.value,
+  }));
+
   const onSave = useCallback(() => {
     if (!canSave || !profile.webCard) {
       return;
@@ -308,7 +310,6 @@ const SimpleTextEditionScreen = ({
       router.push({ route: 'USER_PAY_WALL' });
       return;
     }
-
     commit({
       variables: {
         webCardId: profile.webCard?.id,
@@ -338,10 +339,10 @@ const SimpleTextEditionScreen = ({
     cardModulesCount,
     commit,
     value,
-    fontSize.value,
-    verticalSpacing.value,
-    marginHorizontal.value,
-    marginVertical.value,
+    fontSize,
+    verticalSpacing,
+    marginHorizontal,
+    marginVertical,
     moduleData?.id,
     router,
     handleProfileActionError,
@@ -364,11 +365,13 @@ const SimpleTextEditionScreen = ({
 
   const onCurrentTabChange = useCallback(
     (currentTab: string) => {
-      if (currentTab === 'edit') {
-        setShowContentModal(true);
-      } else {
-        setCurrentTab(currentTab);
-      }
+      startTransition(() => {
+        if (currentTab === 'edit') {
+          setShowContentModal(true);
+        } else {
+          setCurrentTab(currentTab);
+        }
+      });
     },
     [setCurrentTab],
   );
@@ -426,19 +429,18 @@ const SimpleTextEditionScreen = ({
           />
         }
       />
-      <SimpleTextPreview
-        style={{ height: topPanelHeight - 20, marginVertical: 10 }}
-        data={previewData}
-        animatedData={{
-          fontSize,
-          verticalSpacing,
-          marginHorizontal,
-          marginVertical,
-        }}
-        onPreviewPress={onPreviewPress}
-        colorPalette={profile?.webCard?.cardColors}
-        cardStyle={profile?.webCard?.cardStyle}
-      />
+      <AnimatedDataOverride data={previewData} animatedData={animatedData}>
+        {data => (
+          <SimpleTextPreview
+            style={{ height: topPanelHeight - 20, marginVertical: 10 }}
+            data={data}
+            onPreviewPress={onPreviewPress}
+            colorPalette={profile?.webCard?.cardColors}
+            cardStyle={profile?.webCard?.cardStyle}
+          />
+        )}
+      </AnimatedDataOverride>
+
       <TabView
         style={{ height: bottomPanelHeight }}
         currentTab={currentTab}
@@ -458,10 +460,7 @@ const SimpleTextEditionScreen = ({
                 onFontFamilyChange={onFontFamilyChange}
                 onTextAlignmentChange={onTextAlignChange}
                 bottomSheetHeight={bottomPanelHeight}
-                style={{
-                  flex: 1,
-                  marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                }}
+                style={styles.tabStyle}
                 onTouched={onTouched}
               />
             ),
@@ -473,10 +472,7 @@ const SimpleTextEditionScreen = ({
                 moduleKind={moduleKind}
                 marginHorizontal={marginHorizontal}
                 marginVertical={marginVertical}
-                style={{
-                  flex: 1,
-                  marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                }}
+                style={styles.tabStyle}
                 onTouched={onTouched}
               />
             ),
@@ -491,10 +487,7 @@ const SimpleTextEditionScreen = ({
                 onBackgroundChange={onBackgroundChange}
                 onBackgroundStyleChange={onBackgroundStyleChange}
                 bottomSheetHeight={bottomPanelHeight}
-                style={{
-                  flex: 1,
-                  marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                }}
+                style={styles.tabStyle}
               />
             ),
           },
@@ -546,5 +539,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 10,
     right: 10,
+  },
+  tabStyle: {
+    flex: 1,
+    marginBottom: BOTTOM_MENU_HEIGHT,
   },
 });

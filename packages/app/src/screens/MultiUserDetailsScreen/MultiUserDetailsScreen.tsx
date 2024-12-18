@@ -1,10 +1,16 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { fromGlobalId } from 'graphql-relay';
 import { parsePhoneNumber } from 'libphonenumber-js';
-import { useCallback, useEffect, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, type ReactNode } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Alert, StyleSheet, View, useColorScheme } from 'react-native';
+import {
+  Alert,
+  StyleSheet,
+  View,
+  useColorScheme,
+  useWindowDimensions,
+} from 'react-native';
 import * as mime from 'react-native-mime-types';
 import Toast from 'react-native-toast-message';
 import {
@@ -17,6 +23,9 @@ import ERRORS from '@azzapp/shared/errors';
 import { colors } from '#theme';
 import { CancelHeaderButton } from '#components/commonsButtons';
 import { useRouter, type ScreenOptions } from '#components/NativeRouter';
+import ProfileStatisticsChart, {
+  normalizeArray,
+} from '#components/ProfileStatisticsChart';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getFileName } from '#helpers/fileHelpers';
 import { keyExtractor } from '#helpers/idHelpers';
@@ -26,11 +35,10 @@ import relayScreen from '#helpers/relayScreen';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';
 import ContactCardEditForm from '#screens/ContactCardEditScreen/ContactCardEditForm';
-import HomeStatistics from '#screens/HomeScreen/HomeStatistics';
-import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
+import LoadingView from '#ui/LoadingView';
 import PressableNative from '#ui/PressableNative';
 import SafeAreaView from '#ui/SafeAreaView';
 import Select from '#ui/Select';
@@ -164,6 +172,9 @@ const MultiUserDetailsScreen = ({
               phoneNumber
             }
             profileRole
+            statsSummary {
+              contactCardScans
+            }
           }
         }
       }
@@ -414,15 +425,40 @@ const MultiUserDetailsScreen = ({
   }, [intl, onRemoveUser]);
 
   const colorScheme = useColorScheme();
+  const { width: windowWidth } = useWindowDimensions();
+
+  const chartData = useMemo(() => {
+    if (!profile?.statsSummary) {
+      return [];
+    }
+    const result = Array.from({ length: 30 }, (_, i) => {
+      const date = new Date();
+      date.setUTCDate(date.getUTCDate() - 29 + i); // Adjust the date to get the last 30 days
+      const utcDate = new Date(
+        Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()),
+      );
+
+      return {
+        day: utcDate.toISOString(),
+        data: 0,
+      };
+    });
+    profile.statsSummary?.forEach(stats => {
+      if (stats) {
+        const index = result.findIndex(item => item.day === stats.day);
+        if (index !== -1) {
+          result[index].data = stats.contactCardScans ?? 0;
+        }
+      }
+    });
+    return normalizeArray(result.map(item => item.data));
+  }, [profile?.statsSummary]);
 
   if (!profileInfos?.profileId || profile == null) return null;
 
   return (
     <Container style={{ flex: 1 }}>
-      <SafeAreaView
-        style={{ flex: 1 }}
-        edges={{ bottom: 'off', top: 'additive' }}
-      >
+      <SafeAreaView style={{ flex: 1 }}>
         <Header
           leftElement={
             <Button
@@ -471,7 +507,7 @@ const MultiUserDetailsScreen = ({
             )
           }
         >
-          <View style={{ paddingHorizontal: 10 }}>
+          <View style={styles.contentPaddingHorizontal}>
             <Controller
               control={control}
               name="selectedContact"
@@ -527,10 +563,6 @@ const MultiUserDetailsScreen = ({
                     keyExtractor={keyExtractor}
                     onItemSelected={item => onChange(item.id)}
                     itemContainerStyle={styles.selectItemContainerStyle}
-                    bottomSheetHeight={
-                      BOTTOM_SHEET_HEIGHT_BASE +
-                      roles.length * BOTTOM_SHEET_HEIGHT_ITEM
-                    }
                     bottomSheetTitle={
                       intl.formatMessage({
                         defaultMessage: 'Select a role',
@@ -538,6 +570,7 @@ const MultiUserDetailsScreen = ({
                           'MultiUserDetailForm - Role BottomSheet - Title',
                       }) as string
                     }
+                    useFlatList={false}
                   />
                 </View>
               )}
@@ -592,13 +625,30 @@ const MultiUserDetailsScreen = ({
               </Text>
             )}
             <View style={styles.stats}>
-              <HomeStatistics
-                user={[profile]}
-                height={250}
-                variant={colorScheme === 'dark' ? 'dark' : 'light'}
-                initialStatsIndex={1}
-                mode="compact"
+              <ProfileStatisticsChart
+                width={
+                  windowWidth -
+                  styles.contentPaddingHorizontal.paddingHorizontal * 2 -
+                  styles.stats.paddingHorizontal * 2
+                }
+                height={170}
+                data={chartData}
+                variant={colorScheme ?? 'dark'}
               />
+              <View style={styles.statsLabelContainer}>
+                <Text variant="xlarge" style={styles.statsLabel}>
+                  {profile.nbContactCardScans}
+                </Text>
+                <Text variant="smallbold" style={styles.statsLabel}>
+                  <FormattedMessage
+                    defaultMessage="Contact card{azzappA} views"
+                    description="Multi users statistics - Contact card views label"
+                    values={{
+                      azzappA: <Text variant="azzapp">a</Text>,
+                    }}
+                  />
+                </Text>
+              </View>
             </View>
           </View>
         </ContactCardEditForm>
@@ -610,9 +660,6 @@ const MultiUserDetailsScreen = ({
     </Container>
   );
 };
-
-const BOTTOM_SHEET_HEIGHT_BASE = 100;
-const BOTTOM_SHEET_HEIGHT_ITEM = 40;
 
 const roles: Array<{ id: ProfileRole; label: ReactNode }> = [
   {
@@ -680,9 +727,17 @@ const styleSheet = createStyleSheet(appearance => ({
   stats: {
     marginBottom: 50,
     flex: 1,
-    flexDirection: 'row',
     justifyContent: 'center',
     overflow: 'visible',
+    paddingHorizontal: 10,
+    gap: 5,
+  },
+  statsLabelContainer: {
+    rowGap: 10,
+    alignItems: 'center',
+  },
+  statsLabel: {
+    textAlign: 'center',
   },
   name: {
     maxWidth: '50%',
@@ -709,6 +764,9 @@ const styleSheet = createStyleSheet(appearance => ({
   cancelButton: {
     width: 136,
   },
+  contentPaddingHorizontal: {
+    paddingHorizontal: 10,
+  },
 }));
 
 const MultiUserDetailsScreenFallback = () => {
@@ -718,11 +776,7 @@ const MultiUserDetailsScreenFallback = () => {
       <SafeAreaView style={{ flex: 1 }}>
         <Header leftElement={<CancelHeaderButton onPress={router.back} />} />
         <View style={{ aspectRatio: 1, backgroundColor: colors.grey100 }} />
-        <View
-          style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
-        >
-          <ActivityIndicator />
-        </View>
+        <LoadingView />
       </SafeAreaView>
     </Container>
   );
@@ -769,7 +823,6 @@ const multiUserDetailsScreenQuery = graphql`
             selected
           }
         }
-        ...HomeStatistics_profiles
         avatar {
           id
           uri: uri(width: 112, pixelRatio: $pixelRatio)
@@ -784,6 +837,7 @@ const multiUserDetailsScreenQuery = graphql`
         }
         webCard {
           id
+          userName
           profilePendingOwner {
             id
             user {
@@ -818,6 +872,11 @@ const multiUserDetailsScreenQuery = graphql`
             uri: uri(width: 180, pixelRatio: $pixelRatio)
           }
           isMultiUser
+        }
+        nbContactCardScans
+        statsSummary {
+          day
+          contactCardScans
         }
       }
     }

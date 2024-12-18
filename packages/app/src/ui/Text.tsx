@@ -5,9 +5,11 @@ import {
   createVariantsStyleSheet,
   useVariantStyleSheet,
 } from '#helpers/createStyles';
-import type { ColorSchemeName } from '#helpers/createStyles';
 import type { ForwardedRef } from 'react';
-import type { TextProps as NativeTextProps } from 'react-native';
+import type {
+  ColorSchemeName,
+  TextProps as NativeTextProps,
+} from 'react-native';
 
 export type TextVariant =
   | 'azzapp'
@@ -21,7 +23,8 @@ export type TextVariant =
   | 'smallbold'
   | 'textField'
   | 'xlarge'
-  | 'xsmall';
+  | 'xsmall'
+  | 'xxsmallextrabold';
 
 export type TextProps = NativeTextProps & {
   variant?: TextVariant;
@@ -94,6 +97,11 @@ export const textStyleSheet = createVariantsStyleSheet(appearance => ({
   xsmall: {
     text: {
       ...textStyles.xsmall,
+    },
+  },
+  xxsmallextrabold: {
+    text: {
+      ...textStyles.xxsmallextrabold,
     },
   },
   medium: {

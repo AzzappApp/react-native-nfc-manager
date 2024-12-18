@@ -17,9 +17,7 @@ const CoverEditorLinksTool = (
   const intl = useIntl();
 
   const [linksModalVisible, toggleLinksModalVisible] = useToggle();
-  const {
-    coverEditorState: { linksLayer },
-  } = useCoverEditorContext();
+  const { linksLayer } = useCoverEditorContext();
 
   useImperativeHandle(ref, () => ({
     toggleLinksModal: toggleLinksModalVisible,

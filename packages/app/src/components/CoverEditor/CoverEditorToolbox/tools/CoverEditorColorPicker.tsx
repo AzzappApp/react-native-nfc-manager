@@ -1,5 +1,8 @@
 import { useCallback } from 'react';
-import { useCoverEditorContext } from '#components/CoverEditor/CoverEditorContext';
+import {
+  useCoverEditorContext,
+  useCoverEditorEditContext,
+} from '#components/CoverEditor/CoverEditorContext';
 import ColorPicker from '#ui/ColorPicker';
 import type { ColorPickerProps } from '#ui/ColorPicker';
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
@@ -10,10 +13,9 @@ type CoverEditorColorPickerProps = Omit<
 >;
 
 const CoverEditorColorPicker = (props: CoverEditorColorPickerProps) => {
-  const {
-    coverEditorState: { cardColors },
-    dispatch,
-  } = useCoverEditorContext();
+  const { cardColors } = useCoverEditorContext();
+  const dispatch = useCoverEditorEditContext();
+
   const onUpdateColorList = useCallback(
     (otherColors: string[]) => {
       dispatch({

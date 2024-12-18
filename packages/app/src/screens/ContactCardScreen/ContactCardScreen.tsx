@@ -4,13 +4,7 @@ import { Image } from 'expo-image';
 import { fromGlobalId } from 'graphql-relay';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import {
-  View,
-  useWindowDimensions,
-  useColorScheme,
-  Platform,
-  ScrollView,
-} from 'react-native';
+import { View, useColorScheme, Platform, ScrollView } from 'react-native';
 import { getArrayBufferForBlob } from 'react-native-blob-jsi-helper';
 import { fromByteArray } from 'react-native-quick-base64';
 import Animated, {
@@ -35,12 +29,14 @@ import {
 } from '#helpers/MobileWebAPI';
 import relayScreen from '#helpers/relayScreen';
 import useAnimatedState from '#hooks/useAnimatedState';
+import useScreenDimensions from '#hooks/useScreenDimensions';
 import useToggle from '#hooks/useToggle';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import FingerHint from '#ui/FingerHint';
 import Icon from '#ui/Icon';
+import LoadingView from '#ui/LoadingView';
 import PressableAnimated from '#ui/PressableAnimated';
 import PressableNative from '#ui/PressableNative';
 import SafeAreaView from '#ui/SafeAreaView';
@@ -93,7 +89,7 @@ export const ContactCardScreen = ({
     contactCardMobileScreenQuery,
     preloadedQuery,
   );
-  const { width, height } = useWindowDimensions();
+  const { width, height } = useScreenDimensions();
   const profile = node?.profile;
   const webCard = profile?.webCard;
   const intl = useIntl();
@@ -118,57 +114,47 @@ export const ContactCardScreen = ({
     setTopCardY(topYAfterScale);
   };
 
-  const animatedContactCardStyle = useAnimatedStyle(
-    () => ({
-      zIndex: 10,
-      transform: [
-        {
-          scale: interpolate(
-            sharedRotationState.value,
-            [0, 1],
-            [1, fullScreenCardWidth / cardHeight],
-          ),
-        },
-        {
-          translateY: interpolate(
-            sharedRotationState.value,
-            [0, 1],
-            [0, topCardY / 2 + (height - fullScreenCardHeight) / 4],
-          ),
-        },
-        {
-          rotate: `${interpolate(
-            sharedRotationState.value,
-            [0, 1],
-            [0, -90],
-          )}deg`,
-        },
-      ],
-    }),
-    [sharedRotationState.value, cardWidth, width, topCardY],
-  );
+  const animatedContactCardStyle = useAnimatedStyle(() => ({
+    alignSelf: 'center', //styles are intentionally put here to fix an issue with the fullscreen card that was not fully tappable on android
+    zIndex: 10,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    transform: [
+      {
+        scale: interpolate(
+          sharedRotationState.value,
+          [0, 1],
+          [1, fullScreenCardWidth / cardHeight],
+        ),
+      },
+      {
+        translateY: interpolate(
+          sharedRotationState.value,
+          [0, 1],
+          [0, topCardY / 2 + (height - fullScreenCardHeight) / 4],
+        ),
+      },
+      {
+        rotate: `${interpolate(
+          sharedRotationState.value,
+          [0, 1],
+          [0, -90],
+        )}deg`,
+      },
+    ],
+  }));
 
-  const footerStyle = useAnimatedStyle(
-    () => ({
-      transform: [
-        {
-          translateY: interpolate(
-            sharedRotationState.value,
-            [0, 1],
-            [0, height],
-          ),
-        },
-      ],
-    }),
-    [sharedRotationState.value],
-  );
+  const footerStyle = useAnimatedStyle(() => ({
+    transform: [
+      {
+        translateY: interpolate(sharedRotationState.value, [0, 1], [0, height]),
+      },
+    ],
+  }));
 
-  const headerStyle = useAnimatedStyle(
-    () => ({
-      opacity: interpolate(sharedRotationState.value, [0, 1], [1, 0]),
-    }),
-    [sharedRotationState.value],
-  );
+  const headerStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(sharedRotationState.value, [0, 1], [1, 0]),
+  }));
 
   const ref = useRef<View>(null);
   const generateEmail = useCallback(async () => {
@@ -263,7 +249,7 @@ export const ContactCardScreen = ({
               description: 'Error toast message',
             },
             { azzappA: <Text variant="azzapp">a</Text> },
-          ) as string,
+          ) as unknown as string,
           android: intl.formatMessage(
             {
               defaultMessage:
@@ -271,8 +257,8 @@ export const ContactCardScreen = ({
               description: 'Error toast message',
             },
             { azzappA: <Text variant="azzapp">a</Text> },
-          ),
-        }) as string,
+          ) as unknown as string,
+        }),
         type: 'error',
       });
     } finally {
@@ -293,7 +279,7 @@ export const ContactCardScreen = ({
 
         <PressableAnimated
           onPress={setFullscreen}
-          style={[styles.contactCard, animatedContactCardStyle]}
+          style={animatedContactCardStyle}
           onLayout={onLayout}
         >
           <ContactCard profile={profile} height={cardHeight} />
@@ -303,17 +289,15 @@ export const ContactCardScreen = ({
           <Button
             variant="secondary"
             style={styles.editContactCardButton}
-            label={
-              intl.formatMessage(
-                {
-                  defaultMessage: 'Edit ContactCard{azzappA} details',
-                  description: 'Edit card details button label',
-                },
-                {
-                  azzappA: <Text variant="azzapp">a</Text>,
-                },
-              ) as string
-            }
+            label={intl.formatMessage(
+              {
+                defaultMessage: 'Edit ContactCard{azzappA} details',
+                description: 'Edit card details button label',
+              },
+              {
+                azzappA: <Text variant="azzapp">a</Text>,
+              },
+            )}
             onPress={() => {
               router.push({
                 route: 'CONTACT_CARD_EDIT',
@@ -480,18 +464,16 @@ const ContactCardScreenHeader = ({
   return (
     <AccountHeader
       webCard={webCard}
-      title={
-        intl.formatMessage(
-          {
-            defaultMessage: 'Contact Card{azzappA}',
-            description:
-              'Title of the contact card screen where user can edit their contact card.',
-          },
-          {
-            azzappA: <Text variant="azzapp">a</Text>,
-          },
-        ) as string
-      }
+      title={intl.formatMessage(
+        {
+          defaultMessage: 'Contact Card{azzappA}',
+          description:
+            'Title of the contact card screen where user can edit their contact card.',
+        },
+        {
+          azzappA: <Text variant="azzapp">a</Text>,
+        },
+      )}
     />
   );
 };
@@ -500,9 +482,7 @@ const ContactCardScreenFallback = () => (
   <Container style={{ flex: 1 }}>
     <SafeAreaView style={{ flex: 1 }}>
       <ContactCardScreenHeader webCard={null} />
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <ActivityIndicator />
-      </View>
+      <LoadingView />
     </SafeAreaView>
   </Container>
 );
@@ -519,10 +499,7 @@ const styleSheet = createStyleSheet(appearance => ({
   container: {
     flex: 1,
     justifyContent: 'flex-start',
-    gap: 20,
-  },
-  contactCard: {
-    alignSelf: 'center',
+    gap: 10,
   },
   editContactCardButton: {
     borderRadius: 27,

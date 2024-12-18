@@ -148,6 +148,7 @@ const AuthorCartoucheContent = ({
             webCardId={author!.id}
             userName={author!.userName}
             disabled={!author?.cardIsPublished}
+            canPlay={false}
           />
         ) : (
           <CoverRenderer width={styles.image.width} webCard={author} />

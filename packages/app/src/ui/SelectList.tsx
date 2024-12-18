@@ -1,16 +1,17 @@
+import map from 'lodash/map';
 import { memo, useCallback } from 'react';
-import { FlatList } from 'react-native';
+import {
+  type StyleProp,
+  type ViewStyle,
+  type ListRenderItemInfo,
+  type FlatListProps,
+  View,
+} from 'react-native';
+import { FlatList } from 'react-native-gesture-handler';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Text from '#ui/Text';
-
 import PressableNative from './PressableNative';
-import type {
-  StyleProp,
-  ViewStyle,
-  ListRenderItemInfo,
-  FlatListProps,
-} from 'react-native';
 
 export type SelectListProps<ItemT> = Omit<
   FlatListProps<ItemT>,
@@ -34,6 +35,11 @@ export type SelectListProps<ItemT> = Omit<
      * @type {boolean} default = false
      */
     section?: boolean;
+    /**
+     * If false the list will be displayed in a plain react view instead of a FlatList
+     * @default true
+     */
+    useFlatList?: boolean;
   };
 
 /**
@@ -48,6 +54,9 @@ function SelectList<ItemT>({
   renderItem,
   itemContainerStyle,
   selectedItemContainerStyle,
+  contentContainerStyle,
+  style,
+  useFlatList = true,
   ...props
 }: SelectListProps<ItemT>) {
   const renderListItem = useCallback(
@@ -76,12 +85,42 @@ function SelectList<ItemT>({
       labelField,
     ],
   );
+
+  if (!useFlatList) {
+    return (
+      <View {...props} style={[style, contentContainerStyle]}>
+        {map(data, (item, index) => (
+          <MemoSelectListItem
+            key={keyExtractor(item, index)}
+            isSelected={keyExtractor(item, index) === selectedItemKey}
+            selectedItemContainerStyle={selectedItemContainerStyle}
+            renderItem={renderItem}
+            onItemSelected={onItemSelected}
+            itemContainerStyle={itemContainerStyle}
+            item={item}
+            index={index}
+            labelField={labelField}
+          />
+        ))}
+      </View>
+    );
+  }
+
+  /**
+   * according to: https://github.com/gorhom/react-native-bottom-sheet/issues/377
+   * we need to use FlatList, not BottomSheetFlatList
+   */
   return (
     <FlatList
       accessibilityRole="list"
       data={data}
       keyExtractor={keyExtractor}
       renderItem={renderListItem}
+      contentContainerStyle={contentContainerStyle}
+      style={style}
+      scrollEnabled={true}
+      overScrollMode={'always'}
+      nestedScrollEnabled={true}
       {...props}
     />
   );

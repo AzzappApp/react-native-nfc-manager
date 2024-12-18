@@ -41,6 +41,9 @@ const CoverTemplateTypePreviews = ({
       @relay(plural: true) {
         id
         mediaCount
+        medias {
+          editable
+        }
         order
         preview {
           id
@@ -160,7 +163,10 @@ const ListItemComponent = ({
         <View style={styles.badge}>
           <View style={styles.badgeElements}>
             <Icon size={16} icon="landscape" />
-            <Text variant="xsmall">{coverTemplate.mediaCount}</Text>
+            <Text variant="xsmall">
+              {coverTemplate.mediaCount -
+                coverTemplate.medias.filter(media => !media.editable).length}
+            </Text>
           </View>
         </View>
       )}
@@ -218,6 +224,7 @@ const styleSheet = createStyleSheet(appearance => ({
     width: 150,
     height: 240,
     flexShrink: 0,
+    borderRadius: 24,
   },
   badge: {
     position: 'absolute',

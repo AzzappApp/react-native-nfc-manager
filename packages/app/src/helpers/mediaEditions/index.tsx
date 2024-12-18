@@ -5,7 +5,8 @@ export * from './mediasTransformations';
 export * from './mediasExport';
 export * from './singleVideoCompositions';
 export {
-  default as NativeBufferLoader,
-  createImageFromNativeBuffer,
-} from './NativeBufferLoader';
-export { default as useNativeBuffer } from './useNativeBuffer';
+  default as NativeTextureLoader,
+  createImageFromNativeTexture,
+} from './NativeTextureLoader';
+export { default as useNativeTexture } from './useNativeTexture';
+export { compileEffect } from './imageFilterTransforms';

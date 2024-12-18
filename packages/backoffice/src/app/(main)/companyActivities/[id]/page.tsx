@@ -1,11 +1,11 @@
 import { notFound } from 'next/navigation';
 import {
   getCompanyActivityById,
-  getLocalizationMessagesByLocaleAndTarget,
+  getLocalizationMessagesByLocale,
   getCardTemplateTypes,
   getCompanyActivityTypes,
 } from '@azzapp/data';
-import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import CompanyActivityForm from '../CompanyActivityForm';
 type CardTemplatePageProps = {
   params: {
@@ -31,10 +31,7 @@ const CardTemplatePage = async (props: CardTemplatePageProps) => {
     type => type.enabled || type.id === template.cardTemplateTypeId,
   );
 
-  const labels = await getLocalizationMessagesByLocaleAndTarget(
-    DEFAULT_LOCALE,
-    ENTITY_TARGET,
-  );
+  const labels = await getLocalizationMessagesByLocale(DEFAULT_LOCALE);
 
   return (
     <CompanyActivityForm

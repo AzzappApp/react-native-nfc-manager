@@ -255,7 +255,7 @@ const ColorTriptychChooser = ({
           }}
         >
           <PressableOpacity
-            style={[styles.colorPaletteContainer]}
+            style={styles.colorPaletteContainer}
             onPress={onRestorePreviousTriptych}
           >
             <ColorTriptychRenderer width={20} height={20} {...currentPalette} />

@@ -5,7 +5,7 @@ import {
 } from '@shopify/react-native-skia';
 import { FileSystemUploadType, UploadTask } from 'expo-file-system';
 import { useCallback, useState } from 'react';
-import { Platform, unstable_batchedUpdates } from 'react-native';
+import { Platform } from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import * as mime from 'react-native-mime-types';
 import { graphql, useMutation } from 'react-relay';
@@ -20,23 +20,22 @@ import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadSign } from '#helpers/MobileWebAPI';
 import coverDrawer, { coverTransitions } from './coverDrawer';
 import {
-  mediaInfoIsImage,
   createCoverSkottieWithColorReplacement,
   createCoverVideoComposition,
-  extractLottieInfoMemoized,
   isCoverDynamic,
   MAX_EXPORT_DECODER_RESOLUTION,
   COVER_EXPORT_VIDEO_RESOLUTION,
   COVER_VIDEO_BITRATE,
   COVER_VIDEO_FRAME_RATE,
+  extractLottieInfoMemoized,
 } from './coverEditorHelpers';
 import coverLocalStore from './coversLocalStore';
 import type { useSaveCoverMutation } from '#relayArtifacts/useSaveCoverMutation.graphql';
 import type {
   CoverEditorState,
-  MediaInfo,
-  MediaInfoImage,
-  MediaInfoVideo,
+  CoverMedia,
+  CoverMediaImage,
+  CoverMediaVideo,
 } from './coverEditorTypes';
 import type { Sink } from 'relay-runtime/lib/network/RelayObservable';
 
@@ -52,9 +51,9 @@ type ProgressCallback = (progress: {
   nbFrames: number;
 }) => void;
 
-const getMediaDuration = (media: MediaInfo) => {
-  const imgInfo = media as MediaInfoImage;
-  const vidInfo = media as MediaInfoVideo;
+const getMediaDuration = (media: CoverMedia) => {
+  const imgInfo = media as CoverMediaImage;
+  const vidInfo = media as CoverMediaVideo;
   return (imgInfo?.duration || 0) + (vidInfo?.timeRange?.duration || 0);
 };
 
@@ -76,6 +75,10 @@ const useSaveCover = (
           hasCover
           coverId
           ...CoverRenderer_webCard
+          coverMedia {
+            __typename
+            uriDownload: uri
+          }
         }
       }
     }
@@ -106,12 +109,10 @@ const useSaveCover = (
         },
       ));
     } catch (error) {
-      unstable_batchedUpdates(() => {
-        setSavingStatus('error');
-        setError(error);
-        setExportProgressIndicator(null);
-        setUploadProgressIndicator(null);
-      });
+      setSavingStatus('error');
+      setError(error);
+      setExportProgressIndicator(null);
+      setUploadProgressIndicator(null);
       throw error;
     }
 
@@ -147,10 +148,8 @@ const useSaveCover = (
       },
     );
 
-    unstable_batchedUpdates(() => {
-      setSavingStatus('uploading');
-      setUploadProgressIndicator(uploadProgress);
-    });
+    setSavingStatus('uploading');
+    setUploadProgressIndicator(uploadProgress);
     const result = await uploadTask.uploadAsync();
     if (!result) {
       throw new Error('Error uploading media');
@@ -178,7 +177,10 @@ const useSaveCover = (
         return acc + getMediaDuration(media);
       }, 0);
       // duration of first cover
-      const firstMediaDuration = getMediaDuration(coverEditorState.medias[0]);
+      const firstMediaDuration = coverEditorState.medias[0]
+        ? getMediaDuration(coverEditorState.medias[0])
+        : 0;
+
       // remove transition duration
       const transitionDuration =
         (coverTransition && coverTransitions[coverTransition].duration) || 0;
@@ -219,28 +221,22 @@ const useSaveCover = (
         });
       });
     } catch (error) {
-      unstable_batchedUpdates(() => {
-        setSavingStatus('error');
-        setError(error);
-        setExportProgressIndicator(null);
-        setUploadProgressIndicator(null);
-      });
-      throw error;
-    }
-    unstable_batchedUpdates(() => {
-      setSavingStatus('complete');
+      setSavingStatus('error');
+      setError(error);
       setExportProgressIndicator(null);
       setUploadProgressIndicator(null);
-    });
+      throw error;
+    }
+    setSavingStatus('complete');
+    setExportProgressIndicator(null);
+    setUploadProgressIndicator(null);
   }, [commit, coverEditorState, webCardId]);
 
   const reset = useCallback(() => {
-    unstable_batchedUpdates(() => {
-      setSavingStatus(null);
-      setError(null);
-      setExportProgressIndicator(null);
-      setUploadProgressIndicator(null);
-    });
+    setSavingStatus(null);
+    setError(null);
+    setExportProgressIndicator(null);
+    setUploadProgressIndicator(null);
   }, []);
 
   return {
@@ -264,13 +260,13 @@ const isCoverEditorStateValid = (coverEditorState: CoverEditorState) => {
     loadingRemoteMedia,
     images,
     lottie,
-    videoPaths,
+    localFilenames,
   } = coverEditorState;
   if (lottie) {
     const extract = extractLottieInfoMemoized(lottie);
     if (extract?.assetsInfos.length === 0) {
       return overlayLayers.every(
-        overlayLayer => images[overlayLayer.media.uri] != null,
+        overlayLayer => images[overlayLayer.id] != null,
       );
     }
   }
@@ -279,14 +275,14 @@ const isCoverEditorStateValid = (coverEditorState: CoverEditorState) => {
     medias.length > 0 &&
     !loadingLocalMedia &&
     !loadingRemoteMedia &&
-    medias.every(mediaInfo => {
-      if (mediaInfoIsImage(mediaInfo)) {
-        return images[mediaInfo.media.uri] != null;
+    medias.every(media => {
+      if (media.kind === 'image') {
+        return images[media.id] != null;
       } else {
-        return videoPaths[mediaInfo.media.uri] != null;
+        return localFilenames[media.id] != null;
       }
     }) &&
-    overlayLayers.every(overlayLayer => images[overlayLayer.media.uri] != null)
+    overlayLayers.every(overlayLayer => images[overlayLayer.id] != null)
   );
 };
 
@@ -297,7 +293,7 @@ const createCoverMedia = async (
   const {
     lottie,
     images,
-    lutShaders,
+    lutTextures,
     loadingLocalMedia,
     loadingRemoteMedia,
     cardColors,
@@ -324,7 +320,7 @@ const createCoverMedia = async (
 
           coverEditorState,
           images,
-          lutShaders,
+          lutTextures,
           videoComposition: { duration: 0, items: [] },
         });
       }),
@@ -372,28 +368,30 @@ const createCoverMedia = async (
     );
 
     const lottieInfo = extractLottieInfoMemoized(lottie);
-    await exportVideoComposition(
-      composition,
-      {
-        outPath,
-        ...encoderConfigs,
-      },
-      infos => {
+    await exportVideoComposition({
+      videoComposition: composition,
+      outPath,
+      ...encoderConfigs,
+      drawFrame: infos => {
         'worklet';
         coverDrawer({
           ...infos,
           coverEditorState,
           images,
-          lutShaders,
+          lutTextures,
           videoScales,
           skottiePlayer,
           lottieInfo,
         });
       },
-      ({ framesCompleted, nbFrames }) => {
+      after() {
+        'worklet';
+        global.gc?.();
+      },
+      onProgress: ({ framesCompleted, nbFrames }) => {
         progressCallback({ framesCompleted, nbFrames });
       },
-    );
+    });
     skottiePlayer?.dispose();
   }
 

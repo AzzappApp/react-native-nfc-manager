@@ -17,6 +17,7 @@ import {
   getCardTemplatesForWebCardKind,
   searchContacts,
   getContactCount,
+  getNbNewContacts,
 } from '@azzapp/data';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import { shuffle } from '@azzapp/shared/arrayHelpers';
@@ -139,6 +140,20 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
       return null;
     }
     return profile.nbShareBacks;
+  },
+  nbNewContacts: async profile => {
+    if (
+      !profileIsAssociatedToCurrentUser(profile) &&
+      !(await hasWebCardProfileRight(profile.webCardId))
+    ) {
+      return 0;
+    }
+    // profile.lastContactCardUpdate;
+    const nbNewContacts = await getNbNewContacts(
+      profile.id,
+      profile.lastContactViewAt,
+    );
+    return nbNewContacts;
   },
   promotedAsOwner: async profile => {
     if (
@@ -563,10 +578,47 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
     const { data, count } = result;
     return connectionFromArraySlice(
       data.map(video => {
-        const videoFile = video.video_files.find(
-          ({ quality, width, height }) =>
-            quality === 'hd' && width != null && height != null,
-        );
+        let videoFile = video.video_files
+          .filter(
+            ({ quality, width, height }) =>
+              quality === 'hd' && width != null && height != null,
+          )
+          .reduce((lowest: Video['video_files'][number] | null, current) => {
+            // Compare based on width or height
+            if (
+              !lowest?.width ||
+              !lowest?.height ||
+              (current.width &&
+                current.height &&
+                current.width * current.height < lowest.width * lowest.height)
+            ) {
+              return current;
+            }
+            return lowest;
+          }, null);
+
+        // In some cases, video_files don't include "quality", hence we find the closest to HD (Width of 720)
+        if (!videoFile) {
+          videoFile = video.video_files.reduce((closestToHD, current) => {
+            if (!current.width) {
+              return closestToHD;
+            }
+
+            if (!closestToHD.width && current.width) {
+              return current;
+            }
+
+            if (
+              closestToHD.width &&
+              current.width &&
+              Math.abs(closestToHD.width - 720) > Math.abs(current.width - 720)
+            ) {
+              return current;
+            }
+
+            return closestToHD;
+          }, video.video_files[0]);
+        }
 
         return {
           id: `pexels_v_${video.id}`,

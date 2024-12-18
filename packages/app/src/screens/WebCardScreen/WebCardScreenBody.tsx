@@ -12,7 +12,7 @@ import {
   useState,
 } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import {
   graphql,
@@ -25,7 +25,7 @@ import { moduleCountRequiresSubscription } from '@azzapp/shared/subscriptionHelp
 import { colors } from '#theme';
 import CardModuleRenderer from '#components/cardModules/CardModuleRenderer';
 import { useModulesData } from '#components/cardModules/ModuleData';
-import { useRouter } from '#components/NativeRouter';
+import { useRouter, useSuspendUntilAppear } from '#components/NativeRouter';
 import { createId } from '#helpers/idHelpers';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import WebCardBlockContainer from './WebCardBlockContainer';
@@ -117,10 +117,12 @@ const WebCardScreenBody = (
     cardStyle,
     cardIsPublished,
     isPremium,
+    coverBackgroundColor,
   } = useFragment(
     graphql`
       fragment WebCardScreenBody_webCard on WebCard {
         id
+        coverBackgroundColor
         cardModules {
           id
           visible
@@ -149,6 +151,9 @@ const WebCardScreenBody = (
     `,
     webCard,
   );
+
+  useSuspendUntilAppear(Platform.OS === 'android');
+
   useEffect(() => {
     onLoad();
   }, [onLoad]);
@@ -706,6 +711,7 @@ const WebCardScreenBody = (
           module={module}
           colorPalette={cardColors}
           cardStyle={cardStyle}
+          coverBackgroundColor={coverBackgroundColor}
         />
         {blockId.includes(TEMP_ID_PREFIX) && (
           <View style={styles.loadingContainer}>

@@ -1,4 +1,4 @@
-import { memo, useCallback, useContext } from 'react';
+import { useCallback, useContext } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { graphql, useFragment, useMutation } from 'react-relay';
@@ -123,7 +123,7 @@ const MultiUserPendingProfileOwner = ({
   );
 };
 
-export default memo(MultiUserPendingProfileOwner);
+export default MultiUserPendingProfileOwner;
 
 const styleSheet = createStyleSheet(appearance => ({
   iconClock: {

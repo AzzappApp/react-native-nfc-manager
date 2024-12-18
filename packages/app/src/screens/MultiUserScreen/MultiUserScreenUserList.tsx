@@ -8,29 +8,27 @@ import {
   useState,
 } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { SectionList, View } from 'react-native';
+import { Platform, SectionList, View } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useFragment, usePaginationFragment } from 'react-relay';
 import { useDebounce } from 'use-debounce';
-import {
-  convertToNonNullArray,
-  type ArrayItemType,
-} from '@azzapp/shared/arrayHelpers';
+import { type ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import { profileIsOwner } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
+import Link from '#components/Link';
 import { MediaImageRenderer } from '#components/medias';
 import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { keyExtractor } from '#helpers/idHelpers';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import { useFocusEffect } from '#hooks/useFocusEffect';
-import ActivityIndicator from '#ui/ActivityIndicator';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';
+import LoadingView from '#ui/LoadingView';
 import PressableNative from '#ui/PressableNative';
 import RadioButton from '#ui/RadioButton';
-import SearchBar from '#ui/SearchBar';
 import Text from '#ui/Text';
 import Avatar, { AVATAR_WIDTH } from './Avatar';
 import MultiUserPendingProfileOwner from './MultiUserPendingProfileOwner';
@@ -45,14 +43,18 @@ import type { ListRenderItem, SectionListData } from 'react-native';
 export type MultiUserScreenListProps = {
   webCard: MultiUserScreenUserList_webCard$key;
   Header: React.ReactElement;
+  searching?: boolean;
+  searchValue?: string;
 };
 
 const MultiUserScreenUserList = ({
   webCard: webCardKey,
   Header,
+  searching,
+  searchValue,
 }: MultiUserScreenListProps) => {
   const intl = useIntl();
-  const router = useRouter();
+
   const styles = useStyleSheet(styleSheet);
 
   const webCard = useFragment(
@@ -97,10 +99,6 @@ const MultiUserScreenUserList = ({
     (webCard.commonInformation?.urls?.length ?? 0) +
     (webCard.commonInformation?.socials?.length ?? 0) +
     (webCard.logo ? 1 : 0);
-
-  const onAddUsers = useCallback(() => {
-    router.push({ route: 'MULTI_USER_ADD' });
-  }, [router]);
 
   const { data, loadNext, refetch, hasNext, isLoadingNext } =
     usePaginationFragment(
@@ -201,14 +199,15 @@ const MultiUserScreenUserList = ({
         },
       ] as Array<{ title: string; profileRole: string; data: Profile[] }>,
     );
-    return convertToNonNullArray(
-      result.map(section => {
+
+    return result
+      .map(section => {
         if (section.data.length === 0) {
           return null;
         }
         return section;
-      }),
-    );
+      })
+      .filter(section => section !== null);
   }, [data.profiles.edges, intl]);
 
   const onEndReached = useCallback(() => {
@@ -218,7 +217,6 @@ const MultiUserScreenUserList = ({
   }, [hasNext, isLoadingNext, loadNext]);
 
   //#region Search
-  const [searchValue, setSearchValue] = useState<string | undefined>('');
   const [debounceText] = useDebounce(searchValue, 500);
 
   const [refreshing, setRefreshing] = useState(false);
@@ -238,8 +236,6 @@ const MultiUserScreenUserList = ({
   const profileInfos = useProfileInfos();
 
   const { transferOwnerMode } = useContext(MultiUserTransferOwnerContext);
-
-  const [searching, setSearching] = useState(false);
 
   const renderListItem = useCallback<ListRenderItem<Profile>>(
     ({ item }) => {
@@ -276,85 +272,59 @@ const MultiUserScreenUserList = ({
   }, [debounceText, refetch]);
   //#endregion
 
-  const ListHeaderComponent = useMemo(() => {
-    return (
-      <View style={styles.headerContainer}>
-        {Header}
-        {!transferOwnerMode && (
-          <>
-            <Button
-              style={styles.button}
-              label={intl.formatMessage({
-                defaultMessage: 'Add users',
-                description: 'Button to add new users from MultiUserScreen',
-              })}
-              onPress={onAddUsers}
-            />
-            <Button
-              style={styles.button}
-              variant="secondary"
-              label={`${intl.formatMessage({
-                defaultMessage: 'Set common information',
-                description:
-                  'Button to add common information to the contact card in MultiUserScreen',
-              })} (${nbCommonInformation})`}
-              onPress={() => {
-                router.push({ route: 'COMMON_INFORMATION' });
-              }}
-            />
-          </>
-        )}
-      </View>
-    );
-  }, [
-    Header,
-    intl,
-    nbCommonInformation,
-    onAddUsers,
-    router,
-    styles.button,
-    styles.headerContainer,
-    transferOwnerMode,
-  ]);
+  const { bottom } = useScreenInsets();
 
-  const { bottom } = useSafeAreaInsets();
+  const contentContainerStyle = useMemo(
+    () => ({ paddingBottom: 40 + bottom }),
+    [bottom],
+  );
+
   return (
     <View style={styles.content}>
-      <SearchBar
-        placeholder={intl.formatMessage({
-          defaultMessage: 'Search for a user',
-          description: 'MultiScreen - search bar placeholder',
-        })}
-        onChangeText={setSearchValue}
-        value={searchValue}
-        onFocus={() => setSearching(true)}
-        onBlur={() => setSearching(false)}
-      />
-      <Suspense
-        fallback={
-          <View
-            style={{
-              flex: 1,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <ActivityIndicator />
-          </View>
-        }
-      >
+      <Suspense fallback={<LoadingView />}>
         <SectionList
-          ListHeaderComponent={searching ? undefined : ListHeaderComponent}
+          ListHeaderComponent={
+            searching || searchValue ? null : (
+              <View style={styles.headerContainer}>
+                {Header}
+                {!transferOwnerMode && (
+                  <>
+                    <Link route="MULTI_USER_ADD">
+                      <Button
+                        style={styles.button}
+                        label={intl.formatMessage({
+                          defaultMessage: 'Add users',
+                          description:
+                            'Button to add new users from MultiUserScreen',
+                        })}
+                      />
+                    </Link>
+                    <Link route="COMMON_INFORMATION">
+                      <Button
+                        style={styles.button}
+                        variant="secondary"
+                        label={`${intl.formatMessage({
+                          defaultMessage: 'Set common information',
+                          description:
+                            'Button to add common information to the contact card in MultiUserScreen',
+                        })} (${nbCommonInformation})`}
+                      />
+                    </Link>
+                  </>
+                )}
+              </View>
+            )
+          }
           accessibilityRole="list"
           sections={filteredSections}
-          keyExtractor={sectionKeyExtractor}
+          keyExtractor={keyExtractor}
           renderItem={renderListItem}
           renderSectionHeader={renderHeaderSection}
           showsVerticalScrollIndicator={false}
           onEndReached={onEndReached}
           refreshing={refreshing}
           onRefresh={onRefresh}
-          contentContainerStyle={{ paddingBottom: 40 + bottom }}
+          contentContainerStyle={contentContainerStyle}
           onEndReachedThreshold={0.5}
           keyboardShouldPersistTaps="always"
         />
@@ -428,7 +398,10 @@ const ItemList = ({ item }: { item: Profile }) => {
   const isCurrentUser = item.id === profileInfos?.profileId;
 
   return (
-    <Animated.View entering={FadeIn} exiting={FadeOut}>
+    <Animated.View
+      entering={FadeIn}
+      exiting={Platform.OS === 'ios' ? undefined : FadeOut} // commented to fix crash: https://github.com/AzzappApp/azzapp/issues/6116
+    >
       <PressableNative onPress={onPressItem} style={styles.user}>
         {avatarSource ? (
           <MediaImageRenderer source={avatarSource} style={styles.avatar} />
@@ -467,9 +440,6 @@ const ItemList = ({ item }: { item: Profile }) => {
 
 const UserListItem = memo(ItemList);
 
-const sectionKeyExtractor = (item: { id: string }) => {
-  return item.id;
-};
 const styleSheet = createStyleSheet(appearance => ({
   headerContainer: { paddingBottom: 16, gap: 10 },
   content: {

@@ -1,8 +1,8 @@
+import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import chroma from 'chroma-js';
 import { memo, useCallback } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { View, StyleSheet, useColorScheme } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
 import Animated, {
   interpolateColor,
   useAnimatedStyle,
@@ -14,6 +14,7 @@ import {
 import { getTextColor } from '@azzapp/shared/colorsHelpers';
 import { colors } from '#theme';
 import useAnimatedState from '#hooks/useAnimatedState';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Icon from '#ui/Icon/Icon';
 import PressableNative from '#ui/PressableNative';
 
@@ -52,8 +53,11 @@ const ColorList = ({
 }: ColorListProps) => {
   const itemWidth = (width - ITEM_MARGIN * (ITEM_PER_ROW - 1)) / ITEM_PER_ROW;
 
+  const { bottom } = useScreenInsets();
+  const bottomPadding = { height: bottom };
+
   return (
-    <ScrollView
+    <BottomSheetScrollView
       bounces={false}
       style={[styles.root, style]}
       contentContainerStyle={styles.container}
@@ -111,18 +115,16 @@ const ColorList = ({
             ]}
           >
             <View
-              style={[
-                {
-                  borderWidth: 1,
-                  borderStyle: 'dashed',
-                  borderColor: colors.grey200,
-                  width: itemWidth,
-                  height: itemWidth,
-                  borderRadius: itemWidth / 2,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                },
-              ]}
+              style={{
+                borderWidth: 1,
+                borderStyle: 'dashed',
+                borderColor: colors.grey200,
+                width: itemWidth,
+                height: itemWidth,
+                borderRadius: itemWidth / 2,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
             >
               <Icon icon="add" />
             </View>
@@ -140,7 +142,8 @@ const ColorList = ({
           ))}
         </View>
       </View>
-    </ScrollView>
+      <View style={bottomPadding} />
+    </BottomSheetScrollView>
   );
 };
 
@@ -199,7 +202,7 @@ const ColorListItem = ({
       ),
       borderWidth: selectedSharedValue.value * 3,
     };
-  }, [selectedSharedValue]);
+  });
 
   const editSharedValue = useAnimatedState(editMode, { duration: 150 });
   const editIconContainerStyle = useAnimatedStyle(() => {
@@ -211,13 +214,13 @@ const ColorListItem = ({
       ),
       opacity: editSharedValue.value,
     };
-  }, [selectedSharedValue]);
+  });
 
   const linkIconContainerStyle = useAnimatedStyle(() => {
     return {
       opacity: 1 - editSharedValue.value,
     };
-  }, [selectedSharedValue]);
+  });
 
   const layerStyle: ViewStyle = {
     position: 'absolute',

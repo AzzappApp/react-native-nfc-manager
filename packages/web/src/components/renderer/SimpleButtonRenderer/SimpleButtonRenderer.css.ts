@@ -16,6 +16,8 @@ const label = style({
   overflow: 'hidden',
   whiteSpace: 'nowrap',
   wordBreak: 'break-word',
+  width: '100%',
+  textAlign: 'center',
 });
 
 const styles = {

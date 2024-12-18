@@ -5,7 +5,7 @@ import { graphql, useFragment } from 'react-relay';
 import { WebCardBoundEditorLayerSelectorPanel } from '#components/EditorLayerSelectorPanel';
 
 import type { HorizontalPhotoBackgroundEditionPanel_profile$key } from '#relayArtifacts/HorizontalPhotoBackgroundEditionPanel_profile.graphql';
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
+import type { ViewProps } from 'react-native';
 
 type BackgroundStyle = {
   backgroundColor: string;

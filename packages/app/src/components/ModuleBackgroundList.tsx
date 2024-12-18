@@ -10,7 +10,6 @@ import {
 import { graphql, useFragment } from 'react-relay';
 import {
   COVER_ANIMATION_DURATION,
-  COVER_CARD_RADIUS,
   COVER_RATIO,
 } from '@azzapp/shared/coverHelpers';
 import { keyExtractor } from '#helpers/idHelpers';
@@ -22,9 +21,7 @@ import type {
 } from '#relayArtifacts/ModuleBackgroundList_ModuleBackgrounds.graphql';
 import type { BoxButtonItemInfo } from './BoxSelectionList';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
-import type { ColorValue } from 'react-native';
-
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
+import type { ColorValue, ViewProps } from 'react-native';
 
 type ModuleBackgroundListProps = ViewProps & {
   /**
@@ -171,15 +168,11 @@ const ModuleBackgroundListItem = ({
 }: ModuleBackgroundListItemProps) => {
   return (
     <View
-      style={[
-        {
-          height: '100%',
-          borderRadius: width * COVER_CARD_RADIUS,
-          overflow: 'hidden',
-          aspectRatio: imageRatio,
-          backgroundColor,
-        },
-      ]}
+      style={{
+        flex: 1,
+        aspectRatio: imageRatio,
+        backgroundColor,
+      }}
     >
       {item && (
         <CardModuleBackgroundImage

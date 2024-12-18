@@ -1,9 +1,9 @@
 import { Box, TextField, Typography } from '@mui/material';
 import {
   getCardTemplateTypesWithTemplatesCount,
-  getLocalizationMessagesByLocaleAndTarget,
+  getLocalizationMessagesByLocale,
 } from '@azzapp/data';
-import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import CardTemplateTypesList from './CardTemplateTypesList';
 
 export type CardTemplateTypeItem = {
@@ -17,7 +17,7 @@ export type CardTemplateTypeItem = {
 const CardTemplateTypesPage = async () => {
   const [cardTemplateTypes, labels] = await Promise.all([
     getCardTemplateTypesWithTemplatesCount(),
-    getLocalizationMessagesByLocaleAndTarget(DEFAULT_LOCALE, ENTITY_TARGET),
+    getLocalizationMessagesByLocale(DEFAULT_LOCALE),
   ]);
 
   const labelsMap = new Map(labels.map(({ key, value }) => [key, value]));

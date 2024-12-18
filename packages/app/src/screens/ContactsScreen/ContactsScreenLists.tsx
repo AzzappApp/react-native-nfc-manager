@@ -22,9 +22,12 @@ import ContactDetailsModal from './ContactDetailsModal';
 import { storage } from './ContactsScreen';
 import ContactsScreenSearchByDate from './ContactsScreenSearchByDate';
 import ContactsScreenSearchByName from './ContactsScreenSearchByName';
-import type { ContactsScreenListQuery$data } from '#relayArtifacts/ContactsScreenListQuery.graphql';
-import type { ContactsScreenLists_contacts$data } from '#relayArtifacts/ContactsScreenLists_contacts.graphql';
+import type {
+  ContactsScreenLists_contacts$data,
+  ContactsScreenLists_contacts$key,
+} from '#relayArtifacts/ContactsScreenLists_contacts.graphql';
 import type { ContactsScreenListsMutation } from '#relayArtifacts/ContactsScreenListsMutation.graphql';
+import type { ContactsScreenListsMutationUpdateContactsLastViewMutation } from '#relayArtifacts/ContactsScreenListsMutationUpdateContactsLastViewMutation.graphql';
 import type {
   ContactDetails,
   ContactDetailsModalActions,
@@ -35,7 +38,7 @@ import type { Contact } from 'expo-contacts';
 type ContactsScreenListsProps = {
   search: string | undefined;
   searchBy: 'date' | 'name';
-  profile: ContactsScreenListQuery$data['node'];
+  profile: ContactsScreenLists_contacts$key;
 };
 const ContactsScreenLists = ({
   search,
@@ -250,6 +253,33 @@ const ContactsScreenLists = ({
     );
   }, [search, refetch, searchBy]);
 
+  const [commitContactsLastView] =
+    useMutation<ContactsScreenListsMutationUpdateContactsLastViewMutation>(
+      graphql`
+        mutation ContactsScreenListsMutationUpdateContactsLastViewMutation(
+          $profileId: ID!
+        ) {
+          updateContactsLastView(profileId: $profileId)
+        }
+      `,
+    );
+
+  useEffect(() => {
+    const profileId = profileInfos?.profileId;
+    if (!profileId) {
+      return;
+    }
+    commitContactsLastView({
+      variables: {
+        profileId,
+      },
+      updater: store => {
+        const profile = store.get(profileId);
+        profile?.setValue(0, 'nbNewContacts');
+      },
+    });
+  }, [commitContactsLastView, profileInfos, profileInfos?.profileId]);
+
   const [commitRemoveContact] = useMutation<ContactsScreenListsMutation>(
     graphql`
       mutation ContactsScreenListsMutation(
@@ -264,9 +294,13 @@ const ContactsScreenLists = ({
   );
 
   const onRemoveContacts = (contactIds: string[]) => {
+    const profileId = profileInfos?.profileId;
+    if (!profileId) {
+      return;
+    }
     commitRemoveContact({
       variables: {
-        profileId: profileInfos!.profileId,
+        profileId,
         input: {
           contactIds,
         },
@@ -278,7 +312,7 @@ const ContactsScreenLists = ({
               store.delete(removedContactId);
             },
           );
-          const profile = store.get(profileInfos!.profileId);
+          const profile = store.get(profileId);
           const nbContacts = profile?.getValue('nbContacts');
 
           if (typeof nbContacts === 'number') {

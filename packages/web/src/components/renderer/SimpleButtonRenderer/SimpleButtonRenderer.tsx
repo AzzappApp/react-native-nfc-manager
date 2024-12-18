@@ -24,6 +24,7 @@ const SimpleButtonRenderer = ({
   colorPalette,
   cardStyle,
   style,
+  coverBackgroundColor,
   ...props
 }: SimpleButtonRendererProps) => {
   const {

@@ -1,4 +1,4 @@
-import { pick } from 'lodash';
+import pick from 'lodash/pick';
 import { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import Toast from 'react-native-toast-message';

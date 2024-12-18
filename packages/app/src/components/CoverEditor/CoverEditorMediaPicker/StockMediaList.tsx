@@ -1,11 +1,4 @@
-import {
-  memo,
-  Suspense,
-  useCallback,
-  useDeferredValue,
-  useMemo,
-  useState,
-} from 'react';
+import { Suspense, useCallback, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Linking, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { graphql, useLazyLoadQuery, usePaginationFragment } from 'react-relay';
@@ -17,7 +10,7 @@ import { useProfileInfos } from '#hooks/authStateHooks';
 import PressableOpacity from '#ui/PressableOpacity';
 import SearchBarStatic from '#ui/SearchBarStatic';
 import Text from '#ui/Text';
-import type { Media } from '#helpers/mediaHelpers';
+import type { SourceMedia } from '#helpers/mediaHelpers';
 import type { StockMediaList_photos$key } from '#relayArtifacts/StockMediaList_photos.graphql';
 import type { StockMediaList_video$key } from '#relayArtifacts/StockMediaList_video.graphql';
 import type { StockMediaListQuery } from '#relayArtifacts/StockMediaListQuery.graphql';
@@ -26,22 +19,19 @@ import type { ViewProps } from 'react-native';
 type StockMediaListProps = Omit<ViewProps, 'children'> & {
   kind: 'image' | 'video';
   selectedMediasIds: string[];
-  onMediaSelected: (media: Media) => void;
-  displayList?: boolean;
+  onMediaSelected: (media: SourceMedia) => void;
 };
 
 const StockMediaList = ({
   kind,
   selectedMediasIds,
   onMediaSelected,
-  displayList,
   style,
   ...props
 }: StockMediaListProps) => {
   const profileInfos = useProfileInfos();
   const [search, setSearch] = useState<string | null>(null);
-  const deferredSearch = useDeferredValue(search);
-  const [debouncedSearch] = useDebounce(deferredSearch, 300);
+  const [debouncedSearch] = useDebounce(search, 300);
 
   if (!profileInfos?.profileId) {
     throw new Error(
@@ -53,51 +43,29 @@ const StockMediaList = ({
     setSearch(text || null);
   }, []);
 
-  const data = useLazyLoadQuery<StockMediaListQuery>(
-    graphql`
-      query StockMediaListQuery(
-        $profileId: ID!
-        $search: String
-        $isImage: Boolean!
-      ) {
-        node(id: $profileId) {
-          ... on Profile {
-            ...StockMediaList_photos
-              @arguments(search: $search)
-              @include(if: $isImage)
-            ...StockMediaList_video
-              @arguments(search: $search)
-              @skip(if: $isImage)
-          }
-        }
-      }
-    `,
-    {
-      profileId: profileInfos.profileId,
-      search: debouncedSearch,
-      isImage: kind === 'image',
-    },
-  );
-
   const onStockMediaSelect = useCallback(
     (media: StockPhoto | StockVideo) => {
       if (media.__typename === 'StockImage') {
         onMediaSelected({
+          id: media.id,
           kind: 'image',
-          height: media.height,
           uri: media.url,
           thumbnail: media.thumbnail,
           width: media.width,
+          height: media.height,
+          editable: true,
         });
       } else {
         onMediaSelected({
+          id: media.id,
           kind: 'video',
-          duration: media.duration,
-          height: media.height,
           uri: media.url,
           thumbnail: media.thumbnail,
           width: media.width,
+          height: media.height,
+          duration: media.duration,
           rotation: 0,
+          editable: true,
         });
       }
     },
@@ -110,11 +78,6 @@ const StockMediaList = ({
 
   const intl = useIntl();
   const { width: windowWidth } = useWindowDimensions();
-
-  if (!data.node) {
-    return null;
-  }
-
   const searchPlaceholder =
     kind === 'image'
       ? intl.formatMessage({
@@ -137,16 +100,13 @@ const StockMediaList = ({
       <Suspense
         fallback={<MediaGridListFallback numColumns={4} width={windowWidth} />}
       >
-        {displayList && deferredSearch === debouncedSearch ? (
-          <StockMediaListInner
-            kind={kind}
-            profile={data.node}
-            selectedMediasIds={selectedMediasIds}
-            onStockMediaSelect={onStockMediaSelect}
-          />
-        ) : (
-          <SuspenseTrigger />
-        )}
+        <StockMediaListQueryRenderer
+          profileId={profileInfos.profileId}
+          kind={kind}
+          search={debouncedSearch}
+          selectedMediasIds={selectedMediasIds}
+          onStockMediaSelect={onStockMediaSelect}
+        />
       </Suspense>
       <PressableOpacity onPress={openPexels} style={styles.pexelsLink}>
         <Text variant="medium" appearance="dark">
@@ -161,6 +121,62 @@ const StockMediaList = ({
 };
 
 export default StockMediaList;
+
+type StockMediaListQueryRendererProps = {
+  profileId: string;
+  kind: 'image' | 'video';
+  search: string | null;
+  selectedMediasIds: string[];
+  onStockMediaSelect: (media: StockPhoto | StockVideo) => void;
+};
+
+const StockMediaListQueryRenderer = ({
+  profileId,
+  kind,
+  search,
+  selectedMediasIds,
+  onStockMediaSelect,
+}: StockMediaListQueryRendererProps) => {
+  const data = useLazyLoadQuery<StockMediaListQuery>(
+    graphql`
+      query StockMediaListQuery(
+        $profileId: ID!
+        $search: String
+        $isImage: Boolean!
+      ) {
+        node(id: $profileId) {
+          ... on Profile {
+            ...StockMediaList_photos
+              @arguments(search: $search)
+              @include(if: $isImage)
+            ...StockMediaList_video
+              @arguments(search: $search)
+              @skip(if: $isImage)
+          }
+        }
+      }
+    `,
+    {
+      profileId,
+      search,
+      isImage: kind === 'image',
+    },
+  );
+
+  // TODO handle with new relay system for nullability
+  if (!data.node) {
+    return null;
+  }
+
+  return (
+    <StockMediaListGridRenderer
+      kind={kind}
+      profile={data.node}
+      selectedMediasIds={selectedMediasIds}
+      onStockMediaSelect={onStockMediaSelect}
+    />
+  );
+};
 
 const stockImageFragment = graphql`
   fragment StockMediaList_photos on Profile
@@ -193,7 +209,7 @@ const stockVideoFragment = graphql`
   @argumentDefinitions(
     search: { type: "String" }
     after: { type: String }
-    first: { type: Int, defaultValue: 50 }
+    first: { type: Int, defaultValue: 52 }
   ) {
     searchStockVideos(search: $search, after: $after, first: $first)
       @connection(key: "StockMediaList_searchStockVideos") {
@@ -213,19 +229,19 @@ const stockVideoFragment = graphql`
   }
 `;
 
-type StockMediaListInnerProps = {
+type StockMediaListGridRendererProps = {
   kind: 'image' | 'video';
   profile: StockMediaList_photos$key | StockMediaList_video$key;
   selectedMediasIds: string[];
   onStockMediaSelect: (media: StockPhoto | StockVideo) => void;
 };
 
-const StockMediaListInner = ({
+const StockMediaListGridRenderer = ({
   kind,
   profile,
   selectedMediasIds,
   onStockMediaSelect,
-}: StockMediaListInnerProps) => {
+}: StockMediaListGridRendererProps) => {
   const { data, hasNext, isLoadingNext, loadNext } = usePaginationFragment(
     kind === 'image' ? stockImageFragment : stockVideoFragment,
     profile,
@@ -233,7 +249,7 @@ const StockMediaListInner = ({
 
   const onEndReached = useCallback(() => {
     if (hasNext && !isLoadingNext) {
-      loadNext(50);
+      loadNext(52);
     }
   }, [hasNext, isLoadingNext, loadNext]);
 
@@ -284,6 +300,7 @@ type StockPhoto = {
   readonly thumbnail: string;
   readonly width: number;
 };
+
 type StockVideo = {
   readonly __typename: 'StockVideo';
   readonly author: string | null;
@@ -295,7 +312,7 @@ type StockVideo = {
   readonly width: number;
 };
 
-const getItemId = (item: StockPhoto | StockVideo) => item.url;
+const getItemId = (item: StockPhoto | StockVideo) => item.id;
 
 const getItemUri = (item: StockPhoto | StockVideo) => item.thumbnail;
 
@@ -310,8 +327,4 @@ const styles = StyleSheet.create({
     bottom: 10,
     left: 20,
   },
-});
-
-const SuspenseTrigger = memo(function SuspenseTrigger() {
-  throw new Promise(() => {});
 });

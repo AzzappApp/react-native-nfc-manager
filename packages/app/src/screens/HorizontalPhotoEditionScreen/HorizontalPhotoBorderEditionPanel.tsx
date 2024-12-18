@@ -13,8 +13,8 @@ import ColorPreview from '#ui/ColorPreview';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TabsBar from '#ui/TabsBar';
 import type { HorizontalPhotoBorderEditionPanel_webCard$key } from '#relayArtifacts/HorizontalPhotoBorderEditionPanel_webCard.graphql';
+import type { ViewProps } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type HorizontalPhotoBorderEditionPanelProps = ViewProps & {
   /**

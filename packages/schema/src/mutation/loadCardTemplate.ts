@@ -1,5 +1,5 @@
 import { GraphQLError } from 'graphql';
-import { omit } from 'lodash';
+import omit from 'lodash/omit';
 import {
   createCardModules,
   getCardModulesByWebCard,

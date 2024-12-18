@@ -5,7 +5,6 @@ import { signup } from '#helpers/MobileWebAPI';
 import { act, fireEvent, render, screen } from '#helpers/testHelpers';
 import SignUpScreen from '../SignUpScreen';
 
-jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
 jest.mock('#helpers/localeHelpers', () => ({
   getLocales: () => [
     {

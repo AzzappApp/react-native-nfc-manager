@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/react-native';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import { RESULTS } from 'react-native-permissions';
@@ -21,10 +21,9 @@ import PhotoGalleryMediaList from '../PhotoGalleryMediaList';
 import { useImagePickerState } from './ImagePickerContext';
 import ImagePickerMediaRenderer from './ImagePickerMediaRenderer';
 import { ImagePickerStep } from './ImagePickerWizardContainer';
-import type { Media } from '#helpers/mediaHelpers';
+import type { SourceMedia } from '#helpers/mediaHelpers';
 import type { BottomMenuItem } from '#ui/BottomMenu';
 import type { CameraViewHandle } from '../CameraView';
-import type { PhotoGalleryMediaListActions } from '../PhotoGalleryMediaList';
 import type { Album } from '@react-native-camera-roll/camera-roll';
 
 export type SelectImageStepProps = {
@@ -61,7 +60,7 @@ const SelectImageStep = ({
   } = useImagePickerState();
 
   const onGalleryMediaSelected = (
-    media: Media,
+    media: SourceMedia,
     aspectRatio?: number | null | undefined,
   ) => {
     if (
@@ -85,8 +84,6 @@ const SelectImageStep = ({
     onMediaChange(media, aspectRatio);
   };
 
-  const gallery = useRef<PhotoGalleryMediaListActions>(null);
-
   const [pickerMode, setPickerMode] = useState<'gallery' | 'photo' | 'video'>(
     'gallery',
   );
@@ -104,10 +101,7 @@ const SelectImageStep = ({
   const { mediaPermission, cameraPermission, audioPermission } =
     usePermissionContext();
 
-  useMediaLimitedSelectionAlert(mediaPermission, {
-    onSelectedMorePhotos: () => gallery.current?.load(),
-  });
-
+  useMediaLimitedSelectionAlert(mediaPermission);
   const onChangePickerMode = useCallback(
     (mode: 'gallery' | 'photo' | 'video') => {
       //we need to discard the current media if we switch from gallery to video/photo(to desactive the next button)
@@ -156,10 +150,12 @@ const SelectImageStep = ({
 
     onMediaChange(
       {
+        id: uri,
         kind: 'image',
         uri,
         height,
         width,
+        editable: true,
       },
       forceCameraRatio,
     );
@@ -191,12 +187,14 @@ const SelectImageStep = ({
           const { width, height, rotation } = await getVideoSize(uri);
           onMediaChange(
             {
+              id: uri,
               kind: 'video',
               uri,
               height,
               width,
               rotation,
               duration: duration as number,
+              editable: true,
             },
             forceCameraRatio,
           );
@@ -278,6 +276,11 @@ const SelectImageStep = ({
     [insetBottom],
   );
 
+  useEffect(() => {
+    // ensure media is cleared once we display the Image selection Screen
+    clearMedia();
+  }, [clearMedia]);
+
   return (
     <>
       <ImagePickerStep
@@ -332,13 +335,12 @@ const SelectImageStep = ({
             mediaPermission === RESULTS.GRANTED ||
             mediaPermission === RESULTS.LIMITED ? (
               <PhotoGalleryMediaList
-                selectedMediaId={media?.galleryUri}
+                selectedMediaId={media?.id}
                 album={selectedAlbum}
                 onMediaSelected={onGalleryMediaSelected}
                 kind={kind}
                 contentContainerStyle={galleryContainerStyle}
                 autoSelectFirstItem={media == null}
-                ref={gallery}
               />
             ) : null
           ) : (

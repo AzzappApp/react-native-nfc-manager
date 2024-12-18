@@ -17,12 +17,12 @@ import {
   type DerivedValue,
 } from 'react-native-reanimated';
 import {
-  createImageFromNativeBuffer,
-  useNativeBuffer,
+  createImageFromNativeTexture,
+  useNativeTexture,
   type EditionParameters,
   type ImageOrientation,
 } from '#helpers/mediaEditions';
-import type { Media, TimeRange } from '#helpers/mediaHelpers';
+import type { SourceMedia, TimeRange } from '#helpers/mediaHelpers';
 import type { Filter } from '@azzapp/shared/filtersHelper';
 import type { SkImage } from '@shopify/react-native-skia';
 import type { ReactNode, ForwardedRef } from 'react';
@@ -55,7 +55,7 @@ export type ImagePickerState = {
   /**
    * the selected media
    */
-  media: Media | null;
+  media: SourceMedia | null;
   /**
    * The SkImage of the media
    */
@@ -90,7 +90,10 @@ export type ImagePickerState = {
    * @param media the selected media
    * @param aspectRatio the aspect ratio of the media to force (usefull is difference between gallery and camera)
    */
-  onMediaChange(media: Media, aspectRatio?: number | null | undefined): void;
+  onMediaChange(
+    media: SourceMedia,
+    aspectRatio?: number | null | undefined,
+  ): void;
   /**
    * a emthod to clear the selected media
    *
@@ -176,21 +179,21 @@ type ImagePickerContextProviderProps = {
    * Dispatched when the media is changed
    * @param media the selected media
    */
-  onMediaChange?(media: Media | null): void;
+  onMediaChange?(media: SourceMedia | null): void;
 
   cameraButtonsLeftRightPosition?: number;
   /**
    * Initial data for the picker
    */
   initialData?: {
-    media: Media;
+    media: SourceMedia;
     editionParameters: EditionParameters | null;
     filter: Filter | null;
     timeRange?: TimeRange | null;
   } | null;
 };
 
-const _ImagePickerContextProvider = (
+const ImagePickerContextProviderInner = (
   {
     kind,
     maxVideoDuration,
@@ -205,7 +208,9 @@ const _ImagePickerContextProvider = (
   }: ImagePickerContextProviderProps,
   forwardedRef: ForwardedRef<ImagePickerState>,
 ) => {
-  const [media, setMedia] = useState<Media | null>(initialData?.media ?? null);
+  const [media, setMedia] = useState<SourceMedia | null>(
+    initialData?.media ?? null,
+  );
   const [aspectRatio, setAspectRatio] = useState(
     typeof forceAspectRatio === 'number' ? forceAspectRatio : null,
   );
@@ -237,7 +242,7 @@ const _ImagePickerContextProvider = (
   }, [maxVideoDuration, media]);
 
   const onMediaChange = useCallback(
-    (media: Media, aspectRatio: number | null | undefined = null) => {
+    (media: SourceMedia, aspectRatio: number | null | undefined = null) => {
       setMedia(media);
       onMediaChangeProps?.(media);
       setAspectRatio(forceAspectRatio ?? aspectRatio ?? null);
@@ -300,7 +305,7 @@ const _ImagePickerContextProvider = (
     [],
   );
 
-  const nativeBuffer = useNativeBuffer({
+  const textureInfo = useNativeTexture({
     uri: media?.uri,
     kind: media?.kind,
     time: timeRange?.startTime,
@@ -308,11 +313,18 @@ const _ImagePickerContextProvider = (
   });
 
   const skImage = useDerivedValue(() => {
-    if (!nativeBuffer) {
+    if (!textureInfo) {
       return null;
     }
-    return createImageFromNativeBuffer(nativeBuffer, true);
-  }, [nativeBuffer]);
+    return createImageFromNativeTexture(textureInfo);
+  }, [textureInfo]);
+
+  useAnimatedReaction(
+    () => skImage.value,
+    (_, previous) => {
+      previous?.dispose();
+    },
+  );
 
   const [isSkImageReady, setIsSkImageReady] = useState(false);
 
@@ -400,11 +412,11 @@ export const MAX_VIDEO_THUMBNAIL_SIZE = {
  * it also manages the display of the picker steps.
  */
 export const ImagePickerContextProvider = forwardRef(
-  _ImagePickerContextProvider,
+  ImagePickerContextProviderInner,
 );
 
 const getMediaAspectRatio = (
-  media: Media,
+  media: SourceMedia,
   orientation?: ImageOrientation | null,
 ) => {
   const aspectRatio = media.width / media.height;

@@ -27,6 +27,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useFormState } from 'react-dom';
+import MediaInput from '#components/MediaInput';
 import { uploadMedia } from '#helpers/mediaHelper';
 import CoverOverlayForm from './CoverOverlayForm';
 import { saveCoverTemplate } from './coverTemplatesActions';
@@ -78,6 +79,7 @@ const CoverTemplatesParametersForm = ({
       previewId: coverTemplate?.previewId || '',
       lottieId: coverTemplate?.lottieId || '',
       mediaCount: coverTemplate?.mediaCount,
+      medias: coverTemplate?.medias,
       order: coverTemplate?.order || 0,
       colorPaletteId: coverTemplate?.colorPaletteId || colorPalettes[0]?.id,
       typeId: coverTemplate?.typeId || coverTemplateTypes[0]?.id,
@@ -107,6 +109,46 @@ const CoverTemplatesParametersForm = ({
     shouldValidate: 'onSubmit',
     shouldRevalidate: 'onSubmit',
   });
+
+  const [medias, setMedias] = useState<
+    Array<{ id: File | string; editable: boolean; index: number }>
+  >(coverTemplate?.medias ?? []);
+
+  const onMediaChange = (media: {
+    id: File | string | null | undefined;
+    editable: boolean;
+    index: number;
+  }) => {
+    setMedias(prevMedias => {
+      const previousMediaIndex = prevMedias.findIndex(
+        prevMedia => prevMedia.index === media.index,
+      );
+
+      if (previousMediaIndex >= 0) {
+        const nextMedias = [...prevMedias];
+
+        if (media.id) {
+          nextMedias[previousMediaIndex].id = media.id;
+          nextMedias[previousMediaIndex].editable = media.editable;
+        } else {
+          nextMedias.splice(previousMediaIndex, 1);
+        }
+
+        return nextMedias;
+      } else if (media.id) {
+        return [
+          ...prevMedias,
+          {
+            id: media.id,
+            index: media.index,
+            editable: media.editable,
+          },
+        ];
+      }
+
+      return prevMedias;
+    });
+  };
 
   const enabledField = useInputControl(fields.enabled);
 
@@ -147,6 +189,23 @@ const CoverTemplatesParametersForm = ({
           formData.set(`lottieId`, public_id);
         }
         formData.delete('lottie');
+
+        const uploadedMedias = await Promise.all(
+          medias.map(async media => {
+            if (media.id instanceof File) {
+              const { public_id } = await uploadMedia(media.id, 'image');
+              return {
+                ...media,
+                id: public_id,
+              };
+            } else {
+              return media;
+            }
+          }),
+        );
+
+        formData.set('medias', JSON.stringify(uploadedMedias));
+
         action(formData);
       } catch (e) {
         console.error(e);
@@ -154,7 +213,7 @@ const CoverTemplatesParametersForm = ({
         setIsSaving(false);
       }
     },
-    [action],
+    [action, medias],
   );
 
   useEffect(() => {
@@ -435,6 +494,68 @@ const CoverTemplatesParametersForm = ({
           mediaCountField={fields.mediaCount}
           lottieIdField={fields.lottieId}
         />
+
+        <Box width="100%" display="flex" flexDirection="row" gap="20px">
+          {Array.from({
+            length: parseInt(fields.mediaCount.value ?? '0', 10),
+          }).map((_, index) => {
+            const media = medias.find(media => media.index === index);
+            const value =
+              typeof media?.id === 'string'
+                ? { id: media.id, kind: 'image' as const }
+                : (media?.id ?? null);
+
+            return (
+              <Box key={index} display="flex" flexDirection="column">
+                <MediaInput
+                  buttonLabel="UPLOAD AN IMAGE"
+                  buttonStyle={{
+                    paddingLeft: 0,
+                    paddingRight: 0,
+                    width: 150,
+                  }}
+                  label={`Media #${index}`}
+                  name={`media-${index}`}
+                  kind="image"
+                  onChange={file => {
+                    onMediaChange({
+                      id: file,
+                      index,
+                      editable: media?.editable ?? true,
+                    });
+                  }}
+                  value={value}
+                  style={{
+                    maxWidth: 150,
+                    width: 150,
+                    height: 150,
+                    borderRadius: 18,
+                    border: '2px solid rgba(245, 245, 246, 1)',
+                  }}
+                />
+                <FormControlLabel
+                  key={`media-${index}`}
+                  control={
+                    <Checkbox
+                      value={`media-${index}-non-editable`}
+                      name={`media-${index}-non-editable`}
+                      checked={media?.editable === false}
+                      onChange={(_, checked) => {
+                        if (media) {
+                          onMediaChange({
+                            ...media,
+                            editable: !checked,
+                          });
+                        }
+                      }}
+                    />
+                  }
+                  label="Non-editable"
+                />
+              </Box>
+            );
+          })}
+        </Box>
 
         <Box width="100%">
           {fields.params

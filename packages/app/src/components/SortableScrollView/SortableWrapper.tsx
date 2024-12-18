@@ -86,10 +86,10 @@ const SortableWrapper = ({
 }: SortableWrapperProps) => {
   const styles = useStyleSheet(styleSheet);
   const [moving, setMoving] = useState(false);
-  const positionY = useSharedValue(positions.value[id] * itemHeight);
-  const top = useSharedValue(positions.value[id] * itemHeight);
-  const upperBound = useDerivedValue(() => lowerBound.value + containerHeight);
-  const targetLowerBound = useSharedValue(lowerBound.value);
+  const positionY = useSharedValue(positions.get()[id] * itemHeight);
+  const top = useSharedValue(positions.get()[id] * itemHeight);
+  const upperBound = useDerivedValue(() => lowerBound.get() + containerHeight);
+  const targetLowerBound = useSharedValue(lowerBound.get());
   const diffScrolling = useSharedValue(0);
 
   // move the position of the row
@@ -226,7 +226,7 @@ const SortableWrapper = ({
       zIndex: moving ? 1 : 0,
       shadowOpacity: withSpring(moving ? 0.2 : 0),
     };
-  }, [moving]);
+  });
 
   return (
     <Animated.View style={[styles.root, animatedStyle]}>

@@ -1,34 +1,26 @@
 import { Image } from 'expo-image';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Linking, Platform, ScrollView, View } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Linking, Platform, View } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { useBottomSheetModalContext } from '#ui/BottomSheetModal';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import type { Contact } from 'expo-contacts';
-import type { GestureType } from 'react-native-gesture-handler';
 
 type Props = {
   details: ContactDetails;
   onClose: () => void;
   onSave: () => void;
-  scrollListGesture?: GestureType;
 };
 
-const ContactDetailsBody = ({
-  details,
-  onSave,
-  onClose,
-  scrollListGesture = Gesture.Native(),
-}: Props) => {
-  const { bottom } = useSafeAreaInsets();
+const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
+  const { bottom } = useScreenInsets();
   const intl = useIntl();
   const styles = useStyleSheet(stylesheet);
 
@@ -37,9 +29,12 @@ const ContactDetailsBody = ({
       return '';
     }
 
-    const lowercase = new Date(details.createdAt).toLocaleDateString('fr', {
-      dateStyle: 'long',
-    });
+    const lowercase = new Date(details.createdAt).toLocaleDateString(
+      undefined,
+      {
+        dateStyle: 'long',
+      },
+    );
 
     return lowercase
       .split(' ')
@@ -48,14 +43,6 @@ const ContactDetailsBody = ({
   }, [details]);
 
   const avatar = details?.image?.uri;
-
-  const { panGesture: modalPanGesture } = useBottomSheetModalContext(true);
-
-  useEffect(() => {
-    if (modalPanGesture) {
-      scrollListGesture.blocksExternalGesture(modalPanGesture);
-    }
-  }, [modalPanGesture, scrollListGesture]);
 
   return (
     <Container style={styles.container}>
@@ -98,60 +85,59 @@ const ContactDetailsBody = ({
             onPress={onSave}
           />
         </View>
-        <GestureDetector gesture={scrollListGesture}>
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={[
-              {
-                paddingBottom: bottom + HEADER,
-              },
-              styles.scroll,
-            ]}
-          >
-            {details.phoneNumbers?.map(phoneNumber => (
-              <PressableNative
-                key={phoneNumber.number}
-                style={styles.item}
-                onPress={() => {
-                  Linking.openURL(`tel:${phoneNumber.number}`);
-                }}
-              >
-                <View style={styles.label}>
-                  <Icon icon="mobile" />
-                  <Text variant="smallbold">{phoneNumber.label}</Text>
-                </View>
-                <Text>{phoneNumber.number}</Text>
-              </PressableNative>
-            ))}
-            {details.emails?.map(email => (
-              <PressableNative
-                key={email.email}
-                style={styles.item}
-                onPress={() => {
-                  Linking.openURL(`mailto:${email.email}`);
-                }}
-              >
-                <View style={styles.label}>
-                  <Icon icon="mail_line" />
-                  <Text variant="smallbold">{email.label}</Text>
-                </View>
-                <Text>{email.email}</Text>
-              </PressableNative>
-            ))}
-            <View style={styles.item}>
+
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={[
+            {
+              paddingBottom: bottom + HEADER,
+            },
+            styles.scroll,
+          ]}
+        >
+          {details.phoneNumbers?.map(phoneNumber => (
+            <PressableNative
+              key={phoneNumber.number}
+              style={styles.item}
+              onPress={() => {
+                Linking.openURL(`tel:${phoneNumber.number}`);
+              }}
+            >
               <View style={styles.label}>
-                <Icon icon="calendar" />
-                <Text variant="smallbold">
-                  <FormattedMessage
-                    defaultMessage="Date"
-                    description="ContactDetailsModal - Label for date item"
-                  />
-                </Text>
+                <Icon icon="mobile" />
+                <Text variant="smallbold">{phoneNumber.label}</Text>
               </View>
-              <Text>{date}</Text>
+              <Text>{phoneNumber.number}</Text>
+            </PressableNative>
+          ))}
+          {details.emails?.map(email => (
+            <PressableNative
+              key={email.email}
+              style={styles.item}
+              onPress={() => {
+                Linking.openURL(`mailto:${email.email}`);
+              }}
+            >
+              <View style={styles.label}>
+                <Icon icon="mail_line" />
+                <Text variant="smallbold">{email.label}</Text>
+              </View>
+              <Text>{email.email}</Text>
+            </PressableNative>
+          ))}
+          <View style={styles.item}>
+            <View style={styles.label}>
+              <Icon icon="calendar" />
+              <Text variant="smallbold">
+                <FormattedMessage
+                  defaultMessage="Date"
+                  description="ContactDetailsModal - Label for date item"
+                />
+              </Text>
             </View>
-          </ScrollView>
-        </GestureDetector>
+            <Text>{date}</Text>
+          </View>
+        </ScrollView>
       </View>
     </Container>
   );
@@ -167,7 +153,7 @@ const stylesheet = createStyleSheet(theme => ({
   },
   close: {
     position: 'absolute',
-    top: 0,
+    top: 20,
     left: 20,
   },
   share: {
@@ -242,6 +228,8 @@ const stylesheet = createStyleSheet(theme => ({
     color: colors.grey300,
     fontSize: 50,
     fontWeight: 500,
+    lineHeight: 60,
+    textTransform: 'uppercase',
   },
 }));
 

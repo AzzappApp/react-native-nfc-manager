@@ -8,14 +8,11 @@ import { MODULE_KINDS } from '@azzapp/shared/cardModuleHelpers';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
-import {
-  ScreenDidAppear,
-  useCurrentRoute,
-  useRouter,
-  useScreenHasFocus,
-} from '#components/NativeRouter';
+import { useCurrentRoute, useRouter } from '#components/NativeRouter';
 import WebCardBackground from '#components/WebCardBackgroundPreview';
+import useBoolean from '#hooks/useBoolean';
 import useToggle from '#hooks/useToggle';
+import useCoverPlayPermission from '#screens/HomeScreen/useCoverPlayPermission';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import AddContentBelowCoverModal from './AddContentBelowCoverModal';
 import CardStyleModal from './CardStyleModal';
@@ -146,16 +143,11 @@ const WebCardScreenContent = ({
   // #endregion
 
   // #region Color picker
-  const [showWebcardColorPicker, setShowWebcardColorPicker] = useState(false);
-  const onRequestWebcardColorPicker = useCallback(() => {
-    Toast.hide();
-    setShowWebcardColorPicker(true);
-  }, []);
-
-  const onClosWebcardColorPicker = useCallback(() => {
-    setShowWebcardColorPicker(false);
-  }, []);
-
+  const [
+    showWebcardColorPicker,
+    openWebcardColorPicker,
+    closeWebcardColorPicker,
+  ] = useBoolean(false);
   // #endregion
 
   // #region New Module
@@ -328,15 +320,29 @@ const WebCardScreenContent = ({
     return {
       opacity: editTransition?.value ? 0 : 1,
     };
-  }, []);
-
-  const hasFocus = useScreenHasFocus();
+  });
 
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();
+
+  const { canPlay, paused } = useCoverPlayPermission();
 
   return (
     <>
       <View style={styles.flex}>
+        <Animated.View style={[styles.background, backgroundStyle]}>
+          <Suspense
+            fallback={
+              <View
+                style={{
+                  flex: 1,
+                  backgroundColor: coverBackgroundColor,
+                }}
+              />
+            }
+          >
+            <WebCardBackground webCard={webCard} style={styles.flex} />
+          </Suspense>
+        </Animated.View>
         <Suspense>
           <WebCardScreenHeader
             webCard={webCard}
@@ -359,12 +365,16 @@ const WebCardScreenContent = ({
           allBlockLoaded={allBlockLoaded}
           onScroll={onScroll}
           editFooter={
-            <WebCardScreenEditModeFooter
-              fromCreation={fromCreation}
-              onAddContent={onAddContent}
-              onSkip={onDone}
-              webcard={webCard}
-            />
+            isViewer ? (
+              <Suspense>
+                <WebCardScreenEditModeFooter
+                  fromCreation={fromCreation}
+                  onAddContent={onAddContent}
+                  onSkip={onDone}
+                  webcard={webCard}
+                />
+              </Suspense>
+            ) : null
           }
           editFooterHeight={WEBCARD_SCREEN_EDIT_MODE_FOOTER_HEIGHT}
         >
@@ -378,7 +388,8 @@ const WebCardScreenContent = ({
             <CoverRenderer
               webCard={webCard}
               width={windowWidth}
-              canPlay={ready && hasFocus}
+              canPlay={ready && canPlay}
+              paused={paused}
               large
               useAnimationSnapshot
             />
@@ -397,28 +408,15 @@ const WebCardScreenContent = ({
               </View>
             }
           >
-            {/* TODO: We need to wrap the body in a ScreenDidAppear component
-             * To avoid a reanimated bug preventing layout transition
-             * if web card block are mounted during the transition
-             * @see https://github.com/software-mansion/react-native-reanimated/issues/4516
-             *
-             * Could be solved directly in WebCardBlockContainer once this PR is merged :
-             * https://github.com/software-mansion/react-native-reanimated/pull/5371
-             *
-             * update 19/01/2023: the PR is merged, we need to wait for the next reanimated release
-             * update 02/02/2023: the version 3.6.2 is released, but changing the layout transition doesn't seems to fix the issue
-             */}
-            <ScreenDidAppear>
-              <WebCardScreenBody
-                ref={webCardBodyRef}
-                webCard={webCard}
-                editing={editing}
-                selectionMode={selectionMode}
-                onEditModule={onEditModule}
-                onSelectionStateChange={onSelectionStateChange}
-                onLoad={onProfileBodyLoad}
-              />
-            </ScreenDidAppear>
+            <WebCardScreenBody
+              ref={webCardBodyRef}
+              webCard={webCard}
+              editing={editing}
+              selectionMode={selectionMode}
+              onEditModule={onEditModule}
+              onSelectionStateChange={onSelectionStateChange}
+              onLoad={onProfileBodyLoad}
+            />
           </Suspense>
         </WebCardScreenScrollView>
         <Suspense fallback={null}>
@@ -429,7 +427,7 @@ const WebCardScreenContent = ({
             selectionContainsHiddenModules={selectionContainsHiddenModules}
             webCard={webCard}
             onRequestNewModule={onRequestNewModule}
-            onRequestColorPicker={onRequestWebcardColorPicker}
+            onRequestColorPicker={openWebcardColorPicker}
             onRequestWebCardStyle={openCardStyleModal}
             onRequestPreview={openPreviewModal}
             onDelete={onDeleteSelectedModules}
@@ -437,20 +435,6 @@ const WebCardScreenContent = ({
             onToggleVisibility={onToggleSelectedModulesVisibility}
           />
         </Suspense>
-        <Animated.View style={[styles.background, backgroundStyle]}>
-          <Suspense
-            fallback={
-              <View
-                style={{
-                  flex: 1,
-                  backgroundColor: coverBackgroundColor,
-                }}
-              />
-            }
-          >
-            <WebCardBackground webCard={webCard} style={styles.flex} />
-          </Suspense>
-        </Animated.View>
       </View>
 
       {isViewer && (
@@ -479,7 +463,8 @@ const WebCardScreenContent = ({
             <WebCardColorsManager
               webCard={webCard}
               visible={showWebcardColorPicker}
-              onRequestClose={onClosWebcardColorPicker}
+              onRequestClose={closeWebcardColorPicker}
+              onCloseCanceled={openWebcardColorPicker}
             />
             <AddContentBelowCoverModal
               onClose={toggleShowContentModal}
@@ -503,7 +488,6 @@ const styles = StyleSheet.create({
     left: 0,
     width: '100%',
     height: '100%',
-    zIndex: -1,
   },
 });
 

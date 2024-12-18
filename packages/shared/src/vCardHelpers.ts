@@ -4,6 +4,30 @@ import { buildUserUrl } from './urlHelpers';
 import type { CommonInformation } from './contactCardHelpers';
 
 /**
+ * Helpers to help generate correct VCards
+ * @param label label to parse
+ * @returns label to display in the VCard
+ */
+export const addressLabelToVCardLabel = (label: string) => {
+  if (label === 'Home') return 'HOME';
+  if (label === 'Work') return 'WORK';
+  if (label === 'Main') return 'PREF;Main';
+  return undefined;
+};
+
+export const phoneLabelToVCardLabel = (label: string) => {
+  return label === 'Main'
+    ? 'type=PREF'
+    : label === 'Mobile'
+      ? 'type=CELL'
+      : `type=${label.toLocaleUpperCase()}`;
+};
+
+export const emailLabelToVCardLabel = (label: string) => {
+  return label === 'Main' ? 'type=PREF' : `type=${label.toLocaleUpperCase()}`;
+};
+
+/**
  * Generates a vCard from a serialized contact card
  * @param contactCardData The serialized contact card
  * @returns The vCard
@@ -34,23 +58,11 @@ export const buildVCardFromSerializedContact = async (
   }
 
   contactCard.emails.forEach(email => {
-    vcard.addEmail(
-      email[1],
-      email[0] === 'Main'
-        ? 'type=PREF'
-        : `type=${email[0].toLocaleUpperCase()}`,
-    );
+    vcard.addEmail(email[1], emailLabelToVCardLabel(email[0]));
   });
 
   contactCard.phoneNumbers.forEach(phone => {
-    vcard.addPhoneNumber(
-      phone[1],
-      phone[0] === 'Main'
-        ? 'type=PREF'
-        : phone[0] === 'Mobile'
-          ? 'type=CELL'
-          : `type=${phone[0].toLocaleUpperCase()}`,
-    );
+    vcard.addPhoneNumber(phone[1], phoneLabelToVCardLabel(phone[0]));
   });
 
   vcard.addURL(buildUserUrl(userName), 'type=azzapp WebCard');
@@ -59,10 +71,7 @@ export const buildVCardFromSerializedContact = async (
   });
 
   contactCard.addresses.forEach(address => {
-    let type = undefined;
-    if (address[0] === 'Home') type = 'HOME';
-    if (address[0] === 'Work') type = 'WORK';
-    if (address[0] === 'Main') type = 'PREF;Main';
+    const type = addressLabelToVCardLabel(address[0]);
 
     vcard.addAddress(
       address[0],

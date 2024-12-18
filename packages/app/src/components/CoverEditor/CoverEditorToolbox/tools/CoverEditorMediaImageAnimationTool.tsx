@@ -1,9 +1,4 @@
-import {
-  createPicture,
-  Canvas,
-  Picture,
-  Skia,
-} from '@shopify/react-native-skia';
+import { Canvas, Skia, Image } from '@shopify/react-native-skia';
 import { memo, useCallback, useMemo, useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet, Alert } from 'react-native';
@@ -19,21 +14,18 @@ import {
 } from '@azzapp/shared/coverHelpers';
 import BoxSelectionList from '#components/BoxSelectionList';
 import { DoneHeaderButton } from '#components/commonsButtons';
-import { mediaInfoIsImage } from '#components/CoverEditor/coverEditorHelpers';
 import TransformedImageRenderer from '#components/TransformedImageRenderer';
 import { keyExtractor } from '#helpers/idHelpers';
 import {
-  applyImageFrameTransformations,
-  applyShaderTransformations,
-  createImageFromNativeBuffer,
-  getTransformsForEditionParameters,
-  imageFrameFromImage,
-  imageFrameToShaderFrame,
-  useLutShader,
-  useNativeBuffer,
+  createImageFromNativeTexture,
+  scaleCropData,
+  transformImage,
+  useLutTexture,
 } from '#helpers/mediaEditions';
-import useToggle from '#hooks/useToggle';
+import { drawOffScreen, useOffScreenSurface } from '#helpers/skiaHelpers';
+import useBoolean from '#hooks/useBoolean';
 import BottomSheetModal from '#ui/BottomSheetModal';
+import Header from '#ui/Header';
 import LabeledWheelSelector from '#ui/LabeledWheelSelector';
 import Text from '#ui/Text';
 import mediaAnimations, {
@@ -42,26 +34,27 @@ import mediaAnimations, {
 import {
   useCoverEditorActiveImageMedia,
   useCoverEditorContext,
+  useCoverEditorEditContext,
 } from '../../CoverEditorContext';
 import ToolBoxSection from '../ui/ToolBoxSection';
-
 import type { BoxButtonItemInfo } from '#components/BoxSelectionList';
 import type { EditionParameters } from '#helpers/mediaEditions';
+import type { TextureInfo } from '#helpers/mediaEditions/NativeTextureLoader';
 import type {
   MediaAnimationListItem,
   MediaAnimations,
 } from '../../coverDrawer/mediaAnimations';
-import type { SkImage, SkShader } from '@shopify/react-native-skia';
+import type { SkImage } from '@shopify/react-native-skia';
 import type { DerivedValue } from 'react-native-reanimated';
 
 const CoverEditorMediaImageAnimationTool = () => {
-  const [show, toggleBottomSheet] = useToggle(false);
+  const [show, open, close] = useBoolean(false);
+  const coverEditorState = useCoverEditorContext();
   const activeMedia = useCoverEditorActiveImageMedia();
+  const { medias } = useCoverEditorContext();
   const hasMultipleMedias =
-    useCoverEditorContext().coverEditorState.medias.filter(media =>
-      mediaInfoIsImage(media),
-    ).length > 1;
-  const { dispatch } = useCoverEditorContext();
+    medias.filter(media => media.kind === 'image').length > 1;
+  const dispatch = useCoverEditorEditContext();
   const animations = useMediaAnimationList();
   const hasChanges = useRef(false);
   const onSelect = useCallback(
@@ -75,17 +68,26 @@ const CoverEditorMediaImageAnimationTool = () => {
     [dispatch],
   );
 
-  const buffer = useNativeBuffer({
-    uri: activeMedia?.media?.uri,
-    kind: activeMedia?.media?.kind,
-  });
+  const textureInfo = useMemo(() => {
+    return activeMedia ? coverEditorState.images[activeMedia.id] : null;
+  }, [activeMedia, coverEditorState.images]);
 
   const skImage = useDerivedValue(() => {
-    if (!buffer) {
+    if (!textureInfo) {
       return null;
     }
-    return createImageFromNativeBuffer(buffer, true);
-  }, [buffer]);
+    return createImageFromNativeTexture(textureInfo);
+  }, [textureInfo]);
+
+  const imageScale = coverEditorState.imagesScales[activeMedia?.id ?? ''] ?? 1;
+  const editionParameters = useMemo(() => {
+    return {
+      ...activeMedia?.editionParameters,
+      cropData: activeMedia?.editionParameters?.cropData
+        ? scaleCropData(activeMedia.editionParameters.cropData, imageScale)
+        : undefined,
+    };
+  }, [activeMedia?.editionParameters, imageScale]);
 
   const onChangeDurationSlider = useCallback(
     (duration: number) => {
@@ -113,7 +115,7 @@ const CoverEditorMediaImageAnimationTool = () => {
     [intl],
   );
 
-  const lutShader = useLutShader(activeMedia?.filter);
+  const lutTexture = useLutTexture(activeMedia?.filter);
 
   const renderItem = useCallback(
     ({
@@ -128,9 +130,9 @@ const CoverEditorMediaImageAnimationTool = () => {
             height={height}
             width={width}
             skImage={skImage}
-            editionParameters={activeMedia?.editionParameters}
+            editionParameters={editionParameters}
             duration={activeMedia?.duration}
-            lutShader={lutShader}
+            lutTexture={lutTexture}
           />
         );
       }
@@ -141,11 +143,11 @@ const CoverEditorMediaImageAnimationTool = () => {
           height={height}
           width={width}
           filter={activeMedia?.filter}
-          editionParameters={activeMedia?.editionParameters}
+          editionParameters={editionParameters}
         />
       );
     },
-    [activeMedia, lutShader, skImage],
+    [activeMedia, editionParameters, lutTexture, skImage],
   );
 
   const onFinished = useCallback(() => {
@@ -168,7 +170,7 @@ const CoverEditorMediaImageAnimationTool = () => {
               defaultMessage: 'No',
               description: 'Button to not apply the animation to all images',
             }),
-            onPress: toggleBottomSheet,
+            onPress: close,
           },
           {
             text: intl.formatMessage({
@@ -183,7 +185,7 @@ const CoverEditorMediaImageAnimationTool = () => {
                   duration: activeMedia.duration,
                 },
               });
-              toggleBottomSheet();
+              close();
             },
             isPreferred: true,
           },
@@ -191,9 +193,9 @@ const CoverEditorMediaImageAnimationTool = () => {
       );
     } else {
       hasChanges.current = false;
-      toggleBottomSheet();
+      close();
     }
-  }, [activeMedia, dispatch, hasMultipleMedias, intl, toggleBottomSheet]);
+  }, [activeMedia, dispatch, hasMultipleMedias, intl, close]);
 
   return (
     <>
@@ -204,24 +206,21 @@ const CoverEditorMediaImageAnimationTool = () => {
           description:
             'Cover Edition Image Media animation Tool Button - Animations',
         })}
-        onPress={toggleBottomSheet}
+        onPress={open}
       />
       {activeMedia != null && (
-        <BottomSheetModal
-          lazy
-          onRequestClose={toggleBottomSheet}
-          visible={show}
-          height={210 + 80 / COVER_RATIO}
-          headerTitle={
-            <Text variant="large">
-              <FormattedMessage
-                defaultMessage="Animations "
-                description="CoverEditor Animations Tool - Title"
-              />
-            </Text>
-          }
-          headerRightButton={<DoneHeaderButton onPress={onFinished} />}
-        >
+        <BottomSheetModal lazy onDismiss={close} visible={show}>
+          <Header
+            middleElement={
+              <Text variant="large">
+                <FormattedMessage
+                  defaultMessage="Animations "
+                  description="CoverEditor Animations Tool - Title"
+                />
+              </Text>
+            }
+            rightElement={<DoneHeaderButton onPress={onFinished} />}
+          />
           <View style={styles.boxContainer}>
             <BoxSelectionList
               data={animations}
@@ -248,6 +247,7 @@ const CoverEditorMediaImageAnimationTool = () => {
               defaultMessage: 'Duration: ',
               description: 'Duration label in cover edition animation',
             })}
+            style={styles.wheelSelectorStyle}
           />
         </BottomSheetModal>
       )}
@@ -264,7 +264,7 @@ const AnimationPreview = ({
   duration,
   skImage,
   editionParameters,
-  lutShader,
+  lutTexture,
 }: {
   animationId: MediaAnimations;
   height: number;
@@ -272,63 +272,52 @@ const AnimationPreview = ({
   duration: number;
   skImage: DerivedValue<SkImage | null> | null;
   editionParameters?: EditionParameters | null;
-  lutShader?: SkShader | null;
+  lutTexture?: TextureInfo | null;
 }) => {
   const imageAnimation = mediaAnimations[animationId];
 
   const startTime = useMemo(() => Date.now(), []);
-  const animationStateSharedValue = useSharedValue(0);
 
+  const image = useSharedValue<SkImage | null>(null);
+  const surface = useOffScreenSurface(width, height);
   useFrameCallback(() => {
-    animationStateSharedValue.value =
-      ((Date.now() - startTime) / 1000) % duration;
-  });
-
-  const picture = useDerivedValue(() =>
-    createPicture(canvas => {
-      if (!imageAnimation || !skImage?.value) {
-        return;
-      }
-      const { imageTransformations, shaderTransformations } =
-        getTransformsForEditionParameters({
-          width,
-          height,
-          lutShader,
-          editionParameters,
-        });
-      const { imageTransform, shaderTransform } = imageAnimation(
-        animationStateSharedValue.value,
-      );
-      if (imageTransform) {
-        imageTransformations.push(imageTransform);
-      }
-      if (shaderTransform) {
-        shaderTransformations.push(shaderTransform);
-      }
-      const { shader } = applyShaderTransformations(
-        imageFrameToShaderFrame(
-          applyImageFrameTransformations(
-            imageFrameFromImage(skImage.value),
-            imageTransformations,
-          ),
-        ),
-        shaderTransformations,
-      );
+    const sourceImage = skImage?.value;
+    if (!sourceImage) {
+      image.value = null;
+      return;
+    }
+    image.value = drawOffScreen(surface, (canvas, width, height) => {
+      const progress =
+        (((Date.now() - startTime) / 1000) % duration) / duration;
+      const imageInfo = imageAnimation(progress)({
+        matrix: Skia.Matrix(),
+        width: sourceImage.width(),
+        height: sourceImage.height(),
+      });
+      const imageFilter = transformImage({
+        image: sourceImage,
+        imageInfo,
+        targetWidth: width,
+        targetHeight: height,
+        editionParameters,
+        lutTexture,
+      });
       const paint = Skia.Paint();
-      paint.setShader(shader);
+      paint.setImageFilter(imageFilter);
       canvas.drawPaint(paint);
-    }),
-  );
+    });
+  }, true);
 
   return (
     <View style={{ height, width }}>
-      <Canvas style={{ width, height }}>
-        <Picture picture={picture} />
+      <Canvas style={{ width, height }} opaque>
+        <Image image={image} x={0} y={0} width={width} height={height} />
       </Canvas>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  wheelSelectorStyle: { paddingHorizontal: 20 },
   boxContainer: { height: 80 / COVER_RATIO + 70 },
 });

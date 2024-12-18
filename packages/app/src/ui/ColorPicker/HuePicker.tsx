@@ -86,7 +86,7 @@ const HUE_COLORS = [
   '#0000ff',
   '#ff00ff',
   '#ff0000',
-];
+] as const;
 
 const styles = StyleSheet.create({
   container: {

@@ -49,6 +49,7 @@ const MediaSuggestionsScreen = ({
             profile={profile}
             webCard={profile.webCard}
             isCurrentTab={isCurrentTab}
+            canPlay={canPlay}
           />
           <PostSuggestionTitle />
         </View>

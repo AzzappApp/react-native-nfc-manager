@@ -13,3 +13,14 @@ export const labelResolver = async <T extends { id: string }>(
   }
   return label?.value ?? '';
 };
+
+export const labelResolverWithPrefix = (prefix: string) => {
+  return async <T extends { id: string }>({ id }: T, _: unknown) => {
+    const { locale } = getSessionInfos();
+    let label = await labelLoader.load([prefix + id, locale]);
+    if (!label) {
+      label = await labelLoader.load([prefix + id, DEFAULT_LOCALE]);
+    }
+    return label?.value ?? '';
+  };
+};

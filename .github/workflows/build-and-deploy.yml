@@ -335,6 +335,7 @@ jobs:
           IOS_EXPORT_METHOD: ${{ vars.IOS_EXPORT_METHOD }}
           IOS_CERTIFICATE_P12_PASSWORD: ${{ secrets.IOS_CERTIFICATE_P12_PASSWORD }}
           APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
+          AZZAPP_API_VERCEL_PROTECTION_BYPASS: ${{secrets.AZZAPP_API_VERCEL_PROTECTION_BYPASS}}
 
       - name: Upload ios artifact
         uses: actions/upload-artifact@v4
@@ -362,7 +363,7 @@ jobs:
   buid-android:
     environment: ${{(github.ref_name == 'stable' && 'Production') || (github.ref_name == 'staging' && 'Staging') || 'Development' }}
     name: Build native Android application
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-m
     env:
       RUBYOPT: -rostruct
     needs:
@@ -443,6 +444,7 @@ jobs:
           ANDROID_KEY_ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
           PLAY_CONFIG_PATH: ${{ github.workspace }}/play_config.json
+          AZZAPP_API_VERCEL_PROTECTION_BYPASS: ${{secrets.AZZAPP_API_VERCEL_PROTECTION_BYPASS}}
 
       - name: Upload android artifact
         uses: actions/upload-artifact@v4

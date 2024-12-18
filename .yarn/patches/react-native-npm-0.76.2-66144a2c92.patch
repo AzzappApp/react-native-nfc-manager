@@ -1,0 +1,138 @@
+diff --git a/Libraries/Renderer/implementations/ReactFabric-dev.js b/Libraries/Renderer/implementations/ReactFabric-dev.js
+index 4d49bcd510e76a9e391deebd046e12d44ea696b7..78964289ea9b264a52979a3ced3a8b1d469d5a65 100644
+--- a/Libraries/Renderer/implementations/ReactFabric-dev.js
++++ b/Libraries/Renderer/implementations/ReactFabric-dev.js
+@@ -17912,6 +17912,9 @@ to return true:wantsResponderID|                            |
+       var transition = ReactCurrentBatchConfig$1.transition;
+ 
+       if (transition !== null) {
++        if (!transition._callbacks) {
++          transition._callbacks = new Set();
++        }
+         // Whenever a transition update is scheduled, register a callback on the
+         // transition object so we can get the return value of the scope function.
+         transition._callbacks.add(handleAsyncAction);
+diff --git a/Libraries/Renderer/implementations/ReactFabric-prod.js b/Libraries/Renderer/implementations/ReactFabric-prod.js
+index 3e5cf860260b7cf3a50114c805a96d17167f1be0..03819bec4717cc7a5ca26b0aeb20ff7ada755f02 100644
+--- a/Libraries/Renderer/implementations/ReactFabric-prod.js
++++ b/Libraries/Renderer/implementations/ReactFabric-prod.js
+@@ -7629,13 +7629,17 @@ function requestUpdateLane(fiber) {
+   if (0 !== (executionContext & 2) && 0 !== workInProgressRootRenderLanes)
+     return workInProgressRootRenderLanes & -workInProgressRootRenderLanes;
+   fiber = ReactCurrentBatchConfig$1.transition;
+-  null !== fiber && fiber._callbacks.add(handleAsyncAction);
+-  if (null !== fiber)
++  if (null !== fiber){
++    if (!fiber._callbacks) {
++      fiber._callbacks = new Set();
++    }
++    fiber._callbacks.add(handleAsyncAction);
+     return (
+       0 === currentEventTransitionLane &&
+         (currentEventTransitionLane = claimNextTransitionLane()),
+       currentEventTransitionLane
+     );
++  }
+   fiber = currentUpdatePriority;
+   if (0 === fiber)
+     a: {
+diff --git a/Libraries/Renderer/implementations/ReactFabric-profiling.js b/Libraries/Renderer/implementations/ReactFabric-profiling.js
+index 0f5fab5c9e1422e02ddb580aa776d62f4ad6ee6e..c75ec933603e1cb63fca04587e280de64d3b92c8 100644
+--- a/Libraries/Renderer/implementations/ReactFabric-profiling.js
++++ b/Libraries/Renderer/implementations/ReactFabric-profiling.js
+@@ -8015,13 +8015,17 @@ function requestUpdateLane(fiber) {
+   if (0 !== (executionContext & 2) && 0 !== workInProgressRootRenderLanes)
+     return workInProgressRootRenderLanes & -workInProgressRootRenderLanes;
+   fiber = ReactCurrentBatchConfig$1.transition;
+-  null !== fiber && fiber._callbacks.add(handleAsyncAction);
+-  if (null !== fiber)
++  if (null !== fiber){
++    if (!fiber._callbacks) {
++      fiber._callbacks = new Set();
++    }
++    fiber._callbacks.add(handleAsyncAction);
+     return (
+       0 === currentEventTransitionLane &&
+         (currentEventTransitionLane = claimNextTransitionLane()),
+       currentEventTransitionLane
+     );
++  }
+   fiber = currentUpdatePriority;
+   if (0 === fiber)
+     a: {
+diff --git a/ReactAndroid/src/main/java/com/facebook/react/internal/featureflags/ReactNativeFeatureFlagsDefaults.kt b/ReactAndroid/src/main/java/com/facebook/react/internal/featureflags/ReactNativeFeatureFlagsDefaults.kt
+index 1f07e68475cab2813699d40b72cffbc3a19301a8..da69fbdf67638e219a659036f1b5e94c42284ef4 100644
+--- a/ReactAndroid/src/main/java/com/facebook/react/internal/featureflags/ReactNativeFeatureFlagsDefaults.kt
++++ b/ReactAndroid/src/main/java/com/facebook/react/internal/featureflags/ReactNativeFeatureFlagsDefaults.kt
+@@ -4,7 +4,6 @@
+  * This source code is licensed under the MIT license found in the
+  * LICENSE file in the root directory of this source tree.
+  *
+- * @generated SignedSource<<2a0cd5a4875a54bb724e5765ffe7753e>>
+  */
+ 
+ /**
+@@ -25,7 +24,7 @@ public open class ReactNativeFeatureFlagsDefaults : ReactNativeFeatureFlagsProvi
+ 
+   override fun commonTestFlag(): Boolean = false
+ 
+-  override fun allowRecursiveCommitsWithSynchronousMountOnAndroid(): Boolean = false
++  override fun allowRecursiveCommitsWithSynchronousMountOnAndroid(): Boolean = true
+ 
+   override fun batchRenderingUpdatesInEventLoop(): Boolean = false
+ 
+diff --git a/ReactCommon/react/featureflags/ReactNativeFeatureFlagsDefaults.h b/ReactCommon/react/featureflags/ReactNativeFeatureFlagsDefaults.h
+index a5bfc039c71b477a0d19cf030e86f4b94a74b421..3dcdc548c657c3d1ee9b53a29422dfcf4cdfe614 100644
+--- a/ReactCommon/react/featureflags/ReactNativeFeatureFlagsDefaults.h
++++ b/ReactCommon/react/featureflags/ReactNativeFeatureFlagsDefaults.h
+@@ -4,7 +4,6 @@
+  * This source code is licensed under the MIT license found in the
+  * LICENSE file in the root directory of this source tree.
+  *
+- * @generated SignedSource<<2a078848517574213e02b42dff1af8e8>>
+  */
+ 
+ /**
+@@ -32,7 +31,7 @@ class ReactNativeFeatureFlagsDefaults : public ReactNativeFeatureFlagsProvider {
+   }
+ 
+   bool allowRecursiveCommitsWithSynchronousMountOnAndroid() override {
+-    return false;
++    return true;
+   }
+ 
+   bool batchRenderingUpdatesInEventLoop() override {
+diff --git a/src/private/featureflags/ReactNativeFeatureFlags.js b/src/private/featureflags/ReactNativeFeatureFlags.js
+index bd7ad13442a6546ceed5bd9c51d7e708cce9093e..f8880f1fd7b3e6bb71f4e0f3fbbaabd1f3d998a0 100644
+--- a/src/private/featureflags/ReactNativeFeatureFlags.js
++++ b/src/private/featureflags/ReactNativeFeatureFlags.js
+@@ -4,7 +4,7 @@
+  * This source code is licensed under the MIT license found in the
+  * LICENSE file in the root directory of this source tree.
+  *
+- * @generated SignedSource<<0bff47ec5af8ed96d8b2abe351f318f1>>
++ * @generated SignedSource<<847bc735ec959f7191e3491d4b5f329f>>
+  * @flow strict-local
+  */
+ 
+@@ -167,7 +167,7 @@ export const commonTestFlag: Getter<boolean> = createNativeFlagGetter('commonTes
+ /**
+  * Adds support for recursively processing commits that mount synchronously (Android only).
+  */
+-export const allowRecursiveCommitsWithSynchronousMountOnAndroid: Getter<boolean> = createNativeFlagGetter('allowRecursiveCommitsWithSynchronousMountOnAndroid', false);
++export const allowRecursiveCommitsWithSynchronousMountOnAndroid: Getter<boolean> = createNativeFlagGetter('allowRecursiveCommitsWithSynchronousMountOnAndroid', true);
+ /**
+  * When enabled, the RuntimeScheduler processing the event loop will batch all rendering updates and dispatch them together at the end of each iteration of the loop.
+  */
+diff --git a/src/private/featureflags/specs/NativeReactNativeFeatureFlags.js b/src/private/featureflags/specs/NativeReactNativeFeatureFlags.js
+index 530bde4be80407e5f8b4c014e31fb106d9ffe6be..e98ef0f3e9d3c87b65cca9f5e801cab9c983766c 100644
+--- a/src/private/featureflags/specs/NativeReactNativeFeatureFlags.js
++++ b/src/private/featureflags/specs/NativeReactNativeFeatureFlags.js
+@@ -4,7 +4,6 @@
+  * This source code is licensed under the MIT license found in the
+  * LICENSE file in the root directory of this source tree.
+  *
+- * @generated SignedSource<<6d4aa48dfdd3b78ac5f0f8e70eb3895f>>
+  * @flow strict-local
+  */
+ 

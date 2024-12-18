@@ -1,8 +1,7 @@
 import { useCallback } from 'react';
-import { View } from 'react-native';
 import { useRouter } from '#components/NativeRouter';
 import useScreenInsets from '#hooks/useScreenInsets';
-import ActivityIndicator from './ActivityIndicator';
+import LoadingScreen from '#screens/LoadingScreen';
 import Container from './Container';
 import WizardPagerHeader from './WizardPagerHeader';
 import type { Icons } from './Icon';
@@ -33,11 +32,7 @@ const createWizardScreenFallback = ({
           title=""
           backIcon={backIcon}
         />
-        <View
-          style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
-        >
-          <ActivityIndicator />
-        </View>
+        <LoadingScreen />
       </Container>
     );
   };

@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react-native';
 import { useAssets } from 'expo-asset';
 import {
   forwardRef,
@@ -10,8 +11,10 @@ import {
   useState,
 } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View, Platform } from 'react-native';
+import { Platform, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller';
 import Animated, {
+  interpolate,
   useAnimatedStyle,
   useSharedValue,
 } from 'react-native-reanimated';
@@ -21,31 +24,40 @@ import {
   DEFAULT_COLOR_LIST,
   DEFAULT_COLOR_PALETTE,
 } from '@azzapp/shared/cardHelpers';
-import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
+import {
+  COVER_IMAGE_DEFAULT_DURATION,
+  COVER_RATIO,
+} from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import { ScreenModal, preventModalDismiss } from '#components/NativeRouter';
-import { NativeBufferLoader, loadAllLUTShaders } from '#helpers/mediaEditions';
-import { getVideoLocalPath } from '#helpers/mediaHelpers';
-import useToggle from '#hooks/useToggle';
+import {
+  FILTERS,
+  getLutURI,
+  NativeTextureLoader,
+} from '#helpers/mediaEditions';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Text from '#ui/Text';
 import UploadProgressModal from '#ui/UploadProgressModal';
 import CoverEditorContextProvider from './CoverEditorContext';
 import {
-  mediaInfoIsImage,
   extractLottieInfoMemoized,
   calculateImageScale,
-  getMaxAllowedVideosPerCover,
+  getLottieMediasDurations,
+  copyCoverMediaToCacheDir,
+  useLottieMediaDurations,
+  MAX_ALLOWED_VIDEOS_BY_COVER,
 } from './coverEditorHelpers';
 import CoverEditorMediaPicker from './CoverEditorMediaPicker';
 import { coverEditorReducer } from './coverEditorReducer';
 import CoverEditorSaveModal from './CoverEditorSaveModal';
 import CoverEditorToolbox from './CoverEditorToolbox';
 import CoverPreview from './CoverPreview';
+import { getCoverLocalMediaPath } from './coversLocalStore';
 import useLottie from './useLottie';
 import useSaveCover from './useSaveCover';
-import type { Media, MediaImage } from '#helpers/mediaHelpers';
+import type { TextureInfo } from '#helpers/mediaEditions/NativeTextureLoader';
+import type { SourceMedia } from '#helpers/mediaHelpers';
 import type { CoverEditor_coverTemplate$key } from '#relayArtifacts/CoverEditor_coverTemplate.graphql';
 import type { CoverEditor_profile$key } from '#relayArtifacts/CoverEditor_profile.graphql';
 import type { CoverEditorAction } from './coverEditorActions';
@@ -56,6 +68,7 @@ import type {
   CoverEditorState,
   CoverEditorTextLayerItem,
 } from './coverEditorTypes';
+import type { Filter } from '@azzapp/shared/filtersHelper';
 import type { Asset } from 'expo-asset';
 import type { ForwardedRef, Reducer } from 'react';
 import type { LayoutChangeEvent, ViewProps } from 'react-native';
@@ -114,6 +127,8 @@ const ANDROID_ASSET_PATH =
 
 const isAndroidRelease = Platform.OS === 'android' && !__DEV__;
 
+export const maximumCoverFromScratch = 5;
+
 const CoverEditorCore = (
   {
     profile: profileKey,
@@ -165,6 +180,16 @@ const CoverEditorCore = (
           primary
           light
           dark
+        }
+        medias {
+          media {
+            id
+            uri
+            width
+            height
+          }
+          index
+          editable
         }
       }
     `,
@@ -249,28 +274,28 @@ const CoverEditorCore = (
     textLayers = textLayers.filter(textLayer => !!textLayer.text);
 
     const overlayLayers = placeholder
-      ? ((data?.overlayLayers as any)?.map((overlay: CoverEditorOverlayItem) =>
-          placeholder.localUri
-            ? {
-                ...overlay,
-                media: {
+      ? ((data?.overlayLayers as any)?.map(
+          (overlay: CoverEditorOverlayItem, i: number) =>
+            placeholder.localUri
+              ? {
+                  ...overlay,
+                  id: 'overlay_placeholder-' + i,
                   uri: isAndroidRelease ? ANDROID_ASSET_PATH : placeholder.uri,
                   kind: 'image',
                   width: placeholder.width,
                   height: placeholder.height,
-                },
-                rotation: 0,
-              }
-            : overlay,
+                  rotation: 0,
+                }
+              : overlay,
         ) ?? [])
       : [];
 
     let imagesScales =
-      coverInitialState?.medias?.reduce((acc, mediaInfo) => {
-        if (mediaInfoIsImage(mediaInfo)) {
+      coverInitialState?.medias?.reduce((acc, media) => {
+        if (media.kind === 'image') {
           return {
             ...acc,
-            [mediaInfo.media.uri]: calculateImageScale(mediaInfo.media),
+            [media.id]: calculateImageScale(media),
           };
         }
         return acc;
@@ -280,7 +305,7 @@ const CoverEditorCore = (
       imagesScales = coverInitialState.overlayLayers.reduce((acc, overlay) => {
         return {
           ...acc,
-          [overlay.media.uri]: calculateImageScale(overlay.media),
+          [overlay.id]: calculateImageScale(overlay),
         };
       }, imagesScales);
     }
@@ -293,9 +318,32 @@ const CoverEditorCore = (
     const shouldComputeCoverPreviewPositionPercentage =
       !coverTemplate && !coverInitialState?.lottie;
 
+    const lottieInfo = extractLottieInfoMemoized(lottie);
+    const durations = getLottieMediasDurations(lottieInfo);
+
+    let initialMediaToPick = undefined;
+    if (!coverInitialState?.medias?.length) {
+      initialMediaToPick = new Array(
+        lottie ? durations?.length : maximumCoverFromScratch,
+      ).fill(null);
+
+      coverTemplate?.medias.forEach(({ media, index, editable }) => {
+        initialMediaToPick[index] = {
+          editable,
+          kind: 'image',
+          filter: null,
+          animation: null,
+          editionParameters: null,
+          duration: durations ? durations[index] : COVER_IMAGE_DEFAULT_DURATION,
+          ...media,
+        };
+      });
+    }
+
     return {
       isModified: false,
       lottie,
+
       cardColors: {
         ...DEFAULT_COLOR_PALETTE,
         otherColors: [...DEFAULT_COLOR_LIST],
@@ -315,8 +363,8 @@ const CoverEditorCore = (
 
       images: {},
       imagesScales,
-      videoPaths: {},
-      lutShaders: {},
+      localFilenames: {},
+      lutTextures: {},
 
       loadingRemoteMedia: false,
       loadingLocalMedia: false,
@@ -324,6 +372,7 @@ const CoverEditorCore = (
       coverPreviewPositionPercentage: coverTemplate?.previewPositionPercentage,
       shouldComputeCoverPreviewPositionPercentage,
 
+      initialMediaToPick,
       ...coverInitialState,
     };
   });
@@ -334,55 +383,48 @@ const CoverEditorCore = (
     }
   }, [coverEditorState.isModified, onCoverModified]);
 
-  const contextValue = useMemo(() => {
-    return {
-      coverEditorState,
-      dispatch,
-    };
-  }, [coverEditorState, dispatch]);
   // #endregion
 
   const imageRefKeys = useRef<Record<string, string>>({});
+  const lutKeys = useRef<string[]>([]);
   const [reloadCount, setReloadCount] = useState(0);
   // #region Resources loading
   useEffect(() => {
     let canceled = false;
     const abortController = new AbortController();
-    const imagesToLoad: MediaImage[] = [];
-    const videoToLoad: string[] = [];
-    const fontsToLoad: string[] = [];
-    for (const mediaInfo of coverEditorState.medias) {
-      const {
-        media: { uri },
-      } = mediaInfo;
-      if (mediaInfoIsImage(mediaInfo)) {
-        if (!coverEditorState.images[uri]) {
-          imagesToLoad.push(mediaInfo.media);
-        }
-      } else if (!coverEditorState.videoPaths[uri]) {
-        videoToLoad.push(uri);
+    const mediasToLoad: SourceMedia[] = [];
+    for (const media of coverEditorState.medias) {
+      const { id, kind } = media;
+      if (
+        !coverEditorState.localFilenames[id] ||
+        (kind === 'image' && !coverEditorState.images[id])
+      ) {
+        mediasToLoad.push(media);
       }
     }
     for (const overlayLayer of coverEditorState.overlayLayers) {
-      const { media } = overlayLayer;
-      if (!coverEditorState.images[media.uri]) {
-        imagesToLoad.push(media);
+      if (
+        !coverEditorState.images[overlayLayer.id] ||
+        !coverEditorState.localFilenames[overlayLayer.id]
+      ) {
+        mediasToLoad.push(overlayLayer);
       }
     }
 
-    const lutShadersLoaded = !!Object.keys(coverEditorState.lutShaders).length;
-    if (
-      imagesToLoad.length === 0 &&
-      videoToLoad.length === 0 &&
-      fontsToLoad.length === 0 &&
-      lutShadersLoaded
-    ) {
+    let lutTextures = coverEditorState.lutTextures;
+    let localFilenames = coverEditorState.localFilenames;
+    let images = coverEditorState.images;
+
+    const lutTexturesLoaded = !!Object.keys(coverEditorState.lutTextures)
+      .length;
+    if (mediasToLoad.length === 0 && lutTexturesLoaded) {
       return () => {};
     }
 
-    const loadingRemoteMedia =
-      imagesToLoad.some(({ uri }) => uri.startsWith('http')) ||
-      videoToLoad.some(uri => uri.startsWith('http'));
+    const loadingRemoteMedia = mediasToLoad.some(
+      ({ uri, id }) =>
+        uri.startsWith('http') && !coverEditorState.localFilenames[id],
+    );
     dispatch({
       type: 'LOADING_START',
       payload: {
@@ -390,30 +432,67 @@ const CoverEditorCore = (
       },
     });
     const promises: Array<Promise<void>> = [];
-    let lutShaders = coverEditorState.lutShaders;
-    let images = coverEditorState.images;
-    let videoPaths = coverEditorState.videoPaths;
-    if (!lutShadersLoaded) {
+    if (!lutTexturesLoaded) {
       promises.push(
-        loadAllLUTShaders().then(result => {
-          if (canceled) {
-            return;
-          }
-          lutShaders = result;
+        Promise.all(
+          Object.keys(FILTERS).map(async key => {
+            const filter = key as Filter;
+            const filterUri = getLutURI(filter);
+            if (filterUri) {
+              const { key, promise } = NativeTextureLoader.loadImage(filterUri);
+              const textureInfo = await promise;
+              if (!lutKeys.current.includes(key)) {
+                lutKeys.current.push(key);
+                NativeTextureLoader.ref(key);
+              }
+              return { filter, textureInfo };
+            }
+            return null;
+          }),
+        ).then(loadedTextures => {
+          lutTextures = loadedTextures.reduce(
+            (lutTextures, loadedTexture) => {
+              if (loadedTexture) {
+                lutTextures[loadedTexture.filter] = loadedTexture.textureInfo;
+              }
+              return lutTextures;
+            },
+            {} as Partial<Record<Filter, TextureInfo>>,
+          );
         }),
       );
     }
 
     const imagesScales = coverEditorState.imagesScales;
 
-    if (imagesToLoad.length > 0) {
-      promises.push(
-        ...imagesToLoad.map(async media => {
-          const scale = imagesScales[media.uri] ?? 1;
-          const { key, promise } = NativeBufferLoader.loadImage(media.uri, {
-            width: media.width * scale,
-            height: media.height * scale,
-          });
+    promises.push(
+      ...mediasToLoad.map(async media => {
+        if (!localFilenames[media.id]) {
+          const filename = await copyCoverMediaToCacheDir(
+            media,
+            abortController.signal,
+          );
+          if (canceled) {
+            return;
+          }
+          if (!filename) {
+            throw new Error('Video not found for uri ' + media.uri);
+          }
+          localFilenames = {
+            ...localFilenames,
+            [media.id]: filename,
+          };
+        }
+        if (media.kind === 'image') {
+          const path = getCoverLocalMediaPath(localFilenames[media.id]);
+          const scale = imagesScales[media.id] ?? 1;
+          const { key, promise } = NativeTextureLoader.loadImage(
+            `file://${path}`,
+            {
+              width: media.width * scale,
+              height: media.height * scale,
+            },
+          );
 
           const buffer = await promise;
           if (canceled) {
@@ -421,30 +500,12 @@ const CoverEditorCore = (
           }
           images = {
             ...images,
-            [media.uri]: buffer,
+            [media.id]: buffer,
           };
-          imageRefKeys.current[media.uri] = key;
-        }),
-      );
-    }
-    if (videoToLoad.length > 0) {
-      promises.push(
-        ...videoToLoad.map(uri =>
-          getVideoLocalPath(uri, abortController.signal).then(path => {
-            if (canceled) {
-              return;
-            }
-            if (!path) {
-              throw new Error('Video not found for uri ' + uri);
-            }
-            videoPaths = {
-              ...videoPaths,
-              [uri]: path,
-            };
-          }),
-        ),
-      );
-    }
+          imageRefKeys.current[media.id] = key;
+        }
+      }),
+    );
 
     Promise.all(promises).then(
       () => {
@@ -454,16 +515,18 @@ const CoverEditorCore = (
         dispatch({
           type: 'LOADING_SUCCESS',
           payload: {
-            lutShaders,
+            lutTextures,
             images,
-            videoPaths,
+            localFilenames,
           },
         });
       },
       error => {
+        console.error(error);
         if (canceled) {
           return;
         }
+        Sentry.captureException(error);
         dispatch({
           type: 'LOADING_ERROR',
           payload: {
@@ -479,9 +542,9 @@ const CoverEditorCore = (
     };
   }, [
     coverEditorState.medias,
-    coverEditorState.lutShaders,
+    coverEditorState.lutTextures,
     coverEditorState.images,
-    coverEditorState.videoPaths,
+    coverEditorState.localFilenames,
     coverEditorState.overlayLayers,
     coverEditorState.imagesScales,
     // here to force the effect to run again when the reloadCount changes
@@ -494,15 +557,24 @@ const CoverEditorCore = (
 
   useEffect(() => {
     const keys = imageRefKeys.current;
-    Object.keys(coverEditorState.images).forEach(uri => {
-      NativeBufferLoader.ref(keys[uri]);
+    Object.keys(coverEditorState.images).forEach(id => {
+      NativeTextureLoader.ref(keys[id]);
     });
     return () => {
-      Object.keys(coverEditorState.images).forEach(uri => {
-        NativeBufferLoader.unref(keys[uri]);
+      Object.keys(coverEditorState.images).forEach(id => {
+        NativeTextureLoader.unref(keys[id]);
       });
     };
   }, [coverEditorState.images]);
+
+  useEffect(
+    () => () => {
+      lutKeys.current.forEach(key => {
+        NativeTextureLoader.unref(key);
+      });
+    },
+    [],
+  );
   // #endregion
 
   // #region Saving
@@ -518,7 +590,7 @@ const CoverEditorCore = (
 
   useEffect(() => {
     if (error) {
-      console.error(error);
+      console.error('', error);
     }
   }, [error]);
 
@@ -541,39 +613,60 @@ const CoverEditorCore = (
   // #endregion
 
   // #region Initial Media picking
-  const [showImagePicker, toggleImagePicker] = useToggle(false);
-  useEffect(() => {
+  const showImagePicker = useMemo(() => {
+    if (!coverEditorState.lottie && coverEditorState.medias.length === 0) {
+      //cover from scratch
+      return true;
+    }
     const lottieInfo = extractLottieInfoMemoized(coverEditorState.lottie);
     if (lottieInfo && lottieInfo.assetsInfos.length === 0) {
-      return;
+      return false;
     }
-    if (coverEditorState.medias.length === 0) {
-      toggleImagePicker();
+
+    if (
+      !!coverEditorState.lottie &&
+      coverEditorState.initialMediaToPick?.length
+    ) {
+      // ensure media picker is open when we build from scratch
+      return true;
+    }
+    const hasMissingId =
+      coverEditorState.medias.findIndex(
+        media => media === null || media.id === '',
+      ) !== -1;
+    if (hasMissingId) {
+      return true;
     }
   }, [
+    coverEditorState.initialMediaToPick,
     coverEditorState.lottie,
-    coverEditorState.medias.length,
-    toggleImagePicker,
+    coverEditorState.medias,
   ]);
 
+  const allDuration = useLottieMediaDurations(coverEditorState.lottie);
+
   const durations = useMemo(() => {
-    const lottieInfo = extractLottieInfoMemoized(coverEditorState.lottie);
-    return lottieInfo
-      ? lottieInfo.assetsInfos.map(
-          assetInfo => assetInfo.endTime - assetInfo.startTime,
-        )
-      : null;
-  }, [coverEditorState.lottie]);
+    const mediaList =
+      coverEditorState.initialMediaToPick || coverEditorState.medias;
+    const durationArray = mediaList.map(
+      (m, index) =>
+        m?.duration || allDuration?.[index] || COVER_IMAGE_DEFAULT_DURATION,
+    );
+    return durationArray;
+  }, [
+    allDuration,
+    coverEditorState.initialMediaToPick,
+    coverEditorState.medias,
+  ]);
 
   const onMediasPicked = useCallback(
-    (medias: Media[]) => {
+    (baseMedias: SourceMedia[]) => {
       dispatch({
         type: 'UPDATE_MEDIAS',
-        payload: medias,
+        payload: baseMedias,
       });
-      toggleImagePicker();
     },
-    [dispatch, toggleImagePicker],
+    [dispatch],
   );
 
   // #region Layout and styles
@@ -592,20 +685,40 @@ const CoverEditorCore = (
     [],
   );
 
-  const translateYSharedValue = useSharedValue(0);
-  const onKeyboardTranslateWorklet = useCallback(
-    (translateY: number) => {
-      'worklet';
-      translateYSharedValue.value = translateY;
+  const editedInputPosition = useSharedValue(0);
+  const onEditedInputPositionChange = useCallback(
+    (y: number) => {
+      editedInputPosition.value = y;
     },
-    [translateYSharedValue],
+    [editedInputPosition],
   );
 
-  const animatedStyle = useAnimatedStyle(() => {
+  const {
+    progress: keyboardProgressSharedValue,
+    height: keyboardHeightSharedValue,
+  } = useReanimatedKeyboardAnimation();
+
+  const { height: windowHeight } = useWindowDimensions();
+
+  const coverPreviewAnimatedStyle = useAnimatedStyle(() => {
     return {
-      transform: [{ translateY: translateYSharedValue.value }],
+      transform: [
+        {
+          translateY: interpolate(
+            keyboardProgressSharedValue.value,
+            [0, 1],
+            [
+              0,
+              keyboardHeightSharedValue.value +
+                windowHeight / 2 -
+                editedInputPosition.value,
+            ],
+          ),
+        },
+      ],
     };
   });
+
   // #endregion
 
   const toolbox = useRef<CoverEditorLinksToolActions>(null);
@@ -616,35 +729,62 @@ const CoverEditorCore = (
 
   const intl = useIntl();
 
-  const [loadingRemoteMedia] = useDebounce(
-    coverEditorState.loadingRemoteMedia,
+  const [loadingMedia] = useDebounce(
+    coverEditorState.loadingRemoteMedia || coverEditorState.loadingLocalMedia,
     200,
   );
 
+  const imagePicker = (
+    <ScreenModal
+      key="imagePicker"
+      visible={showImagePicker}
+      animationType="slide"
+      onRequestDismiss={onCancel}
+    >
+      <CoverEditorMediaPicker
+        initialMedias={
+          coverEditorState.initialMediaToPick || coverEditorState.medias
+        }
+        durations={durations}
+        durationsFixed={!!coverEditorState.lottie}
+        maxSelectableVideos={MAX_ALLOWED_VIDEOS_BY_COVER}
+        onFinished={onMediasPicked}
+        onClose={onCancel}
+      />
+    </ScreenModal>
+  );
+
+  if (showImagePicker) {
+    return imagePicker;
+  }
+
   return (
     <>
-      <CoverEditorContextProvider value={contextValue}>
-        <Animated.View
-          style={[styles.container, style, animatedStyle]}
-          {...props}
+      <View style={[styles.container, style]} {...props}>
+        <CoverEditorContextProvider
+          value={coverEditorState}
+          dispatch={dispatch}
         >
-          <Container style={styles.container}>
-            <View style={styles.content} onLayout={onContentLayout}>
-              {contentSize && (
-                <CoverPreview
-                  width={contentSize.width}
-                  height={contentSize.height}
-                  style={styles.coverPreview}
-                  onKeyboardTranslateWorklet={onKeyboardTranslateWorklet}
-                  onOpenLinksModal={onOpenLinksModal}
-                />
-              )}
-            </View>
-            <View style={{ height: 50 }} />
+          <Animated.View style={[styles.container, coverPreviewAnimatedStyle]}>
+            <Container style={styles.container}>
+              <View style={styles.content} onLayout={onContentLayout}>
+                {contentSize && (
+                  <CoverPreview
+                    width={contentSize.width}
+                    height={contentSize.height}
+                    style={styles.coverPreview}
+                    onEditedInputPositionChange={onEditedInputPositionChange}
+                    onOpenLinksModal={onOpenLinksModal}
+                  />
+                )}
+              </View>
+            </Container>
+          </Animated.View>
+          <Container style={styles.toolBoxContainer}>
             <CoverEditorToolbox ref={toolbox} />
           </Container>
-        </Animated.View>
-      </CoverEditorContextProvider>
+        </CoverEditorContextProvider>
+      </View>
 
       <ScreenModal
         visible={savingStatus != null}
@@ -676,23 +816,7 @@ const CoverEditorCore = (
         </Container>
       </ScreenModal>
       <ScreenModal
-        visible={showImagePicker}
-        animationType="slide"
-        onRequestDismiss={onCancel}
-      >
-        <CoverEditorMediaPicker
-          initialMedias={null}
-          durations={durations}
-          durationsFixed={!!coverEditorState.lottie}
-          maxSelectableVideos={getMaxAllowedVideosPerCover(
-            !!coverEditorState.lottie,
-          )}
-          onFinished={onMediasPicked}
-          onClose={onCancel}
-        />
-      </ScreenModal>
-      <ScreenModal
-        visible={loadingRemoteMedia}
+        visible={loadingMedia}
         animationType="slide"
         onRequestDismiss={onCancel}
       >
@@ -746,6 +870,7 @@ const CoverEditorCore = (
           </View>
         </Container>
       </ScreenModal>
+      {imagePicker}
     </>
   );
 };
@@ -768,5 +893,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     left: 0,
+  },
+  toolBoxContainer: {
+    paddingTop: 50,
   },
 });

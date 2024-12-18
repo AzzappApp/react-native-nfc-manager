@@ -1,10 +1,11 @@
 import { Suspense } from 'react';
 import { useIntl } from 'react-intl';
-import { Dimensions, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { useModulesData } from '#components/cardModules/ModuleData';
 import { ScreenModal } from '#components/NativeRouter';
 import WebCardPreview from '#components/WebCardPreview';
+import useScreenDimensions from '#hooks/useScreenDimensions';
 import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
@@ -24,8 +25,6 @@ type PreviewModalProps = {
   onRequestClose: () => void;
 };
 
-const { height: windowHeight } = Dimensions.get('window');
-
 /**
  * A modal that allows the user to preview his webcard.
  */
@@ -38,9 +37,7 @@ const PreviewModal = ({
     graphql`
       fragment PreviewModal_webCard on WebCard {
         id
-        ...CoverRenderer_webCard
-        ...WebCardBackgroundPreview_webCard
-        ...WebCardBackground_webCard
+        ...WebCardPreview_webCard
         cardStyle {
           borderColor
           borderRadius
@@ -74,7 +71,9 @@ const PreviewModal = ({
 
   const insets = useScreenInsets();
 
-  const previewHeight = windowHeight - insets.top - HEADER_HEIGHT;
+  const { height: screenHeight } = useScreenDimensions();
+
+  const previewHeight = screenHeight - HEADER_HEIGHT - insets.top;
 
   return (
     <ScreenModal

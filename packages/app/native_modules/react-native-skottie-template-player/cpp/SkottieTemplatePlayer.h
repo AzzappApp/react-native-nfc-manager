@@ -30,6 +30,8 @@ public:
   sk_sp<skresources::ImageAsset> loadImageAsset(const char[], const char[],
                                                 const char[]) const override;
   void updateAssetImage(std::string id, sk_sp<SkImage> image, std::shared_ptr<SkMatrix> matrix);
+  
+  void dispose();
 
 private:
   std::map<std::string, sk_sp<TemplateImageAsset>> assets;

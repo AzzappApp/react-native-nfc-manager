@@ -1,5 +1,10 @@
+import ReactNativeBlobUtil from 'react-native-blob-util';
 import ImageSize from 'react-native-image-size';
-import type { Media } from './mediaTypes';
+import { getFileExtension } from '#helpers/fileHelpers';
+import type {
+  FetchBlobResponse,
+  StatefulPromise,
+} from 'react-native-blob-util';
 
 /**
  * Returns the size of an image.
@@ -25,10 +30,11 @@ export const display2digit = (n: number) => (n >= 10 ? `${n}` : `0${n}`);
  * @returns A string in the form of hh:mm:ss or mm:ss if the time is less than an hour.
  */
 export const formatVideoTime = (timeInSeconds = 0) => {
-  const seconds = Math.floor(timeInSeconds);
+  let seconds = Math.floor(timeInSeconds);
   let minutes = Math.floor(timeInSeconds / 60);
   const hours = Math.floor(minutes / 60);
   minutes = minutes % 60;
+  seconds = seconds % 60;
   if (hours) {
     return `${display2digit(hours)}:${display2digit(minutes)}:${display2digit(
       seconds,
@@ -62,63 +68,44 @@ export const downScaleImage = (
 
 export const isPNG = (uri: string) => uri.toLowerCase().endsWith('.png');
 
-/**
- * Duplicates selected media items to fill all the designated slots in a media template.
- * This function ensures that the number of media items meets the required total number of slots
- * by duplicating existing media items cyclically until the total slot count is reached.
- *
- * @param totalSlots The total number of media slots that need to be filled in the template.
- * @param selectedMedias An array of media items (of generic type T) currently selected. These items can be of any type, typically strings, objects, etc.
- * @returns An array of media items of type T, where the number of items is equal to `totalSlots`. If the initial number of selected media items is less than `totalSlots`, it duplicates items from the `selectedMedias` cyclically to fill the gap.
- *
- * @example
- * Simple example:
- * ```ts
- * // Example of using duplicateMediaToFillSlots with strings as the media type.
- * const totalMediaSlots = 5;
- * const currentSelectedMedias = ['Media A', 'Media B', 'Media C'];
- * const finalMediaList = duplicateMediaToFillSlots<string>(totalMediaSlots, currentSelectedMedias);
- * console.log(finalMediaList); // Outputs: ['Media A', 'Media B', 'Media C', 'Media A', 'Media B']
- * ```
- */
-export const duplicateMediaToFillSlots = (
-  totalSlots: number,
-  selectedMedias: Media[],
-  maxSelectableVideos?: number | undefined,
-): Media[] => {
-  if (selectedMedias.length >= totalSlots) {
-    return selectedMedias;
-  }
+export const downloadRemoteFileToLocalCache = (
+  uri: string,
+  abortSignal?: AbortSignal,
+): Promise<string | null> => {
+  let canceled = false;
+  let promise: StatefulPromise<FetchBlobResponse> | null = null;
 
-  const filledMediaSlots = [...selectedMedias];
-  let filledSlots = 0;
+  abortSignal?.addEventListener(
+    'abort',
+    () => {
+      canceled = true;
+      promise?.cancel();
+    },
+    { once: true },
+  );
 
-  const selectableMedia = [...selectedMedias];
+  const innerFetch = async () => {
+    const ext = getFileExtension(uri);
+    promise = ReactNativeBlobUtil.config({
+      fileCache: true,
+      appendExt: ext ?? undefined,
+    }).fetch('GET', uri);
 
-  while (filledMediaSlots.length < totalSlots && selectableMedia.length) {
-    const index = filledSlots % selectableMedia.length;
-
-    const addedMedia = selectableMedia[index];
-
-    if (
-      addedMedia.kind === 'video' &&
-      maxSelectableVideos !== undefined &&
-      filledMediaSlots.filter(media => media.kind === 'video').length >=
-        maxSelectableVideos
-    ) {
-      selectableMedia.splice(index, 1);
-      continue;
-    }
-
-    // Add to the list the media to be duplicated.
-    // The media to be duplicated is from the initial list of selected medias, cycling through them.
-    filledMediaSlots.push(
-      selectableMedia[filledSlots % selectableMedia.length],
+    return promise.then(
+      response => {
+        if (canceled) {
+          return null;
+        }
+        return response.path();
+      },
+      error => {
+        if (canceled) {
+          return null;
+        }
+        throw error;
+      },
     );
-    filledSlots++;
-  }
+  };
 
-  return filledMediaSlots;
+  return innerFetch();
 };
-
-export const getMediaId = (media: Media) => media.galleryUri ?? media.uri;

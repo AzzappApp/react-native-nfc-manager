@@ -52,7 +52,7 @@ const Label = ({
       {showError && (
         <Text
           variant="error"
-          style={[errorStyle]}
+          style={errorStyle}
           numberOfLines={2}
           allowFontScaling
         >

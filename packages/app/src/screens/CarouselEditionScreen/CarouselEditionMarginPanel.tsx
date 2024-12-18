@@ -7,8 +7,8 @@ import {
 } from '@azzapp/shared/cardModuleHelpers';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TitleWithLine from '#ui/TitleWithLine';
+import type { ViewProps } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type CarouselEditionMarginPanelProps = ViewProps & {
   /**

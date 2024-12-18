@@ -3,6 +3,7 @@ import {
   updateWebCard,
   transaction,
   createRedirectWebCard,
+  deleteRedirectionFromTo,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { isValidUserName } from '@azzapp/shared/stringHelpers';
@@ -75,25 +76,7 @@ const updateWebCardUserNameMutation: MutationResolvers['updateWebCardUserName'] 
             expiresAt,
           });
 
-          // TODO I feels this was a mistake, let's see later
-          // // remove or udpate prevous redirection. As the specification are not fully detailled
-          // // and we can have different option for premium or not,  try to handle different case
-          // // existing profile with expiresAt date not expired
-          // const currentDate = new Date();
-          // await trx
-          //   .delete(RedirectWebCardTable)
-          //   .where(
-          //     and(
-          //       eq(RedirectWebCardTable.toUserName, userName),
-          //       lt(RedirectWebCardTable.expiresAt, currentDate),
-          //     ),
-          //   );
-
-          // // existing profile with expiresAt date expired
-          // await trx
-          //   .update(RedirectWebCardTable)
-          //   .set({ toUserName: userName })
-          //   .where(eq(RedirectWebCardTable.toUserName, webCard.userName));
+          await deleteRedirectionFromTo(userName, webCard.userName);
         }
       });
     } catch (error) {

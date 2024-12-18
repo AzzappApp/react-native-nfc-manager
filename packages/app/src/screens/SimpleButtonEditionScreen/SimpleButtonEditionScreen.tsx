@@ -1,16 +1,19 @@
-import { useCallback, useMemo, useState } from 'react';
+import omit from 'lodash/omit';
+import { startTransition, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
-import { useSharedValue } from 'react-native-reanimated';
+import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import * as z from 'zod';
 import {
+  getButtonDefaultColors,
   SIMPLE_BUTTON_DEFAULT_VALUES,
   SIMPLE_BUTTON_STYLE_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
 import { isValidUrl, isPhoneNumber } from '@azzapp/shared/stringHelpers';
 import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
+import AnimatedDataOverride from '#components/AnimatedDataOverride';
 import { useRouter } from '#components/NativeRouter';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
@@ -52,7 +55,7 @@ const actionTypeSchema = z.intersection(
   z.union([
     z.object({
       actionType: z.literal('email'),
-      actionLink: z.string().min(1),
+      actionLink: z.string().email().min(1),
     }),
     z
       .object({
@@ -122,6 +125,7 @@ const SimpleButtonEditionScreen = ({
           resizeMode
         }
         webCard {
+          coverBackgroundColor
           id
           cardIsPublished
           isPremium
@@ -176,8 +180,12 @@ const SimpleButtonEditionScreen = ({
       height: simpleButton?.height ?? null,
       backgroundId: simpleButton?.background?.id ?? null,
       backgroundStyle: simpleButton?.backgroundStyle ?? null,
+      ...getButtonDefaultColors(
+        profile.webCard?.coverBackgroundColor,
+        simpleButton,
+      ),
     };
-  }, [simpleButton]);
+  }, [simpleButton, profile.webCard?.coverBackgroundColor]);
 
   const { data, value, fieldUpdateHandler, dirty } = useModuleDataEditor({
     initialValue,
@@ -200,31 +208,13 @@ const SimpleButtonEditionScreen = ({
 
   const previewData = useMemo(
     () => ({
-      buttonLabel,
-      actionType,
-      actionLink,
-      fontFamily,
-      fontColor,
-      buttonColor,
-      borderColor,
-      backgroundStyle,
+      ...omit(data, ['backgroundId']),
       background:
         profile.moduleBackgrounds.find(
           background => background.id === backgroundId,
         ) ?? null,
     }),
-    [
-      buttonLabel,
-      actionType,
-      actionLink,
-      fontFamily,
-      fontColor,
-      buttonColor,
-      borderColor,
-      backgroundStyle,
-      backgroundId,
-      profile.moduleBackgrounds,
-    ],
+    [data, profile.moduleBackgrounds, backgroundId],
   );
   // #endregion
 
@@ -309,6 +299,16 @@ const SimpleButtonEditionScreen = ({
 
   const onBackgroundStyleChange = fieldUpdateHandler('backgroundStyle');
 
+  const animatedData = useDerivedValue(() => ({
+    fontSize: fontSize.value,
+    borderWidth: borderWidth.value,
+    borderRadius: borderRadius.value,
+    marginTop: marginTop.value,
+    marginBottom: marginBottom.value,
+    width: width.value,
+    height: height.value,
+  }));
+
   const onSave = useCallback(async () => {
     if (!canSave || !profile.webCard) {
       return;
@@ -362,13 +362,13 @@ const SimpleButtonEditionScreen = ({
     cardModulesCount,
     value,
     simpleButton?.id,
-    fontSize.value,
-    borderWidth.value,
-    borderRadius.value,
-    marginTop.value,
-    marginBottom.value,
-    width.value,
-    height.value,
+    fontSize,
+    borderWidth,
+    borderRadius,
+    marginTop,
+    marginBottom,
+    width,
+    height,
     commit,
     router,
     handleProfileActionError,
@@ -379,6 +379,14 @@ const SimpleButtonEditionScreen = ({
   // #region tabs
 
   const [currentTab, setCurrentTab] = useState('settings');
+  const onMenuItemPressed = useCallback(
+    (tab: string) => {
+      startTransition(() => {
+        setCurrentTab(tab);
+      });
+    },
+    [setCurrentTab],
+  );
 
   const {
     bottomPanelHeight,
@@ -429,21 +437,16 @@ const SimpleButtonEditionScreen = ({
         behavior="position"
         keyboardVerticalOffset={-insetBottom - BOTTOM_MENU_HEIGHT}
       >
-        <SimpleButtonPreview
-          style={{ height: topPanelHeight - 20, marginVertical: 10 }}
-          data={previewData}
-          animatedData={{
-            fontSize,
-            borderWidth,
-            borderRadius,
-            marginTop,
-            marginBottom,
-            width,
-            height,
-          }}
-          colorPalette={profile?.webCard?.cardColors}
-          cardStyle={profile?.webCard?.cardStyle}
-        />
+        <AnimatedDataOverride data={previewData} animatedData={animatedData}>
+          {data => (
+            <SimpleButtonPreview
+              style={{ height: topPanelHeight - 20, marginVertical: 10 }}
+              data={data}
+              colorPalette={profile?.webCard?.cardColors}
+              cardStyle={profile?.webCard?.cardStyle}
+            />
+          )}
+        </AnimatedDataOverride>
         <TabView
           style={{ height: bottomPanelHeight }}
           currentTab={currentTab}
@@ -466,10 +469,7 @@ const SimpleButtonEditionScreen = ({
                   fontSize={fontSize}
                   buttonColor={buttonColor}
                   onButtonColorChange={onButtonColorChange}
-                  style={{
-                    flex: 1,
-                    marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                  }}
+                  style={styles.tabStyle}
                   bottomSheetHeight={bottomPanelHeight}
                   onTouched={onTouched}
                 />
@@ -484,10 +484,7 @@ const SimpleButtonEditionScreen = ({
                   onBorderColorChange={onBordercolorChange}
                   borderWidth={borderWidth}
                   borderRadius={borderRadius}
-                  style={{
-                    flex: 1,
-                    marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                  }}
+                  style={styles.tabStyle}
                   bottomSheetHeight={bottomPanelHeight}
                   onTouched={onTouched}
                 />
@@ -501,10 +498,7 @@ const SimpleButtonEditionScreen = ({
                   marginBottom={marginBottom}
                   width={width}
                   height={height}
-                  style={{
-                    flex: 1,
-                    marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                  }}
+                  style={styles.tabStyle}
                   onTouched={onTouched}
                 />
               ),
@@ -519,10 +513,7 @@ const SimpleButtonEditionScreen = ({
                   onBackgroundChange={onBackgroundChange}
                   onBackgroundStyleChange={onBackgroundStyleChange}
                   bottomSheetHeight={bottomPanelHeight}
-                  style={{
-                    flex: 1,
-                    marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                  }}
+                  style={styles.tabStyle}
                 />
               ),
             },
@@ -531,7 +522,7 @@ const SimpleButtonEditionScreen = ({
       </KeyboardAvoidingView>
       <SimpleButtonEditionBottomMenu
         currentTab={currentTab}
-        onItemPress={setCurrentTab}
+        onItemPress={onMenuItemPressed}
         style={[
           styles.tabsBar,
           { bottom: insetBottom, width: windowWidth - 20 },
@@ -551,5 +542,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 10,
     right: 10,
+  },
+  tabStyle: {
+    flex: 1,
+    marginBottom: BOTTOM_MENU_HEIGHT,
   },
 });

@@ -1,4 +1,4 @@
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import type { ColorPaletteColor } from '@azzapp/shared/cardHelpers';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
@@ -259,6 +259,13 @@ export type ContactDetailsRoute = {
   };
 };
 
+export type OfflineVCardRoute = {
+  route: 'OFFLINE_VCARD';
+  params?: {
+    canGoBack?: boolean;
+  };
+};
+
 export type Route =
   | AboutRoute
   | AccountDetailsRoute
@@ -287,6 +294,7 @@ export type Route =
   | MultiUserDetailRoute
   | MultiUserRoute
   | NewPostRoute
+  | OfflineVCardRoute
   | OnboardingRoute
   | PostCommentsRoute
   | PostLikesRoute

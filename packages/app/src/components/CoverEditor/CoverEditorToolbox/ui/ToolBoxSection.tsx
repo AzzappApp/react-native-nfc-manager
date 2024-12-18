@@ -17,38 +17,40 @@ const ToolBoxSection = ({ label, icon, onPress }: Props) => {
   const styles = useStyleSheet(stylesToolbox);
 
   return (
-    <PressableNative style={styles.toolbox} onPress={onPress}>
-      {typeof icon === 'string' ? (
-        <Icon icon={icon} />
-      ) : (
-        <View style={styles.fakeIcon}>{icon}</View>
-      )}
-      <Text variant="xsmall">{label}</Text>
-    </PressableNative>
+    <View style={styles.container}>
+      <PressableNative style={styles.toolbox} onPress={onPress}>
+        {typeof icon === 'string' ? (
+          <Icon icon={icon} />
+        ) : (
+          <View style={styles.fakeIcon}>{icon}</View>
+        )}
+        <Text variant="xsmall">{label}</Text>
+      </PressableNative>
+    </View>
   );
 };
+export const TOOLBOX_SECTION_HEIGHT = 66;
 
 export const stylesToolbox = createStyleSheet(appearance => ({
-  toolbox: {
-    paddingVertical: 8,
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    rowGap: 1,
-    flexShrink: 0,
-    backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
-    borderRadius: 10,
+  container: {
     width: 70,
     height: TOOLBOX_SECTION_HEIGHT,
+    borderRadius: 10,
+    overflow: 'hidden',
+  },
+  toolbox: {
+    width: 70,
+    height: TOOLBOX_SECTION_HEIGHT,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
   },
   fakeIcon: {
     height: 24,
     alignItems: 'center',
     justifyContent: 'center',
-    position: 'relative',
   },
 }));
-
-export const TOOLBOX_SECTION_HEIGHT = 66;
 
 export default ToolBoxSection;

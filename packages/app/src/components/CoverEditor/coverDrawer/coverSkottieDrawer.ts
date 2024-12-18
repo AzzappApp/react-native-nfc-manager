@@ -1,15 +1,12 @@
+import { Skia, type SkImage, type SkMatrix } from '@shopify/react-native-skia';
 import {
-  applyImageFrameTransformations,
-  createImageFromNativeBuffer,
-  imageFrameFromImage,
-  imageFrameFromVideoFrame,
-  imageFrameTransformations,
+  createImageFromNativeTexture,
+  createImageFromVideoFrame,
   scaleCropData,
+  transformImageInfo,
 } from '#helpers/mediaEditions';
-import { mediaInfoIsImage } from '../coverEditorHelpers';
-import type { ImageFrame } from '#helpers/mediaEditions';
+import type { ImageInfo } from '#helpers/mediaEditions';
 import type { CoverDrawerOptions } from './coverDrawerTypes';
-import type { SkImage, SkMatrix } from '@shopify/react-native-skia';
 
 const coverSkottieDrawer = ({
   canvas,
@@ -35,46 +32,57 @@ const coverSkottieDrawer = ({
     }
   > = {};
   for (let i = 0; i < medias.length; i++) {
-    const mediaInfo = medias[i];
+    const media = medias[i];
     const asset = lottieInfo.assetsInfos[i];
     if (!asset) {
       console.error("Too many medias for the template's assets");
       break;
     }
-    let imageFrame: ImageFrame | null = null;
+    let image: SkImage | null = null;
+    let imageInfo: ImageInfo | null = null;
     let scale = 1;
-    if (mediaInfoIsImage(mediaInfo)) {
-      const image = createImageFromNativeBuffer(
-        images[mediaInfo.media.uri],
-        true,
-      );
-      scale = imagesScales[mediaInfo.media.uri] ?? 1;
-      imageFrame = image ? imageFrameFromImage(image) : null;
+    if (media.kind === 'image') {
+      image = createImageFromNativeTexture(images[media.id]);
+      scale = imagesScales[media.id] ?? 1;
+      imageInfo = image
+        ? {
+            width: image.width(),
+            height: image.height(),
+            matrix: Skia.Matrix(),
+          }
+        : null;
     } else {
-      imageFrame = imageFrameFromVideoFrame(frames[asset.id]) ?? null;
-      scale = videoScales[mediaInfo.media.uri] ?? 1;
+      ({ image, imageInfo } = createImageFromVideoFrame(frames[asset.id]) ?? {
+        image: null,
+        imageInfo: null,
+      });
+      scale = videoScales[media.id] ?? 1;
     }
-    if (!imageFrame) {
+    if (!image || !imageInfo) {
       continue;
     }
-    const { editionParameters } = mediaInfo;
+    const { editionParameters } = media;
     const { orientation, roll } = editionParameters ?? {};
     let cropData = editionParameters?.cropData;
     if (cropData && scale !== 1) {
       cropData = scaleCropData(cropData, scale);
     }
 
-    imageFrame = applyImageFrameTransformations(imageFrame, [
-      imageFrameTransformations.orientation(orientation),
-      imageFrameTransformations.roll(roll),
-      imageFrameTransformations.crop(cropData),
-      imageFrameTransformations.scale(asset.width, asset.height),
-    ]);
+    imageInfo = transformImageInfo({
+      imageInfo,
+      targetWidth: asset.width,
+      targetHeight: asset.height,
+      editionParameters: {
+        orientation,
+        cropData,
+        roll,
+      },
+    });
 
     imagesMap[asset.id] = {
-      image: imageFrame.image,
+      image,
       // android cast of HostObject force us to use get() method
-      matrix: imageFrame.matrix.get(),
+      matrix: imageInfo.matrix.get(),
     };
   }
   const progress = currentTime / lottieInfo.duration;

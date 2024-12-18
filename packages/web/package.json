@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/web",
-  "version": "0.9.14",
+  "version": "1.4.2",
   "private": true,
   "scripts": {
     "lint": "eslint .",
@@ -30,21 +30,20 @@
     "@envelop/validation-cache": "^7.0.0",
     "@escape.tech/graphql-armor-max-aliases": "^2.6.0",
     "@escape.tech/graphql-armor-max-tokens": "^2.5.0",
-    "@graphql-yoga/plugin-disable-introspection": "^2.7.0",
-    "@graphql-yoga/plugin-persisted-operations": "^3.7.0",
+    "@graphql-yoga/plugin-disable-introspection": "^2.10.3",
+    "@graphql-yoga/plugin-persisted-operations": "^3.10.3",
     "@next/third-parties": "^14.2.14",
     "@paralleldrive/cuid2": "^2.2.2",
     "@sentry/nextjs": "^7.113.0",
     "@sentry/tracing": "^7.114.0",
     "@types/react-lottie": "^1.2.10",
     "@vercel/functions": "^1.4.2",
-    "@vercel/kv": "^3.0.0",
     "bcrypt-ts": "^5.0.2",
     "classnames": "^2.5.1",
     "encoding": "^0.1.13",
     "file-saver": "^2.0.5",
     "google-wallet": "^1.0.18",
-    "graphql-yoga": "^5.7.0",
+    "graphql-yoga": "^5.10.3",
     "jose": "^5.9.4",
     "jsonwebtoken": "^9.0.2",
     "jwt-decode": "^4.0.0",
@@ -61,7 +60,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-intl": "^6.8.0",
-    "react-lottie": "^1.2.4",
+    "react-lottie": "1.2.6",
     "sanitize-html": "^2.13.1",
     "semver": "^7.6.3",
     "server-only": "^0.0.1",
@@ -79,6 +78,6 @@
     "@types/semver": "^7.5.8",
     "@vanilla-extract/dynamic": "^2.1.2",
     "@vanilla-extract/next-plugin": "^2.4.6",
-    "eslint": "^9.12.0"
+    "eslint": "^9.15.0"
   }
 }

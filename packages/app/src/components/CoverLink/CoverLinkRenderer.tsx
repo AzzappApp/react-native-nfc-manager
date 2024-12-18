@@ -36,11 +36,7 @@ const CoverLink = ({
       prefetch={prefetch}
       disabled={disabled}
     >
-      <PressableScaleHighlight
-        style={containerStyle}
-        onPress={onPress}
-        onLongPress={onLongPress}
-      >
+      <PressableScaleHighlight style={containerStyle} onLongPress={onLongPress}>
         <CoverRenderer {...props} style={coverStyle} />
       </PressableScaleHighlight>
     </Link>

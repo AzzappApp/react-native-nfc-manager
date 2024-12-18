@@ -140,10 +140,7 @@ const ContactDetailsScreen = ({ route }: Props) => {
   }, [contact, contactsPermissionStatus, intl, localContacts]);
 
   return (
-    <SafeAreaView
-      style={styles.container}
-      edges={{ bottom: 'off', top: 'additive' }}
-    >
+    <SafeAreaView style={styles.container}>
       <ContactDetailsBody
         details={contact}
         onClose={router.back}

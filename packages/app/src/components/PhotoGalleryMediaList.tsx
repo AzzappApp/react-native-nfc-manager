@@ -1,24 +1,11 @@
 import {
   CameraRoll,
+  cameraRollEventEmitter,
   progressUpdateEventEmitter,
 } from '@react-native-camera-roll/camera-roll';
-import {
-  useCallback,
-  useEffect,
-  useImperativeHandle,
-  useMemo,
-  useRef,
-  useState,
-  forwardRef,
-} from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import {
-  AppState,
-  Platform,
-  View,
-  unstable_batchedUpdates,
-  useWindowDimensions,
-} from 'react-native';
+import { AppState, Platform, View, useWindowDimensions } from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import { openPhotoPicker, openSettings } from 'react-native-permissions';
 import { colors } from '#theme';
@@ -32,13 +19,12 @@ import Container from '#ui/Container';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
 import MediaGridList from './MediaGridList';
-import type { Media } from '#helpers/mediaHelpers';
+import type { SourceMedia } from '#helpers/mediaHelpers';
 import type {
   Album,
   PhotoIdentifier,
 } from '@react-native-camera-roll/camera-roll';
 import type { ContentStyle } from '@shopify/flash-list';
-import type { ForwardedRef } from 'react';
 import type { ViewProps } from 'react-native';
 
 type PhotoGalleryMediaListProps = Omit<ViewProps, 'children'> & {
@@ -66,56 +52,54 @@ type PhotoGalleryMediaListProps = Omit<ViewProps, 'children'> & {
    * Called when the user selects a media.
    * @param media The media that was selected.
    */
-  onMediaSelected: (media: Media) => void;
+  onMediaSelected: (media: SourceMedia) => void;
   /**autoSelectFirstItem */
   autoSelectFirstItem?: boolean;
   contentContainerStyle?: ContentStyle;
-};
-
-export type PhotoGalleryMediaListActions = {
-  load: () => void;
 };
 
 /**
  * A component that displays a list of media from the camera roll
  * and allows the user to select one of them.
  */
-const PhotoGalleryMediaList = (
-  {
-    selectedMediaId,
-    selectedMediasIds,
-    album,
-    kind,
-    onMediaSelected,
-    autoSelectFirstItem = true,
-    numColumns = 4,
-    contentContainerStyle,
-    ...props
-  }: PhotoGalleryMediaListProps,
-  ref: ForwardedRef<PhotoGalleryMediaListActions>,
-) => {
+const PhotoGalleryMediaList = ({
+  selectedMediaId,
+  selectedMediasIds,
+  album,
+  kind,
+  onMediaSelected,
+  autoSelectFirstItem = true,
+  numColumns = 4,
+  contentContainerStyle,
+  ...props
+}: PhotoGalleryMediaListProps) => {
   const styles = useStyleSheet(styleSheet);
   const [medias, setMedias] = useState<PhotoIdentifier[]>([]);
-  const [hasNext, setHasNext] = useState(true);
-  const lastPhotoTimestamp = useRef<number | undefined>(undefined);
 
   const { mediaPermission } = usePermissionContext();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-  const mediaLength = useRef(0);
+  const lastPageInfo = useRef<{
+    hasNextPage: boolean;
+    endCursor: string | undefined;
+  } | null>(null);
+
+  const isLoading = useRef(false);
 
   const load = useCallback(
-    async (refreshing = false, updatePictures = false) => {
-      unstable_batchedUpdates(() => {
-        setIsLoadingMore(true);
-        setIsRefreshing(refreshing);
-      });
+    async (refreshing = false) => {
+      if (isLoading.current) {
+        return;
+      }
+      setIsLoadingMore(true);
+      isLoading.current = true;
+      setIsRefreshing(refreshing);
 
       try {
         const result = await CameraRoll.getPhotos({
-          first: updatePictures ? mediaLength.current || 48 : 48, //multiple of items per row
-          toTime: refreshing ? undefined : lastPhotoTimestamp.current,
+          first: 52,
+          after: refreshing ? undefined : lastPageInfo.current?.endCursor,
           assetType:
             kind === 'mixed' ? 'All' : kind === 'image' ? 'Photos' : 'Videos',
           groupTypes: album?.type,
@@ -123,36 +107,25 @@ const PhotoGalleryMediaList = (
           include: ['playableDuration'],
         });
 
-        const hasNextPage = result.page_info.has_next_page;
         const assets = result.edges;
-        const endTimestamp = assets[assets.length - 1]?.node.timestamp;
-
+        lastPageInfo.current = {
+          hasNextPage: result.page_info.has_next_page,
+          endCursor: result.page_info.end_cursor,
+        };
         setMedias(previous => {
-          const result = refreshing ? assets : [...previous, ...assets];
-          mediaLength.current = result.length;
-          return result;
+          return refreshing ? assets : previous.concat(assets);
         });
-
-        if (endTimestamp) {
-          lastPhotoTimestamp.current = Math.round(endTimestamp * 1000) - 1;
-        }
-        setHasNext(hasNextPage);
       } catch (e) {
         console.log(e);
         return;
       } finally {
-        unstable_batchedUpdates(() => {
-          setIsLoadingMore(false);
-          setIsRefreshing(false);
-        });
+        isLoading.current = false;
+        setIsLoadingMore(false);
+        setIsRefreshing(false);
       }
     },
-    [album?.title, album?.type, kind, lastPhotoTimestamp],
+    [album?.title, album?.type, kind],
   );
-
-  useImperativeHandle(ref, () => ({
-    load: () => load(true),
-  }));
 
   useEffect(() => {
     void load(true);
@@ -227,24 +200,28 @@ const PhotoGalleryMediaList = (
           ({ width, height, rotation } = await getVideoSize(uri));
         }
         onMediaSelected({
-          galleryUri: asset.node.image.uri,
+          id: asset.node.id,
           kind: 'video',
           uri,
+          galleryUri: asset.node.image.uri,
           width,
           height,
           rotation,
           duration: asset.node.image.playableDuration,
+          editable: true,
         });
       } else {
         if (width == null || height == null) {
           ({ width, height } = await getImageSize(uri));
         }
         onMediaSelected({
-          galleryUri: asset.node.image.uri,
+          id: asset.node.id,
           kind: 'image',
           uri,
+          galleryUri: asset.node.image.uri,
           width,
           height,
+          editable: true,
         });
       }
     },
@@ -252,10 +229,10 @@ const PhotoGalleryMediaList = (
   );
 
   const onEndReached = useCallback(() => {
-    if (hasNext && !isLoadingMore) {
+    if (lastPageInfo.current?.hasNextPage && !isLoadingMore) {
       void load();
     }
-  }, [hasNext, isLoadingMore, load]);
+  }, [isLoadingMore, load]);
 
   //should select the first media when the list if no media is selected
   useEffect(() => {
@@ -265,11 +242,26 @@ const PhotoGalleryMediaList = (
   }, [autoSelectFirstItem, medias, onMediaPress, selectedMediaId]);
 
   useEffect(() => {
+    const subscription = cameraRollEventEmitter.addListener(
+      'onLibrarySelectionChange',
+      _event => {
+        if (mediaPermission === 'limited') {
+          load(true);
+        }
+      },
+    );
+
+    return () => {
+      subscription.remove();
+    };
+  }, [load, mediaPermission]);
+
+  useEffect(() => {
     const subscription = AppState.addEventListener(
       'change',
       async nextAppState => {
         if (nextAppState === 'active') {
-          load(true, true);
+          load(true);
         }
       },
     );
@@ -327,7 +319,7 @@ const PhotoGalleryMediaList = (
         numColumns={numColumns}
         width={windowWidth}
         contentContainerStyle={contentContainerStyle}
-        getItemId={getPhotoUri}
+        getItemId={getPhotoId}
         getItemUri={getPhotoUri}
         getItemDuration={getPhotoDuration}
         onSelect={onMediaPress}
@@ -336,11 +328,8 @@ const PhotoGalleryMediaList = (
         {...props}
       />
       <BottomSheetModal
-        lazy
-        showGestureIndicator={false}
-        height={200}
+        showHandleIndicator={false}
         visible={manageAccessMediaVisible}
-        onRequestClose={toggleManageAccessMediaVisible}
       >
         <View style={styles.bottomContainer}>
           <PressableOpacity>
@@ -350,7 +339,6 @@ const PhotoGalleryMediaList = (
                 //it not waiting the modal ios will not be displayed
                 await openPhotoPicker();
                 toggleManageAccessMediaVisible();
-                load(true);
               }}
             >
               <FormattedMessage
@@ -389,6 +377,8 @@ const PhotoGalleryMediaList = (
   );
 };
 
+const getPhotoId = (item: PhotoIdentifier) => item.node.id;
+
 const getPhotoUri = (item: PhotoIdentifier) => item.node.image.uri;
 
 const getPhotoDuration = (item: PhotoIdentifier) =>
@@ -396,7 +386,7 @@ const getPhotoDuration = (item: PhotoIdentifier) =>
     ? item.node.image.playableDuration
     : undefined;
 
-export default forwardRef(PhotoGalleryMediaList);
+export default PhotoGalleryMediaList;
 
 const styleSheet = createStyleSheet(appearance => ({
   container: {
@@ -417,6 +407,7 @@ const styleSheet = createStyleSheet(appearance => ({
     alignItems: 'center',
     rowGap: 30,
     paddingTop: 20,
+    paddingBottom: 20,
   },
   cancelButton: {
     color: appearance === 'light' ? colors.grey400 : colors.grey600,

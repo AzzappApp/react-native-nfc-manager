@@ -20,7 +20,6 @@ exports.TRANSLATION_TARGETS = ['app', 'web', 'entity'];
 
 exports.APP_TARGET = 'app';
 exports.WEB_TARGET = 'web';
-exports.ENTITY_TARGET = 'entity';
 
 const DEFAULT_LOCALE = 'en-US';
 

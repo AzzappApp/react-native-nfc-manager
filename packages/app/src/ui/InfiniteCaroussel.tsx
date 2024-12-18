@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Animated, Easing, View } from 'react-native';
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
+import type { ViewProps } from 'react-native';
 
 type InfiniteCarouselProps<T = any> = Omit<ViewProps, 'children'> & {
   items: readonly T[];
@@ -8,6 +8,7 @@ type InfiniteCarouselProps<T = any> = Omit<ViewProps, 'children'> & {
   keyExtractor: (item: T, index: number) => string;
   renderItem: (item: T, index: number) => React.ReactNode;
   itemContainerStyle?: ViewProps['style'];
+  style?: ViewProps['style'];
 };
 
 function InfiniteCarousel<T = any>({
@@ -16,6 +17,7 @@ function InfiniteCarousel<T = any>({
   keyExtractor,
   renderItem,
   itemContainerStyle,
+  style,
   ...props
 }: InfiniteCarouselProps<T>) {
   const animation = useRef(new Animated.Value(0)).current;
@@ -38,7 +40,7 @@ function InfiniteCarousel<T = any>({
     .concat(items.map(item => ({ item, isDupe: true })));
 
   return (
-    <View {...props} style={[props.style, { flexDirection: 'row' }]}>
+    <View {...props} style={[style, { flexDirection: 'row' }]}>
       {displayedItems.map(({ item, isDupe }, index) => (
         <Animated.View
           key={`${keyExtractor(item, index)}-${isDupe ? 'dupe' : 'original'}`}

@@ -6,7 +6,7 @@
  *
  * **/
 import React, { cloneElement, useCallback } from 'react';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { shadow, colors, fontFamilies } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Container from './Container';
@@ -15,8 +15,7 @@ import PressableNative from './PressableNative';
 import Text from './Text';
 import type { Icons } from './Icon';
 import type { ReactNode } from 'react';
-import type { StyleProp, ViewStyle } from 'react-native';
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
+import type { StyleProp, ViewProps, ViewStyle } from 'react-native';
 
 export type BottomMenuItem = {
   /** unique tab key */
@@ -230,7 +229,7 @@ const BottomMenuItemRenderer = ({
             })}
         </View>
         {showLabel && (
-          <View style={[styles.labelDecoration]}>
+          <View style={styles.labelDecoration}>
             <Text
               variant="xsmall"
               style={[styles.label, isSelected && styles.activeLabel]}
@@ -261,16 +260,28 @@ const styleSheet = createStyleSheet(appearance => ({
     borderColor: 'transparent',
     borderRadius: 20,
   },
-  firstTabContainer: {
-    borderTopStartRadius: BOTTOM_MENU_HEIGHT / 2,
-    borderBottomStartRadius: BOTTOM_MENU_HEIGHT / 2,
-    minWidth: 60,
-  },
-  lastTabContainer: {
-    borderTopEndRadius: BOTTOM_MENU_HEIGHT / 2,
-    borderBottomEndRadius: BOTTOM_MENU_HEIGHT / 2,
-    minWidth: 60,
-  },
+  firstTabContainer: [
+    // :warning: this is a workaround for the ios that cause the strange #5735 issue
+    Platform.select({
+      android: {
+        borderTopStartRadius: BOTTOM_MENU_HEIGHT / 2,
+        borderBottomStartRadius: BOTTOM_MENU_HEIGHT / 2,
+      },
+      default: {},
+    }),
+    { minWidth: 60 },
+  ],
+  lastTabContainer: [
+    // :warning: this is a workaround for the ios that cause the strange #5735 issue
+    Platform.select({
+      android: {
+        borderTopEndRadius: BOTTOM_MENU_HEIGHT / 2,
+        borderBottomEndRadius: BOTTOM_MENU_HEIGHT / 2,
+      },
+      default: {},
+    }),
+    { minWidth: 60 },
+  ],
   tab: {
     flex: 1,
     alignItems: 'center',
@@ -293,7 +304,7 @@ const styleSheet = createStyleSheet(appearance => ({
     ...fontFamilies.semibold,
     lineHeight: 14,
     fontSize: 11,
-    color: appearance === 'light' ? colors.grey200 : colors.grey400,
+    color: appearance === 'light' ? colors.grey300 : colors.grey500,
   },
   image: {
     tintColor: appearance === 'light' ? colors.grey200 : colors.grey400,

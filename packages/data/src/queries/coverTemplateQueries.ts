@@ -10,7 +10,7 @@ import {
   or,
   sql,
 } from 'drizzle-orm';
-import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import { db } from '../database';
 import {
   CoverTemplatePreviewTable,
@@ -130,7 +130,6 @@ export const getCoverTemplatesWithTypeLabel = async ({
       LocalizationMessageTable,
       and(
         eq(CoverTemplateTable.typeId, LocalizationMessageTable.key),
-        eq(LocalizationMessageTable.target, ENTITY_TARGET),
         eq(LocalizationMessageTable.locale, locale),
       ),
     )
@@ -145,7 +144,6 @@ export const getCoverTemplatesWithTypeLabel = async ({
       LocalizationMessageTable,
       and(
         eq(CoverTemplateTable.typeId, LocalizationMessageTable.key),
-        eq(LocalizationMessageTable.target, ENTITY_TARGET),
         eq(LocalizationMessageTable.locale, locale),
       ),
     )

@@ -126,6 +126,11 @@ const columns: GridColDef[] = [
     flex: 1,
   },
   {
+    field: 'description',
+    headerName: 'description',
+    flex: 1,
+  },
+  {
     field: 'templates',
     headerName: 'Templates',
     flex: 1,

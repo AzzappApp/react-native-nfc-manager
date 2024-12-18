@@ -1,11 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-  PixelRatio,
-  StyleSheet,
-  useWindowDimensions,
-  View,
-} from 'react-native';
-import { type GestureType } from 'react-native-gesture-handler';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { StyleSheet } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
@@ -19,19 +13,17 @@ import type {
 } from '#relayArtifacts/AddContactModalProfiles_user.graphql';
 import type { CarouselSelectListHandle } from '#ui/CarouselSelectList';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
-import type { LayoutChangeEvent, ListRenderItemInfo } from 'react-native';
+import type { ListRenderItemInfo } from 'react-native';
 
 type Props = {
   user: AddContactModalProfiles_user$key;
   onSelectProfile: (profileId: string) => void;
-  nativeGesture?: GestureType;
 };
 
-const AddContactModalProfiles = ({
-  user: userKey,
-  onSelectProfile,
-  nativeGesture,
-}: Props) => {
+const COVER_HEIGHT = 192;
+const COVER_WIDTH = COVER_HEIGHT * COVER_RATIO;
+
+const AddContactModalProfiles = ({ user: userKey, onSelectProfile }: Props) => {
   const profileInfos = useProfileInfos();
 
   const { profiles } = useFragment(
@@ -64,26 +56,7 @@ const AddContactModalProfiles = ({
 
   const currentIndexSharedValue = useSharedValue(initialProfileIndex);
 
-  const [coverWidth, setCoverWidth] = useState(0);
   const carouselRef = useRef<CarouselSelectListHandle | null>(null);
-
-  const { width } = useWindowDimensions();
-
-  const onLayout = useCallback(
-    ({ nativeEvent: { layout } }: LayoutChangeEvent) => {
-      setCoverWidth(
-        Math.min(
-          width / 2,
-          Math.trunc(
-            PixelRatio.roundToNearestPixel(layout.height * COVER_RATIO),
-          ),
-        ),
-      );
-    },
-    [width],
-  );
-
-  const coverHeight = useMemo(() => coverWidth / COVER_RATIO, [coverWidth]);
 
   const onSelectedIndexChange = useCallback(
     (index: number) => {
@@ -111,26 +84,19 @@ const AddContactModalProfiles = ({
   }, []);
 
   return (
-    <View style={styles.container} onLayout={onLayout}>
-      {coverWidth > 0 && (
-        <CarouselSelectList
-          ref={carouselRef}
-          nativeGesture={nativeGesture}
-          data={data}
-          keyExtractor={keyExtractor}
-          renderItem={renderItem}
-          width={width}
-          height={coverHeight}
-          itemWidth={coverWidth}
-          scaleRatio={SCALE_RATIO}
-          style={styles.carousel}
-          itemContainerStyle={styles.carouselContentContainer}
-          onSelectedIndexChange={onSelectedIndexChange}
-          currentProfileIndexSharedValue={currentIndexSharedValue}
-          initialScrollIndex={initialProfileIndex}
-        />
-      )}
-    </View>
+    <CarouselSelectList<(typeof data)[number]>
+      ref={carouselRef}
+      data={data}
+      keyExtractor={keyExtractor}
+      renderItem={renderItem}
+      itemRatio={COVER_WIDTH / COVER_HEIGHT}
+      scaleRatio={SCALE_RATIO}
+      style={styles.carousel}
+      itemContainerStyle={styles.carouselContentContainer}
+      onSelectedIndexChange={onSelectedIndexChange}
+      currentProfileIndexSharedValue={currentIndexSharedValue}
+      initialScrollIndex={initialProfileIndex}
+    />
   );
 };
 
@@ -139,16 +105,13 @@ type ProfileType = ArrayItemType<AddContactModalProfiles_user$data['profiles']>;
 const SCALE_RATIO = 108 / 291;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    marginVertical: 15,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   carousel: {
-    flexGrow: 0,
-    overflow: 'visible',
     alignSelf: 'center',
+    width: '100%',
+    height: COVER_HEIGHT,
+    marginVertical: 15,
+    maxWidth: COVER_WIDTH * 2.25,
+    overflow: 'visible',
   },
   carouselContentContainer: {
     flexGrow: 0,

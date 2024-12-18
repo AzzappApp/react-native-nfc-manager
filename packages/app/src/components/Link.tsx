@@ -5,6 +5,7 @@ import { useRouter } from './NativeRouter';
 import type { Route } from '#routes';
 import type { ReactElement } from 'react';
 import type { GestureResponderEvent } from 'react-native';
+import type { PressableEvent } from 'react-native-gesture-handler/lib/typescript/components/Pressable/PressableProps';
 import type { Disposable } from 'react-relay';
 
 export type LinkProps<T extends Route> = T & {
@@ -73,10 +74,15 @@ const Link = <T extends Route>({
   }, [prefetch, prefetchScreen, route, params, context, disabled]);
 
   const onLinkPress = useCallback(
-    (event?: GestureResponderEvent) => {
+    (event?: GestureResponderEvent | PressableEvent) => {
       if (!disabled) {
         children.props.onPress?.(event);
-        if (event?.isDefaultPrevented()) {
+        if (
+          // android button is currently a pressable from react-native-gesture-handler (no isDefaultPrevented)
+          event &&
+          'isDefaultPrevented' in event &&
+          event.isDefaultPrevented()
+        ) {
           return;
         }
         if (replace) {

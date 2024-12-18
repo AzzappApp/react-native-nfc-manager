@@ -12,17 +12,15 @@ const WebcardParametersHeader = ({
   return (
     <AccountHeader
       webCard={webCard}
-      title={
-        intl.formatMessage(
-          {
-            defaultMessage: 'WebCard{azzappA} parameters',
-            description: 'Title of the webcard parameters screen.',
-          },
-          {
-            azzappA: <Text variant="azzapp">a</Text>,
-          },
-        ) as string
-      }
+      title={intl.formatMessage(
+        {
+          defaultMessage: 'WebCard{azzappA} parameters',
+          description: 'Title of the webcard parameters screen.',
+        },
+        {
+          azzappA: <Text variant="azzapp">a</Text>,
+        },
+      )}
     />
   );
 };

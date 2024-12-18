@@ -1,40 +1,38 @@
 import { createContext, useContext } from 'react';
-import { mediaInfoIsImage } from './coverEditorHelpers';
-import type { EditionParameters } from '#helpers/mediaEditions';
-import type { Media } from '#helpers/mediaHelpers';
-import type { MediaAnimations } from './coverDrawer/mediaAnimations';
-import type { OverlayAnimations } from './coverDrawer/overlayAnimations';
 import type { CoverEditorAction } from './coverEditorActions';
 import type {
   CoverEditorLinksLayerItem,
   CoverEditorOverlayItem,
   CoverEditorState,
   CoverEditorTextLayerItem,
-  MediaInfo,
-  MediaInfoImage,
+  CoverMedia,
+  CoverMediaImage,
 } from './coverEditorTypes';
-import type { Filter } from '@azzapp/shared/filtersHelper';
 
-export type CoverEditorContextType = {
-  coverEditorState: CoverEditorState;
-  dispatch: React.Dispatch<CoverEditorAction>;
-};
+export type CoverEditorContextType = CoverEditorState;
 
 const CoverEditorContext = createContext<CoverEditorContextType | null>(null);
 
+const CoverEditorEditContext =
+  createContext<React.Dispatch<CoverEditorAction> | null>(null);
+
 export type CoverEditorContextProviderProps = {
   value: CoverEditorContextType;
+  dispatch: React.Dispatch<CoverEditorAction>;
   children: React.ReactNode;
 };
 
 const CoverEditorContextProvider = ({
   value,
+  dispatch,
   children,
 }: CoverEditorContextProviderProps) => {
   return (
-    <CoverEditorContext.Provider value={value}>
-      {children}
-    </CoverEditorContext.Provider>
+    <CoverEditorEditContext.Provider value={dispatch}>
+      <CoverEditorContext.Provider value={value}>
+        {children}
+      </CoverEditorContext.Provider>
+    </CoverEditorEditContext.Provider>
   );
 };
 
@@ -49,23 +47,30 @@ export const useCoverEditorContext = () => {
   return context;
 };
 
+export const useCoverEditorEditContext = () => {
+  const context = useContext(CoverEditorEditContext);
+  if (context === null) {
+    throw new Error('Using CoverEditorEditContext without provider');
+  }
+
+  return context;
+};
+
 type UseCurrentLayerReturnType =
   | { kind: 'links'; layer: CoverEditorLinksLayerItem }
-  | { kind: 'media'; layer: MediaInfo }
+  | { kind: 'media'; layer: CoverMedia }
   | { kind: 'none'; layer: null }
   | { kind: 'overlay'; layer: CoverEditorOverlayItem }
   | { kind: 'text'; layer: CoverEditorTextLayerItem };
 
 export const useCurrentLayer = (): UseCurrentLayerReturnType => {
   const {
-    coverEditorState: {
-      editionMode,
-      selectedItemIndex,
-      overlayLayers,
-      textLayers,
-      medias,
-      linksLayer,
-    },
+    editionMode,
+    selectedItemIndex,
+    overlayLayers,
+    textLayers,
+    medias,
+    linksLayer,
   } = useCoverEditorContext();
 
   if (selectedItemIndex == null) {
@@ -116,52 +121,26 @@ export const useCoverEditorMedia = () => {
 };
 
 //TODO:(SHE)If perf issue, look at this to use directly the context instead of recreating an object on EACH change
-export const useCoverEditorActiveMedia = (): {
-  media: Media;
-  filter: Filter | null;
-  editionParameters: EditionParameters | null;
-  animation: MediaAnimations | OverlayAnimations | null;
-  duration?: number | null;
-} | null => {
-  const {
-    coverEditorState: { editionMode, overlayLayers, medias, selectedItemIndex },
-  } = useCoverEditorContext();
+export const useCoverEditorActiveMedia = ():
+  | CoverEditorOverlayItem
+  | CoverMedia
+  | null => {
+  const { editionMode, overlayLayers, medias, selectedItemIndex } =
+    useCoverEditorContext();
   if (editionMode === 'overlay' && selectedItemIndex != null) {
     const overlay = overlayLayers[selectedItemIndex];
-    if (!overlay) {
-      return null;
-    }
-    return {
-      media: overlay.media,
-      filter: overlay.filter,
-      editionParameters: overlay.editionParameters,
-      animation: overlay.animation,
-    };
+    return overlay ?? null;
   } else if (editionMode === 'mediaEdit' && selectedItemIndex != null) {
-    const media = medias[selectedItemIndex];
-    if (!media) {
-      return null;
-    }
-    return {
-      media: media.media,
-      filter: media.filter,
-      editionParameters: media.editionParameters,
-      animation: mediaInfoIsImage(media) ? media.animation : null,
-      duration: mediaInfoIsImage(media)
-        ? media.duration
-        : media.timeRange.duration,
-    };
+    return medias[selectedItemIndex] ?? null;
   }
   return null;
 };
 
-export const useCoverEditorActiveImageMedia = (): MediaInfoImage | null => {
-  const {
-    coverEditorState: { editionMode, medias, selectedItemIndex },
-  } = useCoverEditorContext();
+export const useCoverEditorActiveImageMedia = (): CoverMediaImage | null => {
+  const { editionMode, medias, selectedItemIndex } = useCoverEditorContext();
   if (editionMode === 'mediaEdit' && selectedItemIndex != null) {
     const media = medias[selectedItemIndex];
-    if (!media || !mediaInfoIsImage(media)) {
+    if (!media || media.kind !== 'image') {
       return null;
     }
     //direclty return the object instead of creating a new one

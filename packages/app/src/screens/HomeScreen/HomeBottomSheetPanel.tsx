@@ -17,8 +17,10 @@ import {
   profileIsOwner,
 } from '@azzapp/shared/profileHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
+import { signInRoutes } from '#mobileRoutes';
 import { colors } from '#theme';
 import Link from '#components/Link';
+import { useRouter } from '#components/NativeRouter';
 import { logEvent } from '#helpers/analytics';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { useDeleteNotifications } from '#hooks/useNotifications';
@@ -78,6 +80,7 @@ const HomeBottomSheetPanel = ({
     profileKey ?? null,
   );
 
+  const { bottom } = useScreenInsets();
   const intl = useIntl();
   const deleteFcmToken = useDeleteNotifications();
 
@@ -97,7 +100,7 @@ const HomeBottomSheetPanel = ({
           {
             azzappA: <Text variant="azzapp">a</Text>,
           },
-        ) as string,
+        ) as unknown as string,
       });
     },
   );
@@ -153,34 +156,28 @@ const HomeBottomSheetPanel = ({
     ]);
   }, [intl, profile?.profileRole, quitWebCard]);
 
-  const { bottom } = useScreenInsets();
   const [requestedLogout, toggleRequestLogout] = useToggle(false);
 
-  //this code work on ios only
-  const onDismiss = async () => {
+  const router = useRouter();
+
+  const onDismiss = useCallback(async () => {
     if (requestedLogout) {
-      try {
-        await deleteFcmToken();
-      } finally {
-        void dispatchGlobalEvent({ type: 'SIGN_OUT' });
-      }
-    }
-  };
-  //TODO: review Using onDismiss to logout (strange) but without it, the app is crashing in dev
-  const onLogout = useCallback(async () => {
-    if (Platform.OS === 'ios') {
-      toggleRequestLogout();
+      setTimeout(() => {
+        try {
+          deleteFcmToken();
+        } finally {
+          void dispatchGlobalEvent({ type: 'SIGN_OUT' });
+        }
+      });
     }
     close();
-    if (Platform.OS === 'android') {
-      //android is not crashing, but onDismiss is an ios feature only
-      try {
-        await deleteFcmToken();
-      } finally {
-        void dispatchGlobalEvent({ type: 'SIGN_OUT' });
-      }
-    }
-  }, [close, deleteFcmToken, toggleRequestLogout]);
+  }, [close, deleteFcmToken, requestedLogout]);
+
+  const onLogout = useCallback(async () => {
+    router.replaceAll(signInRoutes);
+    toggleRequestLogout();
+    close();
+  }, [close, router, toggleRequestLogout]);
 
   const onShare = useCallback(async () => {
     if (profile?.webCard?.userName) {
@@ -263,6 +260,22 @@ const HomeBottomSheetPanel = ({
             route: 'ACCOUNT_DETAILS',
           },
           onPress: close,
+        },
+        {
+          type: 'row',
+          icon: 'offline',
+          text: intl.formatMessage({
+            defaultMessage: 'Offline mode',
+            description: 'Link to open offline mode ',
+          }),
+          linkProps: {
+            route: 'OFFLINE_VCARD',
+            params: { canGoBack: true },
+          },
+          onPress: () => {
+            logEvent('open_webcard_parameters', { source: 'home' });
+            close();
+          },
         },
         profile?.webCard?.isPremium && !profile?.webCard.isWebSubscription
           ? {
@@ -400,52 +413,60 @@ const HomeBottomSheetPanel = ({
     [close, intl, onLogout, onShare, profile, userIsPremium],
   );
 
-  const modalHeight = useMemo(() => {
-    const separatorHeight =
-      elements.filter(element => element.type === 'separator').length * 25;
-    const rowHeight =
-      elements.filter(element => element.type === 'row').length *
-      (ROW_HEIGHT + 10);
-    return 20 + rowHeight + separatorHeight + 30;
-  }, [elements]);
+  const hasQuitWebcard = profile && !profileIsOwner(profile?.profileRole);
+
+  const height = useMemo(() => {
+    const QUIT_WEBCARD_HEIGHT = hasQuitWebcard ? 30 : 0;
+
+    return elements.reduce(
+      (accumulator, currentValue) => {
+        if (currentValue.type === 'separator') {
+          accumulator += SEPARATOR_HEIGHT;
+        } else {
+          accumulator += ELEMENT_HEIGHT;
+        }
+
+        return accumulator;
+      },
+      bottom + HANDLE_HEIGHT + QUIT_WEBCARD_HEIGHT,
+    );
+  }, [bottom, elements, hasQuitWebcard]);
 
   return (
     <BottomSheetModal
+      index={0}
       visible={visible}
-      height={bottom + modalHeight}
-      contentContainerStyle={styles.bottomSheetContainer}
       onDismiss={onDismiss}
-      onRequestClose={close}
+      enablePanDownToClose
+      height={height}
     >
-      <View style={styles.bottomSheetOptionsContainer}>
-        {elements.map((element, index) => {
-          if (element.type === 'separator') {
-            return <View key={`separator_${index}`} style={styles.separator} />;
-          }
-          return <HomeBottomSheetPanelOption key={index} {...element} />;
-        })}
-        {profile && !profileIsOwner(profile?.profileRole) && (
-          <PressableNative
-            style={styles.removeButton}
-            onPress={handleConfirmationQuitWebCard}
-            disabled={isLoadingQuitWebCard}
-          >
-            <Text variant="button" style={styles.removeText}>
-              <FormattedMessage
-                defaultMessage="Quit this WebCard{azzappA}"
-                description="label for button to quit a webcard (multi-user)"
-                values={{
-                  azzappA: (
-                    <Text style={styles.removeText} variant="azzapp">
-                      a
-                    </Text>
-                  ),
-                }}
-              />
-            </Text>
-          </PressableNative>
-        )}
-      </View>
+      {elements.map((element, index) => {
+        if (element.type === 'separator') {
+          return <View key={`separator_${index}`} style={styles.separator} />;
+        }
+        return <HomeBottomSheetPanelOption key={index} {...element} />;
+      })}
+      {hasQuitWebcard && (
+        <PressableNative
+          style={styles.removeButton}
+          onPress={handleConfirmationQuitWebCard}
+          disabled={isLoadingQuitWebCard}
+        >
+          <Text variant="button" style={styles.removeText}>
+            <FormattedMessage
+              defaultMessage="Quit this WebCard{azzappA}"
+              description="label for button to quit a webcard (multi-user)"
+              values={{
+                azzappA: (
+                  <Text style={styles.removeText} variant="azzapp">
+                    a
+                  </Text>
+                ),
+              }}
+            />
+          </Text>
+        </PressableNative>
+      )}
     </BottomSheetModal>
   );
 };
@@ -491,16 +512,13 @@ const HomeBottomSheetPanelOption = ({
   return inner;
 };
 
+const SEPARATOR_HEIGHT = 25;
+const ELEMENT_HEIGHT = 42;
+const HANDLE_HEIGHT = 50;
+
 const ROW_HEIGHT = 42;
 const styles = StyleSheet.create({
   separator: { height: 25 },
-  bottomSheetContainer: {
-    marginTop: 10,
-    paddingHorizontal: 0,
-  },
-  bottomSheetOptionsContainer: {
-    paddingTop: 20,
-  },
   bottomSheetOptionButton: {
     paddingVertical: 5,
     paddingHorizontal: 20,

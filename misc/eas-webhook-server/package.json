@@ -8,6 +8,6 @@
     "@types/safe-compare": "^1.1.0",
     "@vercel/node": "^2.15.3",
     "safe-compare": "^1.1.4",
-    "typescript": "^5.6.2"
+    "typescript": "^5.6.3"
   }
 }

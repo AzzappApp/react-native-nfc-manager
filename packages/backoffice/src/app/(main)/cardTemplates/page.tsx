@@ -1,9 +1,9 @@
 import { Box, TextField, Typography } from '@mui/material';
 import {
   getAllCardTemplates,
-  getLocalizationMessagesByLocaleAndTarget,
+  getLocalizationMessagesByLocale,
 } from '@azzapp/data';
-import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import CardTemplatesList from './CardTemplatesList';
 import type { CardModuleTemplate } from '@azzapp/data';
 
@@ -56,10 +56,7 @@ const CardTemplatesPage = async ({ searchParams = {} }: Props) => {
 
   const [cardTemplates, labels] = await Promise.all([
     getAllCardTemplates(),
-    await getLocalizationMessagesByLocaleAndTarget(
-      DEFAULT_LOCALE,
-      ENTITY_TARGET,
-    ),
+    await getLocalizationMessagesByLocale(DEFAULT_LOCALE),
   ]);
   const labelsMap = new Map(labels.map(label => [label.key, label.value]));
 

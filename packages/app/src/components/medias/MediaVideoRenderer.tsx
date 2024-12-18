@@ -1,4 +1,5 @@
-import { isEqual } from 'lodash';
+import { ResizeMode, Video } from 'expo-av';
+import isEqual from 'lodash/isEqual';
 import {
   forwardRef,
   useCallback,
@@ -10,21 +11,16 @@ import {
   useState,
 } from 'react';
 import { StyleSheet, View } from 'react-native';
-import Video from 'react-native-video';
 import {
   captureSnapshot,
   SnapshotRenderer,
 } from '@azzapp/react-native-snapshot-view';
-import { useLocalCachedMediaFile } from '#helpers/mediaHelpers/LocalMediaCache';
+import { useLocalCachedMediaFile } from '#helpers/mediaHelpers/remoteMediaCache';
 import { DelayedActivityIndicator } from '#ui/ActivityIndicator/ActivityIndicator';
 import MediaImageRenderer from './MediaImageRenderer';
+import type { AVPlaybackStatus } from 'expo-av';
 import type { ForwardedRef } from 'react';
 import type { ViewProps } from 'react-native';
-import type {
-  OnProgressData,
-  VideoRef,
-  ReactVideoProps,
-} from 'react-native-video';
 
 export type MediaVideoRendererProps = ViewProps & {
   /**
@@ -65,10 +61,6 @@ export type MediaVideoRendererProps = ViewProps & {
    * A callback called when the video loading failed
    */
   onError?: (error: any) => void;
-  /**
-   * A callback called when the video has reached the end (before looping)
-   */
-  onEnd?: () => void;
   /**
    * A callback called while the video is playing, allowing to track the current time
    */
@@ -112,7 +104,6 @@ const MediaVideoRenderer = (
     paused = false,
     currentTime,
     onProgress,
-    onEnd,
     onReadyForDisplay,
     onVideoReady,
     videoEnabled,
@@ -140,7 +131,7 @@ const MediaVideoRenderer = (
     }
   }, [useAnimationSnapshot]);
 
-  const videoRef = useRef<VideoRef>(null);
+  const videoRef = useRef<Video>(null);
   const containerRef = useRef<any>(null);
 
   useImperativeHandle(
@@ -148,7 +139,13 @@ const MediaVideoRenderer = (
     () => ({
       async getPlayerCurrentTime() {
         if (videoRef.current) {
-          return videoRef.current.getCurrentPosition().catch(() => null);
+          // return videoRef.current.getCurrentPosition().catch(() => null);
+          videoRef.current.getStatusAsync().then(status => {
+            if (!status.isLoaded) {
+              return null;
+            }
+            return status.positionMillis;
+          });
         }
         return null;
       },
@@ -198,10 +195,13 @@ const MediaVideoRenderer = (
   }, [dispatchReady, onVideoReady, cleanSnapshots]);
 
   const onPlaybackStatusUpdate = useCallback(
-    (status: OnProgressData) => {
+    (status: AVPlaybackStatus) => {
+      if (!status.isLoaded) {
+        return;
+      }
       onProgress?.({
-        currentTime: status.currentTime,
-        duration: status.playableDuration,
+        currentTime: status.positionMillis,
+        duration: status.durationMillis ?? 0,
       });
     },
     [onProgress],
@@ -211,16 +211,10 @@ const MediaVideoRenderer = (
     setLoading(false);
   }, []);
 
-  const videoSource: ReactVideoProps['source'] = useMemo(() => {
-    const startPosition = currentTime ? currentTime * 1000 : undefined;
-    if (localVideoFile) {
-      return {
-        uri: localVideoFile,
-        startPosition,
-      };
-    }
-    return { uri: source.uri, startPosition };
-  }, [localVideoFile, source, currentTime]);
+  const videoSource = useMemo(
+    () => ({ uri: localVideoFile ?? source.uri }),
+    [localVideoFile, source.uri],
+  );
 
   const thumbnailSource = useMemo(
     () =>
@@ -241,36 +235,34 @@ const MediaVideoRenderer = (
 
   return (
     <View style={containerStyle} ref={containerRef} {...props}>
-      {thumbnailSource && !currentTime && !snapshotID && (
-        <MediaImageRenderer
-          source={thumbnailSource}
-          testID="thumbnail"
-          alt={alt}
-          onReadyForDisplay={onThumbnailReadyForDisplay}
-          style={StyleSheet.absoluteFill}
-        />
-      )}
+      {
+        // we don't want to display the thumbnail if the video had a snapshot during
+        // the video loading
+        thumbnailSource && !currentTime && !snapshotID && (
+          <MediaImageRenderer
+            source={thumbnailSource}
+            testID="thumbnail"
+            alt={alt}
+            onReadyForDisplay={onThumbnailReadyForDisplay}
+            style={StyleSheet.absoluteFill}
+          />
+        )
+      }
       {!!videoEnabled && (
         <Video
           ref={videoRef}
           source={videoSource}
-          muted={muted}
-          paused={paused}
-          disableFocus={true}
-          onProgress={onPlaybackStatusUpdate}
-          preventsDisplaySleepDuringVideoPlayback={false}
-          onEnd={onEnd}
+          isMuted={muted}
+          shouldPlay={!paused}
+          resizeMode={ResizeMode.COVER}
+          onPlaybackStatusUpdate={onPlaybackStatusUpdate}
+          positionMillis={currentTime ?? 0}
           accessibilityLabel={alt}
-          repeat
+          isLooping
           style={StyleSheet.absoluteFill}
-          resizeMode="contain"
-          useTextureView
           onReadyForDisplay={onVideoReadyForDisplay}
-          playInBackground={false}
           onError={onError}
-          progressUpdateInterval={onProgress ? 50 : undefined}
-          hideShutterView
-          shutterColor="transparent"
+          progressUpdateIntervalMillis={onProgress ? 50 : undefined}
           onLoad={onLoadEnd}
         />
       )}

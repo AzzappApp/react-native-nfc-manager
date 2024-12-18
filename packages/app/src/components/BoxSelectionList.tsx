@@ -1,4 +1,4 @@
-import { memo, useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
@@ -31,6 +31,7 @@ export type BoxSelectionListProps<T> = Omit<ViewProps, 'hitSlop'> & {
   onSelect: (item: T | null) => void;
   onItemHeightChange?: (height: number) => void;
   fixedItemWidth?: number;
+  fixedItemHeight?: number;
 };
 
 const BoxSelectionList = <T,>({
@@ -44,21 +45,30 @@ const BoxSelectionList = <T,>({
   onLayout,
   onItemHeightChange,
   fixedItemWidth,
+  fixedItemHeight,
   ...props
 }: BoxSelectionListProps<T>) => {
   const styles = useStyleSheet(styleSheet);
 
-  const [height, setHeight] = useState<number | null>(null);
+  const [height, setHeight] = useState<number | null>(fixedItemHeight ?? null);
 
   const onLayoutInner = useCallback(
     (event: LayoutChangeEvent) => {
-      const { height } = event.nativeEvent.layout;
-      setHeight(height);
+      if (!fixedItemHeight) {
+        const { height } = event.nativeEvent.layout;
+        setHeight(height);
+        onItemHeightChange?.(height - VERTICAL_PADDING * 2);
+      }
       onLayout?.(event);
-      onItemHeightChange?.(height - VERTICAL_PADDING * 2);
     },
-    [onItemHeightChange, onLayout],
+    [fixedItemHeight, onItemHeightChange, onLayout],
   );
+
+  useEffect(() => {
+    if (fixedItemHeight) {
+      onItemHeightChange?.(fixedItemHeight - VERTICAL_PADDING * 2);
+    }
+  }, [fixedItemHeight, height, onItemHeightChange, onLayout]);
 
   const renderButton = useCallback(
     ({ item, index }: ListRenderItemInfo<T | null>) => {

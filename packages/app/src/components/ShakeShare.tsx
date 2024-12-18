@@ -1,4 +1,5 @@
 /* eslint-disable no-bitwise */
+import EventEmitter from 'events';
 import {
   BlendColor,
   Canvas,
@@ -27,17 +28,26 @@ import {
   useSharedValue,
 } from 'react-native-reanimated';
 import { graphql, useClientQuery } from 'react-relay';
+import { useNetworkAvailableContext } from '#networkAvailableContext';
 import { colors } from '#theme';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import useLatestCallback from '#hooks/useLatestCallback';
+import useScreenInsets from '#hooks/useScreenInsets';
 import { get as qrCodeWidth } from '#relayProviders/qrCodeWidth.relayprovider';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import IconButton from '#ui/IconButton';
 import CoverRenderer from './CoverRenderer';
 import type { ShakeShareScreenQuery } from '#relayArtifacts/ShakeShareScreenQuery.graphql';
 
+const _shakeShareEventHandler = new EventEmitter();
+
+export const openShakeShare = () => {
+  _shakeShareEventHandler.emit('open');
+};
+
 const ShakeShare = () => {
   const [mountScreen, setMountScreen] = useState(false);
+  const isConnected = useNetworkAvailableContext();
   const profileInfos = useProfileInfos();
 
   const dismount = useCallback(() => {
@@ -52,13 +62,20 @@ const ShakeShare = () => {
 
   useShakeDetector(activateDetector, hasProfile);
 
+  useEffect(() => {
+    _shakeShareEventHandler.on('open', activateDetector);
+    return () => {
+      _shakeShareEventHandler.off('open', activateDetector);
+    };
+  }, [activateDetector]);
+
   //Gesture to close on swipe
   const fling = Gesture.Fling()
     .direction(Directions.DOWN | Directions.RIGHT)
     .runOnJS(true)
     .onBegin(dismount); //seems to be a bug, only work with onBegin
 
-  if (!mountScreen) {
+  if (!mountScreen || !isConnected) {
     return null;
   }
   return (
@@ -125,6 +142,8 @@ const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
   const src = rect(0, 0, svg?.width() ?? 0, svg?.height() ?? 0);
   const dst = rect(0, 0, QR_CODE_WIDTH, QR_CODE_WIDTH);
 
+  const insets = useScreenInsets();
+
   if (!profile?.webCard?.cardIsPublished) {
     return null;
   }
@@ -146,8 +165,10 @@ const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
           style={styles.linear}
         />
         {svg && (
-          <View style={styles.qrCodeContainer}>
-            <Canvas style={styles.canvas}>
+          <View
+            style={[styles.qrCodeContainer, { bottom: 123 + insets.bottom }]}
+          >
+            <Canvas style={styles.canvas} opaque>
               <Group
                 layer={
                   <Paint>
@@ -166,7 +187,7 @@ const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
           icon="close"
           onPress={onClose}
           iconStyle={styles.iconStyle}
-          style={styles.iconContainerStyle}
+          style={[styles.iconContainerStyle, { bottom: insets.bottom + 35 }]}
         />
       </View>
     </>
@@ -176,7 +197,6 @@ const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
 const styles = StyleSheet.create({
   iconContainerStyle: {
     position: 'absolute',
-    bottom: 35,
     borderColor: 'white',
   },
   qrCodeContainer: {
@@ -184,7 +204,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     borderRadius: 34,
     padding: 17,
-    bottom: 123,
   },
   canvas: { width: QR_CODE_WIDTH, height: QR_CODE_WIDTH },
   linear: {
@@ -259,7 +278,7 @@ const useShakeDetector = (callback: () => void, activated: boolean) => {
         reset();
       }
     },
-    [callbackRef, lastShakeTimestamp.value, numShakes.value, reset],
+    [callbackRef, lastShakeTimestamp, numShakes, reset],
   );
 
   const sensorValue = useDerivedValue(() => {

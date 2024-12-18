@@ -1,12 +1,13 @@
-import { omit } from 'lodash';
-import { useCallback, useMemo, useState } from 'react';
+import omit from 'lodash/omit';
+import { startTransition, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Platform, StyleSheet } from 'react-native';
-import { useSharedValue } from 'react-native-reanimated';
+import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { Observable } from 'relay-runtime';
 import {
+  getPhotoWithTextAndTitleDefaultColors,
   MODULE_IMAGE_MAX_WIDTH,
   PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
   PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES,
@@ -15,6 +16,7 @@ import {
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { colors } from '#theme';
+import AnimatedDataOverride from '#components/AnimatedDataOverride';
 import ImagePicker, {
   EditImageStep,
   SelectImageStep,
@@ -138,6 +140,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
         webCard {
           id
           cardIsPublished
+          coverBackgroundColor
           cardColors {
             primary
             dark
@@ -198,8 +201,12 @@ const PhotoWithTextAndTitleEditionScreen = ({
       backgroundId: photoWithTextAndTitle?.background?.id ?? null,
       backgroundStyle: photoWithTextAndTitle?.backgroundStyle ?? null,
       aspectRatio: photoWithTextAndTitle?.aspectRatio ?? null,
+      ...getPhotoWithTextAndTitleDefaultColors(
+        profile.webCard?.coverBackgroundColor,
+        photoWithTextAndTitle,
+      ),
     };
-  }, [photoWithTextAndTitle]);
+  }, [photoWithTextAndTitle, profile.webCard?.coverBackgroundColor]);
 
   const { data, value, fieldUpdateHandler, updateFields, dirty } =
     useModuleDataEditor({
@@ -303,7 +310,11 @@ const PhotoWithTextAndTitleEditionScreen = ({
     width,
     height,
   }: ImagePickerResult) => {
-    const size = downScaleImage(width, height, MODULE_IMAGE_MAX_WIDTH);
+    const size = downScaleImage(
+      editionParameters.cropData?.width ?? width,
+      editionParameters.cropData?.height ?? height,
+      MODULE_IMAGE_MAX_WIDTH,
+    );
     const exportPath = await saveTransformedImageToFile({
       uri,
       resolution: size,
@@ -404,6 +415,18 @@ const PhotoWithTextAndTitleEditionScreen = ({
   const onBackgroundChange = fieldUpdateHandler('backgroundId');
 
   const onBackgroundStyleChange = fieldUpdateHandler('backgroundStyle');
+
+  const animatedData = useDerivedValue(() => ({
+    aspectRatio: aspectRatio.value,
+    borderRadius: borderRadius.value,
+    gap: gap.value,
+    marginHorizontal: marginHorizontal.value,
+    marginVertical: marginVertical.value,
+    titleFontSize: titleFontSize.value,
+    titleVerticalSpacing: titleVerticalSpacing.value,
+    contentFontSize: contentFontSize.value,
+    contentVerticalSpacing: contentVerticalSpacing.value,
+  }));
 
   const onSave = useCallback(async () => {
     if (!canSave || !profile.webCard) {
@@ -507,19 +530,19 @@ const PhotoWithTextAndTitleEditionScreen = ({
     });
   }, [
     canSave,
-    cardModulesCount,
     profile.webCard,
+    cardModulesCount,
     value,
     photoWithTextAndTitle?.id,
-    titleFontSize.value,
-    titleVerticalSpacing.value,
-    contentFontSize.value,
-    contentVerticalSpacing.value,
-    marginHorizontal.value,
-    borderRadius.value,
-    marginVertical.value,
-    gap.value,
-    aspectRatio.value,
+    titleFontSize,
+    titleVerticalSpacing,
+    contentFontSize,
+    contentVerticalSpacing,
+    marginHorizontal,
+    borderRadius,
+    marginVertical,
+    gap,
+    aspectRatio,
     commit,
     router,
     intl,
@@ -539,12 +562,14 @@ const PhotoWithTextAndTitleEditionScreen = ({
 
   const onCurrentTabChange = useCallback(
     (currentTab: string) => {
-      // TODO: Specific case for modal tab
-      if (currentTab === 'editor') {
-        setShowContentModal(true);
-      } else {
-        setCurrentTab(currentTab);
-      }
+      startTransition(() => {
+        // TODO: Specific case for modal tab
+        if (currentTab === 'editor') {
+          setShowContentModal(true);
+        } else {
+          setCurrentTab(currentTab);
+        }
+      });
     },
     [setCurrentTab],
   );
@@ -596,23 +621,16 @@ const PhotoWithTextAndTitleEditionScreen = ({
         }
       />
       <PressableOpacity onPress={onPickImage}>
-        <PhotoWithTextAndTitlePreview
-          style={{ height: topPanelHeight - 20, marginVertical: 10 }}
-          data={previewData}
-          animatedData={{
-            aspectRatio,
-            borderRadius,
-            gap,
-            marginHorizontal,
-            marginVertical,
-            titleFontSize,
-            titleVerticalSpacing,
-            contentFontSize,
-            contentVerticalSpacing,
-          }}
-          colorPalette={profile?.webCard?.cardColors}
-          cardStyle={profile?.webCard?.cardStyle}
-        />
+        <AnimatedDataOverride data={previewData} animatedData={animatedData}>
+          {data => (
+            <PhotoWithTextAndTitlePreview
+              style={{ height: topPanelHeight - 20, marginVertical: 10 }}
+              data={data}
+              colorPalette={profile?.webCard?.cardColors}
+              cardStyle={profile?.webCard?.cardStyle}
+            />
+          )}
+        </AnimatedDataOverride>
       </PressableOpacity>
       <TabView
         style={{ height: bottomPanelHeight, flex: 1 }}
@@ -666,9 +684,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
                 style={{
                   flex: 1,
                   marginBottom:
-                    insetBottom +
-                    BOTTOM_MENU_HEIGHT +
-                    (Platform.OS === 'android' ? 15 : 0),
+                    BOTTOM_MENU_HEIGHT + (Platform.OS === 'android' ? 15 : 0),
                 }}
                 onTouched={onTouched}
               />
@@ -685,9 +701,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
                 style={{
                   flex: 1,
                   marginBottom:
-                    insetBottom +
-                    BOTTOM_MENU_HEIGHT +
-                    (Platform.OS === 'android' ? 15 : 0),
+                    BOTTOM_MENU_HEIGHT + (Platform.OS === 'android' ? 15 : 0),
                 }}
                 onTouched={onTouched}
               />
@@ -705,7 +719,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
                 bottomSheetHeight={bottomPanelHeight}
                 style={{
                   flex: 1,
-                  marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
+                  marginBottom: BOTTOM_MENU_HEIGHT,
                 }}
               />
             ),
@@ -736,7 +750,6 @@ const PhotoWithTextAndTitleEditionScreen = ({
             onContentChange('');
           }
         }}
-        closeOnBlur={false}
         ItemTopComponent={
           <>
             <TextInput
@@ -746,7 +759,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
                 description:
                   'Title placeholder in PhotoWithTextAndTitle module',
               })}
-              value={title ?? ''}
+              defaultValue={title ?? ''}
               onChangeText={onTitleChange}
               onFocus={() => {
                 if (title === undefined) {

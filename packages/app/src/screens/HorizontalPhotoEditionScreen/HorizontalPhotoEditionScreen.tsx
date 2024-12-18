@@ -1,17 +1,19 @@
-import { omit } from 'lodash';
-import { useCallback, useMemo, useState } from 'react';
+import omit from 'lodash/omit';
+import { startTransition, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
-import { useSharedValue } from 'react-native-reanimated';
+import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { Observable } from 'relay-runtime';
 import {
+  getHorizontalPhotoDefaultColors,
   HORIZONTAL_PHOTO_DEFAULT_VALUES,
   HORIZONTAL_PHOTO_STYLE_VALUES,
   MODULE_IMAGE_MAX_WIDTH,
 } from '@azzapp/shared/cardModuleHelpers';
 import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
+import AnimatedDataOverride from '#components/AnimatedDataOverride';
 import { CameraButton } from '#components/commonsButtons';
 import ImagePicker, {
   EditImageStep,
@@ -120,6 +122,7 @@ const HorizontalPhotoEditionScreen = ({
         webCard {
           id
           cardIsPublished
+          coverBackgroundColor
           cardColors {
             primary
             light
@@ -163,8 +166,12 @@ const HorizontalPhotoEditionScreen = ({
       backgroundId: horizontalPhoto?.background?.id ?? null,
       backgroundStyle: horizontalPhoto?.backgroundStyle ?? null,
       image: horizontalPhoto?.image ?? null,
+      ...getHorizontalPhotoDefaultColors(
+        profile.webCard?.coverBackgroundColor,
+        horizontalPhoto,
+      ),
     };
-  }, [horizontalPhoto]);
+  }, [horizontalPhoto, profile.webCard?.coverBackgroundColor]);
 
   const { data, value, fieldUpdateHandler, dirty } = useModuleDataEditor({
     initialValue,
@@ -249,7 +256,11 @@ const HorizontalPhotoEditionScreen = ({
     editionParameters,
     filter,
   }: ImagePickerResult) => {
-    const size = downScaleImage(width, height, MODULE_IMAGE_MAX_WIDTH);
+    const size = downScaleImage(
+      editionParameters.cropData?.width ?? width,
+      editionParameters.cropData?.height ?? height,
+      MODULE_IMAGE_MAX_WIDTH,
+    );
     const exportPath = await saveTransformedImageToFile({
       uri,
       resolution: size,
@@ -298,6 +309,14 @@ const HorizontalPhotoEditionScreen = ({
   const onBackgroundStyleChange = fieldUpdateHandler('backgroundStyle');
 
   const onImageChange = fieldUpdateHandler('image');
+
+  const animatedData = useDerivedValue(() => ({
+    borderWidth: borderWidth.value,
+    borderRadius: borderRadius.value,
+    marginHorizontal: marginHorizontal.value,
+    marginVertical: marginVertical.value,
+    imageHeight: imageHeight.value,
+  }));
 
   const onSave = useCallback(async () => {
     if (!canSave || !profile.webCard) {
@@ -362,6 +381,7 @@ const HorizontalPhotoEditionScreen = ({
     }
 
     const input: SaveHorizontalPhotoModuleInput = {
+      ...data,
       moduleId: horizontalPhoto?.id,
       image: mediaId ?? value.image!.id,
       ...rest,
@@ -396,12 +416,13 @@ const HorizontalPhotoEditionScreen = ({
     cardModulesCount,
     profile.webCard,
     value,
+    data,
     horizontalPhoto?.id,
-    marginHorizontal.value,
-    marginVertical.value,
-    borderWidth.value,
-    borderRadius.value,
-    imageHeight.value,
+    marginHorizontal,
+    marginVertical,
+    borderWidth,
+    borderRadius,
+    imageHeight,
     commit,
     router,
     intl,
@@ -413,12 +434,11 @@ const HorizontalPhotoEditionScreen = ({
   // #region tabs
 
   const [currentTab, setCurrentTab] = useState('settings');
-  const onCurrentTabChange = useCallback(
-    (currentTab: string) => {
+  const onCurrentTabChange = useCallback((currentTab: string) => {
+    startTransition(() => {
       setCurrentTab(currentTab);
-    },
-    [setCurrentTab],
-  );
+    });
+  }, []);
 
   // #endregion
 
@@ -468,19 +488,16 @@ const HorizontalPhotoEditionScreen = ({
         }
       />
       <PressableOpacity onPress={onPickImage}>
-        <HorizontalPhotoPreview
-          style={{ height: topPanelHeight - 110, marginVertical: 10 }}
-          data={previewData}
-          animatedData={{
-            borderWidth,
-            borderRadius,
-            marginHorizontal,
-            marginVertical,
-            imageHeight,
-          }}
-          colorPalette={profile?.webCard?.cardColors}
-          cardStyle={profile?.webCard?.cardStyle}
-        />
+        <AnimatedDataOverride data={previewData} animatedData={animatedData}>
+          {data => (
+            <HorizontalPhotoPreview
+              style={{ height: topPanelHeight - 110, marginVertical: 10 }}
+              data={data}
+              colorPalette={profile?.webCard?.cardColors}
+              cardStyle={profile?.webCard?.cardStyle}
+            />
+          )}
+        </AnimatedDataOverride>
       </PressableOpacity>
       <View
         style={{
@@ -503,10 +520,7 @@ const HorizontalPhotoEditionScreen = ({
             element: (
               <HorizontalPhotoSettingsEditionPanel
                 height={imageHeight}
-                style={{
-                  flex: 1,
-                  marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                }}
+                style={styles.tabStyle}
                 onTouched={onTouched}
               />
             ),
@@ -521,10 +535,7 @@ const HorizontalPhotoEditionScreen = ({
                 onBorderColorChange={onBordercolorChange}
                 webCard={profile?.webCard ?? null}
                 bottomSheetHeight={bottomPanelHeight}
-                style={{
-                  flex: 1,
-                  marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                }}
+                style={styles.tabStyle}
                 onTouched={onTouched}
               />
             ),
@@ -536,10 +547,7 @@ const HorizontalPhotoEditionScreen = ({
                 marginHorizontal={marginHorizontal}
                 marginVertical={marginVertical}
                 onTouched={onTouched}
-                style={{
-                  flex: 1,
-                  marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                }}
+                style={styles.tabStyle}
               />
             ),
           },
@@ -553,10 +561,7 @@ const HorizontalPhotoEditionScreen = ({
                 onBackgroundChange={onBackgroundChange}
                 onBackgroundStyleChange={onBackgroundStyleChange}
                 bottomSheetHeight={bottomPanelHeight}
-                style={{
-                  flex: 1,
-                  marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
-                }}
+                style={styles.tabStyle}
               />
             ),
           },
@@ -606,5 +611,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 10,
     right: 10,
+  },
+  tabStyle: {
+    flex: 1,
+    marginBottom: BOTTOM_MENU_HEIGHT,
   },
 });

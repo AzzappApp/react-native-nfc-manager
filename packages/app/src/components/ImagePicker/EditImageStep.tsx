@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { startTransition, useCallback, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, useWindowDimensions, View } from 'react-native';
 import { useDebouncedCallback } from 'use-debounce';
@@ -7,7 +7,6 @@ import { colors } from '#theme';
 import {
   editionParametersSettings,
   useEditionParametersDisplayInfos,
-  preloadLUTShaders,
 } from '#helpers/mediaEditions';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Icon from '#ui/Icon';
@@ -73,27 +72,39 @@ const EditImageStep = ({
     selectedTab ?? 'filter',
   );
 
+  const onMenuItemPress = useCallback((tab: string) => {
+    startTransition(() => {
+      setCurrentTab(tab as 'edit' | 'filter' | 'timeRange');
+    });
+  }, []);
+
   const onEditionStart = useCallback(
     (param: keyof EditionParameters) => {
-      previousParameters.current = editionParameters;
-      previousTimeRange.current = timeRange;
-      setEditedParam(param);
+      startTransition(() => {
+        previousParameters.current = editionParameters;
+        previousTimeRange.current = timeRange;
+        setEditedParam(param);
+      });
     },
     [editionParameters, timeRange],
   );
 
   const onEditionSave = useCallback(() => {
-    previousParameters.current = editionParameters;
-    previousTimeRange.current = timeRange;
-    setEditedParam(null);
+    startTransition(() => {
+      previousParameters.current = editionParameters;
+      previousTimeRange.current = timeRange;
+      setEditedParam(null);
+    });
     onEditionSaveProp?.(editionParameters);
   }, [editionParameters, onEditionSaveProp, timeRange]);
 
   const onEditionCancel = useCallback(() => {
-    onEditionParametersChange(previousParameters.current);
-    onTimeRangeChange(previousTimeRange.current);
-    setEditedParam(null);
-    onEditionCancelProp?.();
+    startTransition(() => {
+      onEditionParametersChange(previousParameters.current);
+      onTimeRangeChange(previousTimeRange.current);
+      setEditedParam(null);
+      onEditionCancelProp?.();
+    });
   }, [onEditionParametersChange, onEditionCancelProp, onTimeRangeChange]);
 
   const onCurrentParamChange = useCallback(
@@ -212,7 +223,7 @@ const EditImageStep = ({
               {timeRange &&
                 timeRange?.duration < media.duration &&
                 !(media.duration > maxVideoDuration) && (
-                  <View style={[styles.durationView]}>
+                  <View style={styles.durationView}>
                     <Text variant="xsmall" style={styles.duration}>
                       {formatDuration(media.duration)}
                     </Text>
@@ -234,13 +245,13 @@ const EditImageStep = ({
           )}
         </ImagePickerMediaRenderer>
       }
-      bottomPanel={({ insetBottom }) => (
+      bottomPanel={
         <TabView
           currentTab={editedParameter ? 'edit-parameter' : currentTab}
           style={{
             flex: 1,
             marginTop: 20,
-            marginBottom: insetBottom + BOTTOM_MENU_HEIGHT + 15,
+            marginBottom: BOTTOM_MENU_HEIGHT,
           }}
           mountOnlyCurrentTab
           tabs={[
@@ -262,6 +273,7 @@ const EditImageStep = ({
                       media={media}
                       aspectRatio={aspectRatio}
                       cropData={editionParameters.cropData}
+                      orientation={editionParameters.orientation}
                       selectedFilter={mediaFilter}
                       onChange={onMediaFilterChange}
                       style={styles.filterSelectionStyle}
@@ -354,12 +366,12 @@ const EditImageStep = ({
             },
           ]}
         />
-      )}
+      }
       menuBarProps={
         !isEditing && showTabs
           ? {
               currentTab,
-              onItemPress: setCurrentTab as any,
+              onItemPress: onMenuItemPress,
               tabs,
             }
           : null
@@ -369,7 +381,6 @@ const EditImageStep = ({
 };
 
 EditImageStep.STEP_ID = 'EDIT_IMAGE';
-EditImageStep.preload = () => preloadLUTShaders();
 
 export default EditImageStep;
 

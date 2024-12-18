@@ -4,7 +4,7 @@ import { colors, textStyles } from '#theme';
 import { MediaImageRenderer } from '#components/medias';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Text from '#ui/Text';
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
+import type { ViewProps } from 'react-native';
 
 type AvatarProps = ViewProps & {
   firstName: string;
@@ -90,7 +90,11 @@ const ContactAvatar = ({
             {name}
           </Text>
         )}
-        {company && <Text style={styles.company}>{company}</Text>}
+        {company && (
+          <Text numberOfLines={1} style={styles.company}>
+            {company}
+          </Text>
+        )}
       </View>
     </View>
   );

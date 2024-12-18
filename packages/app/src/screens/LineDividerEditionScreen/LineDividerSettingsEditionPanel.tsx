@@ -8,8 +8,8 @@ import FloatingIconButton from '#ui/FloatingIconButton';
 import LabeledDashedSlider from '#ui/LabeledDashedSlider';
 import TitleWithLine from '#ui/TitleWithLine';
 import type { LineDividerOrientation } from '#relayArtifacts/LineDividerEditionScreen_module.graphql';
+import type { ViewProps } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type LineDividerSettingsEditionPanelProps = ViewProps & {
   /**

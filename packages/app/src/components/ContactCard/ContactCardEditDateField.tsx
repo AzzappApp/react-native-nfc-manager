@@ -51,17 +51,7 @@ const ContactCardEditDateField = <TFieldValues extends FieldValues>({
         name={valueKey}
         render={({ field: { onChange, value } }) => {
           return (
-            <View
-              style={[
-                {
-                  flex: 1,
-                  alignItems: 'center',
-                  flexDirection: 'row',
-                  marginLeft: 6,
-                  marginTop: 2,
-                },
-              ]}
-            >
+            <View style={styles.item}>
               <Text variant="smallbold">{title}</Text>
               {Platform.OS === 'android' ? (
                 <PressableNative
@@ -122,6 +112,13 @@ const ContactCardEditDateField = <TFieldValues extends FieldValues>({
 
 const stylesheet = createStyleSheet(appearance => ({
   ...buildContactCardModalStyleSheet(appearance),
+  item: {
+    flex: 1,
+    alignItems: 'center',
+    flexDirection: 'row',
+    marginLeft: 6,
+    marginTop: 2,
+  },
 }));
 
 export default ContactCardEditDateField;

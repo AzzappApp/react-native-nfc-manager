@@ -3,9 +3,9 @@ import { ScrollView, View } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
-import PressableOpacity from '#ui/PressableOpacity';
+import PressableNative from '#ui/PressableNative';
 import {
-  useCoverEditorContext,
+  useCoverEditorEditContext,
   useCoverEditorOverlayLayer,
 } from '../CoverEditorContext';
 import CoverEditorAdjustTool from './tools/CoverEditorAdjustTool';
@@ -21,7 +21,7 @@ import { TOOLBOX_SECTION_HEIGHT } from './ui/ToolBoxSection';
 const CoverEditorOverlayToolbox = () => {
   const styles = useStyleSheet(styleSheet);
 
-  const { dispatch } = useCoverEditorContext();
+  const dispatch = useCoverEditorEditContext();
   const layer = useCoverEditorOverlayLayer();
 
   const onClose = () => {
@@ -36,17 +36,17 @@ const CoverEditorOverlayToolbox = () => {
 
   return (
     <View style={styles.container}>
-      <PressableOpacity style={styles.previewButton} onPress={onClose}>
+      <PressableNative style={styles.previewButton} onPress={onClose}>
         <Icon icon="arrow_down" />
         {layer ? (
           <Image
-            source={{ uri: layer.media.uri }}
+            source={{ uri: layer.galleryUri ?? layer.thumbnail ?? layer.uri }}
             style={styles.previewContent}
           />
         ) : (
           <View style={styles.previewContent} />
         )}
-      </PressableOpacity>
+      </PressableNative>
       <ScrollView
         horizontal
         contentContainerStyle={styles.scrollContentContainer}

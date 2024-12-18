@@ -14,10 +14,7 @@ import {
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
 import BlockTextRenderer, { readBlockTextData } from './BlockTextRenderer';
-import {
-  CarouselViewRenderer,
-  readCarouselData,
-} from './CarouselRenderer/CarouselRenderer';
+import CarouselRenderer, { readCarouselData } from './CarouselRenderer';
 import HorizontalPhotoRenderer, {
   readHorizontalPhotoData,
 } from './HorizontalPhotoRenderer';
@@ -72,7 +69,7 @@ import type {
   SocialLinksRendererData,
   SocialLinksRendererProps,
 } from './SocialLinksRenderer';
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
+import type { ViewProps } from 'react-native';
 
 type ModuleReadInfo =
   | (BlockTextRenderer_module$key & {
@@ -182,6 +179,10 @@ export type CardModuleRendererProps<T extends ModuleRenderInfo> = ViewProps & {
    * @default 'mobile'
    */
   viewMode?: 'desktop' | 'mobile';
+  /**
+   * The cover background color
+   */
+  coverBackgroundColor?: string | null | undefined;
 };
 
 const CardModuleRenderer = <T extends ModuleRenderInfo>({
@@ -202,7 +203,7 @@ export default CardModuleRenderer;
 
 const MODULE_RENDERERS = {
   [MODULE_KIND_BLOCK_TEXT]: BlockTextRenderer,
-  [MODULE_KIND_CAROUSEL]: CarouselViewRenderer,
+  [MODULE_KIND_CAROUSEL]: CarouselRenderer,
   [MODULE_KIND_HORIZONTAL_PHOTO]: HorizontalPhotoRenderer,
   [MODULE_KIND_LINE_DIVIDER]: LineDividerRenderer,
   [MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE]: PhotoWithTextAndTitleRenderer,
@@ -223,7 +224,7 @@ const MODULE_RENDERERS_DESKTOP = {
       }}
     />
   ),
-  [MODULE_KIND_CAROUSEL]: CarouselViewRenderer,
+  [MODULE_KIND_CAROUSEL]: CarouselRenderer,
   [MODULE_KIND_HORIZONTAL_PHOTO]: (
     props: HorizontalPhotoRendererProps & { animatedData: null },
   ) => {

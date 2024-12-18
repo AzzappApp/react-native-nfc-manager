@@ -9,12 +9,12 @@ const useScreenInsets = () => {
   const insets = useSafeAreaInsets();
   return {
     top: Platform.select({
-      default: insets.top,
-      android: insets.top,
+      default: Math.max(insets.top, 24),
+      android: 12 + Math.max(insets.top, 24),
     }),
     bottom: Platform.select({
       default: Math.max(insets.bottom, 16),
-      android: Math.max(insets.bottom, 16),
+      android: 16 + Math.max(insets.bottom, 0),
     }),
   };
 };

@@ -20,7 +20,14 @@ const apiFetch = <ReturnType>(
   init?: RequestInit & { fetchFunction?: FetchFunction<ReturnType> },
 ): Promise<ReturnType> => {
   const fetchFunction = init?.fetchFunction ?? fetchJSON;
-  return fetchFunction(input, init);
+  return fetchFunction(input, {
+    ...init,
+    headers: {
+      ...init?.headers,
+      'x-vercel-protection-bypass':
+        process.env.AZZAPP_API_VERCEL_PROTECTION_BYPASS ?? '',
+    },
+  });
 };
 
 /**

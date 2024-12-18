@@ -1,13 +1,17 @@
 import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
-import { extractLottieInfoMemoized } from '#components/CoverEditor/coverEditorHelpers';
+import {
+  extractLottieInfoMemoized,
+  getMediaWithLocalFile,
+} from '#components/CoverEditor/coverEditorHelpers';
 import ImagePicker, { EditImageStep } from '#components/ImagePicker';
 import { ScreenModal } from '#components/NativeRouter';
 import useToggle from '#hooks/useToggle';
 import {
   useCoverEditorActiveMedia,
   useCoverEditorContext,
+  useCoverEditorEditContext,
 } from '../../CoverEditorContext';
 import ToolBoxSection from '../ui/ToolBoxSection';
 import type { EditionParameters } from '#helpers/mediaEditions';
@@ -15,10 +19,9 @@ import type { EditionParameters } from '#helpers/mediaEditions';
 const CoverEditorCropTool = () => {
   const intl = useIntl();
   const [show, toggleScreenModal] = useToggle(false);
-  const {
-    coverEditorState: { lottie, selectedItemIndex },
-    dispatch,
-  } = useCoverEditorContext();
+
+  const { lottie, selectedItemIndex, localFilenames } = useCoverEditorContext();
+  const dispatch = useCoverEditorEditContext();
 
   const asset =
     selectedItemIndex != null
@@ -62,7 +65,15 @@ const CoverEditorCropTool = () => {
         >
           {show && (
             <ImagePicker
-              initialData={activeMedia}
+              initialData={{
+                editionParameters: activeMedia.editionParameters,
+                filter: activeMedia.filter,
+                media: getMediaWithLocalFile(activeMedia, localFilenames),
+                timeRange:
+                  activeMedia.kind === 'video'
+                    ? activeMedia.timeRange
+                    : undefined,
+              }}
               additionalData={{
                 selectedParameter: 'cropData',
                 selectedTab: 'edit',

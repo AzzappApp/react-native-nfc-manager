@@ -3,8 +3,8 @@ import { ScrollView, View } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
-import PressableOpacity from '#ui/PressableOpacity';
-import { useCoverEditorContext } from '../CoverEditorContext';
+import PressableNative from '#ui/PressableNative';
+import { useCoverEditorEditContext } from '../CoverEditorContext';
 import CoverEditorAlignmentTool from './tools/CoverEditorAligmentTool';
 import CoverEditorColorTool from './tools/CoverEditorColorTool';
 import CoverEditorDeleteTool from './tools/CoverEditorDeleteTool';
@@ -19,7 +19,7 @@ const CoverEditorTextToolbox = () => {
   const styles = useStyleSheet(styleSheet);
 
   const intl = useIntl();
-  const { dispatch } = useCoverEditorContext();
+  const dispatch = useCoverEditorEditContext();
 
   const onClose = () => {
     dispatch({
@@ -33,9 +33,9 @@ const CoverEditorTextToolbox = () => {
 
   return (
     <View style={styles.container}>
-      <PressableOpacity style={styles.previewButton} onPress={onClose}>
+      <PressableNative style={styles.previewButton} onPress={onClose}>
         <Icon icon="arrow_down" />
-      </PressableOpacity>
+      </PressableNative>
       <ScrollView
         horizontal
         contentContainerStyle={styles.scrollContentContainer}

@@ -1,5 +1,5 @@
 import { Image } from 'expo-image';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import {
   forwardRef,
   useCallback,
@@ -15,7 +15,7 @@ import {
   captureSnapshot,
   SnapshotRenderer,
 } from '@azzapp/react-native-snapshot-view';
-import { useLocalCachedMediaFile } from '#helpers/mediaHelpers/LocalMediaCache';
+import { useLocalCachedMediaFile } from '#helpers/mediaHelpers/remoteMediaCache';
 import type { ImageContentFit, ImageErrorEventData } from 'expo-image';
 import type { ForwardedRef } from 'react';
 import type { ViewProps } from 'react-native';

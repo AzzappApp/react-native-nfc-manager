@@ -1,6 +1,6 @@
 import { IntlErrorCode } from '@formatjs/intl';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import * as Sentry from '@sentry/react-native';
-import { StatusBar } from 'expo-status-bar';
 import {
   Component,
   Fragment,
@@ -12,8 +12,9 @@ import {
   useState,
 } from 'react';
 import { FormattedMessage, IntlProvider, injectIntl } from 'react-intl';
-import { Platform, useColorScheme } from 'react-native';
+import { Platform, useColorScheme, StyleSheet } from 'react-native';
 import { hide as hideSplashScreen } from 'react-native-bootsplash';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import Purchases from 'react-native-purchases';
 import {
@@ -25,6 +26,9 @@ import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
 import { isNetworkError } from '@azzapp/shared/networkHelpers';
 import { mainRoutes, signInRoutes, signUpRoutes } from '#mobileRoutes';
+import NetworkAvailableContextProvider, {
+  useNetworkAvailableFetcher,
+} from '#networkAvailableContext';
 import { colors } from '#theme';
 import MainTabBar from '#components/MainTabBar';
 import {
@@ -32,7 +36,6 @@ import {
   ScreensRenderer,
   RouterProvider,
 } from '#components/NativeRouter';
-//import ShakeShare from '#components/ShakeShare';
 import ShakeShare from '#components/ShakeShare';
 import Toast from '#components/Toast';
 import { analyticsLogScreenEvent } from '#helpers/analytics';
@@ -73,6 +76,7 @@ import ContactCardEditScreen from '#screens/ContactCardEditScreen';
 import ContactCardScreen from '#screens/ContactCardScreen';
 import ContactDetailsScreen from '#screens/ContactDetailsScreen';
 import ContactsScreen from '#screens/ContactsScreen';
+import OfflineVCardScreen from '#screens/ContactsScreen/OfflineVCardScreen';
 import CoverCreationScreen from '#screens/CoverCreationScreen';
 import CoverEditionScreen from '#screens/CoverEditionScreen';
 import CoverTemplateSelectionScreen from '#screens/CoverTemplateSelectionScreen';
@@ -123,6 +127,10 @@ Sentry.init({
   // WARNING: This option interferes with reanimated and creates flickering in some animations
   // do not enable it unless it has been fixed
   enableStallTracking: false,
+  tracesSampleRate:
+    process.env.DEPLOYMENT_ENVIRONMENT === 'production' ? 0.1 : 1,
+  profilesSampleRate:
+    process.env.DEPLOYMENT_ENVIRONMENT === 'production' ? 0.1 : 1,
 });
 
 //initializing RC sneed to be done early
@@ -188,11 +196,10 @@ const App = () => {
 
   return (
     <>
-      {Platform.OS === 'android' && <StatusBar style="auto" translucent />}
       <AppIntlProvider>
         <ErrorBoundary>
           <PermissionProvider>
-            <KeyboardProvider statusBarTranslucent>
+            <KeyboardProvider>
               <AppRouter />
             </KeyboardProvider>
           </PermissionProvider>
@@ -214,6 +221,7 @@ const screens = {
   CONFIRM_CHANGE_CONTACT: ConfirmChangeContactScreen,
   COMMON_INFORMATION: CommonInformationScreen,
   CONTACTS: ContactsScreen,
+  OFFLINE_VCARD: OfflineVCardScreen,
   CONTACT_DETAILS: ContactDetailsScreen,
   COVER_CREATION: CoverCreationScreen,
   COVER_EDITION: CoverEditionScreen,
@@ -319,6 +327,15 @@ const AppRouter = () => {
       Sentry.startIdleNavigationSpan({
         name: route.route,
         op: 'navigation',
+      });
+      Sentry.addBreadcrumb({
+        category: 'navigation',
+        type: 'navigation',
+        message: `Navigating to ${route.route}`,
+        data: {
+          to: route.route,
+          params: route.params,
+        },
       });
       analyticsLogScreenEvent(route.route);
     });
@@ -428,6 +445,18 @@ const AppRouter = () => {
     };
   }, [colorScheme]);
 
+  const isConnected = useNetworkAvailableFetcher();
+
+  useEffect(() => {
+    if (!isConnected) {
+      if (router.getCurrentRoute()?.route !== 'OFFLINE_VCARD') {
+        router.push({
+          route: 'OFFLINE_VCARD',
+        });
+      }
+    }
+  }, [isConnected, router]);
+
   // TODO handle errors
   const [fontLoaded] = useApplicationFonts();
   if (!fontLoaded) {
@@ -435,29 +464,38 @@ const AppRouter = () => {
   }
 
   return (
-    <RelayEnvironmentProvider environment={environment}>
-      <ScreenPrefetcherProvider value={screenPrefetcher}>
-        <SafeAreaProvider
-          initialMetrics={initialWindowMetrics}
-          style={safeAreaBackgroundStyle}
-        >
-          <RouterProvider value={router}>
-            <ScreensRenderer
-              routerState={routerState}
-              screens={screens}
-              tabs={tabs}
-              onFinishTransitioning={onFinishTransitioning}
-              onScreenHasBeenDismissed={disposeScreens}
-            />
-          </RouterProvider>
-          <Toast />
-          <Suspense>
-            <ShakeShare />
-          </Suspense>
-          {showLoadingScreen && <LoadingScreen />}
-        </SafeAreaProvider>
-      </ScreenPrefetcherProvider>
-    </RelayEnvironmentProvider>
+    <NetworkAvailableContextProvider value={isConnected}>
+      <RelayEnvironmentProvider environment={environment}>
+        <ScreenPrefetcherProvider value={screenPrefetcher}>
+          <SafeAreaProvider
+            initialMetrics={Platform.select({
+              android: null,
+              default: initialWindowMetrics,
+            })}
+            style={safeAreaBackgroundStyle}
+          >
+            <RouterProvider value={router}>
+              <GestureHandlerRootView style={styles.flex}>
+                <BottomSheetModalProvider>
+                  <ScreensRenderer
+                    routerState={routerState}
+                    screens={screens}
+                    tabs={tabs}
+                    onFinishTransitioning={onFinishTransitioning}
+                    onScreenHasBeenDismissed={disposeScreens}
+                  />
+                </BottomSheetModalProvider>
+              </GestureHandlerRootView>
+            </RouterProvider>
+            <Toast />
+            <Suspense>
+              <ShakeShare />
+            </Suspense>
+            {showLoadingScreen && <LoadingScreen />}
+          </SafeAreaProvider>
+        </ScreenPrefetcherProvider>
+      </RelayEnvironmentProvider>
+    </NetworkAvailableContextProvider>
   );
 };
 
@@ -543,3 +581,7 @@ class _AppErrorBoundary extends Component<{
 }
 
 const AppErrorBoundary = injectIntl(_AppErrorBoundary);
+
+const styles = StyleSheet.create({
+  flex: { flex: 1 },
+});

@@ -273,6 +273,7 @@ export const CoverTemplateTable = cols.table('CoverTemplate', {
   typeId: cols.cuid('typeId').notNull(),
   lottieId: cols.cuid('lottieId').notNull(),
   mediaCount: cols.int('mediaCount').notNull(),
+  medias: cols.json('medias').$type<CoverTemplateMedia[]>(),
   previewId: cols.cuid('previewId').notNull(),
   colorPaletteId: cols.cuid('colorPaletteId').notNull(),
   enabled: cols.boolean('enabled').default(true).notNull(),
@@ -333,6 +334,12 @@ export type CoverTemplateParams = {
   linksLayer: SocialLinks;
 };
 
+export type CoverTemplateMedia = {
+  id: string;
+  index: number;
+  editable: boolean;
+};
+
 export type CoverTemplate = InferSelectModel<typeof CoverTemplateTable>;
 // #endregion
 
@@ -388,15 +395,13 @@ export const LocalizationMessageTable = cols.table(
   {
     key: cols.defaultVarchar('key').notNull(),
     locale: cols.defaultVarchar('locale').notNull(),
-    target: cols.defaultVarchar('target').notNull(),
     value: cols.text('value').notNull(),
   },
   table => {
     return {
       localizationMessageId: cols.primaryKey({
-        columns: [table.key, table.locale, table.target],
+        columns: [table.key, table.locale],
       }),
-      targetKey: cols.index('LocalizationMessage_key').on(table.target),
     };
   },
 );
@@ -651,6 +656,10 @@ export const ProfileTable = cols.table(
     deleted: cols.boolean('deleted').default(false).notNull(),
     deletedAt: cols.dateTime('deletedAt'),
     deletedBy: cols.cuid('deletedBy'),
+    lastContactViewAt: cols
+      .dateTime('lastContactViewAt')
+      .default(DEFAULT_DATETIME_VALUE)
+      .notNull(),
   },
   table => {
     return {

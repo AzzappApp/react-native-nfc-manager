@@ -14,6 +14,9 @@ import {
   buildContactCardModalStyleSheet,
 } from '#helpers/contactCardHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import useBoolean from '#hooks/useBoolean';
+import useScreenDimensions from '#hooks/useScreenDimensions';
+import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
@@ -91,21 +94,33 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
 
   const label = useWatch(watchable);
 
-  const [visible, setVisible] = useState(false);
+  const [visible, open, close] = useBoolean(false);
 
   const styles = useStyleSheet(stylesheet);
+
+  // compute max height of the bottomSheet (2/3 of screen)
+  const { height: screenHeight } = useScreenDimensions();
+  const insets = useScreenInsets();
+  const visibleHeight = screenHeight - insets.top - insets.bottom;
+  const maxHeight = (visibleHeight * 2) / 3;
+
+  // estimate size of the bottomSheet
+  const expectedHeight =
+    (labelValues?.length || 0) * 30 +
+    10 + // size of the header
+    2 * styles.bottomSheetStyle.padding +
+    insets.bottom; // max height is 2/3 of screen size
+
+  const useFlatList = expectedHeight > maxHeight;
+  const bottomSheetHeight = useFlatList
+    ? Math.min(expectedHeight, maxHeight)
+    : undefined;
 
   return (
     <>
       <Animated.View
         style={[styles.field, style]}
         onLayout={event => setLayout(event.nativeEvent.layout)}
-        // TODO reenable once RANIMATED3 see: https://github.com/software-mansion/react-native-reanimated/issues/3124
-
-        // entering={FadeInDown}
-        // exiting={FadeOutUp.withInitialValues({
-        //   originX: -50,
-        // }).withCallback(callback)}
       >
         <View
           style={{
@@ -134,10 +149,7 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
               }}
             />
             {labelValues && labelValues.length > 0 && (
-              <PressableNative
-                style={styles.labelSelector}
-                onPress={() => setVisible(true)}
-              >
+              <PressableNative style={styles.labelSelector} onPress={open}>
                 <Text variant="smallbold">
                   {labelValues.find(
                     l => typeof label === 'string' && l.key === label,
@@ -183,28 +195,28 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
       {labelKey && (
         <BottomSheetModal
           visible={visible}
-          onRequestClose={() => setVisible(false)}
-          nestedScroll
+          onDismiss={close}
+          style={styles.bottomSheetStyle}
+          height={bottomSheetHeight}
         >
-          <View>
-            <Controller
-              name={labelKey}
-              control={control}
-              render={({ field: { onChange, value } }) => (
-                <SelectList
-                  keyExtractor={item => item.key}
-                  data={labelValues}
-                  onItemSelected={item => {
-                    onChange(item.key);
-                    onChangeLabel?.(item.key);
-                    setVisible(false);
-                  }}
-                  selectedItemKey={value as string}
-                  labelField="value"
-                />
-              )}
-            />
-          </View>
+          <Controller
+            name={labelKey}
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <SelectList
+                keyExtractor={item => item.key}
+                data={labelValues}
+                onItemSelected={item => {
+                  onChange(item.key);
+                  onChangeLabel?.(item.key);
+                  close();
+                }}
+                selectedItemKey={value as string}
+                labelField="value"
+                useFlatList={useFlatList}
+              />
+            )}
+          />
         </BottomSheetModal>
       )}
     </>
@@ -231,6 +243,7 @@ const stylesheet = createStyleSheet(appearance => ({
     alignItems: 'center',
     columnGap: 5,
   },
+  bottomSheetStyle: { padding: 16 },
   switch: { marginRight: -8 },
   ...buildContactCardModalStyleSheet(appearance),
 }));

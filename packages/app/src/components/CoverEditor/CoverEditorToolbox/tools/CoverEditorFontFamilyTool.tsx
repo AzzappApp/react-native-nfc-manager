@@ -1,9 +1,9 @@
 import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
-import useToggle from '#hooks/useToggle';
+import useBoolean from '#hooks/useBoolean';
 import FontPicker from '#ui/FontPicker';
 import {
-  useCoverEditorContext,
+  useCoverEditorEditContext,
   useCoverEditorTextLayer,
 } from '../../CoverEditorContext';
 import ToolBoxSection from '../ui/ToolBoxSection';
@@ -11,9 +11,9 @@ import ToolBoxSection from '../ui/ToolBoxSection';
 const CoverEditorFontFamilyTool = () => {
   const intl = useIntl();
   const layer = useCoverEditorTextLayer();
-  const { dispatch } = useCoverEditorContext();
+  const dispatch = useCoverEditorEditContext();
 
-  const [show, toggleBottomSheet] = useToggle(false);
+  const [show, open, close] = useBoolean(false);
 
   const currentFontFamily = layer?.fontFamily ?? '';
   const onFontFamilyChange = useCallback(
@@ -33,12 +33,12 @@ const CoverEditorFontFamilyTool = () => {
           description: 'Cover Edition - Toolbox sub-menu text - Font',
         })}
         icon="font"
-        onPress={() => toggleBottomSheet()}
+        onPress={open}
       />
       <FontPicker
         height={BOTTOM_SHEET_MODAL_HEIGHT}
         onChange={onFontFamilyChange}
-        onRequestClose={toggleBottomSheet}
+        onRequestClose={close}
         title={intl.formatMessage({
           defaultMessage: 'Font family',
           description: 'CoverEditorFontFamilyTool - Modal - Title',
@@ -51,5 +51,4 @@ const CoverEditorFontFamilyTool = () => {
 };
 
 const BOTTOM_SHEET_MODAL_HEIGHT = 265;
-
 export default CoverEditorFontFamilyTool;

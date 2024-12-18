@@ -4,15 +4,25 @@ import zoomInOpacity from './zoomInOpacity';
 import zoomInOut from './zoomInOut';
 import zoomOutInOpacity from './zoomOutInOpacity';
 import zoomOutOpacity from './zoomOutOpacity';
-import type { SkCanvas, SkPaint, SkRect } from '@shopify/react-native-skia';
+import type {
+  SkCanvas,
+  SkImageFilter,
+  SkPaint,
+  SkRect,
+} from '@shopify/react-native-skia';
 
 export type PaintAnimation = (paint: SkPaint, rect: SkRect) => void;
 
 export type CanvasAnimation = (canvas: SkCanvas, rect: SkRect) => void;
 
+export type ImageFilterAnimation = (
+  imageFilter: SkImageFilter,
+) => SkImageFilter;
+
 export type OverlayAnimation = (progress: number) => {
   animatePaint?: PaintAnimation;
   animateCanvas?: CanvasAnimation;
+  animateImageFilter?: ImageFilterAnimation;
 };
 
 const overlayAnimations = {

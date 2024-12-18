@@ -1,5 +1,5 @@
 import { MasonryFlashList } from '@shopify/flash-list';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import {
   Platform,

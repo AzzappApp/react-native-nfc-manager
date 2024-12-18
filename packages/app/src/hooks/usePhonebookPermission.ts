@@ -2,6 +2,7 @@ import {
   requestPermissionsAsync,
   PermissionStatus as ContactPermissionStatus,
 } from 'expo-contacts';
+import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { Alert, Linking, Platform } from 'react-native';
 import { check, PERMISSIONS, RESULTS } from 'react-native-permissions';
@@ -12,7 +13,7 @@ import { check, PERMISSIONS, RESULTS } from 'react-native-permissions';
 export const usePhonebookPermission = () => {
   const intl = useIntl();
 
-  const displaySettingsRedirectPopup = () => {
+  const displaySettingsRedirectPopup = useCallback(() => {
     Alert.alert(
       intl.formatMessage({
         defaultMessage: 'Cannot access to contacts',
@@ -37,57 +38,61 @@ export const usePhonebookPermission = () => {
         cancelable: true,
       },
     );
-  };
+  }, [intl]);
 
   /*
    * common function with or without redirection
    */
-  const requestPhonebook = async (redirectToSettings: boolean) => {
-    if (Platform.OS === 'ios') {
-      // ios
-      const result = await check(PERMISSIONS.IOS.CONTACTS);
-      switch (result) {
-        case RESULTS.LIMITED:
-        case RESULTS.GRANTED:
-          return { status: ContactPermissionStatus.GRANTED };
-        case RESULTS.UNAVAILABLE:
-        case RESULTS.DENIED: {
-          const { status } = await requestPermissionsAsync();
+  const requestPhonebook = useCallback(
+    async (redirectToSettings: boolean) => {
+      if (Platform.OS === 'ios') {
+        // ios
+        const result = await check(PERMISSIONS.IOS.CONTACTS);
+        switch (result) {
+          case RESULTS.LIMITED:
+          case RESULTS.GRANTED:
+            return { status: ContactPermissionStatus.GRANTED };
+          case RESULTS.UNAVAILABLE:
+          case RESULTS.DENIED: {
+            const { status } = await requestPermissionsAsync();
+            return { status };
+          }
+          case RESULTS.BLOCKED: {
+            if (redirectToSettings) {
+              displaySettingsRedirectPopup();
+            }
+            return { status: ContactPermissionStatus.DENIED };
+          }
+        }
+      } else {
+        // android
+        const { status, canAskAgain } = await requestPermissionsAsync();
+        if (status === ContactPermissionStatus.GRANTED) {
           return { status };
         }
-        case RESULTS.BLOCKED: {
-          if (redirectToSettings) {
-            displaySettingsRedirectPopup();
-          }
-          return { status: ContactPermissionStatus.DENIED };
+        if (!canAskAgain && redirectToSettings) {
+          displaySettingsRedirectPopup();
         }
+        return { status: ContactPermissionStatus.DENIED };
       }
-    } else {
-      // android
-      const { status, canAskAgain } = await requestPermissionsAsync();
-      if (status === ContactPermissionStatus.GRANTED) {
-        return { status };
-      }
-      if (!canAskAgain && redirectToSettings) {
-        displaySettingsRedirectPopup();
-      }
-      return { status: ContactPermissionStatus.DENIED };
-    }
-  };
+    },
+    [displaySettingsRedirectPopup],
+  );
 
   /*
    * request phonebook permission. In case of failure redirect to settings
    */
-  const requestPhonebookPermissionAndRedirectToSettingsAsync = async () => {
-    return requestPhonebook(true);
-  };
+  const requestPhonebookPermissionAndRedirectToSettingsAsync =
+    useCallback(async () => {
+      return requestPhonebook(true);
+    }, [requestPhonebook]);
 
   /*
    * request phonebook permission.
    */
-  const requestPhonebookPermissionAsync = async () => {
+  const requestPhonebookPermissionAsync = useCallback(async () => {
     return requestPhonebook(false);
-  };
+  }, [requestPhonebook]);
 
   return {
     requestPhonebookPermissionAndRedirectToSettingsAsync,

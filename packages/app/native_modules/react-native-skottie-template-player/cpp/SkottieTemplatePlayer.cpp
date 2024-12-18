@@ -75,12 +75,15 @@ std::vector<jsi::PropNameID> SkottieTemplatePlayer::getPropertyNames(jsi::Runtim
 void SkottieTemplatePlayer::dispose() {
   if (animation) {
     animation.reset();
+    animation = nullptr;
   }
   animation = nullptr;
+  resourceProvider->dispose();
   if (resourceProvider) {
     resourceProvider.reset();
   }
   resourceProvider = nullptr;
+  
 }
 
 TemplateResourceProvider::TemplateResourceProvider(
@@ -89,6 +92,14 @@ TemplateResourceProvider::TemplateResourceProvider(
     auto imageAsset = new TemplateImageAsset();
     assets[resourceId] = sk_sp(imageAsset);
   }
+}
+
+void TemplateResourceProvider::dispose() {
+  for (const auto& entry : assets) {
+    entry.second->currentImage = nullptr;
+    entry.second->skMatrix = nullptr;
+  }
+  assets.clear();
 }
 
 sk_sp<skresources::ImageAsset>

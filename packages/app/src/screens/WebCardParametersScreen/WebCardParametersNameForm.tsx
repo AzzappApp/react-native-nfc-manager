@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
@@ -41,6 +41,11 @@ const WebcardParametersNameForm = ({
   visible,
   toggleBottomSheet,
 }: WebcardParametersNameFormProps) => {
+  const lastErrorSend = useRef({
+    values: {},
+    errors: {},
+  });
+
   const {
     control,
     handleSubmit,
@@ -64,14 +69,21 @@ const WebcardParametersNameForm = ({
               environment,
               graphql`
                 query WebCardParametersNameFormQuery($userName: String!) {
-                  userNameAvailable(userName: $userName)
+                  isUserNameAvailable(userName: $userName) {
+                    available
+                    userName
+                  }
                 }
               `,
               { userName: data.userName },
             ).toPromise();
 
-            if (!res?.userNameAvailable && userName !== webCard.userName) {
-              return {
+            if (res?.isUserNameAvailable.userName !== data.userName) {
+              // form username changed during validation
+              return lastErrorSend.current;
+            }
+            if (!res?.isUserNameAvailable && userName === webCard.userName) {
+              lastErrorSend.current = {
                 values: {},
                 errors: {
                   userName: {
@@ -80,18 +92,19 @@ const WebcardParametersNameForm = ({
                   },
                 },
               };
+              return lastErrorSend.current;
             }
           } catch {
             //waiting for submi5
           }
         }
-
-        return {
+        lastErrorSend.current = {
           values: data,
           errors: {},
         };
+        return lastErrorSend.current;
       } else {
-        return {
+        lastErrorSend.current = {
           values: {},
           errors: {
             userName: {
@@ -100,6 +113,7 @@ const WebcardParametersNameForm = ({
             },
           },
         };
+        return lastErrorSend.current;
       }
     },
   });
@@ -126,7 +140,7 @@ const WebcardParametersNameForm = ({
     {
       azzappA: <Text variant="azzapp">a</Text>,
     },
-  ) as string;
+  );
 
   const environment = useRelayEnvironment();
 
@@ -181,7 +195,7 @@ const WebcardParametersNameForm = ({
                   </Text>
                 ),
               },
-            ) as string,
+            ) as unknown as string,
           });
         } else if (
           response?.errors.some(
@@ -213,7 +227,7 @@ const WebcardParametersNameForm = ({
                     )}`
                   : 'unknown date',
               },
-            ) as string,
+            ) as unknown as string,
           });
         } else {
           setError('root.server', {

@@ -1,10 +1,7 @@
 import { NextResponse } from 'next/server';
 import * as z from 'zod';
-import {
-  getLocalizationMessagesByTarget,
-  saveLocalizationMessage,
-} from '@azzapp/data';
-import { SUPPORTED_LOCALES, ENTITY_TARGET } from '@azzapp/i18n';
+import { getLocalizationMessages, saveLocalizationMessage } from '@azzapp/data';
+import { SUPPORTED_LOCALES } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
 import { withPluginsRoute } from '#helpers/queries';
 import { checkServerAuth } from '#helpers/tokens';
@@ -18,7 +15,7 @@ export const GET = withPluginsRoute(
       params: { target: string };
     },
   ) => {
-    if (params.target !== ENTITY_TARGET) {
+    if (params.target !== 'entity') {
       return NextResponse.json({ message: 'Invalid target' }, { status: 400 });
     }
     try {
@@ -32,7 +29,7 @@ export const GET = withPluginsRoute(
       }
       throw e;
     }
-    const messages = await getLocalizationMessagesByTarget(params.target);
+    const messages = await getLocalizationMessages();
     return NextResponse.json(messages);
   },
 );
@@ -53,7 +50,7 @@ export const POST = withPluginsRoute(
       params: { target: string };
     },
   ) => {
-    if (params.target !== ENTITY_TARGET) {
+    if (params.target !== 'entity') {
       return NextResponse.json({ message: 'Invalid target' }, { status: 400 });
     }
     try {
@@ -80,7 +77,6 @@ export const POST = withPluginsRoute(
     await saveLocalizationMessage({
       key,
       locale,
-      target: ENTITY_TARGET,
       value,
     });
 

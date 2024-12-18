@@ -4,7 +4,7 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import IconButton from '#ui/IconButton';
 import Text from '#ui/Text';
 import type { Icons } from '#ui/Icon';
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
+import type { ColorSchemeName, ViewProps } from 'react-native';
 
 export type WizardPagerHeaderProps = Omit<ViewProps, 'children'> & {
   title: React.ReactNode;
@@ -14,6 +14,53 @@ export type WizardPagerHeaderProps = Omit<ViewProps, 'children'> & {
   onBack?: () => void;
   rightElement?: React.ReactNode;
   rightElementWidth?: number;
+};
+
+type PageProgressProps = {
+  nbPages: number;
+  currentPage: number;
+  appearance?: ColorSchemeName;
+};
+
+export const PageProgress = ({
+  nbPages,
+  currentPage,
+  appearance,
+}: PageProgressProps) => {
+  const styles = useStyleSheet(styleSheet, appearance);
+
+  return (
+    <View style={styles.pagerContainer}>
+      {Array.from({ length: nbPages }).map((_, index) => {
+        if (index < currentPage) {
+          return (
+            <View
+              accessibilityState={{ selected: false }}
+              key={`NewProfilepager-${index}`}
+              style={[styles.common, styles.previousCircle]}
+            />
+          );
+        } else if (index === currentPage) {
+          return (
+            <View
+              accessibilityRole="none"
+              accessibilityState={{ selected: true }}
+              key={`NewProfilepager-${index}`}
+              style={[styles.common, styles.selectedCircle]}
+            />
+          );
+        }
+        return (
+          <View
+            accessibilityState={{ selected: false }}
+            key={`NewProfilepager-${index}`}
+            style={[styles.common, styles.smallCircle]}
+          />
+        );
+      })}
+      <View />
+    </View>
+  );
 };
 
 const WizardPagerHeader = ({
@@ -64,36 +111,7 @@ const WizardPagerHeader = ({
           {rightElement}
         </View>
       </View>
-      <View style={styles.pagerContainer}>
-        {Array.from({ length: nbPages }).map((_, index) => {
-          if (index < currentPage) {
-            return (
-              <View
-                accessibilityState={{ selected: false }}
-                key={`NewProfilepager-${index}`}
-                style={[styles.common, styles.previousCircle]}
-              />
-            );
-          } else if (index === currentPage) {
-            return (
-              <View
-                accessibilityRole="none"
-                accessibilityState={{ selected: true }}
-                key={`NewProfilepager-${index}`}
-                style={[styles.common, styles.selectedCircle]}
-              />
-            );
-          }
-          return (
-            <View
-              accessibilityState={{ selected: false }}
-              key={`NewProfilepager-${index}`}
-              style={[styles.common, styles.smallCircle]}
-            />
-          );
-        })}
-        <View />
-      </View>
+      <PageProgress nbPages={nbPages} currentPage={currentPage} />
     </View>
   );
 };

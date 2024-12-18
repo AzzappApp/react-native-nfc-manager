@@ -55,7 +55,7 @@ const ContactsScreenSearchByDate = ({
               defaultMessage: 'Today',
               description: 'ContactsScreenSearchByDate - Title for current day',
             })
-          : date.toLocaleDateString('en-us', {
+          : date.toLocaleDateString(undefined, {
               month: 'short',
               day: 'numeric',
               year: 'numeric',

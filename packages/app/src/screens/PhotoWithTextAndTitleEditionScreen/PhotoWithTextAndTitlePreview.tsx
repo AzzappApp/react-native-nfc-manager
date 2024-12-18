@@ -4,14 +4,12 @@ import type { PhotoWithTextAndTitleRendererProps } from '#components/cardModules
 
 type PhotoWithTextAndTitlePreviewProps = Pick<
   PhotoWithTextAndTitleRendererProps,
-  'animatedData' | 'cardStyle' | 'colorPalette' | 'data' | 'style'
+  'cardStyle' | 'colorPalette' | 'data' | 'style'
 > & {
   /**
    * A callback that is called when the module preview is pressed.
    */
   onPreviewPress?: () => void;
-
-  animatedData: object;
 };
 
 /**
@@ -30,7 +28,6 @@ const PhotoWithTextAndTitlePreview = ({
         colorPalette={colorPalette}
         cardStyle={cardStyle}
         data={data}
-        animatedData={props.animatedData}
       />
     </EditorScaledPreview>
   );

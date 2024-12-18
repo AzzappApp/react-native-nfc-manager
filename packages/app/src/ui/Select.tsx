@@ -1,15 +1,17 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import { View } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import useBoolean from '#hooks/useBoolean';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Text from '#ui/Text';
 import BottomSheetModal from './BottomSheetModal';
+import Header from './Header';
 import Icon from './Icon';
 import PressableNative from './PressableNative';
 import SelectList from './SelectList';
 import type { SelectListItemInfo } from './SelectList';
-import type { StyleProp, TextStyle, ViewStyle } from 'react-native';
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
+import type { StyleProp, TextStyle, ViewProps, ViewStyle } from 'react-native';
 
 export type SelectItemInfo<ItemT> = SelectListItemInfo<ItemT> & {
   /**
@@ -95,7 +97,12 @@ type SelectProps<ItemT> = Omit<ViewProps, 'children'> & {
    */
   disabled?: boolean;
 
-  avoidKeyboard?: boolean;
+  dismissKeyboardOnOpening?: boolean;
+  /**
+   * If false the list will be displayed in a plain react view instead of a FlatList
+   * @default true
+   */
+  useFlatList?: boolean;
 };
 
 /**
@@ -118,10 +125,12 @@ const Select = <ItemT,>({
   inputTextStyle,
   style,
   ListHeaderComponent,
-  avoidKeyboard,
+  dismissKeyboardOnOpening,
+  useFlatList,
   ...props
 }: SelectProps<ItemT>) => {
-  const [showDropDown, setShowDropDown] = useState(false);
+  const [showDropDown, openDropDown, closeDropDown] = useBoolean(false);
+  const { bottom } = useScreenInsets();
 
   const selectedItemIndex = data.findIndex(
     (item, index) => selectedItemKey === keyExtractor(item, index),
@@ -158,16 +167,16 @@ const Select = <ItemT,>({
 
   const onSelectListItemSelected = useCallback(
     (item: ItemT) => {
-      setShowDropDown(false);
+      closeDropDown();
       onItemSelected(item);
     },
-    [onItemSelected],
+    [closeDropDown, onItemSelected],
   );
 
   return (
     <>
       <PressableNative
-        onPress={() => setShowDropDown(true)}
+        onPress={openDropDown}
         style={[styles.input, isErrored && styles.error, style]}
         accessibilityRole="combobox"
         {...props}
@@ -195,14 +204,12 @@ const Select = <ItemT,>({
       </PressableNative>
       <BottomSheetModal
         visible={showDropDown}
-        headerTitle={bottomSheetTitle}
-        height={bottomSheetHeight}
+        height={bottomSheetHeight ? bottomSheetHeight + bottom : undefined}
         variant="modal"
-        contentContainerStyle={styles.bottomSheetContentContainer}
-        onRequestClose={() => setShowDropDown(false)}
-        nestedScroll
-        avoidKeyboard={avoidKeyboard}
+        onDismiss={closeDropDown}
+        dismissKeyboardOnOpening={dismissKeyboardOnOpening}
       >
+        {bottomSheetTitle && <Header middleElement={bottomSheetTitle} />}
         <SelectList
           data={data}
           keyExtractor={keyExtractor}
@@ -213,6 +220,7 @@ const Select = <ItemT,>({
           itemContainerStyle={itemContainerStyle}
           selectedItemContainerStyle={selectedItemContainerStyle}
           ListHeaderComponent={ListHeaderComponent}
+          useFlatList={useFlatList}
         />
       </BottomSheetModal>
     </>

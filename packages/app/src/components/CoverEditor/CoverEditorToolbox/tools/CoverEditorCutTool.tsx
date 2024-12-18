@@ -7,24 +7,27 @@ import {
 import {
   extractLottieInfoMemoized,
   getLottieMediasDurations,
-  mediaInfoIsImage,
+  getMediaWithLocalFile,
 } from '#components/CoverEditor/coverEditorHelpers';
 import ImagePicker, { EditImageStep } from '#components/ImagePicker';
 import { ScreenModal } from '#components/NativeRouter';
 import useToggle from '#hooks/useToggle';
-import { useCoverEditorContext } from '../../CoverEditorContext';
+import {
+  useCoverEditorContext,
+  useCoverEditorEditContext,
+} from '../../CoverEditorContext';
 import ToolBoxSection from '../ui/ToolBoxSection';
 import type { ImagePickerResult } from '#components/ImagePicker';
 
 const CoverEditorCutTool = () => {
   const intl = useIntl();
   const [show, toggleScreenModal] = useToggle(false);
-  const {
-    coverEditorState: { editionMode, medias, selectedItemIndex, lottie },
-    dispatch,
-  } = useCoverEditorContext();
+  const { editionMode, medias, selectedItemIndex, lottie, localFilenames } =
+    useCoverEditorContext();
 
-  const mediaInfo =
+  const dispatch = useCoverEditorEditContext();
+
+  const media =
     editionMode === 'mediaEdit' && selectedItemIndex != null
       ? medias[selectedItemIndex]
       : null;
@@ -37,7 +40,7 @@ const CoverEditorCutTool = () => {
     toggleScreenModal();
   };
 
-  const cropData = mediaInfo?.editionParameters?.cropData;
+  const cropData = media?.editionParameters?.cropData;
   const aspectRatio = cropData ? cropData.width / cropData.height : undefined;
 
   const expectedDuration = useMemo(() => {
@@ -58,7 +61,7 @@ const CoverEditorCutTool = () => {
         })}
         onPress={toggleScreenModal}
       />
-      {mediaInfo != null && !mediaInfoIsImage(mediaInfo) && (
+      {media != null && media.kind === 'video' && (
         <ScreenModal
           visible={show}
           animationType="slide"
@@ -67,10 +70,10 @@ const CoverEditorCutTool = () => {
           {show && (
             <ImagePicker
               initialData={{
-                media: mediaInfo.media,
-                timeRange: mediaInfo.timeRange,
-                editionParameters: mediaInfo.editionParameters,
-                filter: mediaInfo.filter,
+                media: getMediaWithLocalFile(media, localFilenames),
+                timeRange: media.timeRange,
+                editionParameters: media.editionParameters,
+                filter: media.filter,
               }}
               forceAspectRatio={aspectRatio}
               additionalData={{ selectedTab: 'timeRange', showTabs: false }}

@@ -134,6 +134,9 @@ const icons = {
   get comment_filled() {
     return require('./assets/comment_filled.png');
   },
+  get community() {
+    return require('./assets/community.png');
+  },
   get contact() {
     return require('./assets/contact.png');
   },
@@ -296,9 +299,6 @@ const icons = {
   get margins() {
     return require('./assets/margins.png');
   },
-  get media() {
-    return require('./assets/media.png');
-  },
   get menu() {
     return require('./assets/menu.png');
   },
@@ -404,6 +404,9 @@ const icons = {
   get shared_webcard() {
     return require('./assets/shared_webcard.png');
   },
+  get share_main() {
+    return require('./assets/share_main.png');
+  },
   get sharpness() {
     return require('./assets/sharpness.png');
   },
@@ -484,6 +487,9 @@ const icons = {
   },
   get font_color_dash() {
     return require('./assets/font_color_dash.png');
+  },
+  get offline() {
+    return require('./assets/offline.png');
   },
 } as const;
 

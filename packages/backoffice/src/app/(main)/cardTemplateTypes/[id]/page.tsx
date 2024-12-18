@@ -1,10 +1,10 @@
 import { notFound } from 'next/navigation';
 import {
   getCardTemplateTypeById,
-  getLocalizationMessagesByLocaleAndTarget,
+  getLocalizationMessagesByLocale,
   getWebCardCategories,
 } from '@azzapp/data';
-import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import CardTemplateTypesForm from '../CardTemplateTypesForm';
 
 type CardTemplatePageProps = {
@@ -19,7 +19,7 @@ const CardTemplatePage = async (props: CardTemplatePageProps) => {
   const [template, allWebCardCategories, labels] = await Promise.all([
     getCardTemplateTypeById(params.id),
     getWebCardCategories(false),
-    getLocalizationMessagesByLocaleAndTarget(DEFAULT_LOCALE, ENTITY_TARGET),
+    getLocalizationMessagesByLocale(DEFAULT_LOCALE),
   ]);
 
   if (!template) {

@@ -1,9 +1,11 @@
-import { Skia, type SkShader } from '@shopify/react-native-skia';
+import { Skia } from '@shopify/react-native-skia';
+import { scaleCropData } from './mediaEditionHelpers';
 import {
-  imageFrameFromVideoFrame,
+  createImageFromVideoFrame,
   transformImage,
 } from './mediasTransformations';
 import type { EditionParameters } from './EditionParameters';
+import type { TextureInfo } from './NativeTextureLoader';
 import type {
   FrameDrawer,
   VideoComposition,
@@ -32,27 +34,34 @@ export const createSingleVideoComposition = (
 
 export const createSingleVideoFrameDrawer =
   (
-    editionParameters: EditionParameters | null,
-    lutShader: SkShader | null,
+    editionParameters: EditionParameters | null | undefined,
+    lutTexture: TextureInfo | null,
+    videoScale = 1,
   ): FrameDrawer =>
   ({ canvas, frames, width, height }) => {
     'worklet';
-    const paint = Skia.Paint();
     const frame = frames[SINGLE_VIDEO_COMPOSITION_ITEM_ID];
-    const imageFrame = imageFrameFromVideoFrame(frame);
-    if (!imageFrame) {
+    if (!frame) {
       return;
     }
-    const shader = transformImage({
-      imageFrame,
-      width,
-      height,
-      editionParameters,
-      lutShader,
+    const info = createImageFromVideoFrame(frame);
+    if (!info) {
+      return;
+    }
+    const imageFilter = transformImage({
+      ...info,
+      targetWidth: width,
+      targetHeight: height,
+      editionParameters: {
+        ...editionParameters,
+        cropData: editionParameters?.cropData
+          ? scaleCropData(editionParameters.cropData, videoScale)
+          : undefined,
+      },
+      lutTexture,
     });
-    if (!shader) {
-      return;
-    }
-    paint.setShader(shader);
-    canvas.drawPaint(paint);
+
+    const paint = Skia.Paint();
+    paint.setImageFilter(imageFilter);
+    canvas.drawRect({ x: 0, y: 0, width, height }, paint);
   };

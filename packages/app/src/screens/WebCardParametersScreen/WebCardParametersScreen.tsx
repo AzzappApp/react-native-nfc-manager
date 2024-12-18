@@ -254,7 +254,7 @@ const WebCardParametersScreen = ({
               {
                 azzappA: <Text variant="azzapp">a</Text>,
               },
-            ) as string,
+            ) as unknown as string,
           });
         },
       });
@@ -312,7 +312,7 @@ const WebCardParametersScreen = ({
             {
               azzappA: <Text variant="azzapp">a</Text>,
             },
-          ) as string,
+          ) as unknown as string,
         });
       }
     },
@@ -339,7 +339,9 @@ const WebCardParametersScreen = ({
           ) as { errors: GraphQLError[] } | undefined;
           if (
             response?.errors.some(
-              r => r.message === ERRORS.SUBSCRIPTION_REQUIRED,
+              r =>
+                r.message === ERRORS.SUBSCRIPTION_REQUIRED ||
+                r.message === ERRORS.SUBSCRIPTION_INSUFFICIENT_SEATS,
             )
           ) {
             router.push({ route: 'USER_PAY_WALL' });
@@ -356,7 +358,7 @@ const WebCardParametersScreen = ({
                 {
                   azzappA: <Text variant="azzapp">a</Text>,
                 },
-              ) as string,
+              ) as unknown as string,
             });
           }
         },
@@ -389,7 +391,7 @@ const WebCardParametersScreen = ({
               {
                 azzappA: <Text variant="azzapp">a</Text>,
               },
-            ) as string,
+            ) as unknown as string,
           });
         },
       });
@@ -429,7 +431,7 @@ const WebCardParametersScreen = ({
           {
             azzappA: <Text variant="azzapp">a</Text>,
           },
-        ) as string,
+        ) as unknown as string,
         text2: intl.formatMessage(
           {
             defaultMessage: 'The {dateChange} at {timeChange}',
@@ -599,10 +601,7 @@ const WebCardParametersScreen = ({
               data={webCardCategories ?? []}
               selectedItemKey={webCard.webCardCategory?.id}
               keyExtractor={keyExtractor}
-              bottomSheetHeight={Math.min(
-                (webCardCategories.length ?? 0) * 50 + 80,
-                bottomSheetMaxHeight,
-              )}
+              useFlatList={false}
               onItemSelected={updateWebCardCategory}
               bottomSheetTitle={
                 intl.formatMessage({
@@ -682,7 +681,6 @@ const WebCardParametersScreen = ({
                     />
                   </View>
                 }
-                avoidKeyboard
                 accessibilityLabelledBy="activitiesLabel"
                 sections={activities ?? []}
                 selectedItemKey={webCard.companyActivity?.id}
@@ -693,6 +691,7 @@ const WebCardParametersScreen = ({
                   ),
                   600,
                 )}
+                dismissKeyboardOnOpening
                 keyExtractor={keyExtractor}
                 onItemSelected={updateProfileActivity}
                 bottomSheetTitle={intl.formatMessage({

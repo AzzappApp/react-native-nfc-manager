@@ -51,6 +51,7 @@ import relayScreen from '#helpers/relayScreen';
 import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import useAnimatedState from '#hooks/useAnimatedState';
+import useBoolean from '#hooks/useBoolean';
 import {
   UPDATE_CONTACT_CARD_SCANS,
   useWebCardViewStatistic,
@@ -70,7 +71,6 @@ import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { WebCardScreenByIdQuery } from '#relayArtifacts/WebCardScreenByIdQuery.graphql';
 import type { WebCardScreenByUserNameQuery } from '#relayArtifacts/WebCardScreenByUserNameQuery.graphql';
 import type { WebCardRoute } from '#routes';
-import type { CardFlipSwitchRef } from './CardFlipSwitch';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 import type { Disposable } from 'react-relay';
 
@@ -155,12 +155,13 @@ const WebCardScreen = ({
 
   const [editing, toggleEditing] = useToggle(canEdit && params.editing);
   const [selectionMode, toggleSelectionMode] = useToggle(false);
-  const [showWebcardModal, toggleWebcardModal] = useToggle(false);
+  const [showWebcardModal, openWebcardModal, closeWebcardModal] =
+    useBoolean(false);
 
   const onShowWebcardModal = useCallback(() => {
     Toast.hide();
-    toggleWebcardModal();
-  }, [toggleWebcardModal]);
+    openWebcardModal();
+  }, [openWebcardModal]);
 
   const [isAtTop, setIsAtTop] = useState(true);
   const onContentPositionChange = useCallback((atTop: boolean) => {
@@ -211,8 +212,6 @@ const WebCardScreen = ({
     [intl, onToggleFollow, profileInfos?.profileRole],
   );
 
-  const ref = useRef<CardFlipSwitchRef>(null);
-
   // #region Flip Animation
   //Restoring it in single file, "is" more performant on android
   const { width: windowWidth } = useWindowDimensions();
@@ -233,39 +232,33 @@ const WebCardScreen = ({
     easing: Easing.out(Easing.back(1)),
   });
 
-  const borderRadiusStyle = useAnimatedStyle(
-    () => ({
-      borderRadius: interpolate(
-        Math.abs(flip.value + manualFlip.value) % 1,
-        [0, 0.1, 0.9, 1],
-        [0, cardRadius, cardRadius, 0],
-      ),
-    }),
-    [flip, manualFlip],
-  );
+  const borderRadiusStyle = useAnimatedStyle(() => ({
+    borderRadius: interpolate(
+      Math.abs(flip.value + manualFlip.value) % 1,
+      [0, 0.1, 0.9, 1],
+      [0, cardRadius, cardRadius, 0],
+    ),
+  }));
 
-  const frontStyle = useAnimatedStyle(
-    () => ({
-      transform: [
-        { perspective: 900 },
-        {
-          rotateY: `${interpolate(
-            (flip.value + manualFlip.value) % 2,
-            [0, 1, 2],
-            [0, Math.PI, 2 * Math.PI],
-          )}rad`,
-        },
-        {
-          scale: interpolate(
-            Math.abs(flip.value + manualFlip.value) % 1,
-            [0, 0.5, 1],
-            [1, 0.7, 1],
-          ),
-        },
-      ],
-    }),
-    [flip, manualFlip],
-  );
+  const frontStyle = useAnimatedStyle(() => ({
+    transform: [
+      { perspective: 900 },
+      {
+        rotateY: `${interpolate(
+          (flip.value + manualFlip.value) % 2,
+          [0, 1, 2],
+          [0, Math.PI, 2 * Math.PI],
+        )}rad`,
+      },
+      {
+        scale: interpolate(
+          Math.abs(flip.value + manualFlip.value) % 1,
+          [0, 0.5, 1],
+          [1, 0.7, 1],
+        ),
+      },
+    ],
+  }));
 
   const backStyle = useAnimatedStyle(() => {
     return {
@@ -287,7 +280,7 @@ const WebCardScreen = ({
         },
       ],
     };
-  }, [flip, manualFlip]);
+  });
 
   const initialManualGesture = useSharedValue(0);
 
@@ -340,9 +333,7 @@ const WebCardScreen = ({
 
   const onEdit = useCallback(() => {
     if (profileHasEditorRight(profileInfos?.profileRole)) {
-      if (!ref.current?.animationRunning.value) {
-        toggleEditing();
-      }
+      toggleEditing();
     } else {
       Toast.show({
         type: 'error',
@@ -422,14 +413,16 @@ const WebCardScreen = ({
               pointerEvents={showPost ? 'box-none' : 'none'}
             >
               <Suspense>
-                <WebCardPostsList
-                  toggleFlip={toggleFlip}
-                  isViewer={isViewer}
-                  webCardId={data.webCard.id}
-                  hasFocus={hasFocus && showPost && ready}
-                  userName={data.webCard.userName!}
-                  viewerWebCard={data.profile.webCard}
-                />
+                {(showPost || ready) && (
+                  <WebCardPostsList
+                    toggleFlip={toggleFlip}
+                    isViewer={isViewer}
+                    webCardId={data.webCard.id}
+                    hasFocus={hasFocus && showPost && ready}
+                    userName={data.webCard.userName!}
+                    viewerWebCard={data.profile.webCard}
+                  />
+                )}
               </Suspense>
             </Animated.View>
           </View>
@@ -460,7 +453,7 @@ const WebCardScreen = ({
         <WebCardMenu
           visible={showWebcardModal}
           webCard={data.webCard}
-          close={toggleWebcardModal}
+          close={closeWebcardModal}
           onToggleFollow={toggleFollow}
           isViewer={isViewer}
           isOwner={isWebCardOwner}

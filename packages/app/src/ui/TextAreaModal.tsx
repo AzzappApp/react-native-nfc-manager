@@ -1,23 +1,26 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useIntl } from 'react-intl';
-import {
-  KeyboardAvoidingView,
-  Modal,
-  Platform,
-  SafeAreaView, //we want to use this one here on purpose
-} from 'react-native';
+import { KeyboardAvoidingView } from 'react-native';
+import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import { colors } from '#theme';
+import AnimatedText from '#components/AnimatedText';
+import { ScreenModal } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import SafeAreaView from '#ui/SafeAreaView';
 import Header from './Header';
 import HeaderButton from './HeaderButton';
-import Text from './Text';
 import TextInput from './TextInput';
-import type { ModalProps, TextInput as TextInputBase } from 'react-native';
+import type { ReactNode } from 'react';
 
-export type TextAreaModalProps = Omit<
-  ModalProps,
-  'onRequestClose' | 'transparent'
-> & {
+export type TextAreaModalProps = {
+  /**
+   * If true, display the modal. Defaults to false.
+   */
+  visible?: boolean;
+  /**
+   * The content of the modal.
+   */
+  children?: ReactNode | null;
   /**
    * The current value of the textarea
    */
@@ -46,10 +49,6 @@ export type TextAreaModalProps = Omit<
    * A Item component to render on top of the modal, under the header
    */
   ItemTopComponent?: React.ReactElement;
-  /**
-   * If true, the modal will close when the textInput onBlur is called
-   */
-  closeOnBlur?: boolean;
 
   onFocus?: () => void;
 
@@ -67,44 +66,53 @@ const TextAreaModal = ({
   onChangeText,
   onClose,
   ItemTopComponent,
-  closeOnBlur = true,
   onFocus,
   loading,
+  visible,
   ...props
 }: TextAreaModalProps) => {
   const intl = useIntl();
   const styles = useStyleSheet(styleSheet);
-  const [text, setText] = useState(value);
+  const textSharedValueLength = useSharedValue<number>(value.length);
+
+  const internalText = useRef('');
 
   const onCancel = useCallback(() => {
-    setText(value);
+    internalText.current = value;
     onClose();
   }, [onClose, value]);
 
-  const onBlur = useCallback(() => {
-    if (closeOnBlur) {
-      onClose();
-    }
-  }, [closeOnBlur, onClose]);
+  const onChangeTextInternal = (newText: string) => {
+    textSharedValueLength.value = newText.length;
+    internalText.current = newText;
+  };
 
-  const onShow = useCallback(() => {
-    // hack - on android autofocus doesn't open the keyboard
-    if (Platform.OS === 'android') {
-      setTimeout(() => {
-        textInputRef.current?.focus();
-      }, 150);
-    }
-  }, []);
+  const animatedText = useDerivedValue(() => {
+    return `${textSharedValueLength.value} / ${maxLength}`;
+  }, [maxLength]);
 
-  const textInputRef = useRef<TextInputBase>(null);
+  const animatedTextColor = useDerivedValue(() => {
+    return maxLength && textSharedValueLength.value >= maxLength
+      ? colors.red400
+      : undefined;
+  }, [maxLength]);
+
+  useEffect(() => {
+    if (visible) {
+      textSharedValueLength.value = value.length;
+      internalText.current = value;
+    } else {
+      textSharedValueLength.value = 0;
+      internalText.current = '';
+    }
+  }, [textSharedValueLength, value, visible]);
 
   return (
-    <Modal
-      onRequestClose={onClose}
-      transparent
+    <ScreenModal
+      onRequestDismiss={onCancel}
       animationType="fade"
+      visible={visible}
       {...props}
-      onShow={onShow}
     >
       <SafeAreaView style={styles.modal}>
         <Header
@@ -135,7 +143,7 @@ const TextAreaModal = ({
               })}
               loading={loading}
               onPress={() => {
-                onChangeText(text);
+                onChangeText(internalText.current);
               }}
             />
           }
@@ -145,32 +153,25 @@ const TextAreaModal = ({
           <TextInput
             multiline
             placeholder={placeholder}
-            value={text}
-            onChangeText={setText}
-            autoFocus={Platform.OS === 'ios'}
+            defaultValue={value}
+            onChangeText={onChangeTextInternal}
+            autoFocus
             onFocus={onFocus}
             maxLength={maxLength}
-            onBlur={onBlur}
             style={styles.textInput}
-            ref={textInputRef}
             readOnly={loading}
           />
           {maxLength != null && (
-            <Text
+            <AnimatedText
               variant="smallbold"
-              style={[
-                styles.counter,
-                text.length >= maxLength && {
-                  color: colors.red400,
-                },
-              ]}
-            >
-              {text?.length ?? 0} / {maxLength}
-            </Text>
+              style={styles.counter}
+              animatedTextColor={animatedTextColor}
+              text={animatedText}
+            />
           )}
         </KeyboardAvoidingView>
       </SafeAreaView>
-    </Modal>
+    </ScreenModal>
   );
 };
 

@@ -3,7 +3,6 @@ import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { View } from 'react-native';
 import * as mime from 'react-native-mime-types';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import {
   ConnectionHandler,
@@ -43,9 +42,10 @@ import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayp
 import { get as PixelRatio } from '#relayProviders/PixelRatio.relayprovider';
 import { get as PostWidth } from '#relayProviders/PostWidth.relayprovider';
 import { get as ScreenWidth } from '#relayProviders/ScreenWidth.relayprovider';
-import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
+import LoadingView from '#ui/LoadingView';
+import SafeAreaView from '#ui/SafeAreaView';
 import UploadProgressModal from '#ui/UploadProgressModal';
 import PostContentStep from './PostContentStep';
 import PostCreationScreenContext from './PostCreationScreenContext';
@@ -376,11 +376,7 @@ const PostCreationScreenFallback = () => {
       <SafeAreaView style={{ flex: 1 }}>
         <Header leftElement={<CancelHeaderButton onPress={router.back} />} />
         <View style={{ aspectRatio: 1, backgroundColor: colors.grey100 }} />
-        <View
-          style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
-        >
-          <ActivityIndicator />
-        </View>
+        <LoadingView />
       </SafeAreaView>
     </Container>
   );

@@ -13,21 +13,22 @@ import {
 } from '@azzapp/react-native-skia-video';
 import { createRandomFilePath } from '#helpers/fileHelpers';
 import { getVideoLocalPath } from '#helpers/mediaHelpers';
-import { getLutShader } from './LUTFilters';
+import { getLutURI } from './LUTFilters';
 import {
   getDeviceMaxDecodingResolution,
   reduceVideoResolutionIfNecessary,
   scaleCropData,
 } from './mediaEditionHelpers';
-import { imageFrameFromImage, transformImage } from './mediasTransformations';
-import NativeBufferLoader, {
-  createImageFromNativeBuffer,
-} from './NativeBufferLoader';
+import { transformImage } from './mediasTransformations';
+import NativeTextureLoader, {
+  createImageFromNativeTexture,
+} from './NativeTextureLoader';
 import {
   createSingleVideoComposition,
   createSingleVideoFrameDrawer,
 } from './singleVideoCompositions';
 import type { EditionParameters } from './EditionParameters';
+import type { TextureInfo } from './NativeTextureLoader';
 import type { Filter } from '@azzapp/shared/filtersHelper';
 const MEMORY_SIZE = (Device.totalMemory ?? 0) / Math.pow(1024, 3);
 
@@ -46,45 +47,64 @@ export const saveTransformedImageToFile = async ({
   filter?: Filter | null;
   editionParameters?: EditionParameters | null;
 }) => {
-  const { key, promise } = NativeBufferLoader.loadImage(uri);
-  const sourceImage = createImageFromNativeBuffer(await promise, true);
+  const { key, promise } = NativeTextureLoader.loadImage(uri);
+  const sourceImage = createImageFromNativeTexture(await promise);
   if (!sourceImage) {
     throw new Error('Image not found');
   }
-  NativeBufferLoader.ref(key);
+  NativeTextureLoader.ref(key);
   if (!sourceImage) {
-    NativeBufferLoader.unref(key);
+    NativeTextureLoader.unref(key);
     throw new Error('Image not found');
   }
-  const lutShader = filter ? await getLutShader(filter) : null;
-  const transformedImage = drawAsImageFromPicture(
-    createPicture(canvas => {
-      const paint = Skia.Paint();
-      paint.setShader(
-        transformImage({
-          imageFrame: imageFrameFromImage(sourceImage),
-          ...resolution,
+  const { lutTexture, lutKey } = await getLutTexture(filter ?? null);
+  try {
+    const transformedImage = drawAsImageFromPicture(
+      createPicture(canvas => {
+        const imageFilter = transformImage({
+          image: sourceImage,
+          imageInfo: {
+            matrix: Skia.Matrix(),
+            width: sourceImage.width(),
+            height: sourceImage.height(),
+          },
+          targetHeight: resolution.height,
+          targetWidth: resolution.width,
           editionParameters,
-          lutShader,
-        }),
-      );
-      canvas.drawPaint(paint);
-    }),
-    resolution,
-  );
-  // TODO: we need to use encodeToBytes here but react-native-blod-util
-  // does not support Uint8Array
-  // const bytes = await image.encodeToBytes(format, quality);
-  const blob = await transformedImage.encodeToBase64(format, quality);
-  const ext =
-    format === ImageFormat.JPEG ? 'jpg' : ImageFormat.PNG ? 'png' : 'webp';
+          lutTexture,
+        });
+        const paint = Skia.Paint();
+        paint.setImageFilter(imageFilter);
+        canvas.drawRect(
+          {
+            x: 0,
+            y: 0,
+            width: resolution.width,
+            height: resolution.height,
+          },
+          paint,
+        );
+      }),
+      resolution,
+    );
+    // TODO: we need to use encodeToBytes here but react-native-blod-util
+    // does not support Uint8Array
+    // const bytes = await image.encodeToBytes(format, quality);
+    const blob = await transformedImage.encodeToBase64(format, quality);
+    const ext =
+      format === ImageFormat.JPEG ? 'jpg' : ImageFormat.PNG ? 'png' : 'webp';
 
-  const path = createRandomFilePath(ext);
-  await ReactNativeBlobUtil.fs.writeFile(path, blob, 'base64');
+    const path = createRandomFilePath(ext);
+    await ReactNativeBlobUtil.fs.writeFile(path, blob, 'base64');
 
-  NativeBufferLoader.unref(uri);
+    NativeTextureLoader.unref(uri);
 
-  return path;
+    return path;
+  } finally {
+    if (lutKey) {
+      NativeTextureLoader.unref(lutKey);
+    }
+  }
 };
 
 const MAX_EXPORT_DECODER_RESOLUTION = MEMORY_SIZE < 8 ? 1280 : 1920;
@@ -142,9 +162,11 @@ export const saveTransformedVideoToFile = async ({
     decoderResolution,
   );
 
+  const { lutTexture, lutKey } = await getLutTexture(filter ?? null);
+
   const drawFrame = createSingleVideoFrameDrawer(
     editionParameters ?? null,
-    filter ? await getLutShader(filter) : null,
+    lutTexture,
   );
 
   const outPath = createRandomFilePath('.mp4');
@@ -155,34 +177,53 @@ export const saveTransformedVideoToFile = async ({
     frameRate,
   };
 
-  const validConfigs =
-    Platform.OS === 'android'
-      ? getValidEncoderConfigurations(
-          requestedConfigs.width,
-          requestedConfigs.height,
-          requestedConfigs.frameRate,
-          requestedConfigs.bitRate,
-        )
-      : [requestedConfigs];
-  if (!validConfigs || validConfigs.length === 0) {
-    throw new Error('No valid encoder configuration found');
-  }
+  try {
+    const validConfigs =
+      Platform.OS === 'android'
+        ? getValidEncoderConfigurations(
+            requestedConfigs.width,
+            requestedConfigs.height,
+            requestedConfigs.frameRate,
+            requestedConfigs.bitRate,
+          )
+        : [requestedConfigs];
+    if (!validConfigs || validConfigs.length === 0) {
+      throw new Error('No valid encoder configuration found');
+    }
 
-  const encoderConfigs = validConfigs[0]!;
+    const encoderConfigs = validConfigs[0]!;
 
-  await exportVideoComposition(
-    videoComposition,
-    {
+    await exportVideoComposition({
+      videoComposition,
+      drawFrame,
       outPath,
       ...encoderConfigs,
-    },
-    drawFrame,
-  );
-  return outPath;
+    });
+    return outPath;
+  } finally {
+    if (lutKey) {
+      NativeTextureLoader.unref(lutKey);
+    }
+  }
 };
 
 export const getTargetFormatFromPath = (path: string) => {
   return path.toLowerCase().endsWith('.png')
     ? ImageFormat.PNG
     : ImageFormat.JPEG;
+};
+
+const getLutTexture = async (filter: Filter | null) => {
+  let lutTexture: TextureInfo | null = null;
+  let lutKey: string | null = null;
+  if (filter) {
+    const lutUri = getLutURI(filter);
+    if (lutUri) {
+      const { promise, key } = NativeTextureLoader.loadImage(lutUri);
+      lutTexture = await promise;
+      lutKey = key;
+      NativeTextureLoader.ref(key);
+    }
+  }
+  return { lutTexture, lutKey };
 };

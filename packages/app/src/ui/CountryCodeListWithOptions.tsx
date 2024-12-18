@@ -1,7 +1,7 @@
-import { useState } from 'react';
 import { Dimensions, Image, View } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import useBoolean from '#hooks/useBoolean';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Text from '#ui/Text';
 import CountrySelector from './CountrySelector';
@@ -47,14 +47,14 @@ const CountryCodeListWithOptions = <T extends string>({
   style,
   ...props
 }: CountryCodeListWithOptionsProps<T>) => {
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [showDropdown, openDropDown, closeDropDown] = useBoolean(false);
   const onButtonPress = () => {
-    setShowDropdown(true);
+    openDropDown();
     onOpen?.();
   };
 
   const onRequestClose = () => {
-    setShowDropdown(false);
+    closeDropDown();
     onClose?.();
     setTimeout(() => {
       inputRef?.current?.focus();
@@ -97,10 +97,8 @@ const CountryCodeListWithOptions = <T extends string>({
       <BottomSheetModal
         visible={showDropdown}
         height={windowHeight - 120}
-        contentContainerStyle={styles.bottomSheetContainer}
-        nestedScroll
-        onRequestClose={onRequestClose}
-        onDismiss={onDismiss}
+        onDismiss={onRequestClose}
+        dismissKeyboardOnOpening
       >
         <CountrySelector
           value={isSelectorType() ? null : (value as CountryCode)}

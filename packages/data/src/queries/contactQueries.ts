@@ -301,6 +301,15 @@ export const removeContacts = async (
     );
 };
 
+export const refreshContactsLastView = async (ownerProfileId: string) => {
+  return db()
+    .update(ProfileTable)
+    .set({
+      lastContactViewAt: new Date(),
+    })
+    .where(eq(ProfileTable.id, ownerProfileId));
+};
+
 export const removeContactsbyIds = async (contactIds: string[]) => {
   return db()
     .update(ContactTable)

@@ -1,4 +1,4 @@
-import { compileEffect } from '#helpers/mediaEditions/shaderUtils';
+import { compileEffect } from '#helpers/mediaEditions';
 import { createTransition } from './createTransition';
 
 const effect = compileEffect(`
@@ -25,24 +25,24 @@ const duration = 0.5;
 
 export const directionalRight = {
   id: 'directionalRight' as const,
-  transition: createTransition(effect, duration, [-1, 0]),
+  transition: createTransition(effect, duration, { x: -1, y: 0 }),
   duration,
 };
 
 export const directionalLeft = {
   id: 'directionalLeft' as const,
-  transition: createTransition(effect, duration, [1, 0]),
+  transition: createTransition(effect, duration, { x: 1, y: 0 }),
   duration,
 };
 
 export const directionalUp = {
   id: 'directionalUp' as const,
-  transition: createTransition(effect, duration, [0, 1]),
+  transition: createTransition(effect, duration, { x: 0, y: 1 }),
   duration,
 };
 
 export const directionalDown = {
   id: 'directionalDown' as const,
-  transition: createTransition(effect, duration, [0, -1]),
+  transition: createTransition(effect, duration, { x: 0, y: -1 }),
   duration,
 };

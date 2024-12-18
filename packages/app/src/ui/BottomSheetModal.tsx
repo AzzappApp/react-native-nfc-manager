@@ -1,405 +1,205 @@
 import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import { useIntl } from 'react-intl';
+  BottomSheetBackdrop,
+  BottomSheetModal as BottomSheetModalG,
+  BottomSheetView,
+} from '@gorhom/bottom-sheet';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { Keyboard } from 'react-native';
 import {
-  Dimensions,
-  Keyboard,
-  Modal,
-  Platform,
-  StatusBar,
-  View,
-} from 'react-native';
-import {
-  Gesture,
-  GestureDetector,
-  GestureHandlerRootView,
-  TouchableWithoutFeedback,
-} from 'react-native-gesture-handler';
-import {
-  KeyboardAvoidingView,
-  KeyboardController,
-  KeyboardEvents,
-} from 'react-native-keyboard-controller';
-import Animated, {
+  Extrapolation,
   interpolate,
-  runOnJS,
-  useAnimatedReaction,
   useAnimatedStyle,
-  useSharedValue,
-  withSpring,
 } from 'react-native-reanimated';
 import { colors, shadow } from '#theme';
 import Toast from '#components/Toast';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import useAnimatedState from '#hooks/useAnimatedState';
 import useScreenInsets from '#hooks/useScreenInsets';
-import Button from './Button';
-import Header from './Header';
-import type { HeaderProps } from './Header';
-import type { ModalProps, StyleProp, ViewStyle } from 'react-native';
-import type { GestureType, PanGesture } from 'react-native-gesture-handler';
+import type {
+  BottomSheetBackdropProps,
+  BottomSheetModalProps,
+} from '@gorhom/bottom-sheet';
 
-export type BottomSheetModalProps = Omit<
-  ModalProps,
-  'animated' | 'animationType' | 'onRequestClose' | 'transparent'
-> & {
+export type Props = BottomSheetModalProps & {
+  children?: React.ReactNode | undefined;
+  visible: boolean;
   /**
-   * The height of the bottomsheet @default 200
-   */
-  height?: number;
-  /**
-   * @see HeaderProps#title
-   */
-  headerTitle?: HeaderProps['middleElement'];
-  /**
-   * @see HeaderProps#rightButton
-   */
-  headerLeftButton?: HeaderProps['leftElement'];
-  /**
-   * @see HeaderProps#rightButton
-   */
-  headerRightButton?: HeaderProps['rightElement'];
-  /**
-   * The variant of the bottomsheet @default 'default'
-   */
-  variant?: 'default' | 'modal';
-  /**
-   * The style of the bottomsheet content container, since the bottomsheet has a default padding
-   * and margin, you can use this to override the default style
-   */
-  contentContainerStyle?: StyleProp<ViewStyle>;
-  /**
-   * The style of the header
-   */
-  headerStyle?: StyleProp<ViewStyle>;
-  /**
-   *
-   * disableGestureInteraction
-   */
-  disableGestureInteraction?: boolean;
-  /**
-   * add a small horizontal line marker to indicate the gesture is available
+   * add a small horizontal line marker to indicate the gesture is available, and activate the gesture
+   * If required to have gesture without marker, //TODO: add a separate props
    *
    * @type {boolean} @default true
    */
-  showGestureIndicator?: boolean;
+  showHandleIndicator?: boolean;
   /**
-   * @see ModalProps#onRequestClose
-   */
-  onRequestClose: () => void;
-  /**
-   * If `true`, the bottom sheet will support nested scrolling.
-   * This is useful when the bottom sheet contains a scrollable element, such as a list or a long form.
-   * If `false`, the bottom sheet will not respond to scroll events on its children.
+   * lazy mode, will not load the content of bottome sheet and return null
+   * if the bottom sheet is not visible
+   *
    * @default false
-   */
-  nestedScroll?: boolean;
-  /**
-   * If `true`, the bottom sheet will appear on top of the keyboard.
-   * @default false
-   */
-  avoidKeyboard?: boolean;
-  /**
-   * If `true`, the bottom sheet will not be visible by default
-   * @default false
+   * @type {boolean}
    */
   lazy?: boolean;
-
-  nativeGestureItems?: GestureType[];
-};
-
-// TODO in the actual implementation, the height of the bottomsheet is actually the given height + insets.bottom
-// this is confusing and should be fixed
-
-const BottomSheetModalContext = createContext<{
-  panGesture: PanGesture;
-} | null>(null);
-
-export const useBottomSheetModalContext = (
-  allowedOutsideOfContext: boolean = false,
-) => {
-  const context = useContext(BottomSheetModalContext);
-  if (context === null) {
-    if (allowedOutsideOfContext) {
-      return { panGesture: undefined };
-    }
-    throw new Error(
-      'useBottomSheetModalContext must be used within a BottomSheetModalContext.Provider',
-    );
-  }
-  return context;
+  /**
+   * Optional Height of the bottom sheet. If defined, the automatic sizing will be disabled
+   * and the height will be fixed to the given value.
+   *
+   * @default undefined
+   * @type {number}
+   */
+  height?: number;
+  /**
+   * add a bottom padding automatically based on the bottom insets and the phone's safe area
+   * This props allows to remove it in a case of a Scrollable content for example
+   * @default true
+   * @type {boolean}
+   */
+  automaticBottomPadding?: boolean;
+  /**
+   * If true, create a backdrop that allow te be touched in order to close the bottom
+   *
+   * @type {boolean}
+   */
+  closeOnBackdropTouch?: boolean;
+  /**
+   *  The variant of the bottomsheet @default 'default'
+   *  if modal, a darkened backdrop will appear
+   */
+  variant?: 'default' | 'modal';
+  /**
+   * will close the existing keyboard on opening if true
+   *
+   * @type {boolean}
+   */
+  dismissKeyboardOnOpening?: boolean;
 };
 
 /**
  * A simple bottom sheet component
  */
 const BottomSheetModal = ({
-  height: baseHeight = 200,
-  visible,
-  headerTitle,
-  headerLeftButton,
-  headerRightButton,
   children,
+  visible,
+  showHandleIndicator = true,
+  style,
+  height,
+  automaticBottomPadding = true,
+  enableContentPanningGesture,
+  closeOnBackdropTouch = true,
   variant,
-  disableGestureInteraction,
-  contentContainerStyle,
-  headerStyle,
-  showGestureIndicator = true,
-  onRequestClose,
-  nestedScroll = false,
-  avoidKeyboard,
-  lazy = false,
-  nativeGestureItems = [],
+  dismissKeyboardOnOpening = false,
   ...props
-}: BottomSheetModalProps) => {
-  const [isVisible, setIsVisible] = useState(false);
-  const insets = useScreenInsets();
-  const intl = useIntl();
-
-  const height = useMemo(() => {
-    const navbarHeight =
-      Dimensions.get('screen').height -
-      Dimensions.get('window').height -
-      (StatusBar.currentHeight || 0);
-
-    return baseHeight + navbarHeight;
-  }, [baseHeight]);
-
-  if (variant === 'default' && headerRightButton === undefined) {
-    headerRightButton = (
-      <Button
-        label={intl.formatMessage({
-          defaultMessage: 'Close',
-          description: 'Bottom sheet close button',
-        })}
-        onPress={onRequestClose}
-      />
-    );
-  }
-
-  const hasHeader =
-    headerTitle != null ||
-    headerLeftButton != null ||
-    headerRightButton != null;
-
-  const disableGestureInteractionRef = useRef(disableGestureInteraction);
-  useEffect(() => {
-    disableGestureInteractionRef.current = disableGestureInteraction;
-  }, [disableGestureInteraction]);
-
+}: Props) => {
   const styles = useStyleSheet(styleSheet);
-  const translateY = useAnimatedState(isVisible);
-  const panTranslationY = useSharedValue(0);
 
-  const openAfterKeyBoardDismiss = useRef(false);
-  const handleKeyBoardEnd = () => {
-    if (openAfterKeyBoardDismiss.current) {
-      setIsVisible(true);
-      openAfterKeyBoardDismiss.current = false;
-    }
-  };
+  const bottomSheetModalRef = useRef<BottomSheetModalG>(null);
 
   useEffect(() => {
-    const listener = KeyboardEvents.addListener(
-      'keyboardDidHide',
-      handleKeyBoardEnd,
-    );
-    return () => {
-      listener.remove();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (visible && Keyboard.isVisible()) {
-      openAfterKeyBoardDismiss.current = true;
-      KeyboardController.dismiss();
-    } else {
-      setIsVisible(visible ?? false);
-    }
-    return () => {
-      openAfterKeyBoardDismiss.current = false;
-    };
-  }, [visible]);
-
-  useEffect(() => {
-    if (!isVisible) {
-      panTranslationY.value = 0;
-    }
-  }, [panTranslationY, isVisible]);
-
-  const panGesture = useMemo(
-    () =>
-      Gesture.Pan()
-        .simultaneousWithExternalGesture(...nativeGestureItems)
-        .enabled(!disableGestureInteractionRef.current)
-        .onChange(e => {
-          panTranslationY.value = Math.max(0, e.translationY) / height;
-        })
-        .onEnd(() => {
-          if (panTranslationY.value > 0.5) {
-            panTranslationY.value = withSpring(1);
-          } else {
-            panTranslationY.value = withSpring(0);
-          }
-        }),
-    [height, panTranslationY, nativeGestureItems],
-  );
-
-  useAnimatedReaction(
-    () => panTranslationY.value,
-    positionYValue => {
-      if (positionYValue !== null && positionYValue >= 1) {
-        runOnJS(onRequestClose)();
+    if (visible) {
+      if (dismissKeyboardOnOpening) {
+        Keyboard.dismiss();
       }
-    },
-  );
+      bottomSheetModalRef.current?.present();
+    } else {
+      bottomSheetModalRef.current?.dismiss();
+    }
+  }, [dismissKeyboardOnOpening, visible]);
 
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        {
-          translateY: interpolate(
-            translateY.value - panTranslationY.value,
-            [0, 1],
-            [0, -(height + insets.bottom)],
-          ),
-        },
-      ],
+  const { bottom } = useScreenInsets();
+  const paddingBottom = useMemo(() => {
+    return bottom + 15;
+  }, [bottom]);
+
+  const dynamicProps = useMemo(() => {
+    const commonProps = {
+      enableHandlePanningGesture: showHandleIndicator,
+      enableContentPanningGesture:
+        enableContentPanningGesture != null
+          ? enableContentPanningGesture
+          : showHandleIndicator,
+      style: [styles.modalContainer, style],
     };
-  });
-
-  const backgroundOpacity = useAnimatedStyle(() => {
-    return {
-      opacity: interpolate(
-        translateY.value - panTranslationY.value,
-        [0, 1],
-        [0, 0.8],
-      ),
-    };
-  });
-
-  const content = useMemo(() => {
-    return (
-      <>
-        {!disableGestureInteraction && showGestureIndicator && (
-          <View
-            style={[styles.gestureInteractionIndicator]}
-            pointerEvents="box-none"
-          />
-        )}
-        {hasHeader && (
-          <Header
-            style={[styles.accessoryView, headerStyle]}
-            middleElement={headerTitle}
-            leftElement={headerLeftButton}
-            rightElement={headerRightButton}
-          />
-        )}
-        {children}
-      </>
-    );
+    if (height !== null && height !== undefined && height > 0) {
+      return {
+        index: 0,
+        snapPoints: [height],
+        enableDynamicSizing: false,
+        ...commonProps,
+      };
+    } else {
+      return {
+        enableDynamicSizing: true,
+        ...commonProps,
+      };
+    }
   }, [
-    children,
-    disableGestureInteraction,
-    hasHeader,
-    headerLeftButton,
-    headerRightButton,
-    headerStyle,
-    headerTitle,
-    showGestureIndicator,
-    styles.accessoryView,
-    styles.gestureInteractionIndicator,
+    enableContentPanningGesture,
+    height,
+    showHandleIndicator,
+    style,
+    styles.modalContainer,
   ]);
 
-  // #endregion
-
-  const bottomSheetContextValue = useMemo(
-    () => ({
-      panGesture,
-    }),
-    [panGesture],
+  const renderBackdrop = useCallback(
+    (props: BottomSheetBackdropProps) => {
+      if (!closeOnBackdropTouch) {
+        return null;
+      }
+      if (variant !== 'modal') {
+        return (
+          <BottomSheetBackdrop
+            {...props}
+            style={[props.style, { backgroundColor: 'transparent' }]}
+            disappearsOnIndex={-1}
+            appearsOnIndex={0}
+            opacity={1}
+            pressBehavior="close"
+          />
+        );
+      }
+      return <CustomBackdrop closeOnBackdropTouch={true} {...props} />;
+    },
+    [closeOnBackdropTouch, variant],
   );
 
   return (
-    <Modal
-      animationType="none"
-      visible={isVisible}
-      transparent
-      onRequestClose={onRequestClose}
-      pointerEvents="box-none"
+    <BottomSheetModalG
+      ref={bottomSheetModalRef}
+      enableDismissOnClose={true}
+      handleIndicatorStyle={styles.gestureInteractionIndicator}
+      handleStyle={styles.handleStyle}
+      backgroundStyle={styles.backgroundStyle}
+      handleComponent={showHandleIndicator ? undefined : null}
+      backdropComponent={renderBackdrop}
+      keyboardBlurBehavior="restore"
+      {...dynamicProps}
       {...props}
     >
-      {lazy && !isVisible ? null : (
-        <KeyboardAvoidingView
-          behavior={avoidKeyboard ? 'height' : undefined}
-          style={{ height: '100%', width: '100%' }}
-        >
-          {/* required for android */}
-          <GestureHandlerRootView style={{ height: '100%', width: '100%' }}>
-            <TouchableWithoutFeedback
-              style={styles.absoluteFill}
-              onPress={onRequestClose}
-            >
-              <View style={styles.absoluteFill}>
-                {variant === 'modal' && (
-                  <Animated.View
-                    style={[
-                      styles.absoluteFill,
-                      {
-                        backgroundColor: colors.black,
-                      },
-                      backgroundOpacity,
-                    ]}
-                  />
-                )}
-              </View>
-            </TouchableWithoutFeedback>
-            <Animated.View
-              style={[
-                styles.bottomSheetContainer,
-                {
-                  height: height + insets.bottom,
-                  paddingBottom: insets.bottom,
-                },
-                contentContainerStyle,
-                animatedStyle,
-              ]}
-            >
-              <BottomSheetModalContext.Provider value={bottomSheetContextValue}>
-                {nestedScroll && Platform.OS === 'android' ? (
-                  <>
-                    <GestureDetector gesture={panGesture}>
-                      <View
-                        style={styles.gestureViewAndroid}
-                        collapsable={false}
-                      />
-                    </GestureDetector>
-                    {content}
-                  </>
-                ) : (
-                  <GestureDetector gesture={panGesture}>
-                    <View style={styles.gestureView}>{content}</View>
-                  </GestureDetector>
-                )}
-              </BottomSheetModalContext.Provider>
-            </Animated.View>
-          </GestureHandlerRootView>
-        </KeyboardAvoidingView>
-      )}
+      <BottomSheetView
+        style={[
+          styles.container,
+          {
+            height: height ? height : undefined,
+            paddingBottom: automaticBottomPadding ? paddingBottom : 0,
+            paddingTop: showHandleIndicator ? 0 : 16,
+          },
+        ]}
+      >
+        {children}
+      </BottomSheetView>
       <Toast />
-    </Modal>
+    </BottomSheetModalG>
   );
 };
 
 export default BottomSheetModal;
 
 const styleSheet = createStyleSheet(appearance => ({
+  container: {
+    flex: 1,
+  },
+  backgroundStyle: {
+    backgroundColor: appearance === 'light' ? colors.white : colors.black,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+  },
   gestureInteractionIndicator: {
     backgroundColor: appearance === 'light' ? colors.grey100 : colors.white,
     height: 4,
@@ -408,35 +208,49 @@ const styleSheet = createStyleSheet(appearance => ({
     borderRadius: 2,
     marginBottom: 4,
   },
-  gestureView: { flex: 1, backgroundColor: 'transparent' },
-  gestureViewAndroid: {
-    position: 'absolute',
-    height: '100%',
-    width: '100%',
+  handleStyle: {
+    backgroundColor: appearance === 'light' ? colors.white : colors.black,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    paddingTop: 16,
   },
   modalContainer: {
-    flex: 1,
-  },
-  absoluteFill: {
-    width: '100%',
-    height: '100%',
-  },
-  bottomSheetContainer: [
-    {
-      position: 'absolute',
-      top: '100%',
-      left: 0,
-      width: '100%',
-      borderTopLeftRadius: 16,
-      borderTopRightRadius: 16,
-      paddingTop: 16,
-      paddingHorizontal: 20,
-      backgroundColor: appearance === 'light' ? colors.white : colors.black,
-    },
-    shadow(appearance, 'top'),
-  ],
-  accessoryView: {
-    marginBottom: 10,
-    paddingHorizontal: 0,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    borderWidth: 0,
+    ...shadow(appearance, 'top'),
   },
 }));
+
+const CustomBackdrop = ({
+  closeOnBackdropTouch,
+  animatedIndex,
+  style,
+  ...props
+}: BottomSheetBackdropProps & { closeOnBackdropTouch: boolean }) => {
+  const containerAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: interpolate(
+        animatedIndex.value,
+        [-1, 0],
+        [0, 0.6],
+        Extrapolation.CLAMP,
+      ),
+    };
+  });
+
+  if (!closeOnBackdropTouch) {
+    return null;
+  }
+
+  return (
+    <BottomSheetBackdrop
+      {...props}
+      style={[style, containerAnimatedStyle]}
+      disappearsOnIndex={-1}
+      appearsOnIndex={0}
+      pressBehavior="close"
+      animatedIndex={animatedIndex}
+    />
+  );
+};

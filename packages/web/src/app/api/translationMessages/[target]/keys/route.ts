@@ -8,13 +8,14 @@ import {
   getCompanyActivityTypes,
   getCoverTemplateTags,
   getCoverTemplateTypes,
-  getLocalizationMessagesByLocaleAndTarget,
+  getLocalizationMessagesByLocale,
   getWebCardCategories,
 } from '@azzapp/data';
-import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import appMessages from '@azzapp/i18n/src/appMessages.json';
 import webMessages from '@azzapp/i18n/src/webMessages.json';
 import ERRORS from '@azzapp/shared/errors';
+import { TEMPLATE_COVERTAG_DESCRIPTION_PREFIX } from '@azzapp/shared/translationsContants';
 import { withPluginsRoute } from '#helpers/queries';
 import { checkServerAuth } from '#helpers/tokens';
 
@@ -70,9 +71,13 @@ export const GET = withPluginsRoute(
           ),
         ),
         getCoverTemplateTags().then(coverTemplateTags =>
-          coverTemplateTags.map(
-            ({ id }) => ({ id, kind: 'CoverTemplateTag' }) as const,
-          ),
+          coverTemplateTags.flatMap(({ id }) => [
+            { id, kind: 'CoverTemplateTag' } as const,
+            {
+              id: TEMPLATE_COVERTAG_DESCRIPTION_PREFIX + id,
+              kind: 'CoverTemplateTagDescription',
+            },
+          ]),
         ),
         getCoverTemplateTypes().then(coverTemplateTypes =>
           coverTemplateTypes.map(
@@ -87,10 +92,7 @@ export const GET = withPluginsRoute(
       ]);
 
       const defaultEntityLabels = (
-        await getLocalizationMessagesByLocaleAndTarget(
-          DEFAULT_LOCALE,
-          ENTITY_TARGET,
-        )
+        await getLocalizationMessagesByLocale(DEFAULT_LOCALE)
       ).reduce(
         (acc, message) => {
           acc[message.key] = message.value;

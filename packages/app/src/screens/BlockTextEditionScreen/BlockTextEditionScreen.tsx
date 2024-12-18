@@ -1,16 +1,18 @@
-import { omit } from 'lodash';
-import { useCallback, useMemo, useState } from 'react';
+import omit from 'lodash/omit';
+import { startTransition, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Platform, StyleSheet } from 'react-native';
-import { useSharedValue } from 'react-native-reanimated';
+import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment, useMutation } from 'react-relay';
 
 import {
   BLOCK_TEXT_DEFAULT_VALUES,
   BLOCK_TEXT_MAX_LENGTH,
   BLOCK_TEXT_STYLE_VALUES,
+  getBlockTextDefaultColors,
 } from '@azzapp/shared/cardModuleHelpers';
 import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
+import AnimatedDataOverride from '#components/AnimatedDataOverride';
 import { useRouter } from '#components/NativeRouter';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
@@ -103,6 +105,7 @@ const BlockTextEditionScreen = ({
         webCard {
           id
           cardIsPublished
+          coverBackgroundColor
           isPremium
           cardColors {
             primary
@@ -153,8 +156,12 @@ const BlockTextEditionScreen = ({
       textBackgroundStyle: blockText?.textBackgroundStyle ?? null,
       backgroundId: blockText?.background?.id ?? null,
       backgroundStyle: blockText?.backgroundStyle ?? null,
+      ...getBlockTextDefaultColors(
+        profile.webCard?.coverBackgroundColor,
+        blockText,
+      ),
     };
-  }, [blockText]);
+  }, [blockText, profile.webCard?.coverBackgroundColor]);
 
   const { data, value, fieldUpdateHandler, dirty } = useModuleDataEditor({
     initialValue,
@@ -269,6 +276,15 @@ const BlockTextEditionScreen = ({
     data.marginVertical ?? BLOCK_TEXT_DEFAULT_VALUES.marginVertical,
   );
 
+  const animatedData = useDerivedValue(() => ({
+    fontSize: fontSize.value,
+    verticalSpacing: verticalSpacing.value,
+    textMarginVertical: textMarginVertical.value,
+    textMarginHorizontal: textMarginHorizontal.value,
+    marginHorizontal: marginHorizontal.value,
+    marginVertical: marginVertical.value,
+  }));
+
   const onTextBackgroundChange = fieldUpdateHandler('textBackgroundId');
 
   const onTextBackgroundStyleChange = fieldUpdateHandler('textBackgroundStyle');
@@ -329,12 +345,12 @@ const BlockTextEditionScreen = ({
     profile.webCard?.id,
     value,
     blockText?.id,
-    textMarginHorizontal.value,
-    textMarginVertical.value,
-    marginHorizontal.value,
-    marginVertical.value,
-    fontSize.value,
-    verticalSpacing.value,
+    textMarginHorizontal,
+    textMarginVertical,
+    marginHorizontal,
+    marginVertical,
+    fontSize,
+    verticalSpacing,
     commit,
     router,
     handleProfileActionError,
@@ -353,11 +369,13 @@ const BlockTextEditionScreen = ({
 
   const onCurrentTabChange = useCallback(
     (currentTab: string) => {
-      if (currentTab === 'editor') {
-        setShowContentModal(true);
-      } else {
-        setCurrentTab(currentTab);
-      }
+      startTransition(() => {
+        if (currentTab === 'editor') {
+          setShowContentModal(true);
+        } else {
+          setCurrentTab(currentTab);
+        }
+      });
     },
     [setCurrentTab],
   );
@@ -410,21 +428,17 @@ const BlockTextEditionScreen = ({
           />
         }
       />
-      <BlockTextPreview
-        style={{ height: topPanelHeight - 20, marginVertical: 10 }}
-        data={previewData}
-        animatedData={{
-          fontSize,
-          verticalSpacing,
-          marginHorizontal,
-          marginVertical,
-          textMarginVertical,
-          textMarginHorizontal,
-        }}
-        onPreviewPress={onPreviewPress}
-        colorPalette={profile?.webCard?.cardColors}
-        cardStyle={profile?.webCard?.cardStyle}
-      />
+      <AnimatedDataOverride data={previewData} animatedData={animatedData}>
+        {data => (
+          <BlockTextPreview
+            style={{ height: topPanelHeight - 20, marginVertical: 10 }}
+            data={data}
+            onPreviewPress={onPreviewPress}
+            colorPalette={profile?.webCard?.cardColors}
+            cardStyle={profile?.webCard?.cardStyle}
+          />
+        )}
+      </AnimatedDataOverride>
       <TabView
         style={{
           height: bottomPanelHeight,
@@ -448,9 +462,7 @@ const BlockTextEditionScreen = ({
                 style={{
                   flex: 1,
                   marginBottom:
-                    insetBottom +
-                    BOTTOM_MENU_HEIGHT +
-                    (Platform.OS === 'android' ? 15 : 0),
+                    BOTTOM_MENU_HEIGHT + (Platform.OS === 'android' ? 15 : 0),
                 }}
                 bottomSheetHeight={bottomPanelHeight}
                 onTouched={onTouched}
@@ -486,9 +498,7 @@ const BlockTextEditionScreen = ({
                 style={{
                   flex: 1,
                   marginBottom:
-                    insetBottom +
-                    BOTTOM_MENU_HEIGHT +
-                    (Platform.OS === 'android' ? 15 : 0),
+                    BOTTOM_MENU_HEIGHT + (Platform.OS === 'android' ? 15 : 0),
                 }}
                 onTouched={onTouched}
               />
@@ -506,7 +516,7 @@ const BlockTextEditionScreen = ({
                 bottomSheetHeight={bottomPanelHeight}
                 style={{
                   flex: 1,
-                  marginBottom: insetBottom + BOTTOM_MENU_HEIGHT,
+                  marginBottom: BOTTOM_MENU_HEIGHT,
                 }}
               />
             ),

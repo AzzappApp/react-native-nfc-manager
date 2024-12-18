@@ -24,6 +24,7 @@ const PhotoWithTextAndTitleRenderer = ({
   module,
   colorPalette,
   cardStyle,
+  coverBackgroundColor,
   ...props
 }: PhotoWithTextAndTitleRendererProps) => {
   const {

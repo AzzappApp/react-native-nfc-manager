@@ -19,6 +19,7 @@ const BlockTextRenderer = ({
   module,
   colorPalette,
   cardStyle,
+  coverBackgroundColor,
   ...props
 }: BlockTextRendererProps) => {
   const {

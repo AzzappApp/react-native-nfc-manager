@@ -1,9 +1,7 @@
-import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import {
-  extractLottieInfoMemoized,
-  getLottieMediasDurations,
-  getMaxAllowedVideosPerCover,
+  MAX_ALLOWED_VIDEOS_BY_COVER,
+  useLottieMediaDurations,
 } from '#components/CoverEditor/coverEditorHelpers';
 import CoverEditorMediaPicker from '#components/CoverEditor/CoverEditorMediaPicker';
 
@@ -12,28 +10,22 @@ import useToggle from '#hooks/useToggle';
 import {
   useCoverEditorActiveMedia,
   useCoverEditorContext,
+  useCoverEditorEditContext,
 } from '../../CoverEditorContext';
 import ToolBoxSection from '../ui/ToolBoxSection';
-import type { Media } from '#helpers/mediaHelpers';
+import type { SourceMedia } from '#helpers/mediaHelpers';
 
 const CoverEditorMediaReplace = () => {
   const intl = useIntl();
   const [show, toggleScreenModal] = useToggle(false);
-  const {
-    coverEditorState: { lottie, editionMode, medias },
-    dispatch,
-  } = useCoverEditorContext();
 
-  const durations = useMemo(() => {
-    const lottieInfo = extractLottieInfoMemoized(lottie);
-    if (!lottieInfo) return null;
+  const { lottie, editionMode, medias } = useCoverEditorContext();
+  const dispatch = useCoverEditorEditContext();
 
-    return getLottieMediasDurations(lottieInfo);
-  }, [lottie]);
-
+  const durations = useLottieMediaDurations(lottie);
   const activeMedia = useCoverEditorActiveMedia();
 
-  const onFinished = (medias: Media[]) => {
+  const onFinished = (medias: SourceMedia[]) => {
     const media = medias[0];
     dispatch({
       type: 'UPDATE_ACTIVE_MEDIA',
@@ -43,11 +35,11 @@ const CoverEditorMediaReplace = () => {
   };
 
   const disableVideoSelection =
-    activeMedia?.media.kind === 'video'
+    activeMedia?.kind === 'video'
       ? false
       : !(
-          getMaxAllowedVideosPerCover(!!lottie) >
-          medias.filter(m => m.media.kind === 'video').length
+          MAX_ALLOWED_VIDEOS_BY_COVER >
+          medias.filter(media => media.kind === 'video').length
         );
 
   return (
@@ -68,7 +60,7 @@ const CoverEditorMediaReplace = () => {
         >
           {show && (
             <CoverEditorMediaPicker
-              initialMedias={null}
+              initialMedias={[activeMedia]}
               durations={durations}
               maxSelectableVideos={
                 editionMode === 'overlay' || disableVideoSelection ? 0 : 1

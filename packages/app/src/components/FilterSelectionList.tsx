@@ -6,8 +6,8 @@ import { colors } from '#theme';
 import { useFilterLabels } from '#helpers/mediaEditions';
 import BoxSelectionList from './BoxSelectionList';
 import TransformedImageRenderer from './TransformedImageRenderer';
-import type { CropData } from '#helpers/mediaEditions';
-import type { Media } from '#helpers/mediaHelpers';
+import type { CropData, ImageOrientation } from '#helpers/mediaEditions';
+import type { SourceMedia } from '#helpers/mediaHelpers';
 import type { BoxButtonItemInfo } from './BoxSelectionList';
 import type { Filter } from '@azzapp/shared/filtersHelper';
 import type { SkImage } from '@shopify/react-native-skia';
@@ -19,9 +19,10 @@ type FilterSelectionListProps = ViewProps & {
   selectedFilter: string | null;
   cropData?: CropData | null;
   cardRadius?: number;
-  media: Media | null;
+  media: SourceMedia | null;
   onChange(value: Filter | null): void;
   isSkImageReady: boolean;
+  orientation?: ImageOrientation | null;
 };
 
 const FilterSelectionList = ({
@@ -29,6 +30,7 @@ const FilterSelectionList = ({
   aspectRatio,
   selectedFilter,
   cropData,
+  orientation,
   onChange,
   media,
   isSkImageReady,
@@ -55,7 +57,7 @@ const FilterSelectionList = ({
       };
     }
     return result;
-  }, [cropData, isSkImageReady, media, skImage.value]);
+  }, [cropData, isSkImageReady, media, skImage]);
 
   const renderItem = useCallback(
     ({ item, height, width }: BoxButtonItemInfo<[Filter, string] | null>) => {
@@ -69,6 +71,7 @@ const FilterSelectionList = ({
           filter={filter}
           editionParameters={{
             cropData: filterListerCropData,
+            orientation,
           }}
           imageStyle={
             colorScheme === 'dark' && {
@@ -78,7 +81,7 @@ const FilterSelectionList = ({
         />
       );
     },
-    [skImage, filterListerCropData, colorScheme],
+    [skImage, filterListerCropData, orientation, colorScheme],
   );
 
   const onSelect = useCallback(

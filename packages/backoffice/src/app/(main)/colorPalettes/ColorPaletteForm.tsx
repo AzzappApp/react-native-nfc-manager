@@ -11,7 +11,7 @@ import {
   Switch,
   Typography,
 } from '@mui/material';
-import { omit } from 'lodash';
+import omit from 'lodash/omit';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import ColorInput from '#components/ColorInput';

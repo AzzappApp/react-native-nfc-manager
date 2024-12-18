@@ -54,13 +54,22 @@ const DownloadVCardLinkButton = (props: ButtonProps) => {
       }
 
       if (!compressedContactCard) {
+        onClick?.(e);
         return;
       }
 
-      saveAs(
-        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/downloadVCard?c=${compressedContactCard}.vcf&u=${userName}`,
-        download ?? 'azzapp-contact.vcf',
+      const blob = new Blob(
+        [
+          btoa(
+            `${process.env.NEXT_PUBLIC_API_ENDPOINT}/downloadVCard?c=${compressedContactCard}.vcf&u=${userName}`,
+          ),
+        ],
+        {
+          type: 'text/plain;charset=utf-8',
+        },
       );
+
+      saveAs(blob, download ?? 'azzapp-contact.vcf');
       onClick?.(e);
     },
     [
@@ -78,6 +87,6 @@ const DownloadVCardLinkButton = (props: ButtonProps) => {
 
 export default DownloadVCardLinkButton;
 
-const supportedBrowserUserAgents = ['safari', 'chrome'];
+const supportedBrowserUserAgents = ['safari', 'chrome', 'mozilla'];
 // Exclude Firefox and Opera
 const unsupportedBrowserUserAgents = ['fxios/', 'opt/'];

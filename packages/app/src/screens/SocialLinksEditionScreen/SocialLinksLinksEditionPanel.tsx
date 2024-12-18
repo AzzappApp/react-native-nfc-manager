@@ -1,4 +1,5 @@
-import { memo, useCallback, useMemo, useState } from 'react';
+import _ from 'lodash';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View, useColorScheme } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
@@ -45,6 +46,7 @@ type SocialLinksLinksEditionPanelProps = ViewProps & {
    */
   onLinksChange: (links: Array<SocialLinkInput | null>) => void;
   contentContainerStyle?: StyleProp<ViewStyle>;
+  ignoreKeyboard?: boolean;
 };
 
 /**
@@ -55,39 +57,43 @@ const SocialLinksLinksEditionPanel = ({
   onLinksChange,
   style,
   contentContainerStyle,
+  ignoreKeyboard,
   ...props
 }: SocialLinksLinksEditionPanelProps) => {
   const intl = useIntl();
   const { insetBottom } = useEditorLayout();
 
-  const onChangeLink = (id: SocialLinkId, value: string) => {
-    if (isNotFalsyString(value)) {
-      const item = links.find(link => link?.socialId === id);
+  const onChangeLink = useCallback(
+    (id: SocialLinkId, value: string) => {
+      if (isNotFalsyString(value)) {
+        const item = links.find(link => link?.socialId === id);
 
-      //add value to item link
-      if (item) {
-        const newLinks = links.map(link => {
-          if (link?.socialId === id) {
-            return {
-              ...link,
-              link: value,
-            };
-          }
-          return link;
-        });
-        onLinksChange(newLinks);
+        //add value to item link
+        if (item) {
+          const newLinks = links.map(link => {
+            if (link?.socialId === id) {
+              return {
+                ...link,
+                link: value,
+              };
+            }
+            return link;
+          });
+          onLinksChange(newLinks);
+        } else {
+          onLinksChange([
+            ...links,
+            { socialId: id, link: value, position: links.length },
+          ]);
+        }
       } else {
-        onLinksChange([
-          ...links,
-          { socialId: id, link: value, position: links.length },
-        ]);
+        onLinksChange(links.filter(link => link?.socialId !== id));
       }
-    } else {
-      onLinksChange(links.filter(link => link?.socialId !== id));
-    }
-  };
+    },
+    [links, onLinksChange],
+  );
 
-  const data = useMemo(() => {
+  const getLinks = useCallback(() => {
     // consolidate a list of link merged with the selected value
     const consolidatedLinks = [];
     for (let index = 0; index < SOCIAL_LINKS.length; index++) {
@@ -132,41 +138,63 @@ const SocialLinksLinksEditionPanel = ({
 
       consolidatedLinks.push({
         ...link,
-        position: NO_POSITION_INDEX, //required for reordering
-        ...value,
+        position: value?.position ?? NO_POSITION_INDEX, //required for reordering
         placeholder,
       });
     }
-    return consolidatedLinks.sort((a, b) => {
+
+    return consolidatedLinks;
+  }, [intl, links]);
+
+  const [data, setData] = useState(() =>
+    getLinks().sort((a, b) => {
       if (a.position !== b.position) {
         return a.position - b.position;
       }
       return 0;
-    });
-  }, [intl, links]);
+    }),
+  );
 
-  const renderItem = (
-    item: {
-      id: SocialLinkId;
-      link?: string | undefined;
-      position: number;
-      mask: string;
-      placeholder?: string;
+  useEffect(() => {
+    setData(data => {
+      const newData = getLinks();
+      if (_.isEqual(data, newData)) {
+        return data;
+      } else {
+        return newData;
+      }
+    });
+  }, [getLinks]);
+
+  const initialLinks = useRef(links);
+
+  const renderItem = useCallback(
+    (
+      item: {
+        id: SocialLinkId;
+        link?: string | undefined;
+        position: number;
+        mask: string;
+        placeholder?: string;
+      },
+      panGesture: PanGesture,
+    ) => {
+      const value =
+        initialLinks.current.find(link => link?.socialId === item.id)?.link ??
+        '';
+      return (
+        <SocialInput
+          icon={item.id}
+          mask={item.mask}
+          placeholder={item.placeholder}
+          value={value}
+          onChangeLink={onChangeLink}
+          panGesture={panGesture}
+        />
+      );
     },
-    panGesture: PanGesture,
-  ) => {
-    const value = links.find(link => link?.socialId === item.id)?.link ?? '';
-    return (
-      <SocialInput
-        icon={item.id}
-        mask={item.mask}
-        placeholder={item.placeholder}
-        value={value}
-        onChangeLink={onChangeLink}
-        panGesture={panGesture}
-      />
-    );
-  };
+    [onChangeLink],
+  );
 
   const onChangeOrder = (
     arr: Array<{
@@ -219,7 +247,7 @@ const SocialLinksLinksEditionPanel = ({
               SOCIAL_LINK_PANEL_ITEM_HEIGHT * SOCIAL_LINKS.length +
               insetBottom +
               BOTTOM_MENU_HEIGHT +
-              20,
+              90,
           }
         }
         onLayout={onLayout}
@@ -264,11 +292,10 @@ const SocialInputComponent = ({
           filterText = filterText.substring(0, endIndex);
         }
       }
-
       if (
         isNotFalsyString(filterText) &&
         icon === 'website' &&
-        !localValue.includes('http')
+        !filterText.includes('http')
       ) {
         filterText = 'https://' + (filterText === 'h' ? '' : filterText);
       }
@@ -277,7 +304,7 @@ const SocialInputComponent = ({
         debouncedChangeLink(icon, filterText);
       }
     },
-    [debouncedChangeLink, icon, localValue, mask],
+    [debouncedChangeLink, icon, mask],
   );
 
   const intl = useIntl();
@@ -322,35 +349,34 @@ const SocialInputComponent = ({
     [icon, intl, onChangeLink],
   );
 
-  return (
-    <View
-      key={icon}
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        height: 56,
-      }}
-    >
-      <SocialIcon
-        icon={icon}
-        style={{
-          width: 30,
-          height: 30,
-          tintColor: isNotFalsyString(value)
-            ? colorScheme === 'dark'
-              ? colors.white
-              : colors.black
-            : colors.grey400,
-        }}
-      />
+  const leftElement = useMemo(
+    () => (
+      <Text variant="textField" style={{ color: colors.grey400 }}>
+        {mask}
+      </Text>
+    ),
+    [mask],
+  );
 
+  const socialIconStyle = useMemo(
+    () => ({
+      width: 30,
+      height: 30,
+      tintColor: isNotFalsyString(localValue)
+        ? colorScheme === 'dark'
+          ? colors.white
+          : colors.black
+        : colors.grey400,
+    }),
+    [colorScheme, localValue],
+  );
+
+  return (
+    <View key={icon} style={styles.inputContainer}>
+      <SocialIcon icon={icon} style={socialIconStyle} />
       <Input
-        style={{ flex: 1, marginLeft: 5, marginRight: 5 }}
-        leftElement={
-          <Text variant="textField" style={{ color: colors.grey400 }}>
-            {mask}
-          </Text>
-        }
+        style={styles.input}
+        leftElement={leftElement}
         placeholder={placeholder}
         clearButtonMode="always"
         value={localValue}
@@ -379,6 +405,12 @@ const styles = StyleSheet.create({
     rowGap: 15,
     justifyContent: 'flex-start',
   },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 56,
+  },
+  input: { flex: 1, marginLeft: 5, marginRight: 5 },
 });
 
 const NO_POSITION_INDEX = 100;

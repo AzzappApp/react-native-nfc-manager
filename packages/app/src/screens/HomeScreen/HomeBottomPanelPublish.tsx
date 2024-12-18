@@ -35,7 +35,7 @@ const HomeBottomPanelPublish = ({ profile }: HomeBottomPanelPublishProps) => {
       {
         azzappA: <Text variant="azzapp">a</Text>,
       },
-    ) as string,
+    ) as unknown as string,
   );
   const router = useRouter();
 
@@ -107,7 +107,7 @@ const HomeBottomPanelPublish = ({ profile }: HomeBottomPanelPublishProps) => {
             {
               azzappA: <Text variant="azzapp">a</Text>,
             },
-          ) as string,
+          ) as unknown as string,
         });
       },
       onError: error => {

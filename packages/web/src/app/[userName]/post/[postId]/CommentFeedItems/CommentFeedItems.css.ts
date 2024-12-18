@@ -30,6 +30,7 @@ const item = style({
   borderBottomColor: vars.color.grey100,
   borderBottomWidth: '1px',
   borderBottomStyle: 'solid',
+  whiteSpace: 'pre-line',
   get selectors() {
     return {
       [`${feed} &:last-child`]: {

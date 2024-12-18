@@ -86,7 +86,8 @@ const FollowersScreenList = ({
   const removeFollower = useCallback(
     (removedFollowerId: string) => {
       const { profileInfos } = getAuthState();
-      if (!profileInfos) {
+      const webCardId = profileInfos?.webCardId;
+      if (!webCardId) {
         return;
       }
       if (profileHasEditorRight(profileInfos?.profileRole)) {
@@ -97,7 +98,7 @@ const FollowersScreenList = ({
 
           commit({
             variables: {
-              webCardId: profileInfos.webCardId,
+              webCardId,
               input: {
                 removedFollowerId,
               },

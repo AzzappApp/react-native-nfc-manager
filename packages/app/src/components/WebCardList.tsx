@@ -11,13 +11,12 @@ import SearchBar from '#ui/SearchBar';
 import Text from '#ui/Text';
 import CoverLinkRenderer from './CoverLink/CoverLinkRenderer';
 import Link from './Link';
-import type { ColorSchemeName } from '#helpers/createStyles';
 import type {
   WebCardList_webCard$data,
   WebCardList_webCard$key,
 } from '#relayArtifacts/WebCardList_webCard.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
-import type { StyleProp, ViewStyle } from 'react-native';
+import type { ColorSchemeName, StyleProp, ViewStyle } from 'react-native';
 
 const WebCardListItemMemoized = memo(function ProfileListItem({
   webCard,

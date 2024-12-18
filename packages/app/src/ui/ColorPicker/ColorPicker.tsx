@@ -1,10 +1,12 @@
-import { uniq } from 'lodash';
+import uniq from 'lodash/uniq';
 import { useCallback, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { useWindowDimensions } from 'react-native';
+import { useWindowDimensions, View, StyleSheet } from 'react-native';
 import { swapColor, type ColorPalette } from '@azzapp/shared/cardHelpers';
+import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
+import Header from '#ui/Header';
 import ColorChooser from './ColorChooser';
 import ColorList from './ColorsList';
 
@@ -182,97 +184,115 @@ const ColorPicker = ({
   const intl = useIntl();
 
   const { width: windowWidth } = useWindowDimensions();
+  const { bottom } = useScreenInsets();
 
   return (
     <BottomSheetModal
-      height={height}
       visible={visible}
-      avoidKeyboard
-      headerTitle={
-        state === 'colorChooser'
-          ? title
-          : state === 'editing'
-            ? intl.formatMessage({
-                defaultMessage: 'Edit Palette',
-                description: 'ColorPicker component button Edit Palette',
-              })
-            : intl.formatMessage({
-                defaultMessage: 'Add a color',
-                description: 'ColorPicker component title when adding a color',
-              })
+      enableContentPanningGesture={
+        state !== 'colorChooser' && state !== 'editing'
       }
-      headerLeftButton={
-        <Button
-          label={
-            state === 'colorChooser'
-              ? intl.formatMessage({
-                  defaultMessage: 'Edit',
-                  description: 'ColorPicker component Edit button label',
-                })
-              : intl.formatMessage({
-                  defaultMessage: 'Cancel',
-                  description: 'ColorPicker component Cancel button label',
-                })
-          }
-          onPress={
-            state === 'colorChooser'
-              ? onEdit
-              : state === 'colorEdition'
-                ? onCancelColorEdition
-                : onCancelEdit
-          }
-          variant="secondary"
-        />
-      }
-      headerRightButton={
-        <Button
-          label={
-            state === 'colorChooser'
-              ? intl.formatMessage({
-                  defaultMessage: 'Done',
-                  description: 'ColorPicker component Done button label',
-                })
-              : intl.formatMessage({
-                  defaultMessage: 'Done',
-                  description: 'ColorPicker component Done Color button label',
-                })
-          }
-          onPress={
-            state === 'colorChooser'
-              ? onValidateColor
-              : state === 'colorEdition'
-                ? onSaveEditedColor
-                : onSaveEditedColorList
-          }
-          variant="primary"
-        />
-      }
-      disableGestureInteraction={state !== 'colorChooser'}
-      showGestureIndicator={false}
-      onRequestClose={onClose}
-      contentContainerStyle={{ paddingBottom: 0 }}
+      onDismiss={onClose}
+      height={height ? height + bottom + 10 : undefined}
+      automaticBottomPadding={false}
+      showHandleIndicator={false}
+      dismissKeyboardOnOpening
     >
-      {state !== 'colorEdition' ? (
-        <ColorList
-          selectedColor={selectedColor}
-          colorList={colorList?.filter(c => !colorsToRemove.has(c)) ?? []}
-          onSelectColor={onColorChange}
-          editMode={state === 'editing'}
-          canEditPalette={canEditPalette}
-          colorPalette={colorPalette}
-          onRequestNewColor={onRequestNewColor}
-          onRemoveColor={onRemoveColor}
-          onEditColor={onEditPaletteColor}
-          width={windowWidth - 40}
+      <View style={styles.bottomContainerView}>
+        <Header
+          middleElement={
+            state === 'colorChooser'
+              ? title
+              : state === 'editing'
+                ? intl.formatMessage({
+                    defaultMessage: 'Edit Palette',
+                    description: 'ColorPicker component button Edit Palette',
+                  })
+                : intl.formatMessage({
+                    defaultMessage: 'Add a color',
+                    description:
+                      'ColorPicker component title when adding a color',
+                  })
+          }
+          leftElement={
+            <Button
+              label={
+                state === 'colorChooser'
+                  ? intl.formatMessage({
+                      defaultMessage: 'Edit',
+                      description: 'ColorPicker component Edit button label',
+                    })
+                  : intl.formatMessage({
+                      defaultMessage: 'Cancel',
+                      description: 'ColorPicker component Cancel button label',
+                    })
+              }
+              onPress={
+                state === 'colorChooser'
+                  ? onEdit
+                  : state === 'colorEdition'
+                    ? onCancelColorEdition
+                    : onCancelEdit
+              }
+              variant="secondary"
+            />
+          }
+          rightElement={
+            <Button
+              label={
+                state === 'colorChooser'
+                  ? intl.formatMessage({
+                      defaultMessage: 'Done',
+                      description: 'ColorPicker component Done button label',
+                    })
+                  : intl.formatMessage({
+                      defaultMessage: 'Done',
+                      description:
+                        'ColorPicker component Done Color button label',
+                    })
+              }
+              onPress={
+                state === 'colorChooser'
+                  ? onValidateColor
+                  : state === 'colorEdition'
+                    ? onSaveEditedColor
+                    : onSaveEditedColorList
+              }
+              variant="primary"
+            />
+          }
+          style={styles.bottomHeader}
         />
-      ) : (
-        <ColorChooser
-          value={selectedColorValue}
-          onColorChange={onColorChange}
-        />
-      )}
+        {state !== 'colorEdition' ? (
+          <ColorList
+            selectedColor={selectedColor}
+            colorList={colorList?.filter(c => !colorsToRemove.has(c)) ?? []}
+            onSelectColor={onColorChange}
+            editMode={state === 'editing'}
+            canEditPalette={canEditPalette}
+            colorPalette={colorPalette}
+            onRequestNewColor={onRequestNewColor}
+            onRemoveColor={onRemoveColor}
+            onEditColor={onEditPaletteColor}
+            width={windowWidth - 40}
+          />
+        ) : (
+          <ColorChooser
+            value={selectedColorValue}
+            onColorChange={onColorChange}
+          />
+        )}
+      </View>
     </BottomSheetModal>
   );
 };
 
 export default ColorPicker;
+
+const styles = StyleSheet.create({
+  bottomHeader: { marginBottom: 16, paddingLeft: 0, paddingRight: 0 },
+  bottomContainerView: {
+    paddingHorizontal: 14,
+    flex: 1,
+  },
+});

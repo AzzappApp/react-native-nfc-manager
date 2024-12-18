@@ -150,6 +150,7 @@ export const updateCardModules = async (
  * @param increment - The increment to apply to the position of the card modules
  */
 export const updateCardModulesPosition = async (
+  webCardId: string,
   ids: string[],
   increment: number,
 ) => {
@@ -158,7 +159,12 @@ export const updateCardModulesPosition = async (
     .set({
       position: sql`${CardModuleTable.position} + ${increment}`,
     })
-    .where(inArray(CardModuleTable.id, ids));
+    .where(
+      and(
+        eq(CardModuleTable.webCardId, webCardId),
+        inArray(CardModuleTable.id, ids),
+      ),
+    );
 };
 
 /**

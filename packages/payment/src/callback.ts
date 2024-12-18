@@ -172,6 +172,7 @@ export const rejectFirstPayment = async (
     const taxes = subscription.taxes;
 
     if (webCardId && subscription.subscriptionPlan && amount && taxes) {
+      const errorDate = new Date();
       await transaction(async () => {
         await createPayment({
           status: 'failed',
@@ -191,7 +192,8 @@ export const rejectFirstPayment = async (
 
         await updateSubscriptionByPaymentMeanId(paymentMeanId, {
           status: 'canceled',
-          canceledAt: new Date(),
+          canceledAt: errorDate,
+          endAt: errorDate,
           lastPaymentError: true,
         });
       });
@@ -207,6 +209,7 @@ export const acknowledgeRecurringPayment = async (
   subscriptionId: string,
   rebillManagerId: string,
   transactionId: string,
+  amount: number,
   paymentProviderResponse?: string,
 ) => {
   const subscription = await getSubscriptionById(subscriptionId);
@@ -219,10 +222,17 @@ export const acknowledgeRecurringPayment = async (
 
     if (payment.length === 0) {
       const webCardId = subscription.webCardId;
-      const amount = subscription.amount;
-      const taxes = subscription.taxes;
+      let paymentAmount = subscription.amount ?? 0;
+      let paymentTaxes = subscription.taxes ?? 0;
 
-      if (webCardId && subscription.subscriptionPlan && amount && taxes) {
+      if (paymentAmount + paymentTaxes !== amount) {
+        //specific case for the first payment on updated subscription
+        const tvaRate = Math.round((paymentTaxes / paymentAmount) * 100);
+        paymentTaxes = Math.round((amount * tvaRate) / 100);
+        paymentAmount = amount - paymentTaxes;
+      }
+
+      if (webCardId && subscription.subscriptionPlan) {
         const endAt = getNextPaymentDate(subscription.subscriptionPlan);
 
         const updates: Partial<UserSubscription> = {
@@ -235,8 +245,8 @@ export const acknowledgeRecurringPayment = async (
             status: 'paid',
             subscriptionId: subscription.id,
             webCardId,
-            amount,
-            taxes,
+            amount: paymentAmount,
+            taxes: paymentTaxes,
             paymentMeanId: subscription.paymentMeanId ?? '',
             transactionId,
             paymentProviderResponse,

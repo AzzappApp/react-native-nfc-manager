@@ -1,15 +1,12 @@
 import {
   BlendColor,
   Canvas,
-  ColorMatrix,
   Group,
   ImageSVG,
-  OpacityMatrix,
   Paint,
   Skia,
   fitbox,
   rect,
-  useSVG,
 } from '@shopify/react-native-skia';
 import { memo, useMemo } from 'react';
 import { Image, View } from 'react-native';
@@ -33,11 +30,11 @@ type ContactCardProps = {
   height: number;
   withRotationArrows?: boolean;
 };
+
 const ContactCard = ({
   profile: profileKey,
   height,
   style,
-  withRotationArrows = false,
 }: ContactCardProps) => {
   const { contactCard, contactCardQrCode, webCard } = useFragment(
     graphql`
@@ -66,12 +63,55 @@ const ContactCard = ({
     `,
     profileKey,
   );
+
+  return (
+    <ContactCardComponent
+      webCard={webCard}
+      height={height}
+      style={style}
+      contactCard={contactCard}
+      contactCardQrCode={contactCardQrCode}
+    />
+  );
+};
+
+type WebCard = {
+  readonly cardColors: {
+    readonly primary: string;
+  } | null;
+  readonly commonInformation: {
+    readonly company: string | null;
+  } | null;
+  readonly isMultiUser: boolean;
+  readonly userName: string;
+};
+
+type ContactCard = {
+  readonly company: string | null;
+  readonly firstName: string | null;
+  readonly lastName: string | null;
+  readonly title: string | null;
+};
+
+type ContactCardComponentProps = {
+  webCard?: WebCard | null;
+  height: number;
+  style?: StyleProp<ViewStyle>;
+  contactCard?: ContactCard | null;
+  contactCardQrCode?: string;
+};
+
+export const ContactCardComponent = ({
+  webCard,
+  height,
+  style,
+  contactCard,
+  contactCardQrCode,
+}: ContactCardComponentProps) => {
   const { userName, cardColors, commonInformation, isMultiUser } =
     webCard ?? {};
 
   const styles = useStyleSheet(stylesheet);
-  const rotateArrowLeft = useSVG(require('#assets/rotateArrowLeft.svg'));
-  const rotateArrowRight = useSVG(require('#assets/rotateArrowRight.svg'));
 
   const backgroundColor = cardColors?.primary ?? colors.black;
 
@@ -101,10 +141,9 @@ const ContactCard = ({
     layoutWidth.value = nativeEvent.layout.width - 40; // remove the margins
   };
 
-  const animatedFooterWidth = useAnimatedStyle(
-    () => ({ width: layoutWidth.value }),
-    [],
-  );
+  const animatedFooterWidth = useAnimatedStyle(() => ({
+    width: layoutWidth.value,
+  }));
 
   if (!contactCard || !webCard) {
     return null;
@@ -207,20 +246,7 @@ const ContactCard = ({
       </View>
       <View style={styles.qrCodeContainer}>
         {svg ? (
-          <Canvas style={styles.qrCodeCanvas}>
-            {withRotationArrows && (
-              <Group
-                layer={
-                  <Paint>
-                    <BlendColor color={readableColor} mode="srcATop" />
-                    <ColorMatrix matrix={OpacityMatrix(0.5)} />
-                  </Paint>
-                }
-              >
-                <ImageSVG x={90} y={3} svg={rotateArrowLeft} />
-                <ImageSVG x={7} y={95} svg={rotateArrowRight} />
-              </Group>
-            )}
+          <Canvas style={styles.qrCodeCanvas} opaque>
             <Group
               layer={
                 <Paint>

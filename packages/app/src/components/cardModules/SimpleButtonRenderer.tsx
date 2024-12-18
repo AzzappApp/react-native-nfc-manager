@@ -1,7 +1,6 @@
 import { parsePhoneNumber } from 'libphonenumber-js';
-import { useCallback } from 'react';
-import { Linking } from 'react-native';
-import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import { useCallback, useMemo } from 'react';
+import { Linking, Text, View } from 'react-native';
 import { graphql, readInlineData } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
@@ -19,7 +18,6 @@ import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { NullableFields } from '@azzapp/shared/objectHelpers';
 import type { CountryCode } from 'libphonenumber-js';
 import type { StyleProp, ViewProps, ViewStyle } from 'react-native';
-import type { SharedValue } from 'react-native-reanimated';
 
 /**
  * Render a SimpleButton module
@@ -55,22 +53,9 @@ const SimpleButtonRendererFragment = graphql`
 export const readSimpleButtonData = (module: SimpleButtonRenderer_module$key) =>
   readInlineData(SimpleButtonRendererFragment, module);
 
-type AnimatedProps =
-  | 'borderRadius'
-  | 'borderWidth'
-  | 'fontSize'
-  | 'height'
-  | 'marginBottom'
-  | 'marginTop'
-  | 'width';
-
 export type SimpleButtonRendererData = NullableFields<
   Omit<SimpleButtonRenderer_module$data, ' $fragmentType'>
 >;
-
-type SimpleButtonRendererAnimatedData = {
-  [K in AnimatedProps]: SharedValue<SimpleButtonRendererData[K]>;
-};
 
 export type SimpleButtonRendererProps = ViewProps & {
   /**
@@ -89,28 +74,15 @@ export type SimpleButtonRendererProps = ViewProps & {
    * Whether the button is disabled
    */
   disabled?: boolean;
-} & (
-    | {
-        /**
-         * The data for the SimpleButton module
-         */
-        data: Omit<SimpleButtonRendererData, AnimatedProps>;
-        /**
-         * The animated data for the SimpleButton module
-         */
-        animatedData: SimpleButtonRendererAnimatedData;
-      }
-    | {
-        /**
-         * The data for the SimpleButton module
-         */
-        data: SimpleButtonRendererData;
-        /**
-         * The animated data for the SimpleButton module
-         */
-        animatedData: null;
-      }
-  );
+  /**
+   * The cover background color
+   */
+  coverBackgroundColor?: string | null | undefined;
+  /**
+   * The data for the SimpleButton module
+   */
+  data: SimpleButtonRendererData;
+};
 
 /**
  *  implementation of the SimpleButton module
@@ -119,12 +91,12 @@ export type SimpleButtonRendererProps = ViewProps & {
  */
 export const SimpleButtonRenderer = ({
   data,
-  animatedData,
   colorPalette,
   cardStyle,
   style,
   contentStyle,
   disabled,
+  coverBackgroundColor,
   ...props
 }: SimpleButtonRendererProps) => {
   const {
@@ -137,7 +109,13 @@ export const SimpleButtonRenderer = ({
     borderColor,
     background,
     backgroundStyle,
-    ...rest
+    borderRadius,
+    borderWidth,
+    fontSize,
+    height,
+    marginBottom,
+    marginTop,
+    width,
   } = getModuleDataValues({
     data,
     cardStyle,
@@ -158,42 +136,20 @@ export const SimpleButtonRenderer = ({
     }
   }, [actionLink, actionType]);
 
-  const moduleContentStyle = useAnimatedStyle(() => {
-    if (animatedData === null) {
-      if ('height' in rest) {
-        return {
-          height: rest.height ?? SIMPLE_BUTTON_DEFAULT_VALUES.height,
-          width: rest.width ?? SIMPLE_BUTTON_DEFAULT_VALUES.width,
-          marginBottom:
-            rest.marginBottom ?? SIMPLE_BUTTON_DEFAULT_VALUES.marginBottom,
-          marginTop: rest.marginTop ?? SIMPLE_BUTTON_DEFAULT_VALUES.marginTop,
-          borderRadius: rest.borderRadius ?? 0,
-          borderWidth: rest.borderWidth ?? 0,
-        };
-      }
-      return {};
-    }
-
+  const moduleContentStyle = useMemo(() => {
     return {
-      height: animatedData.height.value ?? SIMPLE_BUTTON_DEFAULT_VALUES.height,
-      width: animatedData.width.value ?? SIMPLE_BUTTON_DEFAULT_VALUES.width,
-      marginBottom:
-        animatedData.marginBottom.value ??
-        SIMPLE_BUTTON_DEFAULT_VALUES.marginBottom,
-      marginTop:
-        animatedData.marginTop.value ?? SIMPLE_BUTTON_DEFAULT_VALUES.marginTop,
-      borderRadius: animatedData.borderRadius.value ?? 0,
-      borderWidth: animatedData.borderWidth.value ?? 0,
+      height: height ?? SIMPLE_BUTTON_DEFAULT_VALUES.height,
+      width: width ?? SIMPLE_BUTTON_DEFAULT_VALUES.width,
+      marginBottom: marginBottom ?? SIMPLE_BUTTON_DEFAULT_VALUES.marginBottom,
+      marginTop: marginTop ?? SIMPLE_BUTTON_DEFAULT_VALUES.marginTop,
+      borderRadius: borderRadius ?? 0,
+      borderWidth: borderWidth ?? 0,
     };
-  });
+  }, [height, width, marginBottom, marginTop, borderRadius, borderWidth]);
 
-  const textStyle = useAnimatedStyle(() => {
-    return animatedData === null
-      ? { fontSize: 'fontSize' in rest ? rest.fontSize : undefined }
-      : {
-          fontSize: animatedData.fontSize.value ?? undefined,
-        };
-  });
+  const textStyle = useMemo(() => {
+    return { fontSize, lineHeight: fontSize * 1.5 };
+  }, [fontSize]);
 
   return (
     <CardModuleBackground
@@ -213,20 +169,19 @@ export const SimpleButtonRenderer = ({
         disabled={disabled}
         disabledOpacity={1}
       >
-        <Animated.View
+        <View
           style={[
             {
               backgroundColor: swapColor(buttonColor, colorPalette),
               alignItems: 'center',
               justifyContent: 'center',
-
               borderColor: swapColor(borderColor, colorPalette),
               overflow: 'hidden',
             },
             moduleContentStyle,
           ]}
         >
-          <Animated.Text
+          <Text
             style={[
               {
                 fontFamily,
@@ -238,8 +193,8 @@ export const SimpleButtonRenderer = ({
             numberOfLines={1}
           >
             {buttonLabel}
-          </Animated.Text>
-        </Animated.View>
+          </Text>
+        </View>
       </PressableOpacity>
     </CardModuleBackground>
   );

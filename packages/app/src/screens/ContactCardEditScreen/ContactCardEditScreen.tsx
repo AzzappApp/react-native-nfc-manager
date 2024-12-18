@@ -40,6 +40,7 @@ const contactCardEditScreenQuery = graphql`
       ... on Profile @alias(as: "profile") {
         id
         webCard {
+          userName
           isMultiUser
           commonInformation {
             company
@@ -346,7 +347,7 @@ const ContactCardEditScreen = ({
             {
               azzappA: <Text variant="azzapp">a</Text>,
             },
-          ) as string,
+          ) as unknown as string,
         });
       },
     });
@@ -354,22 +355,17 @@ const ContactCardEditScreen = ({
 
   return (
     <Container style={styles.container}>
-      <SafeAreaView
-        style={{ flex: 1 }}
-        edges={{ bottom: 'off', top: 'additive' }}
-      >
+      <SafeAreaView style={{ flex: 1 }}>
         <Header
-          middleElement={
-            intl.formatMessage(
-              {
-                defaultMessage: 'Edit Contact Card{azzappA}',
-                description: 'Edit Contact Card Modal title',
-              },
-              {
-                azzappA: <Text variant="azzapp">a</Text>,
-              },
-            ) as string
-          }
+          middleElement={intl.formatMessage(
+            {
+              defaultMessage: 'Edit Contact Card{azzappA}',
+              description: 'Edit Contact Card Modal title',
+            },
+            {
+              azzappA: <Text variant="azzapp">a</Text>,
+            },
+          )}
           leftElement={
             <Button
               label={intl.formatMessage({

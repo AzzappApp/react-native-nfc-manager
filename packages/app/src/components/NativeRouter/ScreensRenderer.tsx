@@ -2,6 +2,7 @@ import EventEmitter from 'events';
 import memoize from 'lodash/memoize';
 import { useMemo, useEffect, useRef, useState, useCallback } from 'react';
 import {
+  Platform,
   StyleSheet,
   type NativeSyntheticEvent,
   type TargetedEvent,
@@ -100,6 +101,7 @@ export const ScreensRenderer = ({
                     : 'slide_from_bottom'
               }
               hideKeyboardOnSwipe
+              style={StyleSheet.absoluteFill}
             >
               <GestureHandlerRootView style={styles.flex}>
                 {children}
@@ -339,6 +341,7 @@ const ScreenRenderer = ({
   const Component: any = screens[route];
 
   const navigationEventEmitter = useRef(new EventEmitter()).current;
+  navigationEventEmitter.setMaxListeners(Infinity);
   const safeArea = useSafeAreaInsets();
 
   useEffect(
@@ -403,6 +406,24 @@ const ScreenRenderer = ({
       ) : null,
     [Component, id, hasFocus, currentRoute],
   );
+  const [delayedState, setDelayedState] = useState(activityState);
+
+  useEffect(() => {
+    if (Platform.OS === 'android') {
+      // workaround for android
+      // when we switch between 2 tabs, react native skia is unmounted too quickly
+      // due to new activityState. Adding a very small delay to make the new tab active
+      // allows to hide this issue
+      // The 2 tabs will be inactive at the same time
+      if (activityState === 0) {
+        setTimeout(() => {
+          setDelayedState(activityState);
+        }, 20);
+      } else {
+        setDelayedState(activityState);
+      }
+    }
+  }, [activityState]);
 
   if (!Component) {
     console.error(`Unknown component for route ${route}`);
@@ -413,7 +434,7 @@ const ScreenRenderer = ({
     <Screen
       {...options}
       key={id}
-      activityState={activityState}
+      activityState={Platform.OS === 'android' ? delayedState : activityState}
       isNativeStack={isNativeStack}
       onAppear={onAppear}
       onWillAppear={onWillAppear}
@@ -423,11 +444,9 @@ const ScreenRenderer = ({
       style={StyleSheet.absoluteFill}
       hideKeyboardOnSwipe
     >
-      <GestureHandlerRootView style={styles.flex}>
-        <ScreenRendererContext.Provider value={screenContextValue}>
-          {content}
-        </ScreenRendererContext.Provider>
-      </GestureHandlerRootView>
+      <ScreenRendererContext.Provider value={screenContextValue}>
+        {content}
+      </ScreenRendererContext.Provider>
     </Screen>
   );
 };

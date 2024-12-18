@@ -2,12 +2,10 @@ package com.azzapp.media
 
 import android.media.MediaMetadataRetriever
 import android.net.Uri
-import androidx.media3.common.util.UnstableApi
 import com.azzapp.MainApplication.Companion.getMainApplicationContext
 import com.facebook.react.bridge.*
 
 
-@UnstableApi
 class MediaHelpers(private val reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
   override fun getName() = "AZPMediaHelpers"

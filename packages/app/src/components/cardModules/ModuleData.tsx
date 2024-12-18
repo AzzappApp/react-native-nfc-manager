@@ -12,7 +12,7 @@ import {
   MODULE_KIND_SOCIAL_LINKS,
 } from '@azzapp/shared/cardModuleHelpers';
 import { readBlockTextData } from './BlockTextRenderer';
-import { readCarouselData } from './CarouselRenderer/CarouselRenderer';
+import { readCarouselData } from './CarouselRenderer';
 import { readHorizontalPhotoData } from './HorizontalPhotoRenderer';
 import { readLineDividerData } from './LineDividerRenderer';
 import { readPhotoWithTextAndTitleData } from './PhotoWithTextAndTitleRenderer';

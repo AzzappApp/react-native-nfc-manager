@@ -19,9 +19,10 @@ import type {
 
 type Props = {
   isPremium: boolean;
+  userName: string;
 };
 
-const AddContentBelowCoverTemplates = ({ isPremium }: Props) => {
+const AddContentBelowCoverTemplates = ({ isPremium, userName }: Props) => {
   const profileInfos = useProfileInfos();
   const intl = useIntl();
   const router = useRouter();
@@ -39,7 +40,8 @@ const AddContentBelowCoverTemplates = ({ isPremium }: Props) => {
     templates,
     onSelectSection,
     loadMore,
-  ] = useCardTemplates(profileInfos!.profileId);
+    // TODO handle the fact that profileInfos!.profileId can be null
+  ] = useCardTemplates(profileInfos!.profileId!);
 
   const selectedIndexRef = useRef(0);
 
@@ -94,12 +96,12 @@ const AddContentBelowCoverTemplates = ({ isPremium }: Props) => {
     router.replace({
       route: 'WEBCARD',
       params: {
-        webCardId: profileInfos!.webCardId,
-        userName: profileInfos!.userName,
+        webCardId: profileInfos!.webCardId!,
+        userName,
         editing: true,
       },
     });
-  }, [profileInfos, router]);
+  }, [profileInfos, userName, router]);
 
   const [commit, inFlight] = useLoadCardTemplateMutation();
 

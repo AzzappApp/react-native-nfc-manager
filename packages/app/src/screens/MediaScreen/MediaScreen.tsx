@@ -1,14 +1,27 @@
-import { Suspense, useEffect, useState } from 'react';
-import { FormattedMessage } from 'react-intl';
+import {
+  startTransition,
+  Suspense,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { graphql, usePreloadedQuery } from 'react-relay';
+import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
+import { colors } from '#theme';
 import Link from '#components/Link';
-import { useMainTabBarVisibilityController } from '#components/MainTabBar';
+import { setMainTabBarOpacity } from '#components/MainTabBar';
 import { useRouter } from '#components/NativeRouter';
 import ProfilePostsList from '#components/WebCardPostsList';
+import { logEvent } from '#helpers/analytics';
+import { getAuthState } from '#helpers/authStore';
 import relayScreen from '#helpers/relayScreen';
 import useScreenInsets from '#hooks/useScreenInsets';
+import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
+import FloatingButton from '#ui/FloatingButton';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import TabBarMenuItem from '#ui/TabBarMenuItem';
@@ -43,6 +56,7 @@ const mediaScreenQuery = graphql`
           ...PostList_author
           ...MediaFollowingsWebCards_webCard
           ...MediaFollowingsScreen_webCard
+          ...PostList_viewerWebCard
         }
       }
     }
@@ -55,18 +69,45 @@ const MediaScreen = ({
 }: RelayScreenProps<MediaRoute, MediaScreenQuery>) => {
   const { node } = usePreloadedQuery(mediaScreenQuery, preloadedQuery);
   const profile = node?.profile;
-  const { top } = useScreenInsets();
+  const { top, bottom } = useScreenInsets();
   const [tab, setTab] = useState<TAB>('SUGGESTIONS');
+  const onTabChange = useCallback((newTab: TAB) => {
+    startTransition(() => {
+      setTab(newTab);
+    });
+  }, []);
 
   const router = useRouter();
 
-  useMainTabBarVisibilityController(true);
+  useEffect(() => {
+    if (hasFocus) {
+      setMainTabBarOpacity(1);
+    }
+  }, [hasFocus]);
 
   useEffect(() => {
     if (profile?.invited || !profile?.webCard?.cardIsPublished) {
       router.backToTop();
     }
   }, [profile?.invited, profile?.webCard?.cardIsPublished, router]);
+
+  const intl = useIntl();
+
+  const onCreatePost = useCallback(() => {
+    const { profileInfos } = getAuthState();
+    if (profileHasEditorRight(profileInfos?.profileRole)) {
+      logEvent('create_post', { source: 'community' });
+      router.push({ route: 'NEW_POST' });
+    } else {
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage({
+          defaultMessage: 'Your role does not permit this action',
+          description: 'Error message when trying to create a post',
+        }),
+      });
+    }
+  }, [router, intl]);
 
   // viewer might be briefly null when the user logs out or by switching accounts
   if (!profile || !profile.webCard) {
@@ -77,13 +118,11 @@ const MediaScreen = ({
     {
       id: 'SUGGESTIONS',
       element: (
-        <Suspense fallback={<MediaSuggestionsScreenFallback />}>
-          <MediaSuggestionsScreen
-            profile={profile}
-            isCurrentTab={tab === 'SUGGESTIONS'}
-            canPlay={hasFocus && tab === 'SUGGESTIONS'}
-          />
-        </Suspense>
+        <MediaSuggestionsScreen
+          profile={profile}
+          isCurrentTab={tab === 'SUGGESTIONS'}
+          canPlay={hasFocus && tab === 'SUGGESTIONS'}
+        />
       ),
     },
     {
@@ -129,6 +168,7 @@ const MediaScreen = ({
           <Suspense>
             <ProfilePostsList
               webCard={profile.webCard}
+              viewerWebCard={profile.webCard}
               canPlay={hasFocus && tab === 'MY_POSTS'}
             />
           </Suspense>
@@ -138,9 +178,30 @@ const MediaScreen = ({
   ];
 
   return (
-    <Container style={{ flex: 1, marginTop: top }}>
-      <MediaScreenTabBar currentTab={tab} setTab={setTab} />
+    <Container style={{ flex: 1, paddingTop: top }}>
+      <MediaScreenTabBar currentTab={tab} setTab={onTabChange} />
       <TabView style={{ flex: 1 }} currentTab={tab} tabs={tabs} />
+      <View
+        style={{
+          position: 'absolute',
+          alignItems: 'center',
+          bottom: bottom + BOTTOM_MENU_HEIGHT + 10,
+          width: '100%',
+        }}
+      >
+        <FloatingButton
+          variant="grey"
+          style={styles.createPostButton}
+          onPress={onCreatePost}
+        >
+          <Text variant="button" style={styles.createPostButtonLabel}>
+            <FormattedMessage
+              defaultMessage="Create a new post"
+              description="Floating button label to create a post in the media screen"
+            />
+          </Text>
+        </FloatingButton>
+      </View>
     </Container>
   );
 };
@@ -211,14 +272,8 @@ const MediaScreenTabBar = ({
 
 const MediaScreenFallback = () => {
   const { top } = useScreenInsets();
-
   return (
-    <Container
-      style={{
-        flex: 1,
-        marginTop: top,
-      }}
-    >
+    <Container style={{ flex: 1, paddingTop: top }}>
       <MediaScreenTabBar disabled />
       <MediaSuggestionsScreenFallback />
     </Container>
@@ -241,6 +296,13 @@ const styles = StyleSheet.create({
   postsTitleStyle: {
     marginHorizontal: 10,
     marginBottom: 20,
+  },
+  createPostButton: {
+    width: 200,
+    height: 50,
+  },
+  createPostButtonLabel: {
+    color: colors.white,
   },
 });
 

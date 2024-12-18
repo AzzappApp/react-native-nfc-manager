@@ -1,4 +1,4 @@
-import { compileEffect } from '#helpers/mediaEditions/shaderUtils';
+import { compileEffect } from '#helpers/mediaEditions';
 import { createTransition } from './createTransition';
 
 const effect = compileEffect(`
@@ -24,6 +24,6 @@ const duration = 0.5;
 const size = 0.2;
 export default {
   id: 'wind' as const,
-  transition: createTransition(effect, duration, [size]),
+  transition: createTransition(effect, duration, { size }),
   duration,
 };

@@ -318,6 +318,5 @@ const stylesheet = createStyleSheet(() => ({
   },
   body: {
     flex: 1,
-    paddingTop: 10,
   },
 }));

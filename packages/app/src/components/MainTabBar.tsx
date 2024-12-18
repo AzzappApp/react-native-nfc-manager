@@ -1,74 +1,45 @@
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useState,
-} from 'react';
+import { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import {
+  useColorScheme,
   useWindowDimensions,
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
 import Animated, {
+  makeMutable,
   useAnimatedProps,
   useAnimatedStyle,
 } from 'react-native-reanimated';
-import Toast from 'react-native-toast-message';
-import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
-import { logEvent } from '#helpers/analytics';
-import { getAuthState } from '#helpers/authStore';
-import { createId } from '#helpers/idHelpers';
-import { useIsAuthenticated } from '#hooks/authStateHooks';
+import { colors } from '#theme';
 import useScreenInsets from '#hooks/useScreenInsets';
 import BottomMenu from '#ui/BottomMenu';
 import Text from '#ui/Text';
 import { HomeIcon } from './HomeIcon';
-import {
-  useNativeNavigationEvent,
-  useRouter,
-  useScreenHasFocus,
-} from './NativeRouter';
-import type { SharedValue } from 'react-native-reanimated';
+import { useRouter } from './NativeRouter';
+import { openShakeShare } from './ShakeShare';
 
-const mainTabBarVisibilityStates: Array<{
-  id: string;
-  state: SharedValue<number> | false | true;
-}> = [];
+const mainTabBarOpacity = makeMutable(1);
 
-const mainTabBarVisibleListeners = new Set<() => void>();
-export const useMainTabBarVisibilityController = (
-  visibilityState: SharedValue<number> | false | true,
-  active = true,
-) => {
-  const hasFocus = useScreenHasFocus();
-  const [controlVisibility, setControlVisibility] = useState(hasFocus);
+/**
+ * Set the opacity of the main tab bar.
+ * This will not trigger a re-render of the component.
+ *
+ * @param opacity The opacity to set.
+ */
+export const setMainTabBarOpacity = (opacity: number) => {
+  'worklet';
+  mainTabBarOpacity.value = opacity;
+};
 
-  const id = useMemo(() => createId(), []);
-
-  useNativeNavigationEvent('disappear', () => {
-    setControlVisibility(false);
-  });
-
-  useNativeNavigationEvent('willAppear', () => {
-    setControlVisibility(true);
-  });
-  useLayoutEffect(() => {
-    if (controlVisibility && active) {
-      mainTabBarVisibilityStates.push({ id, state: visibilityState });
-      mainTabBarVisibleListeners.forEach(listener => listener());
-    }
-    return () => {
-      const index = mainTabBarVisibilityStates.findIndex(
-        item => item.id === id,
-      );
-      if (index !== -1) {
-        mainTabBarVisibilityStates.splice(index, 1);
-        mainTabBarVisibleListeners.forEach(listener => listener());
-      }
-    };
-  }, [controlVisibility, id, visibilityState, active]);
+/**
+ * Retrieve the opacity of the main tab bar.
+ *
+ * @returns The opacity of the main tab bar.
+ */
+export const getMainTabBarOpacity = () => {
+  'worklet';
+  return mainTabBarOpacity.value;
 };
 
 /**
@@ -86,82 +57,42 @@ const MainTabBar = ({
   const insets = useScreenInsets();
   const { width } = useWindowDimensions();
 
-  const [, forceUpdate] = useState(0);
-
-  const authenticated = useIsAuthenticated();
-
-  const visibilityState =
-    mainTabBarVisibilityStates.at(-1)?.state ?? authenticated;
-
   const visibilityStyle = useAnimatedStyle(() => {
-    const visible =
-      visibilityState === true
-        ? 1
-        : visibilityState === false
-          ? 0
-          : visibilityState?.value;
     return {
-      opacity: visible,
+      opacity: mainTabBarOpacity.value,
     };
-  }, [visibilityState]);
+  }, []);
 
   const animatedProps = useAnimatedProps((): {
     pointerEvents: 'auto' | 'box-none' | 'box-only' | 'none' | undefined;
   } => {
-    const pointerEvents =
-      visibilityState === true
-        ? 'box-none'
-        : visibilityState === false
-          ? 'none'
-          : visibilityState?.value === 0
-            ? 'none'
-            : 'box-none';
+    const pointerEvents = mainTabBarOpacity?.value === 0 ? 'none' : 'box-none';
 
     return {
       pointerEvents,
     };
-  }, [visibilityState]);
+  }, []);
 
   const intl = useIntl();
 
   const onItemPress = useCallback(
     (key: string) => {
-      const hasFinishedTransition =
-        visibilityState === true ||
-        (visibilityState as SharedValue<number>).value > 0.99;
+      const hasFinishedTransition = mainTabBarOpacity.value > 0.99;
 
       if (!hasFinishedTransition) return;
 
-      const { profileInfos } = getAuthState();
-
-      if (
-        key !== 'NEW_POST' ||
-        profileHasEditorRight(profileInfos?.profileRole)
-      ) {
-        logEvent('create_post', { source: 'tab' });
-        router.push({ route: key as any });
+      if (key === 'SHARE') {
+        openShakeShare();
       } else {
-        Toast.show({
-          type: 'error',
-          text1: intl.formatMessage({
-            defaultMessage: 'Your role does not permit this action',
-            description: 'Error message when trying to create a post',
-          }),
-        });
+        router.push({ route: key as any });
       }
     },
-    [intl, router, visibilityState],
+    [router],
   );
 
-  useEffect(() => {
-    const listener = () => {
-      forceUpdate(v => v + 1);
-    };
-    mainTabBarVisibleListeners.add(listener);
-    return () => {
-      mainTabBarVisibleListeners.delete(listener);
-    };
-  }, []);
+  const appearance = useColorScheme() ?? 'light';
+
+  const currentRoute = ['HOME', 'MEDIA'][currentIndex];
 
   const tabs = useMemo(
     () =>
@@ -174,29 +105,53 @@ const MainTabBar = ({
               description: 'Main tab bar title for webcards',
             },
             {
-              azzappA: <Text variant="azzapp">a</Text>,
+              azzappA: (
+                <Text
+                  variant="azzapp"
+                  style={{
+                    color:
+                      currentRoute === 'HOME'
+                        ? appearance === 'light'
+                          ? colors.black
+                          : colors.white
+                        : appearance === 'light'
+                          ? colors.grey200
+                          : colors.grey400,
+                  }}
+                >
+                  a
+                </Text>
+              ),
             },
           ),
           IconComponent: <HomeIcon />,
         },
         {
-          key: 'NEW_POST',
+          key: 'SHARE',
           label: intl.formatMessage({
-            defaultMessage: 'New Post',
-            description: 'Main tab bar title for new post',
+            defaultMessage: 'Share',
+            description: 'Main tab bar title for share',
           }),
-          icon: 'add_filled',
+          icon: 'share_main',
+        },
+        {
+          key: 'CONTACTS',
+          label: intl.formatMessage({
+            defaultMessage: 'Contacts',
+            description: 'Main tab bar title for contacts',
+          }),
+          icon: 'contact',
         },
         {
           key: 'MEDIA',
           label: intl.formatMessage({
-            defaultMessage: 'Media',
-            description: 'Main tab bar title for media',
+            defaultMessage: 'Community',
+            description: 'Main tab bar title for community',
           }),
-          icon: 'media',
+          icon: 'community',
         },
       ] as const,
-    [intl],
+    [intl, currentRoute, appearance],
   );
 
   return (
@@ -217,8 +172,8 @@ const MainTabBar = ({
       animatedProps={animatedProps}
     >
       <BottomMenu
-        currentTab={['HOME', 'MEDIA'][currentIndex]}
-        iconSize={28}
+        currentTab={currentRoute}
+        iconSize={24}
         tabs={tabs}
         onItemPress={onItemPress}
         showLabel

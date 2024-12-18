@@ -7,7 +7,8 @@ import {
   updateCoverTemplateTag,
   createCoverTemplateTag,
 } from '@azzapp/data';
-import { DEFAULT_LOCALE, ENTITY_TARGET } from '@azzapp/i18n';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
+import { TEMPLATE_COVERTAG_DESCRIPTION_PREFIX } from '@azzapp/shared/translationsContants';
 import { ADMIN } from '#roles';
 import { currentUserHasRole } from '#helpers/roleHelpers';
 import { coverTemplateTagsSchema } from './coverTemplateTagsSchema';
@@ -16,6 +17,7 @@ export const saveCoverTemplateTag = async (data: {
   id?: string;
   order: number;
   label: string;
+  description?: string;
   enabled: boolean;
 }): Promise<{
   success: boolean;
@@ -37,7 +39,7 @@ export const saveCoverTemplateTag = async (data: {
 
   try {
     coverTemplateTagId = await transaction(async () => {
-      const { id, label, ...coverTemplateTagData } = data;
+      const { id, label, description, ...coverTemplateTagData } = data;
 
       let coverTemplateTagId: string;
       if (id) {
@@ -56,9 +58,13 @@ export const saveCoverTemplateTag = async (data: {
         key: coverTemplateTagId,
         value: label,
         locale: DEFAULT_LOCALE,
-        target: ENTITY_TARGET,
       });
 
+      await saveLocalizationMessage({
+        key: TEMPLATE_COVERTAG_DESCRIPTION_PREFIX + coverTemplateTagId,
+        value: description || '',
+        locale: DEFAULT_LOCALE,
+      });
       return coverTemplateTagId;
     });
     revalidatePath(`/coverTemplateFilters/[id]`, 'layout');

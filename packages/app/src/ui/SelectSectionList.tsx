@@ -184,7 +184,7 @@ function SelectSectionListItem<ItemT>({
       {renderItem?.({ item, isSelected, index }) ?? (
         <Text
           variant={isSelected ? 'button' : 'medium'}
-          style={[styles.defaultItemRenderer]}
+          style={styles.defaultItemRenderer}
         >
           {(item as any)?.[labelField]}
         </Text>

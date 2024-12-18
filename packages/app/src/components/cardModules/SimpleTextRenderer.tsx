@@ -1,8 +1,5 @@
+import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
-import Animated, {
-  useAnimatedStyle,
-  type SharedValue,
-} from 'react-native-reanimated';
 import { graphql, readInlineData } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
@@ -81,20 +78,10 @@ export const readSimpleTitleData = (
   module: SimpleTextRenderer_simpleTitleModule$key,
 ) => readInlineData(SimpleTitleRendererFragment, module);
 
-type AnimatedProps =
-  | 'fontSize'
-  | 'marginHorizontal'
-  | 'marginVertical'
-  | 'verticalSpacing';
-
 export type SimpleTextRendererData = NullableFields<
   | Omit<SimpleTextRenderer_simpleTextModule$data, ' $fragmentType'>
   | Omit<SimpleTextRenderer_simpleTitleModule$data, ' $fragmentType'>
 >;
-
-type SimpleButtonRendererAnimatedData = {
-  [K in AnimatedProps]: SharedValue<SimpleTextRendererData[K]>;
-};
 
 export type SimpleTextRendererProps = ViewProps & {
   /**
@@ -109,28 +96,12 @@ export type SimpleTextRendererProps = ViewProps & {
    * The wrapped content style
    */
   contentStyle?: StyleProp<TextStyle>;
-} & (
-    | {
-        /**
-         * The data for the simple text module
-         */
-        data: Omit<SimpleTextRendererData, AnimatedProps>;
-        /**
-         * The animated data for the SimpleButton module
-         */
-        animatedData: SimpleButtonRendererAnimatedData;
-      }
-    | {
-        /**
-         * The data for the simple text module
-         */
-        data: SimpleTextRendererData;
-        /**
-         * The animated data for the SimpleButton module
-         */
-        animatedData: null;
-      }
-  );
+  /**
+   * The cover background color
+   */
+  coverBackgroundColor?: string | null | undefined;
+  data: SimpleTextRendererData;
+};
 
 /**
  *  implementation of the simple text module
@@ -142,20 +113,23 @@ const SimpleTextRenderer = ({
   colorPalette,
   cardStyle,
   style,
-  animatedData,
   contentStyle,
+  coverBackgroundColor,
   ...props
 }: SimpleTextRendererProps) => {
   // the getModuleDataValues typings does not match the data type
   // because of the 2 different types of modules
   const {
     text,
-    fontFamily,
     textAlign,
+    fontFamily,
     fontColor,
     background,
     backgroundStyle,
-    ...rest
+    fontSize,
+    verticalSpacing,
+    marginHorizontal,
+    marginVertical,
   } = getModuleDataValues({
     data,
     styleValuesMap:
@@ -169,58 +143,60 @@ const SimpleTextRenderer = ({
         : SIMPLE_TEXT_DEFAULT_VALUES,
   });
 
-  const cardModuleBackgroundStyle = useAnimatedStyle(() => {
-    if (animatedData === null) {
-      if ('marginVertical' in rest) {
-        return {
-          paddingVertical:
-            rest.marginVertical ?? SIMPLE_TEXT_DEFAULT_VALUES.marginVertical,
-          paddingHorizontal:
-            rest.marginHorizontal ??
-            SIMPLE_TEXT_DEFAULT_VALUES.marginHorizontal,
-        };
-      }
-      return {};
-    }
-
+  const cardModuleBackgroundStyle = useMemo(() => {
     return {
-      paddingVertical:
-        animatedData.marginVertical?.value ??
-        SIMPLE_TEXT_DEFAULT_VALUES.marginVertical,
-      paddingHorizontal:
-        animatedData.marginHorizontal?.value ??
-        SIMPLE_TEXT_DEFAULT_VALUES.marginHorizontal,
+      paddingVertical: marginVertical,
+      paddingHorizontal: marginHorizontal,
     };
-  });
+  }, [marginHorizontal, marginVertical]);
 
-  const textStyle = useAnimatedStyle(() => {
-    if (animatedData === null) {
-      if ('fontSize' in rest) {
-        return {
-          lineHeight:
-            rest.fontSize && rest.verticalSpacing != null
-              ? rest.fontSize * 1.2 + rest.verticalSpacing
-              : undefined,
-          fontSize: rest.fontSize ?? undefined,
-        };
-      }
-      return {};
-    }
-
+  const textStyle = useMemo(() => {
     return {
       lineHeight:
-        animatedData.fontSize.value &&
-        animatedData.verticalSpacing.value != null
-          ? animatedData.fontSize.value * 1.2 +
-            animatedData.verticalSpacing.value
+        fontSize && verticalSpacing
+          ? fontSize * 1.2 + verticalSpacing
           : undefined,
-      fontSize: animatedData.fontSize.value ?? undefined,
+      fontSize,
     };
-  });
+  }, [fontSize, verticalSpacing]);
 
   const intl = useIntl();
 
   const textColor = swapColor(fontColor, colorPalette);
+
+  const defaultText = useMemo(() => {
+    if (data.kind === 'simpleTitle') {
+      return intl.formatMessage(
+        {
+          defaultMessage:
+            'Add section contents here. To edit the text, simply open the editor and start typing. You can also change the font style, size, color, and alignment using the editing tools provided. Adjust the margins and the background for this section to match the design and branding of your WebCard{azzappA}.',
+          description: 'Default text for the simple title module',
+        },
+        {
+          azzappA: (
+            <Text variant="azzapp" style={{ color: textColor }}>
+              a
+            </Text>
+          ),
+        },
+      );
+    } else {
+      return intl.formatMessage(
+        {
+          defaultMessage:
+            'Add section contents here. To edit the text, simply open the editor and start typing. You can also change the font style, size, color, and alignment using the editing tools provided. Adjust the margins and the background for this section to match the design and branding of your WebCard{azzappA}.',
+          description: 'Default text for the simple text module',
+        },
+        {
+          azzappA: (
+            <Text variant="azzapp" style={{ color: textColor }}>
+              a
+            </Text>
+          ),
+        },
+      );
+    }
+  }, [data.kind, intl, textColor]);
 
   return (
     <CardModuleBackground
@@ -235,48 +211,36 @@ const SimpleTextRenderer = ({
       resizeMode={background?.resizeMode}
       style={[style, cardModuleBackgroundStyle, { flexShrink: 0 }]}
     >
-      <Animated.Text
-        style={[
-          {
-            textAlign: textAlignmentOrDefault(textAlign),
-            color: textColor,
-            fontFamily,
-          },
-          textStyle,
-          contentStyle,
-        ]}
-      >
-        {text ||
-          (data.kind === 'simpleTitle'
-            ? intl.formatMessage(
-                {
-                  defaultMessage:
-                    'Add section contents here. To edit the text, simply open the editor and start typing. You can also change the font style, size, color, and alignment using the editing tools provided. Adjust the margins and the background for this section to match the design and branding of your WebCard{azzappA}.',
-                  description: 'Default text for the simple title module',
-                },
-                {
-                  azzappA: (
-                    <Text variant="azzapp" style={{ color: textColor }}>
-                      a
-                    </Text>
-                  ),
-                },
-              )
-            : intl.formatMessage(
-                {
-                  defaultMessage:
-                    'Add section contents here. To edit the text, simply open the editor and start typing. You can also change the font style, size, color, and alignment using the editing tools provided. Adjust the margins and the background for this section to match the design and branding of your WebCard{azzappA}.',
-                  description: 'Default text for the simple text module',
-                },
-                {
-                  azzappA: (
-                    <Text variant="azzapp" style={{ color: textColor }}>
-                      a
-                    </Text>
-                  ),
-                },
-              ))}
-      </Animated.Text>
+      {text && (
+        <Text
+          style={[
+            {
+              textAlign: textAlignmentOrDefault(textAlign),
+              color: textColor,
+              fontFamily,
+            },
+            textStyle,
+            contentStyle,
+          ]}
+        >
+          {text}
+        </Text>
+      )}
+      {!text && (
+        <Text
+          style={[
+            {
+              textAlign: textAlignmentOrDefault(textAlign),
+              color: textColor,
+              fontFamily,
+            },
+            textStyle,
+            contentStyle,
+          ]}
+        >
+          {defaultText}
+        </Text>
+      )}
     </CardModuleBackground>
   );
 };

@@ -12,7 +12,10 @@ import {
   CancelHeaderButton,
   DoneHeaderButton,
 } from '#components/commonsButtons';
-import { useCoverEditorContext } from '#components/CoverEditor/CoverEditorContext';
+import {
+  useCoverEditorContext,
+  useCoverEditorEditContext,
+} from '#components/CoverEditor/CoverEditorContext';
 import { ScreenModal } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -39,7 +42,8 @@ const CoverEditorLinksModal = ({
   visible,
   onClose,
 }: CoverEditorLinksModalProps) => {
-  const { coverEditorState: cover, dispatch } = useCoverEditorContext();
+  const cover = useCoverEditorContext();
+  const dispatch = useCoverEditorEditContext();
   const [links, setLinks] = useState<Array<SocialLink | null>>(
     cover.linksLayer.links,
   );
@@ -108,6 +112,7 @@ const CoverEditorLinksModal = ({
             )}
           </View>
           <SocialLinksLinksEditionPanel
+            ignoreKeyboard
             links={links}
             onLinksChange={setLinks}
             style={styles.linksEditor}

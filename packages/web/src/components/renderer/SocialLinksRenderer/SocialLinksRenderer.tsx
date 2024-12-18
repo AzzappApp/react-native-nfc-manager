@@ -2,8 +2,8 @@
 import cn from 'classnames';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
-  SOCIAL_LINKS_DEFAULT_VALUES,
   getModuleDataValues,
+  SOCIAL_LINKS_DEFAULT_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
 import CardModuleBackground from '../../CardModuleBackground';
 import SocialLink from './SocialLink';
@@ -23,6 +23,7 @@ const SocialLinksRenderer = ({
   module,
   colorPalette,
   cardStyle,
+  coverBackgroundColor,
   ...props
 }: SocialLinksRendererProps) => {
   const {

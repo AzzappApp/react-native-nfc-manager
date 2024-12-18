@@ -12,10 +12,11 @@ import Animated, {
 import { formatDuration } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { NativeBufferLoader } from '#helpers/mediaEditions';
-import BufferImage from '#ui/BufferImage';
+import { NativeTextureLoader } from '#helpers/mediaEditions';
 import Icon from '#ui/Icon';
 import Text from '#ui/Text';
+import TextureImage from '#ui/TextureImage';
+import type { TextureInfo } from '#helpers/mediaEditions/NativeTextureLoader';
 import type { ViewProps } from 'react-native';
 import type { PanGestureHandlerGestureEvent } from 'react-native-gesture-handler';
 
@@ -110,12 +111,15 @@ const VideoTimelineEditor = ({
       secondPixel,
   );
 
-  const dispatchChange = useCallback(() => {
-    onChange({
-      startTime: leftPosition.value / secondPixel,
-      duration: (rightPosition.value - leftPosition.value) / secondPixel,
-    });
-  }, [leftPosition.value, onChange, rightPosition.value, secondPixel]);
+  const dispatchChange = useCallback(
+    (left: number, right: number) => {
+      onChange({
+        startTime: left / secondPixel,
+        duration: (right - left) / secondPixel,
+      });
+    },
+    [onChange, secondPixel],
+  );
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -124,7 +128,7 @@ const VideoTimelineEditor = ({
       right: sliderWidth - rightPosition.value,
       height: imagesHeight + 4,
     };
-  }, [leftPosition.value, rightPosition.value]);
+  });
 
   const eventHandler = useAnimatedGestureHandler<
     PanGestureHandlerGestureEvent,
@@ -188,32 +192,32 @@ const VideoTimelineEditor = ({
         ctx.right = false;
       },
       onFinish: () => {
-        runOnJS(dispatchChange)();
+        runOnJS(dispatchChange)(leftPosition.value, rightPosition.value);
       },
     },
-    [leftPosition.value, rightPosition.value],
+    [leftPosition, rightPosition],
   );
 
-  const [buffers, setBuffers] = useState<bigint[]>([]);
+  const [texturesInfos, setTexturesInfos] = useState<TextureInfo[]>([]);
   useEffect(() => {
     let canceled = false;
     let keys: string[] = [];
     const thumbnails = range(0, video.duration, video.duration / nbImage).map(
       second =>
-        NativeBufferLoader.loadVideoThumbnail(video.uri, second, {
+        NativeTextureLoader.loadVideoThumbnail(video.uri, second, {
           width: 256,
           height: 256,
         }),
     );
     Promise.all(thumbnails.map(video => video.promise))
-      .then(setBuffers)
+      .then(setTexturesInfos)
       .then(
         () => {
           if (canceled) {
             return;
           }
           keys = thumbnails.map(video => video.key);
-          keys.forEach(NativeBufferLoader.ref);
+          keys.forEach(NativeTextureLoader.ref);
         },
         () => {
           console.warn('error loading images');
@@ -221,7 +225,7 @@ const VideoTimelineEditor = ({
       );
     return () => {
       canceled = true;
-      keys.forEach(NativeBufferLoader.unref);
+      keys.forEach(NativeTextureLoader.unref);
     };
   }, [video.uri, video.duration, nbImage]);
 
@@ -237,12 +241,12 @@ const VideoTimelineEditor = ({
   return (
     <View {...props}>
       <View style={styles.root}>
-        <Canvas style={{ height: imagesHeight, width: sliderWidth }}>
-          {buffers.map((buffer, index) => (
-            <BufferImage
+        <Canvas style={{ height: imagesHeight, width: sliderWidth }} opaque>
+          {texturesInfos.map((textureInfo, index) => (
+            <TextureImage
               fit={'cover'}
               key={index}
-              buffer={buffer}
+              textureInfo={textureInfo}
               y={0}
               x={index * itemWidth}
               width={itemWidth}
@@ -271,11 +275,11 @@ const VideoTimelineEditor = ({
             return (
               <View key={`timeraouge_${index}`} style={{ height: 25 }}>
                 <View
-                  style={[
+                  style={
                     index % (NUMBER_INTERCALAR_TICK + 1) === 0
                       ? styles.stepmarker
-                      : styles.smallMarker,
-                  ]}
+                      : styles.smallMarker
+                  }
                 />
                 {(index % (NUMBER_INTERCALAR_TICK + 1) === 0 ||
                   index === NUMBER_INTERCALAR_TICK * NUMBER_MAX_TICK - 1) && (

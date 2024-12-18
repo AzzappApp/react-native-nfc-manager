@@ -118,6 +118,8 @@ const ERRORS = {
    * The subscription is required.
    */
   SUBSCRIPTION_REQUIRED: 'SUBSCRIPTION_REQUIRED',
+
+  SUBSCRIPTION_INSUFFICIENT_SEATS: 'SUBSCRIPTION_INSUFFICIENT_SEATS',
   /**
    * The subscription is active.
    */

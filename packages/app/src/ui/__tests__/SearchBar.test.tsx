@@ -19,58 +19,6 @@ describe('SearchBar component', () => {
     onFocus.mockReset();
   });
 
-  test('should render on layout and resize/show cancel button when touching the input', () => {
-    render(<SearchBar placeholder={placeholder} onChangeText={onChangeText} />);
-
-    fireEvent(
-      screen.getByTestId('azzapp__SearchBar__container-view'),
-      'layout',
-      {
-        nativeEvent: { layout: { width: 450, height: 100 } },
-      },
-    );
-
-    jest.advanceTimersByTime(1000);
-
-    expect(
-      screen.getByTestId('azzapp__SearchBar__view-inputcontainer'),
-    ).toHaveAnimatedStyle({ width: 450 });
-
-    fireEvent(screen.getByTestId('azzapp__searchbar__textInput'), 'focus');
-    jest.advanceTimersByTime(1000);
-
-    expect(
-      screen.getByTestId('azzapp__SearchBar__view-inputcontainer'),
-    ).toHaveAnimatedStyle({ width: 440 });
-  });
-
-  test('should call the `onChangeText` callback when writting text', () => {
-    render(<SearchBar placeholder={placeholder} onChangeText={onChangeText} />);
-
-    act(() => {
-      fireEvent(
-        screen.getByTestId('azzapp__SearchBar__container-view'),
-        'layout',
-        {
-          nativeEvent: { layout: { width: 450, height: 100 } },
-        },
-      );
-    });
-    act(() => {
-      fireEvent(
-        screen.getByTestId('azzapp__searchbar__textInput'),
-        'onChangeText',
-        searchText,
-      );
-    });
-    expect(screen.queryByTestId('azzapp__searchbar__textInput')).toHaveProp(
-      'value',
-      searchText,
-    );
-
-    expect(onChangeText).toHaveBeenCalledWith(searchText);
-  });
-
   test('should call `onFocus` when touching the input', () => {
     render(
       <SearchBar
@@ -99,6 +47,7 @@ describe('SearchBar component', () => {
       <SearchBar
         placeholder={placeholder}
         onChangeText={onChangeText}
+        value={'searchText'}
         onCancel={onCancel}
       />,
     );

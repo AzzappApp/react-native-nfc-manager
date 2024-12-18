@@ -47,14 +47,11 @@ find_library(
 # Link
 target_link_libraries(
         ${PACKAGE_NAME}
-        ${LOG_LIB}                          # <-- Logcat logger
-        android                             # <-- Android JNI core
-        fbjni::fbjni                        # <-- fbjni
-        ReactAndroid::react_nativemodule_core # <-- RN: Native module core
-        ReactAndroid::jsi                   # <-- RN: JSI
-        ReactAndroid::reactnativejni        # <-- RN: React Native JNI bindings
-        ReactAndroid::runtimeexecutor       # <-- RN: Runtime executor
-        ReactAndroid::turbomodulejsijni     # <-- RN: TurboModule JSI JNI bindings
+        ${LOG_LIB}
+        android
+        fbjni::fbjni        
+        ReactAndroid::reactnative
+        ReactAndroid::jsi 
         -ljnigraphics
         -lGLESv2
         -lEGL

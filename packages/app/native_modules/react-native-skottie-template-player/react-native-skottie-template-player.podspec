@@ -24,7 +24,9 @@ Pod::Spec.new do |s|
   s.authors      = package["author"]
 
   s.platforms    = { :ios => "12.4" }
-  s.source       = { :git => "https://github.com/AzzappApp/react-native-skottie-template-player.git", :tag => "#{s.version}" }
+  s.source       = { :git => "https://github.com/AzzappApp/azzapp.git", :tag => "v#{s.version}" }
+  s.source_files = "packages/app/native_modules/react-native-skottie-template-player/ios/**/*.{h,m,mm}", "packages/app/native_modules/react-native-skottie-template-player/cpp/**/*.{hpp,cpp,c,h}"
+
 
   s.pod_target_xcconfig = {
     "GCC_PREPROCESSOR_DEFINITIONS" => "$(inherited) SK_METAL=1 SK_GANESH=1", # TODO: do i need this?

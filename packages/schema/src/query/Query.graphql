@@ -43,7 +43,19 @@ type Query {
     The user name of the profile
     """
     userName: String!
-  ): Boolean!
+  ): Boolean! @deprecated(reason: "Use isUserNameAvailable instead")
+
+  """
+  Fetches a profile given its user name
+  This enhanced version also provide the userName request in result
+  """
+  isUserNameAvailable(
+    """
+    The user name of the profile
+    """
+    userName: String!
+  ): isUserNameAvailableResult!
+
   """
   Return a list of profile categories
   """
@@ -58,6 +70,18 @@ type Query {
   colorPalettes(first: Int @max(value: 100), after: String): ColorPaletteConnection!
 }
 
+type isUserNameAvailableResult {
+  """
+  The user name of the profile
+  """
+  userName: String!
+  """
+  true is userName is available
+  """
+  available: Boolean!
+}
+
 type WebCardParameters {
   userNameChangeFrequencyDay: Int!
 }
+

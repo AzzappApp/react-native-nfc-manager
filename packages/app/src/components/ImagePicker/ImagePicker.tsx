@@ -11,12 +11,16 @@ import { ImagePickerContextProvider } from './ImagePickerContext';
 import { ImagePickerWizardContainer } from './ImagePickerWizardContainer';
 import SelectImageStep from './SelectImageStep';
 import type { EditionParameters } from '#helpers/mediaEditions';
-import type { Media, TimeRange } from '#helpers/mediaHelpers';
+import type { SourceMedia, TimeRange } from '#helpers/mediaHelpers';
 import type { ImagePickerState } from './ImagePickerContext';
 import type { Filter } from '@azzapp/shared/filtersHelper';
 import type { ComponentType } from 'react';
 
 export type ImagePickerResult = {
+  /**
+   * The id of the selected media
+   */
+  id: string;
   /**
    * The kind of media selected
    */
@@ -58,10 +62,6 @@ export type ImagePickerResult = {
    * The duration of the video selected
    */
   duration: number | null;
-  /**
-   * The gallery uri of the media selected
-   */
-  galleryUri?: string;
 };
 
 export type ImagePickerProps = {
@@ -131,7 +131,7 @@ export type ImagePickerProps = {
    * the initial data of the media to edit
    */
   initialData?: {
-    media: Media;
+    media: SourceMedia;
     editionParameters: EditionParameters | null;
     filter: Filter | null;
     timeRange?: TimeRange | null;
@@ -166,7 +166,7 @@ const ImagePicker = ({
   additionalData,
 }: ImagePickerProps) => {
   const [stepIndex, setStepIndex] = useState(0);
-  const [media, setMedia] = useState<Media | null>(null);
+  const [media, setMedia] = useState<SourceMedia | null>(null);
   const pickerStateRef = useRef<ImagePickerState | null>(null);
 
   const steps = useMemo(
@@ -205,7 +205,6 @@ const ImagePicker = ({
         filter: mediaFilter,
         timeRange,
         duration: media.kind === 'video' ? media.duration : null,
-        galleryUri: media.galleryUri,
       });
     } else {
       setStepIndex(stepIndex => stepIndex + 1);
@@ -258,7 +257,7 @@ export default ImagePicker;
 
 const filterSteps = (
   steps: Array<ComponentType<any> & { mediaKind?: 'image' | 'video' | null }>,
-  media: Media | null | undefined,
+  media: SourceMedia | null | undefined,
 ) =>
   steps.filter(
     step => !media || step.mediaKind == null || step.mediaKind === media.kind,

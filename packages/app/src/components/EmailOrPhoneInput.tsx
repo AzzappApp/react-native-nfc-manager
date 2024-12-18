@@ -1,3 +1,4 @@
+import { parsePhoneNumber, type CountryCode } from 'libphonenumber-js';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
@@ -8,7 +9,6 @@ import CountryCodeListWithOptions from '#ui/CountryCodeListWithOptions';
 import TextInput from '#ui/TextInput';
 import PhoneInput from './PhoneInput';
 import type { CountryCodeListOption } from '#ui/CountryCodeListWithOptions';
-import type { CountryCode } from 'libphonenumber-js';
 import type { Ref } from 'react';
 import type {
   TextInput as NativeTextInput,
@@ -49,10 +49,29 @@ const EmailOrPhoneInput = ({
 
     if (!isNotFalsyString(input.countryCodeOrEmail) && locales.length > 0) {
       const localCountryCode = locales[0].countryCode;
-      onChange({
-        countryCodeOrEmail: localCountryCode as CountryCode,
-        value: input.value,
-      });
+
+      try {
+        const { country } = parsePhoneNumber(input.value);
+
+        if (country) {
+          onChange({
+            countryCodeOrEmail: country,
+            value: input.value,
+          });
+        } else {
+          onChange({
+            countryCodeOrEmail: localCountryCode as CountryCode,
+            value: input.value,
+          });
+        }
+
+        return;
+      } catch {
+        onChange({
+          countryCodeOrEmail: localCountryCode as CountryCode,
+          value: input.value,
+        });
+      }
     }
   }, [input.countryCodeOrEmail, input.value, onChange]);
 

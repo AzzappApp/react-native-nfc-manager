@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/react-native';
 import { GraphQLError } from 'graphql';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import React, { Suspense, useCallback, useEffect, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import { Alert, Appearance } from 'react-native';
@@ -18,8 +18,8 @@ import {
   useScreenHasFocus,
   type ScreenOptions,
 } from '#components/NativeRouter';
-import ActivityIndicator from '#ui/ActivityIndicator';
-import Container from '#ui/Container';
+import { useAppState } from '#hooks/useAppState';
+import LoadingView from '#ui/LoadingView';
 import {
   addAuthStateListener,
   getAuthState,
@@ -116,7 +116,7 @@ export const isRelayScreen = (
 function relayScreen<TRoute extends Route>(
   Component: ComponentType<RelayScreenProps<TRoute, any>>,
   {
-    fallback: Fallback = RelayScreenFallback,
+    fallback: Fallback = LoadingView,
     errorFallback: ErrorFallback,
     canGoBack = true,
     profileBound = true,
@@ -188,6 +188,14 @@ function relayScreen<TRoute extends Route>(
         },
       });
     }, [environment, params]);
+
+    // refresh the query when the screen gains focus (going from background to foreground)
+    const appState = useAppState();
+    useEffect(() => {
+      if (appState === 'active' && refreshOnFocus) {
+        refreshQuery();
+      }
+    }, [appState, refreshQuery]);
 
     useEffect(() => {
       let currentTimeout: any;
@@ -398,13 +406,3 @@ export class RelayScreenErrorBoundary extends React.Component<
     return children;
   }
 }
-
-export const RelayScreenFallback = () => {
-  return (
-    <Container
-      style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
-    >
-      <ActivityIndicator />
-    </Container>
-  );
-};

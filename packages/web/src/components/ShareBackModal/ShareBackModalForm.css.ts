@@ -96,6 +96,7 @@ const formInput = style({
   '::placeholder': {
     color: vars.color.grey200,
   },
+  textOverflow: 'ellipsis',
 });
 
 const formButtonSuccess = style({});
@@ -116,6 +117,7 @@ const formButton = style({
       margin: '25px auto 0',
       backgroundColor: vars.color.green,
       border: `2px solid ${vars.color.green}`,
+      marginBottom: 20,
     },
   },
 });

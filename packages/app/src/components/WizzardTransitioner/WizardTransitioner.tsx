@@ -1,9 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import {
-  unstable_batchedUpdates,
-  type StyleProp,
-  type ViewStyle,
-} from 'react-native';
+import { type StyleProp, type ViewStyle } from 'react-native';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import Animated, {
   Easing,
@@ -67,16 +63,14 @@ const WizardTransitioner = ({
     }
     const transitionKind =
       currentStepIndex > previousStepIndex.current ? 'forward' : 'back';
-    unstable_batchedUpdates(() => {
-      setNextStepIndex(currentStepIndex);
-      setTransitionInformation({
-        transitionKind,
-        transitioningPage:
-          transitionKind === 'forward'
-            ? currentStepIndex
-            : previousStepIndex.current,
-        disappearingPage: previousStepIndex.current,
-      });
+    setNextStepIndex(currentStepIndex);
+    setTransitionInformation({
+      transitionKind,
+      transitioningPage:
+        transitionKind === 'forward'
+          ? currentStepIndex
+          : previousStepIndex.current,
+      disappearingPage: previousStepIndex.current,
     });
     previousStepIndex.current = currentStepIndex;
     let transitionValue = withTiming(
@@ -132,7 +126,7 @@ const WizardTransitioner = ({
           >
             {/* if we don't enclose the element in another KeyboardProvider,
                the Animations seems to be "eaten" by the ScreenContainer */}
-            <KeyboardProvider statusBarTranslucent>{element}</KeyboardProvider>
+            <KeyboardProvider>{element}</KeyboardProvider>
           </TransitionScreen>
         ))}
       </ScreenContainer>
@@ -175,7 +169,7 @@ const TransitionScreen = ({
         },
       ],
     };
-  }, [transitionProgress, transitionKind]);
+  });
 
   const layoutStyle = { width, height };
 

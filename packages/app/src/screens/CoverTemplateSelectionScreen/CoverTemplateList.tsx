@@ -168,7 +168,7 @@ const CoverTemplateList = ({
           onEndReached={onEndReached}
           onRefresh={onRefresh}
           refreshing={isLoadingPrevious}
-          contentContainerStyle={{ paddingBottom: 200 + bottom }}
+          contentContainerStyle={{ paddingBottom: bottom }}
           onEndReachedThreshold={0.5}
           keyboardShouldPersistTaps="always"
           onViewableItemsChanged={onViewableItemChanged}
@@ -213,7 +213,7 @@ export const CoverTemplateListFallback = ({
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, paddingTop: 20 },
+  container: { flex: 1 },
   activityIndicatorContainer: {
     padding: 5,
     alignItems: 'center',

@@ -59,6 +59,69 @@ export const BLOCK_TEXT_DEFAULT_VALUES = {
   },
 } as const satisfies Partial<CardModuleBlockTextData>;
 
+export const BLOCK_TEXT_DEFAULT_VALUES_DARK = {
+  backgroundStyle: {
+    backgroundColor: 'dark',
+    patternColor: 'primary',
+  },
+  textBackgroundStyle: {
+    backgroundColor: 'primary',
+    patternColor: 'dark',
+    opacity: 100,
+  },
+  fontColor: 'dark',
+} as const;
+
+export const BLOCK_TEXT_DEFAULT_VALUES_LIGHT = {
+  backgroundStyle: {
+    backgroundColor: 'light',
+    patternColor: 'dark',
+  },
+  textBackgroundStyle: {
+    backgroundColor: 'dark',
+    patternColor: 'light',
+    opacity: 100,
+  },
+  fontColor: 'light',
+} as const;
+
+export const BLOCK_TEXT_DEFAULT_VALUES_PRIMARY = {
+  backgroundStyle: {
+    backgroundColor: 'primary',
+    patternColor: 'dark',
+  },
+  textBackgroundStyle: {
+    backgroundColor: 'dark',
+    patternColor: 'light',
+    opacity: 100,
+  },
+  fontColor: 'light',
+} as const;
+
+export const getBlockTextDefaultColors = (
+  coverBackgroundColor: string | null | undefined,
+  data?: Pick<
+    CardModuleBlockTextData,
+    'backgroundStyle' | 'fontColor' | 'textBackgroundStyle'
+  > | null,
+) => {
+  if (
+    !coverBackgroundColor ||
+    data?.backgroundStyle ||
+    data?.fontColor ||
+    data?.textBackgroundStyle
+  )
+    return {};
+
+  const defaultValues: Record<string, Partial<CardModuleBlockTextData>> = {
+    dark: BLOCK_TEXT_DEFAULT_VALUES_DARK,
+    light: BLOCK_TEXT_DEFAULT_VALUES_LIGHT,
+    primary: BLOCK_TEXT_DEFAULT_VALUES_PRIMARY,
+  };
+
+  return defaultValues[coverBackgroundColor];
+};
+
 /**
  * The maximum length of text for the block text module
  */
@@ -150,6 +213,44 @@ export const CAROUSEL_DEFAULT_VALUES = {
   },
 } as const satisfies Partial<CardModuleCarouselData>;
 
+export const CAROUSEL_DEFAULT_VALUES_DARK = {
+  backgroundStyle: {
+    backgroundColor: 'dark',
+    patternColor: 'light',
+  },
+} as const;
+
+export const CAROUSEL_DEFAULT_VALUES_LIGHT = {
+  backgroundStyle: {
+    backgroundColor: 'light',
+    patternColor: 'dark',
+  },
+} as const;
+
+export const CAROUSEL_DEFAULT_VALUES_PRIMARY = {
+  backgroundStyle: {
+    backgroundColor: 'primary',
+    patternColor: 'dark',
+  },
+} as const;
+
+export const getCarouselDefaultColors = (
+  coverBackgroundColor: string | null | undefined,
+  data?: Pick<CardModuleHorizontalPhotoData, 'backgroundStyle'> | null,
+) => {
+  if (!coverBackgroundColor || data?.backgroundStyle) return {};
+
+  const defaultValues: Record<
+    string,
+    Partial<CardModuleHorizontalPhotoData>
+  > = {
+    dark: CAROUSEL_DEFAULT_VALUES_DARK,
+    light: CAROUSEL_DEFAULT_VALUES_LIGHT,
+    primary: CAROUSEL_DEFAULT_VALUES_PRIMARY,
+  };
+
+  return defaultValues[coverBackgroundColor];
+};
 /**
  * The maximum image height for the carousel module
  */
@@ -232,6 +333,44 @@ export const HORIZONTAL_PHOTO_DEFAULT_VALUES = {
   },
 } as const satisfies Partial<CardModuleHorizontalPhotoData>;
 
+export const HORIZONTAL_PHOTO_DEFAULT_VALUES_DARK = {
+  backgroundStyle: {
+    backgroundColor: 'dark',
+    patternColor: 'light',
+  },
+} as const;
+
+export const HORIZONTAL_PHOTO_DEFAULT_VALUES_LIGHT = {
+  backgroundStyle: {
+    backgroundColor: 'light',
+    patternColor: 'dark',
+  },
+} as const;
+
+export const HORIZONTAL_PHOTO_DEFAULT_VALUES_PRIMARY = {
+  backgroundStyle: {
+    backgroundColor: 'primary',
+    patternColor: 'dark',
+  },
+} as const;
+
+export const getHorizontalPhotoDefaultColors = (
+  coverBackgroundColor: string | null | undefined,
+  data?: Pick<CardModuleHorizontalPhotoData, 'backgroundStyle'> | null,
+) => {
+  if (!coverBackgroundColor || data?.backgroundStyle) return {};
+
+  const defaultValues: Record<
+    string,
+    Pick<CardModuleHorizontalPhotoData, 'backgroundStyle'>
+  > = {
+    dark: HORIZONTAL_PHOTO_DEFAULT_VALUES_DARK,
+    light: HORIZONTAL_PHOTO_DEFAULT_VALUES_LIGHT,
+    primary: HORIZONTAL_PHOTO_DEFAULT_VALUES_PRIMARY,
+  };
+
+  return defaultValues[coverBackgroundColor];
+};
 /**
  * The maximum image height for the horizontal photo module
  */
@@ -422,6 +561,62 @@ export const PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES = {
   },
 } as const satisfies Partial<CardModulePhotoWithTextAndTitleData>;
 
+export const PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES_DARK = {
+  backgroundStyle: {
+    backgroundColor: 'dark',
+    patternColor: 'light',
+  },
+  titleFontColor: 'light',
+  contentFontColor: 'light',
+} as const;
+
+export const PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES_LIGHT = {
+  backgroundStyle: {
+    backgroundColor: 'light',
+    patternColor: 'dark',
+  },
+  titleFontColor: 'dark',
+  contentFontColor: 'dark',
+} as const;
+
+export const PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES_PRIMARY = {
+  backgroundStyle: {
+    backgroundColor: 'primary',
+    patternColor: 'dark',
+  },
+  titleFontColor: 'light',
+  contentFontColor: 'light',
+} as const;
+
+export const getPhotoWithTextAndTitleDefaultColors = (
+  coverBackgroundColor: string | null | undefined,
+  data?: Pick<
+    CardModulePhotoWithTextAndTitleData,
+    'backgroundStyle' | 'contentFontColor' | 'titleFontColor'
+  > | null,
+) => {
+  if (
+    !coverBackgroundColor ||
+    data?.backgroundStyle ||
+    data?.titleFontColor ||
+    data?.contentFontColor
+  )
+    return {};
+
+  const defaultValues: Record<
+    string,
+    Pick<
+      CardModulePhotoWithTextAndTitleData,
+      'backgroundStyle' | 'contentFontColor' | 'titleFontColor'
+    >
+  > = {
+    dark: PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES_DARK,
+    light: PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES_LIGHT,
+    primary: PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES_PRIMARY,
+  };
+
+  return defaultValues[coverBackgroundColor];
+};
 /**
  * The maximum content length for the photo with text and title module
  */
@@ -541,6 +736,57 @@ export const SIMPLE_BUTTON_DEFAULT_VALUES = {
   marginBottom: 20,
 } as const satisfies Partial<CardModuleSimpleButtonData>;
 
+export const SIMPLE_BUTTON_DEFAULT_VALUES_DARK = {
+  backgroundStyle: {
+    backgroundColor: 'dark',
+    patternColor: 'primary',
+  },
+  buttonColor: 'primary',
+  fontColor: 'dark',
+} as const;
+
+export const SIMPLE_BUTTON_DEFAULT_VALUES_LIGHT = {
+  backgroundStyle: {
+    backgroundColor: 'light',
+    patternColor: 'primary',
+  },
+  buttonColor: 'primary',
+  fontColor: 'light',
+} as const;
+
+export const SIMPLE_BUTTON_DEFAULT_VALUES_PRIMARY = {
+  backgroundStyle: {
+    backgroundColor: 'primary',
+    patternColor: 'dark',
+  },
+  buttonColor: 'dark',
+  fontColor: 'light',
+} as const;
+
+export const getButtonDefaultColors = (
+  coverBackgroundColor: string | null | undefined,
+  data?: Pick<
+    CardModuleSimpleButtonData,
+    'backgroundStyle' | 'buttonColor' | 'fontColor'
+  > | null,
+) => {
+  if (
+    !coverBackgroundColor ||
+    data?.backgroundStyle ||
+    data?.buttonColor ||
+    data?.fontColor
+  )
+    return {};
+
+  const defaultValues: Record<string, Partial<CardModuleSimpleButtonData>> = {
+    dark: SIMPLE_BUTTON_DEFAULT_VALUES_DARK,
+    light: SIMPLE_BUTTON_DEFAULT_VALUES_LIGHT,
+    primary: SIMPLE_BUTTON_DEFAULT_VALUES_PRIMARY,
+  };
+
+  return defaultValues[coverBackgroundColor];
+};
+
 /**
  * The maximum button label length for the simple button module
  */
@@ -645,6 +891,46 @@ export const SIMPLE_TEXT_DEFAULT_VALUES = {
   },
 } as const satisfies Partial<CardModuleSimpleTextData>;
 
+export const SIMPLE_TEXT_DEFAULT_VALUES_DARK = {
+  backgroundStyle: {
+    backgroundColor: 'dark',
+    patternColor: 'light',
+  },
+  fontColor: 'light',
+} as const;
+
+export const SIMPLE_TEXT_DEFAULT_VALUES_LIGHT = {
+  backgroundStyle: {
+    backgroundColor: 'light',
+    patternColor: 'dark',
+  },
+  fontColor: 'dark',
+} as const;
+
+export const SIMPLE_TEXT_DEFAULT_VALUES_PRIMARY = {
+  backgroundStyle: {
+    backgroundColor: 'primary',
+    patternColor: 'light',
+  },
+  fontColor: 'light',
+} as const;
+
+export const getTextDefaultValues = (
+  coverBackgroundColor: string | null | undefined,
+  data?: Pick<CardModuleSimpleTextData, 'backgroundStyle' | 'fontColor'> | null,
+) => {
+  if (!coverBackgroundColor || data?.backgroundStyle || data?.fontColor)
+    return {};
+
+  const defaultValues: Record<string, Partial<CardModuleSimpleTextData>> = {
+    dark: SIMPLE_TEXT_DEFAULT_VALUES_DARK,
+    light: SIMPLE_TEXT_DEFAULT_VALUES_LIGHT,
+    primary: SIMPLE_TEXT_DEFAULT_VALUES_PRIMARY,
+  };
+
+  return defaultValues[coverBackgroundColor];
+};
+
 /**
  * The maximum length of text for the simple text module
  */
@@ -698,6 +984,22 @@ export const SIMPLE_TITLE_DEFAULT_VALUES = {
     patternColor: 'primary',
   },
 } as const satisfies Partial<CardModuleSimpleTextData>;
+
+export const getTitleDefaultValues = (
+  coverBackgroundColor: string | null | undefined,
+  data?: Pick<CardModuleSimpleTextData, 'backgroundStyle' | 'fontColor'> | null,
+) => {
+  if (!coverBackgroundColor || data?.backgroundStyle || data?.fontColor)
+    return {};
+
+  const defaultValues: Record<string, Partial<CardModuleSimpleTextData>> = {
+    dark: SIMPLE_TEXT_DEFAULT_VALUES_DARK,
+    light: SIMPLE_TEXT_DEFAULT_VALUES_LIGHT,
+    primary: SIMPLE_TEXT_DEFAULT_VALUES_PRIMARY,
+  };
+
+  return defaultValues[coverBackgroundColor];
+};
 
 export const SIMPLE_TITLE_MAX_LENGTH = 300;
 /**
@@ -768,6 +1070,48 @@ export const SOCIAL_LINKS_DEFAULT_VALUES = {
   },
 } as const satisfies Partial<CardModuleSocialLinksData>;
 
+export const SOCIAL_LINKS_DEFAULT_VALUES_DARK = {
+  backgroundStyle: {
+    backgroundColor: 'dark',
+    patternColor: 'light',
+  },
+  iconColor: 'light',
+} as const;
+
+export const SOCIAL_LINKS_DEFAULT_VALUES_LIGHT = {
+  backgroundStyle: {
+    backgroundColor: 'light',
+    patternColor: 'primary',
+  },
+  iconColor: 'primary',
+} as const;
+
+export const SOCIAL_LINKS_DEFAULT_VALUES_PRIMARY = {
+  backgroundStyle: {
+    backgroundColor: 'primary',
+    patternColor: 'light',
+  },
+  iconColor: 'light',
+} as const;
+
+export const getSocialLinksDefaultColors = (
+  coverBackgroundColor: string | null | undefined,
+  data?: Pick<
+    CardModuleSocialLinksData,
+    'backgroundStyle' | 'iconColor'
+  > | null,
+) => {
+  if (!coverBackgroundColor || data?.backgroundStyle || data?.iconColor)
+    return {};
+
+  const defaultValues: Record<string, Partial<CardModuleSocialLinksData>> = {
+    dark: SOCIAL_LINKS_DEFAULT_VALUES_DARK,
+    light: SOCIAL_LINKS_DEFAULT_VALUES_LIGHT,
+    primary: SOCIAL_LINKS_DEFAULT_VALUES_PRIMARY,
+  };
+
+  return defaultValues[coverBackgroundColor];
+};
 /**
  * The maximum icon size for the social links module
  */

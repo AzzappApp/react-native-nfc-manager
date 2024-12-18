@@ -28,7 +28,7 @@ const TabBarMenuItem = ({
         [backgroundColor, selectedBackgroundColor],
       ),
     };
-  }, [state]);
+  });
 
   return (
     <PressableOpacity

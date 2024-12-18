@@ -97,14 +97,15 @@ const PostRendererActionBar = ({
   const profileInfos = useProfileInfos();
   const debouncedCommit = useDebouncedCallback(
     () => {
-      if (!profileInfos) {
+      const webCardId = profileInfos?.webCardId;
+      if (!webCardId) {
         return;
       }
       if (viewerPostReaction !== reaction) {
         const add = viewerPostReaction !== reaction;
         commit({
           variables: {
-            webCardId: profileInfos.webCardId,
+            webCardId,
             input: {
               postId,
               reactionKind: 'like',
@@ -142,7 +143,7 @@ const PostRendererActionBar = ({
                 webCardId: profileInfos.webCardId,
               });
             }
-            const webCard = store.get(profileInfos.webCardId);
+            const webCard = store.get(webCardId);
             const counter = webCard?.getValue('nbPostsLiked');
             if (typeof counter === 'number') {
               webCard?.setValue(
@@ -171,7 +172,7 @@ const PostRendererActionBar = ({
                   {
                     azzappA: <Text variant="azzapp">a</Text>,
                   },
-                ) as string,
+                ) as unknown as string,
               });
             } else {
               //add manual capture exception for testing issue

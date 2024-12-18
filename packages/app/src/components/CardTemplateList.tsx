@@ -18,7 +18,6 @@ import {
   StatusBar,
   TouchableOpacity,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { graphql, useLazyLoadQuery, usePaginationFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { DEFAULT_COLOR_PALETTE } from '@azzapp/shared/cardHelpers';
@@ -42,17 +41,15 @@ import type {
   CardTemplateList_cardTemplates$key,
 } from '#relayArtifacts/CardTemplateList_cardTemplates.graphql';
 import type { CardTemplateListQuery } from '#relayArtifacts/CardTemplateListQuery.graphql';
-import type { CoverRenderer_webCard$key } from '#relayArtifacts/CoverRenderer_webCard.graphql';
-import type { WebCardBackground_webCard$key } from '#relayArtifacts/WebCardBackground_webCard.graphql';
-import type { WebCardBackgroundPreview_webCard$key } from '#relayArtifacts/WebCardBackgroundPreview_webCard.graphql';
+import type { WebCardPreview_webCard$key } from '#relayArtifacts/WebCardPreview_webCard.graphql';
 import type { ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { ForwardedRef, ReactNode } from 'react';
 import type {
   ListRenderItem,
   NativeScrollEvent,
   NativeSyntheticEvent,
+  ViewProps,
 } from 'react-native';
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
 
 type CardTemplateListProps = Omit<ViewProps, 'children'> & {
   profileId: string;
@@ -101,9 +98,7 @@ const CardTemplateList = (
             }
             webCard {
               id
-              ...CoverRenderer_webCard
-              ...WebCardBackground_webCard
-              ...WebCardBackgroundPreview_webCard
+              ...WebCardPreview_webCard
               cardColors {
                 primary
                 dark
@@ -353,7 +348,7 @@ const CardTemplateList = (
     return item.id;
   };
 
-  const { top } = useSafeAreaInsets();
+  const { top } = useScreenInsets();
 
   const [selectedCardTemplateType, setSelectedCardTemplateType] = useState<
     { id: string; title: string } | undefined
@@ -477,7 +472,7 @@ const CardTemplateList = (
               renderItem={renderItem}
               onScroll={onScroll}
               onEndReached={onEndReached}
-              style={[styles.cardTemplateList]}
+              style={styles.cardTemplateList}
               contentContainerStyle={styles.cardTemplateListContentContainer}
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -576,11 +571,7 @@ export type CardTemplateItem = NonNullable<
 
 type CoverTemplatePreviewModalProps = {
   visible: boolean;
-  webCard:
-    | (CoverRenderer_webCard$key &
-        WebCardBackground_webCard$key &
-        WebCardBackgroundPreview_webCard$key)
-    | null;
+  webCard: WebCardPreview_webCard$key | null;
   template: CardTemplateItem | null;
   cardColors: ColorPalette;
   loading: boolean;

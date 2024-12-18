@@ -33,6 +33,7 @@ const AddContentBelowCoverModal = ({
       fragment AddContentBelowCoverModal_webCard on WebCard {
         ...CoverRenderer_webCard
         isPremium
+        userName
       }
     `,
     webCardKey,
@@ -69,10 +70,7 @@ const AddContentBelowCoverModal = ({
       onRequestDismiss={onClose}
     >
       <Container style={{ flex: 1 }}>
-        <SafeAreaView
-          style={{ flex: 1 }}
-          edges={{ bottom: 'off', top: 'additive' }}
-        >
+        <SafeAreaView style={{ flex: 1 }}>
           <Header
             middleElement={
               <View style={{ flexDirection: 'column', alignItems: 'center' }}>
@@ -131,7 +129,10 @@ const AddContentBelowCoverModal = ({
           />
           {currentTab === 'sections' && <AddContentBelowCoverSections />}
           {currentTab === 'templates' && (
-            <AddContentBelowCoverTemplates isPremium={webCard.isPremium} />
+            <AddContentBelowCoverTemplates
+              isPremium={webCard.isPremium}
+              userName={webCard.userName}
+            />
           )}
         </SafeAreaView>
       </Container>

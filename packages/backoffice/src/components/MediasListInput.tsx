@@ -15,7 +15,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import DeleteIcon from '@mui/icons-material/DeleteOutline';
 import { IconButton, Box, Button, Typography } from '@mui/material';
-import { uniqBy } from 'lodash';
+import uniqBy from 'lodash/uniqBy';
 import { useEffect, useState } from 'react';
 import { getImageURL } from '@azzapp/shared/imagesHelpers';
 import LottiePlayer from './LottiePlayer';

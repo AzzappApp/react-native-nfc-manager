@@ -1,15 +1,15 @@
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { FlatList, ScrollView, View } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 import { APPLICATIONS_FONTS } from '@azzapp/shared/fontHelpers';
 import { colors } from '#theme';
-import { useCoverEditorContext } from '#components/CoverEditor/CoverEditorContext';
+import { useCoverEditorEditContext } from '#components/CoverEditor/CoverEditorContext';
 import { ScreenModal } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
+import PressableNative from '#ui/PressableNative';
 import RoundedMenuComponent from '#ui/RoundedMenuComponent';
 import SafeAreaView from '#ui/SafeAreaView';
 import Text from '#ui/Text';
@@ -33,7 +33,7 @@ const CoverEditorAddTextModal = (props: Props) => {
     }
   }, []);
 
-  const { dispatch } = useCoverEditorContext();
+  const dispatch = useCoverEditorEditContext();
 
   const itemsPerTag = useMemo(() => {
     return [
@@ -89,10 +89,7 @@ const CoverEditorAddTextModal = (props: Props) => {
     >
       {open && (
         <Container style={styles.container}>
-          <SafeAreaView
-            style={styles.container}
-            edges={{ bottom: 'off', top: 'additive' }}
-          >
+          <SafeAreaView style={styles.container}>
             <Header
               middleElement={
                 <Text variant="large" style={styles.header}>
@@ -148,6 +145,8 @@ const CoverEditorAddTextModal = (props: Props) => {
   );
 };
 
+const ADD_ITEM_HEIGHT = 172;
+
 const AddTextModalItem = ({
   style,
   dispatch,
@@ -158,7 +157,9 @@ const AddTextModalItem = ({
   dispatch: React.Dispatch<CoverEditorAction>;
 }) => {
   const styles = useStyleSheet(styleSheet);
+
   const onPress = useCallback(() => {
+    onClose();
     dispatch({
       type: 'ADD_TEXT_LAYER',
       payload: {
@@ -168,19 +169,18 @@ const AddTextModalItem = ({
         color: '#000000',
       },
     });
-    onClose();
   }, [dispatch, onClose, style]);
 
   return (
     <View style={styles.styleItem}>
-      <TouchableOpacity style={styles.styleItemContent} onPress={onPress}>
+      <PressableNative style={styles.styleItemContent} onPress={onPress}>
         <Text style={style}>
           <FormattedMessage
             defaultMessage="Title 01"
             description="CoverEditorAddTextModal - Placeholder for text preview"
           />
         </Text>
-      </TouchableOpacity>
+      </PressableNative>
     </View>
   );
 };
@@ -208,11 +208,12 @@ const styleSheet = createStyleSheet(appearance => ({
     flex: 0.5,
   },
   styleItemContent: {
-    height: 172,
+    height: ADD_ITEM_HEIGHT,
     backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey900,
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
+    flex: 1,
   },
   tagsContainer: {
     width: '100%',

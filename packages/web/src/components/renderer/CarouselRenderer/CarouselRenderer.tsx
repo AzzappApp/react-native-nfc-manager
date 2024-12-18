@@ -23,6 +23,7 @@ const CarouselRenderer = async ({
   style,
   cardStyle,
   colorPalette,
+  coverBackgroundColor,
   ...props
 }: CarouselRendererProps) => {
   const {

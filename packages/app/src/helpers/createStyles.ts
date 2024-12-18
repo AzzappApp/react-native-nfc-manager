@@ -1,10 +1,16 @@
 import merge from 'lodash/merge';
 import { useColorScheme, StyleSheet } from 'react-native';
-import type { ImageStyle, StyleProp, TextStyle, ViewStyle } from 'react-native';
+import type {
+  ColorSchemeName,
+  ImageStyle,
+  StyleProp,
+  TextStyle,
+  ViewStyle,
+} from 'react-native';
 
-export type ColorSchemeName = 'dark' | 'light';
+type DefinedColorSchemeName = Exclude<ColorSchemeName, null | undefined>;
 
-type ColorSchemeStyleSheet<T> = Record<ColorSchemeName, T>;
+type ColorSchemeStyleSheet<T> = Record<DefinedColorSchemeName, T>;
 
 type ComposableNamedStyles<T> = {
   [P in keyof T]: StyleProp<ImageStyle | TextStyle | ViewStyle>;
@@ -17,7 +23,7 @@ type ComposableNamedStyles<T> = {
  * @returns An object container a light and dark version of the style object
  */
 export const createStyleSheet = <T extends ComposableNamedStyles<T>>(
-  factory: (appearance: ColorSchemeName) => T,
+  factory: (appearance: DefinedColorSchemeName) => T,
 ): ColorSchemeStyleSheet<T> => {
   return {
     light: StyleSheet.create(composeStyles(factory('light')) as any),
@@ -121,7 +127,7 @@ const composeStyles = <T extends ComposableNamedStyles<T>>(
 export const useVariantStyleSheet = <Variants extends string, T>(
   styleSheet: VariantsStyleSheet<Variants, T>,
   variant: Variants,
-  appearance?: ColorSchemeName,
+  appearance?: ColorSchemeName | null,
 ): T => useStyleSheet(styleSheet[variant], appearance);
 
 type ValueOf<T> = T[keyof T];

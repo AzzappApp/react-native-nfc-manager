@@ -2,12 +2,14 @@ import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { Alert } from 'react-native';
 import { COVER_MAX_MEDIA_DURATION } from '@azzapp/shared/coverHelpers';
+import { getMediaWithLocalFile } from '#components/CoverEditor/coverEditorHelpers';
 import ImagePicker, { EditImageStep } from '#components/ImagePicker';
 import { ScreenModal } from '#components/NativeRouter';
 import useToggle from '#hooks/useToggle';
 import {
   useCoverEditorActiveMedia,
   useCoverEditorContext,
+  useCoverEditorEditContext,
 } from '../../CoverEditorContext';
 import ToolBoxSection from '../ui/ToolBoxSection';
 import type { ImagePickerResult } from '#components/ImagePicker';
@@ -16,18 +18,15 @@ import type { EditionParameters } from '#helpers/mediaEditions';
 const CoverEditorAdjustTool = () => {
   const intl = useIntl();
   const [show, toggleScreenModal] = useToggle(false);
-  const {
-    coverEditorState: { editionMode, medias },
-    dispatch,
-  } = useCoverEditorContext();
+  const { editionMode, medias, localFilenames } = useCoverEditorContext();
+  const dispatch = useCoverEditorEditContext();
 
   const activeMedia = useCoverEditorActiveMedia();
   const cropData = activeMedia?.editionParameters?.cropData;
-  const media = activeMedia?.media;
   const mediaAspectRatio = cropData
     ? cropData.width / cropData.height
-    : media
-      ? media.width / media.height
+    : activeMedia
+      ? activeMedia.width / activeMedia.height
       : 1;
 
   const applyToActiveMedia = useCallback(
@@ -117,7 +116,15 @@ const CoverEditorAdjustTool = () => {
         >
           {show && (
             <ImagePicker
-              initialData={activeMedia}
+              initialData={{
+                media: getMediaWithLocalFile(activeMedia, localFilenames),
+                editionParameters: activeMedia.editionParameters,
+                filter: activeMedia.filter,
+                timeRange:
+                  activeMedia.kind === 'video'
+                    ? activeMedia.timeRange
+                    : undefined,
+              }}
               additionalData={{ selectedTab: 'edit', showTabs: false }}
               kind={editionMode === 'overlay' ? 'image' : 'mixed'}
               forceAspectRatio={mediaAspectRatio}
