@@ -1,5 +1,6 @@
-## 1.4.1-canary.79
+## 1.4.1-canary.80
 
+* **feat:**  - 🎸 rework contact card ([#6377](https://github.com/AzzappApp/azzapp/pull/6377))
 * **build:**  - upgrade dependencies ([#6396](https://github.com/AzzappApp/azzapp/pull/6396))
 * **fix:**  - remove expo-sharing replaced by react-native-share ([#6404](https://github.com/AzzappApp/azzapp/pull/6404))
 * **fix:**  - 🐛 deny access to template selection from invited profile ([#6403](https://github.com/AzzappApp/azzapp/pull/6403))
