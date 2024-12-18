@@ -1,5 +1,6 @@
-## 1.4.1-canary.78
+## 1.4.1-canary.79
 
+* **build:**  - upgrade dependencies ([#6396](https://github.com/AzzappApp/azzapp/pull/6396))
 * **fix:**  - remove expo-sharing replaced by react-native-share ([#6404](https://github.com/AzzappApp/azzapp/pull/6404))
 * **fix:**  - 🐛 deny access to template selection from invited profile ([#6403](https://github.com/AzzappApp/azzapp/pull/6403))
 * **fix:**  - **modules:** parallax effect on safari (deactivated on iOS) ([#6385](https://github.com/AzzappApp/azzapp/pull/6385))
