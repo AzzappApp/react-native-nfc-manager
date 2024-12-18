@@ -107,8 +107,6 @@ const HomeHeader = ({ openPanel, user: userKey }: HomeHeaderProps) => {
 
 export default memo(HomeHeader);
 
-export const HOME_HEADER_HEIGHT = 28;
-
 type AnimatedHomeHeaderCentralComponentProps = {
   isPremium: DerivedValue<number>;
   color: DerivedValue<string>;
@@ -135,8 +133,9 @@ export const AnimatedHomeHeaderCentralComponent = ({
       >
         <PremiumIndicator isRequired size={18} style={iconStyles} />
       </Animated.View>
+      {/** 2 pixel more to avoid crop problem */}
       <Canvas
-        style={{ width: 136, height: 28 }}
+        style={{ width: 136, height: 30 }}
         accessibilityLabel="azzapp"
         accessibilityRole="text"
         opaque
@@ -160,7 +159,7 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: 'transparent',
-    height: HOME_HEADER_HEIGHT,
+    height: 30,
   },
   premiumIndicator: {
     position: 'absolute',
