@@ -1,6 +1,7 @@
-import { useCallback, useMemo, useState } from 'react';
+import * as Sentry from '@sentry/react-native';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Defs, Pattern, Rect, Svg, SvgUri } from 'react-native-svg';
+import { Defs, Pattern, Rect, Svg, SvgXml } from 'react-native-svg';
 import type { CardModuleBackgroundImageProps } from './types';
 import type { ViewStyle, StyleProp, LayoutChangeEvent } from 'react-native';
 import type { PatternProps, UriProps } from 'react-native-svg';
@@ -26,7 +27,7 @@ const CardModuleBackgroundImageSvg = (
     [svgSize],
   );
 
-  const [svg, style, pattern] = useMemo(() => {
+  const [svgProps, style, pattern] = useMemo(() => {
     const svgProps: Omit<UriProps, 'uri'> = { style: {} };
     const containerStyle: StyleProp<ViewStyle> = {};
     const patternProps: PatternProps = {};
@@ -81,7 +82,51 @@ const CardModuleBackgroundImageSvg = (
     return [svgProps, containerStyle, patternProps];
   }, [layout, resizeMode, svgSize]);
 
-  if (!backgroundUri) return null;
+  const [svg, setSVG] = useState<string | null>(null);
+  const color = patternColor ?? '#000';
+
+  useEffect(() => {
+    let canceled = false;
+    const fetchSvg = async () => {
+      if (!backgroundUri) {
+        setSVG(null);
+        return;
+      }
+      try {
+        const resp = await fetch(backgroundUri);
+        if (canceled) {
+          return;
+        }
+        if (!resp.ok) {
+          throw new Error(`Failed to fetch ${backgroundUri}`);
+        }
+        const svgSrc = await resp.text();
+        if (canceled) {
+          return;
+        }
+        setSVG(
+          svgSrc.replaceAll(
+            'stop-color="currentColor"', //see https://github.com/software-mansion/react-native-svg/issues/2581
+            `stop-color="${color.toString()}"`,
+          ),
+        );
+      } catch (e) {
+        if (canceled) {
+          return;
+        }
+        console.warn(`Failed to load SVG: ${backgroundUri}`, e);
+        Sentry.captureException(e);
+        setSVG(null);
+      }
+    };
+    fetchSvg();
+
+    return () => {
+      canceled = true;
+    };
+  }, [backgroundUri, color]);
+
+  if (!svgProps || !svg) return null;
 
   if (resizeMode === 'repeat') {
     return (
@@ -98,12 +143,12 @@ const CardModuleBackgroundImageSvg = (
             x="0"
             y="0"
           >
-            <SvgUri
+            <SvgXml
               onLayout={handleSvgLayout}
-              {...svg}
-              uri={backgroundUri}
+              {...svgProps}
+              xml={svg}
               style={{ opacity: backgroundOpacity }}
-              color={patternColor ?? '#000'}
+              color={color}
             />
           </Pattern>
         </Defs>
@@ -114,17 +159,17 @@ const CardModuleBackgroundImageSvg = (
 
   return (
     <View style={[styles.background, style]} pointerEvents="none">
-      <SvgUri
+      <SvgXml
         onLayout={handleSvgLayout}
-        {...svg}
-        uri={backgroundUri}
-        color={patternColor ?? '#000'}
+        {...svgProps}
+        xml={svg}
+        color={color}
         preserveAspectRatio="xMidYMid slice"
         style={[
           {
             opacity: backgroundOpacity,
           },
-          svg.style,
+          svgProps.style,
         ]}
       />
     </View>
