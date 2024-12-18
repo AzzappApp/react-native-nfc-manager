@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CloudinaryVideo from '#ui/CloudinaryVideo';
 import styles from './Parallax.css';
 import type { Media } from '@azzapp/data';
 import type { CSSProperties, ReactNode } from 'react';
 
-const PARALLAX_RATIO = 0.8;
+const PARALLAX_RATIO = 0.2;
 
 const Parallax = ({
   medias,
@@ -24,20 +24,28 @@ const Parallax = ({
   const [startPosition, setStartPosition] = useState(0);
   const [scrollY, setScrollY] = useState(0);
   const [viewportHeight, setViewportHeight] = useState(0);
+  const [iOS, setiOS] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
+    setiOS(/iPad|iPhone|iPod/.test(navigator.userAgent));
+
+    const handleScroll = () =>
+      requestAnimationFrame(() => {
+        setScrollY(window.scrollY);
+      });
+
+    const handleResize = () => {
       setStartPosition(containerRef.current?.offsetTop ?? 0);
-      setViewportHeight(window.innerHeight);
-      setScrollY(window.scrollY);
+      setViewportHeight(window.innerHeight); // Use innerHeight or a dynamic approach if needed
     };
 
     handleScroll();
-    window.addEventListener('resize', handleScroll);
+    handleResize();
+    window.addEventListener('resize', handleResize);
     window.addEventListener('scroll', handleScroll);
 
     return () => {
-      window.removeEventListener('resize', handleScroll);
+      window.removeEventListener('resize', handleResize);
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
@@ -59,59 +67,80 @@ const Parallax = ({
           : 0;
 
         return (
-          <div
-            key={media.id}
-            className={styles.parallaxContainer}
-            style={backgroundStyle}
-          >
-            <div
-              key={media.id}
-              className={styles.parallaxItem}
-              style={{
-                transform: `translateY(${offset}px)`,
-                willChange: 'transform',
-              }}
-            >
-              {media.kind === 'video' ? (
-                <CloudinaryVideo
-                  assetKind="module"
-                  media={media}
-                  alt="cover"
-                  fluid
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover', // Ensures the video covers the container
-                    objectPosition: 'center', // Center the content
-                    ...imageStyle,
-                  }}
-                  playsInline
-                  autoPlay
-                  muted
-                  loop
-                />
-              ) : (
-                <CloudinaryImage
-                  mediaId={media.id}
-                  draggable={false}
-                  alt="parallax"
-                  fill
-                  format="auto"
-                  quality="auto:best"
-                  style={{
-                    objectFit: 'cover', // Ensures the image covers the container
-                    objectPosition: 'center', // Center the content
-                    ...imageStyle,
-                  }}
-                />
-              )}
+          <div key={media.id} className={styles.parallaxContainer}>
+            <div className={styles.parallaxLayer} style={backgroundStyle}>
+              <ParallaxItemMemo
+                imageStyle={imageStyle}
+                media={media}
+                offset={iOS ? 0 : offset}
+              />
+
+              {children?.({ mediaId: media.id })}
             </div>
-            {children?.({ mediaId: media.id })}
           </div>
         );
       })}
     </div>
   );
 };
+
+const ParallaxItem = ({
+  imageStyle,
+  media,
+  offset,
+}: {
+  imageStyle?: CSSProperties;
+  media: Media;
+  offset: number;
+}) => {
+  const style = useMemo(() => {
+    return {
+      transform: offset ? `translate3d(0, ${-offset}px, 0)` : 'none',
+    } as const;
+  }, [offset]);
+
+  const mediaStyle = useMemo(() => {
+    return {
+      width: '100%',
+      height: '100%',
+      objectFit: 'cover', // Ensures the image covers the container
+      objectPosition: 'center', // Center the content
+      touchAction: 'none' /* Prevents zoom gestures */,
+      pointerEvents: 'none' /* Disables pointer interaction */,
+      ...imageStyle,
+    } as const;
+  }, [imageStyle]);
+
+  return (
+    <div key={media.id} className={styles.parallaxItem} style={style}>
+      {media.kind === 'video' ? (
+        <CloudinaryVideo
+          assetKind="module"
+          media={media}
+          alt="cover"
+          fluid
+          style={mediaStyle}
+          playsInline
+          autoPlay
+          muted
+          loop
+        />
+      ) : (
+        <CloudinaryImage
+          mediaId={media.id}
+          draggable={false}
+          alt="parallax"
+          fill
+          sizes="100vw"
+          format="auto"
+          quality="auto:best"
+          style={mediaStyle}
+        />
+      )}
+    </div>
+  );
+};
+
+const ParallaxItemMemo = memo(ParallaxItem);
 
 export default Parallax;
