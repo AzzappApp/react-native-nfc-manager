@@ -219,7 +219,11 @@ export const ContactCardScreen = ({
           style={animatedContactCardStyle}
           onLayout={onLayout}
         >
-          <ContactCard profile={profile} height={cardHeight} />
+          <ContactCard
+            profile={profile}
+            height={cardHeight}
+            rotation={sharedRotationState}
+          />
         </PressableAnimated>
 
         <Animated.View style={[footerStyle, styles.footer]}>
