@@ -1,5 +1,6 @@
-## 1.4.1-canary.76
+## 1.4.1-canary.77
 
+* **fix:**  - 🐛 deny access to template selection from invited profile ([#6403](https://github.com/AzzappApp/azzapp/pull/6403))
 * **fix:**  - **modules:** parallax effect on safari (deactivated on iOS) ([#6385](https://github.com/AzzappApp/azzapp/pull/6385))
 * **fix:**  - **modules:** [#6224](https://github.com/AzzappApp/azzapp/pull/6224) ensure image aspect ratio ([#6391](https://github.com/AzzappApp/azzapp/pull/6391))
 * **fix:**  - 🐛 scroll to initial index on layout with no height ([#6350](https://github.com/AzzappApp/azzapp/pull/6350))
