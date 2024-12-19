@@ -182,7 +182,7 @@ const PhotoGalleryMediaList = ({
         const fileData = await CameraRoll.iosGetImageDataById(
           asset.node.image.uri,
         );
-        uri = fileData.node.image.filepath;
+        uri = fileData.node.image.filepath?.split('#')[0] ?? null; //react-native-skia-video does not support uri with #
       } else if (Platform.OS === 'android') {
         const fileData = await ReactNativeBlobUtil.fs.stat(
           asset.node.image.uri,
