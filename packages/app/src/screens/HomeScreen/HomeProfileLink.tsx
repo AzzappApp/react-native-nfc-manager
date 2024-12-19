@@ -24,7 +24,6 @@ type HomeProfileLinkProps = {
   user: HomeProfileLink_user$key;
 };
 const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
-  const windowWidth = useWindowDimensions();
   const { profiles } = useFragment(
     graphql`
       fragment HomeProfileLink_user on User {
