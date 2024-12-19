@@ -245,6 +245,7 @@ const MediaVideoRenderer = (
             alt={alt}
             onReadyForDisplay={onThumbnailReadyForDisplay}
             style={StyleSheet.absoluteFill}
+            fit="cover"
           />
         )
       }
