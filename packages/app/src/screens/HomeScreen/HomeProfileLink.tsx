@@ -1,7 +1,7 @@
 import * as Clipboard from 'expo-clipboard';
 import { memo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet, useWindowDimensions, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Animated, {
   runOnJS,
   useAnimatedReaction,
