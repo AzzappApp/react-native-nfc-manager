@@ -1,3 +1,4 @@
+import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
@@ -5,6 +6,7 @@ import { DoneHeaderButton } from '#components/commonsButtons';
 import { MediaImageRenderer } from '#components/medias';
 import ToolBoxSection from '#components/Toolbar/ToolBoxSection';
 import useBoolean from '#hooks/useBoolean';
+import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import BottomSheetTextInput from '#ui/BottomSheetTextInput';
 import Header from '#ui/Header';
@@ -56,6 +58,8 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
     close();
   };
 
+  const { bottom: bottomInset } = useScreenInsets();
+
   if (!isVisible(module)) {
     return null;
   }
@@ -70,16 +74,21 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
         icon="bloc_text"
         onPress={open}
       />
-      <BottomSheetModal visible={show} onDismiss={onDismiss}>
-        <Header
-          middleElement={intl.formatMessage({
-            defaultMessage: 'Design',
-            description: 'CardModuleDesignTool - Bottom Sheet header',
-          })}
-          style={styles.header}
-          rightElement={<DoneHeaderButton onPress={onDismiss} />}
-        />
-        <View style={styles.container}>
+      <BottomSheetModal
+        visible={show}
+        onDismiss={onDismiss}
+        nestedScroll
+        bottomInset={bottomInset}
+      >
+        <BottomSheetScrollView style={styles.container}>
+          <Header
+            middleElement={intl.formatMessage({
+              defaultMessage: 'Design',
+              description: 'CardModuleDesignTool - Bottom Sheet header',
+            })}
+            style={styles.header}
+            rightElement={<DoneHeaderButton onPress={onDismiss} />}
+          />
           {module.moduleKind === 'mediaTextLink' && (
             <View style={{ flexDirection: 'row', gap: 10 }}>
               <MediaImageRenderer
@@ -154,7 +163,7 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
               />
             </>
           )}
-        </View>
+        </BottomSheetScrollView>
       </BottomSheetModal>
     </>
   );

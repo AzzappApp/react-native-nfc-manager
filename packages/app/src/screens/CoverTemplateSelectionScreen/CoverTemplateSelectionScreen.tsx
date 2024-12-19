@@ -71,7 +71,7 @@ const CoverTemplateSelectionScreen = ({
     usePreloadedQuery<CoverTemplateSelectionScreenQuery>(query, preloadedQuery);
 
   useEffect(() => {
-    if (profile?.invited || !profile?.webCard?.cardIsPublished) {
+    if (profile?.invited) {
       router.backToTop();
     }
   }, [profile?.invited, profile?.webCard?.cardIsPublished, router]);

@@ -104,7 +104,6 @@
     "react-native-image-size@^1.1.6": "patch:react-native-image-size@npm%3A1.1.6#./.yarn/patches/react-native-image-size-npm-1.1.6-38755aad48.patch",
     "drizzle-kit@^0.24.2": "patch:drizzle-kit@npm%3A0.24.2#./.yarn/patches/drizzle-kit-npm-0.24.2-ed6f619edc.patch",
     "vcard-creator@^0.7.0": "patch:vcard-creator@npm%3A0.7.0#./.yarn/patches/vcard-creator-npm-0.7.0-a36000c711.patch",
-    "@react-native-camera-roll/camera-roll@^7.8.3": "patch:@react-native-camera-roll/camera-roll@npm%3A7.8.3#./.yarn/patches/@react-native-camera-roll-camera-roll-npm-7.8.3-9c4439f311.patch",
     "source-map-explorer@npm:^2.5.3": "patch:source-map-explorer@npm%3A2.5.3#~/.yarn/patches/source-map-explorer-npm-2.5.3-1f901669e9.patch"
   },
   "dependencies": {

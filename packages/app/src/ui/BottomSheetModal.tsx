@@ -69,6 +69,15 @@ export type Props = BottomSheetModalProps & {
    * @type {boolean}
    */
   dismissKeyboardOnOpening?: boolean;
+
+  /**
+   * this props enable the resizing of the bottom sheet on its content when scrolling
+   * Thiis used in addition with SnapPoint props that need to contain at least 2 values
+   * don't delete before reading the purpose and it is used
+   *
+   * @type {boolean}
+   */
+  nestedScroll?: boolean;
 };
 
 /**
@@ -85,6 +94,7 @@ const BottomSheetModal = ({
   closeOnBackdropTouch = true,
   variant,
   dismissKeyboardOnOpening = false,
+  nestedScroll = false,
   ...props
 }: Props) => {
   const styles = useStyleSheet(styleSheet);
@@ -172,18 +182,22 @@ const BottomSheetModal = ({
       {...dynamicProps}
       {...props}
     >
-      <BottomSheetView
-        style={[
-          styles.container,
-          {
-            height: height ? height : undefined,
-            paddingBottom: automaticBottomPadding ? paddingBottom : 0,
-            paddingTop: showHandleIndicator ? 0 : 16,
-          },
-        ]}
-      >
-        {children}
-      </BottomSheetView>
+      {nestedScroll ? (
+        children
+      ) : (
+        <BottomSheetView
+          style={[
+            styles.container,
+            {
+              height: height ? height : undefined,
+              paddingBottom: automaticBottomPadding ? paddingBottom : 0,
+              paddingTop: showHandleIndicator ? 0 : 16,
+            },
+          ]}
+        >
+          {children}
+        </BottomSheetView>
+      )}
       <Toast />
     </BottomSheetModalG>
   );

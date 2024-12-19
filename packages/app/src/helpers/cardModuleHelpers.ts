@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react-native';
 import Toast from 'react-native-toast-message';
 import {
   MODULE_IMAGE_MAX_WIDTH,
@@ -65,7 +66,7 @@ export const handleUploadCardModuleMedia = async (
           filter: media.filter,
           editionParameters: media.editionParameters,
         });
-        media.uri = localPath;
+        media.uri = `file://${localPath}`;
       } else {
         const exportWidth = Math.min(MODULE_VIDEO_MAX_WIDTH, media.width);
         const exportHeight = (exportWidth / media.width) * media.height;
@@ -90,9 +91,10 @@ export const handleUploadCardModuleMedia = async (
             filter: media.filter,
             editionParameters: media.editionParameters,
           });
-          media.uri = localPath;
+          media.uri = `file://${localPath}`;
         } catch (e) {
-          console.log(e);
+          Sentry.captureException(e);
+          console.error(e);
         }
       }
       const { uploadURL, uploadParameters } = await uploadSign({

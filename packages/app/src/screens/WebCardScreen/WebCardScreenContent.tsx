@@ -97,6 +97,11 @@ const WebCardScreenContent = ({
       fragment WebCardScreenContent_webCard on WebCard {
         id
         userName
+        cardModules {
+          id
+          visible
+          ...ModuleData_cardModules
+        }
         ...CoverRenderer_webCard
         ...WebCardScreenHeader_webCard
         ...WebCardScreenBody_webCard
@@ -108,6 +113,7 @@ const WebCardScreenContent = ({
         ...CardTemplatesList_webCard
         ...WebCardScreenEditModeFooter_webCard
         ...WebCardScreenFooter_webCard
+        ...CardModuleSectionList_webCard
         coverBackgroundColor
         cardColors {
           primary
@@ -446,6 +452,7 @@ const WebCardScreenContent = ({
               close={closeContentModal}
               open={showContentModal}
               webCard={webCard}
+              cardModulesCount={webCard.cardModules?.length ?? 0}
             />
           </Suspense>
         </>

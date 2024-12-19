@@ -10,7 +10,7 @@ import {
 } from '@shopify/react-native-skia';
 import { memo, useCallback, useMemo } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { Image, View } from 'react-native';
+import { Image, TouchableOpacity, View } from 'react-native';
 import Animated, {
   interpolate,
   useAnimatedStyle,
@@ -26,13 +26,17 @@ import { MediaImageRenderer } from '#components/medias';
 import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
-import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import type {
   ContactCard_profile$data,
   ContactCard_profile$key,
 } from '#relayArtifacts/ContactCard_profile.graphql';
-import type { LayoutChangeEvent, StyleProp, ViewStyle } from 'react-native';
+import type {
+  GestureResponderEvent,
+  LayoutChangeEvent,
+  StyleProp,
+  ViewStyle,
+} from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 
 type ContactCardProps = {
@@ -199,11 +203,16 @@ export const ContactCardComponent = ({
     return fitbox('contain', src, dst);
   });
 
-  const onEdit = useCallback(() => {
-    router.push({
-      route: 'CONTACT_CARD_EDIT',
-    });
-  }, [router]);
+  const onEdit = useCallback(
+    (e: GestureResponderEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      router.push({
+        route: 'CONTACT_CARD_EDIT',
+      });
+    },
+    [router],
+  );
 
   if (!contactCard || !webCard) {
     return null;
@@ -327,7 +336,7 @@ export const ContactCardComponent = ({
           </Animated.View>
         ) : null}
         {edit && (
-          <PressableNative
+          <TouchableOpacity
             style={[
               styles.edit,
               {
@@ -347,7 +356,7 @@ export const ContactCardComponent = ({
                 description="ContactCard - Label for edit button"
               />
             </Text>
-          </PressableNative>
+          </TouchableOpacity>
         )}
       </View>
     </View>

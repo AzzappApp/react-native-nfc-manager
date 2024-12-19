@@ -12,15 +12,22 @@ import TabsBar from '#ui/TabsBar';
 import Text from '#ui/Text';
 import CardModuleSectionList from './CardModuleSectionList';
 import CardTemplatesList from './CardTemplatesList';
+import type { CardModuleSectionList_webCard$key } from '#relayArtifacts/CardModuleSectionList_webCard.graphql';
 import type { CardTemplatesList_webCard$key } from '#relayArtifacts/CardTemplatesList_webCard.graphql';
 
 type Props = {
   open: boolean;
   close: () => void;
-  webCard: CardTemplatesList_webCard$key;
+  webCard: CardModuleSectionList_webCard$key & CardTemplatesList_webCard$key;
+  cardModulesCount: number;
 };
 
-const AddModuleSectionModal = ({ open, close, webCard: webCardKey }: Props) => {
+const AddModuleSectionModal = ({
+  open,
+  close,
+  cardModulesCount,
+  webCard: webCardKey,
+}: Props) => {
   const intl = useIntl();
 
   const [currentTab, setCurrentTab] = useState<string>('sections');
@@ -78,7 +85,13 @@ const AddModuleSectionModal = ({ open, close, webCard: webCardKey }: Props) => {
             tabs={tabs}
             decoration="underline"
           />
-          {currentTab === 'sections' && <CardModuleSectionList close={close} />}
+          {currentTab === 'sections' && (
+            <CardModuleSectionList
+              close={close}
+              webCardKey={webCardKey}
+              cardModulesCount={cardModulesCount}
+            />
+          )}
           {currentTab === 'templates' && (
             <CardTemplatesList webCardKey={webCardKey} />
           )}

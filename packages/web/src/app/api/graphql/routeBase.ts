@@ -199,7 +199,7 @@ const { handleRequest } = createYoga({
       allowList: ['node', 'uri'],
     }),
     maxTokensPlugin({
-      n: 1300, // Number of tokens allowed
+      n: 1400, // Number of tokens allowed
     }),
     useDisableIntrospection({
       isDisabled: request => {

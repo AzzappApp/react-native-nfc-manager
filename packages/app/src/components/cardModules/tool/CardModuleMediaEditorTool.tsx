@@ -70,7 +70,8 @@ const CardModuleMediaEditorTool = ({
                     }
                   : null
               }
-              // additionalData={{ selectedTab: 'filter', showTabs: false }}
+              //disabling cropper, if is a bad tool, and the cropData are still no good when displaying landspae image in portrait ratio.... works only if displaying an image in a container with same ratio.
+              additionalData={{ excludedParams: ['cropData'] }}
               forceAspectRatio={mediaAspectRatio}
               steps={[EditImageStep]}
               onCancel={toggleScreenModal}
