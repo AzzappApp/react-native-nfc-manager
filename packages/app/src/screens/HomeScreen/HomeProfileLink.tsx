@@ -1,8 +1,10 @@
 import * as Clipboard from 'expo-clipboard';
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, useWindowDimensions, View } from 'react-native';
 import Animated, {
+  runOnJS,
+  useAnimatedReaction,
   useAnimatedStyle,
   useDerivedValue,
 } from 'react-native-reanimated';
@@ -10,11 +12,13 @@ import { Toast } from 'react-native-toast-message/lib/src/Toast';
 import { useFragment, graphql } from 'react-relay';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
-import AnimatedText from '#components/AnimatedText';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
+import Text from '#ui/Text';
 import { useHomeScreenContext } from './HomeScreenContext';
 import type { HomeProfileLink_user$key } from '#relayArtifacts/HomeProfileLink_user.graphql';
+import type { TextProps } from '#ui/Text';
+import type { DerivedValue } from 'react-native-reanimated';
 
 type HomeProfileLinkProps = {
   user: HomeProfileLink_user$key;
@@ -80,7 +84,7 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
       .catch(() => void 0);
   };
 
-  const text = useDerivedValue(() => {
+  const textDerivedValue = useDerivedValue(() => {
     if (currentIndexSharedValue.value > 0.5) {
       return (
         'azzapp.com/' +
@@ -99,17 +103,29 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
         onPress={onPress}
       >
         <Icon icon="earth" style={styles.iconLink} />
-
-        <AnimatedText
-          variant="button"
-          numberOfLines={1}
-          style={styles.url}
-          text={text}
-          maxLength={windowWidth.width / 13}
-        />
+        <HomeProfileLinkText text={textDerivedValue} style={styles.url} />
         <View style={styles.emptyViewCenter} />
       </PressableNative>
     </Animated.View>
+  );
+};
+
+const HomeProfileLinkText = ({
+  text,
+  ...props
+}: TextProps & { text: DerivedValue<string> }) => {
+  const [textInner, setTextInner] = useState(() => text.value);
+
+  useAnimatedReaction(
+    () => text.value,
+    newValue => {
+      runOnJS(setTextInner)(newValue);
+    },
+  );
+  return (
+    <Text variant="button" numberOfLines={1} {...props}>
+      {textInner}
+    </Text>
   );
 };
 
