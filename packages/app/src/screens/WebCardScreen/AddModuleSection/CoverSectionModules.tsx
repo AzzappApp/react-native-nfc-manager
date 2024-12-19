@@ -19,11 +19,13 @@ import type { ListRenderItemInfo } from 'react-native';
 type CoverSectionModules = {
   section: ModuleKindSection;
   closeModuleList: () => void;
+  addingModuleRequiresSubscription: boolean;
 };
 
 const CoverSectionModules = ({
   section,
   closeModuleList,
+  addingModuleRequiresSubscription,
 }: CoverSectionModules) => {
   const styles = useStyleSheet(stylesheet);
   const renderItem = useCallback(
@@ -36,9 +38,15 @@ const CoverSectionModules = ({
               variant: item,
             }
       ) as ModuleKindWithVariant;
-      return <VariantItem {...props} closeModuleList={closeModuleList} />;
+      return (
+        <VariantItem
+          {...props}
+          closeModuleList={closeModuleList}
+          addingModuleRequiresSubscription={addingModuleRequiresSubscription}
+        />
+      );
     },
-    [closeModuleList, section.section],
+    [addingModuleRequiresSubscription, closeModuleList, section.section],
   );
 
   return (
@@ -90,15 +98,24 @@ export default CoverSectionModules;
 
 const Item = ({
   closeModuleList,
+  addingModuleRequiresSubscription,
   ...props
-}: ModuleKindWithVariant & { closeModuleList: () => void }) => {
+}: ModuleKindWithVariant & {
+  closeModuleList: () => void;
+  addingModuleRequiresSubscription: boolean;
+}) => {
   const router = useRouter();
   const styles = useStyleSheet(stylesheet);
 
   const onSelectModuleKind = useCallback(() => {
+    if (addingModuleRequiresSubscription) {
+      router.push({ route: 'USER_PAY_WALL' });
+      return;
+    }
+
     router.push(getRouteForCardModule({ ...props, isNew: true }));
     closeModuleList();
-  }, [closeModuleList, props, router]);
+  }, [addingModuleRequiresSubscription, closeModuleList, props, router]);
 
   const uri = useModuleVariantsPreviewImage(props);
   const label = useModuleVariantsLabel(props);
