@@ -167,20 +167,23 @@ const CardModuleMediaPicker = ({
       setDownloading(true);
       let downloadError = false;
       const res = await Promise.all(
-        await selectedMedias.map(async cardModuleMedia => {
+        selectedMedias.map(async cardModuleMedia => {
           if (
             cardModuleMedia.media.uri.startsWith('https://videos.pexels.com') ||
             cardModuleMedia.media.uri.startsWith('https://images.pexels.com')
           ) {
             //only copy local cache for pexel, as we don't edit video from cloudinary
             try {
-              const path = await copyCoverMediaToCacheDir(
+              const fileName = await copyCoverMediaToCacheDir(
                 cardModuleMedia.media,
                 MODULES_CACHE_DIR,
               );
               return {
                 ...cardModuleMedia,
-                media: { ...cardModuleMedia.media, uri: `file://${path}` },
+                media: {
+                  ...cardModuleMedia.media,
+                  uri: `file://${MODULES_CACHE_DIR}/${fileName}`,
+                },
               };
             } catch {
               //if there is an error downloading the video, we remove it
@@ -192,7 +195,7 @@ const CardModuleMediaPicker = ({
                 }),
                 intl.formatMessage({
                   defaultMessage:
-                    'Errro downloading the media, please try again',
+                    'Error downloading the media, please try again',
                   description:
                     'CardModule Media Picker - Error message when media are not downloaded',
                 }),
