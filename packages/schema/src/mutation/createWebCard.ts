@@ -105,7 +105,9 @@ const createWebCardMutation: MutationResolvers['createWebCard'] = async (
     const profile = await profileLoader.load(profileId);
 
     if (!profile) {
-      Sentry.captureMessage('Profile not found after creation');
+      Sentry.captureMessage('Profile not found after creation', {
+        extra: { profileId },
+      });
       throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
     }
     return { profile };
