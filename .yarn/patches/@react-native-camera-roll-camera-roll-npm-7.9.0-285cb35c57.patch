@@ -1,20 +1,10 @@
 diff --git a/ios/RNCCameraRoll.mm b/ios/RNCCameraRoll.mm
-index d63f1a7ca21d0ce18454c1bf1a488a4160768bb6..349e005235d2e3963a8fe8e50d97b3ea912096fe 100644
+index d63f1a7ca21d0ce18454c1bf1a488a4160768bb6..a8651915af30aba75beffa63779712ecca62a4f7 100644
 --- a/ios/RNCCameraRoll.mm
 +++ b/ios/RNCCameraRoll.mm
-@@ -753,50 +753,119 @@ -(void)sendProgressUpdateWithId:(NSString *)internalId
- 		editOptions.progressHandler = ^(double progress, BOOL * _Nonnull stop) {
+@@ -754,49 +754,119 @@ -(void)sendProgressUpdateWithId:(NSString *)internalId
  			[self sendProgressUpdateWithId:internalId progress:progress];
  		};
-+      
-+        if (asset.mediaType == PHAssetMediaTypeImage) {
-+          [asset requestContentEditingInputWithOptions:editOptions completionHandler:^(PHContentEditingInput *contentEditingInput, NSDictionary *info) {
-+            if (contentEditingInput.mediaType == PHAssetMediaTypeImage) {
-+                imageURL = contentEditingInput.fullSizeImageURL;
-+            } else {
-+                AVURLAsset *avURLAsset = (AVURLAsset*)contentEditingInput.audiovisualAsset;
-+                imageURL = [avURLAsset URL];
-+            }
  
 -        [asset requestContentEditingInputWithOptions:editOptions completionHandler:^(PHContentEditingInput *contentEditingInput, NSDictionary *info) {
 -          if (contentEditingInput.mediaType == PHAssetMediaTypeImage) {
@@ -27,7 +17,15 @@ index d63f1a7ca21d0ce18454c1bf1a488a4160768bb6..349e005235d2e3963a8fe8e50d97b3ea
 -          if (imageURL.absoluteString.length != 0) {
 -
 -            filePath = [imageURL.absoluteString stringByReplacingOccurrencesOfString:@"pathfile:" withString:@"file:"];
--
++      if (asset.mediaType == PHAssetMediaTypeImage) {
++          [asset requestContentEditingInputWithOptions:editOptions completionHandler:^(PHContentEditingInput *contentEditingInput, NSDictionary *info) {
++            if (contentEditingInput.mediaType == PHAssetMediaTypeImage) {
++                imageURL = contentEditingInput.fullSizeImageURL;
++            } else {
++                AVURLAsset *avURLAsset = (AVURLAsset*)contentEditingInput.audiovisualAsset;
++                imageURL = [avURLAsset URL];
++            }
+ 
 -            resolve(@{
 -                      @"node": @{
 -                          @"type": assetMediaTypeLabel,
@@ -53,7 +51,7 @@ index d63f1a7ca21d0ce18454c1bf1a488a4160768bb6..349e005235d2e3963a8fe8e50d97b3ea
 -                          }
 -                      });
 -          } else {
-+            if (imageURL.absoluteString.length != 0) {
++               if (imageURL.absoluteString.length != 0) {
 +
 +              filePath = [imageURL.absoluteString stringByReplacingOccurrencesOfString:@"pathfile:" withString:@"file:"];
 +
@@ -85,7 +83,7 @@ index d63f1a7ca21d0ce18454c1bf1a488a4160768bb6..349e005235d2e3963a8fe8e50d97b3ea
 +              NSString *errorMessage = [NSString stringWithFormat:@"Failed to load asset"
 +                                        " with localIdentifier %@ with no error message.", internalId];
 +              NSError *error = RCTErrorWithMessage(errorMessage);
-+              reject(@"Error while getting file path",@"Error while getting file path",error);
++              reject(@"No asset found",@"No asset found",error);
 +            }
 +          }];
 +        } else {
@@ -93,14 +91,14 @@ index d63f1a7ca21d0ce18454c1bf1a488a4160768bb6..349e005235d2e3963a8fe8e50d97b3ea
 +          PHAssetResource *resource = [PHAssetResource assetResourcesForAsset:asset].firstObject;
 +          if (resource == nil) {
              NSString *errorMessage = [NSString stringWithFormat:@"Failed to load asset"
--                                      " with localIdentifier %@ with no error message.", internalId];
-+                                " with localIdentifier %@ with no error message.", internalId];
+                                       " with localIdentifier %@ with no error message.", internalId];
              NSError *error = RCTErrorWithMessage(errorMessage);
 -            reject(@"Error while getting file path",@"Error while getting file path",error);
 +            reject(@"No asset found",@"No asset found",error);
            }
 -        }];
-+          NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
++
++         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
 +          NSString *cacheDirectory = [paths objectAtIndex:0];
 +          NSString *phAssetCacheDir = [cacheDirectory stringByAppendingPathComponent:@"ph-assets-cache"];
 +          if (![[NSFileManager defaultManager] fileExistsAtPath:phAssetCacheDir]) {

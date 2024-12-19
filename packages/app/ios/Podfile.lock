@@ -1599,7 +1599,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-cameraroll (7.9.0):
+  - react-native-cameraroll (7.8.3):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -3009,7 +3009,7 @@ SPEC CHECKSUMS:
   react-native-animateable-text: 8baa4ade1a52ed9b17c5f64becf0d48e5218b13b
   react-native-blob-jsi-helper: c51309b88c3a2fb3e16d041f662e0551055d2bfc
   react-native-blob-util: caa7203c370bbf76ae63b67300d1b489b1a62511
-  react-native-cameraroll: c71058d31a5e8088c9d42ff20bfe9cbc6752d36a
+  react-native-cameraroll: 6407cec6b16f9c00404bb34bd1d80c4752b31673
   react-native-keyboard-controller: 3428e4761623fd6a242d9bf3573112f8ebe92238
   react-native-mmkv: 21d0f6ed2d9532f2370cef81eca4ccbef7350441
   react-native-netinfo: f0a9899081c185db1de5bb2fdc1c88c202a059ac
@@ -3018,7 +3018,7 @@ SPEC CHECKSUMS:
   react-native-quick-base64: 6ddd4121d8dcb412ad32ca5fa67633dbea8d3761
   react-native-safe-area-context: d6406c2adbd41b2e09ab1c386781dc1c81a90919
   react-native-skia: bcbabbd748dd4c9ec02f33df07fa49d1d76fc8c0
-  react-native-skottie-template-player: f941ab87bf4695ed69350a1ccb6cbf9642efc49d
+  react-native-skottie-template-player: 5a8020f3b50c106209396647b0d1e4c17c826ea8
   react-native-webview: 40b8823be3fac70f0404016e6aed754ef4307517
   React-nativeconfig: 470fce6d871c02dc5eff250a362d56391b7f52d6
   React-NativeModulesApple: 6297fc3136c1fd42884795c51d7207de6312b606
@@ -3074,7 +3074,7 @@ SPEC CHECKSUMS:
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   SPTPersistentCache: df36ea46762d7cf026502bbb86a8b79d0080dff4
   VisionCamera: 1fcf8b7952080132a6c06df1ff32187d1774e1de
-  Yoga: c5b0e913b5b3b4cde588227c1402e747797061f3
+  Yoga: 96872ee462cfc43866ad013c8160d4ff6b85709b
 
 PODFILE CHECKSUM: 8b1082a96e754e1d604aa2041d2a2dbe70c3dfcb
 

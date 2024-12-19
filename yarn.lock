@@ -132,7 +132,7 @@ __metadata:
     "@hookform/resolvers": "npm:^3.9.1"
     "@lottiefiles/lottie-js": "npm:0.4.2"
     "@miblanchard/react-native-slider": "npm:2.6.0"
-    "@react-native-camera-roll/camera-roll": "npm:^7.9.0"
+    "@react-native-camera-roll/camera-roll": "patch:@react-native-camera-roll/camera-roll@npm%3A7.9.0#~/.yarn/patches/@react-native-camera-roll-camera-roll-npm-7.9.0-285cb35c57.patch"
     "@react-native-community/cli": "npm:^15.1.3"
     "@react-native-community/cli-platform-android": "npm:^15.1.3"
     "@react-native-community/cli-platform-ios": "npm:^15.1.3"
@@ -9449,12 +9449,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native-camera-roll/camera-roll@npm:^7.9.0":
+"@react-native-camera-roll/camera-roll@npm:7.9.0":
   version: 7.9.0
   resolution: "@react-native-camera-roll/camera-roll@npm:7.9.0"
   peerDependencies:
     react-native: ">=0.59"
   checksum: 10/35909a8b622e7405218740e905284ef660ae3a1915cfab124cbb7c488f40fe54bbc5549e194e3d558b172995fee7f22333647b592be24367aeb1667e85d0f4fc
+  languageName: node
+  linkType: hard
+
+"@react-native-camera-roll/camera-roll@patch:@react-native-camera-roll/camera-roll@npm%3A7.9.0#~/.yarn/patches/@react-native-camera-roll-camera-roll-npm-7.9.0-285cb35c57.patch":
+  version: 7.9.0
+  resolution: "@react-native-camera-roll/camera-roll@patch:@react-native-camera-roll/camera-roll@npm%3A7.9.0#~/.yarn/patches/@react-native-camera-roll-camera-roll-npm-7.9.0-285cb35c57.patch::version=7.9.0&hash=256443"
+  peerDependencies:
+    react-native: ">=0.59"
+  checksum: 10/390ca6a6c39a2793897c81401928e840710262170a5afc829a274a6b6c22ed37aea6ee9e09f4dd1b6ac3f1d913d76440020a3d2a69fd39fb583e233ab07f06d1
   languageName: node
   linkType: hard
 
