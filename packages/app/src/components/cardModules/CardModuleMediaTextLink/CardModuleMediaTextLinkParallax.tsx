@@ -124,7 +124,7 @@ const ParallaxItem = ({
     if (moduleEditing) {
       setEditableItemIndex?.(index);
     } else if (!moduleEditing && cardModuleMedia.link?.url) {
-      Linking.openURL(cardModuleMedia.link?.url ?? '');
+      Linking.openURL(cardModuleMedia.link?.url ?? 'https://web.azzapp.com');
     }
   };
 

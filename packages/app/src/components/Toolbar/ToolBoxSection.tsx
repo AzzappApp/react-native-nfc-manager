@@ -11,13 +11,19 @@ type Props = {
   label: string;
   icon: Icons | ReactElement;
   onPress: (() => void) | undefined;
+  showError?: boolean;
 };
 
-const ToolBoxSection = ({ label, icon, onPress }: Props) => {
+const ToolBoxSection = ({ label, icon, onPress, showError = false }: Props) => {
   const styles = useStyleSheet(stylesToolbox);
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        showError && { borderColor: colors.red400, borderWidth: 1 },
+      ]}
+    >
       <PressableNative style={styles.toolbox} onPress={onPress}>
         {typeof icon === 'string' ? (
           <Icon icon={icon} />
