@@ -8,11 +8,12 @@ import {
   createProfile,
   getWebCardByUserNameWithRedirection,
   transaction,
+  getProfileById,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { isValidUserName } from '@azzapp/shared/stringHelpers';
 import { getSessionInfos } from '#GraphQLContext';
-import { profileLoader, userLoader, webCardCategoryLoader } from '#loaders';
+import { userLoader, webCardCategoryLoader } from '#loaders';
 import type { MutationResolvers } from '#/__generated__/types';
 
 const createWebCardMutation: MutationResolvers['createWebCard'] = async (
@@ -102,7 +103,7 @@ const createWebCardMutation: MutationResolvers['createWebCard'] = async (
       throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
     }
 
-    const profile = await profileLoader.load(profileId);
+    const profile = await getProfileById(profileId);
 
     if (!profile) {
       Sentry.captureMessage('Profile not found after creation', {

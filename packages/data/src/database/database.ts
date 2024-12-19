@@ -17,4 +17,10 @@ export const db = (): DrizzleDatabase => {
 export const transaction = async <T>(
   callback: (tx: { rollback(): void }) => Promise<T>,
 ): Promise<T> =>
-  db().transaction(async tx => transactionStorage.run(tx, () => callback(tx)));
+  db().transaction(tx => {
+    return new Promise<T>((resolve, reject) => {
+      transactionStorage.run(tx, () => {
+        callback(tx).then(resolve, reject);
+      });
+    });
+  });

@@ -83,16 +83,9 @@ export const webCardCategoryLoader = createDataLoader(
   createEntitiesBatchLoadFunction('WebCardCategory'),
 );
 
-const ProfileGet = createEntitiesBatchLoadFunction('Profile');
-
 export const profileLoader = createSessionDataLoader(
   'ProfileLoader',
-  async (ids: readonly string[]) => {
-    console.log('ProfileLoader', ids);
-    const profiles = await ProfileGet(ids);
-    console.log('ProfileLoader', profiles);
-    return profiles;
-  },
+  createEntitiesBatchLoadFunction('Profile'),
 );
 
 export const webCardLoader = createSessionDataLoader(
