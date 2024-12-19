@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { FlatList, StyleSheet, useWindowDimensions, View } from 'react-native';
+import {
+  Alert,
+  FlatList,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import CardTemplate from '#components/CardTemplate';
@@ -30,6 +36,9 @@ const CardTemplatesList = ({ webCardKey }: Props) => {
         ...CoverRenderer_webCard
         isPremium
         userName
+        cardModules {
+          id
+        }
       }
     `,
     webCardKey,
@@ -146,11 +155,48 @@ const CardTemplatesList = ({ webCardKey }: Props) => {
     [profileInfos?.webCardId, commit, intl, onDone],
   );
 
-  const onChoseTemplatePress = useCallback(() => {
-    if (selectedTemplate) {
-      onSubmit(selectedTemplate);
+  const handleConfirmation = useCallback(() => {
+    const submitInner = () => {
+      if (selectedTemplate) {
+        onSubmit(selectedTemplate);
+      }
+    };
+
+    if (webCard.cardModules.length === 0) {
+      submitInner();
+      return;
     }
-  }, [onSubmit, selectedTemplate]);
+    const titleMsg = intl.formatMessage({
+      defaultMessage: 'Choose this template',
+      description: 'Choose this template title',
+    });
+
+    const descriptionMsg = intl.formatMessage({
+      defaultMessage:
+        'Are you sure you want to choose this template? This action is irreversible.',
+      description: 'choose this template confirmation message',
+    });
+
+    const labelConfirmation = intl.formatMessage({
+      defaultMessage: 'Choose this WebCard',
+      description: 'Choose template button label',
+    });
+
+    Alert.alert(titleMsg, descriptionMsg, [
+      {
+        text: intl.formatMessage({
+          defaultMessage: 'Cancel',
+          description: 'Cancel button label',
+        }),
+        style: 'cancel',
+      },
+      {
+        text: labelConfirmation,
+        style: 'destructive',
+        onPress: submitInner,
+      },
+    ]);
+  }, [intl, onSubmit, selectedTemplate, webCard.cardModules.length]);
 
   return (
     <View style={{ flex: 1 }}>
@@ -203,7 +249,7 @@ const CardTemplatesList = ({ webCardKey }: Props) => {
             defaultMessage: 'Choose this template',
             description: 'label of the button allowing to pick a template',
           })}
-          onPress={onChoseTemplatePress}
+          onPress={handleConfirmation}
           variant="primary"
           disabled={inFlight}
         />
