@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from 'react';
-import { ScrollView, View } from 'react-native';
+import { View } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import { colors } from '#theme';
 import { areCardModuleColorEqual } from '#helpers/cardModuleColorsHelpers';
@@ -53,7 +54,6 @@ const CardModuleColorDyptichTool = ({
           flexDirection: 'row',
           justifyContent: 'center',
           alignItems: 'center',
-          backgroundColor: 'red',
         }}
       >
         {content}
@@ -67,7 +67,6 @@ const CardModuleColorDyptichTool = ({
       contentContainerStyle={[styles.contentContainerStyle]}
       showsHorizontalScrollIndicator={false}
       contentOffset={{ x: 0, y: 0 }}
-      contentInset={{ left: 16, right: 16 }}
       style={[styles.scrollViewStyle, { width }]} // get place for more readability
     >
       {content}
@@ -183,5 +182,6 @@ const stylesheet = createStyleSheet(appearance => ({
     flexDirection: 'row',
     height: 67,
     gap: ITEM_GAP,
+    paddingHorizontal: 16,
   },
 }));
