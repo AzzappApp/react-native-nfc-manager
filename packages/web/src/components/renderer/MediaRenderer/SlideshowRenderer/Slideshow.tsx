@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowRightIcon } from '#assets';
 import CloudinaryImage from '#ui/CloudinaryImage';
+import CloudinaryVideo from '#ui/CloudinaryVideo';
 import styles from './Slideshow.css';
 import useSlideshow from './useSlideshow';
 import type { Media } from '@azzapp/data';
@@ -125,17 +126,34 @@ const Slideshow = ({ medias: baseMedias, style, square }: Props) => {
                   ...slides[i],
                 }}
               >
-                <CloudinaryImage
-                  mediaId={media.id}
-                  draggable={false}
-                  alt="todo"
-                  fill
-                  format="auto"
-                  quality="auto:best"
-                  style={{
-                    objectFit: 'cover',
-                  }}
-                />
+                {media.kind === 'video' ? (
+                  <CloudinaryVideo
+                    assetKind="module"
+                    media={media}
+                    alt="cover"
+                    fluid
+                    style={{
+                      objectFit: 'cover',
+                      width: '100%',
+                    }}
+                    playsInline
+                    autoPlay
+                    muted
+                    loop
+                  />
+                ) : (
+                  <CloudinaryImage
+                    mediaId={media.id}
+                    draggable={false}
+                    alt="slideshow"
+                    fill
+                    format="auto"
+                    quality="auto:best"
+                    style={{
+                      objectFit: 'cover',
+                    }}
+                  />
+                )}
               </div>
             );
           })}
