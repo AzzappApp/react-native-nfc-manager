@@ -212,11 +212,11 @@ const MediaModuleWebCardScreen = (
   // #endRegion
   useEffect(() => {
     if (
-      data?.cardModuleColor?.background !==
+      (data?.cardModuleColor?.background !==
         selectedCardModuleColor?.background ||
-      data?.variant !== variant ||
-      (!isEqual(data.cardModuleMedias, cardModuleMedias) &&
-        cardModuleMedias.length > 0)
+        data?.variant !== variant ||
+        !isEqual(data.cardModuleMedias, cardModuleMedias)) &&
+      cardModuleMedias.length > 0
     ) {
       setCanSave(true);
     } else {

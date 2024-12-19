@@ -225,6 +225,7 @@ const MediaTextLinkModuleWebCardEditionScreen = (
   // #endRegion
   useEffect(() => {
     if (
+      cardModuleMedias.length > 0 &&
       !isEqual(data, { selectedCardModuleColor, cardModuleMedias, variant })
     ) {
       //from Nico, we allow to save even if the user has not define text/title per media

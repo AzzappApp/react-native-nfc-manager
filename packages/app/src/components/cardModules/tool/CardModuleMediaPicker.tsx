@@ -74,11 +74,17 @@ const CardModuleMediaPicker = ({
 
   const handleMediaSelected = useCallback(
     (media: SourceMedia) => {
-      const index = selectedMedias.findIndex(
+      let localSelectedMedias = [...selectedMedias];
+      if (replacing) {
+        //when replacing there is only one media, so remove it to apply the same rules of logic, as adding a new items
+        localSelectedMedias = [];
+      }
+      const index = localSelectedMedias.findIndex(
         value => value && value.media.id === media.id,
       );
+
       //do not show the toast in case of replacing a media
-      if (!replacing && selectedMedias.length >= maxMedia) {
+      if (localSelectedMedias.length >= maxMedia) {
         //show a tost message
         Toast.show({
           type: 'error',
@@ -91,8 +97,8 @@ const CardModuleMediaPicker = ({
       }
       const disableVideoSelection = maxVideo
         ? maxVideo -
-            (selectedMedias?.filter(m => m.media.kind === 'video').length ??
-              0) ===
+            (localSelectedMedias?.filter(m => m.media.kind === 'video')
+              .length ?? 0) ===
           0
         : false;
 
@@ -159,6 +165,7 @@ const CardModuleMediaPicker = ({
     //download video from pexel
     try {
       setDownloading(true);
+      let downloadError = false;
       const res = await Promise.all(
         await selectedMedias.map(async cardModuleMedia => {
           if (
@@ -166,21 +173,42 @@ const CardModuleMediaPicker = ({
             cardModuleMedia.media.uri.startsWith('https://images.pexels.com')
           ) {
             //only copy local cache for pexel, as we don't edit video from cloudinary
-            const path = await copyCoverMediaToCacheDir(
-              cardModuleMedia.media,
-              MODULES_CACHE_DIR,
-            );
-            return {
-              ...cardModuleMedia,
-              media: { ...cardModuleMedia.media, uri: `file://${path}` },
-            };
+            try {
+              const path = await copyCoverMediaToCacheDir(
+                cardModuleMedia.media,
+                MODULES_CACHE_DIR,
+              );
+              return {
+                ...cardModuleMedia,
+                media: { ...cardModuleMedia.media, uri: `file://${path}` },
+              };
+            } catch {
+              //if there is an error downloading the video, we remove it
+              Alert.alert(
+                intl.formatMessage({
+                  defaultMessage: 'Error',
+                  description:
+                    'CardModule Media Picker - Error title when media are not downloaded',
+                }),
+                intl.formatMessage({
+                  defaultMessage:
+                    'Errro downloading the media, please try again',
+                  description:
+                    'CardModule Media Picker - Error message when media are not downloaded',
+                }),
+              );
+              downloadError = true;
+              return cardModuleMedia;
+            }
           } else {
             return cardModuleMedia;
           }
         }),
       );
-      setDownloading(false);
-      onFinished(res);
+      if (!downloadError) {
+        setDownloading(false);
+        onFinished(res);
+      }
     } catch {
       setDownloading(false);
     }

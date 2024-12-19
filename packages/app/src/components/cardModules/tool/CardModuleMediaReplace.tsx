@@ -10,13 +10,13 @@ type CardModuleMediaReplaceProps = {
   /**
    * This will allow to replace a image per a video
    */
-  allowVideo: boolean;
+  availableVideoSlot: number;
 
   onUpdateMedia: (media: CardModuleMedia) => void;
 };
 const CardModuleMediaReplace = ({
   cardModuleMedia,
-  allowVideo,
+  availableVideoSlot,
   onUpdateMedia,
 }: CardModuleMediaReplaceProps) => {
   const intl = useIntl();
@@ -45,9 +45,12 @@ const CardModuleMediaReplace = ({
         {show && (
           <CardModuleMediaPicker
             initialMedias={[cardModuleMedia]}
-            maxVideo={allowVideo ? 1 : 0}
+            maxVideo={1}
             maxMedia={1}
-            allowVideo={allowVideo}
+            allowVideo={
+              //allow video only if we are replacing a video or have a valid slot
+              availableVideoSlot > 0 || cardModuleMedia.media.kind === 'video'
+            }
             onFinished={onFinished}
             onClose={closeModal}
             replacing

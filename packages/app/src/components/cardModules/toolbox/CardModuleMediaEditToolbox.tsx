@@ -64,7 +64,7 @@ const CardModuleMediaEditToolbox = <T extends ModuleKindAndVariant>({
 
         <CardModuleMediaReplace
           cardModuleMedia={cardModuleMedia}
-          allowVideo={availableVideoSlot > 0}
+          availableVideoSlot={availableVideoSlot}
           onUpdateMedia={onUpdateMedia}
         />
       </ScrollView>

@@ -32,6 +32,7 @@ type EditImageStepProps = {
   selectedTab?: 'edit' | 'filter' | 'timeRange';
   selectedParameter?: keyof EditionParameters | null;
   showTabs?: boolean;
+  excludedParams?: Array<keyof EditionParameters>;
   onEditionSave?: (editionParameters: EditionParameters) => void;
   onEditionCancel?: () => void;
 };
@@ -43,6 +44,7 @@ type EditImageStepProps = {
 const EditImageStep = ({
   selectedTab,
   showTabs = true,
+  excludedParams,
   selectedParameter = null,
   onEditionSave: onEditionSaveProp,
   onEditionCancel: onEditionCancelProp,
@@ -297,6 +299,7 @@ const EditImageStep = ({
                     style={styles.filterSelectionStyle}
                     contentContainerStyle={styles.editImageStepContentContainer}
                     onSelectParam={onEditionStart}
+                    excludedParams={excludedParams}
                   />
                 </>
               ),
