@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs';
 import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
 import {
@@ -106,10 +107,12 @@ const createWebCardMutation: MutationResolvers['createWebCard'] = async (
     const profile = await profileLoader.load(profileId);
 
     if (!profile) {
+      Sentry.captureMessage('Profile not found after creation');
       throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
     }
     return { profile };
-  } catch {
+  } catch (error) {
+    Sentry.captureException(error);
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 };
