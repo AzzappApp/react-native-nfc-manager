@@ -87,11 +87,9 @@ const createWebCardMutation: MutationResolvers['createWebCard'] = async (
   const contactCard = await buildDefaultContactCard(inputWebCard, userId);
 
   try {
-    let profileId: string | null = null;
-
-    await transaction(async () => {
+    const profileId = await transaction(async () => {
       const webCardId = await createWebCard(inputWebCard);
-      profileId = await createProfile({
+      return createProfile({
         webCardId,
         userId,
         contactCard,
