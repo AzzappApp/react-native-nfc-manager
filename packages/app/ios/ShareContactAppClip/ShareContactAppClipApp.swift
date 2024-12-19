@@ -69,7 +69,11 @@ struct ContentView: View {
     private func handleContactData(compressedContactCard: String, username: String) {
       self.contactData = compressedContactCard
       self.username = username
-      let decompressedContactCard = decompressFromEncodedURIComponent(input:compressedContactCard)
+      guard let decodedURI = compressedContactCard.removingPercentEncoding else {
+          print("Failed to decode URI component.")
+          return
+      }
+      let decompressedContactCard = decompressFromEncodedURIComponent(input:decodedURI)
       guard let jsonData = decompressedContactCard.data(using: .utf8) else {
             print("Failed to convert cleaned string to data.")
             return
