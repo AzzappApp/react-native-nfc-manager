@@ -307,7 +307,19 @@ const AddContactModal = ({
             }
 
             if (Platform.OS === 'ios') {
-              await presentFormAsync(null, scanned.contact, {
+              const updatedContact = reworkContactForDeviceInsert({
+                ...scanned.contact,
+                urlAddresses:
+                  additionalContactData?.urls?.map(addr => {
+                    return { label: 'default', address: addr.address };
+                  }) || undefined,
+                socialProfiles:
+                  additionalContactData?.socials?.map(social => {
+                    return { ...social, address: social.url };
+                  }) || undefined,
+              });
+
+              await presentFormAsync(null, updatedContact, {
                 isNew: true,
               });
             } else {
