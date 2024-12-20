@@ -141,7 +141,9 @@ const AlternationItem = ({
     if (moduleEditing) {
       setEditableItemIndex?.(index);
     } else if (!moduleEditing && cardModuleMedia.link?.url) {
-      Linking.openURL(cardModuleMedia.link?.url ?? 'https://web.azzapp.com');
+      Linking.openURL(cardModuleMedia.link?.url);
+    } else {
+      Linking.openURL('https://web.azzapp.com/explanation');
     }
   };
 

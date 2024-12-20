@@ -76,11 +76,13 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
 
   // onDone should check the url is valid and not close the popup
   const onDone = () => {
-    const url = convertUrlLink(linkUrl);
-    if (module.moduleKind === 'mediaTextLink') {
-      if (!isValidUrl(url)) {
-        setHasLinkError(true);
-        return;
+    if (isNotFalsyString(linkUrl)) {
+      const url = convertUrlLink(linkUrl);
+      if (module.moduleKind === 'mediaTextLink') {
+        if (!isValidUrl(url)) {
+          setHasLinkError(true);
+          return;
+        }
       }
     }
     //closing will call ondismiss and save(don't want to create a double save )
