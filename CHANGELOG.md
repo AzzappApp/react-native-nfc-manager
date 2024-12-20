@@ -1,5 +1,6 @@
-## 1.5.4-canary.5
+## 1.5.4-canary.6
 
+* **feat:**  - update data model for new contact card creation process ([#6309](https://github.com/AzzappApp/azzapp/pull/6309))
 * **fix:**  - don’t read directly profile that may be missing on replica
 * **fix:**  - try to read profile within transaction
 * **fix:**  - add confirmation message when we choose a template but modules are already available ([#6457](https://github.com/AzzappApp/azzapp/pull/6457))
