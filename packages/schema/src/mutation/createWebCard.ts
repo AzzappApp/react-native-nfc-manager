@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs';
 import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
 import {
@@ -7,11 +8,12 @@ import {
   createProfile,
   getWebCardByUserNameWithRedirection,
   transaction,
+  getProfileById,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { isValidUserName } from '@azzapp/shared/stringHelpers';
 import { getSessionInfos } from '#GraphQLContext';
-import { profileLoader, userLoader, webCardCategoryLoader } from '#loaders';
+import { userLoader, webCardCategoryLoader } from '#loaders';
 import type { MutationResolvers } from '#/__generated__/types';
 
 const createWebCardMutation: MutationResolvers['createWebCard'] = async (
@@ -86,11 +88,9 @@ const createWebCardMutation: MutationResolvers['createWebCard'] = async (
   const contactCard = await buildDefaultContactCard(inputWebCard, userId);
 
   try {
-    let profileId: string | null = null;
-
-    await transaction(async () => {
+    const profileId = await transaction(async () => {
       const webCardId = await createWebCard(inputWebCard);
-      profileId = await createProfile({
+      return createProfile({
         webCardId,
         userId,
         contactCard,
@@ -103,13 +103,17 @@ const createWebCardMutation: MutationResolvers['createWebCard'] = async (
       throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
     }
 
-    const profile = await profileLoader.load(profileId);
+    const profile = await getProfileById(profileId);
 
     if (!profile) {
+      Sentry.captureMessage('Profile not found after creation', {
+        extra: { profileId },
+      });
       throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
     }
     return { profile };
-  } catch {
+  } catch (error) {
+    Sentry.captureException(error);
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 };

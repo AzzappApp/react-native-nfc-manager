@@ -1,14 +1,19 @@
 import { useIntl } from 'react-intl';
 import ToolBoxSection from '#components/Toolbar/ToolBoxSection';
+import { hasCardModuleMediasError } from '#helpers/cardModuleHelpers';
+import type { ModuleKindAndVariant } from '#helpers/webcardModuleHelpers';
+import type { CardModuleMedia } from '../cardModuleEditorType';
 
 type CardModuleMediaPickerProps = {
-  mediaCount: number;
+  cardModuleMedias: CardModuleMedia[];
+  module: ModuleKindAndVariant;
   open: () => void;
 };
 
 const CardModuleMediaPickerTool = ({
-  mediaCount,
+  cardModuleMedias,
   open,
+  module,
 }: CardModuleMediaPickerProps) => {
   const intl = useIntl();
 
@@ -23,10 +28,11 @@ const CardModuleMediaPickerTool = ({
                   other {# medias}}`,
             description: 'CardModuleMediaPickerTool - Toolboxton title',
           },
-          { mediaCount },
+          { mediaCount: cardModuleMedias?.length ?? 0 },
         )}
         icon="multi_media"
         onPress={open}
+        showError={hasCardModuleMediasError(cardModuleMedias, module)}
       />
     </>
   );

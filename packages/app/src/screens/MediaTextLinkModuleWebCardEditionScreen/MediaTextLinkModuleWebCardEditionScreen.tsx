@@ -22,6 +22,7 @@ import {
   convertModuleMediaRelay,
   handleOnCompletedModuleSave,
   handleUploadCardModuleMedia,
+  hasCardModuleMediasError,
 } from '#helpers/cardModuleHelpers';
 import withWebCardSection from '../../components/cardModules/withCardModule';
 import type { CardModuleMedia } from '#components/cardModules/cardModuleEditorType';
@@ -246,11 +247,16 @@ const MediaTextLinkModuleWebCardEditionScreen = (
   // #endRegion
   useEffect(() => {
     if (
-      cardModuleMedias.length > 0 &&
+      !hasCardModuleMediasError(cardModuleMedias, {
+        moduleKind: MODULE_KIND,
+        variant,
+      }) &&
       !isEqual(data, { selectedCardModuleColor, cardModuleMedias, variant })
     ) {
       //from Nico, we allow to save even if the user has not define text/title per media
       setCanSave(true);
+    } else {
+      setCanSave(false);
     }
   }, [
     cardModuleMedias,

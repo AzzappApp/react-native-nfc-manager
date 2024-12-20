@@ -1,5 +1,5 @@
 import concat from 'lodash/concat';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Pressable, ScrollView, View, useWindowDimensions } from 'react-native';
 import Animated, {
@@ -9,10 +9,11 @@ import Animated, {
   useAnimatedStyle,
   useAnimatedRef,
   useDerivedValue,
+  useAnimatedReaction,
+  runOnJS,
 } from 'react-native-reanimated';
 import { useFragment, graphql } from 'react-relay';
 import { colors, fontFamilies } from '#theme';
-import AnimatedText from '#components/AnimatedText';
 import ProfileStatisticsChart, {
   normalizeArray,
 } from '#components/ProfileStatisticsChart';
@@ -380,15 +381,26 @@ export const StatisticItems = ({
     onSelect(index);
   };
 
+  const [text, setText] = useState(() => value.value);
+  useAnimatedReaction(
+    () => value.value,
+    newValue => {
+      runOnJS(setText)(newValue);
+    },
+    [value],
+  );
+
   const styles = useStyleSheet(stylesheet);
 
   return (
     <Animated.View style={[styles.boxContainer, animatedOpacity]}>
       <Pressable onPress={onPress} style={{ overflow: 'visible' }}>
         <Animated.View style={animatedTextStyle}>
-          <AnimatedText style={styles.largeText} text={value} />
+          <Text style={styles.largeText} selectable={false}>
+            {text}
+          </Text>
         </Animated.View>
-        <Text variant="smallbold" style={styles.smallText}>
+        <Text variant="smallbold" style={styles.smallText} selectable={false}>
           {title}
         </Text>
       </Pressable>

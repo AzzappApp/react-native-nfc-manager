@@ -101,19 +101,12 @@ const CardModuleBottomBar = <T extends ModuleKindAndVariant>({
           needDbUpdate: true,
         };
         setCardModuleMedias(updateCardMedias);
-        setEditableItemIndex(null);
         if (updateCardMedias.length === 0) {
           setCanSave(false);
         }
       }
     },
-    [
-      cardModuleMedias,
-      editableItemIndex,
-      setCanSave,
-      setCardModuleMedias,
-      setEditableItemIndex,
-    ],
+    [cardModuleMedias, editableItemIndex, setCanSave, setCardModuleMedias],
   );
 
   const onFinishImagePicker = useCallback(
@@ -239,8 +232,9 @@ const CardModuleBottomBar = <T extends ModuleKindAndVariant>({
         >
           {hasCardModuleMedia(module, cardModuleMedias) && (
             <CardModuleMediaPickerToolbox
-              mediaCount={cardModuleMedias.length}
+              cardModuleMedias={cardModuleMedias}
               open={openMediaToolbox}
+              module={module}
             />
           )}
           <CardModuleColorTool
@@ -256,6 +250,7 @@ const CardModuleBottomBar = <T extends ModuleKindAndVariant>({
             <ToolBarContainer visible={showMediaToolbox}>
               {/* responsible for displaying the list of media */}
               <CardModuleMediasToolbox
+                module={module}
                 cardModuleMedias={cardModuleMedias}
                 close={closeMediaToolbox}
                 handleRemoveMedia={handleRemoveMedia}

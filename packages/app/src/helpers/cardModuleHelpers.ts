@@ -9,6 +9,7 @@ import {
   POST_VIDEO_BIT_RATE,
   POST_VIDEO_FRAME_RATE,
 } from '@azzapp/shared/postHelpers';
+import { isNotFalsyString, isValidUrl } from '@azzapp/shared/stringHelpers';
 import { getFileName } from './fileHelpers';
 import {
   saveTransformedImageToFile,
@@ -22,6 +23,7 @@ import type {
   CardModuleSourceMedia,
 } from '#components/cardModules/cardModuleEditorType';
 import type { useRouter } from '#components/NativeRouter';
+import type { ModuleKindAndVariant } from './webcardModuleHelpers';
 import type { CardStyle } from '@azzapp/shared/cardHelpers';
 import type { CardModuleColor } from '@azzapp/shared/cardModuleHelpers';
 import type { TextStyle } from 'react-native';
@@ -251,4 +253,36 @@ export const getTextStyle = (
     textStyle.fontSize = cardStyle.fontSize;
   }
   return textStyle;
+};
+
+/**
+ * function to check if a cardModuleMedia is in error based on the module kind and variant
+ * for exemple, url should be valid in case of a mediaTextLink module
+ *
+ */
+export const hasCardModuleMediaError = (
+  cardModuleMedia: CardModuleMedia,
+  module: ModuleKindAndVariant,
+) => {
+  if (module.moduleKind === 'mediaTextLink') {
+    if (isNotFalsyString(cardModuleMedia.link?.url)) {
+      return !isValidUrl(cardModuleMedia.link?.url);
+    }
+  }
+  return false;
+};
+
+export const hasCardModuleMediasError = (
+  cardModuleMedias: CardModuleMedia[],
+  module: ModuleKindAndVariant,
+) => {
+  if (cardModuleMedias?.length === 0) {
+    return true;
+  }
+  for (const cardModuleMedia of cardModuleMedias) {
+    if (hasCardModuleMediaError(cardModuleMedia, module)) {
+      return true;
+    }
+  }
+  return false;
 };

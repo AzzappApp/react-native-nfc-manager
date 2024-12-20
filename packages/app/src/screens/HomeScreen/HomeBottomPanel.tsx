@@ -1,6 +1,6 @@
 import concat from 'lodash/concat';
 import { useState, useMemo, useCallback, startTransition, memo } from 'react';
-import { StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Platform, StyleSheet, useWindowDimensions, View } from 'react-native';
 import Animated, {
   interpolateColor,
   useAnimatedReaction,
@@ -181,6 +181,7 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
         <TabView
           style={{ flex: 1, height: panelHeight }}
           currentTab={selectedPanel}
+          mountOnlyCurrentTab={Platform.OS === 'ios'}
           tabs={[
             {
               id: 'CONTACT_CARD',

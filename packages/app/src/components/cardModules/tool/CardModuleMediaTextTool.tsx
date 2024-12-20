@@ -1,10 +1,12 @@
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
+import { isNotFalsyString, isValidUrl } from '@azzapp/shared/stringHelpers';
 import { DoneHeaderButton } from '#components/commonsButtons';
 import { MediaImageRenderer } from '#components/medias';
 import ToolBoxSection from '#components/Toolbar/ToolBoxSection';
+import { hasCardModuleMediaError } from '#helpers/cardModuleHelpers';
 import useBoolean from '#hooks/useBoolean';
 import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
@@ -39,26 +41,44 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
   const [title, setTitle] = useState(cardModuleMedia.title);
   const [linkUrl, setLinkUrl] = useState(cardModuleMedia.link?.url);
   const [linkAction, setLinkAction] = useState(cardModuleMedia.link?.label);
+  const [hasLinkError, setHasLinkError] = useState(false);
 
   const actionLabel = intl.formatMessage({
     defaultMessage: 'Open',
     description: 'Link action placeholder in design module text tool',
   });
 
+  // onDismiss call when the popup dismiss in order to save
   const onDismiss = () => {
+    const url = convertUrlLink(linkUrl);
     onUpdateMedia({
       ...cardModuleMedia,
       text,
       title,
       link: {
-        url: linkUrl ?? '',
+        url,
         label: linkAction ?? actionLabel,
       },
     });
     close();
   };
 
+  // onDone should check the url is valid and not close the popup
+  const onDone = () => {
+    const url = convertUrlLink(linkUrl);
+    if (module.moduleKind === 'mediaTextLink') {
+      if (!isValidUrl(url)) {
+        setHasLinkError(true);
+        return;
+      }
+    }
+  };
+
   const { bottom: bottomInset } = useScreenInsets();
+
+  const hasError = useMemo(() => {
+    return hasCardModuleMediaError(cardModuleMedia, module);
+  }, [cardModuleMedia, module]);
 
   if (!isVisible(module)) {
     return null;
@@ -73,6 +93,7 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
         })}
         icon="bloc_text"
         onPress={open}
+        showError={hasError}
       />
       <BottomSheetModal
         visible={show}
@@ -87,7 +108,7 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
               description: 'CardModuleDesignTool - Bottom Sheet header',
             })}
             style={styles.header}
-            rightElement={<DoneHeaderButton onPress={onDismiss} />}
+            rightElement={<DoneHeaderButton onPress={onDone} />}
           />
           {module.moduleKind === 'mediaTextLink' && (
             <View style={{ flexDirection: 'row', gap: 10 }}>
@@ -104,17 +125,28 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
                 fit="cover"
                 style={styles.previewContent}
               />
-              <BottomSheetTextInput
-                placeholder={intl.formatMessage({
-                  defaultMessage: 'Enter your url',
-                  description: 'Url placeholder in design module text tool',
-                })}
-                defaultValue={linkUrl}
-                onChangeText={setLinkUrl}
-                style={{ flex: 1 }}
-                autoCorrect={false}
-                keyboardType="url"
-              />
+              <View style={{ flex: 1 }}>
+                <BottomSheetTextInput
+                  placeholder={intl.formatMessage({
+                    defaultMessage: 'Enter your url',
+                    description: 'Url placeholder in design module text tool',
+                  })}
+                  defaultValue={linkUrl}
+                  onChangeText={setLinkUrl}
+                  style={{ flex: 1 }}
+                  autoCorrect={false}
+                  keyboardType="url"
+                  isErrored={hasLinkError}
+                />
+                {hasLinkError ? (
+                  <Text variant="error">
+                    <FormattedMessage
+                      defaultMessage="Please enter a valid link"
+                      description="CardModuleMediaTextTool - Error message when the user enters an invalid link url"
+                    />
+                  </Text>
+                ) : null}
+              </View>
             </View>
           )}
           <Text variant="button" style={{ paddingTop: 10, paddingBottom: 5 }}>
@@ -167,6 +199,14 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
       </BottomSheetModal>
     </>
   );
+};
+
+const convertUrlLink = (link: string | undefined) => {
+  let url = link ?? '';
+  if (isNotFalsyString(url) && !url.startsWith('http')) {
+    url = `https://${url}`;
+  }
+  return url;
 };
 
 const isVisible = (module: ModuleKindAndVariant) => {

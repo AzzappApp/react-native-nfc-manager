@@ -1,12 +1,15 @@
+import { useMemo } from 'react';
 import { ScrollView, View } from 'react-native';
 import { colors } from '#theme';
 import { MediaImageRenderer } from '#components/medias';
 import { TOOLBOX_SECTION_HEIGHT } from '#components/Toolbar/ToolBoxSection';
+import { hasCardModuleMediaError } from '#helpers/cardModuleHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import PressableOpacity from '#ui/PressableOpacity';
 import CardModuleMediaPickerFloatingTool from './CardModuleMediaPickerFloatingTool';
+import type { ModuleKindAndVariant } from '#helpers/webcardModuleHelpers';
 import type { CardModuleMedia } from '../cardModuleEditorType';
 
 type CardModuleMediasToolboxProps = {
@@ -17,6 +20,7 @@ type CardModuleMediasToolboxProps = {
   maxVideo: number;
   maxMedia: number;
   onUpdateMedias: (results: CardModuleMedia[]) => void;
+  module: ModuleKindAndVariant;
 };
 const CardModuleMediasToolbox = ({
   cardModuleMedias,
@@ -26,6 +30,7 @@ const CardModuleMediasToolbox = ({
   onUpdateMedias,
   maxMedia,
   maxVideo,
+  module,
 }: CardModuleMediasToolboxProps) => {
   const styles = useStyleSheet(styleSheet);
 
@@ -47,10 +52,11 @@ const CardModuleMediasToolbox = ({
           return (
             <MediaItem
               key={index}
-              moduleMedia={cardMediaModule}
+              cardModuleMedia={cardMediaModule}
               index={index}
               handleRemoveMedia={handleRemoveMedia}
               onSelectMedia={onSelectMedia}
+              module={module}
             />
           );
         })}
@@ -66,21 +72,28 @@ const CardModuleMediasToolbox = ({
 };
 
 type MediaItemProps = {
-  moduleMedia: CardModuleMedia;
+  cardModuleMedia: CardModuleMedia;
   index: number;
   handleRemoveMedia: (index: number) => void;
   onSelectMedia: (index: number) => void;
+  module: ModuleKindAndVariant;
 };
 
 const MediaItem = ({
-  moduleMedia,
+  cardModuleMedia,
   index,
   handleRemoveMedia,
   onSelectMedia,
+  module,
 }: MediaItemProps) => {
   const styles = useStyleSheet(styleSheet);
   const { galleryUri, uri, thumbnail, smallThumbnail, id } =
-    moduleMedia.media ?? {};
+    cardModuleMedia.media ?? {};
+
+  const hasError = useMemo(() => {
+    return hasCardModuleMediaError(cardModuleMedia, module);
+  }, [cardModuleMedia, module]);
+
   return (
     <PressableOpacity
       key={`${id}-${index}`}
@@ -94,7 +107,13 @@ const MediaItem = ({
             mediaId: id,
           }}
           fit="cover"
-          style={styles.previewContent}
+          style={[
+            styles.previewContent,
+            hasError && {
+              borderWidth: 1,
+              borderColor: colors.red400,
+            },
+          ]}
         />
       </View>
       <IconButton
@@ -121,7 +140,7 @@ const styleSheet = createStyleSheet(appearance => ({
     gap: 5,
     height: TOOLBOX_SECTION_HEIGHT,
     paddingLeft: 5,
-    paddingRight: 20,
+    paddingRight: 60,
   },
   previewButton: {
     paddingVertical: 8,
