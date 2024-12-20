@@ -1,10 +1,11 @@
+import * as Sentry from '@sentry/react-native';
 import { memo } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
 import CoverLinkRenderer from '#components/CoverLink/CoverLinkRenderer';
-import Link from '#components/Link';
+import LinkWebCard from '#components/LinkWebCard';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import useToggleFollow from '#hooks/useToggleFollow';
@@ -34,6 +35,12 @@ const PostLikesListItem = ({ webcard: webcardKey }: Props) => {
 
   const toggleFollow = useToggleFollow();
   const onToggleFollow = () => {
+    if (!webCard.userName) {
+      Sentry.captureMessage(
+        'null username in PostLikesListItem / onToggleFollow',
+      );
+      return;
+    }
     toggleFollow(webCard.id, webCard.userName, !webCard.isFollowing);
   };
 
@@ -42,9 +49,8 @@ const PostLikesListItem = ({ webcard: webcardKey }: Props) => {
   return (
     <View style={styles.item}>
       <View style={styles.content}>
-        <Link
+        <LinkWebCard
           disabled={webCard.cardIsPublished === false}
-          route="WEBCARD"
           params={{ userName: webCard.userName, webCardId: webCard.id }}
         >
           <PressableNative style={styles.profile}>
@@ -61,8 +67,8 @@ const PostLikesListItem = ({ webcard: webcardKey }: Props) => {
               </Text>
             </View>
           </PressableNative>
-        </Link>
-        {profileInfos?.webCardId !== webCard.id && (
+        </LinkWebCard>
+        {profileInfos?.webCardId !== webCard.id && webCard.userName && (
           <PressableNative onPress={onToggleFollow}>
             {!webCard.isFollowing && (
               <Text variant="button">

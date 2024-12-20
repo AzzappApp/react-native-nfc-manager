@@ -58,7 +58,7 @@ const createPostMutation: MutationResolvers['createPost'] = async (
     });
 
     const webCard = await webCardLoader.load(webCardId);
-    if (webCard) {
+    if (webCard?.userName) {
       invalidateWebCard(webCard.userName);
     }
     return { post };

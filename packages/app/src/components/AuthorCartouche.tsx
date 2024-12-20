@@ -93,7 +93,7 @@ const AuthorCartouche = ({
     );
   }
 
-  if (activeLink) {
+  if (activeLink && author.userName) {
     return (
       <Link
         route="WEBCARD"

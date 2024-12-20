@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react-native';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import {
@@ -114,6 +115,10 @@ const CardTemplatesList = ({ webCardKey }: Props) => {
   );
 
   const onDone = useCallback(() => {
+    if (!webCard.userName) {
+      Sentry.captureMessage('null username in CardTemplateList / onDone');
+      return;
+    }
     router.replace({
       route: 'WEBCARD',
       params: {

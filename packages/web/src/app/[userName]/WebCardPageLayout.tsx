@@ -108,6 +108,9 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
   const searchParams = useSearchParams();
   const hasContactCard = !!searchParams.get('c');
 
+  if (!webCard.userName) {
+    return undefined;
+  }
   return (
     <>
       <div className={styles.wrapper}>

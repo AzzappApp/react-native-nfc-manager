@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react-native';
 import range from 'lodash/range';
 import {
   useMemo,
@@ -189,9 +190,15 @@ const CoverLinkWithOptionsItem = ({
     const { profileInfos } = getAuthState();
 
     if (profileInfoHasEditorRight(profileInfos)) {
-      startTransition(() => {
-        toggleFollow(props.webCardId, userName, !isFollowing);
-      });
+      if (!userName) {
+        Sentry.captureMessage(
+          'null username in MediaSuggesionsWebCards / onPress',
+        );
+      } else {
+        startTransition(() => {
+          toggleFollow(props.webCardId, userName, !isFollowing);
+        });
+      }
     } else if (isFollowing) {
       Toast.show({
         type: 'error',

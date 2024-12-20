@@ -112,7 +112,9 @@ const CoverEditionScreen = ({
   const hasCover = !!savedCoverState;
   const onCancelRef = useLatestCallback(onCancel);
   useEffect(() => {
-    if (!loading && !hasCover) {
+    if (data.node?.profile?.webCard?.coverIsPredefined) {
+      onNewCover();
+    } else if (!loading && !hasCover) {
       Alert.alert(
         intl.formatMessage({
           defaultMessage: 'Some files are missing',
@@ -143,7 +145,14 @@ const CoverEditionScreen = ({
         ],
       );
     }
-  }, [hasCover, intl, loading, onCancelRef, onNewCover]);
+  }, [
+    data.node?.profile?.webCard?.coverIsPredefined,
+    hasCover,
+    intl,
+    loading,
+    onCancelRef,
+    onNewCover,
+  ]);
 
   if (!profile) {
     return null;
@@ -235,6 +244,7 @@ const query = graphql`
           coverId
           requiresSubscription
           isPremium
+          coverIsPredefined
         }
       }
     }

@@ -5,7 +5,7 @@ export type CoverLinkRendererProps = CoverRendererProps & {
   /**
    * The username of the webCard, used to navigate to the profile
    */
-  userName: string;
+  userName?: string | null;
   /**
    * The webCard ID of the user, used to animate the cover when opening the profile
    * on iOS

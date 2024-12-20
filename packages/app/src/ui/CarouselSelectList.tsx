@@ -101,6 +101,11 @@ export type CarouselSelectListProps<TItem = any> = Omit<
    * stick it here and treat it immutably.
    */
   extraData?: any | undefined;
+
+  /**
+   * @param width new width of carousel item
+   */
+  onItemWidthUpdated?: (width: number) => void;
 };
 
 export type CarouselSelectListHandle = {
@@ -126,6 +131,7 @@ function CarouselSelectList<TItem = any>(
     extraData,
     currentProfileIndexSharedValue,
     onSelectedIndexChange,
+    onItemWidthUpdated,
     ...props
   }: CarouselSelectListProps<TItem>,
   ref: ForwardedRef<CarouselSelectListHandle>,
@@ -149,18 +155,27 @@ function CarouselSelectList<TItem = any>(
       if (height !== 0 && width !== 0) {
         setContainerHeight(height);
         setContainerWidth(width);
+        onItemWidthUpdated?.(
+          PixelRatio.roundToNearestPixel(height * itemRatio),
+        );
       }
     });
-  }, []);
+  }, [itemRatio, onItemWidthUpdated]);
 
-  const onLayout = useCallback((e: LayoutChangeEvent) => {
-    const { height, width } = e.nativeEvent.layout;
-    //on first render android might return 0 for height and width ... so we need to wait for the next render
-    if (height !== 0 && width !== 0) {
-      setContainerHeight(height);
-      setContainerWidth(width);
-    }
-  }, []);
+  const onLayout = useCallback(
+    (e: LayoutChangeEvent) => {
+      const { height, width } = e.nativeEvent.layout;
+      //on first render android might return 0 for height and width ... so we need to wait for the next render
+      if (height !== 0 && width !== 0) {
+        setContainerHeight(height);
+        setContainerWidth(width);
+        onItemWidthUpdated?.(
+          PixelRatio.roundToNearestPixel(height * itemRatio),
+        );
+      }
+    },
+    [itemRatio, onItemWidthUpdated],
+  );
 
   const listRef = useRef<FlatList>(null);
   useImperativeHandle(

@@ -230,7 +230,7 @@ const DownloadVCard = ({
                 description="Save contact with AppClip modal message"
               />
             </LinkButton>
-          ) : fileUrl ? (
+          ) : fileUrl && webCard.userName ? (
             <DownloadVCardLinkButton
               size="medium"
               href={fileUrl}

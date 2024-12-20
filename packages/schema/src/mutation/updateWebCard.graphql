@@ -6,8 +6,10 @@ input UpdateWebCardInput {
   firstName: String
   lastName: String
   companyName: String
-  webCardCategoryId: ID
-  companyActivityId: ID
+  webCardCategoryId: ID @deprecated(reason: "use only companyActivityLabel")
+  companyActivityId: ID @deprecated(reason: "use only companyActivityLabel")
+  companyActivityLabel: String
+  userName: String
 }
 
 type UpdateWebCardPayload {

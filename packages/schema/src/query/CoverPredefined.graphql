@@ -1,0 +1,26 @@
+"""
+Template for a cover
+"""
+type CoverPredefined implements Node {
+  """
+  The ID of an object
+  """
+  id: ID!
+  """
+  The media associated to the predefined cover
+  """
+  media: Media!
+  """
+  The color triptych for the media
+  """
+  defaultTriptychColors: DefaultTriptychColors!
+}
+
+"""
+A set of colors used by default with this predefined cover
+"""
+type DefaultTriptychColors {
+  dark: String!
+  light: String!
+  primary: String!
+}

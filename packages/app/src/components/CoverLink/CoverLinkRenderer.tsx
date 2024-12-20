@@ -1,8 +1,8 @@
 import { memo, useMemo } from 'react';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
+import LinkWebCard from '#components/LinkWebCard';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
 import CoverRenderer from '../CoverRenderer';
-import Link from '../Link';
 import type { CoverLinkRendererProps } from './coverLinkTypes';
 
 /**
@@ -30,16 +30,11 @@ const CoverLink = ({
   );
 
   return (
-    <Link
-      route="WEBCARD"
-      params={props}
-      prefetch={prefetch}
-      disabled={disabled}
-    >
+    <LinkWebCard params={props} prefetch={prefetch} disabled={disabled}>
       <PressableScaleHighlight style={containerStyle} onLongPress={onLongPress}>
         <CoverRenderer {...props} style={coverStyle} />
       </PressableScaleHighlight>
-    </Link>
+    </LinkWebCard>
   );
 };
 

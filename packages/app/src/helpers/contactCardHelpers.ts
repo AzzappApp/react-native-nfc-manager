@@ -26,7 +26,7 @@ export const buildContactCardModalStyleSheet = (appareance: ColorSchemeName) =>
       justifyContent: 'space-between',
       alignItems: 'center',
       minHeight: MIN_FIELD_HEIGHT,
-      paddingHorizontal: 30,
+      paddingHorizontal: 10,
       backgroundColor: appareance === 'light' ? 'white' : 'black',
     },
     fieldCommon: {
@@ -34,7 +34,7 @@ export const buildContactCardModalStyleSheet = (appareance: ColorSchemeName) =>
       justifyContent: 'flex-start',
       alignItems: 'center',
       minHeight: MIN_FIELD_HEIGHT,
-      paddingLeft: 18,
+      paddingLeft: 10,
       backgroundColor: appareance === 'light' ? 'white' : 'black',
     },
     addButton: {
@@ -42,7 +42,8 @@ export const buildContactCardModalStyleSheet = (appareance: ColorSchemeName) =>
       alignItems: 'center',
       columnGap: 7,
       minHeight: MIN_FIELD_HEIGHT,
-      paddingHorizontal: 20,
+      paddingRight: 20,
+      paddingLeft: 10,
       backgroundColor: appareance === 'light' ? 'white' : 'black',
     },
     sectionsContainer: {
@@ -55,10 +56,10 @@ export const buildContactCardModalStyleSheet = (appareance: ColorSchemeName) =>
       height: undefined,
       backgroundColor: 'transparent',
       borderWidth: 0,
-      paddingLeft: 16,
       paddingRight: 0,
       ...textStyles.medium,
     },
+    fieldTitle: { minWidth: 120 },
   }) as const;
 
 export const contactCardEditModalStyleSheet = createStyleSheet(

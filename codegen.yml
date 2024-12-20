@@ -31,6 +31,7 @@ generates:
         CoverTemplate: '@azzapp/data#CoverTemplate as CoverTemplateModel'
         CoverTemplateType: '@azzapp/data#CoverTemplateType as CoverTemplateTypeModel'
         CoverTemplateTag: '@azzapp/data#CoverTemplateTag as CoverTemplateTagModel'
+        CoverPredefined: '@azzapp/data#CoverPredefined as CoverPredefinedModel'
         CardCover: '@azzapp/data#WebCard as WebCardModel'
         CardModule: '@azzapp/data#CardModule as CardModuleModel'
         CardModuleCarousel: '@azzapp/data#CardModuleCarousel as CardModuleCarouselModel'

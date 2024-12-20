@@ -59,7 +59,7 @@ const WebCardTemplateSelectionScreen = ({
   const cardTemplateListRef = useRef<CardTemplateListHandle>(null);
   const router = useRouter();
   const onDone = useCallback(() => {
-    if (!profile || !profile.webCard) {
+    if (!profile?.webCard?.userName) {
       return;
     }
     const {

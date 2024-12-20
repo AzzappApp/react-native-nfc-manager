@@ -117,10 +117,12 @@ const ProfilePostNavigation = (props: WebCardPostNavigationProps) => {
           </span>
         </ButtonIcon>
       </div>
-      <ShareModal
-        ref={modal}
-        link={generateShareProfileLink(webCard.userName)}
-      />
+      {webCard.userName ? (
+        <ShareModal
+          ref={modal}
+          link={generateShareProfileLink(webCard.userName)}
+        />
+      ) : undefined}
     </>
   );
 };

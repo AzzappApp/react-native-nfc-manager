@@ -17,6 +17,7 @@ type MediasListInputProps = Omit<BoxProps, 'onChange'> & {
   buttonLabel?: string;
   onChange: (media: File | null | undefined) => void;
   buttonStyle?: CSSProperties;
+  showDeleteIcon?: boolean;
 };
 
 const MediaInput = ({
@@ -31,6 +32,7 @@ const MediaInput = ({
   titleVariant = 'h6',
   style,
   buttonStyle,
+  showDeleteIcon = true,
   ...props
 }: MediasListInputProps) => {
   const handleImageUpload = (event: ChangeEvent<HTMLInputElement>) => {
@@ -99,7 +101,7 @@ const MediaInput = ({
             />
           )}
         </div>
-        {value && (
+        {value && showDeleteIcon && (
           <IconButton
             onClick={handleImageDelete}
             sx={{
@@ -115,7 +117,7 @@ const MediaInput = ({
         )}
       </Box>
       <Button component="label" variant="outlined" style={buttonStyle}>
-        {buttonLabel || 'Add Media'}
+        {buttonLabel || value ? 'Edit Media' : 'Add Media'}
         <input
           name={name}
           type="file"

@@ -111,7 +111,6 @@ const WizardPagerHeader = ({
           {rightElement}
         </View>
       </View>
-      <PageProgress nbPages={nbPages} currentPage={currentPage} />
     </View>
   );
 };
@@ -120,7 +119,7 @@ export default WizardPagerHeader;
 
 const CIRCLE_SIZE = 5;
 
-export const PAGER_HEADER_HEIGHT = 85;
+export const PAGER_HEADER_HEIGHT = 65;
 
 const styleSheet = createStyleSheet(appearance => ({
   root: {

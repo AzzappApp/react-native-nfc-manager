@@ -50,18 +50,6 @@ const backOfficeSections: Array<Section | SubSection> = [
         href: '/webCardCategories',
         roles: [ADMIN],
       },
-      {
-        id: 'companyActivities',
-        text: 'Activities',
-        href: '/companyActivities',
-        roles: [ADMIN],
-      },
-      {
-        id: 'companyActivitiesTypes',
-        text: 'Activities Types',
-        href: '/companyActivitiesTypes',
-        roles: [ADMIN],
-      },
     ],
   },
   {
@@ -109,6 +97,12 @@ const backOfficeSections: Array<Section | SubSection> = [
         id: 'coverTemplateFilters',
         text: 'Cover template filters',
         href: '/coverTemplateFilters',
+        roles: [ADMIN],
+      },
+      {
+        id: 'predefinedCover',
+        text: 'Predefined Covers',
+        href: '/predefinedCovers',
         roles: [ADMIN],
       },
     ],

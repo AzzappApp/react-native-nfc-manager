@@ -387,6 +387,12 @@ const AddContactModal = ({
 
   useEffect(() => {
     (async () => {
+      if (!webCard.userName) {
+        Sentry.captureMessage(
+          'null username in AddContactModal / in contact build',
+        );
+        return;
+      }
       if (!scanned && contactData && webCard) {
         const { contact, webCardId, profileId } = await buildContact(
           contactData,

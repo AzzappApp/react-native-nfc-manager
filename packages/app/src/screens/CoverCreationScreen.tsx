@@ -122,7 +122,7 @@ const CoverCreationScreen = ({
     coverEditorRef.current?.save().then(() => {
       if (fromCoverEdition) {
         router.pop(2);
-      } else if (profile?.webCard) {
+      } else if (profile?.webCard?.userName) {
         router.splice(
           {
             route: 'WEBCARD',

@@ -17,13 +17,13 @@ import Select from '#ui/Select';
 import SelectList from '#ui/SelectList';
 import Text from '#ui/Text';
 import type { ProfileRole } from '#relayArtifacts/MultiUserScreenQuery.graphql';
-import type { ContactCardEditFormValues } from '#screens/ContactCardEditScreen/ContactCardEditModalSchema';
+import type { ContactCardFormValues } from '#screens/ContactCardEditScreen/ContactCardSchema';
 import type { SelectListItemInfo } from '#ui/SelectList';
 import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
 import type { CountryCode } from 'libphonenumber-js';
 import type { Control } from 'react-hook-form';
 
-export type MultiUserAddFormValues = ContactCardEditFormValues & {
+export type MultiUserAddFormValues = ContactCardFormValues & {
   selectedContact: {
     countryCodeOrEmail: CountryCode | 'email';
     value: string;

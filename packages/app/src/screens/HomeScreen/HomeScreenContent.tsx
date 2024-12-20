@@ -10,7 +10,9 @@ import useScreenInsets from '#hooks/useScreenInsets';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import HomeBackground from './HomeBackground';
 import HomeBottomPanel from './HomeBottomPanel';
+import { HomeBottomSheetModalWebCardToolTip } from './HomeBottomSheetModalWebCardToolTip';
 import HomeBottomSheetPanel from './HomeBottomSheetPanel';
+import HomeBottomSheetPopupPanel from './HomeBottomSheetPopupPanel';
 import HomeHeader from './HomeHeader';
 import HomeProfileLink from './HomeProfileLink';
 import HomeProfilesCarousel from './HomeProfilesCarousel';
@@ -39,14 +41,18 @@ const HomeScreenContent = ({
           profileRole
           invited
           webCard {
+            id
             cardIsPublished
+            userName
           }
           ...HomeBottomSheetPanel_profile
+          ...HomeBottomSheetModalWebCardToolTip_profile
         }
         ...HomeBackground_user
         ...HomeProfileLink_user
         ...HomeProfilesCarousel_user
         ...HomeBottomPanel_user
+        ...HomeHeader_user
         ...HomeHeader_user
       }
     `,
@@ -93,6 +99,24 @@ const HomeScreenContent = ({
       runOnJS(setCurrentProfile)(cProfile);
     },
   );
+
+  const unknownUserNameWebcardId = useMemo(() => {
+    const emptyProfile = user.profiles?.find(
+      profile =>
+        !profile.webCard?.userName || profile.webCard?.userName.length === 0,
+    );
+    const webCardId = emptyProfile?.webCard?.id;
+    if (emptyProfile && webCardId) {
+      return {
+        webCardId,
+        profileId: emptyProfile.id,
+        profileRole: emptyProfile.profileRole,
+        invited: false,
+      };
+    } else {
+      return undefined;
+    }
+  }, [user.profiles]);
 
   // TODO: here we rely on polling on HOME to check if the profileRole has changed. We should have a better way to keep our app state in sync with the server.
   useEffect(() => {
@@ -142,6 +166,9 @@ const HomeScreenContent = ({
         close={closeMenu}
         profile={currentProfile ?? null}
       />
+      <HomeBottomSheetModalWebCardToolTip user={currentProfile ?? null} />
+
+      <HomeBottomSheetPopupPanel profileInfo={unknownUserNameWebcardId} />
     </View>
   );
 };

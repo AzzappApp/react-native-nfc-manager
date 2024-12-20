@@ -45,7 +45,7 @@ const quitWebCard: Mutation = async (_, params) => {
 
       await markWebCardAsDeleted(profile.webCardId, userId);
     });
-    if (webCard) {
+    if (webCard?.userName) {
       invalidateWebCard(webCard.userName);
     }
   } else {

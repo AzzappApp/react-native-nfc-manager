@@ -110,6 +110,9 @@ const icons = {
   get check_round() {
     return require('./assets/check_round.png');
   },
+  get check_filled() {
+    return require('./assets/check_filled.png');
+  },
   get chrono() {
     return require('./assets/chrono.png');
   },

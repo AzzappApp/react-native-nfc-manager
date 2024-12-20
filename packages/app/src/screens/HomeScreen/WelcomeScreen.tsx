@@ -96,7 +96,10 @@ const WelcomeScreen = ({
             }}
           />
         </Text>
-        <Link route="WEBCARD_KIND_SELECTION" prefetch>
+        <Link
+          route="CONTACT_CARD_CREATE"
+          params={{ launchedFromWelcomeScreen: true }}
+        >
           <Button
             label={intl.formatMessage(
               {

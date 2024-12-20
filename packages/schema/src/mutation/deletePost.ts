@@ -36,10 +36,10 @@ const deletePostMutation: MutationResolvers['deletePost'] = async (
     console.error(error);
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
-
-  invalidatePost(webCard.userName, post.id);
-  invalidateWebCard(webCard.userName);
-
+  if (webCard.userName) {
+    invalidatePost(webCard.userName, post.id);
+    invalidateWebCard(webCard.userName);
+  }
   return {
     postId: gqlPostId,
   };

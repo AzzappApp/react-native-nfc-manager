@@ -1,0 +1,197 @@
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { useIntl } from 'react-intl';
+import { View, StyleSheet } from 'react-native';
+import { graphql, useMutation } from 'react-relay';
+import { useDebounce } from 'use-debounce';
+import { z } from 'zod';
+import Button from '#ui/Button';
+import Header from '#ui/Header';
+import InputAccessoryView from '#ui/InputAccessoryView';
+import Text from '#ui/Text';
+import TextInput from '#ui/TextInput';
+
+const companyActivityLabelFormSchema = z.object({
+  companyActivityLabel: z.string(),
+});
+
+type CompanyActivityLabelForm = z.infer<typeof companyActivityLabelFormSchema>;
+
+type WebcardParametersCompanyActivityLabelFormProps = {
+  visible: boolean;
+  toggleBottomSheet: () => void;
+  webCard: {
+    id: string;
+    companyActivityLabel: string | null;
+  };
+};
+const WebcardParametersCompanyActivityLabelForm = ({
+  webCard,
+  visible,
+  toggleBottomSheet,
+}: WebcardParametersCompanyActivityLabelFormProps) => {
+  const {
+    control,
+    handleSubmit,
+    setError,
+    watch,
+    trigger,
+    formState: { isSubmitting, errors },
+    reset,
+  } = useForm<CompanyActivityLabelForm>({
+    defaultValues: {
+      companyActivityLabel: webCard.companyActivityLabel ?? '',
+    },
+    mode: 'onSubmit',
+    resolver: zodResolver(companyActivityLabelFormSchema),
+  });
+
+  useEffect(() => {
+    if (visible) {
+      reset();
+    }
+  }, [reset, visible]);
+
+  const intl = useIntl();
+
+  const [commitMutation] = useMutation(graphql`
+    mutation WebCardParametersCompanyActivityLabelFormMutation(
+      $webCardId: ID!
+      $input: UpdateWebCardInput!
+    ) {
+      updateWebCard(webCardId: $webCardId, input: $input) {
+        webCard {
+          id
+          companyActivityLabel
+        }
+      }
+    }
+  `);
+
+  const onSubmit = handleSubmit(async ({ companyActivityLabel }) => {
+    commitMutation({
+      variables: {
+        webCardId: webCard.id,
+        input: {
+          companyActivityLabel,
+        },
+      },
+      onCompleted: () => {
+        toggleBottomSheet();
+      },
+      onError: () => {
+        setError('root.server', {
+          message: intl.formatMessage({
+            defaultMessage: 'Unknown error - Please retry',
+            description:
+              'WebcardParameters activitt form - Error Unknown error - Please retry',
+          }),
+        });
+      },
+    });
+  });
+
+  const companyActivityLabel = watch('companyActivityLabel');
+  const [debouncedCompanyActivityLabel] = useDebounce(
+    companyActivityLabel,
+    200,
+  );
+
+  const companyActivityLabelError =
+    webCard.companyActivityLabel !== companyActivityLabel &&
+    errors.companyActivityLabel;
+
+  useEffect(() => {
+    if (debouncedCompanyActivityLabel) {
+      void trigger('companyActivityLabel');
+    }
+  }, [debouncedCompanyActivityLabel, trigger]);
+
+  return (
+    <InputAccessoryView visible={visible} onClose={toggleBottomSheet}>
+      <Header
+        middleElement={intl.formatMessage({
+          defaultMessage: 'Edit company activity',
+          description: 'Edit Webcard company activity modal title',
+        })}
+        leftElement={
+          <Button
+            label={intl.formatMessage({
+              defaultMessage: 'Cancel',
+              description:
+                'Edit Webcard company activity modal cancel button label',
+            })}
+            onPress={toggleBottomSheet}
+            variant="secondary"
+            style={styles.headerButton}
+          />
+        }
+        rightElement={
+          <Button
+            loading={isSubmitting}
+            disabled={
+              isSubmitting ||
+              webCard.companyActivityLabel === companyActivityLabel
+            }
+            label={intl.formatMessage({
+              defaultMessage: 'Save',
+              description: 'Edit Webcard activity modal save button label',
+            })}
+            onPress={onSubmit}
+            variant="primary"
+            style={styles.headerButton}
+          />
+        }
+      />
+
+      <View style={styles.controllerContainer}>
+        <Controller
+          control={control}
+          name="companyActivityLabel"
+          render={({ field: { onChange, value } }) => (
+            <View style={styles.inputContainer}>
+              <TextInput
+                nativeID="companyActivityLabel"
+                accessibilityLabelledBy="companyActivityLabelLabel"
+                placeholder={intl.formatMessage({
+                  defaultMessage: 'Select a WebCard activity',
+                  description:
+                    'ProfileForm company ActivityLabel textinput placeholder',
+                })}
+                isErrored={!!companyActivityLabelError}
+                value={value}
+                onChangeText={text => onChange(text)}
+                autoCapitalize="none"
+                autoComplete="off"
+                autoCorrect={false}
+                returnKeyType="next"
+                onSubmitEditing={onSubmit}
+                autoFocus
+              />
+            </View>
+          )}
+        />
+      </View>
+      {companyActivityLabelError ? (
+        <Text variant="error">{companyActivityLabelError.message}</Text>
+      ) : null}
+      {errors.root?.server ? (
+        <Text variant="error">{errors.root.server.message}</Text>
+      ) : null}
+    </InputAccessoryView>
+  );
+};
+
+const styles = StyleSheet.create({
+  headerButton: { paddingHorizontal: 5, minWidth: 74 },
+  inputContainer: { flex: 1, height: 50, paddingHorizontal: 10 },
+  controllerContainer: {
+    paddingVertical: 10,
+    gap: 5,
+    flexDirection: 'row',
+    width: '100%',
+  },
+});
+
+export default WebcardParametersCompanyActivityLabelForm;

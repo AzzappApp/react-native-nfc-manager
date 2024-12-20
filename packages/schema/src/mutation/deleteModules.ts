@@ -60,9 +60,9 @@ const deleteModules: MutationResolvers['deleteModules'] = async (
   if (!webCard) {
     throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
   }
-
-  invalidateWebCard(webCard.userName);
-
+  if (webCard.userName) {
+    invalidateWebCard(webCard.userName);
+  }
   return { webCard };
 };
 

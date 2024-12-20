@@ -62,15 +62,18 @@ const saveCover: MutationResolvers['saveCover'] = async (
         coverDynamicLinks: dynamicLinks ?? undefined,
         coverPreviewPositionPercentage,
         coverId: createId(),
+        coverIsPredefined: false,
       };
       await updateWebCard(webCard.id, updates);
       updatedWebCard = { ...updatedWebCard, ...updates };
     });
-
-    invalidateWebCard(webCard.userName);
-    const posts = await getWebCardPosts(webCard.id);
-    posts.forEach(post => invalidatePost(webCard.userName, post.id));
-
+    if (webCard.userName) {
+      invalidateWebCard(webCard.userName);
+      const posts = await getWebCardPosts(webCard.id);
+      posts.forEach(
+        post => webCard.userName && invalidatePost(webCard.userName, post.id),
+      );
+    }
     return { webCard: updatedWebCard };
   } catch (error) {
     console.log(error);

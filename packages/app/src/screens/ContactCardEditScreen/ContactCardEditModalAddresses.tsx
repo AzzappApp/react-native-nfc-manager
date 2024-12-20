@@ -13,13 +13,13 @@ import {
   contactCardEditModalStyleSheet,
   useContactCardAddressLabels,
 } from '../../helpers/contactCardHelpers';
-import type { ContactCardEditFormValues } from './ContactCardEditModalSchema';
+import type { ContactCardFormValues } from './ContactCardSchema';
 import type { Control } from 'react-hook-form';
 
 const ContactCardEditModalAddresses = ({
   control,
 }: {
-  control: Control<ContactCardEditFormValues>;
+  control: Control<ContactCardFormValues>;
 }) => {
   const { fields, append, remove } = useFieldArray({
     control,

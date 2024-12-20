@@ -27,12 +27,8 @@ export const webCardRequiresSubscription = (
     isMultiUser: boolean;
   },
 ) => {
-  if (
-    _webCard.isMultiUser ||
-    (_webCard.webCardKind && isWebCardKindSubscription(_webCard.webCardKind))
-  )
-    return true;
   return (
+    _webCard.isMultiUser ||
     moduleCountRequiresSubscription(_modules.length) ||
     _modules.some(module => isModuleKindSubscription(module.kind))
   );

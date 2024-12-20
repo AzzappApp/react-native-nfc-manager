@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react-native';
 import { useEffect, useRef } from 'react';
 import { useRelayEnvironment } from 'react-relay';
 import { COVER_CARD_RADIUS } from '@azzapp/shared/coverHelpers';
@@ -41,6 +42,12 @@ const CoverLink = ({
     }
     const container = ref.current;
     if (!container) {
+      if (!userName) {
+        Sentry.captureMessage(
+          'null username in CoverLinkRendered ios / onPress',
+        );
+        return;
+      }
       router.push({
         route: 'WEBCARD',
         params: {
@@ -51,6 +58,12 @@ const CoverLink = ({
     }
     container.measureInWindow(async (x, y, width, height) => {
       await mediaRef.current?.snapshot();
+      if (!userName) {
+        Sentry.captureMessage(
+          'null username in CoverLinkRendered ios / measureInWindow',
+        );
+        return;
+      }
       router.push({
         route: 'WEBCARD',
         params: {
@@ -66,6 +79,7 @@ const CoverLink = ({
   useEffect(() => {
     let disposable: Disposable | null = null;
     if (prefetch) {
+      if (!userName) return;
       disposable = prefetchScreen(environment, {
         route: 'WEBCARD',
         params: {

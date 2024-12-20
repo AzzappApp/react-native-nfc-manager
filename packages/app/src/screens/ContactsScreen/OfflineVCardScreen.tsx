@@ -189,6 +189,9 @@ const OfflineVCardScreen = () => {
         ?.map(data => {
           const contactCard = data.contactCard as ContactCard;
           const webCard = data.webCard;
+          if (!webCard?.userName) {
+            return undefined;
+          }
           if (!webCard || !webCard.cardIsPublished) return undefined;
           const vCard = new VCard();
           vCard.addName(

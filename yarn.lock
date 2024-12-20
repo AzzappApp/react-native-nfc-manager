@@ -425,6 +425,7 @@ __metadata:
     "@paralleldrive/cuid2": "npm:^2.2.2"
     "@sentry/nextjs": "npm:^7.113.0"
     "@types/jsonwebtoken": "npm:^9.0.7"
+    "@types/latinize": "npm:^0.2.18"
     "@types/lodash": "npm:^4.17.13"
     dataloader: "npm:^2.2.3"
     eslint: "npm:^9.17.0"
@@ -435,6 +436,7 @@ __metadata:
     graphql-scalars: "npm:^1.24.0"
     graphql-shield: "npm:^7.6.5"
     graphql-tag: "npm:^2.12.6"
+    latinize: "npm:^2.0.0"
     lodash: "npm:^4.17.21"
     pexels: "npm:^1.4.0"
     typescript: "npm:^5.7.2"
@@ -11440,6 +11442,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/latinize@npm:^0.2.18":
+  version: 0.2.18
+  resolution: "@types/latinize@npm:0.2.18"
+  checksum: 10/72dda24bdf09d07c4984652d7ec113b7fec37edbd6dd2ef4c3b3b17c825d6ff0d23c01b88eea66044f9c0307e827f18226db6c1d4ecd10c301e5bc1ed20dd38d
+  languageName: node
+  linkType: hard
+
 "@types/lodash@npm:^4.14.175":
   version: 4.14.202
   resolution: "@types/lodash@npm:4.14.202"
@@ -20174,6 +20183,13 @@ __metadata:
   version: 3.0.3
   resolution: "kleur@npm:3.0.3"
   checksum: 10/0c0ecaf00a5c6173d25059c7db2113850b5457016dfa1d0e3ef26da4704fbb186b4938d7611246d86f0ddf1bccf26828daa5877b1f232a65e7373d0122a83e7f
+  languageName: node
+  linkType: hard
+
+"latinize@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "latinize@npm:2.0.0"
+  checksum: 10/5dfa41b3e0a6c73aa278e62d53578afd6372ef88cb9dbdd5928b9ba98c5a021ba9b783d2b9702513361fb28e7e58e5c4a362b2bbb24182aae178417bda2a81f2
   languageName: node
   linkType: hard
 

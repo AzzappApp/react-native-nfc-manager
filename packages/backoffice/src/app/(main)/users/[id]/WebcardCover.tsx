@@ -36,7 +36,7 @@ const WebCardCover = ({
         <CardMedia
           sx={{ height: HEIGHT }}
           component="video"
-          title={webcard.userName}
+          title={webcard.userName || ''}
           image={getVideoURL(webcard.coverMediaId)}
           controls
         />
@@ -44,7 +44,7 @@ const WebCardCover = ({
         <CardMedia
           sx={{ height: HEIGHT }}
           component="img"
-          title={webcard.userName}
+          title={webcard.userName || ''}
           image={getImageURLForSize({ id: webcard.coverMediaId || '' })}
         />
       )}

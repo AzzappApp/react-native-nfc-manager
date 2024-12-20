@@ -40,6 +40,8 @@ const CommentFeedActions = (props: CommentFeedActionsProps) => {
     });
   }, [defaultPost.id]);
 
+  if (!webCard.userName) return undefined;
+
   return (
     <>
       <div className={styles.wrapper}>

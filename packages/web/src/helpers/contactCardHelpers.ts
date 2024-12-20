@@ -1,6 +1,6 @@
 export const displayName = (
   contact: { firstName?: string; lastName?: string; company?: string },
-  webCard: { userName: string } | null,
+  webCard: { userName?: string | null } | null,
 ) => {
   if (contact.firstName || contact.lastName) {
     return `${contact.firstName ?? ''}  ${contact.lastName ?? ''}`.trim();

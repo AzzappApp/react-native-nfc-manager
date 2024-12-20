@@ -54,18 +54,6 @@ export type ForgotPasswordConfirmationRoute = {
   };
 };
 
-export type WebCardKindSelectionRoute = {
-  route: 'WEBCARD_KIND_SELECTION';
-  params?: never;
-};
-
-export type WebCardFormRoute = {
-  route: 'WEBCARD_FORM';
-  params: {
-    webCardCategoryId: string;
-  };
-};
-
 export type CoverTemplateSelectionRoute = {
   route: 'COVER_TEMPLATE_SELECTION';
   params?: {
@@ -230,6 +218,13 @@ export type ContactCardEditRoute = {
   params?: never;
 };
 
+export type ContactCardCreateRoute = {
+  route: 'CONTACT_CARD_CREATE';
+  params?: {
+    launchedFromWelcomeScreen: boolean;
+  };
+};
+
 export type MultiUserDetailRoute = {
   route: 'MULTI_USER_DETAIL';
   params: {
@@ -273,6 +268,7 @@ export type Route =
   | CommonInformationRoute
   | ConfirmChangeContactRoute
   | ConfirmRegistrationRoute
+  | ContactCardCreateRoute
   | ContactCardEditRoute
   | ContactCardRoute
   | ContactDetailsRoute
@@ -305,8 +301,6 @@ export type Route =
   | SignInRoute
   | SignUpRoute
   | UserPayWallRoute
-  | WebCardFormRoute
-  | WebCardKindSelectionRoute
   | WebCardParametersRoute
   | WebCardRoute
   | WebCardTemplateSelectionRoute;

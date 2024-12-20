@@ -3,7 +3,6 @@ import { graphql, useFragment } from 'react-relay';
 import { addAuthStateListener } from '#helpers/authStore';
 import { getRelayEnvironment } from '#helpers/relayEnvironment';
 import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
-import { useHomeScreenContext } from './HomeScreenContext';
 import type { HomeScreenPrefetcher_user$key } from '#relayArtifacts/HomeScreenPrefetcher_user.graphql';
 import type { Disposable } from 'react-relay';
 
@@ -26,24 +25,7 @@ const HomeScreenPrefetcher = ({ user: userKey }: HomeScreenPrefetcherProps) => {
     userKey,
   );
 
-  const { currentIndexProfileSharedValue } = useHomeScreenContext();
-
   const prefetchRoute = usePrefetchRoute();
-  useEffect(() => {
-    let disposable: Disposable | undefined;
-    const timeout = setTimeout(() => {
-      if (currentIndexProfileSharedValue.get() === 0) {
-        disposable = prefetchRoute(getRelayEnvironment(), {
-          route: 'WEBCARD_KIND_SELECTION',
-        });
-      }
-    }, PREFETCH_DELAY);
-    return () => {
-      disposable?.dispose();
-      clearTimeout(timeout);
-    };
-  }, [currentIndexProfileSharedValue, prefetchRoute]);
-
   const profilesRef = useRef(user.profiles);
   useEffect(() => {
     profilesRef.current = user.profiles;
@@ -61,14 +43,18 @@ const HomeScreenPrefetcher = ({ user: userKey }: HomeScreenPrefetcherProps) => {
           );
           if (profile?.webCard) {
             const environment = getRelayEnvironment();
+            if (profile.webCard.userName) {
+              profilesDisposables.push(
+                prefetchRoute(environment, {
+                  route: 'WEBCARD',
+                  params: {
+                    webCardId: profileInfos.webCardId,
+                    userName: profile.webCard.userName,
+                  },
+                }),
+              );
+            }
             profilesDisposables.push(
-              prefetchRoute(environment, {
-                route: 'WEBCARD',
-                params: {
-                  webCardId: profileInfos.webCardId,
-                  userName: profile.webCard.userName,
-                },
-              }),
               prefetchRoute(environment, {
                 route: 'CONTACT_CARD',
               }),

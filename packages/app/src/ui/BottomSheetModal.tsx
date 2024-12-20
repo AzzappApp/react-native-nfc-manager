@@ -18,6 +18,7 @@ import type {
   BottomSheetBackdropProps,
   BottomSheetModalProps,
 } from '@gorhom/bottom-sheet';
+import type { ViewStyle } from 'react-native';
 
 export type Props = BottomSheetModalProps & {
   children?: React.ReactNode | undefined;
@@ -71,8 +72,18 @@ export type Props = BottomSheetModalProps & {
   dismissKeyboardOnOpening?: boolean;
 
   /**
+   * Additionnal style for the background (append to default style)
+   */
+  backgroundStyle?: ViewStyle;
+
+  /*
+   * show shadow on top of modal
+   */
+  showShadow?: boolean;
+
+  /**
    * this props enable the resizing of the bottom sheet on its content when scrolling
-   * Thiis used in addition with SnapPoint props that need to contain at least 2 values
+   * This used in addition with SnapPoint props that need to contain at least 2 values
    * don't delete before reading the purpose and it is used
    *
    * @type {boolean}
@@ -94,6 +105,8 @@ const BottomSheetModal = ({
   closeOnBackdropTouch = true,
   variant,
   dismissKeyboardOnOpening = false,
+  backgroundStyle,
+  showShadow = true,
   nestedScroll = false,
   ...props
 }: Props) => {
@@ -124,7 +137,7 @@ const BottomSheetModal = ({
         enableContentPanningGesture != null
           ? enableContentPanningGesture
           : showHandleIndicator,
-      style: [styles.modalContainer, style],
+      style: showShadow ? [styles.modalContainer, style] : style,
     };
     if (height !== null && height !== undefined && height > 0) {
       return {
@@ -143,6 +156,7 @@ const BottomSheetModal = ({
     enableContentPanningGesture,
     height,
     showHandleIndicator,
+    showShadow,
     style,
     styles.modalContainer,
   ]);
@@ -169,13 +183,16 @@ const BottomSheetModal = ({
     [closeOnBackdropTouch, variant],
   );
 
+  const backgroundStyleInner = backgroundStyle
+    ? [styles.backgroundStyle, backgroundStyle]
+    : styles.backgroundStyle;
   return (
     <BottomSheetModalG
       ref={bottomSheetModalRef}
       enableDismissOnClose
       handleIndicatorStyle={styles.gestureInteractionIndicator}
       handleStyle={styles.handleStyle}
-      backgroundStyle={styles.backgroundStyle}
+      backgroundStyle={backgroundStyleInner}
       handleComponent={showHandleIndicator ? undefined : null}
       backdropComponent={renderBackdrop}
       keyboardBlurBehavior="restore"
