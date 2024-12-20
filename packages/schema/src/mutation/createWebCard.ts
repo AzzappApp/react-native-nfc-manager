@@ -8,7 +8,6 @@ import {
   createProfile,
   getWebCardByUserNameWithRedirection,
   transaction,
-  getProfileById,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { isValidUserName } from '@azzapp/shared/stringHelpers';
@@ -90,20 +89,36 @@ const createWebCardMutation: MutationResolvers['createWebCard'] = async (
   try {
     const profile = await transaction(async () => {
       const webCardId = await createWebCard(inputWebCard);
-      const profileId = await createProfile({
+      const currentDate = new Date();
+      const profileData = {
         webCardId,
         userId,
         contactCard,
-        lastContactCardUpdate: new Date(),
+        lastContactCardUpdate: currentDate,
         inviteSent: true,
-      });
-      return getProfileById(profileId);
+      };
+      const profileId = await createProfile(profileData);
+      return {
+        id: profileId,
+        ...profileData,
+        profileRole: 'owner',
+        invited: false,
+        invitedBy: null,
+        promotedAsOwner: false,
+        avatarId: null,
+        logoId: null,
+        contactCardIsPrivate: true,
+        contactCardDisplayedOnWebCard: false,
+        createdAt: currentDate,
+        nbContactCardScans: 0,
+        nbShareBacks: 0,
+        deleted: false,
+        deletedAt: null,
+        deletedBy: null,
+        lastContactViewAt: currentDate,
+      } as const;
     });
 
-    if (!profile) {
-      Sentry.captureMessage('Profile not found after creation');
-      throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
-    }
     return { profile };
   } catch (error) {
     Sentry.captureException(error);
