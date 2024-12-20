@@ -1,5 +1,5 @@
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { isNotFalsyString, isValidUrl } from '@azzapp/shared/stringHelpers';
@@ -43,6 +43,14 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
   const [linkAction, setLinkAction] = useState(cardModuleMedia.link?.label);
   const [hasLinkError, setHasLinkError] = useState(false);
 
+  useEffect(() => {
+    if (show && isNotFalsyString(linkUrl)) {
+      setHasLinkError(!isValidUrl(linkUrl));
+    }
+    //don't want to refrehs on linkUrl update
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [show]);
+
   const actionLabel = intl.formatMessage({
     defaultMessage: 'Open',
     description: 'Link action placeholder in design module text tool',
@@ -51,6 +59,7 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
   // onDismiss call when the popup dismiss in order to save
   const onDismiss = () => {
     const url = convertUrlLink(linkUrl);
+    setLinkUrl(url);
     onUpdateMedia({
       ...cardModuleMedia,
       text,
@@ -60,6 +69,8 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
         label: linkAction ?? actionLabel,
       },
     });
+    //remove this error
+    setHasLinkError(false);
     close();
   };
 
@@ -72,6 +83,8 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
         return;
       }
     }
+    //closing will call ondismiss and save(don't want to create a double save )
+    close();
   };
 
   const { bottom: bottomInset } = useScreenInsets();
