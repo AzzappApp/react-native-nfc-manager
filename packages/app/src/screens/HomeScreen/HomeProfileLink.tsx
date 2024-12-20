@@ -1,10 +1,8 @@
 import * as Clipboard from 'expo-clipboard';
-import { memo, useState } from 'react';
+import { memo } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
-  runOnJS,
-  useAnimatedReaction,
   useAnimatedStyle,
   useDerivedValue,
 } from 'react-native-reanimated';
@@ -12,15 +10,12 @@ import { Toast } from 'react-native-toast-message/lib/src/Toast';
 import { useFragment, graphql } from 'react-relay';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
-import Icon from '#ui/Icon';
-import PressableNative from '#ui/PressableNative';
-import Text from '#ui/Text';
-import { useHomeScreenContext } from './HomeScreenContext';
-import type { HomeProfileLink_user$key } from '#relayArtifacts/HomeProfileLink_user.graphql';
-import type { TextProps } from '#ui/Text';
-import type { DerivedValue } from 'react-native-reanimated';
 import AnimatedText from '#components/AnimatedText';
 import useScreenDimensions from '#hooks/useScreenDimensions';
+import Icon from '#ui/Icon';
+import PressableNative from '#ui/PressableNative';
+import { useHomeScreenContext } from './HomeScreenContext';
+import type { HomeProfileLink_user$key } from '#relayArtifacts/HomeProfileLink_user.graphql';
 
 type HomeProfileLinkProps = {
   user: HomeProfileLink_user$key;
@@ -90,7 +85,7 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
     const displayedItem = (currentIndexProfileSharedValue.value || 1) - 1;
     return 'azzapp.com/' + userNames.value[displayedItem];
   });
-  
+
   const { width: windowWidth } = useScreenDimensions();
 
   return (
@@ -112,25 +107,6 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
         </View>
       </PressableNative>
     </Animated.View>
-  );
-};
-
-const HomeProfileLinkText = ({
-  text,
-  ...props
-}: TextProps & { text: DerivedValue<string> }) => {
-  const [textInner, setTextInner] = useState(() => text.value);
-
-  useAnimatedReaction(
-    () => text.value,
-    newValue => {
-      runOnJS(setTextInner)(newValue);
-    },
-  );
-  return (
-    <Text variant="button" numberOfLines={1} {...props}>
-      {textInner}
-    </Text>
   );
 };
 
