@@ -88,27 +88,20 @@ const createWebCardMutation: MutationResolvers['createWebCard'] = async (
   const contactCard = await buildDefaultContactCard(inputWebCard, userId);
 
   try {
-    const profileId = await transaction(async () => {
+    const profile = await transaction(async () => {
       const webCardId = await createWebCard(inputWebCard);
-      return createProfile({
+      const profileId = await createProfile({
         webCardId,
         userId,
         contactCard,
         lastContactCardUpdate: new Date(),
         inviteSent: true,
       });
+      return getProfileById(profileId);
     });
 
-    if (!profileId) {
-      throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
-    }
-
-    const profile = await getProfileById(profileId);
-
     if (!profile) {
-      Sentry.captureMessage('Profile not found after creation', {
-        extra: { profileId },
-      });
+      Sentry.captureMessage('Profile not found after creation');
       throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
     }
     return { profile };
