@@ -94,8 +94,6 @@ const WizardTransitioner = ({
     <Container style={style}>
       {!headerHidden && (
         <WizardTransitionerPagerHeader
-          nbPages={steps.length}
-          currentPage={nextStepIndex}
           onBack={onBack}
           title={currentStep.title}
           backIcon={currentStep.backIcon}
