@@ -1,5 +1,6 @@
-## 1.5.4-canary.8
+## 1.5.4-canary.9
 
+* **fix:**  - workaround missing delete/edit buttons ([#6503](https://github.com/AzzappApp/azzapp/pull/6503))
 * **feat:**  - update data model for new contact card creation process ([#6309](https://github.com/AzzappApp/azzapp/pull/6309))
 * **fix:**  - don’t read directly profile that may be missing on replica
 * **fix:**  - try to read profile within transaction
