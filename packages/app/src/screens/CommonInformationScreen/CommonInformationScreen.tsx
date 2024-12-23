@@ -161,7 +161,7 @@ export const CommonInformationScreen = ({
       field.onChange({
         local: true,
         id: localPath,
-        uri: `file://${localPath}`,
+        uri: localPath,
       });
 
       setSize({

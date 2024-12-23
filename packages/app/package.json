@@ -104,7 +104,7 @@
     "expo-clipboard": "~7.0.0",
     "expo-contacts": "patch:expo-contacts@patch%3Aexpo-contacts@npm%253A14.0.2%23~/.yarn/patches/expo-contacts-npm-14.0.2-47a6bf515f.patch%3A%3Aversion=14.0.2&hash=20e638#~/.yarn/patches/expo-contacts-patch-0d7f995ace.patch",
     "expo-device": "7.0.1",
-    "expo-file-system": "^18.0.6",
+    "expo-file-system": "patch:expo-file-system@npm%3A18.0.6#~/.yarn/patches/expo-file-system-npm-18.0.6-08df78c1fd.patch",
     "expo-font": "~13.0.1",
     "expo-haptics": "~14.0.0",
     "expo-image": "^2.0.3",

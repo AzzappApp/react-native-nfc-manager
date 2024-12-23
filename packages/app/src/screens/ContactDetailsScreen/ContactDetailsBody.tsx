@@ -1,5 +1,5 @@
 import { type Contact } from 'expo-contacts';
-import * as FileSystem from 'expo-file-system';
+import { File, Paths } from 'expo-file-system/next';
 import { Image } from 'expo-image';
 import { useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -59,18 +59,18 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
       (details.lastName || '')
     ).trim();
     const filePath =
-      FileSystem.cacheDirectory +
-      (contactName.length ? contactName : 'contact') +
-      '.vcf';
+      Paths.cache.uri + (contactName.length ? contactName : 'contact') + '.vcf';
+    const file = new File(filePath);
+    file.create();
     // generate file
-    await FileSystem.writeAsStringAsync(filePath, vcardData.toString());
+    file.write(vcardData.toString());
     // share the file
     await ShareCommand.open({
       url: filePath,
       type: 'text/x-vcard',
     });
     // clean up file afterward
-    await FileSystem.deleteAsync(filePath);
+    file.delete();
   };
 
   return (

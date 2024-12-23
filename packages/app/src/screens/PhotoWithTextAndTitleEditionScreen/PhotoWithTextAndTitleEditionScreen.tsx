@@ -325,7 +325,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
     });
     setShowImagePicker(false);
     onImageChange({
-      uri: `file://${exportPath}`,
+      uri: exportPath,
       width: size.width,
       height: size.height,
       kind: 'image',

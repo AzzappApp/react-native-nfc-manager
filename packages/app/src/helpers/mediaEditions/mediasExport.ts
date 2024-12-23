@@ -5,13 +5,16 @@ import {
   drawAsImageFromPicture,
 } from '@shopify/react-native-skia';
 import * as Device from 'expo-device';
+import { File, Paths } from 'expo-file-system/next';
 import { Platform } from 'react-native';
-import ReactNativeBlobUtil from 'react-native-blob-util';
 import {
   exportVideoComposition,
   getValidEncoderConfigurations,
 } from '@azzapp/react-native-skia-video';
-import { createRandomFilePath } from '#helpers/fileHelpers';
+import {
+  createRandomFileName,
+  createRandomFilePath,
+} from '#helpers/fileHelpers';
 import { getVideoLocalPath } from '#helpers/mediaHelpers';
 import { getLutURI } from './LUTFilters';
 import {
@@ -87,15 +90,15 @@ export const saveTransformedImageToFile = async ({
       }),
       resolution,
     );
-    // TODO: we need to use encodeToBytes here but react-native-blod-util
-    // does not support Uint8Array
-    // const bytes = await image.encodeToBytes(format, quality);
-    const blob = await transformedImage.encodeToBase64(format, quality);
+
+    const blob = await transformedImage.encodeToBytes(format, quality);
     const ext =
       format === ImageFormat.JPEG ? 'jpg' : ImageFormat.PNG ? 'png' : 'webp';
 
-    const path = createRandomFilePath(ext);
-    await ReactNativeBlobUtil.fs.writeFile(path, blob, 'base64');
+    const path = Paths.cache.uri + createRandomFileName(ext);
+    const file = new File(path);
+    file.create();
+    file.write(blob);
 
     NativeTextureLoader.unref(uri);
 
@@ -171,7 +174,7 @@ export const saveTransformedVideoToFile = async ({
     lutTexture,
   );
 
-  const outPath = createRandomFilePath('.mp4');
+  const outPath = createRandomFilePath('mp4');
 
   const requestedConfigs = {
     ...resolution,
@@ -199,6 +202,10 @@ export const saveTransformedVideoToFile = async ({
       videoComposition,
       drawFrame,
       outPath,
+      afterDrawFrame() {
+        'worklet';
+        global.gc?.();
+      },
       ...encoderConfigs,
     });
     return outPath;

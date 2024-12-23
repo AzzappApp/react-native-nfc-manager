@@ -1,5 +1,5 @@
 import { getContactByIdAsync } from 'expo-contacts';
-import * as FileSystem from 'expo-file-system';
+import { File } from 'expo-file-system/next';
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import VCard from 'vcard-creator';
@@ -325,9 +325,9 @@ export const buildVCardFromExpoContact = async (contact: Contact) => {
       vCard.addAddress(fullAdress, addressLabelToVCardLabel(addr.label) || '');
   });
   if (contact?.image?.uri) {
-    const image = await FileSystem.readAsStringAsync(contact?.image?.uri, {
-      encoding: FileSystem.EncodingType.Base64,
-    });
+    const file = new File(contact.image.uri);
+    const image = file.base64();
+
     if (image) {
       vCard.addPhoto(image);
     }

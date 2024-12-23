@@ -77,7 +77,7 @@ export const handleUploadCardModuleMedia = async (
           });
           value += 1;
           updateProcessedMedia({ total: cardModuleMedias.length, value });
-          media.uri = `file://${localPath}`;
+          media.uri = localPath;
         } else {
           const exportWidth = Math.min(MODULE_VIDEO_MAX_WIDTH, media.width);
           const exportHeight = (exportWidth / media.width) * media.height;
@@ -105,7 +105,7 @@ export const handleUploadCardModuleMedia = async (
             });
             value += 1;
             updateProcessedMedia({ total: cardModuleMedias.length, value });
-            media.uri = `file://${localPath}`;
+            media.uri = localPath;
           } catch (e) {
             Sentry.captureException(e);
             console.error(e);
@@ -144,20 +144,20 @@ export const handleUploadCardModuleMedia = async (
     ),
   );
 
-  const mediasUploaded: Array<UploadedMedia | null> = [];
-  for (const item of mediaToUploads) {
-    if (item != null) {
-      const { promise, uri, kind } = item;
-      const uploadResult = await promise;
-      mediasUploaded.push({
-        id: uploadResult.public_id,
-        kind,
-        uri,
-      });
-    } else {
-      mediasUploaded.push(null);
-    }
-  }
+  const mediasUploaded = await Promise.all(
+    mediaToUploads.map(async item => {
+      if (item != null) {
+        const { promise, uri, kind } = item;
+        const uploadResult = await promise;
+        return {
+          id: uploadResult.public_id,
+          kind,
+          uri,
+        };
+      }
+      return null;
+    }),
+  );
 
   return cardModuleMedias.map((moduleMedia, index) => {
     if (moduleMedia.needDbUpdate) {
@@ -192,7 +192,7 @@ export const handleOnCompletedModuleSave = (
     for (let index = 0; index < moduleMedias.length; index++) {
       const { needDbUpdate, media } = moduleMedias[index];
       if (needDbUpdate) {
-        addLocalCachedMediaFile(media.id, media.kind, `file://${media.uri}`);
+        addLocalCachedMediaFile(media.id, media.kind, media.uri);
       }
     }
   }

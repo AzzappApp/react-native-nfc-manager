@@ -167,7 +167,7 @@ __metadata:
     expo-clipboard: "npm:~7.0.0"
     expo-contacts: "patch:expo-contacts@patch%3Aexpo-contacts@npm%253A14.0.2%23~/.yarn/patches/expo-contacts-npm-14.0.2-47a6bf515f.patch%3A%3Aversion=14.0.2&hash=20e638#~/.yarn/patches/expo-contacts-patch-0d7f995ace.patch"
     expo-device: "npm:7.0.1"
-    expo-file-system: "npm:^18.0.6"
+    expo-file-system: "patch:expo-file-system@npm%3A18.0.6#~/.yarn/patches/expo-file-system-npm-18.0.6-08df78c1fd.patch"
     expo-font: "npm:~13.0.1"
     expo-haptics: "npm:~14.0.0"
     expo-image: "npm:^2.0.3"
@@ -16580,7 +16580,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-file-system@npm:^18.0.6, expo-file-system@npm:~18.0.6":
+"expo-file-system@npm:18.0.6":
   version: 18.0.6
   resolution: "expo-file-system@npm:18.0.6"
   dependencies:
@@ -16589,6 +16589,18 @@ __metadata:
     expo: "*"
     react-native: "*"
   checksum: 10/b3d33037972fd4b8290b74115005a133d1f115249fa06b7c707d4c5cf734ac81e04e22197147f4310913e1508464f37dffa8a98c9b5659768854ea09a797a8bf
+  languageName: node
+  linkType: hard
+
+"expo-file-system@patch:expo-file-system@npm%3A18.0.6#~/.yarn/patches/expo-file-system-npm-18.0.6-08df78c1fd.patch":
+  version: 18.0.6
+  resolution: "expo-file-system@patch:expo-file-system@npm%3A18.0.6#~/.yarn/patches/expo-file-system-npm-18.0.6-08df78c1fd.patch::version=18.0.6&hash=e83a35"
+  dependencies:
+    web-streams-polyfill: "npm:^3.3.2"
+  peerDependencies:
+    expo: "*"
+    react-native: "*"
+  checksum: 10/45fa31292a33fe389b25db0029b607bf966c5ce829b4d6750dc85427f39e3a1666987c2508bfdcf8ab572f5972467e0c7a69565daa356fbc32e284f9c1564657
   languageName: node
   linkType: hard
 

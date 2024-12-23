@@ -203,7 +203,7 @@ const PostCreationScreen = ({
         const fileName = getFileName(path);
         const file: any = {
           name: fileName,
-          uri: `file://${path}`,
+          uri: path,
           type:
             mime.lookup(fileName) ||
             (kind === 'image' ? 'image/jpeg' : 'video/mp4'),

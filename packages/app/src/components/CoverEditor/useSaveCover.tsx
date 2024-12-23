@@ -4,9 +4,9 @@ import {
   drawAsImageFromPicture,
 } from '@shopify/react-native-skia';
 import { FileSystemUploadType, UploadTask } from 'expo-file-system';
+import { File, Paths } from 'expo-file-system/next';
 import { useCallback, useState } from 'react';
 import { Platform } from 'react-native';
-import ReactNativeBlobUtil from 'react-native-blob-util';
 import * as mime from 'react-native-mime-types';
 import { graphql, useMutation } from 'react-relay';
 import { Observable } from 'relay-runtime';
@@ -15,7 +15,11 @@ import {
   getValidEncoderConfigurations,
 } from '@azzapp/react-native-skia-video';
 import { waitTime } from '@azzapp/shared/asyncHelpers';
-import { createRandomFilePath, getFileName } from '#helpers/fileHelpers';
+import {
+  createRandomFileName,
+  createRandomFilePath,
+  getFileName,
+} from '#helpers/fileHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadSign } from '#helpers/MobileWebAPI';
 import coverDrawer, { coverTransitions } from './coverDrawer';
@@ -308,7 +312,6 @@ const createCoverMedia = async (
   let outPath: string;
 
   if (!isDynamic) {
-    outPath = createRandomFilePath('jpg');
     const image = drawAsImageFromPicture(
       createPicture(canvas => {
         coverDrawer({
@@ -327,13 +330,16 @@ const createCoverMedia = async (
       COVER_EXPORT_VIDEO_RESOLUTION,
     );
 
-    const blob = await image.encodeToBase64(ImageFormat.JPEG, 95);
+    const blob = await image.encodeToBytes(ImageFormat.JPEG, 95);
+    outPath = Paths.cache.uri + createRandomFileName('jpg');
 
     progressCallback({
       nbFrames: 1,
       framesCompleted: 1,
     });
-    await ReactNativeBlobUtil.fs.writeFile(outPath, blob, 'base64');
+    const file = new File(outPath);
+    file.create();
+    file.write(blob);
   } else {
     outPath = createRandomFilePath('mp4');
 

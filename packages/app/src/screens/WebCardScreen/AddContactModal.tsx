@@ -5,7 +5,7 @@ import {
   updateContactAsync,
   PermissionStatus as ContactPermissionStatus,
 } from 'expo-contacts';
-import * as FileSystem from 'expo-file-system';
+import { File, Paths } from 'expo-file-system/next';
 import { fromGlobalId } from 'graphql-relay';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -528,17 +528,17 @@ const buildContact = async (
 
   if (additionalContactData?.avatarUrl) {
     try {
-      const avatar = await FileSystem.downloadAsync(
-        additionalContactData.avatarUrl,
-        FileSystem.cacheDirectory + profileId,
-      );
-      if (avatar.status >= 200 && avatar.status < 300) {
-        image = {
-          width: 720,
-          height: 720,
-          uri: avatar.uri,
-        };
+      const avatar = new File(Paths.cache.uri + profileId);
+      if (!avatar.exists) {
+        avatar.create();
+        await File.downloadFileAsync(additionalContactData.avatarUrl, avatar);
       }
+
+      image = {
+        width: 720,
+        height: 720,
+        uri: avatar.uri,
+      };
     } catch (e) {
       Sentry.captureException(e);
     }
