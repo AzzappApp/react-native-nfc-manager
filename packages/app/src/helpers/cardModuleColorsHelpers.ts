@@ -288,6 +288,7 @@ export const getInitalDyptichColor = (
   const key = [module.moduleKind, module.variant, coverBackgroundColor].join(
     ',',
   );
+
   switch (key) {
     case 'media,slideshow,dark':
       return {
@@ -342,24 +343,10 @@ export const getInitalDyptichColor = (
         graphic: 'transparent',
       };
     case 'mediaText,parallax,light':
-      return {
-        background: 'light',
-        content: 'transparent',
-        title: 'dark',
-        text: 'dark',
-        graphic: 'transparent',
-      };
     case 'mediaText,parallax,dark':
-      return {
-        background: 'dark',
-        content: 'transparent',
-        title: 'light',
-        text: 'light',
-        graphic: 'transparent',
-      };
     case 'mediaText,parallax,primary':
       return {
-        background: 'primary',
+        background: 'dark',
         content: 'transparent',
         title: 'light',
         text: 'light',
@@ -390,28 +377,14 @@ export const getInitalDyptichColor = (
         graphic: 'dark',
       };
     case 'mediaTextLink,parallax,light':
-      return {
-        background: 'light',
-        content: 'dark',
-        title: 'dark',
-        text: 'dark',
-        graphic: 'light',
-      };
     case 'mediaTextLink,parallax,dark':
-      return {
-        background: 'dark',
-        content: 'light',
-        title: 'light',
-        text: 'light',
-        graphic: 'dark',
-      };
     case 'mediaTextLink,parallax,primary':
       return {
-        background: 'primary',
-        content: 'dark',
-        title: 'dark',
-        text: 'dark',
-        graphic: 'light',
+        background: 'dark',
+        content: 'transparent',
+        title: 'light',
+        text: 'light',
+        graphic: 'transparent',
       };
 
     default:

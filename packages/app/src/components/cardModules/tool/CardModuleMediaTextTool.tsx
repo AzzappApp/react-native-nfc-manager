@@ -115,6 +115,7 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
         onDismiss={onDismiss}
         nestedScroll
         bottomInset={bottomInset}
+        lazy
       >
         <BottomSheetScrollView style={styles.container}>
           <Header

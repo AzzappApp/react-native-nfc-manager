@@ -134,7 +134,10 @@ const MediaTextLinkModuleWebCardEditionScreen = (
 
   const [selectedCardModuleColor, setModuleColor] = useState<CardModuleColor>(
     data?.cardModuleColor ??
-      getInitalDyptichColor({ moduleKind: MODULE_KIND, variant }),
+      getInitalDyptichColor(
+        { moduleKind: MODULE_KIND, variant },
+        webCard.coverBackgroundColor,
+      ),
   );
 
   // #region Mutations and saving logic
