@@ -6,19 +6,17 @@ import Animated, {
   useAnimatedReaction,
   useAnimatedStyle,
   useSharedValue,
-  withDelay,
-  withTiming,
   type DerivedValue,
 } from 'react-native-reanimated';
 
 import { colors } from '#theme';
 import { percentRectToRect } from '../coverEditorHelpers';
 import type { SkCanvas, SkRect } from '@shopify/react-native-skia';
-import type { ViewProps } from 'react-native';
+import type { ReactNode } from 'react';
 
 export type ResizeHandlePosition = 'bottom' | 'left' | 'right' | 'top';
 
-export type BoundsEditorGestureHandlerProps = ViewProps & {
+export type BoundsEditorGestureHandlerProps = {
   position: DerivedValue<{ bounds: SkRect; rotation: number } | null>;
   handles?: readonly ResizeHandlePosition[];
   onGestureStart: () => void;
@@ -31,6 +29,7 @@ export type BoundsEditorGestureHandlerProps = ViewProps & {
     deltaY: number,
   ) => void;
   onGestureEnd: () => void;
+  children: ReactNode;
 };
 
 const RESIZE_HANDLE_POSITIONS = ['top', 'bottom', 'left', 'right'] as const;
@@ -48,7 +47,6 @@ export const BoundsEditorGestureHandler = ({
   onPan,
   onResize,
   onGestureEnd,
-  style,
   children,
   ...props
 }: BoundsEditorGestureHandlerProps) => {
@@ -97,14 +95,7 @@ export const BoundsEditorGestureHandler = ({
   useAnimatedReaction(
     () => !!position.value,
     (hasPosition: boolean) => {
-      opacitySharedValue.value = hasPosition
-        ? withDelay(
-            50,
-            withTiming(1, {
-              duration: 180,
-            }),
-          )
-        : 0;
+      opacitySharedValue.value = hasPosition ? 1 : 0;
     },
   );
 
@@ -121,7 +112,6 @@ export const BoundsEditorGestureHandler = ({
     >
       <Animated.View
         style={[
-          style,
           animatedStyle,
           { transformOrigin: 'center' },
           DEBUG && { backgroundColor: '#00FFFF33' },
