@@ -11,7 +11,7 @@ export const MODULE_KIND_WITH_VARIANTS = [
   },
   {
     moduleKind: MODULE_KIND_MEDIA_TEXT,
-    variants: ['parallax', 'alternation'],
+    variants: ['alternation', 'parallax'],
   },
   {
     moduleKind: MODULE_KIND_MEDIA_TEXT_LINK,
