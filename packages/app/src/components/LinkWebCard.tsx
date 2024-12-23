@@ -10,9 +10,15 @@ type LinkWebCard = Omit<LinkProps<WebCardRoute>, 'params' | 'route'> & {
 
 const LinkWebCard = ({ params, children, ...props }: LinkWebCard) => {
   if (params?.userName) {
-    <Link route="WEBCARD" params={params as WebCardRoute['params']} {...props}>
-      {children}
-    </Link>;
+    return (
+      <Link
+        route="WEBCARD"
+        params={params as WebCardRoute['params']}
+        {...props}
+      >
+        {children}
+      </Link>
+    );
   }
   return children;
 };
