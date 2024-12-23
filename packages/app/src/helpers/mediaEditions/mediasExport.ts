@@ -120,6 +120,7 @@ export const saveTransformedVideoToFile = async ({
   removeSound: _removeSound = false,
   startTime,
   duration,
+  maxDecoderResolution = MAX_EXPORT_DECODER_RESOLUTION,
 }: {
   video: {
     uri: string;
@@ -135,6 +136,7 @@ export const saveTransformedVideoToFile = async ({
   removeSound?: boolean;
   startTime?: number;
   duration?: number;
+  maxDecoderResolution?: number;
 }): Promise<string> => {
   const sourcePath = await getVideoLocalPath(video.uri);
   if (!sourcePath) {
@@ -146,7 +148,7 @@ export const saveTransformedVideoToFile = async ({
       video.width,
       video.height,
       video.rotation,
-      getDeviceMaxDecodingResolution(sourcePath, MAX_EXPORT_DECODER_RESOLUTION),
+      getDeviceMaxDecodingResolution(sourcePath, maxDecoderResolution),
     );
 
   const cropData = editionParameters?.cropData;

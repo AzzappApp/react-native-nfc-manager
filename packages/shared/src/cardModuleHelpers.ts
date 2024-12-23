@@ -1236,7 +1236,7 @@ export const MODULE_IMAGE_MAX_WIDTH = 2048;
 /**
  * the max width of the module videos
  */
-export const MODULE_VIDEO_MAX_WIDTH = 1920;
+export const MODULE_VIDEO_MAX_WIDTH = 1280;
 /**
  * the list of possible post images pregenerated sizes
  */

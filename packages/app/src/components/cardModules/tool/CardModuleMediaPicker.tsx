@@ -2,8 +2,11 @@ import { Image } from 'expo-image';
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, Alert } from 'react-native';
+import { Video } from 'react-native-compressor';
 import { ScrollView } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
+import { Observable } from 'relay-runtime';
+import { waitTime } from '@azzapp/shared/asyncHelpers';
 import { colors, shadow } from '#theme';
 import { SaveHeaderButton } from '#components/commonsButtons';
 import MediaPicker from '#components/MediaPicker';
@@ -24,6 +27,7 @@ import {
   type CardModuleMedia,
 } from '../cardModuleEditorType';
 import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
+import type { Sink } from 'relay-runtime/lib/network/RelayObservable';
 
 type CardModuleMediaPickerProps = Omit<ViewProps, 'children'> & {
   initialMedias: CardModuleMedia[] | null;
@@ -146,7 +150,9 @@ const CardModuleMediaPicker = ({
     [intl, maxMedia, maxVideo, replacing, selectedMedias],
   );
 
-  const [downloading, setDownloading] = useState(false);
+  const [progressIndicator, setProgressIndicator] =
+    useState<Observable<number> | null>(null);
+
   const handleOnFinished = async () => {
     if (selectedMedias.length === 0) {
       Alert.alert(
@@ -162,10 +168,26 @@ const CardModuleMediaPicker = ({
       return;
     }
 
+    let progressSink: Sink<number> | null;
+    const progress: Observable<number> = Observable.create(sink => {
+      progressSink = sink;
+    });
+
+    const updateProgress = (loaded: number) => {
+      if (progressSink) {
+        progressSink.next(loaded / selectedMedias.length);
+      }
+    };
+    setProgressIndicator(progress);
+
+    // wait to show the progress indicator
+    await waitTime(100);
+
     //download video from pexel
     try {
-      setDownloading(true);
       let downloadError = false;
+      let value = 0;
+
       const res = await Promise.all(
         selectedMedias.map(async cardModuleMedia => {
           if (
@@ -178,6 +200,9 @@ const CardModuleMediaPicker = ({
                 cardModuleMedia.media,
                 MODULES_CACHE_DIR,
               );
+              value += 1;
+              updateProgress(value);
+
               return {
                 ...cardModuleMedia,
                 media: {
@@ -204,16 +229,31 @@ const CardModuleMediaPicker = ({
               return cardModuleMedia;
             }
           } else {
+            if (cardModuleMedia.media.kind === 'video') {
+              const result = await Video.compress(cardModuleMedia.media.uri);
+              value += 1;
+              updateProgress(value);
+              return {
+                ...cardModuleMedia,
+                media: {
+                  ...cardModuleMedia.media,
+                  uri: result,
+                },
+              };
+            }
+            value += 1;
+            updateProgress(value);
             return cardModuleMedia;
           }
         }),
       );
       if (!downloadError) {
-        setDownloading(false);
+        setProgressIndicator(null);
         onFinished(res);
       }
-    } catch {
-      setDownloading(false);
+    } catch (e) {
+      console.error(e);
+      setProgressIndicator(null);
     }
   };
 
@@ -330,11 +370,13 @@ const CardModuleMediaPicker = ({
         }
       />
       <ScreenModal
-        visible={downloading}
+        visible={!!progressIndicator}
         onRequestDismiss={preventModalDismiss}
         gestureEnabled={false}
       >
-        <UploadProgressModal />
+        {progressIndicator && (
+          <UploadProgressModal progressIndicator={progressIndicator} />
+        )}
       </ScreenModal>
     </>
   );

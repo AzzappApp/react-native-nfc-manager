@@ -5,6 +5,7 @@ import {
   MODULE_VIDEO_MAX_WIDTH,
 } from '@azzapp/shared/cardModuleHelpers';
 import { isDefined } from '@azzapp/shared/isDefined';
+import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
 import {
   POST_VIDEO_BIT_RATE,
   POST_VIDEO_FRAME_RATE,
@@ -27,6 +28,7 @@ import type { ModuleKindAndVariant } from './webcardModuleHelpers';
 import type { CardStyle } from '@azzapp/shared/cardHelpers';
 import type { CardModuleColor } from '@azzapp/shared/cardModuleHelpers';
 import type { TextStyle } from 'react-native';
+import type { Observable } from 'relay-runtime';
 
 export const getCardModuleMediaKind = (media: CardModuleSourceMedia) => {
   //put it first because of ts error (stupid) about id does not exist on type never
@@ -50,76 +52,97 @@ type UploadedMedia = {
 
 export const handleUploadCardModuleMedia = async (
   cardModuleMedias: CardModuleMedia[],
+  updateProcessedMedia: (args: { total: number; value: number }) => void,
+  updateUploadIndicator: (arg: Observable<number>) => void,
 ) => {
-  const mediaToUploads = [];
-
-  for (const moduleMedia of cardModuleMedias) {
-    const { media } = moduleMedia;
-    //be sure the media need to be updated, and the uri is not online one
-    if (moduleMedia.needDbUpdate && !moduleMedia.media.uri.startsWith('http')) {
-      if (media.kind === 'image') {
-        const exportWidth = Math.min(MODULE_IMAGE_MAX_WIDTH, media.width);
-        const exportHeight = (exportWidth / media.width) * media.height;
-        const localPath = await saveTransformedImageToFile({
-          uri: media.uri,
-          resolution: { width: exportWidth, height: exportHeight },
-          format: getTargetFormatFromPath(media.uri),
-          quality: 95,
-          filter: media.filter,
-          editionParameters: media.editionParameters,
-        });
-        media.uri = `file://${localPath}`;
-      } else {
-        const exportWidth = Math.min(MODULE_VIDEO_MAX_WIDTH, media.width);
-        const exportHeight = (exportWidth / media.width) * media.height;
-        const aspectRatio = exportWidth / exportHeight;
-        const resolution = {
-          width: aspectRatio >= 1 ? exportWidth : exportWidth * aspectRatio,
-          height: aspectRatio < 1 ? exportWidth : exportWidth / aspectRatio,
-        };
-        try {
-          const localPath = await saveTransformedVideoToFile({
-            video: {
-              uri: media.uri,
-              width: exportWidth,
-              height: exportHeight,
-              rotation: media.rotation ?? 0,
-            },
-            resolution,
-            bitRate: POST_VIDEO_BIT_RATE,
-            frameRate: POST_VIDEO_FRAME_RATE,
-            duration: media.timeRange?.duration,
-            startTime: media.timeRange?.startTime,
+  let value = 0;
+  const mediaToUploads = await Promise.all(
+    cardModuleMedias.map(async moduleMedia => {
+      const { media } = moduleMedia;
+      //be sure the media need to be updated, and the uri is not online one
+      if (
+        moduleMedia.needDbUpdate &&
+        !moduleMedia.media.uri.startsWith('http')
+      ) {
+        if (media.kind === 'image') {
+          const exportWidth = Math.min(MODULE_IMAGE_MAX_WIDTH, media.width);
+          const exportHeight = (exportWidth / media.width) * media.height;
+          const localPath = await saveTransformedImageToFile({
+            uri: media.uri,
+            resolution: { width: exportWidth, height: exportHeight },
+            format: getTargetFormatFromPath(media.uri),
+            quality: 95,
             filter: media.filter,
             editionParameters: media.editionParameters,
           });
+          value += 1;
+          updateProcessedMedia({ total: cardModuleMedias.length, value });
           media.uri = `file://${localPath}`;
-        } catch (e) {
-          Sentry.captureException(e);
-          console.error(e);
+        } else {
+          const exportWidth = Math.min(MODULE_VIDEO_MAX_WIDTH, media.width);
+          const exportHeight = (exportWidth / media.width) * media.height;
+          const aspectRatio = exportWidth / exportHeight;
+          const resolution = {
+            width: aspectRatio >= 1 ? exportWidth : exportWidth * aspectRatio,
+            height: aspectRatio < 1 ? exportWidth : exportWidth / aspectRatio,
+          };
+          try {
+            const localPath = await saveTransformedVideoToFile({
+              video: {
+                uri: media.uri,
+                width: exportWidth,
+                height: exportHeight,
+                rotation: media.rotation ?? 0,
+              },
+              resolution,
+              bitRate: POST_VIDEO_BIT_RATE,
+              frameRate: POST_VIDEO_FRAME_RATE,
+              duration: media.timeRange?.duration,
+              startTime: media.timeRange?.startTime,
+              filter: media.filter,
+              editionParameters: media.editionParameters,
+              maxDecoderResolution: MODULE_VIDEO_MAX_WIDTH,
+            });
+            value += 1;
+            updateProcessedMedia({ total: cardModuleMedias.length, value });
+            media.uri = `file://${localPath}`;
+          } catch (e) {
+            Sentry.captureException(e);
+            console.error(e);
+          }
         }
+        const { uploadURL, uploadParameters } = await uploadSign({
+          kind: media.kind,
+          target: 'module',
+        });
+        return {
+          uri: media.uri,
+          kind: media.kind,
+          ...uploadMedia(
+            {
+              name: getFileName(media.uri),
+              uri: media.uri,
+              type: media.kind === 'image' ? 'image/jpeg' : 'video/mp4',
+            } as any,
+            uploadURL,
+            uploadParameters,
+          ),
+        };
+      } else {
+        value += 1;
+        updateProcessedMedia({ total: cardModuleMedias.length, value });
+        return null;
       }
-      const { uploadURL, uploadParameters } = await uploadSign({
-        kind: media.kind,
-        target: 'module',
-      });
-      mediaToUploads.push({
-        uri: media.uri,
-        kind: media.kind,
-        ...uploadMedia(
-          {
-            name: getFileName(media.uri),
-            uri: media.uri,
-            type: media.kind === 'image' ? 'image/jpeg' : 'video/mp4',
-          } as any,
-          uploadURL,
-          uploadParameters,
-        ),
-      });
-    } else {
-      mediaToUploads.push(null);
-    }
-  }
+    }),
+  );
+
+  updateUploadIndicator(
+    combineMultiUploadProgresses(
+      mediaToUploads
+        .filter(item => item !== null)
+        .map(({ progress }) => progress),
+    ),
+  );
 
   const mediasUploaded: Array<UploadedMedia | null> = [];
   for (const item of mediaToUploads) {
