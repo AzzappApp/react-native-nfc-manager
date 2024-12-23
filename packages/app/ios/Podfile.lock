@@ -23,7 +23,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - azzapp-react-native-skia-video (0.8.0):
+  - azzapp-react-native-skia-video (0.8.3):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2934,7 +2934,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   azzapp-react-native-buffer-loader: f85ec38f698535c0884d76a592b828b755cde3ae
-  azzapp-react-native-skia-video: 710cf33b86652d5d421157e4b201f334956c885d
+  azzapp-react-native-skia-video: e4ca82fb8e00dcae5b57953c8930447da16e9ba1
   azzapp-react-native-snapshot-view: ec5ac33dae592e7bb678b4563e5c4108895af284
   boost: 1dca942403ed9342f98334bf4c3621f011aa7946
   DoubleConversion: f16ae600a246532c4020132d54af21d0ddb2a385
