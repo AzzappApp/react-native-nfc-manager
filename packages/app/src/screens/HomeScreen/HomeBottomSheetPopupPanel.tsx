@@ -17,14 +17,13 @@ import {
 import { colors } from '#theme';
 import BottomSheetPopup from '#components/popup/BottomSheetPopup';
 import { PopupButton } from '#components/popup/PopupElements';
-import { onChangeWebCard } from '#helpers/authStore';
+import { onChangeWebCard, type ProfileInfos } from '#helpers/authStore';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
 import { PageProgress } from '#ui/WizardPagerHeader';
 import { useHomeBottomSheetModalToolTipContext } from './HomeBottomSheetModalToolTip';
-import type { ProfileInfos } from '#helpers/authStore';
 import type { HomeBottomSheetPopupPanelCheckUserNameQuery } from '#relayArtifacts/HomeBottomSheetPopupPanelCheckUserNameQuery.graphql';
 import type { HomeBottomSheetPopupPanelGetProposedUsernameQuery } from '#relayArtifacts/HomeBottomSheetPopupPanelGetProposedUsernameQuery.graphql';
 import type { ReactNode } from 'react';
@@ -94,12 +93,6 @@ const HomeBottomSheetPopupPanel = ({
   );
 
   const visible = profileInfo?.webCardId !== undefined;
-
-  useEffect(() => {
-    if (visible) {
-      onChangeWebCard(profileInfo);
-    }
-  }, [profileInfo, visible]);
 
   const resetPopupState = useCallback(() => {
     setCurrentPage(0);
@@ -222,6 +215,8 @@ const HomeBottomSheetPopupPanel = ({
         },
         onCompleted: () => {
           const tooltipWebcardId = profileInfo?.webCardId;
+          onChangeWebCard(profileInfo);
+
           setTimeout(() => {
             if (tooltipWebcardId) {
               setTooltipedWebcard(tooltipWebcardId);
