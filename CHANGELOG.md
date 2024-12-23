@@ -1,4 +1,4 @@
-## 1.5.4-canary.6
+## 1.5.4-canary.7
 
 * **feat:**  - update data model for new contact card creation process ([#6309](https://github.com/AzzappApp/azzapp/pull/6309))
 * **fix:**  - don’t read directly profile that may be missing on replica
