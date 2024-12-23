@@ -23,6 +23,7 @@ import { isDefined } from '@azzapp/shared/isDefined';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
+import { emitContactAdded } from '#helpers/addContactHelper';
 import { findLocalContact } from '#helpers/contactCardHelpers';
 import { reworkContactForDeviceInsert } from '#helpers/contactListHelpers';
 import { getLocalContactsMap } from '#helpers/getLocalContactsMap';
@@ -288,6 +289,7 @@ const AddContactModal = ({
                   type: 'success',
                   text1: messageToast,
                 });
+                emitContactAdded();
               }
             } catch (e) {
               console.error(e);

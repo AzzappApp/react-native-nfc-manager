@@ -10,6 +10,7 @@ import { AppState, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { usePaginationFragment, graphql, useMutation } from 'react-relay';
 import { useOnFocus } from '#components/NativeRouter';
+import { useOnContactAdded } from '#helpers/addContactHelper';
 import { findLocalContact } from '#helpers/contactCardHelpers';
 import {
   buildLocalContact,
@@ -80,6 +81,8 @@ const ContactsScreenLists = ({
       setLocalContacts([]);
     } // else wait for permission update
   }, [contactsPermissionStatus]);
+
+  useOnContactAdded(refreshLocalContacts);
 
   useEffect(() => {
     refreshLocalContacts();
