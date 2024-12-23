@@ -1,5 +1,6 @@
-## 1.5.4-canary.9
+## 1.5.4-canary.10
 
+* **fix:**  - add notification when contact is added to refresh add to contacts indicator ([#6474](https://github.com/AzzappApp/azzapp/pull/6474))
 * **fix:**  - workaround missing delete/edit buttons ([#6503](https://github.com/AzzappApp/azzapp/pull/6503))
 * **feat:**  - update data model for new contact card creation process ([#6309](https://github.com/AzzappApp/azzapp/pull/6309))
 * **fix:**  - don’t read directly profile that may be missing on replica
