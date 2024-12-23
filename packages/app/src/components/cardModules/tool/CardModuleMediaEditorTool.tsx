@@ -3,8 +3,7 @@ import { useIntl } from 'react-intl';
 import ImagePicker, { EditImageStep } from '#components/ImagePicker';
 import { ScreenModal } from '#components/NativeRouter';
 import ToolBoxSection from '#components/Toolbar/ToolBoxSection';
-import useToggle from '#hooks/useToggle';
-
+import useBoolean from '#hooks/useBoolean';
 import {
   CARD_MEDIA_VIDEO_DEFAULT_DURATION,
   type CardModuleMedia,
@@ -19,7 +18,7 @@ const CardModuleMediaEditorTool = ({
   cardModuleMedia,
   onFinish,
 }: CardModuleMediaEditorToolProps) => {
-  const [show, toggleScreenModal] = useToggle(false);
+  const [modalShown, showModal, hideModal] = useBoolean(false);
   const { media } = cardModuleMedia;
   const cropData = media?.editionParameters?.cropData;
   const mediaAspectRatio = cropData
@@ -37,8 +36,9 @@ const CardModuleMediaEditorTool = ({
         ...cardModuleMedia,
         media: { ...media, filter, editionParameters },
       });
+      hideModal();
     },
-    [cardModuleMedia, media, onFinish],
+    [onFinish, cardModuleMedia, media, hideModal],
   );
 
   return (
@@ -49,15 +49,15 @@ const CardModuleMediaEditorTool = ({
           defaultMessage: 'Effects',
           description: 'Cover Edition Overlay Tool Button- Effect',
         })}
-        onPress={toggleScreenModal}
+        onPress={showModal}
       />
       {media != null && (
         <ScreenModal
-          visible={show}
+          visible={modalShown}
           animationType="slide"
-          onRequestDismiss={toggleScreenModal}
+          onRequestDismiss={hideModal}
         >
-          {show && (
+          {modalShown && (
             <ImagePicker
               initialData={
                 media
@@ -74,7 +74,7 @@ const CardModuleMediaEditorTool = ({
               additionalData={{ excludedParams: ['cropData'] }}
               forceAspectRatio={mediaAspectRatio}
               steps={[EditImageStep]}
-              onCancel={toggleScreenModal}
+              onCancel={hideModal}
               onFinished={onFinished}
               maxVideoDuration={CARD_MEDIA_VIDEO_DEFAULT_DURATION}
             />
