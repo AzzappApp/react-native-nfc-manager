@@ -77,7 +77,7 @@ export const handleUploadCardModuleMedia = async (
           });
           value += 1;
           updateProcessedMedia({ total: cardModuleMedias.length, value });
-          media.uri = localPath;
+          media.uri = `file://${localPath}`;
         } else {
           const exportWidth = Math.min(MODULE_VIDEO_MAX_WIDTH, media.width);
           const exportHeight = (exportWidth / media.width) * media.height;
@@ -105,7 +105,7 @@ export const handleUploadCardModuleMedia = async (
             });
             value += 1;
             updateProcessedMedia({ total: cardModuleMedias.length, value });
-            media.uri = localPath;
+            media.uri = `file://${localPath}`;
           } catch (e) {
             Sentry.captureException(e);
             console.error(e);
