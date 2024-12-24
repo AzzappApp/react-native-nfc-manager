@@ -13,7 +13,6 @@ import {
 } from 'react';
 import { useIntl } from 'react-intl';
 import { Platform, StyleSheet, View } from 'react-native';
-import { useSharedValue, type SharedValue } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import {
   graphql,
@@ -43,6 +42,7 @@ import type { WebCardScreenBodyUpdateModulesVisibilityMutation } from '#relayArt
 import type { ProfileBlockContainerProps } from './WebCardBlockContainer';
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { ForwardedRef } from 'react';
+import type { Animated as RNAnimated } from 'react-native';
 import type { Disposable } from 'react-relay';
 import type { StoreUpdater, RecordSourceSelectorProxy } from 'relay-runtime';
 
@@ -87,7 +87,7 @@ export type WebCardScreenBodyProps = {
    */
   onLoad: () => void;
 
-  scrollPosition: SharedValue<number>;
+  scrollPosition: RNAnimated.Value;
 };
 
 export type WebCardBodyHandle = {
@@ -733,17 +733,17 @@ const WebCardModule = ({
   cardColors?: ColorPalette | null;
   cardStyle?: CardStyle | null;
   coverBackgroundColor?: string | null;
-  scrollPosition: SharedValue<number>;
+  scrollPosition: RNAnimated.Value;
   editing: boolean;
 }) => {
-  const modulePosition = useSharedValue(0);
+  const [modulePosition, setModulePosition] = useState(0);
 
   return (
     <WebCardBlockContainerMemo
       id={module.id}
       editing={editing}
       {...props}
-      modulePosition={modulePosition}
+      setModulePosition={setModulePosition}
       // @ts-expect-error this extraData is used to trigger a re-render when the module data change
       extraData={{
         cardStyle,

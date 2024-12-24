@@ -1,10 +1,6 @@
-import { useCallback } from 'react';
-import { View } from 'react-native';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Animated, View } from 'react-native';
+
 import {
   createVariantsStyleSheet,
   useVariantStyleSheet,
@@ -13,7 +9,6 @@ import CardModuleMediaItem from './CardModuleMediaItem';
 import type { CardModuleSourceMedia } from './cardModuleEditorType';
 import type { CardStyle } from '@azzapp/shared/cardHelpers';
 import type { LayoutChangeEvent, ViewProps } from 'react-native';
-import type { SharedValue } from 'react-native-reanimated';
 
 type AlternationContainerProps = ViewProps & {
   viewMode: 'desktop' | 'mobile';
@@ -25,9 +20,9 @@ type AlternationContainerProps = ViewProps & {
   media: CardModuleSourceMedia;
   cardStyle: CardStyle | null | undefined;
   index: number;
-  scrollY: SharedValue<number>;
-  parentY?: SharedValue<number>;
-  modulePosition?: SharedValue<number>;
+  scrollY: Animated.Value;
+  parentY?: number;
+  modulePosition?: number;
   disableAnimation?: boolean;
 };
 
@@ -58,50 +53,107 @@ const AlternationContainer = ({
       ? (dimension.width - 2 * PADDING_HORIZONTAL - HORIZONTAL_GAP) / 2
       : dimension.width - 2 * PADDING_HORIZONTAL;
 
-  const componentY = useSharedValue(0);
-  const componentHeight = useSharedValue(0);
+  const [componentY, setComponentY] = useState(0);
+  const [componentHeight, setComponentHeight] = useState(0);
 
-  const onLayout = useCallback(
-    (event: LayoutChangeEvent) => {
-      componentY.value = event.nativeEvent.layout.y;
-      componentHeight.value = event.nativeEvent.layout.height;
-    },
-    [componentHeight, componentY],
+  const onLayout = useCallback((event: LayoutChangeEvent) => {
+    setComponentY(event.nativeEvent.layout.y);
+    setComponentHeight(event.nativeEvent.layout.height);
+  }, []);
+
+  const translateX = useRef(
+    new Animated.Value(index % 2 === 0 ? -150 : 150),
+  ).current;
+  const opacity = useRef(new Animated.Value(0)).current;
+
+  const isRunning = useRef(false);
+
+  useEffect(() => {
+    const itemStartY = (modulePosition ?? 0) + (parentY ?? 0) + componentY;
+    const itemEndY = itemStartY + componentHeight;
+    const listener = scrollY.addListener(({ value }) => {
+      if (
+        value >= itemStartY - dimension.height &&
+        value <= itemEndY &&
+        !isRunning.current
+      ) {
+        isRunning.current = true;
+        Animated.parallel([
+          Animated.timing(translateX, {
+            toValue: 0,
+            duration: ANIMATION_DURATION,
+            useNativeDriver: true,
+          }),
+          Animated.timing(opacity, {
+            toValue: 1,
+            duration: ANIMATION_DURATION,
+            useNativeDriver: true,
+          }),
+        ]).start(({ finished }) => {
+          if (finished) {
+            isRunning.current = false;
+          }
+        });
+      } else if (!isRunning.current) {
+        isRunning.current = true;
+        Animated.parallel([
+          Animated.timing(translateX, {
+            toValue: index % 2 === 0 ? -150 : 150,
+            duration: ANIMATION_DURATION,
+            useNativeDriver: true,
+          }),
+          Animated.timing(opacity, {
+            toValue: 0,
+            duration: ANIMATION_DURATION,
+            useNativeDriver: true,
+          }),
+        ]).start(({ finished }) => {
+          if (finished) {
+            isRunning.current = false;
+          }
+        });
+      }
+    });
+
+    return () => scrollY.removeListener(listener);
+  }, [
+    scrollY,
+    modulePosition,
+    parentY,
+    dimension.height,
+    translateX,
+    opacity,
+    componentY,
+    componentHeight,
+    index,
+  ]);
+
+  const imageContainerStyle = useMemo(
+    () => [
+      styles.imageContainer,
+      {
+        width: mediaWidth,
+        borderRadius: cardStyle?.borderRadius ?? 0,
+        transform: [{ translateX }],
+        opacity,
+      },
+    ],
+    [
+      styles.imageContainer,
+      mediaWidth,
+      cardStyle?.borderRadius,
+      translateX,
+      opacity,
+    ],
   );
 
-  const animatedStyle = useAnimatedStyle(() => {
-    const itemStartY =
-      (modulePosition?.value ?? 0) + componentY.value + (parentY?.value ?? 0);
-    const itemEndY = itemStartY + componentHeight.value;
-
-    if (disableAnimation) {
-      return {
-        transform: [{ translateX: 0 }],
-        opacity: 1,
-      };
-    }
-
-    const translateX = withTiming(
-      scrollY.value > itemStartY - dimension.height && scrollY.value < itemEndY
-        ? 0
-        : index % 2 === 0
-          ? -150
-          : 150,
-      { duration: ANIMATION_DURATION },
-    );
-
-    const opacity = withTiming(
-      scrollY.value > itemStartY - dimension.height && scrollY.value < itemEndY
-        ? 1
-        : 0,
-      { duration: ANIMATION_DURATION },
-    );
-
-    return {
-      transform: [{ translateX }],
-      opacity,
-    };
-  });
+  const imageDimension = useMemo(
+    () => ({
+      width: mediaWidth,
+      height: mediaWidth,
+    }),
+    [mediaWidth],
+  );
 
   if (!media || !children) {
     return null;
@@ -114,38 +166,14 @@ const AlternationContainer = ({
       onLayout={onLayout}
     >
       {viewMode === 'mobile' || index % 2 === 0 ? (
-        <Animated.View
-          style={[
-            styles.imageContainer,
-            { width: mediaWidth, borderRadius: cardStyle?.borderRadius ?? 0 },
-            animatedStyle,
-          ]}
-        >
-          <CardModuleMediaItem
-            media={media}
-            dimension={{
-              width: mediaWidth,
-              height: mediaWidth,
-            }}
-          />
+        <Animated.View style={imageContainerStyle}>
+          <CardModuleMediaItem media={media} dimension={imageDimension} />
         </Animated.View>
       ) : null}
       <View style={{ width: mediaWidth }}>{children}</View>
       {viewMode === 'desktop' && index % 2 === 1 ? (
-        <Animated.View
-          style={[
-            styles.imageContainer,
-            { width: mediaWidth, borderRadius: cardStyle?.borderRadius ?? 0 },
-            animatedStyle,
-          ]}
-        >
-          <CardModuleMediaItem
-            media={media}
-            dimension={{
-              width: mediaWidth,
-              height: mediaWidth,
-            }}
-          />
+        <Animated.View style={imageContainerStyle}>
+          <CardModuleMediaItem media={media} dimension={imageDimension} />
         </Animated.View>
       ) : null}
     </View>

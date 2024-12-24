@@ -1,11 +1,11 @@
 import { Suspense, memo, useCallback, useMemo, useRef, useState } from 'react';
-import { useWindowDimensions, View, StyleSheet } from 'react-native';
-import Animated, {
-  runOnJS,
-  useAnimatedScrollHandler,
-  useAnimatedStyle,
-  useSharedValue,
-} from 'react-native-reanimated';
+import {
+  useWindowDimensions,
+  View,
+  StyleSheet,
+  Animated as RNAnimated,
+} from 'react-native';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
@@ -39,6 +39,7 @@ import type {
   WebCardBodyHandle,
   ModuleSelectionInfos,
 } from './WebCardScreenBody';
+import type { NativeSyntheticEvent, NativeScrollEvent } from 'react-native';
 import type { AnimatedScrollView } from 'react-native-reanimated/lib/typescript/component/ScrollView';
 
 type WebCardScreenContentProps = {
@@ -153,9 +154,9 @@ const WebCardScreenContent = ({
 
   // #region Color picker
   const [
-    showWebcardColorPicker,
-    openWebcardColorPicker,
-    closeWebcardColorPicker,
+    showWebCardColorPicker,
+    openWebCardColorPicker,
+    closeWebCardColorPicker,
   ] = useBoolean(false);
   // #endregion
 
@@ -285,7 +286,7 @@ const WebCardScreenContent = ({
   }, []);
   // #endregion
 
-  const scrollPosition = useSharedValue(0);
+  const scrollPosition = useRef(new RNAnimated.Value(0)).current;
 
   const coverBackgroundColor =
     swapColor(webCard.coverBackgroundColor, webCard.cardColors) ??
@@ -302,17 +303,15 @@ const WebCardScreenContent = ({
 
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();
 
-  const scrollHandler = useAnimatedScrollHandler({
-    onScroll: event => {
-      scrollPosition.value = event.contentOffset.y;
-    },
-    onEndDrag(event) {
-      const atTop = event.contentOffset.y < 5;
+  const onMomentumScrollEnd = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const atTop = event.nativeEvent.contentOffset.y < 5;
       if (onContentPositionChange) {
-        runOnJS(onContentPositionChange)(atTop);
+        onContentPositionChange(atTop);
       }
     },
-  });
+    [onContentPositionChange],
+  );
 
   const { canPlay, paused } = useCoverPlayPermission();
 
@@ -346,14 +345,15 @@ const WebCardScreenContent = ({
             onCancelEditModules={onToggleSelectionMode}
             onSelectAllModules={onSelectAllModules}
             onUnSelectAllModules={onUnSelectAllModules}
-            disabledButtons={showWebcardColorPicker}
+            disabledButtons={showWebCardColorPicker}
           />
         </Suspense>
         <WebCardScreenScrollView
           editing={editing}
           ref={scrollViewRef}
           allBlockLoaded={allBlockLoaded}
-          onScroll={scrollHandler}
+          scrollPosition={scrollPosition}
+          onMomentumScrollEnd={onMomentumScrollEnd}
           editFooter={
             isViewer ? (
               <Suspense>
@@ -418,7 +418,7 @@ const WebCardScreenContent = ({
             selectionContainsHiddenModules={selectionContainsHiddenModules}
             webCard={webCard}
             onRequestNewModule={onRequestNewModule}
-            onRequestColorPicker={openWebcardColorPicker}
+            onRequestColorPicker={openWebCardColorPicker}
             onRequestWebCardStyle={openCardStyleModal}
             onRequestPreview={openPreviewModal}
             onDelete={onDeleteSelectedModules}
@@ -447,9 +447,9 @@ const WebCardScreenContent = ({
             />
             <WebCardColorsManager
               webCard={webCard}
-              visible={showWebcardColorPicker}
-              onRequestClose={closeWebcardColorPicker}
-              onCloseCanceled={openWebcardColorPicker}
+              visible={showWebCardColorPicker}
+              onRequestClose={closeWebCardColorPicker}
+              onCloseCanceled={openWebCardColorPicker}
             />
             <AddModuleSectionModal
               close={closeContentModal}

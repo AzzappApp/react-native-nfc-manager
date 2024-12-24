@@ -15,15 +15,14 @@ import type {
 } from '../cardModuleEditorType';
 import type { CardStyle } from '@azzapp/shared/cardHelpers';
 import type { CardModuleColor } from '@azzapp/shared/cardModuleHelpers';
-import type { LayoutChangeEvent } from 'react-native';
-import type { SharedValue } from 'react-native-reanimated';
+import type { Animated, LayoutChangeEvent } from 'react-native';
 
 type CardModuleMediaTextLinkParallaxProps = CardModuleVariantType & {
   cardModuleMedias: CardModuleMedia[];
   onLayout?: (event: LayoutChangeEvent) => void;
   disableParallax?: boolean;
-  scrollPosition?: SharedValue<number>;
-  modulePosition?: SharedValue<number>;
+  scrollPosition?: Animated.Value;
+  modulePosition?: number;
   moduleEditing: boolean;
 };
 
@@ -110,8 +109,8 @@ const ParallaxItem = ({
   index: number;
   disableParallax?: boolean;
   setEditableItemIndex?: (index: number) => void;
-  scrollPosition: SharedValue<number>;
-  modulePosition?: SharedValue<number>;
+  scrollPosition: Animated.Value;
+  modulePosition?: number;
   viewMode: 'desktop' | 'mobile';
   moduleEditing: boolean;
 }) => {

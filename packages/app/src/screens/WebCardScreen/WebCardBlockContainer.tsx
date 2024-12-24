@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import {
   StyleSheet,
@@ -13,12 +13,9 @@ import Animated, {
   FadeOut,
   interpolate,
   LinearTransition,
-  measure,
   runOnJS,
   useAnimatedReaction,
-  useAnimatedRef,
   useAnimatedStyle,
-  useFrameCallback,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
@@ -37,7 +34,7 @@ import {
   useEditTransitionListener,
   useSelectionModeTransition,
 } from './WebCardScreenTransitions';
-import type { SharedValue } from 'react-native-reanimated';
+import type { LayoutChangeEvent } from 'react-native';
 
 export type ProfileBlockContainerProps = {
   /**
@@ -134,7 +131,7 @@ export type ProfileBlockContainerProps = {
    */
   onSelect?: (selected: boolean) => void;
 
-  modulePosition?: SharedValue<number>;
+  setModulePosition?: (position: number) => void;
 };
 
 /**
@@ -163,7 +160,7 @@ const WebCardBlockContainer = ({
   onDuplicate,
   onToggleVisibility,
   onSelect,
-  modulePosition,
+  setModulePosition,
 }: ProfileBlockContainerProps) => {
   const intl = useIntl();
 
@@ -350,16 +347,14 @@ const WebCardBlockContainer = ({
     opacity: Math.max(0, dragX.value / dragLeftLimit),
   }));
 
-  const animatedRef = useAnimatedRef();
-
-  useFrameCallback(() => {
-    if (modulePosition) {
-      const measured = measure(animatedRef);
-      if (measured) {
-        modulePosition.value = measured.y;
+  const onLayout = useCallback(
+    (layoutChangeEvent: LayoutChangeEvent) => {
+      if (setModulePosition) {
+        setModulePosition(layoutChangeEvent.nativeEvent.layout.y);
       }
-    }
-  });
+    },
+    [setModulePosition],
+  );
 
   return (
     <Animated.View
@@ -380,7 +375,7 @@ const WebCardBlockContainer = ({
             )
           : undefined
       }
-      ref={animatedRef}
+      onLayout={onLayout}
     >
       <Animated.View style={blockStyle}>
         <GestureDetector gesture={Gesture.Race(tapGesture, panGesture)}>

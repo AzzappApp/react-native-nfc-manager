@@ -1,15 +1,13 @@
-import { cloneElement, isValidElement } from 'react';
-import Animated, {
-  useAnimatedScrollHandler,
-  useSharedValue,
-} from 'react-native-reanimated';
+import { cloneElement, isValidElement, useMemo, useRef } from 'react';
+
+import { Animated } from 'react-native';
 import type { ReactElement } from 'react';
 import type { ScrollViewProps } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 
 type CardModuleEditionScrollHandlerProps = ScrollViewProps & {
   children: ReactElement<{ scrollPosition: SharedValue }>;
-  scrollPosition?: SharedValue<number> | undefined;
+  scrollPosition?: Animated.Value;
 };
 
 const CardModuleEditionScrollHandler = ({
@@ -28,19 +26,23 @@ const EditionScrollHandler = ({
   children,
   ...props
 }: CardModuleEditionScrollHandlerProps) => {
-  const scrollY = useSharedValue(0);
+  const scrollPosition = useRef(new Animated.Value(0)).current;
 
-  const scrollHandler = useAnimatedScrollHandler({
-    onScroll: event => {
-      scrollY.value = event.contentOffset.y;
-    },
-  });
+  const onScroll = useMemo(
+    () =>
+      Animated.event(
+        [{ nativeEvent: { contentOffset: { y: scrollPosition } } }],
+        { useNativeDriver: true },
+      ),
+    [scrollPosition],
+  );
+
   const clone = isValidElement(children)
-    ? cloneElement(children, { scrollPosition: scrollY })
+    ? cloneElement(children, { scrollPosition })
     : children;
 
   return (
-    <Animated.ScrollView bounces={false} onScroll={scrollHandler} {...props}>
+    <Animated.ScrollView bounces={false} onScroll={onScroll} {...props}>
       {clone}
     </Animated.ScrollView>
   );

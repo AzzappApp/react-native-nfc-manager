@@ -1,4 +1,3 @@
-import { type ViewProps } from 'react-native';
 import { type CardStyle, type ColorPalette } from '@azzapp/shared/cardHelpers';
 import {
   HORIZONTAL_PHOTO_DEFAULT_VALUES,
@@ -44,7 +43,7 @@ import type {
   MODULE_KIND_MEDIA_TEXT,
   MODULE_KIND_MEDIA_TEXT_LINK,
 } from '@azzapp/shared/cardModuleHelpers';
-import type { SharedValue } from 'react-native-reanimated';
+import type { ViewProps, Animated as RNAnimated } from 'react-native';
 
 export type ModuleRenderInfo =
   | {
@@ -132,9 +131,9 @@ export type CardModuleRendererProps<T extends ModuleRenderInfo> = ViewProps & {
    */
   coverBackgroundColor?: string | null | undefined;
 
-  scrollPosition: SharedValue<number>;
+  scrollPosition: RNAnimated.Value;
 
-  modulePosition: SharedValue<number>;
+  modulePosition: number;
 
   editing?: boolean;
 };
