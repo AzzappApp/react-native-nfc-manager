@@ -120,24 +120,27 @@ const TabsBarItem = ({
   }, [tabKey, onTabPress]);
 
   return (
-    <Fragment>
+    <>
       <View style={styles.backgroundLine} />
       <PressableNative
         accessibilityRole="tab"
         accessibilityLabel={label}
         accessibilityState={{ selected: isSelected }}
         onPress={onPress}
-        style={[
-          styles.tab,
-          isSelected && decoration === 'underline' && styles.selected,
-        ]}
+        style={styles.tab}
       >
         <View style={styles.labelContainer}>
           <Text variant="smallbold">{label}</Text>
           {rightElement}
         </View>
+        <View
+          style={[
+            styles.underline,
+            isSelected && decoration === 'underline' && styles.selected,
+          ]}
+        />
       </PressableNative>
-    </Fragment>
+    </>
   );
 };
 
@@ -167,6 +170,7 @@ const styleSheet = createStyleSheet(appearance => ({
     borderBottomWidth: 2,
     borderColor: appearance === 'light' ? colors.black : colors.white,
   },
+  underline: { bottom: 0, width: '100%', height: '100%', position: 'absolute' },
 }));
 
 export default TabsBar;

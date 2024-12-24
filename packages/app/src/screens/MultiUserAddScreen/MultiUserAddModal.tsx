@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as FileSystem from 'expo-file-system';
+import { File, Paths } from 'expo-file-system/next';
 import parsePhoneNumberFromString, {
   parsePhoneNumber,
 } from 'libphonenumber-js';
@@ -384,11 +384,11 @@ const MultiUserAddModal = (
 
         let uri = avatar.uri;
         if (avatar.uri.startsWith('content://')) {
-          uri = FileSystem.cacheDirectory + createId();
-          await FileSystem.copyAsync({
-            from: avatar.uri,
-            to: uri,
-          });
+          const originalFile = new File(avatar.uri);
+          uri = Paths.cache.uri + createId();
+          const file = new File(uri);
+          file.create();
+          originalFile.copy(file);
         }
 
         const file: any = {

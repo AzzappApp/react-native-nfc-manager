@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { FormattedMessage } from 'react-intl';
 import { ScrollView, View } from 'react-native';
 import { colors } from '#theme';
 import { MediaImageRenderer } from '#components/medias';
@@ -8,6 +9,7 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import PressableOpacity from '#ui/PressableOpacity';
+import Text from '#ui/Text';
 import CardModuleMediaPickerFloatingTool from './CardModuleMediaPickerFloatingTool';
 import type { ModuleKindAndVariant } from '#helpers/webcardModuleHelpers';
 import type { CardModuleMedia } from '../cardModuleEditorType';
@@ -39,28 +41,39 @@ const CardModuleMediasToolbox = ({
       <PressableOpacity style={styles.previewButton} onPress={close}>
         <Icon icon="arrow_down" />
       </PressableOpacity>
-      <ScrollView
-        horizontal
-        contentContainerStyle={styles.scrollContentContainer}
-        showsHorizontalScrollIndicator={false}
-      >
-        {cardModuleMedias.map((cardMediaModule, index) => {
-          if (!cardMediaModule) {
-            return <View key={index} style={styles.previewContent} />;
-          }
-
-          return (
-            <MediaItem
-              key={index}
-              cardModuleMedia={cardMediaModule}
-              index={index}
-              handleRemoveMedia={handleRemoveMedia}
-              onSelectMedia={onSelectMedia}
-              module={module}
+      {cardModuleMedias.length === 0 ? (
+        <View style={styles.viewErrorMessage}>
+          <Text variant="error">
+            <FormattedMessage
+              defaultMessage="No media selected"
+              description="CardModuleMediasToolbox - error message when no media are selected"
             />
-          );
-        })}
-      </ScrollView>
+          </Text>
+        </View>
+      ) : (
+        <ScrollView
+          horizontal
+          contentContainerStyle={styles.scrollContentContainer}
+          showsHorizontalScrollIndicator={false}
+        >
+          {cardModuleMedias.map((cardMediaModule, index) => {
+            if (!cardMediaModule) {
+              return <View key={index} style={styles.previewContent} />;
+            }
+
+            return (
+              <MediaItem
+                key={index}
+                cardModuleMedia={cardMediaModule}
+                index={index}
+                handleRemoveMedia={handleRemoveMedia}
+                onSelectMedia={onSelectMedia}
+                module={module}
+              />
+            );
+          })}
+        </ScrollView>
+      )}
       <CardModuleMediaPickerFloatingTool
         cardModuleMedias={cardModuleMedias}
         onUpdateMedia={onUpdateMedias}
@@ -128,6 +141,7 @@ const MediaItem = ({
 };
 
 const styleSheet = createStyleSheet(appearance => ({
+  viewErrorMessage: { justifyContent: 'center' },
   container: {
     height: TOOLBOX_SECTION_HEIGHT,
     width: '100%',

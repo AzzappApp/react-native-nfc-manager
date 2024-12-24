@@ -1,9 +1,10 @@
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 import { isNotFalsyString, isValidUrl } from '@azzapp/shared/stringHelpers';
-import { DoneHeaderButton } from '#components/commonsButtons';
+import { colors } from '#theme';
 import { MediaImageRenderer } from '#components/medias';
 import ToolBoxSection from '#components/Toolbar/ToolBoxSection';
 import { hasCardModuleMediaError } from '#helpers/cardModuleHelpers';
@@ -11,7 +12,7 @@ import useBoolean from '#hooks/useBoolean';
 import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import BottomSheetTextInput from '#ui/BottomSheetTextInput';
-import Header from '#ui/Header';
+import Header, { HEADER_HEIGHT } from '#ui/Header';
 import Text from '#ui/Text';
 import {
   DEFAULT_CARD_MODULE_TEXT,
@@ -43,6 +44,23 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
   const [linkAction, setLinkAction] = useState(cardModuleMedia.link?.label);
   const [hasLinkError, setHasLinkError] = useState(false);
 
+  //this pattern is required here, because we can chose another MediaText/MediaTextLink to edit without dismounting completly the modal
+  // lazy on bottom sheet does not work either. This will not cause to much rerender because the component is save only on dismissing the modal, not realtime
+  useEffect(() => {
+    setText(cardModuleMedia.text);
+    setTitle(cardModuleMedia.title);
+    setLinkUrl(cardModuleMedia.link?.url);
+    setLinkAction(cardModuleMedia.link?.label);
+  }, [cardModuleMedia]);
+
+  useEffect(() => {
+    if (show && isNotFalsyString(linkUrl)) {
+      setHasLinkError(!isValidUrl(linkUrl));
+    }
+    //don't want to refrehs on linkUrl update
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [show]);
+
   const actionLabel = intl.formatMessage({
     defaultMessage: 'Open',
     description: 'Link action placeholder in design module text tool',
@@ -51,6 +69,7 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
   // onDismiss call when the popup dismiss in order to save
   const onDismiss = () => {
     const url = convertUrlLink(linkUrl);
+    setLinkUrl(url);
     onUpdateMedia({
       ...cardModuleMedia,
       text,
@@ -60,18 +79,24 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
         label: linkAction ?? actionLabel,
       },
     });
+    //remove this error
+    setHasLinkError(false);
     close();
   };
 
   // onDone should check the url is valid and not close the popup
   const onDone = () => {
-    const url = convertUrlLink(linkUrl);
-    if (module.moduleKind === 'mediaTextLink') {
-      if (!isValidUrl(url)) {
-        setHasLinkError(true);
-        return;
+    if (isNotFalsyString(linkUrl)) {
+      const url = convertUrlLink(linkUrl);
+      if (module.moduleKind === 'mediaTextLink') {
+        if (!isValidUrl(url)) {
+          setHasLinkError(true);
+          return;
+        }
       }
     }
+    //closing will call ondismiss and save(don't want to create a double save )
+    close();
   };
 
   const { bottom: bottomInset } = useScreenInsets();
@@ -100,15 +125,26 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
         onDismiss={onDismiss}
         nestedScroll
         bottomInset={bottomInset}
+        lazy
+        enableContentPanningGesture={false}
       >
-        <BottomSheetScrollView style={styles.container}>
+        <BottomSheetScrollView style={styles.container} bounces={false}>
           <Header
             middleElement={intl.formatMessage({
               defaultMessage: 'Design',
               description: 'CardModuleDesignTool - Bottom Sheet header',
             })}
             style={styles.header}
-            rightElement={<DoneHeaderButton onPress={onDone} />}
+            rightElement={
+              <TouchableOpacity onPress={onDone} style={styles.doneButton}>
+                <Text variant="button" style={{ color: colors.white }}>
+                  <FormattedMessage
+                    defaultMessage="Done"
+                    description="CardMOduleMediaTextTool - Done header button label"
+                  />
+                </Text>
+              </TouchableOpacity>
+            }
           />
           {module.moduleKind === 'mediaTextLink' && (
             <View style={{ flexDirection: 'row', gap: 10 }}>
@@ -135,6 +171,7 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
                   onChangeText={setLinkUrl}
                   style={{ flex: 1 }}
                   autoCorrect={false}
+                  autoCapitalize="none"
                   keyboardType="url"
                   isErrored={hasLinkError}
                 />
@@ -222,6 +259,17 @@ const isVisible = (module: ModuleKindAndVariant) => {
 export default CardModuleMediaTextTool;
 
 const styles = StyleSheet.create({
+  doneButton: {
+    width: 74,
+    height: HEADER_HEIGHT,
+    paddingHorizontal: 0,
+    backgroundColor: colors.black,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 12,
+    borderCurve: 'continuous',
+    overflow: 'hidden',
+  },
   container: { paddingHorizontal: 16 },
   header: { marginBottom: 15 },
   textAction: { paddingTop: 10, paddingBottom: 5 },

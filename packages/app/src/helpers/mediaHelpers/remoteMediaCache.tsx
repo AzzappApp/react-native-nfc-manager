@@ -1,5 +1,5 @@
+import { File } from 'expo-file-system/next';
 import { useEffect, useState } from 'react';
-import ReactNativeBlobUtil from 'react-native-blob-util';
 import type {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- used in JSDoc
   MediaImageRenderer,
@@ -81,18 +81,14 @@ export const useLocalCachedMediaFile = (
   useEffect(() => {
     let cancelled = false;
     if (localFile) {
-      const path = localFile.replace('file://', '');
-      ReactNativeBlobUtil.fs
-        .exists(path)
-        .catch(() => false)
-        .then(exists => {
-          if (!exists) {
-            deleteLocalCachedMediaFile(mediaId, kind);
-            if (!cancelled) {
-              forceRender(v => v + 1);
-            }
-          }
-        });
+      const file = new File(localFile);
+      const exists = file.exists;
+      if (!exists) {
+        deleteLocalCachedMediaFile(mediaId, kind);
+        if (!cancelled) {
+          forceRender(v => v + 1);
+        }
+      }
     }
     return () => {
       cancelled = true;

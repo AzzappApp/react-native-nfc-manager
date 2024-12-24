@@ -20,10 +20,10 @@ const createRuntimeShaderFactory = <
     Object.entries(uniforms).forEach(([name, value]) => {
       builder.setUniform(name, Array.isArray(value) ? value : [value]);
     });
-    return Skia.ImageFilter.MakeRuntimeShader(
+    return Skia.ImageFilter.MakeRuntimeShaderWithChildren(
       builder,
-      'image',
-      previousFilter ?? null,
+      ['image'],
+      [previousFilter ?? null],
     );
   };
 };

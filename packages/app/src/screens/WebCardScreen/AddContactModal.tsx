@@ -5,7 +5,7 @@ import {
   updateContactAsync,
   PermissionStatus as ContactPermissionStatus,
 } from 'expo-contacts';
-import * as FileSystem from 'expo-file-system';
+import { File, Paths } from 'expo-file-system/next';
 import { fromGlobalId } from 'graphql-relay';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -309,7 +309,19 @@ const AddContactModal = ({
             }
 
             if (Platform.OS === 'ios') {
-              await presentFormAsync(null, scanned.contact, {
+              const updatedContact = reworkContactForDeviceInsert({
+                ...scanned.contact,
+                urlAddresses:
+                  additionalContactData?.urls?.map(addr => {
+                    return { label: 'default', address: addr.address };
+                  }) || undefined,
+                socialProfiles:
+                  additionalContactData?.socials?.map(social => {
+                    return { ...social, address: social.url };
+                  }) || undefined,
+              });
+
+              await presentFormAsync(null, updatedContact, {
                 isNew: true,
               });
             } else {
@@ -524,17 +536,17 @@ const buildContact = async (
 
   if (additionalContactData?.avatarUrl) {
     try {
-      const avatar = await FileSystem.downloadAsync(
-        additionalContactData.avatarUrl,
-        FileSystem.cacheDirectory + profileId,
-      );
-      if (avatar.status >= 200 && avatar.status < 300) {
-        image = {
-          width: 720,
-          height: 720,
-          uri: avatar.uri,
-        };
+      const avatar = new File(Paths.cache.uri + profileId);
+      if (!avatar.exists) {
+        avatar.create();
+        await File.downloadFileAsync(additionalContactData.avatarUrl, avatar);
       }
+
+      image = {
+        width: 720,
+        height: 720,
+        uri: avatar.uri,
+      };
     } catch (e) {
       Sentry.captureException(e);
     }

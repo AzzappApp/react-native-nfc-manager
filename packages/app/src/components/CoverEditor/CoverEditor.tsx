@@ -12,6 +12,7 @@ import {
 } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Platform, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { getVideoMetaData, Video } from 'react-native-compressor';
 import { useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller';
 import Animated, {
   interpolate,
@@ -70,6 +71,7 @@ import type {
   CoverEditorOverlayItem,
   CoverEditorState,
   CoverEditorTextLayerItem,
+  CoverMedia,
 } from './coverEditorTypes';
 import type { Filter } from '@azzapp/shared/filtersHelper';
 import type { Asset } from 'expo-asset';
@@ -392,7 +394,7 @@ const CoverEditorCore = (
   useEffect(() => {
     let canceled = false;
     const abortController = new AbortController();
-    const mediasToLoad: SourceMedia[] = [];
+    const mediasToLoad: Array<CoverEditorOverlayItem | CoverMedia> = [];
     for (const media of coverEditorState.medias) {
       const { id, kind } = media;
       if (
@@ -468,6 +470,38 @@ const CoverEditorCore = (
     promises.push(
       ...mediasToLoad.map(async media => {
         if (!localFilenames[media.id]) {
+          if (media.kind === 'video' && !media.uri.startsWith('http')) {
+            const result = await Video.compress(media.uri);
+            const metaData = await getVideoMetaData(result);
+            media = {
+              ...media,
+              uri: result,
+              width: metaData.width,
+              height: metaData.height,
+              editionParameters: media.editionParameters
+                ? {
+                    ...media.editionParameters,
+                    cropData: media.editionParameters?.cropData
+                      ? {
+                          originX:
+                            (metaData.width / media.width) *
+                            media.editionParameters.cropData.originX,
+                          originY:
+                            (metaData.height / media.height) *
+                            media.editionParameters.cropData.originY,
+                          height:
+                            (metaData.height / media.height) *
+                            media.editionParameters.cropData.height,
+                          width:
+                            (metaData.width / media.width) *
+                            media.editionParameters.cropData.width,
+                        }
+                      : null,
+                  }
+                : null,
+            };
+          }
+
           const filename = await copyCoverMediaToCacheDir(
             media,
             COVER_CACHE_DIR,

@@ -11,8 +11,7 @@ import type {
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { CardModuleColor } from '@azzapp/shared/cardModuleHelpers';
 import type { Filter } from '@azzapp/shared/filtersHelper';
-import type { LayoutChangeEvent } from 'react-native';
-import type { SharedValue } from 'react-native-reanimated';
+import type { LayoutChangeEvent, Animated as RNAnimated } from 'react-native';
 
 type CardModuleMediaBase = {
   filter: Filter | null;
@@ -113,9 +112,9 @@ export type CommonModuleRendererProps<T, V extends ModuleKindHasVariants> = {
    * The scrollPosition of the container (used in variant that require scroll, all new module needs
    *
    */
-  scrollPosition?: SharedValue<number>;
+  scrollPosition?: RNAnimated.Value;
 
-  modulePosition?: SharedValue<number>;
+  modulePosition?: number;
 
   onLayout?: (event: LayoutChangeEvent) => void;
   /* 

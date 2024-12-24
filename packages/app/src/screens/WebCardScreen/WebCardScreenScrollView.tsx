@@ -1,4 +1,5 @@
 import { useMemo, useRef, forwardRef } from 'react';
+import { Animated as RNAnimated } from 'react-native';
 import Animated, {
   FadeIn,
   FadeOut,
@@ -36,6 +37,7 @@ export type WebCardScreenScrollViewProps = Omit<ScrollViewProps, 'hitSlop'> & {
    * Footer
    */
   editFooterHeight: number;
+  scrollPosition: RNAnimated.Value;
 };
 
 /**
@@ -49,6 +51,7 @@ const WebCardScreenScrollView = (
     onScroll,
     editFooter,
     editFooterHeight,
+    scrollPosition,
     ...props
   }: WebCardScreenScrollViewProps,
   forwardedRef: ForwardedRef<AnimatedScrollView>,
@@ -126,9 +129,18 @@ const WebCardScreenScrollView = (
     [forwardedRef],
   );
 
+  const onScrollInner = useMemo(
+    () =>
+      RNAnimated.event(
+        [{ nativeEvent: { contentOffset: { y: scrollPosition } } }],
+        { listener: onScroll, useNativeDriver: true },
+      ),
+    [scrollPosition, onScroll],
+  );
+
   return (
     <Animated.View style={[containerStyle, { transformOrigin: 'top' }]}>
-      <Animated.ScrollView
+      <RNAnimated.ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{
           flexGrow: 1,
@@ -137,8 +149,8 @@ const WebCardScreenScrollView = (
         contentInsetAdjustmentBehavior="never"
         ref={mergedRefs}
         scrollToOverflowEnabled
-        onScroll={onScroll}
         scrollEventThrottle={16}
+        onScroll={onScrollInner}
         {...props}
       >
         <Animated.View style={contentContainerStyle}>
@@ -150,7 +162,7 @@ const WebCardScreenScrollView = (
             <Animated.View style={footerStyle}>{editFooter}</Animated.View>
           </Animated.View>
         </Animated.View>
-      </Animated.ScrollView>
+      </RNAnimated.ScrollView>
     </Animated.View>
   );
 };

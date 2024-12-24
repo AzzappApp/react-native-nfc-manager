@@ -1,11 +1,12 @@
 import FlashList from '@shopify/flash-list/dist/FlashList';
 import { Image } from 'expo-image';
 import { memo, useCallback } from 'react';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { useColorScheme, View } from 'react-native';
 import { colors } from '#theme';
 import { DoneHeaderButton } from '#components/commonsButtons';
 import ToolBoxSection from '#components/Toolbar/ToolBoxSection';
+import { SUPPORTED_VARIANT } from '#helpers/cardModuleRouterHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import {
   MODULE_KIND_WITH_VARIANTS,
@@ -22,6 +23,7 @@ import Container from '#ui/Container';
 import Header from '#ui/Header';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
+import type { SupportedVariant } from '#helpers/cardModuleRouterHelpers';
 import type { ListRenderItemInfo } from '@shopify/flash-list';
 import type { ColorSchemeName } from 'react-native';
 
@@ -128,16 +130,38 @@ const Item = <T extends ModuleKindAndVariant>({
     variant,
   } as ModuleKindWithVariant);
 
+  const isVariantSupported = SUPPORTED_VARIANT.includes(
+    variant as SupportedVariant,
+  );
+
   return (
-    <PressableOpacity onPress={onPress}>
+    <PressableOpacity
+      onPress={onPress}
+      disabled={!isVariantSupported}
+      disabledOpacity={1}
+    >
       <View
         style={[
           styles.imageContainer,
           isSelected && styles.selectedImageContainer,
         ]}
       >
-        <Image source={pictureUri} style={{ flex: 1 }} />
+        <Image source={pictureUri} style={styles.image} />
       </View>
+      {!isVariantSupported && (
+        <Container style={styles.comingSoon}>
+          <Text
+            variant="xsmallbold"
+            appearance="dark"
+            style={styles.comingSoonText}
+          >
+            <FormattedMessage
+              defaultMessage="Coming soon"
+              description="Module is not available yet"
+            />
+          </Text>
+        </Container>
+      )}
       <Container style={styles.badge}>
         <Text variant="smallbold">{label}</Text>
       </Container>
@@ -162,6 +186,34 @@ export const getPictureUri = (
           return colorScheme === 'light'
             ? require('./assets/media_parallax_light.png')
             : require('./assets/media_parallax_dark.png');
+        case 'full_grid':
+          return colorScheme === 'light'
+            ? require('./assets/media_full_grid_light.png')
+            : require('./assets/media_full_grid_dark.png');
+        case 'full_slideshow':
+          return colorScheme === 'light'
+            ? require('./assets/media_full_slideshow_light.png')
+            : require('./assets/media_full_slideshow_dark.png');
+        case 'fullscreen':
+          return colorScheme === 'light'
+            ? require('./assets/media_fullscreen_light.png')
+            : require('./assets/media_fullscreen_dark.png');
+        case 'grid':
+          return colorScheme === 'light'
+            ? require('./assets/media_grid_light.png')
+            : require('./assets/media_grid_dark.png');
+        case 'original':
+          return colorScheme === 'light'
+            ? require('./assets/media_original_light.png')
+            : require('./assets/media_original_dark.png');
+        case 'original_slideshow':
+          return colorScheme === 'light'
+            ? require('./assets/media_original_slideshow_light.png')
+            : require('./assets/media_original_slideshow_dark.png');
+        case 'zoom_out_fade':
+          return colorScheme === 'light'
+            ? require('./assets/media_zoom_out_fade_light.png')
+            : require('./assets/media_zoom_out_fade_dark.png');
         default:
           return null;
       }
@@ -169,13 +221,36 @@ export const getPictureUri = (
       switch (module.variant) {
         case 'alternation':
           return colorScheme === 'light'
-            ? require('./assets/media_text_alternation_light.png')
-            : require('./assets/media_text_alternation_dark.png');
-
+            ? require('./assets/Media_Text/media_with_text_light_grey_Alternation.png')
+            : require('./assets/Media_Text/media_with_text_dark_grey_Alternation.png');
         case 'parallax':
           return colorScheme === 'light'
-            ? require('./assets/media_text_parallax_light.png')
-            : require('./assets/media_text_parallax_dark.png');
+            ? require('./assets/Media_Text/media_with_text_light_grey_Parallax.png')
+            : require('./assets/Media_Text/media_with_text_dark_grey_Parallax.png');
+        case 'full_alternation':
+          return colorScheme === 'light'
+            ? require('./assets/Media_Text/media_with_text_light_grey_Full_Alternation.png')
+            : require('./assets/Media_Text/media_with_text_dark_grey_Full_Alternation.png');
+        case 'article':
+          return colorScheme === 'light'
+            ? require('./assets/Media_Text/media_with_text_light_grey_Articles.png')
+            : require('./assets/Media_Text/media_with_text_dark_grey_Articles.png');
+        case 'card':
+          return colorScheme === 'light'
+            ? require('./assets/Media_Text/media_with_text_light_grey_Cards.png')
+            : require('./assets/Media_Text/media_with_text_dark_grey_Cards.png');
+        case 'card_gradient':
+          return colorScheme === 'light'
+            ? require('./assets/Media_Text/media_with_text_light_grey_Cards_gradient.png')
+            : require('./assets/Media_Text/media_with_text_dark_grey_Cards_gradient.png');
+        case 'grid':
+          return colorScheme === 'light'
+            ? require('./assets/Media_Text/media_with_text_light_grey_Grid.png')
+            : require('./assets/Media_Text/media_with_text_dark_grey_Grid.png');
+        case 'superposition':
+          return colorScheme === 'light'
+            ? require('./assets/Media_Text/media_with_text_light_grey_Superposition.png')
+            : require('./assets/Media_Text/media_with_text_dark_grey_Superposition.png');
         default:
           return null;
       }
@@ -183,13 +258,44 @@ export const getPictureUri = (
       switch (module.variant) {
         case 'alternation':
           return colorScheme === 'light'
-            ? require('./assets/media_text_link_alternation_light.png')
-            : require('./assets/media_text_link_alternation_dark.png');
-
+            ? require('./assets/Media_Text_Link/media_with_text_and_link_light_grey_Alternation.png')
+            : require('./assets/Media_Text_Link/media_with_text_and_link_dark_grey_Alternation.png');
         case 'parallax':
           return colorScheme === 'light'
-            ? require('./assets/media_text_link_parallax_light.png')
-            : require('./assets/media_text_link_parallax_dark.png');
+            ? require('./assets/Media_Text_Link/media_with_text_and_link_light_grey_Parallax.png')
+            : require('./assets/Media_Text_Link/media_with_text_and_link_dark_grey_Parallax.png');
+        case 'full_alternation':
+          return colorScheme === 'light'
+            ? require('./assets/Media_Text_Link/media_with_text_and_link_light_grey_Full_Alternation.png')
+            : require('./assets/Media_Text_Link/media_with_text_and_link_dark_grey_Full_Alternation.png');
+        case 'article':
+          return colorScheme === 'light'
+            ? require('./assets/Media_Text_Link/media_with_text_and_link_light_grey_Articles.png')
+            : require('./assets/Media_Text_Link/media_with_text_and_link_dark_grey_Articles.png');
+        case 'card':
+          return colorScheme === 'light'
+            ? require('./assets/Media_Text_Link/media_with_text_and_link_light_grey_Cards.png')
+            : require('./assets/Media_Text_Link/media_with_text_and_link_dark_grey_Cards.png');
+        case 'card_gradient':
+          return colorScheme === 'light'
+            ? require('./assets/Media_Text_Link/media_with_text_and_link_light_grey_Cards_gradient.png')
+            : require('./assets/Media_Text_Link/media_with_text_and_link_dark_grey_Cards_gradient.png');
+        case 'grid':
+          return colorScheme === 'light'
+            ? require('./assets/Media_Text_Link/media_with_text_and_link_light_grey_Grid.png')
+            : require('./assets/Media_Text_Link/media_with_text_and_link_dark_grey_Grid.png');
+        case 'button_round':
+          return colorScheme === 'light'
+            ? require('./assets/Media_Text_Link/media_with_text_and_link_light_grey_Buttons_round.png')
+            : require('./assets/Media_Text_Link/media_with_text_and_link_dark_grey_Buttons_round.png');
+        case 'button_square':
+          return colorScheme === 'light'
+            ? require('./assets/Media_Text_Link/media_with_text_and_link_light_grey_Buttons_square.png')
+            : require('./assets/Media_Text_Link/media_with_text_and_link_dark_grey_Buttons_square.png');
+        case 'list':
+          return colorScheme === 'light'
+            ? require('./assets/Media_Text_Link/media_with_text_and_link_light_grey_List.png')
+            : require('./assets/Media_Text_Link/media_with_text_and_link_dark_grey_List.png');
         default:
           return null;
       }
@@ -217,6 +323,23 @@ const styleSheet = createStyleSheet(appearance => ({
     position: 'absolute',
     left: 8,
     bottom: 8,
+    paddingVertical: 3,
+    paddingHorizontal: 6,
+    borderRadius: 28,
+  },
+  image: { flex: 1 },
+  comingSoon: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+  },
+  comingSoonText: {
+    backgroundColor: colors.black,
     paddingVertical: 3,
     paddingHorizontal: 6,
     borderRadius: 28,

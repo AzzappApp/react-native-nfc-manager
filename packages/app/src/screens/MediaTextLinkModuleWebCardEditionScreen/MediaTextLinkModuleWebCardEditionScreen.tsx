@@ -134,7 +134,10 @@ const MediaTextLinkModuleWebCardEditionScreen = (
 
   const [selectedCardModuleColor, setModuleColor] = useState<CardModuleColor>(
     data?.cardModuleColor ??
-      getInitalDyptichColor({ moduleKind: MODULE_KIND, variant }),
+      getInitalDyptichColor(
+        { moduleKind: MODULE_KIND, variant },
+        webCard.coverBackgroundColor,
+      ),
   );
 
   // #region Mutations and saving logic
@@ -160,85 +163,91 @@ const MediaTextLinkModuleWebCardEditionScreen = (
     `,
   );
   const router = useRouter();
-  const save = useCallback(async () => {
-    try {
-      const moduleMedias = await handleUploadCardModuleMedia(cardModuleMedias);
-      commit({
-        variables: {
-          webCardId: webCard.id,
-          input: {
-            moduleId: data?.id,
-            cardModuleColor: selectedCardModuleColor,
-            cardModuleMedias: moduleMedias.map(mediaMod => ({
-              text: mediaMod.text,
-              title: mediaMod.title,
-              link: mediaMod.link,
-              media: {
-                id: mediaMod.media.id,
-              },
-            })),
-            variant,
+  const save: ModuleWebCardScreenHandle['save'] = useCallback(
+    async (updateProcessedMedia, updateUploadIndicator) => {
+      try {
+        const moduleMedias = await handleUploadCardModuleMedia(
+          cardModuleMedias,
+          updateProcessedMedia,
+          updateUploadIndicator,
+        );
+        commit({
+          variables: {
+            webCardId: webCard.id,
+            input: {
+              moduleId: data?.id,
+              cardModuleColor: selectedCardModuleColor,
+              cardModuleMedias: moduleMedias.map(mediaMod => ({
+                text: mediaMod.text,
+                title: mediaMod.title,
+                link: mediaMod.link,
+                media: {
+                  id: mediaMod.media.id,
+                },
+              })),
+              variant,
+            },
           },
-        },
-        onCompleted(_, error) {
-          handleOnCompletedModuleSave(
-            moduleMedias,
-            router,
-            error,
-            intl.formatMessage({
-              defaultMessage: 'Error while creating module',
-              description: 'Toast Error message while creating module',
-            }),
-          );
-        },
-        onError(error) {
-          if (error.message === ERRORS.SUBSCRIPTION_REQUIRED) {
-            Toast.show({
-              type: 'error',
-              text1: intl.formatMessage({
-                defaultMessage: 'You need a subscription to add this module.',
-                description:
-                  'Error toast message when trying to add a module without a subscription.',
+          onCompleted(_, error) {
+            handleOnCompletedModuleSave(
+              moduleMedias,
+              router,
+              error,
+              intl.formatMessage({
+                defaultMessage: 'Error while creating module',
+                description: 'Toast Error message while creating module',
               }),
-            });
-            return;
-          } else {
-            Sentry.captureException(error);
-            Toast.show({
-              type: 'error',
-              text1: intl.formatMessage({
-                defaultMessage: 'Error while saving your new module.',
-                description:
-                  'Error toast message when saving a new module failed.',
-              }),
-            });
-          }
-        },
-      });
-    } catch (e) {
-      console.error(e);
-      Toast.show({
-        type: 'error',
-        text1: intl.formatMessage({
-          defaultMessage:
-            'Could not save your Media Text & link module, medias upload failed',
-          description:
-            'Error toast message when saving a carousel module failed because medias upload failed.',
-        }),
-      });
-      //setProgressIndicator(null);
-      return;
-    }
-  }, [
-    cardModuleMedias,
-    commit,
-    webCard.id,
-    data?.id,
-    selectedCardModuleColor,
-    variant,
-    router,
-    intl,
-  ]);
+            );
+          },
+          onError(error) {
+            if (error.message === ERRORS.SUBSCRIPTION_REQUIRED) {
+              Toast.show({
+                type: 'error',
+                text1: intl.formatMessage({
+                  defaultMessage: 'You need a subscription to add this module.',
+                  description:
+                    'Error toast message when trying to add a module without a subscription.',
+                }),
+              });
+              return;
+            } else {
+              Sentry.captureException(error);
+              Toast.show({
+                type: 'error',
+                text1: intl.formatMessage({
+                  defaultMessage: 'Error while saving your new module.',
+                  description:
+                    'Error toast message when saving a new module failed.',
+                }),
+              });
+            }
+          },
+        });
+      } catch (e) {
+        console.error(e);
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage:
+              'Could not save your Media Text & link module, medias upload failed',
+            description:
+              'Error toast message when saving a carousel module failed because medias upload failed.',
+          }),
+        });
+        return;
+      }
+    },
+    [
+      cardModuleMedias,
+      commit,
+      webCard.id,
+      data?.id,
+      selectedCardModuleColor,
+      variant,
+      router,
+      intl,
+    ],
+  );
 
   useImperativeHandle(ref, () => ({
     save,

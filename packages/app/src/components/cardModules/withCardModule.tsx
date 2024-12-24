@@ -2,6 +2,7 @@ import * as Sentry from '@sentry/react-native';
 import React, { Suspense, useCallback, useMemo, useRef, useState } from 'react';
 import { View, useWindowDimensions } from 'react-native';
 import { graphql, useFragment, usePreloadedQuery } from 'react-relay';
+import { Observable } from 'relay-runtime';
 import { colors } from '#theme';
 import CardModuleHeader from '#components/cardModules/CardModuleHeader';
 import CardModuleTabView, {
@@ -33,6 +34,7 @@ import type {
 import type { SectionsRoute } from '#sectionsRoutes';
 import type { CardModuleDimension } from './cardModuleEditorType';
 import type { GraphQLTaggedNode } from 'react-relay';
+import type { Sink } from 'relay-runtime/lib/network/RelayObservable';
 
 // don't have a better way right now to type this without listing all....
 type MediaQueryKey =
@@ -55,7 +57,10 @@ export type CardModuleProps<T extends ModuleKindHasVariants, V> = {
 };
 
 export type ModuleWebCardScreenHandle = {
-  save: () => void;
+  save: (
+    updateProcessedMedia: (arg: { total: number; value: number }) => void,
+    updateUploadIndicator: (arg: Observable<number>) => void,
+  ) => Promise<void>;
 };
 
 /**
@@ -88,7 +93,9 @@ const withCardModule = <T extends ModuleKindHasVariants, V>(
     const [canSave, setCanSave] = useState(false);
     const [viewMode, setViewMode] = useState<CardModuleViewMode>('mobile');
     const data = usePreloadedQuery<MediaQueryKey>(screenQuery, preloadedQuery);
-    const wrappedComponentRef = useRef<{ save: () => Promise<void> }>(null);
+    const wrappedComponentRef = useRef<{
+      save: ModuleWebCardScreenHandle['save'];
+    }>(null);
     const styles = useStyleSheet(stylesheet);
     const { width, height } = useWindowDimensions();
     const { bottom, top } = useScreenInsets();
@@ -156,13 +163,32 @@ const withCardModule = <T extends ModuleKindHasVariants, V>(
     // #endregion
 
     // #region save data
-    const [saving, setSaving] = useState(false);
+    const [progress, setProgress] = useState<
+      [Observable<number>, Observable<number>] | null
+    >(null);
     const save = useCallback(async () => {
       if (canSave) {
-        setSaving(true);
+        let progressSink: Sink<number> | undefined = undefined;
+        const progress = Observable.create<number>(sink => {
+          progressSink = sink;
+        });
+
+        setProgress([progress, Observable.from(0)]);
         try {
           if (wrappedComponentRef.current) {
-            await wrappedComponentRef.current.save();
+            await wrappedComponentRef.current.save(
+              ({ total, value }: { total: number; value: number }) => {
+                if (progressSink) {
+                  progressSink.next(value / total);
+                }
+              },
+              indicator => {
+                setProgress(value => [
+                  value?.[0] ?? Observable.from(0),
+                  indicator,
+                ]);
+              },
+            );
           }
         } catch (e) {
           Sentry.captureException(e, {
@@ -172,9 +198,9 @@ const withCardModule = <T extends ModuleKindHasVariants, V>(
               module: moduleKind,
             },
           });
-          setSaving(false);
+          setProgress(null);
         } finally {
-          setSaving(false);
+          setProgress(null);
         }
       }
     }, [canSave]);
@@ -227,11 +253,11 @@ const withCardModule = <T extends ModuleKindHasVariants, V>(
           </View>
         </Suspense>
         <ScreenModal
-          visible={saving}
+          visible={!!progress}
           onRequestDismiss={preventModalDismiss}
           gestureEnabled={false}
         >
-          <UploadProgressModal />
+          <UploadProgressModal progressIndicators={progress} />
         </ScreenModal>
       </SafeAreaView>
     );

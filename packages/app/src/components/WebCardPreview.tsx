@@ -1,10 +1,6 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { View, useWindowDimensions } from 'react-native';
-import Animated, {
-  useAnimatedScrollHandler,
-  useSharedValue,
-} from 'react-native-reanimated';
+import { ScrollView, View, useWindowDimensions, Animated } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import {
   swapColor,
@@ -21,7 +17,6 @@ import WebCardBackground from './WebCardBackgroundPreview';
 import type { WebCardPreview_webCard$key } from '#relayArtifacts/WebCardPreview_webCard.graphql';
 import type { ModuleRenderInfo } from './cardModules/CardModuleRenderer';
 import type { LayoutChangeEvent, PointProp, ViewProps } from 'react-native';
-import type { SharedValue } from 'react-native-reanimated';
 
 export type WebCardPreviewProps = Omit<ViewProps, 'children'> & {
   /**
@@ -102,13 +97,16 @@ const WebCardPreview = ({
   const lastSectionColor = lastSection?.data?.backgroundStyle
     ?.backgroundColor as string;
 
-  const scrollPosition = useSharedValue(0);
+  const scrollPosition = useRef(new Animated.Value(0)).current;
 
-  const scrollHandler = useAnimatedScrollHandler({
-    onScroll: event => {
-      scrollPosition.value = event.contentOffset.y;
-    },
-  });
+  const onScroll = useMemo(
+    () =>
+      Animated.event(
+        [{ nativeEvent: { contentOffset: { y: scrollPosition } } }],
+        { useNativeDriver: true },
+      ),
+    [scrollPosition],
+  );
 
   return (
     <View
@@ -154,7 +152,7 @@ const WebCardPreview = ({
           ],
         }}
       >
-        <Animated.ScrollView
+        <ScrollView
           style={[
             styles.webCardContainer,
             style,
@@ -164,7 +162,7 @@ const WebCardPreview = ({
           contentContainerStyle={{
             paddingBottom: contentPaddingBottom / scale,
           }}
-          onScroll={scrollHandler}
+          onScroll={onScroll}
         >
           <View ref={contentRef}>
             <WebCardBackground
@@ -199,7 +197,7 @@ const WebCardPreview = ({
               />
             ))}
           </View>
-        </Animated.ScrollView>
+        </ScrollView>
       </View>
     </View>
   );
@@ -218,16 +216,13 @@ const CardModule = ({
   cardStyle?: CardStyle | null;
   viewMode: 'desktop' | 'mobile';
   coverBackgroundColor?: string | null;
-  scrollPosition: SharedValue<number>;
+  scrollPosition: Animated.Value;
 }) => {
-  const modulePosition = useSharedValue(0);
+  const [modulePosition, setModulePosition] = useState(0);
 
-  const onLayout = useCallback(
-    (event: LayoutChangeEvent) => {
-      modulePosition.set(event.nativeEvent.layout.y);
-    },
-    [modulePosition],
-  );
+  const onLayout = useCallback((event: LayoutChangeEvent) => {
+    setModulePosition(event.nativeEvent.layout.y);
+  }, []);
 
   return (
     <CardModuleRenderer

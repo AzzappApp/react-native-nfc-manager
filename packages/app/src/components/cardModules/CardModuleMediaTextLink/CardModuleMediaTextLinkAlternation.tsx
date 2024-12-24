@@ -1,7 +1,6 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Linking, Pressable, View } from 'react-native';
-import { useSharedValue } from 'react-native-reanimated';
 import { shadow } from '#theme';
 import { getTextStyle, getTitleStyle } from '#helpers/cardModuleHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -16,14 +15,13 @@ import type {
 } from '../cardModuleEditorType';
 import type { CardStyle } from '@azzapp/shared/cardHelpers';
 import type { CardModuleColor } from '@azzapp/shared/cardModuleHelpers';
-import type { LayoutChangeEvent } from 'react-native';
-import type { SharedValue } from 'react-native-reanimated';
+import type { Animated, LayoutChangeEvent } from 'react-native';
 
 type CardModuleMediaTextLinkAlternationProps = CardModuleVariantType & {
   cardModuleMedias: CardModuleMedia[];
   onLayout?: (event: LayoutChangeEvent) => void;
-  scrollPosition?: SharedValue<number>;
-  modulePosition?: SharedValue<number>;
+  scrollPosition?: Animated.Value;
+  modulePosition?: number;
   disableAnimation?: boolean;
   moduleEditing: boolean;
 };
@@ -102,8 +100,8 @@ type AlternationItemProps = {
   viewMode: 'desktop' | 'mobile';
   cardStyle?: CardStyle | null;
   setEditableItemIndex?: (index: number) => void;
-  scrollPosition: SharedValue<number>;
-  modulePosition?: SharedValue<number>;
+  scrollPosition: Animated.Value;
+  modulePosition?: number;
   index: number;
   disableAnimation?: boolean;
   moduleEditing: boolean;
@@ -122,14 +120,11 @@ const AlternationItem = ({
   moduleEditing,
 }: AlternationItemProps) => {
   const styles = useStyleSheet(stylesheet);
-  const parentY = useSharedValue(0);
+  const [parentY, setParentY] = useState(0);
 
-  const onLayout = useCallback(
-    (event: LayoutChangeEvent) => {
-      parentY.value = event.nativeEvent.layout.y;
-    },
-    [parentY],
-  );
+  const onLayout = useCallback((event: LayoutChangeEvent) => {
+    setParentY(event.nativeEvent.layout.y);
+  }, []);
 
   const intl = useIntl();
 
@@ -141,7 +136,9 @@ const AlternationItem = ({
     if (moduleEditing) {
       setEditableItemIndex?.(index);
     } else if (!moduleEditing && cardModuleMedia.link?.url) {
-      Linking.openURL(cardModuleMedia.link?.url ?? 'https://web.azzapp.com');
+      Linking.openURL(cardModuleMedia.link?.url);
+    } else {
+      Linking.openURL('https://web.azzapp.com/explanation');
     }
   };
 
@@ -180,7 +177,6 @@ const AlternationItem = ({
                   backgroundColor: cardModuleColor.content,
                 },
                 styles.buttonLink,
-                viewMode === 'mobile' && { width: '100%' },
               ]}
               onPress={openLink}
             >

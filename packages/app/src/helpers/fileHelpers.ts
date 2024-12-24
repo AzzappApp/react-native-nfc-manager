@@ -24,7 +24,9 @@ export const isFileURL = (url: string) => {
  * Create random file path with given extension in the cache directory
  */
 export const createRandomFilePath = (ext: string) =>
-  `${ReactNativeBlobUtil.fs.dirs.CacheDir}/${createId()}.${ext}`;
+  `${ReactNativeBlobUtil.fs.dirs.CacheDir}/${createRandomFileName(ext)}`;
+
+export const createRandomFileName = (ext: string) => `${createId()}.${ext}`;
 
 /**
  * Get file extension from path or url

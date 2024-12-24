@@ -1,8 +1,10 @@
 import * as Clipboard from 'expo-clipboard';
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
+  runOnJS,
+  useAnimatedReaction,
   useAnimatedStyle,
   useDerivedValue,
 } from 'react-native-reanimated';
@@ -10,12 +12,13 @@ import { Toast } from 'react-native-toast-message/lib/src/Toast';
 import { useFragment, graphql } from 'react-relay';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
-import AnimatedText from '#components/AnimatedText';
-import useScreenDimensions from '#hooks/useScreenDimensions';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
+import Text from '#ui/Text';
 import { useHomeScreenContext } from './HomeScreenContext';
 import type { HomeProfileLink_user$key } from '#relayArtifacts/HomeProfileLink_user.graphql';
+import type { TextProps } from '#ui/Text';
+import type { DerivedValue } from 'react-native-reanimated';
 
 type HomeProfileLinkProps = {
   user: HomeProfileLink_user$key;
@@ -80,13 +83,11 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
       .catch(() => void 0);
   };
 
-  const text = useDerivedValue(() => {
+  const textDerivedValue = useDerivedValue(() => {
     // index 0 will be hidden, no need to update it
     const displayedItem = (currentIndexProfileSharedValue.value || 1) - 1;
     return 'azzapp.com/' + userNames.value[displayedItem];
   });
-
-  const { width: windowWidth } = useScreenDimensions();
 
   return (
     <Animated.View style={[styles.container, opacityStyle]}>
@@ -95,18 +96,30 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
         accessibilityRole="button"
         onPress={onPress}
       >
-        <Icon icon="link" style={styles.iconLink} />
-        <View style={styles.animatedContainer}>
-          <AnimatedText
-            variant="button"
-            numberOfLines={1}
-            style={styles.url}
-            text={text}
-            maxLength={windowWidth / 5}
-          />
-        </View>
+        <Icon icon="earth" style={styles.iconLink} />
+        <HomeProfileLinkText text={textDerivedValue} style={styles.url} />
+        <View style={styles.emptyViewCenter} />
       </PressableNative>
     </Animated.View>
+  );
+};
+
+const HomeProfileLinkText = ({
+  text,
+  ...props
+}: TextProps & { text: DerivedValue<string> }) => {
+  const [textInner, setTextInner] = useState(() => text.value);
+
+  useAnimatedReaction(
+    () => text.value,
+    newValue => {
+      runOnJS(setTextInner)(newValue);
+    },
+  );
+  return (
+    <Text variant="button" numberOfLines={1} {...props}>
+      {textInner}
+    </Text>
   );
 };
 
@@ -127,7 +140,6 @@ const styles = StyleSheet.create({
     color: colors.white,
     lineHeight: 14,
     paddingLeft: 5,
-    paddingRight: 10,
   },
   iconLink: {
     tintColor: colors.white,
@@ -145,7 +157,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.2)',
     borderColor: 'rgba(255, 255, 255, 0.4)',
   },
-  animatedContainer: {
-    maxWidth: '80%',
+  emptyViewCenter: {
+    marginRight: 13,
+    height: 18,
   },
 });

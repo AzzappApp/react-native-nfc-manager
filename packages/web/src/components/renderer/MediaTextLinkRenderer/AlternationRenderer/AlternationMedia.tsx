@@ -83,7 +83,10 @@ const AlternationImage = ({
               width={480}
               height={480}
               format="auto"
-              crop="fill"
+              crop={{
+                type: 'fill',
+                gravity: 'center',
+              }}
               quality="auto:best"
               className={styles.media}
               style={{

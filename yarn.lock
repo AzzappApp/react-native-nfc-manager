@@ -78,7 +78,7 @@ __metadata:
   dependencies:
     "@azzapp/i18n": "workspace:^"
     "@azzapp/react-native-buffer-loader": "workspace:^"
-    "@azzapp/react-native-skia-video": "npm:^0.8.0"
+    "@azzapp/react-native-skia-video": "npm:0.8.3"
     "@azzapp/react-native-snapshot-view": "npm:^0.1.4"
     "@azzapp/shared": "workspace:^"
     "@expo-google-fonts/amatic-sc": "npm:^0.2.3"
@@ -151,7 +151,7 @@ __metadata:
     "@sentry/types": "npm:^8.47.0"
     "@sentry/utils": "npm:^8.47.0"
     "@shopify/flash-list": "npm:^1.7.2"
-    "@shopify/react-native-skia": "patch:@shopify/react-native-skia@npm%3A1.7.0#~/.yarn/patches/@shopify-react-native-skia-npm-1.7.0-853dfa58b2.patch"
+    "@shopify/react-native-skia": "patch:@shopify/react-native-skia@npm%3A1.7.6#~/.yarn/patches/@shopify-react-native-skia-npm-1.7.6-9af7d0820d.patch"
     "@testing-library/react-native": "npm:^12.9.0"
     "@types/chroma-js": "npm:^2.4.5"
     "@types/qrcode": "npm:^1.5.5"
@@ -167,7 +167,7 @@ __metadata:
     expo-clipboard: "npm:~7.0.0"
     expo-contacts: "patch:expo-contacts@patch%3Aexpo-contacts@npm%253A14.0.2%23~/.yarn/patches/expo-contacts-npm-14.0.2-47a6bf515f.patch%3A%3Aversion=14.0.2&hash=20e638#~/.yarn/patches/expo-contacts-patch-0d7f995ace.patch"
     expo-device: "npm:7.0.1"
-    expo-file-system: "npm:^18.0.6"
+    expo-file-system: "patch:expo-file-system@npm%3A18.0.6#~/.yarn/patches/expo-file-system-npm-18.0.6-08df78c1fd.patch"
     expo-font: "npm:~13.0.1"
     expo-haptics: "npm:~14.0.0"
     expo-image: "npm:^2.0.3"
@@ -193,6 +193,7 @@ __metadata:
     react-native-blob-util: "npm:^0.21.2"
     react-native-bootsplash: "npm:^6.3.2"
     react-native-bundle-visualizer: "npm:^3.1.3"
+    react-native-compressor: "npm:^1.10.3"
     react-native-confirmation-code-field: "npm:^7.4.0"
     react-native-device-info: "npm:^14.0.2"
     react-native-dotenv: "npm:^3.4.11"
@@ -390,15 +391,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@azzapp/react-native-skia-video@npm:^0.8.0":
-  version: 0.8.0
-  resolution: "@azzapp/react-native-skia-video@npm:0.8.0"
+"@azzapp/react-native-skia-video@npm:0.8.3":
+  version: 0.8.3
+  resolution: "@azzapp/react-native-skia-video@npm:0.8.3"
   peerDependencies:
     "@shopify/react-native-skia": ">= 1.7.0"
     react: "*"
     react-native: "*"
     react-native-reanimated: ">= 3.16.1"
-  checksum: 10/0b217cab436c124b89337df87efbe2ee1b5841951600c8e4cdec8ec328741ad4965bc98a3d43a603f50f0b53bb813063564de0de5df7789bf2ee3465dc5ae32e
+  checksum: 10/fdb0610a9eef3debd108d882292abc1eacf73dbfd99088cc8b9d5f147aa8b38a098a1d5243f6903bd96c6e943840f1fcae6a2d6aad6ab09363ba33d4022e1a1d
   languageName: node
   linkType: hard
 
@@ -10866,9 +10867,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@shopify/react-native-skia@npm:1.7.0":
-  version: 1.7.0
-  resolution: "@shopify/react-native-skia@npm:1.7.0"
+"@shopify/react-native-skia@npm:1.7.6":
+  version: 1.7.6
+  resolution: "@shopify/react-native-skia@npm:1.7.6"
   dependencies:
     canvaskit-wasm: "npm:0.39.1"
     react-reconciler: "npm:0.27.0"
@@ -10883,13 +10884,13 @@ __metadata:
       optional: true
   bin:
     setup-skia-web: ./scripts/setup-canvaskit.js
-  checksum: 10/44806b3ef4a8236c7e27cafc757a5c11b171013b10641a8d49655dcd12770bef9bf0a1f5bda2047a1814e618f298ed662e3d81d2dc1ed1b1ac54ff35a839e1cc
+  checksum: 10/7aa632cd6c8b5ba6f5e22df5b76b4432d7145d2c9cc88ae831745acf8d3027156a55d9045d62aee4148261685d8dc9b38bd5055a72d5e6ee070f9fd34882da8f
   languageName: node
   linkType: hard
 
-"@shopify/react-native-skia@patch:@shopify/react-native-skia@npm%3A1.7.0#~/.yarn/patches/@shopify-react-native-skia-npm-1.7.0-853dfa58b2.patch":
-  version: 1.7.0
-  resolution: "@shopify/react-native-skia@patch:@shopify/react-native-skia@npm%3A1.7.0#~/.yarn/patches/@shopify-react-native-skia-npm-1.7.0-853dfa58b2.patch::version=1.7.0&hash=4cc339"
+"@shopify/react-native-skia@patch:@shopify/react-native-skia@npm%3A1.7.6#~/.yarn/patches/@shopify-react-native-skia-npm-1.7.6-9af7d0820d.patch":
+  version: 1.7.6
+  resolution: "@shopify/react-native-skia@patch:@shopify/react-native-skia@npm%3A1.7.6#~/.yarn/patches/@shopify-react-native-skia-npm-1.7.6-9af7d0820d.patch::version=1.7.6&hash=4cc339"
   dependencies:
     canvaskit-wasm: "npm:0.39.1"
     react-reconciler: "npm:0.27.0"
@@ -10904,7 +10905,7 @@ __metadata:
       optional: true
   bin:
     setup-skia-web: ./scripts/setup-canvaskit.js
-  checksum: 10/7e1f8767f890185fc99fa77852bdc665e371fbcec761e68d6c17d633a1d9a15ab172e9979fcdadba1659d9c056df60c8231743efd6e8e2331059170683d90e63
+  checksum: 10/bbcd511fb6d31a746a4b8e1c04a530a7cec812dd5d39df48ca48f66ec2c7ae083f2a647a6b46a3aa3ffbf3dda8aa6d427b71aff55d91a67049491b401b6c035e
   languageName: node
   linkType: hard
 
@@ -16588,7 +16589,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-file-system@npm:^18.0.6, expo-file-system@npm:~18.0.6":
+"expo-file-system@npm:18.0.6":
   version: 18.0.6
   resolution: "expo-file-system@npm:18.0.6"
   dependencies:
@@ -16597,6 +16598,18 @@ __metadata:
     expo: "*"
     react-native: "*"
   checksum: 10/b3d33037972fd4b8290b74115005a133d1f115249fa06b7c707d4c5cf734ac81e04e22197147f4310913e1508464f37dffa8a98c9b5659768854ea09a797a8bf
+  languageName: node
+  linkType: hard
+
+"expo-file-system@patch:expo-file-system@npm%3A18.0.6#~/.yarn/patches/expo-file-system-npm-18.0.6-08df78c1fd.patch":
+  version: 18.0.6
+  resolution: "expo-file-system@patch:expo-file-system@npm%3A18.0.6#~/.yarn/patches/expo-file-system-npm-18.0.6-08df78c1fd.patch::version=18.0.6&hash=e83a35"
+  dependencies:
+    web-streams-polyfill: "npm:^3.3.2"
+  peerDependencies:
+    expo: "*"
+    react-native: "*"
+  checksum: 10/45fa31292a33fe389b25db0029b607bf966c5ce829b4d6750dc85427f39e3a1666987c2508bfdcf8ab572f5972467e0c7a69565daa356fbc32e284f9c1564657
   languageName: node
   linkType: hard
 
@@ -23364,6 +23377,16 @@ __metadata:
   bin:
     react-native-bundle-visualizer: src/react-native-bundle-visualizer.js
   checksum: 10/cfa14fc9242fda2fc1b56ca07ad65b8759da4b3afd240ae7b116f0531c6c612a33026b76562dd74616a41d3b78c91349cc8ef9bfd481a6c5d5a1e073e357f2d2
+  languageName: node
+  linkType: hard
+
+"react-native-compressor@npm:^1.10.3":
+  version: 1.10.3
+  resolution: "react-native-compressor@npm:1.10.3"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 10/880465ae1f7a275e8da1a5b7bae17cda8b5c676b9c416f2449d369fe2dd6754b32e4896012d3a30547828900edecf07db5b7ccde6c91052d3d90a67269513561
   languageName: node
   linkType: hard
 

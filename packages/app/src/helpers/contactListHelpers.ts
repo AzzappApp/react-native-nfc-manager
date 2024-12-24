@@ -1,4 +1,4 @@
-import * as FileSystem from 'expo-file-system';
+import { File, Paths } from 'expo-file-system/next';
 import { Platform } from 'react-native';
 import type { ContactsScreenLists_contacts$data } from '#relayArtifacts/ContactsScreenLists_contacts.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
@@ -41,11 +41,9 @@ export const buildLocalContact = async (
   }
 
   const avatarURI = contact.contactProfile?.avatar?.uri;
+
   const avatar = avatarURI
-    ? await FileSystem.downloadAsync(
-        avatarURI,
-        FileSystem.cacheDirectory + contact.contactProfile.id,
-      )
+    ? await File.downloadFileAsync(avatarURI, Paths.cache)
     : null;
 
   return {
