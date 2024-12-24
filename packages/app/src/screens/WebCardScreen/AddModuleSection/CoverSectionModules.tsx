@@ -1,5 +1,6 @@
 import { Image } from 'expo-image';
 import { memo, useCallback } from 'react';
+import { FormattedMessage } from 'react-intl';
 import { FlatList, StyleSheet } from 'react-native';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
@@ -92,6 +93,23 @@ const stylesheet = createStyleSheet(appearance => ({
     paddingHorizontal: 6,
     borderRadius: 28,
   },
+  comingSoon: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+  },
+  comingSoonText: {
+    backgroundColor: colors.black,
+    paddingVertical: 3,
+    paddingHorizontal: 6,
+    borderRadius: 28,
+  },
+  image: { flex: 1 },
 }));
 
 export default CoverSectionModules;
@@ -107,22 +125,45 @@ const Item = ({
   const router = useRouter();
   const styles = useStyleSheet(stylesheet);
 
-  const onSelectModuleKind = useCallback(() => {
-    if (addingModuleRequiresSubscription) {
-      router.push({ route: 'USER_PAY_WALL' });
-      return;
-    }
+  const route = getRouteForCardModule({ ...props, isNew: true });
 
-    router.push(getRouteForCardModule({ ...props, isNew: true }));
-    closeModuleList();
-  }, [addingModuleRequiresSubscription, closeModuleList, props, router]);
+  const onSelectModuleKind = useCallback(() => {
+    if (route) {
+      if (addingModuleRequiresSubscription) {
+        router.push({ route: 'USER_PAY_WALL' });
+        return;
+      }
+
+      router.push(route);
+      closeModuleList();
+    }
+  }, [addingModuleRequiresSubscription, closeModuleList, route, router]);
 
   const uri = useModuleVariantsPreviewImage(props);
   const label = useModuleVariantsLabel(props);
 
   return (
-    <PressableOpacity onPress={onSelectModuleKind} style={styles.module}>
-      <Image source={uri} style={{ flex: 1 }} />
+    <PressableOpacity
+      onPress={onSelectModuleKind}
+      style={styles.module}
+      disabled={!route}
+      disabledOpacity={1}
+    >
+      <Image source={uri} style={styles.image} />
+      {!route && (
+        <Container style={styles.comingSoon}>
+          <Text
+            variant="xsmallbold"
+            appearance="dark"
+            style={styles.comingSoonText}
+          >
+            <FormattedMessage
+              defaultMessage="Coming soon"
+              description="Module is not available yet"
+            />
+          </Text>
+        </Container>
+      )}
       <Container style={styles.badge}>
         <Text variant="smallbold">{label}</Text>
       </Container>

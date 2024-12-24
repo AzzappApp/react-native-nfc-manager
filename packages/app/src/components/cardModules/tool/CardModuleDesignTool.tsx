@@ -1,11 +1,12 @@
 import FlashList from '@shopify/flash-list/dist/FlashList';
 import { Image } from 'expo-image';
 import { memo, useCallback } from 'react';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { useColorScheme, View } from 'react-native';
 import { colors } from '#theme';
 import { DoneHeaderButton } from '#components/commonsButtons';
 import ToolBoxSection from '#components/Toolbar/ToolBoxSection';
+import { SUPPORTED_VARIANT } from '#helpers/cardModuleRouterHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import {
   MODULE_KIND_WITH_VARIANTS,
@@ -22,6 +23,7 @@ import Container from '#ui/Container';
 import Header from '#ui/Header';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
+import type { SupportedVariant } from '#helpers/cardModuleRouterHelpers';
 import type { ListRenderItemInfo } from '@shopify/flash-list';
 import type { ColorSchemeName } from 'react-native';
 
@@ -128,16 +130,38 @@ const Item = <T extends ModuleKindAndVariant>({
     variant,
   } as ModuleKindWithVariant);
 
+  const isVariantSupported = SUPPORTED_VARIANT.includes(
+    variant as SupportedVariant,
+  );
+
   return (
-    <PressableOpacity onPress={onPress}>
+    <PressableOpacity
+      onPress={onPress}
+      disabled={!isVariantSupported}
+      disabledOpacity={1}
+    >
       <View
         style={[
           styles.imageContainer,
           isSelected && styles.selectedImageContainer,
         ]}
       >
-        <Image source={pictureUri} style={{ flex: 1 }} />
+        <Image source={pictureUri} style={styles.image} />
       </View>
+      {!isVariantSupported && (
+        <Container style={styles.comingSoon}>
+          <Text
+            variant="xsmallbold"
+            appearance="dark"
+            style={styles.comingSoonText}
+          >
+            <FormattedMessage
+              defaultMessage="Coming soon"
+              description="Module is not available yet"
+            />
+          </Text>
+        </Container>
+      )}
       <Container style={styles.badge}>
         <Text variant="smallbold">{label}</Text>
       </Container>
@@ -162,6 +186,34 @@ export const getPictureUri = (
           return colorScheme === 'light'
             ? require('./assets/media_parallax_light.png')
             : require('./assets/media_parallax_dark.png');
+        case 'full_grid':
+          return colorScheme === 'light'
+            ? require('./assets/media_full_grid_light.png')
+            : require('./assets/media_full_grid_dark.png');
+        case 'full_slideshow':
+          return colorScheme === 'light'
+            ? require('./assets/media_full_slideshow_light.png')
+            : require('./assets/media_full_slideshow_dark.png');
+        case 'fullscreen':
+          return colorScheme === 'light'
+            ? require('./assets/media_fullscreen_light.png')
+            : require('./assets/media_fullscreen_dark.png');
+        case 'grid':
+          return colorScheme === 'light'
+            ? require('./assets/media_grid_light.png')
+            : require('./assets/media_grid_dark.png');
+        case 'original':
+          return colorScheme === 'light'
+            ? require('./assets/media_original_light.png')
+            : require('./assets/media_original_dark.png');
+        case 'original_slideshow':
+          return colorScheme === 'light'
+            ? require('./assets/media_original_slideshow_light.png')
+            : require('./assets/media_original_slideshow_dark.png');
+        case 'zoom_out_fade':
+          return colorScheme === 'light'
+            ? require('./assets/media_zoom_out_fade_light.png')
+            : require('./assets/media_zoom_out_fade_dark.png');
         default:
           return null;
       }
@@ -171,11 +223,14 @@ export const getPictureUri = (
           return colorScheme === 'light'
             ? require('./assets/media_text_alternation_light.png')
             : require('./assets/media_text_alternation_dark.png');
-
         case 'parallax':
           return colorScheme === 'light'
             ? require('./assets/media_text_parallax_light.png')
             : require('./assets/media_text_parallax_dark.png');
+        case 'full_alternation':
+          return colorScheme === 'light'
+            ? require('./assets/media_text_full_alternation_light.png')
+            : require('./assets/media_text_full_alternation_dark.png');
         default:
           return null;
       }
@@ -185,11 +240,14 @@ export const getPictureUri = (
           return colorScheme === 'light'
             ? require('./assets/media_text_link_alternation_light.png')
             : require('./assets/media_text_link_alternation_dark.png');
-
         case 'parallax':
           return colorScheme === 'light'
             ? require('./assets/media_text_link_parallax_light.png')
             : require('./assets/media_text_link_parallax_dark.png');
+        case 'full_alternation':
+          return colorScheme === 'light'
+            ? require('./assets/media_text_link_full_alternation_light.png')
+            : require('./assets/media_text_link_full_alternation_dark.png');
         default:
           return null;
       }
@@ -217,6 +275,23 @@ const styleSheet = createStyleSheet(appearance => ({
     position: 'absolute',
     left: 8,
     bottom: 8,
+    paddingVertical: 3,
+    paddingHorizontal: 6,
+    borderRadius: 28,
+  },
+  image: { flex: 1 },
+  comingSoon: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+  },
+  comingSoonText: {
+    backgroundColor: colors.black,
     paddingVertical: 3,
     paddingHorizontal: 6,
     borderRadius: 28,

@@ -145,21 +145,19 @@ const WebCardScreen = ({
           module.section === 'custom'
             ? module.moduleKind.map(moduleKind => {
                 const module = { moduleKind } as ModuleKindWithVariant;
-                return prefetchRoute(
-                  environment,
-                  getRouteForCardModule(module),
-                );
+                const route = getRouteForCardModule(module);
+                if (!route) return undefined;
+                return prefetchRoute(environment, route);
               })
-            : module.variants.map(v =>
-                prefetchRoute(
-                  environment,
-                  getRouteForCardModule({
-                    moduleKind: module.section,
-                    variant: v,
-                  } as ModuleKindWithVariant),
-                ),
-              ),
-        ),
+            : module.variants.map(v => {
+                const route = getRouteForCardModule({
+                  moduleKind: module.section,
+                  variant: v,
+                } as ModuleKindWithVariant);
+                if (!route) return undefined;
+                return prefetchRoute(environment, route);
+              }),
+        ).filter(disposable => disposable !== undefined),
       ];
     }
     return () => {
