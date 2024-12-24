@@ -2,7 +2,7 @@ import { Image } from 'expo-image';
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, Alert } from 'react-native';
-import { Video } from 'react-native-compressor';
+import { getVideoMetaData, Video } from 'react-native-compressor';
 import { ScrollView } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
 import { Observable } from 'relay-runtime';
@@ -231,12 +231,15 @@ const CardModuleMediaPicker = ({
           } else {
             if (cardModuleMedia.media.kind === 'video') {
               const result = await Video.compress(cardModuleMedia.media.uri);
+              const metaData = await getVideoMetaData(result);
               value += 1;
               updateProgress(value);
               return {
                 ...cardModuleMedia,
                 media: {
                   ...cardModuleMedia.media,
+                  width: metaData.width,
+                  height: metaData.height,
                   uri: result,
                 },
               };
