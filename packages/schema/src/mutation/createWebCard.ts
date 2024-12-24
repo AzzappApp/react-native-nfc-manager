@@ -12,7 +12,7 @@ import {
 import ERRORS from '@azzapp/shared/errors';
 import { isValidUserName } from '@azzapp/shared/stringHelpers';
 import { getSessionInfos } from '#GraphQLContext';
-import { userLoader, webCardCategoryLoader } from '#loaders';
+import { userLoader, webCardCategoryLoader, webCardLoader } from '#loaders';
 import type { MutationResolvers } from '#/__generated__/types';
 
 const createWebCardMutation: MutationResolvers['createWebCard'] = async (
@@ -71,7 +71,7 @@ const createWebCardMutation: MutationResolvers['createWebCard'] = async (
   }
 
   const user = await userLoader.load(userId);
-
+  const currentDate = new Date();
   const inputWebCard = {
     userName,
     firstName: firstName ?? null,
@@ -82,6 +82,43 @@ const createWebCardMutation: MutationResolvers['createWebCard'] = async (
     companyName: companyName ?? null,
     lastUserNameUpdate: new Date(),
     locale: user?.locale ?? null,
+    logoId: null,
+    createdAt: currentDate,
+    deleted: false,
+    deletedAt: null,
+    deletedBy: null,
+    commonInformation: null,
+    updatedAt: currentDate,
+    isMultiUser: false,
+    cardColors: null,
+    cardStyle: null,
+    cardIsPrivate: false,
+    cardIsPublished: false,
+    alreadyPublished: false,
+    lastCardUpdate: currentDate,
+    coverId: '',
+    coverMediaId: null,
+    coverTexts: null,
+    coverBackgroundColor: null,
+    coverDynamicLinks: {
+      links: [],
+      color: '',
+      size: 0,
+      position: {
+        x: 0,
+        y: 0,
+      },
+      rotation: 0,
+      shadow: false,
+    },
+    coverPreviewPositionPercentage: null,
+    nbFollowers: 0,
+    nbFollowings: 0,
+    nbPosts: 0,
+    nbPostsLiked: 0,
+    nbLikes: 0,
+    nbWebCardViews: 0,
+    starred: false,
   };
 
   const contactCard = await buildDefaultContactCard(inputWebCard, userId);
@@ -89,6 +126,10 @@ const createWebCardMutation: MutationResolvers['createWebCard'] = async (
   try {
     const profile = await transaction(async () => {
       const webCardId = await createWebCard(inputWebCard);
+      webCardLoader.prime(webCardId, {
+        ...inputWebCard,
+        id: webCardId,
+      });
       const currentDate = new Date();
       const profileData = {
         webCardId,
