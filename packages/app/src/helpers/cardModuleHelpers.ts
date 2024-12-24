@@ -191,7 +191,7 @@ export const handleOnCompletedModuleSave = (
   if (moduleMedias) {
     for (let index = 0; index < moduleMedias.length; index++) {
       const { needDbUpdate, media } = moduleMedias[index];
-      if (needDbUpdate) {
+      if (needDbUpdate && !media.uri.startsWith('http')) {
         addLocalCachedMediaFile(media.id, media.kind, media.uri);
       }
     }
