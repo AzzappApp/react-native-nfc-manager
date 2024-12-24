@@ -30,11 +30,27 @@ const CardModuleMediaEditorTool = ({
   const intl = useIntl();
 
   const onFinished = useCallback(
-    ({ filter, editionParameters }: ImagePickerResult) => {
+    ({ filter, editionParameters, timeRange, duration }: ImagePickerResult) => {
       //update the media through props drilling
+
+      const updatedMedia =
+        media.kind === 'video'
+          ? {
+              ...media,
+              filter,
+              editionParameters,
+              timeRange: timeRange ?? media.timeRange,
+              duration: duration ?? media.duration,
+            }
+          : {
+              ...media,
+              filter,
+              editionParameters,
+            };
+
       onFinish({
         ...cardModuleMedia,
-        media: { ...media, filter, editionParameters },
+        media: updatedMedia,
       });
       hideModal();
     },
