@@ -124,7 +124,6 @@ const useSaveCover = (
       kind: kind === 'video' ? 'video' : 'image',
       target: 'cover',
     });
-    const uri = `file://${path}`;
     let uploadProgressSink: Sink<number>;
     const uploadProgress: Observable<number> = Observable.create(sink => {
       uploadProgressSink = sink;
@@ -132,7 +131,7 @@ const useSaveCover = (
 
     const uploadTask = new UploadTask(
       uploadURL,
-      uri,
+      path,
       {
         uploadType: FileSystemUploadType.MULTIPART,
         httpMethod: 'POST',
@@ -160,7 +159,7 @@ const useSaveCover = (
     }
     const { public_id } = JSON.parse(result.body);
 
-    addLocalCachedMediaFile(public_id, kind, uri);
+    addLocalCachedMediaFile(public_id, kind, path);
 
     setSavingStatus('saving');
 
@@ -398,6 +397,7 @@ const createCoverMedia = async (
         progressCallback({ framesCompleted, nbFrames });
       },
     });
+    outPath = `file://${outPath}`;
     skottiePlayer?.dispose();
   }
 
