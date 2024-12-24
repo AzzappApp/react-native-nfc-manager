@@ -189,7 +189,10 @@ const WebCardScreenContent = ({
       }
       //TODO: find a better way but with our router, the Toast is keep to(not an autohide toast)
       Toast.hide();
-      router.push(getRouteForCardModule(module));
+      const route = getRouteForCardModule(module);
+      if (route) {
+        router.push(route);
+      }
     },
     [router],
   );
