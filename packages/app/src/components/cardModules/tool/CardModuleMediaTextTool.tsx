@@ -171,6 +171,7 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
                   onChangeText={setLinkUrl}
                   style={{ flex: 1 }}
                   autoCorrect={false}
+                  autoCapitalize="none"
                   keyboardType="url"
                   isErrored={hasLinkError}
                 />
