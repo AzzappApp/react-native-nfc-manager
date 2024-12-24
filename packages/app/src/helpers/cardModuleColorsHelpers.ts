@@ -381,10 +381,10 @@ export const getInitalDyptichColor = (
     case 'mediaTextLink,parallax,primary':
       return {
         background: 'dark',
-        content: 'transparent',
+        content: 'light',
         title: 'light',
         text: 'light',
-        graphic: 'transparent',
+        graphic: 'dark',
       };
 
     default:
