@@ -125,8 +125,9 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
         onDismiss={onDismiss}
         nestedScroll
         bottomInset={bottomInset}
+        enableContentPanningGesture={false}
       >
-        <BottomSheetScrollView style={styles.container}>
+        <BottomSheetScrollView style={styles.container} bounces={false}>
           <Header
             middleElement={intl.formatMessage({
               defaultMessage: 'Design',
