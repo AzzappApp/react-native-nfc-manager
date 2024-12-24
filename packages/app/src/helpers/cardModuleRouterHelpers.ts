@@ -1,7 +1,9 @@
 import {
+  MODULE_KIND_MAP,
   MODULE_KIND_MEDIA,
   MODULE_KIND_MEDIA_TEXT,
   MODULE_KIND_MEDIA_TEXT_LINK,
+  MODULE_KIND_TITLE_TEXT,
 } from '@azzapp/shared/cardModuleHelpers';
 import type { Route } from '#routes';
 import type { ModuleKindWithVariant, Variant } from './webcardModuleHelpers';
@@ -39,6 +41,14 @@ export function getRouteForCardModule({
           moduleId,
           variant: variant as Variant<typeof MODULE_KIND_MEDIA_TEXT_LINK>,
         },
+      };
+    case MODULE_KIND_MAP:
+    case MODULE_KIND_TITLE_TEXT:
+      //this is a hack to avoid returning null of throwing an error, adding coming soon module (not only variant),
+      // break lots of control, like in this case throwing an error to be sure this is coded.
+      // adding hack just to display coming soon modules is bad
+      return {
+        route: 'HOME',
       };
     //INSERT_MODULE
     case 'photoWithTextAndTitle':

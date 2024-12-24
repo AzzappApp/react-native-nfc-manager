@@ -33,6 +33,16 @@ export const dyptichByModuleVariant = (
           ];
         case 'parallax':
           return null;
+        default:
+          return [
+            {
+              background: 'light',
+              content: 'dark',
+              title: 'dark',
+              text: 'dark',
+              graphic: 'light',
+            },
+          ];
       }
       break;
     case 'mediaText':
@@ -125,6 +135,16 @@ export const dyptichByModuleVariant = (
               title: 'dark',
               text: 'dark',
               graphic: 'transparent',
+            },
+          ];
+        default:
+          return [
+            {
+              background: 'light',
+              content: 'dark',
+              title: 'dark',
+              text: 'dark',
+              graphic: 'light',
             },
           ];
       }
@@ -260,6 +280,16 @@ export const dyptichByModuleVariant = (
               content: 'dark',
               title: 'light',
               text: 'light',
+              graphic: 'light',
+            },
+          ];
+        default:
+          return [
+            {
+              background: 'light',
+              content: 'dark',
+              title: 'dark',
+              text: 'dark',
               graphic: 'light',
             },
           ];

@@ -125,6 +125,7 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
         onDismiss={onDismiss}
         nestedScroll
         bottomInset={bottomInset}
+        lazy
         enableContentPanningGesture={false}
       >
         <BottomSheetScrollView style={styles.container} bounces={false}>

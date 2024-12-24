@@ -1162,6 +1162,19 @@ export type CardModuleMediaTextLinkData = CardModuleCommon &
 
 // #endregion
 
+//#region Map
+export const MODULE_KIND_MAP = 'map';
+
+export type CardModuleMapLinkData = CardModuleCommon; //TODO
+// #endregion
+
+//#region Title Text
+export const MODULE_KIND_TITLE_TEXT = 'titleText';
+
+export type CardModuleTitleTextLinkData = CardModuleCommon; //TODO
+
+// #endregion
+
 // #INSERT_MODOLE
 
 //#region Commons
@@ -1178,6 +1191,8 @@ export const MODULE_KINDS = [
   MODULE_KIND_MEDIA,
   MODULE_KIND_MEDIA_TEXT,
   MODULE_KIND_MEDIA_TEXT_LINK,
+  MODULE_KIND_MAP,
+  MODULE_KIND_TITLE_TEXT,
   //INSERT_MODULE
 ] as const;
 
