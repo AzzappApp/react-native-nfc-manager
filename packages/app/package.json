@@ -95,7 +95,7 @@
     "@sentry/types": "^8.47.0",
     "@sentry/utils": "^8.47.0",
     "@shopify/flash-list": "^1.7.2",
-    "@shopify/react-native-skia": "patch:@shopify/react-native-skia@npm%3A1.7.0#~/.yarn/patches/@shopify-react-native-skia-npm-1.7.0-853dfa58b2.patch",
+    "@shopify/react-native-skia": "patch:@shopify/react-native-skia@npm%3A1.7.6#~/.yarn/patches/@shopify-react-native-skia-npm-1.7.6-9af7d0820d.patch",
     "events": "^3.3.0",
     "expo": "^52.0.19",
     "expo-asset": "~11.0.1",

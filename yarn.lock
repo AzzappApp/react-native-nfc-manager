@@ -151,7 +151,7 @@ __metadata:
     "@sentry/types": "npm:^8.47.0"
     "@sentry/utils": "npm:^8.47.0"
     "@shopify/flash-list": "npm:^1.7.2"
-    "@shopify/react-native-skia": "patch:@shopify/react-native-skia@npm%3A1.7.0#~/.yarn/patches/@shopify-react-native-skia-npm-1.7.0-853dfa58b2.patch"
+    "@shopify/react-native-skia": "patch:@shopify/react-native-skia@npm%3A1.7.6#~/.yarn/patches/@shopify-react-native-skia-npm-1.7.6-9af7d0820d.patch"
     "@testing-library/react-native": "npm:^12.9.0"
     "@types/chroma-js": "npm:^2.4.5"
     "@types/qrcode": "npm:^1.5.5"
@@ -10865,9 +10865,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@shopify/react-native-skia@npm:1.7.0":
-  version: 1.7.0
-  resolution: "@shopify/react-native-skia@npm:1.7.0"
+"@shopify/react-native-skia@npm:1.7.6":
+  version: 1.7.6
+  resolution: "@shopify/react-native-skia@npm:1.7.6"
   dependencies:
     canvaskit-wasm: "npm:0.39.1"
     react-reconciler: "npm:0.27.0"
@@ -10882,13 +10882,13 @@ __metadata:
       optional: true
   bin:
     setup-skia-web: ./scripts/setup-canvaskit.js
-  checksum: 10/44806b3ef4a8236c7e27cafc757a5c11b171013b10641a8d49655dcd12770bef9bf0a1f5bda2047a1814e618f298ed662e3d81d2dc1ed1b1ac54ff35a839e1cc
+  checksum: 10/7aa632cd6c8b5ba6f5e22df5b76b4432d7145d2c9cc88ae831745acf8d3027156a55d9045d62aee4148261685d8dc9b38bd5055a72d5e6ee070f9fd34882da8f
   languageName: node
   linkType: hard
 
-"@shopify/react-native-skia@patch:@shopify/react-native-skia@npm%3A1.7.0#~/.yarn/patches/@shopify-react-native-skia-npm-1.7.0-853dfa58b2.patch":
-  version: 1.7.0
-  resolution: "@shopify/react-native-skia@patch:@shopify/react-native-skia@npm%3A1.7.0#~/.yarn/patches/@shopify-react-native-skia-npm-1.7.0-853dfa58b2.patch::version=1.7.0&hash=4cc339"
+"@shopify/react-native-skia@patch:@shopify/react-native-skia@npm%3A1.7.6#~/.yarn/patches/@shopify-react-native-skia-npm-1.7.6-9af7d0820d.patch":
+  version: 1.7.6
+  resolution: "@shopify/react-native-skia@patch:@shopify/react-native-skia@npm%3A1.7.6#~/.yarn/patches/@shopify-react-native-skia-npm-1.7.6-9af7d0820d.patch::version=1.7.6&hash=4cc339"
   dependencies:
     canvaskit-wasm: "npm:0.39.1"
     react-reconciler: "npm:0.27.0"
@@ -10903,7 +10903,7 @@ __metadata:
       optional: true
   bin:
     setup-skia-web: ./scripts/setup-canvaskit.js
-  checksum: 10/7e1f8767f890185fc99fa77852bdc665e371fbcec761e68d6c17d633a1d9a15ab172e9979fcdadba1659d9c056df60c8231743efd6e8e2331059170683d90e63
+  checksum: 10/bbcd511fb6d31a746a4b8e1c04a530a7cec812dd5d39df48ca48f66ec2c7ae083f2a647a6b46a3aa3ffbf3dda8aa6d427b71aff55d91a67049491b401b6c035e
   languageName: node
   linkType: hard
 
