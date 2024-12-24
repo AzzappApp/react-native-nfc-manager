@@ -18,6 +18,7 @@ const SlideshowRenderer = async ({
   module,
   colorPalette,
   coverBackgroundColor,
+  cardStyle,
 }: SlideshowRendererProps) => {
   const { cardModuleMedias, cardModuleColor } = module.data;
 
@@ -48,6 +49,7 @@ const SlideshowRenderer = async ({
         ),
       }}
       square
+      borderRadius={cardStyle.borderRadius}
     />
   );
 };

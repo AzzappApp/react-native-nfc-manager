@@ -12,9 +12,15 @@ type Props = {
   medias: Media[];
   style?: CSSProperties;
   square?: boolean;
+  borderRadius?: number;
 };
 
-const Slideshow = ({ medias: baseMedias, style, square }: Props) => {
+const Slideshow = ({
+  medias: baseMedias,
+  style,
+  square,
+  borderRadius = 0,
+}: Props) => {
   const [size, setSize] = useState<{
     width: number;
     height: number;
@@ -123,6 +129,7 @@ const Slideshow = ({ medias: baseMedias, style, square }: Props) => {
                 className={styles.media}
                 style={{
                   aspectRatio: media.height / media.width,
+                  borderRadius,
                   ...slides[i],
                 }}
               >
