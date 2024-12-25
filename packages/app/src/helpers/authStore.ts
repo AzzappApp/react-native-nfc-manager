@@ -249,7 +249,7 @@ export const getTokens = () => authTokens;
 export const hasBeenSignedIn = () =>
   storage.getBoolean(MMKVS_HAS_BEEN_SIGNED_IN);
 
-export const onChangeWebCard = async (
+export const onChangeWebCard = (
   infos?: {
     profileId: string | null;
     webCardId: string | null;

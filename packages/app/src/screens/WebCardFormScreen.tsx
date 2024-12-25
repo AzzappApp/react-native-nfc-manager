@@ -397,14 +397,9 @@ const WebCardFormScreen = ({
           profileId,
           webCardId: webCard.id,
           profileRole: profileRole!,
-        })
-          .catch(error => {
-            Sentry.captureException(error);
-            throw error;
-          })
-          .finally(() => {
-            onNext();
-          });
+        });
+
+        onNext();
       },
       onError: error => {
         isSubmitting.current = false;
