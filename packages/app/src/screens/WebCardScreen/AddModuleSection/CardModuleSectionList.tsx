@@ -14,13 +14,11 @@ import type { ListRenderItemInfo } from 'react-native';
 type CardModuleSectionListProps = {
   close: () => void;
   webCardKey: CardModuleSectionList_webCard$key;
-  cardModulesCount: number;
 };
 
 const CardModuleSectionList = ({
   close,
   webCardKey,
-  cardModulesCount,
 }: CardModuleSectionListProps) => {
   const webCard = useFragment(
     graphql`
@@ -28,10 +26,14 @@ const CardModuleSectionList = ({
         isPremium
         cardIsPublished
         userName
+        cardModules {
+          id
+        }
       }
     `,
     webCardKey,
   );
+  const cardModulesCount = webCard.cardModules?.length;
 
   const addingModuleRequiresSubscription =
     moduleCountRequiresSubscription(cardModulesCount + 1) &&

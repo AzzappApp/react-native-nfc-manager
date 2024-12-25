@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
+import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
 import { ScreenModal } from '#components/NativeRouter';
 import Container from '#ui/Container';
@@ -12,23 +13,26 @@ import TabsBar from '#ui/TabsBar';
 import Text from '#ui/Text';
 import CardModuleSectionList from './CardModuleSectionList';
 import CardTemplatesList from './CardTemplatesList';
-import type { CardModuleSectionList_webCard$key } from '#relayArtifacts/CardModuleSectionList_webCard.graphql';
-import type { CardTemplatesList_webCard$key } from '#relayArtifacts/CardTemplatesList_webCard.graphql';
+import type { AddModuleSectionModal_webCard$key } from '#relayArtifacts/AddModuleSectionModal_webCard.graphql';
 
 type Props = {
   open: boolean;
   close: () => void;
-  webCard: CardModuleSectionList_webCard$key & CardTemplatesList_webCard$key;
-  cardModulesCount: number;
+  webCard: AddModuleSectionModal_webCard$key;
 };
 
-const AddModuleSectionModal = ({
-  open,
-  close,
-  cardModulesCount,
-  webCard: webCardKey,
-}: Props) => {
+const AddModuleSectionModal = ({ open, close, webCard: webCardKey }: Props) => {
   const intl = useIntl();
+
+  const webCard = useFragment(
+    graphql`
+      fragment AddModuleSectionModal_webCard on WebCard {
+        ...CardModuleSectionList_webCard
+        ...CardTemplatesList_webCard
+      }
+    `,
+    webCardKey,
+  );
 
   const [currentTab, setCurrentTab] = useState<string>('sections');
 
@@ -86,14 +90,10 @@ const AddModuleSectionModal = ({
             decoration="underline"
           />
           {currentTab === 'sections' && (
-            <CardModuleSectionList
-              close={close}
-              webCardKey={webCardKey}
-              cardModulesCount={cardModulesCount}
-            />
+            <CardModuleSectionList close={close} webCardKey={webCard} />
           )}
           {currentTab === 'templates' && (
-            <CardTemplatesList webCardKey={webCardKey} />
+            <CardTemplatesList webCard={webCard} />
           )}
         </SafeAreaView>
       </Container>
