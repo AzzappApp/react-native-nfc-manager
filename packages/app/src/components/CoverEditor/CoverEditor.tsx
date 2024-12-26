@@ -469,7 +469,12 @@ const CoverEditorCore = (
     }
 
     const imagesScales = coverEditorState.imagesScales;
-
+    const compressedMedia: Array<{
+      id: string;
+      uri: string;
+      width: number;
+      height: number;
+    }> = [];
     promises.push(
       ...mediasToLoad.map(async media => {
         if (!localFilenames[media.id]) {
@@ -481,28 +486,8 @@ const CoverEditorCore = (
               uri: result,
               width: metaData.width,
               height: metaData.height,
-              editionParameters: media.editionParameters
-                ? {
-                    ...media.editionParameters,
-                    cropData: media.editionParameters?.cropData
-                      ? {
-                          originX:
-                            (metaData.width / media.width) *
-                            media.editionParameters.cropData.originX,
-                          originY:
-                            (metaData.height / media.height) *
-                            media.editionParameters.cropData.originY,
-                          height:
-                            (metaData.height / media.height) *
-                            media.editionParameters.cropData.height,
-                          width:
-                            (metaData.width / media.width) *
-                            media.editionParameters.cropData.width,
-                        }
-                      : null,
-                  }
-                : null,
             };
+            compressedMedia.push(media);
           }
 
           const filename = await copyCoverMediaToCacheDir(
@@ -556,6 +541,7 @@ const CoverEditorCore = (
             lutTextures,
             images,
             localFilenames,
+            compressedMedia,
           },
         });
       },

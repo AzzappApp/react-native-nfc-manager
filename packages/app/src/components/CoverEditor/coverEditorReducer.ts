@@ -784,9 +784,62 @@ export function coverEditorReducer(
         loadingRemoteMedia: false,
       };
     case 'LOADING_SUCCESS':
-      const { images, lutTextures, localFilenames } = payload;
+      const { images, lutTextures, localFilenames, compressedMedia } = payload;
+      let medias = state.medias;
+      if (compressedMedia) {
+        const lottieInfo = extractLottieInfoMemoized(state.lottie);
+        const durations = lottieInfo
+          ? getLottieMediasDurations(lottieInfo)
+          : null;
+
+        medias = [...state.medias].map((media, index) => {
+          const foundCompressed = compressedMedia.find(
+            compressed => compressed.id === media.id,
+          );
+
+          if (foundCompressed) {
+            const duration = durations ? durations[index] : null;
+
+            let aspectRatio = COVER_RATIO;
+            if (lottieInfo) {
+              const asset = lottieInfo?.assetsInfos[index];
+              if (!asset) {
+                console.error("Too many medias for the template's assets");
+              } else {
+                aspectRatio = asset.width / asset.height;
+              }
+            }
+
+            const cropData = cropDataForAspectRatio(
+              foundCompressed.width,
+              foundCompressed.height,
+              aspectRatio,
+            );
+
+            return {
+              ...media,
+              ...foundCompressed,
+              filter: media.filter,
+              editionParameters: {
+                ...media.editionParameters,
+                cropData,
+              },
+              timeRange: {
+                startTime: 0,
+                duration:
+                  duration ??
+                  Math.min(COVER_VIDEO_DEFAULT_DURATION, media.duration),
+              },
+              editable: media.editable,
+            };
+          }
+          return media;
+        });
+      }
+
       return {
         ...state,
+        medias,
         loadingError: null,
         loadingRemoteMedia: false,
         loadingLocalMedia: false,
