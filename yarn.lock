@@ -9461,10 +9461,10 @@ __metadata:
 
 "@react-native-camera-roll/camera-roll@patch:@react-native-camera-roll/camera-roll@npm%3A7.9.0#~/.yarn/patches/@react-native-camera-roll-camera-roll-npm-7.9.0-285cb35c57.patch":
   version: 7.9.0
-  resolution: "@react-native-camera-roll/camera-roll@patch:@react-native-camera-roll/camera-roll@npm%3A7.9.0#~/.yarn/patches/@react-native-camera-roll-camera-roll-npm-7.9.0-285cb35c57.patch::version=7.9.0&hash=256443"
+  resolution: "@react-native-camera-roll/camera-roll@patch:@react-native-camera-roll/camera-roll@npm%3A7.9.0#~/.yarn/patches/@react-native-camera-roll-camera-roll-npm-7.9.0-285cb35c57.patch::version=7.9.0&hash=ddee97"
   peerDependencies:
     react-native: ">=0.59"
-  checksum: 10/390ca6a6c39a2793897c81401928e840710262170a5afc829a274a6b6c22ed37aea6ee9e09f4dd1b6ac3f1d913d76440020a3d2a69fd39fb583e233ab07f06d1
+  checksum: 10/f7d05f4d2c9e36dde31d89e1f3023da65d9005b63dd5851d4b47d98a7d3a4d95ac19f3ff18dc118d1ad656851fb02a8683e3f6b3da8a3df6b75297b355713bb9
   languageName: node
   linkType: hard
 
