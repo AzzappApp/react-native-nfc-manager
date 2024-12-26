@@ -405,6 +405,7 @@ const WebCardFormScreen = ({
         });
       },
       onError: error => {
+        Sentry.captureException(error);
         isSubmitting.current = false;
         if (error.message === ERRORS.USERNAME_ALREADY_EXISTS) {
           setError('userName', {
