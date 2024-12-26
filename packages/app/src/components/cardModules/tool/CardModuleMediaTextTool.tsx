@@ -127,6 +127,9 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
         bottomInset={bottomInset}
         lazy
         enableContentPanningGesture={false}
+        keyboardBehavior={
+          module.moduleKind === 'mediaTextLink' ? 'fillParent' : 'extend'
+        }
       >
         <BottomSheetScrollView style={styles.container} bounces={false}>
           <Header
@@ -198,10 +201,9 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
               defaultMessage: 'Enter your title',
               description: 'Title placeholder in design module text tool',
             })}
-            defaultValue={title}
+            defaultValue={title === DEFAULT_CARD_MODULE_TITLE ? '' : title}
             onChangeText={setTitle}
             style={styles.titleStyle}
-            clearTextOnFocus={title === DEFAULT_CARD_MODULE_TITLE}
           />
           <BottomSheetTextInput
             multiline
@@ -210,10 +212,9 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
               description:
                 'Text description placeholder in design module text tool',
             })}
-            defaultValue={text}
+            defaultValue={text === DEFAULT_CARD_MODULE_TEXT ? '' : text}
             onChangeText={setText}
             style={styles.textStyle}
-            clearTextOnFocus={text === DEFAULT_CARD_MODULE_TEXT}
           />
           {module.moduleKind === 'mediaTextLink' && (
             <>
