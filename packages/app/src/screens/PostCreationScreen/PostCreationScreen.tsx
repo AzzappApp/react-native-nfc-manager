@@ -254,7 +254,7 @@ const PostCreationScreen = ({
               addLocalCachedMediaFile(
                 public_id,
                 kind === 'video' ? 'video' : 'image',
-                `file://${path}`,
+                path.startsWith('file://') ? path : `file://${path}`,
               );
 
               if (
