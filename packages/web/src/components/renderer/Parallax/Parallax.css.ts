@@ -3,7 +3,7 @@ import { style } from '@vanilla-extract/css';
 const moduleContainer = style({ position: 'relative', overflow: 'hidden' });
 
 const parallaxContainer = style({
-  width: '100vw',
+  width: '100%',
   height: '100dvh',
   position: 'relative',
 });
