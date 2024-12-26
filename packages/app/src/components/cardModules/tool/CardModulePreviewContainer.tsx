@@ -8,6 +8,7 @@ import { shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useAnimatedState from '#hooks/useAnimatedState';
 import Container from '#ui/Container';
+import { CardModuleEditionProvider } from '../CardModuleEditionContext';
 import type { CardModuleDimension } from '../cardModuleEditorType';
 
 type CardModulePreviewContainerProps = {
@@ -72,25 +73,27 @@ const CardModulePreviewContainer = ({
   // #endregion
 
   return (
-    <Container style={styles.container}>
-      <Animated.View style={[scaleViewStyle, styles.scaledContainer]}>
-        {/* The opposite scale is used to remove the application of scale effect on the module renderer itself,
+    <CardModuleEditionProvider value>
+      <Container style={styles.container}>
+        <Animated.View style={[scaleViewStyle, styles.scaledContainer]}>
+          {/* The opposite scale is used to remove the application of scale effect on the module renderer itself,
           this will allow to render module in edition / view mode the same way using normal dimension(screenWidth etc)
           height is added to simulated different frame aspec ratio between mobile and web
         */}
-        <Animated.View
-          style={[
-            deviceEmulatedView,
-            styles.deviceEmulated,
-            {
-              backgroundColor,
-            },
-          ]}
-        >
-          {children}
+          <Animated.View
+            style={[
+              deviceEmulatedView,
+              styles.deviceEmulated,
+              {
+                backgroundColor,
+              },
+            ]}
+          >
+            {children}
+          </Animated.View>
         </Animated.View>
-      </Animated.View>
-    </Container>
+      </Container>
+    </CardModuleEditionProvider>
   );
 };
 

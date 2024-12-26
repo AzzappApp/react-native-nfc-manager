@@ -7,6 +7,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
 import { Observable } from 'relay-runtime';
 import { waitTime } from '@azzapp/shared/asyncHelpers';
+import { MODULE_VIDEO_MAX_WIDTH } from '@azzapp/shared/cardModuleHelpers';
 import { colors, shadow } from '#theme';
 import { SaveHeaderButton } from '#components/commonsButtons';
 import MediaPicker from '#components/MediaPicker';
@@ -230,7 +231,9 @@ const CardModuleMediaPicker = ({
             }
           } else {
             if (cardModuleMedia.media.kind === 'video') {
-              const result = await Video.compress(cardModuleMedia.media.uri);
+              const result = await Video.compress(cardModuleMedia.media.uri, {
+                maxSize: MODULE_VIDEO_MAX_WIDTH,
+              });
               const metaData = await getVideoMetaData(result);
               value += 1;
               updateProgress(value);
@@ -238,6 +241,7 @@ const CardModuleMediaPicker = ({
                 ...cardModuleMedia,
                 media: {
                   ...cardModuleMedia.media,
+                  rotation: 0,
                   width: metaData.width,
                   height: metaData.height,
                   uri: result,

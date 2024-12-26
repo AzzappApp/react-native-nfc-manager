@@ -52,6 +52,8 @@ import {
   getLottieMediasDurations,
   useLottieMediaDurations,
   MAX_ALLOWED_VIDEOS_BY_COVER,
+  MAX_EXPORT_DECODER_RESOLUTION,
+  COVER_VIDEO_BITRATE,
 } from './coverEditorHelpers';
 import CoverEditorMediaPicker from './CoverEditorMediaPicker';
 import { coverEditorReducer } from './coverEditorReducer';
@@ -478,12 +480,22 @@ const CoverEditorCore = (
     promises.push(
       ...mediasToLoad.map(async media => {
         if (!localFilenames[media.id]) {
-          if (media.kind === 'video' && !media.uri.startsWith('http')) {
-            const result = await Video.compress(media.uri);
+          if (
+            media.kind === 'video' &&
+            !media.uri.startsWith('http') &&
+            (media.width > MAX_EXPORT_DECODER_RESOLUTION ||
+              media.height > MAX_EXPORT_DECODER_RESOLUTION)
+          ) {
+            const result = await Video.compress(media.uri, {
+              compressionMethod: 'manual',
+              maxSize: MAX_EXPORT_DECODER_RESOLUTION,
+              bitrate: COVER_VIDEO_BITRATE,
+            });
             const metaData = await getVideoMetaData(result);
             media = {
               ...media,
               uri: result,
+              rotation: 0,
               width: metaData.width,
               height: metaData.height,
             };
