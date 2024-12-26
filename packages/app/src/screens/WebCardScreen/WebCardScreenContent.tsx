@@ -93,6 +93,16 @@ const WebCardScreenContent = ({
   onContentPositionChange,
 }: WebCardScreenContentProps) => {
   // #region Data
+
+  // ================================================
+  //
+  // ( -_•)︻デ═一
+  // BE VERY CAREFUL WHEN MODIFYING THIS FRAGMENT
+  // IT MIGHT BREAK THE WEBCARD APPEAR ANIMATION
+  // IF YOU ADD DATA THAT ARE NOT IN CACHE WHEN COMING
+  // FROM A WEBCARD LINK
+  //
+  // ================================================
   const webCard = useFragment(
     graphql`
       fragment WebCardScreenContent_webCard on WebCard {
