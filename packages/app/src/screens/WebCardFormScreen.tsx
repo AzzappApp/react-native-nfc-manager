@@ -14,7 +14,6 @@ import {
 } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import * as z from 'zod';
-import { waitTime } from '@azzapp/shared/asyncHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import { isValidUserName } from '@azzapp/shared/stringHelpers';
 import { buildReadableUserUrl } from '@azzapp/shared/urlHelpers';
@@ -404,7 +403,6 @@ const WebCardFormScreen = ({
         onNext();
       },
       onError: error => {
-        Sentry.captureException(error);
         isSubmitting.current = false;
         if (error.message === ERRORS.USERNAME_ALREADY_EXISTS) {
           setError('userName', {
@@ -412,6 +410,7 @@ const WebCardFormScreen = ({
             message: userNameAlreadyExistsError,
           });
         } else {
+          Sentry.captureException(error);
           Toast.show({
             type: 'error',
             text1: intl.formatMessage({
