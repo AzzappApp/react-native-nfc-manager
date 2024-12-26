@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react-native';
 import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -389,16 +390,18 @@ const WebCardFormScreen = ({
           webCard,
         } = data.createWebCard.profile;
         if (!webCard) {
+          Sentry.captureMessage('WebCard not created');
           throw new Error('WebCard not created');
         }
+
         onChangeWebCard({
           profileId,
           webCardId: webCard.id,
           profileRole: profileRole!,
           invited: false,
-        }).finally(() => {
-          onNext();
         });
+
+        onNext();
       },
       onError: error => {
         isSubmitting.current = false;
@@ -408,6 +411,7 @@ const WebCardFormScreen = ({
             message: userNameAlreadyExistsError,
           });
         } else {
+          Sentry.captureException(error);
           Toast.show({
             type: 'error',
             text1: intl.formatMessage({
