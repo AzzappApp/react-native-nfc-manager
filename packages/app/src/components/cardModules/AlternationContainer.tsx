@@ -62,41 +62,53 @@ const AlternationContainer = ({
   }, []);
 
   const translateX = useRef(
-    new Animated.Value(index % 2 === 0 ? -150 : 150),
+    new Animated.Value(
+      modulePosition === undefined && index === 0
+        ? 0
+        : index % 2 === 0
+          ? -150
+          : 150,
+    ),
   ).current;
-  const opacity = useRef(new Animated.Value(0)).current;
+  const opacity = useRef(
+    new Animated.Value(modulePosition === undefined && index === 0 ? 1 : 0),
+  ).current;
 
   const isRunning = useRef(false);
+  const hideAnimation = useRef<Animated.CompositeAnimation | null>(null);
 
   useEffect(() => {
     const itemStartY = (modulePosition ?? 0) + (parentY ?? 0) + componentY;
     const itemEndY = itemStartY + componentHeight;
+
     const listener = scrollY.addListener(({ value }) => {
-      if (
-        value >= itemStartY - dimension.height &&
-        value <= itemEndY &&
-        !isRunning.current
-      ) {
-        isRunning.current = true;
-        Animated.parallel([
-          Animated.timing(translateX, {
-            toValue: 0,
-            duration: ANIMATION_DURATION,
-            useNativeDriver: true,
-          }),
-          Animated.timing(opacity, {
-            toValue: 1,
-            duration: ANIMATION_DURATION,
-            useNativeDriver: true,
-          }),
-        ]).start(({ finished }) => {
-          if (finished) {
-            isRunning.current = false;
-          }
-        });
-      } else if (!isRunning.current) {
-        isRunning.current = true;
-        Animated.parallel([
+      if (value >= itemStartY - dimension.height && value <= itemEndY) {
+        if (hideAnimation.current) {
+          hideAnimation.current.stop();
+          hideAnimation.current = null;
+        }
+
+        if (!isRunning.current) {
+          isRunning.current = true;
+          Animated.parallel([
+            Animated.timing(translateX, {
+              toValue: 0,
+              duration: ANIMATION_DURATION,
+              useNativeDriver: true,
+            }),
+            Animated.timing(opacity, {
+              toValue: 1,
+              duration: ANIMATION_DURATION,
+              useNativeDriver: true,
+            }),
+          ]).start(({ finished }) => {
+            if (finished) {
+              isRunning.current = false;
+            }
+          });
+        }
+      } else if (!hideAnimation.current && !isRunning.current) {
+        hideAnimation.current = Animated.parallel([
           Animated.timing(translateX, {
             toValue: index % 2 === 0 ? -150 : 150,
             duration: ANIMATION_DURATION,
@@ -107,9 +119,10 @@ const AlternationContainer = ({
             duration: ANIMATION_DURATION,
             useNativeDriver: true,
           }),
-        ]).start(({ finished }) => {
+        ]);
+        hideAnimation.current.start(({ finished }) => {
           if (finished) {
-            isRunning.current = false;
+            hideAnimation.current = null;
           }
         });
       }
@@ -134,14 +147,15 @@ const AlternationContainer = ({
       {
         width: mediaWidth,
         borderRadius: cardStyle?.borderRadius ?? 0,
-        transform: [{ translateX }],
-        opacity,
+        transform: [{ translateX: disableAnimation ? 0 : translateX }],
+        opacity: disableAnimation ? 1 : opacity,
       },
     ],
     [
       styles.imageContainer,
       mediaWidth,
       cardStyle?.borderRadius,
+      disableAnimation,
       translateX,
       opacity,
     ],
