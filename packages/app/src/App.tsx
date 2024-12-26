@@ -276,10 +276,10 @@ const unauthenticatedRoutes = [
 const AppRouter = () => {
   // #region Routing
   const initialRoutes = useMemo(() => {
-    const { authenticated, hasBeenSignedIn } = getAuthState();
+    const { authenticated, profileInfos } = getAuthState();
     return authenticated
       ? mainRoutes(false)
-      : hasBeenSignedIn
+      : profileInfos
         ? signInRoutes
         : signUpRoutes;
   }, []);

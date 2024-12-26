@@ -10,7 +10,6 @@ import { addGlobalEventListener } from './globalEvents';
 
 const ENCRYPTED_STORAGE_TOKENS_KEY = 'AZZAPP_AUTH';
 const MMKVS_PROFILE_INFOS = '@azzap/auth.profileInfos';
-const MMKVS_HAS_BEEN_SIGNED_IN = '@azzap/auth.hasBeenSignedIn';
 
 export const encryptedStorage = new MMKV({
   id: `encrypted-storage`,
@@ -59,10 +58,6 @@ export type AuthState = {
    * the current profile infos  null if authenticated but without profile created
    */
   profileInfos: ProfileInfos | null;
-  /**
-   * Has the user been signed in at least once
-   */
-  hasBeenSignedIn: boolean;
 };
 
 let authTokens: { token: string; refreshToken: string } | null = null;
@@ -84,7 +79,6 @@ export const init = async () => {
   addGlobalEventListener(
     'SIGN_UP',
     ({ payload: { authTokens: tokens, email, phoneNumber, userId } }) => {
-      storage.set(MMKVS_HAS_BEEN_SIGNED_IN, true);
       encryptedStorage.set(
         ENCRYPTED_STORAGE_TOKENS_KEY,
         JSON.stringify(tokens),
@@ -94,7 +88,6 @@ export const init = async () => {
         JSON.stringify({ email, phoneNumber, userId }),
       );
       authTokens = tokens;
-      emitAuthState();
     },
   );
 
@@ -103,10 +96,20 @@ export const init = async () => {
     ({
       payload: { authTokens: tokens, profileInfos, email, phoneNumber, userId },
     }) => {
+      encryptedStorage.set(
+        ENCRYPTED_STORAGE_TOKENS_KEY,
+        JSON.stringify(tokens),
+      );
+      authTokens = tokens;
       if (profileInfos) {
         storage.set(
           MMKVS_PROFILE_INFOS,
-          JSON.stringify({ ...profileInfos, email, phoneNumber, userId }),
+          JSON.stringify({
+            ...profileInfos,
+            email,
+            phoneNumber,
+            userId,
+          }),
         );
       } else {
         //with the email and phone number confirmation flow, SIGN_UP can be never called
@@ -119,13 +122,6 @@ export const init = async () => {
           }),
         );
       }
-      storage.set(MMKVS_HAS_BEEN_SIGNED_IN, true);
-      encryptedStorage.set(
-        ENCRYPTED_STORAGE_TOKENS_KEY,
-        JSON.stringify(tokens),
-      );
-      authTokens = tokens;
-      emitAuthState();
     },
   );
 
@@ -164,16 +160,14 @@ export const init = async () => {
           JSON.stringify({ ...profileInfos, profileRole }),
         );
       }
-      emitAuthState();
     },
   );
 
   addGlobalEventListener('SIGN_OUT', async () => {
+    authTokens = null;
     storage.delete(MMKVS_PROFILE_INFOS);
     clearRecentSearch();
     encryptedStorage.clearAll();
-    authTokens = null;
-    emitAuthState();
   });
 
   addGlobalEventListener(
@@ -189,10 +183,9 @@ export const init = async () => {
 
   addGlobalEventListener('NETWORK_ERROR', async ({ payload: { error } }) => {
     if (error instanceof Error && error.message === ERRORS.INVALID_TOKEN) {
+      authTokens = null;
       storage.delete(MMKVS_PROFILE_INFOS);
       encryptedStorage.delete(ENCRYPTED_STORAGE_TOKENS_KEY);
-      authTokens = null;
-      emitAuthState();
     }
   });
 };
@@ -212,7 +205,6 @@ export const getAuthState = (): AuthState => {
   return {
     authenticated: authTokens !== null,
     profileInfos: profileInfos ?? null,
-    hasBeenSignedIn: storage.getBoolean(MMKVS_HAS_BEEN_SIGNED_IN) ?? false,
   };
 };
 
@@ -228,6 +220,12 @@ export const addAuthStateListener = (listener: (state: AuthState) => void) => {
   };
 };
 
+storage.addOnValueChangedListener(changedKey => {
+  if (changedKey === MMKVS_PROFILE_INFOS) {
+    emitAuthState();
+  }
+});
+
 const emitAuthState = () => {
   const state = getAuthState();
   startTransition(() => {
@@ -242,12 +240,6 @@ const emitAuthState = () => {
  * @returns the tokens if exist
  */
 export const getTokens = () => authTokens;
-
-/**
- * Return true if the user has been signed in at least once
- */
-export const hasBeenSignedIn = () =>
-  storage.getBoolean(MMKVS_HAS_BEEN_SIGNED_IN);
 
 export const onChangeWebCard = (
   infos?: {
@@ -275,6 +267,5 @@ export const onChangeWebCard = (
         profileRole,
       }),
     );
-    emitAuthState();
   }
 };
