@@ -14,6 +14,7 @@ import {
 } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import * as z from 'zod';
+import { waitTime } from '@azzapp/shared/asyncHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import { isValidUserName } from '@azzapp/shared/stringHelpers';
 import { buildReadableUserUrl } from '@azzapp/shared/urlHelpers';
@@ -393,13 +394,15 @@ const WebCardFormScreen = ({
           Sentry.captureMessage('WebCard not created');
           throw new Error('WebCard not created');
         }
-        onChangeWebCard({
-          profileId,
-          webCardId: webCard.id,
-          profileRole: profileRole!,
-        });
+        waitTime(250).then(() => {
+          onChangeWebCard({
+            profileId,
+            webCardId: webCard.id,
+            profileRole: profileRole!,
+          });
 
-        onNext();
+          onNext();
+        });
       },
       onError: error => {
         isSubmitting.current = false;
