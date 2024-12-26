@@ -228,19 +228,13 @@ export const addAuthStateListener = (listener: (state: AuthState) => void) => {
   };
 };
 
-const emitAuthState = (withoutTransition?: boolean) => {
+const emitAuthState = () => {
   const state = getAuthState();
-  if (withoutTransition) {
+  startTransition(() => {
     for (const listener of authStateListener.values()) {
       listener(state);
     }
-  } else {
-    startTransition(() => {
-      for (const listener of authStateListener.values()) {
-        listener(state);
-      }
-    });
-  }
+  });
 };
 
 /**
@@ -261,7 +255,6 @@ export const onChangeWebCard = (
     webCardId: string | null;
     profileRole: string | null;
   } | null,
-  withoutTransition = false,
 ) => {
   const { profileId, webCardId, profileRole } = infos ?? {
     profileId: null,
@@ -282,6 +275,6 @@ export const onChangeWebCard = (
         profileRole,
       }),
     );
-    emitAuthState(withoutTransition);
+    emitAuthState();
   }
 };

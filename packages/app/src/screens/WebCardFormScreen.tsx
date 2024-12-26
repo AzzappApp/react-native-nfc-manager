@@ -393,14 +393,11 @@ const WebCardFormScreen = ({
           Sentry.captureMessage('WebCard not created');
           throw new Error('WebCard not created');
         }
-        onChangeWebCard(
-          {
-            profileId,
-            webCardId: webCard.id,
-            profileRole: profileRole!,
-          },
-          true,
-        );
+        onChangeWebCard({
+          profileId,
+          webCardId: webCard.id,
+          profileRole: profileRole!,
+        });
 
         onNext();
       },
