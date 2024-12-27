@@ -1,8 +1,8 @@
 import { memo } from 'react';
 import Animated, {
-  Extrapolation,
   interpolate,
   useAnimatedStyle,
+  withTiming,
 } from 'react-native-reanimated';
 import { shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -29,12 +29,6 @@ const CardModulePreviewContainer = ({
   // #region hook
   const styles = useStyleSheet(styleSheet);
   //using animatedState to not have a defined a sharedValue, to animate with the new value(handle by the hook)
-  const animatedWidth = useAnimatedState(dimension.width, {
-    duration: PREVIEW_ANIMATION_DURATION,
-  });
-  const animatedHeight = useAnimatedState(dimension.height, {
-    duration: PREVIEW_ANIMATION_DURATION,
-  });
   const animatedScaledFactor = useAnimatedState(scaleFactor, {
     duration: PREVIEW_ANIMATION_DURATION,
   });
@@ -45,9 +39,6 @@ const CardModulePreviewContainer = ({
   // #region ui
   const scaleViewStyle = useAnimatedStyle(() => {
     return {
-      height: animatedHeight.value,
-      width: animatedWidth.value,
-
       transform: [
         {
           scale:
@@ -58,16 +49,13 @@ const CardModulePreviewContainer = ({
     };
   });
   const deviceEmulatedView = useAnimatedStyle(() => {
-    const oppositeScale = interpolate(
-      viewModeTimer.value,
-      [0, 1 / 0.55],
-      [1, 1 / 0.8],
-      Extrapolation.CLAMP,
-    );
     return {
-      height: animatedHeight.value,
-      width: animatedWidth.value,
-      transform: [{ scale: oppositeScale }],
+      height: withTiming(dimension.height, {
+        duration: PREVIEW_ANIMATION_DURATION,
+      }),
+      width: withTiming(dimension.width, {
+        duration: PREVIEW_ANIMATION_DURATION,
+      }),
     };
   });
   // #endregion
