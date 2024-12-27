@@ -99,7 +99,7 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
     close();
   };
 
-  const { bottom: bottomInset } = useScreenInsets();
+  const { bottom: bottomInset, top: topInset } = useScreenInsets();
 
   const hasError = useMemo(() => {
     return hasCardModuleMediaError(cardModuleMedia, module);
@@ -125,10 +125,11 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
         onDismiss={onDismiss}
         nestedScroll
         bottomInset={bottomInset}
+        topInset={topInset}
         lazy
         enableContentPanningGesture={false}
         keyboardBehavior={
-          module.moduleKind === 'mediaTextLink' ? 'fillParent' : 'extend'
+          module.moduleKind === 'mediaTextLink' ? 'fillParent' : 'interactive'
         }
       >
         <BottomSheetScrollView style={styles.container} bounces={false}>
