@@ -1,5 +1,9 @@
-## 1.5.4-canary.16
+## 1.5.4-canary.17
 
+* **fix:**  - 🐛 display right color for barchart on android ([#6415](https://github.com/AzzappApp/azzapp/pull/6415))
+* **feat:**  - 🎸 display and create contact with cover if no avatar ([#6463](https://github.com/AzzappApp/azzapp/pull/6463))
+* **fix:**  - 🐛 properly display contact modal header ([#6464](https://github.com/AzzappApp/azzapp/pull/6464))
+* **fix:**  - 🐛 don't display common information from deactivated multi ([#6406](https://github.com/AzzappApp/azzapp/pull/6406))
 * **fix:**  - move setup images / lottie to video ([#6595](https://github.com/AzzappApp/azzapp/pull/6595))
 * **fix:**  - manage webCardKind types locally and fix configuration from webCardScreen ([#6583](https://github.com/AzzappApp/azzapp/pull/6583))
 * **fix:**  - do not force displaying keyboard when third step of pop up display ([#6579](https://github.com/AzzappApp/azzapp/pull/6579))
