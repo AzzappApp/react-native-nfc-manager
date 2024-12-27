@@ -1,8 +1,8 @@
-import FlashList from '@shopify/flash-list/dist/FlashList';
 import { Image } from 'expo-image';
 import { memo, useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useColorScheme, View } from 'react-native';
+import { FlatList } from 'react-native-gesture-handler';
 import { colors } from '#theme';
 import { DoneHeaderButton } from '#components/commonsButtons';
 import ToolBoxSection from '#components/Toolbar/ToolBoxSection';
@@ -24,8 +24,7 @@ import Header from '#ui/Header';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
 import type { SupportedVariant } from '#helpers/cardModuleRouterHelpers';
-import type { ListRenderItemInfo } from '@shopify/flash-list';
-import type { ColorSchemeName } from 'react-native';
+import type { ColorSchemeName, ListRenderItemInfo } from 'react-native';
 
 type CardModuleDesignToolProps<T extends ModuleKindAndVariant> = {
   module: T;
@@ -41,13 +40,10 @@ const CardModuleDesignTool = <T extends ModuleKindAndVariant>({
   const styles = useStyleSheet(styleSheet);
 
   const renderItem = useCallback(
-    ({
-      item,
-      extraData,
-    }: ListRenderItemInfo<Variant<ModuleKindHasVariants>>) => {
+    ({ item }: ListRenderItemInfo<T['variant']>) => {
       return (
         <DesignVariant
-          module={extraData.module}
+          module={module}
           variant={item}
           onSelectVariant={
             setVariant as (variant: Variant<ModuleKindHasVariants>) => void
@@ -55,7 +51,7 @@ const CardModuleDesignTool = <T extends ModuleKindAndVariant>({
         />
       );
     },
-    [setVariant],
+    [module, setVariant],
   );
   const { bottom } = useScreenInsets();
   return (
@@ -77,7 +73,7 @@ const CardModuleDesignTool = <T extends ModuleKindAndVariant>({
           rightElement={<DoneHeaderButton onPress={close} />}
           style={styles.headerStyle}
         />
-        <FlashList
+        <FlatList
           data={
             MODULE_KIND_WITH_VARIANTS.find(
               ({ moduleKind }) => moduleKind === module.moduleKind,
@@ -86,9 +82,8 @@ const CardModuleDesignTool = <T extends ModuleKindAndVariant>({
           renderItem={renderItem}
           keyExtractor={item => item}
           horizontal
-          estimatedItemSize={150}
           showsHorizontalScrollIndicator={false}
-          contentInset={styles.scrollContentInset}
+          contentContainerStyle={styles.scrollContentInset}
           ItemSeparatorComponent={ItemSeparator}
           extraData={{ module }}
         />
@@ -318,7 +313,7 @@ const styleSheet = createStyleSheet(appearance => ({
     borderColor: appearance === 'light' ? colors.black : colors.white,
   },
   headerStyle: { marginBottom: 15 },
-  scrollContentInset: { left: 16, right: 16 },
+  scrollContentInset: { paddingHorizontal: 16 },
   badge: {
     position: 'absolute',
     left: 8,
