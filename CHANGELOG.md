@@ -1,4 +1,4 @@
-## 1.5.4-canary.13
+## 1.5.4-canary.14
 
 * **fix:**  - manage webCardKind types locally and fix configuration from webCardScreen ([#6583](https://github.com/AzzappApp/azzapp/pull/6583))
 * **fix:**  - do not force displaying keyboard when third step of pop up display ([#6579](https://github.com/AzzappApp/azzapp/pull/6579))
