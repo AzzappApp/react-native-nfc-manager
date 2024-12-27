@@ -1,4 +1,4 @@
-import { Image } from 'expo-image';
+import { Video } from 'expo-av';
 import { useCallback, useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useColorScheme, View } from 'react-native';
@@ -270,10 +270,6 @@ const HomeBottomSheetPopupPanel = ({
     }
   });
   const colorScheme = useColorScheme();
-  const popupImage =
-    colorScheme === 'dark'
-      ? require('#assets/popup_1_dark.png')
-      : require('#assets/popup_1_light.png');
 
   return (
     <BottomSheetPopup
@@ -285,7 +281,19 @@ const HomeBottomSheetPopupPanel = ({
         <View style={styles.pageContainer}>
           {/* Page 0 */}
           <Animated.View style={[animatedStylePage0, styles.page]}>
-            <Image style={styles.illustration} source={popupImage} />
+            {currentPage === 0 ? (
+              <Video
+                style={styles.illustration}
+                isLooping
+                shouldPlay
+                isMuted
+                source={
+                  colorScheme === 'dark'
+                    ? require('#assets/hint_1_dark_ae.mp4')
+                    : require('#assets/hint_1_light_ae.mp4')
+                }
+              />
+            ) : undefined}
             <Text variant="large" style={styles.descriptionTextContainer}>
               <FormattedMessage
                 defaultMessage="Congratulations!
@@ -303,7 +311,19 @@ to be shared!"
           </Animated.View>
           {/* Page 1 */}
           <Animated.View style={[animatedStylePage1, styles.page]}>
-            <Image style={styles.illustration} source={popupImage} />
+            {currentPage === 1 ? (
+              <Video
+                style={styles.illustration}
+                isLooping
+                shouldPlay
+                isMuted
+                source={
+                  colorScheme === 'dark'
+                    ? require('#assets/hint_2_dark_ae.mp4')
+                    : require('#assets/hint_2_light_ae.mp4')
+                }
+              />
+            ) : undefined}
             <Text variant="large" style={styles.descriptionTextContainer}>
               <FormattedMessage
                 defaultMessage="Instantly share your ContactCard information with the “Shake & Share”!"

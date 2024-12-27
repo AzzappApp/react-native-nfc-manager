@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Image } from 'expo-image';
+import { Video } from 'expo-av';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -378,12 +378,15 @@ const ContactCardCreateScreen = () => {
       <BottomSheetPopup visible={popupVisible} onDismiss={hidePopup}>
         <View style={styles.popupContainer}>
           <View style={styles.popupPage}>
-            <Image
+            <Video
               style={styles.popupIllustration}
+              isLooping
+              isMuted
+              shouldPlay
               source={
                 colorScheme === 'dark'
-                  ? require('#assets/popup_1_dark.png')
-                  : require('#assets/popup_1_light.png')
+                  ? require('#assets/hint_0_dark_ae.mp4')
+                  : require('#assets/hint_0_light_ae.mp4')
               }
             />
             <Text variant="large" style={styles.popupDescriptionTextContainer}>
