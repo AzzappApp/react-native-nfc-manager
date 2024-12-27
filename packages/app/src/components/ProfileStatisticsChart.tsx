@@ -1,7 +1,7 @@
 import { Canvas, Image, Skia, TileMode } from '@shopify/react-native-skia';
 import { memo, useMemo } from 'react';
 import { useIntl } from 'react-intl';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { useDerivedValue } from 'react-native-reanimated';
 import { colors } from '#theme';
 import {
@@ -98,7 +98,7 @@ const BarChart = ({
           { x: 0, y: 0 },
           { x: 0, y: height },
           variant === 'dark'
-            ? [Skia.Color('#FFFFFFFF'), Skia.Color('#FFFFFF00')]
+            ? [Skia.Color('#FFFFFFFF'), BAR_CHART_END_COLOR_DARK]
             : [Skia.Color(colors.black), Skia.Color('#FFFFFFFF')],
           null,
           TileMode.Clamp,
@@ -239,3 +239,8 @@ export const normalizeArray = (values: number[]) => {
 
   return values.map(value => value / maxValue);
 };
+
+const BAR_CHART_END_COLOR_DARK =
+  Platform.OS === 'ios'
+    ? Skia.Color('#FFFFFF00')
+    : Skia.Color('rgba(255,255,255,0.25)');
