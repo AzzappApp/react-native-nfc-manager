@@ -36,14 +36,12 @@ import WebCardParametersScreenFallback from './WebCardParametersScreenFallback';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { WebCardParametersScreen_webCard$key } from '#relayArtifacts/WebCardParametersScreen_webCard.graphql';
 import type { WebCardParametersScreenMutation } from '#relayArtifacts/WebCardParametersScreenMutation.graphql';
-import type {
-  WebCardParametersScreenQuery,
-  WebCardParametersScreenQuery$data,
-} from '#relayArtifacts/WebCardParametersScreenQuery.graphql';
+import type { WebCardParametersScreenQuery } from '#relayArtifacts/WebCardParametersScreenQuery.graphql';
 import type { WebCardParametersScreenUnPublishMutation } from '#relayArtifacts/WebCardParametersScreenUnPublishMutation.graphql';
 import type { WebCardParametersRoute } from '#routes';
-import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
+import type { WebCardKind } from '@azzapp/shared/webCardKind';
 import type { GraphQLError } from 'graphql';
+import type { ReactNode } from 'react';
 
 const webCardParametersScreenQuery = graphql`
   query WebCardParametersScreenQuery($webCardId: ID!, $profileId: ID!) {
@@ -58,19 +56,6 @@ const webCardParametersScreenQuery = graphql`
         profileRole
       }
     }
-    webCardCategories {
-      id
-      label
-      webCardKind
-      companyActivities {
-        id
-        label
-        companyActivityType {
-          id
-          label
-        }
-      }
-    }
     webCardParameters {
       userNameChangeFrequencyDay
     }
@@ -83,7 +68,6 @@ const WebCardParametersScreen = ({
   const {
     webCard: webCardKey,
     profile,
-    webCardCategories,
     webCardParameters: { userNameChangeFrequencyDay },
   } = usePreloadedQuery(webCardParametersScreenQuery, preloadedQuery);
   const router = useRouter();
@@ -102,9 +86,6 @@ const WebCardParametersScreen = ({
         alreadyPublished
         lastUserNameUpdate
         nextChangeUsernameAllowedAt
-        webCardCategory {
-          id
-        }
         companyActivityLabel
         hasCover
         requiresSubscription
@@ -203,9 +184,6 @@ const WebCardParametersScreen = ({
             id
             webCardKind
             lastUserNameUpdate
-            webCardCategory {
-              id
-            }
             companyActivityLabel
             requiresSubscription
           }
@@ -255,7 +233,7 @@ const WebCardParametersScreen = ({
         variables: {
           webCardId: webCard.id,
           input: {
-            webCardCategoryId: webCardCategory.id,
+            webCardKind: webCardCategory.id,
           },
         },
         onError: error => {
@@ -400,6 +378,33 @@ const WebCardParametersScreen = ({
     ]);
   }, [intl, isWebCardOwner, quitWebCard]);
 
+  const webCardCategories = [
+    {
+      id: 'business' as WebCardKind,
+      label: (
+        <FormattedMessage
+          defaultMessage="Business"
+          description="webCard parameter screen - business webcard"
+        />
+      ),
+      isPremium: true,
+    },
+    {
+      id: 'personal' as WebCardKind,
+      label: (
+        <FormattedMessage
+          defaultMessage="Personal"
+          description="webCard parameter screen - personal webcard"
+        />
+      ),
+      isPremium: false,
+    },
+  ];
+
+  const selectedCategory = webCardCategories.find(
+    cat => cat.id === webCard?.webCardKind,
+  );
+
   if (!webCard) {
     return null;
   }
@@ -489,7 +494,7 @@ const WebCardParametersScreen = ({
               nativeID="profileCategories"
               accessibilityLabelledBy="profileCategoriesLabel"
               data={webCardCategories ?? []}
-              selectedItemKey={webCard.webCardCategory?.id}
+              selectedItemKey={selectedCategory?.id}
               keyExtractor={keyExtractor}
               useFlatList={false}
               onItemSelected={updateWebCardCategory}
@@ -512,8 +517,7 @@ const WebCardParametersScreen = ({
                   <PremiumIndicator
                     size={24}
                     isRequired={
-                      isWebCardKindSubscription(item.webCardKind) &&
-                      !webCard.isPremium
+                      isWebCardKindSubscription(item.id) && !webCard.isPremium
                     }
                   />
                 </View>
@@ -726,6 +730,8 @@ export default relayScreen(WebCardParametersScreen, {
   fetchPolicy: 'store-and-network',
 });
 
-type WebCardCategory = ArrayItemType<
-  WebCardParametersScreenQuery$data['webCardCategories']
->;
+type WebCardCategory = {
+  id: WebCardKind;
+  label: ReactNode;
+  isPremium: boolean;
+};

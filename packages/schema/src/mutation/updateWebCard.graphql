@@ -10,6 +10,7 @@ input UpdateWebCardInput {
   companyActivityId: ID @deprecated(reason: "use only companyActivityLabel")
   companyActivityLabel: String
   userName: String
+  webCardKind: WebCardKind
 }
 
 type UpdateWebCardPayload {

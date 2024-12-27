@@ -28,15 +28,15 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
     ...profileUpdates
   } = updates;
 
-  const partialWebCard: Partial<WebCard> = {
-    ...profileUpdates,
-  };
-
   const webCard = await webCardLoader.load(webCardId);
 
   if (!webCard) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
+  const partialWebCard: Partial<WebCard> = {
+    ...profileUpdates,
+    webCardKind: profileUpdates.webCardKind || webCard?.webCardKind,
+  };
 
   if (graphqlWebCardCategoryId) {
     const webCardCategoryId = fromGlobalIdWithType(
