@@ -647,7 +647,7 @@ const getContactCardUrl = async (profile: Profile) => {
     profile.id,
     profile.webCardId,
     profile.contactCard ?? {},
-    webCard?.commonInformation,
+    webCard.isMultiUser ? webCard?.commonInformation : null,
   );
 
   const url = buildUserUrlWithContactCard(

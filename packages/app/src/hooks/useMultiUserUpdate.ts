@@ -54,6 +54,11 @@ export const useMultiUserUpdate = (onCompleted?: () => void) => {
               );
             }
           }
+
+          if (profileInfos?.profileId) {
+            const profile = store.get(profileInfos.profileId);
+            profile?.invalidateRecord();
+          }
         },
         onCompleted,
         onError: error => {
