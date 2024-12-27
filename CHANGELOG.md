@@ -1,4 +1,4 @@
-## 1.5.4-canary.15
+## 1.5.4-canary.16
 
 * **fix:**  - move setup images / lottie to video ([#6595](https://github.com/AzzappApp/azzapp/pull/6595))
 * **fix:**  - manage webCardKind types locally and fix configuration from webCardScreen ([#6583](https://github.com/AzzappApp/azzapp/pull/6583))
