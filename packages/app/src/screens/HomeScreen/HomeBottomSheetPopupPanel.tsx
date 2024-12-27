@@ -50,6 +50,13 @@ const HomeBottomSheetPopupPanel = ({
   const styles = useStyleSheet(stylesheet);
 
   useEffect(() => {
+    const timeout = setTimeout(() => {
+      onChangeWebCard(profileInfo);
+    }, 1000);
+    return () => clearTimeout(timeout);
+  }, [profileInfo]);
+
+  useEffect(() => {
     const fct = async () => {
       if (!profileInfo?.webCardId) return;
       const res =
@@ -215,13 +222,11 @@ const HomeBottomSheetPopupPanel = ({
         },
         onCompleted: () => {
           const tooltipWebcardId = profileInfo?.webCardId;
-          onChangeWebCard(profileInfo);
-
           setTimeout(() => {
             if (tooltipWebcardId) {
               setTooltipedWebcard(tooltipWebcardId);
             }
-          }, 1000);
+          }, 500);
         },
         updater: store => {
           // reorder carousel once userName is set
