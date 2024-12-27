@@ -1,5 +1,5 @@
 import { Image } from 'expo-image';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useColorScheme, View } from 'react-native';
 import Animated, {
@@ -27,7 +27,6 @@ import { useHomeBottomSheetModalToolTipContext } from './HomeBottomSheetModalToo
 import type { HomeBottomSheetPopupPanelCheckUserNameQuery } from '#relayArtifacts/HomeBottomSheetPopupPanelCheckUserNameQuery.graphql';
 import type { HomeBottomSheetPopupPanelGetProposedUsernameQuery } from '#relayArtifacts/HomeBottomSheetPopupPanelGetProposedUsernameQuery.graphql';
 import type { ReactNode } from 'react';
-import type { TextInput as NativeTextInput } from 'react-native';
 
 type HomeBottomSheetPopupPanelProps = {
   /**
@@ -49,7 +48,6 @@ const HomeBottomSheetPopupPanel = ({
   const intl = useIntl();
   const environment = useRelayEnvironment();
   const styles = useStyleSheet(stylesheet);
-  const inputRef = useRef<NativeTextInput>(null);
 
   useEffect(() => {
     const fct = async () => {
@@ -206,9 +204,6 @@ const HomeBottomSheetPopupPanel = ({
       const nextPage = currentPage + 1;
       currentPageSharedValue.value = nextPage;
       setCurrentPage(nextPage);
-      if (nextPage === 2) {
-        inputRef.current?.focus();
-      }
     }
     if (currentPage === 2) {
       commitUserName({
@@ -339,7 +334,6 @@ to be shared!"
             </Text>
             <View style={styles.linkInput}>
               <TextInput
-                ref={inputRef}
                 defaultValue={localUrl}
                 onChangeText={onLinkUrlChanged}
                 autoCapitalize="none"
@@ -371,11 +365,7 @@ to be shared!"
         <View style={styles.progress}>
           <PageProgress nbPages={3} currentPage={currentPage} />
         </View>
-        <View
-          style={{
-            paddingTop: 14,
-          }}
-        >
+        <View style={styles.buttonContainer}>
           <PopupButton
             onPress={onNextPageRequested}
             text={
@@ -438,6 +428,9 @@ const stylesheet = createStyleSheet(theme => ({
     height: 20,
   },
   errorStyle: { color: colors.red400 },
+  buttonContainer: {
+    paddingTop: 14,
+  },
 }));
 
 export default HomeBottomSheetPopupPanel;
