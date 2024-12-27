@@ -276,7 +276,12 @@ const styles = StyleSheet.create({
   header: { marginBottom: 15 },
   textAction: { paddingTop: 10, paddingBottom: 5 },
   titleStyle: { borderWidth: 0, height: 50 },
-  textStyle: { borderWidth: 0, height: 200, marginTop: 10 },
+  textStyle: {
+    borderWidth: 0,
+    height: 200,
+    marginTop: 10,
+    verticalAlign: 'top',
+  },
   previewContent: {
     height: 47,
     width: 47,
