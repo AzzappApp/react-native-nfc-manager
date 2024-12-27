@@ -13,7 +13,7 @@ import {
   convertToBaseCanvasRatio,
 } from '@azzapp/shared/coverHelpers';
 
-import { colors, shadow } from '#theme';
+import { colors, fontFamilies, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import PressableNative from '#ui/PressableNative';
 import { DynamicLinkRenderer } from './CoverEditor/CoverPreview/DynamicLinkRenderer';
@@ -304,12 +304,20 @@ const CoverRenderer = (
                 ]}
               >
                 {overlayTitle && (
-                  <Text style={styles.overlayTitle} allowFontScaling>
+                  <Text
+                    style={styles.overlayTitle}
+                    numberOfLines={1}
+                    allowFontScaling
+                  >
                     {overlayTitle}
                   </Text>
                 )}
                 {overlaySubTitle && (
-                  <Text style={styles.overlaySubTitle} allowFontScaling>
+                  <Text
+                    style={styles.overlaySubTitle}
+                    numberOfLines={1}
+                    allowFontScaling
+                  >
                     {overlaySubTitle}
                   </Text>
                 )}
@@ -399,19 +407,19 @@ const stylesheet = createStyleSheet(theme => ({
     height: DEFAULT_COVER_HEIGHT,
   },
   overlayTitle: {
+    ...fontFamilies.regular,
     color: colors.white,
-    justifyContent: 'center',
-    alignSelf: 'center',
-    top: '49.5%',
-    fontFamily: 'Inter_SemiBold',
-    fontSize: 13,
+    top: '44.8%',
+    left: '22%',
+    width: '70%',
+    fontSize: 19,
   },
   overlaySubTitle: {
+    ...fontFamilies.extrabold,
     color: colors.white,
-    justifyContent: 'center',
-    alignSelf: 'center',
-    top: '50%',
-    fontFamily: 'Inter_SemiBold',
-    fontSize: 13,
+    top: '45%',
+    width: '70%',
+    left: '22%',
+    fontSize: 27,
   },
 }));

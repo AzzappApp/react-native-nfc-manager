@@ -1,5 +1,6 @@
 'use client';
 
+import cn from 'classnames';
 import { useEffect, useRef, useState } from 'react';
 import { swapColor, DEFAULT_COLOR_PALETTE } from '@azzapp/shared/cardHelpers';
 import {
@@ -8,7 +9,7 @@ import {
   DEFAULT_COVER_WIDTH,
 } from '@azzapp/shared/coverHelpers';
 import { DEFAULT_VIDEO_PERCENTAGE_THUMBNAIL } from '@azzapp/shared/imagesHelpers';
-import { fontsMap } from '#helpers/fonts';
+import { Plus_Jakarta_ExtraBold, Plus_Jakarta_Light } from '#helpers/fonts';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CloudinaryVideo from '#ui/CloudinaryVideo';
 import CoverLinksRenderer from './CoverLinksRenderer';
@@ -153,31 +154,16 @@ const CoverRenderer = ({
       )}
 
       {overlayTitle && (
-        <div
-          style={{
-            textAlign: 'center',
-            color: 'white',
-            fontSize: 13,
-            position: 'absolute',
-            width: '100%',
-            top: '49.5%',
-          }}
-          className={fontsMap['Inter_SemiBold'].className}
-        >
+        <div className={cn(styles.overlayTitle, Plus_Jakarta_Light.className)}>
           {overlayTitle}
         </div>
       )}
       {overlaySubTitle && (
         <div
-          style={{
-            textAlign: 'center',
-            color: 'white',
-            fontSize: 13,
-            position: 'absolute',
-            width: '100%',
-            top: '51.5%',
-          }}
-          className={fontsMap['Inter_SemiBold'].className}
+          className={cn(
+            styles.overlaySubTitle,
+            Plus_Jakarta_ExtraBold.className,
+          )}
         >
           {overlaySubTitle}
         </div>
