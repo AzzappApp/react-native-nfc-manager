@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/react-native';
 import { useEffect, useRef } from 'react';
-import { useRelayEnvironment } from 'react-relay';
+import { graphql, useFragment, useRelayEnvironment } from 'react-relay';
 import { COVER_CARD_RADIUS } from '@azzapp/shared/coverHelpers';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
@@ -34,6 +34,14 @@ const CoverLink = ({
   >(null);
   const router = useRouter();
   const prefetchScreen = usePrefetchRoute();
+  const webCard = useFragment(
+    graphql`
+      fragment CoverLinkRendererIos_webCard on WebCard {
+        coverIsPredefined
+      }
+    `,
+    props.webCard,
+  );
 
   const onPressInner = (event: GestureResponderEvent) => {
     onPress?.(event);
@@ -48,12 +56,19 @@ const CoverLink = ({
         );
         return;
       }
-      router.push({
-        route: 'WEBCARD',
-        params: {
-          userName,
-        },
-      });
+
+      if (webCard?.coverIsPredefined) {
+        router.push({
+          route: 'COVER_TEMPLATE_SELECTION',
+        });
+      } else {
+        router.push({
+          route: 'WEBCARD',
+          params: {
+            userName,
+          },
+        });
+      }
       return;
     }
     container.measureInWindow(async (x, y, width, height) => {
@@ -64,14 +79,21 @@ const CoverLink = ({
         );
         return;
       }
-      router.push({
-        route: 'WEBCARD',
-        params: {
-          userName,
-          webCardId,
-          fromRectangle: { x, y, width, height },
-        },
-      });
+
+      if (webCard?.coverIsPredefined) {
+        router.push({
+          route: 'COVER_TEMPLATE_SELECTION',
+        });
+      } else {
+        router.push({
+          route: 'WEBCARD',
+          params: {
+            userName,
+            webCardId,
+            fromRectangle: { x, y, width, height },
+          },
+        });
+      }
     });
   };
 

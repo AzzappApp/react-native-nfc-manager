@@ -361,19 +361,9 @@ const ItemRenderComponent = ({
   }, [scrollToIndex, isCurrent, index]);
 
   const onPressEdit = () => {
-    if (profile.webCard?.coverIsPredefined) {
-      router.push({
-        route: 'COVER_TEMPLATE_SELECTION',
-      });
-    } else if (profile.webCard?.userName) {
-      router.push({
-        route: 'WEBCARD',
-        params: {
-          userName: profile.webCard.userName,
-          webCardId: profile.webCard.id,
-        },
-      });
-    }
+    router.push({
+      route: 'COVER_TEMPLATE_SELECTION',
+    });
   };
 
   const { setTooltipId, tooltipedWebcard, setTooltipedWebcard } =
@@ -436,18 +426,20 @@ const ItemRenderComponent = ({
               onError={onError}
               onLongPress={openWebcardModal}
             />
-            <PressableNative
-              style={styles.editUserContainer}
-              onPress={onPressEdit}
-              android_ripple={{
-                borderless: true,
-                foreground: true,
-              }}
-            >
-              <BlurView style={styles.multiUserIconContainer}>
-                <Icon icon="edit" style={styles.multiUserIcon} />
-              </BlurView>
-            </PressableNative>
+            {profile.webCard?.coverIsPredefined && (
+              <PressableNative
+                style={styles.editUserContainer}
+                onPress={onPressEdit}
+                android_ripple={{
+                  borderless: true,
+                  foreground: true,
+                }}
+              >
+                <BlurView style={styles.multiUserIconContainer}>
+                  <Icon icon="edit" style={styles.multiUserIcon} />
+                </BlurView>
+              </PressableNative>
+            )}
             {isMultiUser && (
               <PressableNative
                 style={styles.multiUserContainer}

@@ -69,6 +69,8 @@ const AuthorCartouche = ({
         userName
         cardIsPublished
         ...CoverRenderer_webCard
+        ...CoverLinkRenderer_webCard
+        ...CoverLinkRendererIos_webCard
       }
     `,
     authorKey,
