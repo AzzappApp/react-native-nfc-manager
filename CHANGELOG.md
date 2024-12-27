@@ -1,5 +1,6 @@
-## 1.5.4-canary.14
+## 1.5.4-canary.15
 
+* **fix:**  - move setup images / lottie to video ([#6595](https://github.com/AzzappApp/azzapp/pull/6595))
 * **fix:**  - manage webCardKind types locally and fix configuration from webCardScreen ([#6583](https://github.com/AzzappApp/azzapp/pull/6583))
 * **fix:**  - do not force displaying keyboard when third step of pop up display ([#6579](https://github.com/AzzappApp/azzapp/pull/6579))
 * **fix:**  - update webcard color on first cover creation ([#6580](https://github.com/AzzappApp/azzapp/pull/6580))
