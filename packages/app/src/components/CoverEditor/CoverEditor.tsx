@@ -165,6 +165,7 @@ const CoverEditorCore = (
           lastName
           companyName
           companyActivityLabel
+          coverIsPredefined
         }
       }
     `,
@@ -313,7 +314,11 @@ const CoverEditorCore = (
     }
 
     const cardColors =
-      profile.webCard?.cardColors ?? coverTemplate?.colorPalette ?? {};
+      (profile.webCard?.coverIsPredefined
+        ? coverTemplate?.colorPalette
+        : profile.webCard?.cardColors) ??
+      coverTemplate?.colorPalette ??
+      {};
 
     // if we create a new cover without a new template and there is no cover already done
     // then we should interpolate the cover preview position
