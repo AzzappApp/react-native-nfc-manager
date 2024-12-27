@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, View } from 'react-native';
+import { Animated, Platform, View } from 'react-native';
 
 import {
   createVariantsStyleSheet,
@@ -150,7 +150,11 @@ const AlternationContainer = ({
         width: mediaWidth,
         borderRadius: cardStyle?.borderRadius ?? 0,
         transform: [{ translateX: disableAnimation ? 0 : translateX }],
-        opacity: disableAnimation ? 1 : opacity,
+        opacity:
+          disableAnimation ||
+          (Platform.OS === 'android' && media.kind === 'video')
+            ? 1
+            : opacity,
       },
     ],
     [
@@ -159,6 +163,7 @@ const AlternationContainer = ({
       cardStyle?.borderRadius,
       disableAnimation,
       translateX,
+      media.kind,
       opacity,
     ],
   );

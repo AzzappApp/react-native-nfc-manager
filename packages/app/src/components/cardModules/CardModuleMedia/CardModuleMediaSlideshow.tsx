@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { PixelRatio, StyleSheet } from 'react-native';
+import { PixelRatio, Platform, StyleSheet } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -211,12 +211,15 @@ const SlideshowItem = ({
       Extrapolation.EXTEND,
     );
 
-    const opacity = interpolate(
-      scrollIndex.value,
-      [index - 1, index, index + 1],
-      [0.25, 1, 0.25],
-      Extrapolation.CLAMP,
-    );
+    const opacity =
+      media.kind === 'video' && Platform.OS === 'android'
+        ? 1
+        : interpolate(
+            scrollIndex.value,
+            [index - 1, index, index + 1],
+            [0.25, 1, 0.25],
+            Extrapolation.CLAMP,
+          );
 
     return {
       opacity,
