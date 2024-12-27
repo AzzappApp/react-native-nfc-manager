@@ -12,7 +12,7 @@ import {
 } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Platform, StyleSheet, View, useWindowDimensions } from 'react-native';
-import { getVideoMetaData, Video } from 'react-native-compressor';
+import { Video } from 'react-native-compressor';
 import { useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller';
 import Animated, {
   interpolate,
@@ -39,6 +39,7 @@ import {
 import {
   copyCoverMediaToCacheDir,
   COVER_CACHE_DIR,
+  getVideoSize,
   type SourceMedia,
 } from '#helpers/mediaHelpers';
 import Button from '#ui/Button';
@@ -491,13 +492,14 @@ const CoverEditorCore = (
               maxSize: MAX_EXPORT_DECODER_RESOLUTION,
               bitrate: COVER_VIDEO_BITRATE,
             });
-            const metaData = await getVideoMetaData(result);
+
+            const res = await getVideoSize(result);
             media = {
               ...media,
               uri: result,
-              rotation: 0,
-              width: metaData.width,
-              height: metaData.height,
+              rotation: res.rotation,
+              width: res.width,
+              height: res.height,
             };
             compressedMedia.push(media);
           }

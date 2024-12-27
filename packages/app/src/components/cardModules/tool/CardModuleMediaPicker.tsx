@@ -2,7 +2,7 @@ import { Image } from 'expo-image';
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, Alert } from 'react-native';
-import { getVideoMetaData, Video } from 'react-native-compressor';
+import { Video } from 'react-native-compressor';
 import { ScrollView } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
 import { Observable } from 'relay-runtime';
@@ -15,6 +15,7 @@ import { ScreenModal, preventModalDismiss } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import {
   copyCoverMediaToCacheDir,
+  getVideoSize,
   MODULES_CACHE_DIR,
   type SourceMedia,
 } from '#helpers/mediaHelpers';
@@ -234,16 +235,17 @@ const CardModuleMediaPicker = ({
               const result = await Video.compress(cardModuleMedia.media.uri, {
                 maxSize: MODULE_VIDEO_MAX_WIDTH,
               });
-              const metaData = await getVideoMetaData(result);
+
+              const res = await getVideoSize(result);
               value += 1;
               updateProgress(value);
               return {
                 ...cardModuleMedia,
                 media: {
                   ...cardModuleMedia.media,
-                  rotation: 0,
-                  width: metaData.width,
-                  height: metaData.height,
+                  rotation: res.rotation,
+                  width: res.width,
+                  height: res.height,
                   uri: result,
                 },
               };
