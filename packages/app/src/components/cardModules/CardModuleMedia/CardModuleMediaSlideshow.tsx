@@ -212,7 +212,7 @@ const SlideshowItem = ({
     );
 
     const opacity =
-      media.kind === 'video' && Platform.OS === 'android'
+      media?.kind === 'video' && Platform.OS === 'android' // media may be undefined
         ? 1
         : interpolate(
             scrollIndex.value,
