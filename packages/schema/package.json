@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/schema",
-  "version": "1.5.4-rc.44",
+  "version": "1.5.4-rc.45",
   "private": true,
   "exports": {
     ".": {
