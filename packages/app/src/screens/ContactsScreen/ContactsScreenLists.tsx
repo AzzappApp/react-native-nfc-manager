@@ -173,7 +173,7 @@ const ContactsScreenLists = ({
                     cardIsPublished
                     userName
                     hasCover
-                    ...CoverRenderer_webCard
+                    ...ContactDetailsModal_webCard
                     commonInformation {
                       addresses {
                         label
@@ -413,6 +413,9 @@ const ContactsScreenLists = ({
         ...details,
         createdAt: contact.createdAt,
         profileId: contact.contactProfile?.id,
+        webCard: contact.contactProfile?.webCard?.cardIsPublished
+          ? contact.contactProfile?.webCard
+          : null,
       });
     },
     [contactsPermissionStatus, localContacts],
