@@ -1,5 +1,6 @@
-## 1.5.4-canary.12
+## 1.5.4-canary.13
 
+* **fix:**  - manage webCardKind types locally and fix configuration from webCardScreen ([#6583](https://github.com/AzzappApp/azzapp/pull/6583))
 * **fix:**  - do not force displaying keyboard when third step of pop up display ([#6579](https://github.com/AzzappApp/azzapp/pull/6579))
 * **fix:**  - update webcard color on first cover creation ([#6580](https://github.com/AzzappApp/azzapp/pull/6580))
 * **fix:**  - **modules:** replace reanimated with animated to fix scroll on android ([#6543](https://github.com/AzzappApp/azzapp/pull/6543))
