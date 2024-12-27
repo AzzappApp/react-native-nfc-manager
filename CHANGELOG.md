@@ -1,5 +1,7 @@
-## 1.5.4-canary.11
+## 1.5.4-canary.12
 
+* **fix:**  - do not force displaying keyboard when third step of pop up display ([#6579](https://github.com/AzzappApp/azzapp/pull/6579))
+* **fix:**  - update webcard color on first cover creation ([#6580](https://github.com/AzzappApp/azzapp/pull/6580))
 * **fix:**  - **modules:** replace reanimated with animated to fix scroll on android ([#6543](https://github.com/AzzappApp/azzapp/pull/6543))
 * **fix:**  - **socialLink:** [#6531](https://github.com/AzzappApp/azzapp/pull/6531) wrong stored svg ([#6540](https://github.com/AzzappApp/azzapp/pull/6540))
 * **fix:**  - **cover:** [#6535](https://github.com/AzzappApp/azzapp/pull/6535) use correct path ([#6539](https://github.com/AzzappApp/azzapp/pull/6539))
