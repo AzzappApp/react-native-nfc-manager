@@ -28,7 +28,7 @@ import {
   CARD_MEDIA_VIDEO_DEFAULT_DURATION,
   type CardModuleMedia,
 } from '../cardModuleEditorType';
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
+import type { ViewProps } from 'react-native';
 import type { Sink } from 'relay-runtime/lib/network/RelayObservable';
 
 type CardModuleMediaPickerProps = Omit<ViewProps, 'children'> & {

@@ -9,6 +9,7 @@ import {
 import { CARD_MEDIA_VIDEO_DEFAULT_DURATION } from './cardModuleEditorType';
 import CardModuleMediaItem from './CardModuleMediaItem';
 import type {
+  CardModuleImage,
   CardModuleSourceMedia,
   CardModuleVideo,
 } from './cardModuleEditorType';
@@ -38,15 +39,13 @@ const CardModuleMediaEditPreview = ({
   );
 };
 
-const VideoRender = ({
-  media,
-  itemWidth,
-  itemHeight,
-}: {
+type VideoRenderProps = {
   media: CardModuleVideo;
   itemWidth: number;
   itemHeight: number;
-}) => {
+};
+
+const VideoRender = ({ media, itemWidth, itemHeight }: VideoRenderProps) => {
   const maxResolution = itemWidth * 2;
   const cropData = calculateCropData(media, itemWidth, itemHeight);
   return (
@@ -68,15 +67,13 @@ const VideoRender = ({
   );
 };
 
-const ImageRender = ({
-  media,
-  itemWidth,
-  itemHeight,
-}: {
-  media: CardModuleSourceMedia;
+type ImageRenderProps = {
+  media: CardModuleImage;
   itemWidth: number;
   itemHeight: number;
-}) => {
+};
+
+const ImageRender = ({ media, itemWidth, itemHeight }: ImageRenderProps) => {
   const { cropData, ...editionParameters } = media.editionParameters ?? {};
 
   const textureInfo = useNativeTexture({
