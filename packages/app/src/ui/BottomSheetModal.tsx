@@ -72,7 +72,7 @@ export type Props = BottomSheetModalProps & {
 
   /**
    * this props enable the resizing of the bottom sheet on its content when scrolling
-   * Thiis used in addition with SnapPoint props that need to contain at least 2 values
+   * This used in addition with SnapPoint props that need to contain at least 2 values
    * don't delete before reading the purpose and it is used
    *
    * @type {boolean}

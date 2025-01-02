@@ -1,8 +1,7 @@
-import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import { isNotFalsyString, isValidUrl } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import { MediaImageRenderer } from '#components/medias';
@@ -99,7 +98,7 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
     close();
   };
 
-  const { bottom: bottomInset, top: topInset } = useScreenInsets();
+  const { top: topInset } = useScreenInsets();
 
   const hasError = useMemo(() => {
     return hasCardModuleMediaError(cardModuleMedia, module);
@@ -123,16 +122,15 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
       <BottomSheetModal
         visible={show}
         onDismiss={onDismiss}
-        nestedScroll
-        bottomInset={bottomInset}
         topInset={topInset}
         lazy
+        height={600}
         enableContentPanningGesture={false}
         keyboardBehavior={
           module.moduleKind === 'mediaTextLink' ? 'fillParent' : 'interactive'
         }
       >
-        <BottomSheetScrollView style={styles.container} bounces={false}>
+        <ScrollView style={styles.container} bounces={false}>
           <Header
             middleElement={intl.formatMessage({
               defaultMessage: 'Design',
@@ -234,7 +232,7 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
               />
             </>
           )}
-        </BottomSheetScrollView>
+        </ScrollView>
       </BottomSheetModal>
     </>
   );
@@ -272,7 +270,10 @@ const styles = StyleSheet.create({
     borderCurve: 'continuous',
     overflow: 'hidden',
   },
-  container: { paddingHorizontal: 16 },
+  container: {
+    paddingHorizontal: 16,
+    overflow: 'visible',
+  },
   header: { marginBottom: 15 },
   textAction: { paddingTop: 10, paddingBottom: 5 },
   titleStyle: { borderWidth: 0, height: 50 },

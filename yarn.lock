@@ -128,7 +128,7 @@ __metadata:
     "@formatjs/intl-locale": "npm:^4.2.8"
     "@formatjs/intl-pluralrules": "npm:^5.4.1"
     "@formatjs/intl-relativetimeformat": "npm:^11.4.8"
-    "@gorhom/bottom-sheet": "npm:^5.0.6"
+    "@gorhom/bottom-sheet": "patch:@gorhom/bottom-sheet@npm%3A5.0.6#~/.yarn/patches/@gorhom-bottom-sheet-npm-5.0.6-ee2c6d5dad.patch"
     "@hookform/resolvers": "npm:^3.9.1"
     "@lottiefiles/lottie-js": "npm:0.4.2"
     "@miblanchard/react-native-slider": "npm:2.6.0"
@@ -6910,7 +6910,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@gorhom/bottom-sheet@npm:^5.0.6":
+"@gorhom/bottom-sheet@npm:5.0.6":
   version: 5.0.6
   resolution: "@gorhom/bottom-sheet@npm:5.0.6"
   dependencies:
@@ -6929,6 +6929,28 @@ __metadata:
     "@types/react-native":
       optional: true
   checksum: 10/b8beb6bb4d80828deed5c74c8b19926cbb4887d530d07c19eaaa1d8faae6c79f942f83baad076c84d065f357f6666cbc257799fe8fc58cb375e6cbebf52b6227
+  languageName: node
+  linkType: hard
+
+"@gorhom/bottom-sheet@patch:@gorhom/bottom-sheet@npm%3A5.0.6#~/.yarn/patches/@gorhom-bottom-sheet-npm-5.0.6-ee2c6d5dad.patch":
+  version: 5.0.6
+  resolution: "@gorhom/bottom-sheet@patch:@gorhom/bottom-sheet@npm%3A5.0.6#~/.yarn/patches/@gorhom-bottom-sheet-npm-5.0.6-ee2c6d5dad.patch::version=5.0.6&hash=2103ef"
+  dependencies:
+    "@gorhom/portal": "npm:1.0.14"
+    invariant: "npm:^2.2.4"
+  peerDependencies:
+    "@types/react": "*"
+    "@types/react-native": "*"
+    react: "*"
+    react-native: "*"
+    react-native-gesture-handler: ">=2.16.1"
+    react-native-reanimated: ">=3.16.0"
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    "@types/react-native":
+      optional: true
+  checksum: 10/50c464d73c579c3dbbe9fe8b4cf602e27a1b2c905910703171b6954d4d575aec86469d96d7dc244f7631f71d517f274f62b4620d9945ae3ce5c2da6f180070ac
   languageName: node
   linkType: hard
 
