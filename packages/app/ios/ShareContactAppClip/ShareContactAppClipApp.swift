@@ -17,19 +17,12 @@ struct ShareContactAppClipApp: App {
     }
 }
 struct ContentView: View {
-    @State var contactData: String?
     @State var username: String?
     @State var step: String?
 
     var body: some View {
       VStack {
         Spacer()
-         if let contactData = contactData {
-            Text("Contact Data: \(contactData)")
-        } else {
-            Text("Contact Data: Not available")
-        }
-
         if let username = username {
             Text("Username: \(username)")
         } else {
@@ -67,7 +60,6 @@ struct ContentView: View {
 
   
     private func handleContactData(compressedContactCard: String, username: String) {
-      self.contactData = compressedContactCard
       self.username = username
       guard let decodedURI = compressedContactCard.removingPercentEncoding else {
           print("Failed to decode URI component.")
@@ -104,7 +96,7 @@ struct ContentView: View {
              self.step = "5"
           return
         }
-           self.step = "6"
+        self.step = "6"
         // Remove outer quotes and unescape characters
         let cleanedContactDataString = contactDataString
           .replacingOccurrences(of: "\r", with: "")
@@ -115,7 +107,8 @@ struct ContentView: View {
         
         self.step = "7  \(cleanedContactDataString)"
         
-        verifySign(signature: signature, data: contactDataString, salt: username) { result in
+        verifySign(signature: signature, data: cleanedContactDataString, salt: username) { result in
+         self.step = "7-bis  \(result)"
           switch result {
           case .success(let additionalContactData):
 
@@ -176,6 +169,7 @@ struct ContentView: View {
         self.step = "16 \(error)"
         print("Failed to decode contact data: \(error)")
       }
+      self.step = "Ended without verify sign"
     }
 
 
@@ -336,12 +330,12 @@ private func mapToContactData(from array: [Any]) -> ContactData {
 
 func verifySign(signature: String, data: String, salt: String, completion: @escaping (Result<[String: Any], Error>) -> Void) {
     guard let baseUrl = ProcessInfo.processInfo.environment["BASE_URL"] else {
-      print("Base url not defined")
+      completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Base url not defined"])))
       return
     }
 
     guard let url = URL(string: "\(baseUrl)api/verifySign") else {
-      print("Invalid URL")
+      completion(.failure(NSError(domain: "", code: -2, userInfo: [NSLocalizedDescriptionKey: "Invalid URL"])))
       return
     }
 
@@ -356,6 +350,7 @@ func verifySign(signature: String, data: String, salt: String, completion: @esca
       request.httpBody = jsonData
     } catch {
       print("Failed to serialize JSON: \(error.localizedDescription)")
+      completion(.failure(NSError(domain: "", code: -31, userInfo: [NSLocalizedDescriptionKey: "Failed to parse JSON request"])))
       return
     }
    
@@ -366,7 +361,7 @@ func verifySign(signature: String, data: String, salt: String, completion: @esca
       }
 
       guard let data = data else {
-        completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data received"])))
+        completion(.failure(NSError(domain: "", code: -4, userInfo: [NSLocalizedDescriptionKey: "No data received"])))
         return
       }
 
@@ -375,7 +370,7 @@ func verifySign(signature: String, data: String, salt: String, completion: @esca
             completion(.success(json))
         } else {
             print("Failed to parse JSON response")
-            completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to parse JSON response"])))
+            completion(.failure(NSError(domain: "", code: -5, userInfo: [NSLocalizedDescriptionKey: "Failed to parse JSON response"])))
         }
       } catch {
           print("Failed to parse JSON: \(error.localizedDescription)")
