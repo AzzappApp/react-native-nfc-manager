@@ -11,19 +11,12 @@ import useScreenInsets from '#hooks/useScreenInsets';
 import BottomMenu, { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import {
-  useEditTransition,
-  useSelectionModeTransition,
-} from './WebCardScreenTransitions';
-import type { WebCardScreenFooter_webCard$key } from '#relayArtifacts/WebCardScreenFooter_webCard.graphql';
+import type { WebCardEditScreenFooter_webCard$key } from '#relayArtifacts/WebCardEditScreenFooter_webCard.graphql';
 import type { BottomMenuItem } from '#ui/BottomMenu';
+import type { DerivedValue } from 'react-native-reanimated';
 
-export type WebCardScreenFooterProps = {
-  webCard: WebCardScreenFooter_webCard$key;
-  /**
-   * Whether the webCard is in edit mode
-   */
-  editing: boolean;
+export type WebCardEditScreenFooterProps = {
+  webCard: WebCardEditScreenFooter_webCard$key;
   /**
    * Whether the webCard is in selection mode
    */
@@ -36,6 +29,10 @@ export type WebCardScreenFooterProps = {
    * True when selection contains hidden modules
    */
   selectionContainsHiddenModules: boolean;
+  /**
+   * A transition value for the selection mode
+   */
+  selectionModeTransition: DerivedValue<number>;
   /**
    * A callback called when the user switch the edit mode display mode
    */
@@ -66,12 +63,12 @@ export type WebCardScreenFooterProps = {
   onDuplicate: () => void;
 };
 
-const WebCardScreenFooter = ({
+const WebCardEditScreenFooter = ({
   webCard: webCardKey,
-  editing,
   selectionMode,
   hasSelectedModules,
   selectionContainsHiddenModules,
+  selectionModeTransition,
   onRequestPreview,
   onRequestNewModule,
   onRequestColorPicker,
@@ -79,10 +76,10 @@ const WebCardScreenFooter = ({
   onDelete,
   onToggleVisibility,
   onDuplicate,
-}: WebCardScreenFooterProps) => {
+}: WebCardEditScreenFooterProps) => {
   const webCard = useFragment(
     graphql`
-      fragment WebCardScreenFooter_webCard on WebCard {
+      fragment WebCardEditScreenFooter_webCard on WebCard {
         cardModules {
           id
         }
@@ -169,15 +166,12 @@ const WebCardScreenFooter = ({
     [colorPalette, intl, styles.viewTriptych],
   );
 
-  const editTransition = useEditTransition();
-  const selectionModeTransition = useSelectionModeTransition();
-
   const bottomMenuStyle = useAnimatedStyle(() => ({
-    opacity:
-      (editTransition?.value ?? 0) - (selectionModeTransition?.value ?? 0),
+    opacity: 1 - selectionModeTransition.value,
   }));
+
   const selectionMenuStyle = useAnimatedStyle(() => ({
-    opacity: editing ? (selectionModeTransition?.value ?? 0) : 0,
+    opacity: selectionModeTransition.value,
   }));
 
   if (webCard.cardModules.length === 0) {
@@ -196,7 +190,6 @@ const WebCardScreenFooter = ({
           },
           bottomMenuStyle,
         ]}
-        pointerEvents={editing ? 'auto' : 'none'}
       >
         <BottomMenu tabs={tabs} showLabel onItemPress={onItemPress} />
       </Animated.View>
@@ -210,7 +203,7 @@ const WebCardScreenFooter = ({
           },
           selectionMenuStyle,
         ]}
-        pointerEvents={editing && selectionMode ? 'auto' : 'none'}
+        pointerEvents={selectionMode ? 'auto' : 'none'}
       >
         <PressableNative
           accessibilityRole="button"
@@ -273,7 +266,7 @@ const WebCardScreenFooter = ({
   );
 };
 
-export default WebCardScreenFooter;
+export default WebCardEditScreenFooter;
 
 const styleSheet = createStyleSheet(appearance => ({
   buttonBar: {

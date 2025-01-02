@@ -1,11 +1,6 @@
 import { Suspense, useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Alert, StyleSheet, View } from 'react-native';
-import Animated, {
-  interpolate,
-  useAnimatedStyle,
-} from 'react-native-reanimated';
-
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
@@ -20,7 +15,6 @@ import BlurredFloatingButton, {
 } from '#ui/BlurredFloatingButton';
 import FloatingButton from '#ui/FloatingButton';
 import Text from '#ui/Text';
-import { useEditTransition } from './WebCardScreenTransitions';
 import type { WebCardScreenButtonBar_profile$key } from '#relayArtifacts/WebCardScreenButtonBar_profile.graphql';
 import type { WebCardScreenButtonBar_webCard$key } from '#relayArtifacts/WebCardScreenButtonBar_webCard.graphql';
 import type { ViewProps } from 'react-native';
@@ -42,10 +36,6 @@ type WebCardScreenButtonBarProps = ViewProps & {
    *  true when the webcard is visible (as opposite of displaying the post list)
    */
   isWebCardDisplayed: boolean;
-  /**
-   * If the card is in editing mode
-   */
-  editing: boolean;
   /**
    * A callback called when the user press the edit button
    */
@@ -80,7 +70,6 @@ type WebCardScreenButtonBarProps = ViewProps & {
 const WebCardScreenButtonBar = ({
   webCard,
   profile,
-  editing,
   isViewer,
   onEdit,
   onHome,
@@ -92,22 +81,11 @@ const WebCardScreenButtonBar = ({
   ...props
 }: WebCardScreenButtonBarProps) => {
   const inset = useScreenInsets();
-  const editTransition = useEditTransition();
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: interpolate(
-        editTransition?.value ?? 0,
-        [0, 0.2, 0.8, 1],
-        [1, 0.1, 0.0, 0],
-      ),
-    };
-  });
 
   return (
-    <Animated.View
-      style={[styles.buttonBar, animatedStyle, { bottom: inset.bottom }, style]}
+    <View
+      style={[styles.buttonBar, { bottom: inset.bottom }, style]}
       {...props}
-      pointerEvents={editing ? 'none' : 'box-none'}
     >
       <BlurredFloatingIconButton
         icon="azzapp"
@@ -143,7 +121,7 @@ const WebCardScreenButtonBar = ({
         style={styles.auxiliaryButton}
         onPress={onFlip}
       />
-    </Animated.View>
+    </View>
   );
 };
 

@@ -13,7 +13,7 @@ import type { CardStyle } from '@azzapp/shared/cardHelpers';
 import type { LayoutChangeEvent, ViewProps } from 'react-native';
 
 type AlternationContainerProps = ViewProps & {
-  viewMode: 'desktop' | 'mobile';
+  displayMode: 'desktop' | 'edit' | 'mobile';
   dimension: {
     width: number;
     height: number;
@@ -25,7 +25,6 @@ type AlternationContainerProps = ViewProps & {
   scrollY: Animated.Value;
   parentY?: number;
   modulePosition?: number;
-  disableAnimation?: boolean;
 };
 
 const ANIMATION_DURATION = 1000;
@@ -36,7 +35,7 @@ const ANIMATION_DURATION = 1000;
  * @return {*}
  */
 const AlternationContainer = ({
-  viewMode,
+  displayMode,
   dimension,
   cardStyle,
   style,
@@ -46,12 +45,14 @@ const AlternationContainer = ({
   scrollY,
   modulePosition,
   parentY,
-  disableAnimation,
   ...props
 }: AlternationContainerProps) => {
-  const styles = useVariantStyleSheet(stylesheet, viewMode);
+  const styles = useVariantStyleSheet(
+    stylesheet,
+    displayMode === 'edit' ? 'mobile' : displayMode,
+  );
   const mediaWidth =
-    viewMode === 'desktop'
+    displayMode === 'desktop'
       ? (dimension.width - 2 * PADDING_HORIZONTAL - HORIZONTAL_GAP) / 2
       : dimension.width - 2 * PADDING_HORIZONTAL;
 
@@ -143,6 +144,8 @@ const AlternationContainer = ({
     index,
   ]);
 
+  const disableAnimation = displayMode !== 'mobile';
+
   const imageContainerStyle = useMemo(
     () => [
       styles.imageContainer,
@@ -190,13 +193,13 @@ const AlternationContainer = ({
       style={[styles.container, { width: dimension.width }, style]}
       onLayout={onLayout}
     >
-      {viewMode === 'mobile' || index % 2 === 0 ? (
+      {displayMode !== 'desktop' || index % 2 === 0 ? (
         <Animated.View style={imageContainerStyle}>
           <MediaItemRenderer media={media} dimension={imageDimension} />
         </Animated.View>
       ) : null}
       <View style={{ width: mediaWidth }}>{children}</View>
-      {viewMode === 'desktop' && index % 2 === 1 ? (
+      {displayMode === 'desktop' && index % 2 === 1 ? (
         <Animated.View style={imageContainerStyle}>
           <MediaItemRenderer media={media} dimension={imageDimension} />
         </Animated.View>

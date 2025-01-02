@@ -19,7 +19,6 @@ type CardModuleMediaTextAlternationProps = CardModuleVariantType & {
   onLayout?: (event: LayoutChangeEvent) => void;
   scrollPosition?: Animated.Value;
   modulePosition?: number;
-  disableAnimation?: boolean;
 };
 
 const CardModuleMediaTextAlternation = ({
@@ -27,13 +26,11 @@ const CardModuleMediaTextAlternation = ({
   cardModuleColor,
   dimension: providedDimension,
   onLayout,
-  viewMode,
+  displayMode,
   cardStyle,
   setEditableItemIndex,
   scrollPosition,
   modulePosition,
-  disableAnimation,
-  webCardEditing,
 }: CardModuleMediaTextAlternationProps) => {
   const screenDimension = useScreenDimensions();
   const dimension = providedDimension ?? screenDimension;
@@ -44,44 +41,29 @@ const CardModuleMediaTextAlternation = ({
     );
   }
 
+  const items =
+    displayMode === 'edit' ? cardModuleMedias.slice(0, 1) : cardModuleMedias;
   return (
     <View
       onLayout={onLayout}
       style={{ backgroundColor: cardModuleColor.background }}
     >
-      {webCardEditing && cardModuleMedias.length > 0 ? (
-        <AlternationItem
-          key={`${cardModuleMedias[0].media.id}`}
-          cardModuleMedia={cardModuleMedias[0]}
-          cardModuleColor={cardModuleColor}
-          dimension={dimension}
-          viewMode={viewMode}
-          cardStyle={cardStyle}
-          setEditableItemIndex={setEditableItemIndex}
-          scrollPosition={scrollPosition}
-          modulePosition={modulePosition}
-          index={0}
-          disableAnimation={disableAnimation}
-        />
-      ) : (
-        cardModuleMedias.map((cardModuleMedia, index) => {
-          return (
-            <AlternationItem
-              key={`${cardModuleMedia.media.id}_${index}`}
-              cardModuleMedia={cardModuleMedia}
-              cardModuleColor={cardModuleColor}
-              dimension={dimension}
-              viewMode={viewMode}
-              cardStyle={cardStyle}
-              setEditableItemIndex={setEditableItemIndex}
-              scrollPosition={scrollPosition}
-              modulePosition={modulePosition}
-              index={index}
-              disableAnimation={disableAnimation}
-            />
-          );
-        })
-      )}
+      {items.map((cardModuleMedia, index) => {
+        return (
+          <AlternationItem
+            key={`${cardModuleMedia.media.id}_${index}`}
+            cardModuleMedia={cardModuleMedia}
+            cardModuleColor={cardModuleColor}
+            dimension={dimension}
+            displayMode={displayMode}
+            cardStyle={cardStyle}
+            setEditableItemIndex={setEditableItemIndex}
+            scrollPosition={scrollPosition}
+            modulePosition={modulePosition}
+            index={index}
+          />
+        );
+      })}
     </View>
   );
 };
@@ -90,24 +72,22 @@ const AlternationItem = ({
   cardModuleMedia,
   cardModuleColor,
   dimension,
-  viewMode,
+  displayMode,
   cardStyle,
   setEditableItemIndex,
   scrollPosition,
   modulePosition,
   index,
-  disableAnimation,
 }: {
   cardModuleMedia: CardModuleMedia;
   cardModuleColor: CardModuleColor;
   dimension: CardModuleDimension;
-  viewMode: 'desktop' | 'mobile';
+  displayMode: 'desktop' | 'edit' | 'mobile';
   cardStyle?: CardStyle | null;
   setEditableItemIndex?: (index: number) => void;
   scrollPosition: Animated.Value;
   modulePosition?: number;
   index: number;
-  disableAnimation?: boolean;
 }) => {
   const [parentY, setParentY] = useState(0);
 
@@ -128,13 +108,12 @@ const AlternationItem = ({
       <AlternationContainer
         scrollY={scrollPosition}
         modulePosition={modulePosition}
-        viewMode={viewMode}
+        displayMode={displayMode}
         dimension={dimension}
         media={cardModuleMedia.media}
         cardStyle={cardStyle}
         index={index}
         parentY={parentY}
-        disableAnimation={disableAnimation}
       >
         <View style={styles.bottomContainer}>
           <Text

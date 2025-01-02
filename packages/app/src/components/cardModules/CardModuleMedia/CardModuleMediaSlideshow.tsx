@@ -22,7 +22,6 @@ import type { SharedValue } from 'react-native-reanimated';
 
 type CardModuleMediaSlideshowProps = CardModuleVariantType & {
   cardModuleMedias: CardModuleMedia[];
-  disableScroll: boolean;
 };
 
 //Simple component to render, not bind to any relay fragment
@@ -30,13 +29,12 @@ const CardModuleMediaSlideshow = ({
   cardModuleColor,
   cardModuleMedias,
   cardStyle,
-  viewMode,
+  displayMode,
   dimension,
-  disableScroll,
   setEditableItemIndex,
 }: CardModuleMediaSlideshowProps) => {
   const scrollIndex = useSharedValue(0);
-  const paddinHorizontal = viewMode === 'desktop' ? 40 : 0;
+  const paddinHorizontal = displayMode === 'desktop' ? 40 : 0;
 
   const screenWidth = dimension.width;
 
@@ -144,7 +142,7 @@ const CardModuleMediaSlideshow = ({
         {
           height: itemWidth + 40,
           backgroundColor: cardModuleColor.background,
-          pointerEvents: disableScroll ? 'none' : 'auto',
+          pointerEvents: displayMode === 'edit' ? 'none' : 'auto',
         },
       ]}
     >

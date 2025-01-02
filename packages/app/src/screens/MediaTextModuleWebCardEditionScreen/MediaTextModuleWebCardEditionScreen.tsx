@@ -60,7 +60,7 @@ const MediaTextModuleWebCardEditionScreen = (
   {
     webCard,
     setCanSave,
-    viewMode,
+    displayMode,
     dimension,
     moduleKey,
     variant,
@@ -165,56 +165,65 @@ const MediaTextModuleWebCardEditionScreen = (
           updateProcessedMedia,
           updateUploadIndicator,
         );
-        commit({
-          variables: {
-            webCardId: webCard.id,
-            input: {
-              moduleId: data?.id,
-              cardModuleColor: selectedCardModuleColor,
-              cardModuleMedias: moduleMedias.map(mediaMod => ({
-                text: mediaMod.text,
-                title: mediaMod.title,
-                media: {
-                  id: mediaMod.media.id,
-                },
-              })),
-              variant,
+        await new Promise((resolve, reject) => {
+          commit({
+            variables: {
+              webCardId: webCard.id,
+              input: {
+                moduleId: data?.id,
+                cardModuleColor: selectedCardModuleColor,
+                cardModuleMedias: moduleMedias.map(mediaMod => ({
+                  text: mediaMod.text,
+                  title: mediaMod.title,
+                  media: {
+                    id: mediaMod.media.id,
+                  },
+                })),
+                variant,
+              },
             },
-          },
-          onCompleted(_, error) {
-            handleOnCompletedModuleSave(
-              moduleMedias,
-              router,
-              error,
-              intl.formatMessage({
-                defaultMessage: 'Error while creating module',
-                description: 'Toast Error message while creating module',
-              }),
-            );
-          },
-          onError(error) {
-            if (error.message === ERRORS.SUBSCRIPTION_REQUIRED) {
-              Toast.show({
-                type: 'error',
-                text1: intl.formatMessage({
-                  defaultMessage: 'You need a subscription to add this module.',
-                  description:
-                    'Error toast message when trying to add a module without a subscription.',
+            onCompleted(_, error) {
+              handleOnCompletedModuleSave(
+                moduleMedias,
+                router,
+                error,
+                intl.formatMessage({
+                  defaultMessage: 'Error while creating module',
+                  description: 'Toast Error message while creating module',
                 }),
-              });
-              return;
-            } else {
-              Sentry.captureException(error);
-              Toast.show({
-                type: 'error',
-                text1: intl.formatMessage({
-                  defaultMessage: 'Error while saving your new module.',
-                  description:
-                    'Error toast message when saving a new module failed.',
-                }),
-              });
-            }
-          },
+              );
+              if (error) {
+                reject(error);
+                return;
+              }
+              resolve(null);
+            },
+            onError(error) {
+              if (error.message === ERRORS.SUBSCRIPTION_REQUIRED) {
+                Toast.show({
+                  type: 'error',
+                  text1: intl.formatMessage({
+                    defaultMessage:
+                      'You need a subscription to add this module.',
+                    description:
+                      'Error toast message when trying to add a module without a subscription.',
+                  }),
+                });
+                return;
+              } else {
+                Sentry.captureException(error);
+                Toast.show({
+                  type: 'error',
+                  text1: intl.formatMessage({
+                    defaultMessage: 'Error while saving your new module.',
+                    description:
+                      'Error toast message when saving a new module failed.',
+                  }),
+                });
+              }
+              reject(error);
+            },
+          });
         });
       } catch (e) {
         console.error(e);
@@ -268,7 +277,7 @@ const MediaTextModuleWebCardEditionScreen = (
   return (
     <>
       <CardModulePreviewContainer
-        viewMode={viewMode}
+        displayMode={displayMode}
         dimension={dimension}
         backgroundColor={swapColor(
           selectedCardModuleColor.background,
@@ -283,7 +292,7 @@ const MediaTextModuleWebCardEditionScreen = (
           }}
           cardStyle={webCard.cardStyle}
           colorPalette={webCard.cardColors ?? DEFAULT_COLOR_PALETTE}
-          viewMode={viewMode}
+          displayMode={displayMode}
           variant={variant}
           dimension={dimension}
           setEditableItemIndex={setEditableItemIndex}

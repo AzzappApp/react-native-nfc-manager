@@ -62,7 +62,7 @@ export type CardModuleVariantType = {
    * Should the preview be rendered in mobile or desktop mode.
    *
    */
-  viewMode: 'desktop' | 'mobile';
+  displayMode: 'desktop' | 'edit' | 'mobile';
   /**
    * The dimension of the container
    * */
@@ -71,8 +71,6 @@ export type CardModuleVariantType = {
   callback when a item renderer is pressed, return the index of the item in case of list 
   */
   setEditableItemIndex?: (index: number) => void;
-
-  webCardEditing?: boolean;
 };
 
 export type CommonModuleRendererProps<T, V extends ModuleKindHasVariants> = {
@@ -95,10 +93,12 @@ export type CommonModuleRendererProps<T, V extends ModuleKindHasVariants> = {
    */
   coverBackgroundColor?: string | null | undefined;
   /**
-   * Should the preview be rendered in mobile or desktop mode.
-   *
+   * The view mode for the module :
+   *  - desktop for the desktop preview
+   *  - edit when the WebCard is in edit mode
+   *  - mobile for the default rendering
    */
-  viewMode: 'desktop' | 'mobile';
+  displayMode: 'desktop' | 'edit' | 'mobile';
   /**
    * The variant design of the media module
    *
@@ -121,12 +121,6 @@ export type CommonModuleRendererProps<T, V extends ModuleKindHasVariants> = {
   callback when a item renderer is pressed, return the index of the item in case of list 
   */
   setEditableItemIndex?: (index: number) => void;
-
-  disableAnimation?: boolean;
-  /* 
-  when we are editing the webcard with splitteed view
-  */
-  webCardEditing?: boolean;
   /* 
   when we are editing the module
   */

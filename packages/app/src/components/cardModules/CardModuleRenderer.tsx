@@ -125,27 +125,30 @@ export type CardModuleRendererProps<T extends ModuleRenderInfo> = ViewProps & {
    * Should the preview be rendered in mobile or desktop mode.
    * @default 'mobile'
    */
-  viewMode?: 'desktop' | 'mobile';
+  displayMode?: 'desktop' | 'edit' | 'mobile';
   /**
    * The cover background color
    */
   coverBackgroundColor?: string | null | undefined;
 
+  /**
+   * A React Native Animated value that represents the scroll position of the WebCard
+   */
   scrollPosition: RNAnimated.Value;
 
+  /**
+   * The position of the module in the WebCard
+   */
   modulePosition: number;
-
-  editing?: boolean;
 };
 
 const DESKTOP_CONTENT_MAX_WIDTH = 800;
 
 const CardModuleRenderer = <T extends ModuleRenderInfo>({
   module,
-  viewMode = 'mobile',
+  displayMode = 'mobile',
   scrollPosition,
   modulePosition,
-  editing,
   ...props
 }: CardModuleRendererProps<T>) => {
   const { width, height } = useScreenDimensions();
@@ -156,7 +159,7 @@ const CardModuleRenderer = <T extends ModuleRenderInfo>({
           {...module}
           {...props}
           contentStyle={
-            viewMode === 'desktop'
+            displayMode === 'desktop'
               ? {
                   maxWidth: DESKTOP_CONTENT_MAX_WIDTH,
                   width: '80%',
@@ -180,7 +183,7 @@ const CardModuleRenderer = <T extends ModuleRenderInfo>({
           {...module}
           {...props}
           contentStyle={
-            viewMode === 'desktop'
+            displayMode === 'desktop'
               ? {
                   maxWidth: marginHorizontal
                     ? DESKTOP_CONTENT_MAX_WIDTH
@@ -200,7 +203,7 @@ const CardModuleRenderer = <T extends ModuleRenderInfo>({
         <PhotoWithTextAndTitleRenderer
           {...module}
           {...props}
-          viewMode={viewMode}
+          displayMode={displayMode}
         />
       );
     case 'simpleButton':
@@ -209,7 +212,7 @@ const CardModuleRenderer = <T extends ModuleRenderInfo>({
           {...module}
           {...props}
           contentStyle={
-            viewMode === 'desktop'
+            displayMode === 'desktop'
               ? {
                   maxWidth: DESKTOP_CONTENT_MAX_WIDTH,
                   alignSelf: 'center',
@@ -224,7 +227,7 @@ const CardModuleRenderer = <T extends ModuleRenderInfo>({
           {...module}
           {...props}
           contentStyle={
-            viewMode === 'desktop'
+            displayMode === 'desktop'
               ? {
                   maxWidth: DESKTOP_CONTENT_MAX_WIDTH,
                   alignSelf: 'center',
@@ -240,7 +243,7 @@ const CardModuleRenderer = <T extends ModuleRenderInfo>({
           {...module}
           {...props}
           contentStyle={
-            viewMode === 'desktop'
+            displayMode === 'desktop'
               ? {
                   maxWidth: DESKTOP_CONTENT_MAX_WIDTH,
                   alignSelf: 'center',
@@ -256,7 +259,7 @@ const CardModuleRenderer = <T extends ModuleRenderInfo>({
           {...module}
           {...props}
           multilineStyle={
-            viewMode === 'desktop'
+            displayMode === 'desktop'
               ? {
                   maxWidth: 800,
                   alignSelf: 'center',
@@ -264,7 +267,7 @@ const CardModuleRenderer = <T extends ModuleRenderInfo>({
               : undefined
           }
           style={
-            viewMode === 'desktop'
+            displayMode === 'desktop'
               ? [props.style, { alignSelf: 'center' }]
               : props.style
           }
@@ -275,15 +278,13 @@ const CardModuleRenderer = <T extends ModuleRenderInfo>({
         <MediaModuleRenderer
           {...module}
           {...props}
-          viewMode={viewMode}
+          displayMode={displayMode}
           dimension={{
-            width: viewMode === 'desktop' ? DESKTOP_PREVIEW_WIDTH : width,
+            width: displayMode === 'desktop' ? DESKTOP_PREVIEW_WIDTH : width,
             height,
           }}
           scrollPosition={scrollPosition}
           modulePosition={modulePosition}
-          webCardEditing={editing}
-          disableAnimation={viewMode === 'desktop' || editing === true}
         />
       );
     case 'mediaText':
@@ -291,15 +292,13 @@ const CardModuleRenderer = <T extends ModuleRenderInfo>({
         <MediaTextModuleRenderer
           {...module}
           {...props}
-          viewMode={viewMode}
+          displayMode={displayMode}
           dimension={{
-            width: viewMode === 'desktop' ? DESKTOP_PREVIEW_WIDTH : width,
+            width: displayMode === 'desktop' ? DESKTOP_PREVIEW_WIDTH : width,
             height,
           }}
           scrollPosition={scrollPosition}
           modulePosition={modulePosition}
-          webCardEditing={editing}
-          disableAnimation={viewMode === 'desktop' || editing === true}
         />
       );
     case 'mediaTextLink':
@@ -307,18 +306,13 @@ const CardModuleRenderer = <T extends ModuleRenderInfo>({
         <MediaTextLinkModuleRenderer
           {...module}
           {...props}
-          viewMode={viewMode}
+          displayMode={displayMode}
           dimension={{
-            width: viewMode === 'desktop' ? DESKTOP_PREVIEW_WIDTH : width,
+            width: displayMode === 'desktop' ? DESKTOP_PREVIEW_WIDTH : width,
             height,
           }}
           scrollPosition={scrollPosition}
           modulePosition={modulePosition}
-          webCardEditing={editing}
-          disableAnimation={
-            viewMode === 'desktop' ||
-            (module.variant === 'parallax' && editing === true)
-          }
         />
       );
   }

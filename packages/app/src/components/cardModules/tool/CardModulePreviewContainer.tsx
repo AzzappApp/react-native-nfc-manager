@@ -12,7 +12,7 @@ import { CardModuleEditionProvider } from '../CardModuleEditionContext';
 import type { CardModuleDimension } from '../cardModuleEditorType';
 
 type CardModulePreviewContainerProps = {
-  viewMode: 'desktop' | 'mobile';
+  displayMode: 'desktop' | 'mobile';
   dimension: CardModuleDimension;
   backgroundColor?: string;
   children: React.ReactNode;
@@ -23,7 +23,7 @@ const CardModulePreviewContainer = ({
   dimension,
   backgroundColor,
   children,
-  viewMode,
+  displayMode,
   scaleFactor,
 }: CardModulePreviewContainerProps) => {
   // #region hook
@@ -32,7 +32,7 @@ const CardModulePreviewContainer = ({
   const animatedScaledFactor = useAnimatedState(scaleFactor, {
     duration: PREVIEW_ANIMATION_DURATION,
   });
-  const viewModeTimer = useAnimatedState(viewMode === 'mobile' ? 0 : 1, {
+  const displayModeTimer = useAnimatedState(displayMode === 'mobile' ? 0 : 1, {
     duration: PREVIEW_ANIMATION_DURATION,
   });
   // #endregion
@@ -43,7 +43,7 @@ const CardModulePreviewContainer = ({
         {
           scale:
             animatedScaledFactor.value *
-            interpolate(viewModeTimer.value, [0, 1], [0.55, 0.8]),
+            interpolate(displayModeTimer.value, [0, 1], [0.55, 0.8]),
         },
       ],
     };

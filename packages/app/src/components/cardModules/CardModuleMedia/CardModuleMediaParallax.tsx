@@ -14,7 +14,6 @@ import type { LayoutChangeEvent, Animated as RNAnimated } from 'react-native';
 type CardModuleMediaParallaxProps = CardModuleVariantType & {
   cardModuleMedias: CardModuleMedia[];
   onLayout?: (event: LayoutChangeEvent) => void;
-  disableParallax?: boolean;
   scrollPosition?: RNAnimated.Value;
   modulePosition?: number;
 };
@@ -22,12 +21,11 @@ type CardModuleMediaParallaxProps = CardModuleVariantType & {
 const CardModuleMediaParallax = ({
   scrollPosition,
   modulePosition,
-  disableParallax,
+  displayMode,
   onLayout,
   cardModuleMedias,
   dimension: providedDimension,
   setEditableItemIndex,
-  webCardEditing,
 }: CardModuleMediaParallaxProps & {}) => {
   const screenDimension = useScreenDimensions();
   const dimension = providedDimension ?? screenDimension;
@@ -36,35 +34,24 @@ const CardModuleMediaParallax = ({
       'CardModuleMediaParallax : the parallax component require a scrollPosition',
     );
   }
+  const items =
+    displayMode === 'edit' ? cardModuleMedias.slice(0, 1) : cardModuleMedias;
   return (
     <View onLayout={onLayout}>
-      {webCardEditing && cardModuleMedias.length > 0 ? (
-        <ParallaxItem
-          key={`${cardModuleMedias[0].media.id}_${0}`}
-          media={cardModuleMedias[0].media}
-          dimension={dimension}
-          index={0}
-          disableParallax={disableParallax}
-          setEditableItemIndex={setEditableItemIndex}
-          scrollPosition={scrollPosition}
-          modulePosition={modulePosition}
-        />
-      ) : (
-        cardModuleMedias.map(({ media }, index) => {
-          return (
-            <ParallaxItem
-              key={`${media.id}_${index}`}
-              media={media}
-              dimension={dimension}
-              index={index}
-              disableParallax={disableParallax}
-              setEditableItemIndex={setEditableItemIndex}
-              scrollPosition={scrollPosition}
-              modulePosition={modulePosition}
-            />
-          );
-        })
-      )}
+      {items.map(({ media }, index) => {
+        return (
+          <ParallaxItem
+            key={`${media.id}_${index}`}
+            media={media}
+            dimension={dimension}
+            index={index}
+            displayMode={displayMode}
+            setEditableItemIndex={setEditableItemIndex}
+            scrollPosition={scrollPosition}
+            modulePosition={modulePosition}
+          />
+        );
+      })}
     </View>
   );
 };
@@ -75,15 +62,15 @@ const ParallaxItem = ({
   index,
   scrollPosition,
   modulePosition,
-  disableParallax,
+  displayMode,
   setEditableItemIndex,
 }: {
   media: CardModuleSourceMedia;
   dimension: CardModuleDimension;
   index: number;
   scrollPosition: RNAnimated.Value;
+  displayMode: 'desktop' | 'edit' | 'mobile';
   modulePosition?: number;
-  disableParallax?: boolean;
   setEditableItemIndex?: (index: number) => void;
 }) => {
   const onPress = useCallback(() => {
@@ -98,7 +85,7 @@ const ParallaxItem = ({
         index={index}
         scrollY={scrollPosition}
         modulePosition={modulePosition}
-        disableParallax={disableParallax}
+        disableParallax={displayMode !== 'mobile'}
       />
     </CardModulePressableTool>
   );

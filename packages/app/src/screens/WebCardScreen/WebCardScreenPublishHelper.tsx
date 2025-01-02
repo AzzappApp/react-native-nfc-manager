@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -14,7 +14,6 @@ import {
 import PremiumIndicator from '#components/PremiumIndicator';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useScreenInsets from '#hooks/useScreenInsets';
-import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';
@@ -25,12 +24,12 @@ import type { WebCardScreenPublishHelperMutation } from '#relayArtifacts/WebCard
 
 type ProfileScreenPublishHelperProps = {
   webCard: WebCardScreenPublishHelper_webCard$key;
-  editMode: boolean;
+  hasEdited: boolean;
 };
 
 const WebCardScreenPublishHelper = ({
   webCard: webCardKey,
-  editMode,
+  hasEdited,
 }: ProfileScreenPublishHelperProps) => {
   const webCard = useFragment(
     graphql`
@@ -40,9 +39,6 @@ const WebCardScreenPublishHelper = ({
         cardIsPublished
         requiresSubscription
         isPremium
-        cardModules {
-          id
-        }
         ...CoverRenderer_webCard
       }
     `,
@@ -55,7 +51,6 @@ const WebCardScreenPublishHelper = ({
     cardIsPublished,
     requiresSubscription,
     isPremium,
-    cardModules,
   } = webCard;
 
   const intl = useIntl();
@@ -76,48 +71,15 @@ const WebCardScreenPublishHelper = ({
     `,
   );
 
-  const { bottom } = useScreenInsets();
-
-  useEffect(() => {
-    if (!cardIsPublished && editMode && cardModules.length > 0) {
-      Toast.show({
-        type: 'info',
-        bottomOffset: bottom + BOTTOM_MENU_HEIGHT,
-        autoHide: false,
-        text1: intl.formatMessage(
-          {
-            defaultMessage:
-              'Tap on a section of your WebCard{azzappA} to modify it',
-            description:
-              'Toast info message that appears when the user is in webcard edit mode for the first time',
-          },
-          {
-            azzappA: <Text variant="azzapp">a</Text>,
-          },
-        ) as unknown as string,
-        props: {
-          showClose: true,
-        },
-      });
-    }
-
-    return () => {
-      Toast.hide();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editMode]);
-
   const [showPublishModal, setShowPublishModal] = useState(false);
 
-  const editModeRef = useRef(editMode);
   const router = useRouter();
 
   useEffect(() => {
-    if (!cardIsPublished && !editMode && editModeRef.current) {
+    if (!cardIsPublished && hasEdited) {
       setShowPublishModal(true);
     }
-    editModeRef.current = editMode;
-  }, [cardIsPublished, editMode]);
+  }, [cardIsPublished, hasEdited]);
 
   const onPublish = () => {
     if (requiresSubscription && !isPremium) {

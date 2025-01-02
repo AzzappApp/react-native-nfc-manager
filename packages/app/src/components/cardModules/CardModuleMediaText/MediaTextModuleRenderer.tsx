@@ -81,9 +81,8 @@ const MediaTextModuleRenderer = ({
   data,
   variant,
   scrollPosition,
-  disableAnimation,
   colorPalette,
-  viewMode,
+  displayMode,
   ...props
 }: MediaTextModuleRendererProps) => {
   if ((data.cardModuleMedias?.length ?? 0) < 1) {
@@ -97,9 +96,8 @@ const MediaTextModuleRenderer = ({
           <CardModuleMediaTextAlternation
             cardModuleMedias={data.cardModuleMedias!}
             cardModuleColor={data.cardModuleColor}
-            viewMode={viewMode}
+            displayMode={displayMode}
             scrollPosition={scrollPosition}
-            disableAnimation={disableAnimation}
             {...props}
           />
         </CardModuleEditionScrollHandler>
@@ -110,9 +108,8 @@ const MediaTextModuleRenderer = ({
           <CardModuleMediaTextParallax
             cardModuleMedias={data.cardModuleMedias}
             cardModuleColor={data.cardModuleColor}
-            viewMode={viewMode}
+            displayMode={displayMode}
             scrollPosition={scrollPosition}
-            disableParallax={disableAnimation}
             {...props}
           />
         </CardModuleEditionScrollHandler>

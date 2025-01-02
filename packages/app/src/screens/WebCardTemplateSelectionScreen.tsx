@@ -63,11 +63,11 @@ const WebCardTemplateSelectionScreen = ({
       return;
     }
     const {
-      webCard: { id: webCardId, userName },
+      webCard: { id: webCardId },
     } = profile;
     router.replace({
-      route: 'WEBCARD',
-      params: { webCardId, userName, editing: true },
+      route: 'WEBCARD_EDIT',
+      params: { webCardId },
     });
   }, [profile, router]);
 

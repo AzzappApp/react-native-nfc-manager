@@ -115,14 +115,12 @@ const CardTemplatesList = ({ webCard: webCardKey }: CardTemplatesListProps) => {
 
   const onDone = useCallback(() => {
     router.replace({
-      route: 'WEBCARD',
+      route: 'WEBCARD_EDIT',
       params: {
         webCardId: profileInfos!.webCardId!,
-        userName: webCard.userName,
-        editing: true,
       },
     });
-  }, [profileInfos, router, webCard.userName]);
+  }, [profileInfos, router]);
 
   const [commit, inFlight] = useLoadCardTemplateMutation();
 

@@ -46,7 +46,7 @@ type MediaQueryKey =
 export type CardModuleProps<T extends ModuleKindHasVariants, V> = {
   moduleKey: V | null;
   webCard: withCardModule_webCard$data;
-  viewMode: CardModuleViewMode;
+  displayMode: CardModuleViewMode;
   setCanSave: (canSave: boolean) => void;
   dimension: CardModuleDimension;
   variant: Variant<T>;
@@ -241,7 +241,7 @@ const withCardModule = <T extends ModuleKindHasVariants, V>(
               moduleKey={module}
               webCard={webCard}
               setCanSave={setCanSave}
-              viewMode={viewMode}
+              displayMode={viewMode}
               dimension={containerDimension}
               ref={wrappedComponentRef}
               variant={selectedVariant}
