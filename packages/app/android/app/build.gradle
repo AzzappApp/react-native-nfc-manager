@@ -155,7 +155,8 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${rootProject.ext.kotlinVersion}"
     // TODO https://github.com/Kotlin/kotlinx.coroutines#avoiding-including-the-debug-infrastructure-in-the-resulting-apk
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
-
+    //TEMPORARY FIX while the 2.0.3 from expo-blur is not available
+    implementation 'com.github.Dimezis:BlurView:version-2.0.4'
     constraints {
         implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0") {
             because("kotlin-stdlib-jdk7 is now a part of kotlin-stdlib")
