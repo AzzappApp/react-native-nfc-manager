@@ -189,10 +189,14 @@ const CardModuleMediaPicker = ({
     try {
       let downloadError = false;
       let value = 0;
-
       const res = await Promise.all(
         selectedMedias.map(async cardModuleMedia => {
-          if (
+          // needDbUpdate can be null, but will but false for cloudinary already save image
+          // it this is not enough to avoid reprocessing, we can filter url with http after handline pexels data
+          if (cardModuleMedia.needDbUpdate === false) {
+            value += 1;
+            return cardModuleMedia;
+          } else if (
             cardModuleMedia.media.uri.startsWith('https://videos.pexels.com') ||
             cardModuleMedia.media.uri.startsWith('https://images.pexels.com')
           ) {
