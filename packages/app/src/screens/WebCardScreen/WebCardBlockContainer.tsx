@@ -11,7 +11,7 @@ const WebCardBlockContainer = ({
 }: WebCardBlockContainerProps) => {
   const containerRef = useScrollViewChildRef(id);
 
-  return <View ref={containerRef} {...props} />;
+  return <View ref={containerRef} {...props} collapsable={false} />;
 };
 
 export default WebCardBlockContainer;

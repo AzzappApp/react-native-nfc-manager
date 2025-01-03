@@ -155,7 +155,11 @@ const ChildPositionAwareScrollView = (
   );
 
   children = (
-    <View ref={scrollViewContentRef} style={contentContainerStyle}>
+    <View
+      ref={scrollViewContentRef}
+      style={contentContainerStyle}
+      collapsable={false}
+    >
       {children}
     </View>
   );
