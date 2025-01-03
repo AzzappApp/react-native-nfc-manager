@@ -347,6 +347,12 @@ const WebCardEditScreenBody = (
     [moduleOrderUpdater, commitReorderModules, webCardId, intl],
   );
 
+  useEffect(() => {
+    return () => {
+      clearTimeout(moduleOrderTimeoutRef.current);
+    };
+  }, []);
+
   const environment = useRelayEnvironment();
   const canReorder = !deleteModulesActive && !duplicateModuleActive;
   const onMoveModule = useCallback(
