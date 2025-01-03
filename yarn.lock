@@ -163,7 +163,7 @@ __metadata:
     expo: "npm:^52.0.19"
     expo-asset: "npm:~11.0.1"
     expo-av: "npm:^15.0.1"
-    expo-blur: "npm:14.0.1"
+    expo-blur: "patch:expo-blur@npm%3A14.0.1#~/.yarn/patches/expo-blur-npm-14.0.1-510f425361.patch"
     expo-clipboard: "npm:~7.0.0"
     expo-contacts: "patch:expo-contacts@patch%3Aexpo-contacts@npm%253A14.0.2%23~/.yarn/patches/expo-contacts-npm-14.0.2-47a6bf515f.patch%3A%3Aversion=14.0.2&hash=20e638#~/.yarn/patches/expo-contacts-patch-0d7f995ace.patch"
     expo-device: "npm:7.0.1"
@@ -16521,6 +16521,17 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 10/263fe270941b8d05792f266ac1101de34f89cd1cf69e54802bc97daf798a89d2c3bf9f72780840fd5ed0519a209f71845f4758b49757be0fdc67942fab7da477
+  languageName: node
+  linkType: hard
+
+"expo-blur@patch:expo-blur@npm%3A14.0.1#~/.yarn/patches/expo-blur-npm-14.0.1-510f425361.patch":
+  version: 14.0.1
+  resolution: "expo-blur@patch:expo-blur@npm%3A14.0.1#~/.yarn/patches/expo-blur-npm-14.0.1-510f425361.patch::version=14.0.1&hash=928730"
+  peerDependencies:
+    expo: "*"
+    react: "*"
+    react-native: "*"
+  checksum: 10/7d2b559ef798723e74b4e384a5f4f6cc5ce20fe86f2220f7610e5e7f01900df0d3d1134773f53d0dd1c6683c41b620406ffb431f313b2e092aae1b38a0b133e5
   languageName: node
   linkType: hard
 
