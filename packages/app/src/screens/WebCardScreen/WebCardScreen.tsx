@@ -321,7 +321,7 @@ const WebCardScreen = ({
       timeout = setTimeout(() => {
         scrollViewRef.current?.scrollToChild({
           childId: scrollPosition.moduleId,
-          y: scrollPosition.y,
+          y: 0,
           animated: false,
         });
       }, 100);
