@@ -65,8 +65,9 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
       sanitizeFilePath(contactName.length ? contactName : 'contact') +
       '.vcf';
 
+    let file;
     try {
-      const file = new File(filePath);
+      file = new File(filePath);
       file.create();
       // generate file
       file.write(vcardData.toString());
@@ -80,6 +81,7 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
     } catch (e) {
       Sentry.captureException(e);
       console.error(e);
+      file?.delete();
     }
   };
 
