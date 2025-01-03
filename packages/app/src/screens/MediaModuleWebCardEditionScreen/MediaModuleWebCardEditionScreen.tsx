@@ -151,6 +151,7 @@ const MediaModuleWebCardScreen = (
             id
             kind
             visible
+            variant
             ...MediaModuleWebCardEditionScreen_module
           }
         }

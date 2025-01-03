@@ -216,8 +216,10 @@ const SocialLinksEditionScreen = ({
             id
             requiresSubscription
             cardModules {
+              id
               kind
               visible
+              variant
               ...SocialLinksEditionScreen_module
             }
           }

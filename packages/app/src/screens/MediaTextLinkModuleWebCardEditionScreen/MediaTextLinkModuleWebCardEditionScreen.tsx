@@ -155,6 +155,7 @@ const MediaTextLinkModuleWebCardEditionScreen = (
               id
               kind
               visible
+              variant
               ...MediaTextLinkModuleWebCardEditionScreen_module
             }
           }

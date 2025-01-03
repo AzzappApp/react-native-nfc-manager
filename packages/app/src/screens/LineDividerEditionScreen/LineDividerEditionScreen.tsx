@@ -130,8 +130,10 @@ const LineDividerEditionScreen = ({
             id
             requiresSubscription
             cardModules {
+              id
               kind
               visible
+              variant
               ...LineDividerEditionScreen_module
             }
           }

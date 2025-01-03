@@ -201,8 +201,10 @@ const HorizontalPhotoEditionScreen = ({
             id
             requiresSubscription
             cardModules {
+              id
               kind
               visible
+              variant
               ...HorizontalPhotoEditionScreen_module
             }
           }

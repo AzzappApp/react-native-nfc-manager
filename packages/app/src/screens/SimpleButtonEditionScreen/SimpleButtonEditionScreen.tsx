@@ -230,8 +230,10 @@ const SimpleButtonEditionScreen = ({
             id
             requiresSubscription
             cardModules {
+              id
               kind
               visible
+              variant
               ...SimpleButtonEditionScreen_module
             }
           }

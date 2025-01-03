@@ -206,8 +206,10 @@ const BlockTextEditionScreen = ({
             id
             requiresSubscription
             cardModules {
+              id
               kind
               visible
+              variant
               ...BlockTextEditionScreen_module
             }
           }
