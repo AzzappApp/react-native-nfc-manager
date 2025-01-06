@@ -95,6 +95,9 @@ const styleSheet = createStyleSheet(appearance => ({
     justifyContent: 'center',
   },
   scaledContainer: {
+    borderWidth: 1,
+    borderColor: 'transparent',
+    borderRadius: 24,
     ...shadow(appearance, 'bottom'),
   },
   deviceEmulated: {
