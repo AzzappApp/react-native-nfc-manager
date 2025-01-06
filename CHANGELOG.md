@@ -1,5 +1,6 @@
-## 1.5.4-canary.18
+## 1.5.4-canary.19
 
+* **fix:**  - incorrect alignment when no label is available ([#6640](https://github.com/AzzappApp/azzapp/pull/6640))
 * **fix:**  - **WebCardScreen:** reenable split animation ([#6661](https://github.com/AzzappApp/azzapp/pull/6661))
 * **fix:**  - arrow sometimes not unmounted, just hide them ([#6654](https://github.com/AzzappApp/azzapp/pull/6654))
 * **fix:**  - card module save first progress bar ([#6656](https://github.com/AzzappApp/azzapp/pull/6656))
