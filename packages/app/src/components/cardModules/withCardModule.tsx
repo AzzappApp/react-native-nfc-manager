@@ -3,6 +3,7 @@ import React, { Suspense, useCallback, useMemo, useRef, useState } from 'react';
 import { View, useWindowDimensions } from 'react-native';
 import { graphql, useFragment, usePreloadedQuery } from 'react-relay';
 import { Observable } from 'relay-runtime';
+import { waitTime } from '@azzapp/shared/asyncHelpers';
 import { colors } from '#theme';
 import CardModuleHeader from '#components/cardModules/CardModuleHeader';
 import CardModuleTabView, {
@@ -174,6 +175,10 @@ const withCardModule = <T extends ModuleKindHasVariants, V>(
         });
 
         setProgress([progress, Observable.from(0)]);
+
+        /* ensure url doesn't change before overlay is displayed */
+        await waitTime(50);
+
         try {
           if (wrappedComponentRef.current) {
             await wrappedComponentRef.current.save(
