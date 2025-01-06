@@ -39,13 +39,8 @@ const sectionPartContainer = style({
 
 const imageContainer = style({
   width: '100%',
-  height: 480,
   position: 'relative',
-  '@media': {
-    [MediaQuery.Desktop]: {
-      aspectRatio: '1',
-    },
-  },
+  aspectRatio: '1',
 });
 
 const sectionTextContainer = style([
