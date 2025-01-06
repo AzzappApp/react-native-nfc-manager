@@ -10,9 +10,10 @@ import useAnimatedState from '#hooks/useAnimatedState';
 import Container from '#ui/Container';
 import { CardModuleEditionProvider } from '../CardModuleEditionContext';
 import type { CardModuleDimension } from '../cardModuleEditorType';
+import type { DisplayMode } from '@azzapp/shared/cardModuleHelpers';
 
 type CardModulePreviewContainerProps = {
-  displayMode: 'desktop' | 'mobile';
+  displayMode: DisplayMode;
   dimension: CardModuleDimension;
   backgroundColor?: string;
   children: React.ReactNode;

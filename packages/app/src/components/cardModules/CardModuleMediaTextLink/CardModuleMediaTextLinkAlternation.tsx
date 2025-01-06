@@ -14,7 +14,10 @@ import type {
   CardModuleVariantType,
 } from '../cardModuleEditorType';
 import type { CardStyle } from '@azzapp/shared/cardHelpers';
-import type { CardModuleColor } from '@azzapp/shared/cardModuleHelpers';
+import type {
+  CardModuleColor,
+  DisplayMode,
+} from '@azzapp/shared/cardModuleHelpers';
 import type { Animated, LayoutChangeEvent } from 'react-native';
 
 type CardModuleMediaTextLinkAlternationProps = CardModuleVariantType & {
@@ -38,6 +41,7 @@ const CardModuleMediaTextLinkAlternation = ({
   modulePosition,
   moduleEditing,
   canPlay,
+  webCardViewMode,
 }: CardModuleMediaTextLinkAlternationProps) => {
   const screenDimension = useScreenDimensions();
   const dimension = providedDimension ?? screenDimension;
@@ -49,7 +53,9 @@ const CardModuleMediaTextLinkAlternation = ({
   }
 
   const items =
-    displayMode === 'edit' ? cardModuleMedias.slice(0, 1) : cardModuleMedias;
+    webCardViewMode === 'edit'
+      ? cardModuleMedias.slice(0, 1)
+      : cardModuleMedias;
   return (
     <View
       onLayout={onLayout}
@@ -81,7 +87,7 @@ type AlternationItemProps = {
   cardModuleMedia: CardModuleMedia;
   cardModuleColor: CardModuleColor;
   dimension: CardModuleDimension;
-  displayMode: 'desktop' | 'edit' | 'mobile';
+  displayMode: DisplayMode;
   cardStyle?: CardStyle | null;
   setEditableItemIndex?: (index: number) => void;
   scrollPosition: Animated.Value;

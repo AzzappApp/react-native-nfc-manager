@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { View } from 'react-native';
+import { isModuleAnimationDisabled } from '@azzapp/shared/cardModuleHelpers';
 import useScreenDimensions from '#hooks/useScreenDimensions';
 import ParallaxContainer from '../ParallaxContainer';
 import CardModulePressableTool from '../tool/CardModulePressableTool';
@@ -21,12 +22,13 @@ type CardModuleMediaParallaxProps = CardModuleVariantType & {
 const CardModuleMediaParallax = ({
   scrollPosition,
   modulePosition,
-  displayMode,
   onLayout,
   cardModuleMedias,
   canPlay,
   dimension: providedDimension,
   setEditableItemIndex,
+  webCardViewMode,
+  displayMode,
 }: CardModuleMediaParallaxProps & {}) => {
   const screenDimension = useScreenDimensions();
   const dimension = providedDimension ?? screenDimension;
@@ -36,7 +38,9 @@ const CardModuleMediaParallax = ({
     );
   }
   const items =
-    displayMode === 'edit' ? cardModuleMedias.slice(0, 1) : cardModuleMedias;
+    webCardViewMode === 'edit'
+      ? cardModuleMedias.slice(0, 1)
+      : cardModuleMedias;
   return (
     <View onLayout={onLayout}>
       {items.map(({ media }, index) => {
@@ -46,11 +50,14 @@ const CardModuleMediaParallax = ({
             media={media}
             dimension={dimension}
             index={index}
-            displayMode={displayMode}
             canPlay={canPlay}
             setEditableItemIndex={setEditableItemIndex}
             scrollPosition={scrollPosition}
             modulePosition={modulePosition}
+            disableParallax={isModuleAnimationDisabled(
+              displayMode,
+              webCardViewMode,
+            )}
           />
         );
       })}
@@ -64,18 +71,18 @@ const ParallaxItem = ({
   index,
   scrollPosition,
   modulePosition,
-  displayMode,
   canPlay,
   setEditableItemIndex,
+  disableParallax,
 }: {
   media: CardModuleSourceMedia;
   dimension: CardModuleDimension;
   index: number;
   scrollPosition: RNAnimated.Value;
-  displayMode: 'desktop' | 'edit' | 'mobile';
   modulePosition?: number;
   canPlay: boolean;
   setEditableItemIndex?: (index: number) => void;
+  disableParallax: boolean;
 }) => {
   const onPress = useCallback(() => {
     setEditableItemIndex?.(index);
@@ -89,7 +96,7 @@ const ParallaxItem = ({
         index={index}
         scrollY={scrollPosition}
         modulePosition={modulePosition}
-        disableParallax={displayMode !== 'mobile'}
+        disableParallax={disableParallax}
         canPlay={canPlay}
       />
     </CardModulePressableTool>

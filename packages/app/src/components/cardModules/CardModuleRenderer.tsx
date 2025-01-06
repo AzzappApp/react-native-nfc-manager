@@ -42,6 +42,8 @@ import type {
   MODULE_KIND_MEDIA,
   MODULE_KIND_MEDIA_TEXT,
   MODULE_KIND_MEDIA_TEXT_LINK,
+  DisplayMode,
+  WebCardViewMode,
 } from '@azzapp/shared/cardModuleHelpers';
 import type { ViewProps, Animated as RNAnimated } from 'react-native';
 
@@ -125,7 +127,11 @@ export type CardModuleRendererProps<T extends ModuleRenderInfo> = ViewProps & {
    * Should the preview be rendered in mobile or desktop mode.
    * @default 'mobile'
    */
-  displayMode?: 'desktop' | 'edit' | 'mobile';
+  displayMode?: DisplayMode;
+  /**
+   * Wether the webCard is in edit mode or preview
+   */
+  webCardViewMode?: WebCardViewMode;
   /**
    * The cover background color
    */

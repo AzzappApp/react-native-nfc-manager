@@ -9,7 +9,11 @@ import type {
   Variant,
 } from '#helpers/webcardModuleHelpers';
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
-import type { CardModuleColor } from '@azzapp/shared/cardModuleHelpers';
+import type {
+  CardModuleColor,
+  DisplayMode,
+  WebCardViewMode,
+} from '@azzapp/shared/cardModuleHelpers';
 import type { Filter } from '@azzapp/shared/filtersHelper';
 import type { LayoutChangeEvent, Animated as RNAnimated } from 'react-native';
 
@@ -60,9 +64,12 @@ export type CardModuleVariantType = {
   cardStyle: CardStyle | null | undefined;
   /**
    * Should the preview be rendered in mobile or desktop mode.
-   *
    */
-  displayMode: 'desktop' | 'edit' | 'mobile';
+  displayMode: DisplayMode;
+  /**
+   * Wether the webCard is in edit mode
+   */
+  webCardViewMode?: WebCardViewMode;
   /**
    * The dimension of the container
    * */
@@ -102,7 +109,11 @@ export type CommonModuleRendererProps<T, V extends ModuleKindHasVariants> = {
    *  - edit when the WebCard is in edit mode
    *  - mobile for the default rendering
    */
-  displayMode: 'desktop' | 'edit' | 'mobile';
+  displayMode: DisplayMode;
+  /**
+   * Wether the webCard is in edit mode or preview
+   */
+  webCardViewMode?: WebCardViewMode;
   /**
    * The variant design of the media module
    *

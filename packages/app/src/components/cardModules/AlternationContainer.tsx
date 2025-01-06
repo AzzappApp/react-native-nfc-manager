@@ -2,6 +2,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, Platform, View } from 'react-native';
 
 import {
+  isModuleAnimationDisabled,
+  type DisplayMode,
+  type WebCardViewMode,
+} from '@azzapp/shared/cardModuleHelpers';
+import {
   createVariantsStyleSheet,
   useVariantStyleSheet,
 } from '#helpers/createStyles';
@@ -13,7 +18,7 @@ import type { CardStyle } from '@azzapp/shared/cardHelpers';
 import type { LayoutChangeEvent, ViewProps } from 'react-native';
 
 type AlternationContainerProps = ViewProps & {
-  displayMode: 'desktop' | 'edit' | 'mobile';
+  displayMode: DisplayMode;
   dimension: {
     width: number;
     height: number;
@@ -26,6 +31,7 @@ type AlternationContainerProps = ViewProps & {
   scrollY: Animated.Value;
   parentY?: number;
   modulePosition?: number;
+  webCardViewMode?: WebCardViewMode;
 };
 
 const ANIMATION_DURATION = 1000;
@@ -47,12 +53,10 @@ const AlternationContainer = ({
   modulePosition,
   parentY,
   canPlay,
+  webCardViewMode,
   ...props
 }: AlternationContainerProps) => {
-  const styles = useVariantStyleSheet(
-    stylesheet,
-    displayMode === 'edit' ? 'mobile' : displayMode,
-  );
+  const styles = useVariantStyleSheet(stylesheet, displayMode);
   const mediaWidth =
     displayMode === 'desktop'
       ? (dimension.width - 2 * PADDING_HORIZONTAL - HORIZONTAL_GAP) / 2
@@ -146,7 +150,10 @@ const AlternationContainer = ({
     index,
   ]);
 
-  const disableAnimation = displayMode !== 'mobile';
+  const disableAnimation = isModuleAnimationDisabled(
+    displayMode,
+    webCardViewMode,
+  );
 
   const imageContainerStyle = useMemo(
     () => [
