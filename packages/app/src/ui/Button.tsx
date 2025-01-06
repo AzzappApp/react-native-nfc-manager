@@ -159,13 +159,8 @@ const computedStyles = createVariantsStyleSheet(appearance => ({
     },
     androidNoPadding: {
       padding: 0,
-      paddingHorizontal: 0,
-      paddingVertical: 0,
-      paddingLeft: 0,
-      paddingRight: 0,
-      paddingTop: 0,
-      paddingBottom: 0,
       overflow: 'hidden',
+      height: undefined,
     },
   },
   primary: {
@@ -193,6 +188,10 @@ const computedStyles = createVariantsStyleSheet(appearance => ({
       borderColor: appearance === 'light' ? colors.grey400 : colors.grey900,
       backgroundColor: 'transparent',
     },
+    androidNoPadding: {
+      padding: 1, //for border
+      overflow: 'hidden',
+    },
   },
   little_round: {
     root: {
@@ -211,6 +210,10 @@ const computedStyles = createVariantsStyleSheet(appearance => ({
       borderColor: appearance === 'light' ? colors.grey400 : colors.grey900,
       backgroundColor: 'transparent',
     },
+    androidNoPadding: {
+      padding: 1, //for border
+      overflow: 'hidden',
+    },
   },
   little_round_inverted: {
     root: {
@@ -228,6 +231,10 @@ const computedStyles = createVariantsStyleSheet(appearance => ({
       color: appearance === 'light' ? colors.grey900 : colors.grey200,
       borderColor: appearance === 'light' ? colors.grey900 : colors.grey400,
       backgroundColor: 'transparent',
+    },
+    androidNoPadding: {
+      padding: 1, //for border
+      overflow: 'hidden',
     },
   },
 }));
