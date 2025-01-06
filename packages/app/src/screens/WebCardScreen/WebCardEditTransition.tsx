@@ -130,7 +130,8 @@ export const useWebCardEditTransition = (initialEdit: boolean) => {
             }) => [
               id,
               await Promise.all([
-                webCardScreenLayout.height < windowHeight
+                webCardScreenLayout.height < windowHeight &&
+                webCardScreenLayout.height > 0
                   ? captureSnapshot(webCardScreenRef).catch(() => null)
                   : null,
                 id !== 'cover'
