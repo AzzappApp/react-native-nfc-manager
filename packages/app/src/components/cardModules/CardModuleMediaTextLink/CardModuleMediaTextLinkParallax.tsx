@@ -20,7 +20,6 @@ import type { Animated, LayoutChangeEvent } from 'react-native';
 type CardModuleMediaTextLinkParallaxProps = CardModuleVariantType & {
   cardModuleMedias: CardModuleMedia[];
   onLayout?: (event: LayoutChangeEvent) => void;
-  disableParallax?: boolean;
   scrollPosition?: Animated.Value;
   modulePosition?: number;
   moduleEditing: boolean;
@@ -34,11 +33,10 @@ const CardModuleMediaTextLinkParallax = ({
   modulePosition,
   onLayout,
   cardStyle,
-  disableParallax,
   setEditableItemIndex,
-  viewMode,
+  displayMode,
   moduleEditing,
-  webCardEditing,
+  canPlay,
 }: CardModuleMediaTextLinkParallaxProps) => {
   const screenDimension = useScreenDimensions();
   const dimension = providedDimension ?? screenDimension;
@@ -48,43 +46,29 @@ const CardModuleMediaTextLinkParallax = ({
       'CardModuleMediaTextLinkParallax : the parallax component require a scrollPosition',
     );
   }
+
+  const items =
+    displayMode === 'edit' ? cardModuleMedias.slice(0, 1) : cardModuleMedias;
   return (
     <View onLayout={onLayout}>
-      {webCardEditing && cardModuleMedias.length > 0 ? (
-        <ParallaxItem
-          key={`${cardModuleMedias[0].media.id}_${0}`}
-          cardModuleMedia={cardModuleMedias[0]}
-          cardModuleColor={cardModuleColor}
-          cardStyle={cardStyle}
-          dimension={dimension}
-          index={0}
-          disableParallax={disableParallax}
-          setEditableItemIndex={setEditableItemIndex}
-          scrollPosition={scrollPosition}
-          modulePosition={modulePosition}
-          viewMode={viewMode}
-          moduleEditing={moduleEditing}
-        />
-      ) : (
-        cardModuleMedias.map((cardModuleMedia, index) => {
-          return (
-            <ParallaxItem
-              key={`${cardModuleMedia.media.id}_${index}`}
-              cardModuleMedia={cardModuleMedia}
-              cardModuleColor={cardModuleColor}
-              cardStyle={cardStyle}
-              dimension={dimension}
-              index={index}
-              disableParallax={disableParallax}
-              setEditableItemIndex={setEditableItemIndex}
-              scrollPosition={scrollPosition}
-              modulePosition={modulePosition}
-              viewMode={viewMode}
-              moduleEditing={moduleEditing}
-            />
-          );
-        })
-      )}
+      {items.map((cardModuleMedia, index) => {
+        return (
+          <ParallaxItem
+            key={`${cardModuleMedia.media.id}_${index}`}
+            cardModuleMedia={cardModuleMedia}
+            cardModuleColor={cardModuleColor}
+            cardStyle={cardStyle}
+            dimension={dimension}
+            index={index}
+            setEditableItemIndex={setEditableItemIndex}
+            scrollPosition={scrollPosition}
+            modulePosition={modulePosition}
+            displayMode={displayMode}
+            moduleEditing={moduleEditing}
+            canPlay={canPlay}
+          />
+        );
+      })}
     </View>
   );
 };
@@ -95,12 +79,12 @@ const ParallaxItem = ({
   cardStyle,
   dimension,
   index,
-  disableParallax,
   setEditableItemIndex,
   scrollPosition,
   modulePosition,
-  viewMode,
+  displayMode,
   moduleEditing,
+  canPlay,
 }: {
   cardModuleMedia: CardModuleMedia;
   cardModuleColor: CardModuleColor;
@@ -111,8 +95,9 @@ const ParallaxItem = ({
   setEditableItemIndex?: (index: number) => void;
   scrollPosition: Animated.Value;
   modulePosition?: number;
-  viewMode: 'desktop' | 'mobile';
+  displayMode: 'desktop' | 'edit' | 'mobile';
   moduleEditing: boolean;
+  canPlay: boolean;
 }) => {
   const styles = useStyleSheet(stylesheet);
   const onPress = useCallback(() => {
@@ -140,11 +125,12 @@ const ParallaxItem = ({
         media={cardModuleMedia.media}
         index={index}
         key={`${cardModuleMedia.media.id}_{index}`}
-        disableParallax={disableParallax}
+        disableParallax={displayMode !== 'mobile'}
         imageStyle={styles.opacityImage}
         imageContainerStyle={{
           backgroundColor: cardModuleColor.background,
         }}
+        canPlay={canPlay}
       >
         <View style={styles.textContainer}>
           <Text
@@ -152,7 +138,7 @@ const ParallaxItem = ({
             style={[
               getTitleStyle(cardStyle, cardModuleColor),
               styles.textStyle,
-              viewMode === 'desktop' && { maxWidth: 400 },
+              displayMode === 'desktop' && { maxWidth: 400 },
             ]}
           >
             {cardModuleMedia.title}

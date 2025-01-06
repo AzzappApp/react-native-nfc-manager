@@ -1,26 +1,21 @@
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
-import { colors } from '#theme';
 import WebCardBuilderSubtitle from '#components/WebCardBuilderSubtitle';
 import useScreenInsets from '#hooks/useScreenInsets';
-import FloatingIconButton from '#ui/FloatingIconButton';
+import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
 import Text from '#ui/Text';
-import { useEditTransition } from './WebCardScreenTransitions';
-import type { WebCardScreenHeader_webCard$key } from '#relayArtifacts/WebCardScreenHeader_webCard.graphql';
+import type { WebCardEditScreenHeader_webCard$key } from '#relayArtifacts/WebCardEditScreenHeader_webCard.graphql';
+import type { DerivedValue } from 'react-native-reanimated';
 
-export type WebCardScreenHeaderProps = {
+export type WebCardEditScreenHeaderProps = {
   /**
    * The webCard to display.
    */
-  webCard: WebCardScreenHeader_webCard$key;
-  /**
-   * Whether the webCard is in edit mode
-   */
-  editing: boolean;
+  webCard: WebCardEditScreenHeader_webCard$key;
   /**
    * Whether the webCard is in selection mode
    */
@@ -33,10 +28,14 @@ export type WebCardScreenHeaderProps = {
    * The number of selected modules
    */
   selectionContainsAllModules: boolean;
-  /**
-   * Called when the user press the close button in view mode
+  /*
+   * Disable all button
    */
-  onClose: () => void;
+  disabledButtons: boolean;
+  /**
+   * The transition value for the edit animation
+   */
+  editTransition: DerivedValue<number>;
   /**
    * Called when the user press the cancel button in edit mode
    */
@@ -57,10 +56,6 @@ export type WebCardScreenHeaderProps = {
    * Called when the user press the unselect all button in selection mode
    */
   onUnSelectAllModules: () => void;
-  /*
-   * Disable all button
-   */
-  disabledButtons: boolean;
 };
 
 /**
@@ -68,37 +63,25 @@ export type WebCardScreenHeaderProps = {
  * in edit mode, it display a cancel and a save button
  * in view mode, it display a close button
  */
-const WebCardScreenHeader = ({
+const WebCardEditScreenHeader = ({
   webCard: webCardKey,
-  editing,
   selectionMode,
   nbSelectedModules,
   selectionContainsAllModules,
-  onClose,
+  disabledButtons,
+  editTransition,
   onDone,
   onEditModules,
   onCancelEditModules,
   onSelectAllModules,
   onUnSelectAllModules,
-  disabledButtons,
-}: WebCardScreenHeaderProps) => {
-  const editTransition = useEditTransition();
+}: WebCardEditScreenHeaderProps) => {
   const inset = useScreenInsets();
   const intl = useIntl();
 
-  const editHeaderStyle = useAnimatedStyle(() => ({
-    height: (editTransition?.value ?? 0) * (HEADER_HEIGHT + 4),
-    marginTop: (editTransition?.value ? 1 : 0) * inset.top,
-    opacity: editTransition?.value ?? 0,
-  }));
-
-  const closeStyle = useAnimatedStyle(() => ({
-    opacity: 1 - (editTransition?.value ?? 0),
-  }));
-
   const webCard = useFragment(
     graphql`
-      fragment WebCardScreenHeader_webCard on WebCard {
+      fragment WebCardEditScreenHeader_webCard on WebCard {
         id
         isPremium
         webCardKind
@@ -112,9 +95,32 @@ const WebCardScreenHeader = ({
     webCardKey,
   );
 
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          translateY:
+            -(HEADER_HEIGHT + 4 + inset.top) * (1 - editTransition.value),
+        },
+      ],
+    };
+  });
+
   return (
-    <>
-      <Animated.View style={editHeaderStyle}>
+    <Animated.View
+      style={[
+        {
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          height: HEADER_HEIGHT + 4,
+          width: '100%',
+          zIndex: 1,
+        },
+        animatedStyle,
+      ]}
+    >
+      <Container style={{ paddingTop: inset.top }}>
         <Header
           middleElement={
             <View>
@@ -122,10 +128,10 @@ const WebCardScreenHeader = ({
                 {selectionMode ? (
                   <FormattedMessage
                     defaultMessage="{nbSelectedModules, plural,
-              =0 {# selected}
-              =1 {# selected}
-              other {# selected}
-      }"
+                      =0 {# selected}
+                      =1 {# selected}
+                      other {# selected}
+                    }"
                     description="Webcard builder header title in module edition mode with selected modules"
                     values={{
                       nbSelectedModules,
@@ -214,29 +220,9 @@ const WebCardScreenHeader = ({
           }
           style={{ backgroundColor: 'transparent', paddingBottom: 6 }}
         />
-      </Animated.View>
-      <Animated.View
-        style={[styles.closeButton, { top: inset.top }, closeStyle]}
-        pointerEvents={editing ? 'none' : 'auto'}
-      >
-        <FloatingIconButton
-          icon="arrow_down"
-          onPress={onClose}
-          iconSize={30}
-          variant="grey"
-          iconStyle={{ tintColor: colors.white }}
-        />
-      </Animated.View>
-    </>
+      </Container>
+    </Animated.View>
   );
 };
 
-export default WebCardScreenHeader;
-
-const styles = StyleSheet.create({
-  closeButton: {
-    position: 'absolute',
-    start: 15,
-    zIndex: 1,
-  },
-});
+export default WebCardEditScreenHeader;

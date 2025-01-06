@@ -17,22 +17,20 @@ import type { Animated, LayoutChangeEvent } from 'react-native';
 type CardModuleMediaTextParallaxProps = CardModuleVariantType & {
   cardModuleMedias: CardModuleMedia[];
   onLayout?: (event: LayoutChangeEvent) => void;
-  disableParallax?: boolean;
   scrollPosition?: Animated.Value;
   modulePosition?: number;
 };
 
 const CardModuleMediaTextParallax = ({
-  viewMode,
+  displayMode,
   cardModuleMedias,
   cardModuleColor,
   dimension: providedDimension,
   scrollPosition,
   modulePosition,
-  webCardEditing,
   onLayout,
   cardStyle,
-  disableParallax,
+  canPlay,
   setEditableItemIndex,
 }: CardModuleMediaTextParallaxProps) => {
   const screenDimension = useScreenDimensions();
@@ -46,41 +44,27 @@ const CardModuleMediaTextParallax = ({
   // the background color is set with an opacity of 0.8 have to be applied
   // on both view and container. if not on view in webcard preview
 
+  const items =
+    displayMode === 'edit' ? cardModuleMedias.slice(0, 1) : cardModuleMedias;
   return (
     <View onLayout={onLayout}>
-      {webCardEditing && cardModuleMedias.length > 0 ? (
-        <ParallaxItem
-          key={`${cardModuleMedias[0].media.id}_${0}`}
-          cardModuleMedia={cardModuleMedias[0]}
-          cardModuleColor={cardModuleColor}
-          cardStyle={cardStyle}
-          dimension={dimension}
-          index={0}
-          disableParallax={disableParallax}
-          setEditableItemIndex={setEditableItemIndex}
-          scrollPosition={scrollPosition}
-          modulePosition={modulePosition}
-          viewMode={viewMode}
-        />
-      ) : (
-        cardModuleMedias.map((cardModuleMedia, index) => {
-          return (
-            <ParallaxItem
-              key={`${cardModuleMedia.media.id}_${index}`}
-              cardModuleMedia={cardModuleMedia}
-              cardModuleColor={cardModuleColor}
-              cardStyle={cardStyle}
-              dimension={dimension}
-              index={index}
-              disableParallax={disableParallax}
-              setEditableItemIndex={setEditableItemIndex}
-              scrollPosition={scrollPosition}
-              modulePosition={modulePosition}
-              viewMode={viewMode}
-            />
-          );
-        })
-      )}
+      {items.map((cardModuleMedia, index) => {
+        return (
+          <ParallaxItem
+            key={`${cardModuleMedia.media.id}_${index}`}
+            cardModuleMedia={cardModuleMedia}
+            cardModuleColor={cardModuleColor}
+            cardStyle={cardStyle}
+            dimension={dimension}
+            index={index}
+            setEditableItemIndex={setEditableItemIndex}
+            scrollPosition={scrollPosition}
+            modulePosition={modulePosition}
+            displayMode={displayMode}
+            canPlay={canPlay}
+          />
+        );
+      })}
     </View>
   );
 };
@@ -91,22 +75,22 @@ const ParallaxItem = ({
   cardStyle,
   dimension,
   index,
-  disableParallax,
   setEditableItemIndex,
   scrollPosition,
   modulePosition,
-  viewMode,
+  canPlay,
+  displayMode,
 }: {
   cardModuleMedia: CardModuleMedia;
   cardModuleColor: CardModuleColor;
   cardStyle?: CardStyle | null;
   dimension: CardModuleDimension;
   index: number;
-  disableParallax?: boolean;
   setEditableItemIndex?: (index: number) => void;
   scrollPosition: Animated.Value;
   modulePosition?: number;
-  viewMode: 'desktop' | 'mobile';
+  canPlay: boolean;
+  displayMode: 'desktop' | 'edit' | 'mobile';
 }) => {
   const onPress = useCallback(() => {
     setEditableItemIndex?.(index);
@@ -120,7 +104,8 @@ const ParallaxItem = ({
         dimension={dimension}
         media={cardModuleMedia.media}
         index={index}
-        disableParallax={disableParallax}
+        canPlay={canPlay}
+        disableParallax={displayMode !== 'mobile'}
         imageStyle={styles.opacityImage}
         imageContainerStyle={{ backgroundColor: cardModuleColor.background }}
       >
@@ -130,7 +115,7 @@ const ParallaxItem = ({
             style={[
               getTitleStyle(cardStyle, cardModuleColor),
               styles.textStyle,
-              viewMode === 'desktop' && { maxWidth: 400 },
+              displayMode === 'desktop' && { maxWidth: 400 },
             ]}
           >
             {cardModuleMedia.title}

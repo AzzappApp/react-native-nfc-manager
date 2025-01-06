@@ -12,7 +12,7 @@ import {
 } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Platform, StyleSheet, View, useWindowDimensions } from 'react-native';
-import { getVideoMetaData, Video } from 'react-native-compressor';
+import { Video } from 'react-native-compressor';
 import { useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller';
 import Animated, {
   interpolate,
@@ -39,6 +39,7 @@ import {
 import {
   copyCoverMediaToCacheDir,
   COVER_CACHE_DIR,
+  getVideoSize,
   type SourceMedia,
 } from '#helpers/mediaHelpers';
 import Button from '#ui/Button';
@@ -52,6 +53,8 @@ import {
   getLottieMediasDurations,
   useLottieMediaDurations,
   MAX_ALLOWED_VIDEOS_BY_COVER,
+  MAX_EXPORT_DECODER_RESOLUTION,
+  COVER_VIDEO_BITRATE,
 } from './coverEditorHelpers';
 import CoverEditorMediaPicker from './CoverEditorMediaPicker';
 import { coverEditorReducer } from './coverEditorReducer';
@@ -471,40 +474,36 @@ const CoverEditorCore = (
     }
 
     const imagesScales = coverEditorState.imagesScales;
-
+    const compressedMedia: Array<{
+      id: string;
+      uri: string;
+      width: number;
+      height: number;
+    }> = [];
     promises.push(
       ...mediasToLoad.map(async media => {
         if (!localFilenames[media.id]) {
-          if (media.kind === 'video' && !media.uri.startsWith('http')) {
-            const result = await Video.compress(media.uri);
-            const metaData = await getVideoMetaData(result);
+          if (
+            media.kind === 'video' &&
+            !media.uri.startsWith('http') &&
+            (media.width > MAX_EXPORT_DECODER_RESOLUTION ||
+              media.height > MAX_EXPORT_DECODER_RESOLUTION)
+          ) {
+            const result = await Video.compress(media.uri, {
+              compressionMethod: 'manual',
+              maxSize: MAX_EXPORT_DECODER_RESOLUTION,
+              bitrate: COVER_VIDEO_BITRATE,
+            });
+
+            const res = await getVideoSize(result);
             media = {
               ...media,
               uri: result,
-              width: metaData.width,
-              height: metaData.height,
-              editionParameters: media.editionParameters
-                ? {
-                    ...media.editionParameters,
-                    cropData: media.editionParameters?.cropData
-                      ? {
-                          originX:
-                            (metaData.width / media.width) *
-                            media.editionParameters.cropData.originX,
-                          originY:
-                            (metaData.height / media.height) *
-                            media.editionParameters.cropData.originY,
-                          height:
-                            (metaData.height / media.height) *
-                            media.editionParameters.cropData.height,
-                          width:
-                            (metaData.width / media.width) *
-                            media.editionParameters.cropData.width,
-                        }
-                      : null,
-                  }
-                : null,
+              rotation: res.rotation,
+              width: res.width,
+              height: res.height,
             };
+            compressedMedia.push(media);
           }
 
           const filename = await copyCoverMediaToCacheDir(
@@ -558,6 +557,7 @@ const CoverEditorCore = (
             lutTextures,
             images,
             localFilenames,
+            compressedMedia,
           },
         });
       },

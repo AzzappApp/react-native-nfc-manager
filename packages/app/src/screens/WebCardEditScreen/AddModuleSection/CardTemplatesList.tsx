@@ -26,11 +26,11 @@ import type {
   NativeSyntheticEvent,
 } from 'react-native';
 
-type Props = {
-  webCardKey: CardTemplatesList_webCard$key;
+type CardTemplatesListProps = {
+  webCard: CardTemplatesList_webCard$key;
 };
 
-const CardTemplatesList = ({ webCardKey }: Props) => {
+const CardTemplatesList = ({ webCard: webCardKey }: CardTemplatesListProps) => {
   const webCard = useFragment(
     graphql`
       fragment CardTemplatesList_webCard on WebCard {

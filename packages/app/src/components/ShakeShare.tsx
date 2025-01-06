@@ -226,20 +226,22 @@ const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
           </View>
         )}
       </ScrollView>
-      <LinearGradient
-        colors={['rgba(0, 0, 0,0)', 'rgba(0, 0, 0, 1)']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 0, y: 1 }}
-        locations={[0, 0.7]}
-        style={styles.closeButtonContainer}
-      >
+      <View style={styles.closeButtonContainer}>
+        <LinearGradient
+          colors={['rgba(0, 0, 0,0)', 'rgba(0, 0, 0, 1)']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+          locations={[0, 0.7]}
+          style={{ width: '100%', height: '100%' }}
+          pointerEvents="none"
+        />
         <IconButton
           icon="close"
           onPress={onClose}
           iconStyle={styles.iconStyle}
           style={[styles.iconContainerStyle, { bottom }]}
         />
-      </LinearGradient>
+      </View>
       <ToastUi />
     </View>
   );

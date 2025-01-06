@@ -1,12 +1,16 @@
 import { MODULE_IMAGE_MAX_WIDTH } from '@azzapp/shared/cardModuleHelpers';
 import { MediaImageRenderer, MediaVideoRenderer } from '#components/medias';
 import { getCardModuleMediaKind } from '#helpers/cardModuleHelpers';
-import CardModuleMediaEditPreview from './CardModuleMediaEditPreview';
 import type { CardModuleSourceMedia } from './cardModuleEditorType';
 import type { ViewStyle } from 'react-native';
 
 type CardModuleMediaItemProps = {
   media: CardModuleSourceMedia;
+
+  /**
+   * Wether the media can be played or not
+   */
+  canPlay: boolean;
   /**
    *
    * display media dimension
@@ -24,55 +28,37 @@ const CardModuleMediaItem = ({
   media,
   dimension,
   imageStyle,
+  canPlay,
 }: CardModuleMediaItemProps) => {
-  const isEditableVideoMedia =
-    media.kind === 'video' &&
-    media.duration !== media.timeRange?.duration &&
-    media.timeRange?.startTime !== 0;
-
-  if (
-    media.editionParameters == null &&
-    media.filter == null &&
-    (media.kind === 'image' || !isEditableVideoMedia)
-  ) {
-    const kind = getCardModuleMediaKind(media);
-    return kind === 'image' ? (
-      <MediaImageRenderer
-        source={{
-          uri: media.uri,
-          mediaId: media.id,
-          requestedSize: MODULE_IMAGE_MAX_WIDTH,
-        }}
-        style={{
-          ...dimension,
-          ...imageStyle,
-        }}
-        fit="cover"
-      />
-    ) : (
-      <MediaVideoRenderer
-        source={{
-          uri: media.uri,
-          mediaId: media.id,
-          requestedSize: dimension.width,
-        }}
-        style={{
-          ...dimension,
-          ...imageStyle,
-        }}
-        thumbnailURI={media.thumbnail}
-        videoEnabled
-        paused={false}
-        muted
-      />
-    );
-  }
-
-  return (
-    <CardModuleMediaEditPreview
-      media={media}
-      itemWidth={dimension.width}
-      itemHeight={dimension.height}
+  const kind = getCardModuleMediaKind(media);
+  return kind === 'image' ? (
+    <MediaImageRenderer
+      source={{
+        uri: media.uri,
+        mediaId: media.id,
+        requestedSize: MODULE_IMAGE_MAX_WIDTH,
+      }}
+      style={{
+        ...dimension,
+        ...imageStyle,
+      }}
+      fit="cover"
+    />
+  ) : (
+    <MediaVideoRenderer
+      source={{
+        uri: media.uri,
+        mediaId: media.id,
+        requestedSize: dimension.width,
+      }}
+      style={{
+        ...dimension,
+        ...imageStyle,
+      }}
+      thumbnailURI={media.thumbnail}
+      videoEnabled={canPlay}
+      paused={false}
+      muted
     />
   );
 };

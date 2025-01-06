@@ -8,7 +8,7 @@ import { hasCardModuleMediaError } from '#helpers/cardModuleHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
-import PressableOpacity from '#ui/PressableOpacity';
+import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import CardModuleMediaPickerFloatingTool from './CardModuleMediaPickerFloatingTool';
 import type { ModuleKindAndVariant } from '#helpers/webcardModuleHelpers';
@@ -38,9 +38,9 @@ const CardModuleMediasToolbox = ({
 
   return (
     <View style={styles.container}>
-      <PressableOpacity style={styles.previewButton} onPress={close}>
+      <PressableNative style={styles.previewButton} onPress={close}>
         <Icon icon="arrow_down" />
-      </PressableOpacity>
+      </PressableNative>
       {cardModuleMedias.length === 0 ? (
         <View style={styles.viewErrorMessage}>
           <Text variant="error">
@@ -108,7 +108,7 @@ const MediaItem = ({
   }, [cardModuleMedia, module]);
 
   return (
-    <PressableOpacity
+    <PressableNative
       key={`${id}-${index}`}
       onPress={() => onSelectMedia(index)}
     >
@@ -136,7 +136,7 @@ const MediaItem = ({
         iconStyle={styles.mediaDeleteIcon}
         style={styles.mediaDeleteButton}
       />
-    </PressableOpacity>
+    </PressableNative>
   );
 };
 

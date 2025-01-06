@@ -148,10 +148,8 @@ function relayScreen<TRoute extends Route>(
     }, []);
 
     useEffect(() => {
-      addAuthStateListener(() => {
-        const newProfileInfos = profileBound
-          ? getAuthState().profileInfos
-          : null;
+      addAuthStateListener(newState => {
+        const newProfileInfos = profileBound ? newState.profileInfos : null;
         if (
           !isEqual(profileInfosRef.current ?? null, newProfileInfos ?? null)
         ) {

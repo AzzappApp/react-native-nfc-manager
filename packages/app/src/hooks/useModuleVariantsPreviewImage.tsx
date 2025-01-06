@@ -43,6 +43,10 @@ function useModuleVariantsPreviewImage({
       return colorScheme === 'light'
         ? require('#assets/module/custom_socialLinks_light.png')
         : require('#assets/module/custom_socialLinks_dark.png');
+    case 'blockText':
+      return colorScheme === 'light'
+        ? require('#assets/module/custom_blockText_light.png')
+        : require('#assets/module/custom_blockText_dark.png');
     case 'media':
       switch (variant) {
         case 'slideshow':

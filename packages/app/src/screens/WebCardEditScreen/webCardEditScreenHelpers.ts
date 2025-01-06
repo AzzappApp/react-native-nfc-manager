@@ -1,9 +1,6 @@
 import { useWindowDimensions } from 'react-native';
 
-/**
- * The duration of the transition when switching between the edit and view modes.
- */
-export const EDIT_TRANSITION_DURATION = 220;
+export const TRANSITIONS_DURATION = 220;
 
 export const BUTTON_SIZE = 35;
 

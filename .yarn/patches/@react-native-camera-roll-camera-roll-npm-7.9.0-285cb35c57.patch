@@ -1,8 +1,8 @@
 diff --git a/ios/RNCCameraRoll.mm b/ios/RNCCameraRoll.mm
-index d63f1a7ca21d0ce18454c1bf1a488a4160768bb6..a8651915af30aba75beffa63779712ecca62a4f7 100644
+index d63f1a7ca21d0ce18454c1bf1a488a4160768bb6..28e7553e2c1116709409e7c33aada34a2d4b1543 100644
 --- a/ios/RNCCameraRoll.mm
 +++ b/ios/RNCCameraRoll.mm
-@@ -754,49 +754,119 @@ -(void)sendProgressUpdateWithId:(NSString *)internalId
+@@ -754,49 +754,123 @@ -(void)sendProgressUpdateWithId:(NSString *)internalId
  			[self sendProgressUpdateWithId:internalId progress:progress];
  		};
  
@@ -88,7 +88,7 @@ index d63f1a7ca21d0ce18454c1bf1a488a4160768bb6..a8651915af30aba75beffa63779712ec
 +          }];
 +        } else {
 +          PHAssetResourceManager *resourceManager = [PHAssetResourceManager defaultManager];
-+          PHAssetResource *resource = [PHAssetResource assetResourcesForAsset:asset].firstObject;
++          PHAssetResource *resource = [PHAssetResource assetResourcesForAsset:asset].lastObject;
 +          if (resource == nil) {
              NSString *errorMessage = [NSString stringWithFormat:@"Failed to load asset"
                                        " with localIdentifier %@ with no error message.", internalId];
@@ -98,7 +98,7 @@ index d63f1a7ca21d0ce18454c1bf1a488a4160768bb6..a8651915af30aba75beffa63779712ec
            }
 -        }];
 +
-+         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
++          NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
 +          NSString *cacheDirectory = [paths objectAtIndex:0];
 +          NSString *phAssetCacheDir = [cacheDirectory stringByAppendingPathComponent:@"ph-assets-cache"];
 +          if (![[NSFileManager defaultManager] fileExistsAtPath:phAssetCacheDir]) {
@@ -109,7 +109,10 @@ index d63f1a7ca21d0ce18454c1bf1a488a4160768bb6..a8651915af30aba75beffa63779712ec
 +              return;
 +            }
 +          }
-+          NSString *sanitizedLocalIdentifier = [asset.localIdentifier stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
++          NSString *lastEditionDate = asset.modificationDate != nil ?
++            [NSString stringWithFormat:@"%f", [asset.modificationDate timeIntervalSince1970]] : @"";
++          NSString *sanitizedLocalIdentifier = [[asset.localIdentifier stringByReplacingOccurrencesOfString:@"/" withString:@"_"]
++                                                stringByAppendingString:lastEditionDate];
 +          NSURL *fileURL = [NSURL fileURLWithPath:[[phAssetCacheDir stringByAppendingPathComponent:sanitizedLocalIdentifier]
 +              stringByAppendingPathExtension:[resource.originalFilename pathExtension]]];
 +          
@@ -141,7 +144,8 @@ index d63f1a7ca21d0ce18454c1bf1a488a4160768bb6..a8651915af30aba75beffa63779712ec
 +            };
 +          
 +          
-+          if ([[NSFileManager defaultManager] fileExistsAtPath:fileURL.path]) {
++          NSFileManager *fileManager = [NSFileManager defaultManager];
++          if ([fileManager fileExistsAtPath:fileURL.path]) {
 +            resolve(result);
 +            return;
 +          }

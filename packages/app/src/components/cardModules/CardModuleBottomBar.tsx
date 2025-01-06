@@ -171,6 +171,10 @@ const CardModuleBottomBar = <T extends ModuleKindAndVariant>({
         mediasPicked.filter((_, i) => i !== index),
       );
     setCanSave(true);
+    // workaround for this issue: software-mansion/react-native-gesture-handler#3282
+    // both click on cross and image are received
+    // here we force closing the selected item (which will be deleted in parallel)
+    setEditableItemIndex(null);
   };
 
   const videoSlotAvailable = useMemo(() => {
@@ -262,13 +266,16 @@ const CardModuleBottomBar = <T extends ModuleKindAndVariant>({
 
             <ToolBarContainer destroyOnHide visible={editableItemIndex != null}>
               {/* responsible for displaying the option for a selected media*/}
-              <CardModuleMediaEditToolbox
-                module={module}
-                cardModuleMedia={cardModuleMedias[editableItemIndex!]}
-                onUpdateMedia={onUpdateMedia}
-                availableVideoSlot={videoSlotAvailable}
-                close={deselectMedia}
-              />
+              {editableItemIndex !== null &&
+              cardModuleMedias[editableItemIndex] ? (
+                <CardModuleMediaEditToolbox
+                  module={module}
+                  cardModuleMedia={cardModuleMedias[editableItemIndex]}
+                  onUpdateMedia={onUpdateMedia}
+                  availableVideoSlot={videoSlotAvailable}
+                  close={deselectMedia}
+                />
+              ) : undefined}
             </ToolBarContainer>
           </>
         )}

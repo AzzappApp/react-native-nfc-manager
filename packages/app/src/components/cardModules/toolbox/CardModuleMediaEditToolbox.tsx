@@ -4,7 +4,7 @@ import { colors } from '#theme';
 import { MediaImageRenderer } from '#components/medias';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
-import PressableOpacity from '#ui/PressableOpacity';
+import PressableNative from '#ui/PressableNative';
 import { TOOLBOX_SECTION_HEIGHT } from '../../Toolbar/ToolBoxSection';
 import CardModuleMediaEditorTool from '../tool/CardModuleMediaEditorTool';
 import CardModuleMediaReplace from '../tool/CardModuleMediaReplace';
@@ -32,7 +32,7 @@ const CardModuleMediaEditToolbox = <T extends ModuleKindAndVariant>({
     cardModuleMedia.media ?? {};
   return (
     <View style={styles.container}>
-      <PressableOpacity style={styles.previewButton} onPress={close}>
+      <PressableNative style={styles.previewButton} onPress={close}>
         <Icon icon="arrow_down" />
         <MediaImageRenderer
           source={{
@@ -43,7 +43,7 @@ const CardModuleMediaEditToolbox = <T extends ModuleKindAndVariant>({
           fit="cover"
           style={styles.previewContent}
         />
-      </PressableOpacity>
+      </PressableNative>
       <ScrollView
         horizontal
         contentContainerStyle={styles.scrollContentContainer}

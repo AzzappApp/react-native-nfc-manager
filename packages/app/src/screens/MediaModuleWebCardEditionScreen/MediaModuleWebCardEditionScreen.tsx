@@ -62,7 +62,7 @@ const MediaModuleWebCardScreen = (
   {
     webCard,
     setCanSave,
-    viewMode,
+    displayMode,
     dimension,
     moduleKey,
     variant,
@@ -151,6 +151,7 @@ const MediaModuleWebCardScreen = (
             id
             kind
             visible
+            variant
             ...MediaModuleWebCardEditionScreen_module
           }
         }
@@ -168,46 +169,55 @@ const MediaModuleWebCardScreen = (
           updateProcessedMedia,
           updateUploadIndicator,
         );
-        commit({
-          variables: {
-            webCardId: webCard.id,
-            input: {
-              moduleId: data?.id,
-              cardModuleColor: selectedCardModuleColor,
-              cardModuleMedias: moduleMedias.map(moduleMedias => ({
-                media: {
-                  id: moduleMedias.media.id,
-                },
-              })),
-              variant,
+        await new Promise((resolve, reject) => {
+          commit({
+            variables: {
+              webCardId: webCard.id,
+              input: {
+                moduleId: data?.id,
+                cardModuleColor: selectedCardModuleColor,
+                cardModuleMedias: moduleMedias.map(moduleMedias => ({
+                  media: {
+                    id: moduleMedias.media.id,
+                  },
+                })),
+                variant,
+              },
             },
-          },
-          onCompleted(_, error) {
-            handleOnCompletedModuleSave(moduleMedias, router, error);
-          },
-          onError(error) {
-            if (error.message === ERRORS.SUBSCRIPTION_REQUIRED) {
-              Toast.show({
-                type: 'error',
-                text1: intl.formatMessage({
-                  defaultMessage: 'You need a subscription to add this module.',
-                  description:
-                    'Error toast message when trying to add a module without a subscription.',
-                }),
-              });
-              return;
-            } else {
-              Sentry.captureException(error);
-              Toast.show({
-                type: 'error',
-                text1: intl.formatMessage({
-                  defaultMessage: 'Error while saving your new module.',
-                  description:
-                    'Error toast message when saving a new module failed.',
-                }),
-              });
-            }
-          },
+            onCompleted(_, error) {
+              handleOnCompletedModuleSave(moduleMedias, router, error);
+              if (error) {
+                reject(error);
+                return;
+              }
+              resolve(null);
+            },
+            onError(error) {
+              if (error.message === ERRORS.SUBSCRIPTION_REQUIRED) {
+                Toast.show({
+                  type: 'error',
+                  text1: intl.formatMessage({
+                    defaultMessage:
+                      'You need a subscription to add this module.',
+                    description:
+                      'Error toast message when trying to add a module without a subscription.',
+                  }),
+                });
+                return;
+              } else {
+                Sentry.captureException(error);
+                Toast.show({
+                  type: 'error',
+                  text1: intl.formatMessage({
+                    defaultMessage: 'Error while saving your new module.',
+                    description:
+                      'Error toast message when saving a new module failed.',
+                  }),
+                });
+              }
+              reject(error);
+            },
+          });
         });
       } catch (e) {
         console.error(e);
@@ -234,9 +244,7 @@ const MediaModuleWebCardScreen = (
       intl,
     ],
   );
-  useImperativeHandle(ref, () => ({
-    save,
-  }));
+  useImperativeHandle(ref, () => ({ save }), [save]);
   // #endRegion
   useEffect(() => {
     if (
@@ -263,7 +271,7 @@ const MediaModuleWebCardScreen = (
   return (
     <>
       <CardModulePreviewContainer
-        viewMode={viewMode}
+        displayMode={displayMode}
         dimension={dimension}
         backgroundColor={swapColor(
           selectedCardModuleColor?.background,
@@ -278,10 +286,11 @@ const MediaModuleWebCardScreen = (
           }}
           cardStyle={webCard.cardStyle}
           colorPalette={webCard.cardColors ?? DEFAULT_COLOR_PALETTE}
-          viewMode={viewMode}
+          displayMode={displayMode}
           variant={variant}
           dimension={dimension}
           setEditableItemIndex={setEditableItemIndex}
+          canPlay
         />
       </CardModulePreviewContainer>
       <CardModuleBottomBar

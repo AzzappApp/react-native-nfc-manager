@@ -1,4 +1,6 @@
-import { File, Paths } from 'expo-file-system/next';
+import * as Sentry from '@sentry/react-native';
+import { File } from 'expo-file-system/next';
+import ExpoFileSystem from 'expo-file-system/src/next/ExpoFileSystem';
 import { Platform } from 'react-native';
 import type { ContactsScreenLists_contacts$data } from '#relayArtifacts/ContactsScreenLists_contacts.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
@@ -42,9 +44,24 @@ export const buildLocalContact = async (
 
   const avatarURI = contact.contactProfile?.avatar?.uri;
 
-  const avatar = avatarURI
-    ? await File.downloadFileAsync(avatarURI, Paths.cache)
-    : null;
+  let avatar = undefined;
+  if (contact.contactProfile?.id) {
+    const avatarFile = new File(
+      ExpoFileSystem.cacheDirectory + contact.contactProfile.id,
+    );
+    try {
+      if (!avatarFile.exists) {
+        avatar = avatarURI
+          ? await File.downloadFileAsync(avatarURI, avatarFile)
+          : null;
+      } else {
+        avatar = avatarFile;
+      }
+    } catch (e) {
+      Sentry.captureException(e);
+      console.error('download avatar failure', e);
+    }
+  }
 
   return {
     ...contact,

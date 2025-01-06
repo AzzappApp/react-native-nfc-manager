@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react-native';
 import { type Contact } from 'expo-contacts';
 import { File, Paths } from 'expo-file-system/next';
 import { Image } from 'expo-image';
@@ -10,6 +11,7 @@ import { colors, shadow } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import { buildVCardFromExpoContact } from '#helpers/contactCardHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { sanitizeFilePath } from '#helpers/fileHelpers';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -60,18 +62,28 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
       (details.lastName || '')
     ).trim();
     const filePath =
-      Paths.cache.uri + (contactName.length ? contactName : 'contact') + '.vcf';
-    const file = new File(filePath);
-    file.create();
-    // generate file
-    file.write(vcardData.toString());
-    // share the file
-    await ShareCommand.open({
-      url: filePath,
-      type: 'text/x-vcard',
-    });
-    // clean up file afterward
-    file.delete();
+      Paths.cache.uri +
+      sanitizeFilePath(contactName.length ? contactName : 'contact') +
+      '.vcf';
+
+    let file;
+    try {
+      file = new File(filePath);
+      file.create();
+      // generate file
+      file.write(vcardData.toString());
+      // share the file
+      await ShareCommand.open({
+        url: filePath,
+        type: 'text/x-vcard',
+      });
+      // clean up file afterward
+      file.delete();
+    } catch (e) {
+      Sentry.captureException(e);
+      console.error(e);
+      file?.delete();
+    }
   };
 
   return (

@@ -75,12 +75,10 @@ export type MediaModuleRendererProps = CommonModuleRendererProps<
 
 const MediaModuleRenderer = ({
   data,
-  viewMode = 'mobile',
+  displayMode = 'mobile',
   variant,
   scrollPosition,
   onLayout,
-  disableAnimation,
-  webCardEditing = false,
   colorPalette,
   ...props
 }: MediaModuleRendererProps) => {
@@ -94,8 +92,7 @@ const MediaModuleRenderer = ({
         <CardModuleMediaSlideshow
           cardModuleMedias={data.cardModuleMedias}
           cardModuleColor={data.cardModuleColor}
-          viewMode={viewMode}
-          disableScroll={webCardEditing}
+          displayMode={displayMode}
           {...props}
         />
       );
@@ -106,10 +103,8 @@ const MediaModuleRenderer = ({
             cardModuleMedias={data.cardModuleMedias}
             cardModuleColor={data.cardModuleColor}
             onLayout={onLayout}
-            viewMode={viewMode}
-            disableParallax={disableAnimation}
+            displayMode={displayMode}
             scrollPosition={scrollPosition}
-            webCardEditing={webCardEditing}
             {...props}
           />
         </CardModuleEditionScrollHandler>

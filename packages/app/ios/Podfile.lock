@@ -1800,7 +1800,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-skia (1.7.0):
+  - react-native-skia (1.7.6):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -3000,7 +3000,7 @@ SPEC CHECKSUMS:
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   PurchasesHybridCommon: 6c07c9abb12b96413ee583c017957f52f5f4ceaa
-  RCT-Folly: 84578c8756030547307e4572ab1947de1685c599
+  RCT-Folly: bf5c0376ffe4dd2cf438dcf86db385df9fdce648
   RCTDeprecation: d575d28132f93e5deef4849d5afffb4ac4e63226
   RCTRequired: e2e5df1df76aac8685aabfebca389e6bec64792b
   RCTTypeSafety: 30e36ceafa26979860e13fb3f234fb61692924c2
@@ -3042,8 +3042,8 @@ SPEC CHECKSUMS:
   react-native-passkit: 7c6871f610512070594e764443e253a45d7ea0cb
   react-native-quick-base64: 6ddd4121d8dcb412ad32ca5fa67633dbea8d3761
   react-native-safe-area-context: d6406c2adbd41b2e09ab1c386781dc1c81a90919
-  react-native-skia: bcbabbd748dd4c9ec02f33df07fa49d1d76fc8c0
-  react-native-skottie-template-player: f941ab87bf4695ed69350a1ccb6cbf9642efc49d
+  react-native-skia: ec846c55d65ee069fc6c6c075938447426a7b4a9
+  react-native-skottie-template-player: 4abf4dc0370aa2fef5fdd3c26c1809ffcf8c38ec
   react-native-webview: 40b8823be3fac70f0404016e6aed754ef4307517
   React-nativeconfig: 470fce6d871c02dc5eff250a362d56391b7f52d6
   React-NativeModulesApple: 6297fc3136c1fd42884795c51d7207de6312b606

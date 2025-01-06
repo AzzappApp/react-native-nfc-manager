@@ -31,14 +31,13 @@ const CardModuleMediaTextLinkAlternation = ({
   cardModuleColor,
   dimension: providedDimension,
   onLayout,
-  viewMode,
+  displayMode,
   cardStyle,
   setEditableItemIndex,
   scrollPosition,
   modulePosition,
-  disableAnimation,
   moduleEditing,
-  webCardEditing,
+  canPlay,
 }: CardModuleMediaTextLinkAlternationProps) => {
   const screenDimension = useScreenDimensions();
   const dimension = providedDimension ?? screenDimension;
@@ -49,46 +48,31 @@ const CardModuleMediaTextLinkAlternation = ({
     );
   }
 
+  const items =
+    displayMode === 'edit' ? cardModuleMedias.slice(0, 1) : cardModuleMedias;
   return (
     <View
       onLayout={onLayout}
       style={{ backgroundColor: cardModuleColor.background }}
     >
-      {webCardEditing && cardModuleMedias.length > 0 ? (
-        <AlternationItem
-          key={`${cardModuleMedias[0].media.id}`}
-          cardModuleMedia={cardModuleMedias[0]}
-          cardModuleColor={cardModuleColor}
-          dimension={dimension}
-          viewMode={viewMode}
-          cardStyle={cardStyle}
-          setEditableItemIndex={setEditableItemIndex}
-          scrollPosition={scrollPosition}
-          modulePosition={modulePosition}
-          index={0}
-          disableAnimation={disableAnimation}
-          moduleEditing={moduleEditing}
-        />
-      ) : (
-        cardModuleMedias.map((cardModuleMedia, index) => {
-          return (
-            <AlternationItem
-              key={`${cardModuleMedia.media.id}_${index}`}
-              cardModuleMedia={cardModuleMedia}
-              cardModuleColor={cardModuleColor}
-              dimension={dimension}
-              viewMode={viewMode}
-              cardStyle={cardStyle}
-              setEditableItemIndex={setEditableItemIndex}
-              scrollPosition={scrollPosition}
-              modulePosition={modulePosition}
-              index={index}
-              disableAnimation={disableAnimation}
-              moduleEditing={moduleEditing}
-            />
-          );
-        })
-      )}
+      {items.map((cardModuleMedia, index) => {
+        return (
+          <AlternationItem
+            key={`${cardModuleMedia.media.id}_${index}`}
+            cardModuleMedia={cardModuleMedia}
+            cardModuleColor={cardModuleColor}
+            dimension={dimension}
+            displayMode={displayMode}
+            cardStyle={cardStyle}
+            setEditableItemIndex={setEditableItemIndex}
+            scrollPosition={scrollPosition}
+            modulePosition={modulePosition}
+            index={index}
+            moduleEditing={moduleEditing}
+            canPlay={canPlay}
+          />
+        );
+      })}
     </View>
   );
 };
@@ -97,27 +81,28 @@ type AlternationItemProps = {
   cardModuleMedia: CardModuleMedia;
   cardModuleColor: CardModuleColor;
   dimension: CardModuleDimension;
-  viewMode: 'desktop' | 'mobile';
+  displayMode: 'desktop' | 'edit' | 'mobile';
   cardStyle?: CardStyle | null;
   setEditableItemIndex?: (index: number) => void;
   scrollPosition: Animated.Value;
   modulePosition?: number;
   index: number;
-  disableAnimation?: boolean;
   moduleEditing: boolean;
+  canPlay: boolean;
 };
+
 const AlternationItem = ({
   cardModuleMedia,
   cardModuleColor,
   dimension,
-  viewMode,
+  displayMode,
   cardStyle,
   setEditableItemIndex,
   scrollPosition,
   modulePosition,
   index,
-  disableAnimation,
   moduleEditing,
+  canPlay,
 }: AlternationItemProps) => {
   const styles = useStyleSheet(stylesheet);
   const [parentY, setParentY] = useState(0);
@@ -151,13 +136,13 @@ const AlternationItem = ({
       <AlternationContainer
         scrollY={scrollPosition}
         modulePosition={modulePosition}
-        viewMode={viewMode}
+        displayMode={displayMode}
         dimension={dimension}
         media={cardModuleMedia.media}
         cardStyle={cardStyle}
         index={index}
         parentY={parentY}
-        disableAnimation={disableAnimation}
+        canPlay={canPlay}
       >
         <View style={styles.bottomContainer}>
           <Text

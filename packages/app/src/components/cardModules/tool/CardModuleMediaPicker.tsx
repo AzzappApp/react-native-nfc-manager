@@ -2,11 +2,12 @@ import { Image } from 'expo-image';
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, Alert } from 'react-native';
-import { getVideoMetaData, Video } from 'react-native-compressor';
+import { Video } from 'react-native-compressor';
 import { ScrollView } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
 import { Observable } from 'relay-runtime';
 import { waitTime } from '@azzapp/shared/asyncHelpers';
+import { MODULE_VIDEO_MAX_WIDTH } from '@azzapp/shared/cardModuleHelpers';
 import { colors, shadow } from '#theme';
 import { SaveHeaderButton } from '#components/commonsButtons';
 import MediaPicker from '#components/MediaPicker';
@@ -14,6 +15,7 @@ import { ScreenModal, preventModalDismiss } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import {
   copyCoverMediaToCacheDir,
+  getVideoSize,
   MODULES_CACHE_DIR,
   type SourceMedia,
 } from '#helpers/mediaHelpers';
@@ -26,7 +28,7 @@ import {
   CARD_MEDIA_VIDEO_DEFAULT_DURATION,
   type CardModuleMedia,
 } from '../cardModuleEditorType';
-import type { ViewProps } from 'react-native-svg/lib/typescript/fabric/utils';
+import type { ViewProps } from 'react-native';
 import type { Sink } from 'relay-runtime/lib/network/RelayObservable';
 
 type CardModuleMediaPickerProps = Omit<ViewProps, 'children'> & {
@@ -187,10 +189,14 @@ const CardModuleMediaPicker = ({
     try {
       let downloadError = false;
       let value = 0;
-
       const res = await Promise.all(
         selectedMedias.map(async cardModuleMedia => {
-          if (
+          // needDbUpdate can be null, but will but false for cloudinary already save image
+          // it this is not enough to avoid reprocessing, we can filter url with http after handline pexels data
+          if (cardModuleMedia.needDbUpdate === false) {
+            value += 1;
+            return cardModuleMedia;
+          } else if (
             cardModuleMedia.media.uri.startsWith('https://videos.pexels.com') ||
             cardModuleMedia.media.uri.startsWith('https://images.pexels.com')
           ) {
@@ -230,16 +236,20 @@ const CardModuleMediaPicker = ({
             }
           } else {
             if (cardModuleMedia.media.kind === 'video') {
-              const result = await Video.compress(cardModuleMedia.media.uri);
-              const metaData = await getVideoMetaData(result);
+              const result = await Video.compress(cardModuleMedia.media.uri, {
+                maxSize: MODULE_VIDEO_MAX_WIDTH,
+              });
+
+              const res = await getVideoSize(result);
               value += 1;
               updateProgress(value);
               return {
                 ...cardModuleMedia,
                 media: {
                   ...cardModuleMedia.media,
-                  width: metaData.width,
-                  height: metaData.height,
+                  rotation: res.rotation,
+                  width: res.width,
+                  height: res.height,
                   uri: result,
                 },
               };

@@ -16,8 +16,8 @@ export const useProfileInfos = () => {
     return {
       get: () => profileInfos,
       subscribe: (onStoreChange: () => void) =>
-        addAuthStateListener(() => {
-          const newProfileInfos = getAuthState().profileInfos;
+        addAuthStateListener(newState => {
+          const newProfileInfos = newState.profileInfos;
           if (!isEqual(newProfileInfos, profileInfos)) {
             profileInfos = newProfileInfos;
             onStoreChange();

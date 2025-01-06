@@ -1,21 +1,24 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, View } from 'react-native';
+import { Animated, Platform, View } from 'react-native';
 
 import {
   createVariantsStyleSheet,
   useVariantStyleSheet,
 } from '#helpers/createStyles';
+import { useIsCardModuleEdition } from './CardModuleEditionContext';
+import CardModuleMediaEditPreview from './CardModuleMediaEditPreview';
 import CardModuleMediaItem from './CardModuleMediaItem';
 import type { CardModuleSourceMedia } from './cardModuleEditorType';
 import type { CardStyle } from '@azzapp/shared/cardHelpers';
 import type { LayoutChangeEvent, ViewProps } from 'react-native';
 
 type AlternationContainerProps = ViewProps & {
-  viewMode: 'desktop' | 'mobile';
+  displayMode: 'desktop' | 'edit' | 'mobile';
   dimension: {
     width: number;
     height: number;
   };
+  canPlay: boolean;
   borderRadius?: number;
   media: CardModuleSourceMedia;
   cardStyle: CardStyle | null | undefined;
@@ -23,7 +26,6 @@ type AlternationContainerProps = ViewProps & {
   scrollY: Animated.Value;
   parentY?: number;
   modulePosition?: number;
-  disableAnimation?: boolean;
 };
 
 const ANIMATION_DURATION = 1000;
@@ -34,7 +36,7 @@ const ANIMATION_DURATION = 1000;
  * @return {*}
  */
 const AlternationContainer = ({
-  viewMode,
+  displayMode,
   dimension,
   cardStyle,
   style,
@@ -44,12 +46,15 @@ const AlternationContainer = ({
   scrollY,
   modulePosition,
   parentY,
-  disableAnimation,
+  canPlay,
   ...props
 }: AlternationContainerProps) => {
-  const styles = useVariantStyleSheet(stylesheet, viewMode);
+  const styles = useVariantStyleSheet(
+    stylesheet,
+    displayMode === 'edit' ? 'mobile' : displayMode,
+  );
   const mediaWidth =
-    viewMode === 'desktop'
+    displayMode === 'desktop'
       ? (dimension.width - 2 * PADDING_HORIZONTAL - HORIZONTAL_GAP) / 2
       : dimension.width - 2 * PADDING_HORIZONTAL;
 
@@ -62,41 +67,53 @@ const AlternationContainer = ({
   }, []);
 
   const translateX = useRef(
-    new Animated.Value(index % 2 === 0 ? -150 : 150),
+    new Animated.Value(
+      modulePosition === undefined && index === 0
+        ? 0
+        : index % 2 === 0
+          ? -150
+          : 150,
+    ),
   ).current;
-  const opacity = useRef(new Animated.Value(0)).current;
+  const opacity = useRef(
+    new Animated.Value(modulePosition === undefined && index === 0 ? 1 : 0),
+  ).current;
 
   const isRunning = useRef(false);
+  const hideAnimation = useRef<Animated.CompositeAnimation | null>(null);
 
   useEffect(() => {
     const itemStartY = (modulePosition ?? 0) + (parentY ?? 0) + componentY;
     const itemEndY = itemStartY + componentHeight;
+
     const listener = scrollY.addListener(({ value }) => {
-      if (
-        value >= itemStartY - dimension.height &&
-        value <= itemEndY &&
-        !isRunning.current
-      ) {
-        isRunning.current = true;
-        Animated.parallel([
-          Animated.timing(translateX, {
-            toValue: 0,
-            duration: ANIMATION_DURATION,
-            useNativeDriver: true,
-          }),
-          Animated.timing(opacity, {
-            toValue: 1,
-            duration: ANIMATION_DURATION,
-            useNativeDriver: true,
-          }),
-        ]).start(({ finished }) => {
-          if (finished) {
-            isRunning.current = false;
-          }
-        });
-      } else if (!isRunning.current) {
-        isRunning.current = true;
-        Animated.parallel([
+      if (value >= itemStartY - dimension.height && value <= itemEndY) {
+        if (hideAnimation.current) {
+          hideAnimation.current.stop();
+          hideAnimation.current = null;
+        }
+
+        if (!isRunning.current) {
+          isRunning.current = true;
+          Animated.parallel([
+            Animated.timing(translateX, {
+              toValue: 0,
+              duration: ANIMATION_DURATION,
+              useNativeDriver: true,
+            }),
+            Animated.timing(opacity, {
+              toValue: 1,
+              duration: ANIMATION_DURATION,
+              useNativeDriver: true,
+            }),
+          ]).start(({ finished }) => {
+            if (finished) {
+              isRunning.current = false;
+            }
+          });
+        }
+      } else if (!hideAnimation.current && !isRunning.current) {
+        hideAnimation.current = Animated.parallel([
           Animated.timing(translateX, {
             toValue: index % 2 === 0 ? -150 : 150,
             duration: ANIMATION_DURATION,
@@ -107,9 +124,10 @@ const AlternationContainer = ({
             duration: ANIMATION_DURATION,
             useNativeDriver: true,
           }),
-        ]).start(({ finished }) => {
+        ]);
+        hideAnimation.current.start(({ finished }) => {
           if (finished) {
-            isRunning.current = false;
+            hideAnimation.current = null;
           }
         });
       }
@@ -128,21 +146,29 @@ const AlternationContainer = ({
     index,
   ]);
 
+  const disableAnimation = displayMode !== 'mobile';
+
   const imageContainerStyle = useMemo(
     () => [
       styles.imageContainer,
       {
         width: mediaWidth,
         borderRadius: cardStyle?.borderRadius ?? 0,
-        transform: [{ translateX }],
-        opacity,
+        transform: [{ translateX: disableAnimation ? 0 : translateX }],
+        opacity:
+          disableAnimation ||
+          (Platform.OS === 'android' && media.kind === 'video')
+            ? 1
+            : opacity,
       },
     ],
     [
       styles.imageContainer,
       mediaWidth,
       cardStyle?.borderRadius,
+      disableAnimation,
       translateX,
+      media.kind,
       opacity,
     ],
   );
@@ -155,6 +181,10 @@ const AlternationContainer = ({
     [mediaWidth],
   );
 
+  const MediaItemRenderer = useIsCardModuleEdition()
+    ? CardModuleMediaEditPreview
+    : CardModuleMediaItem;
+
   if (!media || !children) {
     return null;
   }
@@ -165,15 +195,23 @@ const AlternationContainer = ({
       style={[styles.container, { width: dimension.width }, style]}
       onLayout={onLayout}
     >
-      {viewMode === 'mobile' || index % 2 === 0 ? (
+      {displayMode !== 'desktop' || index % 2 === 0 ? (
         <Animated.View style={imageContainerStyle}>
-          <CardModuleMediaItem media={media} dimension={imageDimension} />
+          <MediaItemRenderer
+            media={media}
+            dimension={imageDimension}
+            canPlay={canPlay}
+          />
         </Animated.View>
       ) : null}
       <View style={{ width: mediaWidth }}>{children}</View>
-      {viewMode === 'desktop' && index % 2 === 1 ? (
+      {displayMode === 'desktop' && index % 2 === 1 ? (
         <Animated.View style={imageContainerStyle}>
-          <CardModuleMediaItem media={media} dimension={imageDimension} />
+          <MediaItemRenderer
+            media={media}
+            dimension={imageDimension}
+            canPlay={canPlay}
+          />
         </Animated.View>
       ) : null}
     </View>

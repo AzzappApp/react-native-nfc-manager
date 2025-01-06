@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { ScrollView, View, useWindowDimensions, Animated } from 'react-native';
+import { View, useWindowDimensions, Animated } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import {
   swapColor,
@@ -152,7 +152,7 @@ const WebCardPreview = ({
           ],
         }}
       >
-        <ScrollView
+        <Animated.ScrollView
           style={[
             styles.webCardContainer,
             style,
@@ -197,7 +197,7 @@ const WebCardPreview = ({
               />
             ))}
           </View>
-        </ScrollView>
+        </Animated.ScrollView>
       </View>
     </View>
   );
@@ -230,7 +230,7 @@ const CardModule = ({
       onLayout={onLayout}
       colorPalette={cardColors}
       cardStyle={cardStyle}
-      viewMode={viewMode}
+      displayMode={viewMode}
       coverBackgroundColor={coverBackgroundColor}
       scrollPosition={scrollPosition}
       modulePosition={modulePosition}

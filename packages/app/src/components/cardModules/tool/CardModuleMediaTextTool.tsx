@@ -1,8 +1,7 @@
-import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import { isNotFalsyString, isValidUrl } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import { MediaImageRenderer } from '#components/medias';
@@ -99,7 +98,7 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
     close();
   };
 
-  const { bottom: bottomInset } = useScreenInsets();
+  const { top: topInset } = useScreenInsets();
 
   const hasError = useMemo(() => {
     return hasCardModuleMediaError(cardModuleMedia, module);
@@ -123,12 +122,15 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
       <BottomSheetModal
         visible={show}
         onDismiss={onDismiss}
-        nestedScroll
-        bottomInset={bottomInset}
+        topInset={topInset}
         lazy
+        height={600}
         enableContentPanningGesture={false}
+        keyboardBehavior={
+          module.moduleKind === 'mediaTextLink' ? 'fillParent' : 'interactive'
+        }
       >
-        <BottomSheetScrollView style={styles.container} bounces={false}>
+        <ScrollView style={styles.container} bounces={false}>
           <Header
             middleElement={intl.formatMessage({
               defaultMessage: 'Design',
@@ -198,10 +200,9 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
               defaultMessage: 'Enter your title',
               description: 'Title placeholder in design module text tool',
             })}
-            defaultValue={title}
+            defaultValue={title === DEFAULT_CARD_MODULE_TITLE ? '' : title}
             onChangeText={setTitle}
             style={styles.titleStyle}
-            clearTextOnFocus={title === DEFAULT_CARD_MODULE_TITLE}
           />
           <BottomSheetTextInput
             multiline
@@ -210,10 +211,9 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
               description:
                 'Text description placeholder in design module text tool',
             })}
-            defaultValue={text}
+            defaultValue={text === DEFAULT_CARD_MODULE_TEXT ? '' : text}
             onChangeText={setText}
             style={styles.textStyle}
-            clearTextOnFocus={text === DEFAULT_CARD_MODULE_TEXT}
           />
           {module.moduleKind === 'mediaTextLink' && (
             <>
@@ -232,7 +232,7 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
               />
             </>
           )}
-        </BottomSheetScrollView>
+        </ScrollView>
       </BottomSheetModal>
     </>
   );
@@ -270,11 +270,19 @@ const styles = StyleSheet.create({
     borderCurve: 'continuous',
     overflow: 'hidden',
   },
-  container: { paddingHorizontal: 16 },
+  container: {
+    paddingHorizontal: 16,
+    overflow: 'visible',
+  },
   header: { marginBottom: 15 },
   textAction: { paddingTop: 10, paddingBottom: 5 },
   titleStyle: { borderWidth: 0, height: 50 },
-  textStyle: { borderWidth: 0, height: 200, marginTop: 10 },
+  textStyle: {
+    borderWidth: 0,
+    height: 200,
+    marginTop: 10,
+    verticalAlign: 'top',
+  },
   previewContent: {
     height: 47,
     width: 47,

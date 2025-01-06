@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { PixelRatio, StyleSheet } from 'react-native';
+import { PixelRatio, Platform, StyleSheet } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -9,6 +9,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import useBoolean from '#hooks/useBoolean';
 import useInterval from '#hooks/useInterval';
+import { useIsCardModuleEdition } from '../CardModuleEditionContext';
+import CardModuleMediaEditPreview from '../CardModuleMediaEditPreview';
 import CardModuleMediaItem from '../CardModuleMediaItem';
 import CardModulePressableTool from '../tool/CardModulePressableTool';
 import type {
@@ -20,7 +22,6 @@ import type { SharedValue } from 'react-native-reanimated';
 
 type CardModuleMediaSlideshowProps = CardModuleVariantType & {
   cardModuleMedias: CardModuleMedia[];
-  disableScroll: boolean;
 };
 
 //Simple component to render, not bind to any relay fragment
@@ -28,13 +29,13 @@ const CardModuleMediaSlideshow = ({
   cardModuleColor,
   cardModuleMedias,
   cardStyle,
-  viewMode,
+  displayMode,
   dimension,
-  disableScroll,
+  canPlay,
   setEditableItemIndex,
 }: CardModuleMediaSlideshowProps) => {
   const scrollIndex = useSharedValue(0);
-  const paddinHorizontal = viewMode === 'desktop' ? 40 : 0;
+  const paddinHorizontal = displayMode === 'desktop' ? 40 : 0;
 
   const screenWidth = dimension.width;
 
@@ -67,6 +68,7 @@ const CardModuleMediaSlideshow = ({
             itemWidth={itemWidth}
             borderRadius={cardStyle?.borderRadius ?? 0}
             gap={cardStyle?.gap}
+            canPlay={canPlay}
           />
         </CardModulePressableTool>
       );
@@ -76,6 +78,7 @@ const CardModuleMediaSlideshow = ({
       scrollIndex,
       offset,
       itemWidth,
+      canPlay,
       cardStyle?.borderRadius,
       cardStyle?.gap,
     ],
@@ -142,7 +145,7 @@ const CardModuleMediaSlideshow = ({
         {
           height: itemWidth + 40,
           backgroundColor: cardModuleColor.background,
-          pointerEvents: disableScroll ? 'none' : 'auto',
+          pointerEvents: displayMode === 'edit' ? 'none' : 'auto',
         },
       ]}
     >
@@ -182,6 +185,7 @@ type SlideshowItemProps = {
   itemWidth: number;
   gap?: number;
   borderRadius?: number;
+  canPlay: boolean;
 };
 
 //using memo(SlideshowItem) will require a custom isEqual function as there is media shallow comparison to do on cardModuleMedia
@@ -193,6 +197,7 @@ const SlideshowItem = ({
   itemWidth,
   gap = 0,
   borderRadius = 0,
+  canPlay,
 }: SlideshowItemProps) => {
   const animatedStyle = useAnimatedStyle(() => {
     const interpolateScale = interpolate(
@@ -209,12 +214,15 @@ const SlideshowItem = ({
       Extrapolation.EXTEND,
     );
 
-    const opacity = interpolate(
-      scrollIndex.value,
-      [index - 1, index, index + 1],
-      [0.25, 1, 0.25],
-      Extrapolation.CLAMP,
-    );
+    const opacity =
+      media?.kind === 'video' && Platform.OS === 'android' // media may be undefined
+        ? 1
+        : interpolate(
+            scrollIndex.value,
+            [index - 1, index, index + 1],
+            [0.25, 1, 0.25],
+            Extrapolation.CLAMP,
+          );
 
     return {
       opacity,
@@ -224,11 +232,16 @@ const SlideshowItem = ({
     };
   });
 
+  const MediaItemRenderer = useIsCardModuleEdition()
+    ? CardModuleMediaEditPreview
+    : CardModuleMediaItem;
+
   const { media } = cardModuleMedia;
   return (
     <Animated.View style={[styles.imageContainer, animatedStyle]}>
-      <CardModuleMediaItem
+      <MediaItemRenderer
         media={media}
+        canPlay={canPlay}
         dimension={{ width: itemWidth, height: itemWidth }}
       />
     </Animated.View>

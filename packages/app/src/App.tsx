@@ -131,8 +131,9 @@ Sentry.init({
   enableStallTracking: false,
   tracesSampleRate:
     process.env.DEPLOYMENT_ENVIRONMENT === 'production' ? 0.1 : 1,
-  profilesSampleRate:
-    process.env.DEPLOYMENT_ENVIRONMENT === 'production' ? 0.1 : 1,
+  // DO NOT REENABLE THIS UNTIL IT DOES NOT CRASH THE APP ANYMORE
+  // see https://github.com/getsentry/sentry-java/issues/2604#issuecomment-1524566544
+  profilesSampleRate: 0,
 });
 
 //initializing RC sneed to be done early
@@ -280,10 +281,10 @@ const unauthenticatedRoutes = [
 const AppRouter = () => {
   // #region Routing
   const initialRoutes = useMemo(() => {
-    const { authenticated, hasBeenSignedIn } = getAuthState();
+    const { authenticated, profileInfos } = getAuthState();
     return authenticated
       ? mainRoutes(false)
-      : hasBeenSignedIn
+      : profileInfos
         ? signInRoutes
         : signUpRoutes;
   }, []);

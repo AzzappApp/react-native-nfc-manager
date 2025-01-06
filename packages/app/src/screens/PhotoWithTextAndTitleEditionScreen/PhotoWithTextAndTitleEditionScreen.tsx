@@ -254,8 +254,10 @@ const PhotoWithTextAndTitleEditionScreen = ({
             id
             requiresSubscription
             cardModules {
+              id
               kind
               visible
+              variant
               ...PhotoWithTextAndTitleEditionScreen_module
             }
           }

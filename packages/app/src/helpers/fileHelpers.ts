@@ -38,3 +38,12 @@ export const getFileExtension = (path: string) => {
       : null;
   return ext && ext.length <= 5 ? ext : null;
 };
+
+/**
+ * replace invalid characters from path with _
+ */
+export const sanitizeFilePath = (filePath: string) => {
+  // Replace invalid characters with an underscore (_)
+  // eslint-disable-next-line no-control-regex, no-useless-escape
+  return filePath.replace(/[ <>:"\/\\|?*\x00-\x1F]/g, '_');
+};

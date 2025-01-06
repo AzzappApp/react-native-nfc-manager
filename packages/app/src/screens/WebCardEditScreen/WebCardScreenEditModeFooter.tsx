@@ -15,14 +15,14 @@ type WebCardScreenEditModeFooter = {
   fromCreation: boolean;
   onAddContent: () => void;
   onSkip?: () => void;
-  webcard: WebCardScreenEditModeFooter_webCard$key;
+  webCard: WebCardScreenEditModeFooter_webCard$key;
 };
 
 const WebCardScreenEditModeFooter = ({
   fromCreation,
   onAddContent,
   onSkip,
-  webcard: webcardKey,
+  webCard: webCardKey,
 }: WebCardScreenEditModeFooter) => {
   const intl = useIntl();
 
@@ -42,7 +42,7 @@ const WebCardScreenEditModeFooter = ({
         }
       }
     `,
-    webcardKey,
+    webCardKey,
   );
 
   const source = useMemo(() => {

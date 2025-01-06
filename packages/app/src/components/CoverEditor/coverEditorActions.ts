@@ -186,6 +186,12 @@ export type LoadingSuccessAction = {
     lutTextures: Partial<Record<Filter, TextureInfo>>;
     images: Record<string, TextureInfo>;
     localFilenames: Record<string, string>;
+    compressedMedia?: Array<{
+      id: string;
+      uri: string;
+      width: number;
+      height: number;
+    }>;
   };
 };
 

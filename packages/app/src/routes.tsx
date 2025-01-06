@@ -85,10 +85,11 @@ export type WebCardRoute = {
     showPosts?: boolean;
     contactData?: string | null;
     additionalContactData?: Pick<ContactCard, 'socials' | 'urls'>;
-    editing?: boolean;
     fromCreation?: boolean;
+    editing?: boolean;
   };
 };
+
 export type PostRoute = {
   route: 'POST';
   params: {
