@@ -307,6 +307,8 @@ const styleSheet = createStyleSheet(appearance => ({
     height: 148,
     borderRadius: 18,
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: appearance === 'light' ? colors.grey50 : 'transparent',
   },
   selectedImageContainer: {
     borderWidth: 2,
