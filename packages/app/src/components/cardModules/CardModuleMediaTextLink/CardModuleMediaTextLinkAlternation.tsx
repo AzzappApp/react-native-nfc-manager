@@ -17,6 +17,7 @@ import type { CardStyle } from '@azzapp/shared/cardHelpers';
 import type {
   CardModuleColor,
   DisplayMode,
+  WebCardViewMode,
 } from '@azzapp/shared/cardModuleHelpers';
 import type { Animated, LayoutChangeEvent } from 'react-native';
 
@@ -76,6 +77,7 @@ const CardModuleMediaTextLinkAlternation = ({
             index={index}
             moduleEditing={moduleEditing}
             canPlay={canPlay}
+            webCardViewMode={webCardViewMode}
           />
         );
       })}
@@ -95,6 +97,7 @@ type AlternationItemProps = {
   index: number;
   moduleEditing: boolean;
   canPlay: boolean;
+  webCardViewMode?: WebCardViewMode;
 };
 
 const AlternationItem = ({
@@ -109,6 +112,7 @@ const AlternationItem = ({
   index,
   moduleEditing,
   canPlay,
+  webCardViewMode,
 }: AlternationItemProps) => {
   const styles = useStyleSheet(stylesheet);
   const [parentY, setParentY] = useState(0);
@@ -149,6 +153,7 @@ const AlternationItem = ({
         index={index}
         parentY={parentY}
         canPlay={canPlay}
+        webCardViewMode={webCardViewMode}
       >
         <View style={styles.bottomContainer}>
           <Text
