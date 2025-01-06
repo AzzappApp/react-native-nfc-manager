@@ -322,7 +322,7 @@ const WebCardEditScreen = ({
       <Suspense>
         <WebCardEditScreenHeader
           webCard={webCard}
-          selectionMode={false}
+          selectionMode={selectionMode}
           nbSelectedModules={nbSelectedModules}
           selectionContainsAllModules={selectionContainsAllModules}
           onDone={onDone}
