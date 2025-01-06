@@ -287,8 +287,20 @@ const WebCardEditBlockContainer = ({
     gap: 20,
   } as const;
 
-  const moveButtonStyle = useAnimatedStyle(() => ({
-    opacity: Math.max(0, 1 - Math.abs(dragX.value) / dragRightLimit),
+  const firstMoveButtonStyle = useAnimatedStyle(() => ({
+    opacity: isFirst
+      ? withTiming(0, { duration: 300 })
+      : dragX.value === 0
+        ? withTiming(1, { duration: 300 })
+        : Math.max(0, 1 - Math.abs(dragX.value) / dragRightLimit),
+  }));
+
+  const lastMoveButtonStyle = useAnimatedStyle(() => ({
+    opacity: isLast
+      ? withTiming(0, { duration: 300 })
+      : dragX.value === 0
+        ? withTiming(1, { duration: 300 })
+        : Math.max(0, 1 - Math.abs(dragX.value) / dragRightLimit),
   }));
 
   const leftSectionStyle = useAnimatedStyle(() => ({
@@ -376,77 +388,73 @@ const WebCardEditBlockContainer = ({
 
         {displayEditionButtons && (
           <>
-            {!isLast && (
-              <Animated.View
-                style={[
-                  moveButtonStyle,
-                  actionSectionBaseStyle,
-                  {
-                    left: -buttonSize - 20,
-                    pointerEvents: activeSection !== 'none' ? 'none' : 'auto',
-                  },
-                ]}
-              >
-                <IconButton
-                  onPress={onMoveDown}
-                  disabled={activeSection !== 'none' || !canMove}
-                  icon="arrow_down"
-                  size={buttonSize}
-                  iconSize={iconSize}
-                  style={{
-                    borderColor: colors.grey200,
-                  }}
-                  iconStyle={{
-                    tintColor: colors.grey200,
-                  }}
-                  accessibilityLabel={intl.formatMessage({
-                    defaultMessage: 'Move down',
-                    description:
-                      'Accessibility label for the move down button in the profile edition screen',
-                  })}
-                  accessibilityHint={intl.formatMessage({
-                    defaultMessage: 'Moves the module down',
-                    description:
-                      'Accessibility hint for the move down button in the profile edition screen',
-                  })}
-                />
-              </Animated.View>
-            )}
+            <Animated.View
+              style={[
+                lastMoveButtonStyle,
+                actionSectionBaseStyle,
+                {
+                  left: -buttonSize - 20,
+                  pointerEvents: activeSection !== 'none' ? 'none' : 'auto',
+                },
+              ]}
+            >
+              <IconButton
+                onPress={onMoveDown}
+                disabled={activeSection !== 'none' || !canMove}
+                icon="arrow_down"
+                size={buttonSize}
+                iconSize={iconSize}
+                style={{
+                  borderColor: colors.grey200,
+                }}
+                iconStyle={{
+                  tintColor: colors.grey200,
+                }}
+                accessibilityLabel={intl.formatMessage({
+                  defaultMessage: 'Move down',
+                  description:
+                    'Accessibility label for the move down button in the profile edition screen',
+                })}
+                accessibilityHint={intl.formatMessage({
+                  defaultMessage: 'Moves the module down',
+                  description:
+                    'Accessibility hint for the move down button in the profile edition screen',
+                })}
+              />
+            </Animated.View>
 
-            {!isFirst && (
-              <Animated.View
-                style={[
-                  moveButtonStyle,
-                  actionSectionBaseStyle,
-                  { right: -buttonSize - 20 },
-                ]}
-                pointerEvents={activeSection !== 'none' ? 'none' : 'auto'}
-              >
-                <IconButton
-                  onPress={onMoveUp}
-                  disabled={activeSection !== 'none' || !canMove}
-                  icon="arrow_up"
-                  size={buttonSize}
-                  iconSize={iconSize}
-                  style={{
-                    borderColor: colors.grey200,
-                  }}
-                  iconStyle={{
-                    tintColor: colors.grey200,
-                  }}
-                  accessibilityLabel={intl.formatMessage({
-                    defaultMessage: 'Move up',
-                    description:
-                      'Accessibility label for the move up button in the profile edition screen',
-                  })}
-                  accessibilityHint={intl.formatMessage({
-                    defaultMessage: 'Moves the module up',
-                    description:
-                      'Accessibility hint for the move up button in the profile edition screen',
-                  })}
-                />
-              </Animated.View>
-            )}
+            <Animated.View
+              style={[
+                firstMoveButtonStyle,
+                actionSectionBaseStyle,
+                { right: -buttonSize - 20 },
+              ]}
+              pointerEvents={activeSection !== 'none' ? 'none' : 'auto'}
+            >
+              <IconButton
+                onPress={onMoveUp}
+                disabled={activeSection !== 'none' || !canMove}
+                icon="arrow_up"
+                size={buttonSize}
+                iconSize={iconSize}
+                style={{
+                  borderColor: colors.grey200,
+                }}
+                iconStyle={{
+                  tintColor: colors.grey200,
+                }}
+                accessibilityLabel={intl.formatMessage({
+                  defaultMessage: 'Move up',
+                  description:
+                    'Accessibility label for the move up button in the profile edition screen',
+                })}
+                accessibilityHint={intl.formatMessage({
+                  defaultMessage: 'Moves the module up',
+                  description:
+                    'Accessibility hint for the move up button in the profile edition screen',
+                })}
+              />
+            </Animated.View>
 
             <Animated.View
               style={[
