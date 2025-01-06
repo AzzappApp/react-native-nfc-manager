@@ -1,15 +1,15 @@
 import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
+import { StyleSheet } from 'react-native';
 import { useSharedValue, withTiming } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
-import { graphql, usePreloadedQuery, useRelayEnvironment } from 'react-relay';
+import { graphql, useFragment, useRelayEnvironment } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import { MODULE_KINDS } from '@azzapp/shared/cardModuleHelpers';
 import { colors } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
-import { useRouter } from '#components/NativeRouter';
+import { useRouter, useSuspendUntilAppear } from '#components/NativeRouter';
 import { getRouteForCardModule } from '#helpers/cardModuleRouterHelpers';
-import relayScreen from '#helpers/relayScreen';
 import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
 import {
   MODULE_VARIANT_SECTION,
@@ -19,6 +19,10 @@ import useBoolean from '#hooks/useBoolean';
 import useScreenDimensions from '#hooks/useScreenDimensions';
 import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
+import {
+  WebCardModuleTransitionSnapshotRenderer,
+  type ModuleTransitionInfo,
+} from '#screens/WebCardScreen/WebCardEditTransition';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import Text from '#ui/Text';
@@ -36,19 +40,36 @@ import WebCardEditScreenScrollView from './WebCardEditScreenScrollView';
 import WebCardScreenEditModeFooter, {
   WEBCARD_SCREEN_EDIT_MODE_FOOTER_HEIGHT,
 } from './WebCardScreenEditModeFooter';
-import type { RelayScreenProps } from '#helpers/relayScreen';
-import type { WebCardEditScreenQuery } from '#relayArtifacts/WebCardEditScreenQuery.graphql';
-import type { WebCardEditRoute, WebCardRoute } from '#routes';
+import type { WebCardEditScreen_webCard$key } from '#relayArtifacts/WebCardEditScreen_webCard.graphql';
 import type { ChildPositionAwareScrollViewHandle } from '#ui/ChildPositionAwareScrollView';
 import type {
   ModuleSelectionInfos,
   WebCardEditScreenBodyHandle,
 } from './WebCardEditScreenBody';
+import type { DerivedValue } from 'react-native-reanimated';
 
-const query = graphql`
-  query WebCardEditScreenQuery($webCardId: ID!) {
-    node(id: $webCardId) {
-      ... on WebCard {
+type WebCardEditScreenProps = {
+  webCard: WebCardEditScreen_webCard$key;
+  fromCreation: boolean;
+  editing: boolean;
+  editTransition: DerivedValue<number>;
+  scrollViewRef: React.RefObject<ChildPositionAwareScrollViewHandle>;
+  transitionInfos: Record<string, ModuleTransitionInfo> | null;
+  onDone: () => void;
+};
+
+const WebCardEditScreen = ({
+  webCard: webCardKey,
+  editing,
+  fromCreation,
+  scrollViewRef,
+  editTransition,
+  transitionInfos,
+  onDone,
+}: WebCardEditScreenProps) => {
+  const webCard = useFragment(
+    graphql`
+      fragment WebCardEditScreen_webCard on WebCard {
         id
         userName
         coverBackgroundColor
@@ -61,94 +82,24 @@ const query = graphql`
         cardModules {
           id
         }
+        ...WebCardEditScreenHeader_webCard
+        ...CoverRenderer_webCard
+        ...WebCardEditScreenBody_webCard
+        ...WebCardScreenEditModeFooter_webCard
+        ...WebCardEditScreenFooter_webCard
+        ...PreviewModal_webCard
+        ...LoadCardTemplateModal_webCard
+        ...WebCardColorPicker_webCard
+        ...AddModuleSectionModal_webCard
       }
-      ...WebCardEditScreenHeader_webCard
-      ...CoverRenderer_webCard
-      ...WebCardEditScreenBody_webCard
-      ...WebCardScreenEditModeFooter_webCard
-      ...WebCardEditScreenFooter_webCard
-      ...PreviewModal_webCard
-      ...LoadCardTemplateModal_webCard
-      ...WebCardColorPicker_webCard
-      ...AddModuleSectionModal_webCard
-    }
-  }
-`;
+    `,
+    webCardKey,
+  );
 
-const WebCardEditScreen = ({
-  preloadedQuery,
-  route: {
-    params: { fromCreation, scrollPosition },
-  },
-}: RelayScreenProps<WebCardEditRoute, WebCardEditScreenQuery>) => {
-  const data = usePreloadedQuery(query, preloadedQuery);
-  const webCard = data.node;
-
-  const scrollViewRef = useRef<ChildPositionAwareScrollViewHandle>(null);
-
-  useEffect(() => {
-    let timeout: any;
-    if (scrollPosition) {
-      timeout = setTimeout(() => {
-        scrollViewRef.current?.scrollToChild({
-          childId: scrollPosition.moduleId,
-          y: 0,
-          animated: false,
-        });
-      }, 100);
-    }
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, [scrollPosition]);
+  useSuspendUntilAppear(!editing);
 
   // #region Routing
   const router = useRouter();
-
-  const onDone = useCallback(async () => {
-    const scrollPosition = await scrollViewRef.current?.getScrollPosition();
-    const scrollPositionParam = scrollPosition
-      ? {
-          moduleId: scrollPosition.childId,
-          y: scrollPosition.y,
-        }
-      : undefined;
-    const routerState = router.getCurrentRouterState();
-    const previousRoute = routerState?.stack[routerState?.stack.length - 2];
-    if (
-      previousRoute?.kind === 'route' &&
-      previousRoute?.state.route === 'WEBCARD'
-    ) {
-      const webCardRoute = previousRoute.state as WebCardRoute;
-      const id = previousRoute.id;
-      router.splice(
-        {
-          // @ts-expect-error id is voluntary not typed in the route type
-          // this is a hack to avoid having to communicate the id of the webcard in two different ways
-          id,
-          route: 'WEBCARD',
-          params: {
-            ...webCardRoute.params,
-            scrollPosition: scrollPositionParam,
-            fromEditing: true,
-          },
-        },
-        2,
-      );
-      return;
-    }
-    if (webCard && webCard.userName) {
-      router.replace({
-        route: 'WEBCARD',
-        params: {
-          webCardId: webCard.id,
-          userName: webCard.userName,
-          scrollPosition: scrollPositionParam,
-          fromEditing: true,
-        },
-      });
-    }
-  }, [router, webCard]);
 
   const prefetchRoute = usePrefetchRoute();
   const environment = useRelayEnvironment();
@@ -380,6 +331,7 @@ const WebCardEditScreen = ({
           onSelectAllModules={onSelectAllModules}
           onUnSelectAllModules={onUnSelectAllModules}
           disabledButtons={showWebCardColorPicker}
+          editTransition={editTransition}
         />
       </Suspense>
       <WebCardEditScreenScrollView
@@ -395,6 +347,7 @@ const WebCardEditScreen = ({
           </Suspense>
         }
         editFooterHeight={WEBCARD_SCREEN_EDIT_MODE_FOOTER_HEIGHT}
+        style={[StyleSheet.absoluteFill, { opacity: transitionInfos ? 0 : 1 }]}
       >
         <WebCardEditBlockContainer
           id="cover"
@@ -406,7 +359,7 @@ const WebCardEditScreen = ({
           <CoverRenderer
             webCard={webCard}
             width={windowWidth}
-            canPlay
+            canPlay={editing}
             large
             useAnimationSnapshot
           />
@@ -418,8 +371,17 @@ const WebCardEditScreen = ({
           onEditModule={onEditModule}
           onSelectionStateChange={onSelectionStateChange}
           selectionModeTransition={selectionModeTransition}
+          editing={editing}
         />
       </WebCardEditScreenScrollView>
+      {transitionInfos &&
+        Object.entries(transitionInfos).map(([id, info]) => (
+          <WebCardModuleTransitionSnapshotRenderer
+            key={id}
+            info={info}
+            editTransition={editTransition}
+          />
+        ))}
       <Suspense fallback={null}>
         <WebCardEditScreenFooter
           selectionMode={selectionMode}
@@ -427,6 +389,7 @@ const WebCardEditScreen = ({
           hasSelectedModules={nbSelectedModules > 0}
           selectionContainsHiddenModules={selectionContainsHiddenModules}
           webCard={webCard}
+          editTransition={editTransition}
           onRequestNewModule={onRequestNewModule}
           onRequestColorPicker={openWebCardColorPicker}
           onRequestWebCardStyle={openCardStyleModal}
@@ -466,13 +429,4 @@ const WebCardEditScreen = ({
     </Container>
   );
 };
-export default relayScreen(WebCardEditScreen, {
-  query,
-  getVariables: ({ webCardId }) => ({
-    webCardId,
-  }),
-  getScreenOptions: () => ({
-    stackAnimation: 'fade',
-    transitionDuration: 220,
-  }),
-});
+export default WebCardEditScreen;

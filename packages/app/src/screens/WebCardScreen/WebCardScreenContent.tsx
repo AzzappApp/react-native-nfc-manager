@@ -5,6 +5,10 @@ import {
   StyleSheet,
   Animated as RNAnimated,
 } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  type DerivedValue,
+} from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
@@ -14,10 +18,12 @@ import { useRouter } from '#components/NativeRouter';
 import WebCardBackground from '#components/WebCardBackgroundPreview';
 import useScreenInsets from '#hooks/useScreenInsets';
 import useCoverPlayPermission from '#screens/HomeScreen/useCoverPlayPermission';
+import WebCardEditScreen from '#screens/WebCardEditScreen/WebCardEditScreen';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import ChildPositionAwareScrollView from '#ui/ChildPositionAwareScrollView';
 import FloatingIconButton from '#ui/FloatingIconButton';
 import WebCardBlockContainer from './WebCardBlockContainer';
+import { type ModuleTransitionInfo } from './WebCardEditTransition';
 import WebCardScreenBody from './WebCardScreenBody';
 import type { WebCardScreenContent_webCard$key } from '#relayArtifacts/WebCardScreenContent_webCard.graphql';
 import type { ChildPositionAwareScrollViewHandle } from '#ui/ChildPositionAwareScrollView';
@@ -33,15 +39,40 @@ type WebCardScreenContentProps = {
    */
   ready: boolean;
   /**
+   * A ref for the scroll view.
+   */
+  scrollViewRef: React.RefObject<ChildPositionAwareScrollViewHandle>;
+  /**
+   * A ref for the WebCardEditScreen scroll view.
+   */
+  editScrollViewRef: React.RefObject<ChildPositionAwareScrollViewHandle>;
+  /**
+   * Wether the WebCardScreen is displayed from the creation screen.
+   */
+  fromCreation: boolean;
+  /**
+   * Wether the user can edit the webcard or not.
+   */
+  canEdit: boolean;
+  /**
+   * Wether the edit screen is displayed or not
+   */
+  editing: boolean;
+  /**
+   * Represent the transition between the edit and the webcard screen
+   */
+  editTransition: DerivedValue<number>;
+  transitionInfos: Record<string, ModuleTransitionInfo> | null;
+  /**
    * A callback called when the user scroll the content.
    * (only called when the user is at the top or is not at the top anymore)
    * @param atTop true if the user is at the top of the content. false otherwise.
    */
   onContentPositionChange?: (atTop: boolean) => void;
   /**
-   * A ref for the scroll view.
+   * A callback called when the user is done editing the webcard.
    */
-  scrollViewRef: React.Ref<ChildPositionAwareScrollViewHandle>;
+  onEditDone: () => void;
 };
 
 /**
@@ -50,8 +81,15 @@ type WebCardScreenContentProps = {
 const WebCardScreenContent = ({
   webCard: webCardKey,
   ready,
-  onContentPositionChange,
+  editScrollViewRef,
   scrollViewRef,
+  canEdit,
+  fromCreation,
+  editTransition,
+  editing,
+  transitionInfos,
+  onContentPositionChange,
+  onEditDone,
 }: WebCardScreenContentProps) => {
   // #region Data
 
@@ -69,15 +107,16 @@ const WebCardScreenContent = ({
       fragment WebCardScreenContent_webCard on WebCard {
         id
         userName
-        ...CoverRenderer_webCard
-        ...WebCardScreenBody_webCard
-        ...WebCardBackgroundPreview_webCard
         coverBackgroundColor
         cardColors {
           primary
           dark
           light
         }
+        ...CoverRenderer_webCard
+        ...WebCardScreenBody_webCard
+        ...WebCardBackgroundPreview_webCard
+        ...WebCardEditScreen_webCard
       }
     `,
     webCardKey,
@@ -125,80 +164,107 @@ const WebCardScreenContent = ({
 
   const inset = useScreenInsets();
 
+  const editScreenStyle = useAnimatedStyle(() => ({
+    opacity: editTransition.value > 0 ? 1 : 0,
+  }));
+
+  const closeButtonStyles = useAnimatedStyle(() => ({
+    opacity: 1 - editTransition.value,
+  }));
+
   return (
-    <>
-      <View style={styles.flex}>
-        <View style={styles.background}>
-          <Suspense
-            fallback={
-              <View
-                style={{
-                  flex: 1,
-                  backgroundColor: coverBackgroundColor,
-                }}
-              />
-            }
-          >
-            <WebCardBackground webCard={webCard} style={styles.flex} />
-          </Suspense>
-        </View>
-        <Suspense>
-          <View style={[styles.closeButton, { top: inset.top }]}>
-            <FloatingIconButton
-              icon="arrow_down"
-              onPress={onClose}
-              iconSize={30}
-              variant="grey"
-              iconStyle={{ tintColor: colors.white }}
+    <View style={styles.flex}>
+      <View style={styles.background}>
+        <Suspense
+          fallback={
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: coverBackgroundColor,
+              }}
             />
-          </View>
-        </Suspense>
-        <ChildPositionAwareScrollView
-          ref={scrollViewRef}
-          style={{ flex: 1 }}
-          contentContainerStyle={{
-            flexGrow: 1,
-          }}
-          contentInsetAdjustmentBehavior="never"
-          scrollToOverflowEnabled
-          scrollEventThrottle={16}
-          onMomentumScrollEnd={onMomentumScrollEnd}
-          renderScrollView={({ onScroll, ...props }) => (
-            <RNAnimated.ScrollView onScroll={wrapScroll(onScroll)} {...props} />
-          )}
+          }
         >
-          <WebCardBlockContainer id="cover">
-            <CoverRenderer
-              webCard={webCard}
-              width={windowWidth}
-              canPlay={ready && canPlay}
-              paused={paused}
-              large
-              useAnimationSnapshot
-            />
-          </WebCardBlockContainer>
-          <Suspense
-            fallback={
-              <View
-                style={{
-                  height: 60,
-                  maxHeight: windowHeight - windowWidth / COVER_RATIO,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
-              >
-                <ActivityIndicator />
-              </View>
-            }
-          >
-            <WebCardScreenBody
-              webCard={webCard}
-              scrollPosition={scrollPosition}
-            />
-          </Suspense>
-        </ChildPositionAwareScrollView>
+          <WebCardBackground webCard={webCard} style={styles.flex} />
+        </Suspense>
       </View>
-    </>
+      <Suspense>
+        <Animated.View
+          style={[styles.closeButton, { top: inset.top }, closeButtonStyles]}
+        >
+          <FloatingIconButton
+            icon="arrow_down"
+            onPress={onClose}
+            iconSize={30}
+            variant="grey"
+            iconStyle={{ tintColor: colors.white }}
+          />
+        </Animated.View>
+      </Suspense>
+      <ChildPositionAwareScrollView
+        ref={scrollViewRef}
+        style={{ flex: 1 }}
+        contentContainerStyle={{
+          flexGrow: 1,
+        }}
+        contentInsetAdjustmentBehavior="never"
+        scrollToOverflowEnabled
+        scrollEventThrottle={16}
+        onMomentumScrollEnd={onMomentumScrollEnd}
+        renderScrollView={({ onScroll, ...props }) => (
+          <RNAnimated.ScrollView onScroll={wrapScroll(onScroll)} {...props} />
+        )}
+      >
+        <WebCardBlockContainer id="cover">
+          <CoverRenderer
+            webCard={webCard}
+            width={windowWidth}
+            canPlay={ready && canPlay && !editing}
+            paused={paused}
+            large
+            useAnimationSnapshot
+          />
+        </WebCardBlockContainer>
+        <Suspense
+          fallback={
+            <View
+              style={{
+                height: 60,
+                maxHeight: windowHeight - windowWidth / COVER_RATIO,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <ActivityIndicator />
+            </View>
+          }
+        >
+          <WebCardScreenBody
+            webCard={webCard}
+            scrollPosition={scrollPosition}
+            editing={editing}
+          />
+        </Suspense>
+      </ChildPositionAwareScrollView>
+      {canEdit && (
+        <Suspense>
+          <Animated.View
+            style={[StyleSheet.absoluteFill, editScreenStyle]}
+            pointerEvents={editing ? 'auto' : 'none'}
+          >
+            <WebCardEditScreen
+              webCard={webCard}
+              editTransition={editTransition}
+              fromCreation={fromCreation}
+              scrollViewRef={editScrollViewRef}
+              transitionInfos={transitionInfos}
+              editing={editing}
+              onDone={onEditDone}
+            />
+          </Animated.View>
+        </Suspense>
+      )}
+    </View>
   );
 };
 

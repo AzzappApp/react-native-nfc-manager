@@ -31,6 +31,7 @@ const CardModuleMediaTextAlternation = ({
   setEditableItemIndex,
   scrollPosition,
   modulePosition,
+  canPlay,
 }: CardModuleMediaTextAlternationProps) => {
   const screenDimension = useScreenDimensions();
   const dimension = providedDimension ?? screenDimension;
@@ -61,6 +62,7 @@ const CardModuleMediaTextAlternation = ({
             scrollPosition={scrollPosition}
             modulePosition={modulePosition}
             index={index}
+            canPlay={canPlay}
           />
         );
       })}
@@ -74,6 +76,7 @@ const AlternationItem = ({
   dimension,
   displayMode,
   cardStyle,
+  canPlay,
   setEditableItemIndex,
   scrollPosition,
   modulePosition,
@@ -84,6 +87,7 @@ const AlternationItem = ({
   dimension: CardModuleDimension;
   displayMode: 'desktop' | 'edit' | 'mobile';
   cardStyle?: CardStyle | null;
+  canPlay: boolean;
   setEditableItemIndex?: (index: number) => void;
   scrollPosition: Animated.Value;
   modulePosition?: number;
@@ -114,6 +118,7 @@ const AlternationItem = ({
         cardStyle={cardStyle}
         index={index}
         parentY={parentY}
+        canPlay={canPlay}
       >
         <View style={styles.bottomContainer}>
           <Text

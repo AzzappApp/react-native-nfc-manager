@@ -30,6 +30,7 @@ const CardModuleMediaTextParallax = ({
   modulePosition,
   onLayout,
   cardStyle,
+  canPlay,
   setEditableItemIndex,
 }: CardModuleMediaTextParallaxProps) => {
   const screenDimension = useScreenDimensions();
@@ -60,6 +61,7 @@ const CardModuleMediaTextParallax = ({
             scrollPosition={scrollPosition}
             modulePosition={modulePosition}
             displayMode={displayMode}
+            canPlay={canPlay}
           />
         );
       })}
@@ -76,6 +78,7 @@ const ParallaxItem = ({
   setEditableItemIndex,
   scrollPosition,
   modulePosition,
+  canPlay,
   displayMode,
 }: {
   cardModuleMedia: CardModuleMedia;
@@ -86,6 +89,7 @@ const ParallaxItem = ({
   setEditableItemIndex?: (index: number) => void;
   scrollPosition: Animated.Value;
   modulePosition?: number;
+  canPlay: boolean;
   displayMode: 'desktop' | 'edit' | 'mobile';
 }) => {
   const onPress = useCallback(() => {
@@ -100,6 +104,7 @@ const ParallaxItem = ({
         dimension={dimension}
         media={cardModuleMedia.media}
         index={index}
+        canPlay={canPlay}
         disableParallax={displayMode !== 'mobile'}
         imageStyle={styles.opacityImage}
         imageContainerStyle={{ backgroundColor: cardModuleColor.background }}

@@ -37,6 +37,7 @@ const CardModuleMediaTextLinkAlternation = ({
   scrollPosition,
   modulePosition,
   moduleEditing,
+  canPlay,
 }: CardModuleMediaTextLinkAlternationProps) => {
   const screenDimension = useScreenDimensions();
   const dimension = providedDimension ?? screenDimension;
@@ -68,6 +69,7 @@ const CardModuleMediaTextLinkAlternation = ({
             modulePosition={modulePosition}
             index={index}
             moduleEditing={moduleEditing}
+            canPlay={canPlay}
           />
         );
       })}
@@ -86,6 +88,7 @@ type AlternationItemProps = {
   modulePosition?: number;
   index: number;
   moduleEditing: boolean;
+  canPlay: boolean;
 };
 
 const AlternationItem = ({
@@ -99,6 +102,7 @@ const AlternationItem = ({
   modulePosition,
   index,
   moduleEditing,
+  canPlay,
 }: AlternationItemProps) => {
   const styles = useStyleSheet(stylesheet);
   const [parentY, setParentY] = useState(0);
@@ -138,6 +142,7 @@ const AlternationItem = ({
         cardStyle={cardStyle}
         index={index}
         parentY={parentY}
+        canPlay={canPlay}
       >
         <View style={styles.bottomContainer}>
           <Text

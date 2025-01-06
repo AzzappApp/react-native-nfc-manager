@@ -18,6 +18,7 @@ type AlternationContainerProps = ViewProps & {
     width: number;
     height: number;
   };
+  canPlay: boolean;
   borderRadius?: number;
   media: CardModuleSourceMedia;
   cardStyle: CardStyle | null | undefined;
@@ -45,6 +46,7 @@ const AlternationContainer = ({
   scrollY,
   modulePosition,
   parentY,
+  canPlay,
   ...props
 }: AlternationContainerProps) => {
   const styles = useVariantStyleSheet(
@@ -195,13 +197,21 @@ const AlternationContainer = ({
     >
       {displayMode !== 'desktop' || index % 2 === 0 ? (
         <Animated.View style={imageContainerStyle}>
-          <MediaItemRenderer media={media} dimension={imageDimension} />
+          <MediaItemRenderer
+            media={media}
+            dimension={imageDimension}
+            canPlay={canPlay}
+          />
         </Animated.View>
       ) : null}
       <View style={{ width: mediaWidth }}>{children}</View>
       {displayMode === 'desktop' && index % 2 === 1 ? (
         <Animated.View style={imageContainerStyle}>
-          <MediaItemRenderer media={media} dimension={imageDimension} />
+          <MediaItemRenderer
+            media={media}
+            dimension={imageDimension}
+            canPlay={canPlay}
+          />
         </Animated.View>
       ) : null}
     </View>

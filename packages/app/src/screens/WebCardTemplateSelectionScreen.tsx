@@ -59,15 +59,15 @@ const WebCardTemplateSelectionScreen = ({
   const cardTemplateListRef = useRef<CardTemplateListHandle>(null);
   const router = useRouter();
   const onDone = useCallback(() => {
-    if (!profile || !profile.webCard) {
+    if (!profile?.webCard?.userName) {
       return;
     }
     const {
-      webCard: { id: webCardId },
+      webCard: { id: webCardId, userName },
     } = profile;
     router.replace({
-      route: 'WEBCARD_EDIT',
-      params: { webCardId },
+      route: 'WEBCARD',
+      params: { webCardId, userName, editing: true },
     });
   }, [profile, router]);
 

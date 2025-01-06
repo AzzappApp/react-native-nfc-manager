@@ -26,12 +26,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
-import {
-  graphql,
-  useMutation,
-  usePreloadedQuery,
-  useRelayEnvironment,
-} from 'react-relay';
+import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
 import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import {
@@ -48,7 +43,6 @@ import {
   profileInfoIsOwner,
 } from '#helpers/profileRoleHelper';
 import relayScreen from '#helpers/relayScreen';
-import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import useAnimatedState from '#hooks/useAnimatedState';
 import useBoolean from '#hooks/useBoolean';
@@ -60,6 +54,7 @@ import useToggleFollow from '#hooks/useToggleFollow';
 import Container from '#ui/Container';
 import AddContactModal from './AddContactModal';
 import WebCardBackground from './WebCardBackground';
+import { useWebCardEditTransition } from './WebCardEditTransition';
 import WebCardPostsList from './WebCardPostsList';
 import WebCardScreenButtonBar from './WebCardScreenButtonBar';
 import WebCardScreenContent from './WebCardScreenContent';
@@ -69,8 +64,6 @@ import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { WebCardScreenByIdQuery } from '#relayArtifacts/WebCardScreenByIdQuery.graphql';
 import type { WebCardScreenByUserNameQuery } from '#relayArtifacts/WebCardScreenByUserNameQuery.graphql';
 import type { WebCardRoute } from '#routes';
-import type { ChildPositionAwareScrollViewHandle } from '#ui/ChildPositionAwareScrollView';
-import type { Disposable } from 'react-relay';
 /**
  * Display a Web card.
  */
@@ -99,22 +92,6 @@ const WebCardScreen = ({
   const isWebCardOwner = isViewer && profileInfoIsOwner(profileInfos);
   const canEdit = isViewer && profileInfoHasEditorRight(profileInfos);
   const isAdmin = isViewer && profileInfoHasAdminRight(profileInfos);
-
-  const prefetchRoute = usePrefetchRoute();
-  const environment = useRelayEnvironment();
-  useEffect(() => {
-    if (!data.webCard?.id || !canEdit) {
-      return () => {};
-    }
-    const disposable: Disposable = prefetchRoute(environment, {
-      route: 'WEBCARD_EDIT',
-      params: { webCardId: data.webCard.id },
-    });
-
-    return () => {
-      disposable.dispose();
-    };
-  }, [prefetchRoute, canEdit, environment, data.webCard?.id]);
 
   const scannedContactCard = useRef<string | null>(null);
 
@@ -312,46 +289,20 @@ const WebCardScreen = ({
     runOnJS(setShowPost)(res);
   }, [manualFlip, flip]);
 
-  const scrollViewRef = useRef<ChildPositionAwareScrollViewHandle>(null);
-
-  const scrollPosition = params.scrollPosition;
-  useEffect(() => {
-    let timeout: any;
-    if (scrollPosition) {
-      timeout = setTimeout(() => {
-        scrollViewRef.current?.scrollToChild({
-          childId: scrollPosition.moduleId,
-          y: 0,
-          animated: false,
-        });
-      }, 100);
-    }
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, [scrollPosition]);
-
   // #end region
 
-  const onEdit = useCallback(async () => {
+  //#region Edit
+  const {
+    editing,
+    editTransition,
+    transitionInfos,
+    scrollViewRef,
+    editScrollViewRef,
+    toggleEditing,
+  } = useWebCardEditTransition((canEdit && params.editing) ?? false);
+  const onEdit = useCallback(() => {
     if (profileInfoHasEditorRight(profileInfos)) {
-      if (!data.webCard?.id) {
-        return;
-      }
-      const scrollPosition = await scrollViewRef.current?.getScrollPosition();
-      router.push({
-        route: 'WEBCARD_EDIT',
-        params: {
-          webCardId: data.webCard.id,
-          fromCreation: false,
-          scrollPosition: scrollPosition
-            ? {
-                moduleId: scrollPosition.childId,
-                y: scrollPosition.y,
-              }
-            : null,
-        },
-      });
+      toggleEditing();
     } else {
       Toast.show({
         type: 'error',
@@ -362,7 +313,12 @@ const WebCardScreen = ({
         }),
       });
     }
-  }, [profileInfos, router, data.webCard?.id, intl]);
+  }, [intl, profileInfos, toggleEditing]);
+
+  const onEditDone = useCallback(() => {
+    toggleEditing();
+  }, [toggleEditing]);
+  //#endregion
 
   if (!data.webCard || !data.profile?.webCard) {
     return null;
@@ -380,8 +336,15 @@ const WebCardScreen = ({
               <WebCardScreenContent
                 ready={ready}
                 webCard={data.webCard}
-                onContentPositionChange={onContentPositionChange}
+                editScrollViewRef={editScrollViewRef}
                 scrollViewRef={scrollViewRef}
+                canEdit={canEdit}
+                fromCreation={!!params.fromCreation}
+                editing={editing}
+                editTransition={editTransition}
+                onContentPositionChange={onContentPositionChange}
+                onEditDone={onEditDone}
+                transitionInfos={transitionInfos}
               />
             </Container>
           </Animated.View>
@@ -414,6 +377,8 @@ const WebCardScreen = ({
         onToggleFollow={toggleFollow}
         onFlip={toggleFlip}
         onShowWebcardModal={onShowWebcardModal}
+        editing={editing}
+        editTransition={editTransition}
       />
       <Suspense>
         <AddContactModal
@@ -435,10 +400,7 @@ const WebCardScreen = ({
         />
       </Suspense>
       <Suspense>
-        <WebCardScreenPublishHelper
-          webCard={data.webCard}
-          hasEdited={!!params.fromEditing}
-        />
+        <WebCardScreenPublishHelper webCard={data.webCard} editing={editing} />
       </Suspense>
     </View>
   );

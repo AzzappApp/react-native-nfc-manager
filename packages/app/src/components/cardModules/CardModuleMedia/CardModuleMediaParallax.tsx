@@ -24,6 +24,7 @@ const CardModuleMediaParallax = ({
   displayMode,
   onLayout,
   cardModuleMedias,
+  canPlay,
   dimension: providedDimension,
   setEditableItemIndex,
 }: CardModuleMediaParallaxProps & {}) => {
@@ -46,6 +47,7 @@ const CardModuleMediaParallax = ({
             dimension={dimension}
             index={index}
             displayMode={displayMode}
+            canPlay={canPlay}
             setEditableItemIndex={setEditableItemIndex}
             scrollPosition={scrollPosition}
             modulePosition={modulePosition}
@@ -63,6 +65,7 @@ const ParallaxItem = ({
   scrollPosition,
   modulePosition,
   displayMode,
+  canPlay,
   setEditableItemIndex,
 }: {
   media: CardModuleSourceMedia;
@@ -71,6 +74,7 @@ const ParallaxItem = ({
   scrollPosition: RNAnimated.Value;
   displayMode: 'desktop' | 'edit' | 'mobile';
   modulePosition?: number;
+  canPlay: boolean;
   setEditableItemIndex?: (index: number) => void;
 }) => {
   const onPress = useCallback(() => {
@@ -86,6 +90,7 @@ const ParallaxItem = ({
         scrollY={scrollPosition}
         modulePosition={modulePosition}
         disableParallax={displayMode !== 'mobile'}
+        canPlay={canPlay}
       />
     </CardModulePressableTool>
   );

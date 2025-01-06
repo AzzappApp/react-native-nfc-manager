@@ -6,6 +6,11 @@ import type { ViewStyle } from 'react-native';
 
 type CardModuleMediaItemProps = {
   media: CardModuleSourceMedia;
+
+  /**
+   * Wether the media can be played or not
+   */
+  canPlay: boolean;
   /**
    *
    * display media dimension
@@ -23,6 +28,7 @@ const CardModuleMediaItem = ({
   media,
   dimension,
   imageStyle,
+  canPlay,
 }: CardModuleMediaItemProps) => {
   const kind = getCardModuleMediaKind(media);
   return kind === 'image' ? (
@@ -50,7 +56,7 @@ const CardModuleMediaItem = ({
         ...imageStyle,
       }}
       thumbnailURI={media.thumbnail}
-      videoEnabled
+      videoEnabled={canPlay}
       paused={false}
       muted
     />

@@ -28,7 +28,7 @@ const CardModuleMediaEditPreview = ({
   }
 
   if (!media.uri.startsWith('file://')) {
-    return <CardModuleMediaItem media={media} dimension={dimension} />;
+    return <CardModuleMediaItem media={media} dimension={dimension} canPlay />;
   }
 
   const { width: itemWidth, height: itemHeight } = dimension;

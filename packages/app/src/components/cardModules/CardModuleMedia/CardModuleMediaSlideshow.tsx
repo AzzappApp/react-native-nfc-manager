@@ -31,6 +31,7 @@ const CardModuleMediaSlideshow = ({
   cardStyle,
   displayMode,
   dimension,
+  canPlay,
   setEditableItemIndex,
 }: CardModuleMediaSlideshowProps) => {
   const scrollIndex = useSharedValue(0);
@@ -67,6 +68,7 @@ const CardModuleMediaSlideshow = ({
             itemWidth={itemWidth}
             borderRadius={cardStyle?.borderRadius ?? 0}
             gap={cardStyle?.gap}
+            canPlay={canPlay}
           />
         </CardModulePressableTool>
       );
@@ -76,6 +78,7 @@ const CardModuleMediaSlideshow = ({
       scrollIndex,
       offset,
       itemWidth,
+      canPlay,
       cardStyle?.borderRadius,
       cardStyle?.gap,
     ],
@@ -182,6 +185,7 @@ type SlideshowItemProps = {
   itemWidth: number;
   gap?: number;
   borderRadius?: number;
+  canPlay: boolean;
 };
 
 //using memo(SlideshowItem) will require a custom isEqual function as there is media shallow comparison to do on cardModuleMedia
@@ -193,6 +197,7 @@ const SlideshowItem = ({
   itemWidth,
   gap = 0,
   borderRadius = 0,
+  canPlay,
 }: SlideshowItemProps) => {
   const animatedStyle = useAnimatedStyle(() => {
     const interpolateScale = interpolate(
@@ -236,6 +241,7 @@ const SlideshowItem = ({
     <Animated.View style={[styles.imageContainer, animatedStyle]}>
       <MediaItemRenderer
         media={media}
+        canPlay={canPlay}
         dimension={{ width: itemWidth, height: itemWidth }}
       />
     </Animated.View>

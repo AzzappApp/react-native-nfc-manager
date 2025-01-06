@@ -97,23 +97,8 @@ export type WebCardRoute = {
     showPosts?: boolean;
     contactData?: string | null;
     additionalContactData?: Pick<ContactCard, 'socials' | 'urls'>;
-    scrollPosition?: {
-      moduleId: string;
-      y: number;
-    } | null;
-    fromEditing?: boolean;
-  };
-};
-
-export type WebCardEditRoute = {
-  route: 'WEBCARD_EDIT';
-  params: {
-    webCardId: string;
     fromCreation?: boolean;
-    scrollPosition?: {
-      moduleId: string;
-      y: number;
-    } | null;
+    editing?: boolean;
   };
 };
 
@@ -321,7 +306,6 @@ export type Route =
   | SignInRoute
   | SignUpRoute
   | UserPayWallRoute
-  | WebCardEditRoute
   | WebCardFormRoute
   | WebCardKindSelectionRoute
   | WebCardParametersRoute

@@ -67,6 +67,10 @@ export type CardModuleVariantType = {
    * The dimension of the container
    * */
   dimension: CardModuleDimension;
+  /**
+   * Wether the video of the media are allowed to play
+   */
+  canPlay: boolean;
   /* 
   callback when a item renderer is pressed, return the index of the item in case of list 
   */
@@ -115,6 +119,10 @@ export type CommonModuleRendererProps<T, V extends ModuleKindHasVariants> = {
   scrollPosition?: RNAnimated.Value;
 
   modulePosition?: number;
+  /**
+   * Wether the video of the media are allowed to play
+   */
+  canPlay: boolean;
 
   onLayout?: (event: LayoutChangeEvent) => void;
   /* 

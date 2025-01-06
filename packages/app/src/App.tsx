@@ -108,7 +108,6 @@ import SignInScreen from '#screens/SignInScreen';
 import SignUpScreen from '#screens/SignUpScreen';
 import UpdateApplicationScreen from '#screens/UpdateApplicationScreen';
 import UserPayWallScreen from '#screens/UserPayWallScreen';
-import WebCardEditScreen from '#screens/WebCardEditScreen/WebCardEditScreen';
 import WebCardFormScreen from '#screens/WebCardFormScreen';
 import WebCardKindSelectionScreen from '#screens/WebCardKindSelectionScreen';
 import WebCardParametersScreen from '#screens/WebCardParametersScreen';
@@ -259,7 +258,6 @@ const screens = {
   SEARCH: SearchScreen,
   USER_PAY_WALL: UserPayWallScreen,
   WEBCARD: WebCardScreen,
-  WEBCARD_EDIT: WebCardEditScreen,
   WEBCARD_PARAMETERS: WebCardParametersScreen,
   WEBCARD_KIND_SELECTION: WebCardKindSelectionScreen,
   WEBCARD_FORM: WebCardFormScreen,

@@ -34,6 +34,10 @@ export type WebCardEditScreenFooterProps = {
    */
   selectionModeTransition: DerivedValue<number>;
   /**
+   * The transition value for the edit animation
+   */
+  editTransition: DerivedValue<number>;
+  /**
    * A callback called when the user switch the edit mode display mode
    */
   onRequestPreview: () => void;
@@ -69,6 +73,7 @@ const WebCardEditScreenFooter = ({
   hasSelectedModules,
   selectionContainsHiddenModules,
   selectionModeTransition,
+  editTransition,
   onRequestPreview,
   onRequestNewModule,
   onRequestColorPicker,
@@ -168,6 +173,12 @@ const WebCardEditScreenFooter = ({
 
   const bottomMenuStyle = useAnimatedStyle(() => ({
     opacity: 1 - selectionModeTransition.value,
+    transform: [
+      {
+        translateY:
+          (1 - editTransition.value) * (BOTTOM_MENU_HEIGHT + insets.bottom),
+      },
+    ],
   }));
 
   const selectionMenuStyle = useAnimatedStyle(() => ({

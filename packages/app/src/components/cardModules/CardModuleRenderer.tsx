@@ -130,6 +130,12 @@ export type CardModuleRendererProps<T extends ModuleRenderInfo> = ViewProps & {
    * The cover background color
    */
   coverBackgroundColor?: string | null | undefined;
+  /**
+   * Wether the video of the media are allowed to play
+   *
+   * @default true
+   */
+  canPlay?: boolean;
 
   /**
    * A React Native Animated value that represents the scroll position of the WebCard
@@ -149,6 +155,7 @@ const CardModuleRenderer = <T extends ModuleRenderInfo>({
   displayMode = 'mobile',
   scrollPosition,
   modulePosition,
+  canPlay = true,
   ...props
 }: CardModuleRendererProps<T>) => {
   const { width, height } = useScreenDimensions();
@@ -285,6 +292,7 @@ const CardModuleRenderer = <T extends ModuleRenderInfo>({
           }}
           scrollPosition={scrollPosition}
           modulePosition={modulePosition}
+          canPlay={canPlay}
         />
       );
     case 'mediaText':
@@ -299,6 +307,7 @@ const CardModuleRenderer = <T extends ModuleRenderInfo>({
           }}
           scrollPosition={scrollPosition}
           modulePosition={modulePosition}
+          canPlay={canPlay}
         />
       );
     case 'mediaTextLink':
@@ -313,6 +322,7 @@ const CardModuleRenderer = <T extends ModuleRenderInfo>({
           }}
           scrollPosition={scrollPosition}
           modulePosition={modulePosition}
+          canPlay={canPlay}
         />
       );
   }

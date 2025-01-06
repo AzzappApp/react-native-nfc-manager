@@ -26,13 +26,18 @@ export type ChildPositionAwareScrollViewProps = ScrollViewProps & {
 };
 
 export type ChildPositionAwareScrollViewHandle = {
-  getScrollPosition: () => Promise<{ childId: string; y: number } | null>;
-  scrollToChild: (args: {
-    childId: string;
-    y: number;
-    animated?: boolean;
-  }) => Promise<void>;
+  getTopChildId: () => Promise<string | null>;
+  scrollToChild: (childId: string) => Promise<void>;
   scrollTo: (args: { y: number; animated?: boolean }) => void;
+  getContentInfos: () => Promise<{
+    scrollY: number;
+    scrollViewLayout: LayoutRectangle;
+    childInfos: Array<{
+      childId: string;
+      layout: LayoutRectangle;
+      ref: View;
+    }>;
+  } | null>;
 };
 
 const ChildPositionAwareScrollView = (
@@ -66,7 +71,7 @@ const ChildPositionAwareScrollView = (
     [onScroll],
   );
 
-  const getScrollPosition = useCallback(async () => {
+  const getTopChildId = useCallback(async () => {
     const scrollView = scrollViewRef.current;
     if (!scrollView) {
       return null;
@@ -95,42 +100,31 @@ const ChildPositionAwareScrollView = (
     let currentDelta = Infinity;
     for (const child of childPositions) {
       const delta = scrollPosition - child.y;
-      if (delta > 0 && delta < currentDelta) {
+      if (delta >= 0 && delta < currentDelta) {
         currentChildId = child.childId;
         currentDelta = scrollPosition - child.y;
       }
     }
-    return currentChildId ? { childId: currentChildId, y: currentDelta } : null;
+    return currentChildId ?? null;
   }, []);
 
-  const scrollToChild = useCallback(
-    async ({
-      childId,
-      y,
-      animated = true,
-    }: {
-      childId: string;
-      y: number;
-      animated?: boolean;
-    }) => {
-      const scrollView = scrollViewRef.current;
-      if (!scrollView) {
-        return;
-      }
-      const view = scrollViewChildRefs.current[childId]?.current;
-      if (!view) {
-        return;
-      }
-      const childLayout = await measureLayout(view, scrollView);
-      const scrollPosition = childLayout.y + (y < childLayout.height ? y : 0);
-      scrollPositionRef.current = scrollPosition;
-      scrollView.scrollTo({
-        y: scrollPosition,
-        animated,
-      });
-    },
-    [],
-  );
+  const scrollToChild = useCallback(async (childId: string) => {
+    const scrollView = scrollViewRef.current;
+    if (!scrollView) {
+      return;
+    }
+    const view = scrollViewChildRefs.current[childId]?.current;
+    if (!view) {
+      return;
+    }
+    const childLayout = await measureLayout(view, scrollView);
+    const scrollPosition = childLayout.y;
+    scrollPositionRef.current = scrollPosition;
+    scrollView.scrollTo({
+      y: scrollPosition,
+      animated: false,
+    });
+  }, []);
 
   const scrollTo = useCallback(
     ({ y, animated = true }: { y: number; animated?: boolean }) => {
@@ -144,14 +138,58 @@ const ChildPositionAwareScrollView = (
     [],
   );
 
+  const getContentInfos = useCallback(async () => {
+    const scrollView = scrollViewRef.current;
+    if (!scrollView) {
+      return null;
+    }
+    const [scrollViewLayout, childInfos] = await Promise.all([
+      new Promise<LayoutRectangle>(resolve => {
+        (scrollView as unknown as View).measureInWindow(
+          (x, y, width, height) => {
+            resolve({
+              width,
+              height,
+              x,
+              y,
+            });
+          },
+        );
+      }),
+      Promise.all(
+        Object.entries(scrollViewChildRefs.current).map(
+          async ([childId, ref]) => {
+            const view = ref.current;
+            if (!view) {
+              return null;
+            }
+            return {
+              childId,
+              layout: await measureLayout(view, scrollView),
+              ref: view,
+            };
+          },
+        ),
+      ),
+    ]);
+
+    const scrollY = scrollPositionRef.current;
+    return {
+      scrollY,
+      scrollViewLayout,
+      childInfos: childInfos.filter(child => !!child),
+    };
+  }, []);
+
   useImperativeHandle(
     ref,
     () => ({
-      getScrollPosition,
+      getTopChildId,
       scrollToChild,
       scrollTo,
+      getContentInfos,
     }),
-    [getScrollPosition, scrollTo, scrollToChild],
+    [getTopChildId, scrollTo, getContentInfos, scrollToChild],
   );
 
   children = (

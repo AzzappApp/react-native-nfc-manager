@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -24,12 +24,12 @@ import type { WebCardScreenPublishHelperMutation } from '#relayArtifacts/WebCard
 
 type ProfileScreenPublishHelperProps = {
   webCard: WebCardScreenPublishHelper_webCard$key;
-  hasEdited: boolean;
+  editing: boolean;
 };
 
 const WebCardScreenPublishHelper = ({
   webCard: webCardKey,
-  hasEdited,
+  editing,
 }: ProfileScreenPublishHelperProps) => {
   const webCard = useFragment(
     graphql`
@@ -75,11 +75,13 @@ const WebCardScreenPublishHelper = ({
 
   const router = useRouter();
 
+  const editingRef = useRef(editing);
   useEffect(() => {
-    if (!cardIsPublished && hasEdited) {
+    if (!cardIsPublished && !editing && editingRef.current) {
       setShowPublishModal(true);
     }
-  }, [cardIsPublished, hasEdited]);
+    editingRef.current = editing;
+  }, [cardIsPublished, editing]);
 
   const onPublish = () => {
     if (requiresSubscription && !isPremium) {

@@ -1,6 +1,10 @@
 import { Suspense, useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Alert, StyleSheet, View } from 'react-native';
+import Animated, {
+  interpolate,
+  useAnimatedStyle,
+} from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
@@ -18,6 +22,7 @@ import Text from '#ui/Text';
 import type { WebCardScreenButtonBar_profile$key } from '#relayArtifacts/WebCardScreenButtonBar_profile.graphql';
 import type { WebCardScreenButtonBar_webCard$key } from '#relayArtifacts/WebCardScreenButtonBar_webCard.graphql';
 import type { ViewProps } from 'react-native';
+import type { DerivedValue } from 'react-native-reanimated';
 
 type WebCardScreenButtonBarProps = ViewProps & {
   /**
@@ -60,6 +65,14 @@ type WebCardScreenButtonBarProps = ViewProps & {
    * A callback called when the user press the more ... button
    */
   onShowWebcardModal: () => void;
+  /**
+   * Wether the edit screen is displayed or not
+   */
+  editing: boolean;
+  /**
+   * Represent the transition between the edit and the webcard screen
+   */
+  editTransition: DerivedValue<number>;
 };
 
 /**
@@ -77,15 +90,27 @@ const WebCardScreenButtonBar = ({
   onShowWebcardModal,
   onFlip,
   isWebCardDisplayed,
+  editing,
+  editTransition,
   style,
   ...props
 }: WebCardScreenButtonBarProps) => {
   const inset = useScreenInsets();
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: interpolate(
+        editTransition?.value ?? 0,
+        [0, 0.2, 0.8, 1],
+        [1, 0.1, 0.0, 0],
+      ),
+    };
+  });
 
   return (
-    <View
-      style={[styles.buttonBar, { bottom: inset.bottom }, style]}
+    <Animated.View
       {...props}
+      style={[styles.buttonBar, { bottom: inset.bottom }, style, animatedStyle]}
+      pointerEvents={editing ? 'none' : 'box-none'}
     >
       <BlurredFloatingIconButton
         icon="azzapp"
@@ -121,7 +146,7 @@ const WebCardScreenButtonBar = ({
         style={styles.auxiliaryButton}
         onPress={onFlip}
       />
-    </View>
+    </Animated.View>
   );
 };
 

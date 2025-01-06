@@ -23,6 +23,10 @@ export type WebCardScreenBodyProps = {
    * An Animated value representing the scroll position of the screen
    */
   scrollPosition: RNAnimated.Value;
+  /**
+   * Whether the card is being edited
+   */
+  editing: boolean;
 };
 
 /**
@@ -32,6 +36,7 @@ export type WebCardScreenBodyProps = {
 const WebCardScreenBody = ({
   webCard,
   scrollPosition,
+  editing,
 }: WebCardScreenBodyProps): any => {
   // #region Relay
   const { cardModules, cardColors, cardStyle, coverBackgroundColor } =
@@ -82,6 +87,7 @@ const WebCardScreenBody = ({
         scrollPosition={scrollPosition}
         displayMode="mobile"
         visible={module.visible}
+        canPlay={!editing}
       />
     );
   });
@@ -90,10 +96,12 @@ const WebCardScreenBody = ({
 const ModuleContainer = <T extends ModuleRenderInfo>({
   id,
   visible,
+  canPlay,
   ...props
 }: Omit<CardModuleRendererProps<T>, 'modulePosition'> & {
   id: string;
   visible: boolean;
+  canPlay: boolean;
 }) => {
   const { width: windowWith } = useScreenDimensions();
   const [modulePosition, setModulePosition] = useState(
@@ -118,7 +126,11 @@ const ModuleContainer = <T extends ModuleRenderInfo>({
         }
       }
     >
-      <CardModuleRenderer {...props} modulePosition={modulePosition} />
+      <CardModuleRenderer
+        {...props}
+        modulePosition={modulePosition}
+        canPlay={canPlay}
+      />
     </WebCardBlockContainer>
   );
 };

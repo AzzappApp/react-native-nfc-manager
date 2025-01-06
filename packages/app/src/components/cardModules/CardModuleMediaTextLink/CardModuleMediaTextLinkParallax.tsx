@@ -36,6 +36,7 @@ const CardModuleMediaTextLinkParallax = ({
   setEditableItemIndex,
   displayMode,
   moduleEditing,
+  canPlay,
 }: CardModuleMediaTextLinkParallaxProps) => {
   const screenDimension = useScreenDimensions();
   const dimension = providedDimension ?? screenDimension;
@@ -64,6 +65,7 @@ const CardModuleMediaTextLinkParallax = ({
             modulePosition={modulePosition}
             displayMode={displayMode}
             moduleEditing={moduleEditing}
+            canPlay={canPlay}
           />
         );
       })}
@@ -82,6 +84,7 @@ const ParallaxItem = ({
   modulePosition,
   displayMode,
   moduleEditing,
+  canPlay,
 }: {
   cardModuleMedia: CardModuleMedia;
   cardModuleColor: CardModuleColor;
@@ -94,6 +97,7 @@ const ParallaxItem = ({
   modulePosition?: number;
   displayMode: 'desktop' | 'edit' | 'mobile';
   moduleEditing: boolean;
+  canPlay: boolean;
 }) => {
   const styles = useStyleSheet(stylesheet);
   const onPress = useCallback(() => {
@@ -126,6 +130,7 @@ const ParallaxItem = ({
         imageContainerStyle={{
           backgroundColor: cardModuleColor.background,
         }}
+        canPlay={canPlay}
       >
         <View style={styles.textContainer}>
           <Text

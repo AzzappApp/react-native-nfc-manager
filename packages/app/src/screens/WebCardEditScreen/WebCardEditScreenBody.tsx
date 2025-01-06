@@ -81,6 +81,10 @@ export type WebCardEditScreenBodyProps = {
    */
   selectionModeTransition: DerivedValue<number>;
   /**
+   * Wether the edit screen is displayed
+   */
+  editing: boolean;
+  /**
    * A callback called when the user press a module block in edit mode
    */
   onEditModule: (module: ModuleKindWithVariant & { moduleId: string }) => void;
@@ -113,6 +117,7 @@ const WebCardEditScreenBody = (
     webCard,
     selectionMode,
     selectionModeTransition,
+    editing,
     onEditModule,
     onSelectionStateChange,
     onLoad,
@@ -721,6 +726,7 @@ const WebCardEditScreenBody = (
         coverBackgroundColor={coverBackgroundColor}
         scrollPosition={scrollPosition}
         selectionModeTransition={selectionModeTransition}
+        editing={editing}
         {...getModuleCallbacks({
           moduleId: module.id,
           moduleKind: module.kind,
@@ -737,12 +743,14 @@ const WebCardModule = ({
   cardStyle,
   coverBackgroundColor,
   scrollPosition,
+  editing,
   ...props
 }: Omit<WebCardEditBlockContainerProps, 'children' | 'id'> & {
   module: ModuleRenderInfo & { id: string; visible: boolean };
   cardColors?: ColorPalette | null;
   cardStyle?: CardStyle | null;
   coverBackgroundColor?: string | null;
+  editing: boolean;
   scrollPosition: RNAnimated.Value;
 }) => {
   const { height: screenHeight } = useScreenDimensions();
@@ -765,6 +773,7 @@ const WebCardModule = ({
         scrollPosition={scrollPosition}
         modulePosition={0}
         displayMode="edit"
+        canPlay={editing}
       />
       {module.id.includes(TEMP_ID_PREFIX) && (
         <View style={styles.loadingContainer}>

@@ -125,9 +125,11 @@ const CoverCreationScreen = ({
       } else if (profile?.webCard) {
         router.splice(
           {
-            route: 'WEBCARD_EDIT',
+            route: 'WEBCARD',
             params: {
               webCardId: profile.webCard.id,
+              userName: profile.webCard.userName,
+              editing: true,
               fromCreation: true,
             },
           },
