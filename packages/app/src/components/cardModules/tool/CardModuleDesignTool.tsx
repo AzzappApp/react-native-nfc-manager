@@ -313,7 +313,7 @@ const styleSheet = createStyleSheet(appearance => ({
     borderColor: appearance === 'light' ? colors.black : colors.white,
   },
   headerStyle: { marginBottom: 15 },
-  scrollContentInset: { paddingHorizontal: 16 },
+  scrollContentInset: { paddingHorizontal: 16, height: 150 },
   badge: {
     position: 'absolute',
     left: 8,
