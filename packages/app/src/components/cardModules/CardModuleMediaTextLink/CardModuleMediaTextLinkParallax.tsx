@@ -4,6 +4,7 @@ import { Linking, Pressable, View } from 'react-native';
 import {
   isModuleAnimationDisabled,
   type CardModuleColor,
+  type DisplayMode,
 } from '@azzapp/shared/cardModuleHelpers';
 import { shadow } from '#theme';
 import { getTextStyle, getTitleStyle } from '#helpers/cardModuleHelpers';
@@ -18,7 +19,6 @@ import type {
   CardModuleVariantType,
 } from '../cardModuleEditorType';
 import type { CardStyle } from '@azzapp/shared/cardHelpers';
-import type { DisplayMode } from '@azzapp/shared/cardModuleHelpers';
 import type { Animated, LayoutChangeEvent } from 'react-native';
 
 type CardModuleMediaTextLinkParallaxProps = CardModuleVariantType & {
