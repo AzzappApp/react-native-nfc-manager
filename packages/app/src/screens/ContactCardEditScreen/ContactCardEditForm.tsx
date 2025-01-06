@@ -353,7 +353,7 @@ const ContactCardEditForm = ({
           )}
           {webCard?.isMultiUser &&
             commonInformation?.urls?.map((url, index) => (
-              <Fragment key={index}>
+              <Fragment key={`commonUrl-${index}`}>
                 <CommonInformationField value={url.address} />
                 <Separation small />
               </Fragment>
@@ -428,7 +428,9 @@ const CommonInformationField = ({
   const styles = useStyleSheet(styleSheet);
   return (
     <View style={styles.fieldCommon}>
-      <View style={styles.commonInfoHeader}>
+      <View
+        style={label ? styles.commonInfoHeader : styles.commonInfoHeaderNoLabel}
+      >
         <Icon icon="locked" />
         {label ? <Text variant="smallbold">{label}</Text> : null}
       </View>
@@ -481,6 +483,12 @@ const styleSheet = createStyleSheet(appearance => ({
     alignItems: 'center',
     columnGap: 5,
     minWidth: 140,
+  },
+  commonInfoHeaderNoLabel: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    columnGap: 5,
+    minWidth: 35,
   },
   commonInfoValue: {
     flex: 1,
