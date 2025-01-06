@@ -191,6 +191,7 @@ const WebCardScreenContent = ({
       <Suspense>
         <Animated.View
           style={[styles.closeButton, { top: inset.top }, closeButtonStyles]}
+          pointerEvents={editing ? 'none' : 'auto'}
         >
           <FloatingIconButton
             icon="arrow_down"
@@ -198,6 +199,7 @@ const WebCardScreenContent = ({
             iconSize={30}
             variant="grey"
             iconStyle={{ tintColor: colors.white }}
+            disabled={editing}
           />
         </Animated.View>
       </Suspense>
