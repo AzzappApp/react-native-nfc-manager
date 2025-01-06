@@ -13,22 +13,32 @@ import type {
   CardModuleSourceMedia,
   CardModuleVideo,
 } from './cardModuleEditorType';
+import type { ViewStyle } from 'react-native';
 
 type CardModuleMediaEditPreviewProps = {
   media: CardModuleSourceMedia;
   dimension: { width: number; height: number };
+  imageStyle?: ViewStyle;
 };
 
 const CardModuleMediaEditPreview = ({
   media,
   dimension,
+  imageStyle,
 }: CardModuleMediaEditPreviewProps) => {
   if (!media) {
     return null;
   }
 
   if (!media.uri.startsWith('file://')) {
-    return <CardModuleMediaItem media={media} dimension={dimension} canPlay />;
+    return (
+      <CardModuleMediaItem
+        media={media}
+        dimension={dimension}
+        canPlay
+        imageStyle={imageStyle}
+      />
+    );
   }
 
   const { width: itemWidth, height: itemHeight } = dimension;
