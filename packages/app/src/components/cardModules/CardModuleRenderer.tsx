@@ -274,14 +274,14 @@ const CardModuleRenderer = <T extends ModuleRenderInfo>({
           multilineStyle={
             displayMode === 'desktop'
               ? {
-                  maxWidth: 800,
+                  maxWidth: DESKTOP_CONTENT_MAX_WIDTH - 100,
                   alignSelf: 'center',
                 }
               : undefined
           }
           style={
             displayMode === 'desktop'
-              ? [props.style, { alignSelf: 'center' }]
+              ? [props.style, { alignSelf: 'center', width: '100%' }]
               : props.style
           }
         />
