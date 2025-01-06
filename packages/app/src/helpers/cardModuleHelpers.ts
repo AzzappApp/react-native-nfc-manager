@@ -56,6 +56,11 @@ export const handleUploadCardModuleMedia = async (
   updateUploadIndicator: (arg: Observable<number>) => void,
 ) => {
   let value = 0;
+  //first determine total because some media don't need any treatment
+  const processingMediaTotal = cardModuleMedias.filter(
+    a => a.needDbUpdate && !a.media.uri.startsWith('http'),
+  ).length;
+
   const mediaToUploads = await Promise.all(
     cardModuleMedias.map(async moduleMedia => {
       const { media } = moduleMedia;
@@ -75,8 +80,6 @@ export const handleUploadCardModuleMedia = async (
             filter: media.filter,
             editionParameters: media.editionParameters,
           });
-          value += 1;
-          updateProcessedMedia({ total: cardModuleMedias.length, value });
           media.uri = localPath;
         } else {
           const exportWidth = Math.min(MODULE_VIDEO_MAX_WIDTH, media.width);
@@ -103,8 +106,6 @@ export const handleUploadCardModuleMedia = async (
               editionParameters: media.editionParameters,
               maxDecoderResolution: MODULE_VIDEO_MAX_WIDTH,
             });
-            value += 1;
-            updateProcessedMedia({ total: cardModuleMedias.length, value });
             media.uri = `file://${localPath}`;
           } catch (e) {
             Sentry.captureException(e);
@@ -115,6 +116,8 @@ export const handleUploadCardModuleMedia = async (
           kind: media.kind,
           target: 'module',
         });
+        value += 1;
+        updateProcessedMedia({ total: processingMediaTotal, value });
         return {
           uri: media.uri,
           kind: media.kind,
@@ -129,8 +132,6 @@ export const handleUploadCardModuleMedia = async (
           ),
         };
       } else {
-        value += 1;
-        updateProcessedMedia({ total: cardModuleMedias.length, value });
         return null;
       }
     }),
