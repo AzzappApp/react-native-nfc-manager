@@ -121,7 +121,7 @@ const ParallaxItem = ({
         media={cardModuleMedia.media}
         index={index}
         key={`${cardModuleMedia.media.id}_{index}`}
-        disableParallax={displayMode === 'edit'}
+        disableParallax={displayMode !== 'mobile'}
         imageStyle={styles.opacityImage}
         imageContainerStyle={{
           backgroundColor: cardModuleColor.background,
