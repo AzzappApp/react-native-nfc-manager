@@ -1,5 +1,6 @@
 import * as Sentry from '@sentry/react-native';
 import Toast from 'react-native-toast-message';
+import { waitTime } from '@azzapp/shared/asyncHelpers';
 import {
   MODULE_IMAGE_MAX_WIDTH,
   MODULE_VIDEO_MAX_WIDTH,
@@ -144,6 +145,7 @@ export const handleUploadCardModuleMedia = async (
         .map(({ progress }) => progress),
     ),
   );
+  await waitTime(1);
 
   const mediasUploaded = await Promise.all(
     mediaToUploads.map(async item => {

@@ -1,5 +1,10 @@
 import { useCallback } from 'react';
 import { StyleSheet, View } from 'react-native';
+import {
+  isModuleAnimationDisabled,
+  type CardModuleColor,
+  type DisplayMode,
+} from '@azzapp/shared/cardModuleHelpers';
 import { getTextStyle, getTitleStyle } from '#helpers/cardModuleHelpers';
 import useScreenDimensions from '#hooks/useScreenDimensions';
 import Text from '#ui/Text';
@@ -11,7 +16,6 @@ import type {
   CardModuleVariantType,
 } from '../cardModuleEditorType';
 import type { CardStyle } from '@azzapp/shared/cardHelpers';
-import type { CardModuleColor } from '@azzapp/shared/cardModuleHelpers';
 import type { Animated, LayoutChangeEvent } from 'react-native';
 
 type CardModuleMediaTextParallaxProps = CardModuleVariantType & {
@@ -32,6 +36,7 @@ const CardModuleMediaTextParallax = ({
   cardStyle,
   canPlay,
   setEditableItemIndex,
+  webCardViewMode,
 }: CardModuleMediaTextParallaxProps) => {
   const screenDimension = useScreenDimensions();
   const dimension = providedDimension ?? screenDimension;
@@ -45,7 +50,9 @@ const CardModuleMediaTextParallax = ({
   // on both view and container. if not on view in webcard preview
 
   const items =
-    displayMode === 'edit' ? cardModuleMedias.slice(0, 1) : cardModuleMedias;
+    webCardViewMode === 'edit'
+      ? cardModuleMedias.slice(0, 1)
+      : cardModuleMedias;
   return (
     <View onLayout={onLayout}>
       {items.map((cardModuleMedia, index) => {
@@ -61,6 +68,10 @@ const CardModuleMediaTextParallax = ({
             scrollPosition={scrollPosition}
             modulePosition={modulePosition}
             displayMode={displayMode}
+            disableParallax={isModuleAnimationDisabled(
+              displayMode,
+              webCardViewMode,
+            )}
             canPlay={canPlay}
           />
         );
@@ -79,6 +90,7 @@ const ParallaxItem = ({
   scrollPosition,
   modulePosition,
   canPlay,
+  disableParallax,
   displayMode,
 }: {
   cardModuleMedia: CardModuleMedia;
@@ -90,7 +102,8 @@ const ParallaxItem = ({
   scrollPosition: Animated.Value;
   modulePosition?: number;
   canPlay: boolean;
-  displayMode: 'desktop' | 'edit' | 'mobile';
+  disableParallax?: boolean;
+  displayMode: DisplayMode;
 }) => {
   const onPress = useCallback(() => {
     setEditableItemIndex?.(index);
@@ -105,7 +118,7 @@ const ParallaxItem = ({
         media={cardModuleMedia.media}
         index={index}
         canPlay={canPlay}
-        disableParallax={displayMode !== 'mobile'}
+        disableParallax={disableParallax}
         imageStyle={styles.opacityImage}
         imageContainerStyle={{ backgroundColor: cardModuleColor.background }}
       >

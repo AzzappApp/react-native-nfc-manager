@@ -1,6 +1,11 @@
 import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { Linking, Pressable, View } from 'react-native';
+import {
+  isModuleAnimationDisabled,
+  type CardModuleColor,
+  type DisplayMode,
+} from '@azzapp/shared/cardModuleHelpers';
 import { shadow } from '#theme';
 import { getTextStyle, getTitleStyle } from '#helpers/cardModuleHelpers';
 import { useStyleSheet, createStyleSheet } from '#helpers/createStyles';
@@ -14,7 +19,6 @@ import type {
   CardModuleVariantType,
 } from '../cardModuleEditorType';
 import type { CardStyle } from '@azzapp/shared/cardHelpers';
-import type { CardModuleColor } from '@azzapp/shared/cardModuleHelpers';
 import type { Animated, LayoutChangeEvent } from 'react-native';
 
 type CardModuleMediaTextLinkParallaxProps = CardModuleVariantType & {
@@ -34,9 +38,10 @@ const CardModuleMediaTextLinkParallax = ({
   onLayout,
   cardStyle,
   setEditableItemIndex,
-  displayMode,
+  webCardViewMode,
   moduleEditing,
   canPlay,
+  displayMode,
 }: CardModuleMediaTextLinkParallaxProps) => {
   const screenDimension = useScreenDimensions();
   const dimension = providedDimension ?? screenDimension;
@@ -48,7 +53,9 @@ const CardModuleMediaTextLinkParallax = ({
   }
 
   const items =
-    displayMode === 'edit' ? cardModuleMedias.slice(0, 1) : cardModuleMedias;
+    webCardViewMode === 'edit'
+      ? cardModuleMedias.slice(0, 1)
+      : cardModuleMedias;
   return (
     <View onLayout={onLayout}>
       {items.map((cardModuleMedia, index) => {
@@ -63,9 +70,13 @@ const CardModuleMediaTextLinkParallax = ({
             setEditableItemIndex={setEditableItemIndex}
             scrollPosition={scrollPosition}
             modulePosition={modulePosition}
-            displayMode={displayMode}
+            disableParallax={isModuleAnimationDisabled(
+              displayMode,
+              webCardViewMode,
+            )}
             moduleEditing={moduleEditing}
             canPlay={canPlay}
+            displayMode={displayMode}
           />
         );
       })}
@@ -82,9 +93,10 @@ const ParallaxItem = ({
   setEditableItemIndex,
   scrollPosition,
   modulePosition,
-  displayMode,
   moduleEditing,
   canPlay,
+  disableParallax,
+  displayMode,
 }: {
   cardModuleMedia: CardModuleMedia;
   cardModuleColor: CardModuleColor;
@@ -95,9 +107,9 @@ const ParallaxItem = ({
   setEditableItemIndex?: (index: number) => void;
   scrollPosition: Animated.Value;
   modulePosition?: number;
-  displayMode: 'desktop' | 'edit' | 'mobile';
   moduleEditing: boolean;
   canPlay: boolean;
+  displayMode: DisplayMode;
 }) => {
   const styles = useStyleSheet(stylesheet);
   const onPress = useCallback(() => {
@@ -125,7 +137,7 @@ const ParallaxItem = ({
         media={cardModuleMedia.media}
         index={index}
         key={`${cardModuleMedia.media.id}_{index}`}
-        disableParallax={displayMode !== 'mobile'}
+        disableParallax={disableParallax}
         imageStyle={styles.opacityImage}
         imageContainerStyle={{
           backgroundColor: cardModuleColor.background,

@@ -309,21 +309,26 @@ const AddContactModal = ({
             }
 
             if (Platform.OS === 'ios') {
-              const updatedContact = reworkContactForDeviceInsert({
-                ...scanned.contact,
-                urlAddresses:
-                  additionalContactData?.urls?.map(addr => {
-                    return { label: 'default', address: addr.address };
-                  }) || undefined,
-                socialProfiles:
-                  additionalContactData?.socials?.map(social => {
-                    return { ...social, address: social.url };
-                  }) || undefined,
-              });
+              try {
+                const updatedContact = reworkContactForDeviceInsert({
+                  ...scanned.contact,
+                  urlAddresses:
+                    additionalContactData?.urls?.map(addr => {
+                      return { label: 'default', address: addr.address };
+                    }) || undefined,
+                  socialProfiles:
+                    additionalContactData?.socials?.map(social => {
+                      return { ...social, address: social.url };
+                    }) || undefined,
+                });
 
-              await presentFormAsync(null, updatedContact, {
-                isNew: true,
-              });
+                await presentFormAsync(null, updatedContact, {
+                  isNew: true,
+                });
+              } catch (e) {
+                console.warn(e);
+                Sentry.captureException(e);
+              }
             } else {
               router.push({
                 route: 'CONTACT_DETAILS',
@@ -540,10 +545,12 @@ const buildContact = async (
   if (additionalContactData?.avatarUrl) {
     try {
       const avatar = new File(Paths.cache.uri + profileId);
-      if (!avatar.exists) {
-        avatar.create();
-        await File.downloadFileAsync(additionalContactData.avatarUrl, avatar);
+      if (avatar.exists) {
+        // be sure that avatar can be refreshed
+        avatar.delete();
       }
+      avatar.create();
+      await File.downloadFileAsync(additionalContactData.avatarUrl, avatar);
 
       image = {
         width: 720,
@@ -551,6 +558,7 @@ const buildContact = async (
         uri: avatar.uri,
       };
     } catch (e) {
+      console.warn('error downloading avatar', e);
       Sentry.captureException(e);
     }
   }

@@ -234,6 +234,7 @@ const CardModule = ({
       coverBackgroundColor={coverBackgroundColor}
       scrollPosition={scrollPosition}
       modulePosition={modulePosition}
+      webCardViewMode="preview"
     />
   );
 };

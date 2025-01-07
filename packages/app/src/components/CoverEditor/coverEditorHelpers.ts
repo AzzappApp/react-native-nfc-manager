@@ -1,4 +1,3 @@
-import * as Device from 'expo-device';
 import memoize from 'lodash/memoize';
 import { useMemo } from 'react';
 import { Dimensions, PixelRatio } from 'react-native';
@@ -9,6 +8,7 @@ import {
 } from '@azzapp/shared/coverHelpers';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { extractLottieInfo, replaceColors } from '@azzapp/shared/lottieHelpers';
+import { MEMORY_SIZE } from '#helpers/device';
 import {
   getDeviceMaxDecodingResolution,
   reduceVideoResolutionIfNecessary,
@@ -232,8 +232,6 @@ export const calculateImageScale = <
   }
   return imageScale;
 };
-
-const MEMORY_SIZE = (Device.totalMemory ?? 0) / Math.pow(1024, 3);
 
 const MAX_VIDEO_SIZE = MEMORY_SIZE < 8 ? 1280 : 1920;
 

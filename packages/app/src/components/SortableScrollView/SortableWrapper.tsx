@@ -254,7 +254,10 @@ const SortableWrapper = ({
     .activateAfterLongPress(activateAfterLongPress ? 300 : 0)
     .onFinalize(() => {
       runOnJS(setMoving)(false);
-      runOnJS(onDragEnd)();
+      // if the item has not moved, do not trigger onDragEnd
+      if (position.value !== start.value) {
+        runOnJS(onDragEnd)();
+      }
     });
 
   const animatedStyle = useAnimatedStyle(() => {

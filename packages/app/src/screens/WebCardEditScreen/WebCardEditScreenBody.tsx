@@ -772,7 +772,7 @@ const WebCardModule = ({
         coverBackgroundColor={coverBackgroundColor}
         scrollPosition={scrollPosition}
         modulePosition={0}
-        displayMode="edit"
+        webCardViewMode="edit"
         canPlay={editing}
       />
       {module.id.includes(TEMP_ID_PREFIX) && (

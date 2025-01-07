@@ -8,6 +8,19 @@ import type { SocialLinkItem } from './socialLinkHelpers';
  */
 export const MODULE_KIND_BLOCK_TEXT = 'blockText';
 
+export type WebCardViewMode = 'edit' | 'preview';
+export type DisplayMode = 'desktop' | 'mobile';
+
+export const isModuleAnimationDisabled = (
+  displayMode: DisplayMode,
+  webCardViewMode?: WebCardViewMode,
+) => {
+  return (
+    (webCardViewMode === 'preview' && displayMode === 'desktop') ||
+    webCardViewMode === 'edit'
+  );
+};
+
 /**
  * The data type for the block text module
  */

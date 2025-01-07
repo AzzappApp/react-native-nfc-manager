@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { PixelRatio, Platform, StyleSheet } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -30,18 +31,19 @@ const CardModuleMediaSlideshow = ({
   cardModuleMedias,
   cardStyle,
   displayMode,
+  webCardViewMode,
   dimension,
   canPlay,
   setEditableItemIndex,
 }: CardModuleMediaSlideshowProps) => {
   const scrollIndex = useSharedValue(0);
-  const paddinHorizontal = displayMode === 'desktop' ? 40 : 0;
+  const paddingHorizontal = displayMode === 'desktop' ? 40 : 0;
 
   const screenWidth = dimension.width;
 
   const itemWidth = Math.trunc(
     PixelRatio.roundToNearestPixel(
-      (screenWidth * 70) / 100 - 2 * paddinHorizontal,
+      (screenWidth * 70) / 100 - 2 * paddingHorizontal,
     ),
   ); //avoid approximation during sliding, getting non integer index
 
@@ -138,6 +140,8 @@ const CardModuleMediaSlideshow = ({
     handleScrollToOffset(0, false);
   }, [itemWidth]);
 
+  const nativeGesture = Gesture.Native();
+
   return (
     <Animated.View
       style={[
@@ -145,28 +149,30 @@ const CardModuleMediaSlideshow = ({
         {
           height: itemWidth + 40,
           backgroundColor: cardModuleColor.background,
-          pointerEvents: displayMode === 'edit' ? 'none' : 'auto',
+          pointerEvents: webCardViewMode === 'edit' ? 'none' : 'auto',
         },
       ]}
     >
-      <Animated.FlatList
-        ref={listRef}
-        data={cardModuleMedias}
-        renderItem={renderItem}
-        keyExtractor={keyExtractor}
-        horizontal
-        decelerationRate="fast"
-        snapToAlignment="start"
-        snapToInterval={itemWidth}
-        showsHorizontalScrollIndicator={false}
-        onScroll={scrollHandler}
-        scrollEventThrottle={16}
-        getItemLayout={getItemLayout}
-        contentContainerStyle={ccstyle}
-        onTouchStart={stopAutoPlay}
-        onTouchEnd={startAutoPlay}
-        onMomentumScrollEnd={startAutoPlay} //onTouchEnd sometimes is not properly catch
-      />
+      <GestureDetector gesture={nativeGesture}>
+        <Animated.FlatList
+          ref={listRef}
+          data={cardModuleMedias}
+          renderItem={renderItem}
+          keyExtractor={keyExtractor}
+          horizontal
+          decelerationRate="fast"
+          snapToAlignment="start"
+          snapToInterval={itemWidth}
+          showsHorizontalScrollIndicator={false}
+          onScroll={scrollHandler}
+          scrollEventThrottle={16}
+          getItemLayout={getItemLayout}
+          contentContainerStyle={ccstyle}
+          onTouchStart={stopAutoPlay}
+          onTouchEnd={startAutoPlay}
+          onMomentumScrollEnd={startAutoPlay} //onTouchEnd sometimes is not properly catch
+        />
+      </GestureDetector>
     </Animated.View>
   );
 };

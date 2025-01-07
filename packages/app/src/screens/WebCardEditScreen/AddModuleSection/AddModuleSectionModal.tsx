@@ -1,5 +1,4 @@
-import { useMemo, useState } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
@@ -9,10 +8,8 @@ import Header from '#ui/Header';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import SafeAreaView from '#ui/SafeAreaView';
-import TabsBar from '#ui/TabsBar';
 import Text from '#ui/Text';
 import CardModuleSectionList from './CardModuleSectionList';
-import CardTemplatesList from './CardTemplatesList';
 import type { AddModuleSectionModal_webCard$key } from '#relayArtifacts/AddModuleSectionModal_webCard.graphql';
 
 type Props = {
@@ -22,8 +19,6 @@ type Props = {
 };
 
 const AddModuleSectionModal = ({ open, close, webCard: webCardKey }: Props) => {
-  const intl = useIntl();
-
   const webCard = useFragment(
     graphql`
       fragment AddModuleSectionModal_webCard on WebCard {
@@ -34,27 +29,27 @@ const AddModuleSectionModal = ({ open, close, webCard: webCardKey }: Props) => {
     webCardKey,
   );
 
-  const [currentTab, setCurrentTab] = useState<string>('sections');
+  // const [currentTab, setCurrentTab] = useState<string>('sections');
 
-  const tabs = useMemo(
-    () => [
-      {
-        tabKey: 'sections',
-        label: intl.formatMessage({
-          defaultMessage: 'Sections',
-          description: 'Sections tab label in BelowCoverModal',
-        }),
-      },
-      {
-        tabKey: 'templates',
-        label: intl.formatMessage({
-          defaultMessage: 'Templates',
-          description: 'Templates tab label in BelowCoverModal',
-        }),
-      },
-    ],
-    [intl],
-  );
+  // const tabs = useMemo(
+  //   () => [
+  //     {
+  //       tabKey: 'sections',
+  //       label: intl.formatMessage({
+  //         defaultMessage: 'Sections',
+  //         description: 'Sections tab label in BelowCoverModal',
+  //       }),
+  //     },
+  //     {
+  //       tabKey: 'templates',
+  //       label: intl.formatMessage({
+  //         defaultMessage: 'Templates',
+  //         description: 'Templates tab label in BelowCoverModal',
+  //       }),
+  //     },
+  //   ],
+  //   [intl],
+  // );
 
   return (
     <ScreenModal visible={open} animationType="slide" onRequestDismiss={close}>
@@ -83,7 +78,10 @@ const AddModuleSectionModal = ({ open, close, webCard: webCardKey }: Props) => {
               </PressableNative>
             }
           />
-          <TabsBar
+          <CardModuleSectionList close={close} webCardKey={webCard} />
+
+          {/* STAGING: temporary disable templates webcard
+           <TabsBar
             currentTab={currentTab}
             onTabPress={setCurrentTab}
             tabs={tabs}
@@ -94,7 +92,7 @@ const AddModuleSectionModal = ({ open, close, webCard: webCardKey }: Props) => {
           )}
           {currentTab === 'templates' && (
             <CardTemplatesList webCard={webCard} />
-          )}
+          )} */}
         </SafeAreaView>
       </Container>
     </ScreenModal>

@@ -28,15 +28,19 @@ const sectionContainerEven = style([
 ]);
 
 const sectionPartContainer = style({
-  width: 'min(max(100vw - 40px, 1px), 480px)',
+  width: 480,
   flex: 1,
+  '@media': {
+    [MediaQuery.Mobile]: {
+      width: 'calc(100vw - 40px)',
+    },
+  },
 });
 
 const imageContainer = style({
   width: '100%',
-  maxHeight: 480,
-  aspectRatio: '1',
   position: 'relative',
+  aspectRatio: '1',
 });
 
 const sectionTextContainer = style([

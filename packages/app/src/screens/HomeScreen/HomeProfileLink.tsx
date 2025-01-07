@@ -132,7 +132,8 @@ export const PROFILE_LINK_MARGIN_TOP = 21;
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    height: PROFILE_LINK_HEIGHT,
+    height: PROFILE_LINK_HEIGHT + 2, // 2 is the border width (for android)
+    padding: 1,
     alignItems: 'center',
     marginTop: PROFILE_LINK_MARGIN_TOP,
   },

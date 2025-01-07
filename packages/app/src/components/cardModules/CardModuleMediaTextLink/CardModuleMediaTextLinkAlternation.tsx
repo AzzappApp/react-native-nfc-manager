@@ -14,7 +14,11 @@ import type {
   CardModuleVariantType,
 } from '../cardModuleEditorType';
 import type { CardStyle } from '@azzapp/shared/cardHelpers';
-import type { CardModuleColor } from '@azzapp/shared/cardModuleHelpers';
+import type {
+  CardModuleColor,
+  DisplayMode,
+  WebCardViewMode,
+} from '@azzapp/shared/cardModuleHelpers';
 import type { Animated, LayoutChangeEvent } from 'react-native';
 
 type CardModuleMediaTextLinkAlternationProps = CardModuleVariantType & {
@@ -38,6 +42,7 @@ const CardModuleMediaTextLinkAlternation = ({
   modulePosition,
   moduleEditing,
   canPlay,
+  webCardViewMode,
 }: CardModuleMediaTextLinkAlternationProps) => {
   const screenDimension = useScreenDimensions();
   const dimension = providedDimension ?? screenDimension;
@@ -49,7 +54,9 @@ const CardModuleMediaTextLinkAlternation = ({
   }
 
   const items =
-    displayMode === 'edit' ? cardModuleMedias.slice(0, 1) : cardModuleMedias;
+    webCardViewMode === 'edit'
+      ? cardModuleMedias.slice(0, 1)
+      : cardModuleMedias;
   return (
     <View
       onLayout={onLayout}
@@ -70,6 +77,7 @@ const CardModuleMediaTextLinkAlternation = ({
             index={index}
             moduleEditing={moduleEditing}
             canPlay={canPlay}
+            webCardViewMode={webCardViewMode}
           />
         );
       })}
@@ -81,7 +89,7 @@ type AlternationItemProps = {
   cardModuleMedia: CardModuleMedia;
   cardModuleColor: CardModuleColor;
   dimension: CardModuleDimension;
-  displayMode: 'desktop' | 'edit' | 'mobile';
+  displayMode: DisplayMode;
   cardStyle?: CardStyle | null;
   setEditableItemIndex?: (index: number) => void;
   scrollPosition: Animated.Value;
@@ -89,6 +97,7 @@ type AlternationItemProps = {
   index: number;
   moduleEditing: boolean;
   canPlay: boolean;
+  webCardViewMode?: WebCardViewMode;
 };
 
 const AlternationItem = ({
@@ -103,6 +112,7 @@ const AlternationItem = ({
   index,
   moduleEditing,
   canPlay,
+  webCardViewMode,
 }: AlternationItemProps) => {
   const styles = useStyleSheet(stylesheet);
   const [parentY, setParentY] = useState(0);
@@ -143,6 +153,7 @@ const AlternationItem = ({
         index={index}
         parentY={parentY}
         canPlay={canPlay}
+        webCardViewMode={webCardViewMode}
       >
         <View style={styles.bottomContainer}>
           <Text
