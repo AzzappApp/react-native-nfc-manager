@@ -1,4 +1,4 @@
-## 1.6.1-canary.2
+## 1.6.1-canary.3
 
 * **fix:**  - move shareAndShare description text outside of the qrcode container ([#6708](https://github.com/AzzappApp/azzapp/pull/6708))
 * **WebCard:**  - try to limit the number of video running in alternation and parallax using viewport ([#6673](https://github.com/AzzappApp/azzapp/pull/6673))
