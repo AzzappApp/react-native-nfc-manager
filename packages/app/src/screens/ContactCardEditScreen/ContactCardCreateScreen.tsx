@@ -387,7 +387,7 @@ const ContactCardCreateScreen = () => {
               isLooping
               isMuted
               shouldPlay
-              resizeMode={ResizeMode.STRETCH}
+              resizeMode={ResizeMode.COVER}
               source={
                 colorScheme === 'dark'
                   ? require('#assets/hint_0_dark_ae.mp4')
@@ -432,7 +432,7 @@ const stylesheet = createStyleSheet(theme => ({
     alignContent: 'center',
   },
   popupIllustration: {
-    height: 200,
+    height: 170,
     borderRadius: 12,
   },
   popupPage: { top: 0, width: '100%', paddingBottom: 20 },

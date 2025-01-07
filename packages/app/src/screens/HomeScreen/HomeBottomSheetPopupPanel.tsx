@@ -302,7 +302,7 @@ const HomeBottomSheetPopupPanel = ({
                 isLooping
                 shouldPlay
                 isMuted
-                resizeMode={ResizeMode.STRETCH}
+                resizeMode={ResizeMode.COVER}
                 source={
                   colorScheme === 'dark'
                     ? require('#assets/hint_1_dark_ae.mp4')
@@ -333,7 +333,7 @@ to be shared!"
                 isLooping
                 shouldPlay
                 isMuted
-                resizeMode={ResizeMode.STRETCH}
+                resizeMode={ResizeMode.COVER}
                 source={
                   colorScheme === 'dark'
                     ? require('#assets/hint_2_dark_ae.mp4')
