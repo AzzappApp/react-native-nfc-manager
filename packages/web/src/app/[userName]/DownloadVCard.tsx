@@ -47,7 +47,7 @@ const DownloadVCard = ({
   onClose,
 }: DownloadVCardProps) => {
   const intl = useIntl();
-  const deviceType = getDeviceType();
+  const [deviceType, setDeviceType] = useState<DeviceType | null>(null);
   const searchParams = useSearchParams();
 
   const [fileUrl, setFileUrl] = useState<string | undefined>();
@@ -71,6 +71,7 @@ const DownloadVCard = ({
 
   useEffect(() => {
     setAppClipIsSupported(isAppClipSupported());
+    setDeviceType(getDeviceType());
   }, []);
 
   useEffect(() => {

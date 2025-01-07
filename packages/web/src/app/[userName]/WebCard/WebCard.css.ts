@@ -145,6 +145,7 @@ const coverContainer = style({
     [MediaQuery.Desktop]: {
       backdropFilter: 'blur(15px)',
       boxShadow: 'none',
+      paddingTop: 20,
     },
   },
 });

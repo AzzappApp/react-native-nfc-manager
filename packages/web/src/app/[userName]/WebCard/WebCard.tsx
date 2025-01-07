@@ -13,7 +13,6 @@ import ContactSteps from '#components/ContactSteps';
 import CoverRenderer from '#components/renderer/CoverRenderer';
 import { MAX_COVER_WIDTH } from '#components/renderer/CoverRenderer/CoverRenderer.css';
 import CoverRendererBackground from '#components/renderer/CoverRenderer/CoverRendererBackground';
-import { DeviceType, getDeviceType } from '#helpers/userAgent';
 import DownloadVCard from '../DownloadVCard';
 import PostFeed from '../PostFeed';
 import WebCardPostNavigation from '../WebCardPostNavigation';
@@ -44,7 +43,6 @@ const WebCard = ({
   handleCloseDownloadVCard,
 }: Step1Props) => {
   const intl = useIntl();
-  const deviceType = getDeviceType();
   const [display, setDisplay] = useState<'card' | 'posts'>('card');
   const [postsOpen, setPostsOpen] = useState(false);
   const searchParams = useSearchParams();
@@ -119,7 +117,6 @@ const WebCard = ({
             <div
               className={styles.coverContainer}
               style={{
-                paddingTop: deviceType === DeviceType.DESKTOP ? 20 : 0,
                 background: `linear-gradient(to bottom, transparent 0%, ${
                   cardBackgroundColor ?? '#FFF'
                 } 95%)`,
