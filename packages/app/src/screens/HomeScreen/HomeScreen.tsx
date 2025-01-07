@@ -58,11 +58,14 @@ const HomeScreen = ({
   }, [hasFocus]);
 
   useEffect(() => {
-    //if not profile, launch onboarding
-    if (!currentUser?.profiles || currentUser.profiles.length === 0) {
+    //if not profile, launch onboarding (except if we are in offline mode)
+    if (
+      (!currentUser?.profiles || currentUser.profiles.length === 0) &&
+      hasFocus
+    ) {
       router.replaceAll(mainRoutes(true));
     }
-  }, [currentUser, currentUser?.profiles, router]);
+  }, [currentUser, currentUser?.profiles, hasFocus, router]);
 
   useSaveOfflineVCard(currentUser?.profiles);
 
