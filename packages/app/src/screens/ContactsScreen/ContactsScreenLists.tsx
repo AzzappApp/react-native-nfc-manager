@@ -10,7 +10,7 @@ import { AppState, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { usePaginationFragment, graphql, useMutation } from 'react-relay';
 import { useOnFocus } from '#components/NativeRouter';
-import { useOnContactAdded } from '#helpers/addContactHelper';
+import { emitContactAdded, useOnContactAdded } from '#helpers/addContactHelper';
 import { findLocalContact } from '#helpers/contactCardHelpers';
 import {
   buildLocalContact,
@@ -471,7 +471,7 @@ const ContactsScreenLists = ({
                 'Toast message when a contact is created successfully',
             });
           }
-
+          emitContactAdded();
           Toast.show({
             type: 'success',
             text1: messageToast,
