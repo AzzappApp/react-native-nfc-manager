@@ -1,5 +1,5 @@
 import { ResizeMode, Video } from 'expo-av';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useColorScheme, View } from 'react-native';
 import Animated, {
@@ -49,12 +49,14 @@ const HomeBottomSheetPopupPanel = ({
   const environment = useRelayEnvironment();
   const styles = useStyleSheet(stylesheet);
 
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
+
   useEffect(() => {
     if (profileInfo) {
-      const timeout = setTimeout(() => {
+      timeoutRef.current = setTimeout(() => {
         onChangeWebCard(profileInfo);
       }, 2000);
-      return () => clearTimeout(timeout);
+      return () => clearTimeout(timeoutRef.current);
     }
   }, [profileInfo]);
 
@@ -224,6 +226,11 @@ const HomeBottomSheetPopupPanel = ({
         },
         onCompleted: () => {
           const tooltipWebcardId = profileInfo?.webCardId;
+
+          if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+            onChangeWebCard(profileInfo);
+          }
           setTimeout(() => {
             if (tooltipWebcardId) {
               setTooltipedWebcard(tooltipWebcardId);
