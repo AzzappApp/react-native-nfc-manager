@@ -156,7 +156,7 @@ const ContactsScreenLists = ({
                   id
                   avatar {
                     id
-                    uri: uri(width: 61, pixelRatio: $pixelRatio)
+                    uri: uri(width: 61, pixelRatio: $pixelRatio, format: png)
                   }
                   contactCard {
                     urls {

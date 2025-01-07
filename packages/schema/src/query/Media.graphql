@@ -3,9 +3,14 @@ interface Media {
   aspectRatio: Float!
   width: Float!
   height: Float!
-  uri(pixelRatio: Float, height: Float, width: Float, raw: Boolean): String!
+  uri(
+    pixelRatio: Float
+    height: Float
+    width: Float
+    raw: Boolean
+    format: MediaFormat
+  ): String!
 }
-
 
 """
 A video media
@@ -15,12 +20,19 @@ type MediaVideo implements Media {
   aspectRatio: Float!
   width: Float!
   height: Float!
-  uri(pixelRatio: Float, height: Float, width: Float, raw: Boolean): String!
+  uri(
+    pixelRatio: Float
+    height: Float
+    width: Float
+    raw: Boolean
+    format: MediaFormat
+  ): String!
   thumbnail(
     pixelRatio: Float
     height: Float
     width: Float
-    videoDurationPercentage: Int @deprecated(reason: "Use coverPreviewPositionPercentage instead")
+    videoDurationPercentage: Int
+      @deprecated(reason: "Use coverPreviewPositionPercentage instead")
   ): String!
   coverPreviewPositionPercentage: Int
 }
@@ -33,9 +45,19 @@ type MediaImage implements Media {
   aspectRatio: Float!
   width: Float!
   height: Float!
-  uri(pixelRatio: Float, height: Float, width: Float, raw: Boolean): String!
+  uri(
+    pixelRatio: Float
+    height: Float
+    width: Float
+    raw: Boolean
+    format: MediaFormat
+  ): String!
 }
 
+enum MediaFormat {
+  png
+  jpg
+}
 
 enum MediaKind {
   video
