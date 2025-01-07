@@ -1,4 +1,4 @@
-## 1.6.0-canary.1
+## 1.6.0-canary.2
 
 * **fix:**  - ensure profile is not reset at boot ([#6704](https://github.com/AzzappApp/azzapp/pull/6704))
 * **fix:**  - improve timing to avoid white screen background ([#6703](https://github.com/AzzappApp/azzapp/pull/6703))
