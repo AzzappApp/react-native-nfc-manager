@@ -252,7 +252,7 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
       profile.id,
       profile.webCardId,
       profile.contactCard ?? {},
-      webCard?.commonInformation,
+      webCard?.isMultiUser ? webCard?.commonInformation : undefined,
     );
   },
   contactCardUrl: async profile => {

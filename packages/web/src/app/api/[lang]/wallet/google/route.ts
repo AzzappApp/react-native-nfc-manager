@@ -97,7 +97,7 @@ const getGoogleWalletPass = async (
         profile.id,
         profile.webCardId,
         contactCard,
-        webCard?.commonInformation,
+        webCard?.isMultiUser ? webCard?.commonInformation : undefined,
       );
 
       const objectData: GenericObject = {

@@ -127,7 +127,7 @@ export const buildApplePass = async (profileId: string, locale: string) => {
         profileId,
         webCard.id,
         contactCard,
-        webCard.commonInformation,
+        webCard.isMultiUser ? webCard.commonInformation : undefined,
       );
 
       pass.setBarcodes({

@@ -52,7 +52,7 @@ const generateEmailSignature = async (req: NextRequest) => {
         profileId,
         webCard.id,
         profile.contactCard,
-        webCard.commonInformation,
+        webCard.isMultiUser ? webCard.commonInformation : undefined,
       );
 
     const mailParam: Record<
