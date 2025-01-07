@@ -4,7 +4,7 @@ import { MEMORY_SIZE } from '#helpers/device';
 export const get = () => {
   return Platform.OS === 'android' &&
     process.env.JEST_WORKER_ID === undefined &&
-    MEMORY_SIZE < 6
+    MEMORY_SIZE < 5.5
     ? 1
     : PixelRatio.get();
 };
