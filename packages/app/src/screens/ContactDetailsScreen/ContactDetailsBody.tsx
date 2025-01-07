@@ -264,7 +264,7 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
               <Icon icon="calendar" />
               <Text variant="smallbold">
                 <FormattedMessage
-                  defaultMessage="Date"
+                  defaultMessage="Date of Contact"
                   description="ContactDetailsModal - Label for date item"
                 />
               </Text>
