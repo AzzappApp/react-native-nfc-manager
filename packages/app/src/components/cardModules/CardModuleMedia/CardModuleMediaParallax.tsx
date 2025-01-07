@@ -38,7 +38,7 @@ const CardModuleMediaParallax = ({
     );
   }
   const items =
-     webCardViewMode === 'edit'
+    webCardViewMode === 'edit'
       ? cardModuleMedias.slice(0, 1)
       : cardModuleMedias;
 

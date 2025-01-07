@@ -177,13 +177,13 @@ const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
                   <ImageSVG svg={svg} />
                 </Group>
               </Canvas>
-              <Text style={styles.subtitle} appearance="dark" variant="button">
-                <FormattedMessage
-                  defaultMessage="Point your camera at the QR Code to save the ContactCard"
-                  description="Shake and share subtitle"
-                />
-              </Text>
             </View>
+            <Text style={styles.subtitle} appearance="dark" variant="button">
+              <FormattedMessage
+                defaultMessage="Point your camera at the QR Code to save the ContactCard"
+                description="Shake and share subtitle"
+              />
+            </Text>
             <View style={styles.buttonContainer}>
               {profile && (
                 <ContactCardExportVcf
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     width: '100%',
     position: 'absolute',
-    bottom: -35,
+    top: -30, // we want to be inside qrcode container
     padding: 5,
     margin: 'auto',
     alignSelf: 'center',
