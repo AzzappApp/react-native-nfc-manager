@@ -1,8 +1,7 @@
 import { type ReactNode } from 'react';
 import { Animated as RNAnimated, StyleSheet, View } from 'react-native';
-import { useIsCardModuleEdition } from './CardModuleEditionContext';
-import CardModuleMediaEditPreview from './CardModuleMediaEditPreview';
-import CardModuleMediaItem from './CardModuleMediaItem';
+import useIsModuleItemInViewPort from '#hooks/useIsModuleItemInViewPort';
+import CardModuleMediaSelector from './CardModuleMediaSelector';
 import type {
   CardModuleDimension,
   CardModuleSourceMedia,
@@ -38,9 +37,9 @@ const ParallaxContainer = ({
 }: ParallaxContainerProps) => {
   const itemStartY = (modulePosition ?? 0) + index * dimension.height;
   const itemEndY = itemStartY + dimension.height;
-  const MediaItemRenderer = useIsCardModuleEdition()
-    ? CardModuleMediaEditPreview
-    : CardModuleMediaItem;
+
+  const inViewport = useIsModuleItemInViewPort(scrollY, itemStartY, dimension);
+
   return (
     <View style={[styles.container, dimension]}>
       <RNAnimated.View
@@ -72,10 +71,10 @@ const ParallaxContainer = ({
           },
         ]}
       >
-        <MediaItemRenderer
+        <CardModuleMediaSelector
           media={media}
           dimension={dimension}
-          canPlay={canPlay}
+          canPlay={canPlay && inViewport}
           imageStyle={{
             width: dimension.width,
             height: dimension.height,

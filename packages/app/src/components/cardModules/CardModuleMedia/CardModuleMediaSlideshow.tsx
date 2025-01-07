@@ -10,9 +10,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import useBoolean from '#hooks/useBoolean';
 import useInterval from '#hooks/useInterval';
-import { useIsCardModuleEdition } from '../CardModuleEditionContext';
-import CardModuleMediaEditPreview from '../CardModuleMediaEditPreview';
-import CardModuleMediaItem from '../CardModuleMediaItem';
+import CardModuleMediaSelector from '../CardModuleMediaSelector';
 import CardModulePressableTool from '../tool/CardModulePressableTool';
 import type {
   CardModuleMedia,
@@ -238,14 +236,10 @@ const SlideshowItem = ({
     };
   });
 
-  const MediaItemRenderer = useIsCardModuleEdition()
-    ? CardModuleMediaEditPreview
-    : CardModuleMediaItem;
-
   const { media } = cardModuleMedia;
   return (
     <Animated.View style={[styles.imageContainer, animatedStyle]}>
-      <MediaItemRenderer
+      <CardModuleMediaSelector
         media={media}
         canPlay={canPlay}
         dimension={{ width: itemWidth, height: itemWidth }}

@@ -10,9 +10,8 @@ import {
   createVariantsStyleSheet,
   useVariantStyleSheet,
 } from '#helpers/createStyles';
-import { useIsCardModuleEdition } from './CardModuleEditionContext';
-import CardModuleMediaEditPreview from './CardModuleMediaEditPreview';
-import CardModuleMediaItem from './CardModuleMediaItem';
+import useIsModuleItemInViewPort from '#hooks/useIsModuleItemInViewPort';
+import CardModuleMediaSelector from './CardModuleMediaSelector';
 import type { CardModuleSourceMedia } from './cardModuleEditorType';
 import type { CardStyle } from '@azzapp/shared/cardHelpers';
 import type { LayoutChangeEvent, ViewProps } from 'react-native';
@@ -188,10 +187,12 @@ const AlternationContainer = ({
     [mediaWidth],
   );
 
-  const MediaItemRenderer = useIsCardModuleEdition()
-    ? CardModuleMediaEditPreview
-    : CardModuleMediaItem;
-
+  const inViewport = useIsModuleItemInViewPort(
+    scrollY,
+    modulePosition ?? 0,
+    dimension,
+  );
+  console.log({ media: media.id, inViewport });
   if (!media || !children) {
     return null;
   }
@@ -204,20 +205,20 @@ const AlternationContainer = ({
     >
       {displayMode !== 'desktop' || index % 2 === 0 ? (
         <Animated.View style={imageContainerStyle}>
-          <MediaItemRenderer
+          <CardModuleMediaSelector
             media={media}
             dimension={imageDimension}
-            canPlay={canPlay}
+            canPlay={canPlay && inViewport}
           />
         </Animated.View>
       ) : null}
       <View style={{ width: mediaWidth }}>{children}</View>
       {displayMode === 'desktop' && index % 2 === 1 ? (
         <Animated.View style={imageContainerStyle}>
-          <MediaItemRenderer
+          <CardModuleMediaSelector
             media={media}
             dimension={imageDimension}
-            canPlay={canPlay}
+            canPlay={canPlay && inViewport}
           />
         </Animated.View>
       ) : null}
