@@ -1,15 +1,15 @@
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  View,
-  StyleSheet,
-  TextInput as NativeTextInput,
-  type NativeSyntheticEvent,
-  type TextInputEndEditingEventData,
-} from 'react-native';
+import { View, StyleSheet, TextInput as NativeTextInput } from 'react-native';
+
 import { useDebouncedCallback } from 'use-debounce';
 import { colors, textStyles } from '#theme';
 import Input from '#ui/Input';
 import type { SocialLinkItemType } from '@azzapp/shared/socialLinkHelpers';
+import type {
+  NativeSyntheticEvent,
+  TextInputEndEditingEventData,
+  ViewStyle,
+} from 'react-native';
 
 const httpsPrefix = 'https://';
 const httpPrefix = 'http://';
@@ -23,6 +23,8 @@ type SocialLinkInputProps = {
   defaultValue: string;
   // allow to display to red border in case of error
   isErrored?: boolean;
+  // style of container
+  style?: ViewStyle;
 };
 
 /*
@@ -35,6 +37,7 @@ const SocialLinkInput = ({
   onChangeLink,
   defaultValue,
   isErrored,
+  style,
 }: SocialLinkInputProps) => {
   const cleanUpLinkUrl = useCallback(
     (value: string) => {
@@ -108,8 +111,12 @@ const SocialLinkInput = ({
     [linkType.mask],
   );
 
+  const containerStyle = style
+    ? [styles.inputContainer, style]
+    : styles.inputContainer;
+
   return (
-    <View style={styles.inputContainer}>
+    <View style={containerStyle}>
       <Input
         style={styles.input}
         clearButtonMode="always"

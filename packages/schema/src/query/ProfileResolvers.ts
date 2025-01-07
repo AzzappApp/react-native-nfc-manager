@@ -36,7 +36,6 @@ import {
   profileLoader,
   profileStatisticsLoader,
   userLoader,
-  webCardCategoryLoader,
   webCardLoader,
 } from '#loaders';
 import {
@@ -54,6 +53,7 @@ import { idResolver } from '#helpers/relayIdHelpers';
 import type { ProfileResolvers } from '#/__generated__/types';
 import type { PexelsSearchResult } from '#helpers/pexelsClient';
 import type { Profile, User } from '@azzapp/data';
+import type { WebCardKind } from '@azzapp/shared/webCardKind';
 import type { Photo, Video } from 'pexels';
 
 const profileIsAssociatedToCurrentUser = (profile: Profile) => {
@@ -252,7 +252,7 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
       profile.id,
       profile.webCardId,
       profile.contactCard ?? {},
-      webCard?.commonInformation,
+      webCard?.isMultiUser ? webCard?.commonInformation : undefined,
     );
   },
   contactCardUrl: async profile => {
@@ -415,7 +415,7 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
     }
     return getCoverTemplateTypes(true);
   },
-  cardTemplates: async (profile, { cardTemplateTypeId, after, first }) => {
+  cardTemplates: async (profile, { after, first }) => {
     if (!profileIsAssociatedToCurrentUser(profile)) {
       return emptyConnection;
     }
@@ -426,31 +426,10 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
     const webCard = profile?.webCardId
       ? await webCardLoader.load(profile.webCardId)
       : null;
-    let typeId = cardTemplateTypeId;
-    if (cardTemplateTypeId == null) {
-      if (webCard?.companyActivityId) {
-        const compActivity = await companyActivityLoader.load(
-          webCard.companyActivityId,
-        );
-        if (compActivity) {
-          typeId = compActivity.cardTemplateTypeId;
-        }
-      }
-    }
-    if (typeId == null) {
-      if (webCard?.webCardCategoryId) {
-        const webCardCategory = await webCardCategoryLoader.load(
-          webCard.webCardCategoryId,
-        );
-        if (webCardCategory) {
-          typeId = webCardCategory.cardTemplateTypeId;
-        }
-      }
-    }
     const limit = first ?? 20;
     const cardTemplates = await getCardTemplatesForWebCardKind(
-      webCard?.webCardKind ?? 'business',
-      typeId,
+      (webCard?.webCardKind as WebCardKind) ?? 'business',
+      undefined,
       profile.webCardId,
       after,
       limit + 1,
@@ -657,7 +636,7 @@ const getActivityName = async (webCardId: string, locale: string) => {
 
 const getContactCardUrl = async (profile: Profile) => {
   const webCard = await webCardLoader.load(profile.webCardId);
-  if (!webCard) {
+  if (!webCard || !webCard?.userName) {
     return process.env.NEXT_PUBLIC_URL!;
   }
   if (!profileIsAssociatedToCurrentUser(profile)) {
@@ -668,7 +647,7 @@ const getContactCardUrl = async (profile: Profile) => {
     profile.id,
     profile.webCardId,
     profile.contactCard ?? {},
-    webCard?.commonInformation,
+    webCard.isMultiUser ? webCard?.commonInformation : null,
   );
 
   const url = buildUserUrlWithContactCard(

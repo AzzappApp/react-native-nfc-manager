@@ -52,10 +52,10 @@ import type { MultiUserDetailsScreen_UpdateProfileMutation } from '#relayArtifac
 import type { MultiUserDetailsScreenQuery } from '#relayArtifacts/MultiUserDetailsScreenQuery.graphql';
 import type { ProfileRole } from '#relayArtifacts/MultiUserScreenQuery.graphql';
 import type { MultiUserDetailRoute } from '#routes';
-import type { ContactCardEditFormValues } from '#screens/ContactCardEditScreen/ContactCardEditModalSchema';
+import type { ContactCardFormValues } from '#screens/ContactCardEditScreen/ContactCardSchema';
 import type { Control } from 'react-hook-form';
 
-export type MultiUserDetailFormValues = ContactCardEditFormValues & {
+export type MultiUserDetailFormValues = ContactCardFormValues & {
   role: ProfileRole;
   selectedContact: EmailPhoneInput | null;
 };
@@ -488,7 +488,7 @@ const MultiUserDetailsScreen = ({
         />
         <ContactCardEditForm
           webCard={profile.webCard}
-          control={control as unknown as Control<ContactCardEditFormValues>}
+          control={control as unknown as Control<ContactCardFormValues>}
           footer={
             !isCurrentProfile &&
             role !== 'owner' && (

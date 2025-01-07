@@ -105,7 +105,12 @@ const PostRendererBottomPanel = ({
   const intl = useIntl();
   const copyLink = useCallback(() => {
     closeModal();
-
+    if (!post.webCard.userName) {
+      Sentry.captureMessage(
+        'null username in PostRenderedBottomPanel / copyLink',
+      );
+      return;
+    }
     Clipboard.setStringAsync(
       buildPostUrl(post.webCard.userName, fromGlobalId(post.id).id),
     ).then(() => {
@@ -132,6 +137,12 @@ const PostRendererBottomPanel = ({
   }, [intl, post.id, post.webCard.userName, closeModal]);
 
   const onShare = async () => {
+    if (!post.webCard.userName) {
+      Sentry.captureMessage(
+        'null username in PostRenderedBottomPanel / onShare',
+      );
+      return;
+    }
     // a quick share method using the native share component. If we want to make a custom share (like tiktok for example, when they are recompressiong the media etc) we can use react-native-shares
     const url = buildPostUrl(post.webCard.userName, fromGlobalId(post.id).id);
     let message = intl.formatMessage({
@@ -319,6 +330,12 @@ const PostRendererBottomPanel = ({
   const toggleFollow = useToggleFollow();
 
   const onToggleFollow = () => {
+    if (!post.webCard.userName) {
+      Sentry.captureMessage(
+        'null username in PostRenderedBottomPanel / onToggleFollow',
+      );
+      return;
+    }
     if (profileInfoHasEditorRight(profileInfos)) {
       toggleFollow(
         post.webCard.id,

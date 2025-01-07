@@ -177,7 +177,7 @@ export const WebCardCategoryCompanyActivityTable = cols.table(
   'WebCardCategoryCompanyActivity',
   {
     webCardCategoryId: cols.cuid('categoryId').notNull(),
-    companyActivityId: cols.cuid('companyActivityId').notNull(),
+    companyActivityId: cols.cuid('companyActivityId'),
     order: cols.int('order').notNull(),
   },
   table => {
@@ -195,13 +195,28 @@ export type CompanyActivityType = InferSelectModel<
 >;
 // #endregion
 
+export const CoverPredefinedTable = cols.table('CoverPredefined', {
+  id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
+  mediaId: cols.mediaId('mediaId').notNull(),
+  defaultTriptychColors: cols
+    .json('defaultTriptychColors')
+    .$type<{
+      primary: string;
+      light: string;
+      dark: string;
+    }>()
+    .notNull(),
+});
+
+export type CoverPredefined = InferSelectModel<typeof CoverPredefinedTable>;
+
 // #region CoverTemplatePreview
 export const CoverTemplatePreviewTable = cols.table(
   'CoverTemplatePreview',
   {
     mediaId: cols.mediaId('mediaId').notNull(),
     coverTemplateId: cols.cuid('coverTemplateId').notNull(),
-    companyActivityId: cols.cuid('companyActivityId').notNull(),
+    companyActivityId: cols.cuid('companyActivityId'),
   },
   table => {
     return {
@@ -604,6 +619,7 @@ export const ProfileTable = cols.table(
       .notNull()
       .default(DEFAULT_DATETIME_VALUE)
       .$onUpdate(() => new Date()),
+
     nbContactCardScans: cols.int('nbContactCardScans').default(0).notNull(),
     nbShareBacks: cols.int('nbShareBacks').default(0).notNull(),
     deleted: cols.boolean('deleted').default(false).notNull(),
@@ -823,7 +839,7 @@ export const WebCardTable = cols.table(
   {
     /* Profile infos */
     id: cols.cuid('id').primaryKey().notNull().$defaultFn(createId),
-    userName: cols.defaultVarchar('userName').notNull(),
+    userName: cols.defaultVarchar('userName'),
     lastUserNameUpdate: cols
       .dateTime('lastUserNameUpdate')
       .notNull()
@@ -886,7 +902,12 @@ export const WebCardTable = cols.table(
         rotation: 0,
         shadow: false,
       }),
+    coverIsPredefined: cols
+      .boolean('coverIsPredefined')
+      .default(false)
+      .notNull(),
     coverPreviewPositionPercentage: cols.int('coverPreviewPositionPercentage'),
+    companyActivityLabel: cols.defaultVarchar('companyActivityLabel'),
 
     /* Social medias infos */
     nbFollowers: cols.int('nbFollowers').default(0).notNull(),

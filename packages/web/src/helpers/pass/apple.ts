@@ -123,11 +123,11 @@ export const buildApplePass = async (profileId: string, locale: string) => {
 
     if (contactCard) {
       const { data, signature } = await serializeAndSignContactCard(
-        webCard.userName,
+        webCard.userName ?? '',
         profileId,
         webCard.id,
         contactCard,
-        webCard.commonInformation,
+        webCard.isMultiUser ? webCard.commonInformation : undefined,
       );
 
       pass.setBarcodes({

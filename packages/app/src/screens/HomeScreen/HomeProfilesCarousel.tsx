@@ -41,6 +41,7 @@ import CarouselSelectList from '#ui/CarouselSelectList';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import PressableOpacity from '#ui/PressableOpacity';
+import { useHomeBottomSheetModalToolTipContext } from './HomeBottomSheetModalToolTip';
 import { useHomeScreenContext } from './HomeScreenContext';
 import useCoverPlayPermission from './useCoverPlayPermission';
 import type {
@@ -87,6 +88,7 @@ const HomeProfilesCarousel = (
           invited
           webCard {
             id
+            userName
           }
           ...HomeProfilesCarouselItem_profile
         }
@@ -214,6 +216,15 @@ const HomeProfilesCarousel = (
 
   const { width: windowWidth } = useWindowDimensions();
 
+  const { setItemWidth } = useHomeBottomSheetModalToolTipContext();
+
+  const onItemWidthUpdated = useCallback(
+    (width: number) => {
+      setItemWidth(width);
+    },
+    [setItemWidth],
+  );
+
   if (profiles == null) {
     return null;
   }
@@ -234,6 +245,7 @@ const HomeProfilesCarousel = (
         onSelectedIndexChange={onSelectedIndexChange}
         currentProfileIndexSharedValue={currentIndexSharedValue}
         initialScrollIndex={initialProfileIndex}
+        onItemWidthUpdated={onItemWidthUpdated}
       />
     </View>
   );
@@ -278,8 +290,10 @@ const ItemRenderComponent = ({
         webCard {
           id
           isMultiUser
+          webCardKind
           userName
           hasCover
+          coverIsPredefined
           ...CoverLink_webCard
           ...CoverRenderer_webCard
           ...WebCardMenu_webCard
@@ -315,7 +329,7 @@ const ItemRenderComponent = ({
       router.push({
         route: 'MULTI_USER',
       });
-    } else if (profile.webCard) {
+    } else if (profile.webCard?.userName) {
       router.push({
         route: 'WEBCARD',
         params: {
@@ -346,6 +360,25 @@ const ItemRenderComponent = ({
       scrollToIndex(index, true);
     }
   }, [scrollToIndex, isCurrent, index]);
+
+  const onPressEdit = () => {
+    router.push({
+      route: 'COVER_TEMPLATE_SELECTION',
+    });
+  };
+
+  const { setTooltipId, tooltipedWebcard, setTooltipedWebcard } =
+    useHomeBottomSheetModalToolTipContext();
+
+  useEffect(() => {
+    if (profile.webCard && tooltipedWebcard === profile.webCard.id) {
+      setTooltipId(1);
+      setTooltipedWebcard(undefined);
+    }
+  }, [profile.webCard, setTooltipId, setTooltipedWebcard, tooltipedWebcard]);
+
+  const isMultiUser =
+    profile.webCard?.isMultiUser || profile.webCard?.webCardKind === 'business';
 
   return (
     <>
@@ -394,7 +427,21 @@ const ItemRenderComponent = ({
               onError={onError}
               onLongPress={openWebcardModal}
             />
-            {profile.webCard.isMultiUser && (
+            {profile.webCard?.coverIsPredefined && (
+              <PressableNative
+                style={styles.editUserContainer}
+                onPress={onPressEdit}
+                android_ripple={{
+                  borderless: true,
+                  foreground: true,
+                }}
+              >
+                <BlurView style={styles.multiUserIconContainer}>
+                  <Icon icon="edit" style={styles.multiUserIcon} />
+                </BlurView>
+              </PressableNative>
+            )}
+            {isMultiUser && (
               <PressableNative
                 style={styles.multiUserContainer}
                 onPress={onPressMultiUser}
@@ -467,7 +514,7 @@ const CreateItem = ({
 }) => {
   const intl = useIntl();
   return (
-    <Link route="WEBCARD_KIND_SELECTION">
+    <Link route="CONTACT_CARD_CREATE">
       <PressableOpacity
         style={[
           styles.newCover,
@@ -529,6 +576,15 @@ const styles = StyleSheet.create({
     // trick to have the shadow on the cover
   },
   coverLinkWrapper: { position: 'relative' },
+  editUserContainer: {
+    position: 'absolute',
+    bottom: 8,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#FFFFFF66',
+    left: 8,
+    ...shadow('light', 'bottom'),
+  },
   multiUserContainer: {
     position: 'absolute',
     bottom: 8,

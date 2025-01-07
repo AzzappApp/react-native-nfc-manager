@@ -8,7 +8,7 @@ import ImageSize from 'react-native-image-size';
 import * as mime from 'react-native-mime-types';
 import { AVATAR_MAX_WIDTH } from '@azzapp/shared/contactCardHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
-import { colors, shadow } from '#theme';
+import { colors } from '#theme';
 import FormDeleteFieldOverlay from '#components/ContactCard/FormDeleteFieldOverlay';
 import ImagePicker, {
   EditImageStep,
@@ -23,27 +23,26 @@ import {
 } from '#helpers/contactCardHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { saveTransformedImageToFile } from '#helpers/mediaEditions';
-import { AVATAR_WIDTH } from '#screens/MultiUserScreen/Avatar';
 import Icon from '#ui/Icon';
-import IconButton from '#ui/IconButton';
-import PressableNative from '#ui/PressableNative';
 import Separation from '#ui/Separation';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
 import ContactCardEditModalAddresses from './ContactCardEditModalAddresses';
+import ContactCardEditModalAvatar from './ContactCardEditModalAvatar';
 import ContactCardEditModalBirthdays from './ContactCardEditModalBirthday';
 import ContactCardEditModalEmails from './ContactCardEditModalEmails';
+import ContactCardEditModalName from './ContactCardEditModalName';
 import ContactCardEditModalPhones from './ContactCardEditModalPhones';
 import ContactCardEditModalSocials from './ContactCardEditModalSocials';
 import ContactCardEditModalUrls from './ContactCardEditModalUrls';
 import type { ImagePickerResult } from '#components/ImagePicker';
 import type { ContactCardEditScreenQuery$data } from '#relayArtifacts/ContactCardEditScreenQuery.graphql';
-import type { ContactCardEditFormValues } from './ContactCardEditModalSchema';
+import type { ContactCardFormValues } from './ContactCardSchema';
 import type { ReactNode } from 'react';
 import type { Control } from 'react-hook-form';
 
 type ContactCardEditFormProps = {
-  control: Control<ContactCardEditFormValues>;
+  control: Control<ContactCardFormValues>;
   webCard: NonNullable<
     NonNullable<ContactCardEditScreenQuery$data['node']>['profile']
   >['webCard'];
@@ -158,142 +157,18 @@ const ContactCardEditForm = ({
       <FormDeleteFieldOverlay>
         <View style={styles.sectionsContainer}>
           {children}
-
-          <View style={styles.avatarSection}>
-            <Controller
-              control={control}
-              name="avatar"
-              render={({ field: { value, onChange } }) =>
-                value?.uri ? (
-                  <View style={styles.avatarContainer}>
-                    <PressableNative
-                      onPress={() => setImagePicker('avatar')}
-                      android_ripple={{
-                        borderless: true,
-                        foreground: true,
-                      }}
-                    >
-                      <View style={[styles.avatar, styles.avatarWrapper]}>
-                        <Image
-                          source={{ uri: value?.uri }}
-                          style={styles.avatar}
-                        />
-                      </View>
-                    </PressableNative>
-                    <IconButton
-                      icon="delete_filled"
-                      variant="icon"
-                      iconStyle={styles.removeAvatarIcon}
-                      style={styles.removeAvatarButton}
-                      onPress={() => onChange(null)}
-                    />
-                  </View>
-                ) : (
-                  <View style={styles.noAvatarContainer}>
-                    <PressableNative
-                      onPress={() => setImagePicker('avatar')}
-                      android_ripple={{
-                        borderless: true,
-                        foreground: true,
-                      }}
-                    >
-                      <View style={styles.noAvatar}>
-                        <Icon icon="add" />
-                      </View>
-                    </PressableNative>
-                  </View>
-                )
-              }
-            />
-          </View>
-          <Separation small />
-          <Controller
+          <ContactCardEditModalAvatar
             control={control}
-            name="firstName"
-            render={({ field: { onChange, onBlur, value, ref } }) => (
-              <View style={styles.field}>
-                <Text variant="smallbold" style={styles.fieldTitle}>
-                  <FormattedMessage
-                    defaultMessage="First name"
-                    description="First name registered for the contact card"
-                  />
-                </Text>
-                <TextInput
-                  value={value ?? ''}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  style={styles.input}
-                  clearButtonMode="while-editing"
-                  placeholder={intl.formatMessage({
-                    defaultMessage: 'Enter a first name',
-                    description:
-                      'Placeholder for first name inside contact card',
-                  })}
-                  ref={ref}
-                />
-              </View>
-            )}
+            onPickerRequested={() => setImagePicker('avatar')}
           />
           <Separation small />
-          <Controller
-            control={control}
-            name="lastName"
-            render={({ field: { onChange, onBlur, value, ref } }) => (
-              <View style={styles.field}>
-                <Text variant="smallbold" style={styles.fieldTitle}>
-                  <FormattedMessage
-                    defaultMessage="Last name"
-                    description="Last name field registered for the contact card"
-                  />
-                </Text>
-                <TextInput
-                  value={value ?? ''}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  style={styles.input}
-                  clearButtonMode="while-editing"
-                  placeholder={intl.formatMessage({
-                    defaultMessage: 'Enter a last name',
-                    description: 'Placeholder for last name contact card',
-                  })}
-                  ref={ref}
-                />
-              </View>
-            )}
-          />
-          <Separation small />
-          <Controller
-            control={control}
-            name="title"
-            render={({ field: { onChange, onBlur, value, ref } }) => (
-              <View style={styles.field}>
-                <Text variant="smallbold" style={styles.fieldTitle}>
-                  <FormattedMessage
-                    defaultMessage="Title"
-                    description="Job title field registered for the contact card"
-                  />
-                </Text>
-                <TextInput
-                  value={value ?? ''}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  style={styles.input}
-                  clearButtonMode="while-editing"
-                  placeholder={intl.formatMessage({
-                    defaultMessage: 'Enter a title',
-                    description: 'Placeholder for title inside contact card',
-                  })}
-                  ref={ref}
-                />
-              </View>
-            )}
-          />
+          <ContactCardEditModalName control={control} />
           <Separation />
           {webCard?.isMultiUser && commonInformation?.company ? (
             <View style={styles.fieldCommon}>
               <View style={styles.fieldTitleWithLock}>
                 <Icon icon="locked" />
-                <Text variant="smallbold" style={styles.fieldTitle}>
+                <Text variant="smallbold" style={styles.fieldTitleLocked}>
                   <FormattedMessage
                     defaultMessage="Company"
                     description="Company name field registered for the contact card"
@@ -315,7 +190,7 @@ const ContactCardEditForm = ({
                     />
                   </Text>
                   <TextInput
-                    value={value}
+                    value={value ?? undefined}
                     onChangeText={onChange}
                     onBlur={onBlur}
                     style={styles.input}
@@ -333,7 +208,7 @@ const ContactCardEditForm = ({
           )}
           {webCard?.isMultiUser && logo ? (
             <View style={styles.logoField}>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <View style={styles.logoButtonContainer}>
                 <View style={styles.logoButton}>
                   <Icon icon="locked" style={{}} />
                   <Text variant="smallbold">
@@ -442,7 +317,6 @@ const ContactCardEditForm = ({
                 <CommonInformationField
                   label={phoneNumber.label}
                   value={phoneNumber.number}
-                  labelMargin={54}
                 />
                 <Separation small />
               </Fragment>
@@ -455,7 +329,6 @@ const ContactCardEditForm = ({
                 <CommonInformationField
                   label={email.label}
                   value={email.address}
-                  labelMargin={54}
                 />
                 <Separation small />
               </Fragment>
@@ -480,8 +353,8 @@ const ContactCardEditForm = ({
           )}
           {webCard?.isMultiUser &&
             commonInformation?.urls?.map((url, index) => (
-              <Fragment key={index}>
-                <CommonInformationField value={url.address} labelMargin={18} />
+              <Fragment key={`commonUrl-${index}`}>
+                <CommonInformationField value={url.address} />
                 <Separation small />
               </Fragment>
             ))}
@@ -493,7 +366,6 @@ const ContactCardEditForm = ({
                 key={index}
                 label={address.label}
                 value={address.address}
-                labelMargin={54}
               />
             ))}
           <ContactCardEditModalAddresses control={control} />
@@ -506,7 +378,6 @@ const ContactCardEditForm = ({
                 <CommonInformationField
                   label={social.label}
                   value={social.url}
-                  labelMargin={47}
                 />
                 <Separation small />
               </Fragment>
@@ -550,95 +421,36 @@ const ContactCardEditForm = ({
 const CommonInformationField = ({
   label,
   value,
-  labelMargin,
 }: {
   label?: string;
   value: string;
-  labelMargin?: number;
 }) => {
   const styles = useStyleSheet(styleSheet);
   return (
     <View style={styles.fieldCommon}>
       <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          columnGap: 5,
-        }}
+        style={label ? styles.commonInfoHeader : styles.commonInfoHeaderNoLabel}
       >
         <Icon icon="locked" />
         {label ? <Text variant="smallbold">{label}</Text> : null}
       </View>
-      <Text
-        style={{
-          marginLeft: labelMargin ?? (label ? 50 : 20),
-          flex: 1,
-          maxHeight: MAX_FIELD_HEIGHT,
-        }}
-        variant="medium"
-      >
+      <Text style={styles.commonInfoValue} variant="medium">
         {value}
       </Text>
     </View>
   );
 };
 
-const ICON_WIDTH = 24;
-
 const styleSheet = createStyleSheet(appearance => ({
-  avatarSection: {
-    alignItems: 'center',
-    paddingTop: 10,
-    paddingBottom: 20,
-  },
-  noAvatar: {
-    width: AVATAR_WIDTH,
-    height: AVATAR_WIDTH,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: appearance === 'dark' ? colors.grey900 : colors.grey50,
-    borderRadius: AVATAR_WIDTH / 2,
-  },
-  noAvatarContainer: {
-    overflow: 'hidden',
-    borderRadius: AVATAR_WIDTH / 2,
-  },
-  avatarWrapper: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    overflow: 'hidden',
-  },
-  avatar: {
-    width: AVATAR_WIDTH,
-    height: AVATAR_WIDTH,
-    borderRadius: AVATAR_WIDTH / 2,
-    borderWidth: 4,
-    borderColor: appearance === 'dark' ? colors.black : colors.white,
-    overflow: 'visible',
-  },
-  fieldTitle: { minWidth: 100 },
   fieldTitleWithLock: { flexDirection: 'row', gap: 5, alignItems: 'center' },
-  avatarContainer: [
-    {
-      position: 'relative',
-      borderRadius: AVATAR_WIDTH / 2,
-    },
-    shadow(appearance, 'bottom'),
-  ],
-  removeAvatarButton: {
-    position: 'absolute',
-    top: AVATAR_WIDTH / 2 - ICON_WIDTH / 2,
-    left: -ICON_WIDTH - 20,
-  },
-  removeAvatarIcon: {
-    tintColor: colors.red400,
-  },
   companyLogoDescription: {
     paddingLeft: 30,
     paddingVertical: 10,
   },
   logoField: {
-    padding: 20,
+    paddingVertical: 20,
+    paddingStart: 10,
+    paddingEnd: 20,
     borderColor: colors.grey50,
     borderTopWidth: 1,
   },
@@ -647,6 +459,7 @@ const styleSheet = createStyleSheet(appearance => ({
     alignItems: 'center',
     columnGap: 7,
   },
+  logoButtonContainer: { flexDirection: 'row', alignItems: 'center' },
   logoContainer: {
     flex: 1,
     paddingLeft: 65,
@@ -665,6 +478,23 @@ const styleSheet = createStyleSheet(appearance => ({
     marginLeft: 5,
     marginRight: 16,
   },
+  commonInfoHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    columnGap: 5,
+    minWidth: 140,
+  },
+  commonInfoHeaderNoLabel: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    columnGap: 5,
+    minWidth: 35,
+  },
+  commonInfoValue: {
+    flex: 1,
+    maxHeight: MAX_FIELD_HEIGHT,
+  },
+  fieldTitleLocked: { minWidth: 130 },
   ...buildContactCardModalStyleSheet(appearance),
 }));
 

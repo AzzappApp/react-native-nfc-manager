@@ -33,7 +33,7 @@ type WebcardParametersNameFormProps = {
   toggleBottomSheet: () => void;
   webCard: {
     id: string;
-    userName: string;
+    userName?: string | null;
   };
 };
 const WebcardParametersNameForm = ({
@@ -56,7 +56,7 @@ const WebcardParametersNameForm = ({
     setValue,
   } = useForm<UserNameForm>({
     defaultValues: {
-      userName: webCard.userName,
+      userName: webCard.userName || '',
     },
     mode: 'onSubmit',
     resolver: async data => {
@@ -119,7 +119,7 @@ const WebcardParametersNameForm = ({
   });
 
   useEffect(() => {
-    if (visible) {
+    if (visible && webCard.userName) {
       setValue('userName', webCard.userName);
     }
   }, [setValue, visible, webCard.userName]);

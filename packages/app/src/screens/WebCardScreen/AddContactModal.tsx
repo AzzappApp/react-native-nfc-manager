@@ -23,6 +23,7 @@ import { isDefined } from '@azzapp/shared/isDefined';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
+import { emitContactAdded } from '#helpers/addContactHelper';
 import { findLocalContact } from '#helpers/contactCardHelpers';
 import { reworkContactForDeviceInsert } from '#helpers/contactListHelpers';
 import { getLocalContactsMap } from '#helpers/getLocalContactsMap';
@@ -288,6 +289,7 @@ const AddContactModal = ({
                   type: 'success',
                   text1: messageToast,
                 });
+                emitContactAdded();
               }
             } catch (e) {
               console.error(e);
@@ -404,6 +406,12 @@ const AddContactModal = ({
 
   useEffect(() => {
     (async () => {
+      if (!webCard.userName) {
+        Sentry.captureMessage(
+          'null username in AddContactModal / in contact build',
+        );
+        return;
+      }
       if (!scanned && contactData && webCard) {
         const { contact, webCardId, profileId } = await buildContact(
           contactData,
@@ -461,21 +469,24 @@ const AddContactModal = ({
     >
       <Header
         middleElement={
-          <Text variant="large" style={styles.headerText} numberOfLines={3}>
-            <FormattedMessage
-              defaultMessage="Add {userName} to your contacts"
-              description="Title for add contact modal"
-              values={{
-                userName,
-              }}
-            />
-          </Text>
+          <View style={styles.headerMiddleContent}>
+            <Text variant="large" style={styles.headerText} numberOfLines={3}>
+              <FormattedMessage
+                defaultMessage="Add {userName} to your contacts"
+                description="Title for add contact modal"
+                values={{
+                  userName,
+                }}
+              />
+            </Text>
+          </View>
         }
         leftElement={
-          <PressableNative onPress={close}>
+          <PressableNative onPress={close} style={styles.close}>
             <Icon icon="close" />
           </PressableNative>
         }
+        middleElementStyle={styles.headerMiddle}
       />
       <View style={styles.section}>
         <CoverRenderer webCard={webCard} width={120} canPlay={false} />
@@ -651,6 +662,18 @@ const styles = StyleSheet.create({
   headerText: {
     textAlign: 'center',
     marginHorizontal: 25,
+  },
+  headerMiddle: {
+    justifyContent: 'flex-start',
+  },
+  headerMiddleContent: {
+    width: '100%',
+    height: 60,
+    justifyContent: 'center',
+  },
+  close: {
+    position: 'relative',
+    top: 8,
   },
 });
 

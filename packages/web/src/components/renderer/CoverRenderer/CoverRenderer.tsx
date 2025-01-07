@@ -1,9 +1,15 @@
 'use client';
 
+import cn from 'classnames';
 import { useEffect, useRef, useState } from 'react';
 import { swapColor, DEFAULT_COLOR_PALETTE } from '@azzapp/shared/cardHelpers';
-import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
+import {
+  COVER_RATIO,
+  DEFAULT_COVER_HEIGHT,
+  DEFAULT_COVER_WIDTH,
+} from '@azzapp/shared/coverHelpers';
 import { DEFAULT_VIDEO_PERCENTAGE_THUMBNAIL } from '@azzapp/shared/imagesHelpers';
+import { Plus_Jakarta_ExtraBold, Plus_Jakarta_Light } from '#helpers/fonts';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CloudinaryVideo from '#ui/CloudinaryVideo';
 import CoverLinksRenderer from './CoverLinksRenderer';
@@ -21,8 +27,6 @@ type CoverRendererProps = Omit<
   priority?: boolean;
 };
 
-const DEFAULT_COVER_WIDTH = 375;
-
 const CoverRenderer = ({
   webCard,
   media,
@@ -38,10 +42,27 @@ const CoverRenderer = ({
     coverBackgroundColor,
     coverDynamicLinks,
     coverPreviewPositionPercentage,
+    coverIsPredefined,
+    webCardKind,
+    companyName,
+    firstName,
+    companyActivityLabel,
+    lastName,
   } = webCard;
-
   const coverWidth = width ? width * 2 : DEFAULT_COVER_WIDTH * 2;
-  const coverHeight = coverWidth / COVER_RATIO;
+  const coverHeight = DEFAULT_COVER_HEIGHT;
+
+  const overlayTitle = coverIsPredefined
+    ? webCardKind === 'business'
+      ? companyName
+      : firstName
+    : undefined;
+
+  const overlaySubTitle = coverIsPredefined
+    ? webCardKind === 'business'
+      ? companyActivityLabel
+      : lastName
+    : undefined;
 
   const [coverSize, setCoverSize] = useState<{
     width: number;
@@ -130,6 +151,22 @@ const CoverRenderer = ({
           links={coverDynamicLinks}
           cardColors={cardColors}
         />
+      )}
+
+      {overlayTitle && (
+        <div className={cn(styles.overlayTitle, Plus_Jakarta_Light.className)}>
+          {overlayTitle}
+        </div>
+      )}
+      {overlaySubTitle && (
+        <div
+          className={cn(
+            styles.overlaySubTitle,
+            Plus_Jakarta_ExtraBold.className,
+          )}
+        >
+          {overlaySubTitle}
+        </div>
       )}
     </div>
   );

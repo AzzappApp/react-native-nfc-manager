@@ -24,6 +24,7 @@ import {
   getContactCountWithWebcardId,
   getAllOwnerProfilesByWebcardId,
 } from '@azzapp/data';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
 import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { buildCoverAvatarUrl } from '#externals';
@@ -34,6 +35,7 @@ import {
   companyActivityLoader,
   companyActivityTypeLoader,
   followingsLoader,
+  labelLoader,
   profileByWebCardIdAndUserIdLoader,
   webCardCategoryLoader,
   webCardOwnerLoader,
@@ -61,6 +63,17 @@ import type {
   WebCardCategoryResolvers,
   WebCardResolvers,
 } from '#/__generated__/types';
+
+const getActivityName = async (companyActivityId: string, locale: string) => {
+  const activity = companyActivityId
+    ? await companyActivityLoader.load(companyActivityId)
+    : null;
+  const activityName = activity?.id
+    ? ((await labelLoader.load([activity.id, locale])) ??
+      (await labelLoader.load([activity.id, DEFAULT_LOCALE])))
+    : null;
+  return activityName?.value;
+};
 
 export const WebCard: ProtectedResolver<WebCardResolvers> = {
   id: idResolver('WebCard'),
@@ -153,7 +166,7 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
     }
     return webCard.nbWebCardViews;
   },
-  userName: webCard => webCard.userName,
+  userName: webCard => webCard.userName || '',
   // TODO: should it be protected?
   webCardKind: webCard => webCard.webCardKind,
   // TODO: should it be protected?
@@ -559,6 +572,20 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
       },
     );
   },
+  companyActivityLabel: async webCard => {
+    if (webCard.companyActivityLabel && webCard.companyActivityLabel !== '') {
+      return webCard.companyActivityLabel;
+    } else if (webCard.companyActivityId) {
+      const { locale } = getSessionInfos();
+      const activityName = await getActivityName(
+        webCard.companyActivityId,
+        locale,
+      );
+      return activityName || null;
+    }
+    return null;
+  },
+  coverIsPredefined: async webCard => webCard.coverIsPredefined,
 };
 
 export const WebCardCategory: WebCardCategoryResolvers = {

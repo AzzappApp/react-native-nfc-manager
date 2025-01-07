@@ -182,7 +182,7 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
     for (const { id, ...profile } of profilesToUpdate) {
       await updateProfile(id, profile);
       const existingUser = users.find(user => user.id === profile.userId);
-      if (existingUser) {
+      if (existingUser && webCard.userName) {
         await sendPushNotification(existingUser.id, {
           type: 'multiuser_invitation',
           mediaId: webCard.coverMediaId,

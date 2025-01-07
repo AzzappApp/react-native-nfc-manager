@@ -47,9 +47,6 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
             userName
             cardIsPublished
             hasCover
-            webCardCategory {
-              id
-            }
             owner {
               email
               phoneNumber

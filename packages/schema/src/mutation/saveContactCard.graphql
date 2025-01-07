@@ -4,8 +4,12 @@ extend type Mutation {
   Save the current user's contact card.
   """
   saveContactCard(profileId: ID!, contactCard: ContactCardInput!): SaveContactCardPayload!
-}
 
+  """
+  create a new contact card.
+  """
+  createContactCard(webCardKind: String!, contactCard: ContactCardInput!): SaveContactCardPayload!
+}
 
 input ContactCardInput {
   firstName: String
@@ -22,6 +26,7 @@ input ContactCardInput {
   displayedOnWebCard: Boolean
   avatarId: String
   logoId: String
+  companyActivityLabel: String
 }
 
 
@@ -57,10 +62,6 @@ input ContactCardSocialInput {
   url: String!
   label: String!
   selected: Boolean
-}
-
-input ContactCardStyleInput {
-  backgroundColor: String!
 }
 
 type SaveContactCardPayload {

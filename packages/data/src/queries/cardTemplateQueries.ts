@@ -2,6 +2,7 @@ import { eq, sql } from 'drizzle-orm';
 import { db } from '../database';
 import { CardTemplateTable } from '../schema';
 import type { CardTemplate } from '../schema';
+import type { WebCardKind } from '@azzapp/shared/webCardKind';
 import type { InferInsertModel } from 'drizzle-orm';
 
 /**
@@ -68,7 +69,7 @@ export const getAllCardTemplates = (): Promise<CardTemplate[]> =>
  * @return a list of card templates with a cursor for pagination
  */
 export const getCardTemplatesForWebCardKind = async (
-  webCardKind: 'business' | 'personal',
+  webCardKind: WebCardKind,
   cardTemplateTypeId: string | null | undefined,
   randomSeed: string,
   offset?: string | null,

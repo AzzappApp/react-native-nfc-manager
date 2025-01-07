@@ -35,7 +35,7 @@ import MediaSuggestionsScreen, {
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { MediaScreenQuery } from '#relayArtifacts/MediaScreenQuery.graphql';
 import type { MediaRoute } from '#routes';
-import type { ReactElement } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 
 type TAB = 'FOLLOWINGS' | 'MY_POSTS' | 'SUGGESTIONS';
 
@@ -50,6 +50,7 @@ const mediaScreenQuery = graphql`
           id
           userName
           cardIsPublished
+          coverIsPredefined
           ...WebCardPostsList_webCard
             @arguments(viewerWebCardId: $viewerWebCardId)
           ...PostRendererFragment_author
@@ -77,6 +78,8 @@ const MediaScreen = ({
     });
   }, []);
 
+  const intl = useIntl();
+
   const router = useRouter();
 
   useEffect(() => {
@@ -85,13 +88,53 @@ const MediaScreen = ({
     }
   }, [hasFocus]);
 
+  const canBrowseCommunity =
+    profile?.webCard?.cardIsPublished &&
+    !profile?.invited &&
+    !profile?.webCard?.coverIsPredefined;
+
   useEffect(() => {
-    if (profile?.invited || !profile?.webCard?.cardIsPublished) {
+    let toastMessage: ReactNode[] | string | undefined = undefined;
+    if (!profile?.webCard?.cardIsPublished) {
+      toastMessage = intl.formatMessage(
+        {
+          defaultMessage: 'Publish WebCard{azzappA} to browse community',
+          description:
+            'info toast when browsing community on an unpublished webcard',
+        },
+        {
+          azzappA: <Text variant="azzapp">a</Text>,
+        },
+      );
+    }
+    if (profile?.invited) {
+      toastMessage = intl.formatMessage({
+        defaultMessage: 'Accept invitation to browse community',
+        description: 'info toast when browsing community on an invit webcard',
+      });
+    }
+    if (profile?.webCard?.coverIsPredefined) {
+      toastMessage = intl.formatMessage({
+        defaultMessage: 'Create a cover to browse community',
+        description:
+          'info toast when browsing community on an predefined cover',
+      });
+    }
+
+    if (toastMessage) {
+      Toast.show({
+        type: 'info',
+        text1: toastMessage as string,
+      });
       router.backToTop();
     }
-  }, [profile?.invited, profile?.webCard?.cardIsPublished, router]);
-
-  const intl = useIntl();
+  }, [
+    intl,
+    profile?.invited,
+    profile?.webCard?.cardIsPublished,
+    profile?.webCard?.coverIsPredefined,
+    router,
+  ]);
 
   const onCreatePost = useCallback(() => {
     const { profileInfos } = getAuthState();
@@ -110,7 +153,7 @@ const MediaScreen = ({
   }, [router, intl]);
 
   // viewer might be briefly null when the user logs out or by switching accounts
-  if (!profile || !profile.webCard) {
+  if (!profile || !profile.webCard || !canBrowseCommunity) {
     return null;
   }
 

@@ -19,6 +19,7 @@ const PostLikesModalContent = ({ likes, onFetchMore }: Props) => {
     <div className={styles.likes} ref={scroll}>
       {likes.map(like => {
         const { media, ...webcard } = like;
+        if (!webcard.userName) return undefined;
         return (
           <div key={like.id} className={styles.like}>
             {media && (

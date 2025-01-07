@@ -2,6 +2,7 @@ import acceptInvitation from './acceptInvitation';
 import acceptOwnership from './acceptOwnership';
 import addContact from './addContact';
 import cancelTransferOwnership from './cancelTransferOwnership';
+import createContactCard from './createContactCard';
 import createPost from './createPost';
 import createPostCommentMutation from './createPostComment';
 import createWebCard from './createWebCard';
@@ -70,6 +71,7 @@ import updateWebCardUserName from './updateWebCardUserName';
 import type { MutationResolvers } from '#/__generated__/types';
 
 export const Mutation: MutationResolvers = {
+  createContactCard,
   createPost,
   createWebCard,
   createPostComment: createPostCommentMutation,

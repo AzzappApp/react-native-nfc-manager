@@ -163,8 +163,6 @@ const WebCardTemplateSelectionScreen = ({
             />
           }
           rightElementWidth={80}
-          currentPage={4}
-          nbPages={5}
         />
       )}
       <Suspense

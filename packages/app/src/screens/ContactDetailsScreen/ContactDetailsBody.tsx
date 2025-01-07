@@ -7,8 +7,8 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { Linking, Platform, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import ShareCommand from 'react-native-share';
-
 import { colors, shadow } from '#theme';
+import CoverRenderer from '#components/CoverRenderer';
 import { buildVCardFromExpoContact } from '#helpers/contactCardHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { sanitizeFilePath } from '#helpers/fileHelpers';
@@ -18,6 +18,7 @@ import Container from '#ui/Container';
 import Icon, { SocialIcon } from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
+import type { CoverRenderer_webCard$key } from '#relayArtifacts/CoverRenderer_webCard.graphql';
 import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
 
 type Props = {
@@ -98,6 +99,8 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
           <View style={[styles.avatar, styles.avatarWrapper]}>
             {avatar ? (
               <Image source={avatar} style={styles.avatar} />
+            ) : details.webCard ? (
+              <CoverRenderer width={AVATAR_WIDTH} webCard={details.webCard} />
             ) : (
               <Text style={styles.initials}>
                 {details.firstName?.substring(0, 1)}
@@ -381,6 +384,7 @@ const HEADER = 300;
 export type ContactDetails = Contact & {
   createdAt: Date;
   profileId?: string;
+  webCard?: CoverRenderer_webCard$key | null;
 };
 
 export default ContactDetailsBody;

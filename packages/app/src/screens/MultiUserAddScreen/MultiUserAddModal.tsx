@@ -38,7 +38,7 @@ import MultiUserAddForm from './MultiUserAddForm';
 import type { EmailPhoneInput } from '#components/EmailOrPhoneInput';
 import type { MultiUserAddModal_InviteUserMutation } from '#relayArtifacts/MultiUserAddModal_InviteUserMutation.graphql';
 import type { MultiUserAddModal_webCard$key } from '#relayArtifacts/MultiUserAddModal_webCard.graphql';
-import type { ContactCardEditFormValues } from '#screens/ContactCardEditScreen/ContactCardEditModalSchema';
+import type { ContactCardFormValues } from '#screens/ContactCardEditScreen/ContactCardSchema';
 import type { MultiUserAddFormValues } from './MultiUserAddForm';
 import type { Address, Contact } from 'expo-contacts';
 import type { CountryCode } from 'libphonenumber-js';
@@ -662,7 +662,7 @@ const MultiUserAddModal = (
           />
           <ContactCardEditForm
             webCard={webCard}
-            control={control as unknown as Control<ContactCardEditFormValues>}
+            control={control as unknown as Control<ContactCardFormValues>}
           >
             <MultiUserAddForm contacts={contacts} control={control} />
           </ContactCardEditForm>

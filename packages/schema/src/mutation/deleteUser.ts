@@ -27,7 +27,7 @@ const deleteUser: MutationResolvers['deleteUser'] = async () => {
     await markUserAsDeleted(userId, userId);
     const userProfiles = await getUserProfilesWithWebCard(userId);
     userProfiles.forEach(({ profile, webCard }) => {
-      if (profile.profileRole === 'owner') {
+      if (profile.profileRole === 'owner' && webCard.userName) {
         invalidateWebCard(webCard.userName);
       }
     });

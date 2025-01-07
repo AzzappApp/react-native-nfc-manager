@@ -3,7 +3,7 @@ import { compressToEncodedURIComponent } from 'lz-string';
  * Builds a user URL from a user name.
  */
 export function buildUserUrl(
-  userName: string,
+  userName?: string | null,
   base: string = process.env.NEXT_PUBLIC_URL ?? 'https://www.azzapp.com/',
 ) {
   if (userName) {
@@ -16,9 +16,12 @@ export function buildUserUrl(
  * Builds a user URL from a user name.
  */
 export function buildReadableUserUrl(
-  userName: string,
+  userName?: string | null,
   base: string = process.env.NEXT_PUBLIC_URL ?? 'https://www.azzapp.com/',
 ) {
+  if (!userName) {
+    return 'azzapp.com/';
+  }
   return buildUserUrl(userName, base).replace(base, 'azzapp.com/');
 }
 

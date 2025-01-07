@@ -123,7 +123,7 @@ const WebCardScreenPublishHelper = ({
     setShowPublishModal(false);
     router.backToTop();
   };
-  const url = buildReadableUserUrl(userName);
+  const url = userName ? buildReadableUserUrl(userName) : '';
 
   const styles = useStyleSheet(stylesheet);
 

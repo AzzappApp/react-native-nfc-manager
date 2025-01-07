@@ -1,5 +1,8 @@
 import { addEventListener, configure } from '@react-native-community/netinfo';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { AppState } from 'react-native';
+import type { NetInfoSubscription } from '@react-native-community/netinfo';
+import type { AppStateStatus } from 'react-native';
 
 const NetworkAvailableContext = createContext<boolean | null>(null);
 
@@ -50,7 +53,13 @@ export const useNetworkAvailableFetcher = () => {
     backendReachable: true,
   });
 
-  useEffect(() => {
+  const intervalRef = useRef<ReturnType<typeof setInterval>>();
+
+  const enableBackendFetcher = () => {
+    if (intervalRef.current) {
+      // already ongoing
+      return;
+    }
     // The function to query backend availability
     const fetchRequest = () => {
       fetch(reachabilityUrl, {
@@ -84,28 +93,63 @@ export const useNetworkAvailableFetcher = () => {
     // initial check
     fetchRequest();
     // Handle backend availability refresh
-    const interval = setInterval(fetchRequest, networkCheckTimeoutMs);
+    intervalRef.current = setInterval(fetchRequest, networkCheckTimeoutMs);
+  };
+
+  const disableBackendFetcher = () => {
+    clearInterval(intervalRef.current);
+    intervalRef.current = undefined;
+  };
+
+  ///// Device monitoring management
+  const deviceMonitoringUnsubscribeRef = useRef<NetInfoSubscription>();
+
+  const enableDeviceMonitoring = () => {
+    if (!deviceMonitoringUnsubscribeRef.current) {
+      // Handle device connection
+      deviceMonitoringUnsubscribeRef.current = addEventListener(state => {
+        if (state.isConnected !== null) {
+          connectionState.current = {
+            networkConnected: state.isConnected,
+            backendReachable: connectionState.current.backendReachable,
+          };
+          setIsConnected(
+            connectionState.current.networkConnected &&
+              connectionState.current.backendReachable,
+          );
+        }
+      });
+    }
+  };
+  const disableDeviceMonitoring = () => {
+    deviceMonitoringUnsubscribeRef.current?.();
+    deviceMonitoringUnsubscribeRef.current = undefined;
+  };
+
+  useEffect(() => {
+    function onChange(newState: AppStateStatus) {
+      if (newState === 'active') {
+        // enable all timers and monitoring
+        enableDeviceMonitoring();
+        enableBackendFetcher();
+      } else {
+        // cancel all timers and monitoring
+        disableDeviceMonitoring();
+        disableBackendFetcher();
+      }
+    }
+    const subscription = AppState.addEventListener('change', onChange);
+    // ensure initial state is well handled
+    onChange(AppState.currentState);
     return () => {
-      clearInterval(interval);
+      subscription.remove();
     };
   }, []);
 
   useEffect(() => {
-    // Handle device connection
-    const unsubscribe = addEventListener(state => {
-      if (state.isConnected !== null) {
-        connectionState.current = {
-          networkConnected: state.isConnected,
-          backendReachable: connectionState.current.backendReachable,
-        };
-        setIsConnected(
-          connectionState.current.networkConnected &&
-            connectionState.current.backendReachable,
-        );
-      }
-    });
     return () => {
-      unsubscribe();
+      disableDeviceMonitoring();
+      disableBackendFetcher();
     };
   }, []);
 

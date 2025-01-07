@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react-native';
 import { Suspense, useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Alert, StyleSheet, View } from 'react-native';
@@ -262,7 +263,13 @@ const WebCardScreenButtonActionButton = ({
     }
     const { profileInfos } = getAuthState();
     if (profileInfoHasEditorRight(profileInfos)) {
-      onToggleFollow(webCard.id, webCard.userName, !isFollowing);
+      if (webCard.userName) {
+        onToggleFollow(webCard.id, webCard.userName, !isFollowing);
+      } else {
+        Sentry.captureMessage(
+          'null username in WebCardButtonBar / onToggleFollow',
+        );
+      }
     } else if (isFollowing) {
       Toast.show({
         type: 'error',

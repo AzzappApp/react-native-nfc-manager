@@ -106,6 +106,10 @@ const WebCardMenu = ({
   const intl = useIntl();
 
   const onShare = async () => {
+    if (!webCard.userName) {
+      Sentry.captureMessage('null username in WebCardMenu / onShare');
+      return;
+    }
     // a quick share method using the native share component. If we want to make a custom share (like tiktok for example, when they are recompressiong the media etc) we can use react-native-shares
     const url = buildUserUrl(webCard.userName);
     let message = intl.formatMessage({
@@ -220,6 +224,10 @@ const WebCardMenu = ({
   }, [visible]);
 
   const debouncedToggleFollowing = useDebouncedCallback(() => {
+    if (!webCard.userName) {
+      Sentry.captureMessage('null username in WebCardMenu / onToggleFollow');
+      return;
+    }
     onToggleFollow(webCard.id, webCard.userName, !isFollowing);
   }, 600);
 
@@ -460,7 +468,7 @@ const WebCardMenu = ({
               </View>
             </PressableNative>
           )}
-          {webCard.cardIsPublished && (
+          {webCard.cardIsPublished && webCard.userName && (
             <PressableNative
               style={styles.bottomSheetOptionButton}
               onPress={onShare}

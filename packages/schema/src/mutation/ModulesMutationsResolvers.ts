@@ -142,9 +142,9 @@ const createModuleSavingMutation =
     if (!webCard) {
       throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
     }
-
-    invalidateWebCard(webCard.userName);
-
+    if (webCard.userName) {
+      invalidateWebCard(webCard.userName);
+    }
     return { webCard };
   };
 

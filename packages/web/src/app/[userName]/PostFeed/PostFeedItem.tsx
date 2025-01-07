@@ -120,10 +120,12 @@ const PostFeedItem = (
           <span className={styles.postElapsedTime}>{elapsedTime}</span>
         </div>
       </div>
-      <ShareModal
-        ref={share}
-        link={generateSharePostLink(webCard.userName, post.id)}
-      />
+      {webCard.userName && (
+        <ShareModal
+          ref={share}
+          link={generateSharePostLink(webCard.userName, post.id)}
+        />
+      )}
     </>
   );
 };

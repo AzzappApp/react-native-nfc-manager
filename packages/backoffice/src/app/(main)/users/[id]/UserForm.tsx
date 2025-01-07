@@ -99,17 +99,22 @@ const UserForm = ({ user, profiles }: UserFormProps) => {
           overflow: 'auto',
         }}
       >
-        {profiles.map(({ webCard, profile: { profileRole } }) => (
-          <WebCardCover
-            key={webCard.id}
-            webcard={webCard}
-            role={profileRole}
-            onRemoveWebCard={() => removeWebCard(user.id, webCard.id)}
-            onToggleStar={() => {
-              toggleStar(user.id, webCard.id);
-            }}
-          />
-        ))}
+        {profiles.map(({ webCard, profile: { profileRole } }) => {
+          if (!webCard?.userName) {
+            return undefined;
+          }
+          return (
+            <WebCardCover
+              key={webCard.id}
+              webcard={webCard}
+              role={profileRole}
+              onRemoveWebCard={() => removeWebCard(user.id, webCard.id)}
+              onToggleStar={() => {
+                toggleStar(user.id, webCard.id);
+              }}
+            />
+          );
+        })}
       </Card>
       <Box
         sx={{

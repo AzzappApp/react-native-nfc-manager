@@ -13,6 +13,7 @@ import { useDeepLinkStoredRoute } from '#hooks/useDeepLink';
 import { useRevenueCat } from '#hooks/useRevenueCat';
 import { useSetRevenueCatUserInfo } from '#hooks/useSetRevenueCatUserInfo';
 import Container from '#ui/Container';
+import { HomeBottomSheetModalToolTip } from './HomeBottomSheetModalToolTip';
 import HomeScreenContent from './HomeScreenContent';
 import { HomeScreenProvider } from './HomeScreenContext';
 import HomeScreenPrefetcher from './HomeScreenPrefetcher';
@@ -56,17 +57,15 @@ const HomeScreen = ({
     }
   }, [hasFocus]);
 
-  const hasProfile = useMemo(() => {
-    if (!currentUser?.profiles) return false;
-    return currentUser.profiles.length > 0;
-  }, [currentUser?.profiles]);
-
   useEffect(() => {
-    //if not profile, launch onboarding
-    if (!hasProfile) {
+    //if not profile, launch onboarding (except if we are in offline mode)
+    if (
+      (!currentUser?.profiles || currentUser.profiles.length === 0) &&
+      hasFocus
+    ) {
       router.replaceAll(mainRoutes(true));
     }
-  }, [hasProfile, router]);
+  }, [currentUser, currentUser?.profiles, hasFocus, router]);
 
   useSaveOfflineVCard(currentUser?.profiles);
 
@@ -84,12 +83,14 @@ const HomeScreen = ({
   return (
     <Suspense>
       <HomeScreenProvider userKey={currentUser} onIndexChange={onIndexChange}>
-        <HomeScreenContent
-          user={currentUser}
-          selectListRef={ref}
-          refreshQuery={refreshQuery}
-        />
-        <HomeScreenPrefetcher user={currentUser} />
+        <HomeBottomSheetModalToolTip>
+          <HomeScreenContent
+            user={currentUser}
+            selectListRef={ref}
+            refreshQuery={refreshQuery}
+          />
+          <HomeScreenPrefetcher user={currentUser} />
+        </HomeBottomSheetModalToolTip>
       </HomeScreenProvider>
     </Suspense>
   );

@@ -5,13 +5,10 @@ import { Typography, Breadcrumbs, Link, Box, Tabs, Tab } from '@mui/material';
 
 import { useState } from 'react';
 import CoverTemplatesParametersForm from './CoverTemplatesParametersForm';
-import CoverTemplatePreviews from './CoverTemplatesPreviews';
-import type { ActivityItem } from './[id]/page';
 
 import type {
   ColorPalette,
   CoverTemplate,
-  CoverTemplatePreview,
   CoverTemplateTag,
   CoverTemplateType,
 } from '@azzapp/data';
@@ -25,8 +22,6 @@ type CoverTemplateFormProps = {
   coverTemplateTags: Array<CoverTemplateTag & { label: string }>;
   colorPalettes: ColorPalette[];
   coverTemplateTypes: Array<CoverTemplateType & { label: string }>;
-  coverTemplatePreviews?: CoverTemplatePreview[];
-  activities?: ActivityItem[];
   saved?: boolean;
 };
 
@@ -35,8 +30,6 @@ const CoverTemplateForm = ({
   colorPalettes,
   coverTemplateTypes,
   coverTemplateTags,
-  coverTemplatePreviews,
-  activities,
   saved = false,
 }: CoverTemplateFormProps) => {
   const [selectedTab, setSelectedTab] = useState(0);
@@ -72,11 +65,6 @@ const CoverTemplateForm = ({
               id="configuration"
               aria-controls="configuration"
             />
-            <Tab
-              label="Activities Previews"
-              id="previews"
-              aria-controls="previews"
-            />
           </Tabs>
         </Box>
       )}
@@ -91,17 +79,6 @@ const CoverTemplateForm = ({
             saved={saved}
           />
         )}
-
-        {TABS[selectedTab] === 'previews' &&
-          coverTemplate &&
-          coverTemplatePreviews &&
-          activities && (
-            <CoverTemplatePreviews
-              coverTemplate={coverTemplate}
-              coverTemplatePreviews={coverTemplatePreviews}
-              activities={activities}
-            />
-          )}
       </Box>
     </>
   );

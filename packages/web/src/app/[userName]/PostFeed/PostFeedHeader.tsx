@@ -80,10 +80,12 @@ const PostFeedHeader = (props: PostFeedHeaderProps) => {
         />
       </div>
       <DownloadAppModal ref={download} webCard={webCard} media={media} />
-      <ShareModal
-        ref={share}
-        link={generateShareProfileLink(webCard.userName)}
-      />
+      {webCard.userName && (
+        <ShareModal
+          ref={share}
+          link={generateShareProfileLink(webCard.userName)}
+        />
+      )}
     </div>
   );
 };

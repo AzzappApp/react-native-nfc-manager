@@ -73,6 +73,7 @@ import CommonInformationScreen from '#screens/CommonInformationScreen';
 import ConfirmChangeContactScreen from '#screens/ConfirmChangeContactScreen';
 import ConfirmRegistrationScreen from '#screens/ConfirmRegistrationScreen';
 import ContactCardEditScreen from '#screens/ContactCardEditScreen';
+import ContactCardCreateScreen from '#screens/ContactCardEditScreen/ContactCardCreateScreen';
 import ContactCardScreen from '#screens/ContactCardScreen';
 import ContactDetailsScreen from '#screens/ContactDetailsScreen';
 import ContactsScreen from '#screens/ContactsScreen';
@@ -108,8 +109,6 @@ import SignInScreen from '#screens/SignInScreen';
 import SignUpScreen from '#screens/SignUpScreen';
 import UpdateApplicationScreen from '#screens/UpdateApplicationScreen';
 import UserPayWallScreen from '#screens/UserPayWallScreen';
-import WebCardFormScreen from '#screens/WebCardFormScreen';
-import WebCardKindSelectionScreen from '#screens/WebCardKindSelectionScreen';
 import WebCardParametersScreen from '#screens/WebCardParametersScreen';
 import WebCardScreen from '#screens/WebCardScreen';
 import WebCardTemplateSelectionScreen from '#screens/WebCardTemplateSelectionScreen';
@@ -225,6 +224,7 @@ const screens = {
   CARD_MODULE_MEDIA_TEXT_LINK_EDITION: MediaTextLinkModuleWebCardEditionScreen,
   CONTACT_CARD: ContactCardScreen,
   CONTACT_CARD_EDIT: ContactCardEditScreen,
+  CONTACT_CARD_CREATE: ContactCardCreateScreen,
   CONFIRM_CHANGE_CONTACT: ConfirmChangeContactScreen,
   COMMON_INFORMATION: CommonInformationScreen,
   CONTACTS: ContactsScreen,
@@ -259,8 +259,6 @@ const screens = {
   USER_PAY_WALL: UserPayWallScreen,
   WEBCARD: WebCardScreen,
   WEBCARD_PARAMETERS: WebCardParametersScreen,
-  WEBCARD_KIND_SELECTION: WebCardKindSelectionScreen,
-  WEBCARD_FORM: WebCardFormScreen,
   WEBCARD_TEMPLATE_SELECTION: WebCardTemplateSelectionScreen,
 } satisfies ScreenMap;
 
