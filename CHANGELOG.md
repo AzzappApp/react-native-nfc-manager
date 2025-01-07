@@ -1,5 +1,6 @@
-## 1.5.4-canary.20
+## 1.6.0-canary.1
 
+* **fix:**  - ensure profile is not reset at boot ([#6704](https://github.com/AzzappApp/azzapp/pull/6704))
 * **fix:**  - improve timing to avoid white screen background ([#6703](https://github.com/AzzappApp/azzapp/pull/6703))
 * **fix:**  - do not allow using the same video multiple times and keep strong constrint on video count ([#6682](https://github.com/AzzappApp/azzapp/pull/6682))
 * **fix:**  - review common informations sharing ([#6639](https://github.com/AzzappApp/azzapp/pull/6639))
@@ -9,103 +10,14 @@
 * **fix:**  - ensure video is well stretch in view ([#6607](https://github.com/AzzappApp/azzapp/pull/6607))
 * **feat:**  - animate popup show and hide (slide from bottom) ([#6596](https://github.com/AzzappApp/azzapp/pull/6596))
 * **fix:**  - incorrect alignment when no label is available ([#6640](https://github.com/AzzappApp/azzapp/pull/6640))
-* **fix:**  - **WebCardScreen:** reenable split animation ([#6661](https://github.com/AzzappApp/azzapp/pull/6661))
-* **fix:**  - arrow sometimes not unmounted, just hide them ([#6654](https://github.com/AzzappApp/azzapp/pull/6654))
-* **fix:**  - card module save first progress bar ([#6656](https://github.com/AzzappApp/azzapp/pull/6656))
-* **fix:**  - preview desktop parallax text with link ([#6659](https://github.com/AzzappApp/azzapp/pull/6659))
-* **fix:**  - variant list design broken after android adaptation ([#6657](https://github.com/AzzappApp/azzapp/pull/6657))
-* **fix:**  - add missing clearTimeout ([#6653](https://github.com/AzzappApp/azzapp/pull/6653))
-* **fix:**  - **Android:** collapsable on ChildAwareScrollView
-* **fix:**  - restore version
-* **fix:**  - **WebCardEdition:** includes variant in result of module creation ([#6645](https://github.com/AzzappApp/azzapp/pull/6645))
-* **fix:**  - delete file to avoid subsequent issues ([#6646](https://github.com/AzzappApp/azzapp/pull/6646))
-* **fix:**  - force  BlurView:version-2.0.4 ([#6642](https://github.com/AzzappApp/azzapp/pull/6642))
-* **fix:**  - ensure path and download of avatar are correctly handled ([#6632](https://github.com/AzzappApp/azzapp/pull/6632))
-* **fix:**  - set default backgroundColor on image with transparancy ([#6631](https://github.com/AzzappApp/azzapp/pull/6631))
-* **fix:**  - restore textblock image ([#6635](https://github.com/AzzappApp/azzapp/pull/6635))
-* **fix:**  - don't try to compress cloudinary image ([#6634](https://github.com/AzzappApp/azzapp/pull/6634))
-* **feat:**  - split webcard edition and webcard screen ([#6629](https://github.com/AzzappApp/azzapp/pull/6629))
-* **fix:**  - **cover:** [#6578](https://github.com/AzzappApp/azzapp/pull/6578) get actual rotation ([#6604](https://github.com/AzzappApp/azzapp/pull/6604))
 * **fix:**  - 🐛 display right color for barchart on android ([#6415](https://github.com/AzzappApp/azzapp/pull/6415))
 * **feat:**  - 🎸 display and create contact with cover if no avatar ([#6463](https://github.com/AzzappApp/azzapp/pull/6463))
 * **fix:**  - 🐛 properly display contact modal header ([#6464](https://github.com/AzzappApp/azzapp/pull/6464))
 * **fix:**  - 🐛 don't display common information from deactivated multi ([#6406](https://github.com/AzzappApp/azzapp/pull/6406))
-* **fix:**  - review autocroll behavior ([#6599](https://github.com/AzzappApp/azzapp/pull/6599))
-* **fix:**  - **modules:** [#6584](https://github.com/AzzappApp/azzapp/pull/6584) make buttons clickable on android ([#6603](https://github.com/AzzappApp/azzapp/pull/6603))
-* **fix:**  - **modules:** [#6571](https://github.com/AzzappApp/azzapp/pull/6571) put text on top on android ([#6602](https://github.com/AzzappApp/azzapp/pull/6602))
-* **fix:**  - **modules:** [#6597](https://github.com/AzzappApp/azzapp/pull/6597) media may be undefined (so app crashes) ([#6600](https://github.com/AzzappApp/azzapp/pull/6600))
 * **fix:**  - move setup images / lottie to video ([#6595](https://github.com/AzzappApp/azzapp/pull/6595))
-* **fix:**  - **modules:** [#6585](https://github.com/AzzappApp/azzapp/pull/6585) keyboard mgmt ([#6589](https://github.com/AzzappApp/azzapp/pull/6589))
-* **fix:**  - **modules:** [#6575](https://github.com/AzzappApp/azzapp/pull/6575) oppositeScale cut preview on android (and is useless) ([#6588](https://github.com/AzzappApp/azzapp/pull/6588))
 * **fix:**  - manage webCardKind types locally and fix configuration from webCardScreen ([#6583](https://github.com/AzzappApp/azzapp/pull/6583))
 * **fix:**  - do not force displaying keyboard when third step of pop up display ([#6579](https://github.com/AzzappApp/azzapp/pull/6579))
 * **fix:**  - update webcard color on first cover creation ([#6580](https://github.com/AzzappApp/azzapp/pull/6580))
-* **fix:**  - **modules:** [#6574](https://github.com/AzzappApp/azzapp/pull/6574) adapt design tool for android ([#6577](https://github.com/AzzappApp/azzapp/pull/6577))
-* **fix:**  - **modules:** [#6564](https://github.com/AzzappApp/azzapp/pull/6564) deactivate opacity on videos on android ([#6569](https://github.com/AzzappApp/azzapp/pull/6569))
-* **fix:**  - **Media:** oriented video support and compression configuration ([#6568](https://github.com/AzzappApp/azzapp/pull/6568))
-* **fix:**  - **modules:** [#6489](https://github.com/AzzappApp/azzapp/pull/6489) resize parallax width when parent div is reduced ([#6566](https://github.com/AzzappApp/azzapp/pull/6566))
-* **fix:**  - **android:** [#6525](https://github.com/AzzappApp/azzapp/pull/6525) action text input is hidden behind keyboard + clearTextOnFocus does not work on android ([#6563](https://github.com/AzzappApp/azzapp/pull/6563))
-* **fix:**  - lint issue
-* **fix:**  - **webCard:** [#6518](https://github.com/AzzappApp/azzapp/pull/6518) wait for webCard to be replicated
-* **docs:**  - Update README.md
-* **docs:**  - update readme.md
-* **fix:**  - **webCard:** [#6518](https://github.com/AzzappApp/azzapp/pull/6518) add sentry error
-* **fix:**  - **cover:** [#6550](https://github.com/AzzappApp/azzapp/pull/6550) update properly media on video compress in cover ([#6557](https://github.com/AzzappApp/azzapp/pull/6557))
-* **fix:**  - **Post:** correct URI for uploading
-* **fix:**  - **webCard:** [#6518](https://github.com/AzzappApp/azzapp/pull/6518) try to slow down webCard change
-* **fix:**  - **IOS:** use the edited version of video in media library ([#6558](https://github.com/AzzappApp/azzapp/pull/6558))
-* **fix:**  - **post:** [#6549](https://github.com/AzzappApp/azzapp/pull/6549) wrong path on post with image creation ([#6555](https://github.com/AzzappApp/azzapp/pull/6555))
-* **fix:**  - **modules:** [#6456](https://github.com/AzzappApp/azzapp/pull/6456) crash on preview + enhance alternation animation ([#6548](https://github.com/AzzappApp/azzapp/pull/6548))
-* **fix:**  - **webCard:** [#6518](https://github.com/AzzappApp/azzapp/pull/6518) try to simplify authStore
-* **fix:**  - **webCard:** [#6518](https://github.com/AzzappApp/azzapp/pull/6518) try without transition
-* **fix:**  - **webCard:** [#6518](https://github.com/AzzappApp/azzapp/pull/6518) remove useless async
-* **fix:**  - **WebCardScreen:** reenable animation on IOS ([#6547](https://github.com/AzzappApp/azzapp/pull/6547))
-* **fix:**  - invalid path on image creation
-* **fix:**  - **webCard:** [#6518](https://github.com/AzzappApp/azzapp/pull/6518) try to add created webcard in dataloader
-* **fix:**  - **modules:** replace reanimated with animated to fix scroll on android ([#6543](https://github.com/AzzappApp/azzapp/pull/6543))
-* **fix:**  - **socialLink:** [#6531](https://github.com/AzzappApp/azzapp/pull/6531) wrong stored svg ([#6540](https://github.com/AzzappApp/azzapp/pull/6540))
-* **fix:**  - **cover:** [#6535](https://github.com/AzzappApp/azzapp/pull/6535) use correct path ([#6539](https://github.com/AzzappApp/azzapp/pull/6539))
-* **fix:**  - **modules:** [#6532](https://github.com/AzzappApp/azzapp/pull/6532) wrong path for local cached media ([#6537](https://github.com/AzzappApp/azzapp/pull/6537))
-* **fix:**  - **modules:** [#6530](https://github.com/AzzappApp/azzapp/pull/6530) apply timeRange ([#6534](https://github.com/AzzappApp/azzapp/pull/6534))
-* **fix:**  - **modules:** [#6521](https://github.com/AzzappApp/azzapp/pull/6521) don’t capitalize url ([#6533](https://github.com/AzzappApp/azzapp/pull/6533))
-* **fix:**  - **Android:** reenable adjust
-* **DRAFT:**  - [Staging] Coming soon module ([#6524](https://github.com/AzzappApp/azzapp/pull/6524))
-* **fix:**  - **modules:** [#6515](https://github.com/AzzappApp/azzapp/pull/6515) update height and width after compression ([#6528](https://github.com/AzzappApp/azzapp/pull/6528))
-* **fix:**  - **modules:** [#6520](https://github.com/AzzappApp/azzapp/pull/6520) don’t save url into local cache ([#6527](https://github.com/AzzappApp/azzapp/pull/6527))
-* **fix:**  -  wrong color pattern media text link parallax ([#6529](https://github.com/AzzappApp/azzapp/pull/6529))
-* **perf:**  - compress local video ([#6519](https://github.com/AzzappApp/azzapp/pull/6519))
-* **fix:**  - adapt borderRadius of slideshow depending of webcard theme ([#6514](https://github.com/AzzappApp/azzapp/pull/6514))
-* **STAGING:**  - Module Fix keyboard cursor  closing  the panel ([#6523](https://github.com/AzzappApp/azzapp/pull/6523))
-* **fix:**  - keyboard behaviour on dismounting and saving module text media
-* **fix:**  - **modules:** [#6455](https://github.com/AzzappApp/azzapp/pull/6455) attempt to reduce memory footprint during module … ([#6486](https://github.com/AzzappApp/azzapp/pull/6486))
 * **fix:**  - add notification when contact is added to refresh add to contacts indicator ([#6474](https://github.com/AzzappApp/azzapp/pull/6474))
-* **fix:**  - **Home:** remove animation of statistics text ([#6505](https://github.com/AzzappApp/azzapp/pull/6505))
-* **fix:**  - **NewModule:** close modal after edition save ([#6509](https://github.com/AzzappApp/azzapp/pull/6509))
-* **fix:**  - **modules:** [#6425](https://github.com/AzzappApp/azzapp/pull/6425) add progress indicators and speed update module s… ([#6512](https://github.com/AzzappApp/azzapp/pull/6512))
 * **fix:**  - workaround missing delete/edit buttons ([#6503](https://github.com/AzzappApp/azzapp/pull/6503))
-* **fix:**  - rework contact before sending it to ios UI ([#6485](https://github.com/AzzappApp/azzapp/pull/6485))
-* **fix:**  - avoid overlap with bottomTabs in modules ([#6479](https://github.com/AzzappApp/azzapp/pull/6479))
-* **fix:**  - fill image from center on web app ([#6481](https://github.com/AzzappApp/azzapp/pull/6481))
 * **feat:**  - update data model for new contact card creation process ([#6309](https://github.com/AzzappApp/azzapp/pull/6309))
-* **fix:**  - Module improvement (from upmitt) ([#6458](https://github.com/AzzappApp/azzapp/pull/6458))
-* **fix:**  - don’t read directly profile that may be missing on replica
-* **fix:**  - try to read profile within transaction
-* **fix:**  - add confirmation message when we choose a template but modules are already available ([#6457](https://github.com/AzzappApp/azzapp/pull/6457))
-* **fix:**  - **Home:** freeze when stats scrolling
-* **fix:**  - add validation on URL but also a red indicator on tool to find t… ([#6442](https://github.com/AzzappApp/azzapp/pull/6442))
-* **fix:**  - replace dataloader with get query
-* **fix:**  - lzString decoding algorithm ([#6451](https://github.com/AzzappApp/azzapp/pull/6451))
-* **fix:**  - simplify get profileId value + get profileId value
-* **fix:**  - 🐛 properly handle edit on android home contact card ([#6449](https://github.com/AzzappApp/azzapp/pull/6449))
-* **fix:**  - **mediaPicker:** [#6428](https://github.com/AzzappApp/azzapp/pull/6428) put back patch on camera-roll ([#6448](https://github.com/AzzappApp/azzapp/pull/6448))
-* **fix:**  - **Home:** fix ios freeze on HOME
-* **fix:**  - **modules:** [#6441](https://github.com/AzzappApp/azzapp/pull/6441) rebuild path after local copy ([#6443](https://github.com/AzzappApp/azzapp/pull/6443))
-* **fix:**  - **video:** [#6412](https://github.com/AzzappApp/azzapp/pull/6412) thumbnail is strechted during webcard closing ([#6445](https://github.com/AzzappApp/azzapp/pull/6445))
-* **fix:**  - **post:** [#6428](https://github.com/AzzappApp/azzapp/pull/6428) remove # from uri ([#6440](https://github.com/AzzappApp/azzapp/pull/6440))
-* **fix:**  - **modules:** [#6432](https://github.com/AzzappApp/azzapp/pull/6432) contentInset is not supported on android ([#6436](https://github.com/AzzappApp/azzapp/pull/6436))
-* **fix:**  - 🐛 properly return filename ([#6439](https://github.com/AzzappApp/azzapp/pull/6439))
-* **fix:**  - **modules:** check if subscription is needed before adding a new module ([#6427](https://github.com/AzzappApp/azzapp/pull/6427))
-* **fix:**  - **modules:** [#6224](https://github.com/AzzappApp/azzapp/pull/6224) add videos in slideshow ([#6431](https://github.com/AzzappApp/azzapp/pull/6431))
-* **fix:**  - **modules:** [#6429](https://github.com/AzzappApp/azzapp/pull/6429) incorrect file path on android ([#6435](https://github.com/AzzappApp/azzapp/pull/6435))
-* **fix:**  - **webCard:** [#6422](https://github.com/AzzappApp/azzapp/pull/6422) no access to template list when not yet published ([#6433](https://github.com/AzzappApp/azzapp/pull/6433))
-* **build:**  - update nextjs for compatibility with node 22
