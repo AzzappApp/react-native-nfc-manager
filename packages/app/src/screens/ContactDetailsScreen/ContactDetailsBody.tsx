@@ -243,7 +243,7 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
               style={styles.item}
               onPress={() => {
                 if (social.url) {
-                  Linking.openURL(social.url);
+                  Linking.openURL(getSocialUrl(social.url));
                 }
               }}
             >
@@ -278,6 +278,9 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
     </Container>
   );
 };
+
+const getSocialUrl = (url: string) =>
+  url.startsWith('http') ? url : `https://${url}`;
 
 const AVATAR_WIDTH = 112;
 
