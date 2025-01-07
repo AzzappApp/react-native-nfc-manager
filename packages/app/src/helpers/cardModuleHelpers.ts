@@ -278,6 +278,8 @@ export const getTextStyle = (
   if (cardStyle?.fontSize) {
     textStyle.fontSize = cardStyle.fontSize;
   }
+  textStyle.lineHeight = textStyle.fontSize! * 1.6;
+
   return textStyle;
 };
 
