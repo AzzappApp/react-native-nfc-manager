@@ -192,7 +192,6 @@ const AlternationContainer = ({
     modulePosition ?? 0,
     dimension,
   );
-  console.log({ media: media.id, inViewport });
   if (!media || !children) {
     return null;
   }
