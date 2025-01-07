@@ -1,5 +1,13 @@
-## 1.5.4-canary.19
+## 1.5.4-canary.20
 
+* **fix:**  - improve timing to avoid white screen background ([#6703](https://github.com/AzzappApp/azzapp/pull/6703))
+* **fix:**  - do not allow using the same video multiple times and keep strong constrint on video count ([#6682](https://github.com/AzzappApp/azzapp/pull/6682))
+* **fix:**  - review common informations sharing ([#6639](https://github.com/AzzappApp/azzapp/pull/6639))
+* **fix:**  - change logo color to red ([#6621](https://github.com/AzzappApp/azzapp/pull/6621))
+* **fix:**  - improve invite removal reactivity ([#6620](https://github.com/AzzappApp/azzapp/pull/6620))
+* **fix:**  - preserve mime type in posts ([#6611](https://github.com/AzzappApp/azzapp/pull/6611))
+* **fix:**  - ensure video is well stretch in view ([#6607](https://github.com/AzzappApp/azzapp/pull/6607))
+* **feat:**  - animate popup show and hide (slide from bottom) ([#6596](https://github.com/AzzappApp/azzapp/pull/6596))
 * **fix:**  - incorrect alignment when no label is available ([#6640](https://github.com/AzzappApp/azzapp/pull/6640))
 * **fix:**  - **WebCardScreen:** reenable split animation ([#6661](https://github.com/AzzappApp/azzapp/pull/6661))
 * **fix:**  - arrow sometimes not unmounted, just hide them ([#6654](https://github.com/AzzappApp/azzapp/pull/6654))
