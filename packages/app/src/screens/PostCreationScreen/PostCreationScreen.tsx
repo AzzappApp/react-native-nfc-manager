@@ -1,4 +1,3 @@
-import { ImageFormat } from '@shopify/react-native-skia';
 import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { View } from 'react-native';
@@ -31,6 +30,7 @@ import {
 } from '#components/NativeRouter';
 import { getFileName } from '#helpers/fileHelpers';
 import {
+  getTargetFormatFromPath,
   saveTransformedImageToFile,
   saveTransformedVideoToFile,
 } from '#helpers/mediaEditions';
@@ -179,7 +179,7 @@ const PostCreationScreen = ({
           ? saveTransformedImageToFile({
               uri,
               resolution,
-              format: ImageFormat.JPEG,
+              format: getTargetFormatFromPath(uri),
               quality: 95,
               filter,
               editionParameters,
