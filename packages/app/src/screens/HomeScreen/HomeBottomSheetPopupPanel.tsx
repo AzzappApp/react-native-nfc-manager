@@ -50,10 +50,12 @@ const HomeBottomSheetPopupPanel = ({
   const styles = useStyleSheet(stylesheet);
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      onChangeWebCard(profileInfo);
-    }, 2000);
-    return () => clearTimeout(timeout);
+    if (profileInfo) {
+      const timeout = setTimeout(() => {
+        onChangeWebCard(profileInfo);
+      }, 2000);
+      return () => clearTimeout(timeout);
+    }
   }, [profileInfo]);
 
   useEffect(() => {
