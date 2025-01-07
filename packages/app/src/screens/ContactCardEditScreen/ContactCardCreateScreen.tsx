@@ -375,7 +375,11 @@ const ContactCardCreateScreen = () => {
           </ScreenModal>
         </SafeAreaView>
       </Container>
-      <BottomSheetPopup visible={popupVisible} onDismiss={hidePopup}>
+      <BottomSheetPopup
+        visible={popupVisible}
+        onDismiss={hidePopup}
+        isAnimatedContent
+      >
         <View style={styles.popupContainer}>
           <View style={styles.popupPage}>
             <Video

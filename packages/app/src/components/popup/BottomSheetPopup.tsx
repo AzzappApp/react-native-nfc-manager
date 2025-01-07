@@ -1,7 +1,8 @@
-import { memo, Suspense, useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
-import {
+import { memo, Suspense, useCallback, useEffect, useState } from 'react';
+import { StyleSheet } from 'react-native';
+import Animated, {
   interpolateColor,
+  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -17,6 +18,7 @@ type BottomSheetPopupProps = {
   children: ReactNode;
   onFadeOutFinish?: () => void;
   backgroundOpacity?: number;
+  isAnimatedContent?: boolean;
 };
 
 const defaultAnimationDuration = 500;
@@ -32,9 +34,21 @@ const BottomSheetPopup = ({
   onFadeOutFinish,
   children,
   backgroundOpacity = 0.5,
+  isAnimatedContent = false,
 }: BottomSheetPopupProps) => {
   const progress = useSharedValue(0);
   const { height } = useScreenDimensions();
+  const [visibleInner, setVisibleInner] = useState(visible);
+
+  useEffect(() => {
+    if (visible) setVisibleInner(visible);
+  }, [visible]);
+
+  const onFadeOutFinishInner = useCallback(() => {
+    'worklet';
+    runOnJS(setVisibleInner)(false);
+    onFadeOutFinish?.();
+  }, [onFadeOutFinish]);
 
   // Interpolating the background color
   const animatedBackground = useAnimatedStyle(() => {
@@ -63,16 +77,22 @@ const BottomSheetPopup = ({
       progress.value = withTiming(
         0,
         { duration: animationDuration },
-        onFadeOutFinish,
+        onFadeOutFinishInner,
       );
     }
-  }, [animationDuration, onFadeOutFinish, progress, visible]);
+  }, [animationDuration, onFadeOutFinishInner, progress, visible]);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return isAnimatedContent
+      ? { transform: [{ translateY: (1 - progress.value) * height }] }
+      : {};
+  });
 
   return (
     <Suspense>
       <BottomSheetModal
         index={0}
-        visible={visible}
+        visible={visibleInner}
         onDismiss={onDismiss}
         showHandleIndicator={false}
         height={height}
@@ -81,7 +101,9 @@ const BottomSheetPopup = ({
         animationConfigs={animationConfigs}
         showShadow={false}
       >
-        <View style={styles.container}>{children}</View>
+        <Animated.View style={[animatedStyle, styles.container]}>
+          {children}
+        </Animated.View>
       </BottomSheetModal>
     </Suspense>
   );

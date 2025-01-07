@@ -281,6 +281,7 @@ const HomeBottomSheetPopupPanel = ({
       animationDuration={animationDuration}
       visible={visible}
       onFadeOutFinish={resetPopupStateWl}
+      isAnimatedContent
     >
       <Animated.View style={[styles.container, containerHeight]}>
         <View style={styles.pageContainer}>
