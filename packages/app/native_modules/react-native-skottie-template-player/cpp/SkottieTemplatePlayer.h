@@ -1,6 +1,7 @@
 #pragma once
 #include <jsi/jsi.h>
-#include <map>
+#include <unordered_map>
+#include <unordered_set>
 #include <include/core/SkImage.h>
 #include <modules/skottie/include/Skottie.h>
 #include <modules/skresources/include/SkResources.h>
@@ -19,22 +20,22 @@ public:
 
 private:
   sk_sp<skottie::Animation> animation;
-  sk_sp<TemplateResourceProvider> resourceProvider;
+  sk_sp<TemplateResourceProvider> resourcesProvider;
+  std::unordered_map<std::string, sk_sp<TemplateImageAsset>> assets;
   
+  void updateAssetImage(std::string id, sk_sp<SkImage> image, std::shared_ptr<SkMatrix> matrix);
   void dispose();
 };
 
 class TemplateResourceProvider : public skresources::ResourceProvider {
 public:
-  TemplateResourceProvider(const std::vector<std::string> resourcesIds);
   sk_sp<skresources::ImageAsset> loadImageAsset(const char[], const char[],
                                                 const char[]) const override;
-  void updateAssetImage(std::string id, sk_sp<SkImage> image, std::shared_ptr<SkMatrix> matrix);
-  
-  void dispose();
+  static sk_sp<TemplateResourceProvider> Make(const std::unordered_map<std::string, sk_sp<TemplateImageAsset>> assets);
 
 private:
-  std::map<std::string, sk_sp<TemplateImageAsset>> assets;
+  TemplateResourceProvider(const std::unordered_map<std::string, sk_sp<TemplateImageAsset>> assets);
+  std::unordered_map<std::string, sk_sp<TemplateImageAsset>> _assets;
 };
 
 class TemplateImageAsset : public skresources::ImageAsset {

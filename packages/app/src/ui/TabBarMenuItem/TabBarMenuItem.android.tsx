@@ -16,6 +16,12 @@ const TabBarMenuItem = ({
   icon,
   style,
 }: TabBarMenuItemProps) => {
+  // rippleColor should be selectedBackgroundColor
+  // value is forced here to workaround this issue:
+  // https://github.com/software-mansion/react-native-gesture-handler/issues/3246
+  // const rippleColor = selectedBackgroundColor;
+  const rippleColor = colors.grey50;
+
   return (
     <View style={[styles.container, style]}>
       <PressableNative
@@ -29,7 +35,10 @@ const TabBarMenuItem = ({
         ]}
         onPress={onPress}
         accessibilityRole="tab"
-        android_ripple={{ color: selectedBackgroundColor, borderless: false }}
+        android_ripple={{
+          color: rippleColor,
+          borderless: false,
+        }}
       >
         {icon && (
           <Icon

@@ -14,6 +14,7 @@ import {
 } from '@azzapp/shared/coverHelpers';
 import BoxSelectionList from '#components/BoxSelectionList';
 import { DoneHeaderButton } from '#components/commonsButtons';
+import ToolBoxSection from '#components/Toolbar/ToolBoxSection';
 import TransformedImageRenderer from '#components/TransformedImageRenderer';
 import { keyExtractor } from '#helpers/idHelpers';
 import {
@@ -36,7 +37,6 @@ import {
   useCoverEditorContext,
   useCoverEditorEditContext,
 } from '../../CoverEditorContext';
-import ToolBoxSection from '../ui/ToolBoxSection';
 import type { BoxButtonItemInfo } from '#components/BoxSelectionList';
 import type { EditionParameters } from '#helpers/mediaEditions';
 import type { TextureInfo } from '#helpers/mediaEditions/NativeTextureLoader';

@@ -51,9 +51,7 @@ const CardStylesPage = async ({ searchParams = {} }: CardStylesPageProps) => {
         multiline
         rows={1}
         maxRows={3}
-        value={
-          'WebCard styles allows to set different parameters like border radius, title font etc... of all the WebCard'
-        }
+        value="WebCard styles allows to set different parameters like border radius, title font etc... of all the WebCard"
       />
       <CardStylesList
         cardStyles={cardStyles.map(({ cardStyle, label }) => ({

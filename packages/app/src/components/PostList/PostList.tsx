@@ -3,9 +3,9 @@ import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Alert, Dimensions, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
 import PostRenderer from '#components/PostList/PostRenderer';
 import EmptyContent from '#components/ui/EmptyContent';
+import { profileInfoHasAdminRight } from '#helpers/profileRoleHelper';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { HEADER_HEIGHT } from '#ui/Header';
@@ -36,6 +36,7 @@ type PostListProps = ViewProps & {
   onPressAuthor?: () => void;
   showUnpublished?: boolean;
   firstItemVideoTime?: number | null;
+  onPostDeleted?: () => void;
 };
 
 const viewabilityConfig = {
@@ -58,6 +59,7 @@ const PostList = ({
   onPressAuthor,
   showUnpublished = false,
   firstItemVideoTime,
+  onPostDeleted,
   ...props
 }: PostListProps) => {
   const profileInfos = useProfileInfos();
@@ -122,7 +124,8 @@ const PostList = ({
         //card is not published. We can do action only
         // if we are the owner and we are displaying his own list of post (author is provided)
         if (
-          profileHasAdminRight(profileInfos?.profileRole) &&
+          profileInfos &&
+          profileInfoHasAdminRight(profileInfos) &&
           profileInfos.webCardId === author?.id
         ) {
           return true;
@@ -135,8 +138,7 @@ const PostList = ({
     }
   }, [
     author?.id,
-    profileInfos?.profileRole,
-    profileInfos?.webCardId,
+    profileInfos,
     viewerProfile?.invited,
     viewerWebCard?.cardIsPublished,
   ]);
@@ -281,10 +283,11 @@ const PostList = ({
           showUnpublished={extraData.showUnpublished}
           useAnimationSnapshot={index === 0}
           initialTime={index === 0 ? extraData.firstItemVideoTime : undefined}
+          onDeleted={onPostDeleted}
         />
       ) : null;
     },
-    [onActionDisabled, onPressAuthor],
+    [onActionDisabled, onPostDeleted, onPressAuthor],
   );
 
   const extraData = useMemo(

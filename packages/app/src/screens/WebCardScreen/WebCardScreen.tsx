@@ -26,19 +26,9 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
-import {
-  graphql,
-  useMutation,
-  usePreloadedQuery,
-  useRelayEnvironment,
-} from 'react-relay';
-import { MODULE_KINDS } from '@azzapp/shared/cardModuleHelpers';
+import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
 import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
-import {
-  profileHasEditorRight,
-  profileIsOwner,
-} from '@azzapp/shared/profileHelpers';
 import {
   useDidAppear,
   useRouter,
@@ -47,8 +37,12 @@ import {
 import WebCardMenu from '#components/WebCardMenu';
 import { logEvent } from '#helpers/analytics';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import {
+  profileInfoHasAdminRight,
+  profileInfoHasEditorRight,
+  profileInfoIsOwner,
+} from '#helpers/profileRoleHelper';
 import relayScreen from '#helpers/relayScreen';
-import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import useAnimatedState from '#hooks/useAnimatedState';
 import useBoolean from '#hooks/useBoolean';
@@ -56,24 +50,20 @@ import {
   UPDATE_CONTACT_CARD_SCANS,
   useWebCardViewStatistic,
 } from '#hooks/useStatistics';
-import useToggle from '#hooks/useToggle';
 import useToggleFollow from '#hooks/useToggleFollow';
 import Container from '#ui/Container';
 import AddContactModal from './AddContactModal';
 import WebCardBackground from './WebCardBackground';
+import { useWebCardEditTransition } from './WebCardEditTransition';
 import WebCardPostsList from './WebCardPostsList';
 import WebCardScreenButtonBar from './WebCardScreenButtonBar';
 import WebCardScreenContent from './WebCardScreenContent';
 import WebCardScreenPublishHelper from './WebCardScreenPublishHelper';
-import { WebCardScreenTransitionsProvider } from './WebCardScreenTransitions';
 import type { ScreenOptions } from '#components/NativeRouter';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { WebCardScreenByIdQuery } from '#relayArtifacts/WebCardScreenByIdQuery.graphql';
 import type { WebCardScreenByUserNameQuery } from '#relayArtifacts/WebCardScreenByUserNameQuery.graphql';
 import type { WebCardRoute } from '#routes';
-import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
-import type { Disposable } from 'react-relay';
-
 /**
  * Display a Web card.
  */
@@ -97,14 +87,11 @@ const WebCardScreen = ({
 
   const router = useRouter();
 
-  const prefetchRoute = usePrefetchRoute();
-
   const profileInfos = useProfileInfos();
   const isViewer = profileInfos?.webCardId === data.webCard?.id;
-  const isWebCardOwner = isViewer && profileIsOwner(profileInfos?.profileRole);
-  const canEdit = isViewer && profileHasEditorRight(profileInfos?.profileRole);
-
-  const environment = useRelayEnvironment();
+  const isWebCardOwner = isViewer && profileInfoIsOwner(profileInfos);
+  const canEdit = isViewer && profileInfoHasEditorRight(profileInfos);
+  const isAdmin = isViewer && profileInfoHasAdminRight(profileInfos);
 
   const scannedContactCard = useRef<string | null>(null);
 
@@ -132,29 +119,6 @@ const WebCardScreen = ({
     }
   }, [commit, data.webCard?.id, params.contactData]);
 
-  useEffect(() => {
-    let disposables: Disposable[];
-    if (canEdit) {
-      const modules: ModuleKind[] = [...MODULE_KINDS];
-      disposables = [
-        prefetchRoute(environment, {
-          route: 'COVER_EDITION',
-        }),
-        ...modules.map(module =>
-          prefetchRoute(environment, {
-            route: 'CARD_MODULE_EDITION',
-            params: { module },
-          }),
-        ),
-      ];
-    }
-    return () => {
-      disposables?.forEach(disposable => disposable.dispose());
-    };
-  }, [prefetchRoute, canEdit, environment]);
-
-  const [editing, toggleEditing] = useToggle(canEdit && params.editing);
-  const [selectionMode, toggleSelectionMode] = useToggle(false);
   const [showWebcardModal, openWebcardModal, closeWebcardModal] =
     useBoolean(false);
 
@@ -175,10 +139,10 @@ const WebCardScreen = ({
         ? ({ stackAnimation: 'slide_from_bottom' } as const)
         : animatedTransitionFactory(params);
     setOptions({
-      gestureEnabled: !editing && positionFlip !== 1,
+      gestureEnabled: positionFlip !== 1,
       ...animation,
     });
-  }, [setOptions, positionFlip, editing, params, isAtTop]);
+  }, [setOptions, positionFlip, params, isAtTop]);
 
   const onToggleFollow = useToggleFollow();
 
@@ -186,10 +150,7 @@ const WebCardScreen = ({
 
   const toggleFollow = useCallback(
     (webCardId: string, userName: string, follow: boolean) => {
-      if (
-        profileInfos?.profileRole &&
-        profileHasEditorRight(profileInfos.profileRole)
-      ) {
+      if (profileInfoHasEditorRight(profileInfos)) {
         onToggleFollow(webCardId, userName, follow);
       } else if (follow) {
         Toast.show({
@@ -209,7 +170,7 @@ const WebCardScreen = ({
         });
       }
     },
-    [intl, onToggleFollow, profileInfos?.profileRole],
+    [intl, onToggleFollow, profileInfos],
   );
 
   // #region Flip Animation
@@ -288,7 +249,6 @@ const WebCardScreen = ({
     () =>
       Gesture.Pan()
         .activeOffsetX([-10, 10]) //help the postlist scroll to work on Android
-        .enabled(!editing)
         .onStart(() => {
           initialManualGesture.value = manualFlip.value;
         })
@@ -320,7 +280,7 @@ const WebCardScreen = ({
             });
           }
         }),
-    [editing, initialManualGesture, manualFlip, windowWidth],
+    [initialManualGesture, manualFlip, windowWidth],
   );
   const [showPost, setShowPost] = useState(params.showPosts ?? false);
 
@@ -331,8 +291,17 @@ const WebCardScreen = ({
 
   // #end region
 
+  //#region Edit
+  const {
+    editing,
+    editTransition,
+    transitionInfos,
+    scrollViewRef,
+    editScrollViewRef,
+    toggleEditing,
+  } = useWebCardEditTransition((canEdit && params.editing) ?? false);
   const onEdit = useCallback(() => {
-    if (profileHasEditorRight(profileInfos?.profileRole)) {
+    if (profileInfoHasEditorRight(profileInfos)) {
       toggleEditing();
     } else {
       Toast.show({
@@ -344,38 +313,12 @@ const WebCardScreen = ({
         }),
       });
     }
-  }, [profileInfos?.profileRole, toggleEditing, intl]);
+  }, [intl, profileInfos, toggleEditing]);
 
-  // const viewerWebCardUnpublish =
-  //   profileInfos?.webCardId !== data.webCard?.id &&
-  //   data.node?.viewerWebCard?.cardIsPublished === false;
-  // const displayAlertUnpublished = useCallback(() => {
-  //   Alert.alert(
-  //     intl.formatMessage({
-  //       defaultMessage: 'Unpublished WebCard.',
-  //       description:
-  //         'PostList - Alert Message title when the user is viewing a post (from deeplinking) with an unpublished WebCard',
-  //     }),
-  //     intl.formatMessage({
-  //       defaultMessage:
-  //         'This action can only be done from a published WebCard.',
-  //       description:
-  //         'PostList - AlertMessage when the user is viewing a post (from deeplinking) with an unpublished WebCard',
-  //     }),
-  //     [
-  //       {
-  //         text: intl.formatMessage({
-  //           defaultMessage: 'Ok',
-  //           description:
-  //             'PostList - Alert button when the user is viewing a post (from deeplinking) with an unpublished WebCard',
-  //         }),
-  //         onPress: () => {
-  //           router.back();
-  //         },
-  //       },
-  //     ],
-  //   );
-  // }, [intl, router]);
+  const onEditDone = useCallback(() => {
+    toggleEditing();
+  }, [toggleEditing]);
+  //#endregion
 
   if (!data.webCard || !data.profile?.webCard) {
     return null;
@@ -386,60 +329,57 @@ const WebCardScreen = ({
       <Suspense>
         <WebCardBackground webCard={data.webCard} />
       </Suspense>
-      <WebCardScreenTransitionsProvider
-        editing={editing}
-        selectionMode={selectionMode}
-      >
-        <GestureDetector gesture={pan}>
-          <View style={styles.container}>
-            <Animated.View
-              style={[styles.front, borderRadiusStyle, frontStyle]}
-            >
-              <Container style={styles.container}>
-                <WebCardScreenContent
-                  ready={ready}
-                  webCard={data.webCard}
-                  editing={editing}
+      <GestureDetector gesture={pan}>
+        <View style={styles.container}>
+          <Animated.View style={[styles.front, borderRadiusStyle, frontStyle]}>
+            <Container style={styles.container}>
+              <WebCardScreenContent
+                ready={ready}
+                webCard={data.webCard}
+                editScrollViewRef={editScrollViewRef}
+                scrollViewRef={scrollViewRef}
+                canEdit={canEdit}
+                fromCreation={!!params.fromCreation}
+                editing={editing}
+                editTransition={editTransition}
+                onContentPositionChange={onContentPositionChange}
+                onEditDone={onEditDone}
+                transitionInfos={transitionInfos}
+              />
+            </Container>
+          </Animated.View>
+          <Animated.View
+            style={[styles.back, borderRadiusStyle, backStyle]}
+            pointerEvents={showPost ? 'box-none' : 'none'}
+          >
+            <Suspense>
+              {(showPost || ready) && (
+                <WebCardPostsList
+                  toggleFlip={toggleFlip}
                   isViewer={isViewer}
-                  selectionMode={selectionMode}
-                  onToggleEditing={toggleEditing}
-                  onToggleSelectionMode={toggleSelectionMode}
-                  onContentPositionChange={onContentPositionChange}
+                  webCardId={data.webCard.id}
+                  hasFocus={hasFocus && showPost && ready}
+                  userName={data.webCard.userName!}
+                  viewerWebCard={data.profile.webCard}
                 />
-              </Container>
-            </Animated.View>
-            <Animated.View
-              style={[styles.back, borderRadiusStyle, backStyle]}
-              pointerEvents={showPost ? 'box-none' : 'none'}
-            >
-              <Suspense>
-                {(showPost || ready) && (
-                  <WebCardPostsList
-                    toggleFlip={toggleFlip}
-                    isViewer={isViewer}
-                    webCardId={data.webCard.id}
-                    hasFocus={hasFocus && showPost && ready}
-                    userName={data.webCard.userName!}
-                    viewerWebCard={data.profile.webCard}
-                  />
-                )}
-              </Suspense>
-            </Animated.View>
-          </View>
-        </GestureDetector>
-        <WebCardScreenButtonBar
-          webCard={data.webCard}
-          profile={data.profile}
-          isViewer={isViewer}
-          editing={editing}
-          onHome={router.backToTop}
-          isWebCardDisplayed={!showPost}
-          onEdit={onEdit}
-          onToggleFollow={toggleFollow}
-          onFlip={toggleFlip}
-          onShowWebcardModal={onShowWebcardModal}
-        />
-      </WebCardScreenTransitionsProvider>
+              )}
+            </Suspense>
+          </Animated.View>
+        </View>
+      </GestureDetector>
+      <WebCardScreenButtonBar
+        webCard={data.webCard}
+        profile={data.profile}
+        isViewer={isViewer}
+        onHome={router.backToTop}
+        isWebCardDisplayed={!showPost}
+        onEdit={onEdit}
+        onToggleFollow={toggleFollow}
+        onFlip={toggleFlip}
+        onShowWebcardModal={onShowWebcardModal}
+        editing={editing}
+        editTransition={editTransition}
+      />
       <Suspense>
         <AddContactModal
           user={data.currentUser!}
@@ -449,7 +389,6 @@ const WebCardScreen = ({
         />
       </Suspense>
       <Suspense fallback={null}>
-        <WebCardScreenPublishHelper webCard={data.webCard} editMode={editing} />
         <WebCardMenu
           visible={showWebcardModal}
           webCard={data.webCard}
@@ -457,7 +396,11 @@ const WebCardScreen = ({
           onToggleFollow={toggleFollow}
           isViewer={isViewer}
           isOwner={isWebCardOwner}
+          isAdmin={isAdmin}
         />
+      </Suspense>
+      <Suspense>
+        <WebCardScreenPublishHelper webCard={data.webCard} editing={editing} />
       </Suspense>
     </View>
   );
@@ -483,6 +426,7 @@ const webCardScreenByIdQuery = graphql`
       ...WebCardScreenPublishHelper_webCard
       ...WebCardBackground_webCard
       ...WebCardMenu_webCard @arguments(viewerWebCardId: $viewerWebCardId)
+      ...WebCardScreenPublishHelper_webCard
       ...AddContactModal_webCard
     }
     profile: node(id: $profileId) {
@@ -491,7 +435,6 @@ const webCardScreenByIdQuery = graphql`
         webCard {
           ...PostList_viewerWebCard
         }
-        invited
       }
     }
     currentUser {
@@ -515,6 +458,7 @@ const webCardScreenByNameQuery = graphql`
       ...WebCardScreenPublishHelper_webCard
       ...WebCardBackground_webCard
       ...WebCardMenu_webCard @arguments(viewerWebCardId: $viewerWebCardId)
+      ...WebCardScreenPublishHelper_webCard
       ...AddContactModal_webCard
     }
     profile: node(id: $profileId) {
@@ -523,7 +467,6 @@ const webCardScreenByNameQuery = graphql`
         webCard {
           ...PostList_viewerWebCard
         }
-        invited
       }
     }
     currentUser {

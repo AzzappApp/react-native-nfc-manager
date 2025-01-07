@@ -107,7 +107,7 @@ const ContactCardEditForm = ({
         avatarField.onChange({
           local: true,
           id: localPath,
-          uri: `file://${localPath}`,
+          uri: localPath,
         });
       } else {
         const exportWidth = width;
@@ -125,7 +125,7 @@ const ContactCardEditForm = ({
         logoField.onChange({
           local: true,
           id: localPath,
-          uri: `file://${localPath}`,
+          uri: localPath,
         });
         setSize({
           width: exportWidth,
@@ -335,7 +335,7 @@ const ContactCardEditForm = ({
             <View style={styles.logoField}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <View style={styles.logoButton}>
-                  <Icon icon={'locked'} style={{}} />
+                  <Icon icon="locked" style={{}} />
                   <Text variant="smallbold">
                     <FormattedMessage
                       defaultMessage="Logo"

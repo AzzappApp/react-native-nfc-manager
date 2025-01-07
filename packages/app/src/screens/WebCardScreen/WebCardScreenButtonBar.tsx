@@ -5,25 +5,24 @@ import Animated, {
   interpolate,
   useAnimatedStyle,
 } from 'react-native-reanimated';
-
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
-import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import { logEvent } from '#helpers/analytics';
 import { getAuthState } from '#helpers/authStore';
+import { profileInfoHasEditorRight } from '#helpers/profileRoleHelper';
 import useScreenInsets from '#hooks/useScreenInsets';
 import BlurredFloatingButton, {
   BlurredFloatingIconButton,
 } from '#ui/BlurredFloatingButton';
 import FloatingButton from '#ui/FloatingButton';
 import Text from '#ui/Text';
-import { useEditTransition } from './WebCardScreenTransitions';
 import type { WebCardScreenButtonBar_profile$key } from '#relayArtifacts/WebCardScreenButtonBar_profile.graphql';
 import type { WebCardScreenButtonBar_webCard$key } from '#relayArtifacts/WebCardScreenButtonBar_webCard.graphql';
 import type { ViewProps } from 'react-native';
+import type { DerivedValue } from 'react-native-reanimated';
 
 type WebCardScreenButtonBarProps = ViewProps & {
   /**
@@ -42,10 +41,6 @@ type WebCardScreenButtonBarProps = ViewProps & {
    *  true when the webcard is visible (as opposite of displaying the post list)
    */
   isWebCardDisplayed: boolean;
-  /**
-   * If the card is in editing mode
-   */
-  editing: boolean;
   /**
    * A callback called when the user press the edit button
    */
@@ -70,6 +65,14 @@ type WebCardScreenButtonBarProps = ViewProps & {
    * A callback called when the user press the more ... button
    */
   onShowWebcardModal: () => void;
+  /**
+   * Wether the edit screen is displayed or not
+   */
+  editing: boolean;
+  /**
+   * Represent the transition between the edit and the webcard screen
+   */
+  editTransition: DerivedValue<number>;
 };
 
 /**
@@ -80,7 +83,6 @@ type WebCardScreenButtonBarProps = ViewProps & {
 const WebCardScreenButtonBar = ({
   webCard,
   profile,
-  editing,
   isViewer,
   onEdit,
   onHome,
@@ -88,11 +90,12 @@ const WebCardScreenButtonBar = ({
   onShowWebcardModal,
   onFlip,
   isWebCardDisplayed,
+  editing,
+  editTransition,
   style,
   ...props
 }: WebCardScreenButtonBarProps) => {
   const inset = useScreenInsets();
-  const editTransition = useEditTransition();
   const animatedStyle = useAnimatedStyle(() => {
     return {
       opacity: interpolate(
@@ -105,8 +108,8 @@ const WebCardScreenButtonBar = ({
 
   return (
     <Animated.View
-      style={[styles.buttonBar, animatedStyle, { bottom: inset.bottom }, style]}
       {...props}
+      style={[styles.buttonBar, { bottom: inset.bottom }, style, animatedStyle]}
       pointerEvents={editing ? 'none' : 'box-none'}
     >
       <BlurredFloatingIconButton
@@ -258,10 +261,7 @@ const WebCardScreenButtonActionButton = ({
       return;
     }
     const { profileInfos } = getAuthState();
-    if (
-      profileInfos?.profileRole &&
-      profileHasEditorRight(profileInfos.profileRole)
-    ) {
+    if (profileInfoHasEditorRight(profileInfos)) {
       onToggleFollow(webCard.id, webCard.userName, !isFollowing);
     } else if (isFollowing) {
       Toast.show({
@@ -286,10 +286,7 @@ const WebCardScreenButtonActionButton = ({
 
   const onCreateNewPost = useCallback(() => {
     const { profileInfos } = getAuthState();
-    if (
-      profileInfos?.profileRole &&
-      profileHasEditorRight(profileInfos?.profileRole)
-    ) {
+    if (profileInfoHasEditorRight(profileInfos)) {
       logEvent('create_post', { source: 'webcard' });
       router.push({ route: 'NEW_POST', params: { fromProfile: true } });
     } else {

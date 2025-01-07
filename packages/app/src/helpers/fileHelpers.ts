@@ -24,7 +24,9 @@ export const isFileURL = (url: string) => {
  * Create random file path with given extension in the cache directory
  */
 export const createRandomFilePath = (ext: string) =>
-  `${ReactNativeBlobUtil.fs.dirs.CacheDir}/${createId()}.${ext}`;
+  `${ReactNativeBlobUtil.fs.dirs.CacheDir}/${createRandomFileName(ext)}`;
+
+export const createRandomFileName = (ext: string) => `${createId()}.${ext}`;
 
 /**
  * Get file extension from path or url
@@ -35,4 +37,13 @@ export const getFileExtension = (path: string) => {
       ? path.split('.').pop()?.split('?')[0]
       : null;
   return ext && ext.length <= 5 ? ext : null;
+};
+
+/**
+ * replace invalid characters from path with _
+ */
+export const sanitizeFilePath = (filePath: string) => {
+  // Replace invalid characters with an underscore (_)
+  // eslint-disable-next-line no-control-regex, no-useless-escape
+  return filePath.replace(/[ <>:"\/\\|?*\x00-\x1F]/g, '_');
 };

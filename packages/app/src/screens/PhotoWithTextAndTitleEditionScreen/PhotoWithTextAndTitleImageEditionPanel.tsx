@@ -189,7 +189,6 @@ const styles = StyleSheet.create({
     width: '100%',
     flex: 1,
     rowGap: 25,
-    justifyContent: 'center',
   },
   slider: {
     width: '90%',

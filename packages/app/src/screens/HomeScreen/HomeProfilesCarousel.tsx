@@ -20,24 +20,20 @@ import {
 } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
-import {
-  profileHasAdminRight,
-  profileIsOwner,
-} from '@azzapp/shared/profileHelpers';
 import { colors, shadow } from '#theme';
 import CoverErrorRenderer from '#components/CoverErrorRenderer';
 import CoverLink from '#components/CoverLink';
 import CoverLoadingIndicator from '#components/CoverLoadingIndicator';
 import CoverRenderer from '#components/CoverRenderer';
 import Link from '#components/Link';
-import {
-  useOnFocus,
-  useRouter,
-  useScreenHasFocus,
-} from '#components/NativeRouter';
+import { useOnFocus, useRouter } from '#components/NativeRouter';
 import WebCardMenu from '#components/WebCardMenu';
 import { logEvent } from '#helpers/analytics';
-import { getAuthState } from '#helpers/authStore';
+import { getAuthState, onChangeWebCard } from '#helpers/authStore';
+import {
+  profileInfoHasAdminRight,
+  profileInfoIsOwner,
+} from '#helpers/profileRoleHelper';
 import useBoolean from '#hooks/useBoolean';
 import useLatestCallback from '#hooks/useLatestCallback';
 import useToggleFollow from '#hooks/useToggleFollow';
@@ -87,6 +83,8 @@ const HomeProfilesCarousel = (
       fragment HomeProfilesCarousel_user on User {
         profiles {
           id
+          profileRole
+          invited
           webCard {
             id
           }
@@ -96,8 +94,6 @@ const HomeProfilesCarousel = (
     `,
     userKey,
   );
-
-  const focus = useScreenHasFocus();
 
   const changeIndexTimeout = useRef<any | null>(null);
   const onCurrentProfileIndexChangeLatest = useLatestCallback(
@@ -143,6 +139,37 @@ const HomeProfilesCarousel = (
   const carouselRef = useRef<CarouselSelectListHandle | null>(null);
   const [selectedIndex, setSelectedIndex] = useState(initialProfileIndex);
 
+  // This useEffect allows to refresh index when profiles list change
+  useEffect(() => {
+    const { profileInfos } = getAuthState();
+    const index = profiles?.findIndex(
+      profile => profile.id === profileInfos?.profileId,
+    );
+    if (index !== undefined && index !== -1) {
+      // new profile has been created (typically from invitation).
+      // scroll to the same selected profile.
+      setSelectedIndex(index + 1);
+    } else {
+      // profile has been removed,
+      // scroll to previous available profile.
+      const newindex = selectedIndex - 2 > 0 ? selectedIndex - 2 : 0;
+      const profile = profiles?.[newindex];
+      if (profile) {
+        onChangeWebCard({
+          profileId: profile.id,
+          webCardId: profile.webCard?.id ?? null,
+          profileRole: profile.profileRole,
+          invited: profile.invited,
+        });
+      } else {
+        onChangeWebCard(null);
+      }
+      setSelectedIndex(newindex);
+    }
+    // No need to refresh when index change. Here we handle only profiles list update
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profiles]);
+
   const data = useMemo(
     () =>
       profiles
@@ -156,19 +183,6 @@ const HomeProfilesCarousel = (
         : [{ profile: null, isCurrent: true }],
     [profiles, selectedIndex],
   );
-
-  const dataSize = useRef(profiles?.length ?? 0);
-
-  useEffect(() => {
-    if (focus) {
-      if (dataSize.current > (profiles?.length ?? 0)) {
-        scrollToIndex(1, false);
-        dataSize.current = profiles?.length ?? 0;
-      } else if (dataSize.current !== profiles?.length) {
-        dataSize.current = profiles?.length ?? 0;
-      }
-    }
-  }, [focus, profiles?.length, currentIndexProfileSharedValue, scrollToIndex]);
 
   const renderItem = useCallback(
     ({
@@ -297,7 +311,7 @@ const ItemRenderComponent = ({
   const router = useRouter();
 
   const onPressMultiUser = useCallback(() => {
-    if (profileHasAdminRight(profile.profileRole)) {
+    if (profileInfoHasAdminRight(profile)) {
       router.push({
         route: 'MULTI_USER',
       });
@@ -310,7 +324,7 @@ const ItemRenderComponent = ({
         },
       });
     }
-  }, [router, profile.profileRole, profile.webCard]);
+  }, [profile, router]);
 
   const { paused, canPlay } = useCoverPlayPermission();
 
@@ -433,7 +447,8 @@ const ItemRenderComponent = ({
             close={closeWebcardModal}
             onToggleFollow={onToggleFollow}
             isViewer
-            isOwner={profileIsOwner(profile.profileRole)}
+            isOwner={profileInfoIsOwner(profile)}
+            isAdmin={profileInfoHasAdminRight(profile)}
           />
         </Suspense>
       )}

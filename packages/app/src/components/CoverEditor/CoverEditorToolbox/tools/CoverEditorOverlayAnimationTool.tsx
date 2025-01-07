@@ -31,12 +31,12 @@ import BottomSheetModal from '#ui/BottomSheetModal';
 import DoubleSlider from '#ui/DoubleSlider';
 import Header from '#ui/Header';
 import Text from '#ui/Text';
+import ToolBoxSection from '../../../Toolbar/ToolBoxSection';
 import {
   useCoverEditorContext,
   useCoverEditorEditContext,
   useCoverEditorOverlayLayer,
 } from '../../CoverEditorContext';
-import ToolBoxSection from '../ui/ToolBoxSection';
 
 import type { BoxButtonItemInfo } from '#components/BoxSelectionList';
 import type {

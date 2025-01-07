@@ -128,6 +128,9 @@ const icons = {
   get color_picker() {
     return require('./assets/color_picker.png');
   },
+  get color_variant() {
+    return require('./assets/color_variant.png');
+  },
   get comment() {
     return require('./assets/comment.png');
   },
@@ -212,6 +215,12 @@ const icons = {
   get font_size() {
     return require('./assets/font_size.png');
   },
+  get font_color_letter() {
+    return require('./assets/font_color_letter.png');
+  },
+  get font_color_dash() {
+    return require('./assets/font_color_dash.png');
+  },
   get foreground_text() {
     return require('./assets/foreground_text.png');
   },
@@ -272,6 +281,9 @@ const icons = {
   get landscape() {
     return require('./assets/landscape.png');
   },
+  get layout() {
+    return require('./assets/layout.png');
+  },
   get like() {
     return require('./assets/like.png');
   },
@@ -280,6 +292,9 @@ const icons = {
   },
   get link() {
     return require('./assets/link.png');
+  },
+  get location() {
+    return require('./assets/location_line.png');
   },
   get locked() {
     return require('./assets/locked.png');
@@ -314,11 +329,17 @@ const icons = {
   get move_segment() {
     return require('./assets/move_segment.png');
   },
+  get multi_media() {
+    return require('./assets/multi_media.png');
+  },
   get multi_user() {
     return require('./assets/multi-user.png');
   },
   get notification() {
     return require('./assets/notification.png');
+  },
+  get offline() {
+    return require('./assets/offline.png');
   },
   get overlay() {
     return require('./assets/overlay.png');
@@ -482,15 +503,7 @@ const icons = {
   get width_limited() {
     return require('./assets/width-limited.png');
   },
-  get font_color_letter() {
-    return require('./assets/font_color_letter.png');
-  },
-  get font_color_dash() {
-    return require('./assets/font_color_dash.png');
-  },
-  get offline() {
-    return require('./assets/offline.png');
-  },
+  //this list is alphabetically sorted, please keep it that way
 } as const;
 
 export type Icons = keyof typeof icons;

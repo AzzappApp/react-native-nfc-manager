@@ -49,6 +49,7 @@ const MultiUserAddList = ({
             Contacts.Fields.UrlAddresses,
             Contacts.Fields.SocialProfiles,
             Contacts.Fields.Emails,
+            Contacts.Fields.Addresses,
           ],
         });
 

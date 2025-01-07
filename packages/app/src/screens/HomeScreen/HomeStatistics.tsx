@@ -68,7 +68,8 @@ const HomeStatistics = ({
     user,
   );
 
-  const { currentIndexSharedValue } = useHomeScreenContext();
+  const { currentIndexSharedValue, currentIndexProfileSharedValue } =
+    useHomeScreenContext();
 
   const { width } = useWindowDimensions();
   const intl = useIntl();
@@ -185,19 +186,19 @@ const HomeStatistics = ({
   });
 
   const totalLikes = useIndexInterpolation(
-    currentIndexSharedValue,
+    currentIndexProfileSharedValue,
     concat(0, profiles?.map(profile => profile.webCard?.nbLikes ?? 0) ?? []),
     0,
   );
   const totalLikesLabel = useDerivedValue(() => format(totalLikes.value));
   const totalScans = useIndexInterpolation(
-    currentIndexSharedValue,
+    currentIndexProfileSharedValue,
     concat(0, profiles?.map(profile => profile.nbContactCardScans ?? 0) ?? []),
     0,
   );
   const totalScansLabel = useDerivedValue(() => format(totalScans.value));
   const totalViews = useIndexInterpolation(
-    currentIndexSharedValue,
+    currentIndexProfileSharedValue,
     concat(
       0,
       profiles?.map(profile => profile.webCard?.nbWebCardViews ?? 0) ?? [],
@@ -206,7 +207,7 @@ const HomeStatistics = ({
   );
   const totalViewsLabel = useDerivedValue(() => format(totalViews.value));
   const totalShareBacks = useIndexInterpolation(
-    currentIndexSharedValue,
+    currentIndexProfileSharedValue,
     concat(0, profiles?.map(profile => profile.nbShareBacks ?? 0) ?? []),
     0,
   );

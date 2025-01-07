@@ -10,7 +10,12 @@ import ActivityIndicator from './ActivityIndicator';
 import PressableBackground from './PressableBackground';
 import PressableOpacity from './PressableOpacity';
 import type { ForwardedRef, ReactNode } from 'react';
-import type { PressableProps, StyleProp, ViewStyle } from 'react-native';
+import type {
+  PressableProps,
+  StyleProp,
+  TextStyle,
+  ViewStyle,
+} from 'react-native';
 
 export type ButtonProps = PressableProps & {
   label: ReactNode;
@@ -19,6 +24,7 @@ export type ButtonProps = PressableProps & {
   style?: StyleProp<ViewStyle>;
   loading?: boolean;
   rightElement?: ReactNode;
+  textStyle?: TextStyle;
 };
 
 const Button = (
@@ -30,6 +36,7 @@ const Button = (
     disabled,
     style,
     rightElement,
+    textStyle,
     ...props
   }: ButtonProps,
   forwardedRef: ForwardedRef<View>,
@@ -62,7 +69,11 @@ const Button = (
       <ActivityIndicator color={color} />
     ) : (
       <View style={variantStyles.labelContainer}>
-        <Text variant="button" style={variantStyles.label} numberOfLines={1}>
+        <Text
+          variant="button"
+          style={[variantStyles.label, textStyle]}
+          numberOfLines={1}
+        >
           {label}
         </Text>
         {rightElement}
@@ -148,13 +159,8 @@ const computedStyles = createVariantsStyleSheet(appearance => ({
     },
     androidNoPadding: {
       padding: 0,
-      paddingHorizontal: 0,
-      paddingVertical: 0,
-      paddingLeft: 0,
-      paddingRight: 0,
-      paddingTop: 0,
-      paddingBottom: 0,
       overflow: 'hidden',
+      height: undefined,
     },
   },
   primary: {
@@ -182,6 +188,10 @@ const computedStyles = createVariantsStyleSheet(appearance => ({
       borderColor: appearance === 'light' ? colors.grey400 : colors.grey900,
       backgroundColor: 'transparent',
     },
+    androidNoPadding: {
+      padding: 1, //for border
+      overflow: 'hidden',
+    },
   },
   little_round: {
     root: {
@@ -200,6 +210,10 @@ const computedStyles = createVariantsStyleSheet(appearance => ({
       borderColor: appearance === 'light' ? colors.grey400 : colors.grey900,
       backgroundColor: 'transparent',
     },
+    androidNoPadding: {
+      padding: 1, //for border
+      overflow: 'hidden',
+    },
   },
   little_round_inverted: {
     root: {
@@ -217,6 +231,10 @@ const computedStyles = createVariantsStyleSheet(appearance => ({
       color: appearance === 'light' ? colors.grey900 : colors.grey200,
       borderColor: appearance === 'light' ? colors.grey900 : colors.grey400,
       backgroundColor: 'transparent',
+    },
+    androidNoPadding: {
+      padding: 1, //for border
+      overflow: 'hidden',
     },
   },
 }));

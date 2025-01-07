@@ -228,7 +228,10 @@ const SimpleTextEditionScreen = ({
             id
             requiresSubscription
             cardModules {
+              id
+              kind
               visible
+              variant
               ...SimpleTextEditionScreen_module
               ...SimpleTextRenderer_simpleTextModule
               ...SimpleTextRenderer_simpleTitleModule

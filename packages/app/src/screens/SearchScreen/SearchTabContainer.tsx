@@ -1,5 +1,5 @@
 import { useState, useEffect, Suspense, useCallback, useMemo } from 'react';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { TabBar, TabView } from 'react-native-tab-view';
 import { loadQuery, useRelayEnvironment } from 'react-relay';
 import { colors } from '#theme';
@@ -112,6 +112,7 @@ const SearchTabContainer = ({
         },
         { fetchPolicy: 'store-or-network' },
       );
+
       setTabPreloadedQuery(prevState => {
         return {
           ...prevState,
@@ -140,6 +141,23 @@ const SearchTabContainer = ({
     setPageindexSelected(index);
   };
 
+  const renderNoResultComponent = useCallback(
+    (query: string) => {
+      return (
+        <Text variant="xsmall" style={styles.noResult}>
+          <FormattedMessage
+            defaultMessage={`No search results for "{query}"`}
+            description="SearchPage - no result text"
+            values={{
+              query,
+            }}
+          />
+        </Text>
+      );
+    },
+    [styles.noResult],
+  );
+
   const renderScene = useCallback(
     ({
       route,
@@ -159,6 +177,7 @@ const SearchTabContainer = ({
                   queryReference={tabQueryReference['searchGlobal']}
                   hasFocus={hasFocus}
                   goToProfilesTab={() => jumpTo('searchProfiles')}
+                  renderNoResultComponent={renderNoResultComponent}
                 />
               )}
             </Suspense>
@@ -169,6 +188,7 @@ const SearchTabContainer = ({
               {tabQueryReference['searchProfiles'] && (
                 <SearchResultProfiles
                   queryReference={tabQueryReference['searchProfiles']}
+                  renderNoResultComponent={renderNoResultComponent}
                 />
               )}
             </Suspense>
@@ -180,13 +200,14 @@ const SearchTabContainer = ({
                 <SearchResultPosts
                   queryReference={tabQueryReference['searchPosts']}
                   hasFocus={hasFocus}
+                  renderNoResultComponent={renderNoResultComponent}
                 />
               )}
             </Suspense>
           );
       }
     },
-    [hasFocus, tabQueryReference],
+    [hasFocus, renderNoResultComponent, tabQueryReference],
   );
   return (
     <TabView
@@ -277,6 +298,11 @@ const styleSheet = createStyleSheet(appearance => ({
     borderColor: colors.grey50,
     padding: 0,
     minWidth: 109,
+  },
+  noResult: {
+    flex: 1,
+    paddingTop: 20,
+    textAlign: 'center',
   },
 }));
 

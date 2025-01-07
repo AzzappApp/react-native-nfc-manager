@@ -13,7 +13,6 @@ import {
   getModuleDataValues,
   SOCIAL_LINKS_DEFAULT_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
-import { SOCIAL_LINKS } from '@azzapp/shared/socialLinkHelpers';
 import { SocialIcon } from '#ui/Icon';
 import PressableOpacity from '#ui/PressableOpacity';
 import CardModuleBackground from './CardModuleBackground';
@@ -142,17 +141,12 @@ const SocialLinksRenderer = ({
     readonly position: number;
     readonly socialId: string;
   }) => {
-    const url = SOCIAL_LINKS.find(l => l.id === link.socialId)?.mask;
+    let linkUrl = link.link;
+    if (link.socialId === 'phone') linkUrl = `tel:${link.link}`;
+    if (link.socialId === 'sms') linkUrl = `sms:${link.link}`;
+    if (link.socialId === 'mail') linkUrl = `mailto:${link.link}`;
 
-    const linkIncludeMethod =
-      link.link?.startsWith('http://') || link.link?.startsWith('https://');
-    let method = linkIncludeMethod ? '' : 'http://';
-
-    if (link.socialId === 'phone') method = `tel:`;
-    if (link.socialId === 'sms') method = 'sms:';
-    if (link.socialId === 'mail') method = 'mailto:';
-
-    await Linking.openURL(`${method}${url}${link.link}`);
+    await Linking.openURL(linkUrl);
   };
 
   useEffect(() => {

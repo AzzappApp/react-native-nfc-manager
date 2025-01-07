@@ -1,7 +1,6 @@
-import { forwardRef, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { View, useWindowDimensions } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
+import { View, useWindowDimensions, Animated } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import {
   swapColor,
@@ -17,8 +16,7 @@ import CoverRendererPreviewDesktop from './CoverRendererPreviewDesktop';
 import WebCardBackground from './WebCardBackgroundPreview';
 import type { WebCardPreview_webCard$key } from '#relayArtifacts/WebCardPreview_webCard.graphql';
 import type { ModuleRenderInfo } from './cardModules/CardModuleRenderer';
-import type { ForwardedRef } from 'react';
-import type { LayoutRectangle, PointProp, ViewProps } from 'react-native';
+import type { LayoutChangeEvent, PointProp, ViewProps } from 'react-native';
 
 export type WebCardPreviewProps = Omit<ViewProps, 'children'> & {
   /**
@@ -51,33 +49,22 @@ export type WebCardPreviewProps = Omit<ViewProps, 'children'> & {
    * @default 0
    */
   contentPaddingBottom?: number;
-  /**
-   * Called when a module is layouted.
-   *
-   * @param index The module index.
-   * @param layout The module layout.
-   */
-  onModuleLayout?: (index: number, layout: LayoutRectangle) => void;
 };
 
 /**
  * This component is used to preview a web card in mobile or desktop mode.
  */
-const WebCardPreview = (
-  {
-    webCard: webCardKey,
-    cardModules,
-    cardColors,
-    cardStyle,
-    onModuleLayout,
-    height,
-    contentOffset,
-    contentPaddingBottom = 0,
-    style,
-    ...props
-  }: WebCardPreviewProps,
-  ref: ForwardedRef<ScrollView>,
-) => {
+const WebCardPreview = ({
+  webCard: webCardKey,
+  cardModules,
+  cardColors,
+  cardStyle,
+  height,
+  contentOffset,
+  contentPaddingBottom = 0,
+  style,
+  ...props
+}: WebCardPreviewProps) => {
   const styles = useStyleSheet(stylesheet);
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('mobile');
 
@@ -105,26 +92,21 @@ const WebCardPreview = (
 
   const contentRef = useRef<View>(null);
 
-  const onModuleLayoutInner = (index: number, moduleView: View) => {
-    if (
-      !onModuleLayout ||
-      !contentRef.current ||
-      // we take some precautions to avoid type mismatch
-      !moduleView ||
-      typeof moduleView !== 'object' ||
-      !('measureLayout' in moduleView)
-    ) {
-      return;
-    }
-    moduleView.measureLayout(contentRef.current, (x, y, width, height) => {
-      onModuleLayout(index, { x, y, width, height });
-    });
-  };
-
   const lastSection = cardModules[cardModules.length - 1]?.data as any;
 
   const lastSectionColor = lastSection?.data?.backgroundStyle
     ?.backgroundColor as string;
+
+  const scrollPosition = useRef(new Animated.Value(0)).current;
+
+  const onScroll = useMemo(
+    () =>
+      Animated.event(
+        [{ nativeEvent: { contentOffset: { y: scrollPosition } } }],
+        { useNativeDriver: true },
+      ),
+    [scrollPosition],
+  );
 
   return (
     <View
@@ -170,8 +152,7 @@ const WebCardPreview = (
           ],
         }}
       >
-        <ScrollView
-          ref={ref}
+        <Animated.ScrollView
           style={[
             styles.webCardContainer,
             style,
@@ -181,6 +162,7 @@ const WebCardPreview = (
           contentContainerStyle={{
             paddingBottom: contentPaddingBottom / scale,
           }}
+          onScroll={onScroll}
         >
           <View ref={contentRef}>
             <WebCardBackground
@@ -204,22 +186,56 @@ const WebCardPreview = (
               />
             )}
             {cardModules.map((module, index) => (
-              <CardModuleRenderer
+              <CardModule
                 module={module}
                 key={index}
-                onLayout={e =>
-                  onModuleLayoutInner?.(index, e.target as unknown as View)
-                }
-                colorPalette={cardColors}
+                cardColors={cardColors}
                 cardStyle={cardStyle}
                 viewMode={viewMode}
                 coverBackgroundColor={webCard.coverBackgroundColor}
+                scrollPosition={scrollPosition}
               />
             ))}
           </View>
-        </ScrollView>
+        </Animated.ScrollView>
       </View>
     </View>
+  );
+};
+
+const CardModule = ({
+  module,
+  cardColors,
+  cardStyle,
+  viewMode,
+  coverBackgroundColor,
+  scrollPosition,
+}: {
+  module: ModuleRenderInfo;
+  cardColors?: ColorPalette | null;
+  cardStyle?: CardStyle | null;
+  viewMode: 'desktop' | 'mobile';
+  coverBackgroundColor?: string | null;
+  scrollPosition: Animated.Value;
+}) => {
+  const [modulePosition, setModulePosition] = useState(0);
+
+  const onLayout = useCallback((event: LayoutChangeEvent) => {
+    setModulePosition(event.nativeEvent.layout.y);
+  }, []);
+
+  return (
+    <CardModuleRenderer
+      module={module}
+      onLayout={onLayout}
+      colorPalette={cardColors}
+      cardStyle={cardStyle}
+      displayMode={viewMode}
+      coverBackgroundColor={coverBackgroundColor}
+      scrollPosition={scrollPosition}
+      modulePosition={modulePosition}
+      webCardViewMode="preview"
+    />
   );
 };
 
@@ -245,7 +261,7 @@ const stylesheet = createStyleSheet(theme => ({
   },
 }));
 
-export default forwardRef(WebCardPreview);
+export default WebCardPreview;
 
 const SWITCH_TOGGLE_SECTION_HEIGHT = 52;
 

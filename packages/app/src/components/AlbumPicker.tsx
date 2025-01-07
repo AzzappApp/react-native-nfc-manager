@@ -189,7 +189,7 @@ const AlbumRenderer = ({
     <PressableOpacity onPress={onPress} style={styles.albumRow}>
       <Image
         accessibilityRole="image"
-        accessibilityIgnoresInvertColors={true}
+        accessibilityIgnoresInvertColors
         source={(imageUri ? { uri: imageUri } : null) as any}
         style={{
           height: 80,

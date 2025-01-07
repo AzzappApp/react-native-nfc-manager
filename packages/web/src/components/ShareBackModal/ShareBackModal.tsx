@@ -44,7 +44,7 @@ const ShareBackModal = forwardRef<ModalActions, ShareBackModalProps>(
 
     return (
       <AppIntlProvider>
-        <Modal ref={internalRef}>
+        <Modal ref={internalRef} className={styles.shareBackModal}>
           <div className={cx(styles.header)}>
             <div className={styles.avatarContainer}>
               <>

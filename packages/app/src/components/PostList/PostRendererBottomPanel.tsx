@@ -1,16 +1,16 @@
 import * as Sentry from '@sentry/react-native';
 import * as Clipboard from 'expo-clipboard';
 import { fromGlobalId } from 'graphql-relay';
-import { memo, useCallback, useEffect, useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 import { FormattedMessage, FormattedRelativeTime, useIntl } from 'react-intl';
 import { View, StyleSheet, Share, Platform } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
-import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import { buildPostUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import { relativeDateMinute } from '#helpers/dateHelpers';
+import { profileInfoHasEditorRight } from '#helpers/profileRoleHelper';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import { useSendReport } from '#hooks/useSendReport';
 import useToggleFollow from '#hooks/useToggleFollow';
@@ -61,6 +61,8 @@ type PostRendererBottomPanelProps = {
   actionEnabled: boolean;
 
   onActionDisabled?: () => void;
+
+  onDeleted?: () => void;
 };
 
 const PostRendererBottomPanel = ({
@@ -70,6 +72,7 @@ const PostRendererBottomPanel = ({
   post: postKey,
   actionEnabled,
   onActionDisabled,
+  onDeleted,
 }: PostRendererBottomPanelProps) => {
   const router = useRouter();
   const post = useFragment(
@@ -177,7 +180,9 @@ const PostRendererBottomPanel = ({
         updatePost(webCardId: $webCardId, input: $input) {
           post {
             id
+            allowLikes
             allowComments
+            content
           }
         }
       }
@@ -193,6 +198,8 @@ const PostRendererBottomPanel = ({
           post {
             id
             allowLikes
+            allowComments
+            content
           }
         }
       }
@@ -207,6 +214,8 @@ const PostRendererBottomPanel = ({
         updatePost(webCardId: $webCardId, input: $input) {
           post {
             id
+            allowLikes
+            allowComments
             content
           }
         }
@@ -238,6 +247,8 @@ const PostRendererBottomPanel = ({
           updatePost: {
             post: {
               id: post.id,
+              allowLikes: post.allowLikes,
+              allowComments: post.allowComments,
               content: text,
             },
           },
@@ -256,13 +267,7 @@ const PostRendererBottomPanel = ({
         },
       });
     },
-    [
-      commitUpdatePostContent,
-      intl,
-      onCloseEditContent,
-      post.id,
-      post.webCard.id,
-    ],
+    [commitUpdatePostContent, intl, onCloseEditContent, post],
   );
 
   const updatePost = useCallback(
@@ -284,6 +289,9 @@ const PostRendererBottomPanel = ({
           updatePost: {
             post: {
               id: post.id,
+              allowLikes: post.allowLikes,
+              allowComments: post.allowComments,
+              content: post.content,
               ...input,
             },
           },
@@ -301,13 +309,7 @@ const PostRendererBottomPanel = ({
         },
       });
     },
-    [
-      commitUpdatePostComments,
-      commitUpdatePostLikes,
-      intl,
-      post.id,
-      post.webCard.id,
-    ],
+    [commitUpdatePostComments, commitUpdatePostLikes, intl, post],
   );
 
   const profileInfos = useProfileInfos();
@@ -317,7 +319,7 @@ const PostRendererBottomPanel = ({
   const toggleFollow = useToggleFollow();
 
   const onToggleFollow = () => {
-    if (profileHasEditorRight(profileInfos?.profileRole)) {
+    if (profileInfoHasEditorRight(profileInfos)) {
       toggleFollow(
         post.webCard.id,
         post.webCard.userName,
@@ -357,10 +359,7 @@ const PostRendererBottomPanel = ({
     `);
 
   const deletePost = useCallback(() => {
-    if (
-      profileHasEditorRight(profileInfos?.profileRole) &&
-      profileInfos?.webCardId
-    ) {
+    if (profileInfoHasEditorRight(profileInfos) && profileInfos?.webCardId) {
       commit({
         variables: {
           webCardId: profileInfos?.webCardId,
@@ -368,6 +367,7 @@ const PostRendererBottomPanel = ({
         },
         onCompleted() {
           closeModal();
+          onDeleted?.();
         },
       });
     } else {
@@ -379,14 +379,7 @@ const PostRendererBottomPanel = ({
         }),
       });
     }
-  }, [
-    commit,
-    intl,
-    post.id,
-    profileInfos?.profileRole,
-    profileInfos?.webCardId,
-    closeModal,
-  ]);
+  }, [profileInfos, commit, post.id, closeModal, onDeleted, intl]);
 
   const [sendReport, commitSendReportLoading] = useSendReport(
     post.id,
@@ -442,12 +435,15 @@ const PostRendererBottomPanel = ({
         )}
         <PressableNative onPress={goToComments}>
           {post.allowComments && post.previewComment && (
-            <Text variant="small" numberOfLines={2} ellipsizeMode="tail">
-              <Text variant="smallbold">
-                {post.previewComment.webCard.userName}{' '}
-              </Text>
-              {post.previewComment.comment}
-            </Text>
+            <ExpendableText
+              numberOfLines={2}
+              label={post.previewComment.comment}
+              variant="small"
+              prefix={{
+                label: `${post.previewComment.webCard.userName} `,
+                variant: 'smallbold',
+              }}
+            />
           )}
           {post.allowComments && post.counterComments > 0 && (
             <PressableNative onPress={goToComments}>
@@ -661,9 +657,23 @@ const PostConfigurationComponent = ({
 }: PostConfigurationProps) => {
   const [like, setLike] = useState(allowLikes);
   const [comment, setComment] = useState(allowComments);
-  useEffect(() => {
-    updatePost({ allowComments: comment, allowLikes: like });
-  }, [like, comment, updatePost]);
+
+  const setLikeInner = useCallback(
+    (value: boolean) => {
+      setLike(value);
+      updatePost({ allowComments: comment, allowLikes: value });
+    },
+    [comment, updatePost],
+  );
+
+  const setCommentInner = useCallback(
+    (value: boolean) => {
+      setComment(value);
+      updatePost({ allowComments: value, allowLikes: like });
+    },
+    [like, updatePost],
+  );
+
   return (
     <>
       <View style={styles.modalLine}>
@@ -673,7 +683,7 @@ const PostConfigurationComponent = ({
             description="PostItem Modal - Likes switch Label"
           />
         </Text>
-        <Switch variant="large" value={like} onValueChange={setLike} />
+        <Switch variant="large" value={like} onValueChange={setLikeInner} />
       </View>
 
       <View style={styles.modalLine}>
@@ -683,7 +693,11 @@ const PostConfigurationComponent = ({
             description="PostItem Modal - Comments switch Label"
           />
         </Text>
-        <Switch variant="large" value={comment} onValueChange={setComment} />
+        <Switch
+          variant="large"
+          value={comment}
+          onValueChange={setCommentInner}
+        />
       </View>
     </>
   );

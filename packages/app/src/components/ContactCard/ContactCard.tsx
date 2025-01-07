@@ -8,10 +8,13 @@ import {
   fitbox,
   rect,
 } from '@shopify/react-native-skia';
-import { memo, useMemo } from 'react';
-import { Image, View } from 'react-native';
+import { memo, useCallback, useMemo } from 'react';
+import { FormattedMessage } from 'react-intl';
+import { Image, TouchableOpacity, View } from 'react-native';
 import Animated, {
+  interpolate,
   useAnimatedStyle,
+  useDerivedValue,
   useSharedValue,
 } from 'react-native-reanimated';
 import { useFragment, graphql } from 'react-relay';
@@ -19,28 +22,47 @@ import { getTextColor } from '@azzapp/shared/colorsHelpers';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors, shadow } from '#theme';
+import { MediaImageRenderer } from '#components/medias';
+import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import Icon from '#ui/Icon';
 import Text from '#ui/Text';
-import type { ContactCard_profile$key } from '#relayArtifacts/ContactCard_profile.graphql';
-import type { LayoutChangeEvent, StyleProp, ViewStyle } from 'react-native';
+import type {
+  ContactCard_profile$data,
+  ContactCard_profile$key,
+} from '#relayArtifacts/ContactCard_profile.graphql';
+import type {
+  GestureResponderEvent,
+  LayoutChangeEvent,
+  StyleProp,
+  ViewStyle,
+} from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 
 type ContactCardProps = {
   profile: ContactCard_profile$key;
   style?: StyleProp<ViewStyle>;
   height: number;
-  withRotationArrows?: boolean;
+  edit?: boolean;
+  rotation?: SharedValue<number>;
 };
 
 const ContactCard = ({
   profile: profileKey,
   height,
   style,
+  edit,
+  rotation,
 }: ContactCardProps) => {
-  const { contactCard, contactCardQrCode, webCard } = useFragment(
+  const { contactCard, contactCardQrCode, webCard, avatar } = useFragment(
     graphql`
       fragment ContactCard_profile on Profile
       @argumentDefinitions(
         width: { type: "Int!", provider: "qrCodeWidth.relayprovider" }
+        pixelRatio: {
+          type: "Float!"
+          provider: "CappedPixelRatio.relayprovider"
+        }
       ) {
         webCard {
           userName
@@ -58,6 +80,10 @@ const ContactCard = ({
           title
           company
         }
+        avatar {
+          id
+          uri: uri(width: 112, pixelRatio: $pixelRatio)
+        }
         contactCardQrCode(width: $width)
       }
     `,
@@ -71,27 +97,15 @@ const ContactCard = ({
       style={style}
       contactCard={contactCard}
       contactCardQrCode={contactCardQrCode}
+      avatar={avatar}
+      edit={edit}
+      rotation={rotation}
     />
   );
 };
 
-type WebCard = {
-  readonly cardColors: {
-    readonly primary: string;
-  } | null;
-  readonly commonInformation: {
-    readonly company: string | null;
-  } | null;
-  readonly isMultiUser: boolean;
-  readonly userName: string;
-};
-
-type ContactCard = {
-  readonly company: string | null;
-  readonly firstName: string | null;
-  readonly lastName: string | null;
-  readonly title: string | null;
-};
+type WebCard = ContactCard_profile$data['webCard'];
+type ContactCard = ContactCard_profile$data['contactCard'];
 
 type ContactCardComponentProps = {
   webCard?: WebCard | null;
@@ -99,6 +113,9 @@ type ContactCardComponentProps = {
   style?: StyleProp<ViewStyle>;
   contactCard?: ContactCard | null;
   contactCardQrCode?: string;
+  avatar?: ContactCard_profile$data['avatar'];
+  edit?: boolean;
+  rotation?: SharedValue<number>;
 };
 
 export const ContactCardComponent = ({
@@ -107,11 +124,15 @@ export const ContactCardComponent = ({
   style,
   contactCard,
   contactCardQrCode,
+  avatar,
+  edit,
+  rotation,
 }: ContactCardComponentProps) => {
   const { userName, cardColors, commonInformation, isMultiUser } =
     webCard ?? {};
 
   const styles = useStyleSheet(stylesheet);
+  const router = useRouter();
 
   const backgroundColor = cardColors?.primary ?? colors.black;
 
@@ -133,7 +154,6 @@ export const ContactCardComponent = ({
     : null;
 
   const src = rect(0, 0, svg?.width() ?? 0, svg?.height() ?? 0);
-  const dst = rect(15, 15, 80, 80);
 
   const layoutWidth = useSharedValue(0);
 
@@ -144,6 +164,55 @@ export const ContactCardComponent = ({
   const animatedFooterWidth = useAnimatedStyle(() => ({
     width: layoutWidth.value,
   }));
+
+  const avatarSource = useMemo(() => {
+    if (avatar?.uri) {
+      return {
+        uri: avatar.uri,
+        mediaId: avatar.id ?? '',
+        requestedSize: 112,
+      };
+    }
+    return null;
+  }, [avatar?.id, avatar?.uri]);
+
+  const qrCodeStyle = useAnimatedStyle(() => {
+    const size = interpolate(
+      rotation?.value ?? 0,
+      [0, 1],
+      [110, (layoutWidth.value / CONTACT_CARD_RATIO) * 0.8],
+    );
+
+    return {
+      width: size,
+      height: size,
+    };
+  });
+
+  const transform = useDerivedValue(() => {
+    const size = interpolate(
+      rotation?.value ?? 0,
+      [0, 1],
+      [80, (layoutWidth.value / CONTACT_CARD_RATIO) * 0.8],
+    );
+
+    const origin = interpolate(rotation?.value ?? 0, [0, 1], [15, 0]);
+
+    const dst = rect(origin, origin, size, size);
+
+    return fitbox('contain', src, dst);
+  });
+
+  const onEdit = useCallback(
+    (e: GestureResponderEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      router.push({
+        route: 'CONTACT_CARD_EDIT',
+      });
+    },
+    [router],
+  );
 
   if (!contactCard || !webCard) {
     return null;
@@ -191,16 +260,21 @@ export const ContactCardComponent = ({
         />
       </View>
       <View style={{ flex: 1 }}>
-        <View style={styles.firstLineView}>
-          <Image
-            source={require('#assets/logo-full_white.png')}
-            resizeMode="contain"
-            style={[styles.azzappImage, { tintColor: readableColor }]}
-          />
-        </View>
+        {!avatarSource && (
+          <View style={styles.firstLineView}>
+            <Image
+              source={require('#assets/logo-full_white.png')}
+              resizeMode="contain"
+              style={[styles.azzappImage, { tintColor: readableColor }]}
+            />
+          </View>
+        )}
 
         <View style={styles.webCardContent}>
           <View style={styles.webcardText}>
+            {avatarSource && (
+              <MediaImageRenderer source={avatarSource} style={styles.avatar} />
+            )}
             <Text
               variant="large"
               style={[
@@ -246,19 +320,44 @@ export const ContactCardComponent = ({
       </View>
       <View style={styles.qrCodeContainer}>
         {svg ? (
-          <Canvas style={styles.qrCodeCanvas} opaque>
-            <Group
-              layer={
-                <Paint>
-                  <BlendColor color={readableColor} mode="srcATop" />
-                </Paint>
-              }
-              transform={fitbox('contain', src, dst)}
-            >
-              <ImageSVG svg={svg} />
-            </Group>
-          </Canvas>
+          <Animated.View style={qrCodeStyle}>
+            <Canvas style={styles.qrCodeCanvas} opaque>
+              <Group
+                layer={
+                  <Paint>
+                    <BlendColor color={readableColor} mode="srcATop" />
+                  </Paint>
+                }
+                transform={transform}
+              >
+                <ImageSVG svg={svg} />
+              </Group>
+            </Canvas>
+          </Animated.View>
         ) : null}
+        {edit && (
+          <TouchableOpacity
+            style={[
+              styles.edit,
+              {
+                backgroundColor: readableColor,
+              },
+            ]}
+            onPress={onEdit}
+          >
+            <Icon
+              icon="edit"
+              size={17}
+              style={{ tintColor: backgroundColor }}
+            />
+            <Text variant="button" style={{ color: backgroundColor }}>
+              <FormattedMessage
+                defaultMessage="Edit"
+                description="ContactCard - Label for edit button"
+              />
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
@@ -348,7 +447,26 @@ const stylesheet = createStyleSheet(appearance => ({
     top: 3,
   },
   qrCodeCanvas: {
-    width: 110,
-    height: 110,
+    flex: 1,
+  },
+  avatar: {
+    width: 55,
+    height: 55,
+    borderRadius: 55,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderColor: colors.white,
+    borderWidth: 2,
+    borderStyle: 'solid',
+  },
+  edit: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 27,
+    width: 80,
+    paddingVertical: 5,
+    gap: 5,
   },
 }));

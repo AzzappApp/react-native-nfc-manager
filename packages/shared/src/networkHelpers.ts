@@ -55,7 +55,6 @@ export const fetchJSON = async <JSON>(
   } catch (error: any) {
     data = { error: ERRORS.JSON_DECODING_ERROR, details: error.message };
   }
-
   throw new FetchError({
     message: data.message ?? response.statusText,
     response,

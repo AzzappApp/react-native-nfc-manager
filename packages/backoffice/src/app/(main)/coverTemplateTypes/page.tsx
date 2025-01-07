@@ -58,9 +58,7 @@ const CoverTemplateTypesPage = async () => {
         multiline
         rows={1}
         maxRows={3}
-        value={
-          'Cover template types correspond to the different lines in the cover list view'
-        }
+        value="Cover template types correspond to the different lines in the cover list view"
       />
       <CoverTemplateTypesList coverTemplateTypes={items} />
     </Box>

@@ -244,7 +244,7 @@ const VideoTimelineEditor = ({
         <Canvas style={{ height: imagesHeight, width: sliderWidth }} opaque>
           {texturesInfos.map((textureInfo, index) => (
             <TextureImage
-              fit={'cover'}
+              fit="cover"
               key={index}
               textureInfo={textureInfo}
               y={0}

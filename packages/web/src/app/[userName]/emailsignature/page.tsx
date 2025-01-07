@@ -53,7 +53,11 @@ const EmailSignature = async ({ params }: EmailSignatureProps) => {
           <FullSignature
             webCard={webCard}
             media={media}
-            companyLogo={webCard.logoId ?? profile.logoId}
+            companyLogo={
+              webCard.isMultiUser && webCard.logoId != null
+                ? webCard.logoId
+                : profile.logoId
+            }
           />
         )}
 
@@ -71,18 +75,30 @@ const EmailSignature = async ({ params }: EmailSignatureProps) => {
               Download the mobile app
             </div>
             <div style={{ display: 'flex', gap: 10 }}>
-              <Image
-                src={dlIos}
-                alt="azzapp-logo"
-                width={150}
-                className={styles.image}
-              />
-              <Image
-                src={dlAndroid}
-                alt="azzapp-logo"
-                width={150}
-                className={styles.image}
-              />
+              <a
+                href="https://apps.apple.com/app/id6502694267"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Image
+                  src={dlIos}
+                  alt="azzapp-logo"
+                  width={150}
+                  className={styles.image}
+                />
+              </a>
+              <a
+                href="https://play.google.com/store/apps/details?id=com.azzapp.app"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Image
+                  src={dlAndroid}
+                  alt="azzapp-logo"
+                  width={150}
+                  className={styles.image}
+                />
+              </a>
             </div>
           </>
         ) : undefined}

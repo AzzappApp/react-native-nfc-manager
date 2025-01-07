@@ -1,5 +1,5 @@
 import { memo, useCallback, useMemo } from 'react';
-import { View } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { useFragment, graphql } from 'react-relay';
 import { getTextColor } from '@azzapp/shared/colorsHelpers';
@@ -14,7 +14,6 @@ import FingerHint, {
   FINGER_HINT_HEIGHT,
   FINGER_HINT_WIDTH,
 } from '#ui/FingerHint';
-import PressableNative from '#ui/PressableNative';
 import { useHomeScreenContext } from './HomeScreenContext';
 import type { HomeContactCard_profile$key } from '#relayArtifacts/HomeContactCard_profile.graphql';
 import type { HomeContactCard_user$key } from '#relayArtifacts/HomeContactCard_user.graphql';
@@ -146,7 +145,8 @@ const ContactCardItem = ({
   }, [profile.id, router]);
 
   const showUpdateContactHint =
-    profile.lastContactCardUpdate <= profile.createdAt;
+    profile.lastContactCardUpdate <= profile.createdAt &&
+    profile.webCard?.cardIsPublished;
 
   const readableColor = useMemo(
     () => getTextColor(profile.webCard?.cardColors?.primary ?? colors.black),
@@ -165,20 +165,14 @@ const ContactCardItem = ({
               overflow: 'hidden',
             }}
           >
-            <PressableNative
-              ripple={{
-                borderless: true,
-                foreground: true,
-                radius: height,
-              }}
-              onPress={onPressContactCard}
-            >
+            <TouchableOpacity onPress={onPressContactCard}>
               <ContactCard
                 profile={profile}
                 height={Math.min(height, height)}
                 style={styles.card}
+                edit
               />
-            </PressableNative>
+            </TouchableOpacity>
           </View>
         )}
       {showUpdateContactHint && (

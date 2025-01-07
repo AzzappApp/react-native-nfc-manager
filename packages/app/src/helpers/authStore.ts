@@ -44,6 +44,10 @@ export type ProfileInfos = {
    * the current user phoneNumber
    */
   phoneNumber: string | null;
+  /**
+   * The user in invited and had not yet validate the invitation
+   */
+  invited: boolean;
 };
 
 /**
@@ -241,17 +245,17 @@ const emitAuthState = () => {
  */
 export const getTokens = () => authTokens;
 
-export const onChangeWebCard = (
-  infos?: {
-    profileId: string | null;
-    webCardId: string | null;
-    profileRole: string | null;
-  } | null,
+export const onChangeWebCard = async (
+  infos?: Pick<
+    ProfileInfos,
+    'invited' | 'profileId' | 'profileRole' | 'webCardId'
+  > | null,
 ) => {
-  const { profileId, webCardId, profileRole } = infos ?? {
+  const { profileId, webCardId, profileRole, invited } = infos ?? {
     profileId: null,
     webCardId: null,
     profileRole: null,
+    invited: false,
   };
   const profileInfos = getAuthState().profileInfos;
   if (
@@ -265,6 +269,7 @@ export const onChangeWebCard = (
         profileId,
         webCardId,
         profileRole,
+        invited,
       }),
     );
   }

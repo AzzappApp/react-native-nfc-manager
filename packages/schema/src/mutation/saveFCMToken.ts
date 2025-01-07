@@ -1,5 +1,9 @@
 import { GraphQLError } from 'graphql';
-import { updateFCMToken } from '@azzapp/data';
+import {
+  clearTokenForDeviceExceptUser,
+  transaction,
+  updateFCMToken,
+} from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { getSessionInfos } from '#GraphQLContext';
 import type { MutationResolvers } from '#/__generated__/types';
@@ -10,8 +14,11 @@ const saveFCMToken: MutationResolvers['saveFCMToken'] = async (
 ) => {
   const { userId } = getSessionInfos();
   if (!userId) throw new GraphQLError(ERRORS.UNAUTHORIZED);
-
-  await updateFCMToken(deviceId, userId, deviceType, deviceOS, fcmToken);
+  await transaction(async () => {
+    //this remove the old token for the device associated to other userId
+    await clearTokenForDeviceExceptUser(userId, deviceId);
+    await updateFCMToken(userId, deviceId, deviceType, deviceOS, fcmToken);
+  });
 
   return true;
 };

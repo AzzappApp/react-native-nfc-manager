@@ -127,8 +127,8 @@ const CoverCreationScreen = ({
           {
             route: 'WEBCARD',
             params: {
-              webCardId: profile?.webCard?.id,
-              userName: profile?.webCard?.userName,
+              webCardId: profile.webCard.id,
+              userName: profile.webCard.userName,
               editing: true,
               fromCreation: true,
             },

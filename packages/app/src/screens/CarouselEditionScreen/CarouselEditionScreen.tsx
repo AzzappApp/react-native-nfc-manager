@@ -204,8 +204,10 @@ const CarouselEditionScreen = ({
             id
             requiresSubscription
             cardModules {
+              id
               kind
               visible
+              variant
               ...CarouselEditionScreen_module
             }
           }

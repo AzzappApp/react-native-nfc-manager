@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import Toast from 'react-native-toast-message';
 import { useMutation, graphql, ConnectionHandler } from 'react-relay';
@@ -118,93 +119,92 @@ const useToggleFollow = (userNameFilter?: string) => {
 
   const intl = useIntl();
 
-  const toggleFollow = (
-    targetWebCardId: string,
-    userName: string,
-    follow: boolean,
-  ) => {
-    // TODO do we really want to prevent fast clicking?
-    if (toggleFollowingActive) {
-      return;
-    }
-    const profileInfos = getAuthState().profileInfos;
-    const currentWebCardId = profileInfos?.webCardId;
+  const toggleFollow = useCallback(
+    (targetWebCardId: string, userName: string, follow: boolean) => {
+      // TODO do we really want to prevent fast clicking?
+      if (toggleFollowingActive) {
+        return;
+      }
+      const profileInfos = getAuthState().profileInfos;
+      const currentWebCardId = profileInfos?.webCardId;
 
-    Toast.show({
-      text1: (follow
-        ? intl.formatMessage(
-            {
-              defaultMessage: 'You started to follow this Webcard{azzappA}',
-              description: 'Toast message when user follows a profile',
-            },
-            {
-              azzappA: <Text variant="azzapp">a</Text>,
-            },
-          )
-        : intl.formatMessage(
-            {
-              defaultMessage: 'You no longer follow this Webcard{azzappA}',
-              description: 'Toast message when user unfollows a profile',
-            },
-            {
-              azzappA: <Text variant="azzapp">a</Text>,
-            },
-          )) as unknown as string,
-    });
+      Toast.show({
+        text1: (follow
+          ? intl.formatMessage(
+              {
+                defaultMessage: 'You started to follow this Webcard{azzappA}',
+                description: 'Toast message when user follows a profile',
+              },
+              {
+                azzappA: <Text variant="azzapp">a</Text>,
+              },
+            )
+          : intl.formatMessage(
+              {
+                defaultMessage: 'You no longer follow this Webcard{azzappA}',
+                description: 'Toast message when user unfollows a profile',
+              },
+              {
+                azzappA: <Text variant="azzapp">a</Text>,
+              },
+            )) as unknown as string,
+      });
 
-    // currentProfileId is undefined when user is anonymous so we can't follow
-    if (!currentWebCardId) {
-      return;
-    }
-    commit({
-      variables: {
-        webCardId: currentWebCardId,
-        viewerWebCardId: currentWebCardId,
-        input: {
-          targetWebCardId,
-          follow,
-        },
-      },
-      optimisticResponse: {
-        toggleFollowing: {
-          webCard: {
-            id: targetWebCardId,
-            isFollowing: follow,
+      // currentProfileId is undefined when user is anonymous so we can't follow
+      if (!currentWebCardId) {
+        return;
+      }
+      commit({
+        variables: {
+          webCardId: currentWebCardId,
+          viewerWebCardId: currentWebCardId,
+          input: {
+            targetWebCardId,
+            follow,
           },
         },
-      },
-      optimisticUpdater: store =>
-        updater(
-          store,
-          currentWebCardId,
-          targetWebCardId,
-          follow,
-          userNameFilter,
-        ),
-      updater: store =>
-        updater(
-          store,
-          currentWebCardId,
-          targetWebCardId,
-          follow,
-          userNameFilter,
-        ),
-      onError(error) {
-        console.error(error);
-        Toast.show({
-          type: 'error',
-          text1: intl.formatMessage(
-            {
-              defaultMessage: 'Error, could not follow {userName}',
-              description:
-                'Error toast message when we could not follow a user',
+        optimisticResponse: {
+          toggleFollowing: {
+            webCard: {
+              id: targetWebCardId,
+              isFollowing: follow,
             },
-            { userName },
+          },
+        },
+        optimisticUpdater: store =>
+          updater(
+            store,
+            currentWebCardId,
+            targetWebCardId,
+            follow,
+            userNameFilter,
           ),
-        });
-      },
-    });
-  };
+        updater: store =>
+          updater(
+            store,
+            currentWebCardId,
+            targetWebCardId,
+            follow,
+            userNameFilter,
+          ),
+        onError(error) {
+          console.error(error);
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage(
+              {
+                defaultMessage: 'Error, could not follow {userName}',
+                description:
+                  'Error toast message when we could not follow a user',
+              },
+              { userName },
+            ),
+          });
+        },
+      });
+    },
+    [commit, intl, toggleFollowingActive, userNameFilter],
+  );
 
   return toggleFollow;
 };

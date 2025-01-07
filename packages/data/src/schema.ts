@@ -10,20 +10,9 @@ import type {
   CardModuleSimpleTextData,
   CardModuleSocialLinksData,
   CardModuleLineDividerData,
-  MODULE_KIND_BLOCK_TEXT,
-  MODULE_KIND_CAROUSEL,
-  MODULE_KIND_HORIZONTAL_PHOTO,
-  MODULE_KIND_LINE_DIVIDER,
-  MODULE_KIND_SCHEDULE,
-  MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE,
-  MODULE_KIND_SIMPLE_BUTTON,
-  MODULE_KIND_SIMPLE_TEXT,
-  MODULE_KIND_SIMPLE_TITLE,
-  MODULE_KIND_SOCIAL_LINKS,
-  MODULE_KIND_WEB_CARDS_CAROUSEL,
-  MODULE_KIND_PARALLAX,
-  MODULE_KIND_VIDEO,
-  MODULE_KIND_IMAGEGRID,
+  CardModuleMediaData,
+  CardModuleMediaTextData,
+  CardModuleMediaTextLinkData,
 } from '@azzapp/shared/cardModuleHelpers';
 import type {
   CommonInformation,
@@ -37,24 +26,8 @@ export const CardModuleTable = cols.table(
   {
     id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
     webCardId: cols.cuid('webCardId').notNull(),
-    kind: cols
-      .enum('kind', [
-        'blockText',
-        'carousel',
-        'horizontalPhoto',
-        'imageGrid',
-        'lineDivider',
-        'parallax',
-        'photoWithTextAndTitle',
-        'schedule',
-        'simpleButton',
-        'simpleText',
-        'simpleTitle',
-        'socialLinks',
-        'video',
-        'webCardsCarousel',
-      ])
-      .notNull(),
+    kind: cols.defaultVarchar('kind').notNull(),
+    variant: cols.defaultVarchar('variant'),
     data: cols.json('data').$type<any>().notNull(),
     position: cols.int('position').notNull(),
     visible: cols.boolean('visible').default(true).notNull(),
@@ -68,88 +41,68 @@ export const CardModuleTable = cols.table(
 
 export type CardModuleBase = Omit<
   InferSelectModel<typeof CardModuleTable>,
-  'data' | 'kind'
+  'data'
 >;
 
 export type CardModuleBlockText = CardModuleBase & {
-  kind: typeof MODULE_KIND_BLOCK_TEXT;
   data: CardModuleBlockTextData;
 };
 
 export type CardModuleCarousel = CardModuleBase & {
-  kind: typeof MODULE_KIND_CAROUSEL;
   data: CardModuleCarouselData;
 };
 
 export type CardModuleHorizontalPhoto = CardModuleBase & {
-  kind: typeof MODULE_KIND_HORIZONTAL_PHOTO;
   data: CardModuleHorizontalPhotoData;
 };
 
 export type CardModuleLineDivider = CardModuleBase & {
-  kind: typeof MODULE_KIND_LINE_DIVIDER;
   data: CardModuleLineDividerData;
 };
 
-export type CardModuleSchedule = CardModuleBase & {
-  kind: typeof MODULE_KIND_SCHEDULE;
-  data: unknown;
-};
-
-export type CardModuleParrallax = CardModuleBase & {
-  kind: typeof MODULE_KIND_PARALLAX;
-  data: unknown;
-};
-
-export type CardModuleVideo = CardModuleBase & {
-  kind: typeof MODULE_KIND_VIDEO;
-  data: unknown;
-};
-
-export type CardModuleImageGrid = CardModuleBase & {
-  kind: typeof MODULE_KIND_IMAGEGRID;
-  data: unknown;
-};
-
 export type CardModulePhotoWithTextAndTitle = CardModuleBase & {
-  kind: typeof MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE;
   data: CardModulePhotoWithTextAndTitleData;
 };
 
 export type CardModuleSimpleButton = CardModuleBase & {
-  kind: typeof MODULE_KIND_SIMPLE_BUTTON;
   data: CardModuleSimpleButtonData;
 };
 
 export type CardModuleSimpleText = CardModuleBase & {
-  kind: typeof MODULE_KIND_SIMPLE_TEXT | typeof MODULE_KIND_SIMPLE_TITLE;
   data: CardModuleSimpleTextData;
 };
 
 export type CardModuleSocialLinks = CardModuleBase & {
-  kind: typeof MODULE_KIND_SOCIAL_LINKS;
   data: CardModuleSocialLinksData;
 };
 
-export type CardModuleWebCardsCarousel = CardModuleBase & {
-  kind: typeof MODULE_KIND_WEB_CARDS_CAROUSEL;
-  data: unknown;
+export type CardModuleMedia = CardModuleBase & {
+  data: CardModuleMediaData;
 };
+
+export type CardModuleMediaText = CardModuleBase & {
+  data: CardModuleMediaTextData;
+};
+
+export type CardModuleMediaTextLink = CardModuleBase & {
+  data: CardModuleMediaTextLinkData;
+};
+
+//INSERT_MODULE : new type
 
 export type CardModule =
   | CardModuleBlockText
   | CardModuleCarousel
   | CardModuleHorizontalPhoto
-  | CardModuleImageGrid
   | CardModuleLineDivider
-  | CardModuleParrallax
+  | CardModuleMedia
+  | CardModuleMediaText
+  | CardModuleMediaTextLink
   | CardModulePhotoWithTextAndTitle
-  | CardModuleSchedule
   | CardModuleSimpleButton
   | CardModuleSimpleText
-  | CardModuleSocialLinks
-  | CardModuleVideo
-  | CardModuleWebCardsCarousel;
+  | CardModuleSocialLinks;
+//INSERT_MODULE
 
 // #endregion
 
@@ -184,7 +137,7 @@ export const CardTemplateTable = cols.table('CardTemplate', {
 });
 
 export type CardTemplate = InferSelectModel<typeof CardTemplateTable>;
-export type CardModuleTemplate = Pick<CardModule, 'data' | 'kind'>;
+export type CardModuleTemplate = Pick<CardModule, 'data' | 'kind' | 'variant'>;
 // #endregion
 
 // #region CardTemplateType

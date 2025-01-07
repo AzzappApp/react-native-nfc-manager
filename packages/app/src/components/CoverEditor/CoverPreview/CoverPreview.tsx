@@ -60,6 +60,9 @@ import type {
   ViewProps,
 } from 'react-native';
 
+const MAGNETIC_THRESHOLD_X = 3;
+const MAGNETIC_THRESHOLD_Y = 3;
+
 type CoverPreviewProps = Exclude<ViewProps, 'children'> & {
   /**
    * Width of the cover preview
@@ -490,18 +493,21 @@ const CoverPreview = ({
           Math.abs(((bounds.width * canvasWidth) / 100) * sin)) /
           canvasHeight) *
         100;
+      const x = clamp(
+        offsetX + (translateX * 100) / canvasWidth,
+        boundingBoxWidth / 2,
+        100 - boundingBoxWidth / 2,
+      );
+      const y = clamp(
+        offsetY + (translateY * 100) / canvasHeight,
+        boundingBoxHeight / 2,
+        100 - boundingBoxHeight / 2,
+      );
+
       activeLayerBounds.value = {
         bounds: {
-          x: clamp(
-            offsetX + (translateX * 100) / canvasWidth,
-            boundingBoxWidth / 2,
-            100 - boundingBoxWidth / 2,
-          ),
-          y: clamp(
-            offsetY + (translateY * 100) / canvasHeight,
-            boundingBoxHeight / 2,
-            100 - boundingBoxHeight / 2,
-          ),
+          x: Math.abs(x - 50) > MAGNETIC_THRESHOLD_X ? x : 50,
+          y: Math.abs(y - 50) > MAGNETIC_THRESHOLD_Y ? y : 50,
           width: bounds.width,
           height: bounds.height,
         },
@@ -1071,7 +1077,7 @@ const CoverPreview = ({
                 >
                   {linksLayer.links.map(link => (
                     <DynamicLinkRenderer
-                      key={link.socialId}
+                      key={`${link.socialId}${link.position}`}
                       as={View}
                       cardColors={cardColors}
                       color={linksLayer.color}

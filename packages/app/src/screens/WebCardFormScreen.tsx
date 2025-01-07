@@ -398,6 +398,7 @@ const WebCardFormScreen = ({
           profileId,
           webCardId: webCard.id,
           profileRole: profileRole!,
+          invited: false,
         });
 
         onNext();

@@ -2,6 +2,8 @@ import BlockTextRenderer from './BlockTextRenderer';
 import CarouselRenderer from './CarouselRenderer';
 import HorizontalPhotoRenderer from './HorizontalPhotoRenderer';
 import LineDividerRenderer from './LineDividerRenderer';
+import MediaRenderer from './MediaRenderer';
+import MediaTextLinkRenderer from './MediaTextLinkRenderer';
 import PhotoWithTextAndTitleRenderer from './PhotoWithTextAndTitleRenderer';
 import SimpleButtonRenderer from './SimpleButtonRenderer';
 import SimpleTextRenderer from './SimpleTextRenderer';
@@ -49,17 +51,15 @@ const renderers: {
   blockText: BlockTextRenderer,
   carousel: CarouselRenderer,
   horizontalPhoto: HorizontalPhotoRenderer,
-  imageGrid: () => null,
   lineDivider: LineDividerRenderer,
-  parallax: () => null,
   photoWithTextAndTitle: PhotoWithTextAndTitleRenderer,
   simpleButton: SimpleButtonRenderer,
   simpleTitle: SimpleTextRenderer,
   simpleText: SimpleTextRenderer,
   socialLinks: SocialLinksRenderer,
-  schedule: () => null,
-  video: () => null,
-  webCardsCarousel: () => null,
+  media: MediaRenderer,
+  mediaText: MediaTextLinkRenderer, // mediaText and mediaTextLink are very close in terms of rendering
+  mediaTextLink: MediaTextLinkRenderer,
 };
 
 export default ModuleRenderer;

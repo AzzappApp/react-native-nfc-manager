@@ -12,6 +12,7 @@ import {
 } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Platform, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { Video } from 'react-native-compressor';
 import { useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller';
 import Animated, {
   interpolate,
@@ -35,6 +36,12 @@ import {
   getLutURI,
   NativeTextureLoader,
 } from '#helpers/mediaEditions';
+import {
+  copyCoverMediaToCacheDir,
+  COVER_CACHE_DIR,
+  getVideoSize,
+  type SourceMedia,
+} from '#helpers/mediaHelpers';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Text from '#ui/Text';
@@ -44,9 +51,10 @@ import {
   extractLottieInfoMemoized,
   calculateImageScale,
   getLottieMediasDurations,
-  copyCoverMediaToCacheDir,
   useLottieMediaDurations,
   MAX_ALLOWED_VIDEOS_BY_COVER,
+  MAX_EXPORT_DECODER_RESOLUTION,
+  COVER_VIDEO_BITRATE,
 } from './coverEditorHelpers';
 import CoverEditorMediaPicker from './CoverEditorMediaPicker';
 import { coverEditorReducer } from './coverEditorReducer';
@@ -57,7 +65,6 @@ import { getCoverLocalMediaPath } from './coversLocalStore';
 import useLottie from './useLottie';
 import useSaveCover from './useSaveCover';
 import type { TextureInfo } from '#helpers/mediaEditions/NativeTextureLoader';
-import type { SourceMedia } from '#helpers/mediaHelpers';
 import type { CoverEditor_coverTemplate$key } from '#relayArtifacts/CoverEditor_coverTemplate.graphql';
 import type { CoverEditor_profile$key } from '#relayArtifacts/CoverEditor_profile.graphql';
 import type { CoverEditorAction } from './coverEditorActions';
@@ -67,6 +74,7 @@ import type {
   CoverEditorOverlayItem,
   CoverEditorState,
   CoverEditorTextLayerItem,
+  CoverMedia,
 } from './coverEditorTypes';
 import type { Filter } from '@azzapp/shared/filtersHelper';
 import type { Asset } from 'expo-asset';
@@ -330,7 +338,7 @@ const CoverEditorCore = (
       coverTemplate?.medias.forEach(({ media, index, editable }) => {
         initialMediaToPick[index] = {
           editable,
-          kind: 'image',
+          kind: media.id.startsWith('v_') ? 'video' : 'image',
           filter: null,
           animation: null,
           editionParameters: null,
@@ -392,7 +400,7 @@ const CoverEditorCore = (
   useEffect(() => {
     let canceled = false;
     const abortController = new AbortController();
-    const mediasToLoad: SourceMedia[] = [];
+    const mediasToLoad: Array<CoverEditorOverlayItem | CoverMedia> = [];
     for (const media of coverEditorState.medias) {
       const { id, kind } = media;
       if (
@@ -464,12 +472,41 @@ const CoverEditorCore = (
     }
 
     const imagesScales = coverEditorState.imagesScales;
-
+    const compressedMedia: Array<{
+      id: string;
+      uri: string;
+      width: number;
+      height: number;
+    }> = [];
     promises.push(
       ...mediasToLoad.map(async media => {
         if (!localFilenames[media.id]) {
+          if (
+            media.kind === 'video' &&
+            !media.uri.startsWith('http') &&
+            (media.width > MAX_EXPORT_DECODER_RESOLUTION ||
+              media.height > MAX_EXPORT_DECODER_RESOLUTION)
+          ) {
+            const result = await Video.compress(media.uri, {
+              compressionMethod: 'manual',
+              maxSize: MAX_EXPORT_DECODER_RESOLUTION,
+              bitrate: COVER_VIDEO_BITRATE,
+            });
+
+            const res = await getVideoSize(result);
+            media = {
+              ...media,
+              uri: result,
+              rotation: res.rotation,
+              width: res.width,
+              height: res.height,
+            };
+            compressedMedia.push(media);
+          }
+
           const filename = await copyCoverMediaToCacheDir(
             media,
+            COVER_CACHE_DIR,
             abortController.signal,
           );
           if (canceled) {
@@ -518,6 +555,7 @@ const CoverEditorCore = (
             lutTextures,
             images,
             localFilenames,
+            compressedMedia,
           },
         });
       },
@@ -724,7 +762,7 @@ const CoverEditorCore = (
   const toolbox = useRef<CoverEditorLinksToolActions>(null);
 
   const onOpenLinksModal = useCallback(() => {
-    toolbox.current?.toggleLinksModal();
+    toolbox.current?.openLinksModal();
   }, []);
 
   const intl = useIntl();

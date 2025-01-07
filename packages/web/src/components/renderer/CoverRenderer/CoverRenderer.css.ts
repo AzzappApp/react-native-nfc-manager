@@ -18,7 +18,7 @@ const content = style({
       width: '100vw',
     },
     [MediaQuery.Desktop]: {
-      maxWidth: '300px',
+      maxWidth: '500px',
       borderRadius: 35,
       boxShadow: '0px 10px 20px 0px rgba(0, 0, 0, 0.20)',
     },
@@ -48,7 +48,7 @@ const backgroundMedia = style({
     },
     [MediaQuery.Desktop]: {
       display: 'block',
-      height: '580px',
+      height: '870px',
     },
   },
 });

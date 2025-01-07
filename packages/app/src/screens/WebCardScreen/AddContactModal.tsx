@@ -5,7 +5,7 @@ import {
   updateContactAsync,
   PermissionStatus as ContactPermissionStatus,
 } from 'expo-contacts';
-import * as FileSystem from 'expo-file-system';
+import { File, Paths } from 'expo-file-system/next';
 import { fromGlobalId } from 'graphql-relay';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -307,9 +307,26 @@ const AddContactModal = ({
             }
 
             if (Platform.OS === 'ios') {
-              await presentFormAsync(null, scanned.contact, {
-                isNew: true,
-              });
+              try {
+                const updatedContact = reworkContactForDeviceInsert({
+                  ...scanned.contact,
+                  urlAddresses:
+                    additionalContactData?.urls?.map(addr => {
+                      return { label: 'default', address: addr.address };
+                    }) || undefined,
+                  socialProfiles:
+                    additionalContactData?.socials?.map(social => {
+                      return { ...social, address: social.url };
+                    }) || undefined,
+                });
+
+                await presentFormAsync(null, updatedContact, {
+                  isNew: true,
+                });
+              } catch (e) {
+                console.warn(e);
+                Sentry.captureException(e);
+              }
             } else {
               router.push({
                 route: 'CONTACT_DETAILS',
@@ -444,7 +461,7 @@ const AddContactModal = ({
     >
       <Header
         middleElement={
-          <Text variant="large" style={styles.headerText}>
+          <Text variant="large" style={styles.headerText} numberOfLines={3}>
             <FormattedMessage
               defaultMessage="Add {userName} to your contacts"
               description="Title for add contact modal"
@@ -516,18 +533,21 @@ const buildContact = async (
 
   if (additionalContactData?.avatarUrl) {
     try {
-      const avatar = await FileSystem.downloadAsync(
-        additionalContactData.avatarUrl,
-        FileSystem.cacheDirectory + profileId,
-      );
-      if (avatar.status >= 200 && avatar.status < 300) {
-        image = {
-          width: 720,
-          height: 720,
-          uri: avatar.uri,
-        };
+      const avatar = new File(Paths.cache.uri + profileId);
+      if (avatar.exists) {
+        // be sure that avatar can be refreshed
+        avatar.delete();
       }
+      avatar.create();
+      await File.downloadFileAsync(additionalContactData.avatarUrl, avatar);
+
+      image = {
+        width: 720,
+        height: 720,
+        uri: avatar.uri,
+      };
     } catch (e) {
+      console.warn('error downloading avatar', e);
       Sentry.captureException(e);
     }
   }
@@ -551,9 +571,7 @@ const buildContact = async (
     phoneNumbers: phoneNumbers.map(phone => ({
       label:
         Platform.OS === 'android' && phone[0] !== 'Main'
-          ? phone[0] === 'Fax'
-            ? 'workFax'
-            : phone[0].toLowerCase()
+          ? phone[0].toLowerCase()
           : phone[0],
       number: phone[1],
       isPrimary: phone[0] === 'Main',
@@ -632,6 +650,7 @@ const styles = StyleSheet.create({
   },
   headerText: {
     textAlign: 'center',
+    marginHorizontal: 25,
   },
 });
 

@@ -232,7 +232,7 @@ const WebCardCategoryForm = ({
           <FormControl fullWidth error={webCardKindProps.error}>
             <InputLabel id="webCardKind-label">Profile Kind</InputLabel>
             <Select
-              labelId={'webCardKind-label'}
+              labelId="webCardKind-label"
               id="webCardKind"
               name="webCardKind"
               value={webCardKindProps.value}

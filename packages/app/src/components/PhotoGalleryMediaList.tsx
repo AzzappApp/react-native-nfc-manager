@@ -182,7 +182,7 @@ const PhotoGalleryMediaList = ({
         const fileData = await CameraRoll.iosGetImageDataById(
           asset.node.image.uri,
         );
-        uri = fileData.node.image.filepath;
+        uri = fileData.node.image.filepath?.split('#')[0] ?? null; //react-native-skia-video does not support uri with #
       } else if (Platform.OS === 'android') {
         const fileData = await ReactNativeBlobUtil.fs.stat(
           asset.node.image.uri,
@@ -208,7 +208,6 @@ const PhotoGalleryMediaList = ({
           height,
           rotation,
           duration: asset.node.image.playableDuration,
-          editable: true,
         });
       } else {
         if (width == null || height == null) {
@@ -221,7 +220,6 @@ const PhotoGalleryMediaList = ({
           galleryUri: asset.node.image.uri,
           width,
           height,
-          editable: true,
         });
       }
     },
@@ -293,9 +291,7 @@ const PhotoGalleryMediaList = ({
             numberOfLines={2}
           >
             <FormattedMessage
-              defaultMessage={
-                'You’ve given azzapp access to a selected number of photos and videos'
-              }
+              defaultMessage="You’ve given azzapp access to a selected number of photos and videos"
               description="ImagePicker Media library - Message when user did not authorize access to media or partially authorize"
             />
           </Text>

@@ -1,37 +1,23 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { View } from 'react-native';
-import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
-import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-import {
-  SOCIAL_LINKS,
-  type SocialLinkId,
-} from '@azzapp/shared/socialLinkHelpers';
+import { isDefined } from '@azzapp/shared/isDefined';
 import { colors } from '#theme';
-import {
-  CancelHeaderButton,
-  DoneHeaderButton,
-} from '#components/commonsButtons';
+import { DoneHeaderButton } from '#components/commonsButtons';
 import {
   useCoverEditorContext,
   useCoverEditorEditContext,
 } from '#components/CoverEditor/CoverEditorContext';
-import { ScreenModal } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import useBoolean from '#hooks/useBoolean';
+import useScreenDimensions from '#hooks/useScreenDimensions';
 import useScreenInsets from '#hooks/useScreenInsets';
-import SocialLinksLinksEditionPanel, {
-  SOCIAL_LINK_PANEL_ITEM_HEIGHT,
-} from '#screens/SocialLinksEditionScreen/SocialLinksLinksEditionPanel';
+import { SocialLinksAddOrEditModal } from '#screens/SocialLinksEditionScreen/SocialLinksAddOrEditModal';
+import SocialLinksLinksEditionPanel from '#screens/SocialLinksEditionScreen/SocialLinksLinksEditionPanel';
+import BottomSheetModal from '#ui/BottomSheetModal';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
-import { SocialIcon } from '#ui/Icon';
 import Text from '#ui/Text';
-
-type SocialLink = {
-  link: string;
-  position: number;
-  socialId: string;
-};
+import type { SocialLinkItem } from '@azzapp/shared/socialLinkHelpers';
 
 type CoverEditorLinksModalProps = {
   visible: boolean;
@@ -42,41 +28,79 @@ const CoverEditorLinksModal = ({
   visible,
   onClose,
 }: CoverEditorLinksModalProps) => {
-  const cover = useCoverEditorContext();
+  const { linksLayer } = useCoverEditorContext();
   const dispatch = useCoverEditorEditContext();
-  const [links, setLinks] = useState<Array<SocialLink | null>>(
-    cover.linksLayer.links,
+  const [links, setLinks] = useState<SocialLinkItem[]>(
+    linksLayer.links.filter(isDefined),
   );
-  const inset = useScreenInsets();
 
   const shownLinks = useMemo(() => {
-    return convertToNonNullArray(links)
-      .sort((a, b) => a.position - b.position)
-      .slice(0, 4);
+    return links.sort((a, b) => a.position - b.position).slice(0, 4);
   }, [links]);
+  const [addLinkVisible, openAddLink, closeAddLink] = useBoolean(false);
 
   const onDone = useCallback(() => {
     dispatch({
       type: 'UPDATE_LINKS',
       payload: shownLinks,
     });
+    closeAddLink();
     onClose();
-  }, [dispatch, onClose, shownLinks]);
+  }, [closeAddLink, dispatch, onClose, shownLinks]);
+
+  const [pickedItem, setPickedItem] = useState<SocialLinkItem>();
+
+  const onCloseAddLink = () => {
+    setPickedItem(undefined);
+    closeAddLink();
+  };
+
+  const onLinksChange = useCallback((socialLinks: SocialLinkItem[]) => {
+    setLinks(socialLinks);
+  }, []);
+
+  const styles = useStyleSheet(styleSheet);
+  const { height: screenHeight } = useScreenDimensions();
+
+  const onDeleteLink = useCallback(
+    (item: SocialLinkItem) => {
+      onLinksChange(links.filter(l => l?.position !== item.position));
+    },
+    [links, onLinksChange],
+  );
+
+  const onLinkItemPress = useCallback(
+    (link: SocialLinkItem) => {
+      openAddLink();
+      setPickedItem(link);
+    },
+    [openAddLink],
+  );
 
   useEffect(() => {
-    setLinks(cover.linksLayer.links);
+    // allow to select the list of link when opeing the pannel for the first time
+    if (visible && links.length === 0) {
+      openAddLink();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
 
-  const styles = useStyleSheet(styleSheet);
+  const onDismiss = () => {
+    // reset local links on dismiss
+    setLinks(linksLayer.links.filter(isDefined));
+    onClose();
+  };
+
+  const { bottom } = useScreenInsets();
+
   return (
-    <ScreenModal
-      visible={visible}
-      animationType="slide"
-      onRequestDismiss={onClose}
-    >
-      <Container style={styles.container}>
-        <KeyboardAvoidingView style={styles.container} behavior="padding">
+    <>
+      <BottomSheetModal
+        visible={visible}
+        onDismiss={onDismiss}
+        height={292 + bottom}
+      >
+        <Container style={styles.container}>
           <Header
             middleElement={
               <Text variant="large" style={styles.headerTitle}>
@@ -86,59 +110,49 @@ const CoverEditorLinksModal = ({
                 />
               </Text>
             }
-            leftElement={<CancelHeaderButton onPress={onClose} />}
             rightElement={<DoneHeaderButton onPress={onDone} />}
-            style={{ marginTop: inset.top }}
           />
-          <View style={styles.linksPreviewSection}>
-            <View style={styles.linksPreviewContainer}>
-              {shownLinks.map(link => (
-                <View key={link.socialId} style={styles.links}>
-                  <SocialIcon
-                    style={styles.linksPreviewIcon}
-                    icon={link.socialId as SocialLinkId}
-                  />
-                </View>
-              ))}
-            </View>
-            {shownLinks.length > 0 && (
-              <Text variant="medium" style={styles.linksPreviewCount}>
-                <FormattedMessage
-                  defaultMessage={'{links}/4 links'}
-                  description="CoverEditorLinksModal - Links count"
-                  values={{ links: shownLinks.length }}
-                />
-              </Text>
-            )}
-          </View>
           <SocialLinksLinksEditionPanel
             ignoreKeyboard
             links={links}
-            onLinksChange={setLinks}
-            style={styles.linksEditor}
-            contentContainerStyle={{
-              height:
-                SOCIAL_LINK_PANEL_ITEM_HEIGHT * SOCIAL_LINKS.length +
-                inset.bottom,
-            }}
+            onDeleteLink={onDeleteLink}
+            onItemPress={onLinkItemPress}
+            onAddLink={openAddLink}
+            onOrderChange={onLinksChange}
+            maxLink={4}
+            style={styles.editionPanel}
           />
-        </KeyboardAvoidingView>
-      </Container>
-    </ScreenModal>
+        </Container>
+      </BottomSheetModal>
+      <Suspense>
+        <BottomSheetModal
+          onDismiss={onCloseAddLink}
+          visible={addLinkVisible}
+          enableContentPanningGesture={false}
+          height={screenHeight}
+          showHandleIndicator={false}
+        >
+          <SocialLinksAddOrEditModal
+            links={links}
+            pickedItem={pickedItem}
+            setPickedItem={setPickedItem}
+            closeAddLink={closeAddLink}
+            onLinksChange={onLinksChange}
+          />
+        </BottomSheetModal>
+      </Suspense>
+    </>
   );
 };
 
 const styleSheet = createStyleSheet(appearance => ({
   container: {
     flex: 1,
+    height: 900,
   },
   headerTitle: {
     maxWidth: '50%',
     textAlign: 'center',
-  },
-  linksPreviewSection: {
-    height: 120,
-    justifyContent: 'center',
   },
   linksPreviewContainer: {
     flexDirection: 'row',
@@ -160,12 +174,11 @@ const styleSheet = createStyleSheet(appearance => ({
     width: 30,
     height: 30,
   },
-  linksPreviewCount: {
-    textAlign: 'center',
-    marginTop: 15,
-    color: appearance === 'light' ? colors.grey400 : colors.grey600,
-  },
   linksEditor: {
+    flex: 1,
+  },
+  editionPanel: {
+    minHeight: 200,
     flex: 1,
   },
 }));

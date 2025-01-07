@@ -20,10 +20,12 @@ export const searchResultProfilesQuery = graphql`
 
 type SearchResultProfilesProps = {
   queryReference: PreloadedQuery<SearchResultProfilesQuery>;
+  renderNoResultComponent: (query: string) => JSX.Element;
 };
 
 const SearchResultProfiles = ({
   queryReference,
+  renderNoResultComponent,
 }: SearchResultProfilesProps) => {
   const preloadedQuery = usePreloadedQuery<SearchResultProfilesQuery>(
     searchResultProfilesQuery,
@@ -71,6 +73,9 @@ const SearchResultProfiles = ({
     }
   }, [isLoadingNext, hasNext, loadNext]);
 
+  if (users.length === 0) {
+    return renderNoResultComponent(queryReference.variables.search);
+  }
   return (
     <View style={styles.containerStyle}>
       <CoverList

@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/react-native';
+import { File } from 'expo-file-system/next';
 import { useEffect, useState } from 'react';
-import ReactNativeBlobUtil from 'react-native-blob-util';
 import coverLocalStore, {
   getCoverLocalMediaPath,
 } from '#components/CoverEditor/coversLocalStore';
@@ -36,42 +36,37 @@ const useLocalCover = (
       }
       const { localFilenames, medias: coverMedias, overlayLayers } = cover;
       const medias = [...(coverMedias ?? []), ...(overlayLayers ?? [])];
-      const fileExists = (
-        await Promise.all(
-          medias.map(async media => {
-            try {
-              if (localFilenames?.[media.id]) {
-                if (
-                  await ReactNativeBlobUtil.fs.exists(
-                    getCoverLocalMediaPath(localFilenames[media.id]),
-                  )
-                ) {
-                  return true;
-                } else {
-                  // the media has been deleted from the device
-                  // we need to redownload it
-                  delete localFilenames[media.id];
-                }
-              }
-
-              if (media.uri.startsWith('http')) {
-                return true;
-              }
-
-              return ReactNativeBlobUtil.fs.exists(
-                media.uri.replace('file://', ''),
+      const fileExists = medias
+        .map(media => {
+          try {
+            if (localFilenames?.[media.id]) {
+              const file = new File(
+                getCoverLocalMediaPath(localFilenames[media.id]),
               );
-            } catch (e) {
-              Sentry.captureException(e, {
-                extra: {
-                  media,
-                },
-              });
-              return false;
+              if (file.exists) {
+                return true;
+              } else {
+                // the media has been deleted from the device
+                // we need to download it again
+                delete localFilenames[media.id];
+              }
             }
-          }),
-        )
-      ).every(Boolean);
+
+            if (media.uri.startsWith('http')) {
+              return true;
+            }
+            const file = new File(media.uri);
+            return file.exists;
+          } catch (e) {
+            Sentry.captureException(e, {
+              extra: {
+                media,
+              },
+            });
+            return false;
+          }
+        })
+        .every(Boolean);
 
       if (cancelled) {
         return;

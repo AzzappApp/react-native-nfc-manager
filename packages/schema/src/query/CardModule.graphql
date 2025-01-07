@@ -1,4 +1,3 @@
-
 """
 User Card module
 """
@@ -14,6 +13,11 @@ interface CardModule {
   kind: CardModuleKind!
 
   """
+  User Card module variant design of a kind
+  """
+  variant: String
+
+  """
   User Card module visibility
   """
   visible: Boolean!
@@ -27,20 +31,24 @@ enum CardModuleKind {
   carousel
   horizontalPhoto
   lineDivider
-  openingHours
   photoWithTextAndTitle
   simpleButton
   simpleText
   simpleTitle
   socialLinks
-  webCardsCarousel
+  media
+  mediaText
+  mediaTextLink
+  map
+  titleText
+  #INSERT_MODULE: add new module kind here
 }
-
 
 """
 User Card module : BlockText
 """
-type CardModuleBlockText implements CardModule {"""
+type CardModuleBlockText implements CardModule {
+  """
   User Card module id, unique between all modules (but not a node id)
   """
   id: ID!
@@ -48,6 +56,10 @@ type CardModuleBlockText implements CardModule {"""
   User Card module kind
   """
   kind: CardModuleKind!
+  """
+  User Card module variant design of a kind
+  """
+  variant: String
   """
   User Card module visibility
   """
@@ -84,6 +96,10 @@ type CardModuleCarousel implements CardModule {
   """
   kind: CardModuleKind!
   """
+  User Card module variant design of a kind
+  """
+  variant: String
+  """
   User Card module visibility
   """
   visible: Boolean!
@@ -100,7 +116,6 @@ type CardModuleCarousel implements CardModule {
   backgroundStyle: ModuleBackgroundStyle
 }
 
-
 """
 User Card module : HorizontalPhoto
 """
@@ -113,6 +128,10 @@ type CardModuleHorizontalPhoto implements CardModule {
   User Card module kind
   """
   kind: CardModuleKind!
+  """
+  User Card module variant design of a kind
+  """
+  variant: String
   """
   User Card module visibility
   """
@@ -134,7 +153,8 @@ type CardModuleHorizontalPhoto implements CardModule {
 """
 User Card module : LineDivider
 """
-type CardModuleLineDivider implements CardModule { """
+type CardModuleLineDivider implements CardModule {
+  """
   User Card module id, unique between all modules (but not a node id)
   """
   id: ID!
@@ -142,6 +162,10 @@ type CardModuleLineDivider implements CardModule { """
   User Card module kind
   """
   kind: CardModuleKind!
+  """
+  User Card module variant design of a kind
+  """
+  variant: String
   """
   User Card module visibility
   """
@@ -155,88 +179,10 @@ type CardModuleLineDivider implements CardModule { """
 }
 
 """
-User Card module :Schedule
-"""
-type CardModuleSchedule implements CardModule {
-  """
-  User Card module id, unique between all modules (but not a node id)
-  """
-  id: ID!
-
-  """
-  User Card module kind
-  """
-  kind: CardModuleKind!
-
-  """
-  User Card module visibility
-  """
-  visible: Boolean!
-}
-
-"""
-User Card module :Video
-"""
-type CardModuleVideo implements CardModule {
-  """
-  User Card module id, unique between all modules (but not a node id)
-  """
-  id: ID!
-
-  """
-  User Card module kind
-  """
-  kind: CardModuleKind!
-
-  """
-  User Card module visibility
-  """
-  visible: Boolean!
-}
-
-"""
-User Card module : ImageGrid
-"""
-type CardModuleImageGrid implements CardModule {
-  """
-  User Card module id, unique between all modules (but not a node id)
-  """
-  id: ID!
-
-  """
-  User Card module kind
-  """
-  kind: CardModuleKind!
-
-  """
-  User Card module visibility
-  """
-  visible: Boolean!
-}
-
-"""
-User Card module : Parallax
-"""
-type CardModuleParallax implements CardModule {
-  """
-  User Card module id, unique between all modules (but not a node id)
-  """
-  id: ID!
-
-  """
-  User Card module kind
-  """
-  kind: CardModuleKind!
-
-  """
-  User Card module visibility
-  """
-  visible: Boolean!
-}
-"""
 User Card module : SimpleButton
 """
-type CardModuleSimpleButton implements CardModule {"""
+type CardModuleSimpleButton implements CardModule {
+  """
   User Card module id, unique between all modules (but not a node id)
   """
   id: ID!
@@ -244,6 +190,10 @@ type CardModuleSimpleButton implements CardModule {"""
   User Card module kind
   """
   kind: CardModuleKind!
+  """
+  User Card module variant design of a kind
+  """
+  variant: String
   """
   User Card module visibility
   """
@@ -269,7 +219,8 @@ type CardModuleSimpleButton implements CardModule {"""
 """
 User Card module : SimpleText
 """
-type CardModuleSimpleText implements CardModule { """
+type CardModuleSimpleText implements CardModule {
+  """
   User Card module id, unique between all modules (but not a node id)
   """
   id: ID!
@@ -277,6 +228,10 @@ type CardModuleSimpleText implements CardModule { """
   User Card module kind
   """
   kind: CardModuleKind!
+  """
+  User Card module variant design of a kind
+  """
+  variant: String
   """
   User Card module visibility
   """
@@ -293,11 +248,11 @@ type CardModuleSimpleText implements CardModule { """
   backgroundStyle: ModuleBackgroundStyle
 }
 
-
 """
 User Card module : SimpleTitle
 """
-type CardModuleSimpleTitle implements CardModule {"""
+type CardModuleSimpleTitle implements CardModule {
+  """
   User Card module id, unique between all modules (but not a node id)
   """
   id: ID!
@@ -305,6 +260,10 @@ type CardModuleSimpleTitle implements CardModule {"""
   User Card module kind
   """
   kind: CardModuleKind!
+  """
+  User Card module variant design of a kind
+  """
+  variant: String
   """
   User Card module visibility
   """
@@ -325,7 +284,7 @@ type CardModuleSimpleTitle implements CardModule {"""
 User Card module : PhotoWithTextAndTitle
 """
 type CardModulePhotoWithTextAndTitle implements CardModule {
-   """
+  """
   User Card module id, unique between all modules (but not a node id)
   """
   id: ID!
@@ -333,12 +292,16 @@ type CardModulePhotoWithTextAndTitle implements CardModule {
   User Card module kind
   """
   kind: CardModuleKind!
+  """
+  User Card module variant design of a kind
+  """
+  variant: String
   visible: Boolean!
   """
   The Media image of the horizontal photo module, cannot be null
   """
   image: MediaImage!
-  
+
   imageMargin: CardModulePhotoWithTextAndTitleImageMargin
   horizontalArrangement: HorizontalArrangement
   verticalArrangement: VerticalArrangement
@@ -363,11 +326,11 @@ type CardModulePhotoWithTextAndTitle implements CardModule {
   backgroundStyle: ModuleBackgroundStyle
 }
 
-
 """
 User Card module : CardModuleSocialLinks
 """
-type CardModuleSocialLinks implements CardModule {"""
+type CardModuleSocialLinks implements CardModule {
+  """
   User Card module id, unique between all modules (but not a node id)
   """
   id: ID!
@@ -375,6 +338,10 @@ type CardModuleSocialLinks implements CardModule {"""
   User Card module kind
   """
   kind: CardModuleKind!
+  """
+  User Card module variant design of a kind
+  """
+  variant: String
   """
   User Card module visibility
   """
@@ -391,7 +358,6 @@ type CardModuleSocialLinks implements CardModule {"""
   background: ModuleBackground
   backgroundStyle: ModuleBackgroundStyle
 }
-
 
 type CardModuleSocialLinkItem {
   socialId: String!
@@ -443,4 +409,144 @@ type ModuleTextBackgroundStyle {
   backgroundColor: String!
   patternColor: String!
   opacity: Int!
+}
+
+"""
+User Card module : Media
+"""
+type CardModuleMedia implements CardModule {
+  """
+  User Card module id, unique between all modules (but not a node id)
+  """
+  id: ID!
+
+  """
+  User Card module kind
+  """
+  kind: CardModuleKind!
+
+  """
+  User Card module visibility
+  """
+  visible: Boolean!
+  """
+  The variant design of the module
+  """
+  variant: String
+
+  cardModuleMedias: [ModuleMedia!]!
+  """
+  The cardModule color , in some case it can be null (parallax media)
+  """
+  cardModuleColor: CardModuleColor!
+}
+
+"""
+User Card module : Media
+"""
+type CardModuleMediaText implements CardModule {
+  """
+  User Card module id, unique between all modules (but not a node id)
+  """
+  id: ID!
+
+  """
+  User Card module kind
+  """
+  kind: CardModuleKind!
+
+  """
+  User Card module visibility
+  """
+  visible: Boolean!
+  """
+  The variant design of the module
+  """
+  variant: String
+
+  cardModuleMedias: [ModuleMedia!]!
+  """
+  The cardModule color , in some case it can be null (parallax media)
+  """
+  cardModuleColor: CardModuleColor!
+}
+
+"""
+User Card module : Media
+"""
+type CardModuleMediaTextLink implements CardModule {
+  """
+  User Card module id, unique between all modules (but not a node id)
+  """
+  id: ID!
+
+  """
+  User Card module kind
+  """
+  kind: CardModuleKind!
+
+  """
+  User Card module visibility
+  """
+  visible: Boolean!
+  """
+  The variant design of the module
+  """
+  variant: String
+
+  cardModuleMedias: [ModuleMedia!]!
+  """
+  The cardModule color , in some case it can be null (parallax media)
+  """
+  cardModuleColor: CardModuleColor!
+}
+
+type CardModuleMap implements CardModule {
+  id: ID!
+  kind: CardModuleKind!
+  """
+  User Card module visibility
+  """
+  visible: Boolean!
+  """
+  The variant design of the module
+  """
+  variant: String
+}
+
+type CardModuleTitleText implements CardModule {
+  id: ID!
+  kind: CardModuleKind!
+  """
+  User Card module visibility
+  """
+  visible: Boolean!
+  """
+  The variant design of the module
+  """
+  variant: String
+}
+
+#INSERT_MODULE: add new module kind  type here
+
+type ModuleMedia {
+  media: Media!
+  title: String
+  text: String
+  link: ModuleMediaLink
+}
+
+type ModuleMediaLink {
+  label: String!
+  url: String!
+}
+
+# this represent the 5 circle layer of color choice, someModule will only use one of them, some will use multiple
+# but use a single one for simplification(all field are optional, because not all module use them)
+type CardModuleColor {
+  background: String!
+  content: String!
+  title: String!
+  text: String!
+  graphic: String!
 }

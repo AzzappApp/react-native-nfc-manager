@@ -201,8 +201,10 @@ const HorizontalPhotoEditionScreen = ({
             id
             requiresSubscription
             cardModules {
+              id
               kind
               visible
+              variant
               ...HorizontalPhotoEditionScreen_module
             }
           }
@@ -271,7 +273,7 @@ const HorizontalPhotoEditionScreen = ({
     });
     setShowImagePicker(false);
     onImageChange({
-      uri: `file://${exportPath}`,
+      uri: exportPath,
       width: size.width,
       height: size.height,
       kind: 'image',

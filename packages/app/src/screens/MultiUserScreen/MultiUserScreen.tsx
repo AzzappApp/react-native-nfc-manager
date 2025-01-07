@@ -10,7 +10,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
-import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import { CancelHeaderButton } from '#components/commonsButtons';
 import CoverRenderer from '#components/CoverRenderer';
@@ -21,6 +20,7 @@ import {
 } from '#components/NativeRouter';
 import PremiumIndicator from '#components/PremiumIndicator';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { profileInfoHasAdminRight } from '#helpers/profileRoleHelper';
 import relayScreen, { RelayScreenErrorBoundary } from '#helpers/relayScreen';
 import useBoolean from '#hooks/useBoolean';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
@@ -64,6 +64,7 @@ const multiUserScreenQuery = graphql`
       ... on Profile @alias(as: "profile") {
         id
         profileRole
+        invited
         webCard {
           id
           isMultiUser
@@ -96,10 +97,10 @@ const MultiUserScreen = ({
 
   useEffect(() => {
     // users that loose their admin role should not be able to access this screen
-    if (!profileHasAdminRight(profile?.profileRole)) {
+    if (!profileInfoHasAdminRight(profile)) {
       router.back();
     }
-  }, [profile?.profileRole, router]);
+  }, [profile, router]);
 
   const [confirmDeleteMultiUser, setConfirmDeleteMultiUser] = useState(false);
 
@@ -533,6 +534,7 @@ export default relayScreen(
       profileId: profileInfos?.profileId ?? '',
     }),
     fetchPolicy: 'store-and-network',
+    pollInterval: 30000,
   },
 );
 

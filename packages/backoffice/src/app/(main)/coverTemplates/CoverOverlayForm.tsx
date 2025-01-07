@@ -59,7 +59,7 @@ const CoverOverlayForm = ({ field }: Props) => {
         >
           <InputLabel id="filter-label">Filter</InputLabel>
           <Select
-            labelId={'filter-label'}
+            labelId="filter-label"
             label="Filter"
             {...getSelectProps(overlayFields.filter)}
             key={overlayFields.filter.key}
@@ -193,7 +193,7 @@ const CoverOverlayForm = ({ field }: Props) => {
         >
           <InputLabel id="animation-label">Animation</InputLabel>
           <Select
-            labelId={'animation-label'}
+            labelId="animation-label"
             label="Animation"
             {...getSelectProps(overlayFields.animation)}
             key={overlayFields.animation.key}

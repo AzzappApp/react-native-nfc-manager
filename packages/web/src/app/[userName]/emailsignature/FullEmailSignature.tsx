@@ -329,7 +329,7 @@ const FullEmailSignature = ({
                           height: '14px',
                           verticalAlign: 'middle',
                         }}
-                        alt={'maillogo'}
+                        alt="maillogo"
                       />
                       <span
                         style={{
@@ -365,7 +365,7 @@ const FullEmailSignature = ({
                           height: '14px',
                           verticalAlign: 'middle',
                         }}
-                        alt={'phonelogo'}
+                        alt="phonelogo"
                       />
                       <span
                         style={{

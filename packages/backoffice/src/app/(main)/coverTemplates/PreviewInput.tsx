@@ -78,7 +78,7 @@ const PreviewInput = ({
   return (
     <Box>
       {src && (
-        <Box height={300} width={'100%'}>
+        <Box height={300} width="100%">
           <Grid container columns={2}>
             <CardMedia
               sx={{ height: 200, width: 100, m: 2 }}
@@ -109,8 +109,8 @@ const PreviewInput = ({
                 label="Preview image position in %"
                 sx={{ flex: 1, width: 200, m: 1 }}
                 defaultValue={previewPositionPercentage.initialValue}
-                type={'number'}
-                key={'previewPosition'}
+                type="number"
+                key="previewPosition"
                 onChangeCapture={debouncedPreviewChange}
               />
             </Grid>

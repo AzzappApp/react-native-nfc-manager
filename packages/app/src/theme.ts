@@ -53,6 +53,11 @@ export const textStyles = StyleSheet.create({
   large: { ...fontFamilies.bold, fontSize: 16, lineHeight: 20 },
   textField: { ...fontFamilies.regular, fontSize: 16, lineHeight: 20 },
   button: { ...fontFamilies.semibold, fontSize: 14, lineHeight: 17 },
+  xsmallbold: {
+    ...fontFamilies.semibold,
+    fontSize: 9,
+    lineHeight: 11.3,
+  },
   smallbold: { ...fontFamilies.semibold, fontSize: 12, lineHeight: 15 },
   xsmall: { ...fontFamilies.semibold, fontSize: 11, lineHeight: 14 },
   xxsmallextrabold: {

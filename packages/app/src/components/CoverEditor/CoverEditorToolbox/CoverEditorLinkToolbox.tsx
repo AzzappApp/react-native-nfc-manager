@@ -2,6 +2,7 @@ import { forwardRef } from 'react';
 import { useIntl } from 'react-intl';
 import { ScrollView, View } from 'react-native';
 import { colors } from '#theme';
+import { TOOLBOX_SECTION_HEIGHT } from '#components/Toolbar/ToolBoxSection';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
@@ -11,7 +12,6 @@ import CoverEditorDeleteTool from './tools/CoverEditorDeleteTool';
 import CoverEditorLinksTool from './tools/CoverEditorLinksTool';
 import CoverEditorShadowTool from './tools/CoverEditorShadowTool';
 import CoverEditorSizeTool from './tools/CoverEditorSizeTool';
-import { TOOLBOX_SECTION_HEIGHT } from './ui/ToolBoxSection';
 import type { CoverEditorLinksToolActions } from './tools/CoverEditorLinksTool';
 import type { ForwardedRef } from 'react';
 

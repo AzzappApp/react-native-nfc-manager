@@ -6,6 +6,7 @@ import {
   MODULES_STYLES_VALUES,
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
+import { isCustomModule } from '#helpers/webcardModuleHelpers';
 import type { WebCardBackgroundPreview_webCard$key } from '#relayArtifacts/WebCardBackgroundPreview_webCard.graphql';
 import type { CardStyle } from '@azzapp/shared/cardHelpers';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
@@ -98,6 +99,21 @@ const WebCardBackground = ({
                 backgroundColor
               }
             }
+            ... on CardModuleMedia {
+              cardModuleColor {
+                background
+              }
+            }
+            ... on CardModuleMediaText {
+              cardModuleColor {
+                background
+              }
+            }
+            ... on CardModuleMediaTextLink {
+              cardModuleColor {
+                background
+              }
+            }
           }
         }
       `,
@@ -110,24 +126,30 @@ const WebCardBackground = ({
   let lastColor = firstColor;
   const kind = overrideLastModule?.kind ?? lastModule?.kind;
   const lastModuleData = overrideLastModule?.data ?? lastModule ?? {};
+
   if (lastModule && kind && kind in MODULES_STYLES_VALUES) {
     const stylesMap =
       MODULES_STYLES_VALUES[kind as keyof typeof MODULES_STYLES_VALUES];
     const defaultValues =
       MODULES_DEFAULT_VALUES[kind as keyof typeof MODULES_STYLES_VALUES];
-
-    const lasModuleData = getModuleDataValues({
-      data: lastModuleData,
-      defaultValues,
-      cardStyle: overrideCardStyle ?? cardStyle,
-      styleValuesMap: stylesMap,
-    });
-
-    lastColor = swapColor(
-      lasModuleData.backgroundStyle?.backgroundColor ??
-        lasModuleData.colorBottom,
-      cardColors,
-    );
+    if (isCustomModule(kind)) {
+      const lasModuleData = getModuleDataValues({
+        data: lastModuleData,
+        defaultValues,
+        cardStyle: overrideCardStyle ?? cardStyle,
+        styleValuesMap: stylesMap,
+      });
+      lastColor = swapColor(
+        lasModuleData.backgroundStyle?.backgroundColor ??
+          lasModuleData.colorBottom,
+        cardColors,
+      );
+    } else {
+      lastColor = swapColor(
+        lastModuleData.cardModuleColor?.background,
+        cardColors,
+      );
+    }
   }
 
   return (

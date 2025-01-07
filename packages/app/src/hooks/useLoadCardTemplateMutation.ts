@@ -25,6 +25,7 @@ const useLoadCardTemplateMutation = () => {
           cardModules {
             id
             visible
+            variant
             ...ModuleData_cardModules
           }
         }

@@ -90,7 +90,7 @@ const WebCardPostsList = ({
       onRefresh={onRefresh}
       contentContainerStyle={styles.container}
       viewerWebCard={viewerWebCard}
-      showUnpublished={true}
+      showUnpublished
     />
   );
 };

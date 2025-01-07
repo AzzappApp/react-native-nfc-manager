@@ -82,14 +82,20 @@ const ContactsScreen = ({
         <View style={styles.menu}>
           <RoundedMenuComponent
             selected={searchBy === 'date'}
-            label={'Date'}
-            id={'date'}
+            label={intl.formatMessage({
+              defaultMessage: 'Date',
+              description: 'Date selector label in ContactsScreen',
+            })}
+            id="date"
             onSelect={() => setSearchBy('date')}
           />
           <RoundedMenuComponent
             selected={searchBy === 'name'}
-            label={'Name'}
-            id={'name'}
+            label={intl.formatMessage({
+              defaultMessage: 'Name',
+              description: 'Name selector label in ContactsScreen',
+            })}
+            id="name"
             onSelect={() => setSearchBy('name')}
           />
           {/* <RoundedMenuComponent

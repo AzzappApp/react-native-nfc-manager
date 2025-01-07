@@ -98,7 +98,8 @@ export const HomeScreenProvider = ({
         onChangeWebCard({
           profileId: newProfile.id,
           webCardId: newProfile.webCard?.id ?? null,
-          profileRole: newProfile.invited ? 'invited' : newProfile.profileRole,
+          profileRole: newProfile.profileRole,
+          invited: newProfile.invited,
         });
       }
     },

@@ -42,6 +42,7 @@ export type RouteListener = (route: Route) => void;
 export type NativeRouter = {
   // state retrieval
   getCurrentRoute(): Route | null;
+  getCurrentRouterState(): RouterState | null;
   getCurrentScreenId(): string | null;
   canGoBack(): boolean;
 
@@ -230,6 +231,9 @@ export const useNativeRouter = (init: RouterInit) => {
     return {
       getCurrentRoute() {
         return getCurrentRouteFromState(routerStateRef.current)?.state ?? null;
+      },
+      getCurrentRouterState() {
+        return routerStateRef.current;
       },
       getCurrentScreenId() {
         return getCurrentRouteFromState(routerStateRef.current)?.id ?? null;

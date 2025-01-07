@@ -71,6 +71,7 @@ const CoverTemplatesParametersForm = ({
   const [enabled, setEnabled] = useState(
     coverTemplate ? coverTemplate.enabled : true,
   );
+  const [uploading, setUploading] = useState(false);
 
   const [form, fields] = useForm<CoverTemplateFormValue>({
     defaultValue: {
@@ -114,11 +115,27 @@ const CoverTemplatesParametersForm = ({
     Array<{ id: File | string; editable: boolean; index: number }>
   >(coverTemplate?.medias ?? []);
 
-  const onMediaChange = (media: {
+  const onMediaChange = async (media: {
     id: File | string | null | undefined;
     editable: boolean;
     index: number;
   }) => {
+    if (media.id instanceof File) {
+      setUploading(true);
+      try {
+        const { public_id } = await uploadMedia(
+          media.id,
+          media.id.type.startsWith('image') ? 'image' : 'video',
+        );
+
+        media.id = public_id;
+        setUploading(false);
+      } catch (e) {
+        setUploading(false);
+        throw e;
+      }
+    }
+
     setMedias(prevMedias => {
       const previousMediaIndex = prevMedias.findIndex(
         prevMedia => prevMedia.index === media.index,
@@ -193,7 +210,10 @@ const CoverTemplatesParametersForm = ({
         const uploadedMedias = await Promise.all(
           medias.map(async media => {
             if (media.id instanceof File) {
-              const { public_id } = await uploadMedia(media.id, 'image');
+              const { public_id } = await uploadMedia(
+                media.id,
+                media.id.type.startsWith('image') ? 'image' : 'video',
+              );
               return {
                 ...media,
                 id: public_id,
@@ -347,7 +367,7 @@ const CoverTemplatesParametersForm = ({
               Cover template type
             </InputLabel>
             <Select
-              labelId={'coverTemplateType-label'}
+              labelId="coverTemplateType-label"
               label="Cover template type"
               {...getSelectProps(fields.typeId)}
               key={fields.typeId.key}
@@ -372,7 +392,7 @@ const CoverTemplatesParametersForm = ({
               Background
             </InputLabel>
             <Select
-              labelId={'coverTemplateBackground-label'}
+              labelId="coverTemplateBackground-label"
               label="Background"
               {...getSelectProps(fields.backgroundColor)}
               key={fields.backgroundColor.key}
@@ -399,7 +419,7 @@ const CoverTemplatesParametersForm = ({
           >
             <InputLabel id="order-label">Order</InputLabel>
             <Select
-              labelId={'order-label'}
+              labelId="order-label"
               label="Cover template type"
               {...getSelectProps(fields.order)}
               key={fields.order.key}
@@ -420,7 +440,7 @@ const CoverTemplatesParametersForm = ({
           >
             <InputLabel id="colorPalette-label">Color Palette</InputLabel>
             <Select
-              labelId={'colorPalette-label'}
+              labelId="colorPalette-label"
               label="Color Palette"
               {...getSelectProps(fields.colorPaletteId)}
               key={fields.colorPaletteId.key}
@@ -502,13 +522,18 @@ const CoverTemplatesParametersForm = ({
             const media = medias.find(media => media.index === index);
             const value =
               typeof media?.id === 'string'
-                ? { id: media.id, kind: 'image' as const }
+                ? {
+                    id: media.id,
+                    kind: media.id.startsWith('v_')
+                      ? ('video' as const)
+                      : ('image' as const),
+                  }
                 : (media?.id ?? null);
 
             return (
               <Box key={index} display="flex" flexDirection="column">
                 <MediaInput
-                  buttonLabel="UPLOAD AN IMAGE"
+                  buttonLabel="UPLOAD A MEDIA"
                   buttonStyle={{
                     paddingLeft: 0,
                     paddingRight: 0,
@@ -516,7 +541,7 @@ const CoverTemplatesParametersForm = ({
                   }}
                   label={`Media #${index}`}
                   name={`media-${index}`}
-                  kind="image"
+                  kind="mixed"
                   onChange={file => {
                     onMediaChange({
                       id: file,
@@ -709,6 +734,24 @@ const CoverTemplatesParametersForm = ({
       >
         <CircularProgress color="inherit" />
       </Backdrop>
+      {uploading && (
+        <Box
+          position="fixed"
+          top={0}
+          left={0}
+          width="100%"
+          height="100%"
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          zIndex={10000}
+          sx={{
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          }}
+        >
+          <CircularProgress color="inherit" />
+        </Box>
+      )}
     </>
   );
 };

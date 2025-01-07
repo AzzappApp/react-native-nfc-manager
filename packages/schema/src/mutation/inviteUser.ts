@@ -122,6 +122,8 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
       const { displayedOnWebCard, isPrivate, avatarId, logoId, ...data } =
         invited.contactCard ?? {};
 
+      const creationDate = new Date();
+
       const profileData = {
         webCardId: webCard.id,
         userId,
@@ -133,16 +135,16 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
         contactCardDisplayedOnWebCard: displayedOnWebCard ?? true,
         contactCardIsPrivate: displayedOnWebCard ?? false,
         profileRole: invited.profileRole,
-        lastContactCardUpdate: new Date(),
+        lastContactCardUpdate: creationDate,
         nbContactCardScans: 0,
         nbShareBacks: 0,
         promotedAsOwner: false,
-        createdAt: new Date(),
+        createdAt: creationDate,
         inviteSent: !!sendInvite,
         deleted: false,
         deletedAt: null,
         deletedBy: null,
-        lastContactViewAt: new Date(),
+        lastContactViewAt: creationDate,
       };
       await referencesMedias(
         addedMedia,

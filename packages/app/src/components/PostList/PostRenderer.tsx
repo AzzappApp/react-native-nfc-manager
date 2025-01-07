@@ -13,15 +13,17 @@ import { useIntl } from 'react-intl';
 import { View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
-import { profileHasEditorRight } from '@azzapp/shared/profileHelpers';
 import { colors } from '#theme';
 import AuthorCartouche from '#components/AuthorCartouche';
 import { getAuthState } from '#helpers/authStore';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { profileInfoHasEditorRight } from '#helpers/profileRoleHelper';
 import useBoolean from '#hooks/useBoolean';
+import useToggleLikePost from '#hooks/useToggleLikePost';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 
+import PressableNative from '#ui/PressableNative';
 import { PostListContext } from './PostListsContext';
 import PostRendererBottomPanel, {
   PostRendererBottomPanelSkeleton,
@@ -95,6 +97,8 @@ export type PostRendererProps = ViewProps & {
   onActionDisabled?: () => void;
 
   showUnpublished?: boolean;
+
+  onDeleted?: () => void;
 };
 
 export type PostRendererHandle = {
@@ -117,11 +121,34 @@ const PostRenderer = (
     onActionDisabled,
     showUnpublished = false,
     useAnimationSnapshot,
+    onDeleted,
     ...props
   }: PostRendererProps,
   forwardedRef: ForwardedRef<PostRendererHandle>,
 ) => {
+  const intl = useIntl();
   const styles = useStyleSheet(styleSheet);
+  const toggleLikePost = useToggleLikePost({
+    onCompleted(response) {
+      if (response?.togglePostReaction.post.postReaction) {
+        Toast.show({
+          type: 'like',
+          text1: intl.formatMessage({
+            defaultMessage: 'liked',
+            description: 'Toggle like post success in post grid',
+          }) as unknown as string,
+        });
+      } else {
+        Toast.show({
+          type: 'unlike',
+          text1: intl.formatMessage({
+            defaultMessage: 'unliked',
+            description: 'Toggle unlike post success in post grid',
+          }) as unknown as string,
+        });
+      }
+    },
+  });
   const post = useFragment(
     graphql`
       fragment PostRendererFragment_post on Post
@@ -132,6 +159,9 @@ const PostRenderer = (
         ...PostRendererMediaFragment_post
         ...PostRendererActionBar_post
           @arguments(viewerWebCardId: $viewerWebCardId)
+        webCard {
+          id
+        }
       }
     `,
     postKey,
@@ -175,11 +205,9 @@ const PostRenderer = (
   const shouldPlayVideo = context.played === post.id;
   const shouldPauseVideo = context.paused.includes(post.id) && !shouldPlayVideo;
 
-  const intl = useIntl();
-
   const safeOpenModal = useCallback(() => {
     const { profileInfos } = getAuthState();
-    if (profileHasEditorRight(profileInfos?.profileRole)) {
+    if (profileInfoHasEditorRight(profileInfos)) {
       openModal();
     } else {
       Toast.show({
@@ -210,6 +238,10 @@ const PostRenderer = (
     else return !author.cardIsPublished;
   }, [author.cardIsPublished, showUnpublished]);
 
+  const onToggleLikePost = () => {
+    toggleLikePost(post.id);
+  };
+
   return (
     <View {...props}>
       <View style={styles.headerView}>
@@ -233,17 +265,22 @@ const PostRenderer = (
             <Icon icon="bloc" size={48} style={styles.unpublishedIcon} />
           </View>
         ) : (
-          <PostRendererMedia
-            post={post}
-            width={width}
-            muted={muted}
-            paused={paused || !shouldPlayVideo}
-            initialTime={initialTime}
-            videoDisabled={
-              videoDisabled || (!shouldPlayVideo && !shouldPauseVideo)
-            }
-            useAnimationSnapshot={useAnimationSnapshot}
-          />
+          <PressableNative
+            style={styles.pressableStyle}
+            onDoublePress={onToggleLikePost}
+          >
+            <PostRendererMedia
+              post={post}
+              width={width}
+              muted={muted}
+              paused={paused || !shouldPlayVideo}
+              initialTime={initialTime}
+              videoDisabled={
+                videoDisabled || (!shouldPlayVideo && !shouldPauseVideo)
+              }
+              useAnimationSnapshot={useAnimationSnapshot}
+            />
+          </PressableNative>
         )}
       </View>
       <Suspense fallback={<PostRendererBottomPanelSkeleton />}>
@@ -254,6 +291,7 @@ const PostRenderer = (
           post={post}
           actionEnabled={actionEnabled}
           onActionDisabled={onActionDisabled}
+          onDeleted={onDeleted}
         />
       </Suspense>
     </View>
@@ -290,4 +328,5 @@ const styleSheet = createStyleSheet(appearance => ({
   unpublishedIcon: {
     tintColor: appearance === 'light' ? colors.grey100 : colors.grey900,
   },
+  pressableStyle: { overflow: 'hidden' },
 }));

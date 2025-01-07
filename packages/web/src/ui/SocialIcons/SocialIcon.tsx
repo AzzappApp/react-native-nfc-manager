@@ -11,6 +11,7 @@ import glassdoor from './assets/glassdoor.svg';
 import hashnode from './assets/hashnode.svg';
 import instagram from './assets/instagram.svg';
 import letterboxd from './assets/letterboxd.svg';
+import link from './assets/link.svg';
 import linkedin from './assets/linkedin.svg';
 import mail from './assets/mail.svg';
 import mastodon from './assets/mastodon.svg';
@@ -47,16 +48,7 @@ type SocialIconProps = Omit<SVGProps<ImageProps>, 'alt' | 'src'> & {
   icon: SocialLinkId;
 };
 
-const SocialIcon = ({ icon, ...props }: SocialIconProps) => {
-  const SocialIcon = socialIcons[icon];
-  if (!SocialIcon) return null;
-
-  return <SocialIcon {...props} alt="icon" />;
-};
-
-export default SocialIcon;
-
-const socialIcons = {
+const socialIcons: Record<SocialLinkId, any> = {
   behance,
   dev,
   discord,
@@ -70,6 +62,7 @@ const socialIcons = {
   hashnode,
   instagram,
   letterboxd,
+  link,
   linkedin,
   mastodon,
   medium,
@@ -99,3 +92,12 @@ const socialIcons = {
   wechat,
   tumblr,
 };
+
+const SocialIcon = ({ icon, ...props }: SocialIconProps) => {
+  const SocialIcon = socialIcons[icon];
+  if (!SocialIcon) return null;
+
+  return <SocialIcon {...props} alt="icon" />;
+};
+
+export default SocialIcon;

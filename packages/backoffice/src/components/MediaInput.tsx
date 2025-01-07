@@ -10,7 +10,7 @@ type MediasListInputProps = Omit<BoxProps, 'onChange'> & {
   name: string;
   label: string;
   value: File | { kind: 'image' | 'video'; id: string } | null | undefined;
-  kind: 'image' | 'video';
+  kind: 'image' | 'mixed' | 'video';
   titleVariant?: Variant;
   error?: boolean | null;
   helperText?: string | null;
@@ -65,6 +65,15 @@ const MediaInput = ({
     };
   }, [value]);
 
+  const isVideo =
+    value instanceof File
+      ? value.type.startsWith('video')
+      : value?.kind === 'video';
+  const isImage =
+    value instanceof File
+      ? value.type.startsWith('image')
+      : value?.kind === 'image';
+
   return (
     <Box {...props}>
       <Typography variant={titleVariant} mb={2}>
@@ -73,13 +82,17 @@ const MediaInput = ({
       {error && <Typography color="error">{helperText}</Typography>}
       <Box style={{ position: 'relative' }} mb={2}>
         <div style={{ maxWidth: 120, ...style }}>
-          {kind === 'video' && src && (
+          {isVideo && src && (
             <video
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               src={src!}
+              autoPlay
+              loop
+              playsInline
+              muted
             />
           )}
-          {kind === 'image' && src && (
+          {isImage && src && (
             <img
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               src={src!}
@@ -106,10 +119,17 @@ const MediaInput = ({
         <input
           name={name}
           type="file"
-          accept={kind === 'image' ? 'image/*' : 'video/*'}
+          accept={
+            kind === 'image'
+              ? 'image/*'
+              : kind === 'video'
+                ? 'video/*'
+                : 'image/*, video/*'
+          }
           onChange={handleImageUpload}
           multiple
           hidden
+          value={value instanceof File ? undefined : ''}
         />
       </Button>
     </Box>

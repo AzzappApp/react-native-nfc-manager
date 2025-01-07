@@ -68,6 +68,28 @@ const avatarContainer = style({
   gap: '20px',
 });
 
+const addContact = style({
+  position: 'fixed',
+  padding: '13px',
+  backgroundColor: 'rgba(255, 255, 255, 1)',
+  bottom: '15px',
+  right: '15px',
+  borderRadius: '200px',
+  zIndex: 3,
+});
+
+const addContactAvatar = style({
+  position: 'fixed',
+  border: '2px solid white',
+  bottom: '15px',
+  right: '15px',
+  borderRadius: '200px',
+  zIndex: 3,
+  width: 50,
+  height: 50,
+  cursor: 'pointer',
+});
+
 const styles = {
   overlay,
   dialog,
@@ -76,6 +98,8 @@ const styles = {
   openedOverlay,
   closedDialog,
   avatarContainer,
+  addContact,
+  addContactAvatar,
 };
 
 export default styles;

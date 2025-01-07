@@ -76,16 +76,14 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
 
   return (
     <div className={styles.content}>
-      {
-        <div
-          className={cx(
-            styles.formFieldError,
-            (form.errors?.length ?? 0) > 0 ? styles.formHasErrors : '',
-          )}
-        >
-          {form.errors}
-        </div>
-      }
+      <div
+        className={cx(
+          styles.formFieldError,
+          (form.errors?.length ?? 0) > 0 ? styles.formHasErrors : '',
+        )}
+      >
+        {form.errors}
+      </div>
       <form
         {...getFormProps(form)}
         id={form.id}

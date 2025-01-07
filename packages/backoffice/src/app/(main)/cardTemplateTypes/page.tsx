@@ -53,9 +53,7 @@ const CardTemplateTypesPage = async () => {
         multiline
         rows={1}
         maxRows={3}
-        value={
-          'WebCard templates types are the lowest level in the template list view'
-        }
+        value="WebCard templates types are the lowest level in the template list view"
       />
       <CardTemplateTypesList cardTemplateTypes={items} />
     </Box>

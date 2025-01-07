@@ -1,7 +1,7 @@
 import { Image } from 'expo-image';
 import { useState, useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
-import { Platform, View } from 'react-native';
+import { View } from 'react-native';
 import { graphql, readInlineData } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
@@ -82,7 +82,7 @@ export type PhotoWithTextAndTitleRendererProps = ViewProps & {
   /**
    * The view mode for the module
    */
-  viewMode?: 'desktop' | 'mobile';
+  displayMode?: 'desktop' | 'edit' | 'mobile';
   /**
    * the color palette
    */
@@ -109,7 +109,7 @@ const PhotoWithTextAndTitleRenderer = ({
   colorPalette,
   cardStyle,
   style,
-  viewMode,
+  displayMode,
   coverBackgroundColor,
   ...props
 }: PhotoWithTextAndTitleRendererProps) => {
@@ -153,24 +153,17 @@ const PhotoWithTextAndTitleRenderer = ({
     [props],
   );
 
-  const os =
-    viewMode === 'desktop'
-      ? 'web'
-      : viewMode === 'mobile'
-        ? 'ios'
-        : Platform.OS;
-
   const widthMargin = (layout?.width ?? 0) - 2 * marginHorizontal;
 
   const imageWidth =
-    os === 'web'
+    displayMode === 'desktop'
       ? widthMargin / 2
       : imageMargin === 'width_full'
         ? (layout?.width ?? 0)
         : widthMargin;
 
   const flexDirection: ViewStyle['flexDirection'] =
-    os === 'web'
+    displayMode === 'desktop'
       ? horizontalArrangement === 'left'
         ? 'row'
         : 'row-reverse'
@@ -184,14 +177,14 @@ const PhotoWithTextAndTitleRenderer = ({
       flexDirection,
       rowGap: gap ?? 0,
       columnGap: gap ?? 0,
-      width: os === 'web' ? widthMargin : (layout?.width ?? 0),
-      marginHorizontal: os === 'web' ? (marginHorizontal ?? 0) : 0,
+      width: displayMode === 'desktop' ? widthMargin : (layout?.width ?? 0),
+      marginHorizontal: displayMode === 'desktop' ? (marginHorizontal ?? 0) : 0,
     }),
     [
       marginVertical,
       flexDirection,
       gap,
-      os,
+      displayMode,
       widthMargin,
       layout?.width,
       marginHorizontal,
@@ -217,11 +210,13 @@ const PhotoWithTextAndTitleRenderer = ({
   const textContainerStyle = useMemo(
     () =>
       ({
-        width: os === 'web' ? widthMargin / 2 - (gap ?? 0) : undefined,
-        marginHorizontal: os === 'web' ? 0 : (marginHorizontal ?? 0),
-        justifyContent: viewMode === 'desktop' ? 'center' : undefined,
+        width:
+          displayMode === 'desktop' ? widthMargin / 2 - (gap ?? 0) : undefined,
+        marginHorizontal:
+          displayMode === 'desktop' ? 0 : (marginHorizontal ?? 0),
+        justifyContent: displayMode === 'desktop' ? 'center' : undefined,
       }) as const,
-    [os, widthMargin, gap, marginHorizontal, viewMode],
+    [displayMode, widthMargin, gap, marginHorizontal],
   );
 
   const titleStyle = useMemo(() => {

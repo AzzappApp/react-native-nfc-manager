@@ -1,11 +1,25 @@
 import uniq from 'lodash/uniq';
-import { getValuesFromStyle, type CardStyle } from './cardHelpers';
+import { getValuesFromStyle, swapColor, type CardStyle } from './cardHelpers';
+import type { SocialLinkItem } from './socialLinkHelpers';
 
 //#region BlockText
 /**
  * Block text module kind
  */
 export const MODULE_KIND_BLOCK_TEXT = 'blockText';
+
+export type WebCardViewMode = 'edit' | 'preview';
+export type DisplayMode = 'desktop' | 'mobile';
+
+export const isModuleAnimationDisabled = (
+  displayMode: DisplayMode,
+  webCardViewMode?: WebCardViewMode,
+) => {
+  return (
+    (webCardViewMode === 'preview' && displayMode === 'desktop') ||
+    webCardViewMode === 'edit'
+  );
+};
 
 /**
  * The data type for the block text module
@@ -453,38 +467,6 @@ export const LINE_DIVIDER_MAX_MARGIN_BOTTOM = 200;
  */
 export const LINE_DIVIDER_MAX_MARGIN_TOP = 200;
 
-//#endregion
-
-//#region Schedule
-/**
- * Schedule module kind
- */
-export const MODULE_KIND_SCHEDULE = 'schedule';
-// TODO add Schedule type
-//#endregion
-
-//#region Parrallax
-/**
- * Parrallax module kind
- */
-export const MODULE_KIND_PARALLAX = 'parallax';
-// TODO add parallax type
-//#endregion
-
-//#region Video
-/**
- * Video module kind
- */
-export const MODULE_KIND_VIDEO = 'video';
-// TODO add video type
-//#endregion
-
-//#region Image Grid
-/**
- * Image Grid module kind
- */
-export const MODULE_KIND_IMAGEGRID = 'imageGrid';
-// TODO add Image Grid type
 //#endregion
 
 //#region PhotoWithTextAndTitle
@@ -1039,7 +1021,7 @@ export const MODULE_KIND_SOCIAL_LINKS = 'socialLinks';
  * The data type for the social links module
  */
 export type CardModuleSocialLinksData = {
-  links: Array<{ socialId: string; link: string; position: number }>;
+  links: SocialLinkItem[];
   iconColor?: string | null;
   arrangement?: 'inline' | 'multiline' | null;
   iconSize?: number | null;
@@ -1149,63 +1131,114 @@ export const SOCIAL_LINKS_MAX_COLUMN_GAP = 100;
 
 //#endregion
 
-//#region WebCardsCarousel
-export const MODULE_KIND_WEB_CARDS_CAROUSEL = 'webCardsCarousel';
-//TODO add web cards carousel type
-//#endregion
+//#region Media
+export const MODULE_KIND_MEDIA = 'media';
+
+export type CardModuleColor = {
+  background: string;
+  content: string;
+  title: string;
+  text: string;
+  graphic: string;
+};
+
+// those 2 types are here to define a common way to define the V2 module
+// will help to have always the same structure/attribute naming
+type CardModuleCommon = {
+  cardModuleColor?: CardModuleColor;
+};
+
+type CardModuleWithMedia = {
+  cardModuleMedias: Array<{
+    media: { id: string };
+    text?: string;
+    title?: string;
+    link?: { url: string; label: string };
+  }>;
+};
+export type CardModuleMediaData = CardModuleCommon & CardModuleWithMedia;
+
+// #endregion
+
+//#region Media Text
+export const MODULE_KIND_MEDIA_TEXT = 'mediaText';
+
+export type CardModuleMediaTextData = CardModuleCommon & CardModuleWithMedia;
+
+// #endregion
+
+//#region Media Text
+export const MODULE_KIND_MEDIA_TEXT_LINK = 'mediaTextLink';
+
+export type CardModuleMediaTextLinkData = CardModuleCommon &
+  CardModuleWithMedia;
+
+// #endregion
+
+//#region Map
+export const MODULE_KIND_MAP = 'map';
+
+export type CardModuleMapLinkData = CardModuleCommon; //TODO
+// #endregion
+
+//#region Title Text
+export const MODULE_KIND_TITLE_TEXT = 'titleText';
+
+export type CardModuleTitleTextLinkData = CardModuleCommon; //TODO
+
+// #endregion
+
+// #INSERT_MODOLE
 
 //#region Commons
 export const MODULE_KINDS = [
   MODULE_KIND_BLOCK_TEXT,
   MODULE_KIND_CAROUSEL,
   MODULE_KIND_HORIZONTAL_PHOTO,
-  MODULE_KIND_IMAGEGRID,
   MODULE_KIND_LINE_DIVIDER,
-  MODULE_KIND_PARALLAX,
   MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE,
-  MODULE_KIND_SCHEDULE,
   MODULE_KIND_SIMPLE_BUTTON,
   MODULE_KIND_SIMPLE_TEXT,
   MODULE_KIND_SIMPLE_TITLE,
   MODULE_KIND_SOCIAL_LINKS,
-  MODULE_KIND_VIDEO,
-  MODULE_KIND_WEB_CARDS_CAROUSEL,
+  MODULE_KIND_MEDIA,
+  MODULE_KIND_MEDIA_TEXT,
+  MODULE_KIND_MEDIA_TEXT_LINK,
+  MODULE_KIND_MAP,
+  MODULE_KIND_TITLE_TEXT,
+  //INSERT_MODULE
 ] as const;
 
 export const MODULES_STYLES_VALUES = {
   [MODULE_KIND_BLOCK_TEXT]: BLOCK_TEXT_STYLE_VALUES,
   [MODULE_KIND_CAROUSEL]: CAROUSEL_STYLE_VALUES,
   [MODULE_KIND_HORIZONTAL_PHOTO]: HORIZONTAL_PHOTO_STYLE_VALUES,
-  [MODULE_KIND_IMAGEGRID]: {},
   [MODULE_KIND_LINE_DIVIDER]: {},
-  [MODULE_KIND_PARALLAX]: {},
   [MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE]:
     PHOTO_WITH_TEXT_AND_TITLE_STYLE_VALUES,
-  [MODULE_KIND_SCHEDULE]: {},
   [MODULE_KIND_SIMPLE_BUTTON]: SIMPLE_BUTTON_STYLE_VALUES,
   [MODULE_KIND_SIMPLE_TEXT]: SIMPLE_TEXT_STYLE_VALUES,
   [MODULE_KIND_SIMPLE_TITLE]: SIMPLE_TITLE_STYLE_VALUES,
   [MODULE_KIND_SOCIAL_LINKS]: {},
-  [MODULE_KIND_VIDEO]: {},
-  [MODULE_KIND_WEB_CARDS_CAROUSEL]: {},
+  [MODULE_KIND_MEDIA]: {},
+  [MODULE_KIND_MEDIA_TEXT]: {},
+  [MODULE_KIND_MEDIA_TEXT_LINK]: {},
 } as const;
 
 export const MODULES_DEFAULT_VALUES = {
   [MODULE_KIND_BLOCK_TEXT]: BLOCK_TEXT_DEFAULT_VALUES,
   [MODULE_KIND_CAROUSEL]: CAROUSEL_DEFAULT_VALUES,
   [MODULE_KIND_HORIZONTAL_PHOTO]: HORIZONTAL_PHOTO_DEFAULT_VALUES,
-  [MODULE_KIND_IMAGEGRID]: {},
   [MODULE_KIND_LINE_DIVIDER]: LINE_DIVIDER_DEFAULT_VALUES,
-  [MODULE_KIND_PARALLAX]: {},
   [MODULE_KIND_PHOTO_WITH_TEXT_AND_TITLE]:
     PHOTO_WITH_TEXT_AND_TITLE_DEFAULT_VALUES,
-  [MODULE_KIND_SCHEDULE]: {},
   [MODULE_KIND_SIMPLE_BUTTON]: SIMPLE_BUTTON_DEFAULT_VALUES,
   [MODULE_KIND_SIMPLE_TEXT]: SIMPLE_TEXT_DEFAULT_VALUES,
   [MODULE_KIND_SIMPLE_TITLE]: SIMPLE_TITLE_DEFAULT_VALUES,
   [MODULE_KIND_SOCIAL_LINKS]: SOCIAL_LINKS_DEFAULT_VALUES,
-  [MODULE_KIND_VIDEO]: {},
-  [MODULE_KIND_WEB_CARDS_CAROUSEL]: {},
+  [MODULE_KIND_MEDIA]: {},
+  [MODULE_KIND_MEDIA_TEXT]: {},
+  [MODULE_KIND_MEDIA_TEXT_LINK]: {},
 } as const;
 
 export type ModuleKind = (typeof MODULE_KINDS)[number];
@@ -1227,6 +1260,11 @@ export type TextAlignment = 'center' | 'justify' | 'left' | 'right';
  * the max width of the module images
  */
 export const MODULE_IMAGE_MAX_WIDTH = 2048;
+
+/**
+ * the max width of the module videos
+ */
+export const MODULE_VIDEO_MAX_WIDTH = 1280;
 /**
  * the list of possible post images pregenerated sizes
  */
@@ -1306,3 +1344,32 @@ export const textAlignmentOrDefault = (
   return 'center';
 };
 // #endregion
+
+/**
+ * Swap colors in a CardModuleColor object with their values in a color palette
+ */
+export const swapModuleColor = (
+  cardModuleColor: {
+    readonly background: string;
+    readonly content: string;
+    readonly graphic: string;
+    readonly text: string;
+    readonly title: string;
+  },
+  colorPalette:
+    | {
+        primary: string;
+        light: string;
+        dark: string;
+      }
+    | null
+    | undefined,
+): CardModuleColor => {
+  return {
+    background: swapColor(cardModuleColor.background, colorPalette),
+    content: swapColor(cardModuleColor.content, colorPalette),
+    title: swapColor(cardModuleColor.title, colorPalette),
+    text: swapColor(cardModuleColor.text, colorPalette),
+    graphic: swapColor(cardModuleColor.graphic, colorPalette),
+  };
+};
