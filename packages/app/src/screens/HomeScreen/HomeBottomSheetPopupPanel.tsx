@@ -52,7 +52,7 @@ const HomeBottomSheetPopupPanel = ({
   useEffect(() => {
     const timeout = setTimeout(() => {
       onChangeWebCard(profileInfo);
-    }, 1000);
+    }, 2000);
     return () => clearTimeout(timeout);
   }, [profileInfo]);
 
