@@ -17,12 +17,9 @@ import {
   MODULES_STYLES_VALUES,
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
-import CoverRenderer from '#components/renderer/CoverRenderer';
-import CoverRendererBackground from '#components/renderer/CoverRenderer/CoverRendererBackground';
 import ModuleRenderer from '#components/renderer/ModuleRenderer';
 import { getMetaData } from '#helpers/seo';
 import { cachedGetWebCardByUserName } from './dataAccess';
-import styles from './WebCardPage.css';
 import WebCardPageLayout from './WebCardPageLayout';
 import type { Metadata } from 'next';
 
@@ -126,29 +123,6 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
       webCard={webCard}
       posts={posts}
       media={media}
-      cover={
-        <>
-          <CoverRendererBackground media={media} />
-          <div
-            className={styles.coverContainer}
-            style={{
-              background: `linear-gradient(to bottom, transparent 0%, ${
-                cardBackgroundColor ?? '#FFF'
-              } 95%)`,
-            }}
-          >
-            <div
-              style={{
-                flex: 1,
-                background: `linear-gradient(to left, transparent 0%, ${
-                  cardBackgroundColor ?? '#FFF'
-                } 95%)`,
-              }}
-            />
-            <CoverRenderer webCard={webCard} media={media} priority />
-          </div>
-        </>
-      }
       cardBackgroundColor={cardBackgroundColor}
       lastModuleBackgroundColor={lastModuleBackgroundColor}
       userName={params.userName}

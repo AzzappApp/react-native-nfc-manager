@@ -46,6 +46,7 @@ const verifySignApi = async (req: Request) => {
       firstName: foundContactCard.firstName,
       lastName: foundContactCard.lastName,
       company: foundContactCard.company,
+      title: foundContactCard?.title,
       userName: webCard?.userName,
     })
       .setJti(createId())

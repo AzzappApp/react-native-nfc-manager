@@ -8,6 +8,7 @@ export const [themeClass, vars] = createTheme({
     grey200: '#c8c7ca',
     grey400: '#a1a1a5',
     grey900: '#45444c',
+    grey1000: '#2C2B32;',
     green: '#0FD59E',
     black: '#0e1216',
     white: '#fff',
@@ -123,6 +124,7 @@ globalStyle('body, #__next, .root', {
 
 globalStyle('body', {
   color: vars.color.black,
+  height: '100%',
 });
 
 globalStyle('.root', {

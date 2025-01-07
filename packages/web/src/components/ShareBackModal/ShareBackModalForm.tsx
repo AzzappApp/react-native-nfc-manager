@@ -90,6 +90,7 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
         onSubmit={form.onSubmit}
         className={styles.form}
         action={action}
+        style={{ maxHeight: window.innerHeight * 0.6 }}
       >
         <div className={styles.formFields}>
           <div className={styles.formField}>
@@ -264,48 +265,50 @@ const ShareBackFormSubmitButton = ({
   const { pending } = useFormStatus();
 
   return (
-    <Button
-      loading={pending}
-      type="submit"
-      variant="primary"
-      disabled={pending || isSuccess || hasErrors || !isDirty}
-      className={cx(
-        styles.formButton,
-        !isSuccess ? styles.formButtonSuccess : '',
-      )}
-    >
-      {pending ? (
-        <Loader />
-      ) : (
-        <>
-          <span
-            className={cx(
-              styles.formButtonLabel,
-              isSuccess ? styles.formButtonSuccess : '',
-            )}
-          >
-            <FormattedMessage
-              defaultMessage="Send"
-              id="Gm+qSm"
-              description="Share back - Send button label"
-            />
-          </span>
-          <div
-            className={cx(
-              styles.formButtonSuccessContainer,
-              isSuccess ? styles.formButtonSuccess : '',
-            )}
-          >
-            <SuccessIcon
+    <div className={styles.formButtonContainer}>
+      <Button
+        loading={pending}
+        type="submit"
+        variant="primary"
+        disabled={pending || isSuccess || hasErrors || !isDirty}
+        className={cx(
+          styles.formButton,
+          !isSuccess ? styles.formButtonSuccess : '',
+        )}
+      >
+        {pending ? (
+          <Loader />
+        ) : (
+          <>
+            <span
               className={cx(
-                styles.formButtonSuccessSvg,
+                styles.formButtonLabel,
                 isSuccess ? styles.formButtonSuccess : '',
               )}
-            />
-          </div>
-        </>
-      )}
-    </Button>
+            >
+              <FormattedMessage
+                defaultMessage="Send"
+                id="Gm+qSm"
+                description="Share back - Send button label"
+              />
+            </span>
+            <div
+              className={cx(
+                styles.formButtonSuccessContainer,
+                isSuccess ? styles.formButtonSuccess : '',
+              )}
+            >
+              <SuccessIcon
+                className={cx(
+                  styles.formButtonSuccessSvg,
+                  isSuccess ? styles.formButtonSuccess : '',
+                )}
+              />
+            </div>
+          </>
+        )}
+      </Button>
+    </div>
   );
 };
 

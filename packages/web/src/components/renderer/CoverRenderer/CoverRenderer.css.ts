@@ -1,6 +1,8 @@
 import { style } from '@vanilla-extract/css';
 import { MediaQuery } from '#app/[userName]/theme.css';
 
+export const MAX_COVER_WIDTH = 500;
+
 const coverMedia = style({
   position: 'absolute',
   top: 0,
@@ -13,14 +15,14 @@ const content = style({
   position: 'relative',
   margin: 'auto',
   overflow: 'hidden',
+  // boxShadow: '0px 10px 20px 0px rgba(0, 0, 0, 0.20)',
   '@media': {
     [MediaQuery.Mobile]: {
       width: '100vw',
     },
     [MediaQuery.Desktop]: {
-      maxWidth: '500px',
+      maxWidth: MAX_COVER_WIDTH,
       borderRadius: 35,
-      boxShadow: '0px 10px 20px 0px rgba(0, 0, 0, 0.20)',
     },
   },
 });
@@ -38,7 +40,7 @@ const backgroundContent = style({
 });
 
 const backgroundMedia = style({
-  backgroundAttachment: 'fixed',
+  // backgroundAttachment: 'fixed',
   backgroundRepeat: 'no-repeat',
   backgroundSize: 'cover',
   backgroundPosition: 'center',

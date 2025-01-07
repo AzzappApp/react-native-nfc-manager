@@ -8,6 +8,7 @@ import { FormattedMessage } from 'react-intl';
 import { ShareBackIcon } from '#assets';
 import { Modal, type ModalProps } from '#ui';
 
+import ContactSteps from '#components/ContactSteps';
 import Avatar from '#ui/Avatar/Avatar';
 import styles from './ShareBackModal.css';
 import ShareBackModalForm from './ShareBackModalForm';
@@ -24,12 +25,14 @@ type ShareBackModalProps = Omit<ModalProps, 'children'> & {
   userId: string;
   webcardId: string;
   initials: string;
+  onClose: () => void;
 };
 
 // eslint-disable-next-line react/display-name
 const ShareBackModal = forwardRef<ModalActions, ShareBackModalProps>(
   (props, ref) => {
-    const { name, avatarUrl, token, userId, webcardId, initials } = props;
+    const { name, avatarUrl, token, userId, webcardId, initials, onClose } =
+      props;
 
     const internalRef = useRef<ModalActions>(null);
 
@@ -44,7 +47,11 @@ const ShareBackModal = forwardRef<ModalActions, ShareBackModalProps>(
 
     return (
       <AppIntlProvider>
-        <Modal ref={internalRef} className={styles.shareBackModal}>
+        <Modal
+          ref={internalRef}
+          className={styles.shareBackModal}
+          onClose={onClose}
+        >
           <div className={cx(styles.header)}>
             <div className={styles.avatarContainer}>
               <>
@@ -56,14 +63,17 @@ const ShareBackModal = forwardRef<ModalActions, ShareBackModalProps>(
                 )}
               </>
             </div>
-            <span className={styles.title}>
-              <FormattedMessage
-                defaultMessage="Share your details with"
-                id="vkuk13"
-                description="Share back modal title"
-              />
-            </span>
-            <span className={styles.title}>{name}</span>
+            <ContactSteps step={1} />
+            <div className={styles.titleContainer}>
+              <span className={styles.title}>
+                <FormattedMessage
+                  defaultMessage="Share your details with"
+                  id="vkuk13"
+                  description="Share back modal title"
+                />
+              </span>
+              <span className={styles.title}>{name}</span>
+            </div>
           </div>
 
           <ShareBackModalForm
@@ -76,6 +86,7 @@ const ShareBackModal = forwardRef<ModalActions, ShareBackModalProps>(
                 event_label: 'ShareBackForm',
                 value: 'Submit',
               });
+              onClose();
               internalRef.current?.close();
             }}
           />

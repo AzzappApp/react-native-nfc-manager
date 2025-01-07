@@ -7,6 +7,7 @@ const content = style({
   flexDirection: 'column',
   flex: 1,
   maxHeight: '100%',
+  overflow: 'hidden',
 });
 
 const formFields = style({
@@ -30,11 +31,13 @@ const formSpacingInner = style({
 });
 
 const form = style({
+  position: 'relative',
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
   maxHeight: 'calc(100% - 310px)',
   overflowY: 'auto',
+  paddingBottom: 60,
 });
 
 const formFieldContainer = style([
@@ -176,6 +179,13 @@ const formButtonSuccessSvg = style({
   },
 });
 
+const formButtonContainer = style({
+  position: 'absolute',
+  bottom: 0,
+  display: 'flex',
+  width: '100%',
+});
+
 const styles = {
   content,
   formHasErrors,
@@ -189,6 +199,7 @@ const styles = {
   formButtonLabel,
   formButtonSuccessContainer,
   formButtonSuccessSvg,
+  formButtonContainer,
 };
 
 export default styles;

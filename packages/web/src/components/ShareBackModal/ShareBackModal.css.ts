@@ -12,6 +12,13 @@ const header = style({
   borderBottomStyle: 'solid',
   borderBottomColor: vars.color.grey100,
   marginTop: `${AVATAR_CONTAINER_TOP_POSITION}px`,
+  gap: 10,
+});
+
+const titleContainer = style({
+  display: 'flex',
+  flexDirection: 'column',
+  textAlign: 'center',
 });
 
 const title = style([{ marginLeft: '0 10px' }, textLargeSemiBold]);
@@ -34,6 +41,7 @@ const shareBackModal = style({
 const styles = {
   header,
   avatarContainer,
+  titleContainer,
   title,
   shareBackModal,
 };

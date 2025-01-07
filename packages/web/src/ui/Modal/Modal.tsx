@@ -18,6 +18,8 @@ import styles from './Modal.css';
 
 export type ModalProps = HTMLAttributes<HTMLDivElement> & {
   children: ReactNode;
+  hideCloseButton?: boolean;
+  onClose?: () => void;
 };
 
 export type ModalActions = {
@@ -28,7 +30,7 @@ export type ModalActions = {
 // eslint-disable-next-line react/display-name
 const Modal = forwardRef(
   (props: ModalProps, ref: ForwardedRef<ModalActions>) => {
-    const { className, children, ...others } = props;
+    const { className, hideCloseButton, children, onClose, ...others } = props;
     const classnames = cn(className, styles.modal);
 
     const [open, setOpen] = useState(false);
@@ -38,8 +40,9 @@ const Modal = forwardRef(
       if (open) {
         setClosing(true);
         setOpen(false);
+        onClose?.();
       }
-    }, [open]);
+    }, [onClose, open]);
 
     const window = useOnClickOutside<HTMLDivElement>(handleClose);
 
@@ -78,12 +81,14 @@ const Modal = forwardRef(
           ref={window}
         >
           <div className={styles.modalContent}>
-            <ButtonIcon
-              onClick={handleClose}
-              size={30}
-              Icon={CloseIcon}
-              className={styles.close}
-            />
+            {!hideCloseButton && (
+              <ButtonIcon
+                onClick={handleClose}
+                size={30}
+                Icon={CloseIcon}
+                className={styles.close}
+              />
+            )}
             {children}
           </div>
         </div>

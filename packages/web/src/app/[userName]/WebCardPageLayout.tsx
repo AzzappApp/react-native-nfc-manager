@@ -1,19 +1,14 @@
 'use client';
+
 import * as Sentry from '@sentry/nextjs';
-import cn from 'classnames';
 import { jwtDecode } from 'jwt-decode';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { colors } from '@azzapp/shared/colorsHelpers';
-import { FlipIcon } from '#assets';
-import { ButtonIcon } from '#ui';
 import { updateWebCardViewsCounter } from '#app/actions/statisticsAction';
 import ShareBackModal from '#components/ShareBackModal/ShareBackModal';
 import { displayName } from '#helpers/contactCardHelpers';
-import DownloadVCard from './DownloadVCard';
-import PostFeed from './PostFeed';
-import styles from './WebCardPage.css';
-import WebCardPostNavigation from './WebCardPostNavigation';
+import DisplayWebCard from './WebCard';
+import WebCardPreview from './WebCardPreview';
 import type { ModalActions } from '#ui/Modal';
 import type { Media, PostWithCommentAndAuthor, WebCard } from '@azzapp/data';
 import type { JwtPayload } from 'jwt-decode';
@@ -21,7 +16,6 @@ import type { PropsWithChildren } from 'react';
 
 type ProfilePageLayoutProps = PropsWithChildren<{
   webCard: WebCard;
-  cover: React.ReactNode;
   posts: PostWithCommentAndAuthor[];
   media: Media;
   cardBackgroundColor: string;
@@ -34,15 +28,15 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
   const {
     webCard,
     children,
-    cover,
     posts,
     media,
     cardBackgroundColor,
     lastModuleBackgroundColor,
     color,
   } = props;
-  const [display, setDisplay] = useState<'card' | 'posts'>('card');
-  const [postsOpen, setPostsOpen] = useState(false);
+  const searchParams = useSearchParams();
+  const isShareBack = !!searchParams.get('c');
+  const [step, setStep] = useState(() => (isShareBack ? 0 : 2));
 
   const [contactDataVCard, setContactDataVCard] = useState({
     userId: '',
@@ -56,8 +50,6 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
   });
 
   const shareBackModal = useRef<ModalActions>(null);
-
-  const hasPosts = posts.length > 0;
 
   type DownloadVCardJwtPayload = JwtPayload & {
     userId: string;
@@ -98,6 +90,10 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
     }
   };
 
+  const onShareBackClose = () => {
+    setStep(2);
+  };
+
   useEffect(() => {
     if (webCard?.id) {
       updateWebCardViewsCounter(webCard?.id);
@@ -105,114 +101,33 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const searchParams = useSearchParams();
-  const hasContactCard = !!searchParams.get('c');
-
   if (!webCard.userName) {
     return undefined;
   }
   return (
     <>
-      <div className={styles.wrapper}>
-        <div
-          className={styles.background}
-          style={{
-            background: `
-            linear-gradient(
-              180deg,
-              ${cardBackgroundColor} 0%,
-              ${cardBackgroundColor} 50%,
-              ${lastModuleBackgroundColor} 50%
-            )
-          `,
-          }}
+      {step === 0 && (
+        <WebCardPreview
+          media={media}
+          webCard={webCard}
+          cardBackgroundColor={cardBackgroundColor}
+          handleCloseDownloadVCard={handleCloseDownloadVCard}
         />
-        {posts.length > 0 && (
-          <WebCardPostNavigation
-            webCard={webCard}
-            onClickCover={() => {
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-            onClickPosts={() => setPostsOpen(true)}
-            className={cn(styles.postNavigation, {
-              [styles.postNavigationHidden]: postsOpen,
-            })}
-            cover={media}
-          />
-        )}
-        <main
-          // TODO card.backgroundColor
-          style={{ backgroundColor: '#FFF' }}
-          className={cn(styles.modules, {
-            [styles.modulesBehind]: display === 'posts' && hasPosts,
-            [styles.modulesWithPosts]: hasPosts && postsOpen,
-          })}
+      )}
+      {step === 2 && (
+        <DisplayWebCard
+          webCard={webCard}
+          posts={posts}
+          media={media}
+          cardBackgroundColor={cardBackgroundColor}
+          lastModuleBackgroundColor={lastModuleBackgroundColor}
+          color={color}
+          handleCloseDownloadVCard={handleCloseDownloadVCard}
+          isShareBack={isShareBack}
         >
-          {cover}
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              width: '100%',
-            }}
-          >
-            {children}
-          </div>
-        </main>
-        {hasPosts && (
-          <aside
-            className={cn(styles.posts, {
-              [styles.postsBehind]: display === 'card',
-              [styles.postsClosed]: !postsOpen,
-            })}
-          >
-            <div
-              style={{
-                width: '100px',
-                background: `linear-gradient(to right, transparent 0%, ${color} 100%)`,
-              }}
-            />
-            <div
-              className={styles.postsContent}
-              style={{
-                backgroundColor: color ?? colors.white,
-              }}
-            >
-              <PostFeed
-                postsCount={webCard.nbPosts}
-                defaultPosts={posts}
-                media={media}
-                webCard={webCard}
-                onPressAuthor={() => {
-                  setDisplay('card');
-                  setPostsOpen(false);
-                }}
-                background={color ?? undefined}
-                onClose={() => setPostsOpen(false)}
-              />
-            </div>
-          </aside>
-        )}
-
-        {hasPosts && !hasContactCard && (
-          <ButtonIcon
-            Icon={FlipIcon}
-            size={24}
-            height={50}
-            width={50}
-            className={styles.switchContent}
-            color="white"
-            aria-label='Switch to "posts" / "card" view'
-            onClick={() => {
-              setDisplay(prevDisplay =>
-                prevDisplay === 'card' ? 'posts' : 'card',
-              );
-              window.scrollTo({ top: 0 });
-            }}
-          />
-        )}
-        <DownloadVCard webCard={webCard} onClose={handleCloseDownloadVCard} />
-      </div>
+          {children}
+        </DisplayWebCard>
+      )}
       <ShareBackModal
         ref={shareBackModal}
         name={displayName(contactDataVCard, webCard)}
@@ -221,6 +136,7 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
         webcardId={webCard.id}
         avatarUrl={contactDataVCard.avatarUrl}
         token={contactDataVCard.token}
+        onClose={onShareBackClose}
       />
     </>
   );

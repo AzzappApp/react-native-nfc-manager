@@ -1,14 +1,15 @@
 import { style } from '@vanilla-extract/css';
-import { MediaQuery } from '#app/[userName]/theme.css';
+import { MediaQuery, textLarge, vars } from '#app/[userName]/theme.css';
 
 const wrapper = style({
+  position: 'relative',
   display: 'flex',
   flexDirection: 'row',
 });
 
 const background = style({
-  position: 'fixed',
-  top: '-10vh',
+  position: 'absolute',
+  top: '0',
   left: 0,
   width: '100%',
   height: '120vh',
@@ -21,19 +22,11 @@ const modules = style({
       transition: 'margin-right 0.3s',
       overflowX: 'hidden',
       flex: 1,
+      width: '100%',
     },
     [MediaQuery.Mobile]: {
       zIndex: 2,
       width: '100%',
-      /*
-      transformStyle: 'preserve-3d',
-      transition: 'transform 1s ease',
-      position: 'absolute',
-      transform: 'rotateY(0deg) rotateX(0deg)',
-      backfaceVisibility: 'hidden',
-      // Fix backface-visibility on Chrome and Edge
-      opacity: 0.999,
-      */
     },
   },
 });
@@ -144,12 +137,35 @@ const postNavigationHidden = style({
 });
 
 const coverContainer = style({
+  display: 'flex',
+  justifyContent: 'center',
+  width: '100%',
+  borderRadius: 60,
   '@media': {
     [MediaQuery.Desktop]: {
-      padding: '20px 0 50px 0',
       backdropFilter: 'blur(15px)',
+      boxShadow: 'none',
     },
   },
+});
+
+const title = style([
+  textLarge,
+  {
+    color: vars.color.black,
+  },
+]);
+
+const header = style({
+  position: 'fixed',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginTop: 10,
+  gap: 10,
+  top: 0,
+  width: '100%',
 });
 
 const styles = {
@@ -166,6 +182,8 @@ const styles = {
   postNavigationHidden,
   postsClosed,
   coverContainer,
+  header,
+  title,
 };
 
 export default styles;

@@ -2,8 +2,10 @@
 
 import { saveAs } from 'file-saver';
 import { useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import IosAddContactInfoModal from '#components/IosAddContactInfoModal';
 import LinkButton from './LinkButton';
+import type { ModalActions } from '#ui/Modal';
 
 type ButtonProps = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
   type?: 'primary' | 'secondary';
@@ -20,6 +22,8 @@ const DownloadVCardLinkButton = (props: ButtonProps) => {
     string | null
   >(null);
   const searchParams = useSearchParams();
+
+  const iosInformationModal = useRef<ModalActions>(null);
 
   useEffect(() => {
     if (
@@ -43,6 +47,7 @@ const DownloadVCardLinkButton = (props: ButtonProps) => {
   const handleDownload = useCallback(
     async (e: React.MouseEvent<HTMLAnchorElement>) => {
       e.preventDefault();
+      iosInformationModal.current?.close();
 
       if (isDownloadSupported) {
         const tempLink = document.createElement('a');
@@ -82,7 +87,26 @@ const DownloadVCardLinkButton = (props: ButtonProps) => {
     ],
   );
 
-  return <LinkButton {...others} onClick={handleDownload} />;
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isIOS = /iphone|ipad/.test(userAgent);
+
+    if (isIOS) {
+      iosInformationModal.current?.open();
+    } else {
+      handleDownload(e);
+    }
+  };
+
+  return (
+    <>
+      <LinkButton {...others} onClick={handleClick} />
+      <IosAddContactInfoModal
+        ref={iosInformationModal}
+        onConfirm={handleDownload}
+      />
+    </>
+  );
 };
 
 export default DownloadVCardLinkButton;
