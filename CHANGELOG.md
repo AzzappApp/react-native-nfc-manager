@@ -1,5 +1,7 @@
-## 1.6.1-canary.3
+## 1.6.1-canary.4
 
+* **fix:**  - **modules:** [#6371](https://github.com/AzzappApp/azzapp/pull/6371) pressableNative is unresponsive on large scale on… ([#6718](https://github.com/AzzappApp/azzapp/pull/6718))
+* **fix:**  - don’t use navigator on ssr ([#6719](https://github.com/AzzappApp/azzapp/pull/6719))
 * **fix:**  - move shareAndShare description text outside of the qrcode container ([#6708](https://github.com/AzzappApp/azzapp/pull/6708))
 * **WebCard:**  - try to limit the number of video running in alternation and parallax using viewport ([#6673](https://github.com/AzzappApp/azzapp/pull/6673))
 * **feat:**  - go to home on invit received with no contact card ([#6615](https://github.com/AzzappApp/azzapp/pull/6615))
