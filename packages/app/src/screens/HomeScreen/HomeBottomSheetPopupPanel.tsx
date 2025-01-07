@@ -1,4 +1,4 @@
-import { Video } from 'expo-av';
+import { ResizeMode, Video } from 'expo-av';
 import { useCallback, useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useColorScheme, View } from 'react-native';
@@ -293,6 +293,7 @@ const HomeBottomSheetPopupPanel = ({
                 isLooping
                 shouldPlay
                 isMuted
+                resizeMode={ResizeMode.STRETCH}
                 source={
                   colorScheme === 'dark'
                     ? require('#assets/hint_1_dark_ae.mp4')
@@ -323,6 +324,7 @@ to be shared!"
                 isLooping
                 shouldPlay
                 isMuted
+                resizeMode={ResizeMode.STRETCH}
                 source={
                   colorScheme === 'dark'
                     ? require('#assets/hint_2_dark_ae.mp4')

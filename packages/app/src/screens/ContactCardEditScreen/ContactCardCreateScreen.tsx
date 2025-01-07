@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Video } from 'expo-av';
+import { ResizeMode, Video } from 'expo-av';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -387,6 +387,7 @@ const ContactCardCreateScreen = () => {
               isLooping
               isMuted
               shouldPlay
+              resizeMode={ResizeMode.STRETCH}
               source={
                 colorScheme === 'dark'
                   ? require('#assets/hint_0_dark_ae.mp4')
@@ -431,7 +432,6 @@ const stylesheet = createStyleSheet(theme => ({
     alignContent: 'center',
   },
   popupIllustration: {
-    width: '100%',
     height: 200,
     borderRadius: 12,
   },
