@@ -147,7 +147,10 @@ const HomeProfilesCarousel = (
     const index = profiles?.findIndex(
       profile => profile.id === profileInfos?.profileId,
     );
-    if (index !== undefined && index !== -1) {
+    if (index === -1 && profiles?.length === 0) {
+      // no more profile available
+      setSelectedIndex(0);
+    } else if (index !== undefined && index !== -1) {
       // new profile has been created (typically from invitation).
       // scroll to the same selected profile.
       setSelectedIndex(index + 1);

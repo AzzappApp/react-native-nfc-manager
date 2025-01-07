@@ -47,9 +47,12 @@ export const HomeScreenProvider = ({
   );
 
   const [initialProfileIndex, setInitialProfileIndex] = useState(() => {
-    const index = user?.profiles?.findIndex(
-      profile => profile.id === getAuthState().profileInfos?.profileId,
-    );
+    const index =
+      user?.profiles?.length === 1
+        ? 1
+        : user?.profiles?.findIndex(
+            profile => profile.id === getAuthState().profileInfos?.profileId,
+          );
     return index !== undefined && index !== -1 ? index + 1 : 0;
   });
 
