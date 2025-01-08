@@ -229,6 +229,8 @@ const HomeBottomSheetPopupPanel = ({
           },
         },
         onCompleted: () => {
+          // we refetch here because changing userName will update profile url/qrcode
+          // This is the simpiest way to handle these profile change as we work on webcard level here
           refreshQuery?.();
 
           const tooltipWebcardId = profileInfo?.webCardId;
