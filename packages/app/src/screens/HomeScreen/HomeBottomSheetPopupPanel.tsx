@@ -14,6 +14,7 @@ import {
   useMutation,
   useRelayEnvironment,
 } from 'react-relay';
+import { isValidUserName } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import BottomSheetPopup from '#components/popup/BottomSheetPopup';
 import { PopupButton } from '#components/popup/PopupElements';
@@ -169,7 +170,7 @@ const HomeBottomSheetPopupPanel = ({
   const validateUrl = useCallback(
     async (userName: string) => {
       if (userName) {
-        if (!userName.match('^[a-zA-Z0-9]+$')) {
+        if (!isValidUserName(userName)) {
           setError(userNameInvalidError);
           return;
         }
