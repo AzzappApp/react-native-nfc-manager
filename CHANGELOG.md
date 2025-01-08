@@ -1,5 +1,6 @@
-## 1.6.1-canary.7
+## 1.6.1-canary.8
 
+* **fix:**  - **post:** [#6207](https://github.com/AzzappApp/azzapp/pull/6207) have same behaviour on android and iOS (on iOS the removed pressable is ignored) ([#6747](https://github.com/AzzappApp/azzapp/pull/6747))
 * **fix:**  - **contact:** [#6622](https://github.com/AzzappApp/azzapp/pull/6622) properly handle avatar ([#6732](https://github.com/AzzappApp/azzapp/pull/6732))
 * **fix:**  - **modules:** [#6701](https://github.com/AzzappApp/azzapp/pull/6701) wrong color on desktop preview with new modules ([#6724](https://github.com/AzzappApp/azzapp/pull/6724))
 * **fix:**  - **modules:** [#6371](https://github.com/AzzappApp/azzapp/pull/6371) pressableNative is unresponsive on large scale on… ([#6718](https://github.com/AzzappApp/azzapp/pull/6718))
