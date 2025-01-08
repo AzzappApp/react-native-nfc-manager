@@ -5,6 +5,7 @@ import { useFragment } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import { getModuleDataValues } from '@azzapp/shared/cardModuleHelpers';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
+import { isCustomModule } from '#helpers/webcardModuleHelpers';
 import CoverRendererFragment from '#relayArtifacts/CoverRenderer_webCard.graphql';
 import CoverRenderer from './CoverRenderer';
 import type { ModuleRenderInfo } from '#components/cardModules/CardModuleRenderer';
@@ -40,15 +41,25 @@ const CoverRendererPreviewDesktop = ({
   const { __typename, uri, thumbnail } = coverMedia ?? {};
 
   const mediaUri = __typename === 'MediaVideo' ? thumbnail : uri;
-  const moduleData = firstModule?.data
-    ? getModuleDataValues({ data: firstModule.data })
-    : null;
-  const backgroundStyle =
-    moduleData && 'backgroundStyle' in moduleData
-      ? moduleData?.backgroundStyle
-      : null;
-  const colorTop =
-    moduleData && 'colorTop' in moduleData ? moduleData?.colorTop : null;
+  let backgroundColor: string | undefined = undefined;
+  if (firstModule) {
+    if (isCustomModule(firstModule.kind)) {
+      const moduleData = firstModule?.data
+        ? getModuleDataValues({ data: firstModule.data })
+        : null;
+      const backgroundStyle =
+        moduleData && 'backgroundStyle' in moduleData
+          ? moduleData?.backgroundStyle
+          : null;
+      const colorTop =
+        moduleData && 'colorTop' in moduleData ? moduleData?.colorTop : null;
+
+      backgroundColor =
+        (backgroundStyle?.backgroundColor || colorTop) ?? backgroundColor;
+    } else if ('cardModuleColor' in firstModule.data) {
+      backgroundColor = firstModule.data.cardModuleColor.background;
+    }
+  }
 
   return (
     <View {...props} style={[style, styles.wrapper]}>
@@ -77,11 +88,8 @@ const CoverRendererPreviewDesktop = ({
       <LinearGradient
         colors={[
           'transparent',
-          backgroundStyle || colorTop
-            ? (swapColor(
-                (backgroundStyle?.backgroundColor || colorTop) ?? '#FFF',
-                cardColors,
-              ) ?? '#FFF')
+          backgroundColor
+            ? (swapColor(backgroundColor, cardColors) ?? '#FFF')
             : '#FFF',
         ]}
         start={{ x: 0, y: 0 }}
