@@ -1,5 +1,5 @@
 import { FlashList } from '@shopify/flash-list';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Alert, Dimensions, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
@@ -341,9 +341,22 @@ const PostList = ({
     [insets.bottom, insets.top],
   );
 
+  useEffect(() => {
+    if (posts.length > 0) {
+      const item = [
+        { index: 0, isViewable: true, item: posts[0], key: posts[0].id },
+      ];
+      onViewableItemsChanged({
+        viewableItems: item,
+        changed: item,
+      });
+    }
+  }, [onViewableItemsChanged, posts]);
+
   return (
     <PostListContext.Provider value={visiblePostIds}>
-      <FlashList<Post>
+      <FlashList
+        keyExtractor={keyExtractor}
         data={posts}
         renderItem={renderItem}
         onEndReached={onEndReached}
@@ -361,6 +374,8 @@ const PostList = ({
     </PostListContext.Provider>
   );
 };
+
+const keyExtractor = (item: Post) => item.id;
 
 export default PostList;
 
