@@ -247,8 +247,15 @@ const AddContactModal = ({
                   foundContact = await findContact();
                 }
                 if (foundContact && foundContact.id) {
+                  const image = await downloadAvatar(
+                    scanned.profileId,
+                    additionalContactData,
+                  );
+
                   const updatedContact = reworkContactForDeviceInsert({
                     ...scanned.contact,
+                    image,
+                    imageAvailable: !!image,
                     urlAddresses:
                       additionalContactData?.urls?.map(addr => {
                         return { label: 'default', address: addr.address };
@@ -354,8 +361,7 @@ const AddContactModal = ({
     requestPhonebookPermissionAsync,
     intl,
     requestPhonebookPermissionAndRedirectToSettingsAsync,
-    additionalContactData?.urls,
-    additionalContactData?.socials,
+    additionalContactData,
     router,
   ]);
 
@@ -522,6 +528,35 @@ const AddContactModal = ({
   );
 };
 
+const downloadAvatar = async (
+  profileId: string,
+  additionalContactData: Props['additionalContactData'],
+) => {
+  let image: Image | undefined = undefined;
+
+  if (additionalContactData?.avatarUrl) {
+    try {
+      const avatar = new File(Paths.cache.uri + profileId);
+      if (avatar.exists) {
+        // be sure that avatar can be refreshed
+        avatar.delete();
+      }
+      await File.downloadFileAsync(additionalContactData.avatarUrl, avatar);
+
+      image = {
+        width: 720,
+        height: 720,
+        uri: avatar.uri,
+      };
+    } catch (e) {
+      console.warn('error downloading avatar', e);
+      Sentry.captureException(e);
+    }
+  }
+
+  return image;
+};
+
 const buildContact = async (
   contactCardData: string,
   additionalContactData: Props['additionalContactData'],
@@ -540,28 +575,7 @@ const buildContact = async (
     birthday,
   } = parseContactCard(contactCardData);
 
-  let image: Image | undefined = undefined;
-
-  if (additionalContactData?.avatarUrl) {
-    try {
-      const avatar = new File(Paths.cache.uri + profileId);
-      if (avatar.exists) {
-        // be sure that avatar can be refreshed
-        avatar.delete();
-      }
-      avatar.create();
-      await File.downloadFileAsync(additionalContactData.avatarUrl, avatar);
-
-      image = {
-        width: 720,
-        height: 720,
-        uri: avatar.uri,
-      };
-    } catch (e) {
-      console.warn('error downloading avatar', e);
-      Sentry.captureException(e);
-    }
-  }
+  const image = await downloadAvatar(profileId, additionalContactData);
 
   const birthdayDate = birthday ? new Date(birthday) : undefined;
 
