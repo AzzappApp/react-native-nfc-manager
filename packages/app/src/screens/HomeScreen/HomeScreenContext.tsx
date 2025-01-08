@@ -73,13 +73,13 @@ export const HomeScreenProvider = ({
     );
     if (nextProfileIndex !== undefined && nextProfileIndex !== -1) {
       setTimeout(() => {
-        if (nextProfileIndex + 1 !== currentIndexSharedValue.value) {
+        if (nextProfileIndex + 1 !== currentIndexProfileSharedValue.value) {
           onIndexChangeLatest(nextProfileIndex + 1);
         }
       });
     }
   }, [
-    currentIndexSharedValue,
+    currentIndexProfileSharedValue,
     currentProfile?.profileId,
     onIndexChangeLatest,
     user.profiles,
