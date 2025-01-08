@@ -40,12 +40,14 @@ type HomeBottomSheetPopupPanelProps = {
     ProfileInfos,
     'invited' | 'profileId' | 'profileRole' | 'webCardId'
   >;
+  refreshQuery?: () => void;
 };
 
 const animationDuration = 500;
 
 const HomeBottomSheetPopupPanel = ({
   profileInfo,
+  refreshQuery,
 }: HomeBottomSheetPopupPanelProps) => {
   const intl = useIntl();
   const environment = useRelayEnvironment();
@@ -227,6 +229,8 @@ const HomeBottomSheetPopupPanel = ({
           },
         },
         onCompleted: () => {
+          refreshQuery?.();
+
           const tooltipWebcardId = profileInfo?.webCardId;
 
           if (timeoutRef.current) {
@@ -242,7 +246,7 @@ const HomeBottomSheetPopupPanel = ({
         updater: store => {
           // reorder carousel once userName is set
           if (!profileInfo?.webCardId) return;
-          const currentWebCard = store.get(profileInfo?.webCardId);
+          const currentWebCard = store.get(profileInfo.webCardId);
           currentWebCard?.setValue(localUrl, 'userName');
 
           const root = store.getRoot();
@@ -275,6 +279,7 @@ const HomeBottomSheetPopupPanel = ({
     currentPageSharedValue,
     localUrl,
     profileInfo,
+    refreshQuery,
     setTooltipedWebcard,
   ]);
 

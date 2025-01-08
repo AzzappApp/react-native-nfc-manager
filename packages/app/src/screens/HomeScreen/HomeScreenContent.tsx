@@ -168,7 +168,10 @@ const HomeScreenContent = ({
       />
       <HomeBottomSheetModalWebCardToolTip user={currentProfile ?? null} />
 
-      <HomeBottomSheetPopupPanel profileInfo={unknownUserNameWebcardId} />
+      <HomeBottomSheetPopupPanel
+        profileInfo={unknownUserNameWebcardId}
+        refreshQuery={refreshQuery}
+      />
     </View>
   );
 };
