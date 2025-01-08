@@ -97,7 +97,10 @@ export const HomeScreenProvider = ({
   const onCurrentProfileIndexChange = useCallback(
     (index: number) => {
       const newProfile = user.profiles?.[index - 1];
-      if (newProfile) {
+      if (
+        newProfile &&
+        newProfile.id !== getAuthState().profileInfos?.profileId
+      ) {
         onChangeWebCard({
           profileId: newProfile.id,
           webCardId: newProfile.webCard?.id ?? null,
