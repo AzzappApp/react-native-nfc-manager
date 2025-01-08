@@ -1,4 +1,4 @@
-## 1.6.1-canary.6
+## 1.6.1-canary.7
 
 * **fix:**  - **contact:** [#6622](https://github.com/AzzappApp/azzapp/pull/6622) properly handle avatar ([#6732](https://github.com/AzzappApp/azzapp/pull/6732))
 * **fix:**  - **modules:** [#6701](https://github.com/AzzappApp/azzapp/pull/6701) wrong color on desktop preview with new modules ([#6724](https://github.com/AzzappApp/azzapp/pull/6724))
