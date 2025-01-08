@@ -2,6 +2,7 @@ import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { runOnJS, useAnimatedReaction } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
+import { useDebouncedCallback } from 'use-debounce';
 import { getAuthState } from '#helpers/authStore';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import useBoolean from '#hooks/useBoolean';
@@ -92,11 +93,13 @@ const HomeScreenContent = ({
   const [currentProfile, setCurrentProfile] = useState(
     user.profiles?.[initialProfileIndex - 1],
   );
+  const debouncedUpdate = useDebouncedCallback(setCurrentProfile, 300);
+
   useAnimatedReaction(
     () => currentIndexProfileSharedValue.value,
     index => {
       const cProfile = user.profiles?.[index - 1];
-      runOnJS(setCurrentProfile)(cProfile);
+      runOnJS(debouncedUpdate)(cProfile);
     },
   );
 
