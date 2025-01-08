@@ -450,41 +450,40 @@ const PostRendererBottomPanel = ({
             variant="medium"
           />
         )}
-        <PressableNative onPress={goToComments}>
-          {post.allowComments && post.previewComment && (
-            <ExpendableText
-              numberOfLines={2}
-              label={post.previewComment.comment}
-              variant="small"
-              prefix={{
-                label: `${post.previewComment.webCard.userName} `,
-                variant: 'smallbold',
-              }}
-            />
-          )}
-          {post.allowComments && post.counterComments > 0 && (
-            <PressableNative onPress={goToComments}>
-              <Text
-                variant="medium"
-                style={styles.textCommentCounter}
-                numberOfLines={3}
-                ellipsizeMode="tail"
-              >
-                <FormattedMessage
-                  defaultMessage="See {counterComments, plural,
+
+        {post.allowComments && post.previewComment && (
+          <ExpendableText
+            numberOfLines={2}
+            label={post.previewComment.comment}
+            variant="small"
+            prefix={{
+              label: `${post.previewComment.webCard.userName} `,
+              variant: 'smallbold',
+            }}
+          />
+        )}
+        {post.allowComments && post.counterComments > 0 && (
+          <PressableNative onPress={goToComments}>
+            <Text
+              variant="medium"
+              style={styles.textCommentCounter}
+              numberOfLines={3}
+              ellipsizeMode="tail"
+            >
+              <FormattedMessage
+                defaultMessage="See {counterComments, plural,
                                     =0 {0 comment}
                                     one {1 comment}
                                     other {# comments}
                                 }"
-                  description="PostRendererBottomPanel - Comments Counter"
-                  values={{
-                    counterComments: post.counterComments ?? 0,
-                  }}
-                />
-              </Text>
-            </PressableNative>
-          )}
-        </PressableNative>
+                description="PostRendererBottomPanel - Comments Counter"
+                values={{
+                  counterComments: post.counterComments ?? 0,
+                }}
+              />
+            </Text>
+          </PressableNative>
+        )}
         <Text variant="small" style={styles.relativeTime}>
           <FormattedRelativeTime
             value={relativeDateMinute(post.createdAt)}
