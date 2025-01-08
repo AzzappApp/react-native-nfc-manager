@@ -1,6 +1,7 @@
 import { View, StyleSheet } from 'react-native';
 import IconButton from '#ui/IconButton';
 import Text from '#ui/Text';
+import { HEADER_HEIGHT } from './Header';
 import type { Icons } from '#ui/Icon';
 import type { ViewProps } from 'react-native';
 
@@ -60,17 +61,16 @@ const WizardPagerHeader = ({
   );
 };
 
-export const PAGER_HEADER_HEIGHT = 30;
-
 const styles = StyleSheet.create({
   root: {
-    height: PAGER_HEADER_HEIGHT,
+    height: HEADER_HEIGHT,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 20,
+    height: '100%',
   },
   headerSegment: {
     alignItems: 'center',

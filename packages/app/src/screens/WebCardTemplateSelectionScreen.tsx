@@ -12,8 +12,9 @@ import useLoadCardTemplateMutation from '#hooks/useLoadCardTemplateMutation';
 import useScreenInsets from '#hooks/useScreenInsets';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Container from '#ui/Container';
+import { HEADER_HEIGHT } from '#ui/Header';
 import Text from '#ui/Text';
-import WizardPagerHeader, { PAGER_HEADER_HEIGHT } from '#ui/WizardPagerHeader';
+import WizardPagerHeader from '#ui/WizardPagerHeader';
 import type {
   CardTemplateItem,
   CardTemplateListHandle,
@@ -122,7 +123,7 @@ const WebCardTemplateSelectionScreen = ({
   const insets = useScreenInsets();
 
   const { height: windowHeight } = useWindowDimensions();
-  const editorHeight = windowHeight - insets.top - PAGER_HEADER_HEIGHT;
+  const editorHeight = windowHeight - insets.top - HEADER_HEIGHT;
 
   return (
     <Container
