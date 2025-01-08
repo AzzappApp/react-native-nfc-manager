@@ -1,5 +1,6 @@
-## 1.6.1-canary.4
+## 1.6.1-canary.5
 
+* **fix:**  - **modules:** [#6701](https://github.com/AzzappApp/azzapp/pull/6701) wrong color on desktop preview with new modules ([#6724](https://github.com/AzzappApp/azzapp/pull/6724))
 * **fix:**  - **modules:** [#6371](https://github.com/AzzappApp/azzapp/pull/6371) pressableNative is unresponsive on large scale on… ([#6718](https://github.com/AzzappApp/azzapp/pull/6718))
 * **fix:**  - don’t use navigator on ssr ([#6719](https://github.com/AzzappApp/azzapp/pull/6719))
 * **fix:**  - move shareAndShare description text outside of the qrcode container ([#6708](https://github.com/AzzappApp/azzapp/pull/6708))
