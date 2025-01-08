@@ -20,6 +20,7 @@ import BottomSheetPopup from '#components/popup/BottomSheetPopup';
 import { PopupButton } from '#components/popup/PopupElements';
 import { onChangeWebCard, type ProfileInfos } from '#helpers/authStore';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import useKeyboardHeight from '#hooks/useKeyboardHeight';
 import Icon from '#ui/Icon';
 import { PageProgress } from '#ui/PageProgress';
 import Text from '#ui/Text';
@@ -277,9 +278,18 @@ const HomeBottomSheetPopupPanel = ({
     setTooltipedWebcard,
   ]);
 
+  const keyboardHeight = useKeyboardHeight();
+
   const containerHeight = useAnimatedStyle(() => {
     if (currentPage === 2) {
-      return { height: withTiming(353, { duration: 500 }) };
+      return {
+        height: withTiming(353, { duration: 500 }),
+        transform: [
+          {
+            translateY: -keyboardHeight.value / 2,
+          },
+        ],
+      };
     } else {
       return { height: 458 };
     }
