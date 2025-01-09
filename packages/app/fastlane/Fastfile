@@ -232,7 +232,8 @@ platform :ios do
         provisioningProfiles: { 
           APP_IDENT => PROFILE_ID,
           APPCLIP_IDENT => PROFILECLIP_ID,
-          WIDGET_IDENT => PROFILEWIDGET_ID,
+          WIDGET_IDENT => PROFILEWIDGET_ID
+         },
         installerSigningCertificate: CODE_SIGNING_IDENTITY,
         distributionBundleIdentifier: APP_IDENT,
       }
