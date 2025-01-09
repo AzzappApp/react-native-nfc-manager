@@ -164,7 +164,7 @@ platform :ios do
     }
 
     widget_entitlements_files = {
-      "azzapp-dev" => "azzappWidget/azzappWidgetExtensio-dev.entitlements",
+      "azzapp-dev" => "azzappWidget/azzappWidgetExtension-dev.entitlements",
       "azzapp-staging" => "azzappWidget/azzappWidgetExtension-staging.entitlements",
       "azzapp" => "azzappWidget/azzappWidgetExtension.entitlements"
     }
