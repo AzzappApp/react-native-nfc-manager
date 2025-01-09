@@ -231,6 +231,8 @@ const CardModuleMediaPicker = ({
                     'CardModule Media Picker - Error message when media are not downloaded',
                 }),
               );
+              value += 1;
+              updateProgress(value);
               downloadError = true;
               return cardModuleMedia;
             }
