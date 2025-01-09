@@ -1,5 +1,6 @@
-## 1.6.1-canary.11
+## 1.6.1-canary.12
 
+* **fix:**  - fastlane typo
 * **fix:**  - fastlane
 * **fix:**  - ci build widget provisionnning profile ([#6779](https://github.com/AzzappApp/azzapp/pull/6779))
 * **feat:**  - initial version widget iOS ([#6752](https://github.com/AzzappApp/azzapp/pull/6752))
