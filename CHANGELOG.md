@@ -1,5 +1,6 @@
-## 1.6.1-canary.16
+## 1.6.1-canary.17
 
+* **fix:**  - testflight
 * **fix:**  - widget entitlement
 * **fix:**  - wrong mobile provision
 * **feat:**  - update revoked mobile provision. use local config is fastlane as it will break the staging config (and we are working on stagingà
