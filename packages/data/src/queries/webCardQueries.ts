@@ -381,6 +381,7 @@ export const getRecommendedWebCards = async (
         isNull(FollowTable.followerId),
         eq(WebCardTable.cardIsPublished, true),
         eq(WebCardTable.deleted, false),
+        eq(WebCardTable.coverIsPredefined, false),
       ),
     )
     .orderBy(desc(WebCardTable.starred), desc(WebCardTable.createdAt))
