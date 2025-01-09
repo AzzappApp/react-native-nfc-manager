@@ -45,6 +45,7 @@ const createContactCard: MutationResolvers['createContactCard'] = async (
     cardIsPublished: true,
     coverMediaId: defaultCover.mediaId,
     companyActivityLabel: contactCard.companyActivityLabel,
+    alreadyPublished: true,
   };
 
   try {

@@ -83,7 +83,6 @@ const WebCardParametersScreen = ({
         userName
         cardIsPublished
         webCardKind
-        alreadyPublished
         lastUserNameUpdate
         nextChangeUsernameAllowedAt
         companyActivityLabel
@@ -119,7 +118,6 @@ const WebCardParametersScreen = ({
           webCard {
             id
             cardIsPublished
-            alreadyPublished
           }
         }
       }
@@ -147,7 +145,6 @@ const WebCardParametersScreen = ({
             webCard: {
               id: webCard?.id,
               cardIsPublished: published,
-              alreadyPublished: webCard?.alreadyPublished,
             },
           },
         },
@@ -273,7 +270,7 @@ const WebCardParametersScreen = ({
   );
 
   const canChangeUserName = useMemo(() => {
-    if (!webCard || webCard?.alreadyPublished === false) {
+    if (!webCard) {
       return true;
     }
     // Get the current date and time
