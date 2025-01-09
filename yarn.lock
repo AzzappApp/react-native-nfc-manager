@@ -215,6 +215,7 @@ __metadata:
     react-native-safe-area-context: "npm:^5.0.0"
     react-native-screens: "patch:react-native-screens@npm%3A4.4.0#~/.yarn/patches/react-native-screens-npm-4.4.0-d13a7ba722.patch"
     react-native-share: "npm:^12.0.3"
+    react-native-shared-group-preferences: "npm:^1.1.24"
     react-native-skottie-template-player: "workspace:^"
     react-native-svg: "npm:^15.10.1"
     react-native-tab-view: "npm:^4.0.5"
@@ -23718,6 +23719,15 @@ __metadata:
   version: 12.0.3
   resolution: "react-native-share@npm:12.0.3"
   checksum: 10/967e09546af4a589e3ce11475db6fd349d7454015b05160b7eb028e443ca011a0042e413ae4c97221050ad4f3c6a33d12933a5fa98400e588b3b50b704f12706
+  languageName: node
+  linkType: hard
+
+"react-native-shared-group-preferences@npm:^1.1.24":
+  version: 1.1.24
+  resolution: "react-native-shared-group-preferences@npm:1.1.24"
+  peerDependencies:
+    react-native: ">=0.41.2"
+  checksum: 10/0e42db9b98c95e55953dcaff57d39f8dfb62d2600fb33d01a6225803783a36eb3f46107abe1bc683d23b6e3ccd51802c5ebdf2fec7bcf7aa395ae3e06e968547
   languageName: node
   linkType: hard
 

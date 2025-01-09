@@ -7,6 +7,7 @@ import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import useBoolean from '#hooks/useBoolean';
 import useNotifications from '#hooks/useNotifications';
 import useScreenInsets from '#hooks/useScreenInsets';
+import useWidget from '#hooks/useWidget';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import HomeBackground from './HomeBackground';
 import HomeBottomPanel from './HomeBottomPanel';
@@ -48,6 +49,7 @@ const HomeScreenContent = ({
           ...HomeBottomSheetPanel_profile
           ...HomeBottomSheetModalWebCardToolTip_profile
         }
+        ...useWidget_user
         ...HomeBackground_user
         ...HomeProfileLink_user
         ...HomeProfilesCarousel_user
@@ -151,6 +153,10 @@ const HomeScreenContent = ({
     ],
     [insets.bottom, insets.top],
   );
+
+  //#region widget
+  useWidget(user ?? null);
+  //#endregion
 
   return (
     <View style={styles.container}>

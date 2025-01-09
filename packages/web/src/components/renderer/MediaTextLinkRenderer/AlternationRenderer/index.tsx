@@ -66,7 +66,7 @@ const AlternationRender = async ({
             >
               <AlternationMedia
                 media={media}
-                even={index % 2 === 0}
+                even={index % 2 === 1}
                 cardStyle={cardStyle}
               />
               <div className={styles.sectionTextContainer}>

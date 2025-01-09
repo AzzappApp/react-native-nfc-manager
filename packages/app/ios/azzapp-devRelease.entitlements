@@ -10,5 +10,9 @@
 		<string>applinks:dev.azzapp.com</string>
 		<string>appclips:dev.azzapp.com</string>
 	</array>
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>group.azzapp.app-dev.wdiget</string>
+	</array>
 </dict>
 </plist>

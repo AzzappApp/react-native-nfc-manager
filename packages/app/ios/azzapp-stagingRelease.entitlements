@@ -10,5 +10,9 @@
 		<string>applinks:staging.azzapp.com</string>
 		<string>appclips:staging.azzapp.com</string>
 	</array>
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>group.azzapp.app-staging.widget</string>
+	</array>
 </dict>
 </plist>

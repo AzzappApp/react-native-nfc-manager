@@ -1,4 +1,14 @@
 {
+  "appPolicies" : {
+    "eula" : "",
+    "policies" : [
+      {
+        "locale" : "en_US",
+        "policyText" : "",
+        "policyURL" : ""
+      }
+    ]
+  },
   "identifier" : "5F2E7ADF",
   "nonRenewingSubscriptions" : [
 
@@ -93,7 +103,10 @@
           "recurringSubscriptionPeriod" : "P1M",
           "referenceName" : "Pro Monthly",
           "subscriptionGroupID" : "F68337C9",
-          "type" : "RecurringSubscription"
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
         },
         {
           "adHocOffers" : [
@@ -122,7 +135,10 @@
           "recurringSubscriptionPeriod" : "P1Y",
           "referenceName" : "Pro yearly",
           "subscriptionGroupID" : "F68337C9",
-          "type" : "RecurringSubscription"
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
         }
       ]
     },
@@ -160,7 +176,10 @@
           "recurringSubscriptionPeriod" : "P1M",
           "referenceName" : "Multi User - 1 seat",
           "subscriptionGroupID" : "7CC98143",
-          "type" : "RecurringSubscription"
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
         },
         {
           "adHocOffers" : [
@@ -189,7 +208,10 @@
           "recurringSubscriptionPeriod" : "P1M",
           "referenceName" : "Multi User - 2 seats",
           "subscriptionGroupID" : "7CC98143",
-          "type" : "RecurringSubscription"
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
         },
         {
           "adHocOffers" : [
@@ -218,7 +240,10 @@
           "recurringSubscriptionPeriod" : "P1M",
           "referenceName" : "Multi User - 10 seats",
           "subscriptionGroupID" : "7CC98143",
-          "type" : "RecurringSubscription"
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
         },
         {
           "adHocOffers" : [
@@ -247,7 +272,10 @@
           "recurringSubscriptionPeriod" : "P1Y",
           "referenceName" : "Multi User - 1 seat - yearly",
           "subscriptionGroupID" : "7CC98143",
-          "type" : "RecurringSubscription"
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
         },
         {
           "adHocOffers" : [
@@ -276,7 +304,10 @@
           "recurringSubscriptionPeriod" : "P1Y",
           "referenceName" : "Multi User - 2 seats - yearly",
           "subscriptionGroupID" : "7CC98143",
-          "type" : "RecurringSubscription"
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
         },
         {
           "adHocOffers" : [
@@ -305,7 +336,10 @@
           "recurringSubscriptionPeriod" : "P1Y",
           "referenceName" : "Multi User - 10 seats - yearly",
           "subscriptionGroupID" : "7CC98143",
-          "type" : "RecurringSubscription"
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
         }
       ]
     }
@@ -315,7 +349,7 @@
     "privateKey" : "MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgNFirOiyYW/CsYv+1xIbpNaQVb110OTIFnY00Bz34jbagCgYIKoZIzj0DAQehRANCAAQB4/A3rXFJPWAitZvPhUwhFJ8/j8YxpWWJawGHKliYQAisUjr0O7S5/c8fGWKD1vMoPU2opH4aIPK146PWz5dJ"
   },
   "version" : {
-    "major" : 3,
+    "major" : 4,
     "minor" : 0
   }
 }
