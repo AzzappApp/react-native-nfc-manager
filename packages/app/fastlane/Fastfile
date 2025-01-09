@@ -17,37 +17,45 @@ fastlane_require 'dotenv'
 
 default_platform(:ios)
 
-
-APP_IDENT = ENV['IOS_APP_IDENTIFIER']
-APPCLIP_IDENT = ENV['IOS_APPCLIP_IDENTIFIER']
-IOS_SCHEME = "azzapp-dev" #ENV["IOS_SCHEME"]
-IOS_APPCLIP_SCHEME = ENV["IOS_APPCLIP_SCHEME"]
+IOS_SCHEME = ENV["IOS_SCHEME"]
 EXPORT_METHOD = ENV['IOS_EXPORT_METHOD']
 P12_PASSWORD = ENV["IOS_CERTIFICATE_P12_PASSWORD"]
-PROFILE_ID = ENV["IOS_PROFILE_ID"]
-PROFILECLIP_ID = ENV["IOS_PROFILECLIP_ID"]
-##CODE_SIGNING_IDENTITY = ENV["IOS_CODE_SIGNING_IDENTITY"]
 CODE_SIGNING_IDENTITY = "iPhone Distribution: APPCORP (66D3U3GLN6)"
 APP_STORE_CONNECT_API_KEY = ENV["APP_STORE_CONNECT_API_KEY"]
 TEAM_ID = "66D3U3GLN6"
 
 # Define configuration locally instead of github en variables(limit the number of variables)
 ios_widget_config = {
+  'azzapp-dev' => {
+    'app_ident' => 'com.azzapp.app-dev',
+    'app_id' => 'e2433eee-b782-4a3d-b91e-707551a5f4e9',
+    'appclip_scheme' => 'ShareContactAppClip-dev',
+    'appclip_ident' => 'com.azzapp.app-dev.Clip',
+    'appclip_widget_id' => 'b93817b0-8552-49fa-b2b2-2ee49f75ac97',
+    'widget_scheme' => 'azzappWidgetExtension-dev',
+    'widget_ident' => 'com.azzapp.app-dev.azzappWidget',
+    'profile_widget_id' => '06d36134-e098-4201-8e8b-fa7176de3f8c'
+  },
   'azzapp-staging' => {
+    'app_ident' => 'com.azzapp.app-staging',
+    'app_id' => '9b36aebe-540b-490d-bc2b-7d7004a4369e',
+    'appclip_scheme' => 'ShareContactAppClip-staging',
+    'appclip_ident' => 'com.azzapp.app-staging.Clip',
+    'appclip_widget_id' => 'a754a538-920d-415e-a75a-3d20edd00288',
     'widget_scheme' => 'azzappWidgetExtension-staging',
     'widget_ident' => 'com.azzapp.app-staging.azzappWidget',
     'profile_widget_id' => '434a482f-0338-4bf1-81ad-a2abbfa0ed3a'
   },
   'azzapp' => {
+    'app_ident' => 'com.azzapp.app',
+    'app_id' => 'f560fb88-1a61-4a1f-bb58-ab278782ad81',
+    'appclip_scheme' => 'ShareContactAppClip',
+    'appclip_ident' => 'com.azzapp.app.Clip',
+    'appclip_widget_id' => '9cb8081b-67e4-4e20-bba9-f590729bf5ec',
     'widget_scheme' => 'azzappWidgetExtension',
     'widget_ident' => 'com.azzapp.app.azzappWidget',
     'profile_widget_id' => 'e9c03e2f-6c53-44e2-b957-49f3af207fff'
   },
-  'azzapp-dev' => {
-    'widget_scheme' => 'azzappWidgetExtension-dev',
-    'widget_ident' => 'com.azzapp.app-dev.azzappWidget',
-    'profile_widget_id' => '06d36134-e098-4201-8e8b-fa7176de3f8c'
-  }
 }
 
 platform :ios do
@@ -60,6 +68,11 @@ platform :ios do
     main_app_plist = "ios/azzapp/Info.plist"
     app_clip_plist = "ios/ShareContactAppClip/Info.plist"
     widget_config = ios_widget_config[IOS_SCHEME]
+    APP_IDENT = widget_config['app_ident']
+    APPCLIP_IDENT = widget_config['appclip_ident']
+    IOS_APPCLIP_SCHEME = widget_config['appclip_scheme']
+    PROFILE_ID = widget_config['app_id']
+    PROFILECLIP_ID = widget_config['appclip_widget_id']
     IOS_WIDGET_SCHEME = widget_config['widget_scheme']
     WIDGET_IDENT = widget_config['widget_ident']
     PROFILEWIDGET_ID = widget_config['profile_widget_id']
