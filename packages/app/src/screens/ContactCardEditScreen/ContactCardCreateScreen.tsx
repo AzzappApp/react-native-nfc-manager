@@ -316,6 +316,10 @@ const ContactCardCreateScreen = () => {
   );
 
   useEffect(() => {
+    return Toast.hide;
+  }, []);
+
+  useEffect(() => {
     const popupTimeout = setTimeout(() => {
       // need to wait for the screen to be displayed
       showPopup();
