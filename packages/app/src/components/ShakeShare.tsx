@@ -57,7 +57,7 @@ const ShakeShare = () => {
   }, []);
 
   const activateShakeAndShare =
-    !!profileInfos?.invited && !!profileInfos?.webCardUserName;
+    !profileInfos?.invited && !!profileInfos?.webCardUserName;
 
   const activateDetector = useCallback(() => {
     setMountScreen(true);
