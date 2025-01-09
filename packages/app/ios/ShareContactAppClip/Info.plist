@@ -5,13 +5,13 @@
 	<key>CFBundleShortVersionString</key>
 	<string>1.6.1</string>
 	<key>CFBundleVersion</key>
-	<string>13</string>
+	<string>14</string>
 	<key>NSAppClip</key>
 	<dict>
 		<key>NSAppClipRequestEphemeralUserNotification</key>
-		<false/>
+		<false />
 		<key>NSAppClipRequestLocationConfirmation</key>
-		<false/>
+		<false />
 	</dict>
 </dict>
 </plist>

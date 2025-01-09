@@ -1,5 +1,6 @@
-## 1.6.1-canary.12
+## 1.6.1-canary.13
 
+* **fix:**  - try to make fastfile working....
 * **fix:**  - fastlane typo
 * **fix:**  - fastlane
 * **fix:**  - ci build widget provisionnning profile ([#6779](https://github.com/AzzappApp/azzapp/pull/6779))
