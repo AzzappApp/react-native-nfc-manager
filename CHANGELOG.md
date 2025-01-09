@@ -1,5 +1,6 @@
-## 1.6.1-canary.10
+## 1.6.1-canary.11
 
+* **fix:**  - fastlane
 * **fix:**  - ci build widget provisionnning profile ([#6779](https://github.com/AzzappApp/azzapp/pull/6779))
 * **feat:**  - initial version widget iOS ([#6752](https://github.com/AzzappApp/azzapp/pull/6752))
 * **fix:**  - **post:** [#6207](https://github.com/AzzappApp/azzapp/pull/6207) have same behaviour on android and iOS (on iOS the removed pressable is ignored) ([#6747](https://github.com/AzzappApp/azzapp/pull/6747))
