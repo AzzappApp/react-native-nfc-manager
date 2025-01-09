@@ -8,9 +8,7 @@ import * as mime from 'react-native-mime-types'; // FIXME import is verry big
 import Toast from 'react-native-toast-message';
 import { useMutation } from 'react-relay';
 import { graphql, Observable } from 'relay-runtime';
-import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { isDefined } from '@azzapp/shared/isDefined';
-import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
 import { mainRoutes } from '#mobileRoutes';
 import { colors } from '#theme';
 import {
@@ -210,11 +208,10 @@ const ContactCardCreateScreen = () => {
           target: 'avatar',
         });
         upload = uploadMedia(file, uploadURL, uploadParameters);
+        setProgressIndicator(
+          upload.progress.map(({ loaded, total }) => loaded / total),
+        );
       }
-
-      setProgressIndicator(
-        combineMultiUploadProgresses(convertToNonNullArray([upload?.progress])),
-      );
 
       const uploadedAvatarId = await upload?.promise.then(({ public_id }) => {
         return public_id;
