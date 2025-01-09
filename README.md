@@ -4,7 +4,7 @@ This is the main repository of the *Azzapp* application source code.
 
 ## Development environment
 
-Developing and building the project requires **MacOS version 12+**.
+Developing and building the project requires **MacOS version 14+**.
 In addition developers should install the followings dependencies:
 
 - [Node.js](https://nodejs.org/en/) version **22** (recommended install through [nvm](https://github.com/nvm-sh/nvm))
