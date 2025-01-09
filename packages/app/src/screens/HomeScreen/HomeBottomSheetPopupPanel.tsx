@@ -18,7 +18,7 @@ import { isValidUserName } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import BottomSheetPopup from '#components/popup/BottomSheetPopup';
 import { PopupButton } from '#components/popup/PopupElements';
-import { onChangeWebCard, type ProfileInfos } from '#helpers/authStore';
+import { onChangeWebCard, type ProfileInfosInput } from '#helpers/authStore';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useKeyboardHeight from '#hooks/useKeyboardHeight';
 import Icon from '#ui/Icon';
@@ -36,10 +36,7 @@ type HomeBottomSheetPopupPanelProps = {
    *
    * @type {boolean}
    */
-  profileInfo?: Pick<
-    ProfileInfos,
-    'invited' | 'profileId' | 'profileRole' | 'webCardId'
-  >;
+  profileInfo?: ProfileInfosInput;
   refreshQuery?: () => void;
 };
 
@@ -59,7 +56,7 @@ const HomeBottomSheetPopupPanel = ({
     if (profileInfo) {
       timeoutRef.current = setTimeout(() => {
         onChangeWebCard(profileInfo);
-      }, 2000);
+      }, 1500);
       return () => clearTimeout(timeoutRef.current);
     }
   }, [profileInfo]);
@@ -80,7 +77,7 @@ const HomeBottomSheetPopupPanel = ({
           { webcardId: profileInfo?.webCardId },
         ).toPromise();
       if (res?.getProposedUserName) {
-        setLocalUrl(res.getProposedUserName);
+        setNewUserName(res.getProposedUserName);
       }
     };
     if (profileInfo?.webCardId) fct();
@@ -102,7 +99,7 @@ const HomeBottomSheetPopupPanel = ({
 
   const [currentPage, setCurrentPage] = useState(0);
   const currentPageSharedValue = useSharedValue(0);
-  const [localUrl, setLocalUrl] = useState('');
+  const [newUserName, setNewUserName] = useState('');
   const [error, setError] = useState<ReactNode[] | string | undefined>(
     undefined,
   );
@@ -112,7 +109,7 @@ const HomeBottomSheetPopupPanel = ({
   const resetPopupState = useCallback(() => {
     setCurrentPage(0);
     setError(undefined);
-    setLocalUrl('');
+    setNewUserName('');
   }, []);
 
   const resetPopupStateWl = useCallback(() => {
@@ -145,7 +142,7 @@ const HomeBottomSheetPopupPanel = ({
   });
 
   const onLinkUrlChanged = (url: string) => {
-    setLocalUrl(url);
+    setNewUserName(url);
     validateUrl(url);
   };
 
@@ -225,7 +222,7 @@ const HomeBottomSheetPopupPanel = ({
         variables: {
           webCardId: profileInfo?.webCardId,
           input: {
-            userName: localUrl,
+            userName: newUserName,
           },
         },
         onCompleted: () => {
@@ -237,7 +234,9 @@ const HomeBottomSheetPopupPanel = ({
 
           if (timeoutRef.current) {
             clearTimeout(timeoutRef.current);
-            onChangeWebCard(profileInfo);
+          }
+          if (profileInfo) {
+            onChangeWebCard({ ...profileInfo, webCardUserName: newUserName });
           }
           setTimeout(() => {
             if (tooltipWebcardId) {
@@ -249,7 +248,7 @@ const HomeBottomSheetPopupPanel = ({
           // reorder carousel once userName is set
           if (!profileInfo?.webCardId) return;
           const currentWebCard = store.get(profileInfo.webCardId);
-          currentWebCard?.setValue(localUrl, 'userName');
+          currentWebCard?.setValue(newUserName, 'userName');
 
           const root = store.getRoot();
           const user = root.getLinkedRecord('currentUser');
@@ -279,7 +278,7 @@ const HomeBottomSheetPopupPanel = ({
     commitUserName,
     currentPage,
     currentPageSharedValue,
-    localUrl,
+    newUserName,
     profileInfo,
     refreshQuery,
     setTooltipedWebcard,
@@ -389,7 +388,7 @@ to be shared!"
             </Text>
             <View style={styles.linkInput}>
               <TextInput
-                defaultValue={localUrl}
+                defaultValue={newUserName}
                 onChangeText={onLinkUrlChanged}
                 autoCapitalize="none"
                 autoCorrect={false}
@@ -412,7 +411,7 @@ to be shared!"
                 variant="medium"
                 style={[styles.urlText, error && styles.errorStyle]}
               >
-                {`azzapp.com/${localUrl}`}
+                {`azzapp.com/${newUserName}`}
               </Text>
             </View>
           </Animated.View>

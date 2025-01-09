@@ -103,7 +103,7 @@ const HomeScreenContent = ({
     },
   );
 
-  const unknownUserNameWebcardId = useMemo(() => {
+  const profileWithoutWebCardUserName = useMemo(() => {
     const emptyProfile = user.profiles?.find(
       profile =>
         !profile.webCard?.userName || profile.webCard?.userName.length === 0,
@@ -115,6 +115,7 @@ const HomeScreenContent = ({
         profileId: emptyProfile.id,
         profileRole: emptyProfile.profileRole,
         invited: false,
+        webCardUserName: emptyProfile.webCard?.userName,
       };
     } else {
       return undefined;
@@ -172,7 +173,7 @@ const HomeScreenContent = ({
       <HomeBottomSheetModalWebCardToolTip user={currentProfile ?? null} />
 
       <HomeBottomSheetPopupPanel
-        profileInfo={unknownUserNameWebcardId}
+        profileInfo={profileWithoutWebCardUserName}
         refreshQuery={refreshQuery}
       />
     </View>

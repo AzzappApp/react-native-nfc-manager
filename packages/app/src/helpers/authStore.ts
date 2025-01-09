@@ -45,10 +45,19 @@ export type ProfileInfos = {
    */
   phoneNumber: string | null;
   /**
-   * The user in invited and had not yet validate the invitation
+   * The user is invited and has not yet accepted the invitation
    */
   invited: boolean;
+  /**
+   * The username of the webcard
+   */
+  webCardUserName?: string | null;
 };
+
+export type ProfileInfosInput = Pick<
+  ProfileInfos,
+  'invited' | 'profileId' | 'profileRole' | 'webCardId' | 'webCardUserName'
+>;
 
 /**
  * Auth state
@@ -245,22 +254,20 @@ const emitAuthState = () => {
  */
 export const getTokens = () => authTokens;
 
-export const onChangeWebCard = async (
-  infos?: Pick<
-    ProfileInfos,
-    'invited' | 'profileId' | 'profileRole' | 'webCardId'
-  > | null,
-) => {
-  const { profileId, webCardId, profileRole, invited } = infos ?? {
-    profileId: null,
-    webCardId: null,
-    profileRole: null,
-    invited: false,
-  };
+export const onChangeWebCard = async (infos?: ProfileInfosInput | null) => {
+  const { profileId, webCardId, profileRole, webCardUserName, invited } =
+    infos ?? {
+      profileId: null,
+      webCardId: null,
+      profileRole: null,
+      invited: false,
+      webCardUserName: undefined,
+    };
   const profileInfos = getAuthState().profileInfos;
   if (
     profileInfos == null ||
-    (profileInfos && profileInfos.profileId !== profileId)
+    profileInfos.profileId !== profileId ||
+    webCardUserName !== profileInfos.webCardUserName
   ) {
     storage.set(
       MMKVS_PROFILE_INFOS,
@@ -270,6 +277,7 @@ export const onChangeWebCard = async (
         webCardId,
         profileRole,
         invited,
+        webCardUserName,
       }),
     );
   }

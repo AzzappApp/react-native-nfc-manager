@@ -39,6 +39,7 @@ export const HomeScreenProvider = ({
           invited
           webCard {
             id
+            userName
           }
         }
       }
@@ -106,6 +107,7 @@ export const HomeScreenProvider = ({
           webCardId: newProfile.webCard?.id ?? null,
           profileRole: newProfile.profileRole,
           invited: newProfile.invited,
+          webCardUserName: newProfile.webCard?.userName ?? null,
         });
       }
     },

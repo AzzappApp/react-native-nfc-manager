@@ -165,6 +165,7 @@ const HomeProfilesCarousel = (
           webCardId: profile.webCard?.id ?? null,
           profileRole: profile.profileRole,
           invited: profile.invited,
+          webCardUserName: profile.webCard?.userName,
         });
       } else {
         onChangeWebCard(null);
