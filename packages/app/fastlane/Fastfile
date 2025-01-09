@@ -31,6 +31,43 @@ CODE_SIGNING_IDENTITY = "iPhone Distribution: APPCORP (66D3U3GLN6)"
 APP_STORE_CONNECT_API_KEY = ENV["APP_STORE_CONNECT_API_KEY"]
 TEAM_ID = "66D3U3GLN6"
 
+# Generate IOS_WIDGET_SCHEME based on IOS_SCHEME (to avoid adding more github env variables)
+IOS_WIDGET_SCHEME = case IOS_SCHEME
+when "azzapp-staging"
+  "azzappWidgetExtension-staging"
+when "azzapp"
+  "azzappWidgetExtension"
+when "azzapp-dev"
+  "azzappWidgetExtension-dev"
+else
+  raise "Unknown IOS_SCHEME: #{IOS_SCHEME}"
+end
+
+# Generate IOS_WIDGET_SCHEME based on IOS_SCHEME (to avoid adding more github env variables)
+WIDGET_IDENT = case IOS_SCHEME
+when "azzapp-staging"
+  "com.azzapp.app-staging.azzappWidget"
+when "azzapp"
+  "com.azzapp.app-staging.azzappWidget"
+when "azzapp-dev"
+  "com.azzapp.app-dev.azzappWidget"
+else
+  raise "Unknown IOS_SCHEME: #{IOS_SCHEME}"
+end
+
+PROFILEWIDGET_ID = case IOS_SCHEME
+when "azzapp-staging"
+  "434a482f-0338-4bf1-81ad-a2abbfa0ed3a"
+when "azzapp"
+  "e9c03e2f-6c53-44e2-b957-49f3af207fff"
+when "azzapp-dev"
+  "06d36134-e098-4201-8e8b-fa7176de3f8c"
+else
+  raise "Unknown IOS_SCHEME: #{IOS_SCHEME}"
+end
+
+
+
 platform :ios do
   keychain_created = false
 
@@ -95,6 +132,7 @@ platform :ios do
     # Import certificate and provisioning profile
     PROFILE_PATH = "./ios/certs/#{APP_IDENT}.mobileprovision"
     PROFILE_CLIP_PATH = "./ios/certs/#{APPCLIP_IDENT}.mobileprovision"
+    PROFILE_WIDGET_PATH = "./ios/certs/#{WIDGET_IDENT}.mobileprovision"
     CERTIFICATE_PATH = "./ios/certs/cerfiticate.p12"
 
     import_certificate(
@@ -106,6 +144,7 @@ platform :ios do
 
     install_provisioning_profile(path: PROFILE_PATH)
     install_provisioning_profile(path: PROFILE_CLIP_PATH)
+    install_provisioning_profile(path: PROFILE_WIDGET_PATH)
 
     # Update code signing settings
     pbxprojPath = "ios/azzapp.xcodeproj/project.pbxproj"
@@ -122,6 +161,12 @@ platform :ios do
       "azzapp-dev" => "ShareContactAppClip/ShareContactAppClip-dev.entitlements",
       "azzapp-staging" => "ShareContactAppClip/ShareContactAppClip-staging.entitlements",
       "azzapp" => "ShareContactAppClip/ShareContactAppClip.entitlements"
+    }
+
+    widget_entitlements_files = {
+      "azzapp-dev" => "azzappWidget/azzappWidgetExtensio-dev.entitlements",
+      "azzapp-staging" => "azzappWidget/azzappWidgetExtension-staging.entitlements",
+      "azzapp" => "azzappWidget/azzappWidgetExtension.entitlements"
     }
 
     # Determine the entitlements file based on the target
@@ -141,6 +186,14 @@ platform :ios do
       code_sign_identity: CODE_SIGNING_IDENTITY,
     )
 
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: "ios/azzapp.xcodeproj",
+      entitlements_file_path: clip_entitlements_files[IOS_WIDGET_SCHEME],
+      targets: [IOS_WIDGET_SCHEME],
+      code_sign_identity: CODE_SIGNING_IDENTITY,
+    )
+
     update_project_provisioning(
       xcodeproj: "ios/azzapp.xcodeproj",
       profile: PROFILE_PATH,
@@ -154,6 +207,14 @@ platform :ios do
       profile: PROFILE_CLIP_PATH,
       code_signing_identity: CODE_SIGNING_IDENTITY,
       target_filter: IOS_APPCLIP_SCHEME,
+      build_configuration: "Release",
+    )
+
+    update_project_provisioning(
+      xcodeproj: "ios/azzapp.xcodeproj",
+      profile: PROFILE_WIDGET_PATH,
+      code_signing_identity: CODE_SIGNING_IDENTITY,
+      target_filter: IOS_WIDGET_SCHEME,
       build_configuration: "Release",
     )
 
@@ -171,7 +232,7 @@ platform :ios do
         provisioningProfiles: { 
           APP_IDENT => PROFILE_ID,
           APPCLIP_IDENT => PROFILECLIP_ID,
-        },
+          WIDGET_IDENT => PROFILEWIDGET_ID,
         installerSigningCertificate: CODE_SIGNING_IDENTITY,
         distributionBundleIdentifier: APP_IDENT,
       }

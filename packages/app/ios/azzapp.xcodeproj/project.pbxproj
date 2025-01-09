@@ -318,8 +318,6 @@
 		9624A8EC2B31E7C4009816DC /* azzappRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = azzappRelease.entitlements; path = azzapp/azzappRelease.entitlements; sourceTree = "<group>"; };
 		96262FD42C908E57001146D7 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		9631A35C2D2EBD06008C156F /* azzappWidgetExtension-staging.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "azzappWidgetExtension-staging.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
-		9631A36C2D2EBDF7008C156F /* azzappWidgetExtension-staging.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "azzappWidgetExtension-staging.entitlements"; sourceTree = "<group>"; };
-		9631A36D2D2EBE02008C156F /* azzappWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = azzappWidgetExtension.entitlements; sourceTree = "<group>"; };
 		963878F22B036F6500D3AE9F /* azzapp-devDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "azzapp-devDebug.entitlements"; sourceTree = "<group>"; };
 		9642B13E2D11B4C6008E236B /* AZPWidgetKit.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AZPWidgetKit.m; sourceTree = "<group>"; };
 		9642B13F2D11B4C6008E236B /* AZPWidgetKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AZPWidgetKit.swift; sourceTree = "<group>"; };
@@ -327,7 +325,6 @@
 		9642B14B2D11B4F2008E236B /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		9642B14D2D11B4F2008E236B /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		9642B16E2D11B4FA008E236B /* azzappWidgetExtension-dev.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "azzappWidgetExtension-dev.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
-		9642B1712D11B553008E236B /* azzappWidgetExtension-dev.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "azzappWidgetExtension-dev.entitlements"; sourceTree = "<group>"; };
 		96678DDD29D5CFF80073D683 /* PlusJakartaSans-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "PlusJakartaSans-Bold.ttf"; path = "../../assets/fonts/PlusJakartaSans-Bold.ttf"; sourceTree = "<group>"; };
 		96678DDE29D5CFF80073D683 /* PlusJakartaSans-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "PlusJakartaSans-Regular.ttf"; path = "../../assets/fonts/PlusJakartaSans-Regular.ttf"; sourceTree = "<group>"; };
 		96678DDF29D5CFF80073D683 /* PlusJakartaSans-ExtraBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "PlusJakartaSans-ExtraBold.ttf"; path = "../../assets/fonts/PlusJakartaSans-ExtraBold.ttf"; sourceTree = "<group>"; };
@@ -605,9 +602,6 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				9631A36D2D2EBE02008C156F /* azzappWidgetExtension.entitlements */,
-				9631A36C2D2EBDF7008C156F /* azzappWidgetExtension-staging.entitlements */,
-				9642B1712D11B553008E236B /* azzappWidgetExtension-dev.entitlements */,
 				961CC3F12CAAD404003DF611 /* azzapp-staging.entitlements */,
 				FDFDBA6F2841006200621C0F /* resources */,
 				13B07FAE1A68108700A75B9A /* azzapp */,
