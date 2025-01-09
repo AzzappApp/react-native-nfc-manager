@@ -70,6 +70,8 @@ type CardModuleBottomBarProps<T extends ModuleKindAndVariant> = {
 
   editableItemIndex: number | null;
   setEditableItemIndex: (index: number | null) => void;
+
+  defaultSearchValue?: string | null;
 };
 
 const CardModuleBottomBar = <T extends ModuleKindAndVariant>({
@@ -84,6 +86,7 @@ const CardModuleBottomBar = <T extends ModuleKindAndVariant>({
   setCanSave,
   editableItemIndex,
   setEditableItemIndex,
+  defaultSearchValue,
 }: CardModuleBottomBarProps<T>) => {
   // #region CardModuleMediaManagement
   const intl = useIntl();
@@ -274,6 +277,7 @@ const CardModuleBottomBar = <T extends ModuleKindAndVariant>({
                   onUpdateMedia={onUpdateMedia}
                   availableVideoSlot={videoSlotAvailable}
                   close={deselectMedia}
+                  defaultSearchValue={defaultSearchValue}
                 />
               ) : undefined}
             </ToolBarContainer>
@@ -292,6 +296,7 @@ const CardModuleBottomBar = <T extends ModuleKindAndVariant>({
             {...getMaxMedia(module)}
             onFinished={onFinishImagePicker}
             onClose={closeImagePicker}
+            defaultSearchValue={defaultSearchValue}
           />
         </ScreenModal>
       )}

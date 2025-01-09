@@ -383,6 +383,7 @@ const CoverEditorCore = (
       shouldComputeCoverPreviewPositionPercentage,
 
       initialMediaToPick,
+      companyActivityLabel: profile.webCard?.companyActivityLabel,
       ...coverInitialState,
     };
   });
@@ -790,6 +791,7 @@ const CoverEditorCore = (
         maxSelectableVideos={MAX_ALLOWED_VIDEOS_BY_COVER}
         onFinished={onMediasPicked}
         onClose={onCancel}
+        defaultSearchValue={profile.webCard?.companyActivityLabel}
       />
     </ScreenModal>
   );

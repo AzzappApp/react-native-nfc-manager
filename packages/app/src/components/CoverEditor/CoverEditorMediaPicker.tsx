@@ -74,6 +74,8 @@ type MediaPickerProps = Omit<ViewProps, 'children'> & {
    *
    */
   maxMedia?: number;
+
+  defaultSearchValue?: string | null;
 };
 
 const CoverEditorMediaPicker = ({
@@ -87,6 +89,7 @@ const CoverEditorMediaPicker = ({
   onClose,
   multiSelection = true,
   allowVideo = true,
+  defaultSearchValue,
   ...props
 }: MediaPickerProps) => {
   const [selectedMedias, setSelectedMedias] = useState<
@@ -431,6 +434,7 @@ const CoverEditorMediaPicker = ({
       onMediaSelected={handleMediaSelected}
       selectedMediasIds={selectedMediasIds}
       allowVideo={allowVideo}
+      defaultSearchValue={defaultSearchValue}
       Header={
         multiSelection ? (
           <Header

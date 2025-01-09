@@ -69,6 +69,7 @@ const CoverEditorMediaPickerFloatingTool = ({
             durationsFixed={durationsFixed}
             maxSelectableVideos={MAX_ALLOWED_VIDEOS_BY_COVER}
             onClose={hideImagePicker}
+            defaultSearchValue={cover.companyActivityLabel}
           />
         )}
       </ScreenModal>

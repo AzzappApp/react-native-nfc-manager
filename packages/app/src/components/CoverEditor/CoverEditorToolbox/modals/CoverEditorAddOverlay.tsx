@@ -44,6 +44,7 @@ const CoverEditorAddOverlay = ({ open, onClose }: Props) => {
           onFinished={onFinish}
           onClose={onClose}
           durations={null}
+          defaultSearchValue={coverEditorState.companyActivityLabel}
         />
       )}
     </ScreenModal>
