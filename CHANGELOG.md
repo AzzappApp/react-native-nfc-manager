@@ -1,5 +1,6 @@
-## 1.6.1-canary.14
+## 1.6.1-canary.15
 
+* **fix:**  - wrong mobile provision
 * **feat:**  - update revoked mobile provision. use local config is fastlane as it will break the staging config (and we are working on stagingà
 * **fix:**  - try to make fastfile working....
 * **fix:**  - fastlane typo
