@@ -34,7 +34,7 @@ ios_widget_config = {
     'appclip_widget_id' => 'b93817b0-8552-49fa-b2b2-2ee49f75ac97',
     'widget_scheme' => 'azzappWidgetExtension-dev',
     'widget_ident' => 'com.azzapp.app-dev.azzappWidget',
-    'profile_widget_id' => '06d36134-e098-4201-8e8b-fa7176de3f8c'
+    'profile_widget_id' => 'e9c03e2f-6c53-44e2-b957-49f3af207fff'
   },
   'azzapp-staging' => {
     'app_ident' => 'com.azzapp.app-staging',
@@ -54,7 +54,7 @@ ios_widget_config = {
     'appclip_widget_id' => '9cb8081b-67e4-4e20-bba9-f590729bf5ec',
     'widget_scheme' => 'azzappWidgetExtension',
     'widget_ident' => 'com.azzapp.app.azzappWidget',
-    'profile_widget_id' => 'e9c03e2f-6c53-44e2-b957-49f3af207fff'
+    'profile_widget_id' => '06d36134-e098-4201-8e8b-fa7176de3f8c'
   },
 }
 
