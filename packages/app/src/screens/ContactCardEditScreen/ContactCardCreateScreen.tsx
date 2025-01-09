@@ -3,7 +3,7 @@ import { ResizeMode, Video } from 'expo-av';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { useColorScheme, View } from 'react-native';
+import { Keyboard, useColorScheme, View } from 'react-native';
 import * as mime from 'react-native-mime-types'; // FIXME import is verry big
 import Toast from 'react-native-toast-message';
 import { useMutation } from 'react-relay';
@@ -146,6 +146,15 @@ const ContactCardCreateScreen = () => {
     defaultValues: {
       webCardKind: 'personal',
     },
+  });
+
+  useEffect(() => {
+    const didShow = Keyboard.addListener('keyboardDidShow', () => Toast.hide());
+    const didHide = Keyboard.addListener('keyboardDidHide', () => Toast.hide());
+    return () => {
+      didShow.remove();
+      didHide.remove();
+    };
   });
 
   const submit = handleSubmit(
