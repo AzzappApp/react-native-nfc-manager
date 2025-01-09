@@ -9,5 +9,9 @@
 	</dict>
 	<key>SHARED_GROUP_IDENTIFIER</key>
 	<string>$(SHARED_GROUP_IDENTIFIER)</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.6.1</string>
+	<key>CFBundleVersion</key>
+	<string>10</string>
 </dict>
 </plist>
