@@ -2,12 +2,7 @@ import { ResizeMode, Video } from 'expo-av';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useColorScheme, View } from 'react-native';
-import Animated, {
-  runOnJS,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import {
   fetchQuery,
   graphql,
@@ -20,11 +15,10 @@ import BottomSheetPopup from '#components/popup/BottomSheetPopup';
 import { PopupButton } from '#components/popup/PopupElements';
 import { onChangeWebCard, type ProfileInfosInput } from '#helpers/authStore';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import useKeyboardHeight from '#hooks/useKeyboardHeight';
+import BottomSheetTextInput from '#ui/BottomSheetTextInput';
 import Icon from '#ui/Icon';
 import { PageProgress } from '#ui/PageProgress';
 import Text from '#ui/Text';
-import TextInput from '#ui/TextInput';
 import { useHomeBottomSheetModalToolTipContext } from './HomeBottomSheetModalToolTip';
 import type { HomeBottomSheetPopupPanelCheckUserNameQuery } from '#relayArtifacts/HomeBottomSheetPopupPanelCheckUserNameQuery.graphql';
 import type { HomeBottomSheetPopupPanelGetProposedUsernameQuery } from '#relayArtifacts/HomeBottomSheetPopupPanelGetProposedUsernameQuery.graphql';
@@ -56,7 +50,7 @@ const HomeBottomSheetPopupPanel = ({
     if (profileInfo) {
       timeoutRef.current = setTimeout(() => {
         onChangeWebCard(profileInfo);
-      }, 1500);
+      }, 2000);
       return () => clearTimeout(timeoutRef.current);
     }
   }, [profileInfo]);
@@ -98,7 +92,6 @@ const HomeBottomSheetPopupPanel = ({
   `);
 
   const [currentPage, setCurrentPage] = useState(0);
-  const currentPageSharedValue = useSharedValue(0);
   const [newUserName, setNewUserName] = useState('');
   const [error, setError] = useState<ReactNode[] | string | undefined>(
     undefined,
@@ -111,35 +104,6 @@ const HomeBottomSheetPopupPanel = ({
     setError(undefined);
     setNewUserName('');
   }, []);
-
-  const resetPopupStateWl = useCallback(() => {
-    'worklet';
-    currentPageSharedValue.value = 0;
-    runOnJS(resetPopupState)();
-  }, [currentPageSharedValue, resetPopupState]);
-
-  const opacityForPage = (pageIndex: number) => {
-    'worklet';
-    const opacity = withTiming(
-      currentPageSharedValue.value === pageIndex ? 1 : 0,
-      {
-        duration: animationDuration,
-      },
-    );
-    return { opacity };
-  };
-
-  const animatedStylePage0 = useAnimatedStyle(() => {
-    return opacityForPage(0);
-  });
-
-  const animatedStylePage1 = useAnimatedStyle(() => {
-    return opacityForPage(1);
-  });
-
-  const animatedStylePage2 = useAnimatedStyle(() => {
-    return opacityForPage(2);
-  });
 
   const onLinkUrlChanged = (url: string) => {
     setNewUserName(url);
@@ -214,7 +178,6 @@ const HomeBottomSheetPopupPanel = ({
   const onNextPageRequested = useCallback(() => {
     if (currentPage < 2) {
       const nextPage = currentPage + 1;
-      currentPageSharedValue.value = nextPage;
       setCurrentPage(nextPage);
     }
     if (currentPage === 2) {
@@ -277,43 +240,30 @@ const HomeBottomSheetPopupPanel = ({
   }, [
     commitUserName,
     currentPage,
-    currentPageSharedValue,
     newUserName,
     profileInfo,
     refreshQuery,
     setTooltipedWebcard,
   ]);
 
-  const keyboardHeight = useKeyboardHeight();
-
-  const containerHeight = useAnimatedStyle(() => {
-    if (currentPage === 2) {
-      return {
-        height: withTiming(353, { duration: 500 }),
-        transform: [
-          {
-            translateY: -keyboardHeight.value / 2,
-          },
-        ],
-      };
-    } else {
-      return { height: 458 };
-    }
-  });
   const colorScheme = useColorScheme();
 
   return (
     <BottomSheetPopup
       animationDuration={animationDuration}
       visible={visible}
-      onFadeOutFinish={resetPopupStateWl}
+      onFadeOutFinish={resetPopupState}
       isAnimatedContent
     >
-      <Animated.View style={[styles.container, containerHeight]}>
-        <View style={styles.pageContainer}>
+      <View style={styles.container}>
+        <View>
           {/* Page 0 */}
-          <Animated.View style={[animatedStylePage0, styles.page]}>
-            {currentPage === 0 ? (
+          {currentPage === 0 && (
+            <Animated.View
+              style={styles.page}
+              entering={FadeIn}
+              exiting={FadeOut}
+            >
               <Video
                 style={styles.illustration}
                 isLooping
@@ -326,25 +276,29 @@ const HomeBottomSheetPopupPanel = ({
                     : require('#assets/hint_1_light_ae.mp4')
                 }
               />
-            ) : undefined}
-            <Text variant="large" style={styles.descriptionTextContainer}>
-              <FormattedMessage
-                defaultMessage="Congratulations!
+              <Text variant="large" style={styles.descriptionTextContainer}>
+                <FormattedMessage
+                  defaultMessage="Congratulations!
 Your contactCard is ready
 to be shared!"
-                description="Congratulation label after sucessfull contact card creation"
-              />
-            </Text>
-            <Text variant="medium" style={styles.descriptionTextContainer}>
-              <FormattedMessage
-                defaultMessage="Use the bottom menu to easily share your contact information"
-                description="Congratulation label after sucessfull contact card creation"
-              />
-            </Text>
-          </Animated.View>
+                  description="Congratulation label after sucessfull contact card creation"
+                />
+              </Text>
+              <Text variant="medium" style={styles.descriptionTextContainer}>
+                <FormattedMessage
+                  defaultMessage="Use the bottom menu to easily share your contact information"
+                  description="Congratulation label after sucessfull contact card creation"
+                />
+              </Text>
+            </Animated.View>
+          )}
           {/* Page 1 */}
-          <Animated.View style={[animatedStylePage1, styles.page]}>
-            {currentPage === 1 ? (
+          {currentPage === 1 && (
+            <Animated.View
+              style={styles.page}
+              entering={FadeIn}
+              exiting={FadeOut}
+            >
               <Video
                 style={styles.illustration}
                 isLooping
@@ -357,64 +311,70 @@ to be shared!"
                     : require('#assets/hint_2_light_ae.mp4')
                 }
               />
-            ) : undefined}
-            <Text variant="large" style={styles.descriptionTextContainer}>
-              <FormattedMessage
-                defaultMessage="Instantly share your ContactCard information with the “Shake & Share”!"
-                description="Congratulation label after sucessfull contact card creation"
-              />
-            </Text>
-            <Text variant="medium" style={styles.descriptionTextContainer}>
-              <FormattedMessage
-                defaultMessage="Shake your phone to instantly share your contact information."
-                description="Congratulation label after sucessfull contact card creation"
-              />
-            </Text>
-          </Animated.View>
+              <Text variant="large" style={styles.descriptionTextContainer}>
+                <FormattedMessage
+                  defaultMessage="Instantly share your ContactCard information with the “Shake & Share”!"
+                  description="Congratulation label after sucessfull contact card creation"
+                />
+              </Text>
+              <Text variant="medium" style={styles.descriptionTextContainer}>
+                <FormattedMessage
+                  defaultMessage="Shake your phone to instantly share your contact information."
+                  description="Congratulation label after sucessfull contact card creation"
+                />
+              </Text>
+            </Animated.View>
+          )}
 
           {/* Page 2 */}
-          <Animated.View style={[animatedStylePage2, styles.page]}>
-            <Text variant="large" style={styles.topDescriptionTextContainer}>
-              <FormattedMessage
-                defaultMessage="Choose your azzapp url"
-                description="Congratulation label after sucessfull contact card creation"
-              />
-            </Text>
-            <Text variant="medium" style={styles.descriptionTextContainer}>
-              <FormattedMessage
-                defaultMessage="Every card comes with a short Website. Claim your free azzapp url, you can modify it later"
-                description="Congratulation label after sucessfull contact card creation"
-              />
-            </Text>
-            <View style={styles.linkInput}>
-              <TextInput
-                defaultValue={newUserName}
-                onChangeText={onLinkUrlChanged}
-                autoCapitalize="none"
-                autoCorrect={false}
-                isErrored={!!error}
-                onEndEditing={onNextPageRequested}
-                returnKeyType="done"
-              />
-              {/* keeping an empty <text> avoid bottom text to jump */}
-              <Text variant="error">{error || ' '}</Text>
-            </View>
-            <View style={styles.urlContainer}>
-              <Icon
-                icon={error ? 'closeFull' : 'check_filled'}
-                style={{
-                  tintColor: error ? colors.red400 : colors.green,
-                }}
-              />
-
-              <Text
-                variant="medium"
-                style={[styles.urlText, error && styles.errorStyle]}
-              >
-                {`azzapp.com/${newUserName}`}
+          {currentPage === 2 && (
+            <Animated.View
+              style={styles.page}
+              entering={FadeIn}
+              exiting={FadeOut}
+            >
+              <Text variant="large" style={styles.topDescriptionTextContainer}>
+                <FormattedMessage
+                  defaultMessage="Choose your azzapp url"
+                  description="Congratulation label after sucessfull contact card creation"
+                />
               </Text>
-            </View>
-          </Animated.View>
+              <Text variant="medium" style={styles.descriptionTextContainer}>
+                <FormattedMessage
+                  defaultMessage="Every card comes with a short Website. Claim your free azzapp url, you can modify it later"
+                  description="Congratulation label after sucessfull contact card creation"
+                />
+              </Text>
+              <View style={styles.linkInput}>
+                <BottomSheetTextInput
+                  defaultValue={newUserName}
+                  onChangeText={onLinkUrlChanged}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  isErrored={!!error}
+                  onEndEditing={onNextPageRequested}
+                  returnKeyType="done"
+                />
+                {/* keeping an empty <text> avoid bottom text to jump */}
+                <Text variant="error">{error || ' '}</Text>
+              </View>
+              <View style={styles.urlContainer}>
+                <Icon
+                  icon={error ? 'closeFull' : 'check_filled'}
+                  style={{
+                    tintColor: error ? colors.red400 : colors.green,
+                  }}
+                />
+
+                <Text
+                  variant="medium"
+                  style={[styles.urlText, error && styles.errorStyle]}
+                >
+                  {`azzapp.com/${newUserName}`}
+                </Text>
+              </View>
+            </Animated.View>
+          )}
         </View>
         <View style={styles.progress}>
           <PageProgress nbPages={3} currentPage={currentPage} />
@@ -437,7 +397,7 @@ to be shared!"
             }
           />
         </View>
-      </Animated.View>
+      </View>
     </BottomSheetPopup>
   );
 };
@@ -464,8 +424,7 @@ const stylesheet = createStyleSheet(theme => ({
     height: 200,
     borderRadius: 12,
   },
-  pageContainer: { flex: 1 },
-  page: { top: 0, position: 'absolute', width: '100%' },
+  page: { width: '100%' },
   progress: {
     paddingVertical: 10,
     height: 25,
