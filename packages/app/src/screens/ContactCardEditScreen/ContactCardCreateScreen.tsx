@@ -414,7 +414,7 @@ const ContactCardCreateScreen = () => {
           <PopupButton
             onPress={hidePopup}
             text={intl.formatMessage({
-              defaultMessage: 'Next',
+              defaultMessage: 'Ok, continue',
               description: 'Creare contact card screen / next buton on popup',
             })}
           />
