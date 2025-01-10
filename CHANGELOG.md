@@ -1,5 +1,6 @@
-## 1.6.1-canary.19
+## 1.6.1-canary.20
 
+* **fix:**  - [#6556](https://github.com/AzzappApp/azzapp/pull/6556) simplify file management ([#6715](https://github.com/AzzappApp/azzapp/pull/6715))
 * **fix:**  - widget skd17 minimal version
 * **feat:**  - force widget minimum os deployment to 16
 * **fix:**  - testflight
