@@ -1,5 +1,6 @@
-## 1.6.1-canary.20
+## 1.6.1-canary.21
 
+* **fix:**  - forbid follow, like and post when cover is predefined and display popup accordingly ([#6818](https://github.com/AzzappApp/azzapp/pull/6818))
 * **fix:**  - [#6556](https://github.com/AzzappApp/azzapp/pull/6556) simplify file management ([#6715](https://github.com/AzzappApp/azzapp/pull/6715))
 * **fix:**  - widget skd17 minimal version
 * **feat:**  - force widget minimum os deployment to 16
