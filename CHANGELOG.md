@@ -1,5 +1,6 @@
-## 1.6.1-canary.17
+## 1.6.1-canary.18
 
+* **feat:**  - force widget minimum os deployment to 16
 * **fix:**  - testflight
 * **fix:**  - widget entitlement
 * **fix:**  - wrong mobile provision
