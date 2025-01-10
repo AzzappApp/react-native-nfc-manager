@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/react-native';
+import { Paths, File, Directory } from 'expo-file-system/next';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
@@ -8,7 +9,6 @@ import {
   Platform,
   Alert,
 } from 'react-native';
-import ReactNativeBlobUtil from 'react-native-blob-util';
 import ShareCommand from 'react-native-share';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
@@ -92,6 +92,7 @@ const WebCardMenu = ({
         cardIsPublished
         coverMedia {
           __typename
+          id
           uriDownload: uri
         }
         WebCardMenu_isFollowing: isFollowing(webCardId: $viewerWebCardId)
@@ -158,41 +159,41 @@ const WebCardMenu = ({
       return;
     }
     setCoverVideoLoading(true);
-    let localPath;
+    let file;
     try {
       //download the coverurl locally
-      const dirs = ReactNativeBlobUtil.fs.dirs;
+      const directory = new Directory(
+        `${Paths.cache.uri}/${webCard.coverMedia.id}`,
+      );
+      if (!directory.exists) {
+        directory.create();
+      }
+      const filePath = `${directory.uri}/${webCard.userName}.mp4`;
+      file = new File(filePath);
 
-      const stateFullPromise = ReactNativeBlobUtil.config({
-        fileCache: true,
-        path: `${dirs.CacheDir}/${webCard.userName}.${webCard.coverMedia.__typename === 'MediaVideo' ? 'mp4' : 'png'}`,
-      }).fetch('GET', webCard.coverMedia.uriDownload);
-      cancelCoverVideoDownloadRef.current = () => {
-        stateFullPromise.cancel();
-      };
-
-      localPath = await stateFullPromise;
+      if (!file.exists) {
+        await File.downloadFileAsync(webCard.coverMedia.uriDownload, file);
+      }
     } catch (error) {
       console.warn('error during cover sharing', error);
-      if (!(error instanceof ReactNativeBlobUtil.CanceledFetchError)) {
-        Toast.show({
-          type: 'error',
-          text1: intl.formatMessage({
-            defaultMessage: 'Error while downloading the media',
-            description:
-              'Error toast message when downloading the media fails during the video share',
-          }),
-        });
-      }
+
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage({
+          defaultMessage: 'Error while downloading the media',
+          description:
+            'Error toast message when downloading the media fails during the video share',
+        }),
+      });
+
       return;
     } finally {
-      cancelCoverVideoDownloadRef.current = null;
       setCoverVideoLoading(false);
     }
 
     try {
       await ShareCommand.open({
-        url: `file://${localPath.path()}`,
+        url: file?.uri,
         type:
           webCard.coverMedia.__typename === 'MediaVideo'
             ? 'video/mp4'
@@ -210,11 +211,12 @@ const WebCardMenu = ({
       });
     }
   }, [
-    intl,
-    coverVideoLoading,
-    webCard.coverMedia?.__typename,
     webCard.coverMedia?.uriDownload,
+    webCard.coverMedia?.id,
+    webCard.coverMedia?.__typename,
     webCard.userName,
+    coverVideoLoading,
+    intl,
   ]);
 
   useEffect(() => {

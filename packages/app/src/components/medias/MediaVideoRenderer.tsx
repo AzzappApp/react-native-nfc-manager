@@ -15,7 +15,7 @@ import {
   captureSnapshot,
   SnapshotRenderer,
 } from '@azzapp/react-native-snapshot-view';
-import { useLocalCachedMediaFile } from '#helpers/mediaHelpers/remoteMediaCache';
+import { getLocalCachedMediaFile } from '#helpers/mediaHelpers/remoteMediaCache';
 import { DelayedActivityIndicator } from '#ui/ActivityIndicator/ActivityIndicator';
 import MediaImageRenderer from './MediaImageRenderer';
 import type { AVPlaybackStatus } from 'expo-av';
@@ -117,7 +117,7 @@ const MediaVideoRenderer = (
   const isReadyForDisplay = useRef(false);
   const sourceRef = useRef(source);
   const [loading, setLoading] = useState(true);
-  const localVideoFile = useLocalCachedMediaFile(source.mediaId, 'video');
+  const localVideoFile = getLocalCachedMediaFile(source.mediaId, 'video');
   const [snapshotID, setSnapshotID] = useState(() =>
     useAnimationSnapshot ? (_videoSnapshots.get(source.mediaId) ?? null) : null,
   );

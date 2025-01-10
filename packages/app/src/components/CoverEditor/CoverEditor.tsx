@@ -525,13 +525,10 @@ const CoverEditorCore = (
         if (media.kind === 'image') {
           const path = getCoverLocalMediaPath(localFilenames[media.id]);
           const scale = imagesScales[media.id] ?? 1;
-          const { key, promise } = NativeTextureLoader.loadImage(
-            `file://${path}`,
-            {
-              width: media.width * scale,
-              height: media.height * scale,
-            },
-          );
+          const { key, promise } = NativeTextureLoader.loadImage(path, {
+            width: media.width * scale,
+            height: media.height * scale,
+          });
 
           const buffer = await promise;
           if (canceled) {

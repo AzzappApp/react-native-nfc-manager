@@ -464,7 +464,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
         const fileName = getFileName(updateImage.uri);
         const file: any = {
           name: fileName,
-          uri: `file://${updateImage.uri}`,
+          uri: updateImage.uri,
           type: 'image/jpeg',
         };
 

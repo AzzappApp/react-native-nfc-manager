@@ -6,11 +6,10 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { AppState, Platform, View, useWindowDimensions } from 'react-native';
-import ReactNativeBlobUtil from 'react-native-blob-util';
 import { openPhotoPicker, openSettings } from 'react-native-permissions';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { getImageSize, getVideoSize } from '#helpers/mediaHelpers';
+import { getFilePath, getImageSize, getVideoSize } from '#helpers/mediaHelpers';
 import { usePermissionContext } from '#helpers/PermissionContext';
 import useToggle from '#hooks/useToggle';
 import BottomSheetModal from '#ui/BottomSheetModal';
@@ -184,10 +183,7 @@ const PhotoGalleryMediaList = ({
         );
         uri = fileData.node.image.filepath?.split('#')[0] ?? null; //react-native-skia-video does not support uri with #
       } else if (Platform.OS === 'android') {
-        const fileData = await ReactNativeBlobUtil.fs.stat(
-          asset.node.image.uri,
-        );
-        uri = `file://${fileData.path}`;
+        uri = await getFilePath(asset.node.image.uri);
       }
 
       if (uri == null) {

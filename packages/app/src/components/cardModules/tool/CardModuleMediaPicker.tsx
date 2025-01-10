@@ -210,7 +210,7 @@ const CardModuleMediaPicker = ({
                 ...cardModuleMedia,
                 media: {
                   ...cardModuleMedia.media,
-                  uri: `file://${MODULES_CACHE_DIR}/${fileName}`,
+                  uri: `${MODULES_CACHE_DIR}/${fileName}`,
                 },
               };
             } catch {

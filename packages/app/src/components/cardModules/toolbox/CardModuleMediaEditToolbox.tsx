@@ -3,6 +3,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { colors } from '#theme';
 import { MediaImageRenderer } from '#components/medias';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { isFileURL } from '#helpers/fileHelpers';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import { TOOLBOX_SECTION_HEIGHT } from '../../Toolbar/ToolBoxSection';
@@ -55,7 +56,7 @@ const CardModuleMediaEditToolbox = <T extends ModuleKindAndVariant>({
           cardModuleMedia={cardModuleMedia}
         />
         {/* show only the editor if the media is local, need to find a better proper way */}
-        {cardModuleMedia.media?.uri?.startsWith('file://') && (
+        {isFileURL(cardModuleMedia.media?.uri) && (
           <CardModuleMediaEditorTool
             cardModuleMedia={cardModuleMedia}
             onFinish={onUpdateMedia}

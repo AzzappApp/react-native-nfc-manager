@@ -124,7 +124,6 @@
     "react-native": "patch:react-native@npm%3A0.76.2#~/.yarn/patches/react-native-npm-0.76.2-66144a2c92.patch",
     "react-native-animateable-text": "^0.14.2",
     "react-native-blob-jsi-helper": "^0.3.1",
-    "react-native-blob-util": "^0.21.2",
     "react-native-bootsplash": "^6.3.2",
     "react-native-compressor": "^1.10.3",
     "react-native-confirmation-code-field": "^7.4.0",

@@ -1578,27 +1578,6 @@ PODS:
   - react-native-blob-jsi-helper (0.3.1):
     - React
     - React-Core
-  - react-native-blob-util (0.21.2):
-    - DoubleConversion
-    - glog
-    - hermes-engine
-    - RCT-Folly (= 2024.01.01.00)
-    - RCTRequired
-    - RCTTypeSafety
-    - React-Core
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-ImageManager
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-rendererdebug
-    - React-utils
-    - ReactCodegen
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
-    - Yoga
   - react-native-cameraroll (7.9.0):
     - DoubleConversion
     - glog
@@ -2322,8 +2301,6 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNReactNativeSharedGroupPreferences (1.1.24):
-    - React
   - RNReanimated (3.16.6):
     - DoubleConversion
     - glog
@@ -2628,7 +2605,6 @@ DEPENDENCIES:
   - React-microtasksnativemodule (from `../../../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
   - react-native-animateable-text (from `../../../node_modules/react-native-animateable-text`)
   - react-native-blob-jsi-helper (from `../../../node_modules/react-native-blob-jsi-helper`)
-  - react-native-blob-util (from `../../../node_modules/react-native-blob-util`)
   - "react-native-cameraroll (from `../../../node_modules/@react-native-camera-roll/camera-roll`)"
   - react-native-compressor (from `../../../node_modules/react-native-compressor`)
   - react-native-keyboard-controller (from `../../../node_modules/react-native-keyboard-controller`)
@@ -2682,7 +2658,6 @@ DEPENDENCIES:
   - RNPermissions (from `../../../node_modules/react-native-permissions`)
   - RNPurchases (from `../../../node_modules/react-native-purchases`)
   - RNReactNativeHapticFeedback (from `../../../node_modules/react-native-haptic-feedback`)
-  - RNReactNativeSharedGroupPreferences (from `../../../node_modules/react-native-shared-group-preferences`)
   - RNReanimated (from `../../../node_modules/react-native-reanimated`)
   - RNScreens (from `../../../node_modules/react-native-screens`)
   - "RNSentry (from `../../../node_modules/@sentry/react-native`)"
@@ -2836,8 +2811,6 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-animateable-text"
   react-native-blob-jsi-helper:
     :path: "../../../node_modules/react-native-blob-jsi-helper"
-  react-native-blob-util:
-    :path: "../../../node_modules/react-native-blob-util"
   react-native-cameraroll:
     :path: "../../../node_modules/@react-native-camera-roll/camera-roll"
   react-native-compressor:
@@ -2944,8 +2917,6 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-purchases"
   RNReactNativeHapticFeedback:
     :path: "../../../node_modules/react-native-haptic-feedback"
-  RNReactNativeSharedGroupPreferences:
-    :path: "../../../node_modules/react-native-shared-group-preferences"
   RNReanimated:
     :path: "../../../node_modules/react-native-reanimated"
   RNScreens:
@@ -3037,7 +3008,6 @@ SPEC CHECKSUMS:
   React-microtasksnativemodule: f30949ee318ba90b9668de1e325b98838b9a4da2
   react-native-animateable-text: 48701de46a35cec80b7e9f2667dc57cf8df8ecf3
   react-native-blob-jsi-helper: 7f1c5d79efc2b7c88c835648ac7d58514f3b70bc
-  react-native-blob-util: 5c9cd69d650932ed699ed51fe026a55aeb070bca
   react-native-cameraroll: 31e39d303319ba20657808f33104afa9d52d83aa
   react-native-compressor: 3cb81b878bb4df31cac23477b0835214c10a46bb
   react-native-keyboard-controller: ca83b0d28acc8cb5b46bd4de2a9a6067e13d4fff
@@ -3048,7 +3018,7 @@ SPEC CHECKSUMS:
   react-native-quick-base64: 580797392fd44fab9721fcb3d6f3fc4e40bf7351
   react-native-safe-area-context: f145b8906585d648f9f9c7dfa3885bac54f38fcc
   react-native-skia: 1ecbb580a78147a6fb71169a96b87a0c14f5448f
-  react-native-skottie-template-player: dcda4911f0b2d28073e593fdac0d66bec8d83f2e
+  react-native-skottie-template-player: c880186835dc6aa628997fae91e73f888afe6173
   react-native-webview: 2ae666ce72cfd3c38d8750c2009f5caa621d709f
   React-nativeconfig: 470fce6d871c02dc5eff250a362d56391b7f52d6
   React-NativeModulesApple: 1586448c61a7c2bd4040cc03ccde66a72037e77e
@@ -3092,7 +3062,6 @@ SPEC CHECKSUMS:
   RNPermissions: 3962d3e9d18ee408b75d2c38b04120f8af4fe940
   RNPurchases: a8ab3d5abe8f58899f9eb6f1a321598ee5f77e70
   RNReactNativeHapticFeedback: 8397b76d1ca8d3336545ce8bc8723e3b6cb551eb
-  RNReactNativeSharedGroupPreferences: d4869af3c7757405b6b5ac633d0ef5f9886a9be7
   RNReanimated: 270e2df37d3a18e8270a9c461d9f90a374a97d04
   RNScreens: 351f431ef2a042a1887d4d90e1c1024b8ae9d123
   RNSentry: a70bb556e187f9e6de6370488f062353351a1b1d
@@ -3105,8 +3074,8 @@ SPEC CHECKSUMS:
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   SPTPersistentCache: df36ea46762d7cf026502bbb86a8b79d0080dff4
   VisionCamera: 3cc88e34bf7425b36b27f23af3eae1d3812a75e3
-  Yoga: c5b0e913b5b3b4cde588227c1402e747797061f3
+  Yoga: 96872ee462cfc43866ad013c8160d4ff6b85709b
 
 PODFILE CHECKSUM: 8b1082a96e754e1d604aa2041d2a2dbe70c3dfcb
 
-COCOAPODS: 1.16.1
+COCOAPODS: 1.16.2

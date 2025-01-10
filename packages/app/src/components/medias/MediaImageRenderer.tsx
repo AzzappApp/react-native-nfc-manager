@@ -15,7 +15,7 @@ import {
   captureSnapshot,
   SnapshotRenderer,
 } from '@azzapp/react-native-snapshot-view';
-import { useLocalCachedMediaFile } from '#helpers/mediaHelpers/remoteMediaCache';
+import { getLocalCachedMediaFile } from '#helpers/mediaHelpers/remoteMediaCache';
 import type { ImageContentFit, ImageErrorEventData } from 'expo-image';
 import type { ForwardedRef } from 'react';
 import type { ViewProps } from 'react-native';
@@ -98,7 +98,7 @@ const MediaImageRenderer = (
 ) => {
   const isReady = useRef(false);
   const sourceRef = useRef(source);
-  const localFile = useLocalCachedMediaFile(source.mediaId, 'image');
+  const localFile = getLocalCachedMediaFile(source.mediaId, 'image');
   const [snapshotID, setSnapshotID] = useState(() =>
     useAnimationSnapshot ? (_imageSnapshots.get(source.mediaId) ?? null) : null,
   );

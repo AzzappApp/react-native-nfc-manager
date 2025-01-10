@@ -375,7 +375,7 @@ const createCoverMedia = async (
     const lottieInfo = extractLottieInfoMemoized(lottie);
     await exportVideoComposition({
       videoComposition: composition,
-      outPath,
+      outPath: outPath.replace('file://', ''),
       ...encoderConfigs,
       drawFrame: infos => {
         'worklet';
@@ -397,7 +397,6 @@ const createCoverMedia = async (
         progressCallback({ framesCompleted, nbFrames });
       },
     });
-    outPath = `file://${outPath}`;
     skottiePlayer?.dispose();
   }
 

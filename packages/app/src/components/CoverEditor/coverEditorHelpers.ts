@@ -355,5 +355,5 @@ export const getMediaWithLocalFile = <T extends SourceMedia>(
   localFilenames: Record<string, string>,
 ) => ({
   ...media,
-  uri: `file://${getCoverLocalMediaPath(localFilenames[media.id])}`,
+  uri: getCoverLocalMediaPath(localFilenames[media.id]),
 });

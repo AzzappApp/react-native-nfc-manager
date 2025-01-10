@@ -45,6 +45,12 @@ class MediaHelpers: NSObject {
       }
     }
   }
+
+
+  @objc
+  func getFilePath(_ uri: NSURL, resolve: @escaping RCTPromiseResolveBlock, reject:  @escaping RCTPromiseRejectBlock) {
+    resolve(uri);
+  }
   
 }
 

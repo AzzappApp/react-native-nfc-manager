@@ -190,7 +190,6 @@ __metadata:
     react-native: "patch:react-native@npm%3A0.76.2#~/.yarn/patches/react-native-npm-0.76.2-66144a2c92.patch"
     react-native-animateable-text: "npm:^0.14.2"
     react-native-blob-jsi-helper: "npm:^0.3.1"
-    react-native-blob-util: "npm:^0.21.2"
     react-native-bootsplash: "npm:^6.3.2"
     react-native-bundle-visualizer: "npm:^3.1.3"
     react-native-compressor: "npm:^1.10.3"
@@ -13123,13 +13122,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"base-64@npm:0.1.0":
-  version: 0.1.0
-  resolution: "base-64@npm:0.1.0"
-  checksum: 10/5a42938f82372ab5392cbacc85a5a78115cbbd9dbef9f7540fa47d78763a3a8bd7d598475f0d92341f66285afd377509851a9bb5c67bbecb89686e9255d5b3eb
-  languageName: node
-  linkType: hard
-
 "base64-js@npm:^1.2.3, base64-js@npm:^1.3.0, base64-js@npm:^1.3.1, base64-js@npm:^1.5.1":
   version: 1.5.1
   resolution: "base64-js@npm:1.5.1"
@@ -23383,19 +23375,6 @@ __metadata:
     react: "*"
     react-native: ">=0.71.0"
   checksum: 10/c9a5be191731093a58a2dd69feaf17f65e88f2b64422f9ef37762edaf2f96bff0a86a38b065e6ec29a7130e360dede1cfd0660322f8be3904c7407e2e670cf79
-  languageName: node
-  linkType: hard
-
-"react-native-blob-util@npm:^0.21.2":
-  version: 0.21.2
-  resolution: "react-native-blob-util@npm:0.21.2"
-  dependencies:
-    base-64: "npm:0.1.0"
-    glob: "npm:^10.3.10"
-  peerDependencies:
-    react: "*"
-    react-native: "*"
-  checksum: 10/8ef768e795edaf7a02eaf84be47adf1461294cd8e9a91f5a015625d2bd1759bb2b2b1203deac065771c49f9a592874953528831dfbae8553056389deb74afc81
   languageName: node
   linkType: hard
 

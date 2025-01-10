@@ -354,7 +354,7 @@ const HorizontalPhotoEditionScreen = ({
         const fileName = getFileName(updateMedia.uri);
         const file: any = {
           name: fileName,
-          uri: `file://${updateMedia.uri}`,
+          uri: updateMedia.uri,
           type: 'image/jpeg',
         };
 

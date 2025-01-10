@@ -2,6 +2,9 @@ package com.azzapp.media
 
 import android.media.MediaMetadataRetriever
 import android.net.Uri
+import android.content.ContentResolver
+import android.database.Cursor
+import android.provider.MediaStore
 import com.azzapp.MainApplication.Companion.getMainApplicationContext
 import com.facebook.react.bridge.*
 
@@ -60,5 +63,38 @@ class MediaHelpers(private val reactContext: ReactApplicationContext) :
     map.putInt("height", height);
     map.putInt("rotation", rotation);
     promise.resolve(map)
+  }
+
+
+  @ReactMethod
+  fun getFilePath(contentUri: String, promise: Promise) {
+      try {
+          val uri = Uri.parse(contentUri)
+          if (uri.scheme == "content") {
+              val filePath = getRealPathFromUri(uri)
+              if (filePath != null) {
+                  promise.resolve("file://$filePath")
+              } else {
+                  promise.reject("NO_PATH", "Could not resolve file path from URI")
+              }
+          } else {
+              promise.resolve(contentUri)
+          }
+      } catch (e: Exception) {
+          promise.reject("ERROR", e.message, e)
+      }
+  }
+
+  private fun getRealPathFromUri(uri: Uri): String? {
+      val projection = arrayOf(MediaStore.MediaColumns.DATA)
+      val contentResolver: ContentResolver = reactApplicationContext.contentResolver
+      val cursor: Cursor? = contentResolver.query(uri, projection, null, null, null)
+      cursor?.use {
+          if (it.moveToFirst()) {
+              val columnIndex = it.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA)
+              return it.getString(columnIndex)
+          }
+      }
+      return null
   }
 }

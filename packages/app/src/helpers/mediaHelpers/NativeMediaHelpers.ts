@@ -17,6 +17,9 @@ export const getVideoSize: (
 ) => Promise<{ width: number; height: number; rotation: number }> =
   AZPMediaHelpers.getVideoSize;
 
+export const getFilePath: (uri: string) => Promise<string> =
+  AZPMediaHelpers.getFilePath;
+
 /**
  * Prefetches an image.
  * returns an observable that will complete when the prefetch is done.

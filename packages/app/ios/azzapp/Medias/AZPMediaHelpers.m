@@ -17,4 +17,10 @@ RCT_EXTERN_METHOD(
   reject:(RCTPromiseRejectBlock)reject
 )
 
+RCT_EXTERN_METHOD(
+  getFilePath:(NSURL *)uri
+  resolve:(RCTPromiseResolveBlock)resolve
+  reject:(RCTPromiseRejectBlock)reject
+)
+
 @end
