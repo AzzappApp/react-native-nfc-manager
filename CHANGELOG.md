@@ -1,5 +1,6 @@
-## 1.6.1-canary.18
+## 1.6.1-canary.19
 
+* **fix:**  - widget skd17 minimal version
 * **feat:**  - force widget minimum os deployment to 16
 * **fix:**  - testflight
 * **fix:**  - widget entitlement
