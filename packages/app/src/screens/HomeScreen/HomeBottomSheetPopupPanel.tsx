@@ -180,7 +180,7 @@ const HomeBottomSheetPopupPanel = ({
       const nextPage = currentPage + 1;
       setCurrentPage(nextPage);
     }
-    if (currentPage === 2) {
+    if (currentPage === 2 && isValidUserName(newUserName)) {
       commitUserName({
         variables: {
           webCardId: profileInfo?.webCardId,
@@ -381,6 +381,7 @@ to be shared!"
         </View>
         <View style={styles.buttonContainer}>
           <PopupButton
+            disabled={!!error}
             onPress={onNextPageRequested}
             text={
               currentPage === 2
