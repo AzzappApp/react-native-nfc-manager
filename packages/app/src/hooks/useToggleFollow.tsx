@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import Toast from 'react-native-toast-message';
 import { useMutation, graphql, ConnectionHandler } from 'react-relay';
+import ERRORS from '@azzapp/shared/errors';
 import { getAuthState } from '#helpers/authStore';
 import Text from '#ui/Text';
 import type {
@@ -188,18 +189,33 @@ const useToggleFollow = (userNameFilter?: string) => {
             userNameFilter,
           ),
         onError(error) {
-          console.error(error);
-          Toast.show({
-            type: 'error',
-            text1: intl.formatMessage(
-              {
-                defaultMessage: 'Error, could not follow {userName}',
-                description:
-                  'Error toast message when we could not follow a user',
-              },
-              { userName },
-            ),
-          });
+          if (error.message === ERRORS.WEBCARD_NO_COVER) {
+            Toast.show({
+              type: 'error',
+              text1: intl.formatMessage(
+                {
+                  defaultMessage:
+                    "Error, could not follow {userName} as you didn't configure cover",
+                  description:
+                    'Error toast message when we could not follow a user because cover is not configured',
+                },
+                { userName },
+              ),
+            });
+          } else {
+            console.error(error);
+            Toast.show({
+              type: 'error',
+              text1: intl.formatMessage(
+                {
+                  defaultMessage: 'Error, could not follow {userName}',
+                  description:
+                    'Error toast message when we could not follow a user',
+                },
+                { userName },
+              ),
+            });
+          }
         },
       });
     },

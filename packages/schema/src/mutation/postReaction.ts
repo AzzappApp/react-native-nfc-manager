@@ -2,7 +2,10 @@ import { GraphQLError } from 'graphql';
 import { togglePostReaction } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { postLoader, webCardLoader } from '#loaders';
-import { checkWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
+import {
+  checkWebCardHasCover,
+  checkWebCardProfileEditorRight,
+} from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 
@@ -14,6 +17,7 @@ const togglePostReactionMutation: MutationResolvers['togglePostReaction'] =
     const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
 
     await checkWebCardProfileEditorRight(webCardId);
+    await checkWebCardHasCover(webCardId);
 
     const postId = fromGlobalIdWithType(gqlPostId, 'Post');
     const post = await postLoader.load(postId);

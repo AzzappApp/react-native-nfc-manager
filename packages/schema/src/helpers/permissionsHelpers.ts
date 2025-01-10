@@ -6,7 +6,7 @@ import {
   profileIsOwner,
 } from '@azzapp/shared/profileHelpers';
 import { getSessionInfos } from '#GraphQLContext';
-import { profileByWebCardIdAndUserIdLoader } from '#loaders';
+import { profileByWebCardIdAndUserIdLoader, webCardLoader } from '#loaders';
 
 export type ProtectedResolver<T> = {
   [P in Exclude<keyof T, '__isTypeOf'>]-?: T[P];
@@ -35,6 +35,13 @@ export const checkWebCardProfileEditorRight = async (webCardId: string) => {
         role: profile?.profileRole,
       },
     });
+  }
+};
+
+export const checkWebCardHasCover = async (webCardId: string) => {
+  const webCard = await webCardLoader.load(webCardId);
+  if (!webCard || webCard.coverIsPredefined) {
+    throw new GraphQLError(ERRORS.WEBCARD_NO_COVER);
   }
 };
 
