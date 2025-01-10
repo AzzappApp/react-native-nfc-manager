@@ -38,7 +38,6 @@ const WebCard = ({
   children,
   color,
   cardBackgroundColor,
-  lastModuleBackgroundColor,
   isShareBack,
   handleCloseDownloadVCard,
 }: Step1Props) => {
@@ -54,19 +53,6 @@ const WebCard = ({
   return (
     <>
       <div className={styles.wrapper}>
-        <div
-          className={styles.background}
-          style={{
-            background: `
-            linear-gradient(
-              180deg,
-              ${cardBackgroundColor} 0%,
-              ${cardBackgroundColor} 50%,
-              ${lastModuleBackgroundColor} 50%
-              )
-              `,
-          }}
-        />
         {posts.length > 0 && (
           <WebCardPostNavigation
             webCard={webCard}
@@ -82,7 +68,6 @@ const WebCard = ({
         )}
 
         <main
-          style={{ backgroundColor: cardBackgroundColor }}
           className={cn(styles.modules, {
             [styles.modulesBehind]: display === 'posts' && hasPosts,
             [styles.modulesWithPosts]: hasPosts && postsOpen,
@@ -142,6 +127,7 @@ const WebCard = ({
               display: 'flex',
               flexDirection: 'column',
               width: '100%',
+              backgroundColor: cardBackgroundColor,
             }}
           >
             {children}

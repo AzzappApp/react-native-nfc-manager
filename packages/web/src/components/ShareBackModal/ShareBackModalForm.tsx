@@ -264,16 +264,19 @@ const ShareBackFormSubmitButton = ({
 }: ShareBackFormSubmitButtonProps) => {
   const { pending } = useFormStatus();
 
+  const disabled = pending || hasErrors || !isDirty;
+
   return (
     <div className={styles.formButtonContainer}>
       <Button
         loading={pending}
         type="submit"
         variant="primary"
-        disabled={pending || isSuccess || hasErrors || !isDirty}
+        disabled={disabled || isSuccess}
         className={cx(
           styles.formButton,
           !isSuccess ? styles.formButtonSuccess : '',
+          disabled ? styles.formButtonDisabled : '',
         )}
       >
         {pending ? (

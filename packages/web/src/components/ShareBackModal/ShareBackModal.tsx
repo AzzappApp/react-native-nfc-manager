@@ -51,6 +51,7 @@ const ShareBackModal = forwardRef<ModalActions, ShareBackModalProps>(
           ref={internalRef}
           className={styles.shareBackModal}
           onClose={onClose}
+          disableClickOutside
         >
           <div className={cx(styles.header)}>
             <div className={styles.avatarContainer}>

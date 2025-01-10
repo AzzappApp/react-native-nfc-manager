@@ -34,47 +34,58 @@ const IosAddContactInfoModal = forwardRef<
     },
   }));
 
+  const { innerHeight: height } = window;
+
   return (
     <AppIntlProvider>
-      <Modal ref={internalRef} hideCloseButton>
+      <Modal ref={internalRef} hideCloseButton disableClickOutside>
         <div
           style={{
-            height: 432,
-            width: '100%',
-            background: `url('${important.src}')`,
-            backgroundSize: 'contain',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
+            display: 'flex',
+            flexDirection: 'column',
+            height: height - 80,
           }}
-        />
-        <div className={styles.bottomContainer}>
-          <span className={styles.title}>
-            {intl.formatMessage({
-              defaultMessage: 'Important!',
-              id: 'yUigRZ',
-              description:
-                'Important! label in ios add contact information modal',
-            })}
-          </span>
-          <span className={styles.subtitle}>
-            {intl.formatMessage({
-              defaultMessage: 'Click on « Create new contact »,not « Done »',
-              id: '7x5NHn',
-              description:
-                'informative label in ios add contact information modal',
-            })}
-          </span>
-          <LinkButton
-            size="medium"
-            onClick={onConfirm}
-            className={styles.buttonLink}
-          >
-            <FormattedMessage
-              defaultMessage="Create New Contact"
-              id="/1UtA8"
-              description="Save contact with AppClip modal message"
-            />
-          </LinkButton>
+        >
+          <div
+            style={{
+              flex: 1,
+              height: 'auto',
+              width: '100%',
+              background: `url('${important.src}')`,
+              backgroundSize: 'contain',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+            }}
+          />
+          <div className={styles.bottomContainer}>
+            <span className={styles.title}>
+              {intl.formatMessage({
+                defaultMessage: 'Important!',
+                id: 'yUigRZ',
+                description:
+                  'Important! label in ios add contact information modal',
+              })}
+            </span>
+            <span className={styles.subtitle}>
+              {intl.formatMessage({
+                defaultMessage: 'Click on « Create new contact »,not « Done »',
+                id: '7x5NHn',
+                description:
+                  'informative label in ios add contact information modal',
+              })}
+            </span>
+            <LinkButton
+              size="medium"
+              onClick={onConfirm}
+              className={styles.buttonLink}
+            >
+              <FormattedMessage
+                defaultMessage="Create new contact"
+                id="spJduZ"
+                description="Save contact with AppClip modal message"
+              />
+            </LinkButton>
+          </div>
         </div>
       </Modal>
     </AppIntlProvider>

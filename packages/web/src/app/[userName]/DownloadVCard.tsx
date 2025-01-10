@@ -241,8 +241,8 @@ const DownloadVCard = ({
             className={styles.buttonLink}
           >
             <FormattedMessage
-              defaultMessage="Create New Contact"
-              id="/1UtA8"
+              defaultMessage="Create new contact"
+              id="spJduZ"
               description="Save contact with AppClip modal message"
             />
           </LinkButton>
@@ -256,8 +256,8 @@ const DownloadVCard = ({
             onClick={handleClose}
           >
             <FormattedMessage
-              defaultMessage="Create New Contact"
-              id="p6Z8jQ"
+              defaultMessage="Create new contact"
+              id="ANfVcR"
               description="Download vCard modal message"
             />
           </DownloadVCardLinkButton>

@@ -19,6 +19,7 @@ import styles from './Modal.css';
 export type ModalProps = HTMLAttributes<HTMLDivElement> & {
   children: ReactNode;
   hideCloseButton?: boolean;
+  disableClickOutside?: boolean;
   onClose?: () => void;
 };
 
@@ -30,7 +31,14 @@ export type ModalActions = {
 // eslint-disable-next-line react/display-name
 const Modal = forwardRef(
   (props: ModalProps, ref: ForwardedRef<ModalActions>) => {
-    const { className, hideCloseButton, children, onClose, ...others } = props;
+    const {
+      className,
+      hideCloseButton,
+      disableClickOutside,
+      children,
+      onClose,
+      ...others
+    } = props;
     const classnames = cn(className, styles.modal);
 
     const [open, setOpen] = useState(false);
@@ -44,7 +52,11 @@ const Modal = forwardRef(
       }
     }, [onClose, open]);
 
-    const window = useOnClickOutside<HTMLDivElement>(handleClose);
+    const window = useOnClickOutside<HTMLDivElement>(() => {
+      if (!disableClickOutside) {
+        handleClose();
+      }
+    });
 
     useImperativeHandle(
       ref,

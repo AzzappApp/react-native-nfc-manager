@@ -37,7 +37,7 @@ const form = style({
   flex: 1,
   maxHeight: 'calc(100% - 310px)',
   overflowY: 'auto',
-  paddingBottom: 60,
+  paddingBottom: 70,
 });
 
 const formFieldContainer = style([
@@ -103,11 +103,14 @@ const formInput = style({
   width: '100%',
 });
 
-const formButtonSuccess = style({});
+const formButtonSuccess = style({ opacity: 1 });
+const formButtonDisabled = style({ opacity: 0.3 });
 const formButton = style({
-  margin: '25px auto 0',
   transition: 'all 400ms cubic-bezier(.47,1.64,.41,.8)',
-  border: 0,
+  backgroundColor: vars.color.grey1000,
+  borderRadius: 45,
+  border: `2px solid ${vars.color.black}`,
+  boxShadow: '0px 10px 10px 0px rgba(0, 0, 0, 0.20)',
   // mandatory to create an animation effect on the button width
   maxWidth: '325px',
   width: '80%',
@@ -121,7 +124,6 @@ const formButton = style({
       margin: '25px auto 0',
       backgroundColor: vars.color.green,
       border: `2px solid ${vars.color.green}`,
-      marginBottom: 20,
     },
   },
 });
@@ -184,6 +186,9 @@ const formButtonContainer = style({
   bottom: 0,
   display: 'flex',
   width: '100%',
+  justifyContent: 'center',
+  alignItems: 'center',
+  padding: '15px 0px',
 });
 
 const styles = {
@@ -196,6 +201,7 @@ const styles = {
   formInput,
   formButton,
   formButtonSuccess,
+  formButtonDisabled,
   formButtonLabel,
   formButtonSuccessContainer,
   formButtonSuccessSvg,

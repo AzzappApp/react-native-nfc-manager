@@ -36,6 +36,7 @@ const avatarContainer = style({
 const shareBackModal = style({
   marginTop: AVATAR_CONTAINER_TOP_POSITION,
   maxHeight: `calc(100% - ${AVATAR_CONTAINER_TOP_POSITION}px)`,
+  paddingBottom: 0,
 });
 
 const styles = {

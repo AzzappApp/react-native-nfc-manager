@@ -7,14 +7,6 @@ const wrapper = style({
   flexDirection: 'row',
 });
 
-const background = style({
-  position: 'absolute',
-  top: '0',
-  left: 0,
-  width: '100%',
-  height: '120vh',
-});
-
 const modules = style({
   transitionTimingFunction: 'ease-out',
   '@media': {
@@ -140,7 +132,9 @@ const coverContainer = style({
   display: 'flex',
   justifyContent: 'center',
   width: '100%',
-  borderRadius: 60,
+  borderRadius: 30,
+  borderBottomLeftRadius: 0,
+  borderBottomRightRadius: 0,
   '@media': {
     [MediaQuery.Desktop]: {
       backdropFilter: 'blur(15px)',
@@ -171,7 +165,6 @@ const header = style({
 
 const styles = {
   wrapper,
-  background,
   modules,
   posts,
   postsContent,

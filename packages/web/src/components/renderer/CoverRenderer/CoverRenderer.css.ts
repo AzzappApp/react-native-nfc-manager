@@ -50,7 +50,6 @@ const backgroundMedia = style({
     },
     [MediaQuery.Desktop]: {
       display: 'block',
-      height: '870px',
     },
   },
 });
