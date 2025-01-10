@@ -64,7 +64,8 @@ export const handleUploadCardModuleMedia = async (
 
   const mediaToUploads = await Promise.all(
     cardModuleMedias.map(async moduleMedia => {
-      const { media } = moduleMedia;
+      const { media: sourceMedia } = moduleMedia;
+      const media = { ...sourceMedia }; //copy to mutate uri
       //be sure the media need to be updated, and the uri is not online one
       if (
         moduleMedia.needDbUpdate &&

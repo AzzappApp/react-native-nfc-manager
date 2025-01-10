@@ -1,3 +1,4 @@
+import { Image } from 'expo-image';
 import { memo } from 'react';
 import { useDerivedValue } from 'react-native-reanimated';
 import TransformedImageRenderer from '#components/TransformedImageRenderer';
@@ -109,6 +110,30 @@ const ImageRender = ({
 }: ImageRenderProps) => {
   const { cropData, ...editionParameters } = media.editionParameters ?? {};
 
+  return media.filter ||
+    Object.entries(editionParameters).filter(([, value]) => value).length >
+      0 ? (
+    <ImageSkiaRender
+      media={media}
+      itemWidth={itemWidth}
+      itemHeight={itemHeight}
+      imageStyle={imageStyle}
+    />
+  ) : (
+    <Image
+      source={media}
+      style={{ width: itemWidth, height: itemHeight }}
+      contentFit="cover"
+    />
+  );
+};
+
+const ImageSkiaRender = ({
+  media,
+  itemWidth,
+  itemHeight,
+  imageStyle,
+}: ImageRenderProps) => {
   const textureInfo = useNativeTexture({
     uri: media?.uri,
     kind: media?.kind,
@@ -134,7 +159,7 @@ const ImageRender = ({
       filter={media.filter}
       imageStyle={imageStyle}
       editionParameters={{
-        ...editionParameters,
+        ...media.editionParameters,
         cropData: calculateCropData(media, itemWidth, itemHeight),
       }}
     />
