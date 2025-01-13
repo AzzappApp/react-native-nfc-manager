@@ -20,6 +20,7 @@ import useScreenInsets from '#hooks/useScreenInsets';
 import useCoverPlayPermission from '#screens/HomeScreen/useCoverPlayPermission';
 import WebCardEditScreen from '#screens/WebCardEditScreen/WebCardEditScreen';
 import ActivityIndicator from '#ui/ActivityIndicator';
+import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import ChildPositionAwareScrollView from '#ui/ChildPositionAwareScrollView';
 import FloatingIconButton from '#ui/FloatingIconButton';
 import WebCardBlockContainer from './WebCardBlockContainer';
@@ -209,6 +210,7 @@ const WebCardScreenContent = ({
         style={{ flex: 1 }}
         contentContainerStyle={{
           flexGrow: 1,
+          paddingBottom: BOTTOM_MENU_HEIGHT,
         }}
         contentInsetAdjustmentBehavior="never"
         scrollToOverflowEnabled
