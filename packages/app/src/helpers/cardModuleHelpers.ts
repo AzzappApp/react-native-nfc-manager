@@ -124,7 +124,7 @@ export const handleUploadCardModuleMedia = async (
                   editionParameters: media.editionParameters,
                   maxDecoderResolution: MODULE_VIDEO_MAX_WIDTH,
                 });
-                media.uri = localPath;
+                media.uri = `file://${localPath}`;
               } catch (e) {
                 Sentry.captureException(e);
                 console.error(e);
