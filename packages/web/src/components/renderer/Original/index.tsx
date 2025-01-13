@@ -1,6 +1,7 @@
 'use client';
 
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useMemo, useRef } from 'react';
+import useContainerWidth from '#hooks/useContainerWidth';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CloudinaryVideo from '#ui/CloudinaryVideo';
 import { AppearanceSliderContainer } from '../AppearanceSliderContainer';
@@ -22,25 +23,7 @@ const Original = ({
   cardStyle: CardStyle;
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [containerWidth, setContainerWidth] = useState<number>(0);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    const resizeObserver = new ResizeObserver(entries => {
-      for (const entry of entries) {
-        if (entry.target === container) {
-          setContainerWidth(entry.contentRect.width);
-        }
-      }
-    });
-    if (container) {
-      resizeObserver.observe(container);
-    }
-
-    return () => {
-      resizeObserver.disconnect();
-    };
-  }, []);
+  const containerWidth = useContainerWidth({ containerRef });
 
   return (
     <div

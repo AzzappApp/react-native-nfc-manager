@@ -1,6 +1,7 @@
 'use client';
 
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import useContainerWidth from '#hooks/useContainerWidth';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CloudinaryVideo from '#ui/CloudinaryVideo';
 import styles from './Parallax.css';
@@ -25,9 +26,7 @@ const Parallax = ({
   const [scrollY, setScrollY] = useState(0);
   const [viewportHeight, setViewportHeight] = useState(0);
   const [iOS, setiOS] = useState(false);
-  const [containerWidth, setContainerWidth] = useState<number | undefined>(
-    undefined,
-  );
+  const containerWidth = useContainerWidth({ containerRef });
 
   useEffect(() => {
     setiOS(/iPad|iPhone|iPod/.test(navigator.userAgent));
@@ -42,18 +41,6 @@ const Parallax = ({
       setViewportHeight(window.innerHeight); // Use innerHeight or a dynamic approach if needed
     };
 
-    const container = containerRef.current;
-    const resizeObserver = new ResizeObserver(entries => {
-      for (const entry of entries) {
-        if (entry.target === container) {
-          setContainerWidth(entry.contentRect.width);
-        }
-      }
-    });
-    if (container) {
-      resizeObserver.observe(container);
-    }
-
     handleScroll();
     handleResize();
     window.addEventListener('resize', handleResize);
@@ -62,7 +49,6 @@ const Parallax = ({
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('scroll', handleScroll);
-      resizeObserver.disconnect();
     };
   }, []);
 
