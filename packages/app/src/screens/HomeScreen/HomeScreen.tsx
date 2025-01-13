@@ -42,8 +42,6 @@ const HomeScreen = ({
   preloadedQuery,
   hasFocus,
   refreshQuery,
-  pausePolling,
-  resumePolling,
 }: RelayScreenProps<HomeRoute, HomeScreenQuery>) => {
   //we need to wait the initial screen to be load before doing any deep link
   useDeepLinkStoredRoute();
@@ -90,8 +88,6 @@ const HomeScreen = ({
             user={currentUser}
             selectListRef={ref}
             refreshQuery={refreshQuery}
-            pausePolling={pausePolling}
-            resumePolling={resumePolling}
           />
           <HomeScreenPrefetcher user={currentUser} />
         </HomeBottomSheetModalToolTip>

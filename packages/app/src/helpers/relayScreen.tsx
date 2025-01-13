@@ -19,7 +19,6 @@ import {
   type ScreenOptions,
 } from '#components/NativeRouter';
 import { useAppState } from '#hooks/useAppState';
-import useBoolean from '#hooks/useBoolean';
 import LoadingView from '#ui/LoadingView';
 import {
   addAuthStateListener,
@@ -94,9 +93,6 @@ export type RelayScreenProps<
    * A function to refresh the query.
    */
   refreshQuery?: () => void;
-
-  pausePolling: () => void;
-  resumePolling: () => void;
 };
 
 /**
@@ -143,8 +139,6 @@ function relayScreen<TRoute extends Route>(
       screenId,
       route: { params },
     } = props;
-
-    const [pollingIsRunning, resumePolling, pausePolling] = useBoolean(true);
 
     const profileInfosRef = useRef<ProfileInfos | null>(null);
     useEffect(() => {
@@ -198,8 +192,7 @@ function relayScreen<TRoute extends Route>(
       let retryCount = 0;
       if (
         Number.isInteger(pollInterval) &&
-        (props.hasFocus || !stopPollingWhenNotFocused) &&
-        pollingIsRunning
+        (props.hasFocus || !stopPollingWhenNotFocused)
       ) {
         const poll = (interval?: number) => {
           currentTimeout = setTimeout(
@@ -248,7 +241,7 @@ function relayScreen<TRoute extends Route>(
         currentSubscription?.unsubscribe();
         clearTimeout(currentTimeout);
       };
-    }, [environment, params, pollingIsRunning, props.hasFocus, screenId]);
+    }, [environment, params, props.hasFocus, screenId]);
 
     const intl = useIntl();
     const router = useRouter();
@@ -316,8 +309,6 @@ function relayScreen<TRoute extends Route>(
             {...props}
             preloadedQuery={preloadedQuery}
             refreshQuery={refreshQuery}
-            pausePolling={pausePolling}
-            resumePolling={resumePolling}
           />
         )}
       </Suspense>
