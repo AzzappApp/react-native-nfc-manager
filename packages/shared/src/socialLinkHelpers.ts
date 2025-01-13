@@ -1,3 +1,5 @@
+import { isValidUrl } from './stringHelpers';
+
 // generic item from configuration list
 export type SocialLinkItemType = {
   id: string;
@@ -304,11 +306,22 @@ export const SocialLinksByCategory: SocialLinkCategory[] = [
 export type SocialLinkCategoryId = (typeof SocialLinksByCategory)[number]['id'];
 
 export const generateSocialLink = (id: SocialLinkId, content: string) => {
-  let link = content;
+  if (id === 'phone') return `tel:${content}`;
+  if (id === 'sms') return `sms:${content}`;
+  if (id === 'mail') return `mailto:${content}`;
 
-  if (id === 'phone') link = `tel:${content}`;
-  if (id === 'sms') link = `sms:${content}`;
-  if (id === 'mail') link = `mailto:${content}`;
+  let result = content;
 
-  return link;
+  // only username were stored before, so for backward compatibility we have to build the url as done before
+  if (!isValidUrl(result)) {
+    const socialLink = SOCIAL_NETWORK_LINKS.find(item => id === item.id);
+    if (socialLink) {
+      const mask = socialLink.mask;
+      if (mask) {
+        result = `https://${mask}${content}`;
+      }
+    }
+  }
+
+  return result;
 };
