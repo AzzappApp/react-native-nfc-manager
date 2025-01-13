@@ -210,7 +210,7 @@ __metadata:
     react-native-permissions: "npm:^5.2.2"
     react-native-purchases: "npm:^8.5.0"
     react-native-quick-base64: "npm:^2.1.2"
-    react-native-reanimated: "npm:^3.16.6"
+    react-native-reanimated: "npm:^3.16.7"
     react-native-safe-area-context: "npm:^5.0.0"
     react-native-screens: "patch:react-native-screens@npm%3A4.4.0#~/.yarn/patches/react-native-screens-npm-4.4.0-d13a7ba722.patch"
     react-native-share: "npm:^12.0.3"
@@ -23635,9 +23635,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-reanimated@npm:^3.16.6":
-  version: 3.16.6
-  resolution: "react-native-reanimated@npm:3.16.6"
+"react-native-reanimated@npm:^3.16.7":
+  version: 3.16.7
+  resolution: "react-native-reanimated@npm:3.16.7"
   dependencies:
     "@babel/plugin-transform-arrow-functions": "npm:^7.0.0-0"
     "@babel/plugin-transform-class-properties": "npm:^7.0.0-0"
@@ -23654,7 +23654,7 @@ __metadata:
     "@babel/core": ^7.0.0-0
     react: "*"
     react-native: "*"
-  checksum: 10/8c545072a96cdb54bfbfd0f7db98ee95263000261c4cbfa8e7f10e16ab1562426fae9c9bda02ce2f3f2b5eda3535d840aca0977cefea70943689bae5408ba763
+  checksum: 10/37099178efca335ea74bb0fc1b50ad898c2b24b1ed99e67bfb90e8898e1fadace2d2765a275d7d23b9c141d19fc673bb4b78dcb9f47d08921dd911c76b5040aa
   languageName: node
   linkType: hard
 

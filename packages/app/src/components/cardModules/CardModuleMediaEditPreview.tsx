@@ -99,7 +99,7 @@ type ImageRenderProps = {
   media: CardModuleImage;
   itemWidth: number;
   itemHeight: number;
-  imageStyle?: StyleProp<ViewStyle>;
+  imageStyle?: StyleProp<Pick<ViewStyle, 'opacity'>>; //expo-image don’t support all view style props
 };
 
 const ImageRender = ({
@@ -122,7 +122,7 @@ const ImageRender = ({
   ) : (
     <Image
       source={media}
-      style={{ width: itemWidth, height: itemHeight }}
+      style={[{ width: itemWidth, height: itemHeight }, imageStyle]}
       contentFit="cover"
     />
   );
