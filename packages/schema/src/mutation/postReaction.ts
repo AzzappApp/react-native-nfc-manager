@@ -1,5 +1,5 @@
 import { GraphQLError } from 'graphql';
-import { togglePostReaction } from '@azzapp/data';
+import { getPostReaction, togglePostReaction } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { postLoader, webCardLoader } from '#loaders';
 import { checkWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
@@ -41,6 +41,21 @@ const togglePostReactionMutation: MutationResolvers['togglePostReaction'] =
         postId,
         reactionKind,
       );
+
+      let postReaction = await getPostReaction(webCardId, postId, reactionKind);
+      let attempt = 1;
+      while (
+        ((reactionAdded && !postReaction) ||
+          (!reactionAdded && postReaction)) &&
+        attempt < 20
+      ) {
+        await new Promise(resolve => {
+          setTimeout(resolve, 50);
+        });
+        postReaction = await getPostReaction(webCardId, postId, reactionKind);
+        attempt++;
+      }
+
       return {
         post: {
           ...post,
