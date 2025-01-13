@@ -26,12 +26,16 @@ type HomeScreenContentProps = {
   user: HomeScreenContent_user$key;
   selectListRef: Ref<CarouselSelectListHandle>;
   refreshQuery: (() => void) | undefined;
+  pausePolling: () => void;
+  resumePolling: () => void;
 };
 
 const HomeScreenContent = ({
   user: userKey,
   selectListRef,
   refreshQuery,
+  pausePolling,
+  resumePolling,
 }: HomeScreenContentProps) => {
   // #regions data
   const user = useFragment(
@@ -154,7 +158,11 @@ const HomeScreenContent = ({
       />
       <HomeBottomSheetModalWebCardToolTip user={currentProfile ?? null} />
 
-      <HomeBottomSheetPopupPanel profile={currentProfile ?? null} />
+      <HomeBottomSheetPopupPanel
+        profile={currentProfile ?? null}
+        pausePolling={pausePolling}
+        resumePolling={resumePolling}
+      />
     </View>
   );
 };

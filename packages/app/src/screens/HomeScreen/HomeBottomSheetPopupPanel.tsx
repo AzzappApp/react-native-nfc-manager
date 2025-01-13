@@ -28,12 +28,16 @@ import type { ReactNode } from 'react';
 
 type HomeBottomSheetPopupPanelProps = {
   profile: HomeBottomSheetPopupPanel_profile$key | null;
+  pausePolling: () => void;
+  resumePolling: () => void;
 };
 
 const animationDuration = 500;
 
 const HomeBottomSheetPopupPanel = ({
   profile: profileKey,
+  pausePolling,
+  resumePolling,
 }: HomeBottomSheetPopupPanelProps) => {
   const profile = useFragment(
     graphql`
@@ -51,6 +55,13 @@ const HomeBottomSheetPopupPanel = ({
   const intl = useIntl();
   const environment = useRelayEnvironment();
   const styles = useStyleSheet(stylesheet);
+
+  useEffect(() => {
+    if (!profile?.webCard?.userName) {
+      pausePolling();
+    }
+    return resumePolling;
+  }, [pausePolling, profile?.webCard?.userName, resumePolling]);
 
   useEffect(() => {
     const fct = async () => {
