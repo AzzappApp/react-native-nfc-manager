@@ -1,24 +1,68 @@
-## 1.6.1-canary.24
+## 1.6.1-canary.25
 
+* **fix:**  - add bottom spacing on webcardscreen [#6831](https://github.com/AzzappApp/azzapp/pull/6831) ([#6843](https://github.com/AzzappApp/azzapp/pull/6843))
+* **fix:**  - **contactCard:** [#6776](https://github.com/AzzappApp/azzapp/pull/6776) put toast on top to avoid keyboard issues ([#6841](https://github.com/AzzappApp/azzapp/pull/6841))
+* **fix:**  - **cardModules:** [#6833](https://github.com/AzzappApp/azzapp/pull/6833) change default texts ([#6836](https://github.com/AzzappApp/azzapp/pull/6836))
+* **fix:**  - **android:** [#6829](https://github.com/AzzappApp/azzapp/pull/6829) issue on uploading video on new card modules ([#6832](https://github.com/AzzappApp/azzapp/pull/6832))
 * **feat:**  - Full alternation ([#6797](https://github.com/AzzappApp/azzapp/pull/6797))
+* **fix:**  - **contactCard:** [#6804](https://github.com/AzzappApp/azzapp/pull/6804) simplify new webcard process ([#6823](https://github.com/AzzappApp/azzapp/pull/6823))
+* **fix:**  - **android:** [#6822](https://github.com/AzzappApp/azzapp/pull/6822) wrong initial index breaks home ([#6824](https://github.com/AzzappApp/azzapp/pull/6824))
+* **fix:**  - **webCard:**  [#6809](https://github.com/AzzappApp/azzapp/pull/6809) display error message on submit ([#6820](https://github.com/AzzappApp/azzapp/pull/6820))
+* **fix:**  - **socialLinks:** [#6825](https://github.com/AzzappApp/azzapp/pull/6825) ensure backward compatibility on social links ([#6826](https://github.com/AzzappApp/azzapp/pull/6826))
+* **fix:**  - **socialLinks:** [#6825](https://github.com/AzzappApp/azzapp/pull/6825) ensure backward compatibility on social links ([#6826](https://github.com/AzzappApp/azzapp/pull/6826))
 * **fix:**  - forbid follow, like and post when cover is predefined and display popup accordingly ([#6818](https://github.com/AzzappApp/azzapp/pull/6818))
+* **fix:**  - **webCard:** [#6809](https://github.com/AzzappApp/azzapp/pull/6809) check username is valid ([#6813](https://github.com/AzzappApp/azzapp/pull/6813))
 * **fix:**  - [#6556](https://github.com/AzzappApp/azzapp/pull/6556) simplify file management ([#6715](https://github.com/AzzappApp/azzapp/pull/6715))
 * **fix:**  - widget skd17 minimal version
+* **fix:**  - **modules:** [#6810](https://github.com/AzzappApp/azzapp/pull/6810) avoid overutilisation of ram ([#6811](https://github.com/AzzappApp/azzapp/pull/6811))
+* **fix:**  - ensure we don't display unsupportted mosules (and avoid crash) ([#6808](https://github.com/AzzappApp/azzapp/pull/6808))
 * **feat:**  - force widget minimum os deployment to 16
+* **perf:**  - **modules:** [#6800](https://github.com/AzzappApp/azzapp/pull/6800) use simple image component when no effects ([#6803](https://github.com/AzzappApp/azzapp/pull/6803))
 * **fix:**  - testflight
 * **fix:**  - widget entitlement
+* **fix:**  - **posts:** [#6794](https://github.com/AzzappApp/azzapp/pull/6794) check that user has created the cover ([#6795](https://github.com/AzzappApp/azzapp/pull/6795))
+* **fix:**  - don’t display progress modal when no avatar ([#6791](https://github.com/AzzappApp/azzapp/pull/6791))
+* **fix:**  - **community:** [#6789](https://github.com/AzzappApp/azzapp/pull/6789) don’t propose unfinished webcards ([#6793](https://github.com/AzzappApp/azzapp/pull/6793))
 * **fix:**  - wrong mobile provision
+* **fix:**  - **contactCard:** [#6777](https://github.com/AzzappApp/azzapp/pull/6777) don’t force height in modal ([#6784](https://github.com/AzzappApp/azzapp/pull/6784))
+* **ui:**  - [#6786](https://github.com/AzzappApp/azzapp/pull/6786) update welcome video ([#6790](https://github.com/AzzappApp/azzapp/pull/6790))
 * **feat:**  - update revoked mobile provision. use local config is fastlane as it will break the staging config (and we are working on stagingà
+* **fix:**  - **contactCard:** [#6776](https://github.com/AzzappApp/azzapp/pull/6776) ensure toast is closed when behind keyboard ([#6782](https://github.com/AzzappApp/azzapp/pull/6782))
 * **fix:**  - try to make fastfile working....
+* **fix:**  - **shakeAndShare:** [#6766](https://github.com/AzzappApp/azzapp/pull/6766) deactivate shake and share when no username ([#6778](https://github.com/AzzappApp/azzapp/pull/6778))
 * **fix:**  - fastlane typo
+* **fix:**  - close modal in case of download error ([#6772](https://github.com/AzzappApp/azzapp/pull/6772))
+* **fix:**  - restore already publiched behavior ([#6780](https://github.com/AzzappApp/azzapp/pull/6780))
 * **fix:**  - fastlane
+* **doc:**  - Update README.md
 * **fix:**  - ci build widget provisionnning profile ([#6779](https://github.com/AzzappApp/azzapp/pull/6779))
 * **feat:**  - initial version widget iOS ([#6752](https://github.com/AzzappApp/azzapp/pull/6752))
+* **fix:**  - search companyActivity by default is defined ([#6771](https://github.com/AzzappApp/azzapp/pull/6771))
+* **fix:**  - **contactCard:** [#6746](https://github.com/AzzappApp/azzapp/pull/6746) inline design text with app ([#6765](https://github.com/AzzappApp/azzapp/pull/6765))
+* **fix:**  - ensure contact card url is well synchronized with qrCode ([#6764](https://github.com/AzzappApp/azzapp/pull/6764))
+* **fix:**  - hide toast when leaving contactCardCreate screen ([#6755](https://github.com/AzzappApp/azzapp/pull/6755))
 * **fix:**  - **post:** [#6207](https://github.com/AzzappApp/azzapp/pull/6207) have same behaviour on android and iOS (on iOS the removed pressable is ignored) ([#6747](https://github.com/AzzappApp/azzapp/pull/6747))
+* **fix:**  - **webCard:** [#6746](https://github.com/AzzappApp/azzapp/pull/6746) disable swipe in edit mode ([#6750](https://github.com/AzzappApp/azzapp/pull/6750))
+* **fix:**  - **modules:** [#6665](https://github.com/AzzappApp/azzapp/pull/6665) apply opacity while editing ([#6744](https://github.com/AzzappApp/azzapp/pull/6744))
+* **fix:**  - **contact:** [#6622](https://github.com/AzzappApp/azzapp/pull/6622) properly handle avatar ([#6732](https://github.com/AzzappApp/azzapp/pull/6732)) ([#6743](https://github.com/AzzappApp/azzapp/pull/6743))
+* **fix:**  - **contactCard:** [#6731](https://github.com/AzzappApp/azzapp/pull/6731) capitalize lastname ([#6740](https://github.com/AzzappApp/azzapp/pull/6740))
+* **perf:**  - avoid intermediate updates while scrolling fast with multiple webcards ([#6739](https://github.com/AzzappApp/azzapp/pull/6739))
+* **fix:**  - **android:** avoid unnecessary scroll to index ([#6727](https://github.com/AzzappApp/azzapp/pull/6727))
+* **fix:**  - update videos during contact card creation ([#6735](https://github.com/AzzappApp/azzapp/pull/6735))
+* **perf:**  - avoid useless update when profile is the same (scroll aborted) ([#6734](https://github.com/AzzappApp/azzapp/pull/6734))
+* **fix:**  - **android:** button is cut on cover creation ([#6737](https://github.com/AzzappApp/azzapp/pull/6737))
+* **fix:**  - build temporary url after username setup ([#6730](https://github.com/AzzappApp/azzapp/pull/6730))
 * **fix:**  - **contact:** [#6622](https://github.com/AzzappApp/azzapp/pull/6622) properly handle avatar ([#6732](https://github.com/AzzappApp/azzapp/pull/6732))
+* **fix:**  - slide popup when keyboard is displayed ([#6728](https://github.com/AzzappApp/azzapp/pull/6728))
+* **fix:**  - do not display error when _ is in the url ([#6725](https://github.com/AzzappApp/azzapp/pull/6725))
+* **fix:**  - **android:** avoid unnecessary scroll to index ([#6727](https://github.com/AzzappApp/azzapp/pull/6727))
 * **fix:**  - **modules:** [#6701](https://github.com/AzzappApp/azzapp/pull/6701) wrong color on desktop preview with new modules ([#6724](https://github.com/AzzappApp/azzapp/pull/6724))
 * **fix:**  - **modules:** [#6371](https://github.com/AzzappApp/azzapp/pull/6371) pressableNative is unresponsive on large scale on… ([#6718](https://github.com/AzzappApp/azzapp/pull/6718))
 * **fix:**  - don’t use navigator on ssr ([#6719](https://github.com/AzzappApp/azzapp/pull/6719))
+* **fix:**  - apply lineHeight on new modules ([#6707](https://github.com/AzzappApp/azzapp/pull/6707))
+* **fix:**  - change video resize strategy to cover and fix video video size ([#6712](https://github.com/AzzappApp/azzapp/pull/6712))
+* **fix:**  - handle corner case when user validate a new webcard very quickly ([#6713](https://github.com/AzzappApp/azzapp/pull/6713))
+* **fix:**  - ensure webcard is selected after creation from scratch ([#6714](https://github.com/AzzappApp/azzapp/pull/6714))
 * **fix:**  - move shareAndShare description text outside of the qrcode container ([#6708](https://github.com/AzzappApp/azzapp/pull/6708))
 * **WebCard:**  - try to limit the number of video running in alternation and parallax using viewport ([#6673](https://github.com/AzzappApp/azzapp/pull/6673))
 * **feat:**  - go to home on invit received with no contact card ([#6615](https://github.com/AzzappApp/azzapp/pull/6615))
