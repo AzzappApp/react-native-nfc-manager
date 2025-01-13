@@ -2,6 +2,7 @@ import { graphql, readInlineData } from 'react-relay';
 import { type CardModuleColor } from '@azzapp/shared/cardModuleHelpers';
 import CardModuleEditionScrollHandler from '../CardModuleEditionScrollHandler';
 import withSwapCardModuleColor from '../withSwapCardModuleColor';
+import CardModuleMediaOriginal from './CardModuleMediaOriginal';
 import CardModuleMediaParallax from './CardModuleMediaParallax';
 import CardModuleMediaSlideshow from './CardModuleMediaSlideshow';
 import type {
@@ -100,6 +101,19 @@ const MediaModuleRenderer = ({
       return (
         <CardModuleEditionScrollHandler scrollPosition={scrollPosition}>
           <CardModuleMediaParallax
+            cardModuleMedias={data.cardModuleMedias}
+            cardModuleColor={data.cardModuleColor}
+            onLayout={onLayout}
+            displayMode={displayMode}
+            scrollPosition={scrollPosition}
+            {...props}
+          />
+        </CardModuleEditionScrollHandler>
+      );
+    case 'original':
+      return (
+        <CardModuleEditionScrollHandler scrollPosition={scrollPosition}>
+          <CardModuleMediaOriginal
             cardModuleMedias={data.cardModuleMedias}
             cardModuleColor={data.cardModuleColor}
             onLayout={onLayout}

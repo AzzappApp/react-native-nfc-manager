@@ -13,6 +13,7 @@ export const SUPPORTED_VARIANT = [
   'slideshow',
   'alternation',
   'full_alternation',
+  'original',
 ] as const;
 
 export type SupportedVariant = (typeof SUPPORTED_VARIANT)[number];

@@ -155,7 +155,6 @@ export const isComingSoonModule = (module: ModuleKindAndVariant) => {
   switch (module.moduleKind) {
     case MODULE_KIND_MEDIA: {
       const soon = [
-        'original',
         'fullscreen',
         'grid',
         'original_slideshow',

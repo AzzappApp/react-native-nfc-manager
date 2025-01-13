@@ -1,3 +1,4 @@
+import OriginalRenderer from './OriginalRenderer';
 import ParallaxRenderer from './ParallaxRenderer';
 import SlideshowRenderer from './SlideshowRenderer';
 import type { ModuleRendererProps } from '../ModuleRenderer';
@@ -18,6 +19,9 @@ const MediaRenderer = async (props: MediaRendererProps) => {
     }
     case 'parallax': {
       return <ParallaxRenderer {...props} />;
+    }
+    case 'original': {
+      return <OriginalRenderer {...props} />;
     }
     default: {
       return null;
