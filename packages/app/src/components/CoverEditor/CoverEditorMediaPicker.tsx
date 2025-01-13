@@ -309,11 +309,6 @@ const CoverEditorMediaPicker = ({
       onFinished(initialMediaUnfiltered?.filter(isDefined) || []);
       return;
     }
-    const resultMediaId =
-      resultMedia
-        ?.filter(selectedMedia => !!selectedMedia)
-        .map(media => media.id) ?? [];
-
     const validMediaCount = selectedMedias?.filter(Boolean).length;
     if (validMediaCount === 0) {
       Alert.alert(
@@ -333,7 +328,7 @@ const CoverEditorMediaPicker = ({
       return;
     }
 
-    if (durationsFixed && resultMediaId.length < maxMedias) {
+    if (durationsFixed && validMediaCount < maxMedias) {
       Alert.alert(
         intl.formatMessage(
           {
