@@ -1,5 +1,5 @@
 import { GraphQLError } from 'graphql';
-import { follows, unfollows } from '@azzapp/data';
+import { follows, unfollows, isFollowing } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { webCardLoader } from '#loaders';
 import {
@@ -39,8 +39,27 @@ const toggleFollowing: MutationResolvers['toggleFollowing'] = async (
   try {
     if (follow) {
       await follows(webCardId, targetId);
+
+      let following = await isFollowing(webCardId, targetId);
+      let attempt = 1;
+      while (!following && attempt < 20) {
+        await new Promise(resolve => {
+          setTimeout(resolve, 50);
+        });
+        following = await isFollowing(webCardId, targetId);
+        attempt++;
+      }
     } else {
       await unfollows(webCardId, targetId);
+      let following = await isFollowing(webCardId, targetId);
+      let attempt = 1;
+      while (following && attempt < 20) {
+        await new Promise(resolve => {
+          setTimeout(resolve, 50);
+        });
+        following = await isFollowing(webCardId, targetId);
+        attempt++;
+      }
     }
   } catch {
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);

@@ -8,9 +8,7 @@ import * as mime from 'react-native-mime-types'; // FIXME import is verry big
 import Toast from 'react-native-toast-message';
 import { useMutation } from 'react-relay';
 import { graphql, Observable } from 'relay-runtime';
-import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-import { isDefined } from '@azzapp/shared/isDefined';
-import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
+import { waitTime } from '@azzapp/shared/asyncHelpers';
 import { mainRoutes } from '#mobileRoutes';
 import { colors } from '#theme';
 import {
@@ -20,13 +18,12 @@ import {
 } from '#components/NativeRouter';
 import BottomSheetPopup from '#components/popup/BottomSheetPopup';
 import { PopupButton } from '#components/popup/PopupElements';
+import { onChangeWebCard } from '#helpers/authStore';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getFileName } from '#helpers/fileHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import useBoolean from '#hooks/useBoolean';
-import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';
-import { get as QRCodeWidth } from '#relayProviders/qrCodeWidth.relayprovider';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
@@ -39,93 +36,38 @@ import {
   type ContactCardFormValues,
 } from './ContactCardSchema';
 import type { ScreenOptions } from '#components/NativeRouter';
-import type { ContactCardCreateScreenMutation$data } from '#relayArtifacts/ContactCardCreateScreenMutation.graphql';
+import type { ContactCardCreateScreenMutation } from '#relayArtifacts/ContactCardCreateScreenMutation.graphql';
 import type { ContactCardCreateRoute } from '#routes';
+
+const WAIT_FOR_REDIRECT = 500;
 
 const ContactCardCreateScreen = () => {
   const styles = useStyleSheet(stylesheet);
 
-  const [commit] = useMutation(graphql`
-    mutation ContactCardCreateScreenMutation(
-      $webCardKind: String!
-      $contactCard: ContactCardInput!
-      $pixelRatio: Float!
-    ) {
-      createContactCard(webCardKind: $webCardKind, contactCard: $contactCard) {
-        profile {
-          id
-          contactCardUrl
-          profileRole
-          webCard {
+  const [commit, loading] = useMutation<ContactCardCreateScreenMutation>(
+    graphql`
+      mutation ContactCardCreateScreenMutation(
+        $webCardKind: String!
+        $contactCard: ContactCardInput!
+      ) {
+        createContactCard(
+          webCardKind: $webCardKind
+          contactCard: $contactCard
+        ) {
+          profile {
             id
-            userName
-            isMultiUser
-            companyActivityLabel
-            commonInformation {
-              company
-              addresses {
-                address
-                label
-              }
-              emails {
-                label
-                address
-              }
-              phoneNumbers {
-                label
-                number
-              }
-              urls {
-                address
-              }
-              socials {
-                label
-                url
-              }
+            contactCardUrl
+            profileRole
+            invited
+            webCard {
+              id
+              userName
             }
-          }
-          contactCard {
-            firstName
-            lastName
-            title
-            company
-            emails {
-              label
-              address
-              selected
-            }
-            phoneNumbers {
-              label
-              number
-              selected
-            }
-            urls {
-              address
-              selected
-            }
-            addresses {
-              address
-              label
-              selected
-            }
-            birthday {
-              birthday
-              selected
-            }
-            socials {
-              url
-              label
-              selected
-            }
-          }
-          avatar {
-            id
-            uri: uri(width: 112, pixelRatio: $pixelRatio)
           }
         }
       }
-    }
-  `);
+    `,
+  );
 
   const intl = useIntl();
   const router = useRouter();
@@ -163,6 +105,7 @@ const ContactCardCreateScreen = () => {
           props: {
             showClose: true,
           },
+          position: 'top',
         });
         return;
       } else if (
@@ -181,6 +124,7 @@ const ContactCardCreateScreen = () => {
           props: {
             showClose: true,
           },
+          position: 'top',
         });
         return;
       }
@@ -201,11 +145,10 @@ const ContactCardCreateScreen = () => {
           target: 'avatar',
         });
         upload = uploadMedia(file, uploadURL, uploadParameters);
+        setProgressIndicator(
+          upload.progress.map(({ loaded, total }) => loaded / total),
+        );
       }
-
-      setProgressIndicator(
-        combineMultiUploadProgresses(convertToNonNullArray([upload?.progress])),
-      );
 
       const uploadedAvatarId = await upload?.promise.then(({ public_id }) => {
         return public_id;
@@ -214,9 +157,9 @@ const ContactCardCreateScreen = () => {
       const avatarId =
         avatar === null ? null : avatar?.local ? uploadedAvatarId : avatar?.id;
 
-      const urls = [{ address: data.companyUrl, selected: true }, ...data.urls]
-        .filter(url => url.address)
-        .filter(isDefined);
+      const urls = data.companyUrl
+        ? [{ address: data.companyUrl, selected: true }, ...data.urls]
+        : data.urls;
 
       commit({
         variables: {
@@ -243,12 +186,8 @@ const ContactCardCreateScreen = () => {
             title: data.title,
             companyActivityLabel: data.companyActivityLabel,
           },
-          pixelRatio: CappedPixelRatio(),
-          width: QRCodeWidth(),
         },
         onCompleted: data => {
-          const typeData = data as ContactCardCreateScreenMutation$data;
-
           if (avatarId && avatar?.uri) {
             addLocalCachedMediaFile(
               `${'image'.slice(0, 1)}:${avatarId}`,
@@ -256,17 +195,27 @@ const ContactCardCreateScreen = () => {
               avatar.uri,
             );
           }
-          const { webCard } = typeData.createContactCard.profile;
-          if (!webCard) {
+          const { profile } = data.createContactCard;
+          if (!profile?.webCard) {
             throw new Error('WebCard not created');
           }
+          onChangeWebCard({
+            profileId: profile.id,
+            profileRole: profile.profileRole,
+            invited: profile.invited,
+            webCardId: profile.webCard.id,
+            webCardUserName: profile.webCard.userName,
+          });
           if (
             (router.getCurrentRoute() as ContactCardCreateRoute)?.params
               ?.launchedFromWelcomeScreen
           ) {
             router.replaceAll(mainRoutes(false));
           } else {
-            router.back();
+            // if we redirect too soon, the home background is not displayed
+            waitTime(WAIT_FOR_REDIRECT).then(() => {
+              router.back();
+            });
           }
         },
         updater: store => {
@@ -280,17 +229,10 @@ const ContactCardCreateScreen = () => {
           if (!newProfile) {
             return;
           }
-          user?.setLinkedRecords(
-            profiles?.concat(newProfile).sort((a, b) => {
-              const webCardA = a.getLinkedRecord('webCard');
-              const webCardB = b.getLinkedRecord('webCard');
+          // webCard are sorted by username so logically no username -> first
+          profiles?.unshift(newProfile);
 
-              return (
-                (webCardA?.getValue('userName') as string) ?? ''
-              ).localeCompare((webCardB?.getValue('userName') as string) ?? '');
-            }),
-            'profiles',
-          );
+          user?.setLinkedRecords(profiles, 'profiles');
           root.setLinkedRecord(user, 'currentUser');
         },
         onError: e => {
@@ -314,6 +256,10 @@ const ContactCardCreateScreen = () => {
       });
     },
   );
+
+  useEffect(() => {
+    return Toast.hide;
+  }, []);
 
   useEffect(() => {
     const popupTimeout = setTimeout(() => {
@@ -355,7 +301,7 @@ const ContactCardCreateScreen = () => {
                   description: 'Create contact card modal save button label',
                 })}
                 testID="save-contact-card"
-                loading={isSubmitting}
+                loading={isSubmitting || loading}
                 onPress={submit}
                 variant="primary"
                 style={styles.headerButton}
@@ -387,7 +333,7 @@ const ContactCardCreateScreen = () => {
               isLooping
               isMuted
               shouldPlay
-              resizeMode={ResizeMode.STRETCH}
+              resizeMode={ResizeMode.COVER}
               source={
                 colorScheme === 'dark'
                   ? require('#assets/hint_0_dark_ae.mp4')
@@ -410,7 +356,7 @@ const ContactCardCreateScreen = () => {
           <PopupButton
             onPress={hidePopup}
             text={intl.formatMessage({
-              defaultMessage: 'Next',
+              defaultMessage: 'Ok, continue',
               description: 'Creare contact card screen / next buton on popup',
             })}
           />
@@ -432,7 +378,7 @@ const stylesheet = createStyleSheet(theme => ({
     alignContent: 'center',
   },
   popupIllustration: {
-    height: 200,
+    height: 170,
     borderRadius: 12,
   },
   popupPage: { top: 0, width: '100%', paddingBottom: 20 },

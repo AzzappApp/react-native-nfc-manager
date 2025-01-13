@@ -44,6 +44,10 @@ type MediaPickerProps = Omit<ViewProps, 'children'> & {
    *
    */
   selectedMediasIds: string[];
+  /**
+   * default search field
+   */
+  defaultSearchValue?: string | null;
 };
 
 const MediaPicker = ({
@@ -54,6 +58,7 @@ const MediaPicker = ({
   BottomPanel,
   onClose,
   style,
+  defaultSearchValue,
   ...props
 }: MediaPickerProps) => {
   const intl = useIntl();
@@ -161,6 +166,7 @@ const MediaPicker = ({
                   kind="image"
                   selectedMediasIds={selectedMediasIds}
                   onMediaSelected={onMediaSelected}
+                  defaultSearchValue={defaultSearchValue}
                 />
               ),
             },
@@ -171,6 +177,7 @@ const MediaPicker = ({
                   kind="video"
                   selectedMediasIds={selectedMediasIds}
                   onMediaSelected={onMediaSelected}
+                  defaultSearchValue={defaultSearchValue}
                 />
               ),
             },

@@ -6,12 +6,17 @@ import Text from '#ui/Text';
 type PopupButtonProps = {
   onPress: () => void;
   text: JSX.Element | string;
+  disabled?: boolean;
 };
-export const PopupButton = ({ onPress, text }: PopupButtonProps) => {
+export const PopupButton = ({ onPress, text, disabled }: PopupButtonProps) => {
   const popupStyles = useStyleSheet(styles);
 
   return (
-    <PressableNative style={popupStyles.popupButtonContainer} onPress={onPress}>
+    <PressableNative
+      style={popupStyles.popupButtonContainer}
+      onPress={onPress}
+      disabled={disabled}
+    >
       <Text variant="button" style={popupStyles.popupButtonText}>
         {text}
       </Text>

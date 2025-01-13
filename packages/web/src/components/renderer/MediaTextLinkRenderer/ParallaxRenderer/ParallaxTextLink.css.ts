@@ -1,7 +1,6 @@
 import { style } from '@vanilla-extract/css';
 
 const textItem = style({
-  lineHeight: '1.2em',
   textAlign: 'center',
 });
 

@@ -45,3 +45,17 @@ export const swap = <T>(arr: T[], index1: number, index2: number): T[] => {
   arr[index2] = temp;
   return arr;
 };
+
+/**
+ *
+ * @param array is the original array
+ * @param size is the size of the chunks
+ * @returns an array of arrays where each array is a chunk of the original array
+ */
+export const splitArrayIntoChunks = <T>(array: T[], size: number) => {
+  const chunks = [];
+  for (let i = 0; i < array.length; i += size) {
+    chunks.push(array.slice(i, i + size));
+  }
+  return chunks;
+};

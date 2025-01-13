@@ -56,13 +56,14 @@ const ShakeShare = () => {
     setMountScreen(false);
   }, []);
 
-  const hasProfile = !!(profileInfos && !profileInfos.invited);
+  const activateShakeAndShare =
+    !profileInfos?.invited && !!profileInfos?.webCardUserName;
 
   const activateDetector = useCallback(() => {
     setMountScreen(true);
   }, []);
 
-  useShakeDetector(activateDetector, hasProfile);
+  useShakeDetector(activateDetector, activateShakeAndShare);
 
   useEffect(() => {
     _shakeShareEventHandler.on('open', activateDetector);

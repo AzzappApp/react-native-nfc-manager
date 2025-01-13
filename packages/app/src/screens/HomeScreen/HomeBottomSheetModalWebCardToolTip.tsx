@@ -46,7 +46,7 @@ const WebCardToolTip = ({
       screenWidth / 2 -
       tooltipWidth / 2 +
       (isLeft ? -offsetFromCenter : offsetFromCenter),
-    top: coverWidth / COVER_RATIO + top + 128 + arrowSize.height,
+    top: coverWidth / COVER_RATIO + top + 94 + arrowSize.height,
     borderRadius: 10,
     backgroundColor: colors.white,
     padding: 10,
@@ -176,6 +176,7 @@ const HomeBottomSheetModalWebCardToolTipComponent = ({
       animationDuration={500}
       visible={!!tooltipId}
       backgroundOpacity={0.1}
+      fullScreen
     >
       <Pressable
         style={{

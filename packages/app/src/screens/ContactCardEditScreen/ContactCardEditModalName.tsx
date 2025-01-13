@@ -39,6 +39,8 @@ const ContactCardEditModalName = ({
               onBlur={onBlur}
               style={styles.input}
               clearButtonMode="while-editing"
+              autoCapitalize="sentences"
+              autoComplete="given-name"
               placeholder={intl.formatMessage({
                 defaultMessage: 'Enter a first name',
                 description: 'Placeholder for first name inside contact card',
@@ -66,6 +68,8 @@ const ContactCardEditModalName = ({
               onBlur={onBlur}
               style={styles.input}
               clearButtonMode="while-editing"
+              autoCapitalize="sentences"
+              autoComplete="name-family"
               placeholder={intl.formatMessage({
                 defaultMessage: 'Enter a last name',
                 description: 'Placeholder for last name contact card',

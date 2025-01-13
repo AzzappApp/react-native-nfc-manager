@@ -2,6 +2,7 @@ import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { runOnJS, useAnimatedReaction } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
+import { useDebouncedCallback } from 'use-debounce';
 import { getAuthState } from '#helpers/authStore';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import useBoolean from '#hooks/useBoolean';
@@ -48,6 +49,7 @@ const HomeScreenContent = ({
           }
           ...HomeBottomSheetPanel_profile
           ...HomeBottomSheetModalWebCardToolTip_profile
+          ...HomeBottomSheetPopupPanel_profile
         }
         ...useWidget_user
         ...HomeBackground_user
@@ -94,31 +96,15 @@ const HomeScreenContent = ({
   const [currentProfile, setCurrentProfile] = useState(
     user.profiles?.[initialProfileIndex - 1],
   );
+  const debouncedUpdate = useDebouncedCallback(setCurrentProfile, 300);
+
   useAnimatedReaction(
     () => currentIndexProfileSharedValue.value,
     index => {
       const cProfile = user.profiles?.[index - 1];
-      runOnJS(setCurrentProfile)(cProfile);
+      runOnJS(debouncedUpdate)(cProfile);
     },
   );
-
-  const unknownUserNameWebcardId = useMemo(() => {
-    const emptyProfile = user.profiles?.find(
-      profile =>
-        !profile.webCard?.userName || profile.webCard?.userName.length === 0,
-    );
-    const webCardId = emptyProfile?.webCard?.id;
-    if (emptyProfile && webCardId) {
-      return {
-        webCardId,
-        profileId: emptyProfile.id,
-        profileRole: emptyProfile.profileRole,
-        invited: false,
-      };
-    } else {
-      return undefined;
-    }
-  }, [user.profiles]);
 
   // TODO: here we rely on polling on HOME to check if the profileRole has changed. We should have a better way to keep our app state in sync with the server.
   useEffect(() => {
@@ -174,7 +160,7 @@ const HomeScreenContent = ({
       />
       <HomeBottomSheetModalWebCardToolTip user={currentProfile ?? null} />
 
-      <HomeBottomSheetPopupPanel profileInfo={unknownUserNameWebcardId} />
+      <HomeBottomSheetPopupPanel profile={currentProfile ?? null} />
     </View>
   );
 };

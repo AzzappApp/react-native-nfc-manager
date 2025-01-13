@@ -44,6 +44,7 @@ type CardModuleMediaPickerProps = Omit<ViewProps, 'children'> & {
   allowVideo?: boolean;
   maxMedia: number;
   replacing?: boolean;
+  defaultSearchValue?: string | null;
 };
 
 const CardModuleMediaPicker = ({
@@ -55,6 +56,8 @@ const CardModuleMediaPicker = ({
   maxVideo,
   onClose,
   allowVideo = true,
+  defaultSearchValue,
+
   ...props
 }: CardModuleMediaPickerProps) => {
   const intl = useIntl();
@@ -228,6 +231,8 @@ const CardModuleMediaPicker = ({
                     'CardModule Media Picker - Error message when media are not downloaded',
                 }),
               );
+              value += 1;
+              updateProgress(value);
               downloadError = true;
               return cardModuleMedia;
             }
@@ -275,6 +280,7 @@ const CardModuleMediaPicker = ({
         onMediaSelected={handleMediaSelected}
         selectedMediasIds={selectedMediasIds}
         allowVideo={allowVideo}
+        defaultSearchValue={defaultSearchValue}
         Header={
           <Header
             leftElement={

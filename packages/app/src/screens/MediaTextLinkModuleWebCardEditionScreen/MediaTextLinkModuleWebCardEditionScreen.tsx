@@ -70,6 +70,7 @@ const MediaTextLinkModuleWebCardEditionScreen = (
     scaleFactor,
     editableItemIndex,
     setEditableItemIndex,
+    defaultSearchValue,
   }: MediaTextLinkModuleWebCardEditionScreenProps,
   ref: ForwardedRef<ModuleWebCardScreenHandle>,
 ) => {
@@ -325,6 +326,7 @@ const MediaTextLinkModuleWebCardEditionScreen = (
         setCanSave={setCanSave}
         editableItemIndex={editableItemIndex}
         setEditableItemIndex={setEditableItemIndex}
+        defaultSearchValue={defaultSearchValue}
       />
     </>
   );

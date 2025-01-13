@@ -19,12 +19,14 @@ type CardModuleMediaEditToolboxProps<T extends ModuleKindAndVariant> = {
   availableVideoSlot: number;
   close: () => void;
   module: T;
+  defaultSearchValue?: string | null;
 };
 const CardModuleMediaEditToolbox = <T extends ModuleKindAndVariant>({
   module,
   cardModuleMedia,
   onUpdateMedia,
   availableVideoSlot,
+  defaultSearchValue,
   close,
 }: CardModuleMediaEditToolboxProps<T>) => {
   const styles = useStyleSheet(styleSheet);
@@ -67,6 +69,7 @@ const CardModuleMediaEditToolbox = <T extends ModuleKindAndVariant>({
           cardModuleMedia={cardModuleMedia}
           availableVideoSlot={availableVideoSlot}
           onUpdateMedia={onUpdateMedia}
+          defaultSearchValue={defaultSearchValue}
         />
       </ScrollView>
     </View>

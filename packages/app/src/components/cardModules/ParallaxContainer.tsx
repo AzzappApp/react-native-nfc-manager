@@ -75,11 +75,7 @@ const ParallaxContainer = ({
           media={media}
           dimension={dimension}
           canPlay={canPlay && inViewport}
-          imageStyle={{
-            width: dimension.width,
-            height: dimension.height,
-            ...imageStyle,
-          }}
+          imageStyle={imageStyle}
         />
       </RNAnimated.View>
       {children}

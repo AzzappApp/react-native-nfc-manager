@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/react-native';
 import { Dimensions, type TextStyle } from 'react-native';
 import Toast from 'react-native-toast-message';
+import { splitArrayIntoChunks } from '@azzapp/shared/arrayHelpers';
 import { waitTime } from '@azzapp/shared/asyncHelpers';
 import {
   MODULE_IMAGE_MAX_WIDTH,
@@ -13,6 +14,7 @@ import {
   POST_VIDEO_FRAME_RATE,
 } from '@azzapp/shared/postHelpers';
 import { isNotFalsyString, isValidUrl } from '@azzapp/shared/stringHelpers';
+import { MEMORY_SIZE } from './device';
 import { getFileName } from './fileHelpers';
 import {
   saveTransformedImageToFile,
@@ -62,85 +64,115 @@ export const handleUploadCardModuleMedia = async (
     a => a.needDbUpdate && !a.media.uri.startsWith('http'),
   ).length;
 
-  const mediaToUploads = await Promise.all(
-    cardModuleMedias.map(async moduleMedia => {
-      const { media } = moduleMedia;
-      //be sure the media need to be updated, and the uri is not online one
-      if (
-        moduleMedia.needDbUpdate &&
-        !moduleMedia.media.uri.startsWith('http')
-      ) {
-        if (media.kind === 'image') {
-          const exportWidth = Math.min(MODULE_IMAGE_MAX_WIDTH, media.width);
-          const exportHeight = (exportWidth / media.width) * media.height;
-          const localPath = await saveTransformedImageToFile({
-            uri: media.uri,
-            resolution: { width: exportWidth, height: exportHeight },
-            format: getTargetFormatFromPath(media.uri),
-            quality: 95,
-            filter: media.filter,
-            editionParameters: media.editionParameters,
-          });
-          media.uri = localPath;
-        } else {
-          const exportWidth = Math.min(MODULE_VIDEO_MAX_WIDTH, media.width);
-          const exportHeight = (exportWidth / media.width) * media.height;
-          const aspectRatio = exportWidth / exportHeight;
-          const resolution = {
-            width: aspectRatio >= 1 ? exportWidth : exportWidth * aspectRatio,
-            height: aspectRatio < 1 ? exportWidth : exportWidth / aspectRatio,
-          };
-          try {
-            const localPath = await saveTransformedVideoToFile({
-              video: {
+  const chunks = splitArrayIntoChunks(
+    cardModuleMedias,
+    MEMORY_SIZE < 6 ? 2 : 5,
+  );
+
+  const mediaToUploads: Array<{
+    uri: string;
+    kind: 'image' | 'video';
+  } | null> = [];
+
+  for (const chunk of chunks) {
+    mediaToUploads.push(
+      ...(await Promise.all(
+        chunk.map(async moduleMedia => {
+          const { media: sourceMedia } = moduleMedia;
+          const media = { ...sourceMedia };
+          //be sure the media need to be updated, and the uri is not online one
+          if (
+            moduleMedia.needDbUpdate &&
+            !moduleMedia.media.uri.startsWith('http')
+          ) {
+            if (media.kind === 'image') {
+              const exportWidth = Math.min(MODULE_IMAGE_MAX_WIDTH, media.width);
+              const exportHeight = (exportWidth / media.width) * media.height;
+              const localPath = await saveTransformedImageToFile({
                 uri: media.uri,
-                width: exportWidth,
-                height: exportHeight,
-                rotation: media.rotation ?? 0,
-              },
-              resolution,
-              bitRate: POST_VIDEO_BIT_RATE,
-              frameRate: POST_VIDEO_FRAME_RATE,
-              duration: media.timeRange?.duration,
-              startTime: media.timeRange?.startTime,
-              filter: media.filter,
-              editionParameters: media.editionParameters,
-              maxDecoderResolution: MODULE_VIDEO_MAX_WIDTH,
-            });
-            media.uri = localPath;
-          } catch (e) {
-            Sentry.captureException(e);
-            console.error(e);
+                resolution: { width: exportWidth, height: exportHeight },
+                format: getTargetFormatFromPath(media.uri),
+                quality: 95,
+                filter: media.filter,
+                editionParameters: media.editionParameters,
+              });
+              media.uri = localPath;
+            } else {
+              const exportWidth = Math.min(MODULE_VIDEO_MAX_WIDTH, media.width);
+              const exportHeight = (exportWidth / media.width) * media.height;
+              const aspectRatio = exportWidth / exportHeight;
+              const resolution = {
+                width:
+                  aspectRatio >= 1 ? exportWidth : exportWidth * aspectRatio,
+                height:
+                  aspectRatio < 1 ? exportWidth : exportWidth / aspectRatio,
+              };
+              try {
+                const localPath = await saveTransformedVideoToFile({
+                  video: {
+                    uri: media.uri,
+                    width: exportWidth,
+                    height: exportHeight,
+                    rotation: media.rotation ?? 0,
+                  },
+                  resolution,
+                  bitRate: POST_VIDEO_BIT_RATE,
+                  frameRate: POST_VIDEO_FRAME_RATE,
+                  duration: media.timeRange?.duration,
+                  startTime: media.timeRange?.startTime,
+                  filter: media.filter,
+                  editionParameters: media.editionParameters,
+                  maxDecoderResolution: MODULE_VIDEO_MAX_WIDTH,
+                });
+                media.uri = localPath;
+              } catch (e) {
+                Sentry.captureException(e);
+                console.error(e);
+              }
+            }
+
+            value += 1;
+            updateProcessedMedia({ total: processingMediaTotal, value });
+            return {
+              uri: media.uri,
+              kind: media.kind,
+            };
+          } else {
+            return null;
           }
-        }
+        }),
+      )),
+    );
+  }
+
+  const mediaUploading = await Promise.all(
+    mediaToUploads
+      .filter(item => item !== null)
+      .map(async ({ uri, kind }) => {
         const { uploadURL, uploadParameters } = await uploadSign({
-          kind: media.kind,
+          kind,
           target: 'module',
         });
-        value += 1;
-        updateProcessedMedia({ total: processingMediaTotal, value });
+
         return {
-          uri: media.uri,
-          kind: media.kind,
+          kind,
+          uri,
           ...uploadMedia(
             {
-              name: getFileName(media.uri),
-              uri: media.uri,
-              type: media.kind === 'image' ? 'image/jpeg' : 'video/mp4',
+              name: getFileName(uri),
+              uri,
+              type: kind === 'image' ? 'image/jpeg' : 'video/mp4',
             } as any,
             uploadURL,
             uploadParameters,
           ),
         };
-      } else {
-        return null;
-      }
-    }),
+      }),
   );
 
   updateUploadIndicator(
     combineMultiUploadProgresses(
-      mediaToUploads
+      mediaUploading
         .filter(item => item !== null)
         .map(({ progress }) => progress),
     ),
@@ -148,7 +180,7 @@ export const handleUploadCardModuleMedia = async (
   await waitTime(1);
 
   const mediasUploaded = await Promise.all(
-    mediaToUploads.map(async item => {
+    mediaUploading.map(async item => {
       if (item != null) {
         const { promise, uri, kind } = item;
         const uploadResult = await promise;
@@ -278,6 +310,8 @@ export const getTextStyle = (
   if (cardStyle?.fontSize) {
     textStyle.fontSize = cardStyle.fontSize;
   }
+  textStyle.lineHeight = textStyle.fontSize! * 1.6;
+
   return textStyle;
 };
 

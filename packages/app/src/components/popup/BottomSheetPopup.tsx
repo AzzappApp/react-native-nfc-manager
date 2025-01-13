@@ -19,6 +19,7 @@ type BottomSheetPopupProps = {
   onFadeOutFinish?: () => void;
   backgroundOpacity?: number;
   isAnimatedContent?: boolean;
+  fullScreen?: boolean;
 };
 
 const defaultAnimationDuration = 500;
@@ -35,6 +36,7 @@ const BottomSheetPopup = ({
   children,
   backgroundOpacity = 0.5,
   isAnimatedContent = false,
+  fullScreen,
 }: BottomSheetPopupProps) => {
   const progress = useSharedValue(0);
   const { height } = useScreenDimensions();
@@ -47,7 +49,9 @@ const BottomSheetPopup = ({
   const onFadeOutFinishInner = useCallback(() => {
     'worklet';
     runOnJS(setVisibleInner)(false);
-    onFadeOutFinish?.();
+    if (onFadeOutFinish) {
+      runOnJS(onFadeOutFinish)();
+    }
   }, [onFadeOutFinish]);
 
   // Interpolating the background color
@@ -64,7 +68,6 @@ const BottomSheetPopup = ({
       ['transparent', `rgba(0, 0, 0, ${backgroundOpacity})`],
     );
     return {
-      ...styles.bottomsheetStyle,
       backgroundColor,
     };
   });
@@ -95,34 +98,24 @@ const BottomSheetPopup = ({
         visible={visibleInner}
         onDismiss={onDismiss}
         showHandleIndicator={false}
-        height={height}
         backgroundStyle={styles.background}
-        style={[animatedBackground, styles.bottomsheetStyle]}
         animationConfigs={animationConfigs}
         showShadow={false}
+        backdropComponent={() => (
+          <Animated.View
+            style={[StyleSheet.absoluteFill, animatedBackground]}
+          />
+        )}
+        height={height}
+        snapPoints={[fullScreen ? height : height / 1.25, height / 1.1]}
+        keyboardBehavior="extend"
       >
-        <Animated.View style={[animatedStyle, styles.container]}>
-          {children}
-        </Animated.View>
+        <Animated.View style={animatedStyle}>{children}</Animated.View>
       </BottomSheetModal>
     </Suspense>
   );
 };
 const styles = StyleSheet.create({
-  container: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    flex: 1,
-  },
-  background: {
-    backgroundColor: 'transparent',
-  },
-  bottomsheetStyle: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    flex: 1,
-    borderTopLeftRadius: 0,
-    borderTopRightRadius: 0,
-  },
+  background: { backgroundColor: 'transparent' },
 });
 export default memo(BottomSheetPopup);

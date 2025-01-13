@@ -18,7 +18,8 @@ const CoverEditorMediaReplace = () => {
   const intl = useIntl();
   const [show, toggleScreenModal] = useToggle(false);
 
-  const { lottie, editionMode, medias } = useCoverEditorContext();
+  const { lottie, editionMode, medias, companyActivityLabel } =
+    useCoverEditorContext();
   const dispatch = useCoverEditorEditContext();
 
   const durations = useLottieMediaDurations(lottie);
@@ -69,6 +70,7 @@ const CoverEditorMediaReplace = () => {
               durationsFixed={!!lottie}
               onFinished={onFinished}
               onClose={toggleScreenModal}
+              defaultSearchValue={companyActivityLabel}
             />
           )}
         </ScreenModal>

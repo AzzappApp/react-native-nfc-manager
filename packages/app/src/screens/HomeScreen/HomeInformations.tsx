@@ -23,10 +23,12 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
+import Toast from 'react-native-toast-message';
 import { useFragment, graphql } from 'react-relay';
 import { convertHexToRGBA } from '@azzapp/shared/colorsHelpers';
 import { useRouter } from '#components/NativeRouter';
 import { useApplicationSkiaFont } from '#hooks/useApplicationFonts';
+import RNText from '#ui/Text';
 import { useIndexInterpolation } from './homeHelpers';
 import { useHomeScreenContext } from './HomeScreenContext';
 import type { HomeInformations_user$key } from '#relayArtifacts/HomeInformations_user.graphql';
@@ -73,6 +75,7 @@ const HomeInformations = ({
             nbFollowings
             nbFollowers
             nbPostsLiked
+            coverIsPredefined
             cardColors {
               primary
             }
@@ -167,6 +170,24 @@ const HomeInformations = ({
   const router = useRouter();
   const goToPosts = useCallback(() => {
     const currentProfile = profiles?.[currentIndexProfileSharedValue.value - 1];
+    if (currentProfile?.webCard?.coverIsPredefined) {
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage(
+          {
+            defaultMessage: 'You have to create your WebCard{azzappA} first',
+            description:
+              'Home screen - error message when trying to access posts without a webcard',
+          },
+          {
+            azzappA: <RNText variant="azzapp">a</RNText>,
+          },
+        ) as unknown as string,
+        visibilityTime: 2000,
+      });
+      return;
+    }
+
     if (currentProfile?.webCard?.userName) {
       router.push({
         route: 'WEBCARD',
@@ -177,7 +198,7 @@ const HomeInformations = ({
         },
       });
     }
-  }, [currentIndexProfileSharedValue.value, profiles, router]);
+  }, [currentIndexProfileSharedValue.value, intl, profiles, router]);
 
   const goToLikedPost = useCallback(() => {
     router.push({
