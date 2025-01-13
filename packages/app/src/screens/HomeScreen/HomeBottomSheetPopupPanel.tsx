@@ -180,62 +180,68 @@ const HomeBottomSheetPopupPanel = ({
       const nextPage = currentPage + 1;
       setCurrentPage(nextPage);
     }
-    if (currentPage === 2 && isValidUserName(newUserName)) {
-      commitUserName({
-        variables: {
-          webCardId: profileInfo?.webCardId,
-          input: {
-            userName: newUserName,
+    if (currentPage === 2) {
+      if (!isValidUserName(newUserName)) {
+        setError(userNameInvalidError);
+      } else {
+        commitUserName({
+          variables: {
+            webCardId: profileInfo?.webCardId,
+            input: {
+              userName: newUserName,
+            },
           },
-        },
-        onCompleted: () => {
-          // we refetch here because changing userName will update profile url/qrcode
-          // This is the simpiest way to handle these profile change as we work on webcard level here
-          refreshQuery?.();
+          onCompleted: () => {
+            // we refetch here because changing userName will update profile url/qrcode
+            // This is the simpiest way to handle these profile change as we work on webcard level here
+            refreshQuery?.();
 
-          const tooltipWebcardId = profileInfo?.webCardId;
+            const tooltipWebcardId = profileInfo?.webCardId;
 
-          if (timeoutRef.current) {
-            clearTimeout(timeoutRef.current);
-          }
-          if (profileInfo) {
-            onChangeWebCard({ ...profileInfo, webCardUserName: newUserName });
-          }
-          setTimeout(() => {
-            if (tooltipWebcardId) {
-              setTooltipedWebcard(tooltipWebcardId);
+            if (timeoutRef.current) {
+              clearTimeout(timeoutRef.current);
             }
-          }, 500);
-        },
-        updater: store => {
-          // reorder carousel once userName is set
-          if (!profileInfo?.webCardId) return;
-          const currentWebCard = store.get(profileInfo.webCardId);
-          currentWebCard?.setValue(newUserName, 'userName');
+            if (profileInfo) {
+              onChangeWebCard({ ...profileInfo, webCardUserName: newUserName });
+            }
+            setTimeout(() => {
+              if (tooltipWebcardId) {
+                setTooltipedWebcard(tooltipWebcardId);
+              }
+            }, 500);
+          },
+          updater: store => {
+            // reorder carousel once userName is set
+            if (!profileInfo?.webCardId) return;
+            const currentWebCard = store.get(profileInfo.webCardId);
+            currentWebCard?.setValue(newUserName, 'userName');
 
-          const root = store.getRoot();
-          const user = root.getLinkedRecord('currentUser');
-          const profiles = user?.getLinkedRecords('profiles');
-          if (!profiles) {
-            return;
-          }
-          user?.setLinkedRecords(
-            profiles?.sort((a, b) => {
-              const webCardA = a.getLinkedRecord('webCard');
-              const webCardB = b.getLinkedRecord('webCard');
+            const root = store.getRoot();
+            const user = root.getLinkedRecord('currentUser');
+            const profiles = user?.getLinkedRecords('profiles');
+            if (!profiles) {
+              return;
+            }
+            user?.setLinkedRecords(
+              profiles?.sort((a, b) => {
+                const webCardA = a.getLinkedRecord('webCard');
+                const webCardB = b.getLinkedRecord('webCard');
 
-              return (
-                (webCardA?.getValue('userName') as string) ?? ''
-              ).localeCompare((webCardB?.getValue('userName') as string) ?? '');
-            }),
-            'profiles',
-          );
-          root.setLinkedRecord(user, 'currentUser');
-        },
-        onError: e => {
-          console.error('fail to configure username', e);
-        },
-      });
+                return (
+                  (webCardA?.getValue('userName') as string) ?? ''
+                ).localeCompare(
+                  (webCardB?.getValue('userName') as string) ?? '',
+                );
+              }),
+              'profiles',
+            );
+            root.setLinkedRecord(user, 'currentUser');
+          },
+          onError: e => {
+            console.error('fail to configure username', e);
+          },
+        });
+      }
     }
   }, [
     commitUserName,
@@ -244,6 +250,7 @@ const HomeBottomSheetPopupPanel = ({
     profileInfo,
     refreshQuery,
     setTooltipedWebcard,
+    userNameInvalidError,
   ]);
 
   const colorScheme = useColorScheme();
