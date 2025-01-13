@@ -31,9 +31,12 @@ type AlternationContainerProps = ViewProps & {
   parentY?: number;
   modulePosition?: number;
   webCardViewMode?: WebCardViewMode;
+  isFullAlternation?: boolean;
 };
 
 const ANIMATION_DURATION = 1000;
+const HORIZONTAL_GAP = 40;
+const PADDING_HORIZONTAL = 20;
 
 /**
  * ALternation container for the section module type
@@ -53,11 +56,15 @@ const AlternationContainer = ({
   parentY,
   canPlay,
   webCardViewMode,
+  isFullAlternation,
   ...props
 }: AlternationContainerProps) => {
   const styles = useVariantStyleSheet(stylesheet, displayMode);
-  const mediaWidth =
-    displayMode === 'desktop'
+  const mediaWidth = isFullAlternation
+    ? displayMode === 'desktop'
+      ? dimension.width / 2
+      : dimension.width
+    : displayMode === 'desktop'
       ? (dimension.width - 2 * PADDING_HORIZONTAL - HORIZONTAL_GAP) / 2
       : dimension.width - 2 * PADDING_HORIZONTAL;
 
@@ -159,7 +166,7 @@ const AlternationContainer = ({
       styles.imageContainer,
       {
         width: mediaWidth,
-        borderRadius: cardStyle?.borderRadius ?? 0,
+        borderRadius: isFullAlternation ? 0 : (cardStyle?.borderRadius ?? 0),
         transform: [{ translateX: disableAnimation ? 0 : translateX }],
         opacity:
           disableAnimation ||
@@ -171,6 +178,7 @@ const AlternationContainer = ({
     [
       styles.imageContainer,
       mediaWidth,
+      isFullAlternation,
       cardStyle?.borderRadius,
       disableAnimation,
       translateX,
@@ -199,9 +207,23 @@ const AlternationContainer = ({
   return (
     <View
       {...props}
-      style={[styles.container, { width: dimension.width }, style]}
+      style={[
+        isFullAlternation ? styles.fullAlternationContainer : styles.container,
+        { width: dimension.width },
+        style,
+      ]}
       onLayout={onLayout}
     >
+      {displayMode === 'desktop' && index % 2 === 0 ? (
+        <View
+          style={{
+            width: mediaWidth,
+            padding: displayMode === 'desktop' && isFullAlternation ? 40 : 0,
+          }}
+        >
+          {children}
+        </View>
+      ) : undefined}
       {displayMode !== 'desktop' || index % 2 === 0 ? (
         <Animated.View style={imageContainerStyle}>
           <CardModuleMediaSelector
@@ -211,7 +233,6 @@ const AlternationContainer = ({
           />
         </Animated.View>
       ) : null}
-      <View style={{ width: mediaWidth }}>{children}</View>
       {displayMode === 'desktop' && index % 2 === 1 ? (
         <Animated.View style={imageContainerStyle}>
           <CardModuleMediaSelector
@@ -221,11 +242,19 @@ const AlternationContainer = ({
           />
         </Animated.View>
       ) : null}
+      {displayMode === 'mobile' || index % 2 === 1 ? (
+        <View
+          style={{
+            width: mediaWidth,
+            padding: displayMode === 'desktop' && isFullAlternation ? 40 : 0,
+          }}
+        >
+          {children}
+        </View>
+      ) : undefined}
     </View>
   );
 };
-const HORIZONTAL_GAP = 40;
-const PADDING_HORIZONTAL = 20;
 
 const stylesheet = createVariantsStyleSheet(() => ({
   default: {
@@ -240,6 +269,10 @@ const stylesheet = createVariantsStyleSheet(() => ({
       paddingVertical: 20,
       rowGap: 20,
     },
+    fullAlternationContainer: {
+      flex: 1,
+      flexDirection: 'column',
+    },
   },
   desktop: {
     container: {
@@ -248,6 +281,10 @@ const stylesheet = createVariantsStyleSheet(() => ({
       paddingHorizontal: PADDING_HORIZONTAL,
       paddingVertical: 20,
       columnGap: 40,
+    },
+    fullAlternationContainer: {
+      flex: 1,
+      flexDirection: 'row',
     },
   },
 }));

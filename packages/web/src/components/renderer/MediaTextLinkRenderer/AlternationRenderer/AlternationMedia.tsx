@@ -6,14 +6,18 @@ import styles from './AlternationRenderer.css';
 import type { Media } from '@azzapp/data';
 import type { CardStyle } from '@azzapp/shared/cardHelpers';
 
-const AlternationImage = ({
+const mediaResolution = 480;
+
+const AlternationMedia = ({
   media,
   even,
   cardStyle,
+  isFullAlternation,
 }: {
   media: Media;
   even: boolean;
   cardStyle: CardStyle;
+  isFullAlternation?: boolean;
 }) => {
   const pictureRef = useRef<HTMLDivElement>(null);
 
@@ -40,18 +44,28 @@ const AlternationImage = ({
   }, []);
 
   return (
-    <div className={styles.sectionPartContainer} ref={pictureRef}>
+    <div
+      className={
+        isFullAlternation
+          ? styles.sectionPartFullAlternationContainer
+          : styles.sectionPartContainer
+      }
+      ref={pictureRef}
+    >
       <div className={styles.imageContainer}>
         <div
           style={{
             position: 'absolute',
             opacity: isVisible ? 1 : 0,
-            transform: isVisible
-              ? 'translateX(0)'
-              : even
-                ? 'translateX(150px)'
-                : 'translateX(-150px)',
-            transition: 'opacity 1s ease-in-out,transform 1s ease-out',
+            transform:
+              isVisible || isFullAlternation
+                ? 'translateX(0)'
+                : even
+                  ? 'translateX(150px)'
+                  : 'translateX(-150px)',
+            transition: isFullAlternation
+              ? 'opacity 1s ease-in-out'
+              : 'opacity 1s ease-in-out,transform 1s ease-out',
             overflow: 'visible',
             width: '100%',
             height: '100%',
@@ -62,11 +76,13 @@ const AlternationImage = ({
               assetKind="module"
               media={media}
               alt="cover"
-              width={480}
-              height={480}
+              width={mediaResolution}
+              height={mediaResolution}
               className={styles.media}
               style={{
-                borderRadius: cardStyle?.borderRadius ?? 0,
+                borderRadius: isFullAlternation
+                  ? 0
+                  : (cardStyle?.borderRadius ?? 0), // FIXME TBC
                 objectFit: 'cover',
                 width: '100%',
               }}
@@ -80,8 +96,8 @@ const AlternationImage = ({
               mediaId={media.id}
               draggable={false}
               alt="alternation"
-              width={480}
-              height={480}
+              width={mediaResolution}
+              height={mediaResolution}
               format="auto"
               crop={{
                 type: 'fill',
@@ -90,7 +106,9 @@ const AlternationImage = ({
               quality="auto:best"
               className={styles.media}
               style={{
-                borderRadius: cardStyle?.borderRadius ?? 0,
+                borderRadius: isFullAlternation
+                  ? 0
+                  : (cardStyle?.borderRadius ?? 0),
                 objectFit: 'cover',
               }}
             />
@@ -101,4 +119,4 @@ const AlternationImage = ({
   );
 };
 
-export default AlternationImage;
+export default AlternationMedia;

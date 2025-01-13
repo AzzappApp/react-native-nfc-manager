@@ -102,6 +102,19 @@ const MediaTextModuleRenderer = ({
           />
         </CardModuleEditionScrollHandler>
       );
+    case 'full_alternation':
+      return (
+        <CardModuleEditionScrollHandler scrollPosition={scrollPosition}>
+          <CardModuleMediaTextAlternation
+            cardModuleMedias={data.cardModuleMedias!}
+            cardModuleColor={data.cardModuleColor}
+            displayMode={displayMode}
+            scrollPosition={scrollPosition}
+            isFullAlternation
+            {...props}
+          />
+        </CardModuleEditionScrollHandler>
+      );
     case 'parallax':
       return (
         <CardModuleEditionScrollHandler scrollPosition={scrollPosition}>

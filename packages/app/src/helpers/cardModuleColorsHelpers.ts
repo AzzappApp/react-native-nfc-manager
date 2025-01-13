@@ -48,6 +48,7 @@ export const dyptichByModuleVariant = (
     case 'mediaText':
       switch (module.variant) {
         case 'alternation':
+        case 'full_alternation':
           return [
             {
               background: 'light',
@@ -152,6 +153,7 @@ export const dyptichByModuleVariant = (
     case 'mediaTextLink':
       switch (module.variant) {
         case 'alternation':
+        case 'full_alternation':
           return [
             {
               background: 'light',

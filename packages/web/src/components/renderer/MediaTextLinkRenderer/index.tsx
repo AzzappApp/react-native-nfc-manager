@@ -20,6 +20,8 @@ const MediaRenderer = async (props: MediaRendererTextProps) => {
       return <ParallaxRenderer {...props} />;
     case 'alternation':
       return <AlternationRenderer {...props} />;
+    case 'full_alternation':
+      return <AlternationRenderer {...props} isFullAlternation />;
     default: {
       return null;
     }

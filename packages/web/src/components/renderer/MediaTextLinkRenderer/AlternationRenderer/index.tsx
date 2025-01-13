@@ -23,13 +23,14 @@ export type AlternationRendererProps = ModuleRendererProps<
 > &
   Omit<React.HTMLProps<HTMLDivElement>, 'children'> & {
     renderMediaOverlay?: (props: { mediaId: string }) => ReactNode;
-  };
+  } & { isFullAlternation?: boolean };
 
 const AlternationRender = async ({
   module,
   colorPalette,
   coverBackgroundColor,
   cardStyle,
+  isFullAlternation,
 }: AlternationRendererProps) => {
   const { cardModuleMedias, cardModuleColor } = module.data;
 
@@ -49,7 +50,11 @@ const AlternationRender = async ({
         ),
       }}
     >
-      <div className={styles.container}>
+      <div
+        className={
+          isFullAlternation ? styles.containerFullAlternation : styles.container
+        }
+      >
         {medias.map((media, index) => {
           const sectionData = cardModuleMedias.find(
             cardModuleMedia => cardModuleMedia.media.id === media.id,
@@ -60,17 +65,34 @@ const AlternationRender = async ({
               key={media.id}
               className={
                 index % 2 === 0
-                  ? styles.sectionContainerEven
-                  : styles.sectionContainer
+                  ? isFullAlternation
+                    ? styles.sectionFullAlternationContainerEven
+                    : styles.sectionContainerEven
+                  : isFullAlternation
+                    ? styles.sectionFullAlternationContainer
+                    : styles.sectionContainer
               }
             >
               <AlternationMedia
                 media={media}
                 even={index % 2 === 1}
                 cardStyle={cardStyle}
+                isFullAlternation={isFullAlternation}
               />
-              <div className={styles.sectionTextContainer}>
-                <section className={styles.section}>
+              <div
+                className={
+                  isFullAlternation
+                    ? styles.sectionTextFullAlternationContainer
+                    : styles.sectionTextContainer
+                }
+              >
+                <section
+                  className={
+                    isFullAlternation
+                      ? styles.sectionFullAlternation
+                      : styles.section
+                  }
+                >
                   <h3
                     className={cn(
                       commonStyles.title,
@@ -93,13 +115,13 @@ const AlternationRender = async ({
                   >
                     {sectionData?.text ?? DEFAULT_MODULE_TEXT}
                   </p>
+                  <Link
+                    mediaData={sectionData}
+                    data={module.data}
+                    cardStyle={cardStyle}
+                    colorPalette={colorPalette}
+                  />
                 </section>
-                <Link
-                  mediaData={sectionData}
-                  data={module.data}
-                  cardStyle={cardStyle}
-                  colorPalette={colorPalette}
-                />
               </div>
             </div>
           );

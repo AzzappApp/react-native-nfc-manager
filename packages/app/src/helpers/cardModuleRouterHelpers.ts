@@ -12,6 +12,7 @@ export const SUPPORTED_VARIANT = [
   'parallax',
   'slideshow',
   'alternation',
+  'full_alternation',
 ] as const;
 
 export type SupportedVariant = (typeof SUPPORTED_VARIANT)[number];
