@@ -1,4 +1,4 @@
-## 1.6.1-canary.25
+## 1.6.1-canary.26
 
 * **fix:**  - add bottom spacing on webcardscreen [#6831](https://github.com/AzzappApp/azzapp/pull/6831) ([#6843](https://github.com/AzzappApp/azzapp/pull/6843))
 * **fix:**  - **contactCard:** [#6776](https://github.com/AzzappApp/azzapp/pull/6776) put toast on top to avoid keyboard issues ([#6841](https://github.com/AzzappApp/azzapp/pull/6841))
