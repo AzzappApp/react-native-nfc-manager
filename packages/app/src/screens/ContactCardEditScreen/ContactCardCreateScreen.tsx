@@ -3,7 +3,7 @@ import { ResizeMode, Video } from 'expo-av';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Keyboard, useColorScheme, View } from 'react-native';
+import { useColorScheme, View } from 'react-native';
 import * as mime from 'react-native-mime-types'; // FIXME import is verry big
 import Toast from 'react-native-toast-message';
 import { useMutation } from 'react-relay';
@@ -90,15 +90,6 @@ const ContactCardCreateScreen = () => {
     },
   });
 
-  useEffect(() => {
-    const didShow = Keyboard.addListener('keyboardDidShow', () => Toast.hide());
-    const didHide = Keyboard.addListener('keyboardDidHide', () => Toast.hide());
-    return () => {
-      didShow.remove();
-      didHide.remove();
-    };
-  });
-
   const submit = handleSubmit(
     async ({ avatar, webCardKind, company, firstName, ...data }) => {
       if (webCardKind === 'business' && (!company || company.length === 0)) {
@@ -114,6 +105,7 @@ const ContactCardCreateScreen = () => {
           props: {
             showClose: true,
           },
+          position: 'top',
         });
         return;
       } else if (
@@ -132,6 +124,7 @@ const ContactCardCreateScreen = () => {
           props: {
             showClose: true,
           },
+          position: 'top',
         });
         return;
       }
