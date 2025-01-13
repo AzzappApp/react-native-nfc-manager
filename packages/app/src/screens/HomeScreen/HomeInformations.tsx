@@ -198,7 +198,7 @@ const HomeInformations = ({
         },
       });
     }
-  }, [currentIndexProfileSharedValue.value, profiles, router]);
+  }, [currentIndexProfileSharedValue.value, intl, profiles, router]);
 
   const goToLikedPost = useCallback(() => {
     router.push({
