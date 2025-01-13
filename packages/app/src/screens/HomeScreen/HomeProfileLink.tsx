@@ -138,6 +138,7 @@ const styles = StyleSheet.create({
     marginTop: PROFILE_LINK_MARGIN_TOP,
   },
   url: {
+    maxWidth: '90%',
     color: colors.white,
     lineHeight: 14,
     paddingLeft: 5,
