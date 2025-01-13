@@ -143,7 +143,7 @@
     "react-native-permissions": "^5.2.2",
     "react-native-purchases": "^8.5.0",
     "react-native-quick-base64": "^2.1.2",
-    "react-native-reanimated": "^3.16.6",
+    "react-native-reanimated": "^3.16.7",
     "react-native-safe-area-context": "^5.0.0",
     "react-native-screens": "patch:react-native-screens@npm%3A4.4.0#~/.yarn/patches/react-native-screens-npm-4.4.0-d13a7ba722.patch",
     "react-native-share": "^12.0.3",
