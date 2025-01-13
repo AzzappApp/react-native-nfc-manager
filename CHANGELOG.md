@@ -1,4 +1,4 @@
-## 1.6.1-canary.23
+## 1.6.1-canary.24
 
 * **feat:**  - Full alternation ([#6797](https://github.com/AzzappApp/azzapp/pull/6797))
 * **fix:**  - forbid follow, like and post when cover is predefined and display popup accordingly ([#6818](https://github.com/AzzappApp/azzapp/pull/6818))
