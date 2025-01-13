@@ -1,5 +1,11 @@
-## 1.6.1-canary.26
+## 1.6.1-canary.27
 
+* **fix:**  - limit url width on home screen ([#6817](https://github.com/AzzappApp/azzapp/pull/6817))
+* **fix:**  - media picker should not closed with empty slots ([#6846](https://github.com/AzzappApp/azzapp/pull/6846))
+* **fix:**  - **newModules:** [#6665](https://github.com/AzzappApp/azzapp/pull/6665) missing style when using image comp ([#6850](https://github.com/AzzappApp/azzapp/pull/6850))
+* **fix:**  - **webCard:** [#6804](https://github.com/AzzappApp/azzapp/pull/6804) only load component when no username
+* **fix:**  - **webCard:** [#6804](https://github.com/AzzappApp/azzapp/pull/6804) test with pause/resume polling
+* **fix:**  - **webCard:** [#6804](https://github.com/AzzappApp/azzapp/pull/6804) test with reanimated 3.16.7
 * **fix:**  - add bottom spacing on webcardscreen [#6831](https://github.com/AzzappApp/azzapp/pull/6831) ([#6843](https://github.com/AzzappApp/azzapp/pull/6843))
 * **fix:**  - **contactCard:** [#6776](https://github.com/AzzappApp/azzapp/pull/6776) put toast on top to avoid keyboard issues ([#6841](https://github.com/AzzappApp/azzapp/pull/6841))
 * **fix:**  - **cardModules:** [#6833](https://github.com/AzzappApp/azzapp/pull/6833) change default texts ([#6836](https://github.com/AzzappApp/azzapp/pull/6836))
