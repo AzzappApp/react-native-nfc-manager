@@ -1,11 +1,12 @@
 import { ResizeMode, Video } from 'expo-av';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useColorScheme, View } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import {
   fetchQuery,
   graphql,
+  useFragment,
   useMutation,
   useRelayEnvironment,
 } from 'react-relay';
@@ -13,69 +14,66 @@ import { isValidUserName } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import BottomSheetPopup from '#components/popup/BottomSheetPopup';
 import { PopupButton } from '#components/popup/PopupElements';
-import { onChangeWebCard, type ProfileInfosInput } from '#helpers/authStore';
+import { getAuthState, onChangeWebCard } from '#helpers/authStore';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import BottomSheetTextInput from '#ui/BottomSheetTextInput';
 import Icon from '#ui/Icon';
 import { PageProgress } from '#ui/PageProgress';
 import Text from '#ui/Text';
 import { useHomeBottomSheetModalToolTipContext } from './HomeBottomSheetModalToolTip';
+import type { HomeBottomSheetPopupPanel_profile$key } from '#relayArtifacts/HomeBottomSheetPopupPanel_profile.graphql';
 import type { HomeBottomSheetPopupPanelCheckUserNameQuery } from '#relayArtifacts/HomeBottomSheetPopupPanelCheckUserNameQuery.graphql';
 import type { HomeBottomSheetPopupPanelGetProposedUsernameQuery } from '#relayArtifacts/HomeBottomSheetPopupPanelGetProposedUsernameQuery.graphql';
 import type { ReactNode } from 'react';
 
 type HomeBottomSheetPopupPanelProps = {
-  /**
-   *
-   *
-   * @type {boolean}
-   */
-  profileInfo?: ProfileInfosInput;
-  refreshQuery?: () => void;
+  profile: HomeBottomSheetPopupPanel_profile$key | null;
 };
 
 const animationDuration = 500;
 
 const HomeBottomSheetPopupPanel = ({
-  profileInfo,
-  refreshQuery,
+  profile: profileKey,
 }: HomeBottomSheetPopupPanelProps) => {
+  const profile = useFragment(
+    graphql`
+      fragment HomeBottomSheetPopupPanel_profile on Profile {
+        id
+        webCard {
+          id
+          userName
+        }
+      }
+    `,
+    profileKey ?? null,
+  );
+
   const intl = useIntl();
   const environment = useRelayEnvironment();
   const styles = useStyleSheet(stylesheet);
 
-  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
-
-  useEffect(() => {
-    if (profileInfo) {
-      timeoutRef.current = setTimeout(() => {
-        onChangeWebCard(profileInfo);
-      }, 2000);
-      return () => clearTimeout(timeoutRef.current);
-    }
-  }, [profileInfo]);
-
   useEffect(() => {
     const fct = async () => {
-      if (!profileInfo?.webCardId) return;
-      const res =
-        await fetchQuery<HomeBottomSheetPopupPanelGetProposedUsernameQuery>(
-          environment,
-          graphql`
-            query HomeBottomSheetPopupPanelGetProposedUsernameQuery(
-              $webcardId: String!
-            ) {
-              getProposedUserName(webcardId: $webcardId)
-            }
-          `,
-          { webcardId: profileInfo?.webCardId },
-        ).toPromise();
-      if (res?.getProposedUserName) {
-        setNewUserName(res.getProposedUserName);
+      if (profile?.webCard && !profile?.webCard?.userName) {
+        const res =
+          await fetchQuery<HomeBottomSheetPopupPanelGetProposedUsernameQuery>(
+            environment,
+            graphql`
+              query HomeBottomSheetPopupPanelGetProposedUsernameQuery(
+                $webcardId: String!
+              ) {
+                getProposedUserName(webcardId: $webcardId)
+              }
+            `,
+            { webcardId: profile.webCard.id },
+          ).toPromise();
+        if (res?.getProposedUserName) {
+          setNewUserName(res.getProposedUserName);
+        }
       }
     };
-    if (profileInfo?.webCardId) fct();
-  }, [environment, profileInfo?.webCardId]);
+    if (profile?.webCard) fct();
+  }, [environment, profile?.webCard]);
 
   const [commitUserName] = useMutation(graphql`
     mutation HomeBottomSheetPopupPanelMutation(
@@ -97,7 +95,7 @@ const HomeBottomSheetPopupPanel = ({
     undefined,
   );
 
-  const visible = profileInfo?.webCardId !== undefined;
+  const visible = profile?.webCard && !profile.webCard.userName;
 
   const resetPopupState = useCallback(() => {
     setCurrentPage(0);
@@ -186,24 +184,19 @@ const HomeBottomSheetPopupPanel = ({
       } else {
         commitUserName({
           variables: {
-            webCardId: profileInfo?.webCardId,
+            webCardId: profile?.webCard?.id,
             input: {
               userName: newUserName,
             },
           },
           onCompleted: () => {
-            // we refetch here because changing userName will update profile url/qrcode
-            // This is the simpiest way to handle these profile change as we work on webcard level here
-            refreshQuery?.();
+            const tooltipWebcardId = profile?.webCard?.id;
 
-            const tooltipWebcardId = profileInfo?.webCardId;
-
-            if (timeoutRef.current) {
-              clearTimeout(timeoutRef.current);
-            }
+            const profileInfo = getAuthState().profileInfos;
             if (profileInfo) {
               onChangeWebCard({ ...profileInfo, webCardUserName: newUserName });
             }
+
             setTimeout(() => {
               if (tooltipWebcardId) {
                 setTooltipedWebcard(tooltipWebcardId);
@@ -212,8 +205,8 @@ const HomeBottomSheetPopupPanel = ({
           },
           updater: store => {
             // reorder carousel once userName is set
-            if (!profileInfo?.webCardId) return;
-            const currentWebCard = store.get(profileInfo.webCardId);
+            if (!profile?.webCard?.id) return;
+            const currentWebCard = store.get(profile.webCard?.id);
             currentWebCard?.setValue(newUserName, 'userName');
 
             const root = store.getRoot();
@@ -247,8 +240,7 @@ const HomeBottomSheetPopupPanel = ({
     commitUserName,
     currentPage,
     newUserName,
-    profileInfo,
-    refreshQuery,
+    profile?.webCard?.id,
     setTooltipedWebcard,
     userNameInvalidError,
   ]);
@@ -258,7 +250,7 @@ const HomeBottomSheetPopupPanel = ({
   return (
     <BottomSheetPopup
       animationDuration={animationDuration}
-      visible={visible}
+      visible={!!visible}
       onFadeOutFinish={resetPopupState}
       isAnimatedContent
     >

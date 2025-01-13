@@ -48,6 +48,7 @@ const HomeScreenContent = ({
           }
           ...HomeBottomSheetPanel_profile
           ...HomeBottomSheetModalWebCardToolTip_profile
+          ...HomeBottomSheetPopupPanel_profile
         }
         ...HomeBackground_user
         ...HomeProfileLink_user
@@ -103,25 +104,6 @@ const HomeScreenContent = ({
     },
   );
 
-  const profileWithoutWebCardUserName = useMemo(() => {
-    const emptyProfile = user.profiles?.find(
-      profile =>
-        !profile.webCard?.userName || profile.webCard?.userName.length === 0,
-    );
-    const webCardId = emptyProfile?.webCard?.id;
-    if (emptyProfile && webCardId) {
-      return {
-        webCardId,
-        profileId: emptyProfile.id,
-        profileRole: emptyProfile.profileRole,
-        invited: false,
-        webCardUserName: emptyProfile.webCard?.userName,
-      };
-    } else {
-      return undefined;
-    }
-  }, [user.profiles]);
-
   // TODO: here we rely on polling on HOME to check if the profileRole has changed. We should have a better way to keep our app state in sync with the server.
   useEffect(() => {
     const { profileInfos } = getAuthState();
@@ -172,10 +154,7 @@ const HomeScreenContent = ({
       />
       <HomeBottomSheetModalWebCardToolTip user={currentProfile ?? null} />
 
-      <HomeBottomSheetPopupPanel
-        profileInfo={profileWithoutWebCardUserName}
-        refreshQuery={refreshQuery}
-      />
+      <HomeBottomSheetPopupPanel profile={currentProfile ?? null} />
     </View>
   );
 };
