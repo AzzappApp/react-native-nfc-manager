@@ -50,7 +50,7 @@ export const HomeScreenProvider = ({
   const [initialProfileIndex, setInitialProfileIndex] = useState(() => {
     const index =
       user?.profiles?.length === 1
-        ? 1
+        ? 0
         : user?.profiles?.findIndex(
             profile => profile.id === getAuthState().profileInfos?.profileId,
           );
