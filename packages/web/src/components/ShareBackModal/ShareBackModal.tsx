@@ -68,8 +68,8 @@ const ShareBackModal = forwardRef<ModalActions, ShareBackModalProps>(
             <div className={styles.titleContainer}>
               <span className={styles.title}>
                 <FormattedMessage
-                  defaultMessage="Share your details with"
-                  id="vkuk13"
+                  defaultMessage="Share your contact details with"
+                  id="Y5FzDH"
                   description="Share back modal title"
                 />
               </span>

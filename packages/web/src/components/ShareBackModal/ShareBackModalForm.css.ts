@@ -142,6 +142,9 @@ const formButtonLabel = style({
 });
 
 const formButtonSuccessContainer = style({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
   width: '32px',
   height: '32px',
   fill: 'white',
@@ -160,20 +163,15 @@ const formButtonSuccessContainer = style({
 });
 
 const formButtonSuccessSvg = style({
-  marginTop: '50%',
-  marginLeft: '-110%',
   width: '32px',
   height: '32px',
   opacity: 1,
   visibility: 'visible',
-  transform: 'translateY(-50%) scale(1)',
   transition: 'all 0.4s',
 
   selectors: {
     [`:not(${formButtonSuccess})&`]: {
       fill: 'white',
-      transformOrigin: '50% 50%',
-      transform: 'translateY(-100%) rotate(0deg) scale(0)',
       transition: 'all 0.4',
       opacity: 0,
       visibility: 'hidden',

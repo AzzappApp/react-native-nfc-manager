@@ -283,18 +283,15 @@ const ShareBackFormSubmitButton = ({
           <Loader />
         ) : (
           <>
-            <span
-              className={cx(
-                styles.formButtonLabel,
-                isSuccess ? styles.formButtonSuccess : '',
-              )}
-            >
-              <FormattedMessage
-                defaultMessage="Send"
-                id="Gm+qSm"
-                description="Share back - Send button label"
-              />
-            </span>
+            {!isSuccess && (
+              <span className={cx(styles.formButtonLabel)}>
+                <FormattedMessage
+                  defaultMessage="Send"
+                  id="Gm+qSm"
+                  description="Share back - Send button label"
+                />
+              </span>
+            )}
             <div
               className={cx(
                 styles.formButtonSuccessContainer,

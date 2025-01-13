@@ -68,8 +68,8 @@ const IosAddContactInfoModal = forwardRef<
             </span>
             <span className={styles.subtitle}>
               {intl.formatMessage({
-                defaultMessage: 'Click on « Create new contact »,not « Done »',
-                id: '7x5NHn',
+                defaultMessage: 'Click on « Create new contact », not « Done »',
+                id: 'vFqgd8',
                 description:
                   'informative label in ios add contact information modal',
               })}
