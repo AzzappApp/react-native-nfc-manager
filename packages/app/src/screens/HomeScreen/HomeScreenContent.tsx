@@ -154,7 +154,9 @@ const HomeScreenContent = ({
       />
       <HomeBottomSheetModalWebCardToolTip user={currentProfile ?? null} />
 
-      <HomeBottomSheetPopupPanel profile={currentProfile ?? null} />
+      {currentProfile?.webCard && !currentProfile.webCard.userName && (
+        <HomeBottomSheetPopupPanel profile={currentProfile ?? null} />
+      )}
     </View>
   );
 };

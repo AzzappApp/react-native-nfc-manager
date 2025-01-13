@@ -103,11 +103,6 @@ const HomeBottomSheetPopupPanel = ({
     setNewUserName('');
   }, []);
 
-  const onLinkUrlChanged = (url: string) => {
-    setNewUserName(url);
-    validateUrl(url);
-  };
-
   const userNameAlreadyExistsError = intl.formatMessage(
     {
       defaultMessage: 'This WebCard{azzappA} name is already registered',
@@ -171,6 +166,14 @@ const HomeBottomSheetPopupPanel = ({
     [environment, userNameAlreadyExistsError, userNameInvalidError],
   );
 
+  const onLinkUrlChanged = useCallback(
+    (url: string) => {
+      setNewUserName(url);
+      validateUrl(url);
+    },
+    [validateUrl],
+  );
+
   const { setTooltipedWebcard } = useHomeBottomSheetModalToolTipContext();
 
   const onNextPageRequested = useCallback(() => {
@@ -192,16 +195,14 @@ const HomeBottomSheetPopupPanel = ({
           onCompleted: () => {
             const tooltipWebcardId = profile?.webCard?.id;
 
+            if (tooltipWebcardId) {
+              setTooltipedWebcard(tooltipWebcardId);
+            }
+
             const profileInfo = getAuthState().profileInfos;
             if (profileInfo) {
               onChangeWebCard({ ...profileInfo, webCardUserName: newUserName });
             }
-
-            setTimeout(() => {
-              if (tooltipWebcardId) {
-                setTooltipedWebcard(tooltipWebcardId);
-              }
-            }, 500);
           },
           updater: store => {
             // reorder carousel once userName is set
