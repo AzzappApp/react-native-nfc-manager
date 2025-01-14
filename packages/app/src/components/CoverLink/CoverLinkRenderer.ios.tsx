@@ -1,11 +1,12 @@
 import * as Sentry from '@sentry/react-native';
 import { useEffect, useRef } from 'react';
-import { graphql, useFragment, useRelayEnvironment } from 'react-relay';
+import { useRelayEnvironment } from 'react-relay';
 import { COVER_CARD_RADIUS } from '@azzapp/shared/coverHelpers';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
 import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
+import useCoverLinkRendererFragment from './useCoverLinkRendererFragment';
 import type {
   MediaImageRendererHandle,
   MediaVideoRendererHandle,
@@ -34,14 +35,7 @@ const CoverLink = ({
   >(null);
   const router = useRouter();
   const prefetchScreen = usePrefetchRoute();
-  const webCard = useFragment(
-    graphql`
-      fragment CoverLinkRendererIos_webCard on WebCard {
-        coverIsPredefined
-      }
-    `,
-    props.webCard,
-  );
+  const webCard = useCoverLinkRendererFragment(props.webCard);
 
   const onPressInner = (event: GestureResponderEvent) => {
     onPress?.(event);
