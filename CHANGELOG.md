@@ -1,5 +1,6 @@
-## 1.6.1-canary.28
+## 1.6.1-canary.29
 
+* **fix:**  - do not overflow hidden, it causes a border of cancel button to be cut ([#6858](https://github.com/AzzappApp/azzapp/pull/6858))
 * **fix:**  - [#6462](https://github.com/AzzappApp/azzapp/pull/6462) ensure reads are made on primary after mutation ([#6581](https://github.com/AzzappApp/azzapp/pull/6581))
 * **build:**  - upgrade native deps ([#6853](https://github.com/AzzappApp/azzapp/pull/6853))
 * **fix:**  - limit url width on home screen ([#6817](https://github.com/AzzappApp/azzapp/pull/6817))
