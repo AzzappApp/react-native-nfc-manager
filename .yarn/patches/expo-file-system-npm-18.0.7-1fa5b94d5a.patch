@@ -46,7 +46,7 @@ index 8bc8cc5badd6f7d5e548b44493ce0d292290c458..cce47f9232d1d23f03c9e9237015d205
  
    async text(): Promise<string> {
 diff --git a/src/next/pathUtilities/path.ts b/src/next/pathUtilities/path.ts
-index e434d9bd288a5a3c8bd716a07dda5abd22ec755b..a79dc6e1537f4072553d622bd8956366431d601d 100644
+index e434d9bd288a5a3c8bd716a07dda5abd22ec755b..f157103dee79bdf3ca9843a6bed67618690e130d 100644
 --- a/src/next/pathUtilities/path.ts
 +++ b/src/next/pathUtilities/path.ts
 @@ -19,7 +19,7 @@
@@ -63,12 +63,12 @@ index e434d9bd288a5a3c8bd716a07dda5abd22ec755b..a79dc6e1537f4072553d622bd8956366
  }
  
 -function formatExt(ext) {
-+function formatExt(ext?: string): string {
++function formatExt(ext?:string): string {
    return ext ? `${ext[0] === '.' ? '' : '.'}${ext}` : '';
  }
  
 diff --git a/src/next/pathUtilities/url.ts b/src/next/pathUtilities/url.ts
-index 0c30006e707c01f21471e6d561125cfb506e9d45..fdaed64255d4cd6e324b13d94f31917c29bce640 100644
+index 0c30006e707c01f21471e6d561125cfb506e9d45..700972d7f1fa6c52b00f9ac511243cbc26ae8844 100644
 --- a/src/next/pathUtilities/url.ts
 +++ b/src/next/pathUtilities/url.ts
 @@ -61,7 +61,7 @@ export function pathToFileURL(filepath: string) {
@@ -76,7 +76,7 @@ index 0c30006e707c01f21471e6d561125cfb506e9d45..fdaed64255d4cd6e324b13d94f31917c
  }
  
 -function getPathFromURLPosix(url) {
-+function getPathFromURLPosix(url: URL) {
++function getPathFromURLPosix(url:URL) {
    if (url.hostname !== '') {
      throw new Error(
        'URL host must be localhost or empty – are you sure your url starts with `file:///`?'
@@ -90,7 +90,7 @@ index 0c30006e707c01f21471e6d561125cfb506e9d45..fdaed64255d4cd6e324b13d94f31917c
          throw new Error('pathname must not include encoded / characters');
        }
 diff --git a/src/next/streams.ts b/src/next/streams.ts
-index bfa37c849e14fd575caddde3fc29c4a98d3277b9..1087d844dc80dc4bce80c2b54ce41659c7d451b5 100644
+index bfa37c849e14fd575caddde3fc29c4a98d3277b9..25c8d4838d4e0f2a3f4a6c5b49a435def271164a 100644
 --- a/src/next/streams.ts
 +++ b/src/next/streams.ts
 @@ -5,7 +5,7 @@ export class FileSystemReadableStreamSource implements UnderlyingByteSource {
@@ -102,20 +102,11 @@ index bfa37c849e14fd575caddde3fc29c4a98d3277b9..1087d844dc80dc4bce80c2b54ce41659
      this.handle = handle;
    }
  
-@@ -15,7 +15,7 @@ export class FileSystemReadableStreamSource implements UnderlyingByteSource {
- 
-   pull(controller: ReadableByteStreamController) {
-     const theView = controller.byobRequest?.view;
--    if (!theView) {
-+    if (!theView) { 
-       const bytes = this.handle.readBytes(this.size);
-       if (bytes.length === 0) {
-         controller.close();
 @@ -36,6 +36,7 @@ export class FileSystemReadableStreamSource implements UnderlyingByteSource {
        theView.set(bytes, theView.byteOffset);
      } else {
        for (let i = 0; i < bytes.length; i++) {
-+        // @ts-ignore
++         // @ts-ignore
          theView[i + theView.byteOffset] = bytes[i];
        }
      }
