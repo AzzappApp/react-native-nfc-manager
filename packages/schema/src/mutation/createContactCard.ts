@@ -3,6 +3,7 @@ import {
   checkMedias,
   createProfile,
   createWebCard,
+  getProfileById,
   pickRandomPredefinedCover,
   referencesMedias,
   transaction,
@@ -10,7 +11,7 @@ import {
 import ERRORS from '@azzapp/shared/errors';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { getSessionInfos } from '#GraphQLContext';
-import { profileLoader, userLoader } from '#loaders';
+import { userLoader } from '#loaders';
 import type { MutationResolvers } from '#/__generated__/types';
 import type { WebCardTable } from '@azzapp/data/src/schema';
 import type { WebCardKind } from '@azzapp/shared/webCardKind';
@@ -75,7 +76,16 @@ const createContactCard: MutationResolvers['createContactCard'] = async (
     if (!profileId) {
       throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
     }
-    const profile = await profileLoader.load(profileId);
+
+    let profile = await getProfileById(profileId);
+    let attempt = 1;
+    while (profile === null && attempt < 20) {
+      await new Promise(resolve => {
+        setTimeout(resolve, 50);
+      });
+      profile = await getProfileById(profileId);
+      attempt++;
+    }
 
     if (!profile) {
       throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);

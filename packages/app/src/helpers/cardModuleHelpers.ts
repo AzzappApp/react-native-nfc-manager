@@ -70,6 +70,7 @@ export const handleUploadCardModuleMedia = async (
   );
 
   const mediaToUploads: Array<{
+    id: string;
     uri: string;
     kind: 'image' | 'video';
   } | null> = [];
@@ -134,6 +135,7 @@ export const handleUploadCardModuleMedia = async (
             value += 1;
             updateProcessedMedia({ total: processingMediaTotal, value });
             return {
+              id: media.id,
               uri: media.uri,
               kind: media.kind,
             };
@@ -148,13 +150,14 @@ export const handleUploadCardModuleMedia = async (
   const mediaUploading = await Promise.all(
     mediaToUploads
       .filter(item => item !== null)
-      .map(async ({ uri, kind }) => {
+      .map(async ({ id, uri, kind }) => {
         const { uploadURL, uploadParameters } = await uploadSign({
           kind,
           target: 'module',
         });
 
         return {
+          id,
           kind,
           uri,
           ...uploadMedia(
@@ -177,14 +180,13 @@ export const handleUploadCardModuleMedia = async (
         .map(({ progress }) => progress),
     ),
   );
-  await waitTime(1);
-
   const mediasUploaded = await Promise.all(
     mediaUploading.map(async item => {
       if (item != null) {
-        const { promise, uri, kind } = item;
+        const { id, promise, uri, kind } = item;
         const uploadResult = await promise;
         return {
+          originalId: id,
           id: uploadResult.public_id,
           kind,
           uri,
@@ -194,11 +196,13 @@ export const handleUploadCardModuleMedia = async (
     }),
   );
 
-  return cardModuleMedias.map((moduleMedia, index) => {
+  return cardModuleMedias.map(moduleMedia => {
     if (moduleMedia.needDbUpdate) {
       return {
         ...moduleMedia,
-        media: mediasUploaded[index] ?? moduleMedia.media,
+        media:
+          mediasUploaded.find(a => a?.originalId === moduleMedia.media.id) ??
+          moduleMedia.media,
       };
     }
     return moduleMedia;
