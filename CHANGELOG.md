@@ -1,5 +1,13 @@
-## 1.7.0-canary.2
+## 1.7.0-canary.3
 
+* **fix:**  - put back waitTime
+* **fix:**  - ensure contact details modal is fullscreen ([#6884](https://github.com/AzzappApp/azzapp/pull/6884))
+* **fix:**  - **likes:** [#6888](https://github.com/AzzappApp/azzapp/pull/6888) missing fragment
+* **fix:**  - **following:** [#6889](https://github.com/AzzappApp/azzapp/pull/6889) missing fragment
+* **fix:**  - put back waitTime
+* **fix:**  - adding media on existing module
+* **fix:**  - adding media on existing module
+* **fix:**  - **profile:** [#6881](https://github.com/AzzappApp/azzapp/pull/6881) ensure profile is on replica
 * **fix:**  - allow to duplicate hidden module ([#6869](https://github.com/AzzappApp/azzapp/pull/6869))
 * **fix:**  - fix ordering management and remove duplicated callbacks ([#6873](https://github.com/AzzappApp/azzapp/pull/6873))
 * **feat:**  - Grid square module ([#6872](https://github.com/AzzappApp/azzapp/pull/6872))
