@@ -21,6 +21,7 @@ import {
 import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
+import { colors } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
 import { emitContactAdded } from '#helpers/addContactHelper';
@@ -469,7 +470,7 @@ const AddContactModal = ({
     <BottomSheetModal
       visible={show}
       onDismiss={onDismiss}
-      height={675 + bottom}
+      height={700 + bottom}
       lazy
       enableContentPanningGesture={false}
     >
@@ -486,11 +487,6 @@ const AddContactModal = ({
               />
             </Text>
           </View>
-        }
-        leftElement={
-          <PressableNative onPress={close} style={styles.close}>
-            <Icon icon="close" />
-          </PressableNative>
         }
         middleElementStyle={styles.headerMiddle}
       />
@@ -523,6 +519,14 @@ const AddContactModal = ({
           })}
           onPress={onShowContact}
         />
+        <PressableNative onPress={close} style={styles.notAddButton}>
+          <Text variant="medium" style={styles.notAddLabel}>
+            <FormattedMessage
+              defaultMessage="Do not add"
+              description="AddContactModal - Not add title"
+            />
+          </Text>
+        </PressableNative>
       </View>
     </BottomSheetModal>
   );
@@ -673,6 +677,13 @@ const styles = StyleSheet.create({
   button: {
     marginTop: 20,
   },
+  notAddButton: {
+    margin: 20,
+    alignItems: 'center',
+  },
+  notAddLabel: {
+    color: colors.grey200,
+  },
   headerText: {
     textAlign: 'center',
     marginHorizontal: 25,
@@ -684,10 +695,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 60,
     justifyContent: 'center',
-  },
-  close: {
-    position: 'relative',
-    top: 8,
   },
 });
 
