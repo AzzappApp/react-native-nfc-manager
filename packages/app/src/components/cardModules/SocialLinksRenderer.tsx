@@ -13,6 +13,10 @@ import {
   getModuleDataValues,
   SOCIAL_LINKS_DEFAULT_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
+import {
+  generateSocialLink,
+  type SocialLinkId,
+} from '@azzapp/shared/socialLinkHelpers';
 import { SocialIcon } from '#ui/Icon';
 import PressableOpacity from '#ui/PressableOpacity';
 import CardModuleBackground from './CardModuleBackground';
@@ -23,7 +27,6 @@ import type {
 import type { PressableOpacityProps } from '#ui/PressableOpacity';
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { NullableFields } from '@azzapp/shared/objectHelpers';
-import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
 import type { ImageStyle, StyleProp, ViewProps, ViewStyle } from 'react-native';
 
 /**
@@ -136,18 +139,13 @@ const SocialLinksRenderer = ({
     (a, b) => a.position - b.position,
   );
 
-  const onPressSocialLink = async (link: {
+  const onPressSocialLink = (link: {
     readonly link: string;
-    readonly position: number;
     readonly socialId: string;
-  }) => {
-    let linkUrl = link.link;
-    if (link.socialId === 'phone') linkUrl = `tel:${link.link}`;
-    if (link.socialId === 'sms') linkUrl = `sms:${link.link}`;
-    if (link.socialId === 'mail') linkUrl = `mailto:${link.link}`;
-
-    await Linking.openURL(linkUrl);
-  };
+  }) =>
+    Linking.openURL(
+      generateSocialLink(link.socialId as SocialLinkId, link.link),
+    );
 
   useEffect(() => {
     LayoutAnimation.configureNext({
