@@ -180,6 +180,8 @@ export const handleUploadCardModuleMedia = async (
         .map(({ progress }) => progress),
     ),
   );
+  await waitTime(1);
+
   const mediasUploaded = await Promise.all(
     mediaUploading.map(async item => {
       if (item != null) {
