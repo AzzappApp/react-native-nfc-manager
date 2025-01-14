@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs';
 import sanitizeHTML from 'sanitize-html';
 import { buildInviteUrl } from '@azzapp/shared/urlHelpers';
 import { sendEmail } from './emailHelpers';
@@ -13,6 +14,10 @@ export const notifyUsers = async (
   notificationType: 'invitation' | 'transferOwnership',
   locale: Locale,
 ) => {
+  if (!webCard.userName) {
+    Sentry.captureMessage('cannot notify user without username');
+    return;
+  }
   const intl = getServerIntl(locale);
   switch (notificationType) {
     case 'invitation':
@@ -56,7 +61,7 @@ export const notifyUsers = async (
                 email: receivers.join(', '),
                 a: (...chunks) =>
                   sanitizeHTML(
-                    `<a href="${buildInviteUrl(webCard.userName)}">${chunks.join('')}</a>`,
+                    `<a href="${buildInviteUrl(webCard.userName || '')}">${chunks.join('')}</a>`,
                   ),
               },
             ),
@@ -76,7 +81,7 @@ export const notifyUsers = async (
                   {
                     userName: webCard.userName,
                     phoneNumber: receiver,
-                    url: buildInviteUrl(webCard.userName),
+                    url: buildInviteUrl(webCard.userName || ''),
                   },
                 ),
               }).catch(error => {

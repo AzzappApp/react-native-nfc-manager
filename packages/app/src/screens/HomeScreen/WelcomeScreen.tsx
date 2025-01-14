@@ -1,4 +1,4 @@
-import LottieView from 'lottie-react-native';
+import { Video } from 'expo-av';
 import { useCallback, useEffect } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Image, StyleSheet, useWindowDimensions, View } from 'react-native';
@@ -69,16 +69,15 @@ const WelcomeScreen = ({
           onPress={open}
         />
       </View>
-      <LottieView
-        source={require('../../assets/welcome/welcom_lottie.json')}
-        autoPlay
-        loop
-        hardwareAccelerationAndroid
+      <Video
+        source={require('../../assets/welcome/home_welcome.mp4')}
+        isLooping
+        isMuted
+        shouldPlay
         style={{
           width,
           height: width,
         }}
-        resizeMode="cover"
       />
       <View style={styles.content}>
         <Text variant="xlarge" style={styles.title} appearance="light">
@@ -96,7 +95,10 @@ const WelcomeScreen = ({
             }}
           />
         </Text>
-        <Link route="WEBCARD_KIND_SELECTION" prefetch>
+        <Link
+          route="CONTACT_CARD_CREATE"
+          params={{ launchedFromWelcomeScreen: true }}
+        >
           <Button
             label={intl.formatMessage(
               {

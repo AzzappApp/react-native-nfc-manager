@@ -1,17 +1,19 @@
 import { forwardRef, memo, useMemo } from 'react';
-import { Dimensions, Image, Platform, View } from 'react-native';
+import { Dimensions, Image, Platform, View, Text } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
   COVER_BASE_WIDTH,
   COVER_CARD_RADIUS,
   COVER_RATIO,
+  DEFAULT_COVER_HEIGHT,
+  DEFAULT_COVER_WIDTH,
   LINKS_GAP,
   calculateLinksSize,
   convertToBaseCanvasRatio,
 } from '@azzapp/shared/coverHelpers';
 
-import { colors, shadow } from '#theme';
+import { colors, fontFamilies, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import PressableNative from '#ui/PressableNative';
 import { DynamicLinkRenderer } from './CoverEditor/CoverPreview/DynamicLinkRenderer';
@@ -73,6 +75,9 @@ export type CoverRendererProps = {
   style?: StyleProp<ViewStyle>;
 };
 
+// define the minimum cover width to allow displaying test on predefined covers
+const MIN_WIDTH_TO_DISPLAY_COVER_TEXT = 50;
+
 /**
  * Renders a card cover
  */
@@ -91,7 +96,18 @@ const CoverRenderer = (
   }: CoverRendererProps,
   forwardRef: ForwardedRef<View>,
 ) => {
-  const { cardColors, coverMedia, coverBackgroundColor, coverDynamicLinks } =
+  const {
+    cardColors,
+    coverMedia,
+    coverBackgroundColor,
+    coverDynamicLinks,
+    coverIsPredefined,
+    firstName,
+    lastName,
+    companyName,
+    companyActivityLabel,
+    webCardKind,
+  } =
     useFragment(
       graphql`
         fragment CoverRenderer_webCard on WebCard
@@ -109,6 +125,12 @@ const CoverRenderer = (
             dark
             light
           }
+          coverIsPredefined
+          firstName
+          lastName
+          companyName
+          companyActivityLabel
+          webCardKind
           coverBackgroundColor
           coverMedia {
             id
@@ -218,34 +240,90 @@ const CoverRenderer = (
     [borderRadius, styles.shadow],
   );
 
+  // To have correct font scalling we need to render on a 375x600 surface and resize it to match cover displayed
+  // No need to render it on small thumbnails
+  const validSizeForText = width > MIN_WIDTH_TO_DISPLAY_COVER_TEXT;
+  const overlayTitle =
+    coverIsPredefined && validSizeForText
+      ? webCardKind === 'business'
+        ? companyName
+        : firstName
+      : undefined;
+
+  const overlaySubTitle =
+    coverIsPredefined && validSizeForText
+      ? webCardKind === 'business'
+        ? companyActivityLabel
+        : lastName
+      : undefined;
+
+  const textScale = width / DEFAULT_COVER_WIDTH;
+  const textTranslateX = -(DEFAULT_COVER_WIDTH - width) / 2;
+  const textTranslateY = -(DEFAULT_COVER_HEIGHT - width / COVER_RATIO) / 2;
+
   return (
     <View style={large ? undefined : shadowStyle}>
       <View ref={forwardRef} style={containerStyle} testID="cover-renderer">
         {coverSource ? (
-          isVideoMedia ? (
-            <MediaVideoRenderer
-              ref={mediaRef as any}
-              testID="CoverRenderer_media"
-              source={coverSource}
-              thumbnailURI={isSmallCover ? smallThumbnail : thumbnail}
-              onReadyForDisplay={onReadyForDisplay}
-              videoEnabled={canPlay}
-              onError={onError}
-              style={styles.layer}
-              paused={paused}
-              useAnimationSnapshot={useAnimationSnapshot}
-            />
-          ) : (
-            <MediaImageRenderer
-              ref={mediaRef as any}
-              testID="CoverRenderer_media"
-              source={coverSource}
-              onReadyForDisplay={onReadyForDisplay}
-              onError={onError}
-              style={styles.layer}
-              useAnimationSnapshot={useAnimationSnapshot}
-            />
-          )
+          <>
+            {isVideoMedia ? (
+              <MediaVideoRenderer
+                ref={mediaRef as any}
+                testID="CoverRenderer_media"
+                source={coverSource}
+                thumbnailURI={isSmallCover ? smallThumbnail : thumbnail}
+                onReadyForDisplay={onReadyForDisplay}
+                videoEnabled={canPlay}
+                onError={onError}
+                style={styles.layer}
+                paused={paused}
+                useAnimationSnapshot={useAnimationSnapshot}
+              />
+            ) : (
+              <MediaImageRenderer
+                ref={mediaRef as any}
+                testID="CoverRenderer_media"
+                source={coverSource}
+                onReadyForDisplay={onReadyForDisplay}
+                onError={onError}
+                style={styles.layer}
+                useAnimationSnapshot={useAnimationSnapshot}
+              />
+            )}
+            {(overlayTitle || overlaySubTitle) && (
+              <View
+                style={[
+                  styles.coverOverlay,
+                  {
+                    transform: [
+                      { translateX: textTranslateX },
+                      { translateY: textTranslateY },
+                      { scale: textScale },
+                    ],
+                  },
+                ]}
+              >
+                {overlayTitle && (
+                  <Text
+                    style={styles.overlayTitle}
+                    numberOfLines={1}
+                    allowFontScaling
+                  >
+                    {overlayTitle}
+                  </Text>
+                )}
+                {overlaySubTitle && (
+                  <Text
+                    style={styles.overlaySubTitle}
+                    numberOfLines={1}
+                    allowFontScaling
+                  >
+                    {overlaySubTitle}
+                  </Text>
+                )}
+              </View>
+            )}
+          </>
         ) : (
           <View style={styles.coverPlaceHolder}>
             <Image
@@ -322,5 +400,26 @@ const stylesheet = createStyleSheet(theme => ({
     aspectRatio: COVER_RATIO,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  coverOverlay: {
+    position: 'absolute',
+    width: DEFAULT_COVER_WIDTH,
+    height: DEFAULT_COVER_HEIGHT,
+  },
+  overlayTitle: {
+    ...fontFamilies.regular,
+    color: colors.white,
+    top: '44.8%',
+    left: '22%',
+    width: '70%',
+    fontSize: 19,
+  },
+  overlaySubTitle: {
+    ...fontFamilies.extrabold,
+    color: colors.white,
+    top: '45%',
+    width: '70%',
+    left: '22%',
+    fontSize: 27,
   },
 }));

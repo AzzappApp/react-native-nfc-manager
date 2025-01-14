@@ -2,6 +2,7 @@ import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { runOnJS, useAnimatedReaction } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
+import { useDebouncedCallback } from 'use-debounce';
 import { getAuthState } from '#helpers/authStore';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import useBoolean from '#hooks/useBoolean';
@@ -10,7 +11,9 @@ import useScreenInsets from '#hooks/useScreenInsets';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import HomeBackground from './HomeBackground';
 import HomeBottomPanel from './HomeBottomPanel';
+import { HomeBottomSheetModalWebCardToolTip } from './HomeBottomSheetModalWebCardToolTip';
 import HomeBottomSheetPanel from './HomeBottomSheetPanel';
+import HomeBottomSheetPopupPanel from './HomeBottomSheetPopupPanel';
 import HomeHeader from './HomeHeader';
 import HomeProfileLink from './HomeProfileLink';
 import HomeProfilesCarousel from './HomeProfilesCarousel';
@@ -39,14 +42,19 @@ const HomeScreenContent = ({
           profileRole
           invited
           webCard {
+            id
             cardIsPublished
+            userName
           }
           ...HomeBottomSheetPanel_profile
+          ...HomeBottomSheetModalWebCardToolTip_profile
+          ...HomeBottomSheetPopupPanel_profile
         }
         ...HomeBackground_user
         ...HomeProfileLink_user
         ...HomeProfilesCarousel_user
         ...HomeBottomPanel_user
+        ...HomeHeader_user
         ...HomeHeader_user
       }
     `,
@@ -86,11 +94,13 @@ const HomeScreenContent = ({
   const [currentProfile, setCurrentProfile] = useState(
     user.profiles?.[initialProfileIndex - 1],
   );
+  const debouncedUpdate = useDebouncedCallback(setCurrentProfile, 300);
+
   useAnimatedReaction(
     () => currentIndexProfileSharedValue.value,
     index => {
       const cProfile = user.profiles?.[index - 1];
-      runOnJS(setCurrentProfile)(cProfile);
+      runOnJS(debouncedUpdate)(cProfile);
     },
   );
 
@@ -142,6 +152,11 @@ const HomeScreenContent = ({
         close={closeMenu}
         profile={currentProfile ?? null}
       />
+      <HomeBottomSheetModalWebCardToolTip user={currentProfile ?? null} />
+
+      {currentProfile?.webCard && !currentProfile.webCard.userName && (
+        <HomeBottomSheetPopupPanel profile={currentProfile ?? null} />
+      )}
     </View>
   );
 };

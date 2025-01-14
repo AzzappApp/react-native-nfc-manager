@@ -39,12 +39,13 @@ const toggleWebCardPublished: MutationResolvers['toggleWebCardPublished'] =
       console.error(e);
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
-
-    invalidateWebCard(webCard.userName);
-
-    const posts = await getWebCardPosts(webCard.id);
-    posts.forEach(post => invalidatePost(webCard.userName, post.id));
-
+    if (webCard.userName) {
+      invalidateWebCard(webCard.userName);
+      const posts = await getWebCardPosts(webCard.id);
+      posts.forEach(
+        post => webCard.userName && invalidatePost(webCard.userName, post.id),
+      );
+    }
     return {
       webCard: {
         ...webCard,

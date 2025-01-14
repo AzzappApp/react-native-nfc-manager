@@ -69,6 +69,8 @@ const AuthorCartouche = ({
         userName
         cardIsPublished
         ...CoverRenderer_webCard
+        ...CoverLinkRenderer_webCard
+        ...CoverLinkRendererIos_webCard
       }
     `,
     authorKey,
@@ -93,7 +95,7 @@ const AuthorCartouche = ({
     );
   }
 
-  if (activeLink) {
+  if (activeLink && author.userName) {
     return (
       <Link
         route="WEBCARD"

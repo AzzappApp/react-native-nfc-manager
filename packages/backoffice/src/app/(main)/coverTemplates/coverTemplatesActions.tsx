@@ -86,7 +86,6 @@ export const saveCoverTemplate = async (
 export const uploadPreview = async (prevState: unknown, formData: FormData) => {
   try {
     const coverTemplateId = formData.get('coverTemplateId') as string;
-    const companyActivityId = formData.get('activityId') as string;
     const previewId = formData.get('previewId') as string;
 
     if (!previewId) {
@@ -95,19 +94,16 @@ export const uploadPreview = async (prevState: unknown, formData: FormData) => {
     await checkMedias([previewId]);
 
     await transaction(async () => {
-      const coverTemplatePreview = await getCoverTemplatePreview(
-        coverTemplateId,
-        companyActivityId,
-      );
+      const coverTemplatePreview =
+        await getCoverTemplatePreview(coverTemplateId);
 
       if (coverTemplatePreview) {
-        await updateCoverTemplatePreview(coverTemplateId, companyActivityId, {
+        await updateCoverTemplatePreview(coverTemplateId, {
           mediaId: previewId,
         });
       } else {
         await createCoverTemplatePreview({
           coverTemplateId,
-          companyActivityId,
           mediaId: previewId,
         });
       }
@@ -124,12 +120,9 @@ export const uploadPreview = async (prevState: unknown, formData: FormData) => {
   }
 };
 
-export const deletePreview = async (
-  coverTemplateId: string,
-  companyActivityId: string,
-) => {
+export const deletePreview = async (coverTemplateId: string) => {
   try {
-    await removeCoverTemplatePreviewById(coverTemplateId, companyActivityId);
+    await removeCoverTemplatePreviewById(coverTemplateId);
     revalidatePath(`/coverTemplates/[id]`, 'layout');
   } catch (e) {
     console.error(e);

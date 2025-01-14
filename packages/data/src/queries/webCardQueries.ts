@@ -64,6 +64,7 @@ export const searchWebCards = ({
       and(
         eq(WebCardTable.cardIsPublished, true),
         eq(WebCardTable.deleted, false),
+        eq(WebCardTable.coverIsPredefined, false),
         after ? lt(WebCardTable.createdAt, after) : undefined,
         search
           ? or(
@@ -293,6 +294,44 @@ export const getWebCardByUserNameWithRedirection = async (
   return null;
 };
 
+/**
+ * Retrieves a webcard by their webcard handling redirection
+ *
+ * @param userName - The username of the webcard to retrieve
+ * @returns - The profile if found, otherwise null
+ */
+export const getWebCardByUserNamePrefixWithRedirection = async (
+  profileName: string,
+) => {
+  const matchPrefix = `${profileName}[0-9]*$`;
+
+  const webCard = await db()
+    .select({ userName: WebCardTable.userName })
+    .from(WebCardTable)
+    .where(
+      and(
+        like(WebCardTable.userName, `${profileName}%`),
+        sql`userName REGEXP ${matchPrefix}`,
+      ),
+    )
+    .limit(1000)
+    .then(res => res.map(res => res.userName) ?? null);
+
+  const redirectionList = await db()
+    .select({ toUserName: RedirectWebCardTable.toUserName })
+    .from(RedirectWebCardTable)
+    .where(
+      and(
+        like(RedirectWebCardTable.toUserName, `${profileName}%`),
+        sql`toUserName REGEXP ${matchPrefix}`,
+      ),
+    )
+    .limit(1000)
+    .then(res => res.map(res => res.toUserName) ?? null);
+
+  return [...webCard, ...redirectionList];
+};
+
 export const getWebCardByProfileId = (id: string): Promise<WebCard | null> => {
   return db()
     .select()
@@ -342,6 +381,7 @@ export const getRecommendedWebCards = async (
         isNull(FollowTable.followerId),
         eq(WebCardTable.cardIsPublished, true),
         eq(WebCardTable.deleted, false),
+        eq(WebCardTable.coverIsPredefined, false),
       ),
     )
     .orderBy(desc(WebCardTable.starred), desc(WebCardTable.createdAt))

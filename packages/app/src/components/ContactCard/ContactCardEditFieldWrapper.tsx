@@ -122,19 +122,11 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
         style={[styles.field, style]}
         onLayout={event => setLayout(event.nativeEvent.layout)}
       >
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            paddingHorizontal: 20,
-            flex: 1,
-          }}
-        >
+        <View style={styles.container}>
           <View
             style={[
               styles.fieldContainer,
-              { minWidth: labelValues && labelValues.length > 0 ? 100 : 0 },
+              { minWidth: labelValues && labelValues.length > 0 ? 130 : 0 },
             ]}
           >
             <IconButton
@@ -224,6 +216,13 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
 };
 
 const stylesheet = createStyleSheet(appearance => ({
+  container: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    flex: 1,
+  },
   fieldContainer: {
     columnGap: 5,
     flexDirection: 'row',

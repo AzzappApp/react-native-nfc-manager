@@ -122,7 +122,7 @@ const CoverCreationScreen = ({
     coverEditorRef.current?.save().then(() => {
       if (fromCoverEdition) {
         router.pop(2);
-      } else if (profile?.webCard) {
+      } else if (profile?.webCard?.userName) {
         router.splice(
           {
             route: 'WEBCARD',
@@ -221,8 +221,6 @@ const CoverCreationScreen = ({
         }
         rightElementWidth={80}
         backIcon="arrow_left"
-        currentPage={fromCoverEdition ? 1 : 3}
-        nbPages={fromCoverEdition ? 2 : 5}
         onBack={onBack}
       />
       <View style={{ flex: 1 }}>

@@ -187,6 +187,10 @@ const PostRendererActionBar = ({
       onActionDisabled?.();
       return;
     }
+    if (!webCard.userName) {
+      Sentry.captureMessage('null username in PostRenderedActionBar');
+      return;
+    }
     // a quick share method using the native share component. If we want to make a custom share (like tiktok for example, when they are recompressiong the media etc) we can use react-native-shares
     try {
       const url = buildPostUrl(webCard.userName, fromGlobalId(postId).id);

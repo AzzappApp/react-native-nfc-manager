@@ -20,6 +20,7 @@ type StockMediaListProps = Omit<ViewProps, 'children'> & {
   kind: 'image' | 'video';
   selectedMediasIds: string[];
   onMediaSelected: (media: SourceMedia) => void;
+  defaultSearchValue?: string | null;
 };
 
 const StockMediaList = ({
@@ -27,10 +28,11 @@ const StockMediaList = ({
   selectedMediasIds,
   onMediaSelected,
   style,
+  defaultSearchValue = null,
   ...props
 }: StockMediaListProps) => {
   const profileInfos = useProfileInfos();
-  const [search, setSearch] = useState<string | null>(null);
+  const [search, setSearch] = useState<string | null>(defaultSearchValue);
   const [debouncedSearch] = useDebounce(search, 300);
 
   if (!profileInfos?.profileId) {

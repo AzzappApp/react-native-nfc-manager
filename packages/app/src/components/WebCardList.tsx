@@ -10,7 +10,7 @@ import PressableNative from '#ui/PressableNative';
 import SearchBar from '#ui/SearchBar';
 import Text from '#ui/Text';
 import CoverLinkRenderer from './CoverLink/CoverLinkRenderer';
-import Link from './Link';
+import LinkWebCard from './LinkWebCard';
 import type {
   WebCardList_webCard$data,
   WebCardList_webCard$key,
@@ -27,12 +27,18 @@ const WebCardListItemMemoized = memo(function ProfileListItem({
 }) {
   const styles = useStyleSheet(styleSheet);
 
+  const toggleFollow =
+    webCard.userName && onToggleFollow
+      ? () => {
+          if (webCard.userName) onToggleFollow(webCard.id, webCard.userName);
+        }
+      : undefined;
+
   return (
     // TODO reenable once RANIMATED3 see: https://github.com/software-mansion/react-native-reanimated/issues/3124
     <Animated.View style={styles.item} /*exiting={FadeOutUp}*/>
-      <Link
+      <LinkWebCard
         disabled={webCard.cardIsPublished === false}
-        route="WEBCARD"
         params={{ userName: webCard.userName, webCardId: webCard.id }}
       >
         <PressableNative style={styles.profile}>
@@ -57,14 +63,14 @@ const WebCardListItemMemoized = memo(function ProfileListItem({
             )}
           </View>
         </PressableNative>
-      </Link>
-      {onToggleFollow ? (
+      </LinkWebCard>
+      {onToggleFollow && webCard.userName ? (
         <IconButton
           icon="delete"
           size={35}
           style={styles.deleteIconButton}
           iconStyle={styles.deleteIcon}
-          onPress={() => onToggleFollow(webCard.id, webCard.userName)}
+          onPress={toggleFollow}
         />
       ) : null}
     </Animated.View>

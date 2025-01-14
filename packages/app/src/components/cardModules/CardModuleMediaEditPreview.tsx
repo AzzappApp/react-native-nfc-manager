@@ -1,3 +1,4 @@
+import { Image } from 'expo-image';
 import { memo } from 'react';
 import { useDerivedValue } from 'react-native-reanimated';
 import TransformedImageRenderer from '#components/TransformedImageRenderer';
@@ -13,7 +14,7 @@ import type {
   CardModuleSourceMedia,
   CardModuleVideo,
 } from './cardModuleEditorType';
-import type { ViewStyle } from 'react-native';
+import type { StyleProp, ViewStyle } from 'react-native';
 
 type CardModuleMediaEditPreviewProps = {
   media: CardModuleSourceMedia;
@@ -43,9 +44,19 @@ const CardModuleMediaEditPreview = ({
 
   const { width: itemWidth, height: itemHeight } = dimension;
   return media.kind === 'video' ? (
-    <VideoRender media={media} itemWidth={itemWidth} itemHeight={itemHeight} />
+    <VideoRender
+      media={media}
+      itemWidth={itemWidth}
+      itemHeight={itemHeight}
+      style={imageStyle}
+    />
   ) : (
-    <ImageRender media={media} itemWidth={itemWidth} itemHeight={itemHeight} />
+    <ImageRender
+      media={media}
+      itemWidth={itemWidth}
+      itemHeight={itemHeight}
+      imageStyle={imageStyle}
+    />
   );
 };
 
@@ -53,9 +64,15 @@ type VideoRenderProps = {
   media: CardModuleVideo;
   itemWidth: number;
   itemHeight: number;
+  style?: StyleProp<ViewStyle>;
 };
 
-const VideoRender = ({ media, itemWidth, itemHeight }: VideoRenderProps) => {
+const VideoRender = ({
+  media,
+  itemWidth,
+  itemHeight,
+  style,
+}: VideoRenderProps) => {
   const maxResolution = itemWidth * 2;
   const cropData = calculateCropData(media, itemWidth, itemHeight);
   return (
@@ -66,6 +83,7 @@ const VideoRender = ({ media, itemWidth, itemHeight }: VideoRenderProps) => {
       width={itemWidth}
       height={itemHeight}
       filter={media.filter}
+      style={style}
       editionParameters={{
         ...media.editionParameters,
         cropData,
@@ -81,11 +99,41 @@ type ImageRenderProps = {
   media: CardModuleImage;
   itemWidth: number;
   itemHeight: number;
+  imageStyle?: StyleProp<Pick<ViewStyle, 'opacity'>>; //expo-image don’t support all view style props
 };
 
-const ImageRender = ({ media, itemWidth, itemHeight }: ImageRenderProps) => {
+const ImageRender = ({
+  media,
+  itemWidth,
+  itemHeight,
+  imageStyle,
+}: ImageRenderProps) => {
   const { cropData, ...editionParameters } = media.editionParameters ?? {};
 
+  return media.filter ||
+    Object.entries(editionParameters).filter(([, value]) => value).length >
+      0 ? (
+    <ImageSkiaRender
+      media={media}
+      itemWidth={itemWidth}
+      itemHeight={itemHeight}
+      imageStyle={imageStyle}
+    />
+  ) : (
+    <Image
+      source={media}
+      style={[{ width: itemWidth, height: itemHeight }, imageStyle]}
+      contentFit="cover"
+    />
+  );
+};
+
+const ImageSkiaRender = ({
+  media,
+  itemWidth,
+  itemHeight,
+  imageStyle,
+}: ImageRenderProps) => {
   const textureInfo = useNativeTexture({
     uri: media?.uri,
     kind: media?.kind,
@@ -109,8 +157,9 @@ const ImageRender = ({ media, itemWidth, itemHeight }: ImageRenderProps) => {
       width={itemWidth}
       height={itemHeight}
       filter={media.filter}
+      imageStyle={imageStyle}
       editionParameters={{
-        ...editionParameters,
+        ...media.editionParameters,
         cropData: calculateCropData(media, itemWidth, itemHeight),
       }}
     />

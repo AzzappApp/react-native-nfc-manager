@@ -254,12 +254,12 @@ const PlayfairDisplay_Bold = Playfair_Display({
   display: 'swap',
   subsets: ['latin-ext'],
 });
-const Plus_Jakarta_Light = Plus_Jakarta_Sans({
+export const Plus_Jakarta_Light = Plus_Jakarta_Sans({
   weight: '300',
   display: 'swap',
   subsets: ['latin-ext'],
 });
-const Plus_Jakarta_ExtraBold = Plus_Jakarta_Sans({
+export const Plus_Jakarta_ExtraBold = Plus_Jakarta_Sans({
   weight: '800',
   display: 'swap',
   subsets: ['latin-ext'],

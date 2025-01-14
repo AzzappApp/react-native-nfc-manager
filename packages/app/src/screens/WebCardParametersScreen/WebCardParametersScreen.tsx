@@ -1,11 +1,6 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import {
-  ActivityIndicator,
-  Alert,
-  useWindowDimensions,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Alert, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import {
   graphql,
@@ -23,17 +18,15 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { keyExtractor } from '#helpers/idHelpers';
 import relayScreen from '#helpers/relayScreen';
 import useQuitWebCard from '#hooks/useQuitWebCard';
-import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import SafeAreaView from '#ui/SafeAreaView';
-import SearchBarStatic from '#ui/SearchBarStatic';
 import Select from '#ui/Select';
-import SelectSection from '#ui/SelectSection';
 import Switch from '#ui/Switch';
 import Text from '#ui/Text';
+import WebcardParametersCompanyActivityLabelForm from './WebCardParametersCompanyActivityLabelForm';
 import WebcardParametersCompanyNameForm from './WebCardParametersCompanyNameForm';
 import WebcardParametersFirstNameForm from './WebCardParametersFirstNameForm';
 import WebCardParametersHeader from './WebCardParametersHeader';
@@ -43,14 +36,12 @@ import WebCardParametersScreenFallback from './WebCardParametersScreenFallback';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { WebCardParametersScreen_webCard$key } from '#relayArtifacts/WebCardParametersScreen_webCard.graphql';
 import type { WebCardParametersScreenMutation } from '#relayArtifacts/WebCardParametersScreenMutation.graphql';
-import type {
-  WebCardParametersScreenQuery,
-  WebCardParametersScreenQuery$data,
-} from '#relayArtifacts/WebCardParametersScreenQuery.graphql';
+import type { WebCardParametersScreenQuery } from '#relayArtifacts/WebCardParametersScreenQuery.graphql';
 import type { WebCardParametersScreenUnPublishMutation } from '#relayArtifacts/WebCardParametersScreenUnPublishMutation.graphql';
 import type { WebCardParametersRoute } from '#routes';
-import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
+import type { WebCardKind } from '@azzapp/shared/webCardKind';
 import type { GraphQLError } from 'graphql';
+import type { ReactNode } from 'react';
 
 const webCardParametersScreenQuery = graphql`
   query WebCardParametersScreenQuery($webCardId: ID!, $profileId: ID!) {
@@ -65,19 +56,6 @@ const webCardParametersScreenQuery = graphql`
         profileRole
       }
     }
-    webCardCategories {
-      id
-      label
-      webCardKind
-      companyActivities {
-        id
-        label
-        companyActivityType {
-          id
-          label
-        }
-      }
-    }
     webCardParameters {
       userNameChangeFrequencyDay
     }
@@ -90,7 +68,6 @@ const WebCardParametersScreen = ({
   const {
     webCard: webCardKey,
     profile,
-    webCardCategories,
     webCardParameters: { userNameChangeFrequencyDay },
   } = usePreloadedQuery(webCardParametersScreenQuery, preloadedQuery);
   const router = useRouter();
@@ -106,15 +83,9 @@ const WebCardParametersScreen = ({
         userName
         cardIsPublished
         webCardKind
-        alreadyPublished
         lastUserNameUpdate
         nextChangeUsernameAllowedAt
-        webCardCategory {
-          id
-        }
-        companyActivity {
-          id
-        }
+        companyActivityLabel
         hasCover
         requiresSubscription
         isPremium
@@ -134,69 +105,8 @@ const WebCardParametersScreen = ({
   const [lastNameFormVisible, toggleLastNameFormVisible] = useToggle(false);
   const [companyNameFormVisible, toggleCompanyNameFormVisible] =
     useToggle(false);
-
-  const [searchActivities, setSearchActivities] = useState('');
-
-  const otherActivityType = intl.formatMessage({
-    defaultMessage: 'Other',
-    description: 'Default activity type label',
-  });
-
-  const categoryActivities = useMemo(
-    () =>
-      webCardCategories?.find(a => a.id === webCard?.webCardCategory?.id)
-        ?.companyActivities,
-    [webCardCategories, webCard?.webCardCategory?.id],
-  );
-
-  const activities = useMemo(
-    () =>
-      categoryActivities
-        ?.filter(
-          activity =>
-            !searchActivities.trim() ||
-            activity.label
-              ?.toLowerCase()
-              .includes(searchActivities.toLowerCase().trim()),
-        )
-        .reduce<
-          Array<{ title: string; data: [{ id: string; title: string }] }>
-        >((acc, activity) => {
-          const type = acc.find(
-            a =>
-              a.title ===
-              (activity.companyActivityType?.label ?? otherActivityType),
-          );
-
-          if (type) {
-            type.data.push({
-              id: activity.id,
-              title: activity.label ?? '',
-            });
-
-            type.data = type.data.sort((a, b) => {
-              return a.title.localeCompare(b.title);
-            });
-          } else {
-            acc.push({
-              title: activity.companyActivityType?.label ?? otherActivityType,
-              data: [
-                {
-                  id: activity.id,
-                  title: activity.label ?? '',
-                },
-              ],
-            });
-
-            acc = acc.sort((a, b) => {
-              return a.title.localeCompare(b.title);
-            });
-          }
-
-          return acc;
-        }, []),
-    [categoryActivities, otherActivityType, searchActivities],
-  );
+  const [companyActivityFormVisible, toggleCompanyActivityFormVisible] =
+    useToggle(false);
 
   const [commitToggleWebCardPublished] =
     useMutation<WebCardParametersScreenUnPublishMutation>(graphql`
@@ -208,7 +118,6 @@ const WebCardParametersScreen = ({
           webCard {
             id
             cardIsPublished
-            alreadyPublished
           }
         }
       }
@@ -236,7 +145,6 @@ const WebCardParametersScreen = ({
             webCard: {
               id: webCard?.id,
               cardIsPublished: published,
-              alreadyPublished: webCard?.alreadyPublished,
             },
           },
         },
@@ -273,12 +181,7 @@ const WebCardParametersScreen = ({
             id
             webCardKind
             lastUserNameUpdate
-            webCardCategory {
-              id
-            }
-            companyActivity {
-              id
-            }
+            companyActivityLabel
             requiresSubscription
           }
         }
@@ -327,8 +230,7 @@ const WebCardParametersScreen = ({
         variables: {
           webCardId: webCard.id,
           input: {
-            webCardCategoryId: webCardCategory.id,
-            companyActivityId: null,
+            webCardKind: webCardCategory.id,
           },
         },
         onError: error => {
@@ -367,40 +269,8 @@ const WebCardParametersScreen = ({
     [commitUpdateWebCard, intl, router, webCard],
   );
 
-  const updateProfileActivity = useCallback(
-    (activity: { id: string }) => {
-      if (!webCard) {
-        return;
-      }
-      commitUpdateWebCard({
-        variables: {
-          webCardId: webCard.id,
-          input: {
-            companyActivityId: activity.id,
-          },
-        },
-        onError: () => {
-          Toast.show({
-            type: 'error',
-            text1: intl.formatMessage(
-              {
-                defaultMessage:
-                  'Oops, the WebCard{azzappA} could not be updated.',
-                description: 'Error toast message when saving webCard failed',
-              },
-              {
-                azzappA: <Text variant="azzapp">a</Text>,
-              },
-            ) as unknown as string,
-          });
-        },
-      });
-    },
-    [commitUpdateWebCard, intl, webCard],
-  );
-
   const canChangeUserName = useMemo(() => {
-    if (!webCard || webCard?.alreadyPublished === false) {
+    if (!webCard) {
       return true;
     }
     // Get the current date and time
@@ -505,10 +375,32 @@ const WebCardParametersScreen = ({
     ]);
   }, [intl, isWebCardOwner, quitWebCard]);
 
-  const { height: windowHeight } = useWindowDimensions();
-  const insets = useScreenInsets();
+  const webCardCategories = [
+    {
+      id: 'business' as WebCardKind,
+      label: (
+        <FormattedMessage
+          defaultMessage="Business"
+          description="webCard parameter screen - business webcard"
+        />
+      ),
+      isPremium: true,
+    },
+    {
+      id: 'personal' as WebCardKind,
+      label: (
+        <FormattedMessage
+          defaultMessage="Personal"
+          description="webCard parameter screen - personal webcard"
+        />
+      ),
+      isPremium: false,
+    },
+  ];
 
-  const bottomSheetMaxHeight = windowHeight - 90 - insets.top;
+  const selectedCategory = webCardCategories.find(
+    cat => cat.id === webCard?.webCardKind,
+  );
 
   if (!webCard) {
     return null;
@@ -599,7 +491,7 @@ const WebCardParametersScreen = ({
               nativeID="profileCategories"
               accessibilityLabelledBy="profileCategoriesLabel"
               data={webCardCategories ?? []}
-              selectedItemKey={webCard.webCardCategory?.id}
+              selectedItemKey={selectedCategory?.id}
               keyExtractor={keyExtractor}
               useFlatList={false}
               onItemSelected={updateWebCardCategory}
@@ -622,8 +514,7 @@ const WebCardParametersScreen = ({
                   <PremiumIndicator
                     size={24}
                     isRequired={
-                      isWebCardKindSubscription(item.webCardKind) &&
-                      !webCard.isPremium
+                      isWebCardKindSubscription(item.id) && !webCard.isPremium
                     }
                   />
                 </View>
@@ -659,66 +550,18 @@ const WebCardParametersScreen = ({
             </PressableNative>
           )}
           {webCard.webCardKind !== 'personal' && (
-            <View style={styles.sectionField}>
+            <PressableNative
+              style={styles.sectionField}
+              onPress={toggleCompanyActivityFormVisible}
+            >
               <Text variant="smallbold">
                 <FormattedMessage
                   defaultMessage="Activity"
                   description="Activity field in the webcard parameters screen"
                 />
               </Text>
-              <SelectSection
-                nativeID="activities"
-                ListHeaderComponent={
-                  <View style={styles.searchContainer}>
-                    <SearchBarStatic
-                      placeholder={intl.formatMessage({
-                        defaultMessage: 'Search an activity',
-                        description:
-                          'WebCardParameters screen - Activity SearchBar - Placeholder',
-                      })}
-                      onChangeText={text => setSearchActivities(text ?? '')}
-                      value={searchActivities}
-                    />
-                  </View>
-                }
-                accessibilityLabelledBy="activitiesLabel"
-                sections={activities ?? []}
-                selectedItemKey={webCard.companyActivity?.id}
-                bottomSheetHeight={Math.max(
-                  Math.min(
-                    (categoryActivities?.length ?? 0) * 50 + 200,
-                    bottomSheetMaxHeight,
-                  ),
-                  600,
-                )}
-                dismissKeyboardOnOpening
-                keyExtractor={keyExtractor}
-                onItemSelected={updateProfileActivity}
-                bottomSheetTitle={intl.formatMessage({
-                  defaultMessage: 'Select an activity',
-                  description:
-                    'WebCardParameters screen - Activity BottomSheet - Title',
-                })}
-                style={{
-                  backgroundColor: 'transparent',
-                  borderWidth: 0,
-                  paddingRight: 0,
-                }}
-                inputLabel={
-                  webCardCategories
-                    ?.find(a => a.id === webCard?.webCardCategory?.id)
-                    ?.companyActivities.find(
-                      a => a.id === webCard?.companyActivity?.id,
-                    )?.label ?? undefined
-                }
-                itemContainerStyle={styles.selectItemContainerStyle}
-                placeHolder={intl.formatMessage({
-                  defaultMessage: 'Select an activity',
-                  description:
-                    'WebCardParameters screen Name Company Screen - Accessibility TextInput Placeholder Choose a company activity',
-                })}
-              />
-            </View>
+              <Text variant="medium">{webCard.companyActivityLabel} </Text>
+            </PressableNative>
           )}
           {webCard.webCardKind !== 'personal' && (
             <PressableNative
@@ -804,6 +647,11 @@ const WebCardParametersScreen = ({
               visible={companyNameFormVisible}
               toggleBottomSheet={toggleCompanyNameFormVisible}
             />
+            <WebcardParametersCompanyActivityLabelForm
+              webCard={webCard}
+              visible={companyActivityFormVisible}
+              toggleBottomSheet={toggleCompanyActivityFormVisible}
+            />
           </>
         )}
       </SafeAreaView>
@@ -879,6 +727,8 @@ export default relayScreen(WebCardParametersScreen, {
   fetchPolicy: 'store-and-network',
 });
 
-type WebCardCategory = ArrayItemType<
-  WebCardParametersScreenQuery$data['webCardCategories']
->;
+type WebCardCategory = {
+  id: WebCardKind;
+  label: ReactNode;
+  isPremium: boolean;
+};

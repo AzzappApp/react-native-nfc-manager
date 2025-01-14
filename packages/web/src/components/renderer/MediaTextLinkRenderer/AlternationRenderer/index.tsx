@@ -60,8 +60,8 @@ const AlternationRender = async ({
               key={media.id}
               className={
                 index % 2 === 0
-                  ? styles.sectionContainerEven
-                  : styles.sectionContainer
+                  ? styles.sectionContainer
+                  : styles.sectionContainerEven
               }
             >
               <AlternationMedia

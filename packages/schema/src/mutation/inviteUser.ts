@@ -157,14 +157,15 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
       if (existingProfile) {
         await updateProfile(existingProfile.id, profileData);
         const locale = guessLocale(existingUser?.locale ?? user.locale);
-        await sendPushNotification(userId, {
-          type: 'multiuser_invitation',
-          mediaId: webCard.coverMediaId,
-          deepLink: 'multiuser_invitation',
-          localeParams: { userName: webCard.userName },
-          locale,
-        });
-
+        if (webCard.userName) {
+          await sendPushNotification(userId, {
+            type: 'multiuser_invitation',
+            mediaId: webCard.coverMediaId,
+            deepLink: 'multiuser_invitation',
+            localeParams: { userName: webCard.userName },
+            locale,
+          });
+        }
         return {
           profile: {
             ...profileData,

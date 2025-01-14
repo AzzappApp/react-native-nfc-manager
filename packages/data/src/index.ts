@@ -28,6 +28,7 @@ export type {
   CompanyActivityType,
   CoverDynamicLinks,
   CoverOverlay,
+  CoverPredefined,
   CoverTemplate,
   CoverTemplateParams,
   CoverTemplatePreview,

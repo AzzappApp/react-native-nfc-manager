@@ -32,7 +32,7 @@ const generateEmailSignature = async (req: NextRequest) => {
       return new Response('Invalid request', { status: 400 });
     }
     const { profile, webCard } = res;
-    if (!profile?.contactCard) {
+    if (!profile?.contactCard || !webCard.userName) {
       return new Response('Invalid request', { status: 400 });
     }
 
@@ -52,7 +52,7 @@ const generateEmailSignature = async (req: NextRequest) => {
         profileId,
         webCard.id,
         profile.contactCard,
-        webCard.commonInformation,
+        webCard.isMultiUser ? webCard.commonInformation : undefined,
       );
 
     const mailParam: Record<

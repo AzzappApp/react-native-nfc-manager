@@ -27,12 +27,12 @@ import SafeAreaView from '#ui/SafeAreaView';
 import Text from '#ui/Text';
 import UploadProgressModal from '#ui/UploadProgressModal';
 import ContactCardEditForm from './ContactCardEditForm';
-import { contactCardEditSchema } from './ContactCardEditModalSchema';
+import { contactCardSchema } from './ContactCardSchema';
 import type { ScreenOptions } from '#components/NativeRouter';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { ContactCardEditScreenQuery } from '#relayArtifacts/ContactCardEditScreenQuery.graphql';
 import type { ContactCardEditRoute } from '#routes';
-import type { ContactCardEditFormValues } from './ContactCardEditModalSchema';
+import type { ContactCardFormValues } from './ContactCardSchema';
 
 const contactCardEditScreenQuery = graphql`
   query ContactCardEditScreenQuery($profileId: ID!, $pixelRatio: Float!) {
@@ -202,10 +202,10 @@ const ContactCardEditScreen = ({
     control,
     handleSubmit,
     formState: { isSubmitting },
-  } = useForm<ContactCardEditFormValues>({
+  } = useForm<ContactCardFormValues>({
     mode: 'onBlur',
     shouldFocusError: true,
-    resolver: zodResolver(contactCardEditSchema),
+    resolver: zodResolver(contactCardSchema),
     defaultValues: {
       ...contactCard,
       company: contactCard?.company ?? '',
@@ -290,14 +290,14 @@ const ContactCardEditScreen = ({
         profileId: id,
         contactCard: {
           ...data,
-          emails: data.emails.filter(email => email.address),
-          phoneNumbers: data.phoneNumbers.filter(
+          emails: data.emails?.filter(email => email.address),
+          phoneNumbers: data.phoneNumbers?.filter(
             phoneNumber => phoneNumber.number,
           ),
-          urls: data.urls.filter(url => url.address),
-          addresses: data.addresses.filter(address => address.address),
+          urls: data.urls?.filter(url => url.address),
+          addresses: data.addresses?.filter(address => address.address),
           birthday: data.birthday,
-          socials: data.socials.filter(social => social.url),
+          socials: data.socials?.filter(social => social.url),
           avatarId,
           logoId,
         },
@@ -311,7 +311,16 @@ const ContactCardEditScreen = ({
             'image',
             avatar.uri,
           );
+          // FIXME why not logoId ???
         }
+        if (logo && logo?.uri) {
+          addLocalCachedMediaFile(
+            `${'image'.slice(0, 1)}:${logoId}`,
+            'image',
+            logo.uri,
+          );
+        }
+
         router.back();
       },
       updater: store => {

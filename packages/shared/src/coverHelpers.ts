@@ -63,6 +63,16 @@ export const COVER_MAX_MEDIA_DURATION = 5;
 export const COVER_MIN_MEDIA_DURATION = 1;
 
 /**
+ *  Optimum cover Width
+ */
+export const DEFAULT_COVER_WIDTH = 375;
+
+/**
+ *  Optimum cover Height
+ */
+export const DEFAULT_COVER_HEIGHT = DEFAULT_COVER_WIDTH / COVER_RATIO;
+
+/**
  * A color that can be replaced in a lottie animation
  */
 export const LOTTIE_REPLACE_COLORS = {

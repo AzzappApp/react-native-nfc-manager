@@ -1,8 +1,10 @@
 import { memo, useMemo } from 'react';
+import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
+import Link from '#components/Link';
+import LinkWebCard from '#components/LinkWebCard';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
 import CoverRenderer from '../CoverRenderer';
-import Link from '../Link';
 import type { CoverLinkRendererProps } from './coverLinkTypes';
 
 /**
@@ -15,8 +17,18 @@ const CoverLink = ({
   onPress,
   onLongPress,
   disabled,
+  coverIsPredefined,
   ...props
 }: CoverLinkRendererProps) => {
+  const webCard = useFragment(
+    graphql`
+      fragment CoverLinkRenderer_webCard on WebCard {
+        coverIsPredefined
+      }
+    `,
+    props.webCard,
+  );
+
   const containerStyle = useMemo(
     () => [
       style,
@@ -29,17 +41,28 @@ const CoverLink = ({
     [style, props.width],
   );
 
+  if (webCard?.coverIsPredefined) {
+    return (
+      <Link
+        route="COVER_TEMPLATE_SELECTION"
+        prefetch={prefetch}
+        disabled={disabled}
+      >
+        <PressableScaleHighlight
+          style={containerStyle}
+          onLongPress={onLongPress}
+        >
+          <CoverRenderer {...props} style={coverStyle} />
+        </PressableScaleHighlight>
+      </Link>
+    );
+  }
   return (
-    <Link
-      route="WEBCARD"
-      params={props}
-      prefetch={prefetch}
-      disabled={disabled}
-    >
+    <LinkWebCard params={props} prefetch={prefetch} disabled={disabled}>
       <PressableScaleHighlight style={containerStyle} onLongPress={onLongPress}>
         <CoverRenderer {...props} style={coverStyle} />
       </PressableScaleHighlight>
-    </Link>
+    </LinkWebCard>
   );
 };
 

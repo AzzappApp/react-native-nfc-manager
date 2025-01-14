@@ -42,8 +42,9 @@ const saveCardColors: MutationResolvers['saveCardColors'] = async (
   if (!webCard) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
-
-  invalidateWebCard(webCard.userName);
+  if (webCard.userName) {
+    invalidateWebCard(webCard.userName);
+  }
   return {
     webCard: {
       ...webCard,

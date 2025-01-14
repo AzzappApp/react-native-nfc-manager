@@ -8,13 +8,13 @@ import { useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import type { ContactCardEditFormValues } from './ContactCardEditModalSchema';
+import type { ContactCardFormValues } from './ContactCardSchema';
 import type { Control } from 'react-hook-form';
 
 const ContactCardEditModalBirthdays = ({
   control,
 }: {
-  control: Control<ContactCardEditFormValues>;
+  control: Control<ContactCardFormValues>;
 }) => {
   const { field } = useController({
     control,

@@ -39,6 +39,7 @@ const mediaModuleWebCardEditionScreenQuery = graphql`
     profile: node(id: $profileId) {
       ... on Profile {
         webCard {
+          companyActivityLabel
           id
           ...withCardModule_webCard
           cardModules {
@@ -70,6 +71,7 @@ const MediaModuleWebCardScreen = (
     scaleFactor,
     editableItemIndex,
     setEditableItemIndex,
+    defaultSearchValue,
   }: MediaModuleWebCardScreenProps,
   ref: ForwardedRef<ModuleWebCardScreenHandle>,
 ) => {
@@ -305,6 +307,7 @@ const MediaModuleWebCardScreen = (
         setCanSave={setCanSave}
         editableItemIndex={editableItemIndex}
         setEditableItemIndex={setEditableItemIndex} //because useImperativeHandle is bad design and use in last resort
+        defaultSearchValue={defaultSearchValue}
       />
     </>
   );

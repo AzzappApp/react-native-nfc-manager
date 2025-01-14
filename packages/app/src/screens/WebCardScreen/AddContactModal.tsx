@@ -23,6 +23,7 @@ import { isDefined } from '@azzapp/shared/isDefined';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
+import { emitContactAdded } from '#helpers/addContactHelper';
 import { findLocalContact } from '#helpers/contactCardHelpers';
 import { reworkContactForDeviceInsert } from '#helpers/contactListHelpers';
 import { getLocalContactsMap } from '#helpers/getLocalContactsMap';
@@ -148,12 +149,13 @@ const AddContactModal = ({
     const birthdayItem = scanned.contact?.dates?.find(
       x => x.label === 'birthday',
     );
+
     const birthday =
       birthdayItem &&
       birthdayItem.year !== undefined &&
       birthdayItem.month !== undefined &&
       birthdayItem.day !== undefined
-        ? `${birthdayItem.year}-${birthdayItem.month}-${birthdayItem.day}`
+        ? `${birthdayItem.year}-${`${birthdayItem.month + 1}`.padStart(2, '0')}-${`${birthdayItem.day}`.padStart(2, '0')}`
         : null;
 
     return {
@@ -246,8 +248,15 @@ const AddContactModal = ({
                   foundContact = await findContact();
                 }
                 if (foundContact && foundContact.id) {
+                  const image = await downloadAvatar(
+                    scanned.profileId,
+                    additionalContactData,
+                  );
+
                   const updatedContact = reworkContactForDeviceInsert({
                     ...scanned.contact,
+                    image,
+                    imageAvailable: !!image,
                     urlAddresses:
                       additionalContactData?.urls?.map(addr => {
                         return { label: 'default', address: addr.address };
@@ -288,6 +297,7 @@ const AddContactModal = ({
                   type: 'success',
                   text1: messageToast,
                 });
+                emitContactAdded();
               }
             } catch (e) {
               console.error(e);
@@ -352,8 +362,7 @@ const AddContactModal = ({
     requestPhonebookPermissionAsync,
     intl,
     requestPhonebookPermissionAndRedirectToSettingsAsync,
-    additionalContactData?.urls,
-    additionalContactData?.socials,
+    additionalContactData,
     router,
   ]);
 
@@ -404,6 +413,12 @@ const AddContactModal = ({
 
   useEffect(() => {
     (async () => {
+      if (!webCard.userName) {
+        Sentry.captureMessage(
+          'null username in AddContactModal / in contact build',
+        );
+        return;
+      }
       if (!scanned && contactData && webCard) {
         const { contact, webCardId, profileId } = await buildContact(
           contactData,
@@ -461,21 +476,24 @@ const AddContactModal = ({
     >
       <Header
         middleElement={
-          <Text variant="large" style={styles.headerText} numberOfLines={3}>
-            <FormattedMessage
-              defaultMessage="Add {userName} to your contacts"
-              description="Title for add contact modal"
-              values={{
-                userName,
-              }}
-            />
-          </Text>
+          <View style={styles.headerMiddleContent}>
+            <Text variant="large" style={styles.headerText} numberOfLines={3}>
+              <FormattedMessage
+                defaultMessage="Add {userName} to your contacts"
+                description="Title for add contact modal"
+                values={{
+                  userName,
+                }}
+              />
+            </Text>
+          </View>
         }
         leftElement={
-          <PressableNative onPress={close}>
+          <PressableNative onPress={close} style={styles.close}>
             <Icon icon="close" />
           </PressableNative>
         }
+        middleElementStyle={styles.headerMiddle}
       />
       <View style={styles.section}>
         <CoverRenderer webCard={webCard} width={120} canPlay={false} />
@@ -511,6 +529,35 @@ const AddContactModal = ({
   );
 };
 
+const downloadAvatar = async (
+  profileId: string,
+  additionalContactData: Props['additionalContactData'],
+) => {
+  let image: Image | undefined = undefined;
+
+  if (additionalContactData?.avatarUrl) {
+    try {
+      const avatar = new File(Paths.cache.uri + profileId);
+      if (avatar.exists) {
+        // be sure that avatar can be refreshed
+        avatar.delete();
+      }
+      await File.downloadFileAsync(additionalContactData.avatarUrl, avatar);
+
+      image = {
+        width: 720,
+        height: 720,
+        uri: avatar.uri,
+      };
+    } catch (e) {
+      console.warn('error downloading avatar', e);
+      Sentry.captureException(e);
+    }
+  }
+
+  return image;
+};
+
 const buildContact = async (
   contactCardData: string,
   additionalContactData: Props['additionalContactData'],
@@ -529,28 +576,7 @@ const buildContact = async (
     birthday,
   } = parseContactCard(contactCardData);
 
-  let image: Image | undefined = undefined;
-
-  if (additionalContactData?.avatarUrl) {
-    try {
-      const avatar = new File(Paths.cache.uri + profileId);
-      if (avatar.exists) {
-        // be sure that avatar can be refreshed
-        avatar.delete();
-      }
-      avatar.create();
-      await File.downloadFileAsync(additionalContactData.avatarUrl, avatar);
-
-      image = {
-        width: 720,
-        height: 720,
-        uri: avatar.uri,
-      };
-    } catch (e) {
-      console.warn('error downloading avatar', e);
-      Sentry.captureException(e);
-    }
-  }
+  const image = await downloadAvatar(profileId, additionalContactData);
 
   const birthdayDate = birthday ? new Date(birthday) : undefined;
 
@@ -651,6 +677,18 @@ const styles = StyleSheet.create({
   headerText: {
     textAlign: 'center',
     marginHorizontal: 25,
+  },
+  headerMiddle: {
+    justifyContent: 'flex-start',
+  },
+  headerMiddleContent: {
+    width: '100%',
+    height: 60,
+    justifyContent: 'center',
+  },
+  close: {
+    position: 'relative',
+    top: 8,
   },
 });
 

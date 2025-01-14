@@ -84,7 +84,9 @@ const ContactCard = ({
           id
           uri: uri(width: 112, pixelRatio: $pixelRatio)
         }
+        # contactCardUrl and contactCardQrCode to ensure coherent behavior
         contactCardQrCode(width: $width)
+        contactCardUrl
       }
     `,
     profileKey,

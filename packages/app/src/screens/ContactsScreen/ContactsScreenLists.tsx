@@ -10,6 +10,7 @@ import { AppState, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { usePaginationFragment, graphql, useMutation } from 'react-relay';
 import { useOnFocus } from '#components/NativeRouter';
+import { emitContactAdded, useOnContactAdded } from '#helpers/addContactHelper';
 import { findLocalContact } from '#helpers/contactCardHelpers';
 import {
   buildLocalContact,
@@ -80,6 +81,8 @@ const ContactsScreenLists = ({
       setLocalContacts([]);
     } // else wait for permission update
   }, [contactsPermissionStatus]);
+
+  useOnContactAdded(refreshLocalContacts);
 
   useEffect(() => {
     refreshLocalContacts();
@@ -170,7 +173,7 @@ const ContactsScreenLists = ({
                     cardIsPublished
                     userName
                     hasCover
-                    ...CoverRenderer_webCard
+                    ...ContactDetailsModal_webCard
                     commonInformation {
                       addresses {
                         label
@@ -410,6 +413,9 @@ const ContactsScreenLists = ({
         ...details,
         createdAt: contact.createdAt,
         profileId: contact.contactProfile?.id,
+        webCard: contact.contactProfile?.webCard?.cardIsPublished
+          ? contact.contactProfile?.webCard
+          : null,
       });
     },
     [contactsPermissionStatus, localContacts],
@@ -465,7 +471,7 @@ const ContactsScreenLists = ({
                 'Toast message when a contact is created successfully',
             });
           }
-
+          emitContactAdded();
           Toast.show({
             type: 'success',
             text1: messageToast,

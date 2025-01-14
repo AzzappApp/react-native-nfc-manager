@@ -1,7 +1,8 @@
 import { GraphQLError } from 'graphql';
-import { updateWebCard, type WebCard } from '@azzapp/data';
+import { updateWebCard } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
+import { isValidUserName } from '@azzapp/shared/stringHelpers';
 import { getSessionInfos } from '#GraphQLContext';
 import {
   profileByWebCardIdAndUserIdLoader,
@@ -12,6 +13,7 @@ import { checkWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { checkWebCardHasSubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
+import type { WebCard } from '@azzapp/data';
 
 const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
   _,
@@ -28,15 +30,19 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
     ...profileUpdates
   } = updates;
 
-  const partialWebCard: Partial<WebCard> = {
-    ...profileUpdates,
-  };
+  if (profileUpdates.userName && !isValidUserName(profileUpdates.userName)) {
+    throw new GraphQLError(ERRORS.INVALID_WEBCARD_USERNAME);
+  }
 
   const webCard = await webCardLoader.load(webCardId);
 
   if (!webCard) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
+  const partialWebCard: Partial<WebCard> = {
+    ...profileUpdates,
+    webCardKind: profileUpdates.webCardKind || webCard?.webCardKind,
+  };
 
   if (graphqlWebCardCategoryId) {
     const webCardCategoryId = fromGlobalIdWithType(

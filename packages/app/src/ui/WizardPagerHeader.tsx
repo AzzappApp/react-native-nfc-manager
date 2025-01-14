@@ -1,80 +1,27 @@
-import { View } from 'react-native';
-import { colors } from '#theme';
-import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { View, StyleSheet } from 'react-native';
 import IconButton from '#ui/IconButton';
 import Text from '#ui/Text';
+import { HEADER_HEIGHT } from './Header';
 import type { Icons } from '#ui/Icon';
-import type { ColorSchemeName, ViewProps } from 'react-native';
+import type { ViewProps } from 'react-native';
 
 export type WizardPagerHeaderProps = Omit<ViewProps, 'children'> & {
   title: React.ReactNode;
-  currentPage: number;
-  nbPages: number;
   backIcon?: Icons;
   onBack?: () => void;
   rightElement?: React.ReactNode;
   rightElementWidth?: number;
 };
 
-type PageProgressProps = {
-  nbPages: number;
-  currentPage: number;
-  appearance?: ColorSchemeName;
-};
-
-export const PageProgress = ({
-  nbPages,
-  currentPage,
-  appearance,
-}: PageProgressProps) => {
-  const styles = useStyleSheet(styleSheet, appearance);
-
-  return (
-    <View style={styles.pagerContainer}>
-      {Array.from({ length: nbPages }).map((_, index) => {
-        if (index < currentPage) {
-          return (
-            <View
-              accessibilityState={{ selected: false }}
-              key={`NewProfilepager-${index}`}
-              style={[styles.common, styles.previousCircle]}
-            />
-          );
-        } else if (index === currentPage) {
-          return (
-            <View
-              accessibilityRole="none"
-              accessibilityState={{ selected: true }}
-              key={`NewProfilepager-${index}`}
-              style={[styles.common, styles.selectedCircle]}
-            />
-          );
-        }
-        return (
-          <View
-            accessibilityState={{ selected: false }}
-            key={`NewProfilepager-${index}`}
-            style={[styles.common, styles.smallCircle]}
-          />
-        );
-      })}
-      <View />
-    </View>
-  );
-};
-
 const WizardPagerHeader = ({
   onBack,
   title,
-  nbPages,
-  currentPage,
   style,
   backIcon,
   rightElement,
   rightElementWidth = 40,
   ...props
 }: WizardPagerHeaderProps) => {
-  const styles = useStyleSheet(styleSheet);
   return (
     <View {...props} style={[styles.root, style]}>
       <View style={styles.header}>
@@ -90,7 +37,6 @@ const WizardPagerHeader = ({
           )}
         </View>
         <View
-          key={currentPage}
           style={[
             styles.titleTextContainer,
             !backIcon && { marginLeft: rightElementWidth },
@@ -111,26 +57,20 @@ const WizardPagerHeader = ({
           {rightElement}
         </View>
       </View>
-      <PageProgress nbPages={nbPages} currentPage={currentPage} />
     </View>
   );
 };
 
-export default WizardPagerHeader;
-
-const CIRCLE_SIZE = 5;
-
-export const PAGER_HEADER_HEIGHT = 85;
-
-const styleSheet = createStyleSheet(appearance => ({
+const styles = StyleSheet.create({
   root: {
-    height: PAGER_HEADER_HEIGHT,
+    height: HEADER_HEIGHT,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 20,
+    height: '100%',
   },
   headerSegment: {
     alignItems: 'center',
@@ -147,28 +87,6 @@ const styleSheet = createStyleSheet(appearance => ({
     textAlign: 'center',
     textAlignVertical: 'center',
   },
-  pagerContainer: {
-    height: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'row',
-  },
-  common: {
-    height: CIRCLE_SIZE,
-    borderRadius: CIRCLE_SIZE / 2,
-    marginLeft: CIRCLE_SIZE / 2,
-    marginRight: CIRCLE_SIZE / 2,
-  },
-  previousCircle: {
-    width: CIRCLE_SIZE,
-    backgroundColor: appearance === 'light' ? colors.black : colors.white,
-  },
-  selectedCircle: {
-    width: 20,
-    backgroundColor: appearance === 'light' ? colors.black : colors.white,
-  },
-  smallCircle: {
-    width: CIRCLE_SIZE,
-    backgroundColor: appearance === 'light' ? colors.grey200 : colors.grey800,
-  },
-}));
+});
+
+export default WizardPagerHeader;

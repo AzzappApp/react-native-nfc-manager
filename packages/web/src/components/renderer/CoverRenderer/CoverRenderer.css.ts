@@ -57,12 +57,40 @@ const linkShadow = style({
   boxShadow: '0px 10px 20px 0px rgba(0, 0, 0, 0.20)',
 });
 
+const overlayTitle = style({
+  color: 'white',
+  fontSize: 21,
+  position: 'absolute',
+  maxWidth: '70%',
+  left: '22%',
+  top: '45.5%',
+  textOverflow: 'ellipsis',
+  height: 30,
+  maxLines: 1,
+  overflow: 'hidden',
+});
+
+const overlaySubTitle = style({
+  color: 'white',
+  fontSize: 29,
+  position: 'absolute',
+  width: '70%',
+  left: '22%',
+  top: '49%',
+  maxLines: 1,
+  textOverflow: 'ellipsis',
+  maxHeight: 40,
+  overflow: 'hidden',
+});
+
 const styles = {
   coverMedia,
   content,
   backgroundContent,
   backgroundMedia,
   linkShadow,
+  overlayTitle,
+  overlaySubTitle,
 };
 
 export default styles;

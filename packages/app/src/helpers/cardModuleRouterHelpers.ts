@@ -91,3 +91,56 @@ export function getRouteForCardModule({
       throw new Error(`Unknown module kind: ${moduleKind}`);
   }
 }
+
+export function isModuleVariantSupported({
+  kind,
+  variant,
+}: {
+  kind?: string | null;
+  variant?: string | null;
+}): boolean {
+  switch (kind) {
+    case MODULE_KIND_MEDIA:
+      if (!SUPPORTED_VARIANT.includes(variant as SupportedVariant)) {
+        return false;
+      }
+      return true;
+    case MODULE_KIND_MEDIA_TEXT:
+      if (
+        !SUPPORTED_VARIANT.includes(
+          variant as (typeof SUPPORTED_VARIANT)[number],
+        )
+      ) {
+        return false;
+      }
+      return true;
+    case MODULE_KIND_MEDIA_TEXT_LINK:
+      if (
+        !SUPPORTED_VARIANT.includes(
+          variant as (typeof SUPPORTED_VARIANT)[number],
+        )
+      ) {
+        return false;
+      }
+      return true;
+    case MODULE_KIND_MAP:
+    case MODULE_KIND_TITLE_TEXT:
+      //this is a hack to avoid returning null of throwing an error, adding coming soon module (not only variant),
+      // break lots of control, like in this case throwing an error to be sure this is coded.
+      // adding hack just to display coming soon modules is bad
+      return false;
+    //INSERT_MODULE
+    case 'photoWithTextAndTitle':
+    case 'socialLinks':
+    case 'blockText':
+    case 'carousel':
+    case 'horizontalPhoto':
+    case 'lineDivider':
+    case 'simpleButton':
+    case 'simpleText':
+    case 'simpleTitle':
+      return true;
+    default:
+      return false;
+  }
+}

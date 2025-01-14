@@ -97,7 +97,7 @@ const getGoogleWalletPass = async (
         profile.id,
         profile.webCardId,
         contactCard,
-        webCard?.commonInformation,
+        webCard?.isMultiUser ? webCard?.commonInformation : undefined,
       );
 
       const objectData: GenericObject = {
@@ -117,7 +117,8 @@ const getGoogleWalletPass = async (
               }`.trim() ||
               webCard?.commonInformation?.company?.trim() ||
               contactCard?.company?.trim() ||
-              webCard?.userName, // empty string is not allowed
+              webCard?.userName ||
+              ' ', // empty string is not allowed
           },
         },
         genericType: GenericTypeEnum.GENERIC_OTHER,

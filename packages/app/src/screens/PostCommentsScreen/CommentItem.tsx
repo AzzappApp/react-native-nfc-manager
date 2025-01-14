@@ -5,7 +5,7 @@ import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
 import AuthorCartouche from '#components/AuthorCartouche';
-import Link from '#components/Link';
+import LinkWebCard from '#components/LinkWebCard';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { relativeDateMinute } from '#helpers/dateHelpers';
 import { profileInfoHasEditorRight } from '#helpers/profileRoleHelper';
@@ -58,12 +58,9 @@ const CommentItem = ({ item }: CommentItemProps) => {
             {postComment.webCard.cardIsPublished ||
             (profileInfoHasEditorRight(profileInfos) &&
               profileInfos?.webCardId === postComment.webCard.id) ? (
-              <Link
-                route="WEBCARD"
-                params={{ userName: postComment.webCard.userName }}
-              >
+              <LinkWebCard params={{ userName: postComment.webCard.userName }}>
                 <Text variant="smallbold">{postComment.webCard.userName} </Text>
-              </Link>
+              </LinkWebCard>
             ) : (
               <PressableNative
                 onPress={() =>

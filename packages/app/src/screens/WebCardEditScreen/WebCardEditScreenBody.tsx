@@ -31,6 +31,7 @@ import { colors } from '#theme';
 import CardModuleRenderer from '#components/cardModules/CardModuleRenderer';
 import { useModulesData } from '#components/cardModules/ModuleData';
 import { useRouter, useSuspendUntilAppear } from '#components/NativeRouter';
+import { isModuleVariantSupported } from '#helpers/cardModuleRouterHelpers';
 import { createId } from '#helpers/idHelpers';
 import useScreenDimensions from '#hooks/useScreenDimensions';
 import ActivityIndicator from '#ui/ActivityIndicator';
@@ -141,6 +142,8 @@ const WebCardEditScreenBody = (
         cardModules {
           id
           visible
+          variant
+          kind
           ...ModuleData_cardModules
         }
         cardColors {
@@ -166,6 +169,10 @@ const WebCardEditScreenBody = (
     `,
     webCard,
   );
+
+  const cardModuleFiltered = useMemo(() => {
+    return cardModules.filter(module => isModuleVariantSupported(module));
+  }, [cardModules]);
 
   useSuspendUntilAppear(Platform.OS === 'android');
 
@@ -203,13 +210,13 @@ const WebCardEditScreenBody = (
     onSelectionStateChange({
       nbSelectedModules: Object.keys(selectedModules).length,
       selectionContainsAllModules:
-        Object.keys(selectedModules).length === cardModules.length,
+        Object.keys(selectedModules).length === cardModuleFiltered.length,
       selectionContainsHiddenModules: Object.keys(selectedModules).some(
         moduleId =>
-          !cardModules.find(module => module?.id === moduleId)?.visible,
+          !cardModuleFiltered.find(module => module?.id === moduleId)?.visible,
       ),
     });
-  }, [selectedModules, onSelectionStateChange, cardModules]);
+  }, [selectedModules, onSelectionStateChange, cardModuleFiltered]);
   // #endregion
 
   // #region Modules mutations
@@ -365,7 +372,7 @@ const WebCardEditScreenBody = (
       if (!canReorder) {
         return;
       }
-      const moduleIndex = cardModules.findIndex(
+      const moduleIndex = cardModuleFiltered.findIndex(
         module => module?.id === moduleId,
       );
       if (moduleIndex === -1) {
@@ -373,11 +380,11 @@ const WebCardEditScreenBody = (
       }
       const nextModuleIndex =
         direction === 'down' ? moduleIndex + 1 : moduleIndex - 1;
-      if (nextModuleIndex < 0 || nextModuleIndex >= cardModules.length) {
+      if (nextModuleIndex < 0 || nextModuleIndex >= cardModuleFiltered.length) {
         return;
       }
       const moduleIds = swap(
-        cardModules.map(module => module.id),
+        cardModuleFiltered.map(module => module.id),
         moduleIndex,
         nextModuleIndex,
       );
@@ -390,7 +397,7 @@ const WebCardEditScreenBody = (
     },
     [
       canReorder,
-      cardModules,
+      cardModuleFiltered,
       environment,
       moduleOrderUpdater,
       scheduleModuleOrderUpdate,
@@ -559,7 +566,7 @@ const WebCardEditScreenBody = (
   const onDuplicateModule = useCallback(
     (moduleId: string) => {
       const requireSubscription = moduleCountRequiresSubscription(
-        cardModules.length + 1,
+        cardModuleFiltered.length + 1,
       );
       if (cardIsPublished && requireSubscription && !isPremium) {
         router.push({ route: 'USER_PAY_WALL' });
@@ -567,7 +574,13 @@ const WebCardEditScreenBody = (
       }
       duplicateModules([moduleId]);
     },
-    [cardIsPublished, cardModules.length, duplicateModules, isPremium, router],
+    [
+      cardIsPublished,
+      cardModuleFiltered.length,
+      duplicateModules,
+      isPremium,
+      router,
+    ],
   );
   // #endregion
 
@@ -638,7 +651,7 @@ const WebCardEditScreenBody = (
       },
       selectAllModules() {
         setSelectedModules(
-          cardModules.reduce(
+          cardModuleFiltered.reduce(
             (acc, module) => {
               acc[module.id] = true;
               return acc;
@@ -654,7 +667,7 @@ const WebCardEditScreenBody = (
     [
       deleteModules,
       duplicateModules,
-      cardModules,
+      cardModuleFiltered,
       selectedModules,
       updateModulesVisibility,
     ],
@@ -716,7 +729,7 @@ const WebCardEditScreenBody = (
         canDuplicate={canDuplicate}
         canToggleVisibility={canUpdateVisibility}
         isFirst={index === 0}
-        isLast={index === cardModules.length - 1}
+        isLast={index === cardModuleFiltered.length - 1}
         visible={module.visible}
         selectionMode={selectionMode}
         selected={!!selectedModules[module.id]}

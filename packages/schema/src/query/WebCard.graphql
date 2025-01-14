@@ -13,7 +13,7 @@ type WebCard implements Node {
   """
   The user name of the webCard
   """
-  userName: String!
+  userName: String
   """
   The user name of the profile
   """
@@ -25,7 +25,7 @@ type WebCard implements Node {
   """
   The webCard category
   """
-  webCardCategory: WebCardCategory
+  webCardCategory: WebCardCategory @deprecated(reason: "use companyActivityLabel")
   """
   The first name of the webCard, will only be set for personal webCard
   """
@@ -41,7 +41,13 @@ type WebCard implements Node {
   """
   The company activity of the webCard, will only be set for business webCard
   """
-  companyActivity: CompanyActivity
+  companyActivity: CompanyActivity @deprecated(reason: "use directly companyActivityLabel")
+
+  """
+  The company activity Label of the webCard, will only be set for business webCard
+  """
+  companyActivityLabel: String
+
   """
   The colors used by the webcard and the contact card of the webCard
   """
@@ -70,6 +76,11 @@ type WebCard implements Node {
   The webCard cover links
   """
   coverDynamicLinks: DynamicLinks
+  """
+  cover has not been configured yet
+  if coverIsPredefined is true, coverMedia will contain only 1 predefined media
+  """
+  coverIsPredefined: Boolean!
   """
   the webCard style
   """
@@ -414,6 +425,7 @@ enum WebCardKind {
 
 """
 Represent a Profile Category
+@deprecated(reason: "no category anymore")
 """
 type WebCardCategory implements Node {
   """
@@ -428,6 +440,7 @@ type WebCardCategory implements Node {
 
 """
 Represent a Company Activity
+@deprecated(reason: "no category anymore")
 """
 type CompanyActivity implements Node {
   """

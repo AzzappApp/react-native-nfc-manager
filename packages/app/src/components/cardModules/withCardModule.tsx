@@ -55,6 +55,7 @@ export type CardModuleProps<T extends ModuleKindHasVariants, V> = {
   scaleFactor: number;
   editableItemIndex: number | null;
   setEditableItemIndex: (index: number | null) => void;
+  defaultSearchValue?: string | null;
 };
 
 export type ModuleWebCardScreenHandle = {
@@ -134,6 +135,7 @@ const withCardModule = <T extends ModuleKindHasVariants, V>(
             light
             dark
           }
+          companyActivityLabel
           cardStyle {
             borderColor
             borderRadius
@@ -254,6 +256,7 @@ const withCardModule = <T extends ModuleKindHasVariants, V>(
               scaleFactor={viewMode === 'mobile' ? 1 : desktopScaleFactor}
               editableItemIndex={editableItemIndex}
               setEditableItemIndex={setEditableItemIndex}
+              defaultSearchValue={webCard?.companyActivityLabel}
             />
           </View>
         </Suspense>

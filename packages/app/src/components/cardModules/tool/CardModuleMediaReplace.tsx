@@ -13,11 +13,14 @@ type CardModuleMediaReplaceProps = {
   availableVideoSlot: number;
 
   onUpdateMedia: (media: CardModuleMedia) => void;
+
+  defaultSearchValue?: string | null;
 };
 const CardModuleMediaReplace = ({
   cardModuleMedia,
   availableVideoSlot,
   onUpdateMedia,
+  defaultSearchValue,
 }: CardModuleMediaReplaceProps) => {
   const intl = useIntl();
   const [show, openModal, closeModal] = useBoolean(false);
@@ -54,6 +57,7 @@ const CardModuleMediaReplace = ({
             onFinished={onFinished}
             onClose={closeModal}
             replacing
+            defaultSearchValue={defaultSearchValue}
           />
         )}
       </ScreenModal>

@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { CloseIcon } from '#assets';
 import { ButtonIcon } from '#ui';
-import logo from '#assets/images/logo-black.png';
+import logo from '#assets/images/logo-red.png';
 import LinkButton from '#ui/Button/LinkButton';
 import styles from './AndroidAppDownloadBanner.css';
 

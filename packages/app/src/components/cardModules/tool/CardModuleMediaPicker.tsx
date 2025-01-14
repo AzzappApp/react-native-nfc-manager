@@ -44,6 +44,7 @@ type CardModuleMediaPickerProps = Omit<ViewProps, 'children'> & {
   allowVideo?: boolean;
   maxMedia: number;
   replacing?: boolean;
+  defaultSearchValue?: string | null;
 };
 
 const CardModuleMediaPicker = ({
@@ -55,6 +56,8 @@ const CardModuleMediaPicker = ({
   maxVideo,
   onClose,
   allowVideo = true,
+  defaultSearchValue,
+
   ...props
 }: CardModuleMediaPickerProps) => {
   const intl = useIntl();
@@ -85,9 +88,6 @@ const CardModuleMediaPicker = ({
         //when replacing there is only one media, so remove it to apply the same rules of logic, as adding a new items
         localSelectedMedias = [];
       }
-      const index = localSelectedMedias.findIndex(
-        value => value && value.media.id === media.id,
-      );
 
       //do not show the toast in case of replacing a media
       if (localSelectedMedias.length >= maxMedia) {
@@ -108,7 +108,7 @@ const CardModuleMediaPicker = ({
           0
         : false;
 
-      if (disableVideoSelection && index === -1 && media.kind === 'video') {
+      if (disableVideoSelection && media.kind === 'video') {
         Toast.show({
           type: 'error',
           text1: intl.formatMessage({
@@ -231,6 +231,8 @@ const CardModuleMediaPicker = ({
                     'CardModule Media Picker - Error message when media are not downloaded',
                 }),
               );
+              value += 1;
+              updateProgress(value);
               downloadError = true;
               return cardModuleMedia;
             }
@@ -278,6 +280,7 @@ const CardModuleMediaPicker = ({
         onMediaSelected={handleMediaSelected}
         selectedMediasIds={selectedMediasIds}
         allowVideo={allowVideo}
+        defaultSearchValue={defaultSearchValue}
         Header={
           <Header
             leftElement={

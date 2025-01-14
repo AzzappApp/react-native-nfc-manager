@@ -1,5 +1,6 @@
+import * as Sentry from '@sentry/react-native';
 import { useEffect, useRef } from 'react';
-import { useRelayEnvironment } from 'react-relay';
+import { graphql, useFragment, useRelayEnvironment } from 'react-relay';
 import { COVER_CARD_RADIUS } from '@azzapp/shared/coverHelpers';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
@@ -33,6 +34,14 @@ const CoverLink = ({
   >(null);
   const router = useRouter();
   const prefetchScreen = usePrefetchRoute();
+  const webCard = useFragment(
+    graphql`
+      fragment CoverLinkRendererIos_webCard on WebCard {
+        coverIsPredefined
+      }
+    `,
+    props.webCard,
+  );
 
   const onPressInner = (event: GestureResponderEvent) => {
     onPress?.(event);
@@ -41,24 +50,50 @@ const CoverLink = ({
     }
     const container = ref.current;
     if (!container) {
-      router.push({
-        route: 'WEBCARD',
-        params: {
-          userName,
-        },
-      });
+      if (!userName) {
+        Sentry.captureMessage(
+          'null username in CoverLinkRendered ios / onPress',
+        );
+        return;
+      }
+
+      if (webCard?.coverIsPredefined) {
+        router.push({
+          route: 'COVER_TEMPLATE_SELECTION',
+        });
+      } else {
+        router.push({
+          route: 'WEBCARD',
+          params: {
+            userName,
+          },
+        });
+      }
       return;
     }
     container.measureInWindow(async (x, y, width, height) => {
       await mediaRef.current?.snapshot();
-      router.push({
-        route: 'WEBCARD',
-        params: {
-          userName,
-          webCardId,
-          fromRectangle: { x, y, width, height },
-        },
-      });
+      if (!userName) {
+        Sentry.captureMessage(
+          'null username in CoverLinkRendered ios / measureInWindow',
+        );
+        return;
+      }
+
+      if (webCard?.coverIsPredefined) {
+        router.push({
+          route: 'COVER_TEMPLATE_SELECTION',
+        });
+      } else {
+        router.push({
+          route: 'WEBCARD',
+          params: {
+            userName,
+            webCardId,
+            fromRectangle: { x, y, width, height },
+          },
+        });
+      }
     });
   };
 
@@ -66,6 +101,7 @@ const CoverLink = ({
   useEffect(() => {
     let disposable: Disposable | null = null;
     if (prefetch) {
+      if (!userName) return;
       disposable = prefetchScreen(environment, {
         route: 'WEBCARD',
         params: {

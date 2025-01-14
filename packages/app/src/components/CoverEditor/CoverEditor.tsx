@@ -167,10 +167,8 @@ const CoverEditorCore = (
           firstName
           lastName
           companyName
-          companyActivity {
-            id
-            label
-          }
+          companyActivityLabel
+          coverIsPredefined
         }
       }
     `,
@@ -266,8 +264,8 @@ const CoverEditorCore = (
             textLayer.text === 'mainName'
               ? profile.webCard?.companyName || profile.webCard?.lastName
               : textLayer.text === 'firstName'
-                ? profile.webCard?.companyActivity?.id
-                  ? profile.webCard?.companyActivity?.label
+                ? profile.webCard?.companyActivityLabel
+                  ? profile.webCard?.companyActivityLabel
                   : profile.webCard?.firstName
                 : textLayer.text === 'custom'
                   ? customText
@@ -319,7 +317,11 @@ const CoverEditorCore = (
     }
 
     const cardColors =
-      profile.webCard?.cardColors ?? coverTemplate?.colorPalette ?? {};
+      (profile.webCard?.coverIsPredefined
+        ? coverTemplate?.colorPalette
+        : profile.webCard?.cardColors) ??
+      coverTemplate?.colorPalette ??
+      {};
 
     // if we create a new cover without a new template and there is no cover already done
     // then we should interpolate the cover preview position
@@ -381,6 +383,7 @@ const CoverEditorCore = (
       shouldComputeCoverPreviewPositionPercentage,
 
       initialMediaToPick,
+      companyActivityLabel: profile.webCard?.companyActivityLabel,
       ...coverInitialState,
     };
   });
@@ -788,6 +791,7 @@ const CoverEditorCore = (
         maxSelectableVideos={MAX_ALLOWED_VIDEOS_BY_COVER}
         onFinished={onMediasPicked}
         onClose={onCancel}
+        defaultSearchValue={profile.webCard?.companyActivityLabel}
       />
     </ScreenModal>
   );

@@ -10,13 +10,13 @@ import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Separation from '#ui/Separation';
 import Text from '#ui/Text';
-import type { ContactCardEditFormValues } from './ContactCardEditModalSchema';
+import type { ContactCardFormValues } from './ContactCardSchema';
 import type { Control } from 'react-hook-form';
 
 const ContactCardEditModalUrls = ({
   control,
 }: {
-  control: Control<ContactCardEditFormValues>;
+  control: Control<ContactCardFormValues>;
 }) => {
   const { fields, append, remove } = useFieldArray({
     control,

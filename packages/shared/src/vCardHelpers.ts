@@ -33,7 +33,7 @@ export const emailLabelToVCardLabel = (label: string) => {
  * @returns The vCard
  */
 export const buildVCardFromSerializedContact = async (
-  userName: string,
+  userName: string | null | undefined,
   contactCardData: string,
   additionalData?:
     | (Pick<CommonInformation, 'socials' | 'urls'> & {
@@ -65,7 +65,9 @@ export const buildVCardFromSerializedContact = async (
     vcard.addPhoneNumber(phone[1], phoneLabelToVCardLabel(phone[0]));
   });
 
-  vcard.addURL(buildUserUrl(userName), 'type=azzapp WebCard');
+  if (userName) {
+    vcard.addURL(buildUserUrl(userName), 'type=azzapp WebCard');
+  }
   additionalData?.urls?.forEach(url => {
     vcard.addURL(url.address, '');
   });

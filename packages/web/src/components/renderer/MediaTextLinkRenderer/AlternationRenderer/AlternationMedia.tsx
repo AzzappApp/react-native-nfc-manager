@@ -49,8 +49,8 @@ const AlternationImage = ({
             transform: isVisible
               ? 'translateX(0)'
               : even
-                ? 'translateX(150px)'
-                : 'translateX(-150px)',
+                ? 'translateX(-150px)'
+                : 'translateX(150px)',
             transition: 'opacity 1s ease-in-out,transform 1s ease-out',
             overflow: 'visible',
             width: '100%',

@@ -132,8 +132,6 @@ const CoverTemplateSelectionScreen = ({
         rightElement={<View style={{ height: HEADER_HEIGHT }} />}
         rightElementWidth={80}
         backIcon="arrow_down"
-        currentPage={fromCoverEdition ? 0 : 2}
-        nbPages={fromCoverEdition ? 2 : 5}
         onBack={onBack}
       />
       <Suspense

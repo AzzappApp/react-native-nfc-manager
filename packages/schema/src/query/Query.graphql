@@ -46,6 +46,16 @@ type Query {
   ): Boolean! @deprecated(reason: "Use isUserNameAvailable instead")
 
   """
+  get proposed username for a profile given
+  """
+  getProposedUserName(
+    """
+    The profile id
+    """
+    webcardId: String!
+  ): String
+
+  """
   Fetches a profile given its user name
   This enhanced version also provide the userName request in result
   """

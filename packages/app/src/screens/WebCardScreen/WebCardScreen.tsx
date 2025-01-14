@@ -173,6 +173,35 @@ const WebCardScreen = ({
     [intl, onToggleFollow, profileInfos],
   );
 
+  //#region Edit
+  const {
+    editing,
+    editTransition,
+    transitionInfos,
+    scrollViewRef,
+    editScrollViewRef,
+    toggleEditing,
+  } = useWebCardEditTransition((canEdit && params.editing) ?? false);
+  const onEdit = useCallback(() => {
+    if (profileInfoHasEditorRight(profileInfos)) {
+      toggleEditing();
+    } else {
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage({
+          defaultMessage: 'Your role does not permit this action',
+          description:
+            'Error message when trying to edit the WebCard without being an admin',
+        }),
+      });
+    }
+  }, [intl, profileInfos, toggleEditing]);
+
+  const onEditDone = useCallback(() => {
+    toggleEditing();
+  }, [toggleEditing]);
+  //#endregion
+
   // #region Flip Animation
   //Restoring it in single file, "is" more performant on android
   const { width: windowWidth } = useWindowDimensions();
@@ -248,6 +277,7 @@ const WebCardScreen = ({
   const pan = useMemo(
     () =>
       Gesture.Pan()
+        .enabled(!editing)
         .activeOffsetX([-10, 10]) //help the postlist scroll to work on Android
         .onStart(() => {
           initialManualGesture.value = manualFlip.value;
@@ -280,7 +310,7 @@ const WebCardScreen = ({
             });
           }
         }),
-    [initialManualGesture, manualFlip, windowWidth],
+    [editing, initialManualGesture, manualFlip, windowWidth],
   );
   const [showPost, setShowPost] = useState(params.showPosts ?? false);
 
@@ -290,35 +320,6 @@ const WebCardScreen = ({
   }, [manualFlip, flip]);
 
   // #end region
-
-  //#region Edit
-  const {
-    editing,
-    editTransition,
-    transitionInfos,
-    scrollViewRef,
-    editScrollViewRef,
-    toggleEditing,
-  } = useWebCardEditTransition((canEdit && params.editing) ?? false);
-  const onEdit = useCallback(() => {
-    if (profileInfoHasEditorRight(profileInfos)) {
-      toggleEditing();
-    } else {
-      Toast.show({
-        type: 'error',
-        text1: intl.formatMessage({
-          defaultMessage: 'Your role does not permit this action',
-          description:
-            'Error message when trying to edit the WebCard without being an admin',
-        }),
-      });
-    }
-  }, [intl, profileInfos, toggleEditing]);
-
-  const onEditDone = useCallback(() => {
-    toggleEditing();
-  }, [toggleEditing]);
-  //#endregion
 
   if (!data.webCard || !data.profile?.webCard) {
     return null;

@@ -1,8 +1,6 @@
 import {
   getColorPalettes,
-  getCompanyActivities,
   getCoverTemplateById,
-  getCoverTemplatePreviewsByCoverTemplateId,
   getCoverTemplateTags,
   getCoverTemplateTypes,
   getLocalizationMessagesByLocale,
@@ -10,12 +8,6 @@ import {
 
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import CoverTemplateForm from '../CoverTemplatesForm';
-
-export type ActivityItem = {
-  id: string;
-  label: string;
-  activityTypeLabel: string | null;
-};
 
 type CoverTemplatePageProps = {
   params: {
@@ -51,18 +43,6 @@ const CoverTemplatePage = async ({
       label: labelsMap[type.id],
     })),
   );
-  const activities = await getCompanyActivities();
-  const activitiesWithLabel: ActivityItem[] = await Promise.all(
-    activities.map(async activity => ({
-      id: activity.id,
-      label: labelsMap[activity.id],
-      activityTypeLabel: activity.companyActivityTypeId
-        ? labelsMap[activity.companyActivityTypeId]
-        : null,
-    })),
-  );
-  const coverTemplatePreviews =
-    await getCoverTemplatePreviewsByCoverTemplateId(id);
   const coverTemplate = await getCoverTemplateById(id);
 
   return (
@@ -71,8 +51,6 @@ const CoverTemplatePage = async ({
       colorPalettes={colorPalettes}
       coverTemplateTypes={coverTemplateTypesWithLabels}
       coverTemplateTags={coverTemplateTagsWithLabels}
-      coverTemplatePreviews={coverTemplatePreviews}
-      activities={activitiesWithLabel}
     />
   );
 };

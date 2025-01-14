@@ -2,7 +2,7 @@ import { Canvas, ImageSVG, Skia } from '@shopify/react-native-skia';
 import { toString } from 'qrcode';
 import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { useWindowDimensions, View } from 'react-native';
+import { BackHandler, View } from 'react-native';
 import Animated, {
   interpolateColor,
   runOnJS,
@@ -34,6 +34,7 @@ import EmptyContent from '#components/ui/EmptyContent';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getOfflineVCard } from '#helpers/offlineVCard';
 import { useProfileInfos } from '#hooks/authStateHooks';
+import useScreenDimensions from '#hooks/useScreenDimensions';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { HomeBackgroundComponent } from '#screens/HomeScreen/HomeBackground';
 import { AnimatedHomeHeaderCentralComponent } from '#screens/HomeScreen/HomeHeader';
@@ -41,9 +42,9 @@ import { useIndexInterpolation } from '#screens/HomeScreen/homeHelpers';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import Icon from '#ui/Icon';
+import { PageProgress } from '#ui/PageProgress';
 import PressableNative from '#ui/PressableNative';
 import SafeAreaView from '#ui/SafeAreaView';
-import { PageProgress } from '#ui/WizardPagerHeader';
 import OfflineHeader from './OfflineHeader';
 import type { OfflineVCardRoute } from '#routes';
 import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
@@ -150,21 +151,22 @@ const OfflineVCardScreen = () => {
   );
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const { top } = useScreenInsets();
+  const { top, bottom } = useScreenInsets();
 
   const onClose = router.back;
 
   const { width: windowWidth, height: fullWindowHeight } =
-    useWindowDimensions();
-  const windowHeight = fullWindowHeight - top;
+    useScreenDimensions();
+  const windowHeight = fullWindowHeight - top - bottom;
 
   const itemMargin = (windowWidth * 5) / 100;
   const halfMargin = itemMargin / 2;
   const itemWidth = (windowWidth * 90) / 100;
   const itemHeight = itemWidth / CONTACT_CARD_RATIO;
 
+  const pageViewSize = 25;
   const headerSize = 230;
-  const footerSize = itemHeight + 35;
+  const footerSize = itemHeight + pageViewSize;
 
   const remainingHeight = windowHeight - headerSize - footerSize;
   const remaingWidth = itemWidth;
@@ -181,6 +183,21 @@ const OfflineVCardScreen = () => {
     setCanLeaveScreen(isConnected);
   }, [isConnected]);
 
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      () => {
+        if (canLeaveScreen) {
+          router.back();
+        }
+        return true;
+      },
+    );
+    return () => {
+      backHandler.remove();
+    };
+  }, [canLeaveScreen, router]);
+
   const vcardList: vCardData[] = useMemo(() => {
     const profiles = getOfflineVCard();
 
@@ -189,6 +206,9 @@ const OfflineVCardScreen = () => {
         ?.map(data => {
           const contactCard = data.contactCard as ContactCard;
           const webCard = data.webCard;
+          if (!webCard?.userName) {
+            return undefined;
+          }
           if (!webCard || !webCard.cardIsPublished) return undefined;
           const vCard = new VCard();
           vCard.addName(
@@ -531,7 +551,10 @@ const OfflineVCardScreen = () => {
           />
         </View>
         <View
-          style={[styles.progress, { top: -flatListPositionInSwipableZone }]}
+          style={[
+            styles.progress,
+            { top: -flatListPositionInSwipableZone + pageViewSize / 2 },
+          ]}
         >
           {vcardList.length > 1 ? (
             <PageProgress

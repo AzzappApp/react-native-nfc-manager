@@ -121,7 +121,7 @@ const sendInvitations: MutationResolvers['sendInvitations'] = async (
     }
     for (let i = 0; i < users.length; i++) {
       const userToNotify = users[i].user;
-      if (userToNotify) {
+      if (userToNotify && webCard.userName) {
         await sendPushNotification(userToNotify.id, {
           type: 'multiuser_invitation',
           mediaId: webCard.coverMediaId,

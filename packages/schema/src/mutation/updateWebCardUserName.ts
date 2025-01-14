@@ -69,7 +69,7 @@ const updateWebCardUserNameMutation: MutationResolvers['updateWebCardUserName'] 
     try {
       await transaction(async () => {
         await updateWebCard(webCard.id, { userName, lastUserNameUpdate: now });
-        if (webCard.alreadyPublished) {
+        if (webCard.alreadyPublished && webCard.userName) {
           await createRedirectWebCard({
             fromUserName: webCard.userName,
             toUserName: userName,

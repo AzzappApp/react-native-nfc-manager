@@ -39,6 +39,7 @@ export const HomeScreenProvider = ({
           invited
           webCard {
             id
+            userName
           }
         }
       }
@@ -47,9 +48,12 @@ export const HomeScreenProvider = ({
   );
 
   const [initialProfileIndex, setInitialProfileIndex] = useState(() => {
-    const index = user?.profiles?.findIndex(
-      profile => profile.id === getAuthState().profileInfos?.profileId,
-    );
+    const index =
+      user?.profiles?.length === 1
+        ? 0
+        : user?.profiles?.findIndex(
+            profile => profile.id === getAuthState().profileInfos?.profileId,
+          );
     return index !== undefined && index !== -1 ? index + 1 : 0;
   });
 
@@ -94,12 +98,16 @@ export const HomeScreenProvider = ({
   const onCurrentProfileIndexChange = useCallback(
     (index: number) => {
       const newProfile = user.profiles?.[index - 1];
-      if (newProfile) {
+      if (
+        newProfile &&
+        newProfile.id !== getAuthState().profileInfos?.profileId
+      ) {
         onChangeWebCard({
           profileId: newProfile.id,
           webCardId: newProfile.webCard?.id ?? null,
           profileRole: newProfile.profileRole,
           invited: newProfile.invited,
+          webCardUserName: newProfile.webCard?.userName ?? null,
         });
       }
     },
