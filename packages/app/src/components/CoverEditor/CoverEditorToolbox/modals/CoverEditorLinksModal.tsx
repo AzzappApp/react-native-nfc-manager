@@ -62,13 +62,6 @@ const CoverEditorLinksModal = ({
   const styles = useStyleSheet(styleSheet);
   const { height: screenHeight } = useScreenDimensions();
 
-  const onDeleteLink = useCallback(
-    (item: SocialLinkItem) => {
-      onLinksChange(links.filter(l => l?.position !== item.position));
-    },
-    [links, onLinksChange],
-  );
-
   const onLinkItemPress = useCallback(
     (link: SocialLinkItem) => {
       openAddLink();
@@ -115,10 +108,9 @@ const CoverEditorLinksModal = ({
           <SocialLinksLinksEditionPanel
             ignoreKeyboard
             links={links}
-            onDeleteLink={onDeleteLink}
+            onChangeLinks={onLinksChange}
             onItemPress={onLinkItemPress}
             onAddLink={openAddLink}
-            onOrderChange={onLinksChange}
             maxLink={4}
             style={styles.editionPanel}
           />

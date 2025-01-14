@@ -382,13 +382,6 @@ const SocialLinksEditionScreen = ({
     closeAddLink();
   };
 
-  const onDeleteLink = useCallback(
-    (item: SocialLinkItem) => {
-      onLinksChange(links.filter(l => l?.position !== item.position));
-    },
-    [links, onLinksChange],
-  );
-
   const onLinkItemPress = useCallback(
     (link: SocialLinkItem) => {
       setPickedItem(link);
@@ -420,10 +413,9 @@ const SocialLinksEditionScreen = ({
         element: (
           <SocialLinksLinksEditionPanel
             links={links}
-            onDeleteLink={onDeleteLink}
+            onChangeLinks={onLinksChange}
             onAddLink={openAddLink}
             onItemPress={onLinkItemPress}
-            onOrderChange={onLinksChange}
             style={{
               minHeight: bottomPanelHeight,
               flex: 1,
@@ -495,7 +487,6 @@ const SocialLinksEditionScreen = ({
       onArrangementChange,
       onBackgroundChange,
       onBackgroundStyleChange,
-      onDeleteLink,
       onIconColorChange,
       onLinkItemPress,
       onLinksChange,
