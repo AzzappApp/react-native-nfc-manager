@@ -1,5 +1,8 @@
-## 1.6.1-canary.32
+## 1.6.1-canary.33
 
+* **fix:**  - allow to duplicate hidden module ([#6869](https://github.com/AzzappApp/azzapp/pull/6869))
+* **fix:**  - fix ordering management and remove duplicated callbacks ([#6873](https://github.com/AzzappApp/azzapp/pull/6873))
+* **feat:**  - Grid square module ([#6872](https://github.com/AzzappApp/azzapp/pull/6872))
 * **fix:**  - reduce gap between header and description in popups ([#6863](https://github.com/AzzappApp/azzapp/pull/6863))
 * **fix:**  - **modules:** [#6861](https://github.com/AzzappApp/azzapp/pull/6861) remove duplicated code from module ([#6865](https://github.com/AzzappApp/azzapp/pull/6865))
 * **feat:**  - Media Grid module ([#6840](https://github.com/AzzappApp/azzapp/pull/6840))
