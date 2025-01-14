@@ -10,6 +10,7 @@ import ShareCommand from 'react-native-share';
 import { colors, shadow } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import { buildVCardFromExpoContact } from '#helpers/contactCardHelpers';
+import { reworkContactForDeviceInsert } from '#helpers/contactListHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { sanitizeFilePath } from '#helpers/fileHelpers';
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -55,7 +56,8 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
   const birthday = details.dates?.find(date => date.label === 'birthday');
 
   const onShare = async () => {
-    const vcardData = await buildVCardFromExpoContact(details);
+    const contact = reworkContactForDeviceInsert(details as Contact);
+    const vcardData = await buildVCardFromExpoContact(contact);
     const contactName = (
       (details.firstName || '') +
       ' ' +
