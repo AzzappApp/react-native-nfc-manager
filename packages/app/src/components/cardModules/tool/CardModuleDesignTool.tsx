@@ -123,7 +123,10 @@ const Item = <T extends ModuleKindAndVariant>({
     moduleKind: module.moduleKind,
     variant,
   } as ModuleKindWithVariant);
-  const isVariantSupported = isModuleVariantSupported(module);
+  const isVariantSupported = isModuleVariantSupported({
+    moduleKind: module.moduleKind,
+    variant,
+  });
 
   return (
     <PressableOpacity
@@ -171,40 +174,44 @@ export const getPictureUri = (
       switch (module.variant) {
         case 'slideshow':
           return colorScheme === 'light'
-            ? require('./assets/media_slideshow_light.png')
-            : require('./assets/media_slideshow_dark.png');
+            ? require('./assets/Media/media_slideshow_light.png')
+            : require('./assets/Media/media_slideshow_dark.png');
         case 'parallax':
           return colorScheme === 'light'
-            ? require('./assets/media_parallax_light.png')
-            : require('./assets/media_parallax_dark.png');
+            ? require('./assets/Media/media_parallax_light.png')
+            : require('./assets/Media/media_parallax_dark.png');
         case 'full_grid':
           return colorScheme === 'light'
-            ? require('./assets/media_full_grid_light.png')
-            : require('./assets/media_full_grid_dark.png');
+            ? require('./assets/Media/media_full_grid_light.png')
+            : require('./assets/Media/media_full_grid_dark.png');
         case 'full_slideshow':
           return colorScheme === 'light'
-            ? require('./assets/media_full_slideshow_light.png')
-            : require('./assets/media_full_slideshow_dark.png');
+            ? require('./assets/Media/media_full_slideshow_light.png')
+            : require('./assets/Media/media_full_slideshow_dark.png');
         case 'fullscreen':
           return colorScheme === 'light'
-            ? require('./assets/media_fullscreen_light.png')
-            : require('./assets/media_fullscreen_dark.png');
+            ? require('./assets/Media/media_fullscreen_light.png')
+            : require('./assets/Media/media_fullscreen_dark.png');
         case 'grid':
           return colorScheme === 'light'
-            ? require('./assets/media_grid_light.png')
-            : require('./assets/media_grid_dark.png');
+            ? require('./assets/Media/media_grid_light.png')
+            : require('./assets/Media/media_grid_dark.png');
+        case 'square_grid':
+          return colorScheme === 'light'
+            ? require('./assets/Media/media_square_grid_light.png')
+            : require('./assets/Media/media_square_grid_dark.png');
         case 'original':
           return colorScheme === 'light'
-            ? require('./assets/media_original_light.png')
-            : require('./assets/media_original_dark.png');
+            ? require('./assets/Media/media_original_light.png')
+            : require('./assets/Media/media_original_dark.png');
         case 'original_slideshow':
           return colorScheme === 'light'
-            ? require('./assets/media_original_slideshow_light.png')
-            : require('./assets/media_original_slideshow_dark.png');
+            ? require('./assets/Media/media_original_slideshow_light.png')
+            : require('./assets/Media/media_original_slideshow_dark.png');
         case 'zoom_out_fade':
           return colorScheme === 'light'
-            ? require('./assets/media_zoom_out_fade_light.png')
-            : require('./assets/media_zoom_out_fade_dark.png');
+            ? require('./assets/Media/media_zoom_out_fade_light.png')
+            : require('./assets/Media/media_zoom_out_fade_dark.png');
         default:
           return null;
       }
@@ -212,36 +219,36 @@ export const getPictureUri = (
       switch (module.variant) {
         case 'alternation':
           return colorScheme === 'light'
-            ? require('./assets/Media_Text/media_with_text_light_grey_Alternation.png')
-            : require('./assets/Media_Text/media_with_text_dark_grey_Alternation.png');
+            ? require('./assets/Media_Text/media_with_text_alternation_grey_light.png')
+            : require('./assets/Media_Text/media_with_text_alternation_grey_dark.png');
         case 'parallax':
           return colorScheme === 'light'
-            ? require('./assets/Media_Text/media_with_text_light_grey_Parallax.png')
-            : require('./assets/Media_Text/media_with_text_dark_grey_Parallax.png');
+            ? require('./assets/Media_Text/media_with_text_parallax_grey_light.png')
+            : require('./assets/Media_Text/media_with_text_parallax_grey_dark.png');
         case 'full_alternation':
           return colorScheme === 'light'
-            ? require('./assets/Media_Text/media_with_text_light_grey_Full_Alternation.png')
-            : require('./assets/Media_Text/media_with_text_dark_grey_Full_Alternation.png');
+            ? require('./assets/Media_Text/media_with_text_full_alternation_grey_light.png')
+            : require('./assets/Media_Text/media_with_text_full_alternation_grey_dark.png');
         case 'article':
           return colorScheme === 'light'
-            ? require('./assets/Media_Text/media_with_text_light_grey_Articles.png')
-            : require('./assets/Media_Text/media_with_text_dark_grey_Articles.png');
+            ? require('./assets/Media_Text/media_with_text_article_grey_light.png')
+            : require('./assets/Media_Text/media_with_text_article_grey_dark.png');
         case 'card':
           return colorScheme === 'light'
-            ? require('./assets/Media_Text/media_with_text_light_grey_Cards.png')
-            : require('./assets/Media_Text/media_with_text_dark_grey_Cards.png');
+            ? require('./assets/Media_Text/media_with_text_card_grey_light.png')
+            : require('./assets/Media_Text/media_with_text_card_grey_dark.png');
         case 'card_gradient':
           return colorScheme === 'light'
-            ? require('./assets/Media_Text/media_with_text_light_grey_Cards_gradient.png')
-            : require('./assets/Media_Text/media_with_text_dark_grey_Cards_gradient.png');
+            ? require('./assets/Media_Text/media_with_text_card_gradient_grey_light.png')
+            : require('./assets/Media_Text/media_with_text_card_gradient_grey_dark.png');
         case 'grid':
           return colorScheme === 'light'
-            ? require('./assets/Media_Text/media_with_text_light_grey_Grid.png')
-            : require('./assets/Media_Text/media_with_text_dark_grey_Grid.png');
+            ? require('./assets/Media_Text/media_with_text_grid_grey_light.png')
+            : require('./assets/Media_Text/media_with_text_grid_grey_dark.png');
         case 'superposition':
           return colorScheme === 'light'
-            ? require('./assets/Media_Text/media_with_text_light_grey_Superposition.png')
-            : require('./assets/Media_Text/media_with_text_dark_grey_Superposition.png');
+            ? require('./assets/Media_Text/media_with_text_superposition_grey_light.png')
+            : require('./assets/Media_Text/media_with_text_superposition_grey_dark.png');
         default:
           return null;
       }
@@ -249,44 +256,44 @@ export const getPictureUri = (
       switch (module.variant) {
         case 'alternation':
           return colorScheme === 'light'
-            ? require('./assets/Media_Text_Link/media_with_text_and_link_light_grey_Alternation.png')
-            : require('./assets/Media_Text_Link/media_with_text_and_link_dark_grey_Alternation.png');
+            ? require('./assets/Media_Text_Link/media_with_text_link_alternation_grey_light.png')
+            : require('./assets/Media_Text_Link/media_with_text_link_alternation_grey_dark.png');
         case 'parallax':
           return colorScheme === 'light'
-            ? require('./assets/Media_Text_Link/media_with_text_and_link_light_grey_Parallax.png')
-            : require('./assets/Media_Text_Link/media_with_text_and_link_dark_grey_Parallax.png');
+            ? require('./assets/Media_Text_Link/media_with_text_link_parallax_grey_light.png')
+            : require('./assets/Media_Text_Link/media_with_text_link_parallax_grey_dark.png');
         case 'full_alternation':
           return colorScheme === 'light'
-            ? require('./assets/Media_Text_Link/media_with_text_and_link_light_grey_Full_Alternation.png')
-            : require('./assets/Media_Text_Link/media_with_text_and_link_dark_grey_Full_Alternation.png');
+            ? require('./assets/Media_Text_Link/media_with_text_link_full_alternation_grey_light.png')
+            : require('./assets/Media_Text_Link/media_with_text_link_full_alternation_grey_dark.png');
         case 'article':
           return colorScheme === 'light'
-            ? require('./assets/Media_Text_Link/media_with_text_and_link_light_grey_Articles.png')
-            : require('./assets/Media_Text_Link/media_with_text_and_link_dark_grey_Articles.png');
+            ? require('./assets/Media_Text_Link/media_with_text_link_article_grey_light.png')
+            : require('./assets/Media_Text_Link/media_with_text_link_article_grey_dark.png');
         case 'card':
           return colorScheme === 'light'
-            ? require('./assets/Media_Text_Link/media_with_text_and_link_light_grey_Cards.png')
-            : require('./assets/Media_Text_Link/media_with_text_and_link_dark_grey_Cards.png');
+            ? require('./assets/Media_Text_Link/media_with_text_link_card_grey_light.png')
+            : require('./assets/Media_Text_Link/media_with_text_link_card_grey_dark.png');
         case 'card_gradient':
           return colorScheme === 'light'
-            ? require('./assets/Media_Text_Link/media_with_text_and_link_light_grey_Cards_gradient.png')
-            : require('./assets/Media_Text_Link/media_with_text_and_link_dark_grey_Cards_gradient.png');
+            ? require('./assets/Media_Text_Link/media_with_text_link_card_gradient_grey_light.png')
+            : require('./assets/Media_Text_Link/media_with_text_link_card_gradient_grey_dark.png');
         case 'grid':
           return colorScheme === 'light'
-            ? require('./assets/Media_Text_Link/media_with_text_and_link_light_grey_Grid.png')
-            : require('./assets/Media_Text_Link/media_with_text_and_link_dark_grey_Grid.png');
+            ? require('./assets/Media_Text_Link/media_with_text_link_grid_grey_light.png')
+            : require('./assets/Media_Text_Link/media_with_text_link_grid_grey_dark.png');
         case 'button_round':
           return colorScheme === 'light'
-            ? require('./assets/Media_Text_Link/media_with_text_and_link_light_grey_Buttons_round.png')
-            : require('./assets/Media_Text_Link/media_with_text_and_link_dark_grey_Buttons_round.png');
+            ? require('./assets/Media_Text_Link/media_with_text_link_button_round_grey_light.png')
+            : require('./assets/Media_Text_Link/media_with_text_link_button_round_grey_dark.png');
         case 'button_square':
           return colorScheme === 'light'
-            ? require('./assets/Media_Text_Link/media_with_text_and_link_light_grey_Buttons_square.png')
-            : require('./assets/Media_Text_Link/media_with_text_and_link_dark_grey_Buttons_square.png');
+            ? require('./assets/Media_Text_Link/media_with_text_link_button_square_grey_light.png')
+            : require('./assets/Media_Text_Link/media_with_text_link_button_square_grey_dark.png');
         case 'list':
           return colorScheme === 'light'
-            ? require('./assets/Media_Text_Link/media_with_text_and_link_light_grey_List.png')
-            : require('./assets/Media_Text_Link/media_with_text_and_link_dark_grey_List.png');
+            ? require('./assets/Media_Text_Link/media_with_text_link_list_grey_light.png')
+            : require('./assets/Media_Text_Link/media_with_text_link_list_grey_dark.png');
         default:
           return null;
       }

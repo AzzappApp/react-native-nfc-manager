@@ -127,6 +127,7 @@ const MediaModuleRenderer = ({
         </CardModuleEditionScrollHandler>
       );
     case 'grid':
+    case 'square_grid':
       return (
         <CardModuleEditionScrollHandler scrollPosition={scrollPosition}>
           <CardModuleMediaGrid
@@ -135,6 +136,7 @@ const MediaModuleRenderer = ({
             onLayout={onLayout}
             displayMode={displayMode}
             scrollPosition={scrollPosition}
+            square={variant === 'square_grid'}
             {...props}
           />
         </CardModuleEditionScrollHandler>

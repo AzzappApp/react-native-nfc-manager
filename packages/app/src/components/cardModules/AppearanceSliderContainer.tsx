@@ -177,4 +177,4 @@ export default memo(AppearanceSliderContainer);
 // this is a buffer in pixel before startingthe animation
 const ANIMATION_DELAY_BUFFER_PIXEL = 100;
 const TRANSLATION_Y_ANIMATION = 200;
-const ANIMATION_DURATION = 1000;
+const ANIMATION_DURATION = 400;

@@ -60,7 +60,8 @@ const CardModuleMediaGrid = ({
       caculatedHeight[shortestColumnIndex].push(
         columnHeights[shortestColumnIndex] + itemHeight,
       );
-      columnHeights[shortestColumnIndex] += itemHeight;
+      //use classic height to have the exact same algorithm as the web
+      columnHeights[shortestColumnIndex] += item.media.height;
     });
     setItemYStartPoint(caculatedHeight);
     return result;

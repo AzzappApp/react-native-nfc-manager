@@ -82,6 +82,11 @@ export function useVariantLabel({
             defaultMessage: 'Grid',
             description: 'useModuleVariant - Module media Grid',
           });
+        case 'square_grid':
+          return intl.formatMessage({
+            defaultMessage: 'Square Grid',
+            description: 'useModuleVariant - Module media Square Grid',
+          });
         case 'original_slideshow':
           return intl.formatMessage({
             defaultMessage: 'Original Slideshow',

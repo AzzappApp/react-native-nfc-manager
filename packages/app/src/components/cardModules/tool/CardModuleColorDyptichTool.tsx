@@ -28,9 +28,8 @@ const CardModuleColorDyptichTool = ({
 }: CardModuleColorToolProps) => {
   const styles = useStyleSheet(stylesheet);
   const { width } = useScreenDimensions();
-
   const totalWidth =
-    variantColor.length * ITEM_SIZE + (ITEM_SIZE - 1) * ITEM_GAP - 32; //32 is for safety margin
+    variantColor.length * ITEM_SIZE + (variantColor.length - 1) * ITEM_GAP - 32; //32 is for safety margin
 
   const content = useMemo(() => {
     return variantColor.map((dyptich, index) => {
@@ -54,6 +53,7 @@ const CardModuleColorDyptichTool = ({
           flexDirection: 'row',
           justifyContent: 'center',
           alignItems: 'center',
+          marginTop: 20,
         }}
       >
         {content}
