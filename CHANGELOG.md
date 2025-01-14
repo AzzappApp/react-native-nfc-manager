@@ -1,5 +1,6 @@
-## 1.6.1-canary.30
+## 1.6.1-canary.31
 
+* **fix:**  - reduce gap between header and description in popups ([#6863](https://github.com/AzzappApp/azzapp/pull/6863))
 * **feat:**  - Media Grid module ([#6840](https://github.com/AzzappApp/azzapp/pull/6840))
 * **fix:**  - hide toast when changing webcard type ([#6860](https://github.com/AzzappApp/azzapp/pull/6860))
 * **fix:**  - do not overflow hidden, it causes a border of cancel button to be cut ([#6858](https://github.com/AzzappApp/azzapp/pull/6858))
