@@ -12,13 +12,13 @@ import useWidget from '#hooks/useWidget';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import HomeBackground from './HomeBackground';
 import HomeBottomPanel from './HomeBottomPanel';
-import { HomeBottomSheetModalWebCardToolTip } from './HomeBottomSheetModalWebCardToolTip';
 import HomeBottomSheetPanel from './HomeBottomSheetPanel';
 import HomeBottomSheetPopupPanel from './HomeBottomSheetPopupPanel';
 import HomeHeader from './HomeHeader';
 import HomeProfileLink from './HomeProfileLink';
 import HomeProfilesCarousel from './HomeProfilesCarousel';
 import { useHomeScreenContext } from './HomeScreenContext';
+import Tooltips from './Tooltips';
 import type { HomeScreenContent_user$key } from '#relayArtifacts/HomeScreenContent_user.graphql';
 import type { CarouselSelectListHandle } from '#ui/CarouselSelectList';
 import type { Ref } from 'react';
@@ -48,7 +48,6 @@ const HomeScreenContent = ({
             userName
           }
           ...HomeBottomSheetPanel_profile
-          ...HomeBottomSheetModalWebCardToolTip_profile
           ...HomeBottomSheetPopupPanel_profile
         }
         ...useWidget_user
@@ -158,11 +157,10 @@ const HomeScreenContent = ({
         close={closeMenu}
         profile={currentProfile ?? null}
       />
-      <HomeBottomSheetModalWebCardToolTip user={currentProfile ?? null} />
-
       {currentProfile?.webCard && !currentProfile.webCard.userName && (
         <HomeBottomSheetPopupPanel profile={currentProfile ?? null} />
       )}
+      <Tooltips />
     </View>
   );
 };

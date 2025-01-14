@@ -9,11 +9,11 @@ import { useRouter } from '#components/NativeRouter';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { useSaveOfflineVCard } from '#helpers/offlineVCard';
 import relayScreen from '#helpers/relayScreen';
+import { TooltipProvider } from '#helpers/TooltipContext';
 import { useDeepLinkStoredRoute } from '#hooks/useDeepLink';
 import { useRevenueCat } from '#hooks/useRevenueCat';
 import { useSetRevenueCatUserInfo } from '#hooks/useSetRevenueCatUserInfo';
 import Container from '#ui/Container';
-import { HomeBottomSheetModalToolTip } from './HomeBottomSheetModalToolTip';
 import HomeScreenContent from './HomeScreenContent';
 import { HomeScreenProvider } from './HomeScreenContext';
 import HomeScreenPrefetcher from './HomeScreenPrefetcher';
@@ -83,14 +83,14 @@ const HomeScreen = ({
   return (
     <Suspense>
       <HomeScreenProvider userKey={currentUser} onIndexChange={onIndexChange}>
-        <HomeBottomSheetModalToolTip>
+        <TooltipProvider>
           <HomeScreenContent
             user={currentUser}
             selectListRef={ref}
             refreshQuery={refreshQuery}
           />
           <HomeScreenPrefetcher user={currentUser} />
-        </HomeBottomSheetModalToolTip>
+        </TooltipProvider>
       </HomeScreenProvider>
     </Suspense>
   );

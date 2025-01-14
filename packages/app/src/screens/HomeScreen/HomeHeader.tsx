@@ -16,6 +16,7 @@ import { graphql, useFragment } from 'react-relay';
 import { getTextColor } from '@azzapp/shared/colorsHelpers';
 import { colors } from '#theme';
 import PremiumIndicator from '#components/PremiumIndicator';
+import { useTooltipContext } from '#helpers/TooltipContext';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import { useIndexInterpolation } from './homeHelpers';
@@ -47,6 +48,7 @@ const HomeHeader = ({ openPanel, user: userKey }: HomeHeaderProps) => {
   );
 
   const { currentIndexSharedValue } = useHomeScreenContext();
+  const { tooltips, openTooltips, closeTooltips } = useTooltipContext();
 
   const readableColors = useMemo(
     () => [
@@ -80,8 +82,39 @@ const HomeHeader = ({ openPanel, user: userKey }: HomeHeaderProps) => {
     0,
   );
 
+  const premiumIndicatorAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: currentIndexSharedValue.value > 0.5 ? 1 : 0,
+    pointerEvents: currentIndexSharedValue.value >= 1 ? 'auto' : 'none',
+  }));
+
+  const openHilt = () => {
+    if (
+      tooltips['profileBottomPanel']?.visible ||
+      tooltips['profileCarousel']?.visible ||
+      tooltips['profileLink']?.visible
+    ) {
+      closeTooltips(['profileBottomPanel', 'profileCarousel', 'profileLink']);
+    } else {
+      openTooltips(['profileBottomPanel', 'profileCarousel', 'profileLink']);
+    }
+  };
+
   return (
     <Header
+      leftElement={
+        <Animated.View
+          style={[styles.rightButtonContainer, premiumIndicatorAnimatedStyle]}
+        >
+          <IconButton
+            icon="information"
+            iconSize={26}
+            size={45}
+            variant="icon"
+            iconStyle={iconStyles}
+            onPress={openHilt}
+          />
+        </Animated.View>
+      }
       middleElement={
         <AnimatedHomeHeaderCentralComponent
           isPremium={isPremium}

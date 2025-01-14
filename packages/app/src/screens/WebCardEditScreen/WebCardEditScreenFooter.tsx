@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
@@ -7,6 +7,7 @@ import { colors } from '#theme';
 import ColorTriptychRenderer from '#components/ColorTriptychRenderer';
 import { useWebCardColors } from '#components/WebCardColorPicker';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { useTooltipContext } from '#helpers/TooltipContext';
 import useScreenInsets from '#hooks/useScreenInsets';
 import BottomMenu, { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import PressableNative from '#ui/PressableNative';
@@ -185,6 +186,20 @@ const WebCardEditScreenFooter = ({
     opacity: selectionModeTransition.value,
   }));
 
+  const { registerTooltip, unregisterTooltip } = useTooltipContext();
+
+  const ref = useRef(null);
+
+  useEffect(() => {
+    registerTooltip('editFooter', {
+      ref,
+    });
+
+    return () => {
+      unregisterTooltip('editFooter');
+    };
+  }, [registerTooltip, unregisterTooltip]);
+
   if (webCard.cardModules.length === 0) {
     return null;
   }
@@ -192,6 +207,7 @@ const WebCardEditScreenFooter = ({
   return (
     <>
       <Animated.View
+        ref={ref}
         style={[
           {
             position: 'absolute',

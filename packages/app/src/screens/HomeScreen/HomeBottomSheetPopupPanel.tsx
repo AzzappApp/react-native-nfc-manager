@@ -16,11 +16,11 @@ import BottomSheetPopup from '#components/popup/BottomSheetPopup';
 import { PopupButton } from '#components/popup/PopupElements';
 import { getAuthState, onChangeWebCard } from '#helpers/authStore';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { useTooltipContext } from '#helpers/TooltipContext';
 import BottomSheetTextInput from '#ui/BottomSheetTextInput';
 import Icon from '#ui/Icon';
 import { PageProgress } from '#ui/PageProgress';
 import Text from '#ui/Text';
-import { useHomeBottomSheetModalToolTipContext } from './HomeBottomSheetModalToolTip';
 import type { HomeBottomSheetPopupPanel_profile$key } from '#relayArtifacts/HomeBottomSheetPopupPanel_profile.graphql';
 import type { HomeBottomSheetPopupPanelCheckUserNameQuery } from '#relayArtifacts/HomeBottomSheetPopupPanelCheckUserNameQuery.graphql';
 import type { HomeBottomSheetPopupPanelGetProposedUsernameQuery } from '#relayArtifacts/HomeBottomSheetPopupPanelGetProposedUsernameQuery.graphql';
@@ -174,7 +174,7 @@ const HomeBottomSheetPopupPanel = ({
     [validateUrl],
   );
 
-  const { setTooltipedWebcard } = useHomeBottomSheetModalToolTipContext();
+  const { openTooltips } = useTooltipContext();
 
   const onNextPageRequested = useCallback(() => {
     if (currentPage < 2) {
@@ -193,11 +193,7 @@ const HomeBottomSheetPopupPanel = ({
             },
           },
           onCompleted: () => {
-            const tooltipWebcardId = profile?.webCard?.id;
-
-            if (tooltipWebcardId) {
-              setTooltipedWebcard(tooltipWebcardId);
-            }
+            openTooltips(['profileEdit']);
 
             const profileInfo = getAuthState().profileInfos;
             if (profileInfo) {
@@ -241,8 +237,8 @@ const HomeBottomSheetPopupPanel = ({
     commitUserName,
     currentPage,
     newUserName,
+    openTooltips,
     profile?.webCard?.id,
-    setTooltipedWebcard,
     userNameInvalidError,
   ]);
 

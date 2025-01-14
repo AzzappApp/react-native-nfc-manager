@@ -208,6 +208,7 @@ __metadata:
     react-native-mmkv: "npm:^3.2.0"
     react-native-pager-view: "npm:^6.6.1"
     react-native-permissions: "npm:^5.2.3"
+    react-native-popover-view: "npm:^6.0.1"
     react-native-purchases: "npm:^8.5.0"
     react-native-quick-base64: "npm:^2.1.2"
     react-native-reanimated: "npm:^3.16.7"
@@ -23540,6 +23541,16 @@ __metadata:
     react-native-windows:
       optional: true
   checksum: 10/541088ed9c0523a85bbc737ad44ab29accd0d94fce237f55fc413090ad9d86814aeeceedac19c1f81ecfb071a20a6d59b9be18ae29c6dce1627823acc45b592e
+  languageName: node
+  linkType: hard
+
+"react-native-popover-view@npm:^6.0.1":
+  version: 6.0.1
+  resolution: "react-native-popover-view@npm:6.0.1"
+  dependencies:
+    deprecated-react-native-prop-types: "npm:^2.3.0"
+    prop-types: "npm:^15.8.1"
+  checksum: 10/7becb3067b13dcaef0e375674ed8459c1c02e83a97a09b7d8474c29b379dae5fb2aa26ac35d8e1427adc3509b51fc5d54b7bdc3da2431fb7d735a83b742fd118
   languageName: node
   linkType: hard
 

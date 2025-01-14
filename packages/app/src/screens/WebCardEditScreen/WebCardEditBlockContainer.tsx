@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import {
   StyleSheet,
@@ -22,6 +22,7 @@ import Animated, {
 import { COVER_CARD_RADIUS } from '@azzapp/shared/coverHelpers';
 import { colors, shadow } from '#theme';
 import { useDidAppear } from '#components/NativeRouter';
+import { useTooltipContext } from '#helpers/TooltipContext';
 import { useScrollViewChildRef } from '#ui/ChildPositionAwareScrollView';
 import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
@@ -318,7 +319,30 @@ const WebCardEditBlockContainer = ({
     opacity: Math.max(0, dragX.value / dragLeftLimit),
   }));
 
+  const { registerTooltip, unregisterTooltip } = useTooltipContext();
+
   const containerRef = useScrollViewChildRef(id);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (id === 'cover') {
+      registerTooltip('cover', {
+        ref,
+      });
+    } else {
+      registerTooltip('section', {
+        ref,
+      });
+    }
+
+    return () => {
+      if (id === 'cover') {
+        unregisterTooltip('cover');
+      } else {
+        unregisterTooltip('section');
+      }
+    };
+  }, [id, registerTooltip, unregisterTooltip]);
 
   return (
     <Animated.View
@@ -352,6 +376,7 @@ const WebCardEditBlockContainer = ({
           <Animated.View style={[moduleContainerStyle, shadow(appearance)]}>
             {/** this View is only here because ios bug with shadow and overflow hidden */}
             <Animated.View
+              ref={ref}
               style={moduleInnerContainerStyle}
               accessibilityHint={intl.formatMessage({
                 defaultMessage: `Press to edit this section of your profile`,

@@ -11,6 +11,7 @@ import CoverRenderer from '#components/CoverRenderer';
 import { useRouter, useSuspendUntilAppear } from '#components/NativeRouter';
 import { getRouteForCardModule } from '#helpers/cardModuleRouterHelpers';
 import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
+import { TooltipProvider } from '#helpers/TooltipContext';
 import {
   MODULE_KIND_WITHOUT_VARIANTS,
   type ModuleKindWithVariant,
@@ -30,6 +31,7 @@ import AddModuleSectionModal from './AddModuleSection';
 import CardStyleModal from './CardStyleModal';
 import LoadCardTemplateModal from './LoadCardTemplateModal';
 import PreviewModal from './PreviewModal';
+import Tooltips from './Tooltips';
 import WebCardColorsManager from './WebCardColorsManager';
 import WebCardEditBlockContainer from './WebCardEditBlockContainer';
 import WebCardEditScreenBody from './WebCardEditScreenBody';
@@ -309,115 +311,122 @@ const WebCardEditScreen = ({
   }
 
   return (
-    <Container style={{ flex: 1 }}>
-      <Suspense>
-        <WebCardEditScreenHeader
-          webCard={webCard}
-          selectionMode={selectionMode}
-          nbSelectedModules={nbSelectedModules}
-          selectionContainsAllModules={selectionContainsAllModules}
-          onDone={onDone}
-          onEditModules={onEditModules}
-          onCancelEditModules={toggleSelectionMode}
-          onSelectAllModules={onSelectAllModules}
-          onUnSelectAllModules={onUnSelectAllModules}
-          disabledButtons={showWebCardColorPicker}
-          editTransition={editTransition}
-        />
-      </Suspense>
-      <WebCardEditScreenScrollView
-        ref={scrollViewRef}
-        editFooter={
-          <Suspense>
-            <WebCardScreenEditModeFooter
-              fromCreation={!!fromCreation}
-              onAddContent={openContentModal}
-              onSkip={onDone}
-              webCard={webCard}
-            />
-          </Suspense>
-        }
-        editFooterHeight={WEBCARD_SCREEN_EDIT_MODE_FOOTER_HEIGHT}
-        style={[StyleSheet.absoluteFill, { opacity: transitionInfos ? 0 : 1 }]}
-      >
-        <WebCardEditBlockContainer
-          id="cover"
-          selectionModeTransition={selectionModeTransition}
-          backgroundColor={coverBackgroundColor}
-          displayEditionButtons={false}
-          onModulePress={onEditCover}
-        >
-          <CoverRenderer
+    <TooltipProvider>
+      <Container style={{ flex: 1 }}>
+        <Suspense>
+          <WebCardEditScreenHeader
             webCard={webCard}
-            width={windowWidth}
-            canPlay={editing}
-            large
-            useAnimationSnapshot
-          />
-        </WebCardEditBlockContainer>
-        <WebCardEditScreenBody
-          ref={webCardBodyRef}
-          webCard={webCard}
-          selectionMode={selectionMode}
-          onEditModule={onEditModule}
-          onSelectionStateChange={onSelectionStateChange}
-          selectionModeTransition={selectionModeTransition}
-          editing={editing}
-        />
-      </WebCardEditScreenScrollView>
-      {transitionInfos &&
-        Object.entries(transitionInfos).map(([id, info]) => (
-          <WebCardModuleTransitionSnapshotRenderer
-            key={id}
-            info={info}
+            selectionMode={selectionMode}
+            nbSelectedModules={nbSelectedModules}
+            selectionContainsAllModules={selectionContainsAllModules}
+            onDone={onDone}
+            onEditModules={onEditModules}
+            onCancelEditModules={toggleSelectionMode}
+            onSelectAllModules={onSelectAllModules}
+            onUnSelectAllModules={onUnSelectAllModules}
+            disabledButtons={showWebCardColorPicker}
             editTransition={editTransition}
           />
-        ))}
-      <Suspense fallback={null}>
-        <WebCardEditScreenFooter
-          selectionMode={selectionMode}
-          selectionModeTransition={selectionModeTransition}
-          hasSelectedModules={nbSelectedModules > 0}
-          selectionContainsHiddenModules={selectionContainsHiddenModules}
-          webCard={webCard}
-          editTransition={editTransition}
-          onRequestNewModule={onRequestNewModule}
-          onRequestColorPicker={openWebCardColorPicker}
-          onRequestWebCardStyle={openCardStyleModal}
-          onRequestPreview={openPreviewModal}
-          onDelete={onDeleteSelectedModules}
-          onDuplicate={onDuplicateSelectedModules}
-          onToggleVisibility={onToggleSelectedModulesVisibility}
-        />
-      </Suspense>
-      <Suspense fallback={null}>
-        <PreviewModal
-          webCard={webCard}
-          visible={showPreviewModal}
-          onRequestClose={closePreviewModal}
-        />
-        <CardStyleModal
-          visible={showCardStyleModal}
-          onRequestClose={closeCardStyleModal}
-        />
-        <LoadCardTemplateModal
-          webCard={webCard}
-          onClose={onTemplateModalClose}
-          visible={loadTemplate}
-        />
-        <WebCardColorsManager
-          webCard={webCard}
-          visible={showWebCardColorPicker}
-          onRequestClose={closeWebCardColorPicker}
-          onCloseCanceled={openWebCardColorPicker}
-        />
-        <AddModuleSectionModal
-          webCard={webCard}
-          close={closeContentModal}
-          open={showContentModal}
-        />
-      </Suspense>
-    </Container>
+        </Suspense>
+
+        <WebCardEditScreenScrollView
+          ref={scrollViewRef}
+          editFooter={
+            <Suspense>
+              <WebCardScreenEditModeFooter
+                fromCreation={!!fromCreation}
+                onAddContent={openContentModal}
+                onSkip={onDone}
+                webCard={webCard}
+              />
+            </Suspense>
+          }
+          editFooterHeight={WEBCARD_SCREEN_EDIT_MODE_FOOTER_HEIGHT}
+          style={[
+            StyleSheet.absoluteFill,
+            { opacity: transitionInfos ? 0 : 1 },
+          ]}
+        >
+          <WebCardEditBlockContainer
+            id="cover"
+            selectionModeTransition={selectionModeTransition}
+            backgroundColor={coverBackgroundColor}
+            displayEditionButtons={false}
+            onModulePress={onEditCover}
+          >
+            <CoverRenderer
+              webCard={webCard}
+              width={windowWidth}
+              canPlay={editing}
+              large
+              useAnimationSnapshot
+            />
+          </WebCardEditBlockContainer>
+          <WebCardEditScreenBody
+            ref={webCardBodyRef}
+            webCard={webCard}
+            selectionMode={selectionMode}
+            onEditModule={onEditModule}
+            onSelectionStateChange={onSelectionStateChange}
+            selectionModeTransition={selectionModeTransition}
+            editing={editing}
+          />
+        </WebCardEditScreenScrollView>
+        {transitionInfos &&
+          Object.entries(transitionInfos).map(([id, info]) => (
+            <WebCardModuleTransitionSnapshotRenderer
+              key={id}
+              info={info}
+              editTransition={editTransition}
+            />
+          ))}
+        <Suspense fallback={null}>
+          <WebCardEditScreenFooter
+            selectionMode={selectionMode}
+            selectionModeTransition={selectionModeTransition}
+            hasSelectedModules={nbSelectedModules > 0}
+            selectionContainsHiddenModules={selectionContainsHiddenModules}
+            webCard={webCard}
+            editTransition={editTransition}
+            onRequestNewModule={onRequestNewModule}
+            onRequestColorPicker={openWebCardColorPicker}
+            onRequestWebCardStyle={openCardStyleModal}
+            onRequestPreview={openPreviewModal}
+            onDelete={onDeleteSelectedModules}
+            onDuplicate={onDuplicateSelectedModules}
+            onToggleVisibility={onToggleSelectedModulesVisibility}
+          />
+        </Suspense>
+        <Suspense fallback={null}>
+          <PreviewModal
+            webCard={webCard}
+            visible={showPreviewModal}
+            onRequestClose={closePreviewModal}
+          />
+          <CardStyleModal
+            visible={showCardStyleModal}
+            onRequestClose={closeCardStyleModal}
+          />
+          <LoadCardTemplateModal
+            webCard={webCard}
+            onClose={onTemplateModalClose}
+            visible={loadTemplate}
+          />
+          <WebCardColorsManager
+            webCard={webCard}
+            visible={showWebCardColorPicker}
+            onRequestClose={closeWebCardColorPicker}
+            onCloseCanceled={openWebCardColorPicker}
+          />
+          <AddModuleSectionModal
+            webCard={webCard}
+            close={closeContentModal}
+            open={showContentModal}
+          />
+        </Suspense>
+      </Container>
+      <Tooltips />
+    </TooltipProvider>
   );
 };
 export default WebCardEditScreen;
