@@ -2,6 +2,7 @@ import * as FileSystem from 'expo-file-system';
 import { useCallback, useImperativeHandle, useState, forwardRef } from 'react';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
+import useScreenDimensions from '#hooks/useScreenDimensions';
 import ContactDetailsBody from '#screens/ContactDetailsScreen/ContactDetailsBody';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import type { ContactDetailsModal_webCard$key } from '#relayArtifacts/ContactDetailsModal_webCard.graphql';
@@ -21,6 +22,7 @@ const ContactDetailsModal = (
   ref: ForwardedRef<ContactDetailsModalActions>,
 ) => {
   const [details, setDetails] = useState<ContactDetails | null>(null);
+  const { height } = useScreenDimensions();
 
   const onClose = useCallback(() => {
     setDetails(null);
@@ -95,7 +97,7 @@ const ContactDetailsModal = (
   ]);
 
   return (
-    <BottomSheetModal visible={!!details} onDismiss={onClose}>
+    <BottomSheetModal height={height} visible={!!details} onDismiss={onClose}>
       {details && (
         <ContactDetailsBody
           details={{
