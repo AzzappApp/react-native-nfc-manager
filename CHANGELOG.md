@@ -1,5 +1,7 @@
-## 1.6.1-canary.27
+## 1.6.1-canary.28
 
+* **fix:**  - [#6462](https://github.com/AzzappApp/azzapp/pull/6462) ensure reads are made on primary after mutation ([#6581](https://github.com/AzzappApp/azzapp/pull/6581))
+* **build:**  - upgrade native deps ([#6853](https://github.com/AzzappApp/azzapp/pull/6853))
 * **fix:**  - limit url width on home screen ([#6817](https://github.com/AzzappApp/azzapp/pull/6817))
 * **fix:**  - media picker should not closed with empty slots ([#6846](https://github.com/AzzappApp/azzapp/pull/6846))
 * **fix:**  - **newModules:** [#6665](https://github.com/AzzappApp/azzapp/pull/6665) missing style when using image comp ([#6850](https://github.com/AzzappApp/azzapp/pull/6850))
