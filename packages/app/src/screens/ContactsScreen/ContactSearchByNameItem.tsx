@@ -10,6 +10,7 @@ import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import ContactAvatar from './ContactAvatar';
+import WhatsappButton from './WhatsappButton';
 import type { ContactsScreenLists_contacts$data } from '#relayArtifacts/ContactsScreenLists_contacts.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { Contact } from 'expo-contacts';
@@ -208,6 +209,9 @@ const ContactSearchByNameItem = ({
           <PressableNative onPress={onInvite}>
             <Icon icon="invite" />
           </PressableNative>
+        )}
+        {!showInvite && (
+          <WhatsappButton phoneNumber={contact?.phoneNumbers?.[0]?.number} />
         )}
 
         <PressableNative onPress={onMore}>

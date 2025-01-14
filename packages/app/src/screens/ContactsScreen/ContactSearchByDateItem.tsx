@@ -7,6 +7,7 @@ import { findLocalContact } from '#helpers/contactCardHelpers';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import ContactAvatar from './ContactAvatar';
+import WhatsappButton from './WhatsappButton';
 import type { ContactsScreenLists_contacts$data } from '#relayArtifacts/ContactsScreenLists_contacts.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { Contact } from 'expo-contacts';
@@ -119,6 +120,12 @@ const ContactSearchByDateItem = ({
         <PressableNative style={styles.invite} onPress={onInvite}>
           <Icon icon="invite" style={styles.icon} size={17} />
         </PressableNative>
+      )}
+      {!showInvite && !invited && (
+        <WhatsappButton
+          phoneNumber={contact?.phoneNumbers?.[0]?.number}
+          style={styles.invite}
+        />
       )}
     </View>
   );
