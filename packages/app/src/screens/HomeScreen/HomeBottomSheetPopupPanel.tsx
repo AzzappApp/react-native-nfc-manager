@@ -272,7 +272,7 @@ const HomeBottomSheetPopupPanel = ({
                     : require('#assets/hint_1_light_ae.mp4')
                 }
               />
-              <Text variant="large" style={styles.descriptionTextContainer}>
+              <Text variant="large" style={styles.headerTextContainer}>
                 <FormattedMessage
                   defaultMessage="Congratulations!
 Your contactCard is ready
@@ -307,7 +307,7 @@ to be shared!"
                     : require('#assets/hint_2_light_ae.mp4')
                 }
               />
-              <Text variant="large" style={styles.descriptionTextContainer}>
+              <Text variant="large" style={styles.headerTextContainer}>
                 <FormattedMessage
                   defaultMessage="Instantly share your ContactCard information with the “Shake & Share”!"
                   description="Congratulation label after sucessfull contact card creation"
@@ -351,8 +351,7 @@ to be shared!"
                   onEndEditing={onNextPageRequested}
                   returnKeyType="done"
                 />
-                {/* keeping an empty <text> avoid bottom text to jump */}
-                <Text variant="error">{error || ' '}</Text>
+                {error ? <Text variant="error">{error}</Text> : undefined}
               </View>
               <View style={styles.urlContainer}>
                 <Icon
@@ -407,9 +406,14 @@ const stylesheet = createStyleSheet(theme => ({
     alignSelf: 'center',
     padding: 20,
   },
-  descriptionTextContainer: {
+  headerTextContainer: {
     color: theme === 'dark' ? colors.white : colors.black,
     paddingTop: 20,
+    textAlign: 'center',
+  },
+  descriptionTextContainer: {
+    color: theme === 'dark' ? colors.white : colors.black,
+    paddingTop: 10,
     textAlign: 'center',
   },
   topDescriptionTextContainer: {

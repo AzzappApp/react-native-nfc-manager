@@ -340,7 +340,7 @@ const ContactCardCreateScreen = () => {
                   : require('#assets/hint_0_light_ae.mp4')
               }
             />
-            <Text variant="large" style={styles.popupDescriptionTextContainer}>
+            <Text variant="large" style={styles.popupHeaderTextContainer}>
               <FormattedMessage
                 defaultMessage="Fill your ContactCard"
                 description="Popup Card creation / main message / Fill your ContactCard"
@@ -382,9 +382,14 @@ const stylesheet = createStyleSheet(theme => ({
     borderRadius: 12,
   },
   popupPage: { top: 0, width: '100%', paddingBottom: 20 },
-  popupDescriptionTextContainer: {
+  popupHeaderTextContainer: {
     color: theme === 'dark' ? colors.white : colors.black,
     paddingTop: 20,
+    textAlign: 'center',
+  },
+  popupDescriptionTextContainer: {
+    color: theme === 'dark' ? colors.white : colors.black,
+    paddingTop: 10,
     textAlign: 'center',
   },
 }));
