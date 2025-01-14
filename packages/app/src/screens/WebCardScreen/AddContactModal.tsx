@@ -149,12 +149,13 @@ const AddContactModal = ({
     const birthdayItem = scanned.contact?.dates?.find(
       x => x.label === 'birthday',
     );
+
     const birthday =
       birthdayItem &&
       birthdayItem.year !== undefined &&
       birthdayItem.month !== undefined &&
       birthdayItem.day !== undefined
-        ? `${birthdayItem.year}-${birthdayItem.month}-${birthdayItem.day}`
+        ? `${birthdayItem.year}-${`${birthdayItem.month + 1}`.padStart(2, '0')}-${`${birthdayItem.day}`.padStart(2, '0')}`
         : null;
 
     return {
