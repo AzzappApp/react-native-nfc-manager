@@ -1,10 +1,10 @@
 import { memo, useMemo } from 'react';
-import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import Link from '#components/Link';
 import LinkWebCard from '#components/LinkWebCard';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
 import CoverRenderer from '../CoverRenderer';
+import useCoverLinkRendererFragment from './useCoverLinkRendererFragment';
 import type { CoverLinkRendererProps } from './coverLinkTypes';
 
 /**
@@ -20,14 +20,7 @@ const CoverLink = ({
   coverIsPredefined,
   ...props
 }: CoverLinkRendererProps) => {
-  const webCard = useFragment(
-    graphql`
-      fragment CoverLinkRenderer_webCard on WebCard {
-        coverIsPredefined
-      }
-    `,
-    props.webCard,
-  );
+  const webCard = useCoverLinkRendererFragment(props.webCard);
 
   const containerStyle = useMemo(
     () => [
