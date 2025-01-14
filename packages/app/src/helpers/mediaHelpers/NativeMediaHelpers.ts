@@ -1,4 +1,4 @@
-import { NativeModules } from 'react-native';
+import { NativeModules, Platform } from 'react-native';
 import { createExpoImagePrefetcher } from './MediaPrefetcher';
 
 const { AZPMediaHelpers } = NativeModules;
@@ -19,6 +19,13 @@ export const getVideoSize: (
 
 export const getFilePath: (uri: string) => Promise<string> =
   AZPMediaHelpers.getFilePath;
+
+export const downloadContactImage: (uri: string) => Promise<string> =
+  Platform.OS === 'android'
+    ? AZPMediaHelpers.downloadContactImage
+    : () => {
+        console.warn('downloadContactImage is android specific');
+      };
 
 /**
  * Prefetches an image.

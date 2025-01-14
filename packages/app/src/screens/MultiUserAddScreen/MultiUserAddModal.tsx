@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { File, Paths } from 'expo-file-system/next';
+import * as Sentry from '@sentry/react-native';
 import parsePhoneNumberFromString, {
   parsePhoneNumber,
 } from 'libphonenumber-js';
@@ -19,14 +19,17 @@ import {
 import * as z from 'zod';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import ERRORS from '@azzapp/shared/errors';
+import { isDefined } from '@azzapp/shared/isDefined';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
 import { ScreenModal } from '#components/NativeRouter';
 import { getAuthState } from '#helpers/authStore';
 import { CardPhoneLabels } from '#helpers/contactCardHelpers';
 import { getFileName } from '#helpers/fileHelpers';
-import { createId } from '#helpers/idHelpers';
 import { getLocales, useCurrentLocale } from '#helpers/localeHelpers';
-import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
+import {
+  addLocalCachedMediaFile,
+  downloadContactImage,
+} from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import ContactCardEditForm from '#screens/ContactCardEditScreen/ContactCardEditForm';
 import Button from '#ui/Button';
@@ -285,10 +288,16 @@ const MultiUserAddModal = (
             title: contact.jobTitle,
             company: contact.company ?? undefined,
             urls:
-              contact.urlAddresses?.map(a => ({
-                address: a.url,
-                selected: true,
-              })) ?? [],
+              contact.urlAddresses
+                ?.map(a =>
+                  a.url
+                    ? {
+                        address: a.url,
+                        selected: true,
+                      }
+                    : null,
+                )
+                .filter(isDefined) ?? [],
             birthday:
               contact.birthday?.day &&
               contact.birthday.month &&
@@ -380,15 +389,20 @@ const MultiUserAddModal = (
       const { avatar, logo, ...data } = value;
 
       if (avatar?.local && avatar.uri) {
-        const fileName = getFileName(avatar.uri);
+        let fileName = getFileName(avatar.uri);
 
         let uri = avatar.uri;
         if (avatar.uri.startsWith('content://')) {
-          const originalFile = new File(avatar.uri);
-          uri = Paths.cache.uri + createId();
-          const file = new File(uri);
-          file.create();
-          originalFile.copy(file);
+          try {
+            uri = `file://${await downloadContactImage(avatar.uri)}`;
+            fileName = uri;
+          } catch (e: any) {
+            Sentry.captureException(e);
+            console.warn(
+              'error downloading contact image from phone contacts',
+              e,
+            );
+          }
         }
 
         const file: any = {
@@ -535,6 +549,7 @@ const MultiUserAddModal = (
                 }),
               });
             } else {
+              console.warn(e);
               Toast.show({
                 type: 'error',
                 text1: intl.formatMessage({
@@ -609,7 +624,9 @@ const MultiUserAddModal = (
             webCard?.setValue(nbProfiles + 1, 'nbProfiles');
           },
         });
-      } catch {
+      } catch (e: any) {
+        Sentry.captureException(e);
+        console.warn('Error submit', e);
         Toast.show({
           type: 'error',
           text1: intl.formatMessage({
