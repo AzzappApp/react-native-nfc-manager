@@ -1,0 +1,180 @@
+import { useState, useCallback, useRef, useEffect, useMemo, memo } from 'react';
+import { Animated, Platform, View } from 'react-native';
+import { isModuleAnimationDisabled } from '@azzapp/shared/cardModuleHelpers';
+import useIsModuleItemInViewPort from '#hooks/useIsModuleItemInViewPort';
+import CardModuleMediaSelector from './CardModuleMediaSelector';
+import type {
+  CardModuleSourceMedia,
+  CardModuleDimension,
+} from './cardModuleEditorType';
+import type { CardStyle } from '@azzapp/shared/cardHelpers';
+import type {
+  DisplayMode,
+  WebCardViewMode,
+} from '@azzapp/shared/cardModuleHelpers';
+import type { LayoutChangeEvent } from 'react-native';
+
+export type AppearanceSliderContainerProps = {
+  index: number;
+  media: CardModuleSourceMedia;
+  dimension: CardModuleDimension;
+  displayMode: DisplayMode;
+  cardStyle?: CardStyle | null;
+  canPlay: boolean;
+  setEditableItemIndex?: (index: number) => void;
+  modulePosition?: number;
+  scrollY: Animated.Value;
+  offsetY: number;
+  webCardViewMode?: WebCardViewMode;
+  parentY: number;
+  displayDimension: CardModuleDimension;
+};
+
+const AppearanceSliderContainer = ({
+  media,
+  index,
+  dimension,
+  cardStyle,
+  canPlay,
+  modulePosition,
+  displayMode,
+  webCardViewMode,
+  parentY,
+  scrollY,
+  offsetY,
+  displayDimension,
+}: AppearanceSliderContainerProps) => {
+  const itemStartY =
+    (modulePosition ?? 0) + offsetY + ANIMATION_DELAY_BUFFER_PIXEL;
+
+  const inViewport = useIsModuleItemInViewPort(scrollY, itemStartY, dimension);
+  const [componentY, setComponentY] = useState(0);
+  const [componentHeight, setComponentHeight] = useState(0);
+
+  const onLayout = useCallback((event: LayoutChangeEvent) => {
+    setComponentY(event.nativeEvent.layout.y);
+    setComponentHeight(event.nativeEvent.layout.height);
+  }, []);
+
+  //make them visible at first even out of the screen until the first listener of scrollY is triggered
+  const translateY = useRef(
+    new Animated.Value(inViewport ? 0 : TRANSLATION_Y_ANIMATION),
+  ).current;
+  const opacity = useRef(new Animated.Value(inViewport ? 1 : 0)).current;
+
+  const isRunning = useRef(false);
+  const hideAnimation = useRef<Animated.CompositeAnimation | null>(null);
+  useEffect(() => {
+    const itemStartY = (modulePosition ?? 0) + (parentY ?? 0) + componentY;
+    const itemEndY = itemStartY + componentHeight;
+    const viewportHeight = dimension.height;
+    const listener = scrollY.addListener(({ value }) => {
+      if (
+        value + viewportHeight - ANIMATION_DELAY_BUFFER_PIXEL >= itemStartY &&
+        value <= itemEndY
+      ) {
+        if (hideAnimation.current) {
+          hideAnimation.current.stop();
+          hideAnimation.current = null;
+        }
+
+        if (!isRunning.current) {
+          isRunning.current = true;
+          Animated.parallel([
+            Animated.timing(translateY, {
+              toValue: 0,
+              duration: ANIMATION_DURATION,
+              useNativeDriver: true,
+            }),
+            Animated.timing(opacity, {
+              toValue: 1,
+              duration: 500, //different than animation duration, tested with upmitt, submit to changes
+              useNativeDriver: true,
+            }),
+          ]).start(({ finished }) => {
+            if (finished) {
+              isRunning.current = false;
+            }
+          });
+        }
+      } else if (!hideAnimation.current && !isRunning.current) {
+        hideAnimation.current = Animated.parallel([
+          Animated.timing(translateY, {
+            toValue:
+              value > itemStartY
+                ? -TRANSLATION_Y_ANIMATION
+                : TRANSLATION_Y_ANIMATION,
+            duration: ANIMATION_DURATION,
+            useNativeDriver: true,
+          }),
+          Animated.timing(opacity, {
+            toValue: 0,
+            duration: 500,
+            useNativeDriver: true,
+          }),
+        ]);
+        hideAnimation.current.start(({ finished }) => {
+          if (finished) {
+            hideAnimation.current = null;
+          }
+        });
+      }
+    });
+
+    return () => scrollY.removeListener(listener);
+  }, [
+    scrollY,
+    modulePosition,
+    parentY,
+    dimension.height,
+    translateY,
+    opacity,
+    componentY,
+    componentHeight,
+    index,
+  ]);
+
+  const disableAnimation = isModuleAnimationDisabled(
+    displayMode,
+    webCardViewMode,
+  );
+  const imageContainerStyle = useMemo(
+    () => [
+      {
+        width: media.width,
+        borderRadius: cardStyle?.borderRadius ?? 0,
+        transform: [{ translateY: disableAnimation ? 0 : translateY }],
+
+        opacity:
+          disableAnimation ||
+          (Platform.OS === 'android' && media.kind === 'video')
+            ? 1
+            : opacity,
+      },
+    ],
+    [media.width, media.kind, cardStyle, disableAnimation, translateY, opacity],
+  );
+
+  return (
+    <View style={{ width: media.width }} onLayout={onLayout}>
+      <Animated.View style={imageContainerStyle}>
+        <CardModuleMediaSelector
+          media={media}
+          dimension={displayDimension}
+          canPlay={canPlay && inViewport}
+          imageStyle={{
+            borderRadius: cardStyle?.borderRadius ?? 0,
+            overflow: 'hidden',
+          }}
+        />
+      </Animated.View>
+    </View>
+  );
+};
+
+export default memo(AppearanceSliderContainer);
+
+// this is a buffer in pixel before startingthe animation
+const ANIMATION_DELAY_BUFFER_PIXEL = 100;
+const TRANSLATION_Y_ANIMATION = 200;
+const ANIMATION_DURATION = 1000;

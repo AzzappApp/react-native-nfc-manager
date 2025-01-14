@@ -7,6 +7,7 @@ export const dyptichByModuleVariant = (
   switch (module.moduleKind) {
     case 'media':
       switch (module.variant) {
+        case 'grid':
         case 'slideshow':
           return [
             {
@@ -322,6 +323,7 @@ export const getInitalDyptichColor = (
   );
 
   switch (key) {
+    case 'media,grid,dark':
     case 'media,slideshow,dark':
       return {
         background: 'dark',
@@ -330,6 +332,7 @@ export const getInitalDyptichColor = (
         text: 'transparent',
         graphic: 'transparent',
       };
+    case 'media,grid,light':
     case 'media,slideshow,light':
       return {
         background: 'light',
@@ -338,6 +341,7 @@ export const getInitalDyptichColor = (
         text: 'transparent',
         graphic: 'transparent',
       };
+    case 'media,grid,primary':
     case 'media,slideshow,primary':
       return {
         background: 'primary',

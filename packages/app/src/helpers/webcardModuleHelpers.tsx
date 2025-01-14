@@ -12,9 +12,9 @@ export const MODULE_KIND_WITH_VARIANTS = [
     variants: [
       'slideshow',
       'parallax',
+      'grid',
       'original',
       'fullscreen',
-      'grid',
       'original_slideshow',
       'full_slideshow',
       'full_grid',
@@ -25,11 +25,11 @@ export const MODULE_KIND_WITH_VARIANTS = [
   {
     moduleKind: MODULE_KIND_MEDIA_TEXT,
     variants: [
-      'parallax',
       'alternation',
+      'parallax',
       'full_alternation',
-      'article',
       'grid',
+      'article',
       'superposition',
       'card',
       'card_gradient',
@@ -41,13 +41,13 @@ export const MODULE_KIND_WITH_VARIANTS = [
       'alternation',
       'parallax',
       'full_alternation',
+      'grid',
       'article',
       'button_round',
       'button_square',
       'list',
       'card',
       'card_gradient',
-      'grid',
     ],
   },
   {
@@ -151,52 +151,79 @@ export type ModuleKindSection = (typeof MODULE_VARIANT_SECTION)[number];
 
 export type ModuleKindSectionName = ModuleKindSection['section'];
 
-export const isComingSoonModule = (module: ModuleKindAndVariant) => {
+//using is module supported naming, (opposite of isCoomingSoon) in case of older app
+// accessing the webcard, not in the list for avoiding crash
+export const isModuleVariantSupported = (module: {
+  moduleKind: string;
+  variant: string | null;
+}) => {
+  if (!module.variant) {
+    //this is the list of  customizable module without variant
+    return [
+      'photoWithTextAndTitle',
+      'socialLinks',
+      'blockText',
+      'carousel',
+      'horizontalPhoto',
+      'lineDivider',
+      'simpleButton',
+      'simpleText',
+      'simpleTitle',
+    ].includes(module.moduleKind);
+  }
   switch (module.moduleKind) {
     case MODULE_KIND_MEDIA: {
       const soon = [
-        'fullscreen',
+        'slideshow',
+        'parallax',
         'grid',
-        'original_slideshow',
-        'full_slideshow',
-        'full_grid',
-        'zoom_out_fade',
-        'parallax_small',
+        'original',
+        // 'fullscreen',
+        // 'original_slideshow',
+        // 'full_slideshow',
+        // 'full_grid',
+        // 'zoom_out_fade',
+        // 'parallax_small',
       ];
       return soon.includes(module.variant);
     }
     case MODULE_KIND_MEDIA_TEXT: {
       const soon = [
-        'original',
-        'fullscreen',
+        'alternation',
+        'parallax',
         'full_alternation',
-        'article',
-        'grid',
-        'superposition',
-        'card',
-        'card_gradient',
+        'original',
+        // 'fullscreen',
+        // 'article',
+        // 'grid',
+        // 'superposition',
+        // 'card',
+        // 'card_gradient',
       ];
       return soon.includes(module.variant);
     }
     case MODULE_KIND_MEDIA_TEXT_LINK: {
       const soon = [
-        'original',
-        'fullscreen',
+        'alternation',
+        'parallax',
         'full_alternation',
-        'article',
-        'button_round',
-        'button_square',
-        'list',
-        'superposition',
-        'card',
-        'card_gradient',
-        'grid',
+        'original',
+        // 'grid',
+        // 'fullscreen',
+        // 'article',
+        // 'button_round',
+        // 'button_square',
+        // 'list',
+        // 'superposition',
+        // 'card',
+        // 'card_gradient',
       ];
       return soon.includes(module.variant);
     }
     case MODULE_KIND_MAP:
     case MODULE_KIND_TITLE_TEXT:
-      return true;
+      return false;
+    //INSERT_MODULE
     default:
       return false;
   }

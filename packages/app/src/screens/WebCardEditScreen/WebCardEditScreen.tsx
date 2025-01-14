@@ -12,7 +12,7 @@ import { useRouter, useSuspendUntilAppear } from '#components/NativeRouter';
 import { getRouteForCardModule } from '#helpers/cardModuleRouterHelpers';
 import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
 import {
-  MODULE_VARIANT_SECTION,
+  MODULE_KIND_WITHOUT_VARIANTS,
   type ModuleKindWithVariant,
 } from '#helpers/webcardModuleHelpers';
 import useBoolean from '#hooks/useBoolean';
@@ -104,27 +104,18 @@ const WebCardEditScreen = ({
   const prefetchRoute = usePrefetchRoute();
   const environment = useRelayEnvironment();
   useEffect(() => {
+    //this is not intereset, gain at all by prefetching the new module(nothing to prefetch)
+
     const disposables = [
       prefetchRoute(environment, {
         route: 'COVER_EDITION',
       }),
-      ...MODULE_VARIANT_SECTION.flatMap(module =>
-        module.section === 'custom'
-          ? module.moduleKind.map(moduleKind => {
-              const module = { moduleKind } as ModuleKindWithVariant;
-              const route = getRouteForCardModule(module);
-              if (!route) return undefined;
-              return prefetchRoute(environment, route);
-            })
-          : module.variants.map(v => {
-              const route = getRouteForCardModule({
-                moduleKind: module.section,
-                variant: v,
-              } as ModuleKindWithVariant);
-              if (!route) return undefined;
-              return prefetchRoute(environment, route);
-            }),
-      ),
+      ...MODULE_KIND_WITHOUT_VARIANTS.map(moduleKind => {
+        const module = { moduleKind } as ModuleKindWithVariant;
+        const route = getRouteForCardModule(module);
+        if (!route) return undefined;
+        return prefetchRoute(environment, route);
+      }),
     ].filter(disposable => disposable !== undefined);
     return () => {
       disposables?.forEach(disposable => disposable.dispose());

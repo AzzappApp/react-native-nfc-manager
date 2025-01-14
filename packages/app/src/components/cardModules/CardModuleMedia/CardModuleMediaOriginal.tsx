@@ -1,15 +1,14 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { View } from 'react-native';
 import useScreenDimensions from '#hooks/useScreenDimensions';
-import OriginalContainer from '../OriginalContainer';
+import AppearanceSliderContainer from '../AppearanceSliderContainer';
+import { DESKTOP_CONTENT_MAX_WIDTH } from '../CardModuleRenderer';
 import CardModulePressableTool from '../tool/CardModulePressableTool';
+import type { AppearanceSliderContainerProps } from '../AppearanceSliderContainer';
 import type {
-  CardModuleDimension,
   CardModuleMedia,
-  CardModuleSourceMedia,
   CardModuleVariantType,
 } from '../cardModuleEditorType';
-import type { CardStyle } from '@azzapp/shared/cardHelpers';
 import type { LayoutChangeEvent, Animated as RNAnimated } from 'react-native';
 
 type CardModuleMediaOriginalProps = CardModuleVariantType & {
@@ -28,6 +27,7 @@ const CardModuleMediaOriginal = ({
   setEditableItemIndex,
   webCardViewMode,
   cardStyle,
+  displayMode,
   dimension: providedDimension,
 }: CardModuleMediaOriginalProps & {}) => {
   if (!scrollPosition) {
@@ -41,6 +41,29 @@ const CardModuleMediaOriginal = ({
       ? cardModuleMedias.slice(0, 1)
       : cardModuleMedias;
 
+  let displayedWidth = dimension.width;
+  if (displayedWidth > DESKTOP_CONTENT_MAX_WIDTH) {
+    displayedWidth = DESKTOP_CONTENT_MAX_WIDTH;
+  } else {
+    displayedWidth = displayedWidth - (cardStyle?.gap || 0) * 2;
+  }
+
+  const offsetY = useMemo(() => {
+    return items.reduce(
+      (acc, { media }, index) => {
+        if (index === 0) {
+          acc.push((displayedWidth * media.height) / media.width);
+        } else {
+          acc.push(
+            acc[index - 1] + (displayedWidth * media.height) / media.width,
+          );
+        }
+        return acc;
+      },
+      [0] as number[],
+    );
+  }, [displayedWidth, items]);
+
   return (
     <View
       style={{ gap: cardStyle?.gap || 0, padding: cardStyle?.gap || 0 }}
@@ -51,53 +74,58 @@ const CardModuleMediaOriginal = ({
           <OriginalItem
             key={`${media.id}_${index}`}
             media={media}
+            displayDimension={{
+              width: displayedWidth,
+              height: (displayedWidth * media.height) / media.width,
+            }}
+            dimension={dimension}
+            displayMode={displayMode}
+            cardStyle={cardStyle}
+            setEditableItemIndex={setEditableItemIndex}
+            modulePosition={modulePosition}
             index={index}
             canPlay={canPlay}
-            setEditableItemIndex={setEditableItemIndex}
-            scrollPosition={scrollPosition}
-            modulePosition={modulePosition}
-            cardStyle={cardStyle}
-            dimension={dimension}
+            scrollY={scrollPosition}
+            offsetY={offsetY[index]}
+            webCardViewMode={webCardViewMode}
           />
         );
       })}
     </View>
   );
 };
-
-const OriginalItem = ({
-  media,
-  index,
-  scrollPosition,
-  modulePosition,
-  canPlay,
-  setEditableItemIndex,
-  cardStyle,
-  dimension,
-}: {
-  media: CardModuleSourceMedia;
-  index: number;
-  scrollPosition: RNAnimated.Value;
-  modulePosition?: number;
-  canPlay: boolean;
-  cardStyle?: CardStyle | null;
+type OriginalItemProps = Omit<AppearanceSliderContainerProps, 'parentY'> & {
   setEditableItemIndex?: (index: number) => void;
-  dimension: CardModuleDimension;
-}) => {
-  const onPress = useCallback(() => {
+};
+const OriginalItem = ({
+  setEditableItemIndex,
+  index,
+  dimension,
+  cardStyle,
+  ...props
+}: OriginalItemProps) => {
+  const [parentY, setParentY] = useState(0);
+
+  const onLayout = useCallback((event: LayoutChangeEvent) => {
+    setParentY(event.nativeEvent.layout.y);
+  }, []);
+
+  const onPressItem = useCallback(() => {
     setEditableItemIndex?.(index);
   }, [index, setEditableItemIndex]);
 
   return (
-    <CardModulePressableTool active={!!setEditableItemIndex} onPress={onPress}>
-      <OriginalContainer
-        media={media}
-        index={index}
-        scrollY={scrollPosition}
-        modulePosition={modulePosition}
-        canPlay={canPlay}
-        cardStyle={cardStyle}
+    <CardModulePressableTool
+      active={!!setEditableItemIndex}
+      onPress={onPressItem}
+      onLayout={onLayout}
+    >
+      <AppearanceSliderContainer
+        {...props}
         dimension={dimension}
+        parentY={parentY}
+        index={index}
+        cardStyle={cardStyle}
       />
     </CardModulePressableTool>
   );

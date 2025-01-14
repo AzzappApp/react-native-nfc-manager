@@ -2,6 +2,7 @@ import { graphql, readInlineData } from 'react-relay';
 import { type CardModuleColor } from '@azzapp/shared/cardModuleHelpers';
 import CardModuleEditionScrollHandler from '../CardModuleEditionScrollHandler';
 import withSwapCardModuleColor from '../withSwapCardModuleColor';
+import CardModuleMediaGrid from './CardModuleMediaGrid';
 import CardModuleMediaOriginal from './CardModuleMediaOriginal';
 import CardModuleMediaParallax from './CardModuleMediaParallax';
 import CardModuleMediaSlideshow from './CardModuleMediaSlideshow';
@@ -38,6 +39,8 @@ export const MediaModuleRendererFragment = graphql`
     cardModuleMedias {
       media {
         id
+        width
+        height
         ... on MediaImage {
           uri(width: $screenWidth, pixelRatio: $pixelRatio)
           smallThumbnail: uri(width: 125, pixelRatio: $cappedPixelRatio)
@@ -114,6 +117,19 @@ const MediaModuleRenderer = ({
       return (
         <CardModuleEditionScrollHandler scrollPosition={scrollPosition}>
           <CardModuleMediaOriginal
+            cardModuleMedias={data.cardModuleMedias}
+            cardModuleColor={data.cardModuleColor}
+            onLayout={onLayout}
+            displayMode={displayMode}
+            scrollPosition={scrollPosition}
+            {...props}
+          />
+        </CardModuleEditionScrollHandler>
+      );
+    case 'grid':
+      return (
+        <CardModuleEditionScrollHandler scrollPosition={scrollPosition}>
+          <CardModuleMediaGrid
             cardModuleMedias={data.cardModuleMedias}
             cardModuleColor={data.cardModuleColor}
             onLayout={onLayout}

@@ -31,13 +31,15 @@ import { colors } from '#theme';
 import CardModuleRenderer from '#components/cardModules/CardModuleRenderer';
 import { useModulesData } from '#components/cardModules/ModuleData';
 import { useRouter, useSuspendUntilAppear } from '#components/NativeRouter';
-import { isModuleVariantSupported } from '#helpers/cardModuleRouterHelpers';
 import { createId } from '#helpers/idHelpers';
+import {
+  isModuleVariantSupported,
+  type ModuleKindWithVariant,
+} from '#helpers/webcardModuleHelpers';
 import useScreenDimensions from '#hooks/useScreenDimensions';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import WebCardEditBlockContainer from './WebCardEditBlockContainer';
 import type { ModuleRenderInfo } from '#components/cardModules/CardModuleRenderer';
-import type { ModuleKindWithVariant } from '#helpers/webcardModuleHelpers';
 import type { WebCardEditScreenBody_webCard$key } from '#relayArtifacts/WebCardEditScreenBody_webCard.graphql';
 import type { WebCardEditScreenBodyDeleteModuleMutation } from '#relayArtifacts/WebCardEditScreenBodyDeleteModuleMutation.graphql';
 import type {
@@ -171,7 +173,12 @@ const WebCardEditScreenBody = (
   );
 
   const cardModuleFiltered = useMemo(() => {
-    return cardModules.filter(module => isModuleVariantSupported(module));
+    return cardModules.filter(module =>
+      isModuleVariantSupported({
+        moduleKind: module.kind,
+        variant: module.variant,
+      }),
+    );
   }, [cardModules]);
 
   useSuspendUntilAppear(Platform.OS === 'android');

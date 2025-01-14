@@ -1,3 +1,4 @@
+import GridRenderer from './GridRenderer';
 import OriginalRenderer from './OriginalRenderer';
 import ParallaxRenderer from './ParallaxRenderer';
 import SlideshowRenderer from './SlideshowRenderer';
@@ -22,6 +23,9 @@ const MediaRenderer = async (props: MediaRendererProps) => {
     }
     case 'original': {
       return <OriginalRenderer {...props} />;
+    }
+    case 'grid': {
+      return <GridRenderer {...props} />;
     }
     default: {
       return null;

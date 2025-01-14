@@ -15,8 +15,7 @@ import {
 } from '@azzapp/shared/cardModuleHelpers';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { readMediaModuleData } from '#components/cardModules/CardModuleMedia/MediaModuleRenderer';
-
-import { isModuleVariantSupported } from '#helpers/cardModuleRouterHelpers';
+import { isModuleVariantSupported } from '#helpers/webcardModuleHelpers';
 import { readBlockTextData } from './BlockTextRenderer';
 import { readMediaTextModuleData } from './CardModuleMediaText/MediaTextModuleRenderer';
 import { readMediaTextLinkModuleData } from './CardModuleMediaTextLink/MediaTextLinkModuleRenderer';
@@ -151,7 +150,12 @@ export const useModulesData = (
       if (module) {
         if (visible && !module.visible) {
           return null;
-        } else if (!isModuleVariantSupported(module)) {
+        } else if (
+          !isModuleVariantSupported({
+            moduleKind: module.kind,
+            variant: module.variant,
+          })
+        ) {
           return null;
         }
         return {

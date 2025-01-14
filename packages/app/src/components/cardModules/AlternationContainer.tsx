@@ -16,7 +16,7 @@ import type { CardModuleSourceMedia } from './cardModuleEditorType';
 import type { CardStyle } from '@azzapp/shared/cardHelpers';
 import type { LayoutChangeEvent, ViewProps } from 'react-native';
 
-type AlternationContainerProps = ViewProps & {
+type AlternationContainerProps = Pick<ViewProps, 'children' | 'onLayout'> & {
   displayMode: DisplayMode;
   dimension: {
     width: number;
@@ -47,7 +47,6 @@ const AlternationContainer = ({
   displayMode,
   dimension,
   cardStyle,
-  style,
   children,
   media,
   index,
@@ -57,7 +56,6 @@ const AlternationContainer = ({
   canPlay,
   webCardViewMode,
   isFullAlternation,
-  ...props
 }: AlternationContainerProps) => {
   const styles = useVariantStyleSheet(stylesheet, displayMode);
   const mediaWidth = isFullAlternation
@@ -89,13 +87,12 @@ const AlternationContainer = ({
     new Animated.Value(modulePosition === undefined && index === 0 ? 1 : 0),
   ).current;
 
-  const isRunning = useRef(false);
   const hideAnimation = useRef<Animated.CompositeAnimation | null>(null);
+  const isRunning = useRef(false);
 
   useEffect(() => {
     const itemStartY = (modulePosition ?? 0) + (parentY ?? 0) + componentY;
     const itemEndY = itemStartY + componentHeight;
-
     const listener = scrollY.addListener(({ value }) => {
       if (value >= itemStartY - dimension.height && value <= itemEndY) {
         if (hideAnimation.current) {
@@ -200,17 +197,16 @@ const AlternationContainer = ({
     modulePosition ?? 0,
     dimension,
   );
+
   if (!media || !children) {
     return null;
   }
 
   return (
     <View
-      {...props}
       style={[
         isFullAlternation ? styles.fullAlternationContainer : styles.container,
         { width: dimension.width },
-        style,
       ]}
       onLayout={onLayout}
     >

@@ -31,18 +31,17 @@ const useIsModuleItemInViewPort = (
   itemStartY: number,
   dimension: { height: number },
 ) => {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(
+    isInsideViewport(
+      //@ts-expect-error scrollY is a RNAnimated.Value
+      scrollY.__getValue(),
+      itemStartY,
+      dimension.height,
+    ),
+  );
 
   useEffect(() => {
     // Initial check
-    setIsVisible(
-      isInsideViewport(
-        //@ts-expect-error scrollY is a RNAnimated.Value
-        scrollY.__getValue(),
-        itemStartY,
-        dimension.height,
-      ),
-    );
 
     const listener = scrollY.addListener(({ value }) => {
       setIsVisible(isInsideViewport(value, itemStartY, dimension.height));

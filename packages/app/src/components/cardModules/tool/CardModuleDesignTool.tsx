@@ -6,7 +6,6 @@ import { FlatList } from 'react-native-gesture-handler';
 import { colors } from '#theme';
 import { DoneHeaderButton } from '#components/commonsButtons';
 import ToolBoxSection from '#components/Toolbar/ToolBoxSection';
-import { SUPPORTED_VARIANT } from '#helpers/cardModuleRouterHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import {
   MODULE_KIND_WITH_VARIANTS,
@@ -14,6 +13,7 @@ import {
   type ModuleKindWithVariant,
   type Variant,
   type ModuleKindHasVariants,
+  isModuleVariantSupported,
 } from '#helpers/webcardModuleHelpers';
 import useBoolean from '#hooks/useBoolean';
 import useModuleVariantsLabel from '#hooks/useModuleVariantsLabel';
@@ -23,7 +23,6 @@ import Container from '#ui/Container';
 import Header from '#ui/Header';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
-import type { SupportedVariant } from '#helpers/cardModuleRouterHelpers';
 import type { ColorSchemeName, ListRenderItemInfo } from 'react-native';
 
 type CardModuleDesignToolProps<T extends ModuleKindAndVariant> = {
@@ -124,10 +123,7 @@ const Item = <T extends ModuleKindAndVariant>({
     moduleKind: module.moduleKind,
     variant,
   } as ModuleKindWithVariant);
-
-  const isVariantSupported = SUPPORTED_VARIANT.includes(
-    variant as SupportedVariant,
-  );
+  const isVariantSupported = isModuleVariantSupported(module);
 
   return (
     <PressableOpacity

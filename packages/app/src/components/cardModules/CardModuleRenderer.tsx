@@ -154,7 +154,7 @@ export type CardModuleRendererProps<T extends ModuleRenderInfo> = ViewProps & {
   modulePosition: number;
 };
 
-const DESKTOP_CONTENT_MAX_WIDTH = 800;
+export const DESKTOP_CONTENT_MAX_WIDTH = 800;
 
 const CardModuleRenderer = <T extends ModuleRenderInfo>({
   module,
