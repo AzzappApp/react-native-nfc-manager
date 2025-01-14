@@ -114,6 +114,7 @@ const WebCardList = ({
         userName
         cardIsPublished
         ...CoverRenderer_webCard
+        ...CoverLinkRendererIos_webCard
       }
     `,
     usersKey,

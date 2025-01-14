@@ -28,6 +28,7 @@ const PostLikesListItem = ({ webcard: webcardKey }: Props) => {
         cardIsPublished
         isFollowing(webCardId: $viewerWebCardId)
         ...CoverRenderer_webCard
+        ...CoverLinkRendererIos_webCard
       }
     `,
     webcardKey,
