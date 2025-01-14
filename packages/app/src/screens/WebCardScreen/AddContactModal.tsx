@@ -408,9 +408,8 @@ const AddContactModal = ({
   }, [scanned, viewer, getContactInput, commit, close]);
 
   const onDismiss = useCallback(() => {
-    router.pop(1);
     onRequestAddContactToPhonebook();
-  }, [onRequestAddContactToPhonebook, router]);
+  }, [onRequestAddContactToPhonebook]);
 
   useEffect(() => {
     (async () => {
