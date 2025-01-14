@@ -1,4 +1,4 @@
-## 1.7.0-canary.5
+## 1.7.0-canary.6
 
 * **fix:**  - download correctly avatar from phone contacts ([#6883](https://github.com/AzzappApp/azzapp/pull/6883))
 * **fix:**  - **likes:** [#6888](https://github.com/AzzappApp/azzapp/pull/6888) [#6889](https://github.com/AzzappApp/azzapp/pull/6889) properly fix fragments
