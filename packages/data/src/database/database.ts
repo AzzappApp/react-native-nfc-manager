@@ -10,9 +10,20 @@ const drizzleClient = createDrizzleClient();
 
 const transactionStorage = new AsyncLocalStorage<DrizzleDatabaseTransaction>();
 
+const usePrimaryStorage = new AsyncLocalStorage<boolean>();
+
 export const db = (): DrizzleDatabase => {
-  return transactionStorage.getStore() ?? drizzleClient;
+  return (
+    transactionStorage.getStore() ??
+    ((usePrimaryStorage.getStore() ?? false) && '$primary' in drizzleClient
+      ? drizzleClient.$primary
+      : drizzleClient)
+  );
 };
+
+export const runWithPrimary = async <T>(
+  callback: () => Promise<T>,
+): Promise<T> => usePrimaryStorage.run(true, callback);
 
 export const transaction = async <T>(
   callback: (tx: { rollback(): void }) => Promise<T>,

@@ -4,6 +4,7 @@ import { applyDirectiveSchemaTransform, directivesTypeDefs } from '#directives';
 import {
   asyncLocalStorageContextMiddleware,
   resetSessionResourceAfterMutationMiddleware,
+  runOnPrimaryMiddleware,
 } from '#GraphQLContext';
 import { typeDefs } from './__generated__/types';
 import MutationResolvers from './mutation';
@@ -26,6 +27,7 @@ const schema = applyMiddleware(
   applyDirectiveSchemaTransform(buildSchema()),
   asyncLocalStorageContextMiddleware,
   resetSessionResourceAfterMutationMiddleware,
+  runOnPrimaryMiddleware,
 );
 
 export default schema;

@@ -163,6 +163,7 @@ export const followingsLoader = createSessionDataLoader(
 
 export const profileInUserContactLoader = createSessionDataLoader(
   'ProfileInUserContactLoader',
+
   async (keys: ReadonlyArray<{ userId: string; profileId: string }>) => {
     const profileIdsByUser = keys.reduce(
       (accumulator, key) => {
@@ -274,6 +275,7 @@ export const activeSubscriptionsLoader = createSessionDataLoader(
 
 export const activeSubscriptionsForWebCardLoader = createSessionDataLoader(
   'ActiveSubscriptionsForWebCardLoader',
+
   async (keys: ReadonlyArray<{ userId: string; webCardId: string }>) => {
     if (keys.length === 0) {
       return [];

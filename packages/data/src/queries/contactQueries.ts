@@ -148,7 +148,6 @@ export const searchContacts = async (
     orderBy === 'name'
       ? [ContactTable.firstName, ContactTable.lastName]
       : [desc(ContactTable.createdAt)];
-
   const contacts = await db()
     .select()
     .from(ContactTable)
