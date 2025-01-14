@@ -1,11 +1,13 @@
-## 1.6.1-canary.31
+## 1.6.1-canary.32
 
 * **fix:**  - reduce gap between header and description in popups ([#6863](https://github.com/AzzappApp/azzapp/pull/6863))
+* **fix:**  - **modules:** [#6861](https://github.com/AzzappApp/azzapp/pull/6861) remove duplicated code from module ([#6865](https://github.com/AzzappApp/azzapp/pull/6865))
 * **feat:**  - Media Grid module ([#6840](https://github.com/AzzappApp/azzapp/pull/6840))
 * **fix:**  - hide toast when changing webcard type ([#6860](https://github.com/AzzappApp/azzapp/pull/6860))
 * **fix:**  - do not overflow hidden, it causes a border of cancel button to be cut ([#6858](https://github.com/AzzappApp/azzapp/pull/6858))
 * **fix:**  - [#6462](https://github.com/AzzappApp/azzapp/pull/6462) ensure reads are made on primary after mutation ([#6581](https://github.com/AzzappApp/azzapp/pull/6581))
 * **build:**  - upgrade native deps ([#6853](https://github.com/AzzappApp/azzapp/pull/6853))
+* **fix:**  - **contact:** [#6855](https://github.com/AzzappApp/azzapp/pull/6855) format correctly the date ([#6856](https://github.com/AzzappApp/azzapp/pull/6856))
 * **fix:**  - limit url width on home screen ([#6817](https://github.com/AzzappApp/azzapp/pull/6817))
 * **fix:**  - media picker should not closed with empty slots ([#6846](https://github.com/AzzappApp/azzapp/pull/6846))
 * **fix:**  - **newModules:** [#6665](https://github.com/AzzappApp/azzapp/pull/6665) missing style when using image comp ([#6850](https://github.com/AzzappApp/azzapp/pull/6850))
