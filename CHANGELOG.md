@@ -1,4 +1,4 @@
-## 1.7.0-canary.15
+## 1.7.0-canary.16
 
 * **feat:**  - use grid module to render original ratio (similar to web) ([#6923](https://github.com/AzzappApp/azzapp/pull/6923))
 * **Fix:**  -  square grid . Remove original item component and use Grid ([#6921](https://github.com/AzzappApp/azzapp/pull/6921))
