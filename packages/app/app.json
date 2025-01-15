@@ -10,5 +10,15 @@
   },
   "ios": {
     "bundleIdentifier": "com.azzapp.app"
-  }
+  },
+  "plugins": [
+    [
+      "@sentry/react-native/expo",
+      {
+        "url": "https://sentry.io/",
+        "project": "azzapp-app",
+        "organization": "azzapp"
+      }
+    ]
+  ]
 }
