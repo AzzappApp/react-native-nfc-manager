@@ -115,6 +115,7 @@ export const COVER_CACHE_DIR = `${ReactNativeBlobUtil.fs.dirs.CacheDir}/covers`;
 export const MODULES_CACHE_DIR = `${ReactNativeBlobUtil.fs.dirs.CacheDir}/modules`;
 
 const checkMediaCacheDirPromise: Record<string, Promise<void> | null> = {};
+
 const checkMediaCacheDir = (cacheDir: string) => {
   if (!checkMediaCacheDirPromise[cacheDir]) {
     checkMediaCacheDirPromise[cacheDir] = (async () => {
