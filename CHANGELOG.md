@@ -1,5 +1,6 @@
-## 1.7.0-canary.9
+## 1.7.0-canary.10
 
+* **fix:**  - do not corrupt already built url addresses ([#6906](https://github.com/AzzappApp/azzapp/pull/6906))
 * **feat:**  - **user:** [#6880](https://github.com/AzzappApp/azzapp/pull/6880) no more create free subscription ([#6901](https://github.com/AzzappApp/azzapp/pull/6901))
 * **feat:**  - disable multi user on android ([#6894](https://github.com/AzzappApp/azzapp/pull/6894))
 * **fix:**  - ensure view doesn't cover buton ([#6893](https://github.com/AzzappApp/azzapp/pull/6893))
