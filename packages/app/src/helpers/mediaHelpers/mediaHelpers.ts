@@ -118,7 +118,7 @@ let checkMediaCacheDirPromise: Promise<void> | null = null;
 const checkMediaCacheDir = (cacheDir: string) => {
   if (!checkMediaCacheDirPromise) {
     checkMediaCacheDirPromise = (async () => {
-      if (!(await ReactNativeBlobUtil.fs.isDir(cacheDir))) {
+      if (!(await ReactNativeBlobUtil.fs.exists(cacheDir))) {
         await ReactNativeBlobUtil.fs.mkdir(cacheDir);
       }
     })();
