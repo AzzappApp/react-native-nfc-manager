@@ -1,5 +1,8 @@
-## 1.7.0-canary.12
+## 1.7.0-canary.13
 
+* **fix:**  - update MARKETING_VERSION and CURRENT_PROJECT_VERSION of all scheme (help building extension) ([#6891](https://github.com/AzzappApp/azzapp/pull/6891))
+* **fix:**  - do not decrease toast text size ([#6913](https://github.com/AzzappApp/azzapp/pull/6913))
+* **build:**  - configure sourcemaps on sentry ([#6914](https://github.com/AzzappApp/azzapp/pull/6914))
 * **fix:**  - temporary disable module count limit ([#6908](https://github.com/AzzappApp/azzapp/pull/6908))
 * **fix:**  - appClip welcome screen (apple review) ([#6910](https://github.com/AzzappApp/azzapp/pull/6910))
 * **fix:**  - do not corrupt already built url addresses ([#6906](https://github.com/AzzappApp/azzapp/pull/6906))
