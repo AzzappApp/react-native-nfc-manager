@@ -1,8 +1,10 @@
-## 1.7.0-canary.11
+## 1.7.0-canary.12
 
 * **fix:**  - temporary disable module count limit ([#6908](https://github.com/AzzappApp/azzapp/pull/6908))
+* **fix:**  - appClip welcome screen (apple review) ([#6910](https://github.com/AzzappApp/azzapp/pull/6910))
 * **fix:**  - do not corrupt already built url addresses ([#6906](https://github.com/AzzappApp/azzapp/pull/6906))
 * **feat:**  - **user:** [#6880](https://github.com/AzzappApp/azzapp/pull/6880) no more create free subscription ([#6901](https://github.com/AzzappApp/azzapp/pull/6901))
+* **fix:**  - **webCard:** [#6895](https://github.com/AzzappApp/azzapp/pull/6895) always pass a value as profile id ([#6902](https://github.com/AzzappApp/azzapp/pull/6902))
 * **feat:**  - disable multi user on android ([#6894](https://github.com/AzzappApp/azzapp/pull/6894))
 * **fix:**  - ensure view doesn't cover buton ([#6893](https://github.com/AzzappApp/azzapp/pull/6893))
 * **fix:**  - download correctly avatar from phone contacts ([#6883](https://github.com/AzzappApp/azzapp/pull/6883))
