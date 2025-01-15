@@ -1,5 +1,6 @@
-## 1.7.0-canary.13
+## 1.7.0-canary.14
 
+* **Fix:**  -  square grid . Remove original item component and use Grid ([#6921](https://github.com/AzzappApp/azzapp/pull/6921))
 * **fix:**  - update MARKETING_VERSION and CURRENT_PROJECT_VERSION of all scheme (help building extension) ([#6891](https://github.com/AzzappApp/azzapp/pull/6891))
 * **fix:**  - do not decrease toast text size ([#6913](https://github.com/AzzappApp/azzapp/pull/6913))
 * **build:**  - configure sourcemaps on sentry ([#6914](https://github.com/AzzappApp/azzapp/pull/6914))
