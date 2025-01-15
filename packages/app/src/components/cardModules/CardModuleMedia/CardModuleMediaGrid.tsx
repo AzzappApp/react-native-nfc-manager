@@ -104,6 +104,9 @@ const CardModuleMediaGrid = ({
           style={{ width: columnWidth, gap: cardStyle?.gap ?? 0 }}
         >
           {column.map((cardModuleMedia, index) => {
+            const offsetY = itemYStartPoint[columnIndex]
+              ? itemYStartPoint[columnIndex][index]
+              : 0;
             return (
               <GridItem
                 {...props}
@@ -120,10 +123,7 @@ const CardModuleMediaGrid = ({
                 cardStyle={cardStyle}
                 index={index}
                 scrollY={scrollPosition}
-                offsetY={
-                  itemYStartPoint[columnIndex][index] +
-                  (cardStyle?.gap ?? 0) * index
-                }
+                offsetY={offsetY + (cardStyle?.gap ?? 0) * index}
               />
             );
           })}
