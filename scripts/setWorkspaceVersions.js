@@ -67,6 +67,33 @@ module.exports = function setWorkspaceVersions(version, androidVersionCode) {
         '\n',
     );
   });
+  updatePbxProject();
 
   console.log(`Updated packages to version ${version}`);
+};
+
+const updatePbxProject = () => {
+  const plistPath = path.join('./packages/app/ios/azzapp', 'Info.plist');
+  const plistContent = fs.readFileSync(plistPath, 'utf8');
+  const plistData = plist.parse(plistContent);
+  const buildVersion = plistData.CFBundleVersion;
+  const shortVersion = plistData.CFBundleShortVersionString;
+  const projectPath = path.join(
+    './packages/app/ios/azzapp.xcodeproj',
+    'project.pbxproj',
+  );
+  const xcode = Xcode.open(projectPath);
+  xcode.document.projects.forEach(project => {
+    project.targets.forEach(target => {
+      if (target.buildConfigurationsList) {
+        target.buildConfigurationsList.buildConfigurations.forEach(config => {
+          const buildSettings = config.ast.value.get('buildSettings');
+          buildSettings.set('MARKETING_VERSION', shortVersion);
+          buildSettings.set('CURRENT_PROJECT_VERSION', buildVersion);
+        });
+      }
+    });
+  });
+
+  xcode.save();
 };
