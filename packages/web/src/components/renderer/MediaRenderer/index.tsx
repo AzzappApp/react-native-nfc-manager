@@ -1,5 +1,4 @@
 import GridRenderer from './GridRenderer';
-import OriginalRenderer from './OriginalRenderer';
 import ParallaxRenderer from './ParallaxRenderer';
 import SlideshowRenderer from './SlideshowRenderer';
 import type { ModuleRendererProps } from '../ModuleRenderer';
