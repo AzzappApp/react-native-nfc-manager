@@ -258,14 +258,6 @@ const AddContactModal = ({
                     ...scanned.contact,
                     image,
                     imageAvailable: !!image,
-                    urlAddresses:
-                      additionalContactData?.urls?.map(addr => {
-                        return { label: 'default', address: addr.address };
-                      }) || undefined,
-                    socialProfiles:
-                      additionalContactData?.socials?.map(social => {
-                        return { ...social, address: social.url };
-                      }) || undefined,
                     id: foundContact.id,
                   });
                   await updateContactAsync(updatedContact);
@@ -319,18 +311,9 @@ const AddContactModal = ({
 
             if (Platform.OS === 'ios') {
               try {
-                const updatedContact = reworkContactForDeviceInsert({
-                  ...scanned.contact,
-                  urlAddresses:
-                    additionalContactData?.urls?.map(addr => {
-                      return { label: 'default', address: addr.address };
-                    }) || undefined,
-                  socialProfiles:
-                    additionalContactData?.socials?.map(social => {
-                      return { ...social, address: social.url };
-                    }) || undefined,
-                });
-
+                const updatedContact = reworkContactForDeviceInsert(
+                  scanned.contact,
+                );
                 await presentFormAsync(null, updatedContact, {
                   isNew: true,
                 });

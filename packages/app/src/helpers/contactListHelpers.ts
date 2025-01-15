@@ -93,6 +93,7 @@ export const reworkContactForDeviceInsert = (contact: Contact): Contact => {
     urlAddresses: contact.urlAddresses?.map(addr => {
       return {
         ...addr,
+        label: addr?.label ? addr?.label : 'default',
         url: prefixWithHttp(addr.url),
       };
     }),
