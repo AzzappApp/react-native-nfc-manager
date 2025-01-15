@@ -449,7 +449,7 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   socialIcon: { height: 44, width: 44, margin: 10, alignSelf: 'center' },
-  errorText: { color: colors.red400, paddingTop: 25 },
+  errorText: { color: colors.red400, top: 25 },
   categoryLine: {
     overflow: 'visible',
   },
