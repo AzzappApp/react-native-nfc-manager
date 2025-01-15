@@ -1,7 +1,6 @@
 import { GraphQLError } from 'graphql';
 import {
   checkMedias,
-  createFreeSubscriptionForBetaPeriod,
   createProfile,
   createUser,
   getProfileByUserAndWebCard,
@@ -103,7 +102,6 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
           phoneNumber,
           invited: true,
         });
-        await createFreeSubscriptionForBetaPeriod([userId]);
       } else {
         userId = existingUser.id;
 

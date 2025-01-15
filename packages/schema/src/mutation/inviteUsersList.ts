@@ -4,7 +4,6 @@ import {
   createProfiles,
   createUsers,
   updateWebCard,
-  createFreeSubscriptionForBetaPeriod,
   transaction,
   getUsersByEmail,
   getProfilesByIds,
@@ -108,8 +107,6 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
         invited: true,
       })),
     );
-
-    await createFreeSubscriptionForBetaPeriod(filtered.map(f => f.id));
 
     const users = (await getUsersByEmail(filtered.map(f => f.email))).filter(
       user => !!user,

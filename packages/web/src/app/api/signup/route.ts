@@ -8,8 +8,6 @@ import {
   getUserByEmail,
   getUserByPhoneNumber,
   updateUser,
-  createFreeSubscriptionForBetaPeriod,
-  transaction,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import {
@@ -114,16 +112,12 @@ export const POST = withPluginsRoute(async (req: Request) => {
     }
 
     const userPhoneNumber = phoneNumber ? formatPhoneNumber(phoneNumber) : null;
-    await transaction(async () => {
-      const userId = await createUser({
-        email: email ?? null,
-        phoneNumber: userPhoneNumber,
-        password: bcrypt.hashSync(password, 12),
-        locale: locale ?? null,
-        roles: null,
-      });
-
-      await createFreeSubscriptionForBetaPeriod([userId]);
+    await createUser({
+      email: email ?? null,
+      phoneNumber: userPhoneNumber,
+      password: bcrypt.hashSync(password, 12),
+      locale: locale ?? null,
+      roles: null,
     });
 
     const issuer = (email ?? userPhoneNumber) as string;

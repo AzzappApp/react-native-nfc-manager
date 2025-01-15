@@ -13,7 +13,6 @@ import {
   like,
 } from 'drizzle-orm';
 import { db } from '../database';
-import { createId } from '../helpers/createId';
 import { UserSubscriptionTable } from '../schema';
 import type { UserSubscription } from '../schema';
 import type { InferInsertModel } from 'drizzle-orm';
@@ -353,35 +352,6 @@ export const getExpiredSubscription = async (limit: number) => {
       ),
     )
     .limit(limit);
-};
-
-const FREE_BETA_DATE_LIMIT = process.env.FREE_BETA_DATE_LIMIT;
-
-export const createFreeSubscriptionForBetaPeriod = async (userId: string[]) => {
-  if (
-    FREE_BETA_DATE_LIMIT &&
-    !isNaN(Date.parse(FREE_BETA_DATE_LIMIT)) &&
-    new Date() < new Date(FREE_BETA_DATE_LIMIT)
-  ) {
-    await db()
-      .insert(UserSubscriptionTable)
-      .values(
-        userId.map(
-          userId =>
-            ({
-              id: createId(),
-              userId,
-              subscriptionPlan: 'web.lifetime',
-              subscriptionId: createId(),
-              startAt: new Date(),
-              endAt: new Date(FREE_BETA_DATE_LIMIT),
-              issuer: 'web',
-              totalSeats: 999999,
-              status: 'active',
-            }) as const,
-        ),
-      );
-  }
 };
 
 /**
