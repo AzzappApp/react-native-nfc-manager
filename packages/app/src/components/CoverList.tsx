@@ -229,7 +229,6 @@ const ItemList = ({
       <CoverLink
         webCard={webCard}
         width={coverWidth}
-        webCardId={webCard.id}
         canPlay={shouldPlayMedia}
       />
     </Container>

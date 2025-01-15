@@ -79,15 +79,22 @@ export type WebCardTemplateSelectionRoute = {
 export type WebCardRoute = {
   route: 'WEBCARD';
   params: {
-    userName: string;
-    webCardId?: string;
     fromRectangle?: LayoutRectangle;
     showPosts?: boolean;
     contactData?: string | null;
     additionalContactData?: Pick<ContactCard, 'socials' | 'urls'>;
     fromCreation?: boolean;
     editing?: boolean;
-  };
+  } & (
+    | {
+        userName: string;
+        webCardId?: string | null;
+      }
+    | {
+        userName?: string | null;
+        webCardId: string;
+      }
+  );
 };
 
 export type PostRoute = {

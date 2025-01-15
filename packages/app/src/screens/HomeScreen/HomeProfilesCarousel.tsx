@@ -43,6 +43,7 @@ import CarouselSelectList from '#ui/CarouselSelectList';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import PressableOpacity from '#ui/PressableOpacity';
+import PressableScaleHighlight from '#ui/PressableScaleHighlight';
 import { useHomeScreenContext } from './HomeScreenContext';
 import useCoverPlayPermission from './useCoverPlayPermission';
 import type {
@@ -437,16 +438,33 @@ const ItemRenderComponent = ({
           </View>
         ) : profile.webCard?.hasCover ? (
           <View style={styles.coverLinkWrapper}>
-            <CoverLink
-              webCard={profile.webCard}
-              width={coverWidth}
-              webCardId={profile.webCard.id}
-              canPlay={isCurrent && canPlay}
-              paused={paused}
-              onReadyForDisplay={onReady}
-              onError={onError}
-              onLongPress={openWebcardModal}
-            />
+            {profile.webCard?.coverIsPredefined ? (
+              <Link route="COVER_TEMPLATE_SELECTION">
+                <PressableScaleHighlight
+                  style={containerStyle}
+                  onLongPress={openWebcardModal}
+                >
+                  <CoverRenderer
+                    webCard={profile.webCard}
+                    width={coverWidth}
+                    canPlay={isCurrent && canPlay}
+                    paused={paused}
+                    onReadyForDisplay={onReady}
+                    onError={onError}
+                  />
+                </PressableScaleHighlight>
+              </Link>
+            ) : (
+              <CoverLink
+                webCard={profile.webCard}
+                width={coverWidth}
+                canPlay={isCurrent && canPlay}
+                paused={paused}
+                onReadyForDisplay={onReady}
+                onError={onError}
+                onLongPress={openWebcardModal}
+              />
+            )}
             {profile.webCard?.coverIsPredefined && (
               <PressableNative
                 style={styles.editUserContainer}

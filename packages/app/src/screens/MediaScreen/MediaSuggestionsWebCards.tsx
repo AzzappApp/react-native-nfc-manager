@@ -130,7 +130,6 @@ const MediaSuggestionsWebCards = ({
         <CoverLinkWithOptions
           webCard={item}
           isFollowing={extraData.followingMap.get(item.id) ?? false}
-          webCardId={item.id}
           cardIsPublished={extraData.cardIsPublished}
           canPlay={shouldPlay}
         />
@@ -169,7 +168,10 @@ const CoverLinkWithOptionsItem = ({
 
   const toggleFollow = useToggleFollow();
 
-  const { userName } = useFragment(CoverLink_webCardFragment, props.webCard);
+  const { id: webCardId, userName } = useFragment(
+    CoverLink_webCardFragment,
+    props.webCard,
+  );
 
   const intl = useIntl();
 
@@ -196,7 +198,7 @@ const CoverLinkWithOptionsItem = ({
         );
       } else {
         startTransition(() => {
-          toggleFollow(props.webCardId, userName, !isFollowing);
+          toggleFollow(webCardId, userName, !isFollowing);
         });
       }
     } else if (isFollowing) {
@@ -218,14 +220,7 @@ const CoverLinkWithOptionsItem = ({
         }),
       });
     }
-  }, [
-    cardIsPublished,
-    intl,
-    isFollowing,
-    props.webCardId,
-    toggleFollow,
-    userName,
-  ]);
+  }, [cardIsPublished, intl, isFollowing, webCardId, toggleFollow, userName]);
 
   return (
     <Animated.View style={styles.coverContainerStyle} exiting={FadeOut}>
