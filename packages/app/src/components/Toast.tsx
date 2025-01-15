@@ -94,9 +94,6 @@ const Toast = ({
           )}
           renderTrailingIcon={() => renderTrailingIcon(successProps.props)}
           text1Style={[textStyles.smallbold, styles.toastText]}
-          text1Props={{
-            adjustsFontSizeToFit: true,
-          }}
         />
       ),
       error: (errorProps: ToastConfigParams<ToastProps>) => (
@@ -110,7 +107,6 @@ const Toast = ({
           renderTrailingIcon={() => renderTrailingIcon(errorProps.props)}
           text1Style={[textStyles.smallbold, styles.toastText]}
           text1Props={{
-            adjustsFontSizeToFit: true,
             numberOfLines: 2,
           }}
         />
@@ -140,7 +136,6 @@ const Toast = ({
             text1Style={[textStyles.smallbold, styles.toastText]}
             onPress={ExternalToast.hide}
             text1Props={{
-              adjustsFontSizeToFit: true,
               numberOfLines: 2,
             }}
           />
@@ -155,9 +150,6 @@ const Toast = ({
             <Icon icon="like_filled" style={styles.successToastIcon} />
           )}
           text1Style={[textStyles.smallbold, styles.toastText]}
-          text1Props={{
-            adjustsFontSizeToFit: true,
-          }}
         />
       ),
       unlike: (successProps: ToastConfigParams<ToastProps>) => (
@@ -169,9 +161,6 @@ const Toast = ({
             <Icon icon="like" style={styles.successToastIcon} />
           )}
           text1Style={[textStyles.smallbold, styles.toastText]}
-          text1Props={{
-            adjustsFontSizeToFit: true,
-          }}
         />
       ),
     };
