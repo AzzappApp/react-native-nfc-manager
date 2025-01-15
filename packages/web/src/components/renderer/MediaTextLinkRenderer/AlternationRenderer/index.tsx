@@ -75,7 +75,7 @@ const AlternationRender = async ({
             >
               <AlternationMedia
                 media={media}
-                even={index % 2 === 1}
+                even={index % 2 === 0}
                 cardStyle={cardStyle}
                 isFullAlternation={isFullAlternation}
               />

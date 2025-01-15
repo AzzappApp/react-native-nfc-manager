@@ -2,7 +2,6 @@ import { useCallback, useMemo, useState } from 'react';
 import { View } from 'react-native';
 import useScreenDimensions from '#hooks/useScreenDimensions';
 import AppearanceSliderContainer from '../AppearanceSliderContainer';
-import { DESKTOP_CONTENT_MAX_WIDTH } from '../CardModuleRenderer';
 import CardModulePressableTool from '../tool/CardModulePressableTool';
 import type { AppearanceSliderContainerProps } from '../AppearanceSliderContainer';
 import type {
@@ -41,12 +40,7 @@ const CardModuleMediaOriginal = ({
       ? cardModuleMedias.slice(0, 1)
       : cardModuleMedias;
 
-  let displayedWidth = dimension.width;
-  if (displayedWidth > DESKTOP_CONTENT_MAX_WIDTH) {
-    displayedWidth = DESKTOP_CONTENT_MAX_WIDTH;
-  } else {
-    displayedWidth = displayedWidth - (cardStyle?.gap || 0) * 2;
-  }
+  const displayedWidth = dimension.width - (cardStyle?.gap || 0) * 2;
 
   const offsetY = useMemo(() => {
     return items.reduce(

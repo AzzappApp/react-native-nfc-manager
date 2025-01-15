@@ -138,10 +138,11 @@ const AppearanceSliderContainer = ({
     displayMode,
     webCardViewMode,
   );
+
   const imageContainerStyle = useMemo(
     () => [
       {
-        width: media.width,
+        width: dimension.width,
         borderRadius: cardStyle?.borderRadius ?? 0,
         transform: [{ translateY: disableAnimation ? 0 : translateY }],
 
@@ -152,11 +153,18 @@ const AppearanceSliderContainer = ({
             : opacity,
       },
     ],
-    [media.width, media.kind, cardStyle, disableAnimation, translateY, opacity],
+    [
+      dimension.width,
+      cardStyle?.borderRadius,
+      disableAnimation,
+      translateY,
+      media.kind,
+      opacity,
+    ],
   );
 
   return (
-    <View style={{ width: media.width }} onLayout={onLayout}>
+    <View style={{ width: displayDimension.width }} onLayout={onLayout}>
       <Animated.View style={imageContainerStyle}>
         <CardModuleMediaSelector
           media={media}

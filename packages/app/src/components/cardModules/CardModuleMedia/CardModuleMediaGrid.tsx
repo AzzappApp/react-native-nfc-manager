@@ -44,32 +44,45 @@ const CardModuleMediaGrid = ({
     [],
   ]);
 
-  const columns = useMemo(() => {
-    const result: CardModuleMedia[][] = [[], [], []]; // Three columns grid
-    const caculatedHeight: number[][] = [[0], [0], [0]];
-    const columnHeights = [0, 0, 0];
-    //simple automatic reordering
-    cardModuleMedias.forEach(item => {
-      const itemHeight =
-        (dimension.width / 3) * (item.media.height / item.media.width);
-      const shortestColumnIndex = columnHeights.indexOf(
-        Math.min(...columnHeights),
-      );
-
-      result[shortestColumnIndex].push(item);
-      caculatedHeight[shortestColumnIndex].push(
-        columnHeights[shortestColumnIndex] + itemHeight,
-      );
-      //use classic height to have the exact same algorithm as the web
-      columnHeights[shortestColumnIndex] += item.media.height;
-    });
-    setItemYStartPoint(caculatedHeight);
-    return result;
-  }, [cardModuleMedias, dimension.width]);
   //determine size of columns
   const columnWidth = useMemo(() => {
     return (dimension.width - 4 * (cardStyle?.gap ?? 0)) / 3;
   }, [cardStyle?.gap, dimension.width]);
+
+  const columns = useMemo(() => {
+    const result: CardModuleMedia[][] = [[], [], []]; // Three columns grid
+    const offsetY: number[][] = [[0], [0], [0]];
+    const columnHeights = [0, 0, 0];
+
+    if (square) {
+      //no reordering, just fill the columns and offsetY
+      cardModuleMedias.forEach((item, index) => {
+        const columnIndex = index % 3;
+        result[columnIndex].push(item);
+        offsetY[columnIndex].push(columnHeights[columnIndex] + columnWidth);
+      });
+    } else {
+      //simple automatic reordering
+      cardModuleMedias.forEach(item => {
+        const shortestColumnIndex = columnHeights.indexOf(
+          Math.min(...columnHeights),
+        );
+        result[shortestColumnIndex].push(item);
+        const lastIndex = offsetY[shortestColumnIndex].length - 1;
+        const lastValue = offsetY[shortestColumnIndex][lastIndex];
+
+        offsetY[shortestColumnIndex].push(
+          lastValue + columnWidth * (item.media.height / item.media.width),
+        );
+        //use classic height to have the exact same algorithm as the web
+        columnHeights[shortestColumnIndex] +=
+          columnWidth * (item.media.height / item.media.width);
+      });
+    }
+    setItemYStartPoint(offsetY);
+
+    return result;
+  }, [cardModuleMedias, columnWidth, square]);
 
   return (
     <View

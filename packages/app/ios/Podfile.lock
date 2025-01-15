@@ -3024,8 +3024,6 @@ SPEC CHECKSUMS:
   react-native-safe-area-context: 0d8827b2420dfb4c8a8e27639585e61b912261be
   react-native-skia: 1ecbb580a78147a6fb71169a96b87a0c14f5448f
   react-native-skottie-template-player: dcda4911f0b2d28073e593fdac0d66bec8d83f2e
-  react-native-webview: 2ae666ce72cfd3c38d8750c2009f5caa621d709f
-  react-native-skottie-template-player: c880186835dc6aa628997fae91e73f888afe6173
   react-native-webview: 2da6a129c153ecbb72523f1f67cd43c84be7c42f
   React-nativeconfig: 470fce6d871c02dc5eff250a362d56391b7f52d6
   React-NativeModulesApple: 1586448c61a7c2bd4040cc03ccde66a72037e77e

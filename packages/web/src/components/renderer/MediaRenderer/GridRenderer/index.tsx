@@ -14,13 +14,18 @@ export type GridRenderererProps = ModuleRendererProps<
     data: CardModuleMediaData;
   }
 > &
-  Omit<React.HTMLProps<HTMLDivElement>, 'children'>;
+  Omit<React.HTMLProps<HTMLDivElement>, 'children'> & {
+    square?: boolean;
+    nbColumns?: number;
+  };
 
 const GridRenderer = async ({
   module,
   colorPalette,
   coverBackgroundColor,
   cardStyle,
+  square = false,
+  nbColumns = 3,
 }: GridRenderererProps) => {
   const { cardModuleMedias, cardModuleColor } = module.data;
 
@@ -28,16 +33,25 @@ const GridRenderer = async ({
     await getMediasByIds(cardModuleMedias.map(({ media }) => media.id))
   ).filter(media => media !== null);
 
-  const columns: any[][] = [[], [], []]; // Three columns
-  const columnHeights = [0, 0, 0];
+  const columns: any[][] = Array.from({ length: nbColumns }, () => []);
+  const columnHeights: number[] = Array(nbColumns).fill(0);
   // Simple automatic reordering
-  medias.forEach(media => {
-    const shortestColumnIndex = columnHeights.indexOf(
-      Math.min(...columnHeights),
-    );
-    columns[shortestColumnIndex].push(media);
-    columnHeights[shortestColumnIndex] += media.height;
-  });
+  if (square) {
+    //no reordering, just fill the columns and offsetY
+    medias.forEach((media, index) => {
+      const columnIndex = index % nbColumns;
+      columns[columnIndex].push(media);
+    });
+  } else {
+    medias.forEach(media => {
+      const shortestColumnIndex = columnHeights.indexOf(
+        Math.min(...columnHeights),
+      );
+      columns[shortestColumnIndex].push(media);
+      //we need a fixed with to calculate the height in order to sort
+      columnHeights[shortestColumnIndex] += media.height / media.width;
+    });
+  }
 
   return (
     <div
@@ -49,11 +63,12 @@ const GridRenderer = async ({
               ?.backgroundColor,
           colorPalette,
         ),
-        paddingTop: 20,
-        paddingBottom: 20,
       }}
     >
-      <div className={styles.container} style={{ gap: cardStyle.gap }}>
+      <div
+        className={styles.container}
+        style={{ padding: cardStyle.gap, gap: cardStyle.gap }}
+      >
         {columns.map((column, columnIndex) => (
           <div
             key={columnIndex}

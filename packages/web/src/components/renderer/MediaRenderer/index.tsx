@@ -22,10 +22,13 @@ const MediaRenderer = async (props: MediaRendererProps) => {
       return <ParallaxRenderer {...props} />;
     }
     case 'original': {
-      return <OriginalRenderer {...props} />;
+      return <GridRenderer {...props} nbColumns={1} />;
     }
     case 'grid': {
       return <GridRenderer {...props} />;
+    }
+    case 'square_grid': {
+      return <GridRenderer {...props} square />;
     }
     default: {
       return null;

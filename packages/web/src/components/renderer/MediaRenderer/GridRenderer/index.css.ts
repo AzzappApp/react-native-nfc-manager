@@ -24,6 +24,8 @@ const image = style({
   objectFit: 'cover',
   top: 0,
   left: 0,
+  touchAction: 'none' /* Prevents zoom gestures */,
+  pointerEvents: 'none' /* Disables pointer interaction */,
 });
 
 export default {
