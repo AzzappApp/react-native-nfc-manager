@@ -15,6 +15,7 @@ import { graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
 import ERRORS from '@azzapp/shared/errors';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
+import { ENABLE_MULTI_USER } from '#Config';
 import { colors, shadow } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
@@ -454,7 +455,7 @@ const WebCardMenu = ({
               </View>
             </PressableNative>
           )}
-          {isViewer && isAdmin && (
+          {isViewer && isAdmin && ENABLE_MULTI_USER && (
             <PressableNative
               style={styles.bottomSheetOptionButton}
               onPress={onMultiUser}

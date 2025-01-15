@@ -20,6 +20,7 @@ import {
 } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
+import { ENABLE_MULTI_USER } from '#Config';
 import { colors, shadow } from '#theme';
 import CoverErrorRenderer from '#components/CoverErrorRenderer';
 import CoverLink from '#components/CoverLink';
@@ -461,7 +462,7 @@ const ItemRenderComponent = ({
                 </BlurView>
               </PressableNative>
             )}
-            {isMultiUser && (
+            {isMultiUser && ENABLE_MULTI_USER && (
               <PressableNative
                 style={styles.multiUserContainer}
                 onPress={onPressMultiUser}
