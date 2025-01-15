@@ -54,7 +54,17 @@
          <EnvironmentVariable
             key = "BASE_URL"
             value = "https://www.azzapp.com/"
-            isEnabled = "YES">
+            isEnabled = "NO">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "_XCAppClipURL"
+            value = "https://appclip.apple.com/id?p=com.azzapp.app.Clip"
+            isEnabled = "NO">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "_XCAppClipURL"
+            value = "https://appclip.apple.com/id?p=com.azzapp.app.Clip&amp;u=mlecoq&amp;c=NoIgOiwRD2BsBPADAMxignAJgK4GsB3aEAGmIEMUAPPAFgHZ6AOANwHMAXPYs8EAWQCWAYzzkApgBsexADLjhMAI4y+8xUoAEq4hBLAAuvqh8AEjAC24nSAt5JAOkkLlAATYXygx4ovEDRoa8EACMGEwAzAC0SBhREUgAKiH0AFwhIalISA7ZSABa-tAATmAAdqQgAKIACgCSCHhYACJMwpIAXgBiHACCAOJV8QAaTACKAHIw5BP9ANLFtABqS70AygDC+RyJY0sAmiHiBCAGQA"
+            isEnabled = "NO">
          </EnvironmentVariable>
       </EnvironmentVariables>
    </LaunchAction>

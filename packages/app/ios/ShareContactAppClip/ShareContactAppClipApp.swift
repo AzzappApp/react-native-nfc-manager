@@ -19,46 +19,83 @@ struct ShareContactAppClipApp: App {
 struct ContentView: View {
     @State var username: String?
     @State var step: String?
+    @State var hasError: Bool = true
+    
 
     var body: some View {
       VStack {
-        Spacer()
-        if let username = username {
-            Text("Username: \(username)")
-        } else {
-            Text("Username: Not available")
+           Spacer()
+           Image("logo_azzapp").padding(.bottom, 25)
+           Image("empty")
+           Text("Network Better")
+               .font(.system(size: 25, weight: .bold))
+               .padding(.bottom, 10)
+               .padding(.horizontal, 22)
+
+           Text("Craft a stunning Digital Business Card to instantly exchange contact details.")
+               .font(.system(size: 14, weight: .medium))
+               .padding(.bottom, 10)
+               .padding(.horizontal, 22)
+               .lineSpacing(4) // Adjusted line height
+               .multilineTextAlignment(.center) // Center alignment
+
+           if hasError {
+               Button(action: {
+                   if let url = URL(string: "https://apps.apple.com/app/6502694267") {
+                       UIApplication.shared.open(url)
+                   }
+               }) {
+                   Text("Create my Card")
+                       .font(.system(size: 14))
+                       .padding(.vertical, 12) // Add vertical padding for better touch target
+                       .padding(.horizontal, 25) // Add horizontal padding for better touch target
+                       .background(Color.black)
+                       .foregroundColor(.white)
+                       .cornerRadius(12)
+                       .frame(height: 47) // Set height to 47 points
+               }
+               .padding(.horizontal, 25) // 25 margin left and right
+           }
+
+           Spacer()
+        if !hasError {
+          Text(": \(step ?? "Not available")")
+            .font(.system(size: 14, weight: .medium)) // Adjusted font size and weight
+            .lineSpacing(4) // Adjusted line height
+            .multilineTextAlignment(.center) // Center alignment
+            .padding()
         }
-        Text(": \(step ?? "Not available")").padding()
-      }
-      .onContinueUserActivity(NSUserActivityTypeBrowsingWeb, perform: handleUserActivity)
-    }
+       }
+       .frame(maxWidth: .infinity)
+       .background(Color.white)
+       .padding(.horizontal, 25)
+       .onContinueUserActivity(NSUserActivityTypeBrowsingWeb, perform: handleUserActivity)
+   }
 
     private func handleUserActivity(_ userActivity: NSUserActivity) {
       guard let webpageURL = userActivity.webpageURL else {
-          print("No webpage URL found in user activity")
-          closeAppClip()
+          hasError = true
           return
       }
       self.step = "10 \(webpageURL)"
 
-      // Check if the webpageURL starts with "https://appclip.apple.com"
       if webpageURL.absoluteString.hasPrefix("https://appclip.apple.com") {
           // Extract the "url" query parameter
           guard let urlComponents = URLComponents(url: webpageURL, resolvingAgainstBaseURL: false),
             let queryItems = urlComponents.queryItems,
             let compressedContactCard = queryItems.first(where: { $0.name == "c" })?.value,
             let username = queryItems.first(where: { $0.name == "u" })?.value else {
-              closeAppClip()
+              hasError = true
               return
             }
+          hasError = false
           handleContactData(compressedContactCard: compressedContactCard, username: username)
       } else {
-             closeAppClip()
-      } 
+        hasError = true
+        return
+      }
     }
 
-
-  
     private func handleContactData(compressedContactCard: String, username: String) {
       self.username = username
       guard let decodedURI = compressedContactCard.removingPercentEncoding else {
@@ -70,7 +107,6 @@ struct ContentView: View {
             print("Failed to convert cleaned string to data.")
             return
       }
-     self.step = "1  \(decompressedContactCard)"
       do {
         // Parse the JSON array
         guard let jsonArray = try JSONSerialization.jsonObject(with: jsonData, options: []) as? [Any] else {
@@ -96,7 +132,6 @@ struct ContentView: View {
              self.step = "5"
           return
         }
-        self.step = "6"
         // Remove outer quotes and unescape characters
         let cleanedContactDataString = contactDataString
           .replacingOccurrences(of: "\r", with: "")
@@ -152,6 +187,7 @@ struct ContentView: View {
                   }
                   contactData.urls = urls
               }
+                self.step = "before dispatch"
               DispatchQueue.main.async {
                    self.step = "13"
                 addContact(contactData, username: username)
@@ -169,7 +205,6 @@ struct ContentView: View {
         self.step = "16 \(error)"
         print("Failed to decode contact data: \(error)")
       }
-      self.step = "Ended without verify sign"
     }
 
 
@@ -222,10 +257,11 @@ struct ContentView: View {
             CNLabeledValue(label: urlData.label, value: urlData.url as NSString)
         }
     }
-    guard let baseUrl = ProcessInfo.processInfo.environment["BASE_URL"] else {
-      print("Base url not defined")
-      return
-    }
+    let baseUrl = "https://www.azzapp.com/"; //hardcoded to be sure env is working
+   //        ProcessInfo.processInfo.environment["BASE_URL"] else {
+   //   print("Base url not defined")
+   //   return
+   // }
 
     urlAddresses.append(CNLabeledValue(label: "Azzapp", value:  "\(baseUrl)\(username)" as NSString))
 
@@ -329,10 +365,11 @@ private func mapToContactData(from array: [Any]) -> ContactData {
 }
 
 func verifySign(signature: String, data: String, salt: String, completion: @escaping (Result<[String: Any], Error>) -> Void) {
-    guard let baseUrl = ProcessInfo.processInfo.environment["BASE_URL"] else {
-      completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Base url not defined"])))
-      return
-    }
+    let baseUrl = "https://www.azzapp.com/"
+    //        ProcessInfo.processInfo.environment["BASE_URL"] else {
+    //  completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Base url not defined"])))
+    //  return
+   // }
 
     guard let url = URL(string: "\(baseUrl)api/verifySign") else {
       completion(.failure(NSError(domain: "", code: -2, userInfo: [NSLocalizedDescriptionKey: "Invalid URL"])))
@@ -385,4 +422,8 @@ private func closeAppClip() {
  UIApplication.shared.perform(#selector(NSXPCConnection.suspend))
 }
 
-
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+    }
+}
