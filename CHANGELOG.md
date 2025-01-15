@@ -1,5 +1,6 @@
-## 1.7.0-canary.10
+## 1.7.0-canary.11
 
+* **fix:**  - temporary disable module count limit ([#6908](https://github.com/AzzappApp/azzapp/pull/6908))
 * **fix:**  - do not corrupt already built url addresses ([#6906](https://github.com/AzzappApp/azzapp/pull/6906))
 * **feat:**  - **user:** [#6880](https://github.com/AzzappApp/azzapp/pull/6880) no more create free subscription ([#6901](https://github.com/AzzappApp/azzapp/pull/6901))
 * **feat:**  - disable multi user on android ([#6894](https://github.com/AzzappApp/azzapp/pull/6894))
