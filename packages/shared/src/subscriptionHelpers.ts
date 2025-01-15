@@ -8,10 +8,15 @@ export const isModuleKindSubscription = (_kind: string) => {
   return modulesKindsSubscription.includes(_kind);
 };
 
-export const MODULE_COUNT_LIMIT_FOR_SUBSCRIPTION = 4;
+// temporary increase number of free modules
+// see: https://github.com/AzzappApp/azzapp/issues/6878
+export const MODULE_COUNT_LIMIT_FOR_SUBSCRIPTION = -1;
 
 export const moduleCountRequiresSubscription = (_moduleCount: number) => {
-  return _moduleCount >= MODULE_COUNT_LIMIT_FOR_SUBSCRIPTION;
+  return (
+    MODULE_COUNT_LIMIT_FOR_SUBSCRIPTION > 0 && // limit is disabled
+    _moduleCount >= MODULE_COUNT_LIMIT_FOR_SUBSCRIPTION
+  );
 };
 
 export const hasModuleKindSubscription = (
