@@ -3,7 +3,6 @@ import { type CardModuleColor } from '@azzapp/shared/cardModuleHelpers';
 import CardModuleEditionScrollHandler from '../CardModuleEditionScrollHandler';
 import withSwapCardModuleColor from '../withSwapCardModuleColor';
 import CardModuleMediaGrid from './CardModuleMediaGrid';
-import CardModuleMediaOriginal from './CardModuleMediaOriginal';
 import CardModuleMediaParallax from './CardModuleMediaParallax';
 import CardModuleMediaSlideshow from './CardModuleMediaSlideshow';
 import type {
@@ -116,12 +115,13 @@ const MediaModuleRenderer = ({
     case 'original':
       return (
         <CardModuleEditionScrollHandler scrollPosition={scrollPosition}>
-          <CardModuleMediaOriginal
+          <CardModuleMediaGrid
             cardModuleMedias={data.cardModuleMedias}
             cardModuleColor={data.cardModuleColor}
             onLayout={onLayout}
             displayMode={displayMode}
             scrollPosition={scrollPosition}
+            nbColumns={1}
             {...props}
           />
         </CardModuleEditionScrollHandler>

@@ -16,6 +16,7 @@ type CardModuleMediaGridProps = CardModuleVariantType & {
   scrollPosition?: Animated.Value;
   modulePosition?: number;
   square?: boolean; //for futur usage of square grid (view with @upmitt)
+  nbColumns?: number;
 };
 
 const CardModuleMediaGrid = ({
@@ -26,6 +27,7 @@ const CardModuleMediaGrid = ({
   cardStyle,
   scrollPosition,
   square = false,
+  nbColumns = 3,
   ...props
 }: CardModuleMediaGridProps) => {
   const screenDimension = useScreenDimensions();
@@ -38,26 +40,28 @@ const CardModuleMediaGrid = ({
   }
 
   // we need to calculate the startPoint of each item in the grid(whichs a 3 column grid). It will allow to start the appearance animation at the right scrolling position
-  const [itemYStartPoint, setItemYStartPoint] = useState<number[][]>([
-    [],
-    [],
-    [],
-  ]);
-
+  const [itemYStartPoint, setItemYStartPoint] = useState<number[][]>(
+    Array.from({ length: nbColumns }, () => []),
+  );
   //determine size of columns
   const columnWidth = useMemo(() => {
-    return (dimension.width - 4 * (cardStyle?.gap ?? 0)) / 3;
-  }, [cardStyle?.gap, dimension.width]);
+    return (
+      (dimension.width - (nbColumns + 1) * (cardStyle?.gap ?? 0)) / nbColumns
+    );
+  }, [cardStyle?.gap, dimension.width, nbColumns]);
 
   const columns = useMemo(() => {
-    const result: CardModuleMedia[][] = [[], [], []]; // Three columns grid
-    const offsetY: number[][] = [[0], [0], [0]];
-    const columnHeights = [0, 0, 0];
+    const result: CardModuleMedia[][] = Array.from(
+      { length: nbColumns },
+      () => [],
+    ); // Three columns grid
+    const offsetY: number[][] = Array.from({ length: nbColumns }, () => [0]); // Three columns grid
+    const columnHeights = Array(nbColumns).fill(0);
 
     if (square) {
       //no reordering, just fill the columns and offsetY
       cardModuleMedias.forEach((item, index) => {
-        const columnIndex = index % 3;
+        const columnIndex = index % nbColumns;
         result[columnIndex].push(item);
         offsetY[columnIndex].push(columnHeights[columnIndex] + columnWidth);
       });
@@ -82,7 +86,7 @@ const CardModuleMediaGrid = ({
     setItemYStartPoint(offsetY);
 
     return result;
-  }, [cardModuleMedias, columnWidth, square]);
+  }, [cardModuleMedias, columnWidth, nbColumns, square]);
 
   return (
     <View
