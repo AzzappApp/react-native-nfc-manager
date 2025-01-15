@@ -114,16 +114,16 @@ export const downloadRemoteFileToLocalCache = (
 export const COVER_CACHE_DIR = `${ReactNativeBlobUtil.fs.dirs.CacheDir}/covers`;
 export const MODULES_CACHE_DIR = `${ReactNativeBlobUtil.fs.dirs.CacheDir}/modules`;
 
-let checkMediaCacheDirPromise: Promise<void> | null = null;
+const checkMediaCacheDirPromise: Record<string, Promise<void> | null> = {};
 const checkMediaCacheDir = (cacheDir: string) => {
-  if (!checkMediaCacheDirPromise) {
-    checkMediaCacheDirPromise = (async () => {
+  if (!checkMediaCacheDirPromise[cacheDir]) {
+    checkMediaCacheDirPromise[cacheDir] = (async () => {
       if (!(await ReactNativeBlobUtil.fs.exists(cacheDir))) {
         await ReactNativeBlobUtil.fs.mkdir(cacheDir);
       }
     })();
   }
-  return checkMediaCacheDirPromise;
+  return checkMediaCacheDirPromise[cacheDir];
 };
 
 const copyPromises: Record<string, Promise<string | null>> = {};
