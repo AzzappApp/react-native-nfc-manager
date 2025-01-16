@@ -79,7 +79,7 @@ export const createCoverVideoComposition = (
         const path = getCoverLocalMediaPath(localFilenames[media.id]);
         items.push({
           id: asset.id,
-          path,
+          path: path.replace('file://', ''),
           compositionStartTime: asset.startTime,
           startTime: media.timeRange.startTime,
           duration: media.timeRange.duration,
