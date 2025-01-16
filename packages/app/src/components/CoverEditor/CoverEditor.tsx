@@ -663,7 +663,7 @@ const CoverEditorCore = (
 
     if (
       !!coverEditorState.lottie &&
-      coverEditorState.initialMediaToPick?.length
+      coverEditorState.initialMediaToPick?.filter(m => m?.editable).length
     ) {
       // ensure media picker is open when we build from scratch
       return true;

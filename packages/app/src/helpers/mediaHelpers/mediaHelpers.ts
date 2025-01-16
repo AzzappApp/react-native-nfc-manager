@@ -70,6 +70,7 @@ export const FILE_CACHE_DIR = `${Paths.cache.uri}/files`;
 export const downloadRemoteFileToLocalCache = (
   uri: string,
   abortSignal?: AbortSignal,
+  targetFile?: File,
 ) => {
   let canceled = false;
 
@@ -83,15 +84,23 @@ export const downloadRemoteFileToLocalCache = (
 
   const innerFetch = async () => {
     try {
-      const targetDirectory = new Directory(FILE_CACHE_DIR);
-      if (!targetDirectory.exists) {
-        targetDirectory.create();
+      if (targetFile) {
+        const file = await File.downloadFileAsync(uri, targetFile);
+        if (canceled) {
+          return null;
+        }
+        return new File(file.uri);
+      } else {
+        const targetDirectory = new Directory(FILE_CACHE_DIR);
+        if (!targetDirectory.exists) {
+          targetDirectory.create();
+        }
+        const file = await File.downloadFileAsync(uri, targetDirectory);
+        if (canceled) {
+          return null;
+        }
+        return new File(file.uri);
       }
-      const file = await File.downloadFileAsync(uri, targetDirectory);
-      if (canceled) {
-        return null;
-      }
-      return new File(file.uri);
     } catch (err) {
       if (canceled) {
         return null;
@@ -103,8 +112,8 @@ export const downloadRemoteFileToLocalCache = (
   return innerFetch();
 };
 
-export const COVER_CACHE_DIR = `${Paths.cache.uri}/covers`;
-export const MODULES_CACHE_DIR = `${Paths.cache.uri}/modules`;
+export const COVER_CACHE_DIR = `${Paths.cache.uri}covers`;
+export const MODULES_CACHE_DIR = `${Paths.cache.uri}modules`;
 
 const checkMediaCacheDir = (cacheDir: string) => {
   const directory = new Directory(cacheDir);
@@ -135,7 +144,6 @@ const copyCoverMediaToCacheDirInternal = async (
 
   if (isFileURL(media.uri)) {
     const oldFile = new File(media.uri);
-
     if (!oldFile.exists) {
       return null;
     }
@@ -143,12 +151,12 @@ const copyCoverMediaToCacheDirInternal = async (
     oldFile.copy(file);
     return file.name;
   } else {
-    const oldFile = await downloadRemoteFileToLocalCache(
+    const resultFile = await downloadRemoteFileToLocalCache(
       media.uri,
       abortSignal,
+      file,
     );
-    if (oldFile) {
-      oldFile.copy(file);
+    if (resultFile) {
       return file.name;
     }
     return null;

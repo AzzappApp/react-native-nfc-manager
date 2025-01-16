@@ -164,7 +164,7 @@ const WebCardMenu = ({
     try {
       //download the coverurl locally
       const directory = new Directory(
-        `${Paths.cache.uri}/${webCard.coverMedia.id}`,
+        `${Paths.cache.uri}${webCard.coverMedia.id}`,
       );
       if (!directory.exists) {
         directory.create();
