@@ -4,8 +4,16 @@ import { AppearanceSliderContainer } from '#components/renderer/AppearanceSlider
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CloudinaryVideo from '#ui/CloudinaryVideo';
 import styles from './index.css';
+import type { CardStyle } from '@azzapp/shared/cardHelpers';
 
-const GridItem = ({ media, index, cardStyle }: any) => {
+type GridItemProps = {
+  media: any;
+  index: number;
+  cardStyle: CardStyle;
+  square: boolean;
+};
+
+const GridItem = ({ media, index, cardStyle, square }: GridItemProps) => {
   const pictureRef = useRef<HTMLDivElement>(null);
   return (
     <div
@@ -14,7 +22,7 @@ const GridItem = ({ media, index, cardStyle }: any) => {
       style={{
         borderRadius: cardStyle?.borderRadius ?? 0,
         overflow: 'hidden',
-        aspectRatio: `${media.width} / ${media.height}`,
+        aspectRatio: square ? 1 : `${media.width} / ${media.height}`,
       }}
       ref={pictureRef}
     >
@@ -46,7 +54,7 @@ const GridItem = ({ media, index, cardStyle }: any) => {
             width={EXPECTED_MEDIA_WIDTH}
             height={(EXPECTED_MEDIA_WIDTH * media.height) / media.width}
             style={{
-              objectFit: 'fill',
+              objectFit: 'cover',
               borderRadius: cardStyle?.borderRadius ?? 0,
             }}
           />

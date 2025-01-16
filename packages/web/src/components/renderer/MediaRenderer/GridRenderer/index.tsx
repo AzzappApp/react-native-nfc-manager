@@ -81,6 +81,8 @@ const GridRenderer = async ({
                   key={`${media.id}_${index}`}
                   media={media}
                   cardStyle={cardStyle}
+                  square={square}
+                  index={index}
                 />
               );
             })}
