@@ -9,9 +9,11 @@ import { ScrollView } from 'react-native-gesture-handler';
 import ShareCommand from 'react-native-share';
 import { colors, shadow } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
+import { useRouter } from '#components/NativeRouter';
 import { buildVCardFromExpoContact } from '#helpers/contactCardHelpers';
 import { reworkContactForDeviceInsert } from '#helpers/contactListHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { matchUrlWithRoute } from '#helpers/deeplinkHelpers';
 import { sanitizeFilePath } from '#helpers/fileHelpers';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
@@ -32,6 +34,7 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
   const { bottom } = useScreenInsets();
   const intl = useIntl();
   const styles = useStyleSheet(stylesheet);
+  const router = useRouter();
 
   const date = useMemo(() => {
     if (!details) {
@@ -203,9 +206,21 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
             <PressableNative
               key={'url' + index + '' + urlAddress.url}
               style={styles.item}
-              onPress={() => {
+              onPress={async () => {
                 if (urlAddress.url) {
-                  Linking.openURL(urlAddress.url);
+                  const route = await matchUrlWithRoute(urlAddress.url);
+                  if (route) {
+                    // will close the contact detail modal
+                    router.back();
+                    // move to route deeplink
+                    router?.push(route);
+                    return;
+                  }
+                  Linking.openURL(
+                    urlAddress.url.startsWith('http')
+                      ? urlAddress.url
+                      : `https://${urlAddress.url}`,
+                  );
                 }
               }}
             >
