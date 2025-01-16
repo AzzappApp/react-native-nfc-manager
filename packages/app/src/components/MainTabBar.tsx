@@ -11,13 +11,17 @@ import Animated, {
   useAnimatedProps,
   useAnimatedStyle,
 } from 'react-native-reanimated';
+import Toast from 'react-native-toast-message';
 import { colors } from '#theme';
+
+import { getAuthState } from '#helpers/authStore';
 import useScreenInsets from '#hooks/useScreenInsets';
 import BottomMenu from '#ui/BottomMenu';
 import Text from '#ui/Text';
 import { HomeIcon } from './HomeIcon';
 import { useRouter } from './NativeRouter';
 import { openShakeShare } from './ShakeShare';
+import type { ReactNode } from 'react';
 
 const mainTabBarOpacity = makeMutable(1);
 
@@ -81,13 +85,60 @@ const MainTabBar = ({
 
       if (!hasFinishedTransition) return;
 
-      if (key === 'SHARE') {
-        openShakeShare();
-      } else {
-        router.push({ route: key as any });
+      switch (key) {
+        case 'SHARE':
+          openShakeShare();
+          break;
+        case 'MEDIA':
+          {
+            const { profileInfos } = getAuthState();
+            let toastMessage: ReactNode[] | string | undefined = undefined;
+            if (!profileInfos?.cardIsPublished) {
+              toastMessage = intl.formatMessage(
+                {
+                  defaultMessage:
+                    'Publish WebCard{azzappA} to browse community',
+                  description:
+                    'info toast when browsing community on an unpublished webcard',
+                },
+                {
+                  azzappA: <Text variant="azzapp">a</Text>,
+                },
+              );
+            }
+
+            if (profileInfos?.invited) {
+              toastMessage = intl.formatMessage({
+                defaultMessage: 'Accept invitation to browse community',
+                description:
+                  'info toast when browsing community on an invit webcard',
+              });
+            }
+
+            if (profileInfos?.coverIsPredefined) {
+              toastMessage = intl.formatMessage({
+                defaultMessage: 'Create a cover to browse community',
+                description:
+                  'info toast when browsing community on an predefined cover',
+              });
+            }
+
+            if (toastMessage) {
+              Toast.show({
+                type: 'info',
+                text1: toastMessage as string,
+              });
+            } else {
+              router.push({ route: key as any });
+            }
+          }
+          break;
+        default:
+          router.push({ route: key as any });
+          break;
       }
     },
-    [router],
+    [intl, router],
   );
 
   const appearance = useColorScheme() ?? 'light';

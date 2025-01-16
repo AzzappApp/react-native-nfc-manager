@@ -62,6 +62,8 @@ const ContactCardCreateScreen = () => {
             webCard {
               id
               userName
+              cardIsPublished
+              coverIsPredefined
             }
           }
         }
@@ -205,6 +207,8 @@ const ContactCardCreateScreen = () => {
             invited: profile.invited,
             webCardId: profile.webCard.id,
             webCardUserName: profile.webCard.userName,
+            cardIsPublished: profile.webCard.cardIsPublished,
+            coverIsPredefined: profile.webCard.coverIsPredefined,
           });
           if (
             (router.getCurrentRoute() as ContactCardCreateRoute)?.params

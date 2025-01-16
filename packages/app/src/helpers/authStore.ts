@@ -52,11 +52,20 @@ export type ProfileInfos = {
    * The username of the webcard
    */
   webCardUserName?: string | null;
+
+  cardIsPublished?: boolean;
+  coverIsPredefined?: boolean;
 };
 
 export type ProfileInfosInput = Pick<
   ProfileInfos,
-  'invited' | 'profileId' | 'profileRole' | 'webCardId' | 'webCardUserName'
+  | 'cardIsPublished'
+  | 'coverIsPredefined'
+  | 'invited'
+  | 'profileId'
+  | 'profileRole'
+  | 'webCardId'
+  | 'webCardUserName'
 >;
 
 /**
@@ -255,14 +264,23 @@ const emitAuthState = () => {
 export const getTokens = () => authTokens;
 
 export const onChangeWebCard = async (infos?: ProfileInfosInput | null) => {
-  const { profileId, webCardId, profileRole, webCardUserName, invited } =
-    infos ?? {
-      profileId: null,
-      webCardId: null,
-      profileRole: null,
-      invited: false,
-      webCardUserName: undefined,
-    };
+  const {
+    profileId,
+    webCardId,
+    profileRole,
+    webCardUserName,
+    invited,
+    cardIsPublished,
+    coverIsPredefined,
+  } = infos ?? {
+    profileId: null,
+    webCardId: null,
+    profileRole: null,
+    invited: false,
+    webCardUserName: undefined,
+    cardIsPublished: undefined,
+    coverIsPredefined: undefined,
+  };
   const profileInfos = getAuthState().profileInfos;
   if (
     profileInfos == null ||
@@ -278,6 +296,8 @@ export const onChangeWebCard = async (infos?: ProfileInfosInput | null) => {
         profileRole,
         invited,
         webCardUserName,
+        cardIsPublished,
+        coverIsPredefined,
       }),
     );
   }
