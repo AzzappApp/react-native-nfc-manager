@@ -2,6 +2,7 @@ import { PermissionStatus as ContactPermissionStatus } from 'expo-contacts';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Alert, Platform, StyleSheet, View } from 'react-native';
+import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { colors, textStyles } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
@@ -26,6 +27,8 @@ type Props = {
   localContacts: Contact[];
   contactsPermissionStatus: ContactPermissionStatus;
 };
+
+const COVER_WIDTH = 35;
 
 const ContactSearchByNameItem = ({
   contact,
@@ -169,7 +172,7 @@ const ContactSearchByNameItem = ({
           <View style={styles.cover}>
             <CoverRenderer
               style={styles.webcard}
-              width={35}
+              width={COVER_WIDTH}
               webCard={contact.webCard}
               large
             />
@@ -249,7 +252,7 @@ const styles = StyleSheet.create({
     color: colors.grey400,
   },
   cover: {
-    width: 35,
+    width: COVER_WIDTH,
     borderRadius: 4,
     overflow: 'hidden',
   },
@@ -260,6 +263,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flex: 1,
     rowGap: 5,
+    height: COVER_WIDTH / COVER_RATIO,
   },
   actions: {
     flexDirection: 'row',
