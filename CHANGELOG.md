@@ -1,5 +1,7 @@
-## 1.7.0-canary.19
+## 1.7.0-canary.20
 
+* **fix:**  - truncated covers in search contact ByName ([#6952](https://github.com/AzzappApp/azzapp/pull/6952))
+* **fix:**  - browser square ([#6950](https://github.com/AzzappApp/azzapp/pull/6950))
 * **docs:**  - Update README.md ([#6949](https://github.com/AzzappApp/azzapp/pull/6949))
 * **fix:**  - **cover:** [#6909](https://github.com/AzzappApp/azzapp/pull/6909) download files directly to target path ([#6917](https://github.com/AzzappApp/azzapp/pull/6917))
 * **fix:**  - **cover:** [#6946](https://github.com/AzzappApp/azzapp/pull/6946) file prefix is not supported by skia-video when handling video ([#6948](https://github.com/AzzappApp/azzapp/pull/6948))
