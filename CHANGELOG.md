@@ -1,5 +1,8 @@
-## 1.7.0-canary.18
+## 1.7.0-canary.19
 
+* **docs:**  - Update README.md ([#6949](https://github.com/AzzappApp/azzapp/pull/6949))
+* **fix:**  - **cover:** [#6909](https://github.com/AzzappApp/azzapp/pull/6909) download files directly to target path ([#6917](https://github.com/AzzappApp/azzapp/pull/6917))
+* **fix:**  - **cover:** [#6946](https://github.com/AzzappApp/azzapp/pull/6946) file prefix is not supported by skia-video when handling video ([#6948](https://github.com/AzzappApp/azzapp/pull/6948))
 * **fix:**  - remove storage widget for android (no widget for now) ([#6938](https://github.com/AzzappApp/azzapp/pull/6938))
 * **fix:**  - ensure contact detail screen redirect to the app when clicking on webcard url ([#6886](https://github.com/AzzappApp/azzapp/pull/6886))
 * **fix:**  - be sure item is defined
