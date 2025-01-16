@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { startTransition } from 'react';
 import { MMKV } from 'react-native-mmkv';
 import ERRORS from '@azzapp/shared/errors';
@@ -263,16 +264,19 @@ const emitAuthState = () => {
  */
 export const getTokens = () => authTokens;
 
-export const onChangeWebCard = async (infos?: ProfileInfosInput | null) => {
-  const {
-    profileId,
-    webCardId,
-    profileRole,
-    webCardUserName,
-    invited,
-    cardIsPublished,
-    coverIsPredefined,
-  } = infos ?? {
+export const commonKeysAreEqual = (a: any, b: any) => {
+  const commonKeys = _.intersection(_.keys(a), _.keys(b));
+
+  const obj1Common = _.pick(a, commonKeys);
+  const obj2Common = _.pick(b, commonKeys);
+
+  return _.isEqual(obj1Common, obj2Common);
+};
+
+export const onChangeWebCard = async (
+  infos?: Partial<ProfileInfosInput> | null,
+) => {
+  const newData = infos ?? {
     profileId: null,
     webCardId: null,
     profileRole: null,
@@ -282,22 +286,13 @@ export const onChangeWebCard = async (infos?: ProfileInfosInput | null) => {
     coverIsPredefined: undefined,
   };
   const profileInfos = getAuthState().profileInfos;
-  if (
-    profileInfos == null ||
-    profileInfos.profileId !== profileId ||
-    webCardUserName !== profileInfos.webCardUserName
-  ) {
+
+  if (!commonKeysAreEqual(profileInfos, newData)) {
     storage.set(
       MMKVS_PROFILE_INFOS,
       JSON.stringify({
         ...profileInfos,
-        profileId,
-        webCardId,
-        profileRole,
-        invited,
-        webCardUserName,
-        cardIsPublished,
-        coverIsPredefined,
+        ...newData,
       }),
     );
   }
