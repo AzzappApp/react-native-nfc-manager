@@ -1,12 +1,19 @@
-## 1.7.0-canary.20
+## 1.7.0-canary.21
 
+* **fix:**  - **home:** [#6951](https://github.com/AzzappApp/azzapp/pull/6951) update coverIsPredefined field ([#6953](https://github.com/AzzappApp/azzapp/pull/6953))
 * **fix:**  - truncated covers in search contact ByName ([#6952](https://github.com/AzzappApp/azzapp/pull/6952))
+* **fix:**  - ensure module is stored in replica
 * **fix:**  - browser square ([#6950](https://github.com/AzzappApp/azzapp/pull/6950))
 * **docs:**  - Update README.md ([#6949](https://github.com/AzzappApp/azzapp/pull/6949))
 * **fix:**  - **cover:** [#6909](https://github.com/AzzappApp/azzapp/pull/6909) download files directly to target path ([#6917](https://github.com/AzzappApp/azzapp/pull/6917))
 * **fix:**  - **cover:** [#6946](https://github.com/AzzappApp/azzapp/pull/6946) file prefix is not supported by skia-video when handling video ([#6948](https://github.com/AzzappApp/azzapp/pull/6948))
+* **fix:**  - slow down profile change
+* **fix:**  - slow down module saving to avoid crash on android
+* **fix:**  - **community:** [#6925](https://github.com/AzzappApp/azzapp/pull/6925) don’t browse to community when not allowed ([#6928](https://github.com/AzzappApp/azzapp/pull/6928))
 * **fix:**  - remove storage widget for android (no widget for now) ([#6938](https://github.com/AzzappApp/azzapp/pull/6938))
 * **fix:**  - ensure contact detail screen redirect to the app when clicking on webcard url ([#6886](https://github.com/AzzappApp/azzapp/pull/6886))
+* **fix:**  - **media:** [#6927](https://github.com/AzzappApp/azzapp/pull/6927) separate promise per dir
+* **fix:**  - **media:** [#6927](https://github.com/AzzappApp/azzapp/pull/6927) isDir looks strange in the code
 * **fix:**  - be sure item is defined
 * **feat:**  - use grid module to render original ratio (similar to web) ([#6923](https://github.com/AzzappApp/azzapp/pull/6923))
 * **Fix:**  -  square grid . Remove original item component and use Grid ([#6921](https://github.com/AzzappApp/azzapp/pull/6921))
