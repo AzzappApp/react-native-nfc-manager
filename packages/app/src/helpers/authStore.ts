@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { startTransition } from 'react';
 import { MMKV } from 'react-native-mmkv';
 import ERRORS from '@azzapp/shared/errors';
@@ -52,11 +53,20 @@ export type ProfileInfos = {
    * The username of the webcard
    */
   webCardUserName?: string | null;
+
+  cardIsPublished?: boolean;
+  coverIsPredefined?: boolean;
 };
 
 export type ProfileInfosInput = Pick<
   ProfileInfos,
-  'invited' | 'profileId' | 'profileRole' | 'webCardId' | 'webCardUserName'
+  | 'cardIsPublished'
+  | 'coverIsPredefined'
+  | 'invited'
+  | 'profileId'
+  | 'profileRole'
+  | 'webCardId'
+  | 'webCardUserName'
 >;
 
 /**
@@ -254,30 +264,35 @@ const emitAuthState = () => {
  */
 export const getTokens = () => authTokens;
 
-export const onChangeWebCard = async (infos?: ProfileInfosInput | null) => {
-  const { profileId, webCardId, profileRole, webCardUserName, invited } =
-    infos ?? {
-      profileId: null,
-      webCardId: null,
-      profileRole: null,
-      invited: false,
-      webCardUserName: undefined,
-    };
+export const commonKeysAreEqual = (a: any, b: any) => {
+  const commonKeys = _.intersection(_.keys(a), _.keys(b));
+
+  const obj1Common = _.pick(a, commonKeys);
+  const obj2Common = _.pick(b, commonKeys);
+
+  return _.isEqual(obj1Common, obj2Common);
+};
+
+export const onChangeWebCard = async (
+  infos?: Partial<ProfileInfosInput> | null,
+) => {
+  const newData = infos ?? {
+    profileId: null,
+    webCardId: null,
+    profileRole: null,
+    invited: false,
+    webCardUserName: undefined,
+    cardIsPublished: undefined,
+    coverIsPredefined: undefined,
+  };
   const profileInfos = getAuthState().profileInfos;
-  if (
-    profileInfos == null ||
-    profileInfos.profileId !== profileId ||
-    webCardUserName !== profileInfos.webCardUserName
-  ) {
+
+  if (!commonKeysAreEqual(profileInfos, newData)) {
     storage.set(
       MMKVS_PROFILE_INFOS,
       JSON.stringify({
         ...profileInfos,
-        profileId,
-        webCardId,
-        profileRole,
-        invited,
-        webCardUserName,
+        ...newData,
       }),
     );
   }

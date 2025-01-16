@@ -518,12 +518,12 @@ export default relayScreen(WebCardScreen, {
       ? {
           webCardId,
           viewerWebCardId: profileInfos?.webCardId ?? '',
-          profileId: profileInfos?.profileId,
+          profileId: profileInfos?.profileId ?? '',
         }
       : {
           userName,
           viewerWebCardId: profileInfos?.webCardId ?? '',
-          profileId: profileInfos?.profileId,
+          profileId: profileInfos?.profileId ?? '',
         },
   fetchPolicy: 'store-and-network',
 });

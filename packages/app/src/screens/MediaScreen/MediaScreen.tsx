@@ -35,7 +35,7 @@ import MediaSuggestionsScreen, {
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { MediaScreenQuery } from '#relayArtifacts/MediaScreenQuery.graphql';
 import type { MediaRoute } from '#routes';
-import type { ReactElement, ReactNode } from 'react';
+import type { ReactElement } from 'react';
 
 type TAB = 'FOLLOWINGS' | 'MY_POSTS' | 'SUGGESTIONS';
 
@@ -94,47 +94,10 @@ const MediaScreen = ({
     !profile?.webCard?.coverIsPredefined;
 
   useEffect(() => {
-    let toastMessage: ReactNode[] | string | undefined = undefined;
-    if (!profile?.webCard?.cardIsPublished) {
-      toastMessage = intl.formatMessage(
-        {
-          defaultMessage: 'Publish WebCard{azzappA} to browse community',
-          description:
-            'info toast when browsing community on an unpublished webcard',
-        },
-        {
-          azzappA: <Text variant="azzapp">a</Text>,
-        },
-      );
+    if (!canBrowseCommunity && hasFocus) {
+      router.back();
     }
-    if (profile?.invited) {
-      toastMessage = intl.formatMessage({
-        defaultMessage: 'Accept invitation to browse community',
-        description: 'info toast when browsing community on an invit webcard',
-      });
-    }
-    if (profile?.webCard?.coverIsPredefined) {
-      toastMessage = intl.formatMessage({
-        defaultMessage: 'Create a cover to browse community',
-        description:
-          'info toast when browsing community on an predefined cover',
-      });
-    }
-
-    if (toastMessage) {
-      Toast.show({
-        type: 'info',
-        text1: toastMessage as string,
-      });
-      router.backToTop();
-    }
-  }, [
-    intl,
-    profile?.invited,
-    profile?.webCard?.cardIsPublished,
-    profile?.webCard?.coverIsPredefined,
-    router,
-  ]);
+  }, [canBrowseCommunity, hasFocus, router]);
 
   const onCreatePost = useCallback(() => {
     const { profileInfos } = getAuthState();

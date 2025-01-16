@@ -1,9 +1,9 @@
 import { toGlobalId } from 'graphql-relay';
 import { NextResponse } from 'next/server';
+import { getWebCardById, type Profile, type User } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { generateTokens } from './tokens';
 import { sendTwilioVerificationCode } from './twilioHelpers';
-import type { Profile, User } from '@azzapp/data';
 
 export const handleSignInAuthMethod = async (
   user: User,
@@ -33,6 +33,9 @@ export const handleSignInAuthMethod = async (
   const { token, refreshToken } = await generateTokens({
     userId: user.id,
   });
+
+  const webCard = await getWebCardById(profile?.webCardId ?? '');
+
   return NextResponse.json({
     ok: true,
     profileInfos: profile
@@ -41,6 +44,9 @@ export const handleSignInAuthMethod = async (
           profileRole: profile.profileRole,
           webCardId: toGlobalId('WebCard', profile.webCardId),
           invited: profile.invited,
+          webCardUserName: webCard?.userName,
+          cardIsPublished: webCard?.cardIsPublished,
+          coverIsPredefined: webCard?.coverIsPredefined,
         }
       : null,
     email: user.email,

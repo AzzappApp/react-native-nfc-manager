@@ -39,7 +39,7 @@ import type { ScreenOptions } from '#components/NativeRouter';
 import type { ContactCardCreateScreenMutation } from '#relayArtifacts/ContactCardCreateScreenMutation.graphql';
 import type { ContactCardCreateRoute } from '#routes';
 
-const WAIT_FOR_REDIRECT = 500;
+const WAIT_FOR_REDIRECT = 1000;
 
 const ContactCardCreateScreen = () => {
   const styles = useStyleSheet(stylesheet);
@@ -62,6 +62,8 @@ const ContactCardCreateScreen = () => {
             webCard {
               id
               userName
+              cardIsPublished
+              coverIsPredefined
             }
           }
         }
@@ -205,6 +207,8 @@ const ContactCardCreateScreen = () => {
             invited: profile.invited,
             webCardId: profile.webCard.id,
             webCardUserName: profile.webCard.userName,
+            cardIsPublished: profile.webCard.cardIsPublished,
+            coverIsPredefined: profile.webCard.coverIsPredefined,
           });
           if (
             (router.getCurrentRoute() as ContactCardCreateRoute)?.params

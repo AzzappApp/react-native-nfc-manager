@@ -15,6 +15,7 @@ import {
   getValidEncoderConfigurations,
 } from '@azzapp/react-native-skia-video';
 import { waitTime } from '@azzapp/shared/asyncHelpers';
+import { onChangeWebCard } from '#helpers/authStore';
 import {
   createRandomFileName,
   createRandomFilePath,
@@ -78,6 +79,7 @@ const useSaveCover = (
           id
           hasCover
           coverId
+          coverIsPredefined
           ...CoverRenderer_webCard
           coverMedia {
             __typename
@@ -208,6 +210,9 @@ const useSaveCover = (
             },
           },
           onCompleted(response, error) {
+            onChangeWebCard({
+              coverIsPredefined: response.saveCover.webCard.coverIsPredefined,
+            });
             coverLocalStore.saveCover(webCardId, {
               ...coverEditorState,
               coverId: response?.saveCover?.webCard.coverId ?? undefined,
