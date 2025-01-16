@@ -16,7 +16,8 @@ import type {
 } from '#relayArtifacts/useWidget_user.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 
-const SharedStorage = NativeModules.SharedStorage;
+//TODO: android widget
+//const SharedStorage = NativeModules.SharedStorage;
 
 const group = process.env.WIDGET_APP_GROUP;
 
@@ -97,10 +98,12 @@ const useWidget = (profileKey: useWidget_user$key | null) => {
             widgetData,
             group,
           );
-        } else {
-          SharedStorage.set(JSON.stringify(widgetData));
+          AZPWidgetKit.reloadAllTimelines();
         }
-        AZPWidgetKit.reloadAllTimelines();
+        //TODO: android widget
+        // else {
+        //   SharedStorage.set(JSON.stringify(widgetData));
+        // }
       } catch (error) {
         Sentry.captureException(error);
         console.log({ error });
@@ -117,10 +120,12 @@ const useWidget = (profileKey: useWidget_user$key | null) => {
         [],
         group,
       );
-    } else {
-      SharedStorage.set(null);
+      AZPWidgetKit.reloadAllTimelines();
     }
-    AZPWidgetKit.reloadAllTimelines();
+    //TODO: android widget
+    // else {
+    //   SharedStorage.set(null);
+    // }
   });
 
   const appState = useAppState();
