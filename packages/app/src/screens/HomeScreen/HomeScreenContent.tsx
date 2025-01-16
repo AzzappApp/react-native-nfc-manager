@@ -95,7 +95,7 @@ const HomeScreenContent = ({
   const [currentProfile, setCurrentProfile] = useState(
     user.profiles?.[initialProfileIndex - 1],
   );
-  const debouncedUpdate = useDebouncedCallback(setCurrentProfile, 300);
+  const debouncedUpdate = useDebouncedCallback(setCurrentProfile, 500);
 
   useAnimatedReaction(
     () => currentIndexProfileSharedValue.value,

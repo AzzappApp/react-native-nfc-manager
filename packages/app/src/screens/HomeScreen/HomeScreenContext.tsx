@@ -1,9 +1,11 @@
+import { isEqual } from 'lodash';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { getAuthState, onChangeWebCard } from '#helpers/authStore';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import useLatestCallback from '#hooks/useLatestCallback';
+import type { ProfileInfosInput } from '#helpers/authStore';
 import type { HomeScreenContext_user$key } from '#relayArtifacts/HomeScreenContext_user.graphql';
 import type { ReactNode } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
@@ -40,6 +42,8 @@ export const HomeScreenProvider = ({
           webCard {
             id
             userName
+            cardIsPublished
+            coverIsPredefined
           }
         }
       }
@@ -98,17 +102,43 @@ export const HomeScreenProvider = ({
   const onCurrentProfileIndexChange = useCallback(
     (index: number) => {
       const newProfile = user.profiles?.[index - 1];
-      if (
-        newProfile &&
-        newProfile.id !== getAuthState().profileInfos?.profileId
-      ) {
-        onChangeWebCard({
+
+      const profileInfos = getAuthState().profileInfos;
+      if (newProfile) {
+        const newData = {
           profileId: newProfile.id,
           webCardId: newProfile.webCard?.id ?? null,
           profileRole: newProfile.profileRole,
           invited: newProfile.invited,
           webCardUserName: newProfile.webCard?.userName ?? null,
-        });
+          cardIsPublished: newProfile.webCard?.cardIsPublished,
+          coverIsPredefined: newProfile.webCard?.coverIsPredefined,
+        };
+
+        let existingData: ProfileInfosInput | null = null;
+        if (profileInfos) {
+          const {
+            profileId,
+            webCardId,
+            profileRole,
+            invited,
+            webCardUserName,
+            cardIsPublished,
+            coverIsPredefined,
+          } = profileInfos;
+          existingData = {
+            profileId,
+            webCardId,
+            profileRole,
+            invited,
+            webCardUserName,
+            cardIsPublished,
+            coverIsPredefined,
+          };
+        }
+        if (!isEqual(newData, existingData)) {
+          onChangeWebCard(newData);
+        }
       }
     },
     [user.profiles],

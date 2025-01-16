@@ -92,6 +92,8 @@ const HomeProfilesCarousel = (
           webCard {
             id
             userName
+            cardIsPublished
+            coverIsPredefined
           }
           ...HomeProfilesCarouselItem_profile
         }
@@ -169,6 +171,8 @@ const HomeProfilesCarousel = (
           profileRole: profile.profileRole,
           invited: profile.invited,
           webCardUserName: profile.webCard?.userName,
+          coverIsPredefined: profile.webCard?.coverIsPredefined,
+          cardIsPublished: profile.webCard?.cardIsPublished,
         });
       } else {
         onChangeWebCard(null);

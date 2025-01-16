@@ -66,7 +66,7 @@ export const handleUploadCardModuleMedia = async (
 
   const chunks = splitArrayIntoChunks(
     cardModuleMedias,
-    MEMORY_SIZE < 6 ? 2 : 5,
+    MEMORY_SIZE < 6 ? 1 : 2,
   );
 
   const mediaToUploads: Array<{
