@@ -1,4 +1,4 @@
-## 1.7.0-canary.26
+## 1.7.0-canary.27
 
 * **fix:**  - refresh permission state after opening settings ([#6742](https://github.com/AzzappApp/azzapp/pull/6742))
 * **fix:**  - **cover:** [#6946](https://github.com/AzzappApp/azzapp/pull/6946) cover with no template case ([#6965](https://github.com/AzzappApp/azzapp/pull/6965))
