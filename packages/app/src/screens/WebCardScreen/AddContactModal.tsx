@@ -263,13 +263,13 @@ const AddContactModal = ({
             description: 'Button to view the contact',
           }),
           onPress: async () => {
-            const { status } =
-              await requestPhonebookPermissionAndRedirectToSettingsAsync();
-            if (status !== ContactPermissionStatus.GRANTED) {
-              return;
-            }
+            const allowSystemUI =
+              Platform.OS === 'ios'
+                ? (await requestPhonebookPermissionAndRedirectToSettingsAsync())
+                    .status === ContactPermissionStatus.GRANTED
+                : false;
 
-            if (Platform.OS === 'ios') {
+            if (allowSystemUI) {
               try {
                 const updatedContact = reworkContactForDeviceInsert(
                   scanned.contact,
@@ -536,7 +536,6 @@ const buildContact = async (
       label: address[0],
       street: address[1],
       isPrimary: address[0] === 'Main',
-      id: `${profileId}-${address[1]}`,
     })),
     phoneNumbers: phoneNumbers.map(phone => ({
       label:
@@ -545,7 +544,6 @@ const buildContact = async (
           : phone[0],
       number: phone[1],
       isPrimary: phone[0] === 'Main',
-      id: `${profileId}-${phone[1]}`,
     })),
     emails: emails.map(email => ({
       label:
@@ -554,7 +552,6 @@ const buildContact = async (
           : email[0],
       email: email[1],
       isPrimary: email[0] === 'Main',
-      id: `${profileId}-${email[1]}`,
     })),
     dates: birthdayDate
       ? [
@@ -563,7 +560,6 @@ const buildContact = async (
             year: birthdayDate?.getFullYear(),
             month: birthdayDate?.getMonth(),
             day: birthdayDate?.getDate(),
-            id: `${profileId}-birthday`,
           },
         ]
       : [],
@@ -579,7 +575,6 @@ const buildContact = async (
           {
             label: 'azzapp',
             url: buildUserUrl(userName),
-            id: `${profileId}-azzapp`,
           },
         ]
       : []
@@ -589,11 +584,11 @@ const buildContact = async (
         url:
           !url.address || url.address.toLocaleLowerCase().startsWith('http')
             ? url.address
-            : `http://${url.address}`,
-        id: `${profileId}-${url.address}`,
+            : `https://${url.address}`,
       })) ?? [],
     ),
     image,
+    imageAvailable: !!image,
   };
 
   return { contact, webCardId, profileId };

@@ -57,21 +57,6 @@ const ContactsScreenLists = ({
   const { requestPhonebookPermissionAndRedirectToSettingsAsync } =
     usePhonebookPermission();
 
-  // will setup the permission for this screen at first opening
-  useEffect(() => {
-    if (contactsPermissionStatus === ContactPermissionStatus.UNDETERMINED) {
-      const updatePermission = async () => {
-        const { status } =
-          await requestPhonebookPermissionAndRedirectToSettingsAsync();
-        setContactsPermissionStatus(status);
-      };
-      updatePermission();
-    }
-  }, [
-    contactsPermissionStatus,
-    requestPhonebookPermissionAndRedirectToSettingsAsync,
-  ]);
-
   // refresh local contact map
   const refreshLocalContacts = useCallback(async () => {
     if (contactsPermissionStatus === ContactPermissionStatus.GRANTED) {
@@ -81,11 +66,25 @@ const ContactsScreenLists = ({
     } // else wait for permission update
   }, [contactsPermissionStatus]);
 
-  useOnContactAdded(refreshLocalContacts);
-
+  // will setup the permission for this screen at first opening
   useEffect(() => {
-    refreshLocalContacts();
-  }, [refreshLocalContacts]);
+    if (contactsPermissionStatus === ContactPermissionStatus.UNDETERMINED) {
+      const updatePermission = async () => {
+        const { status } =
+          await requestPhonebookPermissionAndRedirectToSettingsAsync();
+        setContactsPermissionStatus(status);
+      };
+      updatePermission();
+    } else {
+      refreshLocalContacts();
+    }
+  }, [
+    contactsPermissionStatus,
+    refreshLocalContacts,
+    requestPhonebookPermissionAndRedirectToSettingsAsync,
+  ]);
+
+  useOnContactAdded(refreshLocalContacts);
 
   // ensure we refresh contacts oon resume
   useEffect(() => {
@@ -337,16 +336,24 @@ const ContactsScreenLists = ({
   });
 
   const onInviteContactInner = useCallback(
-    (
+    async (
       contact: ContactDetails | ContactType | ContactType[],
       onHideInvitation?: () => void,
     ) => {
-      onInviteContact(
+      const result = await onInviteContact(
         contactsPermissionStatus,
         contact,
         localContacts,
         onHideInvitation,
       );
+      if (result) {
+        if (result.status) {
+          setContactsPermissionStatus(result.status);
+        }
+        if (result.localContacts) {
+          setLocalContacts(result.localContacts);
+        }
+      }
     },
     [contactsPermissionStatus, localContacts, onInviteContact],
   );

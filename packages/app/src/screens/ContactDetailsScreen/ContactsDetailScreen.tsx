@@ -21,25 +21,21 @@ const ContactDetailsScreen = ({ route }: Props) => {
     PermissionStatus.UNDETERMINED,
   );
 
-  const { requestPhonebookPermissionAndRedirectToSettingsAsync } =
-    usePhonebookPermission();
+  const { requestPhonebookPermissionAsync } = usePhonebookPermission();
+
+  const updatePermission = useCallback(async () => {
+    const { status } = await requestPhonebookPermissionAsync();
+    setContactsPermissionStatus(status);
+  }, [requestPhonebookPermissionAsync]);
 
   // will setup the permission for this screen at first opening
   useEffect(() => {
     if (contactsPermissionStatus === PermissionStatus.UNDETERMINED) {
-      const updatePermission = async () => {
-        const { status } =
-          await requestPhonebookPermissionAndRedirectToSettingsAsync();
-        setContactsPermissionStatus(status);
-      };
       updatePermission();
     }
-  }, [
-    contactsPermissionStatus,
-    requestPhonebookPermissionAndRedirectToSettingsAsync,
-  ]);
+  }, [contactsPermissionStatus, updatePermission]);
 
-  // refresh loca contact map
+  // refresh local contact map
   const refreshLocalContacts = useCallback(async () => {
     if (contactsPermissionStatus === PermissionStatus.GRANTED) {
       setLocalContacts(await getLocalContactsMap());
@@ -68,8 +64,20 @@ const ContactDetailsScreen = ({ route }: Props) => {
 
   const onInviteContact = useOnInviteContact();
 
-  const onInviteContactInner = useCallback(() => {
-    onInviteContact(contactsPermissionStatus, contact, localContacts);
+  const onInviteContactInner = useCallback(async () => {
+    const result = await onInviteContact(
+      contactsPermissionStatus,
+      contact,
+      localContacts,
+    );
+    if (result) {
+      if (result.status) {
+        setContactsPermissionStatus(result.status);
+      }
+      if (result.localContacts) {
+        setLocalContacts(result.localContacts);
+      }
+    }
   }, [contact, contactsPermissionStatus, localContacts, onInviteContact]);
 
   return (

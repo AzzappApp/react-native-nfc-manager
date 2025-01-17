@@ -14,19 +14,44 @@ import {
   buildLocalContact,
   reworkContactForDeviceInsert,
 } from '#helpers/contactListHelpers';
+import { getLocalContactsMap } from '#helpers/getLocalContactsMap';
+import { usePhonebookPermission } from './usePhonebookPermission';
 import type { ContactDetails, ContactType } from '#helpers/contactListHelpers';
 import type { Contact } from 'expo-contacts';
 
+type InviteContactResult = {
+  status?: ContactPermissionStatus;
+  localContacts?: Contact[];
+};
+
 const useOnInviteContact = ({ onEnd }: { onEnd?: () => void } = {}) => {
   const intl = useIntl();
+
+  const { requestPhonebookPermissionAndRedirectToSettingsAsync } =
+    usePhonebookPermission();
+
   const onInviteContact = useCallback(
     async (
       contactsPermissionStatus: ContactPermissionStatus,
       contacts: ContactDetails | ContactType | ContactType[],
       localContacts?: Contact[],
       onHideInvitation?: () => void,
-    ) => {
+    ): Promise<InviteContactResult | undefined> => {
+      let result = undefined;
       try {
+        if (contactsPermissionStatus !== ContactPermissionStatus.GRANTED) {
+          const { status } =
+            await requestPhonebookPermissionAndRedirectToSettingsAsync();
+          contactsPermissionStatus = status;
+          if (contactsPermissionStatus === ContactPermissionStatus.GRANTED) {
+            // permission has just been granted, refresh localContacts
+            localContacts = await getLocalContactsMap();
+            result = { status, localContacts };
+          } else {
+            result = { status };
+          }
+        }
+
         const innerContacts = Array.isArray(contacts) ? contacts : [contacts];
         if (
           contactsPermissionStatus === ContactPermissionStatus.GRANTED &&
@@ -56,7 +81,7 @@ const useOnInviteContact = ({ onEnd }: { onEnd?: () => void } = {}) => {
                   : contact.emails
                       ?.map(({ email }) => email)
                       .filter(isDefined) || [],
-                localContacts,
+                localContacts || [],
                 profileId,
               );
 
@@ -90,7 +115,22 @@ const useOnInviteContact = ({ onEnd }: { onEnd?: () => void } = {}) => {
             }),
             ...contactsToUpdate.map(contactToUpdate => {
               const contact = reworkContactForDeviceInsert(contactToUpdate);
-              return updateContactAsync(contact);
+              try {
+                return updateContactAsync(contact);
+              } catch (error: any) {
+                Sentry.captureException(error);
+                Toast.show({
+                  type: 'error',
+                  text1: intl.formatMessage({
+                    defaultMessage: 'Update contact failed.',
+                    description:
+                      'Toast for update contact failed during contact update',
+                  }),
+                });
+                return new Promise(resolve => {
+                  resolve('');
+                });
+              }
             }),
           ]);
 
@@ -142,8 +182,9 @@ const useOnInviteContact = ({ onEnd }: { onEnd?: () => void } = {}) => {
           }),
         });
       }
+      return result;
     },
-    [intl, onEnd],
+    [intl, onEnd, requestPhonebookPermissionAndRedirectToSettingsAsync],
   );
   return onInviteContact;
 };
