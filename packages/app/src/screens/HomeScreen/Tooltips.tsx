@@ -5,6 +5,7 @@ import { PopoverMode } from 'react-native-popover-view';
 import { Placement, Point } from 'react-native-popover-view/dist/Types';
 import { ENABLE_MULTI_USER } from '#Config';
 import { useTooltipContext } from '#helpers/TooltipContext';
+import Text from '#ui/Text';
 import Tooltip from '#ui/Tooltip';
 
 type TooltipPosition = {
@@ -68,8 +69,11 @@ const Tooltips = () => {
         placement={Placement.TOP}
         header={
           <FormattedMessage
-            defaultMessage="Link to your WebCard"
+            defaultMessage="Link to your WebCard{azzappA}"
             description="WebCard tooltip link"
+            values={{
+              azzappA: <Text variant="azzapp">a</Text>,
+            }}
           />
         }
         description={
@@ -92,9 +96,12 @@ const Tooltips = () => {
           placement={Placement.LEFT}
           header={
             <FormattedMessage
-              defaultMessage="Your WebCard is a digital profile for you or your company, adding depth and design
-to your ContactCard. When shared on its own, it shows only the profile without contact details."
+              defaultMessage="Your WebCard{azzappA} is a digital profile that enhances your ContactCard with richer content.
+Shared alone, it displays the profile without contact details."
               description="WebCard tooltip caroussel"
+              values={{
+                azzappA: <Text variant="azzapp">a</Text>,
+              }}
             />
           }
           isVisible={tooltips['profileCarousel']?.visible}
@@ -108,8 +115,12 @@ to your ContactCard. When shared on its own, it shows only the profile without c
           placement={Placement.BOTTOM}
           header={
             <FormattedMessage
-              defaultMessage="Your ContactCard is a digital business card with your contact details. Sharing it provides recipients with both your WebCard and ContactCard for a complete presentation."
+              defaultMessage="Your ContactCard{azzappA} is a digital business card.
+Get your QR code scanned to share both contact details and digital profile."
               description="WebCard tooltip bottom"
+              values={{
+                azzappA: <Text variant="azzapp">a</Text>,
+              }}
             />
           }
           isVisible={tooltips['profileBottomPanel']?.visible}
