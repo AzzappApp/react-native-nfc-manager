@@ -1,5 +1,7 @@
-## 1.7.0-canary.21
+## 1.7.0-canary.22
 
+* **fix:**  - on auth profileInfos are partial
+* **fix:**  - on auth profileInfos are partial
 * **fix:**  - **home:** [#6951](https://github.com/AzzappApp/azzapp/pull/6951) update coverIsPredefined field ([#6953](https://github.com/AzzappApp/azzapp/pull/6953))
 * **fix:**  - truncated covers in search contact ByName ([#6952](https://github.com/AzzappApp/azzapp/pull/6952))
 * **fix:**  - ensure module is stored in replica
