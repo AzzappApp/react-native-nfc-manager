@@ -1,5 +1,6 @@
-## 1.7.0-canary.24
+## 1.7.0-canary.25
 
+* **fix:**  - **cover:** [#6946](https://github.com/AzzappApp/azzapp/pull/6946) cover with no template case ([#6965](https://github.com/AzzappApp/azzapp/pull/6965))
 * **fix:**  - **multiUser:** [#6957](https://github.com/AzzappApp/azzapp/pull/6957) push new invited value + simplify profile infos… ([#6959](https://github.com/AzzappApp/azzapp/pull/6959))
 * **fix:**  - add a see webcard button ([#6887](https://github.com/AzzappApp/azzapp/pull/6887))
 * **fix:**  - on auth profileInfos are partial
