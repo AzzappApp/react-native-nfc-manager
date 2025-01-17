@@ -14,7 +14,7 @@ import { isValidUserName } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import BottomSheetPopup from '#components/popup/BottomSheetPopup';
 import { PopupButton } from '#components/popup/PopupElements';
-import { getAuthState, onChangeWebCard } from '#helpers/authStore';
+import { onChangeWebCard } from '#helpers/authStore';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { useTooltipContext } from '#helpers/TooltipContext';
 import BottomSheetTextInput from '#ui/BottomSheetTextInput';
@@ -195,10 +195,7 @@ const HomeBottomSheetPopupPanel = ({
           onCompleted: () => {
             openTooltips(['profileEdit']);
 
-            const profileInfo = getAuthState().profileInfos;
-            if (profileInfo) {
-              onChangeWebCard({ ...profileInfo, webCardUserName: newUserName });
-            }
+            onChangeWebCard({ webCardUserName: newUserName });
           },
           updater: store => {
             // reorder carousel once userName is set

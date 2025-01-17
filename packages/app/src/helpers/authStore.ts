@@ -276,7 +276,7 @@ export const commonKeysAreEqual = (a: any, b: any) => {
 export const onChangeWebCard = async (
   infos?: Partial<ProfileInfosInput> | null,
 ) => {
-  const newData = infos ?? {
+  const defaultValues = {
     profileId: null,
     webCardId: null,
     profileRole: null,
@@ -285,7 +285,11 @@ export const onChangeWebCard = async (
     cardIsPublished: undefined,
     coverIsPredefined: undefined,
   };
-  const profileInfos = getAuthState().profileInfos;
+  const newData = infos ?? defaultValues;
+  const profileInfos = {
+    ...defaultValues,
+    ...getAuthState().profileInfos,
+  };
 
   if (!commonKeysAreEqual(profileInfos, newData)) {
     storage.set(
