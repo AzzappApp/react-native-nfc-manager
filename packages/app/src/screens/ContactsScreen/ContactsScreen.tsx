@@ -1,7 +1,6 @@
 import { Suspense, useCallback, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
-import { MMKV } from 'react-native-mmkv';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { colors } from '#theme';
@@ -20,10 +19,6 @@ import Text from '#ui/Text';
 import ContactScreenLists from './ContactsScreenLists';
 import type { ContactsScreenQuery } from '#relayArtifacts/ContactsScreenQuery.graphql';
 import type { PreloadedQuery } from 'react-relay';
-
-export const storage = new MMKV({
-  id: 'contacts',
-});
 
 const contactsScreenQuery = graphql`
   query ContactsScreenQuery($profileId: ID!) {

@@ -2,6 +2,7 @@ import { getContactByIdAsync } from 'expo-contacts';
 import { File } from 'expo-file-system/next';
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
+import { MMKV } from 'react-native-mmkv';
 import VCard from 'vcard-creator';
 import { SOCIAL_NETWORK_LINKS } from '@azzapp/shared/socialLinkHelpers';
 import {
@@ -13,11 +14,14 @@ import { textStyles } from '#theme';
 import { createStyleSheet } from '#helpers/createStyles';
 import type { Contact } from 'expo-contacts';
 import type { ColorSchemeName } from 'react-native';
-import type { MMKV } from 'react-native-mmkv';
 
 export const DELETE_BUTTON_WIDTH = 70;
 export const MAX_FIELD_HEIGHT = 85;
 const MIN_FIELD_HEIGHT = 72;
+
+export const contactStorage = new MMKV({
+  id: 'contacts',
+});
 
 export const buildContactCardModalStyleSheet = (appareance: ColorSchemeName) =>
   ({
@@ -235,14 +239,13 @@ export const useSocialLinkLabels = () => {
 };
 
 export const findLocalContact = async (
-  storage: MMKV,
   phoneNumbers: string[],
   emails: string[],
   localContacts: Contact[],
   profileId?: string,
 ): Promise<Contact | undefined> => {
-  if (profileId && storage.contains(profileId)) {
-    const internalId = storage.getString(profileId);
+  if (profileId && contactStorage.contains(profileId)) {
+    const internalId = contactStorage.getString(profileId);
     if (internalId) {
       const contactByInternalId = await getContactByIdAsync(internalId);
 

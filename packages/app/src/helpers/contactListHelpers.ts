@@ -1,17 +1,21 @@
 import * as Sentry from '@sentry/react-native';
 import { File, Paths } from 'expo-file-system/next';
 import { Platform } from 'react-native';
+import type { ContactDetailsModal_webCard$key } from '#relayArtifacts/ContactDetailsModal_webCard.graphql';
 import type { ContactsScreenLists_contacts$data } from '#relayArtifacts/ContactsScreenLists_contacts.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
-import type { Contact } from 'expo-contacts';
+import type { Contact, Image } from 'expo-contacts';
 
 export const buildLocalContact = async (
-  contact: ContactType,
+  contact: Contact | ContactType,
 ): Promise<Contact> => {
+  if (!('createdAt' in contact)) {
+    return contact;
+  }
   const personal = {
     addresses: contact.addresses.map(address => ({
       label: address.label,
-      // note we need to duplicate this field of ios / android comaptibility with expo-contacts
+      // note we need to duplicate this field of ios / android compatibility with expo-contacts
       street: address.address,
       address: address.address,
     })),
@@ -58,6 +62,19 @@ export const buildLocalContact = async (
     Sentry.captureException(e);
     console.error('download avatar failure', e);
   }
+  const image = avatar
+    ? {
+        // The downloaded avatar
+        uri: avatar.uri,
+      }
+    : 'image' in contact && contact.image
+      ? {
+          // The local image
+          uri: (contact.image as Image).uri,
+          width: (contact.image as Image).width,
+          height: (contact.image as Image).height,
+        }
+      : undefined;
 
   return {
     ...contact,
@@ -71,11 +88,8 @@ export const buildLocalContact = async (
     socialProfiles: personal.socialProfiles,
     urlAddresses: personal.urlAddresses,
     dates: updatedBirthDay || undefined,
-    image: avatar
-      ? {
-          uri: avatar.uri,
-        }
-      : undefined,
+    image,
+    imageAvailable: !!avatar,
     birthday: undefined,
   };
 };
@@ -115,7 +129,7 @@ export const reworkContactForDeviceInsert = (contact: Contact): Contact => {
   };
 };
 
-type ContactType = NonNullable<
+export type ContactType = NonNullable<
   NonNullable<
     NonNullable<
       ArrayItemType<
@@ -124,3 +138,9 @@ type ContactType = NonNullable<
     >
   >['node']
 >;
+
+export type ContactDetails = Contact & {
+  createdAt: Date;
+  profileId?: string;
+  webCard?: ContactDetailsModal_webCard$key | null;
+};

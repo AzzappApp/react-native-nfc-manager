@@ -1,8 +1,6 @@
 import * as Sentry from '@sentry/react-native';
 import {
-  addContactAsync,
   presentFormAsync,
-  updateContactAsync,
   PermissionStatus as ContactPermissionStatus,
 } from 'expo-contacts';
 import { File, Paths } from 'expo-file-system/next';
@@ -10,7 +8,6 @@ import { fromGlobalId } from 'graphql-relay';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Alert, Platform, StyleSheet, View } from 'react-native';
-import { MMKV } from 'react-native-mmkv';
 import Toast from 'react-native-toast-message';
 import {
   ConnectionHandler,
@@ -24,11 +21,11 @@ import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
-import { emitContactAdded } from '#helpers/addContactHelper';
 import { findLocalContact } from '#helpers/contactCardHelpers';
 import { reworkContactForDeviceInsert } from '#helpers/contactListHelpers';
 import { getLocalContactsMap } from '#helpers/getLocalContactsMap';
 import useBoolean from '#hooks/useBoolean';
+import useOnInviteContact from '#hooks/useOnInviteContact';
 import { usePhonebookPermission } from '#hooks/usePhonebookPermission';
 import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
@@ -46,10 +43,6 @@ import type { AddContactModalProfiles_user$key } from '#relayArtifacts/AddContac
 import type { CheckboxStatus } from '#ui/CheckBox';
 import type { CommonInformation } from '@azzapp/shared/contactCardHelpers';
 import type { Contact, Image } from 'expo-contacts';
-
-export const storage = new MMKV({
-  id: 'contacts',
-});
 
 type Props = {
   contactData?: string | null;
@@ -175,11 +168,14 @@ const AddContactModal = ({
     };
   }, [scanned, viewer, withShareBack]);
 
+  const onInviteContact = useOnInviteContact();
+
   const onRequestAddContactToPhonebook = useCallback(async () => {
     if (!scanned) return;
 
+    let localContacts = await getLocalContactsMap();
+
     const findContact = async () => {
-      const localContacts = await getLocalContactsMap();
       const phoneNumbers =
         scanned.contact.phoneNumbers
           ?.map(({ number }) => number)
@@ -189,7 +185,6 @@ const AddContactModal = ({
         [];
 
       return findLocalContact(
-        storage,
         phoneNumbers,
         emails,
         localContacts,
@@ -240,58 +235,23 @@ const AddContactModal = ({
           text: addOrUpdateText,
           onPress: async () => {
             try {
-              let messageToast = '';
-              // Here we don't want to display popup
               const { status } =
                 await requestPhonebookPermissionAndRedirectToSettingsAsync();
-              if (status === ContactPermissionStatus.GRANTED) {
-                if (!foundContact) {
-                  foundContact = await findContact();
-                }
-                if (foundContact && foundContact.id) {
-                  const image = await downloadAvatar(
-                    scanned.profileId,
-                    additionalContactData,
-                  );
-
-                  const updatedContact = reworkContactForDeviceInsert({
-                    ...scanned.contact,
-                    image,
-                    imageAvailable: !!image,
-                    id: foundContact.id,
-                  });
-                  await updateContactAsync(updatedContact);
-                  messageToast = intl.formatMessage({
-                    defaultMessage: 'The contact was updated successfully.',
-                    description:
-                      'Toast message when a contact is updated successfully',
-                  });
-                } else {
-                  const newContact = {
-                    ...scanned.contact,
-                    urls: additionalContactData?.urls,
-                    socials: additionalContactData?.socials,
-                  };
-                  const contactToAddReworked =
-                    reworkContactForDeviceInsert(newContact);
-                  const resultId = await addContactAsync(contactToAddReworked);
-
-                  if (scanned.profileId) {
-                    storage.set(scanned.profileId, resultId);
-                  }
-                  messageToast = intl.formatMessage({
-                    defaultMessage: 'The contact was created successfully.',
-                    description:
-                      'Toast message when a contact is created successfully',
-                  });
-                }
-
-                Toast.show({
-                  type: 'success',
-                  text1: messageToast,
-                });
-                emitContactAdded();
+              if (
+                status === ContactPermissionStatus.GRANTED &&
+                !localContacts
+              ) {
+                localContacts = await getLocalContactsMap();
               }
+              await onInviteContact(
+                status,
+                {
+                  ...scanned.contact,
+                  profileId: scanned.profileId,
+                  createdAt: new Date(),
+                },
+                localContacts,
+              );
             } catch (e) {
               console.error(e);
             }
@@ -346,7 +306,7 @@ const AddContactModal = ({
     requestPhonebookPermissionAsync,
     intl,
     requestPhonebookPermissionAndRedirectToSettingsAsync,
-    additionalContactData,
+    onInviteContact,
     router,
   ]);
 
@@ -383,16 +343,30 @@ const AddContactModal = ({
           console.warn('fail to add contact ?');
         }
       },
-      onCompleted: close,
+      onCompleted: () => {
+        close();
+        Toast.show({
+          type: 'success',
+          text1: intl.formatMessage({
+            defaultMessage: 'The contact was created successfully.',
+            description: 'Toast message when a contact is created successfully',
+          }),
+        });
+      },
       onError: e => {
         console.warn('error adding contact', e);
+        Sentry.captureException(e);
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'The contact was not create. try again',
+            description:
+              'Toast message when a contact failed to be created successfully',
+          }),
+        });
       },
     });
-  }, [scanned, viewer, getContactInput, commit, close]);
-
-  const onDismiss = useCallback(() => {
-    onRequestAddContactToPhonebook();
-  }, [onRequestAddContactToPhonebook]);
+  }, [scanned, viewer, getContactInput, commit, close, intl]);
 
   useEffect(() => {
     (async () => {
@@ -416,21 +390,6 @@ const AddContactModal = ({
     })();
   }, [contactData, webCard, additionalContactData, scanned, open]);
 
-  const onShowContact = useCallback(() => {
-    if (!scanned) return;
-
-    // When user click on add contact, the contact shall always be added to azzapp contacts
-    onAddContactToAzzapp();
-    const messageToast = intl.formatMessage({
-      defaultMessage: 'The contact was created successfully.',
-      description: 'Toast message when a contact is created successfully',
-    });
-    Toast.show({
-      type: 'success',
-      text1: messageToast,
-    });
-  }, [intl, onAddContactToAzzapp, scanned]);
-
   const userName = useMemo(() => {
     if (scanned) {
       const { contact } = scanned;
@@ -452,7 +411,7 @@ const AddContactModal = ({
   return (
     <BottomSheetModal
       visible={show}
-      onDismiss={onDismiss}
+      onDismiss={onRequestAddContactToPhonebook}
       height={700 + bottom}
       lazy
       enableContentPanningGesture={false}
@@ -500,7 +459,7 @@ const AddContactModal = ({
             defaultMessage: 'Add to my WebCard contacts',
             description: 'AddContactModal - Submit title',
           })}
-          onPress={onShowContact}
+          onPress={onAddContactToAzzapp}
         />
         <PressableNative onPress={close} style={styles.notAddButton}>
           <Text variant="medium" style={styles.notAddLabel}>
@@ -520,7 +479,6 @@ const downloadAvatar = async (
   additionalContactData: Props['additionalContactData'],
 ) => {
   let image: Image | undefined = undefined;
-
   if (additionalContactData?.avatarUrl) {
     try {
       const avatar = new File(Paths.cache.uri + profileId);

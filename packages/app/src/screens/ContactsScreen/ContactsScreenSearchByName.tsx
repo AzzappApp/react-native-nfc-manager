@@ -6,26 +6,24 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Text from '#ui/Text';
 import ContactSearchByNameItem from './ContactSearchByNameItem';
-import type { ContactsScreenLists_contacts$data } from '#relayArtifacts/ContactsScreenLists_contacts.graphql';
-import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
+import type { ContactType } from '#helpers/contactListHelpers';
+import type { ContactActionProps } from './ContactsScreenLists';
 import type {
   PermissionStatus as ContactPermissionStatus,
   Contact,
 } from 'expo-contacts';
 import type { SectionListData, SectionListRenderItemInfo } from 'react-native';
-import type { MMKV } from 'react-native-mmkv';
 
 type Props = {
   contacts: ContactType[];
   onEndReached: () => void;
   onRefresh: () => void;
   refreshing: boolean;
-  onRemoveContacts: (contacts: string[]) => void;
   onInviteContact: (contact: ContactType, onHideInvitation: () => void) => void;
   onShowContact: (contact: ContactType) => void;
-  storage: MMKV;
   localContacts: Contact[];
   contactsPermissionStatus: ContactPermissionStatus;
+  showContactAction: (arg: ContactActionProps | undefined) => void;
 };
 
 const ContactsScreenSearchByName = ({
@@ -33,12 +31,11 @@ const ContactsScreenSearchByName = ({
   onEndReached,
   onRefresh,
   refreshing,
-  onRemoveContacts,
   onInviteContact,
   onShowContact,
-  storage,
   localContacts,
   contactsPermissionStatus,
+  showContactAction,
 }: Props) => {
   const { bottom } = useScreenInsets();
   const styles = useStyleSheet(stylesheet);
@@ -96,22 +93,20 @@ const ContactsScreenSearchByName = ({
       return (
         <ContactSearchByNameItem
           contact={item}
-          onRemoveContact={onRemoveContacts}
           onInviteContact={onInviteContact}
           onShowContact={onShowContact}
-          storage={storage}
           localContacts={localContacts}
           contactsPermissionStatus={contactsPermissionStatus}
+          showContactAction={showContactAction}
         />
       );
     },
     [
+      showContactAction,
       contactsPermissionStatus,
       localContacts,
       onInviteContact,
-      onRemoveContacts,
       onShowContact,
-      storage,
     ],
   );
 
@@ -159,15 +154,5 @@ const stylesheet = createStyleSheet(theme => ({
     backgroundColor: theme === 'light' ? colors.grey50 : colors.grey900,
   },
 }));
-
-type ContactType = NonNullable<
-  NonNullable<
-    NonNullable<
-      ArrayItemType<
-        ContactsScreenLists_contacts$data['searchContacts']['edges']
-      >
-    >
-  >['node']
->;
 
 export default ContactsScreenSearchByName;

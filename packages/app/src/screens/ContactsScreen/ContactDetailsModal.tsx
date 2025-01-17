@@ -5,8 +5,7 @@ import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import useScreenDimensions from '#hooks/useScreenDimensions';
 import ContactDetailsBody from '#screens/ContactDetailsScreen/ContactDetailsBody';
 import BottomSheetModal from '#ui/BottomSheetModal';
-import type { ContactDetailsModal_webCard$key } from '#relayArtifacts/ContactDetailsModal_webCard.graphql';
-import type { Contact } from 'expo-contacts';
+import type { ContactDetails } from '#helpers/contactListHelpers';
 import type { ForwardedRef } from 'react';
 
 export type ContactDetailsModalActions = {
@@ -110,12 +109,6 @@ const ContactDetailsModal = (
       )}
     </BottomSheetModal>
   );
-};
-
-export type ContactDetails = Contact & {
-  createdAt: Date;
-  profileId?: string;
-  webCard?: ContactDetailsModal_webCard$key | null;
 };
 
 export default forwardRef(ContactDetailsModal);
