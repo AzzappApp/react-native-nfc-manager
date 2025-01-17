@@ -101,7 +101,7 @@ export const createCoverVideoComposition = (
         const itemDuration = timeRange.duration;
         items.push({
           id: media.id,
-          path,
+          path: path.replace('file://', ''),
           startTime: timeRange.startTime,
           compositionStartTime: duration,
           duration: itemDuration,
