@@ -10,6 +10,7 @@ import { processShareBackSubmission } from '#app/actions/shareBackAction';
 import Loader from '#components/Loader';
 import Button from '#ui/Button';
 import FormInput from '#ui/Form/FormInput';
+import PhoneInput from './PhoneInput';
 import { ShareBackFormSchema } from './shareBackFormSchema';
 import styles from './ShareBackModalForm.css';
 
@@ -147,8 +148,8 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
             />
           </div>
           <div className={styles.formField}>
-            <FormInput
-              {...getInputProps(fields.phone, { type: 'text' })}
+            <PhoneInput
+              field={fields.phone}
               key={fields.phone.id}
               className={styles.formInput}
               placeholder={intl.formatMessage({

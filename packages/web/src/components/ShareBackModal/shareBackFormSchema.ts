@@ -1,7 +1,12 @@
 import { z } from 'zod';
 
 export const emailSchema = z.string().optional();
-export const phoneNumberSchema = z.string().optional();
+export const phoneNumberSchema = z
+  .object({
+    number: z.string().optional(),
+    countryCode: z.string().optional(),
+  })
+  .optional();
 
 export const ShareBackFormSchema = z
   .object({
@@ -22,3 +27,5 @@ export const ShareBackFormSchema = z
       message: 'At least one field must be filled out',
     },
   );
+
+export type phoneNumberSchemaType = z.infer<typeof phoneNumberSchema>;

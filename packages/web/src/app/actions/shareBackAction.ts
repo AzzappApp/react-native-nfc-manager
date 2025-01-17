@@ -3,6 +3,7 @@
 import { parseWithZod } from '@conform-to/zod';
 import * as Sentry from '@sentry/nextjs';
 import { jwtDecode } from 'jwt-decode';
+import { parsePhoneNumberWithError } from 'libphonenumber-js';
 import { compressToEncodedURIComponent } from 'lz-string';
 import { headers } from 'next/headers';
 import {
@@ -30,13 +31,17 @@ import type { EmailAttachment } from '#helpers/emailHelpers';
 import type { NewSharedContact } from '@azzapp/data';
 import type { SubmissionResult } from '@conform-to/react';
 import type { JwtPayload } from 'jwt-decode';
+import type { CountryCode } from 'libphonenumber-js';
 
 export type ShareBackFormData = FormData & {
   firstName: string;
   lastName: string;
   title: string;
   company: string;
-  phone: string;
+  phone: {
+    number: string;
+    countryCode: string;
+  };
   email: string;
 };
 
@@ -140,7 +145,26 @@ export const processShareBackSubmission = async (
       description: 'Email body for new contact share back',
     });
 
-    await saveShareBack(profile.id, submission.payload as NewSharedContact);
+    let phone = submission.value.phone?.number || '';
+
+    try {
+      const { number } = parsePhoneNumberWithError(
+        submission.value.phone?.number || '',
+        {
+          defaultCountry: submission.value.phone?.countryCode as CountryCode,
+        },
+      );
+      phone = number;
+    } catch (e) {
+      Sentry.captureException(e);
+    }
+
+    const contactFormValue: NewSharedContact = {
+      ...(submission.payload as NewSharedContact),
+      phone,
+    };
+
+    await saveShareBack(profile.id, contactFormValue);
 
     await sendPushNotification(profile.userId, {
       type: 'shareBack',
@@ -151,9 +175,7 @@ export const processShareBackSubmission = async (
     });
 
     if (contactMethod.method === CONTACT_METHODS.SMS) {
-      const shareBackContactDetails = getValuesFromSubmitData(
-        submission.payload,
-      );
+      const shareBackContactDetails = getValuesFromSubmitData(contactFormValue);
 
       const signature = await shareBackSignature(
         process.env.CONTACT_CARD_SIGNATURE_SECRET ?? '',
@@ -171,9 +193,8 @@ export const processShareBackSubmission = async (
         mediaUrl: shareBackContactVCardUrl,
       });
     } else {
-      const buildVCardContact = buildVCardFromShareBackContact(
-        submission.payload,
-      );
+      const buildVCardContact =
+        buildVCardFromShareBackContact(contactFormValue);
 
       const vCardFileName = shareBackVCardFilename(submission.value);
 

@@ -52,7 +52,10 @@ const formData = {
   lastName: 'Doe',
   title: 'Developer',
   company: 'Tech Inc',
-  phone: '1234567890',
+  phone: {
+    number: '1234567890',
+    countryCode: 'FR',
+  },
   email: 'john.doe@example.com',
 } as ShareBackFormData;
 

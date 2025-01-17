@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as Sentry from '@sentry/react-native';
 import parsePhoneNumberFromString, {
-  parsePhoneNumber,
+  parsePhoneNumberWithError,
 } from 'libphonenumber-js';
 import capitalize from 'lodash/capitalize';
 import { forwardRef, useImperativeHandle, useMemo, useState } from 'react';
@@ -31,6 +31,7 @@ import {
   downloadContactImage,
 } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
+import { parsePhoneNumber } from '#helpers/phoneNumbersHelper';
 import ContactCardEditForm from '#screens/ContactCardEditScreen/ContactCardEditForm';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -39,6 +40,7 @@ import SafeAreaView from '#ui/SafeAreaView';
 import Text from '#ui/Text';
 import MultiUserAddForm from './MultiUserAddForm';
 import type { EmailPhoneInput } from '#components/EmailOrPhoneInput';
+import type { ContactCardPhoneNumber } from '#helpers/phoneNumbersHelper';
 import type { MultiUserAddModal_InviteUserMutation } from '#relayArtifacts/MultiUserAddModal_InviteUserMutation.graphql';
 import type { MultiUserAddModal_webCard$key } from '#relayArtifacts/MultiUserAddModal_webCard.graphql';
 import type { ContactCardFormValues } from '#screens/ContactCardEditScreen/ContactCardSchema';
@@ -274,11 +276,13 @@ const MultiUserAddModal = (
             firstName: contact.firstName,
             lastName: contact.lastName,
             phoneNumbers:
-              contact.phoneNumbers?.map(a => ({
-                label: normalizePhoneMailLabel(a.label),
-                number: a.number,
-                selected: true,
-              })) ?? [],
+              contact.phoneNumbers
+                ?.map<ContactCardPhoneNumber>(a => ({
+                  label: normalizePhoneMailLabel(a.label),
+                  number: a.number || '',
+                  selected: true,
+                }))
+                .map(parsePhoneNumber) ?? [],
             emails:
               contact.emails?.map(a => ({
                 label: normalizePhoneMailLabel(a.label),
@@ -475,7 +479,7 @@ const MultiUserAddModal = (
 
         const phoneNumber =
           selectedContact.countryCodeOrEmail !== 'email'
-            ? parsePhoneNumber(
+            ? parsePhoneNumberWithError(
                 selectedContact.value,
                 selectedContact.countryCodeOrEmail,
               ).formatInternational()
