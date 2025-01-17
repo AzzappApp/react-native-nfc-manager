@@ -4,8 +4,7 @@ import Toast from 'react-native-toast-message';
 import { commitLocalUpdate, useRelayEnvironment } from 'react-relay';
 import ERRORS from '@azzapp/shared/errors';
 import { useRouter } from '#components/NativeRouter';
-import { getAuthState } from '#helpers/authStore';
-import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import { getAuthState, onChangeWebCard } from '#helpers/authStore';
 import type { GraphQLError } from 'graphql';
 
 type GraphQLErrors = { response: { errors: GraphQLError[] } };
@@ -40,14 +39,11 @@ const useHandleProfileActionError = (errorText: string) => {
             }
           });
 
-          dispatchGlobalEvent({
-            type: 'PROFILE_ROLE_CHANGE',
-            payload: {
-              profileRole: role as string,
-            },
-          }).then(() => {
-            router.backToTop();
+          onChangeWebCard({
+            profileRole: role,
           });
+
+          router.backToTop();
         }
       }
       if (error.message === ERRORS.UNAUTHORIZED) {

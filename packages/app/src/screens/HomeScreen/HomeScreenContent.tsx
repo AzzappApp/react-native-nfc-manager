@@ -3,8 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { runOnJS, useAnimatedReaction } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
-import { getAuthState } from '#helpers/authStore';
-import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import { onChangeWebCard } from '#helpers/authStore';
 import useBoolean from '#hooks/useBoolean';
 import useNotifications from '#hooks/useNotifications';
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -107,16 +106,9 @@ const HomeScreenContent = ({
 
   // TODO: here we rely on polling on HOME to check if the profileRole has changed. We should have a better way to keep our app state in sync with the server.
   useEffect(() => {
-    const { profileInfos } = getAuthState();
-    if (
-      currentProfile?.profileRole &&
-      profileInfos?.profileRole !== currentProfile.profileRole
-    ) {
-      void dispatchGlobalEvent({
-        type: 'PROFILE_ROLE_CHANGE',
-        payload: {
-          profileRole: currentProfile.profileRole,
-        },
+    if (currentProfile?.profileRole) {
+      onChangeWebCard({
+        profileRole: currentProfile.profileRole,
       });
     }
   }, [currentProfile?.profileRole]);
