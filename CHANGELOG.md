@@ -1,5 +1,6 @@
-## 1.7.0-canary.22
+## 1.7.0-canary.23
 
+* **fix:**  - add a see webcard button ([#6887](https://github.com/AzzappApp/azzapp/pull/6887))
 * **fix:**  - on auth profileInfos are partial
 * **fix:**  - on auth profileInfos are partial
 * **fix:**  - **home:** [#6951](https://github.com/AzzappApp/azzapp/pull/6951) update coverIsPredefined field ([#6953](https://github.com/AzzappApp/azzapp/pull/6953))
