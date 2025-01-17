@@ -1,5 +1,6 @@
-## 1.7.0-canary.23
+## 1.7.0-canary.24
 
+* **fix:**  - **multiUser:** [#6957](https://github.com/AzzappApp/azzapp/pull/6957) push new invited value + simplify profile infos… ([#6959](https://github.com/AzzappApp/azzapp/pull/6959))
 * **fix:**  - add a see webcard button ([#6887](https://github.com/AzzappApp/azzapp/pull/6887))
 * **fix:**  - on auth profileInfos are partial
 * **fix:**  - on auth profileInfos are partial
