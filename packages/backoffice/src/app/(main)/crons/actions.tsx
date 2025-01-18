@@ -13,7 +13,6 @@ export async function unpublishWebCards() {
     },
   );
 
-
   if (!response.ok) {
     throw new Error(`${response.status}`);
   }
