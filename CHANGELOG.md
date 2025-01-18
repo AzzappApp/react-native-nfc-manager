@@ -1,5 +1,8 @@
-## 1.7.0-canary.27
+## 1.7.0-canary.28
 
+* **fix:**  - **deepLink:** [#6158](https://github.com/AzzappApp/azzapp/pull/6158) don’t route to home (router don’t support it) ([#6966](https://github.com/AzzappApp/azzapp/pull/6966))
+* **feat:**  - **home:** tooltip text updates ([#6967](https://github.com/AzzappApp/azzapp/pull/6967))
+* **fix:**  - **payment:** [#5176](https://github.com/AzzappApp/azzapp/pull/5176) add a way to run manually cron ([#6974](https://github.com/AzzappApp/azzapp/pull/6974))
 * **fix:**  - refresh permission state after opening settings ([#6742](https://github.com/AzzappApp/azzapp/pull/6742))
 * **fix:**  - **cover:** [#6946](https://github.com/AzzappApp/azzapp/pull/6946) cover with no template case ([#6965](https://github.com/AzzappApp/azzapp/pull/6965))
 * **fix:**  - **multiUser:** [#6957](https://github.com/AzzappApp/azzapp/pull/6957) push new invited value + simplify profile infos… ([#6959](https://github.com/AzzappApp/azzapp/pull/6959))
