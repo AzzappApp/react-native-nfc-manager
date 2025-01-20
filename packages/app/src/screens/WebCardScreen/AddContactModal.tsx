@@ -563,6 +563,14 @@ const buildContact = async (
           },
         ]
       : [],
+    birthday: birthdayDate
+      ? {
+          label: 'birthday',
+          year: birthdayDate?.getFullYear(),
+          month: birthdayDate?.getMonth(),
+          day: birthdayDate?.getDate(),
+        }
+      : undefined,
     socialProfiles:
       additionalContactData?.socials?.map(social => ({
         label: social.label,
@@ -590,7 +598,6 @@ const buildContact = async (
     image,
     imageAvailable: !!image,
   };
-
   return { contact, webCardId, profileId };
 };
 

@@ -46,16 +46,12 @@ export const buildLocalContact = async (
 
   let updatedBirthDay = undefined;
   if (contact.birthday) {
-    let contactBirthday: Date | undefined;
-    if (contact.birthday instanceof Date) {
-      contactBirthday = contact.birthday;
-    } else if (
-      typeof contact.birthday === 'string' ||
-      typeof contact.birthday === 'number'
-    ) {
-      contactBirthday = new Date(contact.birthday);
-    }
-    if (contactBirthday) {
+    // Warning contact.birthday can be a Date from expo-contacts
+    // not a date from JS
+    if (typeof contact.birthday === 'object') {
+      updatedBirthDay = [contact.birthday];
+    } else {
+      const contactBirthday = new Date(contact.birthday);
       updatedBirthDay = [
         {
           label: 'birthday',
@@ -109,7 +105,7 @@ export const buildLocalContact = async (
     phoneNumbers: personal.phoneNumbers,
     socialProfiles: personal.socialProfiles,
     urlAddresses: personal.urlAddresses,
-    dates: updatedBirthDay || undefined,
+    dates: updatedBirthDay,
     image,
     imageAvailable: !!avatar,
     birthday: undefined,
