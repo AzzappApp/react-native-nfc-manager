@@ -179,7 +179,15 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
             </PressableNative>
           ))}
           {birthday && (
-            <PressableNative style={styles.item} key="birthday">
+            <PressableNative
+              style={styles.item}
+              key="birthday"
+              onPress={async () => {
+                openCalendar(
+                  `${birthday.year}-${birthday.month + 1}-${birthday.day}`,
+                );
+              }}
+            >
               <View style={styles.label}>
                 <Icon icon="calendar" />
                 <Text variant="smallbold">
@@ -244,6 +252,18 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
             <PressableNative
               key={'street' + index + '' + address.street}
               style={styles.item}
+              onPress={async () => {
+                const url = Platform.select({
+                  ios: `maps:0,0?q=${address.street}`,
+                  android: `geo:0,0?q=${address.street}`,
+                });
+
+                if (url) {
+                  Linking.openURL(url);
+                } else {
+                  console.warn(`${address.street} is not an adress`);
+                }
+              }}
             >
               <View style={styles.label}>
                 <Icon icon="location" />
@@ -294,6 +314,17 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
       </View>
     </Container>
   );
+};
+
+const openCalendar = (date: string) => {
+  const birthDate = new Date(date).setFullYear(new Date().getFullYear());
+  if (Platform.OS === 'ios') {
+    const from = new Date('2001-01-01').getTime() / 1000;
+    const seconds = Math.floor(birthDate / 1000) - from;
+    Linking.openURL('calshow:' + seconds);
+  } else if (Platform.OS === 'android') {
+    Linking.openURL('content://com.android.calendar/time/' + birthDate);
+  }
 };
 
 const getSocialUrl = (url: string) =>
