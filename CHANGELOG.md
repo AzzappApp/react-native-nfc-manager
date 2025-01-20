@@ -1,5 +1,7 @@
-## 1.7.0-canary.39
+## 1.7.0-canary.40
 
+* **fix:**  - date import in expo contacts ([#7004](https://github.com/AzzappApp/azzapp/pull/7004))
+* **fix:**  - in app purchase ui ([#7006](https://github.com/AzzappApp/azzapp/pull/7006))
 * **fix:**  - add delay in grid item appearence ([#7000](https://github.com/AzzappApp/azzapp/pull/7000))
 * **fix:**  - **payment:** wrong naming in result
 * **feat:**  - add share webcard link from contact ([#6987](https://github.com/AzzappApp/azzapp/pull/6987))
