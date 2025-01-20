@@ -7,7 +7,6 @@ import * as mime from 'react-native-mime-types';
 import Toast from 'react-native-toast-message';
 import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
 import { Observable } from 'relay-runtime';
-import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
 import {
   preventModalDismiss,
@@ -139,7 +138,7 @@ const ContactCardEditScreen = ({
     logo: null,
   };
 
-  const [commit] = useMutation(graphql`
+  const [commit, loading] = useMutation(graphql`
     mutation ContactCardEditScreenMutation(
       $profileId: ID!
       $contactCard: ContactCardInput!
@@ -270,12 +269,14 @@ const ContactCardEditScreen = ({
     } else {
       uploads.push(null);
     }
-
-    setProgressIndicator(
-      combineMultiUploadProgresses(
-        convertToNonNullArray(uploads.map(upload => upload?.progress)),
-      ),
-    );
+    const uploadsToDo = uploads.filter(val => val !== null);
+    if (uploadsToDo.length) {
+      setProgressIndicator(
+        combineMultiUploadProgresses(
+          uploadsToDo.map(upload => upload.progress),
+        ),
+      );
+    }
 
     const [uploadedAvatarId, uploadedLogoId] = await Promise.all(
       uploads.map(upload =>
@@ -404,7 +405,7 @@ const ContactCardEditScreen = ({
                 description: 'Edit contact card modal save button label',
               })}
               testID="save-contact-card"
-              loading={isSubmitting}
+              loading={isSubmitting || loading}
               onPress={submit}
               variant="primary"
               style={styles.headerButton}
