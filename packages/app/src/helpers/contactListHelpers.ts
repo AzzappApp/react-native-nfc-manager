@@ -9,45 +9,67 @@ import type { Contact, Image } from 'expo-contacts';
 export const buildLocalContact = async (
   contact: Contact | ContactType,
 ): Promise<Contact> => {
-  if (!('createdAt' in contact)) {
-    return contact;
-  }
   const personal = {
-    addresses: contact.addresses.map(address => ({
-      label: address.label,
-      // note we need to duplicate this field of ios / android compatibility with expo-contacts
-      street: address.address,
-      address: address.address,
-    })),
-    emails: contact.emails.map(({ label, address }) => ({
-      label,
-      email: address,
-    })),
-    phoneNumbers: contact.phoneNumbers.map(({ label, number }) => ({
-      label,
-      number,
-    })),
+    addresses: contact.addresses?.map(address => {
+      return 'address' in address
+        ? {
+            label: address.label,
+            // note we need to duplicate this field of ios / android compatibility with expo-contacts
+            street: address.address,
+            address: address.address,
+          }
+        : address;
+    }),
+    emails: contact.emails?.map(email => {
+      return 'address' in email
+        ? {
+            label: email.label,
+            email: email.address,
+          }
+        : email;
+    }),
+    phoneNumbers: contact.phoneNumbers?.map(({ label, number }) => {
+      return {
+        label,
+        number,
+      };
+    }),
     socialProfiles:
-      contact.socials?.map(({ label, url }) => ({ label, url })) ?? [],
-    urlAddresses: contact?.urls?.map(({ url }) => ({ label: '', url })) ?? [],
+      'socials' in contact
+        ? contact.socials?.map(({ label, url }) => ({ label, url }))
+        : contact.socialProfiles,
+    urlAddresses:
+      'urls' in contact
+        ? contact?.urls?.map(({ url }) => ({ label: '', url }))
+        : contact?.urlAddresses,
   };
 
   let updatedBirthDay = undefined;
   if (contact.birthday) {
-    const birthday = new Date(contact.birthday);
-    updatedBirthDay = [
-      {
-        label: 'birthday',
-        year: birthday?.getFullYear(),
-        month: birthday?.getMonth(),
-        day: birthday?.getDate(),
-      },
-    ];
+    let contactBirthday: Date | undefined;
+    if (contact.birthday instanceof Date) {
+      contactBirthday = contact.birthday;
+    } else if (
+      typeof contact.birthday === 'string' ||
+      typeof contact.birthday === 'number'
+    ) {
+      contactBirthday = new Date(contact.birthday);
+    }
+    if (contactBirthday) {
+      updatedBirthDay = [
+        {
+          label: 'birthday',
+          year: contactBirthday.getFullYear(),
+          month: contactBirthday.getMonth(),
+          day: contactBirthday.getDate(),
+        },
+      ];
+    }
   }
 
   let avatar = null;
   try {
-    if (contact.contactProfile?.avatar?.uri) {
+    if ('contactProfile' in contact && contact.contactProfile?.avatar?.uri) {
       const file = new File(
         Paths.cache.uri + contact.contactProfile?.avatar.id,
       );
@@ -80,7 +102,7 @@ export const buildLocalContact = async (
     ...contact,
     name: `${contact.firstName} ${contact.lastName}`,
     contactType: 'person' as const,
-    jobTitle: contact.title,
+    jobTitle: 'title' in contact ? contact.title : contact.jobTitle,
     company: contact.company,
     addresses: personal.addresses,
     emails: personal.emails,
