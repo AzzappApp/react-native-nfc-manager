@@ -1,5 +1,7 @@
-## 1.7.0-canary.35
+## 1.7.0-canary.36
 
+* **fix:**  - do not extract common information if multiuser is disabled ([#6989](https://github.com/AzzappApp/azzapp/pull/6989))
+* **fix:**  - paths have changed on iOS
 * **fix:**  - do not display see webcard if contact don't have webcard ([#6986](https://github.com/AzzappApp/azzapp/pull/6986))
 * **fix:**  - stop playback when webcard is not focused ([#6988](https://github.com/AzzappApp/azzapp/pull/6988))
 * **build:**  - upgrade native dependencies ([#6981](https://github.com/AzzappApp/azzapp/pull/6981))
