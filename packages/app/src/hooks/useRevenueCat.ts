@@ -22,29 +22,4 @@ export const useRevenueCat = (userId: string | null | undefined) => {
       });
     };
   }, [userId]);
-
-  //TODO: as we are using the database as reference , not sure we need this
-  // useEffect(() => {
-  //   const listenerRc = (customerInfo: CustomerInfo) => {
-  //     console.log('listenerRc customerInfo', customerInfo);
-  //     commitLocalUpdate(getRelayEnvironment(), store => {
-  //       const { profileInfos } = getAuthState(); //need to refrehs it inside the callback
-
-  //       if (
-  //         profileInfos?.webCardId &&
-  //         customerInfo.entitlements.active?.multiuser?.isActive
-  //       ) {
-  //         console.log('pushing the isPremirum ');
-  //         store.get(profileInfos.webCardId)?.setValue(true, 'isPremium');
-  //       } else {
-  //         store.get(profileInfos.webCardId)?.setValue(true, 'isPremium');
-  //       }
-  //     });
-  //   };
-  //   Purchases.addCustomerInfoUpdateListener(listenerRc);
-
-  //   return () => {
-  //     Purchases.removeCustomerInfoUpdateListener(listenerRc);
-  //   };
-  // }, []);
 };

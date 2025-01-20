@@ -103,6 +103,7 @@ const subscriptionWebHook = async (req: Request) => {
               totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
               freeSeats: 0,
               status: 'canceled',
+              invalidatedAt: new Date(),
             });
           } else {
             await updateActiveUserSubscription(userId, {
@@ -225,7 +226,7 @@ const subscriptionWebHook = async (req: Request) => {
                       ? 'google'
                       : 'web',
                 freeSeats: 0,
-                status: 'active',
+                status: 'canceled',
               });
             } else {
               await updateActiveUserSubscription(userId, {
@@ -233,7 +234,7 @@ const subscriptionWebHook = async (req: Request) => {
                 revenueCatId: rcId,
                 subscriptionId,
                 freeSeats: 0,
-                status: 'active',
+                status: 'canceled',
               });
             }
           });

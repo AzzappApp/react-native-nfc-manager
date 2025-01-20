@@ -239,7 +239,6 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
       return false;
     }
     const owner = await webCardOwnerLoader.load(webCard.id);
-
     //cannot use the loader here (when IAP sub), can't find a way to for revalidation in api route.
     //Got a bug where the subscription is canceled however still active in the result set
     const subscription = owner

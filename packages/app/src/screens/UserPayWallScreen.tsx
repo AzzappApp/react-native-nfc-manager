@@ -14,12 +14,14 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import Purchases, { INTRO_ELIGIBILITY_STATUS } from 'react-native-purchases';
-import { commitLocalUpdate } from 'react-relay';
+import { commitLocalUpdate, graphql, usePreloadedQuery } from 'react-relay';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import PremiumIndicator from '#components/PremiumIndicator';
 import { getAuthState } from '#helpers/authStore';
+import { iso8601DurationToDays } from '#helpers/dateHelpers';
 import { getRelayEnvironment } from '#helpers/relayEnvironment';
+import relayScreen from '#helpers/relayScreen';
 import { useMultiUserUpdate } from '#hooks/useMultiUserUpdate';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { useUserSubscriptionOffer } from '#hooks/useSubscriptionOffer';
@@ -28,18 +30,33 @@ import IconButton from '#ui/IconButton';
 import PressableOpacity from '#ui/PressableOpacity';
 import SwitchLabel from '#ui/SwitchLabel';
 import Text from '#ui/Text';
-import type {
-  NativeScreenProps,
-  ScreenOptions,
-} from '#components/NativeRouter';
+import type { ScreenOptions } from '#components/NativeRouter';
+import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { UserPayWallScreenQuery } from '#relayArtifacts/UserPayWallScreenQuery.graphql';
 import type { UserPayWallRoute } from '#routes';
 import type { PurchasesPackage } from 'react-native-purchases';
 
 const TERMS_OF_SERVICE = process.env.TERMS_OF_SERVICE;
 const PRIVACY_POLICY = process.env.PRIVACY_POLICY;
 const width = Dimensions.get('screen').width;
+/** @type {*} */
+const userPayWallcreenQuery = graphql`
+  query UserPayWallScreenQuery {
+    currentUser {
+      id
+      userSubscription {
+        subscriptionId
+        status
+      }
+    }
+  }
+`;
 
-const UserPayWallScreen = ({ route }: NativeScreenProps<UserPayWallRoute>) => {
+const UserPayWallScreen = ({
+  route,
+  preloadedQuery,
+}: RelayScreenProps<UserPayWallRoute, UserPayWallScreenQuery>) => {
+  const data = usePreloadedQuery(userPayWallcreenQuery, preloadedQuery);
   const intl = useIntl();
   const router = useRouter();
   const { height } = useWindowDimensions();
@@ -54,48 +71,59 @@ const UserPayWallScreen = ({ route }: NativeScreenProps<UserPayWallRoute>) => {
   const subscriptions = useUserSubscriptionOffer(period);
 
   const setAllowMultiUser = useMultiUserUpdate();
-
+  const [freeTrialEligible, setFreeTrialEligible] = useState(false);
   useEffect(() => {
     if (subscriptions && subscriptions.length > 0) {
       setSelectedPurchasePackage(subscriptions[0]);
+      Purchases.checkTrialOrIntroductoryPriceEligibility([
+        subscriptions[0].product.identifier,
+      ]).then(trial => {
+        if (
+          trial[subscriptions[0].product.identifier].status ===
+          INTRO_ELIGIBILITY_STATUS.INTRO_ELIGIBILITY_STATUS_ELIGIBLE
+        ) {
+          setFreeTrialEligible(true);
+        }
+      });
     }
   }, [subscriptions]);
 
   const [labelPurchase, setLabelPurchase] = useState<string>(
     intl.formatMessage({
-      defaultMessage: 'CONTINUE',
+      defaultMessage: 'SUBSCRIBE',
       description: 'MultiUser subscription button label trial not available',
     }),
   );
 
   useEffect(() => {
-    if (selectedPurchasePackage) {
-      Purchases.checkTrialOrIntroductoryPriceEligibility([
-        selectedPurchasePackage?.identifier,
-      ]).then(trial => {
-        if (
-          trial[selectedPurchasePackage.identifier].status ===
-          INTRO_ELIGIBILITY_STATUS.INTRO_ELIGIBILITY_STATUS_ELIGIBLE
-        ) {
-          setLabelPurchase(
-            intl.formatMessage({
-              defaultMessage: 'START MY 7-DAY TRIAL',
-              description:
-                'MultiUser subscription button label trial available',
-            }),
-          );
-        } else {
-          setLabelPurchase(
-            intl.formatMessage({
-              defaultMessage: 'CONTINUE',
-              description:
-                'MultiUser subscription button label trial not available',
-            }),
-          );
-        }
-      });
+    if (
+      selectedPurchasePackage?.product.introPrice?.period &&
+      freeTrialEligible
+    ) {
+      //get duration of the trial
+      setLabelPurchase(
+        intl.formatMessage(
+          {
+            defaultMessage: 'START MY {days}-DAY TRIAL',
+            description: 'MultiUser subscription button label trial available',
+          },
+          {
+            days: iso8601DurationToDays(
+              selectedPurchasePackage.product.introPrice.period,
+            ),
+          },
+        ),
+      );
+    } else {
+      setLabelPurchase(
+        intl.formatMessage({
+          defaultMessage: 'CONTINUE',
+          description:
+            'MultiUser subscription button label trial not available',
+        }),
+      );
     }
-  }, [intl, selectedPurchasePackage]);
+  }, [freeTrialEligible, intl, selectedPurchasePackage]);
 
   const processOrder = useCallback(async () => {
     const { profileInfos } = getAuthState();
@@ -113,7 +141,18 @@ const UserPayWallScreen = ({ route }: NativeScreenProps<UserPayWallRoute>) => {
           setAllowMultiUser(true);
         }
         commitLocalUpdate(getRelayEnvironment(), store => {
-          store.get(webCardId)?.setValue(true, 'isPremium');
+          if (profileInfos?.webCardId) {
+            store.get(profileInfos.webCardId)?.setValue(true, 'isPremium');
+          }
+          const user = store.getRoot().getLinkedRecord('currentUser');
+          const profiles = user?.getLinkedRecords('profiles');
+
+          if (profiles) {
+            const profile = profiles?.find(
+              profile => profile.getDataID() === profileInfos?.profileId,
+            );
+            profile?.getLinkedRecord('webCard')?.setValue(true, 'isPremium');
+          }
         });
       }
       setProcessing(false);
@@ -173,8 +212,18 @@ const UserPayWallScreen = ({ route }: NativeScreenProps<UserPayWallRoute>) => {
     const restore = await Purchases.restorePurchases();
     if (restore.entitlements.active?.multiuser?.isActive) {
       commitLocalUpdate(getRelayEnvironment(), store => {
-        if (profileInfos?.webCardId)
+        if (profileInfos?.webCardId) {
           store.get(profileInfos.webCardId)?.setValue(true, 'isPremium');
+        }
+        const user = store.getRoot().getLinkedRecord('currentUser');
+        const profiles = user?.getLinkedRecords('profiles');
+
+        if (profiles) {
+          const profile = profiles?.find(
+            profile => profile.getDataID() === profileInfos?.profileId,
+          );
+          profile?.getLinkedRecord('webCard')?.setValue(true, 'isPremium');
+        }
       });
     }
   }, []);
@@ -222,7 +271,6 @@ const UserPayWallScreen = ({ route }: NativeScreenProps<UserPayWallRoute>) => {
           </Text>
         </View>
       </View>
-
       <IconButton
         icon="arrow_down"
         style={styles.icon}
@@ -285,6 +333,32 @@ const UserPayWallScreen = ({ route }: NativeScreenProps<UserPayWallRoute>) => {
             pointerEvents="none"
           />
         </View>
+        {data.currentUser?.userSubscription?.status === 'active' &&
+          data.currentUser?.userSubscription?.subscriptionId && (
+            <Text variant="xsmall" style={{ color: colors.grey300 }}>
+              <FormattedMessage
+                defaultMessage="Your actual subscription : {qty, plural,
+            =1 {{qty} user}
+            other {{qty} Users}
+          } billed {period}"
+                description="sdfsdf"
+                values={{
+                  qty: parseInt(
+                    data.currentUser?.userSubscription?.subscriptionId
+                      .split('.')
+                      .pop() ?? '0',
+                    10,
+                  ),
+                  period:
+                    data.currentUser?.userSubscription?.subscriptionId.includes(
+                      'year',
+                    )
+                      ? 'yearly'
+                      : 'monthly',
+                }}
+              />
+            </Text>
+          )}
         <View style={[styles.bottomContainer, { paddingBottom: bottom }]}>
           <Button
             label={labelPurchase}
@@ -360,7 +434,9 @@ UserPayWallScreen.getScreenOptions = (): ScreenOptions => ({
   stackAnimation: 'slide_from_bottom',
 });
 
-export default UserPayWallScreen;
+export default relayScreen(UserPayWallScreen, {
+  query: userPayWallcreenQuery,
+});
 
 type OfferItemProps = {
   offer: PurchasesPackage;
