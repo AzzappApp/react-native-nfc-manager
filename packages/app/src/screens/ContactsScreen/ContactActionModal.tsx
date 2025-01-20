@@ -5,6 +5,7 @@ import { isDefined } from '@azzapp/shared/isDefined';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import { matchUrlWithRoute } from '#helpers/deeplinkHelpers';
+import ShareContact from '#helpers/ShareContact';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
@@ -70,18 +71,23 @@ const ContactActionModal = ({
             onPress: onShowWebcard,
           }
         : undefined,
-      // !multiSelection
-      //   ? {
-      //       icon: 'share' as Icons,
-      //       text: intl.formatMessage({
-      //         defaultMessage: 'Share Contact',
-      //         description: 'ContactsScreen - More option alert - share',
-      //       }),
-      //       onPress: () => {
-      //         // @TODO: how to share without a pre-generated URL?
-      //       },
-      //     }
-      //   : undefined,
+      !multiSelection
+        ? {
+            icon: 'share' as Icons,
+            text: intl.formatMessage({
+              defaultMessage: 'Share Contact',
+              description: 'ContactsScreen - More option alert - share',
+            }),
+            onPress: async () => {
+              if (
+                contactActionData?.contact &&
+                !Array.isArray(contactActionData?.contact)
+              ) {
+                ShareContact(contactActionData?.contact);
+              }
+            },
+          }
+        : undefined,
       !multiSelection
         ? {
             icon: 'contact' as Icons,

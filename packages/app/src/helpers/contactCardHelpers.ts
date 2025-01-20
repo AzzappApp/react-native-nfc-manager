@@ -12,6 +12,7 @@ import {
 } from '@azzapp/shared/vCardHelpers';
 import { textStyles } from '#theme';
 import { createStyleSheet } from '#helpers/createStyles';
+import type { ContactType } from './contactListHelpers';
 import type { Contact } from 'expo-contacts';
 import type { ColorSchemeName } from 'react-native';
 
@@ -284,6 +285,60 @@ export const findLocalContact = async (
   });
 
   return localContact;
+};
+
+export const buildVCardFromAzzappContact = async (contact: ContactType) => {
+  const vCard = new VCard();
+  vCard.addName(contact.lastName ?? undefined, contact.firstName ?? undefined);
+
+  if (contact.title) {
+    vCard.addJobtitle(contact.title);
+  }
+  if (contact.birthday && contact.birthday) {
+    vCard.addBirthday(contact.birthday.toString());
+  }
+  if (contact.company) {
+    vCard.addCompany(contact.company);
+  }
+
+  contact.phoneNumbers.forEach(number => {
+    if (number.number) {
+      vCard.addPhoneNumber(
+        `${number.number}`,
+        phoneLabelToVCardLabel(number.label) || '',
+      );
+    }
+  });
+
+  contact.emails.forEach(email => {
+    if (email.address)
+      vCard.addEmail(email.address, emailLabelToVCardLabel(email.label) || '');
+  });
+
+  contact.urls?.forEach(url => {
+    if (url.url) vCard.addURL(url.url);
+  });
+
+  contact.socials?.forEach(social => {
+    if (social.url) vCard.addSocial(social.url, social.label || '');
+  });
+
+  contact.addresses.forEach(addr => {
+    if (addr.address)
+      vCard.addAddress(
+        addr.address,
+        addressLabelToVCardLabel(addr.label) || '',
+      );
+  });
+  if (contact?.contactProfile?.avatar?.uri) {
+    const file = new File(contact.contactProfile.avatar.uri);
+    const image = file.base64();
+
+    if (image) {
+      vCard.addPhoto(image);
+    }
+  }
+  return vCard;
 };
 
 export const buildVCardFromExpoContact = async (contact: Contact) => {

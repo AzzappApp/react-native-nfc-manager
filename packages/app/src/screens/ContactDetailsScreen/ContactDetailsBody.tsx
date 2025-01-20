@@ -1,20 +1,15 @@
-import * as Sentry from '@sentry/react-native';
 import { type Contact } from 'expo-contacts';
-import { File, Paths } from 'expo-file-system/next';
 import { Image } from 'expo-image';
 import { useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Linking, Platform, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import ShareCommand from 'react-native-share';
 import { colors, shadow } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
-import { buildVCardFromExpoContact } from '#helpers/contactCardHelpers';
-import { reworkContactForDeviceInsert } from '#helpers/contactListHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { matchUrlWithRoute } from '#helpers/deeplinkHelpers';
-import { sanitizeFilePath } from '#helpers/fileHelpers';
+import ShareContact from '#helpers/ShareContact';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -58,38 +53,7 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
 
   const birthday = details.dates?.find(date => date.label === 'birthday');
 
-  const onShare = async () => {
-    const contact = reworkContactForDeviceInsert(details as Contact);
-    const vcardData = await buildVCardFromExpoContact(contact);
-    const contactName = (
-      (details.firstName || '') +
-      ' ' +
-      (details.lastName || '')
-    ).trim();
-    const filePath =
-      Paths.cache.uri +
-      sanitizeFilePath(contactName.length ? contactName : 'contact') +
-      '.vcf';
-
-    let file;
-    try {
-      file = new File(filePath);
-      file.create();
-      // generate file
-      file.write(vcardData.toString());
-      // share the file
-      await ShareCommand.open({
-        url: filePath,
-        type: 'text/x-vcard',
-      });
-      // clean up file afterward
-      file.delete();
-    } catch (e) {
-      Sentry.captureException(e);
-      console.error(e);
-      file?.delete();
-    }
-  };
+  const onShare = async () => ShareContact(details);
 
   return (
     <Container style={styles.container}>
