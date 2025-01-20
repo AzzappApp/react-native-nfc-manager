@@ -17,8 +17,14 @@
 
   ],
   "settings" : {
+    "_billingGracePeriodEnabled" : false,
+    "_billingIssuesEnabled" : false,
+    "_compatibilityTimeRate" : {
+      "3" : 6
+    },
     "_failTransactionsEnabled" : false,
     "_locale" : "en_US",
+    "_renewalBillingIssuesEnabled" : false,
     "_storefront" : "USA",
     "_storeKitErrors" : [
       {
@@ -42,7 +48,10 @@
         "name" : "App Store Sync"
       },
       {
-        "current" : null,
+        "current" : {
+          "index" : 2,
+          "type" : "generic"
+        },
         "enabled" : false,
         "name" : "Subscription Status"
       },
@@ -52,8 +61,11 @@
         "name" : "App Transaction"
       },
       {
-        "current" : null,
-        "enabled" : false,
+        "current" : {
+          "index" : 1,
+          "type" : "generic"
+        },
+        "enabled" : true,
         "name" : "Manage Subscriptions Sheet"
       },
       {
@@ -66,7 +78,8 @@
         "enabled" : false,
         "name" : "Offer Code Redeem Sheet"
       }
-    ]
+    ],
+    "_timeRate" : 1004
   },
   "subscriptionGroups" : [
     {
@@ -76,70 +89,7 @@
       ],
       "name" : "pro",
       "subscriptions" : [
-        {
-          "adHocOffers" : [
 
-          ],
-          "codeOffers" : [
-
-          ],
-          "displayPrice" : "2.99",
-          "familyShareable" : false,
-          "groupNumber" : 1,
-          "internalID" : "1892CA64",
-          "introductoryOffer" : {
-            "internalID" : "7402B613",
-            "paymentMode" : "free",
-            "subscriptionPeriod" : "P1W"
-          },
-          "localizations" : [
-            {
-              "description" : "",
-              "displayName" : "",
-              "locale" : "en_US"
-            }
-          ],
-          "productID" : "com.azzapp.azzapp.pro.month",
-          "recurringSubscriptionPeriod" : "P1M",
-          "referenceName" : "Pro Monthly",
-          "subscriptionGroupID" : "F68337C9",
-          "type" : "RecurringSubscription",
-          "winbackOffers" : [
-
-          ]
-        },
-        {
-          "adHocOffers" : [
-
-          ],
-          "codeOffers" : [
-
-          ],
-          "displayPrice" : "29.99",
-          "familyShareable" : false,
-          "groupNumber" : 1,
-          "internalID" : "AD84B1AC",
-          "introductoryOffer" : {
-            "internalID" : "35EA7B99",
-            "paymentMode" : "free",
-            "subscriptionPeriod" : "P1W"
-          },
-          "localizations" : [
-            {
-              "description" : "",
-              "displayName" : "",
-              "locale" : "en_US"
-            }
-          ],
-          "productID" : "com.azzapp.azzapp.pro.year",
-          "recurringSubscriptionPeriod" : "P1Y",
-          "referenceName" : "Pro yearly",
-          "subscriptionGroupID" : "F68337C9",
-          "type" : "RecurringSubscription",
-          "winbackOffers" : [
-
-          ]
-        }
       ]
     },
     {

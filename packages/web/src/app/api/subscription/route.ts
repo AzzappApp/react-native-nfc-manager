@@ -13,6 +13,7 @@ import { unpublishWebCardForUser } from '#helpers/subscription';
 const BEARER_HEADER = process.env.IAP_REVENUECAT_NOTIFICATION_BEARER;
 const subscriptionWebHook = async (req: Request) => {
   const authorization = req.headers.get('Authorization');
+
   if (!authorization) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
@@ -85,6 +86,7 @@ const subscriptionWebHook = async (req: Request) => {
           const sub = (await getUserSubscriptions(userId)).filter(
             s => s.issuer !== 'web',
           );
+
           if (sub.length === 0) {
             await createSubscription({
               userId,
@@ -145,6 +147,13 @@ const subscriptionWebHook = async (req: Request) => {
               startAt: new Date(purchased_at_ms),
               endAt: new Date(expiration_at_ms),
               revenueCatId: rcId,
+              issuer:
+                store === 'APP_STORE'
+                  ? 'apple'
+                  : store === 'PLAY_STORE'
+                    ? 'google'
+                    : 'web',
+              totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
               status: 'active',
             });
           }
@@ -177,6 +186,14 @@ const subscriptionWebHook = async (req: Request) => {
               startAt: new Date(purchased_at_ms),
               endAt: new Date(expiration_at_ms),
               revenueCatId: rcId,
+              subscriptionId,
+              issuer:
+                store === 'APP_STORE'
+                  ? 'apple'
+                  : store === 'PLAY_STORE'
+                    ? 'google'
+                    : 'web',
+              totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
               status: 'active',
             });
           }
@@ -214,56 +231,22 @@ const subscriptionWebHook = async (req: Request) => {
               await updateActiveUserSubscription(userId, {
                 endAt: new Date(grace_period_expiration_at_ms),
                 revenueCatId: rcId,
+                subscriptionId,
+                freeSeats: 0,
+                status: 'active',
               });
             }
           });
         }
-
         break;
 
       case 'PRODUCT_CHANGE':
-        await transaction(async () => {
-          //with the difference bteween azzapp Profile and ios/adnroid account, it can happen that a renewal is done on another profile if the uer created a new profile, initial purchase does not happen
-          const sub = (await getUserSubscriptions(userId)).filter(
-            s => s.issuer !== 'web',
-          );
-          if (sub.length === 0) {
-            await createSubscription({
-              userId,
-              subscriptionId,
-              startAt: new Date(purchased_at_ms),
-              endAt: new Date(expiration_at_ms),
-              revenueCatId: rcId,
-              issuer:
-                store === 'APP_STORE'
-                  ? 'apple'
-                  : store === 'PLAY_STORE'
-                    ? 'google'
-                    : 'web',
-              totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
-              freeSeats: 0,
-              status: 'active',
-            });
-          } else {
-            await updateActiveUserSubscription(userId, {
-              subscriptionId,
-              startAt: new Date(purchased_at_ms),
-              endAt: new Date(grace_period_expiration_at_ms),
-              revenueCatId: rcId,
-              issuer:
-                store === 'APP_STORE'
-                  ? 'apple'
-                  : store === 'PLAY_STORE'
-                    ? 'google'
-                    : 'web',
-              totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
-              status: 'active',
-            });
-          }
-        });
-
+        // PRODUCT CHANGE WAS BREAKING THE SUBSCRIPTION
+        // The PRODUCT_CHANGE webhook should be considered informative,
+        // and does not mean that the product change has gone into effect. When the product change goes into effect
+        // you will receive a RENEWAL event on Apple and Stripe or a INITIAL_PURCHASE event on Google Play.
+        //we can use it for analytics
         break;
-
       case 'TRANSFER':
         break;
       //we are transfering only when the user sub is over, no work is required here

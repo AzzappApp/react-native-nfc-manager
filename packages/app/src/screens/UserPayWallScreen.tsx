@@ -14,13 +14,6 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import Purchases, { INTRO_ELIGIBILITY_STATUS } from 'react-native-purchases';
-import Animated, {
-  interpolate,
-  interpolateColor,
-  useAnimatedScrollHandler,
-  useAnimatedStyle,
-  useSharedValue,
-} from 'react-native-reanimated';
 import { commitLocalUpdate } from 'react-relay';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
@@ -41,7 +34,6 @@ import type {
 } from '#components/NativeRouter';
 import type { UserPayWallRoute } from '#routes';
 import type { PurchasesPackage } from 'react-native-purchases';
-import type { SharedValue } from 'react-native-reanimated';
 
 const TERMS_OF_SERVICE = process.env.TERMS_OF_SERVICE;
 const PRIVACY_POLICY = process.env.PRIVACY_POLICY;
@@ -176,15 +168,6 @@ const UserPayWallScreen = ({ route }: NativeScreenProps<UserPayWallRoute>) => {
     setAllowMultiUser,
   ]);
 
-  //const [currentPage, setCurrentPage] = useState(2);
-  const currentIndex = useSharedValue(0);
-  const onScroll = useAnimatedScrollHandler({
-    onScroll: event => {
-      const index = event.contentOffset.x / width;
-      currentIndex.value = Math.max(Math.min(4, index), 0);
-    },
-  });
-
   const restorePurchase = useCallback(async () => {
     const { profileInfos } = getAuthState();
     const restore = await Purchases.restorePurchases();
@@ -199,152 +182,44 @@ const UserPayWallScreen = ({ route }: NativeScreenProps<UserPayWallRoute>) => {
   return (
     <View style={styles.container}>
       <View style={[{ width, height: width }, styles.featureContainer]}>
-        <Animated.ScrollView
-          horizontal
-          snapToInterval={width}
-          decelerationRate="fast"
-          snapToAlignment="start"
-          onScroll={onScroll}
-          pagingEnabled
-          scrollEnabled
-          style={{ width }}
-          contentContainerStyle={{ width: 4 * width }}
+        <View
+          key="subscription_page_1"
+          style={[
+            {
+              width,
+              height: lottieHeight,
+            },
+            styles.promoContainer,
+          ]}
         >
-          <View
-            key="subscription_page_1"
-            style={[
-              {
-                width,
-                height: lottieHeight,
-              },
-              styles.promoContainer,
-            ]}
-          >
-            <LottieView
-              source={require('../assets/paywall/paywall_azzapp_step1.json')}
-              autoPlay
-              loop
-              hardwareAccelerationAndroid
-              style={{
-                position: 'absolute',
-                width,
-                height: lottieHeight,
-              }}
-              resizeMode="cover"
+          <LottieView
+            source={require('../assets/paywall/paywall_azzapp_step1.json')}
+            autoPlay
+            loop
+            hardwareAccelerationAndroid
+            style={{
+              position: 'absolute',
+              width,
+              height: lottieHeight,
+            }}
+            resizeMode="cover"
+          />
+          <LinearGradient
+            colors={['transparent', 'rgba(0, 0, 0, 0.9)']}
+            locations={[0, 1]}
+            style={{
+              height: height - BOTTOM_HEIGHT + 130,
+              width,
+              position: 'absolute',
+            }}
+            pointerEvents="none"
+          />
+          <Text variant="xlarge" style={styles.textPromo}>
+            <FormattedMessage
+              defaultMessage="Add as many sections as you want to your WebCard"
+              description="UserPaywall Screen - message promo section"
             />
-            <LinearGradient
-              colors={['transparent', 'rgba(0, 0, 0, 0.9)']}
-              locations={[0, 1]}
-              style={{
-                height: height - BOTTOM_HEIGHT + 130,
-                width,
-                position: 'absolute',
-              }}
-              pointerEvents="none"
-            />
-            <Text variant="xlarge" style={styles.textPromo}>
-              <FormattedMessage
-                defaultMessage="Add as many sections as you want to your WebCard"
-                description="UserPaywall Screen - message promo section"
-              />
-            </Text>
-          </View>
-          <View
-            key="subscription_page_2"
-            style={[
-              {
-                backgroundColor: 'green',
-                width,
-              },
-              styles.promoContainer,
-            ]}
-            //missing content from design team
-          >
-            <LinearGradient
-              colors={['transparent', 'rgba(0, 0, 0, 0.9)']}
-              locations={[0, 1]}
-              style={{
-                height: height - BOTTOM_HEIGHT + 130,
-                width,
-                position: 'absolute',
-              }}
-              pointerEvents="none"
-            />
-            <Text variant="xlarge" style={styles.textPromo}>
-              <FormattedMessage
-                defaultMessage="Choose from 600+ stunning templates"
-                description="UserPaywall Screen - message promo template"
-              />
-            </Text>
-          </View>
-          <View
-            key="subscription_page_3"
-            style={[
-              {
-                width,
-              },
-              styles.promoContainer,
-            ]}
-            //missing content from design team
-          >
-            <LinearGradient
-              colors={['transparent', 'rgba(0, 0, 0, 0.9)']}
-              locations={[0, 1]}
-              style={{
-                height: height - BOTTOM_HEIGHT + 130,
-                width,
-                position: 'absolute',
-              }}
-              pointerEvents="none"
-            />
-            <Text variant="xlarge" style={styles.textPromo}>
-              <FormattedMessage
-                defaultMessage="Explore hundred of sections type"
-                description="UserPaywall Screen - message promo  type"
-              />
-            </Text>
-          </View>
-          <View
-            key="subscription_page_4"
-            style={[
-              {
-                backgroundColor: 'orange',
-                width,
-              },
-              styles.promoContainer,
-            ]}
-            //missing content from design team
-          >
-            <LinearGradient
-              colors={['transparent', 'rgba(0, 0, 0, 0.9)']}
-              locations={[0, 1]}
-              style={{
-                height: height - BOTTOM_HEIGHT + 130,
-                width,
-                position: 'absolute',
-              }}
-              pointerEvents="none"
-            />
-            <Text variant="xlarge" style={styles.textPromo}>
-              <FormattedMessage
-                defaultMessage="Elevate your cover with our suggested media"
-                description="UserPaywall Screen - message promo suggested media"
-              />
-            </Text>
-          </View>
-        </Animated.ScrollView>
-
-        <View style={[styles.containerPager, { width }]}>
-          {Array.from({ length: 4 }).map((_, index) => {
-            return (
-              <AnimatedTabIndex
-                currentIndex={currentIndex}
-                index={index}
-                key={`PayWallPager-${index}`}
-              />
-            );
-          })}
-          <View />
+          </Text>
         </View>
       </View>
 
@@ -485,39 +360,7 @@ UserPayWallScreen.getScreenOptions = (): ScreenOptions => ({
   stackAnimation: 'slide_from_bottom',
 });
 
-const CIRCLE_SIZE = 5;
-
 export default UserPayWallScreen;
-
-type AnimatedTabIndexProps = {
-  currentIndex: SharedValue<number>;
-  index: number;
-};
-const AnimatedTabIndex = ({ currentIndex, index }: AnimatedTabIndexProps) => {
-  const animatedStyle = useAnimatedStyle(() => {
-    const color = interpolateColor(
-      currentIndex.value,
-      [index - 1, index, index + 1],
-      [colors.grey200, colors.white, colors.grey300],
-    );
-    return {
-      backgroundColor: color,
-      width: interpolate(
-        currentIndex.value,
-        [index - 1, index, index + 1],
-        [CIRCLE_SIZE, 20, CIRCLE_SIZE],
-      ),
-    };
-  });
-
-  return (
-    <Animated.View
-      accessibilityRole="none"
-      accessibilityState={{ selected: index === currentIndex.value }}
-      style={[styles.pagerItem, animatedStyle]}
-    />
-  );
-};
 
 type OfferItemProps = {
   offer: PurchasesPackage;
@@ -587,7 +430,7 @@ const OfferItem = ({
 };
 
 const Offer = memo(OfferItem);
-const BOTTOM_HEIGHT = width;
+const BOTTOM_HEIGHT = 450;
 const styles = StyleSheet.create({
   monthlyPricing: { textAlign: 'right', color: colors.grey600 },
   promoContainer: {
@@ -613,14 +456,6 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   plusImage: { height: 34 },
-  containerPager: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'absolute',
-    bottom: 20,
-    height: 30,
-  },
   featureContainer: { flex: 1, marginBottom: -20, aspectRatio: 1 },
   container: { flex: 1, backgroundColor: 'transparent' },
   priceItem: {
@@ -686,14 +521,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     width: '100%',
     overflow: 'visible',
-  },
-  pagerItem: {
-    width: CIRCLE_SIZE,
-    height: CIRCLE_SIZE,
-    borderRadius: CIRCLE_SIZE / 2,
-    marginLeft: CIRCLE_SIZE / 2,
-    marginRight: CIRCLE_SIZE / 2,
-    backgroundColor: colors.grey200,
   },
   loadingContainer: {
     ...StyleSheet.absoluteFillObject,
