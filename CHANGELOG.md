@@ -1,5 +1,6 @@
-## 1.7.0-canary.33
+## 1.7.0-canary.34
 
+* **fix:**  - stop playback when webcard is not focused ([#6988](https://github.com/AzzappApp/azzapp/pull/6988))
 * **build:**  - upgrade native dependencies ([#6981](https://github.com/AzzappApp/azzapp/pull/6981))
 * **fix:**  - handle alternation specification changes ([#6979](https://github.com/AzzappApp/azzapp/pull/6979))
 * **fix:**  - rework buildLocalContact to ensure expo contact is well created ([#6980](https://github.com/AzzappApp/azzapp/pull/6980))
