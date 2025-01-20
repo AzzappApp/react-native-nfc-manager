@@ -83,6 +83,7 @@ const GridRenderer = async ({
                   cardStyle={cardStyle}
                   square={square}
                   index={index}
+                  delaySec={columnIndex * 0.1}
                 />
               );
             })}

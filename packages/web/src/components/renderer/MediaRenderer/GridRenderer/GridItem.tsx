@@ -11,9 +11,16 @@ type GridItemProps = {
   index: number;
   cardStyle: CardStyle;
   square: boolean;
+  delaySec: number;
 };
 
-const GridItem = ({ media, index, cardStyle, square }: GridItemProps) => {
+const GridItem = ({
+  media,
+  index,
+  cardStyle,
+  square,
+  delaySec,
+}: GridItemProps) => {
   const pictureRef = useRef<HTMLDivElement>(null);
   return (
     <div
@@ -26,7 +33,7 @@ const GridItem = ({ media, index, cardStyle, square }: GridItemProps) => {
       }}
       ref={pictureRef}
     >
-      <AppearanceSliderContainer pictureRef={pictureRef}>
+      <AppearanceSliderContainer pictureRef={pictureRef} delaySec={delaySec}>
         {media.kind === 'video' ? (
           <CloudinaryVideo
             assetKind="module"

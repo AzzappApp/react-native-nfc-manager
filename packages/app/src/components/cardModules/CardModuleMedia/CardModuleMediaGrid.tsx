@@ -124,6 +124,7 @@ const CardModuleMediaGrid = ({
                 index={index}
                 scrollY={scrollPosition}
                 offsetY={offsetY + (cardStyle?.gap ?? 0) * index}
+                delaySec={columnIndex * 0.1}
               />
             );
           })}
@@ -134,6 +135,7 @@ const CardModuleMediaGrid = ({
 };
 type GridItemProps = Omit<AppearanceSliderContainerProps, 'parentY'> & {
   setEditableItemIndex?: (index: number) => void;
+  delaySec: number;
 };
 
 const GridItem = ({ setEditableItemIndex, index, ...props }: GridItemProps) => {

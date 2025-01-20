@@ -28,6 +28,7 @@ export type AppearanceSliderContainerProps = {
   webCardViewMode?: WebCardViewMode;
   parentY: number;
   displayDimension: CardModuleDimension;
+  delaySec: number;
 };
 
 const AppearanceSliderContainer = ({
@@ -43,6 +44,7 @@ const AppearanceSliderContainer = ({
   scrollY,
   offsetY,
   displayDimension,
+  delaySec,
 }: AppearanceSliderContainerProps) => {
   const itemStartY =
     (modulePosition ?? 0) + offsetY + ANIMATION_DELAY_BUFFER_PIXEL;
@@ -80,17 +82,20 @@ const AppearanceSliderContainer = ({
 
         if (!isRunning.current) {
           isRunning.current = true;
-          Animated.parallel([
-            Animated.timing(translateY, {
-              toValue: 0,
-              duration: ANIMATION_DURATION,
-              useNativeDriver: true,
-            }),
-            Animated.timing(opacity, {
-              toValue: 1,
-              duration: 500, //different than animation duration, tested with upmitt, submit to changes
-              useNativeDriver: true,
-            }),
+          Animated.sequence([
+            Animated.delay(delaySec * 1000),
+            Animated.parallel([
+              Animated.timing(translateY, {
+                toValue: 0,
+                duration: ANIMATION_DURATION,
+                useNativeDriver: true,
+              }),
+              Animated.timing(opacity, {
+                toValue: 1,
+                duration: 500, //different than animation duration, tested with upmitt, submit to changes
+                useNativeDriver: true,
+              }),
+            ]),
           ]).start(({ finished }) => {
             if (finished) {
               isRunning.current = false;
@@ -132,6 +137,7 @@ const AppearanceSliderContainer = ({
     componentY,
     componentHeight,
     index,
+    delaySec,
   ]);
 
   const disableAnimation = isModuleAnimationDisabled(
@@ -182,7 +188,7 @@ const AppearanceSliderContainer = ({
 
 export default memo(AppearanceSliderContainer);
 
-// this is a buffer in pixel before startingthe animation
+// this is a buffer in pixel before starting the animation
 const ANIMATION_DELAY_BUFFER_PIXEL = 100;
 const TRANSLATION_Y_ANIMATION = 200;
 const ANIMATION_DURATION = 400;

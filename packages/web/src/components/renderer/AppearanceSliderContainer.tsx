@@ -13,9 +13,11 @@ const getScrollDirection = () => {
 export const AppearanceSliderContainer = ({
   pictureRef,
   children,
+  delaySec,
 }: {
   pictureRef: React.MutableRefObject<HTMLDivElement | null>;
   children: React.ReactNode;
+  delaySec: number;
 }) => {
   const [appearance, setAppearance] = useState({
     visible: false,
@@ -57,7 +59,7 @@ export const AppearanceSliderContainer = ({
           : appearance.scrollDirection === 'down'
             ? 'translateY(-200px)'
             : 'translateY(200px)',
-        transition: 'opacity 0.5s ease-in-out,transform 0.2s ease-out',
+        transition: `opacity 0.5s ease-in-out ${delaySec}s,transform 0.2s ease-out ${delaySec}s`,
         width: '100%',
         height: '100%',
       }}
