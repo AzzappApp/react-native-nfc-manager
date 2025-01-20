@@ -10,6 +10,7 @@ import {
   updateSubscriptionForWebCard,
   updateCustomer,
   renewUserSubscription,
+  estimateUpdateSubscriptionForWebCard,
 } from '@azzapp/payment';
 import ERRORS from '@azzapp/shared/errors';
 import { getSessionInfos } from '#GraphQLContext';
@@ -30,6 +31,30 @@ export const estimateSubscriptionCost: MutationResolvers['estimateSubscriptionCo
     );
 
     return cost;
+  };
+
+export const estimateUpdateSubscriptionCost: MutationResolvers['estimateUpdateSubscriptionCost'] =
+  async (
+    _,
+    { webCardId: gqlWebCardId, subscriptionId: gqlSubscriptionId, totalSeats },
+  ) => {
+    const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
+    await checkWebCardOwnerProfile(webCardId);
+    try {
+      const result = await estimateUpdateSubscriptionForWebCard({
+        webCardId,
+        subscriptionId: fromGlobalIdWithType(
+          gqlSubscriptionId,
+          'UserSubscription',
+        ),
+        totalSeats,
+      });
+      return result;
+    } catch (err) {
+      throw new GraphQLError(ERRORS.PAYMENT_ERROR, {
+        originalError: err as Error,
+      });
+    }
   };
 
 export const createPaymentIntent: MutationResolvers['createPaymentIntent'] =

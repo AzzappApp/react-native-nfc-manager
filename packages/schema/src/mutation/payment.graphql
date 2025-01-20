@@ -5,6 +5,11 @@ extend type Mutation {
     countryCode: String
     vatNumber: String
   ): SubscriptionEstimation!
+  estimateUpdateSubscriptionCost(
+    webCardId: ID!
+    subscriptionId: ID!
+    totalSeats: Int!
+  ): UpdateSubscriptionEstimation!
   createPaymentIntent(
     webCardId: ID!
     intent: PaymentIntentInput!
@@ -28,7 +33,10 @@ extend type Mutation {
     customer: Customer!
   ): String!
   generatePaymentInvoice(webCardId: ID!, paymentId: ID!): String!
-  upgradeSubscriptionPlan(webCardId: ID!, subscriptionId: ID!): UserSubscription!
+  upgradeSubscriptionPlan(
+    webCardId: ID!
+    subscriptionId: ID!
+  ): UserSubscription!
   endSubscription(webCardId: ID!, subscriptionId: ID!): UserSubscription!
   updateSubscriptionCustomer(
     webCardId: ID!
@@ -68,6 +76,11 @@ type PaymentIntentPayload {
   clientRedirectUrl: String!
   amount: Int!
   taxes: Int!
+}
+
+type UpdateSubscriptionEstimation {
+  firstPayment: SubscriptionEstimation
+  recurringCost: SubscriptionEstimation
 }
 
 type SubscriptionEstimation {

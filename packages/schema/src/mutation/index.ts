@@ -29,18 +29,7 @@ import {
   saveSimpleTextModule,
   saveSocialLinksModule,
 } from './ModulesMutationsResolvers';
-import {
-  createPaymentIntent,
-  createPaymentMean,
-  createSubscriptionFromPaymentMean,
-  endSubscription,
-  estimateSubscriptionCost,
-  generatePaymentInvoice,
-  renewSubscription,
-  updateSubscription,
-  updateSubscriptionCustomer,
-  upgradeSubscriptionPlan,
-} from './payment';
+import * as payment from './payment';
 import togglePostReaction from './postReaction';
 import quitWebCard from './quitWebCard';
 import removeContacts from './removeContacts';
@@ -120,17 +109,7 @@ export const Mutation: MutationResolvers = {
   inviteUsersList,
   sendInvitations,
   sendReport,
-  createPaymentIntent,
-  createPaymentMean,
-  createSubscriptionFromPaymentMean,
-  estimateSubscriptionCost,
-  generatePaymentInvoice,
-  updateSubscription,
-  upgradeSubscriptionPlan,
-  endSubscription,
   deletePost,
-  updateSubscriptionCustomer,
-  renewSubscription,
   deleteUser,
   addContact,
   removeContacts,
@@ -138,6 +117,7 @@ export const Mutation: MutationResolvers = {
   saveFCMToken,
   deleteFCMToken,
   updateContactsLastView,
+  ...payment,
 };
 
 export default Mutation;

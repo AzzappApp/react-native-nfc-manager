@@ -51,6 +51,116 @@ export const updateSubscriptionForWebCard = async ({
   });
 };
 
+export const estimateUpdateSubscriptionForWebCard = async ({
+  subscriptionId,
+  webCardId,
+  totalSeats,
+}: {
+  subscriptionId: string;
+  webCardId: string;
+  totalSeats?: number | null;
+}) => {
+  const existingSubscription = await getSubscriptionById(subscriptionId);
+
+  if (!existingSubscription) {
+    throw new Error('No subscription found');
+  }
+
+  if (existingSubscription.status === 'canceled') {
+    throw new Error('Subscription is canceled');
+  }
+
+  if (existingSubscription.webCardId !== webCardId) {
+    throw new Error('Web card id does not match');
+  }
+
+  return calculateSubscriptionUpdate(existingSubscription, totalSeats);
+};
+
+const calculateSubscriptionUpdate = async (
+  existingSubscription: UserSubscription,
+  totalSeats?: number | null,
+) => {
+  if (existingSubscription.subscriptionPlan === 'web.monthly') {
+    const amount = totalSeats
+      ? calculateAmount(totalSeats, existingSubscription.subscriptionPlan)
+      : existingSubscription.amount;
+
+    const { amount: taxes, rate } = totalSeats
+      ? await calculateTaxes(
+          amount ?? 0,
+          existingSubscription.subscriberCountryCode ?? undefined,
+          existingSubscription.subscriberVatNumber ?? undefined,
+        )
+      : { amount: 0 };
+
+    return {
+      firstPayment: null,
+      recurringPayment: {
+        amount,
+        taxes,
+        taxRate: rate ?? 0,
+      },
+    };
+  } else if (existingSubscription.subscriptionPlan === 'web.yearly') {
+    if (totalSeats && existingSubscription.totalSeats > totalSeats) {
+      throw new Error('Cannot update to a lower number of seats');
+    }
+
+    const currentDate = new Date();
+
+    const intervalInMonths =
+      Math.floor(existingSubscription.endAt.getTime() - currentDate.getTime()) /
+      MONTHLY_RECURRENCE;
+
+    const amountForTheRestOfTheYear = totalSeats
+      ? Math.floor(
+          (calculateAmount(
+            totalSeats - existingSubscription.totalSeats,
+            existingSubscription.subscriptionPlan,
+          ) *
+            intervalInMonths) /
+            Math.floor(YEARLY_RECURRENCE / MONTHLY_RECURRENCE),
+        )
+      : 0;
+
+    const { amount: taxesForTheRestOfTheYear, rate: rateForTheRestOfTheYear } =
+      totalSeats
+        ? await calculateTaxes(
+            amountForTheRestOfTheYear,
+            existingSubscription.subscriberCountryCode ?? undefined,
+            existingSubscription.subscriberVatNumber ?? undefined,
+          )
+        : { amount: 0 };
+
+    const amount = totalSeats
+      ? calculateAmount(totalSeats, existingSubscription.subscriptionPlan)
+      : existingSubscription.amount;
+
+    const { amount: taxes, rate } = totalSeats
+      ? await calculateTaxes(
+          amount ?? 0,
+          existingSubscription.subscriberCountryCode ?? undefined,
+          existingSubscription.subscriberVatNumber ?? undefined,
+        )
+      : { amount: 0 };
+
+    return {
+      firstPayment: {
+        amount: amountForTheRestOfTheYear,
+        taxes: taxesForTheRestOfTheYear,
+        taxRate: rateForTheRestOfTheYear ?? 0,
+      },
+      recurringPayment: {
+        amount,
+        taxes,
+        taxRate: rate ?? 0,
+      },
+    };
+  }
+  throw new Error('Invalid subscription plan');
+};
+
 export const updateExistingSubscription = async ({
   userSubscription: existingSubscription,
   totalSeats,
@@ -137,18 +247,10 @@ export const updateExistingSubscription = async ({
         }
       }
 
-      const amount = totalSeats
-        ? calculateAmount(totalSeats, existingSubscription.subscriptionPlan)
-        : existingSubscription.amount;
-
-      const { amount: taxes } = totalSeats
-        ? await calculateTaxes(
-            amount ?? 0,
-            existingSubscription.subscriberCountryCode ?? undefined,
-            existingSubscription.subscriberVatNumber ?? undefined,
-          )
-        : { amount: 0 };
-
+      const { recurringPayment } = await calculateSubscriptionUpdate(
+        existingSubscription,
+        totalSeats,
+      );
       const intervalInMinutes = calculateNextPaymentIntervalInMinutes(
         existingSubscription.subscriptionPlan,
       );
@@ -171,7 +273,7 @@ export const updateExistingSubscription = async ({
             rebill_manager_initial_type: 'PAID',
             rebill_manager_initial_price_cnts: '0',
             rebill_manager_initial_duration_min: `${timeUntilNextPayment}`,
-            rebill_manager_rebill_price_cnts: `${(amount ?? 0) + taxes}`,
+            rebill_manager_rebill_price_cnts: `${(recurringPayment.amount ?? 0) + recurringPayment.taxes}`,
             rebill_manager_rebill_duration_mins: `0`,
             rebill_manager_rebill_period_mins: `${intervalInMinutes}`,
             clientPaymentRequestUlid: existingSubscription.paymentMeanId,
@@ -201,8 +303,8 @@ export const updateExistingSubscription = async ({
         subscriptionId: newSubscriptionId,
         id: newSubscriptionId,
         totalSeats: totalSeats ?? existingSubscription.totalSeats,
-        amount,
-        taxes,
+        amount: recurringPayment.amount,
+        taxes: recurringPayment.taxes,
         rebillManagerId: newRebillManagerId,
         canceledAt: null,
         status: 'active',
@@ -262,45 +364,13 @@ export const updateExistingSubscription = async ({
 
     const currentDate = new Date();
 
-    const intervalInMonths =
-      Math.floor(existingSubscription.endAt.getTime() - currentDate.getTime()) /
-      MONTHLY_RECURRENCE;
-
     const intervalInMinutes = dateDiffInMinutes(
       currentDate,
       existingSubscription.endAt,
     );
 
-    const amountForTheRestOfTheYear = totalSeats
-      ? Math.floor(
-          (calculateAmount(
-            totalSeats - existingSubscription.totalSeats,
-            existingSubscription.subscriptionPlan,
-          ) *
-            intervalInMonths) /
-            Math.floor(YEARLY_RECURRENCE / MONTHLY_RECURRENCE),
-        )
-      : 0;
-
-    const { amount: taxesForTheRestOfTheYear } = totalSeats
-      ? await calculateTaxes(
-          amountForTheRestOfTheYear,
-          existingSubscription.subscriberCountryCode ?? undefined,
-          existingSubscription.subscriberVatNumber ?? undefined,
-        )
-      : { amount: 0 };
-
-    const amount = totalSeats
-      ? calculateAmount(totalSeats, existingSubscription.subscriptionPlan)
-      : existingSubscription.amount;
-
-    const { amount: taxes } = totalSeats
-      ? await calculateTaxes(
-          amount ?? 0,
-          existingSubscription.subscriberCountryCode ?? undefined,
-          existingSubscription.subscriberVatNumber ?? undefined,
-        )
-      : { amount: 0 };
+    const { firstPayment, recurringPayment } =
+      await calculateSubscriptionUpdate(existingSubscription, totalSeats);
 
     newSubscriptionId = createId();
 
@@ -313,9 +383,9 @@ export const updateExistingSubscription = async ({
         body: {
           billing_description: `Subscription ${existingSubscription.subscriptionPlan} for ${totalSeats} seats`,
           rebill_manager_initial_type: 'PAID',
-          rebill_manager_initial_price_cnts: `${amountForTheRestOfTheYear + taxesForTheRestOfTheYear}`,
+          rebill_manager_initial_price_cnts: `${(firstPayment?.amount ?? 0) + (firstPayment?.taxes ?? 0)}`,
           rebill_manager_initial_duration_min: `${intervalInMinutes}`,
-          rebill_manager_rebill_price_cnts: `${(amount ?? 0) + taxes}`,
+          rebill_manager_rebill_price_cnts: `${(recurringPayment.amount ?? 0) + recurringPayment.taxes}`,
           rebill_manager_rebill_duration_mins: '0',
           rebill_manager_rebill_period_mins: `${calculateNextPaymentIntervalInMinutes(existingSubscription.subscriptionPlan)}`,
           clientPaymentRequestUlid: existingSubscription.paymentMeanId,
@@ -345,8 +415,8 @@ export const updateExistingSubscription = async ({
       subscriptionId: newSubscriptionId,
       id: newSubscriptionId,
       totalSeats: totalSeats ?? existingSubscription.totalSeats,
-      amount,
-      taxes,
+      amount: recurringPayment.amount,
+      taxes: recurringPayment.taxes,
       rebillManagerId: newRebillManagerId,
       canceledAt: null,
       status: 'active',
