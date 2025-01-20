@@ -40,8 +40,8 @@ Pod::Spec.new do |s|
     mkdir -p libs/
     rm -rf libs/ios
     mkdir -p libs/ios
-    cp -r "#{skiaPath}/libs/ios/libsksg.xcframework" libs/ios/
-    cp -r "#{skiaPath}/libs/ios/libskottie.xcframework" libs/ios/
+    cp -r "#{skiaPath}/libs/apple/libsksg.xcframework" libs/ios/
+    cp -r "#{skiaPath}/libs/apple/libskottie.xcframework" libs/ios/
   CMD
 
   s.ios.vendored_frameworks = [
