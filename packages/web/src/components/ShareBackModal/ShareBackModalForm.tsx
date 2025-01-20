@@ -97,8 +97,6 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
           <div className={styles.formField}>
             <FormInput
               {...getInputProps(fields.firstName, { type: 'text' })}
-              id={fields.firstName.id}
-              key={fields.firstName.id}
               className={styles.formInput}
               placeholder={intl.formatMessage({
                 defaultMessage: 'Enter your firstName',
@@ -125,7 +123,6 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
           <div className={styles.formField}>
             <FormInput
               {...getInputProps(fields.lastName, { type: 'text' })}
-              key={fields.lastName.id}
               className={styles.formInput}
               placeholder={intl.formatMessage({
                 defaultMessage: 'Enter your lastName',
@@ -150,7 +147,6 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
           <div className={styles.formField}>
             <PhoneInput
               field={fields.phone}
-              key={fields.phone.id}
               className={styles.formInput}
               placeholder={intl.formatMessage({
                 defaultMessage: 'Enter your number',
@@ -175,7 +171,6 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
           <div className={styles.formField}>
             <FormInput
               {...getInputProps(fields.email, { type: 'text' })}
-              key={fields.email.id}
               className={styles.formInput}
               placeholder={intl.formatMessage({
                 defaultMessage: 'Enter your email address',
@@ -201,7 +196,6 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
           <div className={styles.formField}>
             <FormInput
               {...getInputProps(fields.company, { type: 'text' })}
-              key={fields.company.id}
               className={styles.formInput}
               placeholder={intl.formatMessage({
                 defaultMessage: 'Enter your company name',
@@ -226,7 +220,6 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
           <div className={styles.formField}>
             <FormInput
               {...getInputProps(fields.title, { type: 'text' })}
-              key={fields.title.id}
               className={styles.formInput}
               placeholder={intl.formatMessage({
                 defaultMessage: 'Enter your title',

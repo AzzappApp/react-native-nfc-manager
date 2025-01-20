@@ -1,6 +1,6 @@
 import { getInputProps } from '@conform-to/react';
 import cn from 'classnames';
-import { forwardRef, useRef, useState, type InputHTMLAttributes } from 'react';
+import { forwardRef, useState, type InputHTMLAttributes } from 'react';
 import ConditionalWrapper from '#components/ConditionalWrapper';
 import EmailOrPhonenumberSelect from '#components/EmailOrPhonenumberSelect';
 import styles from '#ui/Form/FormInput/FormInput.css';
@@ -15,32 +15,21 @@ type PhoneInputProps = InputHTMLAttributes<HTMLInputElement> & {
     | { withLabel?: false; labelText?: never }
   );
 
-let idCounter = 0;
-const generateUniqueId = () => `form-input-${idCounter++}-${Date.now()}`;
-
 // eslint-disable-next-line react/display-name
 const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
   (props, ref) => {
-    const {
-      field,
-      className,
-      id: providedId,
-      withLabel = false,
-      labelText,
-      ...others
-    } = props;
+    const { field, className, withLabel = false, labelText, ...others } = props;
     const [countryCode, setCountryCode] = useState('');
     const classnames = cn(styles.input, className);
-
-    const inputId = useRef(
-      providedId || (withLabel ? generateUniqueId() : undefined),
-    ).current;
+    const numberInputProps = getInputProps(field.getFieldset().number, {
+      type: 'text',
+    });
 
     return (
       <ConditionalWrapper
         condition={withLabel}
         wrapper={children => (
-          <FormLabel htmlFor={inputId} labelText={labelText}>
+          <FormLabel htmlFor={numberInputProps.id} labelText={labelText}>
             {children}
           </FormLabel>
         )}
@@ -51,11 +40,10 @@ const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
         />
 
         <input
-          {...getInputProps(field.getFieldset().number, { type: 'text' })}
+          {...numberInputProps}
           {...others}
           className={classnames}
           ref={ref}
-          id={inputId}
         />
         <input
           {...getInputProps(field.getFieldset().countryCode, {

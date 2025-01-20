@@ -5,6 +5,7 @@ import { getCountries, getCountryCallingCode } from 'libphonenumber-js';
 import Image from 'next/image';
 import { useEffect, type ReactNode } from 'react';
 import { useIntl } from 'react-intl';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import COUNTRY_FLAG from '@azzapp/shared/CountryFlag';
 import { textSmall } from '#app/[userName]/theme.css';
 import Select from '#components/Select';
@@ -64,7 +65,7 @@ const EmailOrPhonenumberSelect = ({
     new Intl.Locale(
       (typeof navigator !== 'undefined'
         ? navigator
-        : { language: 'fr-FR' }
+        : { language: DEFAULT_LOCALE }
       )?.language,
     ).region?.toUpperCase() || 'FR';
 
