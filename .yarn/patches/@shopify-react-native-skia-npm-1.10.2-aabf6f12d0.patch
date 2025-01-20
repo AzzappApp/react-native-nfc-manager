@@ -1,12 +1,11 @@
 diff --git a/cpp/api/JsiSkImageFilterFactory.h b/cpp/api/JsiSkImageFilterFactory.h
-index 3488401b04d08e4f4b7b0ea7624b2aa97a920482..a200b7429147f81df4f15a77ef0018f5d710ce00 100644
+index 3488401b04d08e4f4b7b0ea7624b2aa97a920482..0f0122f194d051be0595646cea5563973229e6eb 100644
 --- a/cpp/api/JsiSkImageFilterFactory.h
 +++ b/cpp/api/JsiSkImageFilterFactory.h
-@@ -36,6 +36,14 @@ public:
-                      SkImageFilters::Blur(sigmaX, sigmaY, (SkTileMode)tileMode,
+@@ -37,6 +37,75 @@ public:
                                            imageFilter)));
    }
-+  
+ 
 +  JSI_HOST_FUNCTION(MakeImage) {
 +    auto image = JsiSkImage::fromValue(runtime, arguments[0]);
 +    auto sampling = SkSamplingOptions(SkFilterMode::kLinear, SkMipmapMode::kNone);
@@ -14,14 +13,7 @@ index 3488401b04d08e4f4b7b0ea7624b2aa97a920482..a200b7429147f81df4f15a77ef0018f5
 +        runtime, std::make_shared<JsiSkImageFilter>(
 +                     getContext(), SkImageFilters::Image(std::move(image), sampling)));
 +  }
- 
-   JSI_HOST_FUNCTION(MakeColorFilter) {
-     auto cf = JsiSkColorFilter::fromValue(runtime, arguments[0]);
-@@ -48,6 +56,32 @@ public:
-                      getContext(), SkImageFilters::ColorFilter(
-                                        std::move(cf), std::move(input))));
-   }
-+  
++
 +  JSI_HOST_FUNCTION(MakeMatrixTransform) {
 +    auto matrix = JsiSkMatrix::fromValue(runtime, arguments[0]);
 +    auto sampling = SkSamplingOptions(SkFilterMode::kLinear, SkMipmapMode::kNone);
@@ -47,14 +39,7 @@ index 3488401b04d08e4f4b7b0ea7624b2aa97a920482..a200b7429147f81df4f15a77ef0018f5
 +                     getContext(), SkImageFilters::Crop(
 +                                       *rect, SkTileMode::kDecal, std::move(input))));
 +  }
- 
-   JSI_HOST_FUNCTION(MakeOffset) {
-     auto x = arguments[0].asNumber();
-@@ -218,11 +252,49 @@ public:
-                      getContext(), SkImageFilters::RuntimeShader(
-                                        *rtb, childName, std::move(input))));
-   }
-+  
++
 +  JSI_HOST_FUNCTION(MakeRuntimeShaderWithChildren) {
 +    auto rtb = JsiSkRuntimeShaderBuilder::fromValue(runtime, arguments[0]);
 +
@@ -89,8 +74,11 @@ index 3488401b04d08e4f4b7b0ea7624b2aa97a920482..a200b7429147f81df4f15a77ef0018f5
 +                     getContext(), SkImageFilters::RuntimeShader(
 +                                       *rtb, childNamesStringView.data(), inputs.data(), length)));
 +  }
- 
-   JSI_EXPORT_FUNCTIONS(
++
+   JSI_HOST_FUNCTION(MakeColorFilter) {
+     auto cf = JsiSkColorFilter::fromValue(runtime, arguments[0]);
+     sk_sp<SkImageFilter> input;
+@@ -223,6 +292,9 @@ public:
        JSI_EXPORT_FUNC(JsiSkImageFilterFactory, MakeBlur),
        JSI_EXPORT_FUNC(JsiSkImageFilterFactory, MakeOffset),
        JSI_EXPORT_FUNC(JsiSkImageFilterFactory, MakeColorFilter),
@@ -111,7 +99,7 @@ index 3488401b04d08e4f4b7b0ea7624b2aa97a920482..a200b7429147f81df4f15a77ef0018f5
    explicit JsiSkImageFilterFactory(std::shared_ptr<RNSkPlatformContext> context)
        : JsiSkHostObject(std::move(context)) {}
 diff --git a/lib/commonjs/skia/types/ImageFilter/ImageFilterFactory.d.ts b/lib/commonjs/skia/types/ImageFilter/ImageFilterFactory.d.ts
-index 3ccb1e20cd143d0d8f64970f000705e72f2485db..9a31f238a8b43d2b5416ac703e2d9257a3701bdb 100644
+index 3ccb1e20cd143d0d8f64970f000705e72f2485db..0778d31d2054ae6e75c33bb82c968f2bbd7f45d6 100644
 --- a/lib/commonjs/skia/types/ImageFilter/ImageFilterFactory.d.ts
 +++ b/lib/commonjs/skia/types/ImageFilter/ImageFilterFactory.d.ts
 @@ -1,5 +1,7 @@
@@ -127,13 +115,13 @@ index 3ccb1e20cd143d0d8f64970f000705e72f2485db..9a31f238a8b43d2b5416ac703e2d9257
       */
      MakeRuntimeShader: (builder: SkRuntimeShaderBuilder, childShaderName: string | null, input: SkImageFilter | null) => SkImageFilter;
 +
-+  MakeCrop(rect: SkRect, input: SkImageFilter | null): SkImageFilter;
-+  MakeMatrixTransform(matrix: SkMatrix, filter: SkImageFilter | null): SkImageFilter;
-+  MakeImage(image: SkImage): SkImageFilter;
-+  MakeRuntimeShaderWithChildren: (builder: SkRuntimeShaderBuilder, childNames: string[], children: (SkImageFilter | null)[]) => SkImageFilter;
++    MakeCrop(rect: SkRect, input: SkImageFilter | null): SkImageFilter;
++    MakeMatrixTransform(matrix: SkMatrix, filter: SkImageFilter | null): SkImageFilter;
++    MakeImage(image: SkImage): SkImageFilter;
++    MakeRuntimeShaderWithChildren: (builder: SkRuntimeShaderBuilder, childNames: string[], children: (SkImageFilter | null)[]) => SkImageFilter;
  }
 diff --git a/lib/module/skia/types/ImageFilter/ImageFilterFactory.d.ts b/lib/module/skia/types/ImageFilter/ImageFilterFactory.d.ts
-index 3ccb1e20cd143d0d8f64970f000705e72f2485db..9a31f238a8b43d2b5416ac703e2d9257a3701bdb 100644
+index 3ccb1e20cd143d0d8f64970f000705e72f2485db..5d6098f573268ef637833b08d94bd1e9e61b47fb 100644
 --- a/lib/module/skia/types/ImageFilter/ImageFilterFactory.d.ts
 +++ b/lib/module/skia/types/ImageFilter/ImageFilterFactory.d.ts
 @@ -1,5 +1,7 @@
@@ -144,18 +132,19 @@ index 3ccb1e20cd143d0d8f64970f000705e72f2485db..9a31f238a8b43d2b5416ac703e2d9257
  import type { BlendMode } from "../Paint";
  import type { SkRect } from "../Rect";
  import type { SkRuntimeShaderBuilder } from "../RuntimeEffect";
-@@ -127,4 +129,9 @@ export interface ImageFilterFactory {
+@@ -127,4 +129,10 @@ export interface ImageFilterFactory {
       *                         shader. If null the implicit source image is used instead
       */
      MakeRuntimeShader: (builder: SkRuntimeShaderBuilder, childShaderName: string | null, input: SkImageFilter | null) => SkImageFilter;
 +
-+  MakeCrop(rect: SkRect, input: SkImageFilter | null): SkImageFilter;
-+  MakeMatrixTransform(matrix: SkMatrix, filter: SkImageFilter | null): SkImageFilter;
-+  MakeImage(image: SkImage): SkImageFilter;
-+  MakeRuntimeShaderWithChildren: (builder: SkRuntimeShaderBuilder, childNames: string[], children: (SkImageFilter | null)[]) => SkImageFilter;
++
++    MakeCrop(rect: SkRect, input: SkImageFilter | null): SkImageFilter;
++    MakeMatrixTransform(matrix: SkMatrix, filter: SkImageFilter | null): SkImageFilter;
++    MakeImage(image: SkImage): SkImageFilter;
++    MakeRuntimeShaderWithChildren: (builder: SkRuntimeShaderBuilder, childNames: string[], children: (SkImageFilter | null)[]) => SkImageFilter;
  }
 diff --git a/lib/typescript/src/skia/types/ImageFilter/ImageFilterFactory.d.ts b/lib/typescript/src/skia/types/ImageFilter/ImageFilterFactory.d.ts
-index 3ccb1e20cd143d0d8f64970f000705e72f2485db..9a31f238a8b43d2b5416ac703e2d9257a3701bdb 100644
+index 3ccb1e20cd143d0d8f64970f000705e72f2485db..0778d31d2054ae6e75c33bb82c968f2bbd7f45d6 100644
 --- a/lib/typescript/src/skia/types/ImageFilter/ImageFilterFactory.d.ts
 +++ b/lib/typescript/src/skia/types/ImageFilter/ImageFilterFactory.d.ts
 @@ -1,5 +1,7 @@
@@ -171,10 +160,10 @@ index 3ccb1e20cd143d0d8f64970f000705e72f2485db..9a31f238a8b43d2b5416ac703e2d9257
       */
      MakeRuntimeShader: (builder: SkRuntimeShaderBuilder, childShaderName: string | null, input: SkImageFilter | null) => SkImageFilter;
 +
-+  MakeCrop(rect: SkRect, input: SkImageFilter | null): SkImageFilter;
-+  MakeMatrixTransform(matrix: SkMatrix, filter: SkImageFilter | null): SkImageFilter;
-+  MakeImage(image: SkImage): SkImageFilter;
-+  MakeRuntimeShaderWithChildren: (builder: SkRuntimeShaderBuilder, childNames: string[], children: (SkImageFilter | null)[]) => SkImageFilter;
++    MakeCrop(rect: SkRect, input: SkImageFilter | null): SkImageFilter;
++    MakeMatrixTransform(matrix: SkMatrix, filter: SkImageFilter | null): SkImageFilter;
++    MakeImage(image: SkImage): SkImageFilter;
++    MakeRuntimeShaderWithChildren: (builder: SkRuntimeShaderBuilder, childNames: string[], children: (SkImageFilter | null)[]) => SkImageFilter;
  }
 diff --git a/src/skia/types/ImageFilter/ImageFilterFactory.ts b/src/skia/types/ImageFilter/ImageFilterFactory.ts
 index ee691877c50d7f8e8f6f7e7fe0657ae7f59cd9bd..748e1d8320750282fa07565312e03c2c0037f5f6 100644
