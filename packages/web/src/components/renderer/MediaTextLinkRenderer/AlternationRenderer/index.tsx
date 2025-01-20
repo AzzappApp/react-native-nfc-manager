@@ -107,6 +107,7 @@ const AlternationRender = async ({
                       )}
                       style={{
                         color: swapColor(cardModuleColor?.title, colorPalette),
+                        fontSize: cardStyle.titleFontSize,
                       }}
                     >
                       {sectionData?.title ?? DEFAULT_MODULE_TITLE}
@@ -118,6 +119,7 @@ const AlternationRender = async ({
                       )}
                       style={{
                         color: swapColor(cardModuleColor?.text, colorPalette),
+                        fontSize: cardStyle.fontSize,
                       }}
                     >
                       {sectionData?.text ?? DEFAULT_MODULE_TEXT}
