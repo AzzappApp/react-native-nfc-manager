@@ -57,7 +57,9 @@ const ContactActionModal = ({
     const multiSelection =
       contactActionData?.contact && Array.isArray(contactActionData.contact);
     return [
-      !multiSelection
+      contactActionData?.contact &&
+      !Array.isArray(contactActionData.contact) &&
+      contactActionData?.contact?.contactProfile?.webCard?.userName
         ? {
             icon: 'preview' as Icons,
             text: intl.formatMessage({
