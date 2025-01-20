@@ -229,7 +229,7 @@ const AccountDetailsScreen = ({
             </Text>
             <Text variant="medium">••••••••••</Text>
           </PressableNative>
-          {/* <View style={styles.sectionField}>
+          <View style={styles.sectionField}>
             <Text variant="smallbold">
               <FormattedMessage
                 defaultMessage="Plan"
@@ -261,7 +261,7 @@ const AccountDetailsScreen = ({
                 />
               )}
             </Text>
-          </View> */}
+          </View>
         </View>
         <PressableNative
           onPress={deleteMyAccount}
