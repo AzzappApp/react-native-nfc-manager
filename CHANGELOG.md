@@ -1,5 +1,6 @@
-## 1.7.0-canary.32
+## 1.7.0-canary.33
 
+* **build:**  - upgrade native dependencies ([#6981](https://github.com/AzzappApp/azzapp/pull/6981))
 * **fix:**  - handle alternation specification changes ([#6979](https://github.com/AzzappApp/azzapp/pull/6979))
 * **fix:**  - rework buildLocalContact to ensure expo contact is well created ([#6980](https://github.com/AzzappApp/azzapp/pull/6980))
 * **fix:**  - **deepLink:** [#6158](https://github.com/AzzappApp/azzapp/pull/6158) don’t route to home (router don’t support it) ([#6966](https://github.com/AzzappApp/azzapp/pull/6966))
