@@ -1,5 +1,6 @@
-## 1.7.0-canary.29
+## 1.7.0-canary.30
 
+* **fix:**  - handle alternation specification changes ([#6979](https://github.com/AzzappApp/azzapp/pull/6979))
 * **fix:**  - rework buildLocalContact to ensure expo contact is well created ([#6980](https://github.com/AzzappApp/azzapp/pull/6980))
 * **fix:**  - **deepLink:** [#6158](https://github.com/AzzappApp/azzapp/pull/6158) don’t route to home (router don’t support it) ([#6966](https://github.com/AzzappApp/azzapp/pull/6966))
 * **feat:**  - **home:** tooltip text updates ([#6967](https://github.com/AzzappApp/azzapp/pull/6967))
