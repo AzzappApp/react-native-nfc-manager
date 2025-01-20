@@ -97,7 +97,7 @@ const calculateSubscriptionUpdate = async (
     return {
       firstPayment: null,
       recurringCost: {
-        amount,
+        amount: amount ?? 0,
         taxes,
         taxRate: rate ?? 0,
       },
@@ -152,7 +152,7 @@ const calculateSubscriptionUpdate = async (
         taxRate: rateForTheRestOfTheYear ?? 0,
       },
       recurringCost: {
-        amount,
+        amount: amount ?? 0,
         taxes,
         taxRate: rate ?? 0,
       },
@@ -273,7 +273,7 @@ export const updateExistingSubscription = async ({
             rebill_manager_initial_type: 'PAID',
             rebill_manager_initial_price_cnts: '0',
             rebill_manager_initial_duration_min: `${timeUntilNextPayment}`,
-            rebill_manager_rebill_price_cnts: `${(recurringCost.amount ?? 0) + recurringCost.taxes}`,
+            rebill_manager_rebill_price_cnts: `${recurringCost.amount + recurringCost.taxes}`,
             rebill_manager_rebill_duration_mins: `0`,
             rebill_manager_rebill_period_mins: `${intervalInMinutes}`,
             clientPaymentRequestUlid: existingSubscription.paymentMeanId,
@@ -387,7 +387,7 @@ export const updateExistingSubscription = async ({
           rebill_manager_initial_type: 'PAID',
           rebill_manager_initial_price_cnts: `${(firstPayment?.amount ?? 0) + (firstPayment?.taxes ?? 0)}`,
           rebill_manager_initial_duration_min: `${intervalInMinutes}`,
-          rebill_manager_rebill_price_cnts: `${(recurringCost.amount ?? 0) + recurringCost.taxes}`,
+          rebill_manager_rebill_price_cnts: `${recurringCost.amount + recurringCost.taxes}`,
           rebill_manager_rebill_duration_mins: '0',
           rebill_manager_rebill_period_mins: `${calculateNextPaymentIntervalInMinutes(existingSubscription.subscriptionPlan)}`,
           clientPaymentRequestUlid: existingSubscription.paymentMeanId,
