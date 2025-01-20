@@ -5,6 +5,7 @@ import CloudinaryVideo from '#ui/CloudinaryVideo';
 import styles from './AlternationRenderer.css';
 import type { Media } from '@azzapp/data';
 import type { CardStyle } from '@azzapp/shared/cardHelpers';
+import type { CSSProperties } from 'react';
 
 const mediaResolution = 480;
 
@@ -51,6 +52,13 @@ const AlternationMedia = ({
           : styles.sectionPartContainer
       }
       ref={pictureRef}
+      style={
+        {
+          '--cardStyle-gap': `${cardStyle.gap}px`,
+          '--cardStyle-gap-left': even ? '0px' : `${cardStyle.gap}px`,
+          '--cardStyle-gap-right': even ? `${cardStyle.gap}px` : '0px',
+        } as CSSProperties & Record<string, any>
+      }
     >
       <div className={styles.imageContainer}>
         <div

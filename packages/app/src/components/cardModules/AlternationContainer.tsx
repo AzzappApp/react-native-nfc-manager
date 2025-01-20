@@ -35,8 +35,6 @@ type AlternationContainerProps = Pick<ViewProps, 'children' | 'onLayout'> & {
 };
 
 const ANIMATION_DURATION = 1000;
-const HORIZONTAL_GAP = 40;
-const PADDING_HORIZONTAL = 20;
 
 /**
  * ALternation container for the section module type
@@ -57,14 +55,16 @@ const AlternationContainer = ({
   webCardViewMode,
   isFullAlternation,
 }: AlternationContainerProps) => {
+  const cardStyleGap = cardStyle?.gap || 0;
+
   const styles = useVariantStyleSheet(stylesheet, displayMode);
   const mediaWidth = isFullAlternation
     ? displayMode === 'desktop'
       ? dimension.width / 2
       : dimension.width
     : displayMode === 'desktop'
-      ? (dimension.width - 2 * PADDING_HORIZONTAL - HORIZONTAL_GAP) / 2
-      : dimension.width - 2 * PADDING_HORIZONTAL;
+      ? dimension.width / 2 - cardStyleGap
+      : dimension.width - 2 * cardStyleGap;
 
   const [componentY, setComponentY] = useState(0);
   const [componentHeight, setComponentHeight] = useState(0);
@@ -170,6 +170,9 @@ const AlternationContainer = ({
           (Platform.OS === 'android' && media.kind === 'video')
             ? 1
             : opacity,
+        marginTop: isFullAlternation ? 0 : cardStyleGap,
+        marginBottom:
+          !isFullAlternation && displayMode === 'desktop' ? cardStyleGap : 0,
       },
     ],
     [
@@ -181,6 +184,8 @@ const AlternationContainer = ({
       translateX,
       media.kind,
       opacity,
+      cardStyleGap,
+      displayMode,
     ],
   );
 
@@ -202,26 +207,37 @@ const AlternationContainer = ({
     return null;
   }
 
+  const textGap = Math.max(20, cardStyleGap);
+
+  const even = index % 2 === 0;
   return (
     <View
-      style={[
-        isFullAlternation ? styles.fullAlternationContainer : styles.container,
-        { width: dimension.width },
-      ]}
+      style={
+        isFullAlternation ? styles.fullAlternationContainer : styles.container
+      }
       onLayout={onLayout}
     >
-      {displayMode === 'desktop' && index % 2 === 0 ? (
+      {displayMode === 'desktop' && even ? (
         <View
           style={{
-            width: mediaWidth,
-            padding: displayMode === 'desktop' && isFullAlternation ? 40 : 0,
+            padding: textGap,
+            width: dimension.width / 2,
           }}
         >
           {children}
         </View>
       ) : undefined}
-      {displayMode !== 'desktop' || index % 2 === 0 ? (
-        <Animated.View style={imageContainerStyle}>
+      {displayMode !== 'desktop' || even ? (
+        <Animated.View
+          style={[
+            imageContainerStyle,
+            displayMode === 'desktop' && !isFullAlternation
+              ? {
+                  marginBottom: cardStyleGap,
+                }
+              : undefined,
+          ]}
+        >
           <CardModuleMediaSelector
             media={media}
             dimension={imageDimension}
@@ -229,20 +245,34 @@ const AlternationContainer = ({
           />
         </Animated.View>
       ) : null}
-      {displayMode === 'desktop' && index % 2 === 1 ? (
-        <Animated.View style={imageContainerStyle}>
-          <CardModuleMediaSelector
-            media={media}
-            dimension={imageDimension}
-            canPlay={canPlay && inViewport}
-          />
-        </Animated.View>
+      {displayMode === 'desktop' && !even ? (
+        <View style={{ width: dimension.width / 2 }}>
+          <Animated.View
+            style={[
+              imageContainerStyle,
+              displayMode === 'desktop' && !isFullAlternation
+                ? {
+                    left: cardStyleGap,
+                    width: mediaWidth,
+                    marginBottom: cardStyleGap,
+                  }
+                : undefined,
+            ]}
+          >
+            <CardModuleMediaSelector
+              media={media}
+              dimension={imageDimension}
+              canPlay={canPlay && inViewport}
+            />
+          </Animated.View>
+        </View>
       ) : null}
-      {displayMode === 'mobile' || index % 2 === 1 ? (
+      {displayMode === 'mobile' || !even ? (
         <View
           style={{
-            width: mediaWidth,
-            padding: displayMode === 'desktop' && isFullAlternation ? 40 : 0,
+            width:
+              displayMode === 'desktop' ? dimension.width / 2 : dimension.width,
+            padding: textGap,
           }}
         >
           {children}
@@ -255,28 +285,27 @@ const AlternationContainer = ({
 const stylesheet = createVariantsStyleSheet(() => ({
   default: {
     container: { borderRadius: 0 },
-    imageContainer: { overflow: 'hidden' },
+    imageContainer: {
+      overflow: 'hidden',
+    },
   },
   mobile: {
     container: {
       flex: 1,
       flexDirection: 'column',
-      paddingHorizontal: PADDING_HORIZONTAL,
-      paddingVertical: 20,
-      rowGap: 20,
+      alignItems: 'center',
     },
     fullAlternationContainer: {
       flex: 1,
       flexDirection: 'column',
+      alignItems: 'center',
     },
   },
   desktop: {
     container: {
       flex: 1,
       flexDirection: 'row',
-      paddingHorizontal: PADDING_HORIZONTAL,
-      paddingVertical: 20,
-      columnGap: 40,
+      alignItems: 'center',
     },
     fullAlternationContainer: {
       flex: 1,

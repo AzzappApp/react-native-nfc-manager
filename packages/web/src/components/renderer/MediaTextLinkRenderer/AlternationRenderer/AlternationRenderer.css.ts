@@ -4,7 +4,6 @@ import { MediaQuery } from '#app/[userName]/theme.css';
 const sectionContainer = style({
   display: 'flex',
   width: '100%',
-  gap: 40,
   alignItems: 'center',
   '@media': {
     [MediaQuery.Mobile]: {
@@ -46,11 +45,27 @@ const sectionFullAlternationContainerEven = style([
 ]);
 
 const sectionPartContainer = style({
-  width: 480,
   flex: 1,
   '@media': {
+    [MediaQuery.Desktop]: {
+      padding:
+        'var(--cardStyle-gap) var(--cardStyle-gap-right) var(--cardStyle-gap) var(--cardStyle-gap-left)',
+    },
     [MediaQuery.Mobile]: {
-      width: 'calc(100vw - 40px)',
+      padding:
+        'var(--cardStyle-gap) var(--cardStyle-gap) 0 var(--cardStyle-gap)',
+    },
+  },
+});
+
+const columnWidth = style({
+  flex: 1,
+  '@media': {
+    [MediaQuery.Desktop]: {
+      width: '50%',
+    },
+    [MediaQuery.Mobile]: {
+      width: '100%',
     },
   },
 });
@@ -120,7 +135,6 @@ const container = style({
   flexDirection: 'column',
   alignItems: 'center',
   maxWidth: 'min(100vw, 1000px)',
-  padding: '0 20px',
   margin: '0 auto',
   flex: 1,
 });
@@ -146,7 +160,17 @@ const link = style({
   display: 'flex',
 });
 
+const mediaGaps = {
+  padding: 'var(--cardStyle-gap) 0 var(--cardStyle-gap) var(--cardStyle-gap)',
+};
+
+const mediaGapsEven = {
+  padding: 'var(--cardStyle-gap) var(--cardStyle-gap) var(--cardStyle-gap) 0',
+};
+
 export default {
+  mediaGaps,
+  mediaGapsEven,
   container,
   sectionContainer,
   imageContainer,
@@ -162,4 +186,5 @@ export default {
   sectionTextFullAlternationContainer,
   media,
   link,
+  columnWidth,
 };
