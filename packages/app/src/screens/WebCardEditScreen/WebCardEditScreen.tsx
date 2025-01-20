@@ -8,7 +8,11 @@ import { swapColor } from '@azzapp/shared/cardHelpers';
 import { MODULE_KINDS } from '@azzapp/shared/cardModuleHelpers';
 import { colors } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
-import { useRouter, useSuspendUntilAppear } from '#components/NativeRouter';
+import {
+  useRouter,
+  useScreenHasFocus,
+  useSuspendUntilAppear,
+} from '#components/NativeRouter';
 import { getRouteForCardModule } from '#helpers/cardModuleRouterHelpers';
 import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
 import { TooltipProvider } from '#helpers/TooltipContext';
@@ -305,6 +309,7 @@ const WebCardEditScreen = ({
     webCard?.cardColors?.light ??
     colors.white;
 
+  const hasFocus = useScreenHasFocus();
   if (!webCard) {
     // TODO: handle error
     return null;
@@ -357,7 +362,7 @@ const WebCardEditScreen = ({
             <CoverRenderer
               webCard={webCard}
               width={windowWidth}
-              canPlay={editing}
+              canPlay={editing && hasFocus}
               large
               useAnimationSnapshot
             />
