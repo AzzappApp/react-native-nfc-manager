@@ -96,7 +96,7 @@ const calculateSubscriptionUpdate = async (
 
     return {
       firstPayment: null,
-      recurringPayment: {
+      recurringCost: {
         amount,
         taxes,
         taxRate: rate ?? 0,
@@ -151,7 +151,7 @@ const calculateSubscriptionUpdate = async (
         taxes: taxesForTheRestOfTheYear,
         taxRate: rateForTheRestOfTheYear ?? 0,
       },
-      recurringPayment: {
+      recurringCost: {
         amount,
         taxes,
         taxRate: rate ?? 0,
@@ -247,7 +247,7 @@ export const updateExistingSubscription = async ({
         }
       }
 
-      const { recurringPayment } = await calculateSubscriptionUpdate(
+      const { recurringCost } = await calculateSubscriptionUpdate(
         existingSubscription,
         totalSeats,
       );
@@ -273,7 +273,7 @@ export const updateExistingSubscription = async ({
             rebill_manager_initial_type: 'PAID',
             rebill_manager_initial_price_cnts: '0',
             rebill_manager_initial_duration_min: `${timeUntilNextPayment}`,
-            rebill_manager_rebill_price_cnts: `${(recurringPayment.amount ?? 0) + recurringPayment.taxes}`,
+            rebill_manager_rebill_price_cnts: `${(recurringCost.amount ?? 0) + recurringCost.taxes}`,
             rebill_manager_rebill_duration_mins: `0`,
             rebill_manager_rebill_period_mins: `${intervalInMinutes}`,
             clientPaymentRequestUlid: existingSubscription.paymentMeanId,
@@ -303,8 +303,8 @@ export const updateExistingSubscription = async ({
         subscriptionId: newSubscriptionId,
         id: newSubscriptionId,
         totalSeats: totalSeats ?? existingSubscription.totalSeats,
-        amount: recurringPayment.amount,
-        taxes: recurringPayment.taxes,
+        amount: recurringCost.amount,
+        taxes: recurringCost.taxes,
         rebillManagerId: newRebillManagerId,
         canceledAt: null,
         status: 'active',
@@ -369,8 +369,10 @@ export const updateExistingSubscription = async ({
       existingSubscription.endAt,
     );
 
-    const { firstPayment, recurringPayment } =
-      await calculateSubscriptionUpdate(existingSubscription, totalSeats);
+    const { firstPayment, recurringCost } = await calculateSubscriptionUpdate(
+      existingSubscription,
+      totalSeats,
+    );
 
     newSubscriptionId = createId();
 
@@ -385,7 +387,7 @@ export const updateExistingSubscription = async ({
           rebill_manager_initial_type: 'PAID',
           rebill_manager_initial_price_cnts: `${(firstPayment?.amount ?? 0) + (firstPayment?.taxes ?? 0)}`,
           rebill_manager_initial_duration_min: `${intervalInMinutes}`,
-          rebill_manager_rebill_price_cnts: `${(recurringPayment.amount ?? 0) + recurringPayment.taxes}`,
+          rebill_manager_rebill_price_cnts: `${(recurringCost.amount ?? 0) + recurringCost.taxes}`,
           rebill_manager_rebill_duration_mins: '0',
           rebill_manager_rebill_period_mins: `${calculateNextPaymentIntervalInMinutes(existingSubscription.subscriptionPlan)}`,
           clientPaymentRequestUlid: existingSubscription.paymentMeanId,
@@ -415,8 +417,8 @@ export const updateExistingSubscription = async ({
       subscriptionId: newSubscriptionId,
       id: newSubscriptionId,
       totalSeats: totalSeats ?? existingSubscription.totalSeats,
-      amount: recurringPayment.amount,
-      taxes: recurringPayment.taxes,
+      amount: recurringCost.amount,
+      taxes: recurringCost.taxes,
       rebillManagerId: newRebillManagerId,
       canceledAt: null,
       status: 'active',

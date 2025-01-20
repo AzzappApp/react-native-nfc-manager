@@ -80,7 +80,7 @@ type PaymentIntentPayload {
 
 type UpdateSubscriptionEstimation {
   firstPayment: SubscriptionEstimation
-  recurringCost: SubscriptionEstimation
+  recurringCost: SubscriptionEstimation!
 }
 
 type SubscriptionEstimation {
