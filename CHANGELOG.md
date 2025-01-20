@@ -1,5 +1,6 @@
-## 1.7.0-canary.28
+## 1.7.0-canary.29
 
+* **fix:**  - rework buildLocalContact to ensure expo contact is well created ([#6980](https://github.com/AzzappApp/azzapp/pull/6980))
 * **fix:**  - **deepLink:** [#6158](https://github.com/AzzappApp/azzapp/pull/6158) don’t route to home (router don’t support it) ([#6966](https://github.com/AzzappApp/azzapp/pull/6966))
 * **feat:**  - **home:** tooltip text updates ([#6967](https://github.com/AzzappApp/azzapp/pull/6967))
 * **fix:**  - **payment:** [#5176](https://github.com/AzzappApp/azzapp/pull/5176) add a way to run manually cron ([#6974](https://github.com/AzzappApp/azzapp/pull/6974))
