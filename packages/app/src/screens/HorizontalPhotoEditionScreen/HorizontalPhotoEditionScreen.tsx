@@ -29,8 +29,8 @@ import {
   getTargetFormatFromPath,
   saveTransformedImageToFile,
 } from '#helpers/mediaEditions';
-import { downScaleImage } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
+import { downScaleImage } from '#helpers/resolutionHelpers';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';

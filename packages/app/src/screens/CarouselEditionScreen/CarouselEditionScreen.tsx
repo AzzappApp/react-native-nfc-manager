@@ -27,6 +27,7 @@ import {
   saveTransformedImageToFile,
 } from '#helpers/mediaEditions';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
+import { downScaleImage } from '#helpers/resolutionHelpers';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
@@ -271,15 +272,15 @@ const CarouselEditionScreen = ({
     async ({
       uri,
       width,
+      height,
       editionParameters,
       filter,
       aspectRatio,
     }: ImagePickerResult) => {
-      const exportWidth = Math.min(MODULE_IMAGE_MAX_WIDTH, width);
-      const exportHeight = exportWidth / aspectRatio;
+      const resolution = downScaleImage(width, height, MODULE_IMAGE_MAX_WIDTH);
       const localPath = await saveTransformedImageToFile({
         uri,
-        resolution: { width: exportWidth, height: exportHeight },
+        resolution,
         format: getTargetFormatFromPath(uri),
         quality: 95,
         filter,

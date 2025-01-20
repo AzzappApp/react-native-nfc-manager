@@ -23,6 +23,7 @@ import {
 } from './mediaEditions';
 import { addLocalCachedMediaFile } from './mediaHelpers';
 import { uploadSign, uploadMedia } from './MobileWebAPI';
+import { downScaleImage } from './resolutionHelpers';
 import type {
   CardModuleMedia,
   CardModuleSourceMedia,
@@ -87,11 +88,14 @@ export const handleUploadCardModuleMedia = async (
             !moduleMedia.media.uri.startsWith('http')
           ) {
             if (media.kind === 'image') {
-              const exportWidth = Math.min(MODULE_IMAGE_MAX_WIDTH, media.width);
-              const exportHeight = (exportWidth / media.width) * media.height;
+              const resolution = downScaleImage(
+                media.width,
+                media.height,
+                MODULE_IMAGE_MAX_WIDTH,
+              );
               const localPath = await saveTransformedImageToFile({
                 uri: media.uri,
-                resolution: { width: exportWidth, height: exportHeight },
+                resolution,
                 format: getTargetFormatFromPath(media.uri),
                 quality: 95,
                 filter: media.filter,
@@ -99,21 +103,17 @@ export const handleUploadCardModuleMedia = async (
               });
               media.uri = localPath;
             } else {
-              const exportWidth = Math.min(MODULE_VIDEO_MAX_WIDTH, media.width);
-              const exportHeight = (exportWidth / media.width) * media.height;
-              const aspectRatio = exportWidth / exportHeight;
-              const resolution = {
-                width:
-                  aspectRatio >= 1 ? exportWidth : exportWidth * aspectRatio,
-                height:
-                  aspectRatio < 1 ? exportWidth : exportWidth / aspectRatio,
-              };
+              const resolution = downScaleImage(
+                media.width,
+                media.height,
+                MODULE_VIDEO_MAX_WIDTH,
+              );
               try {
                 const localPath = await saveTransformedVideoToFile({
                   video: {
                     uri: media.uri,
-                    width: exportWidth,
-                    height: exportHeight,
+                    width: resolution.width,
+                    height: resolution.height,
                     rotation: media.rotation ?? 0,
                   },
                   resolution,
