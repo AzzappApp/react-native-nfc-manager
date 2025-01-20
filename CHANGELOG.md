@@ -1,5 +1,6 @@
-## 1.7.0-canary.34
+## 1.7.0-canary.35
 
+* **fix:**  - do not display see webcard if contact don't have webcard ([#6986](https://github.com/AzzappApp/azzapp/pull/6986))
 * **fix:**  - stop playback when webcard is not focused ([#6988](https://github.com/AzzappApp/azzapp/pull/6988))
 * **build:**  - upgrade native dependencies ([#6981](https://github.com/AzzappApp/azzapp/pull/6981))
 * **fix:**  - handle alternation specification changes ([#6979](https://github.com/AzzappApp/azzapp/pull/6979))
