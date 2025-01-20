@@ -1,5 +1,8 @@
-## 1.7.0-canary.37
+## 1.7.0-canary.38
 
+* **feat:**  - add share webcard link from contact ([#6987](https://github.com/AzzappApp/azzapp/pull/6987))
+* **fix:**  - review image downscaling process ([#6996](https://github.com/AzzappApp/azzapp/pull/6996))
+* **fix:**  - remove opaque prop on Canvas / RNSkia ([#6998](https://github.com/AzzappApp/azzapp/pull/6998))
 * **fix:**  - ensure fontSize is applied on new modules ([#6997](https://github.com/AzzappApp/azzapp/pull/6997))
 * **fix:**  - **payment:** [#5472](https://github.com/AzzappApp/azzapp/pull/5472) add update subscription estimation mutation ([#6991](https://github.com/AzzappApp/azzapp/pull/6991))
 * **fix:**  - **payment:** [#5176](https://github.com/AzzappApp/azzapp/pull/5176) wrong used env var ([#6992](https://github.com/AzzappApp/azzapp/pull/6992))
