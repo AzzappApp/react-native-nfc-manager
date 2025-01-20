@@ -1,5 +1,10 @@
-## 1.7.0-canary.36
+## 1.7.0-canary.37
 
+* **fix:**  - ensure fontSize is applied on new modules ([#6997](https://github.com/AzzappApp/azzapp/pull/6997))
+* **fix:**  - **payment:** [#5472](https://github.com/AzzappApp/azzapp/pull/5472) add update subscription estimation mutation ([#6991](https://github.com/AzzappApp/azzapp/pull/6991))
+* **fix:**  - **payment:** [#5176](https://github.com/AzzappApp/azzapp/pull/5176) wrong used env var ([#6992](https://github.com/AzzappApp/azzapp/pull/6992))
+* **fix:**  - **contactCard:** [#6983](https://github.com/AzzappApp/azzapp/pull/6983) don’t display upload progress when no upload ([#6995](https://github.com/AzzappApp/azzapp/pull/6995))
+* **fix:**  - **payment:** [#5193](https://github.com/AzzappApp/azzapp/pull/5193) put back subscription infos ([#6994](https://github.com/AzzappApp/azzapp/pull/6994))
 * **fix:**  - do not extract common information if multiuser is disabled ([#6989](https://github.com/AzzappApp/azzapp/pull/6989))
 * **fix:**  - paths have changed on iOS
 * **fix:**  - do not display see webcard if contact don't have webcard ([#6986](https://github.com/AzzappApp/azzapp/pull/6986))
