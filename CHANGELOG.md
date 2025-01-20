@@ -1,5 +1,7 @@
-## 1.7.0-canary.38
+## 1.7.0-canary.39
 
+* **fix:**  - add delay in grid item appearence ([#7000](https://github.com/AzzappApp/azzapp/pull/7000))
+* **fix:**  - **payment:** wrong naming in result
 * **feat:**  - add share webcard link from contact ([#6987](https://github.com/AzzappApp/azzapp/pull/6987))
 * **fix:**  - review image downscaling process ([#6996](https://github.com/AzzappApp/azzapp/pull/6996))
 * **fix:**  - remove opaque prop on Canvas / RNSkia ([#6998](https://github.com/AzzappApp/azzapp/pull/6998))
