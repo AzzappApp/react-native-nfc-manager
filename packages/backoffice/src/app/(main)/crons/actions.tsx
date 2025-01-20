@@ -4,7 +4,7 @@ export async function unpublishWebCards() {
   // Mutate data
 
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_URL}api/cron/unpublishWebCards`,
+    `${process.env.NEXT_PUBLIC_API_ENDPOINT}/cron/unpublishWebCards`,
     {
       headers: {
         authorization: `Bearer ${process.env.CRON_SECRET}`,
