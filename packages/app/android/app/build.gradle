@@ -88,8 +88,8 @@ android {
         applicationId "com.azzapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 10700031
-        versionName "1.7.0-canary.31"
+        versionCode 10700032
+        versionName "1.7.0-canary.32"
     }
 
     flavorDimensions "env"

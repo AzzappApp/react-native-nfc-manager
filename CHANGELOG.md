@@ -1,4 +1,4 @@
-## 1.7.0-canary.31
+## 1.7.0-canary.32
 
 * **fix:**  - handle alternation specification changes ([#6979](https://github.com/AzzappApp/azzapp/pull/6979))
 * **fix:**  - rework buildLocalContact to ensure expo contact is well created ([#6980](https://github.com/AzzappApp/azzapp/pull/6980))
