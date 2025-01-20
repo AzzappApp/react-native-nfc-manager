@@ -168,10 +168,12 @@ export const AnimatedHomeHeaderCentralComponent = ({
       </Animated.View>
       {/** 2 pixel more to avoid crop problem */}
       <Canvas
-        style={{ width: 136, height: 30 }}
+        style={{
+          width: 136,
+          height: 30,
+        }}
         accessibilityLabel="azzapp"
         accessibilityRole="text"
-        opaque
       >
         <Mask
           mode="alpha"

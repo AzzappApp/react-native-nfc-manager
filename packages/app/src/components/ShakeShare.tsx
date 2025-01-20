@@ -166,7 +166,7 @@ const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
         {svg && (
           <View style={styles.actionContainer}>
             <View style={styles.qrCodeContainer}>
-              <Canvas style={styles.canvas} opaque>
+              <Canvas style={styles.canvas}>
                 <Group
                   layer={
                     <Paint>
