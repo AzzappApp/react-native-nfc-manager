@@ -1,4 +1,4 @@
-## 1.7.0-canary.56
+## 1.7.0-canary.57
 
 * **feat:**  - add preview in text configuration in media&Text modules ([#7040](https://github.com/AzzappApp/azzapp/pull/7040))
 * **fix:**  - ensure contacts are merged with casing independent ([#7035](https://github.com/AzzappApp/azzapp/pull/7035))
