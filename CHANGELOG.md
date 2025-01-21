@@ -1,5 +1,7 @@
-## 1.7.0-canary.47
+## 1.7.0-canary.48
 
+* **fix:**  - **IOS:** buffer loader memory leak ([#7026](https://github.com/AzzappApp/azzapp/pull/7026))
+* **fix:**  - regression in webcard fullscreen ([#7021](https://github.com/AzzappApp/azzapp/pull/7021))
 * **fix:**  - another date fix ([#7016](https://github.com/AzzappApp/azzapp/pull/7016))
 * **fix:**  - **IOS:** fix texture image loading performance ([#7008](https://github.com/AzzappApp/azzapp/pull/7008))
 * **fix:**  - move padding/margin to ensure gradient is displayed ([#7015](https://github.com/AzzappApp/azzapp/pull/7015))
