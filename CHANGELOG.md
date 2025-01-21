@@ -1,5 +1,6 @@
-## 1.7.0-canary.52
+## 1.7.0-canary.53
 
+* **fix:**  - **payment:** check payment mean belongs to user and webcard ([#7019](https://github.com/AzzappApp/azzapp/pull/7019))
 * **fix:**  - replace HomeProfileLink icon ([#7032](https://github.com/AzzappApp/azzapp/pull/7032))
 * **fix:**  - review paywall UI ([#7028](https://github.com/AzzappApp/azzapp/pull/7028))
 * **feat:**  - tentative to improve media (and small fix on module bakground) ([#7027](https://github.com/AzzappApp/azzapp/pull/7027))
