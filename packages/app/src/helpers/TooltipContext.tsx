@@ -39,10 +39,12 @@ export function TooltipProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const unregisterTooltip = useCallback((id: string) => {
-    setTooltips(tooltip => ({
-      ...tooltip,
-      [id]: null,
-    }));
+    setTooltips(tooltips => {
+      if (tooltips[id]) {
+        delete tooltips[id];
+      }
+      return tooltips;
+    });
   }, []);
 
   const updateTooltip = useCallback(

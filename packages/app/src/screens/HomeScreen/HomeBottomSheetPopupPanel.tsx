@@ -193,9 +193,10 @@ const HomeBottomSheetPopupPanel = ({
             },
           },
           onCompleted: () => {
-            openTooltips(['profileEdit']);
-
             onChangeWebCard({ webCardUserName: newUserName });
+            setTimeout(() => {
+              openTooltips(['profileEdit']);
+            }, 500);
           },
           updater: store => {
             // reorder carousel once userName is set

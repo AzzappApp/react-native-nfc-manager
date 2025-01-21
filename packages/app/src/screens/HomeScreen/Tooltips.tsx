@@ -49,7 +49,7 @@ const Tooltips = () => {
 
   const onCloseToolTipEdit = () => {
     closeTooltips(['profileEdit']);
-    if (ENABLE_MULTI_USER) {
+    if (ENABLE_MULTI_USER && tooltips['profileMulti']?.ref.current) {
       openTooltips(['profileMulti']);
     }
   };
