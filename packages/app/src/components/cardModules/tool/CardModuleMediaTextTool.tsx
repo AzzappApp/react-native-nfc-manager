@@ -148,21 +148,27 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
               </TouchableOpacity>
             }
           />
-          {module.moduleKind === 'mediaTextLink' && (
-            <View style={{ flexDirection: 'row', gap: 10 }}>
-              <MediaImageRenderer
-                source={{
-                  uri:
-                    cardModuleMedia.media.galleryUri ??
-                    cardModuleMedia.media.smallThumbnail ??
-                    cardModuleMedia.media.thumbnail ??
-                    cardModuleMedia.media.uri,
-                  requestedSize: 66,
-                  mediaId: cardModuleMedia.media.id,
-                }}
-                fit="cover"
-                style={styles.previewContent}
-              />
+
+          <View
+            style={[
+              styles.previewImageContainer,
+              module.moduleKind === 'mediaText' ? { alignSelf: 'center' } : {},
+            ]}
+          >
+            <MediaImageRenderer
+              source={{
+                uri:
+                  cardModuleMedia.media.galleryUri ??
+                  cardModuleMedia.media.smallThumbnail ??
+                  cardModuleMedia.media.thumbnail ??
+                  cardModuleMedia.media.uri,
+                requestedSize: 66,
+                mediaId: cardModuleMedia.media.id,
+              }}
+              fit="cover"
+              style={styles.previewContent}
+            />
+            {module.moduleKind === 'mediaTextLink' && (
               <View style={{ flex: 1 }}>
                 <BottomSheetTextInput
                   placeholder={intl.formatMessage({
@@ -186,14 +192,16 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
                   </Text>
                 ) : null}
               </View>
-            </View>
-          )}
+            )}
+          </View>
+
           <Text variant="button" style={{ paddingTop: 10, paddingBottom: 5 }}>
             <FormattedMessage
               defaultMessage="Title & description"
               description="CardModuleMediaTextTool - Title and description"
             />
           </Text>
+
           <BottomSheetTextInput
             multiline
             placeholder={intl.formatMessage({
@@ -288,4 +296,5 @@ const styles = StyleSheet.create({
     width: 47,
     borderRadius: 8,
   },
+  previewImageContainer: { flexDirection: 'row', gap: 10 },
 });
