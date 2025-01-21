@@ -1,10 +1,15 @@
 import { FlashList } from '@shopify/flash-list';
-import { Image } from 'expo-image';
+import { Image as ExpoImage } from 'expo-image';
 import memoize from 'lodash/memoize';
 import range from 'lodash/range';
 import { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet, useColorScheme, View } from 'react-native';
+import {
+  StyleSheet,
+  useColorScheme,
+  View,
+  Image as RNImage,
+} from 'react-native';
 import { colors } from '#theme';
 import { formatVideoTime } from '#helpers/mediaHelpers';
 import ActivityIndicator from '#ui/ActivityIndicator';
@@ -28,6 +33,7 @@ type MediaGridListProps<T> = Omit<ViewProps, 'children'> & {
   getItemDuration: (item: T) => number | undefined;
   onSelect: (media: T) => void;
   onEndReached?: (() => void) | null | undefined;
+  useNativeImage?: boolean;
 };
 
 const MediaGridList = <T,>({
@@ -44,6 +50,7 @@ const MediaGridList = <T,>({
   getItemDuration,
   onEndReached,
   onSelect,
+  useNativeImage = false,
   ...props
 }: MediaGridListProps<T>) => {
   const scrollViewRef = useRef<FlashList<any>>(null);
@@ -73,6 +80,7 @@ const MediaGridList = <T,>({
           isLoading={filesDownloading?.includes(id) ?? false}
           height={itemHeight}
           onPress={memoizedOnSelect(item)}
+          useNativeImage={useNativeImage}
         />
       );
     },
@@ -84,6 +92,7 @@ const MediaGridList = <T,>({
       filesDownloading,
       itemHeight,
       memoizedOnSelect,
+      useNativeImage,
     ],
   );
 
@@ -153,6 +162,7 @@ type MediaItemRendererProps = {
   isLoading: boolean;
   disabled?: boolean;
   onPress: () => void;
+  useNativeImage?: boolean;
 };
 
 const selectedBorderWidth = 2;
@@ -165,7 +175,9 @@ const MediaItemRenderer = ({
   isLoading,
   disabled,
   onPress,
+  useNativeImage = false,
 }: MediaItemRendererProps) => {
+  const Image = useNativeImage ? RNImage : ExpoImage;
   const intl = useIntl();
   const appearance = useColorScheme();
 

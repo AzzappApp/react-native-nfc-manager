@@ -140,7 +140,7 @@ const Item = <T extends ModuleKindAndVariant>({
           isSelected && styles.selectedImageContainer,
         ]}
       >
-        <Image source={pictureUri} style={styles.image} />
+        <Image source={pictureUri} style={styles.image} cachePolicy="none" />
       </View>
       {!isVariantSupported && (
         <Container style={styles.comingSoon}>

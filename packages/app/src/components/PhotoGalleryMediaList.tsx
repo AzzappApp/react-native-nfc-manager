@@ -317,6 +317,7 @@ const PhotoGalleryMediaList = ({
         onSelect={onMediaPress}
         onEndReached={onEndReached}
         testID="photo-gallery-list"
+        useNativeImage
         {...props}
       />
       <BottomSheetModal

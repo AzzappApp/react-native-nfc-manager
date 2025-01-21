@@ -149,7 +149,7 @@ const Item = ({
       disabled={!route}
       disabledOpacity={1}
     >
-      <Image source={uri} style={styles.image} />
+      <Image source={uri} style={styles.image} cachePolicy="none" />
       {!route && (
         <Container style={styles.comingSoon}>
           <Text

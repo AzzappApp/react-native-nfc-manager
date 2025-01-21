@@ -31,7 +31,7 @@ export type MediaImageRendererHandle = {
   snapshot(): Promise<void>;
 };
 
-export type MediaImageRendererProps = ViewProps & {
+export type MediaImageRendererProps = Pick<ViewProps, 'style' | 'testID'> & {
   /**
    * if true, the MediaImageRenderer will display the first frame of the video
    */
@@ -74,6 +74,10 @@ export type MediaImageRendererProps = ViewProps & {
    * Define the image blur
    */
   blurRadius?: number;
+  /**
+   *
+   */
+  cachePolicy?: 'disk' | 'memory-disk' | 'memory' | 'none' | null;
 };
 
 /**
@@ -89,10 +93,11 @@ const MediaImageRenderer = (
     onError,
     style,
     tintColor,
-    useAnimationSnapshot,
+    useAnimationSnapshot = false,
     fit,
     blurRadius,
-    ...props
+    testID,
+    cachePolicy,
   }: MediaImageRendererProps,
   ref: ForwardedRef<MediaImageRendererHandle>,
 ) => {
@@ -120,13 +125,15 @@ const MediaImageRenderer = (
       sourceRef.current = source;
       isReady.current = false;
       setThumbnail(getThumbnail(source.mediaId, source.requestedSize) ?? null);
-      setSnapshotID(
-        useAnimationSnapshotRef.current
-          ? (_imageSnapshots.get(source.mediaId) ?? null)
-          : null,
-      );
+      if (useAnimationSnapshot) {
+        setSnapshotID(
+          useAnimationSnapshotRef.current
+            ? (_imageSnapshots.get(source.mediaId) ?? null)
+            : null,
+        );
+      }
     }
-  }, [source]);
+  }, [source, useAnimationSnapshot]);
 
   const containerRef = useRef<any>(null);
   useImperativeHandle(
@@ -158,8 +165,10 @@ const MediaImageRenderer = (
 
   const onThumbnailLoad = useCallback(() => {
     dispatchReady();
-    cleanSnapshots();
-  }, [dispatchReady, cleanSnapshots]);
+    if (useAnimationSnapshot) {
+      cleanSnapshots();
+    }
+  }, [dispatchReady, useAnimationSnapshot, cleanSnapshots]);
 
   const onImageLoad = useCallback(() => {
     dispatchReady();
@@ -168,9 +177,11 @@ const MediaImageRenderer = (
       addLoadedMedia(source.mediaId, source.requestedSize, source.uri);
     }
     setThumbnail(null);
-    cleanSnapshots();
+    if (useAnimationSnapshot) {
+      cleanSnapshots();
+    }
     onLoad?.();
-  }, [onLoad, localFile, dispatchReady, cleanSnapshots]);
+  }, [dispatchReady, localFile, useAnimationSnapshot, onLoad, cleanSnapshots]);
 
   const onErrorInner = useCallback(
     (event: ImageErrorEventData) => {
@@ -183,6 +194,7 @@ const MediaImageRenderer = (
     if (localFile) {
       return localFile;
     }
+
     return source.uri;
   }, [localFile, source]);
 
@@ -191,8 +203,22 @@ const MediaImageRenderer = (
     [style],
   );
 
+  const optiCachePolicy = useMemo(() => {
+    if (localFile) {
+      return 'none';
+    }
+    if (source.uri.startsWith('file://')) {
+      return 'none';
+    }
+    if (cachePolicy) {
+      return cachePolicy;
+    }
+    //force to default disk value
+    return 'disk';
+  }, [cachePolicy, localFile, source.uri]);
+
   return (
-    <View style={containerStyle} ref={containerRef} {...props}>
+    <View style={containerStyle} ref={containerRef} testID={testID}>
       <Image
         recyclingKey={source.mediaId}
         source={imageSource}
@@ -205,6 +231,7 @@ const MediaImageRenderer = (
         contentFit={fit ?? 'fill'}
         style={StyleSheet.absoluteFill}
         blurRadius={blurRadius}
+        cachePolicy={optiCachePolicy}
       />
       {thumbnail && (
         <Image
@@ -219,6 +246,7 @@ const MediaImageRenderer = (
           contentFit={fit ?? 'fill'}
           style={StyleSheet.absoluteFill}
           blurRadius={blurRadius}
+          cachePolicy="none" // thumbnail are already on disk
         />
       )}
       {snapshotID && (

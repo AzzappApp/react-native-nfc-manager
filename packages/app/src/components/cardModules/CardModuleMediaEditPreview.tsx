@@ -7,7 +7,6 @@ import {
   useNativeTexture,
 } from '#helpers/mediaEditions';
 import { CARD_MEDIA_VIDEO_DEFAULT_DURATION } from './cardModuleEditorType';
-import CardModuleMediaItem from './CardModuleMediaItem';
 import type {
   CardModuleImage,
   CardModuleSourceMedia,
@@ -28,17 +27,6 @@ const CardModuleMediaEditPreview = ({
 }: CardModuleMediaEditPreviewProps) => {
   if (!media) {
     return null;
-  }
-
-  if (!media.uri.startsWith('file://')) {
-    return (
-      <CardModuleMediaItem
-        media={media}
-        dimension={dimension}
-        canPlay
-        imageStyle={imageStyle}
-      />
-    );
   }
 
   const { width: itemWidth, height: itemHeight } = dimension;

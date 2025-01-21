@@ -108,6 +108,7 @@ const AddToWalletButton = ({ webCardId, style, appearance }: Props) => {
               <Image
                 source={require('#assets/wallet.png')}
                 style={styles.addToWalletIcon}
+                cachePolicy="none"
               />
             )}
             <Text variant="button" style={styles.addToWalletButtonText}>

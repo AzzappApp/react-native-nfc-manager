@@ -23,6 +23,8 @@ export type CardModuleMediaItemProps = {
   imageStyle?: ViewStyle;
 
   paused?: boolean;
+
+  cachePolicy?: 'disk' | 'memory-disk' | 'memory' | 'none' | null;
 };
 
 //Simple component to render, not bind to any relay fragment
@@ -31,6 +33,7 @@ const CardModuleMediaItem = ({
   dimension,
   imageStyle,
   canPlay,
+  cachePolicy,
 }: CardModuleMediaItemProps) => {
   const kind = getCardModuleMediaKind(media);
   return kind === 'image' ? (
@@ -45,6 +48,8 @@ const CardModuleMediaItem = ({
         ...imageStyle,
       }}
       fit="cover"
+      useAnimationSnapshot={false}
+      cachePolicy={cachePolicy}
     />
   ) : (
     <MediaVideoRenderer
