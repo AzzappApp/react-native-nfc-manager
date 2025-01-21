@@ -1,5 +1,6 @@
-## 1.7.0-canary.40
+## 1.7.0-canary.41
 
+* **feat:**  - more grid variant option ([#7007](https://github.com/AzzappApp/azzapp/pull/7007))
 * **fix:**  - date import in expo contacts ([#7004](https://github.com/AzzappApp/azzapp/pull/7004))
 * **fix:**  - in app purchase ui ([#7006](https://github.com/AzzappApp/azzapp/pull/7006))
 * **fix:**  - add delay in grid item appearence ([#7000](https://github.com/AzzappApp/azzapp/pull/7000))
