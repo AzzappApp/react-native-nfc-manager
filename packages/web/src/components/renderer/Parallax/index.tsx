@@ -26,7 +26,7 @@ const Parallax = ({
   const [scrollY, setScrollY] = useState(0);
   const [viewportHeight, setViewportHeight] = useState(0);
   const [iOS, setiOS] = useState(false);
-  const containerWidth = useContainerWidth({ containerRef });
+  const containerWidth = useContainerWidth(containerRef);
 
   useEffect(() => {
     setiOS(/iPad|iPhone|iPod/.test(navigator.userAgent));
@@ -141,6 +141,7 @@ const ParallaxItem = ({
           format="auto"
           quality="auto:best"
           style={mediaStyle}
+          loading="eager"
         />
       )}
     </div>
