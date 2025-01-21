@@ -65,7 +65,11 @@ const UserPayWallScreen = ({
 
   const { bottom } = useScreenInsets();
   const lottieHeight = height - BOTTOM_HEIGHT + 20;
-  const [period, setPeriod] = useState<'month' | 'year'>('year');
+  const [period, setPeriod] = useState<'month' | 'year'>(
+    data.currentUser?.userSubscription?.subscriptionId.includes('month')
+      ? 'month'
+      : 'year',
+  );
   const [selectedPurchasePackage, setSelectedPurchasePackage] =
     useState<PurchasesPackage | null>(null);
   const [processing, setProcessing] = useState(false);
@@ -76,7 +80,22 @@ const UserPayWallScreen = ({
   const [freeTrialEligible, setFreeTrialEligible] = useState(false);
   useEffect(() => {
     if (subscriptions && subscriptions.length > 0) {
-      setSelectedPurchasePackage(subscriptions[0]);
+      //set the period
+      if (data.currentUser?.userSubscription) {
+        const found = subscriptions.find(
+          sub =>
+            sub.product.identifier ===
+            data.currentUser?.userSubscription?.subscriptionId,
+        );
+        if (found) {
+          setSelectedPurchasePackage(found);
+        } else {
+          setSelectedPurchasePackage(subscriptions[0]);
+        }
+      } else {
+        setSelectedPurchasePackage(subscriptions[0]);
+      }
+
       Purchases.checkTrialOrIntroductoryPriceEligibility([
         subscriptions[0].product.identifier,
       ]).then(trial => {
@@ -88,7 +107,11 @@ const UserPayWallScreen = ({
         }
       });
     }
-  }, [subscriptions]);
+  }, [
+    data.currentUser?.userSubscription,
+    data.currentUser?.userSubscription?.subscriptionId,
+    subscriptions,
+  ]);
 
   const [labelPurchase, setLabelPurchase] = useState<string>(
     intl.formatMessage({
@@ -355,32 +378,6 @@ const UserPayWallScreen = ({
             pointerEvents="none"
           />
         </View>
-        {data.currentUser?.userSubscription?.status === 'active' &&
-          data.currentUser?.userSubscription?.subscriptionId && (
-            <Text variant="xsmall" style={{ color: colors.grey300 }}>
-              <FormattedMessage
-                defaultMessage="Your actual subscription : {qty, plural,
-            =1 {{qty} user}
-            other {{qty} Users}
-          } billed {period}"
-                description="sdfsdf"
-                values={{
-                  qty: parseInt(
-                    data.currentUser?.userSubscription?.subscriptionId
-                      .split('.')
-                      .pop() ?? '0',
-                    10,
-                  ),
-                  period:
-                    data.currentUser?.userSubscription?.subscriptionId.includes(
-                      'year',
-                    )
-                      ? 'yearly'
-                      : 'monthly',
-                }}
-              />
-            </Text>
-          )}
         <View style={[styles.bottomContainer, { paddingBottom: bottom }]}>
           <Button
             label={labelPurchase}
@@ -401,7 +398,27 @@ const UserPayWallScreen = ({
                 }}
               />
             ) : (
-              '' // ensure the height is constant
+              <FormattedMessage
+                defaultMessage="Your actual subscription : {qty, plural,
+        =1 {{qty} user}
+        other {{qty} Users}
+      } billed {period}"
+                description="sdfsdf"
+                values={{
+                  qty: parseInt(
+                    data.currentUser?.userSubscription?.subscriptionId
+                      .split('.')
+                      .pop() ?? '0',
+                    10,
+                  ),
+                  period:
+                    data.currentUser?.userSubscription?.subscriptionId.includes(
+                      'year',
+                    )
+                      ? 'yearly'
+                      : 'monthly',
+                }}
+              />
             )}
           </Text>
           <View style={styles.footer}>
