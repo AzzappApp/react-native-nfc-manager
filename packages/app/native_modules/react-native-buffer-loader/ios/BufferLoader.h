@@ -22,12 +22,11 @@ private:
   id<MTLDevice> _Nonnull metalDevice;
   id<MTLCommandQueue> _Nonnull commandQueue;
   CGColorSpaceRef _Nonnull colorSpace;
-  CIContext *_Nullable ciContext;
   std::shared_ptr<react::CallInvoker> callInvoker;
   std::unordered_map<uint64_t, id<MTLTexture>> textureCache;
 
-  _Nullable id<MTLTexture> createMTLTextureFromCIImage(CIImage *_Nonnull image, CGSize maxSize);
-  _Nullable id<MTLTexture> createMTLTextureFromCGImage(CGImageRef _Nonnull image);
+  _Nullable id<MTLTexture> createMTLTextureFromCGImage(CGImageRef _Nonnull image, CGSize maxSize);
+  CGImageRef loadImageWithOrientation(NSURL *url);
   void loadTexture(
     std::shared_ptr<jsi::Function> callback,
     jsi::Runtime &runtime,

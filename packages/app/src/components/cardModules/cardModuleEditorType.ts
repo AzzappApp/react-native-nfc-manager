@@ -32,7 +32,8 @@ export type CardModuleVideo = { kind: 'video' } & (CardModuleMediaBase &
 export type CardModuleImage = { kind: 'image' } & (CardModuleMediaBase &
   SourceMediaImage);
 
-export type CardModuleSourceMedia = CardModuleImage | CardModuleVideo; //duplciate kind because propagaiton of type is not good
+//duplicate kind because propagation of type is not good
+export type CardModuleSourceMedia = CardModuleImage | CardModuleVideo;
 
 export type CardModuleMedia = {
   media: CardModuleSourceMedia; //editable has nothing to do in the SourceMediaImage
