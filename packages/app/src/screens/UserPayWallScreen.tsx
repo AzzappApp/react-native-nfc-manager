@@ -265,7 +265,7 @@ const UserPayWallScreen = ({
           />
           <Text variant="xlarge" style={styles.textPromo}>
             <FormattedMessage
-              defaultMessage="Add as many sections as you want to your WebCard"
+              defaultMessage="Unlock multi-user to give contact card to all your team"
               description="UserPaywall Screen - message promo section"
             />
           </Text>
@@ -362,10 +362,26 @@ const UserPayWallScreen = ({
         <View style={[styles.bottomContainer, { paddingBottom: bottom }]}>
           <Button
             label={labelPurchase}
-            style={[styles.buttonSubscribe, { width: '100%' }]}
+            style={styles.buttonSubscribe}
             appearance="light"
             onPress={processOrder}
           />
+          <Text variant="small" style={styles.subTitleText}>
+            {data.currentUser?.userSubscription?.status !== 'active' &&
+            selectedPurchasePackage?.product.introPrice?.period ? (
+              <FormattedMessage
+                defaultMessage="{days}-day free trial, with auto renew. Cancel anytime"
+                description="MultiUser subscription subtitle for inactive subscription"
+                values={{
+                  days: iso8601DurationToDays(
+                    selectedPurchasePackage.product.introPrice.period,
+                  ),
+                }}
+              />
+            ) : (
+              '' // ensure the height is constant
+            )}
+          </Text>
           <View style={styles.footer}>
             <PressableOpacity onPress={restorePurchase}>
               <Text variant="medium" style={styles.descriptionText}>
@@ -486,6 +502,12 @@ const OfferItem = ({
             style="currency"
             currency={offer.product.currencyCode}
           />
+          {period !== 'year' ? (
+            <FormattedMessage
+              defaultMessage=" / month"
+              description="MultiUser Paywall Screen - number of seat offer"
+            />
+          ) : undefined}
         </Text>
         {period === 'year' && (
           <Text variant="smallbold" style={styles.monthlyPricing}>
@@ -576,7 +598,9 @@ const styles = StyleSheet.create({
   },
   descriptionText: {
     color: colors.grey400,
-    marginTop: 20,
+  },
+  subTitleText: {
+    textAlign: 'center',
   },
   icon: {
     backgroundColor: colors.grey100,
@@ -595,6 +619,7 @@ const styles = StyleSheet.create({
   },
   bottomContainer: {
     paddingHorizontal: 30,
+    gap: 10,
     width: '100%',
     overflow: 'visible',
   },
