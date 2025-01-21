@@ -111,7 +111,8 @@ export const ContactCardScreen = ({
     alignSelf: 'center', //styles are intentionally put here to fix an issue with the fullscreen card that was not fully tappable on android
     zIndex: 10,
     paddingHorizontal: 20,
-    paddingVertical: 10,
+    paddingTop: 10,
+    paddingBottom: 20,
     transform: [
       {
         scale: interpolate(
@@ -396,7 +397,7 @@ const styleSheet = createStyleSheet(appearance => ({
     color: appearance === 'light' ? colors.black : colors.white,
   },
   footer: {
-    marginTop: 15,
+    marginTop: 5,
     alignItems: 'center',
     rowGap: 20,
     paddingHorizontal: 10,
