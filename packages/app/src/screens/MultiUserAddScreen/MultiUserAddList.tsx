@@ -116,6 +116,7 @@ const MultiUserAddList = ({
         data={contactData}
         renderItem={renderItem}
         keyExtractor={keyExtractor}
+        keyboardShouldPersistTaps="always"
       />
     </KeyboardAvoidingView>
   );
