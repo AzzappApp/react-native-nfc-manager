@@ -773,12 +773,10 @@ const WebCardModule = ({
   editing: boolean;
   scrollPosition: RNAnimated.Value;
 }) => {
-  const { height: screenHeight } = useScreenDimensions();
   return (
     <WebCardEditBlockContainerMemo
       id={module.id}
       {...props}
-      maxEditHeight={screenHeight}
       extraData={{
         cardStyle,
         cardColors,

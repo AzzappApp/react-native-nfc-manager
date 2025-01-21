@@ -28,6 +28,7 @@ const CardModuleMediaGrid = ({
   scrollPosition,
   square = false,
   nbColumns = 3,
+  webCardViewMode,
   ...props
 }: CardModuleMediaGridProps) => {
   const screenDimension = useScreenDimensions();
@@ -85,8 +86,12 @@ const CardModuleMediaGrid = ({
     }
     setItemYStartPoint(offsetY);
 
+    if (webCardViewMode === 'edit' && nbColumns === 1 && result[0]) {
+      // ensure we display only the first item in edit mode
+      result[0] = result[0].slice(0, 1);
+    }
     return result;
-  }, [cardModuleMedias, columnWidth, nbColumns, square]);
+  }, [cardModuleMedias, columnWidth, nbColumns, square, webCardViewMode]);
 
   return (
     <View
@@ -110,6 +115,7 @@ const CardModuleMediaGrid = ({
             return (
               <GridItem
                 {...props}
+                webCardViewMode={webCardViewMode}
                 key={`${cardModuleMedia.media.id}_${index}`}
                 media={cardModuleMedia.media}
                 dimension={dimension}

@@ -97,10 +97,6 @@ export type WebCardEditBlockContainerProps = {
    */
   backgroundColor: string;
   /**
-   * The maximum height of the edit container
-   */
-  maxEditHeight?: number;
-  /**
    * Called when the user press a module, only enabled in edit mode
    */
   onModulePress: () => void;
