@@ -66,10 +66,6 @@ export const estimateUpdateSubscriptionForWebCard = async ({
     throw new Error('No subscription found');
   }
 
-  if (existingSubscription.status === 'canceled') {
-    throw new Error('Subscription is canceled');
-  }
-
   if (existingSubscription.webCardId !== webCardId) {
     throw new Error('Web card id does not match');
   }
@@ -146,11 +142,14 @@ const calculateSubscriptionUpdate = async (
       : { amount: 0 };
 
     return {
-      firstPayment: {
-        amount: amountForTheRestOfTheYear,
-        taxes: taxesForTheRestOfTheYear,
-        taxRate: rateForTheRestOfTheYear ?? 0,
-      },
+      firstPayment:
+        intervalInMonths > 0
+          ? {
+              amount: amountForTheRestOfTheYear ?? 0,
+              taxes: taxesForTheRestOfTheYear,
+              taxRate: rateForTheRestOfTheYear ?? 0,
+            }
+          : undefined,
       recurringCost: {
         amount: amount ?? 0,
         taxes,
@@ -385,8 +384,8 @@ export const updateExistingSubscription = async ({
         body: {
           billing_description: `Subscription ${existingSubscription.subscriptionPlan} for ${totalSeats} seats`,
           rebill_manager_initial_type: 'PAID',
-          rebill_manager_initial_price_cnts: `${(firstPayment?.amount ?? 0) + (firstPayment?.taxes ?? 0)}`,
-          rebill_manager_initial_duration_min: `${intervalInMinutes}`,
+          rebill_manager_initial_price_cnts: `${(firstPayment?.amount ?? recurringCost.amount) + (firstPayment?.taxes ?? recurringCost.taxes)}`,
+          rebill_manager_initial_duration_min: `${firstPayment ? intervalInMinutes : calculateNextPaymentIntervalInMinutes(existingSubscription.subscriptionPlan)}`,
           rebill_manager_rebill_price_cnts: `${recurringCost.amount + recurringCost.taxes}`,
           rebill_manager_rebill_duration_mins: '0',
           rebill_manager_rebill_period_mins: `${calculateNextPaymentIntervalInMinutes(existingSubscription.subscriptionPlan)}`,
