@@ -8,6 +8,7 @@ import {
   transaction,
   updatePayment,
   createId,
+  getPaymentMeanById,
 } from '@azzapp/data';
 import { login } from '#authent';
 import client from './client';
@@ -255,6 +256,12 @@ export const createSubscriptionRequest = async ({
     calculateNextPaymentIntervalInMinutes(subscriptionPlan);
 
   const subscriptionId = createId();
+
+  const paymentMean = await getPaymentMeanById(paymentMeanId);
+
+  if (paymentMean?.webCardId !== webCardId || paymentMean?.userId !== userId) {
+    throw new Error('Payment mean does not match the web card or the user');
+  }
 
   const rebillManager = await client.POST(
     '/api/client-payment-requests/create-rebill-manager',

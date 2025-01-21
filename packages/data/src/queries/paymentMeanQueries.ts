@@ -17,6 +17,15 @@ export const createPaymentMean = async (
     .values(newPaymentMean)
     .then(() => newPaymentMean.id);
 
+export const getPaymentMeanById = async (
+  id: string,
+): Promise<PaymentMean | null> =>
+  db()
+    .select()
+    .from(PaymentMeanTable)
+    .where(eq(PaymentMeanTable.id, id))
+    .then(result => result[0]);
+
 /**
  * Retrieve a list payment means by user id and web card id.
  *
