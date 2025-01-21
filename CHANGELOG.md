@@ -1,5 +1,11 @@
-## 1.7.0-canary.42
+## 1.7.0-canary.43
 
+* **fix:**  - **IOS:** fix texture image loading performance ([#7008](https://github.com/AzzappApp/azzapp/pull/7008))
+* **fix:**  - move padding/margin to ensure gradient is displayed ([#7015](https://github.com/AzzappApp/azzapp/pull/7015))
+* **fix:**  - display only the first item in edit mode / original content ([#7013](https://github.com/AzzappApp/azzapp/pull/7013))
+* **fix:**  - **payment:** incorrect calculations with active subscription & endAt… ([#7003](https://github.com/AzzappApp/azzapp/pull/7003))
+* **fix:**  - **web:** [#6857](https://github.com/AzzappApp/azzapp/pull/6857) attempt to fix scroll issue ([#7005](https://github.com/AzzappApp/azzapp/pull/7005))
+* **fix:**  - **cover:** [#6972](https://github.com/AzzappApp/azzapp/pull/6972) manage case where template has no editable media ([#7009](https://github.com/AzzappApp/azzapp/pull/7009))
 * **fix:**  - update android icons ([#7012](https://github.com/AzzappApp/azzapp/pull/7012))
 * **feat:**  - more grid variant option ([#7007](https://github.com/AzzappApp/azzapp/pull/7007))
 * **fix:**  - date import in expo contacts ([#7004](https://github.com/AzzappApp/azzapp/pull/7004))
