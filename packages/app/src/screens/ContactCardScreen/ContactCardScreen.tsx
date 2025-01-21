@@ -112,7 +112,7 @@ export const ContactCardScreen = ({
     zIndex: 10,
     paddingHorizontal: 20,
     paddingTop: 10,
-    paddingBottom: 20,
+    paddingBottom: interpolate(sharedRotationState.value, [0, 1], [20, 10]),
     transform: [
       {
         scale: interpolate(
