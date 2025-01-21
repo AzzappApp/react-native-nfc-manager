@@ -1,4 +1,4 @@
-## 1.7.0-canary.58
+## 1.7.0-canary.59
 
 * **fix:**  - select the acutal subscription in paywall ([#7039](https://github.com/AzzappApp/azzapp/pull/7039))
 * **feat:**  - add preview in text configuration in media&Text modules ([#7040](https://github.com/AzzappApp/azzapp/pull/7040))
