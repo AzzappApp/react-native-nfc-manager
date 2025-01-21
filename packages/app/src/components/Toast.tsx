@@ -107,7 +107,7 @@ const Toast = ({
           renderTrailingIcon={() => renderTrailingIcon(errorProps.props)}
           text1Style={[textStyles.smallbold, styles.toastText]}
           text1Props={{
-            numberOfLines: 2,
+            numberOfLines: 3,
           }}
         />
       ),
@@ -136,7 +136,7 @@ const Toast = ({
             text1Style={[textStyles.smallbold, styles.toastText]}
             onPress={ExternalToast.hide}
             text1Props={{
-              numberOfLines: 2,
+              numberOfLines: 3,
             }}
           />
         </>
