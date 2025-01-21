@@ -1,5 +1,6 @@
-## 1.7.0-canary.49
+## 1.7.0-canary.50
 
+* **fix:**  - review paywall UI ([#7028](https://github.com/AzzappApp/azzapp/pull/7028))
 * **feat:**  - tentative to improve media (and small fix on module bakground) ([#7027](https://github.com/AzzappApp/azzapp/pull/7027))
 * **fix:**  - **IOS:** buffer loader memory leak ([#7026](https://github.com/AzzappApp/azzapp/pull/7026))
 * **fix:**  - regression in webcard fullscreen ([#7021](https://github.com/AzzappApp/azzapp/pull/7021))
