@@ -178,16 +178,6 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
     }
     for (const { id, ...profile } of profilesToUpdate) {
       await updateProfile(id, profile);
-      const existingUser = users.find(user => user.id === profile.userId);
-      if (existingUser && webCard.userName) {
-        await sendPushNotification(existingUser.id, {
-          type: 'multiuser_invitation',
-          mediaId: webCard.coverMediaId,
-          deepLink: 'multiuser_invitation',
-          localeParams: { userName: webCard.userName },
-          locale: guessLocale(existingUser?.locale),
-        });
-      }
     }
 
     const createdProfiles = (
@@ -228,6 +218,15 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
           reason: 'alreadyInvited',
         });
       }
+    }
+    if (user && webCard.userName) {
+      await sendPushNotification(user.id, {
+        type: 'multiuser_invitation',
+        mediaId: webCard.coverMediaId,
+        deepLink: 'multiuser_invitation',
+        localeParams: { userName: webCard.userName },
+        locale: guessLocale(user?.locale),
+      });
     }
   }
 

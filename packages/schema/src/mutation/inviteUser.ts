@@ -154,16 +154,6 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
 
       if (existingProfile) {
         await updateProfile(existingProfile.id, profileData);
-        const locale = guessLocale(existingUser?.locale ?? user.locale);
-        if (webCard.userName) {
-          await sendPushNotification(userId, {
-            type: 'multiuser_invitation',
-            mediaId: webCard.coverMediaId,
-            deepLink: 'multiuser_invitation',
-            localeParams: { userName: webCard.userName },
-            locale,
-          });
-        }
         return {
           profile: {
             ...profileData,
@@ -183,6 +173,19 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
         };
       }
     });
+
+    if (existingUser) {
+      const locale = guessLocale(existingUser?.locale ?? user.locale);
+      if (webCard.userName) {
+        await sendPushNotification(userId, {
+          type: 'multiuser_invitation',
+          mediaId: webCard.coverMediaId,
+          deepLink: 'multiuser_invitation',
+          localeParams: { userName: webCard.userName },
+          locale,
+        });
+      }
+    }
 
     if (sendInvite) {
       const locale = guessLocale(existingUser?.locale ?? user.locale);
