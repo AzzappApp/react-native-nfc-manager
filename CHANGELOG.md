@@ -1,4 +1,4 @@
-## 1.7.0-canary.50
+## 1.7.0-canary.51
 
 * **fix:**  - review paywall UI ([#7028](https://github.com/AzzappApp/azzapp/pull/7028))
 * **feat:**  - tentative to improve media (and small fix on module bakground) ([#7027](https://github.com/AzzappApp/azzapp/pull/7027))
