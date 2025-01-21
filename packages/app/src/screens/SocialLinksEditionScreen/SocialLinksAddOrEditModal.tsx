@@ -246,6 +246,15 @@ export const SocialLinksAddOrEditModal = ({
           });
         }
       },
+      mastodon: (text: string) => {
+        if (!isValidUrl('https://' + text)) {
+          return intl.formatMessage({
+            defaultMessage: 'The Mastodon url is not valid.',
+            description:
+              'Error toast message when a website url Mastodon is not valid.',
+          });
+        }
+      },
       link: (text: string) => {
         if (!isValidUrl('https://' + text)) {
           return intl.formatMessage({
