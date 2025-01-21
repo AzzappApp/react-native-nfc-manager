@@ -225,13 +225,6 @@ CGImageRef BufferLoaderHostObject::loadImageWithOrientation(NSURL *url) {
         throw std::runtime_error("Failed to create image");
     }
     
-    // If the image is already in the correct orientation, return it
-    if (orientation == 1) {
-        CFRelease(imageProperties);
-        CFRelease(imageSource);
-        return originalImage;
-    }
-    
     // Apply the orientation
     CGSize imageSize = CGSizeMake(CGImageGetWidth(originalImage), CGImageGetHeight(originalImage));
     CGAffineTransform transform = CGAffineTransformIdentity;
@@ -295,7 +288,7 @@ CGImageRef BufferLoaderHostObject::loadImageWithOrientation(NSURL *url) {
                                                newSize.height,
                                                CGImageGetBitsPerComponent(originalImage),
                                                0,
-                                               CGImageGetColorSpace(originalImage),
+                                               CGColorSpaceCreateDeviceRGB(),
                                                CGImageGetBitmapInfo(originalImage));
     
     if (!context) {
