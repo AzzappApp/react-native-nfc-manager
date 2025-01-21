@@ -308,7 +308,7 @@ const PostList = ({
   );
 
   const ListFooterComponent = useMemo(
-    () => <ListLoadingFooter loading={loading} />,
+    () => <ListLoadingFooter loading={loading} addBottomInset />,
     [loading],
   );
 

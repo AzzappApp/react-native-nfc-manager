@@ -1,14 +1,15 @@
 import { memo } from 'react';
 import { useIntl } from 'react-intl';
+import { StyleSheet } from 'react-native';
 import { graphql } from 'react-relay';
 import { useLazyLoadQuery } from 'react-relay/hooks';
 import { useRouter } from '#components/NativeRouter';
 import PostList from '#components/WebCardPostsList';
 import { useProfileInfos } from '#hooks/authStateHooks';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
-import SafeAreaView from '#ui/SafeAreaView';
 import type { PostList_viewerWebCard$key } from '#relayArtifacts/PostList_viewerWebCard.graphql';
 import type { WebCardPostsListQuery } from '#relayArtifacts/WebCardPostsListQuery.graphql';
 
@@ -55,45 +56,48 @@ const WebCardPostsList = ({
     router.back();
   };
 
+  const { top } = useScreenInsets();
   return (
-    <Container style={{ flex: 1 }}>
-      <SafeAreaView style={{ flex: 1 }}>
-        <Header
-          middleElement={
-            isViewer
-              ? intl.formatMessage({
-                  defaultMessage: 'My posts',
-                  description: 'ProfilePostScreen viewer user title Header',
-                })
-              : intl.formatMessage(
-                  {
-                    defaultMessage: '{userName} posts',
-                    description: 'ProfilePostScreen title Header',
-                  },
-                  { userName },
-                )
-          }
-          leftElement={
-            <IconButton
-              icon="arrow_down"
-              onPress={onClose}
-              iconSize={30}
-              size={47}
-              variant="icon"
-            />
-          }
-        />
-        {webCard && (
-          <PostList
-            webCard={webCard}
-            viewerWebCard={viewerWebCard}
-            canPlay={hasFocus}
-            onPressAuthor={toggleFlip}
+    <Container style={[styles.container, { paddingTop: top }]}>
+      <Header
+        middleElement={
+          isViewer
+            ? intl.formatMessage({
+                defaultMessage: 'My posts',
+                description: 'ProfilePostScreen viewer user title Header',
+              })
+            : intl.formatMessage(
+                {
+                  defaultMessage: '{userName} posts',
+                  description: 'ProfilePostScreen title Header',
+                },
+                { userName },
+              )
+        }
+        leftElement={
+          <IconButton
+            icon="arrow_down"
+            onPress={onClose}
+            iconSize={30}
+            size={47}
+            variant="icon"
           />
-        )}
-      </SafeAreaView>
+        }
+      />
+      {webCard && (
+        <PostList
+          webCard={webCard}
+          viewerWebCard={viewerWebCard}
+          canPlay={hasFocus}
+          onPressAuthor={toggleFlip}
+        />
+      )}
     </Container>
   );
 };
+
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+});
 
 export default memo(WebCardPostsList);
