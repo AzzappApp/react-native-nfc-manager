@@ -682,6 +682,21 @@ const CoverEditorCore = (
     coverEditorState.medias,
   ]);
 
+  // case where template has only non editable medias
+  useEffect(() => {
+    if (
+      coverEditorState.initialMediaToPick &&
+      !coverEditorState.initialMediaToPick.some(
+        media => media === null || media.editable,
+      )
+    ) {
+      dispatch({
+        type: 'UPDATE_MEDIAS',
+        payload: coverEditorState.initialMediaToPick.filter(m => m !== null),
+      });
+    }
+  }, [coverEditorState.initialMediaToPick]);
+
   const allDuration = useLottieMediaDurations(coverEditorState.lottie);
 
   const durations = useMemo(() => {
