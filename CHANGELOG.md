@@ -1,5 +1,6 @@
-## 1.7.0-canary.57
+## 1.7.0-canary.58
 
+* **fix:**  - select the acutal subscription in paywall ([#7039](https://github.com/AzzappApp/azzapp/pull/7039))
 * **feat:**  - add preview in text configuration in media&Text modules ([#7040](https://github.com/AzzappApp/azzapp/pull/7040))
 * **fix:**  - ensure contacts are merged with casing independent ([#7035](https://github.com/AzzappApp/azzapp/pull/7035))
 * **fix:**  - allow background list to be clickable while keyboard is open in multi use add ([#7038](https://github.com/AzzappApp/azzapp/pull/7038))
