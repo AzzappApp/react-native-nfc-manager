@@ -61,6 +61,8 @@ export const buildLocalContact = async (
         },
       ];
     }
+  } else if ('dates' in contact) {
+    updatedBirthDay = contact.dates;
   }
 
   let avatar = null;
