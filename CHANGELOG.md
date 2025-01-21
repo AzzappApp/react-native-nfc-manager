@@ -1,5 +1,9 @@
-## 1.7.0-canary.55
+## 1.7.0-canary.56
 
+* **feat:**  - add preview in text configuration in media&Text modules ([#7040](https://github.com/AzzappApp/azzapp/pull/7040))
+* **fix:**  - ensure contacts are merged with casing independent ([#7035](https://github.com/AzzappApp/azzapp/pull/7035))
+* **fix:**  - allow background list to be clickable while keyboard is open in multi use add ([#7038](https://github.com/AzzappApp/azzapp/pull/7038))
+* **fix:**  - only owner can manage IAP subscription ([#7037](https://github.com/AzzappApp/azzapp/pull/7037))
 * **fix:**  - handle correctly paddingBottom in WebCardScreen ([#7034](https://github.com/AzzappApp/azzapp/pull/7034))
 * **fix:**  - **IOS:** pixel format of jpeg textures
 * **fix:**  - **payment:** check payment mean belongs to user and webcard ([#7019](https://github.com/AzzappApp/azzapp/pull/7019))
