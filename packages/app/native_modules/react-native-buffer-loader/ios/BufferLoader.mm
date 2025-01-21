@@ -10,11 +10,10 @@ BufferLoaderHostObject::BufferLoaderHostObject(std::shared_ptr<react::CallInvoke
     throw std::runtime_error("Failed to create MTLDevice");
   }
   commandQueue = [metalDevice newCommandQueue];
-  colorSpace = CGColorSpaceCreateDeviceRGB();
+  textureLoader = [[MTKTextureLoader alloc] initWithDevice:metalDevice];
 }
 
 BufferLoaderHostObject::~BufferLoaderHostObject() {
-  colorSpace = nil;
   commandQueue = nil;
   metalDevice = nil;
 }
@@ -54,9 +53,18 @@ jsi::Value BufferLoaderHostObject::get(jsi::Runtime &runtime, const jsi::PropNam
             NSURL *imageURL = [NSURL URLWithString:url];
             if (!imageURL) throw std::runtime_error("Invalid image URL");
             CGImageRef cgImage = loadImageWithOrientation(imageURL);
-
-            auto texture = createMTLTextureFromCGImage(cgImage, maxSize);
+            if (!cgImage) throw std::runtime_error("Invalid image URL");
+            
+            NSError *error;
+            auto texture = [textureLoader newTextureWithCGImage:cgImage options:@{
+              MTKTextureLoaderOptionTextureStorageMode: @(MTLStorageModePrivate),
+              MTKTextureLoaderOptionTextureUsage: @(MTLTextureUsageShaderRead | MTLTextureUsageShaderWrite)
+            } error:&error];
             CGImageRelease(cgImage);
+            if (error || !texture) {
+              throw std::runtime_error("Failed to create texture");
+            
+            }
             return texture;
           });
         });
@@ -102,10 +110,16 @@ jsi::Value BufferLoaderHostObject::get(jsi::Runtime &runtime, const jsi::PropNam
                                                  actualTime:nil
                                                       error:&error];
             if (error || !cgImage) throw std::runtime_error("Failed to generate video frame");
-
-            id<MTLTexture> texture = createMTLTextureFromCGImage(cgImage, maxSize);
+  
+            auto texture = [textureLoader newTextureWithCGImage:cgImage options:@{
+              MTKTextureLoaderOptionTextureStorageMode: @(MTLStorageModePrivate),
+              MTKTextureLoaderOptionTextureUsage: @(MTLTextureUsageShaderRead | MTLTextureUsageShaderWrite)
+            } error:&error];
             CGImageRelease(cgImage);
-
+            if (error || !texture) {
+              throw std::runtime_error("Failed to create texture");
+            
+            }
             return texture;
           });
         });
@@ -137,89 +151,6 @@ jsi::Value BufferLoaderHostObject::get(jsi::Runtime &runtime, const jsi::PropNam
   }
 
   return jsi::Value::undefined();
-}
-id<MTLTexture> BufferLoaderHostObject::createMTLTextureFromCGImage(CGImageRef image, CGSize maxSize) {
-  @autoreleasepool {
-    size_t width = CGImageGetWidth(image);
-    size_t height = CGImageGetHeight(image);
-
-    if (!CGSizeEqualToSize(maxSize, CGSizeZero)) {
-      CGFloat aspectRatio = (CGFloat)width / (CGFloat)height;
-      if (aspectRatio > 1) {
-        width = maxSize.width;
-        height = width / aspectRatio;
-      } else {
-        height = maxSize.height;
-        width = height * aspectRatio;
-      }
-    }
-
-    // 1. Creating a shared temporary texture to copy the image data
-    MTLTextureDescriptor *tempDescriptor = [[MTLTextureDescriptor alloc] init];
-    tempDescriptor.pixelFormat = MTLPixelFormatBGRA8Unorm;
-    tempDescriptor.width = width;
-    tempDescriptor.height = height;
-    tempDescriptor.usage = MTLTextureUsageShaderRead | MTLTextureUsageShaderWrite;
-    tempDescriptor.storageMode = MTLStorageModeShared;  // Important !
-
-    id<MTLTexture> tempTexture = [metalDevice newTextureWithDescriptor:tempDescriptor];
-    if (!tempTexture) {
-      throw std::runtime_error("Failed to create temporary Metal texture");
-    }
-
-    // 2. Creating a private (gpu only) final texture
-    MTLTextureDescriptor *finalDescriptor = [[MTLTextureDescriptor alloc] init];
-    finalDescriptor.pixelFormat = MTLPixelFormatBGRA8Unorm;
-    finalDescriptor.width = width;
-    finalDescriptor.height = height;
-    finalDescriptor.usage = MTLTextureUsageShaderRead | MTLTextureUsageShaderWrite;
-    finalDescriptor.storageMode = MTLStorageModePrivate;
-
-    id<MTLTexture> finalTexture = [metalDevice newTextureWithDescriptor:finalDescriptor];
-    if (!finalTexture) {
-      throw std::runtime_error("Failed to create final Metal texture");
-    }
-
-    // 3. Transfer the image data to the temporary texture using a CGContext
-    void *imageData = malloc(width * height * 4);
-    CGContextRef context = CGBitmapContextCreate(imageData, width, height, 8, width * 4,
-                                               CGColorSpaceCreateDeviceRGB(),
-                                               kCGImageAlphaPremultipliedFirst | kCGBitmapByteOrder32Little);
-    if (!context) {
-      free(imageData);
-      throw std::runtime_error("Failed to create CGContext");
-    }
-
-    CGContextDrawImage(context, CGRectMake(0, 0, width, height), image);
-    
-    MTLRegion region = MTLRegionMake2D(0, 0, width, height);
-    [tempTexture replaceRegion:region mipmapLevel:0 withBytes:imageData bytesPerRow:width * 4];
-
-    // 4. Using a blit encoder to copy the data to the final texture (from cpu to gpu)
-    id<MTLCommandBuffer> commandBuffer = [commandQueue commandBuffer];
-    id<MTLBlitCommandEncoder> blitEncoder = [commandBuffer blitCommandEncoder];
-    
-    [blitEncoder copyFromTexture:tempTexture
-                    sourceSlice:0
-                    sourceLevel:0
-                   sourceOrigin:MTLOriginMake(0, 0, 0)
-                     sourceSize:MTLSizeMake(width, height, 1)
-                      toTexture:finalTexture
-               destinationSlice:0
-               destinationLevel:0
-              destinationOrigin:MTLOriginMake(0, 0, 0)];
-    
-    [blitEncoder endEncoding];
-    [commandBuffer commit];
-    [commandBuffer waitUntilCompleted];
-    [tempTexture setPurgeableState:MTLPurgeableStateEmpty];
-
-    // 5. Release the resources
-    CGContextRelease(context);
-    free(imageData);
-
-    return finalTexture;
-  }
 }
 
 void BufferLoaderHostObject::loadTexture(
