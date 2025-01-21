@@ -1,4 +1,4 @@
-## 1.7.0-canary.46
+## 1.7.0-canary.47
 
 * **fix:**  - another date fix ([#7016](https://github.com/AzzappApp/azzapp/pull/7016))
 * **fix:**  - **IOS:** fix texture image loading performance ([#7008](https://github.com/AzzappApp/azzapp/pull/7008))
