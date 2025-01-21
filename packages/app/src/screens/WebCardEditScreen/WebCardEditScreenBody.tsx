@@ -36,7 +36,6 @@ import {
   isModuleVariantSupported,
   type ModuleKindWithVariant,
 } from '#helpers/webcardModuleHelpers';
-import useScreenDimensions from '#hooks/useScreenDimensions';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import WebCardEditBlockContainer from './WebCardEditBlockContainer';
 import type { ModuleRenderInfo } from '#components/cardModules/CardModuleRenderer';
