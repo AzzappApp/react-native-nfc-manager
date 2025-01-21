@@ -112,7 +112,7 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
         accessibilityRole="button"
         onPress={onPress}
       >
-        <Icon icon="earth" style={styles.iconLink} />
+        <Icon icon="link" style={styles.iconLink} />
         <HomeProfileLinkText text={textDerivedValue} style={styles.url} />
         <View style={styles.emptyViewCenter} />
       </PressableNative>
