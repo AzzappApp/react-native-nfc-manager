@@ -1,5 +1,6 @@
-## 1.7.0-canary.53
+## 1.7.0-canary.54
 
+* **fix:**  - **IOS:** pixel format of jpeg textures
 * **fix:**  - **payment:** check payment mean belongs to user and webcard ([#7019](https://github.com/AzzappApp/azzapp/pull/7019))
 * **fix:**  - replace HomeProfileLink icon ([#7032](https://github.com/AzzappApp/azzapp/pull/7032))
 * **fix:**  - review paywall UI ([#7028](https://github.com/AzzappApp/azzapp/pull/7028))
