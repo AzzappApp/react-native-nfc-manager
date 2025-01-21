@@ -43,12 +43,13 @@ const ContactsScreenSearchByName = ({
   const sections = useMemo(() => {
     return contacts.reduce(
       (accumulator, contact) => {
-        const initial =
+        const initial = (
           contact.firstName?.[0] ??
           contact.lastName?.[0] ??
           contact.company?.[0] ??
           contact.contactProfile?.webCard?.userName?.[0] ??
-          '';
+          ''
+        ).toLocaleUpperCase();
 
         const existingSection = accumulator.find(
           section => section.initial === initial,
