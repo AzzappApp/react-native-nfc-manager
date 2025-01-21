@@ -73,6 +73,14 @@ function useModuleVariantsPreviewImage({
           return colorScheme === 'light'
             ? require('#assets/module/media_square_grid_light.png')
             : require('#assets/module/media_square_grid_dark.png');
+        case 'grid2':
+          return colorScheme === 'light'
+            ? require('#assets/module/media_grid2_light.png')
+            : require('#assets/module/media_grid2_dark.png');
+        case 'square_grid2':
+          return colorScheme === 'light'
+            ? require('#assets/module/media_square_grid2_light.png')
+            : require('#assets/module/media_square_grid2_dark.png');
         case 'original_slideshow':
           return colorScheme === 'light'
             ? require('#assets/module/media_original_slideshow_light.png')

@@ -136,7 +136,24 @@ const MediaModuleRenderer = ({
             onLayout={onLayout}
             displayMode={displayMode}
             scrollPosition={scrollPosition}
-            square={variant === 'square_grid'}
+            square={variant.includes('square_grid')}
+            nbColumns={3}
+            {...props}
+          />
+        </CardModuleEditionScrollHandler>
+      );
+    case 'grid2':
+    case 'square_grid2':
+      return (
+        <CardModuleEditionScrollHandler scrollPosition={scrollPosition}>
+          <CardModuleMediaGrid
+            cardModuleMedias={data.cardModuleMedias}
+            cardModuleColor={data.cardModuleColor}
+            onLayout={onLayout}
+            displayMode={displayMode}
+            scrollPosition={scrollPosition}
+            square={variant.includes('square_grid')}
+            nbColumns={2}
             {...props}
           />
         </CardModuleEditionScrollHandler>

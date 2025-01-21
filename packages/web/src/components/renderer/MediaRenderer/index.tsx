@@ -29,6 +29,12 @@ const MediaRenderer = async (props: MediaRendererProps) => {
     case 'square_grid': {
       return <GridRenderer {...props} square />;
     }
+    case 'grid2': {
+      return <GridRenderer {...props} nbColumns={2} />;
+    }
+    case 'square_grid2': {
+      return <GridRenderer {...props} nbColumns={2} square />;
+    }
     default: {
       return null;
     }

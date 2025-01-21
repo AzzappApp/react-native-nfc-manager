@@ -200,6 +200,14 @@ export const getPictureUri = (
           return colorScheme === 'light'
             ? require('./assets/Media/media_square_grid_light.png')
             : require('./assets/Media/media_square_grid_dark.png');
+        case 'grid2':
+          return colorScheme === 'light'
+            ? require('./assets/Media/media_grid2_grey_light.png')
+            : require('./assets/Media/media_grid2_grey_dark.png');
+        case 'square_grid2':
+          return colorScheme === 'light'
+            ? require('./assets/Media/media_square_grid2_grey_light.png')
+            : require('./assets/Media/media_square_grid2_grey_dark.png');
         case 'original':
           return colorScheme === 'light'
             ? require('./assets/Media/media_original_light.png')
