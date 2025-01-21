@@ -47,6 +47,8 @@ const userPayWallcreenQuery = graphql`
       userSubscription {
         subscriptionId
         status
+        availableSeats
+        totalSeats
       }
     }
   }
@@ -141,8 +143,22 @@ const UserPayWallScreen = ({
           setAllowMultiUser(true);
         }
         commitLocalUpdate(getRelayEnvironment(), store => {
+          const newTotalSeat = extractSeatsFromSubscriptionId(
+            res.customerInfo.entitlements.active?.multiuser.productIdentifier,
+          );
+
+          const totalsS = data.currentUser?.userSubscription?.totalSeats ?? 0;
+          const updateAvailableSeats =
+            newTotalSeat -
+            totalsS +
+            (data.currentUser?.userSubscription?.availableSeats ?? 0);
+
           if (profileInfos?.webCardId) {
             store.get(profileInfos.webCardId)?.setValue(true, 'isPremium');
+            store
+              .get(profileInfos.webCardId)
+              ?.getLinkedRecord('subscription')
+              ?.setValue(Math.max(0, updateAvailableSeats), 'availableSeats');
           }
           const user = store.getRoot().getLinkedRecord('currentUser');
           const profiles = user?.getLinkedRecords('profiles');
@@ -152,6 +168,10 @@ const UserPayWallScreen = ({
               profile => profile.getDataID() === profileInfos?.profileId,
             );
             profile?.getLinkedRecord('webCard')?.setValue(true, 'isPremium');
+            profile
+              ?.getLinkedRecord('webCard')
+              ?.getLinkedRecord('subscription')
+              ?.setValue(Math.max(0, updateAvailableSeats), 'availableSeats');
           }
         });
       }
@@ -200,6 +220,8 @@ const UserPayWallScreen = ({
       Sentry.captureException(error, { data: 'userPayWallScreen' });
     }
   }, [
+    data.currentUser?.userSubscription?.availableSeats,
+    data.currentUser?.userSubscription?.totalSeats,
     intl,
     route.params?.activateFeature,
     router,
@@ -630,3 +652,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
+
+function extractSeatsFromSubscriptionId(id: string) {
+  const parts = id.split('.');
+  const number = parts.pop();
+  if (number) {
+    return parseInt(number, 10);
+  }
+  return 0;
+}
