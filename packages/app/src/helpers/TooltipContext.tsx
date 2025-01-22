@@ -1,3 +1,4 @@
+import clone from 'lodash/clone';
 import {
   createContext,
   useCallback,
@@ -12,19 +13,23 @@ type Tooltip = {
   ref: RefObject<View>;
   onPress?: () => void;
   visible?: boolean;
-  hidden?: boolean;
 };
 
 type TooltipContextProps = {
-  tooltips: { [key: string]: Tooltip | null };
   registerTooltip: (id: string, tooltipOption: Tooltip) => void;
   unregisterTooltip: (id: string) => void;
   updateTooltip: (id: string, tooltipOption: Partial<Tooltip>) => void;
   openTooltips: (ids: string[]) => void;
   closeTooltips: (ids: string[]) => void;
+  toggleTooltips: (ids: string[]) => void;
+};
+
+type TooltipDataContextProps = {
+  tooltips: { [key: string]: Tooltip | null };
 };
 
 const TooltipContext = createContext<TooltipContextProps | null>(null);
+const TooltipDataContext = createContext<TooltipDataContextProps | null>(null);
 
 export function TooltipProvider({ children }: { children: ReactNode }) {
   const [tooltips, setTooltips] = useState<{
@@ -34,7 +39,7 @@ export function TooltipProvider({ children }: { children: ReactNode }) {
   const registerTooltip = useCallback((id: string, tooltipOption: Tooltip) => {
     setTooltips(tooltip => ({
       ...tooltip,
-      [id]: { visible: false, hidden: false, ...tooltipOption },
+      [id]: { visible: false, ...tooltipOption },
     }));
   }, []);
 
@@ -64,16 +69,22 @@ export function TooltipProvider({ children }: { children: ReactNode }) {
     [],
   );
 
-  const openTooltips = useCallback(
-    (ids: string[]) => {
+  const openTooltips = useCallback((ids: string[]) => {
+    setTooltips(currentToolTip => {
+      const result = clone(currentToolTip);
+      let updated = false;
       ids.forEach(id => {
-        if (!tooltips[id]?.hidden) {
-          updateTooltip(id, { visible: true });
+        if (result[id] && !result[id]?.visible) {
+          result[id].visible = true;
+          updated = true;
         }
       });
-    },
-    [tooltips, updateTooltip],
-  );
+      if (updated) {
+        return result;
+      }
+      return currentToolTip;
+    });
+  }, []);
 
   const closeTooltips = useCallback(
     (ids: string[]) => {
@@ -84,27 +95,61 @@ export function TooltipProvider({ children }: { children: ReactNode }) {
     [updateTooltip],
   );
 
+  const toggleTooltips = useCallback((tooltipsToToggle: string[]) => {
+    setTooltips(currentToolTip => {
+      const result = clone(currentToolTip);
+      const isVisible = tooltipsToToggle.some(t => currentToolTip[t]?.visible);
+      let updated = false;
+      tooltipsToToggle.forEach(t => {
+        if (!result[t]) return;
+        if (isVisible && result[t].visible) {
+          result[t].visible = false;
+          updated = true;
+        } else if (!isVisible && !result[t].visible) {
+          result[t].visible = true;
+          updated = true;
+        }
+      });
+      if (updated) {
+        return result;
+      }
+      return currentToolTip;
+    });
+  }, []);
+
   const value = useMemo(() => {
     return {
-      tooltips,
       updateTooltip,
       registerTooltip,
       unregisterTooltip,
       openTooltips,
       closeTooltips,
+      toggleTooltips,
     };
   }, [
-    tooltips,
     updateTooltip,
     registerTooltip,
     unregisterTooltip,
     openTooltips,
     closeTooltips,
+    toggleTooltips,
   ]);
 
   return (
-    <TooltipContext.Provider value={value}>{children}</TooltipContext.Provider>
+    <TooltipContext.Provider value={value}>
+      <TooltipDataContext.Provider value={{ tooltips }}>
+        {children}
+      </TooltipDataContext.Provider>
+    </TooltipContext.Provider>
   );
+}
+
+export function useTooltipDataContext() {
+  const context = useContext(TooltipDataContext);
+  if (context === null) {
+    throw new Error('useTooltipContext must be used within a TooltipProvider');
+  }
+  return context;
 }
 
 export function useTooltipContext() {

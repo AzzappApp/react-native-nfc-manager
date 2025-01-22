@@ -394,12 +394,12 @@ const ItemRenderComponent = ({
       registerTooltip('profileMulti', {
         ref: refMulti,
       });
-    }
 
-    return () => {
-      unregisterTooltip('profileEdit');
-      unregisterTooltip('profileMulti');
-    };
+      return () => {
+        unregisterTooltip('profileEdit');
+        unregisterTooltip('profileMulti');
+      };
+    }
   }, [isCurrent, registerTooltip, unregisterTooltip]);
 
   const isMultiUser =

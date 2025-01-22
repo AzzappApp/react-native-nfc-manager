@@ -1,7 +1,10 @@
 import { memo, useCallback, useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Placement, Point } from 'react-native-popover-view/dist/Types';
-import { useTooltipContext } from '#helpers/TooltipContext';
+import {
+  useTooltipContext,
+  useTooltipDataContext,
+} from '#helpers/TooltipContext';
 import useScreenDimensions from '#hooks/useScreenDimensions';
 import Tooltip from '#ui/Tooltip';
 
@@ -12,7 +15,8 @@ type TooltipPosition = {
 
 const Tooltips = () => {
   const { width: screenWidth } = useScreenDimensions();
-  const { tooltips, closeTooltips } = useTooltipContext();
+  const { closeTooltips } = useTooltipContext();
+  const { tooltips } = useTooltipDataContext();
 
   const [tooltipCoverPosition, setTooltipCoverPosition] =
     useState<TooltipPosition>();

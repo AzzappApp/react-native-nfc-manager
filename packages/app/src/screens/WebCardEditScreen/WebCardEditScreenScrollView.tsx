@@ -41,22 +41,14 @@ const WebCardEditScreenScrollView = (
   const editScale = useWebCardEditScale();
 
   const { width: screenWidth, height: screenHeight } = useScreenDimensions();
-  const { tooltips, openTooltips, closeTooltips } = useTooltipContext();
+  const { toggleTooltips } = useTooltipContext();
 
   const insets = useScreenInsets();
 
   const editTopGap = insets.top + HEADER_HEIGHT;
 
   const openHilt = () => {
-    if (
-      tooltips['cover']?.visible ||
-      tooltips['editFooter']?.visible ||
-      tooltips['section']?.visible
-    ) {
-      closeTooltips(['cover', 'editFooter', 'section']);
-    } else {
-      openTooltips(['cover', 'editFooter', 'section']);
-    }
+    toggleTooltips(['cover', 'editFooter', 'section']);
   };
 
   return (

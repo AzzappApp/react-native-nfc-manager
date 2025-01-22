@@ -6,7 +6,6 @@ import {
   startTransition,
   memo,
   useRef,
-  useEffect,
 } from 'react';
 import { Platform, StyleSheet, useWindowDimensions, View } from 'react-native';
 import Animated, {
@@ -97,8 +96,7 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
   //#endregion
 
   // #region MainTabBar visibility
-  const { registerTooltip, unregisterTooltip, updateTooltip } =
-    useTooltipContext();
+  const { registerTooltip, unregisterTooltip } = useTooltipContext();
   const { currentIndexSharedValue } = useHomeScreenContext();
   const mainTabBarVisibleInner = useIndexInterpolation(
     currentIndexSharedValue,
@@ -144,12 +142,26 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
     },
   );
 
+  const registerTooltipInner = () => {
+    registerTooltip('profileBottomPanel', {
+      ref,
+    });
+  };
+
+  const unregisterTooltipInner = () => {
+    unregisterTooltip('profileBottomPanel');
+  };
+
+  const isVisible = useDerivedValue(() => mainTabBarVisible.value === 1);
+
   useAnimatedReaction(
-    () => mainTabBarVisible.value === 1,
+    () => isVisible.value,
     visible => {
-      runOnJS(updateTooltip)('profileBottomPanel', {
-        hidden: !visible,
-      });
+      if (visible) {
+        runOnJS(registerTooltipInner)();
+      } else {
+        runOnJS(unregisterTooltipInner)();
+      }
     },
   );
 
@@ -182,16 +194,6 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
     [nbNewContactsDerivedValue],
   );
   // #endregion
-
-  useEffect(() => {
-    registerTooltip('profileBottomPanel', {
-      ref,
-    });
-
-    return () => {
-      unregisterTooltip('profileBottomPanel');
-    };
-  }, [registerTooltip, unregisterTooltip]);
 
   return (
     <View style={containerHeight}>

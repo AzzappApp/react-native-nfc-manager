@@ -48,7 +48,7 @@ const HomeHeader = ({ openPanel, user: userKey }: HomeHeaderProps) => {
   );
 
   const { currentIndexSharedValue } = useHomeScreenContext();
-  const { tooltips, openTooltips, closeTooltips } = useTooltipContext();
+  const { toggleTooltips } = useTooltipContext();
 
   const readableColors = useMemo(
     () => [
@@ -88,15 +88,7 @@ const HomeHeader = ({ openPanel, user: userKey }: HomeHeaderProps) => {
   }));
 
   const openHilt = () => {
-    if (
-      tooltips['profileBottomPanel']?.visible ||
-      tooltips['profileCarousel']?.visible ||
-      tooltips['profileLink']?.visible
-    ) {
-      closeTooltips(['profileBottomPanel', 'profileCarousel', 'profileLink']);
-    } else {
-      openTooltips(['profileBottomPanel', 'profileCarousel', 'profileLink']);
-    }
+    toggleTooltips(['profileBottomPanel', 'profileCarousel', 'profileLink']);
   };
 
   return (

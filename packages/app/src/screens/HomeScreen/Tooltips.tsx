@@ -4,7 +4,10 @@ import { Platform } from 'react-native';
 import { PopoverMode } from 'react-native-popover-view';
 import { Placement, Point } from 'react-native-popover-view/dist/Types';
 import { ENABLE_MULTI_USER } from '#Config';
-import { useTooltipContext } from '#helpers/TooltipContext';
+import {
+  useTooltipContext,
+  useTooltipDataContext,
+} from '#helpers/TooltipContext';
 import Text from '#ui/Text';
 import Tooltip from '#ui/Tooltip';
 
@@ -14,7 +17,8 @@ type TooltipPosition = {
 };
 
 const Tooltips = () => {
-  const { tooltips, closeTooltips, openTooltips } = useTooltipContext();
+  const { closeTooltips, openTooltips } = useTooltipContext();
+  const { tooltips } = useTooltipDataContext();
   const [tooltipCarouselPosition, setTooltipCarouselPosition] =
     useState<TooltipPosition>();
   const [tooltipBottomPosition, setTooltipBottomPosition] =
