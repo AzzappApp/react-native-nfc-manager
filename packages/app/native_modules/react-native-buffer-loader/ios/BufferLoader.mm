@@ -1,6 +1,7 @@
 #import "BufferLoader.h"
 #import <CoreImage/CoreImage.h>
 
+
 namespace azzapp {
 
 BufferLoaderHostObject::BufferLoaderHostObject(std::shared_ptr<react::CallInvoker> callInvoker)
@@ -184,134 +185,132 @@ void BufferLoaderHostObject::loadTexture(
   }
 }
 
-
 CGImageRef BufferLoaderHostObject::loadImageWithOrientation(NSURL *url) {
-    NSData *imageData = [NSData dataWithContentsOfURL:url];
-    if (!imageData) {
-        throw std::runtime_error("Failed to download image data");
-    }
+  NSData *imageData = [NSData dataWithContentsOfURL:url];
+  if (!imageData) {
+    throw std::runtime_error("Failed to download image data");
+  }
 
-    // Creating the image source
-    CFDictionaryRef options = (__bridge CFDictionaryRef)@{
-        (NSString *)kCGImageSourceCreateThumbnailWithTransform: @YES,
-        (NSString *)kCGImageSourceCreateThumbnailFromImageAlways: @YES,
-        (NSString *)kCGImageSourceShouldCache: @YES
-    };
-    
-    CGImageSourceRef imageSource = CGImageSourceCreateWithData((__bridge CFDataRef)imageData, options);
-    if (!imageSource) {
-        throw std::runtime_error("Failed to create image source");
-    }
-    
-    // Retrieve image properties
-    CFDictionaryRef imageProperties = CGImageSourceCopyPropertiesAtIndex(imageSource, 0, NULL);
-    if (!imageProperties) {
-        CFRelease(imageSource);
-        throw std::runtime_error("Failed to get image properties");
-    }
-    
-    // Retrieve the orientation
-    NSInteger orientation = 1;
-    CFNumberRef orientationProperty = (CFNumberRef)CFDictionaryGetValue(imageProperties, kCGImagePropertyOrientation);
-    if (orientationProperty) {
-        CFNumberGetValue(orientationProperty, kCFNumberNSIntegerType, &orientation);
-    }
-    
-    // Create the original image
-    CGImageRef originalImage = CGImageSourceCreateImageAtIndex(imageSource, 0, NULL);
-    if (!originalImage) {
-        CFRelease(imageProperties);
-        CFRelease(imageSource);
-        throw std::runtime_error("Failed to create image");
-    }
-    
-    // Apply the orientation
-    CGSize imageSize = CGSizeMake(CGImageGetWidth(originalImage), CGImageGetHeight(originalImage));
-    CGAffineTransform transform = CGAffineTransformIdentity;
-    BOOL swapWidthHeight = NO;
-    
-    switch (orientation) {
-        case 2:
-            // Horizontal flip
-            transform = CGAffineTransformMakeScale(-1.0, 1.0);
-            transform = CGAffineTransformTranslate(transform, -imageSize.width, 0);
-            break;
-            
-        case 3:
-            // 180° rotation
-            transform = CGAffineTransformMakeRotation(M_PI);
-            transform = CGAffineTransformTranslate(transform, -imageSize.width, -imageSize.height);
-            break;
-            
-        case 4:
-            // Vertical flip
-            transform = CGAffineTransformMakeScale(1.0, -1.0);
-            transform = CGAffineTransformTranslate(transform, 0, -imageSize.height);
-            break;
-            
-        case 5:
-            // Horizontal flip + 90° rotation
-            swapWidthHeight = YES;
-            transform = CGAffineTransformMakeScale(-1.0, 1.0);
-            transform = CGAffineTransformRotate(transform, -M_PI_2);
-            break;
-            
-        case 6:
-            // 90° rotation
-            swapWidthHeight = YES;
-            transform = CGAffineTransformMakeRotation(-M_PI_2);
-            transform = CGAffineTransformTranslate(transform, -imageSize.width, 0);
-            break;
-            
-        case 7:
-            // Horizontal flip + 270° rotation
-            swapWidthHeight = YES;
-            transform = CGAffineTransformMakeScale(-1.0, 1.0);
-            transform = CGAffineTransformRotate(transform, M_PI_2);
-            break;
-            
-        case 8:
-            // 270° rotation
-            swapWidthHeight = YES;
-            transform = CGAffineTransformMakeRotation(M_PI_2);
-            transform = CGAffineTransformTranslate(transform, 0, -imageSize.height);
-            break;
-    }
-    
-    // Creating the new image
-    CGSize newSize = swapWidthHeight ? 
-        CGSizeMake(imageSize.height, imageSize.width) : 
-        CGSizeMake(imageSize.width, imageSize.height);
+  // Creating the image source
+  CFDictionaryRef options = (__bridge CFDictionaryRef)@{
+    (NSString *)kCGImageSourceCreateThumbnailWithTransform: @YES,
+    (NSString *)kCGImageSourceCreateThumbnailFromImageAlways: @YES,
+    (NSString *)kCGImageSourceShouldCache: @YES
+  };
+  
+  CGImageSourceRef imageSource = CGImageSourceCreateWithData((__bridge CFDataRef)imageData, options);
+  if (!imageSource) {
+    throw std::runtime_error("Failed to create image source");
+  }
+  
+  // Retrieve image properties
+  CFDictionaryRef imageProperties = CGImageSourceCopyPropertiesAtIndex(imageSource, 0, NULL);
+  if (!imageProperties) {
+    CFRelease(imageSource);
+    throw std::runtime_error("Failed to get image properties");
+  }
+  
+  // Retrieve the orientation
+  NSInteger orientation = 1;
+  CFNumberRef orientationProperty = (CFNumberRef)CFDictionaryGetValue(imageProperties, kCGImagePropertyOrientation);
+  if (orientationProperty) {
+    CFNumberGetValue(orientationProperty, kCFNumberNSIntegerType, &orientation);
+  }
+  
+  // Create the original image
+  CGImageRef originalImage = CGImageSourceCreateImageAtIndex(imageSource, 0, NULL);
+  if (!originalImage) {
+    CFRelease(imageProperties);
+    CFRelease(imageSource);
+    throw std::runtime_error("Failed to create image");
+  }
+  // Apply the orientation
+  CGSize imageSize = CGSizeMake(CGImageGetWidth(originalImage), CGImageGetHeight(originalImage));
+  CGAffineTransform transform = CGAffineTransformIdentity;
+  BOOL swapWidthHeight = NO;
+  
+  switch (orientation) {
+    case 2:
+      // Horizontal flip
+      transform = CGAffineTransformMakeScale(-1.0, 1.0);
+      transform = CGAffineTransformTranslate(transform, -imageSize.width, 0);
+      break;
         
-    CGContextRef context = CGBitmapContextCreate(NULL,
-                                               newSize.width,
-                                               newSize.height,
-                                               CGImageGetBitsPerComponent(originalImage),
-                                               0,
-                                               CGColorSpaceCreateDeviceRGB(),
-                                               CGImageGetBitmapInfo(originalImage));
-    
-    if (!context) {
-        CGImageRelease(originalImage);
-        CFRelease(imageProperties);
-        CFRelease(imageSource);
-        throw std::runtime_error("Failed to create context");
-    }
-    
-    // Apply the transform to the context and draw the image
-    CGContextConcatCTM(context, transform);
-    CGContextDrawImage(context, CGRectMake(0, 0, imageSize.width, imageSize.height), originalImage);
-    
-    // Create the new image
-    CGImageRef rotatedImage = CGBitmapContextCreateImage(context);
-    
-    // Release the resources
-    CGContextRelease(context);
+    case 3:
+      // 180° rotation
+      transform = CGAffineTransformMakeRotation(M_PI);
+      transform = CGAffineTransformTranslate(transform, -imageSize.width, -imageSize.height);
+      break;
+        
+    case 4:
+      // Vertical flip
+      transform = CGAffineTransformMakeScale(1.0, -1.0);
+      transform = CGAffineTransformTranslate(transform, 0, -imageSize.height);
+      break;
+        
+    case 5:
+      // Horizontal flip + 90° rotation
+      swapWidthHeight = YES;
+      transform = CGAffineTransformMakeScale(-1.0, 1.0);
+      transform = CGAffineTransformRotate(transform, -M_PI_2);
+      break;
+        
+    case 6:
+      // 90° rotation
+      swapWidthHeight = YES;
+      transform = CGAffineTransformMakeRotation(-M_PI_2);
+      transform = CGAffineTransformTranslate(transform, -imageSize.width, 0);
+      break;
+        
+    case 7:
+      // Horizontal flip + 270° rotation
+      swapWidthHeight = YES;
+      transform = CGAffineTransformMakeScale(-1.0, 1.0);
+      transform = CGAffineTransformRotate(transform, M_PI_2);
+      break;
+        
+    case 8:
+      // 270° rotation
+      swapWidthHeight = YES;
+      transform = CGAffineTransformMakeRotation(M_PI_2);
+      transform = CGAffineTransformTranslate(transform, 0, -imageSize.height);
+      break;
+  }
+  
+  // Creating the new image
+  CGSize newSize = swapWidthHeight ?
+      CGSizeMake(imageSize.height, imageSize.width) :
+      CGSizeMake(imageSize.width, imageSize.height);
+      
+  CGContextRef context = CGBitmapContextCreate(NULL,
+                                             newSize.width,
+                                             newSize.height,
+                                             8,
+                                             0,
+                                             CGColorSpaceCreateDeviceRGB(),
+                                             kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
+  
+  if (!context) {
     CGImageRelease(originalImage);
     CFRelease(imageProperties);
     CFRelease(imageSource);
-    
-    return rotatedImage;
+    throw std::runtime_error("Failed to create context");
+  }
+  
+  // Apply the transform to the context and draw the image
+  CGContextConcatCTM(context, transform);
+  CGContextDrawImage(context, CGRectMake(0, 0, imageSize.width, imageSize.height), originalImage);
+  
+  // Create the new image
+  CGImageRef rotatedImage = CGBitmapContextCreateImage(context);
+  
+  // Release the resources
+  CGContextRelease(context);
+  CGImageRelease(originalImage);
+  CFRelease(imageProperties);
+  CFRelease(imageSource);
+  
+  return rotatedImage;
 }
 
 
