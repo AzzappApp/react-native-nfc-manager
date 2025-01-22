@@ -1,5 +1,6 @@
-## 1.7.0-canary.64
+## 1.7.0-canary.65
 
+* **fix:**  - decrease render count of tooltips ([#7064](https://github.com/AzzappApp/azzapp/pull/7064))
 * **fix:**  - **IOS:** png loading
 * **fix:**  - display index in the textEditor for new modules ([#7048](https://github.com/AzzappApp/azzapp/pull/7048))
 * **fix:**  - download avatar before sharing contact card ([#7049](https://github.com/AzzappApp/azzapp/pull/7049))
