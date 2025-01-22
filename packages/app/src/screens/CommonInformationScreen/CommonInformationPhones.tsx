@@ -57,8 +57,8 @@ const CommonInformationPhones = ({
           onPress={() =>
             append({
               label: 'Home',
-              countryCode: locales[0].countryCode,
               number: '',
+              countryCode: locales[0].countryCode,
             })
           }
         >

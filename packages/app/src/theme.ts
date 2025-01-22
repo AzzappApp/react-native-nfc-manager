@@ -17,6 +17,7 @@ export const colors = {
   darkblue700: '#24309E',
   //red
   red400: '#FF2E54',
+  warn: 'rgba(255,46,84,0.3)',
   //grey
   grey50: '#F5F5F6',
   grey100: '#E2E1E3',

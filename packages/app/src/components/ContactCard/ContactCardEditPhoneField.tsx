@@ -1,8 +1,10 @@
 import { Controller } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import { type TextInputProps } from 'react-native';
+import { colors } from '#theme';
 import { buildContactCardModalStyleSheet } from '#helpers/contactCardHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { isPhoneNumberValid } from '#helpers/phoneNumbersHelper';
 import CountryCodeListWithOptions from '#ui/CountryCodeListWithOptions';
 import TextInput from '#ui/TextInput';
 import ContactCardEditFieldWrapper from './ContactCardEditFieldWrapper';
@@ -15,13 +17,13 @@ export type PhoneInput = {
 };
 
 const ContactCardEditPhoneField = <TFieldValues extends FieldValues>({
-  labelKey,
   deleteField,
   keyboardType,
-  valueKey,
-  selectedKey,
-  countryCodeKey,
   control,
+  valueKey,
+  labelKey,
+  countryCodeKey,
+  selectedKey,
   labelValues,
   placeholder,
   onChangeLabel,
@@ -29,14 +31,14 @@ const ContactCardEditPhoneField = <TFieldValues extends FieldValues>({
   errorMessage,
   trim = false,
 }: {
-  labelKey?: FieldPath<TFieldValues>;
   keyboardType: TextInputProps['keyboardType'];
   autoCapitalize?: TextInputProps['autoCapitalize'];
   deleteField: () => void;
+  control: Control<TFieldValues>;
+  labelKey?: FieldPath<TFieldValues>;
   valueKey: FieldPath<TFieldValues>;
   countryCodeKey: FieldPath<TFieldValues>;
   selectedKey?: FieldPath<TFieldValues>;
-  control: Control<TFieldValues>;
   labelValues?: Array<{ key: string; value: string }>;
   placeholder?: string;
   onChangeLabel?: (label: string) => void;
@@ -66,39 +68,48 @@ const ContactCardEditPhoneField = <TFieldValues extends FieldValues>({
           <Controller
             control={control}
             name={countryCodeKey}
-            render={({ field: { onChange, value } }) => (
-              <CountryCodeListWithOptions
-                phoneSectionTitle={intl.formatMessage({
-                  defaultMessage: 'Phone number',
-                  description: 'Phone field title in country selection list',
-                })}
-                value={value}
-                options={[]}
-                onChange={onChange}
-                accessibilityHint={intl.formatMessage({
-                  defaultMessage:
-                    'Opens a list of countries and allows you to select if you want to use your email address or a phone number',
-                  description:
-                    'Phone field- The accessibility hint for the country selector',
-                })}
-              />
-            )}
-          />
-
-          <TextInput
-            value={value as string}
-            onChangeText={trim ? value => onChange(value.trim()) : onChange}
-            style={styles.input}
-            numberOfLines={4}
-            multiline
-            keyboardType={keyboardType}
-            clearButtonMode="while-editing"
-            testID="contact-card-edit-modal-field"
-            placeholder={placeholder}
-            autoCapitalize={autoCapitalize}
-            isErrored={!!error}
-            onBlur={onBlur}
-            autoFocus={isDirty}
+            render={({
+              field: { onChange: onChangeCountryCode, value: countryCode },
+            }) => {
+              const isValid = isPhoneNumberValid(value, countryCode);
+              return (
+                <>
+                  <CountryCodeListWithOptions
+                    phoneSectionTitle={intl.formatMessage({
+                      defaultMessage: 'Phone number',
+                      description:
+                        'Phone field title in country selection list',
+                    })}
+                    value={countryCode}
+                    options={[]}
+                    onChange={onChangeCountryCode}
+                    accessibilityHint={intl.formatMessage({
+                      defaultMessage:
+                        'Opens a list of countries and allows you to select if you want to use your email address or a phone number',
+                      description:
+                        'Phone field- The accessibility hint for the country selector',
+                    })}
+                  />
+                  <TextInput
+                    value={value as string}
+                    onChangeText={
+                      trim ? value => onChange(value.trim()) : onChange
+                    }
+                    style={[styles.input, !isValid && styles.warning]}
+                    numberOfLines={4}
+                    multiline
+                    keyboardType={keyboardType}
+                    clearButtonMode="while-editing"
+                    testID="contact-card-edit-modal-field"
+                    placeholder={placeholder}
+                    autoCapitalize={autoCapitalize}
+                    isErrored={!!error}
+                    onBlur={onBlur}
+                    autoFocus={isDirty}
+                  />
+                </>
+              );
+            }}
           />
         </ContactCardEditFieldWrapper>
       )}
@@ -108,6 +119,10 @@ const ContactCardEditPhoneField = <TFieldValues extends FieldValues>({
 
 const stylesheet = createStyleSheet(appearance => ({
   ...buildContactCardModalStyleSheet(appearance),
+  warning: {
+    borderBottomWidth: 1,
+    borderColor: colors.warn,
+  },
 }));
 
 export default ContactCardEditPhoneField;
