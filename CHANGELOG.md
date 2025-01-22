@@ -1,4 +1,4 @@
-## 1.7.0-canary.63
+## 1.7.0-canary.64
 
 * **fix:**  - **IOS:** png loading
 * **fix:**  - display index in the textEditor for new modules ([#7048](https://github.com/AzzappApp/azzapp/pull/7048))
