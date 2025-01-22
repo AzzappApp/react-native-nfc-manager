@@ -54,6 +54,13 @@ export type Props = BottomSheetModalProps & {
    */
   automaticBottomPadding?: boolean;
   /**
+   * add a bottom padding automatically based on the top insets and the phone's safe area
+   * This props allows to remove it in a case of a fullscreen or Scrollable content for example
+   * @default true
+   * @type {boolean}
+   */
+  automaticTopPadding?: boolean;
+  /**
    * If true, create a backdrop that allow te be touched in order to close the bottom
    *
    * @type {boolean}
@@ -101,6 +108,7 @@ const BottomSheetModal = ({
   style,
   height,
   automaticBottomPadding = true,
+  automaticTopPadding = true,
   enableContentPanningGesture,
   closeOnBackdropTouch = true,
   variant,
@@ -208,7 +216,11 @@ const BottomSheetModal = ({
             {
               height: height ? height : undefined,
               paddingBottom: automaticBottomPadding ? paddingBottom : 0,
-              paddingTop: showHandleIndicator ? 0 : 16,
+              paddingTop: showHandleIndicator
+                ? 0
+                : automaticTopPadding
+                  ? 16
+                  : undefined,
             },
           ]}
         >

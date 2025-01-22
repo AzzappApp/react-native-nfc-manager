@@ -479,8 +479,8 @@ const AppRouter = () => {
             })}
             style={safeAreaBackgroundStyle}
           >
-            <RouterProvider value={router}>
-              <GestureHandlerRootView style={styles.flex}>
+            <GestureHandlerRootView style={styles.flex}>
+              <RouterProvider value={router}>
                 <BottomSheetModalProvider>
                   <ScreensRenderer
                     routerState={routerState}
@@ -490,13 +490,13 @@ const AppRouter = () => {
                     onScreenHasBeenDismissed={disposeScreens}
                   />
                 </BottomSheetModalProvider>
-              </GestureHandlerRootView>
-            </RouterProvider>
-            <Toast />
-            <Suspense>
-              <ShakeShare />
-            </Suspense>
-            {showLoadingScreen && <LoadingScreen />}
+              </RouterProvider>
+              <Toast />
+              <Suspense>
+                <ShakeShare />
+              </Suspense>
+              {showLoadingScreen && <LoadingScreen />}
+            </GestureHandlerRootView>
           </SafeAreaProvider>
         </ScreenPrefetcherProvider>
       </RelayEnvironmentProvider>

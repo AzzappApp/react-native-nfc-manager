@@ -1,5 +1,8 @@
 import EventEmitter from 'events';
-import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import {
+  BottomSheetModalProvider,
+  BottomSheetScrollView,
+} from '@gorhom/bottom-sheet';
 import {
   BlendColor,
   Canvas,
@@ -12,16 +15,9 @@ import {
 } from '@shopify/react-native-skia';
 import * as Clipboard from 'expo-clipboard';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Suspense, useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import {
-  View,
-  StyleSheet,
-  Dimensions,
-  ScrollView,
-  Platform,
-} from 'react-native';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { View, StyleSheet, Dimensions, Platform } from 'react-native';
 import {
   SensorType,
   runOnJS,
@@ -41,7 +37,7 @@ import useBoolean from '#hooks/useBoolean';
 import useLatestCallback from '#hooks/useLatestCallback';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { get as qrCodeWidth } from '#relayProviders/qrCodeWidth.relayprovider';
-import ActivityIndicator from '#ui/ActivityIndicator';
+import BottomSheetModal from '#ui/BottomSheetModal';
 import IconButton from '#ui/IconButton';
 import LargeButton from '#ui/LargeButton';
 import Text from '#ui/Text';
@@ -61,6 +57,7 @@ const ShakeShare = () => {
   const isConnected = useNetworkAvailableContext();
   const profileInfos = useProfileInfos();
 
+  const visible = mountScreen && isConnected;
   const dismount = useCallback(() => {
     setMountScreen(false);
   }, []);
@@ -81,25 +78,33 @@ const ShakeShare = () => {
     };
   }, [activateDetector]);
 
-  if (!mountScreen || !isConnected) {
-    return null;
-  }
-  return (
-    <GestureHandlerRootView style={StyleSheet.absoluteFillObject}>
-      <View style={styles.safeArea}>
-        <Suspense
-          fallback={
-            <View style={styles.activityIndicatorContainer}>
-              <ActivityIndicator color="white" />
-            </View>
-          }
-        >
-          <BottomSheetModalProvider>
-            <ShakeShareDisplay onClose={dismount} />
-          </BottomSheetModalProvider>
-        </Suspense>
+  // this background is displayed under the scrollView.
+  // When we reach the limits of scroll we see this background for a very short period
+  const renderBackgroundComponent = () => {
+    return (
+      <View style={StyleSheet.absoluteFill}>
+        <View style={styles.backgroundTopTransparent} />
+        <View style={styles.backgroundBottomBlack} />
       </View>
-    </GestureHandlerRootView>
+    );
+  };
+
+  return (
+    <BottomSheetModalProvider>
+      <BottomSheetModal
+        closeOnBackdropTouch={false}
+        automaticBottomPadding={false}
+        automaticTopPadding={false}
+        visible={visible}
+        showHandleIndicator={false}
+        onDismiss={dismount}
+        enableContentPanningGesture
+        showShadow={false}
+        backgroundComponent={visible ? renderBackgroundComponent : undefined}
+      >
+        <ShakeShareDisplay onClose={dismount} visible={visible} />
+      </BottomSheetModal>
+    </BottomSheetModalProvider>
   );
 };
 
@@ -109,11 +114,32 @@ const { width } = Dimensions.get('window');
 
 const QR_CODE_WIDTH = Math.round(width * 0.5);
 
-const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
+const ShakeShareDisplay = ({
+  onClose,
+  visible,
+}: {
+  onClose: () => void;
+  visible: boolean;
+}) => {
   const [popupIosWidgetVisible, showIosWidgetPopup, hideIosWidgetPopup] =
     useBoolean(false);
   const profileInfos = useProfileInfos();
   const { bottom } = useScreenInsets();
+
+  const [enableShakeBack, setEnableShakeBack] = useState(false);
+
+  useEffect(() => {
+    if (visible) {
+      const tout = setTimeout(() => {
+        setEnableShakeBack(true);
+      }, 1000);
+      return () => clearTimeout(tout);
+    } else {
+      setEnableShakeBack(false);
+    }
+  }, [visible]);
+
+  useShakeDetector(onClose, enableShakeBack);
 
   const { node } = useLazyLoadQuery<ShakeShareScreenQuery>(
     graphql`
@@ -162,7 +188,7 @@ const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
 
   return (
     <View style={styles.container}>
-      <ScrollView>
+      <BottomSheetScrollView>
         <CoverRenderer
           width={width}
           webCard={webCard}
@@ -241,7 +267,7 @@ const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
               <View style={styles.buttonContainer}>
                 <LargeButton
                   appearance="light"
-                  icon="link"
+                  icon="QR_code"
                   title={intl.formatMessage({
                     defaultMessage: 'Add qr-code to home screen',
                     description: 'Add qr-code to home screen button label',
@@ -253,7 +279,7 @@ const ShakeShareDisplay = ({ onClose }: { onClose: () => void }) => {
             )}
           </View>
         )}
-      </ScrollView>
+      </BottomSheetScrollView>
       <View style={styles.closeButtonContainer}>
         <LinearGradient
           colors={['rgba(0, 0, 0,0)', 'rgba(0, 0, 0, 1)']}
@@ -310,15 +336,6 @@ const styles = StyleSheet.create({
     left: 0,
     width: '100%',
   },
-  safeArea: {
-    flex: 1,
-    backgroundColor: colors.black,
-  },
-  activityIndicatorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   iconStyle: {
     tintColor: colors.white,
   },
@@ -354,6 +371,14 @@ const styles = StyleSheet.create({
   button: {
     borderWidth: 1,
     borderColor: colors.white,
+  },
+  backgroundTopTransparent: {
+    height: 300,
+    backgroundColor: 'transparent',
+  },
+  backgroundBottomBlack: {
+    flex: 1,
+    backgroundColor: 'black',
   },
 });
 
