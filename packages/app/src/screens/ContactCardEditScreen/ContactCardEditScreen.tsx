@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
+import { Image as ImageCompressor } from 'react-native-compressor';
 import * as mime from 'react-native-mime-types';
 import Toast from 'react-native-toast-message';
 import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
@@ -236,9 +237,10 @@ const ContactCardEditScreen = ({
       setProgressIndicator(Observable.from(0));
 
       const fileName = getFileName(avatar.uri);
+      const compressedFileUri = await ImageCompressor.compress(avatar.uri);
       const file: any = {
         name: fileName,
-        uri: avatar.uri,
+        uri: compressedFileUri,
         type: mime.lookup(fileName) || 'image/jpeg',
       };
 
@@ -255,9 +257,10 @@ const ContactCardEditScreen = ({
       setProgressIndicator(Observable.from(0));
 
       const fileName = getFileName(logo.uri);
+      const compressedFileUri = await ImageCompressor.compress(logo.uri);
       const file: any = {
         name: fileName,
-        uri: logo.uri,
+        uri: compressedFileUri,
         type: mime.lookup(fileName) || 'image/jpeg',
       };
 

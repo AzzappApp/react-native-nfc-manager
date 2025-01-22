@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Controller, useController, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Pressable, View } from 'react-native';
+import { Image as ImageCompressor } from 'react-native-compressor';
 import ImageSize from 'react-native-image-size';
 import * as mime from 'react-native-mime-types';
 import Toast from 'react-native-toast-message';
@@ -231,9 +232,10 @@ export const CommonInformationScreen = ({
         setProgressIndicator(Observable.from(0));
 
         const fileName = getFileName(logo.uri);
+        const compressedFileUri = await ImageCompressor.compress(logo.uri);
         const file: any = {
           name: fileName,
-          uri: logo.uri,
+          uri: compressedFileUri,
           type: mime.lookup(fileName) || 'image/jpeg',
         };
 
