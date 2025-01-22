@@ -1,5 +1,7 @@
-## 1.7.0-canary.59
+## 1.7.0-canary.60
 
+* **fix:**  - display index in the textEditor for new modules ([#7048](https://github.com/AzzappApp/azzapp/pull/7048))
+* **fix:**  - download avatar before sharing contact card ([#7049](https://github.com/AzzappApp/azzapp/pull/7049))
 * **fix:**  - select the acutal subscription in paywall ([#7039](https://github.com/AzzappApp/azzapp/pull/7039))
 * **feat:**  - add preview in text configuration in media&Text modules ([#7040](https://github.com/AzzappApp/azzapp/pull/7040))
 * **fix:**  - ensure contacts are merged with casing independent ([#7035](https://github.com/AzzappApp/azzapp/pull/7035))
