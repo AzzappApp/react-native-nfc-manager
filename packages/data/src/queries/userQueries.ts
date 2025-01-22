@@ -12,6 +12,7 @@ import {
   exists,
   notInArray,
   notExists,
+  ne,
 } from 'drizzle-orm';
 import { db, transaction } from '../database';
 import {
@@ -265,7 +266,6 @@ export const markUserAsDeleted = async (
     }
   });
 
-// TODO rename this I don't understand what it does
 export const getTotalMultiUser = async (userId: string) => {
   const webCardIds = await db()
     .select()
@@ -287,7 +287,12 @@ export const getTotalMultiUser = async (userId: string) => {
   return db()
     .select({ count: sql`count(*)`.mapWith(Number) })
     .from(ProfileTable)
-    .where(inArray(ProfileTable.webCardId, webCardIdList))
+    .where(
+      and(
+        inArray(ProfileTable.webCardId, webCardIdList),
+        ne(ProfileTable.deleted, true),
+      ),
+    )
     .then(res => res[0].count);
 };
 
