@@ -46,13 +46,17 @@ const Tooltip = ({
         onPress={onPress}
       >
         {header && (
-          <Text variant="large" style={styles.contentHeader} appearance="light">
+          <Text
+            variant="button"
+            style={styles.contentHeader}
+            appearance="light"
+          >
             {header}
           </Text>
         )}
         {description && (
           <Text
-            variant="medium"
+            variant="button"
             style={styles.contentDescription}
             appearance="light"
           >
