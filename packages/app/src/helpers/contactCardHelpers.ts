@@ -1,5 +1,6 @@
+import * as Sentry from '@sentry/react-native';
 import { getContactByIdAsync } from 'expo-contacts';
-import { File } from 'expo-file-system/next';
+import { File, Paths } from 'expo-file-system/next';
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { MMKV } from 'react-native-mmkv';
@@ -294,6 +295,7 @@ export const buildVCardFromAzzappContact = async (contact: ContactType) => {
   if (contact.title) {
     vCard.addJobtitle(contact.title);
   }
+
   if (contact.birthday && contact.birthday) {
     vCard.addBirthday(contact.birthday.toString());
   }
@@ -330,12 +332,25 @@ export const buildVCardFromAzzappContact = async (contact: ContactType) => {
         addressLabelToVCardLabel(addr.label) || '',
       );
   });
-  if (contact?.contactProfile?.avatar?.uri) {
-    const file = new File(contact.contactProfile.avatar.uri);
-    const image = file.base64();
 
-    if (image) {
-      vCard.addPhoto(image);
+  if (
+    contact.contactProfile?.avatar?.uri &&
+    contact.contactProfile.avatar.uri.startsWith('http')
+  ) {
+    try {
+      const file = new File(
+        Paths.cache.uri + contact.contactProfile?.avatar.id,
+      );
+      if (!file.exists) {
+        await File.downloadFileAsync(contact.contactProfile?.avatar?.uri, file);
+      }
+      const image = file.base64();
+      if (image) {
+        vCard.addPhoto(image);
+      }
+    } catch (e) {
+      Sentry.captureException(e);
+      console.error('download avatar failure', e);
     }
   }
   return vCard;
