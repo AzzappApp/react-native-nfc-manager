@@ -24,12 +24,14 @@ type CardModuleMediaTextToolProps<T extends ModuleKindAndVariant> = {
   module: T;
   cardModuleMedia: CardModuleMedia;
   onUpdateMedia: (cmm: CardModuleMedia) => void;
+  index: number;
 };
 
 const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
   module,
   cardModuleMedia,
   onUpdateMedia,
+  index,
 }: CardModuleMediaTextToolProps<T>) => {
   const intl = useIntl();
   const [show, open, close] = useBoolean(false);
@@ -132,10 +134,27 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
       >
         <ScrollView style={styles.container} bounces={false}>
           <Header
-            middleElement={intl.formatMessage({
-              defaultMessage: 'Design',
-              description: 'CardModuleDesignTool - Bottom Sheet header',
-            })}
+            middleElement={
+              module.moduleKind === 'mediaText'
+                ? intl.formatMessage(
+                    {
+                      defaultMessage: 'Media #{index}',
+                      description:
+                        'CardModuleDesignTool - Bottom Sheet header mediaText',
+                    },
+
+                    { index: index + 1 },
+                  )
+                : intl.formatMessage(
+                    {
+                      defaultMessage: 'Link #{index}',
+                      description:
+                        'CardModuleDesignTool - Bottom Sheet header mediaTextLink',
+                    },
+
+                    { index: index + 1 },
+                  )
+            }
             style={styles.header}
             rightElement={
               <TouchableOpacity onPress={onDone} style={styles.doneButton}>

@@ -278,6 +278,7 @@ const CardModuleBottomBar = <T extends ModuleKindAndVariant>({
                   availableVideoSlot={videoSlotAvailable}
                   close={deselectMedia}
                   defaultSearchValue={defaultSearchValue}
+                  index={editableItemIndex}
                 />
               ) : undefined}
             </ToolBarContainer>

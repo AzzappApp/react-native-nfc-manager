@@ -20,6 +20,7 @@ type CardModuleMediaEditToolboxProps<T extends ModuleKindAndVariant> = {
   close: () => void;
   module: T;
   defaultSearchValue?: string | null;
+  index: number;
 };
 const CardModuleMediaEditToolbox = <T extends ModuleKindAndVariant>({
   module,
@@ -28,6 +29,7 @@ const CardModuleMediaEditToolbox = <T extends ModuleKindAndVariant>({
   availableVideoSlot,
   defaultSearchValue,
   close,
+  index,
 }: CardModuleMediaEditToolboxProps<T>) => {
   const styles = useStyleSheet(styleSheet);
 
@@ -56,6 +58,7 @@ const CardModuleMediaEditToolbox = <T extends ModuleKindAndVariant>({
           module={module}
           onUpdateMedia={onUpdateMedia}
           cardModuleMedia={cardModuleMedia}
+          index={index}
         />
         {/* show only the editor if the media is local, need to find a better proper way */}
         {isFileURL(cardModuleMedia.media?.uri) && (
