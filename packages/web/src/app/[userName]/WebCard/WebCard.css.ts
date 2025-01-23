@@ -1,5 +1,6 @@
 import { style } from '@vanilla-extract/css';
 import { MediaQuery, textLarge, vars } from '#app/[userName]/theme.css';
+import { MAX_COVER_WIDTH } from '#components/renderer/CoverRenderer/CoverRenderer.css';
 
 const wrapper = style({
   position: 'relative',
@@ -163,6 +164,20 @@ const header = style({
   width: '100%',
 });
 
+const coverWrapper = style({
+  flex: 1,
+  maxWidth: MAX_COVER_WIDTH,
+  boxShadow: '0px -15px 20px -6px rgba(0, 0, 0, 0.25)',
+  borderBottomRightRadius: 0,
+  borderBottomLeftRadius: 0,
+  overflow: 'hidden',
+  '@media': {
+    [MediaQuery.Desktop]: {
+      borderRadius: 35,
+    },
+  },
+});
+
 const styles = {
   wrapper,
   modules,
@@ -176,6 +191,7 @@ const styles = {
   postNavigationHidden,
   postsClosed,
   coverContainer,
+  coverWrapper,
   header,
   title,
 };

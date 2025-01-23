@@ -11,7 +11,6 @@ import { FlipIcon } from '#assets';
 import { ButtonIcon } from '#ui';
 import ContactSteps from '#components/ContactSteps';
 import CoverRenderer from '#components/renderer/CoverRenderer';
-import { MAX_COVER_WIDTH } from '#components/renderer/CoverRenderer/CoverRenderer.css';
 import CoverRendererBackground from '#components/renderer/CoverRenderer/CoverRendererBackground';
 import DownloadVCard from '../DownloadVCard';
 import PostFeed from '../PostFeed';
@@ -108,15 +107,14 @@ const WebCard = ({
               }}
             >
               <div
-                style={{
-                  flex: 1,
-                  maxWidth: MAX_COVER_WIDTH,
-                  boxShadow: '0px -15px 20px -6px rgba(0, 0, 0, 0.25)',
-                  borderRadius: isShareBack ? 60 : 0,
-                  borderBottomRightRadius: 0,
-                  borderBottomLeftRadius: 0,
-                  overflow: 'hidden',
-                }}
+                style={
+                  isShareBack
+                    ? {
+                        borderRadius: 60,
+                      }
+                    : undefined
+                }
+                className={styles.coverWrapper}
               >
                 <CoverRenderer webCard={webCard} media={media} priority />
               </div>

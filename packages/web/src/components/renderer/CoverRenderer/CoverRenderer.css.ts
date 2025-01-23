@@ -22,7 +22,6 @@ const content = style({
     },
     [MediaQuery.Desktop]: {
       maxWidth: MAX_COVER_WIDTH,
-      borderRadius: 35,
     },
   },
 });
