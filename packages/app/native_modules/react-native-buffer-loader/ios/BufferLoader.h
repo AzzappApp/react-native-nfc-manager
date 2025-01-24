@@ -27,7 +27,7 @@ private:
   std::shared_ptr<react::CallInvoker> callInvoker;
   std::unordered_map<uint64_t, id<MTLTexture>> textureCache;
 
-  _Nullable CGImageRef loadImageWithOrientation(NSURL * _Nonnull url);
+  _Nullable CGImageRef loadImageWithOrientation(NSURL * _Nonnull url, CGSize maxSize);
   void loadTexture(
     std::shared_ptr<jsi::Function> callback,
     jsi::Runtime &runtime,

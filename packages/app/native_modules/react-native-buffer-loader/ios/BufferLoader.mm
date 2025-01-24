@@ -4,6 +4,30 @@
 
 namespace azzapp {
 
+
+inline CGImageRef copyImage(CGImageRef image, CGSize imageSize, CGSize targetSize, CGAffineTransform transform) {
+     
+  CGContextRef context = CGBitmapContextCreate(NULL,
+                                             targetSize.width,
+                                             targetSize.height,
+                                             8,
+                                             0,
+                                             CGColorSpaceCreateDeviceRGB(),
+                                             kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
+  
+  if (!context) {
+    return nil;
+  }
+  
+  CGContextConcatCTM(context, transform);
+  CGContextDrawImage(context, CGRectMake(0, 0, imageSize.width, imageSize.height), image);
+  CGImageRef rotatedImage = CGBitmapContextCreateImage(context);
+  CGContextRelease(context);
+  
+  return rotatedImage;
+}
+
+
 BufferLoaderHostObject::BufferLoaderHostObject(std::shared_ptr<react::CallInvoker> callInvoker)
   : callInvoker(callInvoker) {
   metalDevice = MTLCreateSystemDefaultDevice();
@@ -53,7 +77,7 @@ jsi::Value BufferLoaderHostObject::get(jsi::Runtime &runtime, const jsi::PropNam
           loadTexture(callback, runtime, [&]() -> id<MTLTexture> {
             NSURL *imageURL = [NSURL URLWithString:url];
             if (!imageURL) throw std::runtime_error("Invalid image URL");
-            CGImageRef cgImage = loadImageWithOrientation(imageURL);
+            CGImageRef cgImage = loadImageWithOrientation(imageURL, maxSize);
             if (!cgImage) throw std::runtime_error("Invalid image URL");
             
             NSError *error;
@@ -111,6 +135,13 @@ jsi::Value BufferLoaderHostObject::get(jsi::Runtime &runtime, const jsi::PropNam
                                                  actualTime:nil
                                                       error:&error];
             if (error || !cgImage) throw std::runtime_error("Failed to generate video frame");
+            
+            CGSize imageSize = CGSizeMake(CGImageGetWidth(cgImage), CGImageGetHeight(cgImage));
+            CGImageRef copy = copyImage(cgImage, imageSize, imageSize, CGAffineTransformIdentity);
+            if (!copy) throw std::runtime_error("Failed to transform videoframe");
+            CGImageRelease(cgImage);
+            cgImage = copy;
+            
   
             auto texture = [textureLoader newTextureWithCGImage:cgImage options:@{
               MTKTextureLoaderOptionTextureStorageMode: @(MTLStorageModePrivate),
@@ -185,7 +216,7 @@ void BufferLoaderHostObject::loadTexture(
   }
 }
 
-CGImageRef BufferLoaderHostObject::loadImageWithOrientation(NSURL *url) {
+CGImageRef BufferLoaderHostObject::loadImageWithOrientation(NSURL *url, CGSize maxSize) {
   NSData *imageData = [NSData dataWithContentsOfURL:url];
   if (!imageData) {
     throw std::runtime_error("Failed to download image data");
@@ -227,90 +258,73 @@ CGImageRef BufferLoaderHostObject::loadImageWithOrientation(NSURL *url) {
   // Apply the orientation
   CGSize imageSize = CGSizeMake(CGImageGetWidth(originalImage), CGImageGetHeight(originalImage));
   CGAffineTransform transform = CGAffineTransformIdentity;
-  BOOL swapWidthHeight = NO;
+  BOOL swapWidthHeight = orientation >= 5;
+  
+  CGFloat scale = 1;
+  if (!CGSizeEqualToSize(maxSize, CGSizeZero)) {
+    CGFloat widthScale = maxSize.width / (swapWidthHeight ? imageSize.height : imageSize.width);
+    CGFloat heightScale = maxSize.height / (swapWidthHeight ? imageSize.width : imageSize.height);
+    scale = fmin(widthScale, heightScale);
+  }
   
   switch (orientation) {
     case 2:
       // Horizontal flip
-      transform = CGAffineTransformMakeScale(-1.0, 1.0);
-      transform = CGAffineTransformTranslate(transform, -imageSize.width, 0);
+      transform = CGAffineTransformScale(transform, -1.0, 1.0);
+      transform = CGAffineTransformTranslate(transform, -imageSize.width * scale, 0);
       break;
         
     case 3:
       // 180° rotation
-      transform = CGAffineTransformMakeRotation(M_PI);
-      transform = CGAffineTransformTranslate(transform, -imageSize.width, -imageSize.height);
+      transform = CGAffineTransformRotate(transform, M_PI);
+      transform = CGAffineTransformTranslate(transform, -imageSize.width * scale, -imageSize.height * scale);
       break;
         
     case 4:
       // Vertical flip
-      transform = CGAffineTransformMakeScale(1.0, -1.0);
-      transform = CGAffineTransformTranslate(transform, 0, -imageSize.height);
+      transform = CGAffineTransformScale(transform, 1.0, -1.0);
+      transform = CGAffineTransformTranslate(transform, 0, -imageSize.height * scale);
       break;
         
     case 5:
       // Horizontal flip + 90° rotation
-      swapWidthHeight = YES;
-      transform = CGAffineTransformMakeScale(-1.0, 1.0);
+      transform = CGAffineTransformScale(transform, -1.0, 1.0);
       transform = CGAffineTransformRotate(transform, -M_PI_2);
       break;
         
     case 6:
       // 90° rotation
-      swapWidthHeight = YES;
-      transform = CGAffineTransformMakeRotation(-M_PI_2);
-      transform = CGAffineTransformTranslate(transform, -imageSize.width, 0);
+      transform = CGAffineTransformRotate(transform, -M_PI_2);
+      transform = CGAffineTransformTranslate(transform, -imageSize.width * scale, 0);
       break;
         
     case 7:
       // Horizontal flip + 270° rotation
-      swapWidthHeight = YES;
-      transform = CGAffineTransformMakeScale(-1.0, 1.0);
+      transform = CGAffineTransformScale(transform, -1.0, 1.0);
       transform = CGAffineTransformRotate(transform, M_PI_2);
       break;
         
     case 8:
       // 270° rotation
-      swapWidthHeight = YES;
-      transform = CGAffineTransformMakeRotation(M_PI_2);
-      transform = CGAffineTransformTranslate(transform, 0, -imageSize.height);
+      transform = CGAffineTransformRotate(transform, M_PI_2);
+      transform = CGAffineTransformTranslate(transform, 0, -imageSize.height * scale);
       break;
   }
-  
-  // Creating the new image
-  CGSize newSize = swapWidthHeight ?
-      CGSizeMake(imageSize.height, imageSize.width) :
-      CGSizeMake(imageSize.width, imageSize.height);
-      
-  CGContextRef context = CGBitmapContextCreate(NULL,
-                                             newSize.width,
-                                             newSize.height,
-                                             8,
-                                             0,
-                                             CGColorSpaceCreateDeviceRGB(),
-                                             kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
-  
-  if (!context) {
-    CGImageRelease(originalImage);
-    CFRelease(imageProperties);
-    CFRelease(imageSource);
-    throw std::runtime_error("Failed to create context");
+  if (scale < 1) {
+    transform = CGAffineTransformScale(transform, scale, scale);
   }
-  
-  // Apply the transform to the context and draw the image
-  CGContextConcatCTM(context, transform);
-  CGContextDrawImage(context, CGRectMake(0, 0, imageSize.width, imageSize.height), originalImage);
-  
-  // Create the new image
-  CGImageRef rotatedImage = CGBitmapContextCreateImage(context);
-  
-  // Release the resources
-  CGContextRelease(context);
+  CGImageRef result = copyImage(
+    originalImage,
+    imageSize,
+    swapWidthHeight ?
+      CGSizeMake(imageSize.height * scale, imageSize.width * scale) :
+      CGSizeMake(imageSize.width * scale, imageSize.height * scale),
+    transform
+  );
   CGImageRelease(originalImage);
   CFRelease(imageProperties);
   CFRelease(imageSource);
-  
-  return rotatedImage;
+  return result;
 }
 
 
