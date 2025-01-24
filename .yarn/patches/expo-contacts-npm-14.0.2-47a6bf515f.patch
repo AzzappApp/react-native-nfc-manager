@@ -130,7 +130,7 @@ index cfa92965fae0aac77986cf516af95429bb7213a3..793bcf67df692b81c09cd8bce3f08925
 +      }
 +      controller.contactStore = contactStore
 +      controller.delegate = delegate
-+      controller.allowsEditing = false
++      controller.allowsEditing = true
 +      controller.allowsActions = true
 +      controller.shouldShowLinkedContacts = true
 +      let parent = appContext?.utilities?.currentViewController()
