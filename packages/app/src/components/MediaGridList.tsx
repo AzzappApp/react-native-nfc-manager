@@ -72,12 +72,13 @@ const MediaGridList = <T,>({
   const renderItem = useCallback(
     ({ item }: ListRenderItemInfo<T>) => {
       const id = getItemId(item);
+      const uri = getItemUri(item);
       return (
         <MemoMediaItemRenderer
-          uri={getItemUri(item)}
+          uri={uri}
           duration={getItemDuration(item)}
           selected={selectedMediaIds?.includes(id) ?? false}
-          isLoading={filesDownloading?.includes(id) ?? false}
+          isLoading={filesDownloading?.includes(uri) ?? false}
           height={itemHeight}
           onPress={memoizedOnSelect(item)}
           useNativeImage={useNativeImage}
@@ -285,6 +286,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   loadingMore: { justifyContent: 'center', alignItems: 'center' },
   separator: { width: SEPARATOR_WIDTH, height: SEPARATOR_WIDTH },
