@@ -22,8 +22,8 @@ export const isPhoneNumberValid = (
       defaultCountry: countryCode,
     });
     return phone.isValid();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {
-    Sentry.captureException(`Phone number ${phoneNumber} is not valid: ${e}`);
     return false;
   }
 };
@@ -34,8 +34,8 @@ export const parsePhoneNumber = (
   try {
     const { nationalNumber, country } = parsePhoneNumberWithError(p.number);
     return { ...p, number: nationalNumber, countryCode: country };
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {
-    Sentry.captureException(`Phone number ${p.number} is not valid: ${e}`);
     return p;
   }
 };
