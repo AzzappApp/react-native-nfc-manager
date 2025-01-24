@@ -1,4 +1,4 @@
-## 1.7.0-canary.66
+## 1.7.0-canary.67
 
 * **fix:**  - **cover:** [#7051](https://github.com/AzzappApp/azzapp/pull/7051) missing border radius on container ([#7069](https://github.com/AzzappApp/azzapp/pull/7069))
 * **fix:**  - decrease render count of tooltips ([#7064](https://github.com/AzzappApp/azzapp/pull/7064))
