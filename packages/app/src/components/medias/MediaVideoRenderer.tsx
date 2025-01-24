@@ -246,6 +246,7 @@ const MediaVideoRenderer = (
             onReadyForDisplay={onThumbnailReadyForDisplay}
             style={StyleSheet.absoluteFill}
             fit="cover"
+            useRecycling
           />
         )
       }

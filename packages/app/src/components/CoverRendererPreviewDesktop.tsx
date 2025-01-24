@@ -63,18 +63,6 @@ const CoverRendererPreviewDesktop = ({
 
   return (
     <View {...props} style={[style, styles.wrapper]}>
-      {/* {background && (
-        <MediaImageRenderer
-          testID="CoverRenderer_background"
-          source={{
-            uri: background.smallURI,
-            mediaId: background.id,
-            requestedSize: COVER_BASE_WIDTH,
-          }}
-          tintColor={swapColor(backgroundPatternColor, cardColors)}
-          style={styles.layer}
-        />
-      )} */}
       <Image
         style={StyleSheet.absoluteFill}
         source={{ uri: mediaUri }}

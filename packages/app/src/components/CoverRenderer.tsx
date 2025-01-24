@@ -290,6 +290,7 @@ const CoverRenderer = (
                 onError={onError}
                 style={styles.layer}
                 useAnimationSnapshot={useAnimationSnapshot}
+                useRecycling
               />
             )}
             {(overlayTitle || overlaySubTitle) && (

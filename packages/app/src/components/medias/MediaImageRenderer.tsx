@@ -78,6 +78,12 @@ export type MediaImageRendererProps = Pick<ViewProps, 'style' | 'testID'> & {
    *
    */
   cachePolicy?: 'disk' | 'memory-disk' | 'memory' | 'none' | null;
+  /**
+   * there is known issue using recycling key in expo-image #22516
+   *  reset image source with recylingKey on first render
+   * so we are gonna limit the usage only in flashlist case
+   */
+  useRecycling?: boolean;
 };
 
 /**
@@ -98,6 +104,7 @@ const MediaImageRenderer = (
     blurRadius,
     testID,
     cachePolicy,
+    useRecycling = false,
   }: MediaImageRendererProps,
   ref: ForwardedRef<MediaImageRendererHandle>,
 ) => {
@@ -108,7 +115,8 @@ const MediaImageRenderer = (
     useAnimationSnapshot ? (_imageSnapshots.get(source.mediaId) ?? null) : null,
   );
   const [thumbnail, setThumbnail] = useState(
-    () => getThumbnail(source.mediaId, source.requestedSize) ?? null,
+    () =>
+      getThumbnail(source.mediaId, source.requestedSize, source.uri) ?? null,
   );
 
   const useAnimationSnapshotRef = useRef(useAnimationSnapshot);
@@ -124,7 +132,9 @@ const MediaImageRenderer = (
     if (!isEqual(sourceRef.current, source)) {
       sourceRef.current = source;
       isReady.current = false;
-      setThumbnail(getThumbnail(source.mediaId, source.requestedSize) ?? null);
+      setThumbnail(
+        getThumbnail(source.mediaId, source.requestedSize, source.uri) ?? null,
+      );
       if (useAnimationSnapshot) {
         setSnapshotID(
           useAnimationSnapshotRef.current
@@ -220,7 +230,7 @@ const MediaImageRenderer = (
   return (
     <View style={containerStyle} ref={containerRef} testID={testID}>
       <Image
-        recyclingKey={source.mediaId}
+        recyclingKey={useRecycling ? source.mediaId : null}
         source={imageSource}
         accessibilityRole="image"
         alt={alt}
@@ -235,7 +245,7 @@ const MediaImageRenderer = (
       />
       {thumbnail && (
         <Image
-          recyclingKey={`${source.mediaId}-thumbnail`}
+          recyclingKey={useRecycling ? `${source.mediaId}-thumbnail` : null}
           source={thumbnail}
           accessibilityRole="image"
           alt={alt}
@@ -246,7 +256,6 @@ const MediaImageRenderer = (
           contentFit={fit ?? 'fill'}
           style={StyleSheet.absoluteFill}
           blurRadius={blurRadius}
-          cachePolicy="none" // thumbnail are already on disk
         />
       )}
       {snapshotID && (
@@ -272,7 +281,7 @@ const addLoadedMedia = (mediaId: string, size: number, uri: string) => {
   loadedMediaCache.set(mediaId, medias);
 };
 
-const getThumbnail = (mediaId: string, size: number) => {
+const getThumbnail = (mediaId: string, size: number, originalURI: string) => {
   let medias = loadedMediaCache.get(mediaId);
   if (!medias) {
     return null;
@@ -289,6 +298,10 @@ const getThumbnail = (mediaId: string, size: number) => {
       thumbnailUri = media.uri;
       currentSize = media.size;
     }
+  }
+  //don't return the same URI as the original,
+  if (thumbnailUri === originalURI) {
+    return null;
   }
   return thumbnailUri;
 };

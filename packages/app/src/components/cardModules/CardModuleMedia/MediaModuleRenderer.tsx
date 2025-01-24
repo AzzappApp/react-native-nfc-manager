@@ -113,35 +113,8 @@ const MediaModuleRenderer = ({
         </CardModuleEditionScrollHandler>
       );
     case 'original':
-      return (
-        <CardModuleEditionScrollHandler scrollPosition={scrollPosition}>
-          <CardModuleMediaGrid
-            cardModuleMedias={data.cardModuleMedias}
-            cardModuleColor={data.cardModuleColor}
-            onLayout={onLayout}
-            displayMode={displayMode}
-            scrollPosition={scrollPosition}
-            nbColumns={1}
-            {...props}
-          />
-        </CardModuleEditionScrollHandler>
-      );
     case 'grid':
     case 'square_grid':
-      return (
-        <CardModuleEditionScrollHandler scrollPosition={scrollPosition}>
-          <CardModuleMediaGrid
-            cardModuleMedias={data.cardModuleMedias}
-            cardModuleColor={data.cardModuleColor}
-            onLayout={onLayout}
-            displayMode={displayMode}
-            scrollPosition={scrollPosition}
-            square={variant.includes('square_grid')}
-            nbColumns={3}
-            {...props}
-          />
-        </CardModuleEditionScrollHandler>
-      );
     case 'grid2':
     case 'square_grid2':
       return (
@@ -152,8 +125,8 @@ const MediaModuleRenderer = ({
             onLayout={onLayout}
             displayMode={displayMode}
             scrollPosition={scrollPosition}
-            square={variant.includes('square_grid')}
-            nbColumns={2}
+            square={isSquareGrid(variant)}
+            nbColumns={getGridNumberColumn(variant)}
             {...props}
           />
         </CardModuleEditionScrollHandler>
@@ -164,3 +137,22 @@ const MediaModuleRenderer = ({
 export default withSwapCardModuleColor<MediaModuleRendererData, 'media'>(
   MediaModuleRenderer,
 );
+const getGridNumberColumn = (variant: string) => {
+  switch (variant) {
+    case 'grid':
+    case 'square_grid':
+      return 3;
+    case 'grid2':
+    case 'square_grid2':
+      return 2;
+    default:
+      return 1;
+  }
+};
+
+const isSquareGrid = (variant: string) => {
+  if (variant === 'square_grid' || variant === 'square_grid2') {
+    return true;
+  }
+  return false;
+};

@@ -253,7 +253,7 @@ export const convertModuleMediaRelay = (mediaRelay: any) => {
             id: media.id,
             kind: media.id?.startsWith('v_') ? 'video' : 'image',
             uri: media.uri,
-            thumbnail: media.thumbnail,
+            thumbnail: media.smallThumbnail,
             smallUri: media.smallURI,
             width: media.width ?? 0,
             height: media.height ?? 0,

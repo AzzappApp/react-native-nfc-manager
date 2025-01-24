@@ -15,12 +15,7 @@ const CardModuleMediaSelector = (props: CardModuleMediaItemProps) => {
   if (isEdition && requirePreview) {
     return <CardModuleMediaEditPreview {...props} />;
   }
-  return (
-    <CardModuleMediaItem
-      {...props}
-      cachePolicy={isEdition ? 'memory-disk' : null}
-    />
-  );
+  return <CardModuleMediaItem {...props} />;
 };
 
 export default memo(CardModuleMediaSelector);
