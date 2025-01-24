@@ -27,6 +27,7 @@ import { getLocalContactsMap } from '#helpers/getLocalContactsMap';
 import useBoolean from '#hooks/useBoolean';
 import useOnInviteContact from '#hooks/useOnInviteContact';
 import { usePhonebookPermission } from '#hooks/usePhonebookPermission';
+import useScreenDimensions from '#hooks/useScreenDimensions';
 import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
@@ -408,11 +409,14 @@ const AddContactModal = ({
 
   const { bottom } = useScreenInsets();
 
+  const dim = useScreenDimensions();
+  // case for little height screen
+  const coverWidth = dim.height < 700 + bottom ? dim.width / 4 : 120;
+
   return (
     <BottomSheetModal
       visible={show}
       onDismiss={onRequestAddContactToPhonebook}
-      height={700 + bottom}
       lazy
       enableContentPanningGesture={false}
     >
@@ -433,7 +437,7 @@ const AddContactModal = ({
         middleElementStyle={styles.headerMiddle}
       />
       <View style={styles.section}>
-        <CoverRenderer webCard={webCard} width={120} canPlay={false} />
+        <CoverRenderer webCard={webCard} width={coverWidth} canPlay={false} />
       </View>
       <View style={styles.separator}>
         <Icon icon="arrow_down" />
