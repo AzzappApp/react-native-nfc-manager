@@ -467,6 +467,7 @@ const ItemRenderComponent = ({
                 onReadyForDisplay={onReady}
                 onError={onError}
                 onLongPress={openWebcardModal}
+                prefetch
               />
             )}
             {profile.webCard?.coverIsPredefined && (
