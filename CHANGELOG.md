@@ -1,5 +1,6 @@
-## 1.7.0-canary.71
+## 1.7.0-canary.72
 
+* **fix:**  - **IOS:** texture image loading orientation and scale ([#7091](https://github.com/AzzappApp/azzapp/pull/7091))
 * **feat:**  - allow to edit contact ([#7070](https://github.com/AzzappApp/azzapp/pull/7070))
 * **fix:**  - **media:** put back loader on media picker ([#7079](https://github.com/AzzappApp/azzapp/pull/7079))
 * **fix:**  - **webCard:** [#7071](https://github.com/AzzappApp/azzapp/pull/7071) avoid blink on opening webCard ([#7078](https://github.com/AzzappApp/azzapp/pull/7078))
