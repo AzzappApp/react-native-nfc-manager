@@ -1,5 +1,6 @@
-## 1.7.0-canary.67
+## 1.7.0-canary.68
 
+* **fix:**  - decrease limit to display text on thumbnail ([#7077](https://github.com/AzzappApp/azzapp/pull/7077))
 * **fix:**  - **cover:** [#7051](https://github.com/AzzappApp/azzapp/pull/7051) missing border radius on container ([#7069](https://github.com/AzzappApp/azzapp/pull/7069))
 * **fix:**  - decrease render count of tooltips ([#7064](https://github.com/AzzappApp/azzapp/pull/7064))
 * **fix:**  - **IOS:** png loading
