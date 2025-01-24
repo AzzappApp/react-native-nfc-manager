@@ -1,5 +1,8 @@
-## 1.7.0-canary.70
+## 1.7.0-canary.71
 
+* **feat:**  - allow to edit contact ([#7070](https://github.com/AzzappApp/azzapp/pull/7070))
+* **fix:**  - **media:** put back loader on media picker ([#7079](https://github.com/AzzappApp/azzapp/pull/7079))
+* **fix:**  - **webCard:** [#7071](https://github.com/AzzappApp/azzapp/pull/7071) avoid blink on opening webCard ([#7078](https://github.com/AzzappApp/azzapp/pull/7078))
 * **fix:**  - improve perf while switching design in mediaModule. Don't return… ([#7084](https://github.com/AzzappApp/azzapp/pull/7084))
 * **fix:**  - decrease limit to display text on thumbnail ([#7077](https://github.com/AzzappApp/azzapp/pull/7077))
 * **fix:**  - **cover:** [#7051](https://github.com/AzzappApp/azzapp/pull/7051) missing border radius on container ([#7069](https://github.com/AzzappApp/azzapp/pull/7069))
