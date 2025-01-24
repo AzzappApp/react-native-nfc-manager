@@ -17,6 +17,7 @@ import { colors, fontFamilies, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import PressableNative from '#ui/PressableNative';
 import { DynamicLinkRenderer } from './CoverEditor/CoverPreview/DynamicLinkRenderer';
+import { HOME_ICON_COVER_WIDTH } from './HomeIcon';
 import { MediaImageRenderer, MediaVideoRenderer } from './medias';
 import type { CoverRenderer_webCard$key } from '#relayArtifacts/CoverRenderer_webCard.graphql';
 import type {
@@ -76,7 +77,8 @@ export type CoverRendererProps = {
 };
 
 // define the minimum cover width to allow displaying test on predefined covers
-const MIN_WIDTH_TO_DISPLAY_COVER_TEXT = 50;
+// The goal of this limitation is to avoid displaying text on home icon
+const MIN_WIDTH_TO_DISPLAY_COVER_TEXT = HOME_ICON_COVER_WIDTH + 1;
 
 /**
  * Renders a card cover

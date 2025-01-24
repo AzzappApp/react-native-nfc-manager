@@ -55,3 +55,5 @@ export const HomeIcon = () => {
 };
 
 const COVER_WIDTH = 15;
+
+export const HOME_ICON_COVER_WIDTH = COVER_WIDTH;
