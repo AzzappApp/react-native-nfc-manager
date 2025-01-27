@@ -539,7 +539,7 @@ const CoverEditorMediaPicker = ({
                         )}
                         {duration != null && (
                           <View style={styles.mediaDuration}>
-                            <Text variant="button" style={styles.textDuration}>
+                            <Text variant="xsmall" style={styles.textDuration}>
                               <FormattedMessage
                                 defaultMessage="{duration}s"
                                 description="MediaPicker - duration in seconds"
