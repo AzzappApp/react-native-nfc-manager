@@ -13,13 +13,14 @@ index 4d49bcd510e76a9e391deebd046e12d44ea696b7..78964289ea9b264a52979a3ced3a8b1d
          // transition object so we can get the return value of the scope function.
          transition._callbacks.add(handleAsyncAction);
 diff --git a/Libraries/Renderer/implementations/ReactFabric-prod.js b/Libraries/Renderer/implementations/ReactFabric-prod.js
-index 3e5cf860260b7cf3a50114c805a96d17167f1be0..4e5661035104b0ac09dc100031a82ba32c902fbb 100644
+index 3e5cf860260b7cf3a50114c805a96d17167f1be0..03819bec4717cc7a5ca26b0aeb20ff7ada755f02 100644
 --- a/Libraries/Renderer/implementations/ReactFabric-prod.js
 +++ b/Libraries/Renderer/implementations/ReactFabric-prod.js
-@@ -7630,12 +7630,17 @@ function requestUpdateLane(fiber) {
+@@ -7629,13 +7629,17 @@ function requestUpdateLane(fiber) {
+   if (0 !== (executionContext & 2) && 0 !== workInProgressRootRenderLanes)
      return workInProgressRootRenderLanes & -workInProgressRootRenderLanes;
    fiber = ReactCurrentBatchConfig$1.transition;
-   null !== fiber && fiber._callbacks.add(handleAsyncAction);
+-  null !== fiber && fiber._callbacks.add(handleAsyncAction);
 -  if (null !== fiber)
 +  if (null !== fiber){
 +    if (!fiber._callbacks) {
@@ -36,13 +37,14 @@ index 3e5cf860260b7cf3a50114c805a96d17167f1be0..4e5661035104b0ac09dc100031a82ba3
    if (0 === fiber)
      a: {
 diff --git a/Libraries/Renderer/implementations/ReactFabric-profiling.js b/Libraries/Renderer/implementations/ReactFabric-profiling.js
-index 0f5fab5c9e1422e02ddb580aa776d62f4ad6ee6e..ec66a375d390aa752d656cb2673e2c0a007766dd 100644
+index 0f5fab5c9e1422e02ddb580aa776d62f4ad6ee6e..c75ec933603e1cb63fca04587e280de64d3b92c8 100644
 --- a/Libraries/Renderer/implementations/ReactFabric-profiling.js
 +++ b/Libraries/Renderer/implementations/ReactFabric-profiling.js
-@@ -8016,12 +8016,17 @@ function requestUpdateLane(fiber) {
+@@ -8015,13 +8015,17 @@ function requestUpdateLane(fiber) {
+   if (0 !== (executionContext & 2) && 0 !== workInProgressRootRenderLanes)
      return workInProgressRootRenderLanes & -workInProgressRootRenderLanes;
    fiber = ReactCurrentBatchConfig$1.transition;
-   null !== fiber && fiber._callbacks.add(handleAsyncAction);
+-  null !== fiber && fiber._callbacks.add(handleAsyncAction);
 -  if (null !== fiber)
 +  if (null !== fiber){
 +    if (!fiber._callbacks) {
