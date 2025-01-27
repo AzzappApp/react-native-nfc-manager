@@ -76,7 +76,7 @@ PODS:
     - ReactCommon/turbomodule/core
   - EXConstants (17.0.4):
     - ExpoModulesCore
-  - Expo (52.0.27):
+  - Expo (52.0.25):
     - ExpoModulesCore
   - ExpoAsset (11.0.2):
     - ExpoModulesCore
@@ -104,7 +104,7 @@ PODS:
     - ExpoModulesCore
   - ExpoLinearGradient (14.0.2):
     - ExpoModulesCore
-  - ExpoModulesCore (2.1.4):
+  - ExpoModulesCore (2.1.3):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2946,7 +2946,7 @@ SPEC CHECKSUMS:
   DVAssetLoaderDelegate: 0caec20e4e08b8560b691131539e9180024d4bce
   EXAV: 4c41f0a6ae54a0b96597abc90e37962ab2ee0d85
   EXConstants: 6b8c5653492349b3c3fe6b905c556bc45b360405
-  Expo: 296cbea8d4469eb60d61f09dbd4925f86d2b85da
+  Expo: 63db23579a7a878567185fa0524b8294b4f93b28
   ExpoAsset: d2d2cbc6a4efadf51a3da27d85d589935abd0b98
   ExpoBlur: cb75554318a537db7a65ad589a0a5f32173ca39b
   ExpoClipboard: 44fd1c8959ee8f6175d059dc011b154c9709a969
@@ -2958,7 +2958,7 @@ SPEC CHECKSUMS:
   ExpoImage: f2c9cfd2a4cb918bba7ddbb40da851858f7aece4
   ExpoKeepAwake: 62ff49bbc3bff90d8ee28329190f9ba371bf88e7
   ExpoLinearGradient: 35ebd83b16f80b3add053a2fd68cc328ed927f60
-  ExpoModulesCore: 646f706f6e756128c79d4c10972cade56d9efef0
+  ExpoModulesCore: 7e6ae3311a7d566bd284043dc17627b2dac8c203
   ExpoSensors: 02a52ddab1e3a8a1438258c3d87d1ee5f721743a
   FBLazyVector: be509404b5de73a64a74284edcaf73a5d1e128b1
   Firebase: a64bf6a8546e6eab54f1c715cd6151f39d2329f4
