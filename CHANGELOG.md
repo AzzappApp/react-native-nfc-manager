@@ -1,4 +1,4 @@
-## 1.7.0-canary.75
+## 1.7.0-canary.76
 
 * **fix:**  - downgrade expo to be able to run app locally ([#7103](https://github.com/AzzappApp/azzapp/pull/7103))
 * **fix:**  - **IOS:** texture image loading orientation and scale ([#7091](https://github.com/AzzappApp/azzapp/pull/7091))
