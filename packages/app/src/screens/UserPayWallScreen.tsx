@@ -62,9 +62,7 @@ const UserPayWallScreen = ({
   const intl = useIntl();
   const router = useRouter();
   const { height } = useWindowDimensions();
-
   const { bottom } = useScreenInsets();
-  const lottieHeight = height - BOTTOM_HEIGHT + 20;
   const [period, setPeriod] = useState<'month' | 'year'>(
     data.currentUser?.userSubscription?.subscriptionId.includes('month')
       ? 'month'
@@ -73,11 +71,12 @@ const UserPayWallScreen = ({
   const [selectedPurchasePackage, setSelectedPurchasePackage] =
     useState<PurchasesPackage | null>(null);
   const [processing, setProcessing] = useState(false);
-
   const subscriptions = useUserSubscriptionOffer(period);
-
-  const setAllowMultiUser = useMultiUserUpdate();
   const [freeTrialEligible, setFreeTrialEligible] = useState(false);
+  const setAllowMultiUser = useMultiUserUpdate();
+
+  const lottieHeight = height - BOTTOM_HEIGHT + 20;
+
   useEffect(() => {
     if (subscriptions && subscriptions.length > 0) {
       //set the period
@@ -228,7 +227,6 @@ const UserPayWallScreen = ({
         );
         return;
       }
-
       Alert.alert(
         intl.formatMessage({
           defaultMessage: 'Error during processing payment',

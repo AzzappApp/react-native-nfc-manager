@@ -149,8 +149,18 @@ const WebCardParametersScreen = ({
           },
         },
         onError: error => {
-          console.log(error);
-
+          if (error.message === ERRORS.SUBSCRIPTION_INSUFFICIENT_SEATS) {
+            Toast.show({
+              type: 'error',
+              text1: intl.formatMessage({
+                defaultMessage:
+                  'Error, not enough users available in you subscription to publish this webcard, please upgrade your subscription',
+                description:
+                  'Toast Error message when user tries to publish a webcard but has not enough seats',
+              }),
+            });
+            return;
+          }
           Toast.show({
             type: 'error',
             text1: intl.formatMessage(
@@ -234,8 +244,6 @@ const WebCardParametersScreen = ({
           },
         },
         onError: error => {
-          console.log(error);
-
           const response = (
             'response' in error ? error.response : undefined
           ) as { errors: GraphQLError[] } | undefined;

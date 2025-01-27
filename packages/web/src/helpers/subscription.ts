@@ -9,10 +9,15 @@ import {
 import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
 import type { UserSubscription, WebCard } from '@azzapp/data';
 
-export const unpublishWebCardForUser = async (
-  userId: string,
-  userSubscription?: UserSubscription,
-) => {
+export const unpublishWebCardForUser = async ({
+  userId,
+  userSubscription,
+  forceUnpublishUser = false,
+}: {
+  userId: string;
+  userSubscription?: UserSubscription;
+  forceUnpublishUser?: boolean; // force unpublish even if user is premium (in case of missing seat when moving subscirption with IAP)
+}) => {
   await transaction(async () => {
     const profiles = (await getUserProfilesWithWebCard(userId)).filter(
       ({ profile }) => profile.profileRole === 'owner',
@@ -22,7 +27,7 @@ export const unpublishWebCardForUser = async (
 
     for (let index = 0; index < profiles.length; index++) {
       const webCard = profiles[index].webCard;
-      if (!userIsPremium) {
+      if (!userIsPremium || forceUnpublishUser) {
         if (webCard?.cardIsPublished) {
           const modules = await getCardModulesByWebCard(webCard.id, false);
           if (webCardRequiresSubscription(modules, webCard)) {

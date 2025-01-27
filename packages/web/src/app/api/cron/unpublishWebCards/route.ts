@@ -29,10 +29,10 @@ const unpublishedWebCards = async () => {
   const result = await Promise.allSettled(
     expiredSubscriptions.map(async expiredSubscriptions => {
       await transaction(async () => {
-        await unpublishWebCardForUser(
-          expiredSubscriptions.userId,
-          expiredSubscriptions,
-        );
+        await unpublishWebCardForUser({
+          userId: expiredSubscriptions.userId,
+          userSubscription: expiredSubscriptions,
+        });
 
         await updateSubscription(expiredSubscriptions.userId, {
           invalidatedAt: new Date(),

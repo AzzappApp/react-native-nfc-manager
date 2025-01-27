@@ -2,6 +2,7 @@ import * as Sentry from '@sentry/nextjs';
 import { NextResponse } from 'next/server';
 import {
   createSubscription,
+  getTotalMultiUser,
   getUserSubscriptions,
   transaction,
   updateActiveUserSubscription,
@@ -114,7 +115,7 @@ const subscriptionWebHook = async (req: Request) => {
               invalidatedAt: new Date(),
             });
 
-            await unpublishWebCardForUser(userId);
+            await unpublishWebCardForUser({ userId });
           }
         });
 
@@ -162,6 +163,7 @@ const subscriptionWebHook = async (req: Request) => {
         break;
       case 'RENEWAL':
         await transaction(async () => {
+          const totalSeats = extractSeatsFromSubscriptionId(subscriptionId);
           const sub = (await getUserSubscriptions(userId)).filter(
             s => s.issuer !== 'web',
           );
@@ -178,7 +180,7 @@ const subscriptionWebHook = async (req: Request) => {
                   : store === 'PLAY_STORE'
                     ? 'google'
                     : 'web',
-              totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
+              totalSeats,
               freeSeats: 0,
               status: 'active',
             });
@@ -194,9 +196,16 @@ const subscriptionWebHook = async (req: Request) => {
                   : store === 'PLAY_STORE'
                     ? 'google'
                     : 'web',
-              totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
+              totalSeats,
               status: 'active',
             });
+            const totalUsedSeats = await getTotalMultiUser(userId);
+            if (totalSeats - totalUsedSeats < 0) {
+              await unpublishWebCardForUser({
+                userId,
+                forceUnpublishUser: true,
+              });
+            }
           }
         });
 

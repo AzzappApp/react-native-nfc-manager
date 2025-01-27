@@ -1,6 +1,12 @@
 import { GraphQLError } from 'graphql';
-import { getWebCardPosts, updateWebCard } from '@azzapp/data';
+import {
+  activeUserSubscription,
+  getTotalMultiUser,
+  getWebCardPosts,
+  updateWebCard,
+} from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
+import { extractSeatsFromIAPSubscriptionId } from '@azzapp/shared/subscriptionHelpers';
 import { invalidatePost, invalidateWebCard } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
 import { webCardLoader } from '#loaders';
@@ -22,6 +28,24 @@ const toggleWebCardPublished: MutationResolvers['toggleWebCardPublished'] =
 
     if (!webCard.coverMediaId && published) {
       throw new GraphQLError(ERRORS.MISSING_COVER);
+    }
+
+    //checking if there is enough seats for the user
+    const userSubscription = await activeUserSubscription([userId]);
+    if (userSubscription.length > 0) {
+      //user can only have ONE usersubscription at a time
+      const subscription = userSubscription[0];
+      if (subscription && subscription.subscriptionId) {
+        const totalUsedSeats = await getTotalMultiUser(userId);
+        const totalSeats = extractSeatsFromIAPSubscriptionId(
+          subscription.subscriptionId,
+        );
+        if (totalSeats - totalUsedSeats < 0) {
+          //TODO ? be sure the webcard are unpublished (not sure other process should already do it)
+
+          throw new GraphQLError(ERRORS.SUBSCRIPTION_INSUFFICIENT_SEATS);
+        }
+      }
     }
 
     const updates = {

@@ -69,6 +69,12 @@ const useHandleProfileActionError = (errorText: string) => {
           defaultMessage: 'Error, you lost access to this webcard',
           description: 'Toast Error message when user lost webcard access',
         }),
+        [ERRORS.SUBSCRIPTION_INSUFFICIENT_SEATS]: intl.formatMessage({
+          defaultMessage:
+            'Error, not enough users available in you subscription to publish this webcard, please upgrade your subscription',
+          description:
+            'Toast Error message when user tries to publish a webcard but has not enough seats',
+        }),
       };
 
       Toast.show({
