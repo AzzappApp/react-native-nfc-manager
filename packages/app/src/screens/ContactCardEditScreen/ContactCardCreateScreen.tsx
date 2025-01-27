@@ -23,6 +23,7 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getFileName } from '#helpers/fileHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
+import { getPhonenumberWithCountryCode } from '#helpers/phoneNumbersHelper';
 import useBoolean from '#hooks/useBoolean';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -38,6 +39,7 @@ import {
 import type { ScreenOptions } from '#components/NativeRouter';
 import type { ContactCardCreateScreenMutation } from '#relayArtifacts/ContactCardCreateScreenMutation.graphql';
 import type { ContactCardCreateRoute } from '#routes';
+import type { CountryCode } from 'libphonenumber-js';
 
 const WAIT_FOR_REDIRECT = 1000;
 
@@ -171,7 +173,15 @@ const ContactCardCreateScreen = () => {
               ? data.emails.filter(email => email.address)
               : undefined,
             phoneNumbers: data.phoneNumbers?.length
-              ? data.phoneNumbers.filter(phoneNumber => phoneNumber.number)
+              ? data.phoneNumbers
+                  .filter(phoneNumber => phoneNumber.number)
+                  .map(({ countryCode, ...phoneNumber }) => {
+                    const number = getPhonenumberWithCountryCode(
+                      phoneNumber.number,
+                      countryCode as CountryCode,
+                    );
+                    return { ...phoneNumber, number };
+                  })
               : undefined,
             urls: urls?.length ? urls : undefined,
             addresses: data.addresses
