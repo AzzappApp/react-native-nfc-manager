@@ -1,5 +1,6 @@
-## 1.7.0-canary.77
+## 1.7.0-canary.78
 
+* **fix:**  - [#7105](https://github.com/AzzappApp/azzapp/pull/7105) enhance patch on react-native ([#7109](https://github.com/AzzappApp/azzapp/pull/7109))
 * **fix:**  - IAP user can swithc off multiUser even is subscription expired ([#7108](https://github.com/AzzappApp/azzapp/pull/7108))
 * **fix:**  - handle dreasing number of seats on IAP ([#7104](https://github.com/AzzappApp/azzapp/pull/7104))
 * **fix:**  - downgrade expo to be able to run app locally ([#7103](https://github.com/AzzappApp/azzapp/pull/7103))
