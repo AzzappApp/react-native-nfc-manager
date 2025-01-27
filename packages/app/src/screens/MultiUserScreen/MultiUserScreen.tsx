@@ -75,6 +75,7 @@ const multiUserScreenQuery = graphql`
             id
             endAt
             status
+            issuer
           }
           requiresSubscription
           isPremium
@@ -113,6 +114,8 @@ const MultiUserScreen = ({
   const toggleMultiUser = useCallback(
     (value: boolean) => {
       if (
+        !value &&
+        profile?.webCard?.subscription?.issuer === 'web' &&
         !profile?.webCard?.isPremium &&
         profile?.webCard?.subscription &&
         (profile?.webCard?.subscription?.status !== 'active' ||
