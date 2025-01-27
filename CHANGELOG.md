@@ -1,4 +1,4 @@
-## 1.7.0-canary.72
+## 1.7.0-canary.73
 
 * **fix:**  - **IOS:** texture image loading orientation and scale ([#7091](https://github.com/AzzappApp/azzapp/pull/7091))
 * **feat:**  - allow to edit contact ([#7070](https://github.com/AzzappApp/azzapp/pull/7070))
