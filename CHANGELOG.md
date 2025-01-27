@@ -1,5 +1,6 @@
-## 1.7.0-canary.78
+## 1.7.0-canary.79
 
+* **fix:**  - alternation isViewPort ([#7111](https://github.com/AzzappApp/azzapp/pull/7111))
 * **fix:**  - [#7105](https://github.com/AzzappApp/azzapp/pull/7105) enhance patch on react-native ([#7109](https://github.com/AzzappApp/azzapp/pull/7109))
 * **fix:**  - IAP user can swithc off multiUser even is subscription expired ([#7108](https://github.com/AzzappApp/azzapp/pull/7108))
 * **fix:**  - handle dreasing number of seats on IAP ([#7104](https://github.com/AzzappApp/azzapp/pull/7104))
