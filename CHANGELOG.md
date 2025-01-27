@@ -1,5 +1,6 @@
-## 1.7.0-canary.74
+## 1.7.0-canary.75
 
+* **fix:**  - downgrade expo to be able to run app locally ([#7103](https://github.com/AzzappApp/azzapp/pull/7103))
 * **fix:**  - **IOS:** texture image loading orientation and scale ([#7091](https://github.com/AzzappApp/azzapp/pull/7091))
 * **feat:**  - allow to edit contact ([#7070](https://github.com/AzzappApp/azzapp/pull/7070))
 * **fix:**  - **media:** put back loader on media picker ([#7079](https://github.com/AzzappApp/azzapp/pull/7079))
