@@ -1,5 +1,7 @@
-## 1.7.0-canary.76
+## 1.7.0-canary.77
 
+* **fix:**  - IAP user can swithc off multiUser even is subscription expired ([#7108](https://github.com/AzzappApp/azzapp/pull/7108))
+* **fix:**  - handle dreasing number of seats on IAP ([#7104](https://github.com/AzzappApp/azzapp/pull/7104))
 * **fix:**  - downgrade expo to be able to run app locally ([#7103](https://github.com/AzzappApp/azzapp/pull/7103))
 * **fix:**  - **IOS:** texture image loading orientation and scale ([#7091](https://github.com/AzzappApp/azzapp/pull/7091))
 * **feat:**  - allow to edit contact ([#7070](https://github.com/AzzappApp/azzapp/pull/7070))
