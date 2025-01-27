@@ -6,6 +6,7 @@ import {
   getUserProfilesWithWebCard,
   getSubscriptionsOfUser,
   getWebCardProfilesCount,
+  getTotalMultiUser,
 } from '@azzapp/data';
 import { Subscriptions } from './Subscriptions';
 import UserForm from './UserForm';
@@ -31,9 +32,14 @@ const UserPage = async ({ params: { id } }: UserPageProps) => {
   const subscriptions = await getSubscriptionsOfUser(user.id);
   const userSubscriptions: SubscriptionWithProfilesCount[] = await Promise.all(
     subscriptions.map(async s => {
-      const count = await getWebCardProfilesCount(s.webCardId as string);
+      let totalUsed = 0;
+      if (s.webCardId) {
+        totalUsed = await getWebCardProfilesCount(s.webCardId);
+      } else {
+        totalUsed = await getTotalMultiUser(s.userId);
+      }
 
-      return { ...s, profilesCount: count };
+      return { ...s, profilesCount: totalUsed };
     }),
   );
 

@@ -27,6 +27,7 @@ export const Subscription = ({
   const [freeSeats, setFreeSeats] = useState(userSubscription.freeSeats || 0);
   const [debouncedSeats] = useDebounce(freeSeats, 300);
   const [pending, startTransition] = useTransition();
+  const totalSeats = userSubscription.totalSeats + userSubscription.freeSeats;
 
   const toggleSubscriptionStatus = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -81,23 +82,38 @@ export const Subscription = ({
       </Typography>
 
       <Box display="flex" gap={2}>
-        <TextField
-          sx={{ width: 250 }}
-          value={userSubscription.webCardId}
-          label="Webcard"
-          inputProps={{
-            readOnly: true,
-          }}
-          disabled
-        />
-        <TextField
-          sx={{ width: 250 }}
-          value={`${(((userSubscription.amount || 0) + (userSubscription.taxes || 0)) / 100).toFixed(2)}€ (${userSubscription.totalSeats} users)`}
-          label="Billed for (+taxes)"
-          inputProps={{
-            readOnly: true,
-          }}
-        />
+        {userSubscription.issuer === 'web' &&
+        userSubscription.subscriptionPlan !== 'web.lifetime' ? (
+          <>
+            <TextField
+              sx={{ width: 250 }}
+              value={userSubscription.webCardId}
+              label="Webcard"
+              inputProps={{
+                readOnly: true,
+              }}
+              disabled
+            />
+            <TextField
+              sx={{ width: 250 }}
+              value={`${(((userSubscription.amount || 0) + (userSubscription.taxes || 0)) / 100).toFixed(2)}€ (${userSubscription.totalSeats} users)`}
+              label="Billed for (+taxes)"
+              inputProps={{
+                readOnly: true,
+              }}
+            />
+          </>
+        ) : (
+          <TextField
+            sx={{ width: 250 }}
+            value={`${userSubscription.profilesCount} / ${totalSeats}`}
+            label="Seats"
+            error={userSubscription.profilesCount > totalSeats}
+            inputProps={{
+              readOnly: true,
+            }}
+          />
+        )}
         <FormControlLabel
           control={
             <Switch
