@@ -199,7 +199,7 @@ const AlternationContainer = ({
 
   const inViewport = useIsModuleItemInViewPort(
     scrollY,
-    modulePosition ?? 0,
+    (modulePosition ?? 0) + index * componentHeight,
     dimension,
   );
 
