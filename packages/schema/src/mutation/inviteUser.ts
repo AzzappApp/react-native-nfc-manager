@@ -204,6 +204,7 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
 
     return { profile };
   } catch (e) {
+    console.error(e);
     if (e instanceof GraphQLError) {
       throw e;
     }

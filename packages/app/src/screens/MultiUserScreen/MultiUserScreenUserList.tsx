@@ -10,6 +10,7 @@ import {
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Platform, SectionList, View } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import Toast from 'react-native-toast-message';
 import { graphql, useFragment, usePaginationFragment } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { type ArrayItemType } from '@azzapp/shared/arrayHelpers';
@@ -45,6 +46,7 @@ export type MultiUserScreenListProps = {
   Header: React.ReactElement;
   searching?: boolean;
   searchValue?: string;
+  hasUserSubscription: boolean;
 };
 
 const MultiUserScreenUserList = ({
@@ -52,6 +54,7 @@ const MultiUserScreenUserList = ({
   Header,
   searching,
   searchValue,
+  hasUserSubscription,
 }: MultiUserScreenListProps) => {
   const intl = useIntl();
 
@@ -83,6 +86,11 @@ const MultiUserScreenUserList = ({
         logo {
           id
         }
+        subscription {
+          id
+          subscriptionPlan
+        }
+        isPremium
         ...MultiUserScreenUserList_profiles
         ...MultiUserPendingProfileOwner
       }
@@ -279,6 +287,8 @@ const MultiUserScreenUserList = ({
     [bottom],
   );
 
+  const router = useRouter();
+
   return (
     <View style={styles.content}>
       <Suspense fallback={<LoadingView />}>
@@ -289,16 +299,63 @@ const MultiUserScreenUserList = ({
                 {Header}
                 {!transferOwnerMode && (
                   <>
-                    <Link route="MULTI_USER_ADD">
-                      <Button
-                        style={styles.button}
-                        label={intl.formatMessage({
-                          defaultMessage: 'Add users',
-                          description:
-                            'Button to add new users from MultiUserScreen',
-                        })}
-                      />
-                    </Link>
+                    {webCard.isPremium &&
+                      !hasUserSubscription &&
+                      !webCard.subscription && (
+                        <View style={styles.paymentMethod}>
+                          <View>
+                            <Text variant="button" appearance="dark">
+                              <FormattedMessage
+                                defaultMessage="No valid payment method"
+                                description="Title for multi user screen when no valid payment method"
+                              />
+                            </Text>
+                            <Text variant="small" appearance="dark">
+                              <FormattedMessage
+                                defaultMessage="Go to azzapp on the web to manage multi user option"
+                                description="Description for multi user screen when no valid payment method"
+                              />
+                            </Text>
+                          </View>
+                          <Icon
+                            icon="information"
+                            size={14}
+                            style={{ tintColor: 'white' }}
+                          />
+                        </View>
+                      )}
+                    <Button
+                      style={styles.button}
+                      label={intl.formatMessage({
+                        defaultMessage: 'Add users',
+                        description:
+                          'Button to add new users from MultiUserScreen',
+                      })}
+                      onPress={() => {
+                        if (
+                          webCard.isPremium &&
+                          !hasUserSubscription &&
+                          !webCard.subscription
+                        ) {
+                          Toast.show({
+                            type: 'info',
+                            text1: intl.formatMessage({
+                              defaultMessage:
+                                'Go to azzapp on the Web to manage multi-user',
+                              description:
+                                'Error message when trying to add a user without a valid payment method',
+                            }),
+                            props: {
+                              showClose: true,
+                            },
+                          });
+                          return;
+                        }
+                        router.push({
+                          route: 'MULTI_USER_ADD',
+                        });
+                      }}
+                    />
                     <Link route="COMMON_INFORMATION">
                       <Button
                         style={styles.button}
@@ -481,6 +538,16 @@ const styleSheet = createStyleSheet(appearance => ({
     color: appearance === 'light' ? colors.grey600 : colors.grey300,
     textTransform: 'uppercase',
     textAlign: 'center',
+  },
+  paymentMethod: {
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    width: '100%',
+    backgroundColor: colors.red400,
+    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
 }));
 
