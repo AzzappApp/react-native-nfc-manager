@@ -1,5 +1,6 @@
-## 1.7.0-canary.83
+## 1.7.0-canary.84
 
+* **fix:**  - don’t return float values ([#7128](https://github.com/AzzappApp/azzapp/pull/7128))
 * **fix:**  - **payment:** [#7087](https://github.com/AzzappApp/azzapp/pull/7087) end subscription on cancellation ([#7088](https://github.com/AzzappApp/azzapp/pull/7088))
 * **feat:**  - **payment:** add nbMonths in estimation ([#7125](https://github.com/AzzappApp/azzapp/pull/7125))
 * **feat:**  - **multiUser:** [#7112](https://github.com/AzzappApp/azzapp/pull/7112) use email template ([#7117](https://github.com/AzzappApp/azzapp/pull/7117))
