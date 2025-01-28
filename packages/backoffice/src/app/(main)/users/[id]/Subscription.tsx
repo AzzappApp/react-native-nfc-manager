@@ -9,6 +9,7 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  Snackbar,
   Switch,
   TextField,
   Typography,
@@ -28,6 +29,7 @@ export const Subscription = ({
   const [debouncedSeats] = useDebounce(freeSeats, 300);
   const [pending, startTransition] = useTransition();
   const totalSeats = userSubscription.totalSeats + userSubscription.freeSeats;
+  const [message, setMessage] = useState<string | null>(null);
 
   const toggleSubscriptionStatus = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -42,6 +44,7 @@ export const Subscription = ({
           status ? 'active' : 'canceled',
         );
       } catch (e) {
+        setMessage(`An error occurred: ${(e as Error).message}`);
         console.error(e);
       }
     });
@@ -51,6 +54,7 @@ export const Subscription = ({
     try {
       await updateFreeSeatsAction(userSubscription.id, debouncedSeats);
     } catch (e) {
+      setMessage(`An error occurred: ${(e as Error).message}`);
       console.error(e);
     }
   }, [debouncedSeats, userSubscription.id]);
@@ -71,8 +75,10 @@ export const Subscription = ({
         sx={{ width: 250 }}
         value={userSubscription.issuer}
         label="Platform"
-        inputProps={{
-          readOnly: true,
+        slotProps={{
+          htmlInput: {
+            readOnly: true,
+          },
         }}
         disabled
       />
@@ -89,8 +95,10 @@ export const Subscription = ({
               sx={{ width: 250 }}
               value={userSubscription.webCardId}
               label="Webcard"
-              inputProps={{
-                readOnly: true,
+              slotProps={{
+                htmlInput: {
+                  readOnly: true,
+                },
               }}
               disabled
             />
@@ -98,8 +106,10 @@ export const Subscription = ({
               sx={{ width: 250 }}
               value={`${(((userSubscription.amount || 0) + (userSubscription.taxes || 0)) / 100).toFixed(2)}€ (${userSubscription.totalSeats} users)`}
               label="Billed for (+taxes)"
-              inputProps={{
-                readOnly: true,
+              slotProps={{
+                htmlInput: {
+                  readOnly: true,
+                },
               }}
             />
           </>
@@ -109,8 +119,10 @@ export const Subscription = ({
             value={`${userSubscription.profilesCount} / ${totalSeats}`}
             label="Seats"
             error={userSubscription.profilesCount > totalSeats}
-            inputProps={{
-              readOnly: true,
+            slotProps={{
+              htmlInput: {
+                readOnly: true,
+              },
             }}
           />
         )}
@@ -120,6 +132,12 @@ export const Subscription = ({
               checked={userSubscription.status === 'active'}
               color="success"
               onChange={toggleSubscriptionStatus}
+              disabled={
+                userSubscription.issuer === 'apple' ||
+                userSubscription.issuer === 'google' ||
+                (userSubscription.subscriptionPlan !== 'web.lifetime' &&
+                  userSubscription.status !== 'active')
+              }
             />
           }
           label={`${userSubscription.status.replace('_', ' ')}`}
@@ -156,10 +174,12 @@ export const Subscription = ({
             sx={{ width: 250 }}
             value={userSubscription.canceledAt.toDateString()}
             label="Canceled at"
-            inputProps={{
-              readOnly: true,
-              style: {
-                color: 'red',
+            slotProps={{
+              htmlInput: {
+                readOnly: true,
+                style: {
+                  color: 'red',
+                },
               },
             }}
           />
@@ -168,10 +188,12 @@ export const Subscription = ({
           sx={{ width: 250 }}
           value={userSubscription.endAt.toDateString()}
           label="End at"
-          inputProps={{
-            readOnly: true,
-            style: {
-              color: new Date() > userSubscription.endAt ? 'red' : 'black',
+          slotProps={{
+            htmlInput: {
+              readOnly: true,
+              style: {
+                color: new Date() > userSubscription.endAt ? 'red' : 'black',
+              },
             },
           }}
         />
@@ -182,6 +204,14 @@ export const Subscription = ({
       >
         <CircularProgress color="inherit" />
       </Backdrop>
+      <Snackbar
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        open={!!message}
+        onClose={() => {
+          setMessage(null);
+        }}
+        message={message}
+      />
     </Box>
   );
 };

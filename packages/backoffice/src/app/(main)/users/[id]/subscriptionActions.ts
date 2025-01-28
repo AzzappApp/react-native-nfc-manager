@@ -7,7 +7,9 @@ import {
   transaction,
   updateSubscription,
   createId,
+  getSubscriptionById,
 } from '@azzapp/data';
+import { endSubscription } from '@azzapp/payment';
 import type { UserSubscription } from '@azzapp/data';
 
 export const setLifetimeSubscription = async (
@@ -48,13 +50,23 @@ export const toggleSubscriptionStatusAction = async (
   status: 'active' | 'canceled',
 ) => {
   const cancelDate = new Date();
-  await updateSubscription(subscriptionId, {
-    status,
-    canceledAt: status === 'canceled' ? cancelDate : null,
-    endAt:
-      status === 'canceled' && subscriptionPlan === 'web.lifetime'
-        ? cancelDate
-        : undefined,
-  });
+
+  const subscription = await getSubscriptionById(subscriptionId);
+  if (
+    subscription?.issuer === 'web' &&
+    subscription?.subscriptionPlan !== 'web.lifetime' &&
+    subscription.webCardId
+  ) {
+    await endSubscription(subscriptionId, subscription.webCardId);
+  } else if (subscription?.subscriptionPlan === 'web.lifetime') {
+    await updateSubscription(subscriptionId, {
+      status,
+      canceledAt: status === 'canceled' ? cancelDate : null,
+      endAt:
+        status === 'canceled' && subscriptionPlan === 'web.lifetime'
+          ? cancelDate
+          : undefined,
+    });
+  }
   revalidatePath(`/users/${userId}`);
 };
