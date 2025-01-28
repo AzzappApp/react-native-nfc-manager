@@ -1,5 +1,7 @@
-## 1.7.0-canary.88
+## 1.7.0-canary.89
 
+* **fix:**  - **payment:** [#7115](https://github.com/AzzappApp/azzapp/pull/7115) display specific message when user is subscribed … ([#7122](https://github.com/AzzappApp/azzapp/pull/7122))
+* **fix:**  - **multiUser:** [#7116](https://github.com/AzzappApp/azzapp/pull/7116) set new profile in cache in a correct position ([#7134](https://github.com/AzzappApp/azzapp/pull/7134))
 * **fix:**  - target notification add user webapp ([#7132](https://github.com/AzzappApp/azzapp/pull/7132))
 * **feat:**  - Title Text  module ([#7127](https://github.com/AzzappApp/azzapp/pull/7127))
 * **fix:**  - set email sender name ([#7131](https://github.com/AzzappApp/azzapp/pull/7131))
