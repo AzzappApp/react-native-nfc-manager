@@ -1,5 +1,6 @@
-## 1.7.0-canary.84
+## 1.7.0-canary.85
 
+* **feat:**  - Title Text  module ([#7127](https://github.com/AzzappApp/azzapp/pull/7127))
 * **fix:**  - don’t return float values ([#7128](https://github.com/AzzappApp/azzapp/pull/7128))
 * **fix:**  - **payment:** [#7087](https://github.com/AzzappApp/azzapp/pull/7087) end subscription on cancellation ([#7088](https://github.com/AzzappApp/azzapp/pull/7088))
 * **feat:**  - **payment:** add nbMonths in estimation ([#7125](https://github.com/AzzappApp/azzapp/pull/7125))
