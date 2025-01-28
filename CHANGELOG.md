@@ -1,4 +1,4 @@
-## 1.7.0-canary.79
+## 1.7.0-canary.80
 
 * **fix:**  - alternation isViewPort ([#7111](https://github.com/AzzappApp/azzapp/pull/7111))
 * **fix:**  - [#7105](https://github.com/AzzappApp/azzapp/pull/7105) enhance patch on react-native ([#7109](https://github.com/AzzappApp/azzapp/pull/7109))
