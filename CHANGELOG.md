@@ -1,4 +1,4 @@
-## 1.7.0-canary.87
+## 1.7.0-canary.88
 
 * **fix:**  - target notification add user webapp ([#7132](https://github.com/AzzappApp/azzapp/pull/7132))
 * **feat:**  - Title Text  module ([#7127](https://github.com/AzzappApp/azzapp/pull/7127))
