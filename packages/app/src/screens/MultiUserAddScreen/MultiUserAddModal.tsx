@@ -601,7 +601,7 @@ const MultiUserAddModal = (
                         isAfter(invitedContactCard, {
                           firstName,
                           lastName,
-                        })
+                        }) < 0
                       ) {
                         cursor = edge.getValue('cursor') as string;
                         break;
@@ -616,7 +616,11 @@ const MultiUserAddModal = (
                     'WebCardEdge',
                   );
                   if (cursor) {
-                    ConnectionHandler.insertEdgeAfter(connection, edge, cursor);
+                    ConnectionHandler.insertEdgeBefore(
+                      connection,
+                      edge,
+                      cursor,
+                    );
                   } else {
                     ConnectionHandler.insertEdgeAfter(connection, edge);
                   }
