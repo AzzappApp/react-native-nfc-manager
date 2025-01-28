@@ -76,9 +76,9 @@ const ContactSearchByDateSection = ({
           <Text variant="small" style={styles.count}>
             <FormattedMessage
               defaultMessage="{contacts, plural,
-              =0 {# Contacts}
-              =1 {# Contact}
-              other {# Contacts}
+              =0 {# contacts received}
+              =1 {# contact received}
+              other {# contacts received}
       }"
               description="ContactsScreenSearchByDate - Contacts counter under section by date"
               values={{ contacts: data.length }}

@@ -1,9 +1,10 @@
-import { Suspense, useCallback, useState } from 'react';
+import { Suspense, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { colors } from '#theme';
+import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import relayScreen from '#helpers/relayScreen';
@@ -26,6 +27,9 @@ const contactsScreenQuery = graphql`
       ... on Profile {
         nbContacts
         ...ContactsScreenLists_contacts
+        webCard {
+          ...CoverRenderer_webCard
+        }
       }
     }
   }
@@ -39,10 +43,6 @@ const ContactsScreen = ({
   const { profile } = usePreloadedQuery(contactsScreenQuery, preloadedQuery);
 
   const router = useRouter();
-  const onClose = useCallback(() => {
-    router.back();
-  }, [router]);
-
   const styles = useStyleSheet(stylesheet);
 
   const [searchBy, setSearchBy] = useState<'date' | 'name'>('date');
@@ -60,17 +60,29 @@ const ContactsScreen = ({
               <FormattedMessage
                 description="ContactsScreen - Title"
                 defaultMessage="{contacts, plural,
-                =0 {# Contacts}
-                =1 {# Contact}
-                other {# Contacts}
+                =0 {# contacts received}
+                =1 {# contact received}
+                other {# contacts received}
         }"
                 values={{ contacts: profile?.nbContacts ?? 0 }}
               />
             </Text>
           }
           leftElement={
-            <PressableNative onPress={onClose}>
+            <PressableNative onPress={router.back}>
               <Icon icon="close" />
+            </PressableNative>
+          }
+          rightElement={
+            <PressableNative
+              onPress={router.back}
+              accessibilityRole="link"
+              accessibilityLabel={intl.formatMessage({
+                defaultMessage: 'Go back',
+                description: 'Go back button in Contact screen',
+              })}
+            >
+              <CoverRenderer width={30} webCard={profile?.webCard} />
             </PressableNative>
           }
         />
