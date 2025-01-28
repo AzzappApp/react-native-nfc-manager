@@ -1,4 +1,3 @@
-import * as Sentry from '@sentry/react-native';
 import { parsePhoneNumberWithError } from 'libphonenumber-js';
 
 import * as z from 'zod';
@@ -50,8 +49,8 @@ export const getPhonenumberWithCountryCode = (
     });
     return number;
   } catch (e) {
-    Sentry.captureException(
-      `Phone number ${phoneNumber} with countryCode ${countryCode} is not valid: ${e}`,
+    console.warn(
+      `Phone number ${phoneNumber} with countryCode "${countryCode}" is not valid: ${e}`,
     );
     return phoneNumber;
   }
