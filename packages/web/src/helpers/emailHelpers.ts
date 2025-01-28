@@ -59,16 +59,17 @@ export const sendEmail = async ({
   }
 };
 
-export const sendTemplateEmail = async ({
-  to,
+export const sendTemplateEmail = async <T extends Record<string, unknown>>({
+  recipients,
   templateId,
-  dynamicTemplateData,
   attachments,
 }: {
-  to: string;
+  recipients: Array<{
+    to: string;
+    dynamicTemplateData: T;
+  }>;
   templateId: string;
-  dynamicTemplateData: Record<string, unknown>;
-  attachments: EmailAttachment[];
+  attachments?: EmailAttachment[];
 }) => {
   const rep = await fetch('https://api.sendgrid.com/v3/mail/send', {
     method: 'POST',
@@ -77,12 +78,13 @@ export const sendTemplateEmail = async ({
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      personalizations: [
-        { to: [{ email: to }], dynamic_template_data: dynamicTemplateData },
-      ],
+      personalizations: recipients.map(({ to, dynamicTemplateData }) => ({
+        to: [{ email: to }],
+        dynamic_template_data: dynamicTemplateData,
+      })),
       from: { email: SENDGRIP_NOREPLY_SENDER },
       template_id: templateId,
-      attachments: attachments.map(attachment => ({
+      attachments: attachments?.map(attachment => ({
         content: attachment.content,
         filename: attachment.filename,
         type: attachment.type ?? 'text/plain',

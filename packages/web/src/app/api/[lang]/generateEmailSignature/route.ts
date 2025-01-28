@@ -72,9 +72,13 @@ const generateEmailSignature = async (req: NextRequest) => {
 
     if (userEmail?.email) {
       await sendTemplateEmail({
-        to: userEmail.email,
         templateId: 'd-87dd47b327fa44b38f7bdbea5cb6daaf',
-        dynamicTemplateData: mailParam,
+        recipients: [
+          {
+            to: userEmail.email,
+            dynamicTemplateData: mailParam,
+          },
+        ],
         attachments: [
           {
             filename: 'azzapp_contact.jpg',
