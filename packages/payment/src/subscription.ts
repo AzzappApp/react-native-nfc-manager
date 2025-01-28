@@ -150,6 +150,7 @@ const calculateSubscriptionUpdate = async (
               taxRate: rateForTheRestOfTheYear ?? 0,
             }
           : undefined,
+      firstPaymentNbMonths: intervalInMonths > 0 ? intervalInMonths : 0,
       recurringCost: {
         amount: amount ?? 0,
         taxes,
