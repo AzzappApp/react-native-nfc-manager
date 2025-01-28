@@ -39,7 +39,7 @@ export const sendEmail = async ({
       personalizations: [
         { to: (Array.isArray(to) ? to : [to]).map(email => ({ email })) },
       ],
-      from: { email: SENDGRIP_NOREPLY_SENDER },
+      from: { email: SENDGRIP_NOREPLY_SENDER, name: 'azzapp' },
       subject,
       content: [
         { type: 'text/plain', value: text },
@@ -82,7 +82,7 @@ export const sendTemplateEmail = async <T extends Record<string, unknown>>({
         to: [{ email: to }],
         dynamic_template_data: dynamicTemplateData,
       })),
-      from: { email: SENDGRIP_NOREPLY_SENDER },
+      from: { email: SENDGRIP_NOREPLY_SENDER, name: 'azzapp' },
       template_id: templateId,
       attachments: attachments?.map(attachment => ({
         content: attachment.content,
