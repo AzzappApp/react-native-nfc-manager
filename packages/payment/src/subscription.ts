@@ -92,6 +92,7 @@ const calculateSubscriptionUpdate = async (
 
     return {
       firstPayment: null,
+      firstPaymentNbMonths: null,
       recurringCost: {
         amount: amount ?? 0,
         taxes,

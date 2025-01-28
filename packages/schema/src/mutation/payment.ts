@@ -49,7 +49,12 @@ export const estimateUpdateSubscriptionCost: MutationResolvers['estimateUpdateSu
         ),
         totalSeats,
       });
-      return result;
+      return {
+        ...result,
+        firstPaymentNbMonths: result.firstPaymentNbMonths
+          ? Math.floor(result.firstPaymentNbMonths)
+          : undefined,
+      };
     } catch (err) {
       throw new GraphQLError(ERRORS.PAYMENT_ERROR, {
         originalError: err as Error,
