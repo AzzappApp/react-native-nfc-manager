@@ -28,6 +28,7 @@ import {
   saveSimpleButtonModule,
   saveSimpleTextModule,
   saveSocialLinksModule,
+  saveTitleTextModule,
 } from './ModulesMutationsResolvers';
 import * as payment from './payment';
 import togglePostReaction from './postReaction';
@@ -85,6 +86,7 @@ export const Mutation: MutationResolvers = {
   saveCardStyle,
   saveContactCard,
   saveCover,
+  saveTitleTextModule,
   toggleFollowing,
   togglePostReaction,
   toggleWebCardPublished,

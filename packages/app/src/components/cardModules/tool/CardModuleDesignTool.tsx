@@ -305,6 +305,60 @@ export const getPictureUri = (
         default:
           return null;
       }
+    case 'titleText':
+      switch (module.variant) {
+        case 'left':
+          return colorScheme === 'light'
+            ? require('./assets/Title_Text/title_text_left_grey_light.png')
+            : require('./assets/Title_Text/title_text_left_grey_dark.png');
+        case 'center':
+          return colorScheme === 'light'
+            ? require('./assets/Title_Text/title_text_center_grey_light.png')
+            : require('./assets/Title_Text/title_text_center_grey_dark.png');
+        case 'right':
+          return colorScheme === 'light'
+            ? require('./assets/Title_Text/title_text_right_grey_light.png')
+            : require('./assets/Title_Text/title_text_right_grey_dark.png');
+        case 'justified':
+          return colorScheme === 'light'
+            ? require('./assets/Title_Text/title_text_justified_grey_light.png')
+            : require('./assets/Title_Text/title_text_justified_grey_dark.png');
+        case 'column_1':
+          return colorScheme === 'light'
+            ? require('./assets/Title_Text/title_text_column_1_grey_light.png')
+            : require('./assets/Title_Text/title_text_column_1_grey_dark.png');
+        case 'column_1_justified':
+          return colorScheme === 'light'
+            ? require('./assets/Title_Text/title_text_column_1_justified_grey_light.png')
+            : require('./assets/Title_Text/title_text_column_1_justified_grey_dark.png');
+        case 'column_2':
+          return colorScheme === 'light'
+            ? require('./assets/Title_Text/title_text_column_2_grey_light.png')
+            : require('./assets/Title_Text/title_text_column_2_grey_dark.png');
+        case 'column_2_justified':
+          return colorScheme === 'light'
+            ? require('./assets/Title_Text/title_text_column_2_justified_grey_light.png')
+            : require('./assets/Title_Text/title_text_column_2_justified_grey_dark.png');
+        case 'column_3':
+          return colorScheme === 'light'
+            ? require('./assets/Title_Text/title_text_column_3_grey_light.png')
+            : require('./assets/Title_Text/title_text_column_3_grey_dark.png');
+        case 'column_3_justified':
+          return colorScheme === 'light'
+            ? require('./assets/Title_Text/title_text_column_3_justified_grey_light.png')
+            : require('./assets/Title_Text/title_text_column_3_justified_grey_dark.png');
+        case 'column_4':
+          return colorScheme === 'light'
+            ? require('./assets/Title_Text/title_text_column_4_grey_light.png')
+            : require('./assets/Title_Text/title_text_column_4_grey_dark.png');
+        case 'column_4_justified':
+          return colorScheme === 'light'
+            ? require('./assets/Title_Text/title_text_column_4_justified_grey_light.png')
+            : require('./assets/Title_Text/title_text_column_4_justified_grey_dark.png');
+        default:
+          return null;
+      }
+
     default:
       return null;
   }

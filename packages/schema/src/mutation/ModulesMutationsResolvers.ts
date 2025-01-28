@@ -25,6 +25,7 @@ import {
   MODULE_KIND_SIMPLE_TEXT,
   MODULE_KIND_SIMPLE_TITLE,
   MODULE_KIND_SOCIAL_LINKS,
+  MODULE_KIND_TITLE_TEXT,
 } from '@azzapp/shared/cardModuleHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
@@ -303,5 +304,8 @@ export const saveMediaTextModule: MutationResolvers['saveMediaTextModule'] =
 
 export const saveMediaTextLinkModule: MutationResolvers['saveMediaTextLinkModule'] =
   createModuleSavingMutation(MODULE_KIND_MEDIA_TEXT_LINK);
+
+export const saveTitleTextModule: MutationResolvers['saveTitleTextModule'] =
+  createModuleSavingMutation(MODULE_KIND_TITLE_TEXT);
 
 //INSERT_MODULE

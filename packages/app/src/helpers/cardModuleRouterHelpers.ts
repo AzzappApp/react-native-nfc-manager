@@ -50,11 +50,16 @@ export function getRouteForCardModule({
           variant: variant as Variant<typeof MODULE_KIND_MEDIA_TEXT_LINK>,
         },
       };
-    case MODULE_KIND_MAP:
+
     case MODULE_KIND_TITLE_TEXT:
-      //this is a hack to avoid returning null of throwing an error, adding coming soon module (not only variant),
-      // break lots of control, like in this case throwing an error to be sure this is coded.
-      // adding hack just to display coming soon modules is bad
+      return {
+        route: 'CARD_MODULE_TITLE_TEXT_EDITION',
+        params: {
+          moduleId,
+          variant: variant as Variant<typeof MODULE_KIND_TITLE_TEXT>,
+        },
+      };
+    case MODULE_KIND_MAP:
       return undefined;
     //INSERT_MODULE
     case 'photoWithTextAndTitle':

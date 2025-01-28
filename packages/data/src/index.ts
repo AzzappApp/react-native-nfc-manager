@@ -20,6 +20,7 @@ export type {
   CardModuleMedia,
   CardModuleMediaText,
   CardModuleMediaTextLink,
+  CardModuleTitleText,
   CardStyle,
   CardTemplate,
   CardTemplateType,

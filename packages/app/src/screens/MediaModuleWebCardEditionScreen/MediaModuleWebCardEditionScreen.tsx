@@ -25,6 +25,7 @@ import {
 } from '#helpers/cardModuleHelpers';
 import MediaModuleRenderer from '../../components/cardModules/CardModuleMedia/MediaModuleRenderer';
 import withWebCardSection from '../../components/cardModules/withCardModule';
+import type { CardModuleData } from '#components/cardModules/CardModuleBottomBar';
 
 import type { MediaModuleWebCardEditionScreen_module$key } from '#relayArtifacts/MediaModuleWebCardEditionScreen_module.graphql';
 import type { MediaModuleWebCardEditionScreenMutation } from '#relayArtifacts/MediaModuleWebCardEditionScreenMutation.graphql';
@@ -272,6 +273,10 @@ const MediaModuleWebCardScreen = (
     variant,
   ]);
 
+  const setData = useCallback((param: CardModuleData) => {
+    if (param.cardModuleMedias) setCardModuleMedias(param.cardModuleMedias);
+  }, []);
+
   return (
     <>
       <CardModulePreviewContainer
@@ -300,8 +305,8 @@ const MediaModuleWebCardScreen = (
       <CardModuleBottomBar
         cardModuleColor={selectedCardModuleColor}
         setModuleColor={setModuleColor}
-        cardModuleMedias={cardModuleMedias}
-        setCardModuleMedias={setCardModuleMedias}
+        data={{ cardModuleMedias }}
+        setData={setData}
         displayInitialModal={moduleKey === null}
         webCard={webCard}
         module={{ moduleKind: MODULE_KIND, variant }}

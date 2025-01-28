@@ -100,7 +100,7 @@ const AlternationRender = async ({
                         : `0 ${Math.max(cardStyle.gap, 20)}px`,
                     }}
                   >
-                    <h3
+                    <h2
                       className={cn(
                         commonStyles.title,
                         fontsMap[cardStyle.titleFontFamily].className,
@@ -111,7 +111,7 @@ const AlternationRender = async ({
                       }}
                     >
                       {sectionData?.title ?? DEFAULT_MODULE_TITLE}
-                    </h3>
+                    </h2>
                     <p
                       className={cn(
                         commonStyles.text,

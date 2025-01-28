@@ -107,6 +107,7 @@ import ResetPasswordScreen from '#screens/ResetPasswordScreen';
 import SearchScreen from '#screens/SearchScreen';
 import SignInScreen from '#screens/SignInScreen';
 import SignUpScreen from '#screens/SignUpScreen';
+import TitleTextModuleWebCardEditionScreen from '#screens/TitleTextModuleWebCardEditionScreen';
 import UpdateApplicationScreen from '#screens/UpdateApplicationScreen';
 import UserPayWallScreen from '#screens/UserPayWallScreen';
 import WebCardParametersScreen from '#screens/WebCardParametersScreen';
@@ -222,6 +223,7 @@ const screens = {
   CARD_MODULE_MEDIA_EDITION: MediaModuleWebCardEditionScreen,
   CARD_MODULE_MEDIA_TEXT_EDITION: MediaTextModuleWebCardEditionScreen,
   CARD_MODULE_MEDIA_TEXT_LINK_EDITION: MediaTextLinkModuleWebCardEditionScreen,
+  CARD_MODULE_TITLE_TEXT_EDITION: TitleTextModuleWebCardEditionScreen,
   CONTACT_CARD: ContactCardScreen,
   CONTACT_CARD_EDIT: ContactCardEditScreen,
   CONTACT_CARD_CREATE: ContactCardCreateScreen,

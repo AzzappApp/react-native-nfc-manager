@@ -14,6 +14,7 @@ import useBoolean from '#hooks/useBoolean';
 import CardModuleColorTool from './tool/CardModuleColorTool';
 import CardModuleDesignTool from './tool/CardModuleDesignTool';
 import CardModuleMediaPicker from './tool/CardModuleMediaPicker';
+import CardModuleTitleTextTool from './tool/CardModuleTitleTextTool';
 import CardModuleMediaEditToolbox from './toolbox/CardModuleMediaEditToolbox';
 import CardModuleMediaPickerToolbox from './toolbox/CardModuleMediaPickerToolbox';
 import CardModuleMediasToolbox from './toolbox/CardModuleMediasToolbox';
@@ -26,16 +27,23 @@ import type { CardModuleMedia } from './cardModuleEditorType';
 import type { CardModuleColor } from '@azzapp/shared/cardModuleHelpers';
 import type { IntlShape } from 'react-intl';
 
+export type CardModuleData = {
+  cardModuleMedias?: CardModuleMedia[];
+  cardModuleTitleText?: { title: string; text: string };
+};
 type CardModuleBottomBarProps<T extends ModuleKindAndVariant> = {
   /**
    * The Card Module Medias (can be null for some Module/Variant
    */
-  cardModuleMedias?: CardModuleMedia[];
+  data: {
+    cardModuleMedias?: CardModuleMedia[];
+    cardModuleTitleText?: { title: string; text: string };
+  };
   /**
    * update the card module medias
    *
    */
-  setCardModuleMedias?: React.Dispatch<React.SetStateAction<CardModuleMedia[]>>;
+  setData: (param: CardModuleData) => void;
   /**
    * the moduleColor use by all module
    *
@@ -75,8 +83,8 @@ type CardModuleBottomBarProps<T extends ModuleKindAndVariant> = {
 };
 
 const CardModuleBottomBar = <T extends ModuleKindAndVariant>({
-  cardModuleMedias,
-  setCardModuleMedias,
+  data,
+  setData,
   cardModuleColor,
   setModuleColor,
   displayInitialModal,
@@ -96,25 +104,26 @@ const CardModuleBottomBar = <T extends ModuleKindAndVariant>({
 
   const onUpdateMedia = useCallback(
     (cardModuleMedia: CardModuleMedia) => {
-      if (cardModuleMedias && setCardModuleMedias) {
-        const updateCardMedias = [...cardModuleMedias];
+      if (data.cardModuleMedias && setData) {
+        const updateCardMedias = [...data.cardModuleMedias];
         updateCardMedias[editableItemIndex!] = {
-          ...cardModuleMedias[editableItemIndex!],
+          ...data.cardModuleMedias[editableItemIndex!],
           ...cardModuleMedia,
           needDbUpdate: true,
         };
-        setCardModuleMedias(updateCardMedias);
+        setData({ cardModuleMedias: updateCardMedias });
         if (updateCardMedias.length === 0) {
           setCanSave(false);
         }
       }
     },
-    [cardModuleMedias, editableItemIndex, setCanSave, setCardModuleMedias],
+    [data.cardModuleMedias, editableItemIndex, setCanSave, setData],
   );
 
   const onFinishImagePicker = useCallback(
     (results: CardModuleMedia[]) => {
-      if (cardModuleMedias && setCardModuleMedias) {
+      if (data.cardModuleMedias && setData) {
+        const { cardModuleMedias } = data;
         const mediaInfos: CardModuleMedia[] = [];
 
         results.forEach(mediaMod => {
@@ -154,25 +163,18 @@ const CardModuleBottomBar = <T extends ModuleKindAndVariant>({
           }
         });
 
-        setCardModuleMedias(mediaInfos);
+        setData({ cardModuleMedias: mediaInfos });
         closeImagePicker();
       }
     },
-    [
-      cardModuleMedias,
-      setCardModuleMedias,
-      closeImagePicker,
-      setCanSave,
-      module,
-      intl,
-    ],
+    [data, setData, closeImagePicker, setCanSave, module, intl],
   );
   // removing media can be handle here, common to all module
   const handleRemoveMedia = (index: number) => {
-    if (setCardModuleMedias)
-      setCardModuleMedias(mediasPicked =>
-        mediasPicked.filter((_, i) => i !== index),
-      );
+    if (setData)
+      setData({
+        cardModuleMedias: data.cardModuleMedias?.filter((_, i) => i !== index),
+      });
     setCanSave(true);
     // workaround for this issue: software-mansion/react-native-gesture-handler#3282
     // both click on cross and image are received
@@ -182,20 +184,20 @@ const CardModuleBottomBar = <T extends ModuleKindAndVariant>({
 
   const videoSlotAvailable = useMemo(() => {
     // reduce the cardModuleMedias to count the number of video
-    if (cardModuleMedias == null) {
+    if (data.cardModuleMedias == null) {
       return 0;
     }
     const { maxVideo } = getMaxMedia(module);
     return (
       maxVideo -
-      cardModuleMedias.reduce((count, { media }) => {
+      data.cardModuleMedias.reduce((count, { media }) => {
         if (getCardModuleMediaKind(media) === 'video') {
           return count + 1;
         }
         return count;
       }, 0)
     );
-  }, [cardModuleMedias, module]);
+  }, [data.cardModuleMedias, module]);
 
   const deselectMedia = useCallback(() => {
     setEditableItemIndex(null);
@@ -220,13 +222,24 @@ const CardModuleBottomBar = <T extends ModuleKindAndVariant>({
           { ...module, variant } as ModuleKindAndVariant,
           webCard.coverBackgroundColor ?? 'light',
         );
-        if (!areCardModuleColorEqual(initialColor, EMPTY_CARD_MODULE_COLOR)) {
+        if (
+          shouldUpdateCardModuleColors(module) &&
+          !areCardModuleColorEqual(initialColor, EMPTY_CARD_MODULE_COLOR)
+        ) {
           updateModuleColor(initialColor);
         }
         setVariant(variant);
       }
     },
     [module, setVariant, updateModuleColor, webCard.coverBackgroundColor],
+  );
+
+  const onUpdateTitleText = useCallback(
+    (param: CardModuleData) => {
+      setData(param);
+      setEditableItemIndex(null);
+    },
+    [setData, setEditableItemIndex],
   );
 
   return (
@@ -237,11 +250,22 @@ const CardModuleBottomBar = <T extends ModuleKindAndVariant>({
           contentContainerStyle={styles.scrollContentContainer}
           showsHorizontalScrollIndicator={false}
         >
-          {hasCardModuleMedia(module, cardModuleMedias) && (
+          {hasCardModuleMedia(module, data.cardModuleMedias) && (
             <CardModuleMediaPickerToolbox
-              cardModuleMedias={cardModuleMedias}
+              cardModuleMedias={data.cardModuleMedias}
               open={openMediaToolbox}
               module={module}
+            />
+          )}
+          {module.moduleKind === 'titleText' && (
+            // kind of duplicate of the CardModuleMediaTextTool but the text is not defined by media
+            // this will add complexity on CardModuleMediaTextTool and potential bug
+            // don't want to complicate this part and will be use for futur feature like button
+            <CardModuleTitleTextTool
+              module={module}
+              {...data}
+              onUpdate={onUpdateTitleText}
+              openTextEdition={editableItemIndex != null}
             />
           )}
           <CardModuleColorTool
@@ -252,13 +276,13 @@ const CardModuleBottomBar = <T extends ModuleKindAndVariant>({
           />
           <CardModuleDesignTool module={module} setVariant={updateVariant} />
         </ScrollView>
-        {hasCardModuleMedia(module, cardModuleMedias) && (
+        {hasCardModuleMedia(module, data.cardModuleMedias) && (
           <>
             <ToolBarContainer visible={showMediaToolbox}>
               {/* responsible for displaying the list of media */}
               <CardModuleMediasToolbox
                 module={module}
-                cardModuleMedias={cardModuleMedias}
+                cardModuleMedias={data.cardModuleMedias}
                 close={closeMediaToolbox}
                 handleRemoveMedia={handleRemoveMedia}
                 onSelectMedia={setEditableItemIndex}
@@ -270,10 +294,10 @@ const CardModuleBottomBar = <T extends ModuleKindAndVariant>({
             <ToolBarContainer destroyOnHide visible={editableItemIndex != null}>
               {/* responsible for displaying the option for a selected media*/}
               {editableItemIndex !== null &&
-              cardModuleMedias[editableItemIndex] ? (
+              data.cardModuleMedias[editableItemIndex] ? (
                 <CardModuleMediaEditToolbox
                   module={module}
-                  cardModuleMedia={cardModuleMedias[editableItemIndex]}
+                  cardModuleMedia={data.cardModuleMedias[editableItemIndex]}
                   onUpdateMedia={onUpdateMedia}
                   availableVideoSlot={videoSlotAvailable}
                   close={deselectMedia}
@@ -285,7 +309,7 @@ const CardModuleBottomBar = <T extends ModuleKindAndVariant>({
           </>
         )}
       </View>
-      {hasCardModuleMedia(module, cardModuleMedias) && (
+      {hasCardModuleMedia(module, data.cardModuleMedias) && (
         <ScreenModal
           visible={showImagePicker}
           animationType="slide"
@@ -293,7 +317,7 @@ const CardModuleBottomBar = <T extends ModuleKindAndVariant>({
         >
           <CardModuleMediaPicker
             allowVideo
-            initialMedias={cardModuleMedias}
+            initialMedias={data.cardModuleMedias}
             {...getMaxMedia(module)}
             onFinished={onFinishImagePicker}
             onClose={closeImagePicker}
@@ -359,6 +383,15 @@ const getDefaultModuleMediaContent = (
       };
   }
   return '';
+};
+
+// this method help to determine if the CardModuleColor should be udpate when variant is changed.
+// most of the time, each variant has default tryptich and color
+const shouldUpdateCardModuleColors = (module: ModuleKindAndVariant) => {
+  if (module.moduleKind === 'titleText') {
+    return false;
+  }
+  return true;
 };
 
 export const DEFAULT_CARD_MODULE_TITLE = 'Lorem ipsum dolor';

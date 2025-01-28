@@ -10,6 +10,7 @@ import useScreenDimensions from '#hooks/useScreenDimensions';
 import BlockTextRenderer from './BlockTextRenderer';
 import MediaTextModuleRenderer from './CardModuleMediaText/MediaTextModuleRenderer';
 import MediaTextLinkModuleRenderer from './CardModuleMediaTextLink/MediaTextLinkModuleRenderer';
+import TitleTextModuleRenderer from './CardModuleTitleText/TitleTextModuleRenderer';
 import CarouselViewRenderer from './CarouselRenderer';
 import HorizontalPhotoRenderer from './HorizontalPhotoRenderer';
 import LineDividerRenderer from './LineDividerRenderer';
@@ -23,6 +24,7 @@ import type { Variant } from '#helpers/webcardModuleHelpers';
 import type { BlockTextRendererData } from './BlockTextRenderer';
 import type { MediaTextModuleRendererData } from './CardModuleMediaText/MediaTextModuleRenderer';
 import type { MediaTextLinkModuleRendererData } from './CardModuleMediaTextLink/MediaTextLinkModuleRenderer';
+import type { TitleTextModuleRendererData } from './CardModuleTitleText/TitleTextModuleRenderer';
 import type { CarouselRendererData } from './CarouselRenderer';
 import type { HorizontalPhotoRendererData } from './HorizontalPhotoRenderer';
 import type { LineDividerRendererData } from './LineDividerRenderer';
@@ -44,6 +46,7 @@ import type {
   MODULE_KIND_MEDIA_TEXT_LINK,
   DisplayMode,
   WebCardViewMode,
+  MODULE_KIND_TITLE_TEXT,
 } from '@azzapp/shared/cardModuleHelpers';
 import type { ViewProps, Animated as RNAnimated } from 'react-native';
 
@@ -107,6 +110,11 @@ export type ModuleRenderInfo =
       kind: typeof MODULE_KIND_SOCIAL_LINKS;
       data: SocialLinksRendererData;
       variant: never;
+    }
+  | {
+      kind: typeof MODULE_KIND_TITLE_TEXT;
+      data: TitleTextModuleRendererData;
+      variant: Variant<'titleText'>;
     };
 //#INSERT_MODULES
 
@@ -319,6 +327,21 @@ const CardModuleRenderer = <T extends ModuleRenderInfo>({
     case 'mediaTextLink':
       return (
         <MediaTextLinkModuleRenderer
+          {...module}
+          {...props}
+          displayMode={displayMode}
+          dimension={{
+            width: displayMode === 'desktop' ? DESKTOP_PREVIEW_WIDTH : width,
+            height,
+          }}
+          scrollPosition={scrollPosition}
+          modulePosition={modulePosition}
+          canPlay={canPlay}
+        />
+      );
+    case 'titleText':
+      return (
+        <TitleTextModuleRenderer
           {...module}
           {...props}
           displayMode={displayMode}

@@ -54,17 +54,6 @@ export const MODULE_KIND_WITH_VARIANTS = [
     ],
   },
   {
-    moduleKind: MODULE_KIND_MAP,
-    variants: [
-      'map_s',
-      'map_m',
-      'map_l',
-      'map_s_full',
-      'map_m_full',
-      'map_l_full',
-    ],
-  },
-  {
     moduleKind: MODULE_KIND_TITLE_TEXT,
     variants: [
       'left',
@@ -79,6 +68,17 @@ export const MODULE_KIND_WITH_VARIANTS = [
       'column_3_justified',
       'column_4',
       'column_4_justified',
+    ],
+  },
+  {
+    moduleKind: MODULE_KIND_MAP,
+    variants: [
+      'map_s',
+      'map_m',
+      'map_l',
+      'map_s_full',
+      'map_m_full',
+      'map_l_full',
     ],
   },
   //INSERT_MODULE
@@ -176,7 +176,7 @@ export const isModuleVariantSupported = (module: {
   }
   switch (module.moduleKind) {
     case MODULE_KIND_MEDIA: {
-      const soon = [
+      const supported = [
         'slideshow',
         'parallax',
         'grid',
@@ -191,10 +191,10 @@ export const isModuleVariantSupported = (module: {
         // 'zoom_out_fade',
         // 'parallax_small',
       ];
-      return soon.includes(module.variant);
+      return supported.includes(module.variant);
     }
     case MODULE_KIND_MEDIA_TEXT: {
-      const soon = [
+      const supported = [
         'alternation',
         'parallax',
         'full_alternation',
@@ -206,10 +206,10 @@ export const isModuleVariantSupported = (module: {
         // 'card',
         // 'card_gradient',
       ];
-      return soon.includes(module.variant);
+      return supported.includes(module.variant);
     }
     case MODULE_KIND_MEDIA_TEXT_LINK: {
-      const soon = [
+      const supported = [
         'alternation',
         'parallax',
         'full_alternation',
@@ -224,11 +224,27 @@ export const isModuleVariantSupported = (module: {
         // 'card',
         // 'card_gradient',
       ];
-      return soon.includes(module.variant);
+      return supported.includes(module.variant);
     }
     case MODULE_KIND_MAP:
-    case MODULE_KIND_TITLE_TEXT:
       return false;
+    case MODULE_KIND_TITLE_TEXT: {
+      const supported = [
+        'left',
+        'center',
+        'right',
+        'justified',
+        // 'column_1',
+        // 'column_1_justified',
+        // 'column_2',
+        // 'column_2_justified',
+        // 'column_3',
+        // 'column_3_justified',
+        // 'column_4',
+        // 'column_4_justified',
+      ];
+      return supported.includes(module.variant);
+    }
     //INSERT_MODULE
     default:
       return false;

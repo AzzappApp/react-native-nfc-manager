@@ -87,6 +87,13 @@ extend type Mutation {
     input: SaveMediaTextLinkModuleInput!
   ): SaveModulePayload!
 
+  """
+  Save a title text section, create it if it doesn't exist, update it otherwise
+  """
+  saveTitleTextModule(
+    webCardId: ID!
+    input: SaveTitleTextModuleInput!
+  ): SaveModulePayload!
   #INSERT_MODULE
 }
 
@@ -241,6 +248,14 @@ input SaveMediaTextLinkModuleInput {
   moduleId: ID
   variant: String!
   cardModuleMedias: [MediaModuleInput!]!
+  cardModuleColor: CardModuleColorInput!
+}
+
+input SaveTitleTextModuleInput {
+  moduleId: ID
+  variant: String!
+  text: String!
+  title: String!
   cardModuleColor: CardModuleColorInput!
 }
 

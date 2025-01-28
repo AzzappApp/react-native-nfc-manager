@@ -41,7 +41,7 @@ const ParallaxText = ({
         return (
           <div className={styles.container}>
             <section className={styles.textContainer}>
-              <h3
+              <h2
                 style={{
                   color: swapColor(data.cardModuleColor?.title, colorPalette),
                   fontSize: cardStyle.titleFontSize,
@@ -53,7 +53,7 @@ const ParallaxText = ({
                 )}
               >
                 {mediaData?.title ?? DEFAULT_MODULE_TITLE}
-              </h3>
+              </h2>
               <p
                 style={{
                   color: swapColor(data.cardModuleColor?.text, colorPalette),

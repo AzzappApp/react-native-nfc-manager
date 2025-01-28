@@ -302,7 +302,65 @@ export const dyptichByModuleVariant = (
           ];
       }
       break;
-
+    case 'titleText':
+      return [
+        {
+          background: 'light',
+          content: 'transparent',
+          title: 'dark',
+          text: 'dark',
+          graphic: 'transparent',
+        },
+        {
+          background: 'light',
+          content: 'transparent',
+          title: 'primary',
+          text: 'dark',
+          graphic: 'transparent',
+        },
+        {
+          background: 'dark',
+          content: 'transparent',
+          title: 'light',
+          text: 'light',
+          graphic: 'transparent',
+        },
+        {
+          background: 'dark',
+          content: 'transparent',
+          title: 'primary',
+          text: 'light',
+          graphic: 'transparent',
+        },
+        {
+          background: 'primary',
+          content: 'transparent',
+          title: 'dark',
+          text: 'dark',
+          graphic: 'transparent',
+        },
+        {
+          background: 'primary',
+          content: 'transparent',
+          title: 'light',
+          text: 'light',
+          graphic: 'transparent',
+        },
+        {
+          background: 'primary',
+          content: 'transparent',
+          title: 'dark',
+          text: 'light',
+          graphic: 'transparent',
+        },
+        {
+          background: 'primary',
+          content: 'transparent',
+          title: 'light',
+          text: 'dark',
+          graphic: 'transparent',
+        },
+      ];
     default:
       break;
   }
@@ -322,123 +380,160 @@ export const getInitalDyptichColor = (
   module: ModuleKindAndVariant,
   coverBackgroundColor: string | null = 'light',
 ): CardModuleColor => {
-  const key = [module.moduleKind, module.variant, coverBackgroundColor].join(
-    ',',
-  );
+  const { moduleKind, variant } = module;
+  //Maybe we should separate with 2or 3 swithc ase instead of composing
 
-  switch (key) {
-    case 'media,original,dark':
-    case 'media,grid,dark':
-    case 'media,square_grid,dark':
-    case 'media,grid2,dark':
-    case 'media,square_grid2,dark':
-    case 'media,slideshow,dark':
-      return {
-        background: 'dark',
-        content: 'transparent',
-        title: 'transparent',
-        text: 'transparent',
-        graphic: 'transparent',
-      };
-    case 'media,original,light':
-    case 'media,grid,light':
-    case 'media,square_grid,light':
-    case 'media,grid2,light':
-    case 'media,square_grid2,light':
-    case 'media,slideshow,light':
-      return {
-        background: 'light',
-        content: 'transparent',
-        title: 'transparent',
-        text: 'transparent',
-        graphic: 'transparent',
-      };
-    case 'media,original,primary':
-    case 'media,grid,primary':
-    case 'media,square_grid,primary':
-    case 'media,grid2,primary':
-    case 'media,square_grid2,primary':
-    case 'media,slideshow,primary':
-      return {
-        background: 'primary',
-        content: 'transparent',
-        title: 'transparent',
-        text: 'transparent',
-        graphic: 'transparent',
-      };
-    case 'media,parallax,light':
-    case 'media,parallax,dark':
-    case 'media,parallax,primary':
-      return EMPTY_CARD_MODULE_COLOR;
-    case 'mediaText,alternation,light':
-      return {
-        background: 'light',
-        content: 'transparent',
-        title: 'dark',
-        text: 'dark',
-        graphic: 'transparent',
-      };
-    case 'mediaText,alternation,dark':
-      return {
-        background: 'dark',
-        content: 'transparent',
-        title: 'light',
-        text: 'light',
-        graphic: 'transparent',
-      };
-    case 'mediaText,alternation,primary':
-      return {
-        background: 'primary',
-        content: 'transparent',
-        title: 'dark',
-        text: 'dark',
-        graphic: 'transparent',
-      };
-    case 'mediaText,parallax,light':
-    case 'mediaText,parallax,dark':
-    case 'mediaText,parallax,primary':
-      return {
-        background: 'dark',
-        content: 'transparent',
-        title: 'light',
-        text: 'light',
-        graphic: 'transparent',
-      };
-    case 'mediaTextLink,alternation,light':
-      return {
-        background: 'light',
-        content: 'primary',
-        title: 'dark',
-        text: 'dark',
-        graphic: 'light',
-      };
-    case 'mediaTextLink,alternation,dark':
-      return {
-        background: 'dark',
-        content: 'primary',
-        title: 'light',
-        text: 'light',
-        graphic: 'light',
-      };
-    case 'mediaTextLink,alternation,primary':
-      return {
-        background: 'primary',
-        content: 'light',
-        title: 'light',
-        text: 'light',
-        graphic: 'dark',
-      };
-    case 'mediaTextLink,parallax,light':
-    case 'mediaTextLink,parallax,dark':
-    case 'mediaTextLink,parallax,primary':
-      return {
-        background: 'dark',
-        content: 'light',
-        title: 'light',
-        text: 'light',
-        graphic: 'dark',
-      };
+  switch (moduleKind) {
+    case 'media':
+      switch (variant) {
+        case 'original':
+        case 'grid':
+        case 'square_grid':
+        case 'grid2':
+        case 'square_grid2':
+        case 'slideshow':
+          switch (coverBackgroundColor) {
+            case 'dark':
+              return {
+                background: 'dark',
+                content: 'transparent',
+                title: 'transparent',
+                text: 'transparent',
+                graphic: 'transparent',
+              };
+            case 'light':
+              return {
+                background: 'light',
+                content: 'transparent',
+                title: 'transparent',
+                text: 'transparent',
+                graphic: 'transparent',
+              };
+            case 'primary':
+              return {
+                background: 'primary',
+                content: 'transparent',
+                title: 'transparent',
+                text: 'transparent',
+                graphic: 'transparent',
+              };
+          }
+          break;
+        case 'parallax':
+          return EMPTY_CARD_MODULE_COLOR;
+      }
+      break;
 
+    case 'mediaText':
+      switch (variant) {
+        case 'alternation':
+          switch (coverBackgroundColor) {
+            case 'light':
+              return {
+                background: 'light',
+                content: 'transparent',
+                title: 'dark',
+                text: 'dark',
+                graphic: 'transparent',
+              };
+            case 'dark':
+              return {
+                background: 'dark',
+                content: 'transparent',
+                title: 'light',
+                text: 'light',
+                graphic: 'transparent',
+              };
+            case 'primary':
+              return {
+                background: 'primary',
+                content: 'transparent',
+                title: 'dark',
+                text: 'dark',
+                graphic: 'transparent',
+              };
+          }
+          break;
+        case 'parallax':
+          return {
+            background: 'dark',
+            content: 'transparent',
+            title: 'light',
+            text: 'light',
+            graphic: 'transparent',
+          };
+      }
+      break;
+
+    case 'mediaTextLink':
+      switch (variant) {
+        case 'alternation':
+          switch (coverBackgroundColor) {
+            case 'light':
+              return {
+                background: 'light',
+                content: 'primary',
+                title: 'dark',
+                text: 'dark',
+                graphic: 'light',
+              };
+            case 'dark':
+              return {
+                background: 'dark',
+                content: 'primary',
+                title: 'light',
+                text: 'light',
+                graphic: 'light',
+              };
+            case 'primary':
+              return {
+                background: 'primary',
+                content: 'light',
+                title: 'light',
+                text: 'light',
+                graphic: 'dark',
+              };
+          }
+          break;
+        case 'parallax':
+          return {
+            background: 'dark',
+            content: 'light',
+            title: 'light',
+            text: 'light',
+            graphic: 'dark',
+          };
+      }
+      break;
+
+    case 'titleText':
+      switch (coverBackgroundColor) {
+        case 'light':
+          return {
+            background: 'light',
+            content: 'transparent',
+            title: 'dark',
+            text: 'dark',
+            graphic: 'transparent',
+          };
+        case 'dark':
+          return {
+            background: 'dark',
+            content: 'transparent',
+            title: 'light',
+            text: 'light',
+            graphic: 'transparent',
+          };
+        case 'primary':
+          return {
+            background: 'primary',
+            content: 'transparent',
+            title: 'dark',
+            text: 'dark',
+            graphic: 'transparent',
+          };
+      }
+      break;
     default:
       return {
         background: 'light',
@@ -448,6 +543,13 @@ export const getInitalDyptichColor = (
         graphic: 'light',
       };
   }
+  return {
+    background: 'light',
+    content: 'dark',
+    title: 'dark',
+    text: 'dark',
+    graphic: 'light',
+  };
 };
 export const EMPTY_CARD_MODULE_COLOR = {
   background: 'transparent',
