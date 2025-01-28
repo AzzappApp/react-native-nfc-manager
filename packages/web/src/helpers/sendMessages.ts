@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/nextjs';
 import sanitizeHTML from 'sanitize-html';
 import { buildInviteUrl } from '@azzapp/shared/urlHelpers';
-import { sendEmail } from './emailHelpers';
+import { sendEmail, sendTemplateEmail } from './emailHelpers';
 import { getServerIntl } from './i18nHelpers';
 import { sendTwilioSMS } from './twilioHelpers';
 import type { WebCard } from '@azzapp/data';
@@ -23,49 +23,107 @@ export const notifyUsers = async (
     case 'invitation':
       switch (receiversType) {
         case 'email':
-          await sendEmail({
-            to: receivers,
-            subject: intl.formatMessage(
-              {
-                id: 'rd2Dwi',
-                defaultMessage: 'You have been invited to join {userName}',
-                description: 'Email subject for invitation',
+          await sendTemplateEmail({
+            templateId: 'd-62d0fa44557042c78392ba195daef109',
+            recipients: receivers.map(receiver => ({
+              to: receiver,
+              dynamicTemplateData: {
+                title: intl.formatMessage(
+                  {
+                    defaultMessage:
+                      'You have been invited to join "{username}" on azzapp',
+                    id: 'wDb2W4',
+                    description: 'Email title for multi-user invitation',
+                  },
+                  {
+                    username: webCard.userName,
+                  },
+                ),
+                join: intl.formatMessage(
+                  {
+                    defaultMessage:
+                      'To join, download the app and sign up using "{email}"',
+                    id: 'L+W7H3',
+                    description: 'Email body for multi-user invitation',
+                  },
+                  {
+                    email: receiver,
+                  },
+                ),
+                presentation: intl.formatMessage({
+                  defaultMessage:
+                    'azzapp is a mobile app for Digital Business Cards that helps you:',
+                  id: 'HL9OPB',
+                  description:
+                    'Email body for multi-user invitation - presentation',
+                }),
+                key1: intl.formatMessage({
+                  defaultMessage: 'Enhance your networking effortlessly',
+                  id: 'gAqwpA',
+                  description:
+                    'Email body for multi-user invitation - feature 1',
+                }),
+                key2: intl.formatMessage({
+                  defaultMessage: 'Instantly exchange contact details',
+                  id: 'vgRug2',
+                  description:
+                    'Email body for multiuser invitation - feature 2',
+                }),
+                key3: intl.formatMessage({
+                  defaultMessage: 'Receive contact information in return',
+                  id: 'ss0cnZ',
+                  description:
+                    'Email body for multiuser invitation - feature 3',
+                }),
+                key4: intl.formatMessage({
+                  defaultMessage: 'Eliminate the need for physical cards',
+                  id: '+tUpvc',
+                  description:
+                    'Email body for multi-user invitation - feature 4',
+                }),
+                key5: intl.formatMessage({
+                  defaultMessage: 'Contribute to a greener future',
+                  id: 'bUo006',
+                  description:
+                    'Email body for multi-user invitation - feature 5',
+                }),
+                download: intl.formatMessage({
+                  defaultMessage: 'Download the application',
+                  id: '+EIfOg',
+                  description:
+                    'Email body for multi-user invitation - download',
+                }),
+                discover: intl.formatMessage({
+                  defaultMessage:
+                    'Discover more about this innovative solution at',
+                  id: 'tWB0FS',
+                  description:
+                    'Email body for multi-user invitation - discover',
+                }),
+                see: intl.formatMessage(
+                  {
+                    defaultMessage: 'and see why "{username}" chose azzapp!',
+                    id: '0wx+cg',
+                    description: 'Email body for multi-user invitation - see',
+                  },
+                  {
+                    username: webCard.userName,
+                  },
+                ),
+                subject: intl.formatMessage(
+                  {
+                    id: 'rd2Dwi',
+                    defaultMessage: 'You have been invited to join {userName}',
+                    description: 'Email subject for invitation',
+                  },
+                  {
+                    userName: webCard.userName,
+                  },
+                ),
               },
-              {
-                userName: webCard.userName,
-              },
-            ),
-            text: intl.formatMessage(
-              {
-                id: 'p3Wm44',
-                defaultMessage:
-                  'You have been invited to join {userName} on Azzapp! Download the app {url} and sign up with this email to join: {email}',
-                description: 'Email body for invitation',
-              },
-              {
-                userName: webCard.userName,
-                email: receivers.join(', '),
-                url: buildInviteUrl(webCard.userName),
-              },
-            ),
-            html: intl.formatMessage(
-              {
-                id: 'x4Spsz',
-                defaultMessage: `<div>You have been invited to join {userName} on Azzapp! <a>Download</a> the app and sign up with this email to join: {email}</div>`,
-                description: 'Email body for invitation',
-              },
-              {
-                div: (...chunks) =>
-                  sanitizeHTML(`<div>${chunks.join('')}</div>`),
-                userName: webCard.userName,
-                email: receivers.join(', '),
-                a: (...chunks) =>
-                  sanitizeHTML(
-                    `<a href="${buildInviteUrl(webCard.userName || '')}">${chunks.join('')}</a>`,
-                  ),
-              },
-            ),
+            })),
           });
+
           break;
         case 'phone':
           await Promise.all(
