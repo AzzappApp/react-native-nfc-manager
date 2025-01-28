@@ -15,6 +15,7 @@
   ],
   "dependencies": {
     "@azzapp/data": "workspace:^",
+    "@azzapp/payment": "workspace:^",
     "@azzapp/shared": "workspace:^",
     "@conform-to/react": "^1.2.2",
     "@conform-to/zod": "^1.2.2",

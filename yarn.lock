@@ -237,6 +237,7 @@ __metadata:
   resolution: "@azzapp/backoffice@workspace:packages/backoffice"
   dependencies:
     "@azzapp/data": "workspace:^"
+    "@azzapp/payment": "workspace:^"
     "@azzapp/shared": "workspace:^"
     "@conform-to/react": "npm:^1.2.2"
     "@conform-to/zod": "npm:^1.2.2"
