@@ -1,5 +1,6 @@
-## 1.7.0-canary.81
+## 1.7.0-canary.82
 
+* **feat:**  - **payment:** add nbMonths in estimation ([#7125](https://github.com/AzzappApp/azzapp/pull/7125))
 * **feat:**  - **multiUser:** [#7112](https://github.com/AzzappApp/azzapp/pull/7112) use email template ([#7117](https://github.com/AzzappApp/azzapp/pull/7117))
 * **fix:**  - alternation isViewPort ([#7111](https://github.com/AzzappApp/azzapp/pull/7111))
 * **fix:**  - [#7105](https://github.com/AzzappApp/azzapp/pull/7105) enhance patch on react-native ([#7109](https://github.com/AzzappApp/azzapp/pull/7109))
