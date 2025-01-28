@@ -1,6 +1,8 @@
-## 1.7.0-canary.85
+## 1.7.0-canary.86
 
+* **fix:**  - target notification add user webapp ([#7132](https://github.com/AzzappApp/azzapp/pull/7132))
 * **feat:**  - Title Text  module ([#7127](https://github.com/AzzappApp/azzapp/pull/7127))
+* **fix:**  - set email sender name ([#7131](https://github.com/AzzappApp/azzapp/pull/7131))
 * **fix:**  - don’t return float values ([#7128](https://github.com/AzzappApp/azzapp/pull/7128))
 * **fix:**  - **payment:** [#7087](https://github.com/AzzappApp/azzapp/pull/7087) end subscription on cancellation ([#7088](https://github.com/AzzappApp/azzapp/pull/7088))
 * **feat:**  - **payment:** add nbMonths in estimation ([#7125](https://github.com/AzzappApp/azzapp/pull/7125))
