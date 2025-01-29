@@ -147,6 +147,11 @@ export function useVariantLabel({
             description:
               'useModuleVariant - Module media text Full Alternation',
           });
+        case 'simple_carousel':
+          return intl.formatMessage({
+            defaultMessage: 'Simple carousel',
+            description: 'useModuleVariant - Module media text Simple carousel',
+          });
         case 'article':
           return intl.formatMessage({
             defaultMessage: 'Article',

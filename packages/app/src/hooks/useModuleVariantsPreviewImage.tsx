@@ -118,6 +118,10 @@ function useModuleVariantsPreviewImage({
           return colorScheme === 'light'
             ? require('#assets/module/media_text_full_alternation_light.png')
             : require('#assets/module/media_text_full_alternation_dark.png');
+        case 'simple_carousel':
+          return colorScheme === 'light'
+            ? require('#assets/module/media_text_simple_carousel_light.png')
+            : require('#assets/module/media_text_simple_carousel_dark.png');
         case 'article':
           return colorScheme === 'light'
             ? require('#assets/module/media_text_article_light.png')

@@ -237,6 +237,10 @@ export const getPictureUri = (
           return colorScheme === 'light'
             ? require('./assets/Media_Text/media_with_text_full_alternation_grey_light.png')
             : require('./assets/Media_Text/media_with_text_full_alternation_grey_dark.png');
+        case 'simple_carousel':
+          return colorScheme === 'light'
+            ? require('./assets/Media_Text/media_with_text_simple_carousel_grey_light.png')
+            : require('./assets/Media_Text/media_with_text_simple_carousel_grey_dark.png');
         case 'article':
           return colorScheme === 'light'
             ? require('./assets/Media_Text/media_with_text_article_grey_light.png')

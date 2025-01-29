@@ -54,6 +54,7 @@ export const dyptichByModuleVariant = (
       switch (module.variant) {
         case 'alternation':
         case 'full_alternation':
+        case 'simple_carousel':
           return [
             {
               background: 'light',
@@ -426,6 +427,7 @@ export const getInitalDyptichColor = (
 
     case 'mediaText':
       switch (variant) {
+        case 'simple_carousel':
         case 'alternation':
           switch (coverBackgroundColor) {
             case 'light':

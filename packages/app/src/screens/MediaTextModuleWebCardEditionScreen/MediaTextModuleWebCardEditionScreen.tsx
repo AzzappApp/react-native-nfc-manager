@@ -103,6 +103,8 @@ const MediaTextModuleWebCardEditionScreen = (
           title
           media {
             id
+            width
+            height
             ... on MediaImage {
               uri(width: $screenWidth, pixelRatio: $pixelRatio)
               smallThumbnail: uri(width: 125, pixelRatio: $cappedPixelRatio)
