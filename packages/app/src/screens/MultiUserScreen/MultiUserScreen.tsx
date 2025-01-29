@@ -76,6 +76,7 @@ const multiUserScreenQuery = graphql`
             endAt
             status
             issuer
+            availableSeats
           }
           requiresSubscription
           isPremium
@@ -100,7 +101,7 @@ const MultiUserScreen = ({
   useEffect(() => {
     // users that loose their admin role should not be able to access this screen
     if (!profileInfoHasAdminRight(profile)) {
-      router.back();
+      router.backToTop();
     }
   }, [profile, router]);
 
@@ -114,6 +115,20 @@ const MultiUserScreen = ({
 
   const toggleMultiUser = useCallback(
     (value: boolean) => {
+      //when IAP, if the user try to activate multiuser on a another webcard without enought seat
+      if (
+        value &&
+        profile?.webCard?.subscription?.issuer !== 'web' &&
+        (profile?.webCard?.subscription?.availableSeats ?? 0) <= 0
+      ) {
+        router.push({
+          route: 'USER_PAY_WALL',
+          params: {
+            activateFeature: 'MULTI_USER',
+          },
+        });
+        return;
+      }
       if (
         !value &&
         profile?.webCard?.subscription?.issuer === 'web' &&
@@ -347,7 +362,7 @@ const MultiUserScreen = ({
             })}
             rightElement={
               <PressableNative
-                onPress={router.back}
+                onPress={router.backToTop}
                 accessibilityRole="link"
                 accessibilityLabel={intl.formatMessage({
                   defaultMessage: 'Go back',
@@ -364,7 +379,7 @@ const MultiUserScreen = ({
             leftElement={
               <IconButton
                 icon="arrow_left"
-                onPress={router.back}
+                onPress={router.backToTop}
                 iconSize={28}
                 variant="icon"
               />

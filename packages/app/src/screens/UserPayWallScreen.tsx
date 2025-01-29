@@ -179,9 +179,10 @@ const UserPayWallScreen = ({
             store.get(profileInfos.webCardId)?.setValue(true, 'isPremium');
             store
               .get(profileInfos.webCardId)
-              ?.getLinkedRecord('subscription')
+              ?.getOrCreateLinkedRecord('subscription', 'UserSubscription')
               ?.setValue(Math.max(0, updateAvailableSeats), 'availableSeats');
           }
+
           const user = store.getRoot().getLinkedRecord('currentUser');
           const profiles = user?.getLinkedRecords('profiles');
 
@@ -192,7 +193,7 @@ const UserPayWallScreen = ({
             profile?.getLinkedRecord('webCard')?.setValue(true, 'isPremium');
             profile
               ?.getLinkedRecord('webCard')
-              ?.getLinkedRecord('subscription')
+              ?.getOrCreateLinkedRecord('subscription', 'UserSubscription')
               ?.setValue(Math.max(0, updateAvailableSeats), 'availableSeats');
           }
         });
