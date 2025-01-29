@@ -269,6 +269,12 @@ export const getUserSubscriptions = async (
 };
 
 // TODO explain this function
+/**
+ *
+ * @param userId is the user id
+ * @param webCardId is the webcard id
+ * @returns the last subscription of the user for the webcard (the subscription can apply to all webcards of the user)
+ */
 export const getLastSubscription = async (
   userId: string,
   webCardId: string,
@@ -288,10 +294,7 @@ export const getLastSubscription = async (
         ),
         or(
           eq(UserSubscriptionTable.webCardId, webCardId),
-          and(
-            isNull(UserSubscriptionTable.webCardId),
-            ne(UserSubscriptionTable.issuer, 'web'),
-          ),
+          isNull(UserSubscriptionTable.webCardId),
         ),
       ),
     )

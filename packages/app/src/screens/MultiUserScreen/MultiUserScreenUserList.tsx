@@ -46,7 +46,6 @@ export type MultiUserScreenListProps = {
   Header: React.ReactElement;
   searching?: boolean;
   searchValue?: string;
-  hasUserSubscription: boolean;
 };
 
 const MultiUserScreenUserList = ({
@@ -54,7 +53,6 @@ const MultiUserScreenUserList = ({
   Header,
   searching,
   searchValue,
-  hasUserSubscription,
 }: MultiUserScreenListProps) => {
   const intl = useIntl();
 
@@ -299,31 +297,29 @@ const MultiUserScreenUserList = ({
                 {Header}
                 {!transferOwnerMode && (
                   <>
-                    {webCard.isPremium &&
-                      !hasUserSubscription &&
-                      !webCard.subscription && (
-                        <View style={styles.paymentMethod}>
-                          <View>
-                            <Text variant="button" appearance="dark">
-                              <FormattedMessage
-                                defaultMessage="No valid payment method"
-                                description="Title for multi user screen when no valid payment method"
-                              />
-                            </Text>
-                            <Text variant="small" appearance="dark">
-                              <FormattedMessage
-                                defaultMessage="Go to azzapp on the web to manage multi user option"
-                                description="Description for multi user screen when no valid payment method"
-                              />
-                            </Text>
-                          </View>
-                          <Icon
-                            icon="information"
-                            size={14}
-                            style={{ tintColor: 'white' }}
-                          />
+                    {webCard.isPremium && !webCard.subscription && (
+                      <View style={styles.paymentMethod}>
+                        <View>
+                          <Text variant="button" appearance="dark">
+                            <FormattedMessage
+                              defaultMessage="No valid payment method"
+                              description="Title for multi user screen when no valid payment method"
+                            />
+                          </Text>
+                          <Text variant="small" appearance="dark">
+                            <FormattedMessage
+                              defaultMessage="Go to azzapp on the web to manage multi user option"
+                              description="Description for multi user screen when no valid payment method"
+                            />
+                          </Text>
                         </View>
-                      )}
+                        <Icon
+                          icon="information"
+                          size={14}
+                          style={{ tintColor: 'white' }}
+                        />
+                      </View>
+                    )}
                     <Button
                       style={styles.button}
                       label={intl.formatMessage({
@@ -332,11 +328,7 @@ const MultiUserScreenUserList = ({
                           'Button to add new users from MultiUserScreen',
                       })}
                       onPress={() => {
-                        if (
-                          webCard.isPremium &&
-                          !hasUserSubscription &&
-                          !webCard.subscription
-                        ) {
+                        if (webCard.isPremium && !webCard.subscription) {
                           Toast.show({
                             type: 'info',
                             text1: intl.formatMessage({

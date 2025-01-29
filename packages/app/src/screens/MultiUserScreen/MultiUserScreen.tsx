@@ -60,11 +60,6 @@ export type UserInformation = {
 
 const multiUserScreenQuery = graphql`
   query MultiUserScreenQuery($profileId: ID!) {
-    currentUser {
-      userSubscription {
-        id
-      }
-    }
     node(id: $profileId) {
       ... on Profile @alias(as: "profile") {
         id
@@ -93,10 +88,7 @@ const multiUserScreenQuery = graphql`
 const MultiUserScreen = ({
   preloadedQuery,
 }: RelayScreenProps<MultiUserRoute, MultiUserScreenQuery>) => {
-  const { node, currentUser } = usePreloadedQuery(
-    multiUserScreenQuery,
-    preloadedQuery,
-  );
+  const { node } = usePreloadedQuery(multiUserScreenQuery, preloadedQuery);
 
   const profile = node?.profile;
 
@@ -400,7 +392,6 @@ const MultiUserScreen = ({
                     webCard={profile.webCard}
                     searching={searching}
                     searchValue={searchValue}
-                    hasUserSubscription={!!currentUser?.userSubscription}
                   />
                 </MultiUserTransferOwnerContext.Provider>
               </Suspense>
