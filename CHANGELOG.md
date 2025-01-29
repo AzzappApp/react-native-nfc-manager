@@ -1,5 +1,7 @@
-## 1.7.0-canary.94
+## 1.7.0-canary.95
 
+* **fix:**  - review tooltips fonts & size & gap ([#7152](https://github.com/AzzappApp/azzapp/pull/7152))
+* **build:**  - upgrade to rn 0.77 ([#7151](https://github.com/AzzappApp/azzapp/pull/7151))
 * **fix:**  - ensure cover is full width between 500 and 700 px window width ([#7150](https://github.com/AzzappApp/azzapp/pull/7150))
 * **fix:**  - allow access to detail info on predefinedCovers ([#7148](https://github.com/AzzappApp/azzapp/pull/7148))
 * **fix:**  - **subscription:** [#7142](https://github.com/AzzappApp/azzapp/pull/7142) only take into account published webCards ([#7143](https://github.com/AzzappApp/azzapp/pull/7143))
