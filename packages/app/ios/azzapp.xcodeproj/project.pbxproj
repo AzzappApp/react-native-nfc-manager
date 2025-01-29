@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		00E356F31AD99517003FC87E /* azzappTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* azzappTests.m */; };
 		03324426F1314697BD1C702D /* PlusJakartaSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5477301FE9F94EAFA6F8AD80 /* PlusJakartaSans-SemiBold.ttf */; };
 		0C7911CEAB478AB790C006E0 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = D98307CB348705F89E1DE6DA /* PrivacyInfo.xcprivacy */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
@@ -279,8 +278,6 @@
 
 /* Begin PBXFileReference section */
 		00E356EE1AD99517003FC87E /* azzappTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = azzappTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		00E356F21AD99517003FC87E /* azzappTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = azzappTests.m; sourceTree = "<group>"; };
 		01A80455EE3041AA8310DF23 /* PlusJakartaSans-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "PlusJakartaSans-Medium.ttf"; path = "../assets/fonts/PlusJakartaSans-Medium.ttf"; sourceTree = "<group>"; };
 		050B0F459F08451DF3E153D8 /* Pods-common-azzapp-staging.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-azzapp-staging.debug.xcconfig"; path = "Target Support Files/Pods-common-azzapp-staging/Pods-common-azzapp-staging.debug.xcconfig"; sourceTree = "<group>"; };
 		0773611437B756D821550543 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-common-azzapp-staging/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
@@ -492,23 +489,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		00E356EF1AD99517003FC87E /* azzappTests */ = {
-			isa = PBXGroup;
-			children = (
-				00E356F21AD99517003FC87E /* azzappTests.m */,
-				00E356F01AD99517003FC87E /* Supporting Files */,
-			);
-			path = azzappTests;
-			sourceTree = "<group>";
-		};
-		00E356F01AD99517003FC87E /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				00E356F11AD99517003FC87E /* Info.plist */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
 		13B07FAE1A68108700A75B9A /* azzapp */ = {
 			isa = PBXGroup;
 			children = (
@@ -537,7 +517,6 @@
 				96DD310E2B6CEFB100FB36A2 /* IAPDevStorekit.storekit */,
 				96DD310F2B6CF1FE00FB36A2 /* StoreKitTestCertificate.cer */,
 				FB58ADB2576D4F2277CBDD50 /* PrivacyInfo.xcprivacy */,
-				00E356EF1AD99517003FC87E /* azzappTests */,
 			);
 			name = azzapp;
 			sourceTree = "<group>";
@@ -1566,7 +1545,6 @@
 				FD79CACF2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift in Sources */,
 				FD5BFC3828C8EF8D0010B34E /* AZPCustomReavealTransition.mm in Sources */,
 				FD1404462A03FDA800CCA6B9 /* MediaHelpers.swift in Sources */,
-				00E356F31AD99517003FC87E /* azzappTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1712,7 +1690,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION =95;
+				CURRENT_PROJECT_VERSION = 95;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -1751,7 +1729,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION =95;
+				CURRENT_PROJECT_VERSION = 95;
 				INFOPLIST_FILE = azzappTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1787,7 +1765,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = azzapp/azzapp.entitlements;
-				CURRENT_PROJECT_VERSION =95;
+				CURRENT_PROJECT_VERSION = 95;
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
 				DISPLAY_NAME = "azzapp -  Digital Business Card";
 				ENABLE_BITCODE = NO;
@@ -1826,7 +1804,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = azzapp/azzappRelease.entitlements;
-				CURRENT_PROJECT_VERSION =95;
+				CURRENT_PROJECT_VERSION = 95;
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
 				DISPLAY_NAME = "azzapp -  Digital Business Card";
 				INFOPLIST_FILE = azzapp/Info.plist;
@@ -2052,7 +2030,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "azzappWidget/azzappWidgetExtension-staging.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION =95;
+				CURRENT_PROJECT_VERSION = 95;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -2107,7 +2085,7 @@
 				CODE_SIGN_ENTITLEMENTS = "azzappWidget/azzappWidgetExtension-staging.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION =95;
+				CURRENT_PROJECT_VERSION = 95;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -2155,7 +2133,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = azzappWidget/azzappWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION =95;
+				CURRENT_PROJECT_VERSION = 95;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -2211,7 +2189,7 @@
 				CODE_SIGN_ENTITLEMENTS = azzappWidget/azzappWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION =95;
+				CURRENT_PROJECT_VERSION = 95;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -2260,7 +2238,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "azzappWidget/azzappWidgetExtension-dev.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION =95;
+				CURRENT_PROJECT_VERSION = 95;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -2315,7 +2293,7 @@
 				CODE_SIGN_ENTITLEMENTS = "azzappWidget/azzappWidgetExtension-dev.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION =95;
+				CURRENT_PROJECT_VERSION = 95;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -2363,7 +2341,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "ShareContactAppClip/ShareContactAppClip-staging.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION =95;
+				CURRENT_PROJECT_VERSION = 95;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_ASSET_PATHS = "\"ShareContactAppClip/Preview Content\"";
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
@@ -2422,7 +2400,7 @@
 				CODE_SIGN_ENTITLEMENTS = "ShareContactAppClip/ShareContactAppClip-staging.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION =95;
+				CURRENT_PROJECT_VERSION = 95;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"ShareContactAppClip/Preview Content\"";
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
@@ -2474,7 +2452,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "ShareContactAppClip/ShareContactAppClip-dev.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION =95;
+				CURRENT_PROJECT_VERSION = 95;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_ASSET_PATHS = "\"ShareContactAppClip/Preview Content\"";
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
@@ -2533,7 +2511,7 @@
 				CODE_SIGN_ENTITLEMENTS = "ShareContactAppClip/ShareContactAppClip-dev.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION =95;
+				CURRENT_PROJECT_VERSION = 95;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"ShareContactAppClip/Preview Content\"";
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
@@ -2585,7 +2563,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = ShareContactAppClip/ShareContactAppClip.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION =95;
+				CURRENT_PROJECT_VERSION = 95;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_ASSET_PATHS = "\"ShareContactAppClip/Preview Content\"";
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
@@ -2644,7 +2622,7 @@
 				CODE_SIGN_ENTITLEMENTS = ShareContactAppClip/ShareContactAppClip.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION =95;
+				CURRENT_PROJECT_VERSION = 95;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"ShareContactAppClip/Preview Content\"";
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
@@ -2691,7 +2669,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIconDev;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "azzapp-devDebug.entitlements";
-				CURRENT_PROJECT_VERSION =95;
+				CURRENT_PROJECT_VERSION = 95;
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
 				DISPLAY_NAME = "azzapp - Dev";
 				ENABLE_BITCODE = NO;
@@ -2732,7 +2710,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIconDev;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "azzapp-devRelease.entitlements";
-				CURRENT_PROJECT_VERSION =95;
+				CURRENT_PROJECT_VERSION = 95;
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
 				DISPLAY_NAME = "azzapp - Dev";
 				INFOPLIST_FILE = azzapp/Info.plist;
@@ -2771,7 +2749,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "azzapp-staging.entitlements";
-				CURRENT_PROJECT_VERSION =95;
+				CURRENT_PROJECT_VERSION = 95;
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
 				DISPLAY_NAME = "azzapp - Staging";
 				ENABLE_BITCODE = NO;
@@ -2811,7 +2789,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "azzapp-stagingRelease.entitlements";
-				CURRENT_PROJECT_VERSION =95;
+				CURRENT_PROJECT_VERSION = 95;
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
 				DISPLAY_NAME = "azzapp - Staging";
 				INFOPLIST_FILE = azzapp/Info.plist;
