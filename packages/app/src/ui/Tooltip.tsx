@@ -46,17 +46,13 @@ const Tooltip = ({
         onPress={onPress}
       >
         {header && (
-          <Text
-            variant="button"
-            style={styles.contentHeader}
-            appearance="light"
-          >
+          <Text variant="large" style={styles.contentHeader} appearance="light">
             {header}
           </Text>
         )}
         {description && (
           <Text
-            variant="button"
+            variant="medium"
             style={styles.contentDescription}
             appearance="light"
           >
@@ -71,11 +67,10 @@ const Tooltip = ({
 export default Tooltip;
 
 const styles = StyleSheet.create({
-  contentContainer: { padding: 10 },
+  contentContainer: { padding: 10, gap: 5 },
   contentHeader: {
     textAlign: 'center',
-    color: colors.black,
   },
-  contentDescription: { textAlign: 'center', color: colors.grey400 },
+  contentDescription: { textAlign: 'center' },
   backgroundStyle: { backgroundColor: 'transparent' },
 });

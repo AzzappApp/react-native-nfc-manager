@@ -46,7 +46,7 @@ const Tooltips = () => {
         offset={-20}
         from={tooltips['editFooter']?.ref}
         placement={Placement.TOP}
-        header={
+        description={
           <FormattedMessage
             defaultMessage="Click « + » to add sections"
             description="Add section tooltip in WebcardEditScreen"
@@ -59,7 +59,7 @@ const Tooltips = () => {
         offset={-50}
         from={tooltips['cover']?.ref}
         placement={Placement.TOP}
-        header={
+        description={
           <FormattedMessage
             defaultMessage="Tap the cover or any section to edit."
             description="Cover tooltip in WebcardEditScreen"
@@ -74,7 +74,7 @@ const Tooltips = () => {
           offset={-50}
           from={new Point(tooltipCoverPosition.x, tooltipCoverPosition.y)}
           placement={Placement.TOP}
-          header={
+          description={
             <FormattedMessage
               defaultMessage="Use arrows to reorder sections. Swipe right to hide or duplicate, left to delete."
               description="Section tooltip in WebcardEditScreen"

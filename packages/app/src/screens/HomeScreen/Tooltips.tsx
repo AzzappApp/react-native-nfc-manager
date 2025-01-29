@@ -98,7 +98,7 @@ const Tooltips = () => {
           from={new Point(tooltipCarouselPosition.x, tooltipCarouselPosition.y)}
           toolipWidth={157}
           placement={Placement.LEFT}
-          header={
+          description={
             <FormattedMessage
               defaultMessage="Your WebCard{azzappA} is a digital profile that enhances your ContactCard with richer content.
 Shared alone, it displays the profile without contact details."
@@ -117,7 +117,7 @@ Shared alone, it displays the profile without contact details."
           toolipWidth={352}
           from={new Point(tooltipBottomPosition.x, tooltipBottomPosition.y)}
           placement={Placement.BOTTOM}
-          header={
+          description={
             <FormattedMessage
               defaultMessage="Your ContactCard{azzappA} is a digital business card.
 Get your QR code scanned to share both contact details and digital profile."
