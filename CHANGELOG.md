@@ -1,5 +1,6 @@
-## 1.7.0-canary.93
+## 1.7.0-canary.94
 
+* **fix:**  - ensure cover is full width between 500 and 700 px window width ([#7150](https://github.com/AzzappApp/azzapp/pull/7150))
 * **fix:**  - allow access to detail info on predefinedCovers ([#7148](https://github.com/AzzappApp/azzapp/pull/7148))
 * **fix:**  - **subscription:** [#7142](https://github.com/AzzappApp/azzapp/pull/7142) only take into account published webCards ([#7143](https://github.com/AzzappApp/azzapp/pull/7143))
 * **fix:**  - simplify subscription mgmt in multiuser screen ([#7138](https://github.com/AzzappApp/azzapp/pull/7138))
