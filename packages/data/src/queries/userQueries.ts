@@ -276,6 +276,7 @@ export const getTotalMultiUser = async (userId: string) => {
         eq(ProfileTable.userId, userId),
         eq(ProfileTable.profileRole, 'owner'),
         eq(WebCardTable.isMultiUser, true),
+        eq(WebCardTable.cardIsPublished, true),
       ),
     );
 
