@@ -4,7 +4,7 @@ import cn from 'classnames';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { colors, getTextColor } from '@azzapp/shared/colorsHelpers';
 import arrows from '@azzapp/web/public/arrows@3x.png';
@@ -220,7 +220,12 @@ const Footer = ({
   backgroundColor: string;
   isAzzappPlus?: boolean;
 }) => {
-  const deviceType = getDeviceType();
+  const [deviceType, setDeviceType] = useState<DeviceType>(DeviceType.DESKTOP);
+
+  useEffect(() => {
+    setDeviceType(getDeviceType());
+  }, []);
+
   const color = getTextColor(backgroundColor);
   const isLight = color === colors.white;
 
