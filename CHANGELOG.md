@@ -1,4 +1,4 @@
-## 1.7.0-canary.91
+## 1.7.0-canary.92
 
 * **fix:**  - **subscription:** [#7142](https://github.com/AzzappApp/azzapp/pull/7142) only take into account published webCards ([#7143](https://github.com/AzzappApp/azzapp/pull/7143))
 * **fix:**  - simplify subscription mgmt in multiuser screen ([#7138](https://github.com/AzzappApp/azzapp/pull/7138))
