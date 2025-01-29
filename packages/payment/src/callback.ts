@@ -156,6 +156,7 @@ export const acknowledgeFirstPayment = async (
         });
       }
     }
+    return subscription;
   }
 };
 
@@ -203,6 +204,8 @@ export const rejectFirstPayment = async (
       });
     }
   }
+
+  return subscription;
 };
 
 export const acknowledgeRecurringPayment = async (
@@ -257,6 +260,8 @@ export const acknowledgeRecurringPayment = async (
       }
     }
   }
+
+  return subscription;
 };
 
 export const rejectRecurringPayment = async (
@@ -294,4 +299,6 @@ export const rejectRecurringPayment = async (
       });
     });
   }
+
+  return subscription;
 };

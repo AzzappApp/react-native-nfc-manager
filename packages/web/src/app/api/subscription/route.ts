@@ -4,9 +4,11 @@ import {
   createSubscription,
   getTotalMultiUser,
   getUserSubscriptions,
+  getWebCardByUserId,
   transaction,
   updateActiveUserSubscription,
 } from '@azzapp/data';
+import { revalidateWebcardsAndPosts } from '#helpers/api';
 import cors from '#helpers/cors';
 import { withPluginsRoute } from '#helpers/queries';
 import { unpublishWebCardForUser } from '#helpers/subscription';
@@ -261,6 +263,13 @@ const subscriptionWebHook = async (req: Request) => {
         break;
       //we are transfering only when the user sub is over, no work is required here
     }
+
+    const webcards = await getWebCardByUserId(userId);
+    revalidateWebcardsAndPosts(
+      webcards
+        .map(({ userName }) => userName)
+        .filter(userName => userName !== null),
+    );
 
     return NextResponse.json(null, { status: 200 });
   } catch (e) {

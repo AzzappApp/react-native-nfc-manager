@@ -14,7 +14,7 @@ import type { Media, PostWithCommentAndAuthor, WebCard } from '@azzapp/data';
 import type { JwtPayload } from 'jwt-decode';
 import type { PropsWithChildren } from 'react';
 
-type ProfilePageLayoutProps = PropsWithChildren<{
+type WebCardPageLayoutProps = PropsWithChildren<{
   webCard: WebCard;
   posts: PostWithCommentAndAuthor[];
   media: Media;
@@ -22,9 +22,10 @@ type ProfilePageLayoutProps = PropsWithChildren<{
   lastModuleBackgroundColor: string;
   userName: string;
   color: string | null;
+  isAzzappPlus: boolean;
 }>;
 
-const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
+const WebCardPageLayout = (props: WebCardPageLayoutProps) => {
   const {
     webCard,
     children,
@@ -33,6 +34,7 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
     cardBackgroundColor,
     lastModuleBackgroundColor,
     color,
+    isAzzappPlus,
   } = props;
   const searchParams = useSearchParams();
   const isShareBack = !!searchParams.get('c');
@@ -124,6 +126,7 @@ const WebCardPageLayout = (props: ProfilePageLayoutProps) => {
           color={color}
           handleCloseDownloadVCard={handleCloseDownloadVCard}
           isShareBack={isShareBack}
+          isAzzappPlus={isAzzappPlus}
         >
           {children}
         </DisplayWebCard>

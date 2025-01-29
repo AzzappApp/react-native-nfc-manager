@@ -346,6 +346,20 @@ export const getWebCardByProfileId = (id: string): Promise<WebCard | null> => {
     });
 };
 
+export const getWebCardByUserId = (userId: string): Promise<WebCard[]> => {
+  return db()
+    .select({ WebCard: WebCardTable })
+    .from(ProfileTable)
+    .innerJoin(WebCardTable, eq(WebCardTable.id, ProfileTable.webCardId))
+    .where(
+      and(
+        eq(ProfileTable.userId, userId),
+        eq(ProfileTable.profileRole, 'owner'),
+      ),
+    )
+    .then(results => results.map(w => w.WebCard));
+};
+
 export const getWebCardProfilesCount = async (webCardId: string) =>
   db()
     .select({ count: count() })

@@ -5,6 +5,8 @@ import {
   getMediasByIds,
   getProfilesPostsWithTopComment,
   getModuleBackgroundsByIds,
+  getWebCardsOwnerUsers,
+  getActiveUserSubscriptionForWebCard,
 } from '@azzapp/data';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
@@ -32,6 +34,15 @@ type ProfilePageProps = {
 const ProfilePage = async ({ params }: ProfilePageProps) => {
   const userName = params.userName.toLowerCase();
   const webCard = await cachedGetWebCardByUserName(userName);
+  let isAzzappPlus = false;
+  const owners = await getWebCardsOwnerUsers([webCard.id]);
+  if (owners?.length && owners[0]?.id) {
+    const subscriptions = await getActiveUserSubscriptionForWebCard(
+      owners[0].id,
+      webCard.id,
+    );
+    isAzzappPlus = subscriptions.length > 0;
+  }
 
   if (!webCard?.cardIsPublished) {
     return notFound();
@@ -127,6 +138,7 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
       lastModuleBackgroundColor={lastModuleBackgroundColor}
       userName={params.userName}
       color={cardBackgroundColor}
+      isAzzappPlus={isAzzappPlus}
     >
       {modules.map(module => (
         <ModuleRenderer
