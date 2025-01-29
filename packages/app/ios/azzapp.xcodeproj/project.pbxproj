@@ -13,13 +13,11 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		15FBE6E286AE91C4400740A4 /* libPods-common-azzappTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CD48F2D7A16C9B7B35A770 /* libPods-common-azzappTests.a */; };
 		24EF1F24C7124C24B202D8EA /* PlusJakartaSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = EB627C8EABFC4E8A9D4CB061 /* PlusJakartaSans-Bold.ttf */; };
 		2AA4B146474A114724333854 /* libPods-common-azzapp-staging.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A9A58D92E966BE3884BD1C2F /* libPods-common-azzapp-staging.a */; };
 		320762CF3AB74C2CADA5CB9B /* PlusJakartaSans-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 01A80455EE3041AA8310DF23 /* PlusJakartaSans-Medium.ttf */; };
 		34F769AE3F0B4F0182EF92E5 /* PlusJakartaSans-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 64C57ED191924F0A87B8A959 /* PlusJakartaSans-ExtraBold.ttf */; };
 		3EE37F939CF95920D1AF8A4D /* libPods-common-azzapp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A55BE713148562C8B54D4A6D /* libPods-common-azzapp.a */; };
-		485B1058089E3E6317DED749 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A34F8DB70ED6E8D53AFD590 /* ExpoModulesProvider.swift */; };
 		517B22092158447DB4D9807E /* HelveticaNeue-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FE48A15437D4CFB8B1E8602 /* HelveticaNeue-Bold.ttf */; };
 		51C74448A13281FB32E24633 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0773611437B756D821550543 /* ExpoModulesProvider.swift */; };
 		5DF4288E8BFC4EE5E6E388C7 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = FB58ADB2576D4F2277CBDD50 /* PrivacyInfo.xcprivacy */; };
@@ -83,7 +81,6 @@
 		BCACF1162C90C43800F87577 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = BCACF1132C90C43800F87577 /* InfoPlist.xcstrings */; };
 		BCEB3A042A74063A0010EEEE /* Azzapp.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BCEB3A032A74063A0010EEEE /* Azzapp.ttf */; };
 		C2D439B36EA94AC7B690F721 /* HelveticaNeue-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1259B693B98B486E9E0394C7 /* HelveticaNeue-Medium.ttf */; };
-		CE3FB77EFA1BBCFCBA646C5A /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C59A4752184E6A4BC4A569FB /* ExpoModulesProvider.swift */; };
 		D12BE8C9C8CFB933AEF16748 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E2FBF335CCE7355AA69A1C1 /* ExpoModulesProvider.swift */; };
 		E4476D644358FDE64775EC52 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = E39398FBB9147FF432195F49 /* PrivacyInfo.xcprivacy */; };
 		FA88BF592CEE4E398F7EC8AB /* HelveticaNeue.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7BE94E630FD2409FA6CB5E21 /* HelveticaNeue.ttf */; };
@@ -296,18 +293,14 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = azzapp/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = azzapp/main.m; sourceTree = "<group>"; };
 		26FD5F0EEB8A3E477D6F1580 /* Pods-common-azzapp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-azzapp.release.xcconfig"; path = "Target Support Files/Pods-common-azzapp/Pods-common-azzapp.release.xcconfig"; sourceTree = "<group>"; };
-		35018B6D4395AD2BFAA15014 /* Pods-common-azzappTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-azzappTests.debug.xcconfig"; path = "Target Support Files/Pods-common-azzappTests/Pods-common-azzappTests.debug.xcconfig"; sourceTree = "<group>"; };
 		3876E6F533D139B89DB43D3E /* Pods-common-azzapp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-azzapp.debug.xcconfig"; path = "Target Support Files/Pods-common-azzapp/Pods-common-azzapp.debug.xcconfig"; sourceTree = "<group>"; };
 		3D4F895EBE884458B0016262 /* Azzapp.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Azzapp.ttf; path = ../assets/fonts/Azzapp.ttf; sourceTree = "<group>"; };
 		3E2FBF335CCE7355AA69A1C1 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-common-azzapp-dev/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
-		4A34F8DB70ED6E8D53AFD590 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-azzapp-azzappTests/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		4CAFAE64A33E43774ED8D563 /* Pods-common-azzapp-dev.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-azzapp-dev.release.xcconfig"; path = "Target Support Files/Pods-common-azzapp-dev/Pods-common-azzapp-dev.release.xcconfig"; sourceTree = "<group>"; };
 		4D2736CE83BA31C7872F863E /* Pods-common-azzapp-staging.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-azzapp-staging.release.xcconfig"; path = "Target Support Files/Pods-common-azzapp-staging/Pods-common-azzapp-staging.release.xcconfig"; sourceTree = "<group>"; };
-		50B25CAE3886DB2CE6800386 /* Pods-common-azzappTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-azzappTests.release.xcconfig"; path = "Target Support Files/Pods-common-azzappTests/Pods-common-azzappTests.release.xcconfig"; sourceTree = "<group>"; };
 		5477301FE9F94EAFA6F8AD80 /* PlusJakartaSans-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "PlusJakartaSans-SemiBold.ttf"; path = "../assets/fonts/PlusJakartaSans-SemiBold.ttf"; sourceTree = "<group>"; };
 		5E795AEC1BEAF4FE6C0E791F /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-common-azzapp/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		64C57ED191924F0A87B8A959 /* PlusJakartaSans-ExtraBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "PlusJakartaSans-ExtraBold.ttf"; path = "../assets/fonts/PlusJakartaSans-ExtraBold.ttf"; sourceTree = "<group>"; };
-		65CD48F2D7A16C9B7B35A770 /* libPods-common-azzappTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-common-azzappTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7079498E767E80033C2FF85A /* Pods-common-azzapp-dev.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-azzapp-dev.debug.xcconfig"; path = "Target Support Files/Pods-common-azzapp-dev/Pods-common-azzapp-dev.debug.xcconfig"; sourceTree = "<group>"; };
 		7BE94E630FD2409FA6CB5E21 /* HelveticaNeue.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = HelveticaNeue.ttf; path = ../assets/fonts/HelveticaNeue.ttf; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = azzapp/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -356,7 +349,6 @@
 		BCACF1132C90C43800F87577 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		BCEB3A032A74063A0010EEEE /* Azzapp.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Azzapp.ttf; path = ../../assets/fonts/Azzapp.ttf; sourceTree = "<group>"; };
 		C11F023B6BF18091C6F420A9 /* libPods-common-azzapp-dev.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-common-azzapp-dev.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		C59A4752184E6A4BC4A569FB /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-common-azzappTests/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		D98307CB348705F89E1DE6DA /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = azzapp/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		E39398FBB9147FF432195F49 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = azzapp/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		EB627C8EABFC4E8A9D4CB061 /* PlusJakartaSans-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "PlusJakartaSans-Bold.ttf"; path = "../assets/fonts/PlusJakartaSans-Bold.ttf"; sourceTree = "<group>"; };
@@ -416,7 +408,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				15FBE6E286AE91C4400740A4 /* libPods-common-azzappTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -569,7 +560,6 @@
 				A55BE713148562C8B54D4A6D /* libPods-common-azzapp.a */,
 				C11F023B6BF18091C6F420A9 /* libPods-common-azzapp-dev.a */,
 				A9A58D92E966BE3884BD1C2F /* libPods-common-azzapp-staging.a */,
-				65CD48F2D7A16C9B7B35A770 /* libPods-common-azzappTests.a */,
 				9642B14B2D11B4F2008E236B /* WidgetKit.framework */,
 				9642B14D2D11B4F2008E236B /* SwiftUI.framework */,
 			);
@@ -705,19 +695,8 @@
 				4CAFAE64A33E43774ED8D563 /* Pods-common-azzapp-dev.release.xcconfig */,
 				050B0F459F08451DF3E153D8 /* Pods-common-azzapp-staging.debug.xcconfig */,
 				4D2736CE83BA31C7872F863E /* Pods-common-azzapp-staging.release.xcconfig */,
-				35018B6D4395AD2BFAA15014 /* Pods-common-azzappTests.debug.xcconfig */,
-				50B25CAE3886DB2CE6800386 /* Pods-common-azzappTests.release.xcconfig */,
 			);
 			path = Pods;
-			sourceTree = "<group>";
-		};
-		C656BE0C3A4313D5AF095E97 /* azzappTests */ = {
-			isa = PBXGroup;
-			children = (
-				4A34F8DB70ED6E8D53AFD590 /* ExpoModulesProvider.swift */,
-				C59A4752184E6A4BC4A569FB /* ExpoModulesProvider.swift */,
-			);
-			name = azzappTests;
 			sourceTree = "<group>";
 		};
 		D620DDDEAE3B4F7697FA5A18 /* Resources */ = {
@@ -739,7 +718,6 @@
 		E15DC6E9F29D960E2E3E9F74 /* ExpoModulesProviders */ = {
 			isa = PBXGroup;
 			children = (
-				C656BE0C3A4313D5AF095E97 /* azzappTests */,
 				3C8AB1A54BC08A45DE87BC6D /* azzapp */,
 				1B5025684E4BD57F1DB38297 /* azzapp-dev */,
 				638E15A87C3404B4C0B81900 /* azzapp-staging */,
@@ -788,13 +766,10 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "azzappTests" */;
 			buildPhases = (
-				4B9F1030015373D35DCD56C0 /* [CP] Check Pods Manifest.lock */,
 				F3DDF2D43A58EC75C9588A15 /* [Expo] Configure project */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				472527D153912EBAF1B3494D /* [CP] Embed Pods Frameworks */,
-				CA28840F67BB3B232C6E1C48 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -1239,7 +1214,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target' 'Support' 'Files/Pods-common-azzapp/expo-configure-project.sh\"\n";
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-common-azzapp/expo-configure-project.sh\"\n";
 		};
 		355241B54A76788E06605077 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1256,23 +1231,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-azzapp/Pods-common-azzapp-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		472527D153912EBAF1B3494D /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-common-azzappTests/Pods-common-azzappTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-common-azzappTests/Pods-common-azzappTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-azzappTests/Pods-common-azzappTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		474AD885A631282CFAA8823D /* [CP] Embed Pods Frameworks */ = {
@@ -1309,7 +1267,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target' 'Support' 'Files/Pods-common-azzapp-staging/expo-configure-project.sh\"\n";
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-common-azzapp-staging/expo-configure-project.sh\"\n";
 		};
 		49DB3617F8C176E2E1FAAAC2 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1326,28 +1284,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-azzapp-staging/Pods-common-azzapp-staging-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		4B9F1030015373D35DCD56C0 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-common-azzappTests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 		5E9B00049FB3BF4A691D3296 /* [CP] Check Pods Manifest.lock */ = {
@@ -1445,7 +1381,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target' 'Support' 'Files/Pods-common-azzapp-dev/expo-configure-project.sh\"\n";
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-common-azzapp-dev/expo-configure-project.sh\"\n";
 		};
 		B7B8B42F9921CD1F7D0C7538 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1483,23 +1419,6 @@
 			shellPath = /bin/sh;
 			shellScript = "\nWITH_ENVIRONMENT=\"../../../node_modules/react-native/scripts/xcode/with-environment.sh\"\nif [ -f \"$WITH_ENVIRONMENT\" ]; then\n    . \"$WITH_ENVIRONMENT\"\nfi \nexport SENTRY_PROPERTIES=sentry.properties\n[ \"$SENTRY_INCLUDE_NATIVE_SOURCES\" = \"true\" ] && INCLUDE_SOURCES_FLAG=\"--include-sources\" || INCLUDE_SOURCES_FLAG=\"\"\n../../../node_modules/@sentry/cli/bin/sentry-cli debug-files upload \"$INCLUDE_SOURCES_FLAG\" \"$DWARF_DSYM_FOLDER_PATH\"\n";
 		};
-		CA28840F67BB3B232C6E1C48 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-common-azzappTests/Pods-common-azzappTests-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-common-azzappTests/Pods-common-azzappTests-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-azzappTests/Pods-common-azzappTests-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		F3DDF2D43A58EC75C9588A15 /* [Expo] Configure project */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -1517,7 +1436,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target' 'Support' 'Files/Pods-common-azzappTests/expo-configure-project.sh\"\n";
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-common-azzappTests/expo-configure-project.sh\"\n";
 		};
 		FD10A7F022414F080027D42C /* Start Packager */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1648,8 +1567,6 @@
 				FD5BFC3828C8EF8D0010B34E /* AZPCustomReavealTransition.mm in Sources */,
 				FD1404462A03FDA800CCA6B9 /* MediaHelpers.swift in Sources */,
 				00E356F31AD99517003FC87E /* azzappTests.m in Sources */,
-				485B1058089E3E6317DED749 /* ExpoModulesProvider.swift in Sources */,
-				CE3FB77EFA1BBCFCBA646C5A /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1792,7 +1709,6 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 35018B6D4395AD2BFAA15014 /* Pods-common-azzappTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
@@ -1808,7 +1724,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION =1.7.0;
+				MARKETING_VERSION = 1.7.0;
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-lc++",
@@ -1831,7 +1747,6 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 50B25CAE3886DB2CE6800386 /* Pods-common-azzappTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
@@ -1844,7 +1759,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION =1.7.0;
+				MARKETING_VERSION = 1.7.0;
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-lc++",
@@ -1882,7 +1797,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION =1.7.0;
+				MARKETING_VERSION = 1.7.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1920,7 +1835,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION =1.7.0;
+				MARKETING_VERSION = 1.7.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -2157,7 +2072,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION =1.7.0;
+				MARKETING_VERSION = 1.7.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
@@ -2208,7 +2123,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION =1.7.0;
+				MARKETING_VERSION = 1.7.0;
 				MTL_FAST_MATH = YES;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.azzapp.app-staging.azzappWidget";
@@ -2261,7 +2176,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION =1.7.0;
+				MARKETING_VERSION = 1.7.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
@@ -2313,7 +2228,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION =1.7.0;
+				MARKETING_VERSION = 1.7.0;
 				MTL_FAST_MATH = YES;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = com.azzapp.app.azzappWidget;
@@ -2365,7 +2280,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION =1.7.0;
+				MARKETING_VERSION = 1.7.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
@@ -2416,7 +2331,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION =1.7.0;
+				MARKETING_VERSION = 1.7.0;
 				MTL_FAST_MATH = YES;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.azzapp.app-dev.azzappWidget";
@@ -2474,7 +2389,7 @@
 					"@executable_path/Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION =1.7.0;
+				MARKETING_VERSION = 1.7.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
@@ -2529,7 +2444,7 @@
 					"@executable_path/Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION =1.7.0;
+				MARKETING_VERSION = 1.7.0;
 				MTL_FAST_MATH = YES;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.azzapp.app-staging.Clip";
@@ -2585,7 +2500,7 @@
 					"@executable_path/Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION =1.7.0;
+				MARKETING_VERSION = 1.7.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
@@ -2640,7 +2555,7 @@
 					"@executable_path/Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION =1.7.0;
+				MARKETING_VERSION = 1.7.0;
 				MTL_FAST_MATH = YES;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.azzapp.app-dev.Clip";
@@ -2696,7 +2611,7 @@
 					"@executable_path/Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION =1.7.0;
+				MARKETING_VERSION = 1.7.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
@@ -2751,7 +2666,7 @@
 					"@executable_path/Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION =1.7.0;
+				MARKETING_VERSION = 1.7.0;
 				MTL_FAST_MATH = YES;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = com.azzapp.app.Clip;
@@ -2786,7 +2701,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION =1.7.0;
+				MARKETING_VERSION = 1.7.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -2826,7 +2741,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION =1.7.0;
+				MARKETING_VERSION = 1.7.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -2866,7 +2781,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION =1.7.0;
+				MARKETING_VERSION = 1.7.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -2905,7 +2820,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION =1.7.0;
+				MARKETING_VERSION = 1.7.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",

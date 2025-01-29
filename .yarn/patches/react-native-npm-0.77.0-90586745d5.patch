@@ -37,7 +37,7 @@ index 3e5cf860260b7cf3a50114c805a96d17167f1be0..03819bec4717cc7a5ca26b0aeb20ff7a
    if (0 === fiber)
      a: {
 diff --git a/Libraries/Renderer/implementations/ReactFabric-profiling.js b/Libraries/Renderer/implementations/ReactFabric-profiling.js
-index 0f5fab5c9e1422e02ddb580aa776d62f4ad6ee6e..c75ec933603e1cb63fca04587e280de64d3b92c8 100644
+index 0f5fab5c9e1422e02ddb580aa776d62f4ad6ee6e..06fc72f6386116cf71706c570efedabffa8257b8 100644
 --- a/Libraries/Renderer/implementations/ReactFabric-profiling.js
 +++ b/Libraries/Renderer/implementations/ReactFabric-profiling.js
 @@ -8015,13 +8015,17 @@ function requestUpdateLane(fiber) {
