@@ -1,5 +1,6 @@
-## 1.7.0-canary.92
+## 1.7.0-canary.93
 
+* **fix:**  - allow access to detail info on predefinedCovers ([#7148](https://github.com/AzzappApp/azzapp/pull/7148))
 * **fix:**  - **subscription:** [#7142](https://github.com/AzzappApp/azzapp/pull/7142) only take into account published webCards ([#7143](https://github.com/AzzappApp/azzapp/pull/7143))
 * **fix:**  - simplify subscription mgmt in multiuser screen ([#7138](https://github.com/AzzappApp/azzapp/pull/7138))
 * **fix:**  - **payment:** [#7115](https://github.com/AzzappApp/azzapp/pull/7115) display specific message when user is subscribed … ([#7122](https://github.com/AzzappApp/azzapp/pull/7122))
