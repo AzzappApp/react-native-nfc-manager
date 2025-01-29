@@ -99,7 +99,10 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
     return webCard.commonInformation;
   },
   companyName: async webCard => {
-    if (!(await hasWebCardProfileRight(webCard.id))) {
+    if (
+      !webCard.coverIsPredefined &&
+      !(await hasWebCardProfileRight(webCard.id))
+    ) {
       return null;
     }
     return webCard.companyName;
@@ -116,13 +119,19 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
   },
   coverTexts: webCard => webCard.coverTexts,
   firstName: async webCard => {
-    if (!(await hasWebCardProfileRight(webCard.id))) {
+    if (
+      !webCard.coverIsPredefined &&
+      !(await hasWebCardProfileRight(webCard.id))
+    ) {
       return null;
     }
     return webCard.firstName;
   },
   lastName: async webCard => {
-    if (!(await hasWebCardProfileRight(webCard.id))) {
+    if (
+      !webCard.coverIsPredefined &&
+      !(await hasWebCardProfileRight(webCard.id))
+    ) {
       return null;
     }
     return webCard.lastName;
