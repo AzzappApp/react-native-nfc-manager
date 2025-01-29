@@ -12,7 +12,6 @@ const coverMedia = style({
 });
 
 const content = style({
-  position: 'relative',
   margin: 'auto',
   overflow: 'hidden',
   // boxShadow: '0px 10px 20px 0px rgba(0, 0, 0, 0.20)',
@@ -21,6 +20,7 @@ const content = style({
       width: '100vw',
     },
     [MediaQuery.Desktop]: {
+      position: 'relative',
       maxWidth: MAX_COVER_WIDTH,
     },
   },
