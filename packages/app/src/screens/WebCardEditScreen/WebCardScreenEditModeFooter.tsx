@@ -179,7 +179,6 @@ const stylesheet = createStyleSheet(theme => ({
   lottieContainer: {
     ...shadow(theme, 'bottom'),
     marginBottom: 20,
-    marginTop: 20,
     borderRadius: 15,
   },
   load: {

@@ -9,6 +9,7 @@ import ChildPositionAwareScrollView from '#ui/ChildPositionAwareScrollView';
 import { HEADER_HEIGHT } from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import { useWebCardEditScale } from './webCardEditScreenHelpers';
+import { WEBCARD_SCREEN_EDIT_MODE_FOOTER_HEIGHT } from './WebCardScreenEditModeFooter';
 import type { ChildPositionAwareScrollViewHandle } from '#ui/ChildPositionAwareScrollView';
 
 export type WebCardEditScreenScrollViewProps = Omit<
@@ -101,7 +102,16 @@ const WebCardEditScreenScrollView = (
               <View
                 style={{
                   width: screenWidth,
-                  transform: [{ scale: 1 / editScale }],
+                  transform: [
+                    { scale: 1 / editScale },
+                    {
+                      translateY: -(
+                        (WEBCARD_SCREEN_EDIT_MODE_FOOTER_HEIGHT *
+                          (1 - 1 / editScale)) /
+                        2
+                      ),
+                    },
+                  ],
                 }}
               >
                 {editFooter}
