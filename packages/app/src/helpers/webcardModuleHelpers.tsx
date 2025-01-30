@@ -236,14 +236,14 @@ export const isModuleVariantSupported = (module: {
         'center',
         'right',
         'justified',
-        // 'column_1',
-        // 'column_1_justified',
-        // 'column_2',
-        // 'column_2_justified',
-        // 'column_3',
-        // 'column_3_justified',
-        // 'column_4',
-        // 'column_4_justified',
+        'column_1',
+        'column_1_justified',
+        'column_2',
+        'column_2_justified',
+        'column_3',
+        'column_3_justified',
+        'column_4',
+        'column_4_justified',
       ];
       return supported.includes(module.variant);
     }

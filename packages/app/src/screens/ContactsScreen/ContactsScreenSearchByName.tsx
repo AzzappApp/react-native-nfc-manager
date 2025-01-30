@@ -67,6 +67,7 @@ const ContactsScreenSearchByName = ({
     );
   }, [contacts]);
 
+
   const renderHeaderSection = useCallback(
     ({
       section: { initial },

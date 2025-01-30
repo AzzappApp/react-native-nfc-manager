@@ -11,7 +11,13 @@ const container = style({
 
 const section = style({
   width: 'min(100vw, 1000px)',
-  flex: 1,
+  display: 'flex',
+  alignItems: 'center',
+});
+
+const column = style({
+  display: 'flex',
+  gridTemplateColumns: '1fr',
 });
 
 const title = style({
@@ -38,4 +44,5 @@ export default {
   text,
   title,
   section,
+  column,
 };
