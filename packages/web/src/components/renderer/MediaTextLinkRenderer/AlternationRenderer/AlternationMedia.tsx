@@ -7,7 +7,7 @@ import type { Media } from '@azzapp/data';
 import type { CardStyle } from '@azzapp/shared/cardHelpers';
 import type { CSSProperties } from 'react';
 
-const mediaResolution = 480;
+const mediaResolution = 1024;
 
 const AlternationMedia = ({
   media,
@@ -84,8 +84,7 @@ const AlternationMedia = ({
               assetKind="module"
               media={media}
               alt="cover"
-              width={mediaResolution}
-              height={mediaResolution}
+              fluid
               className={styles.media}
               style={{
                 borderRadius: isFullAlternation
