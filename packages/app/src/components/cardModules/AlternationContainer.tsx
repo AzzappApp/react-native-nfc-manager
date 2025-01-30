@@ -93,6 +93,24 @@ const AlternationContainer = ({
   useEffect(() => {
     const itemStartY = (modulePosition ?? 0) + (parentY ?? 0) + componentY;
     const itemEndY = itemStartY + componentHeight;
+    //we need to handle the initial case where no scroll happened
+    Animated.parallel([
+      Animated.timing(translateX, {
+        toValue: 0,
+        duration: ANIMATION_DURATION,
+        useNativeDriver: true,
+      }),
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: ANIMATION_DURATION,
+        useNativeDriver: true,
+      }),
+    ]).start(({ finished }) => {
+      if (finished) {
+        isRunning.current = false;
+      }
+    });
+
     const listener = scrollY.addListener(({ value }) => {
       if (value >= itemStartY - dimension.height && value <= itemEndY) {
         if (hideAnimation.current) {
