@@ -1,6 +1,6 @@
 import { StyleSheet, useColorScheme } from 'react-native';
 import Popover, { PopoverMode } from 'react-native-popover-view';
-import { colors, shadow } from '#theme';
+import { colors, popoverShadow } from '#theme';
 import PressableNative from './PressableNative';
 import Text from './Text';
 import type { ReactNode } from 'react';
@@ -35,7 +35,7 @@ const Tooltip = ({
         backgroundColor: colors.white,
         padding: 10,
         width: toolipWidth,
-        ...shadow(scheme || 'dark', 'bottom'),
+        ...popoverShadow(scheme || 'dark', 'bottom'),
       }}
       {...props}
     >

@@ -94,6 +94,22 @@ export const shadow = (
   direction: 'bottom' | 'center' | 'top' = 'bottom',
 ) =>
   <const>{
+    boxShadow: [
+      {
+        offsetX: 0,
+        offsetY: direction === 'bottom' ? 10 : direction === 'center' ? 0 : -10,
+        blurRadius: '20',
+        spreadDistance: '0',
+        color: `rgba(0, 0, 0, ${appearence === 'dark' ? 0.4 : 0.2})`,
+      },
+    ],
+  };
+
+export const popoverShadow = (
+  appearence: 'dark' | 'light',
+  direction: 'bottom' | 'center' | 'top' = 'bottom',
+) =>
+  <const>{
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
