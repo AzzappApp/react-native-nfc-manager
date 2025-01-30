@@ -1,5 +1,8 @@
-## 1.7.0-canary.99
+## 1.7.0-canary.100
 
+* **fix:**  - **IOS:** prevent edit screen cover to steal the webcard snapshot ([#7187](https://github.com/AzzappApp/azzapp/pull/7187))
+* **fix:**  - **home:** [#6490](https://github.com/AzzappApp/azzapp/pull/6490) remove white screen on contact card creation ([#7183](https://github.com/AzzappApp/azzapp/pull/7183))
+* **fix:**  - padding on text to avoid layout issue for upmitt preview ([#7185](https://github.com/AzzappApp/azzapp/pull/7185))
 * **fix:**  - **modules:** [#7164](https://github.com/AzzappApp/azzapp/pull/7164) wrong parallax behaviour on ipad ([#7173](https://github.com/AzzappApp/azzapp/pull/7173))
 * **fix:**  - alternation Native Animation - handle initial case with no scroll..... display with animation the first  image ([#7171](https://github.com/AzzappApp/azzapp/pull/7171))
 * **fix:**  - increase mediaResolution in alternation media ([#7172](https://github.com/AzzappApp/azzapp/pull/7172))
