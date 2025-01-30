@@ -256,13 +256,22 @@ const Footer = ({
             description="Powered by in webcard footer"
           />
         </div>
-        <Image
-          src={isLight ? '/azzapp_white.svg' : '/azzapp_black.svg'}
-          alt="Logo azzapp"
-          width={isAzzappPlus ? 87 : 112}
-          height={isAzzappPlus ? 18 : 23}
-          style={{ opacity: isAzzappPlus ? 0.3 : 1 }}
-        />
+        <Link
+          href={NEXT_PUBLIC_URL}
+          target="_blank"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
+          <Image
+            src={isLight ? '/azzapp_white.svg' : '/azzapp_black.svg'}
+            alt="Logo azzapp"
+            width={isAzzappPlus ? 87 : 112}
+            height={isAzzappPlus ? 18 : 23}
+            style={{ opacity: isAzzappPlus ? 0.3 : 1 }}
+          />
+        </Link>
       </div>
       {!isAzzappPlus && (
         <>

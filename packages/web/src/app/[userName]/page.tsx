@@ -34,6 +34,9 @@ type ProfilePageProps = {
 const ProfilePage = async ({ params }: ProfilePageProps) => {
   const userName = params.userName.toLowerCase();
   const webCard = await cachedGetWebCardByUserName(userName);
+  if (!webCard) {
+    return notFound();
+  }
   let isAzzappPlus = false;
   const owners = await getWebCardsOwnerUsers([webCard.id]);
   if (owners?.length && owners[0]?.id) {
