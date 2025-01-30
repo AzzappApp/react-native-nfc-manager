@@ -7,6 +7,7 @@ import {
   useFrameCallback,
   useDerivedValue,
 } from 'react-native-reanimated';
+import { useDebouncedCallback } from 'use-debounce';
 import {
   COVER_MAX_MEDIA_DURATION,
   COVER_MIN_MEDIA_DURATION,
@@ -89,7 +90,7 @@ const CoverEditorMediaImageAnimationTool = () => {
     };
   }, [activeMedia?.editionParameters, imageScale]);
 
-  const onChangeDurationSlider = useCallback(
+  const onChangeDurationSlider = useDebouncedCallback(
     (duration: number) => {
       //initial value of slider call on change, avoid setting the hasChange bool to true
       if (activeMedia?.duration !== duration) {
@@ -100,7 +101,8 @@ const CoverEditorMediaImageAnimationTool = () => {
         hasChanges.current = true;
       }
     },
-    [activeMedia?.duration, dispatch],
+    500,
+    { leading: false },
   );
 
   const intl = useIntl();
