@@ -1,4 +1,4 @@
-## 1.7.0-canary.102
+## 1.7.0-canary.103
 
 * **fix:**  - ensure home tooltips are closed when pressed ([#7197](https://github.com/AzzappApp/azzapp/pull/7197))
 * **fix:**  - **CoverEdition:** debounce media animation slider duration ([#7189](https://github.com/AzzappApp/azzapp/pull/7189))
