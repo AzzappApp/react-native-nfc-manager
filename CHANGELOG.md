@@ -1,5 +1,13 @@
-## 1.7.0-canary.96
+## 1.7.0-canary.97
 
+* **fix:**  - **module:** wrong shadow on modules ([#7169](https://github.com/AzzappApp/azzapp/pull/7169))
+* **fix:**  - translate the view properly when scaling down (instead of adding random margin) ([#7162](https://github.com/AzzappApp/azzapp/pull/7162))
+* **fix:**  - update company predefined cover rendering ([#7167](https://github.com/AzzappApp/azzapp/pull/7167))
+* **fix:**  - fix cut text in home profile link ([#7165](https://github.com/AzzappApp/azzapp/pull/7165))
+* **fix:**  - add missing code for 0.77 upgrade ([#7163](https://github.com/AzzappApp/azzapp/pull/7163))
+* **fix:**  - **android:** [#7158](https://github.com/AzzappApp/azzapp/pull/7158) pressable of react-native-gesture-handler don’t bear backgroundColor ([#7160](https://github.com/AzzappApp/azzapp/pull/7160))
+* **fix:**  - **android:** [#7159](https://github.com/AzzappApp/azzapp/pull/7159) update shadow to respect border radius ([#7161](https://github.com/AzzappApp/azzapp/pull/7161))
+* **feat:**  - TitleText Column ([#7156](https://github.com/AzzappApp/azzapp/pull/7156))
 * **fix:**  - web app is broken with getDeviceType
 * **fix:**  - review tooltips fonts & size & gap ([#7152](https://github.com/AzzappApp/azzapp/pull/7152))
 * **build:**  - upgrade to rn 0.77 ([#7151](https://github.com/AzzappApp/azzapp/pull/7151))
