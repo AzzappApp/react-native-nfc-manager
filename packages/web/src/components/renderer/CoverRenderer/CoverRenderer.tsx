@@ -52,15 +52,16 @@ const CoverRenderer = ({
   const coverWidth = width ? width * 2 : DEFAULT_COVER_WIDTH * 2;
   const coverHeight = DEFAULT_COVER_HEIGHT;
 
+  const isBusiness = webCardKind === 'business';
   const overlayTitle = coverIsPredefined
-    ? webCardKind === 'business'
-      ? companyName
+    ? isBusiness
+      ? companyActivityLabel
       : firstName
     : undefined;
 
   const overlaySubTitle = coverIsPredefined
-    ? webCardKind === 'business'
-      ? companyActivityLabel
+    ? isBusiness
+      ? companyName
       : lastName
     : undefined;
 
@@ -154,14 +155,19 @@ const CoverRenderer = ({
       )}
 
       {overlayTitle && (
-        <div className={cn(styles.overlayTitle, Plus_Jakarta_Light.className)}>
+        <div
+          className={cn(
+            isBusiness ? styles.overlaySubTitle : styles.overlayTitle,
+            Plus_Jakarta_Light.className,
+          )}
+        >
           {overlayTitle}
         </div>
       )}
       {overlaySubTitle && (
         <div
           className={cn(
-            styles.overlaySubTitle,
+            isBusiness ? styles.overlayTitle : styles.overlaySubTitle,
             Plus_Jakarta_ExtraBold.className,
           )}
         >

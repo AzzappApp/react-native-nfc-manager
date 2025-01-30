@@ -242,19 +242,20 @@ const CoverRenderer = (
     [borderRadius, styles.shadow],
   );
 
-  // To have correct font scalling we need to render on a 375x600 surface and resize it to match cover displayed
+  // To have correct font scaling we need to render on a 375x600 surface and resize it to match cover displayed
   // No need to render it on small thumbnails
+  const isBusiness = webCardKind === 'business';
   const validSizeForText = width > MIN_WIDTH_TO_DISPLAY_COVER_TEXT;
   const overlayTitle =
     coverIsPredefined && validSizeForText
-      ? webCardKind === 'business'
+      ? isBusiness
         ? companyName
         : firstName
       : undefined;
 
   const overlaySubTitle =
     coverIsPredefined && validSizeForText
-      ? webCardKind === 'business'
+      ? isBusiness
         ? companyActivityLabel
         : lastName
       : undefined;
@@ -308,7 +309,9 @@ const CoverRenderer = (
               >
                 {overlayTitle && (
                   <Text
-                    style={styles.overlayTitle}
+                    style={
+                      isBusiness ? styles.overlaySubTitle : styles.overlayTitle
+                    }
                     numberOfLines={1}
                     allowFontScaling
                   >
@@ -317,7 +320,9 @@ const CoverRenderer = (
                 )}
                 {overlaySubTitle && (
                   <Text
-                    style={styles.overlaySubTitle}
+                    style={
+                      isBusiness ? styles.overlayTitle : styles.overlaySubTitle
+                    }
                     numberOfLines={1}
                     allowFontScaling
                   >
