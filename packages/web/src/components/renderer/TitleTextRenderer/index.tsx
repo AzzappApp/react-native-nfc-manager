@@ -182,16 +182,21 @@ const getTitleAlignmentStyle = (variant: string | null) => {
   }
   return getTextAlignmentStyle(variant);
 };
+
 const splitTextIntoColumns = (text: string, nbColumn: number): string[] => {
   const words = text.split(' ');
+  const wordsPerColumn = Math.ceil(words.length / nbColumn);
   const columns = Array.from({ length: nbColumn }, () => '');
 
-  words.forEach((word, index) => {
-    columns[index % nbColumn] += `${word} `;
-  });
+  for (let i = 0; i < nbColumn; i++) {
+    columns[i] = words
+      .slice(i * wordsPerColumn, (i + 1) * wordsPerColumn)
+      .join(' ');
+  }
 
   return columns;
 };
+
 const getTextAlignmentStyle = (variant: string | null) => {
   switch (variant) {
     case 'left':
