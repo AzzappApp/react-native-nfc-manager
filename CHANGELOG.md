@@ -1,5 +1,8 @@
-## 1.7.0-canary.101
+## 1.7.0-canary.102
 
+* **fix:**  - ensure home tooltips are closed when pressed ([#7197](https://github.com/AzzappApp/azzapp/pull/7197))
+* **fix:**  - **CoverEdition:** debounce media animation slider duration ([#7189](https://github.com/AzzappApp/azzapp/pull/7189))
+* **backoffice:**  - fix missing subscription IAP info ([#7190](https://github.com/AzzappApp/azzapp/pull/7190))
 * **fix:**  - **android:** [#6026](https://github.com/AzzappApp/azzapp/pull/6026) upgrade react-native-screens to fix issues on pressable ([#7191](https://github.com/AzzappApp/azzapp/pull/7191))
 * **fix:**  - **IOS:** prevent edit screen cover to steal the webcard snapshot ([#7187](https://github.com/AzzappApp/azzapp/pull/7187))
 * **fix:**  - **home:** [#6490](https://github.com/AzzappApp/azzapp/pull/6490) remove white screen on contact card creation ([#7183](https://github.com/AzzappApp/azzapp/pull/7183))
