@@ -364,7 +364,7 @@ const WebCardEditScreen = ({
               width={windowWidth}
               canPlay={editing && hasFocus}
               large
-              useAnimationSnapshot
+              useAnimationSnapshot={false}
             />
           </WebCardEditBlockContainer>
           <WebCardEditScreenBody
