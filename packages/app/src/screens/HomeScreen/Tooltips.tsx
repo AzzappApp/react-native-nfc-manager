@@ -110,6 +110,7 @@ Shared alone, it displays the profile without contact details."
           }
           isVisible={tooltips['profileCarousel']?.visible}
           onRequestClose={onCloseToolTip}
+          onPress={onCloseToolTip}
         />
       )}
       {tooltipBottomPosition && (
@@ -129,6 +130,7 @@ Get your QR code scanned to share both contact details and digital profile."
           }
           isVisible={tooltips['profileBottomPanel']?.visible}
           onRequestClose={onCloseToolTip}
+          onPress={onCloseToolTip}
         />
       )}
       <Tooltip
@@ -148,6 +150,7 @@ Get your QR code scanned to share both contact details and digital profile."
         }
         isVisible={tooltips['profileEdit']?.visible}
         onRequestClose={onCloseToolTipEdit}
+        onPress={onCloseToolTipEdit}
       />
       <Tooltip
         from={tooltips['profileMulti']?.ref}
@@ -166,6 +169,7 @@ Get your QR code scanned to share both contact details and digital profile."
         }
         isVisible={tooltips['profileMulti']?.visible}
         onRequestClose={onCloseToolTipMulti}
+        onPress={onCloseToolTipMulti}
       />
     </>
   );
