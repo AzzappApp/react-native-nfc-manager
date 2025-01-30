@@ -1,5 +1,7 @@
-## 1.7.0-canary.97
+## 1.7.0-canary.98
 
+* **fix:**  - alternation Native Animation - handle initial case with no scroll..... display with animation the first  image ([#7171](https://github.com/AzzappApp/azzapp/pull/7171))
+* **fix:**  - increase mediaResolution in alternation media ([#7172](https://github.com/AzzappApp/azzapp/pull/7172))
 * **fix:**  - **module:** wrong shadow on modules ([#7169](https://github.com/AzzappApp/azzapp/pull/7169))
 * **fix:**  - translate the view properly when scaling down (instead of adding random margin) ([#7162](https://github.com/AzzappApp/azzapp/pull/7162))
 * **fix:**  - update company predefined cover rendering ([#7167](https://github.com/AzzappApp/azzapp/pull/7167))
