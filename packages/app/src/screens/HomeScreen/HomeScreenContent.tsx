@@ -1,4 +1,11 @@
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  memo,
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { StyleSheet, View } from 'react-native';
 import { runOnJS, useAnimatedReaction } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
@@ -142,13 +149,17 @@ const HomeScreenContent = ({
         <HomeHeader openPanel={toggleMenu} user={user} />
         <HomeProfileLink user={user} />
         <HomeProfilesCarousel ref={selectListRef} user={user} />
-        <HomeBottomPanel user={user} />
+        <Suspense>
+          <HomeBottomPanel user={user} />
+        </Suspense>
       </View>
-      <HomeBottomSheetPanel
-        visible={showMenu}
-        close={closeMenu}
-        profile={currentProfile ?? null}
-      />
+      <Suspense>
+        <HomeBottomSheetPanel
+          visible={showMenu}
+          close={closeMenu}
+          profile={currentProfile ?? null}
+        />
+      </Suspense>
       {currentProfile?.webCard && !currentProfile.webCard.userName && (
         <HomeBottomSheetPopupPanel profile={currentProfile ?? null} />
       )}

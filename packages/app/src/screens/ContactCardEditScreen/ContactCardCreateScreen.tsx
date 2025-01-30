@@ -8,7 +8,6 @@ import * as mime from 'react-native-mime-types'; // FIXME import is verry big
 import Toast from 'react-native-toast-message';
 import { useMutation } from 'react-relay';
 import { graphql, Observable } from 'relay-runtime';
-import { waitTime } from '@azzapp/shared/asyncHelpers';
 import { mainRoutes } from '#mobileRoutes';
 import { colors } from '#theme';
 import {
@@ -41,8 +40,6 @@ import type { ContactCardCreateScreenMutation } from '#relayArtifacts/ContactCar
 import type { ContactCardCreateRoute } from '#routes';
 import type { CountryCode } from 'libphonenumber-js';
 
-const WAIT_FOR_REDIRECT = 1000;
-
 const ContactCardCreateScreen = () => {
   const styles = useStyleSheet(stylesheet);
 
@@ -64,8 +61,17 @@ const ContactCardCreateScreen = () => {
             webCard {
               id
               userName
+              hasCover
               cardIsPublished
+              coverBackgroundColor
               coverIsPredefined
+              coverMedia {
+                id
+              }
+              cardColors {
+                dark
+                primary
+              }
             }
           }
         }
@@ -227,9 +233,7 @@ const ContactCardCreateScreen = () => {
             router.replaceAll(mainRoutes(false));
           } else {
             // if we redirect too soon, the home background is not displayed
-            waitTime(WAIT_FOR_REDIRECT).then(() => {
-              router.back();
-            });
+            router.back();
           }
         },
         updater: store => {

@@ -3,7 +3,6 @@ import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { getAuthState, onChangeWebCard } from '#helpers/authStore';
 import { useProfileInfos } from '#hooks/authStateHooks';
-import useLatestCallback from '#hooks/useLatestCallback';
 import type { HomeScreenContext_user$key } from '#relayArtifacts/HomeScreenContext_user.graphql';
 import type { ReactNode } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
@@ -72,24 +71,15 @@ export const HomeScreenProvider = ({
   }, [currentIndexSharedValue]);
 
   const currentProfile = useProfileInfos();
-  const onIndexChangeLatest = useLatestCallback(onIndexChange);
+
   useEffect(() => {
     const nextProfileIndex = user.profiles?.findIndex(
       profile => profile.id === currentProfile?.profileId,
     );
     if (nextProfileIndex !== undefined && nextProfileIndex !== -1) {
-      setTimeout(() => {
-        if (nextProfileIndex + 1 !== currentIndexProfileSharedValue.value) {
-          onIndexChangeLatest(nextProfileIndex + 1);
-        }
-      });
+      onIndexChange(nextProfileIndex + 1);
     }
-  }, [
-    currentIndexProfileSharedValue,
-    currentProfile?.profileId,
-    onIndexChangeLatest,
-    user.profiles,
-  ]);
+  }, [currentProfile?.profileId, onIndexChange, user.profiles]);
 
   useEffect(() => {
     if (!user.profiles?.length) {
