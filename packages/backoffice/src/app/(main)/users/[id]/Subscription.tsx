@@ -31,6 +31,7 @@ export const Subscription = ({
   const totalSeats = userSubscription.totalSeats + userSubscription.freeSeats;
   const [message, setMessage] = useState<string | null>(null);
 
+
   const toggleSubscriptionStatus = (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
@@ -69,6 +70,13 @@ export const Subscription = ({
     }
   }, [debouncedSeats, updateFreeSeats, userSubscription.freeSeats]);
 
+  const subscriptionPlan =
+    userSubscription.subscriptionPlan ||
+    userSubscription.subscriptionId.includes('yearly')
+      ? 'web.yearly'
+      : 'web.monthly';
+
+
   return (
     <Box display="flex" flexDirection="column" gap={2}>
       <TextField
@@ -84,7 +92,8 @@ export const Subscription = ({
       />
 
       <Typography variant="subtitle1" color="GrayText" sx={{ mt: 5, mb: 5 }}>
-        Subscription started at {userSubscription.startAt.toDateString()}
+        Subscription <b>{userSubscription.subscriptionId}</b> started at
+        {userSubscription.startAt.toDateString()}
       </Typography>
 
       <Box display="flex" gap={2}>
@@ -152,9 +161,10 @@ export const Subscription = ({
           <Select
             labelId="type"
             id="type"
-            value={userSubscription.subscriptionPlan}
+            value={subscriptionPlan}
             label="Type"
             onChange={() => {}}
+            disabled={!userSubscription.subscriptionPlan}
           >
             <MenuItem value="web.monthly">Monthly</MenuItem>
             <MenuItem value="web.yearly">Yearly</MenuItem>
