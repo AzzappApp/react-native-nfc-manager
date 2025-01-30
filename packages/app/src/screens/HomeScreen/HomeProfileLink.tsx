@@ -1,7 +1,7 @@
 import * as Clipboard from 'expo-clipboard';
 import { memo, useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import Animated, {
   runOnJS,
   useAnimatedReaction,
@@ -157,6 +157,7 @@ const styles = StyleSheet.create({
     maxWidth: '90%',
     color: colors.white,
     lineHeight: 14,
+    top: Platform.OS === 'ios' ? 1 : 0,
     height: 16,
     paddingLeft: 5,
   },
