@@ -29,7 +29,7 @@ const Parallax = ({
   const containerWidth = useContainerWidth(containerRef);
 
   useEffect(() => {
-    setiOS(/iPad|iPhone|iPod/.test(navigator.userAgent));
+    setiOS(/iPhone|iPod/.test(navigator.userAgent));
 
     const handleScroll = () =>
       requestAnimationFrame(() => {
