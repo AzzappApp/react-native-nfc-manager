@@ -165,36 +165,85 @@ const UserPayWallScreen = ({
           setAllowMultiUser(true);
         }
         commitLocalUpdate(getRelayEnvironment(), store => {
-          const newTotalSeat = extractSeatsFromSubscriptionId(
-            res.customerInfo.entitlements.active?.multiuser.productIdentifier,
-          );
+          try {
+            const subscriptionId =
+              res.customerInfo.entitlements.active?.multiuser.productIdentifier;
+            const newTotalSeat = extractSeatsFromSubscriptionId(subscriptionId);
 
-          const totalsS = data.currentUser?.userSubscription?.totalSeats ?? 0;
-          const updateAvailableSeats =
-            newTotalSeat -
-            totalsS +
-            (data.currentUser?.userSubscription?.availableSeats ?? 0);
+            const totalsS = data.currentUser?.userSubscription?.totalSeats ?? 0;
 
-          if (profileInfos?.webCardId) {
-            store.get(profileInfos.webCardId)?.setValue(true, 'isPremium');
-            store
-              .get(profileInfos.webCardId)
-              ?.getOrCreateLinkedRecord('subscription', 'UserSubscription')
-              ?.setValue(Math.max(0, updateAvailableSeats), 'availableSeats');
-          }
+            let updateAvailableSeats =
+              newTotalSeat -
+              totalsS +
+              (data.currentUser?.userSubscription?.availableSeats ?? 0);
+            if (!data.currentUser?.userSubscription) {
+              //if there is no existing subscription, we need to remove one seat for the current user
+              updateAvailableSeats -= 1;
+            }
 
-          const user = store.getRoot().getLinkedRecord('currentUser');
-          const profiles = user?.getLinkedRecords('profiles');
-
-          if (profiles) {
-            const profile = profiles?.find(
-              profile => profile.getDataID() === profileInfos?.profileId,
+            const userSubscriptionCache = store.create(
+              subscriptionId,
+              'UserSubscription',
             );
-            profile?.getLinkedRecord('webCard')?.setValue(true, 'isPremium');
-            profile
-              ?.getLinkedRecord('webCard')
-              ?.getOrCreateLinkedRecord('subscription', 'UserSubscription')
-              ?.setValue(Math.max(0, updateAvailableSeats), 'availableSeats');
+            userSubscriptionCache.setValue(
+              Math.max(0, updateAvailableSeats),
+              'availableSeats',
+            );
+            userSubscriptionCache.setValue(subscriptionId, 'subscriptionId');
+            userSubscriptionCache.setValue(subscriptionId, 'id');
+
+            if (profileInfos?.webCardId) {
+              store.get(profileInfos.webCardId)?.setValue(true, 'isPremium');
+              if (
+                !store
+                  .get(profileInfos.webCardId)
+                  ?.getLinkedRecord('subscription')
+              ) {
+                store
+                  .get(profileInfos.webCardId)
+                  ?.setLinkedRecord(userSubscriptionCache, 'subscription');
+              } else {
+                store
+                  .get(profileInfos.webCardId)
+                  ?.getLinkedRecord('subscription')
+                  ?.setValue(
+                    Math.max(0, updateAvailableSeats),
+                    'availableSeats',
+                  );
+              }
+            }
+
+            const user = store.getRoot().getLinkedRecord('currentUser');
+            const profiles = user?.getLinkedRecords('profiles');
+
+            if (profiles) {
+              const profile = profiles?.find(
+                profile => profile.getDataID() === profileInfos?.profileId,
+              );
+              profile?.getLinkedRecord('webCard')?.setValue(true, 'isPremium');
+              if (
+                !profile
+                  ?.getLinkedRecord('webCard')
+                  ?.getLinkedRecord('subscription')
+              ) {
+                // Link the new UserSubscription record to the webCard
+                profile
+                  ?.getLinkedRecord('webCard')
+                  ?.setLinkedRecord(userSubscriptionCache, 'subscription');
+              } else {
+                profile
+                  ?.getLinkedRecord('webCard')
+                  ?.getLinkedRecord('subscription')
+                  ?.setValue(
+                    Math.max(0, updateAvailableSeats),
+                    'availableSeats',
+                  );
+              }
+            }
+          } catch (error) {
+            Sentry.captureException(error, {
+              data: 'userPayWallScreen-updating cache',
+            });
           }
         });
       }

@@ -124,12 +124,14 @@ const AlternationRender = async ({
                     >
                       {sectionData?.text ?? DEFAULT_MODULE_TEXT}
                     </p>
-                    <Link
-                      mediaData={sectionData}
-                      data={module.data}
-                      cardStyle={cardStyle}
-                      colorPalette={colorPalette}
-                    />
+                    <div>
+                      <Link
+                        mediaData={sectionData}
+                        data={module.data}
+                        cardStyle={cardStyle}
+                        colorPalette={colorPalette}
+                      />
+                    </div>
                   </section>
                 </div>
               </div>

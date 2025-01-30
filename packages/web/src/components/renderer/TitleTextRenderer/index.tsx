@@ -40,7 +40,7 @@ const TitleTextRenderer = ({
       module.variant === 'left' ||
       module.variant === 'right' ||
       module.variant === 'center' ||
-      module.variant === 'center_justified'
+      module.variant === 'justified'
     ) {
       setTitleOnTop(true);
       setNbColumn(1);
@@ -111,7 +111,6 @@ const TitleTextRenderer = ({
         style={{
           padding: Math.max(20, cardStyle?.gap ?? 0),
           gap: Math.max(20, cardStyle?.gap ?? 0),
-
           flexDirection: titleOnTop ? 'column' : 'row',
         }}
       >
@@ -177,7 +176,13 @@ export default TitleTextRenderer;
 
 const getTitleAlignmentStyle = (variant: string | null) => {
   //specific case for title
-  if (variant === 'justified') {
+  if (
+    variant === 'justified' ||
+    variant === 'column_1_justified' ||
+    variant === 'column_2_justified' ||
+    variant === 'column_3_justified' ||
+    variant === 'column_4_justified'
+  ) {
     return { textAlign: 'left' as const };
   }
   return getTextAlignmentStyle(variant);

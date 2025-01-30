@@ -4,7 +4,7 @@ const container = style({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  maxWidth: 'min(100vw, 1000px)',
+  width: '100%',
   margin: '0 auto',
   flex: 1,
 });

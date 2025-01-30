@@ -32,6 +32,7 @@ const Link = ({
         href={mediaData.link?.url}
         className={cn(styles.link, fontsMap[cardStyle.fontFamily].className)}
         style={{
+          display: 'inline-flex',
           backgroundColor: swapColor(
             data.cardModuleColor?.content,
             colorPalette,
