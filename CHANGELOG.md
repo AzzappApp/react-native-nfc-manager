@@ -1,5 +1,6 @@
-## 1.7.0-canary.100
+## 1.7.0-canary.101
 
+* **fix:**  - **android:** [#6026](https://github.com/AzzappApp/azzapp/pull/6026) upgrade react-native-screens to fix issues on pressable ([#7191](https://github.com/AzzappApp/azzapp/pull/7191))
 * **fix:**  - **IOS:** prevent edit screen cover to steal the webcard snapshot ([#7187](https://github.com/AzzappApp/azzapp/pull/7187))
 * **fix:**  - **home:** [#6490](https://github.com/AzzappApp/azzapp/pull/6490) remove white screen on contact card creation ([#7183](https://github.com/AzzappApp/azzapp/pull/7183))
 * **fix:**  - padding on text to avoid layout issue for upmitt preview ([#7185](https://github.com/AzzappApp/azzapp/pull/7185))
