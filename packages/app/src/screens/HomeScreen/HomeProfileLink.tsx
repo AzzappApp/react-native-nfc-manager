@@ -157,6 +157,7 @@ const styles = StyleSheet.create({
     maxWidth: '90%',
     color: colors.white,
     lineHeight: 14,
+    height: 16,
     paddingLeft: 5,
   },
   iconLink: {
