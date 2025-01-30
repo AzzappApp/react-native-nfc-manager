@@ -31,7 +31,6 @@ export const Subscription = ({
   const totalSeats = userSubscription.totalSeats + userSubscription.freeSeats;
   const [message, setMessage] = useState<string | null>(null);
 
-
   const toggleSubscriptionStatus = (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
@@ -75,7 +74,6 @@ export const Subscription = ({
     userSubscription.subscriptionId.includes('yearly')
       ? 'web.yearly'
       : 'web.monthly';
-
 
   return (
     <Box display="flex" flexDirection="column" gap={2}>
