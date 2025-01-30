@@ -1,5 +1,6 @@
-## 1.7.0-canary.98
+## 1.7.0-canary.99
 
+* **fix:**  - **modules:** [#7164](https://github.com/AzzappApp/azzapp/pull/7164) wrong parallax behaviour on ipad ([#7173](https://github.com/AzzappApp/azzapp/pull/7173))
 * **fix:**  - alternation Native Animation - handle initial case with no scroll..... display with animation the first  image ([#7171](https://github.com/AzzappApp/azzapp/pull/7171))
 * **fix:**  - increase mediaResolution in alternation media ([#7172](https://github.com/AzzappApp/azzapp/pull/7172))
 * **fix:**  - **module:** wrong shadow on modules ([#7169](https://github.com/AzzappApp/azzapp/pull/7169))
