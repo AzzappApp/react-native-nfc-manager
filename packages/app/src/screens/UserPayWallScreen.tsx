@@ -291,8 +291,7 @@ const UserPayWallScreen = ({
       Sentry.captureException(error, { data: 'userPayWallScreen' });
     }
   }, [
-    data.currentUser?.userSubscription?.availableSeats,
-    data.currentUser?.userSubscription?.totalSeats,
+    data.currentUser?.userSubscription,
     intl,
     route.params?.activateFeature,
     router,

@@ -1,5 +1,10 @@
 import { memo } from 'react';
-import { useColorScheme, type StyleProp, type ViewStyle } from 'react-native';
+import {
+  useColorScheme,
+  View,
+  type StyleProp,
+  type ViewStyle,
+} from 'react-native';
 import { colors } from '#theme';
 import {
   createVariantsStyleSheet,
@@ -41,18 +46,20 @@ const ToggleButton = ({
       accessibilityState={{ checked: toggled }}
       style={[styles.container, toggled && styles.toggleContainer, style]}
     >
-      <Text
-        variant="button"
-        style={[
-          {
-            textAlignVertical: 'center',
-          },
-          toggled && styles.toggleLabel,
-        ]}
-      >
-        {label}
-      </Text>
-      {rightElement}
+      <View style={styles.textContainer}>
+        <Text
+          variant="button"
+          style={[
+            {
+              textAlignVertical: 'center',
+            },
+            toggled && styles.toggleLabel,
+          ]}
+        >
+          {label}
+        </Text>
+        {rightElement}
+      </View>
     </PressableNative>
   );
 };
@@ -65,15 +72,18 @@ export const TOGGLE_BUTTON_HEIGHT = 35;
 const styleSheet = createVariantsStyleSheet(appearance => ({
   default: {
     container: {
-      paddingLeft: 20,
-      paddingRight: 20,
       height: TOGGLE_BUTTON_HEIGHT,
       borderRadius: 100,
       borderWidth: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
       overflow: 'hidden',
+    },
+    textContainer: {
       flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      flex: 1,
+      paddingLeft: 20,
+      paddingRight: 20,
     },
   },
   primary: {

@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
-import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
+import { ScrollView } from 'react-native-gesture-handler';
 import { isNotFalsyString, isValidUrl } from '@azzapp/shared/stringHelpers';
-import { colors } from '#theme';
 import { MediaImageRenderer } from '#components/medias';
 import ToolBoxSection from '#components/Toolbar/ToolBoxSection';
 import { hasCardModuleMediaError } from '#helpers/cardModuleHelpers';
@@ -11,7 +10,8 @@ import useBoolean from '#hooks/useBoolean';
 import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import BottomSheetTextInput from '#ui/BottomSheetTextInput';
-import Header, { HEADER_HEIGHT } from '#ui/Header';
+import Header from '#ui/Header';
+import HeaderButton from '#ui/HeaderButton';
 import Text from '#ui/Text';
 import {
   DEFAULT_CARD_MODULE_TEXT,
@@ -157,14 +157,14 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
             }
             style={styles.header}
             rightElement={
-              <TouchableOpacity onPress={onDone} style={styles.doneButton}>
-                <Text variant="button" style={{ color: colors.white }}>
-                  <FormattedMessage
-                    defaultMessage="Done"
-                    description="CardMOduleMediaTextTool - Done header button label"
-                  />
-                </Text>
-              </TouchableOpacity>
+              <HeaderButton
+                onPress={onDone}
+                label={intl.formatMessage({
+                  defaultMessage: 'Done',
+                  description:
+                    'CardModuleMediaTextTool - Done header button label',
+                })}
+              />
             }
           />
 
@@ -286,17 +286,6 @@ const isVisible = (module: ModuleKindAndVariant) => {
 export default CardModuleMediaTextTool;
 
 const styles = StyleSheet.create({
-  doneButton: {
-    width: 74,
-    height: HEADER_HEIGHT,
-    paddingHorizontal: 0,
-    backgroundColor: colors.black,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 12,
-    borderCurve: 'continuous',
-    overflow: 'hidden',
-  },
   container: {
     paddingHorizontal: 16,
     overflow: 'visible',

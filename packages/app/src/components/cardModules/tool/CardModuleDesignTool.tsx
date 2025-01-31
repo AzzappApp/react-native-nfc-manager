@@ -21,7 +21,7 @@ import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
-import PressableOpacity from '#ui/PressableOpacity';
+import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import type { ColorSchemeName, ListRenderItemInfo } from 'react-native';
 
@@ -129,7 +129,7 @@ const Item = <T extends ModuleKindAndVariant>({
   });
 
   return (
-    <PressableOpacity
+    <PressableNative
       onPress={onPress}
       disabled={!isVariantSupported}
       disabledOpacity={1}
@@ -159,7 +159,7 @@ const Item = <T extends ModuleKindAndVariant>({
       <Container style={styles.badge}>
         <Text variant="smallbold">{label}</Text>
       </Container>
-    </PressableOpacity>
+    </PressableNative>
   );
 };
 
