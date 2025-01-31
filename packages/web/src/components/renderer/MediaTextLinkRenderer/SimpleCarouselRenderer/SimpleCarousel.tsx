@@ -33,10 +33,11 @@ type Props = {
 const findNearestIndex = (
   snapPoints: number[],
   translation: number,
+  direction: number,
 ): number => {
   if (snapPoints.length === 0) return -1; // Return -1 if snapPoints is empty.
 
-  let nearestIndex = 0;
+  let nearestIndex: number = 0;
   let minDistance = Math.abs(snapPoints[0] - translation);
 
   for (let i = 1; i < snapPoints.length; i++) {
@@ -47,6 +48,17 @@ const findNearestIndex = (
     }
   }
 
+  if (direction > 0 && snapPoints[nearestIndex] > translation) {
+    nearestIndex = nearestIndex - 1;
+    if (nearestIndex < 0) {
+      nearestIndex = 0;
+    }
+  } else if (direction < 0 && snapPoints[nearestIndex] < translation) {
+    nearestIndex = nearestIndex + 1;
+    if (nearestIndex > snapPoints.length - 1) {
+      nearestIndex = snapPoints.length - 1;
+    }
+  }
   return nearestIndex;
 };
 
@@ -63,8 +75,10 @@ const SimpleCarousel = ({
   const { cardModuleMedias, cardModuleColor } = module.data;
   const cardGap = Math.max(cardStyle?.gap || 0, 10);
   const [startPosition, setStartPosition] = useState<{
-    position: number;
+    positionX: number;
+    positionY: number;
     translation: number;
+    slideDirection?: 'X' | 'Y';
   }>();
   const [translation, setTranslation] = useState<number>(0);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -144,13 +158,22 @@ const SimpleCarousel = ({
           : 'clientX' in e
             ? e.clientX
             : 0; // Handles both touch and mouse
-      setStartPosition({ position: startX, translation });
+      const startY =
+        'touches' in e && e.touches
+          ? e.touches[0].clientY
+          : 'clientY' in e
+            ? e.clientY
+            : 0; // Handles both touch and mouse
+
+      setStartPosition({ positionX: startX, positionY: startY, translation });
     }
   };
 
   const handleMove = useCallback(
     (e: MouseEvent<HTMLDivElement> | TouchEvent<HTMLDivElement>) => {
       if (startPosition === undefined) return;
+      if (startPosition.slideDirection === 'Y') return;
+
       const currentX =
         'touches' in e && e.touches
           ? e.touches[0].clientX
@@ -158,9 +181,34 @@ const SimpleCarousel = ({
             ? e.clientX
             : 0;
 
+      const currentY =
+        'touches' in e && e.touches
+          ? e.touches[0].clientY
+          : 'clientY' in e
+            ? e.clientY
+            : 0;
+
+      if (startPosition.slideDirection === undefined) {
+        if (Math.abs(startPosition.positionY - currentY) > 8) {
+          setStartPosition(pos =>
+            pos ? { ...pos, slideDirection: 'Y' } : undefined,
+          );
+          // no need to handle this event
+          return;
+        } else if (Math.abs(startPosition.positionX - currentX) > 8) {
+          setStartPosition(pos =>
+            pos ? { ...pos, slideDirection: 'X' } : undefined,
+          );
+        } else {
+          // cannot identify direction yet
+          return;
+        }
+      }
+
+      e.preventDefault();
       const track = carouselRef.current;
       if (track) {
-        const deltaX = currentX - startPosition.position;
+        const deltaX = currentX - startPosition.positionX;
         const targetTranslation = startPosition.translation + deltaX;
         setTranslation(targetTranslation);
         track.style.transform = `translateX(${targetTranslation}px)`;
@@ -190,13 +238,27 @@ const SimpleCarousel = ({
     };
   }, [startPosition, handleMove, carouselSnapPoints]);
 
-  const handleEnd = () => {
+  const handleEnd = (
+    e: MouseEvent<HTMLDivElement> | TouchEvent<HTMLDivElement>,
+  ) => {
+    if (!startPosition || startPosition.slideDirection === 'Y') return;
+
+    const currentX =
+      'changedTouches' in e && e.changedTouches
+        ? e.changedTouches[0]?.clientX
+        : 'clientX' in e
+          ? e.clientX
+          : 0;
+
     const track = carouselRef.current;
-    if (track) {
+    if (track && startPosition) {
+      const direction = currentX - startPosition.positionX;
       const targetIndex = findNearestIndex(
         carouselSnapPoints.snapPoints,
         -translation,
+        direction,
       );
+
       setTranslation(-carouselSnapPoints.snapPoints[targetIndex]);
     }
     setStartPosition(undefined);
