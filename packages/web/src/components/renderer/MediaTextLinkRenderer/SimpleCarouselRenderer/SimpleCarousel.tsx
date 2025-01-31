@@ -234,13 +234,7 @@ const SimpleCarousel = ({
             );
 
             return (
-              <div
-                key={`${media.id}_${i}`}
-                className={styles.itemContainer}
-                style={{
-                  width: media.width,
-                }}
-              >
+              <div key={`${media.id}_${i}`} className={styles.itemContainer}>
                 <div key={`${media.id}_${i}`}>
                   {media.kind === 'video' ? (
                     <CloudinaryVideo
