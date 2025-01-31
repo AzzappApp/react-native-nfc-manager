@@ -93,14 +93,14 @@ const SimpleCarousel = ({
   // compute a snapPoint for each image in the carousel
   const carouselSnapPoints = useMemo(() => {
     const snapPoints: number[] = [];
-    const totalWidth = medias.reduce((acc, item) => {
-      acc = acc + item.width + cardGap;
-      return acc;
-    }, 0);
+    const totalWidth =
+      medias.length * targetWidth +
+      (medias.length - 1) * cardGap +
+      2 * marginStart;
     const maxSnapPoint = totalWidth - screenWidth;
 
     medias.reduce((acc, item) => {
-      let snapPoint = acc + targetWidth / 2 - screenWidth / 2;
+      let snapPoint = acc + targetWidth / 2 - screenWidth / 2 + cardGap;
       if (snapPoint < 0) {
         snapPoint = 0;
       } else if (snapPoint > maxSnapPoint + marginStart) {
@@ -109,10 +109,10 @@ const SimpleCarousel = ({
       snapPoints.push(snapPoint);
       acc = acc + item.width + cardGap;
       return acc;
-    }, 0);
+    }, marginStart);
 
     return {
-      totalWidth: totalWidth - cardGap,
+      totalWidth,
       snapPoints,
       maxSnapPoint,
     };
@@ -123,21 +123,12 @@ const SimpleCarousel = ({
 
   // padding to apply on none slidable row
   const paddingNoneSlidable = !isSlidable
-    ? (carouselSnapPoints.totalWidth - screenWidth) / 2
+    ? (carouselSnapPoints.totalWidth - 2 * marginStart - screenWidth) / 2
     : 0;
 
-  // reset to default snap point when screen width change
   useEffect(() => {
-    const onCarouselSizeChange = () => {
-      setTranslation(carouselSnapPoints.snapPoints[0]);
-    };
-
-    onCarouselSizeChange();
-    window?.addEventListener('resize', onCarouselSizeChange);
-    return () => {
-      window?.removeEventListener('resize', onCarouselSizeChange);
-    };
-  }, [carouselSnapPoints.snapPoints]);
+    setTranslation(carouselSnapPoints.snapPoints[0]);
+  }, [screenWidth, carouselSnapPoints.snapPoints]);
 
   /**
    * Slide handling
@@ -227,7 +218,7 @@ const SimpleCarousel = ({
           onMouseLeave={isSlidable ? handleEnd : undefined}
           style={{
             transform: `translateX(${translation}px)`,
-            marginLeft: `${-paddingNoneSlidable || marginStart}px`,
+            marginLeft: `${-paddingNoneSlidable}px`,
             transition:
               startPosition !== undefined || !isSlidable
                 ? 'none'
@@ -236,6 +227,7 @@ const SimpleCarousel = ({
             display: 'flex',
           }}
         >
+          {isSlidable ? <div style={{ width: marginStart }} /> : undefined}
           {medias.map((media, i) => {
             const sectionData = cardModuleMedias.find(
               cardModuleMedia => cardModuleMedia.media.id === media.id,
