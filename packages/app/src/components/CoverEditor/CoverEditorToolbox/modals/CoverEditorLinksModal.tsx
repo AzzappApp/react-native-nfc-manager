@@ -140,7 +140,6 @@ const CoverEditorLinksModal = ({
 const styleSheet = createStyleSheet(appearance => ({
   container: {
     flex: 1,
-    height: 900,
   },
   headerTitle: {
     maxWidth: '50%',
