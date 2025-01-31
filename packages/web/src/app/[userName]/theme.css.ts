@@ -104,7 +104,7 @@ export const textHyperLink = style({
 
 export enum MediaQuery {
   Desktop = `screen and (min-width: ${DESKTOP_WIDTH}px)`,
-  Mobile = 'screen and (max-width: 749.9px)',
+  Mobile = `screen and (max-width: ${DESKTOP_WIDTH - 0.1}px)`,
   AtLeastSmallMobile = 'screen and (min-width: 640px)',
   BelowSmallMobile = 'screen and (max-width: 639.9px)',
 }

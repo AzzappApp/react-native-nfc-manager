@@ -309,9 +309,7 @@ const CoverRenderer = (
               >
                 {overlayTitle && (
                   <Text
-                    style={
-                      isBusiness ? styles.overlaySubTitle : styles.overlayTitle
-                    }
+                    style={styles.overlayTitle}
                     numberOfLines={1}
                     allowFontScaling
                   >
@@ -320,9 +318,7 @@ const CoverRenderer = (
                 )}
                 {overlaySubTitle && (
                   <Text
-                    style={
-                      isBusiness ? styles.overlayTitle : styles.overlaySubTitle
-                    }
+                    style={styles.overlaySubTitle}
                     numberOfLines={1}
                     allowFontScaling
                   >

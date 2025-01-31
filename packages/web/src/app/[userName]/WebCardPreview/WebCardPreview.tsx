@@ -34,6 +34,7 @@ const WebCardPreview = ({
             width={coverSize.width}
             webCard={webCard}
             media={media}
+            contentClass={styles.coverContentClass}
             priority
           />
         </div>

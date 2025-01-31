@@ -18,10 +18,12 @@ const content = style({
   '@media': {
     [MediaQuery.Mobile]: {
       width: '100vw',
+      fontSize: '0.8vw',
     },
     [MediaQuery.Desktop]: {
       position: 'relative',
       maxWidth: MAX_COVER_WIDTH,
+      fontSize: 4,
     },
   },
 });
@@ -59,27 +61,25 @@ const linkShadow = style({
 
 const overlayTitle = style({
   color: 'white',
-  fontSize: 21,
+  fontSize: '5em',
   position: 'absolute',
   maxWidth: '70%',
   left: '22%',
   top: '45.5%',
   textOverflow: 'ellipsis',
-  height: 30,
   maxLines: 1,
   overflow: 'hidden',
 });
 
 const overlaySubTitle = style({
   color: 'white',
-  fontSize: 29,
+  fontSize: '7em',
   position: 'absolute',
   width: '70%',
   left: '22%',
   top: '49%',
   maxLines: 1,
   textOverflow: 'ellipsis',
-  maxHeight: 40,
   overflow: 'hidden',
 });
 

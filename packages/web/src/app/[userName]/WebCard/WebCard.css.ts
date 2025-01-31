@@ -10,12 +10,13 @@ const wrapper = style({
 
 const modules = style({
   transitionTimingFunction: 'ease-out',
+  height: '100vh',
+  width: '100%',
   '@media': {
     [MediaQuery.Desktop]: {
       transition: 'margin-right 0.3s',
       overflowX: 'hidden',
       flex: 1,
-      width: '100%',
     },
     [MediaQuery.Mobile]: {
       zIndex: 2,
@@ -165,8 +166,8 @@ const header = style({
 });
 
 const coverWrapper = style({
+  position: 'relative',
   flex: 1,
-  maxWidth: MAX_COVER_WIDTH,
   boxShadow: '0px -15px 20px -6px rgba(0, 0, 0, 0.25)',
   borderBottomRightRadius: 0,
   borderBottomLeftRadius: 0,
@@ -174,6 +175,17 @@ const coverWrapper = style({
   '@media': {
     [MediaQuery.Desktop]: {
       borderRadius: 35,
+      maxWidth: MAX_COVER_WIDTH,
+    },
+  },
+});
+
+const coverSharebackWrapper = style({
+  borderRadius: 35,
+  '@media': {
+    [MediaQuery.Mobile]: {
+      borderBottomLeftRadius: 0,
+      borderBottomRightRadius: 0,
     },
   },
 });
@@ -184,7 +196,7 @@ const footer = style({
   textAlign: 'center',
   alignItems: 'center',
   gap: 20,
-  padding: '30px 10px',
+  padding: '30px 10px 80px 10px',
 });
 
 const poweredByContainer = style({
@@ -241,6 +253,7 @@ const styles = {
   postsClosed,
   coverContainer,
   coverWrapper,
+  coverSharebackWrapper,
   header,
   title,
   footer,

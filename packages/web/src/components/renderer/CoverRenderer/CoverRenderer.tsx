@@ -25,6 +25,7 @@ type CoverRendererProps = Omit<
   staticCover?: boolean;
   width?: number;
   priority?: boolean;
+  contentClass?: string;
 };
 
 const CoverRenderer = ({
@@ -34,6 +35,7 @@ const CoverRenderer = ({
   style,
   width,
   priority,
+  contentClass,
   ...props
 }: CoverRendererProps) => {
   const {
@@ -55,13 +57,13 @@ const CoverRenderer = ({
   const isBusiness = webCardKind === 'business';
   const overlayTitle = coverIsPredefined
     ? isBusiness
-      ? companyActivityLabel
+      ? companyName
       : firstName
     : undefined;
 
   const overlaySubTitle = coverIsPredefined
     ? isBusiness
-      ? companyName
+      ? companyActivityLabel
       : lastName
     : undefined;
 
@@ -99,7 +101,7 @@ const CoverRenderer = ({
         width,
         borderRadius: width ? `${(35 / 300) * width}px` : undefined,
       }}
-      className={styles.content}
+      className={cn(styles.content, contentClass)}
       ref={cover}
     >
       <div
@@ -155,19 +157,14 @@ const CoverRenderer = ({
       )}
 
       {overlayTitle && (
-        <div
-          className={cn(
-            isBusiness ? styles.overlaySubTitle : styles.overlayTitle,
-            Plus_Jakarta_Light.className,
-          )}
-        >
+        <div className={cn(styles.overlayTitle, Plus_Jakarta_Light.className)}>
           {overlayTitle}
         </div>
       )}
       {overlaySubTitle && (
         <div
           className={cn(
-            isBusiness ? styles.overlayTitle : styles.overlaySubTitle,
+            styles.overlaySubTitle,
             Plus_Jakarta_ExtraBold.className,
           )}
         >

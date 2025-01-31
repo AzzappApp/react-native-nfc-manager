@@ -58,7 +58,12 @@ const WebCard = ({
 
   return (
     <>
-      <div className={styles.wrapper}>
+      <div
+        className={styles.wrapper}
+        style={{
+          backgroundColor: !isShareBack ? cardBackgroundColor : 'transparent',
+        }}
+      >
         {posts.length > 0 && (
           <WebCardPostNavigation
             webCard={webCard}
@@ -114,14 +119,10 @@ const WebCard = ({
               }}
             >
               <div
-                style={
-                  isShareBack
-                    ? {
-                        borderRadius: 60,
-                      }
-                    : undefined
-                }
-                className={styles.coverWrapper}
+                className={cn(
+                  styles.coverWrapper,
+                  isShareBack && styles.coverSharebackWrapper,
+                )}
               >
                 <CoverRenderer webCard={webCard} media={media} priority />
               </div>

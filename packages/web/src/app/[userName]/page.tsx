@@ -79,7 +79,8 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
   const cardColors = webCard.cardColors ?? DEFAULT_COLOR_PALETTE;
 
   let cardBackgroundColor = swapColor(
-    webCard.coverBackgroundColor ?? cardColors.light,
+    webCard.coverBackgroundColor ??
+      (webCard.coverIsPredefined ? cardColors.dark : cardColors.light),
     cardColors,
   );
   let lastModuleBackgroundColor = cardBackgroundColor;
