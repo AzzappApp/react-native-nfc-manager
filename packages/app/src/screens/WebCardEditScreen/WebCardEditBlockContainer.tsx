@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import {
+  Platform,
   StyleSheet,
   View,
   useColorScheme,
@@ -20,7 +21,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { COVER_CARD_RADIUS } from '@azzapp/shared/coverHelpers';
-import { colors, reactNativeShadow } from '#theme';
+import { colors, reactNativeShadow, shadow } from '#theme';
 import { useDidAppear } from '#components/NativeRouter';
 import { useTooltipContext } from '#helpers/TooltipContext';
 import { useScrollViewChildRef } from '#ui/ChildPositionAwareScrollView';
@@ -370,7 +371,12 @@ const WebCardEditBlockContainer = ({
       >
         <GestureDetector gesture={Gesture.Race(tapGesture, panGesture)}>
           <Animated.View
-            style={[moduleContainerStyle, reactNativeShadow(appearance)]}
+            style={[
+              moduleContainerStyle,
+              Platform.OS === 'ios'
+                ? reactNativeShadow(appearance)
+                : shadow(appearance),
+            ]}
           >
             {/** this View is only here because ios bug with shadow and overflow hidden */}
             <Animated.View
