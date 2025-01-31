@@ -161,9 +161,6 @@ const UserPayWallScreen = ({
       const res = await Purchases.purchasePackage(selectedPurchasePackage!);
       // Update Relay cache temporary
       if (res.customerInfo.entitlements.active?.multiuser?.isActive) {
-        if (route.params?.activateFeature === 'MULTI_USER') {
-          setAllowMultiUser(true);
-        }
         commitLocalUpdate(getRelayEnvironment(), store => {
           try {
             const subscriptionId =
@@ -172,13 +169,15 @@ const UserPayWallScreen = ({
 
             const totalsS = data.currentUser?.userSubscription?.totalSeats ?? 0;
 
-            let updateAvailableSeats =
+            const updateAvailableSeats =
               newTotalSeat -
               totalsS +
               (data.currentUser?.userSubscription?.availableSeats ?? 0);
-            if (!data.currentUser?.userSubscription) {
-              //if there is no existing subscription, we need to remove one seat for the current user
-              updateAvailableSeats -= 1;
+            //activate only in there is enough seeats
+            if (updateAvailableSeats > 0) {
+              if (route.params?.activateFeature === 'MULTI_USER') {
+                setAllowMultiUser(true);
+              }
             }
 
             const userSubscriptionCache = store.create(

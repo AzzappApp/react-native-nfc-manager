@@ -42,7 +42,6 @@ const toggleWebCardPublished: MutationResolvers['toggleWebCardPublished'] =
         );
         if (totalSeats - totalUsedSeats < 0) {
           //TODO ? be sure the webcard are unpublished (not sure other process should already do it)
-
           throw new GraphQLError(ERRORS.SUBSCRIPTION_INSUFFICIENT_SEATS);
         }
       }

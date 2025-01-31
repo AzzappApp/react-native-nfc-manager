@@ -1,10 +1,13 @@
 import { GraphQLError } from 'graphql';
 import {
+  activeUserSubscription,
+  getTotalMultiUser,
   removeWebCardNonOwnerProfiles,
   transaction,
   updateWebCard,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
+import { extractSeatsFromIAPSubscriptionId } from '@azzapp/shared/subscriptionHelpers';
 import { invalidateWebCard } from '#externals';
 import {
   activeSubscriptionsForWebCardLoader,
@@ -29,6 +32,24 @@ const updateMultiUser: MutationResolvers['updateMultiUser'] = async (
 
   if (isMultiUser) {
     const owner = await webCardOwnerLoader.load(webCardId);
+    //we first need to heck if this is an IAP subscription and enought seath
+    if (owner?.id) {
+      const userSubscription = await activeUserSubscription([owner?.id]);
+      if (userSubscription.length > 0) {
+        //user can only have ONE usersubscription at a time
+        const subscription = userSubscription[0];
+        if (subscription && subscription.subscriptionId) {
+          const totalUsedSeats = await getTotalMultiUser(owner?.id);
+          const totalSeats = extractSeatsFromIAPSubscriptionId(
+            subscription.subscriptionId,
+          );
+          if (totalSeats - totalUsedSeats < 0) {
+            throw new GraphQLError(ERRORS.SUBSCRIPTION_INSUFFICIENT_SEATS);
+          }
+        }
+      }
+    }
+    //then check if there is a subscription for this webcard
     const subscription = owner
       ? await activeSubscriptionsForWebCardLoader.load({
           userId: owner?.id ?? '',
