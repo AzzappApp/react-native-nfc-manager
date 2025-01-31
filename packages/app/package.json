@@ -130,7 +130,7 @@
     "react-native-device-info": "^14.0.2",
     "react-native-edge-to-edge": "^1.4.3",
     "react-native-email-link": "^1.16.1",
-    "react-native-gesture-handler": "^2.22.1",
+    "react-native-gesture-handler": "patch:react-native-gesture-handler@npm%3A2.22.1#~/.yarn/patches/react-native-gesture-handler-npm-2.22.1-9543b67560.patch",
     "react-native-haptic-feedback": "^2.3.3",
     "react-native-image-size": "^1.1.6",
     "react-native-keyboard-controller": "^1.16.0",

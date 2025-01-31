@@ -6,7 +6,6 @@ import {
   type ForwardedRef,
 } from 'react';
 import {
-  View,
   type LayoutChangeEvent,
   type PressableAndroidRippleConfig,
 } from 'react-native';
@@ -26,7 +25,7 @@ type PressableNativeProps = GenericTouchableProps & {
 };
 
 const PressableNative = (
-  { ripple, onDoublePress, style, children, ...props }: PressableNativeProps,
+  { ripple, onDoublePress, ...props }: PressableNativeProps,
   ref: ForwardedRef<GenericTouchable>,
 ) => {
   const timer = useRef<NodeJS.Timeout | null>(null);
@@ -70,20 +69,7 @@ const PressableNative = (
     };
   });
 
-  return (
-    <Pressable
-      onPress={onPress}
-      style={[
-        style,
-        {
-          borderWidth: 0,
-        },
-      ]}
-      {...pressableProps}
-    >
-      <View style={style}>{children}</View>
-    </Pressable>
-  );
+  return <Pressable onPress={onPress} {...pressableProps} />;
 };
 
 export default forwardRef(PressableNative);

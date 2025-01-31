@@ -79,31 +79,18 @@ const Button = (
         foreground: true,
         color: highlightColor,
       }}
-      style={{
-        borderRadius:
-          variant === 'little_round' || variant === 'little_round_inverted'
-            ? 29
-            : 12,
-      }}
+      style={[variantStyles.root, style, disabled && variantStyles.disabled]}
     >
-      <View
-        style={[variantStyles.root, style, disabled && variantStyles.disabled]}
-      >
-        {loading ? (
-          <ActivityIndicator color={color} />
-        ) : (
-          <View style={variantStyles.labelContainer}>
-            <Text
-              variant="button"
-              style={variantStyles.label}
-              numberOfLines={1}
-            >
-              {label}
-            </Text>
-            {rightElement}
-          </View>
-        )}
-      </View>
+      {loading ? (
+        <ActivityIndicator color={color} />
+      ) : (
+        <View style={variantStyles.labelContainer}>
+          <Text variant="button" style={variantStyles.label} numberOfLines={1}>
+            {label}
+          </Text>
+          {rightElement}
+        </View>
+      )}
     </PressableGestureHandler>
   );
 };

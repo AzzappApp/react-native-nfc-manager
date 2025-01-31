@@ -1,0 +1,16 @@
+diff --git a/android/src/main/java/com/swmansion/gesturehandler/react/RNGestureHandlerButtonViewManager.kt b/android/src/main/java/com/swmansion/gesturehandler/react/RNGestureHandlerButtonViewManager.kt
+index 678eb700ef8e70f0356c1a2504327f2766baf9e1..ea6b8c44feb037a63484c51c011d0cb196603e64 100644
+--- a/android/src/main/java/com/swmansion/gesturehandler/react/RNGestureHandlerButtonViewManager.kt
++++ b/android/src/main/java/com/swmansion/gesturehandler/react/RNGestureHandlerButtonViewManager.kt
+@@ -110,6 +110,11 @@ class RNGestureHandlerButtonViewManager : ViewGroupManager<ButtonViewGroup>(), R
+     view.rippleColor = rippleColor
+   }
+ 
++  @ReactProp(name = "backgroundColor")
++  override fun setBackgroundColor(view: ButtonViewGroup, backgroundColor: Int) {
++    view.setBackgroundColor(backgroundColor)
++  }
++
+   @ReactProp(name = "rippleRadius")
+   override fun setRippleRadius(view: ButtonViewGroup, rippleRadius: Int) {
+     view.rippleRadius = rippleRadius
