@@ -13,7 +13,7 @@ import {
   convertToBaseCanvasRatio,
 } from '@azzapp/shared/coverHelpers';
 
-import { colors, fontFamilies, shadow } from '#theme';
+import { colors, fontFamilies, reactNativeShadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import PressableNative from '#ui/PressableNative';
 import { DynamicLinkRenderer } from './CoverEditor/CoverPreview/DynamicLinkRenderer';
@@ -393,7 +393,7 @@ const stylesheet = createStyleSheet(theme => ({
     borderCurve: 'continuous',
   },
   shadow: {
-    ...shadow(theme, 'bottom'),
+    ...reactNativeShadow(theme, 'bottom'),
   },
   layer: {
     position: 'absolute',

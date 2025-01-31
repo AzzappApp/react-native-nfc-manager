@@ -10,7 +10,7 @@ import {
   interpolate,
   useAnimatedStyle,
 } from 'react-native-reanimated';
-import { colors, popoverShadow } from '#theme';
+import { colors, reactNativeShadow } from '#theme';
 import Toast from '#components/Toast';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -261,7 +261,7 @@ const styleSheet = createStyleSheet(appearance => ({
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     borderWidth: 0,
-    ...popoverShadow(appearance, 'top'),
+    ...reactNativeShadow(appearance, 'top'),
   },
 }));
 

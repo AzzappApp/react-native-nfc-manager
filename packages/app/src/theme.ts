@@ -105,7 +105,7 @@ export const shadow = (
     ],
   };
 
-export const popoverShadow = (
+export const reactNativeShadow = (
   appearence: 'dark' | 'light',
   direction: 'bottom' | 'center' | 'top' = 'bottom',
 ) =>
