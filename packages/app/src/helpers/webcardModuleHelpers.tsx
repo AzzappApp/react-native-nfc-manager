@@ -138,15 +138,11 @@ export const MODULE_VARIANT_SECTION = [
   {
     section: 'custom',
     moduleKind: [
-      'photoWithTextAndTitle',
       'socialLinks',
-      'carousel',
       'simpleButton',
-      'horizontalPhoto',
       'lineDivider',
       'simpleTitle',
       'simpleText',
-      'blockText',
     ],
   },
 ] as const;
