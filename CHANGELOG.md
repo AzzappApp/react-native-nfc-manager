@@ -1,5 +1,7 @@
-## 1.7.0-canary.105
+## 1.7.0-canary.106
 
+* **fix:**  - do not activate multiUser if not enough seats while trucking iap using the same subscription) ([#7212](https://github.com/AzzappApp/azzapp/pull/7212))
+* **fix:**  - do not block unpublish even is not enought seats ([#7210](https://github.com/AzzappApp/azzapp/pull/7210))
 * **feat:**  - disable some previous module from ([#7208](https://github.com/AzzappApp/azzapp/pull/7208))
 * **fix:**  - simple_carousel, fix swipe row on mobile and some snappoint computation issue ([#7203](https://github.com/AzzappApp/azzapp/pull/7203))
 * **perf:**  - replace shadow to popoverShadow ([#7204](https://github.com/AzzappApp/azzapp/pull/7204))
