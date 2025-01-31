@@ -1,5 +1,6 @@
-## 1.7.0-canary.104
+## 1.7.0-canary.105
 
+* **feat:**  - disable some previous module from ([#7208](https://github.com/AzzappApp/azzapp/pull/7208))
 * **fix:**  - simple_carousel, fix swipe row on mobile and some snappoint computation issue ([#7203](https://github.com/AzzappApp/azzapp/pull/7203))
 * **perf:**  - replace shadow to popoverShadow ([#7204](https://github.com/AzzappApp/azzapp/pull/7204))
 * **fix:**  - ensure home tooltips are closed when pressed ([#7197](https://github.com/AzzappApp/azzapp/pull/7197))
