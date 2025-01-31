@@ -32,7 +32,7 @@ const toggleWebCardPublished: MutationResolvers['toggleWebCardPublished'] =
 
     //checking if there is enough seats for the user
     const userSubscription = await activeUserSubscription([userId]);
-    if (userSubscription.length > 0) {
+    if (!published && userSubscription.length > 0) {
       //user can only have ONE usersubscription at a time
       const subscription = userSubscription[0];
       if (subscription && subscription.subscriptionId) {
