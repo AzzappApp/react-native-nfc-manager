@@ -1,5 +1,7 @@
-## 1.7.0-canary.107
+## 1.7.0-canary.108
 
+* **fix:**  - remove circular dependency ([#7221](https://github.com/AzzappApp/azzapp/pull/7221))
+* **fix:**  - **modules:** [#7168](https://github.com/AzzappApp/azzapp/pull/7168) avoid blinking on loading ([#7226](https://github.com/AzzappApp/azzapp/pull/7226))
 * **fix:**  - default relay screen fallback
 * **fix:**  - **Links:** remove shadow from sortable items ([#7216](https://github.com/AzzappApp/azzapp/pull/7216))
 * **fix:**  - **android:** properly fix background color issue on gesture-handler … ([#7214](https://github.com/AzzappApp/azzapp/pull/7214))
