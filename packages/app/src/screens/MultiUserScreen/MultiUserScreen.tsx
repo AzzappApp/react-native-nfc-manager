@@ -21,9 +21,8 @@ import {
 import PremiumIndicator from '#components/PremiumIndicator';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { profileInfoHasAdminRight } from '#helpers/profileRoleHelper';
-import relayScreen, { RelayScreenErrorBoundary } from '#helpers/relayScreen';
+import relayScreen from '#helpers/relayScreen';
 import useBoolean from '#hooks/useBoolean';
-import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import { useMultiUserUpdate } from '#hooks/useMultiUserUpdate';
 import useToggle from '#hooks/useToggle';
 import Button from '#ui/Button';
@@ -526,36 +525,14 @@ const styleSheet = createStyleSheet(appearance => ({
   },
 }));
 
-export default relayScreen(
-  (props: RelayScreenProps<MultiUserRoute, MultiUserScreenQuery>) => {
-    const intl = useIntl();
-
-    const handleProfileActionError = useHandleProfileActionError(
-      intl.formatMessage({
-        defaultMessage: 'An error occured',
-        description:
-          'Error toast message when loading MultiUserScreen fails for unknown reason.',
-      }) as string,
-    );
-
-    return (
-      <RelayScreenErrorBoundary
-        onError={handleProfileActionError}
-        fallback={null}
-      >
-        <MultiUserScreen {...props} />
-      </RelayScreenErrorBoundary>
-    );
-  },
-  {
-    query: multiUserScreenQuery,
-    getVariables: (_, profileInfos) => ({
-      profileId: profileInfos?.profileId ?? '',
-    }),
-    fetchPolicy: 'store-and-network',
-    pollInterval: 30000,
-  },
-);
+export default relayScreen(MultiUserScreen, {
+  query: multiUserScreenQuery,
+  getVariables: (_, profileInfos) => ({
+    profileId: profileInfos?.profileId ?? '',
+  }),
+  fetchPolicy: 'store-and-network',
+  pollInterval: 30000,
+});
 
 type MultiUserTransferOwnerContextProps = {
   selectedProfileId: string | undefined;
