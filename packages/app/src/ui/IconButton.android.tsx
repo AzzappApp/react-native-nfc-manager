@@ -1,4 +1,9 @@
-import { type StyleProp, type ImageStyle, type ViewProps } from 'react-native';
+import {
+  type StyleProp,
+  type ImageStyle,
+  type ViewProps,
+  View,
+} from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import {
   createVariantsStyleSheet,
@@ -60,23 +65,24 @@ const IconButton = ({
   const styles = useVariantStyleSheet(computedStyle, variant);
   const variantSize = size ? size : variant === 'border' ? 50 : iconSize;
   return (
-    <TouchableOpacity
-      {...props}
-      accessibilityRole="button"
-      onPress={onPress}
-      style={[
-        {
-          minWidth: variantSize,
-          height: variantSize,
-          borderRadius: variantSize / 2,
-        },
-        styles.button,
-        style,
-      ]}
-      {...props}
-    >
-      <Icon icon={icon} size={iconSize} style={iconStyle} />
-    </TouchableOpacity>
+    <View style={style}>
+      <TouchableOpacity
+        {...props}
+        accessibilityRole="button"
+        onPress={onPress}
+        style={[
+          {
+            minWidth: variantSize,
+            height: variantSize,
+            borderRadius: variantSize / 2,
+          },
+          styles.button,
+        ]}
+        {...props}
+      >
+        <Icon icon={icon} size={iconSize} style={iconStyle} />
+      </TouchableOpacity>
+    </View>
   );
 };
 
