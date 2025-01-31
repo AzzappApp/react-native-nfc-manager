@@ -1,5 +1,6 @@
-## 1.7.0-canary.110
+## 1.7.0-canary.111
 
+* **fix:**  - improve sliding in simple_carousel & block Y sliding during X sliding ([#7219](https://github.com/AzzappApp/azzapp/pull/7219))
 * **fix:**  - cross on mediapick not correctly displayed ([#7228](https://github.com/AzzappApp/azzapp/pull/7228))
 * **fix:**  - **android:** wrong shadow ([#7227](https://github.com/AzzappApp/azzapp/pull/7227))
 * **fix:**  - remove circular dependency ([#7221](https://github.com/AzzappApp/azzapp/pull/7221))
