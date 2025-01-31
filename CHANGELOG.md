@@ -1,5 +1,10 @@
-## 1.7.0-canary.106
+## 1.7.0-canary.107
 
+* **fix:**  - default relay screen fallback
+* **fix:**  - **Links:** remove shadow from sortable items ([#7216](https://github.com/AzzappApp/azzapp/pull/7216))
+* **fix:**  - **android:** properly fix background color issue on gesture-handler … ([#7214](https://github.com/AzzappApp/azzapp/pull/7214))
+* **fix:**  - **modules:** [#7198](https://github.com/AzzappApp/azzapp/pull/7198) avoid layout shift on new carousel ([#7213](https://github.com/AzzappApp/azzapp/pull/7213))
+* **feat:**  - add es, en and it locales ([#7215](https://github.com/AzzappApp/azzapp/pull/7215))
 * **fix:**  - do not activate multiUser if not enough seats while trucking iap using the same subscription) ([#7212](https://github.com/AzzappApp/azzapp/pull/7212))
 * **fix:**  - do not block unpublish even is not enought seats ([#7210](https://github.com/AzzappApp/azzapp/pull/7210))
 * **feat:**  - disable some previous module from ([#7208](https://github.com/AzzappApp/azzapp/pull/7208))
