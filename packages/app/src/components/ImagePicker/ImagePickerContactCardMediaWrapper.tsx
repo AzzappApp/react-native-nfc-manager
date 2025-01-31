@@ -19,7 +19,7 @@ const ImagePickerContactCardMediaWrapper = ({
 
   return (
     <View style={styles.container} onLayout={onLayout}>
-      <View style={[styles.shadowBox, { height }]}>
+      <View style={[styles.shadowBox, { height, borderRadius: height / 2 }]}>
         <View style={[styles.radiusBox, { borderRadius: height / 2 }]}>
           {children}
         </View>

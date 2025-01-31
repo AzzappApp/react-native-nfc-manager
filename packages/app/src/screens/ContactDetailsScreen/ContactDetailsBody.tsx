@@ -360,6 +360,7 @@ const stylesheet = createStyleSheet(theme => ({
     gap: 5,
   },
   avatarContainer: Platform.OS === 'ios' && {
+    borderRadius: AVATAR_WIDTH / 2,
     ...shadow(theme, 'bottom'),
   },
   avatarWrapper: {
