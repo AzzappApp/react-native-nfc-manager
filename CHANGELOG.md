@@ -1,5 +1,6 @@
-## 1.7.0-canary.108
+## 1.7.0-canary.109
 
+* **fix:**  - **android:** wrong shadow ([#7227](https://github.com/AzzappApp/azzapp/pull/7227))
 * **fix:**  - remove circular dependency ([#7221](https://github.com/AzzappApp/azzapp/pull/7221))
 * **fix:**  - **modules:** [#7168](https://github.com/AzzappApp/azzapp/pull/7168) avoid blinking on loading ([#7226](https://github.com/AzzappApp/azzapp/pull/7226))
 * **fix:**  - default relay screen fallback
