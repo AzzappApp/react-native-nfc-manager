@@ -1,4 +1,4 @@
-## 1.7.0-canary.111
+## 1.7.0-canary.112
 
 * **fix:**  - improve sliding in simple_carousel & block Y sliding during X sliding ([#7219](https://github.com/AzzappApp/azzapp/pull/7219))
 * **fix:**  - cross on mediapick not correctly displayed ([#7228](https://github.com/AzzappApp/azzapp/pull/7228))
