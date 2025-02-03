@@ -10,7 +10,7 @@ const wrapper = style({
 
 const modules = style({
   transitionTimingFunction: 'ease-out',
-  height: '100vh',
+  minHeight: '100vh',
   width: '100%',
   '@media': {
     [MediaQuery.Desktop]: {
