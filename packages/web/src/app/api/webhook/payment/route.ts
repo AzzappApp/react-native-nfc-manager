@@ -1,5 +1,5 @@
 import * as z from 'zod';
-import { getUserProfilesWithWebCard, getWebCardById } from '@azzapp/data';
+import { getUserProfilesWithWebCard } from '@azzapp/data';
 import {
   acknowledgeFirstPayment,
   checkSignature,
