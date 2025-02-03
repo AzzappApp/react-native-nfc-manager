@@ -79,8 +79,8 @@ const AlternationContainer = ({
       modulePosition === undefined && index === 0
         ? 0
         : index % 2 === 0
-          ? -150
-          : 150,
+          ? 150
+          : -150,
     ),
   ).current;
   const opacity = useRef(
@@ -140,7 +140,7 @@ const AlternationContainer = ({
       } else if (!hideAnimation.current && !isRunning.current) {
         hideAnimation.current = Animated.parallel([
           Animated.timing(translateX, {
-            toValue: index % 2 === 0 ? -150 : 150,
+            toValue: index % 2 === 0 ? 150 : -150,
             duration: ANIMATION_DURATION,
             useNativeDriver: true,
           }),
