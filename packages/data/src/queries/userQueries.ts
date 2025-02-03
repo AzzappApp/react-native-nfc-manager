@@ -15,13 +15,7 @@ import {
   ne,
 } from 'drizzle-orm';
 import { db, transaction } from '../database';
-import {
-  UserTable,
-  ProfileTable,
-  PostTable,
-  UserSubscriptionTable,
-  WebCardTable,
-} from '../schema';
+import { UserTable, ProfileTable, PostTable, WebCardTable } from '../schema';
 import { getProfilesByUser } from './profileQueries';
 import type { Profile, User } from '../schema';
 import type { InferInsertModel, SQLWrapper } from 'drizzle-orm';
@@ -181,12 +175,9 @@ export const markUserAsDeleted = async (
       );
 
     const ownerProfiles: Profile[] = [];
-    const nonOwnerProfiles: Profile[] = [];
     userProfiles.forEach(profile => {
       if (profile.profileRole === 'owner') {
         ownerProfiles.push(profile);
-      } else {
-        nonOwnerProfiles.push(profile);
       }
     }, []);
 
@@ -243,24 +234,6 @@ export const markUserAsDeleted = async (
           inArray(
             WebCardTable.id,
             sql`(select followerId from Follow where followingId in ${ownedWebCardIds})`,
-          ),
-        );
-    }
-
-    if (nonOwnerProfiles.length) {
-      await db()
-        .update(UserSubscriptionTable)
-        .set({
-          totalSeats: sql`GREATEST(totalSeats - 1, 0)`,
-        })
-        .where(
-          and(
-            eq(UserSubscriptionTable.subscriptionPlan, 'web.monthly'),
-            eq(UserSubscriptionTable.status, 'active'),
-            inArray(
-              UserSubscriptionTable.webCardId,
-              nonOwnerProfiles.map(p => p.webCardId),
-            ),
           ),
         );
     }

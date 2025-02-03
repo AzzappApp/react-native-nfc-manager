@@ -46,7 +46,6 @@ const sendInvitations: MutationResolvers['sendInvitations'] = async (
   if (countDeletedProfiles > 0) {
     await validateCurrentSubscription(
       getSessionInfos().userId!,
-      webCardId,
       countDeletedProfiles,
     );
   }

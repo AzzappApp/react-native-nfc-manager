@@ -6,7 +6,7 @@ import {
   getUserSubscriptions,
   getWebCardByUserId,
   transaction,
-  updateActiveUserSubscription,
+  updateActiveInAppUserSubscription,
 } from '@azzapp/data';
 import { revalidateWebcardsAndPosts } from '#helpers/api';
 import cors from '#helpers/cors';
@@ -41,9 +41,7 @@ const subscriptionWebHook = async (req: Request) => {
     switch (type) {
       case 'INITIAL_PURCHASE': {
         await transaction(async () => {
-          const sub = (await getUserSubscriptions(userId)).filter(
-            s => s.issuer !== 'web',
-          );
+          const sub = await getUserSubscriptions(userId, ['apple', 'google']);
           if (sub.length === 0) {
             await createSubscription({
               userId,
@@ -62,7 +60,7 @@ const subscriptionWebHook = async (req: Request) => {
               status: 'active',
             });
           } else {
-            await updateActiveUserSubscription(userId, {
+            await updateActiveInAppUserSubscription(userId, {
               subscriptionId,
               startAt: new Date(purchased_at_ms),
               endAt: new Date(expiration_at_ms),
@@ -86,9 +84,7 @@ const subscriptionWebHook = async (req: Request) => {
         break;
       case 'EXPIRATION':
         await transaction(async () => {
-          const sub = (await getUserSubscriptions(userId)).filter(
-            s => s.issuer !== 'web',
-          );
+          const sub = await getUserSubscriptions(userId, ['apple', 'google']);
 
           if (sub.length === 0) {
             await createSubscription({
@@ -109,7 +105,7 @@ const subscriptionWebHook = async (req: Request) => {
               invalidatedAt: new Date(),
             });
           } else {
-            await updateActiveUserSubscription(userId, {
+            await updateActiveInAppUserSubscription(userId, {
               subscriptionId,
               endAt: new Date(expiration_at_ms),
               revenueCatId: rcId,
@@ -125,9 +121,7 @@ const subscriptionWebHook = async (req: Request) => {
       case 'SUBSCRIPTION_EXTENDED':
       case 'UNCANCELLATION':
         await transaction(async () => {
-          const sub = (await getUserSubscriptions(userId)).filter(
-            s => s.issuer !== 'web',
-          );
+          const sub = await getUserSubscriptions(userId, ['apple', 'google']);
           if (sub.length === 0) {
             await createSubscription({
               userId,
@@ -146,7 +140,7 @@ const subscriptionWebHook = async (req: Request) => {
               status: 'active',
             });
           } else {
-            await updateActiveUserSubscription(userId, {
+            await updateActiveInAppUserSubscription(userId, {
               subscriptionId,
               startAt: new Date(purchased_at_ms),
               endAt: new Date(expiration_at_ms),
@@ -166,9 +160,7 @@ const subscriptionWebHook = async (req: Request) => {
       case 'RENEWAL':
         await transaction(async () => {
           const totalSeats = extractSeatsFromSubscriptionId(subscriptionId);
-          const sub = (await getUserSubscriptions(userId)).filter(
-            s => s.issuer !== 'web',
-          );
+          const sub = await getUserSubscriptions(userId, ['apple', 'google']);
           if (sub.length === 0) {
             await createSubscription({
               userId,
@@ -187,7 +179,7 @@ const subscriptionWebHook = async (req: Request) => {
               status: 'active',
             });
           } else {
-            await updateActiveUserSubscription(userId, {
+            await updateActiveInAppUserSubscription(userId, {
               startAt: new Date(purchased_at_ms),
               endAt: new Date(expiration_at_ms),
               revenueCatId: rcId,
@@ -220,9 +212,7 @@ const subscriptionWebHook = async (req: Request) => {
           new Date(grace_period_expiration_at_ms) > new Date()
         ) {
           await transaction(async () => {
-            const sub = (await getUserSubscriptions(userId)).filter(
-              s => s.issuer !== 'web',
-            );
+            const sub = await getUserSubscriptions(userId, ['apple', 'google']);
             if (sub.length === 0) {
               await createSubscription({
                 userId,
@@ -240,7 +230,7 @@ const subscriptionWebHook = async (req: Request) => {
                 status: 'canceled',
               });
             } else {
-              await updateActiveUserSubscription(userId, {
+              await updateActiveInAppUserSubscription(userId, {
                 endAt: new Date(grace_period_expiration_at_ms),
                 revenueCatId: rcId,
                 subscriptionId,

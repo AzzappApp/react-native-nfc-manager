@@ -10,7 +10,7 @@ import {
   getProfileByUserAndWebCard,
   isFollowing,
   getContactsByUser,
-  getUserSubscriptionForUserOrWebCard,
+  getActiveUserSubscriptions,
 } from '@azzapp/data';
 import {
   createDataLoader,
@@ -273,29 +273,18 @@ export const activeSubscriptionsLoader = createSessionDataLoader(
   },
 );
 
-export const activeSubscriptionsForWebCardLoader = createSessionDataLoader(
-  'ActiveSubscriptionsForWebCardLoader',
+export const activeSubscriptionsForUserLoader = createSessionDataLoader(
+  'ActiveSubscriptionsForUserLoader',
 
-  async (keys: ReadonlyArray<{ userId: string; webCardId: string }>) => {
+  async (keys: readonly string[]) => {
     if (keys.length === 0) {
       return [];
     }
-    const webCardIds = keys.map(k => k.webCardId);
-    const userIds = keys.map(k => k.userId);
 
-    const userSubscriptions = await getUserSubscriptionForUserOrWebCard(
-      userIds,
-      webCardIds,
+    const userSubscriptions = await getActiveUserSubscriptions(
+      keys as string[],
     );
 
-    return keys.map(
-      k =>
-        userSubscriptions.find(
-          u =>
-            (k.webCardId && u.webCardId === k.webCardId) ||
-            u.userId === k.userId,
-        ) ?? null,
-    );
+    return keys.map(k => userSubscriptions.find(u => u.userId === k) ?? null);
   },
-  { cacheKeyFn: ({ userId, webCardId }) => `${userId}-${webCardId}` },
 );

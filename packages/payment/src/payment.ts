@@ -2,13 +2,11 @@ import dayjs from 'dayjs';
 import {
   createPaymentMean,
   createSubscription,
-  getPaymentById,
   getSubscriptionById,
-  getUserSubscriptionForWebCard,
   transaction,
   updatePayment,
   createId,
-  getPaymentMeanById,
+  getUserWebSubscription,
 } from '@azzapp/data';
 import { login } from '#authent';
 import client from './client';
@@ -22,6 +20,7 @@ import {
   type SubscriptionPlan,
 } from './helpers';
 import type { Customer } from '#types';
+import type { Payment, PaymentMean } from '@azzapp/data';
 
 const IDENTIFIER = 'POOL_AZZAP';
 
@@ -74,7 +73,6 @@ export const getPaymentRequest = async (ulid: string) => {
 export const createPaymentRequest = async ({
   totalSeats,
   userId,
-  webCardId,
   locale,
   plan,
   customer,
@@ -83,7 +81,6 @@ export const createPaymentRequest = async ({
 }: {
   totalSeats: number;
   userId: string;
-  webCardId: string;
   locale: string;
   plan: 'monthly' | 'yearly';
   redirectUrlSuccess: string;
@@ -125,7 +122,7 @@ export const createPaymentRequest = async ({
     HIDECLIENTEMAIL: 'no',
     OPERATIONTYPE: 'payment',
     EXTRADATA: JSON.stringify({
-      webCardId,
+      userId,
     }),
     CALLBACKURL: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/webhook/payment`,
     REDIRECTURLSUCCESS: redirectUrlSuccess,
@@ -175,12 +172,11 @@ export const createPaymentRequest = async ({
   await transaction(async () => {
     await createPaymentMean({
       userId,
-      webCardId,
       id: ulid,
       maskedCard: '',
     });
 
-    const subscription = await getUserSubscriptionForWebCard(userId, webCardId);
+    const subscription = await getUserWebSubscription(userId);
 
     if (subscription && subscription.status === 'active') {
       throw new Error('Subscription already active');
@@ -191,7 +187,6 @@ export const createPaymentRequest = async ({
       id: subscriptionId,
       subscriptionId,
       userId,
-      webCardId,
       issuer: 'web',
       totalSeats,
       subscriberName: customer.name,
@@ -222,24 +217,21 @@ export const createPaymentRequest = async ({
 };
 
 export const createSubscriptionRequest = async ({
-  paymentMeanId,
+  paymentMean,
   totalSeats,
   userId,
-  webCardId,
   plan,
   customer,
 }: {
-  paymentMeanId: string;
+  paymentMean: PaymentMean;
   totalSeats: number;
   userId: string;
-  webCardId: string;
   plan: 'monthly' | 'yearly';
   customer: Customer;
 }) => {
   const subscriptionPlan: SubscriptionPlan = `web.${plan}`;
 
   const amount = calculateAmount(totalSeats, subscriptionPlan);
-
   const { amount: taxes } = await calculateTaxes(
     amount,
     customer.countryCode,
@@ -257,12 +249,6 @@ export const createSubscriptionRequest = async ({
 
   const subscriptionId = createId();
 
-  const paymentMean = await getPaymentMeanById(paymentMeanId);
-
-  if (paymentMean?.webCardId !== webCardId || paymentMean?.userId !== userId) {
-    throw new Error('Payment mean does not match the web card or the user');
-  }
-
   const rebillManager = await client.POST(
     '/api/client-payment-requests/create-rebill-manager',
     {
@@ -277,7 +263,7 @@ export const createSubscriptionRequest = async ({
         rebill_manager_rebill_price_cnts: `${amount}`,
         rebill_manager_rebill_duration_mins: `0`,
         rebill_manager_rebill_period_mins: `${intervalInMinutes}`,
-        clientPaymentRequestUlid: paymentMeanId,
+        clientPaymentRequestUlid: paymentMean.id,
         rebill_manager_fail_rule: generateRebillFailRule(),
         rebill_manager_external_reference: subscriptionId,
         rebill_manager_callback_url: `${process.env.NEXT_PUBLIC_URL}api/webhook/subscription`,
@@ -298,7 +284,6 @@ export const createSubscriptionRequest = async ({
   }
   const subscription = {
     userId,
-    webCardId,
     issuer: 'web' as const,
     totalSeats,
     subscriberName: customer.name,
@@ -313,7 +298,7 @@ export const createSubscriptionRequest = async ({
     startAt: date,
     subscriptionId,
     subscriptionPlan,
-    paymentMeanId,
+    paymentMeanId: paymentMean.id,
     endAt: nextPaymentDate,
     amount,
     taxes,
@@ -333,14 +318,12 @@ export const createSubscriptionRequest = async ({
 
 export const createNewPaymentMean = async ({
   userId,
-  webCardId,
   customer,
   locale,
   redirectUrlSuccess,
   redirectUrlCancel,
 }: {
   userId: string;
-  webCardId: string;
   locale: string;
   customer: Customer;
   redirectUrlSuccess: string;
@@ -362,14 +345,14 @@ export const createNewPaymentMean = async ({
     IDENTIFIER,
     ORDERID,
     VERSION: '3.0',
-    DESCRIPTION: `New payment request for webCard ${webCardId}`,
+    DESCRIPTION: `New payment request for user ${userId}`,
     CLIENTIDENT: userId,
     CLIENTEMAIL: customer.email,
     CARDFULLNAME: customer.name,
     HIDECLIENTEMAIL: 'no',
     OPERATIONTYPE: 'payment',
     EXTRADATA: JSON.stringify({
-      webCardId,
+      userId,
     }),
     REDIRECTURLSUCCESS: redirectUrlSuccess,
     REDIRECTURLCANCEL: redirectUrlCancel,
@@ -414,7 +397,6 @@ export const createNewPaymentMean = async ({
 
   await createPaymentMean({
     userId,
-    webCardId,
     id: result.data.ulid,
     maskedCard: '',
   });
@@ -422,18 +404,8 @@ export const createNewPaymentMean = async ({
   return result.data.clientRedirectUrl;
 };
 
-export const generateInvoice = async (webCardId: string, paymentId: string) => {
+export const generateInvoice = async (payment: Payment) => {
   const token = await login();
-
-  const payment = await getPaymentById(paymentId);
-
-  if (!payment) {
-    throw new Error('Payment not found');
-  }
-
-  if (payment.webCardId !== webCardId) {
-    throw new Error('Payment does not match the webCard');
-  }
 
   const subscription = await getSubscriptionById(payment.subscriptionId);
 
@@ -521,7 +493,7 @@ export const generateInvoice = async (webCardId: string, paymentId: string) => {
     throw new Error('Invoice generation failed', { cause: result.error });
   }
 
-  await updatePayment(paymentId, {
+  await updatePayment(payment.id, {
     invoiceId: result.data.invoiceId,
     invoicePdfUrl: result.data.invoicePdfPath,
   });

@@ -100,17 +100,6 @@ export const Subscription = ({
           <>
             <TextField
               sx={{ width: 250 }}
-              value={userSubscription.webCardId}
-              label="Webcard"
-              slotProps={{
-                htmlInput: {
-                  readOnly: true,
-                },
-              }}
-              disabled
-            />
-            <TextField
-              sx={{ width: 250 }}
               value={`${(((userSubscription.amount || 0) + (userSubscription.taxes || 0)) / 100).toFixed(2)}€ (${userSubscription.totalSeats} users)`}
               label="Billed for (+taxes)"
               slotProps={{

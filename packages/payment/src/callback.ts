@@ -1,6 +1,5 @@
 import {
   createPayment,
-  updateWebCard,
   getSubscriptionByPaymentMeanId,
   transaction,
   updatePaymentMean,
@@ -35,22 +34,17 @@ export const acknowledgeFirstPayment = async (
 
     if (payment.length === 0) {
       // If the subscription is found, we have to update the subscription and the payment mean to start billing
-      const webCardId = subscription.webCardId;
+      const userId = subscription.userId;
       const amount = subscription.amount;
       const taxes = subscription.taxes;
       let maskedCard = '';
 
-      if (
-        webCardId &&
-        subscription.subscriptionPlan &&
-        amount !== null &&
-        taxes !== null
-      ) {
+      if (subscription.subscriptionPlan && amount !== null && taxes !== null) {
         await createPayment({
           status: 'paid',
           transactionId,
           subscriptionId: subscription.id,
-          webCardId,
+          userId,
           amount,
           taxes,
           paymentMeanId,
@@ -123,8 +117,6 @@ export const acknowledgeFirstPayment = async (
           });
 
           await updateSubscriptionByPaymentMeanId(paymentMeanId, updates);
-
-          await updateWebCard(webCardId, { isMultiUser: true });
         });
 
         if (!rebillManager.data) {
@@ -168,17 +160,17 @@ export const rejectFirstPayment = async (
   const subscription = await getSubscriptionByPaymentMeanId(paymentMeanId);
 
   if (subscription) {
-    const webCardId = subscription.webCardId;
+    const userId = subscription.userId;
     const amount = subscription.amount;
     const taxes = subscription.taxes;
 
-    if (webCardId && subscription.subscriptionPlan && amount && taxes) {
+    if (subscription.subscriptionPlan && amount && taxes) {
       const errorDate = new Date();
       await transaction(async () => {
         await createPayment({
           status: 'failed',
           subscriptionId: subscription.id,
-          webCardId,
+          userId,
           amount,
           taxes,
           paymentMeanId,
@@ -224,7 +216,7 @@ export const acknowledgeRecurringPayment = async (
     );
 
     if (payment.length === 0) {
-      const webCardId = subscription.webCardId;
+      const userId = subscription.userId;
       let paymentAmount = subscription.amount ?? 0;
       let paymentTaxes = subscription.taxes ?? 0;
 
@@ -235,7 +227,7 @@ export const acknowledgeRecurringPayment = async (
         paymentAmount = amount - paymentTaxes;
       }
 
-      if (webCardId && subscription.subscriptionPlan) {
+      if (subscription.subscriptionPlan) {
         const endAt = getNextPaymentDate(subscription.subscriptionPlan);
 
         const updates: Partial<UserSubscription> = {
@@ -247,7 +239,7 @@ export const acknowledgeRecurringPayment = async (
           await createPayment({
             status: 'paid',
             subscriptionId: subscription.id,
-            webCardId,
+            userId,
             amount: paymentAmount,
             taxes: paymentTaxes,
             paymentMeanId: subscription.paymentMeanId ?? '',
@@ -273,16 +265,16 @@ export const rejectRecurringPayment = async (
   const subscription = await getSubscriptionById(subscriptionId);
 
   if (subscription) {
-    const webCardId = subscription.webCardId;
+    const userId = subscription.userId;
     const amount = subscription.amount;
     const taxes = subscription.taxes;
 
     await transaction(async () => {
-      if (webCardId && subscription.subscriptionPlan && amount && taxes) {
+      if (subscription.subscriptionPlan && amount && taxes) {
         await createPayment({
           status: 'failed',
           subscriptionId: subscription.id,
-          webCardId,
+          userId,
           amount,
           taxes,
           paymentMeanId: subscription.paymentMeanId ?? '',

@@ -32,8 +32,7 @@ export const createSubscription = (
     .$returningId()
     .then(res => res[0].id);
 
-// TODO i don't understand this function, why isNull(UserSubscriptionTable.webCardId) is used?
-export const updateActiveUserSubscription = async (
+export const updateActiveInAppUserSubscription = async (
   userId: string,
   subscription: Partial<UserSubscription>,
 ) => {
@@ -43,7 +42,10 @@ export const updateActiveUserSubscription = async (
     .where(
       and(
         eq(UserSubscriptionTable.userId, userId),
-        isNull(UserSubscriptionTable.webCardId),
+        or(
+          eq(UserSubscriptionTable.issuer, 'apple'),
+          eq(UserSubscriptionTable.issuer, 'google'),
+        ),
       ),
     );
 };
@@ -121,87 +123,26 @@ export const activeUserSubscription = async (
   return subscriptions;
 };
 
-// TODO document this function properly
-export const getActiveUserSubscriptionForWebCard = async (
-  userId: string,
-  webCardId: string,
-) => {
-  const currentDate = new Date();
-  return db()
-    .select()
-    .from(UserSubscriptionTable)
-    .where(
-      and(
-        or(
-          and(
-            eq(UserSubscriptionTable.userId, userId),
-            isNull(UserSubscriptionTable.webCardId),
-          ),
-          eq(UserSubscriptionTable.webCardId, webCardId),
-        ),
-        or(
-          eq(UserSubscriptionTable.status, 'active'),
-          gte(UserSubscriptionTable.endAt, currentDate),
-        ),
-      ),
-    )
-    .orderBy(
-      asc(UserSubscriptionTable.status),
-      desc(UserSubscriptionTable.webCardId),
-    );
-};
-
-export const getUserSubscriptionForUserOrWebCard = async (
-  userIds: string[],
-  webCardIds: string[],
-) => {
-  const currentDate = new Date();
-  return db()
-    .select()
-    .from(UserSubscriptionTable)
-    .where(
-      and(
-        webCardIds.length
-          ? or(
-              and(inArray(UserSubscriptionTable.userId, [...new Set(userIds)])),
-              inArray(UserSubscriptionTable.webCardId, webCardIds),
-            )
-          : and(inArray(UserSubscriptionTable.userId, userIds)),
-        or(
-          eq(UserSubscriptionTable.status, 'active'),
-          gte(UserSubscriptionTable.endAt, currentDate),
-        ),
-      ),
-    )
-    .orderBy(
-      asc(UserSubscriptionTable.status),
-      desc(UserSubscriptionTable.webCardId),
-    );
-};
-
 /**
- * Retrieve the active user subscription for a given web card id
  *
- * @param webCardId - The web card id
- * @returns The active subscription if any
+ * @param userIds contains the user ids
+ * @returns the active subscriptions for the user
  */
-export const getActiveWebCardSubscription = async (
-  webCardId: string,
-): Promise<UserSubscription> => {
+export const getActiveUserSubscriptions = async (userIds: string[]) => {
   const currentDate = new Date();
   return db()
     .select()
     .from(UserSubscriptionTable)
     .where(
       and(
-        eq(UserSubscriptionTable.webCardId, webCardId),
+        inArray(UserSubscriptionTable.userId, [...new Set(userIds)]),
         or(
           eq(UserSubscriptionTable.status, 'active'),
           gte(UserSubscriptionTable.endAt, currentDate),
         ),
       ),
     )
-    .then(res => res[0]);
+    .orderBy(asc(UserSubscriptionTable.status));
 };
 
 /**
@@ -241,9 +182,8 @@ export const getSubscriptionByPaymentMeanId = async (
  * @param webCardId - The web card id
  * @returns The user subscription if any
  */
-export const getUserSubscriptionForWebCard = async (
+export const getUserWebSubscription = async (
   userId: string,
-  webCardId: string,
 ): Promise<UserSubscription | null> => {
   return db()
     .select()
@@ -251,8 +191,8 @@ export const getUserSubscriptionForWebCard = async (
     .where(
       and(
         eq(UserSubscriptionTable.userId, userId),
-        eq(UserSubscriptionTable.webCardId, webCardId),
         ne(UserSubscriptionTable.status, 'canceled'),
+        eq(UserSubscriptionTable.issuer, 'web'),
       ),
     )
     .orderBy(asc(UserSubscriptionTable.status))
@@ -261,43 +201,31 @@ export const getUserSubscriptionForWebCard = async (
 
 export const getUserSubscriptions = async (
   userId: string,
+  issuers: Array<'apple' | 'google' | 'web'>,
 ): Promise<UserSubscription[]> => {
-  return db()
-    .select()
-    .from(UserSubscriptionTable)
-    .where(eq(UserSubscriptionTable.userId, userId));
-};
-
-// TODO explain this function
-/**
- *
- * @param userId is the user id
- * @param webCardId is the webcard id
- * @returns the last subscription of the user for the webcard (the subscription can apply to all webcards of the user)
- */
-export const getLastSubscription = async (
-  userId: string,
-  webCardId: string,
-) => {
-  const currentDate = new Date();
   return db()
     .select()
     .from(UserSubscriptionTable)
     .where(
       and(
-        or(
-          eq(UserSubscriptionTable.userId, userId),
-          and(
-            eq(UserSubscriptionTable.webCardId, webCardId),
-            gte(UserSubscriptionTable.endAt, currentDate), // we take into account the subscriptions that are not yet expired of precedent owner
-          ),
-        ),
-        or(
-          eq(UserSubscriptionTable.webCardId, webCardId),
-          isNull(UserSubscriptionTable.webCardId),
-        ),
+        eq(UserSubscriptionTable.userId, userId),
+        inArray(UserSubscriptionTable.issuer, issuers),
       ),
     )
+    .orderBy(asc(UserSubscriptionTable.status));
+};
+
+/**
+ *
+ * @param userId is the user id
+ * @param webCardId is the webcard id
+ * @returns the last subscription of the user (active or not)
+ */
+export const getLastSubscription = async (userId: string) => {
+  return db()
+    .select()
+    .from(UserSubscriptionTable)
+    .where(eq(UserSubscriptionTable.userId, userId))
     .orderBy(desc(UserSubscriptionTable.startAt))
     .then(res => res[0]);
 };
@@ -325,7 +253,7 @@ export const cancelExpiredSubscription = async () => {
     );
 };
 
-export const cancelSubscription = async (userId: string, webCardId: string) => {
+export const cancelSubscription = async (userId: string) => {
   const currentDate = new Date();
   await db()
     .update(UserSubscriptionTable)
@@ -333,12 +261,7 @@ export const cancelSubscription = async (userId: string, webCardId: string) => {
       status: 'canceled',
       canceledAt: currentDate,
     })
-    .where(
-      and(
-        eq(UserSubscriptionTable.userId, userId),
-        eq(UserSubscriptionTable.webCardId, webCardId),
-      ),
-    );
+    .where(and(eq(UserSubscriptionTable.userId, userId)));
 };
 
 export const getExpiredSubscription = async (limit: number) => {
@@ -401,7 +324,6 @@ export const getSubscriptionsPaged = async ({
     filters.push(
       or(
         like(UserSubscriptionTable.userId, `%${search}%`),
-        like(UserSubscriptionTable.webCardId, `%${search}%`),
         like(UserSubscriptionTable.issuer, `%${search}%`),
       ),
     );

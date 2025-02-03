@@ -8,7 +8,6 @@ import {
   inArray,
   isNull,
   like,
-  count,
   or,
 } from 'drizzle-orm';
 import { db, transaction } from '../database';
@@ -359,19 +358,6 @@ export const getWebCardByUserId = (userId: string): Promise<WebCard[]> => {
     )
     .then(results => results.map(w => w.WebCard));
 };
-
-export const getWebCardProfilesCount = async (webCardId: string) =>
-  db()
-    .select({ count: count() })
-    .from(ProfileTable)
-
-    .where(
-      and(
-        eq(ProfileTable.webCardId, webCardId),
-        ne(ProfileTable.deleted, true),
-      ),
-    )
-    .then(res => res[0].count);
 
 export const getRecommendedWebCards = async (
   webCardId: string,

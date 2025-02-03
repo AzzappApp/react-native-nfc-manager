@@ -32,22 +32,22 @@ export const getPaymentById = (id: string): Promise<Payment | null> =>
     .then(result => result[0]);
 
 /**
- * Retrieve a web cards payments, paginated.
+ * Retrieve user payments, paginated.
  *
- * @param webCardId  The id of the web card to retrieve the payments from
+ * @param userId  The id of the user to retrieve the payments from
  * @param limit The maximum number of payments to retrieve
  * @param offset The number of payments to skip
- * @returns the list of web card payments
+ * @returns the list of user payments
  */
-export const getWebCardPayments = async (
-  webCardId: string,
+export const getUserPayments = async (
+  userId: string,
   limit?: number,
   offset?: number,
 ): Promise<Payment[]> => {
   let query = db()
     .select()
     .from(PaymentTable)
-    .where(eq(PaymentTable.webCardId, webCardId))
+    .where(eq(PaymentTable.userId, userId))
     .orderBy(desc(PaymentTable.createdAt))
     .$dynamic();
 
@@ -72,18 +72,16 @@ export const getPaymentByTransactionId = async (
     );
 
 /**
- * Count the number of payments for a web card.
+ * Count the number of payments for a user.
  *
- * @param webCardId - The id of the web card
- * @returns the number of payments for the web card
+ * @param userId - The id of the user
+ * @returns the number of payments for the user
  */
-export const countWebCardPayments = async (
-  webCardId: string,
-): Promise<number> =>
+export const countUserPayments = async (userId: string): Promise<number> =>
   db()
     .select({ count: count() })
     .from(PaymentTable)
-    .where(eq(PaymentTable.webCardId, webCardId))
+    .where(eq(PaymentTable.userId, userId))
     .then(result => result[0].count);
 
 /**

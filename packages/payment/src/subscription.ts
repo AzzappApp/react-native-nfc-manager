@@ -19,58 +19,34 @@ import {
 import type { Customer } from '#types';
 import type { UserSubscription } from '@azzapp/data';
 
-export const updateSubscriptionForWebCard = async ({
-  subscriptionId,
-  webCardId,
+export const updateActiveSubscription = async ({
+  subscription,
   totalSeats,
   paymentMeanId,
 }: {
-  subscriptionId: string;
-  webCardId: string;
+  subscription: UserSubscription;
   totalSeats?: number | null;
   paymentMeanId?: string | null;
 }) => {
-  const existingSubscription = await getSubscriptionById(subscriptionId);
-
-  if (!existingSubscription) {
-    throw new Error('No subscription found');
-  }
-
-  if (existingSubscription.status === 'canceled') {
+  if (subscription.status === 'canceled') {
     throw new Error('Subscription is canceled');
   }
 
-  if (existingSubscription.webCardId !== webCardId) {
-    throw new Error('Web card id does not match');
-  }
-
   return updateExistingSubscription({
-    userSubscription: existingSubscription,
+    userSubscription: subscription,
     totalSeats,
     paymentMeanId,
   });
 };
 
 export const estimateUpdateSubscriptionForWebCard = async ({
-  subscriptionId,
-  webCardId,
+  subscription,
   totalSeats,
 }: {
-  subscriptionId: string;
-  webCardId: string;
+  subscription: UserSubscription;
   totalSeats?: number | null;
 }) => {
-  const existingSubscription = await getSubscriptionById(subscriptionId);
-
-  if (!existingSubscription) {
-    throw new Error('No subscription found');
-  }
-
-  if (existingSubscription.webCardId !== webCardId) {
-    throw new Error('Web card id does not match');
-  }
-
-  return calculateSubscriptionUpdate(existingSubscription, totalSeats);
+  return calculateSubscriptionUpdate(subscription, totalSeats);
 };
 
 const calculateSubscriptionUpdate = async (
@@ -186,10 +162,6 @@ export const updateExistingSubscription = async ({
   const token = await login();
 
   const newPaymentMean = paymentMeanId ?? existingSubscription.paymentMeanId;
-
-  if (existingSubscription.webCardId === null) {
-    throw new Error('No web card id found');
-  }
 
   let newSubscriptionId = existingSubscription.id;
 
@@ -439,22 +411,9 @@ export const updateExistingSubscription = async ({
   return (await getSubscriptionById(newSubscriptionId))!;
 };
 
-export const upgradePlan = async (
-  webCardId: string,
-  subscriptionId: string,
-) => {
-  const existingSubscription = await getSubscriptionById(subscriptionId);
-
-  if (!existingSubscription) {
-    throw new Error('No subscription found');
-  }
-
+export const upgradePlan = async (existingSubscription: UserSubscription) => {
   if (existingSubscription.status === 'canceled') {
     throw new Error('Subscription is canceled');
-  }
-
-  if (existingSubscription.webCardId !== webCardId) {
-    throw new Error('Web card id does not match');
   }
 
   if (!existingSubscription.paymentMeanId) {
@@ -597,19 +556,8 @@ export const upgradePlan = async (
 };
 
 export const endSubscription = async (
-  webCardId: string,
-  subscriptionId: string,
+  existingSubscription: UserSubscription,
 ) => {
-  const existingSubscription = await getSubscriptionById(subscriptionId);
-
-  if (!existingSubscription) {
-    throw new Error('No subscription found');
-  }
-
-  if (existingSubscription.webCardId !== webCardId) {
-    throw new Error('Web card id does not match');
-  }
-
   const token = await login();
 
   const rebillManagerId = existingSubscription.rebillManagerId;
@@ -669,20 +617,9 @@ export const endSubscription = async (
 };
 
 export const updateCustomer = async (
-  webCardId: string,
-  subscriptionId: string,
+  subscription: UserSubscription,
   customer: Customer,
 ) => {
-  const subscription = await getSubscriptionById(subscriptionId);
-
-  if (!subscription) {
-    throw new Error('No subscription found');
-  }
-
-  if (subscription.webCardId !== webCardId) {
-    throw new Error('Web card id does not match');
-  }
-
   const updates = {
     subscriberName: customer.name,
     subscriberEmail: customer.email,
@@ -695,7 +632,7 @@ export const updateCustomer = async (
     subscriberVatNumber: customer.vatNumber ?? null,
   };
 
-  await updateSubscription(subscriptionId, updates);
+  await updateSubscription(subscription.id, updates);
   return {
     ...subscription,
     ...updates,
@@ -703,20 +640,9 @@ export const updateCustomer = async (
 };
 
 export const renewUserSubscription = async (
+  subscription: UserSubscription,
   userId: string,
-  webCardId: string,
-  subscriptionId: string,
 ) => {
-  const subscription = await getSubscriptionById(subscriptionId);
-
-  if (!subscription) {
-    throw new Error('No subscription found');
-  }
-
-  if (subscription.webCardId !== webCardId) {
-    throw new Error('WebCard ids don’t match');
-  }
-
   if (!subscription.paymentMeanId || !subscription.rebillManagerId) {
     throw new Error('Nothing to resume');
   }

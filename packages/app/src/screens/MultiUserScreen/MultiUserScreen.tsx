@@ -73,6 +73,7 @@ const multiUserScreenQuery = graphql`
           subscription {
             id
             endAt
+            subscriptionPlan
             status
             issuer
             availableSeats
@@ -114,6 +115,16 @@ const MultiUserScreen = ({
 
   const toggleMultiUser = useCallback(
     (value: boolean) => {
+      if (!profile?.webCard?.isPremium && value) {
+        router.push({
+          route: 'USER_PAY_WALL',
+          params: {
+            activateFeature: 'MULTI_USER',
+          },
+        });
+        return;
+      }
+
       //when IAP, if the user try to activate multiuser on a another webcard without enought seat
       if (
         value &&
@@ -129,12 +140,10 @@ const MultiUserScreen = ({
         return;
       }
       if (
-        !value &&
+        value &&
         profile?.webCard?.subscription?.issuer === 'web' &&
-        !profile?.webCard?.isPremium &&
-        profile?.webCard?.subscription &&
-        (profile?.webCard?.subscription?.status !== 'active' ||
-          profile?.webCard?.subscription?.endAt < new Date())
+        (profile?.webCard?.subscription?.availableSeats ?? 0) <= 0 &&
+        profile?.webCard?.subscription?.subscriptionPlan === 'yearly'
       ) {
         Toast.show({
           type: 'error',
@@ -150,15 +159,7 @@ const MultiUserScreen = ({
         });
         return;
       }
-      if (!profile?.webCard?.isPremium && value) {
-        router.push({
-          route: 'USER_PAY_WALL',
-          params: {
-            activateFeature: 'MULTI_USER',
-          },
-        });
-        return;
-      }
+
       if (value) {
         setAllowMultiUser(value);
       } else {

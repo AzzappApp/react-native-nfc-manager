@@ -31,7 +31,7 @@ import ERRORS from '@azzapp/shared/errors';
 import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { invalidateWebCard } from '#externals';
 import {
-  activeSubscriptionsForWebCardLoader,
+  activeSubscriptionsForUserLoader,
   webCardLoader,
   webCardOwnerLoader,
 } from '#loaders';
@@ -73,10 +73,7 @@ const createModuleSavingMutation =
       webCard.cardIsPublished
     ) {
       const subscription = owner
-        ? await activeSubscriptionsForWebCardLoader.load({
-            userId: owner.id,
-            webCardId: webCard.id,
-          })
+        ? await activeSubscriptionsForUserLoader.load(owner.id)
         : null;
       if (!subscription) {
         throw new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED);

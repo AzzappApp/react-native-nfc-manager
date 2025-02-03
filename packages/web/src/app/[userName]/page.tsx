@@ -6,7 +6,7 @@ import {
   getProfilesPostsWithTopComment,
   getModuleBackgroundsByIds,
   getWebCardsOwnerUsers,
-  getActiveUserSubscriptionForWebCard,
+  getActiveUserSubscriptions,
 } from '@azzapp/data';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
@@ -40,10 +40,7 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
   let isAzzappPlus = false;
   const owners = await getWebCardsOwnerUsers([webCard.id]);
   if (owners?.length && owners[0]?.id) {
-    const subscriptions = await getActiveUserSubscriptionForWebCard(
-      owners[0].id,
-      webCard.id,
-    );
+    const subscriptions = await getActiveUserSubscriptions([owners[0].id]);
     isAzzappPlus = subscriptions.length > 0;
   }
 

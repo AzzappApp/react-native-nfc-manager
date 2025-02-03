@@ -30,13 +30,11 @@ export const getPaymentMeanById = async (
  * Retrieve a list payment means by user id and web card id.
  *
  * @param userId - The id of the user
- * @param webCardId - The id of the web card
  *
  * @returns a list of payment means
  */
 export const getActivePaymentMeans = async (
   userId: string,
-  webCardId: string,
 ): Promise<PaymentMean[]> =>
   db()
     .select()
@@ -44,7 +42,6 @@ export const getActivePaymentMeans = async (
     .where(
       and(
         eq(PaymentMeanTable.userId, userId),
-        eq(PaymentMeanTable.webCardId, webCardId),
         eq(PaymentMeanTable.status, 'active'),
       ),
     )

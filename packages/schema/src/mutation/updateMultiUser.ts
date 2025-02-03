@@ -10,7 +10,7 @@ import ERRORS from '@azzapp/shared/errors';
 import { extractSeatsFromIAPSubscriptionId } from '@azzapp/shared/subscriptionHelpers';
 import { invalidateWebCard } from '#externals';
 import {
-  activeSubscriptionsForWebCardLoader,
+  activeSubscriptionsForUserLoader,
   webCardLoader,
   webCardOwnerLoader,
 } from '#loaders';
@@ -51,10 +51,7 @@ const updateMultiUser: MutationResolvers['updateMultiUser'] = async (
     }
     //then check if there is a subscription for this webcard
     const subscription = owner
-      ? await activeSubscriptionsForWebCardLoader.load({
-          userId: owner?.id ?? '',
-          webCardId,
-        })
+      ? await activeSubscriptionsForUserLoader.load(owner?.id ?? '')
       : null;
 
     if (!subscription) {

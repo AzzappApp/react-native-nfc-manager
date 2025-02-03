@@ -54,10 +54,9 @@ export const toggleSubscriptionStatusAction = async (
   const subscription = await getSubscriptionById(subscriptionId);
   if (
     subscription?.issuer === 'web' &&
-    subscription?.subscriptionPlan !== 'web.lifetime' &&
-    subscription.webCardId
+    subscription?.subscriptionPlan !== 'web.lifetime'
   ) {
-    await endSubscription(subscriptionId, subscription.webCardId);
+    await endSubscription(subscription);
   } else if (subscription?.subscriptionPlan === 'web.lifetime') {
     await updateSubscription(subscriptionId, {
       status,

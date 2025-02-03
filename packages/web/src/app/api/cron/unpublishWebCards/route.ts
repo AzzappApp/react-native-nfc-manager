@@ -31,7 +31,6 @@ const unpublishedWebCards = async () => {
       await transaction(async () => {
         await unpublishWebCardForUser({
           userId: expiredSubscriptions.userId,
-          userSubscription: expiredSubscriptions,
         });
 
         await updateSubscription(expiredSubscriptions.userId, {

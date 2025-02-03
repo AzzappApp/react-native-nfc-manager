@@ -1,5 +1,5 @@
 import * as z from 'zod';
-import { getWebCardById } from '@azzapp/data';
+import { getUserProfilesWithWebCard, getWebCardById } from '@azzapp/data';
 import {
   acknowledgeFirstPayment,
   checkSignature,
@@ -40,9 +40,17 @@ export const POST = withPluginsRoute(async (req: Request) => {
     );
   }
 
-  if (subscription && subscription.webCardId) {
-    const webcard = await getWebCardById(subscription.webCardId);
-    revalidateWebcardsAndPosts(webcard?.userName ? [webcard.userName] : []);
+  if (subscription) {
+    const webCards = await getUserProfilesWithWebCard(
+      subscription.userId,
+      'owner',
+    );
+
+    revalidateWebcardsAndPosts(
+      webCards
+        .map(({ webCard }) => webCard.userName)
+        .filter(userName => userName !== null),
+    );
   }
   return new Response('ok', { status: 200 });
 });
