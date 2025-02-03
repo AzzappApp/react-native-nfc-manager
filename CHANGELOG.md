@@ -1,3 +1,7 @@
+## 1.7.0-canary.115
+
+* **fix:**  - **modules:** [#7235](https://github.com/AzzappApp/azzapp/pull/7235) wrong animation on alternation ([#7260](https://github.com/AzzappApp/azzapp/pull/7260))
+
 ## 1.7.0-canary.114
 
 * **fix:**  - rework add Module Modal to screen ([#7259](https://github.com/AzzappApp/azzapp/pull/7259))
