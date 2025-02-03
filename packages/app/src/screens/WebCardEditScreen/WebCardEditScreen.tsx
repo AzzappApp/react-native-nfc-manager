@@ -31,7 +31,6 @@ import {
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import Text from '#ui/Text';
-import AddModuleSectionModal from './AddModuleSection';
 import CardStyleModal from './CardStyleModal';
 import LoadCardTemplateModal from './LoadCardTemplateModal';
 import PreviewModal from './PreviewModal';
@@ -96,7 +95,6 @@ const WebCardEditScreen = ({
         ...PreviewModal_webCard
         ...LoadCardTemplateModal_webCard
         ...WebCardColorPicker_webCard
-        ...AddModuleSectionModal_webCard
       }
     `,
     webCardKey,
@@ -130,13 +128,13 @@ const WebCardEditScreen = ({
   // #endregion
 
   // #region New Module
-  const [showContentModal, openContentModal, closeContentModal] =
-    useBoolean(false);
-
   const onRequestNewModule = useCallback(() => {
     Toast.hide();
-    openContentModal();
-  }, [openContentModal]);
+    router.push({
+      route: 'ADD_MODULE_SECTION',
+      params: { webCardId: webCardKey as unknown as string },
+    });
+  }, [router, webCardKey]);
   // #endregion
 
   // #region Module edition
@@ -340,7 +338,6 @@ const WebCardEditScreen = ({
             <Suspense>
               <WebCardScreenEditModeFooter
                 fromCreation={!!fromCreation}
-                onAddContent={openContentModal}
                 onSkip={onDone}
                 webCard={webCard}
               />
@@ -422,11 +419,6 @@ const WebCardEditScreen = ({
             visible={showWebCardColorPicker}
             onRequestClose={closeWebCardColorPicker}
             onCloseCanceled={openWebCardColorPicker}
-          />
-          <AddModuleSectionModal
-            webCard={webCard}
-            close={closeContentModal}
-            open={showContentModal}
           />
         </Suspense>
       </Container>

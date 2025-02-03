@@ -5,6 +5,7 @@ import { View, TouchableOpacity } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { replaceColors } from '@azzapp/shared/lottieHelpers';
 import { colors, shadow } from '#theme';
+import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
@@ -14,20 +15,27 @@ import type { WebCardScreenEditModeFooter_webCard$key } from '#relayArtifacts/We
 
 type WebCardScreenEditModeFooter = {
   fromCreation: boolean;
-  onAddContent: () => void;
   onSkip?: () => void;
   webCard: WebCardScreenEditModeFooter_webCard$key;
 };
 
 const WebCardScreenEditModeFooter = ({
   fromCreation,
-  onAddContent,
   onSkip,
   webCard: webCardKey,
 }: WebCardScreenEditModeFooter) => {
   const intl = useIntl();
 
   const styles = useStyleSheet(stylesheet);
+
+  const router = useRouter();
+
+  const onAddContent = () => {
+    router.push({
+      route: 'ADD_MODULE_SECTION',
+      params: { webCardId: webCardKey as unknown as string },
+    });
+  };
 
   const webCard = useFragment(
     graphql`

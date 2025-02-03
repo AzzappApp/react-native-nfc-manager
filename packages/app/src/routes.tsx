@@ -182,6 +182,13 @@ export type ResetPasswordRoute = {
   };
 };
 
+export type AddModuleSectionRoute = {
+  route: 'ADD_MODULE_SECTION';
+  params: {
+    webCardId: string;
+  };
+};
+
 export type OnboardingRoute = {
   route: 'ONBOARDING';
   params?: never;
@@ -272,6 +279,7 @@ export type OfflineVCardRoute = {
 export type Route =
   | AboutRoute
   | AccountDetailsRoute
+  | AddModuleSectionRoute
   | CardModuleEditionRoute
   | CommonInformationRoute
   | ConfirmChangeContactRoute
