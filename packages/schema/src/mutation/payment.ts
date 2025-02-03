@@ -60,28 +60,26 @@ export const estimateUpdateSubscriptionCost: MutationResolvers['estimateUpdateSu
     }
   };
 
-export const createPaymentIntent: MutationResolvers['createPaymentIntent'] = async (
-  _,
-  { intent },
-) => {
-  const { userId } = getSessionInfos();
-  if (!userId) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
-  }
-  try {
-    const result = await createPaymentRequest({
-      ...intent,
-      userId,
-    });
+export const createPaymentIntent: MutationResolvers['createPaymentIntent'] =
+  async (_, { intent }) => {
+    const { userId } = getSessionInfos();
+    if (!userId) {
+      throw new GraphQLError(ERRORS.UNAUTHORIZED);
+    }
+    try {
+      const result = await createPaymentRequest({
+        ...intent,
+        userId,
+      });
 
-    if (!result?.clientRedirectUrl) {
+      if (!result?.clientRedirectUrl) {
+        throw new GraphQLError(ERRORS.PAYMENT_ERROR);
+      }
+      return result;
+    } catch {
       throw new GraphQLError(ERRORS.PAYMENT_ERROR);
     }
-    return result;
-  } catch {
-    throw new GraphQLError(ERRORS.PAYMENT_ERROR);
-  }
-};
+  };
 
 export const createSubscriptionFromPaymentMean: MutationResolvers['createSubscriptionFromPaymentMean'] =
   async (_, { intent, paymentMeanId }) => {
@@ -159,29 +157,30 @@ export const generatePaymentInvoice: MutationResolvers['generatePaymentInvoice']
     return result;
   };
 
-export const updateSubscription: MutationResolvers['updateSubscription'] = async (
-  _,
-  {
-    paymentMeanId: gqlPaymentMeanId,
-    subscriptionId: gqlSubscriptionId,
-    totalSeats,
-  },
-) => {
-  const subscriptionId = fromGlobalIdWithType(
-    gqlSubscriptionId,
-    'UserSubscription',
-  );
+export const updateSubscription: MutationResolvers['updateSubscription'] =
+  async (
+    _,
+    {
+      paymentMeanId: gqlPaymentMeanId,
+      subscriptionId: gqlSubscriptionId,
+      totalSeats,
+    },
+  ) => {
+    const subscriptionId = fromGlobalIdWithType(
+      gqlSubscriptionId,
+      'UserSubscription',
+    );
 
-  const { subscription } = await checkSubscription(subscriptionId);
+    const { subscription } = await checkSubscription(subscriptionId);
 
-  return updateActiveSubscription({
-    subscription,
-    totalSeats,
-    paymentMeanId: gqlPaymentMeanId
-      ? fromGlobalIdWithType(gqlPaymentMeanId, 'PaymentMean')
-      : null,
-  });
-};
+    return updateActiveSubscription({
+      subscription,
+      totalSeats,
+      paymentMeanId: gqlPaymentMeanId
+        ? fromGlobalIdWithType(gqlPaymentMeanId, 'PaymentMean')
+        : null,
+    });
+  };
 
 export const upgradeSubscriptionPlan: MutationResolvers['upgradeSubscriptionPlan'] =
   async (_, { subscriptionId: gqlSubscriptionId }) => {
