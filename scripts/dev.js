@@ -274,7 +274,7 @@ const setupSidebar = () => {
 
   sideBar.key(['up'], () => {
     let index = menuItems.findIndex(item => item.id === displayedScreenID);
-    // eslint-disable-next-line no-constant-condition
+
     while (true) {
       let prevIndex = index - 1;
       if (prevIndex < 0) {
@@ -292,7 +292,6 @@ const setupSidebar = () => {
 
   sideBar.key(['down'], () => {
     let index = menuItems.findIndex(item => item.id === displayedScreenID);
-    // eslint-disable-next-line no-constant-condition
     while (true) {
       const nextIndex = (index + 1) % menuItems.length;
       const nextItem = menuItems[nextIndex];

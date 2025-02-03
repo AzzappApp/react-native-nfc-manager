@@ -85,7 +85,7 @@ jobs:
       - name: Commit version bump
         run: |
           git add .
-          git commit -m "chore: bump version [skip ci]"
+          git commit -m "chore(ci): bump version [skip ci]"
           git push origin $GITHUB_REF_NAME
 
       ############################################
