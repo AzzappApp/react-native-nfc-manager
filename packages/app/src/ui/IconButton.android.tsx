@@ -1,16 +1,11 @@
-import {
-  type StyleProp,
-  type ImageStyle,
-  type ViewProps,
-  View,
-} from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { Pressable } from 'react-native-gesture-handler';
 import {
   createVariantsStyleSheet,
   useVariantStyleSheet,
 } from '#helpers/createStyles';
 import Icon from './Icon';
 import type { Icons } from './Icon';
+import type { StyleProp, ImageStyle, ViewProps } from 'react-native';
 
 export type IconButtonProps = ViewProps & {
   icon: Icons;
@@ -48,8 +43,6 @@ export type IconButtonProps = ViewProps & {
    * @see https://reactnative.dev/docs/pressable#disabled
    */
   disabled?: boolean;
-
-  hitSlop?: number;
 };
 
 const IconButton = ({
@@ -65,24 +58,24 @@ const IconButton = ({
   const styles = useVariantStyleSheet(computedStyle, variant);
   const variantSize = size ? size : variant === 'border' ? 50 : iconSize;
   return (
-    <View style={style}>
-      <TouchableOpacity
-        {...props}
-        accessibilityRole="button"
-        onPress={onPress}
-        style={[
-          {
-            minWidth: variantSize,
-            height: variantSize,
-            borderRadius: variantSize / 2,
-          },
-          styles.button,
-        ]}
-        {...props}
-      >
-        <Icon icon={icon} size={iconSize} style={iconStyle} />
-      </TouchableOpacity>
-    </View>
+    // TODO unfortunately, we can't use PressableNative here because of the ripple effect, see : https://github.com/facebook/react-native/issues/34553
+    <Pressable
+      {...props}
+      accessibilityRole="button"
+      onPress={onPress}
+      style={[
+        {
+          minWidth: variantSize,
+          height: variantSize,
+          borderRadius: variantSize / 2,
+        },
+        styles.button,
+        style,
+      ]}
+      {...props}
+    >
+      <Icon icon={icon} size={iconSize} style={iconStyle} />
+    </Pressable>
   );
 };
 

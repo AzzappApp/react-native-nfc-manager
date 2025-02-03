@@ -89,30 +89,31 @@ const BottomMenu = ({
 }: BottomMenuProps) => {
   const styles = useStyleSheet(styleSheet);
   return (
-    <Container
-      style={[styles.container, style]}
-      accessibilityRole="tablist"
-      accessible
-      {...props}
-    >
-      {tabs.map(({ key, icon, IconComponent, tint, label }, index) => (
-        <BottomMenuItemRenderer
-          key={key}
-          tabKey={key} //key cannot be used in the children
-          icon={icon}
-          IconComponent={IconComponent}
-          label={label}
-          tint={tint}
-          iconSize={iconSize}
-          isSelected={currentTab === key}
-          onItemPress={onItemPress}
-          showLabel={showLabel}
-          showCircle={showCircle}
-          isFirst={index === 0}
-          isLast={index === tabs.length - 1}
-        />
-      ))}
-    </Container>
+    <View style={styles.bottomMenuContainer} {...props}>
+      <Container
+        accessibilityRole="tablist"
+        accessible
+        style={[style, styles.container]}
+      >
+        {tabs.map(({ key, icon, IconComponent, tint, label }, index) => (
+          <BottomMenuItemRenderer
+            key={key}
+            tabKey={key} //key cannot be used in the children
+            icon={icon}
+            IconComponent={IconComponent}
+            label={label}
+            tint={tint}
+            iconSize={iconSize}
+            isSelected={currentTab === key}
+            onItemPress={onItemPress}
+            showLabel={showLabel}
+            showCircle={showCircle}
+            isFirst={index === 0}
+            isLast={index === tabs.length - 1}
+          />
+        ))}
+      </Container>
+    </View>
   );
 };
 
@@ -244,6 +245,11 @@ const BottomMenuItemRenderer = ({
 };
 
 const styleSheet = createStyleSheet(appearance => ({
+  bottomMenuContainer: {
+    width: '100%',
+    alignItems: 'center',
+    paddingVertical: Platform.select({ android: 10, default: 0 }),
+  },
   container: [
     {
       height: BOTTOM_MENU_HEIGHT,
