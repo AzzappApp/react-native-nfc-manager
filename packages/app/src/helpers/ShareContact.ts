@@ -45,6 +45,7 @@ const ShareContact = async (details: Contact | ContactType) => {
     await ShareCommand.open({
       url: filePath,
       type: 'text/x-vcard',
+      failOnCancel: false,
     });
     // clean up file afterward
     file.delete();
