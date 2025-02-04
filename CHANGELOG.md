@@ -1,3 +1,9 @@
+## 1.7.0-canary.116
+
+* **fix:**  - **CoverEdition:** link draging ([#7265](https://github.com/AzzappApp/azzapp/pull/7265))
+* **build:**  - upgrade expo-contacts ([#7261](https://github.com/AzzappApp/azzapp/pull/7261))
+* **fix:**  - **contacts:** [#7262](https://github.com/AzzappApp/azzapp/pull/7262) don’t throw error on cancel ([#7263](https://github.com/AzzappApp/azzapp/pull/7263))
+
 ## 1.7.0-canary.115
 
 * **fix:**  - **modules:** [#7235](https://github.com/AzzappApp/azzapp/pull/7235) wrong animation on alternation ([#7260](https://github.com/AzzappApp/azzapp/pull/7260))
