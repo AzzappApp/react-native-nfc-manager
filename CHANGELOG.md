@@ -1,3 +1,7 @@
+## 1.7.0-canary.118
+
+* **fix:**  - **android:** [#7238](https://github.com/AzzappApp/azzapp/pull/7238) wrong shadow with accessibility roles ([#7270](https://github.com/AzzappApp/azzapp/pull/7270))
+
 ## 1.7.0-canary.117
 
 * **feat:**  - migrate to user subscription (mobile) ([#7268](https://github.com/AzzappApp/azzapp/pull/7268))
