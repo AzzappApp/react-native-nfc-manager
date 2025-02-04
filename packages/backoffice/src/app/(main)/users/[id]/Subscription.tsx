@@ -69,9 +69,9 @@ export const Subscription = ({
     }
   }, [debouncedSeats, updateFreeSeats, userSubscription.freeSeats]);
 
-  const subscriptionPlan =
-    userSubscription.subscriptionPlan ||
-    userSubscription.subscriptionId.includes('yearly')
+  const subscriptionPlan = userSubscription.subscriptionPlan
+    ? userSubscription.subscriptionPlan
+    : userSubscription.subscriptionId.includes('yearly')
       ? 'web.yearly'
       : 'web.monthly';
 
