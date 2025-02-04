@@ -18,8 +18,7 @@ struct ShareContactAppClipApp: App {
 }
 struct ContentView: View {
     @State var username: String?
-    @State var step: String?
-    @State var hasError: Bool = true
+    @State var showAppButton: Bool = true
     
 
     var body: some View {
@@ -39,10 +38,11 @@ struct ContentView: View {
                .lineSpacing(4) // Adjusted line height
                .multilineTextAlignment(.center) // Center alignment
 
-           if hasError {
+           if showAppButton {
                Button(action: {
                    if let url = URL(string: "https://apps.apple.com/app/6502694267") {
-                       UIApplication.shared.open(url)
+                       
+                     UIApplication.shared.open(url)
                    }
                }) {
                    Text("Create my Card")
@@ -58,13 +58,6 @@ struct ContentView: View {
            }
 
            Spacer()
-        if !hasError {
-          Text(": \(step ?? "Not available")")
-            .font(.system(size: 14, weight: .medium)) // Adjusted font size and weight
-            .lineSpacing(4) // Adjusted line height
-            .multilineTextAlignment(.center) // Center alignment
-            .padding()
-        }
        }
        .frame(maxWidth: .infinity)
        .background(Color.white)
@@ -74,10 +67,9 @@ struct ContentView: View {
 
     private func handleUserActivity(_ userActivity: NSUserActivity) {
       guard let webpageURL = userActivity.webpageURL else {
-          hasError = true
-          return
+        showAppButton = true
+        return
       }
-      self.step = "10 \(webpageURL)"
 
       if webpageURL.absoluteString.hasPrefix("https://appclip.apple.com") {
           // Extract the "url" query parameter
@@ -85,13 +77,13 @@ struct ContentView: View {
             let queryItems = urlComponents.queryItems,
             let compressedContactCard = queryItems.first(where: { $0.name == "c" })?.value,
             let username = queryItems.first(where: { $0.name == "u" })?.value else {
-              hasError = true
+            showAppButton = true
               return
             }
-          hasError = false
+          showAppButton = false
           handleContactData(compressedContactCard: compressedContactCard, username: username)
       } else {
-        hasError = true
+        showAppButton = true
         return
       }
     }
@@ -111,58 +103,50 @@ struct ContentView: View {
         // Parse the JSON array
         guard let jsonArray = try JSONSerialization.jsonObject(with: jsonData, options: []) as? [Any] else {
           print("Failed to parse JSON array.")
-          self.step = "2"
           return
         }
         
         guard jsonArray.count == 2 else {
           print("Invalid JSON structure: Expected 2 elements, found \(jsonArray.count).")
-             self.step = "3"
           return
         }
         
         guard let contactDataString = jsonArray[0] as? String else {
           print("Invalid JSON structure: First element is not a string.")
-             self.step = "4"
           return
         }
         
         guard let signature = jsonArray[1] as? String else {
           print("Invalid JSON structure: Second element is not a string.")
-             self.step = "5"
           return
         }
         // Remove outer quotes and unescape characters
-        let cleanedContactDataString = contactDataString
-          .replacingOccurrences(of: "\r", with: "")
-          .replacingOccurrences(of: "\n", with: "")
-          .replacingOccurrences(of: "\"[", with: "[")
-          .replacingOccurrences(of: "]\"", with: "]")
-          .replacingOccurrences(of: "\"\"", with: "\"")
+       
         
-        self.step = "7  \(cleanedContactDataString)"
         
-        verifySign(signature: signature, data: cleanedContactDataString, salt: username) { result in
-         self.step = "7-bis  \(result)"
+        verifySign(signature: signature, data: contactDataString, salt: username) { result in
           switch result {
           case .success(let additionalContactData):
-
+            //swift need to have the data clean to read it
+            let cleanedContactDataString = contactDataString
+              .replacingOccurrences(of: "\r", with: "")
+              .replacingOccurrences(of: "\n", with: "")
+              .replacingOccurrences(of: "\"[", with: "[")
+              .replacingOccurrences(of: "]\"", with: "]")
+              .replacingOccurrences(of: "\"\"", with: "\"")
             guard let contactDataJSONData = cleanedContactDataString.data(using: .utf8) else {
               print("Failed to convert contact data string to data.")
-               self.step = "8"
               return
             }
             do {
             // Parse the cleaned JSON string (or does notcompile if not using a do block
               guard let contactDataArray = try JSONSerialization.jsonObject(with: contactDataJSONData, options: []) as? [Any] else {
                 print("Failed to parse contact data JSON array.")
-                   self.step = "9"
                 return
               }
               
               // Map the JSON array to ContactData
               var contactData = mapToContactData(from: contactDataArray)
-                 self.step = "10"
               if let avatarUrl = additionalContactData["avatarUrl"] as? String {
                 contactData.avatarUrl = avatarUrl
               }
@@ -187,29 +171,31 @@ struct ContentView: View {
                   }
                   contactData.urls = urls
               }
-                self.step = "before dispatch"
+              
+              var token = ""
+              if let tok = additionalContactData["token"] as? String {
+                 
+                token = tok
+              }
+              
               DispatchQueue.main.async {
-                   self.step = "13"
-                addContact(contactData, username: username)
+                addContact(contactData, username: username, token : token )
                 }
             } catch {
-                 self.step = "14  \(error)"
               print("Error parsing contact data JSON: \(error)")
           }
           case .failure(let error):
-           self.step = "15 \(error.localizedDescription)"
             print("Error verifying sign-in: \(error.localizedDescription)")
           }
         }
       } catch {
-        self.step = "16 \(error)"
         print("Failed to decode contact data: \(error)")
       }
     }
 
 
 
-  private func addContact(_ contactData: ContactData, username :String) {
+  private func addContact(_ contactData: ContactData, username :String, token: String) {
     let contact = CNMutableContact()
     contact.givenName = contactData.firstName ?? ""
     contact.familyName = contactData.lastName ?? ""
@@ -257,11 +243,8 @@ struct ContentView: View {
             CNLabeledValue(label: urlData.label, value: urlData.url as NSString)
         }
     }
-    let baseUrl = "https://www.azzapp.com/"; //hardcoded to be sure env is working
-   //        ProcessInfo.processInfo.environment["BASE_URL"] else {
-   //   print("Base url not defined")
-   //   return
-   // }
+
+    let baseUrl = "https://www.azzapp.com/"; //hardcoded to be sure env is working (was the issue when we test in prod)
 
     urlAddresses.append(CNLabeledValue(label: "Azzapp", value:  "\(baseUrl)\(username)" as NSString))
 
@@ -269,7 +252,7 @@ struct ContentView: View {
 
     // Add note with link
     contact.note = "Made with Azzapp" 	
-    
+    print(username, token)
     if let avatarUrl = contactData.avatarUrl, let url = URL(string: avatarUrl) {
     URLSession.shared.dataTask(with: url) { data, response, error in
         if let data = data {
@@ -277,11 +260,11 @@ struct ContentView: View {
         }
         
         DispatchQueue.main.async {
-             ContactViewControllerDelegateHandler.shared.presentContactViewController(with: contact)
+          ContactViewControllerDelegateHandler.shared.presentContactViewController(with: contact,username: username, token: token)
         }
     }.resume()
     } else {
-         ContactViewControllerDelegateHandler.shared.presentContactViewController(with: contact)
+         ContactViewControllerDelegateHandler.shared.presentContactViewController(with: contact,username: username, token: token)
     }
   }
 }
@@ -290,24 +273,30 @@ struct ContentView: View {
 class ContactViewControllerDelegateHandler: NSObject, CNContactViewControllerDelegate {
   static let shared = ContactViewControllerDelegateHandler()
 
-  func presentContactViewController(with contact: CNMutableContact) {
+  var username: String?
+  var token: String?
+
+
+  func presentContactViewController(with contact: CNMutableContact, username: String, token: String) {
       let contactViewController = CNContactViewController(forNewContact: contact)
       contactViewController.delegate = self
+      self.username = username
+      self.token = token
 
       let viewController = UIApplication.shared.windows.first?.rootViewController
       viewController?.present(UINavigationController(rootViewController: contactViewController), animated: true)
   }
 
   func contactViewController(_ viewController: CNContactViewController, didCompleteWith contact: CNContact?) {
-    if let contact = contact {
-        // Handle the "Done" button click
-        print("Contact saved: \(contact)")
-    } else {
-        // Handle the "Cancel" button click
-        print("Contact creation canceled")
-    }
-    viewController.dismiss(animated: true) {
-        UIApplication.shared.perform(#selector(NSXPCConnection.suspend))
+    
+     viewController.dismiss(animated: true) {
+        // Construct the URL with username and token
+        if let username = self.username, let token = self.token {
+            let baseUrl = "https://www.azzapp.com/"
+            if let url = URL(string: "\(baseUrl)\(username)?token=\(token)&mode=shareback") {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            }
+        }
     }
   }
 }
@@ -366,10 +355,6 @@ private func mapToContactData(from array: [Any]) -> ContactData {
 
 func verifySign(signature: String, data: String, salt: String, completion: @escaping (Result<[String: Any], Error>) -> Void) {
     let baseUrl = "https://www.azzapp.com/"
-    //        ProcessInfo.processInfo.environment["BASE_URL"] else {
-    //  completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Base url not defined"])))
-    //  return
-   // }
 
     guard let url = URL(string: "\(baseUrl)api/verifySign") else {
       completion(.failure(NSError(domain: "", code: -2, userInfo: [NSLocalizedDescriptionKey: "Invalid URL"])))
@@ -414,12 +399,6 @@ func verifySign(signature: String, data: String, salt: String, completion: @esca
           completion(.failure(error))
       }
     }.resume()
-}
-
-
-
-private func closeAppClip() {
- UIApplication.shared.perform(#selector(NSXPCConnection.suspend))
 }
 
 struct ContentView_Previews: PreviewProvider {

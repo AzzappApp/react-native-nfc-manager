@@ -75,6 +75,15 @@ const DownloadVCard = ({
   }, []);
 
   useEffect(() => {
+    // call directly shareback (use when coming back from AppClip)
+    const modeQueryParam = searchParams.get('mode');
+    if (modeQueryParam === 'shareback') {
+      const token = searchParams.get('token');
+      if (token && onClose) {
+        onClose({ token });
+      }
+      return;
+    }
     const compressedContactCard = searchParams.get('c');
     if (!compressedContactCard) {
       return;
@@ -152,7 +161,7 @@ const DownloadVCard = ({
         })
         .catch(() => void 0);
     }
-  }, [webCard.userName, webCard.id, searchParams, startOpen]);
+  }, [webCard.userName, webCard.id, searchParams, startOpen, onClose]);
 
   const handleClose = useCallback(() => {
     setOpened(false);
@@ -162,7 +171,6 @@ const DownloadVCard = ({
     }
   }, [onClose, token]);
 
-  const [appClipWasOpen, setAppClipWasOpen] = useState(false);
   const showAppClip = useCallback(
     async (e: React.MouseEvent<HTMLAnchorElement>) => {
       e.preventDefault();
@@ -172,27 +180,10 @@ const DownloadVCard = ({
       }
       const appClipUrl = `${process.env.NEXT_PUBLIC_APPLE_APP_CLIP_URL}&u=${webCard.userName}&c=${compressedContactCard}`;
       // Open the App Clip URL
-      setAppClipWasOpen(true);
       window.location.href = appClipUrl;
     },
     [searchParams, webCard.userName],
   );
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'hidden') {
-        // Show the shareback here
-        if (appClipWasOpen) {
-          handleClose();
-        }
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [appClipWasOpen, handleClose]);
 
   const contactInitials = `${(contact?.firstName?.length ?? 0 > 0) ? contact?.firstName[0] : ''}${(contact?.lastName?.length ?? 0 > 0) ? contact?.lastName[0] : ''}`;
 
