@@ -1,3 +1,7 @@
+## 1.7.0-canary.125
+
+* **fix:**  - **payment:** [#7139](https://github.com/AzzappApp/azzapp/pull/7139) wrong interval calculation ([#7284](https://github.com/AzzappApp/azzapp/pull/7284))
+
 ## 1.7.0-canary.124
 
 * **fix:**  - **modules:** [#6960](https://github.com/AzzappApp/azzapp/pull/6960) ensure keyboard is closed on android ([#7276](https://github.com/AzzappApp/azzapp/pull/7276))
