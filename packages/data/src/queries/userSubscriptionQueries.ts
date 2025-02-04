@@ -99,31 +99,6 @@ export const updateSubscriptionFreeSeats = async (
 };
 
 /**
- * Retrieve active subscription for given userIds
- * @param userIds - The user ids
- * @returns An array containing for each userId the active subscription if any
- */
-export const activeUserSubscription = async (
-  userIds: string[],
-): Promise<Array<UserSubscription | null>> => {
-  const currentDate = new Date();
-  const subscriptions = await db()
-    .select()
-    .from(UserSubscriptionTable)
-    .where(
-      and(
-        inArray(UserSubscriptionTable.userId, userIds),
-        or(
-          eq(UserSubscriptionTable.status, 'active'),
-          gte(UserSubscriptionTable.endAt, currentDate),
-        ),
-      ),
-    );
-
-  return subscriptions;
-};
-
-/**
  *
  * @param userIds contains the user ids
  * @returns the active subscriptions for the user

@@ -1,6 +1,6 @@
 import { GraphQLError } from 'graphql';
 import {
-  activeUserSubscription,
+  getActiveUserSubscriptions,
   getTotalMultiUser,
   getWebCardPosts,
   updateWebCard,
@@ -31,7 +31,7 @@ const toggleWebCardPublished: MutationResolvers['toggleWebCardPublished'] =
     }
 
     //checking if there is enough seats for the user
-    const userSubscription = await activeUserSubscription([userId]);
+    const userSubscription = await getActiveUserSubscriptions([userId]);
     if (!published && userSubscription.length > 0) {
       //user can only have ONE usersubscription at a time
       const subscription = userSubscription[0];

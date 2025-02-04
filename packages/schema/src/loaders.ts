@@ -6,7 +6,6 @@ import {
   getLocalizationMessagesByKeys,
   getWebCardsOwnerUsers,
   getCardModulesByWebCards,
-  activeUserSubscription,
   getProfileByUserAndWebCard,
   isFollowing,
   getContactsByUser,
@@ -257,25 +256,8 @@ export const cardModuleByWebCardLoader = createSessionDataLoader<
   return keys.map(key => modules[key] ?? []);
 });
 
-export const activeSubscriptionsLoader = createSessionDataLoader(
-  'ActiveSubscriptionsLoader',
-  async (keys: readonly string[]) => {
-    if (keys.length === 0) {
-      return [];
-    }
-    const subscriptions = (
-      await activeUserSubscription(keys as string[])
-    ).filter(subscription => !!subscription);
-
-    return keys.map(k =>
-      subscriptions.filter(subscription => subscription.userId === k),
-    );
-  },
-);
-
 export const activeSubscriptionsForUserLoader = createSessionDataLoader(
   'ActiveSubscriptionsForUserLoader',
-
   async (keys: readonly string[]) => {
     if (keys.length === 0) {
       return [];
@@ -284,7 +266,6 @@ export const activeSubscriptionsForUserLoader = createSessionDataLoader(
     const userSubscriptions = await getActiveUserSubscriptions(
       keys as string[],
     );
-
-    return keys.map(k => userSubscriptions.find(u => u.userId === k) ?? null);
+    return keys.map(k => userSubscriptions.filter(u => u.userId === k) ?? null);
   },
 );

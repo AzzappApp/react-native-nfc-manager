@@ -14,7 +14,12 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import Purchases, { INTRO_ELIGIBILITY_STATUS } from 'react-native-purchases';
-import { commitLocalUpdate, graphql, usePreloadedQuery } from 'react-relay';
+import {
+  commitLocalUpdate,
+  graphql,
+  usePreloadedQuery,
+  useRelayEnvironment,
+} from 'react-relay';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import PremiumIndicator from '#components/PremiumIndicator';
@@ -58,6 +63,7 @@ const UserPayWallScreen = ({
   route,
   preloadedQuery,
 }: RelayScreenProps<UserPayWallRoute, UserPayWallScreenQuery>) => {
+  const environment = useRelayEnvironment();
   const data = usePreloadedQuery(userPayWallcreenQuery, preloadedQuery);
   const intl = useIntl();
   const router = useRouter();
@@ -161,82 +167,72 @@ const UserPayWallScreen = ({
       const res = await Purchases.purchasePackage(selectedPurchasePackage!);
       // Update Relay cache temporary
       if (res.customerInfo.entitlements.active?.multiuser?.isActive) {
-        commitLocalUpdate(getRelayEnvironment(), store => {
+        const subscriptionId =
+          res.customerInfo.entitlements.active?.multiuser.productIdentifier;
+        const newTotalSeat = extractSeatsFromSubscriptionId(subscriptionId);
+        const currentTotalSeat =
+          data.currentUser?.userSubscription?.totalSeats ?? 0;
+        const updateAvailableSeats = Math.max(
+          0,
+          newTotalSeat -
+            currentTotalSeat +
+            (data.currentUser?.userSubscription?.availableSeats ?? 0),
+        );
+
+        commitLocalUpdate(environment, store => {
           try {
-            const subscriptionId =
-              res.customerInfo.entitlements.active?.multiuser.productIdentifier;
-            const newTotalSeat = extractSeatsFromSubscriptionId(subscriptionId);
-
-            const totalsS = data.currentUser?.userSubscription?.totalSeats ?? 0;
-
-            const updateAvailableSeats =
-              newTotalSeat -
-              totalsS +
-              (data.currentUser?.userSubscription?.availableSeats ?? 0);
-            //activate only in there is enough seeats
-            if (updateAvailableSeats > 0) {
-              if (route.params?.activateFeature === 'MULTI_USER') {
-                setAllowMultiUser(true);
-              }
-            }
-
-            const userSubscriptionCache = store.create(
-              subscriptionId,
-              'UserSubscription',
-            );
-            userSubscriptionCache.setValue(
-              Math.max(0, updateAvailableSeats),
-              'availableSeats',
-            );
-            userSubscriptionCache.setValue(subscriptionId, 'subscriptionId');
-            userSubscriptionCache.setValue(subscriptionId, 'id');
-
-            if (profileInfos?.webCardId) {
-              store.get(profileInfos.webCardId)?.setValue(true, 'isPremium');
-              if (
-                !store
-                  .get(profileInfos.webCardId)
-                  ?.getLinkedRecord('subscription')
-              ) {
-                store
-                  .get(profileInfos.webCardId)
-                  ?.setLinkedRecord(userSubscriptionCache, 'subscription');
-              } else {
-                store
-                  .get(profileInfos.webCardId)
-                  ?.getLinkedRecord('subscription')
-                  ?.setValue(
-                    Math.max(0, updateAvailableSeats),
-                    'availableSeats',
-                  );
-              }
-            }
-
-            const user = store.getRoot().getLinkedRecord('currentUser');
-            const profiles = user?.getLinkedRecords('profiles');
-
-            if (profiles) {
-              const profile = profiles?.find(
-                profile => profile.getDataID() === profileInfos?.profileId,
+            if (profileInfos?.webCardId && updateAvailableSeats >= 0) {
+              //activate only in there is enough seeats
+              const userSubscriptionCache = store.create(
+                subscriptionId,
+                'UserSubscription',
               );
-              profile?.getLinkedRecord('webCard')?.setValue(true, 'isPremium');
-              if (
-                !profile
-                  ?.getLinkedRecord('webCard')
-                  ?.getLinkedRecord('subscription')
-              ) {
-                // Link the new UserSubscription record to the webCard
-                profile
-                  ?.getLinkedRecord('webCard')
-                  ?.setLinkedRecord(userSubscriptionCache, 'subscription');
+              userSubscriptionCache.setValue(
+                updateAvailableSeats,
+                'availableSeats',
+              );
+              userSubscriptionCache.setValue(subscriptionId, 'subscriptionId');
+              userSubscriptionCache.setValue(subscriptionId, 'id');
+              userSubscriptionCache.setValue('active', 'status');
+              userSubscriptionCache.setValue('apple', 'issuer');
+
+              const webCardStore = store.get(profileInfos.webCardId);
+              webCardStore?.setValue(true, 'isPremium');
+              const subStore = webCardStore?.getLinkedRecord('subscription');
+              if (!subStore) {
+                webCardStore?.setLinkedRecord(
+                  userSubscriptionCache,
+                  'subscription',
+                );
               } else {
-                profile
-                  ?.getLinkedRecord('webCard')
-                  ?.getLinkedRecord('subscription')
-                  ?.setValue(
-                    Math.max(0, updateAvailableSeats),
-                    'availableSeats',
+                subStore?.setValue(updateAvailableSeats, 'availableSeats');
+                subStore.setValue(subscriptionId, 'subscriptionId');
+                subStore.setValue('active', 'status');
+                subStore.setValue('apple', 'issuer');
+              }
+
+              //subscription is created on the webcard, we will use this one as reference
+              const upSubscriptionCache = store
+                ?.get(profileInfos.webCardId)
+                ?.getLinkedRecord('subscription');
+              if (upSubscriptionCache) {
+                const user = store.getRoot().getLinkedRecord('currentUser');
+                const profiles = user?.getLinkedRecords('profiles');
+                if (profiles) {
+                  const profile = profiles?.find(
+                    profile => profile.getDataID() === profileInfos?.profileId,
                   );
+                  if (
+                    !profile
+                      ?.getLinkedRecord('webCard')
+                      ?.getLinkedRecord('subscription')
+                  ) {
+                    // Link the new UserSubscription record to the webCard
+                    profile
+                      ?.getLinkedRecord('webCard')
+                      ?.setLinkedRecord(upSubscriptionCache, 'subscription');
+                  }
+                }
               }
             }
           } catch (error) {
@@ -245,6 +241,12 @@ const UserPayWallScreen = ({
             });
           }
         });
+        if (
+          updateAvailableSeats >= 0 &&
+          route.params?.activateFeature === 'MULTI_USER'
+        ) {
+          setAllowMultiUser(true);
+        }
       }
       setProcessing(false);
       router.back();
@@ -290,7 +292,9 @@ const UserPayWallScreen = ({
       Sentry.captureException(error, { data: 'userPayWallScreen' });
     }
   }, [
-    data.currentUser?.userSubscription,
+    data.currentUser?.userSubscription?.availableSeats,
+    data.currentUser?.userSubscription?.totalSeats,
+    environment,
     intl,
     route.params?.activateFeature,
     router,

@@ -75,7 +75,7 @@ const createModuleSavingMutation =
       const subscription = owner
         ? await activeSubscriptionsForUserLoader.load(owner.id)
         : null;
-      if (!subscription) {
+      if (!subscription || subscription.length === 0) {
         throw new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED);
       }
     }

@@ -1,15 +1,15 @@
 import { connectionFromArraySlice, cursorToOffset } from 'graphql-relay';
 import {
-  activeUserSubscription,
   getActivePaymentMeans,
   getCommonWebCardProfiles,
   getUserProfilesWithWebCard,
   getUserPayments,
   countUserPayments,
+  getActiveUserSubscriptions,
 } from '@azzapp/data';
 import { getSessionInfos } from '#GraphQLContext';
 import {
-  activeSubscriptionsLoader,
+  activeSubscriptionsForUserLoader,
   profileByWebCardIdAndUserIdLoader,
   profileLoader,
   webCardLoader,
@@ -83,7 +83,7 @@ export const User: ProtectedResolver<UserResolvers> = {
     if (!isSameUser(user)) {
       return null;
     }
-    const subscriptions = await activeSubscriptionsLoader.load(user.id);
+    const subscriptions = await activeSubscriptionsForUserLoader.load(user.id);
 
     return subscriptions[0] ?? null;
   },
@@ -91,7 +91,7 @@ export const User: ProtectedResolver<UserResolvers> = {
     if (!isSameUser(user)) {
       return null;
     }
-    const subscription = await activeUserSubscription([user.id]);
+    const subscription = await getActiveUserSubscriptions([user.id]);
     return !!subscription.filter(sub => !!sub).length;
   },
   paymentMeans: async user => {

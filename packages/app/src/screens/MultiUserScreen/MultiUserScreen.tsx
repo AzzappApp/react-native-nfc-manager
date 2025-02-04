@@ -124,7 +124,6 @@ const MultiUserScreen = ({
         });
         return;
       }
-
       //when IAP, if the user try to activate multiuser on a another webcard without enought seat
       if (
         value &&

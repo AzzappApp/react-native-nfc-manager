@@ -1,6 +1,6 @@
 import { revalidatePath } from 'next/cache';
 import {
-  activeUserSubscription,
+  getActiveUserSubscriptions,
   getCardModulesByWebCard,
   getUserProfilesWithWebCard,
   transaction,
@@ -21,7 +21,8 @@ export const unpublishWebCardForUser = async ({
       ({ profile }) => profile.profileRole === 'owner',
     );
 
-    const userIsPremium = (await activeUserSubscription([userId])).length > 0;
+    const userIsPremium =
+      (await getActiveUserSubscriptions([userId])).length > 0;
     for (const { webCard, profile } of profiles) {
       if (!userIsPremium || forceUnpublishUser) {
         if (webCard?.cardIsPublished) {
