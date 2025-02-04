@@ -1,3 +1,8 @@
+## 1.7.0-canary.121
+
+* **fix:**  - **WebCardScreen:** disable flip gesture on android and only from right on IOS ([#7274](https://github.com/AzzappApp/azzapp/pull/7274))
+* **fix:**  - **payment:** don’t charge partial months ([#7275](https://github.com/AzzappApp/azzapp/pull/7275))
+
 ## 1.7.0-canary.120
 
 * **fix:**  - **payment:** [#7272](https://github.com/AzzappApp/azzapp/pull/7272) missing owner while updating monthly subscription ([#7273](https://github.com/AzzappApp/azzapp/pull/7273))
