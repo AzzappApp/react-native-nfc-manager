@@ -9,6 +9,7 @@ import {
   isNull,
   like,
   or,
+  count,
 } from 'drizzle-orm';
 import { db, transaction } from '../database';
 import { createId } from '../helpers/createId';
@@ -194,6 +195,21 @@ export const incrementWebCardPosts = async (webCardId: string) => {
       nbPosts: sql`nbPosts + 1`,
     })
     .where(eq(WebCardTable.id, webCardId));
+};
+
+export const getWebCardCountProfile = async (webCardId: string) => {
+  const profiles = await db()
+    .select({ count: count() })
+    .from(ProfileTable)
+    .where(
+      and(
+        eq(ProfileTable.webCardId, webCardId),
+        ne(ProfileTable.deleted, true),
+      ),
+    )
+    .then(rows => rows[0].count);
+
+  return profiles;
 };
 
 /**

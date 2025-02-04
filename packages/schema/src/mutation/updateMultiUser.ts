@@ -1,19 +1,16 @@
 import { GraphQLError } from 'graphql';
 import {
-  getTotalMultiUser,
+  getWebCardCountProfile,
   removeWebCardNonOwnerProfiles,
   transaction,
   updateWebCard,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { invalidateWebCard } from '#externals';
-import {
-  activeSubscriptionsForUserLoader,
-  webCardLoader,
-  webCardOwnerLoader,
-} from '#loaders';
+import { webCardLoader, webCardOwnerLoader } from '#loaders';
 import { checkWebCardOwnerProfile } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
+import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 import type { WebCard } from '@azzapp/data';
 
@@ -29,27 +26,13 @@ const updateMultiUser: MutationResolvers['updateMultiUser'] = async (
 
   if (isMultiUser) {
     const owner = await webCardOwnerLoader.load(webCardId);
-    const subscriptions = owner
-      ? await activeSubscriptionsForUserLoader.load(owner?.id ?? '')
-      : null;
+
     //we first need to heck if this is an IAP subscription and enought seath
     if (owner?.id) {
-      if (subscriptions && subscriptions.length > 0) {
-        //user can only have ONE usersubscription at a time
-        const subscription = subscriptions[0];
-        if (subscription && subscription.subscriptionId) {
-          const totalUsedSeats = await getTotalMultiUser(owner?.id);
-          const totalSeats = subscription.totalSeats;
-
-          if (totalSeats - totalUsedSeats < 0) {
-            throw new GraphQLError(ERRORS.SUBSCRIPTION_INSUFFICIENT_SEATS);
-          }
-        }
-      }
-    }
-
-    if (!subscriptions || subscriptions.length === 0) {
-      throw new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED);
+      await validateCurrentSubscription(
+        owner.id,
+        await getWebCardCountProfile(webCardId),
+      );
     }
   }
 

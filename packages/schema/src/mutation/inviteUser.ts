@@ -76,7 +76,7 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  await validateCurrentSubscription(owner.id, 1);
+  await validateCurrentSubscription(owner.id, webCard.isMultiUser ? 1 : 2); //add owner
 
   try {
     const { avatarId, logoId } = invited.contactCard ?? {};

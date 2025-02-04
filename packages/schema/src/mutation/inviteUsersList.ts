@@ -193,7 +193,11 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
 
-    await validateCurrentSubscription(owner.id, createdProfiles.length, true); // seats are already added in the transaction, we just check that available seats are bigger or equal to 0
+    await validateCurrentSubscription(
+      owner.id,
+      createdProfiles.length + (webCard.isMultiUser ? 0 : 1),
+      true,
+    ); // seats are already added in the transaction, we just check that available seats are bigger or equal to 0
 
     return { users, createdProfiles };
   });

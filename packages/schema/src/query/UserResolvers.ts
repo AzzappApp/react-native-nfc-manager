@@ -6,6 +6,7 @@ import {
   getUserPayments,
   countUserPayments,
   getActiveUserSubscriptions,
+  getTotalMultiUser,
 } from '@azzapp/data';
 import { getSessionInfos } from '#GraphQLContext';
 import {
@@ -112,5 +113,12 @@ export const User: ProtectedResolver<UserResolvers> = {
         arrayLength: await countUserPayments(user.id),
       },
     );
+  },
+  usedMultiUserSeats: async user => {
+    if (!isSameUser(user)) {
+      return 0;
+    }
+    const totalSeats = await getTotalMultiUser(user.id);
+    return totalSeats;
   },
 };
