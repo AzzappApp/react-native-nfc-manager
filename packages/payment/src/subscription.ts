@@ -83,8 +83,8 @@ const calculateSubscriptionUpdate = async (
     const currentDate = new Date();
 
     const intervalInMonths = Math.floor(
-      existingSubscription.endAt.getTime() -
-        currentDate.getTime() / MONTHLY_RECURRENCE,
+      (existingSubscription.endAt.getTime() - currentDate.getTime()) /
+        MONTHLY_RECURRENCE,
     );
 
     const amountForTheRestOfTheYear = totalSeats
