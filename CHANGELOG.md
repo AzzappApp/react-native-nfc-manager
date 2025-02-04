@@ -1,3 +1,7 @@
+## 1.7.0-canary.122
+
+
+
 ## 1.7.0-canary.121
 
 * **fix:**  - **WebCardScreen:** disable flip gesture on android and only from right on IOS ([#7274](https://github.com/AzzappApp/azzapp/pull/7274))
