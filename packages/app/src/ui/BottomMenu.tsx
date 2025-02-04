@@ -89,12 +89,13 @@ const BottomMenu = ({
 }: BottomMenuProps) => {
   const styles = useStyleSheet(styleSheet);
   return (
-    <View style={styles.bottomMenuContainer} {...props}>
-      <Container
-        accessibilityRole="tablist"
-        accessible
-        style={[style, styles.container]}
-      >
+    <View
+      accessibilityRole="tablist"
+      accessible
+      style={styles.bottomMenuContainer}
+      {...props}
+    >
+      <Container style={[style, styles.container]}>
         {tabs.map(({ key, icon, IconComponent, tint, label }, index) => (
           <BottomMenuItemRenderer
             key={key}
@@ -244,11 +245,13 @@ const BottomMenuItemRenderer = ({
   );
 };
 
+export const BOTTOM_MENU_PADDING = 10;
+
 const styleSheet = createStyleSheet(appearance => ({
   bottomMenuContainer: {
     width: '100%',
     alignItems: 'center',
-    paddingVertical: Platform.select({ android: 10, default: 0 }),
+    paddingVertical: BOTTOM_MENU_PADDING,
   },
   container: [
     {

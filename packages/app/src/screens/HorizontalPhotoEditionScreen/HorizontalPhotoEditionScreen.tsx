@@ -34,7 +34,7 @@ import { downScaleImage } from '#helpers/resolutionHelpers';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
-import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
+import { BOTTOM_MENU_HEIGHT, BOTTOM_MENU_PADDING } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
@@ -569,14 +569,15 @@ const HorizontalPhotoEditionScreen = ({
           },
         ]}
       />
-      <HorizontalPhotoEditionBottomMenu
-        currentTab={currentTab}
-        onItemPress={onCurrentTabChange}
-        style={[
-          styles.tabsBar,
-          { bottom: insetBottom, width: windowWidth - 20 },
-        ]}
-      />
+      <View
+        style={[styles.tabsBar, { bottom: insetBottom - BOTTOM_MENU_PADDING }]}
+      >
+        <HorizontalPhotoEditionBottomMenu
+          currentTab={currentTab}
+          onItemPress={onCurrentTabChange}
+          style={{ width: windowWidth - 20 }}
+        />
+      </View>
       <ScreenModal
         visible={showImagePicker}
         onRequestDismiss={onImagePickerCancel}

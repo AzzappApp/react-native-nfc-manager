@@ -9,7 +9,10 @@ import { useWebCardColors } from '#components/WebCardColorPicker';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { useTooltipContext } from '#helpers/TooltipContext';
 import useScreenInsets from '#hooks/useScreenInsets';
-import BottomMenu, { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
+import BottomMenu, {
+  BOTTOM_MENU_HEIGHT,
+  BOTTOM_MENU_PADDING,
+} from '#ui/BottomMenu';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import type { WebCardEditScreenFooter_webCard$key } from '#relayArtifacts/WebCardEditScreenFooter_webCard.graphql';
@@ -213,7 +216,7 @@ const WebCardEditScreenFooter = ({
             position: 'absolute',
             left: '5%',
             width: '90%',
-            bottom: insets.bottom,
+            bottom: insets.bottom - BOTTOM_MENU_PADDING,
           },
           bottomMenuStyle,
         ]}
