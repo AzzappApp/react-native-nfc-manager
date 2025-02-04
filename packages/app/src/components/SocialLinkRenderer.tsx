@@ -1,4 +1,4 @@
-import { Linking, type View } from 'react-native';
+import { Linking } from 'react-native';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
   COVER_LINK_SIZE_TO_BORDER_RATIO,
@@ -11,30 +11,32 @@ import {
 } from '@azzapp/shared/socialLinkHelpers';
 import { shadow } from '#theme';
 import { SocialIcon } from '#ui/Icon';
-import type PressableNative from '#ui/PressableNative';
+import PressableNative from '#ui/PressableNative';
 import type {
   CardColors,
   CoverEditorLinksLayerItem,
   CoverEditorSocialLink,
-} from '../coverEditorTypes';
+} from './CoverEditor/coverEditorTypes';
 
-type Props = Pick<CoverEditorLinksLayerItem, 'color' | 'shadow' | 'size'> & {
-  as: typeof PressableNative | typeof View;
+type SocialLinkRendererProps = Pick<
+  CoverEditorLinksLayerItem,
+  'color' | 'shadow' | 'size'
+> & {
   viewWidth: number;
   cardColors?: Omit<CardColors, 'otherColors'> | null;
   link: CoverEditorSocialLink;
+  disabled?: boolean;
 };
-export const DynamicLinkRenderer = ({
-  as,
+
+export const SocialLinkRenderer = ({
   size,
   color,
   shadow: hasShadow,
   viewWidth,
   cardColors,
   link,
-}: Props) => {
-  const Component = as;
-
+  disabled,
+}: SocialLinkRendererProps) => {
   const width =
     convertToBaseCanvasRatio(size, viewWidth) * LINKS_ELEMENT_WRAPPER_MULTIPLER;
 
@@ -54,7 +56,7 @@ export const DynamicLinkRenderer = ({
   const borderColor = swapColor(color, cardColors);
 
   return (
-    <Component
+    <PressableNative
       onPress={() => {
         Linking.openURL(
           generateSocialLink(link.socialId as SocialLinkId, link.link),
@@ -74,6 +76,7 @@ export const DynamicLinkRenderer = ({
         },
         hasShadow ? shadow('dark') : undefined,
       ]}
+      disabled={disabled}
     >
       <SocialIcon
         style={{
@@ -83,6 +86,6 @@ export const DynamicLinkRenderer = ({
         }}
         icon={link.socialId as SocialLinkId}
       />
-    </Component>
+    </PressableNative>
   );
 };

@@ -15,10 +15,9 @@ import {
 
 import { colors, fontFamilies, reactNativeShadow, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import PressableNative from '#ui/PressableNative';
 import { HOME_ICON_COVER_WIDTH } from './constants';
-import { DynamicLinkRenderer } from './CoverEditor/CoverPreview/DynamicLinkRenderer';
 import { MediaImageRenderer, MediaVideoRenderer } from './medias';
+import { SocialLinkRenderer } from './SocialLinkRenderer';
 import type { CoverRenderer_webCard$key } from '#relayArtifacts/CoverRenderer_webCard.graphql';
 import type {
   MediaImageRendererHandle,
@@ -362,15 +361,15 @@ const CoverRenderer = (
             }}
           >
             {coverDynamicLinks.links.map(link => (
-              <DynamicLinkRenderer
+              <SocialLinkRenderer
                 key={`${link.socialId}${link.position}`}
-                as={large ? PressableNative : View}
                 cardColors={cardColors}
                 color={coverDynamicLinks.color}
                 link={link}
                 shadow={coverDynamicLinks.shadow}
                 size={coverDynamicLinks.size}
                 viewWidth={width}
+                disabled={!large}
               />
             ))}
           </View>
