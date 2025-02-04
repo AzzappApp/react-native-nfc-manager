@@ -1,3 +1,7 @@
+## 1.7.0-canary.119
+
+* **fix:**  - **android:** [#7238](https://github.com/AzzappApp/azzapp/pull/7238) wrong shadow with accessibility roles ([#7271](https://github.com/AzzappApp/azzapp/pull/7271))
+
 ## 1.7.0-canary.118
 
 * **fix:**  - **android:** [#7238](https://github.com/AzzappApp/azzapp/pull/7238) wrong shadow with accessibility roles ([#7270](https://github.com/AzzappApp/azzapp/pull/7270))
