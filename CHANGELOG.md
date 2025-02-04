@@ -1,3 +1,8 @@
+## 1.7.0-canary.124
+
+* **fix:**  - **modules:** [#6960](https://github.com/AzzappApp/azzapp/pull/6960) ensure keyboard is closed on android ([#7276](https://github.com/AzzappApp/azzapp/pull/7276))
+* **fix:**  - **module:** [#7139](https://github.com/AzzappApp/azzapp/pull/7139) pressable of gesture handler doesn’t function prop… ([#7278](https://github.com/AzzappApp/azzapp/pull/7278))
+
 ## 1.7.0-canary.123
 
 * **fix:**  -  appClip, clean code, redirection to safari with shareback, fix additional data ([#7251](https://github.com/AzzappApp/azzapp/pull/7251))
