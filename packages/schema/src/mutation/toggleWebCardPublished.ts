@@ -1,18 +1,16 @@
 import { GraphQLError } from 'graphql';
 import {
-  getActiveUserSubscriptions,
-  getTotalMultiUser,
+  getWebCardCountProfile,
   getWebCardPosts,
   updateWebCard,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
-import { extractSeatsFromIAPSubscriptionId } from '@azzapp/shared/subscriptionHelpers';
 import { invalidatePost, invalidateWebCard } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
-import { webCardLoader } from '#loaders';
+import { webCardLoader, webCardOwnerLoader } from '#loaders';
 import { checkWebCardProfileAdminRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
-import { checkWebCardHasSubscription } from '#helpers/subscriptionHelpers';
+import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 
 const toggleWebCardPublished: MutationResolvers['toggleWebCardPublished'] =
@@ -31,19 +29,14 @@ const toggleWebCardPublished: MutationResolvers['toggleWebCardPublished'] =
     }
 
     //checking if there is enough seats for the user
-    const userSubscription = await getActiveUserSubscriptions([userId]);
-    if (!published && userSubscription.length > 0) {
-      //user can only have ONE usersubscription at a time
-      const subscription = userSubscription[0];
-      if (subscription && subscription.subscriptionId) {
-        const totalUsedSeats = await getTotalMultiUser(userId);
-        const totalSeats = extractSeatsFromIAPSubscriptionId(
-          subscription.subscriptionId,
+    if (published && webCard.isMultiUser) {
+      const owner = await webCardOwnerLoader.load(webCardId);
+      //we first need to heck if this is an IAP subscription and enought seath
+      if (owner?.id) {
+        await validateCurrentSubscription(
+          owner.id,
+          await getWebCardCountProfile(webCardId),
         );
-        if (totalSeats - totalUsedSeats < 0) {
-          //TODO ? be sure the webcard are unpublished (not sure other process should already do it)
-          throw new GraphQLError(ERRORS.SUBSCRIPTION_INSUFFICIENT_SEATS);
-        }
       }
     }
 
@@ -53,8 +46,6 @@ const toggleWebCardPublished: MutationResolvers['toggleWebCardPublished'] =
       updatedAt: new Date(),
       lastCardUpdate: new Date(),
     };
-
-    await checkWebCardHasSubscription({ webCard: { ...webCard, ...updates } });
 
     try {
       await updateWebCard(webCardId, updates);
