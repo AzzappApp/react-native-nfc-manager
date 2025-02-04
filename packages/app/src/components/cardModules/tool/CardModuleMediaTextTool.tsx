@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View } from 'react-native';
+import { Keyboard, Platform, StyleSheet, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { isNotFalsyString, isValidUrl } from '@azzapp/shared/stringHelpers';
 import { MediaImageRenderer } from '#components/medias';
@@ -95,6 +95,9 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
           return;
         }
       }
+    }
+    if (Platform.OS === 'android') {
+      Keyboard.dismiss(); //on android sometimes the keyboard is hidden but not properly dismissed causing issues on future opening
     }
     //closing will call ondismiss and save(don't want to create a double save )
     close();
