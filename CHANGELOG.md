@@ -1,3 +1,7 @@
+## 1.7.0-canary.120
+
+* **fix:**  - **payment:** [#7272](https://github.com/AzzappApp/azzapp/pull/7272) missing owner while updating monthly subscription ([#7273](https://github.com/AzzappApp/azzapp/pull/7273))
+
 ## 1.7.0-canary.119
 
 * **fix:**  - **android:** [#7238](https://github.com/AzzappApp/azzapp/pull/7238) wrong shadow with accessibility roles ([#7271](https://github.com/AzzappApp/azzapp/pull/7271))
