@@ -107,7 +107,6 @@ export type CommonModuleRendererProps<T, V extends ModuleKindHasVariants> = {
   /**
    * The view mode for the module :
    *  - desktop for the desktop preview
-   *  - edit when the WebCard is in edit mode
    *  - mobile for the default rendering
    */
   displayMode: DisplayMode;

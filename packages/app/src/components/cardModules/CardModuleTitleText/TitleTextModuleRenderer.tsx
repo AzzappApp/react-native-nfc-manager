@@ -69,6 +69,7 @@ const TitleTextModuleRenderer = ({
   setEditableItemIndex,
   onLayout,
   displayMode,
+  webCardViewMode,
 }: TitleTextModuleRendererProps) => {
   const screenDimension = useScreenDimensions();
   const dimension = providedDimension ?? screenDimension;
@@ -82,8 +83,16 @@ const TitleTextModuleRenderer = ({
       width: dimension.width,
       gap: Math.max(20, cardStyle?.gap ?? 0),
       backgroundColor: data.cardModuleColor.background,
+      maxHeight:
+        webCardViewMode === 'edit' ? screenDimension.height : undefined,
     };
-  }, [cardStyle?.gap, data.cardModuleColor.background, dimension.width]);
+  }, [
+    cardStyle?.gap,
+    dimension.width,
+    data.cardModuleColor.background,
+    webCardViewMode,
+    screenDimension.height,
+  ]);
 
   return (
     <CardModuleEditionScrollHandler scrollPosition={scrollPosition}>

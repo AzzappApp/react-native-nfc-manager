@@ -138,11 +138,16 @@ const AlternationItem = ({
         isFullAlternation={isFullAlternation}
       >
         <View
-          style={
+          style={[
             isFullAlternation
               ? styles.bottomFullAlternationContainer
-              : styles.bottomContainer
-          }
+              : styles.bottomContainer,
+            webCardViewMode === 'edit' && {
+              maxHeight: dimension.height / 2,
+              overflow: 'hidden',
+              justifyContent: 'flex-start',
+            },
+          ]}
         >
           <Text
             variant="large"

@@ -135,15 +135,23 @@ const CardModuleMediaSimpleCarousel = ({
       dimension,
     ],
   );
+  const { height: screenHeight } = useScreenDimensions();
+
   return (
     <View
       onLayout={onLayoutInner}
-      style={{
-        backgroundColor: cardModuleColor.background,
-        pointerEvents: webCardViewMode === 'edit' ? 'none' : 'auto',
-        paddingTop: cardGap,
-        paddingBottom: Math.max(cardGap, 20),
-      }}
+      style={[
+        {
+          backgroundColor: cardModuleColor.background,
+          pointerEvents: webCardViewMode === 'edit' ? 'none' : 'auto',
+          paddingTop: cardGap,
+          paddingBottom: Math.max(cardGap, 20),
+        },
+        webCardViewMode === 'edit' && {
+          maxHeight: screenHeight,
+          overflow: 'hidden',
+        },
+      ]}
     >
       <GestureDetector gesture={nativeGesture}>
         {isSlidable ? (
