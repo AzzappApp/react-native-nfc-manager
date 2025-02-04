@@ -1,3 +1,7 @@
+## 1.7.0-canary.117
+
+* **feat:**  - migrate to user subscription (mobile) ([#7268](https://github.com/AzzappApp/azzapp/pull/7268))
+
 ## 1.7.0-canary.116
 
 * **fix:**  - **CoverEdition:** link draging ([#7265](https://github.com/AzzappApp/azzapp/pull/7265))
