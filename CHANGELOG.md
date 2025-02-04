@@ -1,3 +1,7 @@
+## 1.7.0-canary.126
+
+* **fix:**  - block user to publish is not enought seat ([#7288](https://github.com/AzzappApp/azzapp/pull/7288))
+
 ## 1.7.0-canary.125
 
 * **fix:**  - **payment:** [#7139](https://github.com/AzzappApp/azzapp/pull/7139) wrong interval calculation ([#7284](https://github.com/AzzappApp/azzapp/pull/7284))
