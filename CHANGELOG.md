@@ -1,3 +1,8 @@
+## 1.7.0-canary.123
+
+* **fix:**  -  appClip, clean code, redirection to safari with shareback, fix additional data ([#7251](https://github.com/AzzappApp/azzapp/pull/7251))
+* **fix:**  - **WebCardView:** limit size of module in edit mode ([#7279](https://github.com/AzzappApp/azzapp/pull/7279))
+
 ## 1.7.0-canary.122
 
 
