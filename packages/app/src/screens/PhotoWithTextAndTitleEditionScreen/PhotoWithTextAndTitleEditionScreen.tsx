@@ -828,8 +828,8 @@ const styles = StyleSheet.create({
   },
   tabsBar: {
     position: 'absolute',
-    left: 10,
-    right: 10,
+    left: 0,
+    right: 0,
   },
   counter: {
     marginTop: 5,
