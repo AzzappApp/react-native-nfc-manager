@@ -123,7 +123,6 @@ const MultiUserScreen = ({
 
   const toggleMultiUser = useCallback(
     (value: boolean) => {
-      setIsMultiUser(value);
       if (!profile?.webCard?.isPremium && value) {
         router.push({
           route: 'USER_PAY_WALL',
@@ -169,7 +168,7 @@ const MultiUserScreen = ({
         setIsMultiUser(false);
         return;
       }
-
+      setIsMultiUser(value);
       if (value) {
         setAllowMultiUser(value);
       } else {
