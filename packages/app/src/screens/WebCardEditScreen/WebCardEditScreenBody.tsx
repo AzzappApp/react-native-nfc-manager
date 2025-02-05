@@ -790,7 +790,7 @@ const WebCardModule = ({
         scrollPosition={scrollPosition}
         modulePosition={0}
         webCardViewMode="edit"
-        canPlay={editing}
+        canPlay={false}
       />
       {module.id.includes(TEMP_ID_PREFIX) && (
         <View style={styles.loadingContainer}>
