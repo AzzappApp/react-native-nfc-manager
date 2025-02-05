@@ -1,3 +1,7 @@
+## 1.7.1-canary.5
+
+* **fix:**  - choose texts depending of webcard kind ([#7313](https://github.com/AzzappApp/azzapp/pull/7313))
+
 ## 1.7.1-canary.4
 
 * **fix:**  - hide follow button when no admin ([#7310](https://github.com/AzzappApp/azzapp/pull/7310))
