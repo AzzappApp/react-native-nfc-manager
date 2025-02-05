@@ -169,6 +169,7 @@ const CoverEditorCore = (
           companyName
           companyActivityLabel
           coverIsPredefined
+          webCardKind
         }
       }
     `,
@@ -262,9 +263,11 @@ const CoverEditorCore = (
         ).map(({ customText, ...textLayer }) => {
           const text =
             textLayer.text === 'mainName'
-              ? profile.webCard?.companyName || profile.webCard?.lastName
+              ? profile.webCard?.webCardKind === 'business'
+                ? profile.webCard?.companyName
+                : profile.webCard?.lastName
               : textLayer.text === 'firstName'
-                ? profile.webCard?.companyActivityLabel
+                ? profile.webCard?.webCardKind === 'business'
                   ? profile.webCard?.companyActivityLabel
                   : profile.webCard?.firstName
                 : textLayer.text === 'custom'
