@@ -51,9 +51,11 @@ const checkSubscription = async (
   }
 
   if (monthly && monthly.status === 'active') {
+    const availableSeats = await calculateAvailableSeats(monthly);
+
     await updateExistingSubscription({
       userSubscription: monthly,
-      totalSeats: monthly.totalSeats + addedSeats,
+      totalSeats: monthly.totalSeats + (addedSeats - availableSeats),
     });
     return {
       hasActiveSubscription: true,
