@@ -98,6 +98,14 @@ const MultiUserScreen = ({
 
   const styles = useStyleSheet(styleSheet);
 
+  const [isMultiUser, setIsMultiUser] = useState(
+    !!profile?.webCard?.isMultiUser,
+  );
+
+  useEffect(() => {
+    setIsMultiUser(!!profile?.webCard?.isMultiUser);
+  }, [profile?.webCard?.isMultiUser]);
+
   useEffect(() => {
     // users that loose their admin role should not be able to access this screen
     if (!profileInfoHasAdminRight(profile)) {
@@ -115,6 +123,7 @@ const MultiUserScreen = ({
 
   const toggleMultiUser = useCallback(
     (value: boolean) => {
+      setIsMultiUser(value);
       if (!profile?.webCard?.isPremium && value) {
         router.push({
           route: 'USER_PAY_WALL',
@@ -136,6 +145,7 @@ const MultiUserScreen = ({
             activateFeature: 'MULTI_USER',
           },
         });
+        setIsMultiUser(false);
         return;
       }
       if (
@@ -156,6 +166,7 @@ const MultiUserScreen = ({
             showClose: true,
           },
         });
+        setIsMultiUser(false);
         return;
       }
 
@@ -284,7 +295,7 @@ const MultiUserScreen = ({
             </View>
             <Switch
               variant="large"
-              value={profile?.webCard?.isMultiUser}
+              value={isMultiUser}
               onValueChange={toggleMultiUser}
             />
           </View>
@@ -292,8 +303,8 @@ const MultiUserScreen = ({
       </View>
     );
   }, [
+    isMultiUser,
     profile?.profileRole,
-    profile?.webCard?.isMultiUser,
     profile?.webCard?.isPremium,
     styles.description,
     styles.proContainer,
@@ -452,7 +463,10 @@ const MultiUserScreen = ({
                   style={styles.confirmModalButton}
                 />
                 <Button
-                  onPress={() => setConfirmDeleteMultiUser(false)}
+                  onPress={() => {
+                    setConfirmDeleteMultiUser(false);
+                    setIsMultiUser(true);
+                  }}
                   variant="secondary"
                   label={intl.formatMessage({
                     defaultMessage: 'Cancel',
