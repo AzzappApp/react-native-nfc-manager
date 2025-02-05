@@ -1,3 +1,7 @@
+## 1.7.1-canary.6
+
+* **fix:**  - we need a non collapsable view to display the shadow ([#7316](https://github.com/AzzappApp/azzapp/pull/7316))
+
 ## 1.7.1-canary.5
 
 * **fix:**  - choose texts depending of webcard kind ([#7313](https://github.com/AzzappApp/azzapp/pull/7313))
