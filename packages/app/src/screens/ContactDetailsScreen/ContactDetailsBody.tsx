@@ -1,7 +1,7 @@
 import { type Contact } from 'expo-contacts';
 import { Image } from 'expo-image';
 import { useMemo } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
 import { Linking, Platform, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { colors, shadow } from '#theme';
@@ -17,12 +17,47 @@ import Icon, { SocialIcon } from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import type { CoverRenderer_webCard$key } from '#relayArtifacts/CoverRenderer_webCard.graphql';
+import type { Icons } from '#ui/Icon';
 import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
 
 type Props = {
   details: ContactDetails;
   onClose: () => void;
   onSave: () => void;
+};
+
+const ContactDetailItem = ({
+  onPress,
+  icon,
+  label,
+  content,
+  iconComponent,
+}: {
+  onPress?: () => void;
+  icon?: Icons;
+  label?: string;
+  content?: string;
+  iconComponent?: JSX.Element;
+}) => {
+  const styles = useStyleSheet(stylesheet);
+
+  return (
+    <View style={styles.item}>
+      <PressableNative onPress={onPress} style={styles.pressable}>
+        <View style={styles.label}>
+          {iconComponent ? (
+            iconComponent
+          ) : icon ? (
+            <Icon icon={icon} />
+          ) : undefined}
+          <Text variant="smallbold">{label}</Text>
+        </View>
+        <Text numberOfLines={1} style={styles.itemText}>
+          {content}
+        </Text>
+      </PressableNative>
+    </View>
+  );
 };
 
 const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
@@ -109,75 +144,54 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
           ]}
         >
           {details.phoneNumbers?.map((phoneNumber, index) => (
-            <PressableNative
+            <ContactDetailItem
               key={'phone' + index + '' + phoneNumber.number}
-              style={styles.item}
               onPress={() => {
                 Linking.openURL(`tel:${phoneNumber.number}`);
               }}
-            >
-              <View style={styles.label}>
-                <Icon icon="mobile" />
-                <Text variant="smallbold">{phoneNumber.label}</Text>
-              </View>
-              <Text numberOfLines={1} style={styles.itemText}>
-                {phoneNumber.number}
-              </Text>
-            </PressableNative>
+              icon="mobile"
+              label={phoneNumber.label}
+              content={phoneNumber.number}
+            />
           ))}
           {details.emails?.map((email, index) => (
-            <PressableNative
+            <ContactDetailItem
               key={'email' + index + '' + email.email}
-              style={styles.item}
               onPress={() => {
                 Linking.openURL(`mailto:${email.email}`);
               }}
-            >
-              <View style={styles.label}>
-                <Icon icon="mail_line" />
-                <Text variant="smallbold">{email.label}</Text>
-              </View>
-              <Text numberOfLines={1} style={styles.itemText}>
-                {email.email}
-              </Text>
-            </PressableNative>
+              icon="mail_line"
+              label={email.label}
+              content={email.email}
+            />
           ))}
           {birthday && (
-            <PressableNative
-              style={styles.item}
+            <ContactDetailItem
               key="birthday"
               onPress={async () => {
                 openCalendar(
                   `${birthday.year}-${birthday.month + 1}-${birthday.day}`,
                 );
               }}
-            >
-              <View style={styles.label}>
-                <Icon icon="calendar" />
-                <Text variant="smallbold">
-                  <FormattedMessage
-                    defaultMessage="Birthday"
-                    description="ContactDetailsBody - Title for birthday"
-                  />
-                </Text>
-              </View>
-              <Text numberOfLines={1} style={styles.itemText}>
-                {new Date(
-                  birthday.year ?? 0,
-                  birthday.month,
-                  birthday.day,
-                ).toLocaleDateString(undefined, {
-                  year: birthday.year ? 'numeric' : undefined,
-                  month: 'long',
-                  day: 'numeric',
-                })}
-              </Text>
-            </PressableNative>
+              icon="calendar"
+              label={intl.formatMessage({
+                defaultMessage: 'Birthday',
+                description: 'ContactDetailsBody - Title for birthday',
+              })}
+              content={new Date(
+                birthday.year ?? 0,
+                birthday.month,
+                birthday.day,
+              ).toLocaleDateString(undefined, {
+                year: birthday.year ? 'numeric' : undefined,
+                month: 'long',
+                day: 'numeric',
+              })}
+            />
           )}
           {details.urlAddresses?.map((urlAddress, index) => (
-            <PressableNative
+            <ContactDetailItem
               key={'url' + index + '' + urlAddress.url}
-              style={styles.item}
               onPress={async () => {
                 if (urlAddress.url) {
                   const route = await matchUrlWithRoute(urlAddress.url);
@@ -195,27 +209,21 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
                   );
                 }
               }}
-            >
-              <View style={styles.label}>
-                <Icon icon="link" />
-                <Text variant="smallbold">
-                  {urlAddress.label || (
-                    <FormattedMessage
-                      defaultMessage="Url"
-                      description="ContactDetailsBody - Title for item URL with empty label"
-                    />
-                  )}
-                </Text>
-              </View>
-              <Text numberOfLines={1} style={styles.itemText}>
-                {urlAddress.url}
-              </Text>
-            </PressableNative>
+              icon="link"
+              label={
+                urlAddress.label ||
+                intl.formatMessage({
+                  defaultMessage: 'Url',
+                  description:
+                    'ContactDetailsBody - Title for item URL with empty label',
+                })
+              }
+              content={urlAddress.url}
+            />
           ))}
           {details.addresses?.map((address, index) => (
-            <PressableNative
+            <ContactDetailItem
               key={'street' + index + '' + address.street}
-              style={styles.item}
               onPress={async () => {
                 const url = Platform.select({
                   ios: `maps:0,0?q=${address.street}`,
@@ -228,52 +236,38 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
                   console.warn(`${address.street} is not an adress`);
                 }
               }}
-            >
-              <View style={styles.label}>
-                <Icon icon="location" />
-                <Text variant="smallbold">{address.label}</Text>
-              </View>
-              <Text numberOfLines={1} style={styles.itemText}>
-                {address.street}
-              </Text>
-            </PressableNative>
+              icon="location"
+              label={address.label}
+              content={address.street}
+            />
           ))}
           {details.socialProfiles?.map((social, index) => (
-            <PressableNative
+            <ContactDetailItem
               key={'social' + index + '' + social.url}
-              style={styles.item}
               onPress={() => {
                 if (social.url) {
                   Linking.openURL(getSocialUrl(social.url));
                 }
               }}
-            >
-              <View style={styles.label}>
+              iconComponent={
                 <SocialIcon
                   icon={social.label as SocialLinkId}
                   style={styles.social}
                 />
-                <Text variant="smallbold">{social.label}</Text>
-              </View>
-              <Text numberOfLines={1} style={styles.itemText}>
-                {social.url}
-              </Text>
-            </PressableNative>
+              }
+              label={social.label}
+              content={social.url}
+            />
           ))}
-          <View style={styles.item} key="scanDate">
-            <View style={styles.label}>
-              <Icon icon="calendar" />
-              <Text variant="smallbold">
-                <FormattedMessage
-                  defaultMessage="Date of Contact"
-                  description="ContactDetailsModal - Label for date item"
-                />
-              </Text>
-            </View>
-            <Text numberOfLines={1} style={styles.itemText}>
-              {date}
-            </Text>
-          </View>
+          <ContactDetailItem
+            key="scanDate"
+            icon="calendar"
+            label={intl.formatMessage({
+              defaultMessage: 'Date of Contact',
+              description: 'ContactDetailsModal - Label for date item',
+            })}
+            content={date}
+          />
         </ScrollView>
       </View>
     </Container>
@@ -316,6 +310,14 @@ const stylesheet = createStyleSheet(theme => ({
   name: {
     marginTop: 20,
   },
+  pressable: {
+    width: '100%',
+    height: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: 10,
+  },
   content: {
     flexDirection: 'column',
     alignItems: 'center',
@@ -345,10 +347,6 @@ const stylesheet = createStyleSheet(theme => ({
     padding: 14,
     backgroundColor: theme === 'dark' ? colors.grey900 : colors.white,
     borderRadius: 12,
-    justifyContent: 'space-between',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
   },
   itemText: {
     flex: 1,
