@@ -442,7 +442,7 @@ const MultiUserScreen = ({
                   description="Title for confirm delete multi user modal"
                 />
               </Text>
-              <Text variant="medium">
+              <Text variant="medium" style={styles.deactivationText}>
                 <FormattedMessage
                   defaultMessage="If you deactivate the Multi-User, other collaborators will no longer be able to access this WebCard{azzappA} or their linked ContactCards{azzappA}. This action is irreversible."
                   description="Description for confirm delete multi user modal"
@@ -537,6 +537,7 @@ const styleSheet = createStyleSheet(appearance => ({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  deactivationText: { textAlign: 'center' },
 }));
 
 export default relayScreen(MultiUserScreen, {
