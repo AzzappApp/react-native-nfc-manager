@@ -1,3 +1,7 @@
+## 1.7.0-canary.131
+
+* **fix:**  - **WebCardScreen:** don't play video on edit mode ([#7299](https://github.com/AzzappApp/azzapp/pull/7299))
+
 ## 1.7.0-canary.130
 
 * **fix:**  - update paywall animation ([#7298](https://github.com/AzzappApp/azzapp/pull/7298))
