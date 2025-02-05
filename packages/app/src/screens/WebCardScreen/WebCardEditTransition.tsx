@@ -47,6 +47,12 @@ export const useWebCardEditTransition = (initialEdit: boolean) => {
   const editScrollViewRef = useRef<ChildPositionAwareScrollViewHandle>(null);
   const { height: windowHeight } = useScreenDimensions();
 
+  const clearTransitionInfos = useCallback(() => {
+    setTimeout(() => {
+      setTransitionInfo(null);
+    }, 5);
+  }, []);
+
   const editScale = useWebCardEditScale();
   const toggleEditing = useCallback(async () => {
     const fromScrollView = editing ? editScrollViewRef : scrollViewRef;
@@ -201,10 +207,10 @@ export const useWebCardEditTransition = (initialEdit: boolean) => {
       editing ? 0 : 1,
       { duration: TRANSITIONS_DURATION },
       () => {
-        runOnJS(setTransitionInfo)(null);
+        runOnJS(clearTransitionInfos)();
       },
     );
-  }, [editing, editTransition, editScale, windowHeight]);
+  }, [editing, editTransition, editScale, windowHeight, clearTransitionInfos]);
 
   return {
     editing,
