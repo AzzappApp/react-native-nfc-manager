@@ -1,3 +1,7 @@
+## 1.7.0-canary.128
+
+* **fix:**  - review screen inserts usage in FollowingsMosaicScreen ([#7291](https://github.com/AzzappApp/azzapp/pull/7291))
+
 ## 1.7.0-canary.127
 
 * **fix:**  - like plurals translations ([#7290](https://github.com/AzzappApp/azzapp/pull/7290))
