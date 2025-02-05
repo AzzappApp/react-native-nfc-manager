@@ -12,9 +12,13 @@ import type { FollowingsScreenList_webCard$key } from '#relayArtifacts/Following
 
 type FollowingsListProps = {
   webCard: FollowingsScreenList_webCard$key | null;
+  searchValue: string | undefined;
 };
 
-const FollowingsScreenList = ({ webCard: webCardKey }: FollowingsListProps) => {
+const FollowingsScreenList = ({
+  searchValue,
+  webCard: webCardKey,
+}: FollowingsListProps) => {
   const { data, loadNext, hasNext, isLoadingNext, refetch } =
     usePaginationFragment(
       graphql`
@@ -47,8 +51,6 @@ const FollowingsScreenList = ({ webCard: webCardKey }: FollowingsListProps) => {
   }, [isLoadingNext, hasNext, isRefreshing, loadNext]);
 
   const intl = useIntl();
-
-  const [searchValue, setSearchValue] = useState<string | undefined>('');
 
   const [debouncedSearch] = useDebounce(searchValue, 300);
 
@@ -101,8 +103,6 @@ const FollowingsScreenList = ({ webCard: webCardKey }: FollowingsListProps) => {
 
   return (
     <WebCardList
-      searchValue={searchValue}
-      setSearchValue={setSearchValue}
       noProfileFoundLabel={intl.formatMessage({
         defaultMessage: 'Not following anyone',
         description:

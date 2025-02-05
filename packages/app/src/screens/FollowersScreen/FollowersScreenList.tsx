@@ -18,12 +18,14 @@ type FollowersListProps = {
   isPublic: boolean;
   currentWebCardId: string;
   webCard: FollowersScreenList_webCard$key | null;
+  searchValue: string | undefined;
 };
 
 const FollowersScreenList = ({
   isPublic,
   currentWebCardId,
   webCard: webCardKey,
+  searchValue,
 }: FollowersListProps) => {
   const { data, loadNext, hasNext, isLoadingNext, refetch } =
     usePaginationFragment(
@@ -136,8 +138,6 @@ const FollowersScreenList = ({
     [commit, currentWebCardId, data?.followers, intl],
   );
 
-  const [searchValue, setSearchValue] = useState<string | undefined>('');
-
   const [debouncedSearch] = useDebounce(searchValue, 300);
 
   useEffect(() => {
@@ -164,8 +164,6 @@ const FollowersScreenList = ({
 
   return (
     <WebCardList
-      searchValue={searchValue}
-      setSearchValue={setSearchValue}
       users={convertToNonNullArray(
         data?.followers.edges?.map(edge => edge?.node) ?? [],
       )}
