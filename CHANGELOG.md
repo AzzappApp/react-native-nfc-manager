@@ -1,3 +1,8 @@
+## 1.7.0-canary.129
+
+* **clean:**  - remove unecessary latestcallbazck ([#7297](https://github.com/AzzappApp/azzapp/pull/7297))
+* **fix:**  - **multiUser:** [#7282](https://github.com/AzzappApp/azzapp/pull/7282) avoid white screen on multi user update ([#7296](https://github.com/AzzappApp/azzapp/pull/7296))
+
 ## 1.7.0-canary.128
 
 * **fix:**  - review screen inserts usage in FollowingsMosaicScreen ([#7291](https://github.com/AzzappApp/azzapp/pull/7291))
