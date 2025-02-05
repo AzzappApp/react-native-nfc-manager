@@ -232,6 +232,7 @@ const styles = StyleSheet.create({
   content: {
     marginVertical: 15,
     maxHeight: 190,
+    overflow: 'visible',
   },
 });
 
