@@ -22,6 +22,7 @@ import {
   getAllOwnerProfilesByWebcardId,
 } from '@azzapp/data';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
+import { getPreviewVideoForModule } from '@azzapp/shared/cloudinaryHelpers';
 import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
 import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { buildCoverAvatarUrl } from '#externals';
@@ -550,6 +551,19 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
         hasNextPage: coverTemplatesTypes.length > limit,
       },
     );
+  },
+  moduleVideoPreview: (_, args) => {
+    return getPreviewVideoForModule({
+      module: args.module,
+      variant: args.variant,
+      colorScheme: args.colorScheme,
+      locale: args.locale,
+      portraitHeight: args.portraitHeight,
+      portraitWidth: args.portraitWidth,
+      landscapeHeight: args.landscapeHeight,
+      landscapeWidth: args.landscapeWidth,
+      pixelRatio: args.pixelRatio,
+    });
   },
   companyActivityLabel: async webCard => {
     if (webCard.companyActivityLabel && webCard.companyActivityLabel !== '') {

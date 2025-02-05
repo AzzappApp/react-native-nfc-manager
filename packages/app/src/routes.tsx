@@ -1,4 +1,5 @@
 import isEqual from 'lodash/isEqual';
+import type { ModuleKindWithVariant } from '#helpers/webcardModuleHelpers';
 import type { SectionsRoute } from './sectionsRoutes';
 import type { ColorPaletteColor } from '@azzapp/shared/cardHelpers';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
@@ -276,6 +277,14 @@ export type OfflineVCardRoute = {
   };
 };
 
+export type ModulePreviewRoute = {
+  route: 'MODULE_PREVIEW';
+  params: {
+    variant: ModuleKindWithVariant;
+    requireSubscription: boolean;
+  };
+};
+
 export type Route =
   | AboutRoute
   | AccountDetailsRoute
@@ -302,6 +311,7 @@ export type Route =
   | InviteFriendsRoute
   | LikedPostsRoute
   | MediaRoute
+  | ModulePreviewRoute
   | MultiUserAddRoute
   | MultiUserDetailRoute
   | MultiUserRoute

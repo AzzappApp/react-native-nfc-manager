@@ -111,6 +111,7 @@ import TitleTextModuleWebCardEditionScreen from '#screens/TitleTextModuleWebCard
 import UpdateApplicationScreen from '#screens/UpdateApplicationScreen';
 import UserPayWallScreen from '#screens/UserPayWallScreen';
 import AddModuleSectionScreen from '#screens/WebCardEditScreen/AddModuleSection';
+import CardModuleConfirmationScreen from '#screens/WebCardEditScreen/AddModuleSection/CardModuleConfirmationScreen';
 import WebCardParametersScreen from '#screens/WebCardParametersScreen';
 import WebCardScreen from '#screens/WebCardScreen';
 import WebCardTemplateSelectionScreen from '#screens/WebCardTemplateSelectionScreen';
@@ -234,6 +235,7 @@ const screens = {
   OFFLINE_VCARD: OfflineVCardScreen,
   CONTACT_DETAILS: ContactDetailsScreen,
   ADD_MODULE_SECTION: AddModuleSectionScreen,
+  MODULE_PREVIEW: CardModuleConfirmationScreen,
   COVER_CREATION: CoverCreationScreen,
   COVER_EDITION: CoverEditionScreen,
   COVER_TEMPLATE_SELECTION: CoverTemplateSelectionScreen,

@@ -353,6 +353,48 @@ type WebCard implements Node {
     first: Int
     after: String
   ): CoverTemplateTypeConnection!
+
+  """
+  Fetches preview video for module
+  """
+  moduleVideoPreview(
+    """
+    The type of module
+    """
+    module: String!
+    """
+    The variant name
+    """
+    variant: String
+    """
+    The color Scheme
+    """
+    colorScheme: String
+    """
+    The locale of user
+    """
+    locale: String
+    """
+    The landscape video height
+    """
+    landscapeHeight: Int!
+    """
+    The landscape video width
+    """
+    landscapeWidth: Int!
+    """
+    The portrait video height
+    """
+    portraitHeight: Int!
+    """
+    The landscape video width
+    """
+    portraitWidth: Int!
+    """
+    The device pixelRatio
+    """
+    pixelRatio: Float
+  ): ModuleVideoPreview!
 }
 
 type WebCardStyle {
@@ -480,4 +522,18 @@ type Link {
 type Coordinate {
   x: Float!
   y: Float!
+}
+
+"""
+2 Video file to preview module
+"""
+type ModuleVideoPreview {
+  """
+  The preview in landscape mode
+  """
+  landscape: String!
+  """
+  The preview in portrait mode
+  """
+  portrait: String!
 }
