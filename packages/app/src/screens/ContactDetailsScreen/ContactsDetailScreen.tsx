@@ -1,6 +1,6 @@
 import { PermissionStatus } from 'expo-contacts';
 import { useCallback, useEffect, useState } from 'react';
-import { AppState, StyleSheet } from 'react-native';
+import { AppState, StyleSheet, View } from 'react-native';
 import { useRouter, type NativeScreenProps } from '#components/NativeRouter';
 import { getLocalContactsMap } from '#helpers/getLocalContactsMap';
 import useOnInviteContact from '#hooks/useOnInviteContact';
@@ -82,11 +82,13 @@ const ContactDetailsScreen = ({ route }: Props) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ContactDetailsBody
-        details={contact}
-        onClose={router.back}
-        onSave={onInviteContactInner}
-      />
+      <View collapsable={false} style={styles.container}>
+        <ContactDetailsBody
+          details={contact}
+          onClose={router.back}
+          onSave={onInviteContactInner}
+        />
+      </View>
     </SafeAreaView>
   );
 };
