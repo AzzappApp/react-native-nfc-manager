@@ -1,3 +1,7 @@
+## 1.7.0-canary.130
+
+* **fix:**  - update paywall animation ([#7298](https://github.com/AzzappApp/azzapp/pull/7298))
+
 ## 1.7.0-canary.129
 
 * **clean:**  - remove unecessary latestcallbazck ([#7297](https://github.com/AzzappApp/azzapp/pull/7297))
