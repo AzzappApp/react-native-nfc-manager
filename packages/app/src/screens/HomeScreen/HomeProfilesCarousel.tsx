@@ -103,16 +103,14 @@ const HomeProfilesCarousel = (
   );
 
   const changeIndexTimeout = useRef<any | null>(null);
-  const onCurrentProfileIndexChangeLatest = useLatestCallback(
-    onCurrentProfileIndexChange,
-  );
+
   const onSelectedIndexChange = useCallback(
     (index: number) => {
       clearTimeout(changeIndexTimeout.current);
       setSelectedIndex(index);
-      onCurrentProfileIndexChangeLatest(index);
+      onCurrentProfileIndexChange(index);
     },
-    [onCurrentProfileIndexChangeLatest],
+    [onCurrentProfileIndexChange],
   );
 
   const onSelectedIndexChangeLatest = useLatestCallback(onSelectedIndexChange);
