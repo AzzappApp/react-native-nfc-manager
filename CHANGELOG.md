@@ -1,3 +1,7 @@
+## 1.7.1-canary.7
+
+
+
 ## 1.7.1-canary.6
 
 * **fix:**  - we need a non collapsable view to display the shadow ([#7316](https://github.com/AzzappApp/azzapp/pull/7316))
