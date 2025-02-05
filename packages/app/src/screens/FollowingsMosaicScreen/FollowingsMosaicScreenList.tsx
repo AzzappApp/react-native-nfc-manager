@@ -3,6 +3,7 @@ import { Dimensions, StyleSheet, View } from 'react-native';
 import { graphql, usePaginationFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import CoverList from '#components/CoverList';
+import useScreenInsets from '#hooks/useScreenInsets';
 import type { CoverList_users$key } from '#relayArtifacts/CoverList_users.graphql';
 import type { FollowingsMosaicScreenList_webCard$key } from '#relayArtifacts/FollowingsMosaicScreenList_webCard.graphql';
 
@@ -46,6 +47,7 @@ const FollowingsMosaicScreen = ({
     );
   }, [data?.followings?.edges]);
 
+  const { bottom } = useScreenInsets();
   return (
     <View style={styles.containerStyle}>
       <CoverList
@@ -63,6 +65,7 @@ const FollowingsMosaicScreen = ({
         }
         refreshing={isLoadingPrevious}
         withShadow
+        ListFooterComponent={<View style={{ height: bottom }} />}
       />
     </View>
   );
@@ -74,7 +77,7 @@ const styles = StyleSheet.create({
   containerStyle: {
     flex: 1,
     paddingHorizontal: 4,
-    paddingVertical: 10,
+    paddingTop: 10,
   },
 });
 

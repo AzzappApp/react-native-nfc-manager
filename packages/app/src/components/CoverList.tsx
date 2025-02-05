@@ -35,6 +35,11 @@ type CoverListProps = {
     | React.ReactElement
     | null
     | undefined;
+  ListFooterComponent?:
+    | React.ComponentType<any>
+    | React.ReactElement
+    | null
+    | undefined;
   onRefresh?: () => void;
   refreshing?: boolean;
   withShadow?: boolean;
@@ -51,6 +56,7 @@ const CoverList = ({
   horizontal = true,
   numColums = 1,
   ListHeaderComponent,
+  ListFooterComponent,
   renderItem: customRenderItem,
   refreshing,
   onRefresh,
@@ -144,6 +150,7 @@ const CoverList = ({
       onRefresh={onRefresh}
       refreshing={refreshing}
       ListHeaderComponent={ListHeaderComponent}
+      ListFooterComponent={ListFooterComponent}
       onViewableItemsChanged={onViewableItemChanged}
       ItemSeparatorComponent={Separator}
       renderScrollComponent={OverflowScrollView}
