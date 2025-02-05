@@ -366,7 +366,6 @@ const WebCardEditScreen = ({
             onEditModule={onEditModule}
             onSelectionStateChange={onSelectionStateChange}
             selectionModeTransition={selectionModeTransition}
-            editing={editing}
           />
         </WebCardEditScreenScrollView>
         {transitionInfos &&
