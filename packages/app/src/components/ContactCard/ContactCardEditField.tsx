@@ -41,35 +41,34 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
       name={valueKey}
       render={({
         field: { onChange, value, onBlur },
-        fieldState: { error },
-      }) => {
-        return (
-          <ContactCardEditFieldWrapper
-            labelKey={labelKey}
-            control={control}
-            labelValues={labelValues}
-            onChangeLabel={onChangeLabel}
-            deleteField={deleteField}
-            selectedKey={selectedKey}
-            errorMessage={error ? (errorMessage ?? error.message) : undefined}
-          >
-            <TextInput
-              value={value as string}
-              onChangeText={trim ? value => onChange(value.trim()) : onChange}
-              style={styles.input}
-              numberOfLines={4}
-              multiline
-              keyboardType={keyboardType}
-              clearButtonMode="while-editing"
-              testID="contact-card-edit-modal-field"
-              placeholder={placeholder}
-              autoCapitalize={autoCapitalize}
-              isErrored={!!error}
-              onBlur={onBlur}
-            />
-          </ContactCardEditFieldWrapper>
-        );
-      }}
+        fieldState: { error, isDirty },
+      }) => (
+        <ContactCardEditFieldWrapper
+          labelKey={labelKey}
+          control={control}
+          labelValues={labelValues}
+          onChangeLabel={onChangeLabel}
+          deleteField={deleteField}
+          selectedKey={selectedKey}
+          errorMessage={error ? (errorMessage ?? error.message) : undefined}
+        >
+          <TextInput
+            value={value as string}
+            onChangeText={trim ? value => onChange(value.trim()) : onChange}
+            style={styles.input}
+            numberOfLines={4}
+            multiline
+            keyboardType={keyboardType}
+            clearButtonMode="while-editing"
+            testID="contact-card-edit-modal-field"
+            placeholder={placeholder}
+            autoCapitalize={autoCapitalize}
+            isErrored={!!error}
+            onBlur={onBlur}
+            autoFocus={isDirty}
+          />
+        </ContactCardEditFieldWrapper>
+      )}
     />
   );
 };

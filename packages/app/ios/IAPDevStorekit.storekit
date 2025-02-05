@@ -1,4 +1,14 @@
 {
+  "appPolicies" : {
+    "eula" : "",
+    "policies" : [
+      {
+        "locale" : "en_US",
+        "policyText" : "",
+        "policyURL" : ""
+      }
+    ]
+  },
   "identifier" : "5F2E7ADF",
   "nonRenewingSubscriptions" : [
 
@@ -7,8 +17,14 @@
 
   ],
   "settings" : {
+    "_billingGracePeriodEnabled" : false,
+    "_billingIssuesEnabled" : false,
+    "_compatibilityTimeRate" : {
+      "3" : 6
+    },
     "_failTransactionsEnabled" : false,
     "_locale" : "en_US",
+    "_renewalBillingIssuesEnabled" : false,
     "_storefront" : "USA",
     "_storeKitErrors" : [
       {
@@ -32,7 +48,10 @@
         "name" : "App Store Sync"
       },
       {
-        "current" : null,
+        "current" : {
+          "index" : 2,
+          "type" : "generic"
+        },
         "enabled" : false,
         "name" : "Subscription Status"
       },
@@ -42,8 +61,11 @@
         "name" : "App Transaction"
       },
       {
-        "current" : null,
-        "enabled" : false,
+        "current" : {
+          "index" : 1,
+          "type" : "generic"
+        },
+        "enabled" : true,
         "name" : "Manage Subscriptions Sheet"
       },
       {
@@ -56,7 +78,8 @@
         "enabled" : false,
         "name" : "Offer Code Redeem Sheet"
       }
-    ]
+    ],
+    "_timeRate" : 1004
   },
   "subscriptionGroups" : [
     {
@@ -66,64 +89,7 @@
       ],
       "name" : "pro",
       "subscriptions" : [
-        {
-          "adHocOffers" : [
 
-          ],
-          "codeOffers" : [
-
-          ],
-          "displayPrice" : "2.99",
-          "familyShareable" : false,
-          "groupNumber" : 1,
-          "internalID" : "1892CA64",
-          "introductoryOffer" : {
-            "internalID" : "7402B613",
-            "paymentMode" : "free",
-            "subscriptionPeriod" : "P1W"
-          },
-          "localizations" : [
-            {
-              "description" : "",
-              "displayName" : "",
-              "locale" : "en_US"
-            }
-          ],
-          "productID" : "com.azzapp.azzapp.pro.month",
-          "recurringSubscriptionPeriod" : "P1M",
-          "referenceName" : "Pro Monthly",
-          "subscriptionGroupID" : "F68337C9",
-          "type" : "RecurringSubscription"
-        },
-        {
-          "adHocOffers" : [
-
-          ],
-          "codeOffers" : [
-
-          ],
-          "displayPrice" : "29.99",
-          "familyShareable" : false,
-          "groupNumber" : 1,
-          "internalID" : "AD84B1AC",
-          "introductoryOffer" : {
-            "internalID" : "35EA7B99",
-            "paymentMode" : "free",
-            "subscriptionPeriod" : "P1W"
-          },
-          "localizations" : [
-            {
-              "description" : "",
-              "displayName" : "",
-              "locale" : "en_US"
-            }
-          ],
-          "productID" : "com.azzapp.azzapp.pro.year",
-          "recurringSubscriptionPeriod" : "P1Y",
-          "referenceName" : "Pro yearly",
-          "subscriptionGroupID" : "F68337C9",
-          "type" : "RecurringSubscription"
-        }
       ]
     },
     {
@@ -160,7 +126,10 @@
           "recurringSubscriptionPeriod" : "P1M",
           "referenceName" : "Multi User - 1 seat",
           "subscriptionGroupID" : "7CC98143",
-          "type" : "RecurringSubscription"
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
         },
         {
           "adHocOffers" : [
@@ -189,7 +158,10 @@
           "recurringSubscriptionPeriod" : "P1M",
           "referenceName" : "Multi User - 2 seats",
           "subscriptionGroupID" : "7CC98143",
-          "type" : "RecurringSubscription"
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
         },
         {
           "adHocOffers" : [
@@ -218,7 +190,10 @@
           "recurringSubscriptionPeriod" : "P1M",
           "referenceName" : "Multi User - 10 seats",
           "subscriptionGroupID" : "7CC98143",
-          "type" : "RecurringSubscription"
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
         },
         {
           "adHocOffers" : [
@@ -247,7 +222,10 @@
           "recurringSubscriptionPeriod" : "P1Y",
           "referenceName" : "Multi User - 1 seat - yearly",
           "subscriptionGroupID" : "7CC98143",
-          "type" : "RecurringSubscription"
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
         },
         {
           "adHocOffers" : [
@@ -276,7 +254,10 @@
           "recurringSubscriptionPeriod" : "P1Y",
           "referenceName" : "Multi User - 2 seats - yearly",
           "subscriptionGroupID" : "7CC98143",
-          "type" : "RecurringSubscription"
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
         },
         {
           "adHocOffers" : [
@@ -305,7 +286,10 @@
           "recurringSubscriptionPeriod" : "P1Y",
           "referenceName" : "Multi User - 10 seats - yearly",
           "subscriptionGroupID" : "7CC98143",
-          "type" : "RecurringSubscription"
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
         }
       ]
     }
@@ -315,7 +299,7 @@
     "privateKey" : "MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgNFirOiyYW/CsYv+1xIbpNaQVb110OTIFnY00Bz34jbagCgYIKoZIzj0DAQehRANCAAQB4/A3rXFJPWAitZvPhUwhFJ8/j8YxpWWJawGHKliYQAisUjr0O7S5/c8fGWKD1vMoPU2opH4aIPK146PWz5dJ"
   },
   "version" : {
-    "major" : 3,
+    "major" : 4,
     "minor" : 0
   }
 }

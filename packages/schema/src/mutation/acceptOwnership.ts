@@ -50,7 +50,7 @@ const acceptOwnership: MutationResolvers['acceptOwnership'] = async (
       await updateProfileForUserAndWebCard(owner.id, profile.webCardId, {
         profileRole: 'admin',
       });
-      await cancelSubscription(owner.id, profile.webCardId);
+      await cancelSubscription(owner.id);
     }
     await updateProfile(profileId, {
       profileRole: 'owner',

@@ -598,7 +598,6 @@ const QRCode = ({ value, width }: { width: number; value: string }) => {
         width,
         height: width,
       }}
-      opaque
       key={qrCode}
     >
       <ImageSVG svg={svg} />

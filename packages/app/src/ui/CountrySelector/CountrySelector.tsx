@@ -2,11 +2,11 @@ import i18nCountries from 'i18n-iso-countries';
 import { getCountries, getCountryCallingCode } from 'libphonenumber-js';
 import { useCallback, useMemo } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
+import COUNTRY_FLAG from '@azzapp/shared/CountryFlag';
 import { colors } from '#theme';
 import { getLocales, useCurrentLocale } from '#helpers/localeHelpers';
 import Text from '#ui/Text';
 import SelectList from './../SelectList';
-import COUNTRY_FLAG from './CountryFlag';
 import type { SelectListItemInfo, SelectListProps } from './../SelectList';
 import type { CountryCode } from 'libphonenumber-js';
 

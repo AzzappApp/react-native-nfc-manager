@@ -246,7 +246,6 @@ const styleSheet = createStyleSheet(appearance => ({
     columnGap: 10,
   },
   container: {
-    overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'flex-start',
     flexDirection: 'row',

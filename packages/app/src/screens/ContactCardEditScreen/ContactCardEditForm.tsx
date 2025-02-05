@@ -154,7 +154,7 @@ const ContactCardEditForm = ({
 
   return (
     <>
-      <FormDeleteFieldOverlay>
+      <FormDeleteFieldOverlay keyboardShouldPersistTaps="handled">
         <View style={styles.sectionsContainer}>
           {children}
           <ContactCardEditModalAvatar

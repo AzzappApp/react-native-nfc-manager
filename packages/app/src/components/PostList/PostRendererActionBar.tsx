@@ -275,7 +275,7 @@ const PostRendererActionBar = ({
             <Text variant="smallbold">
               <FormattedMessage
                 defaultMessage="{countReactions, plural,
-                                    =0 {0 like}
+                                    =0 {0 likes}
                                     one {1 like}
                                     other {# likes}
                                 }"

@@ -241,7 +241,7 @@ const VideoTimelineEditor = ({
   return (
     <View {...props}>
       <View style={styles.root}>
-        <Canvas style={{ height: imagesHeight, width: sliderWidth }} opaque>
+        <Canvas style={{ height: imagesHeight, width: sliderWidth }}>
           {texturesInfos.map((textureInfo, index) => (
             <TextureImage
               fit="cover"

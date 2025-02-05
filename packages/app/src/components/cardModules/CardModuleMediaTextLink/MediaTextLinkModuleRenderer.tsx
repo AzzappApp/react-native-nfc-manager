@@ -45,6 +45,8 @@ export const MediaTextLinkModuleRendererFragment = graphql`
       }
       media {
         id
+        width
+        height
         ... on MediaImage {
           uri(width: $screenWidth, pixelRatio: $pixelRatio)
           smallThumbnail: uri(width: 125, pixelRatio: $cappedPixelRatio)
@@ -108,6 +110,21 @@ const MediaTextLinkModuleRenderer = ({
           />
         </CardModuleEditionScrollHandler>
       );
+    case 'full_alternation':
+      return (
+        <CardModuleEditionScrollHandler scrollPosition={scrollPosition}>
+          <CardModuleMediaTextLinkAlternation
+            cardModuleMedias={data.cardModuleMedias!}
+            cardModuleColor={data.cardModuleColor!}
+            scrollPosition={scrollPosition}
+            displayMode={displayMode}
+            moduleEditing={moduleEditing}
+            isFullAlternation
+            {...props}
+          />
+        </CardModuleEditionScrollHandler>
+      );
+
     case 'parallax':
       return (
         <CardModuleEditionScrollHandler scrollPosition={scrollPosition}>

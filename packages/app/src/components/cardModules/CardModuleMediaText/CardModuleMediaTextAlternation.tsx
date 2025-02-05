@@ -23,6 +23,7 @@ type CardModuleMediaTextAlternationProps = CardModuleVariantType & {
   onLayout?: (event: LayoutChangeEvent) => void;
   scrollPosition?: Animated.Value;
   modulePosition?: number;
+  isFullAlternation?: boolean;
 };
 
 const CardModuleMediaTextAlternation = ({
@@ -37,6 +38,7 @@ const CardModuleMediaTextAlternation = ({
   modulePosition,
   canPlay,
   webCardViewMode,
+  isFullAlternation,
 }: CardModuleMediaTextAlternationProps) => {
   const screenDimension = useScreenDimensions();
   const dimension = providedDimension ?? screenDimension;
@@ -71,6 +73,7 @@ const CardModuleMediaTextAlternation = ({
             index={index}
             canPlay={canPlay}
             webCardViewMode={webCardViewMode}
+            isFullAlternation={isFullAlternation}
           />
         );
       })}
@@ -90,6 +93,7 @@ const AlternationItem = ({
   modulePosition,
   index,
   webCardViewMode,
+  isFullAlternation,
 }: {
   cardModuleMedia: CardModuleMedia;
   cardModuleColor: CardModuleColor;
@@ -102,6 +106,7 @@ const AlternationItem = ({
   modulePosition?: number;
   index: number;
   webCardViewMode?: WebCardViewMode;
+  isFullAlternation?: boolean;
 }) => {
   const [parentY, setParentY] = useState(0);
 
@@ -130,8 +135,20 @@ const AlternationItem = ({
         parentY={parentY}
         canPlay={canPlay}
         webCardViewMode={webCardViewMode}
+        isFullAlternation={isFullAlternation}
       >
-        <View style={styles.bottomContainer}>
+        <View
+          style={[
+            isFullAlternation
+              ? styles.bottomFullAlternationContainer
+              : styles.bottomContainer,
+            webCardViewMode === 'edit' && {
+              maxHeight: dimension.height / 2,
+              overflow: 'hidden',
+              justifyContent: 'flex-start',
+            },
+          ]}
+        >
           <Text
             variant="large"
             style={getTitleStyle(cardStyle, cardModuleColor)}
@@ -152,6 +169,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flex: 1,
     rowGap: 20,
+  },
+  bottomFullAlternationContainer: {
+    justifyContent: 'center',
+    flex: 1,
+    rowGap: 20,
+    padding: 20,
   },
 });
 

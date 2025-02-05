@@ -58,7 +58,7 @@
          </EnvironmentVariable>
          <EnvironmentVariable
             key = "_XCAppClipURL"
-            value = "https://appclip.apple.com/id?p=com.azzapp.app.Clip-dev&amp;u= sebastien&amp;c=NoIgOiwRBGB2A2BA3A7gKwC4GsC2BOOaEAGmMwFZUAGARnVwEsAWAC3wBNizwQBnAKYwAhn0yMBRXj2IQZvObOnAovABIB7XAO7EA1AGYDCAOz5TzahQPEAurZIrim7bt6CYAOg4BXGABtGOAABAHNcYUZ-TwBjLTsHYAc4H39-W2gAJzA4UhAAD1CAJnxMAFpsBA0ATVoBAA0ABwBxADFWgDkNAA5MhHwASWFu+oAtABkfVkbQgBFWjQFWgAVWAEEAYWwQWyA"
+            value = "https://appclip.apple.com/id?p=com.azzapp.app.Clip-staging&amp;u=sebastien&amp;c=NoIgOiwRBGB2A2BA3A7gKwC4GsC2BOOaEAGmMwFZUAGARnVwEsAWAC3wBNizwQBnAKYwAhn0yMBRXj2IQZvObOnAovABIB7XAO7EA1AGYDCAOz5TzahQPEAurZIrim7bt6CYAOg4BXGABtGOAABAHNcYUZ-TwBjLTsHYAc4H39-W2gAJzA4UhAAD1CAJnxMAFpsBA0ATVoBAA0ABwBxADFWgDkNAA5MhHwASWFu+oAtABkfVkbQgBFWjQFWgAVWAEEAYWwQWyA"
             isEnabled = "NO">
          </EnvironmentVariable>
       </EnvironmentVariables>

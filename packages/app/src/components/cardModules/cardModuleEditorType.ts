@@ -32,7 +32,8 @@ export type CardModuleVideo = { kind: 'video' } & (CardModuleMediaBase &
 export type CardModuleImage = { kind: 'image' } & (CardModuleMediaBase &
   SourceMediaImage);
 
-export type CardModuleSourceMedia = CardModuleImage | CardModuleVideo; //duplciate kind because propagaiton of type is not good
+//duplicate kind because propagation of type is not good
+export type CardModuleSourceMedia = CardModuleImage | CardModuleVideo;
 
 export type CardModuleMedia = {
   media: CardModuleSourceMedia; //editable has nothing to do in the SourceMediaImage
@@ -106,7 +107,6 @@ export type CommonModuleRendererProps<T, V extends ModuleKindHasVariants> = {
   /**
    * The view mode for the module :
    *  - desktop for the desktop preview
-   *  - edit when the WebCard is in edit mode
    *  - mobile for the default rendering
    */
   displayMode: DisplayMode;

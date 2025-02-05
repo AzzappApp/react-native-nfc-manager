@@ -2,6 +2,7 @@ import { graphql, readInlineData } from 'react-relay';
 import { type CardModuleColor } from '@azzapp/shared/cardModuleHelpers';
 import CardModuleEditionScrollHandler from '../CardModuleEditionScrollHandler';
 import withSwapCardModuleColor from '../withSwapCardModuleColor';
+import CardModuleMediaSimpleCarousel from './CardModuleMediaSimpleCarousel';
 import CardModuleMediaTextAlternation from './CardModuleMediaTextAlternation';
 import CardModuleMediaTextParallax from './CardModuleMediaTextParallax';
 import type {
@@ -40,6 +41,8 @@ export const MediaTextModuleRendererFragment = graphql`
       title
       media {
         id
+        width
+        height
         ... on MediaImage {
           uri(width: $screenWidth, pixelRatio: $pixelRatio)
           smallThumbnail: uri(width: 125, pixelRatio: $cappedPixelRatio)
@@ -102,10 +105,35 @@ const MediaTextModuleRenderer = ({
           />
         </CardModuleEditionScrollHandler>
       );
+    case 'full_alternation':
+      return (
+        <CardModuleEditionScrollHandler scrollPosition={scrollPosition}>
+          <CardModuleMediaTextAlternation
+            cardModuleMedias={data.cardModuleMedias!}
+            cardModuleColor={data.cardModuleColor}
+            displayMode={displayMode}
+            scrollPosition={scrollPosition}
+            isFullAlternation
+            {...props}
+          />
+        </CardModuleEditionScrollHandler>
+      );
     case 'parallax':
       return (
         <CardModuleEditionScrollHandler scrollPosition={scrollPosition}>
           <CardModuleMediaTextParallax
+            cardModuleMedias={data.cardModuleMedias}
+            cardModuleColor={data.cardModuleColor}
+            displayMode={displayMode}
+            scrollPosition={scrollPosition}
+            {...props}
+          />
+        </CardModuleEditionScrollHandler>
+      );
+    case 'simple_carousel':
+      return (
+        <CardModuleEditionScrollHandler scrollPosition={scrollPosition}>
+          <CardModuleMediaSimpleCarousel
             cardModuleMedias={data.cardModuleMedias}
             cardModuleColor={data.cardModuleColor}
             displayMode={displayMode}

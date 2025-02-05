@@ -1,8 +1,16 @@
 import concat from 'lodash/concat';
-import { useState, useMemo, useCallback, startTransition, memo } from 'react';
+import {
+  useState,
+  useMemo,
+  useCallback,
+  startTransition,
+  memo,
+  useRef,
+} from 'react';
 import { Platform, StyleSheet, useWindowDimensions, View } from 'react-native';
 import Animated, {
   interpolateColor,
+  runOnJS,
   useAnimatedReaction,
   useAnimatedStyle,
   useDerivedValue,
@@ -12,6 +20,7 @@ import { getTextColorPrimaryForBackground } from '@azzapp/shared/colorsHelpers';
 import { colors } from '#theme';
 import { CONTACT_CARD_RATIO } from '#components/ContactCard/ContactCard';
 import { setMainTabBarOpacity } from '#components/MainTabBar';
+import { useTooltipContext } from '#helpers/TooltipContext';
 import TabView from '#ui/TabView';
 import HomeBottomPanelMessage from './HomeBottomPanelMessage';
 import HomeContactCard from './HomeContactCard';
@@ -87,6 +96,7 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
   //#endregion
 
   // #region MainTabBar visibility
+  const { registerTooltip, unregisterTooltip } = useTooltipContext();
   const { currentIndexSharedValue } = useHomeScreenContext();
   const mainTabBarVisibleInner = useIndexInterpolation(
     currentIndexSharedValue,
@@ -123,10 +133,35 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
     [panelHeight],
   );
 
+  const ref = useRef(null);
+
   useAnimatedReaction(
     () => mainTabBarVisible.value,
     value => {
       setMainTabBarOpacity(value);
+    },
+  );
+
+  const registerTooltipInner = () => {
+    registerTooltip('profileBottomPanel', {
+      ref,
+    });
+  };
+
+  const unregisterTooltipInner = () => {
+    unregisterTooltip('profileBottomPanel');
+  };
+
+  const isVisible = useDerivedValue(() => mainTabBarVisible.value === 1);
+
+  useAnimatedReaction(
+    () => isVisible.value,
+    visible => {
+      if (visible) {
+        runOnJS(registerTooltipInner)();
+      } else {
+        runOnJS(unregisterTooltipInner)();
+      }
     },
   );
 
@@ -183,7 +218,10 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
             {
               id: 'CONTACT_CARD',
               element: (
-                <View style={{ paddingHorizontal: 20, height: panelHeight }}>
+                <View
+                  ref={ref}
+                  style={{ paddingHorizontal: 20, height: panelHeight }}
+                >
                   <HomeContactCard
                     height={panelHeight}
                     width={panelWidth}

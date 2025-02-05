@@ -3,7 +3,7 @@ import { FormattedMessage } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import { graphql, commitMutation } from 'react-relay';
 import { colors } from '#theme';
-import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import { onChangeWebCard } from '#helpers/authStore';
 import { getRelayEnvironment } from '#helpers/relayEnvironment';
 
 import Button from '#ui/Button';
@@ -56,11 +56,8 @@ const HomeBottomPanelTransfertOwner = ({
       onCompleted: (data, error) => {
         if (!error) {
           if (data.acceptOwnership?.profile?.profileRole) {
-            void dispatchGlobalEvent({
-              type: 'PROFILE_ROLE_CHANGE',
-              payload: {
-                profileRole: data.acceptOwnership.profile.profileRole,
-              },
+            onChangeWebCard({
+              profileRole: data.acceptOwnership.profile.profileRole,
             });
           }
         }

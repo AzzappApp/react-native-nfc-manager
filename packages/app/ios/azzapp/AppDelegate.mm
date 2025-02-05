@@ -1,5 +1,6 @@
 #import "AppDelegate.h"
 #import <React/RCTBundleURLProvider.h>
+#import <ReactAppDependencyProvider/RCTAppDependencyProvider.h>
 #import <React/RCTLinkingManager.h>
 #import <RNScreens/RNSScreenStackAnimator.h>
 #import <RNBootSplash/RNBootSplash.h>
@@ -40,6 +41,7 @@ static void ClearKeychainIfNecessary() {
   ClearKeychainIfNecessary();
 
   self.moduleName = @"azzapp";
+  self.dependencyProvider = [RCTAppDependencyProvider new];
   // You can add your custom initial props in the dictionary below.
   // They will be passed down to the ViewController used by React Native.
   self.initialProps = @{};

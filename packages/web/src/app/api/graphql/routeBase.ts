@@ -11,7 +11,6 @@ import { maxAliasesPlugin } from '@escape.tech/graphql-armor-max-aliases';
 import { maxTokensPlugin } from '@escape.tech/graphql-armor-max-tokens';
 import { useDisableIntrospection } from '@graphql-yoga/plugin-disable-introspection';
 import { usePersistedOperations } from '@graphql-yoga/plugin-persisted-operations';
-import { waitUntil } from '@vercel/functions';
 import { createYoga } from 'graphql-yoga';
 import { compare } from 'semver';
 import {
@@ -23,6 +22,7 @@ import { schema, type GraphQLContext } from '@azzapp/schema';
 import ERRORS from '@azzapp/shared/errors';
 import { AZZAPP_SERVER_HEADER } from '@azzapp/shared/urlHelpers';
 import queryMap from '#persisted-query-map.json';
+import { revalidateWebcardsAndPosts } from '#helpers/api';
 import { buildCoverAvatarUrl } from '#helpers/avatar';
 import { sendPushNotification } from '#helpers/notificationsHelpers';
 import { withPluginsRoute } from '#helpers/queries';
@@ -88,23 +88,7 @@ function useRevalidatePages(): YogaPlugin<GraphQLContext> {
         async onExecuteDone() {
           const cards = getInvalidatedWebCards();
           const posts = getInvalidatedPosts();
-          if (cards.length || posts.length) {
-            waitUntil(
-              fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/revalidate`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  [AZZAPP_SERVER_HEADER]: process.env.API_SERVER_TOKEN ?? '',
-                  'x-vercel-protection-bypass':
-                    process.env.VERCEL_AUTOMATION_BYPASS_SECRET ?? '',
-                },
-                body: JSON.stringify({
-                  cards,
-                  posts,
-                }),
-              }),
-            );
-          }
+          revalidateWebcardsAndPosts(cards, posts);
         },
       };
     },
@@ -199,7 +183,7 @@ const { handleRequest } = createYoga({
       allowList: ['node', 'uri'],
     }),
     maxTokensPlugin({
-      n: 1400, // Number of tokens allowed
+      n: 2000, // Number of tokens allowed
     }),
     useDisableIntrospection({
       isDisabled: request => {

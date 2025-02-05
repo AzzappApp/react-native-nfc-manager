@@ -1,7 +1,9 @@
+import * as Sentry from '@sentry/react-native';
 import { getContactByIdAsync } from 'expo-contacts';
-import { File } from 'expo-file-system/next';
+import { File, Paths } from 'expo-file-system/next';
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
+import { MMKV } from 'react-native-mmkv';
 import VCard from 'vcard-creator';
 import { SOCIAL_NETWORK_LINKS } from '@azzapp/shared/socialLinkHelpers';
 import {
@@ -11,13 +13,17 @@ import {
 } from '@azzapp/shared/vCardHelpers';
 import { textStyles } from '#theme';
 import { createStyleSheet } from '#helpers/createStyles';
+import type { ContactType } from './contactListHelpers';
 import type { Contact } from 'expo-contacts';
 import type { ColorSchemeName } from 'react-native';
-import type { MMKV } from 'react-native-mmkv';
 
 export const DELETE_BUTTON_WIDTH = 70;
 export const MAX_FIELD_HEIGHT = 85;
 const MIN_FIELD_HEIGHT = 72;
+
+export const contactStorage = new MMKV({
+  id: 'contacts',
+});
 
 export const buildContactCardModalStyleSheet = (appareance: ColorSchemeName) =>
   ({
@@ -235,14 +241,13 @@ export const useSocialLinkLabels = () => {
 };
 
 export const findLocalContact = async (
-  storage: MMKV,
   phoneNumbers: string[],
   emails: string[],
   localContacts: Contact[],
   profileId?: string,
 ): Promise<Contact | undefined> => {
-  if (profileId && storage.contains(profileId)) {
-    const internalId = storage.getString(profileId);
+  if (profileId && contactStorage.contains(profileId)) {
+    const internalId = contactStorage.getString(profileId);
     if (internalId) {
       const contactByInternalId = await getContactByIdAsync(internalId);
 
@@ -281,6 +286,74 @@ export const findLocalContact = async (
   });
 
   return localContact;
+};
+
+export const buildVCardFromAzzappContact = async (contact: ContactType) => {
+  const vCard = new VCard();
+  vCard.addName(contact.lastName ?? undefined, contact.firstName ?? undefined);
+
+  if (contact.title) {
+    vCard.addJobtitle(contact.title);
+  }
+
+  if (contact.birthday && contact.birthday) {
+    vCard.addBirthday(contact.birthday.toString());
+  }
+  if (contact.company) {
+    vCard.addCompany(contact.company);
+  }
+
+  contact.phoneNumbers.forEach(number => {
+    if (number.number) {
+      vCard.addPhoneNumber(
+        `${number.number}`,
+        phoneLabelToVCardLabel(number.label) || '',
+      );
+    }
+  });
+
+  contact.emails.forEach(email => {
+    if (email.address)
+      vCard.addEmail(email.address, emailLabelToVCardLabel(email.label) || '');
+  });
+
+  contact.urls?.forEach(url => {
+    if (url.url) vCard.addURL(url.url);
+  });
+
+  contact.socials?.forEach(social => {
+    if (social.url) vCard.addSocial(social.url, social.label || '');
+  });
+
+  contact.addresses.forEach(addr => {
+    if (addr.address)
+      vCard.addAddress(
+        addr.address,
+        addressLabelToVCardLabel(addr.label) || '',
+      );
+  });
+
+  if (
+    contact.contactProfile?.avatar?.uri &&
+    contact.contactProfile.avatar.uri.startsWith('http')
+  ) {
+    try {
+      const file = new File(
+        Paths.cache.uri + contact.contactProfile?.avatar.id,
+      );
+      if (!file.exists) {
+        await File.downloadFileAsync(contact.contactProfile?.avatar?.uri, file);
+      }
+      const image = file.base64();
+      if (image) {
+        vCard.addPhoto(image);
+      }
+    } catch (e) {
+      Sentry.captureException(e);
+      console.error('download avatar failure', e);
+    }
+  }
+  return vCard;
 };
 
 export const buildVCardFromExpoContact = async (contact: Contact) => {

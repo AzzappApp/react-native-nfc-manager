@@ -150,7 +150,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     rowGap: 20,
-    paddingHorizontal: 20,
     position: 'absolute',
     top: 0,
     left: 0,
@@ -160,6 +159,7 @@ const styles = StyleSheet.create({
   },
   textStyle: {
     textAlign: 'center',
+    paddingHorizontal: 20,
   },
 });
 

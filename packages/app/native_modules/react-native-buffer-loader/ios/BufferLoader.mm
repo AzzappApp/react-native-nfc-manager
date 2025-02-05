@@ -1,7 +1,32 @@
 #import "BufferLoader.h"
 #import <CoreImage/CoreImage.h>
 
+
 namespace azzapp {
+
+
+inline CGImageRef copyImage(CGImageRef image, CGSize imageSize, CGSize targetSize, CGAffineTransform transform) {
+     
+  CGContextRef context = CGBitmapContextCreate(NULL,
+                                             targetSize.width,
+                                             targetSize.height,
+                                             8,
+                                             0,
+                                             CGColorSpaceCreateDeviceRGB(),
+                                             kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
+  
+  if (!context) {
+    return nil;
+  }
+  
+  CGContextConcatCTM(context, transform);
+  CGContextDrawImage(context, CGRectMake(0, 0, imageSize.width, imageSize.height), image);
+  CGImageRef rotatedImage = CGBitmapContextCreateImage(context);
+  CGContextRelease(context);
+  
+  return rotatedImage;
+}
+
 
 BufferLoaderHostObject::BufferLoaderHostObject(std::shared_ptr<react::CallInvoker> callInvoker)
   : callInvoker(callInvoker) {
@@ -10,13 +35,10 @@ BufferLoaderHostObject::BufferLoaderHostObject(std::shared_ptr<react::CallInvoke
     throw std::runtime_error("Failed to create MTLDevice");
   }
   commandQueue = [metalDevice newCommandQueue];
-  colorSpace = CGColorSpaceCreateDeviceRGB();
-  ciContext = [CIContext contextWithMTLDevice:metalDevice];
+  textureLoader = [[MTKTextureLoader alloc] initWithDevice:metalDevice];
 }
 
 BufferLoaderHostObject::~BufferLoaderHostObject() {
-  colorSpace = nil;
-  ciContext = nil;
   commandQueue = nil;
   metalDevice = nil;
 }
@@ -55,13 +77,20 @@ jsi::Value BufferLoaderHostObject::get(jsi::Runtime &runtime, const jsi::PropNam
           loadTexture(callback, runtime, [&]() -> id<MTLTexture> {
             NSURL *imageURL = [NSURL URLWithString:url];
             if (!imageURL) throw std::runtime_error("Invalid image URL");
-
-            CIImage *ciImage = [[CIImage alloc] initWithContentsOfURL:imageURL options:@{
-              kCIImageApplyOrientationProperty: @YES
-            }];
-            if (!ciImage) throw std::runtime_error("Failed to load image");
-
-            return createMTLTextureFromCIImage(ciImage, maxSize);
+            CGImageRef cgImage = loadImageWithOrientation(imageURL, maxSize);
+            if (!cgImage) throw std::runtime_error("Invalid image URL");
+            
+            NSError *error;
+            auto texture = [textureLoader newTextureWithCGImage:cgImage options:@{
+              MTKTextureLoaderOptionTextureStorageMode: @(MTLStorageModePrivate),
+              MTKTextureLoaderOptionTextureUsage: @(MTLTextureUsageShaderRead | MTLTextureUsageShaderWrite)
+            } error:&error];
+            CGImageRelease(cgImage);
+            if (error || !texture) {
+              throw std::runtime_error("Failed to create texture");
+            
+            }
+            return texture;
           });
         });
 
@@ -106,11 +135,23 @@ jsi::Value BufferLoaderHostObject::get(jsi::Runtime &runtime, const jsi::PropNam
                                                  actualTime:nil
                                                       error:&error];
             if (error || !cgImage) throw std::runtime_error("Failed to generate video frame");
-
-            CIImage *ciImage = [CIImage imageWithCGImage:cgImage];
-            id<MTLTexture> texture = createMTLTextureFromCIImage(ciImage, maxSize);
+            
+            CGSize imageSize = CGSizeMake(CGImageGetWidth(cgImage), CGImageGetHeight(cgImage));
+            CGImageRef copy = copyImage(cgImage, imageSize, imageSize, CGAffineTransformIdentity);
+            if (!copy) throw std::runtime_error("Failed to transform videoframe");
             CGImageRelease(cgImage);
-
+            cgImage = copy;
+            
+  
+            auto texture = [textureLoader newTextureWithCGImage:cgImage options:@{
+              MTKTextureLoaderOptionTextureStorageMode: @(MTLStorageModePrivate),
+              MTKTextureLoaderOptionTextureUsage: @(MTLTextureUsageShaderRead | MTLTextureUsageShaderWrite)
+            } error:&error];
+            CGImageRelease(cgImage);
+            if (error || !texture) {
+              throw std::runtime_error("Failed to create texture");
+            
+            }
             return texture;
           });
         });
@@ -144,45 +185,6 @@ jsi::Value BufferLoaderHostObject::get(jsi::Runtime &runtime, const jsi::PropNam
   return jsi::Value::undefined();
 }
 
-id<MTLTexture> BufferLoaderHostObject::createMTLTextureFromCIImage(CIImage *image, CGSize maxSize) {
-  @autoreleasepool {
-    if (!CGSizeEqualToSize(maxSize, CGSizeZero)) {
-      CGFloat aspectRatio = image.extent.size.width / image.extent.size.height;
-      if (aspectRatio > 1) {
-        image = [image imageByApplyingTransform:CGAffineTransformMakeScale(
-          maxSize.width / image.extent.size.width,
-          maxSize.width / image.extent.size.width)];
-      } else {
-        image = [image imageByApplyingTransform:CGAffineTransformMakeScale(
-          maxSize.height / image.extent.size.height,
-          maxSize.height / image.extent.size.height)];
-      }
-    }
-
-    CGSize imageSize = image.extent.size;
-
-    MTLTextureDescriptor *descriptor = [[MTLTextureDescriptor alloc] init];
-    descriptor.pixelFormat = MTLPixelFormatBGRA8Unorm;
-    descriptor.width = imageSize.width;
-    descriptor.height = imageSize.height;
-    descriptor.usage = MTLTextureUsageShaderRead | MTLTextureUsageShaderWrite;
-    descriptor.storageMode = MTLStorageModePrivate;
-
-    id<MTLTexture> texture = [metalDevice newTextureWithDescriptor:descriptor];
-    if (!texture) {
-      throw std::runtime_error("Failed to create Metal texture");
-    }
-
-    CGAffineTransform transform = CGAffineTransformMakeTranslation(0, imageSize.height);
-    transform = CGAffineTransformScale(transform, 1.0, -1.0);
-    image = [image imageByApplyingTransform:transform];
-
-    [ciContext render:image toMTLTexture:texture commandBuffer:nil bounds:image.extent colorSpace:colorSpace];
-
-    return texture;
-  }
-}
-
 void BufferLoaderHostObject::loadTexture(
   std::shared_ptr<jsi::Function> callback, jsi::Runtime &runtime,
   const std::function<id<MTLTexture>  _Nonnull ()> &textureCreator) {
@@ -214,5 +216,118 @@ void BufferLoaderHostObject::loadTexture(
   }
 }
 
+CGImageRef BufferLoaderHostObject::loadImageWithOrientation(NSURL *url, CGSize maxSize) {
+  NSData *imageData = [NSData dataWithContentsOfURL:url];
+  if (!imageData) {
+    throw std::runtime_error("Failed to download image data");
+  }
+
+  // Creating the image source
+  CFDictionaryRef options = (__bridge CFDictionaryRef)@{
+    (NSString *)kCGImageSourceCreateThumbnailWithTransform: @YES,
+    (NSString *)kCGImageSourceCreateThumbnailFromImageAlways: @YES,
+    (NSString *)kCGImageSourceShouldCache: @YES
+  };
+  
+  CGImageSourceRef imageSource = CGImageSourceCreateWithData((__bridge CFDataRef)imageData, options);
+  if (!imageSource) {
+    throw std::runtime_error("Failed to create image source");
+  }
+  
+  // Retrieve image properties
+  CFDictionaryRef imageProperties = CGImageSourceCopyPropertiesAtIndex(imageSource, 0, NULL);
+  if (!imageProperties) {
+    CFRelease(imageSource);
+    throw std::runtime_error("Failed to get image properties");
+  }
+  
+  // Retrieve the orientation
+  NSInteger orientation = 1;
+  CFNumberRef orientationProperty = (CFNumberRef)CFDictionaryGetValue(imageProperties, kCGImagePropertyOrientation);
+  if (orientationProperty) {
+    CFNumberGetValue(orientationProperty, kCFNumberNSIntegerType, &orientation);
+  }
+  
+  // Create the original image
+  CGImageRef originalImage = CGImageSourceCreateImageAtIndex(imageSource, 0, NULL);
+  if (!originalImage) {
+    CFRelease(imageProperties);
+    CFRelease(imageSource);
+    throw std::runtime_error("Failed to create image");
+  }
+  // Apply the orientation
+  CGSize imageSize = CGSizeMake(CGImageGetWidth(originalImage), CGImageGetHeight(originalImage));
+  CGAffineTransform transform = CGAffineTransformIdentity;
+  BOOL swapWidthHeight = orientation >= 5;
+  
+  CGFloat scale = 1;
+  if (!CGSizeEqualToSize(maxSize, CGSizeZero)) {
+    CGFloat widthScale = maxSize.width / (swapWidthHeight ? imageSize.height : imageSize.width);
+    CGFloat heightScale = maxSize.height / (swapWidthHeight ? imageSize.width : imageSize.height);
+    scale = fmin(widthScale, heightScale);
+  }
+  
+  switch (orientation) {
+    case 2:
+      // Horizontal flip
+      transform = CGAffineTransformScale(transform, -1.0, 1.0);
+      transform = CGAffineTransformTranslate(transform, -imageSize.width * scale, 0);
+      break;
+        
+    case 3:
+      // 180° rotation
+      transform = CGAffineTransformRotate(transform, M_PI);
+      transform = CGAffineTransformTranslate(transform, -imageSize.width * scale, -imageSize.height * scale);
+      break;
+        
+    case 4:
+      // Vertical flip
+      transform = CGAffineTransformScale(transform, 1.0, -1.0);
+      transform = CGAffineTransformTranslate(transform, 0, -imageSize.height * scale);
+      break;
+        
+    case 5:
+      // Horizontal flip + 90° rotation
+      transform = CGAffineTransformScale(transform, -1.0, 1.0);
+      transform = CGAffineTransformRotate(transform, -M_PI_2);
+      break;
+        
+    case 6:
+      // 90° rotation
+      transform = CGAffineTransformRotate(transform, -M_PI_2);
+      transform = CGAffineTransformTranslate(transform, -imageSize.width * scale, 0);
+      break;
+        
+    case 7:
+      // Horizontal flip + 270° rotation
+      transform = CGAffineTransformScale(transform, -1.0, 1.0);
+      transform = CGAffineTransformRotate(transform, M_PI_2);
+      break;
+        
+    case 8:
+      // 270° rotation
+      transform = CGAffineTransformRotate(transform, M_PI_2);
+      transform = CGAffineTransformTranslate(transform, 0, -imageSize.height * scale);
+      break;
+  }
+  if (scale < 1) {
+    transform = CGAffineTransformScale(transform, scale, scale);
+  }
+  CGImageRef result = copyImage(
+    originalImage,
+    imageSize,
+    swapWidthHeight ?
+      CGSizeMake(imageSize.height * scale, imageSize.width * scale) :
+      CGSizeMake(imageSize.width * scale, imageSize.height * scale),
+    transform
+  );
+  CGImageRelease(originalImage);
+  CFRelease(imageProperties);
+  CFRelease(imageSource);
+  return result;
+}
+
 
 } // namespace azzapp
+
+

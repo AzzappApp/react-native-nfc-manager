@@ -5,18 +5,18 @@ import {
   useState,
   type ForwardedRef,
 } from 'react';
-import { Pressable, type PressableProps } from 'react-native-gesture-handler';
-import { colors } from '#theme';
-import type {
-  LayoutChangeEvent,
-  PressableAndroidRippleConfig,
-  View,
+import {
+  type LayoutChangeEvent,
+  type PressableAndroidRippleConfig,
 } from 'react-native';
-import type { PressableEvent } from 'react-native-gesture-handler/lib/typescript/components/Pressable/PressableProps';
+import { Pressable } from 'react-native-gesture-handler';
+import { colors } from '#theme';
+import type GenericTouchable from 'react-native-gesture-handler/lib/typescript/components/touchables/GenericTouchable';
+import type { GenericTouchableProps } from 'react-native-gesture-handler/lib/typescript/components/touchables/GenericTouchableProps';
 
 const TIMEOUT = 200;
 
-type PressableNativeProps = PressableProps & {
+type PressableNativeProps = GenericTouchableProps & {
   activeOpacity?: number;
   disabledOpacity?: number;
   animationDuration?: number;
@@ -26,7 +26,7 @@ type PressableNativeProps = PressableProps & {
 
 const PressableNative = (
   { ripple, onDoublePress, ...props }: PressableNativeProps,
-  ref: ForwardedRef<View>,
+  ref: ForwardedRef<GenericTouchable>,
 ) => {
   const timer = useRef<NodeJS.Timeout | null>(null);
   const [width, setWidth] = useState(0);
@@ -49,7 +49,7 @@ const PressableNative = (
     ...props,
   } as const;
 
-  const onPress = (e: PressableEvent) => {
+  const onPress = () => {
     if (timer.current && onDoublePress) {
       clearTimeout(timer.current);
       timer.current = null;
@@ -57,10 +57,10 @@ const PressableNative = (
     } else if (onDoublePress) {
       timer.current = setTimeout(() => {
         timer.current = null;
-        props.onPress?.(e);
+        props.onPress?.();
       }, TIMEOUT);
     } else {
-      props.onPress?.(e);
+      props.onPress?.();
     }
   };
   useEffect(() => {

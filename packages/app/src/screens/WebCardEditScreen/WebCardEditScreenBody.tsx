@@ -31,13 +31,14 @@ import { colors } from '#theme';
 import CardModuleRenderer from '#components/cardModules/CardModuleRenderer';
 import { useModulesData } from '#components/cardModules/ModuleData';
 import { useRouter, useSuspendUntilAppear } from '#components/NativeRouter';
-import { isModuleVariantSupported } from '#helpers/cardModuleRouterHelpers';
 import { createId } from '#helpers/idHelpers';
-import useScreenDimensions from '#hooks/useScreenDimensions';
+import {
+  isModuleVariantSupported,
+  type ModuleKindWithVariant,
+} from '#helpers/webcardModuleHelpers';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import WebCardEditBlockContainer from './WebCardEditBlockContainer';
 import type { ModuleRenderInfo } from '#components/cardModules/CardModuleRenderer';
-import type { ModuleKindWithVariant } from '#helpers/webcardModuleHelpers';
 import type { WebCardEditScreenBody_webCard$key } from '#relayArtifacts/WebCardEditScreenBody_webCard.graphql';
 import type { WebCardEditScreenBodyDeleteModuleMutation } from '#relayArtifacts/WebCardEditScreenBodyDeleteModuleMutation.graphql';
 import type {
@@ -171,7 +172,12 @@ const WebCardEditScreenBody = (
   );
 
   const cardModuleFiltered = useMemo(() => {
-    return cardModules.filter(module => isModuleVariantSupported(module));
+    return cardModules.filter(module =>
+      isModuleVariantSupported({
+        moduleKind: module.kind,
+        variant: module.variant,
+      }),
+    );
   }, [cardModules]);
 
   useSuspendUntilAppear(Platform.OS === 'android');
@@ -766,12 +772,10 @@ const WebCardModule = ({
   editing: boolean;
   scrollPosition: RNAnimated.Value;
 }) => {
-  const { height: screenHeight } = useScreenDimensions();
   return (
     <WebCardEditBlockContainerMemo
       id={module.id}
       {...props}
-      maxEditHeight={screenHeight}
       extraData={{
         cardStyle,
         cardColors,
@@ -786,7 +790,7 @@ const WebCardModule = ({
         scrollPosition={scrollPosition}
         modulePosition={0}
         webCardViewMode="edit"
-        canPlay={editing}
+        canPlay={false}
       />
       {module.id.includes(TEMP_ID_PREFIX) && (
         <View style={styles.loadingContainer}>

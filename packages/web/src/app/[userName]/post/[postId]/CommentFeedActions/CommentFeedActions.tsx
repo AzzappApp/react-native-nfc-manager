@@ -68,7 +68,16 @@ const CommentFeedActions = (props: CommentFeedActionsProps) => {
               }}
             >
               <span className={styles.likes}>
-                {post.counterReactions} Likes
+                <FormattedMessage
+                  defaultMessage={`{likes, plural,
+                  =0 {0 likes}
+                  =1 {# like}
+                  other {# likes}
+                }`}
+                  id="kvBCRP"
+                  description="post details likes indicator"
+                  values={{ likes: post.counterReactions }}
+                />
               </span>
             </Button>
           )}

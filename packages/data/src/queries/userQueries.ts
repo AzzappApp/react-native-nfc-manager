@@ -12,15 +12,10 @@ import {
   exists,
   notInArray,
   notExists,
+  ne,
 } from 'drizzle-orm';
 import { db, transaction } from '../database';
-import {
-  UserTable,
-  ProfileTable,
-  PostTable,
-  UserSubscriptionTable,
-  WebCardTable,
-} from '../schema';
+import { UserTable, ProfileTable, PostTable, WebCardTable } from '../schema';
 import { getProfilesByUser } from './profileQueries';
 import type { Profile, User } from '../schema';
 import type { InferInsertModel, SQLWrapper } from 'drizzle-orm';
@@ -180,12 +175,9 @@ export const markUserAsDeleted = async (
       );
 
     const ownerProfiles: Profile[] = [];
-    const nonOwnerProfiles: Profile[] = [];
     userProfiles.forEach(profile => {
       if (profile.profileRole === 'owner') {
         ownerProfiles.push(profile);
-      } else {
-        nonOwnerProfiles.push(profile);
       }
     }, []);
 
@@ -245,27 +237,8 @@ export const markUserAsDeleted = async (
           ),
         );
     }
-
-    if (nonOwnerProfiles.length) {
-      await db()
-        .update(UserSubscriptionTable)
-        .set({
-          totalSeats: sql`GREATEST(totalSeats - 1, 0)`,
-        })
-        .where(
-          and(
-            eq(UserSubscriptionTable.subscriptionPlan, 'web.monthly'),
-            eq(UserSubscriptionTable.status, 'active'),
-            inArray(
-              UserSubscriptionTable.webCardId,
-              nonOwnerProfiles.map(p => p.webCardId),
-            ),
-          ),
-        );
-    }
   });
 
-// TODO rename this I don't understand what it does
 export const getTotalMultiUser = async (userId: string) => {
   const webCardIds = await db()
     .select()
@@ -276,6 +249,7 @@ export const getTotalMultiUser = async (userId: string) => {
         eq(ProfileTable.userId, userId),
         eq(ProfileTable.profileRole, 'owner'),
         eq(WebCardTable.isMultiUser, true),
+        eq(WebCardTable.cardIsPublished, true),
       ),
     );
 
@@ -287,7 +261,12 @@ export const getTotalMultiUser = async (userId: string) => {
   return db()
     .select({ count: sql`count(*)`.mapWith(Number) })
     .from(ProfileTable)
-    .where(inArray(ProfileTable.webCardId, webCardIdList))
+    .where(
+      and(
+        inArray(ProfileTable.webCardId, webCardIdList),
+        ne(ProfileTable.deleted, true),
+      ),
+    )
     .then(res => res[0].count);
 };
 

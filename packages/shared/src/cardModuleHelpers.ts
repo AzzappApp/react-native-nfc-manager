@@ -1184,7 +1184,10 @@ export type CardModuleMapLinkData = CardModuleCommon; //TODO
 //#region Title Text
 export const MODULE_KIND_TITLE_TEXT = 'titleText';
 
-export type CardModuleTitleTextLinkData = CardModuleCommon; //TODO
+export type CardModuleTitleTextData = CardModuleCommon & {
+  text: string;
+  title: string;
+};
 
 // #endregion
 
@@ -1223,6 +1226,7 @@ export const MODULES_STYLES_VALUES = {
   [MODULE_KIND_MEDIA]: {},
   [MODULE_KIND_MEDIA_TEXT]: {},
   [MODULE_KIND_MEDIA_TEXT_LINK]: {},
+  [MODULE_KIND_TITLE_TEXT]: {},
 } as const;
 
 export const MODULES_DEFAULT_VALUES = {
@@ -1239,6 +1243,7 @@ export const MODULES_DEFAULT_VALUES = {
   [MODULE_KIND_MEDIA]: {},
   [MODULE_KIND_MEDIA_TEXT]: {},
   [MODULE_KIND_MEDIA_TEXT_LINK]: {},
+  [MODULE_KIND_TITLE_TEXT]: {},
 } as const;
 
 export type ModuleKind = (typeof MODULE_KINDS)[number];

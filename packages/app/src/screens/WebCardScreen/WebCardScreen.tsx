@@ -272,12 +272,19 @@ const WebCardScreen = ({
     };
   });
 
+  const [showPost, setShowPost] = useState(params.showPosts ?? false);
   const initialManualGesture = useSharedValue(0);
 
   const pan = useMemo(
     () =>
       Gesture.Pan()
-        .enabled(!editing)
+        .enabled(!editing && Platform.OS === 'ios')
+        .hitSlop({
+          top: 0,
+          bottom: 0,
+          left: showPost ? 0 : -windowWidth / 2,
+          right: 0,
+        })
         .activeOffsetX([-10, 10]) //help the postlist scroll to work on Android
         .onStart(() => {
           initialManualGesture.value = manualFlip.value;
@@ -310,9 +317,8 @@ const WebCardScreen = ({
             });
           }
         }),
-    [editing, initialManualGesture, manualFlip, windowWidth],
+    [editing, initialManualGesture, manualFlip, showPost, windowWidth],
   );
-  const [showPost, setShowPost] = useState(params.showPosts ?? false);
 
   useDerivedValue(() => {
     const res = Math.round(Math.abs(flip.value + manualFlip.value)) % 2 === 1;

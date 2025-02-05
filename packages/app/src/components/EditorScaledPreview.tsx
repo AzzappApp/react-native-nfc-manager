@@ -14,7 +14,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import PressableNative from '#ui/PressableNative';
+import PressableOpacity from '#ui/PressableOpacity';
 
 type EditorScaledPreviewProps = ViewProps & {
   /**
@@ -94,13 +94,13 @@ const EditorScaledPreview = ({
       >
         <Animated.View style={scaledViewAnimatedStyle}>
           <View style={styles.previewContainer}>
-            <PressableNative
+            <PressableOpacity
               onPress={onPreviewPress}
               disabledOpacity={onPreviewPress != null ? 0.3 : 1}
               disabled={onPreviewPress == null}
             >
               {children}
-            </PressableNative>
+            </PressableOpacity>
           </View>
         </Animated.View>
       </Animated.View>

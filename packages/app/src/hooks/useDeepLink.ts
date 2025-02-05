@@ -19,7 +19,12 @@ export const useDeepLink = (router: NativeRouter | null) => {
       const route = await matchUrlWithRoute(url);
       if (route) {
         if (authenticated) {
-          router?.push(route);
+          if (route.route === 'HOME') {
+            //routing to HOME causes that the footer menu is not displayed
+            router?.backToTop();
+          } else {
+            router?.push(route);
+          }
         } else {
           storage.set(ROUTE_KEY, JSON.stringify(route));
         }
@@ -62,7 +67,14 @@ export const useDeepLinkStoredRoute = () => {
     const route = storage.getString(ROUTE_KEY);
     if (route) {
       storage.delete(ROUTE_KEY);
-      router.push(JSON.parse(route));
+      const storedRoute = JSON.parse(route);
+
+      if (storedRoute.route === 'HOME') {
+        //routing to HOME causes that the footer menu is not displayed
+        router.backToTop();
+      } else {
+        router.push(JSON.parse(route));
+      }
     }
   }, [router]);
 };

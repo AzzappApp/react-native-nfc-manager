@@ -58,7 +58,7 @@
          </EnvironmentVariable>
          <EnvironmentVariable
             key = "_XCAppClipURL"
-            value = "https://appclip.apple/?p=id&amp;url=http://localhost:3000/hint10?c=NoIgOiwRAOCeAPAzAawBYIGYAYCOBTXaEAGmIBMB3OAFwCY4BnAY2ZszmLPBAAkBLAHY0AjNi7EAyuUyMZEnguIQSwKD14B7ALb4lIANRIkANgDsATnMAWbAFYkxALpPV6iFt37G+AEYA6cgBXXwAbIQABAHNtAEN+UP9mHWdXYFdBINDQp2gAJzBBUhBNAE0AaQAOFAAVUoBJGppmgDEzFu0UMwB5AH0AcV9B8gAZAEUADQBRAFlsEwARAHUlgCUABW7K3kqTZhAnIA"
+            value = "https://appclip.apple.com/?p=com.azzapp.app.Clip-dev&amp;u=01bb&amp;c=NoIgOiwRAeCOATANgYzgMwG4E4CmAWANmhABoSBPAWxQAcArOAJwHZ6KBGAQxPPBAAMHXiQBGuAHYj+KAPZVaAFy4TF0khFLAo-ABLzc6kAGoAzKcItsl-AICspkgF0nWnRH1VD-PhADOuKJcfooAlpIAAlwAXtFctLQAdHJUzq7ArhIArkhITtBMYBJkIKihAgAaAPoVsgDKEgDSABaNWQCSAIpZAFIACrgAmgDuij0ASrgAYhIIw1QATAAicBL4uGG4foQA1iBOQA"
             isEnabled = "NO">
          </EnvironmentVariable>
       </EnvironmentVariables>

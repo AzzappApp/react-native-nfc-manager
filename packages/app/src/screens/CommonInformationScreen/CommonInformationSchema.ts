@@ -1,13 +1,9 @@
 import * as z from 'zod';
+import { phoneNumberSchema } from '#helpers/phoneNumbersHelper';
 
 export const commonInformationSchema = z.object({
   company: z.string().optional().nullable(),
-  phoneNumbers: z.array(
-    z.object({
-      label: z.string(),
-      number: z.string(),
-    }),
-  ),
+  phoneNumbers: z.array(phoneNumberSchema),
   emails: z.array(
     z.object({
       label: z.string(),

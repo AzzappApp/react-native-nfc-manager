@@ -1,11 +1,11 @@
 import { Dimensions, Image, View } from 'react-native';
+import COUNTRY_FLAG from '@azzapp/shared/CountryFlag';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useBoolean from '#hooks/useBoolean';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Text from '#ui/Text';
 import CountrySelector from './CountrySelector';
-import COUNTRY_FLAG from './CountrySelector/CountryFlag';
 import Icon from './Icon';
 import PressableBackground from './PressableBackground';
 import PressableNative from './PressableNative';

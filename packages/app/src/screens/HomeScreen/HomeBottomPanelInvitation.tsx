@@ -4,7 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, commitMutation } from 'react-relay';
 import { colors } from '#theme';
-import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import { onChangeWebCard } from '#helpers/authStore';
 import { getRelayEnvironment } from '#helpers/relayEnvironment';
 import useQuitWebCard from '#hooks/useQuitWebCard';
 import Button from '#ui/Button';
@@ -53,12 +53,10 @@ const HomeBottomPanelInvitation = ({
           },
         },
       },
-      onCompleted: () => {
-        void dispatchGlobalEvent({
-          type: 'PROFILE_ROLE_CHANGE',
-          payload: {
-            profileRole: profile?.profileRole,
-          },
+      onCompleted: ({ acceptInvitation }) => {
+        onChangeWebCard({
+          profileRole: acceptInvitation?.profile?.profileRole,
+          invited: acceptInvitation?.profile?.invited,
         });
       },
     });

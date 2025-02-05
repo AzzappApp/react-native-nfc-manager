@@ -51,8 +51,17 @@ const useToggleLikePost = (
           },
           onError: error => {
             console.log(error);
-
-            if (error.message === ERRORS.UNPUBLISHED_WEB_CARD) {
+            if (error.message === ERRORS.WEBCARD_NO_COVER) {
+              Toast.show({
+                type: 'error',
+                text1: intl.formatMessage({
+                  defaultMessage:
+                    "Error, could not like post as you didn't configure cover",
+                  description:
+                    'Error when a user tries to like a post from an webCard without cover',
+                }) as unknown as string,
+              });
+            } else if (error.message === ERRORS.UNPUBLISHED_WEB_CARD) {
               Toast.show({
                 type: 'error',
                 text1: intl.formatMessage(

@@ -8,6 +8,7 @@ import {
   monitorRequest,
   monitorRequestEnd,
 } from '../helpers/databaseMonitorer';
+import type { MySQLWithReplicas } from 'drizzle-orm/mysql-core';
 
 let fetchFunction: typeof fetch;
 
@@ -24,7 +25,9 @@ if (process.env.NEXT_RUNTIME !== 'edge') {
   fetchFunction = fetch;
 }
 
-export type DrizzleDatabase = PlanetScaleDatabase<Record<string, never>>;
+export type DrizzleDatabase =
+  | MySQLWithReplicas<PlanetScaleDatabase<Record<string, never>>>
+  | PlanetScaleDatabase<Record<string, never>>;
 
 export type DrizzleDatabaseTransaction = Parameters<
   Parameters<DrizzleDatabase['transaction']>[0]

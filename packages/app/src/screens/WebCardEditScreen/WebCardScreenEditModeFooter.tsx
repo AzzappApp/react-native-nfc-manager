@@ -5,7 +5,9 @@ import { View, TouchableOpacity } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { replaceColors } from '@azzapp/shared/lottieHelpers';
 import { colors, shadow } from '#theme';
+import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import Text from '#ui/Text';
 import placeholder from '../../assets/module/placeholder_sections.json';
@@ -13,20 +15,27 @@ import type { WebCardScreenEditModeFooter_webCard$key } from '#relayArtifacts/We
 
 type WebCardScreenEditModeFooter = {
   fromCreation: boolean;
-  onAddContent: () => void;
   onSkip?: () => void;
   webCard: WebCardScreenEditModeFooter_webCard$key;
 };
 
 const WebCardScreenEditModeFooter = ({
   fromCreation,
-  onAddContent,
   onSkip,
   webCard: webCardKey,
 }: WebCardScreenEditModeFooter) => {
   const intl = useIntl();
 
   const styles = useStyleSheet(stylesheet);
+
+  const router = useRouter();
+
+  const onAddContent = () => {
+    router.push({
+      route: 'ADD_MODULE_SECTION',
+      params: { webCardId: webCardKey as unknown as string },
+    });
+  };
 
   const webCard = useFragment(
     graphql`
@@ -93,8 +102,11 @@ const WebCardScreenEditModeFooter = ({
     );
   }, [webCard.cardColors, webCard.coverBackgroundColor]);
 
+  const { bottom } = useScreenInsets();
   return (
-    <View style={[styles.root, styles.creation]}>
+    <View
+      style={[styles.root, styles.creation, { paddingBottom: bottom + 30 }]}
+    >
       {webCard.cardModules.length === 0 && (
         <View style={styles.lottieContainer}>
           <View style={styles.lottie}>
@@ -138,7 +150,6 @@ export const WEBCARD_SCREEN_EDIT_MODE_FOOTER_HEIGHT = 110;
 
 const stylesheet = createStyleSheet(theme => ({
   root: {
-    paddingTop: 30,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -176,7 +187,6 @@ const stylesheet = createStyleSheet(theme => ({
   lottieContainer: {
     ...shadow(theme, 'bottom'),
     marginBottom: 20,
-    marginTop: 20,
     borderRadius: 15,
   },
   load: {

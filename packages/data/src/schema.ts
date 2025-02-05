@@ -13,6 +13,7 @@ import type {
   CardModuleMediaData,
   CardModuleMediaTextData,
   CardModuleMediaTextLinkData,
+  CardModuleTitleTextData,
 } from '@azzapp/shared/cardModuleHelpers';
 import type {
   CommonInformation,
@@ -88,6 +89,10 @@ export type CardModuleMediaTextLink = CardModuleBase & {
   data: CardModuleMediaTextLinkData;
 };
 
+export type CardModuleTitleText = CardModuleBase & {
+  data: CardModuleTitleTextData;
+};
+
 //INSERT_MODULE : new type
 
 export type CardModule =
@@ -101,7 +106,8 @@ export type CardModule =
   | CardModulePhotoWithTextAndTitle
   | CardModuleSimpleButton
   | CardModuleSimpleText
-  | CardModuleSocialLinks;
+  | CardModuleSocialLinks
+  | CardModuleTitleText;
 //INSERT_MODULE
 
 // #endregion
@@ -424,7 +430,6 @@ export const PaymentMeanTable = cols.table(
   {
     id: cols.defaultVarchar('id').primaryKey().notNull(), //stored with payment
     userId: cols.cuid('userId').notNull(),
-    webCardId: cols.defaultVarchar('webCardId').notNull(),
     maskedCard: cols.defaultVarchar('maskedCard').notNull(),
     status: cols
       .enum('status', ['pending', 'active', 'inactive'])
@@ -438,9 +443,7 @@ export const PaymentMeanTable = cols.table(
   table => {
     return {
       indexes: {
-        userId: cols
-          .index('PaymentMean_userId_webCardId_idx')
-          .on(table.userId, table.webCardId),
+        userId: cols.index('PaymentMean_userId_idx').on(table.userId),
       },
     };
   },
@@ -474,14 +477,14 @@ export const PaymentTable = cols.table(
     invoiceId: cols.defaultVarchar('invoiceId'),
     invoicePdfUrl: cols.defaultVarchar('invoiceUrl'),
     subscriptionId: cols.cuid('subscriptionId').notNull(),
-    webCardId: cols.cuid('webCardId').notNull(),
+    userId: cols.cuid('userId').notNull(),
   },
   table => {
     return {
       subscriptionIdIdx: cols
         .uniqueIndex('subscriptionId_transactionId_idx')
         .on(table.subscriptionId, table.transactionId),
-      webCardIdIdx: cols.index('webCardId_idx').on(table.webCardId),
+      userIdIdx: cols.index('userId_idx').on(table.userId),
     };
   },
 );
@@ -766,7 +769,6 @@ export const UserSubscriptionTable = cols.table(
   {
     id: cols.cuid('id').primaryKey().notNull().$defaultFn(createId),
     userId: cols.cuid('userId').notNull(),
-    webCardId: cols.cuid('webCardId'),
     subscriptionPlan: cols.enum('subscriptionPlan', [
       'web.monthly',
       'web.yearly',
@@ -805,10 +807,7 @@ export const UserSubscriptionTable = cols.table(
   },
   table => {
     return {
-      userIdWebCardIDIdx: cols
-        .index('userId_webCardId_idx')
-        .on(table.userId, table.webCardId),
-      webCardIDIdx: cols.index('webCardId_idx').on(table.webCardId),
+      userIdWebCardIDIdx: cols.index('userId_idx').on(table.userId),
       statusExpirationDate: cols
         .index('status_expiration_date')
         .on(table.status, table.endAt, table.invalidatedAt),

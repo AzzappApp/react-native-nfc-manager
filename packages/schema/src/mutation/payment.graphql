@@ -5,37 +5,38 @@ extend type Mutation {
     countryCode: String
     vatNumber: String
   ): SubscriptionEstimation!
+  estimateUpdateSubscriptionCost(
+    subscriptionId: ID!
+    totalSeats: Int!
+  ): UpdateSubscriptionEstimation!
   createPaymentIntent(
-    webCardId: ID!
     intent: PaymentIntentInput!
   ): PaymentIntentPayload!
   createSubscriptionFromPaymentMean(
-    webCardId: ID!
     paymentMeanId: ID!
     intent: PaymentIntentInput!
   ): UserSubscription!
   updateSubscription(
-    webCardId: ID!
     subscriptionId: ID!
     totalSeats: Int
     paymentMeanId: ID
   ): UserSubscription!
   createPaymentMean(
-    webCardId: ID!
     locale: String!
     redirectUrlSuccess: String!
     redirectUrlCancel: String!
     customer: Customer!
   ): String!
-  generatePaymentInvoice(webCardId: ID!, paymentId: ID!): String!
-  upgradeSubscriptionPlan(webCardId: ID!, subscriptionId: ID!): UserSubscription!
-  endSubscription(webCardId: ID!, subscriptionId: ID!): UserSubscription!
+  generatePaymentInvoice(paymentId: ID!): String!
+  upgradeSubscriptionPlan(
+    subscriptionId: ID!
+  ): UserSubscription!
+  endSubscription(subscriptionId: ID!): UserSubscription!
   updateSubscriptionCustomer(
-    webCardId: ID!
     subscriptionId: ID!
     customer: Customer!
   ): UserSubscription!
-  renewSubscription(webCardId: ID!, subscriptionId: ID!): UserSubscription!
+  renewSubscription(subscriptionId: ID!): UserSubscription!
 }
 
 enum PaymentPlan {
@@ -68,6 +69,12 @@ type PaymentIntentPayload {
   clientRedirectUrl: String!
   amount: Int!
   taxes: Int!
+}
+
+type UpdateSubscriptionEstimation {
+  firstPayment: SubscriptionEstimation
+  firstPaymentNbMonths: Int
+  recurringCost: SubscriptionEstimation!
 }
 
 type SubscriptionEstimation {

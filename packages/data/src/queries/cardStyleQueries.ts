@@ -159,7 +159,7 @@ export const getCardStylesRandomOrder = async (
 ): Promise<Array<CardStyle & { cursor: string }>> => {
   const query = sql`
     SELECT *, RAND(${randomSeed}) as cursor
-    FROM CardStyle`;
+    FROM CardStyle WHERE enabled=true`;
   if (offset) {
     query.append(sql` HAVING cursor > ${offset} `);
   }

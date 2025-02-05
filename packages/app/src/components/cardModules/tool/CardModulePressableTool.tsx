@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import PressableAnimated from '#ui/PressableAnimated';
+import PressableNative from '#ui/PressableNative';
 import type { LayoutChangeEvent } from 'react-native';
 
 type CardModulePressableToolProps = {
@@ -16,9 +16,9 @@ const CardModulePressableTool = ({
 }: CardModulePressableToolProps) => {
   if (active) {
     return (
-      <PressableAnimated onLayout={onLayout} onPress={onPress}>
+      <PressableNative onLayout={onLayout} onPress={onPress}>
         {children}
-      </PressableAnimated>
+      </PressableNative>
     );
   }
   return children;

@@ -183,7 +183,7 @@ const CardModuleMediaPicker = ({
     setProgressIndicator(progress);
 
     // wait to show the progress indicator
-    await waitTime(100);
+    await waitTime(150);
 
     //download video from pexel
     try {
@@ -213,7 +213,7 @@ const CardModuleMediaPicker = ({
                 ...cardModuleMedia,
                 media: {
                   ...cardModuleMedia.media,
-                  uri: `file://${MODULES_CACHE_DIR}/${fileName}`,
+                  uri: `${MODULES_CACHE_DIR}/${fileName}`,
                 },
               };
             } catch {

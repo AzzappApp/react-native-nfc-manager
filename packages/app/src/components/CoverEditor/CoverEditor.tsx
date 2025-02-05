@@ -526,13 +526,10 @@ const CoverEditorCore = (
         if (media.kind === 'image') {
           const path = getCoverLocalMediaPath(localFilenames[media.id]);
           const scale = imagesScales[media.id] ?? 1;
-          const { key, promise } = NativeTextureLoader.loadImage(
-            `file://${path}`,
-            {
-              width: media.width * scale,
-              height: media.height * scale,
-            },
-          );
+          const { key, promise } = NativeTextureLoader.loadImage(path, {
+            width: media.width * scale,
+            height: media.height * scale,
+          });
 
           const buffer = await promise;
           if (canceled) {
@@ -666,7 +663,8 @@ const CoverEditorCore = (
 
     if (
       !!coverEditorState.lottie &&
-      coverEditorState.initialMediaToPick?.length
+      coverEditorState.initialMediaToPick?.filter(m => m === null || m.editable)
+        .length
     ) {
       // ensure media picker is open when we build from scratch
       return true;
@@ -683,6 +681,21 @@ const CoverEditorCore = (
     coverEditorState.lottie,
     coverEditorState.medias,
   ]);
+
+  // case where template has only non editable medias
+  useEffect(() => {
+    if (
+      coverEditorState.initialMediaToPick &&
+      !coverEditorState.initialMediaToPick.some(
+        media => media === null || media.editable,
+      )
+    ) {
+      dispatch({
+        type: 'UPDATE_MEDIAS',
+        payload: coverEditorState.initialMediaToPick.filter(m => m !== null),
+      });
+    }
+  }, [coverEditorState.initialMediaToPick]);
 
   const allDuration = useLottieMediaDurations(coverEditorState.lottie);
 

@@ -1,9 +1,11 @@
 import * as z from 'zod';
+import { getUserProfilesWithWebCard } from '@azzapp/data';
 import {
   acknowledgeFirstPayment,
   checkSignature,
   rejectFirstPayment,
 } from '@azzapp/payment';
+import { revalidateWebcardsAndPosts } from '#helpers/api';
 import { withPluginsRoute } from '#helpers/queries';
 
 const paymentCallbackBody = z.object({
@@ -23,19 +25,32 @@ export const POST = withPluginsRoute(async (req: Request) => {
 
   const data = paymentCallbackBody.parse(body);
 
+  let subscription;
   if (data.MULTIPSP_UNIFIED_STATUS === 'OK') {
-    await acknowledgeFirstPayment(
+    subscription = await acknowledgeFirstPayment(
       data.MULTIPSP_CLIENT_PAYMENT_REQUEST_ULID,
       data.TRANSACTIONID,
       data.MESSAGE,
     );
   } else {
-    await rejectFirstPayment(
+    subscription = await rejectFirstPayment(
       data.MULTIPSP_CLIENT_PAYMENT_REQUEST_ULID,
       data.TRANSACTIONID,
       data.MESSAGE,
     );
   }
 
+  if (subscription) {
+    const webCards = await getUserProfilesWithWebCard(
+      subscription.userId,
+      'owner',
+    );
+
+    revalidateWebcardsAndPosts(
+      webCards
+        .map(({ webCard }) => webCard.userName)
+        .filter(userName => userName !== null),
+    );
+  }
   return new Response('ok', { status: 200 });
 });

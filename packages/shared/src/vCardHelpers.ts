@@ -105,6 +105,7 @@ export const buildVCardFromSerializedContact = async (
       lastName: contactCard.lastName,
       firstName: contactCard.firstName,
       company: contactCard.company,
+      title: contactCard.title,
     },
   };
 };

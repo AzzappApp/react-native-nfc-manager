@@ -98,13 +98,14 @@ const styleSheet = createStyleSheet(appearance => ({
     borderWidth: 1,
     borderColor: 'transparent',
     borderRadius: 24,
-    ...shadow(appearance, 'bottom'),
+    padding: 20, //for shadow on android
   },
   deviceEmulated: {
     overflow: 'hidden', //do not remove this, it will cause the module to be cut off in some case '(desktop mainly)
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 24,
+    ...shadow(appearance, 'center'),
   },
 }));
 

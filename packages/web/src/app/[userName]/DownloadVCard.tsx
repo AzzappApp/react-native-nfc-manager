@@ -1,15 +1,25 @@
 'use client';
+
 import cx from 'classnames';
+import parsePhoneNumberFromString from 'libphonenumber-js';
 import { decompressFromEncodedURIComponent } from 'lz-string';
 import dynamic from 'next/dynamic';
+import Image from 'next/image';
+import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
+import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
 import { buildVCardFromSerializedContact } from '@azzapp/shared/vCardHelpers';
 import { CloseIcon, InviteIcon } from '#assets';
 import { ButtonIcon } from '#ui';
 import { updateContactCardScanCounter } from '#app/actions/statisticsAction';
-
+import ContactSteps from '#components/ContactSteps';
+import {
+  DeviceType,
+  getDeviceType,
+  isAppClipSupported,
+} from '#helpers/userAgent';
 import Avatar from '#ui/Avatar/Avatar';
 import DownloadVCardLinkButton from '#ui/Button/DownloadVCardLinkButton';
 import LinkButton from '#ui/Button/LinkButton';
@@ -22,37 +32,58 @@ const AppIntlProvider = dynamic(
     ssr: false,
   },
 );
-const DownloadVCard = ({
-  webCard,
-  onClose,
-}: {
+
+type DownloadVCardProps = {
+  step: number;
   webCard: WebCard;
+  startOpen?: boolean;
   onClose?: (data: { token?: string; avatarUrl?: string }) => void;
-}) => {
+};
+
+const DownloadVCard = ({
+  step,
+  webCard,
+  startOpen,
+  onClose,
+}: DownloadVCardProps) => {
+  const intl = useIntl();
+  const [deviceType, setDeviceType] = useState<DeviceType | null>(null);
   const searchParams = useSearchParams();
 
   const [fileUrl, setFileUrl] = useState<string | undefined>();
+  const ref = useRef<HTMLDivElement>(null);
 
   const [opened, setOpened] = useState(false);
-  const [closing, setClosing] = useState(true);
 
   const [contact, setContact] = useState<{
     firstName: string;
     lastName: string;
     company: string;
     avatarUrl?: string;
+    title?: string;
   }>();
 
   const [token, setToken] = useState('');
   const [displayName, setDisplayName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
 
   const [appClipIsSupported, setAppClipIsSupported] = useState(false);
 
   useEffect(() => {
     setAppClipIsSupported(isAppClipSupported());
+    setDeviceType(getDeviceType());
   }, []);
 
   useEffect(() => {
+    // call directly shareback (use when coming back from AppClip)
+    const modeQueryParam = searchParams.get('mode');
+    if (modeQueryParam === 'shareback') {
+      const token = searchParams.get('token');
+      if (token && onClose) {
+        onClose({ token });
+      }
+      return;
+    }
     const compressedContactCard = searchParams.get('c');
     if (!compressedContactCard) {
       return;
@@ -64,6 +95,17 @@ const DownloadVCard = ({
       [contactData, signature] = JSON.parse(
         decompressFromEncodedURIComponent(compressedContactCard),
       );
+
+      const contactCard = parseContactCard(contactData);
+      let phoneNumber;
+      if (contactCard?.phoneNumbers?.[0]?.[1]) {
+        phoneNumber = parsePhoneNumberFromString(
+          contactCard?.phoneNumbers?.[0]?.[1],
+        );
+      }
+      if (phoneNumber) {
+        setPhoneNumber(phoneNumber.number);
+      }
     } catch {
       return;
     }
@@ -107,17 +149,19 @@ const DownloadVCard = ({
               });
               const fileURL = URL.createObjectURL(file);
               setFileUrl(fileURL);
-              setOpened(true);
-              setClosing(false);
+
               updateContactCardScanCounter(contact.profileId);
               setToken(additionalData.token);
               setDisplayName(additionalData.displayName);
+            }
+            if (startOpen) {
+              setOpened(true);
             }
           }
         })
         .catch(() => void 0);
     }
-  }, [webCard.userName, webCard.id, searchParams]);
+  }, [webCard.userName, webCard.id, searchParams, startOpen, onClose]);
 
   const handleClose = useCallback(() => {
     setOpened(false);
@@ -127,14 +171,6 @@ const DownloadVCard = ({
     }
   }, [onClose, token]);
 
-  const handleAnimationEnd = useCallback(() => {
-    if (!opened) {
-      setClosing(true);
-    }
-  }, [opened]);
-
-  const intl = useIntl();
-  const [appClipWasOpen, setAppClipWasOpen] = useState(false);
   const showAppClip = useCallback(
     async (e: React.MouseEvent<HTMLAnchorElement>) => {
       e.preventDefault();
@@ -144,115 +180,141 @@ const DownloadVCard = ({
       }
       const appClipUrl = `${process.env.NEXT_PUBLIC_APPLE_APP_CLIP_URL}&u=${webCard.userName}&c=${compressedContactCard}`;
       // Open the App Clip URL
-      setAppClipWasOpen(true);
       window.location.href = appClipUrl;
     },
     [searchParams, webCard.userName],
   );
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'hidden') {
-        // Show the shareback here
-        if (appClipWasOpen) {
-          handleClose();
-        }
-      }
-    };
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [appClipWasOpen, handleClose]);
+  const contactInitials = `${(contact?.firstName?.length ?? 0 > 0) ? contact?.firstName[0] : ''}${(contact?.lastName?.length ?? 0 > 0) ? contact?.lastName[0] : ''}`;
 
   return (
     <AppIntlProvider>
       <div
-        id="contactCard"
-        className={cx(styles.overlay, {
-          [styles.openedOverlay]: opened || !closing,
+        ref={ref}
+        className={cx(styles.dialog, {
+          [styles.closedDialog]: !opened,
         })}
-        onClick={event => {
-          if ('id' in event.target && event.target.id === 'contactCard') {
-            handleClose();
-          }
-        }}
-        role="button"
+        role="dialog"
+        aria-label={intl.formatMessage({
+          defaultMessage: 'Modal with contact card download link',
+          id: 'aumcS0',
+          description: 'Download vCard modal aria label',
+        })}
       >
-        <div
-          className={cx(
-            styles.dialog,
-
-            {
-              [styles.closedDialog]: !opened,
-            },
-          )}
-          onTransitionEnd={handleAnimationEnd}
-          role="dialog"
-          aria-label={intl.formatMessage({
-            defaultMessage: 'Modal with contact card download link',
-            id: 'aumcS0',
-            description: 'Download vCard modal aria label',
-          })}
-        >
-          <div className={styles.avatarContainer}>
-            {contact ? (
-              contact?.avatarUrl ? (
-                <Avatar
-                  variant="image"
-                  url={contact.avatarUrl}
-                  alt={displayName}
-                />
-              ) : (
-                <Avatar
-                  variant="initials"
-                  initials={`${(contact.firstName?.length ?? 0 > 0) ? contact.firstName[0] : ''}${(contact.lastName?.length ?? 0 > 0) ? contact.lastName[0] : ''}`}
-                />
-              )
-            ) : null}
-          </div>
-          <span className={cx(styles.message)}>
-            <FormattedMessage
-              defaultMessage="Add {userName} to your contacts"
-              id="5AubE3"
-              description="Download vCard modal message"
-              values={{
-                userName: displayName,
-              }}
-            />
-          </span>
-          {appClipIsSupported ? (
-            <LinkButton size="medium" onClick={showAppClip}>
-              <FormattedMessage
-                defaultMessage="Save Contact Card"
-                id="TiZK4B"
-                description="Save contact with AppClip modal message"
+        <div className={styles.avatarContainer}>
+          {contact ? (
+            contact?.avatarUrl ? (
+              <Avatar
+                variant="image"
+                url={contact.avatarUrl}
+                alt={displayName}
               />
-            </LinkButton>
-          ) : fileUrl && webCard.userName ? (
-            <DownloadVCardLinkButton
-              size="medium"
-              href={fileUrl}
-              download={`${webCard.userName}${contact?.firstName.trim() ? `-${contact.firstName.trim()}` : ''}${contact?.lastName.trim() ? `-${contact.lastName.trim()}` : ''}.vcf`}
-              userName={webCard.userName}
-              onClick={handleClose}
-            >
-              <FormattedMessage
-                defaultMessage="Save Contact Card"
-                id="a4m505"
-                description="Download vCard modal message"
-              />
-            </DownloadVCardLinkButton>
+            ) : (
+              <Avatar variant="initials" initials={contactInitials} />
+            )
           ) : null}
-
-          <ButtonIcon
-            onClick={handleClose}
-            size={30}
-            Icon={CloseIcon}
-            className={styles.closeButton}
-          />
         </div>
+        <div className={styles.message}>
+          <div className={styles.userName}>{displayName}</div>
+          {contact?.title && (
+            <div className={styles.subtitle}>{contact?.title}</div>
+          )}
+          {contact?.company && (
+            <div className={styles.subtitle}>{contact?.company}</div>
+          )}
+        </div>
+        {step === 0 && <ContactSteps step={step} />}
+
+        {appClipIsSupported ? (
+          <LinkButton
+            size="medium"
+            onClick={showAppClip}
+            className={styles.buttonLink}
+          >
+            <FormattedMessage
+              defaultMessage="Create new contact"
+              id="spJduZ"
+              description="Save contact with AppClip modal message"
+            />
+          </LinkButton>
+        ) : fileUrl && webCard.userName ? (
+          <DownloadVCardLinkButton
+            size="medium"
+            href={fileUrl}
+            className={styles.buttonLink}
+            download={`${webCard.userName}${contact?.firstName.trim() ? `-${contact.firstName.trim()}` : ''}${contact?.lastName.trim() ? `-${contact.lastName.trim()}` : ''}.vcf`}
+            userName={webCard.userName}
+            onClick={handleClose}
+          >
+            <FormattedMessage
+              defaultMessage="Create new contact"
+              id="ANfVcR"
+              description="Download vCard modal message"
+            />
+          </DownloadVCardLinkButton>
+        ) : null}
+        {step !== 0 && (
+          <div className={styles.bottomContainer}>
+            <div className={styles.poweredByContainer}>
+              <div className={styles.poweredByLabel}>
+                <FormattedMessage
+                  defaultMessage="Powered by"
+                  id="1Kt5MY"
+                  description="Powered by in Download Vcard bottom box"
+                />
+              </div>
+              <Image
+                src="/logo-v2.svg"
+                alt="Logo azzapp"
+                width={101}
+                height={21}
+              />
+            </div>
+            <div className={styles.storeContainer}>
+              {(deviceType === DeviceType.IOS ||
+                deviceType === DeviceType.DESKTOP) && (
+                <Link
+                  href={
+                    new URL(process.env.NEXT_PUBLIC_DOWNLOAD_IOS_APP as string)
+                  }
+                  target="_blank"
+                >
+                  <Image
+                    alt="app store"
+                    src="/appstore.svg"
+                    width={124}
+                    height={36}
+                  />
+                </Link>
+              )}
+              {(deviceType === DeviceType.ANDROID ||
+                deviceType === DeviceType.DESKTOP) && (
+                <Link
+                  href={
+                    new URL(
+                      process.env.NEXT_PUBLIC_DOWNLOAD_ANDROID_APP as string,
+                    )
+                  }
+                  target="_blank"
+                >
+                  <Image
+                    alt="play store"
+                    src="/googleplay.svg"
+                    width={124}
+                    height={36}
+                  />
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
+
+        <ButtonIcon
+          onClick={handleClose}
+          size={30}
+          Icon={CloseIcon}
+          className={styles.closeButton}
+        />
       </div>
       {contact && !opened && !contact.avatarUrl && (
         <ButtonIcon
@@ -268,28 +330,59 @@ const DownloadVCard = ({
         />
       )}
       {contact && !opened && contact.avatarUrl && (
-        <img
-          className={styles.addContactAvatar}
-          src={contact.avatarUrl}
-          onClick={() => {
-            setOpened(true);
+        <div
+          className={styles.addContact}
+          style={{
+            bottom: phoneNumber ? 75 : 15,
+            right: 15,
           }}
-        />
+        >
+          <Image
+            alt="add contact"
+            src="/contact.svg"
+            width={24}
+            height={24}
+            onClick={() => {
+              setOpened(true);
+            }}
+          />
+        </div>
+      )}
+      {phoneNumber && !opened && contact?.avatarUrl && (
+        <Link
+          href={`https://wa.me/${phoneNumber}?text=${intl.formatMessage({
+            defaultMessage: 'Hello',
+            id: 'xuXlIz',
+            description: 'Hello message for whatsapp contact discussion button',
+          })}`}
+          target="_blank"
+          className={styles.whatsappContainer}
+        >
+          {contact?.avatarUrl ? (
+            <Avatar
+              className={styles.whatsappAvatar}
+              variant="image"
+              url={contact?.avatarUrl}
+              alt="avatar"
+            />
+          ) : (
+            <Avatar
+              className={styles.whatsappAvatar}
+              variant="initials"
+              initials={contactInitials}
+            />
+          )}
+          <Image
+            className={styles.whatsappIcon}
+            alt="play store"
+            src="/whatsapp.svg"
+            width={19}
+            height={19}
+          />
+        </Link>
       )}
     </AppIntlProvider>
   );
 };
 
 export default DownloadVCard;
-
-const isAppClipSupported = () => {
-  if (!process.env.NEXT_PUBLIC_APPLE_APP_ENABLED) {
-    return false;
-  }
-  const userAgent = navigator.userAgent.toLowerCase();
-
-  const isIOS = /iphone|ipad/.test(userAgent);
-  const iosVersionMatch = userAgent.match(/os (\d+)_/);
-  const iosVersion = iosVersionMatch ? parseInt(iosVersionMatch[1], 10) : 0;
-  return isIOS && iosVersion >= 16.4; //opening appclip from link only supported after 16.4, open from another app is supported from 17.0
-};

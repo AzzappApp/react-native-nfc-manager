@@ -2,8 +2,9 @@ import { Fragment } from 'react';
 import { useFieldArray } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
+import { getLocales } from 'react-native-localize';
 import { colors } from '#theme';
-import ContactCardEditModalField from '#components/ContactCard/ContactCardEditField';
+import ContactCardEditPhoneField from '#components/ContactCard/ContactCardEditPhoneField';
 import {
   contactCardEditModalStyleSheet,
   useContactCardPhoneLabels,
@@ -21,6 +22,7 @@ const ContactCardEditModalPhones = ({
 }: {
   control: Control<ContactCardFormValues>;
 }) => {
+  const locales = getLocales();
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'phoneNumbers',
@@ -36,16 +38,17 @@ const ContactCardEditModalPhones = ({
     <>
       {fields.map((phone, index) => (
         <Fragment key={phone.id}>
-          <ContactCardEditModalField
+          <ContactCardEditPhoneField
             control={control}
             labelKey={`phoneNumbers.${index}.label`}
             valueKey={`phoneNumbers.${index}.number`}
+            countryCodeKey={`phoneNumbers.${index}.countryCode`}
             selectedKey={`phoneNumbers.${index}.selected`}
             deleteField={() => remove(index)}
             keyboardType="phone-pad"
             labelValues={labelValues}
             placeholder={intl.formatMessage({
-              defaultMessage: 'Enter a phone number',
+              defaultMessage: 'Phone number',
               description: 'Placeholder for phone number inside contact card',
             })}
           />
@@ -56,7 +59,14 @@ const ContactCardEditModalPhones = ({
         <PressableNative
           testID="add-phone-button"
           style={styles.addButton}
-          onPress={() => append({ label: 'Home', number: '', selected: true })}
+          onPress={() =>
+            append({
+              label: 'Home',
+              number: '',
+              countryCode: locales[0].countryCode,
+              selected: true,
+            })
+          }
         >
           <Icon icon="add_filled" style={{ tintColor: colors.green }} />
           <Text variant="smallbold">

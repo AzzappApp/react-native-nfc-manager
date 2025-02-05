@@ -8,6 +8,7 @@ import PhotoWithTextAndTitleRenderer from './PhotoWithTextAndTitleRenderer';
 import SimpleButtonRenderer from './SimpleButtonRenderer';
 import SimpleTextRenderer from './SimpleTextRenderer';
 import SocialLinksRenderer from './SocialLinksRenderer';
+import TitleTextRenderer from './TitleTextRenderer';
 import type { CardModule } from '@azzapp/data';
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
 import type { ComponentType } from 'react';
@@ -60,6 +61,7 @@ const renderers: {
   media: MediaRenderer,
   mediaText: MediaTextLinkRenderer, // mediaText and mediaTextLink are very close in terms of rendering
   mediaTextLink: MediaTextLinkRenderer,
+  titleText: TitleTextRenderer,
 };
 
 export default ModuleRenderer;

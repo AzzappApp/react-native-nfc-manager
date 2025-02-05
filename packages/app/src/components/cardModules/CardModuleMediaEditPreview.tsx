@@ -1,4 +1,3 @@
-import { Image } from 'expo-image';
 import { memo } from 'react';
 import { useDerivedValue } from 'react-native-reanimated';
 import TransformedImageRenderer from '#components/TransformedImageRenderer';
@@ -8,7 +7,6 @@ import {
   useNativeTexture,
 } from '#helpers/mediaEditions';
 import { CARD_MEDIA_VIDEO_DEFAULT_DURATION } from './cardModuleEditorType';
-import CardModuleMediaItem from './CardModuleMediaItem';
 import type {
   CardModuleImage,
   CardModuleSourceMedia,
@@ -29,17 +27,6 @@ const CardModuleMediaEditPreview = ({
 }: CardModuleMediaEditPreviewProps) => {
   if (!media) {
     return null;
-  }
-
-  if (!media.uri.startsWith('file://')) {
-    return (
-      <CardModuleMediaItem
-        media={media}
-        dimension={dimension}
-        canPlay
-        imageStyle={imageStyle}
-      />
-    );
   }
 
   const { width: itemWidth, height: itemHeight } = dimension;
@@ -103,32 +90,6 @@ type ImageRenderProps = {
 };
 
 const ImageRender = ({
-  media,
-  itemWidth,
-  itemHeight,
-  imageStyle,
-}: ImageRenderProps) => {
-  const { cropData, ...editionParameters } = media.editionParameters ?? {};
-
-  return media.filter ||
-    Object.entries(editionParameters).filter(([, value]) => value).length >
-      0 ? (
-    <ImageSkiaRender
-      media={media}
-      itemWidth={itemWidth}
-      itemHeight={itemHeight}
-      imageStyle={imageStyle}
-    />
-  ) : (
-    <Image
-      source={media}
-      style={[{ width: itemWidth, height: itemHeight }, imageStyle]}
-      contentFit="cover"
-    />
-  );
-};
-
-const ImageSkiaRender = ({
   media,
   itemWidth,
   itemHeight,

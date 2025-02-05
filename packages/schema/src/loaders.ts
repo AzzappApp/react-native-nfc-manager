@@ -6,11 +6,10 @@ import {
   getLocalizationMessagesByKeys,
   getWebCardsOwnerUsers,
   getCardModulesByWebCards,
-  activeUserSubscription,
   getProfileByUserAndWebCard,
   isFollowing,
   getContactsByUser,
-  getUserSubscriptionForUserOrWebCard,
+  getActiveUserSubscriptions,
 } from '@azzapp/data';
 import {
   createDataLoader,
@@ -163,6 +162,7 @@ export const followingsLoader = createSessionDataLoader(
 
 export const profileInUserContactLoader = createSessionDataLoader(
   'ProfileInUserContactLoader',
+
   async (keys: ReadonlyArray<{ userId: string; profileId: string }>) => {
     const profileIdsByUser = keys.reduce(
       (accumulator, key) => {
@@ -256,44 +256,16 @@ export const cardModuleByWebCardLoader = createSessionDataLoader<
   return keys.map(key => modules[key] ?? []);
 });
 
-export const activeSubscriptionsLoader = createSessionDataLoader(
-  'ActiveSubscriptionsLoader',
+export const activeSubscriptionsForUserLoader = createSessionDataLoader(
+  'ActiveSubscriptionsForUserLoader',
   async (keys: readonly string[]) => {
     if (keys.length === 0) {
       return [];
     }
-    const subscriptions = (
-      await activeUserSubscription(keys as string[])
-    ).filter(subscription => !!subscription);
 
-    return keys.map(k =>
-      subscriptions.filter(subscription => subscription.userId === k),
+    const userSubscriptions = await getActiveUserSubscriptions(
+      keys as string[],
     );
+    return keys.map(k => userSubscriptions.filter(u => u.userId === k) ?? null);
   },
-);
-
-export const activeSubscriptionsForWebCardLoader = createSessionDataLoader(
-  'ActiveSubscriptionsForWebCardLoader',
-  async (keys: ReadonlyArray<{ userId: string; webCardId: string }>) => {
-    if (keys.length === 0) {
-      return [];
-    }
-    const webCardIds = keys.map(k => k.webCardId);
-    const userIds = keys.map(k => k.userId);
-
-    const userSubscriptions = await getUserSubscriptionForUserOrWebCard(
-      userIds,
-      webCardIds,
-    );
-
-    return keys.map(
-      k =>
-        userSubscriptions.find(
-          u =>
-            (k.webCardId && u.webCardId === k.webCardId) ||
-            u.userId === k.userId,
-        ) ?? null,
-    );
-  },
-  { cacheKeyFn: ({ userId, webCardId }) => `${userId}-${webCardId}` },
 );

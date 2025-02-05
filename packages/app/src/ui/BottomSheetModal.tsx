@@ -10,7 +10,7 @@ import {
   interpolate,
   useAnimatedStyle,
 } from 'react-native-reanimated';
-import { colors, shadow } from '#theme';
+import { colors, reactNativeShadow } from '#theme';
 import Toast from '#components/Toast';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -53,6 +53,13 @@ export type Props = BottomSheetModalProps & {
    * @type {boolean}
    */
   automaticBottomPadding?: boolean;
+  /**
+   * add a bottom padding automatically based on the top insets and the phone's safe area
+   * This props allows to remove it in a case of a fullscreen or Scrollable content for example
+   * @default true
+   * @type {boolean}
+   */
+  automaticTopPadding?: boolean;
   /**
    * If true, create a backdrop that allow te be touched in order to close the bottom
    *
@@ -101,6 +108,7 @@ const BottomSheetModal = ({
   style,
   height,
   automaticBottomPadding = true,
+  automaticTopPadding = true,
   enableContentPanningGesture,
   closeOnBackdropTouch = true,
   variant,
@@ -208,7 +216,11 @@ const BottomSheetModal = ({
             {
               height: height ? height : undefined,
               paddingBottom: automaticBottomPadding ? paddingBottom : 0,
-              paddingTop: showHandleIndicator ? 0 : 16,
+              paddingTop: showHandleIndicator
+                ? 0
+                : automaticTopPadding
+                  ? 16
+                  : undefined,
             },
           ]}
         >
@@ -249,7 +261,7 @@ const styleSheet = createStyleSheet(appearance => ({
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     borderWidth: 0,
-    ...shadow(appearance, 'top'),
+    ...reactNativeShadow(appearance, 'top'),
   },
 }));
 

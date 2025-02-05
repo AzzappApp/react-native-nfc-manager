@@ -3,6 +3,7 @@ import { useCallback, useState } from 'react';
 import { Controller, useController, useWatch } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { AVATAR_MAX_WIDTH } from '@azzapp/shared/contactCardHelpers';
 import FormDeleteFieldOverlay from '#components/ContactCard/FormDeleteFieldOverlay';
 import ImagePicker, {
@@ -78,7 +79,7 @@ const ContactCardCreateForm = ({
         avatarField.onChange({
           local: true,
           id: localPath,
-          uri: `file://${localPath}`,
+          uri: localPath,
         });
       }
       setImagePicker(null);
@@ -150,6 +151,7 @@ const ContactCardCreateForm = ({
                   variant="large"
                   value={value === 'business'}
                   onValueChange={() => {
+                    Toast.hide();
                     const newValue =
                       value === 'business' ? 'personal' : 'business';
                     onChange(newValue);

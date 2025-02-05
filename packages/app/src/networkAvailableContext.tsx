@@ -22,8 +22,8 @@ export const NetworkAvailableContextProvider = ({
   );
 };
 
-// Will fetch availabilityCheck endpoint every 5s
-const networkCheckTimeoutMs = 5000;
+// Will fetch availabilityCheck endpoint every 5s (reduce for DEV, to avoid to much log in webserver, specially when you are debugging the app))
+const networkCheckTimeoutMs = __DEV__ ? 600000 : 5000;
 
 // The url to request
 const reachabilityUrl = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/availabilityCheck`;

@@ -118,7 +118,7 @@ const VideoCompositionRenderer = ({
   }, true);
 
   return (
-    <Canvas style={[{ width, height }, style]} {...props} opaque>
+    <Canvas style={[{ width, height }, style]} {...props}>
       <Image x={0} y={0} width={width} height={height} image={image} />
     </Canvas>
   );

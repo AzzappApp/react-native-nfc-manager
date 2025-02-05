@@ -31,6 +31,11 @@ const prefixes = [
 export const matchUrlWithRoute = async (
   url: string,
 ): Promise<Route | undefined> => {
+  // can be test only with the release app clip, url is fix, not based on scheme or target
+  if (url.startsWith('https://appclip.apple.com/id?p=com.azzapp.app.Clip')) {
+    const route = await handleAppClip(url);
+    return route;
+  }
   const prefix = prefixes.find(prefix => prefix && url.startsWith(prefix));
   if (!prefix) {
     return;
@@ -161,4 +166,58 @@ export const matchUrlWithRoute = async (
   return {
     route: 'HOME',
   };
+};
+
+const handleAppClip = async (url: string): Promise<Route | undefined> => {
+  //get u param and c param from url
+  const parsedUrl = new URL(url);
+  const params = new URLSearchParams(parsedUrl.search);
+  //little duplication but avoiding touching the actual deeplink . and having a custom logEvent
+  logEvent('applink_contactCard');
+
+  const username = params.get('u');
+  const compressedContactCard = params.get('c');
+
+  if (username && compressedContactCard) {
+    let contactData: string;
+    let signature: string;
+    try {
+      [contactData, signature] = JSON.parse(
+        //lz-string decompressFromEncodedURIComponent does not decode properly when space in the url is converted to %20? (happens with applink)
+        //we need to use decodeURI in order to decode the url properly
+        decompressFromEncodedURIComponent(decodeURI(compressedContactCard)),
+      );
+
+      if (signature && contactData) {
+        const additionalContactData = await verifySign({
+          signature,
+          data: contactData,
+          salt: username,
+        });
+
+        return {
+          route: 'WEBCARD',
+          params: {
+            userName: username,
+            contactData,
+            additionalContactData,
+          },
+        };
+      }
+    } catch (error) {
+      Sentry.captureException(error, {
+        data: 'appClip-deeplink-decompressFromEncodedURIComponent',
+      });
+      return {
+        route: 'WEBCARD',
+        params: {
+          userName: username,
+        },
+      } as const;
+    }
+  } else {
+    return {
+      route: 'HOME',
+    } as const;
+  }
 };

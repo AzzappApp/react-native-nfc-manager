@@ -10,7 +10,6 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import { shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { ScrollDirection, objectMove } from './SortableListHelper';
 import type { PanGesture } from 'react-native-gesture-handler';
@@ -278,12 +277,11 @@ const SortableWrapper = ({
 
 export default SortableWrapper;
 
-const styleSheet = createStyleSheet(appearance => ({
+const styleSheet = createStyleSheet(() => ({
   root: {
     position: 'absolute',
     left: 0,
     right: 0,
-    ...shadow(appearance, 'center'),
   },
 }));
 

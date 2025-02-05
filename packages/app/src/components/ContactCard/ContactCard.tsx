@@ -323,7 +323,7 @@ export const ContactCardComponent = ({
       <View style={styles.qrCodeContainer}>
         {svg ? (
           <Animated.View style={qrCodeStyle}>
-            <Canvas style={styles.qrCodeCanvas} opaque>
+            <Canvas style={styles.qrCodeCanvas}>
               <Group
                 layer={
                   <Paint>

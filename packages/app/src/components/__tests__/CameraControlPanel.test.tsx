@@ -1,11 +1,10 @@
 import CameraControlPanel from '#components/CameraControlPanel';
 import { fireEvent, render, screen } from '#helpers/testHelpers';
 
-jest.mock('react-native-blob-util', () => ({
-  fs: {
-    writeFile: jest.fn(),
-    dirs: {
-      CacheDir: 'CacheDir',
+jest.mock('expo-file-system/next', () => ({
+  Paths: {
+    cache: {
+      uri: 'file://temp',
     },
   },
 }));

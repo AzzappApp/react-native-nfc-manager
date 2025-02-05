@@ -4,8 +4,7 @@ import Toast from 'react-native-toast-message';
 import { commitLocalUpdate, useRelayEnvironment } from 'react-relay';
 import ERRORS from '@azzapp/shared/errors';
 import { useRouter } from '#components/NativeRouter';
-import { getAuthState } from '#helpers/authStore';
-import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import { getAuthState, onChangeWebCard } from '#helpers/authStore';
 import type { GraphQLError } from 'graphql';
 
 type GraphQLErrors = { response: { errors: GraphQLError[] } };
@@ -40,14 +39,11 @@ const useHandleProfileActionError = (errorText: string) => {
             }
           });
 
-          dispatchGlobalEvent({
-            type: 'PROFILE_ROLE_CHANGE',
-            payload: {
-              profileRole: role as string,
-            },
-          }).then(() => {
-            router.backToTop();
+          onChangeWebCard({
+            profileRole: role,
           });
+
+          router.backToTop();
         }
       }
       if (error.message === ERRORS.UNAUTHORIZED) {
@@ -72,6 +68,12 @@ const useHandleProfileActionError = (errorText: string) => {
         [ERRORS.UNAUTHORIZED]: intl.formatMessage({
           defaultMessage: 'Error, you lost access to this webcard',
           description: 'Toast Error message when user lost webcard access',
+        }),
+        [ERRORS.SUBSCRIPTION_INSUFFICIENT_SEATS]: intl.formatMessage({
+          defaultMessage:
+            'Error, not enough users available in you subscription to publish this webcard, please upgrade your subscription',
+          description:
+            'Toast Error message when user tries to publish a webcard but has not enough seats',
         }),
       };
 

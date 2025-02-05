@@ -23,16 +23,16 @@ export type AlternationRendererProps = ModuleRendererProps<
 > &
   Omit<React.HTMLProps<HTMLDivElement>, 'children'> & {
     renderMediaOverlay?: (props: { mediaId: string }) => ReactNode;
-  };
+  } & { isFullAlternation?: boolean };
 
 const AlternationRender = async ({
   module,
   colorPalette,
   coverBackgroundColor,
   cardStyle,
+  isFullAlternation,
 }: AlternationRendererProps) => {
   const { cardModuleMedias, cardModuleColor } = module.data;
-
   const medias = (
     await getMediasByIds(cardModuleMedias.map(({ media }) => media.id))
   ).filter(media => media !== null);
@@ -49,57 +49,91 @@ const AlternationRender = async ({
         ),
       }}
     >
-      <div className={styles.container}>
+      <div
+        className={
+          isFullAlternation ? styles.containerFullAlternation : styles.container
+        }
+      >
         {medias.map((media, index) => {
           const sectionData = cardModuleMedias.find(
             cardModuleMedia => cardModuleMedia.media.id === media.id,
           );
-
+          const even = index % 2 === 0;
           return (
             <div
               key={media.id}
               className={
-                index % 2 === 0
-                  ? styles.sectionContainer
-                  : styles.sectionContainerEven
+                even
+                  ? isFullAlternation
+                    ? styles.sectionFullAlternationContainerEven
+                    : styles.sectionContainerEven
+                  : isFullAlternation
+                    ? styles.sectionFullAlternationContainer
+                    : styles.sectionContainer
               }
             >
-              <AlternationMedia
-                media={media}
-                even={index % 2 === 0}
-                cardStyle={cardStyle}
-              />
-              <div className={styles.sectionTextContainer}>
-                <section className={styles.section}>
-                  <h3
-                    className={cn(
-                      commonStyles.title,
-                      fontsMap[cardStyle.titleFontFamily].className,
-                    )}
-                    style={{
-                      color: swapColor(cardModuleColor?.title, colorPalette),
-                    }}
-                  >
-                    {sectionData?.title ?? DEFAULT_MODULE_TITLE}
-                  </h3>
-                  <p
-                    className={cn(
-                      commonStyles.text,
-                      fontsMap[cardStyle.fontFamily].className,
-                    )}
-                    style={{
-                      color: swapColor(cardModuleColor?.text, colorPalette),
-                    }}
-                  >
-                    {sectionData?.text ?? DEFAULT_MODULE_TEXT}
-                  </p>
-                </section>
-                <Link
-                  mediaData={sectionData}
-                  data={module.data}
+              <div className={styles.columnWidth}>
+                <AlternationMedia
+                  media={media}
+                  even={even}
                   cardStyle={cardStyle}
-                  colorPalette={colorPalette}
+                  isFullAlternation={isFullAlternation}
                 />
+              </div>
+              <div className={styles.columnWidth}>
+                <div
+                  className={
+                    isFullAlternation
+                      ? styles.sectionTextFullAlternationContainer
+                      : styles.sectionTextContainer
+                  }
+                >
+                  <section
+                    className={
+                      isFullAlternation
+                        ? styles.sectionFullAlternation
+                        : styles.section
+                    }
+                    style={{
+                      padding: isFullAlternation
+                        ? undefined
+                        : `0 ${Math.max(cardStyle.gap, 20)}px`,
+                    }}
+                  >
+                    <h2
+                      className={cn(
+                        commonStyles.title,
+                        fontsMap[cardStyle.titleFontFamily].className,
+                      )}
+                      style={{
+                        color: swapColor(cardModuleColor?.title, colorPalette),
+                        fontSize: cardStyle.titleFontSize,
+                      }}
+                    >
+                      {sectionData?.title ?? DEFAULT_MODULE_TITLE}
+                    </h2>
+                    <p
+                      className={cn(
+                        commonStyles.text,
+                        fontsMap[cardStyle.fontFamily].className,
+                      )}
+                      style={{
+                        color: swapColor(cardModuleColor?.text, colorPalette),
+                        fontSize: cardStyle.fontSize,
+                      }}
+                    >
+                      {sectionData?.text ?? DEFAULT_MODULE_TEXT}
+                    </p>
+                    <div>
+                      <Link
+                        mediaData={sectionData}
+                        data={module.data}
+                        cardStyle={cardStyle}
+                        colorPalette={colorPalette}
+                      />
+                    </div>
+                  </section>
+                </div>
               </div>
             </div>
           );

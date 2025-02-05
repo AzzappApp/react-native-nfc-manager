@@ -77,7 +77,7 @@ const CardModuleBackgroundImageSkia = (
       });
 
     return (
-      <Canvas style={styles.container} opaque>
+      <Canvas style={styles.container}>
         <Group
           opacity={backgroundOpacity}
           layer={
@@ -116,7 +116,6 @@ const CardModuleBackgroundImageSkia = (
             height: Math.ceil(dst.height),
           },
         ]}
-        opaque
       >
         <Group
           opacity={backgroundOpacity}

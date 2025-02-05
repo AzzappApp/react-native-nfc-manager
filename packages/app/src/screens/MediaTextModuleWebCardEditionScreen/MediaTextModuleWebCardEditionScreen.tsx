@@ -24,6 +24,7 @@ import {
   handleUploadCardModuleMedia,
 } from '#helpers/cardModuleHelpers';
 import withWebCardSection from '../../components/cardModules/withCardModule';
+import type { CardModuleData } from '#components/cardModules/CardModuleBottomBar';
 import type { CardModuleMedia } from '#components/cardModules/cardModuleEditorType';
 import type { MediaTextModuleWebCardEditionScreen_module$key } from '#relayArtifacts/MediaTextModuleWebCardEditionScreen_module.graphql';
 import type { MediaTextModuleWebCardEditionScreenMutation } from '#relayArtifacts/MediaTextModuleWebCardEditionScreenMutation.graphql';
@@ -102,6 +103,8 @@ const MediaTextModuleWebCardEditionScreen = (
           title
           media {
             id
+            width
+            height
             ... on MediaImage {
               uri(width: $screenWidth, pixelRatio: $pixelRatio)
               smallThumbnail: uri(width: 125, pixelRatio: $cappedPixelRatio)
@@ -261,10 +264,17 @@ const MediaTextModuleWebCardEditionScreen = (
   useEffect(() => {
     if (
       cardModuleMedias.length > 0 &&
-      !isEqual(data, { selectedCardModuleColor, cardModuleMedias, variant })
+      !isEqual(data, {
+        id: data?.id,
+        selectedCardModuleColor,
+        cardModuleMedias,
+        variant,
+      })
     ) {
       //from Nico, we allow to save even if the user has not define text/title per media
       setCanSave(true);
+    } else {
+      setCanSave(false);
     }
   }, [
     cardModuleMedias,
@@ -275,6 +285,10 @@ const MediaTextModuleWebCardEditionScreen = (
     setCanSave,
     variant,
   ]);
+
+  const setData = useCallback((param: CardModuleData) => {
+    if (param.cardModuleMedias) setCardModuleMedias(param.cardModuleMedias);
+  }, []);
 
   return (
     <>
@@ -304,8 +318,8 @@ const MediaTextModuleWebCardEditionScreen = (
       <CardModuleBottomBar
         cardModuleColor={selectedCardModuleColor}
         setModuleColor={setModuleColor}
-        cardModuleMedias={cardModuleMedias}
-        setCardModuleMedias={setCardModuleMedias}
+        data={{ cardModuleMedias }}
+        setData={setData}
         displayInitialModal={moduleKey === null}
         webCard={webCard}
         module={{ moduleKind: MODULE_KIND, variant }}

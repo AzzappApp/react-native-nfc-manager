@@ -75,7 +75,7 @@ const TransformedVideoRenderer = ({
 
     return {
       composition: createSingleVideoComposition(
-        videoPath,
+        videoPath.replace('file://', ''),
         startTime,
         duration,
         resolution,

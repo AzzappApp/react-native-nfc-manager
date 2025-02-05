@@ -4,7 +4,7 @@ import { getCardModuleMediaKind } from '#helpers/cardModuleHelpers';
 import type { CardModuleSourceMedia } from './cardModuleEditorType';
 import type { ViewStyle } from 'react-native';
 
-type CardModuleMediaItemProps = {
+export type CardModuleMediaItemProps = {
   media: CardModuleSourceMedia;
 
   /**
@@ -21,6 +21,10 @@ type CardModuleMediaItemProps = {
    *Style to apply to the media, that can come from the card style
    */
   imageStyle?: ViewStyle;
+
+  paused?: boolean;
+
+  cachePolicy?: 'disk' | 'memory-disk' | 'memory' | 'none' | null;
 };
 
 //Simple component to render, not bind to any relay fragment
@@ -29,6 +33,7 @@ const CardModuleMediaItem = ({
   dimension,
   imageStyle,
   canPlay,
+  cachePolicy,
 }: CardModuleMediaItemProps) => {
   const kind = getCardModuleMediaKind(media);
   return kind === 'image' ? (
@@ -43,6 +48,8 @@ const CardModuleMediaItem = ({
         ...imageStyle,
       }}
       fit="cover"
+      useAnimationSnapshot={false}
+      cachePolicy={cachePolicy}
     />
   ) : (
     <MediaVideoRenderer

@@ -4,6 +4,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { DELETE_BUTTON_WIDTH } from '#helpers/contactCardHelpers';
 import type { PropsWithChildren } from 'react';
 import type { GestureResponderEvent, LayoutRectangle } from 'react-native';
+import type { KeyboardAwareScrollViewProps } from 'react-native-keyboard-controller';
 
 type Context = {
   deleted: boolean;
@@ -63,7 +64,10 @@ const reducer = (
   }
 };
 
-const FormDeleteFieldOverlay = ({ children }: PropsWithChildren) => {
+const FormDeleteFieldOverlay = ({
+  children,
+  ...props
+}: KeyboardAwareScrollViewProps & PropsWithChildren) => {
   const [state, dispatch] = useReducer(reducer, { rect: null, deleted: false });
 
   const openDeleteButton = useCallback((rect: LayoutRectangle | null) => {
@@ -102,7 +106,11 @@ const FormDeleteFieldOverlay = ({ children }: PropsWithChildren) => {
     <FormDeleteContext.Provider
       value={{ ...state, openDeleteButton, closeDeleteButton }}
     >
-      <KeyboardAwareScrollView bottomOffset={30} scrollEnabled={!state.rect}>
+      <KeyboardAwareScrollView
+        bottomOffset={30}
+        scrollEnabled={!state.rect}
+        {...props}
+      >
         {children}
         {state.rect && (
           <Pressable style={StyleSheet.absoluteFill} onPress={onPress} />

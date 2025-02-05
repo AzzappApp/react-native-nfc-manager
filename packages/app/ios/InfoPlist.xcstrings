@@ -8,7 +8,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Azzapp - Dev"
+            "value" : "azzapp -  Digital Business Card"
           }
         },
         "fr" : {
@@ -26,7 +26,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "azzapp-dev"
+            "value" : "azzapp"
           }
         },
         "fr" : {
@@ -44,7 +44,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "azzapp-dev needs access to your camera to capture photos and videos for sharing\n\t\twithin the app."
+            "value" : "azzapp needs access to your camera to capture photos and videos for sharing\n\t\twithin the app."
           }
         },
         "fr" : {
@@ -62,7 +62,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Allow azzapp-dev to access your contacts to easily invite friends to join a\n\t\tmulti-user WebCard."
+            "value" : "Allow azzapp to access your contacts to easily invite friends to join a\n\t\tmulti-user WebCard."
           }
         },
         "fr" : {
@@ -80,7 +80,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "azzapp-dev needs access to your microphone to record audio for video content within\n\t\tthe app."
+            "value" : "azzapp needs access to your microphone to record audio for video content within\n\t\tthe app."
           }
         },
         "fr" : {
@@ -98,7 +98,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "azzapp-dev uses motion detection to optimize the display of your contact card based\n\t\ton your device’s orientation."
+            "value" : "azzapp uses motion detection to optimize the display of your contact card based\n\t\ton your device’s orientation."
           }
         },
         "fr" : {
@@ -116,7 +116,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "azzapp-dev requires access to your photo library, in order to create your WebCard,\n\t\tshare and upload media."
+            "value" : "azzapp requires access to your photo library, in order to create your WebCard,\n\t\tshare and upload media."
           }
         },
         "fr" : {

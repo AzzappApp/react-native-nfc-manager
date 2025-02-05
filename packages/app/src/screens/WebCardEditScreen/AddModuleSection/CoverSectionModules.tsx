@@ -19,13 +19,11 @@ import type { ListRenderItemInfo } from 'react-native';
 
 type CoverSectionModules = {
   section: ModuleKindSection;
-  closeModuleList: () => void;
   addingModuleRequiresSubscription: boolean;
 };
 
 const CoverSectionModules = ({
   section,
-  closeModuleList,
   addingModuleRequiresSubscription,
 }: CoverSectionModules) => {
   const styles = useStyleSheet(stylesheet);
@@ -42,12 +40,11 @@ const CoverSectionModules = ({
       return (
         <VariantItem
           {...props}
-          closeModuleList={closeModuleList}
           addingModuleRequiresSubscription={addingModuleRequiresSubscription}
         />
       );
     },
-    [addingModuleRequiresSubscription, closeModuleList, section.section],
+    [addingModuleRequiresSubscription, section.section],
   );
 
   return (
@@ -115,11 +112,9 @@ const stylesheet = createStyleSheet(appearance => ({
 export default CoverSectionModules;
 
 const Item = ({
-  closeModuleList,
   addingModuleRequiresSubscription,
   ...props
 }: ModuleKindWithVariant & {
-  closeModuleList: () => void;
   addingModuleRequiresSubscription: boolean;
 }) => {
   const router = useRouter();
@@ -133,11 +128,9 @@ const Item = ({
         router.push({ route: 'USER_PAY_WALL' });
         return;
       }
-
-      router.push(route);
-      closeModuleList();
+      router.replace(route);
     }
-  }, [addingModuleRequiresSubscription, closeModuleList, route, router]);
+  }, [addingModuleRequiresSubscription, route, router]);
 
   const uri = useModuleVariantsPreviewImage(props);
   const label = useModuleVariantsLabel(props);
@@ -149,7 +142,7 @@ const Item = ({
       disabled={!route}
       disabledOpacity={1}
     >
-      <Image source={uri} style={styles.image} />
+      <Image source={uri} style={styles.image} cachePolicy="none" />
       {!route && (
         <Container style={styles.comingSoon}>
           <Text

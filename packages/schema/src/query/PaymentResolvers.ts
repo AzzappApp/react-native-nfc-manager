@@ -1,3 +1,4 @@
+import { getSessionInfos } from '#GraphQLContext';
 import { idResolver } from '#helpers/relayIdHelpers';
 import type {
   PaymentMeanResolvers,
@@ -10,4 +11,8 @@ export const Payment: PaymentResolvers = {
 
 export const PaymentMean: PaymentMeanResolvers = {
   id: idResolver('PaymentMean'),
+  isMine: async (paymentMean, _args) => {
+    const { userId } = getSessionInfos();
+    return paymentMean.userId === userId;
+  },
 };

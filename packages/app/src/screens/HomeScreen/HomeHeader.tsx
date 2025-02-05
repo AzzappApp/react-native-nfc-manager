@@ -16,6 +16,7 @@ import { graphql, useFragment } from 'react-relay';
 import { getTextColor } from '@azzapp/shared/colorsHelpers';
 import { colors } from '#theme';
 import PremiumIndicator from '#components/PremiumIndicator';
+import { useTooltipContext } from '#helpers/TooltipContext';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import { useIndexInterpolation } from './homeHelpers';
@@ -47,6 +48,7 @@ const HomeHeader = ({ openPanel, user: userKey }: HomeHeaderProps) => {
   );
 
   const { currentIndexSharedValue } = useHomeScreenContext();
+  const { toggleTooltips } = useTooltipContext();
 
   const readableColors = useMemo(
     () => [
@@ -80,8 +82,31 @@ const HomeHeader = ({ openPanel, user: userKey }: HomeHeaderProps) => {
     0,
   );
 
+  const premiumIndicatorAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: currentIndexSharedValue.value > 0.5 ? 1 : 0,
+    pointerEvents: currentIndexSharedValue.value >= 1 ? 'auto' : 'none',
+  }));
+
+  const openHilt = () => {
+    toggleTooltips(['profileBottomPanel', 'profileCarousel', 'profileLink']);
+  };
+
   return (
     <Header
+      leftElement={
+        <Animated.View
+          style={[styles.rightButtonContainer, premiumIndicatorAnimatedStyle]}
+        >
+          <IconButton
+            icon="information"
+            iconSize={26}
+            size={45}
+            variant="icon"
+            iconStyle={iconStyles}
+            onPress={openHilt}
+          />
+        </Animated.View>
+      }
       middleElement={
         <AnimatedHomeHeaderCentralComponent
           isPremium={isPremium}
@@ -135,10 +160,12 @@ export const AnimatedHomeHeaderCentralComponent = ({
       </Animated.View>
       {/** 2 pixel more to avoid crop problem */}
       <Canvas
-        style={{ width: 136, height: 30 }}
+        style={{
+          width: 136,
+          height: 30,
+        }}
         accessibilityLabel="azzapp"
         accessibilityRole="text"
-        opaque
       >
         <Mask
           mode="alpha"

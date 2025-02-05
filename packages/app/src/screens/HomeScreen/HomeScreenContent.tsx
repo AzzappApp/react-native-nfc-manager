@@ -1,23 +1,30 @@
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  memo,
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { StyleSheet, View } from 'react-native';
 import { runOnJS, useAnimatedReaction } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
-import { getAuthState } from '#helpers/authStore';
-import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import { onChangeWebCard } from '#helpers/authStore';
 import useBoolean from '#hooks/useBoolean';
 import useNotifications from '#hooks/useNotifications';
 import useScreenInsets from '#hooks/useScreenInsets';
+import useWidget from '#hooks/useWidget';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import HomeBackground from './HomeBackground';
 import HomeBottomPanel from './HomeBottomPanel';
-import { HomeBottomSheetModalWebCardToolTip } from './HomeBottomSheetModalWebCardToolTip';
 import HomeBottomSheetPanel from './HomeBottomSheetPanel';
 import HomeBottomSheetPopupPanel from './HomeBottomSheetPopupPanel';
 import HomeHeader from './HomeHeader';
 import HomeProfileLink from './HomeProfileLink';
 import HomeProfilesCarousel from './HomeProfilesCarousel';
 import { useHomeScreenContext } from './HomeScreenContext';
+import Tooltips from './Tooltips';
 import type { HomeScreenContent_user$key } from '#relayArtifacts/HomeScreenContent_user.graphql';
 import type { CarouselSelectListHandle } from '#ui/CarouselSelectList';
 import type { Ref } from 'react';
@@ -47,9 +54,9 @@ const HomeScreenContent = ({
             userName
           }
           ...HomeBottomSheetPanel_profile
-          ...HomeBottomSheetModalWebCardToolTip_profile
           ...HomeBottomSheetPopupPanel_profile
         }
+        ...useWidget_user
         ...HomeBackground_user
         ...HomeProfileLink_user
         ...HomeProfilesCarousel_user
@@ -106,16 +113,9 @@ const HomeScreenContent = ({
 
   // TODO: here we rely on polling on HOME to check if the profileRole has changed. We should have a better way to keep our app state in sync with the server.
   useEffect(() => {
-    const { profileInfos } = getAuthState();
-    if (
-      currentProfile?.profileRole &&
-      profileInfos?.profileRole !== currentProfile.profileRole
-    ) {
-      void dispatchGlobalEvent({
-        type: 'PROFILE_ROLE_CHANGE',
-        payload: {
-          profileRole: currentProfile.profileRole,
-        },
+    if (currentProfile?.profileRole) {
+      onChangeWebCard({
+        profileRole: currentProfile.profileRole,
       });
     }
   }, [currentProfile?.profileRole]);
@@ -138,6 +138,10 @@ const HomeScreenContent = ({
     [insets.bottom, insets.top],
   );
 
+  //#region widget
+  useWidget(user ?? null);
+  //#endregion
+
   return (
     <View style={styles.container}>
       <HomeBackground user={user} />
@@ -145,18 +149,21 @@ const HomeScreenContent = ({
         <HomeHeader openPanel={toggleMenu} user={user} />
         <HomeProfileLink user={user} />
         <HomeProfilesCarousel ref={selectListRef} user={user} />
-        <HomeBottomPanel user={user} />
+        <Suspense>
+          <HomeBottomPanel user={user} />
+        </Suspense>
       </View>
-      <HomeBottomSheetPanel
-        visible={showMenu}
-        close={closeMenu}
-        profile={currentProfile ?? null}
-      />
-      <HomeBottomSheetModalWebCardToolTip user={currentProfile ?? null} />
-
+      <Suspense>
+        <HomeBottomSheetPanel
+          visible={showMenu}
+          close={closeMenu}
+          profile={currentProfile ?? null}
+        />
+      </Suspense>
       {currentProfile?.webCard && !currentProfile.webCard.userName && (
         <HomeBottomSheetPopupPanel profile={currentProfile ?? null} />
       )}
+      <Tooltips />
     </View>
   );
 };

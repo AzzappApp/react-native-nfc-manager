@@ -3,11 +3,11 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
+import { Image as ImageCompressor } from 'react-native-compressor';
 import * as mime from 'react-native-mime-types';
 import Toast from 'react-native-toast-message';
 import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
 import { Observable } from 'relay-runtime';
-import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
 import {
   preventModalDismiss,
@@ -17,6 +17,10 @@ import {
 import { getFileName } from '#helpers/fileHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
+import {
+  getPhonenumberWithCountryCode,
+  parsePhoneNumber,
+} from '#helpers/phoneNumbersHelper';
 import relayScreen from '#helpers/relayScreen';
 import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';
 import { get as QRCodeWidth } from '#relayProviders/qrCodeWidth.relayprovider';
@@ -33,6 +37,7 @@ import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { ContactCardEditScreenQuery } from '#relayArtifacts/ContactCardEditScreenQuery.graphql';
 import type { ContactCardEditRoute } from '#routes';
 import type { ContactCardFormValues } from './ContactCardSchema';
+import type { CountryCode } from 'libphonenumber-js';
 
 const contactCardEditScreenQuery = graphql`
   query ContactCardEditScreenQuery($profileId: ID!, $pixelRatio: Float!) {
@@ -134,7 +139,7 @@ const ContactCardEditScreen = ({
     logo: null,
   };
 
-  const [commit] = useMutation(graphql`
+  const [commit, loading] = useMutation(graphql`
     mutation ContactCardEditScreenMutation(
       $profileId: ID!
       $contactCard: ContactCardInput!
@@ -210,7 +215,7 @@ const ContactCardEditScreen = ({
       ...contactCard,
       company: contactCard?.company ?? '',
       emails: contactCard?.emails?.map(m => ({ ...m })) ?? [],
-      phoneNumbers: contactCard?.phoneNumbers?.map(p => ({ ...p })) ?? [],
+      phoneNumbers: contactCard?.phoneNumbers?.map(parsePhoneNumber) ?? [],
       urls: contactCard?.urls?.map(p => ({ ...p })) ?? [],
       addresses: contactCard?.addresses?.map(p => ({ ...p })) ?? [],
       birthday: contactCard?.birthday,
@@ -232,9 +237,10 @@ const ContactCardEditScreen = ({
       setProgressIndicator(Observable.from(0));
 
       const fileName = getFileName(avatar.uri);
+      const compressedFileUri = await ImageCompressor.compress(avatar.uri);
       const file: any = {
         name: fileName,
-        uri: avatar.uri,
+        uri: compressedFileUri,
         type: mime.lookup(fileName) || 'image/jpeg',
       };
 
@@ -251,9 +257,10 @@ const ContactCardEditScreen = ({
       setProgressIndicator(Observable.from(0));
 
       const fileName = getFileName(logo.uri);
+      const compressedFileUri = await ImageCompressor.compress(logo.uri);
       const file: any = {
         name: fileName,
-        uri: logo.uri,
+        uri: compressedFileUri,
         type: mime.lookup(fileName) || 'image/jpeg',
       };
 
@@ -265,12 +272,14 @@ const ContactCardEditScreen = ({
     } else {
       uploads.push(null);
     }
-
-    setProgressIndicator(
-      combineMultiUploadProgresses(
-        convertToNonNullArray(uploads.map(upload => upload?.progress)),
-      ),
-    );
+    const uploadsToDo = uploads.filter(val => val !== null);
+    if (uploadsToDo.length) {
+      setProgressIndicator(
+        combineMultiUploadProgresses(
+          uploadsToDo.map(upload => upload.progress),
+        ),
+      );
+    }
 
     const [uploadedAvatarId, uploadedLogoId] = await Promise.all(
       uploads.map(upload =>
@@ -291,9 +300,15 @@ const ContactCardEditScreen = ({
         contactCard: {
           ...data,
           emails: data.emails?.filter(email => email.address),
-          phoneNumbers: data.phoneNumbers?.filter(
-            phoneNumber => phoneNumber.number,
-          ),
+          phoneNumbers: data.phoneNumbers
+            ?.filter(phoneNumber => phoneNumber.number)
+            .map(({ countryCode, ...phoneNumber }) => {
+              const number = getPhonenumberWithCountryCode(
+                phoneNumber.number,
+                countryCode as CountryCode,
+              );
+              return { ...phoneNumber, number };
+            }),
           urls: data.urls?.filter(url => url.address),
           addresses: data.addresses?.filter(address => address.address),
           birthday: data.birthday,
@@ -393,7 +408,7 @@ const ContactCardEditScreen = ({
                 description: 'Edit contact card modal save button label',
               })}
               testID="save-contact-card"
-              loading={isSubmitting}
+              loading={isSubmitting || loading}
               onPress={submit}
               variant="primary"
               style={styles.headerButton}

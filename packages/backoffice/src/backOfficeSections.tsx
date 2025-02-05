@@ -131,6 +131,18 @@ const backOfficeSections: Array<Section | SubSection> = [
       },
     ],
   },
+  {
+    id: 'crons',
+    text: 'crons',
+    subSections: [
+      {
+        id: 'cron',
+        text: 'Trigger crons',
+        href: '/crons',
+        roles: [ADMIN],
+      },
+    ],
+  },
 ];
 
 export default backOfficeSections;

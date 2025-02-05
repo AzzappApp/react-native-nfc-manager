@@ -94,9 +94,7 @@ const getItem = async (
 const getOwner = async (webCardId: string) =>
   getProfilesByWebCard(webCardId)
     .then(profiles =>
-      profiles.filter(
-        profile => !profile.deleted && profile.profileRole === 'owner',
-      ),
+      profiles.filter(profile => profile.profileRole === 'owner'),
     )
     .then(profiles => profiles[0] ?? null);
 
@@ -186,8 +184,8 @@ const ReportPage = async ({
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Owner:
-                <Link href={`/users/${owner.userId}`} target="_blank">
-                  {owner.userId}
+                <Link href={`/users/${owner?.userId}`} target="_blank">
+                  {owner?.userId}
                 </Link>
               </Typography>
             </CardContent>
@@ -244,8 +242,8 @@ const ReportPage = async ({
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   Owner:
-                  <Link href={`/users/${owner.userId}`} target="_blank">
-                    {owner.userId}
+                  <Link href={`/users/${owner?.userId}`} target="_blank">
+                    {owner?.userId}
                   </Link>
                 </Typography>
               </CardContent>
@@ -269,8 +267,8 @@ const ReportPage = async ({
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Owner:
-                <Link href={`/users/${owner.userId}`} target="_blank">
-                  {owner.userId}
+                <Link href={`/users/${owner?.userId}`} target="_blank">
+                  {owner?.userId}
                 </Link>
               </Typography>
             </CardContent>

@@ -13,11 +13,11 @@ import {
   convertToBaseCanvasRatio,
 } from '@azzapp/shared/coverHelpers';
 
-import { colors, fontFamilies, shadow } from '#theme';
+import { colors, fontFamilies, reactNativeShadow, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import PressableNative from '#ui/PressableNative';
-import { DynamicLinkRenderer } from './CoverEditor/CoverPreview/DynamicLinkRenderer';
+import { HOME_ICON_COVER_WIDTH } from './constants';
 import { MediaImageRenderer, MediaVideoRenderer } from './medias';
+import { SocialLinkRenderer } from './SocialLinkRenderer';
 import type { CoverRenderer_webCard$key } from '#relayArtifacts/CoverRenderer_webCard.graphql';
 import type {
   MediaImageRendererHandle,
@@ -76,7 +76,8 @@ export type CoverRendererProps = {
 };
 
 // define the minimum cover width to allow displaying test on predefined covers
-const MIN_WIDTH_TO_DISPLAY_COVER_TEXT = 50;
+// The goal of this limitation is to avoid displaying text on home icon
+const MIN_WIDTH_TO_DISPLAY_COVER_TEXT = HOME_ICON_COVER_WIDTH + 1;
 
 /**
  * Renders a card cover
@@ -240,19 +241,20 @@ const CoverRenderer = (
     [borderRadius, styles.shadow],
   );
 
-  // To have correct font scalling we need to render on a 375x600 surface and resize it to match cover displayed
+  // To have correct font scaling we need to render on a 375x600 surface and resize it to match cover displayed
   // No need to render it on small thumbnails
+  const isBusiness = webCardKind === 'business';
   const validSizeForText = width > MIN_WIDTH_TO_DISPLAY_COVER_TEXT;
   const overlayTitle =
     coverIsPredefined && validSizeForText
-      ? webCardKind === 'business'
+      ? isBusiness
         ? companyName
         : firstName
       : undefined;
 
   const overlaySubTitle =
     coverIsPredefined && validSizeForText
-      ? webCardKind === 'business'
+      ? isBusiness
         ? companyActivityLabel
         : lastName
       : undefined;
@@ -288,6 +290,7 @@ const CoverRenderer = (
                 onError={onError}
                 style={styles.layer}
                 useAnimationSnapshot={useAnimationSnapshot}
+                useRecycling
               />
             )}
             {(overlayTitle || overlaySubTitle) && (
@@ -358,15 +361,15 @@ const CoverRenderer = (
             }}
           >
             {coverDynamicLinks.links.map(link => (
-              <DynamicLinkRenderer
+              <SocialLinkRenderer
                 key={`${link.socialId}${link.position}`}
-                as={large ? PressableNative : View}
                 cardColors={cardColors}
                 color={coverDynamicLinks.color}
                 link={link}
                 shadow={coverDynamicLinks.shadow}
                 size={coverDynamicLinks.size}
                 viewWidth={width}
+                disabled={!large}
               />
             ))}
           </View>
@@ -385,7 +388,9 @@ const stylesheet = createStyleSheet(theme => ({
     borderCurve: 'continuous',
   },
   shadow: {
-    ...shadow(theme, 'bottom'),
+    ...(Platform.OS === 'ios'
+      ? reactNativeShadow(theme, 'bottom')
+      : shadow(theme, 'bottom')),
   },
   layer: {
     position: 'absolute',

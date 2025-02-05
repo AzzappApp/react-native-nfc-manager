@@ -12,14 +12,15 @@ import {
   MODULE_KIND_SIMPLE_TEXT,
   MODULE_KIND_SIMPLE_TITLE,
   MODULE_KIND_SOCIAL_LINKS,
+  MODULE_KIND_TITLE_TEXT,
 } from '@azzapp/shared/cardModuleHelpers';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { readMediaModuleData } from '#components/cardModules/CardModuleMedia/MediaModuleRenderer';
-
-import { isModuleVariantSupported } from '#helpers/cardModuleRouterHelpers';
+import { isModuleVariantSupported } from '#helpers/webcardModuleHelpers';
 import { readBlockTextData } from './BlockTextRenderer';
 import { readMediaTextModuleData } from './CardModuleMediaText/MediaTextModuleRenderer';
 import { readMediaTextLinkModuleData } from './CardModuleMediaTextLink/MediaTextLinkModuleRenderer';
+import { readTitleTextModuleData } from './CardModuleTitleText/TitleTextModuleRenderer';
 import { readCarouselData } from './CarouselRenderer';
 import { readHorizontalPhotoData } from './HorizontalPhotoRenderer';
 import { readLineDividerData } from './LineDividerRenderer';
@@ -40,6 +41,7 @@ import type { SimpleButtonRenderer_module$key } from '#relayArtifacts/SimpleButt
 import type { SimpleTextRenderer_simpleTextModule$key } from '#relayArtifacts/SimpleTextRenderer_simpleTextModule.graphql';
 import type { SimpleTextRenderer_simpleTitleModule$key } from '#relayArtifacts/SimpleTextRenderer_simpleTitleModule.graphql';
 import type { SocialLinksRenderer_module$key } from '#relayArtifacts/SocialLinksRenderer_module.graphql';
+import type { TitleTextModuleRenderer_module$key } from '#relayArtifacts/TitleTextModuleRenderer_module.graphql';
 import type { ModuleRenderInfo } from './CardModuleRenderer';
 
 export type ModuleReadInfo =
@@ -76,6 +78,9 @@ export type ModuleReadInfo =
     })
   | (SocialLinksRenderer_module$key & {
       kind: typeof MODULE_KIND_SOCIAL_LINKS;
+    })
+  | (TitleTextModuleRenderer_module$key & {
+      kind: typeof MODULE_KIND_TITLE_TEXT;
     });
 //INSERT_MODULE: add more case here
 
@@ -105,6 +110,8 @@ export const readModuleData = (module: ModuleReadInfo) => {
       return readMediaTextModuleData(module);
     case MODULE_KIND_MEDIA_TEXT_LINK:
       return readMediaTextLinkModuleData(module);
+    case MODULE_KIND_TITLE_TEXT:
+      return readTitleTextModuleData(module);
     //INSERT_MODULE: add more case here
   }
 };
@@ -127,6 +134,7 @@ const ModulesDataFragment = graphql`
     ...MediaModuleRenderer_module
     ...MediaTextModuleRenderer_module
     ...MediaTextLinkModuleRenderer_module
+    ...TitleTextModuleRenderer_module
     #INSERT_MODULE: add more case here
   }
 `;
@@ -151,7 +159,12 @@ export const useModulesData = (
       if (module) {
         if (visible && !module.visible) {
           return null;
-        } else if (!isModuleVariantSupported(module)) {
+        } else if (
+          !isModuleVariantSupported({
+            moduleKind: module.kind,
+            variant: module.variant,
+          })
+        ) {
           return null;
         }
         return {

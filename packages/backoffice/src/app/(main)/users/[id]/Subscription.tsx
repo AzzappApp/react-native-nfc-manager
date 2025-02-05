@@ -9,6 +9,7 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  Snackbar,
   Switch,
   TextField,
   Typography,
@@ -27,6 +28,8 @@ export const Subscription = ({
   const [freeSeats, setFreeSeats] = useState(userSubscription.freeSeats || 0);
   const [debouncedSeats] = useDebounce(freeSeats, 300);
   const [pending, startTransition] = useTransition();
+  const totalSeats = userSubscription.totalSeats + userSubscription.freeSeats;
+  const [message, setMessage] = useState<string | null>(null);
 
   const toggleSubscriptionStatus = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -41,6 +44,7 @@ export const Subscription = ({
           status ? 'active' : 'canceled',
         );
       } catch (e) {
+        setMessage(`An error occurred: ${(e as Error).message}`);
         console.error(e);
       }
     });
@@ -50,6 +54,7 @@ export const Subscription = ({
     try {
       await updateFreeSeatsAction(userSubscription.id, debouncedSeats);
     } catch (e) {
+      setMessage(`An error occurred: ${(e as Error).message}`);
       console.error(e);
     }
   }, [debouncedSeats, userSubscription.id]);
@@ -64,46 +69,71 @@ export const Subscription = ({
     }
   }, [debouncedSeats, updateFreeSeats, userSubscription.freeSeats]);
 
+  const subscriptionPlan = userSubscription.subscriptionPlan
+    ? userSubscription.subscriptionPlan
+    : userSubscription.subscriptionId.includes('yearly')
+      ? 'web.yearly'
+      : 'web.monthly';
+
   return (
     <Box display="flex" flexDirection="column" gap={2}>
       <TextField
         sx={{ width: 250 }}
         value={userSubscription.issuer}
         label="Platform"
-        inputProps={{
-          readOnly: true,
+        slotProps={{
+          htmlInput: {
+            readOnly: true,
+          },
         }}
         disabled
       />
 
       <Typography variant="subtitle1" color="GrayText" sx={{ mt: 5, mb: 5 }}>
-        Subscription started at {userSubscription.startAt.toDateString()}
+        Subscription <b>{userSubscription.subscriptionId}</b> started at
+        {userSubscription.startAt.toDateString()}
       </Typography>
 
       <Box display="flex" gap={2}>
-        <TextField
-          sx={{ width: 250 }}
-          value={userSubscription.webCardId}
-          label="Webcard"
-          inputProps={{
-            readOnly: true,
-          }}
-          disabled
-        />
-        <TextField
-          sx={{ width: 250 }}
-          value={`${(((userSubscription.amount || 0) + (userSubscription.taxes || 0)) / 100).toFixed(2)}€ (${userSubscription.totalSeats} users)`}
-          label="Billed for (+taxes)"
-          inputProps={{
-            readOnly: true,
-          }}
-        />
+        {userSubscription.issuer === 'web' &&
+        userSubscription.subscriptionPlan !== 'web.lifetime' ? (
+          <>
+            <TextField
+              sx={{ width: 250 }}
+              value={`${(((userSubscription.amount || 0) + (userSubscription.taxes || 0)) / 100).toFixed(2)}€ (${userSubscription.totalSeats} users)`}
+              label="Billed for (+taxes)"
+              slotProps={{
+                htmlInput: {
+                  readOnly: true,
+                },
+              }}
+            />
+          </>
+        ) : (
+          <TextField
+            sx={{ width: 250 }}
+            value={`${userSubscription.profilesCount} / ${totalSeats}`}
+            label="Seats"
+            error={userSubscription.profilesCount > totalSeats}
+            slotProps={{
+              htmlInput: {
+                readOnly: true,
+              },
+            }}
+          />
+        )}
         <FormControlLabel
           control={
             <Switch
               checked={userSubscription.status === 'active'}
               color="success"
               onChange={toggleSubscriptionStatus}
+              disabled={
+                userSubscription.issuer === 'apple' ||
+                userSubscription.issuer === 'google' ||
+                (userSubscription.subscriptionPlan !== 'web.lifetime' &&
+                  userSubscription.status !== 'active')
+              }
             />
           }
           label={`${userSubscription.status.replace('_', ' ')}`}
@@ -118,9 +148,10 @@ export const Subscription = ({
           <Select
             labelId="type"
             id="type"
-            value={userSubscription.subscriptionPlan}
+            value={subscriptionPlan}
             label="Type"
             onChange={() => {}}
+            disabled={!userSubscription.subscriptionPlan}
           >
             <MenuItem value="web.monthly">Monthly</MenuItem>
             <MenuItem value="web.yearly">Yearly</MenuItem>
@@ -140,10 +171,12 @@ export const Subscription = ({
             sx={{ width: 250 }}
             value={userSubscription.canceledAt.toDateString()}
             label="Canceled at"
-            inputProps={{
-              readOnly: true,
-              style: {
-                color: 'red',
+            slotProps={{
+              htmlInput: {
+                readOnly: true,
+                style: {
+                  color: 'red',
+                },
               },
             }}
           />
@@ -152,10 +185,12 @@ export const Subscription = ({
           sx={{ width: 250 }}
           value={userSubscription.endAt.toDateString()}
           label="End at"
-          inputProps={{
-            readOnly: true,
-            style: {
-              color: new Date() > userSubscription.endAt ? 'red' : 'black',
+          slotProps={{
+            htmlInput: {
+              readOnly: true,
+              style: {
+                color: new Date() > userSubscription.endAt ? 'red' : 'black',
+              },
             },
           }}
         />
@@ -166,6 +201,14 @@ export const Subscription = ({
       >
         <CircularProgress color="inherit" />
       </Backdrop>
+      <Snackbar
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        open={!!message}
+        onClose={() => {
+          setMessage(null);
+        }}
+        message={message}
+      />
     </Box>
   );
 };

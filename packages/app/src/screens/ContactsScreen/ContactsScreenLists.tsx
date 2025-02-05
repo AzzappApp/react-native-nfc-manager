@@ -1,40 +1,37 @@
 import {
-  updateContactAsync,
-  addContactAsync,
   PermissionStatus as ContactPermissionStatus,
   displayContactAsync,
 } from 'expo-contacts';
 import { useMemo, useCallback, useEffect, useState, useRef } from 'react';
-import { useIntl } from 'react-intl';
-import { AppState, View } from 'react-native';
-import Toast from 'react-native-toast-message';
+import { AppState, View, StyleSheet } from 'react-native';
 import { usePaginationFragment, graphql, useMutation } from 'react-relay';
 import { useOnFocus } from '#components/NativeRouter';
-import { emitContactAdded, useOnContactAdded } from '#helpers/addContactHelper';
+import { useOnContactAdded } from '#helpers/addContactHelper';
 import { findLocalContact } from '#helpers/contactCardHelpers';
-import {
-  buildLocalContact,
-  reworkContactForDeviceInsert,
-} from '#helpers/contactListHelpers';
+import { buildLocalContact } from '#helpers/contactListHelpers';
 import { getLocalContactsMap } from '#helpers/getLocalContactsMap';
 import { useProfileInfos } from '#hooks/authStateHooks';
+import useOnInviteContact from '#hooks/useOnInviteContact';
 import { usePhonebookPermission } from '#hooks/usePhonebookPermission';
+import ContactActionModal from './ContactActionModal';
 import ContactDetailsModal from './ContactDetailsModal';
-import { storage } from './ContactsScreen';
 import ContactsScreenSearchByDate from './ContactsScreenSearchByDate';
 import ContactsScreenSearchByName from './ContactsScreenSearchByName';
+import type { ContactDetails, ContactType } from '#helpers/contactListHelpers';
 import type {
   ContactsScreenLists_contacts$data,
   ContactsScreenLists_contacts$key,
 } from '#relayArtifacts/ContactsScreenLists_contacts.graphql';
 import type { ContactsScreenListsMutation } from '#relayArtifacts/ContactsScreenListsMutation.graphql';
 import type { ContactsScreenListsMutationUpdateContactsLastViewMutation } from '#relayArtifacts/ContactsScreenListsMutationUpdateContactsLastViewMutation.graphql';
-import type {
-  ContactDetails,
-  ContactDetailsModalActions,
-} from './ContactDetailsModal';
-import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
+import type { ContactDetailsModalActions } from './ContactDetailsModal';
 import type { Contact } from 'expo-contacts';
+
+export type ContactActionProps = {
+  contact?: ContactType | ContactType[];
+  showInvite: boolean;
+  hideInvitation?: () => void;
+};
 
 type ContactsScreenListsProps = {
   search: string | undefined;
@@ -48,15 +45,26 @@ const ContactsScreenLists = ({
 }: ContactsScreenListsProps) => {
   const [refreshing, setRefreshing] = useState(false);
   const [localContacts, setLocalContacts] = useState<Contact[]>();
-  const intl = useIntl();
   const profileInfos = useProfileInfos();
   const [contactsPermissionStatus, setContactsPermissionStatus] = useState(
     ContactPermissionStatus.UNDETERMINED,
   );
   const contactDetails = useRef<ContactDetailsModalActions>(null);
+  const [contactActionData, setContactActionData] = useState<
+    ContactActionProps | undefined
+  >();
 
   const { requestPhonebookPermissionAndRedirectToSettingsAsync } =
     usePhonebookPermission();
+
+  // refresh local contact map
+  const refreshLocalContacts = useCallback(async () => {
+    if (contactsPermissionStatus === ContactPermissionStatus.GRANTED) {
+      setLocalContacts(await getLocalContactsMap());
+    } else if (contactsPermissionStatus === ContactPermissionStatus.DENIED) {
+      setLocalContacts([]);
+    } // else wait for permission update
+  }, [contactsPermissionStatus]);
 
   // will setup the permission for this screen at first opening
   useEffect(() => {
@@ -67,26 +75,16 @@ const ContactsScreenLists = ({
         setContactsPermissionStatus(status);
       };
       updatePermission();
+    } else {
+      refreshLocalContacts();
     }
   }, [
     contactsPermissionStatus,
+    refreshLocalContacts,
     requestPhonebookPermissionAndRedirectToSettingsAsync,
   ]);
 
-  // refresh loca contact map
-  const refreshLocalContacts = useCallback(async () => {
-    if (contactsPermissionStatus === ContactPermissionStatus.GRANTED) {
-      setLocalContacts(await getLocalContactsMap());
-    } else if (contactsPermissionStatus === ContactPermissionStatus.DENIED) {
-      setLocalContacts([]);
-    } // else wait for permission update
-  }, [contactsPermissionStatus]);
-
   useOnContactAdded(refreshLocalContacts);
-
-  useEffect(() => {
-    refreshLocalContacts();
-  }, [refreshLocalContacts]);
 
   // ensure we refresh contacts oon resume
   useEffect(() => {
@@ -156,7 +154,7 @@ const ContactsScreenLists = ({
                   id
                   avatar {
                     id
-                    uri: uri(width: 61, pixelRatio: $pixelRatio)
+                    uri: uri(width: 61, pixelRatio: $pixelRatio, format: png)
                   }
                   contactCard {
                     urls {
@@ -296,16 +294,20 @@ const ContactsScreenLists = ({
     `,
   );
 
-  const onRemoveContacts = (contactIds: string[]) => {
+  const onRemoveContacts = (contactIds: ContactType | ContactType[]) => {
     const profileId = profileInfos?.profileId;
     if (!profileId) {
       return;
     }
+    const removedIds = (
+      Array.isArray(contactIds) ? contactIds : [contactIds]
+    ).map(contact => contact.id);
+
     commitRemoveContact({
       variables: {
         profileId,
         input: {
-          contactIds,
+          contactIds: removedIds,
         },
       },
       updater: (store, response) => {
@@ -329,63 +331,31 @@ const ContactsScreenLists = ({
     });
   };
 
-  const onInviteContact = useCallback(
-    async (contact: ContactType, onHideInvitation: () => void) => {
-      const contactToAdd: Contact = await buildLocalContact(contact);
-      try {
-        let messageToast = '';
-        if (
-          contactsPermissionStatus === ContactPermissionStatus.GRANTED &&
-          localContacts
-        ) {
-          const foundContact = await findLocalContact(
-            storage,
-            contact.phoneNumbers.map(({ number }) => number),
-            contact.emails.map(({ address }) => address),
-            localContacts,
-            contact.contactProfile?.id,
-          );
+  const onInviteContact = useOnInviteContact({
+    onEnd: contactActionData?.hideInvitation,
+  });
 
-          if (foundContact) {
-            const contactToAddReworked = reworkContactForDeviceInsert({
-              ...contactToAdd,
-              id: foundContact.id,
-            });
-
-            await updateContactAsync(contactToAddReworked);
-            messageToast = intl.formatMessage({
-              defaultMessage: 'The contact was updated successfully.',
-              description:
-                'Toast message when a contact is updated successfully',
-            });
-          } else {
-            const contactToAddReworked =
-              reworkContactForDeviceInsert(contactToAdd);
-
-            const resultId = await addContactAsync(contactToAddReworked);
-
-            if (contact.contactProfile) {
-              storage.set(contact.contactProfile.id, resultId);
-            }
-            messageToast = intl.formatMessage({
-              defaultMessage: 'The contact was created successfully.',
-              description:
-                'Toast message when a contact is created successfully',
-            });
-          }
-
-          onHideInvitation();
-
-          Toast.show({
-            type: 'success',
-            text1: messageToast,
-          });
+  const onInviteContactInner = useCallback(
+    async (
+      contact: ContactDetails | ContactType | ContactType[],
+      onHideInvitation?: () => void,
+    ) => {
+      const result = await onInviteContact(
+        contactsPermissionStatus,
+        contact,
+        localContacts,
+        onHideInvitation,
+      );
+      if (result) {
+        if (result.status) {
+          setContactsPermissionStatus(result.status);
         }
-      } catch (e) {
-        console.error(e);
+        if (result.localContacts) {
+          setLocalContacts(result.localContacts);
+        }
       }
     },
-    [contactsPermissionStatus, intl, localContacts],
+    [contactsPermissionStatus, localContacts, onInviteContact],
   );
 
   const onShowContact = useCallback(
@@ -395,7 +365,6 @@ const ContactsScreenLists = ({
         localContacts
       ) {
         const foundContact = await findLocalContact(
-          storage,
           contact.phoneNumbers.map(({ number }) => number),
           contact.emails.map(({ address }) => address),
           localContacts,
@@ -421,95 +390,27 @@ const ContactsScreenLists = ({
     [contactsPermissionStatus, localContacts],
   );
 
-  const onInviteFromContactDetails = useCallback(
-    async (contact: ContactDetails) => {
-      try {
-        let messageToast = '';
-        if (
-          contactsPermissionStatus === ContactPermissionStatus.GRANTED &&
-          localContacts
-        ) {
-          const phoneNumbers =
-            contact.phoneNumbers
-              ?.filter(({ number }) => !!number)
-              .map(({ number }) => number) ?? [];
-
-          const emails =
-            contact.emails
-              ?.filter(({ email }) => !!email)
-              .map(({ email }) => email) ?? [];
-
-          const foundContact = await findLocalContact(
-            storage,
-            phoneNumbers as string[],
-            emails as string[],
-            localContacts,
-            contact.profileId,
-          );
-
-          if (foundContact) {
-            const contactToAddReworked = reworkContactForDeviceInsert({
-              ...contact,
-              id: foundContact.id,
-            });
-            await updateContactAsync(contactToAddReworked);
-            messageToast = intl.formatMessage({
-              defaultMessage: 'The contact was updated successfully.',
-              description:
-                'Toast message when a contact is updated successfully',
-            });
-          } else {
-            const contactToAddReworked = reworkContactForDeviceInsert(contact);
-            const resultId = await addContactAsync(contactToAddReworked);
-
-            if (contact.profileId) {
-              storage.set(contact.profileId, resultId);
-            }
-            messageToast = intl.formatMessage({
-              defaultMessage: 'The contact was created successfully.',
-              description:
-                'Toast message when a contact is created successfully',
-            });
-          }
-          emitContactAdded();
-          Toast.show({
-            type: 'success',
-            text1: messageToast,
-          });
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    },
-    [contactsPermissionStatus, intl, localContacts],
-  );
-
   if (
     localContacts === undefined ||
     contactsPermissionStatus === ContactPermissionStatus.UNDETERMINED
   ) {
-    // no need to render before locaContacts is queried
+    // no need to render before localContacts is queried
     return undefined;
   }
 
   return (
-    <View
-      style={{
-        flex: 1,
-      }}
-    >
+    <View style={styles.flex}>
       {profile && searchBy === 'name' && (
         <ContactsScreenSearchByName
           contacts={contacts}
           onEndReached={onEndReached}
           onRefresh={onRefresh}
           refreshing={refreshing}
-          onRemoveContacts={onRemoveContacts}
-          onInviteContact={onInviteContact}
+          onInviteContact={onInviteContactInner}
           onShowContact={onShowContact}
-          storage={storage}
           localContacts={localContacts}
           contactsPermissionStatus={contactsPermissionStatus}
+          showContactAction={setContactActionData}
         />
       )}
       {profile && searchBy === 'date' && (
@@ -518,30 +419,32 @@ const ContactsScreenLists = ({
           onEndReached={onEndReached}
           onRefresh={onRefresh}
           refreshing={refreshing}
-          onRemoveContacts={onRemoveContacts}
-          onInviteContact={onInviteContact}
+          onInviteContact={onInviteContactInner}
           onShowContact={onShowContact}
-          storage={storage}
           localContacts={localContacts}
           contactsPermissionStatus={contactsPermissionStatus}
+          showContactAction={setContactActionData}
         />
       )}
       <ContactDetailsModal
         ref={contactDetails}
-        onInviteContact={onInviteFromContactDetails}
+        onInviteContact={onInviteContactInner}
+      />
+      <ContactActionModal
+        contactActionData={contactActionData}
+        close={() => setContactActionData(undefined)}
+        onRemoveContacts={onRemoveContacts}
+        onInviteContact={onInviteContactInner}
+        onShow={onShowContact}
       />
     </View>
   );
 };
 
-export default ContactsScreenLists;
+const styles = StyleSheet.create({
+  flex: {
+    flex: 1,
+  },
+});
 
-type ContactType = NonNullable<
-  NonNullable<
-    NonNullable<
-      ArrayItemType<
-        ContactsScreenLists_contacts$data['searchContacts']['edges']
-      >
-    >
-  >['node']
->;
+export default ContactsScreenLists;

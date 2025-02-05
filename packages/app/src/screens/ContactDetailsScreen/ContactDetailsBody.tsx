@@ -1,17 +1,15 @@
-import * as Sentry from '@sentry/react-native';
 import { type Contact } from 'expo-contacts';
-import { File, Paths } from 'expo-file-system/next';
 import { Image } from 'expo-image';
 import { useMemo } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
 import { Linking, Platform, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import ShareCommand from 'react-native-share';
 import { colors, shadow } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
-import { buildVCardFromExpoContact } from '#helpers/contactCardHelpers';
+import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { sanitizeFilePath } from '#helpers/fileHelpers';
+import { matchUrlWithRoute } from '#helpers/deeplinkHelpers';
+import ShareContact from '#helpers/ShareContact';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -19,6 +17,7 @@ import Icon, { SocialIcon } from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import type { CoverRenderer_webCard$key } from '#relayArtifacts/CoverRenderer_webCard.graphql';
+import type { Icons } from '#ui/Icon';
 import type { SocialLinkId } from '@azzapp/shared/socialLinkHelpers';
 
 type Props = {
@@ -27,10 +26,45 @@ type Props = {
   onSave: () => void;
 };
 
+const ContactDetailItem = ({
+  onPress,
+  icon,
+  label,
+  content,
+  iconComponent,
+}: {
+  onPress?: () => void;
+  icon?: Icons;
+  label?: string;
+  content?: string;
+  iconComponent?: JSX.Element;
+}) => {
+  const styles = useStyleSheet(stylesheet);
+
+  return (
+    <View style={styles.item}>
+      <PressableNative onPress={onPress} style={styles.pressable}>
+        <View style={styles.label}>
+          {iconComponent ? (
+            iconComponent
+          ) : icon ? (
+            <Icon icon={icon} />
+          ) : undefined}
+          <Text variant="smallbold">{label}</Text>
+        </View>
+        <Text numberOfLines={1} style={styles.itemText}>
+          {content}
+        </Text>
+      </PressableNative>
+    </View>
+  );
+};
+
 const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
   const { bottom } = useScreenInsets();
   const intl = useIntl();
   const styles = useStyleSheet(stylesheet);
+  const router = useRouter();
 
   const date = useMemo(() => {
     if (!details) {
@@ -54,37 +88,7 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
 
   const birthday = details.dates?.find(date => date.label === 'birthday');
 
-  const onShare = async () => {
-    const vcardData = await buildVCardFromExpoContact(details);
-    const contactName = (
-      (details.firstName || '') +
-      ' ' +
-      (details.lastName || '')
-    ).trim();
-    const filePath =
-      Paths.cache.uri +
-      sanitizeFilePath(contactName.length ? contactName : 'contact') +
-      '.vcf';
-
-    let file;
-    try {
-      file = new File(filePath);
-      file.create();
-      // generate file
-      file.write(vcardData.toString());
-      // share the file
-      await ShareCommand.open({
-        url: filePath,
-        type: 'text/x-vcard',
-      });
-      // clean up file afterward
-      file.delete();
-    } catch (e) {
-      Sentry.captureException(e);
-      console.error(e);
-      file?.delete();
-    }
-  };
+  const onShare = async () => ShareContact(details);
 
   return (
     <Container style={styles.container}>
@@ -140,144 +144,149 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
           ]}
         >
           {details.phoneNumbers?.map((phoneNumber, index) => (
-            <PressableNative
+            <ContactDetailItem
               key={'phone' + index + '' + phoneNumber.number}
-              style={styles.item}
               onPress={() => {
                 Linking.openURL(`tel:${phoneNumber.number}`);
               }}
-            >
-              <View style={styles.label}>
-                <Icon icon="mobile" />
-                <Text variant="smallbold">{phoneNumber.label}</Text>
-              </View>
-              <Text numberOfLines={1} style={styles.itemText}>
-                {phoneNumber.number}
-              </Text>
-            </PressableNative>
+              icon="mobile"
+              label={phoneNumber.label}
+              content={phoneNumber.number}
+            />
           ))}
           {details.emails?.map((email, index) => (
-            <PressableNative
+            <ContactDetailItem
               key={'email' + index + '' + email.email}
-              style={styles.item}
               onPress={() => {
                 Linking.openURL(`mailto:${email.email}`);
               }}
-            >
-              <View style={styles.label}>
-                <Icon icon="mail_line" />
-                <Text variant="smallbold">{email.label}</Text>
-              </View>
-              <Text numberOfLines={1} style={styles.itemText}>
-                {email.email}
-              </Text>
-            </PressableNative>
+              icon="mail_line"
+              label={email.label}
+              content={email.email}
+            />
           ))}
           {birthday && (
-            <PressableNative style={styles.item} key="birthday">
-              <View style={styles.label}>
-                <Icon icon="calendar" />
-                <Text variant="smallbold">
-                  <FormattedMessage
-                    defaultMessage="Birthday"
-                    description="ContactDetailsBody - Title for birthday"
-                  />
-                </Text>
-              </View>
-              <Text numberOfLines={1} style={styles.itemText}>
-                {new Date(
-                  birthday.year ?? 0,
-                  birthday.month,
-                  birthday.day,
-                ).toLocaleDateString(undefined, {
-                  year: birthday.year ? 'numeric' : undefined,
-                  month: 'long',
-                  day: 'numeric',
-                })}
-              </Text>
-            </PressableNative>
+            <ContactDetailItem
+              key="birthday"
+              onPress={async () => {
+                openCalendar(
+                  `${birthday.year}-${birthday.month + 1}-${birthday.day}`,
+                );
+              }}
+              icon="calendar"
+              label={intl.formatMessage({
+                defaultMessage: 'Birthday',
+                description: 'ContactDetailsBody - Title for birthday',
+              })}
+              content={new Date(
+                birthday.year ?? 0,
+                birthday.month,
+                birthday.day,
+              ).toLocaleDateString(undefined, {
+                year: birthday.year ? 'numeric' : undefined,
+                month: 'long',
+                day: 'numeric',
+              })}
+            />
           )}
           {details.urlAddresses?.map((urlAddress, index) => (
-            <PressableNative
+            <ContactDetailItem
               key={'url' + index + '' + urlAddress.url}
-              style={styles.item}
-              onPress={() => {
+              onPress={async () => {
                 if (urlAddress.url) {
-                  Linking.openURL(urlAddress.url);
+                  const route = await matchUrlWithRoute(urlAddress.url);
+                  if (route) {
+                    // will close the contact detail modal
+                    router.back();
+                    // move to route deeplink
+                    router?.push(route);
+                    return;
+                  }
+                  Linking.openURL(
+                    urlAddress.url.startsWith('http')
+                      ? urlAddress.url
+                      : `https://${urlAddress.url}`,
+                  );
                 }
               }}
-            >
-              <View style={styles.label}>
-                <Icon icon="link" />
-                <Text variant="smallbold">
-                  {urlAddress.label || (
-                    <FormattedMessage
-                      defaultMessage="Url"
-                      description="ContactDetailsBody - Title for item URL with empty label"
-                    />
-                  )}
-                </Text>
-              </View>
-              <Text numberOfLines={1} style={styles.itemText}>
-                {urlAddress.url}
-              </Text>
-            </PressableNative>
+              icon="link"
+              label={
+                urlAddress.label ||
+                intl.formatMessage({
+                  defaultMessage: 'Url',
+                  description:
+                    'ContactDetailsBody - Title for item URL with empty label',
+                })
+              }
+              content={urlAddress.url}
+            />
           ))}
           {details.addresses?.map((address, index) => (
-            <PressableNative
+            <ContactDetailItem
               key={'street' + index + '' + address.street}
-              style={styles.item}
-            >
-              <View style={styles.label}>
-                <Icon icon="location" />
-                <Text variant="smallbold">{address.label}</Text>
-              </View>
-              <Text numberOfLines={1} style={styles.itemText}>
-                {address.street}
-              </Text>
-            </PressableNative>
-          ))}
-          {details.socialProfiles?.map((social, index) => (
-            <PressableNative
-              key={'social' + index + '' + social.url}
-              style={styles.item}
-              onPress={() => {
-                if (social.url) {
-                  Linking.openURL(social.url);
+              onPress={async () => {
+                const url = Platform.select({
+                  ios: `maps:0,0?q=${address.street}`,
+                  android: `geo:0,0?q=${address.street}`,
+                });
+
+                if (url) {
+                  Linking.openURL(url);
+                } else {
+                  console.warn(`${address.street} is not an adress`);
                 }
               }}
-            >
-              <View style={styles.label}>
+              icon="location"
+              label={address.label}
+              content={address.street}
+            />
+          ))}
+          {details.socialProfiles?.map((social, index) => (
+            <ContactDetailItem
+              key={'social' + index + '' + social.url}
+              onPress={() => {
+                if (social.url) {
+                  Linking.openURL(getSocialUrl(social.url));
+                }
+              }}
+              iconComponent={
                 <SocialIcon
                   icon={social.label as SocialLinkId}
                   style={styles.social}
                 />
-                <Text variant="smallbold">{social.label}</Text>
-              </View>
-              <Text numberOfLines={1} style={styles.itemText}>
-                {social.url}
-              </Text>
-            </PressableNative>
+              }
+              label={social.label}
+              content={social.url}
+            />
           ))}
-          <View style={styles.item} key="scanDate">
-            <View style={styles.label}>
-              <Icon icon="calendar" />
-              <Text variant="smallbold">
-                <FormattedMessage
-                  defaultMessage="Date"
-                  description="ContactDetailsModal - Label for date item"
-                />
-              </Text>
-            </View>
-            <Text numberOfLines={1} style={styles.itemText}>
-              {date}
-            </Text>
-          </View>
+          <ContactDetailItem
+            key="scanDate"
+            icon="calendar"
+            label={intl.formatMessage({
+              defaultMessage: 'Date of Contact',
+              description: 'ContactDetailsModal - Label for date item',
+            })}
+            content={date}
+          />
         </ScrollView>
       </View>
     </Container>
   );
 };
+
+const openCalendar = (date: string) => {
+  const birthDate = new Date(date).setFullYear(new Date().getFullYear());
+  if (Platform.OS === 'ios') {
+    const from = new Date('2001-01-01').getTime() / 1000;
+    const seconds = Math.floor(birthDate / 1000) - from;
+    Linking.openURL('calshow:' + seconds);
+  } else if (Platform.OS === 'android') {
+    Linking.openURL('content://com.android.calendar/time/' + birthDate);
+  }
+};
+
+const getSocialUrl = (url: string) =>
+  url.startsWith('http') ? url : `https://${url}`;
 
 const AVATAR_WIDTH = 112;
 
@@ -300,6 +309,14 @@ const stylesheet = createStyleSheet(theme => ({
   shareIcon: { transform: [{ rotateZ: '30deg' }] },
   name: {
     marginTop: 20,
+  },
+  pressable: {
+    width: '100%',
+    height: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: 10,
   },
   content: {
     flexDirection: 'column',
@@ -330,10 +347,6 @@ const stylesheet = createStyleSheet(theme => ({
     padding: 14,
     backgroundColor: theme === 'dark' ? colors.grey900 : colors.white,
     borderRadius: 12,
-    justifyContent: 'space-between',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
   },
   itemText: {
     flex: 1,
@@ -345,6 +358,7 @@ const stylesheet = createStyleSheet(theme => ({
     gap: 5,
   },
   avatarContainer: Platform.OS === 'ios' && {
+    borderRadius: AVATAR_WIDTH / 2,
     ...shadow(theme, 'bottom'),
   },
   avatarWrapper: {

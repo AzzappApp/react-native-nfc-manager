@@ -1,8 +1,6 @@
 import * as Sentry from '@sentry/react-native';
 import {
-  addContactAsync,
   presentFormAsync,
-  updateContactAsync,
   PermissionStatus as ContactPermissionStatus,
 } from 'expo-contacts';
 import { File, Paths } from 'expo-file-system/next';
@@ -10,7 +8,6 @@ import { fromGlobalId } from 'graphql-relay';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Alert, Platform, StyleSheet, View } from 'react-native';
-import { MMKV } from 'react-native-mmkv';
 import Toast from 'react-native-toast-message';
 import {
   ConnectionHandler,
@@ -21,14 +18,16 @@ import {
 import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
+import { colors } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
-import { emitContactAdded } from '#helpers/addContactHelper';
 import { findLocalContact } from '#helpers/contactCardHelpers';
 import { reworkContactForDeviceInsert } from '#helpers/contactListHelpers';
 import { getLocalContactsMap } from '#helpers/getLocalContactsMap';
 import useBoolean from '#hooks/useBoolean';
+import useOnInviteContact from '#hooks/useOnInviteContact';
 import { usePhonebookPermission } from '#hooks/usePhonebookPermission';
+import useScreenDimensions from '#hooks/useScreenDimensions';
 import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
@@ -45,10 +44,6 @@ import type { AddContactModalProfiles_user$key } from '#relayArtifacts/AddContac
 import type { CheckboxStatus } from '#ui/CheckBox';
 import type { CommonInformation } from '@azzapp/shared/contactCardHelpers';
 import type { Contact, Image } from 'expo-contacts';
-
-export const storage = new MMKV({
-  id: 'contacts',
-});
 
 type Props = {
   contactData?: string | null;
@@ -174,11 +169,14 @@ const AddContactModal = ({
     };
   }, [scanned, viewer, withShareBack]);
 
+  const onInviteContact = useOnInviteContact();
+
   const onRequestAddContactToPhonebook = useCallback(async () => {
     if (!scanned) return;
 
+    let localContacts = await getLocalContactsMap();
+
     const findContact = async () => {
-      const localContacts = await getLocalContactsMap();
       const phoneNumbers =
         scanned.contact.phoneNumbers
           ?.map(({ number }) => number)
@@ -188,7 +186,6 @@ const AddContactModal = ({
         [];
 
       return findLocalContact(
-        storage,
         phoneNumbers,
         emails,
         localContacts,
@@ -239,66 +236,23 @@ const AddContactModal = ({
           text: addOrUpdateText,
           onPress: async () => {
             try {
-              let messageToast = '';
-              // Here we don't want to display popup
               const { status } =
                 await requestPhonebookPermissionAndRedirectToSettingsAsync();
-              if (status === ContactPermissionStatus.GRANTED) {
-                if (!foundContact) {
-                  foundContact = await findContact();
-                }
-                if (foundContact && foundContact.id) {
-                  const image = await downloadAvatar(
-                    scanned.profileId,
-                    additionalContactData,
-                  );
-
-                  const updatedContact = reworkContactForDeviceInsert({
-                    ...scanned.contact,
-                    image,
-                    imageAvailable: !!image,
-                    urlAddresses:
-                      additionalContactData?.urls?.map(addr => {
-                        return { label: 'default', address: addr.address };
-                      }) || undefined,
-                    socialProfiles:
-                      additionalContactData?.socials?.map(social => {
-                        return { ...social, address: social.url };
-                      }) || undefined,
-                    id: foundContact.id,
-                  });
-                  await updateContactAsync(updatedContact);
-                  messageToast = intl.formatMessage({
-                    defaultMessage: 'The contact was updated successfully.',
-                    description:
-                      'Toast message when a contact is updated successfully',
-                  });
-                } else {
-                  const newContact = {
-                    ...scanned.contact,
-                    urls: additionalContactData?.urls,
-                    socials: additionalContactData?.socials,
-                  };
-                  const contactToAddReworked =
-                    reworkContactForDeviceInsert(newContact);
-                  const resultId = await addContactAsync(contactToAddReworked);
-
-                  if (scanned.profileId) {
-                    storage.set(scanned.profileId, resultId);
-                  }
-                  messageToast = intl.formatMessage({
-                    defaultMessage: 'The contact was created successfully.',
-                    description:
-                      'Toast message when a contact is created successfully',
-                  });
-                }
-
-                Toast.show({
-                  type: 'success',
-                  text1: messageToast,
-                });
-                emitContactAdded();
+              if (
+                status === ContactPermissionStatus.GRANTED &&
+                !localContacts
+              ) {
+                localContacts = await getLocalContactsMap();
               }
+              await onInviteContact(
+                status,
+                {
+                  ...scanned.contact,
+                  profileId: scanned.profileId,
+                  createdAt: new Date(),
+                },
+                localContacts,
+              );
             } catch (e) {
               console.error(e);
             }
@@ -310,26 +264,17 @@ const AddContactModal = ({
             description: 'Button to view the contact',
           }),
           onPress: async () => {
-            const { status } =
-              await requestPhonebookPermissionAndRedirectToSettingsAsync();
-            if (status !== ContactPermissionStatus.GRANTED) {
-              return;
-            }
+            const allowSystemUI =
+              Platform.OS === 'ios'
+                ? (await requestPhonebookPermissionAndRedirectToSettingsAsync())
+                    .status === ContactPermissionStatus.GRANTED
+                : false;
 
-            if (Platform.OS === 'ios') {
+            if (allowSystemUI) {
               try {
-                const updatedContact = reworkContactForDeviceInsert({
-                  ...scanned.contact,
-                  urlAddresses:
-                    additionalContactData?.urls?.map(addr => {
-                      return { label: 'default', address: addr.address };
-                    }) || undefined,
-                  socialProfiles:
-                    additionalContactData?.socials?.map(social => {
-                      return { ...social, address: social.url };
-                    }) || undefined,
-                });
-
+                const updatedContact = reworkContactForDeviceInsert(
+                  scanned.contact,
+                );
                 await presentFormAsync(null, updatedContact, {
                   isNew: true,
                 });
@@ -362,7 +307,7 @@ const AddContactModal = ({
     requestPhonebookPermissionAsync,
     intl,
     requestPhonebookPermissionAndRedirectToSettingsAsync,
-    additionalContactData,
+    onInviteContact,
     router,
   ]);
 
@@ -399,17 +344,30 @@ const AddContactModal = ({
           console.warn('fail to add contact ?');
         }
       },
-      onCompleted: close,
+      onCompleted: () => {
+        close();
+        Toast.show({
+          type: 'success',
+          text1: intl.formatMessage({
+            defaultMessage: 'The contact was created successfully.',
+            description: 'Toast message when a contact is created successfully',
+          }),
+        });
+      },
       onError: e => {
         console.warn('error adding contact', e);
+        Sentry.captureException(e);
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'The contact was not create. try again',
+            description:
+              'Toast message when a contact failed to be created successfully',
+          }),
+        });
       },
     });
-  }, [scanned, viewer, getContactInput, commit, close]);
-
-  const onDismiss = useCallback(() => {
-    router.pop(1);
-    onRequestAddContactToPhonebook();
-  }, [onRequestAddContactToPhonebook, router]);
+  }, [scanned, viewer, getContactInput, commit, close, intl]);
 
   useEffect(() => {
     (async () => {
@@ -433,21 +391,6 @@ const AddContactModal = ({
     })();
   }, [contactData, webCard, additionalContactData, scanned, open]);
 
-  const onShowContact = useCallback(() => {
-    if (!scanned) return;
-
-    // When user click on add contact, the contact shall always be added to azzapp contacts
-    onAddContactToAzzapp();
-    const messageToast = intl.formatMessage({
-      defaultMessage: 'The contact was created successfully.',
-      description: 'Toast message when a contact is created successfully',
-    });
-    Toast.show({
-      type: 'success',
-      text1: messageToast,
-    });
-  }, [intl, onAddContactToAzzapp, scanned]);
-
   const userName = useMemo(() => {
     if (scanned) {
       const { contact } = scanned;
@@ -466,11 +409,14 @@ const AddContactModal = ({
 
   const { bottom } = useScreenInsets();
 
+  const dim = useScreenDimensions();
+  // case for little height screen
+  const coverWidth = dim.height < 700 + bottom ? dim.width / 4 : 120;
+
   return (
     <BottomSheetModal
       visible={show}
-      onDismiss={onDismiss}
-      height={675 + bottom}
+      onDismiss={onRequestAddContactToPhonebook}
       lazy
       enableContentPanningGesture={false}
     >
@@ -488,15 +434,10 @@ const AddContactModal = ({
             </Text>
           </View>
         }
-        leftElement={
-          <PressableNative onPress={close} style={styles.close}>
-            <Icon icon="close" />
-          </PressableNative>
-        }
         middleElementStyle={styles.headerMiddle}
       />
       <View style={styles.section}>
-        <CoverRenderer webCard={webCard} width={120} canPlay={false} />
+        <CoverRenderer webCard={webCard} width={coverWidth} canPlay={false} />
       </View>
       <View style={styles.separator}>
         <Icon icon="arrow_down" />
@@ -522,8 +463,16 @@ const AddContactModal = ({
             defaultMessage: 'Add to my WebCard contacts',
             description: 'AddContactModal - Submit title',
           })}
-          onPress={onShowContact}
+          onPress={onAddContactToAzzapp}
         />
+        <PressableNative onPress={close} style={styles.notAddButton}>
+          <Text variant="medium" style={styles.notAddLabel}>
+            <FormattedMessage
+              defaultMessage="Do not add"
+              description="AddContactModal - Not add title"
+            />
+          </Text>
+        </PressableNative>
       </View>
     </BottomSheetModal>
   );
@@ -534,7 +483,6 @@ const downloadAvatar = async (
   additionalContactData: Props['additionalContactData'],
 ) => {
   let image: Image | undefined = undefined;
-
   if (additionalContactData?.avatarUrl) {
     try {
       const avatar = new File(Paths.cache.uri + profileId);
@@ -592,7 +540,6 @@ const buildContact = async (
       label: address[0],
       street: address[1],
       isPrimary: address[0] === 'Main',
-      id: `${profileId}-${address[1]}`,
     })),
     phoneNumbers: phoneNumbers.map(phone => ({
       label:
@@ -601,7 +548,6 @@ const buildContact = async (
           : phone[0],
       number: phone[1],
       isPrimary: phone[0] === 'Main',
-      id: `${profileId}-${phone[1]}`,
     })),
     emails: emails.map(email => ({
       label:
@@ -610,7 +556,6 @@ const buildContact = async (
           : email[0],
       email: email[1],
       isPrimary: email[0] === 'Main',
-      id: `${profileId}-${email[1]}`,
     })),
     dates: birthdayDate
       ? [
@@ -619,10 +564,17 @@ const buildContact = async (
             year: birthdayDate?.getFullYear(),
             month: birthdayDate?.getMonth(),
             day: birthdayDate?.getDate(),
-            id: `${profileId}-birthday`,
           },
         ]
       : [],
+    birthday: birthdayDate
+      ? {
+          label: 'birthday',
+          year: birthdayDate?.getFullYear(),
+          month: birthdayDate?.getMonth(),
+          day: birthdayDate?.getDate(),
+        }
+      : undefined,
     socialProfiles:
       additionalContactData?.socials?.map(social => ({
         label: social.label,
@@ -635,7 +587,6 @@ const buildContact = async (
           {
             label: 'azzapp',
             url: buildUserUrl(userName),
-            id: `${profileId}-azzapp`,
           },
         ]
       : []
@@ -645,13 +596,12 @@ const buildContact = async (
         url:
           !url.address || url.address.toLocaleLowerCase().startsWith('http')
             ? url.address
-            : `http://${url.address}`,
-        id: `${profileId}-${url.address}`,
+            : `https://${url.address}`,
       })) ?? [],
     ),
     image,
+    imageAvailable: !!image,
   };
-
   return { contact, webCardId, profileId };
 };
 
@@ -674,6 +624,13 @@ const styles = StyleSheet.create({
   button: {
     marginTop: 20,
   },
+  notAddButton: {
+    margin: 20,
+    alignItems: 'center',
+  },
+  notAddLabel: {
+    color: colors.grey200,
+  },
   headerText: {
     textAlign: 'center',
     marginHorizontal: 25,
@@ -685,10 +642,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 60,
     justifyContent: 'center',
-  },
-  close: {
-    position: 'relative',
-    top: 8,
   },
 });
 

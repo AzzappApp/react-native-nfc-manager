@@ -1,18 +1,16 @@
 import { GraphQLError } from 'graphql';
 import {
+  getWebCardCountProfile,
   removeWebCardNonOwnerProfiles,
   transaction,
   updateWebCard,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { invalidateWebCard } from '#externals';
-import {
-  activeSubscriptionsForWebCardLoader,
-  webCardLoader,
-  webCardOwnerLoader,
-} from '#loaders';
+import { webCardLoader, webCardOwnerLoader } from '#loaders';
 import { checkWebCardOwnerProfile } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
+import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 import type { WebCard } from '@azzapp/data';
 
@@ -22,22 +20,19 @@ const updateMultiUser: MutationResolvers['updateMultiUser'] = async (
 ) => {
   const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
   await checkWebCardOwnerProfile(webCardId);
-
   const updates: Partial<WebCard> = {
     isMultiUser,
   };
 
   if (isMultiUser) {
     const owner = await webCardOwnerLoader.load(webCardId);
-    const subscription = owner
-      ? await activeSubscriptionsForWebCardLoader.load({
-          userId: owner?.id ?? '',
-          webCardId,
-        })
-      : null;
 
-    if (!subscription) {
-      throw new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED);
+    //we first need to heck if this is an IAP subscription and enought seath
+    if (owner?.id) {
+      await validateCurrentSubscription(
+        owner.id,
+        await getWebCardCountProfile(webCardId),
+      );
     }
   }
 

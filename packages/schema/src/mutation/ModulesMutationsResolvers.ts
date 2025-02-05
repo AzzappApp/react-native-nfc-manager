@@ -25,12 +25,13 @@ import {
   MODULE_KIND_SIMPLE_TEXT,
   MODULE_KIND_SIMPLE_TITLE,
   MODULE_KIND_SOCIAL_LINKS,
+  MODULE_KIND_TITLE_TEXT,
 } from '@azzapp/shared/cardModuleHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { invalidateWebCard } from '#externals';
 import {
-  activeSubscriptionsForWebCardLoader,
+  activeSubscriptionsForUserLoader,
   webCardLoader,
   webCardOwnerLoader,
 } from '#loaders';
@@ -72,12 +73,9 @@ const createModuleSavingMutation =
       webCard.cardIsPublished
     ) {
       const subscription = owner
-        ? await activeSubscriptionsForWebCardLoader.load({
-            userId: owner.id,
-            webCardId: webCard.id,
-          })
+        ? await activeSubscriptionsForUserLoader.load(owner.id)
         : null;
-      if (!subscription) {
+      if (!subscription || subscription.length === 0) {
         throw new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED);
       }
     }
@@ -110,13 +108,12 @@ const createModuleSavingMutation =
       }
       previousMedias = getMedias?.(module.data as any) ?? null;
     }
-    let createdModuleId: string | null = null;
+
     try {
       const newMedias = getMedias?.(data as any) ?? null;
       if (newMedias?.length) {
         await checkMedias(newMedias);
       }
-
       await transaction(async () => {
         if (newMedias && !isEqual(newMedias, previousMedias)) {
           await referencesMedias(newMedias, previousMedias);
@@ -124,7 +121,7 @@ const createModuleSavingMutation =
         if (module) {
           await updateCardModule(module.id, { data, variant });
         } else {
-          createdModuleId = await createCardModule({
+          await createCardModule({
             webCardId,
             kind: moduleKind,
             position: await getCardModuleNextPosition(webCardId),
@@ -137,17 +134,6 @@ const createModuleSavingMutation =
     } catch (e) {
       console.error(e);
       throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
-    }
-    if (createdModuleId) {
-      let [createdModule] = await getCardModulesByIds([createdModuleId]);
-      let attempt = 1;
-      while (createdModule === null && attempt < 20) {
-        await new Promise(resolve => {
-          setTimeout(resolve, 50);
-        });
-        [createdModule] = await getCardModulesByIds([createdModuleId]);
-        attempt++;
-      }
     }
 
     webCard = await webCardLoader.load(webCardId);
@@ -315,5 +301,8 @@ export const saveMediaTextModule: MutationResolvers['saveMediaTextModule'] =
 
 export const saveMediaTextLinkModule: MutationResolvers['saveMediaTextLinkModule'] =
   createModuleSavingMutation(MODULE_KIND_MEDIA_TEXT_LINK);
+
+export const saveTitleTextModule: MutationResolvers['saveTitleTextModule'] =
+  createModuleSavingMutation(MODULE_KIND_TITLE_TEXT);
 
 //INSERT_MODULE

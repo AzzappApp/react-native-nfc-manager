@@ -1,7 +1,6 @@
 import { GraphQLError } from 'graphql';
 import {
   checkMedias,
-  createFreeSubscriptionForBetaPeriod,
   createProfile,
   createUser,
   getProfileByUserAndWebCard,
@@ -77,7 +76,7 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  await validateCurrentSubscription(owner.id, webCard.id, 1);
+  await validateCurrentSubscription(owner.id, webCard.isMultiUser ? 1 : 2); //add owner
 
   try {
     const { avatarId, logoId } = invited.contactCard ?? {};
@@ -103,7 +102,6 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
           phoneNumber,
           invited: true,
         });
-        await createFreeSubscriptionForBetaPeriod([userId]);
       } else {
         userId = existingUser.id;
 
@@ -156,16 +154,6 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
 
       if (existingProfile) {
         await updateProfile(existingProfile.id, profileData);
-        const locale = guessLocale(existingUser?.locale ?? user.locale);
-        if (webCard.userName) {
-          await sendPushNotification(userId, {
-            type: 'multiuser_invitation',
-            mediaId: webCard.coverMediaId,
-            deepLink: 'multiuser_invitation',
-            localeParams: { userName: webCard.userName },
-            locale,
-          });
-        }
         return {
           profile: {
             ...profileData,
@@ -186,6 +174,19 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
       }
     });
 
+    if (existingUser) {
+      const locale = guessLocale(existingUser?.locale ?? user.locale);
+      if (webCard.userName) {
+        await sendPushNotification(existingUser.id, {
+          type: 'multiuser_invitation',
+          mediaId: webCard.coverMediaId,
+          deepLink: 'multiuser_invitation',
+          localeParams: { userName: webCard.userName },
+          locale,
+        });
+      }
+    }
+
     if (sendInvite) {
       const locale = guessLocale(existingUser?.locale ?? user.locale);
       if (phoneNumber) {
@@ -203,6 +204,7 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
 
     return { profile };
   } catch (e) {
+    console.error(e);
     if (e instanceof GraphQLError) {
       throw e;
     }

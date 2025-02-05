@@ -5,7 +5,7 @@ import type { CoverLinkRendererProps } from './coverLinkTypes';
 
 export type CoverLinkProps = Omit<
   CoverLinkRendererProps,
-  'userName' | 'webCard' | 'webCardKey'
+  'userName' | 'webCard' | 'webCardId' | 'webCardKey'
 > & {
   webCard: CoverLink_webCard$key;
 };
@@ -14,9 +14,9 @@ const CoverLink = ({ webCard: webCardKey, ...props }: CoverLinkProps) => {
   const webCard = useFragment(
     graphql`
       fragment CoverLink_webCard on WebCard {
+        id
         userName
         ...CoverRenderer_webCard
-        ...useCoverLinkRendererFragment_webCard
       }
     `,
     webCardKey,
@@ -26,6 +26,7 @@ const CoverLink = ({ webCard: webCardKey, ...props }: CoverLinkProps) => {
     <CoverLinkRenderer
       {...props}
       userName={webCard.userName}
+      webCardId={webCard.id}
       webCard={webCard}
     />
   );

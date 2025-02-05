@@ -3,6 +3,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
+import ERRORS from '@azzapp/shared/errors';
 import { buildReadableUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors, shadow } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
@@ -101,7 +102,18 @@ const WebCardScreenPublishHelper = ({
         router.backToTop();
       },
       onError: error => {
-        console.error(error);
+        if (error.message === ERRORS.SUBSCRIPTION_INSUFFICIENT_SEATS) {
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage:
+                'Error, not enough users available in you subscription to publish this webcard, please upgrade your subscription',
+              description:
+                'Toast Error message when user tries to publish a webcard but has not enough seats',
+            }),
+          });
+          return;
+        }
         Toast.show({
           type: 'error',
           text1: intl.formatMessage(

@@ -38,7 +38,7 @@ const duplicateModule: MutationResolvers['duplicateModule'] = async (
   let createdModuleIds: string[] = [];
   try {
     await transaction(async () => {
-      const allModules = await getCardModulesByWebCard(webCardId);
+      const allModules = await getCardModulesByWebCard(webCardId, true);
 
       // create holes in modules position list
       // 1 find the last index of old modules

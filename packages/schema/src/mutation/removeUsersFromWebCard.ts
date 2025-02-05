@@ -54,7 +54,7 @@ const removeUsersFromWebCard: MutationResolvers['removeUsersFromWebCard'] =
         profilesToDelete.map(profile => profile.id),
         userId,
       );
-      await updateMonthlySubscription(userId, webCardId);
+      await updateMonthlySubscription(userId);
     });
 
     return allProfiles ? [] : profilesToDelete.map(profile => profile.id);

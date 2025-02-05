@@ -82,6 +82,22 @@ export function useVariantLabel({
             defaultMessage: 'Grid',
             description: 'useModuleVariant - Module media Grid',
           });
+        case 'square_grid':
+          return intl.formatMessage({
+            defaultMessage: 'Square Grid',
+            description: 'useModuleVariant - Module media Square Grid',
+          });
+        case 'grid2':
+          return intl.formatMessage({
+            defaultMessage: 'Grid 2 columns',
+            description: 'useModuleVariant - Module media Grid  2 columns',
+          });
+        case 'square_grid2':
+          return intl.formatMessage({
+            defaultMessage: 'Square Grid 2 columns',
+            description:
+              'useModuleVariant - Module media Square Grid 2 columns',
+          });
         case 'original_slideshow':
           return intl.formatMessage({
             defaultMessage: 'Original Slideshow',
@@ -130,6 +146,11 @@ export function useVariantLabel({
             defaultMessage: 'Full Alternation',
             description:
               'useModuleVariant - Module media text Full Alternation',
+          });
+        case 'simple_carousel':
+          return intl.formatMessage({
+            defaultMessage: 'Simple carousel',
+            description: 'useModuleVariant - Module media text Simple carousel',
           });
         case 'article':
           return intl.formatMessage({

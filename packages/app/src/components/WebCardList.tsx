@@ -9,8 +9,8 @@ import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
 import SearchBar from '#ui/SearchBar';
 import Text from '#ui/Text';
-import CoverLinkRenderer from './CoverLink/CoverLinkRenderer';
-import LinkWebCard from './LinkWebCard';
+import CoverLink from './CoverLink';
+import Link from './Link';
 import type {
   WebCardList_webCard$data,
   WebCardList_webCard$key,
@@ -37,18 +37,13 @@ const WebCardListItemMemoized = memo(function ProfileListItem({
   return (
     // TODO reenable once RANIMATED3 see: https://github.com/software-mansion/react-native-reanimated/issues/3124
     <Animated.View style={styles.item} /*exiting={FadeOutUp}*/>
-      <LinkWebCard
+      <Link
+        route="WEBCARD"
         disabled={webCard.cardIsPublished === false}
-        params={{ userName: webCard.userName, webCardId: webCard.id }}
+        params={{ webCardId: webCard.id }}
       >
         <PressableNative style={styles.profile}>
-          <CoverLinkRenderer
-            webCard={webCard}
-            width={COVER_WIDTH}
-            webCardId={webCard.id}
-            userName={webCard.userName}
-            canPlay={false}
-          />
+          <CoverLink webCard={webCard} width={COVER_WIDTH} canPlay={false} />
           <View>
             <Text variant="large" numberOfLines={1}>
               {webCard.userName}
@@ -63,7 +58,7 @@ const WebCardListItemMemoized = memo(function ProfileListItem({
             )}
           </View>
         </PressableNative>
-      </LinkWebCard>
+      </Link>
       {onToggleFollow && webCard.userName ? (
         <IconButton
           icon="delete"
@@ -113,8 +108,7 @@ const WebCardList = ({
         id
         userName
         cardIsPublished
-        ...CoverRenderer_webCard
-        ...useCoverLinkRendererFragment_webCard
+        ...CoverLink_webCard
       }
     `,
     usersKey,

@@ -75,8 +75,12 @@ const PostLikesModal = forwardRef<ModalActions, ShareModalProps>(
           <div className={styles.header}>
             <span className={styles.title}>
               <FormattedMessage
-                defaultMessage="{likes} Likes"
-                id="QR06rU"
+                defaultMessage={`{likes, plural,
+                  =0 {0 likes}
+                  =1 {# like}
+                  other {# likes}
+                }`}
+                id="NwmhOW"
                 description="post likes modal title"
                 values={{ likes: count }}
               />

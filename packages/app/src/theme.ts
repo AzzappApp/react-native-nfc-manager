@@ -17,6 +17,7 @@ export const colors = {
   darkblue700: '#24309E',
   //red
   red400: '#FF2E54',
+  warn: 'rgba(255,46,84,0.3)',
   //grey
   grey50: '#F5F5F6',
   grey100: '#E2E1E3',
@@ -89,6 +90,22 @@ export const mixins = {
 } as const;
 
 export const shadow = (
+  appearence: 'dark' | 'light',
+  direction: 'bottom' | 'center' | 'top' = 'bottom',
+) =>
+  <const>{
+    boxShadow: [
+      {
+        offsetX: 0,
+        offsetY: direction === 'bottom' ? 10 : direction === 'center' ? 0 : -10,
+        blurRadius: '20',
+        spreadDistance: '0',
+        color: `rgba(0, 0, 0, ${appearence === 'dark' ? 0.4 : 0.2})`,
+      },
+    ],
+  };
+
+export const reactNativeShadow = (
   appearence: 'dark' | 'light',
   direction: 'bottom' | 'center' | 'top' = 'bottom',
 ) =>

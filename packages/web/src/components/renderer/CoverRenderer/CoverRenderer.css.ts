@@ -1,6 +1,8 @@
 import { style } from '@vanilla-extract/css';
 import { MediaQuery } from '#app/[userName]/theme.css';
 
+export const MAX_COVER_WIDTH = 500;
+
 const coverMedia = style({
   position: 'absolute',
   top: 0,
@@ -10,17 +12,18 @@ const coverMedia = style({
 });
 
 const content = style({
-  position: 'relative',
   margin: 'auto',
   overflow: 'hidden',
+  // boxShadow: '0px 10px 20px 0px rgba(0, 0, 0, 0.20)',
   '@media': {
     [MediaQuery.Mobile]: {
       width: '100vw',
+      fontSize: '0.8vw',
     },
     [MediaQuery.Desktop]: {
-      maxWidth: '500px',
-      borderRadius: 35,
-      boxShadow: '0px 10px 20px 0px rgba(0, 0, 0, 0.20)',
+      position: 'relative',
+      maxWidth: MAX_COVER_WIDTH,
+      fontSize: 4,
     },
   },
 });
@@ -38,7 +41,7 @@ const backgroundContent = style({
 });
 
 const backgroundMedia = style({
-  backgroundAttachment: 'fixed',
+  // backgroundAttachment: 'fixed',
   backgroundRepeat: 'no-repeat',
   backgroundSize: 'cover',
   backgroundPosition: 'center',
@@ -48,7 +51,6 @@ const backgroundMedia = style({
     },
     [MediaQuery.Desktop]: {
       display: 'block',
-      height: '870px',
     },
   },
 });
@@ -59,27 +61,25 @@ const linkShadow = style({
 
 const overlayTitle = style({
   color: 'white',
-  fontSize: 21,
+  fontSize: '5em',
   position: 'absolute',
   maxWidth: '70%',
   left: '22%',
   top: '45.5%',
   textOverflow: 'ellipsis',
-  height: 30,
   maxLines: 1,
   overflow: 'hidden',
 });
 
 const overlaySubTitle = style({
   color: 'white',
-  fontSize: 29,
+  fontSize: '7em',
   position: 'absolute',
   width: '70%',
   left: '22%',
   top: '49%',
   maxLines: 1,
   textOverflow: 'ellipsis',
-  maxHeight: 40,
   overflow: 'hidden',
 });
 

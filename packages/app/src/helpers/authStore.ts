@@ -173,19 +173,6 @@ export const init = async () => {
   //   },
   // );
 
-  addGlobalEventListener(
-    'PROFILE_ROLE_CHANGE',
-    async ({ payload: { profileRole } }) => {
-      const profileInfos = getAuthState().profileInfos;
-      if (profileInfos) {
-        storage.set(
-          MMKVS_PROFILE_INFOS,
-          JSON.stringify({ ...profileInfos, profileRole }),
-        );
-      }
-    },
-  );
-
   addGlobalEventListener('SIGN_OUT', async () => {
     authTokens = null;
     storage.delete(MMKVS_PROFILE_INFOS);
@@ -273,9 +260,7 @@ export const commonKeysAreEqual = (a: any, b: any) => {
   return _.isEqual(obj1Common, obj2Common);
 };
 
-export const onChangeWebCard = async (
-  infos?: Partial<ProfileInfosInput> | null,
-) => {
+export const onChangeWebCard = (infos?: Partial<ProfileInfosInput> | null) => {
   const defaultValues = {
     profileId: null,
     webCardId: null,

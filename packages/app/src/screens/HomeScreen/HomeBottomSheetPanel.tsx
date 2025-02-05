@@ -12,7 +12,9 @@ import {
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+import { profileIsOwner } from '@azzapp/shared/profileHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
+import { ENABLE_MULTI_USER } from '#Config';
 import { signInRoutes } from '#mobileRoutes';
 import { colors } from '#theme';
 import Link from '#components/Link';
@@ -277,7 +279,9 @@ const HomeBottomSheetPanel = ({
             close();
           },
         },
-        profile?.webCard?.isPremium && !profile?.webCard.isWebSubscription
+        profile?.webCard?.isPremium &&
+        !profile?.webCard.isWebSubscription &&
+        profileIsOwner(profile.profileRole)
           ? {
               type: 'row',
               icon: Platform.OS === 'ios' ? 'app_store' : 'play_store',
@@ -316,7 +320,8 @@ const HomeBottomSheetPanel = ({
           : null,
         !profile?.invited &&
         profileInfoHasAdminRight(profile) &&
-        profile?.webCard?.hasCover
+        profile?.webCard?.hasCover &&
+        ENABLE_MULTI_USER
           ? {
               type: 'row',
               icon: 'shared_webcard',

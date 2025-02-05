@@ -201,12 +201,9 @@ const PostCreationScreen = ({
             }));
 
         const fileName = getFileName(path);
-        const exportedURI = path.startsWith('file://')
-          ? path
-          : `file://${path}`;
         const file: any = {
           name: fileName,
-          uri: exportedURI,
+          uri: path,
           type:
             mime.lookup(fileName) ||
             (kind === 'image' ? 'image/jpeg' : 'video/mp4'),
@@ -257,7 +254,7 @@ const PostCreationScreen = ({
               addLocalCachedMediaFile(
                 public_id,
                 kind === 'video' ? 'video' : 'image',
-                exportedURI,
+                path,
               );
 
               if (

@@ -1,7 +1,7 @@
 import omit from 'lodash/omit';
 import { startTransition, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import {
@@ -21,7 +21,7 @@ import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
 import { type SimpleTextEditionScreenUpdateModuleMutation } from '#relayArtifacts/SimpleTextEditionScreenUpdateModuleMutation.graphql';
-import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
+import { BOTTOM_MENU_HEIGHT, BOTTOM_MENU_PADDING } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
@@ -520,14 +520,15 @@ const SimpleTextEditionScreen = ({
           onCloseContentModal();
         }}
       />
-      <SimpleTextEditionBottomMenu
-        currentTab={currentTab}
-        onItemPress={onCurrentTabChange}
-        style={[
-          styles.tabsBar,
-          { bottom: insetBottom, width: windowWidth - 20 },
-        ]}
-      />
+      <View
+        style={[styles.tabsBar, { bottom: insetBottom - BOTTOM_MENU_PADDING }]}
+      >
+        <SimpleTextEditionBottomMenu
+          currentTab={currentTab}
+          onItemPress={onCurrentTabChange}
+          style={{ width: windowWidth - 20 }}
+        />
+      </View>
     </Container>
   );
 };
@@ -540,8 +541,8 @@ const styles = StyleSheet.create({
   },
   tabsBar: {
     position: 'absolute',
-    left: 10,
-    right: 10,
+    left: 0,
+    right: 0,
   },
   tabStyle: {
     flex: 1,

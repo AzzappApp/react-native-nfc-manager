@@ -330,23 +330,6 @@ type WebCard implements Node {
   """
   subscription: UserSubscription
   """
-  Returns the active payment means for the webCard
-  """
-  paymentMeans: [PaymentMean!]
-  """
-  Returns the executed payment
-  """
-  payments(
-    """
-    Returns the items in the list that come after the specified cursor.
-    """
-    after: String
-    """
-    Returns the first n items from the list.
-    """
-    first: Int @max(value: 50)
-  ): PaymentConnection!
-  """
   The webCard logo
   """
   logo: Media

@@ -12,15 +12,6 @@ import type { ContactCardExportVcfTestQuery } from '#relayArtifacts/ContactCardE
 import type { ContactCardExportVcfProps } from '../ContactCardExportVcf';
 import type { RelayMockEnvironment } from 'relay-test-utils/lib/RelayModernMockEnvironment';
 
-jest.mock('react-native-blob-util', () => ({
-  fs: {
-    writeFile: jest.fn(),
-    dirs: {
-      CacheDir: 'CacheDir',
-    },
-  },
-}));
-
 jest.mock('react-native-share', () => ({ open: jest.fn() }));
 
 jest.mock('react-native-quick-base64', () => ({

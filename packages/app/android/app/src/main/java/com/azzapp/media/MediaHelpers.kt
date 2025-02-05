@@ -2,9 +2,17 @@ package com.azzapp.media
 
 import android.media.MediaMetadataRetriever
 import android.net.Uri
+import android.content.Context
+import android.content.ContentResolver
+import android.database.Cursor
+import android.provider.MediaStore
 import com.azzapp.MainApplication.Companion.getMainApplicationContext
 import com.facebook.react.bridge.*
-
+import java.io.ByteArrayInputStream
+import java.io.File
+import java.io.FileOutputStream
+import java.io.InputStream
+import java.util.UUID
 
 class MediaHelpers(private val reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
@@ -60,5 +68,69 @@ class MediaHelpers(private val reactContext: ReactApplicationContext) :
     map.putInt("height", height);
     map.putInt("rotation", rotation);
     promise.resolve(map)
+  }
+
+  /*
+  * create a copy of content provider file: `contentUri`.
+  * The copied file path is returned in the promise
+  */
+  @ReactMethod
+  fun getFilePath(contentUri: String, promise: Promise) {
+      try {
+          val uri = Uri.parse(contentUri)
+          if (uri.scheme == "content") {
+              val filePath = getRealPathFromUri(uri)
+              if (filePath != null) {
+                  promise.resolve("file://$filePath")
+              } else {
+                  promise.reject("NO_PATH", "Could not resolve file path from URI")
+              }
+          } else {
+              promise.resolve(contentUri)
+          }
+      } catch (e: Exception) {
+          promise.reject("ERROR", e.message, e)
+      }
+  }
+
+  @ReactMethod
+  fun downloadContactImage(uriString: String, promise: Promise) {
+      try {
+          val context = reactContext
+          val uri = Uri.parse(uriString)
+          val inputStream: InputStream? = context.contentResolver.openInputStream(uri)
+
+          if (inputStream != null) {
+              // Generate a random file name with a .jpg extension
+              val fileName = "${UUID.randomUUID()}.jpg"
+              val cacheFile = File(context.cacheDir, fileName)
+
+              // Write the input stream data to the cache file
+              FileOutputStream(cacheFile).use { outputStream ->
+                  inputStream.copyTo(outputStream)
+              }
+
+              inputStream.close()
+              promise.resolve(cacheFile.absolutePath)   // Return the full path to the saved file
+          } else {
+              promise.reject("ERROR", "Cannot open input stream")  // InputStream could not be opened
+          }
+      } catch (e: Exception) {
+          e.printStackTrace()
+          promise.reject("ERROR", "unknown", e)  // InputStream could not be opened
+      }
+  }
+
+  private fun getRealPathFromUri(uri: Uri): String? {
+      val projection = arrayOf(MediaStore.MediaColumns.DATA)
+      val contentResolver: ContentResolver = reactApplicationContext.contentResolver
+      val cursor: Cursor? = contentResolver.query(uri, projection, null, null, null)
+      cursor?.use {
+          if (it.moveToFirst()) {
+              val columnIndex = it.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA)
+              return it.getString(columnIndex)
+          }
+      }
+      return null
   }
 }

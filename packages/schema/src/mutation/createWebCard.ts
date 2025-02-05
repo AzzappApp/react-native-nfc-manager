@@ -8,7 +8,6 @@ import {
   createProfile,
   getWebCardByUserNameWithRedirection,
   transaction,
-  getWebCardById,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { isValidUserName } from '@azzapp/shared/stringHelpers';
@@ -119,16 +118,6 @@ const createWebCardMutation: MutationResolvers['createWebCard'] = async (
         lastContactViewAt: currentDate,
       } as const;
     });
-
-    let webCard = await getWebCardById(profile.webCardId);
-    let attempt = 1;
-    while (webCard === null && attempt < 20) {
-      await new Promise(resolve => {
-        setTimeout(resolve, 50);
-      });
-      webCard = await getWebCardById(profile.webCardId);
-      attempt++;
-    }
 
     return { profile };
   } catch (error) {

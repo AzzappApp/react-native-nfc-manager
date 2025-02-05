@@ -15,7 +15,7 @@ import {
   captureSnapshot,
   SnapshotRenderer,
 } from '@azzapp/react-native-snapshot-view';
-import { useLocalCachedMediaFile } from '#helpers/mediaHelpers/remoteMediaCache';
+import { getLocalCachedMediaFile } from '#helpers/mediaHelpers/remoteMediaCache';
 import type { ImageContentFit, ImageErrorEventData } from 'expo-image';
 import type { ForwardedRef } from 'react';
 import type { ViewProps } from 'react-native';
@@ -31,7 +31,7 @@ export type MediaImageRendererHandle = {
   snapshot(): Promise<void>;
 };
 
-export type MediaImageRendererProps = ViewProps & {
+export type MediaImageRendererProps = Pick<ViewProps, 'style' | 'testID'> & {
   /**
    * if true, the MediaImageRenderer will display the first frame of the video
    */
@@ -74,6 +74,16 @@ export type MediaImageRendererProps = ViewProps & {
    * Define the image blur
    */
   blurRadius?: number;
+  /**
+   *
+   */
+  cachePolicy?: 'disk' | 'memory-disk' | 'memory' | 'none' | null;
+  /**
+   * there is known issue using recycling key in expo-image #22516
+   *  reset image source with recylingKey on first render
+   * so we are gonna limit the usage only in flashlist case
+   */
+  useRecycling?: boolean;
 };
 
 /**
@@ -89,21 +99,24 @@ const MediaImageRenderer = (
     onError,
     style,
     tintColor,
-    useAnimationSnapshot,
+    useAnimationSnapshot = false,
     fit,
     blurRadius,
-    ...props
+    testID,
+    cachePolicy,
+    useRecycling = false,
   }: MediaImageRendererProps,
   ref: ForwardedRef<MediaImageRendererHandle>,
 ) => {
   const isReady = useRef(false);
   const sourceRef = useRef(source);
-  const localFile = useLocalCachedMediaFile(source.mediaId, 'image');
+  const localFile = getLocalCachedMediaFile(source.mediaId, 'image');
   const [snapshotID, setSnapshotID] = useState(() =>
     useAnimationSnapshot ? (_imageSnapshots.get(source.mediaId) ?? null) : null,
   );
   const [thumbnail, setThumbnail] = useState(
-    () => getThumbnail(source.mediaId, source.requestedSize) ?? null,
+    () =>
+      getThumbnail(source.mediaId, source.requestedSize, source.uri) ?? null,
   );
 
   const useAnimationSnapshotRef = useRef(useAnimationSnapshot);
@@ -119,14 +132,18 @@ const MediaImageRenderer = (
     if (!isEqual(sourceRef.current, source)) {
       sourceRef.current = source;
       isReady.current = false;
-      setThumbnail(getThumbnail(source.mediaId, source.requestedSize) ?? null);
-      setSnapshotID(
-        useAnimationSnapshotRef.current
-          ? (_imageSnapshots.get(source.mediaId) ?? null)
-          : null,
+      setThumbnail(
+        getThumbnail(source.mediaId, source.requestedSize, source.uri) ?? null,
       );
+      if (useAnimationSnapshot) {
+        setSnapshotID(
+          useAnimationSnapshotRef.current
+            ? (_imageSnapshots.get(source.mediaId) ?? null)
+            : null,
+        );
+      }
     }
-  }, [source]);
+  }, [source, useAnimationSnapshot]);
 
   const containerRef = useRef<any>(null);
   useImperativeHandle(
@@ -158,8 +175,10 @@ const MediaImageRenderer = (
 
   const onThumbnailLoad = useCallback(() => {
     dispatchReady();
-    cleanSnapshots();
-  }, [dispatchReady, cleanSnapshots]);
+    if (useAnimationSnapshot) {
+      cleanSnapshots();
+    }
+  }, [dispatchReady, useAnimationSnapshot, cleanSnapshots]);
 
   const onImageLoad = useCallback(() => {
     dispatchReady();
@@ -168,9 +187,11 @@ const MediaImageRenderer = (
       addLoadedMedia(source.mediaId, source.requestedSize, source.uri);
     }
     setThumbnail(null);
-    cleanSnapshots();
+    if (useAnimationSnapshot) {
+      cleanSnapshots();
+    }
     onLoad?.();
-  }, [onLoad, localFile, dispatchReady, cleanSnapshots]);
+  }, [dispatchReady, localFile, useAnimationSnapshot, onLoad, cleanSnapshots]);
 
   const onErrorInner = useCallback(
     (event: ImageErrorEventData) => {
@@ -183,6 +204,7 @@ const MediaImageRenderer = (
     if (localFile) {
       return localFile;
     }
+
     return source.uri;
   }, [localFile, source]);
 
@@ -191,10 +213,24 @@ const MediaImageRenderer = (
     [style],
   );
 
+  const optiCachePolicy = useMemo(() => {
+    if (localFile) {
+      return 'none';
+    }
+    if (source.uri.startsWith('file://')) {
+      return 'none';
+    }
+    if (cachePolicy) {
+      return cachePolicy;
+    }
+    //force to default disk value
+    return 'disk';
+  }, [cachePolicy, localFile, source.uri]);
+
   return (
-    <View style={containerStyle} ref={containerRef} {...props}>
+    <View style={containerStyle} ref={containerRef} testID={testID}>
       <Image
-        recyclingKey={source.mediaId}
+        recyclingKey={useRecycling ? source.mediaId : null}
         source={imageSource}
         accessibilityRole="image"
         alt={alt}
@@ -205,10 +241,11 @@ const MediaImageRenderer = (
         contentFit={fit ?? 'fill'}
         style={StyleSheet.absoluteFill}
         blurRadius={blurRadius}
+        cachePolicy={optiCachePolicy}
       />
       {thumbnail && (
         <Image
-          recyclingKey={`${source.mediaId}-thumbnail`}
+          recyclingKey={useRecycling ? `${source.mediaId}-thumbnail` : null}
           source={thumbnail}
           accessibilityRole="image"
           alt={alt}
@@ -244,7 +281,7 @@ const addLoadedMedia = (mediaId: string, size: number, uri: string) => {
   loadedMediaCache.set(mediaId, medias);
 };
 
-const getThumbnail = (mediaId: string, size: number) => {
+const getThumbnail = (mediaId: string, size: number, originalURI: string) => {
   let medias = loadedMediaCache.get(mediaId);
   if (!medias) {
     return null;
@@ -261,6 +298,10 @@ const getThumbnail = (mediaId: string, size: number) => {
       thumbnailUri = media.uri;
       currentSize = media.size;
     }
+  }
+  //don't return the same URI as the original,
+  if (thumbnailUri === originalURI) {
+    return null;
   }
   return thumbnailUri;
 };

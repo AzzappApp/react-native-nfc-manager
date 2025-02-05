@@ -6,7 +6,6 @@ import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
 import { usePrefetchRoute } from '#helpers/ScreenPrefetcher';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
-import useCoverLinkRendererFragment from './useCoverLinkRendererFragment';
 import type {
   MediaImageRendererHandle,
   MediaVideoRendererHandle,
@@ -35,7 +34,6 @@ const CoverLink = ({
   >(null);
   const router = useRouter();
   const prefetchScreen = usePrefetchRoute();
-  const webCard = useCoverLinkRendererFragment(props.webCard);
 
   const onPressInner = (event: GestureResponderEvent) => {
     onPress?.(event);
@@ -51,18 +49,12 @@ const CoverLink = ({
         return;
       }
 
-      if (webCard?.coverIsPredefined) {
-        router.push({
-          route: 'COVER_TEMPLATE_SELECTION',
-        });
-      } else {
-        router.push({
-          route: 'WEBCARD',
-          params: {
-            userName,
-          },
-        });
-      }
+      router.push({
+        route: 'WEBCARD',
+        params: {
+          userName,
+        },
+      });
       return;
     }
     container.measureInWindow(async (x, y, width, height) => {
@@ -74,20 +66,14 @@ const CoverLink = ({
         return;
       }
 
-      if (webCard?.coverIsPredefined) {
-        router.push({
-          route: 'COVER_TEMPLATE_SELECTION',
-        });
-      } else {
-        router.push({
-          route: 'WEBCARD',
-          params: {
-            userName,
-            webCardId,
-            fromRectangle: { x, y, width, height },
-          },
-        });
-      }
+      router.push({
+        route: 'WEBCARD',
+        params: {
+          userName,
+          webCardId,
+          fromRectangle: { x, y, width, height },
+        },
+      });
     });
   };
 

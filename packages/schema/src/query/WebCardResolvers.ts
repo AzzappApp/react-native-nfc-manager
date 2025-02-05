@@ -13,12 +13,9 @@ import {
   getWebCardProfiles,
   countWebCardProfiles,
   getWebCardPendingOwnerProfile,
-  getActivePaymentMeans,
-  getWebCardPayments,
   getLastSubscription,
   getFilterCoverTemplateTypes,
   getCoverTemplatesByTypesAndTag,
-  countWebCardPayments,
   countDeletedWebCardProfiles,
   searchContactsByWebcardId,
   getContactCountWithWebcardId,
@@ -30,7 +27,7 @@ import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers'
 import { buildCoverAvatarUrl } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
 import {
-  activeSubscriptionsForWebCardLoader,
+  activeSubscriptionsForUserLoader,
   cardModuleByWebCardLoader,
   companyActivityLoader,
   companyActivityTypeLoader,
@@ -99,7 +96,10 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
     return webCard.commonInformation;
   },
   companyName: async webCard => {
-    if (!(await hasWebCardProfileRight(webCard.id))) {
+    if (
+      !webCard.coverIsPredefined &&
+      !(await hasWebCardProfileRight(webCard.id))
+    ) {
       return null;
     }
     return webCard.companyName;
@@ -116,13 +116,19 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
   },
   coverTexts: webCard => webCard.coverTexts,
   firstName: async webCard => {
-    if (!(await hasWebCardProfileRight(webCard.id))) {
+    if (
+      !webCard.coverIsPredefined &&
+      !(await hasWebCardProfileRight(webCard.id))
+    ) {
       return null;
     }
     return webCard.firstName;
   },
   lastName: async webCard => {
-    if (!(await hasWebCardProfileRight(webCard.id))) {
+    if (
+      !webCard.coverIsPredefined &&
+      !(await hasWebCardProfileRight(webCard.id))
+    ) {
       return null;
     }
     return webCard.lastName;
@@ -223,33 +229,27 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
       return false;
     }
     const owner = await webCardOwnerLoader.load(webCard.id);
-    const subscription = owner
-      ? await activeSubscriptionsForWebCardLoader.load({
-          userId: owner.id,
-          webCardId: webCard.id,
-        })
+    const subscriptions = owner
+      ? await activeSubscriptionsForUserLoader.load(owner.id)
       : null;
-    const isWebSubscription =
-      subscription?.issuer === 'web' && subscription.status === 'active';
 
-    return isWebSubscription ?? false;
+    const subscription = subscriptions?.find(
+      sub => sub.issuer === 'web' && sub.status === 'active',
+    );
+
+    return subscription != null;
   },
   isPremium: async webCard => {
     if (!(await hasWebCardProfileRight(webCard.id))) {
       return false;
     }
     const owner = await webCardOwnerLoader.load(webCard.id);
-
     //cannot use the loader here (when IAP sub), can't find a way to for revalidation in api route.
     //Got a bug where the subscription is canceled however still active in the result set
-    const subscription = owner
-      ? await activeSubscriptionsForWebCardLoader.load({
-          userId: owner.id,
-          webCardId: webCard.id,
-        })
+    const subscriptions = owner
+      ? await activeSubscriptionsForUserLoader.load(owner.id)
       : null;
-
-    return !!subscription;
+    return !!subscriptions?.[0];
   },
   isFollowing: async (webCard, { webCardId: gqlWebCardId }) => {
     if (!gqlWebCardId) {
@@ -501,35 +501,14 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
     if (!userId || !(await hasWebCardProfileRight(webCard.id))) {
       return null;
     }
-    const subscription = await getLastSubscription(userId, webCard.id);
-
-    return subscription ?? null;
-  },
-  paymentMeans: async webCard => {
-    const { userId } = getSessionInfos();
-    if (!userId || !(await hasWebCardProfileRight(webCard.id))) {
+    const owner = await webCardOwnerLoader.load(webCard.id);
+    if (!owner) {
       return null;
     }
-    return getActivePaymentMeans(userId, webCard.id);
-  },
-  payments: async (webCard, args) => {
-    if (!(await hasWebCardProfileRight(webCard.id))) {
-      return emptyConnection;
-    }
-    let { after, first } = args;
-    after = after ?? null;
-    first = first ?? 100;
 
-    const offset = after ? cursorToOffset(after) : 0;
+    const subscription = await getLastSubscription(owner.id);
 
-    return connectionFromArraySlice(
-      await getWebCardPayments(webCard.id, first, offset),
-      { after, first },
-      {
-        sliceStart: offset,
-        arrayLength: await countWebCardPayments(webCard.id),
-      },
-    );
+    return subscription ?? null;
   },
   logo: async webCard =>
     webCard.logoId && (await hasWebCardProfileRight(webCard.id))
