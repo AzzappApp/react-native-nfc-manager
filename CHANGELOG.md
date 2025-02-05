@@ -1,3 +1,8 @@
+## 1.7.0-canary.127
+
+* **fix:**  - like plurals translations ([#7290](https://github.com/AzzappApp/azzapp/pull/7290))
+* **fix:**  - Shadow cut in old module on background panel ([#7289](https://github.com/AzzappApp/azzapp/pull/7289))
+
 ## 1.7.0-canary.126
 
 * **fix:**  - block user to publish is not enought seat ([#7288](https://github.com/AzzappApp/azzapp/pull/7288))
