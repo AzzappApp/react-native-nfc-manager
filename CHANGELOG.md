@@ -1,3 +1,7 @@
+## 1.7.1-rc.9
+
+* **fix:**  - **cover:** [#7327](https://github.com/AzzappApp/azzapp/pull/7327) wrong cover display on menu ([#7331](https://github.com/AzzappApp/azzapp/pull/7331))
+
 ## 1.7.1-rc.8
 
 * **fix:**  - **WebCard:** improve animation split
