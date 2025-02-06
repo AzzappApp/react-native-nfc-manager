@@ -1,12 +1,6 @@
 import { uniq } from 'lodash';
 import { useCallback, useRef, useState } from 'react';
-import {
-  Platform,
-  StatusBar,
-  StyleSheet,
-  useColorScheme,
-  type LayoutRectangle,
-} from 'react-native';
+import { Platform, StatusBar, StyleSheet, useColorScheme } from 'react-native';
 import Animated, {
   interpolate,
   runOnJS,
@@ -20,13 +14,14 @@ import {
 } from '@azzapp/react-native-snapshot-view';
 import { waitTime } from '@azzapp/shared/asyncHelpers';
 import { COVER_CARD_RADIUS } from '@azzapp/shared/coverHelpers';
-import { colors, shadow } from '#theme';
+import { colors, reactNativeShadow, shadow } from '#theme';
 import useScreenDimensions from '#hooks/useScreenDimensions';
 import {
   TRANSITIONS_DURATION,
   useWebCardEditScale,
 } from '#screens/WebCardEditScreen/webCardEditScreenHelpers';
 import type { ChildPositionAwareScrollViewHandle } from '#ui/ChildPositionAwareScrollView';
+import type { ViewStyle, LayoutRectangle } from 'react-native';
 import type { DerivedValue } from 'react-native-reanimated';
 
 export type ModuleTransitionInfo = {
@@ -290,7 +285,15 @@ export const WebCardModuleTransitionSnapshotRenderer = ({
   });
 
   return (
-    <Animated.View style={[style, shadow(appearance)]}>
+    <Animated.View
+      style={[
+        style,
+        Platform.select<ViewStyle>({
+          ios: reactNativeShadow(appearance),
+          default: shadow(appearance),
+        }),
+      ]}
+    >
       <Animated.View style={[StyleSheet.absoluteFill, innerViewStyle]}>
         <SnapshotRenderer
           snapshotID={info.editScreenSnapshotId}
