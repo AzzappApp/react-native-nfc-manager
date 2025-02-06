@@ -109,7 +109,7 @@ The different packages of the application are located under the `packages` direc
 - [app](./packages/app/): contains the source code of the client React Native application.
 - [backoffice](./packages/backoffice/): contains the source code of the backoffice of the application.
 - [data](./packages/data/): contains the source code of the data access layer of the application.
-- [schema](./packages/schema/): contains the source code of the GraphQL API layer of the application.
+- [schema](./packages/schema/): contains the source code of the `GraphQL` API layer of the application.
 - [i18n](./packages/i18n/): contains the translation files and related definitions.
 - [shared](./packages/shared/): contains helpers shared by all the packages of the application
 - [web](./packages/web/): a `NextJS` project responsible of the web version of the application and the API
