@@ -1,10 +1,6 @@
-import { memo, useCallback, useMemo, useRef, useState } from 'react';
-import { View } from 'react-native';
+import { memo, useCallback, useState } from 'react';
+import { FlatList, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, {
-  useAnimatedScrollHandler,
-  useSharedValue,
-} from 'react-native-reanimated';
 import { getTextStyle, getTitleStyle } from '#helpers/cardModuleHelpers';
 import useIsModuleItemInViewPort from '#hooks/useIsModuleItemInViewPort';
 import useScreenDimensions from '#hooks/useScreenDimensions';
@@ -59,42 +55,30 @@ const CardModuleMediaSimpleCarousel = ({
   };
 
   const cardGap = Math.max(10, cardStyle?.gap || 0);
+  const startPadding = 20;
 
   const nativeGesture = Gesture.Native();
-  const listRef = useRef<Animated.FlatList<CardModuleMedia>>(null);
   const itemWidth = Math.min((dimension.width * 70) / 100, 400);
 
-  const scrollIndex = useSharedValue(0);
+  const lineLength =
+    itemWidth * cardModuleMedias.length +
+    cardGap * (cardModuleMedias.length - 1) +
+    2 * startPadding;
 
-  const scrollHandler = useAnimatedScrollHandler({
-    onScroll: event => {
-      const index = event.contentOffset.x / (itemWidth + cardGap);
-      scrollIndex.value = index;
-    },
-  });
-
-  const lineLength = (itemWidth + cardGap) * cardModuleMedias.length - cardGap;
   const isSlidable = lineLength > dimension.width;
 
   const horizontalPadding = isSlidable
-    ? 20
-    : (dimension.width - lineLength) / 2;
+    ? startPadding
+    : (dimension.width - lineLength) / 2 + startPadding;
 
   const getItemLayout = useCallback(
     (_data: any, index: number) => ({
-      length: itemWidth + cardGap,
-      offset: (itemWidth + cardGap) * index + horizontalPadding,
+      length: itemWidth,
+      offset: itemWidth * index + cardGap * (index - 1) + horizontalPadding,
       index,
     }),
     [cardGap, horizontalPadding, itemWidth],
   );
-
-  const ccstyle = useMemo(() => {
-    return {
-      paddingLeft: horizontalPadding,
-      paddingRight: horizontalPadding,
-    };
-  }, [horizontalPadding]);
 
   const renderItem = useCallback(
     ({ item, index }: { item: CardModuleMedia; index: number }) => {
@@ -157,20 +141,24 @@ const CardModuleMediaSimpleCarousel = ({
     >
       <GestureDetector gesture={nativeGesture}>
         {isSlidable ? (
-          <Animated.FlatList
-            ref={listRef}
+          <FlatList
             data={cardModuleMedias}
             renderItem={renderItem}
             keyExtractor={keyExtractor}
             horizontal
             decelerationRate="fast"
-            snapToAlignment="start"
+            snapToAlignment="center"
             snapToInterval={itemWidth + cardGap}
             showsHorizontalScrollIndicator={false}
-            onScroll={scrollHandler}
             scrollEventThrottle={16}
+            disableIntervalMomentum
             getItemLayout={getItemLayout}
-            contentContainerStyle={ccstyle}
+            contentInsetAdjustmentBehavior="always"
+            contentOffset={{ x: -horizontalPadding, y: 0 }}
+            contentInset={{
+              right: horizontalPadding,
+              left: horizontalPadding,
+            }}
             ItemSeparatorComponent={() => {
               return <View style={{ width: cardGap, height: '100%' }} />;
             }}
