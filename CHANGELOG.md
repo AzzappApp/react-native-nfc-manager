@@ -1,3 +1,7 @@
+## 1.7.1-rc.11
+
+* **fix:**  - **IOS:** always use old shadow ([#7334](https://github.com/AzzappApp/azzapp/pull/7334))
+
 ## 1.7.1-rc.10
 
 * **fix:**  - **WebCard:** split animation jerky on IOS
