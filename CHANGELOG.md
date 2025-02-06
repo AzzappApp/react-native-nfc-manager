@@ -1,3 +1,8 @@
+## 1.7.1-canary.10
+
+* **docs:**  - Update README.md
+* **docs:**  - update README.md
+
 ## 1.7.1-canary.9
 
 * **fix:**  - ensure deleted profile profile are not handled in getProfilesByUser ([#7323](https://github.com/AzzappApp/azzapp/pull/7323))
