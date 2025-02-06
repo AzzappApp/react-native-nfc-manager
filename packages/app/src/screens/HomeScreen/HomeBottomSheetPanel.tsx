@@ -235,7 +235,10 @@ const HomeBottomSheetPanel = ({
   >(
     () =>
       convertToNonNullArray([
-        !userIsPremium && profile?.webCard && !profile.webCard.isPremium
+        !userIsPremium &&
+        profile?.webCard &&
+        !profile.webCard.isPremium &&
+        ENABLE_MULTI_USER
           ? {
               type: 'row',
               icon: 'plus',
