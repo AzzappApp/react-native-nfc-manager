@@ -137,12 +137,11 @@ export const useWebCardEditTransition = (initialEdit: boolean) => {
               id,
               await Promise.all([
                 webCardScreenLayout.height < windowHeight &&
-                webCardScreenLayout.height > 0
+                webCardScreenLayout.height > 0 &&
+                id !== 'cover'
                   ? captureSnapshot(webCardScreenRef).catch(() => null)
                   : null,
-                id !== 'cover'
-                  ? captureSnapshot(editScreenRef).catch(() => null)
-                  : null,
+                captureSnapshot(editScreenRef).catch(() => null),
               ]),
             ],
           ),
@@ -201,7 +200,7 @@ export const useWebCardEditTransition = (initialEdit: boolean) => {
     }
 
     setTransitionInfo(transitionItemsInfos);
-    setEditing(!editing);
+    // We need to wait the Snapshot to be rendered before starting the transition
     await waitTime(1);
     editTransition.value = withTiming(
       editing ? 0 : 1,
@@ -210,6 +209,10 @@ export const useWebCardEditTransition = (initialEdit: boolean) => {
         runOnJS(clearTransitionInfos)();
       },
     );
+    // We need the animation to start before changing the editing state to avoid a flicker
+    // the edit screen being visible only if editTransition.value is greater than 0
+    await waitTime(1);
+    setEditing(!editing);
   }, [editing, editTransition, editScale, windowHeight, clearTransitionInfos]);
 
   return {

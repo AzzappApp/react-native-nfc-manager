@@ -1,6 +1,6 @@
 import { useWindowDimensions } from 'react-native';
 
-export const TRANSITIONS_DURATION = 220;
+export const TRANSITIONS_DURATION = 350;
 
 export const BUTTON_SIZE = 35;
 
