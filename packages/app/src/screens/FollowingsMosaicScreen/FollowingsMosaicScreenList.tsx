@@ -65,6 +65,7 @@ const FollowingsMosaicScreen = ({
         }
         refreshing={isLoadingPrevious}
         withShadow
+        ListHeaderComponent={<View style={styles.header} />}
         ListFooterComponent={<View style={{ height: bottom }} />}
       />
     </View>
@@ -77,7 +78,9 @@ const styles = StyleSheet.create({
   containerStyle: {
     flex: 1,
     paddingHorizontal: 4,
-    paddingTop: 10,
+  },
+  header: {
+    height: 10,
   },
 });
 
