@@ -653,6 +653,7 @@ const stylesheet = createStyleSheet(appearance => ({
   },
   deleteButton: { color: colors.red400 },
   coverStyle: {
+    overflow: 'hidden',
     ...shadow(appearance, 'bottom'),
   },
   loader: { height: 25 },
