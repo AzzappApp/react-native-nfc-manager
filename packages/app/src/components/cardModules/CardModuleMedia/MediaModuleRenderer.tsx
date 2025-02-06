@@ -83,6 +83,7 @@ const MediaModuleRenderer = ({
   scrollPosition,
   onLayout,
   colorPalette,
+  webCardViewMode,
   ...props
 }: MediaModuleRendererProps) => {
   if ((data?.cardModuleMedias?.length ?? 0) < 1) {
@@ -96,6 +97,7 @@ const MediaModuleRenderer = ({
           cardModuleMedias={data.cardModuleMedias}
           cardModuleColor={data.cardModuleColor}
           displayMode={displayMode}
+          cancelAutoPlay={webCardViewMode === 'edit'}
           {...props}
         />
       );

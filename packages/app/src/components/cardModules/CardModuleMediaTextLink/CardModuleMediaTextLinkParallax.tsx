@@ -103,7 +103,7 @@ const ParallaxItem = ({
   cardStyle?: CardStyle | null;
   dimension: CardModuleDimension;
   index: number;
-  disableParallax?: boolean;
+  disableParallax: boolean;
   setEditableItemIndex?: (index: number) => void;
   scrollPosition: Animated.Value;
   modulePosition?: number;

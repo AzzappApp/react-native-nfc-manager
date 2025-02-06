@@ -49,10 +49,15 @@ const AppearanceSliderContainer = ({
   const itemStartY =
     (modulePosition ?? 0) + offsetY + ANIMATION_DELAY_BUFFER_PIXEL;
 
-  const inViewport = useIsModuleItemInViewPort(scrollY, itemStartY, dimension);
   const [componentY, setComponentY] = useState(0);
   const [componentHeight, setComponentHeight] = useState(0);
-
+  const inViewport = useIsModuleItemInViewPort(
+    scrollY,
+    itemStartY,
+    componentHeight,
+    dimension,
+    webCardViewMode === 'edit',
+  );
   const onLayout = useCallback((event: LayoutChangeEvent) => {
     setComponentY(event.nativeEvent.layout.y);
     setComponentHeight(event.nativeEvent.layout.height);
@@ -66,6 +71,7 @@ const AppearanceSliderContainer = ({
 
   const isRunning = useRef(false);
   const hideAnimation = useRef<Animated.CompositeAnimation | null>(null);
+
   useEffect(() => {
     const itemStartY = (modulePosition ?? 0) + (parentY ?? 0) + componentY;
     const itemEndY = itemStartY + componentHeight;
@@ -169,6 +175,12 @@ const AppearanceSliderContainer = ({
     ],
   );
 
+  const imageQueuePriority = useMemo(
+    () =>
+      webCardViewMode === 'edit' ? 'normal' : inViewport ? 'high' : 'normal',
+    [inViewport, webCardViewMode],
+  );
+
   return (
     <View style={{ width: displayDimension.width }} onLayout={onLayout}>
       <Animated.View style={imageContainerStyle}>
@@ -180,6 +192,7 @@ const AppearanceSliderContainer = ({
             borderRadius: cardStyle?.borderRadius ?? 0,
             overflow: 'hidden',
           }}
+          priority={imageQueuePriority}
         />
       </Animated.View>
     </View>

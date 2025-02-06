@@ -102,7 +102,7 @@ const ParallaxItem = ({
   scrollPosition: Animated.Value;
   modulePosition?: number;
   canPlay: boolean;
-  disableParallax?: boolean;
+  disableParallax: boolean;
   displayMode: DisplayMode;
 }) => {
   const onPress = useCallback(() => {

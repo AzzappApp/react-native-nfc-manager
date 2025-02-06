@@ -29,30 +29,40 @@ const isInsideViewport = (
 const useIsModuleItemInViewPort = (
   scrollY: Animated.Value,
   itemStartY: number,
+  insidePosition: number,
   dimension: { height: number },
+  cancel: boolean,
 ) => {
-  const [isVisible, setIsVisible] = useState(
-    isInsideViewport(
-      //@ts-expect-error scrollY is a RNAnimated.Value
-      scrollY.__getValue(),
-      itemStartY,
-      dimension.height,
-    ),
-  );
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // Initial check
+    if (insidePosition > 0) {
+      setIsVisible(
+        isInsideViewport(
+          //@ts-expect-error - __getValue is private but we need it
+          scrollY.__getValue(),
+          itemStartY + insidePosition,
+          dimension.height,
+        ),
+      );
+    }
+    //react-hooks/exhaustive-deps, using it when insidePosition != 0
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [insidePosition]);
 
+  useEffect(() => {
     const listener = scrollY.addListener(({ value }) => {
-      setIsVisible(isInsideViewport(value, itemStartY, dimension.height));
+      setIsVisible(
+        isInsideViewport(value, itemStartY + insidePosition, dimension.height),
+      );
     });
 
     return () => {
       scrollY.removeListener(listener);
     };
-  }, [scrollY, itemStartY, dimension]);
+  }, [scrollY, itemStartY, dimension, insidePosition]);
 
-  return isVisible;
+  return cancel ? false : isVisible;
 };
 
 export default useIsModuleItemInViewPort;

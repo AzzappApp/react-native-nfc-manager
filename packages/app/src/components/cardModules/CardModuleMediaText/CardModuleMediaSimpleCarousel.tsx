@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
@@ -16,7 +16,10 @@ import type {
   CardModuleVariantType,
 } from '../cardModuleEditorType';
 import type { CardStyle } from '@azzapp/shared/cardHelpers';
-import type { CardModuleColor } from '@azzapp/shared/cardModuleHelpers';
+import type {
+  CardModuleColor,
+  WebCardViewMode,
+} from '@azzapp/shared/cardModuleHelpers';
 import type {
   LayoutChangeEvent,
   Animated as AnimatedNative,
@@ -70,9 +73,6 @@ const CardModuleMediaSimpleCarousel = ({
     },
   });
 
-  const keyExtractor = (item: CardModuleMedia, index: number) =>
-    `${item.media.uri}_${index}`;
-
   const lineLength = (itemWidth + cardGap) * cardModuleMedias.length - cardGap;
   const isSlidable = lineLength > dimension.width;
 
@@ -119,6 +119,7 @@ const CardModuleMediaSimpleCarousel = ({
             modulePosition={modulePosition}
             componentHeight={componentHeight}
             dimension={dimension}
+            webCardViewMode={webCardViewMode}
           />
         </CardModulePressableTool>
       );
@@ -133,6 +134,7 @@ const CardModuleMediaSimpleCarousel = ({
       modulePosition,
       componentHeight,
       dimension,
+      webCardViewMode,
     ],
   );
   const { height: screenHeight } = useScreenDimensions();
@@ -198,19 +200,10 @@ const CardModuleMediaSimpleCarousel = ({
   );
 };
 
-const SimpleCarouselItem = ({
-  cardModuleMedia,
-  cardModuleColor,
-  mediaWidth,
-  cardStyle,
-  setEditableItemIndex,
-  index,
-  canPlay,
-  scrollY,
-  modulePosition,
-  componentHeight,
-  dimension,
-}: {
+const keyExtractor = (item: CardModuleMedia, index: number) =>
+  `${item.media.uri}_${index}`;
+
+type SimpleCarouselItemProps = {
   cardModuleMedia: CardModuleMedia;
   cardModuleColor: CardModuleColor;
   cardStyle?: CardStyle | null;
@@ -225,7 +218,23 @@ const SimpleCarouselItem = ({
     height: number;
   };
   componentHeight: number;
-}) => {
+  webCardViewMode: WebCardViewMode | undefined;
+};
+
+const SimpleCarouselItemComponent = ({
+  cardModuleMedia,
+  cardModuleColor,
+  mediaWidth,
+  cardStyle,
+  setEditableItemIndex,
+  index,
+  canPlay,
+  scrollY,
+  modulePosition,
+  componentHeight,
+  dimension,
+  webCardViewMode,
+}: SimpleCarouselItemProps) => {
   const onPressItem = useCallback(() => {
     setEditableItemIndex?.(index);
   }, [index, setEditableItemIndex]);
@@ -235,8 +244,10 @@ const SimpleCarouselItem = ({
 
   const inViewport = useIsModuleItemInViewPort(
     scrollY,
-    (modulePosition ?? 0) + index * componentHeight,
+    modulePosition ?? 0,
+    index * componentHeight,
     dimension,
+    webCardViewMode === 'edit',
   );
 
   return (
@@ -260,6 +271,7 @@ const SimpleCarouselItem = ({
             borderRadius: cardStyle?.borderRadius ?? 0,
           }}
           canPlay={canPlay && inViewport}
+          priority={inViewport ? 'high' : 'normal'}
         />
         <Text variant="large" style={getTitleStyle(cardStyle, cardModuleColor)}>
           {cardModuleMedia.title}
@@ -271,8 +283,7 @@ const SimpleCarouselItem = ({
     </CardModulePressableTool>
   );
 };
-
-// const styles = StyleSheet.create({
-// });
+//item in list should be PureComponent
+const SimpleCarouselItem = memo(SimpleCarouselItemComponent);
 
 export default CardModuleMediaSimpleCarousel;

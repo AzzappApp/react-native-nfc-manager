@@ -217,8 +217,10 @@ const AlternationContainer = ({
 
   const inViewport = useIsModuleItemInViewPort(
     scrollY,
-    (modulePosition ?? 0) + index * componentHeight,
+    modulePosition ?? 0,
+    index * componentHeight,
     dimension,
+    webCardViewMode === 'edit',
   );
 
   if (!media || !children) {
@@ -260,6 +262,7 @@ const AlternationContainer = ({
             media={media}
             dimension={imageDimension}
             canPlay={canPlay && inViewport}
+            priority={inViewport ? 'high' : 'normal'}
           />
         </Animated.View>
       ) : null}
@@ -281,6 +284,7 @@ const AlternationContainer = ({
               media={media}
               dimension={imageDimension}
               canPlay={canPlay && inViewport}
+              priority={inViewport ? 'high' : 'normal'}
             />
           </Animated.View>
         </View>
