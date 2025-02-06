@@ -49,7 +49,7 @@ const WelcomeScreen = ({
 
   useEffect(() => {
     if (profilesCountRef.current === 0 && currentUser?.profiles?.length === 1) {
-      const newProfile = currentUser?.profiles[0];
+      const newProfile = currentUser.profiles[0];
       onChangeWebCard({
         profileId: newProfile.id,
         webCardId: newProfile.webCard?.id ?? null,

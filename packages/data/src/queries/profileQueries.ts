@@ -109,7 +109,15 @@ export const getProfileByUserAndWebCard = async (
  * @returns The list of profiles associated to the user
  */
 export const getProfilesByUser = async (userId: string): Promise<Profile[]> =>
-  db().select().from(ProfileTable).where(eq(ProfileTable.userId, userId));
+  db()
+    .select({ profile: ProfileTable })
+    .from(ProfileTable)
+    .innerJoin(WebCardTable, eq(WebCardTable.id, ProfileTable.webCardId))
+    .where(
+      and(eq(ProfileTable.deleted, false), eq(ProfileTable.userId, userId)),
+    )
+    .orderBy(asc(WebCardTable.userName))
+    .then(res => res.map(({ profile }) => profile));
 
 /**
  * Retrieves a user profiles list with the associated web card

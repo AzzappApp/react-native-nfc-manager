@@ -161,9 +161,7 @@ export const markUserAsDeleted = async (
       deleted: true,
     };
     await updateUser(userId, updates);
-    const userProfiles = (await getProfilesByUser(userId)).filter(
-      profile => profile.deleted === false,
-    );
+    const userProfiles = await getProfilesByUser(userId);
     await db()
       .update(ProfileTable)
       .set(updates)
