@@ -1,3 +1,7 @@
+## 1.7.1-canary.8
+
+* **fix:**  - viewPort in module ([#7322](https://github.com/AzzappApp/azzapp/pull/7322))
+
 ## 1.7.1-canary.7
 
 
