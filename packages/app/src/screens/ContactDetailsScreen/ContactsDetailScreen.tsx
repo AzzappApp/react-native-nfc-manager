@@ -82,6 +82,8 @@ const ContactDetailsScreen = ({ route }: Props) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* This View collapsable={false} is here to fix shadow issue: https://github.com/AzzappApp/azzapp/pull/7316
+        Original discussion in react-native-screens: https://github.com/software-mansion/react-native-screens/issues/2669 */}
       <View collapsable={false} style={styles.container}>
         <ContactDetailsBody
           details={contact}
