@@ -1,3 +1,7 @@
+## 1.7.1-canary.9
+
+* **fix:**  - ensure deleted profile profile are not handled in getProfilesByUser ([#7323](https://github.com/AzzappApp/azzapp/pull/7323))
+
 ## 1.7.1-canary.8
 
 * **fix:**  - viewPort in module ([#7322](https://github.com/AzzappApp/azzapp/pull/7322))
