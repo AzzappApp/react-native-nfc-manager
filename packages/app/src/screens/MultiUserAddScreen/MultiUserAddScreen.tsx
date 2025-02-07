@@ -3,6 +3,7 @@ import { useIntl } from 'react-intl';
 import { Alert, StyleSheet, View } from 'react-native';
 import { graphql, useFragment, usePreloadedQuery } from 'react-relay';
 import { useRouter } from '#components/NativeRouter';
+import { getAuthState } from '#helpers/authStore';
 import relayScreen from '#helpers/relayScreen';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
@@ -63,6 +64,48 @@ const MultiUserAddScreen = ({
         webCardData.subscription.issuer !== 'web' &&
         webCardData?.subscription?.availableSeats <= 0
       ) {
+        const { profileInfos } = getAuthState();
+
+        if (profileInfos?.profileRole === 'owner') {
+          Alert.alert(
+            intl.formatMessage({
+              defaultMessage: 'Not enough seats',
+              description:
+                'MultiUserAddScreen - Alert message title when not enough seats',
+            }),
+            intl.formatMessage({
+              defaultMessage:
+                "You don't have enough seat to invite more users. Please upgrade your subscription",
+              description:
+                'MultiUserAddScreen - Alert message content when not enough seats',
+            }),
+            [
+              {
+                text: intl.formatMessage({
+                  defaultMessage: 'Cancel',
+                  description:
+                    'Alert button to cancel upgrading a subscription to add a new user',
+                }),
+                style: 'cancel',
+                onPress: () => {
+                  router.back();
+                },
+              },
+              {
+                text: intl.formatMessage({
+                  defaultMessage: 'Upgrade',
+                  description: 'MultiUserAddScreen - Upgrade bouton action',
+                }),
+                onPress: () => {
+                  router.push({ route: 'USER_PAY_WALL' });
+                },
+              },
+            ],
+          );
+        } else {
+          ref.current?.open(contact ?? searchValue ?? '');
+        }
+      } else {
         Alert.alert(
           intl.formatMessage({
             defaultMessage: 'Not enough seats',
@@ -71,35 +114,24 @@ const MultiUserAddScreen = ({
           }),
           intl.formatMessage({
             defaultMessage:
-              "You don't have enough seat to invite more users. Please upgrade your subscription",
+              "The owner doesn't have enough seat to invite more users. Please contact the owner to upgrade the subscription",
             description:
-              'MultiUserAddScreen - Alert message content when not enough seats',
+              'MultiUserAddScreen - Alert message content when not enough seats for the owner',
           }),
           [
             {
               text: intl.formatMessage({
                 defaultMessage: 'Cancel',
                 description:
-                  'Alert button to cancel upgrading a subscription to add a new user',
+                  'Alert button to cancel inviting a new user when the owner does not have enough seats',
               }),
               style: 'cancel',
               onPress: () => {
                 router.back();
               },
             },
-            {
-              text: intl.formatMessage({
-                defaultMessage: 'Upgrade',
-                description: 'MultiUserAddScreen - Upgrade bouton action',
-              }),
-              onPress: () => {
-                router.push({ route: 'USER_PAY_WALL' });
-              },
-            },
           ],
         );
-      } else {
-        ref.current?.open(contact ?? searchValue ?? '');
       }
     },
     [
