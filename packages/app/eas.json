@@ -36,6 +36,7 @@
       "env": {
         "NEXT_PUBLIC_URL": "https://dev.azzapp.com/",
         "NEXT_PUBLIC_API_ENDPOINT": "https://dev.azzapp.com/api",
+        "NEXT_PUBLIC_USER_MGMT_URL": "https://users.dev.azzapp.com",
         "DEPLOYMENT_ENVIRONMENT": "development",
         "PURCHASE_ANDROID_KEY": "goog_vyxAfpVyZNmOdHVuuIQOBmjHevs",
         "PURCHASE_IOS_KEY": "appl_lWmNaDeIzQcECQzHakHNyLaktch",
@@ -57,6 +58,7 @@
       "env": {
         "NEXT_PUBLIC_URL": "https://staging.azzapp.com/",
         "NEXT_PUBLIC_API_ENDPOINT": "https://staging.azzapp.com/api",
+        "NEXT_PUBLIC_USER_MGMT_URL": "https://users.staging.azzapp.com",
         "DEPLOYMENT_ENVIRONMENT": "staging",
         "PURCHASE_IOS_KEY": "appl_snKjYqjvdiQjvatKGCOHyHUwXMO",
         "PURCHASE_ANDROID_KEY": "TODO",
@@ -77,6 +79,7 @@
       "env": {
         "NEXT_PUBLIC_URL": "https://www.azzapp.com/",
         "NEXT_PUBLIC_API_ENDPOINT": "https://www.azzapp.com/api",
+        "NEXT_PUBLIC_USER_MGMT_URL": "https://users.azzapp.com",
         "DEPLOYMENT_ENVIRONMENT": "production",
         "NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME": "azzapp",
         "PURCHASE_IOS_KEY": "appl_XWlrdgSwpfsScIXTNWeFxtyCqzz",

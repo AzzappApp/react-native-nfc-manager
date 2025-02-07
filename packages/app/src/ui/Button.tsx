@@ -23,6 +23,7 @@ export type ButtonProps = PressableProps & {
   appearance?: 'dark' | 'light';
   style?: StyleProp<ViewStyle>;
   loading?: boolean;
+  leftElement?: ReactNode;
   rightElement?: ReactNode;
   textStyle?: TextStyle;
 };
@@ -35,6 +36,7 @@ const Button = (
     loading,
     disabled,
     style,
+    leftElement,
     rightElement,
     textStyle,
     ...props
@@ -69,6 +71,7 @@ const Button = (
       <ActivityIndicator color={color} />
     ) : (
       <View style={variantStyles.labelContainer}>
+        {leftElement}
         <Text
           variant="button"
           style={[variantStyles.label, textStyle]}
