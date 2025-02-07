@@ -1,3 +1,7 @@
+## 1.7.1-canary.16
+
+* **feat:**  - **contactCard:** [#7264](https://github.com/AzzappApp/azzapp/pull/7264) use open ai api to read photos of business c… ([#7329](https://github.com/AzzappApp/azzapp/pull/7329))
+
 ## 1.7.1-canary.15
 
 
