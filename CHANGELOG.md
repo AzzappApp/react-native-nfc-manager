@@ -1,3 +1,7 @@
+## 1.7.1-rc.14
+
+* **feat:**  - **paywall:** [#7330](https://github.com/AzzappApp/azzapp/pull/7330) add user mgmt section ([#7336](https://github.com/AzzappApp/azzapp/pull/7336))
+
 ## 1.7.1-rc.13
 
 * **fix:**  - **android:** [#7342](https://github.com/AzzappApp/azzapp/pull/7342) don’t manage subscription on android ([#7344](https://github.com/AzzappApp/azzapp/pull/7344))
