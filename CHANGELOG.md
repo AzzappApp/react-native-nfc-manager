@@ -1,3 +1,7 @@
+## 1.7.1-canary.18
+
+* **fix:**  - use 4o-mini for affordable price
+
 ## 1.7.1-canary.17
 
 * **fix:**  - **modules:** [#6405](https://github.com/AzzappApp/azzapp/pull/6405) background continues outside module preview ([#7347](https://github.com/AzzappApp/azzapp/pull/7347))
