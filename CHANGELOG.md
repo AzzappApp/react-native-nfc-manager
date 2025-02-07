@@ -1,3 +1,7 @@
+## 1.7.1-canary.17
+
+* **fix:**  - **modules:** [#6405](https://github.com/AzzappApp/azzapp/pull/6405) background continues outside module preview ([#7347](https://github.com/AzzappApp/azzapp/pull/7347))
+
 ## 1.7.1-canary.16
 
 * **feat:**  - **contactCard:** [#7264](https://github.com/AzzappApp/azzapp/pull/7264) use open ai api to read photos of business c… ([#7329](https://github.com/AzzappApp/azzapp/pull/7329))
