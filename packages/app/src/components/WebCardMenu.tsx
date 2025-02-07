@@ -8,6 +8,7 @@ import {
   Share,
   Platform,
   Alert,
+  StyleSheet,
 } from 'react-native';
 import ShareCommand from 'react-native-share';
 import Toast from 'react-native-toast-message';
@@ -16,10 +17,9 @@ import { useDebouncedCallback } from 'use-debounce';
 import ERRORS from '@azzapp/shared/errors';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { ENABLE_MULTI_USER } from '#Config';
-import { colors, shadow } from '#theme';
+import { colors } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
-import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useQuitWebCard from '#hooks/useQuitWebCard';
 import { useSendReport } from '#hooks/useSendReport';
 import ActivityIndicator from '#ui/ActivityIndicator';
@@ -234,8 +234,6 @@ const WebCardMenu = ({
     onToggleFollow(webCard.id, webCard.userName, !isFollowing);
   }, 600);
 
-  const styles = useStyleSheet(stylesheet);
-
   const [sendReport, commitSendReportLoading] = useSendReport(
     webCard.id,
     ({ sendReport }) => {
@@ -397,13 +395,11 @@ const WebCardMenu = ({
             paddingVertical: 20,
           }}
         >
-          <View style={styles.coverStyle}>
-            <CoverRenderer
-              webCard={webCard}
-              width={windowsWith / 3}
-              canPlay={false}
-            />
-          </View>
+          <CoverRenderer
+            webCard={webCard}
+            width={windowsWith / 3}
+            canPlay={false}
+          />
         </View>
         <View style={styles.countersContainer}>
           <View style={styles.counterContainer}>
@@ -614,7 +610,7 @@ const WebCardMenu = ({
 
 export default memo(WebCardMenu);
 
-const stylesheet = createStyleSheet(appearance => ({
+const styles = StyleSheet.create({
   countersContainer: {
     flexDirection: 'row',
     columnGap: 12,
@@ -652,10 +648,6 @@ const stylesheet = createStyleSheet(appearance => ({
     columnGap: 10,
   },
   deleteButton: { color: colors.red400 },
-  coverStyle: {
-    overflow: 'hidden',
-    ...shadow(appearance, 'bottom'),
-  },
   loader: { height: 25 },
   headerBottom: { paddingLeft: 16, paddingRight: 16 },
-}));
+});
