@@ -26,6 +26,7 @@ const saveCover: MutationResolvers['saveCover'] = async (
       cardColors,
       dynamicLinks,
       coverPreviewPositionPercentage,
+      coverIsPredefined = false,
     },
   },
 ) => {
@@ -62,7 +63,7 @@ const saveCover: MutationResolvers['saveCover'] = async (
         coverDynamicLinks: dynamicLinks ?? undefined,
         coverPreviewPositionPercentage,
         coverId: createId(),
-        coverIsPredefined: false,
+        coverIsPredefined: coverIsPredefined || false,
       };
       await updateWebCard(webCard.id, updates);
       updatedWebCard = { ...updatedWebCard, ...updates };
