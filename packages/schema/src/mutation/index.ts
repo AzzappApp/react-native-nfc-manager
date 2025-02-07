@@ -13,6 +13,7 @@ import deletePost from './deletePost';
 import deletePostComment from './deletePostComment';
 import deleteUser from './deleteUser';
 import duplicateModule from './duplicateModule';
+import { extractVisitCardData } from './extractVisitCardData';
 import inviteUser from './inviteUser';
 import inviteUsersList from './inviteUsersList';
 import loadCardTemplate from './loadCardTemplate';
@@ -119,6 +120,7 @@ export const Mutation: MutationResolvers = {
   saveFCMToken,
   deleteFCMToken,
   updateContactsLastView,
+  extractVisitCardData,
   ...payment,
 };
 
