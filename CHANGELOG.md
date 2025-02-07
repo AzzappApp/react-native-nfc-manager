@@ -1,3 +1,9 @@
+## 1.7.1-rc.13
+
+* **fix:**  - **android:** [#7342](https://github.com/AzzappApp/azzapp/pull/7342) don’t manage subscription on android ([#7344](https://github.com/AzzappApp/azzapp/pull/7344))
+* **fix:**  - **cover:** [#7327](https://github.com/AzzappApp/azzapp/pull/7327) remove duplicate shadow ([#7341](https://github.com/AzzappApp/azzapp/pull/7341))
+* **fix:**  - **payment:** [#7335](https://github.com/AzzappApp/azzapp/pull/7335) only propose paywall to owners ([#7338](https://github.com/AzzappApp/azzapp/pull/7338))
+
 ## 1.7.1-rc.12
 
 
