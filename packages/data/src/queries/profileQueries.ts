@@ -324,8 +324,9 @@ export const getWebCardProfiles = async (
           WHERE webCardId = ${webCardId} 
           AND (
             ${search} IS NULL OR
-            JSON_EXTRACT(contactCard, '$.firstName') LIKE ${`%${search}%`}
-            OR JSON_EXTRACT(contactCard, '$.lastName') LIKE ${`%${search}%`}
+            LOWER(JSON_EXTRACT(contactCard, '$.firstName')) LIKE ${`%${search?.toLowerCase()}%`}
+            OR LOWER(JSON_EXTRACT(contactCard, '$.lastName')) LIKE ${`%${search?.toLowerCase()}%`}
+            OR LOWER(JSON_EXTRACT(contactCard, '$.title')) LIKE ${`%${search?.toLowerCase()}%`}
             OR User.email LIKE ${`%${search}%`}
             OR User.phoneNumber LIKE ${`%${search}%`}
           )
