@@ -1,3 +1,7 @@
+## 1.7.1-rc.15
+
+* **fix:**  - **server:** [#7351](https://github.com/AzzappApp/azzapp/pull/7351) ensure response resolvers are executed on primary ([#7352](https://github.com/AzzappApp/azzapp/pull/7352))
+
 ## 1.7.1-rc.14
 
 * **feat:**  - **paywall:** [#7330](https://github.com/AzzappApp/azzapp/pull/7330) add user mgmt section ([#7336](https://github.com/AzzappApp/azzapp/pull/7336))
