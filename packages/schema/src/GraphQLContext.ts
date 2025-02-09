@@ -1,5 +1,4 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
-import { runWithPrimary } from '@azzapp/data/src/database/database';
 import type * as externalsFunctions from './externals';
 import type { Locale } from '@azzapp/i18n';
 import type { IMiddleware } from 'graphql-middleware';
@@ -72,18 +71,6 @@ export const resetSessionResourceAfterMutationMiddleware: IMiddleware = async (
     delete context[sessionMemoizedSymbol];
   }
   return result;
-};
-
-export const runOnPrimaryMiddleware: IMiddleware = async (
-  resolve,
-  parent,
-  args,
-  context,
-  info,
-) => {
-  if (info.parentType.name === 'Mutation') {
-    return runWithPrimary(() => resolve(parent, args, context, info));
-  } else return resolve(parent, args, context, info);
 };
 
 export const externalFunction =

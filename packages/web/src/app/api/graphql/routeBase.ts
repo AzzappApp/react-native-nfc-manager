@@ -11,12 +11,14 @@ import { maxAliasesPlugin } from '@escape.tech/graphql-armor-max-aliases';
 import { maxTokensPlugin } from '@escape.tech/graphql-armor-max-tokens';
 import { useDisableIntrospection } from '@graphql-yoga/plugin-disable-introspection';
 import { usePersistedOperations } from '@graphql-yoga/plugin-persisted-operations';
+import { Kind, OperationTypeNode, type GraphQLError } from 'graphql';
 import { createYoga } from 'graphql-yoga';
 import { compare } from 'semver';
 import {
   getDatabaseConnectionsInfos,
   startDatabaseConnectionMonitoring,
 } from '@azzapp/data';
+import { runWithPrimary } from '@azzapp/data/src/database/database';
 import { DEFAULT_LOCALE, type Locale } from '@azzapp/i18n';
 import { schema, type GraphQLContext } from '@azzapp/schema';
 import ERRORS from '@azzapp/shared/errors';
@@ -29,7 +31,6 @@ import { withPluginsRoute } from '#helpers/queries';
 import { notifyUsers } from '#helpers/sendMessages';
 import { getSessionData } from '#helpers/tokens';
 import packageJSON from '../../../../package.json';
-import type { GraphQLError } from 'graphql';
 import type { LogLevel, Plugin as YogaPlugin } from 'graphql-yoga';
 
 const LAST_SUPPORTED_APP_VERSION =
@@ -110,6 +111,25 @@ const getLoggingLevel = () => {
   }
 
   return process.env.NODE_ENV !== 'production' ? 'debug' : 'error';
+};
+
+/**
+ * Middleware to check if the request is a mutation and run it on the primary database
+ */
+const runOnPrimaryPlugin: YogaPlugin = {
+  onExecute({ args, setExecuteFn, executeFn }) {
+    const operationDefinition = args.document.definitions.find(
+      (definition: { kind: 'OperationDefinition' }) =>
+        definition.kind === Kind.OPERATION_DEFINITION,
+    );
+
+    if (
+      operationDefinition &&
+      operationDefinition.operation === OperationTypeNode.MUTATION
+    ) {
+      setExecuteFn(() => runWithPrimary(() => executeFn(args)));
+    }
+  },
 };
 
 const { handleRequest } = createYoga({
@@ -244,6 +264,7 @@ const { handleRequest } = createYoga({
       includeRawResult: false,
       includeExecuteVariables: true,
     }),
+    runOnPrimaryPlugin,
   ],
 });
 
