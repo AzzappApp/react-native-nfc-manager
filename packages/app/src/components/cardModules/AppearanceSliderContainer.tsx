@@ -76,6 +76,22 @@ const AppearanceSliderContainer = ({
     const itemStartY = (modulePosition ?? 0) + (parentY ?? 0) + componentY;
     const itemEndY = itemStartY + componentHeight;
     const viewportHeight = dimension.height;
+    Animated.parallel([
+      Animated.timing(translateY, {
+        toValue: 0,
+        duration: ANIMATION_DURATION,
+        useNativeDriver: true,
+      }),
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 500, //different than animation duration, tested with upmitt, submit to changes
+        useNativeDriver: true,
+      }),
+    ]).start(({ finished }) => {
+      if (finished) {
+        isRunning.current = false;
+      }
+    });
     const listener = scrollY.addListener(({ value }) => {
       if (
         value + viewportHeight - ANIMATION_DELAY_BUFFER_PIXEL >= itemStartY &&
