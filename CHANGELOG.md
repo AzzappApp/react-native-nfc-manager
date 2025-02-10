@@ -1,3 +1,7 @@
+## 1.7.1-rc.17
+
+* **fix:**  - updating expo-file-system avoid error accessing file locally cache ([#7382](https://github.com/AzzappApp/azzapp/pull/7382))
+
 ## 1.7.1-rc.16
 
 * **fix:**  - **modules:** [#7356](https://github.com/AzzappApp/azzapp/pull/7356) use new shadow on modules ([#7362](https://github.com/AzzappApp/azzapp/pull/7362))
