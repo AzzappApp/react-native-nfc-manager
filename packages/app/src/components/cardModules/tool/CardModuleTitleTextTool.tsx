@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Dimensions, StyleSheet } from 'react-native';
-import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
+import { StyleSheet, View } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 import { colors } from '#theme';
 import ToolBoxSection from '#components/Toolbar/ToolBoxSection';
 import useBoolean from '#hooks/useBoolean';
@@ -58,7 +58,7 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
     });
     close();
   };
-
+  console.log(module.moduleKind);
   const { top: topInset } = useScreenInsets();
 
   return (
@@ -104,7 +104,7 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
             </TouchableOpacity>
           }
         />
-        <ScrollView style={styles.container} bounces={false}>
+        <View style={styles.container}>
           <Text variant="button" style={{ paddingTop: 10, paddingBottom: 5 }}>
             <FormattedMessage
               defaultMessage="Title & text"
@@ -132,14 +132,13 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
             onChangeText={setText}
             style={styles.textStyle}
           />
-        </ScrollView>
+        </View>
       </BottomSheetModal>
     </>
   );
 };
 
 export default CardModuleMediaTextTool;
-const { height } = Dimensions.get('screen');
 
 const styles = StyleSheet.create({
   doneButton: {
@@ -156,12 +155,13 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 16,
     overflow: 'visible',
+    flex: 1,
   },
   header: { zIndex: 300, height: HEADER_HEIGHT + 15 },
   titleStyle: { borderWidth: 0, height: 60 },
   textStyle: {
     borderWidth: 0,
-    height: height - 260,
+    flex: 1,
     marginTop: 10,
     verticalAlign: 'top',
   },

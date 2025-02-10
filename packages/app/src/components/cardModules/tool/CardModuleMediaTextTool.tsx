@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Keyboard, Platform, StyleSheet, View } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
 import { isNotFalsyString, isValidUrl } from '@azzapp/shared/stringHelpers';
 import { MediaImageRenderer } from '#components/medias';
 import ToolBoxSection from '#components/Toolbar/ToolBoxSection';
@@ -135,7 +134,7 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
           module.moduleKind === 'mediaTextLink' ? 'fillParent' : 'interactive'
         }
       >
-        <ScrollView style={styles.container} bounces={false}>
+        <View style={styles.container}>
           <Header
             middleElement={
               module.moduleKind === 'mediaText'
@@ -262,7 +261,7 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
               />
             </>
           )}
-        </ScrollView>
+        </View>
       </BottomSheetModal>
     </>
   );
@@ -292,13 +291,14 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 16,
     overflow: 'visible',
+    flex: 1,
   },
   header: { marginBottom: 15 },
   textAction: { paddingTop: 10, paddingBottom: 5 },
   titleStyle: { borderWidth: 0, height: 50 },
   textStyle: {
     borderWidth: 0,
-    height: 200,
+    flex: 1,
     marginTop: 10,
     verticalAlign: 'top',
   },
