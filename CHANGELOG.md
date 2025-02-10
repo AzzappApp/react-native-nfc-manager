@@ -1,3 +1,8 @@
+## 1.7.1-rc.18
+
+* **fix:**  - **accountDetails:** [#7358](https://github.com/AzzappApp/azzapp/pull/7358) wrong shadow on InputAccessoryView on android (missing) and iOS (visible at the bottom) ([#7364](https://github.com/AzzappApp/azzapp/pull/7364))
+* **fix:**  - **simpleCarousel:** [#7363](https://github.com/AzzappApp/azzapp/pull/7363) properly deal with canPlay flag ([#7381](https://github.com/AzzappApp/azzapp/pull/7381))
+
 ## 1.7.1-rc.17
 
 * **fix:**  - updating expo-file-system avoid error accessing file locally cache ([#7382](https://github.com/AzzappApp/azzapp/pull/7382))
