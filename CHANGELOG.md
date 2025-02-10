@@ -1,3 +1,7 @@
+## 1.7.1-rc.16
+
+* **fix:**  - **modules:** [#7356](https://github.com/AzzappApp/azzapp/pull/7356) use new shadow on modules ([#7362](https://github.com/AzzappApp/azzapp/pull/7362))
+
 ## 1.7.1-rc.15
 
 * **fix:**  - **server:** [#7351](https://github.com/AzzappApp/azzapp/pull/7351) ensure response resolvers are executed on primary ([#7352](https://github.com/AzzappApp/azzapp/pull/7352))
