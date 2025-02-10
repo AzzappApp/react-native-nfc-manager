@@ -105,7 +105,7 @@ const styleSheet = createStyleSheet(appearance => ({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 24,
-    ...shadow(appearance, 'center'),
+    ...shadow(appearance, 'center', false),
   },
 }));
 
