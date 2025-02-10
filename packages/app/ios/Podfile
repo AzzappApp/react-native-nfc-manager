@@ -30,7 +30,6 @@ setup_permissions([
 ])  
 $RNFirebaseAsStaticFramework = true
 $RNFirebaseAnalyticsEnableAdSupport = true # enable Firebase Analytics to generate automatic audience metrics for iOS 
-$RNFirebaseAnalyticsWithoutAdIdSupport = true
 linkage = ENV['USE_FRAMEWORKS']
 if linkage != nil
   Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
