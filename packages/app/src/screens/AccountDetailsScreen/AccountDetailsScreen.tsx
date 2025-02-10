@@ -275,21 +275,21 @@ const AccountDetailsScreen = ({
             />
           </Text>
         </PressableNative>
-        <AccountDetailsEmailForm
-          currentUser={currentUser}
-          visible={emailsFormVisible}
-          toggleBottomSheet={toggleEmailsFormVisible}
-        />
-        <AccountDetailsPhoneNumberForm
-          currentUser={currentUser}
-          visible={phoneNumberFormVisible}
-          toggleBottomSheet={togglePhoneNumberFormVisible}
-        />
-        <AccountDetailsPasswordForm
-          visible={passwordVisible}
-          toggleBottomSheet={togglePasswordVisible}
-        />
       </SafeAreaView>
+      <AccountDetailsEmailForm
+        currentUser={currentUser}
+        visible={emailsFormVisible}
+        toggleBottomSheet={toggleEmailsFormVisible}
+      />
+      <AccountDetailsPhoneNumberForm
+        currentUser={currentUser}
+        visible={phoneNumberFormVisible}
+        toggleBottomSheet={togglePhoneNumberFormVisible}
+      />
+      <AccountDetailsPasswordForm
+        visible={passwordVisible}
+        toggleBottomSheet={togglePasswordVisible}
+      />
     </Container>
   );
 };

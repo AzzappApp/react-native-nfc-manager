@@ -2,6 +2,7 @@ import { TouchableWithoutFeedback, View } from 'react-native';
 import { KeyboardStickyView } from 'react-native-keyboard-controller';
 import { colors, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import useScreenInsets from '#hooks/useScreenInsets';
 import type { StyleProp, ViewStyle } from 'react-native';
 
 type InputAccessoryViewProps = {
@@ -19,6 +20,8 @@ const InputAccessoryView = ({
 }: InputAccessoryViewProps) => {
   const styles = useStyleSheet(styleSheet);
 
+  const insets = useScreenInsets();
+
   if (!visible) {
     return null;
   }
@@ -28,7 +31,10 @@ const InputAccessoryView = ({
       <TouchableWithoutFeedback onPress={onClose} style={styles.overlay}>
         <View style={styles.overlay} />
       </TouchableWithoutFeedback>
-      <KeyboardStickyView style={styles.modalContainer}>
+      <KeyboardStickyView
+        style={styles.modalContainer}
+        offset={{ opened: insets.bottom }}
+      >
         {children}
       </KeyboardStickyView>
     </View>
@@ -44,6 +50,7 @@ const styleSheet = createStyleSheet(appearance => ({
     bottom: 0,
     width: '100%',
     height: '100%',
+    zIndex: 1,
   },
   overlay: {
     flex: 1,
