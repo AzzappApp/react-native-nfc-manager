@@ -11,6 +11,7 @@ jest.mock('#helpers/globalEvents');
 jest.mock('react-native-keychain', () => ({
   setSharedWebCredentials: jest.fn().mockResolvedValue(true),
 }));
+jest.mock('#ui/SelectList');
 
 describe('Signin Screen', () => {
   const signinMock = jest.mocked(signin);

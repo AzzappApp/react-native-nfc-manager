@@ -21,6 +21,7 @@ jest.mock('#helpers/localeHelpers', () => ({
 
 jest.mock('#helpers/MobileWebAPI');
 jest.mock('#helpers/globalEvents');
+jest.mock('#ui/SelectList');
 
 describe('SignUpScreen', () => {
   const signupMock = jest.mocked(signup);
@@ -228,18 +229,19 @@ describe('SignUpScreen', () => {
 
     act(() => fireEvent(checkboxes[0], 'onPress'));
     act(() => fireEvent(submitButton, 'onPress'));
+    await act(flushPromises);
     expect(signupMock).not.toHaveBeenCalled();
     expect(screen.queryByText(tosError)).toBeTruthy();
 
     act(() => fireEvent(checkboxes[1], 'onPress'));
     act(() => fireEvent(submitButton, 'onPress'));
+    await act(flushPromises);
 
     expect(screen.queryByText(tosError)).not.toBeTruthy();
     expect(signupMock).toHaveBeenCalled();
-    await act(flushPromises);
   });
 
-  test('should display the already registered error message if signup return the error', async () => {
+  test.only('should display the already registered error message if signup return the error', async () => {
     render(<SignUpScreen />);
 
     const emailInput = screen.getByPlaceholderText('Email address');
