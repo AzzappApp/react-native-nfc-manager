@@ -1,6 +1,7 @@
 import ERRORS from '@azzapp/shared/errors';
 import { flushPromises } from '@azzapp/shared/jestHelpers';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
+import { init as initLocaleHelpers } from '#helpers/localeHelpers';
 import { signin } from '#helpers/MobileWebAPI';
 import { act, fireEvent, render, screen } from '#helpers/testHelpers';
 import SignInScreen from '../SignInScreen';
@@ -14,6 +15,10 @@ jest.mock('react-native-keychain', () => ({
 describe('Signin Screen', () => {
   const signinMock = jest.mocked(signin);
   const dispatchGlobalEventMock = jest.mocked(dispatchGlobalEvent);
+
+  beforeAll(() => {
+    initLocaleHelpers();
+  });
 
   beforeEach(() => {
     signinMock.mockReset();

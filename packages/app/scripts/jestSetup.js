@@ -1,4 +1,7 @@
 const { jest } = require('@jest/globals');
+const { Platform } = require('react-native');
+
+process.env.EXPO_OS = Platform.OS;
 
 //#region Expect Extensions
 require('@testing-library/jest-native/extend-expect');

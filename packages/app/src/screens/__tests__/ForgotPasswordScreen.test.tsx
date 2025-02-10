@@ -1,3 +1,4 @@
+import { init as initLocaleHelpers } from '#helpers/localeHelpers';
 import { forgotPassword } from '#helpers/MobileWebAPI';
 import { fireEvent, render, act, waitFor } from '#helpers/testHelpers';
 import ForgotPasswordScreen from '../ForgotPasswordScreen';
@@ -8,9 +9,14 @@ jest.mock('#helpers/MobileWebAPI', () => ({
 
 describe('ForgotPassword Screen', () => {
   const forgotPasswordMock = jest.mocked(forgotPassword);
+  beforeAll(() => {
+    initLocaleHelpers();
+  });
+
   beforeEach(() => {
     forgotPasswordMock.mockReset();
   });
+
   afterEach(() => {
     jest.clearAllMocks();
     jest.useRealTimers();

@@ -1,5 +1,6 @@
 import { RelayEnvironmentProvider } from 'react-relay';
 import { createMockEnvironment } from 'relay-test-utils';
+import { init as initLocaleHelpers } from '#helpers/localeHelpers';
 import { requestUpdateContact } from '#helpers/MobileWebAPI';
 import { screen, render, fireEvent, act, waitFor } from '#helpers/testHelpers';
 import AccountDetailsPhoneNumberForm from '../AccountDetailsPhoneNumberForm';
@@ -8,6 +9,10 @@ jest.mock('#helpers/MobileWebAPI');
 
 describe('AccountDetailsPhoneNumberForm', () => {
   const requestUpdateContactMock = jest.mocked(requestUpdateContact);
+
+  beforeAll(() => {
+    initLocaleHelpers();
+  });
 
   beforeEach(() => {
     requestUpdateContactMock.mockReset();
