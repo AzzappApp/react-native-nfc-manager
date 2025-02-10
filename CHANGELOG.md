@@ -1,3 +1,7 @@
+## 1.7.1-rc.19
+
+* **feat:**  - analytics[staging] ([#7346](https://github.com/AzzappApp/azzapp/pull/7346))
+
 ## 1.7.1-rc.18
 
 * **fix:**  - **accountDetails:** [#7358](https://github.com/AzzappApp/azzapp/pull/7358) wrong shadow on InputAccessoryView on android (missing) and iOS (visible at the bottom) ([#7364](https://github.com/AzzappApp/azzapp/pull/7364))
