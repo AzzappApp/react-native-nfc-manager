@@ -1,3 +1,7 @@
+## 1.7.1-canary.20
+
+* **fix:**  - **multiUser:** [#7348](https://github.com/AzzappApp/azzapp/pull/7348) add missing env var in github action ([#7355](https://github.com/AzzappApp/azzapp/pull/7355))
+
 ## 1.7.1-canary.19
 
 
