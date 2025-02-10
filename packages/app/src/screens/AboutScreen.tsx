@@ -23,7 +23,6 @@ const AboutScreen = () => {
       style={{
         flex: 1,
         rowGap: 20,
-        paddingTop: insets.top,
         paddingBottom: insets.bottom,
       }}
     >

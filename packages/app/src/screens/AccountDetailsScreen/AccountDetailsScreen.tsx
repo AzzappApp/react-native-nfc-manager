@@ -14,7 +14,6 @@ import useToggle from '#hooks/useToggle';
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
-import SafeAreaView from '#ui/SafeAreaView';
 import Text from '#ui/Text';
 import AccountDetailsEmailForm from './AccountDetailsEmailForm';
 import AccountDetailsHeader from './AccountDetailsHeader';
@@ -139,13 +138,8 @@ const AccountDetailsScreen = ({
 
   return (
     <Container style={{ flex: 1 }}>
-      <SafeAreaView
-        style={{
-          flex: 1,
-          rowGap: 15,
-        }}
-      >
-        <AccountDetailsHeader />
+      <AccountDetailsHeader />
+      <View style={styles.content}>
         <Icon icon="information" style={styles.warningIcon} />
         <View style={{ rowGap: 20, paddingHorizontal: 10 }}>
           <Text variant="xsmall" style={styles.warningMessage}>
@@ -275,7 +269,7 @@ const AccountDetailsScreen = ({
             />
           </Text>
         </PressableNative>
-      </SafeAreaView>
+      </View>
       <AccountDetailsEmailForm
         currentUser={currentUser}
         visible={emailsFormVisible}
@@ -295,6 +289,7 @@ const AccountDetailsScreen = ({
 };
 
 const styleSheet = createStyleSheet(appearance => ({
+  content: { flex: 1, rowGap: 15 },
   warningIcon: { width: 50, height: 50, alignSelf: 'center' },
   warningMessage: { width: 255, textAlign: 'center', alignSelf: 'center' },
   section: {

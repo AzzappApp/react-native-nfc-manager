@@ -33,7 +33,6 @@ import Icon from '#ui/Icon';
 import LoadingView from '#ui/LoadingView';
 import PressableAnimated from '#ui/PressableAnimated';
 import PressableNative from '#ui/PressableNative';
-import SafeAreaView from '#ui/SafeAreaView';
 import Text from '#ui/Text';
 import SignaturePreview from './SignaturePreview';
 import type { RelayScreenProps } from '#helpers/relayScreen';
@@ -111,7 +110,7 @@ export const ContactCardScreen = ({
     alignSelf: 'center', //styles are intentionally put here to fix an issue with the fullscreen card that was not fully tappable on android
     zIndex: 10,
     paddingHorizontal: 20,
-    paddingTop: 10,
+    paddingTop: interpolate(sharedRotationState.value, [0, 1], [0, 10]),
     paddingBottom: interpolate(sharedRotationState.value, [0, 1], [20, 10]),
     transform: [
       {
@@ -210,7 +209,7 @@ export const ContactCardScreen = ({
 
   return (
     <Container style={{ flex: 1 }}>
-      <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
         <Animated.View style={headerStyle}>
           <ContactCardScreenHeader webCard={webCard} />
         </Animated.View>
@@ -336,7 +335,7 @@ export const ContactCardScreen = ({
             </View>
           </ScrollView>
         </Animated.View>
-      </SafeAreaView>
+      </View>
     </Container>
   );
 };
@@ -366,10 +365,8 @@ const ContactCardScreenHeader = ({
 
 const ContactCardScreenFallback = () => (
   <Container style={{ flex: 1 }}>
-    <SafeAreaView style={{ flex: 1 }}>
-      <ContactCardScreenHeader webCard={null} />
-      <LoadingView />
-    </SafeAreaView>
+    <ContactCardScreenHeader webCard={null} />
+    <LoadingView />
   </Container>
 );
 

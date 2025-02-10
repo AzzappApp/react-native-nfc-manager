@@ -1,21 +1,26 @@
 import { useIntl } from 'react-intl';
+import { StyleSheet } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
-import Header from '#ui/Header';
+import useScreenInsets from '#hooks/useScreenInsets';
+import Header, { HEADER_HEIGHT } from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import CoverRenderer from './CoverRenderer';
 import { useRouter } from './NativeRouter';
 import type { AccountHeader_webCard$key } from '#relayArtifacts/AccountHeader_webCard.graphql';
+import type { IconButtonProps } from '#ui/IconButton';
 
 const COVER_WIDTH = 29;
 
 const AccountHeader = ({
   webCard: webCardKey,
   title,
+  leftIcon = 'arrow_left',
 }: {
   webCard: AccountHeader_webCard$key | null;
   title: React.ReactNode;
+  leftIcon?: IconButtonProps['icon'];
 }) => {
   const webCard = useFragment(
     graphql`
@@ -31,13 +36,15 @@ const AccountHeader = ({
 
   const router = useRouter();
 
+  const insets = useScreenInsets();
+
   const intl = useIntl();
 
   return (
     <Header
       leftElement={
         <IconButton
-          icon="arrow_left"
+          icon={leftIcon}
           onPress={router.back}
           iconSize={28}
           variant="icon"
@@ -58,8 +65,24 @@ const AccountHeader = ({
           </PressableNative>
         )
       }
+      style={[
+        styles.header,
+        {
+          paddingTop: insets.top,
+          height: HEADER_HEIGHT + insets.top + HEADER_PADDING_BOTTOM,
+        },
+      ]}
     />
   );
 };
+
+const HEADER_PADDING_BOTTOM = 15;
+
+const styles = StyleSheet.create({
+  header: {
+    paddingBottom: HEADER_PADDING_BOTTOM,
+    zIndex: 1,
+  },
+});
 
 export default AccountHeader;

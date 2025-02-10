@@ -4,16 +4,12 @@ import { View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { colors } from '#theme';
-import CoverRenderer from '#components/CoverRenderer';
-import { useRouter } from '#components/NativeRouter';
+import AccountHeader from '#components/AccountHeader';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import relayScreen from '#helpers/relayScreen';
 import Container from '#ui/Container';
-import Header from '#ui/Header';
-import Icon from '#ui/Icon';
-import PressableNative from '#ui/PressableNative';
+import LoadingView from '#ui/LoadingView';
 import RoundedMenuComponent from '#ui/RoundedMenuComponent';
-import SafeAreaView from '#ui/SafeAreaView';
 import SearchBarStatic from '#ui/SearchBarStatic';
 import Text from '#ui/Text';
 
@@ -29,6 +25,7 @@ const contactsScreenQuery = graphql`
         ...ContactsScreenLists_contacts
         webCard {
           ...CoverRenderer_webCard
+          ...AccountHeader_webCard
         }
       }
     }
@@ -42,7 +39,6 @@ const ContactsScreen = ({
 }) => {
   const { profile } = usePreloadedQuery(contactsScreenQuery, preloadedQuery);
 
-  const router = useRouter();
   const styles = useStyleSheet(stylesheet);
 
   const [searchBy, setSearchBy] = useState<'date' | 'name'>('date');
@@ -53,9 +49,11 @@ const ContactsScreen = ({
 
   return (
     <Container style={styles.container}>
-      <SafeAreaView style={styles.container}>
-        <Header
-          middleElement={
+      {profile?.webCard && (
+        <AccountHeader
+          leftIcon="close"
+          webCard={profile?.webCard}
+          title={
             <Text variant="large">
               <FormattedMessage
                 description="ContactsScreen - Title"
@@ -68,69 +66,52 @@ const ContactsScreen = ({
               />
             </Text>
           }
-          leftElement={
-            <PressableNative onPress={router.back}>
-              <Icon icon="close" />
-            </PressableNative>
-          }
-          rightElement={
-            <PressableNative
-              onPress={router.back}
-              accessibilityRole="link"
-              accessibilityLabel={intl.formatMessage({
-                defaultMessage: 'Go back',
-                description: 'Go back button in Contact screen',
-              })}
-            >
-              <CoverRenderer width={30} webCard={profile?.webCard} />
-            </PressableNative>
-          }
         />
-        <View style={styles.menu}>
-          <RoundedMenuComponent
-            selected={searchBy === 'date'}
-            label={intl.formatMessage({
-              defaultMessage: 'Date',
-              description: 'Date selector label in ContactsScreen',
-            })}
-            id="date"
-            onSelect={() => setSearchBy('date')}
-          />
-          <RoundedMenuComponent
-            selected={searchBy === 'name'}
-            label={intl.formatMessage({
-              defaultMessage: 'Name',
-              description: 'Name selector label in ContactsScreen',
-            })}
-            id="name"
-            onSelect={() => setSearchBy('name')}
-          />
-          {/* <RoundedMenuComponent
+      )}
+      <View style={styles.menu}>
+        <RoundedMenuComponent
+          selected={searchBy === 'date'}
+          label={intl.formatMessage({
+            defaultMessage: 'Date',
+            description: 'Date selector label in ContactsScreen',
+          })}
+          id="date"
+          onSelect={() => setSearchBy('date')}
+        />
+        <RoundedMenuComponent
+          selected={searchBy === 'name'}
+          label={intl.formatMessage({
+            defaultMessage: 'Name',
+            description: 'Name selector label in ContactsScreen',
+          })}
+          id="name"
+          onSelect={() => setSearchBy('name')}
+        />
+        {/* <RoundedMenuComponent
             selected={searchBy === 'location'}
             label={'Location'}
             id={'location'}
             onSelect={() => setSearchBy('location')}
           /> */}
-        </View>
-        <SearchBarStatic
-          style={styles.search}
-          value={search}
-          placeholder={intl.formatMessage({
-            defaultMessage: 'Search for name, company...',
-            description: 'Search placeholder in ContactsScreen',
-          })}
-          onChangeText={e => setSearch(e ?? '')}
-        />
-        <Suspense>
-          {profile && (
-            <ContactScreenLists
-              search={debounceSearch}
-              searchBy={searchBy}
-              profile={profile}
-            />
-          )}
-        </Suspense>
-      </SafeAreaView>
+      </View>
+      <SearchBarStatic
+        style={styles.search}
+        value={search}
+        placeholder={intl.formatMessage({
+          defaultMessage: 'Search for name, company...',
+          description: 'Search placeholder in ContactsScreen',
+        })}
+        onChangeText={e => setSearch(e ?? '')}
+      />
+      <Suspense>
+        {profile && (
+          <ContactScreenLists
+            search={debounceSearch}
+            searchBy={searchBy}
+            profile={profile}
+          />
+        )}
+      </Suspense>
     </Container>
   );
 };
@@ -186,9 +167,17 @@ const stylesheet = createStyleSheet(theme => ({
   },
 }));
 
+const ContactsScreenFallback = () => (
+  <Container style={{ flex: 1 }}>
+    <AccountHeader leftIcon="close" title="" webCard={null} />
+    <LoadingView />
+  </Container>
+);
+
 export default relayScreen(ContactsScreen, {
   query: contactsScreenQuery,
   getVariables: (_, profileInfos) => ({
     profileId: profileInfos?.profileId ?? '',
   }),
+  fallback: ContactsScreenFallback,
 });

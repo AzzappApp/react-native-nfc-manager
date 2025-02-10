@@ -112,8 +112,8 @@ export const shadow = (
           {
             offsetX: 0,
             offsetY:
-              direction === 'bottom' ? 10 : direction === 'center' ? 0 : -10,
-            blurRadius: '20',
+              direction === 'bottom' ? 5 : direction === 'center' ? 0 : -5,
+            blurRadius: '10',
             spreadDistance: '0',
             color: `rgba(0, 0, 0, ${appearence === 'dark' ? 0.4 : 0.2})`,
           },
