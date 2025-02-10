@@ -1,10 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { View } from 'react-native';
+import { FlatList, View, Animated as AnimatedNative } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, {
-  useAnimatedScrollHandler,
-  useSharedValue,
-} from 'react-native-reanimated';
 import { getTextStyle, getTitleStyle } from '#helpers/cardModuleHelpers';
 import useIsModuleItemInViewPort from '#hooks/useIsModuleItemInViewPort';
 import useScreenDimensions from '#hooks/useScreenDimensions';
@@ -17,10 +13,7 @@ import type {
 } from '../cardModuleEditorType';
 import type { CardStyle } from '@azzapp/shared/cardHelpers';
 import type { CardModuleColor } from '@azzapp/shared/cardModuleHelpers';
-import type {
-  LayoutChangeEvent,
-  Animated as AnimatedNative,
-} from 'react-native';
+import type { LayoutChangeEvent, NativeScrollEvent } from 'react-native';
 
 type CardModuleMediaSimpleCarouselProps = CardModuleVariantType & {
   cardModuleMedias: CardModuleMedia[];
@@ -40,6 +33,7 @@ const CardModuleMediaSimpleCarousel = ({
   webCardViewMode,
   scrollPosition,
   modulePosition,
+  moduleEditing,
 }: CardModuleMediaSimpleCarouselProps) => {
   if (!scrollPosition) {
     throw new Error(
@@ -48,27 +42,26 @@ const CardModuleMediaSimpleCarousel = ({
   }
   const screenDimension = useScreenDimensions();
   const dimension = providedDimension ?? screenDimension;
-  const [componentHeight, setComponentHeight] = useState(0);
-
-  const onLayoutInner = (event: LayoutChangeEvent) => {
-    setComponentHeight(event.nativeEvent.layout.height);
-    onLayout?.(event);
-  };
 
   const cardGap = Math.max(10, cardStyle?.gap || 0);
 
   const nativeGesture = Gesture.Native();
-  const listRef = useRef<Animated.FlatList<CardModuleMedia>>(null);
   const itemWidth = Math.min((dimension.width * 70) / 100, 400);
 
-  const scrollIndex = useSharedValue(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const scrollX = useRef(new AnimatedNative.Value(0)).current;
 
-  const scrollHandler = useAnimatedScrollHandler({
-    onScroll: event => {
-      const index = event.contentOffset.x / (itemWidth + cardGap);
-      scrollIndex.value = index;
+  const handleScroll = AnimatedNative.event<NativeScrollEvent>(
+    [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+    {
+      useNativeDriver: false,
+      listener: event => {
+        const offsetX = event.nativeEvent.contentOffset.x;
+        const index = Math.round(offsetX / itemWidth); // Calculate index
+        setCurrentIndex(index);
+      },
     },
-  });
+  );
 
   const keyExtractor = (item: CardModuleMedia, index: number) =>
     `${item.media.uri}_${index}`;
@@ -114,10 +107,10 @@ const CardModuleMediaSimpleCarousel = ({
             cardStyle={cardStyle}
             setEditableItemIndex={setEditableItemIndex}
             index={index}
-            canPlay={canPlay}
+            canPlay={canPlay && (moduleEditing || currentIndex === index)}
+            paused={currentIndex !== index}
             scrollY={scrollPosition}
             modulePosition={modulePosition}
-            componentHeight={componentHeight}
             dimension={dimension}
           />
         </CardModulePressableTool>
@@ -129,9 +122,10 @@ const CardModuleMediaSimpleCarousel = ({
       itemWidth,
       cardStyle,
       canPlay,
+      moduleEditing,
+      currentIndex,
       scrollPosition,
       modulePosition,
-      componentHeight,
       dimension,
     ],
   );
@@ -139,7 +133,7 @@ const CardModuleMediaSimpleCarousel = ({
 
   return (
     <View
-      onLayout={onLayoutInner}
+      onLayout={onLayout}
       style={[
         {
           backgroundColor: cardModuleColor.background,
@@ -155,8 +149,7 @@ const CardModuleMediaSimpleCarousel = ({
     >
       <GestureDetector gesture={nativeGesture}>
         {isSlidable ? (
-          <Animated.FlatList
-            ref={listRef}
+          <FlatList
             data={cardModuleMedias}
             renderItem={renderItem}
             keyExtractor={keyExtractor}
@@ -165,7 +158,7 @@ const CardModuleMediaSimpleCarousel = ({
             snapToAlignment="start"
             snapToInterval={itemWidth + cardGap}
             showsHorizontalScrollIndicator={false}
-            onScroll={scrollHandler}
+            onScroll={handleScroll}
             scrollEventThrottle={16}
             getItemLayout={getItemLayout}
             contentContainerStyle={ccstyle}
@@ -208,7 +201,7 @@ const SimpleCarouselItem = ({
   canPlay,
   scrollY,
   modulePosition,
-  componentHeight,
+  paused,
   dimension,
 }: {
   cardModuleMedia: CardModuleMedia;
@@ -217,6 +210,7 @@ const SimpleCarouselItem = ({
   setEditableItemIndex?: (index: number) => void;
   index: number;
   canPlay: boolean;
+  paused: boolean;
   mediaWidth: number;
   scrollY: AnimatedNative.Value;
   modulePosition?: number;
@@ -224,7 +218,6 @@ const SimpleCarouselItem = ({
     width: number;
     height: number;
   };
-  componentHeight: number;
 }) => {
   const onPressItem = useCallback(() => {
     setEditableItemIndex?.(index);
@@ -235,7 +228,7 @@ const SimpleCarouselItem = ({
 
   const inViewport = useIsModuleItemInViewPort(
     scrollY,
-    (modulePosition ?? 0) + index * componentHeight,
+    modulePosition ?? 0, // media are displayed horizontally
     dimension,
   );
 
@@ -260,6 +253,7 @@ const SimpleCarouselItem = ({
             borderRadius: cardStyle?.borderRadius ?? 0,
           }}
           canPlay={canPlay && inViewport}
+          paused={paused}
         />
         <Text variant="large" style={getTitleStyle(cardStyle, cardModuleColor)}>
           {cardModuleMedia.title}

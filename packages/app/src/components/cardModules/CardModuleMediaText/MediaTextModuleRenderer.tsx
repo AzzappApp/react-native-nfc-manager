@@ -86,6 +86,7 @@ const MediaTextModuleRenderer = ({
   scrollPosition,
   colorPalette,
   displayMode,
+  moduleEditing = false,
   ...props
 }: MediaTextModuleRendererProps) => {
   if ((data.cardModuleMedias?.length ?? 0) < 1) {
@@ -101,6 +102,7 @@ const MediaTextModuleRenderer = ({
             cardModuleColor={data.cardModuleColor}
             displayMode={displayMode}
             scrollPosition={scrollPosition}
+            moduleEditing={moduleEditing}
             {...props}
           />
         </CardModuleEditionScrollHandler>
@@ -113,6 +115,7 @@ const MediaTextModuleRenderer = ({
             cardModuleColor={data.cardModuleColor}
             displayMode={displayMode}
             scrollPosition={scrollPosition}
+            moduleEditing={moduleEditing}
             isFullAlternation
             {...props}
           />
@@ -126,6 +129,7 @@ const MediaTextModuleRenderer = ({
             cardModuleColor={data.cardModuleColor}
             displayMode={displayMode}
             scrollPosition={scrollPosition}
+            moduleEditing={moduleEditing}
             {...props}
           />
         </CardModuleEditionScrollHandler>
@@ -138,6 +142,7 @@ const MediaTextModuleRenderer = ({
             cardModuleColor={data.cardModuleColor}
             displayMode={displayMode}
             scrollPosition={scrollPosition}
+            moduleEditing={moduleEditing}
             {...props}
           />
         </CardModuleEditionScrollHandler>

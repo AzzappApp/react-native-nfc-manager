@@ -27,7 +27,6 @@ type CardModuleMediaTextLinkAlternationProps = CardModuleVariantType & {
   scrollPosition?: Animated.Value;
   modulePosition?: number;
   disableAnimation?: boolean;
-  moduleEditing: boolean;
   isFullAlternation?: boolean;
 };
 

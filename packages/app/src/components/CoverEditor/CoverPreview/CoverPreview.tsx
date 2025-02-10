@@ -1036,7 +1036,7 @@ const CoverPreview = ({
               )}
               {hasFocus && (
                 <VideoCompositionRenderer
-                  pause={
+                  paused={
                     editionMode === 'textEdit' ||
                     editionMode === 'text' ||
                     editionMode === 'overlay'

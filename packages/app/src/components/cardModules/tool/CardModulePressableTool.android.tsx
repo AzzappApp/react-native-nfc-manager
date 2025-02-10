@@ -17,7 +17,8 @@ const CardModulePressableTool = ({
   if (active) {
     const singleTap = Gesture.Tap()
       .maxDuration(250)
-      .onStart(onPress ?? (() => {}));
+      .onStart(onPress ?? (() => {}))
+      .runOnJS(true);
     // I don't use PressableNative here because there is an issue when taping text on Android (using pressable from gesture handler) - to be replaced by PressableNative once android pressable are fixed
     return (
       <GestureDetector gesture={singleTap}>
