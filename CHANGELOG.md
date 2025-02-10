@@ -1,3 +1,9 @@
+## 1.7.1-rc.20
+
+* **fix:**  - **android:** [#7383](https://github.com/AzzappApp/azzapp/pull/7383) avoid cutting shadows on android ([#7387](https://github.com/AzzappApp/azzapp/pull/7387))
+* **fix:**  - **modules:** [#7377](https://github.com/AzzappApp/azzapp/pull/7377) avoid double scroll in bottom sheet ([#7384](https://github.com/AzzappApp/azzapp/pull/7384))
+* **fix:**  - **payment:** [#7359](https://github.com/AzzappApp/azzapp/pull/7359) don’t count seats twice on monthly subscription ([#7360](https://github.com/AzzappApp/azzapp/pull/7360))
+
 ## 1.7.1-rc.19
 
 * **feat:**  - analytics[staging] ([#7346](https://github.com/AzzappApp/azzapp/pull/7346))
