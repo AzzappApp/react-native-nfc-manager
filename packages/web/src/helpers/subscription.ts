@@ -23,22 +23,13 @@ export const unpublishWebCardForUser = async ({
 
     const userIsPremium =
       (await getActiveUserSubscriptions([userId])).length > 0;
-    for (const { webCard, profile } of profiles) {
+    for (const { webCard } of profiles) {
       if (!userIsPremium || forceUnpublishUser) {
         if (webCard?.cardIsPublished) {
           const modules = await getCardModulesByWebCard(webCard.id, false);
           if (webCardRequiresSubscription(modules, webCard)) {
             const currentDate = new Date();
             //unpublished webCard
-            const updates: Partial<WebCard> = {
-              cardIsPublished: false,
-              updatedAt: currentDate,
-              lastCardUpdate: currentDate,
-            };
-            await updateWebCard(webCard.id, updates);
-            revalidatePath(`/${webCard.userName}`);
-          } else if (profile.profileRole === 'owner' && webCard.isMultiUser) {
-            const currentDate = new Date();
             const updates: Partial<WebCard> = {
               cardIsPublished: false,
               updatedAt: currentDate,
