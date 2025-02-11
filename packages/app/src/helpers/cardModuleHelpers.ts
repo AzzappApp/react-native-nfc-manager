@@ -237,7 +237,7 @@ export const handleOnCompletedModuleSave = (
       }
     }
   }
-  router.back();
+  router.pop(2);
 };
 
 export const convertModuleMediaRelay = (mediaRelay: any) => {

@@ -470,7 +470,7 @@ const CarouselEditionScreen = ({
       onCompleted() {
         setProgressIndicator(null);
         setShowImagePicker(false);
-        router.back();
+        router.pop(2);
       },
       onError(e) {
         setProgressIndicator(null);

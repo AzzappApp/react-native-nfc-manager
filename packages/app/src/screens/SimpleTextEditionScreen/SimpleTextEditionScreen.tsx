@@ -328,7 +328,7 @@ const SimpleTextEditionScreen = ({
         },
       },
       onCompleted() {
-        router.back();
+        router.pop(2);
       },
       onError(e) {
         console.error(e);
