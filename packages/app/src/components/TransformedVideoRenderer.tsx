@@ -34,6 +34,7 @@ export type TransformedVideoRendererProps = Exclude<ViewProps, 'children'> & {
   maxResolution?: number;
   onLoad?: () => void;
   onError?: (error?: Error) => void;
+  paused?: boolean;
 };
 
 const TransformedVideoRenderer = ({
@@ -47,6 +48,7 @@ const TransformedVideoRenderer = ({
   width,
   height,
   maxResolution,
+  paused,
   ...props
 }: TransformedVideoRendererProps) => {
   const lutTexture = useLutTexture(filter);
@@ -100,6 +102,7 @@ const TransformedVideoRenderer = ({
       width={width}
       height={height}
       style={styles.video}
+      paused={paused}
       {...props}
     />
   );

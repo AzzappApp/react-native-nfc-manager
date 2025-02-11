@@ -22,7 +22,6 @@ import useToggle from '#hooks/useToggle';
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
-import SafeAreaView from '#ui/SafeAreaView';
 import Select from '#ui/Select';
 import Switch from '#ui/Switch';
 import Text from '#ui/Text';
@@ -416,253 +415,244 @@ const WebCardParametersScreen = ({
 
   return (
     <Container style={{ flex: 1 }}>
-      <SafeAreaView
-        style={{
-          flex: 1,
-        }}
-      >
-        <View style={styles.content}>
-          <WebCardParametersHeader webCard={webCard ?? null} />
-          <Icon icon="parameters" style={styles.warningIcon} />
-          <View style={styles.modalLine}>
-            <View style={[styles.publishTitle, styles.proContainer]}>
-              <Text variant="medium">
-                <FormattedMessage
-                  defaultMessage="Publish"
-                  description="WebCard parameters Modal - Likes switch Label"
-                />
-              </Text>
-              <PremiumIndicator
-                isRequired={webCard.requiresSubscription && !webCard.isPremium}
-              />
-            </View>
-            <Switch
-              variant="large"
-              value={webCard?.cardIsPublished}
-              onValueChange={onChangeIsPublished}
-              disabled={!webCard?.hasCover}
-            />
-          </View>
-          <View style={styles.section}>
-            <Text variant="xsmall" style={styles.sectionTitle}>
+      <WebCardParametersHeader webCard={webCard ?? null} />
+      <View style={styles.content}>
+        <Icon icon="parameters" style={styles.warningIcon} />
+        <View style={styles.modalLine}>
+          <View style={[styles.publishTitle, styles.proContainer]}>
+            <Text variant="medium">
               <FormattedMessage
-                defaultMessage="NAME"
-                description="Title of the section where user can change their webcard name"
+                defaultMessage="Publish"
+                description="WebCard parameters Modal - Likes switch Label"
               />
             </Text>
+            <PremiumIndicator
+              isRequired={webCard.requiresSubscription && !webCard.isPremium}
+            />
           </View>
+          <Switch
+            variant="large"
+            value={webCard?.cardIsPublished}
+            onValueChange={onChangeIsPublished}
+            disabled={!webCard?.hasCover}
+          />
+        </View>
+        <View style={styles.section}>
+          <Text variant="xsmall" style={styles.sectionTitle}>
+            <FormattedMessage
+              defaultMessage="NAME"
+              description="Title of the section where user can change their webcard name"
+            />
+          </Text>
+        </View>
+        <PressableNative style={styles.sectionField} onPress={onPressUserName}>
+          <Text variant="smallbold">
+            <FormattedMessage
+              defaultMessage="WebCard{azzappA} name"
+              description="UserName field in the webcard parameters screen"
+              values={{
+                azzappA: <Text variant="azzapp">a</Text>,
+              }}
+            />
+          </Text>
+          <Text variant="medium">{webCard.userName}</Text>
+        </PressableNative>
+        <Text variant="xsmall" style={styles.descriptionText}>
+          <FormattedMessage
+            defaultMessage="You can only change your WebCard{azzappA} name every {dayInterval} days."
+            description="Description message for userName field in webcard parameters"
+            values={{
+              dayInterval: userNameChangeFrequencyDay,
+              azzappA: <Text variant="azzapp">a</Text>,
+            }}
+          />
+        </Text>
+        <View style={styles.section}>
+          <Text variant="xsmall" style={styles.sectionTitle}>
+            <FormattedMessage
+              defaultMessage="CATEGORY & ACTIVITY"
+              description="Title of the section where user can view their category and activity"
+            />
+          </Text>
+        </View>
+
+        <View style={styles.sectionField}>
+          <Text variant="smallbold">
+            <FormattedMessage
+              defaultMessage="WebCard{azzappA} category"
+              description="category field in the webcard parameters screen"
+              values={{
+                azzappA: <Text variant="azzapp">a</Text>,
+              }}
+            />
+          </Text>
+          <Select
+            nativeID="profileCategories"
+            accessibilityLabelledBy="profileCategoriesLabel"
+            data={webCardCategories ?? []}
+            selectedItemKey={selectedCategory?.id}
+            keyExtractor={keyExtractor}
+            useFlatList={false}
+            onItemSelected={updateWebCardCategory}
+            bottomSheetTitle={
+              intl.formatMessage({
+                defaultMessage: 'Select a category',
+                description:
+                  'WebCardParameters screen - Profile Categoriy BottomSheet - Title',
+              }) as string
+            }
+            style={{
+              backgroundColor: 'transparent',
+              borderWidth: 0,
+              paddingRight: 0,
+            }}
+            itemContainerStyle={styles.selectItemContainerStyle}
+            renderItem={({ item }) => (
+              <View style={styles.selectItem}>
+                <Text variant="button">{item.label}</Text>
+                <PremiumIndicator
+                  size={24}
+                  isRequired={
+                    isWebCardKindSubscription(item.id) && !webCard.isPremium
+                  }
+                />
+              </View>
+            )}
+          />
+        </View>
+        {webCard.webCardKind === 'personal' && (
           <PressableNative
             style={styles.sectionField}
-            onPress={onPressUserName}
+            onPress={toggleFirstNameFormVisible}
           >
             <Text variant="smallbold">
               <FormattedMessage
-                defaultMessage="WebCard{azzappA} name"
-                description="UserName field in the webcard parameters screen"
-                values={{
-                  azzappA: <Text variant="azzapp">a</Text>,
-                }}
+                defaultMessage="Firstname"
+                description="firstname field in the webcard parameters screen"
               />
             </Text>
-            <Text variant="medium">{webCard.userName}</Text>
+            <Text variant="medium">{webCard.firstName}</Text>
           </PressableNative>
-          <Text variant="xsmall" style={styles.descriptionText}>
-            <FormattedMessage
-              defaultMessage="You can only change your WebCard{azzappA} name every {dayInterval} days."
-              description="Description message for userName field in webcard parameters"
-              values={{
-                dayInterval: userNameChangeFrequencyDay,
-                azzappA: <Text variant="azzapp">a</Text>,
-              }}
-            />
-          </Text>
-          <View style={styles.section}>
-            <Text variant="xsmall" style={styles.sectionTitle}>
-              <FormattedMessage
-                defaultMessage="CATEGORY & ACTIVITY"
-                description="Title of the section where user can view their category and activity"
-              />
-            </Text>
-          </View>
-
-          <View style={styles.sectionField}>
-            <Text variant="smallbold">
-              <FormattedMessage
-                defaultMessage="WebCard{azzappA} category"
-                description="category field in the webcard parameters screen"
-                values={{
-                  azzappA: <Text variant="azzapp">a</Text>,
-                }}
-              />
-            </Text>
-            <Select
-              nativeID="profileCategories"
-              accessibilityLabelledBy="profileCategoriesLabel"
-              data={webCardCategories ?? []}
-              selectedItemKey={selectedCategory?.id}
-              keyExtractor={keyExtractor}
-              useFlatList={false}
-              onItemSelected={updateWebCardCategory}
-              bottomSheetTitle={
-                intl.formatMessage({
-                  defaultMessage: 'Select a category',
-                  description:
-                    'WebCardParameters screen - Profile Categoriy BottomSheet - Title',
-                }) as string
-              }
-              style={{
-                backgroundColor: 'transparent',
-                borderWidth: 0,
-                paddingRight: 0,
-              }}
-              itemContainerStyle={styles.selectItemContainerStyle}
-              renderItem={({ item }) => (
-                <View style={styles.selectItem}>
-                  <Text variant="button">{item.label}</Text>
-                  <PremiumIndicator
-                    size={24}
-                    isRequired={
-                      isWebCardKindSubscription(item.id) && !webCard.isPremium
-                    }
-                  />
-                </View>
-              )}
-            />
-          </View>
-          {webCard.webCardKind === 'personal' && (
-            <PressableNative
-              style={styles.sectionField}
-              onPress={toggleFirstNameFormVisible}
-            >
-              <Text variant="smallbold">
-                <FormattedMessage
-                  defaultMessage="Firstname"
-                  description="firstname field in the webcard parameters screen"
-                />
-              </Text>
-              <Text variant="medium">{webCard.firstName}</Text>
-            </PressableNative>
-          )}
-          {webCard.webCardKind === 'personal' && (
-            <PressableNative
-              style={styles.sectionField}
-              onPress={toggleLastNameFormVisible}
-            >
-              <Text variant="smallbold">
-                <FormattedMessage
-                  defaultMessage="Lastname"
-                  description="lastname field in the webcard parameters screen"
-                />
-              </Text>
-              <Text variant="medium">{webCard.lastName}</Text>
-            </PressableNative>
-          )}
-          {webCard.webCardKind !== 'personal' && (
-            <PressableNative
-              style={styles.sectionField}
-              onPress={toggleCompanyActivityFormVisible}
-            >
-              <Text variant="smallbold">
-                <FormattedMessage
-                  defaultMessage="Activity"
-                  description="Activity field in the webcard parameters screen"
-                />
-              </Text>
-              <Text variant="medium">{webCard.companyActivityLabel} </Text>
-            </PressableNative>
-          )}
-          {webCard.webCardKind !== 'personal' && (
-            <PressableNative
-              style={styles.sectionField}
-              onPress={toggleCompanyNameFormVisible}
-            >
-              <Text variant="smallbold">
-                <FormattedMessage
-                  defaultMessage="Company name"
-                  description="company name field in the webcard parameters screen"
-                />
-              </Text>
-              <Text variant="medium">{webCard.companyName}</Text>
-            </PressableNative>
-          )}
-
-          <Text variant="xsmall" style={styles.descriptionText}>
-            <FormattedMessage
-              defaultMessage="Changing the WebCard{azzappA} category will not impact your current WebCard{azzappA}, but it will change what suggested photos and videos you are offered for your WebCard{azzappA} Cover."
-              description="Description message for category and activity field in webcard parameters"
-              values={{
-                azzappA: <Text variant="azzapp">a</Text>,
-              }}
-            />
-          </Text>
-          <PressableNative
-            onPress={handleConfirmationQuitWebCard}
-            style={styles.deleteOptionButton}
-            disabled={isLoadingQuitWebCard}
-          >
-            {isLoadingQuitWebCard ? (
-              <ActivityIndicator color={colors.red400} />
-            ) : (
-              <Text variant="error" style={textStyles.button}>
-                {isWebCardOwner ? (
-                  <FormattedMessage
-                    defaultMessage="Delete this WebCard{azzappA}"
-                    description="label for button to delete a webcard"
-                    values={{
-                      azzappA: (
-                        <Text variant="azzapp" style={styles.deleteButton}>
-                          a
-                        </Text>
-                      ),
-                    }}
-                  />
-                ) : (
-                  <FormattedMessage
-                    defaultMessage="Quit this WebCard{azzappA}"
-                    description="Quit WebCard title"
-                    values={{
-                      azzappA: (
-                        <Text variant="azzapp" style={styles.deleteButton}>
-                          a
-                        </Text>
-                      ),
-                    }}
-                  />
-                )}
-              </Text>
-            )}
-          </PressableNative>
-        </View>
-        {webCard && (
-          <>
-            <WebCardParametersNameForm
-              webCard={webCard}
-              visible={userNameFormVisible}
-              toggleBottomSheet={toggleUserNameFormVisible}
-            />
-            <WebcardParametersFirstNameForm
-              webCard={webCard}
-              visible={firstNameFormVisible}
-              toggleBottomSheet={toggleFirstNameFormVisible}
-            />
-            <WebcardParametersLastNameForm
-              webCard={webCard}
-              visible={lastNameFormVisible}
-              toggleBottomSheet={toggleLastNameFormVisible}
-            />
-            <WebcardParametersCompanyNameForm
-              webCard={webCard}
-              visible={companyNameFormVisible}
-              toggleBottomSheet={toggleCompanyNameFormVisible}
-            />
-            <WebcardParametersCompanyActivityLabelForm
-              webCard={webCard}
-              visible={companyActivityFormVisible}
-              toggleBottomSheet={toggleCompanyActivityFormVisible}
-            />
-          </>
         )}
-      </SafeAreaView>
+        {webCard.webCardKind === 'personal' && (
+          <PressableNative
+            style={styles.sectionField}
+            onPress={toggleLastNameFormVisible}
+          >
+            <Text variant="smallbold">
+              <FormattedMessage
+                defaultMessage="Lastname"
+                description="lastname field in the webcard parameters screen"
+              />
+            </Text>
+            <Text variant="medium">{webCard.lastName}</Text>
+          </PressableNative>
+        )}
+        {webCard.webCardKind !== 'personal' && (
+          <PressableNative
+            style={styles.sectionField}
+            onPress={toggleCompanyActivityFormVisible}
+          >
+            <Text variant="smallbold">
+              <FormattedMessage
+                defaultMessage="Activity"
+                description="Activity field in the webcard parameters screen"
+              />
+            </Text>
+            <Text variant="medium">{webCard.companyActivityLabel} </Text>
+          </PressableNative>
+        )}
+        {webCard.webCardKind !== 'personal' && (
+          <PressableNative
+            style={styles.sectionField}
+            onPress={toggleCompanyNameFormVisible}
+          >
+            <Text variant="smallbold">
+              <FormattedMessage
+                defaultMessage="Company name"
+                description="company name field in the webcard parameters screen"
+              />
+            </Text>
+            <Text variant="medium">{webCard.companyName}</Text>
+          </PressableNative>
+        )}
+
+        <Text variant="xsmall" style={styles.descriptionText}>
+          <FormattedMessage
+            defaultMessage="Changing the WebCard{azzappA} category will not impact your current WebCard{azzappA}, but it will change what suggested photos and videos you are offered for your WebCard{azzappA} Cover."
+            description="Description message for category and activity field in webcard parameters"
+            values={{
+              azzappA: <Text variant="azzapp">a</Text>,
+            }}
+          />
+        </Text>
+        <PressableNative
+          onPress={handleConfirmationQuitWebCard}
+          style={styles.deleteOptionButton}
+          disabled={isLoadingQuitWebCard}
+        >
+          {isLoadingQuitWebCard ? (
+            <ActivityIndicator color={colors.red400} />
+          ) : (
+            <Text variant="error" style={textStyles.button}>
+              {isWebCardOwner ? (
+                <FormattedMessage
+                  defaultMessage="Delete this WebCard{azzappA}"
+                  description="label for button to delete a webcard"
+                  values={{
+                    azzappA: (
+                      <Text variant="azzapp" style={styles.deleteButton}>
+                        a
+                      </Text>
+                    ),
+                  }}
+                />
+              ) : (
+                <FormattedMessage
+                  defaultMessage="Quit this WebCard{azzappA}"
+                  description="Quit WebCard title"
+                  values={{
+                    azzappA: (
+                      <Text variant="azzapp" style={styles.deleteButton}>
+                        a
+                      </Text>
+                    ),
+                  }}
+                />
+              )}
+            </Text>
+          )}
+        </PressableNative>
+      </View>
+      {webCard && (
+        <>
+          <WebCardParametersNameForm
+            webCard={webCard}
+            visible={userNameFormVisible}
+            toggleBottomSheet={toggleUserNameFormVisible}
+          />
+          <WebcardParametersFirstNameForm
+            webCard={webCard}
+            visible={firstNameFormVisible}
+            toggleBottomSheet={toggleFirstNameFormVisible}
+          />
+          <WebcardParametersLastNameForm
+            webCard={webCard}
+            visible={lastNameFormVisible}
+            toggleBottomSheet={toggleLastNameFormVisible}
+          />
+          <WebcardParametersCompanyNameForm
+            webCard={webCard}
+            visible={companyNameFormVisible}
+            toggleBottomSheet={toggleCompanyNameFormVisible}
+          />
+          <WebcardParametersCompanyActivityLabelForm
+            webCard={webCard}
+            visible={companyActivityFormVisible}
+            toggleBottomSheet={toggleCompanyActivityFormVisible}
+          />
+        </>
+      )}
     </Container>
   );
 };

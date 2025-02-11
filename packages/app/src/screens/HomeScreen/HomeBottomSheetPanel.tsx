@@ -229,13 +229,16 @@ const HomeBottomSheetPanel = ({
   }, [close, intl, profile?.webCard?.userName]);
 
   //Restore purchase
-  //Manage my subsciption
+  //Manage my subscription
   const elements = useMemo<
     Array<HomeBottomSheetPanelOptionProps | { type: 'separator' }>
   >(
     () =>
       convertToNonNullArray([
-        !userIsPremium && profile?.webCard && !profile.webCard.isPremium
+        !userIsPremium &&
+        profile?.webCard &&
+        !profile.webCard.isPremium &&
+        ENABLE_MULTI_USER
           ? {
               type: 'row',
               icon: 'plus',
@@ -281,7 +284,8 @@ const HomeBottomSheetPanel = ({
         },
         profile?.webCard?.isPremium &&
         !profile?.webCard.isWebSubscription &&
-        profileIsOwner(profile.profileRole)
+        profileIsOwner(profile.profileRole) &&
+        ENABLE_MULTI_USER
           ? {
               type: 'row',
               icon: Platform.OS === 'ios' ? 'app_store' : 'play_store',

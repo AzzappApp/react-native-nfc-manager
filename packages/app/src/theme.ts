@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 
 // color from style guide
 export const colors = {
@@ -92,30 +92,30 @@ export const mixins = {
 export const shadow = (
   appearence: 'dark' | 'light',
   direction: 'bottom' | 'center' | 'top' = 'bottom',
+  // @see https://github.com/facebook/react-native/issues/49128
+  forceOldShadow = Platform.OS === 'ios',
 ) =>
-  <const>{
-    boxShadow: [
-      {
-        offsetX: 0,
-        offsetY: direction === 'bottom' ? 10 : direction === 'center' ? 0 : -10,
-        blurRadius: '20',
-        spreadDistance: '0',
-        color: `rgba(0, 0, 0, ${appearence === 'dark' ? 0.4 : 0.2})`,
-      },
-    ],
-  };
-
-export const reactNativeShadow = (
-  appearence: 'dark' | 'light',
-  direction: 'bottom' | 'center' | 'top' = 'bottom',
-) =>
-  <const>{
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: direction === 'bottom' ? 10 : direction === 'center' ? 0 : -10,
-    },
-    shadowOpacity: appearence === 'dark' ? 0.4 : 0.2,
-    shadowRadius: 10,
-    elevation: 10,
-  };
+  forceOldShadow
+    ? {
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 0,
+          height:
+            direction === 'bottom' ? 10 : direction === 'center' ? 0 : -10,
+        },
+        shadowOpacity: appearence === 'dark' ? 0.4 : 0.2,
+        shadowRadius: 10,
+        elevation: 10,
+      }
+    : {
+        boxShadow: [
+          {
+            offsetX: 0,
+            offsetY:
+              direction === 'bottom' ? 5 : direction === 'center' ? 0 : -5,
+            blurRadius: '10',
+            spreadDistance: '0',
+            color: `rgba(0, 0, 0, ${appearence === 'dark' ? 0.4 : 0.2})`,
+          },
+        ],
+      };

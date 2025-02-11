@@ -60,9 +60,7 @@ jobs:
           fi
 
           yarn bump-version $NEXT_VERSION
-          if [ "$GITHUB_REF" == "refs/heads/main" ]; then
-            yarn write-dev-changelog
-          fi
+          yarn write-dev-changelog
         env:
           github_token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
 

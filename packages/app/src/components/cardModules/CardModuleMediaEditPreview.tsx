@@ -18,17 +18,18 @@ type CardModuleMediaEditPreviewProps = {
   media: CardModuleSourceMedia;
   dimension: { width: number; height: number };
   imageStyle?: ViewStyle;
+  paused?: boolean;
 };
 
 const CardModuleMediaEditPreview = ({
   media,
   dimension,
   imageStyle,
+  paused,
 }: CardModuleMediaEditPreviewProps) => {
   if (!media) {
     return null;
   }
-
   const { width: itemWidth, height: itemHeight } = dimension;
   return media.kind === 'video' ? (
     <VideoRender
@@ -36,6 +37,7 @@ const CardModuleMediaEditPreview = ({
       itemWidth={itemWidth}
       itemHeight={itemHeight}
       style={imageStyle}
+      paused={paused}
     />
   ) : (
     <ImageRender
@@ -52,6 +54,7 @@ type VideoRenderProps = {
   itemWidth: number;
   itemHeight: number;
   style?: StyleProp<ViewStyle>;
+  paused?: boolean;
 };
 
 const VideoRender = ({
@@ -59,6 +62,7 @@ const VideoRender = ({
   itemWidth,
   itemHeight,
   style,
+  paused,
 }: VideoRenderProps) => {
   const maxResolution = itemWidth * 2;
   const cropData = calculateCropData(media, itemWidth, itemHeight);
@@ -78,6 +82,7 @@ const VideoRender = ({
       startTime={media.timeRange?.startTime ?? 0}
       duration={media.timeRange?.duration ?? CARD_MEDIA_VIDEO_DEFAULT_DURATION}
       maxResolution={maxResolution}
+      paused={paused}
     />
   );
 };

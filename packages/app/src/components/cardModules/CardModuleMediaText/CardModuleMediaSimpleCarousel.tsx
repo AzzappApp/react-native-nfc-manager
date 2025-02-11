@@ -1,5 +1,5 @@
-import { memo, useCallback, useState } from 'react';
-import { FlatList, View } from 'react-native';
+import { memo, useCallback, useRef, useState } from 'react';
+import { FlatList, View, Animated as AnimatedNative } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { getTextStyle, getTitleStyle } from '#helpers/cardModuleHelpers';
 import useIsModuleItemInViewPort from '#hooks/useIsModuleItemInViewPort';
@@ -16,10 +16,7 @@ import type {
   CardModuleColor,
   WebCardViewMode,
 } from '@azzapp/shared/cardModuleHelpers';
-import type {
-  LayoutChangeEvent,
-  Animated as AnimatedNative,
-} from 'react-native';
+import type { LayoutChangeEvent, NativeScrollEvent } from 'react-native';
 
 type CardModuleMediaSimpleCarouselProps = CardModuleVariantType & {
   cardModuleMedias: CardModuleMedia[];
@@ -39,6 +36,7 @@ const CardModuleMediaSimpleCarousel = ({
   webCardViewMode,
   scrollPosition,
   modulePosition,
+  moduleEditing,
 }: CardModuleMediaSimpleCarouselProps) => {
   if (!scrollPosition) {
     throw new Error(
@@ -47,6 +45,7 @@ const CardModuleMediaSimpleCarousel = ({
   }
   const screenDimension = useScreenDimensions();
   const dimension = providedDimension ?? screenDimension;
+
   const [componentHeight, setComponentHeight] = useState(0);
 
   const onLayoutInner = (event: LayoutChangeEvent) => {
@@ -59,6 +58,21 @@ const CardModuleMediaSimpleCarousel = ({
 
   const nativeGesture = Gesture.Native();
   const itemWidth = Math.min((dimension.width * 70) / 100, 400);
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const scrollX = useRef(new AnimatedNative.Value(0)).current;
+
+  const handleScroll = AnimatedNative.event<NativeScrollEvent>(
+    [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+    {
+      useNativeDriver: false,
+      listener: event => {
+        const offsetX = event.nativeEvent.contentOffset.x;
+        const index = Math.round(offsetX / itemWidth); // Calculate index
+        setCurrentIndex(index);
+      },
+    },
+  );
 
   const lineLength =
     itemWidth * cardModuleMedias.length +
@@ -98,12 +112,13 @@ const CardModuleMediaSimpleCarousel = ({
             cardStyle={cardStyle}
             setEditableItemIndex={setEditableItemIndex}
             index={index}
-            canPlay={canPlay}
+            canPlay={canPlay && (moduleEditing || currentIndex === index)}
+            paused={currentIndex !== index}
             scrollY={scrollPosition}
             modulePosition={modulePosition}
-            componentHeight={componentHeight}
             dimension={dimension}
             webCardViewMode={webCardViewMode}
+            componentHeight={componentHeight}
           />
         </CardModulePressableTool>
       );
@@ -114,11 +129,13 @@ const CardModuleMediaSimpleCarousel = ({
       itemWidth,
       cardStyle,
       canPlay,
+      moduleEditing,
+      currentIndex,
       scrollPosition,
       modulePosition,
-      componentHeight,
       dimension,
       webCardViewMode,
+      componentHeight,
     ],
   );
   const { height: screenHeight } = useScreenDimensions();
@@ -150,6 +167,7 @@ const CardModuleMediaSimpleCarousel = ({
             snapToAlignment="center"
             snapToInterval={itemWidth + cardGap}
             showsHorizontalScrollIndicator={false}
+            onScroll={handleScroll}
             scrollEventThrottle={16}
             disableIntervalMomentum
             getItemLayout={getItemLayout}
@@ -198,6 +216,7 @@ type SimpleCarouselItemProps = {
   setEditableItemIndex?: (index: number) => void;
   index: number;
   canPlay: boolean;
+  paused: boolean;
   mediaWidth: number;
   scrollY: AnimatedNative.Value;
   modulePosition?: number;
@@ -205,8 +224,8 @@ type SimpleCarouselItemProps = {
     width: number;
     height: number;
   };
+  webCardViewMode?: WebCardViewMode;
   componentHeight: number;
-  webCardViewMode: WebCardViewMode | undefined;
 };
 
 const SimpleCarouselItemComponent = ({
@@ -219,7 +238,7 @@ const SimpleCarouselItemComponent = ({
   canPlay,
   scrollY,
   modulePosition,
-  componentHeight,
+  paused,
   dimension,
   webCardViewMode,
 }: SimpleCarouselItemProps) => {
@@ -233,7 +252,7 @@ const SimpleCarouselItemComponent = ({
   const inViewport = useIsModuleItemInViewPort(
     scrollY,
     modulePosition ?? 0,
-    index * componentHeight,
+    0, // media are displayed horizontally
     dimension,
     webCardViewMode === 'edit',
   );
@@ -260,6 +279,7 @@ const SimpleCarouselItemComponent = ({
           }}
           canPlay={canPlay && inViewport}
           priority={inViewport ? 'high' : 'normal'}
+          paused={paused}
         />
         <Text variant="large" style={getTitleStyle(cardStyle, cardModuleColor)}>
           {cardModuleMedia.title}

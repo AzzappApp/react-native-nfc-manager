@@ -36,7 +36,7 @@ const ParallaxContainer = ({
   imageStyle,
   imageContainerStyle,
 }: ParallaxContainerProps) => {
-  const itemStartY = (modulePosition ?? 0) + index * dimension.height;
+  const itemStartY = modulePosition ?? 0;
   const itemEndY = itemStartY + dimension.height;
 
   const inViewport = useIsModuleItemInViewPort(

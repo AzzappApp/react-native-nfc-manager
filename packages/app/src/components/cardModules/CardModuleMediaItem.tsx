@@ -38,6 +38,7 @@ const CardModuleMediaItem = ({
   canPlay,
   cachePolicy,
   priority,
+  paused,
 }: CardModuleMediaItemProps) => {
   const kind = getCardModuleMediaKind(media);
   return kind === 'image' ? (
@@ -69,7 +70,7 @@ const CardModuleMediaItem = ({
       }}
       thumbnailURI={media.thumbnail}
       videoEnabled={canPlay}
-      paused={false}
+      paused={paused}
       muted
       priority={priority}
     />

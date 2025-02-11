@@ -3,6 +3,7 @@ import { startTransition } from 'react';
 import { MMKV } from 'react-native-mmkv';
 import ERRORS from '@azzapp/shared/errors';
 import { clearRecentSearch } from '#screens/SearchScreen/useRecentSearch';
+import { logSignIn } from './analytics';
 import { addGlobalEventListener } from './globalEvents';
 
 /**
@@ -119,6 +120,7 @@ export const init = async () => {
     ({
       payload: { authTokens: tokens, profileInfos, email, phoneNumber, userId },
     }) => {
+      logSignIn(userId);
       encryptedStorage.set(
         ENCRYPTED_STORAGE_TOKENS_KEY,
         JSON.stringify(tokens),

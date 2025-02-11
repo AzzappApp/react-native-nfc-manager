@@ -1,12 +1,6 @@
 import { uniq } from 'lodash';
 import { useCallback, useRef, useState } from 'react';
-import {
-  Platform,
-  StatusBar,
-  StyleSheet,
-  useColorScheme,
-  type LayoutRectangle,
-} from 'react-native';
+import { Platform, StatusBar, StyleSheet, useColorScheme } from 'react-native';
 import Animated, {
   interpolate,
   runOnJS,
@@ -27,6 +21,7 @@ import {
   useWebCardEditScale,
 } from '#screens/WebCardEditScreen/webCardEditScreenHelpers';
 import type { ChildPositionAwareScrollViewHandle } from '#ui/ChildPositionAwareScrollView';
+import type { LayoutRectangle } from 'react-native';
 import type { DerivedValue } from 'react-native-reanimated';
 
 export type ModuleTransitionInfo = {
@@ -46,6 +41,12 @@ export const useWebCardEditTransition = (initialEdit: boolean) => {
   const scrollViewRef = useRef<ChildPositionAwareScrollViewHandle>(null);
   const editScrollViewRef = useRef<ChildPositionAwareScrollViewHandle>(null);
   const { height: windowHeight } = useScreenDimensions();
+
+  const clearTransitionInfos = useCallback(() => {
+    setTimeout(() => {
+      setTransitionInfo(null);
+    }, 5);
+  }, []);
 
   const editScale = useWebCardEditScale();
   const toggleEditing = useCallback(async () => {
@@ -131,12 +132,11 @@ export const useWebCardEditTransition = (initialEdit: boolean) => {
               id,
               await Promise.all([
                 webCardScreenLayout.height < windowHeight &&
-                webCardScreenLayout.height > 0
+                webCardScreenLayout.height > 0 &&
+                id !== 'cover'
                   ? captureSnapshot(webCardScreenRef).catch(() => null)
                   : null,
-                id !== 'cover'
-                  ? captureSnapshot(editScreenRef).catch(() => null)
-                  : null,
+                captureSnapshot(editScreenRef).catch(() => null),
               ]),
             ],
           ),
@@ -195,16 +195,20 @@ export const useWebCardEditTransition = (initialEdit: boolean) => {
     }
 
     setTransitionInfo(transitionItemsInfos);
-    setEditing(!editing);
+    // We need to wait the Snapshot to be rendered before starting the transition
     await waitTime(1);
     editTransition.value = withTiming(
       editing ? 0 : 1,
       { duration: TRANSITIONS_DURATION },
       () => {
-        runOnJS(setTransitionInfo)(null);
+        runOnJS(clearTransitionInfos)();
       },
     );
-  }, [editing, editTransition, editScale, windowHeight]);
+    // We need the animation to start before changing the editing state to avoid a flicker
+    // the edit screen being visible only if editTransition.value is greater than 0
+    await waitTime(1);
+    setEditing(!editing);
+  }, [editing, editTransition, editScale, windowHeight, clearTransitionInfos]);
 
   return {
     editing,

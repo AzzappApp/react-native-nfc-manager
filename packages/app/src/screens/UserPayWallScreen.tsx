@@ -20,7 +20,7 @@ import {
   usePreloadedQuery,
   useRelayEnvironment,
 } from 'react-relay';
-import { colors } from '#theme';
+import { colors, shadow } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import PremiumIndicator from '#components/PremiumIndicator';
 import { getAuthState } from '#helpers/authStore';
@@ -32,6 +32,7 @@ import useScreenInsets from '#hooks/useScreenInsets';
 import { useUserSubscriptionOffer } from '#hooks/useSubscriptionOffer';
 import Button from '#ui/Button';
 import IconButton from '#ui/IconButton';
+import PressableNative from '#ui/PressableNative';
 import PressableOpacity from '#ui/PressableOpacity';
 import SwitchLabel from '#ui/SwitchLabel';
 import Text from '#ui/Text';
@@ -374,7 +375,7 @@ const UserPayWallScreen = ({
         size={50}
       />
       <View style={styles.content}>
-        <View style={styles.contaienrLogo}>
+        <View style={styles.containerLogo}>
           <Image
             source={require('#assets/logo-full.png')}
             resizeMode="contain"
@@ -410,6 +411,33 @@ const UserPayWallScreen = ({
                 />
               );
             })}
+            <View style={[styles.selectionItem, styles.userMgmtItem]}>
+              <Text variant="large">
+                <FormattedMessage
+                  defaultMessage="20+ users"
+                  description="UserPaywall Screen - 20+ users suggestion title"
+                />
+              </Text>
+              <Text variant="small" style={styles.userMgmtDescriptionText}>
+                <FormattedMessage
+                  defaultMessage="Looking to equip a bigger team?"
+                  description="UserPaywall Screen - 20+ users suggestion description"
+                />
+              </Text>
+              <PressableNative
+                style={styles.userMgmtLink}
+                onPress={() => {
+                  Linking.openURL('mailto:contact@azzapp.com');
+                }}
+              >
+                <Text variant="button" style={styles.userMgmtLinkText}>
+                  <FormattedMessage
+                    defaultMessage="Contact us"
+                    description="UserPaywall Screen - 20+ users suggestion button"
+                  />
+                </Text>
+              </PressableNative>
+            </View>
           </ScrollView>
           <LinearGradient
             colors={[
@@ -566,6 +594,7 @@ const OfferItem = ({
       onPress={selectOffer}
       style={[
         styles.priceItem,
+        styles.selectionItem,
         { overflow: 'visible' },
         selectedPurchasePackage?.identifier === offer.identifier && {
           borderColor: colors.red400,
@@ -637,7 +666,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingHorizontal: 41,
   },
-  contaienrLogo: {
+  containerLogo: {
     flexDirection: 'row',
     height: 34,
     marginBottom: 15,
@@ -650,23 +679,22 @@ const styles = StyleSheet.create({
     height: 54,
     borderWidth: 2,
     borderColor: colors.white,
-    alignItems: 'center',
     justifyContent: 'space-between',
     flex: 1,
-    marginHorizontal: 10,
+
     marginBottom: 10,
+  },
+  selectionItem: {
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    marginHorizontal: 10,
     borderRadius: 18,
     backgroundColor: 'white',
-    //custom shadow, (this screen has no darmode )
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 0,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
-    paddingHorizontal: 20,
+    ...shadow('light', 'center'),
+  },
+  userMgmtItem: {
+    paddingVertical: 20,
+    rowGap: 20,
   },
   contentContainerStyle: {
     marginHorizontal: 20,
@@ -717,6 +745,21 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.9)',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  userMgmtLink: {
+    width: '100%',
+    height: 48,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.red400,
+    ...shadow('light', 'bottom'),
+  },
+  userMgmtLinkText: {
+    color: colors.white,
+  },
+  userMgmtDescriptionText: {
+    textAlign: 'center',
   },
 });
 

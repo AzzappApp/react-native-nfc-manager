@@ -79,10 +79,14 @@ export type CardModuleVariantType = {
    * Wether the video of the media are allowed to play
    */
   canPlay: boolean;
-  /* 
-  callback when a item renderer is pressed, return the index of the item in case of list 
-  */
+  /**
+   * callback when a item renderer is pressed, return the index of the item in case of list
+   */
   setEditableItemIndex?: (index: number) => void;
+  /**
+   * when we are editing the module
+   */
+  moduleEditing: boolean;
 };
 
 export type CommonModuleRendererProps<T, V extends ModuleKindHasVariants> = {

@@ -312,6 +312,7 @@ const MediaTextModuleWebCardEditionScreen = (
           variant={variant}
           dimension={dimension}
           setEditableItemIndex={setEditableItemIndex}
+          moduleEditing
           canPlay
         />
       </CardModulePreviewContainer>

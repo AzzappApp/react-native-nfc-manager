@@ -13,7 +13,7 @@ import {
   convertToBaseCanvasRatio,
 } from '@azzapp/shared/coverHelpers';
 
-import { colors, fontFamilies, reactNativeShadow, shadow } from '#theme';
+import { colors, fontFamilies, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { HOME_ICON_COVER_WIDTH } from './constants';
 import { MediaImageRenderer, MediaVideoRenderer } from './medias';
@@ -389,11 +389,7 @@ const stylesheet = createStyleSheet(theme => ({
     overflow: 'hidden',
     borderCurve: 'continuous',
   },
-  shadow: {
-    ...(Platform.OS === 'ios'
-      ? reactNativeShadow(theme, 'bottom')
-      : shadow(theme, 'bottom')),
-  },
+  shadow: shadow(theme, 'bottom'),
   layer: {
     position: 'absolute',
     top: 0,
