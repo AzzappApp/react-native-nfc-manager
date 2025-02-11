@@ -1282,10 +1282,10 @@ const CoverPreview = ({
 export default CoverPreview;
 
 const iconHitSlop = {
-  top: 3,
-  bottom: 3,
-  left: 3,
-  right: 3,
+  top: 5,
+  bottom: 5,
+  left: 5,
+  right: 5,
 };
 
 const CONTROLS_BUTTON_ICON_SIZE = 20;
@@ -1353,6 +1353,7 @@ const styles = StyleSheet.create({
     borderColor: colors.white,
     borderWidth: 2,
     transformOrigin: 'center',
+    pointerEvents: 'box-only',
   },
   controlsButtonIcon: {
     tintColor: colors.white,
