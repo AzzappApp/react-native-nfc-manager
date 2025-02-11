@@ -1,3 +1,7 @@
+## 1.7.1-rc.22
+
+* **fix:**  - avoid empty cover edition "sometimes" due to snapshot  not null (timing issue) ([#7392](https://github.com/AzzappApp/azzapp/pull/7392))
+
 ## 1.7.1-rc.21
 
 * **fix:**  - **payment:** [#7389](https://github.com/AzzappApp/azzapp/pull/7389) expired subscription case ([#7391](https://github.com/AzzappApp/azzapp/pull/7391))
