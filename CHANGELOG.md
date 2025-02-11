@@ -1,3 +1,7 @@
+## 1.7.1-canary.25
+
+
+
 ## 1.7.1-canary.24
 
 * **fix:**  - **payment:** [#7389](https://github.com/AzzappApp/azzapp/pull/7389) expired subscription case ([#7391](https://github.com/AzzappApp/azzapp/pull/7391))
