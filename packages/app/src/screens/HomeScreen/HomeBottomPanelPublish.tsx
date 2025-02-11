@@ -55,8 +55,26 @@ const HomeBottomPanelPublish = ({ profile }: HomeBottomPanelPublishProps) => {
     }
 
     if (profile.webCard?.requiresSubscription && !profile.webCard.isPremium) {
-      router.push({ route: 'USER_PAY_WALL' });
-      return;
+      if (profileInfos?.profileRole === 'owner') {
+        router.push({ route: 'USER_PAY_WALL' });
+        return;
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage(
+            {
+              defaultMessage:
+                'Please contact the owner of this WebCard{azzappA}. There is an issue on his/her azzapp+ subscription.',
+              description:
+                'Error toast when a non-owner is trying to publish a webcard from Home without subscription',
+            },
+            {
+              azzappA: <Text variant="azzapp">a</Text>,
+            },
+          ) as unknown as string,
+        });
+        return;
+      }
     }
 
     const environment = getRelayEnvironment();
