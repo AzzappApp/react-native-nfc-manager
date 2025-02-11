@@ -1,3 +1,9 @@
+## 1.7.1-rc.23
+
+* **fix:**  - **payment:** [#7395](https://github.com/AzzappApp/azzapp/pull/7395) don’t display paywall when not owner ([#7401](https://github.com/AzzappApp/azzapp/pull/7401))
+* **fix:**  - **account:** [#7394](https://github.com/AzzappApp/azzapp/pull/7394) delete button position ([#7399](https://github.com/AzzappApp/azzapp/pull/7399))
+* **fix:**  - [#7390](https://github.com/AzzappApp/azzapp/pull/7390) ([#7403](https://github.com/AzzappApp/azzapp/pull/7403))
+
 ## 1.7.1-rc.22
 
 * **fix:**  - avoid empty cover edition "sometimes" due to snapshot  not null (timing issue) ([#7392](https://github.com/AzzappApp/azzapp/pull/7392))
