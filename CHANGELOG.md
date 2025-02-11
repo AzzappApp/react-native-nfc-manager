@@ -1,3 +1,7 @@
+## 1.7.1-rc.21
+
+* **fix:**  - **payment:** [#7389](https://github.com/AzzappApp/azzapp/pull/7389) expired subscription case ([#7391](https://github.com/AzzappApp/azzapp/pull/7391))
+
 ## 1.7.1-rc.20
 
 * **fix:**  - **android:** [#7383](https://github.com/AzzappApp/azzapp/pull/7383) avoid cutting shadows on android ([#7387](https://github.com/AzzappApp/azzapp/pull/7387))
