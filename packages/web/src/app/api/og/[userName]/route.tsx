@@ -4,9 +4,9 @@ import { getWebCardByUserName } from '@azzapp/data';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { buildCoverImageUrl } from '#helpers/cover';
 
-const COVER_WIDTH = 300;
-const OG_WIDTH = 1200;
-const OG_HEIGHT = 630;
+const COVER_WIDTH = 180;
+const OG_WIDTH = 720;
+const OG_HEIGHT = 378;
 
 const width = COVER_WIDTH;
 const height = COVER_WIDTH / COVER_RATIO;
@@ -65,7 +65,7 @@ export async function GET(
         <div
           style={{
             display: 'flex',
-            borderRadius: 35,
+            borderRadius: 21,
             width,
             height,
             overflow: 'hidden',
