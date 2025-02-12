@@ -1,3 +1,11 @@
+## 1.7.1-rc.24
+
+* **fix:**  - **webCard:** [#7414](https://github.com/AzzappApp/azzapp/pull/7414) mutualize inset mgmt on input accessory view ([#7415](https://github.com/AzzappApp/azzapp/pull/7415))
+* **fix:**  - **payment:** [#7408](https://github.com/AzzappApp/azzapp/pull/7408) check new owner has a subscription ([#7413](https://github.com/AzzappApp/azzapp/pull/7413))
+* **fix:**  - **android:** [#6960](https://github.com/AzzappApp/azzapp/pull/6960) add box-only to ensure done button is capturing press event ([#7407](https://github.com/AzzappApp/azzapp/pull/7407))
+* **fix:**  - **webCard:** [#7402](https://github.com/AzzappApp/azzapp/pull/7402) reduce og image size to be under 300kb ([#7410](https://github.com/AzzappApp/azzapp/pull/7410))
+* **fix:**  - **account:** [#7409](https://github.com/AzzappApp/azzapp/pull/7409) wrong style prop ([#7411](https://github.com/AzzappApp/azzapp/pull/7411))
+
 ## 1.7.1-rc.23
 
 * **fix:**  - **payment:** [#7395](https://github.com/AzzappApp/azzapp/pull/7395) don’t display paywall when not owner ([#7401](https://github.com/AzzappApp/azzapp/pull/7401))
