@@ -21,6 +21,8 @@ import ERRORS from '@azzapp/shared/errors';
 import { getSessionInfos } from '#GraphQLContext';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#__generated__/types';
+import type { GraphQLContext } from '#GraphQLContext';
+import type { UserSubscription } from '@azzapp/data';
 
 export const estimateSubscriptionCost: MutationResolvers['estimateSubscriptionCost'] =
   async (_, { totalSeats, plan, countryCode, vatNumber }) => {
@@ -124,8 +126,8 @@ export const createPaymentMean: MutationResolvers['createPaymentMean'] = async (
   return result;
 };
 
-export const generatePaymentInvoice: MutationResolvers['generatePaymentInvoice'] =
-  async (_, { paymentId }) => {
+export const generatePaymentInvoice: MutationResolvers<GraphQLContext>['generatePaymentInvoice'] =
+  async (_, { paymentId }, { intl }) => {
     const { userId } = getSessionInfos();
     if (!userId) {
       throw new GraphQLError(ERRORS.UNAUTHORIZED);
@@ -143,7 +145,50 @@ export const generatePaymentInvoice: MutationResolvers['generatePaymentInvoice']
       throw new GraphQLError(ERRORS.FORBIDDEN);
     }
 
-    const result = await generateInvoice(payment);
+    const result = await generateInvoice(
+      payment,
+      (userSubscription: UserSubscription) => {
+        const subscriptionPlan = userSubscription.subscriptionPlan;
+
+        switch (subscriptionPlan) {
+          case 'web.yearly':
+            return intl.formatMessage(
+              {
+                defaultMessage: `Annual azzapp+ subscription for {count, plural,
+                =0 {0 seats}
+                =1 {1 seat}
+                other {(count) seats}
+              }`,
+                id: 'of4hL2',
+                description: 'Invoice description for yearly subscription',
+              },
+              {
+                count: userSubscription.totalSeats,
+              },
+            );
+          case 'web.monthly':
+            return intl.formatMessage(
+              {
+                defaultMessage: `Monthly azzapp+ subscription for {count, plural,
+                =0 {0 seats}
+                =1 {1 seat}
+                other {(count) seats}
+              }`,
+                id: 'hJ9rhS',
+                description: 'Invoice description for monthly subscription',
+              },
+              {
+                count: userSubscription.totalSeats,
+              },
+            );
+
+          default:
+            throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR, {
+              originalError: new Error('Invalid subscription plan'),
+            });
+        }
+      },
+    );
 
     if (!result) {
       throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
