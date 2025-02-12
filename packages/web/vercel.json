@@ -22,6 +22,10 @@
     {
       "path": "/api/cron/unpublishWebCards",
       "schedule": "*/3 * * * *"
+    },
+    {
+      "path": "/api/cron/removeUnusedMedia",
+      "schedule": "*/5 * * * *"
     }
   ],
   "redirects": [

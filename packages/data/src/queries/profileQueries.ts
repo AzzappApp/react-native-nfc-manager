@@ -435,19 +435,6 @@ export const removeProfile = async (id: string, deletedBy: string) => {
   });
 };
 
-const getAvatarAndLogo = async (profileIds: string[]) => {
-  if (profileIds.length === 0) {
-    return [];
-  }
-  return db()
-    .select({
-      avatarId: ProfileTable.avatarId,
-      logoId: ProfileTable.logoId,
-    })
-    .from(ProfileTable)
-    .where(inArray(ProfileTable.id, profileIds));
-};
-
 /**
  * Deletes multiple profiles by their ids
  *
@@ -458,30 +445,6 @@ export const removeProfiles = async (
   deletedBy: string,
 ) => {
   await transaction(async () => {
-    const profiles = await getAvatarAndLogo(profileIds);
-
-    const avatarIds = profiles
-      .map(({ avatarId }) => avatarId)
-      .filter(av => av !== null);
-
-    if (avatarIds.length > 0) {
-      await db()
-        .update(MediaTable)
-        .set({ refCount: sql`${MediaTable.refCount} - 1` })
-        .where(inArray(MediaTable.id, avatarIds));
-    }
-
-    const logoIds = profiles
-      .map(({ logoId }) => logoId)
-      .filter(logo => logo !== null);
-
-    if (logoIds.length > 0) {
-      await db()
-        .update(MediaTable)
-        .set({ refCount: sql`${MediaTable.refCount} - 1` })
-        .where(inArray(MediaTable.id, logoIds));
-    }
-
     await db()
       .update(ProfileTable)
       .set({
