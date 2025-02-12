@@ -1,3 +1,7 @@
+## 1.7.1-canary.28
+
+* **feat:**  - **media:** [#5162](https://github.com/AzzappApp/azzapp/pull/5162) put back automatic removal of media ([#7429](https://github.com/AzzappApp/azzapp/pull/7429))
+
 ## 1.7.1-canary.27
 
 * **fix:**  - **payment:** [#7404](https://github.com/AzzappApp/azzapp/pull/7404) customize invoice product name ([#7405](https://github.com/AzzappApp/azzapp/pull/7405))
