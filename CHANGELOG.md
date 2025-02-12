@@ -1,3 +1,7 @@
+## 1.7.1-rc.25
+
+* **fix:**  - **payment:** [#7404](https://github.com/AzzappApp/azzapp/pull/7404) customize invoice product name ([#7405](https://github.com/AzzappApp/azzapp/pull/7405))
+
 ## 1.7.1-rc.24
 
 * **fix:**  - **webCard:** [#7414](https://github.com/AzzappApp/azzapp/pull/7414) mutualize inset mgmt on input accessory view ([#7415](https://github.com/AzzappApp/azzapp/pull/7415))
