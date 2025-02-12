@@ -1,3 +1,7 @@
+## 1.7.1-rc.27
+
+* **fix:**  - update out of date podfile.lock file ([#7424](https://github.com/AzzappApp/azzapp/pull/7424))
+
 ## 1.7.1-rc.26
 
 * **fix:**  - wrong param in sentence ([#7422](https://github.com/AzzappApp/azzapp/pull/7422))
