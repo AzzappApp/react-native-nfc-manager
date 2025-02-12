@@ -929,8 +929,13 @@ const CoverPreview = ({
   const hasFocus = useScreenHasFocus();
   const compositionContainerRef = useRef<View | null>(null);
   const [snapshotId, setSnapshotId] = useState<string | null>(null);
-  const currentScreenShot = useRef<string | null>(null);
   useModalInterceptor(async () => {
+    if (
+      coverEditorState.loadingLocalMedia ||
+      coverEditorState.loadingRemoteMedia
+    ) {
+      return;
+    }
     let screenShotId: string | null;
     if (!compositionContainerRef.current) {
       return;
@@ -946,7 +951,7 @@ const CoverPreview = ({
       console.log('error', e);
       screenShotId = null;
     }
-    currentScreenShot.current = screenShotId;
+
     setSnapshotId(screenShotId);
     await waitTime(10);
   });
@@ -1031,7 +1036,13 @@ const CoverPreview = ({
               {snapshotId && (
                 <SnapshotRenderer
                   snapshotID={snapshotId}
-                  style={{ width: viewWidth, height: viewHeight }}
+                  style={{
+                    width: viewWidth,
+                    height: viewHeight,
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                  }}
                 />
               )}
               {hasFocus && (
@@ -1271,10 +1282,10 @@ const CoverPreview = ({
 export default CoverPreview;
 
 const iconHitSlop = {
-  top: 3,
-  bottom: 3,
-  left: 3,
-  right: 3,
+  top: 5,
+  bottom: 5,
+  left: 5,
+  right: 5,
 };
 
 const CONTROLS_BUTTON_ICON_SIZE = 20;
@@ -1342,6 +1353,7 @@ const styles = StyleSheet.create({
     borderColor: colors.white,
     borderWidth: 2,
     transformOrigin: 'center',
+    pointerEvents: 'box-only',
   },
   controlsButtonIcon: {
     tintColor: colors.white,

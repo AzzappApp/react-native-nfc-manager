@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Keyboard, Platform, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { isNotFalsyString, isValidUrl } from '@azzapp/shared/stringHelpers';
 import { MediaImageRenderer } from '#components/medias';
 import ToolBoxSection from '#components/Toolbar/ToolBoxSection';
@@ -85,7 +85,7 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
   };
 
   // onDone should check the url is valid and not close the popup
-  const onDone = () => {
+  const onDone = useCallback(() => {
     if (isNotFalsyString(linkUrl)) {
       const url = convertUrlLink(linkUrl);
       if (module.moduleKind === 'mediaTextLink') {
@@ -95,12 +95,9 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
         }
       }
     }
-    if (Platform.OS === 'android') {
-      Keyboard.dismiss(); //on android sometimes the keyboard is hidden but not properly dismissed causing issues on future opening
-    }
     //closing will call ondismiss and save(don't want to create a double save )
     close();
-  };
+  }, [close, linkUrl, module.moduleKind]);
 
   const { top: topInset } = useScreenInsets();
 
@@ -166,6 +163,7 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
                   description:
                     'CardModuleMediaTextTool - Done header button label',
                 })}
+                style={styles.headerButton}
               />
             }
           />
@@ -293,7 +291,10 @@ const styles = StyleSheet.create({
     overflow: 'visible',
     flex: 1,
   },
-  header: { marginBottom: 15 },
+  header: { marginBottom: 15, paddingHorizontal: 0 },
+  headerButton: {
+    pointerEvents: 'box-only',
+  },
   textAction: { paddingTop: 10, paddingBottom: 5 },
   titleStyle: { borderWidth: 0, height: 50 },
   textStyle: {

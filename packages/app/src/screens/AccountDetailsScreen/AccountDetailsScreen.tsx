@@ -10,6 +10,7 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import relayScreen from '#helpers/relayScreen';
 import { useDeleteNotifications } from '#hooks/useNotifications';
+import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';
@@ -132,6 +133,8 @@ const AccountDetailsScreen = ({
     );
   }, [commit, deleteFcmToken, intl]);
 
+  const insets = useScreenInsets();
+
   if (!currentUser) {
     return null;
   }
@@ -139,7 +142,7 @@ const AccountDetailsScreen = ({
   return (
     <Container style={{ flex: 1 }}>
       <AccountDetailsHeader />
-      <View style={styles.content}>
+      <View style={[styles.content, { paddingBottom: insets.bottom }]}>
         <Icon icon="information" style={styles.warningIcon} />
         <View style={{ rowGap: 20, paddingHorizontal: 10 }}>
           <Text variant="xsmall" style={styles.warningMessage}>

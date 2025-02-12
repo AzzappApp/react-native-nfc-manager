@@ -20,7 +20,7 @@ import {
   type SubscriptionPlan,
 } from './helpers';
 import type { Customer } from '#types';
-import type { Payment, PaymentMean } from '@azzapp/data';
+import type { Payment, PaymentMean, UserSubscription } from '@azzapp/data';
 
 const IDENTIFIER = 'POOL_AZZAP';
 
@@ -404,7 +404,10 @@ export const createNewPaymentMean = async ({
   return result.data.clientRedirectUrl;
 };
 
-export const generateInvoice = async (payment: Payment) => {
+export const generateInvoice = async (
+  payment: Payment,
+  formatProduct: (subscription: UserSubscription) => string,
+) => {
   const token = await login();
 
   const subscription = await getSubscriptionById(payment.subscriptionId);
@@ -439,7 +442,7 @@ export const generateInvoice = async (payment: Payment) => {
     invoicedCountry: subscription.subscriberCountry ?? '',
     invoicedVat: subscription.subscriberVatNumber ?? '',
     invoicedPhone: subscription.subscriberPhoneNumber ?? '',
-    invoicedProduct: 'Azzapp PRO',
+    invoicedProduct: formatProduct(subscription),
     hasVat: payment.taxes > 0 ? '1' : '0',
     vatRate: `${Math.round((payment.taxes / payment.amount) * 100)}`,
   };

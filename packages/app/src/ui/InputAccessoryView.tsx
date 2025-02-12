@@ -27,7 +27,7 @@ const InputAccessoryView = ({
   }
 
   return (
-    <View style={[styles.titleModal, style]}>
+    <View style={[styles.titleModal, style, { paddingBottom: insets.bottom }]}>
       <TouchableWithoutFeedback onPress={onClose} style={styles.overlay}>
         <View style={styles.overlay} />
       </TouchableWithoutFeedback>

@@ -33,6 +33,7 @@
     "@azzapp/i18n": "workspace:^",
     "@azzapp/payment": "workspace:^",
     "@azzapp/shared": "workspace:^",
+    "@formatjs/intl": "^3.1.4",
     "@graphql-tools/schema": "^10.0.13",
     "@paralleldrive/cuid2": "^2.2.2",
     "@sentry/nextjs": "^7.113.0",

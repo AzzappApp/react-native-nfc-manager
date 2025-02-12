@@ -1,23 +1,33 @@
-import { useCallback } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { useCallback, useState } from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { graphql, commitMutation } from 'react-relay';
+import ERRORS from '@azzapp/shared/errors';
 import { colors } from '#theme';
+import { useRouter } from '#components/NativeRouter';
 import { onChangeWebCard } from '#helpers/authStore';
 import { getRelayEnvironment } from '#helpers/relayEnvironment';
 
 import Button from '#ui/Button';
 import Text from '#ui/Text';
+import type { HomeBottomPanel_user$data } from '#relayArtifacts/HomeBottomPanel_user.graphql';
 import type { HomeBottomPanelMessage_profiles$data } from '#relayArtifacts/HomeBottomPanelMessage_profiles.graphql';
-import type { HomeBottomPanelTransfertOwnerAceeptMutation } from '#relayArtifacts/HomeBottomPanelTransfertOwnerAceeptMutation.graphql';
-import type { HomeBottomPanelTransfertOwnerDeclineMutation } from '#relayArtifacts/HomeBottomPanelTransfertOwnerDeclineMutation.graphql';
+import type { HomeBottomPanelTransferOwnerAcceptMutation } from '#relayArtifacts/HomeBottomPanelTransferOwnerAcceptMutation.graphql';
+import type { HomeBottomPanelTransferOwnerDeclineMutation } from '#relayArtifacts/HomeBottomPanelTransferOwnerDeclineMutation.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 
-const HomeBottomPanelTransfertOwner = ({
+const HomeBottomPanelTransferOwner = ({
   profile,
+  userSubscription,
 }: {
   profile: ArrayItemType<HomeBottomPanelMessage_profiles$data>;
+  userSubscription: HomeBottomPanel_user$data['userSubscription'];
 }) => {
+  const router = useRouter();
+  const intl = useIntl();
+  const [loading, setLoading] = useState(false);
+
   const onAcceptOwnership = useCallback(() => {
     if (!profile) {
       return;
@@ -25,7 +35,7 @@ const HomeBottomPanelTransfertOwner = ({
     const environment = getRelayEnvironment();
 
     const acceptOwnershipMutation = graphql`
-      mutation HomeBottomPanelTransfertOwnerAceeptMutation($profileId: ID!)
+      mutation HomeBottomPanelTransferOwnerAcceptMutation($profileId: ID!)
       @raw_response_type {
         acceptOwnership(profileId: $profileId) {
           profile {
@@ -37,23 +47,14 @@ const HomeBottomPanelTransfertOwner = ({
         }
       }
     `;
-
-    commitMutation<HomeBottomPanelTransfertOwnerAceeptMutation>(environment, {
+    setLoading(true);
+    commitMutation<HomeBottomPanelTransferOwnerAcceptMutation>(environment, {
       mutation: acceptOwnershipMutation,
       variables: {
         profileId: profile.id,
       },
-      optimisticResponse: {
-        acceptOwnership: {
-          profile: {
-            id: profile.id,
-            profileRole: 'owner',
-            promotedAsOwner: false,
-            invited: false,
-          },
-        },
-      },
       onCompleted: (data, error) => {
+        setLoading(false);
         if (!error) {
           if (data.acceptOwnership?.profile?.profileRole) {
             onChangeWebCard({
@@ -62,8 +63,41 @@ const HomeBottomPanelTransfertOwner = ({
           }
         }
       },
+      onError: error => {
+        setLoading(false);
+        if (error.message === ERRORS.SUBSCRIPTION_REQUIRED) {
+          router.push({
+            route: 'USER_PAY_WALL',
+          });
+        } else if (error.message === ERRORS.SUBSCRIPTION_INSUFFICIENT_SEATS) {
+          if (userSubscription?.issuer === 'web') {
+            Toast.show({
+              type: 'error',
+              text1: intl.formatMessage({
+                defaultMessage:
+                  'Please log in to the WebApp to manage your azzapp+ subscription',
+                description:
+                  'Error message when trying to activate multi-user on mobile when it is configured on the WebApp.',
+              }),
+            });
+          } else {
+            router.push({
+              route: 'USER_PAY_WALL',
+            });
+          }
+        } else {
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage: 'Error while accepting ownership',
+              description:
+                'Error toast message when accepting ownership on home screen',
+            }),
+          });
+        }
+      },
     });
-  }, [profile]);
+  }, [intl, profile, router, userSubscription?.issuer]);
 
   const onDeclineOwnership = useCallback(() => {
     if (!profile) {
@@ -73,7 +107,7 @@ const HomeBottomPanelTransfertOwner = ({
     const environment = getRelayEnvironment();
 
     const declineInvitationMutation = graphql`
-      mutation HomeBottomPanelTransfertOwnerDeclineMutation($profileId: ID!)
+      mutation HomeBottomPanelTransferOwnerDeclineMutation($profileId: ID!)
       @raw_response_type {
         declineOwnership(profileId: $profileId) {
           profile {
@@ -84,7 +118,7 @@ const HomeBottomPanelTransfertOwner = ({
       }
     `;
 
-    commitMutation<HomeBottomPanelTransfertOwnerDeclineMutation>(environment, {
+    commitMutation<HomeBottomPanelTransferOwnerDeclineMutation>(environment, {
       mutation: declineInvitationMutation,
       variables: { profileId: profile.id },
       optimisticResponse: {
@@ -135,6 +169,7 @@ const HomeBottomPanelTransfertOwner = ({
           }
           style={styles.invitationPanelButton}
           onPress={onAcceptOwnership}
+          loading={loading}
         />
         <Button
           variant="secondary"
@@ -153,7 +188,7 @@ const HomeBottomPanelTransfertOwner = ({
   );
 };
 
-export default HomeBottomPanelTransfertOwner;
+export default HomeBottomPanelTransferOwner;
 
 const styles = StyleSheet.create({
   text: {

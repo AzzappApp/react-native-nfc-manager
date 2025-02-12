@@ -10,8 +10,9 @@ import HomeBottomPanelCreate from './HomeBottomPanelCreate';
 import HomeBottomPanelInvitation from './HomeBottomPanelInvitation';
 import HomeBottomPanelNewCover from './HomeBottomPanelNewCover';
 import HomeBottomPanelPublish from './HomeBottomPanelPublish';
-import HomeBottomPanelTransfertOwner from './HomeBottomPanelTransfertOwner';
+import HomeBottomPanelTransferOwner from './HomeBottomPanelTransferOwner';
 import { useHomeScreenContext } from './HomeScreenContext';
+import type { HomeBottomPanel_user$data } from '#relayArtifacts/HomeBottomPanel_user.graphql';
 import type {
   HomeBottomPanelMessage_profiles$data,
   HomeBottomPanelMessage_profiles$key,
@@ -22,12 +23,16 @@ export type MessageContentType =
   | 'cover'
   | 'invitation'
   | 'publish'
-  | 'transfert';
+  | 'transfer';
 
 type HomeBottomPanelMessageProps = {
   user: HomeBottomPanelMessage_profiles$key;
+  userSubscription: HomeBottomPanel_user$data['userSubscription'];
 };
-const HomeBottomPanelMessage = ({ user }: HomeBottomPanelMessageProps) => {
+const HomeBottomPanelMessage = ({
+  user,
+  userSubscription,
+}: HomeBottomPanelMessageProps) => {
   const profiles = useFragment(
     graphql`
       fragment HomeBottomPanelMessage_profiles on Profile @relay(plural: true) {
@@ -61,7 +66,7 @@ const HomeBottomPanelMessage = ({ user }: HomeBottomPanelMessageProps) => {
     const res = profiles?.map(profile => {
       if (!profile) return null;
       if (profile.promotedAsOwner) {
-        return { type: 'transfert', profile };
+        return { type: 'transfer', profile };
       } else if (profile.invited) {
         return { type: 'invitation', profile };
       } else if (!profile.webCard?.hasCover) {
@@ -79,7 +84,14 @@ const HomeBottomPanelMessage = ({ user }: HomeBottomPanelMessageProps) => {
     <View style={styles.container}>
       {(bottomContent ?? []).map((content, index) => {
         if (!content?.type) return null;
-        return <MessageItem key={index} content={content} index={index} />;
+        return (
+          <MessageItem
+            key={index}
+            content={content}
+            index={index}
+            userSubscription={userSubscription}
+          />
+        );
       })}
     </View>
   );
@@ -90,9 +102,14 @@ export default memo(HomeBottomPanelMessage);
 type MessageItemProps = {
   content: ArrayItemType<MessageArrayType>;
   index: number;
+  userSubscription: HomeBottomPanel_user$data['userSubscription'];
 };
 
-const MessageItemComponent = ({ content, index }: MessageItemProps) => {
+const MessageItemComponent = ({
+  content,
+  index,
+  userSubscription,
+}: MessageItemProps) => {
   const { currentIndexSharedValue } = useHomeScreenContext();
 
   const opacity = useDerivedValue(() => {
@@ -133,8 +150,11 @@ const MessageItemComponent = ({ content, index }: MessageItemProps) => {
         <HomeBottomPanelNewCover profile={content.profile} />
       ) : content.type === 'invitation' ? (
         <HomeBottomPanelInvitation profile={content.profile} />
-      ) : content.type === 'transfert' ? (
-        <HomeBottomPanelTransfertOwner profile={content.profile} />
+      ) : content.type === 'transfer' ? (
+        <HomeBottomPanelTransferOwner
+          profile={content.profile}
+          userSubscription={userSubscription}
+        />
       ) : content.type === 'create' ? (
         <HomeBottomPanelCreate />
       ) : null}

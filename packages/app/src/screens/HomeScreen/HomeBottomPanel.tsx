@@ -45,6 +45,9 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
       fragment HomeBottomPanel_user on User {
         ...HomeContactCard_user
         ...HomeInformations_user
+        userSubscription {
+          issuer
+        }
         profiles {
           id
           invited
@@ -198,7 +201,10 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
   return (
     <View style={containerHeight}>
       <View style={styles.informationPanel}>
-        <HomeBottomPanelMessage user={profiles!} />
+        <HomeBottomPanelMessage
+          user={profiles!}
+          userSubscription={user.userSubscription}
+        />
       </View>
       <Animated.View
         style={[styles.bottomPanel, bottomPanelStyle]}
