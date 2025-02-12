@@ -142,7 +142,7 @@ const AccountDetailsScreen = ({
   return (
     <Container style={{ flex: 1 }}>
       <AccountDetailsHeader />
-      <View style={[styles.content, { bottom: insets.bottom }]}>
+      <View style={[styles.content, { paddingBottom: insets.bottom }]}>
         <Icon icon="information" style={styles.warningIcon} />
         <View style={{ rowGap: 20, paddingHorizontal: 10 }}>
           <Text variant="xsmall" style={styles.warningMessage}>
