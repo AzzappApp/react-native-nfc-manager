@@ -9,7 +9,6 @@ import { z } from 'zod';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { useRouter } from '#components/NativeRouter';
 import { requestUpdateContact } from '#helpers/MobileWebAPI';
-import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import Header from '#ui/Header';
 import InputAccessoryView from '#ui/InputAccessoryView';
@@ -139,14 +138,8 @@ const AccountDetailsEmailForm = ({
     } else deleteEmail();
   });
 
-  const { bottom } = useScreenInsets();
-
   return (
-    <InputAccessoryView
-      visible={visible}
-      onClose={toggleBottomSheet}
-      style={{ paddingBottom: bottom }}
-    >
+    <InputAccessoryView visible={visible} onClose={toggleBottomSheet}>
       <Header
         leftElement={
           <Button

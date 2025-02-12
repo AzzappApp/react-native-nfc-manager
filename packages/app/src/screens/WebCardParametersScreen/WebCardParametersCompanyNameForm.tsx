@@ -136,6 +136,7 @@ const WebcardParametersCompanyNameForm = ({
             style={styles.headerButton}
           />
         }
+        style={styles.header}
       />
 
       <View style={styles.controllerContainer}>
@@ -176,6 +177,7 @@ const WebcardParametersCompanyNameForm = ({
 };
 
 const styles = StyleSheet.create({
+  header: { paddingHorizontal: 10 },
   headerButton: { paddingHorizontal: 5, minWidth: 74 },
   inputContainer: { flex: 1, height: 50, paddingHorizontal: 10 },
   controllerContainer: {

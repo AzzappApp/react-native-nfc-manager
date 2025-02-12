@@ -7,7 +7,6 @@ import Toast from 'react-native-toast-message';
 import { z } from 'zod';
 import ERRORS from '@azzapp/shared/errors';
 import { REGEX_PWD } from '@azzapp/shared/stringHelpers';
-import useScreenInsets from '#hooks/useScreenInsets';
 import useUpdateUser from '#screens/AccountDetailsScreen/useUpdateUser';
 import Button from '#ui/Button';
 import Header from '#ui/Header';
@@ -101,8 +100,6 @@ const AccountDetailsPasswordForm = ({
     });
   });
 
-  const insets = useScreenInsets();
-
   const newPasswordRef = useRef<TextInput>(null);
 
   return (
@@ -137,7 +134,7 @@ const AccountDetailsPasswordForm = ({
           description: 'Edit password modal title',
         })}
       />
-      <View style={[styles.container, { marginBottom: insets.bottom }]}>
+      <View style={styles.container}>
         <Controller
           control={control}
           name="currentPassword"
