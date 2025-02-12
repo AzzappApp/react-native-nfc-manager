@@ -1,3 +1,7 @@
+## 1.7.1-rc.26
+
+* **fix:**  - wrong param in sentence ([#7422](https://github.com/AzzappApp/azzapp/pull/7422))
+
 ## 1.7.1-rc.25
 
 * **fix:**  - **payment:** [#7404](https://github.com/AzzappApp/azzapp/pull/7404) customize invoice product name ([#7405](https://github.com/AzzappApp/azzapp/pull/7405))
