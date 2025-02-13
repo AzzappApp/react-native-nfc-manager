@@ -1,3 +1,20 @@
+## 1.7.1-canary.30
+
+* **fix:**  - **cover:** [#6618](https://github.com/AzzappApp/azzapp/pull/6618) empeach automatic sleeping while exporting cover ([#7423](https://github.com/AzzappApp/azzapp/pull/7423))
+* **feat:**  - business can scanner ([#7357](https://github.com/AzzappApp/azzapp/pull/7357))
+* **feat:**  - **media:** [#5162](https://github.com/AzzappApp/azzapp/pull/5162) put back automatic removal of media ([#7429](https://github.com/AzzappApp/azzapp/pull/7429))
+* **fix:**  - **multiUser:** [#7348](https://github.com/AzzappApp/azzapp/pull/7348) add missing env var in github action ([#7355](https://github.com/AzzappApp/azzapp/pull/7355))
+* **fix:**  - use 4o-mini for affordable price
+* **fix:**  - **modules:** [#6405](https://github.com/AzzappApp/azzapp/pull/6405) background continues outside module preview ([#7347](https://github.com/AzzappApp/azzapp/pull/7347))
+* **feat:**  - **contactCard:** [#7264](https://github.com/AzzappApp/azzapp/pull/7264) use open ai api to read photos of business c… ([#7329](https://github.com/AzzappApp/azzapp/pull/7329))
+* **docs:**  - Update README.md
+* **docs:**  - update README.md
+* **fix:**  - ensure deleted profile profile are not handled in getProfilesByUser ([#7323](https://github.com/AzzappApp/azzapp/pull/7323))
+* **fix:**  - viewPort in module ([#7322](https://github.com/AzzappApp/azzapp/pull/7322))
+* **fix:**  - we need a non collapsable view to display the shadow ([#7316](https://github.com/AzzappApp/azzapp/pull/7316))
+* **fix:**  - choose texts depending of webcard kind ([#7313](https://github.com/AzzappApp/azzapp/pull/7313))
+* **fix:**  - hide follow button when no admin ([#7310](https://github.com/AzzappApp/azzapp/pull/7310))
+
 ## 1.7.1-canary.29
 
 * **feat:**  - business can scanner ([#7357](https://github.com/AzzappApp/azzapp/pull/7357))
