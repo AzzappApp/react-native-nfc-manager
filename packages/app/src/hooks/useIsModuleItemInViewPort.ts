@@ -29,38 +29,36 @@ const isInsideViewport = (
 const useIsModuleItemInViewPort = (
   scrollY: Animated.Value,
   itemStartY: number,
-  insidePosition: number,
-  dimension: { height: number },
+  componentheight: number,
+  isLayoutReady: boolean, // sometimes we need to wait for the layout to calculate the initial position when we did not start the scrolling
   cancel: boolean,
 ) => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    if (insidePosition > 0) {
+    if (isLayoutReady) {
       setIsVisible(
         isInsideViewport(
           //@ts-expect-error - __getValue is private but we need it
           scrollY.__getValue(),
-          itemStartY + insidePosition,
-          dimension.height,
+          itemStartY,
+          componentheight,
         ),
       );
     }
-    //react-hooks/exhaustive-deps, using it when insidePosition != 0
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [insidePosition]);
+  }, [isLayoutReady]);
 
   useEffect(() => {
     const listener = scrollY.addListener(({ value }) => {
-      setIsVisible(
-        isInsideViewport(value, itemStartY + insidePosition, dimension.height),
-      );
+      setIsVisible(isInsideViewport(value, itemStartY, componentheight));
     });
 
     return () => {
       scrollY.removeListener(listener);
     };
-  }, [scrollY, itemStartY, dimension, insidePosition]);
+  }, [scrollY, itemStartY, componentheight]);
 
   return cancel ? false : isVisible;
 };

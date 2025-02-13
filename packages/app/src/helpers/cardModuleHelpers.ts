@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/react-native';
-import { Dimensions, type TextStyle } from 'react-native';
+import { type TextStyle } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { splitArrayIntoChunks } from '@azzapp/shared/arrayHelpers';
 import { waitTime } from '@azzapp/shared/asyncHelpers';
@@ -351,32 +351,4 @@ export const hasCardModuleMediasError = (
     }
   }
   return false;
-};
-
-const { height: viewportHeight } = Dimensions.get('window');
-
-/**
- * The function `isInViewport` determines if a module media is within the viewport or partially visible based
- * on scroll position and module dimensions.
- * The `scrollPosition` parameter represents the current scroll position of the viewport.
- */
-export const isCardModuleMediaInViewport = (
-  scrollPosition: number,
-  modulePosition: number,
-  moduleHeight: number,
-): boolean => {
-  const viewportTop = scrollPosition;
-  const viewportBottom = scrollPosition + viewportHeight;
-
-  const moduleTop = modulePosition;
-  const moduleBottom = modulePosition + moduleHeight;
-
-  // Check if the module is within the viewport or just before or after it
-  return (
-    (moduleTop >= viewportTop && moduleTop <= viewportBottom) ||
-    (moduleBottom >= viewportTop && moduleBottom <= viewportBottom) ||
-    (moduleTop <= viewportTop && moduleBottom >= viewportBottom) ||
-    (moduleTop <= viewportTop && moduleBottom >= viewportTop) ||
-    (moduleTop <= viewportBottom && moduleBottom >= viewportBottom)
-  );
 };

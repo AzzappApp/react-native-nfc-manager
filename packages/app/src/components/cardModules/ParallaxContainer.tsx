@@ -41,12 +41,12 @@ const ParallaxContainer = ({
 
   const inViewport = useIsModuleItemInViewPort(
     scrollY,
-    itemStartY,
-    index * dimension.height,
-    dimension,
+    itemStartY + index * dimension.height,
+    dimension.height,
+    true,
     disableParallax,
   );
-
+  console.log(inViewport);
   return (
     <View style={[styles.container, dimension]}>
       <RNAnimated.View

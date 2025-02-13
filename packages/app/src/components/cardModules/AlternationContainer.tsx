@@ -217,9 +217,9 @@ const AlternationContainer = ({
 
   const inViewport = useIsModuleItemInViewPort(
     scrollY,
-    modulePosition ?? 0,
-    index * componentHeight,
-    dimension,
+    (modulePosition ?? 0) + index * componentHeight,
+    componentHeight,
+    componentHeight > 0,
     webCardViewMode === 'edit',
   );
 

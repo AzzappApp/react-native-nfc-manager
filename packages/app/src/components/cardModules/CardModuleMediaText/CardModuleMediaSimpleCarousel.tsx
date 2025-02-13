@@ -239,7 +239,6 @@ const SimpleCarouselItemComponent = ({
   scrollY,
   modulePosition,
   paused,
-  dimension,
   webCardViewMode,
 }: SimpleCarouselItemProps) => {
   const onPressItem = useCallback(() => {
@@ -252,8 +251,8 @@ const SimpleCarouselItemComponent = ({
   const inViewport = useIsModuleItemInViewPort(
     scrollY,
     modulePosition ?? 0,
-    0, // media are displayed horizontally
-    dimension,
+    mediaHeight,
+    true,
     webCardViewMode === 'edit',
   );
 

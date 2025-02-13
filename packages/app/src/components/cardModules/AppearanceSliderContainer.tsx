@@ -53,9 +53,9 @@ const AppearanceSliderContainer = ({
   const [componentHeight, setComponentHeight] = useState(0);
   const inViewport = useIsModuleItemInViewPort(
     scrollY,
-    itemStartY,
+    itemStartY + componentHeight,
     componentHeight,
-    dimension,
+    componentHeight > 0,
     webCardViewMode === 'edit',
   );
   const onLayout = useCallback((event: LayoutChangeEvent) => {
