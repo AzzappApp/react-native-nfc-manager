@@ -1,3 +1,7 @@
+## 1.7.1-canary.33
+
+* **fix:**  - reduce media id size to 14 ([#7433](https://github.com/AzzappApp/azzapp/pull/7433))
+
 ## 1.7.1-canary.32
 
 * **feat:**  - improve isModuleInViewport ([#7434](https://github.com/AzzappApp/azzapp/pull/7434))
