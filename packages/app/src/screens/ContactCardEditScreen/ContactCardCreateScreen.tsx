@@ -547,7 +547,7 @@ const ScanMyPaperBusinessCard = ({
         description: 'MultiUserAddModal - Cancel button label',
       })}
       onPress={onPress}
-      leftElement={<Icon icon="scan" />}
+      leftElement={<Icon icon="scan" size={24} />}
       style={style}
     />
   );

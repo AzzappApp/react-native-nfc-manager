@@ -46,7 +46,7 @@ const ParallaxContainer = ({
     true,
     disableParallax,
   );
-  console.log(inViewport);
+
   return (
     <View style={[styles.container, dimension]}>
       <RNAnimated.View

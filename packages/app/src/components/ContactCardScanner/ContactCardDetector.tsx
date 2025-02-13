@@ -17,6 +17,7 @@ import { graphql, useMutation } from 'react-relay';
 import { colors } from '#theme';
 import ImagePicker, { SelectImageStep } from '#components/ImagePicker';
 import { ScreenModal } from '#components/NativeRouter';
+import PermissionModal from '#components/PermissionModal';
 import useBoolean from '#hooks/useBoolean';
 import useIsForeground from '#hooks/useIsForeground';
 import useScreenDimensions from '#hooks/useScreenDimensions';
@@ -58,6 +59,7 @@ const ContactCardDetector = ({
   const [imageGallery, setImageGallery] = useState<ImagePickerResult | null>(
     null,
   );
+  const [showPermission, , closePermission] = useBoolean(true);
   const [showPicker, openPicker, closePicker] = useBoolean(false);
   const { width, height } = useScreenDimensions();
   const { bottom, top } = useScreenInsets();
@@ -295,7 +297,7 @@ const ContactCardDetector = ({
 
   return (
     <View style={styles.container}>
-      {isCameraMode && device ? (
+      {isCameraMode && device && isActive ? (
         <Camera
           ref={camera}
           style={styles.container}
@@ -407,40 +409,32 @@ const ContactCardDetector = ({
             />
           </Text>
         </View>
-        <Pressable onPress={setHorizontal}>
-          <View
-            style={[
-              styles.button,
-              {
-                top:
-                  boxDimension.y +
-                  boxDimension.height +
-                  (isHorizontal ? 50 : 15),
-                left: width / 2 - 44,
-              },
-              isHorizontal && styles.selected,
-            ]}
+        <View
+          style={[
+            styles.containerCameraAlign,
+            {
+              width,
+
+              top:
+                boxDimension.y + boxDimension.height + (isHorizontal ? 50 : 15),
+            },
+          ]}
+        >
+          <Pressable
+            onPress={setHorizontal}
+            style={[styles.button, isHorizontal && styles.selected]}
           >
             <Image source={horizontal} style={styles.icon} />
-          </View>
-        </Pressable>
-        <Pressable onPress={setVertical}>
-          <View
-            style={[
-              styles.button,
-              {
-                top:
-                  boxDimension.y +
-                  boxDimension.height +
-                  (isHorizontal ? 50 : 15),
-                left: width / 2,
-              },
-              !isHorizontal && styles.selected,
-            ]}
+          </Pressable>
+          <Pressable
+            onPress={setVertical}
+            style={[styles.button, !isHorizontal && styles.selected]}
           >
-            <Image source={vertical} style={styles.icon} />
-          </View>
-        </Pressable>
+            <View style={[styles.button, !isHorizontal && styles.selected]}>
+              <Image source={vertical} style={styles.icon} />
+            </View>
+          </Pressable>
+        </View>
         <View
           style={[
             {
@@ -515,6 +509,11 @@ const ContactCardDetector = ({
           steps={[SelectImageStep]}
         />
       </ScreenModal>
+      <PermissionModal
+        permissionsFor="photo"
+        onRequestClose={closePermission}
+        autoFocus={showPermission}
+      />
     </View>
   );
 };
@@ -524,6 +523,11 @@ const TAKE_BUTTON_SIZE = 74;
 const BORDER_RADIUS = 20;
 
 const styles = StyleSheet.create({
+  containerCameraAlign: {
+    height: 44,
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
   iconButton: {
     backgroundColor: 'rgba(255, 255, 255, 0.25)',
     borderWidth: 0,
@@ -549,10 +553,8 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'black' },
   icon: { width: 30, height: 30 },
   button: {
-    position: 'absolute',
     width: 44,
     height: 44,
-    backgroundColor: 'transparent',
     borderRadius: 6,
     alignItems: 'center',
     justifyContent: 'center',

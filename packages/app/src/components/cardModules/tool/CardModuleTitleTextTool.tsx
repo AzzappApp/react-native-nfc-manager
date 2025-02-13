@@ -58,7 +58,7 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
     });
     close();
   };
-  console.log(module.moduleKind);
+
   const { top: topInset } = useScreenInsets();
 
   return (
