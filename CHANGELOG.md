@@ -1,3 +1,7 @@
+## 1.7.1-rc.29
+
+* **fix:**  - dont display message is no trial and no subscription ([#7441](https://github.com/AzzappApp/azzapp/pull/7441))
+
 ## 1.7.1-rc.28
 
 * **fix:**  - **payment:** [#7416](https://github.com/AzzappApp/azzapp/pull/7416) don’t show NaN for web subscription ([#7418](https://github.com/AzzappApp/azzapp/pull/7418))
