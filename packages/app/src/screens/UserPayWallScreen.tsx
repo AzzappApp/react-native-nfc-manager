@@ -20,6 +20,7 @@ import {
   usePreloadedQuery,
   useRelayEnvironment,
 } from 'react-relay';
+import { waitTime } from '@azzapp/shared/asyncHelpers';
 import { colors, shadow } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import PremiumIndicator from '#components/PremiumIndicator';
@@ -246,6 +247,7 @@ const UserPayWallScreen = ({
           updateAvailableSeats >= 0 &&
           route.params?.activateFeature === 'MULTI_USER'
         ) {
+          await waitTime(2000); // we need to wait the call from revenue cat to ensure that user has a subscription on next call
           setAllowMultiUser(true);
         }
       }
