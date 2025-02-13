@@ -23,7 +23,7 @@ describe('useNativeRouter', () => {
     stack: [{ id: 'HOME', route: 'HOME', params: undefined }],
   };
 
-  it('should initialize router state', () => {
+  test('should initialize router state', () => {
     const { result } = renderHook(() => {
       return useNativeRouter({
         id: 'test',
@@ -109,7 +109,7 @@ describe('useNativeRouter', () => {
   });
 
   describe('router.getCurrentRoute', () => {
-    it('should return the modal route if any', () => {
+    test('should return the modal route if any', () => {
       const { result } = renderHook(() => {
         return useNativeRouter({
           id: 'test',
@@ -141,7 +141,7 @@ describe('useNativeRouter', () => {
       });
     });
 
-    it('should return the current tab if any', () => {
+    test('should return the current tab if any', () => {
       const { result } = renderHook(() => {
         return useNativeRouter({
           id: 'test',
@@ -175,7 +175,7 @@ describe('useNativeRouter', () => {
   });
 
   describe('router navigation', () => {
-    it('should handle push action', () => {
+    test('should handle push action', () => {
       const { result } = renderHook(() => useNativeRouter(init));
 
       act(() => {
@@ -187,7 +187,7 @@ describe('useNativeRouter', () => {
       expect((route as BasicRoute).state.route).toBe('SIGN_IN');
     });
 
-    it('should handle push action with tabs', () => {
+    test('should handle push action with tabs', () => {
       const { result } = renderHook(() => {
         return useNativeRouter({
           id: 'test',
@@ -219,7 +219,7 @@ describe('useNativeRouter', () => {
       });
     });
 
-    it('should handle back action', () => {
+    test('should handle back action', () => {
       const { result } = renderHook(() => useNativeRouter(init));
 
       act(() => {
@@ -231,7 +231,7 @@ describe('useNativeRouter', () => {
       expect((route as BasicRoute).state.route).toBe('HOME');
     });
 
-    it('should handle back action with tabs', () => {
+    test('should handle back action with tabs', () => {
       const { result } = renderHook(() =>
         useNativeRouter({
           id: 'test',
@@ -282,7 +282,7 @@ describe('useNativeRouter', () => {
       });
     });
 
-    it('should handle pop action', () => {
+    test('should handle pop action', () => {
       const { result } = renderHook(() => useNativeRouter(init));
 
       act(() => {
@@ -296,7 +296,7 @@ describe('useNativeRouter', () => {
       expect((route as BasicRoute).state.route).toBe('HOME');
     });
 
-    it('should handle replace action', () => {
+    test('should handle replace action', () => {
       const { result } = renderHook(() => useNativeRouter(init));
 
       act(() => {
@@ -309,7 +309,7 @@ describe('useNativeRouter', () => {
       expect((route as BasicRoute).state.route).toBe('SIGN_UP');
     });
 
-    it('should handle replace action with tabs', () => {
+    test('should handle replace action with tabs', () => {
       const { result } = renderHook(() =>
         useNativeRouter({
           id: 'test',
@@ -337,7 +337,7 @@ describe('useNativeRouter', () => {
       });
     });
 
-    it('should handle backToTop action', () => {
+    test('should handle backToTop action', () => {
       const { result } = renderHook(() => useNativeRouter(init));
 
       act(() => {
@@ -352,7 +352,7 @@ describe('useNativeRouter', () => {
       expect((route as BasicRoute).state.route).toBe('HOME');
     });
 
-    it('should handle showModal action', async () => {
+    test('should handle showModal action', async () => {
       const { result } = renderHook(() => useNativeRouter(init));
 
       await act(async () => {
@@ -366,7 +366,7 @@ describe('useNativeRouter', () => {
       expect(result.current.routerState.modals[0].id).toBe('modal1');
     });
 
-    it('should handle updateModal action', async () => {
+    test('should handle updateModal action', async () => {
       const { result } = renderHook(() => useNativeRouter(init));
 
       await act(async () => {
@@ -389,7 +389,7 @@ describe('useNativeRouter', () => {
       expect(result.current.routerState.modals[0].animationType).toBe('slide');
     });
 
-    it('should handle hideModal action', async () => {
+    test('should handle hideModal action', async () => {
       const { result } = renderHook(() => useNativeRouter(init));
 
       await act(async () => {
@@ -403,7 +403,7 @@ describe('useNativeRouter', () => {
       expect(result.current.routerState.modals).toHaveLength(0);
     });
 
-    it('should handle __screenDismissed action', () => {
+    test('should handle __screenDismissed action', () => {
       const { result } = renderHook(() => useNativeRouter(init));
 
       act(() => {
@@ -427,7 +427,7 @@ describe('useNativeRouter', () => {
       });
     });
 
-    it('should handle __screenDismissed action with modal', async () => {
+    test('should handle __screenDismissed action with modal', async () => {
       const { result } = renderHook(() => useNativeRouter(init));
 
       await act(async () => {
@@ -443,7 +443,7 @@ describe('useNativeRouter', () => {
   });
 
   describe('listeners', () => {
-    it('should handle addRouteWillChangeListener', () => {
+    test('should handle addRouteWillChangeListener', () => {
       const { result } = renderHook(() => useNativeRouter(init));
       const listener = jest.fn();
 
@@ -457,7 +457,7 @@ describe('useNativeRouter', () => {
       );
     });
 
-    it('should handle addRouteDidChangeListener', () => {
+    test('should handle addRouteDidChangeListener', () => {
       const { result } = renderHook(() => useNativeRouter(init));
       const listener = jest.fn();
 
@@ -471,7 +471,7 @@ describe('useNativeRouter', () => {
       );
     });
 
-    it('should handle addScreenWillBePushedListener', () => {
+    test('should handle addScreenWillBePushedListener', () => {
       const { result } = renderHook(() => useNativeRouter(init));
       const listener = jest.fn();
 
@@ -492,7 +492,7 @@ describe('useNativeRouter', () => {
       ]);
     });
 
-    it('should handle addScreenWillBeRemovedListener', () => {
+    test('should handle addScreenWillBeRemovedListener', () => {
       const { result } = renderHook(() => useNativeRouter(init));
       const listener = jest.fn();
 
@@ -514,7 +514,7 @@ describe('useNativeRouter', () => {
       ]);
     });
 
-    it('should handle screen listeners in replace all action', () => {
+    test('should handle screen listeners in replace all action', () => {
       const { result } = renderHook(() =>
         useNativeRouter({
           id: 'test',
@@ -635,7 +635,7 @@ describe('useNativeRouter', () => {
       `);
     });
 
-    it('should handle addModalCloseRequestListener', async () => {
+    test('should handle addModalCloseRequestListener', async () => {
       const { result } = renderHook(() => useNativeRouter(init));
       await act(async () => {
         await result.current.router.showModal(
@@ -668,7 +668,7 @@ describe('useNativeRouter', () => {
       expect(result.current.routerState.modals).toHaveLength(1);
     });
 
-    it('should handle modal interceptors', async () => {
+    test('should handle modal interceptors', async () => {
       const { result } = renderHook(() => useNativeRouter(init));
       let deferred: Deferred<undefined> | undefined;
       const interceptor = jest.fn(() => {
@@ -697,7 +697,7 @@ describe('useNativeRouter', () => {
   });
 
   describe('back button', () => {
-    it('should handle BackHandler event', async () => {
+    test('should handle BackHandler event', async () => {
       let listener: () => boolean = () => false;
       (BackHandler.addEventListener as jest.Mock).mockImplementationOnce(
         (_, callback) => {

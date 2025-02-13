@@ -77,7 +77,7 @@ describe('processShareBackSubmission', () => {
     jest.clearAllMocks();
   });
 
-  it('should send an SMS if preferred contact method is SMS', async () => {
+  test('should send an SMS if preferred contact method is SMS', async () => {
     jwtDecodeMocked.mockImplementation(() => ({
       exp: Date.now() / 1000 + 1000,
     }));
@@ -109,7 +109,7 @@ describe('processShareBackSubmission', () => {
     expect(sendEmail).not.toHaveBeenCalled();
   });
 
-  it('should send an email if preferred contact method is EMAIL', async () => {
+  test('should send an email if preferred contact method is EMAIL', async () => {
     jwtDecodeMocked.mockImplementation(() => ({
       exp: Date.now() / 1000 + 1000,
     }));
@@ -145,7 +145,7 @@ describe('processShareBackSubmission', () => {
     expect(sendTwilioSMS).not.toHaveBeenCalled();
   });
 
-  it('should reply with form error if token is expired', async () => {
+  test('should reply with form error if token is expired', async () => {
     parseWithZodMocked.mockReturnValueOnce({
       reply: jest.fn().mockImplementation(() => ({
         formErrors: ['Token expired, please refresh and try sharing again'],

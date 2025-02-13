@@ -24,13 +24,13 @@ describe('useAppState', () => {
     return (newStatus: AppStateStatus) => listener(newStatus);
   };
 
-  it('should return current state by default', () => {
+  test('should return current state by default', () => {
     const { result } = renderHook(() => useAppState());
 
     expect(result.current).toBe(AppState.currentState);
   });
 
-  it('should update state when it change', () => {
+  test('should update state when it change', () => {
     const newStatus = 'background';
     const emit = createEmitAppStateChange();
 

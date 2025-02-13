@@ -67,7 +67,7 @@ import type { WebCardRoute } from '#routes';
 /**
  * Display a Web card.
  */
-const WebCardScreen = ({
+export const WebCardScreen = ({
   preloadedQuery,
   hasFocus,
   route: { params },
@@ -436,6 +436,7 @@ const webCardScreenByIdQuery = graphql`
       ...WebCardScreenPublishHelper_webCard
       ...AddContactModal_webCard
     }
+    ## TODO find a way to remove this profile fetch
     profile: node(id: $profileId) {
       ... on Profile {
         ...WebCardScreenButtonBar_profile
@@ -468,6 +469,7 @@ const webCardScreenByNameQuery = graphql`
       ...WebCardScreenPublishHelper_webCard
       ...AddContactModal_webCard
     }
+    ## TODO find a way to remove this profile fetch
     profile: node(id: $profileId) {
       ... on Profile {
         ...WebCardScreenButtonBar_profile

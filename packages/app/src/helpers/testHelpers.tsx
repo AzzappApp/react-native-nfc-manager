@@ -6,9 +6,10 @@ import { IntlProvider } from 'react-intl';
 import { Text } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { RouterProvider, useNativeRouter } from '#components/NativeRouter';
-import type { RouterInit } from '#components/NativeRouter';
+import type { NativeRouter, RouterInit } from '#components/NativeRouter';
 import type { RenderResult } from '@testing-library/react-native';
 import type { ReactElement } from 'react';
+
 const initialRoutes: RouterInit = {
   id: 'test',
   stack: [
@@ -67,3 +68,33 @@ const customRender = (ui: ReactElement, options?: any): RenderResult =>
 
 export * from '@testing-library/react-native';
 export { customRender as render };
+
+export const createMockRouter = (): jest.MockedObject<NativeRouter> => ({
+  getCurrentRoute: jest.fn(),
+  getCurrentRouterState: jest.fn(),
+  getCurrentScreenId: jest.fn(),
+  canGoBack: jest.fn(),
+
+  // navigation
+  push: jest.fn(),
+  back: jest.fn(),
+  pop: jest.fn(),
+  replace: jest.fn(),
+  splice: jest.fn(),
+  replaceAll: jest.fn(),
+  backToTop: jest.fn(),
+
+  // listeners
+  addRouteWillChangeListener: jest.fn(),
+  addRouteDidChangeListener: jest.fn(),
+  addScreenWillBePushedListener: jest.fn(),
+  addScreenWillBeRemovedListener: jest.fn(),
+  addModalCloseRequestListener: jest.fn(),
+
+  // modals
+  showModal: jest.fn(),
+  updateModal: jest.fn(),
+  hideModal: jest.fn(),
+  addModalInterceptor: jest.fn(),
+  __screenDismissed: jest.fn(),
+});

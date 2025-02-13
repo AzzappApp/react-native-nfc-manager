@@ -22,7 +22,7 @@ describe('ForgotPassword Screen', () => {
     jest.useRealTimers();
   });
 
-  test.only('should display the confirmation message when a valid form is submitted', async () => {
+  test('should display the confirmation message when a valid form is submitted', async () => {
     jest.useFakeTimers();
     const { getByPlaceholderText, getByLabelText } = render(
       <ForgotPasswordScreen />,
@@ -37,13 +37,13 @@ describe('ForgotPassword Screen', () => {
       fireEvent.press(getByLabelText('Tap to reset your password'));
     });
 
-    await waitFor(() => expect(forgotPasswordMock).toBeCalled());
+    await waitFor(() => expect(forgotPasswordMock).toHaveBeenCalled());
 
     jest.useRealTimers();
   });
 
   test('should not call the `forgotPassword` callback when the provided email is invalid', () => {
-    const { getByRole, getByPlaceholderText } = render(
+    const { getByTestId, getByPlaceholderText } = render(
       <ForgotPasswordScreen />,
     );
     const inputLogin = getByPlaceholderText('Email address');
@@ -51,7 +51,7 @@ describe('ForgotPassword Screen', () => {
       fireEvent(inputLogin, 'onChangeText', 'test@com');
     });
 
-    const buttonComponent = getByRole('button');
+    const buttonComponent = getByTestId('submitButton');
     act(() => {
       fireEvent(buttonComponent, 'onPress');
     });

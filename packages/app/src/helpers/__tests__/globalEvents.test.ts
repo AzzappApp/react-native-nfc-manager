@@ -1,7 +1,7 @@
 import { addGlobalEventListener, dispatchGlobalEvent } from '../globalEvents';
 
 describe('globalEvents', () => {
-  it('adds and removes a listener correctly', () => {
+  test('adds and removes a listener correctly', () => {
     const listener = jest.fn();
     const removeListener = addGlobalEventListener('SIGN_IN', listener);
     expect(removeListener).toBeDefined();

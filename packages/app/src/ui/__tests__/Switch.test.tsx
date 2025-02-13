@@ -17,7 +17,7 @@ describe('Switch component', () => {
     jest.clearAllMocks();
   });
 
-  it('should render Switch component with default value', () => {
+  test('should render Switch component with default value', () => {
     const { getByTestId } = render(
       <Switch testID="switch" onValueChange={mockOnValueChange} />,
     );
@@ -26,7 +26,7 @@ describe('Switch component', () => {
     expect(switchComponent.props.value).toBe(false);
   });
 
-  it('should render Switch component with the right variant', () => {
+  test('should render Switch component with the right variant', () => {
     const { rerender, getByTestId } = render(
       <Switch
         testID="switch"
@@ -51,7 +51,7 @@ describe('Switch component', () => {
     });
   });
 
-  it('should render Switch component with dark mode', () => {
+  test('should render Switch component with dark mode', () => {
     mockedUseColorScheme.mockReturnValue('dark');
     const { getByTestId } = render(
       <Switch
@@ -66,7 +66,7 @@ describe('Switch component', () => {
     expect(switchComponent.props.onTintColor).toBe(colors.grey100);
   });
 
-  it('should call onValueChange when the user taps the switch', () => {
+  test('should call onValueChange when the user taps the switch', () => {
     const { getByTestId } = render(
       <Switch testID="switch" onValueChange={mockOnValueChange} />,
     );

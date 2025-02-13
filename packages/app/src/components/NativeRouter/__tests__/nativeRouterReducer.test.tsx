@@ -14,7 +14,7 @@ const initialState: RouterState = {
 };
 
 describe('nativeRouterReducer', () => {
-  it('should handle SPLICE action', () => {
+  test('should handle SPLICE action', () => {
     const state: RouterState = {
       ...initialState,
       stack: [
@@ -36,7 +36,7 @@ describe('nativeRouterReducer', () => {
     expect(newState.stack[1].id).toBe('new-route');
   });
 
-  it('should splice multiple routes and add a new route', () => {
+  test('should splice multiple routes and add a new route', () => {
     const state: RouterState = {
       ...initialState,
       stack: [
@@ -60,7 +60,7 @@ describe('nativeRouterReducer', () => {
     expect(newState.stack[1].id).toBe('new-route');
   });
 
-  it('should splice within a nested tabs structure', () => {
+  test('should splice within a nested tabs structure', () => {
     const state: RouterState = {
       stack: [
         {
@@ -109,7 +109,7 @@ describe('nativeRouterReducer', () => {
     expect(nestedStack.state[1].id).toBe('new-tab-route');
   });
 
-  it('should splice and remove routes correctly', () => {
+  test('should splice and remove routes correctly', () => {
     const action: RouterAction = {
       type: 'SPLICE',
       payload: { count: 2 },
@@ -128,7 +128,7 @@ describe('nativeRouterReducer', () => {
     expect(newState.stack[0].id).toBe('home');
   });
 
-  it('should splice and handle nested stack within tabs', () => {
+  test('should splice and handle nested stack within tabs', () => {
     const action: RouterAction = {
       type: 'SPLICE',
       payload: {
@@ -173,7 +173,7 @@ describe('nativeRouterReducer', () => {
     expect(nestedStack.state[1].id).toBe('new-nested-route');
   });
 
-  it('should handle SHOW_MODAL action', () => {
+  test('should handle SHOW_MODAL action', () => {
     const action: RouterAction = {
       type: 'SHOW_MODAL',
       payload: {
@@ -192,7 +192,7 @@ describe('nativeRouterReducer', () => {
     expect(newState.modals[0].children).toEqual(action.payload.initialContent);
   });
 
-  it('should handle UPDATE_MODAL action', () => {
+  test('should handle UPDATE_MODAL action', () => {
     const action: RouterAction = {
       type: 'UPDATE_MODAL',
       payload: {
@@ -223,7 +223,7 @@ describe('nativeRouterReducer', () => {
     expect(newState.modals[0].animationType).toBe('slide');
   });
 
-  it('should handle HIDE_MODAL action', () => {
+  test('should handle HIDE_MODAL action', () => {
     const action: RouterAction = {
       type: 'HIDE_MODAL',
       payload: { modalId: 'modal1' },
@@ -246,7 +246,7 @@ describe('nativeRouterReducer', () => {
     expect(newState.modals).toHaveLength(0);
   });
 
-  it('should handle BACK_TO_TOP action', () => {
+  test('should handle BACK_TO_TOP action', () => {
     const action: RouterAction = {
       type: 'BACK_TO_TOP',
       payload: undefined,
@@ -265,7 +265,7 @@ describe('nativeRouterReducer', () => {
     expect(newState.stack[0].id).toBe('home');
   });
 
-  it('should handle REPLACE_ALL action', () => {
+  test('should handle REPLACE_ALL action', () => {
     const action: RouterAction = {
       type: 'REPLACE_ALL',
       payload: {
@@ -279,7 +279,7 @@ describe('nativeRouterReducer', () => {
     expect(newState.stack[0].id).toBe('new-home');
   });
 
-  it('should handle SCREEN_DISMISSED action', () => {
+  test('should handle SCREEN_DISMISSED action', () => {
     const action: RouterAction = {
       type: 'SCREEN_DISMISSED',
       payload: { id: 'second' },
@@ -298,7 +298,7 @@ describe('nativeRouterReducer', () => {
     expect(newState.stack[0].id).toBe('home');
   });
 
-  it('should handle SCREEN_DISMISSED action with modal', () => {
+  test('should handle SCREEN_DISMISSED action with modal', () => {
     const action: RouterAction = {
       type: 'SCREEN_DISMISSED',
       payload: { id: 'modal1' },
@@ -321,7 +321,7 @@ describe('nativeRouterReducer', () => {
     expect(newState.modals).toHaveLength(0);
   });
 
-  it('should remove all modals belonging to a screen when this screen is removed', () => {
+  test('should remove all modals belonging to a screen when this screen is removed', () => {
     const state: RouterState = {
       stack: [
         { id: 'home', kind: 'route', state: {} as Route },
@@ -360,7 +360,7 @@ describe('nativeRouterReducer', () => {
     expect(newState.modals[0].id).toBe('modal1');
   });
 
-  it('should handle SET_TAB action', () => {
+  test('should handle SET_TAB action', () => {
     const action: RouterAction = {
       type: 'SET_TAB',
       payload: { tabIndex: 1 },
@@ -391,7 +391,7 @@ describe('nativeRouterReducer', () => {
     expect((newState.stack[0] as TabsRoute).state.currentIndex).toBe(1);
   });
 
-  it('should handle TAB_BACK action', () => {
+  test('should handle TAB_BACK action', () => {
     const action: RouterAction = {
       type: 'TAB_BACK',
       payload: undefined,

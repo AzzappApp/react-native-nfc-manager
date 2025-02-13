@@ -4,7 +4,7 @@ import { Animated, Easing } from 'react-native';
 import AnimatedCircleHint from '../AnimatedCircleHint';
 
 describe('Animated Circle Hint component', () => {
-  it('renders correctly with provided props', () => {
+  test('renders correctly with provided props', () => {
     const { queryByTestId } = render(
       <AnimatedCircleHint
         testID="animated-circle"
@@ -20,7 +20,7 @@ describe('Animated Circle Hint component', () => {
     expect(queryByTestId('child-view')).toBeTruthy();
   });
 
-  it('renders null when hidesWhenStopped prop is true and animating prop is false', () => {
+  test('renders null when hidesWhenStopped prop is true and animating prop is false', () => {
     const { queryByTestId } = render(
       <AnimatedCircleHint
         testID="animated-circle"

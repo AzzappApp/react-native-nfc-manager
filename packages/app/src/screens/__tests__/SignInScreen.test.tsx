@@ -3,7 +3,13 @@ import { flushPromises } from '@azzapp/shared/jestHelpers';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { init as initLocaleHelpers } from '#helpers/localeHelpers';
 import { signin } from '#helpers/MobileWebAPI';
-import { act, fireEvent, render, screen } from '#helpers/testHelpers';
+import {
+  act,
+  fireEvent,
+  createMockRouter,
+  render,
+  screen,
+} from '#helpers/testHelpers';
 import SignInScreen from '../SignInScreen';
 
 jest.mock('#helpers/MobileWebAPI');
@@ -12,6 +18,12 @@ jest.mock('react-native-keychain', () => ({
   setSharedWebCredentials: jest.fn().mockResolvedValue(true),
 }));
 jest.mock('#ui/SelectList');
+
+const mockRouter = createMockRouter();
+jest.mock('#components/NativeRouter', () => ({
+  ...jest.requireActual('#components/NativeRouter'),
+  useRouter: () => mockRouter,
+}));
 
 describe('Signin Screen', () => {
   const signinMock = jest.mocked(signin);
@@ -26,8 +38,7 @@ describe('Signin Screen', () => {
     dispatchGlobalEventMock.mockReset();
   });
 
-  // TODO reenable this test
-  xtest('submit button should be `disabled` if both credential and password are empty', () => {
+  test('submit button should be enabled only if both credential or password are set', () => {
     render(<SignInScreen />);
 
     const credentialInput = screen.getByPlaceholderText('Email address');
@@ -41,6 +52,7 @@ describe('Signin Screen', () => {
     expect(buttonComponent).toBeDisabled();
     act(() => fireEvent(passwordInput, 'onChangeText', 'myPassword'));
     expect(passwordInput.props.value).toBe('myPassword');
+    expect(buttonComponent).not.toBeDisabled();
   });
 
   test('should call the `signin` callback if credential and password are filled', async () => {
@@ -62,10 +74,16 @@ describe('Signin Screen', () => {
     const passwordInput = screen.getByPlaceholderText('Password');
     const buttonComponent = screen.getByTestId('submitButton');
 
+    act(() => fireEvent(buttonComponent, 'onPress'));
+    expect(signin).not.toHaveBeenCalled();
+
     act(() => fireEvent(credentialInput, 'onChangeText', 'myname'));
+
+    act(() => fireEvent(buttonComponent, 'onPress'));
+    expect(signin).not.toHaveBeenCalled();
+
     act(() => fireEvent(passwordInput, 'onChangeText', 'myPassword'));
     act(() => fireEvent(buttonComponent, 'onPress'));
-
     expect(signin).toHaveBeenCalledWith({
       credential: 'myname',
       password: 'myPassword',
@@ -92,6 +110,26 @@ describe('Signin Screen', () => {
     });
   });
 
+  test('should display an error message if the credentials are invalid', async () => {
+    render(<SignInScreen />);
+    const credentialInput = screen.getByPlaceholderText('Email address');
+    const passwordInput = screen.getByPlaceholderText('Password');
+    const buttonComponent = screen.getByTestId('submitButton');
+
+    act(() => fireEvent(credentialInput, 'onChangeText', '__'));
+    act(() => fireEvent(passwordInput, 'onChangeText', 'myPassword'));
+
+    expect(
+      screen.queryByText('Please use a valid phone number or email address'),
+    ).not.toBeTruthy();
+
+    act(() => fireEvent(buttonComponent, 'onPress'));
+    expect(
+      screen.queryByText('Please use a valid phone number or email address'),
+    ).toBeTruthy();
+    expect(signinMock).not.toHaveBeenCalled();
+  });
+
   test('should display an error message if the `signin` callback fails', async () => {
     render(<SignInScreen />);
     signinMock.mockRejectedValueOnce(new Error(ERRORS.INVALID_CREDENTIALS));
@@ -108,5 +146,61 @@ describe('Signin Screen', () => {
     act(() => fireEvent(buttonComponent, 'onPress'));
     await act(flushPromises);
     expect(screen.queryByText('Invalid credentials')).toBeTruthy();
+  });
+
+  test('should display an error message if the account has been disabled', async () => {
+    render(<SignInScreen />);
+    signinMock.mockRejectedValueOnce(new Error(ERRORS.FORBIDDEN));
+
+    const credentialInput = screen.getByPlaceholderText('Email address');
+    const passwordInput = screen.getByPlaceholderText('Password');
+    const buttonComponent = screen.getByTestId('submitButton');
+
+    act(() => fireEvent(credentialInput, 'onChangeText', 'myname'));
+    act(() => fireEvent(passwordInput, 'onChangeText', 'myPassword'));
+
+    expect(
+      screen.queryByText(
+        'Your account has been disabled. Please contact support.',
+      ),
+    ).not.toBeTruthy();
+
+    act(() => fireEvent(buttonComponent, 'onPress'));
+    await act(flushPromises);
+    expect(
+      screen.queryByText(
+        'Your account has been disabled. Please contact support.',
+      ),
+    ).toBeTruthy();
+  });
+
+  test('should redirect the user if the user credential is not confirmed', async () => {
+    render(<SignInScreen />);
+    signinMock.mockResolvedValueOnce({
+      token: 'fake-token',
+      refreshToken: 'fake-refreshToken',
+      userId: 'fake-userId',
+      profileInfos: null,
+      email: null,
+      phoneNumber: null,
+      issuer: 'fake.email@gmail.com',
+    });
+
+    const credentialInput = screen.getByPlaceholderText('Email address');
+    const passwordInput = screen.getByPlaceholderText('Password');
+    const buttonComponent = screen.getByTestId('submitButton');
+
+    act(() => fireEvent(credentialInput, 'onChangeText', 'myname'));
+    act(() => fireEvent(passwordInput, 'onChangeText', 'myPassword'));
+    act(() => fireEvent(buttonComponent, 'onPress'));
+    await act(flushPromises);
+    expect(dispatchGlobalEvent).not.toHaveBeenCalled();
+
+    expect(mockRouter.push).toHaveBeenCalledWith({
+      route: 'CONFIRM_REGISTRATION',
+      params: {
+        issuer: 'fake.email@gmail.com',
+      },
+    });
   });
 });
