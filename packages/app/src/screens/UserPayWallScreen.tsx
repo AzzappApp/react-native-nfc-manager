@@ -56,6 +56,7 @@ const userPayWallcreenQuery = graphql`
         status
         availableSeats
         totalSeats
+        subscriptionPlan
       }
     }
   }
@@ -72,7 +73,7 @@ const UserPayWallScreen = ({
   const { height } = useWindowDimensions();
   const { bottom } = useScreenInsets();
   const [period, setPeriod] = useState<'month' | 'year'>(
-    data.currentUser?.userSubscription?.subscriptionId.includes('month')
+    data.currentUser?.userSubscription?.subscriptionPlan === 'monthly'
       ? 'month'
       : 'year',
   );
@@ -483,20 +484,25 @@ const UserPayWallScreen = ({
         =1 {{qty} user}
         other {{qty} Users}
       } billed {period}"
-                description="sdfsdf"
+                description="Paywall subscription subtitle for active subscription"
                 values={{
-                  qty: parseInt(
-                    data.currentUser?.userSubscription?.subscriptionId
-                      .split('.')
-                      .pop() ?? '0',
-                    10,
-                  ),
+                  qty: data.currentUser?.userSubscription?.totalSeats,
                   period:
-                    data.currentUser?.userSubscription?.subscriptionId.includes(
-                      'year',
-                    )
-                      ? 'yearly'
-                      : 'monthly',
+                    data.currentUser?.userSubscription?.subscriptionPlan ===
+                    'yearly'
+                      ? intl.formatMessage({
+                          defaultMessage: 'yearly',
+                          description:
+                            'UserPaywall Screen - yearly billing - period',
+                        })
+                      : data.currentUser?.userSubscription?.subscriptionPlan ===
+                          'monthly'
+                        ? intl.formatMessage({
+                            defaultMessage: 'monthly',
+                            description:
+                              'UserPaywall Screen - monthly billing - period',
+                          })
+                        : '',
                 }}
               />
             )}
