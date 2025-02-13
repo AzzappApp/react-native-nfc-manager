@@ -1,32 +1,37 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ResizeMode, Video } from 'expo-av';
-import { useEffect, useState } from 'react';
+import { capitalize } from 'lodash';
+import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { useColorScheme, View } from 'react-native';
+import { useColorScheme, View, StyleSheet } from 'react-native';
 import * as mime from 'react-native-mime-types'; // FIXME import is verry big
 import Toast from 'react-native-toast-message';
 import { useMutation } from 'react-relay';
 import { graphql, Observable } from 'relay-runtime';
 import { mainRoutes } from '#mobileRoutes';
 import { colors } from '#theme';
+import ContactCardDetector from '#components/ContactCardScanner/ContactCardDetector';
 import {
   preventModalDismiss,
   useRouter,
   ScreenModal,
 } from '#components/NativeRouter';
 import BottomSheetPopup from '#components/popup/BottomSheetPopup';
-import { PopupButton } from '#components/popup/PopupElements';
 import { onChangeWebCard } from '#helpers/authStore';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getFileName } from '#helpers/fileHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
-import { getPhonenumberWithCountryCode } from '#helpers/phoneNumbersHelper';
+import {
+  extractPhoneNumberDetails,
+  getPhonenumberWithCountryCode,
+} from '#helpers/phoneNumbersHelper';
 import useBoolean from '#hooks/useBoolean';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
+import Icon from '#ui/Icon';
 import SafeAreaView from '#ui/SafeAreaView';
 import Text from '#ui/Text';
 import UploadProgressModal from '#ui/UploadProgressModal';
@@ -37,8 +42,10 @@ import {
 } from './ContactCardSchema';
 import type { ScreenOptions } from '#components/NativeRouter';
 import type { ContactCardCreateScreenMutation } from '#relayArtifacts/ContactCardCreateScreenMutation.graphql';
+import type { ContactCardDetectorMutation$data } from '#relayArtifacts/ContactCardDetectorMutation.graphql';
 import type { ContactCardCreateRoute } from '#routes';
 import type { CountryCode } from 'libphonenumber-js';
+import type { ViewStyle } from 'react-native';
 
 const ContactCardCreateScreen = () => {
   const styles = useStyleSheet(stylesheet);
@@ -91,6 +98,7 @@ const ContactCardCreateScreen = () => {
     control,
     handleSubmit,
     formState: { isSubmitting },
+    setValue,
   } = useForm<ContactCardFormValues>({
     mode: 'onBlur',
     shouldFocusError: true,
@@ -275,6 +283,67 @@ const ContactCardCreateScreen = () => {
     },
   );
 
+  const loadFormFromScan = useCallback(
+    (data: ContactCardDetectorMutation$data['extractVisitCardData']) => {
+      if (data) {
+        setValue('company', data.company);
+        setValue('firstName', data.firstName);
+        setValue('lastName', data.lastName);
+        if (data.title) {
+          setValue('title', capitalize(data.title));
+        }
+        setValue('companyActivityLabel', data.company);
+        const formattedEmails = data.emails
+          ?.map((email: string) => {
+            if (email) {
+              return { address: email, selected: true, label: 'WORK' };
+            }
+            return null;
+          })
+          .filter(n => n != null);
+        if (formattedEmails) {
+          setValue('emails', formattedEmails);
+        }
+        const formattedPhoneNumber = data.phoneNumbers
+          ?.map((phoneNumber: string) => {
+            if (phoneNumber) {
+              return {
+                ...extractPhoneNumberDetails(phoneNumber),
+                selected: true,
+                label: 'WORK',
+              };
+            }
+            return null;
+          })
+          .filter(n => n != null);
+
+        if (formattedPhoneNumber) {
+          setValue('phoneNumbers', formattedPhoneNumber);
+        }
+        const formattedUrl = data.urls
+          ?.map(url => {
+            return { address: url, selected: true };
+          })
+          .filter(n => n != null);
+
+        if (formattedUrl) {
+          setValue('urls', formattedUrl);
+        }
+
+        const formattedAdress = data.addresses
+          ?.map(add => {
+            return { address: add, selected: true, label: 'WORK' };
+          })
+          .filter(n => n != null);
+
+        if (formattedAdress) {
+          setValue('addresses', formattedAdress);
+        }
+      }
+    },
+    [setValue],
+  );
+
   useEffect(() => {
     return Toast.hide;
   }, []);
@@ -286,6 +355,13 @@ const ContactCardCreateScreen = () => {
     }, 300);
     return () => clearTimeout(popupTimeout);
   }, [showPopup]);
+
+  const [showScanner, openScanner, closeScanner] = useBoolean(false);
+
+  const openScannerFromPopup = useCallback(() => {
+    hidePopup();
+    openScanner();
+  }, [hidePopup, openScanner]);
 
   return (
     <>
@@ -325,6 +401,16 @@ const ContactCardCreateScreen = () => {
                 style={styles.headerButton}
               />
             }
+          />
+          <Text variant="small" style={styles.centerGreyText}>
+            <FormattedMessage
+              defaultMessage="Add the information you’d like to share with your ContactCard"
+              description="ContactCardCreateScreen - Header Subtitle"
+            />
+          </Text>
+          <ScanMyPaperBusinessCard
+            onPress={openScanner}
+            style={styles.scanBusinessCardButton}
           />
 
           <ContactCardCreateForm control={control} />
@@ -371,24 +457,40 @@ const ContactCardCreateScreen = () => {
               />
             </Text>
           </View>
-          <PopupButton
+          <Button
             onPress={hidePopup}
-            text={intl.formatMessage({
-              defaultMessage: 'Ok, continue',
-              description: 'Creare contact card screen / next buton on popup',
+            label={intl.formatMessage({
+              defaultMessage: 'Fill my ContactCard manually',
+              description:
+                'Create contact card screen - Popup -  button creation manually',
             })}
           />
+          <Text variant="small" style={styles.centerGreyText}>
+            <FormattedMessage
+              defaultMessage=" or save time"
+              description="ContactCardCreateScreen - Message in popup between 2 buttons"
+            />
+          </Text>
+          <ScanMyPaperBusinessCard onPress={openScannerFromPopup} />
         </View>
       </BottomSheetPopup>
+      {showScanner && (
+        <View style={StyleSheet.absoluteFill}>
+          <ContactCardDetector
+            close={closeScanner}
+            extractData={loadFormFromScan}
+          />
+        </View>
+      )}
     </>
   );
 };
 
-const stylesheet = createStyleSheet(theme => ({
+const stylesheet = createStyleSheet(appearance => ({
   headerButton: { paddingHorizontal: 5, minWidth: 74 },
   container: { flex: 1 },
   popupContainer: {
-    backgroundColor: theme === 'dark' ? colors.grey900 : colors.white,
+    backgroundColor: appearance === 'dark' ? colors.grey900 : colors.white,
     width: 295,
     borderRadius: 20,
     alignSelf: 'center',
@@ -401,14 +503,25 @@ const stylesheet = createStyleSheet(theme => ({
   },
   popupPage: { top: 0, width: '100%', paddingBottom: 20 },
   popupHeaderTextContainer: {
-    color: theme === 'dark' ? colors.white : colors.black,
+    color: appearance === 'dark' ? colors.white : colors.black,
     paddingTop: 20,
     textAlign: 'center',
   },
   popupDescriptionTextContainer: {
-    color: theme === 'dark' ? colors.white : colors.black,
+    color: appearance === 'dark' ? colors.white : colors.black,
     paddingTop: 10,
     textAlign: 'center',
+  },
+  centerGreyText: {
+    color: appearance === 'dark' ? colors.grey400 : colors.grey600,
+    textAlign: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 40,
+  },
+  scanBusinessCardButton: {
+    marginHorizontal: 48,
+    marginTop: 10,
+    marginBottom: 10,
   },
 }));
 
@@ -417,3 +530,25 @@ ContactCardCreateScreen.getScreenOptions = (): ScreenOptions => ({
 });
 
 export default ContactCardCreateScreen;
+
+const ScanMyPaperBusinessCard = ({
+  onPress,
+  style,
+}: {
+  onPress: () => void;
+  style?: ViewStyle;
+}) => {
+  const intl = useIntl();
+  return (
+    <Button
+      variant="secondary"
+      label={intl.formatMessage({
+        defaultMessage: 'Scan my paper business card',
+        description: 'MultiUserAddModal - Cancel button label',
+      })}
+      onPress={onPress}
+      leftElement={<Icon icon="scan" />}
+      style={style}
+    />
+  );
+};

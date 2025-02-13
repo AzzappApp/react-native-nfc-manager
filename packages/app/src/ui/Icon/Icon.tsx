@@ -398,6 +398,9 @@ const icons = {
   get saturation() {
     return require('./assets/saturation.png');
   },
+  get scan() {
+    return require('./assets/scan.png');
+  },
   get search() {
     return require('./assets/search.png');
   },

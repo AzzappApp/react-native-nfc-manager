@@ -55,3 +55,20 @@ export const getPhonenumberWithCountryCode = (
     return phoneNumber;
   }
 };
+
+export const extractPhoneNumberDetails = (
+  phoneNumber: string,
+): { number: string; countryCode?: string | undefined } => {
+  try {
+    const parsedNumber = parsePhoneNumberWithError(phoneNumber);
+    if (parsedNumber) {
+      return {
+        countryCode: parsedNumber.country,
+        number: parsedNumber.nationalNumber,
+      };
+    }
+    return { number: phoneNumber };
+  } catch {
+    return { number: phoneNumber };
+  }
+};
