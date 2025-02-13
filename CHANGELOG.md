@@ -1,3 +1,7 @@
+## 1.7.1-canary.29
+
+* **feat:**  - business can scanner ([#7357](https://github.com/AzzappApp/azzapp/pull/7357))
+
 ## 1.7.1-canary.28
 
 * **feat:**  - **media:** [#5162](https://github.com/AzzappApp/azzapp/pull/5162) put back automatic removal of media ([#7429](https://github.com/AzzappApp/azzapp/pull/7429))
