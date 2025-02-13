@@ -157,9 +157,9 @@ export const generatePaymentInvoice: MutationResolvers<GraphQLContext>['generate
                 defaultMessage: `Annual azzapp+ subscription for {count, plural,
                 =0 {0 seats}
                 =1 {1 seat}
-                other {(count) seats}
+                other {{count} seats}
               }`,
-                id: 'of4hL2',
+                id: '85DMRR',
                 description: 'Invoice description for yearly subscription',
               },
               {
@@ -172,9 +172,9 @@ export const generatePaymentInvoice: MutationResolvers<GraphQLContext>['generate
                 defaultMessage: `Monthly azzapp+ subscription for {count, plural,
                 =0 {0 seats}
                 =1 {1 seat}
-                other {(count) seats}
+                other {{count} seats}
               }`,
-                id: 'hJ9rhS',
+                id: 'P28o+6',
                 description: 'Invoice description for monthly subscription',
               },
               {

@@ -91,7 +91,7 @@ PODS:
     - ExpoModulesCore
   - ExpoDevice (7.0.2):
     - ExpoModulesCore
-  - ExpoFileSystem (18.0.7):
+  - ExpoFileSystem (18.0.10):
     - ExpoModulesCore
   - ExpoFont (13.0.3):
     - ExpoModulesCore
@@ -141,9 +141,8 @@ PODS:
   - FBLazyVector (0.77.0)
   - Firebase (11.7.0):
     - Firebase/Core (= 11.7.0)
-  - Firebase/AnalyticsWithoutAdIdSupport (11.7.0):
-    - Firebase/CoreOnly
-    - FirebaseAnalytics/WithoutAdIdSupport (~> 11.7.0)
+  - Firebase/Analytics (11.7.0):
+    - Firebase/Core
   - Firebase/Core (11.7.0):
     - Firebase/CoreOnly
     - FirebaseAnalytics (~> 11.7.0)
@@ -165,15 +164,6 @@ PODS:
     - FirebaseCore (~> 11.7.0)
     - FirebaseInstallations (~> 11.0)
     - GoogleAppMeasurement (= 11.7.0)
-    - GoogleUtilities/AppDelegateSwizzler (~> 8.0)
-    - GoogleUtilities/MethodSwizzler (~> 8.0)
-    - GoogleUtilities/Network (~> 8.0)
-    - "GoogleUtilities/NSData+zlib (~> 8.0)"
-    - nanopb (~> 3.30910.0)
-  - FirebaseAnalytics/WithoutAdIdSupport (11.7.0):
-    - FirebaseCore (~> 11.7.0)
-    - FirebaseInstallations (~> 11.0)
-    - GoogleAppMeasurement/WithoutAdIdSupport (= 11.7.0)
     - GoogleUtilities/AppDelegateSwizzler (~> 8.0)
     - GoogleUtilities/MethodSwizzler (~> 8.0)
     - GoogleUtilities/Network (~> 8.0)
@@ -2171,7 +2161,7 @@ PODS:
   - RNDeviceInfo (14.0.2):
     - React-Core
   - RNFBAnalytics (21.7.1):
-    - Firebase/AnalyticsWithoutAdIdSupport (= 11.7.0)
+    - Firebase/Analytics (= 11.7.0)
     - React-Core
     - RNFBApp
   - RNFBApp (21.7.1):
@@ -2983,7 +2973,7 @@ SPEC CHECKSUMS:
   ExpoClipboard: 44fd1c8959ee8f6175d059dc011b154c9709a969
   ExpoContacts: 98484e09e4caccd2daa6042f341dc2e62a29697e
   ExpoDevice: 1662ecdf42a8b5b2cf60ef7cecaf5a297639dd63
-  ExpoFileSystem: 818e82dbb71175414d1ca310e926c48ff0d07348
+  ExpoFileSystem: 5df53001901f76b493bd5deb75ac506871cc9b2e
   ExpoFont: 38656978c2a4022fb7e0c43e4968d66340f5e2f3
   ExpoHaptics: 8d199b2f33245ea85289ff6c954c7ee7c00a5b5d
   ExpoImage: f2c9cfd2a4cb918bba7ddbb40da851858f7aece4
@@ -3057,7 +3047,7 @@ SPEC CHECKSUMS:
   react-native-quick-base64: e69675f0ddca418dd1eb8a6ffa06ed388be293d9
   react-native-safe-area-context: efd435f89b73d91f37438e5ac2d725f0e7adff95
   react-native-skia: 28b18b9b7d265770830ae31a9d9ee80d5c8b7141
-  react-native-skottie-template-player: 3120030f38fc46dacafd2220539c31f4df1b7d0d
+  react-native-skottie-template-player: e71f773222960069b747bd3b14d86be395c5a3d0
   react-native-webview: 449c3f27cdb926086a5eff7993421fd096cc5ae3
   React-nativeconfig: cd0fbb40987a9658c24dab5812c14e5522a64929
   React-NativeModulesApple: 4a9c304aa4fb086af32e8758ba892386d895b4d3
@@ -3093,7 +3083,7 @@ SPEC CHECKSUMS:
   RNCMaskedView: 308c763227e237d4d260bd8841870e099572bb3e
   RNDateTimePicker: b49449a7da91211c6fcc60acd346a0ddf0d25256
   RNDeviceInfo: 801c18d0525e86580900e7b5f562dca0c8c05021
-  RNFBAnalytics: 3af91cb0d568e16588ec535cec64e4082f84f61b
+  RNFBAnalytics: af8d3ebfa5d0a45ee337400c9f840f72f6df5a55
   RNFBApp: 32f7425af42aef99472dd46e14222cb0a8a17504
   RNFBMessaging: 993c913f7a037104b5ae02cadf7fc191545ceb51
   RNFlashList: d6f5c8e04ae8ce8e27693cd98c0297abce8f4c54
@@ -3117,8 +3107,8 @@ SPEC CHECKSUMS:
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   SPTPersistentCache: df36ea46762d7cf026502bbb86a8b79d0080dff4
   VisionCamera: 3cc88e34bf7425b36b27f23af3eae1d3812a75e3
-  Yoga: c0d8564af14a858f962607cd7306539cb2ace926
+  Yoga: 78d74e245ed67bb94275a1316cdc170b9b7fe884
 
-PODFILE CHECKSUM: eb957fb9bc612297ca2de17441b791946bf98c09
+PODFILE CHECKSUM: ca03835200938cc10d80d63e8c003657ba0703d1
 
-COCOAPODS: 1.16.1
+COCOAPODS: 1.16.2

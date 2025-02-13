@@ -17,6 +17,14 @@ export const UserSubscription: UserSubscriptionResolvers = {
     return calculateAvailableSeats(userSubscription);
   },
   subscriptionPlan: async (userSubscription, _args) => {
+    if (userSubscription.subscriptionId.includes('year')) {
+      return 'yearly';
+    }
+
+    if (userSubscription.subscriptionId.includes('month')) {
+      return 'monthly';
+    }
+
     switch (userSubscription.subscriptionPlan) {
       case 'web.lifetime':
         return 'lifetime';
