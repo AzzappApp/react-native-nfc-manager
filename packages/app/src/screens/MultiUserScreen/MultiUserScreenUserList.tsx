@@ -18,7 +18,6 @@ import Link from '#components/Link';
 import { MediaImageRenderer } from '#components/medias';
 import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { keyExtractor } from '#helpers/idHelpers';
 import { profileInfoIsOwner } from '#helpers/profileRoleHelper';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import { useFocusEffect } from '#hooks/useFocusEffect';
@@ -338,6 +337,9 @@ const MultiUserScreenUserList = ({
     </View>
   );
 };
+
+const keyExtractor = (item: { id: string; profileRole: string }) =>
+  `${item.id}-${item.profileRole}`;
 
 const renderHeaderSection = (info: {
   section: SectionListData<Profile, { title: string; data: Profile[] }>;
