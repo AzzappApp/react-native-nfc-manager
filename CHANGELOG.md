@@ -1,3 +1,7 @@
+## 1.7.1-canary.31
+
+
+
 ## 1.7.1-canary.30
 
 * **fix:**  - **cover:** [#6618](https://github.com/AzzappApp/azzapp/pull/6618) empeach automatic sleeping while exporting cover ([#7423](https://github.com/AzzappApp/azzapp/pull/7423))
