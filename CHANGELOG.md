@@ -1,3 +1,9 @@
+## 1.7.1-rc.28
+
+* **fix:**  - **payment:** [#7416](https://github.com/AzzappApp/azzapp/pull/7416) don’t show NaN for web subscription ([#7418](https://github.com/AzzappApp/azzapp/pull/7418))
+* **fix:**  - **payment:** [#7169](https://github.com/AzzappApp/azzapp/pull/7169) slow down multi user activation to ensure revenue… ([#7419](https://github.com/AzzappApp/azzapp/pull/7419))
+* **fix:**  - **multiUser:** [#7417](https://github.com/AzzappApp/azzapp/pull/7417) avoid overlapping while changing roles ([#7420](https://github.com/AzzappApp/azzapp/pull/7420))
+
 ## 1.7.1-rc.27
 
 * **fix:**  - update out of date podfile.lock file ([#7424](https://github.com/AzzappApp/azzapp/pull/7424))
