@@ -172,6 +172,7 @@ __metadata:
     expo-haptics: "npm:~14.0.1"
     expo-image: "npm:^2.0.4"
     expo-image-manipulator: "npm:^13.0.6"
+    expo-keep-awake: "npm:^14.0.2"
     expo-linear-gradient: "npm:~14.0.2"
     expo-sensors: "npm:14.0.2"
     graphql: "npm:^16.10.0"
@@ -16820,7 +16821,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-keep-awake@npm:~14.0.2":
+"expo-keep-awake@npm:^14.0.2, expo-keep-awake@npm:~14.0.2":
   version: 14.0.2
   resolution: "expo-keep-awake@npm:14.0.2"
   peerDependencies:

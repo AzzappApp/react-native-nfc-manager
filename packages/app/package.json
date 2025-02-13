@@ -109,6 +109,7 @@
     "expo-haptics": "~14.0.1",
     "expo-image": "^2.0.4",
     "expo-image-manipulator": "^13.0.6",
+    "expo-keep-awake": "^14.0.2",
     "expo-linear-gradient": "~14.0.2",
     "expo-sensors": "14.0.2",
     "graphql": "^16.10.0",

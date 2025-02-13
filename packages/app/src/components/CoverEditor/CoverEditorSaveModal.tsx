@@ -1,3 +1,4 @@
+import { useKeepAwake } from 'expo-keep-awake';
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import UploadProgressModal from '#ui/UploadProgressModal';
@@ -10,6 +11,8 @@ const CoverEditorSaveModal = ({
   exportProgressIndicator: Observable<number> | null;
   uploadProgressIndicator: Observable<number> | null;
 }) => {
+  useKeepAwake();
+
   const intl = useIntl();
   const progressIndicators = useMemo(
     () => [exportProgressIndicator, uploadProgressIndicator],
