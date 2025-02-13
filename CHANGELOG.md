@@ -1,3 +1,7 @@
+## 1.7.1-canary.32
+
+* **feat:**  - improve isModuleInViewport ([#7434](https://github.com/AzzappApp/azzapp/pull/7434))
+
 ## 1.7.1-canary.31
 
 
