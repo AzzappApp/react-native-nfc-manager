@@ -90,4 +90,20 @@ type SubscriptionEstimation {
   The applied rate
   """
   taxRate: Float!
+  """
+  The amount of the azzapp plus per month
+  """
+  azzappPlusPerMonth: Int!
+  """
+  The amount of the azzapp paid
+  """
+  amountAzzappPlus: Int!
+  """
+  The price per seat
+  """
+  pricePerSeat: Int!
+  """
+  The amount for the seats
+  """
+  amountForSeats: Int!
 }
