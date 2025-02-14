@@ -23,7 +23,7 @@ import { isDefined } from '@azzapp/shared/isDefined';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
 import { ScreenModal } from '#components/NativeRouter';
 import { getAuthState } from '#helpers/authStore';
-import { CardPhoneLabels } from '#helpers/contactCardHelpers';
+import { CardPhoneLabels } from '#helpers/contactHelpers';
 import { getFileName } from '#helpers/fileHelpers';
 import { getLocales, useCurrentLocale } from '#helpers/localeHelpers';
 import {

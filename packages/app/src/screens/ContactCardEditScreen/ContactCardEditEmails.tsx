@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import { useFieldArray } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
@@ -10,14 +11,15 @@ import {
 import { useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
+import Separation from '#ui/Separation';
 import Text from '#ui/Text';
-import type { CommonInformationForm } from './CommonInformationSchema';
+import type { ContactCardFormValues } from './ContactCardSchema';
 import type { Control } from 'react-hook-form';
 
-const CommonInformationEmails = ({
+const ContactCardEditModalEmails = ({
   control,
 }: {
-  control: Control<CommonInformationForm>;
+  control: Control<ContactCardFormValues>;
 }) => {
   const { fields, append, remove } = useFieldArray({
     control,
@@ -33,25 +35,28 @@ const CommonInformationEmails = ({
   return (
     <>
       {fields.map((email, index) => (
-        <ContactCardEditModalField
-          key={email.id}
-          control={control}
-          labelKey={`emails.${index}.label`}
-          valueKey={`emails.${index}.address`}
-          deleteField={() => remove(index)}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          labelValues={labelValues}
-          placeholder={intl.formatMessage({
-            defaultMessage: 'Enter an email',
-            description: 'Placeholder for email inside contact card',
-          })}
-          errorMessage={intl.formatMessage({
-            defaultMessage: 'Please enter a valid email',
-            description:
-              'Edit Common Information - Error message when email is invalid',
-          })}
-        />
+        <Fragment key={email.id}>
+          <ContactCardEditModalField
+            control={control}
+            labelKey={`emails.${index}.label`}
+            valueKey={`emails.${index}.address`}
+            selectedKey={`emails.${index}.selected`}
+            deleteField={() => remove(index)}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            labelValues={labelValues}
+            placeholder={intl.formatMessage({
+              defaultMessage: 'Enter an email',
+              description: 'Placeholder for email inside contact card',
+            })}
+            errorMessage={intl.formatMessage({
+              defaultMessage: 'Please enter a valid email',
+              description:
+                'Edit Contact Card - Error message when an email is wrongly formatted',
+            })}
+          />
+          <Separation small />
+        </Fragment>
       ))}
       <View>
         <PressableNative
@@ -60,6 +65,7 @@ const CommonInformationEmails = ({
             append({
               label: 'Home',
               address: '',
+              selected: true,
             });
           }}
         >
@@ -76,4 +82,4 @@ const CommonInformationEmails = ({
   );
 };
 
-export default CommonInformationEmails;
+export default ContactCardEditModalEmails;

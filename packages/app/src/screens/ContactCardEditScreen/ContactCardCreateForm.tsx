@@ -5,28 +5,28 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { AVATAR_MAX_WIDTH } from '@azzapp/shared/contactCardHelpers';
-import FormDeleteFieldOverlay from '#components/ContactCard/FormDeleteFieldOverlay';
+import FormDeleteFieldOverlay from '#components/FormDeleteFieldOverlay';
 import ImagePicker, {
   EditImageStep,
   ImagePickerContactCardMediaWrapper,
   SelectImageStepWithFrontCameraByDefault,
 } from '#components/ImagePicker';
 import { ScreenModal } from '#components/NativeRouter';
-import { buildContactCardModalStyleSheet } from '#helpers/contactCardHelpers';
+import { buildContactStyleSheet } from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { saveTransformedImageToFile } from '#helpers/mediaEditions';
 import Separation from '#ui/Separation';
 import Switch from '#ui/Switch';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
-import ContactCardEditModalAddresses from './ContactCardEditModalAddresses';
-import ContactCardEditModalAvatar from './ContactCardEditModalAvatar';
-import ContactCardEditModalBirthdays from './ContactCardEditModalBirthday';
-import ContactCardEditModalEmails from './ContactCardEditModalEmails';
-import ContactCardEditModalName from './ContactCardEditModalName';
-import ContactCardEditModalPhones from './ContactCardEditModalPhones';
-import ContactCardEditModalSocials from './ContactCardEditModalSocials';
-import ContactCardEditModalUrls from './ContactCardEditModalUrls';
+import ContactCardEditModalAddresses from './ContactCardEditAddresses';
+import ContactCardEditModalAvatar from './ContactCardEditAvatar';
+import ContactCardEditModalBirthdays from './ContactCardEditBirthday';
+import ContactCardEditModalEmails from './ContactCardEditEmails';
+import ContactCardEditModalName from './ContactCardEditName';
+import ContactCardEditModalPhones from './ContactCardEditPhones';
+import ContactCardEditModalSocials from './ContactCardEditSocials';
+import ContactCardEditModalUrls from './ContactCardEditUrls';
 import type { ImagePickerResult } from '#components/ImagePicker';
 import type { ContactCardFormValues } from './ContactCardSchema';
 import type { ReactNode } from 'react';
@@ -256,7 +256,7 @@ const ContactCardCreateForm = ({
 const styleSheet = createStyleSheet(appearance => ({
   fieldTitleWithLock: { flexDirection: 'row', gap: 5, alignItems: 'center' },
   confirmModalButton: { width: 255 },
-  ...buildContactCardModalStyleSheet(appearance),
+  ...buildContactStyleSheet(appearance),
 }));
 
 export default ContactCardCreateForm;

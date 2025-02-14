@@ -5,6 +5,14 @@ import type { ContactResolvers } from '#/__generated__/types';
 
 export const Contact: ContactResolvers = {
   id: idResolver('Contact'),
+  avatar: contact => {
+    return contact.avatarId
+      ? {
+          media: contact.avatarId,
+          assetKind: 'contactCard',
+        }
+      : null;
+  },
   webCard: contact => {
     if (contact.contactProfileId) {
       return getWebCardByProfileId(contact.contactProfileId);

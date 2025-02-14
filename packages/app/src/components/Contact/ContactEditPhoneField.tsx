@@ -2,12 +2,12 @@ import { Controller } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import { type TextInputProps } from 'react-native';
 import { colors } from '#theme';
-import { buildContactCardModalStyleSheet } from '#helpers/contactCardHelpers';
+import { buildContactStyleSheet } from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { isPhoneNumberValid } from '#helpers/phoneNumbersHelper';
 import CountryCodeListWithOptions from '#ui/CountryCodeListWithOptions';
 import TextInput from '#ui/TextInput';
-import ContactCardEditFieldWrapper from './ContactCardEditFieldWrapper';
+import ContactCardEditFieldWrapper from './ContactEditFieldWrapper';
 import type { CountryCode } from 'libphonenumber-js';
 import type { Control, FieldPath, FieldValues } from 'react-hook-form';
 
@@ -118,7 +118,7 @@ const ContactCardEditPhoneField = <TFieldValues extends FieldValues>({
 };
 
 const stylesheet = createStyleSheet(appearance => ({
-  ...buildContactCardModalStyleSheet(appearance),
+  ...buildContactStyleSheet(appearance),
   warning: {
     borderBottomWidth: 1,
     borderColor: colors.warn,

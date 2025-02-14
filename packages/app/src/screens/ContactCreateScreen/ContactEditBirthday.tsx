@@ -2,19 +2,19 @@ import { useController } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { colors } from '#theme';
-import ContactCardEditDateField from '#components/ContactCard/ContactCardEditDateField';
-import { contactCardEditModalStyleSheet } from '#helpers/contactCardHelpers';
+import ContactDateField from '#components/Contact/ContactEditDateField';
+import { contactEditStyleSheet } from '#helpers/contactHelpers';
 import { useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import type { ContactCardFormValues } from './ContactCardSchema';
+import type { ContactFormValues } from './ContactSchema';
 import type { Control } from 'react-hook-form';
 
-const ContactCardEditModalBirthdays = ({
+const ContactEditBirthday = ({
   control,
 }: {
-  control: Control<ContactCardFormValues>;
+  control: Control<ContactFormValues>;
 }) => {
   const { field } = useController({
     control,
@@ -22,15 +22,14 @@ const ContactCardEditModalBirthdays = ({
   });
   const intl = useIntl();
 
-  const styles = useStyleSheet(contactCardEditModalStyleSheet);
+  const styles = useStyleSheet(contactEditStyleSheet);
 
   return (
     <>
       {field.value && (
-        <ContactCardEditDateField
+        <ContactDateField
           control={control}
           valueKey="birthday.birthday"
-          selectedKey="birthday.selected"
           deleteField={() => field.onChange(null)}
           title={intl.formatMessage({
             defaultMessage: 'Birthday',
@@ -60,4 +59,4 @@ const ContactCardEditModalBirthdays = ({
   );
 };
 
-export default ContactCardEditModalBirthdays;
+export default ContactEditBirthday;

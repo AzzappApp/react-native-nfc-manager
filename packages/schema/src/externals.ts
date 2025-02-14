@@ -1,6 +1,12 @@
 import { externalFunction } from './GraphQLContext';
-import type { WebCard } from '@azzapp/data';
+import type { AddContactInput } from '#__generated__/types';
+import type { Profile, WebCard } from '@azzapp/data';
 import type { Locale } from '@azzapp/i18n';
+
+type Parameters = {
+  profile?: Profile;
+  contact?: Partial<AddContactInput>;
+};
 
 export const notifyUsers =
   externalFunction<
@@ -8,8 +14,9 @@ export const notifyUsers =
       type: 'email' | 'phone',
       receivers: string[],
       webCard: WebCard,
-      notificationType: 'invitation' | 'transferOwnership',
+      notificationType: 'invitation' | 'transferOwnership' | 'vcard',
       locale: Locale,
+      parameters?: Parameters,
     ) => Promise<void>
   >('notifyUsers');
 

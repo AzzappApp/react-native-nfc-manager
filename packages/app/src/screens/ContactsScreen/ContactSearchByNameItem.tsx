@@ -4,7 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors, textStyles } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
-import { findLocalContact } from '#helpers/contactCardHelpers';
+import { findLocalContact } from '#helpers/contactHelpers';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
@@ -84,8 +84,20 @@ const ContactSearchByNameItem = ({
         requestedSize: 26,
       };
     }
+    if (contact.avatar?.uri) {
+      return {
+        uri: contact.avatar.uri,
+        mediaId: contact.avatar.id ?? '',
+        requestedSize: 26,
+      };
+    }
     return null;
-  }, [contact.contactProfile?.avatar?.id, contact.contactProfile?.avatar?.uri]);
+  }, [
+    contact.avatar?.id,
+    contact.avatar?.uri,
+    contact.contactProfile?.avatar?.id,
+    contact.contactProfile?.avatar?.uri,
+  ]);
 
   const [firstname, lastname, name] = useMemo(() => {
     if (contact.firstName || contact.lastName) {

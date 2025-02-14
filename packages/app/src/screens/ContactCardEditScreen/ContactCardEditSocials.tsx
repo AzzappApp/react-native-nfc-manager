@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import { useFieldArray } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
@@ -11,14 +12,15 @@ import {
 import { useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
+import Separation from '#ui/Separation';
 import Text from '#ui/Text';
-import type { CommonInformationForm } from './CommonInformationSchema';
+import type { ContactCardFormValues } from './ContactCardSchema';
 import type { Control } from 'react-hook-form';
 
-const CommonInformationSocials = ({
+const ContactCardEditModalSocials = ({
   control,
 }: {
-  control: Control<CommonInformationForm>;
+  control: Control<ContactCardFormValues>;
 }) => {
   const { fields, append, remove, update } = useFieldArray({
     control,
@@ -34,28 +36,31 @@ const CommonInformationSocials = ({
   return (
     <>
       {fields.map((social, index) => (
-        <ContactCardEditModalField
-          key={social.id}
-          control={control}
-          labelKey={`socials.${index}.label`}
-          valueKey={`socials.${index}.url`}
-          labelValues={labelValues}
-          deleteField={() => remove(index)}
-          keyboardType="default"
-          placeholder={intl.formatMessage({
-            defaultMessage: 'Enter a social profile',
-            description: 'Placeholder for social profile inside contact card',
-          })}
-          onChangeLabel={label => {
-            update(index, {
-              ...social,
-              label,
-              url:
-                SOCIAL_NETWORK_LINKS.find(socialLink => socialLink.id === label)
-                  ?.mask ?? '',
-            });
-          }}
-        />
+        <Fragment key={social.id}>
+          <ContactCardEditModalField
+            control={control}
+            labelKey={`socials.${index}.label`}
+            valueKey={`socials.${index}.url`}
+            labelValues={labelValues}
+            deleteField={() => remove(index)}
+            keyboardType="default"
+            placeholder={intl.formatMessage({
+              defaultMessage: 'Enter a social profile',
+              description: 'Placeholder for social profile inside contact card',
+            })}
+            onChangeLabel={label => {
+              update(index, {
+                selected: social.selected,
+                label,
+                url:
+                  SOCIAL_NETWORK_LINKS.find(
+                    socialLink => socialLink.id === label,
+                  )?.mask ?? '',
+              });
+            }}
+          />
+          <Separation small />
+        </Fragment>
       ))}
       <View>
         <PressableNative
@@ -80,4 +85,4 @@ const CommonInformationSocials = ({
   );
 };
 
-export default CommonInformationSocials;
+export default ContactCardEditModalSocials;

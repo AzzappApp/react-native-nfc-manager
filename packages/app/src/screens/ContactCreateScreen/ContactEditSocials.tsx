@@ -4,23 +4,23 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { SOCIAL_NETWORK_LINKS } from '@azzapp/shared/socialLinkHelpers';
 import { colors } from '#theme';
-import ContactCardEditModalField from '#components/ContactCard/ContactCardEditField';
+import ContactField from '#components/Contact/ContactEditField';
 import {
-  contactCardEditModalStyleSheet,
+  contactEditStyleSheet,
   useSocialLinkLabels,
-} from '#helpers/contactCardHelpers';
+} from '#helpers/contactHelpers';
 import { useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Separation from '#ui/Separation';
 import Text from '#ui/Text';
-import type { ContactCardFormValues } from './ContactCardSchema';
+import type { ContactFormValues } from './ContactSchema';
 import type { Control } from 'react-hook-form';
 
-const ContactCardEditModalSocials = ({
+const ContactEditSocials = ({
   control,
 }: {
-  control: Control<ContactCardFormValues>;
+  control: Control<ContactFormValues>;
 }) => {
   const { fields, append, remove, update } = useFieldArray({
     control,
@@ -31,13 +31,13 @@ const ContactCardEditModalSocials = ({
 
   const labelValues = useSocialLinkLabels();
 
-  const styles = useStyleSheet(contactCardEditModalStyleSheet);
+  const styles = useStyleSheet(contactEditStyleSheet);
 
   return (
     <>
       {fields.map((social, index) => (
         <Fragment key={social.id}>
-          <ContactCardEditModalField
+          <ContactField
             control={control}
             labelKey={`socials.${index}.label`}
             valueKey={`socials.${index}.url`}
@@ -50,7 +50,6 @@ const ContactCardEditModalSocials = ({
             })}
             onChangeLabel={label => {
               update(index, {
-                selected: social.selected,
                 label,
                 url:
                   SOCIAL_NETWORK_LINKS.find(
@@ -85,4 +84,4 @@ const ContactCardEditModalSocials = ({
   );
 };
 
-export default ContactCardEditModalSocials;
+export default ContactEditSocials;

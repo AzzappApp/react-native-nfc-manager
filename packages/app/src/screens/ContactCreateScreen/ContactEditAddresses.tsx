@@ -3,23 +3,23 @@ import { useFieldArray } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { colors } from '#theme';
-import ContactCardEditModalField from '#components/ContactCard/ContactCardEditField';
+import ContactField from '#components/Contact/ContactEditField';
 import { useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Separation from '#ui/Separation';
 import Text from '#ui/Text';
 import {
-  contactCardEditModalStyleSheet,
-  useContactCardAddressLabels,
-} from '../../helpers/contactCardHelpers';
-import type { ContactCardFormValues } from './ContactCardSchema';
+  contactEditStyleSheet,
+  useContactAddressLabels,
+} from '../../helpers/contactHelpers';
+import type { ContactFormValues } from './ContactSchema';
 import type { Control } from 'react-hook-form';
 
-const ContactCardEditModalAddresses = ({
+const ContactEditAddresses = ({
   control,
 }: {
-  control: Control<ContactCardFormValues>;
+  control: Control<ContactFormValues>;
 }) => {
   const { fields, append, remove } = useFieldArray({
     control,
@@ -28,19 +28,18 @@ const ContactCardEditModalAddresses = ({
 
   const intl = useIntl();
 
-  const styles = useStyleSheet(contactCardEditModalStyleSheet);
+  const styles = useStyleSheet(contactEditStyleSheet);
 
-  const labelValues = useContactCardAddressLabels();
+  const labelValues = useContactAddressLabels();
 
   return (
     <>
       {fields.map((address, index) => (
         <Fragment key={address.id}>
-          <ContactCardEditModalField
+          <ContactField
             control={control}
             labelKey={`addresses.${index}.label`}
             valueKey={`addresses.${index}.address`}
-            selectedKey={`addresses.${index}.selected`}
             deleteField={() => remove(index)}
             keyboardType="default"
             labelValues={labelValues}
@@ -59,7 +58,6 @@ const ContactCardEditModalAddresses = ({
             append({
               label: 'Home',
               address: '',
-              selected: true,
             });
           }}
         >
@@ -76,4 +74,4 @@ const ContactCardEditModalAddresses = ({
   );
 };
 
-export default ContactCardEditModalAddresses;
+export default ContactEditAddresses;

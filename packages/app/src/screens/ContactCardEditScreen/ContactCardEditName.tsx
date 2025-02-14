@@ -1,7 +1,7 @@
 import { Controller } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
-import { buildContactCardModalStyleSheet } from '#helpers/contactCardHelpers';
+import { buildContactStyleSheet } from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Separation from '#ui/Separation';
 import Text from '#ui/Text';
@@ -111,7 +111,7 @@ const ContactCardEditModalName = ({
 };
 
 const styleSheet = createStyleSheet(appearance => ({
-  ...buildContactCardModalStyleSheet(appearance),
+  ...buildContactStyleSheet(appearance),
 }));
 
 export default ContactCardEditModalName;

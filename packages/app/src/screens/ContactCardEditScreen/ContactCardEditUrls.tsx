@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import { useFieldArray } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
@@ -7,14 +8,15 @@ import { contactEditStyleSheet } from '#helpers/contactHelpers';
 import { useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
+import Separation from '#ui/Separation';
 import Text from '#ui/Text';
-import type { CommonInformationForm } from './CommonInformationSchema';
+import type { ContactCardFormValues } from './ContactCardSchema';
 import type { Control } from 'react-hook-form';
 
-const CommonInformationUrls = ({
+const ContactCardEditModalUrls = ({
   control,
 }: {
-  control: Control<CommonInformationForm>;
+  control: Control<ContactCardFormValues>;
 }) => {
   const { fields, append, remove } = useFieldArray({
     control,
@@ -28,25 +30,27 @@ const CommonInformationUrls = ({
   return (
     <>
       {fields.map((url, index) => (
-        <ContactCardEditModalField
-          key={url.id}
-          control={control}
-          valueKey={`urls.${index}.address`}
-          deleteField={() => remove(index)}
-          autoCapitalize="none"
-          keyboardType="url"
-          placeholder={intl.formatMessage({
-            defaultMessage: 'Enter a URL',
-            description:
-              'CommonInformationUrls - Placeholder for URL inside contact card',
-          })}
-          errorMessage={intl.formatMessage({
-            defaultMessage: 'Please enter a valid url',
-            description:
-              'CommonInformationUrls - Error message when a url is wrongly formatted',
-          })}
-          trim
-        />
+        <Fragment key={url.id}>
+          <ContactCardEditModalField
+            control={control}
+            valueKey={`urls.${index}.address`}
+            deleteField={() => remove(index)}
+            keyboardType="url"
+            autoCapitalize="none"
+            placeholder={intl.formatMessage({
+              defaultMessage: 'Enter a URL',
+              description:
+                'ContactCardEditModalUrls  - Placeholder for URL inside contact card',
+            })}
+            errorMessage={intl.formatMessage({
+              defaultMessage: 'Please enter a valid url',
+              description:
+                'ContactCardEditModalUrls - Error message when a url is wrongly formatted',
+            })}
+            trim
+          />
+          <Separation small />
+        </Fragment>
       ))}
       <View>
         <PressableNative
@@ -59,7 +63,7 @@ const CommonInformationUrls = ({
           <Text variant="smallbold">
             <FormattedMessage
               defaultMessage="Add URL"
-              description="CommonInformationUrls - Add URL to the contact card"
+              description="ContactCardEditModalUrls  - Add URL to the contact card"
             />
           </Text>
         </PressableNative>
@@ -68,4 +72,4 @@ const CommonInformationUrls = ({
   );
 };
 
-export default CommonInformationUrls;
+export default ContactCardEditModalUrls;

@@ -67,16 +67,18 @@ export const buildLocalContact = async (
 
   let avatar = null;
   try {
+    let contactAvatar = null;
+    if ('avatar' in contact) {
+      contactAvatar = contact?.avatar;
+    }
     if ('contactProfile' in contact && contact.contactProfile?.avatar?.uri) {
-      const file = new File(
-        Paths.cache.uri + contact.contactProfile?.avatar.id,
-      );
+      contactAvatar = contact.contactProfile?.avatar;
+    }
+    if (contactAvatar) {
+      const file = new File(Paths.cache.uri + contactAvatar.id);
       avatar = file.exists
         ? file
-        : await File.downloadFileAsync(
-            contact.contactProfile?.avatar?.uri,
-            file,
-          );
+        : await File.downloadFileAsync(contactAvatar.uri, file);
     }
   } catch (e) {
     Sentry.captureException(e);

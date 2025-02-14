@@ -13,14 +13,14 @@ import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
 import { Observable } from 'relay-runtime';
 import { colors } from '#theme';
 import { CancelHeaderButton } from '#components/commonsButtons';
-import FormDeleteFieldOverlay from '#components/ContactCard/FormDeleteFieldOverlay';
+import FormDeleteFieldOverlay from '#components/FormDeleteFieldOverlay';
 import ImagePicker, { SelectImageStep } from '#components/ImagePicker';
 import {
   useRouter,
   ScreenModal,
   preventModalDismiss,
 } from '#components/NativeRouter';
-import { buildContactCardModalStyleSheet } from '#helpers/contactCardHelpers';
+import { buildContactStyleSheet } from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getFileName } from '#helpers/fileHelpers';
 import { saveTransformedImageToFile } from '#helpers/mediaEditions';
@@ -573,5 +573,5 @@ const styleSheet = createStyleSheet(appearance => ({
     borderColor: colors.grey100,
     borderRadius: 5,
   },
-  ...buildContactCardModalStyleSheet(appearance),
+  ...buildContactStyleSheet(appearance),
 }));

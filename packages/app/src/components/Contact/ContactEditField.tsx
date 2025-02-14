@@ -1,9 +1,9 @@
 import { Controller } from 'react-hook-form';
 import { type TextInputProps } from 'react-native';
-import { buildContactCardModalStyleSheet } from '#helpers/contactCardHelpers';
+import { buildContactStyleSheet } from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import TextInput from '#ui/TextInput';
-import ContactCardEditFieldWrapper from './ContactCardEditFieldWrapper';
+import ContactCardEditFieldWrapper from './ContactEditFieldWrapper';
 import type { Control, FieldPath, FieldValues } from 'react-hook-form';
 
 const ContactCardEditField = <TFieldValues extends FieldValues>({
@@ -74,7 +74,7 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
 };
 
 const stylesheet = createStyleSheet(appearance => ({
-  ...buildContactCardModalStyleSheet(appearance),
+  ...buildContactStyleSheet(appearance),
 }));
 
 export default ContactCardEditField;

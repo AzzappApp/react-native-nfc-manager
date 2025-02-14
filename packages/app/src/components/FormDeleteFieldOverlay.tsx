@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useReducer } from 'react';
 import { Pressable, StyleSheet } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
-import { DELETE_BUTTON_WIDTH } from '#helpers/contactCardHelpers';
+import { DELETE_BUTTON_WIDTH } from '#helpers/contactHelpers';
 import type { PropsWithChildren } from 'react';
 import type { GestureResponderEvent, LayoutRectangle } from 'react-native';
 import type { KeyboardAwareScrollViewProps } from 'react-native-keyboard-controller';
@@ -13,12 +13,7 @@ type Context = {
   closeDeleteButton: () => void;
 };
 
-const FormDeleteContext = createContext<Context>({
-  deleted: false,
-  rect: null,
-  openDeleteButton: () => {},
-  closeDeleteButton: () => {},
-});
+const FormDeleteContext = createContext<Context | null>(null);
 
 export const useFormDeleteContext = () => {
   const context = useContext(FormDeleteContext);

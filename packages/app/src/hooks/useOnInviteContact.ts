@@ -9,7 +9,7 @@ import { useIntl } from 'react-intl';
 import Toast from 'react-native-toast-message';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { emitContactAdded } from '#helpers/addContactHelper';
-import { contactStorage, findLocalContact } from '#helpers/contactCardHelpers';
+import { contactStorage, findLocalContact } from '#helpers/contactHelpers';
 import {
   buildLocalContact,
   reworkContactForDeviceInsert,

@@ -979,6 +979,7 @@ export const ContactTable = cols.table(
     lastName: cols.defaultVarchar('lastName').default('').notNull(),
     company: cols.defaultVarchar('company').default('').notNull(),
     title: cols.defaultVarchar('title').default('').notNull(),
+    avatarId: cols.mediaId('avatarId'),
     createdAt: cols
       .dateTime('createdAt')
       .notNull()

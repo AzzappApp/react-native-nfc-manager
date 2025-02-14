@@ -75,6 +75,7 @@ import ConfirmRegistrationScreen from '#screens/ConfirmRegistrationScreen';
 import ContactCardEditScreen from '#screens/ContactCardEditScreen';
 import ContactCardCreateScreen from '#screens/ContactCardEditScreen/ContactCardCreateScreen';
 import ContactCardScreen from '#screens/ContactCardScreen';
+import ContactCreateScreen from '#screens/ContactCreateScreen/ContactCreateScreen';
 import ContactDetailsScreen from '#screens/ContactDetailsScreen';
 import ContactsScreen from '#screens/ContactsScreen';
 import OfflineVCardScreen from '#screens/ContactsScreen/OfflineVCardScreen';
@@ -229,6 +230,7 @@ const screens = {
   CONTACT_CARD: ContactCardScreen,
   CONTACT_CARD_EDIT: ContactCardEditScreen,
   CONTACT_CARD_CREATE: ContactCardCreateScreen,
+  CONTACT_CREATE: ContactCreateScreen,
   CONFIRM_CHANGE_CONTACT: ConfirmChangeContactScreen,
   COMMON_INFORMATION: CommonInformationScreen,
   CONTACTS: ContactsScreen,

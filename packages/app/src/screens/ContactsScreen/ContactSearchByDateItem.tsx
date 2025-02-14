@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { colors } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
-import { findLocalContact } from '#helpers/contactCardHelpers';
+import { findLocalContact } from '#helpers/contactHelpers';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import ContactAvatar from './ContactAvatar';
@@ -83,7 +83,6 @@ const ContactSearchByDateItem = ({
     contact.firstName,
     contact.lastName,
   ]);
-
   const avatarSource = useMemo(() => {
     if (contact.contactProfile?.avatar?.uri) {
       return {
@@ -92,8 +91,20 @@ const ContactSearchByDateItem = ({
         requestedSize: 26,
       };
     }
+    if (contact.avatar?.uri) {
+      return {
+        uri: contact.avatar.uri,
+        mediaId: contact.avatar.id ?? '',
+        requestedSize: 26,
+      };
+    }
     return null;
-  }, [contact.contactProfile?.avatar?.id, contact.contactProfile?.avatar?.uri]);
+  }, [
+    contact.avatar?.id,
+    contact.avatar?.uri,
+    contact.contactProfile?.avatar?.id,
+    contact.contactProfile?.avatar?.uri,
+  ]);
 
   return (
     <View style={styles.profile}>

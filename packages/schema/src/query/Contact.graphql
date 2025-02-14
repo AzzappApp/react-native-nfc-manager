@@ -5,6 +5,7 @@ type Contact {
   id: ID!
   ownerProfile: Profile
   contactProfile: Profile
+  avatar: Media
   firstName: String!
   lastName: String!
   company: String!

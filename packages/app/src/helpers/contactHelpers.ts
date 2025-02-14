@@ -25,7 +25,7 @@ export const contactStorage = new MMKV({
   id: 'contacts',
 });
 
-export const buildContactCardModalStyleSheet = (appareance: ColorSchemeName) =>
+export const buildContactStyleSheet = (appareance: ColorSchemeName) =>
   ({
     field: {
       flexDirection: 'row',
@@ -68,11 +68,9 @@ export const buildContactCardModalStyleSheet = (appareance: ColorSchemeName) =>
     fieldTitle: { minWidth: 120 },
   }) as const;
 
-export const contactCardEditModalStyleSheet = createStyleSheet(
-  buildContactCardModalStyleSheet,
-);
+export const contactEditStyleSheet = createStyleSheet(buildContactStyleSheet);
 
-export const useContactCardAddressLabels = () => {
+export const useContactAddressLabels = () => {
   const intl = useIntl();
 
   const labelValues = useMemo(
@@ -116,7 +114,7 @@ export const useContactCardAddressLabels = () => {
   return labelValues;
 };
 
-export const useContactCardEmailLabels = () => {
+export const useContactEmailLabels = () => {
   const intl = useIntl();
 
   const labelValues = useMemo(
@@ -167,7 +165,7 @@ export const CardPhoneLabels = [
   'Fax',
   'Other',
 ];
-export const useContactCardPhoneLabels = () => {
+export const useContactPhoneLabels = () => {
   const intl = useIntl();
 
   const labelValues = useMemo(

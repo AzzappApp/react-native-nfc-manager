@@ -10,11 +10,11 @@ import {
 import { FormattedMessage } from 'react-intl';
 import { Platform, View } from 'react-native';
 import { formatDateToYYYYMMDD } from '@azzapp/shared/timeHelpers';
-import { buildContactCardModalStyleSheet } from '#helpers/contactCardHelpers';
+import { buildContactStyleSheet } from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import ContactCardEditFieldWrapper from './ContactCardEditFieldWrapper';
+import ContactCardEditFieldWrapper from './ContactEditFieldWrapper';
 
 const ContactCardEditDateField = <TFieldValues extends FieldValues>({
   labelKey,
@@ -111,7 +111,7 @@ const ContactCardEditDateField = <TFieldValues extends FieldValues>({
 };
 
 const stylesheet = createStyleSheet(appearance => ({
-  ...buildContactCardModalStyleSheet(appearance),
+  ...buildContactStyleSheet(appearance),
   item: {
     flex: 1,
     alignItems: 'center',

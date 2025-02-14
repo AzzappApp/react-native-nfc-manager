@@ -241,6 +241,13 @@ export type ContactCardCreateRoute = {
   };
 };
 
+export type ContactCreateRoute = {
+  route: 'CONTACT_CREATE';
+  params?: {
+    profileId: string;
+  };
+};
+
 export type MultiUserDetailRoute = {
   route: 'MULTI_USER_DETAIL';
   params: {
@@ -296,6 +303,7 @@ export type Route =
   | ContactCardCreateRoute
   | ContactCardEditRoute
   | ContactCardRoute
+  | ContactCreateRoute
   | ContactDetailsRoute
   | ContactsRoute
   | CoverCreationRoute

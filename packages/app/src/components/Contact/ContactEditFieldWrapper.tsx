@@ -11,8 +11,8 @@ import Animated, {
 import { colors } from '#theme';
 import {
   DELETE_BUTTON_WIDTH,
-  buildContactCardModalStyleSheet,
-} from '#helpers/contactCardHelpers';
+  buildContactStyleSheet,
+} from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useBoolean from '#hooks/useBoolean';
 import useScreenDimensions from '#hooks/useScreenDimensions';
@@ -24,7 +24,7 @@ import PressableNative from '#ui/PressableNative';
 import SelectList from '#ui/SelectList';
 import Switch from '#ui/Switch';
 import Text from '#ui/Text';
-import { useFormDeleteContext } from './FormDeleteFieldOverlay';
+import { useFormDeleteContext } from '../FormDeleteFieldOverlay';
 import type { PropsWithChildren } from 'react';
 import type { FieldValues, Control, FieldPath } from 'react-hook-form';
 import type { LayoutRectangle } from 'react-native';
@@ -245,7 +245,7 @@ const stylesheet = createStyleSheet(appearance => ({
   },
   bottomSheetStyle: { padding: 16 },
   switch: { marginRight: -8 },
-  ...buildContactCardModalStyleSheet(appearance),
+  ...buildContactStyleSheet(appearance),
 }));
 
 export default ContactCardEditField;

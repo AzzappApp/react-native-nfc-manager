@@ -1,0 +1,244 @@
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useIntl } from 'react-intl';
+import * as mime from 'react-native-mime-types'; // FIXME import is verry big
+import Toast from 'react-native-toast-message';
+import { useMutation } from 'react-relay';
+import { graphql, Observable } from 'relay-runtime';
+import { colors } from '#theme';
+import {
+  preventModalDismiss,
+  ScreenModal,
+  useRouter,
+} from '#components/NativeRouter';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { getFileName } from '#helpers/fileHelpers';
+import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
+import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
+import { getPhonenumberWithCountryCode } from '#helpers/phoneNumbersHelper';
+import Button from '#ui/Button';
+import Container from '#ui/Container';
+import Header from '#ui/Header';
+import IconButton from '#ui/IconButton';
+import SafeAreaView from '#ui/SafeAreaView';
+import UploadProgressModal from '#ui/UploadProgressModal';
+import ContactCreateForm from './ContactCreateForm';
+import { contactSchema, type ContactFormValues } from './ContactSchema';
+import type { ScreenOptions } from '#components/NativeRouter';
+import type { ContactCreateScreenMutation } from '#relayArtifacts/ContactCreateScreenMutation.graphql';
+import type { ContactCreateRoute } from '#routes';
+import type { CountryCode } from 'libphonenumber-js';
+
+const ContactCreateScreen = () => {
+  const styles = useStyleSheet(stylesheet);
+  const [progressIndicator, setProgressIndicator] =
+    useState<Observable<number> | null>(null);
+
+  const [commit, loading] = useMutation<ContactCreateScreenMutation>(graphql`
+    mutation ContactCreateScreenMutation(
+      $profileId: ID!
+      $contact: AddContactInput!
+      $notify: Boolean!
+    ) {
+      addContact(profileId: $profileId, input: $contact, notify: $notify) {
+        contact {
+          id
+        }
+      }
+    }
+  `);
+
+  const intl = useIntl();
+  const router = useRouter();
+  const profileId = (router.getCurrentRoute() as ContactCreateRoute)?.params
+    ?.profileId;
+
+  const {
+    control,
+    handleSubmit,
+    formState: { isSubmitting, isValid },
+  } = useForm<ContactFormValues>({
+    mode: 'onBlur',
+    shouldFocusError: true,
+    resolver: zodResolver(contactSchema),
+  });
+
+  const submit = handleSubmit(async ({ avatar, ...data }) => {
+    if (!profileId) {
+      return;
+    }
+
+    let upload;
+
+    if (avatar?.local && avatar.uri) {
+      setProgressIndicator(Observable.from(0));
+
+      const fileName = getFileName(avatar.uri);
+      const file: any = {
+        name: fileName,
+        uri: avatar.uri,
+        type: mime.lookup(fileName) || 'image/jpeg',
+      };
+
+      const { uploadURL, uploadParameters } = await uploadSign({
+        kind: 'image',
+        target: 'avatar',
+      });
+      upload = uploadMedia(file, uploadURL, uploadParameters);
+      setProgressIndicator(
+        upload.progress.map(({ loaded, total }) => loaded / total),
+      );
+    }
+
+    const uploadedAvatarId = await upload?.promise.then(({ public_id }) => {
+      return public_id;
+    });
+
+    const avatarId =
+      avatar === null ? null : avatar?.local ? uploadedAvatarId : avatar?.id;
+
+    commit({
+      variables: {
+        profileId,
+        notify: data.notify,
+        contact: {
+          avatarId,
+          emails: data.emails?.length
+            ? data.emails.filter(email => email.address)
+            : [],
+          phoneNumbers: data.phoneNumbers?.length
+            ? data.phoneNumbers
+                .filter(phoneNumber => phoneNumber.number)
+                .map(({ countryCode, ...phoneNumber }) => {
+                  const number = getPhonenumberWithCountryCode(
+                    phoneNumber.number,
+                    countryCode as CountryCode,
+                  );
+                  return { label: phoneNumber.label, number };
+                })
+            : [],
+          urls: data.urls,
+          addresses: data.addresses,
+          socials: data.socials,
+          company: data.company || '',
+          firstname: data.firstName || '',
+          lastname: data.lastName || '',
+          title: data.title || '',
+          birthday: data.birthday?.birthday || '',
+          withShareBack: false,
+        },
+      },
+      onCompleted: () => {
+        if (avatarId && avatar?.uri) {
+          addLocalCachedMediaFile(
+            `${'image'.slice(0, 1)}:${avatarId}`,
+            'image',
+            avatar.uri,
+          );
+        }
+        router.back();
+      },
+      onError: e => {
+        console.error(e);
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage:
+              'Error, could not save your contact. Please try again.',
+            description: 'Error toast message when saving contact card failed',
+          }) as unknown as string,
+        });
+        router.back();
+      },
+    });
+  });
+
+  useEffect(() => {
+    return Toast.hide;
+  }, []);
+
+  return (
+    <>
+      <Container style={styles.container}>
+        <SafeAreaView style={styles.container}>
+          <Header
+            middleElement={intl.formatMessage({
+              defaultMessage: 'Create Contact',
+              description: 'Create Contact Card Modal title',
+            })}
+            leftElement={
+              <IconButton
+                icon="arrow_left"
+                onPress={router.back}
+                style={styles.leftArrowIcon}
+              />
+            }
+            rightElement={
+              <Button
+                label={intl.formatMessage({
+                  defaultMessage: 'Save',
+                  description: 'Create contact modal save button label',
+                })}
+                testID="save-contact-card"
+                loading={isSubmitting || loading}
+                onPress={submit}
+                variant="primary"
+                style={styles.headerButton}
+                disabled={!isValid}
+              />
+            }
+          />
+
+          <ContactCreateForm control={control} />
+          <ScreenModal
+            visible={!!progressIndicator}
+            gestureEnabled={false}
+            onRequestDismiss={preventModalDismiss}
+          >
+            {progressIndicator && (
+              <UploadProgressModal progressIndicator={progressIndicator} />
+            )}
+          </ScreenModal>
+        </SafeAreaView>
+      </Container>
+    </>
+  );
+};
+
+const stylesheet = createStyleSheet(theme => ({
+  headerButton: { paddingHorizontal: 5, minWidth: 74 },
+  container: { flex: 1 },
+  popupContainer: {
+    backgroundColor: theme === 'dark' ? colors.grey900 : colors.white,
+    width: 295,
+    borderRadius: 20,
+    alignSelf: 'center',
+    padding: 20,
+    alignContent: 'center',
+  },
+  popupIllustration: {
+    height: 170,
+    borderRadius: 12,
+  },
+  popupPage: { top: 0, width: '100%', paddingBottom: 20 },
+  popupHeaderTextContainer: {
+    color: theme === 'dark' ? colors.white : colors.black,
+    paddingTop: 20,
+    textAlign: 'center',
+  },
+  popupDescriptionTextContainer: {
+    color: theme === 'dark' ? colors.white : colors.black,
+    paddingTop: 10,
+    textAlign: 'center',
+  },
+  leftArrowIcon: {
+    borderWidth: 0,
+  },
+}));
+
+ContactCreateScreen.getScreenOptions = (): ScreenOptions => ({
+  stackAnimation: 'slide_from_bottom',
+});
+
+export default ContactCreateScreen;
