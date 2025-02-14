@@ -133,14 +133,14 @@ The application use a [GraphQL](https://graphql.org/) API to communicate between
 
 ### Client
 
-- [React](https://reactjs.org/) Main client framework
-- [React Native](https://reactnative.dev/) main mobile application framework
-- [ReactRelay](https://relay.dev/) client data layer
+- [React](https://reactjs.org/): Main client framework
+- [React Native](https://reactnative.dev/): main mobile application framework
+- [ReactRelay](https://relay.dev/): client data layer
 
 ### Code Quality
 
 - [Jest](https://jestjs.io/fr/): Test framework
-- [React testing library](https://testing-library.com/docs/react-testing-library/intro/) : UI testing framework
+- [React testing library](https://testing-library.com/docs/react-testing-library/intro/): UI testing framework
 - [ESlint](https://eslint.org/): linter
 - [Prettier](https://prettier.io/): code formatting
 
