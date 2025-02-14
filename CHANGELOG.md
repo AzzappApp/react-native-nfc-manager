@@ -1,3 +1,7 @@
+## 1.7.1-rc.30
+
+* **feat:**  - **payment:** add azzapp plus in payment ([#7450](https://github.com/AzzappApp/azzapp/pull/7450))
+
 ## 1.7.1-rc.29
 
 * **fix:**  - dont display message is no trial and no subscription ([#7441](https://github.com/AzzappApp/azzapp/pull/7441))
