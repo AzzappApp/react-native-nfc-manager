@@ -1,3 +1,7 @@
+## 1.7.1-canary.36
+
+* **fix:**  - ensure a label is displayed even if backend doesn't have it ([#7444](https://github.com/AzzappApp/azzapp/pull/7444))
+
 ## 1.7.1-canary.35
 
 
