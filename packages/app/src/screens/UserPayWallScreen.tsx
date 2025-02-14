@@ -393,7 +393,7 @@ const UserPayWallScreen = ({
           labelPosition="left"
           onValueChange={() => setPeriod(period === 'year' ? 'month' : 'year')}
           label={intl.formatMessage({
-            defaultMessage: 'Yearly billing',
+            defaultMessage: 'Yearly billing (30% off)',
             description:
               'MultiUser Paywall screen - switch between monthly and yearly billing',
           })}
@@ -624,26 +624,27 @@ const OfferItem = ({
       <View>
         <Text variant="button" appearance="light">
           <FormattedNumber
-            value={offer.product.price}
+            value={
+              period === 'year' ? offer.product.price / 12 : offer.product.price
+            }
             style="currency"
             currency={offer.product.currencyCode}
           />
-          {period !== 'year' ? (
-            <FormattedMessage
-              defaultMessage=" / month"
-              description="MultiUser Paywall Screen - number of seat offer"
-            />
-          ) : undefined}
+          <FormattedMessage
+            defaultMessage=" / month"
+            description="MultiUser Paywall Screen - number of seat offer"
+          />
         </Text>
+
         {period === 'year' && (
-          <Text variant="smallbold" style={styles.monthlyPricing}>
+          <Text variant="smallbold" style={styles.yearlyPricing}>
             <FormattedNumber
-              value={offer.product.price / 12}
+              value={offer.product.price}
               style="currency"
               currency={offer.product.currencyCode}
             />
             <FormattedMessage
-              defaultMessage=" / month"
+              defaultMessage=" / year"
               description="MultiUser Paywall Screen - number of seat offer"
             />
           </Text>
@@ -656,7 +657,7 @@ const OfferItem = ({
 const Offer = memo(OfferItem);
 const BOTTOM_HEIGHT = 450;
 const styles = StyleSheet.create({
-  monthlyPricing: { textAlign: 'right', color: colors.grey600 },
+  yearlyPricing: { textAlign: 'right', color: colors.grey600 },
   promoContainer: {
     alignItems: 'flex-end',
     justifyContent: 'flex-end',
