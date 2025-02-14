@@ -1,3 +1,7 @@
+## 1.7.1-canary.39
+
+* **docs:**  - update readme
+
 ## 1.7.1-canary.38
 
 * **fix:**  - **database:** [#5031](https://github.com/AzzappApp/azzapp/pull/5031) migrate columns to 12 chars ([#7442](https://github.com/AzzappApp/azzapp/pull/7442))
