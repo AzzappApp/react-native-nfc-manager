@@ -9,13 +9,13 @@ import { dateDiffInMinutes } from '@azzapp/shared/timeHelpers';
 import { login } from '#authent';
 import client from '#client';
 import {
-  AZZAPP_PLUS_PRICE,
   calculateAmount,
   calculateAmountForSeats,
   calculateAzzappPlusPrice,
   calculateNextPaymentIntervalInMinutes,
   calculateTaxes,
   generateRebillFailRule,
+  getAzzappPlusPrice,
   getPricePerSeat,
   MONTHLY_RECURRENCE,
   YEARLY_RECURRENCE,
@@ -79,12 +79,13 @@ const calculateSubscriptionUpdate = async (
       recurringCost: {
         amount: amountForSeats + azzappPlusPrice,
         amountForSeats,
-        azzappPlusPerMonth: AZZAPP_PLUS_PRICE,
+        azzappPlusPerMonth: getAzzappPlusPrice(
+          existingSubscription.subscriptionPlan,
+        ),
         amountAzzappPlus: azzappPlusPrice,
         pricePerSeat: getPricePerSeat(existingSubscription.subscriptionPlan),
         taxes,
         taxRate: rate,
-        azzappPlus: AZZAPP_PLUS_PRICE,
       },
     };
   } else if (existingSubscription.subscriptionPlan === 'web.yearly') {
@@ -137,6 +138,10 @@ const calculateSubscriptionUpdate = async (
 
     const pricePerSeat = getPricePerSeat(existingSubscription.subscriptionPlan);
 
+    const azzappPlusPerMonth = getAzzappPlusPrice(
+      existingSubscription.subscriptionPlan,
+    );
+
     return {
       firstPayment:
         intervalInMonths > 0
@@ -148,7 +153,7 @@ const calculateSubscriptionUpdate = async (
               taxes: taxesForTheRestOfTheYear,
               taxRate: rateForTheRestOfTheYear,
               amountAzzappPlus: azzappPlusPriceForTheRestOfTheYear,
-              azzappPlusPerMonth: AZZAPP_PLUS_PRICE,
+              azzappPlusPerMonth,
               pricePerSeat,
             }
           : undefined,
@@ -156,7 +161,7 @@ const calculateSubscriptionUpdate = async (
       recurringCost: {
         amount: amountForSeats + azzappPlusPrice,
         amountForSeats,
-        azzappPlusPerMonth: AZZAPP_PLUS_PRICE,
+        azzappPlusPerMonth,
         amountAzzappPlus: azzappPlusPrice,
         pricePerSeat,
         taxes,

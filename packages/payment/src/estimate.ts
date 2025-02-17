@@ -1,8 +1,8 @@
 import {
-  AZZAPP_PLUS_PRICE,
   calculateAmountForSeats,
   calculateAzzappPlusPrice,
   calculateTaxes,
+  getAzzappPlusPrice,
   getPricePerSeat,
 } from '#helpers';
 
@@ -29,7 +29,7 @@ export const estimate = async (
   return {
     amount,
     amountForSeats,
-    azzappPlusPerMonth: AZZAPP_PLUS_PRICE,
+    azzappPlusPerMonth: getAzzappPlusPrice(subscriptionPlan),
     amountAzzappPlus: calculateAzzappPlusPrice(subscriptionPlan),
     pricePerSeat: getPricePerSeat(subscriptionPlan),
     taxes,
