@@ -3,6 +3,7 @@ import {
   deleteUnusedAccounts,
   getProfilesByIds,
   getProfilesByWebCard,
+  getWebCardsOwnerUsers,
   removeProfiles,
   transaction,
 } from '@azzapp/data';
@@ -32,6 +33,7 @@ const removeUsersFromWebCard: MutationResolvers['removeUsersFromWebCard'] =
     }
 
     const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
+    const [owner] = await getWebCardsOwnerUsers([webCardId]);
     await checkWebCardProfileAdminRight(webCardId);
 
     const profileToRemoveIds = allProfiles
@@ -54,7 +56,9 @@ const removeUsersFromWebCard: MutationResolvers['removeUsersFromWebCard'] =
         profilesToDelete.map(profile => profile.id),
         userId,
       );
-      await updateMonthlySubscription(userId);
+      if (owner) {
+        await updateMonthlySubscription(owner.id);
+      }
     });
 
     return allProfiles ? [] : profilesToDelete.map(profile => profile.id);
