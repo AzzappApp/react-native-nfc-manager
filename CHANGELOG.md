@@ -1,3 +1,7 @@
+## 1.7.1-rc.32
+
+* **fix:**  - **payment:** [#7456](https://github.com/AzzappApp/azzapp/pull/7456) only count added users on published webCard ([#7457](https://github.com/AzzappApp/azzapp/pull/7457))
+
 ## 1.7.1-rc.31
 
 * **fix:**  - **auth:** [#7452](https://github.com/AzzappApp/azzapp/pull/7452) automatically signout when current user is null ([#7453](https://github.com/AzzappApp/azzapp/pull/7453))
