@@ -10,9 +10,13 @@ import { login } from '#authent';
 import client from '#client';
 import {
   calculateAmount,
+  calculateAmountForSeats,
+  calculateAzzappPlusPrice,
   calculateNextPaymentIntervalInMinutes,
   calculateTaxes,
   generateRebillFailRule,
+  getAzzappPlusPrice,
+  getPricePerSeat,
   MONTHLY_RECURRENCE,
   YEARLY_RECURRENCE,
 } from '#helpers';
@@ -44,35 +48,44 @@ export const estimateUpdateSubscriptionForWebCard = async ({
   totalSeats,
 }: {
   subscription: UserSubscription;
-  totalSeats?: number | null;
+  totalSeats: number;
 }) => {
   return calculateSubscriptionUpdate(subscription, totalSeats);
 };
 
 const calculateSubscriptionUpdate = async (
   existingSubscription: UserSubscription,
-  totalSeats?: number | null,
+  totalSeats: number,
 ) => {
   if (existingSubscription.subscriptionPlan === 'web.monthly') {
-    const amount = totalSeats
-      ? calculateAmount(totalSeats, existingSubscription.subscriptionPlan)
-      : existingSubscription.amount;
+    const amountForSeats = calculateAmountForSeats(
+      totalSeats,
+      existingSubscription.subscriptionPlan,
+    );
 
-    const { amount: taxes, rate } = totalSeats
-      ? await calculateTaxes(
-          amount ?? 0,
-          existingSubscription.subscriberCountryCode ?? undefined,
-          existingSubscription.subscriberVatNumber ?? undefined,
-        )
-      : { amount: 0 };
+    const azzappPlusPrice = calculateAzzappPlusPrice(
+      existingSubscription.subscriptionPlan,
+    );
+
+    const { amount: taxes, rate } = await calculateTaxes(
+      amountForSeats + azzappPlusPrice,
+      existingSubscription.subscriberCountryCode ?? undefined,
+      existingSubscription.subscriberVatNumber ?? undefined,
+    );
 
     return {
       firstPayment: null,
       firstPaymentNbMonths: null,
       recurringCost: {
-        amount: amount ?? 0,
+        amount: amountForSeats + azzappPlusPrice,
+        amountForSeats,
+        azzappPlusPerMonth: getAzzappPlusPrice(
+          existingSubscription.subscriptionPlan,
+        ),
+        amountAzzappPlus: azzappPlusPrice,
+        pricePerSeat: getPricePerSeat(existingSubscription.subscriptionPlan),
         taxes,
-        taxRate: rate ?? 0,
+        taxRate: rate,
       },
     };
   } else if (existingSubscription.subscriptionPlan === 'web.yearly') {
@@ -87,52 +100,72 @@ const calculateSubscriptionUpdate = async (
         MONTHLY_RECURRENCE,
     );
 
-    const amountForTheRestOfTheYear = totalSeats
-      ? Math.floor(
-          (calculateAmount(
-            totalSeats - existingSubscription.totalSeats,
-            existingSubscription.subscriptionPlan,
-          ) *
-            intervalInMonths) /
-            Math.floor(YEARLY_RECURRENCE / MONTHLY_RECURRENCE),
-        )
-      : 0;
+    const amountForSeatsForTheRestOfTheYear = Math.floor(
+      (calculateAmountForSeats(
+        totalSeats - existingSubscription.totalSeats,
+        existingSubscription.subscriptionPlan,
+      ) *
+        intervalInMonths) /
+        Math.floor(YEARLY_RECURRENCE / MONTHLY_RECURRENCE),
+    );
+
+    const azzappPlusPrice = calculateAzzappPlusPrice(
+      existingSubscription.subscriptionPlan,
+    );
+
+    const azzappPlusPriceForTheRestOfTheYear = Math.floor(
+      (azzappPlusPrice * intervalInMonths) /
+        Math.floor(YEARLY_RECURRENCE / MONTHLY_RECURRENCE),
+    );
 
     const { amount: taxesForTheRestOfTheYear, rate: rateForTheRestOfTheYear } =
-      totalSeats
-        ? await calculateTaxes(
-            amountForTheRestOfTheYear,
-            existingSubscription.subscriberCountryCode ?? undefined,
-            existingSubscription.subscriberVatNumber ?? undefined,
-          )
-        : { amount: 0 };
+      await calculateTaxes(
+        amountForSeatsForTheRestOfTheYear + azzappPlusPriceForTheRestOfTheYear,
+        existingSubscription.subscriberCountryCode ?? undefined,
+        existingSubscription.subscriberVatNumber ?? undefined,
+      );
 
-    const amount = totalSeats
-      ? calculateAmount(totalSeats, existingSubscription.subscriptionPlan)
-      : existingSubscription.amount;
+    const amountForSeats = calculateAmountForSeats(
+      totalSeats ?? 0,
+      existingSubscription.subscriptionPlan,
+    );
 
-    const { amount: taxes, rate } = totalSeats
-      ? await calculateTaxes(
-          amount ?? 0,
-          existingSubscription.subscriberCountryCode ?? undefined,
-          existingSubscription.subscriberVatNumber ?? undefined,
-        )
-      : { amount: 0 };
+    const { amount: taxes, rate } = await calculateTaxes(
+      amountForSeats + azzappPlusPrice,
+      existingSubscription.subscriberCountryCode ?? undefined,
+      existingSubscription.subscriberVatNumber ?? undefined,
+    );
+
+    const pricePerSeat = getPricePerSeat(existingSubscription.subscriptionPlan);
+
+    const azzappPlusPerMonth = getAzzappPlusPrice(
+      existingSubscription.subscriptionPlan,
+    );
 
     return {
       firstPayment:
         intervalInMonths > 0
           ? {
-              amount: amountForTheRestOfTheYear ?? 0,
+              amount:
+                amountForSeatsForTheRestOfTheYear +
+                azzappPlusPriceForTheRestOfTheYear,
+              amountForSeats: amountForSeatsForTheRestOfTheYear,
               taxes: taxesForTheRestOfTheYear,
-              taxRate: rateForTheRestOfTheYear ?? 0,
+              taxRate: rateForTheRestOfTheYear,
+              amountAzzappPlus: azzappPlusPriceForTheRestOfTheYear,
+              azzappPlusPerMonth,
+              pricePerSeat,
             }
           : undefined,
       firstPaymentNbMonths: intervalInMonths > 0 ? intervalInMonths : 0,
       recurringCost: {
-        amount: amount ?? 0,
+        amount: amountForSeats + azzappPlusPrice,
+        amountForSeats,
+        azzappPlusPerMonth,
+        amountAzzappPlus: azzappPlusPrice,
+        pricePerSeat,
         taxes,
-        taxRate: rate ?? 0,
+        taxRate: rate,
       },
     };
   }
@@ -223,7 +256,7 @@ export const updateExistingSubscription = async ({
 
       const { recurringCost } = await calculateSubscriptionUpdate(
         existingSubscription,
-        totalSeats,
+        totalSeats!,
       );
       const intervalInMinutes = calculateNextPaymentIntervalInMinutes(
         existingSubscription.subscriptionPlan,
@@ -345,7 +378,7 @@ export const updateExistingSubscription = async ({
 
     const { firstPayment, recurringCost } = await calculateSubscriptionUpdate(
       existingSubscription,
-      totalSeats,
+      totalSeats!,
     );
 
     newSubscriptionId = createId();

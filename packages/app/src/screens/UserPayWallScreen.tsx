@@ -478,7 +478,7 @@ const UserPayWallScreen = ({
                   ),
                 }}
               />
-            ) : (
+            ) : data.currentUser?.userSubscription?.status === 'active' ? (
               <FormattedMessage
                 defaultMessage="Your actual subscription : {qty, plural,
         =1 {{qty} user}
@@ -505,7 +505,7 @@ const UserPayWallScreen = ({
                         : '',
                 }}
               />
-            )}
+            ) : null}
           </Text>
           <View style={styles.footer}>
             <PressableOpacity onPress={restorePurchase}>
