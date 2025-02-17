@@ -1,3 +1,7 @@
+## 1.7.1-canary.44
+
+* **build:**  - upgrade to rn 0.77.1 ([#7455](https://github.com/AzzappApp/azzapp/pull/7455))
+
 ## 1.7.1-canary.43
 
 * **fix:**  - **auth:** [#7452](https://github.com/AzzappApp/azzapp/pull/7452) automatically signout when current user is null ([#7453](https://github.com/AzzappApp/azzapp/pull/7453))
