@@ -1,3 +1,7 @@
+## 1.7.1-rc.33
+
+* **fix:**  - **payment:** [#7460](https://github.com/AzzappApp/azzapp/pull/7460) update webcard owner subscription ([#7461](https://github.com/AzzappApp/azzapp/pull/7461))
+
 ## 1.7.1-rc.32
 
 * **fix:**  - **payment:** [#7456](https://github.com/AzzappApp/azzapp/pull/7456) only count added users on published webCard ([#7457](https://github.com/AzzappApp/azzapp/pull/7457))
