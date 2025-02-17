@@ -1,3 +1,10 @@
+## 1.7.1-rc.31
+
+* **fix:**  - **auth:** [#7452](https://github.com/AzzappApp/azzapp/pull/7452) automatically signout when current user is null ([#7453](https://github.com/AzzappApp/azzapp/pull/7453))
+* **feat:**  - manage translator role in backoffice ([#7448](https://github.com/AzzappApp/azzapp/pull/7448))
+* **fix:**  - **payment:** [#7446](https://github.com/AzzappApp/azzapp/pull/7446) case when user has no more seats after ownership transferts ([#7447](https://github.com/AzzappApp/azzapp/pull/7447))
+* **fix:**  - azzapp plus price is not the same for monthly and yearly ([#7454](https://github.com/AzzappApp/azzapp/pull/7454))
+
 ## 1.7.1-rc.30
 
 * **feat:**  - **payment:** add azzapp plus in payment ([#7450](https://github.com/AzzappApp/azzapp/pull/7450))
