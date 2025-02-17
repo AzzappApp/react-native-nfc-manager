@@ -57,6 +57,11 @@ const HomeScreen = ({
   }, [hasFocus]);
 
   useEffect(() => {
+    //current user is fetched on welcome screen / when null the app is in infinite loop
+    if (!currentUser) {
+      dispatchGlobalEvent({ type: 'SIGN_OUT' });
+      return;
+    }
     //if not profile, launch onboarding (except if we are in offline mode)
     if (
       (!currentUser?.profiles || currentUser.profiles.length === 0) &&
