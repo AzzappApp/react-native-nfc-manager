@@ -1,3 +1,7 @@
+## 1.7.1-canary.45
+
+* **build:**  - rollback react-native to 0.77
+
 ## 1.7.1-canary.44
 
 * **build:**  - upgrade to rn 0.77.1 ([#7455](https://github.com/AzzappApp/azzapp/pull/7455))
