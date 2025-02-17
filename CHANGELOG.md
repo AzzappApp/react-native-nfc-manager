@@ -1,3 +1,7 @@
+## 1.7.1-canary.42
+
+* **fix:**  - **auth:** [#7452](https://github.com/AzzappApp/azzapp/pull/7452) automatically signout when current user is null ([#7453](https://github.com/AzzappApp/azzapp/pull/7453))
+
 ## 1.7.1-canary.41
 
 
