@@ -123,7 +123,7 @@
     "react": "^18.3.1",
     "react-hook-form": "^7.54.2",
     "react-intl": "^7.1.6",
-    "react-native": "patch:react-native@npm%3A0.77.1#~/.yarn/patches/react-native-npm-0.77.1-508c57ca1f.patch",
+    "react-native": "patch:react-native@npm%3A0.77.0#~/.yarn/patches/react-native-npm-0.77.0-90586745d5.patch",
     "react-native-animateable-text": "^0.15.0-beta.0",
     "react-native-blob-jsi-helper": "^0.3.1",
     "react-native-bootsplash": "^6.3.3",
