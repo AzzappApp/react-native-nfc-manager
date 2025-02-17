@@ -111,7 +111,7 @@ export const updateMonthlySubscription = async (userId: string) => {
   );
 
   if (monthly) {
-    const seats = await getTotalMultiUser(userId);
+    const seats = Math.min(await getTotalMultiUser(userId), 1);
 
     await updateExistingSubscription({
       userSubscription: monthly,
