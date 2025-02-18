@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/nextjs';
+import { getProfilesWhereUserBIsOwner } from '@azzapp/data';
 import { getPaymentRequest } from '@azzapp/payment';
 import { getSessionInfos } from '#GraphQLContext';
 import { paymentMeanLoader } from '#loaders';
@@ -10,8 +11,14 @@ export const UserSubscription: UserSubscriptionResolvers = {
   id: idResolver('UserSubscription'),
   availableSeats: async userSubscription => {
     const { userId } = getSessionInfos();
+
     if (userId !== userSubscription.userId) {
-      return 0;
+      const existingProfiles = userId
+        ? await getProfilesWhereUserBIsOwner(userId, userSubscription.userId)
+        : [];
+      if (existingProfiles.length === 0) {
+        return 0;
+      }
     }
 
     return calculateAvailableSeats(userSubscription);
@@ -37,14 +44,16 @@ export const UserSubscription: UserSubscriptionResolvers = {
     }
   },
   paymentMean: async userSubscription => {
-    return userSubscription.paymentMeanId
+    return userSubscription.paymentMeanId &&
+      getSessionInfos().userId === userSubscription.userId
       ? paymentMeanLoader.load(userSubscription.paymentMeanId)
       : null;
   },
   paymentRedirectUrl: async (userSubscription, _) => {
     if (
       userSubscription.status === 'waiting_payment' &&
-      userSubscription.paymentMeanId
+      userSubscription.paymentMeanId &&
+      getSessionInfos().userId === userSubscription.userId
     ) {
       try {
         const result = await getPaymentRequest(userSubscription.paymentMeanId);
