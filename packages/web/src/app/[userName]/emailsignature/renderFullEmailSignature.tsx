@@ -162,7 +162,6 @@ const renderFullEmailSignature = ({
     border="0"
     cellpadding="0"
     cellspacing="0"
-    width="100%"
     style="
       table-layout: fixed;
       padding: 20px 15px;
@@ -170,13 +169,12 @@ const renderFullEmailSignature = ({
       font-family: Helvetica Neue;
       border-collapse: collapse;"
     >
-    ${avatarSection}
     <tbody>
+      ${avatarSection}
       <tr>
         <td
-          width="50%"
           valign="top"
-          style="border-right: 1px solid #E2E1E3;"
+          style="border-right: 1px solid #E2E1E3; padding-right: 15px;"
         >
           <table style="table-layout: fixed; padding-bottom: 12px;">
             ${nameSection}
@@ -189,7 +187,7 @@ const renderFullEmailSignature = ({
             url: saveContactURL ?? '#',
           })}
         </td>
-        <td width="50%" valign="top">
+        <td valign="top">
           <table style="table-layout: fixed; padding-left: 15px;">
             ${phoneSection}
             ${emailSection}

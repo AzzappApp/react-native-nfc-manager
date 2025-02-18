@@ -4,6 +4,8 @@ import Image from 'next/image';
 import { getMediasByIds, getOwnerProfileByUserName } from '@azzapp/data';
 import { verifyHmacWithPassword } from '@azzapp/shared/crypto';
 import { parseEmailSignature } from '@azzapp/shared/emailSignatureHelpers';
+import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
+import { buildUserUrlWithContactCard } from '@azzapp/shared/urlHelpers';
 import azzappFull from '#assets/images/azzapp-full.png';
 import { CopyrightFooter } from '#components/CopyrightFooter';
 import { getDeviceInfo } from '#helpers/devices';
@@ -70,6 +72,20 @@ const EmailSignaturePage = async ({
     return notFound();
   }
   const contact = parseEmailSignature(contactData);
+  const { data: saveContactData, signature: saveContactSignature } =
+    await serializeAndSignContactCard(
+      userName,
+      profile.id,
+      profile.webCardId,
+      profile.contactCard ?? {},
+      webCard.isMultiUser ? webCard?.commonInformation : null,
+    );
+
+  const saveContactURL = buildUserUrlWithContactCard(
+    userName,
+    saveContactData,
+    saveContactSignature,
+  );
 
   const showStoreLinks = !isMobileDevice;
   return (
@@ -91,7 +107,7 @@ const EmailSignaturePage = async ({
               ? webCard.logoId
               : profile.logoId
           }
-          compressedContactCard={compressedContactCard}
+          saveContactURL={saveContactURL}
         />
 
         <Image

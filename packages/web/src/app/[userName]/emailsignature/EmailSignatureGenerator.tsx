@@ -5,7 +5,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { colors } from '@azzapp/shared/colorsHelpers';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { getImageURLForSize } from '@azzapp/shared/imagesHelpers';
-import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { ArrowRightIcon } from '#assets';
 import { Button } from '#ui';
 import CoverRenderer from '#components/renderer/CoverRenderer';
@@ -22,14 +21,14 @@ const EmailSignatureGenerator = ({
   contact,
   mode,
   companyLogo,
-  compressedContactCard,
+  saveContactURL,
 }: {
   webCard: WebCard;
   media: Media | null;
   contact: EmailSignatureParsed;
   mode: 'full' | 'simple';
   companyLogo: string | null;
-  compressedContactCard: string;
+  saveContactURL: string;
 }) => {
   const intl = useIntl();
 
@@ -44,8 +43,6 @@ const EmailSignatureGenerator = ({
   });
 
   const handleCopySignature = async (mode: 'full' | 'simple') => {
-    const saveContactURL =
-      buildUserUrl(webCard.userName) + '?c=' + compressedContactCard;
     const signature =
       mode === 'full'
         ? renderFullEmailSignature({
@@ -128,10 +125,7 @@ const EmailSignatureGenerator = ({
                 webCard,
                 companyLogoUrl,
                 saveContactMessage,
-                saveContactURL:
-                  buildUserUrl(webCard.userName) +
-                  '?c=' +
-                  compressedContactCard,
+                saveContactURL,
               }),
             }}
           />
