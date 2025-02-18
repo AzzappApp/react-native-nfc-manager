@@ -140,14 +140,26 @@ const copyCoverMediaToCacheDirInternal = async (
       throw e;
     }
   }
-  const resultFile = await downloadRemoteFileToLocalCache(
-    media.uri,
-    abortSignal,
-    file,
-  );
-  if (resultFile) {
-    return file.name;
+  try {
+    const resultFile = await downloadRemoteFileToLocalCache(
+      media.uri,
+      abortSignal,
+      file,
+    );
+    if (resultFile) {
+      return file.name;
+    }
+  } catch (e) {
+    Sentry.captureException(e, {
+      extra: {
+        label: 'copyCoverMediaToCacheDirInternalDownload',
+        url: media.uri,
+        media,
+      },
+    });
+    throw e;
   }
+
   return null;
 };
 
