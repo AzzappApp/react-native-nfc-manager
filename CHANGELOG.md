@@ -1,3 +1,7 @@
+## 1.7.1-rc.35
+
+* **test:**  - add more log to find production bug android
+
 ## 1.7.1-rc.34
 
 * **fix:**  - **home:** [#6490](https://github.com/AzzappApp/azzapp/pull/6490) new attempt to fix white screen after payment ([#7458](https://github.com/AzzappApp/azzapp/pull/7458))
