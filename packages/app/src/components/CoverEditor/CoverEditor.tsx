@@ -11,7 +11,7 @@ import {
   useState,
 } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Platform, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import { Video } from 'react-native-compressor';
 import { useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller';
 import Animated, {
@@ -129,11 +129,6 @@ const CoverEditorWrapper = (
     )
   );
 };
-
-const ANDROID_ASSET_PATH =
-  'file:///android_asset/cover_overlay_placeholder_logo.png';
-
-const isAndroidRelease = Platform.OS === 'android' && !__DEV__;
 
 export const maximumCoverFromScratch = 5;
 
@@ -286,7 +281,7 @@ const CoverEditorCore = (
               ? {
                   ...overlay,
                   id: 'overlay_placeholder-' + i,
-                  uri: isAndroidRelease ? ANDROID_ASSET_PATH : placeholder.uri,
+                  uri: placeholder.localUri,
                   kind: 'image',
                   width: placeholder.width,
                   height: placeholder.height,
