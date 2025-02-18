@@ -83,7 +83,8 @@ const HomeHeader = ({ openPanel, user: userKey }: HomeHeaderProps) => {
   );
 
   const premiumIndicatorAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: currentIndexSharedValue.value > 0.5 ? 1 : 0,
+    opacity:
+      currentIndexSharedValue.value > 1 ? 1 : currentIndexSharedValue.value,
     pointerEvents: currentIndexSharedValue.value >= 1 ? 'auto' : 'none',
   }));
 
