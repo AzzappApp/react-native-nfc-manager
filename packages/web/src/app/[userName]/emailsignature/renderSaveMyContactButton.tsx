@@ -49,7 +49,7 @@ const renderSaveMyContactButton = ({
         text-align: center;
         font-weight: 700;
         color: ${getTextColor(primaryColor)};
-      }}
+      "
       href="${url}"
     >${saveContactMessage}</a>
   <!-- <![endif]-->
