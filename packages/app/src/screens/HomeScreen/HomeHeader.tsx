@@ -82,7 +82,7 @@ const HomeHeader = ({ openPanel, user: userKey }: HomeHeaderProps) => {
     0,
   );
 
-  const premiumIndicatorAnimatedStyle = useAnimatedStyle(() => ({
+  const hintIndicatorAnimatedStyle = useAnimatedStyle(() => ({
     opacity: currentIndexSharedValue.value > 0.5 ? 1 : 0,
     pointerEvents: currentIndexSharedValue.value >= 1 ? 'auto' : 'none',
   }));
@@ -95,7 +95,7 @@ const HomeHeader = ({ openPanel, user: userKey }: HomeHeaderProps) => {
     <Header
       leftElement={
         <Animated.View
-          style={[styles.rightButtonContainer, premiumIndicatorAnimatedStyle]}
+          style={[styles.rightButtonContainer, hintIndicatorAnimatedStyle]}
         >
           <IconButton
             icon="information"
