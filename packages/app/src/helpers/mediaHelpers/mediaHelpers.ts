@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react-native';
 import { Paths, Directory, File } from 'expo-file-system/next';
 import ImageSize from 'react-native-image-size';
 import { getFileExtension, isFileURL } from '#helpers/fileHelpers';
@@ -120,24 +121,34 @@ const copyCoverMediaToCacheDirInternal = async (
   }
 
   if (isFileURL(media.uri)) {
-    const oldFile = new File(media.uri);
-    if (!oldFile.exists) {
-      return null;
-    }
+    try {
+      const oldFile = new File(media.uri);
+      if (!oldFile.exists) {
+        return null;
+      }
 
-    oldFile.copy(file);
-    return file.name;
-  } else {
-    const resultFile = await downloadRemoteFileToLocalCache(
-      media.uri,
-      abortSignal,
-      file,
-    );
-    if (resultFile) {
+      oldFile.copy(file);
       return file.name;
+    } catch (e) {
+      Sentry.captureException(e, {
+        data: {
+          label: 'copyCoverMediaToCacheDirInternal',
+          url: media.uri,
+          media,
+        },
+      });
+      throw e;
     }
-    return null;
   }
+  const resultFile = await downloadRemoteFileToLocalCache(
+    media.uri,
+    abortSignal,
+    file,
+  );
+  if (resultFile) {
+    return file.name;
+  }
+  return null;
 };
 
 export const copyCoverMediaToCacheDir = (
