@@ -275,8 +275,7 @@ const CoverEditorCore = (
       : [];
 
     textLayers = textLayers.filter(textLayer => !!textLayer.text);
-    console.log(Paths.cache.uri);
-    console.log(placeholder);
+
     const overlayLayers = placeholder
       ? ((data?.overlayLayers as any)?.map(
           (overlay: CoverEditorOverlayItem, i: number) =>
