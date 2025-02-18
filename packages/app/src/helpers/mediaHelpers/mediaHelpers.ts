@@ -131,7 +131,7 @@ const copyCoverMediaToCacheDirInternal = async (
       return file.name;
     } catch (e) {
       Sentry.captureException(e, {
-        data: {
+        extra: {
           label: 'copyCoverMediaToCacheDirInternal',
           url: media.uri,
           media,
