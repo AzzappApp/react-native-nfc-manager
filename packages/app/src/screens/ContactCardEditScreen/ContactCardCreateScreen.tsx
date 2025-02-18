@@ -16,7 +16,6 @@ import {
   ScreenModal,
 } from '#components/NativeRouter';
 import BottomSheetPopup from '#components/popup/BottomSheetPopup';
-import { PopupButton } from '#components/popup/PopupElements';
 import { onChangeWebCard } from '#helpers/authStore';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getFileName } from '#helpers/fileHelpers';
@@ -371,9 +370,9 @@ const ContactCardCreateScreen = () => {
               />
             </Text>
           </View>
-          <PopupButton
+          <Button
             onPress={hidePopup}
-            text={intl.formatMessage({
+            label={intl.formatMessage({
               defaultMessage: 'Ok, continue',
               description: 'Creare contact card screen / next buton on popup',
             })}

@@ -3,8 +3,8 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { colors } from '#theme';
 import BottomSheetPopup from '#components/popup/BottomSheetPopup';
-import { PopupButton } from '#components/popup/PopupElements';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import Button from '#ui/Button';
 import Text from '#ui/Text';
 
 const IosAddWidgetPopup = ({
@@ -48,9 +48,9 @@ const IosAddWidgetPopup = ({
             />
           </Text>
         </View>
-        <PopupButton
+        <Button
           onPress={onHide}
-          text={intl.formatMessage({
+          label={intl.formatMessage({
             defaultMessage: 'Ok',
             description: 'Popup add widget to home screen / ok buton on popup',
           })}

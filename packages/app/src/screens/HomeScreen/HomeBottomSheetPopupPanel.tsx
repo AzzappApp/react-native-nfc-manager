@@ -1,8 +1,10 @@
+import * as Sentry from '@sentry/react-native';
 import { ResizeMode, Video } from 'expo-av';
 import { useCallback, useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useColorScheme, View } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import Toast from 'react-native-toast-message';
 import {
   fetchQuery,
   graphql,
@@ -13,20 +15,25 @@ import {
 import { isValidUserName } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import BottomSheetPopup from '#components/popup/BottomSheetPopup';
-import { PopupButton } from '#components/popup/PopupElements';
 import { onChangeWebCard } from '#helpers/authStore';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { useTooltipContext } from '#helpers/TooltipContext';
 import BottomSheetTextInput from '#ui/BottomSheetTextInput';
+import Button from '#ui/Button';
 import Icon from '#ui/Icon';
 import { PageProgress } from '#ui/PageProgress';
 import Text from '#ui/Text';
 import type { HomeBottomSheetPopupPanel_profile$key } from '#relayArtifacts/HomeBottomSheetPopupPanel_profile.graphql';
 import type { HomeBottomSheetPopupPanelCheckUserNameQuery } from '#relayArtifacts/HomeBottomSheetPopupPanelCheckUserNameQuery.graphql';
 import type { HomeBottomSheetPopupPanelGetProposedUsernameQuery } from '#relayArtifacts/HomeBottomSheetPopupPanelGetProposedUsernameQuery.graphql';
+import type {
+  HomeBottomSheetPopupPanelMutation,
+  HomeBottomSheetPopupPanelMutation$data,
+} from '#relayArtifacts/HomeBottomSheetPopupPanelMutation.graphql';
 import type { ReactNode } from 'react';
+import type { RecordSourceSelectorProxy } from 'relay-runtime';
 
-type HomeBottomSheetPopupPanelProps = {
+export type HomeBottomSheetPopupPanelProps = {
   profile: HomeBottomSheetPopupPanel_profile$key | null;
 };
 
@@ -75,19 +82,20 @@ const HomeBottomSheetPopupPanel = ({
     if (profile?.webCard) fct();
   }, [environment, profile?.webCard]);
 
-  const [commitUserName] = useMutation(graphql`
-    mutation HomeBottomSheetPopupPanelMutation(
-      $webCardId: ID!
-      $input: UpdateWebCardInput!
-    ) {
-      updateWebCard(webCardId: $webCardId, input: $input) {
-        webCard {
-          id
-          userName
+  const [commitUserName, isLoadingCommitUserName] =
+    useMutation<HomeBottomSheetPopupPanelMutation>(graphql`
+      mutation HomeBottomSheetPopupPanelMutation(
+        $webCardId: ID!
+        $input: UpdateWebCardInput!
+      ) {
+        updateWebCard(webCardId: $webCardId, input: $input) {
+          webCard {
+            id
+            userName
+          }
         }
       }
-    }
-  `);
+    `);
 
   const [currentPage, setCurrentPage] = useState(0);
   const [newUserName, setNewUserName] = useState('');
@@ -175,7 +183,6 @@ const HomeBottomSheetPopupPanel = ({
   );
 
   const { openTooltips } = useTooltipContext();
-
   const onNextPageRequested = useCallback(() => {
     if (currentPage < 2) {
       const nextPage = currentPage + 1;
@@ -187,9 +194,17 @@ const HomeBottomSheetPopupPanel = ({
       } else {
         commitUserName({
           variables: {
-            webCardId: profile?.webCard?.id,
+            webCardId: profile?.webCard?.id ?? '',
             input: {
               userName: newUserName,
+            },
+          },
+          optimisticResponse: {
+            updateWebCard: {
+              webCard: {
+                id: profile?.webCard?.id,
+                userName: newUserName,
+              },
             },
           },
           onCompleted: () => {
@@ -198,35 +213,18 @@ const HomeBottomSheetPopupPanel = ({
               openTooltips(['profileEdit']);
             }, 500);
           },
-          updater: store => {
-            // reorder carousel once userName is set
-            if (!profile?.webCard?.id) return;
-            const currentWebCard = store.get(profile.webCard?.id);
-            currentWebCard?.setValue(newUserName, 'userName');
-
-            const root = store.getRoot();
-            const user = root.getLinkedRecord('currentUser');
-            const profiles = user?.getLinkedRecords('profiles');
-            if (!profiles) {
-              return;
-            }
-            user?.setLinkedRecords(
-              profiles?.sort((a, b) => {
-                const webCardA = a.getLinkedRecord('webCard');
-                const webCardB = b.getLinkedRecord('webCard');
-
-                return (
-                  (webCardA?.getValue('userName') as string) ?? ''
-                ).localeCompare(
-                  (webCardB?.getValue('userName') as string) ?? '',
-                );
+          optimisticUpdater: updater,
+          updater,
+          onError: err => {
+            Sentry.captureException(err);
+            Toast.show({
+              type: 'error',
+              text1: intl.formatMessage({
+                defaultMessage: 'An error occured while updating your WebCard',
+                description:
+                  'Error toast title when updating WebCard username on home',
               }),
-              'profiles',
-            );
-            root.setLinkedRecord(user, 'currentUser');
-          },
-          onError: e => {
-            console.error('fail to configure username', e);
+            });
           },
         });
       }
@@ -234,6 +232,7 @@ const HomeBottomSheetPopupPanel = ({
   }, [
     commitUserName,
     currentPage,
+    intl,
     newUserName,
     openTooltips,
     profile?.webCard?.id,
@@ -342,6 +341,7 @@ to be shared!"
               <View style={styles.linkInput}>
                 <BottomSheetTextInput
                   defaultValue={newUserName}
+                  testID="home-bottom-sheet-popup-panel-link-input"
                   onChangeText={onLinkUrlChanged}
                   autoCapitalize="none"
                   autoCorrect={false}
@@ -373,10 +373,12 @@ to be shared!"
           <PageProgress nbPages={3} currentPage={currentPage} />
         </View>
         <View style={styles.buttonContainer}>
-          <PopupButton
+          <Button
             disabled={!!error}
+            loading={isLoadingCommitUserName}
             onPress={onNextPageRequested}
-            text={
+            testID="home-bottom-sheet-popup-panel-next-button"
+            label={
               currentPage === 2
                 ? intl.formatMessage({
                     defaultMessage: 'OK',
@@ -394,6 +396,37 @@ to be shared!"
       </View>
     </BottomSheetPopup>
   );
+};
+
+const updater = (
+  store: RecordSourceSelectorProxy<HomeBottomSheetPopupPanelMutation$data>,
+  response?: HomeBottomSheetPopupPanelMutation$data | null,
+) => {
+  const webCardId = response?.updateWebCard?.webCard?.id;
+  const newUserName = response?.updateWebCard?.webCard?.userName;
+  // reorder carousel once userName is set
+  if (!webCardId) return;
+  const currentWebCard = store.get(webCardId);
+  currentWebCard?.setValue(newUserName, 'userName');
+
+  const root = store.getRoot();
+  const user = root.getLinkedRecord('currentUser');
+  const profiles = user?.getLinkedRecords('profiles');
+  if (!profiles) {
+    return;
+  }
+  user?.setLinkedRecords(
+    profiles?.sort((a, b) => {
+      const webCardA = a.getLinkedRecord('webCard');
+      const webCardB = b.getLinkedRecord('webCard');
+
+      return ((webCardA?.getValue('userName') as string) ?? '').localeCompare(
+        (webCardB?.getValue('userName') as string) ?? '',
+      );
+    }),
+    'profiles',
+  );
+  root.setLinkedRecord(user, 'currentUser');
 };
 
 const stylesheet = createStyleSheet(theme => ({
