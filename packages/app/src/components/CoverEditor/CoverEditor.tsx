@@ -1,5 +1,6 @@
 import * as Sentry from '@sentry/react-native';
 import { useAssets } from 'expo-asset';
+import { Paths } from 'expo-file-system/next';
 import {
   forwardRef,
   useCallback,
@@ -31,6 +32,7 @@ import {
 } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import { ScreenModal, preventModalDismiss } from '#components/NativeRouter';
+import { isFileURL } from '#helpers/fileHelpers';
 import {
   FILTERS,
   getLutURI,
@@ -273,7 +275,8 @@ const CoverEditorCore = (
       : [];
 
     textLayers = textLayers.filter(textLayer => !!textLayer.text);
-
+    console.log(Paths.cache.uri);
+    console.log(placeholder);
     const overlayLayers = placeholder
       ? ((data?.overlayLayers as any)?.map(
           (overlay: CoverEditorOverlayItem, i: number) =>
@@ -281,7 +284,9 @@ const CoverEditorCore = (
               ? {
                   ...overlay,
                   id: 'overlay_placeholder-' + i,
-                  uri: placeholder.localUri,
+                  uri: isFileURL(placeholder.localUri)
+                    ? placeholder.localUri
+                    : `${Paths.cache.uri}ExponentAsset-${placeholder.hash}.${placeholder.type}`, //see https://github.com/expo/expo/issues/23288#issuecomment-1765821314
                   kind: 'image',
                   width: placeholder.width,
                   height: placeholder.height,

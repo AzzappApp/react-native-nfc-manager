@@ -43,7 +43,7 @@ export const formatVideoTime = (timeInSeconds = 0) => {
 
 export const isPNG = (uri: string) => uri.toLowerCase().endsWith('.png');
 
-export const FILE_CACHE_DIR = `${Paths.cache.uri}/files`;
+export const FILE_CACHE_DIR = `${Paths.cache.uri}files`;
 
 export const downloadRemoteFileToLocalCache = (
   uri: string,
