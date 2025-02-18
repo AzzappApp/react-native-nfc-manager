@@ -1,3 +1,7 @@
+## 1.7.1-canary.46
+
+* **fix:**  - email signature refactoring ([#7464](https://github.com/AzzappApp/azzapp/pull/7464))
+
 ## 1.7.1-canary.45
 
 * **build:**  - rollback react-native to 0.77
