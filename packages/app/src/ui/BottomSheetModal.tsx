@@ -5,7 +5,7 @@ import {
 } from '@gorhom/bottom-sheet';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Keyboard } from 'react-native';
-import {
+import Animated, {
   Extrapolation,
   interpolate,
   useAnimatedStyle,
@@ -13,6 +13,7 @@ import {
 import { colors, shadow } from '#theme';
 import Toast from '#components/Toast';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import useKeyboardHeight from '#hooks/useKeyboardHeight';
 import useScreenInsets from '#hooks/useScreenInsets';
 import type {
   BottomSheetBackdropProps,
@@ -134,9 +135,13 @@ const BottomSheetModal = ({
   }, [dismissKeyboardOnOpening, visible]);
 
   const { bottom } = useScreenInsets();
-  const paddingBottom = useMemo(() => {
-    return bottom + 15;
-  }, [bottom]);
+
+  const keyboardHeight = useKeyboardHeight();
+  const keyboardAvoidAnimatedStyle = useAnimatedStyle(() => ({
+    paddingBottom: automaticBottomPadding
+      ? 15 + (keyboardHeight.value < bottom ? bottom : 0)
+      : undefined,
+  }));
 
   const dynamicProps = useMemo(() => {
     const commonProps = {
@@ -215,7 +220,6 @@ const BottomSheetModal = ({
             styles.container,
             {
               height: height ? height : undefined,
-              paddingBottom: automaticBottomPadding ? paddingBottom : 0,
               paddingTop: showHandleIndicator
                 ? 0
                 : automaticTopPadding
@@ -224,7 +228,9 @@ const BottomSheetModal = ({
             },
           ]}
         >
-          {children}
+          <Animated.View style={[styles.container, keyboardAvoidAnimatedStyle]}>
+            {children}
+          </Animated.View>
         </BottomSheetView>
       )}
       <Toast />
