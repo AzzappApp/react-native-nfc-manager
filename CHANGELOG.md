@@ -1,3 +1,8 @@
+## 1.7.1-rc.38
+
+* **fix:**  - check users has a common webcard ([#7467](https://github.com/AzzappApp/azzapp/pull/7467))
+* **fix:**  - **android:** [#7097](https://github.com/AzzappApp/azzapp/pull/7097) use local uri for embedded overlay ([#7469](https://github.com/AzzappApp/azzapp/pull/7469))
+
 ## 1.7.1-rc.37
 
 
