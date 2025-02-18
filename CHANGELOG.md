@@ -1,3 +1,7 @@
+## 1.7.1-rc.34
+
+* **fix:**  - **home:** [#6490](https://github.com/AzzappApp/azzapp/pull/6490) new attempt to fix white screen after payment ([#7458](https://github.com/AzzappApp/azzapp/pull/7458))
+
 ## 1.7.1-rc.33
 
 * **fix:**  - **payment:** [#7460](https://github.com/AzzappApp/azzapp/pull/7460) update webcard owner subscription ([#7461](https://github.com/AzzappApp/azzapp/pull/7461))
