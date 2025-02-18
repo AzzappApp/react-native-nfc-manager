@@ -1,3 +1,7 @@
+## 1.7.1-rc.36
+
+* **fix:**  - **home:** [#7302](https://github.com/AzzappApp/azzapp/pull/7302) add optimistic update to speed up home update ([#7459](https://github.com/AzzappApp/azzapp/pull/7459))
+
 ## 1.7.1-rc.35
 
 * **test:**  - add more log to find production bug android
