@@ -1,3 +1,8 @@
+## 1.7.1-canary.47
+
+* **fix:**  - remove padding when keyboard is open ([#7462](https://github.com/AzzappApp/azzapp/pull/7462))
+* **build:**  - remove unknown option
+
 ## 1.7.1-canary.46
 
 * **fix:**  - email signature refactoring ([#7464](https://github.com/AzzappApp/azzapp/pull/7464))
