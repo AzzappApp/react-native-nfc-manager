@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/web",
-  "version": "1.7.1-rc.39",
+  "version": "1.7.1-rc.40",
   "private": true,
   "scripts": {
     "lint": "eslint .",
