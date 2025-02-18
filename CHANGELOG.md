@@ -1,3 +1,7 @@
+## 1.7.1-canary.50
+
+* **fix:**  - **EmailSignature:** fix save contact url
+
 ## 1.7.1-canary.49
 
 * **fix:**  - animate correctly home screen information button ([#7466](https://github.com/AzzappApp/azzapp/pull/7466))
