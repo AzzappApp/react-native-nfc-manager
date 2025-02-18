@@ -96,9 +96,6 @@ export const ContactCardScreen = ({
   const fullScreenCardWidth = width - 40;
   const fullScreenCardHeight = fullScreenCardWidth * CONTACT_CARD_RATIO;
 
-  // temporary disable email signature
-  const enableEmailSignature = false;
-
   const [topCardY, setTopCardY] = useState(0);
   const onLayout = (event: LayoutChangeEvent) => {
     const middleY = event.nativeEvent.layout.y + cardHeight / 2;
@@ -269,70 +266,61 @@ export const ContactCardScreen = ({
               />
             </Text>
             <AddToWalletButton webCardId={profile?.webCard.id} />
-            <View style={styles.buttons}>
-              {webCard && <ContactCardExportVcf profile={profile} />}
-              {enableEmailSignature ? (
-                <>
-                  <PressableNative
-                    ripple={{
-                      foreground: true,
-                      color:
-                        colorScheme === 'dark'
-                          ? colors.grey100
-                          : colors.grey900,
-                    }}
-                    style={styles.addToWalletButton}
-                    onPress={generateEmail}
-                  >
-                    {isGeneratingEmail ? (
-                      <ActivityIndicator
-                        color={colorScheme === 'dark' ? 'black' : 'white'}
-                        style={styles.addToWalletIcon}
-                      />
-                    ) : (
-                      <Icon
-                        icon="signature"
-                        style={styles.sharedIcon}
-                        size={24}
-                        tintColor={
-                          colorScheme === 'dark' ? colors.black : colors.white
-                        }
-                      />
-                    )}
-                    <Text variant="button" style={styles.addToWalletButtonText}>
-                      <FormattedMessage
-                        defaultMessage="Smart email Signature"
-                        description="Generate an email Signature button label"
-                      />
-                    </Text>
-                  </PressableNative>
-                  <Text
-                    variant="xsmall"
-                    style={{
-                      width: '100%',
-                      textAlign: 'center',
-                      color: colors.grey400,
-                      paddingTop: 10,
-                    }}
-                  >
-                    <FormattedMessage
-                      defaultMessage="Your smart email signature:"
-                      description="ConctactCardScreen - Your smart email signature"
-                    />
-                  </Text>
-                  <View style={styles.signaturePreview}>
-                    <View
-                      ref={ref}
-                      collapsable={false}
-                      style={styles.viewShotBackgroundColor}
-                    >
-                      <SignaturePreview profile={profile} />
-                    </View>
-                  </View>
-                  <View style={{ height: 90, width: '100%' }} />
-                </>
-              ) : undefined}
+            {webCard && <ContactCardExportVcf profile={profile} />}
+            <PressableNative
+              ripple={{
+                foreground: true,
+                color: colorScheme === 'dark' ? colors.grey100 : colors.grey900,
+              }}
+              style={styles.addToWalletButton}
+              onPress={generateEmail}
+            >
+              {isGeneratingEmail ? (
+                <ActivityIndicator
+                  color={colorScheme === 'dark' ? 'black' : 'white'}
+                  style={styles.addToWalletIcon}
+                />
+              ) : (
+                <Icon
+                  icon="signature"
+                  style={styles.sharedIcon}
+                  size={24}
+                  tintColor={
+                    colorScheme === 'dark' ? colors.black : colors.white
+                  }
+                />
+              )}
+              <Text variant="button" style={styles.addToWalletButtonText}>
+                <FormattedMessage
+                  defaultMessage="Smart email Signature"
+                  description="Generate an email Signature button label"
+                />
+              </Text>
+            </PressableNative>
+            <Text
+              variant="xsmall"
+              style={{
+                width: '100%',
+                textAlign: 'center',
+                color: colors.grey400,
+                paddingTop: 10,
+              }}
+            >
+              <FormattedMessage
+                defaultMessage="Your smart email signature:"
+                description="ConctactCardScreen - Your smart email signature"
+              />
+            </Text>
+            <View style={styles.signaturePreview}>
+              <View
+                ref={ref}
+                collapsable={false}
+                style={styles.viewShotBackgroundColor}
+              >
+                <SignaturePreview profile={profile} />
+              </View>
             </View>
+            <View style={{ height: 90, width: '100%' }} />
           </ScrollView>
         </Animated.View>
       </View>
