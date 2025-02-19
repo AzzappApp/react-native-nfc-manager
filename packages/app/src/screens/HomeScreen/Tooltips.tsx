@@ -1,4 +1,4 @@
-import { memo, useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Platform } from 'react-native';
 import { PopoverMode } from 'react-native-popover-view';
@@ -47,20 +47,20 @@ const Tooltips = () => {
     }
   }, [tooltipBottomPosition, tooltipCarouselPosition, tooltips]);
 
-  const onCloseToolTip = () => {
+  const onCloseToolTip = useCallback(() => {
     closeTooltips(['profileBottomPanel', 'profileCarousel', 'profileLink']);
-  };
+  }, [closeTooltips]);
 
-  const onCloseToolTipEdit = () => {
+  const onCloseToolTipEdit = useCallback(() => {
     closeTooltips(['profileEdit']);
     if (ENABLE_MULTI_USER && tooltips['profileMulti']?.ref.current) {
       openTooltips(['profileMulti']);
     }
-  };
+  }, [closeTooltips, openTooltips, tooltips]);
 
-  const onCloseToolTipMulti = () => {
+  const onCloseToolTipMulti = useCallback(() => {
     closeTooltips(['profileMulti']);
-  };
+  }, [closeTooltips]);
 
   return (
     <>
