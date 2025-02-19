@@ -27,7 +27,7 @@ describe('HomeBottomSheetPopupPanel', () => {
             id: String(generateId()),
             webCard: {
               id: 'test-webCard',
-              username: null,
+              userName: null,
             },
           };
         },
@@ -106,6 +106,9 @@ describe('HomeBottomSheetPopupPanel', () => {
       fireEvent.changeText(textInput, newUserName);
     });
 
+    // Verify the update has occurred
+    expect(screen.getByText(`azzapp.com/${newUserName}`)).toBeTruthy();
+
     expect(
       environment.mock.getMostRecentOperation().request.node.operation.name,
     ).toBe('HomeBottomSheetPopupPanelCheckUserNameQuery');
@@ -155,8 +158,5 @@ describe('HomeBottomSheetPopupPanel', () => {
         }),
       );
     });
-
-    // Verify the update has occurred
-    expect(screen.getByText(`azzapp.com/${newUserName}`)).toBeTruthy();
   });
 });
