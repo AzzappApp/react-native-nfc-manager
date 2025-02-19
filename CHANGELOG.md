@@ -1,3 +1,7 @@
+## 1.7.1-canary.52
+
+* **tests:**  - fix reanimated mock ([#7477](https://github.com/AzzappApp/azzapp/pull/7477))
+
 ## 1.7.1-canary.51
 
 
