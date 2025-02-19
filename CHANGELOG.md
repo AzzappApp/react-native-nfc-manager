@@ -1,3 +1,7 @@
+## 1.7.1-rc.45
+
+* **fix:**  - **home:** [#7302](https://github.com/AzzappApp/azzapp/pull/7302) move tooltip opening to ensure bottom sheet is closed ([#7488](https://github.com/AzzappApp/azzapp/pull/7488))
+
 ## 1.7.1-rc.44
 
 * **fix:**  - **multiUser:** [#7479](https://github.com/AzzappApp/azzapp/pull/7479) check owner subscription on send invite ([#7480](https://github.com/AzzappApp/azzapp/pull/7480))
