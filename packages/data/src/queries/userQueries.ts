@@ -330,10 +330,11 @@ export const getWebCardsOwnerUsers = async (
 export const getUsersFromWebCard = async (
   webCardId: string,
   profileIds?: string[],
-): Promise<Array<{ user: User; profileId: string }>> =>
+) =>
   db()
     .select({
       profileId: ProfileTable.id,
+      profileIsDeleted: ProfileTable.deleted,
       user: UserTable,
     })
     .from(ProfileTable)

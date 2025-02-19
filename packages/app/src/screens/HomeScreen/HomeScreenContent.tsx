@@ -62,7 +62,6 @@ const HomeScreenContent = ({
         ...HomeProfilesCarousel_user
         ...HomeBottomPanel_user
         ...HomeHeader_user
-        ...HomeHeader_user
       }
     `,
     userKey,

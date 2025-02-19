@@ -1,6 +1,9 @@
+import * as Sentry from '@sentry/react-native';
 import { Paths, Directory, File } from 'expo-file-system/next';
+import { Platform } from 'react-native';
 import ImageSize from 'react-native-image-size';
 import { getFileExtension, isFileURL } from '#helpers/fileHelpers';
+import { copyAsset } from './NativeMediaHelpers';
 import type { SourceMedia } from './mediaTypes';
 
 /**
@@ -42,7 +45,7 @@ export const formatVideoTime = (timeInSeconds = 0) => {
 
 export const isPNG = (uri: string) => uri.toLowerCase().endsWith('.png');
 
-export const FILE_CACHE_DIR = `${Paths.cache.uri}/files`;
+export const FILE_CACHE_DIR = `${Paths.cache.uri}files`;
 
 export const downloadRemoteFileToLocalCache = (
   uri: string,
@@ -120,14 +123,38 @@ const copyCoverMediaToCacheDirInternal = async (
   }
 
   if (isFileURL(media.uri)) {
-    const oldFile = new File(media.uri);
-    if (!oldFile.exists) {
-      return null;
-    }
+    try {
+      const oldFile = new File(media.uri);
+      if (!oldFile.exists) {
+        return null;
+      }
 
-    oldFile.copy(file);
+      oldFile.copy(file);
+      return file.name;
+    } catch (e) {
+      Sentry.captureException(e, {
+        extra: {
+          label: 'copyCoverMediaToCacheDirInternal',
+          url: media.uri,
+          media,
+        },
+      });
+      throw e;
+    }
+  }
+
+  if (!media.uri.startsWith('http') && Platform.OS === 'android') {
+    // on android media asset has a specific case in release mode (for cover_overlay_placeholder_logo.png)
+    const result = await copyAsset(
+      media.uri,
+      cacheDir.replace(Paths.cache.uri, ''),
+    );
+
+    const file = new File(result);
     return file.name;
-  } else {
+  }
+
+  try {
     const resultFile = await downloadRemoteFileToLocalCache(
       media.uri,
       abortSignal,
@@ -136,8 +163,18 @@ const copyCoverMediaToCacheDirInternal = async (
     if (resultFile) {
       return file.name;
     }
-    return null;
+  } catch (e) {
+    Sentry.captureException(e, {
+      extra: {
+        label: 'copyCoverMediaToCacheDirInternalDownload',
+        url: media.uri,
+        media,
+      },
+    });
+    throw e;
   }
+
+  return null;
 };
 
 export const copyCoverMediaToCacheDir = (

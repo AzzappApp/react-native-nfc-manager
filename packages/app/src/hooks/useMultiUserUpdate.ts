@@ -16,18 +16,6 @@ export const useMultiUserUpdate = (onCompleted?: () => void) => {
         webCard {
           id
           isMultiUser
-          isPremium
-          hasCover
-          cardIsPublished
-          coverBackgroundColor
-          coverIsPredefined
-          coverMedia {
-            id
-          }
-          cardColors {
-            dark
-            primary
-          }
           subscription {
             id
             availableSeats
@@ -61,11 +49,6 @@ export const useMultiUserUpdate = (onCompleted?: () => void) => {
                 'profiles',
               );
             }
-          }
-
-          if (profileInfos?.profileId) {
-            const profile = store.get(profileInfos.profileId);
-            profile?.invalidateRecord();
           }
         },
         onCompleted,

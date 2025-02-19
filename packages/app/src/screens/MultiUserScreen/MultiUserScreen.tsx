@@ -74,7 +74,6 @@ const multiUserScreenQuery = graphql`
           ...MultiUserScreenUserList_webCard
           subscription {
             id
-            endAt
             subscriptionPlan
             status
             issuer
@@ -394,7 +393,7 @@ const MultiUserScreen = ({
             })}
             rightElement={
               <PressableNative
-                onPress={router.backToTop}
+                onPress={router.back}
                 accessibilityRole="link"
                 accessibilityLabel={intl.formatMessage({
                   defaultMessage: 'Go back',
@@ -411,7 +410,7 @@ const MultiUserScreen = ({
             leftElement={
               <IconButton
                 icon="arrow_left"
-                onPress={router.backToTop}
+                onPress={router.back}
                 iconSize={28}
                 variant="icon"
               />

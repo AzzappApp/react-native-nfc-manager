@@ -532,3 +532,25 @@ export const getNbNewContacts = async (profileId: string, date: Date) => {
     )
     .then(res => res[0].count);
 };
+
+export const getProfilesWhereUserBIsOwner = async (
+  userAId: string,
+  userBId: string,
+) => {
+  const OwnerProfile = alias(ProfileTable, 'ownerProfile');
+
+  const profiles = await db()
+    .select()
+    .from(ProfileTable)
+    .innerJoin(
+      OwnerProfile,
+      and(
+        eq(ProfileTable.webCardId, OwnerProfile.webCardId),
+        eq(OwnerProfile.userId, userBId),
+        eq(OwnerProfile.profileRole, 'owner'),
+      ),
+    )
+    .where(eq(ProfileTable.userId, userAId));
+
+  return profiles;
+};

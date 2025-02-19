@@ -130,12 +130,9 @@ const CoverEditorWrapper = (
   );
 };
 
-const ANDROID_ASSET_PATH =
-  'file:///android_asset/cover_overlay_placeholder_logo.png';
+export const maximumCoverFromScratch = 5;
 
 const isAndroidRelease = Platform.OS === 'android' && !__DEV__;
-
-export const maximumCoverFromScratch = 5;
 
 const CoverEditorCore = (
   {
@@ -289,7 +286,9 @@ const CoverEditorCore = (
               ? {
                   ...overlay,
                   id: 'overlay_placeholder-' + i,
-                  uri: isAndroidRelease ? ANDROID_ASSET_PATH : placeholder.uri,
+                  uri: isAndroidRelease
+                    ? 'cover_overlay_placeholder_logo.png'
+                    : placeholder.localUri,
                   kind: 'image',
                   width: placeholder.width,
                   height: placeholder.height,
