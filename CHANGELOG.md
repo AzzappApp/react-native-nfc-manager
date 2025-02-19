@@ -1,3 +1,7 @@
+## 1.7.1-rc.44
+
+* **fix:**  - **multiUser:** [#7479](https://github.com/AzzappApp/azzapp/pull/7479) check owner subscription on send invite ([#7480](https://github.com/AzzappApp/azzapp/pull/7480))
+
 ## 1.7.1-rc.43
 
 * **fix:**  - **android:** [#7097](https://github.com/AzzappApp/azzapp/pull/7097) manage android asset specific case ([#7476](https://github.com/AzzappApp/azzapp/pull/7476))
