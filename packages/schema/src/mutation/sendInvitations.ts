@@ -6,7 +6,7 @@ import { guessLocale } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
 import { notifyUsers, sendPushNotification } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
-import { userLoader, webCardLoader } from '#loaders';
+import { userLoader, webCardLoader, webCardOwnerLoader } from '#loaders';
 import { checkWebCardProfileAdminRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
@@ -38,11 +38,14 @@ const sendInvitations: MutationResolvers['sendInvitations'] = async (
     ({ profileIsDeleted }) => profileIsDeleted,
   ).length;
 
+  const owner = await webCardOwnerLoader.load(webCardId);
+
+  if (!owner) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
+
   if (countDeletedProfiles > 0) {
-    await validateCurrentSubscription(
-      getSessionInfos().userId!,
-      countDeletedProfiles,
-    );
+    await validateCurrentSubscription(owner.id, countDeletedProfiles);
   }
 
   const webCard = await webCardLoader.load(webCardId);
