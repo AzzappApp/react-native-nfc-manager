@@ -133,4 +133,38 @@ class MediaHelpers(private val reactContext: ReactApplicationContext) :
       }
       return null
   }
+
+
+  @ReactMethod
+  fun copyAsset(fileName: String, targetDir: String, promise: Promise) {
+      try {
+          val context: Context = reactApplicationContext
+          val assetManager = context.assets
+          val inputStream: InputStream = assetManager.open(fileName)
+
+          val cacheDir = File(context.cacheDir, targetDir)
+
+          if (!cacheDir.exists()) {
+              cacheDir.mkdirs()
+          }
+
+          val outFile = File(cacheDir, fileName)
+          if (!outFile.exists()) {
+            val created = outFile.createNewFile()
+            if (!created) {
+              throw Exception("Can’t create the file : ${outFile.absolutePath}")
+            }
+          }
+
+          val outputStream = FileOutputStream(outFile)
+          inputStream.copyTo(outputStream)
+          outputStream.close()
+          inputStream.close()
+
+          val uri = Uri.fromFile(outFile)
+          promise.resolve(uri.toString())
+      } catch (e: Exception) {
+          promise.reject("ASSET_READ_ERROR", "Error while reading image $fileName", e)
+      }
+    }
 }

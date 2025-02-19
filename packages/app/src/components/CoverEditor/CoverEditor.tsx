@@ -1,6 +1,5 @@
 import * as Sentry from '@sentry/react-native';
 import { useAssets } from 'expo-asset';
-import { Paths } from 'expo-file-system/next';
 import {
   forwardRef,
   useCallback,
@@ -12,7 +11,7 @@ import {
   useState,
 } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { Platform, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { Video } from 'react-native-compressor';
 import { useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller';
 import Animated, {
@@ -32,7 +31,6 @@ import {
 } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import { ScreenModal, preventModalDismiss } from '#components/NativeRouter';
-import { isFileURL } from '#helpers/fileHelpers';
 import {
   FILTERS,
   getLutURI,
@@ -133,6 +131,8 @@ const CoverEditorWrapper = (
 };
 
 export const maximumCoverFromScratch = 5;
+
+const isAndroidRelease = Platform.OS === 'android' && !__DEV__;
 
 const CoverEditorCore = (
   {
@@ -283,9 +283,9 @@ const CoverEditorCore = (
               ? {
                   ...overlay,
                   id: 'overlay_placeholder-' + i,
-                  uri: isFileURL(placeholder.localUri)
-                    ? placeholder.localUri
-                    : `${Paths.cache.uri}ExponentAsset-${placeholder.hash}.${placeholder.type}`, //see https://github.com/expo/expo/issues/23288#issuecomment-1765821314
+                  uri: isAndroidRelease
+                    ? 'cover_overlay_placeholder_logo.png'
+                    : placeholder.localUri,
                   kind: 'image',
                   width: placeholder.width,
                   height: placeholder.height,

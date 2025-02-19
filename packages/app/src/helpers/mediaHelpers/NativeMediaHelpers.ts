@@ -27,6 +27,16 @@ export const downloadContactImage: (uri: string) => Promise<string> =
         console.warn('downloadContactImage is android specific');
       };
 
+export const copyAsset: (
+  fileName: string,
+  cacheDir: string,
+) => Promise<string> =
+  Platform.OS === 'android'
+    ? AZPMediaHelpers.copyAsset
+    : () => {
+        console.warn('copyAsset is android specific');
+      };
+
 /**
  * Prefetches an image.
  * returns an observable that will complete when the prefetch is done.

@@ -1,7 +1,9 @@
 import * as Sentry from '@sentry/react-native';
 import { Paths, Directory, File } from 'expo-file-system/next';
+import { Platform } from 'react-native';
 import ImageSize from 'react-native-image-size';
 import { getFileExtension, isFileURL } from '#helpers/fileHelpers';
+import { copyAsset } from './NativeMediaHelpers';
 import type { SourceMedia } from './mediaTypes';
 
 /**
@@ -140,6 +142,18 @@ const copyCoverMediaToCacheDirInternal = async (
       throw e;
     }
   }
+
+  if (!media.uri.startsWith('http') && Platform.OS === 'android') {
+    // on android media asset has a specific case in release mode (for cover_overlay_placeholder_logo.png)
+    const result = await copyAsset(
+      media.uri,
+      cacheDir.replace(Paths.cache.uri, ''),
+    );
+
+    const file = new File(result);
+    return file.name;
+  }
+
   try {
     const resultFile = await downloadRemoteFileToLocalCache(
       media.uri,
