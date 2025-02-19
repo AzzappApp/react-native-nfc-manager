@@ -238,6 +238,14 @@ export const useSocialLinkLabels = () => {
   return labelValues;
 };
 
+const formatDate = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Ensure two-digit month
+  const day = String(date.getDate()).padStart(2, '0'); // Ensure two-digit day
+
+  return `${year}-${month}-${day}`;
+};
+
 export const findLocalContact = async (
   phoneNumbers: string[],
   emails: string[],
@@ -294,8 +302,19 @@ export const buildVCardFromAzzappContact = async (contact: ContactType) => {
     vCard.addJobtitle(contact.title);
   }
 
-  if (contact.birthday && contact.birthday) {
-    vCard.addBirthday(contact.birthday.toString());
+  let birthday = contact.birthday;
+  if (
+    !birthday &&
+    'dates' in contact &&
+    Array.isArray(contact.dates) &&
+    contact.dates.length
+  ) {
+    const birth = contact.dates?.find(date => date.label === 'birthday');
+    birthday = formatDate(new Date(birth.year ?? 0, birth.month, birth.day));
+  }
+
+  if (birthday) {
+    vCard.addBirthday(birthday.toString());
   }
   if (contact.company) {
     vCard.addCompany(contact.company);
@@ -313,6 +332,13 @@ export const buildVCardFromAzzappContact = async (contact: ContactType) => {
   contact.emails.forEach(email => {
     if (email.address)
       vCard.addEmail(email.address, emailLabelToVCardLabel(email.label) || '');
+    else if (
+      'email' in email &&
+      email.email &&
+      typeof email.email === 'string'
+    ) {
+      vCard.addEmail(email.email, emailLabelToVCardLabel(email.label) || '');
+    }
   });
 
   contact.urls?.forEach(url => {
