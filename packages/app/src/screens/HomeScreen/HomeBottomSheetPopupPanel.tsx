@@ -211,7 +211,7 @@ const HomeBottomSheetPopupPanel = ({
             onChangeWebCard({ webCardUserName: newUserName });
             setTimeout(() => {
               openTooltips(['profileEdit']);
-            }, 500);
+            }, 1000);
           },
           optimisticUpdater: updater,
           updater,
