@@ -12,6 +12,13 @@ require('@testing-library/jest-native/extend-expect');
 //#region Native Dependencies mock
 // Reanimated Mock
 require('react-native-reanimated').setUpTests();
+
+// This code is here it fix issue with mocked createAnimatedComponent
+// workaround from: https://github.com/software-mansion/react-native-reanimated/issues/3982
+jest.mock('react-native-reanimated', () =>
+  require('react-native-reanimated/mock'),
+);
+
 global.ReanimatedDataMock = {
   now: () => Date.now(),
 };

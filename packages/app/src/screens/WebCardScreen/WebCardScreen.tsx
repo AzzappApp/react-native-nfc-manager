@@ -20,8 +20,8 @@ import Animated, {
   Easing,
   interpolate,
   runOnJS,
+  useAnimatedReaction,
   useAnimatedStyle,
-  useDerivedValue,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
@@ -320,10 +320,15 @@ export const WebCardScreen = ({
     [editing, initialManualGesture, manualFlip, showPost, windowWidth],
   );
 
-  useDerivedValue(() => {
-    const res = Math.round(Math.abs(flip.value + manualFlip.value)) % 2 === 1;
-    runOnJS(setShowPost)(res);
-  }, [manualFlip, flip]);
+  useAnimatedReaction(
+    () => Math.round(Math.abs(flip.value + manualFlip.value)) % 2 === 1,
+    (value, previous) => {
+      if (value !== previous) {
+        runOnJS(setShowPost)(value);
+      }
+    },
+    [],
+  );
 
   // #end region
 
