@@ -1,3 +1,8 @@
+## 1.7.1-rc.46
+
+* **fix:**  - **home:** [#7302](https://github.com/AzzappApp/azzapp/pull/7302) put back delay on tooltip display
+* **fix:**  - **home:** [#7302](https://github.com/AzzappApp/azzapp/pull/7302) wait for end of query call
+
 ## 1.7.1-rc.45
 
 * **fix:**  - **home:** [#7302](https://github.com/AzzappApp/azzapp/pull/7302) move tooltip opening to ensure bottom sheet is closed ([#7488](https://github.com/AzzappApp/azzapp/pull/7488))
