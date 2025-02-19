@@ -119,7 +119,7 @@ const HomeBottomSheetPopupPanel = ({
     setCurrentPage(0);
     setError(undefined);
     setNewUserName('');
-    openTooltips(['profileEdit']);
+    setTimeout(() => openTooltips(['profileEdit']), 1000);
   }, [openTooltips]);
 
   const userNameAlreadyExistsError = intl.formatMessage(
