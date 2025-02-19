@@ -1,3 +1,7 @@
+## 1.7.1-canary.54
+
+* **fix:**  - ensure contact email & birthday are well shared ([#7482](https://github.com/AzzappApp/azzapp/pull/7482))
+
 ## 1.7.1-canary.53
 
 * **tests:**  - fix reanimated mock ([#7477](https://github.com/AzzappApp/azzapp/pull/7477))
