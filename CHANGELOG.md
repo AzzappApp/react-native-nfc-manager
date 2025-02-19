@@ -1,3 +1,8 @@
+## 1.7.1-rc.42
+
+* **fix:**  - **multiUser:** [#6490](https://github.com/AzzappApp/azzapp/pull/6490) don’t invalidate profile on activating multi-user ([#7475](https://github.com/AzzappApp/azzapp/pull/7475))
+* **fix:**  - **multiUser:** [#7468](https://github.com/AzzappApp/azzapp/pull/7468) don’t reinit invited flag on all users ([#7470](https://github.com/AzzappApp/azzapp/pull/7470))
+
 ## 1.7.1-rc.41
 
 
