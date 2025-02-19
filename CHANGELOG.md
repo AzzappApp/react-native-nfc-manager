@@ -1,3 +1,7 @@
+## 1.7.1-rc.43
+
+* **fix:**  - **android:** [#7097](https://github.com/AzzappApp/azzapp/pull/7097) manage android asset specific case ([#7476](https://github.com/AzzappApp/azzapp/pull/7476))
+
 ## 1.7.1-rc.42
 
 * **fix:**  - **multiUser:** [#6490](https://github.com/AzzappApp/azzapp/pull/6490) don’t invalidate profile on activating multi-user ([#7475](https://github.com/AzzappApp/azzapp/pull/7475))
