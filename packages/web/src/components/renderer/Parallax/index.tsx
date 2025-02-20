@@ -41,6 +41,8 @@ const Parallax = ({
       setViewportHeight(window.innerHeight); // Use innerHeight or a dynamic approach if needed
     };
 
+    const timeout = setTimeout(handleResize, 100); // after the first render and a small delay to ensure the container is rendered
+
     handleScroll();
     handleResize();
     window.addEventListener('resize', handleResize);
@@ -49,6 +51,7 @@ const Parallax = ({
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('scroll', handleScroll);
+      clearTimeout(timeout);
     };
   }, []);
 

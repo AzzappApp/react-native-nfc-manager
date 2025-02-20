@@ -1,7 +1,7 @@
 'use client';
 
 import cn from 'classnames';
-import { useEffect, useRef, useState } from 'react';
+import { useMemo, useRef } from 'react';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
   getCarouselDefaultColors,
@@ -29,56 +29,56 @@ const TitleTextRenderer = ({
 }: TitleTextRendererProps) => {
   const { text, title, cardModuleColor } = module.data;
 
-  const [nbColumn, setNbColumn] = useState(1); // Default to 4 columns
-
   const containerRef = useRef<HTMLDivElement>(null);
   const containerWidth = useContainerWidth(containerRef);
-  const [titleOnTop, setTitleOnTop] = useState(false);
 
-  useEffect(() => {
+  const { titleOnTop, nbColumn } = useMemo(() => {
+    let titleOnTop = false;
+    let nbColumn = 1;
+
     if (
       module.variant === 'left' ||
       module.variant === 'right' ||
       module.variant === 'center' ||
       module.variant === 'justified'
     ) {
-      setTitleOnTop(true);
-      setNbColumn(1);
+      titleOnTop = true;
+      nbColumn = 1;
     } else if (containerWidth < 600) {
-      setTitleOnTop(true);
-      setNbColumn(1);
+      titleOnTop = true;
+      nbColumn = 1;
     } else if (containerWidth < 900) {
-      setNbColumn(2);
-      setTitleOnTop(true);
+      nbColumn = 2;
+      titleOnTop = true;
       if (
         module.variant === 'column_2' ||
         module.variant === 'column_1' ||
         module.variant === 'column_2_justified' ||
         module.variant === 'column_1_justified'
       ) {
-        setNbColumn(1);
-        setTitleOnTop(false);
+        nbColumn = 1;
+        titleOnTop = false;
       }
     } else {
-      setTitleOnTop(false);
-      setNbColumn(2);
+      titleOnTop = false;
+      nbColumn = 2;
       if (
         module.variant === 'column_1' ||
         module.variant === 'column_1_justified'
       ) {
-        setNbColumn(1);
-        setTitleOnTop(false);
+        nbColumn = 1;
+        titleOnTop = false;
       } else if (
         module.variant === 'column_2' ||
         module.variant === 'column_2_justified'
       ) {
-        setNbColumn(2);
-        setTitleOnTop(false);
+        nbColumn = 2;
+        titleOnTop = false;
       } else if (
         module.variant === 'column_4' ||
         module.variant === 'column_4_justified'
       ) {
-        setNbColumn(3);
+        nbColumn = 3;
       }
       if (
         module.variant === 'column_3' ||
@@ -86,12 +86,15 @@ const TitleTextRenderer = ({
         module.variant === 'column_3_justified' ||
         module.variant === 'column_4_justified'
       ) {
-        setTitleOnTop(true);
+        titleOnTop = true;
       }
     }
+
+    return { titleOnTop, nbColumn };
   }, [containerWidth, module.variant]);
 
   const columns = splitTextIntoColumns(text ?? DEFAULT_MODULE_TEXT, nbColumn);
+
   return (
     <div
       className={styles.container}
