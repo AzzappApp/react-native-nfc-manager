@@ -1,3 +1,4 @@
+import { captureException } from '@sentry/nextjs';
 import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
 import {
@@ -54,32 +55,37 @@ const acceptOwnership: MutationResolvers['acceptOwnership'] = async (
 
   await validateCurrentSubscription(user.id, webCardNbSeats);
 
-  const updatedProfile = await transaction(async () => {
-    if (owner) {
-      await updateProfileForUserAndWebCard(owner.id, profile.webCardId, {
-        profileRole: 'admin',
+  try {
+    const updatedProfile = await transaction(async () => {
+      if (owner) {
+        await updateProfileForUserAndWebCard(owner.id, profile.webCardId, {
+          profileRole: 'admin',
+        });
+        await updateMonthlySubscription(owner.id);
+      }
+      await updateProfile(profileId, {
+        profileRole: 'owner',
+        promotedAsOwner: false,
+        invited: false,
       });
-      await updateMonthlySubscription(owner.id);
-    }
-    await updateProfile(profileId, {
-      profileRole: 'owner',
-      promotedAsOwner: false,
-      invited: false,
+
+      return {
+        ...profile,
+        profileRole: 'owner',
+        promotedAsOwner: false,
+        invited: false,
+      } as const;
     });
 
+    profileLoader.prime(profileId, updatedProfile);
+
     return {
-      ...profile,
-      profileRole: 'owner',
-      promotedAsOwner: false,
-      invited: false,
-    } as const;
-  });
-
-  profileLoader.prime(profileId, updatedProfile);
-
-  return {
-    profile: updatedProfile,
-  };
+      profile: updatedProfile,
+    };
+  } catch (error) {
+    captureException(error);
+    throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
+  }
 };
 
 export default acceptOwnership;

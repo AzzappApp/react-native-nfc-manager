@@ -54,6 +54,7 @@ import updateContactsLastView from './updateContactsLastView';
 import updateModulesVisibility from './updateModulesVisibility';
 import updateMultiUser from './updateMultiUser';
 import updatePost from './updatePost';
+import updatePostComment from './updatePostComment';
 import updateProfile from './updateProfile';
 import { updateContactCardScans, updateWebCardViews } from './updateStatistic';
 import updateUser from './updateUser';
@@ -93,6 +94,7 @@ export const Mutation: MutationResolvers = {
   toggleWebCardPublished,
   updateContactCardScans,
   updatePost,
+  updatePostComment,
   updateWebCard,
   updateUser,
   updateWebCardViews,

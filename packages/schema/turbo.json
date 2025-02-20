@@ -1,29 +1,20 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "extends": [
-    "//"
-  ],
+  "extends": ["//"],
   "tasks": {
     "build": {
-      "dependsOn": [
-        "//#relay:build",
-        "^build"
-      ],
-      "outputs": [
-        "lib/**"
-      ],
-      "inputs": [
-        "src/**"
-      ]
+      "dependsOn": ["//#relay:build", "^build"],
+      "outputs": ["lib/**"],
+      "inputs": ["src/**"]
     },
     "typecheck": {
-      "dependsOn": [
-        "//#relay:build",
-        "^build"
-      ],
-      "inputs": [
-        "src/**"
-      ]
+      "dependsOn": ["//#relay:build", "^build"],
+      "inputs": ["src/**"]
+    },
+    "test": {
+      "inputs": ["src/**"]
     }
   }
 }
+
+

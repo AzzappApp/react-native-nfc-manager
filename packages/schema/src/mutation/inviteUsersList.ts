@@ -68,6 +68,10 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
     throw new GraphQLError(ERRORS.PAYLOAD_TOO_LARGE);
   }
 
+  if (invited.some(inv => inv.profileRole === 'owner')) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
+
   if (invited.length === 0) {
     return {
       rejected: [],
