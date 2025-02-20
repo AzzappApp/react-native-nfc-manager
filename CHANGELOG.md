@@ -1,3 +1,7 @@
+## 1.7.1-rc.48
+
+* **fix:**  - **cover:** [#7487](https://github.com/AzzappApp/azzapp/pull/7487) the subtitle is not base on premium info ([#7496](https://github.com/AzzappApp/azzapp/pull/7496))
+
 ## 1.7.1-rc.47
 
 * **feat:**  - **webCard:** [#7487](https://github.com/AzzappApp/azzapp/pull/7487) deactivate premium on webcard kind ([#7493](https://github.com/AzzappApp/azzapp/pull/7493))
