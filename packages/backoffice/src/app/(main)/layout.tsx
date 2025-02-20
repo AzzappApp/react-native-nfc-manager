@@ -1,5 +1,6 @@
 import {
   AccountCircle,
+  DisplaySettings,
   Layers,
   People,
   PhoneIphone,
@@ -127,4 +128,5 @@ const SectionIcons: Record<string, React.ComponentType> = {
   covers: StarsSharp,
   sections: Layers,
   translations: Layers,
+  crons: DisplaySettings,
 };

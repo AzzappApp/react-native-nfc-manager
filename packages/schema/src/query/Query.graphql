@@ -2,7 +2,6 @@
 GraphQL Schema Root Query object
 """
 type Query {
-
   """
   the current user
   """
@@ -21,12 +20,12 @@ type Query {
   Fetches objects given their IDs
   """
   nodes(
-  """
+    """
     The IDs of objects
     """
     ids: [ID!]!
   ): [Node]!
-   """
+  """
   Fetches a published webCard given its user name
   """
   webCard(
@@ -77,7 +76,11 @@ type Query {
   """
   The list of color palettes available in the application
   """
-  colorPalettes(first: Int @max(value: 100), after: String): ColorPaletteConnection!
+  colorPalettes(
+    first: Int @max(value: 100)
+    after: String
+  ): ColorPaletteConnection!
+  pickRandomPredefinedCover: Media!
 }
 
 type isUserNameAvailableResult {
@@ -94,4 +97,3 @@ type isUserNameAvailableResult {
 type WebCardParameters {
   userNameChangeFrequencyDay: Int!
 }
-

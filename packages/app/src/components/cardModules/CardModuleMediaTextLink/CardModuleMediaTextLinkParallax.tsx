@@ -197,7 +197,6 @@ const stylesheet = createStyleSheet(appearance => ({
     justifyContent: 'center',
     alignItems: 'center',
     rowGap: 20,
-    paddingHorizontal: 20,
     position: 'absolute',
     top: 0,
     left: 0,
@@ -206,6 +205,7 @@ const stylesheet = createStyleSheet(appearance => ({
   },
   textStyle: {
     textAlign: 'center',
+    paddingHorizontal: 20,
   },
   buttonLink: {
     ...shadow(appearance, 'bottom'), //need specification on shadow

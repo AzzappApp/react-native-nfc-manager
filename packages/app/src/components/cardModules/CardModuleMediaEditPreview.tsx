@@ -1,4 +1,3 @@
-import { Image } from 'expo-image';
 import { memo } from 'react';
 import { useDerivedValue } from 'react-native-reanimated';
 import TransformedImageRenderer from '#components/TransformedImageRenderer';
@@ -8,7 +7,6 @@ import {
   useNativeTexture,
 } from '#helpers/mediaEditions';
 import { CARD_MEDIA_VIDEO_DEFAULT_DURATION } from './cardModuleEditorType';
-import CardModuleMediaItem from './CardModuleMediaItem';
 import type {
   CardModuleImage,
   CardModuleSourceMedia,
@@ -20,28 +18,18 @@ type CardModuleMediaEditPreviewProps = {
   media: CardModuleSourceMedia;
   dimension: { width: number; height: number };
   imageStyle?: ViewStyle;
+  paused?: boolean;
 };
 
 const CardModuleMediaEditPreview = ({
   media,
   dimension,
   imageStyle,
+  paused,
 }: CardModuleMediaEditPreviewProps) => {
   if (!media) {
     return null;
   }
-
-  if (!media.uri.startsWith('file://')) {
-    return (
-      <CardModuleMediaItem
-        media={media}
-        dimension={dimension}
-        canPlay
-        imageStyle={imageStyle}
-      />
-    );
-  }
-
   const { width: itemWidth, height: itemHeight } = dimension;
   return media.kind === 'video' ? (
     <VideoRender
@@ -49,6 +37,7 @@ const CardModuleMediaEditPreview = ({
       itemWidth={itemWidth}
       itemHeight={itemHeight}
       style={imageStyle}
+      paused={paused}
     />
   ) : (
     <ImageRender
@@ -65,6 +54,7 @@ type VideoRenderProps = {
   itemWidth: number;
   itemHeight: number;
   style?: StyleProp<ViewStyle>;
+  paused?: boolean;
 };
 
 const VideoRender = ({
@@ -72,6 +62,7 @@ const VideoRender = ({
   itemWidth,
   itemHeight,
   style,
+  paused,
 }: VideoRenderProps) => {
   const maxResolution = itemWidth * 2;
   const cropData = calculateCropData(media, itemWidth, itemHeight);
@@ -91,6 +82,7 @@ const VideoRender = ({
       startTime={media.timeRange?.startTime ?? 0}
       duration={media.timeRange?.duration ?? CARD_MEDIA_VIDEO_DEFAULT_DURATION}
       maxResolution={maxResolution}
+      paused={paused}
     />
   );
 };
@@ -103,32 +95,6 @@ type ImageRenderProps = {
 };
 
 const ImageRender = ({
-  media,
-  itemWidth,
-  itemHeight,
-  imageStyle,
-}: ImageRenderProps) => {
-  const { cropData, ...editionParameters } = media.editionParameters ?? {};
-
-  return media.filter ||
-    Object.entries(editionParameters).filter(([, value]) => value).length >
-      0 ? (
-    <ImageSkiaRender
-      media={media}
-      itemWidth={itemWidth}
-      itemHeight={itemHeight}
-      imageStyle={imageStyle}
-    />
-  ) : (
-    <Image
-      source={media}
-      style={[{ width: itemWidth, height: itemHeight }, imageStyle]}
-      contentFit="cover"
-    />
-  );
-};
-
-const ImageSkiaRender = ({
   media,
   itemWidth,
   itemHeight,

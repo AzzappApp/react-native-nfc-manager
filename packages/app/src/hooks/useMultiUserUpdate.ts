@@ -16,7 +16,12 @@ export const useMultiUserUpdate = (onCompleted?: () => void) => {
         webCard {
           id
           isMultiUser
-          isPremium
+          subscription {
+            id
+            availableSeats
+            status
+            issuer
+          }
         }
       }
     }
@@ -32,15 +37,6 @@ export const useMultiUserUpdate = (onCompleted?: () => void) => {
           webCardId: profileInfos?.webCardId ?? '',
           input: { isMultiUser: value },
         },
-        optimisticResponse: {
-          updateMultiUser: {
-            webCard: {
-              id: profileInfos?.webCardId,
-              isMultiUser: value,
-              isPremium: true,
-            },
-          },
-        },
         updater: store => {
           if (!value && profileInfos?.webCardId) {
             const webCard = store.get(profileInfos.webCardId);
@@ -53,11 +49,6 @@ export const useMultiUserUpdate = (onCompleted?: () => void) => {
                 'profiles',
               );
             }
-          }
-
-          if (profileInfos?.profileId) {
-            const profile = store.get(profileInfos.profileId);
-            profile?.invalidateRecord();
           }
         },
         onCompleted,

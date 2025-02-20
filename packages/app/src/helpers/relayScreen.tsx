@@ -3,7 +3,7 @@ import { GraphQLError } from 'graphql';
 import isEqual from 'lodash/isEqual';
 import React, { Suspense, useCallback, useEffect, useRef } from 'react';
 import { useIntl } from 'react-intl';
-import { Alert, Appearance } from 'react-native';
+import { Alert, Appearance, useWindowDimensions } from 'react-native';
 import {
   type PreloadedQuery,
   fetchQuery,
@@ -19,6 +19,7 @@ import {
   type ScreenOptions,
 } from '#components/NativeRouter';
 import { useAppState } from '#hooks/useAppState';
+import Container from '#ui/Container';
 import LoadingView from '#ui/LoadingView';
 import {
   addAuthStateListener,
@@ -116,7 +117,7 @@ export const isRelayScreen = (
 function relayScreen<TRoute extends Route>(
   Component: ComponentType<RelayScreenProps<TRoute, any>>,
   {
-    fallback: Fallback = LoadingView,
+    fallback: Fallback = DefaultScreenFallback,
     errorFallback: ErrorFallback,
     canGoBack = true,
     profileBound = true,
@@ -394,3 +395,12 @@ export class RelayScreenErrorBoundary extends React.Component<
     return children;
   }
 }
+
+const DefaultScreenFallback = () => {
+  const { width, height } = useWindowDimensions();
+  return (
+    <Container style={{ width, height }}>
+      <LoadingView />
+    </Container>
+  );
+};

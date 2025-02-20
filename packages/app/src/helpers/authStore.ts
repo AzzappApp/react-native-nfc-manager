@@ -3,6 +3,7 @@ import { startTransition } from 'react';
 import { MMKV } from 'react-native-mmkv';
 import ERRORS from '@azzapp/shared/errors';
 import { clearRecentSearch } from '#screens/SearchScreen/useRecentSearch';
+import { logSignIn } from './analytics';
 import { addGlobalEventListener } from './globalEvents';
 
 /**
@@ -119,6 +120,7 @@ export const init = async () => {
     ({
       payload: { authTokens: tokens, profileInfos, email, phoneNumber, userId },
     }) => {
+      logSignIn(userId);
       encryptedStorage.set(
         ENCRYPTED_STORAGE_TOKENS_KEY,
         JSON.stringify(tokens),
@@ -172,19 +174,6 @@ export const init = async () => {
   //     }
   //   },
   // );
-
-  addGlobalEventListener(
-    'PROFILE_ROLE_CHANGE',
-    async ({ payload: { profileRole } }) => {
-      const profileInfos = getAuthState().profileInfos;
-      if (profileInfos) {
-        storage.set(
-          MMKVS_PROFILE_INFOS,
-          JSON.stringify({ ...profileInfos, profileRole }),
-        );
-      }
-    },
-  );
 
   addGlobalEventListener('SIGN_OUT', async () => {
     authTokens = null;
@@ -273,9 +262,7 @@ export const commonKeysAreEqual = (a: any, b: any) => {
   return _.isEqual(obj1Common, obj2Common);
 };
 
-export const onChangeWebCard = async (
-  infos?: Partial<ProfileInfosInput> | null,
-) => {
+export const onChangeWebCard = (infos?: Partial<ProfileInfosInput> | null) => {
   const defaultValues = {
     profileId: null,
     webCardId: null,

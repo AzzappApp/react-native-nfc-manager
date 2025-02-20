@@ -23,9 +23,8 @@ type SocialLinksLinksEditionPanelProps = ViewProps & {
   /**
    * A callback called when the user update the links
    */
-  onDeleteLink: (links: SocialLinkItem) => void;
+  onChangeLinks: (links: SocialLinkItem[]) => void;
   onItemPress: (link: SocialLinkItem) => void;
-  onOrderChange: (links: SocialLinkItem[]) => void;
   onAddLink: () => void;
   contentContainerStyle?: StyleProp<ViewStyle>;
   ignoreKeyboard?: boolean;
@@ -38,10 +37,9 @@ type SocialLinksLinksEditionPanelProps = ViewProps & {
  */
 const SocialLinksLinksEditionPanel = ({
   links,
-  onDeleteLink,
+  onChangeLinks,
   onAddLink,
   onItemPress,
-  onOrderChange,
   style,
   contentContainerStyle,
   ignoreKeyboard,
@@ -52,17 +50,20 @@ const SocialLinksLinksEditionPanel = ({
   const intl = useIntl();
   const styles = useStyleSheet(styleSheet);
 
-  const onChangeOrder = (arr: SocialLinkItem[]) => {
-    const orderedList: SocialLinkItem[] = arr
-      .sort((a, b) => a.position - b.position)
-      // filterout keyId
-      .map(item => ({
-        link: item.link,
-        position: item.position,
-        socialId: item.socialId,
-      }));
-    onOrderChange(orderedList);
-  };
+  const onChangeOrder = useCallback(
+    (arr: SocialLinkItem[]) => {
+      const orderedList: SocialLinkItem[] = arr
+        .sort((a, b) => a.position - b.position)
+        // filter out keyId
+        .map((item, index) => ({
+          link: item.link,
+          position: index,
+          socialId: item.socialId,
+        }));
+      onChangeLinks(orderedList);
+    },
+    [onChangeLinks],
+  );
 
   const sortableLinks = links
     .sort((a, b) => a.position - b.position)
@@ -92,6 +93,13 @@ const SocialLinksLinksEditionPanel = ({
       onItemPress(rest);
     },
     [onItemPress],
+  );
+
+  const onDeleteLink = useCallback(
+    (item: SocialLinkItem) => {
+      onChangeOrder(sortableLinks.filter(l => l?.position !== item.position));
+    },
+    [sortableLinks, onChangeOrder],
   );
 
   const renderItem = useCallback(

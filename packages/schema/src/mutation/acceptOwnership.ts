@@ -1,7 +1,7 @@
 import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
 import {
-  cancelSubscription,
+  getWebCardCountProfile,
   transaction,
   updateProfile,
   updateProfileForUserAndWebCard,
@@ -14,6 +14,10 @@ import {
   webCardLoader,
   webCardOwnerLoader,
 } from '#loaders';
+import {
+  updateMonthlySubscription,
+  validateCurrentSubscription,
+} from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 
 const acceptOwnership: MutationResolvers['acceptOwnership'] = async (
@@ -45,12 +49,17 @@ const acceptOwnership: MutationResolvers['acceptOwnership'] = async (
   }
 
   const owner = await webCardOwnerLoader.load(webCard.id);
+
+  const webCardNbSeats = await getWebCardCountProfile(profile.webCardId);
+
+  await validateCurrentSubscription(user.id, webCardNbSeats);
+
   const updatedProfile = await transaction(async () => {
     if (owner) {
       await updateProfileForUserAndWebCard(owner.id, profile.webCardId, {
         profileRole: 'admin',
       });
-      await cancelSubscription(owner.id, profile.webCardId);
+      await updateMonthlySubscription(owner.id);
     }
     await updateProfile(profileId, {
       profileRole: 'owner',

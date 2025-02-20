@@ -14,6 +14,7 @@ import type {
   CardModuleMediaResolvers,
   CardModuleMediaTextResolvers,
   CardModuleMediaTextLinkResolvers,
+  CardModuleTitleTextResolvers,
 } from '#/__generated__/types';
 import type { CardModule as CardModuleModel } from '@azzapp/data';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
@@ -228,5 +229,11 @@ export const CardModuleMediaTextLink: CardModuleMediaTextLinkResolvers = {
       link,
     }));
   },
+};
+
+export const CardModuleTitleText: CardModuleTitleTextResolvers = {
+  cardModuleColor: module => module.data.cardModuleColor ?? {},
+  title: module => module.data.title,
+  text: module => module.data.text,
 };
 //INSERT_MODULE

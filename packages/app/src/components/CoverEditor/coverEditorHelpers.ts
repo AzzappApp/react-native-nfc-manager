@@ -79,7 +79,7 @@ export const createCoverVideoComposition = (
         const path = getCoverLocalMediaPath(localFilenames[media.id]);
         items.push({
           id: asset.id,
-          path,
+          path: path.replace('file://', ''),
           compositionStartTime: asset.startTime,
           startTime: media.timeRange.startTime,
           duration: media.timeRange.duration,
@@ -101,7 +101,7 @@ export const createCoverVideoComposition = (
         const itemDuration = timeRange.duration;
         items.push({
           id: media.id,
-          path,
+          path: path.replace('file://', ''),
           startTime: timeRange.startTime,
           compositionStartTime: duration,
           duration: itemDuration,
@@ -355,5 +355,5 @@ export const getMediaWithLocalFile = <T extends SourceMedia>(
   localFilenames: Record<string, string>,
 ) => ({
   ...media,
-  uri: `file://${getCoverLocalMediaPath(localFilenames[media.id])}`,
+  uri: getCoverLocalMediaPath(localFilenames[media.id]),
 });

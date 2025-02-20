@@ -10,17 +10,14 @@ type User {
   Returns the email of the user
   """
   email: String
-
   """
   Returns the phone number of the user
   """
   phoneNumber: String
-
   """
   Returns a list of Profiles of the user
   """
   profiles: [Profile!]
-
   """
   Returns a list of published WebCards of the user
   """
@@ -33,4 +30,26 @@ type User {
   Returns the subscription state of the current user
   """
   isPremium: Boolean
+  """
+  Returns the active payment means for the webCard
+  """
+  paymentMeans: [PaymentMean!]
+  """
+  Returns the executed payment
+  """
+  payments(
+    """
+    Returns the items in the list that come after the specified cursor.
+    """
+    after: String
+    """
+    Returns the first n items from the list.
+    """
+    first: Int @max(value: 50)
+  ): PaymentConnection!
+
+  """
+  Returns the number of used seats for the user
+  """
+  usedMultiUserSeats: Int!
 }

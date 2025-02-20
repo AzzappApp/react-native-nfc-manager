@@ -389,6 +389,9 @@ const icons = {
   get plus_white_border() {
     return require('./assets/plus_white_border.png');
   },
+  get QR_code() {
+    return require('./assets/QR_code.png');
+  },
   get rotate() {
     return require('./assets/rotate.png');
   },

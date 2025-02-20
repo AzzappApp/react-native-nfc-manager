@@ -9,19 +9,19 @@ import {
   useState,
 } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Dimensions, Platform, View } from 'react-native';
+import { Dimensions, Platform, View, StyleSheet } from 'react-native';
+import { type EdgeInsets } from 'react-native-safe-area-context';
 import { graphql, usePaginationFragment, usePreloadedQuery } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-import { colors } from '#theme';
 import { AUTHOR_CARTOUCHE_HEIGHT } from '#components/AuthorCartouche';
 import { useDidAppear, useRouter } from '#components/NativeRouter';
 import PostList from '#components/PostList/PostList';
-import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import relayScreen from '#helpers/relayScreen';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
+import Container from '#ui/Container';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
 import IconButton from '#ui/IconButton';
-import SafeAreaView from '#ui/SafeAreaView';
 import Text from '#ui/Text';
 import type { ScreenOptions } from '#components/NativeRouter';
 import type { RelayScreenProps } from '#helpers/relayScreen';
@@ -32,7 +32,6 @@ import type {
 import type { PostScreenQuery } from '#relayArtifacts/PostScreenQuery.graphql';
 import type { PostRoute } from '#routes';
 import type { ForwardedRef } from 'react';
-import type { EdgeInsets } from 'react-native-safe-area-context';
 
 const postScreenQuery = graphql`
   query PostScreenQuery($postId: ID!, $webCardId: ID!, $profileId: ID!) {
@@ -105,34 +104,27 @@ const PostScreen = ({
     [post, relatedPosts],
   );
 
-  const styles = useStyleSheet(styleSheet);
+  const { top } = useScreenInsets();
 
-  if (!post) {
-    return (
-      <SafeAreaView style={styles.safeAreaView}>
-        <Header
-          middleElement={intl.formatMessage({
-            defaultMessage: 'Related Posts',
-            description: 'Post screen header title',
-          })}
-          leftElement={
-            <IconButton
-              icon="arrow_down"
-              onPress={onClose}
-              iconSize={30}
-              size={47}
-              style={{ borderWidth: 0 }}
-            />
-          }
-        />
-        <View
-          style={{
-            flex: 1,
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 20,
-          }}
-        >
+  return (
+    <Container style={[styles.container, { paddingTop: top }]}>
+      <Header
+        middleElement={intl.formatMessage({
+          defaultMessage: 'Related Posts',
+          description: 'Post screen header title',
+        })}
+        leftElement={
+          <IconButton
+            icon="arrow_down"
+            onPress={onClose}
+            iconSize={30}
+            size={47}
+            style={styles.noBorder}
+          />
+        }
+      />
+      {!post || !webCard || !profile ? (
+        <View style={styles.noPostContainer}>
           <Text variant="large">
             <FormattedMessage
               defaultMessage="The post doesn't exist"
@@ -148,47 +140,28 @@ const PostScreen = ({
             onPress={router.back}
           />
         </View>
-      </SafeAreaView>
-    );
-  }
-  if (!webCard || !profile) {
-    return null;
-  }
-  return (
-    <SafeAreaView style={styles.safeAreaView}>
-      <Header
-        middleElement={intl.formatMessage({
-          defaultMessage: 'Related Posts',
-          description: 'Post screen header title',
-        })}
-        leftElement={
-          <IconButton
-            icon="arrow_down"
-            onPress={onClose}
-            iconSize={30}
-            size={47}
-            style={{ borderWidth: 0 }}
+      ) : (
+        <>
+          <PostList
+            canPlay={ready && hasFocus}
+            posts={posts}
+            viewerWebCard={webCard}
+            profile={profile}
+            onEndReached={onEndReached}
+            loading={loading}
+            firstItemVideoTime={videoTime}
+            onPostDeleted={router.back}
           />
-        }
-      />
-      <PostList
-        canPlay={ready && hasFocus}
-        posts={posts}
-        viewerWebCard={webCard}
-        profile={profile}
-        onEndReached={onEndReached}
-        loading={loading}
-        firstItemVideoTime={videoTime}
-        onPostDeleted={router.back}
-      />
-      <Suspense>
-        <RelatedPostLoader
-          ref={relatedPostLoaderRef}
-          post={post}
-          onRelatedPostChange={onRelatedPostLoaded}
-        />
-      </Suspense>
-    </SafeAreaView>
+          <Suspense>
+            <RelatedPostLoader
+              ref={relatedPostLoaderRef}
+              post={post}
+              onRelatedPostChange={onRelatedPostLoaded}
+            />
+          </Suspense>
+        </>
+      )}
+    </Container>
   );
 };
 
@@ -300,10 +273,15 @@ const RelatedPostLoaderInner = (
 
 const RelatedPostLoader = forwardRef(RelatedPostLoaderInner);
 
-const styleSheet = createStyleSheet(appearance => ({
-  safeAreaView: {
+const styles = StyleSheet.create({
+  container: {
     flex: 1,
-    overflow: 'hidden',
-    backgroundColor: appearance === 'light' ? colors.white : colors.black,
   },
-}));
+  noPostContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 20,
+  },
+  noBorder: { borderWidth: 0 },
+});

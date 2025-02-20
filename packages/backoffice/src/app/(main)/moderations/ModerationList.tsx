@@ -229,7 +229,7 @@ const columns: GridColDef[] = [
     field: 'latestReport',
     headerName: 'Latest report',
     type: 'date',
-    valueGetter: params => (params.value ? new Date(params.value) : null),
+    valueGetter: value => (value ? new Date(value) : null),
     flex: 1,
   },
 ];

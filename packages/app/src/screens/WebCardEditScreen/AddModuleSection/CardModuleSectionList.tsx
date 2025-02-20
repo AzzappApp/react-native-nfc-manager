@@ -12,14 +12,10 @@ import type { CardModuleSectionList_webCard$key } from '#relayArtifacts/CardModu
 import type { ListRenderItemInfo } from 'react-native';
 
 type CardModuleSectionListProps = {
-  close: () => void;
   webCardKey: CardModuleSectionList_webCard$key;
 };
 
-const CardModuleSectionList = ({
-  close,
-  webCardKey,
-}: CardModuleSectionListProps) => {
+const CardModuleSectionList = ({ webCardKey }: CardModuleSectionListProps) => {
   const webCard = useFragment(
     graphql`
       fragment CardModuleSectionList_webCard on WebCard {
@@ -47,12 +43,11 @@ const CardModuleSectionList = ({
       return (
         <SectionModules
           item={item}
-          close={close}
           addingModuleRequiresSubscription={addingModuleRequiresSubscription}
         />
       );
     },
-    [addingModuleRequiresSubscription, close],
+    [addingModuleRequiresSubscription],
   );
 
   return (
@@ -77,12 +72,10 @@ export default CardModuleSectionList;
 
 type SectionModulesProps = {
   item: ModuleKindSection;
-  close: () => void;
   addingModuleRequiresSubscription: boolean;
 };
 const Item = ({
   item,
-  close,
   addingModuleRequiresSubscription,
 }: SectionModulesProps) => {
   const label = useModuleLabel(item.section);
@@ -93,7 +86,6 @@ const Item = ({
       </Text>
       <CoverSectionModules
         section={item}
-        closeModuleList={close}
         addingModuleRequiresSubscription={addingModuleRequiresSubscription}
       />
     </View>

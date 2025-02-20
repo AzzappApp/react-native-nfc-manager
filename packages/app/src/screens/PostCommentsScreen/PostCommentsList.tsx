@@ -18,6 +18,7 @@ import {
   usePaginationFragment,
 } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+import ERRORS from '@azzapp/shared/errors';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors, textStyles } from '#theme';
 import AuthorCartouche from '#components/AuthorCartouche';
@@ -191,15 +192,27 @@ const PostCommentsList = ({
           },
           onError(error) {
             setSubmitting(false);
-            console.error(error);
-            Toast.show({
-              type: 'error',
-              text1: intl.formatMessage({
-                defaultMessage:
-                  'Error, could not save your comment, try again later',
-                description: 'Post comment screen - error toast',
-              }),
-            });
+            if (error.message === ERRORS.WEBCARD_NO_COVER) {
+              Toast.show({
+                type: 'error',
+                text1: intl.formatMessage({
+                  defaultMessage:
+                    "Error, could not comment as you didn't configure cover",
+                  description:
+                    'Error when a user tries to comment a post from an webCard without cover',
+                }) as unknown as string,
+              });
+            } else {
+              console.error(error);
+              Toast.show({
+                type: 'error',
+                text1: intl.formatMessage({
+                  defaultMessage:
+                    'Error, could not save your comment, try again later',
+                  description: 'Post comment screen - error toast',
+                }),
+              });
+            }
           },
         });
       } else if (profile.invited) {

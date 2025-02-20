@@ -10,6 +10,7 @@ import { processShareBackSubmission } from '#app/actions/shareBackAction';
 import Loader from '#components/Loader';
 import Button from '#ui/Button';
 import FormInput from '#ui/Form/FormInput';
+import PhoneInput from './PhoneInput';
 import { ShareBackFormSchema } from './shareBackFormSchema';
 import styles from './ShareBackModalForm.css';
 
@@ -90,13 +91,12 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
         onSubmit={form.onSubmit}
         className={styles.form}
         action={action}
+        style={{ maxHeight: window.innerHeight * 0.6 }}
       >
         <div className={styles.formFields}>
           <div className={styles.formField}>
             <FormInput
               {...getInputProps(fields.firstName, { type: 'text' })}
-              id={fields.firstName.id}
-              key={fields.firstName.id}
               className={styles.formInput}
               placeholder={intl.formatMessage({
                 defaultMessage: 'Enter your firstName',
@@ -123,7 +123,6 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
           <div className={styles.formField}>
             <FormInput
               {...getInputProps(fields.lastName, { type: 'text' })}
-              key={fields.lastName.id}
               className={styles.formInput}
               placeholder={intl.formatMessage({
                 defaultMessage: 'Enter your lastName',
@@ -146,9 +145,8 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
             />
           </div>
           <div className={styles.formField}>
-            <FormInput
-              {...getInputProps(fields.phone, { type: 'text' })}
-              key={fields.phone.id}
+            <PhoneInput
+              field={fields.phone}
               className={styles.formInput}
               placeholder={intl.formatMessage({
                 defaultMessage: 'Enter your number',
@@ -173,7 +171,6 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
           <div className={styles.formField}>
             <FormInput
               {...getInputProps(fields.email, { type: 'text' })}
-              key={fields.email.id}
               className={styles.formInput}
               placeholder={intl.formatMessage({
                 defaultMessage: 'Enter your email address',
@@ -199,7 +196,6 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
           <div className={styles.formField}>
             <FormInput
               {...getInputProps(fields.company, { type: 'text' })}
-              key={fields.company.id}
               className={styles.formInput}
               placeholder={intl.formatMessage({
                 defaultMessage: 'Enter your company name',
@@ -224,7 +220,6 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
           <div className={styles.formField}>
             <FormInput
               {...getInputProps(fields.title, { type: 'text' })}
-              key={fields.title.id}
               className={styles.formInput}
               placeholder={intl.formatMessage({
                 defaultMessage: 'Enter your title',
@@ -263,49 +258,51 @@ const ShareBackFormSubmitButton = ({
 }: ShareBackFormSubmitButtonProps) => {
   const { pending } = useFormStatus();
 
+  const disabled = pending || hasErrors || !isDirty;
+
   return (
-    <Button
-      loading={pending}
-      type="submit"
-      variant="primary"
-      disabled={pending || isSuccess || hasErrors || !isDirty}
-      className={cx(
-        styles.formButton,
-        !isSuccess ? styles.formButtonSuccess : '',
-      )}
-    >
-      {pending ? (
-        <Loader />
-      ) : (
-        <>
-          <span
-            className={cx(
-              styles.formButtonLabel,
-              isSuccess ? styles.formButtonSuccess : '',
+    <div className={styles.formButtonContainer}>
+      <Button
+        loading={pending}
+        type="submit"
+        variant="primary"
+        disabled={disabled || isSuccess}
+        className={cx(
+          styles.formButton,
+          !isSuccess ? styles.formButtonSuccess : '',
+          disabled ? styles.formButtonDisabled : '',
+        )}
+      >
+        {pending ? (
+          <Loader />
+        ) : (
+          <>
+            {!isSuccess && (
+              <span className={cx(styles.formButtonLabel)}>
+                <FormattedMessage
+                  defaultMessage="Send"
+                  id="Gm+qSm"
+                  description="Share back - Send button label"
+                />
+              </span>
             )}
-          >
-            <FormattedMessage
-              defaultMessage="Send"
-              id="Gm+qSm"
-              description="Share back - Send button label"
-            />
-          </span>
-          <div
-            className={cx(
-              styles.formButtonSuccessContainer,
-              isSuccess ? styles.formButtonSuccess : '',
-            )}
-          >
-            <SuccessIcon
+            <div
               className={cx(
-                styles.formButtonSuccessSvg,
+                styles.formButtonSuccessContainer,
                 isSuccess ? styles.formButtonSuccess : '',
               )}
-            />
-          </div>
-        </>
-      )}
-    </Button>
+            >
+              <SuccessIcon
+                className={cx(
+                  styles.formButtonSuccessSvg,
+                  isSuccess ? styles.formButtonSuccess : '',
+                )}
+              />
+            </div>
+          </>
+        )}
+      </Button>
+    </div>
   );
 };
 

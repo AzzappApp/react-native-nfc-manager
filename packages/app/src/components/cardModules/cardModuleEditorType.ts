@@ -32,7 +32,8 @@ export type CardModuleVideo = { kind: 'video' } & (CardModuleMediaBase &
 export type CardModuleImage = { kind: 'image' } & (CardModuleMediaBase &
   SourceMediaImage);
 
-export type CardModuleSourceMedia = CardModuleImage | CardModuleVideo; //duplciate kind because propagaiton of type is not good
+//duplicate kind because propagation of type is not good
+export type CardModuleSourceMedia = CardModuleImage | CardModuleVideo;
 
 export type CardModuleMedia = {
   media: CardModuleSourceMedia; //editable has nothing to do in the SourceMediaImage
@@ -78,10 +79,14 @@ export type CardModuleVariantType = {
    * Wether the video of the media are allowed to play
    */
   canPlay: boolean;
-  /* 
-  callback when a item renderer is pressed, return the index of the item in case of list 
-  */
+  /**
+   * callback when a item renderer is pressed, return the index of the item in case of list
+   */
   setEditableItemIndex?: (index: number) => void;
+  /**
+   * when we are editing the module
+   */
+  moduleEditing: boolean;
 };
 
 export type CommonModuleRendererProps<T, V extends ModuleKindHasVariants> = {
@@ -106,7 +111,6 @@ export type CommonModuleRendererProps<T, V extends ModuleKindHasVariants> = {
   /**
    * The view mode for the module :
    *  - desktop for the desktop preview
-   *  - edit when the WebCard is in edit mode
    *  - mobile for the default rendering
    */
   displayMode: DisplayMode;

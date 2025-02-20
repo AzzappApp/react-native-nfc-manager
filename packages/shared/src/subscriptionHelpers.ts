@@ -1,5 +1,6 @@
-export const isWebCardKindSubscription = (kind: string) => {
-  return kind !== 'personal';
+export const isWebCardKindSubscription = (_kind: string) => {
+  // return kind !== 'personal';
+  return false;
 };
 
 const modulesKindsSubscription = ['parallax'];
@@ -8,10 +9,15 @@ export const isModuleKindSubscription = (_kind: string) => {
   return modulesKindsSubscription.includes(_kind);
 };
 
-export const MODULE_COUNT_LIMIT_FOR_SUBSCRIPTION = 4;
+// temporary increase number of free modules
+// see: https://github.com/AzzappApp/azzapp/issues/6878
+export const MODULE_COUNT_LIMIT_FOR_SUBSCRIPTION = -1;
 
 export const moduleCountRequiresSubscription = (_moduleCount: number) => {
-  return _moduleCount >= MODULE_COUNT_LIMIT_FOR_SUBSCRIPTION;
+  return (
+    MODULE_COUNT_LIMIT_FOR_SUBSCRIPTION > 0 && // limit is disabled
+    _moduleCount >= MODULE_COUNT_LIMIT_FOR_SUBSCRIPTION
+  );
 };
 
 export const hasModuleKindSubscription = (
@@ -43,3 +49,13 @@ export const changeModuleRequireSubscription = (
     moduleCountRequiresSubscription(currentModuleCount)
   );
 };
+
+//we don't have a param seat, users, metatdata  in IAP, so we are basing this info on the subscriptionID
+export function extractSeatsFromIAPSubscriptionId(id: string) {
+  const parts = id.split('.');
+  const number = parts.pop();
+  if (number) {
+    return parseInt(number, 10);
+  }
+  return 0;
+}

@@ -1,8 +1,7 @@
 import { PermissionStatus as ContactPermissionStatus } from 'expo-contacts';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useIntl } from 'react-intl';
-import { Alert, Platform, StyleSheet, View } from 'react-native';
-import { isDefined } from '@azzapp/shared/isDefined';
+import { StyleSheet, View } from 'react-native';
+import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors, textStyles } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import { findLocalContact } from '#helpers/contactCardHelpers';
@@ -10,43 +9,36 @@ import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import ContactAvatar from './ContactAvatar';
-import type { ContactsScreenLists_contacts$data } from '#relayArtifacts/ContactsScreenLists_contacts.graphql';
-import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
+import WhatsappButton from './WhatsappButton';
+import type { ContactType } from '#helpers/contactListHelpers';
+import type { ContactActionProps } from './ContactsScreenLists';
 import type { Contact } from 'expo-contacts';
-import type { AlertButton } from 'react-native';
-import type { MMKV } from 'react-native-mmkv';
 
 type Props = {
   contact: ContactType;
-  onRemoveContact: (contacts: string[]) => void;
   onInviteContact: (contact: ContactType, onHideInvitation: () => void) => void;
   onShowContact: (contact: ContactType) => void;
-  storage: MMKV;
   localContacts: Contact[];
   contactsPermissionStatus: ContactPermissionStatus;
+  showContactAction: (arg: ContactActionProps | undefined) => void;
 };
+
+const COVER_WIDTH = 35;
 
 const ContactSearchByNameItem = ({
   contact,
-  onRemoveContact,
   onInviteContact,
   onShowContact,
-  storage,
   localContacts,
   contactsPermissionStatus,
+  showContactAction,
 }: Props) => {
   const [showInvite, setShowInvite] = useState(false);
-  const intl = useIntl();
-
-  const onRemove = useCallback(() => {
-    onRemoveContact([contact.id]);
-  }, [contact.id, onRemoveContact]);
 
   useEffect(() => {
     const verifyInvitation = async () => {
       if (contactsPermissionStatus === ContactPermissionStatus.GRANTED) {
         const foundContact = await findLocalContact(
-          storage,
           contact.phoneNumbers.map(({ number }) => number) ?? [],
           contact.emails.map(({ address }) => address) ?? [],
           localContacts,
@@ -62,69 +54,27 @@ const ContactSearchByNameItem = ({
     contact.phoneNumbers,
     contactsPermissionStatus,
     localContacts,
-    storage,
   ]);
 
   const onInvite = useCallback(() => {
-    onInviteContact(contact, () => setShowInvite(false));
+    onInviteContact(contact, () => {
+      setShowInvite(false);
+    });
   }, [contact, onInviteContact]);
 
   const onShow = useCallback(() => {
     onShowContact(contact);
   }, [contact, onShowContact]);
 
-  const buttonsList = useMemo<AlertButton[]>(() => {
-    return [
-      {
-        text: intl.formatMessage({
-          defaultMessage: 'View Contact',
-          description: 'ContactsScreen - More option alert - view',
-        }),
-        onPress: onShow,
-      } as AlertButton,
-      // {
-      //   text: intl.formatMessage({
-      //     defaultMessage: 'Share Contact',
-      //     description: 'ContactsScreen - More option alert - share',
-      //   }),
-      //   onPress: () => {
-      //     // @TODO: how to share without a pre-generated URL?
-      //   },
-      // },
-      showInvite
-        ? ({
-            text: intl.formatMessage({
-              defaultMessage: "Save to my phone's Contact",
-              description: 'ContactsScreen - More option alert - save',
-            }),
-            onPress: onInvite,
-          } as AlertButton)
-        : undefined,
-      {
-        text: intl.formatMessage({
-          defaultMessage: 'Remove contact',
-          description: 'ContactsScreen - More option alert - remove',
-        }),
-        style: 'destructive',
-        onPress: onRemove,
-      } as AlertButton,
-      Platform.OS === 'ios'
-        ? ({
-            text: intl.formatMessage({
-              defaultMessage: 'Cancel',
-              description: 'ContactsScreen - More option alert - cancel',
-            }),
-            style: 'cancel',
-          } as AlertButton)
-        : undefined,
-    ].filter(isDefined);
-  }, [intl, onInvite, onRemove, onShow, showInvite]);
-
   const onMore = useCallback(() => {
-    Alert.alert(`${contact.firstName} ${contact.lastName}`, '', buttonsList, {
-      cancelable: true,
+    showContactAction({
+      contact,
+      showInvite,
+      hideInvitation: () => {
+        setShowInvite(false);
+      },
     });
-  }, [buttonsList, contact.firstName, contact.lastName]);
+  }, [contact, showContactAction, showInvite]);
 
   const avatarSource = useMemo(() => {
     if (contact.contactProfile?.avatar?.uri) {
@@ -168,7 +118,7 @@ const ContactSearchByNameItem = ({
           <View style={styles.cover}>
             <CoverRenderer
               style={styles.webcard}
-              width={35}
+              width={COVER_WIDTH}
               webCard={contact.webCard}
               large
             />
@@ -209,6 +159,9 @@ const ContactSearchByNameItem = ({
             <Icon icon="invite" />
           </PressableNative>
         )}
+        {!showInvite && (
+          <WhatsappButton phoneNumber={contact?.phoneNumbers?.[0]?.number} />
+        )}
 
         <PressableNative onPress={onMore}>
           <Icon icon="more" />
@@ -217,16 +170,6 @@ const ContactSearchByNameItem = ({
     </View>
   );
 };
-
-type ContactType = NonNullable<
-  NonNullable<
-    NonNullable<
-      ArrayItemType<
-        ContactsScreenLists_contacts$data['searchContacts']['edges']
-      >
-    >
-  >['node']
->;
 
 const GAP = 15;
 
@@ -245,7 +188,7 @@ const styles = StyleSheet.create({
     color: colors.grey400,
   },
   cover: {
-    width: 35,
+    width: COVER_WIDTH,
     borderRadius: 4,
     overflow: 'hidden',
   },
@@ -256,6 +199,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flex: 1,
     rowGap: 5,
+    height: COVER_WIDTH / COVER_RATIO,
   },
   actions: {
     flexDirection: 'row',

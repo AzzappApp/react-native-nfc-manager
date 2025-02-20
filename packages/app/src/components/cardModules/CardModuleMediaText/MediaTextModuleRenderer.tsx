@@ -2,6 +2,7 @@ import { graphql, readInlineData } from 'react-relay';
 import { type CardModuleColor } from '@azzapp/shared/cardModuleHelpers';
 import CardModuleEditionScrollHandler from '../CardModuleEditionScrollHandler';
 import withSwapCardModuleColor from '../withSwapCardModuleColor';
+import CardModuleMediaSimpleCarousel from './CardModuleMediaSimpleCarousel';
 import CardModuleMediaTextAlternation from './CardModuleMediaTextAlternation';
 import CardModuleMediaTextParallax from './CardModuleMediaTextParallax';
 import type {
@@ -40,6 +41,8 @@ export const MediaTextModuleRendererFragment = graphql`
       title
       media {
         id
+        width
+        height
         ... on MediaImage {
           uri(width: $screenWidth, pixelRatio: $pixelRatio)
           smallThumbnail: uri(width: 125, pixelRatio: $cappedPixelRatio)
@@ -83,6 +86,7 @@ const MediaTextModuleRenderer = ({
   scrollPosition,
   colorPalette,
   displayMode,
+  moduleEditing = false,
   ...props
 }: MediaTextModuleRendererProps) => {
   if ((data.cardModuleMedias?.length ?? 0) < 1) {
@@ -98,6 +102,21 @@ const MediaTextModuleRenderer = ({
             cardModuleColor={data.cardModuleColor}
             displayMode={displayMode}
             scrollPosition={scrollPosition}
+            moduleEditing={moduleEditing}
+            {...props}
+          />
+        </CardModuleEditionScrollHandler>
+      );
+    case 'full_alternation':
+      return (
+        <CardModuleEditionScrollHandler scrollPosition={scrollPosition}>
+          <CardModuleMediaTextAlternation
+            cardModuleMedias={data.cardModuleMedias!}
+            cardModuleColor={data.cardModuleColor}
+            displayMode={displayMode}
+            scrollPosition={scrollPosition}
+            moduleEditing={moduleEditing}
+            isFullAlternation
             {...props}
           />
         </CardModuleEditionScrollHandler>
@@ -110,6 +129,20 @@ const MediaTextModuleRenderer = ({
             cardModuleColor={data.cardModuleColor}
             displayMode={displayMode}
             scrollPosition={scrollPosition}
+            moduleEditing={moduleEditing}
+            {...props}
+          />
+        </CardModuleEditionScrollHandler>
+      );
+    case 'simple_carousel':
+      return (
+        <CardModuleEditionScrollHandler scrollPosition={scrollPosition}>
+          <CardModuleMediaSimpleCarousel
+            cardModuleMedias={data.cardModuleMedias}
+            cardModuleColor={data.cardModuleColor}
+            displayMode={displayMode}
+            scrollPosition={scrollPosition}
+            moduleEditing={moduleEditing}
             {...props}
           />
         </CardModuleEditionScrollHandler>

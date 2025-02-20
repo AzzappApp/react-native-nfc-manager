@@ -20,6 +20,7 @@ import {
 } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
+import { ENABLE_MULTI_USER } from '#Config';
 import { colors, shadow } from '#theme';
 import CoverErrorRenderer from '#components/CoverErrorRenderer';
 import CoverLink from '#components/CoverLink';
@@ -34,6 +35,7 @@ import {
   profileInfoHasAdminRight,
   profileInfoIsOwner,
 } from '#helpers/profileRoleHelper';
+import { useTooltipContext } from '#helpers/TooltipContext';
 import useBoolean from '#hooks/useBoolean';
 import useLatestCallback from '#hooks/useLatestCallback';
 import useToggleFollow from '#hooks/useToggleFollow';
@@ -41,7 +43,7 @@ import CarouselSelectList from '#ui/CarouselSelectList';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import PressableOpacity from '#ui/PressableOpacity';
-import { useHomeBottomSheetModalToolTipContext } from './HomeBottomSheetModalToolTip';
+import PressableScaleHighlight from '#ui/PressableScaleHighlight';
 import { useHomeScreenContext } from './HomeScreenContext';
 import useCoverPlayPermission from './useCoverPlayPermission';
 import type {
@@ -78,6 +80,7 @@ const HomeProfilesCarousel = (
     currentIndexProfileSharedValue,
     initialProfileIndex,
   } = useHomeScreenContext();
+  const { registerTooltip, unregisterTooltip } = useTooltipContext();
 
   const { profiles } = useFragment(
     graphql`
@@ -100,16 +103,14 @@ const HomeProfilesCarousel = (
   );
 
   const changeIndexTimeout = useRef<any | null>(null);
-  const onCurrentProfileIndexChangeLatest = useLatestCallback(
-    onCurrentProfileIndexChange,
-  );
+
   const onSelectedIndexChange = useCallback(
     (index: number) => {
       clearTimeout(changeIndexTimeout.current);
       setSelectedIndex(index);
-      onCurrentProfileIndexChangeLatest(index);
+      onCurrentProfileIndexChange(index);
     },
-    [onCurrentProfileIndexChangeLatest],
+    [onCurrentProfileIndexChange],
   );
 
   const onSelectedIndexChangeLatest = useLatestCallback(onSelectedIndexChange);
@@ -224,14 +225,17 @@ const HomeProfilesCarousel = (
 
   const { width: windowWidth } = useWindowDimensions();
 
-  const { setItemWidth } = useHomeBottomSheetModalToolTipContext();
+  const refCarousel = useRef(null);
 
-  const onItemWidthUpdated = useCallback(
-    (width: number) => {
-      setItemWidth(width);
-    },
-    [setItemWidth],
-  );
+  useEffect(() => {
+    registerTooltip('profileCarousel', {
+      ref: refCarousel,
+    });
+
+    return () => {
+      unregisterTooltip('profileCarousel');
+    };
+  }, [registerTooltip, unregisterTooltip]);
 
   if (profiles == null) {
     return null;
@@ -239,6 +243,7 @@ const HomeProfilesCarousel = (
 
   return (
     <View
+      ref={refCarousel}
       style={[styles.container, { maxHeight: windowWidth / (2 * COVER_RATIO) }]}
     >
       <CarouselSelectList
@@ -253,7 +258,6 @@ const HomeProfilesCarousel = (
         onSelectedIndexChange={onSelectedIndexChange}
         currentProfileIndexSharedValue={currentIndexSharedValue}
         initialScrollIndex={initialProfileIndex}
-        onItemWidthUpdated={onItemWidthUpdated}
       />
     </View>
   );
@@ -375,15 +379,26 @@ const ItemRenderComponent = ({
     });
   };
 
-  const { setTooltipId, tooltipedWebcard, setTooltipedWebcard } =
-    useHomeBottomSheetModalToolTipContext();
+  const { registerTooltip, unregisterTooltip } = useTooltipContext();
+
+  const refEdit = useRef(null);
+  const refMulti = useRef(null);
 
   useEffect(() => {
-    if (profile.webCard && tooltipedWebcard === profile.webCard.id) {
-      setTooltipId(1);
-      setTooltipedWebcard(undefined);
+    if (isCurrent) {
+      registerTooltip('profileEdit', {
+        ref: refEdit,
+      });
+      registerTooltip('profileMulti', {
+        ref: refMulti,
+      });
+
+      return () => {
+        unregisterTooltip('profileEdit');
+        unregisterTooltip('profileMulti');
+      };
     }
-  }, [profile.webCard, setTooltipId, setTooltipedWebcard, tooltipedWebcard]);
+  }, [isCurrent, registerTooltip, unregisterTooltip]);
 
   const isMultiUser =
     profile.webCard?.isMultiUser || profile.webCard?.webCardKind === 'business';
@@ -425,16 +440,34 @@ const ItemRenderComponent = ({
           </View>
         ) : profile.webCard?.hasCover ? (
           <View style={styles.coverLinkWrapper}>
-            <CoverLink
-              webCard={profile.webCard}
-              width={coverWidth}
-              webCardId={profile.webCard.id}
-              canPlay={isCurrent && canPlay}
-              paused={paused}
-              onReadyForDisplay={onReady}
-              onError={onError}
-              onLongPress={openWebcardModal}
-            />
+            {profile.webCard?.coverIsPredefined ? (
+              <Link route="COVER_TEMPLATE_SELECTION">
+                <PressableScaleHighlight
+                  style={containerStyle}
+                  onLongPress={openWebcardModal}
+                >
+                  <CoverRenderer
+                    webCard={profile.webCard}
+                    width={coverWidth}
+                    canPlay={isCurrent && canPlay}
+                    paused={paused}
+                    onReadyForDisplay={onReady}
+                    onError={onError}
+                  />
+                </PressableScaleHighlight>
+              </Link>
+            ) : (
+              <CoverLink
+                webCard={profile.webCard}
+                width={coverWidth}
+                canPlay={isCurrent && canPlay}
+                paused={paused}
+                onReadyForDisplay={onReady}
+                onError={onError}
+                onLongPress={openWebcardModal}
+                prefetch
+              />
+            )}
             {profile.webCard?.coverIsPredefined && (
               <PressableNative
                 style={styles.editUserContainer}
@@ -445,11 +478,12 @@ const ItemRenderComponent = ({
                 }}
               >
                 <BlurView style={styles.multiUserIconContainer}>
+                  <View ref={refEdit} style={styles.tooltipTarget} />
                   <Icon icon="edit" style={styles.multiUserIcon} />
                 </BlurView>
               </PressableNative>
             )}
-            {isMultiUser && (
+            {isMultiUser && ENABLE_MULTI_USER && (
               <PressableNative
                 style={styles.multiUserContainer}
                 onPress={onPressMultiUser}
@@ -459,6 +493,7 @@ const ItemRenderComponent = ({
                 }}
               >
                 <BlurView style={styles.multiUserIconContainer}>
+                  <View ref={refMulti} style={styles.tooltipTarget} />
                   <Icon icon="shared_webcard" style={styles.multiUserIcon} />
                 </BlurView>
               </PressableNative>
@@ -616,5 +651,13 @@ const styles = StyleSheet.create({
     width: 17,
     height: 17,
     tintColor: colors.white,
+  },
+  tooltipTarget: {
+    position: 'absolute',
+    top: 0,
+    width: 10,
+    height: 10,
+    backgroundColor: 'transparent',
+    pointerEvents: 'none',
   },
 });

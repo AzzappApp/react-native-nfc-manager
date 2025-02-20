@@ -1,5 +1,5 @@
 import { Video } from 'expo-av';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Image, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
@@ -8,6 +8,7 @@ import { colors } from '#theme';
 import Link from '#components/Link';
 import { setMainTabBarOpacity } from '#components/MainTabBar';
 import { useRouter } from '#components/NativeRouter';
+import { onChangeWebCard } from '#helpers/authStore';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import relayScreen from '#helpers/relayScreen';
 import { useProfileInfos } from '#hooks/authStateHooks';
@@ -43,6 +44,22 @@ const WelcomeScreen = ({
   const profileInfos = useProfileInfos();
 
   const router = useRouter();
+
+  const profilesCountRef = useRef(currentUser?.profiles?.length);
+
+  useEffect(() => {
+    if (profilesCountRef.current === 0 && currentUser?.profiles?.length === 1) {
+      const newProfile = currentUser?.profiles[0];
+      onChangeWebCard({
+        profileId: newProfile.id,
+        webCardId: newProfile.webCard?.id ?? null,
+        profileRole: newProfile.profileRole,
+        invited: newProfile.invited,
+      });
+      router.replace({ route: 'HOME' });
+    }
+    profilesCountRef.current = currentUser?.profiles?.length;
+  }, [currentUser, router]);
 
   const goBackToHome = useCallback(() => {
     if (profileInfos?.webCardId) {
@@ -131,6 +148,14 @@ const welcomeScreenQuery = graphql`
     currentUser {
       id
       isPremium
+      profiles {
+        id
+        profileRole
+        invited
+        webCard {
+          id
+        }
+      }
     }
   }
 `;

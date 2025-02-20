@@ -21,9 +21,8 @@ import {
 import PremiumIndicator from '#components/PremiumIndicator';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { profileInfoHasAdminRight } from '#helpers/profileRoleHelper';
-import relayScreen, { RelayScreenErrorBoundary } from '#helpers/relayScreen';
+import relayScreen from '#helpers/relayScreen';
 import useBoolean from '#hooks/useBoolean';
-import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import { useMultiUserUpdate } from '#hooks/useMultiUserUpdate';
 import useToggle from '#hooks/useToggle';
 import Button from '#ui/Button';
@@ -73,8 +72,10 @@ const multiUserScreenQuery = graphql`
           ...MultiUserScreenUserList_webCard
           subscription {
             id
-            endAt
+            subscriptionPlan
             status
+            issuer
+            availableSeats
           }
           requiresSubscription
           isPremium
@@ -88,6 +89,7 @@ const MultiUserScreen = ({
   preloadedQuery,
 }: RelayScreenProps<MultiUserRoute, MultiUserScreenQuery>) => {
   const { node } = usePreloadedQuery(multiUserScreenQuery, preloadedQuery);
+
   const profile = node?.profile;
 
   const intl = useIntl();
@@ -95,10 +97,18 @@ const MultiUserScreen = ({
 
   const styles = useStyleSheet(styleSheet);
 
+  const [isMultiUser, setIsMultiUser] = useState(
+    !!profile?.webCard?.isMultiUser,
+  );
+
+  useEffect(() => {
+    setIsMultiUser(!!profile?.webCard?.isMultiUser);
+  }, [profile?.webCard?.isMultiUser]);
+
   useEffect(() => {
     // users that loose their admin role should not be able to access this screen
     if (!profileInfoHasAdminRight(profile)) {
-      router.back();
+      router.backToTop();
     }
   }, [profile, router]);
 
@@ -112,11 +122,35 @@ const MultiUserScreen = ({
 
   const toggleMultiUser = useCallback(
     (value: boolean) => {
+      if (!profile?.webCard?.isPremium && value) {
+        router.push({
+          route: 'USER_PAY_WALL',
+          params: {
+            activateFeature: 'MULTI_USER',
+          },
+        });
+        return;
+      }
+      //when IAP, if the user try to activate multiuser on a another webcard without enought seat
       if (
-        !profile?.webCard?.isPremium &&
-        profile?.webCard?.subscription &&
-        (profile?.webCard?.subscription?.status !== 'active' ||
-          profile?.webCard?.subscription?.endAt < new Date())
+        value &&
+        profile?.webCard?.subscription?.issuer !== 'web' &&
+        (profile?.webCard?.subscription?.availableSeats ?? 0) <= 0
+      ) {
+        router.push({
+          route: 'USER_PAY_WALL',
+          params: {
+            activateFeature: 'MULTI_USER',
+          },
+        });
+        setIsMultiUser(false);
+        return;
+      }
+      if (
+        value &&
+        profile?.webCard?.subscription?.issuer === 'web' &&
+        (profile?.webCard?.subscription?.availableSeats ?? 0) <= 0 &&
+        profile?.webCard?.subscription?.subscriptionPlan === 'yearly'
       ) {
         Toast.show({
           type: 'error',
@@ -130,17 +164,10 @@ const MultiUserScreen = ({
             showClose: true,
           },
         });
+        setIsMultiUser(false);
         return;
       }
-      if (!profile?.webCard?.isPremium && value) {
-        router.push({
-          route: 'USER_PAY_WALL',
-          params: {
-            activateFeature: 'MULTI_USER',
-          },
-        });
-        return;
-      }
+      setIsMultiUser(value);
       if (value) {
         setAllowMultiUser(value);
       } else {
@@ -266,7 +293,7 @@ const MultiUserScreen = ({
             </View>
             <Switch
               variant="large"
-              value={profile?.webCard?.isMultiUser}
+              value={isMultiUser}
               onValueChange={toggleMultiUser}
             />
           </View>
@@ -274,8 +301,8 @@ const MultiUserScreen = ({
       </View>
     );
   }, [
+    isMultiUser,
     profile?.profileRole,
-    profile?.webCard?.isMultiUser,
     profile?.webCard?.isPremium,
     styles.description,
     styles.proContainer,
@@ -434,7 +461,10 @@ const MultiUserScreen = ({
                   style={styles.confirmModalButton}
                 />
                 <Button
-                  onPress={() => setConfirmDeleteMultiUser(false)}
+                  onPress={() => {
+                    setConfirmDeleteMultiUser(false);
+                    setIsMultiUser(true);
+                  }}
                   variant="secondary"
                   label={intl.formatMessage({
                     defaultMessage: 'Cancel',
@@ -507,36 +537,14 @@ const styleSheet = createStyleSheet(appearance => ({
   },
 }));
 
-export default relayScreen(
-  (props: RelayScreenProps<MultiUserRoute, MultiUserScreenQuery>) => {
-    const intl = useIntl();
-
-    const handleProfileActionError = useHandleProfileActionError(
-      intl.formatMessage({
-        defaultMessage: 'An error occured',
-        description:
-          'Error toast message when loading MultiUserScreen fails for unknown reason.',
-      }) as string,
-    );
-
-    return (
-      <RelayScreenErrorBoundary
-        onError={handleProfileActionError}
-        fallback={null}
-      >
-        <MultiUserScreen {...props} />
-      </RelayScreenErrorBoundary>
-    );
-  },
-  {
-    query: multiUserScreenQuery,
-    getVariables: (_, profileInfos) => ({
-      profileId: profileInfos?.profileId ?? '',
-    }),
-    fetchPolicy: 'store-and-network',
-    pollInterval: 30000,
-  },
-);
+export default relayScreen(MultiUserScreen, {
+  query: multiUserScreenQuery,
+  getVariables: (_, profileInfos) => ({
+    profileId: profileInfos?.profileId ?? '',
+  }),
+  fetchPolicy: 'store-and-network',
+  pollInterval: 30000,
+});
 
 type MultiUserTransferOwnerContextProps = {
   selectedProfileId: string | undefined;

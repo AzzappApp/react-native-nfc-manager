@@ -1,17 +1,12 @@
 import * as z from 'zod';
+import { phoneNumberSchema } from '#helpers/phoneNumbersHelper';
 
 export const contactCardSchema = z.object({
   firstName: z.string().nullable().optional(),
   lastName: z.string().nullable().optional(),
   title: z.string().nullable().optional(),
   company: z.string().nullable().optional(),
-  phoneNumbers: z.array(
-    z.object({
-      label: z.string(),
-      number: z.string(),
-      selected: z.boolean().nullable().optional(),
-    }),
-  ),
+  phoneNumbers: z.array(phoneNumberSchema),
   emails: z.array(
     z.object({
       label: z.string(),

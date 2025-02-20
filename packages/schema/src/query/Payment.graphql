@@ -71,6 +71,10 @@ type PaymentMean {
   maskedCard: String
 
   status: PaymentMeanStatus!
+  """
+  Returns true if the payment mean belongs to current user
+  """
+  isMine: Boolean!
 }
 
 enum PaymentMeanStatus {

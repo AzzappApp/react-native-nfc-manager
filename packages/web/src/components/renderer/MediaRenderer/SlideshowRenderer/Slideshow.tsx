@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowRightIcon } from '#assets';
+import useIsVisible from '#hooks/useIsVisible';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CloudinaryVideo from '#ui/CloudinaryVideo';
 import styles from './Slideshow.css';
@@ -70,7 +71,11 @@ const Slideshow = ({
     -50,
   );
 
-  const [isAutoPlay, setAutoplay] = useState(true);
+  const [isAutoPlay, setAutoplay] = useState(false);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const appearance = useIsVisible(containerRef);
 
   const startAutoPlay = () => {
     setAutoplay(true);
@@ -79,6 +84,14 @@ const Slideshow = ({
   const stopAutoPlay = () => {
     setAutoplay(false);
   };
+
+  useEffect(() => {
+    if (appearance.visible) {
+      setAutoplay(true);
+    } else {
+      setAutoplay(false);
+    }
+  }, [appearance.visible]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -95,7 +108,7 @@ const Slideshow = ({
   }, [isAutoPlay, onNext]);
 
   return (
-    <div className={styles.container} style={style}>
+    <div ref={containerRef} className={styles.container} style={style}>
       <div ref={slideshow} className={styles.slideshow}>
         <div
           role="button"

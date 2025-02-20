@@ -1,5 +1,5 @@
 import LottieView from 'lottie-react-native';
-import { Suspense, useEffect, useMemo, useRef } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useColorScheme } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { replaceColors } from '@azzapp/shared/lottieHelpers';
@@ -9,11 +9,11 @@ import { useRouter } from '#components/NativeRouter';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { useSaveOfflineVCard } from '#helpers/offlineVCard';
 import relayScreen from '#helpers/relayScreen';
+import { TooltipProvider } from '#helpers/TooltipContext';
 import { useDeepLinkStoredRoute } from '#hooks/useDeepLink';
 import { useRevenueCat } from '#hooks/useRevenueCat';
 import { useSetRevenueCatUserInfo } from '#hooks/useSetRevenueCatUserInfo';
 import Container from '#ui/Container';
-import { HomeBottomSheetModalToolTip } from './HomeBottomSheetModalToolTip';
 import HomeScreenContent from './HomeScreenContent';
 import { HomeScreenProvider } from './HomeScreenContext';
 import HomeScreenPrefetcher from './HomeScreenPrefetcher';
@@ -33,7 +33,6 @@ export const homeScreenQuery = graphql`
       ...HomeScreenContent_user
       ...HomeScreenContext_user
       ...HomeScreenPrefetcher_user
-      ...HomeBottomPanel_user
     }
   }
 `;
@@ -58,6 +57,11 @@ const HomeScreen = ({
   }, [hasFocus]);
 
   useEffect(() => {
+    //current user is fetched on welcome screen / when null the app is in infinite loop
+    if (!currentUser) {
+      dispatchGlobalEvent({ type: 'SIGN_OUT' });
+      return;
+    }
     //if not profile, launch onboarding (except if we are in offline mode)
     if (
       (!currentUser?.profiles || currentUser.profiles.length === 0) &&
@@ -71,9 +75,9 @@ const HomeScreen = ({
 
   const ref = useRef<CarouselSelectListHandle | null>(null);
 
-  const onIndexChange = (index: number) => {
+  const onIndexChange = useCallback((index: number) => {
     ref.current?.scrollToIndex(index, false);
-  };
+  }, []);
 
   if (!currentUser) {
     // should never happen
@@ -83,14 +87,14 @@ const HomeScreen = ({
   return (
     <Suspense>
       <HomeScreenProvider userKey={currentUser} onIndexChange={onIndexChange}>
-        <HomeBottomSheetModalToolTip>
+        <TooltipProvider>
           <HomeScreenContent
             user={currentUser}
             selectListRef={ref}
             refreshQuery={refreshQuery}
           />
           <HomeScreenPrefetcher user={currentUser} />
-        </HomeBottomSheetModalToolTip>
+        </TooltipProvider>
       </HomeScreenProvider>
     </Suspense>
   );

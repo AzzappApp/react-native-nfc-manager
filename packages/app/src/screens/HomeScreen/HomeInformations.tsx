@@ -425,7 +425,7 @@ const InformationButtonRenderer = ({
         borderRadius: radius,
       }}
     >
-      <Canvas style={{ width, height }} opaque>
+      <Canvas style={{ width, height }}>
         {renderBackground({
           color,
           x: 0,

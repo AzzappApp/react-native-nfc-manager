@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { File, Paths } from 'expo-file-system/next';
+import * as Sentry from '@sentry/react-native';
 import parsePhoneNumberFromString, {
-  parsePhoneNumber,
+  parsePhoneNumberWithError,
 } from 'libphonenumber-js';
 import capitalize from 'lodash/capitalize';
 import { forwardRef, useImperativeHandle, useMemo, useState } from 'react';
@@ -19,15 +19,19 @@ import {
 import * as z from 'zod';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import ERRORS from '@azzapp/shared/errors';
+import { isDefined } from '@azzapp/shared/isDefined';
 import { isValidEmail } from '@azzapp/shared/stringHelpers';
 import { ScreenModal } from '#components/NativeRouter';
 import { getAuthState } from '#helpers/authStore';
 import { CardPhoneLabels } from '#helpers/contactCardHelpers';
 import { getFileName } from '#helpers/fileHelpers';
-import { createId } from '#helpers/idHelpers';
 import { getLocales, useCurrentLocale } from '#helpers/localeHelpers';
-import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
+import {
+  addLocalCachedMediaFile,
+  downloadContactImage,
+} from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
+import { parsePhoneNumber } from '#helpers/phoneNumbersHelper';
 import ContactCardEditForm from '#screens/ContactCardEditScreen/ContactCardEditForm';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -36,6 +40,7 @@ import SafeAreaView from '#ui/SafeAreaView';
 import Text from '#ui/Text';
 import MultiUserAddForm from './MultiUserAddForm';
 import type { EmailPhoneInput } from '#components/EmailOrPhoneInput';
+import type { ContactCardPhoneNumber } from '#helpers/phoneNumbersHelper';
 import type { MultiUserAddModal_InviteUserMutation } from '#relayArtifacts/MultiUserAddModal_InviteUserMutation.graphql';
 import type { MultiUserAddModal_webCard$key } from '#relayArtifacts/MultiUserAddModal_webCard.graphql';
 import type { ContactCardFormValues } from '#screens/ContactCardEditScreen/ContactCardSchema';
@@ -271,11 +276,13 @@ const MultiUserAddModal = (
             firstName: contact.firstName,
             lastName: contact.lastName,
             phoneNumbers:
-              contact.phoneNumbers?.map(a => ({
-                label: normalizePhoneMailLabel(a.label),
-                number: a.number,
-                selected: true,
-              })) ?? [],
+              contact.phoneNumbers
+                ?.map<ContactCardPhoneNumber>(a => ({
+                  label: normalizePhoneMailLabel(a.label),
+                  number: a.number || '',
+                  selected: true,
+                }))
+                .map(parsePhoneNumber) ?? [],
             emails:
               contact.emails?.map(a => ({
                 label: normalizePhoneMailLabel(a.label),
@@ -285,10 +292,16 @@ const MultiUserAddModal = (
             title: contact.jobTitle,
             company: contact.company ?? undefined,
             urls:
-              contact.urlAddresses?.map(a => ({
-                address: a.url,
-                selected: true,
-              })) ?? [],
+              contact.urlAddresses
+                ?.map(a =>
+                  a.url
+                    ? {
+                        address: a.url,
+                        selected: true,
+                      }
+                    : null,
+                )
+                .filter(isDefined) ?? [],
             birthday:
               contact.birthday?.day &&
               contact.birthday.month &&
@@ -380,15 +393,20 @@ const MultiUserAddModal = (
       const { avatar, logo, ...data } = value;
 
       if (avatar?.local && avatar.uri) {
-        const fileName = getFileName(avatar.uri);
+        let fileName = getFileName(avatar.uri);
 
         let uri = avatar.uri;
         if (avatar.uri.startsWith('content://')) {
-          const originalFile = new File(avatar.uri);
-          uri = Paths.cache.uri + createId();
-          const file = new File(uri);
-          file.create();
-          originalFile.copy(file);
+          try {
+            uri = `file://${await downloadContactImage(avatar.uri)}`;
+            fileName = uri;
+          } catch (e: any) {
+            Sentry.captureException(e);
+            console.warn(
+              'error downloading contact image from phone contacts',
+              e,
+            );
+          }
         }
 
         const file: any = {
@@ -461,7 +479,7 @@ const MultiUserAddModal = (
 
         const phoneNumber =
           selectedContact.countryCodeOrEmail !== 'email'
-            ? parsePhoneNumber(
+            ? parsePhoneNumberWithError(
                 selectedContact.value,
                 selectedContact.countryCodeOrEmail,
               ).formatInternational()
@@ -535,6 +553,7 @@ const MultiUserAddModal = (
                 }),
               });
             } else {
+              console.warn(e);
               Toast.show({
                 type: 'error',
                 text1: intl.formatMessage({
@@ -582,7 +601,7 @@ const MultiUserAddModal = (
                         isAfter(invitedContactCard, {
                           firstName,
                           lastName,
-                        })
+                        }) < 0
                       ) {
                         cursor = edge.getValue('cursor') as string;
                         break;
@@ -597,7 +616,11 @@ const MultiUserAddModal = (
                     'WebCardEdge',
                   );
                   if (cursor) {
-                    ConnectionHandler.insertEdgeAfter(connection, edge, cursor);
+                    ConnectionHandler.insertEdgeBefore(
+                      connection,
+                      edge,
+                      cursor,
+                    );
                   } else {
                     ConnectionHandler.insertEdgeAfter(connection, edge);
                   }
@@ -609,7 +632,9 @@ const MultiUserAddModal = (
             webCard?.setValue(nbProfiles + 1, 'nbProfiles');
           },
         });
-      } catch {
+      } catch (e: any) {
+        Sentry.captureException(e);
+        console.warn('Error submit', e);
         Toast.show({
           type: 'error',
           text1: intl.formatMessage({

@@ -9,7 +9,6 @@ import relayScreen from '#helpers/relayScreen';
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
-import SafeAreaView from '#ui/SafeAreaView';
 import Text from '#ui/Text';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { InviteFriendsScreenQuery } from '#relayArtifacts/InviteFriendsScreenQuery.graphql';
@@ -64,16 +63,15 @@ const InviteFriendsScreen = ({
 
   return (
     <Container style={{ flex: 1 }}>
-      <SafeAreaView style={{ flex: 1, rowGap: 15 }}>
-        <AccountHeader
-          webCard={webCard ?? null}
-          title={intl.formatMessage({
-            defaultMessage: 'Invite Friends',
-            description:
-              'Title of the screen where the user can invite friends to the app',
-          })}
-        />
-
+      <AccountHeader
+        webCard={webCard ?? null}
+        title={intl.formatMessage({
+          defaultMessage: 'Invite Friends',
+          description:
+            'Title of the screen where the user can invite friends to the app',
+        })}
+      />
+      <View style={{ flex: 1, rowGap: 15 }}>
         <Icon icon="invite" style={styles.inviteIcon} />
         <View style={{ rowGap: 20, paddingHorizontal: 10 }}>
           <Text variant="xsmall" style={styles.inviteMessage}>
@@ -164,7 +162,7 @@ const InviteFriendsScreen = ({
             <Icon icon="arrow_right" />
           </PressableNative>
         </View>
-      </SafeAreaView>
+      </View>
     </Container>
   );
 };

@@ -91,4 +91,3 @@ jest.mock('@gorhom/bottom-sheet', () => {
 
 jest.mock('@azzapp/react-native-skia-video', () => ({}));
 jest.mock('@azzapp/react-native-buffer-loader', () => ({}));
-jest.mock('react-native-blob-util', () => ({}));

@@ -17,7 +17,7 @@ import type { MutableRefObject } from 'react';
 
 export type VideoCompositionRendererProps = Exclude<ViewProps, 'children'> & {
   composition: VideoComposition | null;
-  pause?: boolean;
+  paused?: boolean;
   drawFrame: FrameDrawer;
   width: number;
   height: number;
@@ -27,7 +27,7 @@ export type VideoCompositionRendererProps = Exclude<ViewProps, 'children'> & {
 
 const VideoCompositionRenderer = ({
   composition,
-  pause = false,
+  paused = false,
   drawFrame,
   width,
   height,
@@ -73,13 +73,13 @@ const VideoCompositionRenderer = ({
 
   useEffect(() => {
     if (framesExtractor) {
-      if (pause) {
+      if (paused) {
         framesExtractor.pause();
       } else {
         framesExtractor.play();
       }
     }
-  }, [framesExtractor, pause]);
+  }, [framesExtractor, paused]);
 
   const surface = useOffScreenSurface(width, height);
   const image = useSharedValue<SkImage | null>(null);
@@ -118,7 +118,7 @@ const VideoCompositionRenderer = ({
   }, true);
 
   return (
-    <Canvas style={[{ width, height }, style]} {...props} opaque>
+    <Canvas style={[{ width, height }, style]} {...props}>
       <Image x={0} y={0} width={width} height={height} image={image} />
     </Canvas>
   );

@@ -46,6 +46,7 @@ const verifySignApi = async (req: Request) => {
       firstName: foundContactCard.firstName,
       lastName: foundContactCard.lastName,
       company: foundContactCard.company,
+      title: foundContactCard?.title,
       userName: webCard?.userName,
     })
       .setJti(createId())
@@ -58,12 +59,14 @@ const verifySignApi = async (req: Request) => {
 
     return NextResponse.json(
       {
-        urls: (webCard?.commonInformation?.urls ?? []).concat(
-          storedProfile?.contactCard?.urls || [],
-        ),
-        socials: (webCard?.commonInformation?.socials ?? []).concat(
-          storedProfile?.contactCard?.socials || [],
-        ),
+        urls: (webCard?.isMultiUser
+          ? (webCard?.commonInformation?.urls ?? [])
+          : []
+        ).concat(storedProfile?.contactCard?.urls || []),
+        socials: (webCard?.isMultiUser
+          ? (webCard?.commonInformation?.socials ?? [])
+          : []
+        ).concat(storedProfile?.contactCard?.socials || []),
         avatarUrl,
         displayName: displayName(foundContactCard, webCard),
         token,

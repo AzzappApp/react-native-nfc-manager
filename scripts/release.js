@@ -1,4 +1,6 @@
 const { execSync } = require('child_process');
+const fs = require('fs');
+const path = require('path');
 const { Octokit: GitHubAPI } = require('@octokit/rest');
 const buildChangeLog = require('./buildChangeLog');
 const setWorkspaceVersions = require('./setWorkspaceVersions');
@@ -41,6 +43,9 @@ const main = async () => {
 
   console.log('Updating worskpace version...');
   setWorkspaceVersions(nextVersion, androidVersionCode);
+
+  console.log('Erase changelog');
+  fs.writeFileSync(path.join(__dirname, '..', 'CHANGELOG.md'), '');
 
   console.log('Commiting changes...');
   execSyncWithLog(`git add .`);

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
+import { isFileURL } from '#helpers/fileHelpers';
 import useLatestCallback from '#hooks/useLatestCallback';
-import { downloadRemoteFileToLocalCache } from './mediaHelpers';
+import { downloadRemoteFileToLocalCache, FILE_CACHE_DIR } from './mediaHelpers';
 
 const videoCache = new Map<string, string>();
 
@@ -8,17 +9,18 @@ export const getVideoLocalPath = async (
   uri: string,
   abortSignal?: AbortSignal,
 ): Promise<string | null> => {
-  if (uri?.startsWith('file://')) {
-    return uri.replace('file://', '');
+  if (isFileURL(uri)) {
+    return uri;
   }
-  if (videoCache.has(uri)) {
-    return videoCache.get(uri) ?? null;
+
+  if (!videoCache.has(uri)) {
+    const file = await downloadRemoteFileToLocalCache(uri, abortSignal);
+    if (file) {
+      videoCache.set(uri, file.name);
+    }
   }
-  const path = await downloadRemoteFileToLocalCache(uri, abortSignal);
-  if (path) {
-    videoCache.set(uri, path);
-  }
-  return path;
+
+  return `${FILE_CACHE_DIR}/${videoCache.get(uri)}`;
 };
 
 export const useVideoLocalPath = (

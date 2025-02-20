@@ -1,27 +1,22 @@
 import { memo, useMemo } from 'react';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import Link from '#components/Link';
-import LinkWebCard from '#components/LinkWebCard';
 import PressableScaleHighlight from '#ui/PressableScaleHighlight';
 import CoverRenderer from '../CoverRenderer';
-import useCoverLinkRendererFragment from './useCoverLinkRendererFragment';
 import type { CoverLinkRendererProps } from './coverLinkTypes';
 
 /**
  * A cover link is a cover renderer wrapped in a link to the profile page
  */
-const CoverLink = ({
+const CoverLinkRenderer = ({
   style,
   coverStyle,
   prefetch = false,
   onPress,
   onLongPress,
   disabled,
-  coverIsPredefined,
   ...props
 }: CoverLinkRendererProps) => {
-  const webCard = useCoverLinkRendererFragment(props.webCard);
-
   const containerStyle = useMemo(
     () => [
       style,
@@ -33,31 +28,22 @@ const CoverLink = ({
     ],
     [style, props.width],
   );
-
-  if (webCard?.coverIsPredefined) {
-    return (
-      <Link
-        route="COVER_TEMPLATE_SELECTION"
-        prefetch={prefetch}
-        disabled={disabled}
-      >
-        <PressableScaleHighlight
-          style={containerStyle}
-          onLongPress={onLongPress}
-        >
-          <CoverRenderer {...props} style={coverStyle} />
-        </PressableScaleHighlight>
-      </Link>
-    );
-  }
   return (
-    <LinkWebCard params={props} prefetch={prefetch} disabled={disabled}>
+    <Link
+      route="WEBCARD"
+      params={{
+        userName: props.userName!,
+        webCardId: props.webCardId,
+      }}
+      prefetch={prefetch}
+      disabled={disabled}
+    >
       <PressableScaleHighlight style={containerStyle} onLongPress={onLongPress}>
         <CoverRenderer {...props} style={coverStyle} />
       </PressableScaleHighlight>
-    </LinkWebCard>
+    </Link>
   );
 };
 
 // memo is recommanded as coverlink is used in FlatList
-export default memo(CoverLink);
+export default memo(CoverLinkRenderer);

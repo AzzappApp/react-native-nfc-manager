@@ -3,6 +3,7 @@ import { useIntl } from 'react-intl';
 import { Alert, StyleSheet, View } from 'react-native';
 import { graphql, useFragment, usePreloadedQuery } from 'react-relay';
 import { useRouter } from '#components/NativeRouter';
+import { getAuthState } from '#helpers/authStore';
 import relayScreen from '#helpers/relayScreen';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
@@ -48,6 +49,7 @@ const MultiUserAddScreen = ({
         subscription {
           issuer
           availableSeats
+          subscriptionPlan
         }
       }
     `,
@@ -59,56 +61,119 @@ const MultiUserAddScreen = ({
   const onAddUser = useCallback(
     (contact?: Contacts.Contact) => {
       if (
-        webCardData?.subscription?.issuer &&
-        webCardData.subscription.issuer !== 'web' &&
+        webCardData?.subscription &&
         webCardData?.subscription?.availableSeats <= 0
       ) {
-        Alert.alert(
-          intl.formatMessage({
-            defaultMessage: 'Not enough seats',
-            description:
-              'MultiUserAddScreen - Alert message title when not enough seats',
-          }),
-          intl.formatMessage({
-            defaultMessage:
-              "You don't have enough seat to invite more users. Please upgrade your subscription",
-            description:
-              'MultiUserAddScreen - Alert message content when not enough seats',
-          }),
-          [
-            {
-              text: intl.formatMessage({
-                defaultMessage: 'Cancel',
+        const { profileInfos } = getAuthState();
+
+        if (
+          webCardData.subscription?.issuer === 'web' &&
+          webCardData.subscription.subscriptionPlan === 'monthly'
+        ) {
+          ref.current?.open(contact ?? searchValue ?? '');
+          return;
+        }
+
+        if (profileInfos?.profileRole === 'owner') {
+          if (webCardData.subscription?.issuer === 'web') {
+            Alert.alert(
+              intl.formatMessage({
+                defaultMessage: 'Not enough seats',
                 description:
-                  'Alert button to cancel upgrading a subscription to add a new user',
+                  'MultiUserAddScreen - Alert message title when not enough seats',
               }),
-              style: 'cancel',
-              onPress: () => {
-                router.back();
-              },
-            },
-            {
-              text: intl.formatMessage({
-                defaultMessage: 'Upgrade',
-                description: 'MultiUserAddScreen - Upgrade bouton action',
+              intl.formatMessage({
+                defaultMessage:
+                  'Please log in to the WebApp to manage your azzapp+ subscription',
+                description:
+                  'Error message when trying to activate multi-user on mobile when it is configured on the WebApp.',
               }),
-              onPress: () => {
-                router.push({ route: 'USER_PAY_WALL' });
+
+              [
+                {
+                  text: intl.formatMessage({
+                    defaultMessage: 'Cancel',
+                    description:
+                      'Alert button to cancel inviting a new user when the owner does not have enough seats',
+                  }),
+                  style: 'cancel',
+                  onPress: () => {
+                    router.back();
+                  },
+                },
+              ],
+            );
+          } else {
+            // in-app subscription
+            Alert.alert(
+              intl.formatMessage({
+                defaultMessage: 'Not enough seats',
+                description:
+                  'MultiUserAddScreen - Alert message title when not enough seats',
+              }),
+              intl.formatMessage({
+                defaultMessage:
+                  "You don't have enough seat to invite more users. Please upgrade your subscription",
+                description:
+                  'MultiUserAddScreen - Alert message content when not enough seats',
+              }),
+              [
+                {
+                  text: intl.formatMessage({
+                    defaultMessage: 'Cancel',
+                    description:
+                      'Alert button to cancel upgrading a subscription to add a new user',
+                  }),
+                  style: 'cancel',
+                  onPress: () => {
+                    router.back();
+                  },
+                },
+                {
+                  text: intl.formatMessage({
+                    defaultMessage: 'Upgrade',
+                    description: 'MultiUserAddScreen - Upgrade bouton action',
+                  }),
+                  onPress: () => {
+                    router.push({ route: 'USER_PAY_WALL' });
+                  },
+                },
+              ],
+            );
+          }
+        } else {
+          Alert.alert(
+            intl.formatMessage({
+              defaultMessage: 'Not enough seats',
+              description:
+                'MultiUserAddScreen - Alert message title when not enough seats',
+            }),
+            intl.formatMessage({
+              defaultMessage:
+                "The owner doesn't have enough seat to invite more users. Please contact the owner to upgrade the subscription",
+              description:
+                'MultiUserAddScreen - Alert message content when not enough seats for the owner',
+            }),
+            [
+              {
+                text: intl.formatMessage({
+                  defaultMessage: 'Cancel',
+                  description:
+                    'Alert button to cancel inviting a new user when the owner does not have enough seats',
+                }),
+                style: 'cancel',
+                onPress: () => {
+                  router.back();
+                },
               },
-            },
-          ],
-        );
+            ],
+          );
+        }
       } else {
         ref.current?.open(contact ?? searchValue ?? '');
       }
     },
-    [
-      intl,
-      router,
-      searchValue,
-      webCardData.subscription?.availableSeats,
-      webCardData.subscription?.issuer,
-    ],
+    [intl, router, searchValue, webCardData.subscription],
   );
 
   return (

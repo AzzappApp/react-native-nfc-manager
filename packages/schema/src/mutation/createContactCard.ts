@@ -3,15 +3,16 @@ import {
   checkMedias,
   createProfile,
   createWebCard,
-  getProfileById,
+  getWebCardByUserNameWithRedirection,
   pickRandomPredefinedCover,
   referencesMedias,
   transaction,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { isDefined } from '@azzapp/shared/isDefined';
+import { isValidUserName } from '@azzapp/shared/stringHelpers';
 import { getSessionInfos } from '#GraphQLContext';
-import { userLoader } from '#loaders';
+import { profileLoader, userLoader } from '#loaders';
 import type { MutationResolvers } from '#/__generated__/types';
 import type { WebCardTable } from '@azzapp/data/src/schema';
 import type { WebCardKind } from '@azzapp/shared/webCardKind';
@@ -19,7 +20,7 @@ import type { InferInsertModel } from 'drizzle-orm';
 
 const createContactCard: MutationResolvers['createContactCard'] = async (
   _,
-  { webCardKind, contactCard },
+  { webCardKind, contactCard, webCardUserName },
 ) => {
   const { userId } = getSessionInfos();
 
@@ -31,6 +32,16 @@ const createContactCard: MutationResolvers['createContactCard'] = async (
   const defaultCover = await pickRandomPredefinedCover();
 
   const currentDate = new Date();
+
+  if (webCardUserName) {
+    if (!isValidUserName(webCardUserName)) {
+      throw new GraphQLError(ERRORS.INVALID_REQUEST);
+    }
+
+    if (await getWebCardByUserNameWithRedirection(webCardUserName)) {
+      throw new GraphQLError(ERRORS.USERNAME_ALREADY_EXISTS);
+    }
+  }
 
   const inputWebCard: InferInsertModel<typeof WebCardTable> = {
     firstName: contactCard.firstName,
@@ -47,6 +58,7 @@ const createContactCard: MutationResolvers['createContactCard'] = async (
     coverMediaId: defaultCover.mediaId,
     companyActivityLabel: contactCard.companyActivityLabel,
     alreadyPublished: true,
+    userName: webCardUserName,
   };
 
   try {
@@ -76,16 +88,7 @@ const createContactCard: MutationResolvers['createContactCard'] = async (
     if (!profileId) {
       throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
     }
-
-    let profile = await getProfileById(profileId);
-    let attempt = 1;
-    while (profile === null && attempt < 20) {
-      await new Promise(resolve => {
-        setTimeout(resolve, 50);
-      });
-      profile = await getProfileById(profileId);
-      attempt++;
-    }
+    const profile = await profileLoader.load(profileId);
 
     if (!profile) {
       throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);

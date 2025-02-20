@@ -9,7 +9,7 @@ import { useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import useEditorLayout from '#hooks/useEditorLayout';
 import ActivityIndicator from '#ui/ActivityIndicator';
-import BottomMenu from '#ui/BottomMenu';
+import BottomMenu, { BOTTOM_MENU_PADDING } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
@@ -251,7 +251,10 @@ const ImagePickerWizardRenderer = ({
       </View>
       {menuBarProps && (
         <View
-          style={[styles.bottomMenuContainer, { bottom: insetBottom }]}
+          style={[
+            styles.bottomMenuContainer,
+            { bottom: insetBottom - BOTTOM_MENU_PADDING },
+          ]}
           pointerEvents="box-none"
         >
           <BottomMenu

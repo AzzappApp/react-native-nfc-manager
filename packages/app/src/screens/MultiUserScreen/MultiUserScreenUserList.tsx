@@ -18,7 +18,6 @@ import Link from '#components/Link';
 import { MediaImageRenderer } from '#components/medias';
 import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { keyExtractor } from '#helpers/idHelpers';
 import { profileInfoIsOwner } from '#helpers/profileRoleHelper';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import { useFocusEffect } from '#hooks/useFocusEffect';
@@ -83,6 +82,7 @@ const MultiUserScreenUserList = ({
         logo {
           id
         }
+        isPremium
         ...MultiUserScreenUserList_profiles
         ...MultiUserPendingProfileOwner
       }
@@ -279,6 +279,8 @@ const MultiUserScreenUserList = ({
     [bottom],
   );
 
+  const router = useRouter();
+
   return (
     <View style={styles.content}>
       <Suspense fallback={<LoadingView />}>
@@ -289,16 +291,19 @@ const MultiUserScreenUserList = ({
                 {Header}
                 {!transferOwnerMode && (
                   <>
-                    <Link route="MULTI_USER_ADD">
-                      <Button
-                        style={styles.button}
-                        label={intl.formatMessage({
-                          defaultMessage: 'Add users',
-                          description:
-                            'Button to add new users from MultiUserScreen',
-                        })}
-                      />
-                    </Link>
+                    <Button
+                      style={styles.button}
+                      label={intl.formatMessage({
+                        defaultMessage: 'Add users',
+                        description:
+                          'Button to add new users from MultiUserScreen',
+                      })}
+                      onPress={() => {
+                        router.push({
+                          route: 'MULTI_USER_ADD',
+                        });
+                      }}
+                    />
                     <Link route="COMMON_INFORMATION">
                       <Button
                         style={styles.button}
@@ -332,6 +337,9 @@ const MultiUserScreenUserList = ({
     </View>
   );
 };
+
+const keyExtractor = (item: { id: string; profileRole: string }) =>
+  `${item.id}-${item.profileRole}`;
 
 const renderHeaderSection = (info: {
   section: SectionListData<Profile, { title: string; data: Profile[] }>;

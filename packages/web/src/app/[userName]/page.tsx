@@ -5,6 +5,8 @@ import {
   getMediasByIds,
   getProfilesPostsWithTopComment,
   getModuleBackgroundsByIds,
+  getWebCardsOwnerUsers,
+  getActiveUserSubscriptions,
 } from '@azzapp/data';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
@@ -17,12 +19,9 @@ import {
   MODULES_STYLES_VALUES,
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
-import CoverRenderer from '#components/renderer/CoverRenderer';
-import CoverRendererBackground from '#components/renderer/CoverRenderer/CoverRendererBackground';
 import ModuleRenderer from '#components/renderer/ModuleRenderer';
 import { getMetaData } from '#helpers/seo';
 import { cachedGetWebCardByUserName } from './dataAccess';
-import styles from './WebCardPage.css';
 import WebCardPageLayout from './WebCardPageLayout';
 import type { Metadata } from 'next';
 
@@ -35,6 +34,15 @@ type ProfilePageProps = {
 const ProfilePage = async ({ params }: ProfilePageProps) => {
   const userName = params.userName.toLowerCase();
   const webCard = await cachedGetWebCardByUserName(userName);
+  if (!webCard) {
+    return notFound();
+  }
+  let isAzzappPlus = false;
+  const owners = await getWebCardsOwnerUsers([webCard.id]);
+  if (owners?.length && owners[0]?.id) {
+    const subscriptions = await getActiveUserSubscriptions([owners[0].id]);
+    isAzzappPlus = subscriptions.length > 0;
+  }
 
   if (!webCard?.cardIsPublished) {
     return notFound();
@@ -68,7 +76,8 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
   const cardColors = webCard.cardColors ?? DEFAULT_COLOR_PALETTE;
 
   let cardBackgroundColor = swapColor(
-    webCard.coverBackgroundColor ?? cardColors.light,
+    webCard.coverBackgroundColor ??
+      (webCard.coverIsPredefined ? cardColors.dark : cardColors.light),
     cardColors,
   );
   let lastModuleBackgroundColor = cardBackgroundColor;
@@ -126,33 +135,11 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
       webCard={webCard}
       posts={posts}
       media={media}
-      cover={
-        <>
-          <CoverRendererBackground media={media} />
-          <div
-            className={styles.coverContainer}
-            style={{
-              background: `linear-gradient(to bottom, transparent 0%, ${
-                cardBackgroundColor ?? '#FFF'
-              } 95%)`,
-            }}
-          >
-            <div
-              style={{
-                flex: 1,
-                background: `linear-gradient(to left, transparent 0%, ${
-                  cardBackgroundColor ?? '#FFF'
-                } 95%)`,
-              }}
-            />
-            <CoverRenderer webCard={webCard} media={media} priority />
-          </div>
-        </>
-      }
       cardBackgroundColor={cardBackgroundColor}
       lastModuleBackgroundColor={lastModuleBackgroundColor}
       userName={params.userName}
       color={cardBackgroundColor}
+      isAzzappPlus={isAzzappPlus}
     >
       {modules.map(module => (
         <ModuleRenderer

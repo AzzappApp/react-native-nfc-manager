@@ -1,14 +1,20 @@
-
 extend type Mutation {
   """
   Save the current user's contact card.
   """
-  saveContactCard(profileId: ID!, contactCard: ContactCardInput!): SaveContactCardPayload!
+  saveContactCard(
+    profileId: ID!
+    contactCard: ContactCardInput!
+  ): SaveContactCardPayload!
 
   """
   create a new contact card.
   """
-  createContactCard(webCardKind: String!, contactCard: ContactCardInput!): SaveContactCardPayload!
+  createContactCard(
+    webCardKind: String!
+    contactCard: ContactCardInput!
+    webCardUserName: String
+  ): SaveContactCardPayload!
 }
 
 input ContactCardInput {
@@ -28,7 +34,6 @@ input ContactCardInput {
   logoId: String
   companyActivityLabel: String
 }
-
 
 input ContactCardEmailInput {
   address: String!

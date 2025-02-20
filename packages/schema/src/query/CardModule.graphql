@@ -525,6 +525,18 @@ type CardModuleTitleText implements CardModule {
   The variant design of the module
   """
   variant: String
+  """
+  The cardModule color , in some case it can be null (parallax media)
+  """
+  cardModuleColor: CardModuleColor!
+  """
+  The title of the module
+  """
+  title: String
+  """
+  the text of the module
+  """
+  text: String!
 }
 
 #INSERT_MODULE: add new module kind  type here

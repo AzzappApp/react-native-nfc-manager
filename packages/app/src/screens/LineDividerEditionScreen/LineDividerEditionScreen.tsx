@@ -1,6 +1,6 @@
 import { startTransition, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { LINE_DIVIDER_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
@@ -11,7 +11,7 @@ import WebCardColorPicker from '#components/WebCardColorPicker';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
-import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
+import { BOTTOM_MENU_HEIGHT, BOTTOM_MENU_PADDING } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
@@ -353,18 +353,18 @@ const LineDividerEditionScreen = ({
           },
         ]}
       />
-
-      <LineDividerEditionBottomMenu
-        colorPalette={webCard?.cardColors}
-        currentTab={currentTab}
-        onItemPress={onCurrentTabChange}
-        colorTop={colorTop}
-        colorBottom={colorBottom}
-        style={[
-          styles.tabsBar,
-          { bottom: insetBottom, width: windowWidth - 20 },
-        ]}
-      />
+      <View
+        style={[styles.tabsBar, { bottom: insetBottom - BOTTOM_MENU_PADDING }]}
+      >
+        <LineDividerEditionBottomMenu
+          colorPalette={webCard?.cardColors}
+          currentTab={currentTab}
+          onItemPress={onCurrentTabChange}
+          colorTop={colorTop}
+          colorBottom={colorBottom}
+          style={{ width: windowWidth - 20 }}
+        />
+      </View>
       {webCard && (
         <WebCardColorPicker
           visible={showContentModal}
@@ -401,8 +401,8 @@ const styles = StyleSheet.create({
   },
   tabsBar: {
     position: 'absolute',
-    left: 10,
-    right: 10,
+    left: 0,
+    right: 0,
   },
   tabStyle: {
     flex: 1,

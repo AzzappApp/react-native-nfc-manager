@@ -219,7 +219,7 @@ const AccountDetailsPasswordForm = ({
 
 const styles = StyleSheet.create({
   headerButton: { paddingHorizontal: 5, minWidth: 74 },
-  container: { rowGap: 20, marginBottom: 20, paddingHorizontal: 20 },
+  container: { rowGap: 20, paddingBottom: 20, paddingHorizontal: 20 },
   field: { paddingTop: 10, rowGap: 5 },
   input: { rowGap: 10 },
 });

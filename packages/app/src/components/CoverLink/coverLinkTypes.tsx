@@ -30,6 +30,4 @@ export type CoverLinkRendererProps = CoverRendererProps & {
   onLongPress?: (e: GestureResponderEvent) => void;
 
   disabled?: boolean;
-
-  coverIsPredefined?: boolean;
 };

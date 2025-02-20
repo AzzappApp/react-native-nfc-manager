@@ -5,31 +5,28 @@ import {
   MODULE_KIND_MEDIA_TEXT_LINK,
   MODULE_KIND_TITLE_TEXT,
 } from '@azzapp/shared/cardModuleHelpers';
+import {
+  isModuleVariantSupported,
+  type ModuleKindWithVariant,
+  type Variant,
+} from './webcardModuleHelpers';
 import type { Route } from '#routes';
-import type { ModuleKindWithVariant, Variant } from './webcardModuleHelpers';
-
-export const SUPPORTED_VARIANT = [
-  'parallax',
-  'slideshow',
-  'alternation',
-] as const;
-
-export type SupportedVariant = (typeof SUPPORTED_VARIANT)[number];
 
 export function getRouteForCardModule({
   moduleKind,
-  variant,
   moduleId,
-  isNew = false,
+  variant,
+  isNew,
 }: ModuleKindWithVariant & {
   isNew?: boolean;
   moduleId?: string;
 }): Route | undefined {
+  if (!isModuleVariantSupported({ moduleKind, variant })) {
+    return undefined;
+  }
+
   switch (moduleKind) {
     case MODULE_KIND_MEDIA:
-      if (!SUPPORTED_VARIANT.includes(variant as SupportedVariant)) {
-        return undefined;
-      }
       return {
         route: 'CARD_MODULE_MEDIA_EDITION',
         params: {
@@ -38,13 +35,6 @@ export function getRouteForCardModule({
         },
       };
     case MODULE_KIND_MEDIA_TEXT:
-      if (
-        !SUPPORTED_VARIANT.includes(
-          variant as (typeof SUPPORTED_VARIANT)[number],
-        )
-      ) {
-        return undefined;
-      }
       return {
         route: 'CARD_MODULE_MEDIA_TEXT_EDITION',
         params: {
@@ -53,13 +43,6 @@ export function getRouteForCardModule({
         },
       };
     case MODULE_KIND_MEDIA_TEXT_LINK:
-      if (
-        !SUPPORTED_VARIANT.includes(
-          variant as (typeof SUPPORTED_VARIANT)[number],
-        )
-      ) {
-        return undefined;
-      }
       return {
         route: 'CARD_MODULE_MEDIA_TEXT_LINK_EDITION',
         params: {
@@ -67,11 +50,16 @@ export function getRouteForCardModule({
           variant: variant as Variant<typeof MODULE_KIND_MEDIA_TEXT_LINK>,
         },
       };
-    case MODULE_KIND_MAP:
+
     case MODULE_KIND_TITLE_TEXT:
-      //this is a hack to avoid returning null of throwing an error, adding coming soon module (not only variant),
-      // break lots of control, like in this case throwing an error to be sure this is coded.
-      // adding hack just to display coming soon modules is bad
+      return {
+        route: 'CARD_MODULE_TITLE_TEXT_EDITION',
+        params: {
+          moduleId,
+          variant: variant as Variant<typeof MODULE_KIND_TITLE_TEXT>,
+        },
+      };
+    case MODULE_KIND_MAP:
       return undefined;
     //INSERT_MODULE
     case 'photoWithTextAndTitle':
@@ -89,58 +77,5 @@ export function getRouteForCardModule({
       };
     default:
       throw new Error(`Unknown module kind: ${moduleKind}`);
-  }
-}
-
-export function isModuleVariantSupported({
-  kind,
-  variant,
-}: {
-  kind?: string | null;
-  variant?: string | null;
-}): boolean {
-  switch (kind) {
-    case MODULE_KIND_MEDIA:
-      if (!SUPPORTED_VARIANT.includes(variant as SupportedVariant)) {
-        return false;
-      }
-      return true;
-    case MODULE_KIND_MEDIA_TEXT:
-      if (
-        !SUPPORTED_VARIANT.includes(
-          variant as (typeof SUPPORTED_VARIANT)[number],
-        )
-      ) {
-        return false;
-      }
-      return true;
-    case MODULE_KIND_MEDIA_TEXT_LINK:
-      if (
-        !SUPPORTED_VARIANT.includes(
-          variant as (typeof SUPPORTED_VARIANT)[number],
-        )
-      ) {
-        return false;
-      }
-      return true;
-    case MODULE_KIND_MAP:
-    case MODULE_KIND_TITLE_TEXT:
-      //this is a hack to avoid returning null of throwing an error, adding coming soon module (not only variant),
-      // break lots of control, like in this case throwing an error to be sure this is coded.
-      // adding hack just to display coming soon modules is bad
-      return false;
-    //INSERT_MODULE
-    case 'photoWithTextAndTitle':
-    case 'socialLinks':
-    case 'blockText':
-    case 'carousel':
-    case 'horizontalPhoto':
-    case 'lineDivider':
-    case 'simpleButton':
-    case 'simpleText':
-    case 'simpleTitle':
-      return true;
-    default:
-      return false;
   }
 }

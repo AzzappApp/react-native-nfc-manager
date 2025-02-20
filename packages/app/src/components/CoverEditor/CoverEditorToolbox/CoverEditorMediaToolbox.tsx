@@ -1,3 +1,4 @@
+import { ResizeMode, Video } from 'expo-av';
 import { Image } from 'expo-image';
 import { useMemo } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -70,8 +71,6 @@ const CoverEditorMediaToolbox = () => {
         );
       }
 
-      const { galleryUri, uri, thumbnail } = media;
-
       return (
         <PressableNative
           key={`${media.id}-${index}`}
@@ -85,10 +84,20 @@ const CoverEditorMediaToolbox = () => {
             });
           }}
         >
-          <Image
-            source={{ uri: galleryUri ?? thumbnail ?? uri }}
-            style={styles.previewContent}
-          />
+          {media.kind === 'image' || media.galleryUri || media.thumbnail ? (
+            <Image
+              source={{
+                uri: media?.galleryUri ?? media.thumbnail ?? media.uri,
+              }}
+              style={styles.previewContent}
+            />
+          ) : (
+            <Video
+              source={{ uri: media.uri }}
+              style={styles.previewContent}
+              resizeMode={ResizeMode.COVER}
+            />
+          )}
           <View style={styles.duration}>
             <Text variant="xsmall">
               <FormattedMessage

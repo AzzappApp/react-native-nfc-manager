@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/react-native';
+import { Dimensions, type TextStyle } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { splitArrayIntoChunks } from '@azzapp/shared/arrayHelpers';
 import { waitTime } from '@azzapp/shared/asyncHelpers';
@@ -22,6 +23,7 @@ import {
 } from './mediaEditions';
 import { addLocalCachedMediaFile } from './mediaHelpers';
 import { uploadSign, uploadMedia } from './MobileWebAPI';
+import { downScaleImage } from './resolutionHelpers';
 import type {
   CardModuleMedia,
   CardModuleSourceMedia,
@@ -30,7 +32,6 @@ import type { useRouter } from '#components/NativeRouter';
 import type { ModuleKindAndVariant } from './webcardModuleHelpers';
 import type { CardStyle } from '@azzapp/shared/cardHelpers';
 import type { CardModuleColor } from '@azzapp/shared/cardModuleHelpers';
-import type { TextStyle } from 'react-native';
 import type { Observable } from 'relay-runtime';
 
 export const getCardModuleMediaKind = (media: CardModuleSourceMedia) => {
@@ -87,11 +88,14 @@ export const handleUploadCardModuleMedia = async (
             !moduleMedia.media.uri.startsWith('http')
           ) {
             if (media.kind === 'image') {
-              const exportWidth = Math.min(MODULE_IMAGE_MAX_WIDTH, media.width);
-              const exportHeight = (exportWidth / media.width) * media.height;
+              const resolution = downScaleImage(
+                media.width,
+                media.height,
+                MODULE_IMAGE_MAX_WIDTH,
+              );
               const localPath = await saveTransformedImageToFile({
                 uri: media.uri,
-                resolution: { width: exportWidth, height: exportHeight },
+                resolution,
                 format: getTargetFormatFromPath(media.uri),
                 quality: 95,
                 filter: media.filter,
@@ -99,21 +103,17 @@ export const handleUploadCardModuleMedia = async (
               });
               media.uri = localPath;
             } else {
-              const exportWidth = Math.min(MODULE_VIDEO_MAX_WIDTH, media.width);
-              const exportHeight = (exportWidth / media.width) * media.height;
-              const aspectRatio = exportWidth / exportHeight;
-              const resolution = {
-                width:
-                  aspectRatio >= 1 ? exportWidth : exportWidth * aspectRatio,
-                height:
-                  aspectRatio < 1 ? exportWidth : exportWidth / aspectRatio,
-              };
+              const resolution = downScaleImage(
+                media.width,
+                media.height,
+                MODULE_VIDEO_MAX_WIDTH,
+              );
               try {
                 const localPath = await saveTransformedVideoToFile({
                   video: {
                     uri: media.uri,
-                    width: exportWidth,
-                    height: exportHeight,
+                    width: resolution.width,
+                    height: resolution.height,
                     rotation: media.rotation ?? 0,
                   },
                   resolution,
@@ -125,7 +125,7 @@ export const handleUploadCardModuleMedia = async (
                   editionParameters: media.editionParameters,
                   maxDecoderResolution: MODULE_VIDEO_MAX_WIDTH,
                 });
-                media.uri = `file://${localPath}`;
+                media.uri = localPath;
               } catch (e) {
                 Sentry.captureException(e);
                 console.error(e);
@@ -253,7 +253,7 @@ export const convertModuleMediaRelay = (mediaRelay: any) => {
             id: media.id,
             kind: media.id?.startsWith('v_') ? 'video' : 'image',
             uri: media.uri,
-            thumbnail: media.thumbnail,
+            thumbnail: media.smallThumbnail,
             smallUri: media.smallURI,
             width: media.width ?? 0,
             height: media.height ?? 0,
@@ -351,4 +351,32 @@ export const hasCardModuleMediasError = (
     }
   }
   return false;
+};
+
+const { height: viewportHeight } = Dimensions.get('window');
+
+/**
+ * The function `isInViewport` determines if a module media is within the viewport or partially visible based
+ * on scroll position and module dimensions.
+ * The `scrollPosition` parameter represents the current scroll position of the viewport.
+ */
+export const isCardModuleMediaInViewport = (
+  scrollPosition: number,
+  modulePosition: number,
+  moduleHeight: number,
+): boolean => {
+  const viewportTop = scrollPosition;
+  const viewportBottom = scrollPosition + viewportHeight;
+
+  const moduleTop = modulePosition;
+  const moduleBottom = modulePosition + moduleHeight;
+
+  // Check if the module is within the viewport or just before or after it
+  return (
+    (moduleTop >= viewportTop && moduleTop <= viewportBottom) ||
+    (moduleBottom >= viewportTop && moduleBottom <= viewportBottom) ||
+    (moduleTop <= viewportTop && moduleBottom >= viewportBottom) ||
+    (moduleTop <= viewportTop && moduleBottom >= viewportTop) ||
+    (moduleTop <= viewportBottom && moduleBottom >= viewportBottom)
+  );
 };

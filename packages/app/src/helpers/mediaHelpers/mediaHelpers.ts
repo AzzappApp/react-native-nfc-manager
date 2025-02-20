@@ -1,11 +1,10 @@
-import ReactNativeBlobUtil from 'react-native-blob-util';
+import * as Sentry from '@sentry/react-native';
+import { Paths, Directory, File } from 'expo-file-system/next';
+import { Platform } from 'react-native';
 import ImageSize from 'react-native-image-size';
-import { getFileExtension } from '#helpers/fileHelpers';
+import { getFileExtension, isFileURL } from '#helpers/fileHelpers';
+import { copyAsset } from './NativeMediaHelpers';
 import type { SourceMedia } from './mediaTypes';
-import type {
-  FetchBlobResponse,
-  StatefulPromise,
-} from 'react-native-blob-util';
 
 /**
  * Returns the size of an image.
@@ -44,87 +43,63 @@ export const formatVideoTime = (timeInSeconds = 0) => {
   return `${display2digit(minutes)}:${display2digit(seconds)}`;
 };
 
-/**
- * It takes a width and height, and returns a new width and height that are scaled down to fit within a
- * maximum dimension
- * @param {number} width - The width of the image
- * @param {number} height - The height of the image
- * @param {number} maxDimension - The maximum width or height of the image.
- * @returns An object with two properties, width and height.
- */
-export const downScaleImage = (
-  width: number,
-  height: number,
-  maxDimension: number,
-) => {
-  if (width <= maxDimension && height <= maxDimension) {
-    return { width, height };
-  }
-  const ratio = maxDimension / Math.max(width, height);
-  return {
-    width: width * ratio,
-    height: height * ratio,
-  };
-};
-
 export const isPNG = (uri: string) => uri.toLowerCase().endsWith('.png');
+
+export const FILE_CACHE_DIR = `${Paths.cache.uri}files`;
 
 export const downloadRemoteFileToLocalCache = (
   uri: string,
   abortSignal?: AbortSignal,
-): Promise<string | null> => {
+  targetFile?: File,
+) => {
   let canceled = false;
-  let promise: StatefulPromise<FetchBlobResponse> | null = null;
 
   abortSignal?.addEventListener(
     'abort',
     () => {
       canceled = true;
-      promise?.cancel();
     },
     { once: true },
   );
 
   const innerFetch = async () => {
-    const ext = getFileExtension(uri);
-    promise = ReactNativeBlobUtil.config({
-      fileCache: true,
-      appendExt: ext ?? undefined,
-    }).fetch('GET', uri);
-
-    return promise.then(
-      response => {
+    try {
+      if (targetFile) {
+        const file = await File.downloadFileAsync(uri, targetFile);
         if (canceled) {
           return null;
         }
-        return response.path();
-      },
-      error => {
+        return new File(file.uri);
+      } else {
+        const targetDirectory = new Directory(FILE_CACHE_DIR);
+        if (!targetDirectory.exists) {
+          targetDirectory.create();
+        }
+        const file = await File.downloadFileAsync(uri, targetDirectory);
         if (canceled) {
           return null;
         }
-        throw error;
-      },
-    );
+        return new File(file.uri);
+      }
+    } catch (err) {
+      if (canceled) {
+        return null;
+      }
+      throw err;
+    }
   };
 
   return innerFetch();
 };
 
-export const COVER_CACHE_DIR = `${ReactNativeBlobUtil.fs.dirs.CacheDir}/covers`;
-export const MODULES_CACHE_DIR = `${ReactNativeBlobUtil.fs.dirs.CacheDir}/modules`;
-
-const checkMediaCacheDirPromise: Record<string, Promise<void> | null> = {};
+export const COVER_CACHE_DIR = `${Paths.cache.uri}covers`;
+export const MODULES_CACHE_DIR = `${Paths.cache.uri}modules`;
 
 const checkMediaCacheDir = (cacheDir: string) => {
-  if (!checkMediaCacheDirPromise[cacheDir]) {
-    checkMediaCacheDirPromise[cacheDir] = (async () => {
-      if (!(await ReactNativeBlobUtil.fs.exists(cacheDir))) {
-        await ReactNativeBlobUtil.fs.mkdir(cacheDir);
-      }
-    })();
+  const directory = new Directory(cacheDir);
+  if (!directory.exists) {
+    directory.create();
   }
-  return checkMediaCacheDirPromise[cacheDir];
 };
 
 const copyPromises: Record<string, Promise<string | null>> = {};
@@ -134,36 +109,72 @@ const copyCoverMediaToCacheDirInternal = async (
   cacheDir: string,
   abortSignal?: AbortSignal,
 ): Promise<string | null> => {
-  await checkMediaCacheDir(cacheDir);
+  checkMediaCacheDir(cacheDir);
   let ext = getFileExtension(media.uri);
 
   if (!ext && media.kind === 'video') {
     ext = 'mp4';
   }
   const sanitizedId = media.id.replace(/[^a-z0-9]/gi, '_');
-  const filename = `${sanitizedId}${ext ? `.${ext}` : ''}`;
-  const resultPath = `${cacheDir}/${filename}`;
-  if (await ReactNativeBlobUtil.fs.exists(resultPath)) {
-    return filename;
+  const resultPath = `${cacheDir}/${sanitizedId}${ext ? `.${ext}` : ''}`;
+  const file = new File(resultPath);
+  if (file.exists) {
+    return file.name;
   }
-  let oldPath;
-  if (media.uri && media.uri.startsWith('file:///android_asset')) {
-    oldPath = ReactNativeBlobUtil.fs.asset(
-      media.uri.replace('file:///android_asset/', ''),
+
+  if (isFileURL(media.uri)) {
+    try {
+      const oldFile = new File(media.uri);
+      if (!oldFile.exists) {
+        return null;
+      }
+
+      oldFile.copy(file);
+      return file.name;
+    } catch (e) {
+      Sentry.captureException(e, {
+        extra: {
+          label: 'copyCoverMediaToCacheDirInternal',
+          url: media.uri,
+          media,
+        },
+      });
+      throw e;
+    }
+  }
+
+  if (!media.uri.startsWith('http') && Platform.OS === 'android') {
+    // on android media asset has a specific case in release mode (for cover_overlay_placeholder_logo.png)
+    const result = await copyAsset(
+      media.uri,
+      cacheDir.replace(Paths.cache.uri, ''),
     );
-  } else if (media.uri && media.uri.startsWith('file://')) {
-    oldPath = media.uri.replace('file://', '');
-    if (!(await ReactNativeBlobUtil.fs.exists(oldPath))) {
-      return null;
-    }
-  } else {
-    oldPath = await downloadRemoteFileToLocalCache(media.uri, abortSignal);
-    if (!oldPath) {
-      return null;
-    }
+
+    const file = new File(result);
+    return file.name;
   }
-  await ReactNativeBlobUtil.fs.cp(oldPath, resultPath);
-  return filename;
+
+  try {
+    const resultFile = await downloadRemoteFileToLocalCache(
+      media.uri,
+      abortSignal,
+      file,
+    );
+    if (resultFile) {
+      return file.name;
+    }
+  } catch (e) {
+    Sentry.captureException(e, {
+      extra: {
+        label: 'copyCoverMediaToCacheDirInternalDownload',
+        url: media.uri,
+        media,
+      },
+    });
+    throw e;
+  }
+
+  return null;
 };
 
 export const copyCoverMediaToCacheDir = (

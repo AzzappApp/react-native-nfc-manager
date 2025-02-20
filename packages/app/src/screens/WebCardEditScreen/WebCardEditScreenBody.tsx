@@ -1,6 +1,4 @@
-import isEqual from 'lodash/isEqual';
 import memoize from 'lodash/memoize';
-import omit from 'lodash/omit';
 import {
   forwardRef,
   memo,
@@ -31,13 +29,14 @@ import { colors } from '#theme';
 import CardModuleRenderer from '#components/cardModules/CardModuleRenderer';
 import { useModulesData } from '#components/cardModules/ModuleData';
 import { useRouter, useSuspendUntilAppear } from '#components/NativeRouter';
-import { isModuleVariantSupported } from '#helpers/cardModuleRouterHelpers';
 import { createId } from '#helpers/idHelpers';
-import useScreenDimensions from '#hooks/useScreenDimensions';
+import {
+  isModuleVariantSupported,
+  type ModuleKindWithVariant,
+} from '#helpers/webcardModuleHelpers';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import WebCardEditBlockContainer from './WebCardEditBlockContainer';
 import type { ModuleRenderInfo } from '#components/cardModules/CardModuleRenderer';
-import type { ModuleKindWithVariant } from '#helpers/webcardModuleHelpers';
 import type { WebCardEditScreenBody_webCard$key } from '#relayArtifacts/WebCardEditScreenBody_webCard.graphql';
 import type { WebCardEditScreenBodyDeleteModuleMutation } from '#relayArtifacts/WebCardEditScreenBodyDeleteModuleMutation.graphql';
 import type {
@@ -82,10 +81,6 @@ export type WebCardEditScreenBodyProps = {
    */
   selectionModeTransition: DerivedValue<number>;
   /**
-   * Wether the edit screen is displayed
-   */
-  editing: boolean;
-  /**
    * A callback called when the user press a module block in edit mode
    */
   onEditModule: (module: ModuleKindWithVariant & { moduleId: string }) => void;
@@ -118,7 +113,6 @@ const WebCardEditScreenBody = (
     webCard,
     selectionMode,
     selectionModeTransition,
-    editing,
     onEditModule,
     onSelectionStateChange,
     onLoad,
@@ -171,7 +165,12 @@ const WebCardEditScreenBody = (
   );
 
   const cardModuleFiltered = useMemo(() => {
-    return cardModules.filter(module => isModuleVariantSupported(module));
+    return cardModules.filter(module =>
+      isModuleVariantSupported({
+        moduleKind: module.kind,
+        variant: module.variant,
+      }),
+    );
   }, [cardModules]);
 
   useSuspendUntilAppear(Platform.OS === 'android');
@@ -721,7 +720,7 @@ const WebCardEditScreenBody = (
     const blockId = module.id;
 
     return (
-      <WebCardModule
+      <WebCardModuleMemo
         key={blockId}
         module={module}
         canMove={canReorder}
@@ -739,7 +738,6 @@ const WebCardEditScreenBody = (
         coverBackgroundColor={coverBackgroundColor}
         scrollPosition={scrollPosition}
         selectionModeTransition={selectionModeTransition}
-        editing={editing}
         {...getModuleCallbacks({
           moduleId: module.id,
           moduleKind: module.kind,
@@ -756,58 +754,36 @@ const WebCardModule = ({
   cardStyle,
   coverBackgroundColor,
   scrollPosition,
-  editing,
   ...props
 }: Omit<WebCardEditBlockContainerProps, 'children' | 'id'> & {
   module: ModuleRenderInfo & { id: string; visible: boolean };
   cardColors?: ColorPalette | null;
   cardStyle?: CardStyle | null;
   coverBackgroundColor?: string | null;
-  editing: boolean;
   scrollPosition: RNAnimated.Value;
-}) => {
-  const { height: screenHeight } = useScreenDimensions();
-  return (
-    <WebCardEditBlockContainerMemo
-      id={module.id}
-      {...props}
-      maxEditHeight={screenHeight}
-      extraData={{
-        cardStyle,
-        cardColors,
-        module,
-      }}
-    >
-      <CardModuleRenderer
-        module={module}
-        colorPalette={cardColors}
-        cardStyle={cardStyle}
-        coverBackgroundColor={coverBackgroundColor}
-        scrollPosition={scrollPosition}
-        modulePosition={0}
-        webCardViewMode="edit"
-        canPlay={editing}
-      />
-      {module.id.includes(TEMP_ID_PREFIX) && (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator color="white" style={styles.loading} />
-        </View>
-      )}
-    </WebCardEditBlockContainerMemo>
-  );
-};
+}) => (
+  <WebCardEditBlockContainer id={module.id} {...props}>
+    <CardModuleRenderer
+      module={module}
+      colorPalette={cardColors}
+      cardStyle={cardStyle}
+      coverBackgroundColor={coverBackgroundColor}
+      scrollPosition={scrollPosition}
+      modulePosition={0}
+      webCardViewMode="edit"
+      canPlay={false}
+    />
+    {module.id.includes(TEMP_ID_PREFIX) && (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator color="white" style={styles.loading} />
+      </View>
+    )}
+  </WebCardEditBlockContainer>
+);
+
+const WebCardModuleMemo = memo(WebCardModule);
 
 export default memo(forwardRef(WebCardEditScreenBody));
-
-// Perhaps a premature optimization, but with all the animations going on, it's better to memoize this component
-// so that it doesn't re-render unnecessarily
-const WebCardEditBlockContainerMemo: React.FC<
-  WebCardEditBlockContainerProps & {
-    extraData?: any;
-  }
-> = memo(WebCardEditBlockContainer, (prev, next) => {
-  return isEqual(omit(prev, 'children'), omit(next, 'children'));
-});
 
 const styles = StyleSheet.create({
   loadingContainer: {

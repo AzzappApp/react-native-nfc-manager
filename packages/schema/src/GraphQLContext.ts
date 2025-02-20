@@ -1,6 +1,7 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 import type * as externalsFunctions from './externals';
 import type { Locale } from '@azzapp/i18n';
+import type { IntlShape } from '@formatjs/intl';
 import type { IMiddleware } from 'graphql-middleware';
 
 export type GraphQLContext = {
@@ -10,6 +11,7 @@ export type GraphQLContext = {
     userId?: string;
   };
   locale: Locale;
+  intl: IntlShape;
 };
 
 const storage = new AsyncLocalStorage<GraphQLContext>();
@@ -66,6 +68,7 @@ export const resetSessionResourceAfterMutationMiddleware: IMiddleware = async (
   info,
 ) => {
   const result = await resolve(parent, args, context, info);
+
   if (info.parentType.name === 'Mutation') {
     delete context[sessionMemoizedSymbol];
   }

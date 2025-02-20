@@ -7,7 +7,14 @@
       "#*": ["./src/*"]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.json"],
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.js",
+    "**/*.jsx",
+    "**/*.json",
+    "../shared/src/CountryFlag.ts"
+  ],
   "exclude": [
     ".bundle",
     "android",

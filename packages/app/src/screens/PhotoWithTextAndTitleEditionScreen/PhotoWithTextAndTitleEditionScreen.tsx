@@ -1,7 +1,7 @@
 import omit from 'lodash/omit';
 import { startTransition, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Platform, StyleSheet } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
@@ -31,12 +31,12 @@ import {
   getTargetFormatFromPath,
   saveTransformedImageToFile,
 } from '#helpers/mediaEditions';
-import { downScaleImage } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
+import { downScaleImage } from '#helpers/resolutionHelpers';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
-import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
+import { BOTTOM_MENU_HEIGHT, BOTTOM_MENU_PADDING } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
@@ -464,7 +464,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
         const fileName = getFileName(updateImage.uri);
         const file: any = {
           name: fileName,
-          uri: `file://${updateImage.uri}`,
+          uri: updateImage.uri,
           type: 'image/jpeg',
         };
 
@@ -785,15 +785,15 @@ const PhotoWithTextAndTitleEditionScreen = ({
           </>
         }
       />
-
-      <PhotoWithTextAndTitleEditionBottomMenu
-        currentTab={currentTab}
-        onItemPress={onCurrentTabChange}
-        style={[
-          styles.tabsBar,
-          { bottom: insetBottom, width: windowWidth - 20 },
-        ]}
-      />
+      <View
+        style={[styles.tabsBar, { bottom: insetBottom - BOTTOM_MENU_PADDING }]}
+      >
+        <PhotoWithTextAndTitleEditionBottomMenu
+          currentTab={currentTab}
+          onItemPress={onCurrentTabChange}
+          style={{ width: windowWidth - 20 }}
+        />
+      </View>
       <ScreenModal
         visible={showImagePicker}
         onRequestDismiss={onImagePickerCancel}
@@ -828,8 +828,8 @@ const styles = StyleSheet.create({
   },
   tabsBar: {
     position: 'absolute',
-    left: 10,
-    right: 10,
+    left: 0,
+    right: 0,
   },
   counter: {
     marginTop: 5,

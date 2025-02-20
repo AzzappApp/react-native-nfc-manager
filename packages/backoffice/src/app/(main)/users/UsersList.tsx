@@ -125,8 +125,10 @@ const UsersList = ({
       </Typography>
       <TextField
         id="note"
-        inputProps={{
-          readOnly: true,
+        slotProps={{
+          htmlInput: {
+            readOnly: true,
+          },
         }}
         label="Note"
         multiline
@@ -208,13 +210,13 @@ const columns: GridColDef[] = [
     field: 'email',
     headerName: 'Email',
     flex: 1,
-    valueFormatter: params => params.value || '-',
+    valueFormatter: value => value || '-',
   },
   {
     field: 'phoneNumber',
     headerName: 'Phone number',
     flex: 1,
-    valueFormatter: params => params.value || '-',
+    valueFormatter: value => value || '-',
   },
   {
     field: 'status',

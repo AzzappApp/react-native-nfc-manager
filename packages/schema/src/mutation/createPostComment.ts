@@ -2,7 +2,10 @@ import { GraphQLError } from 'graphql';
 import { getPostByIdWithMedia, createPostComment } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { webCardLoader } from '#loaders';
-import { checkWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
+import {
+  checkWebCardHasCover,
+  checkWebCardProfileEditorRight,
+} from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 
@@ -15,6 +18,7 @@ const createPostCommentMutation: MutationResolvers['createPostComment'] =
     const postId = fromGlobalIdWithType(gqlPostId, 'Post');
 
     await checkWebCardProfileEditorRight(webCardId);
+    await checkWebCardHasCover(webCardId);
 
     const post = await getPostByIdWithMedia(postId);
     if (!post?.allowComments) throw new GraphQLError(ERRORS.INVALID_REQUEST);

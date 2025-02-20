@@ -41,6 +41,7 @@ const CardModuleMediaParallax = ({
     webCardViewMode === 'edit'
       ? cardModuleMedias.slice(0, 1)
       : cardModuleMedias;
+
   return (
     <View onLayout={onLayout}>
       {items.map(({ media }, index) => {

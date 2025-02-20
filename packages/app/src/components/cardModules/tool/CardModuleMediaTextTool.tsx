@@ -1,9 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
-import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import { isNotFalsyString, isValidUrl } from '@azzapp/shared/stringHelpers';
-import { colors } from '#theme';
 import { MediaImageRenderer } from '#components/medias';
 import ToolBoxSection from '#components/Toolbar/ToolBoxSection';
 import { hasCardModuleMediaError } from '#helpers/cardModuleHelpers';
@@ -11,7 +9,8 @@ import useBoolean from '#hooks/useBoolean';
 import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import BottomSheetTextInput from '#ui/BottomSheetTextInput';
-import Header, { HEADER_HEIGHT } from '#ui/Header';
+import Header from '#ui/Header';
+import HeaderButton from '#ui/HeaderButton';
 import Text from '#ui/Text';
 import {
   DEFAULT_CARD_MODULE_TEXT,
@@ -24,12 +23,14 @@ type CardModuleMediaTextToolProps<T extends ModuleKindAndVariant> = {
   module: T;
   cardModuleMedia: CardModuleMedia;
   onUpdateMedia: (cmm: CardModuleMedia) => void;
+  index: number;
 };
 
 const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
   module,
   cardModuleMedia,
   onUpdateMedia,
+  index,
 }: CardModuleMediaTextToolProps<T>) => {
   const intl = useIntl();
   const [show, open, close] = useBoolean(false);
@@ -84,7 +85,7 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
   };
 
   // onDone should check the url is valid and not close the popup
-  const onDone = () => {
+  const onDone = useCallback(() => {
     if (isNotFalsyString(linkUrl)) {
       const url = convertUrlLink(linkUrl);
       if (module.moduleKind === 'mediaTextLink') {
@@ -96,7 +97,7 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
     }
     //closing will call ondismiss and save(don't want to create a double save )
     close();
-  };
+  }, [close, linkUrl, module.moduleKind]);
 
   const { top: topInset } = useScreenInsets();
 
@@ -130,39 +131,63 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
           module.moduleKind === 'mediaTextLink' ? 'fillParent' : 'interactive'
         }
       >
-        <ScrollView style={styles.container} bounces={false}>
+        <View style={styles.container}>
           <Header
-            middleElement={intl.formatMessage({
-              defaultMessage: 'Design',
-              description: 'CardModuleDesignTool - Bottom Sheet header',
-            })}
+            middleElement={
+              module.moduleKind === 'mediaText'
+                ? intl.formatMessage(
+                    {
+                      defaultMessage: 'Media #{index}',
+                      description:
+                        'CardModuleDesignTool - Bottom Sheet header mediaText',
+                    },
+
+                    { index: index + 1 },
+                  )
+                : intl.formatMessage(
+                    {
+                      defaultMessage: 'Link #{index}',
+                      description:
+                        'CardModuleDesignTool - Bottom Sheet header mediaTextLink',
+                    },
+
+                    { index: index + 1 },
+                  )
+            }
             style={styles.header}
             rightElement={
-              <TouchableOpacity onPress={onDone} style={styles.doneButton}>
-                <Text variant="button" style={{ color: colors.white }}>
-                  <FormattedMessage
-                    defaultMessage="Done"
-                    description="CardMOduleMediaTextTool - Done header button label"
-                  />
-                </Text>
-              </TouchableOpacity>
+              <HeaderButton
+                onPress={onDone}
+                label={intl.formatMessage({
+                  defaultMessage: 'Done',
+                  description:
+                    'CardModuleMediaTextTool - Done header button label',
+                })}
+                style={styles.headerButton}
+              />
             }
           />
-          {module.moduleKind === 'mediaTextLink' && (
-            <View style={{ flexDirection: 'row', gap: 10 }}>
-              <MediaImageRenderer
-                source={{
-                  uri:
-                    cardModuleMedia.media.galleryUri ??
-                    cardModuleMedia.media.smallThumbnail ??
-                    cardModuleMedia.media.thumbnail ??
-                    cardModuleMedia.media.uri,
-                  requestedSize: 66,
-                  mediaId: cardModuleMedia.media.id,
-                }}
-                fit="cover"
-                style={styles.previewContent}
-              />
+
+          <View
+            style={[
+              styles.previewImageContainer,
+              module.moduleKind === 'mediaText' ? { alignSelf: 'center' } : {},
+            ]}
+          >
+            <MediaImageRenderer
+              source={{
+                uri:
+                  cardModuleMedia.media.galleryUri ??
+                  cardModuleMedia.media.smallThumbnail ??
+                  cardModuleMedia.media.thumbnail ??
+                  cardModuleMedia.media.uri,
+                requestedSize: 66,
+                mediaId: cardModuleMedia.media.id,
+              }}
+              fit="cover"
+              style={styles.previewContent}
+            />
+            {module.moduleKind === 'mediaTextLink' && (
               <View style={{ flex: 1 }}>
                 <BottomSheetTextInput
                   placeholder={intl.formatMessage({
@@ -186,14 +211,16 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
                   </Text>
                 ) : null}
               </View>
-            </View>
-          )}
+            )}
+          </View>
+
           <Text variant="button" style={{ paddingTop: 10, paddingBottom: 5 }}>
             <FormattedMessage
               defaultMessage="Title & description"
               description="CardModuleMediaTextTool - Title and description"
             />
           </Text>
+
           <BottomSheetTextInput
             multiline
             placeholder={intl.formatMessage({
@@ -232,7 +259,7 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
               />
             </>
           )}
-        </ScrollView>
+        </View>
       </BottomSheetModal>
     </>
   );
@@ -259,27 +286,20 @@ const isVisible = (module: ModuleKindAndVariant) => {
 export default CardModuleMediaTextTool;
 
 const styles = StyleSheet.create({
-  doneButton: {
-    width: 74,
-    height: HEADER_HEIGHT,
-    paddingHorizontal: 0,
-    backgroundColor: colors.black,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 12,
-    borderCurve: 'continuous',
-    overflow: 'hidden',
-  },
   container: {
     paddingHorizontal: 16,
     overflow: 'visible',
+    flex: 1,
   },
-  header: { marginBottom: 15 },
+  header: { marginBottom: 15, paddingHorizontal: 0 },
+  headerButton: {
+    pointerEvents: 'box-only',
+  },
   textAction: { paddingTop: 10, paddingBottom: 5 },
   titleStyle: { borderWidth: 0, height: 50 },
   textStyle: {
     borderWidth: 0,
-    height: 200,
+    flex: 1,
     marginTop: 10,
     verticalAlign: 'top',
   },
@@ -288,4 +308,5 @@ const styles = StyleSheet.create({
     width: 47,
     borderRadius: 8,
   },
+  previewImageContainer: { flexDirection: 'row', gap: 10 },
 });

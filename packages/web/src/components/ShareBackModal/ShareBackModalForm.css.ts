@@ -7,6 +7,7 @@ const content = style({
   flexDirection: 'column',
   flex: 1,
   maxHeight: '100%',
+  overflow: 'hidden',
 });
 
 const formFields = style({
@@ -30,11 +31,13 @@ const formSpacingInner = style({
 });
 
 const form = style({
+  position: 'relative',
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
   maxHeight: 'calc(100% - 310px)',
   overflowY: 'auto',
+  paddingBottom: 70,
 });
 
 const formFieldContainer = style([
@@ -100,11 +103,14 @@ const formInput = style({
   width: '100%',
 });
 
-const formButtonSuccess = style({});
+const formButtonSuccess = style({ opacity: 1 });
+const formButtonDisabled = style({ opacity: 0.3 });
 const formButton = style({
-  margin: '25px auto 0',
   transition: 'all 400ms cubic-bezier(.47,1.64,.41,.8)',
-  border: 0,
+  backgroundColor: vars.color.grey1000,
+  borderRadius: 45,
+  border: `2px solid ${vars.color.black}`,
+  boxShadow: '0px 10px 10px 0px rgba(0, 0, 0, 0.20)',
   // mandatory to create an animation effect on the button width
   maxWidth: '325px',
   width: '80%',
@@ -118,7 +124,6 @@ const formButton = style({
       margin: '25px auto 0',
       backgroundColor: vars.color.green,
       border: `2px solid ${vars.color.green}`,
-      marginBottom: 20,
     },
   },
 });
@@ -137,6 +142,9 @@ const formButtonLabel = style({
 });
 
 const formButtonSuccessContainer = style({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
   width: '32px',
   height: '32px',
   fill: 'white',
@@ -155,25 +163,30 @@ const formButtonSuccessContainer = style({
 });
 
 const formButtonSuccessSvg = style({
-  marginTop: '50%',
-  marginLeft: '-110%',
   width: '32px',
   height: '32px',
   opacity: 1,
   visibility: 'visible',
-  transform: 'translateY(-50%) scale(1)',
   transition: 'all 0.4s',
 
   selectors: {
     [`:not(${formButtonSuccess})&`]: {
       fill: 'white',
-      transformOrigin: '50% 50%',
-      transform: 'translateY(-100%) rotate(0deg) scale(0)',
       transition: 'all 0.4',
       opacity: 0,
       visibility: 'hidden',
     },
   },
+});
+
+const formButtonContainer = style({
+  position: 'absolute',
+  bottom: 0,
+  display: 'flex',
+  width: '100%',
+  justifyContent: 'center',
+  alignItems: 'center',
+  padding: '15px 0px',
 });
 
 const styles = {
@@ -186,9 +199,11 @@ const styles = {
   formInput,
   formButton,
   formButtonSuccess,
+  formButtonDisabled,
   formButtonLabel,
   formButtonSuccessContainer,
   formButtonSuccessSvg,
+  formButtonContainer,
 };
 
 export default styles;

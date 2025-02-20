@@ -143,6 +143,7 @@ export const getEntitiesByIds = async <T extends Entity>(
       .where(eq(entitiesTable[entity].id, ids[0]));
     return [(entityById[0] as any) ?? null];
   }
+
   return sortEntitiesByIds(
     ids,
     (await db()

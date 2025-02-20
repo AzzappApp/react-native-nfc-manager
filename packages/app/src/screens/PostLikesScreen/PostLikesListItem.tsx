@@ -4,8 +4,8 @@ import { FormattedMessage } from 'react-intl';
 import { View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { colors } from '#theme';
-import CoverLinkRenderer from '#components/CoverLink/CoverLinkRenderer';
-import LinkWebCard from '#components/LinkWebCard';
+import CoverRenderer from '#components/CoverRenderer';
+import Link from '#components/Link';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import useToggleFollow from '#hooks/useToggleFollow';
@@ -28,7 +28,6 @@ const PostLikesListItem = ({ webcard: webcardKey }: Props) => {
         cardIsPublished
         isFollowing(webCardId: $viewerWebCardId)
         ...CoverRenderer_webCard
-        ...useCoverLinkRendererFragment_webCard
       }
     `,
     webcardKey,
@@ -50,16 +49,15 @@ const PostLikesListItem = ({ webcard: webcardKey }: Props) => {
   return (
     <View style={styles.item}>
       <View style={styles.content}>
-        <LinkWebCard
+        <Link
+          route="WEBCARD"
           disabled={webCard.cardIsPublished === false}
-          params={{ userName: webCard.userName, webCardId: webCard.id }}
+          params={{ webCardId: webCard.id }}
         >
           <PressableNative style={styles.profile}>
-            <CoverLinkRenderer
+            <CoverRenderer
               webCard={webCard}
               width={COVER_WIDTH}
-              webCardId={webCard.id}
-              userName={webCard.userName}
               canPlay={false}
             />
             <View>
@@ -68,7 +66,7 @@ const PostLikesListItem = ({ webcard: webcardKey }: Props) => {
               </Text>
             </View>
           </PressableNative>
-        </LinkWebCard>
+        </Link>
         {profileInfos?.webCardId !== webCard.id && webCard.userName && (
           <PressableNative onPress={onToggleFollow}>
             {!webCard.isFollowing && (

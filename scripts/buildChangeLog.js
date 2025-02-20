@@ -9,7 +9,7 @@ const loadCommits = rev => {
   const inner = Date.now();
   const outer = inner - 1;
 
-  // How the output shoud look like
+  // How the output should look like
   const spec = ['s', 'n', 'ae', 'b'];
   const format = `${inner}%${spec.join(`${inner}%`)}${outer}`;
 
@@ -76,11 +76,43 @@ const formatCommit = ({ scope, message, type }) => {
 
 const BREAKING_CHANGE_PATTERN = /BREAKING CHANGE/g;
 
+/**
+ * Find the most recent commit hash where the commit message starts with the given prefix.
+ *
+ * @param {string} prefix The commit message prefix (e.g., "chore(ci):")
+ * @returns {Promise<string|null>} A promise that resolves with the commit hash or null if not found.
+ */
+const findCommitByPrefix = prefix => {
+  const repoPath = path.join(process.cwd(), '.git');
+  return new Promise((resolve, reject) => {
+    let dataStr = '';
+    const stream = gitStream(repoPath, [
+      'log',
+      '--grep',
+      `^${prefix}`,
+      '-n',
+      '1',
+      '--format=%H',
+    ]);
+    stream.on('data', data => {
+      dataStr += data.toString('utf8');
+    });
+    stream.on('error', err => {
+      reject(err);
+    });
+    stream.on('end', () => {
+      const commitHash = dataStr.trim();
+      resolve(commitHash || null);
+    });
+  });
+};
+
 module.exports = async function buildChangeLog(
   prerelease = false,
   majorInc = false,
   group = true,
   nextVersion = null,
+  commitPrefix = null, // optionally override the commit range
 ) {
   const currentVersion = pkg.version;
   console.log('Checking previous versions...');
@@ -94,8 +126,36 @@ module.exports = async function buildChangeLog(
 
   const lastTag = tags?.shift();
 
-  console.log('Retriving commits...');
-  const commits = await loadCommits(lastTag ? `${lastTag.hash}..HEAD` : null);
+  let rev = null;
+
+  // If a commitPrefix is provided, try to use the last commit whose message starts with that prefix.
+  if (commitPrefix) {
+    console.log(
+      `Searching for last commit with message starting with "${commitPrefix}"...`,
+    );
+    const commitHash = await findCommitByPrefix(commitPrefix);
+    if (commitHash) {
+      rev = `${commitHash}..HEAD`;
+      console.log(
+        `Using commit ${commitHash} (message starts with "${commitPrefix}") as the changelog start point.`,
+      );
+    } else {
+      console.log(
+        `No commit found with message starting with "${commitPrefix}".`,
+      );
+    }
+  }
+
+  // Fallback: if no commit range was defined via commitPrefix, use the last tag.
+  if (!rev) {
+    rev = lastTag ? `${lastTag.hash}..HEAD` : null;
+    if (lastTag) {
+      console.log(`Using tag ${lastTag.version} as the changelog start point.`);
+    }
+  }
+
+  console.log('Retrieving commits...');
+  const commits = await loadCommits(rev);
 
   if (nextVersion == null) {
     console.log('Determining version and building change log...');
@@ -144,7 +204,7 @@ module.exports = async function buildChangeLog(
       if (!match) {
         return acc;
       }
-      const [, type, scope, message] = commit.title.match(commitPattern);
+      const [, type, scope, message] = match;
 
       if (!acc[type]) {
         acc[type] = [];
@@ -177,7 +237,7 @@ module.exports = async function buildChangeLog(
           if (!match) {
             return null;
           }
-          const [, type, scope, message] = commit.title.match(commitPattern);
+          const [, type, scope, message] = match;
           if (type === 'chore') {
             return null;
           }

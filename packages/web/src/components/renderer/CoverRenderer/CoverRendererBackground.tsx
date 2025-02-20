@@ -18,6 +18,7 @@ const CoverRendererBackground = ({ media }: CoverRendererBackgroundProps) => {
       <div
         className={cn(styles.coverMedia, styles.backgroundMedia)}
         style={{
+          backgroundAttachment: 'fixed',
           backgroundImage: `url(${getCldImageUrl({
             src: media.id,
             assetType: media.kind,

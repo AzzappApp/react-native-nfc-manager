@@ -234,7 +234,7 @@ const TransitionPreview = ({
   });
 
   return (
-    <Canvas style={{ width, height }} opaque>
+    <Canvas style={{ width, height }}>
       <SkiaImage image={image} x={0} y={0} width={width} height={height} />
     </Canvas>
   );

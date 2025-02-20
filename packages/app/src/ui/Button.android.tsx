@@ -1,4 +1,4 @@
-import { forwardRef, useMemo } from 'react';
+import { forwardRef } from 'react';
 import { useColorScheme, View } from 'react-native';
 import { Pressable as PressableGestureHandler } from 'react-native-gesture-handler';
 import { colors } from '#theme';
@@ -60,16 +60,7 @@ const Button = (
 
   const buttonProps = {
     accessibilityRole: 'button',
-    children: loading ? (
-      <ActivityIndicator color={color} />
-    ) : (
-      <View style={variantStyles.labelContainer}>
-        <Text variant="button" style={variantStyles.label} numberOfLines={1}>
-          {label}
-        </Text>
-        {rightElement}
-      </View>
-    ),
+
     accessibilityState: {
       disabled: disabled ?? false,
       busy: loading ?? false,
@@ -79,28 +70,28 @@ const Button = (
     ...props,
   } as const;
 
-  const buttonStyle = useMemo(
-    () => [
-      variantStyles.androidContainer,
-      style,
-      variantStyles.androidNoPadding,
-    ],
-    [style, variantStyles.androidContainer, variantStyles.androidNoPadding],
-  );
-
   return (
-    <View style={buttonStyle}>
-      <PressableGestureHandler
-        {...buttonProps}
-        onPress={props.onPress}
-        style={[variantStyles.root, style, disabled && variantStyles.disabled]}
-        android_ripple={{
-          borderless: false,
-          foreground: true,
-          color: highlightColor,
-        }}
-      />
-    </View>
+    <PressableGestureHandler
+      {...buttonProps}
+      onPress={props.onPress}
+      android_ripple={{
+        borderless: false,
+        foreground: true,
+        color: highlightColor,
+      }}
+      style={[variantStyles.root, style, disabled && variantStyles.disabled]}
+    >
+      {loading ? (
+        <ActivityIndicator color={color} />
+      ) : (
+        <View style={variantStyles.labelContainer}>
+          <Text variant="button" style={variantStyles.label} numberOfLines={1}>
+            {label}
+          </Text>
+          {rightElement}
+        </View>
+      )}
+    </PressableGestureHandler>
   );
 };
 
@@ -126,6 +117,7 @@ const computedStyles = createVariantsStyleSheet(appearance => ({
     },
     label: {
       flexWrap: 'nowrap',
+      lineHeight: 18,
     },
     androidContainer: {
       borderRadius: 12,

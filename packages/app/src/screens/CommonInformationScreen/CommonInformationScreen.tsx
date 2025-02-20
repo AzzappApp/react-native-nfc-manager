@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Controller, useController, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Pressable, View } from 'react-native';
+import { Image as ImageCompressor } from 'react-native-compressor';
 import ImageSize from 'react-native-image-size';
 import * as mime from 'react-native-mime-types';
 import Toast from 'react-native-toast-message';
@@ -24,6 +25,10 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getFileName } from '#helpers/fileHelpers';
 import { saveTransformedImageToFile } from '#helpers/mediaEditions';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
+import {
+  getPhonenumberWithCountryCode,
+  parsePhoneNumber,
+} from '#helpers/phoneNumbersHelper';
 import relayScreen from '#helpers/relayScreen';
 import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';
 import LoadingScreen from '#screens/LoadingScreen';
@@ -50,6 +55,7 @@ import type { ScreenOptions } from '#components/NativeRouter';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { CommonInformationScreenQuery } from '#relayArtifacts/CommonInformationScreenQuery.graphql';
 import type { CommonInformationRoute } from '#routes';
+import type { CountryCode } from 'libphonenumber-js';
 
 const commonInformationScreenQuery = graphql`
   query CommonInformationScreenQuery($webCardId: ID!, $pixelRatio: Float!) {
@@ -117,7 +123,8 @@ export const CommonInformationScreen = ({
     defaultValues: {
       ...commonInformation,
       emails: commonInformation?.emails?.map(m => ({ ...m })) ?? [],
-      phoneNumbers: commonInformation?.phoneNumbers?.map(p => ({ ...p })) ?? [],
+      phoneNumbers:
+        commonInformation?.phoneNumbers?.map(parsePhoneNumber) ?? [],
       urls: commonInformation?.urls?.map(p => ({ ...p })) ?? [],
       addresses: commonInformation?.addresses?.map(p => ({ ...p })) ?? [],
       socials: commonInformation?.socials?.map(p => ({ ...p })) ?? [],
@@ -225,9 +232,10 @@ export const CommonInformationScreen = ({
         setProgressIndicator(Observable.from(0));
 
         const fileName = getFileName(logo.uri);
+        const compressedFileUri = await ImageCompressor.compress(logo.uri);
         const file: any = {
           name: fileName,
-          uri: logo.uri,
+          uri: compressedFileUri,
           type: mime.lookup(fileName) || 'image/jpeg',
         };
 
@@ -250,9 +258,16 @@ export const CommonInformationScreen = ({
           input: {
             ...data,
             emails: data.emails.filter(email => email.address),
-            phoneNumbers: data.phoneNumbers.filter(
-              phoneNumber => phoneNumber.number,
-            ),
+
+            phoneNumbers: data.phoneNumbers
+              ?.filter(phoneNumber => phoneNumber.number)
+              .map(({ countryCode, ...phoneNumber }) => {
+                const number = getPhonenumberWithCountryCode(
+                  phoneNumber.number,
+                  countryCode as CountryCode,
+                );
+                return { ...phoneNumber, number };
+              }),
             urls: data.urls.filter(url => url.address),
             addresses: data.addresses.filter(address => address.address),
             socials: data.socials.filter(social => social.url),

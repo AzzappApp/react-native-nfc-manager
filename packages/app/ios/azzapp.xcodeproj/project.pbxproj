@@ -3,23 +3,20 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		00E356F31AD99517003FC87E /* azzappTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* azzappTests.m */; };
 		03324426F1314697BD1C702D /* PlusJakartaSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5477301FE9F94EAFA6F8AD80 /* PlusJakartaSans-SemiBold.ttf */; };
 		0C7911CEAB478AB790C006E0 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = D98307CB348705F89E1DE6DA /* PrivacyInfo.xcprivacy */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		15FBE6E286AE91C4400740A4 /* libPods-common-azzappTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CD48F2D7A16C9B7B35A770 /* libPods-common-azzappTests.a */; };
 		24EF1F24C7124C24B202D8EA /* PlusJakartaSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = EB627C8EABFC4E8A9D4CB061 /* PlusJakartaSans-Bold.ttf */; };
 		2AA4B146474A114724333854 /* libPods-common-azzapp-staging.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A9A58D92E966BE3884BD1C2F /* libPods-common-azzapp-staging.a */; };
 		320762CF3AB74C2CADA5CB9B /* PlusJakartaSans-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 01A80455EE3041AA8310DF23 /* PlusJakartaSans-Medium.ttf */; };
 		34F769AE3F0B4F0182EF92E5 /* PlusJakartaSans-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 64C57ED191924F0A87B8A959 /* PlusJakartaSans-ExtraBold.ttf */; };
 		3EE37F939CF95920D1AF8A4D /* libPods-common-azzapp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A55BE713148562C8B54D4A6D /* libPods-common-azzapp.a */; };
-		485B1058089E3E6317DED749 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A34F8DB70ED6E8D53AFD590 /* ExpoModulesProvider.swift */; };
 		517B22092158447DB4D9807E /* HelveticaNeue-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FE48A15437D4CFB8B1E8602 /* HelveticaNeue-Bold.ttf */; };
 		51C74448A13281FB32E24633 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0773611437B756D821550543 /* ExpoModulesProvider.swift */; };
 		5DF4288E8BFC4EE5E6E388C7 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = FB58ADB2576D4F2277CBDD50 /* PrivacyInfo.xcprivacy */; };
@@ -28,6 +25,22 @@
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		92A812FC3DCC67A8944B9ED9 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E795AEC1BEAF4FE6C0E791F /* ExpoModulesProvider.swift */; };
 		96262FD52C908E57001146D7 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 96262FD42C908E57001146D7 /* GoogleService-Info.plist */; };
+		9631A3562D2EBD06008C156F /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9642B14D2D11B4F2008E236B /* SwiftUI.framework */; };
+		9631A3572D2EBD06008C156F /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9642B14B2D11B4F2008E236B /* WidgetKit.framework */; };
+		9631A3622D2EBD69008C156F /* azzappWidgetExtension-staging.appex in Embed Widget Extension */ = {isa = PBXBuildFile; fileRef = 9631A35C2D2EBD06008C156F /* azzappWidgetExtension-staging.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		96363A3C2D12EAC800A482DC /* ShareContactAppClip-dev.app in Embed App Clips */ = {isa = PBXBuildFile; fileRef = 96A9AE432C7F56CD009380FE /* ShareContactAppClip-dev.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		96363A3F2D12EBDF00A482DC /* azzappWidgetExtension-dev.appex in Embed Widget Extension */ = {isa = PBXBuildFile; fileRef = 9642B16E2D11B4FA008E236B /* azzappWidgetExtension-dev.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		9642B1402D11B4C6008E236B /* AZPWidgetKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 9642B13E2D11B4C6008E236B /* AZPWidgetKit.m */; };
+		9642B1412D11B4C6008E236B /* AZPWidgetKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9642B13F2D11B4C6008E236B /* AZPWidgetKit.swift */; };
+		9642B1422D11B4C6008E236B /* AZPWidgetKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 9642B13E2D11B4C6008E236B /* AZPWidgetKit.m */; };
+		9642B1432D11B4C6008E236B /* AZPWidgetKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9642B13F2D11B4C6008E236B /* AZPWidgetKit.swift */; };
+		9642B1442D11B4C6008E236B /* AZPWidgetKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 9642B13E2D11B4C6008E236B /* AZPWidgetKit.m */; };
+		9642B1452D11B4C6008E236B /* AZPWidgetKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9642B13F2D11B4C6008E236B /* AZPWidgetKit.swift */; };
+		9642B14C2D11B4F2008E236B /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9642B14B2D11B4F2008E236B /* WidgetKit.framework */; };
+		9642B14E2D11B4F2008E236B /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9642B14D2D11B4F2008E236B /* SwiftUI.framework */; };
+		9642B1602D11B4F3008E236B /* azzappWidgetExtension.appex in Embed WIDGET Extensions */ = {isa = PBXBuildFile; fileRef = 9642B14A2D11B4F2008E236B /* azzappWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		9642B1682D11B4FA008E236B /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9642B14D2D11B4F2008E236B /* SwiftUI.framework */; };
+		9642B1692D11B4FA008E236B /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9642B14B2D11B4F2008E236B /* WidgetKit.framework */; };
 		96678DE229D5CFF80073D683 /* PlusJakartaSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96678DDD29D5CFF80073D683 /* PlusJakartaSans-Bold.ttf */; };
 		96678DE329D5CFF80073D683 /* PlusJakartaSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96678DDE29D5CFF80073D683 /* PlusJakartaSans-Regular.ttf */; };
 		96678DE429D5CFF80073D683 /* PlusJakartaSans-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96678DDF29D5CFF80073D683 /* PlusJakartaSans-ExtraBold.ttf */; };
@@ -41,7 +54,6 @@
 		96847F1E2C5248B20089A75C /* HelveticaNeue.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96847F182C5248B20089A75C /* HelveticaNeue.ttf */; };
 		9689E6A92C8607F5000E6F84 /* ShareContactAppClip.app in Embed AppClip */ = {isa = PBXBuildFile; fileRef = 96DD48BB2C5D42F900620722 /* ShareContactAppClip.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		9689E6AC2C860814000E6F84 /* ShareContactAppClip-staging.app in Embed App Clips */ = {isa = PBXBuildFile; fileRef = 96A9AE362C7F56BE009380FE /* ShareContactAppClip-staging.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		96988DCB2CAECCA400583BA0 /* ShareContactAppClip-dev.app in Embed App Clips */ = {isa = PBXBuildFile; fileRef = 96A9AE432C7F56CD009380FE /* ShareContactAppClip-dev.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		969D24B12C909C5600053A8E /* libPods-common-azzapp-dev.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 969D24B02C909C5600053A8E /* libPods-common-azzapp-dev.a */; };
 		969D24B32C909CC700053A8E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 969D24B22C909CC700053A8E /* GoogleService-Info.plist */; };
 		969D24B82C909CDC00053A8E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 969D24B72C909CDC00053A8E /* GoogleService-Info.plist */; };
@@ -68,12 +80,10 @@
 		BCACF1162C90C43800F87577 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = BCACF1132C90C43800F87577 /* InfoPlist.xcstrings */; };
 		BCEB3A042A74063A0010EEEE /* Azzapp.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BCEB3A032A74063A0010EEEE /* Azzapp.ttf */; };
 		C2D439B36EA94AC7B690F721 /* HelveticaNeue-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1259B693B98B486E9E0394C7 /* HelveticaNeue-Medium.ttf */; };
-		CE3FB77EFA1BBCFCBA646C5A /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C59A4752184E6A4BC4A569FB /* ExpoModulesProvider.swift */; };
 		D12BE8C9C8CFB933AEF16748 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E2FBF335CCE7355AA69A1C1 /* ExpoModulesProvider.swift */; };
 		E4476D644358FDE64775EC52 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = E39398FBB9147FF432195F49 /* PrivacyInfo.xcprivacy */; };
 		FA88BF592CEE4E398F7EC8AB /* HelveticaNeue.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7BE94E630FD2409FA6CB5E21 /* HelveticaNeue.ttf */; };
 		FD1404452A03FDA800CCA6B9 /* MediaHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1404442A03FDA700CCA6B9 /* MediaHelpers.swift */; };
-		FD1404462A03FDA800CCA6B9 /* MediaHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1404442A03FDA700CCA6B9 /* MediaHelpers.swift */; };
 		FD292EAE2A94BDC300D880E8 /* Azzapp.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BCEB3A032A74063A0010EEEE /* Azzapp.ttf */; };
 		FD292EAF2A94BDC700D880E8 /* Azzapp.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BCEB3A032A74063A0010EEEE /* Azzapp.ttf */; };
 		FD39DA9A2A52AB5F00C49A82 /* AZPCustomReavealTransition.mm in Sources */ = {isa = PBXBuildFile; fileRef = FD5BFC3628C8EF8D0010B34E /* AZPCustomReavealTransition.mm */; };
@@ -103,24 +113,27 @@
 		FD4BD5462AA626F100DDDB54 /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FD4BD5452AA626F100DDDB54 /* BootSplash.storyboard */; };
 		FD4BD5472AA626F100DDDB54 /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FD4BD5452AA626F100DDDB54 /* BootSplash.storyboard */; };
 		FD4BD5482AA626F100DDDB54 /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FD4BD5452AA626F100DDDB54 /* BootSplash.storyboard */; };
-		FD4BD5492AA626F100DDDB54 /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FD4BD5452AA626F100DDDB54 /* BootSplash.storyboard */; };
 		FD5BFC3728C8EF8D0010B34E /* AZPCustomReavealTransition.mm in Sources */ = {isa = PBXBuildFile; fileRef = FD5BFC3628C8EF8D0010B34E /* AZPCustomReavealTransition.mm */; };
-		FD5BFC3828C8EF8D0010B34E /* AZPCustomReavealTransition.mm in Sources */ = {isa = PBXBuildFile; fileRef = FD5BFC3628C8EF8D0010B34E /* AZPCustomReavealTransition.mm */; };
 		FD79CACC2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD79CACB2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift */; };
 		FD79CACD2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD79CACB2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift */; };
 		FD79CACE2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD79CACB2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift */; };
-		FD79CACF2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD79CACB2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift */; };
 		FD8F774628EC310F00E27551 /* AZPMediaHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = FD8F774528EC310F00E27551 /* AZPMediaHelpers.m */; };
-		FD8F774728EC310F00E27551 /* AZPMediaHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = FD8F774528EC310F00E27551 /* AZPMediaHelpers.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		00E356F41AD99517003FC87E /* PBXContainerItemProxy */ = {
+		9631A35F2D2EBD41008C156F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 13B07F861A680F5B00A75B9A;
-			remoteInfo = azzapp;
+			remoteGlobalIDString = 9631A3532D2EBD06008C156F;
+			remoteInfo = "azzappWidgetExtension-staging";
+		};
+		96363A3D2D12EBCF00A482DC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9642B1652D11B4FA008E236B;
+			remoteInfo = "azzappWidgetExtension-dev";
 		};
 		967E8B582CAC39690059AF8E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -128,6 +141,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 96A9AE382C7F56CD009380FE;
 			remoteInfo = "ShareContactAppClip-dev";
+		};
+		9682989E2D2EEA100024969B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9642B1492D11B4F2008E236B;
+			remoteInfo = azzappWidgetExtension;
 		};
 		96A9AE492C7F5C74009380FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -146,6 +166,39 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		9631A3612D2EBD56008C156F /* Embed Widget Extension */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				9631A3622D2EBD69008C156F /* azzappWidgetExtension-staging.appex in Embed Widget Extension */,
+			);
+			name = "Embed Widget Extension";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9642B15F2D11B4F3008E236B /* Embed WIDGET Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				9642B1602D11B4F3008E236B /* azzappWidgetExtension.appex in Embed WIDGET Extensions */,
+			);
+			name = "Embed WIDGET Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9642B1A12D11E514008E236B /* Embed Widget Extension */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				96363A3F2D12EBDF00A482DC /* azzappWidgetExtension-dev.appex in Embed Widget Extension */,
+			);
+			name = "Embed Widget Extension";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9689E6A82C8607D0000E6F84 /* Embed AppClip */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -174,7 +227,7 @@
 			dstPath = "$(CONTENTS_FOLDER_PATH)/AppClips";
 			dstSubfolderSpec = 16;
 			files = (
-				96988DCB2CAECCA400583BA0 /* ShareContactAppClip-dev.app in Embed App Clips */,
+				96363A3C2D12EAC800A482DC /* ShareContactAppClip-dev.app in Embed App Clips */,
 			);
 			name = "Embed App Clips";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -212,9 +265,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		00E356EE1AD99517003FC87E /* azzappTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = azzappTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		00E356F21AD99517003FC87E /* azzappTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = azzappTests.m; sourceTree = "<group>"; };
 		01A80455EE3041AA8310DF23 /* PlusJakartaSans-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "PlusJakartaSans-Medium.ttf"; path = "../assets/fonts/PlusJakartaSans-Medium.ttf"; sourceTree = "<group>"; };
 		050B0F459F08451DF3E153D8 /* Pods-common-azzapp-staging.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-azzapp-staging.debug.xcconfig"; path = "Target Support Files/Pods-common-azzapp-staging/Pods-common-azzapp-staging.debug.xcconfig"; sourceTree = "<group>"; };
 		0773611437B756D821550543 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-common-azzapp-staging/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
@@ -227,18 +277,14 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = azzapp/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = azzapp/main.m; sourceTree = "<group>"; };
 		26FD5F0EEB8A3E477D6F1580 /* Pods-common-azzapp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-azzapp.release.xcconfig"; path = "Target Support Files/Pods-common-azzapp/Pods-common-azzapp.release.xcconfig"; sourceTree = "<group>"; };
-		35018B6D4395AD2BFAA15014 /* Pods-common-azzappTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-azzappTests.debug.xcconfig"; path = "Target Support Files/Pods-common-azzappTests/Pods-common-azzappTests.debug.xcconfig"; sourceTree = "<group>"; };
 		3876E6F533D139B89DB43D3E /* Pods-common-azzapp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-azzapp.debug.xcconfig"; path = "Target Support Files/Pods-common-azzapp/Pods-common-azzapp.debug.xcconfig"; sourceTree = "<group>"; };
 		3D4F895EBE884458B0016262 /* Azzapp.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Azzapp.ttf; path = ../assets/fonts/Azzapp.ttf; sourceTree = "<group>"; };
 		3E2FBF335CCE7355AA69A1C1 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-common-azzapp-dev/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
-		4A34F8DB70ED6E8D53AFD590 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-azzapp-azzappTests/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		4CAFAE64A33E43774ED8D563 /* Pods-common-azzapp-dev.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-azzapp-dev.release.xcconfig"; path = "Target Support Files/Pods-common-azzapp-dev/Pods-common-azzapp-dev.release.xcconfig"; sourceTree = "<group>"; };
 		4D2736CE83BA31C7872F863E /* Pods-common-azzapp-staging.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-azzapp-staging.release.xcconfig"; path = "Target Support Files/Pods-common-azzapp-staging/Pods-common-azzapp-staging.release.xcconfig"; sourceTree = "<group>"; };
-		50B25CAE3886DB2CE6800386 /* Pods-common-azzappTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-azzappTests.release.xcconfig"; path = "Target Support Files/Pods-common-azzappTests/Pods-common-azzappTests.release.xcconfig"; sourceTree = "<group>"; };
 		5477301FE9F94EAFA6F8AD80 /* PlusJakartaSans-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "PlusJakartaSans-SemiBold.ttf"; path = "../assets/fonts/PlusJakartaSans-SemiBold.ttf"; sourceTree = "<group>"; };
 		5E795AEC1BEAF4FE6C0E791F /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-common-azzapp/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		64C57ED191924F0A87B8A959 /* PlusJakartaSans-ExtraBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "PlusJakartaSans-ExtraBold.ttf"; path = "../assets/fonts/PlusJakartaSans-ExtraBold.ttf"; sourceTree = "<group>"; };
-		65CD48F2D7A16C9B7B35A770 /* libPods-common-azzappTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-common-azzappTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7079498E767E80033C2FF85A /* Pods-common-azzapp-dev.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-azzapp-dev.debug.xcconfig"; path = "Target Support Files/Pods-common-azzapp-dev/Pods-common-azzapp-dev.debug.xcconfig"; sourceTree = "<group>"; };
 		7BE94E630FD2409FA6CB5E21 /* HelveticaNeue.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = HelveticaNeue.ttf; path = ../assets/fonts/HelveticaNeue.ttf; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = azzapp/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -248,7 +294,14 @@
 		961CC3F22CAAD409003DF611 /* azzapp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = azzapp.entitlements; path = azzapp/azzapp.entitlements; sourceTree = "<group>"; };
 		9624A8EC2B31E7C4009816DC /* azzappRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = azzappRelease.entitlements; path = azzapp/azzappRelease.entitlements; sourceTree = "<group>"; };
 		96262FD42C908E57001146D7 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		9631A35C2D2EBD06008C156F /* azzappWidgetExtension-staging.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "azzappWidgetExtension-staging.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		963878F22B036F6500D3AE9F /* azzapp-devDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "azzapp-devDebug.entitlements"; sourceTree = "<group>"; };
+		9642B13E2D11B4C6008E236B /* AZPWidgetKit.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AZPWidgetKit.m; sourceTree = "<group>"; };
+		9642B13F2D11B4C6008E236B /* AZPWidgetKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AZPWidgetKit.swift; sourceTree = "<group>"; };
+		9642B14A2D11B4F2008E236B /* azzappWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = azzappWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		9642B14B2D11B4F2008E236B /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		9642B14D2D11B4F2008E236B /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		9642B16E2D11B4FA008E236B /* azzappWidgetExtension-dev.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "azzappWidgetExtension-dev.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		96678DDD29D5CFF80073D683 /* PlusJakartaSans-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "PlusJakartaSans-Bold.ttf"; path = "../../assets/fonts/PlusJakartaSans-Bold.ttf"; sourceTree = "<group>"; };
 		96678DDE29D5CFF80073D683 /* PlusJakartaSans-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "PlusJakartaSans-Regular.ttf"; path = "../../assets/fonts/PlusJakartaSans-Regular.ttf"; sourceTree = "<group>"; };
 		96678DDF29D5CFF80073D683 /* PlusJakartaSans-ExtraBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "PlusJakartaSans-ExtraBold.ttf"; path = "../../assets/fonts/PlusJakartaSans-ExtraBold.ttf"; sourceTree = "<group>"; };
@@ -280,7 +333,6 @@
 		BCACF1132C90C43800F87577 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		BCEB3A032A74063A0010EEEE /* Azzapp.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Azzapp.ttf; path = ../../assets/fonts/Azzapp.ttf; sourceTree = "<group>"; };
 		C11F023B6BF18091C6F420A9 /* libPods-common-azzapp-dev.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-common-azzapp-dev.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		C59A4752184E6A4BC4A569FB /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-common-azzappTests/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		D98307CB348705F89E1DE6DA /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = azzapp/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		E39398FBB9147FF432195F49 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = azzapp/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		EB627C8EABFC4E8A9D4CB061 /* PlusJakartaSans-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "PlusJakartaSans-Bold.ttf"; path = "../assets/fonts/PlusJakartaSans-Bold.ttf"; sourceTree = "<group>"; };
@@ -298,15 +350,44 @@
 		FD8F774528EC310F00E27551 /* AZPMediaHelpers.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AZPMediaHelpers.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
-/* Begin PBXFrameworksBuildPhase section */
-		00E356EB1AD99517003FC87E /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				15FBE6E286AE91C4400740A4 /* libPods-common-azzappTests.a in Frameworks */,
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		9631A35D2D2EBD06008C156F /* Exceptions for "azzappWidget" folder in "azzappWidgetExtension-staging" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
 			);
-			runOnlyForDeploymentPostprocessing = 0;
+			target = 9631A3532D2EBD06008C156F /* azzappWidgetExtension-staging */;
 		};
+		9642B1612D11B4F3008E236B /* Exceptions for "azzappWidget" folder in "azzappWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 9642B1492D11B4F2008E236B /* azzappWidgetExtension */;
+		};
+		9642B16F2D11B4FA008E236B /* Exceptions for "azzappWidget" folder in "azzappWidgetExtension-dev" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 9642B1652D11B4FA008E236B /* azzappWidgetExtension-dev */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		9642B14F2D11B4F2008E236B /* azzappWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				9642B1612D11B4F3008E236B /* Exceptions for "azzappWidget" folder in "azzappWidgetExtension" target */,
+				9631A35D2D2EBD06008C156F /* Exceptions for "azzappWidget" folder in "azzappWidgetExtension-staging" target */,
+				9642B16F2D11B4FA008E236B /* Exceptions for "azzappWidget" folder in "azzappWidgetExtension-dev" target */,
+			);
+			path = azzappWidget;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
 		13B07F8C1A680F5B00A75B9A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -314,6 +395,33 @@
 				969D24BC2C90A5FA00053A8E /* AdSupport.framework in Frameworks */,
 				96DD310C2B6C018600FB36A2 /* StoreKit.framework in Frameworks */,
 				3EE37F939CF95920D1AF8A4D /* libPods-common-azzapp.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9631A3552D2EBD06008C156F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9631A3562D2EBD06008C156F /* SwiftUI.framework in Frameworks */,
+				9631A3572D2EBD06008C156F /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9642B1472D11B4F2008E236B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9642B14E2D11B4F2008E236B /* SwiftUI.framework in Frameworks */,
+				9642B14C2D11B4F2008E236B /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9642B1672D11B4FA008E236B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9642B1682D11B4FA008E236B /* SwiftUI.framework in Frameworks */,
+				9642B1692D11B4FA008E236B /* WidgetKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -361,23 +469,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		00E356EF1AD99517003FC87E /* azzappTests */ = {
-			isa = PBXGroup;
-			children = (
-				00E356F21AD99517003FC87E /* azzappTests.m */,
-				00E356F01AD99517003FC87E /* Supporting Files */,
-			);
-			path = azzappTests;
-			sourceTree = "<group>";
-		};
-		00E356F01AD99517003FC87E /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				00E356F11AD99517003FC87E /* Info.plist */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
 		13B07FAE1A68108700A75B9A /* azzapp */ = {
 			isa = PBXGroup;
 			children = (
@@ -401,6 +492,8 @@
 				FD1EA60E28B8D7F300916DBC /* azzappTests-Bridging-Header.h */,
 				FD5BFC3528C8EF8D0010B34E /* AZPCustomReavealTransition.h */,
 				FD5BFC3628C8EF8D0010B34E /* AZPCustomReavealTransition.mm */,
+				9642B13E2D11B4C6008E236B /* AZPWidgetKit.m */,
+				9642B13F2D11B4C6008E236B /* AZPWidgetKit.swift */,
 				96DD310E2B6CEFB100FB36A2 /* IAPDevStorekit.storekit */,
 				96DD310F2B6CF1FE00FB36A2 /* StoreKitTestCertificate.cer */,
 				FB58ADB2576D4F2277CBDD50 /* PrivacyInfo.xcprivacy */,
@@ -426,7 +519,8 @@
 				A55BE713148562C8B54D4A6D /* libPods-common-azzapp.a */,
 				C11F023B6BF18091C6F420A9 /* libPods-common-azzapp-dev.a */,
 				A9A58D92E966BE3884BD1C2F /* libPods-common-azzapp-staging.a */,
-				65CD48F2D7A16C9B7B35A770 /* libPods-common-azzappTests.a */,
+				9642B14B2D11B4F2008E236B /* WidgetKit.framework */,
+				9642B14D2D11B4F2008E236B /* SwiftUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -461,8 +555,8 @@
 				FDFDBA6F2841006200621C0F /* resources */,
 				13B07FAE1A68108700A75B9A /* azzapp */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
-				00E356EF1AD99517003FC87E /* azzappTests */,
 				96DD48BC2C5D42FA00620722 /* ShareContactAppClip */,
+				9642B14F2D11B4F2008E236B /* azzappWidget */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
@@ -480,12 +574,14 @@
 			isa = PBXGroup;
 			children = (
 				13B07F961A680F5B00A75B9A /* azzapp.app */,
-				00E356EE1AD99517003FC87E /* azzappTests.xctest */,
 				FD39DAC92A52AB5F00C49A82 /* azzapp-dev.app */,
 				FD39DB002A52AC2100C49A82 /* azzapp-staging.app */,
 				96DD48BB2C5D42F900620722 /* ShareContactAppClip.app */,
 				96A9AE362C7F56BE009380FE /* ShareContactAppClip-staging.app */,
 				96A9AE432C7F56CD009380FE /* ShareContactAppClip-dev.app */,
+				9642B14A2D11B4F2008E236B /* azzappWidgetExtension.appex */,
+				9642B16E2D11B4FA008E236B /* azzappWidgetExtension-dev.appex */,
+				9631A35C2D2EBD06008C156F /* azzappWidgetExtension-staging.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -557,19 +653,8 @@
 				4CAFAE64A33E43774ED8D563 /* Pods-common-azzapp-dev.release.xcconfig */,
 				050B0F459F08451DF3E153D8 /* Pods-common-azzapp-staging.debug.xcconfig */,
 				4D2736CE83BA31C7872F863E /* Pods-common-azzapp-staging.release.xcconfig */,
-				35018B6D4395AD2BFAA15014 /* Pods-common-azzappTests.debug.xcconfig */,
-				50B25CAE3886DB2CE6800386 /* Pods-common-azzappTests.release.xcconfig */,
 			);
 			path = Pods;
-			sourceTree = "<group>";
-		};
-		C656BE0C3A4313D5AF095E97 /* azzappTests */ = {
-			isa = PBXGroup;
-			children = (
-				4A34F8DB70ED6E8D53AFD590 /* ExpoModulesProvider.swift */,
-				C59A4752184E6A4BC4A569FB /* ExpoModulesProvider.swift */,
-			);
-			name = azzappTests;
 			sourceTree = "<group>";
 		};
 		D620DDDEAE3B4F7697FA5A18 /* Resources */ = {
@@ -591,7 +676,6 @@
 		E15DC6E9F29D960E2E3E9F74 /* ExpoModulesProviders */ = {
 			isa = PBXGroup;
 			children = (
-				C656BE0C3A4313D5AF095E97 /* azzappTests */,
 				3C8AB1A54BC08A45DE87BC6D /* azzapp */,
 				1B5025684E4BD57F1DB38297 /* azzapp-dev */,
 				638E15A87C3404B4C0B81900 /* azzapp-staging */,
@@ -636,28 +720,6 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		00E356ED1AD99517003FC87E /* azzappTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "azzappTests" */;
-			buildPhases = (
-				4B9F1030015373D35DCD56C0 /* [CP] Check Pods Manifest.lock */,
-				F3DDF2D43A58EC75C9588A15 /* [Expo] Configure project */,
-				00E356EA1AD99517003FC87E /* Sources */,
-				00E356EB1AD99517003FC87E /* Frameworks */,
-				00E356EC1AD99517003FC87E /* Resources */,
-				472527D153912EBAF1B3494D /* [CP] Embed Pods Frameworks */,
-				CA28840F67BB3B232C6E1C48 /* [CP] Copy Pods Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				00E356F51AD99517003FC87E /* PBXTargetDependency */,
-			);
-			name = azzappTests;
-			productName = azzappTests;
-			productReference = 00E356EE1AD99517003FC87E /* azzappTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 		13B07F861A680F5B00A75B9A /* azzapp */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "azzapp" */;
@@ -672,18 +734,80 @@
 				FDA79D7229EDA47700E16407 /* Embed Frameworks */,
 				B9E8C17894C84F10A27B8BAD /* Upload Debug Symbols to Sentry */,
 				9689E6A82C8607D0000E6F84 /* Embed AppClip */,
+				9642B15F2D11B4F3008E236B /* Embed WIDGET Extensions */,
 				355241B54A76788E06605077 /* [CP] Embed Pods Frameworks */,
 				042AF6C7FA6CB55FDA81A235 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				9682989F2D2EEA100024969B /* PBXTargetDependency */,
 				96A9AE4A2C7F5C74009380FE /* PBXTargetDependency */,
 			);
 			name = azzapp;
 			productName = azzapp;
 			productReference = 13B07F961A680F5B00A75B9A /* azzapp.app */;
 			productType = "com.apple.product-type.application";
+		};
+		9631A3532D2EBD06008C156F /* azzappWidgetExtension-staging */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9631A3592D2EBD06008C156F /* Build configuration list for PBXNativeTarget "azzappWidgetExtension-staging" */;
+			buildPhases = (
+				9631A3542D2EBD06008C156F /* Sources */,
+				9631A3552D2EBD06008C156F /* Frameworks */,
+				9631A3582D2EBD06008C156F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				9642B14F2D11B4F2008E236B /* azzappWidget */,
+			);
+			name = "azzappWidgetExtension-staging";
+			productName = azzappWidgetExtension;
+			productReference = 9631A35C2D2EBD06008C156F /* azzappWidgetExtension-staging.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		9642B1492D11B4F2008E236B /* azzappWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9642B1622D11B4F3008E236B /* Build configuration list for PBXNativeTarget "azzappWidgetExtension" */;
+			buildPhases = (
+				9642B1462D11B4F2008E236B /* Sources */,
+				9642B1472D11B4F2008E236B /* Frameworks */,
+				9642B1482D11B4F2008E236B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				9642B14F2D11B4F2008E236B /* azzappWidget */,
+			);
+			name = azzappWidgetExtension;
+			productName = azzappWidgetExtension;
+			productReference = 9642B14A2D11B4F2008E236B /* azzappWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		9642B1652D11B4FA008E236B /* azzappWidgetExtension-dev */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9642B16B2D11B4FA008E236B /* Build configuration list for PBXNativeTarget "azzappWidgetExtension-dev" */;
+			buildPhases = (
+				9642B1662D11B4FA008E236B /* Sources */,
+				9642B1672D11B4FA008E236B /* Frameworks */,
+				9642B16A2D11B4FA008E236B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				9642B14F2D11B4F2008E236B /* azzappWidget */,
+			);
+			name = "azzappWidgetExtension-dev";
+			productName = azzappWidgetExtension;
+			productReference = 9642B16E2D11B4FA008E236B /* azzappWidgetExtension-dev.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 		96A9AE2B2C7F56BE009380FE /* ShareContactAppClip-staging */ = {
 			isa = PBXNativeTarget;
@@ -750,12 +874,14 @@
 				FD39DAC42A52AB5F00C49A82 /* Embed Frameworks */,
 				FD292EAC2A94BA2F00D880E8 /* Upload Debug Symbols to Sentry */,
 				96DD48CB2C5D42FB00620722 /* Embed App Clips */,
+				9642B1A12D11E514008E236B /* Embed Widget Extension */,
 				474AD885A631282CFAA8823D /* [CP] Embed Pods Frameworks */,
 				886BE19D5CC9EAC9C4496DA7 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				96363A3E2D12EBCF00A482DC /* PBXTargetDependency */,
 				96A9AE462C7F56DE009380FE /* PBXTargetDependency */,
 			);
 			name = "azzapp-dev";
@@ -777,12 +903,14 @@
 				FD39DAFB2A52AC2100C49A82 /* Embed Frameworks */,
 				FD292EAD2A94BA3700D880E8 /* Upload Debug Symbols to Sentry */,
 				9689E6AB2C860807000E6F84 /* Embed App Clips */,
+				9631A3612D2EBD56008C156F /* Embed Widget Extension */,
 				88D5BF7996D48261F83C1188 /* [CP] Embed Pods Frameworks */,
 				49DB3617F8C176E2E1FAAAC2 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				9631A3602D2EBD41008C156F /* PBXTargetDependency */,
 				96A9AE4C2C7F5C7A009380FE /* PBXTargetDependency */,
 			);
 			name = "azzapp-staging";
@@ -796,16 +924,14 @@
 		83CBB9F71A601CBA00E9B192 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1540;
+				LastSwiftUpdateCheck = 1600;
 				LastUpgradeCheck = 1210;
 				TargetAttributes = {
-					00E356ED1AD99517003FC87E = {
-						CreatedOnToolsVersion = 6.2;
-						LastSwiftMigration = 1340;
-						TestTargetID = 13B07F861A680F5B00A75B9A;
-					};
 					13B07F861A680F5B00A75B9A = {
 						LastSwiftMigration = 1340;
+					};
+					9642B1492D11B4F2008E236B = {
+						CreatedOnToolsVersion = 16.0;
 					};
 					96DD48BA2C5D42F900620722 = {
 						CreatedOnToolsVersion = 15.4;
@@ -813,7 +939,6 @@
 				};
 			};
 			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "azzapp" */;
-			compatibilityVersion = "Xcode 12.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -822,6 +947,7 @@
 				fr,
 			);
 			mainGroup = 83CBB9F61A601CBA00E9B192;
+			preferredProjectObjectVersion = 77;
 			productRefGroup = 83CBBA001A601CBA00E9B192 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -829,23 +955,17 @@
 				13B07F861A680F5B00A75B9A /* azzapp */,
 				FD39DA942A52AB5F00C49A82 /* azzapp-dev */,
 				FD39DACB2A52AC2100C49A82 /* azzapp-staging */,
-				00E356ED1AD99517003FC87E /* azzappTests */,
 				96DD48BA2C5D42F900620722 /* ShareContactAppClip */,
 				96A9AE382C7F56CD009380FE /* ShareContactAppClip-dev */,
 				96A9AE2B2C7F56BE009380FE /* ShareContactAppClip-staging */,
+				9642B1492D11B4F2008E236B /* azzappWidgetExtension */,
+				9631A3532D2EBD06008C156F /* azzappWidgetExtension-staging */,
+				9642B1652D11B4FA008E236B /* azzappWidgetExtension-dev */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		00E356EC1AD99517003FC87E /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				FD4BD5492AA626F100DDDB54 /* BootSplash.storyboard in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		13B07F8E1A680F5B00A75B9A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -873,6 +993,27 @@
 				969D24B32C909CC700053A8E /* GoogleService-Info.plist in Resources */,
 				03324426F1314697BD1C702D /* PlusJakartaSans-SemiBold.ttf in Resources */,
 				C2D439B36EA94AC7B690F721 /* HelveticaNeue-Medium.ttf in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9631A3582D2EBD06008C156F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9642B1482D11B4F2008E236B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9642B16A2D11B4FA008E236B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1017,23 +1158,6 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-azzapp/Pods-common-azzapp-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		472527D153912EBAF1B3494D /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-common-azzappTests/Pods-common-azzappTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-common-azzappTests/Pods-common-azzappTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-azzappTests/Pods-common-azzappTests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		474AD885A631282CFAA8823D /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1085,28 +1209,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-azzapp-staging/Pods-common-azzapp-staging-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		4B9F1030015373D35DCD56C0 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-common-azzappTests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 		5E9B00049FB3BF4A691D3296 /* [CP] Check Pods Manifest.lock */ = {
@@ -1242,42 +1344,6 @@
 			shellPath = /bin/sh;
 			shellScript = "\nWITH_ENVIRONMENT=\"../../../node_modules/react-native/scripts/xcode/with-environment.sh\"\nif [ -f \"$WITH_ENVIRONMENT\" ]; then\n    . \"$WITH_ENVIRONMENT\"\nfi \nexport SENTRY_PROPERTIES=sentry.properties\n[ \"$SENTRY_INCLUDE_NATIVE_SOURCES\" = \"true\" ] && INCLUDE_SOURCES_FLAG=\"--include-sources\" || INCLUDE_SOURCES_FLAG=\"\"\n../../../node_modules/@sentry/cli/bin/sentry-cli debug-files upload \"$INCLUDE_SOURCES_FLAG\" \"$DWARF_DSYM_FOLDER_PATH\"\n";
 		};
-		CA28840F67BB3B232C6E1C48 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-common-azzappTests/Pods-common-azzappTests-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-common-azzappTests/Pods-common-azzappTests-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-azzappTests/Pods-common-azzappTests-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		F3DDF2D43A58EC75C9588A15 /* [Expo] Configure project */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "[Expo] Configure project";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target' 'Support' 'Files/Pods-common-azzappTests/expo-configure-project.sh\"\n";
-		};
 		FD10A7F022414F080027D42C /* Start Packager */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1398,20 +1464,6 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		00E356EA1AD99517003FC87E /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				FD8F774728EC310F00E27551 /* AZPMediaHelpers.m in Sources */,
-				FD79CACF2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift in Sources */,
-				FD5BFC3828C8EF8D0010B34E /* AZPCustomReavealTransition.mm in Sources */,
-				FD1404462A03FDA800CCA6B9 /* MediaHelpers.swift in Sources */,
-				00E356F31AD99517003FC87E /* azzappTests.m in Sources */,
-				485B1058089E3E6317DED749 /* ExpoModulesProvider.swift in Sources */,
-				CE3FB77EFA1BBCFCBA646C5A /* ExpoModulesProvider.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		13B07F871A680F5B00A75B9A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1420,9 +1472,32 @@
 				FD8F774628EC310F00E27551 /* AZPMediaHelpers.m in Sources */,
 				FD1404452A03FDA800CCA6B9 /* MediaHelpers.swift in Sources */,
 				FD79CACC2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift in Sources */,
+				9642B1442D11B4C6008E236B /* AZPWidgetKit.m in Sources */,
+				9642B1452D11B4C6008E236B /* AZPWidgetKit.swift in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				92A812FC3DCC67A8944B9ED9 /* ExpoModulesProvider.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9631A3542D2EBD06008C156F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9642B1462D11B4F2008E236B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9642B1662D11B4FA008E236B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1461,6 +1536,8 @@
 				FD39DAA32A52AB5F00C49A82 /* AZPMediaHelpers.m in Sources */,
 				FD39DAA52A52AB5F00C49A82 /* MediaHelpers.swift in Sources */,
 				FD79CACD2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift in Sources */,
+				9642B1402D11B4C6008E236B /* AZPWidgetKit.m in Sources */,
+				9642B1412D11B4C6008E236B /* AZPWidgetKit.swift in Sources */,
 				FD39DAAB2A52AB5F00C49A82 /* AppDelegate.mm in Sources */,
 				FD39DAAD2A52AB5F00C49A82 /* main.m in Sources */,
 				D12BE8C9C8CFB933AEF16748 /* ExpoModulesProvider.swift in Sources */,
@@ -1475,6 +1552,8 @@
 				FD39DADA2A52AC2100C49A82 /* AZPMediaHelpers.m in Sources */,
 				FD39DADC2A52AC2100C49A82 /* MediaHelpers.swift in Sources */,
 				FD79CACE2AE01ED900EB4E33 /* CGImagePropertyOrientation+init_uiOrientation.swift in Sources */,
+				9642B1422D11B4C6008E236B /* AZPWidgetKit.m in Sources */,
+				9642B1432D11B4C6008E236B /* AZPWidgetKit.swift in Sources */,
 				FD39DAE22A52AC2100C49A82 /* AppDelegate.mm in Sources */,
 				FD39DAE42A52AC2100C49A82 /* main.m in Sources */,
 				51C74448A13281FB32E24633 /* ExpoModulesProvider.swift in Sources */,
@@ -1484,10 +1563,20 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		00E356F51AD99517003FC87E /* PBXTargetDependency */ = {
+		9631A3602D2EBD41008C156F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 13B07F861A680F5B00A75B9A /* azzapp */;
-			targetProxy = 00E356F41AD99517003FC87E /* PBXContainerItemProxy */;
+			target = 9631A3532D2EBD06008C156F /* azzappWidgetExtension-staging */;
+			targetProxy = 9631A35F2D2EBD41008C156F /* PBXContainerItemProxy */;
+		};
+		96363A3E2D12EBCF00A482DC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9642B1652D11B4FA008E236B /* azzappWidgetExtension-dev */;
+			targetProxy = 96363A3D2D12EBCF00A482DC /* PBXContainerItemProxy */;
+		};
+		9682989F2D2EEA100024969B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9642B1492D11B4F2008E236B /* azzappWidgetExtension */;
+			targetProxy = 9682989E2D2EEA100024969B /* PBXContainerItemProxy */;
 		};
 		96A9AE462C7F56DE009380FE /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1507,76 +1596,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		00E356F61AD99517003FC87E /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 35018B6D4395AD2BFAA15014 /* Pods-common-azzappTests.debug.xcconfig */;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CLANG_ENABLE_MODULES = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = azzappTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				OTHER_LDFLAGS = (
-					"-ObjC",
-					"-lc++",
-					"$(inherited)",
-				);
-				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
-				PRODUCT_BUNDLE_IDENTIFIER = com.fadioit.azzapp;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_OBJC_BRIDGING_HEADER = "azzappTests-Bridging-Header.h";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/azzapp.app/azzapp";
-			};
-			name = Debug;
-		};
-		00E356F71AD99517003FC87E /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 50B25CAE3886DB2CE6800386 /* Pods-common-azzappTests.release.xcconfig */;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CLANG_ENABLE_MODULES = YES;
-				COPY_PHASE_STRIP = NO;
-				INFOPLIST_FILE = azzappTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				OTHER_LDFLAGS = (
-					"-ObjC",
-					"-lc++",
-					"$(inherited)",
-				);
-				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
-				PRODUCT_BUNDLE_IDENTIFIER = com.fadioit.azzapp;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_OBJC_BRIDGING_HEADER = "azzappTests-Bridging-Header.h";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/azzapp.app/azzapp";
-			};
-			name = Release;
-		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3876E6F533D139B89DB43D3E /* Pods-common-azzapp.debug.xcconfig */;
@@ -1585,9 +1604,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = azzapp/azzapp.entitlements;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION =1;
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
-				DISPLAY_NAME = Azzapp;
+				DISPLAY_NAME = "azzapp -  Digital Business Card";
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = azzapp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
@@ -1595,7 +1614,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.9.1;
+				MARKETING_VERSION =1.7.2;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1624,16 +1643,16 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = azzapp/azzappRelease.entitlements;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION =1;
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
-				DISPLAY_NAME = Azzapp;
+				DISPLAY_NAME = "azzapp -  Digital Business Card";
 				INFOPLIST_FILE = azzapp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.9.1;
+				MARKETING_VERSION =1.7.2;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1742,6 +1761,7 @@
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				USE_HERMES = true;
 			};
 			name = Debug;
@@ -1829,8 +1849,320 @@
 				OTHER_LDFLAGS = "$(inherited)";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../../../node_modules/react-native";
 				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				USE_HERMES = true;
 				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		9631A35A2D2EBD06008C156F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = "azzappWidget/azzappWidgetExtension-staging.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION =1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 66D3U3GLN6;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = azzappWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = azzappWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION =1.7.2;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.azzapp.app-staging.azzappWidget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SHARED_GROUP_IDENTIFIER = "group.azzapp.app-staging.widget";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		9631A35B2D2EBD06008C156F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = "azzappWidget/azzappWidgetExtension-staging.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION =1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 66D3U3GLN6;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = azzappWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = azzappWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION =1.7.2;
+				MTL_FAST_MATH = YES;
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.azzapp.app-staging.azzappWidget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SHARED_GROUP_IDENTIFIER = "group.azzapp.app-staging.widget";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		9642B1632D11B4F3008E236B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = azzappWidget/azzappWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION =1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 66D3U3GLN6;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = azzappWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = azzappWidget;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION =1.7.2;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
+				PRODUCT_BUNDLE_IDENTIFIER = com.azzapp.app.azzappWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SHARED_GROUP_IDENTIFIER = group.azzapp.app.widget;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		9642B1642D11B4F3008E236B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = azzappWidget/azzappWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION =1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 66D3U3GLN6;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = azzappWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = azzappWidget;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION =1.7.2;
+				MTL_FAST_MATH = YES;
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
+				PRODUCT_BUNDLE_IDENTIFIER = com.azzapp.app.azzappWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SHARED_GROUP_IDENTIFIER = group.azzapp.app.widget;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		9642B16C2D11B4FA008E236B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = "azzappWidget/azzappWidgetExtension-dev.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION =1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 66D3U3GLN6;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = azzappWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = azzappWidgetDev;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION =1.7.2;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.azzapp.app-dev.azzappWidget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SHARED_GROUP_IDENTIFIER = "group.azzapp.app-dev.widget";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		9642B16D2D11B4FA008E236B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = "azzappWidget/azzappWidgetExtension-dev.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION =1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 66D3U3GLN6;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = azzappWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = azzappWidgetDev;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION =1.7.2;
+				MTL_FAST_MATH = YES;
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.azzapp.app-dev.azzappWidget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SHARED_GROUP_IDENTIFIER = "group.azzapp.app-dev.widget";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
@@ -1848,7 +2180,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "ShareContactAppClip/ShareContactAppClip-staging.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION =1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_ASSET_PATHS = "\"ShareContactAppClip/Preview Content\"";
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
@@ -1874,7 +2206,7 @@
 					"@executable_path/Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 0.9.1;
+				MARKETING_VERSION =1.7.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
@@ -1907,7 +2239,7 @@
 				CODE_SIGN_ENTITLEMENTS = "ShareContactAppClip/ShareContactAppClip-staging.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION =1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"ShareContactAppClip/Preview Content\"";
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
@@ -1929,7 +2261,7 @@
 					"@executable_path/Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 0.9.1;
+				MARKETING_VERSION =1.7.2;
 				MTL_FAST_MATH = YES;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.azzapp.app-staging.Clip";
@@ -1959,7 +2291,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "ShareContactAppClip/ShareContactAppClip-dev.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 25;
+				CURRENT_PROJECT_VERSION =1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_ASSET_PATHS = "\"ShareContactAppClip/Preview Content\"";
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
@@ -1985,7 +2317,7 @@
 					"@executable_path/Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 0.9.1;
+				MARKETING_VERSION =1.7.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
@@ -2018,7 +2350,7 @@
 				CODE_SIGN_ENTITLEMENTS = "ShareContactAppClip/ShareContactAppClip-dev.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 25;
+				CURRENT_PROJECT_VERSION =1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"ShareContactAppClip/Preview Content\"";
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
@@ -2040,7 +2372,7 @@
 					"@executable_path/Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 0.9.1;
+				MARKETING_VERSION =1.7.2;
 				MTL_FAST_MATH = YES;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.azzapp.app-dev.Clip";
@@ -2070,7 +2402,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = ShareContactAppClip/ShareContactAppClip.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION =1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_ASSET_PATHS = "\"ShareContactAppClip/Preview Content\"";
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
@@ -2096,7 +2428,7 @@
 					"@executable_path/Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 0.9.1;
+				MARKETING_VERSION =1.7.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
@@ -2129,7 +2461,7 @@
 				CODE_SIGN_ENTITLEMENTS = ShareContactAppClip/ShareContactAppClip.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION =1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"ShareContactAppClip/Preview Content\"";
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
@@ -2151,7 +2483,7 @@
 					"@executable_path/Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 0.9.1;
+				MARKETING_VERSION =1.7.2;
 				MTL_FAST_MATH = YES;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = com.azzapp.app.Clip;
@@ -2176,9 +2508,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIconDev;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "azzapp-devDebug.entitlements";
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION =1;
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
-				DISPLAY_NAME = "Azzapp - Dev";
+				DISPLAY_NAME = "azzapp - Dev";
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = azzapp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
@@ -2186,7 +2518,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.9.5;
+				MARKETING_VERSION =1.7.2;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -2195,6 +2527,7 @@
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.azzapp.app-dev";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SHARED_GROUP_IDENTIFIER = "group.azzapp.app-dev.widget";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -2216,16 +2549,16 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIconDev;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "azzapp-devRelease.entitlements";
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION =1;
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
-				DISPLAY_NAME = "Azzapp - Dev";
+				DISPLAY_NAME = "azzapp - Dev";
 				INFOPLIST_FILE = azzapp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.9.5;
+				MARKETING_VERSION =1.7.2;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -2234,6 +2567,7 @@
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.azzapp.app-dev";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SHARED_GROUP_IDENTIFIER = "group.azzapp.app-dev.widget";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -2254,9 +2588,9 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "azzapp-staging.entitlements";
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION =1;
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
-				DISPLAY_NAME = "Azzapp - Staging";
+				DISPLAY_NAME = "azzapp - Staging";
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = azzapp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
@@ -2264,7 +2598,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.9.1;
+				MARKETING_VERSION =1.7.2;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -2294,16 +2628,16 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "azzapp-stagingRelease.entitlements";
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION =1;
 				DEVELOPMENT_TEAM = 66D3U3GLN6;
-				DISPLAY_NAME = "Azzapp - Staging";
+				DISPLAY_NAME = "azzapp - Staging";
 				INFOPLIST_FILE = azzapp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.9.1;
+				MARKETING_VERSION =1.7.2;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -2326,15 +2660,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "azzappTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				00E356F61AD99517003FC87E /* Debug */,
-				00E356F71AD99517003FC87E /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "azzapp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -2349,6 +2674,33 @@
 			buildConfigurations = (
 				83CBBA201A601CBA00E9B192 /* Debug */,
 				83CBBA211A601CBA00E9B192 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9631A3592D2EBD06008C156F /* Build configuration list for PBXNativeTarget "azzappWidgetExtension-staging" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9631A35A2D2EBD06008C156F /* Debug */,
+				9631A35B2D2EBD06008C156F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9642B1622D11B4F3008E236B /* Build configuration list for PBXNativeTarget "azzappWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9642B1632D11B4F3008E236B /* Debug */,
+				9642B1642D11B4F3008E236B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9642B16B2D11B4FA008E236B /* Build configuration list for PBXNativeTarget "azzappWidgetExtension-dev" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9642B16C2D11B4FA008E236B /* Debug */,
+				9642B16D2D11B4FA008E236B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

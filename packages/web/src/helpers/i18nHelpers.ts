@@ -17,15 +17,15 @@ const webMessages: Record<Locale, Record<string, string>> = {
   // get 'en-GB'() {
   //   return require('@azzapp/i18n/compiled/web/en-GB.json');
   // },
-  // get es() {
-  //   return require('@azzapp/i18n/compiled/web/es.json');
-  // },
+  get es() {
+    return require('@azzapp/i18n/compiled/web/es.json');
+  },
   // get fr() {
   //   return require('@azzapp/i18n/compiled/web/fr.json');
   // },
-  // get it() {
-  //   return require('@azzapp/i18n/compiled/web/it.json');
-  // },
+  get it() {
+    return require('@azzapp/i18n/compiled/web/it.json');
+  },
   // get nl() {
   //   return require('@azzapp/i18n/compiled/web/nl.json');
   // },
@@ -41,9 +41,9 @@ const webMessages: Record<Locale, Record<string, string>> = {
   // get sv() {
   //   return require('@azzapp/i18n/compiled/web/sv.json');
   // },
-  // get de() {
-  //   return require('@azzapp/i18n/compiled/web/de.json');
-  // },
+  get de() {
+    return require('@azzapp/i18n/compiled/web/de.json');
+  },
 };
 export const getTranslationMessages = (locale: Locale = DEFAULT_LOCALE) => {
   const messages = Object.assign({}, webMessages[DEFAULT_LOCALE]);

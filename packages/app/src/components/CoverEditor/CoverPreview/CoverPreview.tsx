@@ -32,6 +32,7 @@ import VideoCompositionRenderer from '#components/VideoCompositionRenderer';
 import useToggle from '#hooks/useToggle';
 import IconButton from '#ui/IconButton';
 import LoadingView from '#ui/LoadingView';
+import { SocialLinkRenderer } from '../../SocialLinkRenderer';
 import coverDrawer from '../coverDrawer';
 import { createParagraph } from '../coverDrawer/coverTextDrawer';
 import {
@@ -49,7 +50,6 @@ import {
   getMediaWithLocalFile,
 } from '../coverEditorHelpers';
 import { BoundsEditorGestureHandler, drawBoundsEditor } from './BoundsEditor';
-import { DynamicLinkRenderer } from './DynamicLinkRenderer';
 import type { EditionParameters } from '#helpers/mediaEditions';
 import type { ResizeHandlePosition } from './BoundsEditor';
 import type { FrameDrawer } from '@azzapp/react-native-skia-video';
@@ -929,8 +929,13 @@ const CoverPreview = ({
   const hasFocus = useScreenHasFocus();
   const compositionContainerRef = useRef<View | null>(null);
   const [snapshotId, setSnapshotId] = useState<string | null>(null);
-  const currentScreenShot = useRef<string | null>(null);
   useModalInterceptor(async () => {
+    if (
+      coverEditorState.loadingLocalMedia ||
+      coverEditorState.loadingRemoteMedia
+    ) {
+      return;
+    }
     let screenShotId: string | null;
     if (!compositionContainerRef.current) {
       return;
@@ -946,7 +951,7 @@ const CoverPreview = ({
       console.log('error', e);
       screenShotId = null;
     }
-    currentScreenShot.current = screenShotId;
+
     setSnapshotId(screenShotId);
     await waitTime(10);
   });
@@ -959,38 +964,36 @@ const CoverPreview = ({
   // #endregion
 
   const animatedLinksStyle = useAnimatedStyle(() => {
+    let x: number = 0;
+    let y: number = 0;
+    let width: number = 0;
+    let height: number = 0;
+    let rotation: number = 0;
     if (activeLayerBounds.value && activeLayer.kind === 'links') {
-      const { bounds, rotation } = activeLayerBounds.value;
-
-      const width = (bounds.width * viewWidth) / 100;
-      const height = (bounds.height * viewHeight) / 100;
-
-      const top = (bounds.y * viewHeight) / 100 - height / 2;
-      const left = (bounds.x * viewWidth) / 100 - width / 2;
-
-      return {
-        top,
-        left,
-        // width: bounds.width * viewWidth,
-        transform: [{ rotate: `${rotation}rad` }],
-      };
+      ({
+        bounds: { x, y, width, height },
+        rotation,
+      } = activeLayerBounds.value);
+    } else {
+      ({
+        position: { x, y },
+        rotation,
+      } = linksLayer);
+      ({ width, height } = calculateLinksSize(
+        linksLayer.links.length,
+        linksLayer.size,
+        { viewHeight, viewWidth },
+      ));
     }
-
-    const { height, width } = calculateLinksSize(
-      linksLayer.links.length,
-      linksLayer.size,
-      {
-        viewHeight,
-        viewWidth,
-      },
-    );
 
     const calculatedWith = (width * viewWidth) / 100;
     const calculatedHeight = (height * viewHeight) / 100;
 
     return {
-      top: (linksLayer.position.y * viewHeight) / 100 - calculatedHeight / 2,
-      left: (linksLayer.position.x * viewWidth) / 100 - calculatedWith / 2,
+      position: 'absolute',
+      top: (y * viewHeight) / 100 - calculatedHeight / 2,
+      left: (x * viewWidth) / 100 - calculatedWith / 2,
+      transform: [{ rotate: `${rotation}rad` }],
     };
   });
 
@@ -1033,12 +1036,18 @@ const CoverPreview = ({
               {snapshotId && (
                 <SnapshotRenderer
                   snapshotID={snapshotId}
-                  style={{ width: viewWidth, height: viewHeight }}
+                  style={{
+                    width: viewWidth,
+                    height: viewHeight,
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                  }}
                 />
               )}
               {hasFocus && (
                 <VideoCompositionRenderer
-                  pause={
+                  paused={
                     editionMode === 'textEdit' ||
                     editionMode === 'text' ||
                     editionMode === 'overlay'
@@ -1058,36 +1067,33 @@ const CoverPreview = ({
                 }}
                 onPress={handleCanvasPress}
               >
-                <AnimatedPressable
-                  style={[
-                    {
-                      position: 'absolute',
-                      transformOrigin: 'center',
-                      transform: [{ rotate: `${linksLayer.rotation}rad` }],
-                      top: (linksLayer.position.y * viewHeight) / 100,
-                      left: (linksLayer.position.x * viewWidth) / 100,
+                <Animated.View
+                  style={[animatedLinksStyle, { transformOrigin: 'center' }]}
+                  pointerEvents="box-none"
+                >
+                  <Pressable
+                    onPress={handleLinksPress}
+                    pointerEvents="box-none"
+                    style={{
                       display: 'flex',
                       flexDirection: 'row',
                       gap: convertToBaseCanvasRatio(LINKS_GAP, viewWidth),
-                    },
-                    animatedLinksStyle,
-                  ]}
-                  onPress={handleLinksPress}
-                  pointerEvents="box-none"
-                >
-                  {linksLayer.links.map(link => (
-                    <DynamicLinkRenderer
-                      key={`${link.socialId}${link.position}`}
-                      as={View}
-                      cardColors={cardColors}
-                      color={linksLayer.color}
-                      link={link}
-                      shadow={linksLayer.shadow}
-                      size={linksLayer.size}
-                      viewWidth={viewWidth}
-                    />
-                  ))}
-                </AnimatedPressable>
+                    }}
+                  >
+                    {linksLayer.links.map(link => (
+                      <SocialLinkRenderer
+                        key={`${link.socialId}${link.position}`}
+                        cardColors={cardColors}
+                        color={linksLayer.color}
+                        link={link}
+                        shadow={linksLayer.shadow}
+                        size={linksLayer.size}
+                        viewWidth={viewWidth}
+                        disabled
+                      />
+                    ))}
+                  </Pressable>
+                </Animated.View>
 
                 {activeLayer.kind === 'overlay' &&
                   editionMode !== 'textEdit' && (
@@ -1276,17 +1282,16 @@ const CoverPreview = ({
 export default CoverPreview;
 
 const iconHitSlop = {
-  top: 3,
-  bottom: 3,
-  left: 3,
-  right: 3,
+  top: 5,
+  bottom: 5,
+  left: 5,
+  right: 5,
 };
 
 const CONTROLS_BUTTON_ICON_SIZE = 20;
 const CONTROLS_BUTTON_HEIGHT = 30;
 const OVERLAY_CONTROLS_MARGIN = 20;
 
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 const inBounds = (
   x: number,
@@ -1348,6 +1353,7 @@ const styles = StyleSheet.create({
     borderColor: colors.white,
     borderWidth: 2,
     transformOrigin: 'center',
+    pointerEvents: 'box-only',
   },
   controlsButtonIcon: {
     tintColor: colors.white,

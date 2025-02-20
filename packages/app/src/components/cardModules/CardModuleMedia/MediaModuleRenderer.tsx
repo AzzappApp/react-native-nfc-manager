@@ -2,6 +2,7 @@ import { graphql, readInlineData } from 'react-relay';
 import { type CardModuleColor } from '@azzapp/shared/cardModuleHelpers';
 import CardModuleEditionScrollHandler from '../CardModuleEditionScrollHandler';
 import withSwapCardModuleColor from '../withSwapCardModuleColor';
+import CardModuleMediaGrid from './CardModuleMediaGrid';
 import CardModuleMediaParallax from './CardModuleMediaParallax';
 import CardModuleMediaSlideshow from './CardModuleMediaSlideshow';
 import type {
@@ -37,6 +38,8 @@ export const MediaModuleRendererFragment = graphql`
     cardModuleMedias {
       media {
         id
+        width
+        height
         ... on MediaImage {
           uri(width: $screenWidth, pixelRatio: $pixelRatio)
           smallThumbnail: uri(width: 125, pixelRatio: $cappedPixelRatio)
@@ -80,6 +83,7 @@ const MediaModuleRenderer = ({
   scrollPosition,
   onLayout,
   colorPalette,
+  moduleEditing = false,
   ...props
 }: MediaModuleRendererProps) => {
   if ((data?.cardModuleMedias?.length ?? 0) < 1) {
@@ -93,6 +97,7 @@ const MediaModuleRenderer = ({
           cardModuleMedias={data.cardModuleMedias}
           cardModuleColor={data.cardModuleColor}
           displayMode={displayMode}
+          moduleEditing={moduleEditing}
           {...props}
         />
       );
@@ -105,6 +110,27 @@ const MediaModuleRenderer = ({
             onLayout={onLayout}
             displayMode={displayMode}
             scrollPosition={scrollPosition}
+            moduleEditing={moduleEditing}
+            {...props}
+          />
+        </CardModuleEditionScrollHandler>
+      );
+    case 'original':
+    case 'grid':
+    case 'square_grid':
+    case 'grid2':
+    case 'square_grid2':
+      return (
+        <CardModuleEditionScrollHandler scrollPosition={scrollPosition}>
+          <CardModuleMediaGrid
+            cardModuleMedias={data.cardModuleMedias}
+            cardModuleColor={data.cardModuleColor}
+            onLayout={onLayout}
+            displayMode={displayMode}
+            scrollPosition={scrollPosition}
+            square={isSquareGrid(variant)}
+            nbColumns={getGridNumberColumn(variant)}
+            moduleEditing={moduleEditing}
             {...props}
           />
         </CardModuleEditionScrollHandler>
@@ -115,3 +141,22 @@ const MediaModuleRenderer = ({
 export default withSwapCardModuleColor<MediaModuleRendererData, 'media'>(
   MediaModuleRenderer,
 );
+const getGridNumberColumn = (variant: string) => {
+  switch (variant) {
+    case 'grid':
+    case 'square_grid':
+      return 3;
+    case 'grid2':
+    case 'square_grid2':
+      return 2;
+    default:
+      return 1;
+  }
+};
+
+const isSquareGrid = (variant: string) => {
+  if (variant === 'square_grid' || variant === 'square_grid2') {
+    return true;
+  }
+  return false;
+};

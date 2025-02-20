@@ -136,6 +136,13 @@ const ERRORS = {
    * The reaction is not allowed
    */
   REACTION_NOT_ALLOWED: 'REACTION_NOT_ALLOWED',
+  /*
+   * The webcard doesn't have cover, action cannot be done
+   */
+  WEBCARD_NO_COVER: 'WEBCARD_NO_COVER',
+  /**
+   * not enough seats to publish a webcard
+   */
 } as const;
 
 export default ERRORS;

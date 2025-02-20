@@ -1,7 +1,7 @@
 import * as Clipboard from 'expo-clipboard';
-import { memo, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import Animated, {
   runOnJS,
   useAnimatedReaction,
@@ -12,6 +12,7 @@ import { Toast } from 'react-native-toast-message/lib/src/Toast';
 import { useFragment, graphql } from 'react-relay';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
+import { useTooltipContext } from '#helpers/TooltipContext';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
@@ -40,6 +41,7 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
 
   const { currentIndexProfileSharedValue, currentIndexSharedValue } =
     useHomeScreenContext();
+  const { registerTooltip, unregisterTooltip } = useTooltipContext();
 
   const userNames = useDerivedValue(
     () => profiles?.map(p => p.webCard?.userName) ?? [],
@@ -89,14 +91,28 @@ const HomeProfileLink = ({ user: userKey }: HomeProfileLinkProps) => {
     return 'azzapp.com/' + userNames.value[displayedItem];
   });
 
+  const ref = useRef(null);
+
+  useEffect(() => {
+    registerTooltip('profileLink', {
+      ref,
+      onPress,
+    });
+
+    return () => {
+      unregisterTooltip('profileLink');
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [registerTooltip, unregisterTooltip]);
+
   return (
-    <Animated.View style={[styles.container, opacityStyle]}>
+    <Animated.View ref={ref} style={[styles.container, opacityStyle]}>
       <PressableNative
         style={styles.containerText}
         accessibilityRole="button"
         onPress={onPress}
       >
-        <Icon icon="earth" style={styles.iconLink} />
+        <Icon icon="link" style={styles.iconLink} />
         <HomeProfileLinkText text={textDerivedValue} style={styles.url} />
         <View style={styles.emptyViewCenter} />
       </PressableNative>
@@ -138,8 +154,11 @@ const styles = StyleSheet.create({
     marginTop: PROFILE_LINK_MARGIN_TOP,
   },
   url: {
+    maxWidth: '90%',
     color: colors.white,
     lineHeight: 14,
+    top: Platform.OS === 'ios' ? 1 : 0,
+    height: 16,
     paddingLeft: 5,
   },
   iconLink: {

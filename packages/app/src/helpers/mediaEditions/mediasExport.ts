@@ -160,7 +160,7 @@ export const saveTransformedVideoToFile = async ({
   };
 
   const videoComposition = createSingleVideoComposition(
-    sourcePath,
+    sourcePath.replace('file://', ''),
     startTime ?? 0,
     duration ?? 0,
     decoderResolution,
@@ -200,7 +200,7 @@ export const saveTransformedVideoToFile = async ({
     await exportVideoComposition({
       videoComposition,
       drawFrame,
-      outPath,
+      outPath: outPath.replace('file://', ''),
       afterDrawFrame() {
         'worklet';
         global.gc?.();

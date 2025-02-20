@@ -23,15 +23,6 @@ jest.mock('react-native-quick-base64', () => ({
   fromByteArray: jest.fn(),
 }));
 
-jest.mock('react-native-blob-util', () => ({
-  fs: {
-    writeFile: jest.fn(),
-    dirs: {
-      CacheDir: 'CacheDir',
-    },
-  },
-}));
-
 jest.mock('#helpers/MobileWebAPI', () => ({
   getAppleWalletPass: jest.fn(),
   getGoogleWalletPass: jest.fn(),

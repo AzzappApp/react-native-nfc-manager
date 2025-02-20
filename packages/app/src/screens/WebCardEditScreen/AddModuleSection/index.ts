@@ -1,3 +1,3 @@
-import AddModuleSectionModal from './AddModuleSectionModal';
+import AddModuleSectionScreen from './AddModuleSectionScreen';
 
-export default AddModuleSectionModal;
+export default AddModuleSectionScreen;

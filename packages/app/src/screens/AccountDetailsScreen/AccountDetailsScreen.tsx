@@ -10,11 +10,11 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import relayScreen from '#helpers/relayScreen';
 import { useDeleteNotifications } from '#hooks/useNotifications';
+import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
 import Container from '#ui/Container';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
-import SafeAreaView from '#ui/SafeAreaView';
 import Text from '#ui/Text';
 import AccountDetailsEmailForm from './AccountDetailsEmailForm';
 import AccountDetailsHeader from './AccountDetailsHeader';
@@ -133,19 +133,16 @@ const AccountDetailsScreen = ({
     );
   }, [commit, deleteFcmToken, intl]);
 
+  const insets = useScreenInsets();
+
   if (!currentUser) {
     return null;
   }
 
   return (
     <Container style={{ flex: 1 }}>
-      <SafeAreaView
-        style={{
-          flex: 1,
-          rowGap: 15,
-        }}
-      >
-        <AccountDetailsHeader />
+      <AccountDetailsHeader />
+      <View style={[styles.content, { paddingBottom: insets.bottom }]}>
         <Icon icon="information" style={styles.warningIcon} />
         <View style={{ rowGap: 20, paddingHorizontal: 10 }}>
           <Text variant="xsmall" style={styles.warningMessage}>
@@ -229,7 +226,7 @@ const AccountDetailsScreen = ({
             </Text>
             <Text variant="medium">••••••••••</Text>
           </PressableNative>
-          {/* <View style={styles.sectionField}>
+          <View style={styles.sectionField}>
             <Text variant="smallbold">
               <FormattedMessage
                 defaultMessage="Plan"
@@ -261,7 +258,7 @@ const AccountDetailsScreen = ({
                 />
               )}
             </Text>
-          </View> */}
+          </View>
         </View>
         <PressableNative
           onPress={deleteMyAccount}
@@ -275,26 +272,27 @@ const AccountDetailsScreen = ({
             />
           </Text>
         </PressableNative>
-        <AccountDetailsEmailForm
-          currentUser={currentUser}
-          visible={emailsFormVisible}
-          toggleBottomSheet={toggleEmailsFormVisible}
-        />
-        <AccountDetailsPhoneNumberForm
-          currentUser={currentUser}
-          visible={phoneNumberFormVisible}
-          toggleBottomSheet={togglePhoneNumberFormVisible}
-        />
-        <AccountDetailsPasswordForm
-          visible={passwordVisible}
-          toggleBottomSheet={togglePasswordVisible}
-        />
-      </SafeAreaView>
+      </View>
+      <AccountDetailsEmailForm
+        currentUser={currentUser}
+        visible={emailsFormVisible}
+        toggleBottomSheet={toggleEmailsFormVisible}
+      />
+      <AccountDetailsPhoneNumberForm
+        currentUser={currentUser}
+        visible={phoneNumberFormVisible}
+        toggleBottomSheet={togglePhoneNumberFormVisible}
+      />
+      <AccountDetailsPasswordForm
+        visible={passwordVisible}
+        toggleBottomSheet={togglePasswordVisible}
+      />
     </Container>
   );
 };
 
 const styleSheet = createStyleSheet(appearance => ({
+  content: { flex: 1, rowGap: 15 },
   warningIcon: { width: 50, height: 50, alignSelf: 'center' },
   warningMessage: { width: 255, textAlign: 'center', alignSelf: 'center' },
   section: {

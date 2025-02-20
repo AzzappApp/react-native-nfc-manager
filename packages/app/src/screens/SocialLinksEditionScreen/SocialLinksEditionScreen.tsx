@@ -7,7 +7,7 @@ import {
   useState,
 } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment, useMutation } from 'react-relay';
@@ -24,7 +24,7 @@ import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
 import useScreenDimensions from '#hooks/useScreenDimensions';
-import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
+import { BOTTOM_MENU_HEIGHT, BOTTOM_MENU_PADDING } from '#ui/BottomMenu';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
@@ -382,13 +382,6 @@ const SocialLinksEditionScreen = ({
     closeAddLink();
   };
 
-  const onDeleteLink = useCallback(
-    (item: SocialLinkItem) => {
-      onLinksChange(links.filter(l => l?.position !== item.position));
-    },
-    [links, onLinksChange],
-  );
-
   const onLinkItemPress = useCallback(
     (link: SocialLinkItem) => {
       setPickedItem(link);
@@ -420,10 +413,9 @@ const SocialLinksEditionScreen = ({
         element: (
           <SocialLinksLinksEditionPanel
             links={links}
-            onDeleteLink={onDeleteLink}
+            onChangeLinks={onLinksChange}
             onAddLink={openAddLink}
             onItemPress={onLinkItemPress}
-            onOrderChange={onLinksChange}
             style={{
               minHeight: bottomPanelHeight,
               flex: 1,
@@ -495,7 +487,6 @@ const SocialLinksEditionScreen = ({
       onArrangementChange,
       onBackgroundChange,
       onBackgroundStyleChange,
-      onDeleteLink,
       onIconColorChange,
       onLinkItemPress,
       onLinksChange,
@@ -561,14 +552,15 @@ const SocialLinksEditionScreen = ({
           tabs={tabs}
         />
       </KeyboardAvoidingView>
-      <SocialLinksEditionBottomMenu
-        currentTab={currentTab}
-        onItemPress={onMenuItemPressed}
-        style={[
-          styles.tabsBar,
-          { bottom: insetBottom, width: windowWidth - 20 },
-        ]}
-      />
+      <View
+        style={[styles.tabsBar, { bottom: insetBottom - BOTTOM_MENU_PADDING }]}
+      >
+        <SocialLinksEditionBottomMenu
+          currentTab={currentTab}
+          onItemPress={onMenuItemPressed}
+          style={{ width: windowWidth - 20 }}
+        />
+      </View>
       <Suspense>
         <BottomSheetModal
           onDismiss={onCloseAddLink}
@@ -598,8 +590,8 @@ const styles = StyleSheet.create({
   },
   tabsBar: {
     position: 'absolute',
-    left: 10,
-    right: 10,
+    left: 0,
+    right: 0,
   },
   preview: {
     flex: 1,

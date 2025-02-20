@@ -2,12 +2,14 @@ import { GraphQLError } from 'graphql';
 import {
   getUserById,
   getUserProfilesWithWebCard,
+  getWebCardsOwnerUsers,
   markUserAsDeleted,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { invalidateWebCard } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
-import { activeSubscriptionsLoader } from '#loaders';
+import { activeSubscriptionsForUserLoader } from '#loaders';
+import { updateMonthlySubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#__generated__/types';
 
 const deleteUser: MutationResolvers['deleteUser'] = async () => {
@@ -16,7 +18,7 @@ const deleteUser: MutationResolvers['deleteUser'] = async () => {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
   if (
-    (await activeSubscriptionsLoader.load(userId)).filter(
+    (await activeSubscriptionsForUserLoader.load(userId)).filter(
       sub => sub.subscriptionPlan !== 'web.lifetime',
     ).length > 0
   ) {
@@ -31,6 +33,21 @@ const deleteUser: MutationResolvers['deleteUser'] = async () => {
         invalidateWebCard(webCard.userName);
       }
     });
+
+    const webCardIds: string[] = [];
+    userProfiles.forEach(({ profile, webCard }) => {
+      if (profile.profileRole !== 'owner' && webCard.id) {
+        webCardIds.push(webCard.id);
+      }
+    });
+    const owners = (await getWebCardsOwnerUsers(webCardIds)).filter(
+      owner => !!owner,
+    );
+    if (owners.length > 0) {
+      for (const owner of owners) {
+        await updateMonthlySubscription(owner.id);
+      }
+    }
   } catch (error) {
     console.error(error);
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);

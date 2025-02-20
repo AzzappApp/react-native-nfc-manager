@@ -37,11 +37,13 @@ export const uriResolver =
       height,
       pixelRatio,
       raw,
+      format,
     }: {
       width?: number | null;
       height?: number | null;
       pixelRatio?: number | null;
       raw?: boolean | null;
+      format?: string | null;
     },
   ) => {
     const assetKind = getAssetKind(media);
@@ -70,6 +72,7 @@ export const uriResolver =
       pixelRatio,
       pregeneratedSizes,
       previewPositionPercentage,
+      format,
     });
   };
 

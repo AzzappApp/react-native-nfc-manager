@@ -19,6 +19,15 @@ export function logSignUp(userId: string) {
     .catch();
 }
 
+export function logSignIn(userId: string) {
+  analytics()
+    .setUserId(userId)
+    .then(() => {
+      logEvent('sign_in', { userId });
+    })
+    .catch();
+}
+
 /**
  * Generic even logging,this function is here in case we change analytics on day, or add a second one
  * to avoid change in all the code

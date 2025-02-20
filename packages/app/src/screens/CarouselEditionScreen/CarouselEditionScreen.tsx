@@ -1,6 +1,6 @@
 import { startTransition, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
@@ -27,10 +27,11 @@ import {
   saveTransformedImageToFile,
 } from '#helpers/mediaEditions';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
+import { downScaleImage } from '#helpers/resolutionHelpers';
 import useEditorLayout from '#hooks/useEditorLayout';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
 import useModuleDataEditor from '#hooks/useModuleDataEditor';
-import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
+import { BOTTOM_MENU_HEIGHT, BOTTOM_MENU_PADDING } from '#ui/BottomMenu';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
@@ -271,15 +272,15 @@ const CarouselEditionScreen = ({
     async ({
       uri,
       width,
+      height,
       editionParameters,
       filter,
       aspectRatio,
     }: ImagePickerResult) => {
-      const exportWidth = Math.min(MODULE_IMAGE_MAX_WIDTH, width);
-      const exportHeight = exportWidth / aspectRatio;
+      const resolution = downScaleImage(width, height, MODULE_IMAGE_MAX_WIDTH);
       const localPath = await saveTransformedImageToFile({
         uri,
-        resolution: { width: exportWidth, height: exportHeight },
+        resolution,
         format: getTargetFormatFromPath(uri),
         quality: 95,
         filter,
@@ -292,9 +293,7 @@ const CarouselEditionScreen = ({
           {
             local: true,
             id: localPath,
-            uri: localPath.startsWith('file')
-              ? localPath
-              : `file://${localPath}`,
+            uri: localPath,
             aspectRatio,
           },
         ],
@@ -616,14 +615,15 @@ const CarouselEditionScreen = ({
           },
         ]}
       />
-      <CarouselEditionBottomMenu
-        currentTab={currentTab}
-        onItemPress={onMenuItemPress}
-        style={[
-          styles.tabsBar,
-          { bottom: insetBottom, width: windowWidth - 20 },
-        ]}
-      />
+      <View
+        style={[styles.tabsBar, { bottom: insetBottom - BOTTOM_MENU_PADDING }]}
+      >
+        <CarouselEditionBottomMenu
+          currentTab={currentTab}
+          onItemPress={onMenuItemPress}
+          style={{ width: windowWidth - 20 }}
+        />
+      </View>
       <ScreenModal
         visible={showImagePicker}
         onRequestDismiss={onCloseImagePicker}
@@ -654,8 +654,8 @@ const styles = StyleSheet.create({
   },
   tabsBar: {
     position: 'absolute',
-    left: 10,
-    right: 10,
+    left: 0,
+    right: 0,
   },
   tabStyle: {
     flex: 1,

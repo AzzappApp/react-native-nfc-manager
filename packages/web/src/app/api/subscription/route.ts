@@ -2,10 +2,13 @@ import * as Sentry from '@sentry/nextjs';
 import { NextResponse } from 'next/server';
 import {
   createSubscription,
+  getTotalMultiUser,
   getUserSubscriptions,
+  getWebCardByUserId,
   transaction,
-  updateActiveUserSubscription,
+  updateActiveInAppUserSubscription,
 } from '@azzapp/data';
+import { revalidateWebcardsAndPosts } from '#helpers/api';
 import cors from '#helpers/cors';
 import { withPluginsRoute } from '#helpers/queries';
 import { unpublishWebCardForUser } from '#helpers/subscription';
@@ -13,6 +16,7 @@ import { unpublishWebCardForUser } from '#helpers/subscription';
 const BEARER_HEADER = process.env.IAP_REVENUECAT_NOTIFICATION_BEARER;
 const subscriptionWebHook = async (req: Request) => {
   const authorization = req.headers.get('Authorization');
+
   if (!authorization) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
@@ -37,9 +41,7 @@ const subscriptionWebHook = async (req: Request) => {
     switch (type) {
       case 'INITIAL_PURCHASE': {
         await transaction(async () => {
-          const sub = (await getUserSubscriptions(userId)).filter(
-            s => s.issuer !== 'web',
-          );
+          const sub = await getUserSubscriptions(userId, ['apple', 'google']);
           if (sub.length === 0) {
             await createSubscription({
               userId,
@@ -58,7 +60,7 @@ const subscriptionWebHook = async (req: Request) => {
               status: 'active',
             });
           } else {
-            await updateActiveUserSubscription(userId, {
+            await updateActiveInAppUserSubscription(userId, {
               subscriptionId,
               startAt: new Date(purchased_at_ms),
               endAt: new Date(expiration_at_ms),
@@ -82,9 +84,8 @@ const subscriptionWebHook = async (req: Request) => {
         break;
       case 'EXPIRATION':
         await transaction(async () => {
-          const sub = (await getUserSubscriptions(userId)).filter(
-            s => s.issuer !== 'web',
-          );
+          const sub = await getUserSubscriptions(userId, ['apple', 'google']);
+
           if (sub.length === 0) {
             await createSubscription({
               userId,
@@ -101,9 +102,10 @@ const subscriptionWebHook = async (req: Request) => {
               totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
               freeSeats: 0,
               status: 'canceled',
+              invalidatedAt: new Date(),
             });
           } else {
-            await updateActiveUserSubscription(userId, {
+            await updateActiveInAppUserSubscription(userId, {
               subscriptionId,
               endAt: new Date(expiration_at_ms),
               revenueCatId: rcId,
@@ -111,7 +113,7 @@ const subscriptionWebHook = async (req: Request) => {
               invalidatedAt: new Date(),
             });
 
-            await unpublishWebCardForUser(userId);
+            await unpublishWebCardForUser({ userId });
           }
         });
 
@@ -119,9 +121,7 @@ const subscriptionWebHook = async (req: Request) => {
       case 'SUBSCRIPTION_EXTENDED':
       case 'UNCANCELLATION':
         await transaction(async () => {
-          const sub = (await getUserSubscriptions(userId)).filter(
-            s => s.issuer !== 'web',
-          );
+          const sub = await getUserSubscriptions(userId, ['apple', 'google']);
           if (sub.length === 0) {
             await createSubscription({
               userId,
@@ -140,11 +140,18 @@ const subscriptionWebHook = async (req: Request) => {
               status: 'active',
             });
           } else {
-            await updateActiveUserSubscription(userId, {
+            await updateActiveInAppUserSubscription(userId, {
               subscriptionId,
               startAt: new Date(purchased_at_ms),
               endAt: new Date(expiration_at_ms),
               revenueCatId: rcId,
+              issuer:
+                store === 'APP_STORE'
+                  ? 'apple'
+                  : store === 'PLAY_STORE'
+                    ? 'google'
+                    : 'web',
+              totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
               status: 'active',
             });
           }
@@ -152,9 +159,8 @@ const subscriptionWebHook = async (req: Request) => {
         break;
       case 'RENEWAL':
         await transaction(async () => {
-          const sub = (await getUserSubscriptions(userId)).filter(
-            s => s.issuer !== 'web',
-          );
+          const totalSeats = extractSeatsFromSubscriptionId(subscriptionId);
+          const sub = await getUserSubscriptions(userId, ['apple', 'google']);
           if (sub.length === 0) {
             await createSubscription({
               userId,
@@ -168,17 +174,32 @@ const subscriptionWebHook = async (req: Request) => {
                   : store === 'PLAY_STORE'
                     ? 'google'
                     : 'web',
-              totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
+              totalSeats,
               freeSeats: 0,
               status: 'active',
             });
           } else {
-            await updateActiveUserSubscription(userId, {
+            await updateActiveInAppUserSubscription(userId, {
               startAt: new Date(purchased_at_ms),
               endAt: new Date(expiration_at_ms),
               revenueCatId: rcId,
+              subscriptionId,
+              issuer:
+                store === 'APP_STORE'
+                  ? 'apple'
+                  : store === 'PLAY_STORE'
+                    ? 'google'
+                    : 'web',
+              totalSeats,
               status: 'active',
             });
+            const totalUsedSeats = await getTotalMultiUser(userId);
+            if (totalSeats - totalUsedSeats < 0) {
+              await unpublishWebCardForUser({
+                userId,
+                forceUnpublishUser: true,
+              });
+            }
           }
         });
 
@@ -191,9 +212,7 @@ const subscriptionWebHook = async (req: Request) => {
           new Date(grace_period_expiration_at_ms) > new Date()
         ) {
           await transaction(async () => {
-            const sub = (await getUserSubscriptions(userId)).filter(
-              s => s.issuer !== 'web',
-            );
+            const sub = await getUserSubscriptions(userId, ['apple', 'google']);
             if (sub.length === 0) {
               await createSubscription({
                 userId,
@@ -208,66 +227,39 @@ const subscriptionWebHook = async (req: Request) => {
                       ? 'google'
                       : 'web',
                 freeSeats: 0,
-                status: 'active',
+                status: 'canceled',
               });
             } else {
-              await updateActiveUserSubscription(userId, {
+              await updateActiveInAppUserSubscription(userId, {
                 endAt: new Date(grace_period_expiration_at_ms),
                 revenueCatId: rcId,
+                subscriptionId,
+                freeSeats: 0,
+                status: 'canceled',
               });
             }
           });
         }
-
         break;
 
       case 'PRODUCT_CHANGE':
-        await transaction(async () => {
-          //with the difference bteween azzapp Profile and ios/adnroid account, it can happen that a renewal is done on another profile if the uer created a new profile, initial purchase does not happen
-          const sub = (await getUserSubscriptions(userId)).filter(
-            s => s.issuer !== 'web',
-          );
-          if (sub.length === 0) {
-            await createSubscription({
-              userId,
-              subscriptionId,
-              startAt: new Date(purchased_at_ms),
-              endAt: new Date(expiration_at_ms),
-              revenueCatId: rcId,
-              issuer:
-                store === 'APP_STORE'
-                  ? 'apple'
-                  : store === 'PLAY_STORE'
-                    ? 'google'
-                    : 'web',
-              totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
-              freeSeats: 0,
-              status: 'active',
-            });
-          } else {
-            await updateActiveUserSubscription(userId, {
-              subscriptionId,
-              startAt: new Date(purchased_at_ms),
-              endAt: new Date(grace_period_expiration_at_ms),
-              revenueCatId: rcId,
-              issuer:
-                store === 'APP_STORE'
-                  ? 'apple'
-                  : store === 'PLAY_STORE'
-                    ? 'google'
-                    : 'web',
-              totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
-              status: 'active',
-            });
-          }
-        });
-
+        // PRODUCT CHANGE WAS BREAKING THE SUBSCRIPTION
+        // The PRODUCT_CHANGE webhook should be considered informative,
+        // and does not mean that the product change has gone into effect. When the product change goes into effect
+        // you will receive a RENEWAL event on Apple and Stripe or a INITIAL_PURCHASE event on Google Play.
+        //we can use it for analytics
         break;
-
       case 'TRANSFER':
         break;
       //we are transfering only when the user sub is over, no work is required here
     }
+
+    const webcards = await getWebCardByUserId(userId);
+    revalidateWebcardsAndPosts(
+      webcards
+        .map(({ userName }) => userName)
+        .filter(userName => userName !== null),
+    );
 
     return NextResponse.json(null, { status: 200 });
   } catch (e) {

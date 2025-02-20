@@ -1,10 +1,15 @@
 import { FlashList } from '@shopify/flash-list';
-import { Image } from 'expo-image';
+import { Image as ExpoImage } from 'expo-image';
 import memoize from 'lodash/memoize';
 import range from 'lodash/range';
 import { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useIntl } from 'react-intl';
-import { StyleSheet, useColorScheme, View } from 'react-native';
+import {
+  StyleSheet,
+  useColorScheme,
+  View,
+  Image as RNImage,
+} from 'react-native';
 import { colors } from '#theme';
 import { formatVideoTime } from '#helpers/mediaHelpers';
 import ActivityIndicator from '#ui/ActivityIndicator';
@@ -28,6 +33,7 @@ type MediaGridListProps<T> = Omit<ViewProps, 'children'> & {
   getItemDuration: (item: T) => number | undefined;
   onSelect: (media: T) => void;
   onEndReached?: (() => void) | null | undefined;
+  useNativeImage?: boolean;
 };
 
 const MediaGridList = <T,>({
@@ -44,6 +50,7 @@ const MediaGridList = <T,>({
   getItemDuration,
   onEndReached,
   onSelect,
+  useNativeImage = false,
   ...props
 }: MediaGridListProps<T>) => {
   const scrollViewRef = useRef<FlashList<any>>(null);
@@ -65,14 +72,16 @@ const MediaGridList = <T,>({
   const renderItem = useCallback(
     ({ item }: ListRenderItemInfo<T>) => {
       const id = getItemId(item);
+      const uri = getItemUri(item);
       return (
         <MemoMediaItemRenderer
-          uri={getItemUri(item)}
+          uri={uri}
           duration={getItemDuration(item)}
           selected={selectedMediaIds?.includes(id) ?? false}
-          isLoading={filesDownloading?.includes(id) ?? false}
+          isLoading={filesDownloading?.includes(uri) ?? false}
           height={itemHeight}
           onPress={memoizedOnSelect(item)}
+          useNativeImage={useNativeImage}
         />
       );
     },
@@ -84,6 +93,7 @@ const MediaGridList = <T,>({
       filesDownloading,
       itemHeight,
       memoizedOnSelect,
+      useNativeImage,
     ],
   );
 
@@ -153,6 +163,7 @@ type MediaItemRendererProps = {
   isLoading: boolean;
   disabled?: boolean;
   onPress: () => void;
+  useNativeImage?: boolean;
 };
 
 const selectedBorderWidth = 2;
@@ -165,7 +176,9 @@ const MediaItemRenderer = ({
   isLoading,
   disabled,
   onPress,
+  useNativeImage = false,
 }: MediaItemRendererProps) => {
+  const Image = useNativeImage ? RNImage : ExpoImage;
   const intl = useIntl();
   const appearance = useColorScheme();
 
@@ -273,6 +286,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   loadingMore: { justifyContent: 'center', alignItems: 'center' },
   separator: { width: SEPARATOR_WIDTH, height: SEPARATOR_WIDTH },

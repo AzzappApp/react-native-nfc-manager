@@ -268,7 +268,7 @@ const columns: GridColDef[] = [
     field: 'subscriptionPlan',
     headerName: 'Type',
     width: 100,
-    valueGetter: ({ value }) => value?.replace('web.', '') || '',
+    valueGetter: (value: string) => value?.replace('web.', '') || '',
   },
   {
     field: 'userId',
@@ -284,7 +284,7 @@ const columns: GridColDef[] = [
     field: 'amount',
     headerName: 'Billed for',
     flex: 1,
-    valueGetter: ({ value, row }) =>
+    valueGetter: (value: number, row) =>
       `${((value + row.taxes) / 100).toFixed(2)}€ (${row.totalSeats} users)`,
   },
   {

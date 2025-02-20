@@ -188,6 +188,7 @@ const PostRendererMedia = (
           onReadyForDisplay={onReady}
           testID="PostRendererMedia_media"
           useAnimationSnapshot={useAnimationSnapshot}
+          useRecycling
         />
       )}
     </View>

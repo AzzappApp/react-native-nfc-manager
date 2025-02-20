@@ -8,6 +8,7 @@ import {
   deleteRedirection,
   getWebCardById,
   getWebCardByUserNamePrefixWithRedirection,
+  pickRandomPredefinedCover,
 } from '@azzapp/data';
 import { getSessionInfos } from '#GraphQLContext';
 import { userLoader } from '#loaders';
@@ -124,6 +125,11 @@ export const Query: QueryResolvers = {
       return null;
     }
     return profileName + suffix;
+  },
+  pickRandomPredefinedCover: async () => {
+    const { mediaId } = await pickRandomPredefinedCover();
+
+    return { media: mediaId, assetKind: 'cover' };
   },
 };
 

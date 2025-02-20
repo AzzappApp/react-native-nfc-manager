@@ -236,7 +236,12 @@ export default [
     },
   },
   {
-    files: ['packages/web/**/*.ts', 'packages/web/**/*.tsx'],
+    files: [
+      'packages/web/**/*.ts',
+      'packages/web/**/*.tsx',
+      'packages/schema/**/*.ts',
+      'packages/schema/**/*.tsx',
+    ],
     rules: {
       'formatjs/enforce-id': [
         'error',

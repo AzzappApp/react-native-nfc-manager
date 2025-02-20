@@ -190,6 +190,7 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
           onDismiss={close}
           style={styles.bottomSheetStyle}
           height={bottomSheetHeight}
+          dismissKeyboardOnOpening
         >
           <Controller
             name={labelKey}

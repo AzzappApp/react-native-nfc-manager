@@ -16,7 +16,7 @@ import { colors } from '#theme';
 
 import { getAuthState } from '#helpers/authStore';
 import useScreenInsets from '#hooks/useScreenInsets';
-import BottomMenu from '#ui/BottomMenu';
+import BottomMenu, { BOTTOM_MENU_PADDING } from '#ui/BottomMenu';
 import Text from '#ui/Text';
 import { HomeIcon } from './HomeIcon';
 import { useRouter } from './NativeRouter';
@@ -211,7 +211,7 @@ const MainTabBar = ({
         {
           left: 0,
           bottom: 0,
-          paddingBottom: insets.bottom,
+          paddingBottom: insets.bottom - BOTTOM_MENU_PADDING,
           position: 'absolute',
           paddingLeft: MARGIN_HORIZONTAL,
           paddingRight: MARGIN_HORIZONTAL,

@@ -1,19 +1,10 @@
-import * as Sentry from '@sentry/react-native';
-import {
-  addContactAsync,
-  PermissionStatus,
-  updateContactAsync,
-} from 'expo-contacts';
+import { PermissionStatus } from 'expo-contacts';
 import { useCallback, useEffect, useState } from 'react';
-import { useIntl } from 'react-intl';
 import { AppState, StyleSheet } from 'react-native';
-import Toast from 'react-native-toast-message';
 import { useRouter, type NativeScreenProps } from '#components/NativeRouter';
-import { findLocalContact } from '#helpers/contactCardHelpers';
-import { reworkContactForDeviceInsert } from '#helpers/contactListHelpers';
 import { getLocalContactsMap } from '#helpers/getLocalContactsMap';
+import useOnInviteContact from '#hooks/useOnInviteContact';
 import { usePhonebookPermission } from '#hooks/usePhonebookPermission';
-import { storage } from '#screens/ContactsScreen/ContactsScreen';
 import SafeAreaView from '#ui/SafeAreaView';
 import ContactDetailsBody from './ContactDetailsBody';
 import type { ContactDetailsRoute } from '#routes';
@@ -24,32 +15,27 @@ type Props = NativeScreenProps<ContactDetailsRoute>;
 const ContactDetailsScreen = ({ route }: Props) => {
   const contact = route.params;
   const router = useRouter();
-  const intl = useIntl();
 
   const [localContacts, setLocalContacts] = useState<Contact[]>();
   const [contactsPermissionStatus, setContactsPermissionStatus] = useState(
     PermissionStatus.UNDETERMINED,
   );
 
-  const { requestPhonebookPermissionAndRedirectToSettingsAsync } =
-    usePhonebookPermission();
+  const { requestPhonebookPermissionAsync } = usePhonebookPermission();
+
+  const updatePermission = useCallback(async () => {
+    const { status } = await requestPhonebookPermissionAsync();
+    setContactsPermissionStatus(status);
+  }, [requestPhonebookPermissionAsync]);
 
   // will setup the permission for this screen at first opening
   useEffect(() => {
     if (contactsPermissionStatus === PermissionStatus.UNDETERMINED) {
-      const updatePermission = async () => {
-        const { status } =
-          await requestPhonebookPermissionAndRedirectToSettingsAsync();
-        setContactsPermissionStatus(status);
-      };
       updatePermission();
     }
-  }, [
-    contactsPermissionStatus,
-    requestPhonebookPermissionAndRedirectToSettingsAsync,
-  ]);
+  }, [contactsPermissionStatus, updatePermission]);
 
-  // refresh loca contact map
+  // refresh local contact map
   const refreshLocalContacts = useCallback(async () => {
     if (contactsPermissionStatus === PermissionStatus.GRANTED) {
       setLocalContacts(await getLocalContactsMap());
@@ -76,75 +62,30 @@ const ContactDetailsScreen = ({ route }: Props) => {
     }
   }, [contactsPermissionStatus, refreshLocalContacts]);
 
-  const onInviteContact = useCallback(async () => {
-    try {
-      let messageToast = '';
-      if (
-        contactsPermissionStatus === PermissionStatus.GRANTED &&
-        localContacts
-      ) {
-        const phoneNumbers =
-          contact.phoneNumbers
-            ?.filter(({ number }) => !!number)
-            .map(({ number }) => number) ?? [];
+  const onInviteContact = useOnInviteContact();
 
-        const emails =
-          contact.emails
-            ?.filter(({ email }) => !!email)
-            .map(({ email }) => email) ?? [];
-
-        const foundContact = await findLocalContact(
-          storage,
-          phoneNumbers as string[],
-          emails as string[],
-          localContacts,
-          contact.profileId,
-        );
-
-        if (foundContact) {
-          const contactToAddReworked = reworkContactForDeviceInsert({
-            ...contact,
-            id: foundContact.id,
-          });
-
-          await updateContactAsync(contactToAddReworked);
-          messageToast = intl.formatMessage({
-            defaultMessage: 'The contact was updated successfully.',
-            description: 'Toast message when a contact is updated successfully',
-          });
-        } else {
-          const contactToAddReworked = reworkContactForDeviceInsert(contact);
-          const resultId = await addContactAsync(contactToAddReworked).catch(
-            e => {
-              Sentry.captureException(e);
-              return '';
-            },
-          );
-          if (contact.profileId) {
-            storage.set(contact.profileId, resultId);
-          }
-          messageToast = intl.formatMessage({
-            defaultMessage: 'The contact was created successfully.',
-            description: 'Toast message when a contact is created successfully',
-          });
-        }
-
-        Toast.show({
-          type: 'success',
-          text1: messageToast,
-        });
+  const onInviteContactInner = useCallback(async () => {
+    const result = await onInviteContact(
+      contactsPermissionStatus,
+      contact,
+      localContacts,
+    );
+    if (result) {
+      if (result.status) {
+        setContactsPermissionStatus(result.status);
       }
-    } catch (e) {
-      console.error(e);
+      if (result.localContacts) {
+        setLocalContacts(result.localContacts);
+      }
     }
-  }, [contact, contactsPermissionStatus, intl, localContacts]);
+  }, [contact, contactsPermissionStatus, localContacts, onInviteContact]);
 
   return (
     <SafeAreaView style={styles.container}>
       <ContactDetailsBody
         details={contact}
         onClose={router.back}
-        onSave={onInviteContact}
+        onSave={onInviteContactInner}
       />
     </SafeAreaView>
   );

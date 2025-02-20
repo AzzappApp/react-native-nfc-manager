@@ -44,7 +44,11 @@ const PostLikesScreen = ({
         <Header
           middleElement={intl.formatMessage(
             {
-              defaultMessage: '{likes} Likes',
+              defaultMessage: `{likes, plural,
+              =0 {0 likes}
+              =1 {# like}
+              other {# likes}
+            }`,
               description: 'Post Likes header title',
             },
             { likes: post?.counterReactions },

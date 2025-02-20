@@ -1,16 +1,12 @@
 import * as Sentry from '@sentry/nextjs';
 import { GraphQLError } from 'graphql';
 import { toGlobalId } from 'graphql-relay';
-import {
-  countDeletedWebCardProfiles,
-  getUsersFromWebCard,
-  updateWebCardProfiles,
-} from '@azzapp/data';
+import { getUsersFromWebCard, updateWebCardProfiles } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
 import { notifyUsers, sendPushNotification } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
-import { userLoader, webCardLoader } from '#loaders';
+import { userLoader, webCardLoader, webCardOwnerLoader } from '#loaders';
 import { checkWebCardProfileAdminRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
@@ -38,17 +34,18 @@ const sendInvitations: MutationResolvers['sendInvitations'] = async (
       : profileIds?.map(id => fromGlobalIdWithType(id, 'Profile')),
   );
 
-  const countDeletedProfiles = await countDeletedWebCardProfiles(
-    webCardId,
-    allProfiles ? undefined : users.map(({ profileId }) => profileId),
-  );
+  const countDeletedProfiles = users.filter(
+    ({ profileIsDeleted }) => profileIsDeleted,
+  ).length;
+
+  const owner = await webCardOwnerLoader.load(webCardId);
+
+  if (!owner) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
 
   if (countDeletedProfiles > 0) {
-    await validateCurrentSubscription(
-      getSessionInfos().userId!,
-      webCardId,
-      countDeletedProfiles,
-    );
+    await validateCurrentSubscription(owner.id, countDeletedProfiles);
   }
 
   const webCard = await webCardLoader.load(webCardId);
@@ -68,11 +65,11 @@ const sendInvitations: MutationResolvers['sendInvitations'] = async (
     withEmail: typeof users;
     withPhoneNumbers: typeof users;
   }>(
-    (acc, { user, profileId }) => {
-      if (user.email) {
-        acc.withEmail.push({ user, profileId });
-      } else if (user.phoneNumber) {
-        acc.withPhoneNumbers.push({ user, profileId });
+    (acc, value) => {
+      if (value.user.email) {
+        acc.withEmail.push(value);
+      } else if (value.user.phoneNumber) {
+        acc.withPhoneNumbers.push(value);
       }
       return acc;
     },
@@ -85,19 +82,45 @@ const sendInvitations: MutationResolvers['sendInvitations'] = async (
 
   try {
     if (withPhoneNumbers.length > 0 || withEmail.length > 0) {
-      await updateWebCardProfiles(
-        webCardId,
-        {
-          inviteSent: true,
-          invited: true,
-          deleted: false,
-          deletedAt: null,
-          deletedBy: null,
-        },
-        withPhoneNumbers
-          .map(({ profileId }) => profileId)
-          .concat(withEmail.map(({ profileId }) => profileId)),
-      );
+      const deletedProfiles = withPhoneNumbers
+        .filter(({ profileIsDeleted }) => profileIsDeleted)
+        .map(({ profileId }) => profileId)
+        .concat(
+          withEmail
+            .filter(({ profileIsDeleted }) => profileIsDeleted)
+            .map(({ profileId }) => profileId),
+        );
+      if (deletedProfiles.length > 0) {
+        await updateWebCardProfiles(
+          webCardId,
+          {
+            inviteSent: true,
+            invited: true,
+            deleted: false,
+            deletedAt: null,
+            deletedBy: null,
+          },
+          deletedProfiles,
+        );
+      }
+
+      const activeUsers = withPhoneNumbers
+        .filter(({ user }) => !user.deleted)
+        .map(({ profileId }) => profileId)
+        .concat(
+          withEmail
+            .filter(({ user }) => !user.deleted)
+            .map(({ profileId }) => profileId),
+        );
+      if (activeUsers.length > 0) {
+        await updateWebCardProfiles(
+          webCardId,
+          {
+            inviteSent: true,
+          },
+          activeUsers,
+        );
+      }
     }
 
     if (withEmail.length > 0) {

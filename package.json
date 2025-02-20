@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/monorepo",
-  "version": "1.6.23",
+  "version": "1.7.2",
   "private": true,
   "packageManager": "yarn@4.5.1",
   "workspaces": {
@@ -104,8 +104,7 @@
     "react-native-image-size@^1.1.6": "patch:react-native-image-size@npm%3A1.1.6#./.yarn/patches/react-native-image-size-npm-1.1.6-38755aad48.patch",
     "drizzle-kit@^0.24.2": "patch:drizzle-kit@npm%3A0.24.2#./.yarn/patches/drizzle-kit-npm-0.24.2-ed6f619edc.patch",
     "vcard-creator@^0.7.0": "patch:vcard-creator@npm%3A0.7.0#./.yarn/patches/vcard-creator-npm-0.7.0-a36000c711.patch",
-    "source-map-explorer@npm:^2.5.3": "patch:source-map-explorer@npm%3A2.5.3#~/.yarn/patches/source-map-explorer-npm-2.5.3-1f901669e9.patch",
-    "expo-file-system@npm:~18.0.6": "patch:expo-file-system@npm%3A18.0.6#~/.yarn/patches/expo-file-system-npm-18.0.6-08df78c1fd.patch"
+    "source-map-explorer@npm:^2.5.3": "patch:source-map-explorer@npm%3A2.5.3#~/.yarn/patches/source-map-explorer-npm-2.5.3-1f901669e9.patch"
   },
   "dependencies": {
     "node-gyp": "^10.1.0"

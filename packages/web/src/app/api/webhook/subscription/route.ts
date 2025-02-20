@@ -1,9 +1,11 @@
 import * as z from 'zod';
+import { getUserProfilesWithWebCard } from '@azzapp/data';
 import {
   acknowledgeRecurringPayment,
   checkSignature,
   rejectRecurringPayment,
 } from '@azzapp/payment';
+import { revalidateWebcardsAndPosts } from '#helpers/api';
 import { withPluginsRoute } from '#helpers/queries';
 
 const subscriptionPostSchema = z.object({
@@ -29,8 +31,9 @@ export const POST = withPluginsRoute(async (req: Request) => {
     return new Response('hash mismatch', { status: 400 });
   }
 
+  let subscription;
   if (data.status === 'OK') {
-    await acknowledgeRecurringPayment(
+    subscription = await acknowledgeRecurringPayment(
       data.rebill_manager_external_reference,
       data.rebill_manager_id,
       data.transaction_id,
@@ -38,11 +41,23 @@ export const POST = withPluginsRoute(async (req: Request) => {
       data.provider_response,
     );
   } else {
-    await rejectRecurringPayment(
+    subscription = await rejectRecurringPayment(
       data.rebill_manager_external_reference,
       data.rebill_manager_state === 'ON',
       data.transaction_id,
       data.provider_response,
+    );
+  }
+
+  if (subscription) {
+    const webcards = await getUserProfilesWithWebCard(
+      subscription.userId,
+      'owner',
+    );
+    revalidateWebcardsAndPosts(
+      webcards
+        .map(({ webCard }) => webCard.userName)
+        .filter(value => value !== null),
     );
   }
 

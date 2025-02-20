@@ -183,9 +183,9 @@ describe('localeHelpers', () => {
       expect(result.current).toBe('fr');
       mock.mockReturnValueOnce([
         {
-          languageCode: 'es',
-          countryCode: 'es',
-          languageTag: 'es',
+          languageCode: 'ja',
+          countryCode: 'ja',
+          languageTag: 'ja',
           isRTL: false,
         },
       ]);
@@ -265,9 +265,9 @@ describe('localeHelpers', () => {
       expect(result.current).toBe('fr');
       mock.mockReturnValueOnce([
         {
-          languageCode: 'es',
-          countryCode: 'es',
-          languageTag: 'es',
+          languageCode: 'ja',
+          countryCode: 'ja',
+          languageTag: 'ja',
           isRTL: false,
         },
       ]);

@@ -1,4 +1,10 @@
-import { calculateAmount, calculateTaxes } from '#helpers';
+import {
+  calculateAmountForSeats,
+  calculateAzzappPlusPrice,
+  calculateTaxes,
+  getAzzappPlusPrice,
+  getPricePerSeat,
+} from '#helpers';
 
 export const estimate = async (
   totalSeats: number,
@@ -6,7 +12,13 @@ export const estimate = async (
   countryCode?: string,
   vatNumber?: string,
 ) => {
-  const amount = calculateAmount(totalSeats, `web.${interval}`);
+  const subscriptionPlan = `web.${interval}` as const;
+
+  const amountForSeats = calculateAmountForSeats(totalSeats, subscriptionPlan);
+
+  const amountAzzappPlus = calculateAzzappPlusPrice(subscriptionPlan);
+
+  const amount = amountForSeats + amountAzzappPlus;
 
   const { rate: taxRate, amount: taxes } = await calculateTaxes(
     amount,
@@ -16,6 +28,10 @@ export const estimate = async (
 
   return {
     amount,
+    amountForSeats,
+    azzappPlusPerMonth: getAzzappPlusPrice(subscriptionPlan),
+    amountAzzappPlus: calculateAzzappPlusPrice(subscriptionPlan),
+    pricePerSeat: getPricePerSeat(subscriptionPlan),
     taxes,
     taxRate,
   };

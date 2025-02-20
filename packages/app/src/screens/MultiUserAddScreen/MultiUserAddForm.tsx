@@ -130,6 +130,7 @@ const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
               height - top,
             )}
             variant="modal"
+            dismissKeyboardOnOpening
           >
             <Header
               middleElement={
@@ -195,6 +196,7 @@ const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
               }) as string
             }
             useFlatList={false}
+            dismissKeyboardOnOpening
           />
         )}
       />

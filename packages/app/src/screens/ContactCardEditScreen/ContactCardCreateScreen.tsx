@@ -8,7 +8,6 @@ import * as mime from 'react-native-mime-types'; // FIXME import is verry big
 import Toast from 'react-native-toast-message';
 import { useMutation } from 'react-relay';
 import { graphql, Observable } from 'relay-runtime';
-import { waitTime } from '@azzapp/shared/asyncHelpers';
 import { mainRoutes } from '#mobileRoutes';
 import { colors } from '#theme';
 import {
@@ -17,12 +16,12 @@ import {
   ScreenModal,
 } from '#components/NativeRouter';
 import BottomSheetPopup from '#components/popup/BottomSheetPopup';
-import { PopupButton } from '#components/popup/PopupElements';
 import { onChangeWebCard } from '#helpers/authStore';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getFileName } from '#helpers/fileHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
+import { getPhonenumberWithCountryCode } from '#helpers/phoneNumbersHelper';
 import useBoolean from '#hooks/useBoolean';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -38,8 +37,7 @@ import {
 import type { ScreenOptions } from '#components/NativeRouter';
 import type { ContactCardCreateScreenMutation } from '#relayArtifacts/ContactCardCreateScreenMutation.graphql';
 import type { ContactCardCreateRoute } from '#routes';
-
-const WAIT_FOR_REDIRECT = 1000;
+import type { CountryCode } from 'libphonenumber-js';
 
 const ContactCardCreateScreen = () => {
   const styles = useStyleSheet(stylesheet);
@@ -62,8 +60,17 @@ const ContactCardCreateScreen = () => {
             webCard {
               id
               userName
+              hasCover
               cardIsPublished
+              coverBackgroundColor
               coverIsPredefined
+              coverMedia {
+                id
+              }
+              cardColors {
+                dark
+                primary
+              }
             }
           }
         }
@@ -171,7 +178,15 @@ const ContactCardCreateScreen = () => {
               ? data.emails.filter(email => email.address)
               : undefined,
             phoneNumbers: data.phoneNumbers?.length
-              ? data.phoneNumbers.filter(phoneNumber => phoneNumber.number)
+              ? data.phoneNumbers
+                  .filter(phoneNumber => phoneNumber.number)
+                  .map(({ countryCode, ...phoneNumber }) => {
+                    const number = getPhonenumberWithCountryCode(
+                      phoneNumber.number,
+                      countryCode as CountryCode,
+                    );
+                    return { ...phoneNumber, number };
+                  })
               : undefined,
             urls: urls?.length ? urls : undefined,
             addresses: data.addresses
@@ -217,9 +232,7 @@ const ContactCardCreateScreen = () => {
             router.replaceAll(mainRoutes(false));
           } else {
             // if we redirect too soon, the home background is not displayed
-            waitTime(WAIT_FOR_REDIRECT).then(() => {
-              router.back();
-            });
+            router.back();
           }
         },
         updater: store => {
@@ -344,7 +357,7 @@ const ContactCardCreateScreen = () => {
                   : require('#assets/hint_0_light_ae.mp4')
               }
             />
-            <Text variant="large" style={styles.popupDescriptionTextContainer}>
+            <Text variant="large" style={styles.popupHeaderTextContainer}>
               <FormattedMessage
                 defaultMessage="Fill your ContactCard"
                 description="Popup Card creation / main message / Fill your ContactCard"
@@ -357,9 +370,9 @@ const ContactCardCreateScreen = () => {
               />
             </Text>
           </View>
-          <PopupButton
+          <Button
             onPress={hidePopup}
-            text={intl.formatMessage({
+            label={intl.formatMessage({
               defaultMessage: 'Ok, continue',
               description: 'Creare contact card screen / next buton on popup',
             })}
@@ -386,9 +399,14 @@ const stylesheet = createStyleSheet(theme => ({
     borderRadius: 12,
   },
   popupPage: { top: 0, width: '100%', paddingBottom: 20 },
-  popupDescriptionTextContainer: {
+  popupHeaderTextContainer: {
     color: theme === 'dark' ? colors.white : colors.black,
     paddingTop: 20,
+    textAlign: 'center',
+  },
+  popupDescriptionTextContainer: {
+    color: theme === 'dark' ? colors.white : colors.black,
+    paddingTop: 10,
     textAlign: 'center',
   },
 }));

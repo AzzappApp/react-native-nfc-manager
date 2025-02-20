@@ -69,6 +69,18 @@ function useModuleVariantsPreviewImage({
           return colorScheme === 'light'
             ? require('#assets/module/media_grid_light.png')
             : require('#assets/module/media_grid_dark.png');
+        case 'square_grid':
+          return colorScheme === 'light'
+            ? require('#assets/module/media_square_grid_light.png')
+            : require('#assets/module/media_square_grid_dark.png');
+        case 'grid2':
+          return colorScheme === 'light'
+            ? require('#assets/module/media_grid2_light.png')
+            : require('#assets/module/media_grid2_dark.png');
+        case 'square_grid2':
+          return colorScheme === 'light'
+            ? require('#assets/module/media_square_grid2_light.png')
+            : require('#assets/module/media_square_grid2_dark.png');
         case 'original_slideshow':
           return colorScheme === 'light'
             ? require('#assets/module/media_original_slideshow_light.png')
@@ -106,6 +118,10 @@ function useModuleVariantsPreviewImage({
           return colorScheme === 'light'
             ? require('#assets/module/media_text_full_alternation_light.png')
             : require('#assets/module/media_text_full_alternation_dark.png');
+        case 'simple_carousel':
+          return colorScheme === 'light'
+            ? require('#assets/module/media_text_simple_carousel_light.png')
+            : require('#assets/module/media_text_simple_carousel_dark.png');
         case 'article':
           return colorScheme === 'light'
             ? require('#assets/module/media_text_article_light.png')

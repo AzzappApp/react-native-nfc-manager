@@ -12,9 +12,12 @@ export const MODULE_KIND_WITH_VARIANTS = [
     variants: [
       'slideshow',
       'parallax',
+      'grid',
+      'square_grid',
+      'grid2',
+      'square_grid2',
       'original',
       'fullscreen',
-      'grid',
       'original_slideshow',
       'full_slideshow',
       'full_grid',
@@ -25,11 +28,12 @@ export const MODULE_KIND_WITH_VARIANTS = [
   {
     moduleKind: MODULE_KIND_MEDIA_TEXT,
     variants: [
-      'parallax',
       'alternation',
+      'parallax',
       'full_alternation',
-      'article',
+      'simple_carousel',
       'grid',
+      'article',
       'superposition',
       'card',
       'card_gradient',
@@ -41,24 +45,13 @@ export const MODULE_KIND_WITH_VARIANTS = [
       'alternation',
       'parallax',
       'full_alternation',
+      'grid',
       'article',
       'button_round',
       'button_square',
       'list',
       'card',
       'card_gradient',
-      'grid',
-    ],
-  },
-  {
-    moduleKind: MODULE_KIND_MAP,
-    variants: [
-      'map_s',
-      'map_m',
-      'map_l',
-      'map_s_full',
-      'map_m_full',
-      'map_l_full',
     ],
   },
   {
@@ -76,6 +69,17 @@ export const MODULE_KIND_WITH_VARIANTS = [
       'column_3_justified',
       'column_4',
       'column_4_justified',
+    ],
+  },
+  {
+    moduleKind: MODULE_KIND_MAP,
+    variants: [
+      'map_s',
+      'map_m',
+      'map_l',
+      'map_s_full',
+      'map_m_full',
+      'map_l_full',
     ],
   },
   //INSERT_MODULE
@@ -134,15 +138,11 @@ export const MODULE_VARIANT_SECTION = [
   {
     section: 'custom',
     moduleKind: [
-      'photoWithTextAndTitle',
       'socialLinks',
-      'carousel',
       'simpleButton',
-      'horizontalPhoto',
       'lineDivider',
       'simpleTitle',
       'simpleText',
-      'blockText',
     ],
   },
 ] as const;
@@ -151,53 +151,99 @@ export type ModuleKindSection = (typeof MODULE_VARIANT_SECTION)[number];
 
 export type ModuleKindSectionName = ModuleKindSection['section'];
 
-export const isComingSoonModule = (module: ModuleKindAndVariant) => {
+//using is module supported naming, (opposite of isCoomingSoon) in case of older app
+// accessing the webcard, not in the list for avoiding crash
+export const isModuleVariantSupported = (module: {
+  moduleKind: string;
+  variant: string | null;
+}) => {
+  if (!module.variant) {
+    //this is the list of  customizable module without variant
+    return [
+      'photoWithTextAndTitle',
+      'socialLinks',
+      'blockText',
+      'carousel',
+      'horizontalPhoto',
+      'lineDivider',
+      'simpleButton',
+      'simpleText',
+      'simpleTitle',
+    ].includes(module.moduleKind);
+  }
   switch (module.moduleKind) {
     case MODULE_KIND_MEDIA: {
-      const soon = [
-        'original',
-        'fullscreen',
+      const supported = [
+        'slideshow',
+        'parallax',
         'grid',
-        'original_slideshow',
-        'full_slideshow',
-        'full_grid',
-        'zoom_out_fade',
-        'parallax_small',
+        'square_grid',
+        'grid2',
+        'square_grid2',
+        'original',
+        // 'fullscreen',
+        // 'original_slideshow',
+        // 'full_slideshow',
+        // 'full_grid',
+        // 'zoom_out_fade',
+        // 'parallax_small',
       ];
-      return soon.includes(module.variant);
+      return supported.includes(module.variant);
     }
     case MODULE_KIND_MEDIA_TEXT: {
-      const soon = [
-        'original',
-        'fullscreen',
+      const supported = [
+        'alternation',
+        'parallax',
         'full_alternation',
-        'article',
-        'grid',
-        'superposition',
-        'card',
-        'card_gradient',
+        'original',
+        'simple_carousel',
+        // 'fullscreen',
+        // 'article',
+        // 'grid',
+        // 'superposition',
+        // 'card',
+        // 'card_gradient',
       ];
-      return soon.includes(module.variant);
+      return supported.includes(module.variant);
     }
     case MODULE_KIND_MEDIA_TEXT_LINK: {
-      const soon = [
-        'original',
-        'fullscreen',
+      const supported = [
+        'alternation',
+        'parallax',
         'full_alternation',
-        'article',
-        'button_round',
-        'button_square',
-        'list',
-        'superposition',
-        'card',
-        'card_gradient',
-        'grid',
+        'original',
+        // 'grid',
+        // 'fullscreen',
+        // 'article',
+        // 'button_round',
+        // 'button_square',
+        // 'list',
+        // 'superposition',
+        // 'card',
+        // 'card_gradient',
       ];
-      return soon.includes(module.variant);
+      return supported.includes(module.variant);
     }
     case MODULE_KIND_MAP:
-    case MODULE_KIND_TITLE_TEXT:
-      return true;
+      return false;
+    case MODULE_KIND_TITLE_TEXT: {
+      const supported = [
+        'left',
+        'center',
+        'right',
+        'justified',
+        'column_1',
+        'column_1_justified',
+        'column_2',
+        'column_2_justified',
+        'column_3',
+        'column_3_justified',
+        'column_4',
+        'column_4_justified',
+      ];
+      return supported.includes(module.variant);
+    }
+    //INSERT_MODULE
     default:
       return false;
   }

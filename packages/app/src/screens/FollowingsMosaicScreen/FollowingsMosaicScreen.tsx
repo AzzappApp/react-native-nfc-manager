@@ -1,13 +1,14 @@
 import { Suspense } from 'react';
 import { useIntl } from 'react-intl';
+import { StyleSheet, View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { useRouter } from '#components/NativeRouter';
 import relayScreen from '#helpers/relayScreen';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import LoadingView from '#ui/LoadingView';
-import SafeAreaView from '#ui/SafeAreaView';
 import FollowingsMosaicScreenList from './FollowingsMosaicScreenList';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { FollowingsMosaicScreenQuery } from '#relayArtifacts/FollowingsMosaicScreenQuery.graphql';
@@ -28,9 +29,10 @@ const FollowingsMosaicScreen = ({
   const router = useRouter();
   const intl = useIntl();
 
+  const { top } = useScreenInsets();
   return (
-    <Container style={{ flex: 1 }}>
-      <SafeAreaView style={{ flex: 1 }}>
+    <Container style={styles.flex}>
+      <View style={[styles.flex, { paddingTop: top }]}>
         <Header
           leftElement={
             <IconButton
@@ -48,10 +50,14 @@ const FollowingsMosaicScreen = ({
         <Suspense fallback={<LoadingView />}>
           <FollowingsMosaicScreenInner preloadedQuery={preloadedQuery} />
         </Suspense>
-      </SafeAreaView>
+      </View>
     </Container>
   );
 };
+
+const styles = StyleSheet.create({
+  flex: { flex: 1 },
+});
 
 const FollowingsMosaicScreenInner = ({
   preloadedQuery,

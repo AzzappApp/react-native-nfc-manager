@@ -1,8 +1,9 @@
 import { useFieldArray } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
+import { getLocales } from 'react-native-localize';
 import { colors } from '#theme';
-import ContactCardEditModalField from '#components/ContactCard/ContactCardEditField';
+import ContactCardEditPhoneField from '#components/ContactCard/ContactCardEditPhoneField';
 import {
   contactCardEditModalStyleSheet,
   useContactCardPhoneLabels,
@@ -19,6 +20,7 @@ const CommonInformationPhones = ({
 }: {
   control: Control<CommonInformationForm>;
 }) => {
+  const locales = getLocales();
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'phoneNumbers',
@@ -33,11 +35,12 @@ const CommonInformationPhones = ({
   return (
     <>
       {fields.map((phone, index) => (
-        <ContactCardEditModalField
+        <ContactCardEditPhoneField
           key={phone.id}
           control={control}
           labelKey={`phoneNumbers.${index}.label`}
           valueKey={`phoneNumbers.${index}.number`}
+          countryCodeKey={`phoneNumbers.${index}.countryCode`}
           deleteField={() => remove(index)}
           keyboardType="phone-pad"
           labelValues={labelValues}
@@ -51,7 +54,13 @@ const CommonInformationPhones = ({
         <PressableNative
           testID="add-phone-button"
           style={styles.addButton}
-          onPress={() => append({ label: 'Home', number: '' })}
+          onPress={() =>
+            append({
+              label: 'Home',
+              number: '',
+              countryCode: locales[0].countryCode,
+            })
+          }
         >
           <Icon icon="add_filled" style={{ tintColor: colors.green }} />
           <Text variant="smallbold">

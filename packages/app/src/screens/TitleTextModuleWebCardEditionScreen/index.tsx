@@ -1,0 +1,3 @@
+import TitleTextModuleWebCardEditionScreen from './TitleTextModuleWebCardEditionScreen';
+
+export default TitleTextModuleWebCardEditionScreen;

@@ -11,25 +11,27 @@ import { maxAliasesPlugin } from '@escape.tech/graphql-armor-max-aliases';
 import { maxTokensPlugin } from '@escape.tech/graphql-armor-max-tokens';
 import { useDisableIntrospection } from '@graphql-yoga/plugin-disable-introspection';
 import { usePersistedOperations } from '@graphql-yoga/plugin-persisted-operations';
-import { waitUntil } from '@vercel/functions';
+import { Kind, OperationTypeNode, type GraphQLError } from 'graphql';
 import { createYoga } from 'graphql-yoga';
 import { compare } from 'semver';
 import {
   getDatabaseConnectionsInfos,
   startDatabaseConnectionMonitoring,
 } from '@azzapp/data';
+import { runWithPrimary } from '@azzapp/data/src/database/database';
 import { DEFAULT_LOCALE, type Locale } from '@azzapp/i18n';
 import { schema, type GraphQLContext } from '@azzapp/schema';
 import ERRORS from '@azzapp/shared/errors';
 import { AZZAPP_SERVER_HEADER } from '@azzapp/shared/urlHelpers';
 import queryMap from '#persisted-query-map.json';
+import { revalidateWebcardsAndPosts } from '#helpers/api';
 import { buildCoverAvatarUrl } from '#helpers/avatar';
+import { getServerIntl } from '#helpers/i18nHelpers';
 import { sendPushNotification } from '#helpers/notificationsHelpers';
 import { withPluginsRoute } from '#helpers/queries';
 import { notifyUsers } from '#helpers/sendMessages';
 import { getSessionData } from '#helpers/tokens';
 import packageJSON from '../../../../package.json';
-import type { GraphQLError } from 'graphql';
 import type { LogLevel, Plugin as YogaPlugin } from 'graphql-yoga';
 
 const LAST_SUPPORTED_APP_VERSION =
@@ -88,23 +90,7 @@ function useRevalidatePages(): YogaPlugin<GraphQLContext> {
         async onExecuteDone() {
           const cards = getInvalidatedWebCards();
           const posts = getInvalidatedPosts();
-          if (cards.length || posts.length) {
-            waitUntil(
-              fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/revalidate`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  [AZZAPP_SERVER_HEADER]: process.env.API_SERVER_TOKEN ?? '',
-                  'x-vercel-protection-bypass':
-                    process.env.VERCEL_AUTOMATION_BYPASS_SECRET ?? '',
-                },
-                body: JSON.stringify({
-                  cards,
-                  posts,
-                }),
-              }),
-            );
-          }
+          revalidateWebcardsAndPosts(cards, posts);
         },
       };
     },
@@ -126,6 +112,25 @@ const getLoggingLevel = () => {
   }
 
   return process.env.NODE_ENV !== 'production' ? 'debug' : 'error';
+};
+
+/**
+ * Middleware to check if the request is a mutation and run it on the primary database
+ */
+const runOnPrimaryPlugin: YogaPlugin = {
+  onExecute({ args, setExecuteFn, executeFn }) {
+    const operationDefinition = args.document.definitions.find(
+      (definition: { kind: 'OperationDefinition' }) =>
+        definition.kind === Kind.OPERATION_DEFINITION,
+    );
+
+    if (
+      operationDefinition &&
+      operationDefinition.operation === OperationTypeNode.MUTATION
+    ) {
+      setExecuteFn(() => runWithPrimary(() => executeFn(args)));
+    }
+  },
 };
 
 const { handleRequest } = createYoga({
@@ -153,6 +158,7 @@ const { handleRequest } = createYoga({
       validateMailOrPhone,
       buildCoverAvatarUrl,
       sendPushNotification,
+      intl: getServerIntl(locale ?? DEFAULT_LOCALE),
     };
   },
   plugins: [
@@ -199,7 +205,7 @@ const { handleRequest } = createYoga({
       allowList: ['node', 'uri'],
     }),
     maxTokensPlugin({
-      n: 1400, // Number of tokens allowed
+      n: 2000, // Number of tokens allowed
     }),
     useDisableIntrospection({
       isDisabled: request => {
@@ -260,6 +266,7 @@ const { handleRequest } = createYoga({
       includeRawResult: false,
       includeExecuteVariables: true,
     }),
+    runOnPrimaryPlugin,
   ],
 });
 

@@ -79,15 +79,22 @@ export type WebCardTemplateSelectionRoute = {
 export type WebCardRoute = {
   route: 'WEBCARD';
   params: {
-    userName: string;
-    webCardId?: string;
     fromRectangle?: LayoutRectangle;
     showPosts?: boolean;
     contactData?: string | null;
     additionalContactData?: Pick<ContactCard, 'socials' | 'urls'>;
     fromCreation?: boolean;
     editing?: boolean;
-  };
+  } & (
+    | {
+        userName: string;
+        webCardId?: string | null;
+      }
+    | {
+        userName?: string | null;
+        webCardId: string;
+      }
+  );
 };
 
 export type PostRoute = {
@@ -172,6 +179,13 @@ export type ResetPasswordRoute = {
   params: {
     token: string;
     issuer: string;
+  };
+};
+
+export type AddModuleSectionRoute = {
+  route: 'ADD_MODULE_SECTION';
+  params: {
+    webCardId: string;
   };
 };
 
@@ -265,6 +279,7 @@ export type OfflineVCardRoute = {
 export type Route =
   | AboutRoute
   | AccountDetailsRoute
+  | AddModuleSectionRoute
   | CardModuleEditionRoute
   | CommonInformationRoute
   | ConfirmChangeContactRoute

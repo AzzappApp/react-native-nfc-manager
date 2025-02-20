@@ -8,13 +8,12 @@ import { getCountry } from 'react-native-localize';
 import Purchases from 'react-native-purchases';
 import Toast from 'react-native-toast-message';
 import { z } from 'zod';
+import COUNTRY_FLAG from '@azzapp/shared/CountryFlag';
 import { isPhoneNumber } from '@azzapp/shared/stringHelpers';
 import { useRouter } from '#components/NativeRouter';
 import { requestUpdateContact } from '#helpers/MobileWebAPI';
-import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import CountryCodeListWithOptions from '#ui/CountryCodeListWithOptions';
-import COUNTRY_FLAG from '#ui/CountrySelector/CountryFlag';
 import Header from '#ui/Header';
 import InputAccessoryView from '#ui/InputAccessoryView';
 import Text from '#ui/Text';
@@ -192,16 +191,10 @@ const AccountDetailsPhoneNumberForm = ({
     }
   });
 
-  const { bottom } = useScreenInsets();
-
   const phoneNumberInputRef = useRef<NativeTextInput>(null);
 
   return (
-    <InputAccessoryView
-      visible={visible}
-      onClose={toggleBottomSheet}
-      style={{ paddingBottom: bottom }}
-    >
+    <InputAccessoryView visible={visible} onClose={toggleBottomSheet}>
       <Header
         leftElement={
           <Button

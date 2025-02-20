@@ -7,7 +7,7 @@ import PremiumIndicator from '#components/PremiumIndicator';
 import { useStyleSheet, createStyleSheet } from '#helpers/createStyles';
 
 import Icon from '#ui/Icon';
-import PressableOpacity from '#ui/PressableOpacity';
+import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 
@@ -47,7 +47,7 @@ const ModuleSelectionListModalItem = ({
     }
   }, [module.moduleKind, module.ready, onSelect]);
   return (
-    <PressableOpacity style={styles.root} onPress={onPress}>
+    <PressableNative style={styles.root} onPress={onPress}>
       <View>
         <View style={styles.moduleContainer}>
           <Image
@@ -108,7 +108,7 @@ const ModuleSelectionListModalItem = ({
           </View>
         </View>
       </View>
-    </PressableOpacity>
+    </PressableNative>
   );
 };
 

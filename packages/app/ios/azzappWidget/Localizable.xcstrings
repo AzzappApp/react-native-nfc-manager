@@ -1,0 +1,135 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "color" : {
+      "comment" : "widget color title in configuration ",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Color"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couleur"
+          }
+        }
+      }
+    },
+    "Configuration" : {
+      "comment" : "Widget configuration (mandatory but seems not use)",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configuration"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réglage"
+          }
+        }
+      }
+    },
+    "dark" : {
+      "comment" : "widget color  dark color",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dark"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noir"
+          }
+        }
+      }
+    },
+    "Homescreen Widgets" : {
+      "comment" : "widget configuration Title",
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Widgets de l'écran d'accueil"
+          }
+        }
+      }
+    },
+    "Instantly share your contact information from your home screen" : {
+      "comment" : "widget configuration description",
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partagez instantanément vos coordonnées depuis votre écran d'accueil"
+          }
+        }
+      }
+    },
+    "theme" : {
+      "comment" : "widget configuration theme",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Theme"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thème"
+          }
+        }
+      }
+    },
+    "webcard" : {
+      "comment" : "widget configuration webcard",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WebCard"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WebCard"
+          }
+        }
+      }
+    },
+    "white" : {
+      "comment" : "widget configuration white color",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "White"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blanc"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

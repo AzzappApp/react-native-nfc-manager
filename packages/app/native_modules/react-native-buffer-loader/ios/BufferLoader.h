@@ -4,6 +4,7 @@
 #import <AVFoundation/AVFoundation.h>
 #import <MetalKit/MetalKit.h>
 #import <ReactCommon/CallInvoker.h>
+#import <MetalKit/MetalKit.h>
 #import <jsi/jsi.h>
 
 namespace azzapp {
@@ -21,13 +22,12 @@ public:
 private:
   id<MTLDevice> _Nonnull metalDevice;
   id<MTLCommandQueue> _Nonnull commandQueue;
-  CGColorSpaceRef _Nonnull colorSpace;
-  CIContext *_Nullable ciContext;
+  MTKTextureLoader * _Nonnull textureLoader;
+  
   std::shared_ptr<react::CallInvoker> callInvoker;
   std::unordered_map<uint64_t, id<MTLTexture>> textureCache;
 
-  _Nullable id<MTLTexture> createMTLTextureFromCIImage(CIImage *_Nonnull image, CGSize maxSize);
-  _Nullable id<MTLTexture> createMTLTextureFromCGImage(CGImageRef _Nonnull image);
+  _Nullable CGImageRef loadImageWithOrientation(NSURL * _Nonnull url, CGSize maxSize);
   void loadTexture(
     std::shared_ptr<jsi::Function> callback,
     jsi::Runtime &runtime,

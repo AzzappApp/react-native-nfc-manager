@@ -7,14 +7,12 @@ import { findLocalContact } from '#helpers/contactCardHelpers';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import ContactAvatar from './ContactAvatar';
-import type { ContactsScreenLists_contacts$data } from '#relayArtifacts/ContactsScreenLists_contacts.graphql';
-import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
+import WhatsappButton from './WhatsappButton';
+import type { ContactType } from '#helpers/contactListHelpers';
 import type { Contact } from 'expo-contacts';
-import type { MMKV } from 'react-native-mmkv';
 
 type Props = {
   contact: ContactType;
-  storage: MMKV;
   onInviteContact: (onHideInvitation: () => void) => void;
   onShowContact: (contact: ContactType) => void;
   localContacts: Contact[];
@@ -24,7 +22,6 @@ type Props = {
 
 const ContactSearchByDateItem = ({
   contact,
-  storage,
   onInviteContact,
   onShowContact,
   localContacts,
@@ -37,7 +34,6 @@ const ContactSearchByDateItem = ({
     const verifyInvitation = async () => {
       if (contactsPermissionStatus === ContactPermissionStatus.GRANTED) {
         const foundContact = await findLocalContact(
-          storage,
           contact.phoneNumbers?.map(({ number }) => number) ?? [],
           contact.emails?.map(({ address }) => address) ?? [],
           localContacts,
@@ -54,7 +50,6 @@ const ContactSearchByDateItem = ({
     contact.emails,
     contact.phoneNumbers,
     localContacts,
-    storage,
   ]);
 
   const onInvite = useCallback(() => {
@@ -120,6 +115,12 @@ const ContactSearchByDateItem = ({
           <Icon icon="invite" style={styles.icon} size={17} />
         </PressableNative>
       )}
+      {!showInvite && !invited && (
+        <WhatsappButton
+          phoneNumber={contact?.phoneNumbers?.[0]?.number}
+          style={styles.invite}
+        />
+      )}
     </View>
   );
 };
@@ -147,15 +148,5 @@ const styles = StyleSheet.create({
     tintColor: colors.white,
   },
 });
-
-type ContactType = NonNullable<
-  NonNullable<
-    NonNullable<
-      ArrayItemType<
-        ContactsScreenLists_contacts$data['searchContacts']['edges']
-      >
-    >
-  >['node']
->;
 
 export default ContactSearchByDateItem;

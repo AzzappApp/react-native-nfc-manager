@@ -49,16 +49,6 @@ export type WEBCARD_CHANGE = {
 };
 
 /**
- * Events dispatched when an user current role is changed
- */
-export type PROFILE_ROLE_CHANGE = {
-  type: 'PROFILE_ROLE_CHANGE';
-  payload: {
-    profileRole: string;
-  };
-};
-
-/**
  * Events dispatched when an error occurs while making a network request
  */
 export type NETWORK_ERROR = {
@@ -89,7 +79,6 @@ export type READY = {
 
 export type GlobalEvents =
   | NETWORK_ERROR
-  | PROFILE_ROLE_CHANGE
   | READY
   | SIGN_IN
   | SIGN_OUT
@@ -105,13 +94,11 @@ type TypeToLister<TType extends GlobalEvents['type']> = TType extends 'SIGN_UP'
       ? SIGN_OUT
       : TType extends 'WEBCARD_CHANGE'
         ? WEBCARD_CHANGE
-        : TType extends 'PROFILE_ROLE_CHANGE'
-          ? PROFILE_ROLE_CHANGE
-          : TType extends 'NETWORK_ERROR'
-            ? NETWORK_ERROR
-            : TType extends 'TOKENS_REFRESHED'
-              ? TOKENS_REFRESHED
-              : never;
+        : TType extends 'NETWORK_ERROR'
+          ? NETWORK_ERROR
+          : TType extends 'TOKENS_REFRESHED'
+            ? TOKENS_REFRESHED
+            : never;
 
 type EventListener<T extends GlobalEvents> =
   | ((event: T) => Promise<any>)

@@ -27,7 +27,7 @@ type CardModuleMediaTextLinkAlternationProps = CardModuleVariantType & {
   scrollPosition?: Animated.Value;
   modulePosition?: number;
   disableAnimation?: boolean;
-  moduleEditing: boolean;
+  isFullAlternation?: boolean;
 };
 
 const CardModuleMediaTextLinkAlternation = ({
@@ -43,6 +43,7 @@ const CardModuleMediaTextLinkAlternation = ({
   moduleEditing,
   canPlay,
   webCardViewMode,
+  isFullAlternation,
 }: CardModuleMediaTextLinkAlternationProps) => {
   const screenDimension = useScreenDimensions();
   const dimension = providedDimension ?? screenDimension;
@@ -78,6 +79,7 @@ const CardModuleMediaTextLinkAlternation = ({
             moduleEditing={moduleEditing}
             canPlay={canPlay}
             webCardViewMode={webCardViewMode}
+            isFullAlternation={isFullAlternation}
           />
         );
       })}
@@ -98,6 +100,7 @@ type AlternationItemProps = {
   moduleEditing: boolean;
   canPlay: boolean;
   webCardViewMode?: WebCardViewMode;
+  isFullAlternation?: boolean;
 };
 
 const AlternationItem = ({
@@ -113,6 +116,7 @@ const AlternationItem = ({
   moduleEditing,
   canPlay,
   webCardViewMode,
+  isFullAlternation,
 }: AlternationItemProps) => {
   const styles = useStyleSheet(stylesheet);
   const [parentY, setParentY] = useState(0);
@@ -154,8 +158,20 @@ const AlternationItem = ({
         parentY={parentY}
         canPlay={canPlay}
         webCardViewMode={webCardViewMode}
+        isFullAlternation={isFullAlternation}
       >
-        <View style={styles.bottomContainer}>
+        <View
+          style={[
+            isFullAlternation
+              ? styles.bottomFullAlternationContainer
+              : styles.bottomContainer,
+            webCardViewMode === 'edit' && {
+              maxHeight: dimension.height / 2,
+              overflow: 'hidden',
+              justifyContent: 'flex-start',
+            },
+          ]}
+        >
           <Text
             variant="large"
             style={getTitleStyle(cardStyle, cardModuleColor)}
@@ -213,6 +229,12 @@ const stylesheet = createStyleSheet(appearance => ({
     justifyContent: 'center',
     flex: 1,
     rowGap: 20,
+  },
+  bottomFullAlternationContainer: {
+    justifyContent: 'center',
+    flex: 1,
+    rowGap: 20,
+    padding: 20,
   },
   buttonCenter: { alignItems: 'flex-start' },
 }));

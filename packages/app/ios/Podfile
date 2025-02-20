@@ -30,7 +30,6 @@ setup_permissions([
 ])  
 $RNFirebaseAsStaticFramework = true
 $RNFirebaseAnalyticsEnableAdSupport = true # enable Firebase Analytics to generate automatic audience metrics for iOS 
-$RNFirebaseAnalyticsWithoutAdIdSupport = true
 linkage = ENV['USE_FRAMEWORKS']
 if linkage != nil
   Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
@@ -70,10 +69,6 @@ abstract_target 'common' do
   pod 'SPTPersistentCache', :modular_headers => true
   pod 'DVAssetLoaderDelegate', :modular_headers => true
 
-  target 'azzappTests' do
-    inherit! :complete
-    # Pods for testing
-  end
 
   post_install do |installer|
     # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/react_native_pods.rb#L197-L202

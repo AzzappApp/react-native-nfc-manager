@@ -14,96 +14,149 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import Purchases, { INTRO_ELIGIBILITY_STATUS } from 'react-native-purchases';
-import Animated, {
-  interpolate,
-  interpolateColor,
-  useAnimatedScrollHandler,
-  useAnimatedStyle,
-  useSharedValue,
-} from 'react-native-reanimated';
-import { commitLocalUpdate } from 'react-relay';
-import { colors } from '#theme';
+import {
+  commitLocalUpdate,
+  graphql,
+  usePreloadedQuery,
+  useRelayEnvironment,
+} from 'react-relay';
+import { waitTime } from '@azzapp/shared/asyncHelpers';
+import { colors, shadow } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import PremiumIndicator from '#components/PremiumIndicator';
 import { getAuthState } from '#helpers/authStore';
+import { iso8601DurationToDays } from '#helpers/dateHelpers';
 import { getRelayEnvironment } from '#helpers/relayEnvironment';
+import relayScreen from '#helpers/relayScreen';
 import { useMultiUserUpdate } from '#hooks/useMultiUserUpdate';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { useUserSubscriptionOffer } from '#hooks/useSubscriptionOffer';
 import Button from '#ui/Button';
 import IconButton from '#ui/IconButton';
+import PressableNative from '#ui/PressableNative';
 import PressableOpacity from '#ui/PressableOpacity';
 import SwitchLabel from '#ui/SwitchLabel';
 import Text from '#ui/Text';
-import type {
-  NativeScreenProps,
-  ScreenOptions,
-} from '#components/NativeRouter';
+import type { ScreenOptions } from '#components/NativeRouter';
+import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { UserPayWallScreenQuery } from '#relayArtifacts/UserPayWallScreenQuery.graphql';
 import type { UserPayWallRoute } from '#routes';
 import type { PurchasesPackage } from 'react-native-purchases';
-import type { SharedValue } from 'react-native-reanimated';
 
 const TERMS_OF_SERVICE = process.env.TERMS_OF_SERVICE;
 const PRIVACY_POLICY = process.env.PRIVACY_POLICY;
 const width = Dimensions.get('screen').width;
+/** @type {*} */
+const userPayWallcreenQuery = graphql`
+  query UserPayWallScreenQuery {
+    currentUser {
+      id
+      userSubscription {
+        subscriptionId
+        status
+        availableSeats
+        totalSeats
+        subscriptionPlan
+      }
+    }
+  }
+`;
 
-const UserPayWallScreen = ({ route }: NativeScreenProps<UserPayWallRoute>) => {
+const UserPayWallScreen = ({
+  route,
+  preloadedQuery,
+}: RelayScreenProps<UserPayWallRoute, UserPayWallScreenQuery>) => {
+  const environment = useRelayEnvironment();
+  const data = usePreloadedQuery(userPayWallcreenQuery, preloadedQuery);
   const intl = useIntl();
   const router = useRouter();
   const { height } = useWindowDimensions();
-
   const { bottom } = useScreenInsets();
-  const lottieHeight = height - BOTTOM_HEIGHT + 20;
-  const [period, setPeriod] = useState<'month' | 'year'>('year');
+  const [period, setPeriod] = useState<'month' | 'year'>(
+    data.currentUser?.userSubscription?.subscriptionPlan === 'monthly'
+      ? 'month'
+      : 'year',
+  );
   const [selectedPurchasePackage, setSelectedPurchasePackage] =
     useState<PurchasesPackage | null>(null);
   const [processing, setProcessing] = useState(false);
-
   const subscriptions = useUserSubscriptionOffer(period);
-
+  const [freeTrialEligible, setFreeTrialEligible] = useState(false);
   const setAllowMultiUser = useMultiUserUpdate();
+
+  const lottieHeight = height - BOTTOM_HEIGHT + 20;
 
   useEffect(() => {
     if (subscriptions && subscriptions.length > 0) {
-      setSelectedPurchasePackage(subscriptions[0]);
+      //set the period
+      if (data.currentUser?.userSubscription) {
+        const found = subscriptions.find(
+          sub =>
+            sub.product.identifier ===
+            data.currentUser?.userSubscription?.subscriptionId,
+        );
+        if (found) {
+          setSelectedPurchasePackage(found);
+        } else {
+          setSelectedPurchasePackage(subscriptions[0]);
+        }
+      } else {
+        setSelectedPurchasePackage(subscriptions[0]);
+      }
+
+      Purchases.checkTrialOrIntroductoryPriceEligibility([
+        subscriptions[0].product.identifier,
+      ]).then(trial => {
+        if (
+          trial[subscriptions[0].product.identifier].status ===
+          INTRO_ELIGIBILITY_STATUS.INTRO_ELIGIBILITY_STATUS_ELIGIBLE
+        ) {
+          setFreeTrialEligible(true);
+        }
+      });
     }
-  }, [subscriptions]);
+  }, [
+    data.currentUser?.userSubscription,
+    data.currentUser?.userSubscription?.subscriptionId,
+    subscriptions,
+  ]);
 
   const [labelPurchase, setLabelPurchase] = useState<string>(
     intl.formatMessage({
-      defaultMessage: 'CONTINUE',
+      defaultMessage: 'SUBSCRIBE',
       description: 'MultiUser subscription button label trial not available',
     }),
   );
 
   useEffect(() => {
-    if (selectedPurchasePackage) {
-      Purchases.checkTrialOrIntroductoryPriceEligibility([
-        selectedPurchasePackage?.identifier,
-      ]).then(trial => {
-        if (
-          trial[selectedPurchasePackage.identifier].status ===
-          INTRO_ELIGIBILITY_STATUS.INTRO_ELIGIBILITY_STATUS_ELIGIBLE
-        ) {
-          setLabelPurchase(
-            intl.formatMessage({
-              defaultMessage: 'START MY 7-DAY TRIAL',
-              description:
-                'MultiUser subscription button label trial available',
-            }),
-          );
-        } else {
-          setLabelPurchase(
-            intl.formatMessage({
-              defaultMessage: 'CONTINUE',
-              description:
-                'MultiUser subscription button label trial not available',
-            }),
-          );
-        }
-      });
+    if (
+      selectedPurchasePackage?.product.introPrice?.period &&
+      freeTrialEligible
+    ) {
+      //get duration of the trial
+      setLabelPurchase(
+        intl.formatMessage(
+          {
+            defaultMessage: 'START MY {days}-DAY TRIAL',
+            description: 'MultiUser subscription button label trial available',
+          },
+          {
+            days: iso8601DurationToDays(
+              selectedPurchasePackage.product.introPrice.period,
+            ),
+          },
+        ),
+      );
+    } else {
+      setLabelPurchase(
+        intl.formatMessage({
+          defaultMessage: 'CONTINUE',
+          description:
+            'MultiUser subscription button label trial not available',
+        }),
+      );
     }
-  }, [intl, selectedPurchasePackage]);
+  }, [freeTrialEligible, intl, selectedPurchasePackage]);
 
   const processOrder = useCallback(async () => {
     const { profileInfos } = getAuthState();
@@ -117,12 +170,87 @@ const UserPayWallScreen = ({ route }: NativeScreenProps<UserPayWallRoute>) => {
       const res = await Purchases.purchasePackage(selectedPurchasePackage!);
       // Update Relay cache temporary
       if (res.customerInfo.entitlements.active?.multiuser?.isActive) {
-        if (route.params?.activateFeature === 'MULTI_USER') {
+        const subscriptionId =
+          res.customerInfo.entitlements.active?.multiuser.productIdentifier;
+        const newTotalSeat = extractSeatsFromSubscriptionId(subscriptionId);
+        const currentTotalSeat =
+          data.currentUser?.userSubscription?.totalSeats ?? 0;
+        const updateAvailableSeats = Math.max(
+          0,
+          newTotalSeat -
+            currentTotalSeat +
+            (data.currentUser?.userSubscription?.availableSeats ?? 0),
+        );
+
+        commitLocalUpdate(environment, store => {
+          try {
+            if (profileInfos?.webCardId && updateAvailableSeats >= 0) {
+              //activate only in there is enough seeats
+              const userSubscriptionCache = store.create(
+                subscriptionId,
+                'UserSubscription',
+              );
+              userSubscriptionCache.setValue(
+                updateAvailableSeats,
+                'availableSeats',
+              );
+              userSubscriptionCache.setValue(subscriptionId, 'subscriptionId');
+              userSubscriptionCache.setValue(subscriptionId, 'id');
+              userSubscriptionCache.setValue('active', 'status');
+              userSubscriptionCache.setValue('apple', 'issuer');
+
+              const webCardStore = store.get(profileInfos.webCardId);
+              webCardStore?.setValue(true, 'isPremium');
+              const subStore = webCardStore?.getLinkedRecord('subscription');
+              if (!subStore) {
+                webCardStore?.setLinkedRecord(
+                  userSubscriptionCache,
+                  'subscription',
+                );
+              } else {
+                subStore?.setValue(updateAvailableSeats, 'availableSeats');
+                subStore.setValue(subscriptionId, 'subscriptionId');
+                subStore.setValue('active', 'status');
+                subStore.setValue('apple', 'issuer');
+              }
+
+              //subscription is created on the webcard, we will use this one as reference
+              const upSubscriptionCache = store
+                ?.get(profileInfos.webCardId)
+                ?.getLinkedRecord('subscription');
+              if (upSubscriptionCache) {
+                const user = store.getRoot().getLinkedRecord('currentUser');
+                const profiles = user?.getLinkedRecords('profiles');
+                if (profiles) {
+                  const profile = profiles?.find(
+                    profile => profile.getDataID() === profileInfos?.profileId,
+                  );
+                  if (
+                    !profile
+                      ?.getLinkedRecord('webCard')
+                      ?.getLinkedRecord('subscription')
+                  ) {
+                    // Link the new UserSubscription record to the webCard
+                    profile
+                      ?.getLinkedRecord('webCard')
+                      ?.setLinkedRecord(upSubscriptionCache, 'subscription');
+                  }
+                }
+              }
+            }
+          } catch (error) {
+            Sentry.captureException(error, {
+              data: 'userPayWallScreen-updating cache',
+            });
+          }
+        });
+        if (
+          updateAvailableSeats >= 0 &&
+          route.params?.activateFeature === 'MULTI_USER'
+        ) {
+          await waitTime(2000); // we need to wait the call from revenue cat to ensure that user has a subscription on next call
           setAllowMultiUser(true);
         }
-        commitLocalUpdate(getRelayEnvironment(), store => {
-          store.get(webCardId)?.setValue(true, 'isPremium');
-        });
       }
       setProcessing(false);
       router.back();
@@ -154,7 +282,6 @@ const UserPayWallScreen = ({ route }: NativeScreenProps<UserPayWallRoute>) => {
         );
         return;
       }
-
       Alert.alert(
         intl.formatMessage({
           defaultMessage: 'Error during processing payment',
@@ -169,6 +296,9 @@ const UserPayWallScreen = ({ route }: NativeScreenProps<UserPayWallRoute>) => {
       Sentry.captureException(error, { data: 'userPayWallScreen' });
     }
   }, [
+    data.currentUser?.userSubscription?.availableSeats,
+    data.currentUser?.userSubscription?.totalSeats,
+    environment,
     intl,
     route.params?.activateFeature,
     router,
@@ -176,22 +306,23 @@ const UserPayWallScreen = ({ route }: NativeScreenProps<UserPayWallRoute>) => {
     setAllowMultiUser,
   ]);
 
-  //const [currentPage, setCurrentPage] = useState(2);
-  const currentIndex = useSharedValue(0);
-  const onScroll = useAnimatedScrollHandler({
-    onScroll: event => {
-      const index = event.contentOffset.x / width;
-      currentIndex.value = Math.max(Math.min(4, index), 0);
-    },
-  });
-
   const restorePurchase = useCallback(async () => {
     const { profileInfos } = getAuthState();
     const restore = await Purchases.restorePurchases();
     if (restore.entitlements.active?.multiuser?.isActive) {
       commitLocalUpdate(getRelayEnvironment(), store => {
-        if (profileInfos?.webCardId)
+        if (profileInfos?.webCardId) {
           store.get(profileInfos.webCardId)?.setValue(true, 'isPremium');
+        }
+        const user = store.getRoot().getLinkedRecord('currentUser');
+        const profiles = user?.getLinkedRecords('profiles');
+
+        if (profiles) {
+          const profile = profiles?.find(
+            profile => profile.getDataID() === profileInfos?.profileId,
+          );
+          profile?.getLinkedRecord('webCard')?.setValue(true, 'isPremium');
+        }
       });
     }
   }, []);
@@ -199,155 +330,46 @@ const UserPayWallScreen = ({ route }: NativeScreenProps<UserPayWallRoute>) => {
   return (
     <View style={styles.container}>
       <View style={[{ width, height: width }, styles.featureContainer]}>
-        <Animated.ScrollView
-          horizontal
-          snapToInterval={width}
-          decelerationRate="fast"
-          snapToAlignment="start"
-          onScroll={onScroll}
-          pagingEnabled
-          scrollEnabled
-          style={{ width }}
-          contentContainerStyle={{ width: 4 * width }}
+        <View
+          key="subscription_page_1"
+          style={[
+            {
+              width,
+              height: lottieHeight,
+            },
+            styles.promoContainer,
+          ]}
         >
-          <View
-            key="subscription_page_1"
-            style={[
-              {
-                width,
-                height: lottieHeight,
-              },
-              styles.promoContainer,
-            ]}
-          >
-            <LottieView
-              source={require('../assets/paywall/paywall_azzapp_step1.json')}
-              autoPlay
-              loop
-              hardwareAccelerationAndroid
-              style={{
-                position: 'absolute',
-                width,
-                height: lottieHeight,
-              }}
-              resizeMode="cover"
+          <LottieView
+            source={require('../assets/paywall/paywall_azzapp_step1.json')}
+            autoPlay
+            loop
+            hardwareAccelerationAndroid
+            style={{
+              position: 'absolute',
+              width,
+              height: lottieHeight,
+            }}
+            resizeMode="cover"
+          />
+          <LinearGradient
+            colors={['transparent', 'rgba(0, 0, 0, 0.9)']}
+            locations={[0, 1]}
+            style={{
+              height: height - BOTTOM_HEIGHT + 130,
+              width,
+              position: 'absolute',
+            }}
+            pointerEvents="none"
+          />
+          <Text variant="xlarge" style={styles.textPromo}>
+            <FormattedMessage
+              defaultMessage="Unlock multi-user to give contact card to all your team"
+              description="UserPaywall Screen - message promo section"
             />
-            <LinearGradient
-              colors={['transparent', 'rgba(0, 0, 0, 0.9)']}
-              locations={[0, 1]}
-              style={{
-                height: height - BOTTOM_HEIGHT + 130,
-                width,
-                position: 'absolute',
-              }}
-              pointerEvents="none"
-            />
-            <Text variant="xlarge" style={styles.textPromo}>
-              <FormattedMessage
-                defaultMessage="Add as many sections as you want to your WebCard"
-                description="UserPaywall Screen - message promo section"
-              />
-            </Text>
-          </View>
-          <View
-            key="subscription_page_2"
-            style={[
-              {
-                backgroundColor: 'green',
-                width,
-              },
-              styles.promoContainer,
-            ]}
-            //missing content from design team
-          >
-            <LinearGradient
-              colors={['transparent', 'rgba(0, 0, 0, 0.9)']}
-              locations={[0, 1]}
-              style={{
-                height: height - BOTTOM_HEIGHT + 130,
-                width,
-                position: 'absolute',
-              }}
-              pointerEvents="none"
-            />
-            <Text variant="xlarge" style={styles.textPromo}>
-              <FormattedMessage
-                defaultMessage="Choose from 600+ stunning templates"
-                description="UserPaywall Screen - message promo template"
-              />
-            </Text>
-          </View>
-          <View
-            key="subscription_page_3"
-            style={[
-              {
-                width,
-              },
-              styles.promoContainer,
-            ]}
-            //missing content from design team
-          >
-            <LinearGradient
-              colors={['transparent', 'rgba(0, 0, 0, 0.9)']}
-              locations={[0, 1]}
-              style={{
-                height: height - BOTTOM_HEIGHT + 130,
-                width,
-                position: 'absolute',
-              }}
-              pointerEvents="none"
-            />
-            <Text variant="xlarge" style={styles.textPromo}>
-              <FormattedMessage
-                defaultMessage="Explore hundred of sections type"
-                description="UserPaywall Screen - message promo  type"
-              />
-            </Text>
-          </View>
-          <View
-            key="subscription_page_4"
-            style={[
-              {
-                backgroundColor: 'orange',
-                width,
-              },
-              styles.promoContainer,
-            ]}
-            //missing content from design team
-          >
-            <LinearGradient
-              colors={['transparent', 'rgba(0, 0, 0, 0.9)']}
-              locations={[0, 1]}
-              style={{
-                height: height - BOTTOM_HEIGHT + 130,
-                width,
-                position: 'absolute',
-              }}
-              pointerEvents="none"
-            />
-            <Text variant="xlarge" style={styles.textPromo}>
-              <FormattedMessage
-                defaultMessage="Elevate your cover with our suggested media"
-                description="UserPaywall Screen - message promo suggested media"
-              />
-            </Text>
-          </View>
-        </Animated.ScrollView>
-
-        <View style={[styles.containerPager, { width }]}>
-          {Array.from({ length: 4 }).map((_, index) => {
-            return (
-              <AnimatedTabIndex
-                currentIndex={currentIndex}
-                index={index}
-                key={`PayWallPager-${index}`}
-              />
-            );
-          })}
-          <View />
+          </Text>
         </View>
       </View>
-
       <IconButton
         icon="arrow_down"
         style={styles.icon}
@@ -356,7 +378,7 @@ const UserPayWallScreen = ({ route }: NativeScreenProps<UserPayWallRoute>) => {
         size={50}
       />
       <View style={styles.content}>
-        <View style={styles.contaienrLogo}>
+        <View style={styles.containerLogo}>
           <Image
             source={require('#assets/logo-full.png')}
             resizeMode="contain"
@@ -392,6 +414,33 @@ const UserPayWallScreen = ({ route }: NativeScreenProps<UserPayWallRoute>) => {
                 />
               );
             })}
+            <View style={[styles.selectionItem, styles.userMgmtItem]}>
+              <Text variant="large">
+                <FormattedMessage
+                  defaultMessage="20+ users"
+                  description="UserPaywall Screen - 20+ users suggestion title"
+                />
+              </Text>
+              <Text variant="small" style={styles.userMgmtDescriptionText}>
+                <FormattedMessage
+                  defaultMessage="Looking to equip a bigger team?"
+                  description="UserPaywall Screen - 20+ users suggestion description"
+                />
+              </Text>
+              <PressableNative
+                style={styles.userMgmtLink}
+                onPress={() => {
+                  Linking.openURL('mailto:contact@azzapp.com');
+                }}
+              >
+                <Text variant="button" style={styles.userMgmtLinkText}>
+                  <FormattedMessage
+                    defaultMessage="Contact us"
+                    description="UserPaywall Screen - 20+ users suggestion button"
+                  />
+                </Text>
+              </PressableNative>
+            </View>
           </ScrollView>
           <LinearGradient
             colors={[
@@ -413,10 +462,51 @@ const UserPayWallScreen = ({ route }: NativeScreenProps<UserPayWallRoute>) => {
         <View style={[styles.bottomContainer, { paddingBottom: bottom }]}>
           <Button
             label={labelPurchase}
-            style={[styles.buttonSubscribe, { width: '100%' }]}
+            style={styles.buttonSubscribe}
             appearance="light"
             onPress={processOrder}
           />
+          <Text variant="small" style={styles.subTitleText}>
+            {data.currentUser?.userSubscription?.status !== 'active' &&
+            selectedPurchasePackage?.product.introPrice?.period ? (
+              <FormattedMessage
+                defaultMessage="{days}-day free trial, with auto renew. Cancel anytime"
+                description="MultiUser subscription subtitle for inactive subscription"
+                values={{
+                  days: iso8601DurationToDays(
+                    selectedPurchasePackage.product.introPrice.period,
+                  ),
+                }}
+              />
+            ) : data.currentUser?.userSubscription?.status === 'active' ? (
+              <FormattedMessage
+                defaultMessage="Your actual subscription : {qty, plural,
+        =1 {{qty} user}
+        other {{qty} Users}
+      } billed {period}"
+                description="Paywall subscription subtitle for active subscription"
+                values={{
+                  qty: data.currentUser?.userSubscription?.totalSeats,
+                  period:
+                    data.currentUser?.userSubscription?.subscriptionPlan ===
+                    'yearly'
+                      ? intl.formatMessage({
+                          defaultMessage: 'yearly',
+                          description:
+                            'UserPaywall Screen - yearly billing - period',
+                        })
+                      : data.currentUser?.userSubscription?.subscriptionPlan ===
+                          'monthly'
+                        ? intl.formatMessage({
+                            defaultMessage: 'monthly',
+                            description:
+                              'UserPaywall Screen - monthly billing - period',
+                          })
+                        : '',
+                }}
+              />
+            ) : null}
+          </Text>
           <View style={styles.footer}>
             <PressableOpacity onPress={restorePurchase}>
               <Text variant="medium" style={styles.descriptionText}>
@@ -485,39 +575,9 @@ UserPayWallScreen.getScreenOptions = (): ScreenOptions => ({
   stackAnimation: 'slide_from_bottom',
 });
 
-const CIRCLE_SIZE = 5;
-
-export default UserPayWallScreen;
-
-type AnimatedTabIndexProps = {
-  currentIndex: SharedValue<number>;
-  index: number;
-};
-const AnimatedTabIndex = ({ currentIndex, index }: AnimatedTabIndexProps) => {
-  const animatedStyle = useAnimatedStyle(() => {
-    const color = interpolateColor(
-      currentIndex.value,
-      [index - 1, index, index + 1],
-      [colors.grey200, colors.white, colors.grey300],
-    );
-    return {
-      backgroundColor: color,
-      width: interpolate(
-        currentIndex.value,
-        [index - 1, index, index + 1],
-        [CIRCLE_SIZE, 20, CIRCLE_SIZE],
-      ),
-    };
-  });
-
-  return (
-    <Animated.View
-      accessibilityRole="none"
-      accessibilityState={{ selected: index === currentIndex.value }}
-      style={[styles.pagerItem, animatedStyle]}
-    />
-  );
-};
+export default relayScreen(UserPayWallScreen, {
+  query: userPayWallcreenQuery,
+});
 
 type OfferItemProps = {
   offer: PurchasesPackage;
@@ -542,6 +602,7 @@ const OfferItem = ({
       onPress={selectOffer}
       style={[
         styles.priceItem,
+        styles.selectionItem,
         { overflow: 'visible' },
         selectedPurchasePackage?.identifier === offer.identifier && {
           borderColor: colors.red400,
@@ -567,6 +628,12 @@ const OfferItem = ({
             style="currency"
             currency={offer.product.currencyCode}
           />
+          {period !== 'year' ? (
+            <FormattedMessage
+              defaultMessage=" / month"
+              description="MultiUser Paywall Screen - number of seat offer"
+            />
+          ) : undefined}
         </Text>
         {period === 'year' && (
           <Text variant="smallbold" style={styles.monthlyPricing}>
@@ -587,7 +654,7 @@ const OfferItem = ({
 };
 
 const Offer = memo(OfferItem);
-const BOTTOM_HEIGHT = width;
+const BOTTOM_HEIGHT = 450;
 const styles = StyleSheet.create({
   monthlyPricing: { textAlign: 'right', color: colors.grey600 },
   promoContainer: {
@@ -607,20 +674,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingHorizontal: 41,
   },
-  contaienrLogo: {
+  containerLogo: {
     flexDirection: 'row',
     height: 34,
     marginBottom: 15,
   },
   plusImage: { height: 34 },
-  containerPager: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'absolute',
-    bottom: 20,
-    height: 30,
-  },
   featureContainer: { flex: 1, marginBottom: -20, aspectRatio: 1 },
   container: { flex: 1, backgroundColor: 'transparent' },
   priceItem: {
@@ -628,23 +687,22 @@ const styles = StyleSheet.create({
     height: 54,
     borderWidth: 2,
     borderColor: colors.white,
-    alignItems: 'center',
     justifyContent: 'space-between',
     flex: 1,
-    marginHorizontal: 10,
+
     marginBottom: 10,
+  },
+  selectionItem: {
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    marginHorizontal: 10,
     borderRadius: 18,
     backgroundColor: 'white',
-    //custom shadow, (this screen has no darmode )
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 0,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
-    paddingHorizontal: 20,
+    ...shadow('light', 'center'),
+  },
+  userMgmtItem: {
+    paddingVertical: 20,
+    rowGap: 20,
   },
   contentContainerStyle: {
     marginHorizontal: 20,
@@ -665,7 +723,9 @@ const styles = StyleSheet.create({
   },
   descriptionText: {
     color: colors.grey400,
-    marginTop: 20,
+  },
+  subTitleText: {
+    textAlign: 'center',
   },
   icon: {
     backgroundColor: colors.grey100,
@@ -684,16 +744,9 @@ const styles = StyleSheet.create({
   },
   bottomContainer: {
     paddingHorizontal: 30,
+    gap: 10,
     width: '100%',
     overflow: 'visible',
-  },
-  pagerItem: {
-    width: CIRCLE_SIZE,
-    height: CIRCLE_SIZE,
-    borderRadius: CIRCLE_SIZE / 2,
-    marginLeft: CIRCLE_SIZE / 2,
-    marginRight: CIRCLE_SIZE / 2,
-    backgroundColor: colors.grey200,
   },
   loadingContainer: {
     ...StyleSheet.absoluteFillObject,
@@ -701,4 +754,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  userMgmtLink: {
+    width: '100%',
+    height: 48,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.red400,
+    ...shadow('light', 'bottom'),
+  },
+  userMgmtLinkText: {
+    color: colors.white,
+  },
+  userMgmtDescriptionText: {
+    textAlign: 'center',
+  },
 });
+
+function extractSeatsFromSubscriptionId(id: string) {
+  const parts = id.split('.');
+  const number = parts.pop();
+  if (number) {
+    return parseInt(number, 10);
+  }
+  return 0;
+}

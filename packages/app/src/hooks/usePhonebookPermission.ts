@@ -6,6 +6,7 @@ import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { Alert, Linking, Platform } from 'react-native';
 import { check, PERMISSIONS, RESULTS } from 'react-native-permissions';
+import { waitForAppState } from '#helpers/appState';
 
 /*
  * hook definition
@@ -13,32 +14,51 @@ import { check, PERMISSIONS, RESULTS } from 'react-native-permissions';
 export const usePhonebookPermission = () => {
   const intl = useIntl();
 
-  const displaySettingsRedirectPopup = useCallback(() => {
-    Alert.alert(
-      intl.formatMessage({
-        defaultMessage: 'Cannot access to contacts',
-        description: 'Alert title when contacts cannot be accessed',
-      }),
-      intl.formatMessage({
-        defaultMessage:
-          'Open your settings to share contacts access with azzapp and retry',
-        description: 'Alert message when contacts cannot be accessed',
-      }),
-      [
-        {
-          text: 'Open settings',
-          onPress: Linking.openSettings,
-        },
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-      ],
-      {
-        cancelable: true,
-      },
-    );
-  }, [intl]);
+  const displaySettingsRedirectPopup =
+    useCallback(async (): Promise<ContactPermissionStatus> => {
+      return new Promise(resolve => {
+        Alert.alert(
+          intl.formatMessage({
+            defaultMessage: 'Cannot access to contacts',
+            description: 'Alert title when contacts cannot be accessed',
+          }),
+          intl.formatMessage({
+            defaultMessage:
+              'Open your settings to share contacts access with azzapp and retry',
+            description: 'Alert message when contacts cannot be accessed',
+          }),
+          [
+            {
+              text: 'Open settings',
+              onPress: async () => {
+                Linking.openSettings();
+                // openSettings is not instant function due to android architecture.
+                // So we cannot wait for the app being active directly after opening the settings,
+                // because the app may still be active if the settings are not yet open.
+                // Here I ensure setting are well open before waiting for app active
+                await waitForAppState('background');
+                await waitForAppState('active');
+                const { status } = await requestPermissionsAsync();
+                resolve(status);
+              },
+            },
+            {
+              text: 'Cancel',
+              style: 'cancel',
+              onPress: () => {
+                resolve(ContactPermissionStatus.DENIED);
+              },
+            },
+          ],
+          {
+            cancelable: true,
+            onDismiss: () => {
+              resolve(ContactPermissionStatus.DENIED);
+            },
+          },
+        );
+      });
+    }, [intl]);
 
   /*
    * common function with or without redirection
@@ -58,10 +78,10 @@ export const usePhonebookPermission = () => {
             return { status };
           }
           case RESULTS.BLOCKED: {
-            if (redirectToSettings) {
-              displaySettingsRedirectPopup();
-            }
-            return { status: ContactPermissionStatus.DENIED };
+            const status = redirectToSettings
+              ? await displaySettingsRedirectPopup()
+              : ContactPermissionStatus.DENIED;
+            return { status };
           }
         }
       } else {
@@ -71,7 +91,7 @@ export const usePhonebookPermission = () => {
           return { status };
         }
         if (!canAskAgain && redirectToSettings) {
-          displaySettingsRedirectPopup();
+          return { status: await displaySettingsRedirectPopup() };
         }
         return { status: ContactPermissionStatus.DENIED };
       }

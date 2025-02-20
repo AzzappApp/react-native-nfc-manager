@@ -1,19 +1,15 @@
-import { Suspense, useCallback, useState } from 'react';
+import { Suspense, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
-import { MMKV } from 'react-native-mmkv';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { colors } from '#theme';
-import { useRouter } from '#components/NativeRouter';
+import AccountHeader from '#components/AccountHeader';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import relayScreen from '#helpers/relayScreen';
 import Container from '#ui/Container';
-import Header from '#ui/Header';
-import Icon from '#ui/Icon';
-import PressableNative from '#ui/PressableNative';
+import LoadingView from '#ui/LoadingView';
 import RoundedMenuComponent from '#ui/RoundedMenuComponent';
-import SafeAreaView from '#ui/SafeAreaView';
 import SearchBarStatic from '#ui/SearchBarStatic';
 import Text from '#ui/Text';
 
@@ -21,16 +17,16 @@ import ContactScreenLists from './ContactsScreenLists';
 import type { ContactsScreenQuery } from '#relayArtifacts/ContactsScreenQuery.graphql';
 import type { PreloadedQuery } from 'react-relay';
 
-export const storage = new MMKV({
-  id: 'contacts',
-});
-
 const contactsScreenQuery = graphql`
   query ContactsScreenQuery($profileId: ID!) {
     profile: node(id: $profileId) {
       ... on Profile {
         nbContacts
         ...ContactsScreenLists_contacts
+        webCard {
+          ...CoverRenderer_webCard
+          ...AccountHeader_webCard
+        }
       }
     }
   }
@@ -43,11 +39,6 @@ const ContactsScreen = ({
 }) => {
   const { profile } = usePreloadedQuery(contactsScreenQuery, preloadedQuery);
 
-  const router = useRouter();
-  const onClose = useCallback(() => {
-    router.back();
-  }, [router]);
-
   const styles = useStyleSheet(stylesheet);
 
   const [searchBy, setSearchBy] = useState<'date' | 'name'>('date');
@@ -58,72 +49,69 @@ const ContactsScreen = ({
 
   return (
     <Container style={styles.container}>
-      <SafeAreaView style={styles.container}>
-        <Header
-          middleElement={
+      {profile?.webCard && (
+        <AccountHeader
+          leftIcon="close"
+          webCard={profile?.webCard}
+          title={
             <Text variant="large">
               <FormattedMessage
                 description="ContactsScreen - Title"
                 defaultMessage="{contacts, plural,
-                =0 {# Contacts}
-                =1 {# Contact}
-                other {# Contacts}
+                =0 {# contacts received}
+                =1 {# contact received}
+                other {# contacts received}
         }"
                 values={{ contacts: profile?.nbContacts ?? 0 }}
               />
             </Text>
           }
-          leftElement={
-            <PressableNative onPress={onClose}>
-              <Icon icon="close" />
-            </PressableNative>
-          }
         />
-        <View style={styles.menu}>
-          <RoundedMenuComponent
-            selected={searchBy === 'date'}
-            label={intl.formatMessage({
-              defaultMessage: 'Date',
-              description: 'Date selector label in ContactsScreen',
-            })}
-            id="date"
-            onSelect={() => setSearchBy('date')}
-          />
-          <RoundedMenuComponent
-            selected={searchBy === 'name'}
-            label={intl.formatMessage({
-              defaultMessage: 'Name',
-              description: 'Name selector label in ContactsScreen',
-            })}
-            id="name"
-            onSelect={() => setSearchBy('name')}
-          />
-          {/* <RoundedMenuComponent
+      )}
+      <View style={styles.menu}>
+        <RoundedMenuComponent
+          selected={searchBy === 'date'}
+          label={intl.formatMessage({
+            defaultMessage: 'Date',
+            description: 'Date selector label in ContactsScreen',
+          })}
+          id="date"
+          onSelect={() => setSearchBy('date')}
+        />
+        <RoundedMenuComponent
+          selected={searchBy === 'name'}
+          label={intl.formatMessage({
+            defaultMessage: 'Name',
+            description: 'Name selector label in ContactsScreen',
+          })}
+          id="name"
+          onSelect={() => setSearchBy('name')}
+        />
+        {/* <RoundedMenuComponent
             selected={searchBy === 'location'}
             label={'Location'}
             id={'location'}
             onSelect={() => setSearchBy('location')}
           /> */}
-        </View>
-        <SearchBarStatic
-          style={styles.search}
-          value={search}
-          placeholder={intl.formatMessage({
-            defaultMessage: 'Search for name, company...',
-            description: 'Search placeholder in ContactsScreen',
-          })}
-          onChangeText={e => setSearch(e ?? '')}
-        />
-        <Suspense>
-          {profile && (
-            <ContactScreenLists
-              search={debounceSearch}
-              searchBy={searchBy}
-              profile={profile}
-            />
-          )}
-        </Suspense>
-      </SafeAreaView>
+      </View>
+      <SearchBarStatic
+        style={styles.search}
+        value={search}
+        placeholder={intl.formatMessage({
+          defaultMessage: 'Search for name, company...',
+          description: 'Search placeholder in ContactsScreen',
+        })}
+        onChangeText={e => setSearch(e ?? '')}
+      />
+      <Suspense>
+        {profile && (
+          <ContactScreenLists
+            search={debounceSearch}
+            searchBy={searchBy}
+            profile={profile}
+          />
+        )}
+      </Suspense>
     </Container>
   );
 };
@@ -179,9 +167,17 @@ const stylesheet = createStyleSheet(theme => ({
   },
 }));
 
+const ContactsScreenFallback = () => (
+  <Container style={{ flex: 1 }}>
+    <AccountHeader leftIcon="close" title="" webCard={null} />
+    <LoadingView />
+  </Container>
+);
+
 export default relayScreen(ContactsScreen, {
   query: contactsScreenQuery,
   getVariables: (_, profileInfos) => ({
     profileId: profileInfos?.profileId ?? '',
   }),
+  fallback: ContactsScreenFallback,
 });

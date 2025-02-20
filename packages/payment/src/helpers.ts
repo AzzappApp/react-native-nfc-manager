@@ -34,19 +34,45 @@ export const getNextPaymentDate = (
   return endAt;
 };
 
-export const calculateAmount = (
+export const getAzzappPlusPrice = (subscriptionPlan: SubscriptionPlan) =>
+  (subscriptionPlan === 'web.monthly' ? 2.99 : 1.99) * 100; //cents;
+
+export const getPricePerSeat = (subscriptionPlan: SubscriptionPlan) => {
+  return subscriptionPlan === 'web.monthly' ? 1.5 * 100 : 1 * 100; // cents;
+};
+
+export const calculateAzzappPlusPrice = (
+  subscriptionPlan: SubscriptionPlan,
+) => {
+  return Math.round(
+    getAzzappPlusPrice(subscriptionPlan) *
+      (subscriptionPlan === 'web.monthly'
+        ? 1
+        : Math.floor(YEARLY_RECURRENCE / MONTHLY_RECURRENCE)),
+  );
+};
+
+export const calculateAmountForSeats = (
   totalSeats: number,
   subscriptionPlan: SubscriptionPlan,
 ) => {
   return Math.round(
-    (subscriptionPlan === 'web.monthly'
-      ? totalSeats * 1.2
-      : totalSeats * 0.99) *
-      100 *
+    getPricePerSeat(subscriptionPlan) *
+      totalSeats *
       (subscriptionPlan === 'web.monthly'
         ? 1
         : Math.floor(YEARLY_RECURRENCE / MONTHLY_RECURRENCE)),
-  ); // cents;
+  );
+};
+
+export const calculateAmount = (
+  totalSeats: number,
+  subscriptionPlan: SubscriptionPlan,
+) => {
+  return (
+    calculateAmountForSeats(totalSeats, subscriptionPlan) +
+    calculateAzzappPlusPrice(subscriptionPlan)
+  );
 };
 
 export const calculateTaxes = async (
