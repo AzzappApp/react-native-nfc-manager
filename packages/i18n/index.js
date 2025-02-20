@@ -6,12 +6,12 @@ const SUPPORTED_LOCALES = [
   // 'fr',
   // 'da',
   // 'nl',
-  'de',
-  'it',
+  //'de',
+  //'it',
   // 'no',
   // 'pt-PT',
   // 'pt-BR',
-  'es',
+  //'es',
   // 'sv',
 ];
 
