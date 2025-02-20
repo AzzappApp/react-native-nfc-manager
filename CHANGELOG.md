@@ -1,3 +1,7 @@
+## 1.7.1-rc.47
+
+* **feat:**  - **webCard:** [#7487](https://github.com/AzzappApp/azzapp/pull/7487) deactivate premium on webcard kind ([#7493](https://github.com/AzzappApp/azzapp/pull/7493))
+
 ## 1.7.1-rc.46
 
 * **fix:**  - **home:** [#7302](https://github.com/AzzappApp/azzapp/pull/7302) put back delay on tooltip display
