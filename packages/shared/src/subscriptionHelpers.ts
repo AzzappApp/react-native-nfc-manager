@@ -1,5 +1,6 @@
-export const isWebCardKindSubscription = (kind: string) => {
-  return kind !== 'personal';
+export const isWebCardKindSubscription = (_kind: string) => {
+  // return kind !== 'personal';
+  return false;
 };
 
 const modulesKindsSubscription = ['parallax'];
