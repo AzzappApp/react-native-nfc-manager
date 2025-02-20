@@ -24,7 +24,7 @@ type WebCardBackgroundProps = ViewProps & {
     | undefined;
 };
 
-const WebCardBackground = ({
+const WebCardBackgroundPreview = ({
   webCard,
   overrideCardStyle,
   overrideLastModule,
@@ -114,6 +114,11 @@ const WebCardBackground = ({
                 background
               }
             }
+            ... on CardModuleTitleText {
+              cardModuleColor {
+                background
+              }
+            }
           }
         }
       `,
@@ -127,6 +132,11 @@ const WebCardBackground = ({
   const kind = overrideLastModule?.kind ?? lastModule?.kind;
   const lastModuleData = overrideLastModule?.data ?? lastModule ?? {};
 
+  if (__DEV__ && !lastModuleData.cardModuleColor) {
+    console.warn(
+      'Error no cardModuleColor defined for your module, You have an issue here',
+    );
+  }
   if (lastModule && kind && kind in MODULES_STYLES_VALUES) {
     const stylesMap =
       MODULES_STYLES_VALUES[kind as keyof typeof MODULES_STYLES_VALUES];
@@ -154,10 +164,16 @@ const WebCardBackground = ({
 
   return (
     <View {...props}>
-      <View style={{ backgroundColor: firstColor, flex: 1 }} />
-      <View style={{ backgroundColor: lastColor, flex: 1 }} />
+      <View
+        testID="WebCardBackgroundPreviewFirstColor"
+        style={{ backgroundColor: firstColor, flex: 1 }}
+      />
+      <View
+        testID="WebCardBackgroundPreviewLastColor"
+        style={{ backgroundColor: lastColor, flex: 1 }}
+      />
     </View>
   );
 };
 
-export default WebCardBackground;
+export default WebCardBackgroundPreview;

@@ -13,7 +13,7 @@ import ToggleButton from '#ui/ToggleButton';
 import CardModuleRenderer from './cardModules/CardModuleRenderer';
 import CoverRenderer from './CoverRenderer';
 import CoverRendererPreviewDesktop from './CoverRendererPreviewDesktop';
-import WebCardBackground from './WebCardBackgroundPreview';
+import WebCardBackgroundPreview from './WebCardBackgroundPreview';
 import type { WebCardPreview_webCard$key } from '#relayArtifacts/WebCardPreview_webCard.graphql';
 import type { ModuleRenderInfo } from './cardModules/CardModuleRenderer';
 import type { LayoutChangeEvent, PointProp, ViewProps } from 'react-native';
@@ -165,7 +165,7 @@ const WebCardPreview = ({
           onScroll={onScroll}
         >
           <View ref={contentRef}>
-            <WebCardBackground
+            <WebCardBackgroundPreview
               webCard={webCard}
               overrideCardStyle={cardStyle}
               overrideLastModule={cardModules.at(-1)}
