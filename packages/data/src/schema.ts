@@ -750,6 +750,8 @@ export const UserTable = cols.table(
     deletedAt: cols.dateTime('deletedAt'),
     deletedBy: cols.cuid('deletedBy'),
     note: cols.text('note'),
+    termsOfUseAcceptedVersion: cols.defaultVarchar('termsOfUseAcceptedVersion'),
+    termsOfUseAcceptedAt: cols.dateTime('termsOfUseAcceptedAt'),
   },
   table => {
     return {
@@ -1042,4 +1044,15 @@ export const FCMTokenTable = cols.table(
 );
 export type FCMToken = InferSelectModel<typeof FCMTokenTable>;
 
+//#endregion
+
+// #region TermsOfUse
+export const TermsOfUseTable = cols.table('TermsOfUse', {
+  version: cols.defaultVarchar('version').notNull().primaryKey(),
+  createdAt: cols
+    .dateTime('createdAt')
+    .notNull()
+    .default(DEFAULT_DATETIME_VALUE),
+});
+export type TermsOfUse = InferSelectModel<typeof TermsOfUseTable>;
 //#endregion

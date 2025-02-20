@@ -30,3 +30,8 @@ module.exports = {
   },
   prettierPath: require.resolve('prettier-2'),
 };
+
+process.env = Object.assign(process.env, {
+  TERMS_OF_SERVICE: 'TERMS_OF_SERVICE',
+  PRIVACY_POLICY: 'PRIVACY_POLICY',
+});

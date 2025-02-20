@@ -10,6 +10,7 @@ import { StyleSheet, View } from 'react-native';
 import { runOnJS, useAnimatedReaction } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
+import AcceptTermsOfUseModal from '#components/AcceptTermsOfUseModal';
 import { onChangeWebCard } from '#helpers/authStore';
 import useBoolean from '#hooks/useBoolean';
 import useNotifications from '#hooks/useNotifications';
@@ -44,6 +45,8 @@ const HomeScreenContent = ({
   const user = useFragment(
     graphql`
       fragment HomeScreenContent_user on User {
+        id
+        hasAcceptedLastTermsOfUse
         profiles {
           id
           profileRole
@@ -163,6 +166,7 @@ const HomeScreenContent = ({
         <HomeBottomSheetPopupPanel profile={currentProfile ?? null} />
       )}
       <Tooltips />
+      <AcceptTermsOfUseModal visible={!user.hasAcceptedLastTermsOfUse} />
     </View>
   );
 };

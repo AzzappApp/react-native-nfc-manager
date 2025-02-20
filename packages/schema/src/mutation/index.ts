@@ -1,5 +1,6 @@
 import acceptInvitation from './acceptInvitation';
 import acceptOwnership from './acceptOwnership';
+import acceptTermsOfUse from './acceptTermsOfUse';
 import addContact from './addContact';
 import cancelTransferOwnership from './cancelTransferOwnership';
 import createContactCard from './createContactCard';
@@ -123,6 +124,7 @@ export const Mutation: MutationResolvers = {
   deleteFCMToken,
   updateContactsLastView,
   extractVisitCardData,
+  acceptTermsOfUse,
   ...payment,
 };
 

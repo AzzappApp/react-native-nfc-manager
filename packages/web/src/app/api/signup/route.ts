@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 import * as z from 'zod';
 import {
   createUser,
+  getLastTermsOfUse,
   getProfilesByUser,
   getUserByEmail,
   getUserByPhoneNumber,
@@ -112,12 +113,15 @@ export const POST = withPluginsRoute(async (req: Request) => {
     }
 
     const userPhoneNumber = phoneNumber ? formatPhoneNumber(phoneNumber) : null;
+    const termsOfUse = await getLastTermsOfUse();
     await createUser({
       email: email ?? null,
       phoneNumber: userPhoneNumber,
       password: bcrypt.hashSync(password, 12),
       locale: locale ?? null,
       roles: null,
+      termsOfUseAcceptedVersion: termsOfUse?.version ?? null,
+      termsOfUseAcceptedAt: termsOfUse ? new Date() : null,
     });
 
     const issuer = (email ?? userPhoneNumber) as string;

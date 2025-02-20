@@ -673,4 +673,6 @@ const fakeUser: Omit<User, 'id'> = {
   locale: DEFAULT_LOCALE,
   note: null,
   password: null,
+  termsOfUseAcceptedVersion: null,
+  termsOfUseAcceptedAt: null,
 };
