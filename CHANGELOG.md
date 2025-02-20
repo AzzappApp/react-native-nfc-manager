@@ -1,3 +1,8 @@
+## 1.8.0-canary.3
+
+* **fix:**  - normalize socialProfile information ([#7495](https://github.com/AzzappApp/azzapp/pull/7495))
+* **fix:**  - correct last color when module is TitleText ([#7501](https://github.com/AzzappApp/azzapp/pull/7501))
+
 ## 1.8.0-canary.2
 
 * **fix:**  - **payment:** [#7499](https://github.com/AzzappApp/azzapp/pull/7499) update monthly subscription on deactivation ([#7500](https://github.com/AzzappApp/azzapp/pull/7500))
