@@ -1,3 +1,7 @@
+## 1.8.0-canary.4
+
+
+
 ## 1.8.0-canary.3
 
 * **fix:**  - normalize socialProfile information ([#7495](https://github.com/AzzappApp/azzapp/pull/7495))
