@@ -1,3 +1,8 @@
+## 1.7.1-canary.55
+
+* **fix:**  - **payment:** [#7499](https://github.com/AzzappApp/azzapp/pull/7499) update monthly subscription on deactivation ([#7500](https://github.com/AzzappApp/azzapp/pull/7500))
+* **fix:**  - **webCard:** [#7490](https://github.com/AzzappApp/azzapp/pull/7490) remove layout shift and add small delay to avoid incorrect calculation ([#7497](https://github.com/AzzappApp/azzapp/pull/7497))
+
 ## 1.7.1-canary.54
 
 * **fix:**  - ensure contact email & birthday are well shared ([#7482](https://github.com/AzzappApp/azzapp/pull/7482))
