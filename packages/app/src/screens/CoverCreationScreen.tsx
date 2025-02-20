@@ -2,6 +2,7 @@ import { useCallback, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Alert, View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
+import { isWebCardKindSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { colors } from '#theme';
 import { SaveHeaderButton } from '#components/commonsButtons';
 import CoverEditor from '#components/CoverEditor';
@@ -24,9 +25,6 @@ const queryWithCoverTemplate = graphql`
     $profileId: ID!
     $coverTemplateId: ID!
   ) {
-    currentUser {
-      isPremium
-    }
     profile: node(id: $profileId) {
       ...CoverEditor_profile
       ... on Profile {
@@ -49,9 +47,6 @@ const queryWithCoverTemplate = graphql`
 
 const queryWithoutCoverTemplate = graphql`
   query CoverCreationScreenQuery($profileId: ID!) {
-    currentUser {
-      isPremium
-    }
     profile: node(id: $profileId) {
       ...CoverEditor_profile
       ... on Profile {
@@ -78,7 +73,7 @@ const CoverCreationScreen = ({
     templateId ? queryWithCoverTemplate : queryWithoutCoverTemplate,
     preloadedQuery,
   );
-  const { profile, currentUser } = data;
+  const { profile } = data;
 
   const [canSave, setCanSave] = useState(false);
   const coverEditorRef = useRef<CoverEditorHandle | null>(null);
@@ -176,7 +171,6 @@ const CoverCreationScreen = ({
   }, [intl, onSaveCover]);
 
   const webCardKind = profile?.webCard?.webCardKind;
-  const isPremium = currentUser?.isPremium;
 
   return (
     <Container
@@ -197,7 +191,7 @@ const CoverCreationScreen = ({
                   description="Cover creation Screen - screen title"
                 />
               </Text>
-              {isPremium ? null : (
+              {webCardKind && isWebCardKindSubscription(webCardKind) && (
                 <View style={styles.proContainer}>
                   <Text variant="medium" style={styles.proText}>
                     <FormattedMessage
