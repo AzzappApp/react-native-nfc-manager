@@ -34,14 +34,12 @@ const updateMultiUser: MutationResolvers['updateMultiUser'] = async (
   }
 
   try {
-    if (isMultiUser) {
+    await transaction(async () => {
       await updateWebCard(webCardId, updates);
-    } else {
-      await transaction(async () => {
-        await updateWebCard(webCardId, updates);
+      if (!isMultiUser) {
         await removeWebCardNonOwnerProfiles(webCardId);
-      });
-    }
+      }
+    });
   } catch (e) {
     console.error(e);
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);

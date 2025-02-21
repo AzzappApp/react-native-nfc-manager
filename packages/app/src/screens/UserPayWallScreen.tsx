@@ -15,12 +15,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import Purchases, { INTRO_ELIGIBILITY_STATUS } from 'react-native-purchases';
-import {
-  commitLocalUpdate,
-  graphql,
-  usePreloadedQuery,
-  useRelayEnvironment,
-} from 'react-relay';
+import { commitLocalUpdate, graphql, usePreloadedQuery } from 'react-relay';
 import { colors, shadow } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import PremiumIndicator from '#components/PremiumIndicator';
@@ -71,7 +66,6 @@ const UserPayWallScreen = ({
   route,
   preloadedQuery,
 }: RelayScreenProps<UserPayWallRoute, UserPayWallScreenQuery>) => {
-  const environment = useRelayEnvironment();
   const data = usePreloadedQuery(userPayWallScreenQuery, preloadedQuery);
   const intl = useIntl();
   const router = useRouter();
@@ -88,10 +82,8 @@ const UserPayWallScreen = ({
   const subscriptions = useUserSubscriptionOffer(period);
   const [freeTrialEligible, setFreeTrialEligible] = useState(false);
   const onCompleted = useCallback(() => {
-    setTimeout(() => {
-      setProcessing(false);
-      router.back();
-    }, 1000); // wait for update to be replicated
+    setProcessing(false);
+    router.back();
   }, [router]);
   const setAllowMultiUser = useMultiUserUpdate(onCompleted);
 
@@ -215,68 +207,6 @@ const UserPayWallScreen = ({
             (currentSubscription?.availableSeats ?? 0),
         );
 
-        commitLocalUpdate(environment, store => {
-          try {
-            if (profileInfos?.webCardId && updateAvailableSeats >= 0) {
-              //activate only in there is enough seeats
-              const userSubscriptionCache = store.create(
-                subscriptionId,
-                'UserSubscription',
-              );
-              userSubscriptionCache.setValue(
-                updateAvailableSeats,
-                'availableSeats',
-              );
-              userSubscriptionCache.setValue(subscriptionId, 'subscriptionId');
-              userSubscriptionCache.setValue(subscriptionId, 'id');
-              userSubscriptionCache.setValue('active', 'status');
-              userSubscriptionCache.setValue('apple', 'issuer');
-
-              const webCardStore = store.get(profileInfos.webCardId);
-              webCardStore?.setValue(true, 'isPremium');
-              const subStore = webCardStore?.getLinkedRecord('subscription');
-              if (!subStore) {
-                webCardStore?.setLinkedRecord(
-                  userSubscriptionCache,
-                  'subscription',
-                );
-              } else {
-                subStore?.setValue(updateAvailableSeats, 'availableSeats');
-                subStore.setValue(subscriptionId, 'subscriptionId');
-                subStore.setValue('active', 'status');
-                subStore.setValue('apple', 'issuer');
-              }
-
-              //subscription is created on the webcard, we will use this one as reference
-              const upSubscriptionCache = store
-                ?.get(profileInfos.webCardId)
-                ?.getLinkedRecord('subscription');
-              if (upSubscriptionCache) {
-                const user = store.getRoot().getLinkedRecord('currentUser');
-                const profiles = user?.getLinkedRecords('profiles');
-                if (profiles) {
-                  const profile = profiles?.find(
-                    profile => profile.getDataID() === profileInfos?.profileId,
-                  );
-                  if (
-                    !profile
-                      ?.getLinkedRecord('webCard')
-                      ?.getLinkedRecord('subscription')
-                  ) {
-                    // Link the new UserSubscription record to the webCard
-                    profile
-                      ?.getLinkedRecord('webCard')
-                      ?.setLinkedRecord(upSubscriptionCache, 'subscription');
-                  }
-                }
-              }
-            }
-          } catch (error) {
-            Sentry.captureException(error, {
-              data: 'userPayWallScreen-updating cache',
-            });
-          }
-        });
         if (updateAvailableSeats >= 0 && activateMultiUser) {
           startWaitDatabase();
           return;
@@ -329,7 +259,6 @@ const UserPayWallScreen = ({
     activateMultiUser,
     currentSubscription?.availableSeats,
     currentSubscription?.totalSeats,
-    environment,
     intl,
     router,
     selectedPurchasePackage,
