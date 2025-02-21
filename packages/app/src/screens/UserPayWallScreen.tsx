@@ -8,6 +8,7 @@ import {
   Dimensions,
   Image,
   Linking,
+  Platform,
   ScrollView,
   StyleSheet,
   View,
@@ -33,7 +34,6 @@ import useScreenInsets from '#hooks/useScreenInsets';
 import { useUserSubscriptionOffer } from '#hooks/useSubscriptionOffer';
 import Button from '#ui/Button';
 import IconButton from '#ui/IconButton';
-import PressableNative from '#ui/PressableNative';
 import PressableOpacity from '#ui/PressableOpacity';
 import SwitchLabel from '#ui/SwitchLabel';
 import Text from '#ui/Text';
@@ -43,11 +43,14 @@ import type { UserPayWallScreenQuery } from '#relayArtifacts/UserPayWallScreenQu
 import type { UserPayWallRoute } from '#routes';
 import type { PurchasesPackage } from 'react-native-purchases';
 
-const TERMS_OF_SERVICE = process.env.TERMS_OF_SERVICE;
+const TERMS_OF_SERVICE =
+  Platform.OS === 'ios'
+    ? 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/'
+    : process.env.TERMS_OF_SERVICE;
 const PRIVACY_POLICY = process.env.PRIVACY_POLICY;
 const width = Dimensions.get('screen').width;
-/** @type {*} */
-const userPayWallcreenQuery = graphql`
+
+const userPayWallScreenQuery = graphql`
   query UserPayWallScreenQuery {
     currentUser {
       id
@@ -67,7 +70,7 @@ const UserPayWallScreen = ({
   preloadedQuery,
 }: RelayScreenProps<UserPayWallRoute, UserPayWallScreenQuery>) => {
   const environment = useRelayEnvironment();
-  const data = usePreloadedQuery(userPayWallcreenQuery, preloadedQuery);
+  const data = usePreloadedQuery(userPayWallScreenQuery, preloadedQuery);
   const intl = useIntl();
   const router = useRouter();
   const { height } = useWindowDimensions();
@@ -373,6 +376,7 @@ const UserPayWallScreen = ({
       <IconButton
         icon="arrow_down"
         style={styles.icon}
+        iconStyle={styles.iconStyle}
         variant="icon"
         onPress={() => router.back()}
         size={50}
@@ -414,33 +418,6 @@ const UserPayWallScreen = ({
                 />
               );
             })}
-            <View style={[styles.selectionItem, styles.userMgmtItem]}>
-              <Text variant="large">
-                <FormattedMessage
-                  defaultMessage="20+ users"
-                  description="UserPaywall Screen - 20+ users suggestion title"
-                />
-              </Text>
-              <Text variant="small" style={styles.userMgmtDescriptionText}>
-                <FormattedMessage
-                  defaultMessage="Looking to equip a bigger team?"
-                  description="UserPaywall Screen - 20+ users suggestion description"
-                />
-              </Text>
-              <PressableNative
-                style={styles.userMgmtLink}
-                onPress={() => {
-                  Linking.openURL('mailto:contact@azzapp.com');
-                }}
-              >
-                <Text variant="button" style={styles.userMgmtLinkText}>
-                  <FormattedMessage
-                    defaultMessage="Contact us"
-                    description="UserPaywall Screen - 20+ users suggestion button"
-                  />
-                </Text>
-              </PressableNative>
-            </View>
           </ScrollView>
           <LinearGradient
             colors={[
@@ -576,7 +553,7 @@ UserPayWallScreen.getScreenOptions = (): ScreenOptions => ({
 });
 
 export default relayScreen(UserPayWallScreen, {
-  query: userPayWallcreenQuery,
+  query: userPayWallScreenQuery,
 });
 
 type OfferItemProps = {
@@ -596,6 +573,7 @@ const OfferItem = ({
     () => setSelectedPurchasePackage(offer),
     [offer, setSelectedPurchasePackage],
   );
+
   return (
     <PressableOpacity
       key={offer.identifier}
@@ -612,8 +590,8 @@ const OfferItem = ({
       <Text variant="button" appearance="light">
         <FormattedMessage
           defaultMessage={`{qty, plural,
-            =1 {{qty} User}
-            other {{qty} Users}
+            =1 {Multi-User}
+            other {Multi-User for {qty} Users}
           }`}
           description="MultiUser Paywall Screen - number of seat offer"
           values={{
@@ -628,12 +606,17 @@ const OfferItem = ({
             style="currency"
             currency={offer.product.currencyCode}
           />
-          {period !== 'year' ? (
+          {period === 'year' ? (
+            <FormattedMessage
+              defaultMessage=" / year"
+              description="MultiUser Paywall Screen - number of seat offer per year"
+            />
+          ) : (
             <FormattedMessage
               defaultMessage=" / month"
-              description="MultiUser Paywall Screen - number of seat offer"
+              description="MultiUser Paywall Screen - number of seat offer per month"
             />
-          ) : undefined}
+          )}
         </Text>
         {period === 'year' && (
           <Text variant="smallbold" style={styles.monthlyPricing}>
@@ -700,10 +683,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     ...shadow('light', 'center'),
   },
-  userMgmtItem: {
-    paddingVertical: 20,
-    rowGap: 20,
-  },
   contentContainerStyle: {
     marginHorizontal: 20,
     paddingTop: 15,
@@ -726,12 +705,16 @@ const styles = StyleSheet.create({
   },
   subTitleText: {
     textAlign: 'center',
+    color: colors.black,
   },
   icon: {
     backgroundColor: colors.grey100,
     position: 'absolute',
     top: 50,
     left: 15,
+  },
+  iconStyle: {
+    tintColor: colors.black,
   },
   buttonSubscribe: {
     width: '100%',
@@ -753,21 +736,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.9)',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  userMgmtLink: {
-    width: '100%',
-    height: 48,
-    borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: colors.red400,
-    ...shadow('light', 'bottom'),
-  },
-  userMgmtLinkText: {
-    color: colors.white,
-  },
-  userMgmtDescriptionText: {
-    textAlign: 'center',
   },
 });
 
