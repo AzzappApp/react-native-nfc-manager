@@ -1,3 +1,43 @@
+## 1.8.0-canary.7
+
+* **fix:**  - add autofill in shareback modal on web ([#7510](https://github.com/AzzappApp/azzapp/pull/7510))
+* **fix:**  - some text are not visible in multi user screen in dark mode ([#7508](https://github.com/AzzappApp/azzapp/pull/7508))
+* **fix:**  - review colors in paywall darkmode ([#7507](https://github.com/AzzappApp/azzapp/pull/7507))
+* **fix:**  - normalize socialProfile information ([#7495](https://github.com/AzzappApp/azzapp/pull/7495))
+* **fix:**  - correct last color when module is TitleText ([#7501](https://github.com/AzzappApp/azzapp/pull/7501))
+* **fix:**  - **payment:** [#7499](https://github.com/AzzappApp/azzapp/pull/7499) update monthly subscription on deactivation ([#7500](https://github.com/AzzappApp/azzapp/pull/7500))
+* **fix:**  - **webCard:** [#7490](https://github.com/AzzappApp/azzapp/pull/7490) remove layout shift and add small delay to avoid incorrect calculation ([#7497](https://github.com/AzzappApp/azzapp/pull/7497))
+* **fix:**  - ensure contact email & birthday are well shared ([#7482](https://github.com/AzzappApp/azzapp/pull/7482))
+* **tests:**  - fix reanimated mock ([#7477](https://github.com/AzzappApp/azzapp/pull/7477))
+* **fix:**  - **EmailSignature:** fix save contact url
+* **fix:**  - animate correctly home screen information button ([#7466](https://github.com/AzzappApp/azzapp/pull/7466))
+* **fix:**  - **EmailSignature:** fix save my contact button
+* **fix:**  - remove padding when keyboard is open ([#7462](https://github.com/AzzappApp/azzapp/pull/7462))
+* **build:**  - remove unknown option
+* **fix:**  - email signature refactoring ([#7464](https://github.com/AzzappApp/azzapp/pull/7464))
+* **build:**  - rollback react-native to 0.77
+* **build:**  - upgrade to rn 0.77.1 ([#7455](https://github.com/AzzappApp/azzapp/pull/7455))
+* **fix:**  - **auth:** [#7452](https://github.com/AzzappApp/azzapp/pull/7452) automatically signout when current user is null ([#7453](https://github.com/AzzappApp/azzapp/pull/7453))
+* **docs:**  - update readme
+* **fix:**  - **database:** [#5031](https://github.com/AzzappApp/azzapp/pull/5031) migrate columns to 12 chars ([#7442](https://github.com/AzzappApp/azzapp/pull/7442))
+* **fix:**  - ensure a label is displayed even if backend doesn't have it ([#7444](https://github.com/AzzappApp/azzapp/pull/7444))
+* **fix:**  - reduce media id size to 14 ([#7433](https://github.com/AzzappApp/azzapp/pull/7433))
+* **feat:**  - improve isModuleInViewport ([#7434](https://github.com/AzzappApp/azzapp/pull/7434))
+* **fix:**  - **cover:** [#6618](https://github.com/AzzappApp/azzapp/pull/6618) empeach automatic sleeping while exporting cover ([#7423](https://github.com/AzzappApp/azzapp/pull/7423))
+* **feat:**  - business can scanner ([#7357](https://github.com/AzzappApp/azzapp/pull/7357))
+* **feat:**  - **media:** [#5162](https://github.com/AzzappApp/azzapp/pull/5162) put back automatic removal of media ([#7429](https://github.com/AzzappApp/azzapp/pull/7429))
+* **fix:**  - **multiUser:** [#7348](https://github.com/AzzappApp/azzapp/pull/7348) add missing env var in github action ([#7355](https://github.com/AzzappApp/azzapp/pull/7355))
+* **fix:**  - use 4o-mini for affordable price
+* **fix:**  - **modules:** [#6405](https://github.com/AzzappApp/azzapp/pull/6405) background continues outside module preview ([#7347](https://github.com/AzzappApp/azzapp/pull/7347))
+* **feat:**  - **contactCard:** [#7264](https://github.com/AzzappApp/azzapp/pull/7264) use open ai api to read photos of business c… ([#7329](https://github.com/AzzappApp/azzapp/pull/7329))
+* **docs:**  - Update README.md
+* **docs:**  - update README.md
+* **fix:**  - ensure deleted profile profile are not handled in getProfilesByUser ([#7323](https://github.com/AzzappApp/azzapp/pull/7323))
+* **fix:**  - viewPort in module ([#7322](https://github.com/AzzappApp/azzapp/pull/7322))
+* **fix:**  - we need a non collapsable view to display the shadow ([#7316](https://github.com/AzzappApp/azzapp/pull/7316))
+* **fix:**  - choose texts depending of webcard kind ([#7313](https://github.com/AzzappApp/azzapp/pull/7313))
+* **fix:**  - hide follow button when no admin ([#7310](https://github.com/AzzappApp/azzapp/pull/7310))
+
 ## 1.8.0-canary.6
 
 * **fix:**  - add autofill in shareback modal on web ([#7510](https://github.com/AzzappApp/azzapp/pull/7510))
