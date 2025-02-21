@@ -544,6 +544,7 @@ export default relayScreen(MultiUserScreen, {
   }),
   fetchPolicy: 'store-and-network',
   pollInterval: 30000,
+  refreshOnFocus: true,
 });
 
 type MultiUserTransferOwnerContextProps = {
