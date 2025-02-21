@@ -1,3 +1,7 @@
+## 1.8.0-canary.10
+
+
+
 ## 1.8.0-canary.9
 
 * **feat:**  - fetch logo and create cover ([#7491](https://github.com/AzzappApp/azzapp/pull/7491))
