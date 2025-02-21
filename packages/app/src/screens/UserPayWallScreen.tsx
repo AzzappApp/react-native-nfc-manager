@@ -1,13 +1,14 @@
 import * as Sentry from '@sentry/react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import LottieView from 'lottie-react-native';
-import { memo, useCallback, useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, FormattedNumber, useIntl } from 'react-intl';
 import {
   Alert,
   Dimensions,
   Image,
   Linking,
+  Platform,
   ScrollView,
   StyleSheet,
   View,
@@ -20,7 +21,6 @@ import {
   usePreloadedQuery,
   useRelayEnvironment,
 } from 'react-relay';
-import { waitTime } from '@azzapp/shared/asyncHelpers';
 import { colors, shadow } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import PremiumIndicator from '#components/PremiumIndicator';
@@ -28,12 +28,12 @@ import { getAuthState } from '#helpers/authStore';
 import { iso8601DurationToDays } from '#helpers/dateHelpers';
 import { getRelayEnvironment } from '#helpers/relayEnvironment';
 import relayScreen from '#helpers/relayScreen';
+import useBoolean from '#hooks/useBoolean';
 import { useMultiUserUpdate } from '#hooks/useMultiUserUpdate';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { useUserSubscriptionOffer } from '#hooks/useSubscriptionOffer';
 import Button from '#ui/Button';
 import IconButton from '#ui/IconButton';
-import PressableNative from '#ui/PressableNative';
 import PressableOpacity from '#ui/PressableOpacity';
 import SwitchLabel from '#ui/SwitchLabel';
 import Text from '#ui/Text';
@@ -43,11 +43,14 @@ import type { UserPayWallScreenQuery } from '#relayArtifacts/UserPayWallScreenQu
 import type { UserPayWallRoute } from '#routes';
 import type { PurchasesPackage } from 'react-native-purchases';
 
-const TERMS_OF_SERVICE = process.env.TERMS_OF_SERVICE;
+const TERMS_OF_SERVICE =
+  Platform.OS === 'ios'
+    ? 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/'
+    : process.env.TERMS_OF_SERVICE;
 const PRIVACY_POLICY = process.env.PRIVACY_POLICY;
 const width = Dimensions.get('screen').width;
-/** @type {*} */
-const userPayWallcreenQuery = graphql`
+
+const userPayWallScreenQuery = graphql`
   query UserPayWallScreenQuery {
     currentUser {
       id
@@ -67,7 +70,7 @@ const UserPayWallScreen = ({
   preloadedQuery,
 }: RelayScreenProps<UserPayWallRoute, UserPayWallScreenQuery>) => {
   const environment = useRelayEnvironment();
-  const data = usePreloadedQuery(userPayWallcreenQuery, preloadedQuery);
+  const data = usePreloadedQuery(userPayWallScreenQuery, preloadedQuery);
   const intl = useIntl();
   const router = useRouter();
   const { height } = useWindowDimensions();
@@ -86,14 +89,40 @@ const UserPayWallScreen = ({
 
   const lottieHeight = height - BOTTOM_HEIGHT + 20;
 
+  const currentSubscription = useMemo(() => {
+    return data.currentUser?.userSubscription;
+  }, [data.currentUser?.userSubscription]);
+
+  // this concept comes from Francois and Mickael, i am not responsible
+  const [shouldWaitDatabase, startWaitDatabase] = useBoolean(false);
+
+  const [waitedSubscriptionId, setWaitedSubscriptionId] = useState<
+    string | null
+  >(null);
+
+  useEffect(() => {
+    if (
+      shouldWaitDatabase &&
+      currentSubscription?.subscriptionId === waitedSubscriptionId
+    ) {
+      setAllowMultiUser(true);
+      setProcessing(false);
+      router.back();
+    }
+  }, [
+    currentSubscription,
+    router,
+    setAllowMultiUser,
+    shouldWaitDatabase,
+    waitedSubscriptionId,
+  ]);
+
   useEffect(() => {
     if (subscriptions && subscriptions.length > 0) {
       //set the period
-      if (data.currentUser?.userSubscription) {
+      if (currentSubscription) {
         const found = subscriptions.find(
-          sub =>
-            sub.product.identifier ===
-            data.currentUser?.userSubscription?.subscriptionId,
+          sub => sub.product.identifier === currentSubscription?.subscriptionId,
         );
         if (found) {
           setSelectedPurchasePackage(found);
@@ -115,11 +144,7 @@ const UserPayWallScreen = ({
         }
       });
     }
-  }, [
-    data.currentUser?.userSubscription,
-    data.currentUser?.userSubscription?.subscriptionId,
-    subscriptions,
-  ]);
+  }, [currentSubscription, currentSubscription?.subscriptionId, subscriptions]);
 
   const [labelPurchase, setLabelPurchase] = useState<string>(
     intl.formatMessage({
@@ -172,14 +197,14 @@ const UserPayWallScreen = ({
       if (res.customerInfo.entitlements.active?.multiuser?.isActive) {
         const subscriptionId =
           res.customerInfo.entitlements.active?.multiuser.productIdentifier;
+        setWaitedSubscriptionId(subscriptionId);
         const newTotalSeat = extractSeatsFromSubscriptionId(subscriptionId);
-        const currentTotalSeat =
-          data.currentUser?.userSubscription?.totalSeats ?? 0;
+        const currentTotalSeat = currentSubscription?.totalSeats ?? 0;
         const updateAvailableSeats = Math.max(
           0,
           newTotalSeat -
             currentTotalSeat +
-            (data.currentUser?.userSubscription?.availableSeats ?? 0),
+            (currentSubscription?.availableSeats ?? 0),
         );
 
         commitLocalUpdate(environment, store => {
@@ -248,8 +273,8 @@ const UserPayWallScreen = ({
           updateAvailableSeats >= 0 &&
           route.params?.activateFeature === 'MULTI_USER'
         ) {
-          await waitTime(2000); // we need to wait the call from revenue cat to ensure that user has a subscription on next call
-          setAllowMultiUser(true);
+          startWaitDatabase();
+          return;
         }
       }
       setProcessing(false);
@@ -296,14 +321,14 @@ const UserPayWallScreen = ({
       Sentry.captureException(error, { data: 'userPayWallScreen' });
     }
   }, [
-    data.currentUser?.userSubscription?.availableSeats,
-    data.currentUser?.userSubscription?.totalSeats,
+    currentSubscription?.availableSeats,
+    currentSubscription?.totalSeats,
     environment,
     intl,
     route.params?.activateFeature,
     router,
     selectedPurchasePackage,
-    setAllowMultiUser,
+    startWaitDatabase,
   ]);
 
   const restorePurchase = useCallback(async () => {
@@ -373,6 +398,7 @@ const UserPayWallScreen = ({
       <IconButton
         icon="arrow_down"
         style={styles.icon}
+        iconStyle={styles.iconStyle}
         variant="icon"
         onPress={() => router.back()}
         size={50}
@@ -414,33 +440,6 @@ const UserPayWallScreen = ({
                 />
               );
             })}
-            <View style={[styles.selectionItem, styles.userMgmtItem]}>
-              <Text variant="large">
-                <FormattedMessage
-                  defaultMessage="20+ users"
-                  description="UserPaywall Screen - 20+ users suggestion title"
-                />
-              </Text>
-              <Text variant="small" style={styles.userMgmtDescriptionText}>
-                <FormattedMessage
-                  defaultMessage="Looking to equip a bigger team?"
-                  description="UserPaywall Screen - 20+ users suggestion description"
-                />
-              </Text>
-              <PressableNative
-                style={styles.userMgmtLink}
-                onPress={() => {
-                  Linking.openURL('mailto:contact@azzapp.com');
-                }}
-              >
-                <Text variant="button" style={styles.userMgmtLinkText}>
-                  <FormattedMessage
-                    defaultMessage="Contact us"
-                    description="UserPaywall Screen - 20+ users suggestion button"
-                  />
-                </Text>
-              </PressableNative>
-            </View>
           </ScrollView>
           <LinearGradient
             colors={[
@@ -467,7 +466,7 @@ const UserPayWallScreen = ({
             onPress={processOrder}
           />
           <Text variant="small" style={styles.subTitleText}>
-            {data.currentUser?.userSubscription?.status !== 'active' &&
+            {currentSubscription?.status !== 'active' &&
             selectedPurchasePackage?.product.introPrice?.period ? (
               <FormattedMessage
                 defaultMessage="{days}-day free trial, with auto renew. Cancel anytime"
@@ -478,7 +477,7 @@ const UserPayWallScreen = ({
                   ),
                 }}
               />
-            ) : data.currentUser?.userSubscription?.status === 'active' ? (
+            ) : currentSubscription?.status === 'active' ? (
               <FormattedMessage
                 defaultMessage="Your actual subscription : {qty, plural,
         =1 {{qty} user}
@@ -486,17 +485,15 @@ const UserPayWallScreen = ({
       } billed {period}"
                 description="Paywall subscription subtitle for active subscription"
                 values={{
-                  qty: data.currentUser?.userSubscription?.totalSeats,
+                  qty: currentSubscription?.totalSeats,
                   period:
-                    data.currentUser?.userSubscription?.subscriptionPlan ===
-                    'yearly'
+                    currentSubscription?.subscriptionPlan === 'yearly'
                       ? intl.formatMessage({
                           defaultMessage: 'yearly',
                           description:
                             'UserPaywall Screen - yearly billing - period',
                         })
-                      : data.currentUser?.userSubscription?.subscriptionPlan ===
-                          'monthly'
+                      : currentSubscription?.subscriptionPlan === 'monthly'
                         ? intl.formatMessage({
                             defaultMessage: 'monthly',
                             description:
@@ -576,7 +573,8 @@ UserPayWallScreen.getScreenOptions = (): ScreenOptions => ({
 });
 
 export default relayScreen(UserPayWallScreen, {
-  query: userPayWallcreenQuery,
+  query: userPayWallScreenQuery,
+  pollInterval: 500,
 });
 
 type OfferItemProps = {
@@ -596,6 +594,7 @@ const OfferItem = ({
     () => setSelectedPurchasePackage(offer),
     [offer, setSelectedPurchasePackage],
   );
+
   return (
     <PressableOpacity
       key={offer.identifier}
@@ -612,8 +611,8 @@ const OfferItem = ({
       <Text variant="button" appearance="light">
         <FormattedMessage
           defaultMessage={`{qty, plural,
-            =1 {{qty} User}
-            other {{qty} Users}
+            =1 {Multi-User}
+            other {Multi-User for {qty} Users}
           }`}
           description="MultiUser Paywall Screen - number of seat offer"
           values={{
@@ -628,12 +627,17 @@ const OfferItem = ({
             style="currency"
             currency={offer.product.currencyCode}
           />
-          {period !== 'year' ? (
+          {period === 'year' ? (
+            <FormattedMessage
+              defaultMessage=" / year"
+              description="MultiUser Paywall Screen - number of seat offer per year"
+            />
+          ) : (
             <FormattedMessage
               defaultMessage=" / month"
-              description="MultiUser Paywall Screen - number of seat offer"
+              description="MultiUser Paywall Screen - number of seat offer per month"
             />
-          ) : undefined}
+          )}
         </Text>
         {period === 'year' && (
           <Text variant="smallbold" style={styles.monthlyPricing}>
@@ -700,10 +704,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     ...shadow('light', 'center'),
   },
-  userMgmtItem: {
-    paddingVertical: 20,
-    rowGap: 20,
-  },
   contentContainerStyle: {
     marginHorizontal: 20,
     paddingTop: 15,
@@ -726,12 +726,16 @@ const styles = StyleSheet.create({
   },
   subTitleText: {
     textAlign: 'center',
+    color: colors.black,
   },
   icon: {
     backgroundColor: colors.grey100,
     position: 'absolute',
     top: 50,
     left: 15,
+  },
+  iconStyle: {
+    tintColor: colors.black,
   },
   buttonSubscribe: {
     width: '100%',
@@ -753,21 +757,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.9)',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  userMgmtLink: {
-    width: '100%',
-    height: 48,
-    borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: colors.red400,
-    ...shadow('light', 'bottom'),
-  },
-  userMgmtLinkText: {
-    color: colors.white,
-  },
-  userMgmtDescriptionText: {
-    textAlign: 'center',
   },
 });
 
