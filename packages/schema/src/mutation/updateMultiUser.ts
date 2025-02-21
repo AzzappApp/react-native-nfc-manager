@@ -1,5 +1,6 @@
 import { GraphQLError } from 'graphql';
 import {
+  getWebCardById,
   getWebCardCountProfile,
   removeWebCardNonOwnerProfiles,
   transaction,
@@ -7,7 +8,7 @@ import {
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { invalidateWebCard } from '#externals';
-import { webCardLoader, webCardOwnerLoader } from '#loaders';
+import { webCardOwnerLoader } from '#loaders';
 import { checkWebCardOwnerProfile } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
@@ -47,7 +48,7 @@ const updateMultiUser: MutationResolvers['updateMultiUser'] = async (
     console.error(e);
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
-  const webCard = await webCardLoader.load(webCardId);
+  const webCard = await getWebCardById(webCardId);
   if (!webCard) {
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
