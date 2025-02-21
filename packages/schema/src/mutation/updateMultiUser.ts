@@ -39,9 +39,7 @@ const updateMultiUser: MutationResolvers['updateMultiUser'] = async (
     } else {
       await transaction(async () => {
         await updateWebCard(webCardId, updates);
-        if (!isMultiUser) {
-          await removeWebCardNonOwnerProfiles(webCardId);
-        }
+        await removeWebCardNonOwnerProfiles(webCardId);
       });
     }
   } catch (e) {
