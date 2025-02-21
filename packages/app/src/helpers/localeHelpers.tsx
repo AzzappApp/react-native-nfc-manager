@@ -106,15 +106,15 @@ export const messages: Record<Locale, Record<string, string>> = {
   // get 'en-GB'() {
   //   return require('@azzapp/i18n/compiled/app/en-GB.json');
   // },
-  get es() {
-    return require('@azzapp/i18n/compiled/app/es.json');
-  },
+  //get es() {
+  //  return require('@azzapp/i18n/compiled/app/es.json');
+  //},
   // get fr() {
   //   return require('@azzapp/i18n/compiled/app/fr.json');
   // },
-  get it() {
-    return require('@azzapp/i18n/compiled/app/it.json');
-  },
+  //get it() {
+  //  return require('@azzapp/i18n/compiled/app/it.json');
+  //},
   // get nl() {
   //   return require('@azzapp/i18n/compiled/app/nl.json');
   // },
@@ -130,7 +130,7 @@ export const messages: Record<Locale, Record<string, string>> = {
   // get sv() {
   //   return require('@azzapp/i18n/compiled/app/sv.json');
   // },
-  get de() {
-    return require('@azzapp/i18n/compiled/app/de.json');
-  },
+  //get de() {
+  //return require('@azzapp/i18n/compiled/app/de.json');
+  //},
 };
