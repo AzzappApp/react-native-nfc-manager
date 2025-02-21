@@ -1,3 +1,7 @@
+## 1.8.0-canary.6
+
+* **fix:**  - add autofill in shareback modal on web ([#7510](https://github.com/AzzappApp/azzapp/pull/7510))
+
 ## 1.8.0-canary.5
 
 * **fix:**  - some text are not visible in multi user screen in dark mode ([#7508](https://github.com/AzzappApp/azzapp/pull/7508))
