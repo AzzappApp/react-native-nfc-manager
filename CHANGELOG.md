@@ -1,3 +1,8 @@
+## 1.8.0-canary.5
+
+* **fix:**  - some text are not visible in multi user screen in dark mode ([#7508](https://github.com/AzzappApp/azzapp/pull/7508))
+* **fix:**  - review colors in paywall darkmode ([#7507](https://github.com/AzzappApp/azzapp/pull/7507))
+
 ## 1.8.0-canary.4
 
 
