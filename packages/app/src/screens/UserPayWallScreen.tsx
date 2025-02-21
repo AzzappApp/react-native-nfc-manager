@@ -87,8 +87,10 @@ const UserPayWallScreen = ({
   const subscriptions = useUserSubscriptionOffer(period);
   const [freeTrialEligible, setFreeTrialEligible] = useState(false);
   const onCompleted = useCallback(() => {
-    setProcessing(false);
-    router.back();
+    setTimeout(() => {
+      setProcessing(false);
+      router.back();
+    }, 1000); // wait for update to be replicated
   }, [router]);
   const setAllowMultiUser = useMultiUserUpdate(onCompleted);
 
