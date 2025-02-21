@@ -86,10 +86,11 @@ const UserPayWallScreen = ({
   const [processing, setProcessing] = useState(false);
   const subscriptions = useUserSubscriptionOffer(period);
   const [freeTrialEligible, setFreeTrialEligible] = useState(false);
-  const setAllowMultiUser = useMultiUserUpdate(() => {
+  const onCompleted = useCallback(() => {
     setProcessing(false);
     router.back();
-  });
+  }, [router]);
+  const setAllowMultiUser = useMultiUserUpdate(onCompleted);
 
   const lottieHeight = height - BOTTOM_HEIGHT + 20;
 
