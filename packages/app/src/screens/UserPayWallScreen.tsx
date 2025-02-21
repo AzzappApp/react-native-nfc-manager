@@ -373,6 +373,7 @@ const UserPayWallScreen = ({
       <IconButton
         icon="arrow_down"
         style={styles.icon}
+        iconStyle={styles.iconStyle}
         variant="icon"
         onPress={() => router.back()}
         size={50}
@@ -415,7 +416,10 @@ const UserPayWallScreen = ({
               );
             })}
             <View style={[styles.selectionItem, styles.userMgmtItem]}>
-              <Text variant="large">
+              <Text
+                variant="large"
+                style={styles.userMgmtDescriptionHeaderText}
+              >
                 <FormattedMessage
                   defaultMessage="20+ users"
                   description="UserPaywall Screen - 20+ users suggestion title"
@@ -727,12 +731,16 @@ const styles = StyleSheet.create({
   },
   subTitleText: {
     textAlign: 'center',
+    color: colors.black,
   },
   icon: {
     backgroundColor: colors.grey100,
     position: 'absolute',
     top: 50,
     left: 15,
+  },
+  iconStyle: {
+    tintColor: colors.black,
   },
   buttonSubscribe: {
     width: '100%',
@@ -769,6 +777,10 @@ const styles = StyleSheet.create({
   },
   userMgmtDescriptionText: {
     textAlign: 'center',
+    color: colors.black,
+  },
+  userMgmtDescriptionHeaderText: {
+    color: colors.black,
   },
 });
 
