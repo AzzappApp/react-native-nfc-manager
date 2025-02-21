@@ -189,6 +189,8 @@ const UserPayWallScreen = ({
     }
   }, [freeTrialEligible, intl, selectedPurchasePackage]);
 
+  const activateMultiUser = route.params?.activateFeature === 'MULTI_USER';
+
   const processOrder = useCallback(async () => {
     const { profileInfos } = getAuthState();
     const webCardId = profileInfos?.webCardId;
@@ -275,10 +277,7 @@ const UserPayWallScreen = ({
             });
           }
         });
-        if (
-          updateAvailableSeats >= 0 &&
-          route.params?.activateFeature === 'MULTI_USER'
-        ) {
+        if (updateAvailableSeats >= 0 && activateMultiUser) {
           startWaitDatabase();
           return;
         }
@@ -327,11 +326,11 @@ const UserPayWallScreen = ({
       Sentry.captureException(error, { data: 'userPayWallScreen' });
     }
   }, [
+    activateMultiUser,
     currentSubscription?.availableSeats,
     currentSubscription?.totalSeats,
     environment,
     intl,
-    route.params?.activateFeature,
     router,
     selectedPurchasePackage,
     startWaitDatabase,
