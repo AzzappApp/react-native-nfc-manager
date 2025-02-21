@@ -19,7 +19,7 @@ const Row = ({ children }: PropsWithChildren) => {
   return (
     <View style={styles.row}>
       <Image source={require('./assets/check.svg')} style={styles.check} />
-      <Text variant="medium" appearance="light">
+      <Text variant="medium" appearance="light" style={styles.rowText}>
         {children}
       </Text>
     </View>
@@ -130,7 +130,7 @@ const MultiUserDescription = ({
 
 export default MultiUserDescription;
 
-const styleSheet = createStyleSheet(() => ({
+const styleSheet = createStyleSheet(appearance => ({
   container: {
     marginTop: 30,
     gap: 30,
@@ -158,5 +158,8 @@ const styleSheet = createStyleSheet(() => ({
   buttonContainer: {
     gap: 10,
     minWidth: 311,
+  },
+  rowText: {
+    color: appearance === 'dark' ? colors.white : colors.black,
   },
 }));
