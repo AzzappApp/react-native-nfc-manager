@@ -54,7 +54,40 @@ describe('SignUpScreen', () => {
     expect(submitButton).not.toBeDisabled();
   });
 
-  test('should call the `signup` callback if form is valid', async () => {
+  test('should call the `signup` callback if form is valid with accepted communication checked by default', async () => {
+    render(<SignUpScreen />);
+    signupMock.mockResolvedValueOnce({
+      token: 'fake-token',
+      refreshToken: 'fake-refreshToken',
+      profileInfos: null,
+      userId: '',
+      email: 'test@azzapp.com',
+      phoneNumber: null,
+    });
+    dispatchGlobalEventMock.mockResolvedValueOnce(void 0);
+
+    const emailInput = screen.getByPlaceholderText('Email address');
+    const passwordInput = screen.getByPlaceholderText('Password');
+    const submitButton = screen.getByTestId('submit');
+    const checkboxes = screen.queryAllByRole('checkbox');
+
+    act(() => fireEvent(emailInput, 'onChangeText', 'test@azzaap.com'));
+    act(() => fireEvent(passwordInput, 'onChangeText', 'AZEqsd81'));
+    act(() => fireEvent(checkboxes[1], 'onPress'));
+    act(() => fireEvent(submitButton, 'onPress'));
+
+    expect(signupMock).toHaveBeenCalledWith({
+      email: 'test@azzaap.com',
+      password: 'AZEqsd81',
+      locale: 'en-US',
+      hasAcceptedCommunications: true,
+    });
+    expect(submitButton).toHaveAccessibilityState({ busy: true });
+
+    await act(flushPromises);
+  });
+
+  test('should call the `signup` callback if form is valid without accepted communication', async () => {
     render(<SignUpScreen />);
     signupMock.mockResolvedValueOnce({
       token: 'fake-token',
@@ -81,6 +114,7 @@ describe('SignUpScreen', () => {
       email: 'test@azzaap.com',
       password: 'AZEqsd81',
       locale: 'en-US',
+      hasAcceptedCommunications: false,
     });
     expect(submitButton).toHaveAccessibilityState({ busy: true });
 
@@ -116,7 +150,6 @@ describe('SignUpScreen', () => {
 
     act(() => fireEvent(phoneInput, 'onChangeText', '2126880188'));
     act(() => fireEvent(passwordInput, 'onChangeText', 'AZEqsd81'));
-    act(() => fireEvent(checkboxes[0], 'onPress'));
     act(() => fireEvent(checkboxes[1], 'onPress'));
     act(() => fireEvent(submitButton, 'onPress'));
 
@@ -124,6 +157,7 @@ describe('SignUpScreen', () => {
       phoneNumber: '+1 212 688 0188',
       password: 'AZEqsd81',
       locale: 'en-US',
+      hasAcceptedCommunications: true,
     });
 
     expect(submitButton).toHaveAccessibilityState({ busy: true });
@@ -218,7 +252,7 @@ describe('SignUpScreen', () => {
     const submitButton = screen.getByTestId('submit');
     const checkboxes = screen.queryAllByRole('checkbox');
     const tosError =
-      'You need to accept the Terms of Service and the Privacy Policy';
+      'You need to accept the Terms of Use and the Privacy Policy';
 
     act(() => fireEvent(emailInput, 'onChangeText', 'test@azzaap.com'));
     act(() => fireEvent(passwordInput, 'onChangeText', 'AZEqsd81'));

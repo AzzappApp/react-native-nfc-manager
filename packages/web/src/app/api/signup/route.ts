@@ -33,6 +33,7 @@ const SignupSchema = z
       }),
     password: z.string().regex(REGEX_PWD, ERRORS.PASSWORD_NOT_VALID),
     locale: z.string().optional(),
+    hasAcceptedCommunications: z.boolean(),
   })
   .refine(
     ({ phoneNumber, email }) => {
@@ -95,7 +96,8 @@ export const POST = withPluginsRoute(async (req: Request) => {
     );
   }
 
-  const { email, phoneNumber, password, locale } = result.data;
+  const { email, phoneNumber, password, locale, hasAcceptedCommunications } =
+    result.data;
 
   try {
     if (email) {
@@ -122,6 +124,7 @@ export const POST = withPluginsRoute(async (req: Request) => {
       roles: null,
       termsOfUseAcceptedVersion: termsOfUse?.version ?? null,
       termsOfUseAcceptedAt: termsOfUse ? new Date() : null,
+      hasAcceptedCommunications,
     });
 
     const issuer = (email ?? userPhoneNumber) as string;

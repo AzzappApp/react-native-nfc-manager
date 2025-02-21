@@ -752,6 +752,10 @@ export const UserTable = cols.table(
     note: cols.text('note'),
     termsOfUseAcceptedVersion: cols.defaultVarchar('termsOfUseAcceptedVersion'),
     termsOfUseAcceptedAt: cols.dateTime('termsOfUseAcceptedAt'),
+    hasAcceptedCommunications: cols
+      .boolean('hasAcceptedCommunications')
+      .default(false)
+      .notNull(),
   },
   table => {
     return {
