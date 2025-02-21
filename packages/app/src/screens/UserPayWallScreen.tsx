@@ -54,7 +54,9 @@ const userPayWallScreenQuery = graphql`
   query UserPayWallScreenQuery {
     currentUser {
       id
+      isMultiUser
       userSubscription {
+        id
         subscriptionId
         status
         availableSeats
@@ -85,7 +87,10 @@ const UserPayWallScreen = ({
   const [processing, setProcessing] = useState(false);
   const subscriptions = useUserSubscriptionOffer(period);
   const [freeTrialEligible, setFreeTrialEligible] = useState(false);
-  const setAllowMultiUser = useMultiUserUpdate();
+  const setAllowMultiUser = useMultiUserUpdate(() => {
+    setProcessing(false);
+    router.back();
+  });
 
   const lottieHeight = height - BOTTOM_HEIGHT + 20;
 
@@ -106,8 +111,6 @@ const UserPayWallScreen = ({
       currentSubscription?.subscriptionId === waitedSubscriptionId
     ) {
       setAllowMultiUser(true);
-      setProcessing(false);
-      router.back();
     }
   }, [
     currentSubscription,

@@ -18,9 +18,11 @@ export const useMultiUserUpdate = (onCompleted?: () => void) => {
           isMultiUser
           subscription {
             id
-            availableSeats
+            subscriptionId
             status
-            issuer
+            availableSeats
+            totalSeats
+            subscriptionPlan
           }
         }
       }
