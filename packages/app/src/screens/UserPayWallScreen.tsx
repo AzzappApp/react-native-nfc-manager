@@ -54,7 +54,6 @@ const userPayWallScreenQuery = graphql`
   query UserPayWallScreenQuery {
     currentUser {
       id
-      isMultiUser
       userSubscription {
         id
         subscriptionId
