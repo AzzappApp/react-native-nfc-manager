@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/monorepo",
-  "version": "1.7.2-rc.1",
+  "version": "1.7.6-rc.1",
   "private": true,
   "packageManager": "yarn@4.5.1",
   "workspaces": {
