@@ -1,3 +1,7 @@
+## 1.8.0-canary.8
+
+* **fix:**  - increase floatingButton Opacity ([#7520](https://github.com/AzzappApp/azzapp/pull/7520))
+
 ## 1.8.0-canary.7
 
 * **fix:**  - add autofill in shareback modal on web ([#7510](https://github.com/AzzappApp/azzapp/pull/7510))
