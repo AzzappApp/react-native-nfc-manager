@@ -1,5 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  drawAsImageFromPicture,
+  createPicture,
+  ImageFormat,
+} from '@shopify/react-native-skia';
 import { ResizeMode, Video } from 'expo-av';
+import { Paths, File } from 'expo-file-system/next';
 import { capitalize } from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -9,9 +15,12 @@ import * as mime from 'react-native-mime-types'; // FIXME import is verry big
 import Toast from 'react-native-toast-message';
 import { useMutation } from 'react-relay';
 import { graphql, Observable } from 'relay-runtime';
+import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
 import { mainRoutes } from '#mobileRoutes';
 import { colors } from '#theme';
 import ContactCardDetector from '#components/ContactCardScanner/ContactCardDetector';
+import coverDrawer from '#components/CoverEditor/coverDrawer';
+import { COVER_EXPORT_VIDEO_RESOLUTION } from '#components/CoverEditor/coverEditorHelpers';
 import {
   preventModalDismiss,
   useRouter,
@@ -20,7 +29,8 @@ import {
 import BottomSheetPopup from '#components/popup/BottomSheetPopup';
 import { onChangeWebCard } from '#helpers/authStore';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { getFileName } from '#helpers/fileHelpers';
+import { createRandomFileName, getFileName } from '#helpers/fileHelpers';
+import { NativeTextureLoader } from '#helpers/mediaEditions';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import {
@@ -40,6 +50,7 @@ import {
   contactCardSchema,
   type ContactCardFormValues,
 } from './ContactCardSchema';
+import type { CoverEditorState } from '#components/CoverEditor';
 import type { ScreenOptions } from '#components/NativeRouter';
 import type { ContactCardCreateScreenMutation } from '#relayArtifacts/ContactCardCreateScreenMutation.graphql';
 import type { ContactCardDetectorMutation$data } from '#relayArtifacts/ContactCardDetectorMutation.graphql';
@@ -55,10 +66,14 @@ const ContactCardCreateScreen = () => {
       mutation ContactCardCreateScreenMutation(
         $webCardKind: String!
         $contactCard: ContactCardInput!
+        $primaryColor: String
+        $coverMediaId: String
       ) {
         createContactCard(
           webCardKind: $webCardKind
           contactCard: $contactCard
+          primaryColor: $primaryColor
+          coverMediaId: $coverMediaId
         ) {
           profile {
             id
@@ -105,11 +120,12 @@ const ContactCardCreateScreen = () => {
     resolver: zodResolver(contactCardSchema),
     defaultValues: {
       webCardKind: 'personal',
+      primaryColor: colors.grey400,
     },
   });
 
   const submit = handleSubmit(
-    async ({ avatar, webCardKind, company, firstName, ...data }) => {
+    async ({ avatar, webCardKind, company, firstName, logo, ...data }) => {
       if (webCardKind === 'business' && (!company || company.length === 0)) {
         Toast.show({
           type: 'error',
@@ -146,7 +162,7 @@ const ContactCardCreateScreen = () => {
         });
         return;
       }
-      let upload;
+      const uploads = [];
 
       if (avatar?.local && avatar.uri) {
         setProgressIndicator(Observable.from(0));
@@ -162,18 +178,141 @@ const ContactCardCreateScreen = () => {
           kind: 'image',
           target: 'avatar',
         });
-        upload = uploadMedia(file, uploadURL, uploadParameters);
+        uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+      } else {
+        uploads.push(null);
+      }
+
+      if (logo?.uri) {
+        const fileName = getFileName(logo.uri);
+        const file: any = {
+          name: fileName,
+          uri: logo.uri,
+          type: mime.lookup(fileName) || 'image/jpeg',
+        };
+
+        const { uploadURL, uploadParameters } = await uploadSign({
+          kind: 'image',
+          target: 'logo',
+        });
+        uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+      } else {
+        uploads.push(null);
+      }
+
+      //create the coverId
+      if (logo && logo.id != null) {
+        const logoTextureInfo = await NativeTextureLoader.loadImage(logo.uri, {
+          width: logo.width,
+          height: logo.height,
+        });
+        NativeTextureLoader.ref(logoTextureInfo.key);
+        const textTure = await logoTextureInfo.promise;
+
+        const image = drawAsImageFromPicture(
+          createPicture(canvas => {
+            coverDrawer({
+              canvas,
+              ...COVER_EXPORT_VIDEO_RESOLUTION,
+              frames: {},
+              currentTime: 0,
+              videoScales: {},
+              coverEditorState: {
+                ...DEFAULT_COVER_DATA,
+                backgroundColor: data.expendableColor ?? colors.white,
+                overlayLayers: [
+                  {
+                    animation: null,
+                    borderColor: '#0E1216',
+                    borderRadius: 0,
+                    borderWidth: 0,
+                    bounds: {
+                      height:
+                        ((LOGO_PERCENT_WIDTH *
+                          COVER_EXPORT_VIDEO_RESOLUTION.width) /
+                          (logo.width / logo.height) /
+                          COVER_EXPORT_VIDEO_RESOLUTION.height) *
+                        100,
+                      width: 70, //we take 70%  for the width
+                      x: 50,
+                      y: 50,
+                    },
+                    editionParameters: null,
+                    elevation: 0,
+                    endPercentageTotal: 100,
+                    filter: null,
+                    height: logo.height,
+                    id: logo.id!, //even the != null condition above, the linter does not understand
+                    kind: 'image',
+                    rotation: 0,
+                    shadow: false,
+                    startPercentageTotal: 0,
+                    uri: logo.uri,
+                    width: logo.width,
+                  },
+                ],
+                cardColors: {
+                  primary: data.primaryColor ?? colors.grey400,
+                  light: '#FFFFFF',
+                  dark: '#0E1216',
+                  otherColors: [],
+                },
+              },
+              images: {
+                [logo.id!]: textTure,
+              },
+              lutTextures: {},
+              videoComposition: { duration: 0, items: [] },
+            });
+          }),
+          COVER_EXPORT_VIDEO_RESOLUTION,
+        );
+
+        const blob = await image.encodeToBytes(ImageFormat.JPEG, 95);
+        const outPath = Paths.cache.uri + createRandomFileName('jpg');
+
+        const file = new File(outPath);
+        file.create();
+        file.write(blob);
+        NativeTextureLoader.unref(logoTextureInfo.key);
+        const { uploadURL, uploadParameters } = await uploadSign({
+          kind: 'image',
+          target: 'cover',
+        });
+
+        const fileUpload: any = {
+          name: getFileName(outPath),
+          uri: outPath,
+          type: 'image/jpeg',
+        };
+
+        uploads.push(uploadMedia(fileUpload, uploadURL, uploadParameters));
+      } else {
+        uploads.push(null);
+      }
+
+      const uploadsToDo = uploads.filter(val => val !== null);
+      if (uploadsToDo.length) {
         setProgressIndicator(
-          upload.progress.map(({ loaded, total }) => loaded / total),
+          combineMultiUploadProgresses(
+            uploadsToDo.map(upload => upload.progress),
+          ),
         );
       }
 
-      const uploadedAvatarId = await upload?.promise.then(({ public_id }) => {
-        return public_id;
-      });
+      const [uploadedAvatarId, uploadedLogoId, uploadedCoverId] =
+        await Promise.all(
+          uploads.map(upload =>
+            upload?.promise.then(({ public_id }) => {
+              return public_id;
+            }),
+          ),
+        );
 
       const avatarId =
         avatar === null ? null : avatar?.local ? uploadedAvatarId : avatar?.id;
+      const logoId =
+        logo === null ? null : logo?.local ? uploadedLogoId : logo?.id;
 
       const urls = data.companyUrl
         ? [{ address: data.companyUrl, selected: true }, ...data.urls]
@@ -181,7 +320,9 @@ const ContactCardCreateScreen = () => {
 
       commit({
         variables: {
+          primaryColor: data.primaryColor ?? colors.grey400,
           webCardKind: webCardKind as string,
+          coverMediaId: uploadedCoverId,
           contactCard: {
             emails: data.emails?.length
               ? data.emails.filter(email => email.address)
@@ -206,6 +347,7 @@ const ContactCardCreateScreen = () => {
               ? data.socials.filter(social => social.url)
               : undefined,
             avatarId,
+            logoId,
             company,
             firstName,
             lastName: data.lastName,
@@ -219,6 +361,13 @@ const ContactCardCreateScreen = () => {
               `${'image'.slice(0, 1)}:${avatarId}`,
               'image',
               avatar.uri,
+            );
+          }
+          if (logo && logo?.uri) {
+            addLocalCachedMediaFile(
+              `${'image'.slice(0, 1)}:${logoId}`,
+              'image',
+              logo.uri,
             );
           }
           const { profile } = data.createContactCard;
@@ -549,6 +698,45 @@ const ScanMyPaperBusinessCard = ({
       onPress={onPress}
       leftElement={<Icon icon="scan" size={24} />}
       style={style}
+      textStyle={{ flex: 1, textAlign: 'center' }}
     />
   );
 };
+
+const DEFAULT_COVER_DATA: CoverEditorState = {
+  isModified: true,
+  lottie: null,
+  medias: [],
+  coverTransition: null,
+  overlayLayers: [],
+  textLayers: [],
+  linksLayer: {
+    links: [],
+    color: colors.black,
+    size: 24,
+    position: {
+      x: 50,
+      y: 50,
+    },
+    rotation: 0,
+    shadow: false,
+  },
+  editionMode: 'text',
+  selectedItemIndex: null,
+  loadingRemoteMedia: false,
+  loadingLocalMedia: false,
+  loadingError: undefined,
+  shouldComputeCoverPreviewPositionPercentage: false,
+  images: {},
+  imagesScales: {},
+  localFilenames: {},
+  lutTextures: {},
+  backgroundColor: null,
+  cardColors: {
+    primary: colors.grey400,
+    light: colors.white,
+    dark: colors.black,
+    otherColors: [],
+  },
+};
+const LOGO_PERCENT_WIDTH = 70 / 100;

@@ -22,6 +22,8 @@ import TextInput from '#ui/TextInput';
 import ContactCardEditModalAddresses from './ContactCardEditAddresses';
 import ContactCardEditModalAvatar from './ContactCardEditAvatar';
 import ContactCardEditModalBirthdays from './ContactCardEditBirthday';
+import ContactCardEditCompanyColor from './ContactCardEditCompanyColor';
+import ContactCardEditCompanyLogo from './ContactCardEditCompanyLogo';
 import ContactCardEditModalEmails from './ContactCardEditEmails';
 import ContactCardEditModalName from './ContactCardEditName';
 import ContactCardEditModalPhones from './ContactCardEditPhones';
@@ -53,6 +55,11 @@ const ContactCardCreateForm = ({
   const { field: avatarField } = useController({
     control,
     name: 'avatar',
+  });
+
+  const { field: logoField } = useController({
+    control,
+    name: 'logo',
   });
 
   const [imagePicker, setImagePicker] = useState<'avatar' | null>(null);
@@ -218,6 +225,8 @@ const ContactCardCreateForm = ({
               />
             </>
           ) : undefined}
+          <ContactCardEditCompanyLogo control={control} />
+          {logoField.value && <ContactCardEditCompanyColor control={control} />}
           <Separation />
           <ContactCardEditModalPhones control={control} />
           <Separation />

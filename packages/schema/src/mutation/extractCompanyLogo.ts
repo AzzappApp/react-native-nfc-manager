@@ -1,0 +1,60 @@
+import { captureException } from '@sentry/nextjs';
+import { GraphQLError } from 'graphql';
+
+import ERRORS from '@azzapp/shared/errors';
+import { getSessionInfos } from '#GraphQLContext';
+import type { MutationResolvers } from '#__generated__/types';
+
+const apiKey = process.env.BRANDFETCH_CLIENT_ID;
+
+export const extractCompanyLogo: MutationResolvers['extractCompanyLogo'] =
+  async (_parent, args) => {
+    const { userId } = getSessionInfos();
+
+    if (!userId) {
+      throw new GraphQLError(ERRORS.UNAUTHORIZED);
+    }
+    try {
+      const response = await fetch(
+        `https://api.brandfetch.io/v2/search/${args.brand}?c=${apiKey}`,
+        {
+          method: 'GET',
+        },
+      );
+
+      const data = (await response.json()) as BrandFetchResult[];
+
+      return data
+        .map(result => {
+          return {
+            id: result.brandId,
+            uri: updateUrl(result.icon),
+            score: parseFloat(result.qualityScore),
+          };
+        })
+        .sort((a, b) => b.score - a.score);
+    } catch (error) {
+      captureException(error);
+    }
+
+    return null;
+  };
+
+const updateUrl = (url: string): string => {
+  // Replace 'webp' with 'png'
+  let updatedUrl = url.replace('webp', 'png');
+
+  // Replace 'w/128' with 'w/1280' and 'h/128' with 'h/1280'
+  updatedUrl = updatedUrl
+    .replace(/w\/\d+/g, '')
+    // .replace(/w\/\d+/g, 'w/1280')
+    .replace(/h\/\d+/g, 'h/1280');
+
+  return updatedUrl;
+};
+
+type BrandFetchResult = {
+  brandId: string;
+  icon: string;
+  qualityScore: string;
+};

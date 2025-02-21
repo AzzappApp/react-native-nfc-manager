@@ -154,8 +154,6 @@ const computedStyles = createVariantsStyleSheet(appearance => ({
       columnGap: 5,
     },
     label: {
-      flex: 1,
-      textAlign: 'center',
       flexWrap: 'nowrap',
     },
     androidContainer: {

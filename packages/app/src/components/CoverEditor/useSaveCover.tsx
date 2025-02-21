@@ -324,7 +324,6 @@ const createCoverMedia = async (
           frames: {},
           currentTime: 0,
           videoScales: {},
-
           coverEditorState,
           images,
           lutTextures,

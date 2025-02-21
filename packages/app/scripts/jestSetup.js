@@ -101,3 +101,37 @@ jest.mock('@gorhom/bottom-sheet', () => {
 
 jest.mock('@azzapp/react-native-skia-video', () => ({}));
 jest.mock('@azzapp/react-native-buffer-loader', () => ({}));
+
+// Configuration for react-hook-form (from documentation)
+global.window = {};
+global.window = global;
+
+// Mock expo-file-system
+jest.mock('expo-file-system/next', () => {
+  return {
+    documentDirectory: '/mock/document/directory/',
+    cacheDirectory: '/mock/cache/directory/',
+    downloadAsync: jest.fn().mockResolvedValue({
+      uri: '/mock/cache/directory/mock_file',
+    }),
+    makeDirectoryAsync: jest.fn().mockResolvedValue(true),
+    readAsStringAsync: jest.fn().mockResolvedValue('mock_file_content'),
+    writeAsStringAsync: jest.fn().mockResolvedValue(true),
+    deleteAsync: jest.fn().mockResolvedValue(true),
+    Paths: {
+      cache: {
+        uri: '/mock/cache/directory/',
+      },
+    },
+  };
+});
+
+//mock expo file image manupulator
+// Mock expo-image-manipulator
+jest.mock('expo-image-manipulator', () => ({
+  manipulateAsync: jest.fn().mockResolvedValue({ uri: 'mock_local_uri' }),
+  SaveFormat: {
+    JPEG: 'jpeg',
+    PNG: 'png',
+  },
+}));

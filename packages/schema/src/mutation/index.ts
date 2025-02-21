@@ -14,6 +14,7 @@ import deletePost from './deletePost';
 import deletePostComment from './deletePostComment';
 import deleteUser from './deleteUser';
 import duplicateModule from './duplicateModule';
+import { extractCompanyLogo } from './extractCompanyLogo';
 import { extractVisitCardData } from './extractVisitCardData';
 import inviteUser from './inviteUser';
 import inviteUsersList from './inviteUsersList';
@@ -125,6 +126,7 @@ export const Mutation: MutationResolvers = {
   updateContactsLastView,
   extractVisitCardData,
   acceptTermsOfUse,
+  extractCompanyLogo,
   ...payment,
 };
 

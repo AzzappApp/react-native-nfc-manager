@@ -94,6 +94,7 @@ export const downloadRemoteFileToLocalCache = (
 
 export const COVER_CACHE_DIR = `${Paths.cache.uri}covers`;
 export const MODULES_CACHE_DIR = `${Paths.cache.uri}modules`;
+export const CONTACT_CARD_CACHE_DIR = `${Paths.cache.uri}contactCard`;
 
 const checkMediaCacheDir = (cacheDir: string) => {
   const directory = new Directory(cacheDir);
