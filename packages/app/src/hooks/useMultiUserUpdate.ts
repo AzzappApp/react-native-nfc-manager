@@ -16,14 +16,6 @@ export const useMultiUserUpdate = (onCompleted?: () => void) => {
         webCard {
           id
           isMultiUser
-          subscription {
-            id
-            subscriptionId
-            status
-            availableSeats
-            totalSeats
-            subscriptionPlan
-          }
         }
       }
     }
@@ -39,9 +31,17 @@ export const useMultiUserUpdate = (onCompleted?: () => void) => {
           webCardId: profileInfos?.webCardId ?? '',
           input: { isMultiUser: value },
         },
-        updater: store => {
-          if (!value && profileInfos?.webCardId) {
-            const webCard = store.get(profileInfos.webCardId);
+        optimisticResponse: {
+          updateMultiUser: {
+            webCard: {
+              id: profileInfos?.webCardId ?? '',
+              isMultiUser: value,
+            },
+          },
+        },
+        updater: (store, response) => {
+          if (!value && profileInfos && response?.updateMultiUser?.webCard) {
+            const webCard = store.get(response?.updateMultiUser?.webCard?.id);
             if (webCard) {
               const profiles = webCard.getLinkedRecords('profiles');
               webCard.setLinkedRecords(

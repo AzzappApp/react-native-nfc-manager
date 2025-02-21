@@ -57,6 +57,7 @@ const userPayWallScreenQuery = graphql`
       userSubscription {
         id
         subscriptionId
+        issuer
         status
         availableSeats
         totalSeats
