@@ -36,12 +36,12 @@ const ParallaxContainer = ({
   imageStyle,
   imageContainerStyle,
 }: ParallaxContainerProps) => {
-  const itemStartY = modulePosition ?? 0;
+  const itemStartY = (modulePosition ?? 0) + index * dimension.height;
   const itemEndY = itemStartY + dimension.height;
 
   const inViewport = useIsModuleItemInViewPort(
     scrollY,
-    itemStartY + index * dimension.height,
+    itemStartY,
     dimension.height,
     true,
     disableParallax,
