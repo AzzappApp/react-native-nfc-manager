@@ -1,3 +1,8 @@
+## 1.8.0-canary.17
+
+* **fix:**  - ensure cover is considered as prefined even if a company logo is… ([#7544](https://github.com/AzzappApp/azzapp/pull/7544))
+* **fix:**  - explicit check on username unicity to have explicit error ([#7551](https://github.com/AzzappApp/azzapp/pull/7551))
+
 ## 1.8.0-canary.16
 
 
