@@ -11,6 +11,7 @@ import { invalidateWebCard } from '#externals';
 import { webCardLoader } from '#loaders';
 import { checkWebCardProfileAdminRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
+import { isUserNameAvailable } from '#helpers/webCardHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 
 const USERNAME_CHANGE_FREQUENCY_DAY = parseInt(
@@ -30,6 +31,7 @@ const updateWebCardUserNameMutation: MutationResolvers['updateWebCardUserName'] 
     if (!isValidUserName(userName)) {
       throw new GraphQLError(ERRORS.INVALID_WEBCARD_USERNAME);
     }
+
     await checkWebCardProfileAdminRight(webCardId);
 
     const webCard = await webCardLoader.load(webCardId);
@@ -37,6 +39,16 @@ const updateWebCardUserNameMutation: MutationResolvers['updateWebCardUserName'] 
     if (!webCard) {
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
+
+    //avoid having the same value
+    if (webCard.userName === userName) {
+      throw new GraphQLError(ERRORS.INVALID_REQUEST);
+    }
+
+    if (!(await isUserNameAvailable(userName)).available) {
+      throw new GraphQLError(ERRORS.USERNAME_ALREADY_EXISTS);
+    }
+
     // Get the current date and time
     const now = new Date();
     // Convert lastUpdate to a Date object
@@ -54,11 +66,6 @@ const updateWebCardUserNameMutation: MutationResolvers['updateWebCardUserName'] 
           alloweChangeUserNameDate: nextChangeDate,
         },
       });
-    }
-
-    //avoid having the same value
-    if (webCard.userName === userName) {
-      throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
 
     const expiresAt = new Date();
