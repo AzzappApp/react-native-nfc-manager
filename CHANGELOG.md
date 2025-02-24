@@ -1,3 +1,7 @@
+## 1.8.0-canary.12
+
+* **fix:**  - close keyboard before when the scanner opens ([#7528](https://github.com/AzzappApp/azzapp/pull/7528))
+
 ## 1.8.0-canary.11
 
 * **fix:**  - ensure form validation is not needed to manage contactCard avatar ([#7529](https://github.com/AzzappApp/azzapp/pull/7529))
