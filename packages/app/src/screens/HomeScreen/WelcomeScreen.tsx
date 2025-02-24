@@ -137,7 +137,7 @@ const WelcomeScreen = ({
       <HomeBottomSheetPanel
         visible={showMenu}
         close={close}
-        userIsPremium={currentUser?.isPremium}
+        user={currentUser}
       />
     </View>
   );
@@ -147,7 +147,6 @@ const welcomeScreenQuery = graphql`
   query WelcomeScreenQuery {
     currentUser {
       id
-      isPremium
       profiles {
         id
         profileRole
@@ -156,6 +155,7 @@ const welcomeScreenQuery = graphql`
           id
         }
       }
+      ...HomeBottomSheetPanel_user
     }
   }
 `;

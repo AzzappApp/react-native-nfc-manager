@@ -59,6 +59,7 @@ const HomeScreenContent = ({
           ...HomeBottomSheetPanel_profile
           ...HomeBottomSheetPopupPanel_profile
         }
+        ...HomeBottomSheetPanel_user
         ...useWidget_user
         ...HomeBackground_user
         ...HomeProfileLink_user
@@ -159,6 +160,7 @@ const HomeScreenContent = ({
         <HomeBottomSheetPanel
           visible={showMenu}
           close={closeMenu}
+          user={user}
           profile={currentProfile ?? null}
         />
       </Suspense>
