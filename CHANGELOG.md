@@ -1,3 +1,7 @@
+## 1.8.0-canary.19
+
+* **fix:**  - **modules:** [#7492](https://github.com/AzzappApp/azzapp/pull/7492) increase video quality ([#7556](https://github.com/AzzappApp/azzapp/pull/7556))
+
 ## 1.8.0-canary.18
 
 * **fix:**  - compute correctly parralax start position ([#7557](https://github.com/AzzappApp/azzapp/pull/7557))
