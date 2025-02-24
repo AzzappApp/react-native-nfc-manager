@@ -328,32 +328,22 @@ const SignUpScreen = () => {
               label={
                 <Text style={styles.checkLabel} variant="medium">
                   <FormattedMessage
-                    defaultMessage="I have read and accept the "
+                    defaultMessage="I have read and accept the <tosLink>Terms of Use</tosLink> and <ppLink>Privacy Policy</ppLink> of azzapp"
                     description="Signup Screen - 'I have read and accept the' Terms of use"
-                  />
-                  <HyperLink
-                    label={intl.formatMessage({
-                      defaultMessage: 'Terms of Use',
-                      description:
-                        'Signup Screen - Terms of Use label for hyperlink',
-                    })}
-                    url={`${TERMS_OF_SERVICE}`}
-                  />
-                  <FormattedMessage
-                    defaultMessage=" and "
-                    description="Signup Screen - 'and"
-                  />
-                  <HyperLink
-                    label={intl.formatMessage({
-                      defaultMessage: 'Privacy Policy',
-                      description:
-                        'Signup Screen - Privacy Policy Hyperlink Clickable label',
-                    })}
-                    url={`${PRIVACY_POLICY}`}
-                  />
-                  <FormattedMessage
-                    defaultMessage=" of azzapp"
-                    description="Signup Screen - 'of azzapp"
+                    values={{
+                      tosLink: value => (
+                        <HyperLink
+                          label={value[0] as string}
+                          url={`${TERMS_OF_SERVICE}`}
+                        />
+                      ),
+                      ppLink: value => (
+                        <HyperLink
+                          label={value[0] as string}
+                          url={`${PRIVACY_POLICY}`}
+                        />
+                      ),
+                    }}
                   />
                 </Text>
               }
