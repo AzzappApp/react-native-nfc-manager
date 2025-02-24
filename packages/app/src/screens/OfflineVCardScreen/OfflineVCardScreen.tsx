@@ -2,7 +2,7 @@ import { Canvas, ImageSVG, Skia } from '@shopify/react-native-skia';
 import { toString } from 'qrcode';
 import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { BackHandler, View } from 'react-native';
+import { View } from 'react-native';
 import Animated, {
   interpolateColor,
   runOnJS,
@@ -22,7 +22,6 @@ import {
   emailLabelToVCardLabel,
   phoneLabelToVCardLabel,
 } from '@azzapp/shared/vCardHelpers';
-import { useNetworkAvailableContext } from '#networkAvailableContext';
 import { colors } from '#theme';
 import AnimatedText from '#components/AnimatedText';
 import {
@@ -46,7 +45,6 @@ import { PageProgress } from '#ui/PageProgress';
 import PressableNative from '#ui/PressableNative';
 import SafeAreaView from '#ui/SafeAreaView';
 import OfflineHeader from './OfflineHeader';
-import type { OfflineVCardRoute } from '#routes';
 import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
 
 type vCardData = {
@@ -143,17 +141,25 @@ export const OfflineVCardScreenProfilesFragment = graphql`
 
 const OfflineVCardScreen = () => {
   const router = useRouter();
+  return <OfflineVCardScreenRenderer canLeaveScreen onClose={router.back} />;
+};
+
+export default OfflineVCardScreen;
+
+export type OfflineVCardScreenRendererProps = {
+  canLeaveScreen: boolean;
+  onClose: () => void;
+};
+
+export const OfflineVCardScreenRenderer = ({
+  canLeaveScreen,
+  onClose,
+}: OfflineVCardScreenRendererProps) => {
   const styles = useStyleSheet(stylesheet);
   const profileInfos = useProfileInfos();
 
-  const [canLeaveScreen, setCanLeaveScreen] = useState(
-    (router.getCurrentRoute() as OfflineVCardRoute)?.params?.canGoBack,
-  );
-
   const [currentIndex, setCurrentIndex] = useState(0);
   const { top, bottom } = useScreenInsets();
-
-  const onClose = router.back;
 
   const { width: windowWidth, height: fullWindowHeight } =
     useScreenDimensions();
@@ -176,27 +182,6 @@ const OfflineVCardScreen = () => {
 
   const swipableZoneHeight = qrCodeContainerSize + itemHeight + 30;
   const flatListPositionInSwipableZone = qrCodeContainerSize + 30;
-
-  const isConnected = useNetworkAvailableContext();
-
-  useEffect(() => {
-    setCanLeaveScreen(isConnected);
-  }, [isConnected]);
-
-  useEffect(() => {
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      () => {
-        if (canLeaveScreen) {
-          router.back();
-        }
-        return true;
-      },
-    );
-    return () => {
-      backHandler.remove();
-    };
-  }, [canLeaveScreen, router]);
 
   const vcardList: vCardData[] = useMemo(() => {
     const profiles = getOfflineVCard();
@@ -649,5 +634,3 @@ const stylesheet = createStyleSheet(() => ({
     alignSelf: 'center',
   },
 }));
-
-export default OfflineVCardScreen;

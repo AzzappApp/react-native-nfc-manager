@@ -2,8 +2,6 @@ import { IntlErrorCode } from '@formatjs/intl';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import * as Sentry from '@sentry/react-native';
 import {
-  Component,
-  Fragment,
   Suspense,
   useCallback,
   useEffect,
@@ -11,8 +9,8 @@ import {
   useRef,
   useState,
 } from 'react';
-import { FormattedMessage, IntlProvider, injectIntl } from 'react-intl';
-import { Platform, useColorScheme, StyleSheet } from 'react-native';
+import { IntlProvider } from 'react-intl';
+import { Platform, useColorScheme, StyleSheet, Modal } from 'react-native';
 import { hide as hideSplashScreen } from 'react-native-bootsplash';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
@@ -24,12 +22,13 @@ import {
 import { RelayEnvironmentProvider } from 'react-relay';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
-import { isNetworkError } from '@azzapp/shared/networkHelpers';
 import { mainRoutes, signInRoutes, signUpRoutes } from '#mobileRoutes';
 import NetworkAvailableContextProvider, {
   useNetworkAvailableFetcher,
 } from '#networkAvailableContext';
 import { colors } from '#theme';
+import ErrorBoundary from '#components/ErrorBoundary';
+import ErrorScreen from '#components/ErrorScreen';
 import MainTabBar from '#components/MainTabBar';
 import {
   useNativeRouter,
@@ -65,6 +64,7 @@ import { useIsAuthenticated } from '#hooks/authStateHooks';
 import useApplicationFonts, {
   loadSkiaTypeFonts,
 } from '#hooks/useApplicationFonts';
+import useBoolean from '#hooks/useBoolean';
 import { useDeepLink } from '#hooks/useDeepLink';
 import AboutScreen from '#screens/AboutScreen';
 import AccountDetailsScreen from '#screens/AccountDetailsScreen';
@@ -78,7 +78,6 @@ import ContactCardScreen from '#screens/ContactCardScreen';
 import ContactCreateScreen from '#screens/ContactCreateScreen/ContactCreateScreen';
 import ContactDetailsScreen from '#screens/ContactDetailsScreen';
 import ContactsScreen from '#screens/ContactsScreen';
-import OfflineVCardScreen from '#screens/ContactsScreen/OfflineVCardScreen';
 import CoverCreationScreen from '#screens/CoverCreationScreen';
 import CoverEditionScreen from '#screens/CoverEditionScreen';
 import CoverTemplateSelectionScreen from '#screens/CoverTemplateSelectionScreen';
@@ -100,6 +99,9 @@ import MediaTextModuleWebCardEditionScreen from '#screens/MediaTextModuleWebCard
 import MultiUserAddScreen from '#screens/MultiUserAddScreen';
 import MultiUserDetailsScreen from '#screens/MultiUserDetailsScreen';
 import MultiUserScreen from '#screens/MultiUserScreen';
+import OfflineVCardScreen, {
+  OfflineVCardScreenRenderer,
+} from '#screens/OfflineVCardScreen';
 import PostCommentsMobileScreen from '#screens/PostCommentsScreen';
 import PostCreationScreen from '#screens/PostCreationScreen';
 import PostLikesScreen from '#screens/PostLikesScreen/PostLikesScreen';
@@ -116,14 +118,10 @@ import CardModuleConfirmationScreen from '#screens/WebCardEditScreen/AddModuleSe
 import WebCardParametersScreen from '#screens/WebCardParametersScreen';
 import WebCardScreen from '#screens/WebCardScreen';
 import WebCardTemplateSelectionScreen from '#screens/WebCardTemplateSelectionScreen';
-import Button from '#ui/Button';
-import Container from '#ui/Container';
-import Text from '#ui/Text';
 import type { ScreenMap } from '#components/NativeRouter';
 import type { ScreenPrefetchOptions } from '#helpers/ScreenPrefetcher';
 import type { ROUTES } from '#routes';
 import type { ReactNode } from 'react';
-import type { IntlShape } from 'react-intl';
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
@@ -187,11 +185,14 @@ const App = () => {
       }),
     [],
   );
+
+  const onError = useCallback((error: Error) => {
+    Sentry.captureException(error);
+  }, []);
+
   if (!ready) {
     return null;
   }
-
-  const ErrorBoundary = __DEV__ ? Fragment : AppErrorBoundary;
 
   if (needsUpdate) {
     return (
@@ -202,17 +203,21 @@ const App = () => {
   }
 
   return (
-    <>
-      <AppIntlProvider>
-        <ErrorBoundary>
-          <PermissionProvider>
-            <KeyboardProvider>
-              <AppRouter />
-            </KeyboardProvider>
-          </PermissionProvider>
-        </ErrorBoundary>
-      </AppIntlProvider>
-    </>
+    <AppIntlProvider>
+      <ErrorBoundary onError={onError}>
+        {({ error, reset }) =>
+          error ? (
+            <ErrorScreen retry={reset} />
+          ) : (
+            <PermissionProvider>
+              <KeyboardProvider>
+                <AppRouter />
+              </KeyboardProvider>
+            </PermissionProvider>
+          )
+        }
+      </ErrorBoundary>
+    </AppIntlProvider>
   );
 };
 
@@ -459,16 +464,14 @@ const AppRouter = () => {
   }, [colorScheme]);
 
   const isConnected = useNetworkAvailableFetcher();
+  const [offlineScreenDisplayed, showOfflineScreen, hideOfflineScreen] =
+    useBoolean(false);
 
   useEffect(() => {
     if (!isConnected) {
-      if (router.getCurrentRoute()?.route !== 'OFFLINE_VCARD') {
-        router.push({
-          route: 'OFFLINE_VCARD',
-        });
-      }
+      showOfflineScreen();
     }
-  }, [isConnected, router]);
+  }, [isConnected, showOfflineScreen]);
 
   // TODO handle errors
   const [fontLoaded] = useApplicationFonts();
@@ -504,6 +507,15 @@ const AppRouter = () => {
                 <ShakeShare />
               </Suspense>
               {showLoadingScreen && <LoadingScreen />}
+              <Modal
+                visible={offlineScreenDisplayed}
+                onRequestClose={isConnected ? hideOfflineScreen : () => void 0}
+              >
+                <OfflineVCardScreenRenderer
+                  onClose={hideOfflineScreen}
+                  canLeaveScreen={isConnected}
+                />
+              </Modal>
             </GestureHandlerRootView>
           </SafeAreaProvider>
         </ScreenPrefetcherProvider>
@@ -541,59 +553,6 @@ const AppIntlProvider = ({ children }: { children: ReactNode }) => {
     </IntlProvider>
   );
 };
-
-class _AppErrorBoundary extends Component<{
-  intl: IntlShape;
-  children: ReactNode;
-}> {
-  state = { error: null };
-
-  componentDidCatch(error: Error) {
-    if (!__DEV__ && !isNetworkError(error)) {
-      Sentry.captureException(error);
-    }
-  }
-
-  static getDerivedStateFromError(error: Error) {
-    return { error };
-  }
-
-  retry = () => {
-    this.setState({ error: null });
-  };
-
-  render() {
-    if (this.state.error) {
-      return (
-        <Container
-          style={{
-            flex: 1,
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 20,
-          }}
-        >
-          <Text variant="large">
-            <FormattedMessage
-              defaultMessage="Something went wrong"
-              description="Top level error message for uncaught exceptions"
-            />
-          </Text>
-          <Button
-            label={this.props.intl.formatMessage({
-              defaultMessage: 'Retry',
-              description: 'Retry button for uncaught exceptions',
-            })}
-            onPress={this.retry}
-          />
-        </Container>
-      );
-    }
-    return this.props.children;
-  }
-}
-
-const AppErrorBoundary = injectIntl(_AppErrorBoundary);
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },

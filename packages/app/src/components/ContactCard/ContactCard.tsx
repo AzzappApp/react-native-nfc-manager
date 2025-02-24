@@ -92,6 +92,19 @@ const ContactCard = ({
     profileKey,
   );
 
+  const router = useRouter();
+  const onEdit = useMemo(
+    () =>
+      edit
+        ? () => {
+            router.push({
+              route: 'CONTACT_CARD_EDIT',
+            });
+          }
+        : null,
+    [edit, router],
+  );
+
   return (
     <ContactCardComponent
       webCard={webCard}
@@ -100,7 +113,7 @@ const ContactCard = ({
       contactCard={contactCard}
       contactCardQrCode={contactCardQrCode}
       avatar={avatar}
-      edit={edit}
+      onEdit={onEdit}
       rotation={rotation}
     />
   );
@@ -116,7 +129,7 @@ type ContactCardComponentProps = {
   contactCard?: ContactCard | null;
   contactCardQrCode?: string;
   avatar?: ContactCard_profile$data['avatar'];
-  edit?: boolean;
+  onEdit?: (() => void) | null;
   rotation?: SharedValue<number>;
 };
 
@@ -127,14 +140,13 @@ export const ContactCardComponent = ({
   contactCard,
   contactCardQrCode,
   avatar,
-  edit,
   rotation,
+  onEdit: onEditProp,
 }: ContactCardComponentProps) => {
   const { userName, cardColors, commonInformation, isMultiUser } =
     webCard ?? {};
 
   const styles = useStyleSheet(stylesheet);
-  const router = useRouter();
 
   const backgroundColor = cardColors?.primary ?? colors.black;
 
@@ -209,11 +221,9 @@ export const ContactCardComponent = ({
     (e: GestureResponderEvent) => {
       e.preventDefault();
       e.stopPropagation();
-      router.push({
-        route: 'CONTACT_CARD_EDIT',
-      });
+      onEditProp?.();
     },
-    [router],
+    [onEditProp],
   );
 
   if (!contactCard || !webCard) {
@@ -337,7 +347,7 @@ export const ContactCardComponent = ({
             </Canvas>
           </Animated.View>
         ) : null}
-        {edit && (
+        {onEditProp != null && (
           <TouchableOpacity
             style={[
               styles.edit,
