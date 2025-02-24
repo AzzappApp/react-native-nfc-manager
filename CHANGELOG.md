@@ -1,3 +1,7 @@
+## 1.8.0-canary.16
+
+
+
 ## 1.8.0-canary.15
 
 * **fix:**  - ui design issues in contact card creation ([#7541](https://github.com/AzzappApp/azzapp/pull/7541))
