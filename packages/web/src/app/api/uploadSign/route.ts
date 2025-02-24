@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server';
 import * as z from 'zod';
 import { createMedia, createId } from '@azzapp/data';
-import { MODULE_IMAGES_SIZES } from '@azzapp/shared/cardModuleHelpers';
+import {
+  MODULE_IMAGES_SIZES,
+  MODULE_VIDEO_SIZES,
+} from '@azzapp/shared/cardModuleHelpers';
 import { createPresignedUpload } from '@azzapp/shared/cloudinaryHelpers';
 import { COVER_ASSET_SIZES } from '@azzapp/shared/coverHelpers';
 import ERRORS from '@azzapp/shared/errors';
@@ -82,7 +85,7 @@ const getPregeneratedSizes = (body: uploadSignParams) => {
     case 'cover':
       return COVER_ASSET_SIZES;
     case 'module':
-      return MODULE_IMAGES_SIZES;
+      return body.kind === 'image' ? MODULE_IMAGES_SIZES : MODULE_VIDEO_SIZES;
     case 'post':
       return body.kind === 'image' ? POST_IMAGES_SIZES : POST_VIDEO_SIZES;
     default:

@@ -1261,6 +1261,9 @@ export type ModuleTextBackgroundStyle = {
 
 export type TextAlignment = 'center' | 'justify' | 'left' | 'right';
 
+export const MODULE_VIDEO_BIT_RATE = 8000000;
+export const MODULE_VIDEO_FRAME_RATE = 30;
+
 /**
  * the max width of the module images
  */
@@ -1269,11 +1272,15 @@ export const MODULE_IMAGE_MAX_WIDTH = 2048;
 /**
  * the max width of the module videos
  */
-export const MODULE_VIDEO_MAX_WIDTH = 1280;
+export const MODULE_VIDEO_MAX_WIDTH = 1980;
 /**
- * the list of possible post images pregenerated sizes
+ * the list of possible module images pregenerated sizes
  */
-export const MODULE_IMAGES_SIZES = [128, 256, 512, 1024, 1536];
+export const MODULE_IMAGES_SIZES = [128, 256, 512, 1024, 1530];
+/**
+ * the list of possible module video pregenerated sizes
+ */
+export const MODULE_VIDEO_SIZES = [128, 256, 512, 768, 1024, 1280, 1980];
 
 //#endregion
 

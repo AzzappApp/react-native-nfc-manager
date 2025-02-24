@@ -5,14 +5,12 @@ import { splitArrayIntoChunks } from '@azzapp/shared/arrayHelpers';
 import { waitTime } from '@azzapp/shared/asyncHelpers';
 import {
   MODULE_IMAGE_MAX_WIDTH,
+  MODULE_VIDEO_BIT_RATE,
+  MODULE_VIDEO_FRAME_RATE,
   MODULE_VIDEO_MAX_WIDTH,
 } from '@azzapp/shared/cardModuleHelpers';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
-import {
-  POST_VIDEO_BIT_RATE,
-  POST_VIDEO_FRAME_RATE,
-} from '@azzapp/shared/postHelpers';
 import { isNotFalsyString, isValidUrl } from '@azzapp/shared/stringHelpers';
 import { MEMORY_SIZE } from './device';
 import { getFileName } from './fileHelpers';
@@ -117,8 +115,8 @@ export const handleUploadCardModuleMedia = async (
                     rotation: media.rotation ?? 0,
                   },
                   resolution,
-                  bitRate: POST_VIDEO_BIT_RATE,
-                  frameRate: POST_VIDEO_FRAME_RATE,
+                  bitRate: MODULE_VIDEO_BIT_RATE,
+                  frameRate: MODULE_VIDEO_FRAME_RATE,
                   duration: media.timeRange?.duration,
                   startTime: media.timeRange?.startTime,
                   filter: media.filter,
