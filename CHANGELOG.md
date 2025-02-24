@@ -1,3 +1,8 @@
+## 1.8.0-canary.14
+
+* **fix:**  - ensure Home Bottom Panel is focxused before changing opacity ([#7533](https://github.com/AzzappApp/azzapp/pull/7533))
+* **fix:**  - **android:** disable autocomplete on contact card edition ([#7539](https://github.com/AzzappApp/azzapp/pull/7539))
+
 ## 1.8.0-canary.13
 
 * **fix:**  - add missing 'Upgrade to Azzapp PRO' ([#7509](https://github.com/AzzappApp/azzapp/pull/7509))
