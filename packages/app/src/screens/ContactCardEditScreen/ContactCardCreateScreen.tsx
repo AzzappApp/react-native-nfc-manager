@@ -30,6 +30,7 @@ import BottomSheetPopup from '#components/popup/BottomSheetPopup';
 import { onChangeWebCard } from '#helpers/authStore';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { createRandomFileName, getFileName } from '#helpers/fileHelpers';
+import { keyboardDismiss } from '#helpers/keyboardHelper';
 import { NativeTextureLoader } from '#helpers/mediaEditions';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
@@ -511,6 +512,7 @@ const ContactCardCreateScreen = () => {
 
   const openScannerFromPopup = useCallback(() => {
     hidePopup();
+    keyboardDismiss();
     openScanner();
   }, [hidePopup, openScanner]);
 
@@ -560,7 +562,7 @@ const ContactCardCreateScreen = () => {
             />
           </Text>
           <ScanMyPaperBusinessCard
-            onPress={openScanner}
+            onPress={openScannerFromPopup}
             style={styles.scanBusinessCardButton}
           />
 
