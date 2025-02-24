@@ -114,7 +114,6 @@ const WebCardScreenContent = ({
           dark
           light
         }
-        coverIsPredefined
         ...CoverRenderer_webCard
         ...WebCardScreenBody_webCard
         ...WebCardBackgroundPreview_webCard

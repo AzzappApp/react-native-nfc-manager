@@ -308,6 +308,7 @@ const ItemRenderComponent = ({
           userName
           hasCover
           coverIsPredefined
+          coverIsLogoPredefined
           ...CoverLink_webCard
           ...CoverRenderer_webCard
           ...WebCardMenu_webCard
@@ -454,7 +455,8 @@ const ItemRenderComponent = ({
           </View>
         ) : profile.webCard?.hasCover ? (
           <View style={styles.coverLinkWrapper}>
-            {profile.webCard?.coverIsPredefined ? (
+            {profile.webCard?.coverIsPredefined ||
+            profile.webCard?.coverIsLogoPredefined ? (
               <PressableScaleHighlight
                 style={containerStyle}
                 onLongPress={openWebcardModal}
@@ -481,21 +483,22 @@ const ItemRenderComponent = ({
                 prefetch
               />
             )}
-            {profile.webCard?.coverIsPredefined && (
-              <PressableNative
-                style={styles.editUserContainer}
-                onPress={onPressEdit}
-                android_ripple={{
-                  borderless: true,
-                  foreground: true,
-                }}
-              >
-                <BlurView style={styles.multiUserIconContainer}>
-                  <View ref={refEdit} style={styles.tooltipTarget} />
-                  <Icon icon="edit" style={styles.multiUserIcon} />
-                </BlurView>
-              </PressableNative>
-            )}
+            {profile.webCard?.coverIsPredefined ||
+              (profile.webCard?.coverIsLogoPredefined && (
+                <PressableNative
+                  style={styles.editUserContainer}
+                  onPress={onPressEdit}
+                  android_ripple={{
+                    borderless: true,
+                    foreground: true,
+                  }}
+                >
+                  <BlurView style={styles.multiUserIconContainer}>
+                    <View ref={refEdit} style={styles.tooltipTarget} />
+                    <Icon icon="edit" style={styles.multiUserIcon} />
+                  </BlurView>
+                </PressableNative>
+              ))}
             {isMultiUser && ENABLE_MULTI_USER && (
               <PressableNative
                 style={styles.multiUserContainer}

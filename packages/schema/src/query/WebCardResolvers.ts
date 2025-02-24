@@ -579,6 +579,7 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
     return null;
   },
   coverIsPredefined: async webCard => webCard.coverIsPredefined,
+  coverIsLogoPredefined: async webCard => webCard.coverIsLogoPredefined,
 };
 
 export const WebCardCategory: WebCardCategoryResolvers = {

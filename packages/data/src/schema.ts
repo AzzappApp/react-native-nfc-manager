@@ -911,6 +911,10 @@ export const WebCardTable = cols.table(
       .boolean('coverIsPredefined')
       .default(false)
       .notNull(),
+    coverIsLogoPredefined: cols
+      .boolean('coverIsLogoPredefined')
+      .default(false)
+      .notNull(),
     coverPreviewPositionPercentage: cols.int('coverPreviewPositionPercentage'),
     companyActivityLabel: cols.defaultVarchar('companyActivityLabel'),
 

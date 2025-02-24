@@ -82,6 +82,11 @@ type WebCard implements Node {
   """
   coverIsPredefined: Boolean!
   """
+  cover has not been configured yet
+  if coverIsLogoPredefined is true, coverMedia will contain only 1 predefined media with company logo 
+  """
+  coverIsLogoPredefined: Boolean!
+  """
   the webCard style
   """
   cardStyle: WebCardStyle

@@ -71,6 +71,7 @@ describe('WebCard Resolvers (with checks)', () => {
       shadow: false,
     },
     coverIsPredefined: false,
+    coverIsLogoPredefined: false,
     coverPreviewPositionPercentage: null,
     companyActivityLabel: null,
     nbFollowers: 0,

@@ -66,6 +66,7 @@ const createContactCard: MutationResolvers['createContactCard'] = async (
           }
         : undefined,
     coverIsPredefined: !coverMediaId,
+    coverIsLogoPredefined: !!coverMediaId,
     cardIsPublished: true,
     coverMediaId: coverMediaId ?? defaultCover?.mediaId,
     companyActivityLabel: contactCard.companyActivityLabel,

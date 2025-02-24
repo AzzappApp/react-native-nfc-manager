@@ -64,6 +64,7 @@ const saveCover: MutationResolvers['saveCover'] = async (
         coverPreviewPositionPercentage,
         coverId: createId(),
         coverIsPredefined: coverIsPredefined || false,
+        coverIsLogoPredefined: false,
       };
       await updateWebCard(webCard.id, updates);
       updatedWebCard = { ...updatedWebCard, ...updates };
