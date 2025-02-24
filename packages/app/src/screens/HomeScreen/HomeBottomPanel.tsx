@@ -20,6 +20,7 @@ import { getTextColorPrimaryForBackground } from '@azzapp/shared/colorsHelpers';
 import { colors } from '#theme';
 import { CONTACT_CARD_RATIO } from '#components/ContactCard/ContactCard';
 import { setMainTabBarOpacity } from '#components/MainTabBar';
+import { useScreenHasFocus } from '#components/NativeRouter';
 import { useTooltipContext } from '#helpers/TooltipContext';
 import TabView from '#ui/TabView';
 import HomeBottomPanelMessage from './HomeBottomPanelMessage';
@@ -129,6 +130,8 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
     };
   });
 
+  const hasFocus = useScreenHasFocus();
+
   const containerHeight = useMemo(
     () => ({
       height: panelHeight + HOME_MENU_HEIGHT,
@@ -141,7 +144,9 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
   useAnimatedReaction(
     () => mainTabBarVisible.value,
     value => {
-      setMainTabBarOpacity(value);
+      if (hasFocus) {
+        setMainTabBarOpacity(value);
+      }
     },
   );
 
