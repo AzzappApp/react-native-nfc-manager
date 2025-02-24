@@ -54,8 +54,8 @@ export const contactCardSchema = z.object({
       uri: z.string(),
       id: z.string().optional(),
       local: z.boolean().optional(),
-      width: z.number(),
-      height: z.number(),
+      width: z.number().optional(),
+      height: z.number().optional(),
     })
     .optional()
     .nullable(),

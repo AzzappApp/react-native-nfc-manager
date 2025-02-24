@@ -200,11 +200,13 @@ const ContactCardCreateScreen = () => {
         uploads.push(null);
       }
 
+      const logoWidth = logo?.width ?? 0;
+      const logoHeight = logo?.height ?? 0;
       //create the coverId
-      if (logo && logo.id != null) {
+      if (logo && logo.id != null && logoWidth > 0 && logoHeight > 0) {
         const logoTextureInfo = await NativeTextureLoader.loadImage(logo.uri, {
-          width: logo.width,
-          height: logo.height,
+          width: logoWidth,
+          height: logoHeight,
         });
         NativeTextureLoader.ref(logoTextureInfo.key);
         const textTure = await logoTextureInfo.promise;
@@ -230,7 +232,7 @@ const ContactCardCreateScreen = () => {
                       height:
                         ((LOGO_PERCENT_WIDTH *
                           COVER_EXPORT_VIDEO_RESOLUTION.width) /
-                          (logo.width / logo.height) /
+                          (logoWidth / logoHeight) /
                           COVER_EXPORT_VIDEO_RESOLUTION.height) *
                         100,
                       width: 70, //we take 70%  for the width
@@ -241,14 +243,14 @@ const ContactCardCreateScreen = () => {
                     elevation: 0,
                     endPercentageTotal: 100,
                     filter: null,
-                    height: logo.height,
+                    height: logoHeight,
                     id: logo.id!, //even the != null condition above, the linter does not understand
                     kind: 'image',
                     rotation: 0,
                     shadow: false,
                     startPercentageTotal: 0,
                     uri: logo.uri,
-                    width: logo.width,
+                    width: logoWidth,
                   },
                 ],
                 cardColors: {
