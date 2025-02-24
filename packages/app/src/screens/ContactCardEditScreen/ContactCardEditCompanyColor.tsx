@@ -26,7 +26,7 @@ import type {
   IOSImageColors,
 } from 'react-native-image-colors/build/types';
 
-const ContactCardEditCompanyLogo = ({
+const ContactCardEditCompanyColor = ({
   control,
 }: {
   control: Control<ContactCardFormValues>;
@@ -226,7 +226,7 @@ const stylesheet = createStyleSheet(appearance => ({
   },
 }));
 
-export default ContactCardEditCompanyLogo;
+export default ContactCardEditCompanyColor;
 
 // react-native-image-color cannot determine the background color on android, so with @upmitt, we decide to take the 5,5 pixel
 const useBackgroundPixelColor = (

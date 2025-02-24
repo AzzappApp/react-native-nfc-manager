@@ -317,6 +317,7 @@ const stylesheet = createStyleSheet(appearance => ({
   },
   itemImage: { flex: 1, height: 55 },
   container: {
+    paddingTop: 20,
     flexDirection: 'column',
     justifyContent: 'flex-start',
     alignItems: 'flex-start',

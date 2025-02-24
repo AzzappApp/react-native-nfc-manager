@@ -143,6 +143,15 @@ const ContactCardCreateForm = ({
               </View>
             )}
           />
+          <Separation small />
+          <ContactCardEditCompanyLogo control={control} />
+          <Separation small />
+          {logoField.value && (
+            <>
+              <ContactCardEditCompanyColor control={control} />
+              <Separation small />
+            </>
+          )}
           <Controller
             control={control}
             name="webCardKind"
@@ -167,8 +176,10 @@ const ContactCardCreateForm = ({
               </View>
             )}
           />
+
           {webCardKind === 'business' ? (
             <>
+              <Separation small />
               <Controller
                 control={control}
                 name="companyActivityLabel"
@@ -196,6 +207,8 @@ const ContactCardCreateForm = ({
                   </View>
                 )}
               />
+              <Separation small />
+
               <Controller
                 control={control}
                 name="companyUrl"
@@ -225,8 +238,6 @@ const ContactCardCreateForm = ({
               />
             </>
           ) : undefined}
-          <ContactCardEditCompanyLogo control={control} />
-          {logoField.value && <ContactCardEditCompanyColor control={control} />}
           <Separation />
           <ContactCardEditModalPhones control={control} />
           <Separation />
