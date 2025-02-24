@@ -1,3 +1,7 @@
+## 1.8.0-canary.18
+
+* **fix:**  - compute correctly parralax start position ([#7557](https://github.com/AzzappApp/azzapp/pull/7557))
+
 ## 1.8.0-canary.17
 
 * **fix:**  - ensure cover is considered as prefined even if a company logo is… ([#7544](https://github.com/AzzappApp/azzapp/pull/7544))
