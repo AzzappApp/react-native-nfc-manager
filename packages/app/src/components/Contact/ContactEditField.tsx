@@ -19,6 +19,7 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
   autoCapitalize,
   errorMessage,
   trim = false,
+  autoComplete = 'off',
 }: {
   labelKey?: FieldPath<TFieldValues>;
   keyboardType: TextInputProps['keyboardType'];
@@ -32,6 +33,7 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
   onChangeLabel?: (label: string) => void;
   errorMessage?: string;
   trim?: boolean;
+  autoComplete?: TextInputProps['autoComplete'];
 }) => {
   const styles = useStyleSheet(stylesheet);
 
@@ -66,6 +68,7 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
             isErrored={!!error}
             onBlur={onBlur}
             autoFocus={isDirty}
+            autoComplete={autoComplete}
           />
         </ContactCardEditFieldWrapper>
       )}
