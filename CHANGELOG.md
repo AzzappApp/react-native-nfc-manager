@@ -1,3 +1,7 @@
+## 1.8.0-canary.21
+
+* **fix:**  - **EmailSignature:** underline and alignment
+
 ## 1.8.0-canary.20
 
 * **fix:**  - **contactCard:** [#7546](https://github.com/AzzappApp/azzapp/pull/7546) add default border and make the button bigger ([#7559](https://github.com/AzzappApp/azzapp/pull/7559))
