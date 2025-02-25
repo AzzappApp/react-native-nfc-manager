@@ -1,3 +1,7 @@
+## 1.8.0-canary.24
+
+* **feat:**  - add contact from scanner ([#7548](https://github.com/AzzappApp/azzapp/pull/7548))
+
 ## 1.8.0-canary.23
 
 * **fix:**  - deduplicate color in company colors form ([#7560](https://github.com/AzzappApp/azzapp/pull/7560))
