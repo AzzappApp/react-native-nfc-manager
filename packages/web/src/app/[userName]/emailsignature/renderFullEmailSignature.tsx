@@ -163,7 +163,6 @@ const renderFullEmailSignature = ({
     cellpadding="0"
     cellspacing="0"
     style="
-      table-layout: fixed;
       padding: 20px 15px;
       background: white;
       font-family: Helvetica Neue;
@@ -176,7 +175,7 @@ const renderFullEmailSignature = ({
           valign="top"
           style="border-right: 1px solid #E2E1E3; padding-right: 15px;"
         >
-          <table style="table-layout: fixed; padding-bottom: 12px;">
+          <table style="padding-bottom: 12px;">
             ${nameSection}
             ${titleSection}
             ${companySection}
@@ -188,7 +187,7 @@ const renderFullEmailSignature = ({
           })}
         </td>
         <td valign="top">
-          <table style="table-layout: fixed; padding-left: 15px;">
+          <table style="padding-left: 15px;">
             ${phoneSection}
             ${emailSection}
             ${companyLogoSection}

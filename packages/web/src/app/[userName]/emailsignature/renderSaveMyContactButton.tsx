@@ -41,12 +41,12 @@ const renderSaveMyContactButton = ({
         background-color: ${primaryColor};
         height: 34px;
         line-height: 34px;
-        width: 125px;
-        padding: 0 10px;
+        min-width: 125px;
         border-radius: 48px;
         font-size: 12px;
         text-decoration: none;
         text-decoration: unset;
+        font-family: Helvetica Neue;
         text-align: center;
         font-weight: 700;
         color: ${getTextColor(primaryColor)};
