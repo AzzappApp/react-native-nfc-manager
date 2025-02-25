@@ -1,3 +1,7 @@
+## 1.8.0-canary.23
+
+* **fix:**  - deduplicate color in company colors form ([#7560](https://github.com/AzzappApp/azzapp/pull/7560))
+
 ## 1.8.0-canary.22
 
 * **fix:**  - clicking on webcard with logo predfined shall open webcard preview, not cover editor ([#7562](https://github.com/AzzappApp/azzapp/pull/7562))
