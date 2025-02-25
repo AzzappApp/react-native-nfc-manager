@@ -1,3 +1,7 @@
+## 1.8.0-canary.29
+
+* **fix:**  - shakeShare , qrcode position based on its size to avoid text over qrcode ([#7575](https://github.com/AzzappApp/azzapp/pull/7575))
+
 ## 1.8.0-canary.28
 
 
