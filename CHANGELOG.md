@@ -1,3 +1,8 @@
+## 1.8.0-canary.26
+
+* **Fix:**  - form was not displaying properly after scan ([#7572](https://github.com/AzzappApp/azzapp/pull/7572))
+* **fix:**  - don't show export on not dynamic cover ([#7574](https://github.com/AzzappApp/azzapp/pull/7574))
+
 ## 1.8.0-canary.25
 
 * **fix:**  - **EmailSignature:** improve rendering across navigator/email client ([#7567](https://github.com/AzzappApp/azzapp/pull/7567))
