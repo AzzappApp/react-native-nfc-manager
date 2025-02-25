@@ -1,3 +1,7 @@
+## 1.8.0-canary.22
+
+* **fix:**  - clicking on webcard with logo predfined shall open webcard preview, not cover editor ([#7562](https://github.com/AzzappApp/azzapp/pull/7562))
+
 ## 1.8.0-canary.21
 
 * **fix:**  - **EmailSignature:** underline and alignment
