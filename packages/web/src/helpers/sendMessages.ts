@@ -17,6 +17,7 @@ import { sendEmail, sendTemplateEmail } from './emailHelpers';
 import { getServerIntl } from './i18nHelpers';
 import { sendTwilioSMS } from './twilioHelpers';
 import type { Locale } from '@azzapp/i18n';
+import type { VCardAdditionnalData } from '@azzapp/shared/vCardHelpers';
 
 const buildWebcardUrl = async (profile: Profile, webCard: WebCard) => {
   const { data, signature } = await serializeAndSignContactCard(
@@ -255,15 +256,15 @@ export const notifyUsers = async (
             const companyName =
               webCard.commonInformation?.company ??
               profile.contactCard?.company;
-            const vCard = await buildVCardFromSerializedContact(
-              profile.id,
-              serializeContactCard(
-                profile.id,
-                webCard.id,
-                profile.contactCard,
-                webCard.commonInformation,
+
+            const additionalData: VCardAdditionnalData = {
+              urls: (webCard.commonInformation?.urls ?? [])?.concat(
+                profile.contactCard?.urls ?? [],
               ),
-            );
+              socials: (webCard.commonInformation?.socials ?? [])?.concat(
+                profile.contactCard?.socials ?? [],
+              ),
+            };
             const avatar = parameters?.profile?.avatarId
               ? await getMediasByIds([parameters?.profile?.avatarId])
               : null;
@@ -274,6 +275,27 @@ export const notifyUsers = async (
                   height: 100,
                 })
               : '';
+            if (avatarUrl) {
+              const data = await fetch(avatarUrl);
+              const blob = await data.arrayBuffer();
+              const base64 = Buffer.from(blob).toString('base64');
+
+              additionalData.avatar = {
+                type: data.headers.get('content-type')?.split('/')[1] ?? 'png',
+                base64,
+              };
+            }
+            const vCard = await buildVCardFromSerializedContact(
+              profile.id,
+              serializeContactCard(
+                profile.id,
+                webCard.id,
+                profile.contactCard,
+                webCard.commonInformation,
+              ),
+              additionalData,
+            );
+
             const cover = webCard.coverMediaId
               ? await getMediasByIds([webCard.coverMediaId])
               : null;

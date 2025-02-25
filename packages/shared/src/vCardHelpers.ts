@@ -32,14 +32,17 @@ export const emailLabelToVCardLabel = (label: string) => {
  * @param contactCardData The serialized contact card
  * @returns The vCard
  */
+
+export type VCardAdditionnalData =
+  | (Pick<CommonInformation, 'socials' | 'urls'> & {
+      avatar?: { base64: string; type: string } | null;
+    })
+  | null;
+
 export const buildVCardFromSerializedContact = async (
   userName: string | null | undefined,
   contactCardData: string,
-  additionalData?:
-    | (Pick<CommonInformation, 'socials' | 'urls'> & {
-        avatar?: { base64: string; type: string } | null;
-      })
-    | null,
+  additionalData?: VCardAdditionnalData,
 ) => {
   const contactCard = parseContactCard(contactCardData);
 
