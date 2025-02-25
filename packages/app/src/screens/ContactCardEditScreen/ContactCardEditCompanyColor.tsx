@@ -9,6 +9,7 @@ import { Controller, useController } from 'react-hook-form';
 import { FormattedMessage } from 'react-intl';
 import { Platform, Pressable, View } from 'react-native';
 import { getColors, cache } from 'react-native-image-colors';
+import { isDefined } from '@azzapp/shared/isDefined';
 import { colors } from '#theme';
 import { DoneHeaderButton } from '#components/commonsButtons';
 import { buildContactStyleSheet } from '#helpers/contactHelpers';
@@ -57,8 +58,8 @@ const ContactCardEditCompanyColor = ({
 
   const [imageColors, setImagesColors] = useState<{
     primary: string;
-    secondary: string;
-    detail: string;
+    secondary?: string;
+    detail?: string;
   }>({
     primary: colors.grey400,
     secondary: colors.red400,
@@ -70,21 +71,25 @@ const ContactCardEditCompanyColor = ({
       if (Platform.OS === 'ios') {
         onChangeExpendableColor((colors as IOSImageColors).background);
       }
+      const primary =
+        colors.platform === 'ios' ? colors.primary : colors.dominant;
+      const secondary =
+        colors.platform === 'ios' ? colors.secondary : colors.vibrant;
+      const detail =
+        colors.platform === 'ios'
+          ? colors.background === '#FFFFFF'
+            ? colors.detail
+            : colors.background
+          : colors.lightVibrant;
 
       setImagesColors({
-        primary: colors.platform === 'ios' ? colors.primary : colors.dominant,
-        secondary:
-          colors.platform === 'ios' ? colors.secondary : colors.vibrant,
-        detail:
-          colors.platform === 'ios'
-            ? colors.background === '#FFFFFF'
-              ? colors.detail
-              : colors.background
-            : colors.lightVibrant,
+        primary,
+        secondary: secondary !== primary ? secondary : undefined,
+        detail: detail !== primary && detail !== secondary ? detail : undefined,
       });
-      onChange(colors.platform === 'ios' ? colors.primary : colors.dominant);
+      onChange(primary);
     },
-    //onChange cannot be in depedency because it will rerender and block selection of primary color
+    //onChange cannot be in dependency because it will rerender and block selection of primary color
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [onChangeExpendableColor],
   );
@@ -131,7 +136,7 @@ const ContactCardEditCompanyColor = ({
             <View style={[styles.field, styles.container]}>
               <Text variant="smallbold" style={styles.fieldTitle}>
                 <FormattedMessage
-                  defaultMessage="Company’s color"
+                  defaultMessage="Company's colors"
                   description="ContactCardCreationScreen - Company Color"
                 />
               </Text>
@@ -148,16 +153,18 @@ const ContactCardEditCompanyColor = ({
                 )}
               </Pressable>
               <View style={styles.previewView}>
-                {Object.values(imageColors).map((key, index) => {
-                  return (
-                    <ColorPreview
-                      key={index}
-                      color={key}
-                      selected={value === key}
-                      onSelect={onChange}
-                    />
-                  );
-                })}
+                {Object.values(imageColors)
+                  .filter(isDefined)
+                  .map((key, index) => {
+                    return (
+                      <ColorPreview
+                        key={index}
+                        color={key}
+                        selected={value === key}
+                        onSelect={onChange}
+                      />
+                    );
+                  })}
               </View>
             </View>
             <BottomSheetModal
