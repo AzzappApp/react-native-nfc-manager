@@ -455,8 +455,7 @@ const ItemRenderComponent = ({
           </View>
         ) : profile.webCard?.hasCover ? (
           <View style={styles.coverLinkWrapper}>
-            {profile.webCard?.coverIsPredefined ||
-            profile.webCard?.coverIsLogoPredefined ? (
+            {profile.webCard?.coverIsPredefined ? (
               <PressableScaleHighlight
                 style={containerStyle}
                 onLongPress={openWebcardModal}
