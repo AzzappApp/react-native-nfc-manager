@@ -1,3 +1,7 @@
+## 1.8.0-canary.25
+
+* **fix:**  - **EmailSignature:** improve rendering across navigator/email client ([#7567](https://github.com/AzzappApp/azzapp/pull/7567))
+
 ## 1.8.0-canary.24
 
 * **feat:**  - add contact from scanner ([#7548](https://github.com/AzzappApp/azzapp/pull/7548))
