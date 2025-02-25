@@ -57,6 +57,7 @@ const AppearanceSliderContainer = ({
     componentHeight,
     componentHeight > 0,
     webCardViewMode === 'edit',
+    dimension,
   );
   const onLayout = useCallback((event: LayoutChangeEvent) => {
     setComponentY(event.nativeEvent.layout.y);

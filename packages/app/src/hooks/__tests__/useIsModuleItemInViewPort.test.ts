@@ -4,9 +4,6 @@ import useIsModuleItemInViewPort from '../useIsModuleItemInViewPort';
 
 // Mock Dimensions
 jest.mock('react-native', () => ({
-  Dimensions: {
-    get: jest.fn(() => ({ height: 800 })), // Mock viewport height
-  },
   Animated: {
     Value: jest.fn(() => ({
       __getValue: jest.fn(),
@@ -44,6 +41,7 @@ describe('useIsModuleItemInViewPort', () => {
         componentheight,
         isLayoutReady,
         cancel,
+        { width: 406, height: 800 },
       ),
     );
     expect(result.current).toBe(false);
@@ -59,6 +57,7 @@ describe('useIsModuleItemInViewPort', () => {
         componentheight,
         isLayoutReady,
         cancel,
+        { width: 406, height: 800 },
       ),
     );
     expect(result.current).toBe(true);
@@ -74,6 +73,7 @@ describe('useIsModuleItemInViewPort', () => {
         componentheight,
         isLayoutReady,
         cancel,
+        { width: 406, height: 800 },
       ),
     );
     expect(result.current).toBe(false);
@@ -87,6 +87,7 @@ describe('useIsModuleItemInViewPort', () => {
         componentheight,
         isLayoutReady,
         cancel,
+        { width: 406, height: 800 },
       ),
     );
 
@@ -114,6 +115,7 @@ describe('useIsModuleItemInViewPort', () => {
         componentheight,
         isLayoutReady,
         cancel,
+        { width: 406, height: 800 },
       ),
     );
     expect(result.current).toBe(false);
@@ -127,6 +129,7 @@ describe('useIsModuleItemInViewPort', () => {
         componentheight,
         isLayoutReady,
         cancel,
+        { width: 406, height: 800 },
       ),
     );
 

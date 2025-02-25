@@ -98,12 +98,12 @@ const ModuleContainer = <T extends ModuleRenderInfo>({
   visible,
   canPlay,
   ...props
-}: Omit<CardModuleRendererProps<T>, 'modulePosition'> & {
+}: Omit<CardModuleRendererProps<T>, 'dimension' | 'modulePosition'> & {
   id: string;
   visible: boolean;
   canPlay: boolean;
 }) => {
-  const { width: windowWith } = useScreenDimensions();
+  const { width: windowWith, height } = useScreenDimensions();
   const [modulePosition, setModulePosition] = useState(
     windowWith / COVER_RATIO,
   );
@@ -130,6 +130,7 @@ const ModuleContainer = <T extends ModuleRenderInfo>({
         {...props}
         modulePosition={modulePosition}
         canPlay={canPlay}
+        dimension={{ width: windowWith, height }}
       />
     </WebCardBlockContainer>
   );

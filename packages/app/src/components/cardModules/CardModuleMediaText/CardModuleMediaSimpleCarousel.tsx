@@ -240,6 +240,7 @@ const SimpleCarouselItemComponent = ({
   modulePosition,
   paused,
   webCardViewMode,
+  dimension,
 }: SimpleCarouselItemProps) => {
   const onPressItem = useCallback(() => {
     setEditableItemIndex?.(index);
@@ -254,6 +255,7 @@ const SimpleCarouselItemComponent = ({
     mediaHeight,
     true,
     webCardViewMode === 'edit',
+    dimension,
   );
 
   return (

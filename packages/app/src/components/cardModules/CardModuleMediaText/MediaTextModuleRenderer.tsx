@@ -85,7 +85,6 @@ const MediaTextModuleRenderer = ({
   variant,
   scrollPosition,
   colorPalette,
-  displayMode,
   moduleEditing = false,
   ...props
 }: MediaTextModuleRendererProps) => {
@@ -100,7 +99,6 @@ const MediaTextModuleRenderer = ({
           <CardModuleMediaTextAlternation
             cardModuleMedias={data.cardModuleMedias!}
             cardModuleColor={data.cardModuleColor}
-            displayMode={displayMode}
             scrollPosition={scrollPosition}
             moduleEditing={moduleEditing}
             {...props}
@@ -113,7 +111,6 @@ const MediaTextModuleRenderer = ({
           <CardModuleMediaTextAlternation
             cardModuleMedias={data.cardModuleMedias!}
             cardModuleColor={data.cardModuleColor}
-            displayMode={displayMode}
             scrollPosition={scrollPosition}
             moduleEditing={moduleEditing}
             isFullAlternation
@@ -127,7 +124,6 @@ const MediaTextModuleRenderer = ({
           <CardModuleMediaTextParallax
             cardModuleMedias={data.cardModuleMedias}
             cardModuleColor={data.cardModuleColor}
-            displayMode={displayMode}
             scrollPosition={scrollPosition}
             moduleEditing={moduleEditing}
             {...props}
@@ -140,7 +136,6 @@ const MediaTextModuleRenderer = ({
           <CardModuleMediaSimpleCarousel
             cardModuleMedias={data.cardModuleMedias}
             cardModuleColor={data.cardModuleColor}
-            displayMode={displayMode}
             scrollPosition={scrollPosition}
             moduleEditing={moduleEditing}
             {...props}

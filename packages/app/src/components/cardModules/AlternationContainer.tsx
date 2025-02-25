@@ -221,6 +221,7 @@ const AlternationContainer = ({
     componentHeight,
     componentHeight > 0,
     webCardViewMode === 'edit',
+    dimension,
   );
 
   if (!media || !children) {

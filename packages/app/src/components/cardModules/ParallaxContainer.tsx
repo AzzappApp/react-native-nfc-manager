@@ -32,6 +32,7 @@ const ParallaxContainer = ({
   scrollY,
   modulePosition,
   disableParallax,
+  webCardViewMode,
   children,
   imageStyle,
   imageContainerStyle,
@@ -44,7 +45,8 @@ const ParallaxContainer = ({
     itemStartY,
     dimension.height,
     true,
-    disableParallax,
+    webCardViewMode === 'edit',
+    dimension,
   );
 
   return (

@@ -1,18 +1,15 @@
 import { useState, useEffect } from 'react';
-import { Dimensions } from 'react-native';
+import type { CardModuleDimension } from '#components/cardModules/cardModuleEditorType';
 import type { Animated } from 'react-native';
-
-const viewportHeight = Dimensions.get('window').height;
-
 const isInsideViewport = (
   scrollPosition: number,
   modulePosition: number,
   moduleHeight: number,
+  viewportHeight: number,
 ): boolean => {
   const buffer = 10;
   const viewportTop = scrollPosition - buffer;
   const viewportBottom = scrollPosition + viewportHeight + buffer;
-
   const moduleTop = modulePosition;
   const moduleBottom = modulePosition + moduleHeight;
 
@@ -32,6 +29,7 @@ const useIsModuleItemInViewPort = (
   componentheight: number,
   isLayoutReady: boolean, // sometimes we need to wait for the layout to calculate the initial position when we did not start the scrolling
   cancel: boolean,
+  dimension: CardModuleDimension,
 ) => {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -43,6 +41,7 @@ const useIsModuleItemInViewPort = (
           scrollY.__getValue(),
           itemStartY,
           componentheight,
+          dimension.height,
         ),
       );
     }
@@ -52,13 +51,15 @@ const useIsModuleItemInViewPort = (
 
   useEffect(() => {
     const listener = scrollY.addListener(({ value }) => {
-      setIsVisible(isInsideViewport(value, itemStartY, componentheight));
+      setIsVisible(
+        isInsideViewport(value, itemStartY, componentheight, dimension.height),
+      );
     });
 
     return () => {
       scrollY.removeListener(listener);
     };
-  }, [scrollY, itemStartY, componentheight]);
+  }, [scrollY, itemStartY, componentheight, dimension.height]);
 
   return cancel ? false : isVisible;
 };
