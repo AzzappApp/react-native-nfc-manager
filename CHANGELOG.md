@@ -1,3 +1,7 @@
+## 1.8.0-canary.27
+
+
+
 ## 1.8.0-canary.26
 
 * **Fix:**  - form was not displaying properly after scan ([#7572](https://github.com/AzzappApp/azzapp/pull/7572))
