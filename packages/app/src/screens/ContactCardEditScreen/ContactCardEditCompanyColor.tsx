@@ -198,7 +198,8 @@ const stylesheet = createStyleSheet(appearance => ({
   colorBox: {
     height: 22,
     width: 34,
-    borderWidth: 0,
+    borderWidth: 1,
+    borderColor: colors.grey100,
     borderRadius: 70,
     justifyContent: 'center',
     alignItems: 'center',

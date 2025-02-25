@@ -672,7 +672,7 @@ const stylesheet = createStyleSheet(appearance => ({
     paddingHorizontal: 40,
   },
   scanBusinessCardButton: {
-    marginHorizontal: 48,
+    marginHorizontal: 20,
     marginTop: 10,
     marginBottom: 10,
   },
@@ -696,7 +696,7 @@ const ScanMyPaperBusinessCard = ({
     <Button
       variant="secondary"
       label={intl.formatMessage({
-        defaultMessage: 'Scan my paper business card',
+        defaultMessage: 'Scan a Card, Badge, email signature...',
         description: 'MultiUserAddModal - Cancel button label',
       })}
       onPress={onPress}
