@@ -103,6 +103,7 @@ const styleSheet = createStyleSheet(appearance => ({
     {
       position: 'relative',
       borderRadius: AVATAR_WIDTH / 2,
+      overflow: 'visible',
     },
     shadow(appearance, 'bottom'),
   ],

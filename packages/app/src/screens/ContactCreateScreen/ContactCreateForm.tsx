@@ -2,8 +2,9 @@ import { ImageFormat } from '@shopify/react-native-skia';
 import { useCallback, useState } from 'react';
 import { Controller, useController } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View } from 'react-native';
+import { Image, View } from 'react-native';
 import { AVATAR_MAX_WIDTH } from '@azzapp/shared/contactCardHelpers';
+import { colors, shadow } from '#theme';
 import FormDeleteFieldOverlay from '#components/FormDeleteFieldOverlay';
 import ImagePicker, {
   EditImageStep,
@@ -14,6 +15,7 @@ import { ScreenModal } from '#components/NativeRouter';
 import { buildContactStyleSheet } from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { saveTransformedImageToFile } from '#helpers/mediaEditions';
+import useScreenDimensions from '#hooks/useScreenDimensions';
 import CheckBox from '#ui/CheckBox';
 import Separation from '#ui/Separation';
 import Text from '#ui/Text';
@@ -33,9 +35,14 @@ import type { Control } from 'react-hook-form';
 
 type ContactCreateFormProps = {
   control: Control<ContactFormValues>;
+  //not added in the formValue for the simple reason it is not save in the form, just informative data
+  scanImage: {
+    uri: string;
+    aspectRatio: number;
+  } | null;
 };
 
-const ContactCreateForm = ({ control }: ContactCreateFormProps) => {
+const ContactCreateForm = ({ control, scanImage }: ContactCreateFormProps) => {
   const styles = useStyleSheet(styleSheet);
   const intl = useIntl();
 
@@ -96,15 +103,32 @@ const ContactCreateForm = ({ control }: ContactCreateFormProps) => {
     },
     [notifyField],
   );
-
+  const { width } = useScreenDimensions();
   return (
     <>
       <FormDeleteFieldOverlay>
         <View style={styles.sectionsContainer}>
-          <View style={styles.field}>
+          {scanImage && (
+            <View style={styles.imageContainer}>
+              <View
+                style={[
+                  styles.imageViewScan,
+                  { width: scanImage.aspectRatio > 1 ? width - 40 : width / 2 },
+                ]}
+              >
+                <Image
+                  source={{ uri: scanImage.uri }}
+                  style={{
+                    aspectRatio: scanImage.aspectRatio,
+                  }}
+                />
+              </View>
+            </View>
+          )}
+          <View style={styles.shareback}>
             <CheckBox
               label={
-                <Text style={{ paddingLeft: 10 }}>
+                <Text style={styles.textCheckbox}>
                   <FormattedMessage
                     defaultMessage="Send your azzapp card to this contact"
                     description="Send checkbox label in add contact form"
@@ -187,6 +211,37 @@ const styleSheet = createStyleSheet(appearance => ({
   fieldTitleWithLock: { flexDirection: 'row', gap: 5, alignItems: 'center' },
   confirmModalButton: { width: 255 },
   ...buildContactStyleSheet(appearance),
+  imageScan: {
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: colors.white,
+    overflow: 'hidden',
+  },
+  imageContainer: {
+    alignItems: 'center',
+    marginTop: 20,
+    ...shadow(appearance),
+    overflow: 'visible',
+    marginBottom: 20,
+  },
+  imageViewScan: {
+    overflow: 'hidden',
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: colors.white,
+    width: '100%',
+    marginHorizontal: 20,
+  },
+  shareback: {
+    backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 20,
+    borderRadius: 15,
+    minHeight: 58,
+    marginTop: 10,
+  },
+  textCheckbox: { paddingLeft: 10 },
 }));
 
 export default ContactCreateForm;

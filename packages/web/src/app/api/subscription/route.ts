@@ -111,6 +111,7 @@ const subscriptionWebHook = async (req: Request) => {
               revenueCatId: rcId,
               status: 'canceled',
               invalidatedAt: new Date(),
+              totalSeats: extractSeatsFromSubscriptionId(subscriptionId),
             });
 
             await unpublishWebCardForUser({ userId });

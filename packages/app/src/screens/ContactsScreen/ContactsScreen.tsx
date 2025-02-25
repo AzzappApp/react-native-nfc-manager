@@ -55,6 +55,16 @@ const ContactsScreen = ({
   const [isAddNewContactMenuOpen, openNewContactMenu, closeNewContactMenu] =
     useBoolean();
 
+  const onCreateWithScanner = useCallback(() => {
+    closeNewContactMenu();
+    if (profile?.id) {
+      router.push({
+        route: 'CONTACT_CREATE',
+        params: { profileId: profile.id, showCardScanner: true },
+      });
+    }
+  }, [closeNewContactMenu, profile?.id, router]);
+
   const onCreateContact = useCallback(
     (e: GestureResponderEvent) => {
       e.preventDefault();
@@ -63,7 +73,7 @@ const ContactsScreen = ({
       if (profile?.id) {
         router.push({
           route: 'CONTACT_CREATE',
-          params: { profileId: profile.id },
+          params: { profileId: profile.id, showCardScanner: false },
         });
       }
     },
@@ -165,8 +175,21 @@ const ContactsScreen = ({
           style={styles.addManualyButton}
           label={
             <FormattedMessage
-              description="ContactsScreen - Add manualy button label in Add New Contact Menu"
-              defaultMessage="Add manualy"
+              description="ContactsScreen - Scan a Card, Badge, email signature Add New Contact Menu"
+              defaultMessage="Scan a Card, Badge, email signature..."
+            />
+          }
+          leftElement={<Icon icon="scan" />}
+          textStyle={styles.addManualyButtonLabel}
+          onPress={onCreateWithScanner}
+        />
+        <Button
+          variant="secondary"
+          style={styles.addManualyButton}
+          label={
+            <FormattedMessage
+              description="ContactsScreen - Add manually button label in Add New Contact Menu"
+              defaultMessage="Add manually"
             />
           }
           leftElement={<Icon icon="edit" />}

@@ -25,7 +25,11 @@ export const contactStorage = new MMKV({
   id: 'contacts',
 });
 
-export const buildContactStyleSheet = (appareance: ColorSchemeName) =>
+//TODO: if this updated color is validated after dev test
+// (respecting our color and not using pure black, using transparancy because the background behing have the right color)
+// we have to remove this param, but that will imply to udpate 12/15 files and remove useStyleSheet
+// waiting for nico validation of this change. ()
+export const buildContactStyleSheet = (_: ColorSchemeName) =>
   ({
     field: {
       flexDirection: 'row',
@@ -33,7 +37,6 @@ export const buildContactStyleSheet = (appareance: ColorSchemeName) =>
       alignItems: 'center',
       minHeight: MIN_FIELD_HEIGHT,
       paddingHorizontal: 10,
-      backgroundColor: appareance === 'light' ? 'white' : 'black',
     },
     fieldCommon: {
       flexDirection: 'row',
@@ -41,7 +44,6 @@ export const buildContactStyleSheet = (appareance: ColorSchemeName) =>
       alignItems: 'center',
       minHeight: MIN_FIELD_HEIGHT,
       paddingLeft: 10,
-      backgroundColor: appareance === 'light' ? 'white' : 'black',
     },
     addButton: {
       flexDirection: 'row',
@@ -50,7 +52,6 @@ export const buildContactStyleSheet = (appareance: ColorSchemeName) =>
       minHeight: MIN_FIELD_HEIGHT,
       paddingRight: 20,
       paddingLeft: 10,
-      backgroundColor: appareance === 'light' ? 'white' : 'black',
     },
     sectionsContainer: {
       rowGap: 1,

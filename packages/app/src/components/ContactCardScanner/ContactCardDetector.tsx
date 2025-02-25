@@ -40,7 +40,7 @@ type ContactCardDetectorProps = {
   close: () => void;
   extractData: (
     data: ContactCardDetectorMutation$data['extractVisitCardData'],
-    uri: string,
+    image: { uri: string; aspectRatio: number },
   ) => void;
 };
 
@@ -129,7 +129,10 @@ const ContactCardDetector = ({
       commit({
         variables: { imgUrl: `data:image/jpg;base64,${croppedImage.base64}` },
         onCompleted: data => {
-          extractData(data.extractVisitCardData, croppedImage.uri);
+          extractData(data.extractVisitCardData, {
+            uri: croppedImage.uri,
+            aspectRatio: croppedImage.width / croppedImage.height,
+          });
           close();
           closeLoading();
         },
@@ -280,7 +283,10 @@ const ContactCardDetector = ({
         commit({
           variables: { imgUrl: `data:image/jpg;base64,${base64Data}` },
           onCompleted: data => {
-            extractData(data.extractVisitCardData, filePath);
+            extractData(data.extractVisitCardData, {
+              uri: filePath,
+              aspectRatio: image.width() / image.height(),
+            });
             close();
             closeLoading();
           },

@@ -4,6 +4,7 @@ import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useScreenInsets from '#hooks/useScreenInsets';
+import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Text from '#ui/Text';
 import ContactSearchByNameItem from './ContactSearchByNameItem';
 import type { ContactType } from '#helpers/contactListHelpers';
@@ -122,7 +123,10 @@ const ContactsScreenSearchByName = ({
       onEndReached={onEndReached}
       refreshing={refreshing}
       onRefresh={onRefresh}
-      contentContainerStyle={[{ paddingBottom: bottom }, styles.content]}
+      contentContainerStyle={[
+        { paddingBottom: bottom + BOTTOM_MENU_HEIGHT },
+        styles.content,
+      ]}
       ItemSeparatorComponent={ItemSeparator}
       onEndReachedThreshold={0.5}
       keyboardShouldPersistTaps="always"
