@@ -100,7 +100,6 @@ const renderFullEmailSignature = ({
           src="${removeDoubleSlash(`${process.env.NEXT_PUBLIC_URL}${logo}`)}"
           width="14"
           height="14"
-          alt="phone"
         />
       </td>
       <td style="padding: 0 0 5px 4px;">
@@ -112,6 +111,7 @@ const renderFullEmailSignature = ({
             font-weight: 400;
             text-align: center;
             color: black;
+            text-align: left;
             text-decoration: none;
             text-decoration: unset;"
           href="${href}"
@@ -143,7 +143,7 @@ const renderFullEmailSignature = ({
   const companyLogoSection = companyLogoUrl
     ? `
       <tr>
-        <td colspan="2" style="padding: 0; text-align: left;">
+        <td colspan="2" style="padding: 0;">
           <img
             height="60"
             style="
