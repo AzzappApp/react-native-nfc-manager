@@ -1,7 +1,8 @@
 import { forwardRef, useState } from 'react';
-import { TextInput as NativeTextInput, useColorScheme } from 'react-native';
+import { TextInput as NativeTextInput } from 'react-native';
 import { colors, textStyles } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import type { DefinedColorSchemeName } from '#helpers/createStyles';
 import type { ForwardedRef } from 'react';
 import type {
   TextInputProps as NativeTextInputProps,
@@ -26,7 +27,6 @@ const TextInput = (
 ) => {
   //#region hooks
   const styles = useStyleSheet(styleSheet);
-  const scheme = useColorScheme();
   const [isFocused, setIsFocused] = useState(false);
   //#endregion
 
@@ -45,9 +45,7 @@ const TextInput = (
       ref={ref}
       selectionColor={colors.primary400}
       {...props}
-      placeholderTextColor={
-        scheme === 'light' ? colors.grey400 : colors.grey400
-      }
+      placeholderTextColor={colors.grey400}
       onFocus={onFocusInner}
       onBlur={onBlurInner}
       allowFontScaling={false}
@@ -61,7 +59,7 @@ const TextInput = (
   );
 };
 
-const styleSheet = createStyleSheet(appearance => ({
+export const styleSheetData = (appearance: DefinedColorSchemeName) => ({
   text: {
     color: appearance === 'light' ? colors.black : colors.grey400,
   },
@@ -82,6 +80,7 @@ const styleSheet = createStyleSheet(appearance => ({
   errored: {
     borderColor: colors.red400,
   },
-}));
+});
+const styleSheet = createStyleSheet(styleSheetData);
 
 export default forwardRef(TextInput);

@@ -8,7 +8,7 @@ import type {
   ViewStyle,
 } from 'react-native';
 
-type DefinedColorSchemeName = Exclude<ColorSchemeName, null | undefined>;
+export type DefinedColorSchemeName = Exclude<ColorSchemeName, null | undefined>;
 
 type ColorSchemeStyleSheet<T> = Record<DefinedColorSchemeName, T>;
 
