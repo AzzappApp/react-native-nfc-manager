@@ -104,7 +104,12 @@ const useSaveCover = (
     const exportProgress: Observable<number> = Observable.create(sink => {
       progressSink = sink;
     });
-    setExportProgressIndicator(exportProgress);
+
+    const isDynamic = isCoverDynamic(coverEditorState);
+    if (isDynamic) {
+      setExportProgressIndicator(exportProgress);
+    }
+
     let path: string;
     let kind: 'image' | 'video';
     try {

@@ -14,23 +14,33 @@ const CoverEditorSaveModal = ({
   useKeepAwake();
 
   const intl = useIntl();
-  const progressIndicators = useMemo(
-    () => [exportProgressIndicator, uploadProgressIndicator],
-    [exportProgressIndicator, uploadProgressIndicator],
-  );
-  const texts = useMemo(
-    () => [
-      intl.formatMessage({
-        defaultMessage: 'Export',
-        description: 'Export phase title in cover editor save modal',
-      }),
+  const progressIndicators = useMemo(() => {
+    const result = [];
+    if (exportProgressIndicator) {
+      result.push(exportProgressIndicator);
+    }
+    result.push(uploadProgressIndicator);
+    return result;
+  }, [exportProgressIndicator, uploadProgressIndicator]);
+
+  const texts = useMemo(() => {
+    const result = [];
+    if (exportProgressIndicator) {
+      result.push(
+        intl.formatMessage({
+          defaultMessage: 'Export',
+          description: 'Export phase title in cover editor save modal',
+        }),
+      );
+    }
+    result.push(
       intl.formatMessage({
         defaultMessage: 'Upload',
         description: 'Upload phase title in cover editor save modal',
       }),
-    ],
-    [intl],
-  );
+    );
+    return result;
+  }, [exportProgressIndicator, intl]);
   return (
     <UploadProgressModal
       progressIndicators={progressIndicators}
