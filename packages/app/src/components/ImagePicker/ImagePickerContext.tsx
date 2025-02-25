@@ -226,8 +226,7 @@ const ImagePickerContextProviderInner = (
 
   const previousMedia = useRef(media);
   useEffect(() => {
-    if (previousMedia.current !== media) {
-      setEditionParameters({});
+    if (previousMedia.current?.id !== media?.id) {
       let initialTimeRange: TimeRange | null = null;
       if (media?.kind === 'video') {
         initialTimeRange = {
@@ -243,6 +242,7 @@ const ImagePickerContextProviderInner = (
 
   const onMediaChange = useCallback(
     (media: SourceMedia, aspectRatio: number | null | undefined = null) => {
+      setEditionParameters({});
       setMedia(media);
       onMediaChangeProps?.(media);
       setAspectRatio(forceAspectRatio ?? aspectRatio ?? null);
