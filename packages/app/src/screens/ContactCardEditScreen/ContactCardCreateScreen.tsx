@@ -115,7 +115,6 @@ const ContactCardCreateScreen = () => {
     handleSubmit,
     formState: { isSubmitting },
     setValue,
-    reset,
   } = useForm<ContactCardFormValues>({
     mode: 'onBlur',
     shouldFocusError: true,
@@ -438,75 +437,72 @@ const ContactCardCreateScreen = () => {
 
   const loadFormFromScan = useCallback(
     (data: ContactCardDetectorMutation$data['extractVisitCardData']) => {
-      reset();
-      if (data) {
-        setValue('company', data.company);
-        setValue('firstName', data.firstName);
-        setValue('lastName', data.lastName);
-        if (data.title) {
-          setValue('title', capitalize(data.title));
-        } else {
-          setValue('title', undefined);
-        }
-        setValue('companyActivityLabel', data.company);
-        const formattedEmails = data.emails
-          ?.map((email: string) => {
-            if (email) {
-              return { address: email, selected: true, label: 'Work' };
-            }
-            return null;
-          })
-          .filter(n => n != null);
-        if (formattedEmails) {
-          setValue('emails', formattedEmails);
-        } else {
-          setValue('emails', []);
-        }
-        const formattedPhoneNumber = data.phoneNumbers
-          ?.map((phoneNumber: string) => {
-            if (phoneNumber) {
-              return {
-                ...extractPhoneNumberDetails(phoneNumber),
-                selected: true,
-                label: 'WORK',
-              };
-            }
-            return null;
-          })
-          .filter(n => n != null);
+      setValue('company', data?.company);
+      setValue('firstName', data?.firstName);
+      setValue('lastName', data?.lastName);
+      if (data?.title) {
+        setValue('title', capitalize(data?.title));
+      } else {
+        setValue('title', undefined);
+      }
+      setValue('companyActivityLabel', data?.company);
+      const formattedEmails = data?.emails
+        ?.map((email: string) => {
+          if (email) {
+            return { address: email, selected: true, label: 'Work' };
+          }
+          return null;
+        })
+        .filter(n => n != null);
+      if (formattedEmails) {
+        setValue('emails', formattedEmails);
+      } else {
+        setValue('emails', []);
+      }
+      const formattedPhoneNumber = data?.phoneNumbers
+        ?.map((phoneNumber: string) => {
+          if (phoneNumber) {
+            return {
+              ...extractPhoneNumberDetails(phoneNumber),
+              selected: true,
+              label: 'WORK',
+            };
+          }
+          return null;
+        })
+        .filter(n => n != null);
 
-        if (formattedPhoneNumber) {
-          setValue('phoneNumbers', formattedPhoneNumber);
-        } else {
-          setValue('phoneNumbers', []);
-        }
+      if (formattedPhoneNumber) {
+        setValue('phoneNumbers', formattedPhoneNumber);
+      } else {
+        setValue('phoneNumbers', []);
+      }
 
-        const formattedUrl = data.urls
-          ?.map(url => {
-            return { address: url, selected: true };
-          })
-          .filter(n => n != null);
+      const formattedUrl = data?.urls
+        ?.map(url => {
+          return { address: url, selected: true };
+        })
+        .filter(n => n != null);
 
-        if (formattedUrl) {
-          setValue('urls', formattedUrl);
-        } else {
-          setValue('urls', []);
-        }
+      if (formattedUrl) {
+        setValue('urls', formattedUrl);
+      } else {
+        setValue('urls', []);
+      }
 
-        const formattedAdress = data.addresses
-          ?.map(add => {
-            return { address: add, selected: true, label: 'Work' };
-          })
-          .filter(n => n != null);
+      const formattedAdress = data?.addresses
+        ?.map(add => {
+          return { address: add, selected: true, label: 'Work' };
+        })
+        .filter(n => n != null);
 
-        if (formattedAdress) {
-          setValue('addresses', formattedAdress);
-        } else {
-          setValue('addresses', []);
-        }
+      if (formattedAdress) {
+        setValue('addresses', formattedAdress);
+      } else {
+        setValue('addresses', []);
       }
     },
-    [reset, setValue],
+    [setValue],
   );
 
   useEffect(() => {

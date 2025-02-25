@@ -74,7 +74,6 @@ const ContactCreateScreen = ({
     handleSubmit,
     formState: { isSubmitting, isValid },
     setValue,
-    reset,
   } = useForm<ContactFormValues>({
     mode: 'onBlur',
     shouldFocusError: true,
@@ -187,75 +186,72 @@ const ContactCreateScreen = ({
       data: ContactCardDetectorMutation$data['extractVisitCardData'],
       image: { uri: string; aspectRatio: number },
     ) => {
-      reset();
       setScanImage(image);
-      if (data) {
-        setValue('firstName', data.firstName);
-        setValue('lastName', data.lastName);
-        if (data.title) {
-          setValue('title', capitalize(data.title));
-        } else {
-          setValue('title', undefined);
-        }
-        setValue('company', data.company);
-        const formattedEmails = data.emails
-          ?.map((email: string) => {
-            if (email) {
-              return { address: email, selected: true, label: 'WORK' };
-            }
-            return null;
-          })
-          .filter(n => n != null);
-        if (formattedEmails) {
-          setValue('emails', formattedEmails);
-        } else {
-          setValue('emails', []);
-        }
-        const formattedPhoneNumber = data.phoneNumbers
-          ?.map((phoneNumber: string) => {
-            if (phoneNumber) {
-              return {
-                ...extractPhoneNumberDetails(phoneNumber),
-                selected: true,
-                label: 'Work',
-              };
-            }
-            return null;
-          })
-          .filter(n => n != null);
+      setValue('firstName', data?.firstName);
+      setValue('lastName', data?.lastName);
+      if (data?.title) {
+        setValue('title', capitalize(data?.title));
+      } else {
+        setValue('title', undefined);
+      }
+      setValue('company', data?.company);
+      const formattedEmails = data?.emails
+        ?.map((email: string) => {
+          if (email) {
+            return { address: email, selected: true, label: 'WORK' };
+          }
+          return null;
+        })
+        .filter(n => n != null);
+      if (formattedEmails) {
+        setValue('emails', formattedEmails);
+      } else {
+        setValue('emails', []);
+      }
+      const formattedPhoneNumber = data?.phoneNumbers
+        ?.map((phoneNumber: string) => {
+          if (phoneNumber) {
+            return {
+              ...extractPhoneNumberDetails(phoneNumber),
+              selected: true,
+              label: 'Work',
+            };
+          }
+          return null;
+        })
+        .filter(n => n != null);
 
-        if (formattedPhoneNumber) {
-          setValue('phoneNumbers', formattedPhoneNumber);
-        } else {
-          setValue('phoneNumbers', []);
-        }
+      if (formattedPhoneNumber) {
+        setValue('phoneNumbers', formattedPhoneNumber);
+      } else {
+        setValue('phoneNumbers', []);
+      }
 
-        const formattedUrl = data.urls
-          ?.map(url => {
-            return { url };
-          })
-          .filter(n => n != null);
+      const formattedUrl = data?.urls
+        ?.map(url => {
+          return { url };
+        })
+        .filter(n => n != null);
 
-        if (formattedUrl) {
-          setValue('urls', formattedUrl);
-        } else {
-          setValue('urls', []);
-        }
+      if (formattedUrl) {
+        setValue('urls', formattedUrl);
+      } else {
+        setValue('urls', []);
+      }
 
-        const formattedAdress = data.addresses
-          ?.map(add => {
-            return { address: add, selected: true, label: 'Work' };
-          })
-          .filter(n => n != null);
+      const formattedAdress = data?.addresses
+        ?.map(add => {
+          return { address: add, selected: true, label: 'Work' };
+        })
+        .filter(n => n != null);
 
-        if (formattedAdress) {
-          setValue('addresses', formattedAdress);
-        } else {
-          setValue('addresses', []);
-        }
+      if (formattedAdress) {
+        setValue('addresses', formattedAdress);
+      } else {
+        setValue('addresses', []);
       }
     },
-    [reset, setValue],
+    [setValue],
   );
 
   const [showScanner, openScanner, closeScanner] = useBoolean(
