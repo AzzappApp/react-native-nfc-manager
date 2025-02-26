@@ -1,3 +1,7 @@
+## 1.8.0-canary.33
+
+* **feat:**  - add support of company logo in contact creation screen and ensure logo is displayed when avatar not available ([#7568](https://github.com/AzzappApp/azzapp/pull/7568))
+
 ## 1.8.0-canary.32
 
 * **fix:**  - restore parallax in destkop preview ([#7588](https://github.com/AzzappApp/azzapp/pull/7588))
