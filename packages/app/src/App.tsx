@@ -91,7 +91,6 @@ import HomeScreen from '#screens/HomeScreen';
 import WelcomeScreen from '#screens/HomeScreen/WelcomeScreen';
 import InviteFriendsScreen from '#screens/InviteFriendsScreen';
 import LikedPostsScreen from '#screens/LikedPostsScreen';
-import LoadingScreen from '#screens/LoadingScreen';
 import MediaModuleWebCardEditionScreen from '#screens/MediaModuleWebCardEditionScreen';
 import MediaScreen from '#screens/MediaScreen';
 import MediaTextLinkModuleWebCardEditionScreen from '#screens/MediaTextLinkModuleWebCardEditionScreen';
@@ -432,27 +431,6 @@ const AppRouter = () => {
   }, [disposeScreens]);
   // #endregion
 
-  // #region Loading Screen
-  const [showLoadingScreen, setShowLoadingScreen] = useState(false);
-
-  useEffect(
-    () =>
-      addGlobalEventListener('READY', () => {
-        setShowLoadingScreen(false);
-      }),
-    [],
-  );
-
-  useEffect(() => {
-    if (!authenticated) {
-      setTimeout(() => {
-        setShowLoadingScreen(false);
-      }, 500);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  // #endregion
-
   useDeepLink(router);
 
   const colorScheme = useColorScheme();
@@ -506,7 +484,6 @@ const AppRouter = () => {
               <Suspense>
                 <ShakeShare />
               </Suspense>
-              {showLoadingScreen && <LoadingScreen />}
               <Modal
                 visible={offlineScreenDisplayed}
                 onRequestClose={isConnected ? hideOfflineScreen : () => void 0}
