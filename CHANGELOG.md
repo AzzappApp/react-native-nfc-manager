@@ -1,3 +1,7 @@
+## 1.8.0-canary.34
+
+* **feat:**  - add rich text editor ([#7443](https://github.com/AzzappApp/azzapp/pull/7443))
+
 ## 1.8.0-canary.33
 
 * **feat:**  - add support of company logo in contact creation screen and ensure logo is displayed when avatar not available ([#7568](https://github.com/AzzappApp/azzapp/pull/7568))
