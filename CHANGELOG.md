@@ -1,3 +1,7 @@
+## 1.8.0-canary.31
+
+* **fix:**  - **parallax:** [#7432](https://github.com/AzzappApp/azzapp/pull/7432) simplify opacity mgmt ([#7558](https://github.com/AzzappApp/azzapp/pull/7558))
+
 ## 1.8.0-canary.30
 
 * **fix:**  - Parallax media module edit preview ([#7581](https://github.com/AzzappApp/azzapp/pull/7581))
