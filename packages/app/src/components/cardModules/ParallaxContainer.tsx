@@ -6,7 +6,6 @@ import type {
   CardModuleDimension,
   CardModuleSourceMedia,
 } from './cardModuleEditorType';
-import type { ViewStyle } from 'react-native';
 
 type ParallaxContainerProps = {
   media: CardModuleSourceMedia;
@@ -17,8 +16,6 @@ type ParallaxContainerProps = {
   disableParallax: boolean;
   modulePosition?: number;
   children?: ReactNode | undefined;
-  imageStyle?: ViewStyle; // some variant need opacity and backgroundcolor (mediaText) but not other (media)
-  imageContainerStyle?: ViewStyle; // some variant need opacity and backgroundcolor (mediaText) but not other (media)
   webCardViewMode?: 'edit' | 'view';
 };
 
@@ -34,8 +31,6 @@ const ParallaxContainer = ({
   disableParallax,
   webCardViewMode,
   children,
-  imageStyle,
-  imageContainerStyle,
 }: ParallaxContainerProps) => {
   const itemStartY = (modulePosition ?? 0) + index * dimension.height;
   const itemEndY = itemStartY + dimension.height;
@@ -57,7 +52,6 @@ const ParallaxContainer = ({
             width: dimension.width,
             height: dimension.height,
           },
-          imageContainerStyle,
           {
             transform: [
               {
@@ -84,7 +78,6 @@ const ParallaxContainer = ({
           media={media}
           dimension={dimension}
           canPlay={canPlay && inViewport}
-          imageStyle={imageStyle}
           priority={inViewport ? 'high' : 'normal'}
         />
       </RNAnimated.View>

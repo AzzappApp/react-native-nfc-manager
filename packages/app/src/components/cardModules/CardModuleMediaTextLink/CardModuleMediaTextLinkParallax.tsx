@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
-import { Linking, Pressable, View } from 'react-native';
+import { Linking, Pressable, View, StyleSheet } from 'react-native';
 import {
   isModuleAnimationDisabled,
   type CardModuleColor,
@@ -138,12 +138,15 @@ const ParallaxItem = ({
         index={index}
         key={`${cardModuleMedia.media.id}_{index}`}
         disableParallax={disableParallax}
-        imageStyle={styles.opacityImage}
-        imageContainerStyle={{
-          backgroundColor: cardModuleColor.background,
-        }}
         canPlay={canPlay}
       >
+        <View
+          style={[
+            StyleSheet.absoluteFill,
+            styles.overlay,
+            { backgroundColor: cardModuleColor.background },
+          ]}
+        />
         <View style={styles.textContainer}>
           <Text
             variant="large"
@@ -192,7 +195,7 @@ const ParallaxItem = ({
 };
 
 const stylesheet = createStyleSheet(appearance => ({
-  opacityImage: { opacity: 0.8 },
+  overlay: { opacity: 0.2 },
   textContainer: {
     justifyContent: 'center',
     alignItems: 'center',

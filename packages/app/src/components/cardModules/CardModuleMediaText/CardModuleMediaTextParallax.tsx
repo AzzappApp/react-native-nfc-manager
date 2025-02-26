@@ -119,9 +119,14 @@ const ParallaxItem = ({
         index={index}
         canPlay={canPlay}
         disableParallax={disableParallax}
-        imageStyle={styles.opacityImage}
-        imageContainerStyle={{ backgroundColor: cardModuleColor.background }}
       >
+        <View
+          style={[
+            StyleSheet.absoluteFill,
+            styles.overlay,
+            { backgroundColor: cardModuleColor.background },
+          ]}
+        />
         <View style={styles.textContainer}>
           <Text
             variant="large"
@@ -145,7 +150,7 @@ const ParallaxItem = ({
 };
 
 const styles = StyleSheet.create({
-  opacityImage: { opacity: 0.8 },
+  overlay: { opacity: 0.2 },
   textContainer: {
     justifyContent: 'center',
     alignItems: 'center',

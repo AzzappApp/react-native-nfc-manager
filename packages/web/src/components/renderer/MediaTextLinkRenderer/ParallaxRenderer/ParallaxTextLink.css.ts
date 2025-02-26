@@ -23,9 +23,20 @@ const textContainer = style({
   alignItems: 'center',
   flexDirection: 'column',
   gap: 20,
+  position: 'relative',
+});
+
+const overlay = style({
+  opacity: 0.2,
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  width: '100%',
+  height: '100%',
 });
 
 export default {
+  overlay,
   textItem,
   textContainer,
   container,
