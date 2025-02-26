@@ -1,6 +1,5 @@
 import { useCallback } from 'react';
 import { View } from 'react-native';
-import { isModuleAnimationDisabled } from '@azzapp/shared/cardModuleHelpers';
 import useScreenDimensions from '#hooks/useScreenDimensions';
 import ParallaxContainer from '../ParallaxContainer';
 import CardModulePressableTool from '../tool/CardModulePressableTool';
@@ -28,7 +27,6 @@ const CardModuleMediaParallax = ({
   dimension: providedDimension,
   setEditableItemIndex,
   webCardViewMode,
-  displayMode,
 }: CardModuleMediaParallaxProps & {}) => {
   const screenDimension = useScreenDimensions();
   const dimension = providedDimension ?? screenDimension;
@@ -55,10 +53,7 @@ const CardModuleMediaParallax = ({
             setEditableItemIndex={setEditableItemIndex}
             scrollPosition={scrollPosition}
             modulePosition={modulePosition}
-            disableParallax={isModuleAnimationDisabled(
-              displayMode,
-              webCardViewMode,
-            )}
+            disableParallax={webCardViewMode === 'edit'}
           />
         );
       })}

@@ -1,7 +1,6 @@
 import { useCallback } from 'react';
 import { StyleSheet, View } from 'react-native';
 import {
-  isModuleAnimationDisabled,
   type CardModuleColor,
   type DisplayMode,
 } from '@azzapp/shared/cardModuleHelpers';
@@ -68,10 +67,7 @@ const CardModuleMediaTextParallax = ({
             scrollPosition={scrollPosition}
             modulePosition={modulePosition}
             displayMode={displayMode}
-            disableParallax={isModuleAnimationDisabled(
-              displayMode,
-              webCardViewMode,
-            )}
+            disableParallax={webCardViewMode === 'edit'}
             canPlay={canPlay}
           />
         );
