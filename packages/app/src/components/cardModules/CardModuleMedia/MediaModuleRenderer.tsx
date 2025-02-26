@@ -113,6 +113,7 @@ const MediaModuleRenderer = ({
             displayMode={displayMode}
             scrollPosition={scrollPosition}
             moduleEditing={moduleEditing}
+            webCardViewMode={webCardViewMode}
             {...props}
           />
         </CardModuleEditionScrollHandler>
@@ -133,6 +134,7 @@ const MediaModuleRenderer = ({
             square={isSquareGrid(variant)}
             nbColumns={getGridNumberColumn(variant)}
             moduleEditing={moduleEditing}
+            webCardViewMode={webCardViewMode}
             {...props}
           />
         </CardModuleEditionScrollHandler>
