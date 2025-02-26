@@ -1,3 +1,7 @@
+## 1.8.0-canary.35
+
+
+
 ## 1.8.0-canary.34
 
 * **feat:**  - add rich text editor ([#7443](https://github.com/AzzappApp/azzapp/pull/7443))
