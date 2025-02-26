@@ -80,6 +80,9 @@ const icons = {
   get bloc_text() {
     return require('./assets/bloc_text.png');
   },
+  get bold() {
+    return require('./assets/bold.png');
+  },
   get border() {
     return require('./assets/border.png');
   },
@@ -277,6 +280,9 @@ const icons = {
   },
   get invite_via() {
     return require('./assets/invite_via.png');
+  },
+  get italic() {
+    return require('./assets/italic.png');
   },
   get keyboard() {
     return require('./assets/keyboard.png');
@@ -484,6 +490,9 @@ const icons = {
   },
   get unlock_line() {
     return require('./assets/unlock_line.png');
+  },
+  get underline() {
+    return require('./assets/underline.png');
   },
   get vibrance() {
     return require('./assets/vibrance.png');

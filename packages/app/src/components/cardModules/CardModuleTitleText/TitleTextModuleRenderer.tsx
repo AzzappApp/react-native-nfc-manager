@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { graphql, readInlineData } from 'react-relay';
+import { RichText } from '#components/ui/RichText';
 import { getTextStyle, getTitleStyle } from '#helpers/cardModuleHelpers';
 import useScreenDimensions from '#hooks/useScreenDimensions';
 import Text from '#ui/Text';
@@ -112,13 +113,11 @@ const TitleTextModuleRenderer = ({
             >
               {data.title}
             </Text>
-            <Text
-              style={[
-                getTextStyle(cardStyle, data.cardModuleColor),
-                getTextAlignmentStyle(variant),
-              ]}
-            >
-              {data.text}
+            <Text style={getTextAlignmentStyle(variant)}>
+              <RichText
+                text={data.text}
+                style={getTextStyle(cardStyle, data.cardModuleColor)}
+              />
             </Text>
           </View>
         ) : (

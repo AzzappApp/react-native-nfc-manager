@@ -4,6 +4,7 @@ import {
   type CardModuleColor,
   type DisplayMode,
 } from '@azzapp/shared/cardModuleHelpers';
+import { RichText } from '#components/ui/RichText';
 import { getTextStyle, getTitleStyle } from '#helpers/cardModuleHelpers';
 import useScreenDimensions from '#hooks/useScreenDimensions';
 import Text from '#ui/Text';
@@ -134,11 +135,10 @@ const ParallaxItem = ({
           >
             {cardModuleMedia.title}
           </Text>
-          <Text
+          <RichText
+            text={cardModuleMedia.text}
             style={[getTextStyle(cardStyle, cardModuleColor), styles.textStyle]}
-          >
-            {cardModuleMedia.text}
-          </Text>
+          />
         </View>
       </ParallaxContainer>
     </CardModulePressableTool>

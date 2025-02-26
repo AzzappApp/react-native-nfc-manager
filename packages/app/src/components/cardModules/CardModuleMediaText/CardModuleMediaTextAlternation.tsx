@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
+import { RichText } from '#components/ui/RichText';
 import { getTextStyle, getTitleStyle } from '#helpers/cardModuleHelpers';
 import useScreenDimensions from '#hooks/useScreenDimensions';
 import Text from '#ui/Text';
@@ -155,9 +156,10 @@ const AlternationItem = ({
           >
             {cardModuleMedia.title}
           </Text>
-          <Text style={getTextStyle(cardStyle, cardModuleColor)}>
-            {cardModuleMedia.text}
-          </Text>
+          <RichText
+            text={cardModuleMedia.text}
+            style={getTextStyle(cardStyle, cardModuleColor)}
+          />
         </View>
       </AlternationContainer>
     </CardModulePressableTool>

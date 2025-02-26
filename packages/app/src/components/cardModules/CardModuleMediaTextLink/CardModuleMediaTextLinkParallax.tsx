@@ -6,6 +6,7 @@ import {
   type DisplayMode,
 } from '@azzapp/shared/cardModuleHelpers';
 import { shadow } from '#theme';
+import { RichText } from '#components/ui/RichText';
 import { getTextStyle, getTitleStyle } from '#helpers/cardModuleHelpers';
 import { useStyleSheet, createStyleSheet } from '#helpers/createStyles';
 import useScreenDimensions from '#hooks/useScreenDimensions';
@@ -154,11 +155,10 @@ const ParallaxItem = ({
           >
             {cardModuleMedia.title}
           </Text>
-          <Text
+          <RichText
+            text={cardModuleMedia.text}
             style={[getTextStyle(cardStyle, cardModuleColor), styles.textStyle]}
-          >
-            {cardModuleMedia.text}
-          </Text>
+          />
           <Pressable
             style={[
               {

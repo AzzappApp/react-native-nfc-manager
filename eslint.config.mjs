@@ -29,6 +29,7 @@ export default [
       'packages/shared/lib',
       'packages/schema/lib',
       'packages/payment/lib',
+      'packages/app/fonts',
       'packages/web/.next',
       'packages/backoffice/.next',
       '**/trash',

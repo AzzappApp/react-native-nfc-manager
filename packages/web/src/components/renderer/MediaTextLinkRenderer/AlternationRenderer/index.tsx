@@ -6,8 +6,9 @@ import {
   type CardModuleMediaTextLinkData,
   type CardModuleMediaTextData,
 } from '@azzapp/shared/cardModuleHelpers';
-import { fontsMap } from '#helpers/fonts';
+import { webCardTextFontsMap, webCardTitleFontsMap } from '#helpers/fonts';
 import { DEFAULT_MODULE_TEXT, DEFAULT_MODULE_TITLE } from '#helpers/modules';
+import { RichText } from '#helpers/richText';
 import Link from '../Link';
 import commonStyles from '../MediaTextLink.css';
 import AlternationMedia from './AlternationMedia';
@@ -103,7 +104,8 @@ const AlternationRender = async ({
                     <h2
                       className={cn(
                         commonStyles.title,
-                        fontsMap[cardStyle.titleFontFamily].className,
+                        webCardTitleFontsMap[cardStyle.titleFontFamily]
+                          .className,
                       )}
                       style={{
                         color: swapColor(cardModuleColor?.title, colorPalette),
@@ -115,14 +117,17 @@ const AlternationRender = async ({
                     <p
                       className={cn(
                         commonStyles.text,
-                        fontsMap[cardStyle.fontFamily].className,
+                        webCardTextFontsMap[cardStyle.fontFamily].className,
                       )}
                       style={{
                         color: swapColor(cardModuleColor?.text, colorPalette),
                         fontSize: cardStyle.fontSize,
                       }}
                     >
-                      {sectionData?.text ?? DEFAULT_MODULE_TEXT}
+                      <RichText
+                        fontFamily={cardStyle.fontFamily}
+                        text={sectionData?.text ?? DEFAULT_MODULE_TEXT}
+                      />
                     </p>
                     <div>
                       <Link

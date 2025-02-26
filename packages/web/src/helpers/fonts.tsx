@@ -44,8 +44,12 @@ import {
   Water_Brush,
   Monoton,
 } from 'next/font/google';
-import type { ApplicationFonts } from '@azzapp/shared/fontHelpers';
+import type {
+  WebcardTitleFonts,
+  WebcardTextFonts,
+} from '@azzapp/shared/fontHelpers';
 import type { NextFont } from 'next/dist/compiled/@next/font';
+import type { CSSProperties } from 'react';
 
 const AmaticSC_Bold = Amatic_SC({
   weight: '700',
@@ -84,6 +88,11 @@ const Cardo_Regular = Cardo({
 });
 const CormorantGaramond_Bold = Cormorant_Garamond({
   weight: '700',
+  display: 'swap',
+  subsets: ['latin-ext'],
+});
+const CormorantGaramond_Regular = Cormorant_Garamond({
+  weight: '500',
   display: 'swap',
   subsets: ['latin-ext'],
 });
@@ -314,6 +323,11 @@ const SixCaps_Regular = Six_Caps({
   display: 'swap',
   subsets: ['latin'],
 });
+const SourceSans3_Regular = Source_Sans_3({
+  weight: '400',
+  display: 'swap',
+  subsets: ['latin-ext'],
+});
 const SourcePro_Regular = Source_Sans_3({
   weight: '400',
   display: 'swap',
@@ -335,7 +349,45 @@ const YesevaOne_Regular = Yeseva_One({
   subsets: ['latin-ext'],
 });
 
-export const fontsMap: Record<string, NextFont> = {
+export const webCardTextFontsMap: Record<WebcardTextFonts, NextFont> = {
+  SourceSans3_Regular,
+  Raleway_Regular,
+  'Plus-Jakarta_Light': Plus_Jakarta_Light,
+  OpenSans_Regular,
+  Montserrat_Regular,
+  Jost_Regular,
+  JosefinSans_Regular,
+  Fraunces_Light,
+  CourrierPrime_Regular,
+  CormorantGaramond_Regular,
+  Archivo_Light,
+  Inter_Regular,
+};
+
+type fontVariants = {
+  bold: CSSProperties;
+};
+
+export const webCardTextFontsVariantsMap: Record<
+  WebcardTextFonts,
+  fontVariants
+> = {
+  SourcePro_Regular_Bold: { bold: { fontWeight: '600' } },
+  SourceSans3_Regular: { bold: { fontWeight: '600' } },
+  Raleway_Regular: { bold: { fontWeight: '600' } },
+  'Plus-Jakarta_Light': { bold: { fontWeight: '600' } },
+  OpenSans_Regular: { bold: { fontWeight: '600' } },
+  Montserrat_Regular: { bold: { fontWeight: '600' } },
+  Jost_Regular: { bold: { fontWeight: '600' } },
+  JosefinSans_Regular: { bold: { fontWeight: '600' } },
+  Fraunces_Light: { bold: { fontWeight: '600' } },
+  CourrierPrime_Regular: { bold: { fontWeight: '700' } },
+  CormorantGaramond_Regular: { bold: { fontWeight: '600' } },
+  Archivo_Light: { bold: { fontWeight: '600' } },
+  Inter_Regular: { bold: { fontWeight: '600' } },
+};
+
+export const webCardTitleFontsMap: Record<WebcardTitleFonts, NextFont> = {
   AmaticSC_Bold,
   AmaticSC_Regular,
   Anton_Regular,
@@ -345,6 +397,7 @@ export const fontsMap: Record<string, NextFont> = {
   Cardo_Regular,
   Cinzel_Regular,
   CormorantGaramond_Bold,
+  CormorantGaramond_Regular,
   CourrierPrime_Regular,
   DMSerifDisplay_Regular,
   FaunaOne_Regular,
@@ -393,4 +446,9 @@ export const fontsMap: Record<string, NextFont> = {
   Ultra_Regular,
   WaterBrush_Regular,
   YesevaOne_Regular,
-} satisfies Record<ApplicationFonts, NextFont>;
+} satisfies Record<WebcardTitleFonts, NextFont>;
+
+export const fontsMap = {
+  ...webCardTitleFontsMap,
+  ...webCardTitleFontsMap,
+};

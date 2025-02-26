@@ -1,6 +1,7 @@
 import { memo, useCallback, useRef, useState } from 'react';
 import { FlatList, View, Animated as AnimatedNative } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { RichText } from '#components/ui/RichText';
 import { getTextStyle, getTitleStyle } from '#helpers/cardModuleHelpers';
 import useIsModuleItemInViewPort from '#hooks/useIsModuleItemInViewPort';
 import useScreenDimensions from '#hooks/useScreenDimensions';
@@ -285,9 +286,10 @@ const SimpleCarouselItemComponent = ({
         <Text variant="large" style={getTitleStyle(cardStyle, cardModuleColor)}>
           {cardModuleMedia.title}
         </Text>
-        <Text style={getTextStyle(cardStyle, cardModuleColor)}>
-          {cardModuleMedia.text}
-        </Text>
+        <RichText
+          text={cardModuleMedia.text}
+          style={getTextStyle(cardStyle, cardModuleColor)}
+        />
       </View>
     </CardModulePressableTool>
   );

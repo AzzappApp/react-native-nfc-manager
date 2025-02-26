@@ -5,7 +5,6 @@ import {
   MenuItem,
   Select,
 } from '@mui/material';
-import { APPLICATIONS_FONTS } from '@azzapp/shared/fontHelpers';
 import type { FormControlProps } from '@mui/material';
 
 type FontSelectProps = Omit<FormControlProps, 'onChange'> & {
@@ -14,6 +13,7 @@ type FontSelectProps = Omit<FormControlProps, 'onChange'> & {
   value?: string | null;
   onChange?: (value: string) => void;
   helperText?: string;
+  fontList: string[];
 };
 
 const FontSelect = ({
@@ -22,6 +22,7 @@ const FontSelect = ({
   value,
   helperText,
   onChange,
+  fontList,
   ...props
 }: FontSelectProps) => (
   <FormControl fullWidth {...props}>
@@ -34,7 +35,7 @@ const FontSelect = ({
       label={label}
       onChange={onChange ? e => onChange(e.target.value as string) : undefined}
     >
-      {APPLICATIONS_FONTS.map(font => (
+      {fontList.map(font => (
         <MenuItem key={font} value={font}>
           {font}
         </MenuItem>

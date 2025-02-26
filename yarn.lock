@@ -87,7 +87,7 @@ __metadata:
     "@expo-google-fonts/bebas-neue": "npm:^0.2.3"
     "@expo-google-fonts/cardo": "npm:^0.2.3"
     "@expo-google-fonts/cinzel": "npm:^0.2.3"
-    "@expo-google-fonts/cormorant-garamond": "npm:^0.2.3"
+    "@expo-google-fonts/cormorant-garamond": ./fonts/cormorant-garamond
     "@expo-google-fonts/courier-prime": "npm:^0.2.3"
     "@expo-google-fonts/dm-serif-display": "npm:^0.2.3"
     "@expo-google-fonts/fauna-one": "npm:^0.2.3"
@@ -95,7 +95,7 @@ __metadata:
     "@expo-google-fonts/gilda-display": "npm:^0.2.3"
     "@expo-google-fonts/gloock": "npm:^0.2.3"
     "@expo-google-fonts/great-vibes": "npm:^0.2.3"
-    "@expo-google-fonts/inter": "npm:^0.2.3"
+    "@expo-google-fonts/inter": ./fonts/inter
     "@expo-google-fonts/josefin-sans": "npm:^0.2.3"
     "@expo-google-fonts/jost": "npm:^0.2.3"
     "@expo-google-fonts/kaushan-script": "npm:^0.2.3"
@@ -121,6 +121,7 @@ __metadata:
     "@expo-google-fonts/rye": "npm:^0.2.3"
     "@expo-google-fonts/seaweed-script": "npm:^0.2.3"
     "@expo-google-fonts/six-caps": "npm:^0.2.3"
+    "@expo-google-fonts/source-sans-3": ./fonts/source-sans-3
     "@expo-google-fonts/source-sans-pro": "npm:^0.2.3"
     "@expo-google-fonts/ultra": "npm:^0.2.3"
     "@expo-google-fonts/water-brush": "npm:^0.2.3"
@@ -463,6 +464,7 @@ __metadata:
     csv42: "npm:^5.0.3"
     eslint: "npm:^9.17.0"
     iron-webcrypto: "npm:^1.2.1"
+    jest: "npm:^29.7.0"
     libphonenumber-js: "npm:^1.11.17"
     lz-string: "npm:^1.5.0"
     typescript: "npm:^5.7.2"
@@ -5586,10 +5588,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@expo-google-fonts/cormorant-garamond@npm:^0.2.3":
+"@expo-google-fonts/cormorant-garamond@file:./fonts/cormorant-garamond::locator=%40azzapp%2Fapp%40workspace%3Apackages%2Fapp":
   version: 0.2.3
-  resolution: "@expo-google-fonts/cormorant-garamond@npm:0.2.3"
-  checksum: 10/9f0734f8bdbfea190c9d1bb9a0866ec6d892b7d55cbcbb994078ae520babe4eabdc5edc9a88de0f18e41c00fd0c9e2e0dade6187a75de725ab0096c09986a63c
+  resolution: "@expo-google-fonts/cormorant-garamond@file:./fonts/cormorant-garamond#./fonts/cormorant-garamond::hash=2b8e97&locator=%40azzapp%2Fapp%40workspace%3Apackages%2Fapp"
+  checksum: 10/49df15706568186f75672e9db4d5b4d05a6a912621685012017527bfb20a760f8c06abbdf10410d0b387983a4900c3c1c693d7ffa315c16a55262214efa6b0fd
   languageName: node
   linkType: hard
 
@@ -5642,10 +5644,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@expo-google-fonts/inter@npm:^0.2.3":
+"@expo-google-fonts/inter@file:./fonts/inter::locator=%40azzapp%2Fapp%40workspace%3Apackages%2Fapp":
   version: 0.2.3
-  resolution: "@expo-google-fonts/inter@npm:0.2.3"
-  checksum: 10/434dd414e4d4dd9b61283cc09dfc499d5a4162bcaa39d0ac88cc3664bac0f21d8c54c0be9868b36bcf6d562be077eec6fbe8874274bd447d29d4ee1e988d8682
+  resolution: "@expo-google-fonts/inter@file:./fonts/inter#./fonts/inter::hash=85069d&locator=%40azzapp%2Fapp%40workspace%3Apackages%2Fapp"
+  checksum: 10/2a4901374201e76a15ea0236263139b8b218e0fd0cb1d1271a41e86bc97f91eb4a37c73628c7fc56090c28f128633ef42e0697f1b1c6deb96e2f2c6e7391970d
   languageName: node
   linkType: hard
 
@@ -5821,6 +5823,13 @@ __metadata:
   version: 0.2.3
   resolution: "@expo-google-fonts/six-caps@npm:0.2.3"
   checksum: 10/9c3729858c8910a139078a16b0f0ec24fe6d31c390e11734b00823c77865e650bd06c97e36813cdbbb0dd8497778c1953570bd1be0b11bd7f93495705498c4bb
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/source-sans-3@file:./fonts/source-sans-3::locator=%40azzapp%2Fapp%40workspace%3Apackages%2Fapp":
+  version: 0.2.3
+  resolution: "@expo-google-fonts/source-sans-3@file:./fonts/source-sans-3#./fonts/source-sans-3::hash=48dad8&locator=%40azzapp%2Fapp%40workspace%3Apackages%2Fapp"
+  checksum: 10/2994c10f62672e2d78c115b1fef50fd0fe36cf6fcebb41a2349e06d608105a38cfb78cb946672797fbe823b9bff61d0d3b62d6944969f71aa8effc88865f498f
   languageName: node
   linkType: hard
 

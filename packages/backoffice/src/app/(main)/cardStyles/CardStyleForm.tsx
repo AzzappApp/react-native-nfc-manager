@@ -15,6 +15,10 @@ import {
 import omit from 'lodash/omit';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import {
+  WEBCARD_TEXT_FONTS,
+  WEBCARD_TITLE_FONTS,
+} from '@azzapp/shared/fontHelpers';
 import FontSelect from '#components/FontSelect';
 import { intParser, useForm } from '#helpers/formHelpers';
 import { saveCardStyle } from './cardStylesActions';
@@ -129,6 +133,7 @@ const CardStyleForm = ({ cardStyle, saved, label }: CardStyleFormProps) => {
           disabled={saving}
           required
           sx={{ width: 250 }}
+          fontList={WEBCARD_TEXT_FONTS}
           {...fieldProps('fontFamily')}
         />
         <TextField
@@ -145,6 +150,7 @@ const CardStyleForm = ({ cardStyle, saved, label }: CardStyleFormProps) => {
           label="Titles font family"
           disabled={saving}
           required
+          fontList={WEBCARD_TITLE_FONTS}
           sx={{ width: 250 }}
           {...fieldProps('titleFontFamily')}
         />

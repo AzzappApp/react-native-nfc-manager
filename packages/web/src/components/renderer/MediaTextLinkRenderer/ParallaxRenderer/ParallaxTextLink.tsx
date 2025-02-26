@@ -3,8 +3,9 @@
 import cn from 'classnames';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import Parallax from '#components/renderer/Parallax';
-import { fontsMap } from '#helpers/fonts';
+import { webCardTextFontsMap, webCardTitleFontsMap } from '#helpers/fonts';
 import { DEFAULT_MODULE_TEXT, DEFAULT_MODULE_TITLE } from '#helpers/modules';
+import { RichText } from '#helpers/richText';
 import Link from '../Link';
 import commonStyles from '../MediaTextLink.css';
 import styles from './ParallaxTextLink.css';
@@ -35,6 +36,7 @@ const ParallaxText = ({
         return (
           <>
             <div style={{ backgroundColor }} className={styles.overlay} />
+
             <div className={styles.container}>
               <section className={styles.textContainer}>
                 <h2
@@ -45,7 +47,7 @@ const ParallaxText = ({
                   className={cn(
                     styles.textItem,
                     commonStyles.title,
-                    fontsMap[cardStyle.titleFontFamily].className,
+                    webCardTitleFontsMap[cardStyle.titleFontFamily].className,
                   )}
                 >
                   {mediaData?.title ?? DEFAULT_MODULE_TITLE}
@@ -58,13 +60,15 @@ const ParallaxText = ({
                   className={cn(
                     styles.textItem,
                     commonStyles.text,
-                    fontsMap[cardStyle.fontFamily].className,
+                    webCardTextFontsMap[cardStyle.fontFamily].className,
                   )}
                 >
-                  {mediaData?.text ?? DEFAULT_MODULE_TEXT}
+                  <RichText
+                    fontFamily={cardStyle.fontFamily}
+                    text={mediaData?.text ?? DEFAULT_MODULE_TEXT}
+                  />
                 </p>
               </section>
-
               <Link
                 mediaData={mediaData}
                 data={data}

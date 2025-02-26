@@ -2,8 +2,9 @@
 import cn from 'classnames';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { swapColor } from '@azzapp/shared/cardHelpers';
-import { fontsMap } from '#helpers/fonts';
+import { webCardTextFontsMap, webCardTitleFontsMap } from '#helpers/fonts';
 import { DEFAULT_MODULE_TEXT, DEFAULT_MODULE_TITLE } from '#helpers/modules';
+import { RichText } from '#helpers/richText';
 import useDimensions from '#hooks/useDimensions';
 import useLatestCallback from '#hooks/useLastestCallback';
 import CloudinaryImage from '#ui/CloudinaryImage';
@@ -485,7 +486,7 @@ const SimpleCarousel = ({
                 <h3
                   className={cn(
                     commonStyles.title,
-                    fontsMap[cardStyle.titleFontFamily].className,
+                    webCardTitleFontsMap[cardStyle.titleFontFamily].className,
                   )}
                   style={{
                     color: swapColor(cardModuleColor?.title, colorPalette),
@@ -497,14 +498,17 @@ const SimpleCarousel = ({
                 <p
                   className={cn(
                     commonStyles.text,
-                    fontsMap[cardStyle.fontFamily].className,
+                    webCardTextFontsMap[cardStyle.fontFamily].className,
                   )}
                   style={{
                     color: swapColor(cardModuleColor?.text, colorPalette),
                     fontSize: cardStyle.fontSize,
                   }}
                 >
-                  {sectionData?.text ?? DEFAULT_MODULE_TEXT}
+                  <RichText
+                    fontFamily={cardStyle.fontFamily}
+                    text={sectionData?.text ?? DEFAULT_MODULE_TEXT}
+                  />
                 </p>
               </div>
             );
