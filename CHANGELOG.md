@@ -1,3 +1,7 @@
+## 1.8.0-canary.32
+
+* **fix:**  - restore parallax in destkop preview ([#7588](https://github.com/AzzappApp/azzapp/pull/7588))
+
 ## 1.8.0-canary.31
 
 * **fix:**  - **parallax:** [#7432](https://github.com/AzzappApp/azzapp/pull/7432) simplify opacity mgmt ([#7558](https://github.com/AzzappApp/azzapp/pull/7558))
