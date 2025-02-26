@@ -351,7 +351,11 @@ const SimpleButtonEditionScreen = ({
         input,
       },
       onCompleted() {
-        router.pop(2);
+        if (module) {
+          router.pop(1);
+        } else {
+          router.pop(2);
+        }
       },
       onError(e) {
         console.error(e);
@@ -373,6 +377,7 @@ const SimpleButtonEditionScreen = ({
     height,
     commit,
     router,
+    module,
     handleProfileActionError,
   ]);
 

@@ -210,6 +210,7 @@ export const handleUploadCardModuleMedia = async (
 };
 
 export const handleOnCompletedModuleSave = (
+  isNewModule: boolean,
   moduleMedias: Array<{
     media: UploadedMedia;
     title?: string;
@@ -235,7 +236,11 @@ export const handleOnCompletedModuleSave = (
       }
     }
   }
-  router.pop(2);
+  if (isNewModule) {
+    router.pop(2);
+  } else {
+    router.pop(1);
+  }
 };
 
 export const convertModuleMediaRelay = (mediaRelay: any) => {

@@ -332,7 +332,11 @@ const BlockTextEditionScreen = ({
         input,
       },
       onCompleted() {
-        router.pop(2);
+        if (module) {
+          router.pop(1);
+        } else {
+          router.pop(2);
+        }
       },
       onError(e) {
         console.error(e);
@@ -341,10 +345,10 @@ const BlockTextEditionScreen = ({
     });
   }, [
     canSave,
-    cardModulesCount,
+    profile.webCard?.id,
     profile.webCard?.cardIsPublished,
     profile.webCard?.isPremium,
-    profile.webCard?.id,
+    cardModulesCount,
     value,
     blockText?.id,
     textMarginHorizontal,
@@ -355,6 +359,7 @@ const BlockTextEditionScreen = ({
     verticalSpacing,
     commit,
     router,
+    module,
     handleProfileActionError,
   ]);
 

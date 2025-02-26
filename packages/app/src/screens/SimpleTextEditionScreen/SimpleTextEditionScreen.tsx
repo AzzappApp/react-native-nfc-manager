@@ -328,7 +328,11 @@ const SimpleTextEditionScreen = ({
         },
       },
       onCompleted() {
-        router.pop(2);
+        if (module) {
+          router.pop(1);
+        } else {
+          router.pop(2);
+        }
       },
       onError(e) {
         console.error(e);
@@ -348,6 +352,7 @@ const SimpleTextEditionScreen = ({
     marginVertical,
     moduleData?.id,
     router,
+    module,
     handleProfileActionError,
   ]);
 

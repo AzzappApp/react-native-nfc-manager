@@ -518,9 +518,12 @@ const PhotoWithTextAndTitleEditionScreen = ({
       },
       onCompleted() {
         setProgressIndicator(null);
-
         setShowImagePicker(false);
-        router.pop(2);
+        if (module) {
+          router.pop(1);
+        } else {
+          router.pop(2);
+        }
       },
       onError(e) {
         setProgressIndicator(null);
@@ -548,6 +551,7 @@ const PhotoWithTextAndTitleEditionScreen = ({
     commit,
     router,
     intl,
+    module,
     handleProfileActionError,
   ]);
 

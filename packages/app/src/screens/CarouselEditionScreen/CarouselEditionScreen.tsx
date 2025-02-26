@@ -470,7 +470,11 @@ const CarouselEditionScreen = ({
       onCompleted() {
         setProgressIndicator(null);
         setShowImagePicker(false);
-        router.pop(2);
+        if (module) {
+          router.pop(1);
+        } else {
+          router.pop(2);
+        }
       },
       onError(e) {
         setProgressIndicator(null);
@@ -481,10 +485,10 @@ const CarouselEditionScreen = ({
     });
   }, [
     canSave,
-    cardModulesCount,
+    profile.webCard?.id,
     profile.webCard?.cardIsPublished,
     profile.webCard?.isPremium,
-    profile.webCard?.id,
+    cardModulesCount,
     value,
     commit,
     carousel?.id,
@@ -496,6 +500,7 @@ const CarouselEditionScreen = ({
     gap,
     router,
     intl,
+    module,
     handleProfileActionError,
   ]);
 

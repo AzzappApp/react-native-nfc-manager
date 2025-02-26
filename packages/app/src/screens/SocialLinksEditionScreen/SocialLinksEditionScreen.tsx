@@ -330,7 +330,11 @@ const SocialLinksEditionScreen = ({
         input,
       },
       onCompleted() {
-        router.pop(2);
+        if (module) {
+          router.pop(1);
+        } else {
+          router.pop(2);
+        }
       },
       onError(e) {
         console.log(e);
@@ -339,8 +343,8 @@ const SocialLinksEditionScreen = ({
     });
   }, [
     canSave,
-    cardModulesCount,
     profile.webCard,
+    cardModulesCount,
     value,
     iconSize,
     borderWidth,
@@ -351,6 +355,7 @@ const SocialLinksEditionScreen = ({
     socialLinks?.id,
     commit,
     router,
+    module,
     handleProfileActionError,
   ]);
 

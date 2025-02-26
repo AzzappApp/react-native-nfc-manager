@@ -225,7 +225,11 @@ const LineDividerEditionScreen = ({
         },
       },
       onCompleted() {
-        router.pop(2);
+        if (module) {
+          router.pop(1);
+        } else {
+          router.pop(2);
+        }
       },
       onError(e) {
         console.error(e);
@@ -243,6 +247,7 @@ const LineDividerEditionScreen = ({
     marginTop,
     lineDivider?.id,
     router,
+    module,
     handleProfileActionError,
   ]);
 
