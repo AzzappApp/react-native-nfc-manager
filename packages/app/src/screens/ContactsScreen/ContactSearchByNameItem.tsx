@@ -9,6 +9,7 @@ import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import ContactAvatar from './ContactAvatar';
+import useImageFromContact from './useImageFromContact';
 import WhatsappButton from './WhatsappButton';
 import type { ContactType } from '#helpers/contactListHelpers';
 import type { ContactActionProps } from './ContactsScreenLists';
@@ -76,28 +77,7 @@ const ContactSearchByNameItem = ({
     });
   }, [contact, showContactAction, showInvite]);
 
-  const avatarSource = useMemo(() => {
-    if (contact.contactProfile?.avatar?.uri) {
-      return {
-        uri: contact.contactProfile.avatar.uri,
-        mediaId: contact.contactProfile.avatar.id ?? '',
-        requestedSize: 26,
-      };
-    }
-    if (contact.avatar?.uri) {
-      return {
-        uri: contact.avatar.uri,
-        mediaId: contact.avatar.id ?? '',
-        requestedSize: 26,
-      };
-    }
-    return null;
-  }, [
-    contact.avatar?.id,
-    contact.avatar?.uri,
-    contact.contactProfile?.avatar?.id,
-    contact.contactProfile?.avatar?.uri,
-  ]);
+  const avatarSource = useImageFromContact({ contact });
 
   const [firstname, lastname, name] = useMemo(() => {
     if (contact.firstName || contact.lastName) {

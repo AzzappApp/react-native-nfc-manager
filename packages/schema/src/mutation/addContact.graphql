@@ -21,6 +21,7 @@ input AddContactInput {
   withShareBack: Boolean!
   socials: [AddContactSocial!]
   urls: [AddContactUrl!]
+  logoId: String
 }
 
 input AddContactSocial {

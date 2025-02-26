@@ -358,16 +358,15 @@ export const buildVCardFromAzzappContact = async (contact: ContactType) => {
       );
   });
 
-  if (
-    contact.contactProfile?.avatar?.uri &&
-    contact.contactProfile.avatar.uri.startsWith('http')
-  ) {
+  const contactImageUrl =
+    contact.contactProfile?.avatar?.uri || contact.logo?.uri;
+  const contactImageId = contact.contactProfile?.avatar?.id || contact.logo?.id;
+
+  if (contactImageUrl && contactImageUrl.startsWith('http')) {
     try {
-      const file = new File(
-        Paths.cache.uri + contact.contactProfile?.avatar.id,
-      );
+      const file = new File(Paths.cache.uri + contactImageId);
       if (!file.exists) {
-        await File.downloadFileAsync(contact.contactProfile?.avatar?.uri, file);
+        await File.downloadFileAsync(contactImageUrl, file);
       }
       const image = file.base64();
       if (image) {

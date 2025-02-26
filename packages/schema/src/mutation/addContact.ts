@@ -2,15 +2,18 @@ import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
 
 import {
+  checkMedias,
   createContact,
   getContactByProfiles,
   incrementShareBacks,
   incrementShareBacksTotal,
+  referencesMedias,
   transaction,
   updateContact,
 } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
+import { isDefined } from '@azzapp/shared/isDefined';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { notifyUsers, sendPushNotification } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
@@ -42,6 +45,12 @@ const addContact: MutationResolvers['addContact'] = async (
       })
     : null;
 
+  const data = [input.avatarId, input.logoId].filter(isDefined);
+  if (data.length) {
+    await checkMedias(data);
+    await referencesMedias(data, null);
+  }
+
   const contactToCreate: Omit<Contact, 'deletedAt' | 'id'> = {
     avatarId: input.avatarId ?? null,
     addresses: input.addresses,
@@ -59,6 +68,7 @@ const addContact: MutationResolvers['addContact'] = async (
     urls: input.urls || null,
     socials: input.socials || null,
     createdAt: new Date(),
+    logoId: input.logoId ?? null,
   };
 
   let contact: Contact;

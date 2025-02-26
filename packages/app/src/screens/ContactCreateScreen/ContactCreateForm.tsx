@@ -16,6 +16,7 @@ import { buildContactStyleSheet } from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { saveTransformedImageToFile } from '#helpers/mediaEditions';
 import useScreenDimensions from '#hooks/useScreenDimensions';
+import ContactCardEditCompanyLogo from '#screens/ContactCardEditScreen/ContactCardEditCompanyLogo';
 import CheckBox from '#ui/CheckBox';
 import Separation from '#ui/Separation';
 import Text from '#ui/Text';
@@ -173,6 +174,9 @@ const ContactCreateForm = ({ control, scanImage }: ContactCreateFormProps) => {
               </View>
             )}
           />
+
+          <Separation small />
+          <ContactCardEditCompanyLogo control={control} />
           <Separation />
           <ContactEditPhones control={control} />
           <Separation />

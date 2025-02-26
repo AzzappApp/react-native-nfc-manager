@@ -123,6 +123,12 @@ jest.mock('expo-file-system/next', () => {
         uri: '/mock/cache/directory/',
       },
     },
+    File: jest.fn().mockImplementation(() => {
+      return {
+        exists: true,
+        base64: () => '<BASE64DATA>',
+      };
+    }),
   };
 });
 

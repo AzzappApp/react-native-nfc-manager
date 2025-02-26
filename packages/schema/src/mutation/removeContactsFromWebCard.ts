@@ -1,5 +1,10 @@
 import { GraphQLError } from 'graphql';
-import { getWebcardsFromContactIds, removeContactsbyIds } from '@azzapp/data';
+import {
+  getWebcardsFromContactIds,
+  getWebcardsMediaFromContactIds,
+  referencesMedias,
+  removeContactsbyIds,
+} from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { getSessionInfos } from '#GraphQLContext';
 import { profileLoader } from '#loaders';
@@ -38,6 +43,10 @@ const removeContactsFromWebCardMutation: Mutation = async (
   });
 
   if (contactIdsToRemove.length > 0) {
+    const data = await getWebcardsMediaFromContactIds(contactIdsToRemove);
+    if (data.length) {
+      await referencesMedias([], data);
+    }
     await removeContactsbyIds(contactIdsToRemove);
   }
 

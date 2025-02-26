@@ -46,6 +46,14 @@ export const contactSchema = z
       })
       .optional()
       .nullable(),
+    logo: z
+      .object({
+        uri: z.string(),
+        id: z.string().optional(),
+        local: z.boolean().optional(),
+      })
+      .optional()
+      .nullable(),
   })
   .refine(
     data => !!data.firstName || !!data.lastName,

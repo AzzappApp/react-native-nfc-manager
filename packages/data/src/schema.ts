@@ -1014,6 +1014,7 @@ export const ContactTable = cols.table(
     socials: cols
       .json('socials')
       .$type<Array<{ url: string; label: string }>>(),
+    logoId: cols.mediaId('logoId'),
   },
   table => {
     return {

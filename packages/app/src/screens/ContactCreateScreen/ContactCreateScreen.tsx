@@ -8,6 +8,7 @@ import * as mime from 'react-native-mime-types'; // FIXME import is verry big
 import Toast from 'react-native-toast-message';
 import { useMutation } from 'react-relay';
 import { graphql, Observable } from 'relay-runtime';
+import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
 import { colors } from '#theme';
 import ContactCardDetector from '#components/ContactCardScanner/ContactCardDetector';
 import {
@@ -83,16 +84,14 @@ const ContactCreateScreen = ({
     },
   });
 
-  const submit = handleSubmit(async ({ avatar, ...data }) => {
+  const submit = handleSubmit(async ({ avatar, logo, ...data }) => {
     if (!profileId) {
       return;
     }
 
-    let upload;
+    const uploads = [];
 
     if (avatar?.local && avatar.uri) {
-      setProgressIndicator(Observable.from(0));
-
       const fileName = getFileName(avatar.uri);
       const file: any = {
         name: fileName,
@@ -104,18 +103,52 @@ const ContactCreateScreen = ({
         kind: 'image',
         target: 'avatar',
       });
-      upload = uploadMedia(file, uploadURL, uploadParameters);
+      uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+    } else {
+      uploads.push(null);
+    }
+
+    if (logo?.local && logo.uri) {
+      const fileName = getFileName(logo.uri);
+      const file: any = {
+        name: fileName,
+        uri: logo.uri,
+        type: mime.lookup(fileName) || 'image/jpeg',
+      };
+
+      const { uploadURL, uploadParameters } = await uploadSign({
+        kind: 'image',
+        target: 'logo',
+      });
+      uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+    } else {
+      uploads.push(null);
+    }
+
+    const uploadsToDo = uploads.filter(val => val !== null);
+
+    if (uploadsToDo.length) {
+      setProgressIndicator(Observable.from(0));
       setProgressIndicator(
-        upload.progress.map(({ loaded, total }) => loaded / total),
+        combineMultiUploadProgresses(
+          uploadsToDo.map(upload => upload.progress),
+        ),
       );
     }
 
-    const uploadedAvatarId = await upload?.promise.then(({ public_id }) => {
-      return public_id;
-    });
+    const [uploadedAvatarId, uploadedLogoId] = await Promise.all(
+      uploads.map(upload =>
+        upload?.promise.then(({ public_id }) => {
+          return public_id;
+        }),
+      ),
+    );
 
     const avatarId =
       avatar === null ? null : avatar?.local ? uploadedAvatarId : avatar?.id;
+
+    const logoId =
+      logo === null ? null : logo?.local ? uploadedLogoId : logo?.id;
 
     commit({
       variables: {
@@ -123,6 +156,7 @@ const ContactCreateScreen = ({
         notify: data.notify,
         contact: {
           avatarId,
+          logoId,
           emails: data.emails?.length
             ? data.emails.filter(email => email.address)
             : [],

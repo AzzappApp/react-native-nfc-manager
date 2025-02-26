@@ -153,6 +153,10 @@ const ContactsScreenLists = ({
                   id
                   uri: uri(width: 61, pixelRatio: $pixelRatio, format: png)
                 }
+                logo {
+                  id
+                  uri: uri(width: 61, pixelRatio: $pixelRatio, format: png)
+                }
                 birthday
                 contactProfile {
                   id

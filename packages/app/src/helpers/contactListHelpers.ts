@@ -74,6 +74,9 @@ export const buildLocalContact = async (
     if ('contactProfile' in contact && contact.contactProfile?.avatar?.uri) {
       contactAvatar = contact.contactProfile?.avatar;
     }
+    if (!contactAvatar && 'logo' in contact) {
+      contactAvatar = contact?.logo;
+    }
     if (contactAvatar) {
       const file = new File(Paths.cache.uri + contactAvatar.id);
       avatar = file.exists
@@ -84,6 +87,7 @@ export const buildLocalContact = async (
     Sentry.captureException(e);
     console.error('download avatar failure', e);
   }
+
   const image = avatar
     ? {
         // The downloaded avatar
@@ -96,7 +100,11 @@ export const buildLocalContact = async (
           width: (contact.image as Image).width,
           height: (contact.image as Image).height,
         }
-      : undefined;
+      : 'logo' in contact && contact.logo
+        ? {
+            uri: contact.logo.uri,
+          }
+        : undefined;
 
   return {
     ...contact,

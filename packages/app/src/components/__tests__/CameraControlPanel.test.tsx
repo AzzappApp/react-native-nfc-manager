@@ -1,14 +1,6 @@
 import CameraControlPanel from '#components/CameraControlPanel';
 import { fireEvent, render, screen } from '#helpers/testHelpers';
 
-jest.mock('expo-file-system/next', () => ({
-  Paths: {
-    cache: {
-      uri: 'file://temp',
-    },
-  },
-}));
-
 describe('CameraControlPanel', () => {
   test('Should render a shutter button in photo mode', () => {
     const onTakePhoto = jest.fn();

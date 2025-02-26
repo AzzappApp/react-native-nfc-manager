@@ -6,6 +6,7 @@ describe('ShareContact', () => {
     const contact: ContactType = {
       addresses: [],
       avatar: null,
+      logo: null,
       birthday: null,
       company: '',
       contactProfile: null,
@@ -30,6 +31,7 @@ describe('ShareContact', () => {
         { address: 'paris', label: 'work' },
       ],
       avatar: null,
+      logo: null,
       birthday: '2012-12-21',
       company: 'azzapp',
       contactProfile: null,
@@ -61,6 +63,7 @@ describe('ShareContact', () => {
     const contact: ContactType = {
       addresses: [],
       avatar: null,
+      logo: null,
       birthday: null,
       company: '',
       contactProfile: null,
@@ -83,6 +86,72 @@ describe('ShareContact', () => {
         },
       ],
     } as ContactType;
+    const vCard = await buildVCardFromAzzappContact(contact);
+    expect(vCard).toMatchSnapshot();
+  });
+  test('buildVCardFromAzzappContact with avatar', async () => {
+    const contact: ContactType = {
+      addresses: [],
+      avatar: { id: 'avatarId', uri: 'http://avatar.com' },
+      logo: null,
+      birthday: null,
+      company: '',
+      contactProfile: null,
+      createdAt: new Date('2012-12-21'),
+      emails: [],
+      firstName: '',
+      id: '',
+      lastName: '',
+      phoneNumbers: [],
+      socials: null,
+      title: '',
+      urls: null,
+      webCard: null,
+    };
+    const vCard = await buildVCardFromAzzappContact(contact);
+    expect(vCard).toMatchSnapshot();
+  });
+  test('buildVCardFromAzzappContact with logo', async () => {
+    const contact: ContactType = {
+      addresses: [],
+      avatar: null,
+      logo: { id: 'logoId', uri: 'http://logo.com' },
+      birthday: null,
+      company: '',
+      contactProfile: null,
+      createdAt: new Date('2012-12-21'),
+      emails: [],
+      firstName: '',
+      id: '',
+      lastName: '',
+      phoneNumbers: [],
+      socials: null,
+      title: '',
+      urls: null,
+      webCard: null,
+    };
+    const vCard = await buildVCardFromAzzappContact(contact);
+    expect(vCard).toMatchSnapshot();
+  });
+  test('buildVCardFromAzzappContact with logo and avatar', async () => {
+    const contact: ContactType = {
+      addresses: [],
+      avatar: { id: 'avatarId', uri: 'http://avatar.com' },
+      logo: { id: 'logoId', uri: 'http://logo.com' },
+      birthday: null,
+      company: '',
+      contactProfile: null,
+      createdAt: new Date('2012-12-21'),
+      emails: [],
+      firstName: '',
+      id: '',
+      lastName: '',
+      phoneNumbers: [],
+      socials: null,
+      title: '',
+      urls: null,
+      webCard: null,
+    };
     const vCard = await buildVCardFromAzzappContact(contact);
     expect(vCard).toMatchSnapshot();
   });

@@ -13,6 +13,14 @@ export const Contact: ContactResolvers = {
         }
       : null;
   },
+  logo: contact => {
+    return contact.logoId
+      ? {
+          media: contact.logoId,
+          assetKind: 'contactCard',
+        }
+      : null;
+  },
   webCard: contact => {
     if (contact.contactProfileId) {
       return getWebCardByProfileId(contact.contactProfileId);

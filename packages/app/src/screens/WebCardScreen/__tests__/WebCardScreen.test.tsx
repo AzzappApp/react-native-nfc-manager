@@ -9,13 +9,6 @@ import type { WebCardScreenByIdQuery } from '#relayArtifacts/WebCardScreenByIdQu
 import type { RelayMockEnvironment } from 'relay-test-utils/lib/RelayModernMockEnvironment';
 
 jest.mock('react-native-share', () => ({}));
-jest.mock('expo-file-system/next', () => ({
-  Paths: {
-    cache: {
-      uri: 'file:///cache-dir',
-    },
-  },
-}));
 
 describe('WebCardScreen', () => {
   const environment: RelayMockEnvironment = createMockEnvironment();

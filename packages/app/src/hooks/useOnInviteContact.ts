@@ -106,6 +106,13 @@ const useOnInviteContact = ({ onEnd }: { onEnd?: () => void } = {}) => {
               );
 
               const resultId = await addContactAsync(contact).catch(e => {
+                Toast.show({
+                  type: 'error',
+                  text1: intl.formatMessage({
+                    defaultMessage: 'Create contact failed.',
+                    description: 'Toast for creating new contact failed',
+                  }),
+                });
                 Sentry.captureException(e);
                 return '';
               });

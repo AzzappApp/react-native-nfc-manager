@@ -23,16 +23,11 @@ import type {
   ContactCardEditCompanyLogoMutation,
   ContactCardEditCompanyLogoMutation$data,
 } from '#relayArtifacts/ContactCardEditCompanyLogoMutation.graphql';
-import type { ContactCardFormValues } from './ContactCardSchema';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { Control } from 'react-hook-form';
 import type { ViewProps } from 'react-native';
 
-const ContactCardEditCompanyLogo = ({
-  control,
-}: {
-  control: Control<ContactCardFormValues>;
-}) => {
+const ContactCardEditCompanyLogo = ({ control }: { control: Control<any> }) => {
   const styles = useStyleSheet(stylesheet);
 
   const { field: fieldCompany } = useController({
