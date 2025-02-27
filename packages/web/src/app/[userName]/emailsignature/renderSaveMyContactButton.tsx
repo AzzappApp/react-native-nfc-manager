@@ -39,8 +39,8 @@ const renderSaveMyContactButton = ({
       style="
         display: block;
         background-color: ${primaryColor};
-        height: 34px;
-        line-height: 34px;
+        padding: 10px 0;
+        line-height: 14px;
         min-width: 125px;
         border-radius: 48px;
         font-size: 12px;

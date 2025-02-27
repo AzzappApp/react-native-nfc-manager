@@ -1,3 +1,4 @@
+import chroma from 'chroma-js';
 import { colors } from '@azzapp/shared/colorsHelpers';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
 import mailLogo from '@azzapp/web/public/signature/mail.png';
@@ -43,6 +44,7 @@ const renderFullEmailSignature = ({
             src="${contact.avatar}"
           />
           <![endif]-->
+          5
         </td>
       </tr>
     `
@@ -63,11 +65,17 @@ const renderFullEmailSignature = ({
     </tr>
   `;
 
+  let titleColor = webCard.cardColors?.primary ?? colors.black;
+  const rgba = chroma(titleColor).rgba();
+  if (rgba[0] * 0.299 + rgba[1] * 0.587 + rgba[2] * 0.114 > 186) {
+    titleColor = '#54535B';
+  }
+
   const titleSection = contact?.title
     ? `<tr valign="top">
         <td style="padding-bottom: 5px;" >
           <span style="
-            color: ${webCard.cardColors?.primary ?? colors.black};"
+            color: ${titleColor};"
             line-height: 10px;
             font-size: 14px;
             font-weight: 500;
@@ -95,19 +103,22 @@ const renderFullEmailSignature = ({
 
   const generateContactLink = (href: string, text: string, logo: string) =>
     `<tr>
-      <td style="padding: 0; vertical-align: middle;">
+      <td style="padding: 2.5px 0; vertical-align: middle;" valign="middle">
         <img
-          src="${removeDoubleSlash(`${process.env.NEXT_PUBLIC_URL}${logo}`)}"
+          src="${removeDoubleSlash(`${logo}`)}"
           width="14"
           height="14"
         />
       </td>
-      <td style="padding: 0 0 5px 4px;">
+      <td style="padding: 0 0 5px 4px; vertical-align: middle;" valign="middle">
         <a
           style="
             padding: 0;
             font-size: 12px;
             line-height: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
             font-weight: 400;
             text-align: center;
             color: black;
@@ -173,7 +184,7 @@ const renderFullEmailSignature = ({
       <tr>
         <td
           valign="top"
-          style="border-right: 1px solid #E2E1E3; padding-right: 15px;"
+          style="border-right: 1px solid #E2E1E3; padding-right: 15px; min-width: 160px"
         >
           <table style="padding-bottom: 12px;">
             ${nameSection}
