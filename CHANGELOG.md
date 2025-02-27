@@ -1,3 +1,7 @@
+## 1.8.0-canary.41
+
+* **fix:**  - **HomeScreen:** prevent revenue cat query to fail offline boot ([#7620](https://github.com/AzzappApp/azzapp/pull/7620))
+
 ## 1.8.0-canary.40
 
 
