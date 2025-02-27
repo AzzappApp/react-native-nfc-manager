@@ -1,3 +1,9 @@
+## 1.8.0-canary.49
+
+* **fix:**  - compute scrollViewHeight instead of using hardcoded values ([#7639](https://github.com/AzzappApp/azzapp/pull/7639))
+* **fix:**  - ensure buttons are not transparent when disabled ([#7637](https://github.com/AzzappApp/azzapp/pull/7637))
+* **fix:**  - split tags correctly and fix font not applyed to text columns ([#7636](https://github.com/AzzappApp/azzapp/pull/7636))
+
 ## 1.8.0-canary.48
 
 
