@@ -1,3 +1,7 @@
+## 1.8.0-canary.37
+
+* **fix:**  - **EmailSigature:** fix few issues on android and apple mail
+
 ## 1.8.0-canary.36
 
 
