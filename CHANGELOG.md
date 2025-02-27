@@ -1,3 +1,7 @@
+## 1.8.0-canary.45
+
+* **feat:**  - **ContactCard:** [#1191](https://github.com/AzzappApp/azzapp/pull/1191) implement auto update of apple wallet  ([#7602](https://github.com/AzzappApp/azzapp/pull/7602))
+
 ## 1.8.0-canary.44
 
 * **fix:**  - **EmailSignature:** copy from safari produce invalid icons images
