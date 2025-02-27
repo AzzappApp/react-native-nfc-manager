@@ -279,7 +279,7 @@ export const notifyUsers = async (
               };
             }
             const vCard = await buildVCardFromSerializedContact(
-              profile.id,
+              webCard.userName,
               serializeContactCard(
                 profile.id,
                 webCard.id,
