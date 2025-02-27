@@ -104,7 +104,7 @@ const renderFullEmailSignature = ({
     `<tr>
       <td style="padding: 0; vertical-align: middle;" valign="middle">
         <img
-          src="${removeDoubleSlash(`${logo}`)}"
+          src="${removeDoubleSlash(`${process.env.NEXT_PUBLIC_URL}${logo}`)}"
           width="20"
           height="20"
         />
