@@ -42,7 +42,9 @@ const PostFeedHeader = (props: PostFeedHeaderProps) => {
           <Link
             href={`/${webCard.userName}`}
             className={styles.headerName}
-            style={{ color: background ? getTextColor(background) : undefined }}
+            style={{
+              color: background ? getTextColor(background) : colors.black,
+            }}
           >
             {webCard.userName}
           </Link>
