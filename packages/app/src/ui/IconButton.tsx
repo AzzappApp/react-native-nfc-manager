@@ -8,7 +8,10 @@ import type { Icons } from './Icon';
 import type { PressableOpacityProps } from './PressableOpacity';
 import type { StyleProp, ImageStyle, ViewProps } from 'react-native';
 
-export type IconButtonProps = PressableOpacityProps &
+export type IconButtonProps = Pick<
+  PressableOpacityProps,
+  'disabled' | 'disabledOpacity'
+> &
   ViewProps & {
     icon: Icons;
     /**
