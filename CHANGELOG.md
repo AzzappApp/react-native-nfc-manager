@@ -1,3 +1,9 @@
+## 1.8.0-canary.43
+
+* **fix:**  - apply RichText on TextAndTitle and ensure center is correctly applied ([#7624](https://github.com/AzzappApp/azzapp/pull/7624))
+* **fix:**  - add missing RichText in desktop column rendering ([#7625](https://github.com/AzzappApp/azzapp/pull/7625))
+* **fix:**  - ensure ref is well handled ([#7626](https://github.com/AzzappApp/azzapp/pull/7626))
+
 ## 1.8.0-canary.42
 
 * **fix:**  - **EmailSignature:** add plain text error fallback in clipboard copy
