@@ -1,3 +1,8 @@
+## 1.8.0-canary.44
+
+* **fix:**  - **EmailSignature:** copy from safari produce invalid icons images
+* **fix:**  - ensure we handle correctly incorrect AI anwer ([#7627](https://github.com/AzzappApp/azzapp/pull/7627))
+
 ## 1.8.0-canary.43
 
 * **fix:**  - apply RichText on TextAndTitle and ensure center is correctly applied ([#7624](https://github.com/AzzappApp/azzapp/pull/7624))
