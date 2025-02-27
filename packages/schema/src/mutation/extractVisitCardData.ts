@@ -1,4 +1,4 @@
-import { captureException } from '@sentry/nextjs';
+import * as Sentry from '@sentry/nextjs';
 import { GraphQLError } from 'graphql';
 import { z } from 'zod';
 import ERRORS from '@azzapp/shared/errors';
@@ -58,10 +58,19 @@ export const extractVisitCardData: MutationResolvers['extractVisitCardData'] =
       );
 
       const data = await response.json();
+      if (!data.choices?.[0]?.message?.content) {
+        Sentry.captureMessage('cannot parse AI answer request', {
+          extra: {
+            image: args.imgUrl,
+            data,
+          },
+        });
+        return null;
+      }
       const match = data.choices[0].message.content.match(/\{[^}]*\}/); // Extract JSON object from the response
       return match ? businessCardSchema.parse(JSON.parse(match[0])) : null;
     } catch (error) {
-      captureException(error);
+      Sentry.captureException(error);
     }
 
     return null;
