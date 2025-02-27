@@ -59,6 +59,10 @@ const TextInputWithEllipsizeMode = ({
     onBlur?.(e);
   };
 
+  const onTextPress = () => {
+    nativeTextInputRef?.current?.focus();
+  };
+
   return (
     <View style={style as ViewStyle}>
       <TextInput
@@ -80,7 +84,7 @@ const TextInputWithEllipsizeMode = ({
       />
       {!isFocused ? (
         <Text
-          onPress={nativeTextInputRef?.current?.focus}
+          onPress={onTextPress}
           {...props}
           allowFontScaling={false}
           ellipsizeMode="tail"

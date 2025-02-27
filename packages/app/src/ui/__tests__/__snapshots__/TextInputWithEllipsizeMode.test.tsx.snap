@@ -40,6 +40,7 @@ exports[`TextInputWithEllipsizeMode component change text value 1`] = `
     ellipsizeMode="tail"
     maxFontSizeMultiplier={1}
     numberOfLines={1}
+    onPress={[Function]}
     style={
       [
         {
@@ -121,6 +122,7 @@ exports[`TextInputWithEllipsizeMode component with value 1`] = `
     ellipsizeMode="tail"
     maxFontSizeMultiplier={1}
     numberOfLines={1}
+    onPress={[Function]}
     style={
       [
         {
@@ -201,6 +203,7 @@ exports[`TextInputWithEllipsizeMode empty component 1`] = `
     ellipsizeMode="tail"
     maxFontSizeMultiplier={1}
     numberOfLines={1}
+    onPress={[Function]}
     style={
       [
         {
