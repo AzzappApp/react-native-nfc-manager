@@ -9,6 +9,7 @@ import {
 } from '@azzapp/shared/cardModuleHelpers';
 import { fontsMap } from '#helpers/fonts';
 import { DEFAULT_MODULE_TEXT, DEFAULT_MODULE_TITLE } from '#helpers/modules';
+import { RichText } from '#helpers/richText';
 import useContainerWidth from '#hooks/useContainerWidth';
 import styles from './index.css';
 import type { ModuleRendererProps } from '../ModuleRenderer';
@@ -115,6 +116,7 @@ const TitleTextRenderer = ({
           padding: Math.max(20, cardStyle?.gap ?? 0),
           gap: Math.max(20, cardStyle?.gap ?? 0),
           flexDirection: titleOnTop ? 'column' : 'row',
+          alignItems: columns.length === 1 ? 'center' : undefined,
         }}
       >
         {titleOnTop && (
@@ -132,6 +134,7 @@ const TitleTextRenderer = ({
             {title ?? DEFAULT_MODULE_TITLE}
           </h2>
         )}
+
         <div
           className={styles.column}
           style={{
@@ -156,17 +159,17 @@ const TitleTextRenderer = ({
           {columns.map((columnText, index) => (
             <p
               key={index}
-              className={cn(
-                styles.text,
-                fontsMap[cardStyle.fontFamily].className,
-              )}
+              className={styles.text}
               style={{
                 color: swapColor(cardModuleColor?.text, colorPalette),
                 fontSize: cardStyle.fontSize,
                 ...getTextAlignmentStyle(module.variant),
               }}
             >
-              {columnText.trim()}
+              <RichText
+                fontFamily={cardStyle.fontFamily}
+                text={columnText.trim()}
+              />
             </p>
           ))}
         </div>

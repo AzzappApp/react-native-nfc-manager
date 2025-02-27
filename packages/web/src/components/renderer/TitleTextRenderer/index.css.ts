@@ -12,7 +12,6 @@ const container = style({
 const section = style({
   width: 'min(100vw, 1000px)',
   display: 'flex',
-  alignItems: 'center',
 });
 
 const column = style({
