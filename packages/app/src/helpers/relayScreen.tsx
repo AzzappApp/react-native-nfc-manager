@@ -293,10 +293,6 @@ function relayScreen<TRoute extends Route>(
       }
     }, []);
 
-    const cancel = useCallback(() => {
-      router.back();
-    }, [router]);
-
     const errorBoundaryRef = useRef<ErrorBoundary | null>(null);
     const retry = useCallback(() => {
       errorBoundaryRef.current?.reset();
@@ -336,7 +332,7 @@ function relayScreen<TRoute extends Route>(
             return (
               <ErrorFallback
                 retry={retry}
-                cancel={cancel}
+                cancel={router.back}
                 canGoBack={canGoBack}
               />
             );

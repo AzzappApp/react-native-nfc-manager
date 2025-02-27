@@ -10,7 +10,7 @@ import {
   useState,
 } from 'react';
 import { IntlProvider } from 'react-intl';
-import { Platform, useColorScheme, StyleSheet, Modal } from 'react-native';
+import { Platform, useColorScheme, StyleSheet, View } from 'react-native';
 import { hide as hideSplashScreen } from 'react-native-bootsplash';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
@@ -66,6 +66,7 @@ import useApplicationFonts, {
 } from '#hooks/useApplicationFonts';
 import useBoolean from '#hooks/useBoolean';
 import { useDeepLink } from '#hooks/useDeepLink';
+import useScreenDimensions from '#hooks/useScreenDimensions';
 import AboutScreen from '#screens/AboutScreen';
 import AccountDetailsScreen from '#screens/AccountDetailsScreen';
 import CardModuleEditionScreen from '#screens/CardModuleEditionScreen';
@@ -450,6 +451,7 @@ const AppRouter = () => {
       showOfflineScreen();
     }
   }, [isConnected, showOfflineScreen]);
+  const { width: screenWidth, height: screenHeight } = useScreenDimensions();
 
   // TODO handle errors
   const [fontLoaded] = useApplicationFonts();
@@ -484,15 +486,20 @@ const AppRouter = () => {
               <Suspense>
                 <ShakeShare />
               </Suspense>
-              <Modal
-                visible={offlineScreenDisplayed}
-                onRequestClose={isConnected ? hideOfflineScreen : () => void 0}
-              >
-                <OfflineVCardScreenRenderer
-                  onClose={hideOfflineScreen}
-                  canLeaveScreen={isConnected}
-                />
-              </Modal>
+
+              {offlineScreenDisplayed ? (
+                <View
+                  style={{
+                    width: screenWidth,
+                    height: screenHeight,
+                  }}
+                >
+                  <OfflineVCardScreenRenderer
+                    onClose={hideOfflineScreen}
+                    canLeaveScreen={isConnected}
+                  />
+                </View>
+              ) : undefined}
             </GestureHandlerRootView>
           </SafeAreaProvider>
         </ScreenPrefetcherProvider>
