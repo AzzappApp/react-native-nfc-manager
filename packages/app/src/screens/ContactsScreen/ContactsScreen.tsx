@@ -20,7 +20,6 @@ import Text from '#ui/Text';
 
 import ContactScreenLists from './ContactsScreenLists';
 import type { ContactsScreenQuery } from '#relayArtifacts/ContactsScreenQuery.graphql';
-import type { GestureResponderEvent } from 'react-native';
 import type { PreloadedQuery } from 'react-relay';
 
 const contactsScreenQuery = graphql`
@@ -65,20 +64,15 @@ const ContactsScreen = ({
     }
   }, [closeNewContactMenu, profile?.id, router]);
 
-  const onCreateContact = useCallback(
-    (e: GestureResponderEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      closeNewContactMenu();
-      if (profile?.id) {
-        router.push({
-          route: 'CONTACT_CREATE',
-          params: { profileId: profile.id, showCardScanner: false },
-        });
-      }
-    },
-    [closeNewContactMenu, profile?.id, router],
-  );
+  const onCreateContact = useCallback(() => {
+    closeNewContactMenu();
+    if (profile?.id) {
+      router.push({
+        route: 'CONTACT_CREATE',
+        params: { profileId: profile.id, showCardScanner: false },
+      });
+    }
+  }, [closeNewContactMenu, profile?.id, router]);
 
   const intl = useIntl();
 
