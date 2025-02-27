@@ -57,10 +57,22 @@ const EmailSignatureGenerator = ({
             saveContactMessage,
             url: saveContactURL,
           });
-    const type = 'text/html';
-    const blob = new Blob([signature], { type });
-    const data = [new ClipboardItem({ [type]: blob })];
-    await navigator.clipboard.write(data);
+    await navigator.clipboard.write([
+      new ClipboardItem({
+        'text/html': new Blob([signature], { type: 'text/html' }),
+        'text/plain': new Blob(
+          [
+            intl.formatMessage({
+              defaultMessage:
+                "This email client doesn't support rich text signatures",
+              description: 'Signature web link / HTML signature not supported',
+              id: 'ZvoN2Y',
+            }),
+          ],
+          { type: 'text/plain' },
+        ),
+      }),
+    ]);
   };
 
   const [activeClient, setActiveClient] = useState('gmail');

@@ -44,7 +44,6 @@ const renderFullEmailSignature = ({
             src="${contact.avatar}"
           />
           <![endif]-->
-          5
         </td>
       </tr>
     `
