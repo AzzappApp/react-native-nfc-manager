@@ -7,14 +7,14 @@ import {
   getCarouselDefaultColors,
   type CardModuleTitleTextData,
 } from '@azzapp/shared/cardModuleHelpers';
-import { fontsMap } from '#helpers/fonts';
+import { splitRichTextIntoColumns } from '@azzapp/shared/richText/stringUpdate';
+import { fontsMap, webCardTextFontsMap } from '#helpers/fonts';
 import { DEFAULT_MODULE_TEXT, DEFAULT_MODULE_TITLE } from '#helpers/modules';
 import { RichText } from '#helpers/richText';
 import useContainerWidth from '#hooks/useContainerWidth';
 import styles from './index.css';
 import type { ModuleRendererProps } from '../ModuleRenderer';
 import type { CardModuleBase } from '@azzapp/data';
-
 export type TitleTextRendererProps = ModuleRendererProps<
   CardModuleBase & {
     data: CardModuleTitleTextData;
@@ -94,7 +94,10 @@ const TitleTextRenderer = ({
     return { titleOnTop, nbColumn };
   }, [containerWidth, module.variant]);
 
-  const columns = splitTextIntoColumns(text ?? DEFAULT_MODULE_TEXT, nbColumn);
+  const columns = splitRichTextIntoColumns(
+    text ?? DEFAULT_MODULE_TEXT,
+    nbColumn,
+  );
 
   return (
     <div
@@ -159,17 +162,17 @@ const TitleTextRenderer = ({
           {columns.map((columnText, index) => (
             <p
               key={index}
-              className={styles.text}
+              className={cn(
+                styles.text,
+                webCardTextFontsMap[cardStyle.fontFamily].className,
+              )}
               style={{
                 color: swapColor(cardModuleColor?.text, colorPalette),
                 fontSize: cardStyle.fontSize,
                 ...getTextAlignmentStyle(module.variant),
               }}
             >
-              <RichText
-                fontFamily={cardStyle.fontFamily}
-                text={columnText.trim()}
-              />
+              <RichText fontFamily={cardStyle.fontFamily} text={columnText} />
             </p>
           ))}
         </div>
@@ -192,20 +195,6 @@ const getTitleAlignmentStyle = (variant: string | null) => {
     return { textAlign: 'left' as const };
   }
   return getTextAlignmentStyle(variant);
-};
-
-const splitTextIntoColumns = (text: string, nbColumn: number): string[] => {
-  const words = text.split(' ');
-  const wordsPerColumn = Math.ceil(words.length / nbColumn);
-  const columns = Array.from({ length: nbColumn }, () => '');
-
-  for (let i = 0; i < nbColumn; i++) {
-    columns[i] = words
-      .slice(i * wordsPerColumn, (i + 1) * wordsPerColumn)
-      .join(' ');
-  }
-
-  return columns;
 };
 
 const getTextAlignmentStyle = (variant: string | null) => {

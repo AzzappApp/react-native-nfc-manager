@@ -6,9 +6,15 @@
 import { isDefined } from '../isDefined';
 import {
   simplifyRichTextAST,
+  splitRichTextAST,
   splitRichTextASTInThree,
 } from './internalToolbox';
-import { createNodeFromText } from './stringToolbox';
+import {
+  createNodeFromText,
+  generateHTMLFromRichText,
+  getRawTextFromRichText,
+  parseHTMLToRichText,
+} from './stringToolbox';
 import type { RichTextASTNode } from './richTextTypes';
 
 /*
@@ -281,4 +287,60 @@ export const forceUpdateTextInRichText = (
     console.warn('impossible to forceUpdateTextInRichText length do not match');
     return node;
   }
+};
+
+/**
+ * Helper function to help splitting text into multiple columns
+ *
+ * @param text input text to split
+ * @param nbColumn number of column to generate
+ * @returns an array of formatted sting to display
+ */
+export const splitRichTextIntoColumns = (
+  text: string,
+  nbColumn: number,
+): string[] => {
+  if (nbColumn === 1) {
+    return [text];
+  }
+  const ast = parseHTMLToRichText(text);
+
+  // need to remove html tags to compute word count
+  const cleanedText = getRawTextFromRichText(ast);
+  const words = cleanedText.split(' ');
+  const wordsPerColumn = Math.ceil(words.length / nbColumn);
+  const columns = Array.from({ length: nbColumn }, () => '');
+
+  // split the text without html tags
+  for (let i = 0; i < nbColumn; i++) {
+    columns[i] = words
+      .slice(i * wordsPerColumn, (i + 1) * wordsPerColumn)
+      .join(' ');
+  }
+
+  // regenerate splitted text with the tags
+  let astToSplit: RichTextASTNode | undefined = ast;
+  const richColumns = columns.map(text => {
+    if (!astToSplit) return '';
+    // split text into 2 parts
+    const splittedAST = splitRichTextAST(
+      astToSplit,
+      astToSplit.start + text.length,
+    );
+    astToSplit = splittedAST.second;
+
+    // trim second text
+    const secondText = getRawTextFromRichText(astToSplit);
+    let spaceStart = 0;
+    while (secondText[spaceStart] === ' ') {
+      spaceStart = spaceStart + 1;
+    }
+    if (astToSplit) {
+      removeTextInRichText(astToSplit, astToSplit.start, spaceStart);
+    }
+    // return generated text
+    const result = generateHTMLFromRichText(splittedAST.first);
+    return result;
+  });
+  return richColumns;
 };

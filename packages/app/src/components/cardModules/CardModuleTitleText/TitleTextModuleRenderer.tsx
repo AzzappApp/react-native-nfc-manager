@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { graphql, readInlineData } from 'react-relay';
+import { splitRichTextIntoColumns } from '@azzapp/shared/richText/stringUpdate';
 import { RichText } from '#components/ui/RichText';
 import { getTextStyle, getTitleStyle } from '#helpers/cardModuleHelpers';
 import useScreenDimensions from '#hooks/useScreenDimensions';
@@ -211,7 +212,7 @@ const TitleTextColumnRenderer = ({
 }) => {
   const nbColumn = variantToNbColumn(variant);
   const columns = useMemo(
-    () => splitTextIntoColumns(text, nbColumn),
+    () => splitRichTextIntoColumns(text, nbColumn),
     [text, nbColumn],
   );
   const textViewContainerStyle = useMemo(() => {
@@ -268,20 +269,6 @@ const TitleTextColumnRenderer = ({
       )}
     </View>
   );
-};
-
-const splitTextIntoColumns = (text: string, nbColumn: number): string[] => {
-  const words = text.split(' ');
-  const wordsPerColumn = Math.ceil(words.length / nbColumn);
-  const columns = Array.from({ length: nbColumn }, () => '');
-
-  for (let i = 0; i < nbColumn; i++) {
-    columns[i] = words
-      .slice(i * wordsPerColumn, (i + 1) * wordsPerColumn)
-      .join(' ');
-  }
-
-  return columns;
 };
 
 //when 1/2 column, the layout if fully horizonta with the title on left

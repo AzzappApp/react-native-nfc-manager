@@ -372,19 +372,21 @@ export const webCardTextFontsVariantsMap: Record<
   WebcardTextFonts,
   fontVariants
 > = {
-  SourcePro_Regular_Bold: { bold: { fontWeight: '600' } },
-  SourceSans3_Regular: { bold: { fontWeight: '600' } },
-  Raleway_Regular: { bold: { fontWeight: '600' } },
-  'Plus-Jakarta_Light': { bold: { fontWeight: '600' } },
-  OpenSans_Regular: { bold: { fontWeight: '600' } },
-  Montserrat_Regular: { bold: { fontWeight: '600' } },
-  Jost_Regular: { bold: { fontWeight: '600' } },
-  JosefinSans_Regular: { bold: { fontWeight: '600' } },
-  Fraunces_Light: { bold: { fontWeight: '600' } },
-  CourrierPrime_Regular: { bold: { fontWeight: '700' } },
-  CormorantGaramond_Regular: { bold: { fontWeight: '600' } },
-  Archivo_Light: { bold: { fontWeight: '600' } },
-  Inter_Regular: { bold: { fontWeight: '600' } },
+  SourcePro_Regular_Bold: { bold: { fontWeight: '600', fontFamily: 'bold' } },
+  SourceSans3_Regular: { bold: { fontWeight: '600', fontFamily: 'bold' } },
+  Raleway_Regular: { bold: { fontWeight: '600', fontFamily: 'bold' } },
+  'Plus-Jakarta_Light': { bold: { fontWeight: '600', fontFamily: 'bold' } },
+  OpenSans_Regular: { bold: { fontWeight: '600', fontFamily: 'bold' } },
+  Montserrat_Regular: { bold: { fontWeight: '600', fontFamily: 'bold' } },
+  Jost_Regular: { bold: { fontWeight: '600', fontFamily: 'bold' } },
+  JosefinSans_Regular: { bold: { fontWeight: '600', fontFamily: 'bold' } },
+  Fraunces_Light: { bold: { fontWeight: '600', fontFamily: 'bold' } },
+  CourrierPrime_Regular: { bold: { fontWeight: '700', fontFamily: 'bold' } },
+  CormorantGaramond_Regular: {
+    bold: { fontWeight: '600', fontFamily: 'bold' },
+  },
+  Archivo_Light: { bold: { fontWeight: '600', fontFamily: 'bold' } },
+  Inter_Regular: { bold: { fontWeight: '600', fontFamily: 'bold' } },
 };
 
 export const webCardTitleFontsMap: Record<WebcardTitleFonts, NextFont> = {

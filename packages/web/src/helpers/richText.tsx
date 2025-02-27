@@ -9,12 +9,17 @@ import type {
   RichTextASTTags,
 } from '@azzapp/shared/richText/richTextTypes';
 
-export const generateComponentFromRichTextAst = (
-  node: RichTextASTNode,
-  fontFamily: string,
-  style: React.CSSProperties = {},
-  stackedTags: RichTextASTTags[] = [],
-): JSX.Element => {
+export const RichTextFromAst = ({
+  node,
+  fontFamily,
+  style = {},
+  stackedTags = [],
+}: {
+  node: RichTextASTNode;
+  fontFamily: string;
+  style?: React.CSSProperties;
+  stackedTags?: RichTextASTTags[];
+}): JSX.Element => {
   if (node.type === 'text') {
     let newStyle = { ...style };
     if (stackedTags.includes('b')) {
@@ -40,27 +45,33 @@ export const generateComponentFromRichTextAst = (
       </span>
     );
   } else if (isRichTextTag(node.type)) {
-    stackedTags.push(node.type as RichTextASTTags);
+    const newStackedTags = [...stackedTags, node.type as RichTextASTTags];
     const result = (
       <>
-        {node.children?.map(child =>
-          generateComponentFromRichTextAst(
-            child,
-            fontFamily,
-            style,
-            stackedTags,
-          ),
-        )}
+        {node.children?.map((child, index) => (
+          <RichTextFromAst
+            key={`child-${index}`}
+            fontFamily={fontFamily}
+            style={style}
+            stackedTags={newStackedTags}
+            node={child}
+          />
+        ))}
       </>
     );
-    stackedTags.pop();
     return result;
   }
   return (
     <>
-      {node.children?.map(child =>
-        generateComponentFromRichTextAst(child, fontFamily, style, stackedTags),
-      )}
+      {node.children?.map((child, index) => (
+        <RichTextFromAst
+          key={`child-${index}`}
+          fontFamily={fontFamily}
+          style={style}
+          stackedTags={stackedTags}
+          node={child}
+        />
+      ))}
     </>
   );
 };
@@ -77,5 +88,5 @@ export const RichText: React.FC<RichTextProps> = ({
   style,
 }): JSX.Element => {
   const ast = parseHTMLToRichText(text);
-  return generateComponentFromRichTextAst(ast, fontFamily, style);
+  return <RichTextFromAst fontFamily={fontFamily} style={style} node={ast} />;
 };
