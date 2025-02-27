@@ -103,11 +103,11 @@ const renderFullEmailSignature = ({
 
   const generateContactLink = (href: string, text: string, logo: string) =>
     `<tr>
-      <td style="padding: 2.5px 0; vertical-align: middle;" valign="middle">
+      <td style="padding: 0; vertical-align: middle;" valign="middle">
         <img
           src="${removeDoubleSlash(`${logo}`)}"
-          width="14"
-          height="14"
+          width="20"
+          height="20"
         />
       </td>
       <td style="padding: 0 0 5px 4px; vertical-align: middle;" valign="middle">
