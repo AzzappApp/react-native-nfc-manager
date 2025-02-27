@@ -1,3 +1,8 @@
+## 1.8.0-canary.39
+
+* **fix:**  - **EmailSignature:** change icon
+* **fix:**  - **webCard:** [#7600](https://github.com/AzzappApp/azzapp/pull/7600) crash when page has no lastBackgroundColor ([#7609](https://github.com/AzzappApp/azzapp/pull/7609))
+
 ## 1.8.0-canary.38
 
 
