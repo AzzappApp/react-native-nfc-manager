@@ -11,7 +11,9 @@ import Animated, {
 import Toast from 'react-native-toast-message';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { colors, shadow } from '#theme';
-import AccountHeader from '#components/AccountHeader';
+import AccountHeader, {
+  HEADER_PADDING_BOTTOM,
+} from '#components/AccountHeader';
 import AddToWalletButton from '#components/AddToWalletButton';
 import ContactCard, {
   CONTACT_CARD_RATIO,
@@ -24,11 +26,13 @@ import { generateEmailSignature } from '#helpers/MobileWebAPI';
 import relayScreen from '#helpers/relayScreen';
 import useAnimatedState from '#hooks/useAnimatedState';
 import useScreenDimensions from '#hooks/useScreenDimensions';
+import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import FingerHint from '#ui/FingerHint';
+import { HEADER_HEIGHT } from '#ui/Header';
 import Icon from '#ui/Icon';
 import LoadingView from '#ui/LoadingView';
 import PressableAnimated from '#ui/PressableAnimated';
@@ -200,6 +204,8 @@ export const ContactCardScreen = ({
     }
   }, [profile?.invited, profile?.webCard?.cardIsPublished, router]);
 
+  const { bottom, top } = useScreenInsets();
+
   if (!webCard) {
     return null;
   }
@@ -250,7 +256,16 @@ export const ContactCardScreen = ({
           )}
 
           <ScrollView
-            style={[styles.scrollViewStyle, { height: height - 247 }]}
+            style={[
+              styles.scrollViewStyle,
+              {
+                height:
+                  height -
+                  styles.editContactCardButton.height -
+                  cardHeight -
+                  (HEADER_HEIGHT + top + HEADER_PADDING_BOTTOM),
+              },
+            ]}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{
               gap: 20,
@@ -320,7 +335,7 @@ export const ContactCardScreen = ({
                 <SignaturePreview profile={profile} />
               </View>
             </View>
-            <View style={{ height: 90, width: '100%' }} />
+            <View style={{ height: bottom + 15, width: '100%' }} />
           </ScrollView>
         </Animated.View>
       </View>
