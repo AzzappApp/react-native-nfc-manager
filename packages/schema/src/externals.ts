@@ -38,6 +38,14 @@ export const validateMailOrPhone = externalFunction<
   (type: 'email' | 'phone', issuer: string, token: string) => Promise<void>
 >('validateMailOrPhone');
 
+export const notifyApplePassWallet = externalFunction<
+  (pushToken: string) => void
+>('notifyApplePassWallet');
+
+export const notifyGooglePassWallet = externalFunction<
+  (profileId: string, locale: string) => void
+>('notifyGooglePassWallet');
+
 type MessageType = {
   type: 'multiuser_invitation' | 'shareBack';
   mediaId?: string | null;

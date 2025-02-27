@@ -632,6 +632,7 @@ export const ProfileTable = cols.table(
       .dateTime('lastContactViewAt')
       .default(DEFAULT_DATETIME_VALUE)
       .notNull(),
+    hasGooglePass: cols.boolean('hasGooglePass').default(false).notNull(),
   },
   table => {
     return {
@@ -1065,3 +1066,24 @@ export const TermsOfUseTable = cols.table('TermsOfUse', {
 });
 export type TermsOfUse = InferSelectModel<typeof TermsOfUseTable>;
 //#endregion
+
+export const PassRegistrationTable = cols.table(
+  'PassRegistration',
+  {
+    deviceIdentifier: cols.defaultVarchar('deviceIdentifier').notNull(),
+    passTypeIdentifier: cols.defaultVarchar('passTypeIdentifier').notNull(),
+    serial: cols.defaultVarchar('serial').notNull(),
+    pushToken: cols.defaultVarchar('pushToken').notNull(),
+    createdAt: cols
+      .dateTime('createdAt')
+      .notNull()
+      .default(DEFAULT_DATETIME_VALUE),
+  },
+  table => ({
+    pk: cols.primaryKey({
+      columns: [table.deviceIdentifier, table.passTypeIdentifier, table.serial],
+    }),
+  }),
+);
+
+export type PassRegistration = InferSelectModel<typeof PassRegistrationTable>;

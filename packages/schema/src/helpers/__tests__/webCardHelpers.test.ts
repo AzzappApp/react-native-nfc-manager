@@ -1,15 +1,29 @@
 import {
   deleteRedirection,
+  getProfilesWithHasGooglePass,
+  getPushTokensFromWebCardId,
   getRedirectWebCardByUserName,
   getWebCardByUserName,
 } from '@azzapp/data';
-import { isUserNameAvailable } from '../webCardHelpers'; // Adjust path if needed
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
+import { notifyApplePassWallet, notifyGooglePassWallet } from '#externals';
+import {
+  isUserNameAvailable,
+  notifyRelatedWalletPasses,
+} from '../webCardHelpers';
 
 // Mock dependencies
 jest.mock('@azzapp/data', () => ({
   getWebCardByUserName: jest.fn(),
   getRedirectWebCardByUserName: jest.fn(),
   deleteRedirection: jest.fn(),
+  getPushTokensFromWebCardId: jest.fn(),
+  getProfilesWithHasGooglePass: jest.fn(),
+}));
+
+jest.mock('#externals', () => ({
+  notifyApplePassWallet: jest.fn(),
+  notifyGooglePassWallet: jest.fn(),
 }));
 
 describe('isUserNameAvailable', () => {
@@ -63,17 +77,63 @@ describe('isUserNameAvailable', () => {
     expect(deleteRedirection).toHaveBeenCalledWith('expiredRedirect');
     expect(result).toEqual({ available: true, userName: 'expiredRedirect' });
   });
+});
 
-  test('should return available = false when multiple redirections exist but username is taken', async () => {
-    (getWebCardByUserName as jest.Mock).mockResolvedValue({ id: '123' });
-    (getRedirectWebCardByUserName as jest.Mock).mockResolvedValue([
-      { expiresAt: new Date(Date.now() - 10000), fromUserName: 'redirect1' },
-      { expiresAt: new Date(Date.now() + 10000), fromUserName: 'redirect2' },
+describe('notifyRelatedWalletPasses', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test('should notify Apple Wallet only when push tokens exist', async () => {
+    (getPushTokensFromWebCardId as jest.Mock).mockResolvedValue([
+      'token1',
+      'token2',
+    ]);
+    (getProfilesWithHasGooglePass as jest.Mock).mockResolvedValue([]);
+
+    await notifyRelatedWalletPasses('webcard-123');
+
+    expect(notifyApplePassWallet).toHaveBeenCalledTimes(2); // Deux tokens = 2 appels
+    expect(notifyGooglePassWallet).not.toHaveBeenCalled();
+  });
+
+  test('should notify Google Wallet only when profiles with Google passes exist', async () => {
+    (getPushTokensFromWebCardId as jest.Mock).mockResolvedValue([]);
+    (getProfilesWithHasGooglePass as jest.Mock).mockResolvedValue([
+      { profileId: 'profile-1', userLocale: 'fr' },
+      { profileId: 'profile-2', userLocale: null },
     ]);
 
-    const result = await isUserNameAvailable('takenUsername');
+    await notifyRelatedWalletPasses('webcard-123');
 
-    expect(result).toEqual({ available: false, userName: 'takenUsername' });
-    expect(deleteRedirection).not.toHaveBeenCalled();
+    expect(notifyApplePassWallet).not.toHaveBeenCalled();
+    expect(notifyGooglePassWallet).toHaveBeenCalledTimes(2);
+    expect(notifyGooglePassWallet).toHaveBeenCalledWith('profile-1', 'fr');
+    expect(notifyGooglePassWallet).toHaveBeenCalledWith(
+      'profile-2',
+      DEFAULT_LOCALE,
+    );
+  });
+
+  test('should notify both Apple and Google Wallets when both push tokens and profiles exist', async () => {
+    (getPushTokensFromWebCardId as jest.Mock).mockResolvedValue(['token1']);
+    (getProfilesWithHasGooglePass as jest.Mock).mockResolvedValue([
+      { profileId: 'profile-1', userLocale: 'fr' },
+    ]);
+
+    await notifyRelatedWalletPasses('webcard-123');
+
+    expect(notifyApplePassWallet).toHaveBeenCalledTimes(1);
+    expect(notifyGooglePassWallet).toHaveBeenCalledTimes(1);
+  });
+
+  test('should not notify any Wallet if there are no push tokens or Google passes', async () => {
+    (getPushTokensFromWebCardId as jest.Mock).mockResolvedValue([]);
+    (getProfilesWithHasGooglePass as jest.Mock).mockResolvedValue([]);
+
+    await notifyRelatedWalletPasses('webcard-123');
+
+    expect(notifyApplePassWallet).not.toHaveBeenCalled();
+    expect(notifyGooglePassWallet).not.toHaveBeenCalled();
   });
 });

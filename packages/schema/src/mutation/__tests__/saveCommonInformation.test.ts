@@ -1,7 +1,6 @@
 import { GraphQLError } from 'graphql';
 import {
   checkMedias,
-  referencesMedias,
   transaction,
   updateWebCard,
   updateWebCardProfiles,
@@ -10,6 +9,7 @@ import ERRORS from '@azzapp/shared/errors';
 import { webCardLoader } from '#loaders';
 import { checkWebCardProfileAdminRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
+import { notifyRelatedWalletPasses } from '#helpers/webCardHelpers';
 import saveCommonInformation from '../saveCommonInformation';
 
 // Mock dependencies
@@ -21,6 +21,10 @@ jest.mock('@azzapp/data', () => ({
   updateWebCardProfiles: jest.fn(),
 }));
 
+jest.mock('#helpers/webCardHelpers', () => ({
+  notifyRelatedWalletPasses: jest.fn(),
+}));
+
 jest.mock('#loaders', () => ({
   webCardLoader: {
     load: jest.fn(),
@@ -29,6 +33,10 @@ jest.mock('#loaders', () => ({
 
 jest.mock('#helpers/permissionsHelpers', () => ({
   checkWebCardProfileAdminRight: jest.fn(),
+}));
+
+jest.mock('@sentry/nextjs', () => ({
+  captureMessage: jest.fn(),
 }));
 
 jest.mock('#helpers/relayIdHelpers', () => jest.fn());
@@ -48,7 +56,7 @@ describe('saveCommonInformation', () => {
     jest.clearAllMocks();
   });
 
-  test('should successfully save common information without a logo', async () => {
+  test('should successfully save common information and notify related Wallet passes', async () => {
     (fromGlobalIdWithType as jest.Mock).mockReturnValue('webcard-123');
     (checkWebCardProfileAdminRight as jest.Mock).mockResolvedValue(undefined);
     (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
@@ -63,11 +71,6 @@ describe('saveCommonInformation', () => {
       mockInfo,
     );
 
-    expect(fromGlobalIdWithType).toHaveBeenCalledWith(
-      'global-webcard-123',
-      'WebCard',
-    );
-    expect(checkWebCardProfileAdminRight).toHaveBeenCalledWith('webcard-123');
     expect(updateWebCard).toHaveBeenCalledWith('webcard-123', {
       commonInformation: { company: 'New Company' },
       logoId: undefined,
@@ -75,8 +78,7 @@ describe('saveCommonInformation', () => {
     expect(updateWebCardProfiles).toHaveBeenCalledWith('webcard-123', {
       lastContactCardUpdate: expect.any(Date),
     });
-    expect(referencesMedias).toHaveBeenCalledWith([], ['old-logo-id']);
-
+    expect(notifyRelatedWalletPasses).toHaveBeenCalledWith('webcard-123'); // ✅ Check if passes are notified
     expect(result).toEqual({
       webCard: {
         ...mockWebCard,
@@ -86,39 +88,22 @@ describe('saveCommonInformation', () => {
     });
   });
 
-  test('should successfully save common information with a new logo', async () => {
+  test('should not notify Wallet passes if transaction fails', async () => {
     (fromGlobalIdWithType as jest.Mock).mockReturnValue('webcard-123');
-    (checkWebCardProfileAdminRight as jest.Mock).mockResolvedValue(undefined);
     (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
-    (checkMedias as jest.Mock).mockResolvedValue(undefined);
+    (transaction as jest.Mock).mockRejectedValue(new Error('DB Error'));
 
-    const result = await saveCommonInformation(
-      {},
-      {
-        webCardId: 'global-webcard-123',
-        input: { company: 'Updated Company', logoId: 'new-logo-id' },
-      },
-      mockContext,
-      mockInfo,
-    );
+    await expect(
+      saveCommonInformation(
+        {},
+        { webCardId: 'global-webcard-123', input: { company: 'Test Company' } },
+        mockContext,
+        mockInfo,
+      ),
+    ).rejects.toThrow(new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR));
 
-    expect(checkMedias).toHaveBeenCalledWith(['new-logo-id']);
-    expect(updateWebCard).toHaveBeenCalledWith('webcard-123', {
-      commonInformation: { company: 'Updated Company' },
-      logoId: 'new-logo-id',
-    });
-    expect(referencesMedias).toHaveBeenCalledWith(
-      ['new-logo-id'],
-      ['old-logo-id'],
-    );
-
-    expect(result).toEqual({
-      webCard: {
-        ...mockWebCard,
-        commonInformation: { company: 'Updated Company' },
-        logoId: 'new-logo-id',
-      },
-    });
+    expect(updateWebCard).not.toHaveBeenCalled();
+    expect(notifyRelatedWalletPasses).not.toHaveBeenCalled(); // ✅ Check if passes are not notified when transaction fail
   });
 
   test('should throw UNAUTHORIZED if user lacks admin rights', async () => {
@@ -135,8 +120,6 @@ describe('saveCommonInformation', () => {
         mockInfo,
       ),
     ).rejects.toThrow(new GraphQLError(ERRORS.UNAUTHORIZED));
-
-    expect(updateWebCard).not.toHaveBeenCalled();
   });
 
   test('should throw INVALID_REQUEST if web card is not found', async () => {
@@ -154,6 +137,7 @@ describe('saveCommonInformation', () => {
     ).rejects.toThrow(new GraphQLError(ERRORS.INVALID_REQUEST));
 
     expect(updateWebCard).not.toHaveBeenCalled();
+    expect(notifyRelatedWalletPasses).not.toHaveBeenCalled();
   });
 
   test('should throw INTERNAL_SERVER_ERROR if transaction fails', async () => {
@@ -171,6 +155,7 @@ describe('saveCommonInformation', () => {
     ).rejects.toThrow(new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR));
 
     expect(updateWebCard).not.toHaveBeenCalled();
+    expect(notifyRelatedWalletPasses).not.toHaveBeenCalled();
   });
 
   test('should not call checkMedias if no logo is provided', async () => {

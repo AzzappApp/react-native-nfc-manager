@@ -116,6 +116,7 @@ const createWebCardMutation: MutationResolvers['createWebCard'] = async (
         deletedAt: null,
         deletedBy: null,
         lastContactViewAt: currentDate,
+        hasGooglePass: false,
       } as const;
     });
 

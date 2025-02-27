@@ -1,8 +1,12 @@
 import {
   deleteRedirection,
+  getProfilesWithHasGooglePass,
+  getPushTokensFromWebCardId,
   getRedirectWebCardByUserName,
   getWebCardByUserName,
 } from '@azzapp/data';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
+import { notifyApplePassWallet, notifyGooglePassWallet } from '#externals';
 
 export const isUserNameAvailable = async (userName: string) => {
   const profile = await getWebCardByUserName(userName);
@@ -18,4 +22,20 @@ export const isUserNameAvailable = async (userName: string) => {
     }
   }
   return { available: false, userName };
+};
+
+export const notifyRelatedWalletPasses = async (webCardId: string) => {
+  const pushTokens = await getPushTokensFromWebCardId(webCardId);
+
+  if (pushTokens.length) {
+    pushTokens.map(notifyApplePassWallet);
+  }
+
+  const googleWalletPasses = await getProfilesWithHasGooglePass(webCardId);
+
+  if (googleWalletPasses.length) {
+    googleWalletPasses.map(({ profileId, userLocale }) =>
+      notifyGooglePassWallet(profileId, userLocale ?? DEFAULT_LOCALE),
+    );
+  }
 };

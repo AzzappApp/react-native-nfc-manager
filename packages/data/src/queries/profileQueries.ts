@@ -5,6 +5,7 @@ import {
   ContactTable,
   MediaTable,
   ProfileTable,
+  UserTable,
   WebCardTable,
 } from '../schema';
 import { getEntitiesByIds } from './entitiesQueries';
@@ -553,4 +554,48 @@ export const getProfilesWhereUserBIsOwner = async (
     .where(eq(ProfileTable.userId, userAId));
 
   return profiles;
+};
+
+/**
+ *
+ * @param profileIds collection of profile ids
+ * @param date is the date to compare the lastContactCardUpdate field
+ * @returns filtered profiles that have a lastContactCardUpdate greater than the date
+ */
+export const getUpdatedProfiles = async (profileIds: string[], date?: Date) => {
+  return db()
+    .select()
+    .from(ProfileTable)
+    .where(
+      and(
+        inArray(ProfileTable.id, profileIds),
+        date ? gt(ProfileTable.lastContactCardUpdate, date) : undefined,
+      ),
+    );
+};
+
+export const updateHasGooglePass = async (
+  profileId: string,
+  hasGooglePass: boolean,
+) => {
+  await db()
+    .update(ProfileTable)
+    .set({ hasGooglePass })
+    .where(eq(ProfileTable.id, profileId));
+};
+
+export const getProfilesWithHasGooglePass = async (webCardId: string) => {
+  return db()
+    .select({
+      profileId: ProfileTable.id,
+      userLocale: UserTable.locale,
+    })
+    .from(ProfileTable)
+    .innerJoin(UserTable, eq(UserTable.id, ProfileTable.userId))
+    .where(
+      and(
+        eq(ProfileTable.webCardId, webCardId),
+        eq(ProfileTable.hasGooglePass, true),
+      ),
+    );
 };

@@ -2,11 +2,15 @@ import { GraphQLError } from 'graphql';
 import {
   buildDefaultContactCard,
   checkMedias,
+  getPushTokens,
+  getUserById,
   referencesMedias,
   transaction,
   updateProfile,
 } from '@azzapp/data';
+import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
+import { notifyApplePassWallet, notifyGooglePassWallet } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
 import { profileLoader, webCardLoader } from '#loaders';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
@@ -21,6 +25,7 @@ const saveContactCard: MutationResolvers['saveContactCard'] = async (
   if (!userId) {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
+  const user = await getUserById(userId);
   const profileId = fromGlobalIdWithType(gqlProfileId, 'Profile');
   const profile = await profileLoader.load(profileId);
   if (!profile) {
@@ -71,6 +76,15 @@ const saveContactCard: MutationResolvers['saveContactCard'] = async (
   } catch (e) {
     console.error(e);
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
+  }
+
+  const pushTokens = await getPushTokens(profileId);
+  if (pushTokens.length) {
+    pushTokens.map(notifyApplePassWallet);
+  }
+
+  if (profile.hasGooglePass) {
+    notifyGooglePassWallet(profile.id, user?.locale ?? DEFAULT_LOCALE);
   }
 
   return {

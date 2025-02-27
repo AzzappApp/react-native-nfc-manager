@@ -1,6 +1,5 @@
 import {
   BarcodeTypeEnum,
-  GenericClient,
   GenericTypeEnum,
   MultipleDevicesAndHoldersAllowedStatusEnum,
   StateEnum,
@@ -11,10 +10,12 @@ import {
   buildDefaultContactCard,
   getProfileByUserAndWebCard,
   getWebCardById,
+  updateHasGooglePass,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
 import { buildUserUrlWithContactCard } from '@azzapp/shared/urlHelpers';
+import { generateGooglePassInfos } from '#helpers/pass/google';
 import { withPluginsRoute } from '#helpers/queries';
 import { getSessionData } from '#helpers/tokens';
 import type {
@@ -58,7 +59,8 @@ const getGoogleWalletPass = async (
       ).toString(),
     );
 
-    const generic = new GenericClient(credentials);
+    const { passId, issuerId, objectId, genericClient } =
+      generateGooglePassInfos(profile.id);
 
     const classPrefix = 'contactCard_class';
 
@@ -69,19 +71,18 @@ const getGoogleWalletPass = async (
         MultipleDevicesAndHoldersAllowedStatusEnum.ONE_USER_ALL_DEVICES,
     };
 
-    let genericClass = await generic.getClass(
+    let genericClass = await genericClient.getClass(
       process.env.GOOGLE_PASS_ISSUER_ID ?? '',
       `${classPrefix}`,
     );
 
     if (!genericClass) {
-      genericClass = await generic.createClass(classData);
+      genericClass = await genericClient.createClass(classData);
     } else {
-      genericClass = await generic.patchClass(classData);
+      genericClass = await genericClient.patchClass(classData);
     }
 
     // Create or update a contact card object
-    const objectSuffix = 'contactCard_object';
 
     const webCard = await getWebCardById(profile.webCardId);
 
@@ -132,7 +133,7 @@ const getGoogleWalletPass = async (
           alternateText: '',
         },
         classId: classData.id,
-        id: `${process.env.GOOGLE_PASS_ISSUER_ID}.${objectSuffix}.${profile.id}`,
+        id: passId,
         hexBackgroundColor: webCard?.cardColors?.primary ?? '#000000',
         state: StateEnum.ACTIVE,
         logo: {
@@ -160,16 +161,14 @@ const getGoogleWalletPass = async (
         ];
       }
 
-      let genericObject = await generic.getObject(
-        process.env.GOOGLE_PASS_ISSUER_ID ?? '',
-        `${objectSuffix}.${profile.id}`,
-      );
+      let genericObject = await genericClient.getObject(issuerId, objectId);
       if (!genericObject) {
-        genericObject = await generic.createObject(objectData);
+        genericObject = await genericClient.createObject(objectData);
       } else {
         // Update the object data
-        genericObject = await generic.patchObject(objectData);
+        genericObject = await genericClient.patchObject(objectData);
       }
+      await updateHasGooglePass(profile.id, true);
 
       const token = jwt.sign(
         {

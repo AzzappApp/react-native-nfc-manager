@@ -148,6 +148,7 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
         deletedAt: null,
         deletedBy: null,
         lastContactViewAt: creationDate,
+        hasGooglePass: false,
       };
       await referencesMedias(
         addedMedia,
