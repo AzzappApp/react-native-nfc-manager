@@ -1,3 +1,7 @@
+## 1.8.0-canary.42
+
+* **fix:**  - **EmailSignature:** add plain text error fallback in clipboard copy
+
 ## 1.8.0-canary.41
 
 * **fix:**  - **HomeScreen:** prevent revenue cat query to fail offline boot ([#7620](https://github.com/AzzappApp/azzapp/pull/7620))
