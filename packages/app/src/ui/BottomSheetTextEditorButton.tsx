@@ -43,6 +43,7 @@ export const BottomSheetTextEditorButton = ({
           : styles.buttonSelected,
       ]}
       disabled={isDisableInner}
+      disabledOpacity={1}
     />
   );
 };

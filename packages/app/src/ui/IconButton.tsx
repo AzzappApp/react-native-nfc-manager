@@ -5,45 +5,43 @@ import {
 import Icon from './Icon';
 import PressableOpacity from './PressableOpacity';
 import type { Icons } from './Icon';
+import type { PressableOpacityProps } from './PressableOpacity';
 import type { StyleProp, ImageStyle, ViewProps } from 'react-native';
 
-export type IconButtonProps = ViewProps & {
-  icon: Icons;
-  /**
-   * Size of the icon
-   *
-   * @type {number}
-   */
-  iconSize?: number;
-  /**
-   * Size of the container
-   *
-   * @type {number}
-   */
-  size?: number;
-  /**
-   *Action to call when pressing the icon
-   *
-   */
-  onPress?: () => void;
-  /**
-   * style of the icon
-   *
-   * @type {StyleProp<ImageStyle>}
-   */
-  iconStyle?: StyleProp<ImageStyle>;
-  /**
-   * @default 'border' like define in the Styleguide. with a border circle around
-   * icon :a simple version close to icon, without border and extra padding
-   *
-   * @type {('border' | 'icon')}
-   */
-  variant?: 'border' | 'icon';
-  /**
-   * @see https://reactnative.dev/docs/pressable#disabled
-   */
-  disabled?: boolean;
-};
+export type IconButtonProps = PressableOpacityProps &
+  ViewProps & {
+    icon: Icons;
+    /**
+     * Size of the icon
+     *
+     * @type {number}
+     */
+    iconSize?: number;
+    /**
+     * Size of the container
+     *
+     * @type {number}
+     */
+    size?: number;
+    /**
+     *Action to call when pressing the icon
+     *
+     */
+    onPress?: () => void;
+    /**
+     * style of the icon
+     *
+     * @type {StyleProp<ImageStyle>}
+     */
+    iconStyle?: StyleProp<ImageStyle>;
+    /**
+     * @default 'border' like define in the Styleguide. with a border circle around
+     * icon :a simple version close to icon, without border and extra padding
+     *
+     * @type {('border' | 'icon')}
+     */
+    variant?: 'border' | 'icon';
+  };
 
 const IconButton = ({
   onPress,
