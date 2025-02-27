@@ -32,7 +32,7 @@ const Button = (
   {
     label,
     variant = 'primary',
-    appearance,
+    appearance: appearanceProp,
     loading,
     disabled,
     style,
@@ -45,7 +45,7 @@ const Button = (
 ) => {
   const colorScheme = useColorScheme();
 
-  appearance = appearance ?? colorScheme ?? 'light';
+  const appearance = appearanceProp ?? colorScheme ?? 'light';
 
   const highlightColor =
     variant === 'primary'
@@ -107,11 +107,6 @@ const Button = (
             style,
             disabled && variantStyles.disabled,
           ]}
-          android_ripple={{
-            borderless: false,
-            foreground: true,
-            color: highlightColor,
-          }}
         />
       </View>
     );

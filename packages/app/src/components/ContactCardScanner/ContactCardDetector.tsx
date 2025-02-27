@@ -228,30 +228,22 @@ const ContactCardDetector = ({
     rotationGesture,
   );
 
-  const ref = useRef<View>(null);
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        { translateX: translateX.value },
-        { translateY: translateY.value },
-        { scale: scale.value },
-        { rotate: `${rotation.value}rad` },
-      ],
-    };
-  });
   const onSelectImage = useCallback(
     (params: ImagePickerResult) => {
-      const scaledWidth = height * params.aspectRatio;
-      translateX.value = scaledWidth > width ? (width - scaledWidth) / 2 : 0;
-      translateY.value = -(height - boxDimension.height) / 2;
+      translateX.value = 0;
+      translateY.value = 0;
       scale.value = 1;
       rotation.value = 0;
-      setImageGallery(params);
+      //resize  widht and height to fit the screen dimension, portrait use height screen dimension, landscape use width screen dimension
+      const imageSize =
+        params.aspectRatio > 1
+          ? { width, height: width / params.aspectRatio }
+          : { width: height * params.aspectRatio, height };
+      setImageGallery({ ...params, ...imageSize });
       setGalleryMode();
       closePicker();
     },
     [
-      boxDimension.height,
       closePicker,
       height,
       rotation,
@@ -301,226 +293,240 @@ const ContactCardDetector = ({
     }
   }, [close, closeLoading, commit, extractData, showLoading]);
 
+  const ref = useRef<View>(null);
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      height,
+      width,
+      transform: [
+        { translateX: -boxDimension.x + translateX.value },
+        { translateY: -boxDimension.y + translateY.value },
+        { scale: scale.value },
+        { rotate: `${rotation.value}rad` },
+      ],
+    };
+  });
+
   return (
-    <View style={styles.container}>
-      {isCameraMode && device && isActive ? (
-        <Camera
-          ref={camera}
-          style={styles.container}
-          device={device}
-          isActive={isActive}
-          photo
-          video={false}
-          androidPreviewViewType="surface-view"
-          outputOrientation="device"
-        />
-      ) : (
-        <GestureDetector gesture={composedGesture}>
+    <GestureDetector gesture={composedGesture}>
+      <View style={[styles.container, { width, height }]}>
+        {isCameraMode && device && isActive ? (
+          <Camera
+            ref={camera}
+            style={{ width, height }}
+            device={device}
+            isActive={isActive}
+            photo
+            video={false}
+            androidPreviewViewType="surface-view"
+            outputOrientation="device"
+          />
+        ) : (
           <View
             ref={ref}
-            style={[
-              StyleSheet.absoluteFill,
-              {
-                top: boxDimension.y,
-                left: boxDimension.x,
-                width: boxDimension.width,
-                height: boxDimension.height,
-                borderRadius: BORDER_RADIUS,
-                overflow: 'visible',
-                pointerEvents: 'box-none',
-              },
-            ]}
+            style={{
+              position: 'absolute',
+              top: boxDimension.y,
+              left: boxDimension.x,
+              width: boxDimension.width,
+              height: boxDimension.height * 2,
+              borderRadius: BORDER_RADIUS,
+            }}
+            collapsable={false}
           >
-            <Animated.View style={animatedStyle}>
+            <Animated.View style={[animatedStyle, styles.containerImage]}>
               <Image
                 source={{ uri: imageGallery?.uri }}
                 style={{
-                  height,
-                  aspectRatio: imageGallery?.aspectRatio,
+                  height: imageGallery?.height,
+                  width: imageGallery?.width,
                 }}
               />
             </Animated.View>
           </View>
-        </GestureDetector>
-      )}
-      <View
-        style={[
-          StyleSheet.absoluteFill,
-          { pointerEvents: isCameraMode ? 'box-none' : 'none' },
-        ]}
-      >
-        <GestureDetector gesture={gesture}>
-          <Svg height="100%" width="100%" style={StyleSheet.absoluteFill}>
-            <Defs>
-              <Mask id="mask" x="0" y="0" width="100%" height="100%">
-                <Rect height="100%" width="100%" fill="white" />
-                <Rect
-                  {...boxDimension}
-                  fill="black"
-                  rx={BORDER_RADIUS}
-                  ry={BORDER_RADIUS}
-                />
-              </Mask>
-            </Defs>
-            <Rect
-              height="100%"
-              width="100%"
-              fill="black"
-              mask="url(#mask)"
-              fillOpacity="0.6"
-            />
-          </Svg>
-        </GestureDetector>
-
-        <Text
-          variant="medium"
-          style={[
-            styles.whiteText,
-            {
-              color: 'white',
-              top: boxDimension.y - 40,
-              width,
-              textAlign: 'center',
-            },
-          ]}
-        >
-          <FormattedMessage
-            defaultMessage="Make sure all of the information is in the frame"
-            description="ContactCardDetector - information for scanning card"
-          />
-        </Text>
-      </View>
-      <View style={StyleSheet.absoluteFill}>
+        )}
         <View
           style={[
-            {
-              width,
-              top: top + 20,
-            },
-            styles.viewButton,
+            StyleSheet.absoluteFill,
+            { pointerEvents: isCameraMode ? 'box-none' : 'none' },
           ]}
         >
-          <IconButton
-            icon="close"
-            variant="icon"
-            style={{ position: 'absolute', left: 20 }}
-            iconStyle={{ tintColor: 'white' }}
-            size={30}
-            onPress={close}
-          />
-          <Text variant="large" style={styles.whiteText}>
+          <GestureDetector gesture={gesture}>
+            <Svg height="100%" width="100%" style={StyleSheet.absoluteFill}>
+              <Defs>
+                <Mask id="mask" x="0" y="0" width="100%" height="100%">
+                  <Rect height="100%" width="100%" fill="white" />
+                  <Rect
+                    {...boxDimension}
+                    fill="black"
+                    rx={BORDER_RADIUS}
+                    ry={BORDER_RADIUS}
+                  />
+                </Mask>
+              </Defs>
+              <Rect
+                height="100%"
+                width="100%"
+                fill="black"
+                mask="url(#mask)"
+                fillOpacity="0.6"
+              />
+            </Svg>
+          </GestureDetector>
+          <Text
+            variant="medium"
+            style={[
+              styles.whiteText,
+              {
+                color: 'white',
+                top: boxDimension.y - 40,
+                width,
+                textAlign: 'center',
+              },
+            ]}
+          >
             <FormattedMessage
-              defaultMessage="Scan your paper business card"
-              description="ContactCardDetector - title Scan your paper business card"
+              defaultMessage="Make sure all of the information is in the frame"
+              description="ContactCardDetector - information for scanning card"
             />
           </Text>
         </View>
-        <View
-          style={[
-            styles.containerCameraAlign,
-            {
-              width,
-
-              top:
-                boxDimension.y + boxDimension.height + (isHorizontal ? 50 : 15),
-            },
-          ]}
-        >
-          <Pressable
-            onPress={setHorizontal}
-            style={[styles.button, isHorizontal && styles.selected]}
+        <View style={StyleSheet.absoluteFill}>
+          <View
+            style={[
+              {
+                width,
+                top: top + 20,
+              },
+              styles.viewButton,
+            ]}
           >
-            <Image source={horizontal} style={styles.icon} />
-          </Pressable>
-          <Pressable
-            onPress={setVertical}
-            style={[styles.button, !isHorizontal && styles.selected]}
-          >
-            <View style={[styles.button, !isHorizontal && styles.selected]}>
-              <Image source={vertical} style={styles.icon} />
-            </View>
-          </Pressable>
-        </View>
-        <View
-          style={[
-            {
-              bottom: bottom + 20,
-            },
-            styles.bottomButtonController,
-          ]}
-        >
-          <View style={styles.buttonViewContainer}>
             <IconButton
-              icon="add_media"
-              size={44}
-              iconSize={24}
-              style={styles.iconButton}
-              iconStyle={{ tintColor: colors.white }}
-              onPress={openPicker}
+              icon="close"
+              variant="icon"
+              style={{ position: 'absolute', left: 20 }}
+              iconStyle={{ tintColor: 'white' }}
+              size={30}
+              onPress={close}
             />
+            <Text variant="large" style={styles.whiteText}>
+              <FormattedMessage
+                defaultMessage="Scan your paper business card"
+                description="ContactCardDetector - title Scan your paper business card"
+              />
+            </Text>
           </View>
-
-          {isCameraMode ? (
-            <Pressable onPress={takePicture} style={styles.takePictureButton} />
-          ) : (
-            <Button
-              label={intl.formatMessage({
-                defaultMessage: 'Ok',
-                description: 'Contact card Detector - Ok Button',
-              })}
-              appearance="dark"
-              style={{ height: 47, width: 80 }}
-              onPress={extractDataFromGalleryMedia}
-            />
-          )}
-          <View style={styles.buttonViewContainer}>
-            {!isCameraMode && (
+          <View
+            style={[
+              styles.containerCameraAlign,
+              {
+                width,
+                top:
+                  boxDimension.y +
+                  boxDimension.height +
+                  (isHorizontal ? 50 : 15),
+              },
+            ]}
+          >
+            <Pressable
+              onPress={setHorizontal}
+              style={[styles.button, isHorizontal && styles.selected]}
+            >
+              <Image source={horizontal} style={styles.icon} />
+            </Pressable>
+            <Pressable
+              onPress={setVertical}
+              style={[styles.button, !isHorizontal && styles.selected]}
+            >
+              <View style={[styles.button, !isHorizontal && styles.selected]}>
+                <Image source={vertical} style={styles.icon} />
+              </View>
+            </Pressable>
+          </View>
+          <View
+            style={[
+              {
+                bottom: bottom + 20,
+              },
+              styles.bottomButtonController,
+            ]}
+          >
+            <View style={styles.buttonViewContainer}>
               <IconButton
-                icon="camera"
+                icon="add_media"
                 size={44}
                 iconSize={24}
-                iconStyle={{ tintColor: colors.white }}
                 style={styles.iconButton}
-                onPress={() => {
-                  setImageGallery(null);
-                  setCameraMode();
-                }}
+                iconStyle={{ tintColor: colors.white }}
+                onPress={openPicker}
+              />
+            </View>
+
+            {isCameraMode ? (
+              <Pressable
+                onPress={takePicture}
+                style={styles.takePictureButton}
+              />
+            ) : (
+              <Button
+                label={intl.formatMessage({
+                  defaultMessage: 'Ok',
+                  description: 'Contact card Detector - Ok Button',
+                })}
+                appearance="dark"
+                style={{ height: 47, width: 80 }}
+                onPress={extractDataFromGalleryMedia}
               />
             )}
+            <View style={styles.buttonViewContainer}>
+              {!isCameraMode && (
+                <IconButton
+                  icon="camera"
+                  size={44}
+                  iconSize={24}
+                  iconStyle={{ tintColor: colors.white }}
+                  style={styles.iconButton}
+                  onPress={() => {
+                    setImageGallery(null);
+                    setCameraMode();
+                  }}
+                />
+              )}
+            </View>
           </View>
         </View>
+        <ScreenModal
+          visible={loading}
+          onRequestDismiss={closeLoading}
+          gestureEnabled={false}
+        >
+          <UploadProgressModal
+            text={intl.formatMessage({
+              defaultMessage: 'Reading Information',
+              description:
+                'Contact card Detector - Reading Information while processing image',
+            })}
+          />
+        </ScreenModal>
+        <ScreenModal
+          visible={showPicker}
+          animationType="slide"
+          onRequestDismiss={closePicker}
+        >
+          <ImagePicker
+            kind="image"
+            onFinished={onSelectImage}
+            onCancel={closePicker}
+            steps={[SelectImageStep]}
+          />
+        </ScreenModal>
+        <PermissionModal
+          permissionsFor="photo"
+          onRequestClose={closePermission}
+          autoFocus={showPermission}
+        />
       </View>
-      <ScreenModal
-        visible={loading}
-        onRequestDismiss={closeLoading}
-        gestureEnabled={false}
-      >
-        <UploadProgressModal
-          text={intl.formatMessage({
-            defaultMessage: 'Reading Information',
-            description:
-              'Contact card Detector - Reading Information while processing image',
-          })}
-        />
-      </ScreenModal>
-      <ScreenModal
-        visible={showPicker}
-        animationType="slide"
-        onRequestDismiss={closePicker}
-      >
-        <ImagePicker
-          kind="image"
-          onFinished={onSelectImage}
-          onCancel={closePicker}
-          steps={[SelectImageStep]}
-        />
-      </ScreenModal>
-      <PermissionModal
-        permissionsFor="photo"
-        onRequestClose={closePermission}
-        autoFocus={showPermission}
-      />
-    </View>
+    </GestureDetector>
   );
 };
 
@@ -529,6 +535,12 @@ const TAKE_BUTTON_SIZE = 74;
 const BORDER_RADIUS = 20;
 
 const styles = StyleSheet.create({
+  containerImage: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'visible',
+    position: 'absolute',
+  },
   containerCameraAlign: {
     height: 44,
     flexDirection: 'row',
@@ -556,7 +568,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   whiteText: { color: 'white' },
-  container: { flex: 1, backgroundColor: 'black' },
+  container: { backgroundColor: 'black' },
   icon: { width: 30, height: 30 },
   button: {
     width: 44,

@@ -31,12 +31,7 @@ import type {
   ContactCard_profile$data,
   ContactCard_profile$key,
 } from '#relayArtifacts/ContactCard_profile.graphql';
-import type {
-  GestureResponderEvent,
-  LayoutChangeEvent,
-  StyleProp,
-  ViewStyle,
-} from 'react-native';
+import type { LayoutChangeEvent, StyleProp, ViewStyle } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 
 type ContactCardProps = {
@@ -217,14 +212,9 @@ export const ContactCardComponent = ({
     return fitbox('contain', src, dst);
   });
 
-  const onEdit = useCallback(
-    (e: GestureResponderEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      onEditProp?.();
-    },
-    [onEditProp],
-  );
+  const onEdit = useCallback(() => {
+    onEditProp?.();
+  }, [onEditProp]);
 
   if (!contactCard || !webCard) {
     return null;
