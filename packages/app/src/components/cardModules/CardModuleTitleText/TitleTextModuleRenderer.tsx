@@ -227,14 +227,13 @@ const TitleTextColumnRenderer = ({
           style={textViewContainerStyle}
           key={`titleTextModule_column_${index}`}
         >
-          <Text
+          <RichText
+            text={column}
             style={[
               getTextStyle(cardStyle, cardModuleColor),
               getTextAlignmentStyle(variant),
             ]}
-          >
-            {column}
-          </Text>
+          />
         </View>
       );
     });
