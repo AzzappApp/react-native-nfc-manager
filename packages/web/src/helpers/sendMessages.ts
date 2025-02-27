@@ -13,6 +13,7 @@ import {
   buildUserUrlWithContactCard,
 } from '@azzapp/shared/urlHelpers';
 import { buildVCardFromSerializedContact } from '@azzapp/shared/vCardHelpers';
+import { buildAvatarUrl } from './avatar';
 import { sendEmail, sendTemplateEmail } from './emailHelpers';
 import { getServerIntl } from './i18nHelpers';
 import { sendTwilioSMS } from './twilioHelpers';
@@ -265,16 +266,8 @@ export const notifyUsers = async (
                 profile.contactCard?.socials ?? [],
               ),
             };
-            const avatar = parameters?.profile?.avatarId
-              ? await getMediasByIds([parameters?.profile?.avatarId])
-              : null;
-            const avatarUrl = avatar?.[0]
-              ? getImageURLForSize({
-                  id: avatar?.[0]?.id,
-                  width: 100,
-                  height: 100,
-                })
-              : '';
+
+            const avatarUrl = await buildAvatarUrl(profile, webCard);
             if (avatarUrl) {
               const data = await fetch(avatarUrl);
               const blob = await data.arrayBuffer();
