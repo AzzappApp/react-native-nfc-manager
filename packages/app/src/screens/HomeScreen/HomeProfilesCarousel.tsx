@@ -482,22 +482,22 @@ const ItemRenderComponent = ({
                 prefetch
               />
             )}
-            {profile.webCard?.coverIsPredefined ||
-              (profile.webCard?.coverIsLogoPredefined && (
-                <PressableNative
-                  style={styles.editUserContainer}
-                  onPress={onPressEdit}
-                  android_ripple={{
-                    borderless: true,
-                    foreground: true,
-                  }}
-                >
-                  <BlurView style={styles.multiUserIconContainer}>
-                    <View ref={refEdit} style={styles.tooltipTarget} />
-                    <Icon icon="edit" style={styles.multiUserIcon} />
-                  </BlurView>
-                </PressableNative>
-              ))}
+            {(profile.webCard?.coverIsPredefined ||
+              profile.webCard?.coverIsLogoPredefined) && (
+              <PressableNative
+                style={styles.editUserContainer}
+                onPress={onPressEdit}
+                android_ripple={{
+                  borderless: true,
+                  foreground: true,
+                }}
+              >
+                <BlurView style={styles.multiUserIconContainer}>
+                  <View ref={refEdit} style={styles.tooltipTarget} />
+                  <Icon icon="edit" style={styles.multiUserIcon} />
+                </BlurView>
+              </PressableNative>
+            )}
             {isMultiUser && ENABLE_MULTI_USER && (
               <PressableNative
                 style={styles.multiUserContainer}

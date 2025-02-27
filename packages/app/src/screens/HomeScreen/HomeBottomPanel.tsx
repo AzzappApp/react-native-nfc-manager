@@ -150,11 +150,15 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
     },
   );
 
-  const registerTooltipInner = () => {
-    registerTooltip('profileBottomPanel', {
-      ref,
-    });
-  };
+  const registerTooltipInner = useCallback(() => {
+    if (selectedPanel === 'CONTACT_CARD') {
+      registerTooltip('profileBottomPanel', {
+        ref,
+      });
+    } else {
+      unregisterTooltip('profileBottomPanel');
+    }
+  }, [registerTooltip, selectedPanel, unregisterTooltip]);
 
   const unregisterTooltipInner = () => {
     unregisterTooltip('profileBottomPanel');
