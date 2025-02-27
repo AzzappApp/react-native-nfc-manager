@@ -59,7 +59,7 @@ exports[`BottomSheetTextEditorButton component disabled state 1`] = `
         ],
       ],
       {
-        "opacity": 0.3,
+        "opacity": 1,
       },
     ]
   }
@@ -150,7 +150,7 @@ exports[`BottomSheetTextEditorButton component selected state 1`] = `
         ],
       ],
       {
-        "opacity": 0.3,
+        "opacity": 1,
       },
     ]
   }
@@ -239,7 +239,7 @@ exports[`BottomSheetTextEditorButton component unselected state 1`] = `
         ],
       ],
       {
-        "opacity": 0.3,
+        "opacity": 1,
       },
     ]
   }
