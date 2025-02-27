@@ -268,7 +268,11 @@ function relayScreen<TRoute extends Route>(
       ) {
         refreshQuery();
         if (isConnectedPrevious.current !== isConnected) {
-          errorBoundaryRef.current?.reset();
+          // the timeout will prevent the rerender to catch error from the previous
+          // preloaded query
+          setTimeout(() => {
+            errorBoundaryRef.current?.reset();
+          }, 10);
         }
       }
       appStatePrevious.current = appState;
