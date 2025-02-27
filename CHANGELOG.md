@@ -1,3 +1,7 @@
+## 1.8.0-canary.40
+
+
+
 ## 1.8.0-canary.39
 
 * **fix:**  - **EmailSignature:** change icon
