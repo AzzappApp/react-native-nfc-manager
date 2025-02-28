@@ -1,3 +1,7 @@
+## 1.8.0-canary.52
+
+* **fix:**  - remove duplicated height dimension ([#7651](https://github.com/AzzappApp/azzapp/pull/7651))
+
 ## 1.8.0-canary.51
 
 * **fix:**  - contact detail background color is not full screen in dark mode ([#7645](https://github.com/AzzappApp/azzapp/pull/7645))
