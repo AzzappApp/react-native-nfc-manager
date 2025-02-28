@@ -1,3 +1,7 @@
+## 1.8.0-canary.55
+
+
+
 ## 1.8.0-canary.54
 
 * **perf:**  - **web:** [#7648](https://github.com/AzzappApp/azzapp/pull/7648) avoid rerenders on rich text ([#7653](https://github.com/AzzappApp/azzapp/pull/7653))
