@@ -9,10 +9,9 @@ import type { CommonInformation } from './contactCardHelpers';
  * @returns label to display in the VCard
  */
 export const addressLabelToVCardLabel = (label: string) => {
-  if (label === 'Home') return 'HOME';
-  if (label === 'Work') return 'WORK';
-  if (label === 'Main') return 'PREF;Main';
-  return undefined;
+  if (label === 'Home') return 'type=HOME';
+  if (label === 'Work') return 'type=WORK';
+  return 'type=PREF';
 };
 
 export const phoneLabelToVCardLabel = (label: string) => {

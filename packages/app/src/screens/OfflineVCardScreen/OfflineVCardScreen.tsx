@@ -231,8 +231,14 @@ export const OfflineVCardScreenRenderer = ({
           contactCard?.addresses?.forEach(addr => {
             if (addr.selected)
               vCard.addAddress(
+                undefined,
+                undefined,
                 addr.address,
-                addressLabelToVCardLabel(addr.label) || '',
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                addressLabelToVCardLabel(addr.label),
               );
           });
           if (webCard?.isMultiUser) {
@@ -257,7 +263,7 @@ export const OfflineVCardScreenRenderer = ({
             webCard?.commonInformation?.addresses?.forEach(addr => {
               vCard.addAddress(
                 addr.address,
-                addressLabelToVCardLabel(addr.label) || '',
+                addressLabelToVCardLabel(addr.label),
               );
             });
           }

@@ -351,11 +351,18 @@ export const buildVCardFromAzzappContact = async (contact: ContactType) => {
   });
 
   contact.addresses.forEach(addr => {
-    if (addr.address)
+    if (addr.address) {
       vCard.addAddress(
+        undefined,
+        undefined,
         addr.address,
-        addressLabelToVCardLabel(addr.label) || '',
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        addressLabelToVCardLabel(addr.label),
       );
+    }
   });
 
   const contactImageUrl =
@@ -420,7 +427,16 @@ export const buildVCardFromExpoContact = async (contact: Contact) => {
     fullAdress += addr.country || '';
 
     if (fullAdress.length)
-      vCard.addAddress(fullAdress, addressLabelToVCardLabel(addr.label) || '');
+      vCard.addAddress(
+        undefined,
+        undefined,
+        fullAdress,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        addressLabelToVCardLabel(addr.label),
+      );
   });
   if (contact?.image?.uri) {
     const file = new File(contact.image.uri);
