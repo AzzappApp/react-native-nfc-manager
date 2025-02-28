@@ -1,3 +1,7 @@
+## 1.8.0-canary.57
+
+* **fix:**  - bad test for alignment fix ([#7666](https://github.com/AzzappApp/azzapp/pull/7666))
+
 ## 1.8.0-canary.56
 
 
