@@ -215,12 +215,6 @@ const styleSheet = createStyleSheet(appearance => ({
   fieldTitleWithLock: { flexDirection: 'row', gap: 5, alignItems: 'center' },
   confirmModalButton: { width: 255 },
   ...buildContactStyleSheet(appearance),
-  imageScan: {
-    borderRadius: 20,
-    borderWidth: 2,
-    borderColor: colors.white,
-    overflow: 'hidden',
-  },
   imageContainer: {
     alignItems: 'center',
     marginTop: 20,

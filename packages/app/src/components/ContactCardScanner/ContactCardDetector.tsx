@@ -234,7 +234,7 @@ const ContactCardDetector = ({
       translateY.value = 0;
       scale.value = 1;
       rotation.value = 0;
-      //resize  widht and height to fit the screen dimension, portrait use height screen dimension, landscape use width screen dimension
+      //resize width and height to fit the screen dimension, portrait use height screen dimension, landscape use width screen dimension
       const imageSize =
         params.aspectRatio > 1
           ? { width, height: width / params.aspectRatio }
@@ -329,7 +329,7 @@ const ContactCardDetector = ({
               top: boxDimension.y,
               left: boxDimension.x,
               width: boxDimension.width,
-              height: boxDimension.height * 2,
+              height: boxDimension.height,
               borderRadius: BORDER_RADIUS,
             }}
             collapsable={false}
