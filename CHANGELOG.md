@@ -1,3 +1,7 @@
+## 1.8.0-canary.50
+
+
+
 ## 1.8.0-canary.49
 
 * **fix:**  - compute scrollViewHeight instead of using hardcoded values ([#7639](https://github.com/AzzappApp/azzapp/pull/7639))
