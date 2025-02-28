@@ -452,5 +452,5 @@ export const webCardTitleFontsMap: Record<WebcardTitleFonts, NextFont> = {
 
 export const fontsMap = {
   ...webCardTitleFontsMap,
-  ...webCardTitleFontsMap,
+  ...webCardTextFontsMap,
 };
