@@ -21,7 +21,7 @@ const NotifyGooglePassWalletSchema = z.object({
 
 export const POST = withPluginsRoute(async (req: Request) => {
   try {
-    checkServerAuth();
+    await checkServerAuth();
     const body = await req.json();
     const { profileId, locale } = NotifyGooglePassWalletSchema.parse(body);
 

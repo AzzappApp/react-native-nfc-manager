@@ -12,6 +12,7 @@ import { maxTokensPlugin } from '@escape.tech/graphql-armor-max-tokens';
 import { useDisableIntrospection } from '@graphql-yoga/plugin-disable-introspection';
 import { usePersistedOperations } from '@graphql-yoga/plugin-persisted-operations';
 import { waitUntil } from '@vercel/functions';
+import { getVercelOidcToken } from '@vercel/functions/oidc';
 import { Kind, OperationTypeNode, type GraphQLError } from 'graphql';
 import { createYoga } from 'graphql-yoga';
 import { compare } from 'semver';
@@ -31,7 +32,7 @@ import { getServerIntl } from '#helpers/i18nHelpers';
 import { sendPushNotification } from '#helpers/notificationsHelpers';
 import { withPluginsRoute } from '#helpers/queries';
 import { notifyUsers } from '#helpers/sendMessages';
-import { getSessionData } from '#helpers/tokens';
+import { checkServerAuth, getSessionData } from '#helpers/tokens';
 import packageJSON from '../../../../package.json';
 import type { LogLevel, Plugin as YogaPlugin } from 'graphql-yoga';
 
@@ -211,13 +212,16 @@ const { handleRequest } = createYoga({
       n: 2000, // Number of tokens allowed
     }),
     useDisableIntrospection({
-      isDisabled: request => {
-        return process.env.NODE_ENV !== 'production'
-          ? false
-          : process.env.API_SERVER_TOKEN
-            ? request.headers.get(AZZAPP_SERVER_HEADER) !==
-              process.env.API_SERVER_TOKEN
-            : true;
+      isDisabled: async () => {
+        if (process.env.NODE_ENV !== 'production') {
+          return false;
+        }
+        try {
+          await checkServerAuth();
+          return false;
+        } catch {
+          return true;
+        }
       },
     }),
     usePersistedOperations({
@@ -227,20 +231,20 @@ const { handleRequest } = createYoga({
       getPersistedOperation(id: string) {
         return (queryMap as any)[id];
       },
-      allowArbitraryOperations: request => {
+      allowArbitraryOperations: async () => {
         if (
           process.env.NODE_ENV !== 'production' ||
           process.env.NEXT_PUBLIC_PLATFORM === 'development'
         ) {
           return true;
         }
-        if (process.env.API_SERVER_TOKEN) {
-          return (
-            request.headers.get(AZZAPP_SERVER_HEADER) ===
-            process.env.API_SERVER_TOKEN
-          );
+
+        try {
+          await checkServerAuth();
+          return true;
+        } catch {
+          return false;
         }
-        return false;
       },
     }),
     useGenericAuth({
@@ -291,7 +295,7 @@ const validateMailOrPhone = async (
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        [AZZAPP_SERVER_HEADER]: process.env.API_SERVER_TOKEN ?? '',
+        [AZZAPP_SERVER_HEADER]: `Bearer ${await getVercelOidcToken()}`,
       },
       body: JSON.stringify({ type, issuer, token }),
     },
@@ -303,26 +307,33 @@ const validateMailOrPhone = async (
 
 const notifyApplePassWallet = (pushToken: string) => {
   waitUntil(
-    fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/notifyWallet/apple`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        [AZZAPP_SERVER_HEADER]: process.env.API_SERVER_TOKEN ?? '',
-      },
-      body: JSON.stringify({ pushToken }),
-    }),
+    (async () => {
+      await fetch(
+        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/notifyWallet/apple`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            [AZZAPP_SERVER_HEADER]: `Bearer ${await getVercelOidcToken()}`,
+          },
+          body: JSON.stringify({ pushToken }),
+        },
+      );
+    })(),
   );
 };
 
 const notifyGooglePassWallet = (profileId: string, locale: string) => {
   waitUntil(
-    fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/notifyWallet/google`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        [AZZAPP_SERVER_HEADER]: process.env.API_SERVER_TOKEN ?? '',
-      },
-      body: JSON.stringify({ profileId, locale }),
-    }),
+    (async () => {
+      fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/notifyWallet/google`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          [AZZAPP_SERVER_HEADER]: `Bearer ${await getVercelOidcToken()}`,
+        },
+        body: JSON.stringify({ profileId, locale }),
+      });
+    })(),
   );
 };

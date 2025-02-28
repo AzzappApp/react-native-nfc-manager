@@ -76,7 +76,7 @@ const notifyApplePassWallet = async (pushToken: string) => {
 
 export const POST = withPluginsRoute(async (req: Request) => {
   try {
-    checkServerAuth();
+    await checkServerAuth();
     const body = await req.json();
     const input = NotifyApplePassWalletSchema.parse(body);
 
