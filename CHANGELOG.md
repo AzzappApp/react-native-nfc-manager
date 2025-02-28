@@ -1,3 +1,7 @@
+## 1.8.0-canary.51
+
+* **fix:**  - contact detail background color is not full screen in dark mode ([#7645](https://github.com/AzzappApp/azzapp/pull/7645))
+
 ## 1.8.0-canary.50
 
 
