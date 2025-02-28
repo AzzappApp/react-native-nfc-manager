@@ -1,3 +1,8 @@
+## 1.8.0-canary.53
+
+* **fix:**  - remove unexisting locale ([#7650](https://github.com/AzzappApp/azzapp/pull/7650))
+* **fix:**  - ensure fontsMap is correctly built ([#7652](https://github.com/AzzappApp/azzapp/pull/7652))
+
 ## 1.8.0-canary.52
 
 * **fix:**  - remove duplicated height dimension ([#7651](https://github.com/AzzappApp/azzapp/pull/7651))
