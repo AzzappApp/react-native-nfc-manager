@@ -37,10 +37,7 @@ export function getMetaData({
     alternates: {
       //TODO: maybe we can use azzapp as alternate when user is using is own domain
       canonical: canonical ?? url,
-      languages: {
-        //TODO: add language when i18n will be handled etc
-        'en-EN': basePath + '/en/',
-      },
+      languages: {},
       ...other?.alternates,
     },
     openGraph: {
