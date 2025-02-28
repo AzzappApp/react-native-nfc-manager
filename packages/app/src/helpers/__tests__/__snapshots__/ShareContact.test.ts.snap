@@ -150,12 +150,12 @@ exports[`ShareContact buildVCardFromAzzappContact full featured contact 1`] = `
       "value": "https://facebook.com/azzapp",
     },
     {
-      "key": "ADR;WORK;POSTAL;CHARSET=utf-8",
-      "value": "monaco;;;;;;",
+      "key": "ADR;type=PREF;CHARSET=utf-8",
+      "value": ";;monaco;;;;",
     },
     {
-      "key": "ADR;WORK;POSTAL;CHARSET=utf-8",
-      "value": "paris;;;;;;",
+      "key": "ADR;type=PREF;CHARSET=utf-8",
+      "value": ";;paris;;;;",
     },
   ],
   "useVCalendar": false,
