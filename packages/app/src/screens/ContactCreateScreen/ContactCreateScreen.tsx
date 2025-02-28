@@ -192,6 +192,16 @@ const ContactCreateScreen = ({
         }
         router.back();
       },
+      updater: (store, response) => {
+        if (response && response.addContact && params?.profileId) {
+          const profile = store.get(params.profileId);
+          const nbContacts = profile?.getValue('nbContacts');
+
+          if (typeof nbContacts === 'number') {
+            profile?.setValue(nbContacts + 1, 'nbContacts');
+          }
+        }
+      },
       onError: e => {
         console.error(e);
         Toast.show({
