@@ -78,15 +78,6 @@ const DownloadVCard = ({
   useEffect(() => {
     if (!loading && !contact) {
       startTransition(() => {
-        // call directly shareback (use when coming back from AppClip)
-        const modeQueryParam = searchParams.get('mode');
-        if (modeQueryParam === 'shareback') {
-          const token = searchParams.get('token');
-          if (token && onClose) {
-            onClose({ token });
-          }
-          return;
-        }
         const compressedContactCard = searchParams.get('c');
         if (!compressedContactCard) {
           return;
