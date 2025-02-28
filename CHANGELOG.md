@@ -1,3 +1,8 @@
+## 1.8.0-canary.58
+
+* **fix:**  - do not force bold, it breaks font familly ([#7665](https://github.com/AzzappApp/azzapp/pull/7665))
+* **perf:**  - **chrome:** starting useless transition is not well handled by chrome ([#7664](https://github.com/AzzappApp/azzapp/pull/7664))
+
 ## 1.8.0-canary.57
 
 * **fix:**  - bad test for alignment fix ([#7666](https://github.com/AzzappApp/azzapp/pull/7666))
