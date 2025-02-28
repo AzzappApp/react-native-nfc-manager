@@ -119,7 +119,7 @@ const TitleTextRenderer = ({
           padding: Math.max(20, cardStyle?.gap ?? 0),
           gap: Math.max(20, cardStyle?.gap ?? 0),
           flexDirection: titleOnTop ? 'column' : 'row',
-          alignItems: columns.length === 1 ? 'center' : undefined,
+          alignItems: columns.length !== 1 ? 'center' : undefined,
         }}
       >
         {titleOnTop && (
