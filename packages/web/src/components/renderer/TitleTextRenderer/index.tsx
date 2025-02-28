@@ -10,8 +10,8 @@ import {
 import { splitRichTextIntoColumns } from '@azzapp/shared/richText/stringUpdate';
 import { fontsMap, webCardTextFontsMap } from '#helpers/fonts';
 import { DEFAULT_MODULE_TEXT, DEFAULT_MODULE_TITLE } from '#helpers/modules';
-import { RichText } from '#helpers/richText';
 import useContainerWidth from '#hooks/useContainerWidth';
+import RichText from '#ui/RichText';
 import styles from './index.css';
 import type { ModuleRendererProps } from '../ModuleRenderer';
 import type { CardModuleBase } from '@azzapp/data';

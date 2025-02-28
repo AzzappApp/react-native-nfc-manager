@@ -8,7 +8,7 @@ import {
 } from '@azzapp/shared/cardModuleHelpers';
 import { webCardTextFontsMap, webCardTitleFontsMap } from '#helpers/fonts';
 import { DEFAULT_MODULE_TEXT, DEFAULT_MODULE_TITLE } from '#helpers/modules';
-import { RichText } from '#helpers/richText';
+import RichText from '#ui/RichText';
 import Link from '../Link';
 import commonStyles from '../MediaTextLink.css';
 import AlternationMedia from './AlternationMedia';

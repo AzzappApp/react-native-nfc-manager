@@ -3,13 +3,13 @@ import {
   parseHTMLToRichText,
   isRichTextTag,
 } from '@azzapp/shared/richText/stringToolbox';
-import { webCardTextFontsVariantsMap } from './fonts';
+import { webCardTextFontsVariantsMap } from '../helpers/fonts';
 import type {
   RichTextASTNode,
   RichTextASTTags,
 } from '@azzapp/shared/richText/richTextTypes';
 
-export const RichTextFromAst = ({
+const RichTextFromAst = ({
   node,
   fontFamily,
   style = {},
@@ -82,7 +82,7 @@ type RichTextProps = {
   style?: React.CSSProperties;
 };
 
-export const RichText: React.FC<RichTextProps> = ({
+const RichText: React.FC<RichTextProps> = ({
   text,
   fontFamily,
   style,
@@ -90,3 +90,5 @@ export const RichText: React.FC<RichTextProps> = ({
   const ast = parseHTMLToRichText(text);
   return <RichTextFromAst fontFamily={fontFamily} style={style} node={ast} />;
 };
+
+export default React.memo(RichText);

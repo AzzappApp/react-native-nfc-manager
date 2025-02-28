@@ -5,7 +5,7 @@ import { swapColor } from '@azzapp/shared/cardHelpers';
 import Parallax from '#components/renderer/Parallax';
 import { webCardTextFontsMap, webCardTitleFontsMap } from '#helpers/fonts';
 import { DEFAULT_MODULE_TEXT, DEFAULT_MODULE_TITLE } from '#helpers/modules';
-import { RichText } from '#helpers/richText';
+import RichText from '#ui/RichText';
 import Link from '../Link';
 import commonStyles from '../MediaTextLink.css';
 import styles from './ParallaxTextLink.css';

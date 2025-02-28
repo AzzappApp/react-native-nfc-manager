@@ -69,7 +69,6 @@ const ENVIRONMENT =
 export const checkServerAuth = async () => {
   const token =
     headers().get(AZZAPP_SERVER_HEADER)?.split('Bearer ')[1] ?? null;
-  console.log({ token });
   if (!token) {
     throw new Error(ERRORS.INVALID_TOKEN);
   }

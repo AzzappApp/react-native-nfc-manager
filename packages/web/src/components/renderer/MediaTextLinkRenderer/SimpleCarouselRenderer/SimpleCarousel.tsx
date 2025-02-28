@@ -1,19 +1,28 @@
 'use client';
 import cn from 'classnames';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import { webCardTextFontsMap, webCardTitleFontsMap } from '#helpers/fonts';
 import { DEFAULT_MODULE_TEXT, DEFAULT_MODULE_TITLE } from '#helpers/modules';
-import { RichText } from '#helpers/richText';
 import useDimensions from '#hooks/useDimensions';
 import useLatestCallback from '#hooks/useLastestCallback';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CloudinaryVideo from '#ui/CloudinaryVideo';
+import RichText from '#ui/RichText';
 import commonStyles from '../MediaTextLink.css';
 import styles from './SimpleCarousel.css';
 import type { CardModuleBase, Media } from '@azzapp/data';
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
-import type { CardModuleMediaTextData } from '@azzapp/shared/cardModuleHelpers';
+import type {
+  CardModuleColor,
+  CardModuleMediaTextData,
+} from '@azzapp/shared/cardModuleHelpers';
 import type { CSSProperties, MouseEvent, TouchEvent } from 'react';
 
 type Props = {
@@ -447,70 +456,14 @@ const SimpleCarousel = ({
             );
 
             return (
-              <div key={`${media.id}_${i}`} className={styles.itemContainer}>
-                <div key={`${media.id}_${i}`}>
-                  {media.kind === 'video' ? (
-                    <CloudinaryVideo
-                      assetKind="module"
-                      media={media}
-                      alt="cover"
-                      fluid
-                      style={{
-                        objectFit: 'cover',
-                        width: '100%',
-                        borderRadius: cardStyle.borderRadius,
-                      }}
-                      playsInline
-                      autoPlay
-                      muted
-                      loop
-                    />
-                  ) : (
-                    <CloudinaryImage
-                      mediaId={media.id}
-                      draggable={false}
-                      alt="carousel"
-                      width={media.width}
-                      height={media.height}
-                      format="auto"
-                      quality="auto:best"
-                      style={{
-                        objectFit: 'cover',
-                        width: '100%',
-                        height: '100%',
-                        borderRadius: cardStyle.borderRadius,
-                      }}
-                    />
-                  )}
-                </div>
-                <h3
-                  className={cn(
-                    commonStyles.title,
-                    webCardTitleFontsMap[cardStyle.titleFontFamily].className,
-                  )}
-                  style={{
-                    color: swapColor(cardModuleColor?.title, colorPalette),
-                    fontSize: cardStyle.titleFontSize,
-                  }}
-                >
-                  {sectionData?.title ?? DEFAULT_MODULE_TITLE}
-                </h3>
-                <p
-                  className={cn(
-                    commonStyles.text,
-                    webCardTextFontsMap[cardStyle.fontFamily].className,
-                  )}
-                  style={{
-                    color: swapColor(cardModuleColor?.text, colorPalette),
-                    fontSize: cardStyle.fontSize,
-                  }}
-                >
-                  <RichText
-                    fontFamily={cardStyle.fontFamily}
-                    text={sectionData?.text ?? DEFAULT_MODULE_TEXT}
-                  />
-                </p>
-              </div>
+              <SimpleCarouselItemMemo
+                key={i}
+                media={media}
+                sectionData={sectionData}
+                colorPalette={colorPalette}
+                cardModuleColor={cardModuleColor}
+                cardStyle={cardStyle}
+              />
             );
           })}
         </div>
@@ -518,5 +471,91 @@ const SimpleCarousel = ({
     </div>
   );
 };
+
+const SimpleCarouselItem = ({
+  media,
+  cardStyle,
+  colorPalette,
+  cardModuleColor,
+  sectionData,
+}: {
+  media: Media;
+  cardStyle: CardStyle;
+  colorPalette: ColorPalette;
+  cardModuleColor?: CardModuleColor;
+  sectionData?: {
+    title?: string;
+    text?: string;
+  };
+}) => {
+  return (
+    <div className={styles.itemContainer}>
+      <div>
+        {media.kind === 'video' ? (
+          <CloudinaryVideo
+            assetKind="module"
+            media={media}
+            alt="cover"
+            fluid
+            style={{
+              objectFit: 'cover',
+              width: '100%',
+              borderRadius: cardStyle.borderRadius,
+            }}
+            playsInline
+            autoPlay
+            muted
+            loop
+          />
+        ) : (
+          <CloudinaryImage
+            mediaId={media.id}
+            draggable={false}
+            alt="carousel"
+            width={media.width}
+            height={media.height}
+            format="auto"
+            quality="auto:best"
+            style={{
+              objectFit: 'cover',
+              width: '100%',
+              height: '100%',
+              borderRadius: cardStyle.borderRadius,
+            }}
+          />
+        )}
+      </div>
+      <h3
+        className={cn(
+          commonStyles.title,
+          webCardTitleFontsMap[cardStyle.titleFontFamily].className,
+        )}
+        style={{
+          color: swapColor(cardModuleColor?.title, colorPalette),
+          fontSize: cardStyle.titleFontSize,
+        }}
+      >
+        {sectionData?.title ?? DEFAULT_MODULE_TITLE}
+      </h3>
+      <p
+        className={cn(
+          commonStyles.text,
+          webCardTextFontsMap[cardStyle.fontFamily].className,
+        )}
+        style={{
+          color: swapColor(cardModuleColor?.text, colorPalette),
+          fontSize: cardStyle.fontSize,
+        }}
+      >
+        <RichText
+          fontFamily={cardStyle.fontFamily}
+          text={sectionData?.text ?? DEFAULT_MODULE_TEXT}
+        />
+      </p>
+    </div>
+  );
+};
+
+const SimpleCarouselItemMemo = React.memo(SimpleCarouselItem);
 
 export default SimpleCarousel;
