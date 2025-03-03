@@ -100,11 +100,11 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
     });
 
     cardBackgroundColor = swapColor(
-      (firstModuleData.backgroundStyle?.backgroundColor ??
+      firstModuleData.backgroundStyle?.backgroundColor ??
         firstModuleData.cardModuleColor?.background ??
-        firstModule.kind === 'lineDivider')
-        ? firstModuleData.colorTop
-        : firstModuleData.colorBottom,
+        (firstModule.kind === 'lineDivider'
+          ? firstModuleData.colorTop
+          : firstModuleData.colorBottom),
       cardColors,
     );
   }
