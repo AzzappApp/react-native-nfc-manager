@@ -40,6 +40,7 @@ const ContactAvatar = ({
         {
           width: AVATAR_DEFAULT_WIDTH * scale,
           height: (AVATAR_DEFAULT_WIDTH * scale) / COVER_RATIO,
+          borderRadius: AVATAR_DEFAULT_WIDTH * COVER_CARD_RADIUS,
         },
         style,
         styles.shadow,
