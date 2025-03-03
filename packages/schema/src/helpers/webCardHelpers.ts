@@ -24,18 +24,23 @@ export const isUserNameAvailable = async (userName: string) => {
   return { available: false, userName };
 };
 
-export const notifyRelatedWalletPasses = async (webCardId: string) => {
+export const notifyRelatedWalletPasses = async (
+  webCardId: string,
+  appleOnly?: boolean,
+) => {
   const pushTokens = await getPushTokensFromWebCardId(webCardId);
 
   if (pushTokens.length) {
     pushTokens.map(notifyApplePassWallet);
   }
 
-  const googleWalletPasses = await getProfilesWithHasGooglePass(webCardId);
+  if (!appleOnly) {
+    const googleWalletPasses = await getProfilesWithHasGooglePass(webCardId);
 
-  if (googleWalletPasses.length) {
-    googleWalletPasses.map(({ profileId, userLocale }) =>
-      notifyGooglePassWallet(profileId, userLocale ?? DEFAULT_LOCALE),
-    );
+    if (googleWalletPasses.length) {
+      googleWalletPasses.map(({ profileId, userLocale }) =>
+        notifyGooglePassWallet(profileId, userLocale ?? DEFAULT_LOCALE),
+      );
+    }
   }
 };

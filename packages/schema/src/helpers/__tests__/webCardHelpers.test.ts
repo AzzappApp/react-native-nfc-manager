@@ -127,6 +127,15 @@ describe('notifyRelatedWalletPasses', () => {
     expect(notifyGooglePassWallet).toHaveBeenCalledTimes(1);
   });
 
+  test('should notify only Apple when requested', async () => {
+    (getPushTokensFromWebCardId as jest.Mock).mockResolvedValue(['token1']);
+
+    await notifyRelatedWalletPasses('webcard-123', true);
+
+    expect(notifyApplePassWallet).toHaveBeenCalledTimes(1);
+    expect(notifyGooglePassWallet).toHaveBeenCalledTimes(0);
+  });
+
   test('should not notify any Wallet if there are no push tokens or Google passes', async () => {
     (getPushTokensFromWebCardId as jest.Mock).mockResolvedValue([]);
     (getProfilesWithHasGooglePass as jest.Mock).mockResolvedValue([]);

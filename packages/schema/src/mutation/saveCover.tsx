@@ -12,6 +12,7 @@ import { invalidatePost, invalidateWebCard } from '#externals';
 import { webCardLoader } from '#loaders';
 import { checkWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
+import { notifyRelatedWalletPasses } from '#helpers/webCardHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 import type { WebCard } from '@azzapp/data';
 
@@ -69,6 +70,9 @@ const saveCover: MutationResolvers['saveCover'] = async (
       await updateWebCard(webCard.id, updates);
       updatedWebCard = { ...updatedWebCard, ...updates };
     });
+
+    await notifyRelatedWalletPasses(webCardId, true);
+
     if (webCard.userName) {
       invalidateWebCard(webCard.userName);
       const posts = await getWebCardPosts(webCard.id);
