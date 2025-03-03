@@ -71,9 +71,24 @@ describe('WebCardBackgroundPreview Component', () => {
     expect(lastColorView.props.style.backgroundColor).toBe('#00ff00'); // last module background color
   });
 
-  it('warns when last module has no cardModuleColor', () => {
+  it('don t warns when last module has no cardModule', () => {
     console.warn = jest.fn(); // Mock console.warn
     (useFragment as jest.Mock).mockReturnValue(defaultFragment);
+    render(
+      <WebCardBackgroundPreview
+        webCard={{} as WebCardBackgroundPreview_webCard$key}
+      />,
+    );
+    expect(console.warn).not.toHaveBeenCalledWith(
+      'Error no cardModuleColor defined for your module, You have an issue here',
+    );
+  });
+  it('warns when last module has no cardModuleColor', () => {
+    console.warn = jest.fn(); // Mock console.warn
+    (useFragment as jest.Mock).mockReturnValue({
+      ...defaultFragment,
+      cardModules: [{ kind: 'titleText' }],
+    });
     render(
       <WebCardBackgroundPreview
         webCard={{} as WebCardBackgroundPreview_webCard$key}

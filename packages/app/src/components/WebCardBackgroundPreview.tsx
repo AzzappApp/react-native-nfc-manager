@@ -132,7 +132,7 @@ const WebCardBackgroundPreview = ({
   const kind = overrideLastModule?.kind ?? lastModule?.kind;
   const lastModuleData = overrideLastModule?.data ?? lastModule ?? {};
 
-  if (__DEV__ && !lastModuleData.cardModuleColor) {
+  if (__DEV__ && cardModules.length && !lastModuleData.cardModuleColor) {
     console.warn(
       'Error no cardModuleColor defined for your module, You have an issue here',
     );
