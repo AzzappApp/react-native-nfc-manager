@@ -1,3 +1,9 @@
+## 1.8.0-canary.62
+
+* **fix:**  - **contact:** [#7657](https://github.com/AzzappApp/azzapp/pull/7657) safe insets mgmt ([#7676](https://github.com/AzzappApp/azzapp/pull/7676))
+* **fix:**  - **webCard:** [#7668](https://github.com/AzzappApp/azzapp/pull/7668) wrong color was applied ([#7673](https://github.com/AzzappApp/azzapp/pull/7673))
+* **fix:**  - **cover:** [#7648](https://github.com/AzzappApp/azzapp/pull/7648) update apple passes on cover update ([#7660](https://github.com/AzzappApp/azzapp/pull/7660))
+
 ## 1.8.0-canary.61
 
 
