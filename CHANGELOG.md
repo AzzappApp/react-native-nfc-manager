@@ -1,3 +1,7 @@
+## 1.8.0-canary.59
+
+
+
 ## 1.8.0-canary.58
 
 * **fix:**  - do not force bold, it breaks font familly ([#7665](https://github.com/AzzappApp/azzapp/pull/7665))
