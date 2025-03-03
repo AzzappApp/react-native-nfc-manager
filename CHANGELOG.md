@@ -1,3 +1,7 @@
+## 1.8.0-canary.67
+
+* **fix:**  - **home:** [#7671](https://github.com/AzzappApp/azzapp/pull/7671) ensure resetPopup state is called ([#7687](https://github.com/AzzappApp/azzapp/pull/7687))
+
 ## 1.8.0-canary.66
 
 * **fix:**  - **webCard:** wait revalidate call ([#7686](https://github.com/AzzappApp/azzapp/pull/7686))
