@@ -1,3 +1,7 @@
+## 1.8.0-canary.65
+
+
+
 ## 1.8.0-canary.64
 
 * **fix:**  - **webCard:** [#7675](https://github.com/AzzappApp/azzapp/pull/7675) add missing font variants ([#7681](https://github.com/AzzappApp/azzapp/pull/7681))
