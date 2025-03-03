@@ -21,13 +21,11 @@ const RichTextFromAst = ({
   stackedTags?: RichTextASTTags[];
 }): JSX.Element => {
   if (node.type === 'text') {
+    let className = undefined;
     let newStyle = { ...style };
     if (stackedTags.includes('b')) {
       if (fontFamily && webCardTextFontsVariantsMap[fontFamily]) {
-        newStyle = {
-          ...newStyle,
-          ...webCardTextFontsVariantsMap[fontFamily].bold,
-        };
+        className = webCardTextFontsVariantsMap[fontFamily].className;
       } else {
         newStyle = { ...newStyle, fontFamily: 'bold' };
       }
@@ -40,7 +38,11 @@ const RichTextFromAst = ({
     }
 
     return (
-      <span key={node.type + '' + node.start + '' + node.end} style={newStyle}>
+      <span
+        key={node.type + '' + node.start + '' + node.end}
+        style={newStyle}
+        className={className}
+      >
         {node.value}
       </span>
     );

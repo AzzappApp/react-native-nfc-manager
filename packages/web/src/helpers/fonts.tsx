@@ -49,7 +49,6 @@ import type {
   WebcardTextFonts,
 } from '@azzapp/shared/fontHelpers';
 import type { NextFont } from 'next/dist/compiled/@next/font';
-import type { CSSProperties } from 'react';
 
 const AmaticSC_Bold = Amatic_SC({
   weight: '700',
@@ -81,6 +80,12 @@ const Archivo_Light = Archivo({
   subsets: ['latin-ext'],
   preload: false,
 });
+const Archivo_SemiBold = Archivo({
+  weight: '600',
+  display: 'swap',
+  subsets: ['latin-ext'],
+  preload: false,
+});
 const BebasNeue_Regular = Bebas_Neue({
   weight: '400',
   display: 'swap',
@@ -89,6 +94,12 @@ const BebasNeue_Regular = Bebas_Neue({
 });
 const Cardo_Regular = Cardo({
   weight: '400',
+  display: 'swap',
+  subsets: ['latin-ext'],
+  preload: false,
+});
+const CormorantGaramond_SemiBold = Cormorant_Garamond({
+  weight: '600',
   display: 'swap',
   subsets: ['latin-ext'],
   preload: false,
@@ -118,6 +129,12 @@ const CourrierPrime_Regular = Courier_Prime({
   subsets: ['latin-ext'],
   preload: false,
 });
+const CourrierPrime_Bold = Courier_Prime({
+  weight: '700',
+  display: 'swap',
+  subsets: ['latin-ext'],
+  preload: false,
+});
 const Cinzel_Regular = Cinzel({
   weight: '400',
   display: 'swap',
@@ -138,6 +155,12 @@ const FaunaOne_Regular = Fauna_One({
 });
 const Fraunces_Light = Fraunces({
   weight: '300',
+  display: 'swap',
+  subsets: ['latin-ext'],
+  preload: false,
+});
+const Fraunces_Light_SemiBold = Fraunces({
+  weight: '600',
   display: 'swap',
   subsets: ['latin-ext'],
   preload: false,
@@ -172,8 +195,20 @@ const JosefinSans_Regular = Josefin_Sans({
   subsets: ['latin-ext'],
   preload: false,
 });
+const JosefinSans_SemiBold = Josefin_Sans({
+  weight: '600',
+  display: 'swap',
+  subsets: ['latin-ext'],
+  preload: false,
+});
 const Jost_Regular = Jost({
   weight: '400',
+  display: 'swap',
+  subsets: ['latin-ext'],
+  preload: false,
+});
+const Jost_Regular_SemiBold = Jost({
+  weight: '600',
   display: 'swap',
   subsets: ['latin-ext'],
   preload: false,
@@ -300,6 +335,12 @@ const OpenSans_Regular = Open_Sans({
   subsets: ['latin-ext'],
   preload: false,
 });
+const OpenSans_SemiBold = Open_Sans({
+  weight: '600',
+  display: 'swap',
+  subsets: ['latin-ext'],
+  preload: false,
+});
 const Outfit_Medium = Outfit({
   weight: '500',
   display: 'swap',
@@ -314,6 +355,12 @@ const PlayfairDisplay_Bold = Playfair_Display({
 });
 export const Plus_Jakarta_Light = Plus_Jakarta_Sans({
   weight: '300',
+  display: 'swap',
+  subsets: ['latin-ext'],
+  preload: false,
+});
+export const Plus_Jakarta_SemiBold = Plus_Jakarta_Sans({
+  weight: '600',
   display: 'swap',
   subsets: ['latin-ext'],
   preload: false,
@@ -354,6 +401,12 @@ const Raleway_Regular = Raleway({
   subsets: ['latin-ext'],
   preload: false,
 });
+const Raleway_Regular_SemiBold = Raleway({
+  weight: '600',
+  display: 'swap',
+  subsets: ['latin-ext'],
+  preload: false,
+});
 const Righteous_Regular = Righteous({
   weight: '400',
   display: 'swap',
@@ -390,8 +443,20 @@ const SourceSans3_Regular = Source_Sans_3({
   subsets: ['latin-ext'],
   preload: false,
 });
+const SourceSans3_SemiBold = Source_Sans_3({
+  weight: '600',
+  display: 'swap',
+  subsets: ['latin-ext'],
+  preload: false,
+});
 const SourcePro_Regular = Source_Sans_3({
   weight: '400',
+  display: 'swap',
+  subsets: ['latin-ext'],
+  preload: false,
+});
+const SourcePro_SemiBold = Source_Sans_3({
+  weight: '600',
   display: 'swap',
   subsets: ['latin-ext'],
   preload: false,
@@ -430,29 +495,20 @@ export const webCardTextFontsMap: Record<WebcardTextFonts, NextFont> = {
   Inter_Regular,
 };
 
-type fontVariants = {
-  bold: CSSProperties;
-};
-
-export const webCardTextFontsVariantsMap: Record<
-  WebcardTextFonts,
-  fontVariants
-> = {
-  SourcePro_Regular_Bold: { bold: { fontWeight: '600' } },
-  SourceSans3_Regular: { bold: { fontWeight: '600' } },
-  Raleway_Regular: { bold: { fontWeight: '600' } },
-  'Plus-Jakarta_Light': { bold: { fontWeight: '600' } },
-  OpenSans_Regular: { bold: { fontWeight: '600' } },
-  Montserrat_Regular: { bold: { fontWeight: '600' } },
-  Jost_Regular: { bold: { fontWeight: '600' } },
-  JosefinSans_Regular: { bold: { fontWeight: '600' } },
-  Fraunces_Light: { bold: { fontWeight: '600' } },
-  CourrierPrime_Regular: { bold: { fontWeight: '700' } },
-  CormorantGaramond_Regular: {
-    bold: { fontWeight: '600' },
-  },
-  Archivo_Light: { bold: { fontWeight: '600' } },
-  Inter_Regular: { bold: { fontWeight: '600' } },
+export const webCardTextFontsVariantsMap: Record<WebcardTextFonts, NextFont> = {
+  SourcePro_Regular_Bold: SourcePro_SemiBold,
+  SourceSans3_Regular: SourceSans3_SemiBold,
+  Raleway_Regular: Raleway_Regular_SemiBold,
+  'Plus-Jakarta_Light': Plus_Jakarta_SemiBold,
+  OpenSans_Regular: OpenSans_SemiBold,
+  Montserrat_Regular: Montserrat_SemiBold,
+  Jost_Regular: Jost_Regular_SemiBold,
+  JosefinSans_Regular: JosefinSans_SemiBold,
+  Fraunces_Light: Fraunces_Light_SemiBold,
+  CourrierPrime_Regular: CourrierPrime_Bold,
+  CormorantGaramond_Regular: CormorantGaramond_SemiBold,
+  Archivo_Light: Archivo_SemiBold,
+  Inter_Regular: Inter_SemiBold,
 };
 
 export const webCardTitleFontsMap: Record<WebcardTitleFonts, NextFont> = {
