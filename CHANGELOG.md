@@ -1,3 +1,7 @@
+## 1.8.0-canary.66
+
+* **fix:**  - **webCard:** wait revalidate call ([#7686](https://github.com/AzzappApp/azzapp/pull/7686))
+
 ## 1.8.0-canary.65
 
 
