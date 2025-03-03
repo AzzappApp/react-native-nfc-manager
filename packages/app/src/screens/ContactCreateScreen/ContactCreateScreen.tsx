@@ -26,12 +26,12 @@ import {
   getPhonenumberWithCountryCode,
 } from '#helpers/phoneNumbersHelper';
 import useBoolean from '#hooks/useBoolean';
+import useScreenInsets from '#hooks/useScreenInsets';
 import { ScanMyPaperBusinessCard } from '#screens/ContactCardEditScreen/ContactCardCreateScreen';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
-import SafeAreaView from '#ui/SafeAreaView';
 import UploadProgressModal from '#ui/UploadProgressModal';
 import ContactCreateForm from './ContactCreateForm';
 import { contactSchema, type ContactFormValues } from './ContactSchema';
@@ -306,52 +306,53 @@ const ContactCreateScreen = ({
     openScanner();
   }, [openScanner]);
 
+  const { top } = useScreenInsets();
+
   return (
     <>
-      <Container style={styles.container}>
-        <SafeAreaView style={styles.container}>
-          <Header
-            middleElement={intl.formatMessage({
-              defaultMessage: 'Create Contact',
-              description: 'Create Contact Card Modal title',
-            })}
-            leftElement={
-              <IconButton
-                icon="arrow_left"
-                onPress={router.back}
-                style={styles.leftArrowIcon}
-              />
-            }
-            rightElement={
-              <Button
-                label={intl.formatMessage({
-                  defaultMessage: 'Save',
-                  description: 'Create contact modal save button label',
-                })}
-                testID="save-contact-card"
-                loading={isSubmitting || loading}
-                onPress={submit}
-                variant="primary"
-                style={styles.headerButton}
-                disabled={!isValid}
-              />
-            }
-          />
-          <ScanMyPaperBusinessCard
-            onPress={openScannerView}
-            style={styles.scanButton}
-          />
-          <ContactCreateForm control={control} scanImage={scanImage} />
-          <ScreenModal
-            visible={!!progressIndicator}
-            gestureEnabled={false}
-            onRequestDismiss={preventModalDismiss}
-          >
-            {progressIndicator && (
-              <UploadProgressModal progressIndicator={progressIndicator} />
-            )}
-          </ScreenModal>
-        </SafeAreaView>
+      <Container style={[styles.container, { paddingTop: top }]}>
+        <Header
+          middleElement={intl.formatMessage({
+            defaultMessage: 'Create Contact',
+            description: 'Create Contact Card Modal title',
+          })}
+          leftElement={
+            <IconButton
+              icon="arrow_left"
+              onPress={router.back}
+              style={styles.leftArrowIcon}
+            />
+          }
+          rightElement={
+            <Button
+              label={intl.formatMessage({
+                defaultMessage: 'Save',
+                description: 'Create contact modal save button label',
+              })}
+              testID="save-contact-card"
+              loading={isSubmitting || loading}
+              onPress={submit}
+              variant="primary"
+              style={styles.headerButton}
+              disabled={!isValid}
+            />
+          }
+        />
+        <ScanMyPaperBusinessCard
+          onPress={openScannerView}
+          style={styles.scanButton}
+        />
+        <ContactCreateForm control={control} scanImage={scanImage} />
+        <ScreenModal
+          visible={!!progressIndicator}
+          gestureEnabled={false}
+          onRequestDismiss={preventModalDismiss}
+        >
+          {progressIndicator && (
+            <UploadProgressModal progressIndicator={progressIndicator} />
+          )}
+        </ScreenModal>
+
         {showScanner && (
           <View style={StyleSheet.absoluteFill}>
             <ContactCardDetector

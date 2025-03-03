@@ -39,11 +39,11 @@ import {
   getPhonenumberWithCountryCode,
 } from '#helpers/phoneNumbersHelper';
 import useBoolean from '#hooks/useBoolean';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import Icon from '#ui/Icon';
-import SafeAreaView from '#ui/SafeAreaView';
 import Text from '#ui/Text';
 import UploadProgressModal from '#ui/UploadProgressModal';
 import ContactCardCreateForm from './ContactCardCreateForm';
@@ -525,67 +525,67 @@ const ContactCardCreateScreen = () => {
     openScanner();
   }, [hidePopup, openScanner]);
 
+  const { top } = useScreenInsets();
+
   return (
     <>
-      <Container style={styles.container}>
-        <SafeAreaView style={styles.container}>
-          <Header
-            middleElement={intl.formatMessage(
-              {
-                defaultMessage: 'Create Contact Card{azzappA}',
-                description: 'Create Contact Card Modal title',
-              },
-              {
-                azzappA: <Text variant="azzapp">a</Text>,
-              },
-            )}
-            leftElement={
-              <Button
-                label={intl.formatMessage({
-                  defaultMessage: 'Cancel',
-                  description: 'Create contact card modal cancel button title',
-                })}
-                onPress={router.back}
-                variant="secondary"
-                style={styles.headerButton}
-              />
-            }
-            rightElement={
-              <Button
-                label={intl.formatMessage({
-                  defaultMessage: 'Save',
-                  description: 'Create contact card modal save button label',
-                })}
-                testID="save-contact-card"
-                loading={isSubmitting || loading}
-                onPress={submit}
-                variant="primary"
-                style={styles.headerButton}
-              />
-            }
-          />
-          <Text variant="small" style={styles.centerGreyText}>
-            <FormattedMessage
-              defaultMessage="Add the information you’d like to share with your ContactCard"
-              description="ContactCardCreateScreen - Header Subtitle"
+      <Container style={[styles.container, { paddingTop: top }]}>
+        <Header
+          middleElement={intl.formatMessage(
+            {
+              defaultMessage: 'Create Contact Card{azzappA}',
+              description: 'Create Contact Card Modal title',
+            },
+            {
+              azzappA: <Text variant="azzapp">a</Text>,
+            },
+          )}
+          leftElement={
+            <Button
+              label={intl.formatMessage({
+                defaultMessage: 'Cancel',
+                description: 'Create contact card modal cancel button title',
+              })}
+              onPress={router.back}
+              variant="secondary"
+              style={styles.headerButton}
             />
-          </Text>
-          <ScanMyPaperBusinessCard
-            onPress={openScannerFromPopup}
-            style={styles.scanBusinessCardButton}
+          }
+          rightElement={
+            <Button
+              label={intl.formatMessage({
+                defaultMessage: 'Save',
+                description: 'Create contact card modal save button label',
+              })}
+              testID="save-contact-card"
+              loading={isSubmitting || loading}
+              onPress={submit}
+              variant="primary"
+              style={styles.headerButton}
+            />
+          }
+        />
+        <Text variant="small" style={styles.centerGreyText}>
+          <FormattedMessage
+            defaultMessage="Add the information you’d like to share with your ContactCard"
+            description="ContactCardCreateScreen - Header Subtitle"
           />
+        </Text>
+        <ScanMyPaperBusinessCard
+          onPress={openScannerFromPopup}
+          style={styles.scanBusinessCardButton}
+        />
 
-          <ContactCardCreateForm control={control} />
-          <ScreenModal
-            visible={!!progressIndicator}
-            gestureEnabled={false}
-            onRequestDismiss={preventModalDismiss}
-          >
-            {progressIndicator && (
-              <UploadProgressModal progressIndicator={progressIndicator} />
-            )}
-          </ScreenModal>
-        </SafeAreaView>
+        <ContactCardCreateForm control={control} />
+        <ScreenModal
+          visible={!!progressIndicator}
+          gestureEnabled={false}
+          onRequestDismiss={preventModalDismiss}
+        >
+          {progressIndicator && (
+            <UploadProgressModal progressIndicator={progressIndicator} />
+          )}
+        </ScreenModal>
       </Container>
       <BottomSheetPopup
         visible={popupVisible}
