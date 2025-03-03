@@ -119,8 +119,7 @@ const HomeBottomSheetPopupPanel = ({
     setCurrentPage(0);
     setError(undefined);
     setNewUserName('');
-    setTimeout(() => openTooltips(['profileEdit']), 1000);
-  }, [openTooltips]);
+  }, []);
 
   const userNameAlreadyExistsError = intl.formatMessage(
     {
@@ -220,6 +219,7 @@ const HomeBottomSheetPopupPanel = ({
           onCompleted: () => {
             onChangeWebCard({ webCardUserName: newUserName });
             setVisible(false);
+            setTimeout(() => openTooltips(['profileEdit']), 1000);
           },
           optimisticUpdater: updater,
           updater,
@@ -242,6 +242,7 @@ const HomeBottomSheetPopupPanel = ({
     currentPage,
     intl,
     newUserName,
+    openTooltips,
     profile?.webCard?.id,
     userNameInvalidError,
   ]);
