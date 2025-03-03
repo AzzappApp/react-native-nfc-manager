@@ -9,7 +9,7 @@ export const handleSignInAuthMethod = async (
   user: User,
   profile: Profile | null | undefined,
 ) => {
-  if (user.deleted) {
+  if (user.deleted && user.id !== user.deletedBy) {
     return NextResponse.json({ message: ERRORS.FORBIDDEN }, { status: 403 });
   }
 

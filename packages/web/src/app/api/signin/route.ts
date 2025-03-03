@@ -55,7 +55,7 @@ const signin = async (req: Request) => {
       user = profile ? await getUserById(profile.userId) : null;
     }
 
-    if (!user?.password) {
+    if (!user?.password || (user.deleted && user.id === user.deletedBy)) {
       return NextResponse.json(
         { message: ERRORS.INVALID_CREDENTIALS },
         { status: 401 },
