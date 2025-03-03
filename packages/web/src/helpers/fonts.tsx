@@ -99,6 +99,13 @@ const CormorantGaramond_Bold = Cormorant_Garamond({
   subsets: ['latin-ext'],
   preload: false,
 });
+const CormorantGaramond_Bold_Italic = Cormorant_Garamond({
+  weight: '700',
+  style: 'italic',
+  display: 'swap',
+  subsets: ['latin-ext'],
+  preload: false,
+});
 const CormorantGaramond_Regular = Cormorant_Garamond({
   weight: '500',
   display: 'swap',
@@ -458,6 +465,7 @@ export const webCardTitleFontsMap: Record<WebcardTitleFonts, NextFont> = {
   Cardo_Regular,
   Cinzel_Regular,
   CormorantGaramond_Bold,
+  CormorantGaramond_Bold_Italic,
   CormorantGaramond_Regular,
   CourrierPrime_Regular,
   DMSerifDisplay_Regular,
