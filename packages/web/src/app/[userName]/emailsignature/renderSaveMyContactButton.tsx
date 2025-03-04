@@ -1,11 +1,11 @@
 import { getTextColor } from '@azzapp/shared/colorsHelpers';
 
 const renderSaveMyContactButton = ({
-  url,
+  saveContactURL,
   saveContactMessage,
   primaryColor,
 }: {
-  url: string;
+  saveContactURL: string;
   saveContactMessage: string;
   primaryColor: string;
 }) =>
@@ -15,7 +15,7 @@ const renderSaveMyContactButton = ({
     <v:roundrect 
       xmlns:v="urn:schemas-microsoft-com:vml" 
       xmlns:w="urn:schemas-microsoft-com:office:word" 
-      href="${url}" 
+      href="${saveContactURL}" 
       style="
         height:34px;
         v-text-anchor:middle;
@@ -52,7 +52,7 @@ const renderSaveMyContactButton = ({
         font-weight: 700;
         color: ${getTextColor(primaryColor)};
       "
-      href="${url}"
+      href="${saveContactURL}"
     >${saveContactMessage}</a>
   <!-- <![endif]-->
   </div>`;

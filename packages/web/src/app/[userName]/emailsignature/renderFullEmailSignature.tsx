@@ -193,7 +193,7 @@ const renderFullEmailSignature = ({
           ${renderSaveMyContactButton({
             primaryColor: webCard.cardColors?.primary ?? colors.black,
             saveContactMessage,
-            url: saveContactURL ?? '#',
+            saveContactURL: saveContactURL ?? '#',
           })}
         </td>
         <td valign="top">

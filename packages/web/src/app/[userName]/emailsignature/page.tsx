@@ -4,15 +4,19 @@ import Image from 'next/image';
 import { getMediasByIds, getOwnerProfileByUserName } from '@azzapp/data';
 import { verifyHmacWithPassword } from '@azzapp/shared/crypto';
 import { parseEmailSignature } from '@azzapp/shared/emailSignatureHelpers';
+import { getImageURLForSize } from '@azzapp/shared/imagesHelpers';
 import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
 import { buildUserUrlWithContactCard } from '@azzapp/shared/urlHelpers';
 import azzappFull from '#assets/images/azzapp-full.png';
 import { CopyrightFooter } from '#components/CopyrightFooter';
 import { getDeviceInfo } from '#helpers/devices';
+import { getServerIntl } from '#helpers/i18nHelpers';
 import { cachedGetWebCardByUserName } from '../dataAccess';
 import notFound from '../not-found';
-import EmailSignatureGenerator from './EmailSignatureGenerator';
+import CopySignatureButton from './CopySignatureButton';
+import EmailSignaturePreview from './EmailSignaturePreview';
 import styles from './page.css';
+import SignatureNotice from './SignatureNotice';
 import StoreLinks from './StoreLinks';
 
 type EmailSignatureProps = {
@@ -81,6 +85,14 @@ const EmailSignaturePage = async ({
       webCard.isMultiUser ? webCard?.commonInformation : null,
     );
 
+  const companyLogo =
+    webCard.isMultiUser && webCard.logoId != null
+      ? webCard.logoId
+      : profile.logoId;
+  const companyLogoUrl = companyLogo
+    ? getImageURLForSize({ id: companyLogo, height: 140, format: 'png' })
+    : null;
+
   const saveContactURL = buildUserUrlWithContactCard(
     userName,
     saveContactData,
@@ -88,37 +100,91 @@ const EmailSignaturePage = async ({
   );
 
   const showStoreLinks = !isMobileDevice;
-  return (
-    <div className={styles.background}>
-      <div className={styles.container}>
-        <Image
-          src={azzappFull}
-          alt="azzapp-logo"
-          width={150}
-          style={{ marginBottom: 50 }}
-        />
-        <EmailSignatureGenerator
-          contact={contact}
-          mode={mode}
-          webCard={webCard}
-          media={media}
-          companyLogo={
-            webCard.isMultiUser && webCard.logoId != null
-              ? webCard.logoId
-              : profile.logoId
-          }
-          saveContactURL={saveContactURL}
-        />
 
-        <Image
-          src={azzappFull}
-          alt="azzapp-logo"
-          width={150}
-          style={{ marginTop: 30, marginBottom: 30 }}
-        />
-        {showStoreLinks && <StoreLinks />}
-        <CopyrightFooter />
-      </div>
+  const intl = getServerIntl();
+  const saveContactMessage = intl.formatMessage({
+    defaultMessage: 'Save my contact',
+    id: 'YdhsiU',
+    description: 'Signature web link / save my contact',
+  });
+
+  return (
+    <div className={styles.container}>
+      <Image
+        src={azzappFull}
+        alt="azzapp-logo"
+        width={150}
+        className={styles.logo}
+      />
+      <h2 className={styles.title}>
+        {mode === 'simple'
+          ? intl.formatMessage({
+              defaultMessage: "Add 'Save my contact' button to your email",
+              id: 'APgNhO',
+              description:
+                'Signature web link / Simple Mode / add save my contact',
+            })
+          : intl.formatMessage({
+              defaultMessage: 'Add this signature to your emails',
+              id: 'uZbSQo',
+              description:
+                'Signature web link / Normal Mode / add save my contact',
+            })}
+      </h2>
+      <EmailSignaturePreview
+        mode={mode}
+        webCard={webCard}
+        media={media}
+        contact={contact}
+        companyLogoUrl={companyLogoUrl}
+        saveContactMessage={saveContactMessage}
+      />
+      <p className={styles.description}>
+        {mode === 'simple'
+          ? intl.formatMessage({
+              defaultMessage:
+                'Incorporate this button into your current signature, enabling your recipients to effortlessly save your contact information with just a single click.',
+              id: 'Pm7HPS',
+              description: 'Signature web link / description',
+            })
+          : intl.formatMessage({
+              defaultMessage:
+                'Incorporate this signature to your emails, enabling your recipients to effortlessly save your contact information with just a single click.',
+              id: 'PmoqJ7',
+              description: 'Signature web link / footer',
+            })}
+      </p>
+      <CopySignatureButton
+        mode={mode}
+        companyLogoUrl={companyLogoUrl}
+        contact={contact}
+        saveContactMessage={saveContactMessage}
+        saveContactURL={saveContactURL}
+        webCard={webCard}
+      />
+      <h3 className={styles.title}>
+        {mode === 'simple'
+          ? intl.formatMessage({
+              defaultMessage: 'How to add the button to your email signature',
+              id: 'jVfUhp',
+              description: 'Signature web link / Simple Mode / how to',
+            })
+          : intl.formatMessage({
+              defaultMessage:
+                'How to add the signature to your email signature',
+              id: 'FaebJ9',
+              description: 'Signature web link / Normal Mode / how to',
+            })}
+      </h3>
+      <SignatureNotice />
+      <Image
+        src={azzappFull}
+        alt="azzapp-logo"
+        width={150}
+        style={{ marginTop: 30, marginBottom: 30 }}
+      />
+      {showStoreLinks && <StoreLinks />}
+      <CopyrightFooter />
     </div>
   );
 };
