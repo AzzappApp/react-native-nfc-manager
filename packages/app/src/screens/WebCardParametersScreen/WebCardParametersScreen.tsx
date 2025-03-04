@@ -501,10 +501,9 @@ const WebCardParametersScreen = ({
                   'WebCardParameters screen - Profile Categoriy BottomSheet - Title',
               }) as string
             }
-            style={{
-              backgroundColor: 'transparent',
-              borderWidth: 0,
-              paddingRight: 0,
+            style={styles.selectStyle}
+            iconStyle={{
+              marginRight: 0,
             }}
             itemContainerStyle={styles.selectItemContainerStyle}
             renderItem={({ item }) => (
@@ -712,6 +711,11 @@ const styleSheet = createStyleSheet(appearance => ({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  selectStyle: {
+    backgroundColor: 'transparent',
+    borderWidth: 0,
+    paddingRight: 0,
   },
 }));
 
