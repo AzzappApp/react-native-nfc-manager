@@ -84,8 +84,11 @@ const HomeScreen = ({
     ref.current?.scrollToIndex(index, false);
   }, []);
 
-  if (!currentUser) {
-    // should never happen
+  if (
+    !currentUser ||
+    !currentUser.profiles ||
+    currentUser.profiles.length === 0
+  ) {
     return null;
   }
 
