@@ -21,6 +21,7 @@ import type { SharedValue } from 'react-native-reanimated';
 
 type CardModuleMediaSlideshowProps = CardModuleVariantType & {
   cardModuleMedias: CardModuleMedia[];
+  cancelAutoPlay: boolean;
 };
 
 //Simple component to render, not bind to any relay fragment
@@ -33,6 +34,7 @@ const CardModuleMediaSlideshow = ({
   dimension,
   canPlay,
   setEditableItemIndex,
+  cancelAutoPlay,
 }: CardModuleMediaSlideshowProps) => {
   const scrollIndex = useSharedValue(0);
   const paddingHorizontal = displayMode === 'desktop' ? 40 : 0;
@@ -120,7 +122,7 @@ const CardModuleMediaSlideshow = ({
   const [direction, setDirection] = useState(1); // 1 for forward, -1 for backward
 
   useInterval(() => {
-    if (isAutoPlay) {
+    if (!cancelAutoPlay && isAutoPlay) {
       let nextIndex = scrollIndex.value + direction;
       if (nextIndex >= cardModuleMedias.length) {
         nextIndex = cardModuleMedias.length - 1;

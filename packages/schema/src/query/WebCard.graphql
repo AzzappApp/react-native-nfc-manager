@@ -82,6 +82,11 @@ type WebCard implements Node {
   """
   coverIsPredefined: Boolean!
   """
+  cover has not been configured yet
+  if coverIsLogoPredefined is true, coverMedia will contain only 1 predefined media with company logo 
+  """
+  coverIsLogoPredefined: Boolean!
+  """
   the webCard style
   """
   cardStyle: WebCardStyle
@@ -344,7 +349,7 @@ type WebCard implements Node {
   """
   The webCard premium account is from the web
   """
-  isWebSubscription: Boolean!
+  isWebSubscription: Boolean! @deprecated(reason: "use issuer")
   """
   Fetches cover template type
   """
@@ -353,6 +358,48 @@ type WebCard implements Node {
     first: Int
     after: String
   ): CoverTemplateTypeConnection!
+
+  """
+  Fetches preview video for module
+  """
+  moduleVideoPreview(
+    """
+    The type of module
+    """
+    module: String!
+    """
+    The variant name
+    """
+    variant: String
+    """
+    The color Scheme
+    """
+    colorScheme: String
+    """
+    The locale of user
+    """
+    locale: String
+    """
+    The landscape video height
+    """
+    landscapeHeight: Int!
+    """
+    The landscape video width
+    """
+    landscapeWidth: Int!
+    """
+    The portrait video height
+    """
+    portraitHeight: Int!
+    """
+    The landscape video width
+    """
+    portraitWidth: Int!
+    """
+    The device pixelRatio
+    """
+    pixelRatio: Float
+  ): ModuleVideoPreview!
 }
 
 type WebCardStyle {
@@ -480,4 +527,18 @@ type Link {
 type Coordinate {
   x: Float!
   y: Float!
+}
+
+"""
+2 Video file to preview module
+"""
+type ModuleVideoPreview {
+  """
+  The preview in landscape mode
+  """
+  landscape: String!
+  """
+  The preview in portrait mode
+  """
+  portrait: String!
 }

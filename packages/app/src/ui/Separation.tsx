@@ -17,7 +17,7 @@ const Separation = (props: SeparationProps) => {
 const styleSheet = createStyleSheet(appearance => ({
   separator: {
     width: '100%',
-    backgroundColor: appearance === 'light' ? colors.grey50 : colors.black,
+    backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
   },
 }));
 

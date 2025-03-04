@@ -1,6 +1,7 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import { View } from 'react-native';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
-import { colors, textStyles } from '#theme';
+import { colors, shadow, textStyles } from '#theme';
 import { MediaImageRenderer } from '#components/medias';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Text from '#ui/Text';
@@ -39,8 +40,10 @@ const ContactAvatar = ({
         {
           width: AVATAR_DEFAULT_WIDTH * scale,
           height: (AVATAR_DEFAULT_WIDTH * scale) / COVER_RATIO,
+          borderRadius: AVATAR_DEFAULT_WIDTH * COVER_CARD_RADIUS,
         },
         style,
+        styles.shadow,
       ]}
     >
       <View
@@ -71,8 +74,20 @@ const ContactAvatar = ({
             blurRadius={40}
           />
         )}
+
         {avatar ? (
-          <MediaImageRenderer source={avatar} style={styles.avatar} />
+          <>
+            <LinearGradient
+              colors={['rgba(0, 0, 0, 0.30)', '#000']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 0, y: 1 }}
+              style={[
+                { borderRadius: AVATAR_DEFAULT_WIDTH * COVER_CARD_RADIUS },
+                styles.layer,
+              ]}
+            />
+            <MediaImageRenderer source={avatar} style={styles.avatar} />
+          </>
         ) : (
           <View style={styles.avatar}>
             <Text variant="smallbold" style={styles.initials}>
@@ -145,6 +160,15 @@ const styleSheet = createStyleSheet(appearance => ({
     lineHeight: 8.75,
     textAlign: 'center',
     color: 'white',
+  },
+  shadow: shadow(appearance, 'bottom'),
+  layer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    top: 0,
+    right: 0,
+    aspectRatio: COVER_RATIO,
   },
 }));
 

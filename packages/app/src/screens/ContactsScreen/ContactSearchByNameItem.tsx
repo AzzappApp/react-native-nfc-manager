@@ -4,11 +4,12 @@ import { StyleSheet, View } from 'react-native';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors, textStyles } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
-import { findLocalContact } from '#helpers/contactCardHelpers';
+import { findLocalContact } from '#helpers/contactHelpers';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import ContactAvatar from './ContactAvatar';
+import useImageFromContact from './useImageFromContact';
 import WhatsappButton from './WhatsappButton';
 import type { ContactType } from '#helpers/contactListHelpers';
 import type { ContactActionProps } from './ContactsScreenLists';
@@ -39,8 +40,8 @@ const ContactSearchByNameItem = ({
     const verifyInvitation = async () => {
       if (contactsPermissionStatus === ContactPermissionStatus.GRANTED) {
         const foundContact = await findLocalContact(
-          contact.phoneNumbers.map(({ number }) => number) ?? [],
-          contact.emails.map(({ address }) => address) ?? [],
+          contact.phoneNumbers?.map(({ number }) => number) ?? [],
+          contact.emails?.map(({ address }) => address) ?? [],
           localContacts,
           contact.contactProfile?.id,
         );
@@ -76,16 +77,7 @@ const ContactSearchByNameItem = ({
     });
   }, [contact, showContactAction, showInvite]);
 
-  const avatarSource = useMemo(() => {
-    if (contact.contactProfile?.avatar?.uri) {
-      return {
-        uri: contact.contactProfile.avatar.uri,
-        mediaId: contact.contactProfile.avatar.id ?? '',
-        requestedSize: 26,
-      };
-    }
-    return null;
-  }, [contact.contactProfile?.avatar?.id, contact.contactProfile?.avatar?.uri]);
+  const avatarSource = useImageFromContact({ contact });
 
   const [firstname, lastname, name] = useMemo(() => {
     if (contact.firstName || contact.lastName) {

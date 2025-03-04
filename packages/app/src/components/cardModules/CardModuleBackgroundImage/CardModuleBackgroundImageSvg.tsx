@@ -27,6 +27,8 @@ const CardModuleBackgroundImageSvg = (
     [svgSize],
   );
 
+  const [svg, setSVG] = useState<string | null>(null);
+
   const [svgProps, style, pattern] = useMemo(() => {
     const svgProps: Omit<UriProps, 'uri'> = { style: {} };
     const containerStyle: StyleProp<ViewStyle> = {};
@@ -61,9 +63,14 @@ const CardModuleBackgroundImageSvg = (
       containerStyle.alignItems = 'center';
     }
 
-    if (resizeMode === 'repeat' && svgSize) {
-      patternProps.width = svgSize.width;
-      patternProps.height = svgSize.height;
+    if (resizeMode === 'repeat' && svg) {
+      const widthMatch = svg.match(/width=["'](\d+\.?\d*)["']/);
+      const heightMatch = svg.match(/height=["'](\d+\.?\d*)["']/);
+
+      patternProps.width = widthMatch ? parseFloat(widthMatch[1]) : undefined;
+      patternProps.height = heightMatch
+        ? parseFloat(heightMatch[1])
+        : undefined;
     }
 
     if (resizeMode === 'stretch' && svgSize && width && height) {
@@ -80,9 +87,8 @@ const CardModuleBackgroundImageSvg = (
     }
 
     return [svgProps, containerStyle, patternProps];
-  }, [layout, resizeMode, svgSize]);
+  }, [layout?.height, layout?.width, resizeMode, svg, svgSize]);
 
-  const [svg, setSVG] = useState<string | null>(null);
   const color = patternColor ?? '#000';
 
   useEffect(() => {
@@ -144,7 +150,6 @@ const CardModuleBackgroundImageSvg = (
             y="0"
           >
             <SvgXml
-              onLayout={handleSvgLayout}
               {...svgProps}
               xml={svg}
               style={{ opacity: backgroundOpacity }}
@@ -185,6 +190,7 @@ const styles = StyleSheet.create({
     height: '100%',
     pointerEvents: 'none',
     zIndex: -1,
+    overflow: 'hidden',
   },
 });
 

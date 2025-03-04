@@ -3,7 +3,7 @@
 import { sendGAEvent } from '@next/third-parties/google';
 import cx from 'classnames';
 import dynamic from 'next/dynamic';
-import { forwardRef, useImperativeHandle, useRef } from 'react';
+import { forwardRef, useCallback, useImperativeHandle, useRef } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { ShareBackIcon } from '#assets';
 import { Modal, type ModalProps } from '#ui';
@@ -26,15 +26,24 @@ type ShareBackModalProps = Omit<ModalProps, 'children'> & {
   webcardId: string;
   initials: string;
   onClose: () => void;
+  onReady?: () => void;
 };
 
 // eslint-disable-next-line react/display-name
 const ShareBackModal = forwardRef<ModalActions, ShareBackModalProps>(
   (props, ref) => {
-    const { name, avatarUrl, token, userId, webcardId, initials, onClose } =
-      props;
+    const {
+      name,
+      avatarUrl,
+      token,
+      userId,
+      webcardId,
+      initials,
+      onClose,
+      onReady,
+    } = props;
 
-    const internalRef = useRef<ModalActions>(null);
+    const internalRef = useRef<ModalActions | null>(null);
 
     useImperativeHandle(ref, () => ({
       close: () => {
@@ -45,10 +54,20 @@ const ShareBackModal = forwardRef<ModalActions, ShareBackModalProps>(
       },
     }));
 
+    const setInternalRef = useCallback(
+      (node: ModalActions | null) => {
+        if (node) {
+          internalRef.current = node;
+          onReady?.();
+        }
+      },
+      [onReady],
+    );
+
     return (
       <AppIntlProvider>
         <Modal
-          ref={internalRef}
+          ref={setInternalRef}
           className={styles.shareBackModal}
           onClose={onClose}
           disableClickOutside

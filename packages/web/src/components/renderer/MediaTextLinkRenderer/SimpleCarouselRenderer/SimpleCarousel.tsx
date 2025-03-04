@@ -1,17 +1,28 @@
 'use client';
 import cn from 'classnames';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { swapColor } from '@azzapp/shared/cardHelpers';
-import { fontsMap } from '#helpers/fonts';
+import { webCardTextFontsMap, webCardTitleFontsMap } from '#helpers/fonts';
 import { DEFAULT_MODULE_TEXT, DEFAULT_MODULE_TITLE } from '#helpers/modules';
 import useDimensions from '#hooks/useDimensions';
+import useLatestCallback from '#hooks/useLastestCallback';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CloudinaryVideo from '#ui/CloudinaryVideo';
+import RichText from '#ui/RichText';
 import commonStyles from '../MediaTextLink.css';
 import styles from './SimpleCarousel.css';
 import type { CardModuleBase, Media } from '@azzapp/data';
 import type { CardStyle, ColorPalette } from '@azzapp/shared/cardHelpers';
-import type { CardModuleMediaTextData } from '@azzapp/shared/cardModuleHelpers';
+import type {
+  CardModuleColor,
+  CardModuleMediaTextData,
+} from '@azzapp/shared/cardModuleHelpers';
 import type { CSSProperties, MouseEvent, TouchEvent } from 'react';
 
 type Props = {
@@ -23,6 +34,12 @@ type Props = {
     data: CardModuleMediaTextData;
   };
 };
+
+// Timeout to consider wheel move as finished
+const wheelStopTimeout = 250;
+
+// start margin to avoid having text to close to the screen border
+const marginStart = 20;
 
 /**
  * Function to find the nearest index in snapPoints given an input value (translation).
@@ -62,9 +79,6 @@ const findNearestIndex = (
   return nearestIndex;
 };
 
-// start margin to avoid having text to close to the screen border
-const marginStart = 20;
-
 const SimpleCarousel = ({
   medias: baseMedias,
   style,
@@ -79,12 +93,14 @@ const SimpleCarousel = ({
     positionY: number;
     translation: number;
     slideDirection?: 'X' | 'Y';
+    translationType?: 'touch' | 'wheel';
   }>();
   const [translation, setTranslation] = useState<number>(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const carouselRef = useRef<HTMLDivElement>(null);
-
+  const targetTranslationRef = useRef<number>();
   const dimensions = useDimensions(containerRef);
+
   const screenWidth = dimensions?.width || 0;
 
   // Target Width of an element in the carousel
@@ -111,19 +127,24 @@ const SimpleCarousel = ({
       medias.length * targetWidth +
       (medias.length - 1) * cardGap +
       2 * marginStart;
+
     const maxSnapPoint = totalWidth - screenWidth;
 
-    medias.reduce((acc, item) => {
-      let snapPoint = acc + targetWidth / 2 - screenWidth / 2 + cardGap;
+    medias.forEach((_, index) => {
+      let snapPoint =
+        index * cardGap +
+        index * targetWidth +
+        marginStart +
+        targetWidth / 2 -
+        screenWidth / 2;
+
       if (snapPoint < 0) {
         snapPoint = 0;
-      } else if (snapPoint > maxSnapPoint + marginStart) {
-        snapPoint = maxSnapPoint + marginStart;
+      } else if (snapPoint > maxSnapPoint) {
+        snapPoint = maxSnapPoint;
       }
       snapPoints.push(snapPoint);
-      acc = acc + item.width + cardGap;
-      return acc;
-    }, marginStart);
+    });
 
     return {
       totalWidth,
@@ -137,12 +158,12 @@ const SimpleCarousel = ({
 
   // padding to apply on none slidable row
   const paddingNoneSlidable = !isSlidable
-    ? (carouselSnapPoints.totalWidth - 2 * marginStart - screenWidth) / 2
+    ? (carouselSnapPoints.totalWidth - screenWidth) / 2
     : 0;
 
   useEffect(() => {
-    setTranslation(carouselSnapPoints.snapPoints[0]);
-  }, [screenWidth, carouselSnapPoints.snapPoints]);
+    setTranslation(0);
+  }, [screenWidth]);
 
   /**
    * Slide handling
@@ -150,6 +171,8 @@ const SimpleCarousel = ({
   const handleStart = (
     e: MouseEvent<HTMLDivElement> | TouchEvent<HTMLDivElement>,
   ) => {
+    if (startPosition?.translationType === 'wheel') return;
+
     const track = carouselRef.current;
     if (track) {
       const startX =
@@ -165,63 +188,182 @@ const SimpleCarousel = ({
             ? e.clientY
             : 0; // Handles both touch and mouse
 
-      setStartPosition({ positionX: startX, positionY: startY, translation });
+      setStartPosition({
+        positionX: startX,
+        positionY: startY,
+        translation,
+        translationType: 'touch',
+      });
     }
   };
 
-  const handleMove = useCallback(
-    (e: MouseEvent<HTMLDivElement> | TouchEvent<HTMLDivElement>) => {
-      if (startPosition === undefined) return;
-      if (startPosition.slideDirection === 'Y') return;
+  const wheelXTimeout = useRef<ReturnType<typeof setTimeout>>();
+  const wheelYTimeout = useRef<ReturnType<typeof setTimeout>>();
 
-      const currentX =
-        'touches' in e && e.touches
-          ? e.touches[0].clientX
-          : 'clientX' in e
-            ? e.clientX
-            : 0;
+  // function called to reset wheel slide X management
+  const onWheelXTimeout = useCallback(() => {
+    const track = carouselRef.current;
+    if (track && startPosition && targetTranslationRef.current) {
+      const direction = targetTranslationRef.current - startPosition.positionX;
+      const targetIndex = findNearestIndex(
+        carouselSnapPoints.snapPoints,
+        -translation,
+        direction,
+      );
+      const target = -carouselSnapPoints.snapPoints[targetIndex];
+      setTranslation(target);
+    }
+    if (startPosition?.slideDirection === 'X') {
+      setStartPosition(undefined);
+    }
+  }, [carouselSnapPoints.snapPoints, startPosition, translation]);
 
-      const currentY =
-        'touches' in e && e.touches
-          ? e.touches[0].clientY
-          : 'clientY' in e
-            ? e.clientY
-            : 0;
+  // function called to reset wheel slide Y management
+  const onWheelYTimeout = useCallback(() => {
+    if (startPosition?.slideDirection === 'Y') {
+      setStartPosition(undefined);
+    }
+  }, [startPosition?.slideDirection]);
 
-      if (startPosition.slideDirection === undefined) {
-        if (Math.abs(startPosition.positionY - currentY) > 8) {
-          setStartPosition(pos =>
-            pos ? { ...pos, slideDirection: 'Y' } : undefined,
-          );
-          // no need to handle this event
-          return;
-        } else if (Math.abs(startPosition.positionX - currentX) > 8) {
-          setStartPosition(pos =>
-            pos ? { ...pos, slideDirection: 'X' } : undefined,
-          );
-        } else {
-          // cannot identify direction yet
-          return;
-        }
+  // handle wheel event on the row
+  const handleWheel = (e: WheelEvent) => {
+    // slide direction management (change and initial direction detection)
+    if (
+      startPosition?.slideDirection === 'Y' ||
+      Math.abs(e.deltaY) > Math.abs(e.deltaX) + 2
+    ) {
+      // handle wheel Y sliding
+      if (startPosition?.slideDirection === 'X') {
+        // directly stop movement
+        clearTimeout(wheelXTimeout.current);
+        targetTranslationRef.current = translation;
+        onWheelXTimeout();
       }
 
+      setStartPosition(startPos => {
+        return startPos?.slideDirection === 'Y'
+          ? startPos
+          : {
+              positionX: 0,
+              positionY: 0,
+              translation: 0,
+              slideDirection: 'Y',
+              translationType: 'wheel',
+            };
+      });
+      wheelYTimeout.current = setTimeout(onWheelYTimeout, wheelStopTimeout);
+      // no need to handle this event
+      return;
+    } else if (
+      // handle wheel X sliding
+
+      startPosition?.slideDirection !== 'X' &&
+      Math.abs(e.deltaX) > 1
+    ) {
+      if (startPosition?.slideDirection === 'Y') {
+        // directly stop movement
+        clearTimeout(wheelYTimeout.current);
+      }
+      setStartPosition({
+        positionX: translation,
+        positionY: 0,
+        translation,
+        slideDirection: 'X',
+        translationType: 'wheel',
+      });
+    }
+
+    // To not forward the event to browser if handled
+    if (!startPosition) {
       e.preventDefault();
-      const track = carouselRef.current;
-      if (track) {
-        const deltaX = currentX - startPosition.positionX;
-        const targetTranslation = startPosition.translation + deltaX;
-        setTranslation(targetTranslation);
-        track.style.transform = `translateX(${targetTranslation}px)`;
-      }
-    },
-    [startPosition],
-  );
+      return;
+    }
 
+    const track = carouselRef.current;
+    const deltaX = e.deltaX;
+
+    if (!track || deltaX === 0) return;
+
+    let targetTranslation = translation - deltaX;
+
+    // Limit sliding to avoid slide out of line
+    if (targetTranslation > 0) {
+      targetTranslation = 0;
+    } else if (
+      -targetTranslation >=
+      carouselSnapPoints.totalWidth - screenWidth
+    ) {
+      targetTranslation = screenWidth - carouselSnapPoints.totalWidth;
+    }
+
+    if (targetTranslation !== translation) e.preventDefault();
+
+    setTranslation(targetTranslation);
+    track.style.transform = `translateX(${targetTranslation}px)`;
+
+    clearTimeout(wheelXTimeout.current);
+    targetTranslationRef.current = targetTranslation;
+    wheelXTimeout.current = setTimeout(onWheelXTimeout, wheelStopTimeout);
+  };
+
+  const handleMove = (
+    e: MouseEvent<HTMLDivElement> | TouchEvent<HTMLDivElement>,
+  ) => {
+    if (startPosition === undefined) return;
+    if (startPosition.slideDirection === 'Y') return;
+    if (startPosition?.translationType === 'wheel') return;
+
+    const currentX =
+      'touches' in e && e.touches
+        ? e.touches[0].clientX
+        : 'clientX' in e
+          ? e.clientX
+          : 0;
+
+    const currentY =
+      'touches' in e && e.touches
+        ? e.touches[0].clientY
+        : 'clientY' in e
+          ? e.clientY
+          : 0;
+
+    if (startPosition.slideDirection === undefined) {
+      if (Math.abs(startPosition.positionY - currentY) > 8) {
+        setStartPosition(pos =>
+          pos
+            ? { ...pos, slideDirection: 'Y', translationType: 'touch' }
+            : undefined,
+        );
+        // no need to handle this event
+        return;
+      } else if (Math.abs(startPosition.positionX - currentX) > 8) {
+        setStartPosition(pos =>
+          pos
+            ? { ...pos, slideDirection: 'X', translationType: 'touch' }
+            : undefined,
+        );
+      } else {
+        // cannot identify direction yet
+        return;
+      }
+    }
+
+    e.preventDefault();
+    const track = carouselRef.current;
+    if (track) {
+      const deltaX = currentX - startPosition.positionX;
+      const targetTranslation = startPosition.translation + deltaX;
+      setTranslation(targetTranslation);
+      track.style.transform = `translateX(${targetTranslation}px)`;
+    }
+  };
+
+  const latestMove = useLatestCallback(handleMove);
   useEffect(() => {
     const current = carouselRef.current;
 
     const handleTouchMove: EventListener = e => {
-      return handleMove(e as unknown as TouchEvent<HTMLDivElement>);
+      return latestMove(e as unknown as TouchEvent<HTMLDivElement>);
     };
 
     if (current) {
@@ -229,14 +371,33 @@ const SimpleCarousel = ({
       current.addEventListener('touchmove', handleTouchMove, {
         passive: false,
       });
-    }
 
-    return () => {
-      if (current) {
-        current.removeEventListener('touchmove', handleTouchMove);
-      }
-    };
-  }, [startPosition, handleMove, carouselSnapPoints]);
+      return () => {
+        if (current) {
+          current.removeEventListener('touchmove', handleTouchMove);
+        }
+      };
+    }
+  }, [latestMove]);
+
+  const latestWheel = useLatestCallback(handleWheel);
+  useEffect(() => {
+    if (!isSlidable) return;
+    const current = carouselRef.current;
+
+    if (current) {
+      // Add a non-passive touch event listener for Safari
+      current.addEventListener('wheel', latestWheel, {
+        passive: false,
+      });
+
+      return () => {
+        if (current) {
+          current.removeEventListener('wheel', latestWheel);
+        }
+      };
+    }
+  }, [latestWheel, isSlidable]);
 
   const handleEnd = (
     e: MouseEvent<HTMLDivElement> | TouchEvent<HTMLDivElement>,
@@ -258,7 +419,6 @@ const SimpleCarousel = ({
         -translation,
         direction,
       );
-
       setTranslation(-carouselSnapPoints.snapPoints[targetIndex]);
     }
     setStartPosition(undefined);
@@ -282,81 +442,28 @@ const SimpleCarousel = ({
             transform: `translateX(${translation}px)`,
             marginLeft: `${-paddingNoneSlidable}px`,
             transition:
-              startPosition !== undefined || !isSlidable
+              startPosition?.slideDirection === 'X' || !isSlidable
                 ? 'none'
                 : 'transform 0.5s ease-in-out', // Disable animation while dragging
             gap: cardGap,
+            paddingLeft: marginStart,
             display: 'flex',
           }}
         >
-          {isSlidable ? <div style={{ width: marginStart }} /> : undefined}
           {medias.map((media, i) => {
             const sectionData = cardModuleMedias.find(
               cardModuleMedia => cardModuleMedia.media.id === media.id,
             );
 
             return (
-              <div key={`${media.id}_${i}`} className={styles.itemContainer}>
-                <div key={`${media.id}_${i}`}>
-                  {media.kind === 'video' ? (
-                    <CloudinaryVideo
-                      assetKind="module"
-                      media={media}
-                      alt="cover"
-                      fluid
-                      style={{
-                        objectFit: 'cover',
-                        width: '100%',
-                        borderRadius: cardStyle.borderRadius,
-                      }}
-                      playsInline
-                      autoPlay
-                      muted
-                      loop
-                    />
-                  ) : (
-                    <CloudinaryImage
-                      mediaId={media.id}
-                      draggable={false}
-                      alt="carousel"
-                      width={media.width}
-                      height={media.height}
-                      format="auto"
-                      quality="auto:best"
-                      style={{
-                        objectFit: 'cover',
-                        width: '100%',
-                        height: '100%',
-                        borderRadius: cardStyle.borderRadius,
-                      }}
-                    />
-                  )}
-                </div>
-                <h3
-                  className={cn(
-                    commonStyles.title,
-                    fontsMap[cardStyle.titleFontFamily].className,
-                  )}
-                  style={{
-                    color: swapColor(cardModuleColor?.title, colorPalette),
-                    fontSize: cardStyle.titleFontSize,
-                  }}
-                >
-                  {sectionData?.title ?? DEFAULT_MODULE_TITLE}
-                </h3>
-                <p
-                  className={cn(
-                    commonStyles.text,
-                    fontsMap[cardStyle.fontFamily].className,
-                  )}
-                  style={{
-                    color: swapColor(cardModuleColor?.text, colorPalette),
-                    fontSize: cardStyle.fontSize,
-                  }}
-                >
-                  {sectionData?.text ?? DEFAULT_MODULE_TEXT}
-                </p>
-              </div>
+              <SimpleCarouselItemMemo
+                key={i}
+                media={media}
+                sectionData={sectionData}
+                colorPalette={colorPalette}
+                cardModuleColor={cardModuleColor}
+                cardStyle={cardStyle}
+              />
             );
           })}
         </div>
@@ -364,5 +471,91 @@ const SimpleCarousel = ({
     </div>
   );
 };
+
+const SimpleCarouselItem = ({
+  media,
+  cardStyle,
+  colorPalette,
+  cardModuleColor,
+  sectionData,
+}: {
+  media: Media;
+  cardStyle: CardStyle;
+  colorPalette: ColorPalette;
+  cardModuleColor?: CardModuleColor;
+  sectionData?: {
+    title?: string;
+    text?: string;
+  };
+}) => {
+  return (
+    <div className={styles.itemContainer}>
+      <div>
+        {media.kind === 'video' ? (
+          <CloudinaryVideo
+            assetKind="module"
+            media={media}
+            alt="cover"
+            fluid
+            style={{
+              objectFit: 'cover',
+              width: '100%',
+              borderRadius: cardStyle.borderRadius,
+            }}
+            playsInline
+            autoPlay
+            muted
+            loop
+          />
+        ) : (
+          <CloudinaryImage
+            mediaId={media.id}
+            draggable={false}
+            alt="carousel"
+            width={media.width}
+            height={media.height}
+            format="auto"
+            quality="auto:best"
+            style={{
+              objectFit: 'cover',
+              width: '100%',
+              height: '100%',
+              borderRadius: cardStyle.borderRadius,
+            }}
+          />
+        )}
+      </div>
+      <h3
+        className={cn(
+          commonStyles.title,
+          webCardTitleFontsMap[cardStyle.titleFontFamily].className,
+        )}
+        style={{
+          color: swapColor(cardModuleColor?.title, colorPalette),
+          fontSize: cardStyle.titleFontSize,
+        }}
+      >
+        {sectionData?.title ?? DEFAULT_MODULE_TITLE}
+      </h3>
+      <p
+        className={cn(
+          commonStyles.text,
+          webCardTextFontsMap[cardStyle.fontFamily].className,
+        )}
+        style={{
+          color: swapColor(cardModuleColor?.text, colorPalette),
+          fontSize: cardStyle.fontSize,
+        }}
+      >
+        <RichText
+          fontFamily={cardStyle.fontFamily}
+          text={sectionData?.text ?? DEFAULT_MODULE_TEXT}
+        />
+      </p>
+    </div>
+  );
+};
+
+const SimpleCarouselItemMemo = React.memo(SimpleCarouselItem);
 
 export default SimpleCarousel;

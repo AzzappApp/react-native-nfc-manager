@@ -7,7 +7,7 @@ import { AppState, View, StyleSheet } from 'react-native';
 import { usePaginationFragment, graphql, useMutation } from 'react-relay';
 import { useOnFocus } from '#components/NativeRouter';
 import { useOnContactAdded } from '#helpers/addContactHelper';
-import { findLocalContact } from '#helpers/contactCardHelpers';
+import { findLocalContact } from '#helpers/contactHelpers';
 import { buildLocalContact } from '#helpers/contactListHelpers';
 import { getLocalContactsMap } from '#helpers/getLocalContactsMap';
 import { useProfileInfos } from '#hooks/authStateHooks';
@@ -148,6 +148,14 @@ const ContactsScreenLists = ({
                 }
                 urls {
                   url
+                }
+                avatar {
+                  id
+                  uri: uri(width: 61, pixelRatio: $pixelRatio, format: png)
+                }
+                logo {
+                  id
+                  uri: uri(width: 61, pixelRatio: $pixelRatio, format: png)
                 }
                 birthday
                 contactProfile {

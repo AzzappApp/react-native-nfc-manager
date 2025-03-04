@@ -12,12 +12,12 @@ jest.mock('react-native/Libraries/Utilities/useColorScheme', () => {
 
 // Test suite for SwitchLabel component
 describe('SwitchLabel component', () => {
-  it('renders the `label` of the switch correclty', () => {
+  test('renders the `label` of the switch correclty', () => {
     const { getByText } = render(<SwitchLabel label="Test Label" />);
     expect(getByText('Test Label')).toBeTruthy();
   });
 
-  it('should call `onValueChange` when switch is press', () => {
+  test('should call `onValueChange` when switch is press', () => {
     // Define mock onChange function
     const mockOnChange = jest.fn();
     const { getByTestId } = render(
@@ -39,7 +39,7 @@ describe('SwitchLabel component', () => {
     expect(mockOnChange).toHaveBeenCalledWith(true);
   });
 
-  it('should display correctly in dark mode', () => {
+  test('should display correctly in dark mode', () => {
     // Define mock onChange function
     const mockOnChange = jest.fn();
     const { getByTestId } = render(

@@ -32,7 +32,14 @@ export const matchUrlWithRoute = async (
   url: string,
 ): Promise<Route | undefined> => {
   // can be test only with the release app clip, url is fix, not based on scheme or target
-  if (url.startsWith('https://appclip.apple.com/id?p=com.azzapp.app.Clip')) {
+  if (url.includes('com.azzapp.app.Clip')) {
+    const route = await handleAppClip(url);
+    return route;
+  }
+  //when testing the url condition did not work for nico,we can also in second layer if query param u and c are present
+  //those 2 cases are working using the release appclip and the stable app id
+  if (getSearchParamFromURL(url, 'u') && getSearchParamFromURL(url, 'c')) {
+    //second try for the appclip
     const route = await handleAppClip(url);
     return route;
   }

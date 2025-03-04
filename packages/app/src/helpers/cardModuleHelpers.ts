@@ -1,18 +1,16 @@
 import * as Sentry from '@sentry/react-native';
-import { Dimensions, type TextStyle } from 'react-native';
+import { type TextStyle } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { splitArrayIntoChunks } from '@azzapp/shared/arrayHelpers';
 import { waitTime } from '@azzapp/shared/asyncHelpers';
 import {
   MODULE_IMAGE_MAX_WIDTH,
+  MODULE_VIDEO_BIT_RATE,
+  MODULE_VIDEO_FRAME_RATE,
   MODULE_VIDEO_MAX_WIDTH,
 } from '@azzapp/shared/cardModuleHelpers';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
-import {
-  POST_VIDEO_BIT_RATE,
-  POST_VIDEO_FRAME_RATE,
-} from '@azzapp/shared/postHelpers';
 import { isNotFalsyString, isValidUrl } from '@azzapp/shared/stringHelpers';
 import { MEMORY_SIZE } from './device';
 import { getFileName } from './fileHelpers';
@@ -117,8 +115,8 @@ export const handleUploadCardModuleMedia = async (
                     rotation: media.rotation ?? 0,
                   },
                   resolution,
-                  bitRate: POST_VIDEO_BIT_RATE,
-                  frameRate: POST_VIDEO_FRAME_RATE,
+                  bitRate: MODULE_VIDEO_BIT_RATE,
+                  frameRate: MODULE_VIDEO_FRAME_RATE,
                   duration: media.timeRange?.duration,
                   startTime: media.timeRange?.startTime,
                   filter: media.filter,
@@ -212,6 +210,7 @@ export const handleUploadCardModuleMedia = async (
 };
 
 export const handleOnCompletedModuleSave = (
+  isNewModule: boolean,
   moduleMedias: Array<{
     media: UploadedMedia;
     title?: string;
@@ -237,7 +236,11 @@ export const handleOnCompletedModuleSave = (
       }
     }
   }
-  router.back();
+  if (isNewModule) {
+    router.pop(2);
+  } else {
+    router.pop(1);
+  }
 };
 
 export const convertModuleMediaRelay = (mediaRelay: any) => {
@@ -351,32 +354,4 @@ export const hasCardModuleMediasError = (
     }
   }
   return false;
-};
-
-const { height: viewportHeight } = Dimensions.get('window');
-
-/**
- * The function `isInViewport` determines if a module media is within the viewport or partially visible based
- * on scroll position and module dimensions.
- * The `scrollPosition` parameter represents the current scroll position of the viewport.
- */
-export const isCardModuleMediaInViewport = (
-  scrollPosition: number,
-  modulePosition: number,
-  moduleHeight: number,
-): boolean => {
-  const viewportTop = scrollPosition;
-  const viewportBottom = scrollPosition + viewportHeight;
-
-  const moduleTop = modulePosition;
-  const moduleBottom = modulePosition + moduleHeight;
-
-  // Check if the module is within the viewport or just before or after it
-  return (
-    (moduleTop >= viewportTop && moduleTop <= viewportBottom) ||
-    (moduleBottom >= viewportTop && moduleBottom <= viewportBottom) ||
-    (moduleTop <= viewportTop && moduleBottom >= viewportBottom) ||
-    (moduleTop <= viewportTop && moduleBottom >= viewportTop) ||
-    (moduleTop <= viewportBottom && moduleBottom >= viewportBottom)
-  );
 };

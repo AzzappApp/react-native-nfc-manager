@@ -10,6 +10,7 @@ import ERRORS from '@azzapp/shared/errors';
 import { webCardLoader } from '#loaders';
 import { checkWebCardProfileAdminRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
+import { notifyRelatedWalletPasses } from '#helpers/webCardHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 import type { WebCard } from '@azzapp/data';
 
@@ -41,6 +42,8 @@ const saveCommonInformation: MutationResolvers['saveCommonInformation'] =
 
         await referencesMedias(logoId ? [logoId] : [], [webCard.logoId]);
       });
+
+      await notifyRelatedWalletPasses(webCardId);
     } catch (e) {
       console.error(e);
       throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);

@@ -123,6 +123,7 @@ const ForgotPasswordScreen = () => {
                 </Text>
               )}
               <Button
+                testID="submitButton"
                 onTouchStart={Keyboard.dismiss}
                 label={intl.formatMessage({
                   defaultMessage: 'Reset password',

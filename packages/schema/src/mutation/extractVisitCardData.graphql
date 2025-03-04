@@ -1,0 +1,14 @@
+extend type Mutation {
+  extractVisitCardData(imgUrl: String!): VisitCardData
+}
+
+type VisitCardData {
+  firstName: String
+  lastName: String
+  title: String
+  company: String
+  phoneNumbers: [String!]
+  emails: [String!]
+  addresses: [String!]
+  urls: [String!]
+}

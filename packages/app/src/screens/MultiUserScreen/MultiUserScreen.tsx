@@ -13,11 +13,13 @@ import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
 import { colors } from '#theme';
 import { CancelHeaderButton } from '#components/commonsButtons';
 import CoverRenderer from '#components/CoverRenderer';
+import MultiUserDescription from '#components/MultiUserDescription';
 import {
   useRouter,
   ScreenModal,
   preventModalDismiss,
 } from '#components/NativeRouter';
+import BottomSheetPopup from '#components/popup/BottomSheetPopup';
 import PremiumIndicator from '#components/PremiumIndicator';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { profileInfoHasAdminRight } from '#helpers/profileRoleHelper';
@@ -100,6 +102,9 @@ const MultiUserScreen = ({
   const [isMultiUser, setIsMultiUser] = useState(
     !!profile?.webCard?.isMultiUser,
   );
+
+  const [isOpenMultiUserInfo, openMultiUserInfo, closeMultiUserInfo] =
+    useBoolean();
 
   useEffect(() => {
     setIsMultiUser(!!profile?.webCard?.isMultiUser);
@@ -245,11 +250,10 @@ const MultiUserScreen = ({
   ]);
 
   //#endRegion
-
   const ScrollableHeader = useMemo(() => {
     return (
       <View style={{ alignItems: 'center' }}>
-        <Icon style={styles.sharedIcon} icon="multi_user" size={140} />
+        <Icon style={styles.sharedIcon} icon="shared_webcard" size={60} />
         <Text variant="xsmall" style={styles.description}>
           {transferOwnerMode ? (
             <FormattedMessage
@@ -258,11 +262,8 @@ const MultiUserScreen = ({
             />
           ) : (
             <FormattedMessage
-              defaultMessage="Enhance teamwork: provide each member with a personalized ContactCard{azzappA}, seamlessly connected to the shared WebCard{azzappA}, fostering individual identity within a cohesive system."
+              defaultMessage="Equip your team with digital business cards, linked to the company’s WebCard."
               description="Description for MultiUserScreen"
-              values={{
-                azzappA: <Text variant="azzapp">a</Text>,
-              }}
             />
           )}
         </Text>
@@ -290,6 +291,13 @@ const MultiUserScreen = ({
                 />
               </Text>
               <PremiumIndicator isRequired={!profile?.webCard?.isPremium} />
+              {profile.webCard?.isMultiUser && (
+                <IconButton
+                  style={styles.informationIcon}
+                  icon="information"
+                  onPress={openMultiUserInfo}
+                />
+              )}
             </View>
             <Switch
               variant="large"
@@ -298,13 +306,28 @@ const MultiUserScreen = ({
             />
           </View>
         )}
+        <BottomSheetPopup
+          visible={isOpenMultiUserInfo}
+          onDismiss={closeMultiUserInfo}
+          isAnimatedContent
+        >
+          <View style={styles.popupContainer}>
+            <MultiUserDescription onClose={closeMultiUserInfo} width={345} />
+          </View>
+        </BottomSheetPopup>
       </View>
     );
   }, [
+    closeMultiUserInfo,
     isMultiUser,
+    isOpenMultiUserInfo,
+    openMultiUserInfo,
     profile?.profileRole,
+    profile?.webCard?.isMultiUser,
     profile?.webCard?.isPremium,
     styles.description,
+    styles.informationIcon,
+    styles.popupContainer,
     styles.proContainer,
     styles.sharedIcon,
     styles.switchSection,
@@ -420,7 +443,10 @@ const MultiUserScreen = ({
               </Suspense>
             </>
           ) : (
-            ScrollableHeader
+            <>
+              {ScrollableHeader}
+              <MultiUserDescription />
+            </>
           )}
         </View>
       </SafeAreaView>
@@ -440,7 +466,7 @@ const MultiUserScreen = ({
                   description="Title for confirm delete multi user modal"
                 />
               </Text>
-              <Text variant="medium">
+              <Text variant="medium" style={styles.deactivationText}>
                 <FormattedMessage
                   defaultMessage="If you deactivate the Multi-User, other collaborators will no longer be able to access this WebCard{azzappA} or their linked ContactCards{azzappA}. This action is irreversible."
                   description="Description for confirm delete multi user modal"
@@ -487,6 +513,7 @@ const styleSheet = createStyleSheet(appearance => ({
   sharedIcon: {
     margin: 'auto',
     marginTop: 15,
+    marginBottom: 20,
   },
   content: {
     flexDirection: 'column',
@@ -534,6 +561,18 @@ const styleSheet = createStyleSheet(appearance => ({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  deactivationText: { textAlign: 'center' },
+  popupContainer: {
+    display: 'flex',
+    backgroundColor: colors.white,
+    borderRadius: 20,
+    alignSelf: 'center',
+    paddingBottom: 20,
+    height: 550,
+  },
+  informationIcon: {
+    borderWidth: 0,
   },
 }));
 

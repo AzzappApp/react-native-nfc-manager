@@ -5,6 +5,7 @@ import {
   ContactTable,
   MediaTable,
   ProfileTable,
+  UserTable,
   WebCardTable,
 } from '../schema';
 import { getEntitiesByIds } from './entitiesQueries';
@@ -109,7 +110,15 @@ export const getProfileByUserAndWebCard = async (
  * @returns The list of profiles associated to the user
  */
 export const getProfilesByUser = async (userId: string): Promise<Profile[]> =>
-  db().select().from(ProfileTable).where(eq(ProfileTable.userId, userId));
+  db()
+    .select({ profile: ProfileTable })
+    .from(ProfileTable)
+    .innerJoin(WebCardTable, eq(WebCardTable.id, ProfileTable.webCardId))
+    .where(
+      and(eq(ProfileTable.deleted, false), eq(ProfileTable.userId, userId)),
+    )
+    .orderBy(asc(WebCardTable.userName))
+    .then(res => res.map(({ profile }) => profile));
 
 /**
  * Retrieves a user profiles list with the associated web card
@@ -427,19 +436,6 @@ export const removeProfile = async (id: string, deletedBy: string) => {
   });
 };
 
-const getAvatarAndLogo = async (profileIds: string[]) => {
-  if (profileIds.length === 0) {
-    return [];
-  }
-  return db()
-    .select({
-      avatarId: ProfileTable.avatarId,
-      logoId: ProfileTable.logoId,
-    })
-    .from(ProfileTable)
-    .where(inArray(ProfileTable.id, profileIds));
-};
-
 /**
  * Deletes multiple profiles by their ids
  *
@@ -450,30 +446,6 @@ export const removeProfiles = async (
   deletedBy: string,
 ) => {
   await transaction(async () => {
-    const profiles = await getAvatarAndLogo(profileIds);
-
-    const avatarIds = profiles
-      .map(({ avatarId }) => avatarId)
-      .filter(av => av !== null);
-
-    if (avatarIds.length > 0) {
-      await db()
-        .update(MediaTable)
-        .set({ refCount: sql`${MediaTable.refCount} - 1` })
-        .where(inArray(MediaTable.id, avatarIds));
-    }
-
-    const logoIds = profiles
-      .map(({ logoId }) => logoId)
-      .filter(logo => logo !== null);
-
-    if (logoIds.length > 0) {
-      await db()
-        .update(MediaTable)
-        .set({ refCount: sql`${MediaTable.refCount} - 1` })
-        .where(inArray(MediaTable.id, logoIds));
-    }
-
     await db()
       .update(ProfileTable)
       .set({
@@ -582,4 +554,48 @@ export const getProfilesWhereUserBIsOwner = async (
     .where(eq(ProfileTable.userId, userAId));
 
   return profiles;
+};
+
+/**
+ *
+ * @param profileIds collection of profile ids
+ * @param date is the date to compare the lastContactCardUpdate field
+ * @returns filtered profiles that have a lastContactCardUpdate greater than the date
+ */
+export const getUpdatedProfiles = async (profileIds: string[], date?: Date) => {
+  return db()
+    .select()
+    .from(ProfileTable)
+    .where(
+      and(
+        inArray(ProfileTable.id, profileIds),
+        date ? gt(ProfileTable.lastContactCardUpdate, date) : undefined,
+      ),
+    );
+};
+
+export const updateHasGooglePass = async (
+  profileId: string,
+  hasGooglePass: boolean,
+) => {
+  await db()
+    .update(ProfileTable)
+    .set({ hasGooglePass })
+    .where(eq(ProfileTable.id, profileId));
+};
+
+export const getProfilesWithHasGooglePass = async (webCardId: string) => {
+  return db()
+    .select({
+      profileId: ProfileTable.id,
+      userLocale: UserTable.locale,
+    })
+    .from(ProfileTable)
+    .innerJoin(UserTable, eq(UserTable.id, ProfileTable.userId))
+    .where(
+      and(
+        eq(ProfileTable.webCardId, webCardId),
+        eq(ProfileTable.hasGooglePass, true),
+      ),
+    );
 };

@@ -227,7 +227,9 @@ const Footer = ({
     setDeviceType(getDeviceType());
   }, []);
 
-  const color = getTextColor(backgroundColor);
+  const color = getTextColor(
+    backgroundColor === 'transparent' ? '#FFF' : backgroundColor,
+  );
   const isLight = color === colors.white;
 
   return (

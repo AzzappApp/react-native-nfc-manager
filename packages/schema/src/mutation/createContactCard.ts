@@ -20,7 +20,7 @@ import type { InferInsertModel } from 'drizzle-orm';
 
 const createContactCard: MutationResolvers['createContactCard'] = async (
   _,
-  { webCardKind, contactCard, webCardUserName },
+  { webCardKind, contactCard, webCardUserName, primaryColor, coverMediaId },
 ) => {
   const { userId } = getSessionInfos();
 
@@ -29,7 +29,12 @@ const createContactCard: MutationResolvers['createContactCard'] = async (
   }
 
   const user = await userLoader.load(userId);
-  const defaultCover = await pickRandomPredefinedCover();
+  let defaultCover = null;
+
+  //w don't need a default cover if we got a coverMediId
+  if (!coverMediaId) {
+    defaultCover = await pickRandomPredefinedCover();
+  }
 
   const currentDate = new Date();
 
@@ -52,28 +57,38 @@ const createContactCard: MutationResolvers['createContactCard'] = async (
     locale: user?.locale ?? null,
     cardColors: defaultCover
       ? { ...defaultCover.defaultTriptychColors, otherColors: [] }
-      : undefined,
-    coverIsPredefined: true,
+      : primaryColor
+        ? {
+            primary: primaryColor,
+            dark: '#0E1216',
+            light: '#FFFFFF',
+            otherColors: [],
+          }
+        : undefined,
+    coverIsPredefined: !coverMediaId,
+    coverIsLogoPredefined: !!coverMediaId,
     cardIsPublished: true,
-    coverMediaId: defaultCover.mediaId,
+    coverMediaId: coverMediaId ?? defaultCover?.mediaId,
     companyActivityLabel: contactCard.companyActivityLabel,
     alreadyPublished: true,
     userName: webCardUserName,
   };
 
   try {
-    let profileId: string | null = null;
+    const addedMedia = [
+      coverMediaId ?? defaultCover?.mediaId,
+      contactCard.avatarId,
+      contactCard.logoId,
+    ].filter(isDefined);
 
-    await transaction(async () => {
-      const addedMedia = [defaultCover.mediaId, contactCard.avatarId].filter(
-        isDefined,
-      );
-      if (addedMedia.length) {
-        await checkMedias(addedMedia);
-        await referencesMedias(addedMedia, null);
-      }
+    if (addedMedia.length) {
+      await checkMedias(addedMedia);
+      await referencesMedias(addedMedia, null);
+    }
+
+    const profileId = await transaction(async () => {
       const webCardId = await createWebCard(inputWebCard);
-      profileId = await createProfile({
+      const id = await createProfile({
         webCardId,
         userId,
         contactCard,
@@ -82,7 +97,9 @@ const createContactCard: MutationResolvers['createContactCard'] = async (
         ), // Will hide finger hint after creation
         inviteSent: true,
         avatarId: contactCard.avatarId,
+        logoId: contactCard.logoId,
       });
+      return id;
     });
 
     if (!profileId) {

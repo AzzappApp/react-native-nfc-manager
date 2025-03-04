@@ -5,7 +5,7 @@ import {
   getProfileWithWebCardById,
 } from '@azzapp/data';
 import { convertHexToRGBA, getTextColor } from '@azzapp/shared/colorsHelpers';
-import { seal } from '@azzapp/shared/crypto';
+import { seal, unseal } from '@azzapp/shared/crypto';
 import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
 import { buildUserUrlWithContactCard } from '@azzapp/shared/urlHelpers';
 import icon from '@azzapp/web/public/pass/ICON_PADDING_15.png';
@@ -21,6 +21,44 @@ const getCoverUrl = (webCard: WebCard, size: number) =>
     height: size,
     crop: 'lpad',
   });
+
+export const APPLE_TEAM_IDENTIFIER = process.env.APPLE_TEAM_IDENTIFIER ?? ''; // Team ID
+
+const APPLE_HEADER_PREFIX = 'ApplePass ';
+
+export const SIGNER_CERT = Buffer.from(
+  process.env.APPLE_PASS_SIGNER_CERT ?? '',
+  'base64',
+);
+
+export const SIGNER_KEY = Buffer.from(
+  process.env.APPLE_PASS_SIGNER_KEY ?? '',
+  'base64',
+);
+
+export const SIGNER_KEY_PASSPHRASE =
+  process.env.APPLE_PASS_SIGNER_KEY_PASSPHRASE;
+
+export const APPLE_PASS_IDENTIFIER = process.env.APPLE_PASS_IDENTIFIER ?? '';
+
+export const checkAuthorization = async (req: Request, serial: string) => {
+  const authorization = req.headers
+    .get('Authorization')
+    ?.replace(APPLE_HEADER_PREFIX, '');
+
+  if (!authorization) {
+    throw new Error('Unauthorized');
+  }
+
+  const profileId = await unseal(
+    authorization,
+    process.env.APPLE_TOKEN_PASSWORD ?? '',
+  );
+
+  if (profileId !== serial) {
+    throw new Error('Unauthorized');
+  }
+};
 
 export const buildApplePass = async (profileId: string, locale: string) => {
   const res = await getProfileWithWebCardById(profileId);
@@ -92,20 +130,14 @@ export const buildApplePass = async (profileId: string, locale: string) => {
         ...thumbnails,
       },
       {
-        signerCert: Buffer.from(
-          process.env.APPLE_PASS_SIGNER_CERT ?? '',
-          'base64',
-        ),
-        signerKey: Buffer.from(
-          process.env.APPLE_PASS_SIGNER_KEY ?? '',
-          'base64',
-        ),
-        signerKeyPassphrase: process.env.APPLE_PASS_SIGNER_KEY_PASSPHRASE,
+        signerCert: SIGNER_CERT,
+        signerKey: SIGNER_KEY,
+        signerKeyPassphrase: SIGNER_KEY_PASSPHRASE,
         wwdr: Buffer.from(process.env.APPLE_PASS_WWDR ?? '', 'base64'),
       },
       {
         passTypeIdentifier: process.env.APPLE_PASS_IDENTIFIER ?? '',
-        teamIdentifier: process.env.APPLE_TEAM_IDENTIFIER ?? '',
+        teamIdentifier: APPLE_TEAM_IDENTIFIER,
         organizationName: process.env.APPLE_ORGANIZATION_NAME ?? '',
         description: 'Contact Card',
         foregroundColor: convertHexToRGBA(getTextColor(backgroundColor)),

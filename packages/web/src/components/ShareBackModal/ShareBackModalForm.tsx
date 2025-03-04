@@ -117,6 +117,7 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
                   refs.lastname.current?.focus();
                 }
               }}
+              autoComplete="given-name"
             />
           </div>
 
@@ -142,6 +143,7 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
                   refs.phone.current?.focus();
                 }
               }}
+              autoComplete="family-name"
             />
           </div>
           <div className={styles.formField}>
@@ -166,6 +168,7 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
                   refs.email.current?.focus();
                 }
               }}
+              autoComplete="tel"
             />
           </div>
           <div className={styles.formField}>
@@ -191,6 +194,7 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
                 }
               }}
               inputMode="email"
+              autoComplete="email"
             />
           </div>
           <div className={styles.formField}>
@@ -215,6 +219,7 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
                   refs.title.current?.focus();
                 }
               }}
+              autoComplete="organization"
             />
           </div>
           <div className={styles.formField}>
@@ -233,6 +238,7 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
                 description: 'Title label',
               })}
               ref={refs.title}
+              autoComplete="organization-title"
             />
           </div>
         </div>

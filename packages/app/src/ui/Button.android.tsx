@@ -9,7 +9,7 @@ import {
 import Text from '#ui/Text';
 import ActivityIndicator from './ActivityIndicator';
 import type { ForwardedRef, ReactNode } from 'react';
-import type { StyleProp, ViewStyle } from 'react-native';
+import type { StyleProp, TextStyle, ViewStyle } from 'react-native';
 import type { PressableProps } from 'react-native-gesture-handler';
 
 export type ButtonProps = PressableProps & {
@@ -19,6 +19,8 @@ export type ButtonProps = PressableProps & {
   style?: StyleProp<ViewStyle>;
   loading?: boolean;
   rightElement?: ReactNode;
+  leftElement?: ReactNode;
+  textStyle?: TextStyle;
 };
 
 // We use gesture handler as temporary solution for Android when there is a transform (via keyboard for example) on the parent view
@@ -32,6 +34,8 @@ const Button = (
     disabled,
     style,
     rightElement,
+    textStyle,
+    leftElement,
     ...props
   }: ButtonProps,
   forwardedRef: ForwardedRef<View>,
@@ -85,7 +89,12 @@ const Button = (
         <ActivityIndicator color={color} />
       ) : (
         <View style={variantStyles.labelContainer}>
-          <Text variant="button" style={variantStyles.label} numberOfLines={1}>
+          {leftElement}
+          <Text
+            variant="button"
+            style={[variantStyles.label, textStyle]}
+            numberOfLines={1}
+          >
             {label}
           </Text>
           {rightElement}
@@ -120,6 +129,9 @@ const computedStyles = createVariantsStyleSheet(appearance => ({
       lineHeight: 18,
     },
     androidContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      columnGap: 5,
       borderRadius: 12,
       overflow: 'hidden',
     },

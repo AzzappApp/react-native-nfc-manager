@@ -154,12 +154,15 @@ export function formatDuration(duration: number) {
 export function formatDisplayName(
   firstName: string | null | undefined,
   lastName: string | null | undefined,
+  companyName?: string | null | undefined,
 ) {
   if (isNotFalsyString(firstName) && isNotFalsyString(lastName)) {
     return `${firstName} ${lastName}`;
   }
   if (isNotFalsyString(firstName)) return firstName;
   if (isNotFalsyString(lastName)) return lastName;
+  if (isNotFalsyString(companyName)) return companyName;
+
   return undefined;
 }
 

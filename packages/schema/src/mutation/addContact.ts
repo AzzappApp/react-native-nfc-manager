@@ -2,17 +2,20 @@ import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
 
 import {
+  checkMedias,
   createContact,
   getContactByProfiles,
   incrementShareBacks,
   incrementShareBacksTotal,
+  referencesMedias,
   transaction,
   updateContact,
 } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
+import { isDefined } from '@azzapp/shared/isDefined';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
-import { sendPushNotification } from '#externals';
+import { notifyUsers, sendPushNotification } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
 import { profileLoader, userLoader, webCardLoader } from '#loaders';
 import type { MutationResolvers } from '#__generated__/types';
@@ -20,7 +23,7 @@ import type { Contact, ContactRow } from '@azzapp/data';
 
 const addContact: MutationResolvers['addContact'] = async (
   _,
-  { profileId: gqlProfileId, input },
+  { profileId: gqlProfileId, input, notify },
 ) => {
   const { userId } = getSessionInfos();
 
@@ -33,15 +36,25 @@ const addContact: MutationResolvers['addContact'] = async (
   if (!profile || profile.userId !== userId) {
     throw new GraphQLError(ERRORS.FORBIDDEN);
   }
+  const webCard = await webCardLoader.load(profile.webCardId);
 
-  const existingContact = await getContactByProfiles({
-    owner: profileId,
-    contact: input.profileId,
-  });
+  const existingContact = input.profileId
+    ? await getContactByProfiles({
+        owner: profileId,
+        contact: input.profileId,
+      })
+    : null;
+
+  const data = [input.avatarId, input.logoId].filter(isDefined);
+  if (data.length) {
+    await checkMedias(data);
+    await referencesMedias(data, null);
+  }
 
   const contactToCreate: Omit<Contact, 'deletedAt' | 'id'> = {
+    avatarId: input.avatarId ?? null,
     addresses: input.addresses,
-    contactProfileId: input.profileId,
+    contactProfileId: input.profileId ?? null,
     emails: input.emails,
     ownerProfileId: profileId,
     phoneNumbers: input.phoneNumbers,
@@ -55,6 +68,7 @@ const addContact: MutationResolvers['addContact'] = async (
     urls: input.urls || null,
     socials: input.socials || null,
     createdAt: new Date(),
+    logoId: input.logoId ?? null,
   };
 
   let contact: Contact;
@@ -76,8 +90,7 @@ const addContact: MutationResolvers['addContact'] = async (
     };
   }
 
-  if (input.withShareBack) {
-    const webCard = await webCardLoader.load(profile.webCardId);
+  if (input.withShareBack && input.profileId) {
     const commonInformation = webCard?.isMultiUser
       ? webCard?.commonInformation
       : undefined;
@@ -163,18 +176,22 @@ const addContact: MutationResolvers['addContact'] = async (
       contact: profileId,
     });
 
-    if (!existingShareBack) {
-      await transaction(async () => {
-        await createContact(shareBackToCreate);
-        await incrementShareBacksTotal(input.profileId);
-        await incrementShareBacks(input.profileId, true);
-      });
-    } else {
-      await transaction(async () => {
-        await updateContact(existingShareBack.id, shareBackToCreate);
-        await incrementShareBacksTotal(input.profileId);
-        await incrementShareBacks(input.profileId, true);
-      });
+    const inputProfileId = input.profileId;
+
+    if (inputProfileId) {
+      if (!existingShareBack) {
+        await transaction(async () => {
+          await createContact(shareBackToCreate);
+          await incrementShareBacksTotal(inputProfileId);
+          await incrementShareBacks(inputProfileId, true);
+        });
+      } else {
+        await transaction(async () => {
+          await updateContact(existingShareBack.id, shareBackToCreate);
+          await incrementShareBacksTotal(inputProfileId);
+          await incrementShareBacks(inputProfileId, true);
+        });
+      }
     }
 
     const profileToNotify = await profileLoader.load(input.profileId);
@@ -191,6 +208,24 @@ const addContact: MutationResolvers['addContact'] = async (
         });
       }
     }
+  }
+
+  if (notify && input.emails.length > 0 && webCard) {
+    const user = await userLoader.load(profile?.userId);
+    await notifyUsers(
+      'email',
+      input.emails.map(({ address }) => address!),
+      webCard,
+      'vcard',
+      guessLocale(user?.locale),
+      {
+        profile,
+        contact: {
+          firstname: input.firstname,
+          lastname: input.lastname,
+        },
+      },
+    );
   }
 
   return {

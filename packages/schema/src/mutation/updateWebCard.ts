@@ -12,6 +12,7 @@ import {
 import { checkWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { checkWebCardHasSubscription } from '#helpers/subscriptionHelpers';
+import { isUserNameAvailable } from '#helpers/webCardHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 import type { WebCard } from '@azzapp/data';
 
@@ -30,15 +31,21 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
     ...profileUpdates
   } = updates;
 
-  if (profileUpdates.userName && !isValidUserName(profileUpdates.userName)) {
-    throw new GraphQLError(ERRORS.INVALID_WEBCARD_USERNAME);
-  }
-
   const webCard = await webCardLoader.load(webCardId);
 
   if (!webCard) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
+
+  if (profileUpdates.userName && profileUpdates.userName !== webCard.userName) {
+    if (!isValidUserName(profileUpdates.userName)) {
+      throw new GraphQLError(ERRORS.INVALID_WEBCARD_USERNAME);
+    }
+    if (!(await isUserNameAvailable(profileUpdates.userName)).available) {
+      throw new GraphQLError(ERRORS.USERNAME_ALREADY_EXISTS);
+    }
+  }
+
   const partialWebCard: Partial<WebCard> = {
     ...profileUpdates,
     webCardKind: profileUpdates.webCardKind || webCard?.webCardKind,

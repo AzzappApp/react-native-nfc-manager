@@ -10,7 +10,10 @@ import { invalidateWebCard } from '#externals';
 import { webCardLoader, webCardOwnerLoader } from '#loaders';
 import { checkWebCardOwnerProfile } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
-import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
+import {
+  updateMonthlySubscription,
+  validateCurrentSubscription,
+} from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 import type { WebCard } from '@azzapp/data';
 
@@ -24,23 +27,28 @@ const updateMultiUser: MutationResolvers['updateMultiUser'] = async (
     isMultiUser,
   };
 
-  if (isMultiUser) {
-    const owner = await webCardOwnerLoader.load(webCardId);
+  const owner = await webCardOwnerLoader.load(webCardId);
 
+  if (!owner) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
+
+  if (isMultiUser) {
     //we first need to heck if this is an IAP subscription and enought seath
-    if (owner?.id) {
-      await validateCurrentSubscription(
-        owner.id,
-        await getWebCardCountProfile(webCardId),
-      );
-    }
+    await validateCurrentSubscription(
+      owner.id,
+      await getWebCardCountProfile(webCardId),
+    );
   }
 
   try {
     await transaction(async () => {
       await updateWebCard(webCardId, updates);
       if (!isMultiUser) {
-        await removeWebCardNonOwnerProfiles(webCardId);
+        await transaction(async () => {
+          await removeWebCardNonOwnerProfiles(webCardId);
+          await updateMonthlySubscription(owner.id);
+        });
       }
     });
   } catch (e) {

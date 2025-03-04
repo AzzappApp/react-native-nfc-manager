@@ -189,6 +189,7 @@ const MediaTextModuleWebCardEditionScreen = (
             },
             onCompleted(_, error) {
               handleOnCompletedModuleSave(
+                !data?.id,
                 moduleMedias,
                 router,
                 error,

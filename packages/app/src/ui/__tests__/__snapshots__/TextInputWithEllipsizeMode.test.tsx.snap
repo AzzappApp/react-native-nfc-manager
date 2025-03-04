@@ -1,0 +1,243 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TextInputWithEllipsizeMode component change text value 1`] = `
+<View>
+  <TextInput
+    allowFontScaling={false}
+    onBlur={[Function]}
+    onFocus={[Function]}
+    placeholderTextColor="#A1A1A5"
+    selectionColor="#FF502E"
+    style={
+      [
+        {
+          "backgroundColor": "#F5F5F6",
+          "borderColor": "#F5F5F6",
+          "borderRadius": 12,
+          "borderWidth": 1,
+          "color": "#0E1216",
+          "fontFamily": "PlusJakartaSans-Regular",
+          "fontSize": 16,
+          "height": 47,
+          "lineHeight": 20,
+          "paddingHorizontal": 15,
+          "paddingVertical": 3,
+        },
+        undefined,
+        false,
+        undefined,
+        {
+          "color": "transparent",
+        },
+      ]
+    }
+    testID="nativeInputText"
+    value="test"
+  />
+  <Text
+    accessible={true}
+    allowFontScaling={false}
+    ellipsizeMode="tail"
+    maxFontSizeMultiplier={1}
+    numberOfLines={1}
+    onPress={[Function]}
+    style={
+      [
+        {
+          "color": "#0E1216",
+          "fontFamily": "PlusJakartaSans-Regular",
+        },
+        [
+          {
+            "backgroundColor": "#F5F5F6",
+            "borderColor": "#F5F5F6",
+            "borderRadius": 12,
+            "borderWidth": 1,
+            "color": "#0E1216",
+            "fontFamily": "PlusJakartaSans-Regular",
+            "fontSize": 16,
+            "height": 47,
+            "lineHeight": 20,
+            "paddingHorizontal": 15,
+            "paddingVertical": 3,
+          },
+          undefined,
+          undefined,
+          {
+            "backgroundColor": "transparent",
+            "justifyContent": "center",
+            "position": "absolute",
+            "top": 9,
+          },
+          {
+            "opacity": 1,
+          },
+        ],
+      ]
+    }
+    value="test"
+  >
+    test
+  </Text>
+</View>
+`;
+
+exports[`TextInputWithEllipsizeMode component with value 1`] = `
+<View>
+  <TextInput
+    allowFontScaling={false}
+    onBlur={[Function]}
+    onFocus={[Function]}
+    placeholderTextColor="#A1A1A5"
+    selectionColor="#FF502E"
+    style={
+      [
+        {
+          "backgroundColor": "#F5F5F6",
+          "borderColor": "#F5F5F6",
+          "borderRadius": 12,
+          "borderWidth": 1,
+          "color": "#0E1216",
+          "fontFamily": "PlusJakartaSans-Regular",
+          "fontSize": 16,
+          "height": 47,
+          "lineHeight": 20,
+          "paddingHorizontal": 15,
+          "paddingVertical": 3,
+        },
+        undefined,
+        false,
+        undefined,
+        {
+          "color": "transparent",
+        },
+      ]
+    }
+    testID="nativeInputText"
+    value="test"
+  />
+  <Text
+    accessible={true}
+    allowFontScaling={false}
+    ellipsizeMode="tail"
+    maxFontSizeMultiplier={1}
+    numberOfLines={1}
+    onPress={[Function]}
+    style={
+      [
+        {
+          "color": "#0E1216",
+          "fontFamily": "PlusJakartaSans-Regular",
+        },
+        [
+          {
+            "backgroundColor": "#F5F5F6",
+            "borderColor": "#F5F5F6",
+            "borderRadius": 12,
+            "borderWidth": 1,
+            "color": "#0E1216",
+            "fontFamily": "PlusJakartaSans-Regular",
+            "fontSize": 16,
+            "height": 47,
+            "lineHeight": 20,
+            "paddingHorizontal": 15,
+            "paddingVertical": 3,
+          },
+          undefined,
+          undefined,
+          {
+            "backgroundColor": "transparent",
+            "justifyContent": "center",
+            "position": "absolute",
+            "top": 9,
+          },
+          {
+            "opacity": 1,
+          },
+        ],
+      ]
+    }
+    value="test"
+  >
+    test
+  </Text>
+</View>
+`;
+
+exports[`TextInputWithEllipsizeMode empty component 1`] = `
+<View>
+  <TextInput
+    allowFontScaling={false}
+    onBlur={[Function]}
+    onFocus={[Function]}
+    placeholderTextColor="#A1A1A5"
+    selectionColor="#FF502E"
+    style={
+      [
+        {
+          "backgroundColor": "#F5F5F6",
+          "borderColor": "#F5F5F6",
+          "borderRadius": 12,
+          "borderWidth": 1,
+          "color": "#0E1216",
+          "fontFamily": "PlusJakartaSans-Regular",
+          "fontSize": 16,
+          "height": 47,
+          "lineHeight": 20,
+          "paddingHorizontal": 15,
+          "paddingVertical": 3,
+        },
+        undefined,
+        false,
+        undefined,
+        {
+          "color": "transparent",
+        },
+      ]
+    }
+    testID="nativeInputText"
+  />
+  <Text
+    accessible={true}
+    allowFontScaling={false}
+    ellipsizeMode="tail"
+    maxFontSizeMultiplier={1}
+    numberOfLines={1}
+    onPress={[Function]}
+    style={
+      [
+        {
+          "color": "#0E1216",
+          "fontFamily": "PlusJakartaSans-Regular",
+        },
+        [
+          {
+            "backgroundColor": "#F5F5F6",
+            "borderColor": "#F5F5F6",
+            "borderRadius": 12,
+            "borderWidth": 1,
+            "color": "#0E1216",
+            "fontFamily": "PlusJakartaSans-Regular",
+            "fontSize": 16,
+            "height": 47,
+            "lineHeight": 20,
+            "paddingHorizontal": 15,
+            "paddingVertical": 3,
+          },
+          undefined,
+          undefined,
+          {
+            "backgroundColor": "transparent",
+            "justifyContent": "center",
+            "position": "absolute",
+            "top": 9,
+          },
+          {
+            "opacity": 1,
+          },
+        ],
+      ]
+    }
+  />
+</View>
+`;

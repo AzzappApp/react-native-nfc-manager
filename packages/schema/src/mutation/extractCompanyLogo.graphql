@@ -1,0 +1,9 @@
+extend type Mutation {
+  extractCompanyLogo(brand: String!): [CompanyData]
+}
+
+type CompanyData {
+  id: String!
+  score: Float!
+  uri: String!
+}

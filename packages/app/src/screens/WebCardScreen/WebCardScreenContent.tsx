@@ -15,7 +15,7 @@ import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
-import WebCardBackground from '#components/WebCardBackgroundPreview';
+import WebCardBackgroundPreview from '#components/WebCardBackgroundPreview';
 import useScreenInsets from '#hooks/useScreenInsets';
 import useCoverPlayPermission from '#screens/HomeScreen/useCoverPlayPermission';
 import WebCardEditScreen from '#screens/WebCardEditScreen/WebCardEditScreen';
@@ -114,7 +114,6 @@ const WebCardScreenContent = ({
           dark
           light
         }
-        coverIsPredefined
         ...CoverRenderer_webCard
         ...WebCardScreenBody_webCard
         ...WebCardBackgroundPreview_webCard
@@ -187,7 +186,7 @@ const WebCardScreenContent = ({
             />
           }
         >
-          <WebCardBackground webCard={webCard} style={styles.flex} />
+          <WebCardBackgroundPreview webCard={webCard} style={styles.flex} />
         </Suspense>
       </View>
       <Suspense>

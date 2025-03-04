@@ -8,7 +8,7 @@ export const buildAvatarUrl = async (
   profile: Profile,
   webCard: WebCard | null,
 ) => {
-  const avatarId = profile.avatarId;
+  const avatarId = profile.avatarId ?? profile.logoId;
   let avatarUrl: string | null = null;
   if (avatarId) {
     avatarUrl = constructCloudinaryUrl({

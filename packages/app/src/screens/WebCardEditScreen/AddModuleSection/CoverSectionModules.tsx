@@ -3,7 +3,6 @@ import { memo, useCallback } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { FlatList, StyleSheet } from 'react-native';
 import { colors } from '#theme';
-import { useRouter } from '#components/NativeRouter';
 import { getRouteForCardModule } from '#helpers/cardModuleRouterHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useModuleVariantsLabel from '#hooks/useModuleVariantsLabel';
@@ -19,12 +18,12 @@ import type { ListRenderItemInfo } from 'react-native';
 
 type CoverSectionModules = {
   section: ModuleKindSection;
-  addingModuleRequiresSubscription: boolean;
+  onSelectModuleKind: (variant: ModuleKindWithVariant) => void;
 };
 
 const CoverSectionModules = ({
   section,
-  addingModuleRequiresSubscription,
+  onSelectModuleKind,
 }: CoverSectionModules) => {
   const styles = useStyleSheet(stylesheet);
   const renderItem = useCallback(
@@ -37,14 +36,9 @@ const CoverSectionModules = ({
               variant: item,
             }
       ) as ModuleKindWithVariant;
-      return (
-        <VariantItem
-          {...props}
-          addingModuleRequiresSubscription={addingModuleRequiresSubscription}
-        />
-      );
+      return <VariantItem {...props} onSelectModuleKind={onSelectModuleKind} />;
     },
-    [addingModuleRequiresSubscription, section.section],
+    [onSelectModuleKind, section.section],
   );
 
   return (
@@ -112,32 +106,27 @@ const stylesheet = createStyleSheet(appearance => ({
 export default CoverSectionModules;
 
 const Item = ({
-  addingModuleRequiresSubscription,
+  onSelectModuleKind,
   ...props
 }: ModuleKindWithVariant & {
-  addingModuleRequiresSubscription: boolean;
+  onSelectModuleKind: (variant: ModuleKindWithVariant) => void;
 }) => {
-  const router = useRouter();
   const styles = useStyleSheet(stylesheet);
 
   const route = getRouteForCardModule({ ...props, isNew: true });
 
-  const onSelectModuleKind = useCallback(() => {
+  const onSelectModuleKindInner = () => {
     if (route) {
-      if (addingModuleRequiresSubscription) {
-        router.push({ route: 'USER_PAY_WALL' });
-        return;
-      }
-      router.replace(route);
+      onSelectModuleKind(props);
     }
-  }, [addingModuleRequiresSubscription, route, router]);
+  };
 
   const uri = useModuleVariantsPreviewImage(props);
   const label = useModuleVariantsLabel(props);
 
   return (
     <PressableOpacity
-      onPress={onSelectModuleKind}
+      onPress={onSelectModuleKindInner}
       style={styles.module}
       disabled={!route}
       disabledOpacity={1}

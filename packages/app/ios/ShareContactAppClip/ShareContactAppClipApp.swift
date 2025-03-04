@@ -66,6 +66,7 @@ struct ContentView: View {
    }
 
     private func handleUserActivity(_ userActivity: NSUserActivity) {
+      showAppButton = false
       guard let webpageURL = userActivity.webpageURL else {
         showAppButton = true
         return
@@ -251,8 +252,7 @@ struct ContentView: View {
     contact.urlAddresses = urlAddresses
 
     // Add note with link
-    contact.note = "Made with Azzapp" 	
-    print(username, token)
+    contact.note = "Made with Azzapp"
     if let avatarUrl = contactData.avatarUrl, let url = URL(string: avatarUrl) {
     URLSession.shared.dataTask(with: url) { data, response, error in
         if let data = data {
@@ -266,6 +266,7 @@ struct ContentView: View {
     } else {
          ContactViewControllerDelegateHandler.shared.presentContactViewController(with: contact,username: username, token: token)
     }
+    showAppButton = true
   }
 }
 

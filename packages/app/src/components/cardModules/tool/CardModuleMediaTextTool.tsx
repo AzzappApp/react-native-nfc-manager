@@ -8,6 +8,7 @@ import { hasCardModuleMediaError } from '#helpers/cardModuleHelpers';
 import useBoolean from '#hooks/useBoolean';
 import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
+import BottomSheetTextEditor from '#ui/BottomSheetTextEditor';
 import BottomSheetTextInput from '#ui/BottomSheetTextInput';
 import Header from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
@@ -231,7 +232,7 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
             onChangeText={setTitle}
             style={styles.titleStyle}
           />
-          <BottomSheetTextInput
+          <BottomSheetTextEditor
             multiline
             placeholder={intl.formatMessage({
               defaultMessage: 'Enter your description',

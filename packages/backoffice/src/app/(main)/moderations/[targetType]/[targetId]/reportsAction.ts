@@ -1,5 +1,6 @@
 'use server';
 
+import { getVercelOidcToken } from '@vercel/functions/oidc';
 import { revalidatePath } from 'next/cache';
 import {
   markWebCardAsDeleted,
@@ -55,8 +56,7 @@ export const deleteRelatedItem = async (
                       method: 'POST',
                       headers: {
                         'Content-Type': 'application/json',
-                        [AZZAPP_SERVER_HEADER]:
-                          process.env.API_SERVER_TOKEN ?? '',
+                        [AZZAPP_SERVER_HEADER]: `Bearer ${await getVercelOidcToken()}`,
                       },
                       body: JSON.stringify({
                         cards: [webCard.userName],
@@ -89,8 +89,7 @@ export const deleteRelatedItem = async (
                     method: 'POST',
                     headers: {
                       'Content-Type': 'application/json',
-                      [AZZAPP_SERVER_HEADER]:
-                        process.env.API_SERVER_TOKEN ?? '',
+                      [AZZAPP_SERVER_HEADER]: `Bearer ${await getVercelOidcToken()}`,
                     },
                     body: JSON.stringify({
                       cards: [webCard.userName],
@@ -121,7 +120,7 @@ export const deleteRelatedItem = async (
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
-                  [AZZAPP_SERVER_HEADER]: process.env.API_SERVER_TOKEN ?? '',
+                  [AZZAPP_SERVER_HEADER]: `Bearer ${await getVercelOidcToken()}`,
                 },
                 body: JSON.stringify({
                   cards: [webCard.userName],

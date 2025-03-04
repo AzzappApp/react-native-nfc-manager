@@ -29,7 +29,7 @@ inline CGImageRef copyImage(CGImageRef image, CGSize imageSize, CGSize targetSiz
 
 
 BufferLoaderHostObject::BufferLoaderHostObject(std::shared_ptr<react::CallInvoker> callInvoker)
-  : callInvoker(callInvoker) {
+  : callInvoker(callInvoker), textureCache() {
   metalDevice = MTLCreateSystemDefaultDevice();
   if (!metalDevice) {
     throw std::runtime_error("Failed to create MTLDevice");
@@ -169,12 +169,22 @@ jsi::Value BufferLoaderHostObject::get(jsi::Runtime &runtime, const jsi::PropNam
           uint64_t textureKey = arguments[0].asObject(runtime)
             .getProperty(runtime, "mtlTexture")
             .asBigInt(runtime).asUint64(runtime);
-          auto it = textureCache.find(textureKey);
-          if (it != textureCache.end()) {
-            id<MTLTexture> texture = it->second;
-            [texture setPurgeableState:MTLPurgeableStateEmpty];
-            textureCache.erase(it);
-          }
+          dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            try {
+              auto it = textureCache.find(textureKey);
+              if (it != textureCache.end()) {
+                id<MTLTexture> texture = it->second;
+                if (texture) {
+                  [texture setPurgeableState:MTLPurgeableStateEmpty];
+                } else {
+                  NSLog(@"BufferLoaderHostObject: unrefTexture without texture");
+                }
+                textureCache.erase(it);
+              }
+            } catch (...) {
+              NSLog(@"BufferLoaderHostObject: unrefTexture failed to release (thread)");
+            }
+          });
         } catch (...) {
           NSLog(@"BufferLoaderHostObject: unrefTexture failed to release");
         }

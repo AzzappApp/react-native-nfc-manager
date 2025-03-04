@@ -100,6 +100,7 @@ const CoverRenderer = ({
         aspectRatio: `${COVER_RATIO}`,
         width,
         borderRadius: width ? `${(35 / 300) * width}px` : undefined,
+        position: 'relative',
       }}
       className={cn(styles.content, contentClass)}
       ref={cover}

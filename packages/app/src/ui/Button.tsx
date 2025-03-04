@@ -23,6 +23,7 @@ export type ButtonProps = PressableProps & {
   appearance?: 'dark' | 'light';
   style?: StyleProp<ViewStyle>;
   loading?: boolean;
+  leftElement?: ReactNode;
   rightElement?: ReactNode;
   textStyle?: TextStyle;
 };
@@ -31,10 +32,11 @@ const Button = (
   {
     label,
     variant = 'primary',
-    appearance,
+    appearance: appearanceProp,
     loading,
     disabled,
     style,
+    leftElement,
     rightElement,
     textStyle,
     ...props
@@ -43,7 +45,7 @@ const Button = (
 ) => {
   const colorScheme = useColorScheme();
 
-  appearance = appearance ?? colorScheme ?? 'light';
+  const appearance = appearanceProp ?? colorScheme ?? 'light';
 
   const highlightColor =
     variant === 'primary'
@@ -69,6 +71,7 @@ const Button = (
       <ActivityIndicator color={color} />
     ) : (
       <View style={variantStyles.labelContainer}>
+        {leftElement}
         <Text
           variant="button"
           style={[variantStyles.label, textStyle]}
@@ -104,11 +107,6 @@ const Button = (
             style,
             disabled && variantStyles.disabled,
           ]}
-          android_ripple={{
-            borderless: false,
-            foreground: true,
-            color: highlightColor,
-          }}
         />
       </View>
     );

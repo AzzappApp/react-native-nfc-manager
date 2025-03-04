@@ -1,14 +1,19 @@
 extend type Mutation {
-  addContact(profileId: ID!, input: AddContactInput!): AddContactPayload
+  addContact(
+    profileId: ID!
+    input: AddContactInput!
+    notify: Boolean
+  ): AddContactPayload
 }
 
 input AddContactInput {
-  profileId: String!
+  profileId: String
   firstname: String!
   lastname: String!
   company: String!
   title: String!
   birthday: String
+  avatarId: String
   phoneNumbers: [AddContactPhoneNumberInput!]!
   emails: [AddContactEmailInput!]!
   addresses: [AddContactAddressInput!]!
@@ -16,6 +21,7 @@ input AddContactInput {
   withShareBack: Boolean!
   socials: [AddContactSocial!]
   urls: [AddContactUrl!]
+  logoId: String
 }
 
 input AddContactSocial {

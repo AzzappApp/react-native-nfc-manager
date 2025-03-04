@@ -2,8 +2,8 @@ import { useFieldArray } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { colors } from '#theme';
-import ContactCardEditModalField from '#components/ContactCard/ContactCardEditField';
-import { contactCardEditModalStyleSheet } from '#helpers/contactCardHelpers';
+import ContactCardEditModalField from '#components/Contact/ContactEditField';
+import { contactEditStyleSheet } from '#helpers/contactHelpers';
 import { useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
@@ -23,7 +23,7 @@ const CommonInformationUrls = ({
 
   const intl = useIntl();
 
-  const styles = useStyleSheet(contactCardEditModalStyleSheet);
+  const styles = useStyleSheet(contactEditStyleSheet);
 
   return (
     <>

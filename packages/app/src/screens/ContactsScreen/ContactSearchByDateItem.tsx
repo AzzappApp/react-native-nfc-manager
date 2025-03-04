@@ -3,10 +3,11 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { colors } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
-import { findLocalContact } from '#helpers/contactCardHelpers';
+import { findLocalContact } from '#helpers/contactHelpers';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import ContactAvatar from './ContactAvatar';
+import useImageFromContact from './useImageFromContact';
 import WhatsappButton from './WhatsappButton';
 import type { ContactType } from '#helpers/contactListHelpers';
 import type { Contact } from 'expo-contacts';
@@ -84,16 +85,7 @@ const ContactSearchByDateItem = ({
     contact.lastName,
   ]);
 
-  const avatarSource = useMemo(() => {
-    if (contact.contactProfile?.avatar?.uri) {
-      return {
-        uri: contact.contactProfile.avatar.uri,
-        mediaId: contact.contactProfile.avatar.id ?? '',
-        requestedSize: 26,
-      };
-    }
-    return null;
-  }, [contact.contactProfile?.avatar?.id, contact.contactProfile?.avatar?.uri]);
+  const avatarSource = useImageFromContact({ contact });
 
   return (
     <View style={styles.profile}>

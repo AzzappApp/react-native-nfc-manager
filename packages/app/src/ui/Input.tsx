@@ -1,10 +1,5 @@
 import { forwardRef, useState } from 'react';
-import {
-  TextInput as NativeTextInput,
-  Platform,
-  useColorScheme,
-  View,
-} from 'react-native';
+import { TextInput as NativeTextInput, Platform, View } from 'react-native';
 import { colors, textStyles } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import type { ForwardedRef, ReactNode } from 'react';
@@ -74,7 +69,6 @@ const Input = (
     onBlur?.(e);
   };
 
-  const scheme = useColorScheme();
   const styles = useStyleSheet(styleSheet);
 
   return (
@@ -92,9 +86,7 @@ const Input = (
         selectionColor={colors.primary400}
         textAlignVertical="center"
         {...props}
-        placeholderTextColor={
-          scheme === 'light' ? colors.grey400 : colors.grey400
-        }
+        placeholderTextColor={colors.grey400}
         onFocus={onFocusInner}
         onBlur={onBlurInner}
         style={[styles.input, inputStyle]}

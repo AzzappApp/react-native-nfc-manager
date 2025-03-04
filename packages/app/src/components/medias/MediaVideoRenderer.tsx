@@ -74,6 +74,8 @@ export type MediaVideoRendererProps = ViewProps & {
    * During the loading of the video
    */
   useAnimationSnapshot?: boolean;
+
+  priority?: 'high' | 'low' | 'normal';
 };
 
 /**
@@ -110,6 +112,7 @@ const MediaVideoRenderer = (
     useAnimationSnapshot,
     onError,
     style,
+    priority = 'normal',
     ...props
   }: MediaVideoRendererProps,
   ref: ForwardedRef<MediaVideoRendererHandle>,
@@ -247,6 +250,7 @@ const MediaVideoRenderer = (
             style={StyleSheet.absoluteFill}
             fit="cover"
             useRecycling
+            priority={priority}
           />
         )
       }

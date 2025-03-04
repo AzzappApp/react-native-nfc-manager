@@ -1,7 +1,7 @@
 // TODO reenable test
 
 describe('CoverEditionScreen', () => {
-  it('should pass', () => {
+  test('should pass', () => {
     expect(true).toBe(true);
   });
 });

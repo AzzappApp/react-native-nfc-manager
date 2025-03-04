@@ -3,7 +3,7 @@
 import * as Sentry from '@sentry/nextjs';
 import { jwtDecode } from 'jwt-decode';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { updateWebCardViewsCounter } from '#app/actions/statisticsAction';
 import ShareBackModal from '#components/ShareBackModal/ShareBackModal';
 import { displayName } from '#helpers/contactCardHelpers';
@@ -37,9 +37,9 @@ const WebCardPageLayout = (props: WebCardPageLayoutProps) => {
     isAzzappPlus,
   } = props;
   const searchParams = useSearchParams();
-  const isShareBack = !!searchParams.get('c');
+  const isShareBack = !!searchParams.get('c') || !!searchParams.get('token');
+  const mode = searchParams.get('mode');
   const [step, setStep] = useState(() => (isShareBack ? 0 : 2));
-
   const [contactDataVCard, setContactDataVCard] = useState({
     userId: '',
     webcardId: '',
@@ -62,35 +62,54 @@ const WebCardPageLayout = (props: WebCardPageLayoutProps) => {
     company?: string;
   };
 
-  const handleCloseDownloadVCard = ({ token }: { token?: string }) => {
-    if (token) {
-      try {
-        const tokenDecoded = jwtDecode<DownloadVCardJwtPayload>(token);
-        setContactDataVCard({
-          userId: tokenDecoded.userId,
-          webcardId: webCard?.id,
-          avatarUrl: tokenDecoded.avatarUrl ?? '',
-          isMultiUser: tokenDecoded.isMultiUser,
-          token,
-          firstName: tokenDecoded.firstName ?? '',
-          lastName: tokenDecoded.lastName ?? '',
-          company: tokenDecoded.company ?? '',
-        });
-      } catch (error) {
-        Sentry.captureException(
-          new Error(
-            `Error while decoding token: 
+  const handleCloseDownloadVCard = useCallback(
+    ({ token }: { token?: string }) => {
+      if (token) {
+        try {
+          const tokenDecoded = jwtDecode<DownloadVCardJwtPayload>(token);
+          setContactDataVCard({
+            userId: tokenDecoded.userId,
+            webcardId: webCard?.id,
+            avatarUrl: tokenDecoded.avatarUrl ?? '',
+            isMultiUser: tokenDecoded.isMultiUser,
+            token,
+            firstName: tokenDecoded.firstName ?? '',
+            lastName: tokenDecoded.lastName ?? '',
+            company: tokenDecoded.company ?? '',
+          });
+        } catch (error) {
+          Sentry.captureException(
+            new Error(
+              `Error while decoding token: 
             ${error}`,
-          ),
-        );
-      }
+            ),
+          );
+        }
 
-      // Opening of the shareback modal after 450ms depending on the Save CC closing animation(see issue #3305)
-      setTimeout(() => {
-        shareBackModal.current?.open();
-      }, 450);
-    }
+        // Opening of the shareback modal after 450ms depending on the Save CC closing animation(see issue #3305)
+        setTimeout(() => {
+          shareBackModal.current?.open();
+        }, 450);
+      }
+    },
+    [webCard?.id],
+  );
+
+  const [isModalReady, setIsModalReady] = useState(false);
+
+  const handleModalReady = () => {
+    setIsModalReady(true);
   };
+
+  useEffect(() => {
+    // call directly shareback (use when coming back from AppClip)
+    if (mode === 'shareback' && isModalReady) {
+      const token = searchParams.get('token');
+      if (token) {
+        handleCloseDownloadVCard({ token });
+      }
+    }
+  }, [handleCloseDownloadVCard, isModalReady, mode, searchParams]);
 
   const onShareBackClose = () => {
     setStep(2);
@@ -106,6 +125,7 @@ const WebCardPageLayout = (props: WebCardPageLayoutProps) => {
   if (!webCard.userName) {
     return undefined;
   }
+
   return (
     <>
       {step === 0 && (
@@ -140,6 +160,7 @@ const WebCardPageLayout = (props: WebCardPageLayoutProps) => {
         avatarUrl={contactDataVCard.avatarUrl}
         token={contactDataVCard.token}
         onClose={onShareBackClose}
+        onReady={handleModalReady}
       />
     </>
   );

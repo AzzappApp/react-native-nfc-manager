@@ -1,5 +1,6 @@
 import acceptInvitation from './acceptInvitation';
 import acceptOwnership from './acceptOwnership';
+import acceptTermsOfUse from './acceptTermsOfUse';
 import addContact from './addContact';
 import cancelTransferOwnership from './cancelTransferOwnership';
 import createContactCard from './createContactCard';
@@ -13,6 +14,8 @@ import deletePost from './deletePost';
 import deletePostComment from './deletePostComment';
 import deleteUser from './deleteUser';
 import duplicateModule from './duplicateModule';
+import { extractCompanyLogo } from './extractCompanyLogo';
+import { extractVisitCardData } from './extractVisitCardData';
 import inviteUser from './inviteUser';
 import inviteUsersList from './inviteUsersList';
 import loadCardTemplate from './loadCardTemplate';
@@ -53,6 +56,7 @@ import updateContactsLastView from './updateContactsLastView';
 import updateModulesVisibility from './updateModulesVisibility';
 import updateMultiUser from './updateMultiUser';
 import updatePost from './updatePost';
+import updatePostComment from './updatePostComment';
 import updateProfile from './updateProfile';
 import { updateContactCardScans, updateWebCardViews } from './updateStatistic';
 import updateUser from './updateUser';
@@ -92,6 +96,7 @@ export const Mutation: MutationResolvers = {
   toggleWebCardPublished,
   updateContactCardScans,
   updatePost,
+  updatePostComment,
   updateWebCard,
   updateUser,
   updateWebCardViews,
@@ -119,6 +124,9 @@ export const Mutation: MutationResolvers = {
   saveFCMToken,
   deleteFCMToken,
   updateContactsLastView,
+  extractVisitCardData,
+  acceptTermsOfUse,
+  extractCompanyLogo,
   ...payment,
 };
 

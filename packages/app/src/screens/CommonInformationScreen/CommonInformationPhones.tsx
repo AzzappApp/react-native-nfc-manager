@@ -3,11 +3,11 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { getLocales } from 'react-native-localize';
 import { colors } from '#theme';
-import ContactCardEditPhoneField from '#components/ContactCard/ContactCardEditPhoneField';
+import ContactCardEditPhoneField from '#components/Contact/ContactEditPhoneField';
 import {
-  contactCardEditModalStyleSheet,
-  useContactCardPhoneLabels,
-} from '#helpers/contactCardHelpers';
+  contactEditStyleSheet,
+  useContactPhoneLabels,
+} from '#helpers/contactHelpers';
 import { useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
@@ -28,9 +28,9 @@ const CommonInformationPhones = ({
 
   const intl = useIntl();
 
-  const labelValues = useContactCardPhoneLabels();
+  const labelValues = useContactPhoneLabels();
 
-  const styles = useStyleSheet(contactCardEditModalStyleSheet);
+  const styles = useStyleSheet(contactEditStyleSheet);
 
   return (
     <>

@@ -13,13 +13,9 @@ const PARALLAX_RATIO = 0.2;
 const Parallax = ({
   medias,
   children,
-  imageStyle,
-  backgroundStyle,
 }: {
   medias: Media[];
   children?: (props: { mediaId: string }) => ReactNode;
-  imageStyle?: CSSProperties;
-  backgroundStyle?: CSSProperties;
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [startPosition, setStartPosition] = useState(0);
@@ -41,6 +37,8 @@ const Parallax = ({
       setViewportHeight(window.innerHeight); // Use innerHeight or a dynamic approach if needed
     };
 
+    const timeout = setTimeout(handleResize, 100); // after the first render and a small delay to ensure the container is rendered
+
     handleScroll();
     handleResize();
     window.addEventListener('resize', handleResize);
@@ -49,6 +47,7 @@ const Parallax = ({
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('scroll', handleScroll);
+      clearTimeout(timeout);
     };
   }, []);
 
@@ -70,9 +69,8 @@ const Parallax = ({
 
         return (
           <div key={media.id} className={styles.parallaxContainer}>
-            <div className={styles.parallaxLayer} style={backgroundStyle}>
+            <div className={styles.parallaxLayer}>
               <ParallaxItemMemo
-                imageStyle={imageStyle}
                 media={media}
                 offset={iOS ? 0 : offset}
                 containerWidth={containerWidth}

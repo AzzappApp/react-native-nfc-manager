@@ -78,10 +78,7 @@ const computedStyle = createVariantsStyleSheet(appearance => ({
     root: {
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor:
-        appearance === 'light'
-          ? 'rgba(14, 18, 22, 0.4)'
-          : 'rgba(14, 18, 22, 0.6)',
+      backgroundColor: 'rgba(14, 18, 22, 0.6)',
       opacity: 1,
     },
     pressed: {

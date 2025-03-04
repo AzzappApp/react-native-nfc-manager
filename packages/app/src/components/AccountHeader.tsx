@@ -76,7 +76,7 @@ const AccountHeader = ({
   );
 };
 
-const HEADER_PADDING_BOTTOM = 15;
+export const HEADER_PADDING_BOTTOM = 15;
 
 const styles = StyleSheet.create({
   header: {

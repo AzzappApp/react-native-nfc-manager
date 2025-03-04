@@ -132,13 +132,19 @@ const backOfficeSections: Array<Section | SubSection> = [
     ],
   },
   {
-    id: 'crons',
-    text: 'crons',
+    id: 'settings',
+    text: 'settings',
     subSections: [
       {
         id: 'cron',
         text: 'Trigger crons',
         href: '/crons',
+        roles: [ADMIN],
+      },
+      {
+        id: 'termsOfUse',
+        text: 'Terms of use',
+        href: '/termsOfUse',
         roles: [ADMIN],
       },
     ],

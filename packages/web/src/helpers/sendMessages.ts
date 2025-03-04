@@ -1,18 +1,58 @@
 import * as Sentry from '@sentry/nextjs';
 import sanitizeHTML from 'sanitize-html';
-import { buildInviteUrl } from '@azzapp/shared/urlHelpers';
+import { getMediasByIds, type Profile, type WebCard } from '@azzapp/data';
+import { serializeContactCard } from '@azzapp/shared/contactCardHelpers';
+import {
+  getImageURLForSize,
+  getVideoThumbnailURL,
+} from '@azzapp/shared/imagesHelpers';
+import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
+import { formatDisplayName } from '@azzapp/shared/stringHelpers';
+import {
+  buildInviteUrl,
+  buildUserUrlWithContactCard,
+} from '@azzapp/shared/urlHelpers';
+import { buildVCardFromSerializedContact } from '@azzapp/shared/vCardHelpers';
+import { buildAvatarUrl } from './avatar';
 import { sendEmail, sendTemplateEmail } from './emailHelpers';
 import { getServerIntl } from './i18nHelpers';
 import { sendTwilioSMS } from './twilioHelpers';
-import type { WebCard } from '@azzapp/data';
 import type { Locale } from '@azzapp/i18n';
+import type { VCardAdditionnalData } from '@azzapp/shared/vCardHelpers';
+
+const buildWebcardUrl = async (profile: Profile, webCard: WebCard) => {
+  const { data, signature } = await serializeAndSignContactCard(
+    webCard?.userName ?? '',
+    profile.id,
+    profile.webCardId,
+    profile.contactCard ?? {},
+    webCard.isMultiUser ? webCard?.commonInformation : null,
+  );
+
+  const url = buildUserUrlWithContactCard(
+    webCard?.userName ?? '',
+    data,
+    signature,
+  );
+
+  return url;
+};
+
+type Parameters = {
+  profile?: Profile;
+  contact?: {
+    firstname: string;
+    lastname: string;
+  };
+};
 
 export const notifyUsers = async (
   receiversType: 'email' | 'phone',
   receivers: string[],
   webCard: WebCard,
-  notificationType: 'invitation' | 'transferOwnership',
+  notificationType: 'invitation' | 'transferOwnership' | 'vcard',
   locale: Locale,
+  parameters?: Parameters,
 ) => {
   if (!webCard.userName) {
     Sentry.captureMessage('cannot notify user without username');
@@ -203,5 +243,252 @@ export const notifyUsers = async (
           });
       }
       break;
+
+    case 'vcard':
+      switch (receiversType) {
+        case 'email': {
+          const profile = parameters?.profile;
+          const contact = parameters?.contact;
+          if (profile && webCard && contact) {
+            const profileName = formatDisplayName(
+              profile.contactCard?.firstName,
+              profile.contactCard?.lastName,
+            );
+            const companyName =
+              webCard.commonInformation?.company ??
+              profile.contactCard?.company;
+
+            const additionalData: VCardAdditionnalData = {
+              urls: (webCard.commonInformation?.urls ?? [])?.concat(
+                profile.contactCard?.urls ?? [],
+              ),
+              socials: (webCard.commonInformation?.socials ?? [])?.concat(
+                profile.contactCard?.socials ?? [],
+              ),
+            };
+
+            const avatarUrl = await buildAvatarUrl(profile, webCard);
+            if (avatarUrl) {
+              const data = await fetch(avatarUrl);
+              const blob = await data.arrayBuffer();
+              const base64 = Buffer.from(blob).toString('base64');
+
+              additionalData.avatar = {
+                type: data.headers.get('content-type')?.split('/')[1] ?? 'png',
+                base64,
+              };
+            }
+            const vCard = await buildVCardFromSerializedContact(
+              webCard.userName,
+              serializeContactCard(
+                profile.id,
+                webCard.id,
+                profile.contactCard,
+                webCard.commonInformation,
+              ),
+              additionalData,
+            );
+
+            const cover = webCard.coverMediaId
+              ? await getMediasByIds([webCard.coverMediaId])
+              : null;
+            const coverUrl = cover?.[0]
+              ? cover?.[0].kind === 'image'
+                ? getImageURLForSize({
+                    id: cover?.[0]?.id,
+                    width: 200,
+                    height: 320,
+                    previewPositionPercentage:
+                      webCard.coverPreviewPositionPercentage,
+                  })
+                : getVideoThumbnailURL({
+                    id: cover?.[0]?.id,
+                    width: 200,
+                    height: 320,
+                    previewPositionPercentage:
+                      webCard.coverPreviewPositionPercentage,
+                  })
+              : '';
+
+            const webCardUrl = await buildWebcardUrl(profile, webCard);
+            const vcardName =
+              formatDisplayName(
+                profile.contactCard?.firstName,
+                profile.contactCard?.lastName,
+                companyName,
+              ) || 'vcard';
+
+            await sendTemplateEmail({
+              templateId: 'd-6bec7b2457764066a531ecb66793e4c1',
+              attachments: vCard
+                ? [
+                    {
+                      content: Buffer.from(vCard.vCard.toString()).toString(
+                        'base64',
+                      ),
+                      filename: `${vcardName}.vcf`,
+                      disposition: 'attachment',
+                    },
+                  ]
+                : [],
+              recipients: receivers.map(receiver => ({
+                to: receiver,
+                dynamicTemplateData: {
+                  subject: intl.formatMessage(
+                    {
+                      defaultMessage: '{username}’s Contact Details',
+                      id: 'LC/eid',
+                      description: 'Email title for add contact notification',
+                    },
+                    {
+                      username: profileName,
+                    },
+                  ),
+                  title: intl.formatMessage(
+                    {
+                      defaultMessage:
+                        '{username} has shared contact details with you.',
+                      id: 'AsJ0+b',
+                      description: 'Email title for add contact notification',
+                    },
+                    {
+                      username: profileName,
+                    },
+                  ),
+                  avatarUrl,
+                  name: profileName,
+                  jobTitle: profile.contactCard?.title,
+                  company: companyName,
+                  hello: intl.formatMessage(
+                    {
+                      defaultMessage: 'Hi {name}',
+                      id: '8QTQo3',
+                      description: 'Email hello for add contact notification',
+                    },
+                    {
+                      name: contact.firstname,
+                    },
+                  ),
+                  content: intl.formatMessage(
+                    {
+                      defaultMessage:
+                        "Please open the <b>attached contact file</b> to save <b>{username}'s details</b>, or open the link below.",
+                      id: 'Oe0aFY',
+                      description: 'Email content for add contact notification',
+                    },
+                    {
+                      b: (...chunks) => `<b>${chunks}</b>`,
+                      username: profileName,
+                    },
+                  ),
+                  coverUrl,
+                  webCardUrl,
+                  openContact: intl.formatMessage(
+                    {
+                      defaultMessage: "Open {name}'s Contact",
+                      id: '4hZb27',
+                      description: 'open contact for add contact notification',
+                    },
+                    { name: profileName },
+                  ),
+                  getAzzapp: intl.formatMessage(
+                    {
+                      defaultMessage:
+                        '<b>Get azzapp now for free to create your own digital business card in seconds.</b>',
+                      id: 'HabKRZ',
+                      description: 'get azzapp for add contact notification',
+                    },
+                    {
+                      b: (...chunks) => `<b>${chunks}</b>`,
+                    },
+                  ),
+                  azzappPresentation: intl.formatMessage({
+                    defaultMessage:
+                      'Azzapp: The Smarter Way to Share Your Digital Business Card Instantly.',
+                    id: 'tzwvWt',
+                    description:
+                      'azzapp presentation for add contact notification',
+                  }),
+                  networking: intl.formatMessage({
+                    defaultMessage:
+                      'Elevate your networking experience with ease and sustainability:',
+                    id: 'S86nJJ',
+                    description: 'networking for add contact notification',
+                  }),
+                  sharing: intl.formatMessage(
+                    {
+                      defaultMessage:
+                        '<b>Instant Contact Sharing:</b> Exchange details in seconds.',
+                      id: 'NmMnGF',
+                      description: 'sharing for add contact notification',
+                    },
+                    {
+                      b: (...chunks) => `<b>${chunks}</b>`,
+                    },
+                  ),
+                  connection: intl.formatMessage(
+                    {
+                      defaultMessage:
+                        '<b>Seamless Connections:</b> Receive contact information effortlessly.',
+                      id: 'yaZXcv',
+                      description: 'connection for add contact notification',
+                    },
+                    {
+                      b: (...chunks) => `<b>${chunks}</b>`,
+                    },
+                  ),
+                  paperless: intl.formatMessage(
+                    {
+                      defaultMessage:
+                        '<b>Go Paperless:</b> Say goodbye to outdated paper business cards.',
+                      id: 'iJxBCm',
+                      description: 'paperless for add contact notification',
+                    },
+                    {
+                      b: (...chunks) => `<b>${chunks}</b>`,
+                    },
+                  ),
+                  ecofriendly: intl.formatMessage(
+                    {
+                      defaultMessage:
+                        '<b>Eco-Friendly Networking:</b> Make a positive impact on the planet while you connect.',
+                      id: 'HD3Qyd',
+                      description: 'ecofriendly for add contact notification',
+                    },
+                    {
+                      b: (...chunks) => `<b>${chunks}</b>`,
+                    },
+                  ),
+                  join: intl.formatMessage({
+                    defaultMessage:
+                      'Join Now and Network More Efficiently Than Ever Before!',
+                    id: 'WNUebq',
+                    description: 'join for add contact notification',
+                  }),
+                  unlock: intl.formatMessage({
+                    defaultMessage:
+                      'Unlock smarter, faster connections and redefine your networking experience.',
+                    id: 'lt+MaO',
+                    description: 'unlock for add contact notification',
+                  }),
+                  discover: intl.formatMessage({
+                    defaultMessage: 'Discover more at',
+                    id: 'HO2BMC',
+                    description: 'discover for add contact notification',
+                  }),
+                  azzappUrl: process.env.NEXT_PUBLIC_URL,
+                  year: intl.formatMessage({
+                    defaultMessage: '2025',
+                    id: '7mxm1W',
+                    description: 'year for add contact notification',
+                  }),
+                },
+              })),
+            });
+          }
+
+          break;
+        }
+      }
   }
 };

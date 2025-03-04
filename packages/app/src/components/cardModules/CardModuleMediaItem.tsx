@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { MODULE_IMAGE_MAX_WIDTH } from '@azzapp/shared/cardModuleHelpers';
 import { MediaImageRenderer, MediaVideoRenderer } from '#components/medias';
 import { getCardModuleMediaKind } from '#helpers/cardModuleHelpers';
@@ -25,6 +26,8 @@ export type CardModuleMediaItemProps = {
   paused?: boolean;
 
   cachePolicy?: 'disk' | 'memory-disk' | 'memory' | 'none' | null;
+
+  priority?: 'high' | 'low' | 'normal';
 };
 
 //Simple component to render, not bind to any relay fragment
@@ -34,6 +37,7 @@ const CardModuleMediaItem = ({
   imageStyle,
   canPlay,
   cachePolicy,
+  priority,
   paused,
 }: CardModuleMediaItemProps) => {
   const kind = getCardModuleMediaKind(media);
@@ -51,6 +55,7 @@ const CardModuleMediaItem = ({
       fit="cover"
       useAnimationSnapshot={false}
       cachePolicy={cachePolicy}
+      priority={priority}
     />
   ) : (
     <MediaVideoRenderer
@@ -67,8 +72,9 @@ const CardModuleMediaItem = ({
       videoEnabled={canPlay}
       paused={paused}
       muted
+      priority={priority}
     />
   );
 };
 
-export default CardModuleMediaItem;
+export default memo(CardModuleMediaItem);

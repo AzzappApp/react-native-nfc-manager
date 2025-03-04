@@ -1,6 +1,7 @@
 'use server';
 
 import * as Sentry from '@sentry/nextjs';
+import { getVercelOidcToken } from '@vercel/functions/oidc';
 import { revalidatePath } from 'next/cache';
 import {
   getUserById,
@@ -90,7 +91,7 @@ export const toggleUserActive = async (userId: string) => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            [AZZAPP_SERVER_HEADER]: process.env.API_SERVER_TOKEN ?? '',
+            [AZZAPP_SERVER_HEADER]: `Bearer ${await getVercelOidcToken()}`,
           },
           body: JSON.stringify({
             cards: ownerProfiles.map(({ webCard }) => webCard.userName),

@@ -22,17 +22,18 @@ export const acknowledgeFirstPayment = async (
   transactionId: string,
   paymentProviderResponse?: string,
 ) => {
+  let paymentId: string | undefined;
   const subscription = await getSubscriptionByPaymentMeanId(paymentMeanId);
 
   const token = await login();
 
   if (subscription) {
-    const payment = await getPaymentByTransactionId(
+    const foundPayment = await getPaymentByTransactionId(
       subscription.id,
       transactionId,
     );
 
-    if (payment.length === 0) {
+    if (foundPayment.length === 0) {
       // If the subscription is found, we have to update the subscription and the payment mean to start billing
       const userId = subscription.userId;
       const amount = subscription.amount;
@@ -40,7 +41,7 @@ export const acknowledgeFirstPayment = async (
       let maskedCard = '';
 
       if (subscription.subscriptionPlan && amount !== null && taxes !== null) {
-        await createPayment({
+        paymentId = await createPayment({
           status: 'paid',
           transactionId,
           subscriptionId: subscription.id,
@@ -148,7 +149,7 @@ export const acknowledgeFirstPayment = async (
         });
       }
     }
-    return subscription;
+    return { subscription, paymentId };
   }
 };
 
@@ -208,7 +209,7 @@ export const acknowledgeRecurringPayment = async (
   paymentProviderResponse?: string,
 ) => {
   const subscription = await getSubscriptionById(subscriptionId);
-
+  let paymentId: string | undefined;
   if (subscription) {
     const payment = await getPaymentByTransactionId(
       subscriptionId,
@@ -235,8 +236,8 @@ export const acknowledgeRecurringPayment = async (
           lastPaymentError: false,
         };
 
-        await transaction(async () => {
-          await createPayment({
+        paymentId = await transaction(async () => {
+          const id = await createPayment({
             status: 'paid',
             subscriptionId: subscription.id,
             userId,
@@ -248,17 +249,17 @@ export const acknowledgeRecurringPayment = async (
             rebillManagerId,
           });
           await updateSubscription(subscriptionId, updates);
+          return id;
         });
       }
     }
   }
 
-  return subscription;
+  return { subscription, paymentId };
 };
 
 export const rejectRecurringPayment = async (
   subscriptionId: string,
-  isRebillOn: boolean,
   transactionId?: string,
   paymentProviderResponse?: string,
 ) => {

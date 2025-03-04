@@ -77,6 +77,7 @@ export const SocialLinkRenderer = ({
         hasShadow ? shadow('dark') : undefined,
       ]}
       disabled={disabled}
+      disabledOpacity={1}
     >
       <SocialIcon
         style={{

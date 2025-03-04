@@ -3,12 +3,14 @@
 import { Box, Button, Stack, TextField, Tooltip } from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
 import { useState } from 'react';
-import { unpublishWebCards } from './actions';
+import { removeUnusedMedia, unpublishWebCards } from './actions';
 
 const Crons = () => {
   const [message, setMessage] = useState<string | null>(null);
 
-  const [running, setRuning] = useState(false); //to be replaced with useActionState with next 15
+  const [running, setRunning] = useState<'unpublish' | 'unusedMedia' | null>(
+    null,
+  ); //to be replaced with useActionState with next 15
 
   return (
     <Stack spacing={5}>
@@ -29,10 +31,10 @@ const Crons = () => {
         <Tooltip title="Find all WebCards with expired subscription and unpublish them">
           <Button
             variant="contained"
-            disabled={running}
-            loading={running}
+            disabled={running === 'unpublish'}
+            loading={running === 'unpublish'}
             onClick={async () => {
-              setRuning(true);
+              setRunning('unpublish');
               try {
                 await unpublishWebCards();
                 setMessage(
@@ -41,23 +43,46 @@ const Crons = () => {
               } catch (err) {
                 setMessage(`An error occurred ${err}`);
               } finally {
-                setRuning(false);
+                setRunning(null);
               }
             }}
           >
             Run unpublish webcards
           </Button>
         </Tooltip>
-
-        <Snackbar
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-          open={!!message}
-          onClose={() => {
-            setMessage(null);
-          }}
-          message={message}
-        />
       </Box>
+      <Box>
+        <Tooltip title="Find all unused media and remove them">
+          <Button
+            variant="contained"
+            disabled={running === 'unusedMedia'}
+            loading={running === 'unusedMedia'}
+            onClick={async () => {
+              setRunning('unusedMedia');
+              try {
+                await removeUnusedMedia();
+                setMessage(
+                  'Unused media have been removed successfully (if many, it may need a new run, they are treated in batches)',
+                );
+              } catch (err) {
+                setMessage(`An error occurred ${err}`);
+              } finally {
+                setRunning(null);
+              }
+            }}
+          >
+            Run remove unused media
+          </Button>
+        </Tooltip>
+      </Box>
+      <Snackbar
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        open={!!message}
+        onClose={() => {
+          setMessage(null);
+        }}
+        message={message}
+      />
     </Stack>
   );
 };

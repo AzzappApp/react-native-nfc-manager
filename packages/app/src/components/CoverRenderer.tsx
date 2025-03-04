@@ -280,6 +280,7 @@ const CoverRenderer = (
                 style={styles.layer}
                 paused={paused}
                 useAnimationSnapshot={useAnimationSnapshot}
+                priority="high"
               />
             ) : (
               <MediaImageRenderer
@@ -291,6 +292,7 @@ const CoverRenderer = (
                 style={styles.layer}
                 useAnimationSnapshot={useAnimationSnapshot}
                 useRecycling
+                priority="high"
               />
             )}
             {(overlayTitle || overlaySubTitle) && (

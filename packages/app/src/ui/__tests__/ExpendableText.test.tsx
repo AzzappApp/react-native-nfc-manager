@@ -1,4 +1,5 @@
-import { act, fireEvent, render } from '#helpers/testHelpers';
+import { act } from 'react';
+import { fireEvent, render } from '#helpers/testHelpers';
 import ExpendableText from '../ExpendableText';
 
 describe('ExpendableText', () => {
@@ -22,8 +23,8 @@ describe('ExpendableText', () => {
           lines: loremTextLayoutEvent,
         },
       });
+      jest.runAllTimers();
     });
-    jest.runAllTimers();
 
     expect(textComponent).toHaveTextContent(
       "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took ... more",

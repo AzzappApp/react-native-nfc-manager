@@ -1,5 +1,6 @@
 import { getCldImageUrl, getCldVideoUrl } from 'next-cloudinary';
 import { forwardRef, type ForwardedRef } from 'react';
+import { MODULE_VIDEO_SIZES } from '@azzapp/shared/cardModuleHelpers';
 import { COVER_ASSET_SIZES } from '@azzapp/shared/coverHelpers';
 import { DEFAULT_VIDEO_PERCENTAGE_THUMBNAIL } from '@azzapp/shared/imagesHelpers';
 import { POST_VIDEO_SIZES } from '@azzapp/shared/postHelpers';
@@ -47,7 +48,11 @@ const CloudinaryVideo = (
   }
 
   const pregeneratedSizes =
-    assetKind === 'cover' ? COVER_ASSET_SIZES : POST_VIDEO_SIZES;
+    assetKind === 'cover'
+      ? COVER_ASSET_SIZES
+      : assetKind === 'module'
+        ? MODULE_VIDEO_SIZES
+        : POST_VIDEO_SIZES;
 
   const maxSize = pregeneratedSizes.at(-1);
 

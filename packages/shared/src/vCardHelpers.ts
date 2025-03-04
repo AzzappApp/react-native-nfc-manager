@@ -9,10 +9,9 @@ import type { CommonInformation } from './contactCardHelpers';
  * @returns label to display in the VCard
  */
 export const addressLabelToVCardLabel = (label: string) => {
-  if (label === 'Home') return 'HOME';
-  if (label === 'Work') return 'WORK';
-  if (label === 'Main') return 'PREF;Main';
-  return undefined;
+  if (label === 'Home') return 'type=HOME';
+  if (label === 'Work') return 'type=WORK';
+  return 'type=PREF';
 };
 
 export const phoneLabelToVCardLabel = (label: string) => {
@@ -32,14 +31,17 @@ export const emailLabelToVCardLabel = (label: string) => {
  * @param contactCardData The serialized contact card
  * @returns The vCard
  */
+
+export type VCardAdditionnalData =
+  | (Pick<CommonInformation, 'socials' | 'urls'> & {
+      avatar?: { base64: string; type: string } | null;
+    })
+  | null;
+
 export const buildVCardFromSerializedContact = async (
   userName: string | null | undefined,
   contactCardData: string,
-  additionalData?:
-    | (Pick<CommonInformation, 'socials' | 'urls'> & {
-        avatar?: { base64: string; type: string } | null;
-      })
-    | null,
+  additionalData?: VCardAdditionnalData,
 ) => {
   const contactCard = parseContactCard(contactCardData);
 

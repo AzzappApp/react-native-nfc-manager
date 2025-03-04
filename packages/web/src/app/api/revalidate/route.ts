@@ -12,7 +12,7 @@ const RevalidateSchema = z.object({
 
 export const POST = withPluginsRoute(async (req: Request) => {
   try {
-    checkServerAuth();
+    await checkServerAuth();
     const body = await req.json();
     const input = RevalidateSchema.parse(body);
 

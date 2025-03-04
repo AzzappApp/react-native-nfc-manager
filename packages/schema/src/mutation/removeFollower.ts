@@ -5,9 +5,10 @@ import { checkWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 
-type Mutation = MutationResolvers['removeFollower'];
-
-const removeFollowerMutation: Mutation = async (_, params) => {
+const removeFollowerMutation: MutationResolvers['removeFollower'] = async (
+  _,
+  params,
+) => {
   const webCardId = fromGlobalIdWithType(params.webCardId, 'WebCard');
   await checkWebCardProfileEditorRight(webCardId);
 

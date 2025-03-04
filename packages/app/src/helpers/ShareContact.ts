@@ -4,7 +4,7 @@ import ShareCommand from 'react-native-share';
 import {
   buildVCardFromAzzappContact,
   buildVCardFromExpoContact,
-} from '#helpers/contactCardHelpers';
+} from '#helpers/contactHelpers';
 import { reworkContactForDeviceInsert } from '#helpers/contactListHelpers';
 import { sanitizeFilePath } from '#helpers/fileHelpers';
 import type { ContactType } from '#helpers/contactListHelpers';

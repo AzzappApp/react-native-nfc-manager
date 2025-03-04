@@ -5,8 +5,6 @@ import {
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
 import MediaModuleRenderer from '#components/cardModules/CardModuleMedia/MediaModuleRenderer';
-import { DESKTOP_PREVIEW_WIDTH } from '#components/WebCardPreview';
-import useScreenDimensions from '#hooks/useScreenDimensions';
 import BlockTextRenderer from './BlockTextRenderer';
 import MediaTextModuleRenderer from './CardModuleMediaText/MediaTextModuleRenderer';
 import MediaTextLinkModuleRenderer from './CardModuleMediaTextLink/MediaTextLinkModuleRenderer';
@@ -22,6 +20,7 @@ import SocialLinksRenderer from './SocialLinksRenderer';
 import type { MediaModuleRendererData } from '#components/cardModules/CardModuleMedia/MediaModuleRenderer';
 import type { Variant } from '#helpers/webcardModuleHelpers';
 import type { BlockTextRendererData } from './BlockTextRenderer';
+import type { CardModuleDimension } from './cardModuleEditorType';
 import type { MediaTextModuleRendererData } from './CardModuleMediaText/MediaTextModuleRenderer';
 import type { MediaTextLinkModuleRendererData } from './CardModuleMediaTextLink/MediaTextLinkModuleRenderer';
 import type { TitleTextModuleRendererData } from './CardModuleTitleText/TitleTextModuleRenderer';
@@ -160,6 +159,11 @@ export type CardModuleRendererProps<T extends ModuleRenderInfo> = ViewProps & {
    * The position of the module in the WebCard
    */
   modulePosition: number;
+
+  /**
+   * The dimension of the container for the modules
+   */
+  dimension: CardModuleDimension;
 };
 
 export const DESKTOP_CONTENT_MAX_WIDTH = 800;
@@ -170,9 +174,9 @@ const CardModuleRenderer = <T extends ModuleRenderInfo>({
   scrollPosition,
   modulePosition,
   canPlay = true,
+  dimension,
   ...props
 }: CardModuleRendererProps<T>) => {
-  const { width, height } = useScreenDimensions();
   switch (module.kind) {
     case 'blockText':
       return (
@@ -300,10 +304,7 @@ const CardModuleRenderer = <T extends ModuleRenderInfo>({
           {...module}
           {...props}
           displayMode={displayMode}
-          dimension={{
-            width: displayMode === 'desktop' ? DESKTOP_PREVIEW_WIDTH : width,
-            height,
-          }}
+          dimension={dimension}
           scrollPosition={scrollPosition}
           modulePosition={modulePosition}
           canPlay={canPlay}
@@ -315,10 +316,7 @@ const CardModuleRenderer = <T extends ModuleRenderInfo>({
           {...module}
           {...props}
           displayMode={displayMode}
-          dimension={{
-            width: displayMode === 'desktop' ? DESKTOP_PREVIEW_WIDTH : width,
-            height,
-          }}
+          dimension={dimension}
           scrollPosition={scrollPosition}
           modulePosition={modulePosition}
           canPlay={canPlay}
@@ -330,10 +328,7 @@ const CardModuleRenderer = <T extends ModuleRenderInfo>({
           {...module}
           {...props}
           displayMode={displayMode}
-          dimension={{
-            width: displayMode === 'desktop' ? DESKTOP_PREVIEW_WIDTH : width,
-            height,
-          }}
+          dimension={dimension}
           scrollPosition={scrollPosition}
           modulePosition={modulePosition}
           canPlay={canPlay}
@@ -345,10 +340,7 @@ const CardModuleRenderer = <T extends ModuleRenderInfo>({
           {...module}
           {...props}
           displayMode={displayMode}
-          dimension={{
-            width: displayMode === 'desktop' ? DESKTOP_PREVIEW_WIDTH : width,
-            height,
-          }}
+          dimension={dimension}
           scrollPosition={scrollPosition}
           modulePosition={modulePosition}
           canPlay={canPlay}

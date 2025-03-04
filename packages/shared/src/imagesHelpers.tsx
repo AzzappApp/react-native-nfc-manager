@@ -39,6 +39,7 @@ export type UrLForSizeParam = {
   pregeneratedSizes?: number[] | null;
   format?: string | null;
   previewPositionPercentage?: number | null;
+  path?: string | null;
 };
 
 /**
@@ -75,9 +76,16 @@ export const getImageURLForSize = ({
  * @param id the id of the cloudinary file
  * @returns
  */
-export const getVideoURL = (id: string) => {
+export const getVideoURL = (id: string, path?: string) => {
   assetNotRN('getVideoURL');
-  return assembleCloudinaryUrl(id, 'video', resizeTransforms(), 'mp4');
+  return assembleCloudinaryUrl(
+    id,
+    'video',
+    resizeTransforms(),
+    'mp4',
+    undefined,
+    path,
+  );
 };
 
 /**
@@ -86,7 +94,7 @@ export const getVideoURL = (id: string) => {
  * @param id the id of the cloudinary file
  * @param width the desired image width
  * @param height the desired height
- * @param pixelRatio the desired pixeld density - default 1
+ * @param pixelRatio the desired pixel density - default 1
  * @returns the url of a transformed video
  */
 export const getVideoUrlForSize = ({
@@ -96,6 +104,7 @@ export const getVideoUrlForSize = ({
   pixelRatio = 1,
   pregeneratedSizes,
   format,
+  path,
 }: UrLForSizeParam) => {
   assetNotRN('getVideoUrlForSize');
   const transforms = resizeTransforms(
@@ -104,7 +113,14 @@ export const getVideoUrlForSize = ({
     pixelRatio,
     pregeneratedSizes,
   );
-  return assembleCloudinaryUrl(id, 'video', transforms, format ?? 'mp4');
+  return assembleCloudinaryUrl(
+    id,
+    'video',
+    transforms,
+    format ?? 'mp4',
+    undefined,
+    path,
+  );
 };
 
 /**
@@ -177,6 +193,7 @@ export const resizeTransforms = (
     return result.join(',');
   }
   if (height != null) {
+    height = Math.ceil(height * pixelRatio);
     result.push(`c_fill`);
     result.push(`w_${width}`);
     result.push(`h_${height}`);
@@ -210,7 +227,8 @@ const assembleCloudinaryUrl = (
   transforms: string,
   format?: string,
   videoPercentage?: number | null,
+  path?: string | null,
 ) => {
   // prettier-ignore
-  return `${CLOUDINARY_BASE_URL}/${kind}/upload${videoPercentage ? `/so_${videoPercentage}p`: ''}${transforms ? `/${transforms}`: ''}${format ? `/f_${format}`: ''}/q_auto:best/${id}`;
+  return `${CLOUDINARY_BASE_URL}/${kind}/upload${videoPercentage ? `/so_${videoPercentage}p`: ''}${transforms ? `/${transforms}`: ''}${format ? `/f_${format}`: ''}/q_auto:best/${path? `${path}/` : ''}${id}`;
 };

@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { FlatList, ScrollView, View } from 'react-native';
-import { APPLICATIONS_FONTS } from '@azzapp/shared/fontHelpers';
+import { COVER_EDITOR_FONTS } from '@azzapp/shared/fontHelpers';
 import { colors } from '#theme';
 import { useCoverEditorEditContext } from '#components/CoverEditor/CoverEditorContext';
 import { ScreenModal } from '#components/NativeRouter';
@@ -187,7 +187,7 @@ const AddTextModalItem = ({
 
 type TextStyleItem = { fontFamily: string; fontSize: number };
 
-const titleTextStyles: TextStyleItem[] = APPLICATIONS_FONTS.map(font => ({
+const titleTextStyles: TextStyleItem[] = COVER_EDITOR_FONTS.map(font => ({
   fontFamily: font,
   fontSize: 25,
 }));

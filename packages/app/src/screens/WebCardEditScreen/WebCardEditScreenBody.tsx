@@ -34,6 +34,7 @@ import {
   isModuleVariantSupported,
   type ModuleKindWithVariant,
 } from '#helpers/webcardModuleHelpers';
+import useScreenDimensions from '#hooks/useScreenDimensions';
 import ActivityIndicator from '#ui/ActivityIndicator';
 import WebCardEditBlockContainer from './WebCardEditBlockContainer';
 import type { ModuleRenderInfo } from '#components/cardModules/CardModuleRenderer';
@@ -761,25 +762,29 @@ const WebCardModule = ({
   cardStyle?: CardStyle | null;
   coverBackgroundColor?: string | null;
   scrollPosition: RNAnimated.Value;
-}) => (
-  <WebCardEditBlockContainer id={module.id} {...props}>
-    <CardModuleRenderer
-      module={module}
-      colorPalette={cardColors}
-      cardStyle={cardStyle}
-      coverBackgroundColor={coverBackgroundColor}
-      scrollPosition={scrollPosition}
-      modulePosition={0}
-      webCardViewMode="edit"
-      canPlay={false}
-    />
-    {module.id.includes(TEMP_ID_PREFIX) && (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator color="white" style={styles.loading} />
-      </View>
-    )}
-  </WebCardEditBlockContainer>
-);
+}) => {
+  const dimension = useScreenDimensions();
+  return (
+    <WebCardEditBlockContainer id={module.id} {...props}>
+      <CardModuleRenderer
+        module={module}
+        colorPalette={cardColors}
+        cardStyle={cardStyle}
+        coverBackgroundColor={coverBackgroundColor}
+        scrollPosition={scrollPosition}
+        modulePosition={0}
+        webCardViewMode="edit"
+        canPlay={false}
+        dimension={dimension}
+      />
+      {module.id.includes(TEMP_ID_PREFIX) && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator color="white" style={styles.loading} />
+        </View>
+      )}
+    </WebCardEditBlockContainer>
+  );
+};
 
 const WebCardModuleMemo = memo(WebCardModule);
 

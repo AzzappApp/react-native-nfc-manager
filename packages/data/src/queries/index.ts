@@ -30,3 +30,5 @@ export * from './paymentMeanQueries';
 export * from './contactQueries';
 export * from './fcmTokenQueries';
 export * from './predefinedCoverQueries';
+export * from './termsOfUseQueries';
+export * from './passRegistrationQueries';

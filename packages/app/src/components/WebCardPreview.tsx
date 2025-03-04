@@ -13,8 +13,9 @@ import ToggleButton from '#ui/ToggleButton';
 import CardModuleRenderer from './cardModules/CardModuleRenderer';
 import CoverRenderer from './CoverRenderer';
 import CoverRendererPreviewDesktop from './CoverRendererPreviewDesktop';
-import WebCardBackground from './WebCardBackgroundPreview';
+import WebCardBackgroundPreview from './WebCardBackgroundPreview';
 import type { WebCardPreview_webCard$key } from '#relayArtifacts/WebCardPreview_webCard.graphql';
+import type { CardModuleDimension } from './cardModules/cardModuleEditorType';
 import type { ModuleRenderInfo } from './cardModules/CardModuleRenderer';
 import type { LayoutChangeEvent, PointProp, ViewProps } from 'react-native';
 
@@ -103,7 +104,9 @@ const WebCardPreview = ({
     () =>
       Animated.event(
         [{ nativeEvent: { contentOffset: { y: scrollPosition } } }],
-        { useNativeDriver: true },
+        {
+          useNativeDriver: true,
+        },
       ),
     [scrollPosition],
   );
@@ -163,9 +166,10 @@ const WebCardPreview = ({
             paddingBottom: contentPaddingBottom / scale,
           }}
           onScroll={onScroll}
+          scrollEventThrottle={16}
         >
           <View ref={contentRef}>
-            <WebCardBackground
+            <WebCardBackgroundPreview
               webCard={webCard}
               overrideCardStyle={cardStyle}
               overrideLastModule={cardModules.at(-1)}
@@ -194,6 +198,7 @@ const WebCardPreview = ({
                 viewMode={viewMode}
                 coverBackgroundColor={webCard.coverBackgroundColor}
                 scrollPosition={scrollPosition}
+                dimension={{ width: webCardWidth, height: webCardHeight }}
               />
             ))}
           </View>
@@ -210,6 +215,7 @@ const CardModule = ({
   viewMode,
   coverBackgroundColor,
   scrollPosition,
+  dimension,
 }: {
   module: ModuleRenderInfo;
   cardColors?: ColorPalette | null;
@@ -217,6 +223,7 @@ const CardModule = ({
   viewMode: 'desktop' | 'mobile';
   coverBackgroundColor?: string | null;
   scrollPosition: Animated.Value;
+  dimension: CardModuleDimension;
 }) => {
   const [modulePosition, setModulePosition] = useState(0);
 
@@ -235,6 +242,7 @@ const CardModule = ({
       scrollPosition={scrollPosition}
       modulePosition={modulePosition}
       webCardViewMode="preview"
+      dimension={dimension}
     />
   );
 };

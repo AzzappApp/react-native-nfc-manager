@@ -109,10 +109,10 @@ The different packages of the application are located under the `packages` direc
 - [app](./packages/app/): contains the source code of the client React Native application.
 - [backoffice](./packages/backoffice/): contains the source code of the backoffice of the application.
 - [data](./packages/data/): contains the source code of the data access layer of the application.
-- [schema](./packages/schema/): contains the source code of the GraphQL API layer of the application.
+- [schema](./packages/schema/): contains the source code of the `GraphQL` API layer of the application.
 - [i18n](./packages/i18n/): contains the translation files and related definitions.
 - [shared](./packages/shared/): contains helpers shared by all the packages of the application
-- [web](./packages/web/): a NextJS project responsible of the web version of the application and the API
+- [web](./packages/web/): a `NextJS` project responsible of the web version of the application and the API
 - [payment](./packages/payment/): contains the source code for web subscription.
 
 ## Main technologies
@@ -133,14 +133,14 @@ The application use a [GraphQL](https://graphql.org/) API to communicate between
 
 ### Client
 
-- [React](https://reactjs.org/) Main client framework
-- [React Native](https://reactnative.dev/) main mobile application framework
-- [ReactRelay](https://relay.dev/) client data layer
+- [React](https://reactjs.org/): Main client framework
+- [React Native](https://reactnative.dev/): main mobile application framework
+- [ReactRelay](https://relay.dev/): client data layer
 
 ### Code Quality
 
 - [Jest](https://jestjs.io/fr/): Test framework
-- [React testing library](https://testing-library.com/docs/react-testing-library/intro/) : UI testing framework
+- [React testing library](https://testing-library.com/docs/react-testing-library/intro/): UI testing framework
 - [ESlint](https://eslint.org/): linter
 - [Prettier](https://prettier.io/): code formatting
 

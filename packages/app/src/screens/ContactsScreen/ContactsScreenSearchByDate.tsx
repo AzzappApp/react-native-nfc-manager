@@ -4,6 +4,7 @@ import { FlatList, View } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useScreenInsets from '#hooks/useScreenInsets';
+import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import ContactSearchByDateSection from './ContactSearchByDateSection';
 import type { ContactType } from '#helpers/contactListHelpers';
 import type { ContactActionProps } from './ContactsScreenLists';
@@ -105,7 +106,10 @@ const ContactsScreenSearchByDate = ({
       onEndReached={onEndReached}
       refreshing={refreshing}
       onRefresh={onRefresh}
-      contentContainerStyle={[{ paddingBottom: bottom }, styles.content]}
+      contentContainerStyle={[
+        { paddingBottom: bottom + BOTTOM_MENU_HEIGHT },
+        styles.content,
+      ]}
       showsVerticalScrollIndicator={false}
       snapToAlignment="start"
       decelerationRate="fast"

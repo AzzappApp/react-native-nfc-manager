@@ -334,6 +334,7 @@ const CardStyleList = ({
   onSelectCardStyle,
 }: CardStyleListProps) => {
   const styles = useStyleSheet(styleSheet);
+  const intl = useIntl();
 
   const {
     data: { cardStyles },
@@ -403,11 +404,17 @@ const CardStyleList = ({
             selectedCardStyle.id !== item.id && { opacity: 0.5, fontSize: 16 },
           ]}
         >
-          {item.label}
+          {item.label ||
+            intl.formatMessage({
+              defaultMessage: 'Style',
+              description:
+                'default style label in style list (fallback when no label available)',
+            })}
         </Text>
       </PressableNative>
     ),
     [
+      intl,
       onSelectCardStyle,
       selectedCardStyle.id,
       styles.cardStyleItem,

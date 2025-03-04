@@ -2,25 +2,28 @@ import * as Sentry from '@sentry/react-native';
 import { GraphQLError } from 'graphql';
 import isEqual from 'lodash/isEqual';
 import React, { Suspense, useCallback, useEffect, useRef } from 'react';
-import { useIntl } from 'react-intl';
-import { Alert, Appearance, useWindowDimensions } from 'react-native';
+import { FormattedMessage } from 'react-intl';
+import { Image, useWindowDimensions, View } from 'react-native';
 import {
   type PreloadedQuery,
   fetchQuery,
   useRelayEnvironment,
 } from 'react-relay';
-import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import { FetchError, isNetworkError } from '@azzapp/shared/networkHelpers';
+import { useNetworkAvailableContext } from '#networkAvailableContext';
+import ErrorBoundary from '#components/ErrorBoundary';
+import ErrorScreen from '#components/ErrorScreen';
 import {
   useRouter,
   type NativeScreenProps,
-  useScreenHasFocus,
   type ScreenOptions,
 } from '#components/NativeRouter';
 import { useAppState } from '#hooks/useAppState';
+import Button from '#ui/Button';
 import Container from '#ui/Container';
 import LoadingView from '#ui/LoadingView';
+import Text from '#ui/Text';
 import {
   addAuthStateListener,
   getAuthState,
@@ -39,6 +42,12 @@ import type { ComponentType } from 'react';
 import type { EdgeInsets } from 'react-native-safe-area-context';
 import type { OperationType, Subscription } from 'relay-runtime';
 
+export type ErrorRendererProps = {
+  retry: () => void;
+  cancel: () => void;
+  canGoBack: boolean;
+};
+
 export type RelayScreenOptions<TRoute extends Route> = LoadQueryOptions<
   TRoute['params']
 > &
@@ -50,7 +59,7 @@ export type RelayScreenOptions<TRoute extends Route> = LoadQueryOptions<
     /**
      * The component to render when an error occurs.
      */
-    errorFallback?: React.ComponentType<any> | null;
+    errorFallback?: React.ComponentType<ErrorRendererProps> | null;
     /**
      * Wether the screen can go back or not.
      *
@@ -117,8 +126,8 @@ export const isRelayScreen = (
 function relayScreen<TRoute extends Route>(
   Component: ComponentType<RelayScreenProps<TRoute, any>>,
   {
-    fallback: Fallback = DefaultScreenFallback,
-    errorFallback: ErrorFallback,
+    fallback,
+    errorFallback,
     canGoBack = true,
     profileBound = true,
     pollInterval,
@@ -136,11 +145,25 @@ function relayScreen<TRoute extends Route>(
     getScreenOptions?: () => ScreenOptions;
   } {
   const RelayWrapper = (props: RelayScreenProps<TRoute, any>) => {
+    // #region Query loading
     const {
       screenId,
       route: { params },
+      hasFocus,
     } = props;
 
+    const { preloadedQuery } = useManagedQuery((props as any).screenId) ?? {};
+
+    useEffect(() => {
+      if (!preloadedQuery && hasFocus) {
+        loadQueryFor(screenId, options, params);
+      }
+    }, [screenId, params, preloadedQuery, hasFocus]);
+    // #endregion
+
+    // #region Auth handling
+    // We need to dispose the query when the profile changes
+    // if the query is profile bound
     const profileInfosRef = useRef<ProfileInfos | null>(null);
     useEffect(() => {
       profileInfosRef.current = profileBound
@@ -159,33 +182,10 @@ function relayScreen<TRoute extends Route>(
         }
       });
     }, [params, screenId]);
+    // #endregion
 
-    const { preloadedQuery } = useManagedQuery((props as any).screenId) ?? {};
-
-    const hasFocus = useScreenHasFocus();
-
-    useEffect(() => {
-      if (!preloadedQuery && hasFocus) {
-        loadQueryFor(screenId, options, params);
-      }
-    }, [screenId, params, preloadedQuery, hasFocus]);
-
+    // #region Polling
     const environment = useRelayEnvironment();
-
-    //this method is used to force refresh, mainly in case of push notification
-    const refreshQuery = useCallback(() => {
-      //TODO: should we had a param to refresh only when hasFocus. in case of push notification it should refresh even if the screen is not focused
-      loadQueryFor(screenId, options, params, true);
-    }, [params, screenId]);
-
-    // refresh the query when the screen gains focus (going from background to foreground)
-    const appState = useAppState();
-    useEffect(() => {
-      if (appState === 'active' && refreshOnFocus) {
-        refreshQuery();
-      }
-    }, [appState, refreshQuery]);
-
     useEffect(() => {
       let currentTimeout: any;
       let currentSubscription: Subscription | null;
@@ -193,47 +193,45 @@ function relayScreen<TRoute extends Route>(
       let retryCount = 0;
       if (
         Number.isInteger(pollInterval) &&
-        (props.hasFocus || !stopPollingWhenNotFocused)
+        (hasFocus || !stopPollingWhenNotFocused)
       ) {
-        const poll = (interval?: number) => {
-          currentTimeout = setTimeout(
-            () => {
-              const { query, variables } = getLoadQueryInfo(
-                options,
-                params,
-                profileInfosRef.current,
-              );
-              const { useOfflineCache } = options;
-              currentSubscription = fetchQuery(environment, query, variables, {
-                fetchPolicy: 'network-only',
-                networkCacheConfig: {
-                  force: true,
-                  metadata: { useOfflineCache },
-                },
-              }).subscribe({
-                complete: () => {
-                  retryCount = 0;
-                  if (cancelled) {
-                    return;
-                  }
-                  poll(pollInterval);
-                },
-                error: () => {
-                  retryCount += 1;
-                  setTimeout(
-                    () => {
-                      if (cancelled) {
-                        return;
-                      }
-                      poll(pollInterval);
-                    },
-                    2 ** Math.min(retryCount, 5) * 1000,
-                  );
-                },
-              });
-            },
-            interval ?? (refreshOnFocus ? 0 : pollInterval),
-          );
+        const poll = () => {
+          const innerFetch = () => {
+            const { query, variables } = getLoadQueryInfo(
+              options,
+              params,
+              profileInfosRef.current,
+            );
+            const { useOfflineCache } = options;
+            currentSubscription = fetchQuery(environment, query, variables, {
+              fetchPolicy: 'network-only',
+              networkCacheConfig: {
+                force: true,
+                metadata: { useOfflineCache },
+              },
+            }).subscribe({
+              complete: () => {
+                retryCount = 0;
+                if (cancelled) {
+                  return;
+                }
+                poll();
+              },
+              error: () => {
+                retryCount += 1;
+                setTimeout(
+                  () => {
+                    if (cancelled) {
+                      return;
+                    }
+                    innerFetch();
+                  },
+                  2 * Math.min(retryCount, 5) * 1000,
+                );
+              },
+            });
+          };
+          currentTimeout = setTimeout(innerFetch, pollInterval);
         };
         poll();
       }
@@ -242,93 +240,106 @@ function relayScreen<TRoute extends Route>(
         currentSubscription?.unsubscribe();
         clearTimeout(currentTimeout);
       };
-    }, [environment, params, props.hasFocus, screenId]);
+    }, [environment, params, hasFocus, screenId]);
+    // #endregion
 
-    const intl = useIntl();
-    const router = useRouter();
-
-    const isInErrorState = useRef(false);
-    const errorBoundaryRef = useRef<RelayScreenErrorBoundary>(null);
-    const retry = useCallback(() => {
-      isInErrorState.current = false;
+    // #region Query refreshing
+    const refreshQuery = useCallback(() => {
       loadQueryFor(screenId, options, params, true);
-      errorBoundaryRef.current?.reset();
     }, [params, screenId]);
 
-    const onError = useCallback(
-      (error: Error) => {
-        Sentry.captureException(error, { data: 'relayScreen' });
-        if (isInErrorState.current) {
-          return;
+    // refresh the query when the screen gains focus or when the
+    // app combe back from background  or when the network is available
+    // after being disconnected
+    const appState = useAppState();
+    const isConnected = useNetworkAvailableContext();
+    const appStatePrevious = useRef(appState);
+    const isConnectedPrevious = useRef(isConnected);
+    const hasFocusPrevious = useRef(hasFocus);
+    useEffect(() => {
+      if (
+        refreshOnFocus &&
+        appState === 'active' &&
+        hasFocus &&
+        isConnected &&
+        (appStatePrevious.current !== appState ||
+          isConnectedPrevious.current !== isConnected ||
+          hasFocusPrevious.current !== hasFocus)
+      ) {
+        refreshQuery();
+        if (isConnectedPrevious.current !== isConnected) {
+          // the timeout will prevent the rerender to catch error from the previous
+          // preloaded query
+          setTimeout(() => {
+            errorBoundaryRef.current?.reset();
+          }, 10);
         }
+      }
+      appStatePrevious.current = appState;
+      isConnectedPrevious.current = isConnected;
+      hasFocusPrevious.current = hasFocus;
+    }, [appState, hasFocus, isConnected, refreshQuery]);
+    // #endregion
 
-        isInErrorState.current = true;
-        Alert.alert(
-          intl.formatMessage({
-            defaultMessage: 'Loading error',
-            description: 'Screen alert message loading error title',
-          }),
-          intl.formatMessage({
-            defaultMessage: 'Could not load the data',
-            description: 'Screen Alert message loading error',
-          }),
-          convertToNonNullArray([
-            canGoBack
-              ? {
-                  text: intl.formatMessage({
-                    defaultMessage: 'Cancel',
-                    description:
-                      'Screen alert message loading error cancel button',
-                  }),
-                  onPress: () => {
-                    isInErrorState.current = false;
-                    router.back();
-                  },
-                  style: 'cancel',
-                }
-              : null,
-            {
-              text: intl.formatMessage({
-                defaultMessage: 'Retry',
-                description: 'Screen alert message loading error retry button',
-              }),
-              onPress: () => retry(),
-            },
-          ]),
-          {
-            userInterfaceStyle: Appearance.getColorScheme() ?? 'light',
-          },
-        );
-      },
-      [intl, retry, router],
-    );
+    // #region Error handling
+    const router = useRouter();
 
-    const inner = (
-      <Suspense fallback={Fallback ? <Fallback {...props} /> : null}>
-        {preloadedQuery && (
-          <Component
-            {...props}
-            preloadedQuery={preloadedQuery}
-            refreshQuery={refreshQuery}
-          />
-        )}
-      </Suspense>
-    );
-    if (__DEV__) {
-      return inner;
-    }
+    const onError = useCallback((error: Error) => {
+      if (!isNetworkError(error) && error.message !== ERRORS.INVALID_TOKEN) {
+        // TODO should we log more information about the error?
+        Sentry.captureException(error, {
+          data: 'relayScreen',
+        });
+      }
+    }, []);
 
-    ErrorFallback = ErrorFallback ?? Fallback;
+    const errorBoundaryRef = useRef<ErrorBoundary | null>(null);
+    const retry = useCallback(() => {
+      errorBoundaryRef.current?.reset();
+      loadQueryFor(screenId, options, params, true);
+    }, [params, screenId]);
+    // #endregion
+
+    const Fallback = fallback ?? DefaultScreenFallback;
+    const ErrorFallback = errorFallback ?? DefaultErrorFallback;
+
     return (
-      <RelayScreenErrorBoundary
-        ref={errorBoundaryRef}
-        onError={onError}
-        fallback={
-          ErrorFallback ? <ErrorFallback {...props} retry={retry} /> : null
-        }
-      >
-        {inner}
-      </RelayScreenErrorBoundary>
+      <ErrorBoundary ref={errorBoundaryRef} onError={onError}>
+        {({ error }) => {
+          if (!error) {
+            return (
+              <Suspense fallback={<Fallback {...props} />}>
+                {preloadedQuery ? (
+                  <Component
+                    {...props}
+                    preloadedQuery={preloadedQuery}
+                    refreshQuery={refreshQuery}
+                  />
+                ) : (
+                  <Fallback {...props} />
+                )}
+              </Suspense>
+            );
+          }
+          if (isNetworkError(error) || error.message === ERRORS.INVALID_TOKEN) {
+            return <Fallback {...props} />;
+          }
+          if (
+            error instanceof FetchError ||
+            error instanceof GraphQLError ||
+            error.name === 'GraphQLError'
+          ) {
+            return (
+              <ErrorFallback
+                retry={retry}
+                cancel={router.back}
+                canGoBack={canGoBack}
+              />
+            );
+          }
+          return <ErrorScreen retry={retry} />;
+        }}
+      </ErrorBoundary>
     );
   };
 
@@ -344,58 +355,6 @@ function relayScreen<TRoute extends Route>(
 
 export default relayScreen;
 
-const isRelayNetworkError = (error: Error) => {
-  if (error instanceof FetchError && error.message !== ERRORS.INVALID_TOKEN) {
-    return true;
-  }
-  if (error instanceof GraphQLError || error.name === 'GraphQLError') {
-    return true;
-  }
-  if (isNetworkError(error)) {
-    return true;
-  }
-  return false;
-};
-
-export type RelayScreenErrorBoundaryProps = {
-  fallback: React.ReactNode;
-  children: React.ReactNode;
-  onError: (error: Error) => void;
-};
-
-export class RelayScreenErrorBoundary extends React.Component<
-  RelayScreenErrorBoundaryProps,
-  { error: Error | null }
-> {
-  state = { error: null };
-
-  static getDerivedStateFromError(error: Error) {
-    return { error };
-  }
-
-  reset() {
-    this.setState({ error: null });
-  }
-
-  componentDidCatch(error: Error) {
-    if (isRelayNetworkError(error)) {
-      this.props.onError?.(error);
-    }
-  }
-
-  render() {
-    const { children, fallback } = this.props;
-    const { error } = this.state;
-    if (error) {
-      if (!isRelayNetworkError(error)) {
-        throw error;
-      }
-      return fallback;
-    }
-    return children;
-  }
-}
-
 const DefaultScreenFallback = () => {
   const { width, height } = useWindowDimensions();
   return (
@@ -404,3 +363,61 @@ const DefaultScreenFallback = () => {
     </Container>
   );
 };
+
+const DefaultErrorFallback = ({
+  retry,
+  cancel,
+  canGoBack,
+}: ErrorRendererProps) => (
+  <Container
+    style={{
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 20,
+      gap: 10,
+    }}
+  >
+    <Image
+      source={require('#assets/logo.png')}
+      style={{ width: 100, height: 100 }}
+    />
+    <Text variant="large">
+      <FormattedMessage
+        defaultMessage="Loading error"
+        description="Screen alert message loading error title"
+      />
+    </Text>
+    <Text variant="medium">
+      <FormattedMessage
+        defaultMessage="Could not load the data"
+        description="Screen Alert message loading error"
+      />
+    </Text>
+    <View style={{ flexDirection: 'row', gap: 10 }}>
+      {canGoBack && (
+        <Button
+          label={
+            <FormattedMessage
+              defaultMessage="Cancel"
+              description="Screen alert message loading error cancel button"
+            />
+          }
+          onPress={cancel}
+          variant="secondary"
+          style={{ width: 120 }}
+        />
+      )}
+      <Button
+        label={
+          <FormattedMessage
+            defaultMessage="Retry"
+            description="Screen alert message loading error retry button"
+          />
+        }
+        onPress={retry}
+        style={{ width: 120 }}
+      />
+    </View>
+  </Container>
+);

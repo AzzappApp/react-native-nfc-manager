@@ -15,7 +15,7 @@ const fetchMessages = async (sourceId, messagesDir, appMessages) => {
       `${TRANSLATION_APP_API_ENDPOINT}/messages/${sourceId}/${ENVIRONMENT === 'development' ? 'staging' : ENVIRONMENT}`, //fallback to staging in dev env
       {
         headers: {
-          'azzapp-server-auth': API_SERVER_TOKEN,
+          'azzapp-translation-auth': API_SERVER_TOKEN,
         },
       },
     );

@@ -14,8 +14,8 @@ describe('getExportResolution', () => {
         576 * 2,
         MODULE_VIDEO_MAX_WIDTH,
       );
-      expect(resolution.width).toBe(1280);
-      expect(resolution.height).toBe(720);
+      expect(resolution.width).toBe(1980);
+      expect(resolution.height).toBe(1113.75);
     });
     test('video landscape 16:9 small video', () => {
       const resolution = downScaleImage(
@@ -38,8 +38,8 @@ describe('getExportResolution', () => {
         1024 * 2,
         MODULE_VIDEO_MAX_WIDTH,
       );
-      expect(resolution.width).toBe(720);
-      expect(resolution.height).toBe(1280);
+      expect(resolution.width).toBe(1113.75);
+      expect(resolution.height).toBe(1980);
     });
     test('video portrait 16:9 small video', () => {
       const resolution = downScaleImage(

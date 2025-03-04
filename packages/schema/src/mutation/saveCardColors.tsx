@@ -9,6 +9,7 @@ import { invalidateWebCard } from '#externals';
 import { webCardLoader } from '#loaders';
 import { checkWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
+import { notifyRelatedWalletPasses } from '#helpers/webCardHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 
 const saveCardColors: MutationResolvers['saveCardColors'] = async (
@@ -36,6 +37,8 @@ const saveCardColors: MutationResolvers['saveCardColors'] = async (
     console.error(e);
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
+
+  notifyRelatedWalletPasses(webCardId);
 
   const webCard = await webCardLoader.load(webCardId);
 

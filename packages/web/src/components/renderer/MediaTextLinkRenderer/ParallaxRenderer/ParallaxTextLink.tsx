@@ -3,8 +3,9 @@
 import cn from 'classnames';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import Parallax from '#components/renderer/Parallax';
-import { fontsMap } from '#helpers/fonts';
+import { webCardTextFontsMap, webCardTitleFontsMap } from '#helpers/fonts';
 import { DEFAULT_MODULE_TEXT, DEFAULT_MODULE_TITLE } from '#helpers/modules';
+import RichText from '#ui/RichText';
 import Link from '../Link';
 import commonStyles from '../MediaTextLink.css';
 import styles from './ParallaxTextLink.css';
@@ -26,56 +27,56 @@ const ParallaxText = ({
   backgroundColor?: string;
 }) => {
   return (
-    <Parallax
-      medias={medias}
-      imageStyle={{ opacity: 0.8 }}
-      backgroundStyle={{
-        backgroundColor,
-      }}
-    >
+    <Parallax medias={medias}>
       {({ mediaId }) => {
         const mediaData = data.cardModuleMedias.find(
           ({ media }) => media.id === mediaId,
         );
 
         return (
-          <div className={styles.container}>
-            <section className={styles.textContainer}>
-              <h2
-                style={{
-                  color: swapColor(data.cardModuleColor?.title, colorPalette),
-                  fontSize: cardStyle.titleFontSize,
-                }}
-                className={cn(
-                  styles.textItem,
-                  commonStyles.title,
-                  fontsMap[cardStyle.titleFontFamily].className,
-                )}
-              >
-                {mediaData?.title ?? DEFAULT_MODULE_TITLE}
-              </h2>
-              <p
-                style={{
-                  color: swapColor(data.cardModuleColor?.text, colorPalette),
-                  fontSize: cardStyle.fontSize,
-                }}
-                className={cn(
-                  styles.textItem,
-                  commonStyles.text,
-                  fontsMap[cardStyle.fontFamily].className,
-                )}
-              >
-                {mediaData?.text ?? DEFAULT_MODULE_TEXT}
-              </p>
-            </section>
+          <>
+            <div style={{ backgroundColor }} className={styles.overlay} />
 
-            <Link
-              mediaData={mediaData}
-              data={data}
-              cardStyle={cardStyle}
-              colorPalette={colorPalette}
-            />
-          </div>
+            <div className={styles.container}>
+              <section className={styles.textContainer}>
+                <h2
+                  style={{
+                    color: swapColor(data.cardModuleColor?.title, colorPalette),
+                    fontSize: cardStyle.titleFontSize,
+                  }}
+                  className={cn(
+                    styles.textItem,
+                    commonStyles.title,
+                    webCardTitleFontsMap[cardStyle.titleFontFamily].className,
+                  )}
+                >
+                  {mediaData?.title ?? DEFAULT_MODULE_TITLE}
+                </h2>
+                <p
+                  style={{
+                    color: swapColor(data.cardModuleColor?.text, colorPalette),
+                    fontSize: cardStyle.fontSize,
+                  }}
+                  className={cn(
+                    styles.textItem,
+                    commonStyles.text,
+                    webCardTextFontsMap[cardStyle.fontFamily].className,
+                  )}
+                >
+                  <RichText
+                    fontFamily={cardStyle.fontFamily}
+                    text={mediaData?.text ?? DEFAULT_MODULE_TEXT}
+                  />
+                </p>
+              </section>
+              <Link
+                mediaData={mediaData}
+                data={data}
+                cardStyle={cardStyle}
+                colorPalette={colorPalette}
+              />
+            </div>
+          </>
         );
       }}
     </Parallax>
