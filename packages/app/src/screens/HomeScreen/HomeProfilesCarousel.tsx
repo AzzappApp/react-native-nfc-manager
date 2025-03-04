@@ -611,7 +611,7 @@ const styles = StyleSheet.create({
     overflow: 'visible',
   },
   coverShadow: Platform.select<ViewStyle>({
-    default: shadow('light', 'bottom'),
+    default: shadow({ appearance: 'light', direction: 'bottom' }),
     android: {},
   }),
   newCover: {
@@ -641,7 +641,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#FFFFFF66',
     left: 8,
-    ...shadow('light', 'bottom'),
+    ...shadow({ appearance: 'light', direction: 'bottom' }),
   },
   multiUserContainer: {
     position: 'absolute',
@@ -650,7 +650,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#FFFFFF66',
     right: 8,
-    ...shadow('light', 'bottom'),
+    ...shadow({ appearance: 'light', direction: 'bottom' }),
   },
   multiUserIconContainer: {
     flex: 1,

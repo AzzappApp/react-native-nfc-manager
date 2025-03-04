@@ -447,7 +447,7 @@ const styleSheet = createStyleSheet(appearance => ({
     padding: 15,
     borderRadius: 16,
     transform: [{ scale: 0.85 }, { translateY: -20 }],
-    ...shadow('light', 'bottom'),
+    ...shadow({ appearance: 'light', direction: 'bottom' }),
   },
   scrollViewStyle: { width: '100%' },
   viewShotBackgroundColor: { backgroundColor: 'white', paddingBottom: 5 },

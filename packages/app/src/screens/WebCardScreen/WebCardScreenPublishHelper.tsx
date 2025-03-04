@@ -260,7 +260,7 @@ const stylesheet = createStyleSheet(appearance => ({
     flexDirection: 'row',
     alignSelf: 'center',
     overflow: 'visible',
-    ...shadow(appearance, 'bottom'),
+    ...shadow({ appearance, direction: 'bottom' }),
   },
   url: {
     color: appearance === 'dark' ? colors.white : colors.black,

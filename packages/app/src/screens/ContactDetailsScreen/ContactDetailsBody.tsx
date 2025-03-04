@@ -290,11 +290,11 @@ const getSocialUrl = (url: string) =>
 
 const AVATAR_WIDTH = 112;
 
-const stylesheet = createStyleSheet(theme => ({
+const stylesheet = createStyleSheet(appearance => ({
   container: {
     flex: 1,
     position: 'relative',
-    backgroundColor: theme === 'dark' ? colors.grey1000 : 'white',
+    backgroundColor: appearance === 'dark' ? colors.grey1000 : 'white',
   },
   close: {
     position: 'absolute',
@@ -342,10 +342,10 @@ const stylesheet = createStyleSheet(theme => ({
   item: {
     width: '100%',
     height: 52,
-    ...shadow(theme, 'center'),
+    ...shadow({ appearance, direction: 'center' }),
     marginTop: 20,
     padding: 14,
-    backgroundColor: theme === 'dark' ? colors.grey900 : colors.white,
+    backgroundColor: appearance === 'dark' ? colors.grey900 : colors.white,
     borderRadius: 12,
   },
   itemText: {
@@ -359,13 +359,13 @@ const stylesheet = createStyleSheet(theme => ({
   },
   avatarContainer: Platform.OS === 'ios' && {
     borderRadius: AVATAR_WIDTH / 2,
-    ...shadow(theme, 'bottom'),
+    ...shadow({ appearance, direction: 'bottom' }),
   },
   avatarWrapper: {
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
-    ...shadow(theme, 'bottom'),
+    ...shadow({ appearance, direction: 'bottom' }),
     backgroundColor: 'white',
   },
   avatar: {
@@ -373,7 +373,7 @@ const stylesheet = createStyleSheet(theme => ({
     height: AVATAR_WIDTH,
     borderRadius: AVATAR_WIDTH / 2,
     borderWidth: 4,
-    borderColor: theme === 'dark' ? colors.black : colors.white,
+    borderColor: appearance === 'dark' ? colors.black : colors.white,
     overflow: 'visible',
     backgroundColor: colors.grey50,
   },

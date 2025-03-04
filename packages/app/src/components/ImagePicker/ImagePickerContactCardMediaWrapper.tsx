@@ -43,7 +43,7 @@ const styleSheet = createStyleSheet(appearance => ({
       flex: 1,
       aspectRatio: 1,
     },
-    shadow(appearance, 'bottom'),
+    shadow({ appearance, direction: 'bottom' }),
   ],
   container: {
     flex: 1,

@@ -16,6 +16,7 @@ import {
   ScreenModal,
   useRouter,
 } from '#components/NativeRouter';
+import { getAuthState } from '#helpers/authStore';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getFileName } from '#helpers/fileHelpers';
 import { keyboardDismiss } from '#helpers/keyboardHelper';
@@ -67,13 +68,12 @@ const ContactCreateScreen = ({
 
   const intl = useIntl();
   const router = useRouter();
-  const profileId = (router.getCurrentRoute() as ContactCreateRoute)?.params
-    ?.profileId;
+  const profileId = getAuthState().profileInfos?.profileId;
 
   const {
     control,
     handleSubmit,
-    formState: { isSubmitting, isValid },
+    formState: { isSubmitting, isValid, isDirty },
     setValue,
   } = useForm<ContactFormValues>({
     mode: 'onBlur',
@@ -193,8 +193,8 @@ const ContactCreateScreen = ({
         router.back();
       },
       updater: (store, response) => {
-        if (response && response.addContact && params?.profileId) {
-          const profile = store.get(params.profileId);
+        if (response && response.addContact && profileId) {
+          const profile = store.get(profileId);
           const nbContacts = profile?.getValue('nbContacts');
 
           if (typeof nbContacts === 'number') {
@@ -301,6 +301,13 @@ const ContactCreateScreen = ({
   const [showScanner, openScanner, closeScanner] = useBoolean(
     params?.showCardScanner,
   );
+  const closeScannerView = useCallback(() => {
+    if (!isDirty) {
+      router.back();
+    }
+    closeScanner();
+  }, [closeScanner, isDirty, router]);
+
   const openScannerView = useCallback(() => {
     keyboardDismiss();
     openScanner();
@@ -358,6 +365,7 @@ const ContactCreateScreen = ({
             <ContactCardDetector
               close={closeScanner}
               extractData={loadFormFromScan}
+              closeContainer={closeScannerView}
             />
           </View>
         )}

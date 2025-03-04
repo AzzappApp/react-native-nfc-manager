@@ -603,7 +603,7 @@ const stylesheet = createStyleSheet(appearance => ({
     borderRadius: 12,
     backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
     overflow: 'visible',
-    ...shadow(appearance, 'center'),
+    ...shadow({ appearance, direction: 'center' }),
   },
   mediaContainer: {
     paddingBottom: 15,
@@ -629,7 +629,7 @@ const stylesheet = createStyleSheet(appearance => ({
       padding: 5,
       flex: 1,
     },
-    shadow(appearance, 'center'),
+    shadow({ appearance, direction: 'center' }),
   ],
   mediaPicked: {
     flex: 1,

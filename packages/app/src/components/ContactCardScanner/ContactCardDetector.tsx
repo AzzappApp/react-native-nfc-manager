@@ -42,11 +42,13 @@ type ContactCardDetectorProps = {
     data: ContactCardDetectorMutation$data['extractVisitCardData'],
     image: { uri: string; aspectRatio: number },
   ) => void;
+  closeContainer?: () => void;
 };
 
 const ContactCardDetector = ({
   close,
   extractData,
+  closeContainer,
 }: ContactCardDetectorProps) => {
   const isActive = useIsForeground();
   const intl = useIntl();
@@ -407,7 +409,7 @@ const ContactCardDetector = ({
               style={{ position: 'absolute', left: 20 }}
               iconStyle={{ tintColor: 'white' }}
               size={30}
-              onPress={close}
+              onPress={closeContainer ?? close}
             />
             <Text variant="large" style={styles.whiteText}>
               <FormattedMessage

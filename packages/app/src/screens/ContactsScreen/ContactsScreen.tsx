@@ -59,7 +59,7 @@ const ContactsScreen = ({
     if (profile?.id) {
       router.push({
         route: 'CONTACT_CREATE',
-        params: { profileId: profile.id, showCardScanner: true },
+        params: { showCardScanner: true },
       });
     }
   }, [closeNewContactMenu, profile?.id, router]);
@@ -69,7 +69,7 @@ const ContactsScreen = ({
     if (profile?.id) {
       router.push({
         route: 'CONTACT_CREATE',
-        params: { profileId: profile.id, showCardScanner: false },
+        params: { showCardScanner: false },
       });
     }
   }, [closeNewContactMenu, profile?.id, router]);
@@ -195,7 +195,7 @@ const ContactsScreen = ({
   );
 };
 
-const stylesheet = createStyleSheet(theme => ({
+const stylesheet = createStyleSheet(appearance => ({
   container: {
     flex: 1,
   },
@@ -229,7 +229,7 @@ const stylesheet = createStyleSheet(theme => ({
   separator: {
     height: 1,
     width: '100%',
-    backgroundColor: theme === 'light' ? colors.grey50 : colors.grey900,
+    backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey900,
   },
   initial: {
     marginVertical: 20,

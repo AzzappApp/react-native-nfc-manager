@@ -67,6 +67,11 @@ export type BottomMenuProps = Omit<ViewProps, 'children'> & {
    * the Style of the container
    */
   style?: StyleProp<ViewStyle>;
+
+  renderCustomMenuItem?: (
+    tab: BottomMenuItem,
+    index: number,
+  ) => ReactNode | null;
 };
 
 export const BOTTOM_MENU_HEIGHT = 70;
@@ -85,9 +90,57 @@ const BottomMenu = ({
   showLabel = false,
   showCircle = true,
   style,
+  renderCustomMenuItem,
   ...props
 }: BottomMenuProps) => {
   const styles = useStyleSheet(styleSheet);
+
+  const renderBottomMenuItem = useCallback(
+    (
+      { key, icon, IconComponent, tint, label }: BottomMenuItem,
+      index: number,
+    ) => {
+      const customRender = renderCustomMenuItem?.(
+        {
+          key,
+          icon,
+          IconComponent,
+          tint,
+          label,
+        },
+        index,
+      );
+      if (customRender) {
+        return customRender;
+      }
+      return (
+        <BottomMenuItemRenderer
+          key={key}
+          tabKey={key} //key cannot be used in the children
+          icon={icon}
+          IconComponent={IconComponent}
+          label={label}
+          tint={tint}
+          iconSize={iconSize}
+          isSelected={currentTab === key}
+          onItemPress={onItemPress}
+          showLabel={showLabel}
+          showCircle={showCircle}
+          isFirst={index === 0}
+          isLast={index === tabs.length - 1}
+        />
+      );
+    },
+    [
+      currentTab,
+      iconSize,
+      onItemPress,
+      renderCustomMenuItem,
+      showCircle,
+      showLabel,
+      tabs.length,
+    ],
+  );
   return (
     <View
       accessibilityRole="tablist"
@@ -96,23 +149,7 @@ const BottomMenu = ({
       {...props}
     >
       <Container style={[style, styles.container]}>
-        {tabs.map(({ key, icon, IconComponent, tint, label }, index) => (
-          <BottomMenuItemRenderer
-            key={key}
-            tabKey={key} //key cannot be used in the children
-            icon={icon}
-            IconComponent={IconComponent}
-            label={label}
-            tint={tint}
-            iconSize={iconSize}
-            isSelected={currentTab === key}
-            onItemPress={onItemPress}
-            showLabel={showLabel}
-            showCircle={showCircle}
-            isFirst={index === 0}
-            isLast={index === tabs.length - 1}
-          />
-        ))}
+        {tabs.map(renderBottomMenuItem)}
       </Container>
     </View>
   );
@@ -252,6 +289,7 @@ const styleSheet = createStyleSheet(appearance => ({
     width: '100%',
     alignItems: 'center',
     paddingVertical: BOTTOM_MENU_PADDING,
+    overflow: 'visible',
   },
   container: [
     {
@@ -260,7 +298,7 @@ const styleSheet = createStyleSheet(appearance => ({
       flexDirection: 'row',
       backgroundColor: appearance === 'light' ? colors.white : colors.grey1000,
     },
-    shadow(appearance),
+    shadow({ appearance }),
   ],
   tabContainer: {
     flex: 1,

@@ -60,6 +60,6 @@ const styleSheet = createStyleSheet(appearance => ({
     borderTopRightRadius: 16,
     paddingTop: 16,
     backgroundColor: appearance === 'light' ? colors.white : colors.black,
-    ...shadow(appearance, 'top'),
+    ...shadow({ appearance, direction: 'top' }),
   },
 }));

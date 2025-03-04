@@ -12,5 +12,6 @@ import SwiftUI
 struct QRCodeWidgetBundle: WidgetBundle {
     var body: some Widget {
         QRCodeWidget()
+        LockScreenScanWidget()
     }
 }

@@ -218,7 +218,7 @@ const AlternationItem = ({
 
 const stylesheet = createStyleSheet(appearance => ({
   buttonLink: {
-    ...shadow(appearance, 'bottom'), //need specification on shadow
+    ...shadow({ appearance, direction: 'bottom' }), //need specification on shadow
     overflow: 'visible',
     height: 54,
     minWidth: 150,

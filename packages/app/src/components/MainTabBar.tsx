@@ -1,8 +1,11 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import {
+  Platform,
   useColorScheme,
   useWindowDimensions,
+  View,
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
@@ -12,15 +15,18 @@ import Animated, {
   useAnimatedStyle,
 } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
-import { colors } from '#theme';
-
+import { colors, fontFamilies, shadow } from '#theme';
 import { getAuthState } from '#helpers/authStore';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useScreenInsets from '#hooks/useScreenInsets';
 import BottomMenu, { BOTTOM_MENU_PADDING } from '#ui/BottomMenu';
+import Icon from '#ui/Icon';
+import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import { HomeIcon } from './HomeIcon';
 import { useRouter } from './NativeRouter';
 import { openShakeShare } from './ShakeShare';
+import type { BottomMenuItem } from '#ui/BottomMenu';
 import type { ReactNode } from 'react';
 
 const mainTabBarOpacity = makeMutable(1);
@@ -88,6 +94,15 @@ const MainTabBar = ({
       switch (key) {
         case 'SHARE':
           openShakeShare();
+          break;
+        case 'SCAN':
+          router.push({
+            route: 'CONTACT_CREATE',
+            params: {
+              showCardScanner: true,
+            },
+          });
+
           break;
         case 'MEDIA':
           {
@@ -186,6 +201,14 @@ const MainTabBar = ({
           icon: 'share_main',
         },
         {
+          key: 'SCAN',
+          label: intl.formatMessage({
+            defaultMessage: 'Scan',
+            description: 'Main tab bar title for scan',
+          }),
+          icon: 'scan',
+        },
+        {
           key: 'CONTACTS',
           label: intl.formatMessage({
             defaultMessage: 'Contacts',
@@ -204,6 +227,52 @@ const MainTabBar = ({
       ] as const,
     [intl, currentRoute, appearance],
   );
+  const styles = useStyleSheet(styleSheet);
+
+  const renderScanButton = useCallback(
+    (tab: BottomMenuItem) => {
+      if (tab.key === 'SCAN') {
+        const onPress = () => onItemPress(tab.key);
+        return (
+          <PressableNative
+            testID={tab.key}
+            key={tab.key}
+            accessibilityRole="tab"
+            accessibilityLabel={
+              typeof tab.label === 'string' ? tab.label : undefined
+            }
+            onPress={onPress}
+            style={styles.scanButton}
+          >
+            <LinearGradient
+              colors={[
+                'red', //rgba(200, 199, 202, 0.30)',
+                'rgba(200, 199, 202, 0.00)',
+              ]}
+              start={{ x: 0.5, y: 0 }}
+              end={{ x: 0.5, y: 1 }}
+              style={styles.linearGradient}
+            />
+            <Icon icon="scan" style={styles.icon} />
+            <View style={styles.labelDecoration}>
+              <Text variant="xsmall" style={styles.label}>
+                {tab.label}
+              </Text>
+            </View>
+          </PressableNative>
+        );
+      }
+      return null;
+    },
+    [
+      onItemPress,
+      styles.icon,
+      styles.label,
+      styles.labelDecoration,
+      styles.linearGradient,
+      styles.scanButton,
+    ],
+  );
 
   return (
     <Animated.View
@@ -216,6 +285,7 @@ const MainTabBar = ({
           paddingLeft: MARGIN_HORIZONTAL,
           paddingRight: MARGIN_HORIZONTAL,
           width,
+          overflow: 'visible',
         },
         visibilityStyle,
         style,
@@ -229,11 +299,53 @@ const MainTabBar = ({
         onItemPress={onItemPress}
         showLabel
         showCircle={false}
+        renderCustomMenuItem={renderScanButton}
       />
     </Animated.View>
   );
 };
 
-const MARGIN_HORIZONTAL = 30;
-
+const MARGIN_HORIZONTAL = 10;
 export default MainTabBar;
+
+const styleSheet = createStyleSheet(appearance => ({
+  scanButton: {
+    flex: 1,
+    overflow: 'visible',
+    minWidth: 50,
+    borderRadius: 20,
+    height: Platform.OS === 'ios' ? 62 : 70,
+    paddingBottom: Platform.OS === 'ios' ? 0 : 8,
+    backgroundColor: appearance === 'light' ? colors.white : colors.grey1000,
+    top: -5,
+    ...shadow({
+      appearance,
+      direction: 'top',
+      height: 15,
+      forceOldShadow: true,
+    }),
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
+  },
+  icon: {
+    tintColor: appearance === 'light' ? colors.grey200 : colors.grey400,
+    width: 24,
+    height: 24,
+  },
+  linearGradient: {
+    top: 2,
+    marginHorizontal: 2,
+    flex: 1,
+    borderRadius: 18,
+  },
+  labelDecoration: {
+    marginTop: 10,
+    backgroundColor: 'transparent',
+  },
+  label: {
+    ...fontFamilies.semibold,
+    lineHeight: 14,
+    fontSize: 11,
+    color: appearance === 'light' ? colors.grey300 : colors.grey500,
+  },
+}));

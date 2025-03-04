@@ -145,6 +145,6 @@ const styleSheet = createStyleSheet(appearance => ({
       borderRadius: 20,
       backgroundColor: appearance === 'dark' ? colors.black : colors.white,
     },
-    shadow(appearance, 'center'),
+    shadow({ appearance, direction: 'center' }),
   ],
 }));

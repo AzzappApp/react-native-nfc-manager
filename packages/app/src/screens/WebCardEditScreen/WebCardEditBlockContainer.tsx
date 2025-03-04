@@ -369,7 +369,7 @@ const WebCardEditBlockContainer = ({
         }}
       >
         <GestureDetector gesture={Gesture.Race(tapGesture, panGesture)}>
-          <Animated.View style={[moduleContainerStyle, shadow(appearance)]}>
+          <Animated.View style={[moduleContainerStyle, shadow({ appearance })]}>
             {/** this View is only here because ios bug with shadow and overflow hidden */}
             <Animated.View
               ref={ref}

@@ -705,7 +705,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     borderRadius: 18,
     backgroundColor: 'white',
-    ...shadow('light', 'center'),
+    ...shadow({ appearance: 'light', direction: 'center' }),
   },
   contentContainerStyle: {
     marginHorizontal: 20,

@@ -428,26 +428,26 @@ const updater = (
   root.setLinkedRecord(user, 'currentUser');
 };
 
-const stylesheet = createStyleSheet(theme => ({
+const stylesheet = createStyleSheet(appearance => ({
   container: {
-    backgroundColor: theme === 'dark' ? colors.grey900 : colors.white,
+    backgroundColor: appearance === 'dark' ? colors.grey900 : colors.white,
     width: 295,
     borderRadius: 20,
     alignSelf: 'center',
     padding: 20,
   },
   headerTextContainer: {
-    color: theme === 'dark' ? colors.white : colors.black,
+    color: appearance === 'dark' ? colors.white : colors.black,
     paddingTop: 20,
     textAlign: 'center',
   },
   descriptionTextContainer: {
-    color: theme === 'dark' ? colors.white : colors.black,
+    color: appearance === 'dark' ? colors.white : colors.black,
     paddingTop: 10,
     textAlign: 'center',
   },
   topDescriptionTextContainer: {
-    color: theme === 'dark' ? colors.white : colors.black,
+    color: appearance === 'dark' ? colors.white : colors.black,
     textAlign: 'center',
   },
   illustration: {

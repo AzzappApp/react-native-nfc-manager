@@ -195,7 +195,7 @@ export default memo(CoverList);
 
 const styleSheet = createStyleSheet(appearance => ({
   coverContainerStyle: {
-    ...shadow(appearance, 'center'),
+    ...shadow({ appearance, direction: 'center' }),
   },
 }));
 

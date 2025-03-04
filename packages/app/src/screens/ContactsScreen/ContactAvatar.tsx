@@ -161,7 +161,7 @@ const styleSheet = createStyleSheet(appearance => ({
     textAlign: 'center',
     color: 'white',
   },
-  shadow: shadow(appearance, 'bottom'),
+  shadow: shadow({ appearance, direction: 'bottom' }),
   layer: {
     position: 'absolute',
     bottom: 0,
