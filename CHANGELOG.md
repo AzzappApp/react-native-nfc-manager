@@ -1,3 +1,7 @@
+## 1.8.3-canary.4
+
+* **fix:**  - widget url  deeplink and scheme by target ([#7715](https://github.com/AzzappApp/azzapp/pull/7715))
+
 ## 1.8.3-canary.3
 
 * **fix:**  - webcard parameters alignment ([#7708](https://github.com/AzzappApp/azzapp/pull/7708))
