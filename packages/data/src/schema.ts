@@ -750,6 +750,7 @@ export const UserTable = cols.table(
     deleted: cols.boolean('deleted').default(false).notNull(),
     deletedAt: cols.dateTime('deletedAt'),
     deletedBy: cols.cuid('deletedBy'),
+    replacedBy: cols.cuid('replacedBy'),
     note: cols.text('note'),
     termsOfUseAcceptedVersion: cols.defaultVarchar('termsOfUseAcceptedVersion'),
     termsOfUseAcceptedAt: cols.dateTime('termsOfUseAcceptedAt'),

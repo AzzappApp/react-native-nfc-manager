@@ -698,4 +698,5 @@ const fakeUser: Omit<User, 'id'> = {
   termsOfUseAcceptedVersion: null,
   termsOfUseAcceptedAt: null,
   hasAcceptedCommunications: false,
+  replacedBy: null,
 };

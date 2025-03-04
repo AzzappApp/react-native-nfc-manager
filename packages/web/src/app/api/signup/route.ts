@@ -8,6 +8,7 @@ import {
   getProfilesByUser,
   getUserByEmail,
   getUserByPhoneNumber,
+  transaction,
   updateUser,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
@@ -100,32 +101,58 @@ export const POST = withPluginsRoute(async (req: Request) => {
     result.data;
 
   try {
+    let user: User | null = null;
     if (email) {
-      const user = await getUserByEmail(email);
-      if (user != null) {
+      user = await getUserByEmail(email);
+      if (user != null && !user.deleted) {
         return handleExistingUser(user, password);
       }
     }
 
     if (phoneNumber) {
-      const user = await getUserByPhoneNumber(formatPhoneNumber(phoneNumber));
-      if (user != null) {
+      user = await getUserByPhoneNumber(formatPhoneNumber(phoneNumber));
+      if (user != null && !user.deleted) {
         return handleExistingUser(user, password);
       }
     }
 
     const userPhoneNumber = phoneNumber ? formatPhoneNumber(phoneNumber) : null;
     const termsOfUse = await getLastTermsOfUse();
-    await createUser({
-      email: email ?? null,
-      phoneNumber: userPhoneNumber,
-      password: bcrypt.hashSync(password, 12),
-      locale: locale ?? null,
-      roles: null,
-      termsOfUseAcceptedVersion: termsOfUse?.version ?? null,
-      termsOfUseAcceptedAt: termsOfUse ? new Date() : null,
-      hasAcceptedCommunications,
-    });
+    if (user) {
+      await transaction(async () => {
+        await updateUser(user.id, {
+          email: user.email === email ? null : user.email,
+          phoneNumber:
+            user.phoneNumber === phoneNumber ? null : user.phoneNumber,
+        });
+
+        const userId = await createUser({
+          email: email ?? null,
+          phoneNumber: userPhoneNumber,
+          password: bcrypt.hashSync(password, 12),
+          locale: locale ?? null,
+          roles: null,
+          termsOfUseAcceptedVersion: termsOfUse?.version ?? null,
+          termsOfUseAcceptedAt: termsOfUse ? new Date() : null,
+          hasAcceptedCommunications,
+        });
+
+        await updateUser(user.id, {
+          replacedBy: userId,
+        });
+      });
+    } else {
+      await createUser({
+        email: email ?? null,
+        phoneNumber: userPhoneNumber,
+        password: bcrypt.hashSync(password, 12),
+        locale: locale ?? null,
+        roles: null,
+        termsOfUseAcceptedVersion: termsOfUse?.version ?? null,
+        termsOfUseAcceptedAt: termsOfUse ? new Date() : null,
+        hasAcceptedCommunications,
+      });
+    }
 
     const issuer = (email ?? userPhoneNumber) as string;
     const verification = await sendTwilioVerificationCode(

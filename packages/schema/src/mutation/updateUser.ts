@@ -1,6 +1,11 @@
 import * as bcrypt from 'bcrypt-ts';
 import { GraphQLError } from 'graphql';
-import { getUserByEmail, getUserByPhoneNumber, updateUser } from '@azzapp/data';
+import {
+  getUserByEmail,
+  getUserByPhoneNumber,
+  transaction,
+  updateUser,
+} from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import {
   formatPhoneNumber,
@@ -24,7 +29,6 @@ const updateUserMutation: MutationResolvers['updateUser'] = async (_, args) => {
   const partialUser: Partial<User> = {};
 
   const dbUser = await userLoader.load(userId);
-
   if (!dbUser) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
@@ -53,12 +57,14 @@ const updateUserMutation: MutationResolvers['updateUser'] = async (_, args) => {
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
   }
-
+  let existingUser: User | null = null;
+  let commonInfo: 'both' | 'email' | 'none' | 'phone' = 'none';
   if (email) {
-    const existingUser = await getUserByEmail(email);
-    if (existingUser && existingUser.id !== userId) {
+    existingUser = await getUserByEmail(email);
+    if (existingUser && existingUser.id !== userId && !existingUser.deleted) {
       throw new GraphQLError(ERRORS.EMAIL_ALREADY_EXISTS);
     }
+    commonInfo = 'email';
     partialUser.email = email;
   }
 
@@ -68,12 +74,11 @@ const updateUserMutation: MutationResolvers['updateUser'] = async (_, args) => {
   }
 
   if (phoneNumber && isInternationalPhoneNumber(phoneNumber)) {
-    const existingUser = await getUserByPhoneNumber(
-      formatPhoneNumber(phoneNumber),
-    );
-    if (existingUser && existingUser.id !== userId) {
+    existingUser = await getUserByPhoneNumber(formatPhoneNumber(phoneNumber));
+    if (existingUser && existingUser.id !== userId && !existingUser.deleted) {
       throw new GraphQLError(ERRORS.PHONENUMBER_ALREADY_EXISTS);
     }
+    commonInfo = commonInfo === 'email' ? 'both' : 'phone';
     partialUser.phoneNumber = formatPhoneNumber(phoneNumber);
   }
   if (phoneNumber === null) {
@@ -100,7 +105,22 @@ const updateUserMutation: MutationResolvers['updateUser'] = async (_, args) => {
   }
 
   try {
-    await updateUser(userId, partialUser);
+    await transaction(async () => {
+      if (existingUser) {
+        await updateUser(existingUser.id, {
+          email:
+            commonInfo === 'email' || commonInfo === 'both'
+              ? null
+              : existingUser.email,
+          phoneNumber:
+            commonInfo === 'phone' || commonInfo === 'both'
+              ? null
+              : existingUser.phoneNumber,
+          replacedBy: existingUser.replacedBy ?? userId,
+        });
+      }
+      await updateUser(userId, partialUser);
+    });
 
     return { user: { ...dbUser, ...partialUser } };
   } catch {
