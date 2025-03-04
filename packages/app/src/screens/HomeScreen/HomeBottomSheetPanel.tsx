@@ -12,6 +12,7 @@ import {
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+import { SUPPORT_EMAIL } from '@azzapp/shared/emailHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { ENABLE_MULTI_USER } from '#Config';
 import { signInRoutes } from '#mobileRoutes';
@@ -388,7 +389,7 @@ const HomeBottomSheetPanel = ({
           }),
           onPress: () => {
             logEvent('open_mail_support');
-            Linking.openURL('mailto:support@azzapp.com');
+            Linking.openURL(`mailto:${SUPPORT_EMAIL}`);
           },
         },
         {
