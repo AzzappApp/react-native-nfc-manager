@@ -22,6 +22,10 @@ export const mainRoutes = (withOnboarding: boolean): RouterInit => {
           route: 'HOME',
         },
         {
+          id: 'CONTACTS',
+          route: 'CONTACTS',
+        },
+        {
           id: 'MEDIA',
           route: 'MEDIA',
         },
