@@ -268,7 +268,7 @@ export const ContactCardScreen = ({
             ]}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{
-              gap: 20,
+              gap: 10,
             }}
           >
             <Text variant="xsmall" style={styles.contactCardDescriptionText}>
