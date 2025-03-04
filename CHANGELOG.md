@@ -1,3 +1,7 @@
+## 1.8.0-canary.69
+
+* **fix:**  - **user:** [#7688](https://github.com/AzzappApp/azzapp/pull/7688) create new user on signup ([#7696](https://github.com/AzzappApp/azzapp/pull/7696))
+
 ## 1.8.0-canary.68
 
 * **feat:**  - **payment:** [#7549](https://github.com/AzzappApp/azzapp/pull/7549) send automatic invoices ([#7690](https://github.com/AzzappApp/azzapp/pull/7690))
