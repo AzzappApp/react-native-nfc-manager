@@ -1,3 +1,7 @@
+## 1.8.0-canary.68
+
+* **feat:**  - **payment:** [#7549](https://github.com/AzzappApp/azzapp/pull/7549) send automatic invoices ([#7690](https://github.com/AzzappApp/azzapp/pull/7690))
+
 ## 1.8.0-canary.67
 
 * **fix:**  - **home:** [#7671](https://github.com/AzzappApp/azzapp/pull/7671) ensure resetPopup state is called ([#7687](https://github.com/AzzappApp/azzapp/pull/7687))
