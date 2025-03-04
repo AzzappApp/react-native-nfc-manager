@@ -1,3 +1,7 @@
+## 1.8.0-canary.70
+
+* **fix:**  - **EmailSignature:** email signature page integration ([#7706](https://github.com/AzzappApp/azzapp/pull/7706))
+
 ## 1.8.0-canary.69
 
 * **fix:**  - **user:** [#7688](https://github.com/AzzappApp/azzapp/pull/7688) create new user on signup ([#7696](https://github.com/AzzappApp/azzapp/pull/7696))
