@@ -429,6 +429,7 @@ const CoverEditorMediaPicker = ({
       onMediaSelected={handleMediaSelected}
       selectedMediasIds={selectedMediasIds}
       allowVideo={allowVideo}
+      allowLogo
       defaultSearchValue={defaultSearchValue}
       Header={
         multiSelection ? (

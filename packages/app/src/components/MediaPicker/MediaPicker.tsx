@@ -18,6 +18,7 @@ import Container from '#ui/Container';
 import Icon from '#ui/Icon';
 import TabsBar from '#ui/TabsBar';
 import TabView from '#ui/TabView';
+import LogosMediaList from './LogosMediaList';
 import StockMediaList from './StockMediaList';
 import type { SourceMedia } from '#helpers/mediaHelpers';
 import type { Album } from '@react-native-camera-roll/camera-roll';
@@ -40,6 +41,12 @@ type MediaPickerProps = Omit<ViewProps, 'children'> & {
    */
   allowVideo?: boolean;
   /**
+   * allow logo selection
+   *
+   * @type {boolean}
+   */
+  allowLogo?: boolean;
+  /**
    * list of already selected media
    *
    */
@@ -55,6 +62,7 @@ const MediaPicker = ({
   Header,
   selectedMediasIds,
   allowVideo,
+  allowLogo,
   BottomPanel,
   onClose,
   style,
@@ -115,8 +123,17 @@ const MediaPicker = ({
         }),
       });
     }
+    if (allowLogo) {
+      result.push({
+        tabKey: 'logos',
+        label: intl.formatMessage({
+          defaultMessage: 'Logos',
+          description: 'Label for the Logos tab in the Media picker',
+        }),
+      });
+    }
     return result;
-  }, [selectedAlbum?.title, intl, allowVideo]);
+  }, [selectedAlbum?.title, intl, allowVideo, allowLogo]);
 
   const { top, bottom } = useScreenInsets();
   const { width: windowWidth } = useWindowDimensions();
@@ -175,6 +192,16 @@ const MediaPicker = ({
               element: (
                 <StockMediaList
                   kind="video"
+                  selectedMediasIds={selectedMediasIds}
+                  onMediaSelected={onMediaSelected}
+                  defaultSearchValue={defaultSearchValue}
+                />
+              ),
+            },
+            {
+              id: 'logos',
+              element: (
+                <LogosMediaList
                   selectedMediasIds={selectedMediasIds}
                   onMediaSelected={onMediaSelected}
                   defaultSearchValue={defaultSearchValue}
