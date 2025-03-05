@@ -1,3 +1,7 @@
+## 1.8.3-rc.5
+
+* **fix:**  - **EmailSignature:** single button white ([#7720](https://github.com/AzzappApp/azzapp/pull/7720))
+
 ## 1.8.3-rc.4
 
 
