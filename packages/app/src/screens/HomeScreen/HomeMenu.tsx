@@ -1,19 +1,25 @@
-import { memo } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { memo, useCallback } from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
+import Toast from 'react-native-toast-message';
 import { colors } from '#theme';
+import { useRouter } from '#components/NativeRouter';
+import { profileInfoHasAdminRight } from '#helpers/profileRoleHelper';
 import TabBarMenuItem from '#ui/TabBarMenuItem';
 import Text from '#ui/Text';
+import { useHomeScreenContext } from './HomeScreenContext';
+import type { HomeBottomPanel_user$data } from '#relayArtifacts/HomeBottomPanel_user.graphql';
 import type { DerivedValue } from 'react-native-reanimated';
 
-export type HOME_TAB = 'CONTACT_CARD' | 'INFORMATION' | 'STATS';
+export type HOME_TAB = 'CONTACT_CARD' | 'MULTI_USER' | 'STATS';
 
 type HomeMenuProps = {
   selected: HOME_TAB;
+  user: HomeBottomPanel_user$data;
   setSelected: (section: HOME_TAB) => void;
   newContactsOpacity: DerivedValue<number>;
   notificationColor: DerivedValue<string>;
@@ -22,20 +28,39 @@ type HomeMenuProps = {
 const circleSize = 4.5;
 
 const HomeMenu = ({
+  user,
   selected,
   setSelected,
   newContactsOpacity,
   notificationColor,
 }: HomeMenuProps) => {
+  const router = useRouter();
+  const intl = useIntl();
+  const { currentIndexProfileSharedValue } = useHomeScreenContext();
   const circleAnimatedStyle = useAnimatedStyle(() => {
     return {
       backgroundColor: notificationColor.value,
-      opacity: withTiming(
-        selected === 'INFORMATION' ? 0 : newContactsOpacity.value,
-        { duration: 300 },
-      ),
+      opacity: withTiming(newContactsOpacity.value, { duration: 300 }),
     };
   });
+
+  const onPressMultiUser = useCallback(() => {
+    const profile = user?.profiles?.[currentIndexProfileSharedValue.value - 1];
+    if (profile?.webCard?.isMultiUser && profileInfoHasAdminRight(profile)) {
+      router.push({
+        route: 'MULTI_USER',
+      });
+    } else {
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage({
+          defaultMessage: 'This action is outside your role permissions.',
+          description:
+            'Error toast message when try to access to the multi user page from home tabs menu',
+        }),
+      });
+    }
+  }, [currentIndexProfileSharedValue.value, intl, router, user?.profiles]);
 
   return (
     <View style={styles.container} accessibilityRole="tablist">
@@ -60,6 +85,19 @@ const HomeMenu = ({
         />
       </TabBarMenuItem>
       <TabBarMenuItem
+        selected={selected === 'MULTI_USER'}
+        onPress={onPressMultiUser}
+        selectedBackgroundColor={END_GRADIENT_COLOR}
+        backgroundColor={CLEAR_GRADIENT_COLOR}
+        labelStyle={styles.menuLabelStyle}
+        selectedLabelColor={colors.white}
+      >
+        <FormattedMessage
+          defaultMessage="Multi-user"
+          description="Home Screen menu - Multi user"
+        />
+      </TabBarMenuItem>
+      <TabBarMenuItem
         selected={selected === 'STATS'}
         onPress={() => setSelected('STATS')}
         selectedBackgroundColor={END_GRADIENT_COLOR}
@@ -68,23 +106,11 @@ const HomeMenu = ({
         selectedLabelColor={colors.white}
       >
         <FormattedMessage
-          defaultMessage="Stats"
+          defaultMessage="Statistics"
           description="Home Screen menu - Stats"
         />
       </TabBarMenuItem>
-      <TabBarMenuItem
-        selected={selected === 'INFORMATION'}
-        onPress={() => setSelected('INFORMATION')}
-        selectedBackgroundColor={END_GRADIENT_COLOR}
-        backgroundColor={CLEAR_GRADIENT_COLOR}
-        labelStyle={styles.menuLabelStyle}
-        selectedLabelColor={colors.white}
-      >
-        <FormattedMessage
-          defaultMessage="Information"
-          description="Home Screen menu - Information"
-        />
-      </TabBarMenuItem>
+
       <Animated.View style={[styles.circle, circleAnimatedStyle]} />
     </View>
   );
