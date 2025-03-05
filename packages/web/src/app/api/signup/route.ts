@@ -123,7 +123,7 @@ export const POST = withPluginsRoute(async (req: Request) => {
         await updateUser(user.id, {
           email: user.email === email ? null : user.email,
           phoneNumber:
-            user.phoneNumber === phoneNumber ? null : user.phoneNumber,
+            user.phoneNumber === userPhoneNumber ? null : user.phoneNumber,
         });
 
         const userId = await createUser({
