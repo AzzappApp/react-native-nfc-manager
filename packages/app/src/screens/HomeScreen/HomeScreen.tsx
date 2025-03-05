@@ -1,5 +1,5 @@
 import LottieView from 'lottie-react-native';
-import { Suspense, useCallback, useEffect, useMemo, useRef } from 'react';
+import { Suspense, useEffect, useMemo, useRef } from 'react';
 import { useColorScheme } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { replaceColors } from '@azzapp/shared/lottieHelpers';
@@ -80,10 +80,6 @@ const HomeScreen = ({
 
   const ref = useRef<CarouselSelectListHandle | null>(null);
 
-  const onIndexChange = useCallback((index: number) => {
-    ref.current?.scrollToIndex(index, false);
-  }, []);
-
   if (
     !currentUser ||
     !currentUser.profiles ||
@@ -94,7 +90,7 @@ const HomeScreen = ({
 
   return (
     <Suspense>
-      <HomeScreenProvider userKey={currentUser} onIndexChange={onIndexChange}>
+      <HomeScreenProvider userKey={currentUser}>
         <TooltipProvider>
           <HomeScreenContent
             user={currentUser}

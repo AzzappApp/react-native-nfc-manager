@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { getAuthState, onChangeWebCard } from '#helpers/authStore';
-import { useProfileInfos } from '#hooks/authStateHooks';
 import type { HomeScreenContext_user$key } from '#relayArtifacts/HomeScreenContext_user.graphql';
 import type { ReactNode } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
@@ -21,12 +20,10 @@ const HomeScreenContext = React.createContext<
 type HomeScreenProviderProps = {
   children: ReactNode;
   userKey: HomeScreenContext_user$key;
-  onIndexChange: (index: number) => void;
 };
 
 export const HomeScreenProvider = ({
   children,
-  onIndexChange,
   userKey,
 }: HomeScreenProviderProps) => {
   const user = useFragment(
@@ -69,17 +66,6 @@ export const HomeScreenProvider = ({
   const currentIndexProfileSharedValue = useDerivedValue(() => {
     return Math.round(currentIndexSharedValue.value);
   }, [currentIndexSharedValue]);
-
-  const currentProfile = useProfileInfos();
-
-  useEffect(() => {
-    const nextProfileIndex = user.profiles?.findIndex(
-      profile => profile.id === currentProfile?.profileId,
-    );
-    if (nextProfileIndex !== undefined && nextProfileIndex !== -1) {
-      onIndexChange(nextProfileIndex + 1);
-    }
-  }, [currentProfile?.profileId, onIndexChange, user.profiles]);
 
   useEffect(() => {
     if (!user.profiles?.length) {
