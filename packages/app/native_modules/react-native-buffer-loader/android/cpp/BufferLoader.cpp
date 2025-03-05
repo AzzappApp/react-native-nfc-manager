@@ -41,9 +41,9 @@ void JBufferLoader::postTaskResult(jni::alias_ref<jni::JClass>, jlong bufferLoad
 }
 
 void JBufferLoader::releaseTexture(int texId) {
-  static const auto loadVideoFrameMethod =
+  static const auto releaseTextureMethod =
       getClass()->getMethod<void(jint)>("releaseTexture");
-  loadVideoFrameMethod(self(), texId);
+  releaseTextureMethod(self(), texId);
 }
 
 BufferLoaderHostObject::BufferLoaderHostObject(jsi::Runtime &runtime) {
