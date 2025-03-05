@@ -1,3 +1,7 @@
+## 1.8.3-rc.9
+
+* **fix:**  - **home:** [#7739](https://github.com/AzzappApp/azzapp/pull/7739) try to fix missing bottom bar ([#7740](https://github.com/AzzappApp/azzapp/pull/7740))
+
 ## 1.8.3-rc.8
 
 * **fix:**  - **multiUser:** [#7735](https://github.com/AzzappApp/azzapp/pull/7735) display phone number when available ([#7738](https://github.com/AzzappApp/azzapp/pull/7738))
