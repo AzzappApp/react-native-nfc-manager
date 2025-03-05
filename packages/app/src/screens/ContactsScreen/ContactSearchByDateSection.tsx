@@ -56,6 +56,7 @@ const ContactSearchByDateSection = ({
           localContacts={localContacts}
           invited={invited}
           contactsPermissionStatus={contactsPermissionStatus}
+          showContactAction={showContactAction}
         />
       );
     },
@@ -65,6 +66,7 @@ const ContactSearchByDateSection = ({
       onInviteContact,
       onShowContact,
       contactsPermissionStatus,
+      showContactAction,
     ],
   );
 

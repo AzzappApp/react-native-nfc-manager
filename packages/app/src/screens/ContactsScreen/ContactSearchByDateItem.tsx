@@ -10,6 +10,7 @@ import ContactAvatar from './ContactAvatar';
 import useImageFromContact from './useImageFromContact';
 import WhatsappButton from './WhatsappButton';
 import type { ContactType } from '#helpers/contactListHelpers';
+import type { ContactActionProps } from './ContactsScreenLists';
 import type { Contact } from 'expo-contacts';
 
 type Props = {
@@ -19,6 +20,7 @@ type Props = {
   localContacts: Contact[];
   invited: boolean;
   contactsPermissionStatus: ContactPermissionStatus;
+  showContactAction: (arg: ContactActionProps | undefined) => void;
 };
 
 const ContactSearchByDateItem = ({
@@ -28,6 +30,7 @@ const ContactSearchByDateItem = ({
   localContacts,
   invited,
   contactsPermissionStatus,
+  showContactAction,
 }: Props) => {
   const [showInvite, setShowInvite] = useState(false);
 
@@ -85,11 +88,21 @@ const ContactSearchByDateItem = ({
     contact.lastName,
   ]);
 
+  const onMore = useCallback(() => {
+    showContactAction({
+      contact,
+      showInvite,
+      hideInvitation: () => {
+        setShowInvite(false);
+      },
+    });
+  }, [contact, showContactAction, showInvite]);
+
   const avatarSource = useImageFromContact({ contact });
 
   return (
     <View style={styles.profile}>
-      <PressableNative onPress={onShow}>
+      <PressableNative onPress={onShow} onLongPress={onMore}>
         {contact.contactProfile?.webCard?.cardIsPublished && !avatarSource ? (
           <CoverRenderer width={80} webCard={contact.webCard} />
         ) : (
