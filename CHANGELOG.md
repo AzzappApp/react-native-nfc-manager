@@ -1,3 +1,7 @@
+## 1.8.3-canary.9
+
+* **fix:**  - refactor duplicated profile added / removed code ([#7737](https://github.com/AzzappApp/azzapp/pull/7737))
+
 ## 1.8.3-canary.8
 
 
