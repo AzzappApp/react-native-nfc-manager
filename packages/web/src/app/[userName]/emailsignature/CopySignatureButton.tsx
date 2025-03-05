@@ -39,9 +39,10 @@ const CopySignatureButton = ({
             saveContactURL,
           })
         : renderSaveMyContactButton({
-            primaryColor: webCard.cardColors?.primary ?? colors.black,
+            primaryColor: colors.white,
             saveContactMessage,
             saveContactURL,
+            border: true,
           });
     await navigator.clipboard.write([
       new ClipboardItem({
