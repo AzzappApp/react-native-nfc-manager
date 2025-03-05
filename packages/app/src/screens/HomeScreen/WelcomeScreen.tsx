@@ -7,7 +7,7 @@ import { mainRoutes } from '#mobileRoutes';
 import { colors } from '#theme';
 import Link from '#components/Link';
 import { setMainTabBarOpacity } from '#components/MainTabBar';
-import { useRouter } from '#components/NativeRouter';
+import { useRouter, useScreenHasFocus } from '#components/NativeRouter';
 import { onChangeWebCard } from '#helpers/authStore';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import relayScreen from '#helpers/relayScreen';
@@ -31,9 +31,14 @@ const WelcomeScreen = ({
   const { currentUser } = usePreloadedQuery(welcomeScreenQuery, preloadedQuery);
 
   const intl = useIntl();
+
+  const hasFocus = useScreenHasFocus();
+
   useEffect(() => {
-    setMainTabBarOpacity(0);
-  }, []);
+    if (hasFocus) {
+      setMainTabBarOpacity(0);
+    }
+  }, [hasFocus]);
 
   const [showMenu, open, close] = useBoolean(false);
 
