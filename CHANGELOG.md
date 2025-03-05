@@ -1,3 +1,8 @@
+## 1.8.3-rc.8
+
+* **fix:**  - **multiUser:** [#7735](https://github.com/AzzappApp/azzapp/pull/7735) display phone number when available ([#7738](https://github.com/AzzappApp/azzapp/pull/7738))
+* **fix:**  - **android:** [#7729](https://github.com/AzzappApp/azzapp/pull/7729) missing shadow on social links ([#7731](https://github.com/AzzappApp/azzapp/pull/7731))
+
 ## 1.8.3-rc.7
 
 * **fix:**  - **validation:** [#7734](https://github.com/AzzappApp/azzapp/pull/7734) try with nodejs runtime ([#7736](https://github.com/AzzappApp/azzapp/pull/7736))
