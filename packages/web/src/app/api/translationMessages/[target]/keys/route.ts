@@ -124,3 +124,5 @@ export const GET = withPluginsRoute(
     }
   },
 );
+
+export const runtime = 'nodejs';

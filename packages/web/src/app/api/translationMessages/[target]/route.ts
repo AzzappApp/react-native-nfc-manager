@@ -83,3 +83,5 @@ export const POST = withPluginsRoute(
     return NextResponse.json({ message: 'ok' });
   },
 );
+
+export const runtime = 'nodejs';
