@@ -45,7 +45,8 @@ const EmailSignaturePreview = ({
         className={styles.simpleSignatureContainer}
         dangerouslySetInnerHTML={{
           __html: renderSaveMyContactButton({
-            primaryColor: webCard.cardColors?.primary ?? colors.black,
+            primaryColor: colors.white,
+            border: true,
             saveContactMessage,
             saveContactURL: '#',
           }),

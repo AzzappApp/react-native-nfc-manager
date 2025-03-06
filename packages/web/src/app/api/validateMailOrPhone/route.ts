@@ -58,3 +58,5 @@ export const POST = withPluginsRoute(async (req: Request) => {
     );
   }
 });
+
+export const runtime = 'nodejs';

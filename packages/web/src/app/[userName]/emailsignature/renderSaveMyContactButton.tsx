@@ -4,10 +4,12 @@ const renderSaveMyContactButton = ({
   saveContactURL,
   saveContactMessage,
   primaryColor,
+  border,
 }: {
   saveContactURL: string;
   saveContactMessage: string;
   primaryColor: string;
+  border?: boolean;
 }) =>
   `
   <div>
@@ -22,6 +24,7 @@ const renderSaveMyContactButton = ({
         width:125px;" 
       arcsize="48px" 
       stroke="f" 
+      ${border ? 'strokecolor="#000" strokeweight="1px"' : ''}
       fillcolor="${primaryColor}">
         <w:anchorlock/>
         <center style="
@@ -51,6 +54,7 @@ const renderSaveMyContactButton = ({
         text-align: center;
         font-weight: 700;
         color: ${getTextColor(primaryColor)};
+        ${border ? 'border: 1px solid #000;' : ''}
       "
       href="${saveContactURL}"
     >${saveContactMessage}</a>

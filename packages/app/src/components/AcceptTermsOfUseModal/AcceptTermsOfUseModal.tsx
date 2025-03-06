@@ -43,7 +43,7 @@ const AcceptTermsOfUseModal = ({ visible }: AcceptTermsOfUseModalProps) => {
   };
 
   return (
-    <BottomSheetPopup visible={visible} onDismiss={() => {}} isAnimatedContent>
+    <BottomSheetPopup visible={visible} isAnimatedContent>
       <View style={styles.popupContainer}>
         <View style={styles.popupPage}>
           <Text variant="large" style={styles.popupHeaderTextContainer}>

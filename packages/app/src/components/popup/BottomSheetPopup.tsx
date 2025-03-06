@@ -1,8 +1,6 @@
-import { memo, Suspense, useCallback, useEffect, useState } from 'react';
+import { Suspense, useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import Animated, {
-  interpolateColor,
-  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -16,8 +14,6 @@ type BottomSheetPopupProps = {
   visible: boolean;
   onDismiss?: () => void;
   children: ReactNode;
-  onFadeOutFinish?: () => void;
-  backgroundOpacity?: number;
   isAnimatedContent?: boolean;
   fullScreen?: boolean;
 };
@@ -32,58 +28,21 @@ const BottomSheetPopup = ({
   animationDuration = defaultAnimationDuration,
   visible,
   onDismiss,
-  onFadeOutFinish,
   children,
-  backgroundOpacity = 0.5,
   isAnimatedContent = false,
   fullScreen,
 }: BottomSheetPopupProps) => {
   const progress = useSharedValue(0);
   const { height } = useScreenDimensions();
-  const [visibleInner, setVisibleInner] = useState(visible);
-
-  useEffect(() => {
-    if (visible) setVisibleInner(visible);
-  }, [visible]);
-
-  const onFadeOutFinishInner = useCallback(() => {
-    'worklet';
-    runOnJS(setVisibleInner)(false);
-    if (onFadeOutFinish) {
-      runOnJS(onFadeOutFinish)();
-    }
-  }, [onFadeOutFinish]);
-
-  // Interpolating the background color
-  const animatedBackground = useAnimatedStyle(() => {
-    if (backgroundOpacity === 0) {
-      return {
-        backgroundColor: 'transparent',
-      };
-    }
-
-    const backgroundColor = interpolateColor(
-      progress.value,
-      [0, 1],
-      ['transparent', `rgba(0, 0, 0, ${backgroundOpacity})`],
-    );
-    return {
-      backgroundColor,
-    };
-  });
 
   // Trigger the animation
   useEffect(() => {
     if (visible) {
       progress.value = withTiming(1, { duration: animationDuration });
     } else {
-      progress.value = withTiming(
-        0,
-        { duration: animationDuration },
-        onFadeOutFinishInner,
-      );
+      progress.value = withTiming(0, { duration: animationDuration });
     }
-  }, [animationDuration, onFadeOutFinishInner, progress, visible]);
+  }, [animationDuration, progress, visible]);
 
   const animatedStyle = useAnimatedStyle(() => {
     return isAnimatedContent
@@ -95,18 +54,13 @@ const BottomSheetPopup = ({
     <Suspense>
       <BottomSheetModal
         index={0}
-        visible={visibleInner}
+        visible={visible}
         onDismiss={onDismiss}
         showHandleIndicator={false}
         backgroundStyle={styles.background}
         animationConfigs={animationConfigs}
-        showShadow={false}
-        backdropComponent={() => (
-          <Animated.View
-            style={[StyleSheet.absoluteFill, animatedBackground]}
-          />
-        )}
         height={height}
+        variant="modal"
         snapPoints={[fullScreen ? height : height / 1.25, height / 1.1]}
         keyboardBehavior="extend"
       >
@@ -118,4 +72,4 @@ const BottomSheetPopup = ({
 const styles = StyleSheet.create({
   background: { backgroundColor: 'transparent' },
 });
-export default memo(BottomSheetPopup);
+export default BottomSheetPopup;

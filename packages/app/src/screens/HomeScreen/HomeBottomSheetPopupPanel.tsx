@@ -244,8 +244,8 @@ const HomeBottomSheetPopupPanel = ({
     <BottomSheetPopup
       animationDuration={animationDuration}
       visible={!!visible}
-      onFadeOutFinish={resetPopupState}
       isAnimatedContent
+      onDismiss={resetPopupState}
     >
       <View style={styles.container}>
         <View>
