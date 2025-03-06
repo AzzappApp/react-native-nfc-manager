@@ -173,7 +173,7 @@ const coverOverlayDrawer = ({
         convertToBaseCanvasRatio(8, width),
         convertToBaseCanvasRatio(8, width),
         Skia.Color('#00000099'),
-        imageFilter,
+        null,
       );
       if (animateImageFilter) {
         shadowFilter = animateImageFilter(shadowFilter);
