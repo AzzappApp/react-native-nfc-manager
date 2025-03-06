@@ -1,3 +1,7 @@
+## 1.8.3-canary.14
+
+* **feat:**  - add possibility to increase or decrease text size ([#7697](https://github.com/AzzappApp/azzapp/pull/7697))
+
 ## 1.8.3-canary.13
 
 * **fix:**  - **signature:** [#7754](https://github.com/AzzappApp/azzapp/pull/7754) use correct profile ([#7760](https://github.com/AzzappApp/azzapp/pull/7760))
