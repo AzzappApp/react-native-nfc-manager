@@ -37,9 +37,14 @@ export const Query: QueryResolvers = {
     userNameChangeFrequencyDay: USERNAME_CHANGE_FREQUENCY_DAY,
   }),
 
-  webCard: async (_, { userName }) =>
-    getWebCardByUserNameWithRedirection(userName),
+  webCard: async (_, { userName }) => {
+    const result = await getWebCardByUserNameWithRedirection(userName);
 
+    if (result?.deleted) {
+      return null;
+    }
+    return result;
+  },
   userNameAvailable: async (_, { userName }) => {
     const profile = await getWebCardByUserName(userName);
     const redirection = await getRedirectWebCardByUserName(userName);

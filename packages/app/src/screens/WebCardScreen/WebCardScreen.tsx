@@ -7,7 +7,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import {
   Dimensions,
   Platform,
@@ -51,7 +51,9 @@ import {
   useWebCardViewStatistic,
 } from '#hooks/useStatistics';
 import useToggleFollow from '#hooks/useToggleFollow';
+import Button from '#ui/Button';
 import Container from '#ui/Container';
+import Text from '#ui/Text';
 import AddContactModal from './AddContactModal';
 import WebCardBackground from './WebCardBackground';
 import { useWebCardEditTransition } from './WebCardEditTransition';
@@ -333,7 +335,26 @@ export const WebCardScreen = ({
   // #end region
 
   if (!data.webCard || !data.profile?.webCard) {
-    return null;
+    return (
+      <View style={styles.deletedCaseContainer}>
+        <Text variant="large">
+          <FormattedMessage
+            defaultMessage="This WebCard{azzappA} does not exist"
+            description="Error message when the WebCard is not found"
+            values={{
+              azzappA: <Text variant="azzapp">a</Text>,
+            }}
+          />
+        </Text>
+        <Button
+          onPress={router.back}
+          label={intl.formatMessage({
+            defaultMessage: 'Go back',
+            description: 'Button to go back to the previous screen',
+          })}
+        />
+      </View>
+    );
   }
 
   return (
@@ -556,5 +577,11 @@ const styles = StyleSheet.create({
     width: '100%',
     backfaceVisibility: 'hidden',
     overflow: 'hidden',
+  },
+  deletedCaseContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 20,
   },
 });
