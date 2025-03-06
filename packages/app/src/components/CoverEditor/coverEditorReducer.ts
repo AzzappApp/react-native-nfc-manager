@@ -16,11 +16,60 @@ import {
 } from './coverEditorHelpers';
 import type { CoverEditorAction } from './coverEditorActions';
 import type {
+  CoverEditorOverlayItem,
   CoverEditorState,
   CoverMedia,
   CoverMediaImage,
   CoverMediaVideo,
 } from './coverEditorTypes';
+
+const updateOverlayLayer = (
+  state: CoverEditorState,
+  payload: Partial<CoverEditorOverlayItem>,
+  forceRefresh: boolean = false,
+): CoverEditorState => {
+  const { selectedItemIndex, overlayLayers } = state;
+  if (selectedItemIndex !== null && overlayLayers[selectedItemIndex] != null) {
+    const overlayLayers = [...state.overlayLayers];
+    const layer = {
+      ...overlayLayers[selectedItemIndex],
+      ...payload,
+    };
+    const boundsAspectRatio =
+      (layer.bounds.width / layer.bounds.height) * COVER_RATIO;
+    let cropData = layer.editionParameters?.cropData;
+    const cropDataAspectRatio = cropData
+      ? cropData.width / cropData.height
+      : null;
+    const naturalAspectRatio = layer.width / layer.height;
+
+    if (
+      (cropDataAspectRatio != null &&
+        cropDataAspectRatio !== boundsAspectRatio) ||
+      (cropDataAspectRatio == null &&
+        naturalAspectRatio !== boundsAspectRatio) ||
+      forceRefresh
+    ) {
+      cropData = cropDataForAspectRatio(
+        layer.width,
+        layer.height,
+        boundsAspectRatio,
+      );
+      layer.editionParameters = {
+        ...layer.editionParameters,
+        roll: 0,
+        cropData,
+      };
+    }
+    overlayLayers[selectedItemIndex] = layer;
+    return {
+      ...state,
+      overlayLayers,
+    };
+  }
+  console.warn('Update overlay layer without selected overlay layer');
+  return state;
+};
 
 export function coverEditorReducer(
   state: CoverEditorState,
@@ -474,10 +523,13 @@ export function coverEditorReducer(
           ...overlayLayers[state.selectedItemIndex],
           ...payload,
         };
-        return {
-          ...state,
-          overlayLayers,
-        };
+        const targetState = { ...state, overlayLayers };
+
+        return updateOverlayLayer(
+          targetState,
+          targetState.overlayLayers[targetState.selectedItemIndex!],
+          true,
+        );
       }
       if (
         !(state.editionMode === 'mediaEdit' && state.selectedItemIndex != null)
@@ -644,49 +696,7 @@ export function coverEditorReducer(
       };
     }
     case 'UPDATE_OVERLAY_LAYER': {
-      const { selectedItemIndex, overlayLayers } = state;
-      if (
-        selectedItemIndex !== null &&
-        overlayLayers[selectedItemIndex] != null
-      ) {
-        const overlayLayers = [...state.overlayLayers];
-        const layer = {
-          ...overlayLayers[selectedItemIndex],
-          ...payload,
-        };
-        const boundsAspectRatio =
-          (layer.bounds.width / layer.bounds.height) * COVER_RATIO;
-        let cropData = layer.editionParameters?.cropData;
-        const cropDataAspectRatio = cropData
-          ? cropData.width / cropData.height
-          : null;
-        const naturalAspectRatio = layer.width / layer.height;
-
-        if (
-          (cropDataAspectRatio != null &&
-            cropDataAspectRatio !== boundsAspectRatio) ||
-          (cropDataAspectRatio == null &&
-            naturalAspectRatio !== boundsAspectRatio)
-        ) {
-          cropData = cropDataForAspectRatio(
-            layer.width,
-            layer.height,
-            boundsAspectRatio,
-          );
-          layer.editionParameters = {
-            ...layer.editionParameters,
-            roll: 0,
-            cropData,
-          };
-        }
-        overlayLayers[selectedItemIndex] = layer;
-        return {
-          ...state,
-          overlayLayers,
-        };
-      }
-      console.warn('Update overlay layer without selected overlay layer');
-      return state;
+      return updateOverlayLayer(state, payload);
     }
     // #endregion
     case 'UPDATE_CURRENT_LAYER_COLOR':
