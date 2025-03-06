@@ -406,7 +406,7 @@ const SignatureNotice = () => {
               defaultMessage="STEP {index}"
               description="Email Signature notice / Step index"
               id="IO0D/Q"
-              values={{ index }}
+              values={{ index: index + 1 }}
             />
           </label>
           <p>{step}</p>
