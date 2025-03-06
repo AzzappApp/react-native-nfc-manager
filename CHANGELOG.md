@@ -1,3 +1,7 @@
+## 1.8.3-canary.11
+
+* **fix:**  - ensure the focused element in bottom tab is well handled ([#7755](https://github.com/AzzappApp/azzapp/pull/7755))
+
 ## 1.8.3-canary.10
 
 
