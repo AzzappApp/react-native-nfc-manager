@@ -302,7 +302,7 @@ const WebcardParametersNameForm = ({
                 })}
                 isErrored={!!userNameError}
                 value={value}
-                onChangeText={text => onChange(text.toLowerCase())}
+                onChangeText={onChange}
                 autoCapitalize="none"
                 autoComplete="off"
                 autoCorrect={false}
@@ -314,12 +314,14 @@ const WebcardParametersNameForm = ({
           )}
         />
       </View>
-      {userNameError ? (
-        <Text variant="error">{userNameError.message}</Text>
-      ) : null}
-      {errors.root?.server ? (
-        <Text variant="error">{errors.root.server.message}</Text>
-      ) : null}
+      <View style={styles.errorMessage}>
+        {userNameError ? (
+          <Text variant="error">{userNameError.message}</Text>
+        ) : null}
+        {errors.root?.server ? (
+          <Text variant="error">{errors.root.server.message}</Text>
+        ) : null}
+      </View>
     </InputAccessoryView>
   );
 };
@@ -328,6 +330,7 @@ const styles = StyleSheet.create({
   header: { paddingHorizontal: 10 },
   headerButton: { paddingHorizontal: 5, minWidth: 74 },
   inputContainer: { flex: 1, height: 50, paddingHorizontal: 10 },
+  errorMessage: { paddingHorizontal: 10 },
   controllerContainer: {
     paddingVertical: 10,
     gap: 5,
