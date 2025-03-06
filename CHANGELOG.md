@@ -1,3 +1,7 @@
+## 1.8.3-canary.15
+
+* **fix:**  - ensure cover shadow follow border radius in image overlay ([#7766](https://github.com/AzzappApp/azzapp/pull/7766))
+
 ## 1.8.3-canary.14
 
 * **feat:**  - add possibility to increase or decrease text size ([#7697](https://github.com/AzzappApp/azzapp/pull/7697))
