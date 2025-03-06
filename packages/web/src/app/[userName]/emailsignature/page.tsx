@@ -31,9 +31,8 @@ const EmailSignaturePage = async ({
   searchParams,
 }: EmailSignatureProps) => {
   const { isMobileDevice } = getDeviceInfo(headers().get('user-agent'));
-  const userName = params.userName.toLowerCase();
 
-  const webCard = await cachedGetWebCardByUserName(userName);
+  const webCard = await cachedGetWebCardByUserName(params.userName);
   if (!webCard) {
     return notFound();
   }
@@ -80,7 +79,7 @@ const EmailSignaturePage = async ({
   }
   const { data: saveContactData, signature: saveContactSignature } =
     await serializeAndSignContactCard(
-      userName,
+      webCard.userName,
       profile.id,
       profile.webCardId,
       profile.contactCard ?? {},
@@ -96,7 +95,7 @@ const EmailSignaturePage = async ({
     : null;
 
   const saveContactURL = buildUserUrlWithContactCard(
-    userName,
+    webCard.userName,
     saveContactData,
     saveContactSignature,
   );

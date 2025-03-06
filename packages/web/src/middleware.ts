@@ -62,13 +62,6 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  if (nextUrl.pathname !== nextUrl.pathname.toLowerCase()) {
-    const pathComponents = nextUrl.pathname.substring(1).split('/');
-    pathComponents[0] = pathComponents[0].toLowerCase(); // Lowercase only the first part
-    const nextPath = `/${pathComponents.join('/')}${request.nextUrl.search}`;
-    return NextResponse.redirect(new URL(nextPath, request.url));
-  }
-
   return undefined;
 }
 
