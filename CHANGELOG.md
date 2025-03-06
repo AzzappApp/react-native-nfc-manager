@@ -1,3 +1,7 @@
+## 1.8.3-rc.12
+
+* **fix:**  - **signature:** [#7754](https://github.com/AzzappApp/azzapp/pull/7754) use correct profile ([#7760](https://github.com/AzzappApp/azzapp/pull/7760))
+
 ## 1.8.3-rc.11
 
 * **fix:**  - **emailSignature:** [#7741](https://github.com/AzzappApp/azzapp/pull/7741) starts at 1 ([#7753](https://github.com/AzzappApp/azzapp/pull/7753))
