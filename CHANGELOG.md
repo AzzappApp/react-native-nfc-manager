@@ -1,3 +1,7 @@
+## 1.8.3-rc.14
+
+* **fix:**  - don’t force lower case on username ([#7771](https://github.com/AzzappApp/azzapp/pull/7771))
+
 ## 1.8.3-rc.13
 
 * **fix:**  - remove link to user mgmt just before paywall screen ([#7770](https://github.com/AzzappApp/azzapp/pull/7770))
