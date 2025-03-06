@@ -1,3 +1,11 @@
+## 1.8.3-rc.13
+
+* **fix:**  - remove link to user mgmt just before paywall screen ([#7770](https://github.com/AzzappApp/azzapp/pull/7770))
+* **fix:**  - **home:** [#7739](https://github.com/AzzappApp/azzapp/pull/7739) put back opacity to 1 when leaving welcome screen ([#7768](https://github.com/AzzappApp/azzapp/pull/7768))
+* **fix:**  - don’t return deleted webcards ([#7763](https://github.com/AzzappApp/azzapp/pull/7763))
+* **fix:**  - canceled subscription must not be updated ([#7769](https://github.com/AzzappApp/azzapp/pull/7769))
+* **fix:**  - **signature:** [#7765](https://github.com/AzzappApp/azzapp/pull/7765) use correct webcard username ([#7767](https://github.com/AzzappApp/azzapp/pull/7767))
+
 ## 1.8.3-rc.12
 
 * **fix:**  - **signature:** [#7754](https://github.com/AzzappApp/azzapp/pull/7754) use correct profile ([#7760](https://github.com/AzzappApp/azzapp/pull/7760))
