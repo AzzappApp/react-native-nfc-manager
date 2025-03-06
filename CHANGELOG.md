@@ -1,3 +1,7 @@
+## 1.8.3-rc.10
+
+* **fix:**  - **home:** [#7302](https://github.com/AzzappApp/azzapp/pull/7302) simplify BottomSheetPopup component ([#7744](https://github.com/AzzappApp/azzapp/pull/7744))
+
 ## 1.8.3-rc.9
 
 * **fix:**  - **home:** [#7739](https://github.com/AzzappApp/azzapp/pull/7739) try to fix missing bottom bar ([#7740](https://github.com/AzzappApp/azzapp/pull/7740))
