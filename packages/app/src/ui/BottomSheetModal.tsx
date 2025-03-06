@@ -6,6 +6,7 @@ import {
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Keyboard } from 'react-native';
 import Animated, {
+  Easing,
   Extrapolation,
   interpolate,
   useAnimatedStyle,
@@ -130,7 +131,7 @@ const BottomSheetModal = ({
       }
       bottomSheetModalRef.current?.present();
     } else {
-      bottomSheetModalRef.current?.dismiss();
+      bottomSheetModalRef.current?.close({ easing: Easing.ease });
     }
   }, [dismissKeyboardOnOpening, visible]);
 
