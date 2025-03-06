@@ -1,3 +1,8 @@
+## 1.8.3-canary.12
+
+* **fix:**  - remove cross from contacts screen ([#7757](https://github.com/AzzappApp/azzapp/pull/7757))
+* **fix:**  - apply image resizing after change the image overlay ([#7762](https://github.com/AzzappApp/azzapp/pull/7762))
+
 ## 1.8.3-canary.11
 
 * **fix:**  - ensure the focused element in bottom tab is well handled ([#7755](https://github.com/AzzappApp/azzapp/pull/7755))
