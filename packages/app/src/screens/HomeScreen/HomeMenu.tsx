@@ -46,7 +46,7 @@ const HomeMenu = ({
 
   const onPressMultiUser = useCallback(() => {
     const profile = user?.profiles?.[currentIndexProfileSharedValue.value - 1];
-    if (profile?.webCard?.isMultiUser && profileInfoHasAdminRight(profile)) {
+    if (!profile?.webCard?.isMultiUser || profileInfoHasAdminRight(profile)) {
       router.push({
         route: 'MULTI_USER',
       });
@@ -127,11 +127,10 @@ const styles = StyleSheet.create({
   container: {
     height: HOME_MENU_HEIGHT,
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginLeft: 20,
-    marginRight: 20,
+    justifyContent: 'center',
     paddingBottom: HOME_MENU_PADDING,
     overflow: 'visible',
+    gap: 5,
   },
   menuLabelStyle: {
     color: colors.white,
