@@ -212,20 +212,26 @@ const icons = {
   get flip() {
     return require('./assets/flip.png');
   },
-  get font_color() {
-    return require('./assets/font_color.png');
-  },
   get font() {
     return require('./assets/font.png');
   },
-  get font_size() {
-    return require('./assets/font_size.png');
+  get font_decrease() {
+    return require('./assets/font_decrease.png');
+  },
+  get font_increase() {
+    return require('./assets/font_increase.png');
+  },
+  get font_color() {
+    return require('./assets/font_color.png');
   },
   get font_color_letter() {
     return require('./assets/font_color_letter.png');
   },
   get font_color_dash() {
     return require('./assets/font_color_dash.png');
+  },
+  get font_size() {
+    return require('./assets/font_size.png');
   },
   get foreground_text() {
     return require('./assets/foreground_text.png');

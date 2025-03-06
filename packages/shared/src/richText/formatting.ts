@@ -5,12 +5,22 @@ import {
   splitRichTextAST,
   splitRichTextASTInThree,
 } from './internalToolbox';
-import { createNodeFromChildren, isRichTextTag } from './stringToolbox';
-import type {
-  RichTextASTNode,
-  RichTextASTNodeType,
-  RichTextASTTags,
+import {
+  richTextIncompatibleTags,
+  type RichTextASTNode,
+  type RichTextASTNodeType,
+  type RichTextASTTags,
 } from './richTextTypes';
+import { createNodeFromChildren, isRichTextTag } from './stringToolbox';
+
+/**
+ * @param tag tag to remove
+ * @returns the list of all incompatible tags + tag
+ */
+const getTagsToRemove = (tag: RichTextASTTags) =>
+  richTextIncompatibleTags[tag]
+    ? [tag, ...richTextIncompatibleTags[tag]]
+    : [tag];
 
 /**
  * helper function which returns the list of tag from the selection tag returned are fully in the selection
@@ -61,9 +71,9 @@ const applyFormattingOnRichTextInner = (
       end,
     );
     return createNodeFromChildren('fragment', [
-      deleteTagFromRichTextAST(firstAST, tag),
-      createNodeFromChildren(tag, [deleteTagFromRichTextAST(secondAST, tag)]),
-      deleteTagFromRichTextAST(thirdAST, tag),
+      firstAST,
+      createNodeFromChildren(tag, [secondAST]),
+      thirdAST,
     ]);
   }
 
@@ -90,7 +100,10 @@ const applyFormattingOnRichTextInner = (
     }
     if (subNodeFoundIndex >= 0) {
       // exact match
-      if (root.type === tag) {
+      if (
+        root.type === tag ||
+        richTextIncompatibleTags[root.type as RichTextASTTags]?.includes(tag)
+      ) {
         // it the save tag => split the tree to remove formatting only in the good part
         const [first, second, third] = splitRichTextASTInThree(
           root,
@@ -98,10 +111,20 @@ const applyFormattingOnRichTextInner = (
           end,
         );
 
-        const newChildren = [first, ...(second?.children || []), third]?.map(
-          child => deleteTagFromRichTextAST(child, tag),
+        const cleanedSecond = deleteTagFromRichTextAST(
+          second,
+          getTagsToRemove(tag),
         );
-        return createNodeFromChildren('fragment', newChildren);
+        const newChildren = [first, cleanedSecond, third];
+        if (root.type === tag) {
+          return createNodeFromChildren('fragment', newChildren);
+        } else {
+          return createNodeFromChildren('fragment', [
+            newChildren[0],
+            createNodeFromChildren(tag, [newChildren[1]]),
+            newChildren[2],
+          ]);
+        }
       } else {
         // all processing is done in subnode
         const newChildren = [...root.children];
@@ -115,17 +138,26 @@ const applyFormattingOnRichTextInner = (
       }
     } else if (firstItemIdx >= 0 && lastItemIdx >= 0) {
       // Start and end found we need to add the formatting
-      if (root.type === tag) {
+      if (
+        root.type === tag ||
+        richTextIncompatibleTags[root.type as RichTextASTTags]?.includes(tag)
+      ) {
         // split in three to ensure sub formatting are well regenerated
         const [first, second, third] = splitRichTextASTInThree(
           root,
           start,
           end,
         );
-        const newChildren = [first, ...(second?.children || []), third]?.map(
-          child => deleteTagFromRichTextAST(child, tag),
+        const cleanedSecond = deleteTagFromRichTextAST(
+          second,
+          getTagsToRemove(tag),
         );
-        return createNodeFromChildren('fragment', newChildren);
+        const newChildren = [first, cleanedSecond, third];
+        if (root.type === tag) {
+          return createNodeFromChildren('fragment', newChildren);
+        } else {
+          return createNodeFromChildren(tag, newChildren);
+        }
       } else {
         // split the tree to ensure sub formatting are well regenerated
         // the 7 parts:
@@ -141,25 +173,25 @@ const applyFormattingOnRichTextInner = (
         const startSplit = splitRichTextAST(root.children[firstItemIdx], start);
         const endSplit = splitRichTextAST(root.children[lastItemIdx], end);
 
+        const incompatibleTagsToRemove = getTagsToRemove(tag);
+
         const theChildren = [
-          deleteTagFromRichTextAST(startSplit.second, tag),
+          deleteTagFromRichTextAST(startSplit.second, incompatibleTagsToRemove),
           ...root.children
             .slice(firstItemIdx + 1, lastItemIdx)
-            .map(child => deleteTagFromRichTextAST(child, tag))
+            .map(child =>
+              deleteTagFromRichTextAST(child, incompatibleTagsToRemove),
+            )
             .filter(isDefined),
-          deleteTagFromRichTextAST(endSplit.first, tag),
+          deleteTagFromRichTextAST(endSplit.first, incompatibleTagsToRemove),
         ];
 
         const newChildren = [
-          ...root.children
-            .slice(0, firstItemIdx)
-            .map(child => deleteTagFromRichTextAST(child, tag)),
-          deleteTagFromRichTextAST(startSplit.first, tag),
+          ...root.children.slice(0, firstItemIdx),
+          startSplit.first,
           createNodeFromChildren(tag, theChildren),
-          deleteTagFromRichTextAST(endSplit.second, tag),
-          ...root.children
-            .slice(lastItemIdx + 1, root.children.length)
-            .map(child => deleteTagFromRichTextAST(child, tag)),
+          endSplit.second,
+          ...root.children.slice(lastItemIdx + 1, root.children.length),
         ];
 
         const result = createNodeFromChildren(root.type, newChildren);

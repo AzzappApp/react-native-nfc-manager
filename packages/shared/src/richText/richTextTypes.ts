@@ -5,12 +5,31 @@
 /**
  * an array of string representing supported tags
  */
-export const richTextASTTagsArray = ['b', 'c', 'i'] as const;
+export const richTextASTTagsArray = [
+  'b', // bold
+  'c', // underline
+  'i', // italic
+  '+3', // increase text size of 3 px
+  '-3', // decrease text size of 3 px
+] as const;
 
 /**
  * text tags corresponding to text style, bold, underline, italic
  */
 export type RichTextASTTags = (typeof richTextASTTagsArray)[number];
+
+/**
+ * Incompatible tags management.
+ * It shall not be possible put tags increase and decrease nested
+ * When this case happens the tree will be split to ensure they are not nested
+ */
+
+export const richTextIncompatibleTags: Partial<
+  Record<RichTextASTTags, RichTextASTTags[]>
+> = {
+  '+3': ['-3'], // Increase text size is incompatible with decrease text size
+  '-3': ['+3'], // Decrease text size is incompatible with increase text size
+};
 
 /**
  * All possible types:

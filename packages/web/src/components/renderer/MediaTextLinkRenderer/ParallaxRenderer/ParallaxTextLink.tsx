@@ -66,6 +66,9 @@ const ParallaxText = ({
                   <RichText
                     fontFamily={cardStyle.fontFamily}
                     text={mediaData?.text ?? DEFAULT_MODULE_TEXT}
+                    textFontSize={
+                      cardStyle.fontSize || commonStyles.textFontSize
+                    }
                   />
                 </p>
               </section>

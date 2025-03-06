@@ -15,6 +15,7 @@ import RichText from '#ui/RichText';
 import styles from './index.css';
 import type { ModuleRendererProps } from '../ModuleRenderer';
 import type { CardModuleBase } from '@azzapp/data';
+
 export type TitleTextRendererProps = ModuleRendererProps<
   CardModuleBase & {
     data: CardModuleTitleTextData;
@@ -172,7 +173,11 @@ const TitleTextRenderer = ({
                 ...getTextAlignmentStyle(module.variant),
               }}
             >
-              <RichText fontFamily={cardStyle.fontFamily} text={columnText} />
+              <RichText
+                fontFamily={cardStyle.fontFamily}
+                text={columnText}
+                textFontSize={cardStyle.fontSize || styles.textFontSize}
+              />
             </p>
           ))}
         </div>

@@ -332,6 +332,178 @@ exports[`BottomSheetTextEditor component simple snapshot 1`] = `
               }
             />
           </View>
+          <View
+            accessibilityRole="button"
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": true,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              [
+                [
+                  {
+                    "borderRadius": 25,
+                    "height": 50,
+                    "minWidth": 50,
+                  },
+                  {
+                    "alignItems": "center",
+                    "borderColor": "#000000",
+                    "borderWidth": 1,
+                    "justifyContent": "center",
+                    "overflow": "hidden",
+                  },
+                  [
+                    {
+                      "borderColor": "#F5F5F6",
+                      "borderRadius": 33,
+                      "borderWidth": 1,
+                      "height": "100%",
+                      "width": 54,
+                    },
+                    undefined,
+                  ],
+                ],
+                {
+                  "opacity": 1,
+                },
+              ]
+            }
+          >
+            <Image
+              source={
+                {
+                  "testUri": "../../../packages/app/src/ui/Icon/assets/font_decrease.png",
+                }
+              }
+              style={
+                [
+                  {
+                    "height": 20,
+                    "resizeMode": "contain",
+                    "width": 20,
+                  },
+                  {
+                    "tintColor": "#0E1216",
+                  },
+                  {
+                    "tintColor": "#C8C7CA",
+                  },
+                ]
+              }
+            />
+          </View>
+          <View
+            accessibilityRole="button"
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": true,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              [
+                [
+                  {
+                    "borderRadius": 25,
+                    "height": 50,
+                    "minWidth": 50,
+                  },
+                  {
+                    "alignItems": "center",
+                    "borderColor": "#000000",
+                    "borderWidth": 1,
+                    "justifyContent": "center",
+                    "overflow": "hidden",
+                  },
+                  [
+                    {
+                      "borderColor": "#F5F5F6",
+                      "borderRadius": 33,
+                      "borderWidth": 1,
+                      "height": "100%",
+                      "width": 54,
+                    },
+                    undefined,
+                  ],
+                ],
+                {
+                  "opacity": 1,
+                },
+              ]
+            }
+          >
+            <Image
+              source={
+                {
+                  "testUri": "../../../packages/app/src/ui/Icon/assets/font_increase.png",
+                }
+              }
+              style={
+                [
+                  {
+                    "height": 20,
+                    "resizeMode": "contain",
+                    "width": 20,
+                  },
+                  {
+                    "tintColor": "#0E1216",
+                  },
+                  {
+                    "tintColor": "#C8C7CA",
+                  },
+                ]
+              }
+            />
+          </View>
         </View>
       </View>
     </RCTScrollView>
@@ -662,6 +834,178 @@ exports[`BottomSheetTextEditor component simple snapshot with bold 1`] = `
                     "height": 12,
                     "resizeMode": "contain",
                     "width": 12,
+                  },
+                  {
+                    "tintColor": "#0E1216",
+                  },
+                  {
+                    "tintColor": "#C8C7CA",
+                  },
+                ]
+              }
+            />
+          </View>
+          <View
+            accessibilityRole="button"
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": true,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              [
+                [
+                  {
+                    "borderRadius": 25,
+                    "height": 50,
+                    "minWidth": 50,
+                  },
+                  {
+                    "alignItems": "center",
+                    "borderColor": "#000000",
+                    "borderWidth": 1,
+                    "justifyContent": "center",
+                    "overflow": "hidden",
+                  },
+                  [
+                    {
+                      "borderColor": "#F5F5F6",
+                      "borderRadius": 33,
+                      "borderWidth": 1,
+                      "height": "100%",
+                      "width": 54,
+                    },
+                    undefined,
+                  ],
+                ],
+                {
+                  "opacity": 1,
+                },
+              ]
+            }
+          >
+            <Image
+              source={
+                {
+                  "testUri": "../../../packages/app/src/ui/Icon/assets/font_decrease.png",
+                }
+              }
+              style={
+                [
+                  {
+                    "height": 20,
+                    "resizeMode": "contain",
+                    "width": 20,
+                  },
+                  {
+                    "tintColor": "#0E1216",
+                  },
+                  {
+                    "tintColor": "#C8C7CA",
+                  },
+                ]
+              }
+            />
+          </View>
+          <View
+            accessibilityRole="button"
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": true,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              [
+                [
+                  {
+                    "borderRadius": 25,
+                    "height": 50,
+                    "minWidth": 50,
+                  },
+                  {
+                    "alignItems": "center",
+                    "borderColor": "#000000",
+                    "borderWidth": 1,
+                    "justifyContent": "center",
+                    "overflow": "hidden",
+                  },
+                  [
+                    {
+                      "borderColor": "#F5F5F6",
+                      "borderRadius": 33,
+                      "borderWidth": 1,
+                      "height": "100%",
+                      "width": 54,
+                    },
+                    undefined,
+                  ],
+                ],
+                {
+                  "opacity": 1,
+                },
+              ]
+            }
+          >
+            <Image
+              source={
+                {
+                  "testUri": "../../../packages/app/src/ui/Icon/assets/font_increase.png",
+                }
+              }
+              style={
+                [
+                  {
+                    "height": 20,
+                    "resizeMode": "contain",
+                    "width": 20,
                   },
                   {
                     "tintColor": "#0E1216",
@@ -1020,6 +1364,178 @@ exports[`BottomSheetTextEditor component snapshot after append text 1`] = `
               }
             />
           </View>
+          <View
+            accessibilityRole="button"
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": true,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              [
+                [
+                  {
+                    "borderRadius": 25,
+                    "height": 50,
+                    "minWidth": 50,
+                  },
+                  {
+                    "alignItems": "center",
+                    "borderColor": "#000000",
+                    "borderWidth": 1,
+                    "justifyContent": "center",
+                    "overflow": "hidden",
+                  },
+                  [
+                    {
+                      "borderColor": "#F5F5F6",
+                      "borderRadius": 33,
+                      "borderWidth": 1,
+                      "height": "100%",
+                      "width": 54,
+                    },
+                    undefined,
+                  ],
+                ],
+                {
+                  "opacity": 1,
+                },
+              ]
+            }
+          >
+            <Image
+              source={
+                {
+                  "testUri": "../../../packages/app/src/ui/Icon/assets/font_decrease.png",
+                }
+              }
+              style={
+                [
+                  {
+                    "height": 20,
+                    "resizeMode": "contain",
+                    "width": 20,
+                  },
+                  {
+                    "tintColor": "#0E1216",
+                  },
+                  {
+                    "tintColor": "#C8C7CA",
+                  },
+                ]
+              }
+            />
+          </View>
+          <View
+            accessibilityRole="button"
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": true,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              [
+                [
+                  {
+                    "borderRadius": 25,
+                    "height": 50,
+                    "minWidth": 50,
+                  },
+                  {
+                    "alignItems": "center",
+                    "borderColor": "#000000",
+                    "borderWidth": 1,
+                    "justifyContent": "center",
+                    "overflow": "hidden",
+                  },
+                  [
+                    {
+                      "borderColor": "#F5F5F6",
+                      "borderRadius": 33,
+                      "borderWidth": 1,
+                      "height": "100%",
+                      "width": 54,
+                    },
+                    undefined,
+                  ],
+                ],
+                {
+                  "opacity": 1,
+                },
+              ]
+            }
+          >
+            <Image
+              source={
+                {
+                  "testUri": "../../../packages/app/src/ui/Icon/assets/font_increase.png",
+                }
+              }
+              style={
+                [
+                  {
+                    "height": 20,
+                    "resizeMode": "contain",
+                    "width": 20,
+                  },
+                  {
+                    "tintColor": "#0E1216",
+                  },
+                  {
+                    "tintColor": "#C8C7CA",
+                  },
+                ]
+              }
+            />
+          </View>
         </View>
       </View>
     </RCTScrollView>
@@ -1367,6 +1883,178 @@ exports[`BottomSheetTextEditor component snapshot after change text 1`] = `
               }
             />
           </View>
+          <View
+            accessibilityRole="button"
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": true,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              [
+                [
+                  {
+                    "borderRadius": 25,
+                    "height": 50,
+                    "minWidth": 50,
+                  },
+                  {
+                    "alignItems": "center",
+                    "borderColor": "#000000",
+                    "borderWidth": 1,
+                    "justifyContent": "center",
+                    "overflow": "hidden",
+                  },
+                  [
+                    {
+                      "borderColor": "#F5F5F6",
+                      "borderRadius": 33,
+                      "borderWidth": 1,
+                      "height": "100%",
+                      "width": 54,
+                    },
+                    undefined,
+                  ],
+                ],
+                {
+                  "opacity": 1,
+                },
+              ]
+            }
+          >
+            <Image
+              source={
+                {
+                  "testUri": "../../../packages/app/src/ui/Icon/assets/font_decrease.png",
+                }
+              }
+              style={
+                [
+                  {
+                    "height": 20,
+                    "resizeMode": "contain",
+                    "width": 20,
+                  },
+                  {
+                    "tintColor": "#0E1216",
+                  },
+                  {
+                    "tintColor": "#C8C7CA",
+                  },
+                ]
+              }
+            />
+          </View>
+          <View
+            accessibilityRole="button"
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": true,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              [
+                [
+                  {
+                    "borderRadius": 25,
+                    "height": 50,
+                    "minWidth": 50,
+                  },
+                  {
+                    "alignItems": "center",
+                    "borderColor": "#000000",
+                    "borderWidth": 1,
+                    "justifyContent": "center",
+                    "overflow": "hidden",
+                  },
+                  [
+                    {
+                      "borderColor": "#F5F5F6",
+                      "borderRadius": 33,
+                      "borderWidth": 1,
+                      "height": "100%",
+                      "width": 54,
+                    },
+                    undefined,
+                  ],
+                ],
+                {
+                  "opacity": 1,
+                },
+              ]
+            }
+          >
+            <Image
+              source={
+                {
+                  "testUri": "../../../packages/app/src/ui/Icon/assets/font_increase.png",
+                }
+              }
+              style={
+                [
+                  {
+                    "height": 20,
+                    "resizeMode": "contain",
+                    "width": 20,
+                  },
+                  {
+                    "tintColor": "#0E1216",
+                  },
+                  {
+                    "tintColor": "#C8C7CA",
+                  },
+                ]
+              }
+            />
+          </View>
         </View>
       </View>
     </RCTScrollView>
@@ -1690,6 +2378,178 @@ exports[`BottomSheetTextEditor component snapshot after clean text 1`] = `
                     "height": 12,
                     "resizeMode": "contain",
                     "width": 12,
+                  },
+                  {
+                    "tintColor": "#0E1216",
+                  },
+                  {
+                    "tintColor": "#C8C7CA",
+                  },
+                ]
+              }
+            />
+          </View>
+          <View
+            accessibilityRole="button"
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": true,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              [
+                [
+                  {
+                    "borderRadius": 25,
+                    "height": 50,
+                    "minWidth": 50,
+                  },
+                  {
+                    "alignItems": "center",
+                    "borderColor": "#000000",
+                    "borderWidth": 1,
+                    "justifyContent": "center",
+                    "overflow": "hidden",
+                  },
+                  [
+                    {
+                      "borderColor": "#F5F5F6",
+                      "borderRadius": 33,
+                      "borderWidth": 1,
+                      "height": "100%",
+                      "width": 54,
+                    },
+                    undefined,
+                  ],
+                ],
+                {
+                  "opacity": 1,
+                },
+              ]
+            }
+          >
+            <Image
+              source={
+                {
+                  "testUri": "../../../packages/app/src/ui/Icon/assets/font_decrease.png",
+                }
+              }
+              style={
+                [
+                  {
+                    "height": 20,
+                    "resizeMode": "contain",
+                    "width": 20,
+                  },
+                  {
+                    "tintColor": "#0E1216",
+                  },
+                  {
+                    "tintColor": "#C8C7CA",
+                  },
+                ]
+              }
+            />
+          </View>
+          <View
+            accessibilityRole="button"
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": true,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              [
+                [
+                  {
+                    "borderRadius": 25,
+                    "height": 50,
+                    "minWidth": 50,
+                  },
+                  {
+                    "alignItems": "center",
+                    "borderColor": "#000000",
+                    "borderWidth": 1,
+                    "justifyContent": "center",
+                    "overflow": "hidden",
+                  },
+                  [
+                    {
+                      "borderColor": "#F5F5F6",
+                      "borderRadius": 33,
+                      "borderWidth": 1,
+                      "height": "100%",
+                      "width": 54,
+                    },
+                    undefined,
+                  ],
+                ],
+                {
+                  "opacity": 1,
+                },
+              ]
+            }
+          >
+            <Image
+              source={
+                {
+                  "testUri": "../../../packages/app/src/ui/Icon/assets/font_increase.png",
+                }
+              }
+              style={
+                [
+                  {
+                    "height": 20,
+                    "resizeMode": "contain",
+                    "width": 20,
                   },
                   {
                     "tintColor": "#0E1216",
@@ -2037,6 +2897,178 @@ exports[`BottomSheetTextEditor component snapshot after remove text 1`] = `
                     "height": 12,
                     "resizeMode": "contain",
                     "width": 12,
+                  },
+                  {
+                    "tintColor": "#0E1216",
+                  },
+                  {
+                    "tintColor": "#C8C7CA",
+                  },
+                ]
+              }
+            />
+          </View>
+          <View
+            accessibilityRole="button"
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": true,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              [
+                [
+                  {
+                    "borderRadius": 25,
+                    "height": 50,
+                    "minWidth": 50,
+                  },
+                  {
+                    "alignItems": "center",
+                    "borderColor": "#000000",
+                    "borderWidth": 1,
+                    "justifyContent": "center",
+                    "overflow": "hidden",
+                  },
+                  [
+                    {
+                      "borderColor": "#F5F5F6",
+                      "borderRadius": 33,
+                      "borderWidth": 1,
+                      "height": "100%",
+                      "width": 54,
+                    },
+                    undefined,
+                  ],
+                ],
+                {
+                  "opacity": 1,
+                },
+              ]
+            }
+          >
+            <Image
+              source={
+                {
+                  "testUri": "../../../packages/app/src/ui/Icon/assets/font_decrease.png",
+                }
+              }
+              style={
+                [
+                  {
+                    "height": 20,
+                    "resizeMode": "contain",
+                    "width": 20,
+                  },
+                  {
+                    "tintColor": "#0E1216",
+                  },
+                  {
+                    "tintColor": "#C8C7CA",
+                  },
+                ]
+              }
+            />
+          </View>
+          <View
+            accessibilityRole="button"
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": true,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              [
+                [
+                  {
+                    "borderRadius": 25,
+                    "height": 50,
+                    "minWidth": 50,
+                  },
+                  {
+                    "alignItems": "center",
+                    "borderColor": "#000000",
+                    "borderWidth": 1,
+                    "justifyContent": "center",
+                    "overflow": "hidden",
+                  },
+                  [
+                    {
+                      "borderColor": "#F5F5F6",
+                      "borderRadius": 33,
+                      "borderWidth": 1,
+                      "height": "100%",
+                      "width": 54,
+                    },
+                    undefined,
+                  ],
+                ],
+                {
+                  "opacity": 1,
+                },
+              ]
+            }
+          >
+            <Image
+              source={
+                {
+                  "testUri": "../../../packages/app/src/ui/Icon/assets/font_increase.png",
+                }
+              }
+              style={
+                [
+                  {
+                    "height": 20,
+                    "resizeMode": "contain",
+                    "width": 20,
                   },
                   {
                     "tintColor": "#0E1216",

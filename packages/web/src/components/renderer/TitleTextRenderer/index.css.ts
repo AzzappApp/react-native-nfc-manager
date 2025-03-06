@@ -1,5 +1,8 @@
 import { style } from '@vanilla-extract/css';
 
+const textFontSize = 16;
+const titleFontSize = 34;
+
 const container = style({
   display: 'flex',
   flexDirection: 'column',
@@ -20,7 +23,7 @@ const column = style({
 });
 
 const title = style({
-  fontSize: 34,
+  fontSize: titleFontSize,
   fontWeight: 700,
   lineHeight: '1.6em',
   margin: 0,
@@ -30,7 +33,7 @@ const title = style({
 });
 
 const text = style({
-  fontSize: 16,
+  fontSize: textFontSize,
   lineHeight: '1.9em',
   margin: 0,
   whiteSpace: 'pre-wrap',
@@ -44,4 +47,6 @@ export default {
   title,
   section,
   column,
+  textFontSize,
+  titleFontSize,
 };

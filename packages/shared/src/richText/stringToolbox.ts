@@ -14,6 +14,16 @@ export const isRichTextTag = (c: string) =>
   richTextASTTagsArray.includes(c as RichTextASTTags);
 
 /**
+ * Statically generate regexp to parse correctly the text
+ */
+// Escape special characters in +3 and -3
+const escapedTags = richTextASTTagsArray.map(tag =>
+  tag.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+);
+
+const richTextTagPattern = new RegExp(`^<(${escapedTags.join('|')})>`);
+
+/**
  * @param input string to parse
  * @param index current parsing position
  * @param initialPosition position in initial string
@@ -31,12 +41,16 @@ const parseHTMLInner = (
   while (index < input.length) {
     if (input[index] === '<') {
       // Detect opening tag
-      const startTagMatch = input.slice(index).match(/^<(b|i|c)>/);
+      const startTagMatch = input.slice(index).match(richTextTagPattern);
       if (startTagMatch) {
         // Detect closing tag
         const endTagMatch = input
           .slice(index)
-          .match(new RegExp(`</${startTagMatch[1]}>`));
+          .match(
+            new RegExp(
+              `</${startTagMatch[1].replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}>`,
+            ),
+          );
 
         if (endTagMatch !== null && endTagMatch.index !== undefined) {
           // Flush text buffer before processing the tag
@@ -57,6 +71,7 @@ const parseHTMLInner = (
             0,
             initialPosition + parseLength,
           );
+
           const newNode: RichTextASTNode = {
             type: startTagMatch[1] as RichTextASTTags,
             start: initialPosition + parseLength,
@@ -65,7 +80,11 @@ const parseHTMLInner = (
           };
           parseLength += len;
           currentNode.push(newNode);
-          index = index + subHtml.length + 7;
+          index =
+            index +
+            subHtml.length +
+            endTagMatch[0].length +
+            startTagMatch[0].length;
           textBuffer = '';
           continue;
         }
@@ -118,7 +137,7 @@ export const generateHTMLFromRichText = (node?: RichTextASTNode): string => {
   }
 
   const innerHTML = node.children.map(generateHTMLFromRichText).join('');
-  return node.type === 'root'
+  return node.type === 'root' || node.type === 'fragment'
     ? innerHTML
     : `<${node.type}>${innerHTML}</${node.type}>`;
 };

@@ -16,6 +16,9 @@ type RichTextFromASTProps = {
   style?: TextStyle | TextStyle[];
   stackedTags?: RichTextASTTags[];
 };
+
+const defaultFontSize = 15;
+
 export const RichTextFromAST = ({
   node,
   style = {},
@@ -46,6 +49,8 @@ export const RichTextFromAST = ({
     const hasVariant =
       typeof styleInner.fontFamily === 'string' &&
       MODULE_TEXT_FONTS_VARIANTS_OBJECT[styleInner.fontFamily];
+    const isBigger = stackedTags.includes('+3');
+    const isSmaller = stackedTags.includes('-3');
 
     let fontStyle = {};
     let fontFamily = styleInner.fontFamily;
@@ -69,6 +74,19 @@ export const RichTextFromAST = ({
         fontStyle = { ...fontStyle, fontStyle: 'italic' };
       }
     }
+    if (isBigger) {
+      fontStyle = {
+        ...fontStyle,
+        fontSize: defaultFontSize + 3,
+      };
+    }
+    if (isSmaller) {
+      fontStyle = {
+        ...fontStyle,
+        fontSize: defaultFontSize - 3,
+      };
+    }
+
     if (stackedTags.includes('c')) {
       fontStyle = {
         ...fontStyle,

@@ -550,6 +550,7 @@ const SimpleCarouselItem = ({
         <RichText
           fontFamily={cardStyle.fontFamily}
           text={sectionData?.text ?? DEFAULT_MODULE_TEXT}
+          textFontSize={cardStyle.fontSize || commonStyles.textFontSize}
         />
       </p>
     </div>

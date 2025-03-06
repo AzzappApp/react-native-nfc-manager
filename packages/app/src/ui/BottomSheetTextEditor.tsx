@@ -337,6 +337,22 @@ const BottomSheetTextEditor = (
               icon="underline"
               isFocused={isFocused}
             />
+            <BottomSheetTextEditorButton
+              onPress={onPress}
+              textAndSelection={textAndSelection}
+              tag="-3"
+              icon="font_decrease"
+              isFocused={isFocused}
+              iconSize={20}
+            />
+            <BottomSheetTextEditorButton
+              onPress={onPress}
+              textAndSelection={textAndSelection}
+              tag="+3"
+              icon="font_increase"
+              isFocused={isFocused}
+              iconSize={20}
+            />
           </View>
         </ScrollView>
       </View>

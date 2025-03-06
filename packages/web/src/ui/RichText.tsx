@@ -12,11 +12,13 @@ import type {
 const RichTextFromAst = ({
   node,
   fontFamily,
+  textFontSize,
   style = {},
   stackedTags = [],
 }: {
   node: RichTextASTNode;
   fontFamily: string;
+  textFontSize: number;
   style?: React.CSSProperties;
   stackedTags?: RichTextASTTags[];
 }): JSX.Element => {
@@ -35,6 +37,14 @@ const RichTextFromAst = ({
     }
     if (stackedTags.includes('i')) {
       newStyle = { ...newStyle, fontStyle: 'italic' };
+    }
+    if (stackedTags.includes('+3')) {
+      // HardCodeValue to match px value
+      newStyle = { ...newStyle, fontSize: textFontSize + 3 };
+    }
+    if (stackedTags.includes('-3')) {
+      // HardCodeValue to match px value
+      newStyle = { ...newStyle, fontSize: textFontSize - 3 };
     }
 
     return (
@@ -57,6 +67,7 @@ const RichTextFromAst = ({
             style={style}
             stackedTags={newStackedTags}
             node={child}
+            textFontSize={textFontSize}
           />
         ))}
       </>
@@ -72,6 +83,7 @@ const RichTextFromAst = ({
           style={style}
           stackedTags={stackedTags}
           node={child}
+          textFontSize={textFontSize}
         />
       ))}
     </>
@@ -81,6 +93,7 @@ const RichTextFromAst = ({
 type RichTextProps = {
   text: string | undefined;
   fontFamily: string;
+  textFontSize: number;
   style?: React.CSSProperties;
 };
 
@@ -88,9 +101,17 @@ const RichText: React.FC<RichTextProps> = ({
   text,
   fontFamily,
   style,
+  textFontSize,
 }): JSX.Element => {
   const ast = parseHTMLToRichText(text);
-  return <RichTextFromAst fontFamily={fontFamily} style={style} node={ast} />;
+  return (
+    <RichTextFromAst
+      fontFamily={fontFamily}
+      style={style}
+      node={ast}
+      textFontSize={textFontSize}
+    />
+  );
 };
 
 export default React.memo(RichText);

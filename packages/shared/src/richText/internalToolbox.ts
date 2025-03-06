@@ -13,17 +13,20 @@ type SplitArrayResult = [RichTextASTNode[], RichTextASTNode[]];
  */
 export function deleteTagFromRichTextAST(
   node: RichTextASTNode | undefined,
-  tag: string,
+  tag: string[],
 ): RichTextASTNode | undefined {
   if (!node) return undefined;
   const newChildren = node.children?.map(child => {
-    if (child.type === tag) {
+    if (tag.includes(child.type)) {
       child.type = 'fragment';
     }
     return deleteTagFromRichTextAST(child, tag);
   });
   return simplifyRichTextAST({
-    ...node,
+    start: node.start,
+    end: node.end,
+    type: tag.includes(node.type) ? 'fragment' : node.type,
+    value: node.value,
     children: newChildren?.filter(isDefined),
   });
 }
