@@ -1,7 +1,7 @@
 import { decompressFromEncodedURIComponent } from 'lz-string';
 import { headers } from 'next/headers';
 import Image from 'next/image';
-import { getMediasByIds, getOwnerProfileByUserName } from '@azzapp/data';
+import { getMediasByIds, getProfileById } from '@azzapp/data';
 import { verifyHmacWithPassword } from '@azzapp/shared/crypto';
 import { parseEmailSignature } from '@azzapp/shared/emailSignatureHelpers';
 import { getImageURLForSize } from '@azzapp/shared/imagesHelpers';
@@ -42,9 +42,7 @@ const EmailSignaturePage = async ({
     ? getMediasByIds([webCard.coverMediaId]).then(([media]) => media)
     : null);
 
-  const profile = await getOwnerProfileByUserName(userName);
-
-  if (!profile || !searchParams) {
+  if (!searchParams) {
     return notFound();
   }
 
@@ -76,6 +74,10 @@ const EmailSignaturePage = async ({
     return notFound();
   }
   const contact = parseEmailSignature(contactData);
+  const profile = await getProfileById(contact.profileId);
+  if (!profile || profile.webCardId !== webCard.id) {
+    return notFound();
+  }
   const { data: saveContactData, signature: saveContactSignature } =
     await serializeAndSignContactCard(
       userName,
