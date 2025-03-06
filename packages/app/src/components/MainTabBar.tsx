@@ -158,7 +158,7 @@ const MainTabBar = ({
 
   const appearance = useColorScheme() ?? 'light';
 
-  const currentRoute = ['HOME', 'MEDIA'][currentIndex];
+  const currentRoute = ['HOME', 'CONTACTS', 'MEDIA'][currentIndex];
 
   const tabs = useMemo(
     () =>
