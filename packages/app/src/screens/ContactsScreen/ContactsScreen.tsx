@@ -81,7 +81,7 @@ const ContactsScreen = ({
       <Container style={styles.container}>
         {profile?.webCard && (
           <AccountHeader
-            leftIcon="close"
+            leftIcon={null}
             webCard={profile?.webCard}
             title={
               <Text variant="large">
