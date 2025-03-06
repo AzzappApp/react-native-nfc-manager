@@ -1,3 +1,7 @@
+## 1.8.3-rc.11
+
+* **fix:**  - **emailSignature:** [#7741](https://github.com/AzzappApp/azzapp/pull/7741) starts at 1 ([#7753](https://github.com/AzzappApp/azzapp/pull/7753))
+
 ## 1.8.3-rc.10
 
 * **fix:**  - **home:** [#7302](https://github.com/AzzappApp/azzapp/pull/7302) simplify BottomSheetPopup component ([#7744](https://github.com/AzzappApp/azzapp/pull/7744))
