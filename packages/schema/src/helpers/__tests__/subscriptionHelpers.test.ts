@@ -77,7 +77,7 @@ describe('Subscription Helpers', () => {
   describe('updateMonthlySubscription', () => {
     test('should update monthly subscription with correct seats', async () => {
       (getActiveUserSubscriptions as jest.Mock).mockResolvedValue([
-        { subscriptionPlan: 'web.monthly', userId: 'user-1' },
+        { subscriptionPlan: 'web.monthly', userId: 'user-1', status: 'active' },
       ]);
       (getTotalMultiUser as jest.Mock).mockResolvedValue(4);
 
@@ -89,6 +89,21 @@ describe('Subscription Helpers', () => {
         }),
         totalSeats: 4,
       });
+    });
+
+    test('should not update canceled monthly subscription', async () => {
+      (getActiveUserSubscriptions as jest.Mock).mockResolvedValue([
+        {
+          subscriptionPlan: 'web.monthly',
+          userId: 'user-1',
+          status: 'canceled',
+        },
+      ]);
+      (getTotalMultiUser as jest.Mock).mockResolvedValue(4);
+
+      await updateMonthlySubscription('user-1');
+
+      expect(updateExistingSubscription).not.toHaveBeenCalled();
     });
 
     test('should do nothing if no monthly subscription is found', async () => {
