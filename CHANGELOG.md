@@ -1,3 +1,8 @@
+## 1.8.3-canary.22
+
+* **fix:**  - allow to search contact by company ([#7787](https://github.com/AzzappApp/azzapp/pull/7787))
+* **fix:**  - unify compagny logo management in contact card edit ([#7789](https://github.com/AzzappApp/azzapp/pull/7789))
+
 ## 1.8.3-canary.21
 
 * **perf:**  - [#7322](https://github.com/AzzappApp/azzapp/pull/7322) don’t make queries in middleware ([#7784](https://github.com/AzzappApp/azzapp/pull/7784))
