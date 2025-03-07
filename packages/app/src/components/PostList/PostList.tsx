@@ -5,6 +5,7 @@ import { Alert, Dimensions, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import PostRenderer from '#components/PostList/PostRenderer';
 import EmptyContent from '#components/ui/EmptyContent';
+import { getAuthState } from '#helpers/authStore';
 import { profileInfoHasAdminRight } from '#helpers/profileRoleHelper';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -15,8 +16,6 @@ import type {
   PostList_posts$data,
   PostList_posts$key,
 } from '#relayArtifacts/PostList_posts.graphql';
-import type { PostList_viewerProfile$key } from '#relayArtifacts/PostList_viewerProfile.graphql';
-import type { PostList_viewerWebCard$key } from '#relayArtifacts/PostList_viewerWebCard.graphql';
 import type { PostRendererFragment_author$key } from '#relayArtifacts/PostRendererFragment_author.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { ContentStyle, ListRenderItemInfo } from '@shopify/flash-list';
@@ -25,8 +24,6 @@ import type { ViewProps, ViewToken } from 'react-native';
 type PostListProps = ViewProps & {
   posts: PostList_posts$key;
   author?: PostRendererFragment_author$key;
-  viewerWebCard?: PostList_viewerWebCard$key | null;
-  profile?: PostList_viewerProfile$key;
   canPlay?: boolean;
   onEndReached?: () => void;
   onRefresh?: () => void;
@@ -49,8 +46,6 @@ const { height: windowHeight, width: windowWidth } = Dimensions.get('window');
 const PostList = ({
   posts: postKey,
   author: authorKey,
-  viewerWebCard: viewerWebCardKey,
-  profile: profileKey,
   canPlay = true,
   refreshing = false,
   loading = false,
@@ -89,26 +84,6 @@ const PostList = ({
 
   const intl = useIntl();
 
-  const viewerWebCard = useFragment(
-    graphql`
-      fragment PostList_viewerWebCard on WebCard {
-        id
-        cardIsPublished
-      }
-    `,
-    viewerWebCardKey ?? null,
-  );
-
-  const viewerProfile = useFragment(
-    graphql`
-      fragment PostList_viewerProfile on Profile {
-        id
-        invited
-      }
-    `,
-    profileKey ?? null,
-  );
-
   const author = useFragment(
     graphql`
       fragment PostList_author on WebCard {
@@ -119,8 +94,9 @@ const PostList = ({
   );
 
   const postActionEnabled = useMemo(() => {
-    if (viewerWebCard?.cardIsPublished != null) {
-      if (!viewerProfile?.invited) {
+    const authState = getAuthState();
+    if (authState.profileInfos?.cardIsPublished) {
+      if (!authState.profileInfos?.invited) {
         //card is not published. We can do action only
         // if we are the owner and we are displaying his own list of post (author is provided)
         if (
@@ -130,21 +106,17 @@ const PostList = ({
         ) {
           return true;
         }
-        return !!viewerWebCard?.cardIsPublished;
+        return !!authState.profileInfos?.cardIsPublished;
       }
       return false;
     } else {
       return false;
     }
-  }, [
-    author?.id,
-    profileInfos,
-    viewerProfile?.invited,
-    viewerWebCard?.cardIsPublished,
-  ]);
+  }, [author?.id, profileInfos]);
 
   const onActionDisabled = useCallback(() => {
-    if (!viewerWebCard?.cardIsPublished) {
+    const authState = getAuthState();
+    if (!authState.profileInfos?.cardIsPublished) {
       Alert.alert(
         intl.formatMessage({
           defaultMessage: 'Unpublished WebCard.',
@@ -169,7 +141,7 @@ const PostList = ({
       );
     }
 
-    if (viewerProfile?.invited) {
+    if (authState.profileInfos?.invited) {
       Alert.alert(
         intl.formatMessage({
           defaultMessage: 'Invitation pending.',
@@ -193,7 +165,7 @@ const PostList = ({
         ],
       );
     }
-  }, [intl, viewerProfile?.invited, viewerWebCard?.cardIsPublished]);
+  }, [intl]);
 
   const [visiblePostIds, setVisiblePostIds] = useState<{
     played: string | null;

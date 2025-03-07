@@ -16,12 +16,11 @@ describe('WebCardScreen', () => {
   const renderWebCarScreen = (
     webCardId = 'webCardId',
     viewerWebCardId = 'viewerWebCardId',
-    profileId = 'testProfileId',
   ) => {
     const preloadedQuery = loadQuery<WebCardScreenByIdQuery>(
       environment,
       WebCardScreenByIdQueryNode,
-      { webCardId, viewerWebCardId, profileId },
+      { webCardId, viewerWebCardId },
     );
 
     return render(
@@ -60,18 +59,6 @@ describe('WebCardScreen', () => {
             ...CoverRenderer_webCard
           }
         }
-        webcard: node(id: "viewerWebCardId") {
-          id
-        }
-        ## TODO the fact that we need to fetch the profile is a miss conception and should be fixed
-        profile: node(id: "testProfileId") {
-          id
-          ... on Profile {
-            webCard {
-              id
-            }
-          }
-        }
         currentUser {
           id
         }
@@ -108,17 +95,6 @@ describe('WebCardScreen', () => {
         },
         currentUser: {
           id: 'viewerId',
-        },
-        webcard: {
-          id: 'viewerWebCardId',
-          __typename: 'WebCard',
-        },
-        profile: {
-          id: 'testProfileId',
-          __typename: 'Profile',
-          webCard: {
-            id: 'viewerWebCardId',
-          },
         },
       },
     );

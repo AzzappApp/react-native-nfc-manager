@@ -10,7 +10,6 @@ import useScreenInsets from '#hooks/useScreenInsets';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
-import type { PostList_viewerWebCard$key } from '#relayArtifacts/PostList_viewerWebCard.graphql';
 import type { WebCardPostsListQuery } from '#relayArtifacts/WebCardPostsListQuery.graphql';
 
 type WebCardPostsListProps = {
@@ -19,11 +18,9 @@ type WebCardPostsListProps = {
   hasFocus: boolean;
   userName: string;
   toggleFlip: () => void;
-  viewerWebCard: PostList_viewerWebCard$key;
 };
 
 const WebCardPostsList = ({
-  viewerWebCard,
   webCardId,
   isViewer,
   hasFocus,
@@ -87,7 +84,6 @@ const WebCardPostsList = ({
       {webCard && (
         <PostList
           webCard={webCard}
-          viewerWebCard={viewerWebCard}
           canPlay={hasFocus}
           onPressAuthor={toggleFlip}
         />

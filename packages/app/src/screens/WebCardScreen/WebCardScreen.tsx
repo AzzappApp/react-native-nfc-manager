@@ -332,7 +332,7 @@ export const WebCardScreen = ({
 
   // #end region
 
-  if (!data.webCard || !data.profile?.webCard) {
+  if (!data.webCard) {
     return null;
   }
 
@@ -372,7 +372,6 @@ export const WebCardScreen = ({
                   webCardId={data.webCard.id}
                   hasFocus={hasFocus && showPost && ready}
                   userName={data.webCard.userName!}
-                  viewerWebCard={data.profile.webCard}
                 />
               )}
             </Suspense>
@@ -381,7 +380,6 @@ export const WebCardScreen = ({
       </GestureDetector>
       <WebCardScreenButtonBar
         webCard={data.webCard}
-        profile={data.profile}
         isViewer={isViewer}
         onHome={router.backToTop}
         isWebCardDisplayed={!showPost}
@@ -422,11 +420,7 @@ const getQuery = (params: WebCardRoute['params']) =>
   params.webCardId ? webCardScreenByIdQuery : webCardScreenByNameQuery;
 
 const webCardScreenByIdQuery = graphql`
-  query WebCardScreenByIdQuery(
-    $webCardId: ID!
-    $viewerWebCardId: ID!
-    $profileId: ID!
-  ) {
+  query WebCardScreenByIdQuery($webCardId: ID!, $viewerWebCardId: ID!) {
     webCard: node(id: $webCardId) {
       id
       ... on WebCard {
@@ -441,15 +435,6 @@ const webCardScreenByIdQuery = graphql`
       ...WebCardScreenPublishHelper_webCard
       ...AddContactModal_webCard
     }
-    ## TODO find a way to remove this profile fetch
-    profile: node(id: $profileId) {
-      ... on Profile {
-        ...WebCardScreenButtonBar_profile
-        webCard {
-          ...PostList_viewerWebCard
-        }
-      }
-    }
     currentUser {
       ...AddContactModalProfiles_user
     }
@@ -460,7 +445,6 @@ const webCardScreenByNameQuery = graphql`
   query WebCardScreenByUserNameQuery(
     $userName: String!
     $viewerWebCardId: ID!
-    $profileId: ID!
   ) {
     webCard(userName: $userName) {
       id
@@ -473,15 +457,6 @@ const webCardScreenByNameQuery = graphql`
       ...WebCardMenu_webCard @arguments(viewerWebCardId: $viewerWebCardId)
       ...WebCardScreenPublishHelper_webCard
       ...AddContactModal_webCard
-    }
-    ## TODO find a way to remove this profile fetch
-    profile: node(id: $profileId) {
-      ... on Profile {
-        ...WebCardScreenButtonBar_profile
-        webCard {
-          ...PostList_viewerWebCard
-        }
-      }
     }
     currentUser {
       ...AddContactModalProfiles_user
@@ -531,12 +506,10 @@ export default relayScreen(WebCardScreen, {
       ? {
           webCardId,
           viewerWebCardId: profileInfos?.webCardId ?? '',
-          profileId: profileInfos?.profileId ?? '',
         }
       : {
           userName,
           viewerWebCardId: profileInfos?.webCardId ?? '',
-          profileId: profileInfos?.profileId ?? '',
         },
   fetchPolicy: 'store-and-network',
 });

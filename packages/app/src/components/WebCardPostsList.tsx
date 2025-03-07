@@ -3,17 +3,14 @@ import { StyleSheet } from 'react-native';
 import { usePaginationFragment, graphql } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import PostList from './PostList';
-import type { PostList_viewerWebCard$key } from '#relayArtifacts/PostList_viewerWebCard.graphql';
 import type { PostRendererFragment_author$key } from '#relayArtifacts/PostRendererFragment_author.graphql';
 import type { WebCardPostsList_webCard$key } from '#relayArtifacts/WebCardPostsList_webCard.graphql';
 
 const WebCardPostsList = ({
-  viewerWebCard,
   webCard,
   canPlay,
   onPressAuthor,
 }: {
-  viewerWebCard?: PostList_viewerWebCard$key;
   webCard: PostRendererFragment_author$key & WebCardPostsList_webCard$key;
   canPlay: boolean;
   onPressAuthor?: () => void;
@@ -89,7 +86,6 @@ const WebCardPostsList = ({
       onEndReached={onEndReached}
       onRefresh={onRefresh}
       contentContainerStyle={styles.container}
-      viewerWebCard={viewerWebCard}
       showUnpublished
     />
   );
