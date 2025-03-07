@@ -318,7 +318,7 @@ export const ContactCardScreen = ({
                 width: '100%',
                 textAlign: 'center',
                 color: colors.grey400,
-                paddingTop: 10,
+                paddingVertical: 10,
               }}
             >
               <FormattedMessage
