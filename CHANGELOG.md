@@ -1,3 +1,7 @@
+## 1.8.3-canary.19
+
+
+
 ## 1.8.3-canary.18
 
 * **fix:**  - **webCard:** [#7537](https://github.com/AzzappApp/azzapp/pull/7537) simplify queries ([#7779](https://github.com/AzzappApp/azzapp/pull/7779))
