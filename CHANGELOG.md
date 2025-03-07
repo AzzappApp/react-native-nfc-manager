@@ -1,3 +1,7 @@
+## 1.8.3-canary.16
+
+* **fix:**  - update lockScreen translation ([#7776](https://github.com/AzzappApp/azzapp/pull/7776))
+
 ## 1.8.3-canary.15
 
 * **fix:**  - ensure cover shadow follow border radius in image overlay ([#7766](https://github.com/AzzappApp/azzapp/pull/7766))
