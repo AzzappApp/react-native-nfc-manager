@@ -82,7 +82,7 @@ const ContactCardEditCompanyLogo = ({ control }: { control: Control<any> }) => {
 
   useEffect(() => {
     const getImageSizeInner = async () => {
-      if (field.value.uri && (!field.value.width || !field.value.height)) {
+      if (field?.value?.uri && (!field.value.width || !field.value.height)) {
         const uri = field.value.uri;
         const { width, height } = await getImageSize(uri);
         setPickerImage({ ...field.value, width, height });
