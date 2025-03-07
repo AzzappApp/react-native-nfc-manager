@@ -9,7 +9,6 @@ import Link from '#components/Link';
 import { setMainTabBarOpacity } from '#components/MainTabBar';
 import { useRouter } from '#components/NativeRouter';
 import { onChangeWebCard } from '#helpers/authStore';
-import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import relayScreen from '#helpers/relayScreen';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import useBoolean from '#hooks/useBoolean';
@@ -43,10 +42,6 @@ const WelcomeScreen = ({
   }, [hasFocus]);
 
   const [showMenu, open, close] = useBoolean(false);
-
-  useEffect(() => {
-    dispatchGlobalEvent({ type: 'READY' });
-  }, []);
 
   const profileInfos = useProfileInfos();
 

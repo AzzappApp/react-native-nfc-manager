@@ -32,11 +32,11 @@ import {
 import relayScreen from '#helpers/relayScreen';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';
-import LoadingScreen from '#screens/LoadingScreen';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import Icon from '#ui/Icon';
+import LoadingView from '#ui/LoadingView';
 import SafeAreaView from '#ui/SafeAreaView';
 import Separation from '#ui/Separation';
 import Text from '#ui/Text';
@@ -512,7 +512,7 @@ const CommonInformationScreenFallback = () => {
       <SafeAreaView style={{ flex: 1 }}>
         <Header leftElement={<CancelHeaderButton onPress={router.back} />} />
         <View style={{ aspectRatio: 1, backgroundColor: colors.grey100 }} />
-        <LoadingScreen />
+        <LoadingView />
       </SafeAreaView>
     </Container>
   );

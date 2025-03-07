@@ -9,9 +9,9 @@ import PhotoWithTextAndTitleEditionMobileScreenNode from '#relayArtifacts/PhotoW
 import SimpleButtonEditionMobileScreenNode from '#relayArtifacts/SimpleButtonEditionMobileScreenQuery.graphql';
 import SimpleTextEditionMobileScreenNode from '#relayArtifacts/SimpleTextEditionMobileScreenQuery.graphql';
 import SocialLinksEditionMobileScreenNode from '#relayArtifacts/SocialLinksEditionMobileScreenQuery.graphql';
-import LoadingScreen from '#screens/LoadingScreen';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
+import LoadingView from '#ui/LoadingView';
 import SafeAreaView from '#ui/SafeAreaView';
 import BlockTextEditionMobileScreen from './BlockTextEditionMobileScreen';
 import CarouselEditionMobileScreen from './CarouselEditionMobileScreen';
@@ -155,7 +155,7 @@ const CardModuleEditionScreenFallback = () => {
     <Container style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 1 }}>
         <Header leftElement={<CancelHeaderButton onPress={onCancel} />} />
-        <LoadingScreen />
+        <LoadingView />
       </SafeAreaView>
     </Container>
   );

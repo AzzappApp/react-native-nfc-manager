@@ -4,6 +4,7 @@ import { useColorScheme } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { replaceColors } from '@azzapp/shared/lottieHelpers';
 import { mainRoutes } from '#mobileRoutes';
+import { HomeIcon } from '#components/HomeIcon';
 import { setMainTabBarOpacity } from '#components/MainTabBar';
 import { useRouter } from '#components/NativeRouter';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
@@ -56,10 +57,8 @@ const HomeScreen = ({
   const router = useRouter();
 
   useEffect(() => {
-    if (hasFocus) {
-      dispatchGlobalEvent({ type: 'READY' });
-    }
-  }, [hasFocus]);
+    HomeIcon.forceRefresh();
+  }, []);
 
   useEffect(() => {
     //current user is fetched on welcome screen / when null the app is in infinite loop

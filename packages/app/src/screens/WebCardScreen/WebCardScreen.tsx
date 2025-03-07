@@ -36,7 +36,6 @@ import {
 } from '#components/NativeRouter';
 import WebCardMenu from '#components/WebCardMenu';
 import { logEvent } from '#helpers/analytics';
-import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import {
   profileInfoHasAdminRight,
   profileInfoHasEditorRight,
@@ -82,10 +81,6 @@ export const WebCardScreen = ({
   useWebCardViewStatistic(params.webCardId ?? data.webCard?.id);
 
   const ready = useDidAppear();
-
-  useEffect(() => {
-    dispatchGlobalEvent({ type: 'READY' });
-  }, []);
 
   const router = useRouter();
 
