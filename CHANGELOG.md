@@ -1,3 +1,7 @@
+## 1.8.3-canary.17
+
+* **feat:**  - add zoom on hoover on web webcard ([#7775](https://github.com/AzzappApp/azzapp/pull/7775))
+
 ## 1.8.3-canary.16
 
 * **fix:**  - update lockScreen translation ([#7776](https://github.com/AzzappApp/azzapp/pull/7776))
