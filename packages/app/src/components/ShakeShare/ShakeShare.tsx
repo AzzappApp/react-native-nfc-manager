@@ -163,6 +163,7 @@ const ShakeShareDisplay = ({
       profileId: profileInfos?.profileId ?? '',
       width: qrCodeWidth(),
     },
+    { fetchKey: profileInfos?.profileId ?? '' },
   );
 
   const profile = node?.profile;
