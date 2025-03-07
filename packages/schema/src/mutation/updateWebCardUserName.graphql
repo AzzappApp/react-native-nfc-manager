@@ -2,7 +2,7 @@ extend type Mutation {
   """
   Updates the user name of a web card.
   """
-  updateWebCardUserName(webCardId: ID!, input: UpdateWebCardUserNameInput!): UpdateWebCardUserNamePayload
+  updateWebCardUserName(webCardId: ID!, input: UpdateWebCardUserNameInput!): UpdateWebCardUserNamePayload @deprecated(reason: "Use updateWebCard instead.")
 }
 
 input UpdateWebCardUserNameInput {
