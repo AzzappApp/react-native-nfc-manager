@@ -1,3 +1,7 @@
+## 1.8.3-canary.21
+
+* **perf:**  - [#7322](https://github.com/AzzappApp/azzapp/pull/7322) don’t make queries in middleware ([#7784](https://github.com/AzzappApp/azzapp/pull/7784))
+
 ## 1.8.3-canary.20
 
 * **fix:**  - add missing gap ([#7786](https://github.com/AzzappApp/azzapp/pull/7786))
