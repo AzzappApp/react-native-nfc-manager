@@ -10,8 +10,8 @@
 	<key>SHARED_GROUP_IDENTIFIER</key>
 	<string>$(SHARED_GROUP_IDENTIFIER)</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.8.3</string>
+	<string>1.8.4</string>
 	<key>CFBundleVersion</key>
-	<string>16</string>
+	<string>1</string>
 </dict>
 </plist>
