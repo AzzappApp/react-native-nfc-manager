@@ -130,7 +130,7 @@ export const messages: Record<Locale, Record<string, string>> = {
   // get sv() {
   //   return require('@azzapp/i18n/compiled/app/sv.json');
   // },
-  get de() {
-    return require('@azzapp/i18n/compiled/app/de.json');
-  },
+  // get de() {
+  //  return require('@azzapp/i18n/compiled/app/de.json');
+  // },
 };
