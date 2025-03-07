@@ -135,7 +135,11 @@ const TitleTextRenderer = ({
               ...getTitleAlignmentStyle(module.variant),
             }}
           >
-            {title ?? DEFAULT_MODULE_TITLE}
+            <RichText
+              fontFamily={cardStyle.titleFontFamily}
+              text={title ?? DEFAULT_MODULE_TITLE}
+              textFontSize={cardStyle.titleFontSize || styles.titleFontSize}
+            />
           </h2>
         )}
 
@@ -157,7 +161,11 @@ const TitleTextRenderer = ({
                 ...getTitleAlignmentStyle(module.variant),
               }}
             >
-              {title ?? DEFAULT_MODULE_TITLE}
+              <RichText
+                fontFamily={cardStyle.titleFontFamily}
+                text={title ?? DEFAULT_MODULE_TITLE}
+                textFontSize={cardStyle.titleFontSize || styles.titleFontSize}
+              />
             </h2>
           )}
           {columns.map((columnText, index) => (

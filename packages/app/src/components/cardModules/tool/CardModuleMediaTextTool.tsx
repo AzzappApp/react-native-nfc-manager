@@ -12,11 +12,16 @@ import BottomSheetTextEditor from '#ui/BottomSheetTextEditor';
 import BottomSheetTextInput from '#ui/BottomSheetTextInput';
 import Header from '#ui/Header';
 import HeaderButton from '#ui/HeaderButton';
+import RichTextButtons, {
+  textButtons,
+  titleButtons,
+} from '#ui/RichTextButtons';
 import Text from '#ui/Text';
 import {
   DEFAULT_CARD_MODULE_TEXT,
   DEFAULT_CARD_MODULE_TITLE,
 } from '../CardModuleBottomBar';
+import useRichTextManager from './useRichTextManager';
 import type { ModuleKindAndVariant } from '#helpers/webcardModuleHelpers';
 import type { CardModuleMedia } from '../cardModuleEditorType';
 
@@ -44,8 +49,41 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
   const [linkUrl, setLinkUrl] = useState(cardModuleMedia.link?.url);
   const [linkAction, setLinkAction] = useState(cardModuleMedia.link?.label);
   const [hasLinkError, setHasLinkError] = useState(false);
+  const [focusedInput, setFocusedInput] = useState<'text' | 'title'>('title');
 
-  //this pattern is required here, because we can chose another MediaText/MediaTextLink to edit without dismounting completly the modal
+  const onTextFocus = () => {
+    setFocusedInput('text');
+  };
+  const onTitleFocus = () => {
+    setFocusedInput('title');
+  };
+  const {
+    onApplyTagPress: onTextApplyTagPress,
+    onSelectionChange: onTextSelectionChange,
+    onChangeText: onTextChangeText,
+    textAndSelection: textTextAndSelection,
+  } = useRichTextManager({
+    defaultValue:
+      cardModuleMedia.text === DEFAULT_CARD_MODULE_TEXT
+        ? ''
+        : cardModuleMedia.text,
+    setText,
+  });
+
+  const {
+    onApplyTagPress: onTitleApplyTagPress,
+    onSelectionChange: onTitleSelectionChange,
+    onChangeText: onTitleChangeText,
+    textAndSelection: titleTextAndSelection,
+  } = useRichTextManager({
+    defaultValue:
+      cardModuleMedia.title === DEFAULT_CARD_MODULE_TITLE
+        ? ''
+        : cardModuleMedia.title,
+    setText: setTitle,
+  });
+
+  //this pattern is required here, because we can chose another MediaText/MediaTextLink to edit without dismounting completely the modal
   // lazy on bottom sheet does not work either. This will not cause to much rerender because the component is save only on dismissing the modal, not realtime
   useEffect(() => {
     setText(cardModuleMedia.text);
@@ -105,6 +143,12 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
   const hasError = useMemo(() => {
     return hasCardModuleMediaError(cardModuleMedia, module);
   }, [cardModuleMedia, module]);
+
+  const onApplyTagPress =
+    focusedInput === 'text' ? onTextApplyTagPress : onTitleApplyTagPress;
+
+  const textAndSelectionInner =
+    focusedInput === 'text' ? textTextAndSelection : titleTextAndSelection;
 
   if (!isVisible(module)) {
     return null;
@@ -222,15 +266,17 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
             />
           </Text>
 
-          <BottomSheetTextInput
+          <BottomSheetTextEditor
             multiline
             placeholder={intl.formatMessage({
               defaultMessage: 'Enter your title',
               description: 'Title placeholder in design module text tool',
             })}
-            defaultValue={title === DEFAULT_CARD_MODULE_TITLE ? '' : title}
-            onChangeText={setTitle}
+            onSelectionChange={onTitleSelectionChange}
+            onChangeText={onTitleChangeText}
             style={styles.titleStyle}
+            onFocus={onTitleFocus}
+            textAndSelection={titleTextAndSelection}
           />
           <BottomSheetTextEditor
             multiline
@@ -239,9 +285,19 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
               description:
                 'Text description placeholder in design module text tool',
             })}
-            defaultValue={text === DEFAULT_CARD_MODULE_TEXT ? '' : text}
-            onChangeText={setText}
+            onSelectionChange={onTextSelectionChange}
+            onChangeText={onTextChangeText}
             style={styles.textStyle}
+            onFocus={onTextFocus}
+            textAndSelection={textTextAndSelection}
+          />
+          <RichTextButtons
+            onPress={onApplyTagPress}
+            textAndSelection={textAndSelectionInner}
+            isFocused
+            enabledButtons={
+              focusedInput === 'title' ? titleButtons : textButtons
+            }
           />
           {module.moduleKind === 'mediaTextLink' && (
             <>

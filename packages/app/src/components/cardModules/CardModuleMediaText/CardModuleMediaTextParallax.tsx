@@ -4,7 +4,11 @@ import {
   type CardModuleColor,
   type DisplayMode,
 } from '@azzapp/shared/cardModuleHelpers';
-import { RichText } from '#components/ui/RichText';
+import {
+  defaultTextFontSize,
+  defaultTitleFontSize,
+  RichText,
+} from '#components/ui/RichText';
 import { getTextStyle, getTitleStyle } from '#helpers/cardModuleHelpers';
 import useScreenDimensions from '#hooks/useScreenDimensions';
 import Text from '#ui/Text';
@@ -133,11 +137,15 @@ const ParallaxItem = ({
               displayMode === 'desktop' && { maxWidth: 400 },
             ]}
           >
-            {cardModuleMedia.title}
+            <RichText
+              text={cardModuleMedia.title}
+              fontSize={defaultTitleFontSize}
+            />
           </Text>
           <RichText
             text={cardModuleMedia.text}
             style={[getTextStyle(cardStyle, cardModuleColor), styles.textStyle]}
+            fontSize={defaultTextFontSize}
           />
         </View>
       </ParallaxContainer>

@@ -535,7 +535,11 @@ const SimpleCarouselItem = ({
           fontSize: cardStyle.titleFontSize,
         }}
       >
-        {sectionData?.title ?? DEFAULT_MODULE_TITLE}
+        <RichText
+          fontFamily={cardStyle.titleFontFamily}
+          text={sectionData?.title ?? DEFAULT_MODULE_TITLE}
+          textFontSize={cardStyle.titleFontSize || commonStyles.titleFontSize}
+        />
       </h3>
       <p
         className={cn(

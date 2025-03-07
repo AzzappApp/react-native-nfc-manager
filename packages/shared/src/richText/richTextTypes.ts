@@ -11,6 +11,8 @@ export const richTextASTTagsArray = [
   'i', // italic
   '+3', // increase text size of 3 px
   '-3', // decrease text size of 3 px
+  '+6', // increase text size of 6 px
+  '-6', // decrease text size of 6 px
 ] as const;
 
 /**
@@ -27,8 +29,10 @@ export type RichTextASTTags = (typeof richTextASTTagsArray)[number];
 export const richTextIncompatibleTags: Partial<
   Record<RichTextASTTags, RichTextASTTags[]>
 > = {
-  '+3': ['-3'], // Increase text size is incompatible with decrease text size
-  '-3': ['+3'], // Decrease text size is incompatible with increase text size
+  '+3': ['-3', '-6', '+6'], // Increase text size is incompatible with decrease text size
+  '-3': ['+3', '-6', '+6'], // Decrease text size is incompatible with increase text size
+  '+6': ['-3', '+3', '-6'], // Increase text size is incompatible with decrease text size
+  '-6': ['+3', '+3', '+6'], // Decrease text size is incompatible with increase text size
 };
 
 /**

@@ -39,12 +39,16 @@ const RichTextFromAst = ({
       newStyle = { ...newStyle, fontStyle: 'italic' };
     }
     if (stackedTags.includes('+3')) {
-      // HardCodeValue to match px value
       newStyle = { ...newStyle, fontSize: textFontSize + 3 };
     }
     if (stackedTags.includes('-3')) {
-      // HardCodeValue to match px value
       newStyle = { ...newStyle, fontSize: textFontSize - 3 };
+    }
+    if (stackedTags.includes('+6')) {
+      newStyle = { ...newStyle, fontSize: textFontSize + 6 };
+    }
+    if (stackedTags.includes('-6')) {
+      newStyle = { ...newStyle, fontSize: textFontSize - 6 };
     }
 
     return (

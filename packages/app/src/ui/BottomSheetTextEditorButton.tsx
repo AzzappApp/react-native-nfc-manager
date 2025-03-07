@@ -15,6 +15,7 @@ type BottomSheetTextEditorButtonProps = {
   icon: Icons;
   isFocused: boolean;
   iconSize?: number;
+  enabledButtons?: RichTextASTTags[];
 };
 
 export const BottomSheetTextEditorButton = ({
@@ -23,10 +24,14 @@ export const BottomSheetTextEditorButton = ({
   tag,
   icon,
   isFocused,
+  enabledButtons,
   iconSize = defaultIconSize,
 }: BottomSheetTextEditorButtonProps) => {
   const styles = useStyleSheet(styleSheet);
 
+  if (enabledButtons && !enabledButtons.includes(tag)) {
+    return undefined;
+  }
   const isDisableInner =
     !isFocused ||
     textAndSelection.selection?.start === textAndSelection.selection?.end;
