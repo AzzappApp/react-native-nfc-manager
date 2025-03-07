@@ -127,7 +127,7 @@ struct QRCodeWidget: Widget {
     AppIntentConfiguration(kind: kind, intent: ConfigurationAppIntent.self, provider: Provider()) { entry in
       QRCodeWidgetEntryView(entry: entry)
     }
-    .configurationDisplayName("Homescreen Widgets")
+    .configurationDisplayName("LockScreen Widgets")
     .description("Instantly share your contact information from your home screen")
     .supportedFamilies([.systemSmall, .systemLarge, .accessoryCircular])
     .disableContentMarginsIfNeeded()
