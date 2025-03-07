@@ -23,8 +23,9 @@ import {
 import sqliteCols from './sqliteCols';
 
 const cols = {
-  cuid: (name: string) => char(name, { length: 24 }),
-  mediaId: (name: string) => char(name, { length: 26 }),
+  cuid: (name: string) => char(name, { length: 12 }),
+  mediaId: (name: string) => char(name, { length: 14 }),
+  lottieId: (name: string) => char(name, { length: 19 }),
   defaultVarchar: (name: string) =>
     varchar(name, { length: DEFAULT_VARCHAR_LENGTH }),
   color: (name: string) => char(name, { length: 9 }),

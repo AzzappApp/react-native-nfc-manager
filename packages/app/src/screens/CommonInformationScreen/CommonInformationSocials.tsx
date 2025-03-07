@@ -3,11 +3,11 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { SOCIAL_NETWORK_LINKS } from '@azzapp/shared/socialLinkHelpers';
 import { colors } from '#theme';
-import ContactCardEditModalField from '#components/ContactCard/ContactCardEditField';
+import ContactCardEditModalField from '#components/Contact/ContactEditField';
 import {
-  contactCardEditModalStyleSheet,
+  contactEditStyleSheet,
   useSocialLinkLabels,
-} from '#helpers/contactCardHelpers';
+} from '#helpers/contactHelpers';
 import { useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
@@ -29,7 +29,7 @@ const CommonInformationSocials = ({
 
   const labelValues = useSocialLinkLabels();
 
-  const styles = useStyleSheet(contactCardEditModalStyleSheet);
+  const styles = useStyleSheet(contactEditStyleSheet);
 
   return (
     <>

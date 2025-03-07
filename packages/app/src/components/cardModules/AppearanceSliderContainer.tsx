@@ -49,10 +49,16 @@ const AppearanceSliderContainer = ({
   const itemStartY =
     (modulePosition ?? 0) + offsetY + ANIMATION_DELAY_BUFFER_PIXEL;
 
-  const inViewport = useIsModuleItemInViewPort(scrollY, itemStartY, dimension);
   const [componentY, setComponentY] = useState(0);
   const [componentHeight, setComponentHeight] = useState(0);
-
+  const inViewport = useIsModuleItemInViewPort(
+    scrollY,
+    itemStartY + componentHeight,
+    componentHeight,
+    componentHeight > 0,
+    webCardViewMode === 'edit',
+    dimension,
+  );
   const onLayout = useCallback((event: LayoutChangeEvent) => {
     setComponentY(event.nativeEvent.layout.y);
     setComponentHeight(event.nativeEvent.layout.height);
@@ -66,10 +72,27 @@ const AppearanceSliderContainer = ({
 
   const isRunning = useRef(false);
   const hideAnimation = useRef<Animated.CompositeAnimation | null>(null);
+
   useEffect(() => {
     const itemStartY = (modulePosition ?? 0) + (parentY ?? 0) + componentY;
     const itemEndY = itemStartY + componentHeight;
     const viewportHeight = dimension.height;
+    Animated.parallel([
+      Animated.timing(translateY, {
+        toValue: 0,
+        duration: ANIMATION_DURATION,
+        useNativeDriver: true,
+      }),
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 500, //different than animation duration, tested with upmitt, submit to changes
+        useNativeDriver: true,
+      }),
+    ]).start(({ finished }) => {
+      if (finished) {
+        isRunning.current = false;
+      }
+    });
     const listener = scrollY.addListener(({ value }) => {
       if (
         value + viewportHeight - ANIMATION_DELAY_BUFFER_PIXEL >= itemStartY &&
@@ -169,6 +192,12 @@ const AppearanceSliderContainer = ({
     ],
   );
 
+  const imageQueuePriority = useMemo(
+    () =>
+      webCardViewMode === 'edit' ? 'normal' : inViewport ? 'high' : 'normal',
+    [inViewport, webCardViewMode],
+  );
+
   return (
     <View style={{ width: displayDimension.width }} onLayout={onLayout}>
       <Animated.View style={imageContainerStyle}>
@@ -180,6 +209,7 @@ const AppearanceSliderContainer = ({
             borderRadius: cardStyle?.borderRadius ?? 0,
             overflow: 'hidden',
           }}
+          priority={imageQueuePriority}
         />
       </Animated.View>
     </View>

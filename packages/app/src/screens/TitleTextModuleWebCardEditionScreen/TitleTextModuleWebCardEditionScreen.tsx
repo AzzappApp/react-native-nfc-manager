@@ -147,6 +147,7 @@ const TitleTextModuleWebCardEditionScreen = (
           },
           onCompleted(_, error) {
             handleOnCompletedModuleSave(
+              !data?.id,
               null,
               router,
               error,

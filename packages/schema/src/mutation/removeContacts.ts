@@ -1,5 +1,9 @@
 import { GraphQLError } from 'graphql';
-import { removeContacts } from '@azzapp/data';
+import {
+  getWebcardsMediaFromContactIds,
+  referencesMedias,
+  removeContacts,
+} from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { getSessionInfos } from '#GraphQLContext';
 import { profileLoader } from '#loaders';
@@ -29,6 +33,10 @@ const removeFollowerMutation: Mutation = async (
     fromGlobalIdWithType(contactIdToRemove, 'Contact'),
   );
 
+  const data = await getWebcardsMediaFromContactIds(contactIdsToRemove);
+  if (data.length) {
+    await referencesMedias([], data);
+  }
   await removeContacts(profileId, contactIdsToRemove);
 
   return {

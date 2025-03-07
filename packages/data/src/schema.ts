@@ -245,10 +245,10 @@ export const CoverTemplateTable = cols.table('CoverTemplate', {
   order: cols.int('order').notNull().default(1),
   tags: cols.json('tags').$type<string[]>().notNull(),
   typeId: cols.cuid('typeId').notNull(),
-  lottieId: cols.cuid('lottieId').notNull(),
+  lottieId: cols.lottieId('lottieId').notNull(),
   mediaCount: cols.int('mediaCount').notNull(),
   medias: cols.json('medias').$type<CoverTemplateMedia[]>(),
-  previewId: cols.cuid('previewId').notNull(),
+  previewId: cols.mediaId('previewId').notNull(),
   colorPaletteId: cols.cuid('colorPaletteId').notNull(),
   enabled: cols.boolean('enabled').default(true).notNull(),
   params: cols.json('params').$type<CoverTemplateParams>(),
@@ -632,6 +632,7 @@ export const ProfileTable = cols.table(
       .dateTime('lastContactViewAt')
       .default(DEFAULT_DATETIME_VALUE)
       .notNull(),
+    hasGooglePass: cols.boolean('hasGooglePass').default(false).notNull(),
   },
   table => {
     return {
@@ -749,7 +750,14 @@ export const UserTable = cols.table(
     deleted: cols.boolean('deleted').default(false).notNull(),
     deletedAt: cols.dateTime('deletedAt'),
     deletedBy: cols.cuid('deletedBy'),
+    replacedBy: cols.cuid('replacedBy'),
     note: cols.text('note'),
+    termsOfUseAcceptedVersion: cols.defaultVarchar('termsOfUseAcceptedVersion'),
+    termsOfUseAcceptedAt: cols.dateTime('termsOfUseAcceptedAt'),
+    hasAcceptedCommunications: cols
+      .boolean('hasAcceptedCommunications')
+      .default(false)
+      .notNull(),
   },
   table => {
     return {
@@ -905,6 +913,10 @@ export const WebCardTable = cols.table(
       .boolean('coverIsPredefined')
       .default(false)
       .notNull(),
+    coverIsLogoPredefined: cols
+      .boolean('coverIsLogoPredefined')
+      .default(false)
+      .notNull(),
     coverPreviewPositionPercentage: cols.int('coverPreviewPositionPercentage'),
     companyActivityLabel: cols.defaultVarchar('companyActivityLabel'),
 
@@ -979,6 +991,7 @@ export const ContactTable = cols.table(
     lastName: cols.defaultVarchar('lastName').default('').notNull(),
     company: cols.defaultVarchar('company').default('').notNull(),
     title: cols.defaultVarchar('title').default('').notNull(),
+    avatarId: cols.mediaId('avatarId'),
     createdAt: cols
       .dateTime('createdAt')
       .notNull()
@@ -1003,6 +1016,7 @@ export const ContactTable = cols.table(
     socials: cols
       .json('socials')
       .$type<Array<{ url: string; label: string }>>(),
+    logoId: cols.mediaId('logoId'),
   },
   table => {
     return {
@@ -1042,3 +1056,35 @@ export const FCMTokenTable = cols.table(
 export type FCMToken = InferSelectModel<typeof FCMTokenTable>;
 
 //#endregion
+
+// #region TermsOfUse
+export const TermsOfUseTable = cols.table('TermsOfUse', {
+  version: cols.defaultVarchar('version').notNull().primaryKey(),
+  createdAt: cols
+    .dateTime('createdAt')
+    .notNull()
+    .default(DEFAULT_DATETIME_VALUE),
+});
+export type TermsOfUse = InferSelectModel<typeof TermsOfUseTable>;
+//#endregion
+
+export const PassRegistrationTable = cols.table(
+  'PassRegistration',
+  {
+    deviceIdentifier: cols.defaultVarchar('deviceIdentifier').notNull(),
+    passTypeIdentifier: cols.defaultVarchar('passTypeIdentifier').notNull(),
+    serial: cols.defaultVarchar('serial').notNull(),
+    pushToken: cols.defaultVarchar('pushToken').notNull(),
+    createdAt: cols
+      .dateTime('createdAt')
+      .notNull()
+      .default(DEFAULT_DATETIME_VALUE),
+  },
+  table => ({
+    pk: cols.primaryKey({
+      columns: [table.deviceIdentifier, table.passTypeIdentifier, table.serial],
+    }),
+  }),
+);
+
+export type PassRegistration = InferSelectModel<typeof PassRegistrationTable>;

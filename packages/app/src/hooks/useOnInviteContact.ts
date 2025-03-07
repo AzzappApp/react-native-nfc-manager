@@ -9,7 +9,7 @@ import { useIntl } from 'react-intl';
 import Toast from 'react-native-toast-message';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { emitContactAdded } from '#helpers/addContactHelper';
-import { contactStorage, findLocalContact } from '#helpers/contactCardHelpers';
+import { contactStorage, findLocalContact } from '#helpers/contactHelpers';
 import {
   buildLocalContact,
   reworkContactForDeviceInsert,
@@ -106,6 +106,13 @@ const useOnInviteContact = ({ onEnd }: { onEnd?: () => void } = {}) => {
               );
 
               const resultId = await addContactAsync(contact).catch(e => {
+                Toast.show({
+                  type: 'error',
+                  text1: intl.formatMessage({
+                    defaultMessage: 'Create contact failed.',
+                    description: 'Toast for creating new contact failed',
+                  }),
+                });
                 Sentry.captureException(e);
                 return '';
               });

@@ -1,18 +1,15 @@
 import { useState, useEffect } from 'react';
-import { Dimensions } from 'react-native';
+import type { CardModuleDimension } from '#components/cardModules/cardModuleEditorType';
 import type { Animated } from 'react-native';
-
-const viewportHeight = Dimensions.get('window').height;
-
 const isInsideViewport = (
   scrollPosition: number,
   modulePosition: number,
   moduleHeight: number,
+  viewportHeight: number,
 ): boolean => {
   const buffer = 10;
   const viewportTop = scrollPosition - buffer;
   const viewportBottom = scrollPosition + viewportHeight + buffer;
-
   const moduleTop = modulePosition;
   const moduleBottom = modulePosition + moduleHeight;
 
@@ -29,30 +26,42 @@ const isInsideViewport = (
 const useIsModuleItemInViewPort = (
   scrollY: Animated.Value,
   itemStartY: number,
-  dimension: { height: number },
+  componentheight: number,
+  isLayoutReady: boolean, // sometimes we need to wait for the layout to calculate the initial position when we did not start the scrolling
+  cancel: boolean,
+  dimension: CardModuleDimension,
 ) => {
-  const [isVisible, setIsVisible] = useState(
-    isInsideViewport(
-      //@ts-expect-error scrollY is a RNAnimated.Value
-      scrollY.__getValue(),
-      itemStartY,
-      dimension.height,
-    ),
-  );
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // Initial check
+    if (isLayoutReady) {
+      setIsVisible(
+        isInsideViewport(
+          //@ts-expect-error - __getValue is private but we need it
+          scrollY.__getValue(),
+          itemStartY,
+          componentheight,
+          dimension.height,
+        ),
+      );
+    }
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLayoutReady]);
+
+  useEffect(() => {
     const listener = scrollY.addListener(({ value }) => {
-      setIsVisible(isInsideViewport(value, itemStartY, dimension.height));
+      setIsVisible(
+        isInsideViewport(value, itemStartY, componentheight, dimension.height),
+      );
     });
 
     return () => {
       scrollY.removeListener(listener);
     };
-  }, [scrollY, itemStartY, dimension]);
+  }, [scrollY, itemStartY, componentheight, dimension.height]);
 
-  return isVisible;
+  return cancel ? false : isVisible;
 };
 
 export default useIsModuleItemInViewPort;

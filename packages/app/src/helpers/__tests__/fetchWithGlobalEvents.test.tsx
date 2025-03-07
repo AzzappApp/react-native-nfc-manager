@@ -8,7 +8,7 @@ jest.mock('../globalEvents', () => ({
 describe('fetchWithGlobalEvents', () => {
   afterEach(() => jest.clearAllMocks());
 
-  it('should call fetchJSON with the given input and init parameters', async () => {
+  test('should call fetchJSON with the given input and init parameters', async () => {
     const input = 'http://test.com';
     const init = { method: 'POST' };
     const fetchSpy = jest
@@ -21,7 +21,7 @@ describe('fetchWithGlobalEvents', () => {
     expect(fetchSpy).toHaveBeenCalledWith(input, init);
   });
 
-  it('should dispatch a NETWORK_ERROR event if an error occurs', async () => {
+  test('should dispatch a NETWORK_ERROR event if an error occurs', async () => {
     const input = 'http://test.com';
     const init = { method: 'POST' };
     const error = new Error('Sample error message');

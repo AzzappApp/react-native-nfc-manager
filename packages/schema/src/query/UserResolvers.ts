@@ -7,6 +7,7 @@ import {
   countUserPayments,
   getActiveUserSubscriptions,
   getTotalMultiUser,
+  getLastTermsOfUse,
 } from '@azzapp/data';
 import { getSessionInfos } from '#GraphQLContext';
 import {
@@ -120,5 +121,10 @@ export const User: ProtectedResolver<UserResolvers> = {
     }
     const totalSeats = await getTotalMultiUser(user.id);
     return totalSeats;
+  },
+  hasAcceptedLastTermsOfUse: async user => {
+    const termsOfUse = await getLastTermsOfUse();
+
+    return !termsOfUse || termsOfUse.version === user.termsOfUseAcceptedVersion;
   },
 };

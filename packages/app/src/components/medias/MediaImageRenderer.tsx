@@ -84,6 +84,8 @@ export type MediaImageRendererProps = Pick<ViewProps, 'style' | 'testID'> & {
    * so we are gonna limit the usage only in flashlist case
    */
   useRecycling?: boolean;
+
+  priority?: 'high' | 'low' | 'normal';
 };
 
 /**
@@ -105,6 +107,7 @@ const MediaImageRenderer = (
     testID,
     cachePolicy,
     useRecycling = false,
+    priority = 'normal',
   }: MediaImageRendererProps,
   ref: ForwardedRef<MediaImageRendererHandle>,
 ) => {
@@ -242,6 +245,7 @@ const MediaImageRenderer = (
         style={StyleSheet.absoluteFill}
         blurRadius={blurRadius}
         cachePolicy={optiCachePolicy}
+        priority={priority}
       />
       {thumbnail && (
         <Image

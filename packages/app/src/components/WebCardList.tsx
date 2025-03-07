@@ -7,7 +7,6 @@ import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { keyExtractor } from '#helpers/idHelpers';
 import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
-import SearchBar from '#ui/SearchBar';
 import Text from '#ui/Text';
 import CoverLink from './CoverLink';
 import Link from './Link';
@@ -78,8 +77,6 @@ type ProfileListProps = {
   style?: StyleProp<ViewStyle>;
   onToggleFollow?: (id: string, userName: string) => void;
   noProfileFoundLabel: string;
-  searchValue: string | undefined;
-  setSearchValue: (value: string | undefined) => void;
 };
 
 const COVER_WIDTH = 35;
@@ -99,8 +96,6 @@ const WebCardList = ({
   style,
   onToggleFollow,
   noProfileFoundLabel,
-  searchValue,
-  setSearchValue,
 }: ProfileListProps) => {
   const users = useFragment(
     graphql`
@@ -136,11 +131,6 @@ const WebCardList = ({
       contentContainerStyle={styles.container}
       style={style}
       getItemLayout={getItemLayout}
-      ListHeaderComponent={
-        <View style={styles.header}>
-          <SearchBar onChangeText={setSearchValue} value={searchValue} />
-        </View>
-      }
       ListEmptyComponent={
         <View style={styles.empty}>
           <Text variant="medium">{noProfileFoundLabel}</Text>
@@ -158,7 +148,7 @@ const styleSheet = createStyleSheet((appareance: ColorSchemeName) => ({
     flexGrow: 1,
     rowGap: SEPARATOR_HEIGHT,
   },
-  header: { paddingHorizontal: 10 },
+
   item: {
     paddingRight: 10,
     columnGap: 15.5,

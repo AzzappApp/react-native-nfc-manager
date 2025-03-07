@@ -1,4 +1,4 @@
-import { Linking } from 'react-native';
+import { Linking, View } from 'react-native';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
   COVER_LINK_SIZE_TO_BORDER_RATIO,
@@ -62,30 +62,34 @@ export const SocialLinkRenderer = ({
           generateSocialLink(link.socialId as SocialLinkId, link.link),
         );
       }}
-      style={[
-        {
-          display: 'flex',
-          width,
-          height,
-          borderStyle: 'solid',
-          borderWidth,
-          borderRadius,
-          borderColor,
-          alignItems: 'center',
-          justifyContent: 'center',
-        },
-        hasShadow ? shadow('dark') : undefined,
-      ]}
       disabled={disabled}
+      disabledOpacity={1}
     >
-      <SocialIcon
-        style={{
-          height: convertToBaseCanvasRatio(size, viewWidth),
-          width: convertToBaseCanvasRatio(size, viewWidth),
-          tintColor: swapColor(color, cardColors),
-        }}
-        icon={link.socialId as SocialLinkId}
-      />
+      <View
+        style={[
+          {
+            display: 'flex',
+            width,
+            height,
+            borderStyle: 'solid',
+            borderWidth,
+            borderRadius,
+            borderColor,
+            alignItems: 'center',
+            justifyContent: 'center',
+          },
+          hasShadow ? shadow('dark') : undefined,
+        ]}
+      >
+        <SocialIcon
+          style={{
+            height: convertToBaseCanvasRatio(size, viewWidth),
+            width: convertToBaseCanvasRatio(size, viewWidth),
+            tintColor: swapColor(color, cardColors),
+          }}
+          icon={link.socialId as SocialLinkId}
+        />
+      </View>
     </PressableNative>
   );
 };

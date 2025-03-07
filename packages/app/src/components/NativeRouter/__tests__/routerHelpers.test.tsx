@@ -9,7 +9,7 @@ import type { RouterState, StackState } from '../routerTypes';
 
 describe('routerHelper', () => {
   describe('getCurrentRouteFromState', () => {
-    it('should return the current route from a simple stack', () => {
+    test('should return the current route from a simple stack', () => {
       const state: RouterState = {
         stack: [
           { id: 'home', kind: 'route', state: {} as Route },
@@ -22,7 +22,7 @@ describe('routerHelper', () => {
       expect(currentRoute?.id).toBe('details');
     });
 
-    it('should return the current route from a nested tabs', () => {
+    test('should return the current route from a nested tabs', () => {
       const state: RouterState = {
         stack: [
           {
@@ -47,7 +47,7 @@ describe('routerHelper', () => {
       expect(currentRoute?.id).toBe('tab2');
     });
 
-    it('should return null if stack is empty', () => {
+    test('should return null if stack is empty', () => {
       const state: RouterState = {
         stack: [],
         modals: [],
@@ -59,7 +59,7 @@ describe('routerHelper', () => {
   });
 
   describe('getAllRoutesFromStack', () => {
-    it('should return all routes from a simple stack', () => {
+    test('should return all routes from a simple stack', () => {
       const state: StackState = [
         { id: 'home', kind: 'route', state: {} as Route },
         { id: 'details', kind: 'route', state: {} as Route },
@@ -71,7 +71,7 @@ describe('routerHelper', () => {
       expect(routes[1].id).toBe('home');
     });
 
-    it('should return all routes from a nested tabs', () => {
+    test('should return all routes from a nested tabs', () => {
       const state: StackState = [
         {
           id: 'tabs',
@@ -95,7 +95,7 @@ describe('routerHelper', () => {
       expect(routes[1].id).toBe('tab2');
     });
 
-    it('should return not inactive tabs', () => {
+    test('should return not inactive tabs', () => {
       let state: StackState = [
         {
           id: 'tabs',
@@ -163,7 +163,7 @@ describe('routerHelper', () => {
   });
 
   describe('getActiveTabs', () => {
-    it('should return active tabs state from a nested tabs', () => {
+    test('should return active tabs state from a nested tabs', () => {
       const state: RouterState = {
         stack: [
           {
@@ -188,7 +188,7 @@ describe('routerHelper', () => {
       expect(activeTabs?.currentIndex).toBe(1);
     });
 
-    it('should return null if no tabs in stack', () => {
+    test('should return null if no tabs in stack', () => {
       const state: RouterState = {
         stack: [{ id: 'home', kind: 'route', state: {} as Route }],
         modals: [],
@@ -200,7 +200,7 @@ describe('routerHelper', () => {
   });
 
   describe('dispatchToListeners', () => {
-    it('should call all listeners with provided arguments', () => {
+    test('should call all listeners with provided arguments', () => {
       const listener1 = jest.fn();
       const listener2 = jest.fn();
       const listeners = [listener1, listener2];

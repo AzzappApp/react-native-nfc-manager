@@ -13,7 +13,7 @@ jest.mock('react-native/Libraries/Utilities/useColorScheme', () => {
 describe('RadioButton', () => {
   const onChange = jest.fn();
 
-  it('calls `onChange` prop when pressed', () => {
+  test('calls `onChange` prop when pressed', () => {
     const { getByRole } = render(
       <RadioButton checked={false} onChange={onChange} />,
     );
@@ -22,13 +22,13 @@ describe('RadioButton', () => {
     expect(onChange).toHaveBeenCalled();
   });
 
-  it('renders as checked when checked prop is true', () => {
+  test('renders as checked when checked prop is true', () => {
     const { getByRole } = render(<RadioButton checked onChange={onChange} />);
     const radio = getByRole('radio');
     expect(radio.props.accessibilityState.checked).toBe(true);
   });
 
-  it('renders correctly with small variant and dark mode', () => {
+  test('renders correctly with small variant and dark mode', () => {
     mockedUseColorScheme.mockReturnValue('dark');
     const { getByRole } = render(
       <RadioButton checked={false} onChange={onChange} variant="small" />,

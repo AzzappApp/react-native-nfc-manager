@@ -1,23 +1,21 @@
 import { useCallback, useEffect } from 'react';
 import Purchases from 'react-native-purchases';
-import { graphql, useLazyLoadQuery } from 'react-relay';
+import { graphql, useFragment } from 'react-relay';
 import { useProfileInfos } from './authStateHooks';
-import type { useSetRevenueCatUserInfoQuery } from '#relayArtifacts/useSetRevenueCatUserInfoQuery.graphql';
-const setRevenueCatUserInfoQuery = graphql`
-  query useSetRevenueCatUserInfoQuery {
-    currentUser {
-      id
-      email
-      phoneNumber
-    }
-  }
-`;
+import type { useSetRevenueCatUserInfo_user$key } from '#relayArtifacts/useSetRevenueCatUserInfo_user.graphql';
 
-export function useSetRevenueCatUserInfo() {
-  const { currentUser } = useLazyLoadQuery<useSetRevenueCatUserInfoQuery>(
-    setRevenueCatUserInfoQuery,
-    {},
-    { fetchPolicy: 'store-and-network' },
+export function useSetRevenueCatUserInfo(
+  userKey: useSetRevenueCatUserInfo_user$key | null,
+) {
+  const currentUser = useFragment(
+    graphql`
+      fragment useSetRevenueCatUserInfo_user on User {
+        id
+        email
+        phoneNumber
+      }
+    `,
+    userKey,
   );
 
   const profileInfos = useProfileInfos();

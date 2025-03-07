@@ -18,6 +18,7 @@ import {
   Pressable,
   useWindowDimensions,
 } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_CARD_RADIUS, COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { ENABLE_MULTI_USER } from '#Config';
@@ -33,6 +34,7 @@ import { logEvent } from '#helpers/analytics';
 import { getAuthState, onChangeWebCard } from '#helpers/authStore';
 import {
   profileInfoHasAdminRight,
+  profileInfoHasEditorRight,
   profileInfoIsOwner,
 } from '#helpers/profileRoleHelper';
 import { useTooltipContext } from '#helpers/TooltipContext';
@@ -306,6 +308,7 @@ const ItemRenderComponent = ({
           userName
           hasCover
           coverIsPredefined
+          coverIsLogoPredefined
           ...CoverLink_webCard
           ...CoverRenderer_webCard
           ...WebCardMenu_webCard
@@ -374,9 +377,21 @@ const ItemRenderComponent = ({
   }, [scrollToIndex, isCurrent, index]);
 
   const onPressEdit = () => {
-    router.push({
-      route: 'COVER_TEMPLATE_SELECTION',
-    });
+    const { profileInfos } = getAuthState();
+    if (profileInfoHasEditorRight(profileInfos)) {
+      router.push({
+        route: 'COVER_TEMPLATE_SELECTION',
+      });
+    } else {
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage({
+          defaultMessage: 'Your role does not permit this action',
+          description:
+            'Error message when a user tries to edit a post but is not an admin',
+        }),
+      });
+    }
   };
 
   const { registerTooltip, unregisterTooltip } = useTooltipContext();
@@ -441,21 +456,20 @@ const ItemRenderComponent = ({
         ) : profile.webCard?.hasCover ? (
           <View style={styles.coverLinkWrapper}>
             {profile.webCard?.coverIsPredefined ? (
-              <Link route="COVER_TEMPLATE_SELECTION">
-                <PressableScaleHighlight
-                  style={containerStyle}
-                  onLongPress={openWebcardModal}
-                >
-                  <CoverRenderer
-                    webCard={profile.webCard}
-                    width={coverWidth}
-                    canPlay={isCurrent && canPlay}
-                    paused={paused}
-                    onReadyForDisplay={onReady}
-                    onError={onError}
-                  />
-                </PressableScaleHighlight>
-              </Link>
+              <PressableScaleHighlight
+                style={containerStyle}
+                onLongPress={openWebcardModal}
+                onPress={onPressEdit}
+              >
+                <CoverRenderer
+                  webCard={profile.webCard}
+                  width={coverWidth}
+                  canPlay={isCurrent && canPlay}
+                  paused={paused}
+                  onReadyForDisplay={onReady}
+                  onError={onError}
+                />
+              </PressableScaleHighlight>
             ) : (
               <CoverLink
                 webCard={profile.webCard}
@@ -468,7 +482,8 @@ const ItemRenderComponent = ({
                 prefetch
               />
             )}
-            {profile.webCard?.coverIsPredefined && (
+            {(profile.webCard?.coverIsPredefined ||
+              profile.webCard?.coverIsLogoPredefined) && (
               <PressableNative
                 style={styles.editUserContainer}
                 onPress={onPressEdit}

@@ -64,6 +64,30 @@ export const getWebcardsFromContactIds = (
     .then(rows => rows.map(({ id }) => id));
 };
 
+/**
+ * return a list of MediaIds linked to the contact (logoIds and avatarIds)
+ *
+ * @param contactIds a list of contacts ids
+ * @returns a list of MediaIds
+ */
+export const getWebcardsMediaFromContactIds = (
+  contactIds: string[],
+): Promise<string[]> => {
+  return db()
+    .select({ logo: ContactTable.logoId, avatar: ContactTable.avatarId })
+    .from(WebCardTable)
+    .innerJoin(ProfileTable, eq(WebCardTable.id, ProfileTable.webCardId))
+    .innerJoin(ContactTable, eq(ContactTable.ownerProfileId, ProfileTable.id))
+    .where(inArray(ContactTable.id, contactIds))
+    .then(rows => {
+      return rows.reduce((acc, { logo, avatar }) => {
+        if (logo) acc.push(logo);
+        if (avatar) acc.push(avatar);
+        return acc;
+      }, [] as string[]);
+    });
+};
+
 export const getContactCount = (profileId: string): Promise<number> => {
   return db()
     .select({ count: count() })

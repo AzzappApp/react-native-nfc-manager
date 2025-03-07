@@ -4,9 +4,11 @@ import { NextResponse } from 'next/server';
 import * as z from 'zod';
 import {
   createUser,
+  getLastTermsOfUse,
   getProfilesByUser,
   getUserByEmail,
   getUserByPhoneNumber,
+  transaction,
   updateUser,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
@@ -32,6 +34,7 @@ const SignupSchema = z
       }),
     password: z.string().regex(REGEX_PWD, ERRORS.PASSWORD_NOT_VALID),
     locale: z.string().optional(),
+    hasAcceptedCommunications: z.boolean(),
   })
   .refine(
     ({ phoneNumber, email }) => {
@@ -94,31 +97,62 @@ export const POST = withPluginsRoute(async (req: Request) => {
     );
   }
 
-  const { email, phoneNumber, password, locale } = result.data;
+  const { email, phoneNumber, password, locale, hasAcceptedCommunications } =
+    result.data;
 
   try {
+    let user: User | null = null;
     if (email) {
-      const user = await getUserByEmail(email);
-      if (user != null) {
+      user = await getUserByEmail(email);
+      if (user != null && !user.deleted) {
         return handleExistingUser(user, password);
       }
     }
 
     if (phoneNumber) {
-      const user = await getUserByPhoneNumber(formatPhoneNumber(phoneNumber));
-      if (user != null) {
+      user = await getUserByPhoneNumber(formatPhoneNumber(phoneNumber));
+      if (user != null && !user.deleted) {
         return handleExistingUser(user, password);
       }
     }
 
     const userPhoneNumber = phoneNumber ? formatPhoneNumber(phoneNumber) : null;
-    await createUser({
-      email: email ?? null,
-      phoneNumber: userPhoneNumber,
-      password: bcrypt.hashSync(password, 12),
-      locale: locale ?? null,
-      roles: null,
-    });
+    const termsOfUse = await getLastTermsOfUse();
+    if (user) {
+      await transaction(async () => {
+        await updateUser(user.id, {
+          email: user.email === email ? null : user.email,
+          phoneNumber:
+            user.phoneNumber === userPhoneNumber ? null : user.phoneNumber,
+        });
+
+        const userId = await createUser({
+          email: email ?? null,
+          phoneNumber: userPhoneNumber,
+          password: bcrypt.hashSync(password, 12),
+          locale: locale ?? null,
+          roles: null,
+          termsOfUseAcceptedVersion: termsOfUse?.version ?? null,
+          termsOfUseAcceptedAt: termsOfUse ? new Date() : null,
+          hasAcceptedCommunications,
+        });
+
+        await updateUser(user.id, {
+          replacedBy: userId,
+        });
+      });
+    } else {
+      await createUser({
+        email: email ?? null,
+        phoneNumber: userPhoneNumber,
+        password: bcrypt.hashSync(password, 12),
+        locale: locale ?? null,
+        roles: null,
+        termsOfUseAcceptedVersion: termsOfUse?.version ?? null,
+        termsOfUseAcceptedAt: termsOfUse ? new Date() : null,
+        hasAcceptedCommunications,
+      });
+    }
 
     const issuer = (email ?? userPhoneNumber) as string;
     const verification = await sendTwilioVerificationCode(

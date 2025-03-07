@@ -2,6 +2,8 @@ import * as FileSystem from 'expo-file-system';
 import { useCallback, useImperativeHandle, useState, forwardRef } from 'react';
 import { graphql, useFragment } from 'react-relay';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
+import { colors } from '#theme';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useScreenDimensions from '#hooks/useScreenDimensions';
 import ContactDetailsBody from '#screens/ContactDetailsScreen/ContactDetailsBody';
 import BottomSheetModal from '#ui/BottomSheetModal';
@@ -22,6 +24,7 @@ const ContactDetailsModal = (
 ) => {
   const [details, setDetails] = useState<ContactDetails | null>(null);
   const { height } = useScreenDimensions();
+  const styles = useStyleSheet(stylesheet);
 
   const onClose = useCallback(() => {
     setDetails(null);
@@ -96,7 +99,12 @@ const ContactDetailsModal = (
   ]);
 
   return (
-    <BottomSheetModal height={height} visible={!!details} onDismiss={onClose}>
+    <BottomSheetModal
+      height={height}
+      visible={!!details}
+      onDismiss={onClose}
+      backgroundStyle={styles.background}
+    >
       {details && (
         <ContactDetailsBody
           details={{
@@ -110,5 +118,10 @@ const ContactDetailsModal = (
     </BottomSheetModal>
   );
 };
+const stylesheet = createStyleSheet(theme => ({
+  background: {
+    backgroundColor: theme === 'dark' ? colors.grey1000 : 'white',
+  },
+}));
 
 export default forwardRef(ContactDetailsModal);

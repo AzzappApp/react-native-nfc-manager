@@ -83,6 +83,7 @@ const MediaModuleRenderer = ({
   scrollPosition,
   onLayout,
   colorPalette,
+  webCardViewMode,
   moduleEditing = false,
   ...props
 }: MediaModuleRendererProps) => {
@@ -97,6 +98,7 @@ const MediaModuleRenderer = ({
           cardModuleMedias={data.cardModuleMedias}
           cardModuleColor={data.cardModuleColor}
           displayMode={displayMode}
+          cancelAutoPlay={webCardViewMode === 'edit'}
           moduleEditing={moduleEditing}
           {...props}
         />
@@ -111,6 +113,7 @@ const MediaModuleRenderer = ({
             displayMode={displayMode}
             scrollPosition={scrollPosition}
             moduleEditing={moduleEditing}
+            webCardViewMode={webCardViewMode}
             {...props}
           />
         </CardModuleEditionScrollHandler>
@@ -131,6 +134,7 @@ const MediaModuleRenderer = ({
             square={isSquareGrid(variant)}
             nbColumns={getGridNumberColumn(variant)}
             moduleEditing={moduleEditing}
+            webCardViewMode={webCardViewMode}
             {...props}
           />
         </CardModuleEditionScrollHandler>

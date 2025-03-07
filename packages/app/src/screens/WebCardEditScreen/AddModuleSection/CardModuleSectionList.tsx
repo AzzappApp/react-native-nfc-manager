@@ -2,12 +2,16 @@ import { memo, useCallback } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 import { graphql, useFragment } from 'react-relay';
 import { moduleCountRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
+import { useRouter } from '#components/NativeRouter';
 import { MODULE_VARIANT_SECTION } from '#helpers/webcardModuleHelpers';
 import { useModuleLabel } from '#hooks/useModuleVariantsLabel';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Text from '#ui/Text';
 import CoverSectionModules from './CoverSectionModules';
-import type { ModuleKindSection } from '#helpers/webcardModuleHelpers';
+import type {
+  ModuleKindSection,
+  ModuleKindWithVariant,
+} from '#helpers/webcardModuleHelpers';
 import type { CardModuleSectionList_webCard$key } from '#relayArtifacts/CardModuleSectionList_webCard.graphql';
 import type { ListRenderItemInfo } from 'react-native';
 
@@ -16,6 +20,8 @@ type CardModuleSectionListProps = {
 };
 
 const CardModuleSectionList = ({ webCardKey }: CardModuleSectionListProps) => {
+  const router = useRouter();
+
   const webCard = useFragment(
     graphql`
       fragment CardModuleSectionList_webCard on WebCard {
@@ -29,25 +35,42 @@ const CardModuleSectionList = ({ webCardKey }: CardModuleSectionListProps) => {
     `,
     webCardKey,
   );
-  const cardModulesCount = webCard.cardModules?.length;
-
-  const addingModuleRequiresSubscription =
-    moduleCountRequiresSubscription(cardModulesCount + 1) &&
-    webCard.cardIsPublished &&
-    !webCard.isPremium;
 
   const { bottom } = useScreenInsets();
+
+  const onSelectModuleKind = useCallback(
+    (variant: ModuleKindWithVariant) => {
+      const cardModulesCount = webCard.cardModules?.length;
+      const addingModuleRequiresSubscription =
+        moduleCountRequiresSubscription(cardModulesCount + 1) &&
+        webCard.cardIsPublished &&
+        !webCard.isPremium;
+
+      if (!variant) return;
+
+      router.push({
+        route: 'MODULE_PREVIEW',
+        params: {
+          variant,
+          requireSubscription: addingModuleRequiresSubscription,
+        },
+      });
+    },
+    [
+      router,
+      webCard.cardIsPublished,
+      webCard.cardModules?.length,
+      webCard.isPremium,
+    ],
+  );
 
   const renderItem = useCallback(
     ({ item }: ListRenderItemInfo<ModuleKindSection>) => {
       return (
-        <SectionModules
-          item={item}
-          addingModuleRequiresSubscription={addingModuleRequiresSubscription}
-        />
+        <SectionModules item={item} onSelectModuleKind={onSelectModuleKind} />
       );
     },
-    [addingModuleRequiresSubscription],
+    [onSelectModuleKind],
   );
 
   return (
@@ -72,12 +95,10 @@ export default CardModuleSectionList;
 
 type SectionModulesProps = {
   item: ModuleKindSection;
-  addingModuleRequiresSubscription: boolean;
+  onSelectModuleKind: (variant: ModuleKindWithVariant) => void;
 };
-const Item = ({
-  item,
-  addingModuleRequiresSubscription,
-}: SectionModulesProps) => {
+
+const Item = ({ item, onSelectModuleKind }: SectionModulesProps) => {
   const label = useModuleLabel(item.section);
   return (
     <View>
@@ -86,7 +107,7 @@ const Item = ({
       </Text>
       <CoverSectionModules
         section={item}
-        addingModuleRequiresSubscription={addingModuleRequiresSubscription}
+        onSelectModuleKind={onSelectModuleKind}
       />
     </View>
   );
@@ -100,7 +121,5 @@ const styles = StyleSheet.create({
     columnGap: 10,
   },
   textItem: { marginHorizontal: 10 },
-  flatList: {
-    paddingTop: 20,
-  },
+  flatList: { paddingTop: 20 },
 });

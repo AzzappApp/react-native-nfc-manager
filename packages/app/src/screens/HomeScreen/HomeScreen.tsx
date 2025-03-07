@@ -33,6 +33,7 @@ export const homeScreenQuery = graphql`
       ...HomeScreenContent_user
       ...HomeScreenContext_user
       ...HomeScreenPrefetcher_user
+      ...useSetRevenueCatUserInfo_user
     }
   }
 `;
@@ -44,10 +45,12 @@ const HomeScreen = ({
 }: RelayScreenProps<HomeRoute, HomeScreenQuery>) => {
   //we need to wait the initial screen to be load before doing any deep link
   useDeepLinkStoredRoute();
-  useSetRevenueCatUserInfo();
 
   const { currentUser } = usePreloadedQuery(homeScreenQuery, preloadedQuery);
+
+  useSetRevenueCatUserInfo(currentUser);
   useRevenueCat(currentUser?.id);
+
   const router = useRouter();
 
   useEffect(() => {

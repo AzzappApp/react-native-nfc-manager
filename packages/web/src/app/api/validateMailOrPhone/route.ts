@@ -20,7 +20,7 @@ const ValidateSchema = z.union([
 
 export const POST = withPluginsRoute(async (req: Request) => {
   try {
-    checkServerAuth();
+    await checkServerAuth();
     const body = await req.json();
     const input = ValidateSchema.parse(body);
 
@@ -58,3 +58,5 @@ export const POST = withPluginsRoute(async (req: Request) => {
     );
   }
 });
+
+export const runtime = 'nodejs';

@@ -1,10 +1,10 @@
 import {
   AccountCircle,
-  DisplaySettings,
   Layers,
   People,
   PhoneIphone,
   StarsSharp,
+  Settings,
 } from '@mui/icons-material';
 import MenuIcon from '@mui/icons-material/Menu';
 import {
@@ -128,5 +128,5 @@ const SectionIcons: Record<string, React.ComponentType> = {
   covers: StarsSharp,
   sections: Layers,
   translations: Layers,
-  crons: DisplaySettings,
+  settings: Settings,
 };

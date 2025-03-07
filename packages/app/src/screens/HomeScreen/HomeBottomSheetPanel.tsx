@@ -12,7 +12,7 @@ import {
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
-import { profileIsOwner } from '@azzapp/shared/profileHelpers';
+import { SUPPORT_EMAIL } from '@azzapp/shared/emailHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { ENABLE_MULTI_USER } from '#Config';
 import { signInRoutes } from '#mobileRoutes';
@@ -35,6 +35,7 @@ import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import type { LinkProps } from '#components/Link';
 import type { HomeBottomSheetPanel_profile$key } from '#relayArtifacts/HomeBottomSheetPanel_profile.graphql';
+import type { HomeBottomSheetPanel_user$key } from '#relayArtifacts/HomeBottomSheetPanel_user.graphql';
 import type { Icons } from '#ui/Icon';
 import type { ReactNode } from 'react';
 
@@ -51,16 +52,15 @@ type HomeBottomSheetPanelProps = {
    */
   close: () => void;
 
+  user: HomeBottomSheetPanel_user$key | null;
   profile?: HomeBottomSheetPanel_profile$key | null;
-
-  userIsPremium?: boolean | null;
 };
 
 const HomeBottomSheetPanel = ({
   visible,
   close,
+  user: userKey,
   profile: profileKey,
-  userIsPremium,
 }: HomeBottomSheetPanelProps) => {
   const profile = useFragment(
     graphql`
@@ -72,14 +72,24 @@ const HomeBottomSheetPanel = ({
           userName
           cardIsPublished
           hasCover
-          requiresSubscription
-          isPremium
-          isWebSubscription
         }
         invited
       }
     `,
     profileKey ?? null,
+  );
+
+  const user = useFragment(
+    graphql`
+      fragment HomeBottomSheetPanel_user on User {
+        userSubscription {
+          status
+          issuer
+          id
+        }
+      }
+    `,
+    userKey ?? null,
   );
 
   const { bottom } = useScreenInsets();
@@ -235,10 +245,7 @@ const HomeBottomSheetPanel = ({
   >(
     () =>
       convertToNonNullArray([
-        !userIsPremium &&
-        profile?.webCard &&
-        !profile.webCard.isPremium &&
-        ENABLE_MULTI_USER
+        user?.userSubscription?.status !== 'active' && ENABLE_MULTI_USER
           ? {
               type: 'row',
               icon: 'plus',
@@ -282,9 +289,8 @@ const HomeBottomSheetPanel = ({
             close();
           },
         },
-        profile?.webCard?.isPremium &&
-        !profile?.webCard.isWebSubscription &&
-        profileIsOwner(profile.profileRole) &&
+        user?.userSubscription?.status === 'active' &&
+        user.userSubscription.issuer !== 'web' &&
         ENABLE_MULTI_USER
           ? {
               type: 'row',
@@ -383,7 +389,7 @@ const HomeBottomSheetPanel = ({
           }),
           onPress: () => {
             logEvent('open_mail_support');
-            Linking.openURL('mailto:support@azzapp.com');
+            Linking.openURL(`mailto:${SUPPORT_EMAIL}`);
           },
         },
         {
@@ -419,7 +425,15 @@ const HomeBottomSheetPanel = ({
           onPress: onLogout,
         },
       ]),
-    [close, intl, onLogout, onShare, profile, userIsPremium],
+    [
+      close,
+      intl,
+      onLogout,
+      onShare,
+      profile,
+      user?.userSubscription?.issuer,
+      user?.userSubscription?.status,
+    ],
   );
 
   const hasQuitWebcard = profile && !profileInfoIsOwner(profile);

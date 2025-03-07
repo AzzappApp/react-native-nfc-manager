@@ -1,6 +1,12 @@
 import { externalFunction } from './GraphQLContext';
-import type { WebCard } from '@azzapp/data';
+import type { AddContactInput } from '#__generated__/types';
+import type { Profile, WebCard } from '@azzapp/data';
 import type { Locale } from '@azzapp/i18n';
+
+type Parameters = {
+  profile?: Profile;
+  contact?: Partial<AddContactInput>;
+};
 
 export const notifyUsers =
   externalFunction<
@@ -8,8 +14,9 @@ export const notifyUsers =
       type: 'email' | 'phone',
       receivers: string[],
       webCard: WebCard,
-      notificationType: 'invitation' | 'transferOwnership',
+      notificationType: 'invitation' | 'transferOwnership' | 'vcard',
       locale: Locale,
+      parameters?: Parameters,
     ) => Promise<void>
   >('notifyUsers');
 
@@ -30,6 +37,14 @@ export const buildCoverAvatarUrl = externalFunction<
 export const validateMailOrPhone = externalFunction<
   (type: 'email' | 'phone', issuer: string, token: string) => Promise<void>
 >('validateMailOrPhone');
+
+export const notifyApplePassWallet = externalFunction<
+  (pushToken: string) => void
+>('notifyApplePassWallet');
+
+export const notifyGooglePassWallet = externalFunction<
+  (profileId: string, locale: string) => void
+>('notifyGooglePassWallet');
 
 type MessageType = {
   type: 'multiuser_invitation' | 'shareBack';

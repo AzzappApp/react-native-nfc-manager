@@ -54,12 +54,16 @@ export const contactCardSchema = z.object({
       uri: z.string(),
       id: z.string().optional(),
       local: z.boolean().optional(),
+      width: z.number().optional(),
+      height: z.number().optional(),
     })
     .optional()
     .nullable(),
   webCardKind: z.string().optional().nullable(),
   companyActivityLabel: z.string().optional().nullable(),
   companyUrl: z.string().optional().nullable(),
+  primaryColor: z.string().optional().nullable(),
+  expendableColor: z.string().optional().nullable(),
 });
 
 export type ContactCardFormValues = z.infer<typeof contactCardSchema>;

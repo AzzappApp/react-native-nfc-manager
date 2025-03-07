@@ -19,7 +19,7 @@ export const GET = withPluginsRoute(
       return NextResponse.json({ message: 'Invalid target' }, { status: 400 });
     }
     try {
-      checkServerAuth();
+      await checkServerAuth();
     } catch (e) {
       if ((e as Error).message === ERRORS.INVALID_TOKEN) {
         return NextResponse.json(
@@ -54,7 +54,7 @@ export const POST = withPluginsRoute(
       return NextResponse.json({ message: 'Invalid target' }, { status: 400 });
     }
     try {
-      checkServerAuth();
+      await checkServerAuth();
     } catch (e) {
       if ((e as Error).message === ERRORS.INVALID_TOKEN) {
         return NextResponse.json(
@@ -83,3 +83,5 @@ export const POST = withPluginsRoute(
     return NextResponse.json({ message: 'ok' });
   },
 );
+
+export const runtime = 'nodejs';

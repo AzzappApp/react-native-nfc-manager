@@ -59,7 +59,7 @@ const LineDividerRenderer = ({
         style={{
           height,
           backgroundColor: colorTop,
-          backgroundImage: `linear-gradient(${cssOrientation}, ${colorTop} 50%, ${colorBottom} 50.3%)`,
+          backgroundImage: `linear-gradient(${cssOrientation}, ${colorTop} calc(50% - 1px), ${colorBottom} 50.3%)`, // calc(50% - 1px) for blur the diagonal
         }}
       />
       {marginBottom > 0 && (

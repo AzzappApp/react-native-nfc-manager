@@ -1,11 +1,13 @@
 import * as z from 'zod';
 import { getUserProfilesWithWebCard } from '@azzapp/data';
+import { runWithPrimary } from '@azzapp/data/src/database/database';
 import {
   acknowledgeRecurringPayment,
   checkSignature,
   rejectRecurringPayment,
 } from '@azzapp/payment';
 import { revalidateWebcardsAndPosts } from '#helpers/api';
+import { sendInvoice } from '#helpers/paymentHelpers';
 import { withPluginsRoute } from '#helpers/queries';
 
 const subscriptionPostSchema = z.object({
@@ -32,18 +34,25 @@ export const POST = withPluginsRoute(async (req: Request) => {
   }
 
   let subscription;
+
   if (data.status === 'OK') {
-    subscription = await acknowledgeRecurringPayment(
+    const result = await acknowledgeRecurringPayment(
       data.rebill_manager_external_reference,
       data.rebill_manager_id,
       data.transaction_id,
       parseInt(data.amount_cnts, 10),
       data.provider_response,
     );
+    subscription = result.subscription;
+    const paymentId = result.paymentId;
+    if (paymentId) {
+      await runWithPrimary(() =>
+        sendInvoice({ paymentId, subscription: result.subscription }),
+      );
+    }
   } else {
     subscription = await rejectRecurringPayment(
       data.rebill_manager_external_reference,
-      data.rebill_manager_state === 'ON',
       data.transaction_id,
       data.provider_response,
     );

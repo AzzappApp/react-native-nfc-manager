@@ -1,4 +1,7 @@
 const { jest } = require('@jest/globals');
+const { Platform } = require('react-native');
+
+process.env.EXPO_OS = Platform.OS;
 
 //#region Expect Extensions
 require('@testing-library/jest-native/extend-expect');
@@ -9,6 +12,13 @@ require('@testing-library/jest-native/extend-expect');
 //#region Native Dependencies mock
 // Reanimated Mock
 require('react-native-reanimated').setUpTests();
+
+// This code is here it fix issue with mocked createAnimatedComponent
+// workaround from: https://github.com/software-mansion/react-native-reanimated/issues/3982
+jest.mock('react-native-reanimated', () =>
+  require('react-native-reanimated/mock'),
+);
+
 global.ReanimatedDataMock = {
   now: () => Date.now(),
 };
@@ -91,3 +101,43 @@ jest.mock('@gorhom/bottom-sheet', () => {
 
 jest.mock('@azzapp/react-native-skia-video', () => ({}));
 jest.mock('@azzapp/react-native-buffer-loader', () => ({}));
+
+// Configuration for react-hook-form (from documentation)
+global.window = {};
+global.window = global;
+
+// Mock expo-file-system
+jest.mock('expo-file-system/next', () => {
+  return {
+    documentDirectory: '/mock/document/directory/',
+    cacheDirectory: '/mock/cache/directory/',
+    downloadAsync: jest.fn().mockResolvedValue({
+      uri: '/mock/cache/directory/mock_file',
+    }),
+    makeDirectoryAsync: jest.fn().mockResolvedValue(true),
+    readAsStringAsync: jest.fn().mockResolvedValue('mock_file_content'),
+    writeAsStringAsync: jest.fn().mockResolvedValue(true),
+    deleteAsync: jest.fn().mockResolvedValue(true),
+    Paths: {
+      cache: {
+        uri: '/mock/cache/directory/',
+      },
+    },
+    File: jest.fn().mockImplementation(() => {
+      return {
+        exists: true,
+        base64: () => '<BASE64DATA>',
+      };
+    }),
+  };
+});
+
+//mock expo file image manupulator
+// Mock expo-image-manipulator
+jest.mock('expo-image-manipulator', () => ({
+  manipulateAsync: jest.fn().mockResolvedValue({ uri: 'mock_local_uri' }),
+  SaveFormat: {
+    JPEG: 'jpeg',
+    PNG: 'png',
+  },
+}));

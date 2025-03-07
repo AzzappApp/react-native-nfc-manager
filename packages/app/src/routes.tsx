@@ -1,4 +1,5 @@
 import isEqual from 'lodash/isEqual';
+import type { ModuleKindWithVariant } from '#helpers/webcardModuleHelpers';
 import type { SectionsRoute } from './sectionsRoutes';
 import type { ColorPaletteColor } from '@azzapp/shared/cardHelpers';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
@@ -240,6 +241,14 @@ export type ContactCardCreateRoute = {
   };
 };
 
+export type ContactCreateRoute = {
+  route: 'CONTACT_CREATE';
+  params?: {
+    profileId: string;
+    showCardScanner?: boolean;
+  };
+};
+
 export type MultiUserDetailRoute = {
   route: 'MULTI_USER_DETAIL';
   params: {
@@ -276,6 +285,14 @@ export type OfflineVCardRoute = {
   };
 };
 
+export type ModulePreviewRoute = {
+  route: 'MODULE_PREVIEW';
+  params: {
+    variant: ModuleKindWithVariant;
+    requireSubscription: boolean;
+  };
+};
+
 export type Route =
   | AboutRoute
   | AccountDetailsRoute
@@ -287,6 +304,7 @@ export type Route =
   | ContactCardCreateRoute
   | ContactCardEditRoute
   | ContactCardRoute
+  | ContactCreateRoute
   | ContactDetailsRoute
   | ContactsRoute
   | CoverCreationRoute
@@ -302,6 +320,7 @@ export type Route =
   | InviteFriendsRoute
   | LikedPostsRoute
   | MediaRoute
+  | ModulePreviewRoute
   | MultiUserAddRoute
   | MultiUserDetailRoute
   | MultiUserRoute

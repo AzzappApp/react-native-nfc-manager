@@ -1,6 +1,5 @@
 import { GraphQLError } from 'graphql';
 import {
-  getWebCardById,
   getWebCardCountProfile,
   removeWebCardNonOwnerProfiles,
   transaction,
@@ -8,10 +7,13 @@ import {
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
 import { invalidateWebCard } from '#externals';
-import { getSessionInfos } from '#GraphQLContext';
+import { webCardLoader, webCardOwnerLoader } from '#loaders';
 import { checkWebCardOwnerProfile } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
-import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
+import {
+  updateMonthlySubscription,
+  validateCurrentSubscription,
+} from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 import type { WebCard } from '@azzapp/data';
 
@@ -25,10 +27,16 @@ const updateMultiUser: MutationResolvers['updateMultiUser'] = async (
     isMultiUser,
   };
 
+  const owner = await webCardOwnerLoader.load(webCardId);
+
+  if (!owner) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
+
   if (isMultiUser) {
-    //we first need to heck if this is an IAP subscription and enough seats
+    //we first need to heck if this is an IAP subscription and enought seath
     await validateCurrentSubscription(
-      getSessionInfos().userId ?? '', //we know that the user is the owner
+      owner.id,
       await getWebCardCountProfile(webCardId),
     );
   }
@@ -37,14 +45,17 @@ const updateMultiUser: MutationResolvers['updateMultiUser'] = async (
     await transaction(async () => {
       await updateWebCard(webCardId, updates);
       if (!isMultiUser) {
-        await removeWebCardNonOwnerProfiles(webCardId);
+        await transaction(async () => {
+          await removeWebCardNonOwnerProfiles(webCardId);
+          await updateMonthlySubscription(owner.id);
+        });
       }
     });
   } catch (e) {
     console.error(e);
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
-  const webCard = await getWebCardById(webCardId);
+  const webCard = await webCardLoader.load(webCardId);
   if (!webCard) {
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }

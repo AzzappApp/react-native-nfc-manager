@@ -5,6 +5,7 @@ type Contact {
   id: ID!
   ownerProfile: Profile
   contactProfile: Profile
+  avatar: Media
   firstName: String!
   lastName: String!
   company: String!
@@ -19,6 +20,7 @@ type Contact {
   socials: [ContactSocial!]
   urls: [ContactUrl!]
   deleted: Boolean
+  logo: Media
 }
 
 type ContactUrl {

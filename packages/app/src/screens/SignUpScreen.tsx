@@ -52,8 +52,8 @@ const SignUpScreen = () => {
   const [password, setPassword] = useState('');
   const [showPasswordError, setShowPasswordError] = useState(false);
 
-  const [checkedTos, setCheckedTos] = useState<CheckboxStatus>('none');
-  const [checkedPrivacy, setCheckedPrivacy] = useState<CheckboxStatus>('none');
+  const [checkedCom, setCheckedCom] = useState<CheckboxStatus>('checked');
+  const [checkedToU, setCheckedToU] = useState<CheckboxStatus>('none');
   const [showTOSError, setShowTOSError] = useState<boolean>(false);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -89,9 +89,9 @@ const SignUpScreen = () => {
     setShowPasswordError(!passWordValid);
     canSignup &&= passWordValid;
 
-    const tosValid = checkedTos === 'checked' && checkedPrivacy === 'checked';
-    setShowTOSError(!tosValid);
-    canSignup &&= tosValid;
+    const toUValid = checkedToU === 'checked';
+    setShowTOSError(!toUValid);
+    canSignup &&= toUValid;
 
     if (canSignup) {
       let tokens: Awaited<ReturnType<typeof signup>>;
@@ -106,6 +106,7 @@ const SignUpScreen = () => {
             email: username,
             password,
             locale: locale.languageTag,
+            hasAcceptedCommunications: checkedCom === 'checked',
           });
         } else {
           username = parsePhoneNumber(
@@ -116,6 +117,7 @@ const SignUpScreen = () => {
             phoneNumber: username,
             locale: locale.languageTag,
             password,
+            hasAcceptedCommunications: checkedCom === 'checked',
           });
         }
         await setSharedWebCredentials(
@@ -175,8 +177,8 @@ const SignUpScreen = () => {
       }
     }
   }, [
-    checkedPrivacy,
-    checkedTos,
+    checkedCom,
+    checkedToU,
     contact.countryCodeOrEmail,
     contact.value,
     intl,
@@ -308,46 +310,45 @@ const SignUpScreen = () => {
               label={
                 <Text style={styles.checkLabel} variant="medium">
                   <FormattedMessage
-                    defaultMessage="I agree to the"
-                    description="Signup Screen - 'I agree to the' Terms of service "
+                    defaultMessage="I want to receive communications about promotions and news from azzapp."
+                    description="Signup Screen - accept communications label"
                   />{' '}
-                  <HyperLink
-                    label={intl.formatMessage({
-                      defaultMessage: 'Terms of Service',
-                      description:
-                        'Signup Screen - Terms of Service label for hyperlink',
-                    })}
-                    url={`${TERMS_OF_SERVICE}`}
-                  />
                 </Text>
               }
-              status={checkedTos}
-              onValueChange={setCheckedTos}
+              status={checkedCom}
+              onValueChange={setCheckedCom}
               accessibilityLabel={intl.formatMessage({
-                defaultMessage: 'Tap to accept the terms of service',
+                defaultMessage:
+                  'Tap to accept to receive communications about promotions and news from azzapp.',
                 description:
-                  'Signup Screen - Accessibility checkbox terms of service',
+                  'Signup Screen - Accessibility checkbox communications',
               })}
             />
             <CheckBox
               label={
                 <Text style={styles.checkLabel} variant="medium">
                   <FormattedMessage
-                    defaultMessage="I agree to the"
-                    description="Signup Screen - 'I agree to the' Privacy Policy"
-                  />{' '}
-                  <HyperLink
-                    label={intl.formatMessage({
-                      defaultMessage: 'Privacy Policy',
-                      description:
-                        'Signup Screen - Privacy Policy Hyperlink Clickable label',
-                    })}
-                    url={`${PRIVACY_POLICY}`}
+                    defaultMessage="I have read and accept the <tosLink>Terms of Use</tosLink> and <ppLink>Privacy Policy</ppLink> of azzapp"
+                    description="Signup Screen - 'I have read and accept the' Terms of use"
+                    values={{
+                      tosLink: value => (
+                        <HyperLink
+                          label={value[0] as string}
+                          url={`${TERMS_OF_SERVICE}`}
+                        />
+                      ),
+                      ppLink: value => (
+                        <HyperLink
+                          label={value[0] as string}
+                          url={`${PRIVACY_POLICY}`}
+                        />
+                      ),
+                    }}
                   />
                 </Text>
               }
-              status={checkedPrivacy}
-              onValueChange={setCheckedPrivacy}
+              status={checkedToU}
+              onValueChange={setCheckedToU}
               accessibilityLabel={intl.formatMessage({
                 defaultMessage: 'Tap to accept the privacy policy',
                 description:
@@ -376,8 +377,8 @@ const SignUpScreen = () => {
           {showTOSError && (
             <Text style={styles.formError} variant="error">
               <FormattedMessage
-                defaultMessage="You need to accept the Terms of Service and the Privacy Policy"
-                description="Signup Screen - error message when the user did not accept the terms of service and the privacy policy"
+                defaultMessage="You need to accept the Terms of Use and the Privacy Policy"
+                description="Signup Screen - error message when the user did not accept the terms of use and the privacy policy"
               />
             </Text>
           )}

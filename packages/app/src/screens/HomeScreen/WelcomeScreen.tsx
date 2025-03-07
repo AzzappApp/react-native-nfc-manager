@@ -26,14 +26,21 @@ import type { WelcomeScreenQuery } from '#relayArtifacts/WelcomeScreenQuery.grap
 import type { OnboardingRoute } from '#routes';
 
 const WelcomeScreen = ({
+  hasFocus,
   preloadedQuery,
 }: RelayScreenProps<OnboardingRoute, WelcomeScreenQuery>) => {
   const { currentUser } = usePreloadedQuery(welcomeScreenQuery, preloadedQuery);
 
   const intl = useIntl();
+
   useEffect(() => {
-    setMainTabBarOpacity(0);
-  }, []);
+    if (hasFocus) {
+      setMainTabBarOpacity(0);
+    }
+    return () => {
+      setMainTabBarOpacity(1);
+    };
+  }, [hasFocus]);
 
   const [showMenu, open, close] = useBoolean(false);
 
@@ -49,7 +56,7 @@ const WelcomeScreen = ({
 
   useEffect(() => {
     if (profilesCountRef.current === 0 && currentUser?.profiles?.length === 1) {
-      const newProfile = currentUser?.profiles[0];
+      const newProfile = currentUser.profiles[0];
       onChangeWebCard({
         profileId: newProfile.id,
         webCardId: newProfile.webCard?.id ?? null,
@@ -137,7 +144,7 @@ const WelcomeScreen = ({
       <HomeBottomSheetPanel
         visible={showMenu}
         close={close}
-        userIsPremium={currentUser?.isPremium}
+        user={currentUser}
       />
     </View>
   );
@@ -147,7 +154,6 @@ const welcomeScreenQuery = graphql`
   query WelcomeScreenQuery {
     currentUser {
       id
-      isPremium
       profiles {
         id
         profileRole
@@ -156,6 +162,7 @@ const welcomeScreenQuery = graphql`
           id
         }
       }
+      ...HomeBottomSheetPanel_user
     }
   }
 `;

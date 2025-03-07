@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { View } from 'react-native';
 import useScreenDimensions from '#hooks/useScreenDimensions';
 import AppearanceSliderContainer from '../AppearanceSliderContainer';
@@ -144,7 +144,11 @@ type GridItemProps = Omit<AppearanceSliderContainerProps, 'parentY'> & {
   delaySec: number;
 };
 
-const GridItem = ({ setEditableItemIndex, index, ...props }: GridItemProps) => {
+const GridItemComponent = ({
+  setEditableItemIndex,
+  index,
+  ...props
+}: GridItemProps) => {
   const [parentY, setParentY] = useState(0);
 
   const onLayout = useCallback((event: LayoutChangeEvent) => {
@@ -165,4 +169,6 @@ const GridItem = ({ setEditableItemIndex, index, ...props }: GridItemProps) => {
   );
 };
 
-export default CardModuleMediaGrid;
+const GridItem = memo(GridItemComponent);
+
+export default memo(CardModuleMediaGrid);

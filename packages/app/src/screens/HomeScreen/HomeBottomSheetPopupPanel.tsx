@@ -209,17 +209,9 @@ const HomeBottomSheetPopupPanel = ({
               userName: newUserName,
             },
           },
-          optimisticResponse: {
-            updateWebCard: {
-              webCard: {
-                id: profile?.webCard?.id,
-                userName: newUserName,
-              },
-            },
-          },
           onCompleted: () => {
-            onChangeWebCard({ webCardUserName: newUserName });
             setVisible(false);
+            onChangeWebCard({ webCardUserName: newUserName });
           },
           optimisticUpdater: updater,
           updater,
@@ -252,8 +244,8 @@ const HomeBottomSheetPopupPanel = ({
     <BottomSheetPopup
       animationDuration={animationDuration}
       visible={!!visible}
-      onFadeOutFinish={resetPopupState}
       isAnimatedContent
+      onDismiss={resetPopupState}
     >
       <View style={styles.container}>
         <View>

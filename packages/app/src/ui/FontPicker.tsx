@@ -1,7 +1,7 @@
 import { memo, useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
-import { APPLICATIONS_FONTS } from '@azzapp/shared/fontHelpers';
+import { COVER_EDITOR_FONTS } from '@azzapp/shared/fontHelpers';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Text from '#ui/Text';
 import BottomSheetModal from './BottomSheetModal';
@@ -53,7 +53,7 @@ const FontPicker = ({
         />
       )}
       <SelectList
-        data={APPLICATIONS_FONTS}
+        data={COVER_EDITOR_FONTS}
         selectedItemKey={value}
         onItemSelected={onChange}
         renderItem={renderItem}

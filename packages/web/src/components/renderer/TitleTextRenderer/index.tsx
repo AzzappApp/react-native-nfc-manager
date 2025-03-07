@@ -1,19 +1,20 @@
 'use client';
 
 import cn from 'classnames';
-import { useEffect, useRef, useState } from 'react';
+import { useMemo, useRef } from 'react';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
   getCarouselDefaultColors,
   type CardModuleTitleTextData,
 } from '@azzapp/shared/cardModuleHelpers';
-import { fontsMap } from '#helpers/fonts';
+import { splitRichTextIntoColumns } from '@azzapp/shared/richText/stringUpdate';
+import { fontsMap, webCardTextFontsMap } from '#helpers/fonts';
 import { DEFAULT_MODULE_TEXT, DEFAULT_MODULE_TITLE } from '#helpers/modules';
 import useContainerWidth from '#hooks/useContainerWidth';
+import RichText from '#ui/RichText';
 import styles from './index.css';
 import type { ModuleRendererProps } from '../ModuleRenderer';
 import type { CardModuleBase } from '@azzapp/data';
-
 export type TitleTextRendererProps = ModuleRendererProps<
   CardModuleBase & {
     data: CardModuleTitleTextData;
@@ -29,56 +30,56 @@ const TitleTextRenderer = ({
 }: TitleTextRendererProps) => {
   const { text, title, cardModuleColor } = module.data;
 
-  const [nbColumn, setNbColumn] = useState(1); // Default to 4 columns
-
   const containerRef = useRef<HTMLDivElement>(null);
   const containerWidth = useContainerWidth(containerRef);
-  const [titleOnTop, setTitleOnTop] = useState(false);
 
-  useEffect(() => {
+  const { titleOnTop, nbColumn } = useMemo(() => {
+    let titleOnTop = false;
+    let nbColumn = 1;
+
     if (
       module.variant === 'left' ||
       module.variant === 'right' ||
       module.variant === 'center' ||
       module.variant === 'justified'
     ) {
-      setTitleOnTop(true);
-      setNbColumn(1);
+      titleOnTop = true;
+      nbColumn = 1;
     } else if (containerWidth < 600) {
-      setTitleOnTop(true);
-      setNbColumn(1);
+      titleOnTop = true;
+      nbColumn = 1;
     } else if (containerWidth < 900) {
-      setNbColumn(2);
-      setTitleOnTop(true);
+      nbColumn = 2;
+      titleOnTop = true;
       if (
         module.variant === 'column_2' ||
         module.variant === 'column_1' ||
         module.variant === 'column_2_justified' ||
         module.variant === 'column_1_justified'
       ) {
-        setNbColumn(1);
-        setTitleOnTop(false);
+        nbColumn = 1;
+        titleOnTop = false;
       }
     } else {
-      setTitleOnTop(false);
-      setNbColumn(2);
+      titleOnTop = false;
+      nbColumn = 2;
       if (
         module.variant === 'column_1' ||
         module.variant === 'column_1_justified'
       ) {
-        setNbColumn(1);
-        setTitleOnTop(false);
+        nbColumn = 1;
+        titleOnTop = false;
       } else if (
         module.variant === 'column_2' ||
         module.variant === 'column_2_justified'
       ) {
-        setNbColumn(2);
-        setTitleOnTop(false);
+        nbColumn = 2;
+        titleOnTop = false;
       } else if (
         module.variant === 'column_4' ||
         module.variant === 'column_4_justified'
       ) {
-        setNbColumn(3);
+        nbColumn = 3;
       }
       if (
         module.variant === 'column_3' ||
@@ -86,12 +87,18 @@ const TitleTextRenderer = ({
         module.variant === 'column_3_justified' ||
         module.variant === 'column_4_justified'
       ) {
-        setTitleOnTop(true);
+        titleOnTop = true;
       }
     }
+
+    return { titleOnTop, nbColumn };
   }, [containerWidth, module.variant]);
 
-  const columns = splitTextIntoColumns(text ?? DEFAULT_MODULE_TEXT, nbColumn);
+  const columns = splitRichTextIntoColumns(
+    text ?? DEFAULT_MODULE_TEXT,
+    nbColumn,
+  );
+
   return (
     <div
       className={styles.container}
@@ -112,6 +119,7 @@ const TitleTextRenderer = ({
           padding: Math.max(20, cardStyle?.gap ?? 0),
           gap: Math.max(20, cardStyle?.gap ?? 0),
           flexDirection: titleOnTop ? 'column' : 'row',
+          alignItems: columns.length !== 1 ? 'center' : undefined,
         }}
       >
         {titleOnTop && (
@@ -129,6 +137,7 @@ const TitleTextRenderer = ({
             {title ?? DEFAULT_MODULE_TITLE}
           </h2>
         )}
+
         <div
           className={styles.column}
           style={{
@@ -155,7 +164,7 @@ const TitleTextRenderer = ({
               key={index}
               className={cn(
                 styles.text,
-                fontsMap[cardStyle.fontFamily].className,
+                webCardTextFontsMap[cardStyle.fontFamily].className,
               )}
               style={{
                 color: swapColor(cardModuleColor?.text, colorPalette),
@@ -163,7 +172,7 @@ const TitleTextRenderer = ({
                 ...getTextAlignmentStyle(module.variant),
               }}
             >
-              {columnText.trim()}
+              <RichText fontFamily={cardStyle.fontFamily} text={columnText} />
             </p>
           ))}
         </div>
@@ -186,20 +195,6 @@ const getTitleAlignmentStyle = (variant: string | null) => {
     return { textAlign: 'left' as const };
   }
   return getTextAlignmentStyle(variant);
-};
-
-const splitTextIntoColumns = (text: string, nbColumn: number): string[] => {
-  const words = text.split(' ');
-  const wordsPerColumn = Math.ceil(words.length / nbColumn);
-  const columns = Array.from({ length: nbColumn }, () => '');
-
-  for (let i = 0; i < nbColumn; i++) {
-    columns[i] = words
-      .slice(i * wordsPerColumn, (i + 1) * wordsPerColumn)
-      .join(' ');
-  }
-
-  return columns;
 };
 
 const getTextAlignmentStyle = (variant: string | null) => {

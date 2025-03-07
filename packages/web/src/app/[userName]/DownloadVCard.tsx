@@ -63,6 +63,7 @@ const DownloadVCard = ({
     title?: string;
   }>();
 
+  const loading = useRef(false);
   const [token, setToken] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -74,94 +75,99 @@ const DownloadVCard = ({
     setDeviceType(getDeviceType());
   }, []);
 
-  useEffect(() => {
-    // call directly shareback (use when coming back from AppClip)
-    const modeQueryParam = searchParams.get('mode');
-    if (modeQueryParam === 'shareback') {
-      const token = searchParams.get('token');
-      if (token && onClose) {
-        onClose({ token });
+  const processContact = useCallback(
+    async (compressedContactCard: string) => {
+      let contactData: string;
+      let signature: string;
+      try {
+        [contactData, signature] = JSON.parse(
+          decompressFromEncodedURIComponent(compressedContactCard),
+        );
+
+        const contactCard = parseContactCard(contactData);
+        let phoneNumber;
+        if (contactCard?.phoneNumbers?.[0]?.[1]) {
+          phoneNumber = parsePhoneNumberFromString(
+            contactCard?.phoneNumbers?.[0]?.[1],
+          );
+        }
+        if (phoneNumber) {
+          setPhoneNumber(phoneNumber.number);
+        }
+      } catch {
+        return;
       }
-      return;
-    }
+
+      if (contactData && signature) {
+        const res = await fetch('/api/verifySign', {
+          body: JSON.stringify({
+            signature,
+            data: contactData,
+            salt: webCard.userName,
+          }),
+          method: 'POST',
+        });
+        if (res.ok) {
+          const additionalData = await res.json();
+
+          if (additionalData.avatarUrl) {
+            const data = await fetch(additionalData.avatarUrl);
+            const blob = await data.arrayBuffer();
+            const base64 = Buffer.from(blob).toString('base64');
+
+            additionalData.avatar = {
+              type: data.headers.get('content-type')?.split('/')[1] ?? 'png',
+              base64,
+            };
+          }
+
+          const { vCard, contact } = await buildVCardFromSerializedContact(
+            webCard.userName,
+            contactData,
+            additionalData,
+          );
+
+          if (contact.webCardId === webCard.id) {
+            const isIE = !!(window as any)?.StyleMedia;
+
+            setContact({
+              ...contact,
+              avatarUrl: additionalData.avatarUrl,
+            });
+            const file = new Blob([vCard.toString()], {
+              type: isIE ? 'application/octet-stream' : 'text/vcard',
+            });
+            const fileURL = URL.createObjectURL(file);
+            setFileUrl(fileURL);
+
+            updateContactCardScanCounter(contact.profileId);
+            setToken(additionalData.token);
+            setDisplayName(additionalData.displayName);
+          }
+          if (startOpen) {
+            setOpened(true);
+          }
+        }
+      }
+    },
+    [webCard.userName, webCard.id, startOpen],
+  );
+
+  useEffect(() => {
     const compressedContactCard = searchParams.get('c');
     if (!compressedContactCard) {
       return;
     }
 
-    let contactData: string;
-    let signature: string;
-    try {
-      [contactData, signature] = JSON.parse(
-        decompressFromEncodedURIComponent(compressedContactCard),
-      );
-
-      const contactCard = parseContactCard(contactData);
-      let phoneNumber;
-      if (contactCard?.phoneNumbers?.[0]?.[1]) {
-        phoneNumber = parsePhoneNumberFromString(
-          contactCard?.phoneNumbers?.[0]?.[1],
-        );
-      }
-      if (phoneNumber) {
-        setPhoneNumber(phoneNumber.number);
-      }
-    } catch {
-      return;
+    if (!loading.current && !contact) {
+      loading.current = true;
+      processContact(compressedContactCard)
+        .catch(() => void 0)
+        .finally(() => {
+          loading.current = false;
+        });
     }
-
-    if (contactData && signature) {
-      fetch('/api/verifySign', {
-        body: JSON.stringify({
-          signature,
-          data: contactData,
-          salt: webCard.userName,
-        }),
-        method: 'POST',
-      })
-        .then(async res => {
-          if (res.status === 200) {
-            const additionalData = await res.json();
-
-            if (additionalData.avatarUrl) {
-              const data = await fetch(additionalData.avatarUrl);
-              const blob = await data.arrayBuffer();
-              const base64 = Buffer.from(blob).toString('base64');
-
-              additionalData.avatar = {
-                type: data.headers.get('content-type')?.split('/')[1] ?? 'png',
-                base64,
-              };
-            }
-
-            const { vCard, contact } = await buildVCardFromSerializedContact(
-              webCard.userName,
-              contactData,
-              additionalData,
-            );
-
-            if (contact.webCardId === webCard.id) {
-              const isIE = !!(window as any)?.StyleMedia;
-
-              setContact({ ...contact, avatarUrl: additionalData.avatarUrl });
-              const file = new Blob([vCard.toString()], {
-                type: isIE ? 'application/octet-stream' : 'text/vcard',
-              });
-              const fileURL = URL.createObjectURL(file);
-              setFileUrl(fileURL);
-
-              updateContactCardScanCounter(contact.profileId);
-              setToken(additionalData.token);
-              setDisplayName(additionalData.displayName);
-            }
-            if (startOpen) {
-              setOpened(true);
-            }
-          }
-        })
-        .catch(() => void 0);
-    }
-  }, [webCard.userName, webCard.id, searchParams, startOpen, onClose]);
+  }, [searchParams, contact, processContact]);
 
   const handleClose = useCallback(() => {
     setOpened(false);

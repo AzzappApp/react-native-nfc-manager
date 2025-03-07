@@ -163,6 +163,7 @@ const ShakeShareDisplay = ({
       profileId: profileInfos?.profileId ?? '',
       width: qrCodeWidth(),
     },
+    { fetchKey: profileInfos?.profileId ?? '' },
   );
 
   const profile = node?.profile;
@@ -321,7 +322,7 @@ const styles = StyleSheet.create({
   },
   qrCodeContainer: {
     position: 'absolute',
-    top: -250,
+    top: -QR_CODE_WIDTH - 80,
     backgroundColor: 'rgba(0,0,0,0.8)',
     borderRadius: 23,
     borderCurve: 'continuous',

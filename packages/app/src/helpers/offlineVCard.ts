@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { MMKV } from 'react-native-mmkv';
 import { useFragment } from 'react-relay';
-import { OfflineVCardScreenProfilesFragment } from '#screens/ContactsScreen/OfflineVCardScreen';
+import OfflineVCardScreenProfilesFragment from '#relayArtifacts/OfflineVCardScreen_profiles.graphql';
 import type {
   OfflineVCardScreen_profiles$data,
   OfflineVCardScreen_profiles$key,

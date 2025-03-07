@@ -39,6 +39,11 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
   const { userId } = getSessionInfos();
   const { email, phoneNumber: rawPhoneNumber } = invited;
 
+  const profile = await profileLoader.load(profileId);
+  if (!profile || profile.userId !== userId) {
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
+  }
+
   if (email && !isValidEmail(email)) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
@@ -55,17 +60,16 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  const profile = await profileLoader.load(profileId);
-  if (!profile || profile.userId !== userId) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
-  }
-
   if (!profileHasAdminRight(profile.profileRole)) {
     throw new GraphQLError(ERRORS.FORBIDDEN, {
       extensions: {
         role: profile.profileRole,
       },
     });
+  }
+
+  if (invited.profileRole === 'owner') {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
   const owner = await webCardOwnerLoader.load(profile.webCardId);
@@ -144,6 +148,7 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
         deletedAt: null,
         deletedBy: null,
         lastContactViewAt: creationDate,
+        hasGooglePass: false,
       };
       await referencesMedias(
         addedMedia,

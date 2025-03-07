@@ -1,12 +1,12 @@
 import { useCallback } from 'react';
 import { useIntl } from 'react-intl';
-import { Linking, Pressable, View } from 'react-native';
+import { Linking, Pressable, View, StyleSheet } from 'react-native';
 import {
-  isModuleAnimationDisabled,
   type CardModuleColor,
   type DisplayMode,
 } from '@azzapp/shared/cardModuleHelpers';
 import { shadow } from '#theme';
+import { RichText } from '#components/ui/RichText';
 import { getTextStyle, getTitleStyle } from '#helpers/cardModuleHelpers';
 import { useStyleSheet, createStyleSheet } from '#helpers/createStyles';
 import useScreenDimensions from '#hooks/useScreenDimensions';
@@ -70,10 +70,7 @@ const CardModuleMediaTextLinkParallax = ({
             setEditableItemIndex={setEditableItemIndex}
             scrollPosition={scrollPosition}
             modulePosition={modulePosition}
-            disableParallax={isModuleAnimationDisabled(
-              displayMode,
-              webCardViewMode,
-            )}
+            disableParallax={webCardViewMode === 'edit'}
             moduleEditing={moduleEditing}
             canPlay={canPlay}
             displayMode={displayMode}
@@ -103,7 +100,7 @@ const ParallaxItem = ({
   cardStyle?: CardStyle | null;
   dimension: CardModuleDimension;
   index: number;
-  disableParallax?: boolean;
+  disableParallax: boolean;
   setEditableItemIndex?: (index: number) => void;
   scrollPosition: Animated.Value;
   modulePosition?: number;
@@ -138,12 +135,15 @@ const ParallaxItem = ({
         index={index}
         key={`${cardModuleMedia.media.id}_{index}`}
         disableParallax={disableParallax}
-        imageStyle={styles.opacityImage}
-        imageContainerStyle={{
-          backgroundColor: cardModuleColor.background,
-        }}
         canPlay={canPlay}
       >
+        <View
+          style={[
+            StyleSheet.absoluteFill,
+            styles.overlay,
+            { backgroundColor: cardModuleColor.background },
+          ]}
+        />
         <View style={styles.textContainer}>
           <Text
             variant="large"
@@ -155,11 +155,10 @@ const ParallaxItem = ({
           >
             {cardModuleMedia.title}
           </Text>
-          <Text
+          <RichText
+            text={cardModuleMedia.text}
             style={[getTextStyle(cardStyle, cardModuleColor), styles.textStyle]}
-          >
-            {cardModuleMedia.text}
-          </Text>
+          />
           <Pressable
             style={[
               {
@@ -192,7 +191,7 @@ const ParallaxItem = ({
 };
 
 const stylesheet = createStyleSheet(appearance => ({
-  opacityImage: { opacity: 0.8 },
+  overlay: { opacity: 0.2 },
   textContainer: {
     justifyContent: 'center',
     alignItems: 'center',

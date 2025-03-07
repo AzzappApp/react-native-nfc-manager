@@ -5,6 +5,7 @@ import { FlatList, Platform, StyleSheet, View } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
+import { getContactsAsync } from '#helpers/getLocalContactsMap';
 import IconButton from '#ui/IconButton';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
@@ -38,7 +39,7 @@ const MultiUserAddList = ({
     (async () => {
       const { status } = await Contacts.requestPermissionsAsync();
       if (status === 'granted') {
-        const { data } = await Contacts.getContactsAsync({
+        const { data } = await getContactsAsync({
           fields: [
             Contacts.Fields.Name,
             Contacts.Fields.FirstName,

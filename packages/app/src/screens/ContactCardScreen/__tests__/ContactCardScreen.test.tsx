@@ -3,6 +3,7 @@ import { Platform } from 'react-native';
 import { RelayEnvironmentProvider, loadQuery } from 'react-relay';
 import { MockPayloadGenerator } from 'relay-test-utils';
 import { createMockEnvironment } from 'relay-test-utils/lib/RelayModernMockEnvironment';
+import { flushPromises } from '@azzapp/shared/jestHelpers';
 import { getAppleWalletPass, getGoogleWalletPass } from '#helpers/MobileWebAPI';
 import { screen, render, fireEvent, act } from '#helpers/testHelpers';
 import ContactCardScreenQueryNode from '#relayArtifacts/ContactCardScreenQuery.graphql';
@@ -108,27 +109,25 @@ describe('ContactCardScreen', () => {
     expect(screen.getByTestId('add-to-wallet-button')).toBeOnTheScreen();
   });
 
-  test('Should call getAppleWallet', () => {
+  test('Should call getAppleWallet', async () => {
     Platform.OS = 'ios';
-    jest.useFakeTimers();
     renderContactCardScreen();
-    jest.runAllTimers();
 
-    act(() => {
+    await act(async () => {
       fireEvent.press(screen.getByTestId('add-to-wallet-button'));
+      await flushPromises();
     });
 
     expect(getAppleWalletPassMock).toBeCalledTimes(1);
   });
 
-  test('Should call getGoogleWallet', () => {
+  test('Should call getGoogleWallet', async () => {
     Platform.OS = 'android';
-    jest.useFakeTimers();
     renderContactCardScreen();
-    jest.runAllTimers();
 
-    act(() => {
+    await act(async () => {
       fireEvent.press(screen.getByTestId('add-to-wallet-button'));
+      await flushPromises();
     });
 
     expect(getGoogleWalletPassMock).toBeCalledTimes(1);

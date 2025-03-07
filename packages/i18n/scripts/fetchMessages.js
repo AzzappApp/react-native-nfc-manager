@@ -6,7 +6,7 @@ const API_SERVER_TOKEN = process.env.API_SERVER_TOKEN;
 const ENVIRONMENT = process.env.NEXT_PUBLIC_PLATFORM;
 
 // TODO duplicated from i18nConfig.ts but I don't want to import typescript in this script
-const SUPPORTED_LOCALES = ['en-US', 'fr'];
+const SUPPORTED_LOCALES = ['en-US', 'fr', 'es', 'it', 'de'];
 
 const fetchMessages = async (sourceId, messagesDir, appMessages) => {
   let messages = [];
@@ -15,7 +15,7 @@ const fetchMessages = async (sourceId, messagesDir, appMessages) => {
       `${TRANSLATION_APP_API_ENDPOINT}/messages/${sourceId}/${ENVIRONMENT === 'development' ? 'staging' : ENVIRONMENT}`, //fallback to staging in dev env
       {
         headers: {
-          'azzapp-server-auth': API_SERVER_TOKEN,
+          'azzapp-translation-auth': API_SERVER_TOKEN,
         },
       },
     );

@@ -1,0 +1,270 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`BottomSheetTextEditorButton component disabled state 1`] = `
+<View
+  accessibilityRole="button"
+  accessibilityState={
+    {
+      "busy": undefined,
+      "checked": undefined,
+      "disabled": true,
+      "expanded": undefined,
+      "selected": undefined,
+    }
+  }
+  accessibilityValue={
+    {
+      "max": undefined,
+      "min": undefined,
+      "now": undefined,
+      "text": undefined,
+    }
+  }
+  accessible={true}
+  collapsable={false}
+  focusable={true}
+  onBlur={[Function]}
+  onClick={[Function]}
+  onFocus={[Function]}
+  onResponderGrant={[Function]}
+  onResponderMove={[Function]}
+  onResponderRelease={[Function]}
+  onResponderTerminate={[Function]}
+  onResponderTerminationRequest={[Function]}
+  onStartShouldSetResponder={[Function]}
+  style={
+    [
+      [
+        {
+          "borderRadius": 25,
+          "height": 50,
+          "minWidth": 50,
+        },
+        {
+          "alignItems": "center",
+          "borderColor": "#000000",
+          "borderWidth": 1,
+          "justifyContent": "center",
+          "overflow": "hidden",
+        },
+        [
+          {
+            "borderColor": "#F5F5F6",
+            "borderRadius": 33,
+            "borderWidth": 1,
+            "height": "100%",
+            "width": 54,
+          },
+          undefined,
+        ],
+      ],
+      {
+        "opacity": 1,
+      },
+    ]
+  }
+>
+  <Image
+    source={
+      {
+        "testUri": "../../../packages/app/src/ui/Icon/assets/link.png",
+      }
+    }
+    style={
+      [
+        {
+          "height": 12,
+          "resizeMode": "contain",
+          "width": 12,
+        },
+        {
+          "tintColor": "#0E1216",
+        },
+        {
+          "tintColor": "#C8C7CA",
+        },
+      ]
+    }
+  />
+</View>
+`;
+
+exports[`BottomSheetTextEditorButton component selected state 1`] = `
+<View
+  accessibilityRole="button"
+  accessibilityState={
+    {
+      "busy": undefined,
+      "checked": undefined,
+      "disabled": true,
+      "expanded": undefined,
+      "selected": undefined,
+    }
+  }
+  accessibilityValue={
+    {
+      "max": undefined,
+      "min": undefined,
+      "now": undefined,
+      "text": undefined,
+    }
+  }
+  accessible={true}
+  collapsable={false}
+  focusable={true}
+  onBlur={[Function]}
+  onClick={[Function]}
+  onFocus={[Function]}
+  onResponderGrant={[Function]}
+  onResponderMove={[Function]}
+  onResponderRelease={[Function]}
+  onResponderTerminate={[Function]}
+  onResponderTerminationRequest={[Function]}
+  onStartShouldSetResponder={[Function]}
+  style={
+    [
+      [
+        {
+          "borderRadius": 25,
+          "height": 50,
+          "minWidth": 50,
+        },
+        {
+          "alignItems": "center",
+          "borderColor": "#000000",
+          "borderWidth": 1,
+          "justifyContent": "center",
+          "overflow": "hidden",
+        },
+        [
+          {
+            "borderColor": "#F5F5F6",
+            "borderRadius": 33,
+            "borderWidth": 1,
+            "height": "100%",
+            "width": 54,
+          },
+          {
+            "backgroundColor": "#F5F5F6",
+          },
+        ],
+      ],
+      {
+        "opacity": 1,
+      },
+    ]
+  }
+>
+  <Image
+    source={
+      {
+        "testUri": "../../../packages/app/src/ui/Icon/assets/link.png",
+      }
+    }
+    style={
+      [
+        {
+          "height": 12,
+          "resizeMode": "contain",
+          "width": 12,
+        },
+        {
+          "tintColor": "#0E1216",
+        },
+        {
+          "tintColor": "#C8C7CA",
+        },
+      ]
+    }
+  />
+</View>
+`;
+
+exports[`BottomSheetTextEditorButton component unselected state 1`] = `
+<View
+  accessibilityRole="button"
+  accessibilityState={
+    {
+      "busy": undefined,
+      "checked": undefined,
+      "disabled": true,
+      "expanded": undefined,
+      "selected": undefined,
+    }
+  }
+  accessibilityValue={
+    {
+      "max": undefined,
+      "min": undefined,
+      "now": undefined,
+      "text": undefined,
+    }
+  }
+  accessible={true}
+  collapsable={false}
+  focusable={true}
+  onBlur={[Function]}
+  onClick={[Function]}
+  onFocus={[Function]}
+  onResponderGrant={[Function]}
+  onResponderMove={[Function]}
+  onResponderRelease={[Function]}
+  onResponderTerminate={[Function]}
+  onResponderTerminationRequest={[Function]}
+  onStartShouldSetResponder={[Function]}
+  style={
+    [
+      [
+        {
+          "borderRadius": 25,
+          "height": 50,
+          "minWidth": 50,
+        },
+        {
+          "alignItems": "center",
+          "borderColor": "#000000",
+          "borderWidth": 1,
+          "justifyContent": "center",
+          "overflow": "hidden",
+        },
+        [
+          {
+            "borderColor": "#F5F5F6",
+            "borderRadius": 33,
+            "borderWidth": 1,
+            "height": "100%",
+            "width": 54,
+          },
+          undefined,
+        ],
+      ],
+      {
+        "opacity": 1,
+      },
+    ]
+  }
+>
+  <Image
+    source={
+      {
+        "testUri": "../../../packages/app/src/ui/Icon/assets/link.png",
+      }
+    }
+    style={
+      [
+        {
+          "height": 12,
+          "resizeMode": "contain",
+          "width": 12,
+        },
+        {
+          "tintColor": "#0E1216",
+        },
+        {
+          "tintColor": "#C8C7CA",
+        },
+      ]
+    }
+  />
+</View>
+`;

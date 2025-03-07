@@ -2,11 +2,11 @@ import { useFieldArray } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { colors } from '#theme';
-import ContactCardEditModalField from '#components/ContactCard/ContactCardEditField';
+import ContactCardEditModalField from '#components/Contact/ContactEditField';
 import {
-  contactCardEditModalStyleSheet,
-  useContactCardEmailLabels,
-} from '#helpers/contactCardHelpers';
+  contactEditStyleSheet,
+  useContactEmailLabels,
+} from '#helpers/contactHelpers';
 import { useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
@@ -26,9 +26,9 @@ const CommonInformationEmails = ({
 
   const intl = useIntl();
 
-  const labelValues = useContactCardEmailLabels();
+  const labelValues = useContactEmailLabels();
 
-  const styles = useStyleSheet(contactCardEditModalStyleSheet);
+  const styles = useStyleSheet(contactEditStyleSheet);
 
   return (
     <>

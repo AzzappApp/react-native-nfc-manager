@@ -9,7 +9,7 @@ import * as mime from 'react-native-mime-types';
 import { AVATAR_MAX_WIDTH } from '@azzapp/shared/contactCardHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
-import FormDeleteFieldOverlay from '#components/ContactCard/FormDeleteFieldOverlay';
+import FormDeleteFieldOverlay from '#components/FormDeleteFieldOverlay';
 import ImagePicker, {
   EditImageStep,
   ImagePickerContactCardMediaWrapper,
@@ -19,22 +19,22 @@ import ImagePicker, {
 import { ScreenModal } from '#components/NativeRouter';
 import {
   MAX_FIELD_HEIGHT,
-  buildContactCardModalStyleSheet,
-} from '#helpers/contactCardHelpers';
+  buildContactStyleSheet,
+} from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { saveTransformedImageToFile } from '#helpers/mediaEditions';
 import Icon from '#ui/Icon';
 import Separation from '#ui/Separation';
 import Text from '#ui/Text';
 import TextInput from '#ui/TextInput';
-import ContactCardEditModalAddresses from './ContactCardEditModalAddresses';
-import ContactCardEditModalAvatar from './ContactCardEditModalAvatar';
-import ContactCardEditModalBirthdays from './ContactCardEditModalBirthday';
-import ContactCardEditModalEmails from './ContactCardEditModalEmails';
-import ContactCardEditModalName from './ContactCardEditModalName';
-import ContactCardEditModalPhones from './ContactCardEditModalPhones';
-import ContactCardEditModalSocials from './ContactCardEditModalSocials';
-import ContactCardEditModalUrls from './ContactCardEditModalUrls';
+import ContactCardEditModalAddresses from './ContactCardEditAddresses';
+import ContactCardEditModalAvatar from './ContactCardEditAvatar';
+import ContactCardEditModalBirthdays from './ContactCardEditBirthday';
+import ContactCardEditModalEmails from './ContactCardEditEmails';
+import ContactCardEditModalName from './ContactCardEditName';
+import ContactCardEditModalPhones from './ContactCardEditPhones';
+import ContactCardEditModalSocials from './ContactCardEditSocials';
+import ContactCardEditModalUrls from './ContactCardEditUrls';
 import type { ImagePickerResult } from '#components/ImagePicker';
 import type { ContactCardEditScreenQuery$data } from '#relayArtifacts/ContactCardEditScreenQuery.graphql';
 import type { ContactCardFormValues } from './ContactCardSchema';
@@ -495,7 +495,7 @@ const styleSheet = createStyleSheet(appearance => ({
     maxHeight: MAX_FIELD_HEIGHT,
   },
   fieldTitleLocked: { minWidth: 130 },
-  ...buildContactCardModalStyleSheet(appearance),
+  ...buildContactStyleSheet(appearance),
 }));
 
 export default ContactCardEditForm;

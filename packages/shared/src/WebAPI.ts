@@ -50,6 +50,8 @@ export type SignUpParams = {
    * The user's locale.
    */
   locale?: string;
+
+  hasAcceptedCommunications?: boolean;
 } & (
   | {
       /**

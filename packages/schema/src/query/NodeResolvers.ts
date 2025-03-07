@@ -65,8 +65,10 @@ export const fetchNode = async (gqlId: string): Promise<any> => {
       );
     case 'Profile':
       return withTypeSymbol(await profileLoader.load(id), profileSymbol);
-    case 'WebCard':
-      return withTypeSymbol(await webCardLoader.load(id), webCardSymbol);
+    case 'WebCard': {
+      const webCard = await webCardLoader.load(id);
+      return withTypeSymbol(webCard?.deleted ? null : webCard, webCardSymbol);
+    }
     case 'WebCardCategory':
       return withTypeSymbol(
         await webCardCategoryLoader.load(id),

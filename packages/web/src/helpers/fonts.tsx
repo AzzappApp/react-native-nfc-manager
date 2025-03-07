@@ -44,298 +44,474 @@ import {
   Water_Brush,
   Monoton,
 } from 'next/font/google';
-import type { ApplicationFonts } from '@azzapp/shared/fontHelpers';
+import type {
+  WebcardTitleFonts,
+  WebcardTextFonts,
+} from '@azzapp/shared/fontHelpers';
 import type { NextFont } from 'next/dist/compiled/@next/font';
 
 const AmaticSC_Bold = Amatic_SC({
   weight: '700',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const AmaticSC_Regular = Amatic_SC({
   weight: '400',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const Anton_Regular = Anton({
   weight: '400',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const Archivo_Black = Archivo({
   weight: '900',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const Archivo_Light = Archivo({
   weight: '300',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
+});
+const Archivo_SemiBold = Archivo({
+  weight: '600',
+  display: 'swap',
+  subsets: ['latin-ext'],
+  preload: false,
 });
 const BebasNeue_Regular = Bebas_Neue({
   weight: '400',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const Cardo_Regular = Cardo({
   weight: '400',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
+});
+const CormorantGaramond_SemiBold = Cormorant_Garamond({
+  weight: '600',
+  display: 'swap',
+  subsets: ['latin-ext'],
+  preload: false,
 });
 const CormorantGaramond_Bold = Cormorant_Garamond({
   weight: '700',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
+});
+const CormorantGaramond_Bold_Italic = Cormorant_Garamond({
+  weight: '700',
+  style: 'italic',
+  display: 'swap',
+  subsets: ['latin-ext'],
+  preload: false,
+});
+const CormorantGaramond_Regular = Cormorant_Garamond({
+  weight: '500',
+  display: 'swap',
+  subsets: ['latin-ext'],
+  preload: false,
 });
 const CourrierPrime_Regular = Courier_Prime({
   weight: '400',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
+});
+const CourrierPrime_Bold = Courier_Prime({
+  weight: '700',
+  display: 'swap',
+  subsets: ['latin-ext'],
+  preload: false,
 });
 const Cinzel_Regular = Cinzel({
   weight: '400',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const DMSerifDisplay_Regular = DM_Serif_Display({
   weight: '400',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const FaunaOne_Regular = Fauna_One({
   weight: '400',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const Fraunces_Light = Fraunces({
   weight: '300',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
+});
+const Fraunces_Light_SemiBold = Fraunces({
+  weight: '600',
+  display: 'swap',
+  subsets: ['latin-ext'],
+  preload: false,
 });
 const Inter_Regular = Inter({
   weight: '400',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const Inter_Medium = Inter({
   weight: '500',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const Inter_SemiBold = Inter({
   weight: '600',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const Inter_Black = Inter({
   weight: '900',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const JosefinSans_Regular = Josefin_Sans({
   weight: '400',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
+});
+const JosefinSans_SemiBold = Josefin_Sans({
+  weight: '600',
+  display: 'swap',
+  subsets: ['latin-ext'],
+  preload: false,
 });
 const Jost_Regular = Jost({
   weight: '400',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
+});
+const Jost_Regular_SemiBold = Jost({
+  weight: '600',
+  display: 'swap',
+  subsets: ['latin-ext'],
+  preload: false,
 });
 const GildaDisplay_Regular = Gilda_Display({
   weight: '400',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const Gloock_Regular = Gloock({
   weight: '400',
   display: 'swap',
   subsets: ['latin-ext'],
   adjustFontFallback: false,
+  preload: false,
 });
 const GreatVibes_Regular = Great_Vibes({
   weight: '400',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const Kaushan_Regular = Kaushan_Script({
   weight: '400',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const Koulen_Regular = Koulen({
   weight: '400',
   display: 'swap',
   subsets: ['latin'],
+  preload: false,
 });
 const Lexend_ExtraBold = Lexend({
   weight: '800',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const LibreBaskerville_Italic = Libre_Baskerville({
   weight: '400',
   style: 'italic',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const LibreCaslonDisplay_Regular = Libre_Caslon_Display({
   weight: '400',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const LibreCaslonText_Regular = Libre_Caslon_Text({
   weight: '400',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const Limelight_Regular = Limelight({
   weight: '400',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const Lora_Regular = Lora({
   weight: '400',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const Lora_Bold = Lora({
   weight: '700',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const Manrope_ExtraLight = Manrope({
   weight: '200',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const Manrope_Light = Manrope({
   weight: '300',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const Manrope_Regular = Manrope({
   weight: '400',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const Monoton_Regular = Monoton({
   weight: '400',
   display: 'swap',
   subsets: ['latin'],
+  preload: false,
 });
 const Montserrat_Regular = Montserrat({
   weight: '400',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const Montserrat_SemiBold = Montserrat({
   weight: '600',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const MrDafoe_Regular = Mr_Dafoe({
   weight: '400',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const OpenSans_Regular = Open_Sans({
   weight: '400',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
+});
+const OpenSans_SemiBold = Open_Sans({
+  weight: '600',
+  display: 'swap',
+  subsets: ['latin-ext'],
+  preload: false,
 });
 const Outfit_Medium = Outfit({
   weight: '500',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const PlayfairDisplay_Bold = Playfair_Display({
   weight: '700',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 export const Plus_Jakarta_Light = Plus_Jakarta_Sans({
   weight: '300',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
+});
+export const Plus_Jakarta_SemiBold = Plus_Jakarta_Sans({
+  weight: '600',
+  display: 'swap',
+  subsets: ['latin-ext'],
+  preload: false,
 });
 export const Plus_Jakarta_ExtraBold = Plus_Jakarta_Sans({
   weight: '800',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const Poppins_Regular = Poppins({
   weight: '400',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const Poppins_SemiBold = Poppins({
   weight: '600',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const Poppins_Bold = Poppins({
   weight: '700',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const Poppins_Black = Poppins({
   weight: '900',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const Raleway_Regular = Raleway({
   weight: '400',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
+});
+const Raleway_Regular_SemiBold = Raleway({
+  weight: '600',
+  display: 'swap',
+  subsets: ['latin-ext'],
+  preload: false,
 });
 const Righteous_Regular = Righteous({
   weight: '400',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const Rubik_Bold = Rubik({
   weight: '700',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const Rye_Regular = Rye({
   weight: '400',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const SeaweedScript_Regular = Seaweed_Script({
   weight: '400',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const SixCaps_Regular = Six_Caps({
   weight: '400',
   display: 'swap',
   subsets: ['latin'],
+  preload: false,
+});
+const SourceSans3_Regular = Source_Sans_3({
+  weight: '400',
+  display: 'swap',
+  subsets: ['latin-ext'],
+  preload: false,
+});
+const SourceSans3_SemiBold = Source_Sans_3({
+  weight: '600',
+  display: 'swap',
+  subsets: ['latin-ext'],
+  preload: false,
 });
 const SourcePro_Regular = Source_Sans_3({
   weight: '400',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
+});
+const SourcePro_SemiBold = Source_Sans_3({
+  weight: '600',
+  display: 'swap',
+  subsets: ['latin-ext'],
+  preload: false,
 });
 const Ultra_Regular = Ultra({
   weight: '400',
   display: 'swap',
   subsets: ['latin'],
+  preload: false,
 });
 const WaterBrush_Regular = Water_Brush({
   weight: '400',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 const YesevaOne_Regular = Yeseva_One({
   weight: '400',
   display: 'swap',
   subsets: ['latin-ext'],
+  preload: false,
 });
 
-export const fontsMap: Record<string, NextFont> = {
+export const webCardTextFontsMap: Record<WebcardTextFonts, NextFont> = {
+  SourceSans3_Regular,
+  Raleway_Regular,
+  'Plus-Jakarta_Light': Plus_Jakarta_Light,
+  OpenSans_Regular,
+  Montserrat_Regular,
+  Jost_Regular,
+  JosefinSans_Regular,
+  Fraunces_Light,
+  CourrierPrime_Regular,
+  CormorantGaramond_Regular,
+  Archivo_Light,
+  Inter_Regular,
+};
+
+export const webCardTextFontsVariantsMap: Record<WebcardTextFonts, NextFont> = {
+  SourcePro_Regular_Bold: SourcePro_SemiBold,
+  SourceSans3_Regular: SourceSans3_SemiBold,
+  Raleway_Regular: Raleway_Regular_SemiBold,
+  'Plus-Jakarta_Light': Plus_Jakarta_SemiBold,
+  OpenSans_Regular: OpenSans_SemiBold,
+  Montserrat_Regular: Montserrat_SemiBold,
+  Jost_Regular: Jost_Regular_SemiBold,
+  JosefinSans_Regular: JosefinSans_SemiBold,
+  Fraunces_Light: Fraunces_Light_SemiBold,
+  CourrierPrime_Regular: CourrierPrime_Bold,
+  CormorantGaramond_Regular: CormorantGaramond_SemiBold,
+  Archivo_Light: Archivo_SemiBold,
+  Inter_Regular: Inter_SemiBold,
+};
+
+export const webCardTitleFontsMap: Record<WebcardTitleFonts, NextFont> = {
   AmaticSC_Bold,
   AmaticSC_Regular,
   Anton_Regular,
@@ -345,6 +521,8 @@ export const fontsMap: Record<string, NextFont> = {
   Cardo_Regular,
   Cinzel_Regular,
   CormorantGaramond_Bold,
+  CormorantGaramond_Bold_Italic,
+  CormorantGaramond_Regular,
   CourrierPrime_Regular,
   DMSerifDisplay_Regular,
   FaunaOne_Regular,
@@ -393,4 +571,9 @@ export const fontsMap: Record<string, NextFont> = {
   Ultra_Regular,
   WaterBrush_Regular,
   YesevaOne_Regular,
-} satisfies Record<ApplicationFonts, NextFont>;
+} satisfies Record<WebcardTitleFonts, NextFont>;
+
+export const fontsMap = {
+  ...webCardTitleFontsMap,
+  ...webCardTextFontsMap,
+};

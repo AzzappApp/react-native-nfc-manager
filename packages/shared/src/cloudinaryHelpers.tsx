@@ -1,5 +1,5 @@
 import { getCrypto } from './crypto';
-import { resizeTransforms } from './imagesHelpers';
+import { getVideoUrlForSize, resizeTransforms } from './imagesHelpers';
 import { fetchJSON } from './networkHelpers';
 
 const CLOUDINARY_CLOUDNAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
@@ -32,6 +32,111 @@ export type CloudinaryResource = {
 
 type ResourceResult = {
   resources: CloudinaryResource[];
+};
+
+/**
+ * get 2 preview video linked to modules
+ *
+ * @param landscape
+ * @param portrait
+ */
+export const getPreviewVideoForModule = async ({
+  module,
+  variant,
+  portraitHeight,
+  portraitWidth,
+  landscapeHeight,
+  landscapeWidth,
+  pixelRatio,
+}: {
+  module: string;
+  variant?: string | null;
+  colorScheme?: string | null;
+  locale?: string | null;
+  portraitHeight: number;
+  portraitWidth: number;
+  landscapeHeight: number;
+  landscapeWidth: number;
+  pixelRatio?: number | null;
+}) => {
+  // normalize internal name to asset name
+  let moduleName = module;
+  let variantName = variant;
+  switch (module) {
+    case 'titleText':
+      moduleName = 'title_and_text';
+      if (variantName === 'center') {
+        variantName = 'centered';
+      }
+      break;
+    case 'mediaTextLink':
+      moduleName = 'media_with_text_and_link';
+      break;
+    case 'mediaText':
+      moduleName = 'media_with_text';
+      break;
+    case 'media':
+      switch (variantName) {
+        case 'square_grid':
+          variantName = 'grid_square';
+          break;
+        case 'grid2':
+          variantName = 'grid_2_columns';
+          break;
+        case 'square_grid2':
+          variantName = 'grid_2_columns_square';
+          break;
+      }
+      break;
+    case 'photoWithTextAndTitle':
+      moduleName = 'custom';
+      variantName = '';
+      break;
+    case 'socialLinks':
+      moduleName = 'custom';
+      variantName = 'links';
+      break;
+    case 'simpleTitle':
+      moduleName = 'custom';
+      variantName = 'title';
+      break;
+    case 'lineDivider':
+      moduleName = 'custom';
+      variantName = 'separation';
+      break;
+    case 'simpleButton':
+      moduleName = 'custom';
+      variantName = 'button';
+      break;
+    case 'simpleText':
+      moduleName = 'custom';
+      variantName = 'text';
+      break;
+  }
+
+  // build urls
+  const videoIdDesktop = `section_${moduleName}_${variantName ? variantName + '_' : ''}desktop.mp4`;
+  const videoIdMobile = `section_${moduleName}_${variantName ? variantName + '_' : ''}mobile.mp4`;
+  const urlDesktop = getVideoUrlForSize({
+    id: videoIdDesktop,
+    width: landscapeWidth,
+    height: landscapeHeight,
+    pixelRatio,
+    path: '/static_assets/modules',
+  });
+
+  const urlMobile = getVideoUrlForSize({
+    id: videoIdMobile,
+    width: portraitWidth,
+    height: portraitHeight,
+    pixelRatio,
+    path: '/static_assets/modules',
+  });
+
+  return {
+    landscape: urlDesktop,
+    portrait: urlMobile,
+  };
 };
 
 /**

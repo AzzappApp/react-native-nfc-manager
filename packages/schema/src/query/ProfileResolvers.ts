@@ -562,23 +562,39 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
             ({ quality, width, height }) =>
               quality === 'hd' && width != null && height != null,
           )
-          .reduce((lowest: Video['video_files'][number] | null, current) => {
-            // Compare based on width or height
-            if (
-              !lowest?.width ||
-              !lowest?.height ||
-              (current.width &&
+          .reduce(
+            (closestToHD: Video['video_files'][number] | null, current) => {
+              // Compare based on width or height
+              const isPortrait =
                 current.height &&
-                current.width * current.height < lowest.width * lowest.height)
-            ) {
-              return current;
-            }
-            return lowest;
-          }, null);
+                current.width &&
+                current.height > current.width;
+              if (
+                !closestToHD?.width ||
+                !closestToHD?.height ||
+                (isPortrait &&
+                  closestToHD.width &&
+                  current.width &&
+                  Math.abs(closestToHD.width - 1080) >
+                    Math.abs(current.width - 1080)) ||
+                (!isPortrait &&
+                  closestToHD.height &&
+                  current.height &&
+                  Math.abs(closestToHD.height - 1080) >
+                    Math.abs(current.height - 1080))
+              ) {
+                return current;
+              }
+              return closestToHD;
+            },
+            null,
+          );
 
         // In some cases, video_files don't include "quality", hence we find the closest to HD (Width of 720)
         if (!videoFile) {
           videoFile = video.video_files.reduce((closestToHD, current) => {
+            const isPortrait =
+              current.height && current.width && current.height > current.width;
             if (!current.width) {
               return closestToHD;
             }
@@ -588,9 +604,16 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
             }
 
             if (
-              closestToHD.width &&
-              current.width &&
-              Math.abs(closestToHD.width - 720) > Math.abs(current.width - 720)
+              (isPortrait &&
+                closestToHD.width &&
+                current.width &&
+                Math.abs(closestToHD.width - 1080) >
+                  Math.abs(current.width - 1080)) ||
+              (!isPortrait &&
+                closestToHD.height &&
+                current.height &&
+                Math.abs(closestToHD.height - 1080) >
+                  Math.abs(current.height - 1080))
             ) {
               return current;
             }
@@ -598,7 +621,6 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
             return closestToHD;
           }, video.video_files[0]);
         }
-
         return {
           id: `pexels_v_${video.id}`,
           width: videoFile ? videoFile.width! : video.width,
@@ -673,4 +695,8 @@ const fakeUser: Omit<User, 'id'> = {
   locale: DEFAULT_LOCALE,
   note: null,
   password: null,
+  termsOfUseAcceptedVersion: null,
+  termsOfUseAcceptedAt: null,
+  hasAcceptedCommunications: false,
+  replacedBy: null,
 };

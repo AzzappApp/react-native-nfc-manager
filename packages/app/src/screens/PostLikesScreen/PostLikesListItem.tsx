@@ -7,6 +7,7 @@ import { colors } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import Link from '#components/Link';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { profileInfoHasAdminRight } from '#helpers/profileRoleHelper';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import useToggleFollow from '#hooks/useToggleFollow';
 import PressableNative from '#ui/PressableNative';
@@ -67,26 +68,28 @@ const PostLikesListItem = ({ webcard: webcardKey }: Props) => {
             </View>
           </PressableNative>
         </Link>
-        {profileInfos?.webCardId !== webCard.id && webCard.userName && (
-          <PressableNative onPress={onToggleFollow}>
-            {!webCard.isFollowing && (
-              <Text variant="button">
-                <FormattedMessage
-                  defaultMessage="Follow"
-                  description="Follow from post likes screen"
-                />
-              </Text>
-            )}
-            {webCard.isFollowing && (
-              <Text variant="button" style={styles.unfollow}>
-                <FormattedMessage
-                  defaultMessage="Unfollow"
-                  description="Unfollow from post likes screen"
-                />
-              </Text>
-            )}
-          </PressableNative>
-        )}
+        {profileInfoHasAdminRight(profileInfos) &&
+          profileInfos?.webCardId !== webCard.id &&
+          webCard.userName && (
+            <PressableNative onPress={onToggleFollow}>
+              {!webCard.isFollowing && (
+                <Text variant="button">
+                  <FormattedMessage
+                    defaultMessage="Follow"
+                    description="Follow from post likes screen"
+                  />
+                </Text>
+              )}
+              {webCard.isFollowing && (
+                <Text variant="button" style={styles.unfollow}>
+                  <FormattedMessage
+                    defaultMessage="Unfollow"
+                    description="Unfollow from post likes screen"
+                  />
+                </Text>
+              )}
+            </PressableNative>
+          )}
       </View>
     </View>
   );

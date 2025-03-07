@@ -95,6 +95,7 @@ const HomeBottomPanelInvitation = ({
           values={{
             contact:
               profile?.invitedBy?.user?.email ||
+              profile?.invitedBy?.user?.phoneNumber ||
               profile?.webCard?.owner?.email ||
               profile?.webCard?.owner?.phoneNumber ||
               '',

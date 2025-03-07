@@ -52,4 +52,8 @@ type User {
   Returns the number of used seats for the user
   """
   usedMultiUserSeats: Int!
+  """
+  Returns true if the user has accepted new Terms of use
+  """
+  hasAcceptedLastTermsOfUse: Boolean!
 }

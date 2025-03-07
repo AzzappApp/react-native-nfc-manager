@@ -1,5 +1,5 @@
 import capitalize from 'lodash/capitalize';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import {
   getCardModulesByWebCard,
   getMediasByIds,
@@ -19,6 +19,7 @@ import {
   MODULES_STYLES_VALUES,
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
+import { colors } from '@azzapp/shared/colorsHelpers';
 import ModuleRenderer from '#components/renderer/ModuleRenderer';
 import { getMetaData } from '#helpers/seo';
 import { cachedGetWebCardByUserName } from './dataAccess';
@@ -101,7 +102,9 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
     cardBackgroundColor = swapColor(
       firstModuleData.backgroundStyle?.backgroundColor ??
         firstModuleData.cardModuleColor?.background ??
-        firstModuleData.colorBottom,
+        (firstModule.kind === 'lineDivider'
+          ? firstModuleData.colorTop
+          : firstModuleData.colorBottom),
       cardColors,
     );
   }
@@ -125,7 +128,8 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
     lastModuleBackgroundColor = swapColor(
       lastModuleData.backgroundStyle?.backgroundColor ??
         lastModuleData.cardModuleColor?.background ??
-        lastModuleData.colorBottom,
+        lastModuleData.colorBottom ??
+        colors.white, //add fallback for modules without background color (like buttons)
       cardColors,
     );
   }
@@ -162,9 +166,10 @@ export const dynamic = 'force-static';
 export async function generateMetadata({
   params,
 }: ProfilePageProps): Promise<Metadata> {
-  const userName = params.userName.toLowerCase();
-  const webCard = await cachedGetWebCardByUserName(userName);
-
+  const webCard = await cachedGetWebCardByUserName(params.userName);
+  if (webCard.userName !== params.userName) {
+    return redirect(`/${webCard.userName}`);
+  }
   const imageUrlOption = webCard?.updatedAt
     ? `?t=${webCard.updatedAt.getTime()}`
     : '';

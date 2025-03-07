@@ -31,12 +31,7 @@ import type {
   ContactCard_profile$data,
   ContactCard_profile$key,
 } from '#relayArtifacts/ContactCard_profile.graphql';
-import type {
-  GestureResponderEvent,
-  LayoutChangeEvent,
-  StyleProp,
-  ViewStyle,
-} from 'react-native';
+import type { LayoutChangeEvent, StyleProp, ViewStyle } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 
 type ContactCardProps = {
@@ -92,6 +87,19 @@ const ContactCard = ({
     profileKey,
   );
 
+  const router = useRouter();
+  const onEdit = useMemo(
+    () =>
+      edit
+        ? () => {
+            router.push({
+              route: 'CONTACT_CARD_EDIT',
+            });
+          }
+        : null,
+    [edit, router],
+  );
+
   return (
     <ContactCardComponent
       webCard={webCard}
@@ -100,7 +108,7 @@ const ContactCard = ({
       contactCard={contactCard}
       contactCardQrCode={contactCardQrCode}
       avatar={avatar}
-      edit={edit}
+      onEdit={onEdit}
       rotation={rotation}
     />
   );
@@ -116,7 +124,7 @@ type ContactCardComponentProps = {
   contactCard?: ContactCard | null;
   contactCardQrCode?: string;
   avatar?: ContactCard_profile$data['avatar'];
-  edit?: boolean;
+  onEdit?: (() => void) | null;
   rotation?: SharedValue<number>;
 };
 
@@ -127,14 +135,13 @@ export const ContactCardComponent = ({
   contactCard,
   contactCardQrCode,
   avatar,
-  edit,
   rotation,
+  onEdit: onEditProp,
 }: ContactCardComponentProps) => {
   const { userName, cardColors, commonInformation, isMultiUser } =
     webCard ?? {};
 
   const styles = useStyleSheet(stylesheet);
-  const router = useRouter();
 
   const backgroundColor = cardColors?.primary ?? colors.black;
 
@@ -205,16 +212,9 @@ export const ContactCardComponent = ({
     return fitbox('contain', src, dst);
   });
 
-  const onEdit = useCallback(
-    (e: GestureResponderEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      router.push({
-        route: 'CONTACT_CARD_EDIT',
-      });
-    },
-    [router],
-  );
+  const onEdit = useCallback(() => {
+    onEditProp?.();
+  }, [onEditProp]);
 
   if (!contactCard || !webCard) {
     return null;
@@ -337,7 +337,7 @@ export const ContactCardComponent = ({
             </Canvas>
           </Animated.View>
         ) : null}
-        {edit && (
+        {onEditProp != null && (
           <TouchableOpacity
             style={[
               styles.edit,

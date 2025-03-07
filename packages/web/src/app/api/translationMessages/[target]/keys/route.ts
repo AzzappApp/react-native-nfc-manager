@@ -29,7 +29,7 @@ export const GET = withPluginsRoute(
     },
   ) => {
     try {
-      checkServerAuth();
+      await checkServerAuth();
     } catch (e) {
       if ((e as Error).message === ERRORS.INVALID_TOKEN) {
         return NextResponse.json(
@@ -124,3 +124,5 @@ export const GET = withPluginsRoute(
     }
   },
 );
+
+export const runtime = 'nodejs';

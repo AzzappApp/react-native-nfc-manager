@@ -21,7 +21,7 @@ import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
-import { findLocalContact } from '#helpers/contactCardHelpers';
+import { findLocalContact } from '#helpers/contactHelpers';
 import { reworkContactForDeviceInsert } from '#helpers/contactListHelpers';
 import { getLocalContactsMap } from '#helpers/getLocalContactsMap';
 import useBoolean from '#hooks/useBoolean';
@@ -567,14 +567,6 @@ const buildContact = async (
           },
         ]
       : [],
-    birthday: birthdayDate
-      ? {
-          label: 'birthday',
-          year: birthdayDate?.getFullYear(),
-          month: birthdayDate?.getMonth(),
-          day: birthdayDate?.getDate(),
-        }
-      : undefined,
     socialProfiles:
       additionalContactData?.socials?.map(social => ({
         label: social.label,

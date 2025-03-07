@@ -41,6 +41,7 @@ const HomeBottomPanelMessage = ({
         invitedBy {
           user {
             email
+            phoneNumber
           }
         }
         profileRole

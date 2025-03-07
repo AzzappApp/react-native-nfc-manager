@@ -7,7 +7,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import {
   Dimensions,
   Platform,
@@ -20,8 +20,8 @@ import Animated, {
   Easing,
   interpolate,
   runOnJS,
+  useAnimatedReaction,
   useAnimatedStyle,
-  useDerivedValue,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
@@ -51,7 +51,9 @@ import {
   useWebCardViewStatistic,
 } from '#hooks/useStatistics';
 import useToggleFollow from '#hooks/useToggleFollow';
+import Button from '#ui/Button';
 import Container from '#ui/Container';
+import Text from '#ui/Text';
 import AddContactModal from './AddContactModal';
 import WebCardBackground from './WebCardBackground';
 import { useWebCardEditTransition } from './WebCardEditTransition';
@@ -67,7 +69,7 @@ import type { WebCardRoute } from '#routes';
 /**
  * Display a Web card.
  */
-const WebCardScreen = ({
+export const WebCardScreen = ({
   preloadedQuery,
   hasFocus,
   route: { params },
@@ -320,15 +322,39 @@ const WebCardScreen = ({
     [editing, initialManualGesture, manualFlip, showPost, windowWidth],
   );
 
-  useDerivedValue(() => {
-    const res = Math.round(Math.abs(flip.value + manualFlip.value)) % 2 === 1;
-    runOnJS(setShowPost)(res);
-  }, [manualFlip, flip]);
+  useAnimatedReaction(
+    () => Math.round(Math.abs(flip.value + manualFlip.value)) % 2 === 1,
+    (value, previous) => {
+      if (value !== previous) {
+        runOnJS(setShowPost)(value);
+      }
+    },
+    [],
+  );
 
   // #end region
 
   if (!data.webCard || !data.profile?.webCard) {
-    return null;
+    return (
+      <View style={styles.deletedCaseContainer}>
+        <Text variant="large">
+          <FormattedMessage
+            defaultMessage="This WebCard{azzappA} does not exist"
+            description="Error message when the WebCard is not found"
+            values={{
+              azzappA: <Text variant="azzapp">a</Text>,
+            }}
+          />
+        </Text>
+        <Button
+          onPress={router.back}
+          label={intl.formatMessage({
+            defaultMessage: 'Go back',
+            description: 'Button to go back to the previous screen',
+          })}
+        />
+      </View>
+    );
   }
 
   return (
@@ -436,6 +462,7 @@ const webCardScreenByIdQuery = graphql`
       ...WebCardScreenPublishHelper_webCard
       ...AddContactModal_webCard
     }
+    ## TODO find a way to remove this profile fetch
     profile: node(id: $profileId) {
       ... on Profile {
         ...WebCardScreenButtonBar_profile
@@ -468,6 +495,7 @@ const webCardScreenByNameQuery = graphql`
       ...WebCardScreenPublishHelper_webCard
       ...AddContactModal_webCard
     }
+    ## TODO find a way to remove this profile fetch
     profile: node(id: $profileId) {
       ... on Profile {
         ...WebCardScreenButtonBar_profile
@@ -549,5 +577,11 @@ const styles = StyleSheet.create({
     width: '100%',
     backfaceVisibility: 'hidden',
     overflow: 'hidden',
+  },
+  deletedCaseContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 20,
   },
 });
