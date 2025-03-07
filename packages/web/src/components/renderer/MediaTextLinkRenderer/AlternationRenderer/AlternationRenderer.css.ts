@@ -150,6 +150,15 @@ const containerFullAlternation = style({
 const media = style({
   width: '100%',
   height: '100%',
+  transform: 'scale(1)',
+  transition: 'transform 1s ease-in-out',
+
+  selectors: {
+    [`${imageContainer}:hover &`]: {
+      transform: 'scale(1.2)',
+      transition: 'transform 1s ease-in-out',
+    },
+  },
 });
 
 const link = style({

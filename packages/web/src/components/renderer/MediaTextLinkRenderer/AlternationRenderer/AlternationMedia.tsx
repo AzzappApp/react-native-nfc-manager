@@ -74,9 +74,12 @@ const AlternationMedia = ({
             transition: isFullAlternation
               ? 'opacity 1s ease-in-out'
               : 'opacity 1s ease-in-out,transform 1s ease-out',
-            overflow: 'visible',
             width: '100%',
             height: '100%',
+            borderRadius: isFullAlternation
+              ? 0
+              : (cardStyle?.borderRadius ?? 0),
+            overflow: 'hidden',
           }}
         >
           {media.kind === 'video' ? (
@@ -87,9 +90,6 @@ const AlternationMedia = ({
               fluid
               className={styles.media}
               style={{
-                borderRadius: isFullAlternation
-                  ? 0
-                  : (cardStyle?.borderRadius ?? 0), // FIXME TBC
                 objectFit: 'cover',
                 width: '100%',
               }}
@@ -113,9 +113,6 @@ const AlternationMedia = ({
               quality="auto:best"
               className={styles.media}
               style={{
-                borderRadius: isFullAlternation
-                  ? 0
-                  : (cardStyle?.borderRadius ?? 0),
                 objectFit: 'cover',
               }}
             />

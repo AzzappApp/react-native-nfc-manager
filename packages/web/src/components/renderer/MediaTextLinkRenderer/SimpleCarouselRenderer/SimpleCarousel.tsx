@@ -490,17 +490,20 @@ const SimpleCarouselItem = ({
 }) => {
   return (
     <div className={styles.itemContainer}>
-      <div>
+      <div
+        className={styles.imageContainer}
+        style={{ borderRadius: cardStyle.borderRadius }}
+      >
         {media.kind === 'video' ? (
           <CloudinaryVideo
             assetKind="module"
+            className={styles.media}
             media={media}
             alt="cover"
             fluid
             style={{
               objectFit: 'cover',
               width: '100%',
-              borderRadius: cardStyle.borderRadius,
             }}
             playsInline
             autoPlay
@@ -509,6 +512,7 @@ const SimpleCarouselItem = ({
           />
         ) : (
           <CloudinaryImage
+            className={styles.media}
             mediaId={media.id}
             draggable={false}
             alt="carousel"
@@ -520,7 +524,6 @@ const SimpleCarouselItem = ({
               objectFit: 'cover',
               width: '100%',
               height: '100%',
-              borderRadius: cardStyle.borderRadius,
             }}
           />
         )}

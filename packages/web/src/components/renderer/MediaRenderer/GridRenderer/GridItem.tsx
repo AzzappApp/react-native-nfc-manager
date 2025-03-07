@@ -22,6 +22,7 @@ const GridItem = ({
   delaySec,
 }: GridItemProps) => {
   const pictureRef = useRef<HTMLDivElement>(null);
+
   return (
     <div
       key={`${media.id}_${index}`}
@@ -62,7 +63,6 @@ const GridItem = ({
             height={(EXPECTED_MEDIA_WIDTH * media.height) / media.width}
             style={{
               objectFit: 'cover',
-              borderRadius: cardStyle?.borderRadius ?? 0,
             }}
           />
         )}
