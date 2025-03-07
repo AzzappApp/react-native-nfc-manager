@@ -1,10 +1,8 @@
 import { ImageFormat } from '@shopify/react-native-skia';
-import { Image } from 'expo-image';
-import { Fragment, useCallback, useEffect, useState } from 'react';
+import { Fragment, useCallback, useState } from 'react';
 import { Controller, useController } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Pressable, View } from 'react-native';
-import ImageSize from 'react-native-image-size';
+import { View } from 'react-native';
 import * as mime from 'react-native-mime-types';
 import { AVATAR_MAX_WIDTH } from '@azzapp/shared/contactCardHelpers';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
@@ -30,6 +28,7 @@ import TextInput from '#ui/TextInput';
 import ContactCardEditModalAddresses from './ContactCardEditAddresses';
 import ContactCardEditModalAvatar from './ContactCardEditAvatar';
 import ContactCardEditModalBirthdays from './ContactCardEditBirthday';
+import ContactCardEditCompanyLogo from './ContactCardEditCompanyLogo';
 import ContactCardEditModalEmails from './ContactCardEditEmails';
 import ContactCardEditModalName from './ContactCardEditName';
 import ContactCardEditModalPhones from './ContactCardEditPhones';
@@ -71,18 +70,6 @@ const ContactCardEditForm = ({
   const [imagePicker, setImagePicker] = useState<'avatar' | 'logo' | null>(
     null,
   );
-
-  const [size, setSize] = useState<{ width: number; height: number } | null>(
-    null,
-  );
-
-  useEffect(() => {
-    if (logoField.value?.uri) {
-      ImageSize.getSize(logoField.value.uri).then(({ width, height }) => {
-        setSize(size => (size ? size : { width, height }));
-      });
-    }
-  }, [logoField.value?.uri]);
 
   const onImagePickerFinished = useCallback(
     async ({
@@ -126,10 +113,6 @@ const ContactCardEditForm = ({
           id: localPath,
           uri: localPath,
         });
-        setSize({
-          width: exportWidth,
-          height: exportHeight,
-        });
       }
 
       setImagePicker(null);
@@ -137,20 +120,7 @@ const ContactCardEditForm = ({
     [avatarField, imagePicker, logoField],
   );
 
-  const { commonInformation, logo } = webCard ?? {};
-
-  const [webCardLogoSize, setWebCardLogoSize] = useState<{
-    width: number;
-    height: number;
-  } | null>(null);
-
-  useEffect(() => {
-    if (logo?.uri) {
-      ImageSize.getSize(logo.uri).then(({ width, height }) => {
-        setWebCardLogoSize({ width, height });
-      });
-    }
-  }, [logo]);
+  const { commonInformation } = webCard ?? {};
 
   return (
     <>
@@ -206,110 +176,8 @@ const ContactCardEditForm = ({
               )}
             />
           )}
-          {webCard?.isMultiUser && logo ? (
-            <View style={styles.logoField}>
-              <View style={styles.logoButtonContainer}>
-                <View style={styles.logoButton}>
-                  <Icon icon="locked" style={{}} />
-                  <Text variant="smallbold">
-                    <FormattedMessage
-                      defaultMessage="Logo"
-                      description="Logo field registered for the contact card"
-                    />
-                  </Text>
-                </View>
-
-                {webCardLogoSize ? (
-                  <View style={styles.logoContainer}>
-                    <View style={styles.logoWrapper}>
-                      <Image
-                        source={{ uri: logo.uri }}
-                        style={{
-                          height: 55,
-                          width:
-                            webCardLogoSize.width *
-                            (55 / webCardLogoSize.height),
-                        }}
-                        contentFit="contain"
-                      />
-                    </View>
-                  </View>
-                ) : null}
-              </View>
-              <View style={styles.companyLogoDescription}>
-                <Text variant="xsmall" style={{ color: colors.grey400 }}>
-                  <FormattedMessage
-                    defaultMessage="Company logo will be used in your email signature"
-                    description="Company logo field description"
-                  />
-                </Text>
-              </View>
-            </View>
-          ) : (
-            <Controller
-              control={control}
-              name="logo"
-              render={({ field: { value, onChange } }) => (
-                <View style={styles.logoField}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Pressable
-                      onPress={() => {
-                        if (value?.uri) {
-                          onChange(null);
-                        } else {
-                          setImagePicker('logo');
-                        }
-                      }}
-                    >
-                      <View style={styles.logoButton}>
-                        <Icon
-                          icon={value?.uri ? 'delete_filled' : 'add_filled'}
-                          style={{
-                            tintColor: value?.uri
-                              ? colors.red400
-                              : colors.green,
-                          }}
-                        />
-                        <Text variant="smallbold">
-                          <FormattedMessage
-                            defaultMessage="Logo"
-                            description="Logo field registered for the contact card"
-                          />
-                        </Text>
-                      </View>
-                    </Pressable>
-
-                    {value?.uri && size ? (
-                      <View style={styles.logoContainer}>
-                        <Pressable
-                          style={styles.logoWrapper}
-                          onPress={() => setImagePicker('logo')}
-                        >
-                          <Image
-                            source={{ uri: value?.uri }}
-                            style={{
-                              height: 55,
-                              width: size.width * (55 / size.height),
-                            }}
-                            contentFit="contain"
-                          />
-                        </Pressable>
-                      </View>
-                    ) : null}
-                  </View>
-                  <View style={styles.companyLogoDescription}>
-                    <Text variant="xsmall" style={{ color: colors.grey400 }}>
-                      <FormattedMessage
-                        defaultMessage="Company logo will be used in your email signature"
-                        description="Company logo field description"
-                      />
-                    </Text>
-                  </View>
-                </View>
-              )}
-            />
-          )}
-
+          <Separation small />
+          <ContactCardEditCompanyLogo control={control} />
           <Separation />
           {webCard?.isMultiUser &&
             commonInformation?.phoneNumbers?.map((phoneNumber, index) => (
