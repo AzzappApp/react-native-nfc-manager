@@ -1,5 +1,5 @@
 import capitalize from 'lodash/capitalize';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import {
   getCardModulesByWebCard,
   getMediasByIds,
@@ -166,9 +166,10 @@ export const dynamic = 'force-static';
 export async function generateMetadata({
   params,
 }: ProfilePageProps): Promise<Metadata> {
-  const userName = params.userName.toLowerCase();
-  const webCard = await cachedGetWebCardByUserName(userName);
-
+  const webCard = await cachedGetWebCardByUserName(params.userName);
+  if (webCard.userName !== params.userName) {
+    return redirect(`/${webCard.userName}`);
+  }
   const imageUrlOption = webCard?.updatedAt
     ? `?t=${webCard.updatedAt.getTime()}`
     : '';

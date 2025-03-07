@@ -38,6 +38,11 @@ const PostPage = async (props: PostPageProps) => {
   }
 
   const author = post ? await getWebCardById(post.webCardId) : null;
+
+  if (userName !== author?.userName) {
+    return redirect(`/${author?.userName}/post/${post?.id}`);
+  }
+
   const seeMorePosts =
     author && post
       ? await getWebCardsPostsWithMedias(author.id, 3, post.id)

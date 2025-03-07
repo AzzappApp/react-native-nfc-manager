@@ -37,9 +37,14 @@ export const Query: QueryResolvers = {
     userNameChangeFrequencyDay: USERNAME_CHANGE_FREQUENCY_DAY,
   }),
 
-  webCard: async (_, { userName }) =>
-    getWebCardByUserNameWithRedirection(userName),
+  webCard: async (_, { userName }) => {
+    const result = await getWebCardByUserNameWithRedirection(userName);
 
+    if (result?.deleted) {
+      return null;
+    }
+    return result;
+  },
   userNameAvailable: async (_, { userName }) => {
     const profile = await getWebCardByUserName(userName);
     const redirection = await getRedirectWebCardByUserName(userName);
@@ -72,9 +77,7 @@ export const Query: QueryResolvers = {
       profile.webCardKind === 'business'
         ? profile.companyName || ''
         : (profile.firstName || '') + (profile.lastName || ''),
-    )
-      .replace(/[^0-9a-z_-]/gi, '')
-      .toLocaleLowerCase();
+    ).replace(/[^0-9a-z_-]/gi, '');
 
     if (!profileName) {
       // should never happen

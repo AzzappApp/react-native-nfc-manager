@@ -50,18 +50,26 @@ const checkSubscription = async (
     };
   }
 
-  if (monthly && monthly.status === 'active') {
+  if (monthly) {
     const availableSeats = await calculateAvailableSeats(monthly);
 
-    await updateExistingSubscription({
-      userSubscription: monthly,
-      totalSeats:
-        monthly.totalSeats + ((alreadyAdded ? 0 : addedSeats) - availableSeats),
-    });
-    return {
-      hasActiveSubscription: true,
-      hasEnoughSeats: true,
-    };
+    if (monthly.status === 'active') {
+      await updateExistingSubscription({
+        userSubscription: monthly,
+        totalSeats:
+          monthly.totalSeats +
+          ((alreadyAdded ? 0 : addedSeats) - availableSeats),
+      });
+      return {
+        hasActiveSubscription: true,
+        hasEnoughSeats: true,
+      };
+    } else {
+      return {
+        hasActiveSubscription: true,
+        hasEnoughSeats: availableSeats >= (alreadyAdded ? 0 : addedSeats),
+      };
+    }
   }
 
   if (yearly) {
@@ -110,7 +118,7 @@ export const updateMonthlySubscription = async (userId: string) => {
     subscription => subscription.subscriptionPlan === 'web.monthly',
   );
 
-  if (monthly) {
+  if (monthly && monthly.status === 'active') {
     const seats = Math.max(await getTotalMultiUser(userId), 1);
 
     await updateExistingSubscription({
