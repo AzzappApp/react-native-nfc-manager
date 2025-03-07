@@ -1,4 +1,4 @@
-export const SUPPORTED_LOCALES: Array<'de' | 'en-US' | 'es' | 'fr' | 'it'>;
+export const SUPPORTED_LOCALES: Array<'en-US' | 'es' | 'fr'>;
 
 // disabled for now
 // Array<
