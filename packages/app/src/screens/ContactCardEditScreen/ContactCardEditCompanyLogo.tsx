@@ -16,6 +16,7 @@ import { ScreenModal } from '#components/NativeRouter';
 import { buildContactStyleSheet } from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { saveTransformedImageToFile } from '#helpers/mediaEditions';
+import { getImageSize } from '#helpers/mediaHelpers';
 import useBoolean from '#hooks/useBoolean';
 import Icon from '#ui/Icon';
 import Text from '#ui/Text';
@@ -78,6 +79,17 @@ const ContactCardEditCompanyLogo = ({ control }: { control: Control<any> }) => {
     width: number;
     height: number;
   } | null>(null);
+
+  useEffect(() => {
+    const getImageSizeInner = async () => {
+      if (field.value.uri && (!field.value.width || !field.value.height)) {
+        const uri = field.value.uri;
+        const { width, height } = await getImageSize(uri);
+        setPickerImage({ ...field.value, width, height });
+      }
+    };
+    getImageSizeInner();
+  }, [field.value]);
 
   const onImagePickerFinished = useCallback(
     async ({ id, uri, width, height }: ImagePickerResult) => {
