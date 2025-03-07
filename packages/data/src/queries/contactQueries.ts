@@ -183,6 +183,7 @@ export const searchContacts = async (
           ? or(
               like(ContactTable.firstName, `%${name}%`),
               like(ContactTable.lastName, `%${name}%`),
+              like(ContactTable.company, `%${name}%`),
             )
           : undefined,
       ),
