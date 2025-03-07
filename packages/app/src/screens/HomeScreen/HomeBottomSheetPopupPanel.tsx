@@ -86,9 +86,9 @@ const HomeBottomSheetPopupPanel = ({
     useMutation<HomeBottomSheetPopupPanelMutation>(graphql`
       mutation HomeBottomSheetPopupPanelMutation(
         $webCardId: ID!
-        $input: UpdateWebCardInput!
+        $input: UpdateWebCardUserNameInput!
       ) {
-        updateWebCard(webCardId: $webCardId, input: $input) {
+        updateWebCardUserName(webCardId: $webCardId, input: $input) {
           webCard {
             id
             userName
@@ -401,8 +401,8 @@ const updater = (
   store: RecordSourceSelectorProxy<HomeBottomSheetPopupPanelMutation$data>,
   response?: HomeBottomSheetPopupPanelMutation$data | null,
 ) => {
-  const webCardId = response?.updateWebCard?.webCard?.id;
-  const newUserName = response?.updateWebCard?.webCard?.userName;
+  const webCardId = response?.updateWebCardUserName?.webCard?.id;
+  const newUserName = response?.updateWebCardUserName?.webCard?.userName;
   // reorder carousel once userName is set
   if (!webCardId) return;
   const currentWebCard = store.get(webCardId);

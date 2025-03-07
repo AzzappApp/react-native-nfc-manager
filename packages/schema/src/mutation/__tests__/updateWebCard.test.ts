@@ -80,7 +80,10 @@ describe('updateWebCardMutation', () => {
   });
 
   test('should throw INVALID_WEBCARD_USERNAME if username is invalid', async () => {
-    (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
+    (webCardLoader.load as jest.Mock).mockResolvedValue({
+      ...mockWebCard,
+      userName: null,
+    });
     (isValidUserName as jest.Mock).mockReturnValue(false);
     (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
 
@@ -98,7 +101,10 @@ describe('updateWebCardMutation', () => {
   });
 
   test('should throw USERNAME_ALREADY_EXISTS if username is taken', async () => {
-    (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
+    (webCardLoader.load as jest.Mock).mockResolvedValue({
+      ...mockWebCard,
+      userName: null,
+    });
     (isValidUserName as jest.Mock).mockReturnValue(true);
     (isUserNameAvailable as jest.Mock).mockResolvedValue({ available: false });
     (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
@@ -111,6 +117,22 @@ describe('updateWebCardMutation', () => {
         mockInfo,
       ),
     ).rejects.toThrow(new GraphQLError(ERRORS.USERNAME_ALREADY_EXISTS));
+  });
+
+  test('should throw INVALID_REQUEST if username is already set', async () => {
+    (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
+    (isValidUserName as jest.Mock).mockReturnValue(true);
+    (isUserNameAvailable as jest.Mock).mockResolvedValue({ available: false });
+    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
+
+    await expect(
+      updateWebCardMutation(
+        {},
+        { webCardId: 'global-webcard-123', input: { userName: 'takenUser' } },
+        mockContext,
+        mockInfo,
+      ),
+    ).rejects.toThrow(new GraphQLError(ERRORS.INVALID_REQUEST));
   });
 
   test('should throw UNAUTHORIZED if user is invited and tries to update company activity', async () => {

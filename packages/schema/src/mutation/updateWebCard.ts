@@ -38,6 +38,11 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
   }
 
   if (profileUpdates.userName && profileUpdates.userName !== webCard.userName) {
+    if (webCard.userName) {
+      // we must use updateWebCardUserName mutation to change the username / here we only accept filling empty username
+      throw new GraphQLError(ERRORS.INVALID_REQUEST);
+    }
+
     if (!isValidUserName(profileUpdates.userName)) {
       throw new GraphQLError(ERRORS.INVALID_WEBCARD_USERNAME);
     }

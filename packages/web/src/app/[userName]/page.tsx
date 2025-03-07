@@ -7,6 +7,7 @@ import {
   getModuleBackgroundsByIds,
   getWebCardsOwnerUsers,
   getActiveUserSubscriptions,
+  getRedirectWebCardByUserName,
 } from '@azzapp/data';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import {
@@ -36,8 +37,19 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
   const userName = params.userName.toLowerCase();
   const webCard = await cachedGetWebCardByUserName(userName);
   if (!webCard) {
+    const redirection = await getRedirectWebCardByUserName(userName);
+
+    if (redirection.length > 0) {
+      return redirect(`/${redirection[0].toUserName}`);
+    }
+
     return notFound();
   }
+
+  if (webCard.userName !== params.userName) {
+    return redirect(`/${webCard.userName}`);
+  }
+
   let isAzzappPlus = false;
   const owners = await getWebCardsOwnerUsers([webCard.id]);
   if (owners?.length && owners[0]?.id) {
@@ -167,9 +179,6 @@ export async function generateMetadata({
   params,
 }: ProfilePageProps): Promise<Metadata> {
   const webCard = await cachedGetWebCardByUserName(params.userName);
-  if (webCard.userName !== params.userName) {
-    return redirect(`/${webCard.userName}`);
-  }
   const imageUrlOption = webCard?.updatedAt
     ? `?t=${webCard.updatedAt.getTime()}`
     : '';

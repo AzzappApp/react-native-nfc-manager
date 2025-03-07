@@ -9,7 +9,7 @@ input UpdateWebCardInput {
   webCardCategoryId: ID @deprecated(reason: "use only webCardKind")
   companyActivityId: ID @deprecated(reason: "use only companyActivityLabel")
   companyActivityLabel: String
-  userName: String
+  userName: String @deprecated(reason: "use updateWebCardUserName")
   webCardKind: WebCardKind
 }
 
