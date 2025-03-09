@@ -29,7 +29,7 @@ export function logSignIn(userId: string) {
 }
 
 /**
- * Generic even logging,this function is here in case we change analytics() on day, or add a second one
+ * Generic even logging,this function is here in case we change analytics on day, or add a second one
  * to avoid change in all the code
  *
  * @export
