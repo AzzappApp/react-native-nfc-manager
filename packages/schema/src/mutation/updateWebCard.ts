@@ -175,7 +175,9 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
 
     webCardLoader.clear(webCardId);
     const result = await webCardLoader.load(webCardId);
-
+    if(result.userName){
+      invalidateWebCard(result.userNames);
+    }
     return {
       webCard: result,
     };
