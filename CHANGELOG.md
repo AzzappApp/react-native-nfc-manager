@@ -1,3 +1,21 @@
+## 1.9.0-canary.2
+
+* **fix:**  - allow to search contact by company ([#7787](https://github.com/AzzappApp/azzapp/pull/7787))
+* **fix:**  - unify compagny logo management in contact card edit ([#7789](https://github.com/AzzappApp/azzapp/pull/7789))
+* **perf:**  - [#7322](https://github.com/AzzappApp/azzapp/pull/7322) don’t make queries in middleware ([#7784](https://github.com/AzzappApp/azzapp/pull/7784))
+* **fix:**  - add missing gap ([#7786](https://github.com/AzzappApp/azzapp/pull/7786))
+* **fix:**  - **webCard:** [#7537](https://github.com/AzzappApp/azzapp/pull/7537) simplify queries ([#7779](https://github.com/AzzappApp/azzapp/pull/7779))
+* **feat:**  - add zoom on hoover on web webcard ([#7775](https://github.com/AzzappApp/azzapp/pull/7775))
+* **fix:**  - update lockScreen translation ([#7776](https://github.com/AzzappApp/azzapp/pull/7776))
+* **fix:**  - ensure cover shadow follow border radius in image overlay ([#7766](https://github.com/AzzappApp/azzapp/pull/7766))
+* **feat:**  - add possibility to increase or decrease text size ([#7697](https://github.com/AzzappApp/azzapp/pull/7697))
+* **fix:**  - remove cross from contacts screen ([#7757](https://github.com/AzzappApp/azzapp/pull/7757))
+* **fix:**  - apply image resizing after change the image overlay ([#7762](https://github.com/AzzappApp/azzapp/pull/7762))
+* **fix:**  - ensure the focused element in bottom tab is well handled ([#7755](https://github.com/AzzappApp/azzapp/pull/7755))
+* **fix:**  - refactor duplicated profile added / removed code ([#7737](https://github.com/AzzappApp/azzapp/pull/7737))
+* **fix:**  - widget url  deeplink and scheme by target ([#7715](https://github.com/AzzappApp/azzapp/pull/7715))
+* **fix:**  - webcard parameters alignment ([#7708](https://github.com/AzzappApp/azzapp/pull/7708))
+
 ## 1.8.3-canary.22
 
 * **fix:**  - allow to search contact by company ([#7787](https://github.com/AzzappApp/azzapp/pull/7787))
@@ -98,4 +116,6 @@
 
 ## 1.8.3-canary.2
 
-* **fix:**  - gap in contact card screen ([#7709](https://github.com/AzzappApp/azzapp/pull/7709))
+## 1.8.5
+
+* **fix:**  - wait for the setMultiUser mutation ([#7522](https://github.com/AzzappApp/azzapp/pull/7522))
