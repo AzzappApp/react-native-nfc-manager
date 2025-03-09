@@ -50,6 +50,10 @@ jest.mock('@azzapp/shared/profileHelpers', () => ({
 
 jest.mock('#helpers/relayIdHelpers', () => jest.fn());
 
+jest.mock('#externals', () => ({
+  invalidateWebCard: jest.fn(),
+}));
+
 // Mock context and info
 const mockContext: any = {};
 const mockInfo: any = {};
