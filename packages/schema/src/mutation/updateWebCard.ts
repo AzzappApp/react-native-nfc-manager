@@ -8,13 +8,13 @@ import {
 import ERRORS from '@azzapp/shared/errors';
 import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
 import { isValidUserName } from '@azzapp/shared/stringHelpers';
+import { invalidateWebCard } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
 import {
   profileByWebCardIdAndUserIdLoader,
   webCardCategoryLoader,
   webCardLoader,
 } from '#loaders';
-import { invalidateWebCard } from '#externals';
 import { checkWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { checkWebCardHasSubscription } from '#helpers/subscriptionHelpers';
@@ -175,7 +175,7 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
 
     webCardLoader.clear(webCardId);
     const result = await webCardLoader.load(webCardId);
-    if(result?.userName){
+    if (result?.userName) {
       invalidateWebCard(result.userName);
     }
     return {
