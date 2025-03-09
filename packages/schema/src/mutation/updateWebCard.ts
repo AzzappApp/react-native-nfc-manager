@@ -14,6 +14,7 @@ import {
   webCardCategoryLoader,
   webCardLoader,
 } from '#loaders';
+import { invalidateWebCard } from '#externals';
 import { checkWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { checkWebCardHasSubscription } from '#helpers/subscriptionHelpers';
@@ -167,6 +168,8 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
           partialWebCard.userName,
           previousUserName,
         );
+
+        invalidateWebCard(previousUserName);
       }
     });
 
