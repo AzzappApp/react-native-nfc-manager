@@ -1,6 +1,16 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Azzapp Scan Widget" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Azzapp Scan Widget"
+          }
+        }
+      }
+    },
     "color" : {
       "comment" : "widget color title in configuration ",
       "extractionState" : "manual",
@@ -72,6 +82,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Partagez instantanément vos coordonnées depuis votre écran d'accueil"
+          }
+        }
+      }
+    },
+    "Scan a contact card easily with this widget." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scan a contact card easily with this widget."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scan un contact"
           }
         }
       }

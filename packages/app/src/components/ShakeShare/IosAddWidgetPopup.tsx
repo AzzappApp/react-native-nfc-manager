@@ -60,9 +60,9 @@ const IosAddWidgetPopup = ({
   );
 };
 
-const stylesheet = createStyleSheet(theme => ({
+const stylesheet = createStyleSheet(appearance => ({
   popupContainer: {
-    backgroundColor: theme === 'dark' ? colors.grey900 : colors.white,
+    backgroundColor: appearance === 'dark' ? colors.grey900 : colors.white,
     width: 295,
     borderRadius: 20,
     alignSelf: 'center',
@@ -76,12 +76,12 @@ const stylesheet = createStyleSheet(theme => ({
   },
   popupPage: { top: 0, width: '100%', paddingBottom: 20 },
   popupHeaderTextContainer: {
-    color: theme === 'dark' ? colors.white : colors.black,
+    color: appearance === 'dark' ? colors.white : colors.black,
     paddingTop: 20,
     textAlign: 'center',
   },
   popupDescriptionTextContainer: {
-    color: theme === 'dark' ? colors.white : colors.black,
+    color: appearance === 'dark' ? colors.white : colors.black,
     paddingTop: 10,
     textAlign: 'center',
   },

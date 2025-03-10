@@ -124,7 +124,7 @@ const styleSheet = createStyleSheet(appearance => ({
     borderRadius: 10,
     aspectRatio: RATIO_MODULE,
     marginHorizontal: 5,
-    ...shadow(appearance, 'bottom'),
+    ...shadow({ appearance, direction: 'bottom' }),
   },
   moduleContainer: {
     backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey1000,

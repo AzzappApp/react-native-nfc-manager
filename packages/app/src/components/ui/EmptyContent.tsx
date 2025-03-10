@@ -36,7 +36,7 @@ const EmptyContent = ({
   );
 };
 
-const stylesheet = createStyleSheet(theme => ({
+const stylesheet = createStyleSheet(appearance => ({
   container: {
     alignItems: 'center',
     width: 200,
@@ -45,7 +45,7 @@ const stylesheet = createStyleSheet(theme => ({
     width: 60,
     height: 60,
     marginBottom: 20,
-    tintColor: theme === 'dark' ? colors.grey800 : colors.grey200,
+    tintColor: appearance === 'dark' ? colors.grey800 : colors.grey200,
   },
   message: { marginBottom: 10, textAlign: 'center' },
   description: { textAlign: 'center' },

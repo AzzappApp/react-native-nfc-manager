@@ -78,7 +78,7 @@ const CardTemplate = ({
   );
 };
 
-const stylesheet = createStyleSheet(theme => ({
+const stylesheet = createStyleSheet(appearance => ({
   labelContainerHeight: {
     height: LABEL_CONTAINER_HEIGHT,
     justifyContent: 'center',
@@ -91,7 +91,7 @@ const stylesheet = createStyleSheet(theme => ({
     borderCurve: 'continuous',
     minHeight: '30%',
     borderRadius: 20,
-    ...shadow(theme, 'bottom'),
+    ...shadow({ appearance, direction: 'bottom' }),
   },
   webCardContainerRadius: {
     borderRadius: ITEM_RADIUS,

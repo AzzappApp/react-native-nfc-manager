@@ -383,13 +383,13 @@ const CoverRenderer = (
 
 export default memo(forwardRef(CoverRenderer));
 
-const stylesheet = createStyleSheet(theme => ({
+const stylesheet = createStyleSheet(appearance => ({
   root: {
     aspectRatio: COVER_RATIO,
     overflow: 'hidden',
     borderCurve: 'continuous',
   },
-  shadow: shadow(theme, 'bottom'),
+  shadow: shadow({ appearance, direction: 'bottom' }),
   layer: {
     position: 'absolute',
     top: 0,

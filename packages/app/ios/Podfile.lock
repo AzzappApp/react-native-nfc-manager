@@ -135,6 +135,8 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
+  - ExpoQuickActions (4.0.2):
+    - ExpoModulesCore
   - ExpoSensors (14.0.2):
     - ExpoModulesCore
   - fast_float (6.1.4)
@@ -2602,6 +2604,7 @@ DEPENDENCIES:
   - ExpoKeepAwake (from `../../../node_modules/expo-keep-awake/ios`)
   - ExpoLinearGradient (from `../../../node_modules/expo-linear-gradient/ios`)
   - ExpoModulesCore (from `../../../node_modules/expo-modules-core`)
+  - ExpoQuickActions (from `../../../node_modules/expo-quick-actions/ios`)
   - ExpoSensors (from `../../../node_modules/expo-sensors/ios`)
   - fast_float (from `../../../node_modules/react-native/third-party-podspecs/fast_float.podspec`)
   - FBLazyVector (from `../../../node_modules/react-native/Libraries/FBLazyVector`)
@@ -2788,6 +2791,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/expo-linear-gradient/ios"
   ExpoModulesCore:
     :path: "../../../node_modules/expo-modules-core"
+  ExpoQuickActions:
+    :path: "../../../node_modules/expo-quick-actions/ios"
   ExpoSensors:
     :path: "../../../node_modules/expo-sensors/ios"
   fast_float:
@@ -3018,6 +3023,7 @@ SPEC CHECKSUMS:
   ExpoKeepAwake: b0171a73665bfcefcfcc311742a72a956e6aa680
   ExpoLinearGradient: 35ebd83b16f80b3add053a2fd68cc328ed927f60
   ExpoModulesCore: 3df312dd803e75d8e42ba6ca2e7fd9224110f25e
+  ExpoQuickActions: 3fa116b4efea5baf19edb142f0b612a75c30265f
   ExpoSensors: 02a52ddab1e3a8a1438258c3d87d1ee5f721743a
   fast_float: 06eeec4fe712a76acc9376682e4808b05ce978b6
   FBLazyVector: 79c4b7ec726447eec5f8593379466bd9fde1aa14
@@ -3085,7 +3091,7 @@ SPEC CHECKSUMS:
   react-native-quick-base64: e69675f0ddca418dd1eb8a6ffa06ed388be293d9
   react-native-safe-area-context: 7e513d737b0b5c1d10bbe0e5fcc9f925a7be144c
   react-native-skia: d3d3afa9c428c6c7ccfd89a02683b5dbf2f31d35
-  react-native-skottie-template-player: e71f773222960069b747bd3b14d86be395c5a3d0
+  react-native-skottie-template-player: 3120030f38fc46dacafd2220539c31f4df1b7d0d
   react-native-webview: 449c3f27cdb926086a5eff7993421fd096cc5ae3
   React-nativeconfig: cb207ebba7cafce30657c7ad9f1587a8f32e4564
   React-NativeModulesApple: 8411d548b1ad9d2b3e597beb9348e715c8020e0c
@@ -3145,8 +3151,8 @@ SPEC CHECKSUMS:
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   SPTPersistentCache: df36ea46762d7cf026502bbb86a8b79d0080dff4
   VisionCamera: 7aaae584148bbc250e81b5662e45a7f25c18be2e
-  Yoga: 1fd059161b449018342943b095a6d4e69bcaa719
+  Yoga: 2957d0e744897870b5a377f26522e3f08cadd7ac
 
 PODFILE CHECKSUM: ca03835200938cc10d80d63e8c003657ba0703d1
 
-COCOAPODS: 1.16.2
+COCOAPODS: 1.16.1

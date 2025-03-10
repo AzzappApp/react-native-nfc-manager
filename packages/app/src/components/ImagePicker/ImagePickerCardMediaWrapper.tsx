@@ -34,7 +34,7 @@ const ImagePickerCardMediaWrapper = ({ children }: { children: ReactNode }) => {
 
 export default ImagePickerCardMediaWrapper;
 
-const styleSheet = createStyleSheet(apperance => ({
+const styleSheet = createStyleSheet(appearance => ({
   radiusBox: {
     flex: 1,
     overflow: 'hidden',
@@ -45,7 +45,7 @@ const styleSheet = createStyleSheet(apperance => ({
       flex: 1,
       aspectRatio: COVER_RATIO,
     },
-    shadow(apperance, 'center'),
+    shadow({ appearance, direction: 'center' }),
   ],
   container: {
     flex: 1,

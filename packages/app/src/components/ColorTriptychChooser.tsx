@@ -394,7 +394,7 @@ const stylesheet = createStyleSheet(appearance => ({
     borderWidth: 3,
     borderColor: colors.white,
     position: 'absolute',
-    ...shadow(appearance, 'bottom'),
+    ...shadow({ appearance, direction: 'bottom' }),
   },
   colorPaletteContainer: {
     width: PALETTE_LIST_HEIGHT,

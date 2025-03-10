@@ -118,9 +118,9 @@ const ContactDetailsModal = (
     </BottomSheetModal>
   );
 };
-const stylesheet = createStyleSheet(theme => ({
+const stylesheet = createStyleSheet(appearance => ({
   background: {
-    backgroundColor: theme === 'dark' ? colors.grey1000 : 'white',
+    backgroundColor: appearance === 'dark' ? colors.grey1000 : 'white',
   },
 }));
 

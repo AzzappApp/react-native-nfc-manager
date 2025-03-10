@@ -97,7 +97,7 @@ const PostLikesListItem = ({ webcard: webcardKey }: Props) => {
 
 const COVER_WIDTH = 35;
 
-const stylesheet = createStyleSheet(theme => ({
+const stylesheet = createStyleSheet(appearance => ({
   item: {
     paddingRight: 10,
     columnGap: 15.5,
@@ -118,7 +118,7 @@ const stylesheet = createStyleSheet(theme => ({
     alignItems: 'center',
   },
   unfollow: {
-    color: theme === 'light' ? colors.grey200 : colors.grey800,
+    color: appearance === 'light' ? colors.grey200 : colors.grey800,
   },
 }));
 

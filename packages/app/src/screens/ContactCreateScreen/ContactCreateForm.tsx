@@ -218,7 +218,7 @@ const styleSheet = createStyleSheet(appearance => ({
   imageContainer: {
     alignItems: 'center',
     marginTop: 20,
-    ...shadow(appearance),
+    ...shadow({ appearance }),
     overflow: 'visible',
     marginBottom: 20,
   },

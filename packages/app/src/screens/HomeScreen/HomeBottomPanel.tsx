@@ -26,7 +26,6 @@ import TabView from '#ui/TabView';
 import HomeBottomPanelMessage from './HomeBottomPanelMessage';
 import HomeContactCard from './HomeContactCard';
 import { useIndexInterpolation } from './homeHelpers';
-import HomeInformations from './HomeInformations';
 import HomeMenu, { HOME_MENU_HEIGHT } from './HomeMenu';
 import { useHomeScreenContext } from './HomeScreenContext';
 import HomeStatistics from './HomeStatistics';
@@ -45,7 +44,6 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
     graphql`
       fragment HomeBottomPanel_user on User {
         ...HomeContactCard_user
-        ...HomeInformations_user
         userSubscription {
           issuer
         }
@@ -57,6 +55,7 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
           nbNewContacts
           webCard {
             id
+            isMultiUser
             userName
             cardIsPublished
             hasCover
@@ -220,6 +219,7 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
         collapsable={false}
       >
         <HomeMenu
+          user={user}
           selected={selectedPanel}
           setSelected={onSelectedPanelChange}
           newContactsOpacity={newContactsOpacity}
@@ -242,21 +242,6 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
                     width={panelWidth}
                     gap={20}
                     user={user}
-                  />
-                </View>
-              ),
-            },
-            {
-              id: 'INFORMATION',
-              element: (
-                <View style={{ paddingHorizontal: 20, height: panelHeight }}>
-                  <HomeInformations
-                    user={user}
-                    height={panelHeight}
-                    width={panelWidth}
-                    notificationColor={notificationColor}
-                    nbNewContacts={nbNewContactsDerivedValue}
-                    newContactsOpacity={newContactsOpacity}
                   />
                 </View>
               ),

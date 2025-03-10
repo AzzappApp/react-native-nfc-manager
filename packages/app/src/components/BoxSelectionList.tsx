@@ -303,7 +303,7 @@ const styleSheet = createStyleSheet(appearance => ({
       backgroundColor: appearance === 'dark' ? colors.grey900 : colors.grey200,
       borderCurve: 'continuous',
       overflow: 'visible',
-      ...shadow(appearance),
+      ...shadow({ appearance }),
     },
   ],
   buttonInnerBorder: {

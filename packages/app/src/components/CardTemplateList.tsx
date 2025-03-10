@@ -654,7 +654,7 @@ const SKIP_BUTTON_HEIGHT = 20;
 const LABEL_CONTAINER_HEIGHT = 40;
 const SELECT_INPUT_HEIGHT = 43;
 
-const stylesheet = createStyleSheet(theme => ({
+const stylesheet = createStyleSheet(appearance => ({
   root: {
     flex: 1,
     gap: GAP,
@@ -693,7 +693,7 @@ const stylesheet = createStyleSheet(theme => ({
       borderCurve: 'continuous',
       minHeight: '30%',
     },
-    shadow(theme, 'bottom'),
+    shadow({ appearance, direction: 'bottom' }),
   ],
   webCardContainerRadius: {
     borderRadius: ITEM_RADIUS,

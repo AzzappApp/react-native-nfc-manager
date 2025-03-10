@@ -43,7 +43,7 @@ const styleSheet = createStyleSheet(appearance => ({
     paddingHorizontal: 10,
     paddingVertical: 20,
     gap: 5,
-    ...shadow(appearance, 'center'),
+    ...shadow({ appearance, direction: 'center' }),
   },
   templateErrorIcon: {
     width: 34,

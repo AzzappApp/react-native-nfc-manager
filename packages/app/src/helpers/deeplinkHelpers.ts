@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/react-native';
 import { toGlobalId } from 'graphql-relay';
 import { decompressFromEncodedURIComponent } from 'lz-string';
+import { openShakeShare } from '#components/ShakeShare';
 import { logEvent } from './analytics';
 import { verifySign } from './MobileWebAPI';
 import type { Route } from '#routes';
@@ -50,6 +51,21 @@ export const matchUrlWithRoute = async (
   let withoutPrefix = url.replace(prefix, '');
   if (withoutPrefix.startsWith('/')) {
     withoutPrefix = withoutPrefix.slice(1);
+  }
+
+  if (withoutPrefix === 'scan') {
+    return {
+      route: 'CONTACT_CREATE',
+      params: {
+        showCardScanner: true,
+      },
+    };
+  }
+  if (withoutPrefix === 'widget_share') {
+    openShakeShare();
+    return {
+      route: 'HOME',
+    };
   }
   const matchResetPassword = withoutPrefix.match(resetPasswordUrl);
   if (matchResetPassword) {

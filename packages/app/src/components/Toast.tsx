@@ -256,7 +256,7 @@ const styleSheet = createStyleSheet(appearance => ({
     width: undefined,
     // TODO UI
     backgroundColor: colors.white, // appearance === 'light' ? colors.white : colors.black,
-    ...shadow(appearance, 'center'),
+    ...shadow({ appearance, direction: 'center' }),
   },
   successToastIcon: {
     // TODO UI

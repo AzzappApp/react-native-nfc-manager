@@ -268,7 +268,7 @@ const styleSheet = createStyleSheet(appearance => ({
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     borderWidth: 0,
-    ...shadow(appearance, 'top'),
+    ...shadow({ appearance, direction: 'top' }),
   },
 }));
 

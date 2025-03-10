@@ -101,6 +101,15 @@ struct QRCodeWidgetEntryView: View {
           }
           .widgetBackground(backgroundView: BackgroundView(color: Color(hex: entry.widgetData.color)))
         }
+      case .accessoryCircular :
+        ZStack {
+          Image("QR_code") // Use a system image for testing
+             .resizable()
+             .scaledToFit()
+             .frame(width: 40, height: 40)
+        }.containerBackground(.fill, for: .widget)
+       .widgetURL(URL(string: "azzapp://widget_share"))
+  
        default:
            VStack {
            }
@@ -118,7 +127,7 @@ struct QRCodeWidget: Widget {
     }
     .configurationDisplayName("Homescreen Widgets")
     .description("Instantly share your contact information from your home screen")
-    .supportedFamilies([.systemSmall, .systemLarge])
+    .supportedFamilies([.systemSmall, .systemLarge, .accessoryCircular])
     .disableContentMarginsIfNeeded()
   }
 }

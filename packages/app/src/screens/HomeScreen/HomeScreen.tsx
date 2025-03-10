@@ -11,6 +11,7 @@ import { useSaveOfflineVCard } from '#helpers/offlineVCard';
 import relayScreen from '#helpers/relayScreen';
 import { TooltipProvider } from '#helpers/TooltipContext';
 import { useDeepLinkStoredRoute } from '#hooks/useDeepLink';
+import { useQuickActions } from '#hooks/useQuickActions';
 import { useRevenueCat } from '#hooks/useRevenueCat';
 import { useSetRevenueCatUserInfo } from '#hooks/useSetRevenueCatUserInfo';
 import Container from '#ui/Container';
@@ -45,6 +46,7 @@ const HomeScreen = ({
 }: RelayScreenProps<HomeRoute, HomeScreenQuery>) => {
   //we need to wait the initial screen to be load before doing any deep link
   useDeepLinkStoredRoute();
+  useQuickActions();
 
   const { currentUser } = usePreloadedQuery(homeScreenQuery, preloadedQuery);
 

@@ -247,7 +247,7 @@ const CardModule = ({
   );
 };
 
-const stylesheet = createStyleSheet(theme => ({
+const stylesheet = createStyleSheet(appearance => ({
   toggleContainer: {
     paddingHorizontal: 20,
     paddingVertical: 10,
@@ -257,7 +257,7 @@ const stylesheet = createStyleSheet(theme => ({
   },
   webCardContainer: {
     flex: 1,
-    backgroundColor: theme === 'dark' ? colors.black : colors.white,
+    backgroundColor: appearance === 'dark' ? colors.black : colors.white,
   },
   webCardBackground: {
     position: 'absolute',

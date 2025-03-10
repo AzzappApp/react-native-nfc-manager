@@ -1318,7 +1318,7 @@ const inBounds = (
 const styles = StyleSheet.create({
   root: {
     backgroundColor: colors.grey300,
-    ...shadow('light'),
+    ...shadow({ appearance: 'light' }),
   },
   overlayControls: {
     gap: 15,
