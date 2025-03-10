@@ -6,6 +6,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
+import { ENABLE_MULTI_USER } from '#Config';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import { profileInfoHasAdminRight } from '#helpers/profileRoleHelper';
@@ -23,6 +24,7 @@ type HomeMenuProps = {
   setSelected: (section: HOME_TAB) => void;
   newContactsOpacity: DerivedValue<number>;
   notificationColor: DerivedValue<string>;
+  minWidth: number;
 };
 
 const circleSize = 4.5;
@@ -33,6 +35,7 @@ const HomeMenu = ({
   setSelected,
   newContactsOpacity,
   notificationColor,
+  minWidth,
 }: HomeMenuProps) => {
   const router = useRouter();
   const intl = useIntl();
@@ -63,7 +66,10 @@ const HomeMenu = ({
   }, [currentIndexProfileSharedValue.value, intl, router, user?.profiles]);
 
   return (
-    <View style={styles.container} accessibilityRole="tablist">
+    <View
+      style={[styles.container, { width: minWidth }]}
+      accessibilityRole="tablist"
+    >
       <TabBarMenuItem
         selected={selected === 'CONTACT_CARD'}
         onPress={() => setSelected('CONTACT_CARD')}
@@ -84,19 +90,21 @@ const HomeMenu = ({
           }}
         />
       </TabBarMenuItem>
-      <TabBarMenuItem
-        selected={selected === 'MULTI_USER'}
-        onPress={onPressMultiUser}
-        selectedBackgroundColor={END_GRADIENT_COLOR}
-        backgroundColor={CLEAR_GRADIENT_COLOR}
-        labelStyle={styles.menuLabelStyle}
-        selectedLabelColor={colors.white}
-      >
-        <FormattedMessage
-          defaultMessage="Multi-user"
-          description="Home Screen menu - Multi user"
-        />
-      </TabBarMenuItem>
+      {ENABLE_MULTI_USER && (
+        <TabBarMenuItem
+          selected={selected === 'MULTI_USER'}
+          onPress={onPressMultiUser}
+          selectedBackgroundColor={END_GRADIENT_COLOR}
+          backgroundColor={CLEAR_GRADIENT_COLOR}
+          labelStyle={styles.menuLabelStyle}
+          selectedLabelColor={colors.white}
+        >
+          <FormattedMessage
+            defaultMessage="Multi-user"
+            description="Home Screen menu - Multi user"
+          />
+        </TabBarMenuItem>
+      )}
       <TabBarMenuItem
         selected={selected === 'STATS'}
         onPress={() => setSelected('STATS')}
@@ -127,10 +135,11 @@ const styles = StyleSheet.create({
   container: {
     height: HOME_MENU_HEIGHT,
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'space-evenly',
     paddingBottom: HOME_MENU_PADDING,
     overflow: 'visible',
     gap: 5,
+    alignSelf: 'center',
   },
   menuLabelStyle: {
     color: colors.white,

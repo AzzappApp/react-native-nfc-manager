@@ -224,6 +224,7 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
           setSelected={onSelectedPanelChange}
           newContactsOpacity={newContactsOpacity}
           notificationColor={notificationColor}
+          minWidth={panelWidth}
         />
         <TabView
           style={{ flex: 1, height: panelHeight }}
