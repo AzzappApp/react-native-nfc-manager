@@ -165,31 +165,10 @@ const MainTabBar = ({
       [
         {
           key: 'HOME',
-          label: intl.formatMessage(
-            {
-              defaultMessage: 'Webcards{azzappA}',
-              description: 'Main tab bar title for webcards',
-            },
-            {
-              azzappA: (
-                <Text
-                  variant="azzapp"
-                  style={{
-                    color:
-                      currentRoute === 'HOME'
-                        ? appearance === 'light'
-                          ? colors.black
-                          : colors.white
-                        : appearance === 'light'
-                          ? colors.grey200
-                          : colors.grey400,
-                  }}
-                >
-                  a
-                </Text>
-              ),
-            },
-          ),
+          label: intl.formatMessage({
+            defaultMessage: 'Home',
+            description: 'Main tab bar title for home',
+          }),
           IconComponent: <HomeIcon />,
         },
         {
