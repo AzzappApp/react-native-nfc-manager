@@ -10,7 +10,8 @@
         "PRIVACY_POLICY": "https://web.azzapp.com/legal/privacy",
         "ABOUT": "https://web.azzapp.com/company/about_us",
         "FAQ": "https://web.azzapp.com/company/faq",
-        "WIDGET_APP_GROUP": "group.azzapp.app-staging.widget"
+        "WIDGET_APP_GROUP": "group.azzapp.app-staging.widget",
+        "APP_SCHEME": "azzapp"
       },
       "ios": {
         "image": "latest",
@@ -69,6 +70,7 @@
     },
     "production": {
       "extends": "base",
+      "distribution": "internal",
       "ios": {
         "buildConfiguration": "Release",
         "scheme": "azzapp"
