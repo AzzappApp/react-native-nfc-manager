@@ -1,5 +1,5 @@
-import { Fragment, useCallback } from 'react';
-import { View } from 'react-native';
+import { useCallback } from 'react';
+import { ScrollView, View } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Text from '#ui/Text';
@@ -66,10 +66,19 @@ const TabsBar = ({
   const styles = useStyleSheet(styleSheet);
 
   return (
-    <View
-      style={[styles.container, style]}
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={[
+        styles.container,
+        style,
+        {
+          minWidth: '100%',
+        },
+      ]}
       accessibilityRole="tablist"
-      accessible
+      testID="tablist"
+      bounces={false}
     >
       {tabs.map(({ tabKey, rightElement, label }) => (
         <TabsBarItem
@@ -83,7 +92,7 @@ const TabsBar = ({
         />
       ))}
       <View style={styles.backgroundLine} />
-    </View>
+    </ScrollView>
   );
 };
 
@@ -153,6 +162,7 @@ const styleSheet = createStyleSheet(appearance => ({
   backgroundLine: {
     flex: 1,
     height: 1,
+    minWidth: 5,
     backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
     alignSelf: 'center',
   },

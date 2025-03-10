@@ -150,7 +150,6 @@ const MediaPicker = ({
             currentTab={selectedTab}
             onTabPress={onTabPress}
             decoration="underline"
-            style={styles.gallery}
           />
         </View>
         <TabView
@@ -246,9 +245,6 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-  },
-  gallery: {
-    flexGrow: 1,
   },
   arrowIcon: {
     width: 12,
