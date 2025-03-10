@@ -1,3 +1,7 @@
+## 1.9.0-canary.4
+
+
+
 ## 1.9.0-canary.3
 
 * **fix:**  - use new fonts packages ([#7798](https://github.com/AzzappApp/azzapp/pull/7798))
