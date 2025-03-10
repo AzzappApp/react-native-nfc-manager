@@ -19,6 +19,7 @@ import {
   getPricePerSeat,
   MONTHLY_RECURRENCE,
   YEARLY_RECURRENCE,
+  REBILL_MANAGER_REBILL_DURATION,
 } from '#helpers';
 import type { Customer } from '#types';
 import type { UserSubscription } from '@azzapp/data';
@@ -281,7 +282,7 @@ export const updateExistingSubscription = async ({
             rebill_manager_initial_price_cnts: '0',
             rebill_manager_initial_duration_min: `${timeUntilNextPayment}`,
             rebill_manager_rebill_price_cnts: `${recurringCost.amount + recurringCost.taxes}`,
-            rebill_manager_rebill_duration_mins: `0`,
+            rebill_manager_rebill_duration_mins: REBILL_MANAGER_REBILL_DURATION,
             rebill_manager_rebill_period_mins: `${intervalInMinutes}`,
             clientPaymentRequestUlid: existingSubscription.paymentMeanId,
             rebill_manager_fail_rule: generateRebillFailRule(),
@@ -395,7 +396,7 @@ export const updateExistingSubscription = async ({
           rebill_manager_initial_price_cnts: `${(firstPayment?.amount ?? recurringCost.amount) + (firstPayment?.taxes ?? recurringCost.taxes)}`,
           rebill_manager_initial_duration_min: `${firstPayment ? intervalInMinutes : calculateNextPaymentIntervalInMinutes(existingSubscription.subscriptionPlan)}`,
           rebill_manager_rebill_price_cnts: `${recurringCost.amount + recurringCost.taxes}`,
-          rebill_manager_rebill_duration_mins: '0',
+          rebill_manager_rebill_duration_mins: REBILL_MANAGER_REBILL_DURATION,
           rebill_manager_rebill_period_mins: `${calculateNextPaymentIntervalInMinutes(existingSubscription.subscriptionPlan)}`,
           clientPaymentRequestUlid: existingSubscription.paymentMeanId,
           rebill_manager_fail_rule: generateRebillFailRule(),
@@ -539,7 +540,7 @@ export const upgradePlan = async (existingSubscription: UserSubscription) => {
           rebill_manager_initial_price_cnts: `${amount + taxes}`,
           rebill_manager_initial_duration_min: `${intervalInMinutes + intervalInMinutesForPreviousSubscription}`,
           rebill_manager_rebill_price_cnts: `${amount + taxes}`,
-          rebill_manager_rebill_duration_mins: `0`,
+          rebill_manager_rebill_duration_mins: REBILL_MANAGER_REBILL_DURATION,
           rebill_manager_rebill_period_mins: `${intervalInMinutes}`,
           clientPaymentRequestUlid: existingSubscription.paymentMeanId,
           rebill_manager_fail_rule: generateRebillFailRule(),

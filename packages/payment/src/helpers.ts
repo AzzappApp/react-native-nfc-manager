@@ -12,6 +12,11 @@ export const YEARLY_RECURRENCE = ms(
   process.env.PAYMENT_YEARLY_RECURRENCE ?? '365d',
 );
 
+export const REBILL_MANAGER_REBILL_DURATION =
+  process.env.NEXT_PUBLIC_PLATFORM === 'production'
+    ? '0' // 0 means unlimited
+    : `${60 * 24}`; // 1 day (in minutes) in test environments
+
 /**
  *
  * @param subscriptionPlan

@@ -16,6 +16,7 @@ import {
   calculateTaxes,
   generateRebillFailRule,
   getNextPaymentDate,
+  REBILL_MANAGER_REBILL_DURATION,
   signature,
   type SubscriptionPlan,
 } from './helpers';
@@ -261,7 +262,7 @@ export const createSubscriptionRequest = async ({
         rebill_manager_initial_price_cnts: `${amount}`,
         rebill_manager_initial_duration_min: `${intervalInMinutes}`,
         rebill_manager_rebill_price_cnts: `${amount}`,
-        rebill_manager_rebill_duration_mins: `0`,
+        rebill_manager_rebill_duration_mins: REBILL_MANAGER_REBILL_DURATION,
         rebill_manager_rebill_period_mins: `${intervalInMinutes}`,
         clientPaymentRequestUlid: paymentMean.id,
         rebill_manager_fail_rule: generateRebillFailRule(),
