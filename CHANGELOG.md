@@ -1,3 +1,7 @@
+## 1.9.0-canary.3
+
+* **fix:**  - use new fonts packages ([#7798](https://github.com/AzzappApp/azzapp/pull/7798))
+
 ## 1.9.0-canary.2
 
 * **fix:**  - allow to search contact by company ([#7787](https://github.com/AzzappApp/azzapp/pull/7787))
