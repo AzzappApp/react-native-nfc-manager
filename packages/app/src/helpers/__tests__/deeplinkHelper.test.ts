@@ -3,7 +3,11 @@ import { matchUrlWithRoute } from '#helpers/deeplinkHelpers';
 import { verifySign } from '#helpers/MobileWebAPI';
 
 jest.mock('#helpers/MobileWebAPI');
-
+jest.mock('#components/ShakeShare', () => ({
+  openShakeShare: jest.fn(() => {
+    console.log('Mock openShakeShare called');
+  }),
+}));
 describe('deeplinkHelpers', () => {
   const verifySignMock = jest.mocked(verifySign);
 

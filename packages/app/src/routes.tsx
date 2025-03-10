@@ -244,7 +244,6 @@ export type ContactCardCreateRoute = {
 export type ContactCreateRoute = {
   route: 'CONTACT_CREATE';
   params?: {
-    profileId: string;
     showCardScanner?: boolean;
   };
 };

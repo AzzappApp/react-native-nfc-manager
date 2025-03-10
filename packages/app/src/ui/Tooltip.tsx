@@ -35,7 +35,11 @@ const Tooltip = ({
         backgroundColor: colors.white,
         padding: 10,
         width: toolipWidth,
-        ...shadow(scheme || 'dark', 'bottom', true),
+        ...shadow({
+          appearance: scheme || 'dark',
+          direction: 'bottom',
+          forceOldShadow: true,
+        }),
       }}
       {...props}
     >

@@ -64,6 +64,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     height: TAB_BAR_MENU_ITEM_HEIGHT,
     gap: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
   },
   icon: {
     width: 22,

@@ -195,6 +195,6 @@ const styleSheet = createStyleSheet(appearance => ({
     flex: 1,
   },
   card: {
-    ...shadow(appearance),
+    ...shadow({ appearance }),
   },
 }));

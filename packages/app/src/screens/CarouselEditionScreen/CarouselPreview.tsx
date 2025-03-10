@@ -40,5 +40,5 @@ export default CarouselPreview;
 
 const styleSheet = createStyleSheet(appearance => ({
   module: [{ width: '100%' }],
-  container: shadow(appearance),
+  container: shadow({ appearance }),
 }));

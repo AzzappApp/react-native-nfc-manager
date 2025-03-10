@@ -285,7 +285,7 @@ export const WebCardModuleTransitionSnapshotRenderer = ({
   });
 
   return (
-    <Animated.View style={[style, shadow(appearance)]}>
+    <Animated.View style={[style, shadow({ appearance })]}>
       <Animated.View style={[StyleSheet.absoluteFill, innerViewStyle]}>
         <SnapshotRenderer
           snapshotID={info.editScreenSnapshotId}

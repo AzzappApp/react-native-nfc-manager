@@ -379,7 +379,7 @@ const stylesheet = createStyleSheet(appearance => ({
     overflow: 'visible',
     flexDirection: 'row',
     borderCurve: 'continuous',
-    ...shadow(appearance),
+    ...shadow({ appearance }),
   },
   logo: { zIndex: 1 },
   webCardBackground: {
@@ -434,7 +434,7 @@ const stylesheet = createStyleSheet(appearance => ({
     backgroundColor: '#FFFFFF4D',
     borderRadius: 78,
     width: 70,
-    ...shadow('light', 'center'),
+    ...shadow({ appearance: 'light', direction: 'center' }),
     overflow: 'visible',
   },
   firstLineView: {

@@ -20,7 +20,6 @@ import ProfileStatisticsChart, {
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import Text from '#ui/Text';
 import { useIndexInterpolation } from './homeHelpers';
-import { format } from './HomeInformations';
 import { useHomeScreenContext } from './HomeScreenContext';
 import type { HomeStatistics_profiles$key } from '#relayArtifacts/HomeStatistics_profiles.graphql';
 import type { ReactNode } from 'react';
@@ -446,3 +445,11 @@ const STATISTICS_ORDER = [
   'shareBacks',
   'likes',
 ] as const;
+
+export const format = (value: number) => {
+  'worklet';
+  if (typeof value === 'number') {
+    return Math.round(value).toString();
+  }
+  return '0';
+};

@@ -1,4 +1,5 @@
 import { Platform, StyleSheet } from 'react-native';
+import type { DefinedColorSchemeName } from '#helpers/createStyles';
 
 // color from style guide
 export const colors = {
@@ -89,21 +90,34 @@ export const mixins = {
   },
 } as const;
 
-export const shadow = (
-  appearence: 'dark' | 'light',
-  direction: 'bottom' | 'center' | 'top' = 'bottom',
+type ShadowParams = {
+  appearance: DefinedColorSchemeName;
+  direction?: 'bottom' | 'center' | 'top';
+  // @see https://github.com/facebook/react-native/issues/49128
+  forceOldShadow?: boolean;
+  height?: number;
+};
+
+export const shadow = ({
+  appearance,
+  direction = 'bottom',
   // @see https://github.com/facebook/react-native/issues/49128
   forceOldShadow = Platform.OS === 'ios',
-) =>
+  height = 10,
+}: ShadowParams) =>
   forceOldShadow
     ? {
         shadowColor: '#000',
         shadowOffset: {
           width: 0,
           height:
-            direction === 'bottom' ? 10 : direction === 'center' ? 0 : -10,
+            direction === 'bottom'
+              ? height
+              : direction === 'center'
+                ? 0
+                : -height,
         },
-        shadowOpacity: appearence === 'dark' ? 0.4 : 0.2,
+        shadowOpacity: appearance === 'dark' ? 0.4 : 0.2,
         shadowRadius: 10,
         elevation: 10,
       }
@@ -112,10 +126,14 @@ export const shadow = (
           {
             offsetX: 0,
             offsetY:
-              direction === 'bottom' ? 5 : direction === 'center' ? 0 : -5,
+              direction === 'bottom'
+                ? height / 2
+                : direction === 'center'
+                  ? 0
+                  : -height / 2,
             blurRadius: '10',
             spreadDistance: '0',
-            color: `rgba(0, 0, 0, ${appearence === 'dark' ? 0.4 : 0.2})`,
+            color: `rgba(0, 0, 0, ${appearance === 'dark' ? 0.4 : 0.2})`,
           },
         ],
       };

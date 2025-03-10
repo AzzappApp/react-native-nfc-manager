@@ -117,6 +117,6 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   previewContainer: {
     backgroundColor: colors.white,
-    ...shadow(appearance),
+    ...shadow({ appearance }),
   },
 }));

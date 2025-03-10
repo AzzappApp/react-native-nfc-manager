@@ -142,7 +142,7 @@ const ItemSeparator = () => {
   return <View style={styles.separator} />;
 };
 
-const stylesheet = createStyleSheet(theme => ({
+const stylesheet = createStyleSheet(appearance => ({
   content: {
     paddingHorizontal: 10,
   },
@@ -156,7 +156,7 @@ const stylesheet = createStyleSheet(theme => ({
   separator: {
     height: 1,
     width: '100%',
-    backgroundColor: theme === 'light' ? colors.grey50 : colors.grey900,
+    backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey900,
   },
 }));
 

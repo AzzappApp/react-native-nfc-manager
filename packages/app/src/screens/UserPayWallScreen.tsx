@@ -557,9 +557,7 @@ const OfferItem = ({
       <View>
         <Text variant="button" appearance="light">
           <FormattedNumber
-            value={
-              period === 'year' ? offer.product.price / 12 : offer.product.price
-            }
+            value={offer.product.price}
             style="currency"
             currency={offer.product.currencyCode}
           />
@@ -579,13 +577,13 @@ const OfferItem = ({
         {period === 'year' && (
           <Text variant="smallbold" style={styles.yearlyPricing}>
             <FormattedNumber
-              value={offer.product.price}
+              value={offer.product.price / 12}
               style="currency"
               currency={offer.product.currencyCode}
             />
             <FormattedMessage
-              defaultMessage=" / year"
-              description="MultiUser Paywall Screen - number of seat offer"
+              defaultMessage=" / month"
+              description="MultiUser Paywall Screen - number of seat offer per month"
             />
           </Text>
         )}
@@ -639,7 +637,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     borderRadius: 18,
     backgroundColor: 'white',
-    ...shadow('light', 'center'),
+    ...shadow({ appearance: 'light', direction: 'center' }),
   },
   contentContainerStyle: {
     marginHorizontal: 20,

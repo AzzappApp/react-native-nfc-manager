@@ -104,7 +104,7 @@ const styleSheet = createStyleSheet(appearance => ({
       position: 'relative',
       borderRadius: AVATAR_WIDTH / 2,
     },
-    shadow(appearance, 'bottom'),
+    shadow({ appearance, direction: 'bottom' }),
   ],
   removeAvatarIcon: {
     tintColor: colors.red400,

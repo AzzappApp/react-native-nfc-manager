@@ -148,7 +148,7 @@ const WebCardScreenEditModeFooter = ({
 
 export const WEBCARD_SCREEN_EDIT_MODE_FOOTER_HEIGHT = 110;
 
-const stylesheet = createStyleSheet(theme => ({
+const stylesheet = createStyleSheet(appearance => ({
   root: {
     display: 'flex',
     flexDirection: 'column',
@@ -185,7 +185,7 @@ const stylesheet = createStyleSheet(theme => ({
     overflow: 'hidden',
   },
   lottieContainer: {
-    ...shadow(theme, 'bottom'),
+    ...shadow({ appearance, direction: 'bottom' }),
     marginBottom: 20,
     borderRadius: 15,
   },

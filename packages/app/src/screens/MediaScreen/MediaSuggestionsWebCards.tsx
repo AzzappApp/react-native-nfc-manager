@@ -308,7 +308,7 @@ const styleSheet = createStyleSheet(appearance => ({
       2 * COVER_SUGGESTIONS_PADDING +
       2 * COVER_SUGGESTIONS_PADDING +
       ACTION_BUTTON_HEIGHT, //required for android
-    ...shadow(appearance, 'bottom'),
+    ...shadow({ appearance, direction: 'bottom' }),
   },
   coverContainerFallback: {
     width: COVER_SUGGESTIONS_WIDTH,
