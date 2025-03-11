@@ -465,7 +465,7 @@ const ContactCardCreateScreen = () => {
             return {
               ...extractPhoneNumberDetails(phoneNumber),
               selected: true,
-              label: 'WORK',
+              label: 'Work',
             };
           }
           return null;
