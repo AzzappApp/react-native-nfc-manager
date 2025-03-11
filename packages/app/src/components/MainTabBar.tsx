@@ -3,7 +3,6 @@ import { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import {
   Platform,
-  useColorScheme,
   useWindowDimensions,
   View,
   type StyleProp,
@@ -156,8 +155,6 @@ const MainTabBar = ({
     [intl, router],
   );
 
-  const appearance = useColorScheme() ?? 'light';
-
   const currentRoute = ['HOME', 'CONTACTS', 'MEDIA'][currentIndex];
 
   const tabs = useMemo(
@@ -204,7 +201,7 @@ const MainTabBar = ({
           icon: 'community',
         },
       ] as const,
-    [intl, currentRoute, appearance],
+    [intl],
   );
   const styles = useStyleSheet(styleSheet);
 
