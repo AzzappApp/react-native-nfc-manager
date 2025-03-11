@@ -1,3 +1,8 @@
+## 1.9.0-canary.7
+
+* **fix:**  - **payment:** 7750 don’t play infinite subscription in test envs
+* **fix:**  - deprecate updateWebCardUserName
+
 ## 1.9.0-canary.6
 
 * **feat:**  - add robots.txt file ([#7815](https://github.com/AzzappApp/azzapp/pull/7815))
