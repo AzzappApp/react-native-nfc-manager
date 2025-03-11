@@ -77,7 +77,7 @@ const ContactCardEditCompanyLogo = ({ control }: { control: Control<any> }) => {
     uri: string;
     width: number;
     height: number;
-  } | null>(null);
+  } | null>(field.value);
 
   const onImagePickerFinished = useCallback(
     async ({ id, uri, width, height }: ImagePickerResult) => {
@@ -269,7 +269,9 @@ const LogoComponentItem = ({
     <Pressable
       style={[
         styles.boxItem,
-        { aspectRatio: width / height },
+        width && height
+          ? { aspectRatio: width / height }
+          : styles.fallbackWidth,
         selected && styles.selected,
       ]}
       onPress={onPress}
@@ -278,7 +280,12 @@ const LogoComponentItem = ({
       <Image
         //use cache over uri to reduce request count to brandfetch external service
         source={{ uri: imageLocalUrl.get(item.id) ?? item.uri }}
-        style={[styles.itemImage, { aspectRatio: width / height }]}
+        style={[
+          styles.itemImage,
+          width && height
+            ? { aspectRatio: width / height }
+            : styles.fallbackWidth,
+        ]}
         contentFit="contain"
       />
     </Pressable>
@@ -297,6 +304,7 @@ const stylesheet = createStyleSheet(appearance => ({
     alignItems: 'center',
     overflow: 'hidden',
   },
+  fallbackWidth: { width: 55 },
   descriptionText: {
     marginBottom: 15,
     marginTop: 15,

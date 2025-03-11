@@ -326,7 +326,6 @@ const ContactCardEditScreen = ({
             'image',
             avatar.uri,
           );
-          // FIXME why not logoId ???
         }
         if (logo && logo?.uri) {
           addLocalCachedMediaFile(
