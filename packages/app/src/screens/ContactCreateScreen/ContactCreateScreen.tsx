@@ -242,7 +242,7 @@ const ContactCreateScreen = ({
       const formattedEmails = data?.emails
         ?.map((email: string) => {
           if (email) {
-            return { address: email, selected: true, label: 'WORK' };
+            return { address: email, selected: true, label: 'Work' };
           }
           return null;
         })
