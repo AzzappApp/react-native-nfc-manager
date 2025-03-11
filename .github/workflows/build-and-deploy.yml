@@ -330,6 +330,7 @@ jobs:
           IOS_APP_IDENTIFIER: ${{ vars.IOS_APP_IDENTIFIER }}
           IOS_APPCLIP_IDENTIFIER: ${{ vars.IOS_APPCLIP_IDENTIFIER }}
           IOS_SCHEME: ${{ vars.IOS_SCHEME }}
+          APP_SCHEME: ${{ vars.APP_SCHEME }}
           IOS_PROFILE_ID: ${{ vars.IOS_PROFILE_ID }}
           IOS_PROFILECLIP_ID: ${{ vars.IOS_PROFILECLIP_ID }}
           IOS_APPCLIP_SCHEME: ${{ vars.IOS_APPCLIP_SCHEME }}
@@ -359,6 +360,7 @@ jobs:
         env:
           IOS_APP_IDENTIFIER: ${{ vars.IOS_APP_IDENTIFIER }}
           IOS_SCHEME: ${{ vars.IOS_SCHEME }}
+          APP_SCHEME: ${{ vars.APP_SCHEME }}
           IOS_PROFILE_ID: ${{ vars.IOS_PROFILE_ID }}
           IOS_CODE_SIGNING_IDENTITY: ${{ vars.CODE_SIGNING_IDENTITY }}
           IOS_EXPORT_METHOD: ${{ vars.IOS_EXPORT_METHOD }}
