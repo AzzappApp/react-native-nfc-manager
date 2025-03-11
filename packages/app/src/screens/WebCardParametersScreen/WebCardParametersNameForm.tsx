@@ -147,9 +147,9 @@ const WebcardParametersNameForm = ({
   const [commitMutation] = useMutation(graphql`
     mutation WebCardParametersNameFormMutation(
       $webCardId: ID!
-      $input: UpdateWebCardUserNameInput!
+      $input: UpdateWebCardInput!
     ) {
-      updateWebCardUserName(webCardId: $webCardId, input: $input) {
+      updateWebCard(webCardId: $webCardId, input: $input) {
         webCard {
           id
           userName
