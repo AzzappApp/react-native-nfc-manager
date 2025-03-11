@@ -1,3 +1,7 @@
+## 1.9.0-canary.10
+
+* **fix:**  - review statics description and create a generic component / review navigation in network screen ([#7794](https://github.com/AzzappApp/azzapp/pull/7794))
+
 ## 1.9.0-canary.9
 
 * **fix:**  - wrong dependencies in useEffect
