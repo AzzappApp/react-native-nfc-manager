@@ -1,3 +1,7 @@
+## 1.9.0-canary.8
+
+* **fix:**  - wrong dependencies in useEffect
+
 ## 1.9.0-canary.7
 
 * **fix:**  - **payment:** 7750 don’t play infinite subscription in test envs
