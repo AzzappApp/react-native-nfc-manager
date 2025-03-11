@@ -1,4 +1,4 @@
-import analytics from '@react-native-firebase/analytics';
+import { getAnalytics as analytics } from '@react-native-firebase/analytics';
 
 export function setAnalyticsUserId(profileId: string) {
   analytics().setUserId(profileId).catch();

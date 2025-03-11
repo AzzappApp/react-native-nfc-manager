@@ -1,4 +1,4 @@
-import messaging from '@react-native-firebase/messaging';
+import { getMessaging as messaging } from '@react-native-firebase/messaging';
 import * as Device from 'expo-device';
 import { useCallback, useEffect, useState } from 'react';
 import { Platform } from 'react-native';
