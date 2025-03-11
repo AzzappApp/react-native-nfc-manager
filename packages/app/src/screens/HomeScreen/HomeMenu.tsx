@@ -106,19 +106,6 @@ const HomeMenu = ({
         </TabBarMenuItem>
       )}
       <TabBarMenuItem
-        selected={selected === 'MULTI_USER'}
-        onPress={onPressMultiUser}
-        selectedBackgroundColor={END_GRADIENT_COLOR}
-        backgroundColor={CLEAR_GRADIENT_COLOR}
-        labelStyle={styles.menuLabelStyle}
-        selectedLabelColor={colors.white}
-      >
-        <FormattedMessage
-          defaultMessage="Multi-user"
-          description="Home Screen menu - Multi user"
-        />
-      </TabBarMenuItem>
-      <TabBarMenuItem
         selected={selected === 'STATS'}
         onPress={() => setSelected('STATS')}
         selectedBackgroundColor={END_GRADIENT_COLOR}
