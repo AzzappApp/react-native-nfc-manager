@@ -56,12 +56,18 @@ export const saveCoverTemplate = async (
         enabled: submission.value.enabled === 'true',
       };
       const previousPreviewIds: string[] = [];
+      const previousMediaIds: string[] = [];
 
       let coverTemplateId = data.id;
       if (coverTemplateId) {
         const coverTemplate = await getCoverTemplateById(coverTemplateId);
         if (coverTemplate) {
           previousPreviewIds.push(coverTemplate.previewId);
+          if (coverTemplate.medias) {
+            previousMediaIds.push(
+              ...coverTemplate.medias.map(media => media.id),
+            );
+          }
         }
         await updateCoverTemplate(coverTemplateId, data);
       } else {
@@ -69,6 +75,10 @@ export const saveCoverTemplate = async (
       }
 
       await referencesMedias([data.previewId], previousPreviewIds);
+      await referencesMedias(
+        medias.map(media => media.id),
+        previousMediaIds,
+      );
 
       return {
         ...submission.reply(),

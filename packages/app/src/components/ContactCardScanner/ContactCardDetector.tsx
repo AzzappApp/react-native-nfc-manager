@@ -2,10 +2,11 @@ import { makeImageFromView } from '@shopify/react-native-skia';
 import { Paths, File } from 'expo-file-system/next';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { trigger } from 'react-native-haptic-feedback';
 import Animated, {
   runOnJS,
   useAnimatedStyle,
@@ -308,6 +309,19 @@ const ContactCardDetector = ({
       ],
     };
   });
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (loading) {
+      interval = setInterval(() => {
+        trigger('impactMedium');
+      }, 2000);
+    }
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [loading]);
 
   return (
     <GestureDetector gesture={composedGesture}>

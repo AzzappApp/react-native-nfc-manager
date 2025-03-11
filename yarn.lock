@@ -331,79 +331,35 @@ __metadata:
     "@azzapp/react-native-skia-video": "npm:0.8.3"
     "@azzapp/react-native-snapshot-view": "npm:^0.1.4"
     "@azzapp/shared": "workspace:^"
-    "@expo-google-fonts/amatic-sc": "npm:^0.2.3"
-    "@expo-google-fonts/anton": "npm:^0.2.3"
-    "@expo-google-fonts/archivo": "npm:^0.2.3"
-    "@expo-google-fonts/bebas-neue": "npm:^0.2.3"
-    "@expo-google-fonts/cardo": "npm:^0.2.3"
-    "@expo-google-fonts/cinzel": "npm:^0.2.3"
-    "@expo-google-fonts/cormorant-garamond": ./fonts/cormorant-garamond
-    "@expo-google-fonts/courier-prime": "npm:^0.2.3"
-    "@expo-google-fonts/dm-serif-display": "npm:^0.2.3"
-    "@expo-google-fonts/fauna-one": "npm:^0.2.3"
-    "@expo-google-fonts/fraunces": "npm:^0.2.3"
-    "@expo-google-fonts/gilda-display": "npm:^0.2.3"
-    "@expo-google-fonts/gloock": "npm:^0.2.3"
-    "@expo-google-fonts/great-vibes": "npm:^0.2.3"
-    "@expo-google-fonts/inter": ./fonts/inter
-    "@expo-google-fonts/josefin-sans": "npm:^0.2.3"
-    "@expo-google-fonts/jost": "npm:^0.2.3"
-    "@expo-google-fonts/kaushan-script": "npm:^0.2.3"
-    "@expo-google-fonts/koulen": "npm:^0.2.3"
-    "@expo-google-fonts/lexend": "npm:^0.2.3"
-    "@expo-google-fonts/libre-baskerville": "npm:^0.2.3"
-    "@expo-google-fonts/libre-caslon-display": "npm:^0.2.3"
-    "@expo-google-fonts/libre-caslon-text": "npm:^0.2.3"
-    "@expo-google-fonts/limelight": "npm:^0.2.3"
-    "@expo-google-fonts/lora": "npm:^0.2.3"
-    "@expo-google-fonts/manrope": "npm:^0.2.3"
-    "@expo-google-fonts/monoton": "npm:^0.2.3"
-    "@expo-google-fonts/montserrat": "npm:^0.2.3"
-    "@expo-google-fonts/mr-dafoe": "npm:^0.2.3"
-    "@expo-google-fonts/open-sans": "npm:^0.2.3"
-    "@expo-google-fonts/outfit": "npm:^0.2.3"
-    "@expo-google-fonts/playfair-display": "npm:^0.2.3"
-    "@expo-google-fonts/plus-jakarta-sans": "npm:^0.2.3"
-    "@expo-google-fonts/poppins": "npm:^0.2.3"
-    "@expo-google-fonts/raleway": "npm:^0.2.3"
-    "@expo-google-fonts/righteous": "npm:^0.2.3"
-    "@expo-google-fonts/rubik": "npm:^0.2.3"
-    "@expo-google-fonts/rye": "npm:^0.2.3"
-    "@expo-google-fonts/seaweed-script": "npm:^0.2.3"
-    "@expo-google-fonts/six-caps": "npm:^0.2.3"
-    "@expo-google-fonts/source-sans-3": ./fonts/source-sans-3
     "@expo-google-fonts/source-sans-pro": "npm:^0.2.3"
-    "@expo-google-fonts/ultra": "npm:^0.2.3"
-    "@expo-google-fonts/water-brush": "npm:^0.2.3"
-    "@expo-google-fonts/yeseva-one": "npm:^0.2.3"
     "@formatjs/intl-locale": "npm:^4.2.10"
     "@formatjs/intl-pluralrules": "npm:^5.4.3"
     "@formatjs/intl-relativetimeformat": "npm:^11.4.10"
-    "@gorhom/bottom-sheet": "patch:@gorhom/bottom-sheet@npm%3A5.0.6#~/.yarn/patches/@gorhom-bottom-sheet-npm-5.0.6-ee2c6d5dad.patch"
+    "@gorhom/bottom-sheet": "patch:@gorhom/bottom-sheet@npm%3A5.1.2#~/.yarn/patches/@gorhom-bottom-sheet-npm-5.1.2-9593eea256.patch"
     "@hookform/resolvers": "npm:^3.10.0"
     "@lottiefiles/lottie-js": "npm:0.4.2"
     "@miblanchard/react-native-slider": "npm:2.6.0"
     "@react-native-camera-roll/camera-roll": "patch:@react-native-camera-roll/camera-roll@npm%3A7.9.0#~/.yarn/patches/@react-native-camera-roll-camera-roll-npm-7.9.0-285cb35c57.patch"
-    "@react-native-community/cli": "npm:^15.1.3"
-    "@react-native-community/cli-platform-android": "npm:^15.1.3"
-    "@react-native-community/cli-platform-ios": "npm:^15.1.3"
+    "@react-native-community/cli": "npm:^17.0.0"
+    "@react-native-community/cli-platform-android": "npm:^17.0.0"
+    "@react-native-community/cli-platform-ios": "npm:^17.0.0"
     "@react-native-community/datetimepicker": "npm:^8.3.0"
     "@react-native-community/netinfo": "npm:^11.4.1"
-    "@react-native-firebase/analytics": "npm:^21.11.0"
-    "@react-native-firebase/app": "npm:^21.11.0"
-    "@react-native-firebase/messaging": "npm:^21.11.0"
+    "@react-native-firebase/analytics": "npm:^21.12.0"
+    "@react-native-firebase/app": "npm:^21.12.0"
+    "@react-native-firebase/messaging": "npm:^21.12.0"
     "@react-native-masked-view/masked-view": "npm:^0.3.2"
     "@react-native/babel-preset": "npm:^0.77.1"
     "@react-native/metro-config": "npm:^0.77.1"
     "@react-native/typescript-config": "npm:^0.77.1"
     "@reeq/react-native-passkit": "npm:^0.1.3"
-    "@sentry/core": "npm:^9.3.0"
+    "@sentry/core": "npm:^9.5.0"
     "@sentry/react-native": "npm:^6.9.0"
-    "@sentry/types": "npm:^9.3.0"
+    "@sentry/types": "npm:^9.5.0"
     "@sentry/utils": "npm:^8.55.0"
     "@shopify/flash-list": "npm:^1.7.3"
     "@shopify/react-native-skia": "patch:@shopify/react-native-skia@npm%3A1.11.8#~/.yarn/patches/@shopify-react-native-skia-npm-1.11.8-e11c3369b8.patch"
-    "@testing-library/react-native": "npm:^13.0.1"
+    "@testing-library/react-native": "npm:^13.2.0"
     "@types/chroma-js": "npm:^3.1.1"
     "@types/qrcode": "npm:^1.5.5"
     "@types/react": "npm:^18.3.12"
@@ -420,6 +376,50 @@ __metadata:
     expo-device: "npm:7.0.2"
     expo-file-system: "npm:^18.0.11"
     expo-font: "npm:^13.0.4"
+    expo-google-fonts-amatic-sc: "npm:^0.3.0"
+    expo-google-fonts-anton: "npm:^0.3.0"
+    expo-google-fonts-archivo: "npm:^0.3.0"
+    expo-google-fonts-bebas-neue: "npm:^0.3.0"
+    expo-google-fonts-cardo: "npm:^0.3.0"
+    expo-google-fonts-cinzel: "npm:^0.3.0"
+    expo-google-fonts-cormorant-garamond: "npm:^0.3.0"
+    expo-google-fonts-courier-prime: "npm:^0.3.0"
+    expo-google-fonts-dm-serif-display: "npm:^0.3.0"
+    expo-google-fonts-fauna-one: "npm:^0.3.0"
+    expo-google-fonts-fraunces: "npm:^0.3.0"
+    expo-google-fonts-gilda-display: "npm:^0.3.0"
+    expo-google-fonts-gloock: "npm:^0.3.0"
+    expo-google-fonts-great-vibes: "npm:^0.3.0"
+    expo-google-fonts-inter: "npm:^0.3.0"
+    expo-google-fonts-josefin-sans: "npm:^0.3.0"
+    expo-google-fonts-jost: "npm:^0.3.0"
+    expo-google-fonts-kaushan-script: "npm:^0.3.0"
+    expo-google-fonts-koulen: "npm:^0.3.0"
+    expo-google-fonts-lexend: "npm:^0.3.0"
+    expo-google-fonts-libre-baskerville: "npm:^0.3.0"
+    expo-google-fonts-libre-caslon-display: "npm:^0.3.0"
+    expo-google-fonts-libre-caslon-text: "npm:^0.3.0"
+    expo-google-fonts-limelight: "npm:^0.3.0"
+    expo-google-fonts-lora: "npm:^0.3.0"
+    expo-google-fonts-manrope: "npm:^0.3.0"
+    expo-google-fonts-monoton: "npm:^0.3.0"
+    expo-google-fonts-montserrat: "npm:^0.3.0"
+    expo-google-fonts-mr-dafoe: "npm:^0.3.0"
+    expo-google-fonts-open-sans: "npm:^0.3.0"
+    expo-google-fonts-outfit: "npm:^0.3.0"
+    expo-google-fonts-playfair-display: "npm:^0.3.0"
+    expo-google-fonts-plus-jakarta-sans: "npm:^0.3.0"
+    expo-google-fonts-poppins: "npm:^0.3.0"
+    expo-google-fonts-raleway: "npm:^0.3.0"
+    expo-google-fonts-righteous: "npm:^0.3.0"
+    expo-google-fonts-rubik: "npm:^0.3.0"
+    expo-google-fonts-rye: "npm:^0.3.0"
+    expo-google-fonts-seaweed-script: "npm:^0.3.0"
+    expo-google-fonts-six-caps: "npm:^0.3.0"
+    expo-google-fonts-source-sans-3: "npm:^0.3.0"
+    expo-google-fonts-ultra: "npm:^0.3.0"
+    expo-google-fonts-water-brush: "npm:^0.3.0"
+    expo-google-fonts-yeseva-one: "npm:^0.3.0"
     expo-haptics: "npm:~14.0.1"
     expo-image: "npm:^2.0.6"
     expo-image-manipulator: "npm:^13.0.6"
@@ -446,7 +446,7 @@ __metadata:
     react-native-blob-jsi-helper: "npm:^0.3.1"
     react-native-bootsplash: "npm:^6.3.3"
     react-native-bundle-visualizer: "npm:^3.1.3"
-    react-native-compressor: "npm:^1.10.4"
+    react-native-compressor: "npm:^1.10.5"
     react-native-confirmation-code-field: "npm:^7.4.0"
     react-native-device-info: "npm:^14.0.4"
     react-native-dotenv: "npm:^3.4.11"
@@ -456,18 +456,18 @@ __metadata:
     react-native-haptic-feedback: "npm:^2.3.3"
     react-native-image-colors: "npm:^2.4.0"
     react-native-image-size: "npm:^1.1.6"
-    react-native-keyboard-controller: "npm:^1.16.6"
+    react-native-keyboard-controller: "npm:^1.16.7"
     react-native-keychain: "npm:^9.2.3"
     react-native-localize: "npm:^3.4.1"
     react-native-mime-types: "npm:^2.5.0"
     react-native-mmkv: "npm:^3.2.0"
     react-native-pager-view: "npm:^6.7.0"
-    react-native-permissions: "npm:^5.2.5"
+    react-native-permissions: "npm:^5.2.6"
     react-native-popover-view: "npm:^6.1.0"
-    react-native-purchases: "npm:^8.7.0"
+    react-native-purchases: "npm:^8.8.0"
     react-native-quick-base64: "npm:^2.1.2"
     react-native-reanimated: "npm:^3.17.1"
-    react-native-safe-area-context: "npm:^5.2.0"
+    react-native-safe-area-context: "npm:^5.3.0"
     react-native-screens: "patch:react-native-screens@npm%3A4.8.0#~/.yarn/patches/react-native-screens-npm-4.8.0-93ce87a7e1.patch"
     react-native-share: "npm:^12.0.9"
     react-native-shared-group-preferences: "npm:^1.1.24"
@@ -476,7 +476,7 @@ __metadata:
     react-native-tab-view: "npm:^4.0.5"
     react-native-toast-message: "patch:react-native-toast-message@npm%3A2.2.1#~/.yarn/patches/react-native-toast-message-npm-2.2.1-82329f0933.patch"
     react-native-vision-camera: "npm:^4.6.4"
-    react-native-webview: "npm:^13.13.2"
+    react-native-webview: "npm:^13.13.3"
     react-relay: "npm:^18.2.0"
     react-test-renderer: "npm:^18.3.1"
     relay-test-utils: "npm:^18.2.0"
@@ -5652,318 +5652,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@expo-google-fonts/amatic-sc@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/amatic-sc@npm:0.2.3"
-  checksum: 10/ff35bf99363c5a116f5b44c692034d687bea3e385be3bbb92d334f1697c838a62b51995ec90080042efdc664d9aaf229b2a74108243601e60ebffab7bf95d148
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/anton@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/anton@npm:0.2.3"
-  checksum: 10/4cbc8710fff6284db7219085c656f7c55edeb4eef3c4046351d7573a42044a1777e0cc03e76d9631c35a7f3ff49296208bcb52703ff424ba7062b83f71634976
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/archivo@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/archivo@npm:0.2.3"
-  checksum: 10/4b6f8e6342bb580de4294d64cf9e5bb203aea988a016abb9da57583c1af2ba424b9fa8f4af39327d03355518b8e13b61df2a9adeb53c91ab0d257d546a7a06e7
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/bebas-neue@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/bebas-neue@npm:0.2.3"
-  checksum: 10/e8c890a22ca995130c64c5a90d1f5835ec2c973c1da969cf8f7006047fd7b7f0c43553fc6b3f638dfd233c9f843fbb586c4bebaadc49ea4cc24ab7c3889af290
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/cardo@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/cardo@npm:0.2.3"
-  checksum: 10/5397520449fdc7cee11a422d9a42d9942d3f7bd5ad28c352e308fc15360f8088b2f0be9175ff83eed2c6794accad3ba34bc22f672e770e59bbcfc36d50733e8e
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/cinzel@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/cinzel@npm:0.2.3"
-  checksum: 10/f5a39fb15f1b91f13b037c52d2efaa44b540d2593409b0c23310c60d39a28b3c953625eabf5e1dfbda63421263185408923894b253124c668a3b14bc83d2bbf5
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/cormorant-garamond@file:./fonts/cormorant-garamond::locator=%40azzapp%2Fapp%40workspace%3Apackages%2Fapp":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/cormorant-garamond@file:./fonts/cormorant-garamond#./fonts/cormorant-garamond::hash=2b8e97&locator=%40azzapp%2Fapp%40workspace%3Apackages%2Fapp"
-  checksum: 10/49df15706568186f75672e9db4d5b4d05a6a912621685012017527bfb20a760f8c06abbdf10410d0b387983a4900c3c1c693d7ffa315c16a55262214efa6b0fd
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/courier-prime@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/courier-prime@npm:0.2.3"
-  checksum: 10/7f492cf6f5777dfd74ad0c5adf78b91209589b761fe71e6029ed1b2326920fe697020d79528488ea9d591a1d0ee40716c7e34ec1d44e3f50154af58695887f37
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/dm-serif-display@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/dm-serif-display@npm:0.2.3"
-  checksum: 10/a1653e4f2a9925c9d1d1204e72524ac4578ca3e20e12b7589a38045c630bd6e1bfa3ace4999e025ca1765acd748050b09d6e412836908c82ba8efed7bb9f249c
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/fauna-one@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/fauna-one@npm:0.2.3"
-  checksum: 10/7b5ec98eea1ab9285b2c3205f9b01dec1a7f6ca4918b0e905cf792943ebc8ef87c417985c017f0d99885cd42cecd148323aed5df758972226290bd48b9d75e99
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/fraunces@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/fraunces@npm:0.2.3"
-  checksum: 10/168fc16e1cd5b4db1c4e1b72b867c40e0b300027567b91a3c8ed6def6c3c8c40b88be587c4c21dd0e8629ba5a973b89940dd5aba34cb6f3e0fdc028b878e6669
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/gilda-display@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/gilda-display@npm:0.2.3"
-  checksum: 10/1537c9252524527a1a5fefc43a52f5adb77c580939705c63308bebf3b64aebc472893a1ed11d6c823e1ebd3e88ca38d164905061812cdf49f8af2379a257847b
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/gloock@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/gloock@npm:0.2.3"
-  checksum: 10/7a1219e2330097cafe1d6b975db73122b45b3591b07c1a784e78308f23ef77e79edf3b249302433d04e99e2da4533c219d83899dea8678b315e5a9c97d5a0ca1
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/great-vibes@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/great-vibes@npm:0.2.3"
-  checksum: 10/9a0249656b17b0a75092d036bb1a81d7a4171ec6f44a13e1bbf6af1967f24e9fac210df68b78aa5c3e9eb0d091d17d106fc00b624bead41a0502be784db062ab
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/inter@file:./fonts/inter::locator=%40azzapp%2Fapp%40workspace%3Apackages%2Fapp":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/inter@file:./fonts/inter#./fonts/inter::hash=85069d&locator=%40azzapp%2Fapp%40workspace%3Apackages%2Fapp"
-  checksum: 10/2a4901374201e76a15ea0236263139b8b218e0fd0cb1d1271a41e86bc97f91eb4a37c73628c7fc56090c28f128633ef42e0697f1b1c6deb96e2f2c6e7391970d
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/josefin-sans@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/josefin-sans@npm:0.2.3"
-  checksum: 10/4e3f5d667ac4da12b0b64dda8411ee68706b5d164a8583b5bcb506df353f38f8e9d637c440c8bfedc2f155c438fddd91929756ba9d2cd862384bce96eb7246cd
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/jost@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/jost@npm:0.2.3"
-  checksum: 10/4e2b742c1512073f247b544a694ed742239befaa56d77d725ab4c87c3532a0ef10bf1438c5a6d67b933eea239a1379b2899e9c8cc07daf5f5f399dac66b5d9ed
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/kaushan-script@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/kaushan-script@npm:0.2.3"
-  checksum: 10/32d924932296a69e58f9811e77add413e93925adc3d723c96abed1ddb0cc12a23deee1ddb2e8713faedb9c54eda53013c57f67dfbc4e4e42b8c3e05403e1be7b
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/koulen@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/koulen@npm:0.2.3"
-  checksum: 10/b22bf703c18cb908b4f4a75d43ac7c949f7d45949e74cfda4a3e245871f879fbb1340f193156a5a09d18a5b0cfec640a1dd5b8313694281cf150978c3879834e
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/lexend@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/lexend@npm:0.2.3"
-  checksum: 10/508516ecb40f28675ed050f23d4e7887b82872cb28842e95daadb6c0d12083762c3ab7f5a27b8b2708fbe519c12bfc49b68f0ab614da5563056dc349e40ae9e6
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/libre-baskerville@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/libre-baskerville@npm:0.2.3"
-  checksum: 10/76e3cb6c8d19688b9f728dd0e3d007e5a33ad728091d8162c7acde526be2587e22362302f3a6d820fece962d19aeb3461b8fca555bb24838846a4b24892cc8d5
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/libre-caslon-display@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/libre-caslon-display@npm:0.2.3"
-  checksum: 10/7bb58d531e64623d5ba73b3aa3d071904ed07ac244716172fcc676a358f17c3560d81ad4209b53c9b287ee5c92080b072572dc51cd77cb5ee1cbeb81d0e7cd87
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/libre-caslon-text@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/libre-caslon-text@npm:0.2.3"
-  checksum: 10/0a261b6085b473cddadaf56e138da243aba65b84fc2c3b6160db7d463d750e429a4dce3095b0caac1df307a87a6f45715946ac68a280d619309ace357604e753
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/limelight@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/limelight@npm:0.2.3"
-  checksum: 10/ab108d4e66ecdf8eba96726ad195b2e02c8690641fc920ef1939265e530596e947150c5dac3fd678158cf4628481d7d5187eecb92050fb8f5b19ae99f70d5065
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/lora@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/lora@npm:0.2.3"
-  checksum: 10/7233b6c3dd139ed0d7deb4cb9e8977631979a2ee9c99c890a861cdac93bf2e1c8c03f626909daf2921a56006a1cfa2ffdabc49d9810cf64b06f736f86bd7aaa7
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/manrope@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/manrope@npm:0.2.3"
-  checksum: 10/6b7bf0510dcfa4fdf015eecc88ebc8ea08097499f1d3e1ccf4aaf9a3835d99519d4c7c50086a8dd747031d3cde6d550d9db7f13f041bf1242eba1c86ad145aad
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/monoton@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/monoton@npm:0.2.3"
-  checksum: 10/e691c866c49954a1f4261b26df14ef3b02f45048043f2714984c48f53a4fc64f05ef4a7812014af63f5ddbcc0d91c7a2bae8017dd82b3050f982fe72605c22b5
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/montserrat@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/montserrat@npm:0.2.3"
-  checksum: 10/dae79a24eddffde3ae7fb0036a163978143dc7afd97ba6455142c1a51a452eb5cd978189b75be8c152067addb14f9524d12e619d6a3e33d500257bf3592cec98
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/mr-dafoe@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/mr-dafoe@npm:0.2.3"
-  checksum: 10/c9f428ad618123a382dc97893bc13b5bf6b8cdea2e79847e5bf24c5f89061f830c1a1b4330a7d082a0798d4a9d97a4197a9c80713e05ec9d827fe7505d744f50
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/open-sans@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/open-sans@npm:0.2.3"
-  checksum: 10/92cabf603979ccaea5190a68941eb54c52c8783ef922a97f01b7d24af01a28896e9dedd3bca9db65b9e4663eb273efc0d67c19ad68c885a6932a8d1131fb1fe0
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/outfit@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/outfit@npm:0.2.3"
-  checksum: 10/e0567b5502c69b56b79945948ad1f4b39972744e9fbebffe4ee71ce78c7feac84a5a4dfb743d674e8c57108a14a0204b3414a09836588a19c31589eba325c9bc
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/playfair-display@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/playfair-display@npm:0.2.3"
-  checksum: 10/9e13e347b59075ab9d5f28260e038e495d1fc657de2bc56a64198ab05393dec06fe56c095d25dbf6d1af1f223f22171a04828dca97093729d59acf1da0699437
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/plus-jakarta-sans@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/plus-jakarta-sans@npm:0.2.3"
-  checksum: 10/102c4af06c316f167c36eeca926a3f0208b4a29c93180c549b8b62c92833337b1bbdee1f9331bb47cd03f25195f289a7b0cc304617a3fcf8289f7cf4c492af4e
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/poppins@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/poppins@npm:0.2.3"
-  checksum: 10/7a9468ce14027205adb442f1f19cc6eae0d0289b82fb2b729cc410b87f5a0d9ca201b70a7ae3ccaa9ea306b37cc12e76f9289a99d6ce02f0d6b10ecc1c3f2f92
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/raleway@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/raleway@npm:0.2.3"
-  checksum: 10/4623a443a96f067a711d4693315eecf296b10d9b23db1cf58226fd1ba064ade53309c8c1e155be5dad3fda670254d5a7eb33f757370cb6566edf1bb2779a9475
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/righteous@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/righteous@npm:0.2.3"
-  checksum: 10/202b0f5ef6881e58ad918bf77cec88c1c05706ad0e79c37fba75173abd5735ec2ce0acf7a1a0dcb0cdcbde9092cc3d5008cde57e67aab9ae785b08f58693232d
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/rubik@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/rubik@npm:0.2.3"
-  checksum: 10/2b0a3717ef3e045c9597b014081626a4d1d532e09acd0b643c09c9e7fba95659be6a224dbe323fb93403111d9634c060fa9f03505dbd9ebc2345e3c75d4d7781
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/rye@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/rye@npm:0.2.3"
-  checksum: 10/901cd3c90e9c30ad15354569f82e02d43422644d0fc815a3ced7eb7a84e61c938af87cd7ff2c7812eb74832612b0a60cd5cb32e2ba01aee262daf3617ae88314
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/seaweed-script@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/seaweed-script@npm:0.2.3"
-  checksum: 10/77d77aaa549b3e859283ed887ea3982600afb75279a95dc3572e11e914f0933b0238b7552689785d08bf6c0a8fa14b5fbaee1d65e317c24c5e16ebf55e84c3c5
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/six-caps@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/six-caps@npm:0.2.3"
-  checksum: 10/9c3729858c8910a139078a16b0f0ec24fe6d31c390e11734b00823c77865e650bd06c97e36813cdbbb0dd8497778c1953570bd1be0b11bd7f93495705498c4bb
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/source-sans-3@file:./fonts/source-sans-3::locator=%40azzapp%2Fapp%40workspace%3Apackages%2Fapp":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/source-sans-3@file:./fonts/source-sans-3#./fonts/source-sans-3::hash=48dad8&locator=%40azzapp%2Fapp%40workspace%3Apackages%2Fapp"
-  checksum: 10/2994c10f62672e2d78c115b1fef50fd0fe36cf6fcebb41a2349e06d608105a38cfb78cb946672797fbe823b9bff61d0d3b62d6944969f71aa8effc88865f498f
-  languageName: node
-  linkType: hard
-
 "@expo-google-fonts/source-sans-pro@npm:^0.2.3":
   version: 0.2.3
   resolution: "@expo-google-fonts/source-sans-pro@npm:0.2.3"
   checksum: 10/1ad23d8a2681c8977258f62d976c29c152c7c8f91f0ad8e2365efae09cae898a9abaafa556d6a0a679e091e7e2aa47f04cf4dd7bfad4fa82bcc2bb811e9476df
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/ultra@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/ultra@npm:0.2.3"
-  checksum: 10/75acd11e989124187be264b3c3fccd82620dfe642b3b052cf0b3e4fe030c1a9d32957a059a846ded7d727f31c4d580ab45ce3847102b32758c8ddcca763094c2
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/water-brush@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/water-brush@npm:0.2.3"
-  checksum: 10/8bb9f084d3f67b1e78c27947c1df30a4976fdaffea1a167c2f7aea0f1de3f33bd68e1ebb397aeda3179297968fb1635fc27081c87f913d2a09e25621d12991bd
-  languageName: node
-  linkType: hard
-
-"@expo-google-fonts/yeseva-one@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@expo-google-fonts/yeseva-one@npm:0.2.3"
-  checksum: 10/3996a29d1c94f848c0c75ed883469c1a2259bb4a63901e1c2eb7ad1e9d4c610fd4401e397a80c846df992ddec3b523e84f5e6b883e41caf0929f2d83660fb305
   languageName: node
   linkType: hard
 
@@ -7294,9 +6986,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@gorhom/bottom-sheet@npm:5.0.6":
-  version: 5.0.6
-  resolution: "@gorhom/bottom-sheet@npm:5.0.6"
+"@gorhom/bottom-sheet@npm:5.1.2":
+  version: 5.1.2
+  resolution: "@gorhom/bottom-sheet@npm:5.1.2"
   dependencies:
     "@gorhom/portal": "npm:1.0.14"
     invariant: "npm:^2.2.4"
@@ -7312,13 +7004,13 @@ __metadata:
       optional: true
     "@types/react-native":
       optional: true
-  checksum: 10/b8beb6bb4d80828deed5c74c8b19926cbb4887d530d07c19eaaa1d8faae6c79f942f83baad076c84d065f357f6666cbc257799fe8fc58cb375e6cbebf52b6227
+  checksum: 10/dee116bdb749643bde163dd88c7fb800988472d58cf38532bc1b034ca1153cb250f2c8c83f2c4b393e39019f6205ca28be018eed47ae4767c75ff4983de8a151
   languageName: node
   linkType: hard
 
-"@gorhom/bottom-sheet@patch:@gorhom/bottom-sheet@npm%3A5.0.6#~/.yarn/patches/@gorhom-bottom-sheet-npm-5.0.6-ee2c6d5dad.patch":
-  version: 5.0.6
-  resolution: "@gorhom/bottom-sheet@patch:@gorhom/bottom-sheet@npm%3A5.0.6#~/.yarn/patches/@gorhom-bottom-sheet-npm-5.0.6-ee2c6d5dad.patch::version=5.0.6&hash=2103ef"
+"@gorhom/bottom-sheet@patch:@gorhom/bottom-sheet@npm%3A5.1.2#~/.yarn/patches/@gorhom-bottom-sheet-npm-5.1.2-9593eea256.patch":
+  version: 5.1.2
+  resolution: "@gorhom/bottom-sheet@patch:@gorhom/bottom-sheet@npm%3A5.1.2#~/.yarn/patches/@gorhom-bottom-sheet-npm-5.1.2-9593eea256.patch::version=5.1.2&hash=2103ef"
   dependencies:
     "@gorhom/portal": "npm:1.0.14"
     invariant: "npm:^2.2.4"
@@ -7334,7 +7026,7 @@ __metadata:
       optional: true
     "@types/react-native":
       optional: true
-  checksum: 10/50c464d73c579c3dbbe9fe8b4cf602e27a1b2c905910703171b6954d4d575aec86469d96d7dc244f7631f71d517f274f62b4620d9945ae3ce5c2da6f180070ac
+  checksum: 10/8880d8111fd5ccd9a086b956f9a46a9ffe90c2ed004122f229bbc6975a22286433becd1a752895e4ce52c9d9ef92991689b2f5a0149c23a0313da1f5ab30c03d
   languageName: node
   linkType: hard
 
@@ -10069,27 +9761,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native-community/cli-clean@npm:15.1.3":
-  version: 15.1.3
-  resolution: "@react-native-community/cli-clean@npm:15.1.3"
+"@react-native-community/cli-clean@npm:17.0.0":
+  version: 17.0.0
+  resolution: "@react-native-community/cli-clean@npm:17.0.0"
   dependencies:
-    "@react-native-community/cli-tools": "npm:15.1.3"
+    "@react-native-community/cli-tools": "npm:17.0.0"
     chalk: "npm:^4.1.2"
     execa: "npm:^5.0.0"
     fast-glob: "npm:^3.3.2"
-  checksum: 10/5f06ed322708b8d87b83a6a8bc7172bac1e21a2d4eb7a902ac549c3d3d7a7690a4f557c7949379c6ce9dd50fb52781ee0039f16098727a82a91ce2e406b8f1a9
+  checksum: 10/85da45642d15128f14f09f4bf7fa59c1dcfa1a5540426746b7a0c02720a92e1d25cfe9a7d8ac43c1cd863411821a816b9616c3a767003c23041d2d1fa04a5274
   languageName: node
   linkType: hard
 
-"@react-native-community/cli-config-android@npm:15.1.3":
-  version: 15.1.3
-  resolution: "@react-native-community/cli-config-android@npm:15.1.3"
+"@react-native-community/cli-config-android@npm:17.0.0":
+  version: 17.0.0
+  resolution: "@react-native-community/cli-config-android@npm:17.0.0"
   dependencies:
-    "@react-native-community/cli-tools": "npm:15.1.3"
+    "@react-native-community/cli-tools": "npm:17.0.0"
     chalk: "npm:^4.1.2"
     fast-glob: "npm:^3.3.2"
     fast-xml-parser: "npm:^4.4.1"
-  checksum: 10/ea59b9e662f1dfdd8c92e666bf38a80de553e63b645de6d8041b0dcd64d9313aadfd9ee162d778562c01c2350f09b84732572471ca7bb4e5574a27ab616fca28
+  checksum: 10/35223f946e0d9349401f5e78f3df32afda235fee602f90896675046a23c60558575449ca3572244da002797a58cc75a544de1340d6f24417ea750009bb613bf4
   languageName: node
   linkType: hard
 
@@ -10105,15 +9797,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native-community/cli-config-apple@npm:15.1.3":
-  version: 15.1.3
-  resolution: "@react-native-community/cli-config-apple@npm:15.1.3"
+"@react-native-community/cli-config-apple@npm:17.0.0":
+  version: 17.0.0
+  resolution: "@react-native-community/cli-config-apple@npm:17.0.0"
   dependencies:
-    "@react-native-community/cli-tools": "npm:15.1.3"
+    "@react-native-community/cli-tools": "npm:17.0.0"
     chalk: "npm:^4.1.2"
     execa: "npm:^5.0.0"
     fast-glob: "npm:^3.3.2"
-  checksum: 10/2181cc5569a6fabf8051a751987c603d5ddf7cee9ec5b37c37005ab598dad15c8baf43981de9fa3cde0735c8a8aa231cdd78f6c2a004a6da23ae5c14dcaf2cbc
+  checksum: 10/2f2ba9adc3e1df8de37e61feb6f6e3567fe74d5d30efbee49168329cb8cebc5793bd4756ba4fa485d02fdc21d6cfe8ec892f505b5144787546ab7eef94a4debd
   languageName: node
   linkType: hard
 
@@ -10129,38 +9821,29 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native-community/cli-config@npm:15.1.3":
-  version: 15.1.3
-  resolution: "@react-native-community/cli-config@npm:15.1.3"
+"@react-native-community/cli-config@npm:17.0.0":
+  version: 17.0.0
+  resolution: "@react-native-community/cli-config@npm:17.0.0"
   dependencies:
-    "@react-native-community/cli-tools": "npm:15.1.3"
+    "@react-native-community/cli-tools": "npm:17.0.0"
     chalk: "npm:^4.1.2"
     cosmiconfig: "npm:^9.0.0"
     deepmerge: "npm:^4.3.0"
     fast-glob: "npm:^3.3.2"
     joi: "npm:^17.2.1"
-  checksum: 10/c867f8ef1b48b0d4557be058e50f209db5d30e4d8629a21d412e1c8ea3da4a8eab9606f10cf746084ffc2eb47b20086e65507a0f6e36cf7536c188c7b6dd4464
+  checksum: 10/f2f8555eaf84943423f30fd2b8aedbeba9a72bd2d344aec25999c5e98e7b903e751c86163ec5a53ef891939f2c11dcecf6d8a8984cd835f892eb2cbb619a2f16
   languageName: node
   linkType: hard
 
-"@react-native-community/cli-debugger-ui@npm:15.1.3":
-  version: 15.1.3
-  resolution: "@react-native-community/cli-debugger-ui@npm:15.1.3"
+"@react-native-community/cli-doctor@npm:17.0.0":
+  version: 17.0.0
+  resolution: "@react-native-community/cli-doctor@npm:17.0.0"
   dependencies:
-    serve-static: "npm:^1.13.1"
-  checksum: 10/317d32e87581f1f9cec0d4e64877f526268f365a5b7d09e1b5b2684c15f7561d640da72ced2d7f82580511c7128d002566543e5d9f741fb8b1a64b66c10ef692
-  languageName: node
-  linkType: hard
-
-"@react-native-community/cli-doctor@npm:15.1.3":
-  version: 15.1.3
-  resolution: "@react-native-community/cli-doctor@npm:15.1.3"
-  dependencies:
-    "@react-native-community/cli-config": "npm:15.1.3"
-    "@react-native-community/cli-platform-android": "npm:15.1.3"
-    "@react-native-community/cli-platform-apple": "npm:15.1.3"
-    "@react-native-community/cli-platform-ios": "npm:15.1.3"
-    "@react-native-community/cli-tools": "npm:15.1.3"
+    "@react-native-community/cli-config": "npm:17.0.0"
+    "@react-native-community/cli-platform-android": "npm:17.0.0"
+    "@react-native-community/cli-platform-apple": "npm:17.0.0"
+    "@react-native-community/cli-platform-ios": "npm:17.0.0"
+    "@react-native-community/cli-tools": "npm:17.0.0"
     chalk: "npm:^4.1.2"
     command-exists: "npm:^1.2.8"
     deepmerge: "npm:^4.3.0"
@@ -10169,62 +9852,62 @@ __metadata:
     node-stream-zip: "npm:^1.9.1"
     ora: "npm:^5.4.1"
     semver: "npm:^7.5.2"
-    strip-ansi: "npm:^5.2.0"
     wcwidth: "npm:^1.0.1"
     yaml: "npm:^2.2.1"
-  checksum: 10/3e806b20ca38c51efddab7ee571788b957ee0ffc00b4886cef2e506a91b0be06f5f1524f50ddb618125ec683686e4fa8ba5222d07d751fa396f47725d2212b4d
+  checksum: 10/f4cde20cb430a6dd05d23b85ca6c298f7caf526580605f6840966a9191de4b56d5daa650df4e74011e2860aff6054cc9b89c830d2d1a26b6c8eca8435c05bdeb
   languageName: node
   linkType: hard
 
-"@react-native-community/cli-platform-android@npm:15.1.3, @react-native-community/cli-platform-android@npm:^15.1.3":
-  version: 15.1.3
-  resolution: "@react-native-community/cli-platform-android@npm:15.1.3"
+"@react-native-community/cli-platform-android@npm:17.0.0, @react-native-community/cli-platform-android@npm:^17.0.0":
+  version: 17.0.0
+  resolution: "@react-native-community/cli-platform-android@npm:17.0.0"
   dependencies:
-    "@react-native-community/cli-config-android": "npm:15.1.3"
-    "@react-native-community/cli-tools": "npm:15.1.3"
+    "@react-native-community/cli-config-android": "npm:17.0.0"
+    "@react-native-community/cli-tools": "npm:17.0.0"
     chalk: "npm:^4.1.2"
     execa: "npm:^5.0.0"
     logkitty: "npm:^0.7.1"
-  checksum: 10/8ddfa18a11c6cf9e9b30792e295f62702035f67f2fb5365ed64068e7148fb66a352a969b364ac35acb45033ad8cc0a66639bbd9bb52a405b20e3c63c5ed13564
+  checksum: 10/cde6c441a7db7d7c86ac5cfd8713ca06895c70b3c84490cbd45b467272371aa1ecdc2dee5e729ce996ab77e07d6f6a0462fa5ff99ba980909915a89b73680ec6
   languageName: node
   linkType: hard
 
-"@react-native-community/cli-platform-apple@npm:15.1.3":
-  version: 15.1.3
-  resolution: "@react-native-community/cli-platform-apple@npm:15.1.3"
+"@react-native-community/cli-platform-apple@npm:17.0.0":
+  version: 17.0.0
+  resolution: "@react-native-community/cli-platform-apple@npm:17.0.0"
   dependencies:
-    "@react-native-community/cli-config-apple": "npm:15.1.3"
-    "@react-native-community/cli-tools": "npm:15.1.3"
+    "@react-native-community/cli-config-apple": "npm:17.0.0"
+    "@react-native-community/cli-tools": "npm:17.0.0"
     chalk: "npm:^4.1.2"
     execa: "npm:^5.0.0"
     fast-xml-parser: "npm:^4.4.1"
-  checksum: 10/de3d765de28cc6d4fab53c41e2eda41b14d1bc42c12c2cfc4300b4699f14ab5745225c892e30417640867551c18f94154497afee67c47f29fa5515dacfd478c3
+  checksum: 10/49d7db367394994a8ca8c3fb8e406ce3a27dac8450b312d680de9557ba531c4939bce2b83ccaa1899efd280ba01e4df6949178e5f651e979e8fbca741a207f94
   languageName: node
   linkType: hard
 
-"@react-native-community/cli-platform-ios@npm:15.1.3, @react-native-community/cli-platform-ios@npm:^15.1.3":
-  version: 15.1.3
-  resolution: "@react-native-community/cli-platform-ios@npm:15.1.3"
+"@react-native-community/cli-platform-ios@npm:17.0.0, @react-native-community/cli-platform-ios@npm:^17.0.0":
+  version: 17.0.0
+  resolution: "@react-native-community/cli-platform-ios@npm:17.0.0"
   dependencies:
-    "@react-native-community/cli-platform-apple": "npm:15.1.3"
-  checksum: 10/b99e0a2b51ca1be631e94ce7061b353811bf1b146e670928ae890287380ac652ae48e16f67751d4a772b2035781cf0a55847bb18648359048536d2d314c3ed97
+    "@react-native-community/cli-platform-apple": "npm:17.0.0"
+  checksum: 10/e7677421564aa462d4b3a33d89c3bfd9792d1a5b32e3ba7d12d5fc547d5cbe02b69144165d08cc0962495c79c683c6bd49a07dae668d89b64df9ce75ae21e71d
   languageName: node
   linkType: hard
 
-"@react-native-community/cli-server-api@npm:15.1.3":
-  version: 15.1.3
-  resolution: "@react-native-community/cli-server-api@npm:15.1.3"
+"@react-native-community/cli-server-api@npm:17.0.0":
+  version: 17.0.0
+  resolution: "@react-native-community/cli-server-api@npm:17.0.0"
   dependencies:
-    "@react-native-community/cli-debugger-ui": "npm:15.1.3"
-    "@react-native-community/cli-tools": "npm:15.1.3"
+    "@react-native-community/cli-tools": "npm:17.0.0"
+    body-parser: "npm:^1.20.3"
     compression: "npm:^1.7.1"
     connect: "npm:^3.6.5"
     errorhandler: "npm:^1.5.1"
     nocache: "npm:^3.0.1"
+    open: "npm:^6.2.0"
     pretty-format: "npm:^26.6.2"
     serve-static: "npm:^1.13.1"
     ws: "npm:^6.2.3"
-  checksum: 10/323f9e4035f162e1115f6a1d3d5654b021bc4dda29856abd6674f516fb02c0d01039748a53b028e883ba0d02254b29ece18558e8c6ba0faed880690dc79df18a
+  checksum: 10/1f303edbe4d81b1048a11a67a5621d0aea259ba2d7f070a02c755d950e0d030c33561bcb473da1b90f7e4fbad8ed5188ddc766478a2d63bac9d2ddc6fd1806a4
   languageName: node
   linkType: hard
 
@@ -10247,45 +9930,43 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native-community/cli-tools@npm:15.1.3":
-  version: 15.1.3
-  resolution: "@react-native-community/cli-tools@npm:15.1.3"
+"@react-native-community/cli-tools@npm:17.0.0":
+  version: 17.0.0
+  resolution: "@react-native-community/cli-tools@npm:17.0.0"
   dependencies:
+    "@vscode/sudo-prompt": "npm:^9.0.0"
     appdirsjs: "npm:^1.2.4"
     chalk: "npm:^4.1.2"
     execa: "npm:^5.0.0"
     find-up: "npm:^5.0.0"
+    launch-editor: "npm:^2.9.1"
     mime: "npm:^2.4.1"
-    open: "npm:^6.2.0"
     ora: "npm:^5.4.1"
     prompts: "npm:^2.4.2"
     semver: "npm:^7.5.2"
-    shell-quote: "npm:^1.7.3"
-    sudo-prompt: "npm:^9.0.0"
-  checksum: 10/050344a4617c39d996c549446e4f894076c99bd2897fa8132c9d675ef387e88e1f5b48cdcd718a2eab90a2e51c6c4d6c4b240421633a2b3f0bc6b7d866f8e6c9
+  checksum: 10/674bfc0bd7b818f568e898eef17b81ed5842b1372dddda092cb1cc5c1c26f24126937e204fac16d3f86c1e33c619e09a497a20d13444925999fdb465d2143366
   languageName: node
   linkType: hard
 
-"@react-native-community/cli-types@npm:15.1.3":
-  version: 15.1.3
-  resolution: "@react-native-community/cli-types@npm:15.1.3"
+"@react-native-community/cli-types@npm:17.0.0":
+  version: 17.0.0
+  resolution: "@react-native-community/cli-types@npm:17.0.0"
   dependencies:
     joi: "npm:^17.2.1"
-  checksum: 10/5551e218499645ec7f1c8c3e24cfed427a5b4fab54d376b20f04fbe6b304bbf7dc69a7e64677e10c5d263ab8d98a37cb26d006ce0bcdad0d9710e09568fd297e
+  checksum: 10/9e3a5c081005eb1e768c284a69fb4102e24bdb4ba12c927fce85fd2dd2969c3d2888c3e4bcaac301cab40b91bd5b56932326c83009af06a234b5e579b5527202
   languageName: node
   linkType: hard
 
-"@react-native-community/cli@npm:^15.1.3":
-  version: 15.1.3
-  resolution: "@react-native-community/cli@npm:15.1.3"
+"@react-native-community/cli@npm:^17.0.0":
+  version: 17.0.0
+  resolution: "@react-native-community/cli@npm:17.0.0"
   dependencies:
-    "@react-native-community/cli-clean": "npm:15.1.3"
-    "@react-native-community/cli-config": "npm:15.1.3"
-    "@react-native-community/cli-debugger-ui": "npm:15.1.3"
-    "@react-native-community/cli-doctor": "npm:15.1.3"
-    "@react-native-community/cli-server-api": "npm:15.1.3"
-    "@react-native-community/cli-tools": "npm:15.1.3"
-    "@react-native-community/cli-types": "npm:15.1.3"
+    "@react-native-community/cli-clean": "npm:17.0.0"
+    "@react-native-community/cli-config": "npm:17.0.0"
+    "@react-native-community/cli-doctor": "npm:17.0.0"
+    "@react-native-community/cli-server-api": "npm:17.0.0"
+    "@react-native-community/cli-tools": "npm:17.0.0"
+    "@react-native-community/cli-types": "npm:17.0.0"
     chalk: "npm:^4.1.2"
     commander: "npm:^9.4.1"
     deepmerge: "npm:^4.3.0"
@@ -10297,7 +9978,7 @@ __metadata:
     semver: "npm:^7.5.2"
   bin:
     rnc-cli: build/bin.js
-  checksum: 10/e27e8685928f0770fcbb8bb9bf0eac2e1aa4fbe8d5ea151a5da9f9f9efc5e5a5f0223396dcbde6f26a6e32bd8a21b45cf13c030ab04b23eab92a8157995b1796
+  checksum: 10/87c006a18e6ad51f5c2e1432792ba8a4a21185e7613e2d4ef962a028ead4640762cd06e4b7cb9d6d87abc23bcc019d75a493f04192fa4c7a348824cf0aaaf9de
   languageName: node
   linkType: hard
 
@@ -10329,20 +10010,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native-firebase/analytics@npm:^21.11.0":
-  version: 21.11.0
-  resolution: "@react-native-firebase/analytics@npm:21.11.0"
+"@react-native-firebase/analytics@npm:^21.12.0":
+  version: 21.12.0
+  resolution: "@react-native-firebase/analytics@npm:21.12.0"
   dependencies:
     superstruct: "npm:^2.0.2"
   peerDependencies:
-    "@react-native-firebase/app": 21.11.0
-  checksum: 10/776a6751fa1a854b3b6b21a9883e2c983b973e9ed7d20a3ea26bbe6cc2f9d93e4f51be4dc6197dc2fc0ce6d012e6a46ad2cb7645ee7d7a5b8ac9995792c0e7be
+    "@react-native-firebase/app": 21.12.0
+  checksum: 10/e60120858773abcfd537b0653bc0b59fbb54a1f5bd0a6c39a40304bc6209edf660a3e613bf2fd4b44ad0a3227fbbfdf413bb9ba100c3141ec9db453cc683c3a2
   languageName: node
   linkType: hard
 
-"@react-native-firebase/app@npm:^21.11.0":
-  version: 21.11.0
-  resolution: "@react-native-firebase/app@npm:21.11.0"
+"@react-native-firebase/app@npm:^21.12.0":
+  version: 21.12.0
+  resolution: "@react-native-firebase/app@npm:21.12.0"
   dependencies:
     firebase: "npm:11.3.1"
   peerDependencies:
@@ -10352,20 +10033,20 @@ __metadata:
   peerDependenciesMeta:
     expo:
       optional: true
-  checksum: 10/11256faa1df25acb9b0bc75bfadf56e869b5115efa21e2e8691b65d73eb6b4c6cfbdc17c27c43c32e74b03ff165a12c1e6c59978b568185d7ae5f84050330abc
+  checksum: 10/e7b2a2e1d1537fc796040dd916d6af2774b0464146a067e3dc2df70dfd0f8ee9f27f00135d753026f7e22819d0e14359d5d43128c9489c23648db8e595196fb3
   languageName: node
   linkType: hard
 
-"@react-native-firebase/messaging@npm:^21.11.0":
-  version: 21.11.0
-  resolution: "@react-native-firebase/messaging@npm:21.11.0"
+"@react-native-firebase/messaging@npm:^21.12.0":
+  version: 21.12.0
+  resolution: "@react-native-firebase/messaging@npm:21.12.0"
   peerDependencies:
-    "@react-native-firebase/app": 21.11.0
+    "@react-native-firebase/app": 21.12.0
     expo: ">=47.0.0"
   peerDependenciesMeta:
     expo:
       optional: true
-  checksum: 10/a4b9895130b0c4427b321d72b4dd3379e055845d761e1a20763d8084840154e53c2e6cc9da14d356e4e8f151f0b1d5b71ef2b4937cd40d95a0f2779a70bd3370
+  checksum: 10/3295e7e7b0c308d5588f87ddebc6e899e8ea46f6eeb1a83e373403afe68cdaf3a6a9647e954e46cc63710bfe1831ec9b5b4a23831bae6ebe1a15186c09f6e576
   languageName: node
   linkType: hard
 
@@ -10766,10 +10447,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@revenuecat/purchases-typescript-internal@npm:13.21.0":
-  version: 13.21.0
-  resolution: "@revenuecat/purchases-typescript-internal@npm:13.21.0"
-  checksum: 10/6d70259acc85969ba9f3e5c2aa76bf9978d0ce7a71fbe5195f7ba24f88a4c64697eca8f9f1b184cb9d11b86fc39bf7780651b07fcbae2c68c7a443c98973f372
+"@revenuecat/purchases-typescript-internal@npm:13.22.0":
+  version: 13.22.0
+  resolution: "@revenuecat/purchases-typescript-internal@npm:13.22.0"
+  checksum: 10/b04a8ff067e18ac8bd714219edb1310f1b4042d8a6266566c498ef26185490b0961a71705c3781cf9fd36c22fc0f4682406dd2b1306f62b196b29e8305a2b520
   languageName: node
   linkType: hard
 
@@ -11116,10 +10797,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/core@npm:9.3.0, @sentry/core@npm:^9.3.0":
-  version: 9.3.0
-  resolution: "@sentry/core@npm:9.3.0"
-  checksum: 10/80ca12b8cf2bd862fcf82b92b26b4a6915596814262c642f57f3ca8fd859162efd7b94863eadbc7b1b22b9c62789be99b94fa0f3b8467605ca462d0b2fed5856
+"@sentry/core@npm:9.5.0, @sentry/core@npm:^9.5.0":
+  version: 9.5.0
+  resolution: "@sentry/core@npm:9.5.0"
+  checksum: 10/95d83c51334984005a248f50a6c1990ddc8bddf6a40df560e9bb329a8eb5d538fa0b742dcb6aab1dcb0195c925a22627184099e4fdaa076fa62c0d6946c9f617
   languageName: node
   linkType: hard
 
@@ -11272,12 +10953,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/types@npm:^9.3.0":
-  version: 9.3.0
-  resolution: "@sentry/types@npm:9.3.0"
+"@sentry/types@npm:^9.5.0":
+  version: 9.5.0
+  resolution: "@sentry/types@npm:9.5.0"
   dependencies:
-    "@sentry/core": "npm:9.3.0"
-  checksum: 10/90bc0595d65e990d0c6aad7acb22f266657d473ee3a3806242e8e1266e5388dea0cc061ef7c4de285bba85095a9ed2bce030787c5424e19a0298bbf1a1005c98
+    "@sentry/core": "npm:9.5.0"
+  checksum: 10/901905c9ceb6d1350917fef0abab456d76115a7ae2141b67c4720015e371b32ed1d89892c9a448f66b1a11e5eb198cd15f1065855f6ae253e61c76bfa19c5642
   languageName: node
   linkType: hard
 
@@ -12133,9 +11814,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@testing-library/react-native@npm:^13.0.1":
-  version: 13.0.1
-  resolution: "@testing-library/react-native@npm:13.0.1"
+"@testing-library/react-native@npm:^13.2.0":
+  version: 13.2.0
+  resolution: "@testing-library/react-native@npm:13.2.0"
   dependencies:
     chalk: "npm:^4.1.2"
     jest-matcher-utils: "npm:^29.7.0"
@@ -12149,7 +11830,7 @@ __metadata:
   peerDependenciesMeta:
     jest:
       optional: true
-  checksum: 10/1b7beae3de95d02ef2173f3b6129bf416a83842f8b6df9b7ec904567a29397e68dd958e3572c0cddb6733c22665511b02ebc1be893b47ab09635643fe8ae9e10
+  checksum: 10/b5c4bc61ed61ceb835224e223a528bb1a43c82776f964511f53559c8bd606feb11b85654abfe7ef5bdebd25fa5855682ebcf50afdab9aaffce45d46decdcf29e
   languageName: node
   linkType: hard
 
@@ -13088,6 +12769,13 @@ __metadata:
     "@aws-sdk/credential-provider-web-identity":
       optional: true
   checksum: 10/ff69593e4c8d70145a5d36ed6ed87601fb7b615231a6f52227b9a143861f12cd536de0392a2f9ac0d770969c9284d8955905d45aad36542cefb95c872a01e070
+  languageName: node
+  linkType: hard
+
+"@vscode/sudo-prompt@npm:^9.0.0":
+  version: 9.3.1
+  resolution: "@vscode/sudo-prompt@npm:9.3.1"
+  checksum: 10/233edb992ae5dda69b9c63101f85a7996ff7034cb9b0ea976f3ab06483511a35162a650d8e081ded5f07aa9b2f2bac93e45420d956cf1b1d8a76ac385d4a9581
   languageName: node
   linkType: hard
 
@@ -14288,6 +13976,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"body-parser@npm:^1.20.3":
+  version: 1.20.3
+  resolution: "body-parser@npm:1.20.3"
+  dependencies:
+    bytes: "npm:3.1.2"
+    content-type: "npm:~1.0.5"
+    debug: "npm:2.6.9"
+    depd: "npm:2.0.0"
+    destroy: "npm:1.2.0"
+    http-errors: "npm:2.0.0"
+    iconv-lite: "npm:0.4.24"
+    on-finished: "npm:2.4.1"
+    qs: "npm:6.13.0"
+    raw-body: "npm:2.5.2"
+    type-is: "npm:~1.6.18"
+    unpipe: "npm:1.0.0"
+  checksum: 10/8723e3d7a672eb50854327453bed85ac48d045f4958e81e7d470c56bf111f835b97e5b73ae9f6393d0011cc9e252771f46fd281bbabc57d33d3986edf1e6aeca
+  languageName: node
+  linkType: hard
+
 "boolbase@npm:^1.0.0":
   version: 1.0.0
   resolution: "boolbase@npm:1.0.0"
@@ -14547,6 +14255,13 @@ __metadata:
   version: 3.0.0
   resolution: "bytes@npm:3.0.0"
   checksum: 10/a2b386dd8188849a5325f58eef69c3b73c51801c08ffc6963eddc9be244089ba32d19347caf6d145c86f315ae1b1fc7061a32b0c1aa6379e6a719090287ed101
+  languageName: node
+  linkType: hard
+
+"bytes@npm:3.1.2":
+  version: 3.1.2
+  resolution: "bytes@npm:3.1.2"
+  checksum: 10/a10abf2ba70c784471d6b4f58778c0beeb2b5d405148e66affa91f23a9f13d07603d0a0354667310ae1d6dc141474ffd44e2a074be0f6e2254edb8fc21445388
   languageName: node
   linkType: hard
 
@@ -15264,6 +14979,13 @@ __metadata:
     tslib: "npm:^2.0.3"
     upper-case: "npm:^2.0.2"
   checksum: 10/6c3346d51afc28d9fae922e966c68eb77a19d94858dba230dd92d7b918b37d36db50f0311e9ecf6847e43e934b1c01406a0936973376ab17ec2c471fbcfb2cf3
+  languageName: node
+  linkType: hard
+
+"content-type@npm:~1.0.5":
+  version: 1.0.5
+  resolution: "content-type@npm:1.0.5"
+  checksum: 10/585847d98dc7fb8035c02ae2cb76c7a9bd7b25f84c447e5ed55c45c2175e83617c8813871b4ee22f368126af6b2b167df655829007b21aa10302873ea9c62662
   languageName: node
   linkType: hard
 
@@ -17742,6 +17464,314 @@ __metadata:
   languageName: node
   linkType: hard
 
+"expo-google-fonts-amatic-sc@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-amatic-sc@npm:0.3.0"
+  checksum: 10/8c027e13d77ed7a083b090bdf0acbc137b7a1d6784da403b9c279f18a22513b84c32f7928e51be66098306430d1759db1b8c1b955e7347ff73ba5466c973cd58
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-anton@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-anton@npm:0.3.0"
+  checksum: 10/8471981006a28a2c0616b9d31d29daa69895df373ee1ad94d0502c1ffa41e22b265625878132ca4954cda7f43b46c9984578582505edc0ada0c10b1b96664524
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-archivo@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-archivo@npm:0.3.0"
+  checksum: 10/5bb197d0fedc376360ccfda5df47e32fd43d9cb4a33a61413fbff0dd877cea8dab91938ea78429d49dfd884c93cd41de2791bd0698ca600d17b8f7a84bfdea6f
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-bebas-neue@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-bebas-neue@npm:0.3.0"
+  checksum: 10/ec3625c8bea99490d3f8d3c9324d62899c2d4e4bf086be116749f5b7549267605c2da4c147daf515ebab26382e54cb76fe73da70186b157d7b02f9f0d5e6729a
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-cardo@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-cardo@npm:0.3.0"
+  checksum: 10/c7c0b41a6f545b75a2c0f5476a6e8aabd4c8aa62f005a58a45247ad89fd25a9f63900809ebed6b08e7680365c6c38f54e163e1c0fcebe099f1bc1fe58e07dbb4
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-cinzel@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-cinzel@npm:0.3.0"
+  checksum: 10/241a68139cc979a4cd70b95d4eb3de51b005d95786748d0ddb14eb7d643d32eaeb6a2a5bb8d369a5a9c64f0bcb7b1d33c17d9fefea193a705f8e27bc34345aa3
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-cormorant-garamond@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-cormorant-garamond@npm:0.3.0"
+  checksum: 10/cf9e983e6e2826b160ce69caeff81a588eae6b3998838b4da01f6982eba6fc51e1712ba0510c6d3c451d9333166ecd8c3e5aa5684cc689fa573e4ef11a3d7229
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-courier-prime@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-courier-prime@npm:0.3.0"
+  checksum: 10/243a01c8113b6fd3401ffba1c9f67cfc8e303ed56d1232361fd97c6ac798b5fb38c0c12fb844feeb1cfd1fb6319cc42d919a00c9eea3f3112e3070ed3fd3fae5
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-dm-serif-display@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-dm-serif-display@npm:0.3.0"
+  checksum: 10/7d009b5be0cc89fbbdb2e82cd88431c37095239b31c425655158ef1f7ebb7e6171e39343b5ecb26c8b7b15e05bc11284e9a875c173cab7cabfc676488a16b3a6
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-fauna-one@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-fauna-one@npm:0.3.0"
+  checksum: 10/12c39bcd29e29eef224a9494322bbcfd0fc29fcf64ee3e43c9b18ac029b620e8dcf3deb2c9f566d20a57c5802b89e0c17c18a1c01ca5101bc0d675a65f1b7b6d
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-fraunces@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-fraunces@npm:0.3.0"
+  checksum: 10/a51cf07cbe53fb9c1f29ccda0bfeba64e15f2d44fc5ab51a30dda3846b46fb339d7ec05e31f5717a3aa190c10212aa419cd8fad89d5e417c605249c80aa94137
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-gilda-display@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-gilda-display@npm:0.3.0"
+  checksum: 10/2b4b16df1aea302e421c823181068518f25e799b411d929b96744131b63e3347102c7f038cede86728c7817291462be69316887bd999390cfbad9f86a762bb00
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-gloock@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-gloock@npm:0.3.0"
+  checksum: 10/792d00eebf5590e22b6efb50614ac8afc6ae31e4a73f588aa0a486f0b38215703bfc62f431c2a71374f976e69181628ff1bc37b848e6e3c0ed6102cacdaabe8a
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-great-vibes@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-great-vibes@npm:0.3.0"
+  checksum: 10/0a7fb93f5e9b6c2792ecb88dc7e668807e8577dd4fb5298645bea280e4ce8f9351ab34453c84cef3d0c0183f982b3b39e99627b5a3b87505e06af8c2561552a2
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-inter@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-inter@npm:0.3.0"
+  checksum: 10/cf2096d34c5a4b3c3cd73b497fd05af356442dcc24546edf02e9e6bd425346c9eb37d605c0d3ab81ccae5002d5980f08209ad582ce32f2a4bd8715c98aed3937
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-josefin-sans@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-josefin-sans@npm:0.3.0"
+  checksum: 10/d30f0639c9caa617859a7412456edd5568b2fdd74920992aa950f4cbe7212951aff0b4f3b46dcb07ffce68d00562095fe7d7846d64057455c7f8dada20e4312c
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-jost@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-jost@npm:0.3.0"
+  checksum: 10/03d12fbbc15df74c25fea62612e838157d9d6607ce801a723b11a5a539baf0622df94358b1ba2bf47c42a1972409fbe30ff93f9d618278f9854c634e61380679
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-kaushan-script@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-kaushan-script@npm:0.3.0"
+  checksum: 10/abd1c35f101b0661f53633363641037ffa40e6f2bf0b2cb61d72d3d52dc8d886c521a7dd869a1553396284a2f0749d7e19b218d9fe46e444307bda73779267c4
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-koulen@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-koulen@npm:0.3.0"
+  checksum: 10/f40173c222ffab008c4ee91153812066ca74cfe059e92f5618d8580ee45d0397d85e2bc4fe6289a4ae55e6f12ca1b475d07b2494571acf9d7652438364cdc151
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-lexend@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-lexend@npm:0.3.0"
+  checksum: 10/c6be5159f001f692d696a99a878f870ee3206187b33e08516175fdc24e6258cbd7c54c0e68aecf1e15969eb3c05985fd155d9fca63be27abd6f4af30069cb0bd
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-libre-baskerville@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-libre-baskerville@npm:0.3.0"
+  checksum: 10/f6aff997d27db9852061f06d8876b365ac9bf81eb9ceb9defa2a53bd16160738e9cb2e4f72566a9882c3a738682b783ed1d1d81399448cf89b71ae6665a31e12
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-libre-caslon-display@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-libre-caslon-display@npm:0.3.0"
+  checksum: 10/d262b913c58b1c41256c01b39b75b2c97be0cb45f3f57eec76e34ab24c8070538e9d5add1b4a656c5561304cd872467ecba9b85448c69b1b741e16ee040a9240
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-libre-caslon-text@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-libre-caslon-text@npm:0.3.0"
+  checksum: 10/7e0bc1199717baf8fb40d4aed4541e20506617c2e21bdb19401fc01467426e1d30076d24a90663878e2a4baedc0aec8a3b344aec278f8458102a6f7887e30ce9
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-limelight@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-limelight@npm:0.3.0"
+  checksum: 10/07c5a453f1b71bb1fc335a3e6d748cb042c97ce16ab8c12ee52b47ab0098a7ec89c9870aad49c64c94bcb6f0d56a64760ef6fec07a73bd04d8381e4b80336a3c
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-lora@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-lora@npm:0.3.0"
+  checksum: 10/23a809f07ad7bb2f61ae94514b63f16836ea9891a53ac8a5d64df84e383fb203704b0ad757163d0bc80c47f0af7fc90339ecea832c776b72ea6ab3ca159c456b
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-manrope@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-manrope@npm:0.3.0"
+  checksum: 10/043e27d643efba31e0a619b7a08c38f18d4a79a0ea7bfda246f2afa97c2ad2d7af83e32ac03b8f5475e9ab797b5fb3a13880f3b6458ee52049446dffe67460ea
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-monoton@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-monoton@npm:0.3.0"
+  checksum: 10/860ee6831fd0756195697312f1682919c3d3dcf4981688e9818f6d68920e477355741781ce5a80cd3637d207f3490c989d0c3432c7a7706030fbdb5d551c38ea
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-montserrat@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-montserrat@npm:0.3.0"
+  checksum: 10/7579c13dbe284b258d1336802578e411a95d77ad4ef4a9c8ddbf10b8f67b663029b617e212e9e810e1eabb24a5f37f0be722d9bb6cdfded5090f88babca34869
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-mr-dafoe@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-mr-dafoe@npm:0.3.0"
+  checksum: 10/4bdb7378e89e85d208cb03817be15760330189a5b242eeb8e776d298b5fdd410053fc3f9d3513a21c716902c5040ef36c5c2b1f3bc555225c8e4d0500d995a9b
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-open-sans@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-open-sans@npm:0.3.0"
+  checksum: 10/e393dca9d09ef253374367836d4413c977ebf2cb3961bb8d40bba948bdfc749107156987696dd2a2da539ad01370c3937a6a5608407cf56db7a4c05d8ab06d69
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-outfit@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-outfit@npm:0.3.0"
+  checksum: 10/37f7f9d5d1937ee623f28691dedb8097ca417267496215e203bae334e5666daf33a4ed62822d10a607d9cf17163763847fe626c1080aed7f43b16b4f6fa322de
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-playfair-display@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-playfair-display@npm:0.3.0"
+  checksum: 10/0239ead8f7bdc0d1fc1ed65490e000d0450a05058fc0cab1a97ba7fb7102f80bb162bb32764b75584cf55e17a491bb0fae5bc17510833bdef6f1d55c02bf7c17
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-plus-jakarta-sans@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-plus-jakarta-sans@npm:0.3.0"
+  checksum: 10/a054b3c4ae78a95c020b45053c15039360c059fa62a79a9e19bf5455042f28cbf31e319e62949a3f21ba5823a3126e5d6ddcf032e0fe68c543d036ddb554b23f
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-poppins@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-poppins@npm:0.3.0"
+  checksum: 10/38a84f863bbd2c29052efb975c66d05b09c51d79cd1c62df865fa14263601fee7a5354b555e3f74b096223fc624262c261859d698d5a21038a56eb1b01b29b38
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-raleway@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-raleway@npm:0.3.0"
+  checksum: 10/0e62494ddd8e0664eda279a2ca7ad6dd95cb628dd546f8236f4566b7c7686e4e1ddf145bdf5191558ec2c69ca05ae9255222407d91e9ed73d426ab52ef682e98
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-righteous@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-righteous@npm:0.3.0"
+  checksum: 10/fbc78ab5f51bff36818ef8078975041ad996bfdcd0d37a46500674dcc6982f7df72946d322bbb5dedbc531c0ec5fa28c575709a5798de69da9d7367abfc30b31
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-rubik@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-rubik@npm:0.3.0"
+  checksum: 10/05980e9a9d28ae14991303d89fad59e2dafbbe5e21708f866234a2a59364e0237dfccf3695c8bde2c47dd34b402e7916751b1888ad8d19bdbcb047c9d4e38462
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-rye@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-rye@npm:0.3.0"
+  checksum: 10/d6237610ab209b2999942a12297a8164b010480c9c6ab69f8b3e04b8d2ff7e209f64a4a862ed93de1e946ef08bac707ea19b1a38a2aac04c854b6e8a7066a102
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-seaweed-script@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-seaweed-script@npm:0.3.0"
+  checksum: 10/e78ce10eae4b764802fc89c601bdf35285be6cde775cf68de64b1f389e7e64caa6dfdf4651577aa28db49f6aee74d7fb2aa692ffb80675bedb756f77cf7ea2a4
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-six-caps@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-six-caps@npm:0.3.0"
+  checksum: 10/fb2eca76f262340fb59b1c3ef1a12b097ad88e6fc6fbefb6ec8d8fd1d9a9e552c4a8ff5e049ea9bbb89b678787bd2f84fd1f055bd2356fed5c5a173ac21b7c33
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-source-sans-3@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-source-sans-3@npm:0.3.0"
+  checksum: 10/d13925f1e493ea24b80a7182c3fc1fad3ead602b5abcf5a6f794c66f74fc6d0b33ff8792bb31de7eb3016f63d8627d4b1d2b66c91995b9bb82a303633f06b06b
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-ultra@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-ultra@npm:0.3.0"
+  checksum: 10/cf1aeb3ace74bd96664002dea990ddc1d335539c7c280f0cb91c58488699de7465acfdbb6ab01566b47dd76ffe72706fd75c93650638322c3b13e7949ddc5da8
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-water-brush@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-water-brush@npm:0.3.0"
+  checksum: 10/f9c1f152d4dfecdfdc64259e4e74e1f5110178d7179299ff546459ad4f9b508e466340877c518653669400e1c950d6bbf118daaaf75e7767735e8577590910db
+  languageName: node
+  linkType: hard
+
+"expo-google-fonts-yeseva-one@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "expo-google-fonts-yeseva-one@npm:0.3.0"
+  checksum: 10/b794242f9b3e6151d3adaf3fead90ab8f91601ddce4de316624b5f0f5669d9e73b2d7394db18a3cd0edcbb76c8288dcb3b258d5bb683cd6fce598e281bd17217
+  languageName: node
+  linkType: hard
+
 "expo-haptics@npm:~14.0.1":
   version: 14.0.1
   resolution: "expo-haptics@npm:14.0.1"
@@ -19453,21 +19483,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"iconv-lite@npm:0.4.24, iconv-lite@npm:^0.4.24":
+  version: 0.4.24
+  resolution: "iconv-lite@npm:0.4.24"
+  dependencies:
+    safer-buffer: "npm:>= 2.1.2 < 3"
+  checksum: 10/6d3a2dac6e5d1fb126d25645c25c3a1209f70cceecc68b8ef51ae0da3cdc078c151fade7524a30b12a3094926336831fca09c666ef55b37e2c69638b5d6bd2e3
+  languageName: node
+  linkType: hard
+
 "iconv-lite@npm:0.6.3, iconv-lite@npm:^0.6.2, iconv-lite@npm:^0.6.3":
   version: 0.6.3
   resolution: "iconv-lite@npm:0.6.3"
   dependencies:
     safer-buffer: "npm:>= 2.1.2 < 3.0.0"
   checksum: 10/24e3292dd3dadaa81d065c6f8c41b274a47098150d444b96e5f53b4638a9a71482921ea6a91a1f59bb71d9796de25e04afd05919fa64c360347ba65d3766f10f
-  languageName: node
-  linkType: hard
-
-"iconv-lite@npm:^0.4.24":
-  version: 0.4.24
-  resolution: "iconv-lite@npm:0.4.24"
-  dependencies:
-    safer-buffer: "npm:>= 2.1.2 < 3"
-  checksum: 10/6d3a2dac6e5d1fb126d25645c25c3a1209f70cceecc68b8ef51ae0da3cdc078c151fade7524a30b12a3094926336831fca09c666ef55b37e2c69638b5d6bd2e3
   languageName: node
   linkType: hard
 
@@ -21493,6 +21523,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"launch-editor@npm:^2.9.1":
+  version: 2.10.0
+  resolution: "launch-editor@npm:2.10.0"
+  dependencies:
+    picocolors: "npm:^1.0.0"
+    shell-quote: "npm:^1.8.1"
+  checksum: 10/2ef26369d89ad22938c1f5c343a622ff2e8e2f7709901c739ef38319a103b7da400afc147005e765fc0c22fd467eeb5f63f98568b3882e21f7782a4061fdeb60
+  languageName: node
+  linkType: hard
+
 "leven@npm:^3.1.0":
   version: 3.1.0
   resolution: "leven@npm:3.1.0"
@@ -22219,6 +22259,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"media-typer@npm:0.3.0":
+  version: 0.3.0
+  resolution: "media-typer@npm:0.3.0"
+  checksum: 10/38e0984db39139604756903a01397e29e17dcb04207bb3e081412ce725ab17338ecc47220c1b186b6bbe79a658aad1b0d41142884f5a481f36290cdefbe6aa46
+  languageName: node
+  linkType: hard
+
 "memoize-one@npm:^5.0.0":
   version: 5.2.1
   resolution: "memoize-one@npm:5.2.1"
@@ -22512,7 +22559,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mime-types@npm:^2.1.12, mime-types@npm:^2.1.27, mime-types@npm:~2.1.34":
+"mime-types@npm:^2.1.12, mime-types@npm:^2.1.27, mime-types@npm:~2.1.24, mime-types@npm:~2.1.34":
   version: 2.1.35
   resolution: "mime-types@npm:2.1.35"
   dependencies:
@@ -24523,6 +24570,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"qs@npm:6.13.0":
+  version: 6.13.0
+  resolution: "qs@npm:6.13.0"
+  dependencies:
+    side-channel: "npm:^1.0.6"
+  checksum: 10/f548b376e685553d12e461409f0d6e5c59ec7c7d76f308e2a888fd9db3e0c5e89902bedd0754db3a9038eda5f27da2331a6f019c8517dc5e0a16b3c9a6e9cef8
+  languageName: node
+  linkType: hard
+
 "qs@npm:^6.12.3":
   version: 6.14.0
   resolution: "qs@npm:6.14.0"
@@ -24566,6 +24622,18 @@ __metadata:
   version: 1.2.1
   resolution: "range-parser@npm:1.2.1"
   checksum: 10/ce21ef2a2dd40506893157970dc76e835c78cf56437e26e19189c48d5291e7279314477b06ac38abd6a401b661a6840f7b03bd0b1249da9b691deeaa15872c26
+  languageName: node
+  linkType: hard
+
+"raw-body@npm:2.5.2":
+  version: 2.5.2
+  resolution: "raw-body@npm:2.5.2"
+  dependencies:
+    bytes: "npm:3.1.2"
+    http-errors: "npm:2.0.0"
+    iconv-lite: "npm:0.4.24"
+    unpipe: "npm:1.0.0"
+  checksum: 10/863b5171e140546a4d99f349b720abac4410338e23df5e409cfcc3752538c9caf947ce382c89129ba976f71894bd38b5806c774edac35ebf168d02aa1ac11a95
   languageName: node
   linkType: hard
 
@@ -24781,13 +24849,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-compressor@npm:^1.10.4":
-  version: 1.10.4
-  resolution: "react-native-compressor@npm:1.10.4"
+"react-native-compressor@npm:^1.10.5":
+  version: 1.10.5
+  resolution: "react-native-compressor@npm:1.10.5"
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 10/432a470091064f5670148c520005a049476bf6f7d60128993c6ffa67cc90a54b00150ca768f8c05177db73c98667d4cad84e3590f13e509e5391c869a2cb703f
+  checksum: 10/cb42ca6d9893b886b5d979c70cb1f3238cb2b5914b8da14ff8592bbb5cb28ded0a66907d6bde851b9afae3837ca2af7d80a6a74ddbb87ce21a2cb9970ddab33f
   languageName: node
   linkType: hard
 
@@ -24906,16 +24974,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-keyboard-controller@npm:^1.16.6":
-  version: 1.16.6
-  resolution: "react-native-keyboard-controller@npm:1.16.6"
+"react-native-keyboard-controller@npm:^1.16.7":
+  version: 1.16.7
+  resolution: "react-native-keyboard-controller@npm:1.16.7"
   dependencies:
     react-native-is-edge-to-edge: "npm:^1.1.6"
   peerDependencies:
     react: "*"
     react-native: "*"
     react-native-reanimated: ">=3.0.0"
-  checksum: 10/82f7cca312640738913c341bc3ff8f53b1f1d86428390a76bb9852e07d400adfdb3c1396ead44ecc6fe1bf5869a97b365c434b449c12b531681d4ca8e8cba8cd
+  checksum: 10/b1ae29064cd388646cc3ba0ba316600f71ce83eecac0f8777a5128f5f83fc1f7d550e9bff658194bd6391610c6ce8057a05855c944870d818ed9ffbea73993c4
   languageName: node
   linkType: hard
 
@@ -24969,9 +25037,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-permissions@npm:^5.2.5":
-  version: 5.2.5
-  resolution: "react-native-permissions@npm:5.2.5"
+"react-native-permissions@npm:^5.2.6":
+  version: 5.2.6
+  resolution: "react-native-permissions@npm:5.2.6"
   peerDependencies:
     react: ">=18.1.0"
     react-native: ">=0.70.0"
@@ -24979,7 +25047,7 @@ __metadata:
   peerDependenciesMeta:
     react-native-windows:
       optional: true
-  checksum: 10/e0c6eb88346064bcaad0b0c0bc92516673f54758aba6bb7ae954df4270540c3a2d38dfb012d9d7c1c4c95159d084001aaa58e7597a31dcb9acd8974c199de917
+  checksum: 10/9ba8f66d550b19e975559b8d14e13d4fd69a8828cbe0d6b04b6c87eebf0990363133d56f46defb1a2f723dd2e274ca9d7023d1b05678c39a0f827c5114c544da
   languageName: node
   linkType: hard
 
@@ -24993,15 +25061,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-purchases@npm:^8.7.0":
-  version: 8.7.0
-  resolution: "react-native-purchases@npm:8.7.0"
+"react-native-purchases@npm:^8.8.0":
+  version: 8.8.0
+  resolution: "react-native-purchases@npm:8.8.0"
   dependencies:
-    "@revenuecat/purchases-typescript-internal": "npm:13.21.0"
+    "@revenuecat/purchases-typescript-internal": "npm:13.22.0"
   peerDependencies:
     react: ">= 16.6.3"
     react-native: "*"
-  checksum: 10/98b9b5d12b6dd117be9a182e6c62b835eb536406f2267e34664585b49cc6ff33c0c4459940f0f7a38c30ed98246db08272607dcf7815f1ca9cf248e948ff7cf1
+  checksum: 10/4dd0acf665c9b47bfc37130aa456d04cc48880ec16e8e442c8b17de5d66f585c98091dac872ef0915c716c075298ada391d4a1ff2ee4280f5f59b8d4d1887b79
   languageName: node
   linkType: hard
 
@@ -25041,13 +25109,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-safe-area-context@npm:^5.2.0":
-  version: 5.2.0
-  resolution: "react-native-safe-area-context@npm:5.2.0"
+"react-native-safe-area-context@npm:^5.3.0":
+  version: 5.3.0
+  resolution: "react-native-safe-area-context@npm:5.3.0"
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 10/0972d6f1e2485b71c148aeabaf9f1bfbc533549c66de7d0ea617f92df0024646324c38dc9062ea0392761b72b0f7b6e605a784c09addce61e105e6737bbde7b0
+  checksum: 10/771abab96577fcdf7ff77835174d58ebb032df06938a99b30d24f192e2c8eb823cec88f289a33b862b7c10f35c6fccc5da02698aadcb2a199741cbf829ee4ea6
   languageName: node
   linkType: hard
 
@@ -25193,16 +25261,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-webview@npm:^13.13.2":
-  version: 13.13.2
-  resolution: "react-native-webview@npm:13.13.2"
+"react-native-webview@npm:^13.13.3":
+  version: 13.13.3
+  resolution: "react-native-webview@npm:13.13.3"
   dependencies:
     escape-string-regexp: "npm:^4.0.0"
     invariant: "npm:2.2.4"
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 10/1e0e7b036910c751ad7ae95da37694a808ad92aff3645e7eee88f7969ed721b18e4c62a436129b1766135b2262d6568198eb83ef1e8cc1e68ca6cd708f6dc33f
+  checksum: 10/7d93e166d272132fce163ad6c0ca97ed6cd00a06ce998fa7239e636c78566a602d39eb39a3ef0d0ef7a2e6b7bf55a5861578b607d74a92bbae38f7bd842cdde0
   languageName: node
   linkType: hard
 
@@ -26706,6 +26774,13 @@ __metadata:
   version: 1.8.1
   resolution: "shell-quote@npm:1.8.1"
   checksum: 10/af19ab5a1ec30cb4b2f91fd6df49a7442d5c4825a2e269b3712eded10eedd7f9efeaab96d57829880733fc55bcdd8e9b1d8589b4befb06667c731d08145e274d
+  languageName: node
+  linkType: hard
+
+"shell-quote@npm:^1.8.1":
+  version: 1.8.2
+  resolution: "shell-quote@npm:1.8.2"
+  checksum: 10/3ae4804fd80a12ba07650d0262804ae3b479a62a6b6971a6dc5fa12995507aa63d3de3e6a8b7a8d18f4ce6eb118b7d75db7fcb2c0acbf016f210f746b10cfe02
   languageName: node
   linkType: hard
 
@@ -28236,6 +28311,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"type-is@npm:~1.6.18":
+  version: 1.6.18
+  resolution: "type-is@npm:1.6.18"
+  dependencies:
+    media-typer: "npm:0.3.0"
+    mime-types: "npm:~2.1.24"
+  checksum: 10/0bd9eeae5efd27d98fd63519f999908c009e148039d8e7179a074f105362d4fcc214c38b24f6cda79c87e563cbd12083a4691381ed28559220d4a10c2047bed4
+  languageName: node
+  linkType: hard
+
 "typed-array-buffer@npm:^1.0.0":
   version: 1.0.0
   resolution: "typed-array-buffer@npm:1.0.0"
@@ -28577,7 +28662,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"unpipe@npm:~1.0.0":
+"unpipe@npm:1.0.0, unpipe@npm:~1.0.0":
   version: 1.0.0
   resolution: "unpipe@npm:1.0.0"
   checksum: 10/4fa18d8d8d977c55cb09715385c203197105e10a6d220087ec819f50cb68870f02942244f1017565484237f1f8c5d3cd413631b1ae104d3096f24fdfde1b4aa2

@@ -280,6 +280,7 @@ const CardModuleMediaPicker = ({
         onMediaSelected={handleMediaSelected}
         selectedMediasIds={selectedMediasIds}
         allowVideo={allowVideo}
+        allowLogo
         defaultSearchValue={defaultSearchValue}
         Header={
           <Header

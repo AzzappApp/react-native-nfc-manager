@@ -309,7 +309,7 @@ PODS:
   - nanopb/decode (3.30910.0)
   - nanopb/encode (3.30910.0)
   - PromisesObjC (2.4.0)
-  - PurchasesHybridCommon (13.21.0):
+  - PurchasesHybridCommon (13.22.0):
     - RevenueCat (= 5.18.0)
   - RCT-Folly (2024.11.18.00):
     - boost
@@ -1581,7 +1581,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-compressor (1.10.4):
+  - react-native-compressor (1.10.5):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1602,7 +1602,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-keyboard-controller (1.16.6):
+  - react-native-keyboard-controller (1.16.7):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1695,7 +1695,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-safe-area-context (5.2.0):
+  - react-native-safe-area-context (5.3.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1708,8 +1708,8 @@ PODS:
     - React-featureflags
     - React-graphics
     - React-ImageManager
-    - react-native-safe-area-context/common (= 5.2.0)
-    - react-native-safe-area-context/fabric (= 5.2.0)
+    - react-native-safe-area-context/common (= 5.3.0)
+    - react-native-safe-area-context/fabric (= 5.3.0)
     - React-NativeModulesApple
     - React-RCTFabric
     - React-rendererdebug
@@ -1718,7 +1718,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-safe-area-context/common (5.2.0):
+  - react-native-safe-area-context/common (5.3.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1739,7 +1739,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-safe-area-context/fabric (5.2.0):
+  - react-native-safe-area-context/fabric (5.3.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1788,7 +1788,7 @@ PODS:
     - React
     - React-Core
     - react-native-skia
-  - react-native-webview (13.13.2):
+  - react-native-webview (13.13.3):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2164,14 +2164,14 @@ PODS:
     - Yoga
   - RNDeviceInfo (14.0.4):
     - React-Core
-  - RNFBAnalytics (21.11.0):
+  - RNFBAnalytics (21.12.0):
     - Firebase/Analytics (= 11.8.0)
     - React-Core
     - RNFBApp
-  - RNFBApp (21.11.0):
+  - RNFBApp (21.12.0):
     - Firebase/CoreOnly (= 11.8.0)
     - React-Core
-  - RNFBMessaging (21.11.0):
+  - RNFBMessaging (21.12.0):
     - Firebase/Messaging (= 11.8.0)
     - FirebaseCoreExtension
     - React-Core
@@ -2260,7 +2260,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNPermissions (5.2.5):
+  - RNPermissions (5.2.6):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2281,8 +2281,8 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNPurchases (8.7.0):
-    - PurchasesHybridCommon (= 13.21.0)
+  - RNPurchases (8.8.0):
+    - PurchasesHybridCommon (= 13.22.0)
     - React-Core
   - RNReactNativeHapticFeedback (2.3.3):
     - DoubleConversion
@@ -3048,7 +3048,7 @@ SPEC CHECKSUMS:
   lottie-react-native: 28e5b80459ee6723917995556657e54b98bb16bc
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
-  PurchasesHybridCommon: 9691d74a051f30858360d78936d59dc14575014e
+  PurchasesHybridCommon: 16367f792481e8e2d61101ecb607b566937aa67f
   RCT-Folly: e78785aa9ba2ed998ea4151e314036f6c49e6d82
   RCTDeprecation: 664055db806cce35c3c1b43c84414dd66e117ae6
   RCTRequired: dc9a83fa1012054f94430d210337ca3a1afe6fc0
@@ -3082,17 +3082,17 @@ SPEC CHECKSUMS:
   react-native-animateable-text: 3626f4f58e40f6a6b073cd45ac97fe4ca6ac0ed2
   react-native-blob-jsi-helper: 7f1c5d79efc2b7c88c835648ac7d58514f3b70bc
   react-native-cameraroll: 9708b174e4edc3badd33b38e423b4bd08b9725bf
-  react-native-compressor: 301aad45f0ee114289d7b0da0b5496e56faae5f0
-  react-native-keyboard-controller: d4714621ca4bad1c85e99621aba36977b349698a
+  react-native-compressor: 7c60f36b5bf3ca1a6ddeb238bac7b9a8c118db55
+  react-native-keyboard-controller: bc901620083e30e88ddd48a1358183b36a66adc0
   react-native-mmkv: 24917f0685641ccfd37c9b7004b26c00551128be
   react-native-netinfo: cec9c4e86083cb5b6aba0e0711f563e2fbbff187
   react-native-pager-view: cda3e94765176877702695c4b8c4b5ca69cb2f16
   react-native-passkit: 3979317a86e60cc9288eeffab27da37d62d15160
   react-native-quick-base64: e69675f0ddca418dd1eb8a6ffa06ed388be293d9
-  react-native-safe-area-context: 7e513d737b0b5c1d10bbe0e5fcc9f925a7be144c
+  react-native-safe-area-context: 0f14bce545abcdfbff79ce2e3c78c109f0be283e
   react-native-skia: d3d3afa9c428c6c7ccfd89a02683b5dbf2f31d35
-  react-native-skottie-template-player: 3120030f38fc46dacafd2220539c31f4df1b7d0d
-  react-native-webview: 449c3f27cdb926086a5eff7993421fd096cc5ae3
+  react-native-skottie-template-player: e71f773222960069b747bd3b14d86be395c5a3d0
+  react-native-webview: 4c4e51dcfb4b68c80be207a640952698ecb4f65d
   React-nativeconfig: cb207ebba7cafce30657c7ad9f1587a8f32e4564
   React-NativeModulesApple: 8411d548b1ad9d2b3e597beb9348e715c8020e0c
   React-perflogger: c4c3b7c18f8a50cdbe2bcdd2f15705ba029a5a02
@@ -3127,15 +3127,15 @@ SPEC CHECKSUMS:
   RNCMaskedView: 308c763227e237d4d260bd8841870e099572bb3e
   RNDateTimePicker: e30677c15dfba25452b1434181970162115cc4fe
   RNDeviceInfo: d863506092aef7e7af3a1c350c913d867d795047
-  RNFBAnalytics: 6b226d93aa4153686d8e337fabcf1ac4243d7c12
-  RNFBApp: b5626640e0f4b4fe5be4f44375df703c0d62ee4b
-  RNFBMessaging: 8e38f5ca846497f8a9c91d33f311c00ca52d119c
+  RNFBAnalytics: a5deff2112ed229501c5804a6a4936c67c39f321
+  RNFBApp: 3ecdb44edd5cce785ea9b796682766889962a5fd
+  RNFBMessaging: 65b436add429c5fd8fed20643c3a92916d275444
   RNFlashList: d6f5c8e04ae8ce8e27693cd98c0297abce8f4c54
   RNGestureHandler: 8b1080a6db0be82dbca18550d6212b885bfab6b2
   RNKeychain: 8d45ee314f242a6fb81fa9677ed8e0bf39dcecc3
   RNLocalize: 7ed277415799ab5a8931b77fd2124c4749822e8a
-  RNPermissions: bf2b9db46769eab026008c0a6cd408027dd4dac4
-  RNPurchases: 2c8780f3b7be8af8cd6f3f3740ba4176465d1d0a
+  RNPermissions: 0ec4c8312912a45056185b429db95457da490cf4
+  RNPurchases: d1f57477a73970b532790a85f48d1611d7b5b030
   RNReactNativeHapticFeedback: 66c6b0cf19f5d9dae8be36b2336e1fe2a2e42566
   RNReactNativeSharedGroupPreferences: d4869af3c7757405b6b5ac633d0ef5f9886a9be7
   RNReanimated: afed763d6c0b1916bfef1dbde4271ec0947dd376
@@ -3151,8 +3151,8 @@ SPEC CHECKSUMS:
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   SPTPersistentCache: df36ea46762d7cf026502bbb86a8b79d0080dff4
   VisionCamera: 7aaae584148bbc250e81b5662e45a7f25c18be2e
-  Yoga: 2957d0e744897870b5a377f26522e3f08cadd7ac
+  Yoga: 1fd059161b449018342943b095a6d4e69bcaa719
 
 PODFILE CHECKSUM: ca03835200938cc10d80d63e8c003657ba0703d1
 
-COCOAPODS: 1.16.1
+COCOAPODS: 1.16.2
