@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { View, StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useMutation, usePaginationFragment } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+import EmptyContent from '#components/ui/EmptyContent';
 import WebCardList from '#components/WebCardList';
 import { getAuthState } from '#helpers/authStore';
 import { profileInfoHasEditorRight } from '#helpers/profileRoleHelper';
@@ -169,12 +171,29 @@ const FollowersScreenList = ({
       )}
       onEndReached={onEndReached}
       onToggleFollow={onToggleFollow}
-      noProfileFoundLabel={intl.formatMessage({
-        defaultMessage: 'No followers',
-        description:
-          'Message displayed in the followers screen when the user has no followers',
-      })}
+      ListEmptyComponent={<FollowersScreenListEmpty />}
     />
+  );
+};
+
+const FollowersScreenListEmpty = () => {
+  return (
+    <View style={styles.emptyScreenContainer}>
+      <EmptyContent
+        message={
+          <FormattedMessage
+            defaultMessage="No contact yet"
+            description="Empty followers message title"
+          />
+        }
+        description={
+          <FormattedMessage
+            defaultMessage="Seems like you have no follower yet..."
+            description="Empty followers list message content"
+          />
+        }
+      />
+    </View>
   );
 };
 
@@ -200,4 +219,11 @@ const updater = (
   }
 };
 
+const styles = StyleSheet.create({
+  emptyScreenContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
 export default FollowersScreenList;

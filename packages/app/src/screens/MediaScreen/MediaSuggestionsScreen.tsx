@@ -10,21 +10,29 @@ import Text from '#ui/Text';
 import MediaSuggestionsWebCards, {
   MediaSuggestionWebCardFallback,
 } from './MediaSuggestionsWebCards';
+import type { ScrollableToOffset } from '#helpers/types';
 import type { MediaSuggestionsScreen_profile$key } from '#relayArtifacts/MediaSuggestionsScreen_profile.graphql';
 import type { MediaSuggestionsScreenInner_profile$key } from '#relayArtifacts/MediaSuggestionsScreenInner_profile.graphql';
 import type { PostsGrid_posts$key } from '#relayArtifacts/PostsGrid_posts.graphql';
 import type { ReactElement } from 'react';
+import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 
 type MediaSuggestionsScreenProps = {
   profile: MediaSuggestionsScreen_profile$key;
   isCurrentTab: boolean;
   canPlay: boolean;
+  onScroll?: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
+  ListHeaderComponent: JSX.Element;
+  scrollableRef?: ScrollableToOffset;
 };
 
 const MediaSuggestionsScreen = ({
   profile: profileKey,
   isCurrentTab,
   canPlay,
+  onScroll,
+  ListHeaderComponent,
+  scrollableRef,
 }: MediaSuggestionsScreenProps) => {
   const profile = useFragment(
     graphql`
@@ -38,12 +46,16 @@ const MediaSuggestionsScreen = ({
     `,
     profileKey,
   );
+
   return (
     <MediaSuggestionsScreenInner
       profile={profile}
       canPlay={canPlay}
+      onScroll={onScroll}
+      scrollableRef={scrollableRef}
       ListHeaderComponent={
         <View>
+          {ListHeaderComponent}
           <CoverSuggestionTitle />
           <MediaSuggestionsWebCards
             profile={profile}
@@ -62,12 +74,16 @@ type MediaSuggestionsScreenInnerProps = {
   profile: MediaSuggestionsScreenInner_profile$key;
   canPlay: boolean;
   ListHeaderComponent: ReactElement<any> | null;
+  onScroll?: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
+  scrollableRef?: ScrollableToOffset;
 };
 
 const MediaSuggestionsScreenInner = ({
   profile,
   canPlay,
   ListHeaderComponent,
+  scrollableRef,
+  onScroll,
 }: MediaSuggestionsScreenInnerProps) => {
   const [refreshing, setRefreshing] = useState(false);
   const { data, loadNext, refetch, hasNext, isLoadingNext } =
@@ -149,6 +165,8 @@ const MediaSuggestionsScreenInner = ({
       onRefresh={onRefresh}
       onEndReached={onEndReached}
       nestedScrollEnabled
+      onScroll={onScroll}
+      scrollableRef={scrollableRef}
     />
   );
 };

@@ -96,6 +96,12 @@ type ShadowParams = {
   // @see https://github.com/facebook/react-native/issues/49128
   forceOldShadow?: boolean;
   height?: number;
+  color?: {
+    r: number;
+    g: number;
+    b: number;
+    a?: number;
+  };
 };
 
 export const shadow = ({
@@ -104,10 +110,11 @@ export const shadow = ({
   // @see https://github.com/facebook/react-native/issues/49128
   forceOldShadow = Platform.OS === 'ios',
   height = 10,
+  color = { r: 0, g: 0, b: 0 },
 }: ShadowParams) =>
   forceOldShadow
     ? {
-        shadowColor: '#000',
+        shadowColor: `#${color.r.toString(16)}${color.g.toString(16)}${color.b.toString(16)}`,
         shadowOffset: {
           width: 0,
           height:
@@ -117,7 +124,7 @@ export const shadow = ({
                 ? 0
                 : -height,
         },
-        shadowOpacity: appearance === 'dark' ? 0.4 : 0.2,
+        shadowOpacity: color.a ?? (appearance === 'dark' ? 0.4 : 0.2),
         shadowRadius: 10,
         elevation: 10,
       }
@@ -133,7 +140,7 @@ export const shadow = ({
                   : -height / 2,
             blurRadius: '10',
             spreadDistance: '0',
-            color: `rgba(0, 0, 0, ${appearance === 'dark' ? 0.4 : 0.2})`,
+            color: `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a ?? (appearance === 'dark' ? 0.4 : 0.2)})`,
           },
         ],
       };

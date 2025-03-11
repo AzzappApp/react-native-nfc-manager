@@ -12,6 +12,7 @@ import useScreenInsets from '#hooks/useScreenInsets';
 import { HEADER_HEIGHT } from '#ui/Header';
 import ListLoadingFooter from '#ui/ListLoadingFooter';
 import { PostListContext } from './PostListsContext';
+import type { ScrollableToOffset } from '#helpers/types';
 import type {
   PostList_posts$data,
   PostList_posts$key,
@@ -19,7 +20,13 @@ import type {
 import type { PostRendererFragment_author$key } from '#relayArtifacts/PostRendererFragment_author.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { ContentStyle, ListRenderItemInfo } from '@shopify/flash-list';
-import type { ViewProps, ViewToken } from 'react-native';
+import type { MutableRefObject } from 'react';
+import type {
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  ViewProps,
+  ViewToken,
+} from 'react-native';
 
 type PostListProps = ViewProps & {
   posts: PostList_posts$key;
@@ -34,6 +41,13 @@ type PostListProps = ViewProps & {
   showUnpublished?: boolean;
   firstItemVideoTime?: number | null;
   onPostDeleted?: () => void;
+  onScroll?: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
+  ListHeaderComponent?:
+    | React.ComponentType<any>
+    | React.ReactElement
+    | null
+    | undefined;
+  scrollableRef?: ScrollableToOffset;
 };
 
 const viewabilityConfig = {
@@ -55,6 +69,9 @@ const PostList = ({
   showUnpublished = false,
   firstItemVideoTime,
   onPostDeleted,
+  onScroll,
+  ListHeaderComponent,
+  scrollableRef,
   ...props
 }: PostListProps) => {
   const profileInfos = useProfileInfos();
@@ -284,35 +301,6 @@ const PostList = ({
     [loading],
   );
 
-  const insets = useScreenInsets();
-  const ListEmptyComponent = useMemo(
-    () => (
-      <View
-        style={{
-          height: windowHeight - HEADER_HEIGHT - insets.bottom - insets.top,
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <EmptyContent
-          message={
-            <FormattedMessage
-              defaultMessage="No posts yet"
-              description="Empty post list message title"
-            />
-          }
-          description={
-            <FormattedMessage
-              defaultMessage="Seems like there is no post on this feed..."
-              description="Empty post list message content"
-            />
-          }
-        />
-      </View>
-    ),
-    [insets.bottom, insets.top],
-  );
-
   useEffect(() => {
     if (posts.length > 0) {
       const item = [
@@ -328,22 +316,53 @@ const PostList = ({
   return (
     <PostListContext.Provider value={visiblePostIds}>
       <FlashList
+        ref={scrollableRef as MutableRefObject<FlashList<any>>}
+        onScroll={onScroll}
         keyExtractor={keyExtractor}
         data={posts}
         renderItem={renderItem}
         onEndReached={onEndReached}
         refreshing={refreshing}
         onRefresh={onRefresh}
+        ListHeaderComponent={ListHeaderComponent}
         ListFooterComponent={ListFooterComponent}
         estimatedItemSize={300}
         onViewableItemsChanged={onViewableItemsChanged}
         onEndReachedThreshold={1}
         extraData={extraData}
         viewabilityConfig={viewabilityConfig}
-        ListEmptyComponent={ListEmptyComponent}
+        ListEmptyComponent={<PostListEmpty />}
         {...props}
       />
     </PostListContext.Provider>
+  );
+};
+
+const PostListEmpty = () => {
+  const insets = useScreenInsets();
+  return (
+    <View
+      style={{
+        height: windowHeight - HEADER_HEIGHT - insets.bottom - insets.top,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <EmptyContent
+        message={
+          <FormattedMessage
+            defaultMessage="No posts yet"
+            description="Empty post list message title"
+          />
+        }
+        description={
+          <FormattedMessage
+            defaultMessage="Seems like there is no post on this feed..."
+            description="Empty post list message content"
+          />
+        }
+      />
+    </View>
   );
 };
 

@@ -76,7 +76,7 @@ type ProfileListProps = {
   onEndReached?: () => void;
   style?: StyleProp<ViewStyle>;
   onToggleFollow?: (id: string, userName: string) => void;
-  noProfileFoundLabel: string;
+  ListEmptyComponent: JSX.Element;
 };
 
 const COVER_WIDTH = 35;
@@ -95,7 +95,7 @@ const WebCardList = ({
   onEndReached,
   style,
   onToggleFollow,
-  noProfileFoundLabel,
+  ListEmptyComponent,
 }: ProfileListProps) => {
   const users = useFragment(
     graphql`
@@ -131,11 +131,7 @@ const WebCardList = ({
       contentContainerStyle={styles.container}
       style={style}
       getItemLayout={getItemLayout}
-      ListEmptyComponent={
-        <View style={styles.empty}>
-          <Text variant="medium">{noProfileFoundLabel}</Text>
-        </View>
-      }
+      ListEmptyComponent={ListEmptyComponent}
       ListFooterComponent={<View style={styles.footer} />}
     />
   );

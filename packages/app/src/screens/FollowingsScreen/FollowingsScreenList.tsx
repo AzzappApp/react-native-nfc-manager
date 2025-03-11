@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { View, StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, usePaginationFragment } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+import EmptyContent from '#components/ui/EmptyContent';
 import WebCardList from '#components/WebCardList';
 import { getAuthState } from '#helpers/authStore';
 import { profileInfoHasEditorRight } from '#helpers/profileRoleHelper';
@@ -100,21 +102,45 @@ const FollowingsScreenList = ({
     },
     [intl, toggleFollow],
   );
-
   return (
     <WebCardList
-      noProfileFoundLabel={intl.formatMessage({
-        defaultMessage: 'Not following anyone',
-        description:
-          'Message displayed in the followed profiles screen when the user is not following anyone',
-      })}
       users={convertToNonNullArray(
         data?.followings?.edges?.map(edge => edge?.node) ?? [],
       )}
       onEndReached={onEndReached}
       onToggleFollow={onToggleFollow}
+      ListEmptyComponent={<FollowingScreenListEmpty />}
     />
   );
 };
+
+const FollowingScreenListEmpty = () => {
+  return (
+    <View style={styles.emptyScreenContainer}>
+      <EmptyContent
+        message={
+          <FormattedMessage
+            defaultMessage="No contact yet"
+            description="Empty following message title"
+          />
+        }
+        description={
+          <FormattedMessage
+            defaultMessage="Seems like you are not following anyone yet..."
+            description="Empty following list message content"
+          />
+        }
+      />
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  emptyScreenContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
 
 export default FollowingsScreenList;

@@ -2,14 +2,7 @@ import * as Sentry from '@sentry/react-native';
 import { Paths, File, Directory } from 'expo-file-system/next';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import {
-  View,
-  useWindowDimensions,
-  Share,
-  Platform,
-  Alert,
-  StyleSheet,
-} from 'react-native';
+import { View, Share, Platform, Alert, StyleSheet } from 'react-native';
 import ShareCommand from 'react-native-share';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
@@ -18,7 +11,6 @@ import ERRORS from '@azzapp/shared/errors';
 import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { ENABLE_MULTI_USER } from '#Config';
 import { colors } from '#theme';
-import CoverRenderer from '#components/CoverRenderer';
 import { useRouter } from '#components/NativeRouter';
 import useQuitWebCard from '#hooks/useQuitWebCard';
 import { useSendReport } from '#hooks/useSendReport';
@@ -31,6 +23,7 @@ import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
+import WebCardStatHeader from './WebCard/WebCardStatHeader';
 import type { WebCardMenu_webCard$key } from '#relayArtifacts/WebCardMenu_webCard.graphql';
 
 type WebCardMenuProps = {
@@ -87,24 +80,20 @@ const WebCardMenu = ({
       @argumentDefinitions(viewerWebCardId: { type: "ID" }) {
         id
         userName
-        nbPosts
-        nbFollowers
-        nbFollowings
         cardIsPublished
+        ...WebCardStatHeader_webCard
         coverMedia {
           __typename
           id
           uriDownload: uri
         }
         WebCardMenu_isFollowing: isFollowing(webCardId: $viewerWebCardId)
-        ...CoverRenderer_webCard
       }
     `,
     webCardKey,
   );
   const isFollowing = webCard.WebCardMenu_isFollowing;
 
-  const { width: windowsWith } = useWindowDimensions();
   const intl = useIntl();
 
   const onShare = async () => {
@@ -388,49 +377,7 @@ const WebCardMenu = ({
           rightElement={null}
           style={styles.headerBottom}
         />
-        <View
-          style={{
-            justifyContent: 'center',
-            alignItems: 'center',
-            paddingVertical: 20,
-          }}
-        >
-          <CoverRenderer
-            webCard={webCard}
-            width={windowsWith / 3}
-            canPlay={false}
-          />
-        </View>
-        <View style={styles.countersContainer}>
-          <View style={styles.counterContainer}>
-            <Text variant="xlarge">{webCard?.nbPosts}</Text>
-            <Text variant="small" style={styles.counterValue} numberOfLines={1}>
-              <FormattedMessage
-                defaultMessage="Posts"
-                description="Number of posts"
-              />
-            </Text>
-          </View>
-
-          <View style={styles.counterContainer}>
-            <Text variant="xlarge">{webCard?.nbFollowers}</Text>
-            <Text variant="small" style={styles.counterValue} numberOfLines={1}>
-              <FormattedMessage
-                defaultMessage="Followers"
-                description="Number of followers"
-              />
-            </Text>
-          </View>
-          <View style={styles.counterContainer}>
-            <Text variant="xlarge">{webCard?.nbFollowings}</Text>
-            <Text variant="small" style={styles.counterValue} numberOfLines={1}>
-              <FormattedMessage
-                defaultMessage="Followings"
-                description="Number of followed webcards"
-              />
-            </Text>
-          </View>
-        </View>
+        <WebCardStatHeader webCard={webCard} onLeave={close} />
         <View style={styles.bottomSheetOptionsContainer}>
           {isViewer && isAdmin && (
             <PressableNative
@@ -611,22 +558,10 @@ const WebCardMenu = ({
 export default memo(WebCardMenu);
 
 const styles = StyleSheet.create({
-  countersContainer: {
-    flexDirection: 'row',
-    columnGap: 12,
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderColor: colors.grey100,
-    height: 60,
-  },
   bottomSheetOptionsContainer: {
     paddingTop: 20,
     paddingHorizontal: 20,
     rowGap: 20,
-  },
-  counterContainer: { width: 12, alignItems: 'center', flex: 1 },
-  counterValue: {
-    color: colors.grey400,
   },
   bottomSheetOptionButton: {
     height: 32,
