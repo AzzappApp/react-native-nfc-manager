@@ -1,3 +1,7 @@
+## 1.8.13
+
+* **fix:**  - missing env var in build
+
 ## 1.8.12
 
 * **fix:**  - incorrect APP_SCHEME value
