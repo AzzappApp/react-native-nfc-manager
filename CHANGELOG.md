@@ -1,3 +1,7 @@
+## 1.9.0-canary.12
+
+* **fix:**  - **home:** [#7834](https://github.com/AzzappApp/azzapp/pull/7834) remove duplicated tab ([#7839](https://github.com/AzzappApp/azzapp/pull/7839))
+
 ## 1.9.0-canary.11
 
 * **fix:**  - downgrade to rn cli 15 ([#7836](https://github.com/AzzappApp/azzapp/pull/7836))
