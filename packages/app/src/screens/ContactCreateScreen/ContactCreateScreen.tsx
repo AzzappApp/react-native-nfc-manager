@@ -88,6 +88,18 @@ const ContactCreateScreen = ({
     if (!profileId) {
       return;
     }
+    if (data.notify && data.emails.length <= 0) {
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage({
+          defaultMessage:
+            'Error, could not save your contact. Please add email or uncheck the box.',
+          description:
+            'Error toast message when saving contact card without email and box checked',
+        }) as unknown as string,
+      });
+      return;
+    }
 
     const uploads = [];
 
