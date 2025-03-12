@@ -24,7 +24,6 @@ const column = style({
 
 const title = style({
   fontSize: titleFontSize,
-  fontWeight: 700,
   lineHeight: '1.6em',
   margin: 0,
   whiteSpace: 'pre-wrap',
