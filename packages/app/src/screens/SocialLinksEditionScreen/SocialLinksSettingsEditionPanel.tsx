@@ -129,8 +129,12 @@ const SocialLinksSettingsEditionPanel = ({
 
   return (
     <View style={[styles.root, style]} {...props}>
-      <TabsBar currentTab={currentTab} onTabPress={setCurrentTab} tabs={tabs} />
       <View style={styles.paramContainer}>
+        <TabsBar
+          currentTab={currentTab}
+          onTabPress={setCurrentTab}
+          tabs={tabs}
+        />
         <View style={styles.buttonContainer}>
           <FloatingIconButton
             onPress={onArrangementChange}
@@ -247,7 +251,6 @@ const styles = StyleSheet.create({
   },
   paramContainer: {
     width: '100%',
-    flex: 1,
     rowGap: 15,
   },
   slider: {

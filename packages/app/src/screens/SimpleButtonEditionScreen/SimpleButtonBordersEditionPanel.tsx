@@ -109,8 +109,12 @@ const SimpleButtonBordersEditionPanel = ({
 
   return (
     <View style={[styles.root, style]} {...props}>
-      <TabsBar currentTab={currentTab} onTabPress={setCurrentTab} tabs={tabs} />
       <View style={styles.paramContainer}>
+        <TabsBar
+          currentTab={currentTab}
+          onTabPress={setCurrentTab}
+          tabs={tabs}
+        />
         <LabeledDashedSlider
           label={
             <FormattedMessage
@@ -189,9 +193,8 @@ const styles = StyleSheet.create({
   },
   paramContainer: {
     width: '100%',
-    flex: 1,
     rowGap: 25,
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
   },
   slider: {
     width: '90%',

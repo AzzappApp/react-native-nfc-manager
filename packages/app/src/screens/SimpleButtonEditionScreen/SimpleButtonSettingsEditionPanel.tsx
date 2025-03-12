@@ -254,106 +254,114 @@ const SimpleButtonSettingsEditionPanel = ({
 
   return (
     <View style={[styles.root, style]} {...props}>
-      <TabsBar currentTab={currentTab} onTabPress={setCurrentTab} tabs={tabs} />
-      <TextInput
-        value={buttonLabel}
-        onChangeText={onButtonLabelChange}
-        placeholder={intl.formatMessage({
-          defaultMessage: 'Button Label',
-          description:
-            'Label of the buttonLabel input in SimpleButton Settings edition',
-        })}
-        maxLength={SIMPLE_BUTTON_MAX_LABEL_LENGTH}
-      />
-      <View style={{ rowGap: 15 }}>
-        <View style={styles.actionContainer}>
-          <CountryCodeListWithOptions<'email' | 'link'>
-            otherSectionTitle={intl.formatMessage({
-              defaultMessage: 'Button Options',
-              description:
-                'Label of the action type selector in SimpleButton Settings edition',
-            })}
-            phoneSectionTitle={intl.formatMessage({
-              defaultMessage: 'Contact by phone number',
-              description:
-                'Signup Form Connect with phone number section title in country selection list SimpleButton Settings edition',
-            })}
-            value={actionType as CountryCode | 'email' | 'link'} //force type here, will not define country code is GraphQL
-            options={SELECTORS}
-            onChange={onActionTypeChange}
-            style={styles.selectorsList}
+      <View style={styles.paramContainer}>
+        <TabsBar
+          currentTab={currentTab}
+          onTabPress={setCurrentTab}
+          tabs={tabs}
+        />
+        <TextInput
+          value={buttonLabel}
+          onChangeText={onButtonLabelChange}
+          placeholder={intl.formatMessage({
+            defaultMessage: 'Button Label',
+            description:
+              'Label of the buttonLabel input in SimpleButton Settings edition',
+          })}
+          maxLength={SIMPLE_BUTTON_MAX_LABEL_LENGTH}
+        />
+        <View style={{ rowGap: 15 }}>
+          <View style={styles.actionContainer}>
+            <CountryCodeListWithOptions<'email' | 'link'>
+              otherSectionTitle={intl.formatMessage({
+                defaultMessage: 'Button Options',
+                description:
+                  'Label of the action type selector in SimpleButton Settings edition',
+              })}
+              phoneSectionTitle={intl.formatMessage({
+                defaultMessage: 'Contact by phone number',
+                description:
+                  'Signup Form Connect with phone number section title in country selection list SimpleButton Settings edition',
+              })}
+              value={actionType as CountryCode | 'email' | 'link'} //force type here, will not define country code is GraphQL
+              options={SELECTORS}
+              onChange={onActionTypeChange}
+              style={styles.selectorsList}
+              accessibilityLabel={intl.formatMessage({
+                defaultMessage: 'Select a calling code, email or an URL link',
+                description:
+                  'Simplebutton - The accessibility label for the CountryCodeListWithOptions selector ',
+              })}
+              accessibilityHint={intl.formatMessage({
+                defaultMessage:
+                  'Opens a list of countries, an email address and an URL link and allows you to select if you want to use an email, a link or a phone number for the simple button action',
+                description:
+                  'Simplebutton - The accessibility hint for the CountryCodeListWithOptions',
+              })}
+            />
+            <TextInputWithEllipsizeMode
+              value={actionLink}
+              onChangeText={onActionLinkTextInputChangeText}
+              placeholder={getActionTypePlaceholder()}
+              onBlur={onBlur}
+              style={{ flex: 1 }}
+              autoCapitalize="none"
+              keyboardType={keyboardType}
+              enterKeyHint="done"
+            />
+          </View>
+          <View style={styles.buttonContainer}>
+            <FontDropDownPicker
+              fontFamily={fontFamily}
+              onFontFamilyChange={onFontFamilyChange}
+              bottomSheetHeight={bottomSheetHeight}
+            />
+            <WebCardColorDropDownPicker
+              webCard={webCard ?? null}
+              color={fontColor}
+              onColorChange={onFontColorChange}
+              bottomSheetHeight={bottomSheetHeight}
+            />
+          </View>
+          <LabeledDashedSlider
+            label={
+              <FormattedMessage
+                defaultMessage="Font size :"
+                description="fontSize message in SimpleButton edition"
+              />
+            }
+            value={fontSize}
+            min={SIMPLE_BUTTON_MIN_FONT_SIZE}
+            max={SIMPLE_BUTTON_MAX_FONT_SIZE}
+            step={1}
             accessibilityLabel={intl.formatMessage({
-              defaultMessage: 'Select a calling code, email or an URL link',
+              defaultMessage: 'Font size',
               description:
-                'Simplebutton - The accessibility label for the CountryCodeListWithOptions selector ',
+                'Label of the fontSize slider in SimpleButton edition',
             })}
             accessibilityHint={intl.formatMessage({
-              defaultMessage:
-                'Opens a list of countries, an email address and an URL link and allows you to select if you want to use an email, a link or a phone number for the simple button action',
+              defaultMessage: 'Slide to change the Font Size',
               description:
-                'Simplebutton - The accessibility hint for the CountryCodeListWithOptions',
+                'Hint of the fontSize slider in SimpleButton edition',
             })}
+            style={styles.slider}
+            onTouched={onTouched}
           />
-          <TextInputWithEllipsizeMode
-            value={actionLink}
-            onChangeText={onActionLinkTextInputChangeText}
-            placeholder={getActionTypePlaceholder()}
-            onBlur={onBlur}
-            style={{ flex: 1 }}
-            autoCapitalize="none"
-            keyboardType={keyboardType}
-            enterKeyHint="done"
-          />
-        </View>
-        <View style={styles.buttonContainer}>
-          <FontDropDownPicker
-            fontFamily={fontFamily}
-            onFontFamilyChange={onFontFamilyChange}
-            bottomSheetHeight={bottomSheetHeight}
-          />
-          <WebCardColorDropDownPicker
-            webCard={webCard ?? null}
-            color={fontColor}
-            onColorChange={onFontColorChange}
-            bottomSheetHeight={bottomSheetHeight}
-          />
-        </View>
-        <LabeledDashedSlider
-          label={
-            <FormattedMessage
-              defaultMessage="Font size :"
-              description="fontSize message in SimpleButton edition"
+          {webCard && (
+            <WebCardColorPicker
+              visible={currentTab !== 'settings'}
+              height={bottomSheetHeight}
+              webCard={webCard}
+              title={intl.formatMessage({
+                defaultMessage: 'Button color',
+                description: 'Button color title in SimpleButton edition',
+              })}
+              selectedColor={buttonColor}
+              onColorChange={onButtonColorChange}
+              onRequestClose={onProfileColorPickerClose}
             />
-          }
-          value={fontSize}
-          min={SIMPLE_BUTTON_MIN_FONT_SIZE}
-          max={SIMPLE_BUTTON_MAX_FONT_SIZE}
-          step={1}
-          accessibilityLabel={intl.formatMessage({
-            defaultMessage: 'Font size',
-            description: 'Label of the fontSize slider in SimpleButton edition',
-          })}
-          accessibilityHint={intl.formatMessage({
-            defaultMessage: 'Slide to change the Font Size',
-            description: 'Hint of the fontSize slider in SimpleButton edition',
-          })}
-          style={styles.slider}
-          onTouched={onTouched}
-        />
-        {webCard && (
-          <WebCardColorPicker
-            visible={currentTab !== 'settings'}
-            height={bottomSheetHeight}
-            webCard={webCard}
-            title={intl.formatMessage({
-              defaultMessage: 'Button color',
-              description: 'Button color title in SimpleButton edition',
-            })}
-            selectedColor={buttonColor}
-            onColorChange={onButtonColorChange}
-            onRequestClose={onProfileColorPickerClose}
-          />
-        )}
+          )}
+        </View>
       </View>
     </View>
   );
@@ -366,6 +374,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     rowGap: 15,
     justifyContent: 'flex-start',
+  },
+  paramContainer: {
+    width: '100%',
+    rowGap: 25,
+    justifyContent: 'center',
   },
   actionContainer: {
     alignItems: 'center',
