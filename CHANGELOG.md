@@ -1,3 +1,7 @@
+## 1.9.0-canary.15
+
+* **fix:**  - remove window access in useDimension ([#7857](https://github.com/AzzappApp/azzapp/pull/7857))
+
 ## 1.9.0-canary.14
 
 
