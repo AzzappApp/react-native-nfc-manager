@@ -1,3 +1,7 @@
+## 1.8.14
+
+* **fix:**  - error 500 on unknown webcard username ([#7859](https://github.com/AzzappApp/azzapp/pull/7859))
+
 ## 1.8.13
 
 * **fix:**  - missing env var in build
