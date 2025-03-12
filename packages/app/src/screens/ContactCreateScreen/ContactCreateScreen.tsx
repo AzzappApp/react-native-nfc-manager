@@ -96,7 +96,7 @@ const ContactCreateScreen = ({
             'Error, could not save your contact. Please add email or uncheck the box.',
           description:
             'Error toast message when saving contact card without email and box checked',
-        }) as unknown as string,
+        }),
       });
       return;
     }
