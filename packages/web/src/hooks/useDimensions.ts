@@ -6,18 +6,19 @@ type Dimensions = {
 };
 
 export const useDimensions = (targetRef: React.RefObject<HTMLDivElement>) => {
-  const [dimensions, setDimensions] = useState<Dimensions>({
-    width: window.innerWidth,
-    height: window.innerHeight,
-  });
+  const getDimension = useCallback(() => {
+    const dim = targetRef.current?.getBoundingClientRect().toJSON();
+    return {
+      width: dim?.width,
+      height: dim?.height,
+    };
+  }, [targetRef]);
+
+  const [dimensions, setDimensions] = useState<Dimensions>(getDimension);
 
   const handleResize = useCallback(() => {
-    const dim = targetRef.current?.getBoundingClientRect().toJSON();
-    setDimensions({
-      width: dim.width || window.innerWidth,
-      height: dim.height || window.innerHeight,
-    });
-  }, [targetRef]);
+    setDimensions(getDimension());
+  }, [getDimension]);
 
   useEffect(() => {
     handleResize();
