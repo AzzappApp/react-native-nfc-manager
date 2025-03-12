@@ -1,3 +1,10 @@
+## 1.9.0-canary.17
+
+* **fix:**  - ensure follower and following screen move when keyboard is open ([#7871](https://github.com/AzzappApp/azzapp/pull/7871))
+* **fix:**  - ensure we don't display the module preview under the modification panel ([#7870](https://github.com/AzzappApp/azzapp/pull/7870))
+* **fix:**  - do not force titles to fontWeight: 700 ([#7852](https://github.com/AzzappApp/azzapp/pull/7852))
+* **fix:**  - restore ios shadows on links for android ([#7863](https://github.com/AzzappApp/azzapp/pull/7863))
+
 ## 1.9.0-canary.16
 
 
