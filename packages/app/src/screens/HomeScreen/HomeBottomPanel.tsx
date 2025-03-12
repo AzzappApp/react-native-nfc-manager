@@ -9,15 +9,12 @@ import {
 } from 'react';
 import { Platform, StyleSheet, useWindowDimensions, View } from 'react-native';
 import Animated, {
-  interpolateColor,
   runOnJS,
   useAnimatedReaction,
   useAnimatedStyle,
   useDerivedValue,
 } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
-import { getTextColorPrimaryForBackground } from '@azzapp/shared/colorsHelpers';
-import { colors } from '#theme';
 import { CONTACT_CARD_RATIO } from '#components/ContactCard/ContactCard';
 import { setMainTabBarOpacity } from '#components/MainTabBar';
 import { useScreenHasFocus } from '#components/NativeRouter';
@@ -178,34 +175,6 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
 
   //#endregion
 
-  // # region NewContacts notification
-  const nbNewContactsDerivedValue = useIndexInterpolation(
-    currentIndexSharedValue,
-    concat(0, profiles?.map(profile => profile.nbNewContacts) ?? []),
-    0,
-  );
-
-  const notificationColor = useIndexInterpolation<string>(
-    currentIndexSharedValue,
-    concat(
-      colors.red400,
-      profiles?.map(({ webCard }) =>
-        getTextColorPrimaryForBackground(
-          webCard?.cardColors?.primary ?? colors.red400,
-          webCard?.cardColors?.dark ?? '#000000',
-        ),
-      ) ?? [],
-    ),
-    colors.red400,
-    interpolateColor,
-  );
-
-  const newContactsOpacity = useDerivedValue(
-    () => Math.min(nbNewContactsDerivedValue.value, 1),
-    [nbNewContactsDerivedValue],
-  );
-  // #endregion
-
   return (
     <View style={containerHeight}>
       <View style={styles.informationPanel}>
@@ -222,8 +191,6 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
           user={user}
           selected={selectedPanel}
           setSelected={onSelectedPanelChange}
-          newContactsOpacity={newContactsOpacity}
-          notificationColor={notificationColor}
           minWidth={panelWidth}
         />
         <TabView
