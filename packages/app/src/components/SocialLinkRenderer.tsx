@@ -78,7 +78,9 @@ export const SocialLinkRenderer = ({
             alignItems: 'center',
             justifyContent: 'center',
           },
-          hasShadow ? shadow({ appearance: 'dark' }) : undefined,
+          hasShadow
+            ? shadow({ appearance: 'dark', forceOldShadow: true })
+            : undefined,
         ]}
       >
         <SocialIcon
