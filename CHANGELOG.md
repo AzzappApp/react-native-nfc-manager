@@ -1,3 +1,7 @@
+## 1.9.0-canary.14
+
+
+
 ## 1.9.0-canary.13
 
 * **fix:**  - ensure sizes is well managed when we open post panel ([#7829](https://github.com/AzzappApp/azzapp/pull/7829))
