@@ -1,3 +1,7 @@
+## 1.9.0-canary.13
+
+* **fix:**  - ensure sizes is well managed when we open post panel ([#7829](https://github.com/AzzappApp/azzapp/pull/7829))
+
 ## 1.9.0-canary.12
 
 * **fix:**  - **home:** [#7834](https://github.com/AzzappApp/azzapp/pull/7834) remove duplicated tab ([#7839](https://github.com/AzzappApp/azzapp/pull/7839))
