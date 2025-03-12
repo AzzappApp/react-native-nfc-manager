@@ -24,7 +24,6 @@ const media = style({
 
 const itemContainer = style({
   transition: 'transform 0.5s cubic-bezier(0.5, 1, 0.89, 1)',
-  width: 'min(400px, 70vw)',
 });
 
 const styles = {

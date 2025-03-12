@@ -489,7 +489,12 @@ const SimpleCarouselItem = ({
   };
 }) => {
   return (
-    <div className={styles.itemContainer}>
+    <div
+      className={styles.itemContainer}
+      style={{
+        width: media.width,
+      }}
+    >
       <div
         className={styles.imageContainer}
         style={{ borderRadius: cardStyle.borderRadius }}
