@@ -4,11 +4,11 @@ import { StyleSheet, View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { useRouter } from '#components/NativeRouter';
 import relayScreen from '#helpers/relayScreen';
+import useScreenInsets from '#hooks/useScreenInsets';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
 import IconButton from '#ui/IconButton';
 import LoadingView from '#ui/LoadingView';
-import SafeAreaView from '#ui/SafeAreaView';
 import SearchBar from '#ui/SearchBar';
 import FollowingsScreenList from './FollowingsScreenList';
 import type { RelayScreenProps } from '#helpers/relayScreen';
@@ -30,30 +30,29 @@ const FollowingsScreen = ({
   const intl = useIntl();
   const [searchValue, setSearchValue] = useState<string | undefined>('');
   const { webCard } = usePreloadedQuery(followingsScreenQuery, preloadedQuery);
+  const { top } = useScreenInsets();
   return (
-    <Container style={styles.container}>
-      <SafeAreaView style={styles.container}>
-        <Header
-          leftElement={
-            <IconButton
-              icon="arrow_left"
-              iconSize={28}
-              onPress={router.back}
-              variant="icon"
-            />
-          }
-          middleElement={intl.formatMessage({
-            defaultMessage: 'Following',
-            description: 'Title of the screen listing followed profiles',
-          })}
-        />
-        <View style={styles.header}>
-          <SearchBar onChangeText={setSearchValue} value={searchValue} />
-        </View>
-        <Suspense fallback={<LoadingView />}>
-          <FollowingsScreenList webCard={webCard} searchValue={searchValue} />
-        </Suspense>
-      </SafeAreaView>
+    <Container style={[styles.container, { paddingTop: top }]}>
+      <Header
+        leftElement={
+          <IconButton
+            icon="arrow_left"
+            iconSize={28}
+            onPress={router.back}
+            variant="icon"
+          />
+        }
+        middleElement={intl.formatMessage({
+          defaultMessage: 'Following',
+          description: 'Title of the screen listing followed profiles',
+        })}
+      />
+      <View style={styles.header}>
+        <SearchBar onChangeText={setSearchValue} value={searchValue} />
+      </View>
+      <Suspense fallback={<LoadingView />}>
+        <FollowingsScreenList webCard={webCard} searchValue={searchValue} />
+      </Suspense>
     </Container>
   );
 };

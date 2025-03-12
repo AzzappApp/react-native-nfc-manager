@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Toast from 'react-native-toast-message';
 import { graphql, useMutation, usePaginationFragment } from 'react-relay';
 import { useDebounce } from 'use-debounce';
@@ -165,14 +166,16 @@ const FollowersScreenList = ({
   );
 
   return (
-    <WebCardList
-      users={convertToNonNullArray(
-        data?.followers.edges?.map(edge => edge?.node) ?? [],
-      )}
-      onEndReached={onEndReached}
-      onToggleFollow={onToggleFollow}
-      ListEmptyComponent={<FollowersScreenListEmpty />}
-    />
+    <KeyboardAvoidingView behavior="padding" style={styles.flex}>
+      <WebCardList
+        users={convertToNonNullArray(
+          data?.followers.edges?.map(edge => edge?.node) ?? [],
+        )}
+        onEndReached={onEndReached}
+        onToggleFollow={onToggleFollow}
+        ListEmptyComponent={<FollowersScreenListEmpty />}
+      />
+    </KeyboardAvoidingView>
   );
 };
 
@@ -225,5 +228,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  flex: { flex: 1 },
 });
 export default FollowersScreenList;
