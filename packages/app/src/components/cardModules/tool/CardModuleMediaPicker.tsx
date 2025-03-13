@@ -196,7 +196,11 @@ const CardModuleMediaPicker = ({
           if (cardModuleMedia.needDbUpdate === false) {
             value += 1;
             return cardModuleMedia;
-          } else if (cardModuleMedia.media.uri.startsWith('http')) {
+          } else if (
+            cardModuleMedia.media.uri.startsWith('https://videos.pexels.com') ||
+            cardModuleMedia.media.uri.startsWith('https://images.pexels.com') ||
+            cardModuleMedia.media.uri.startsWith('https://cdn.brandfetch.io')
+          ) {
             //only copy local cache for pexel and brandFetch, as we don't edit video from cloudinary
             try {
               const fileName = await copyCoverMediaToCacheDir(
