@@ -1,3 +1,8 @@
+## 1.9.0-canary.18
+
+* **fix:**  - manage bottom padding with listFooter ([#7830](https://github.com/AzzappApp/azzapp/pull/7830))
+* **fix:**  - **modules:** [#7833](https://github.com/AzzappApp/azzapp/pull/7833) use domain list to exclude cloudinary ([#7874](https://github.com/AzzappApp/azzapp/pull/7874))
+
 ## 1.9.0-canary.17
 
 * **fix:**  - ensure follower and following screen move when keyboard is open ([#7871](https://github.com/AzzappApp/azzapp/pull/7871))
