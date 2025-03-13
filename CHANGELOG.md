@@ -1,3 +1,7 @@
+## 1.9.0-canary.19
+
+
+
 ## 1.9.0-canary.18
 
 * **fix:**  - manage bottom padding with listFooter ([#7830](https://github.com/AzzappApp/azzapp/pull/7830))
