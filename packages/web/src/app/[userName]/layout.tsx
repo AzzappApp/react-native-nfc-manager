@@ -44,6 +44,7 @@ const RootLayout = async ({
       lang={currentLocale}
       className={cn(plusJakarta.className, themeClass)}
     >
+      <GoogleTagManager gtmId={`${process.env.NEXT_PUBLIC_GTM_ID}`} />
       <head>
         <meta
           name="viewport"
@@ -83,7 +84,6 @@ const RootLayout = async ({
           name="apple-itunes-app"
           content={`${process.env.NEXT_PUBLIC_APPLE_ITUNES_APP_META}`}
         />
-        <GoogleTagManager gtmId={`${process.env.NEXT_PUBLIC_GTM_ID}`} />
       </head>
       <body>
         <ClientWrapper locale={locale} messages={messages}>
