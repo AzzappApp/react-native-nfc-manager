@@ -13,3 +13,4 @@ export { default as SoundOnIcon } from './sound_on.svg';
 export { default as PlayIcon } from './play.svg';
 export { default as SuccessIcon } from './success.svg';
 export { default as InviteIcon } from './invite.svg';
+export { default as CheckRoundIcon } from './check_round.svg';

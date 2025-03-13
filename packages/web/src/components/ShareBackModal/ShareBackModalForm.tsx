@@ -5,7 +5,7 @@ import cx from 'classnames';
 import { useEffect, useRef } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { SuccessIcon } from '#assets';
+import { CheckRoundIcon } from '#assets';
 import { processShareBackSubmission } from '#app/actions/shareBackAction';
 import Loader from '#components/Loader';
 import Button from '#ui/Button';
@@ -298,7 +298,7 @@ const ShareBackFormSubmitButton = ({
                 isSuccess ? styles.formButtonSuccess : '',
               )}
             >
-              <SuccessIcon
+              <CheckRoundIcon
                 className={cx(
                   styles.formButtonSuccessSvg,
                   isSuccess ? styles.formButtonSuccess : '',

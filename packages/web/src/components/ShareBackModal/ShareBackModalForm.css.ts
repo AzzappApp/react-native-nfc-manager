@@ -115,6 +115,7 @@ const formButton = style({
   maxWidth: '325px',
   width: '80%',
   height: '47px',
+  padding: 0,
 
   selectors: {
     [`&:not(${formButtonSuccess})`]: {
