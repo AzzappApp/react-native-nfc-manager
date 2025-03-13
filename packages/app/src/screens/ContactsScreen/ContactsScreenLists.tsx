@@ -4,6 +4,7 @@ import {
 } from 'expo-contacts';
 import { useMemo, useCallback, useEffect, useState, useRef } from 'react';
 import { AppState, View, StyleSheet } from 'react-native';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { usePaginationFragment, graphql, useMutation } from 'react-relay';
 import { useOnFocus } from '#components/NativeRouter';
 import { useOnContactAdded } from '#helpers/addContactHelper';
@@ -11,8 +12,11 @@ import { findLocalContact } from '#helpers/contactHelpers';
 import { buildLocalContact } from '#helpers/contactListHelpers';
 import { getLocalContactsMap } from '#helpers/getLocalContactsMap';
 import { useProfileInfos } from '#hooks/authStateHooks';
+import useKeyboardHeight from '#hooks/useKeyboardHeight';
 import useOnInviteContact from '#hooks/useOnInviteContact';
 import { usePhonebookPermission } from '#hooks/usePhonebookPermission';
+import useScreenInsets from '#hooks/useScreenInsets';
+import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import ContactActionModal from './ContactActionModal';
 import ContactDetailsModal from './ContactDetailsModal';
 import ContactsScreenSearchByDate from './ContactsScreenSearchByDate';
@@ -398,6 +402,16 @@ const ContactsScreenLists = ({
     [contactsPermissionStatus, localContacts],
   );
 
+  // manage keyboard height
+  const { bottom } = useScreenInsets();
+  const keyboardHeight = useKeyboardHeight();
+  const footerStyle = useAnimatedStyle(() => {
+    const normalizedHeight = bottom + BOTTOM_MENU_HEIGHT - keyboardHeight.value;
+    return {
+      height: Math.max(normalizedHeight, keyboardHeight.value),
+    };
+  });
+
   if (
     localContacts === undefined ||
     contactsPermissionStatus === ContactPermissionStatus.UNDETERMINED
@@ -419,6 +433,7 @@ const ContactsScreenLists = ({
           localContacts={localContacts}
           contactsPermissionStatus={contactsPermissionStatus}
           showContactAction={setContactActionData}
+          listFooterComponent={<Animated.View style={footerStyle} />}
         />
       )}
       {profile && searchBy === 'date' && (
@@ -432,6 +447,7 @@ const ContactsScreenLists = ({
           localContacts={localContacts}
           contactsPermissionStatus={contactsPermissionStatus}
           showContactAction={setContactActionData}
+          listFooterComponent={<Animated.View style={footerStyle} />}
         />
       )}
       <ContactDetailsModal

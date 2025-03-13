@@ -3,8 +3,6 @@ import { useIntl } from 'react-intl';
 import { FlatList, View } from 'react-native';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import useScreenInsets from '#hooks/useScreenInsets';
-import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import ContactSearchByDateSection from './ContactSearchByDateSection';
 import type { ContactType } from '#helpers/contactListHelpers';
 import type { ContactActionProps } from './ContactsScreenLists';
@@ -24,6 +22,7 @@ type Props = {
   localContacts: Contact[];
   contactsPermissionStatus: ContactPermissionStatus;
   showContactAction: (arg: ContactActionProps | undefined) => void;
+  listFooterComponent: JSX.Element;
 };
 
 const ContactsScreenSearchByDate = ({
@@ -36,8 +35,8 @@ const ContactsScreenSearchByDate = ({
   localContacts,
   contactsPermissionStatus,
   showContactAction,
+  listFooterComponent,
 }: Props) => {
-  const { bottom } = useScreenInsets();
   const styles = useStyleSheet(stylesheet);
 
   const intl = useIntl();
@@ -106,16 +105,14 @@ const ContactsScreenSearchByDate = ({
       onEndReached={onEndReached}
       refreshing={refreshing}
       onRefresh={onRefresh}
-      contentContainerStyle={[
-        { paddingBottom: bottom + BOTTOM_MENU_HEIGHT },
-        styles.content,
-      ]}
+      contentContainerStyle={styles.content}
       showsVerticalScrollIndicator={false}
       snapToAlignment="start"
       decelerationRate="fast"
       scrollEventThrottle={16}
       nestedScrollEnabled
       ItemSeparatorComponent={RenderSectionSeparator}
+      ListFooterComponent={listFooterComponent}
     />
   );
 };
@@ -130,6 +127,7 @@ const RenderSectionSeparator = () => {
 };
 
 const stylesheet = createStyleSheet(appearance => ({
+  flex: { flex: 1 },
   content: {
     marginHorizontal: 10,
   },

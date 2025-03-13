@@ -3,8 +3,6 @@ import { SectionList, View } from 'react-native';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import useScreenInsets from '#hooks/useScreenInsets';
-import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import Text from '#ui/Text';
 import ContactSearchByNameItem from './ContactSearchByNameItem';
 import type { ContactType } from '#helpers/contactListHelpers';
@@ -25,6 +23,7 @@ type Props = {
   localContacts: Contact[];
   contactsPermissionStatus: ContactPermissionStatus;
   showContactAction: (arg: ContactActionProps | undefined) => void;
+  listFooterComponent: JSX.Element;
 };
 
 const ContactsScreenSearchByName = ({
@@ -37,8 +36,8 @@ const ContactsScreenSearchByName = ({
   localContacts,
   contactsPermissionStatus,
   showContactAction,
+  listFooterComponent,
 }: Props) => {
-  const { bottom } = useScreenInsets();
   const styles = useStyleSheet(stylesheet);
 
   const sections = useMemo(() => {
@@ -123,11 +122,9 @@ const ContactsScreenSearchByName = ({
       onEndReached={onEndReached}
       refreshing={refreshing}
       onRefresh={onRefresh}
-      contentContainerStyle={[
-        { paddingBottom: bottom + BOTTOM_MENU_HEIGHT },
-        styles.content,
-      ]}
+      contentContainerStyle={styles.content}
       ItemSeparatorComponent={ItemSeparator}
+      ListFooterComponent={listFooterComponent}
       onEndReachedThreshold={0.5}
       keyboardShouldPersistTaps="always"
     />
@@ -146,6 +143,7 @@ const stylesheet = createStyleSheet(appearance => ({
   content: {
     paddingHorizontal: 10,
   },
+  flex: { flex: 1 },
   title: {
     marginVertical: 20,
     textTransform: 'uppercase',
