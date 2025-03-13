@@ -298,6 +298,7 @@ const WebCardParametersScreen = ({
     } else {
       Toast.show({
         type: 'error',
+        text2Style: styles.toast,
         text1: intl.formatMessage(
           {
             defaultMessage:
@@ -306,7 +307,11 @@ const WebCardParametersScreen = ({
               'WebCardParameters Screen : Toast Error message when not authorize to change the WebCard name',
           },
           {
-            azzappA: <Text variant="azzapp">a</Text>,
+            azzappA: (
+              <Text variant="azzapp" style={styles.toast}>
+                a
+              </Text>
+            ),
           },
         ) as unknown as string,
         text2: intl.formatMessage(
@@ -330,6 +335,7 @@ const WebCardParametersScreen = ({
   }, [
     canChangeUserName,
     intl,
+    styles.toast,
     toggleUserNameFormVisible,
     webCard?.nextChangeUsernameAllowedAt,
   ]);
@@ -716,6 +722,9 @@ const styleSheet = createStyleSheet(appearance => ({
     backgroundColor: 'transparent',
     borderWidth: 0,
     paddingRight: 0,
+  },
+  toast: {
+    color: colors.black,
   },
 }));
 
