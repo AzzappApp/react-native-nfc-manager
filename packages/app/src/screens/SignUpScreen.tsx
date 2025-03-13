@@ -461,7 +461,7 @@ const styleSheet = createStyleSheet(appearance => ({
     marginBottom: 5,
   },
   checkLabel: {
-    paddingLeft: 11,
+    paddingHorizontal: 11,
   },
   checkboxesContainer: {
     gap: 20,
