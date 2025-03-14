@@ -1,3 +1,9 @@
+## 1.9.0-canary.25
+
+* **fix:**  - fix fallback stylings in MediaScreen ([#7894](https://github.com/AzzappApp/azzapp/pull/7894))
+* **fix:**  - do not set state if not needed ([#7895](https://github.com/AzzappApp/azzapp/pull/7895))
+* **feat:**  - **payment:** [#7872](https://github.com/AzzappApp/azzapp/pull/7872) remove azzapp + ([#7873](https://github.com/AzzappApp/azzapp/pull/7873))
+
 ## 1.9.0-canary.24
 
 * **fix:**  - review sortableScrollList implementation, use react-native-sortables instead ([#7846](https://github.com/AzzappApp/azzapp/pull/7846))
