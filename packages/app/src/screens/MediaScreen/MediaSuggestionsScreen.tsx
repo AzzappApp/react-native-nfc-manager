@@ -195,7 +195,7 @@ const PostSuggestionTitle = () => (
 export default MediaSuggestionsScreen;
 
 export const MediaSuggestionsScreenFallback = () => (
-  <View style={{ flex: 1 }}>
+  <View style={styles.suggestionFallback}>
     <CoverSuggestionTitle />
     <MediaSuggestionWebCardFallback />
     <PostSuggestionTitle />
@@ -204,6 +204,7 @@ export const MediaSuggestionsScreenFallback = () => (
 );
 
 const styles = StyleSheet.create({
+  suggestionFallback: { flex: 1 },
   coversTitleStyle: {
     marginHorizontal: 10,
     marginTop: 6.5,

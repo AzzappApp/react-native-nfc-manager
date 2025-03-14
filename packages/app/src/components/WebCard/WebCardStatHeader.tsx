@@ -197,10 +197,10 @@ export const WebCardStatHeaderFallback = () => {
         />
       </View>
       <View style={styles.countersContainer}>
-        <Skeleton style={styles.counterContainer} />
-        <Skeleton style={styles.counterContainer} />
-        <Skeleton style={styles.counterContainer} />
-        <Skeleton style={styles.counterContainer} />
+        <Skeleton style={styles.counterContainerFallback} />
+        <Skeleton style={styles.counterContainerFallback} />
+        <Skeleton style={styles.counterContainerFallback} />
+        <Skeleton style={styles.counterContainerFallback} />
       </View>
     </>
   );
@@ -224,6 +224,15 @@ const stylesheet = createStyleSheet(appearance => ({
     alignItems: 'center',
     flex: 1,
     backgroundColor: appearance === 'dark' ? colors.grey1000 : colors.grey50,
+    paddingVertical: 10,
+    paddingHorizontal: 6,
+    borderRadius: 10,
+  },
+  counterContainerFallback: {
+    width: 85,
+    height: 60,
+    alignItems: 'center',
+    flex: 1,
     paddingVertical: 10,
     paddingHorizontal: 6,
     borderRadius: 10,

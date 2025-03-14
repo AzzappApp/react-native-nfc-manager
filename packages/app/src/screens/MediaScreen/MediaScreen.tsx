@@ -400,6 +400,7 @@ const MediaScreenFallback = () => {
   return (
     <Container style={[styles.flex, { paddingTop: top }]}>
       <WebCardStatHeaderFallback />
+      <View style={styles.tabBarContainerWithPadding} />
       <MediaScreenTabBar disabled />
       <MediaSuggestionsScreenFallback />
     </Container>
