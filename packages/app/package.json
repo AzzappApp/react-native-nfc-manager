@@ -35,9 +35,6 @@
     "@lottiefiles/lottie-js": "0.4.2",
     "@miblanchard/react-native-slider": "2.6.0",
     "@react-native-camera-roll/camera-roll": "patch:@react-native-camera-roll/camera-roll@npm%3A7.9.0#~/.yarn/patches/@react-native-camera-roll-camera-roll-npm-7.9.0-285cb35c57.patch",
-    "@react-native-community/cli": "^15.0.0",
-    "@react-native-community/cli-platform-android": "^15.0.0",
-    "@react-native-community/cli-platform-ios": "^15.0.0",
     "@react-native-community/datetimepicker": "^8.3.0",
     "@react-native-community/netinfo": "^11.4.1",
     "@react-native-firebase/analytics": "^21.12.0",
@@ -164,6 +161,9 @@
     "zod": "3.24.1"
   },
   "devDependencies": {
+    "@react-native-community/cli": "^15.0.0",
+    "@react-native-community/cli-platform-android": "^15.0.0",
+    "@react-native-community/cli-platform-ios": "^15.0.0",
     "@react-native/babel-preset": "^0.77.1",
     "@testing-library/react-native": "^13.2.0",
     "@types/chroma-js": "^3.1.1",
