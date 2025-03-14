@@ -1,3 +1,9 @@
+## 1.9.0-canary.28
+
+* **feat:**  - handle logo from commonformation ([#7862](https://github.com/AzzappApp/azzapp/pull/7862))
+* **fix:**  - correct post I like counter field ([#7911](https://github.com/AzzappApp/azzapp/pull/7911))
+* **fix:**  - restore correct shadow on transparent logo ([#7910](https://github.com/AzzappApp/azzapp/pull/7910))
+
 ## 1.9.0-canary.27
 
 * **fix:**  - update button color in dark mode ([#7831](https://github.com/AzzappApp/azzapp/pull/7831))
