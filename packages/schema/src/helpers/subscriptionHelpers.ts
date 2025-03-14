@@ -116,6 +116,10 @@ type FeatureParams =
       contactCardHasUrl: boolean;
     }
   | {
+      action: 'GENERATE_EMAIL_SIGNATURE';
+      webCardIsMultiUser: boolean;
+    }
+  | {
       action: 'UPDATE_CONTACT_CARD';
       webCardIsPublished: boolean;
       contactCardHasCompanyName: boolean;
@@ -171,6 +175,18 @@ export const validateCurrentSubscription = async (
       if (!hasActiveSubscription) {
         const user = await getUserById(userId);
         if (user && user.nbFreeScans >= MAX_FREE_SCANS) {
+          throw new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED);
+        }
+      }
+      break;
+    }
+    case 'GENERATE_EMAIL_SIGNATURE': {
+      if (!params.webCardIsMultiUser) {
+        const { hasActiveSubscription } = await checkSubscription(
+          userId,
+          params,
+        );
+        if (!hasActiveSubscription) {
           throw new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED);
         }
       }

@@ -12,13 +12,13 @@ import {
   saveShareBack,
 } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
+import { sendEmail } from '@azzapp/shared/emailHelpers';
 import { buildVCardFromShareBackContact } from '@azzapp/shared/vCardHelpers';
 import { ShareBackFormSchema } from '#components/ShareBackModal/shareBackFormSchema';
 import {
   CONTACT_METHODS,
   getPreferredContactMethod,
 } from '#helpers/contactMethodsHelpers';
-import { sendEmail } from '#helpers/emailHelpers';
 import { getServerIntl } from '#helpers/i18nHelpers';
 import { sendPushNotification } from '#helpers/notificationsHelpers';
 import {
@@ -27,8 +27,8 @@ import {
   shareBackVCardFilename,
 } from '#helpers/shareBackHelper';
 import { sendTwilioSMS } from '#helpers/twilioHelpers';
-import type { EmailAttachment } from '#helpers/emailHelpers';
 import type { NewSharedContact } from '@azzapp/data';
+import type { EmailAttachment } from '@azzapp/shared/emailHelpers';
 import type { SubmissionResult } from '@conform-to/react';
 import type { JwtPayload } from 'jwt-decode';
 import type { CountryCode } from 'libphonenumber-js';

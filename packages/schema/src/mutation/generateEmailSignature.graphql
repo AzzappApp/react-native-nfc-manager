@@ -1,0 +1,11 @@
+extend type Mutation {
+  generateEmailSignature(profileId: ID!, config: GenerateEmailSignatureInput!): GenerateEmailSignaturePayload
+}
+
+input GenerateEmailSignatureInput {
+  preview: String!
+}
+
+type GenerateEmailSignaturePayload {
+  url: String
+}

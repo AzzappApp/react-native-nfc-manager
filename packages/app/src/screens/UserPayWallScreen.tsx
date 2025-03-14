@@ -400,7 +400,7 @@ const UserPayWallScreen = ({
                   defaultMessage="Email signature"
                   description="UserPaywall Screen - Email signature"
                 />
-              </Text>{' '}
+              </Text>
             </View>
           </View>
         </View>

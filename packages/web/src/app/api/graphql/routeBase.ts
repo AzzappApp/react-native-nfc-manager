@@ -27,7 +27,6 @@ import ERRORS from '@azzapp/shared/errors';
 import { AZZAPP_SERVER_HEADER } from '@azzapp/shared/urlHelpers';
 import queryMap from '#persisted-query-map.json';
 import { revalidateWebcardsAndPosts } from '#helpers/api';
-import { buildCoverAvatarUrl } from '#helpers/avatar';
 import { getServerIntl } from '#helpers/i18nHelpers';
 import { sendPushNotification } from '#helpers/notificationsHelpers';
 import { withPluginsRoute } from '#helpers/queries';
@@ -158,7 +157,6 @@ const { handleRequest } = createYoga({
       locale: locale ?? DEFAULT_LOCALE,
       notifyUsers,
       validateMailOrPhone,
-      buildCoverAvatarUrl,
       sendPushNotification,
       notifyApplePassWallet,
       notifyGooglePassWallet,

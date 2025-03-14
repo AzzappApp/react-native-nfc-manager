@@ -2,10 +2,10 @@ import { SignJWT } from 'jose';
 
 import { NextResponse } from 'next/server';
 import { getProfileById, getWebCardById, createId } from '@azzapp/data';
+import { buildAvatarUrl } from '@azzapp/service/mediaServices';
 import { parseContactCard } from '@azzapp/shared/contactCardHelpers';
 import { verifyHmacWithPassword } from '@azzapp/shared/crypto';
 import ERRORS from '@azzapp/shared/errors';
-import { buildAvatarUrl } from '#helpers/avatar';
 import { displayName } from '#helpers/contactCardHelpers';
 import cors from '#helpers/cors';
 import { withPluginsRoute } from '#helpers/queries';

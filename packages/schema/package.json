@@ -33,6 +33,7 @@
     "@azzapp/data": "workspace:^",
     "@azzapp/i18n": "workspace:^",
     "@azzapp/payment": "workspace:^",
+    "@azzapp/service": "workspace:^",
     "@azzapp/shared": "workspace:^",
     "@formatjs/intl": "^3.1.4",
     "@graphql-tools/schema": "^10.0.18",

@@ -22,6 +22,7 @@
     "@azzapp/payment": "workspace:^",
     "@azzapp/schema": "workspace:^",
     "@azzapp/shared": "workspace:^",
+    "@azzapp/service": "workspace:^",
     "@conform-to/react": "^1.2.2",
     "@conform-to/zod": "^1.2.2",
     "@envelop/dataloader": "^6.0.0",

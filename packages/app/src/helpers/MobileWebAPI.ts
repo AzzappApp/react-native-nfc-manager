@@ -68,10 +68,6 @@ export const getGoogleWalletPass = withFetchFunction(
   WebAPI.getGoogleWalletPass,
   authenticatedFetchJSON,
 );
-export const generateEmailSignature = withFetchFunction(
-  WebAPI.generateEmailSignature,
-  authenticatedFetchJSON,
-);
 
 export const requestUpdateContact = withFetchFunction(
   WebAPI.requestUpdateContact,

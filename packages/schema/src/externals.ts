@@ -28,12 +28,6 @@ export const invalidatePost =
 export const invalidateWebCard =
   externalFunction<(userName: string) => void>('invalidateWebCard');
 
-// TODO the fact that this function is injected in the context is a bit weird
-// I guess it should be moved to @azzapp/shared or something like that
-export const buildCoverAvatarUrl = externalFunction<
-  (webCard: WebCard | null) => Promise<string | null>
->('buildCoverAvatarUrl');
-
 export const validateMailOrPhone = externalFunction<
   (type: 'email' | 'phone', issuer: string, token: string) => Promise<void>
 >('validateMailOrPhone');

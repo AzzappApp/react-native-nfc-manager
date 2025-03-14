@@ -1,0 +1,23 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "emitDeclarationOnly": true,
+    "rootDir": "./src",
+    "baseUrl": "./src",
+    "outDir": "./lib",
+    "paths": {
+      "#*": ["./*"],
+      "@azzapp/shared/*": ["../shared/src/*"]
+    }
+  },
+  "include": ["./src/**/*.ts", "./src/**/*.tsx"],
+  "exclude": [
+    "node_modules",
+    "lib",
+    "scripts",
+    "tsconfig.json",
+    "tsconfig.lib.json",
+    "jest.config.js",
+    "**/*.test.ts"
+  ]
+}

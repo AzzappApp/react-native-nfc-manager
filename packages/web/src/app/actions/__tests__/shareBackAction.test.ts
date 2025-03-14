@@ -2,7 +2,7 @@ import { parseWithZod } from '@conform-to/zod';
 import { jwtDecode } from 'jwt-decode';
 
 import { getProfileByUserAndWebCard, getUserById } from '@azzapp/data';
-import { sendEmail } from '#helpers/emailHelpers';
+import { sendEmail } from '@azzapp/shared/emailHelpers';
 import { sendTwilioSMS } from '#helpers/twilioHelpers';
 import { processShareBackSubmission } from '../shareBackAction';
 import type { ShareBackFormData } from '../shareBackAction';
@@ -12,7 +12,7 @@ jest.mock('@azzapp/data', () => ({
   getUserById: jest.fn(),
 }));
 
-jest.mock('#helpers/emailHelpers', () => ({
+jest.mock('@azzapp/shared/emailHelpers', () => ({
   sendEmail: jest.fn(),
 }));
 

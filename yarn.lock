@@ -679,6 +679,7 @@ __metadata:
     "@azzapp/data": "workspace:^"
     "@azzapp/i18n": "workspace:^"
     "@azzapp/payment": "workspace:^"
+    "@azzapp/service": "workspace:^"
     "@azzapp/shared": "workspace:^"
     "@babel/cli": "npm:^7.26.4"
     "@formatjs/intl": "npm:^3.1.4"
@@ -703,6 +704,18 @@ __metadata:
     pexels: "npm:^1.4.0"
     typescript: "npm:^5.7.2"
     zod: "npm:^3.24.1"
+  languageName: unknown
+  linkType: soft
+
+"@azzapp/service@workspace:^, @azzapp/service@workspace:packages/service":
+  version: 0.0.0-use.local
+  resolution: "@azzapp/service@workspace:packages/service"
+  dependencies:
+    "@azzapp/data": "workspace:^"
+    "@azzapp/shared": "workspace:^"
+    eslint: "npm:^9.17.0"
+    jest: "npm:^29.7.0"
+    typescript: "npm:^5.7.2"
   languageName: unknown
   linkType: soft
 
@@ -735,6 +748,7 @@ __metadata:
     "@azzapp/i18n": "workspace:^"
     "@azzapp/payment": "workspace:^"
     "@azzapp/schema": "workspace:^"
+    "@azzapp/service": "workspace:^"
     "@azzapp/shared": "workspace:^"
     "@conform-to/react": "npm:^1.2.2"
     "@conform-to/zod": "npm:^1.2.2"

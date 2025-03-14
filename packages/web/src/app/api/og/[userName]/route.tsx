@@ -1,8 +1,8 @@
 import { notFound } from 'next/navigation';
 import { ImageResponse } from 'next/og';
 import { getWebCardByUserName } from '@azzapp/data';
+import { buildCoverImageUrl } from '@azzapp/service/mediaServices';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
-import { buildCoverImageUrl } from '#helpers/cover';
 
 const COVER_WIDTH = 180;
 const OG_WIDTH = 720;

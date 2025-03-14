@@ -22,10 +22,10 @@ import {
   getAllOwnerProfilesByWebcardId,
 } from '@azzapp/data';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
+import { buildCoverAvatarUrl } from '@azzapp/service/mediaServices';
 import { getPreviewVideoForModule } from '@azzapp/shared/cloudinaryHelpers';
 import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
 import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
-import { buildCoverAvatarUrl } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
 import {
   activeSubscriptionsForUserLoader,

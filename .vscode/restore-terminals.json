@@ -54,6 +54,10 @@
         {
           "name": "shared",
           "commands": ["cd packages/shared", "yarn dev"]
+        },
+        {
+          "name": "service",
+          "commands": ["cd packages/service", "yarn dev"]
         }
       ]
     },

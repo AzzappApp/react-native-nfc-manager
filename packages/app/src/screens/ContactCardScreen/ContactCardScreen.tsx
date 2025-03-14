@@ -1,5 +1,4 @@
 import { ImageFormat, makeImageFromView } from '@shopify/react-native-skia';
-import { fromGlobalId } from 'graphql-relay';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, useColorScheme, ScrollView } from 'react-native';
@@ -9,7 +8,8 @@ import Animated, {
   useAnimatedStyle,
 } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
-import { graphql, usePreloadedQuery } from 'react-relay';
+import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
+import ERRORS from '@azzapp/shared/errors';
 import { colors, shadow } from '#theme';
 import AccountHeader, {
   HEADER_PADDING_BOTTOM,
@@ -22,7 +22,6 @@ import ContactCardExportVcf from '#components/ContactCardExportVcf';
 import { useRouter } from '#components/NativeRouter';
 import { logEvent } from '#helpers/analytics';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { generateEmailSignature } from '#helpers/MobileWebAPI';
 import relayScreen from '#helpers/relayScreen';
 import useAnimatedState from '#hooks/useAnimatedState';
 import useScreenDimensions from '#hooks/useScreenDimensions';
@@ -151,6 +150,20 @@ export const ContactCardScreen = ({
   }));
 
   const ref = useRef<View>(null);
+
+  const [commit] = useMutation(graphql`
+    mutation ContactCardScreenGenerateEmailSignatureMutation(
+      $profileId: ID!
+      $config: GenerateEmailSignatureInput!
+    ) {
+      generateEmailSignature(config: $config, profileId: $profileId) {
+        url
+      }
+    }
+  `);
+
+  const router = useRouter();
+
   const generateEmail = useCallback(async () => {
     if (!currentUser?.email) {
       Toast.show({
@@ -170,33 +183,49 @@ export const ContactCardScreen = ({
       const image = await makeImageFromView(ref);
       const base64 = image?.encodeToBase64(ImageFormat.JPEG, 100);
 
-      try {
-        logEvent('generate_email_signature');
-        await generateEmailSignature({
-          locale: intl.locale,
-          profileId: fromGlobalId(profile.id).id,
-          preview: base64 ?? '',
-        });
-      } catch (e) {
-        console.log(e);
-      }
-      Toast.show({
-        type: 'success',
-        text1: intl.formatMessage({
-          defaultMessage: 'An email has been sent to you',
-          description:
-            'Toast message while generating email signature for the user',
-        }),
+      logEvent('generate_email_signature');
+      commit({
+        variables: {
+          profileId: profile.id,
+          config: {
+            preview: base64 ?? '',
+          },
+        },
+        onCompleted: () => {
+          setIsGeneratingEmail(false);
+          Toast.show({
+            type: 'success',
+            text1: intl.formatMessage({
+              defaultMessage: 'An email has been sent to you',
+              description:
+                'Toast message while generating email signature for the user',
+            }),
+          });
+        },
+        onError: e => {
+          setIsGeneratingEmail(false);
+          if (e.message === ERRORS.SUBSCRIPTION_REQUIRED) {
+            router.push({
+              route: 'USER_PAY_WALL',
+            });
+            return;
+          }
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage: 'Unknown error - Please retry',
+              description:
+                'ContactCardScreen - Error Unknown error - Please retry',
+            }),
+          });
+        },
       });
-      setIsGeneratingEmail(false);
     }
-  }, [currentUser?.email, intl, profile?.id, webCard?.id]);
+  }, [commit, currentUser?.email, intl, profile?.id, router, webCard?.id]);
 
   const styles = useStyleSheet(styleSheet);
 
   const colorScheme = useColorScheme();
-
-  const router = useRouter();
 
   useEffect(() => {
     if (profile?.invited || !profile?.webCard?.cardIsPublished) {

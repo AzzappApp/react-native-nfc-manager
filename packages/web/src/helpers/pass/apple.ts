@@ -4,6 +4,7 @@ import {
   buildDefaultContactCard,
   getProfileWithWebCardById,
 } from '@azzapp/data';
+import { buildCoverImageUrl } from '@azzapp/service/mediaServices';
 import { convertHexToRGBA, getTextColor } from '@azzapp/shared/colorsHelpers';
 import { seal, unseal } from '@azzapp/shared/crypto';
 import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
@@ -12,7 +13,6 @@ import icon from '@azzapp/web/public/pass/ICON_PADDING_15.png';
 import icon2x from '@azzapp/web/public/pass/ICON_PADDING_15@2x.png';
 import logo from '@azzapp/web/public/pass/LOGO_PADDING_0-40.png';
 import logo2x from '@azzapp/web/public/pass/LOGO_PADDING_0-40@2x.png';
-import { buildCoverImageUrl } from '#helpers/cover';
 import type { WebCard } from '@azzapp/data';
 
 const getCoverUrl = (webCard: WebCard, size: number) =>

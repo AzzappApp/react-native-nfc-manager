@@ -16,6 +16,7 @@ import deleteUser from './deleteUser';
 import duplicateModule from './duplicateModule';
 import { extractCompanyLogo } from './extractCompanyLogo';
 import { extractVisitCardData } from './extractVisitCardData';
+import generateEmailSignature from './generateEmailSignature';
 import inviteUser from './inviteUser';
 import inviteUsersList from './inviteUsersList';
 import loadCardTemplate from './loadCardTemplate';
@@ -127,6 +128,7 @@ export const Mutation: MutationResolvers = {
   extractVisitCardData,
   acceptTermsOfUse,
   extractCompanyLogo,
+  generateEmailSignature,
   ...payment,
 };
 
