@@ -15,6 +15,7 @@ import * as mime from 'react-native-mime-types'; // FIXME import is verry big
 import Toast from 'react-native-toast-message';
 import { useMutation } from 'react-relay';
 import { graphql, Observable } from 'relay-runtime';
+import ERRORS from '@azzapp/shared/errors';
 import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
 import { mainRoutes } from '#mobileRoutes';
 import { colors } from '#theme';
@@ -415,6 +416,12 @@ const ContactCardCreateScreen = () => {
         },
         onError: e => {
           console.error(e);
+
+          if (e.message === ERRORS.SUBSCRIPTION_REQUIRED) {
+            router.push({ route: 'USER_PAY_WALL' });
+            return;
+          }
+
           Toast.show({
             type: 'error',
             text1: intl.formatMessage(

@@ -11,7 +11,6 @@ import {
   BLOCK_TEXT_STYLE_VALUES,
   getBlockTextDefaultColors,
 } from '@azzapp/shared/cardModuleHelpers';
-import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import AnimatedDataOverride from '#components/AnimatedDataOverride';
 import { useRouter } from '#components/NativeRouter';
 import useEditorLayout from '#hooks/useEditorLayout';
@@ -104,9 +103,7 @@ const BlockTextEditionScreen = ({
         }
         webCard {
           id
-          cardIsPublished
           coverBackgroundColor
-          isPremium
           cardColors {
             primary
             light
@@ -123,9 +120,6 @@ const BlockTextEditionScreen = ({
             gap
             titleFontFamily
             titleFontSize
-          }
-          cardModules {
-            id
           }
           ...BlockTextSettingsEditionPanel_webCard
           ...ModuleEditionScreenTitle_webCard
@@ -230,9 +224,6 @@ const BlockTextEditionScreen = ({
 
   const intl = useIntl();
 
-  const cardModulesCount =
-    (profile.webCard?.cardModules.length ?? 0) + (blockText ? 0 : 1);
-
   const onCancel = useCallback(() => {
     router.back();
   }, [router]);
@@ -300,20 +291,6 @@ const BlockTextEditionScreen = ({
       return;
     }
 
-    const requireSubscription = changeModuleRequireSubscription(
-      'blockText',
-      cardModulesCount,
-    );
-
-    if (
-      profile.webCard?.cardIsPublished &&
-      requireSubscription &&
-      !profile.webCard?.isPremium
-    ) {
-      router.push({ route: 'USER_PAY_WALL' });
-      return;
-    }
-
     const input: SaveBlockTextModuleInput = {
       ...value,
       moduleId: blockText?.id,
@@ -346,9 +323,6 @@ const BlockTextEditionScreen = ({
   }, [
     canSave,
     profile.webCard?.id,
-    profile.webCard?.cardIsPublished,
-    profile.webCard?.isPremium,
-    cardModulesCount,
     value,
     blockText?.id,
     textMarginHorizontal,
@@ -410,7 +384,6 @@ const BlockTextEditionScreen = ({
               description: 'BlockText text screen title',
             })}
             kind="blockText"
-            moduleCount={cardModulesCount}
             webCardKey={profile.webCard}
           />
         }

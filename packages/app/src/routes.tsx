@@ -288,7 +288,6 @@ export type ModulePreviewRoute = {
   route: 'MODULE_PREVIEW';
   params: {
     variant: ModuleKindWithVariant;
-    requireSubscription: boolean;
   };
 };
 

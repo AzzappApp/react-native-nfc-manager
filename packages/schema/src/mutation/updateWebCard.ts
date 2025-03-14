@@ -14,10 +14,11 @@ import {
   profileByWebCardIdAndUserIdLoader,
   webCardCategoryLoader,
   webCardLoader,
+  webCardOwnerLoader,
 } from '#loaders';
 import { checkWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
-import { checkWebCardHasSubscription } from '#helpers/subscriptionHelpers';
+import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import { isUserNameAvailable } from '#helpers/webCardHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 import type { WebCard } from '@azzapp/data';
@@ -120,16 +121,18 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
     partialWebCard.companyActivityId = null;
   }
 
-  await checkWebCardHasSubscription({
-    webCard: {
-      ...webCard,
-      ...Object.fromEntries(
-        Object.entries(partialWebCard).filter(
-          ([_entry, value]) => value !== undefined,
-        ),
-      ),
-    },
-  });
+  if (profileUpdates.webCardKind) {
+    const owner = await webCardOwnerLoader.load(webCardId);
+
+    if (!owner) {
+      throw new GraphQLError(ERRORS.INVALID_REQUEST);
+    }
+    await validateCurrentSubscription(owner.id, {
+      webCardIsPublished: webCard.cardIsPublished,
+      action: 'UPDATE_WEBCARD_KIND',
+      webCardKind: profileUpdates.webCardKind,
+    });
+  }
 
   if (webCard.companyActivityId !== partialWebCard.companyActivityId) {
     const profile =

@@ -44,14 +44,18 @@ const sendInvitations: MutationResolvers['sendInvitations'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  if (countDeletedProfiles > 0) {
-    await validateCurrentSubscription(owner.id, countDeletedProfiles);
-  }
-
   const webCard = await webCardLoader.load(webCardId);
 
   if (!webCard) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
+
+  if (countDeletedProfiles > 0) {
+    await validateCurrentSubscription(owner.id, {
+      webCardIsPublished: webCard.cardIsPublished,
+      action: 'UPDATE_MULTI_USER',
+      addedSeats: countDeletedProfiles,
+    });
   }
 
   const { userId } = getSessionInfos();

@@ -218,9 +218,8 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
     if (!(await hasWebCardProfileRight(webCard.id))) {
       return false;
     }
-    const modules = await cardModuleByWebCardLoader.load(webCard.id);
 
-    return webCardRequiresSubscription(modules, {
+    return webCardRequiresSubscription({
       webCardKind: newWebCardKind ?? webCard.webCardKind,
       isMultiUser: webCard.isMultiUser,
     });

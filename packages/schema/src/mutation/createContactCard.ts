@@ -4,6 +4,7 @@ import {
   createProfile,
   createWebCard,
   getWebCardByUserNameWithRedirection,
+  getPublishedWebCardCount,
   pickRandomPredefinedCover,
   referencesMedias,
   transaction,
@@ -13,6 +14,7 @@ import { isDefined } from '@azzapp/shared/isDefined';
 import { isValidUserName } from '@azzapp/shared/stringHelpers';
 import { getSessionInfos } from '#GraphQLContext';
 import { profileLoader, userLoader } from '#loaders';
+import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 import type { WebCardTable } from '@azzapp/data/src/schema';
 import type { WebCardKind } from '@azzapp/shared/webCardKind';
@@ -47,6 +49,14 @@ const createContactCard: MutationResolvers['createContactCard'] = async (
       throw new GraphQLError(ERRORS.USERNAME_ALREADY_EXISTS);
     }
   }
+
+  await validateCurrentSubscription(userId, {
+    webCardKind,
+    action: 'UPDATE_WEBCARD_PUBLICATION',
+    alreadyPublished: await getPublishedWebCardCount(userId),
+    webCardIsMultiUser: false,
+    webCardIsPublished: true,
+  });
 
   const inputWebCard: InferInsertModel<typeof WebCardTable> = {
     firstName: contactCard.firstName,

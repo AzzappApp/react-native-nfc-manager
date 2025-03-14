@@ -1,6 +1,6 @@
 import { FormattedMessage } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
-import { graphql, usePreloadedQuery } from 'react-relay';
+import { graphql } from 'react-relay';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import relayScreen from '#helpers/relayScreen';
@@ -11,26 +11,18 @@ import PressableNative from '#ui/PressableNative';
 import SafeAreaView from '#ui/SafeAreaView';
 import Text from '#ui/Text';
 import CardModuleSectionList from './CardModuleSectionList';
-import type { RelayScreenProps } from '#helpers/relayScreen';
-import type { AddModuleSectionScreenQuery } from '#relayArtifacts/AddModuleSectionScreenQuery.graphql';
-import type { AddModuleSectionRoute } from '#routes';
 
 const addModuleSectionScreenQuery = graphql`
   query AddModuleSectionScreenQuery($webCardId: ID!) {
     node(id: $webCardId) {
       ... on WebCard @alias(as: "webCard") {
-        ...CardModuleSectionList_webCard
         ...CardTemplatesList_webCard
       }
     }
   }
 `;
 
-const AddModuleSectionScreen = ({
-  preloadedQuery,
-}: RelayScreenProps<AddModuleSectionRoute, AddModuleSectionScreenQuery>) => {
-  const node = usePreloadedQuery(addModuleSectionScreenQuery, preloadedQuery);
-  const webCard = node.node?.webCard;
+const AddModuleSectionScreen = () => {
   const router = useRouter();
 
   // const [currentTab, setCurrentTab] = useState<string>('sections');
@@ -81,7 +73,7 @@ const AddModuleSectionScreen = ({
             </PressableNative>
           }
         />
-        <CardModuleSectionList webCardKey={webCard!} />
+        <CardModuleSectionList />
 
         {/* STAGING: temporary disable templates webcard
            <TabsBar

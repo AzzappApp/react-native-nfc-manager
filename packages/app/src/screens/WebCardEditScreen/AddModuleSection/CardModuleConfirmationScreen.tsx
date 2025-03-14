@@ -54,7 +54,7 @@ const cardModuleConfirmationScreenQuery = graphql`
 
 const CardModuleConfirmationScreen = ({
   route: {
-    params: { variant, requireSubscription },
+    params: { variant },
   },
   preloadedQuery,
 }: RelayScreenProps<ModulePreviewRoute, CardModuleConfirmationScreenQuery>) => {
@@ -73,14 +73,9 @@ const CardModuleConfirmationScreen = ({
     router.back();
   };
   const onConfirm = () => {
-    if (requireSubscription) {
-      router.push({ route: 'USER_PAY_WALL' });
-      return;
-    } else {
-      const route = getRouteForCardModule({ ...variant, isNew: true });
-      if (route) {
-        router.replace(route);
-      }
+    const route = getRouteForCardModule({ ...variant, isNew: true });
+    if (route) {
+      router.replace(route);
     }
   };
 

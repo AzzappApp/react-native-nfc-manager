@@ -3,14 +3,9 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment } from 'react-relay';
-import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { colors } from '#theme';
 import CardTemplateList from '#components/CardTemplateList';
-import {
-  useRouter,
-  ScreenModal,
-  preventModalDismiss,
-} from '#components/NativeRouter';
+import { ScreenModal, preventModalDismiss } from '#components/NativeRouter';
 import WebCardBuilderSubtitle from '#components/WebCardBuilderSubtitle';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import useLoadCardTemplateMutation from '#hooks/useLoadCardTemplateMutation';
@@ -101,22 +96,11 @@ const LoadCardTemplateModal = ({
     [commit, intl, onClose, webCard.id],
   );
 
-  const router = useRouter();
-
   const cardTemplateHandle = useRef<CardTemplateListHandle>(null);
   const onSubmit = useCallback(() => {
     if (!cardTemplate) return;
-    const requireSubscription = webCardRequiresSubscription(
-      cardTemplate.modules,
-      webCard,
-    );
-
-    if (webCard.cardIsPublished && requireSubscription && !webCard.isPremium) {
-      router.push({ route: 'USER_PAY_WALL' });
-      return;
-    }
     commitCardTemplate(cardTemplate.id);
-  }, [cardTemplate, commitCardTemplate, router, webCard]);
+  }, [cardTemplate, commitCardTemplate]);
 
   const showWarning = Boolean(webCard.cardModules?.length);
 
@@ -124,24 +108,10 @@ const LoadCardTemplateModal = ({
     (template: CardTemplateItem) => {
       setCardTemplate(template);
       if (!showWarning) {
-        const requireSubscription = webCardRequiresSubscription(
-          template.modules,
-          webCard,
-        );
-
-        if (
-          webCard.cardIsPublished &&
-          requireSubscription &&
-          !webCard.isPremium
-        ) {
-          router.push({ route: 'USER_PAY_WALL' });
-          return;
-        }
-
         commitCardTemplate(template.id);
       }
     },
-    [commitCardTemplate, router, showWarning, webCard],
+    [commitCardTemplate, showWarning],
   );
 
   const onRequestDismiss = useCallback(
@@ -191,10 +161,7 @@ const LoadCardTemplateModal = ({
                   />
                 </Text>
                 {selectedTemplate && !webCard.isPremium && (
-                  <WebCardBuilderSubtitle
-                    modules={selectedTemplate.modules}
-                    webCard={webCard}
-                  />
+                  <WebCardBuilderSubtitle webCard={webCard} />
                 )}
               </View>
             }

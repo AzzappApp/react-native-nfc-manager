@@ -1,7 +1,6 @@
 import { revalidatePath } from 'next/cache';
 import {
   getActiveUserSubscriptions,
-  getCardModulesByWebCard,
   getUserProfilesWithWebCard,
   transaction,
   updateWebCard,
@@ -26,8 +25,7 @@ export const unpublishWebCardForUser = async ({
     for (const { webCard } of profiles) {
       if (!userIsPremium || forceUnpublishUser) {
         if (webCard?.cardIsPublished) {
-          const modules = await getCardModulesByWebCard(webCard.id, false);
-          if (webCardRequiresSubscription(modules, webCard)) {
+          if (profiles.length > 2 || webCardRequiresSubscription(webCard)) {
             const currentDate = new Date();
             //unpublished webCard
             const updates: Partial<WebCard> = {

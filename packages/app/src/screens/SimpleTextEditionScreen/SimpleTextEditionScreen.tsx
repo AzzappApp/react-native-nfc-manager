@@ -14,7 +14,6 @@ import {
   SIMPLE_TEXT_DEFAULT_VALUES,
   SIMPLE_TITLE_DEFAULT_VALUES,
 } from '@azzapp/shared/cardModuleHelpers';
-import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import AnimatedDataOverride from '#components/AnimatedDataOverride';
 import { useRouter } from '#components/NativeRouter';
 import useEditorLayout from '#hooks/useEditorLayout';
@@ -121,9 +120,7 @@ const SimpleTextEditionScreen = ({
       fragment SimpleTextEditionScreen_profile on Profile {
         webCard {
           id
-          cardIsPublished
           coverBackgroundColor
-          isPremium
           cardStyle {
             borderColor
             borderRadius
@@ -140,9 +137,6 @@ const SimpleTextEditionScreen = ({
             primary
             light
             dark
-          }
-          cardModules {
-            id
           }
           ...WebCardColorPicker_webCard
           ...SimpleTextStyleEditionPanel_webCard
@@ -256,9 +250,6 @@ const SimpleTextEditionScreen = ({
 
   const onCancel = router.back;
 
-  const cardModulesCount =
-    (profile.webCard?.cardModules.length ?? 0) + (moduleData ? 0 : 1);
-
   const handleProfileActionError = useHandleProfileActionError(
     intl.formatMessage({
       defaultMessage: 'Error, could not save your module',
@@ -300,19 +291,6 @@ const SimpleTextEditionScreen = ({
       return;
     }
 
-    const requireSubscription = changeModuleRequireSubscription(
-      moduleKind,
-      cardModulesCount,
-    );
-
-    if (
-      profile.webCard?.cardIsPublished &&
-      requireSubscription &&
-      !profile.webCard?.isPremium
-    ) {
-      router.push({ route: 'USER_PAY_WALL' });
-      return;
-    }
     commit({
       variables: {
         webCardId: profile.webCard?.id,
@@ -343,7 +321,6 @@ const SimpleTextEditionScreen = ({
     canSave,
     profile.webCard,
     moduleKind,
-    cardModulesCount,
     commit,
     value,
     fontSize,
@@ -407,7 +384,6 @@ const SimpleTextEditionScreen = ({
             })
       }
       kind={moduleKind}
-      moduleCount={cardModulesCount}
       webCardKey={profile.webCard}
     />
   );

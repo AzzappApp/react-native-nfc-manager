@@ -4,7 +4,6 @@ import { StyleSheet, View } from 'react-native';
 import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { LINE_DIVIDER_DEFAULT_VALUES } from '@azzapp/shared/cardModuleHelpers';
-import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import AnimatedDataOverride from '#components/AnimatedDataOverride';
 import { useRouter } from '#components/NativeRouter';
 import WebCardColorPicker from '#components/WebCardColorPicker';
@@ -65,7 +64,6 @@ const LineDividerEditionScreen = ({
     graphql`
       fragment LineDividerEditionScreen_webCard on WebCard {
         id
-        cardIsPublished
         cardColors {
           primary
           light
@@ -83,10 +81,6 @@ const LineDividerEditionScreen = ({
           titleFontFamily
           titleFontSize
         }
-        cardModules {
-          id
-        }
-        isPremium
         ...WebCardColorPicker_webCard
         ...ModuleEditionScreenTitle_webCard
       }
@@ -187,9 +181,6 @@ const LineDividerEditionScreen = ({
     data.marginBottom ?? LINE_DIVIDER_DEFAULT_VALUES.marginBottom,
   );
 
-  const cardModulesCount =
-    (webCard?.cardModules.length ?? 0) + (lineDivider ? 0 : 1);
-
   const animatedData = useDerivedValue(() => {
     return {
       height: height.value,
@@ -200,16 +191,6 @@ const LineDividerEditionScreen = ({
 
   const onSave = useCallback(() => {
     if (!canSave || !webCard) {
-      return;
-    }
-
-    const requireSubscription = changeModuleRequireSubscription(
-      'lineDivider',
-      cardModulesCount,
-    );
-
-    if (webCard.cardIsPublished && requireSubscription && !webCard.isPremium) {
-      router.push({ route: 'USER_PAY_WALL' });
       return;
     }
 
@@ -239,7 +220,6 @@ const LineDividerEditionScreen = ({
   }, [
     canSave,
     webCard,
-    cardModulesCount,
     commit,
     value,
     height,
@@ -295,7 +275,6 @@ const LineDividerEditionScreen = ({
               description: 'Line Divider text screen title',
             })}
             kind="lineDivider"
-            moduleCount={cardModulesCount}
             webCardKey={webCard ?? null}
           />
         }

@@ -3,14 +3,9 @@ import {
   getActiveUserSubscriptions,
   getTotalMultiUser,
   type UserSubscription,
-  type WebCard,
-  type CardModuleTemplate,
-  getCardModulesByWebCard,
 } from '@azzapp/data';
 import { updateExistingSubscription } from '@azzapp/payment';
 import ERRORS from '@azzapp/shared/errors';
-import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
-import { activeSubscriptionsForUserLoader, webCardOwnerLoader } from '#loaders';
 
 export const calculateAvailableSeats = async (
   userSubscription: UserSubscription,
@@ -19,11 +14,7 @@ export const calculateAvailableSeats = async (
   return userSubscription.totalSeats + userSubscription.freeSeats - totalUsed;
 };
 
-const checkSubscription = async (
-  userId: string,
-  addedSeats: number,
-  alreadyAdded?: boolean,
-) => {
+const checkSubscription = async (userId: string, params: FeatureParams) => {
   const result = { hasActiveSubscription: false, hasEnoughSeats: false };
   const userSubscription = await getActiveUserSubscriptions([userId]);
 
@@ -54,12 +45,18 @@ const checkSubscription = async (
     const availableSeats = await calculateAvailableSeats(monthly);
 
     if (monthly.status === 'active') {
-      await updateExistingSubscription({
-        userSubscription: monthly,
-        totalSeats:
-          monthly.totalSeats +
-          ((alreadyAdded ? 0 : addedSeats) - availableSeats),
-      });
+      if (
+        params.action === 'UPDATE_MULTI_USER' ||
+        (params.action === 'UPDATE_WEBCARD_PUBLICATION' &&
+          params.webCardIsMultiUser)
+      ) {
+        await updateExistingSubscription({
+          userSubscription: monthly,
+          totalSeats:
+            monthly.totalSeats +
+            ((params.alreadyAdded ? 0 : params.addedSeats) - availableSeats),
+        });
+      }
       return {
         hasActiveSubscription: true,
         hasEnoughSeats: true,
@@ -67,7 +64,12 @@ const checkSubscription = async (
     } else {
       return {
         hasActiveSubscription: true,
-        hasEnoughSeats: availableSeats >= (alreadyAdded ? 0 : addedSeats),
+        hasEnoughSeats:
+          params.action === 'UPDATE_MULTI_USER' ||
+          (params.action === 'UPDATE_WEBCARD_PUBLICATION' &&
+            params.webCardIsMultiUser)
+            ? availableSeats >= (params.alreadyAdded ? 0 : params.addedSeats)
+            : true,
       };
     }
   }
@@ -76,30 +78,85 @@ const checkSubscription = async (
     return {
       hasActiveSubscription: true,
       hasEnoughSeats:
-        (await calculateAvailableSeats(yearly)) >=
-        (alreadyAdded ? 0 : addedSeats),
+        params.action === 'UPDATE_MULTI_USER' ||
+        (params.action === 'UPDATE_WEBCARD_PUBLICATION' &&
+          params.webCardIsMultiUser)
+          ? (await calculateAvailableSeats(yearly)) >=
+            (params.alreadyAdded ? 0 : params.addedSeats)
+          : true,
     };
   } else if (store) {
     return {
       hasActiveSubscription: true,
       hasEnoughSeats:
-        (await calculateAvailableSeats(store)) >=
-        (alreadyAdded ? 0 : addedSeats),
+        params.action === 'UPDATE_MULTI_USER' ||
+        (params.action === 'UPDATE_WEBCARD_PUBLICATION' &&
+          params.webCardIsMultiUser)
+          ? (await calculateAvailableSeats(store)) >=
+            (params.alreadyAdded ? 0 : params.addedSeats)
+          : true,
     };
   }
 
   return result;
 };
 
+type FeatureParams =
+  | {
+      action: 'UPDATE_MULTI_USER';
+      addedSeats: number;
+      alreadyAdded?: boolean;
+      webCardIsPublished: boolean;
+    }
+  | {
+      action: 'UPDATE_WEBCARD_KIND';
+      webCardKind: string;
+      webCardIsPublished: boolean;
+    }
+  | {
+      action: 'UPDATE_WEBCARD_PUBLICATION';
+      alreadyPublished: number;
+      webCardKind: string;
+      addedSeats: number;
+      alreadyAdded?: boolean;
+      webCardIsMultiUser: true;
+      webCardIsPublished: boolean;
+    }
+  | {
+      action: 'UPDATE_WEBCARD_PUBLICATION';
+      alreadyPublished: number;
+      webCardKind: string;
+      webCardIsMultiUser: false;
+      webCardIsPublished: boolean;
+    };
+
 export const validateCurrentSubscription = async (
   userId: string,
-  addedSeats: number,
-  alreadyAdded?: boolean,
+  params: FeatureParams,
 ) => {
+  if (!params.webCardIsPublished) {
+    return;
+  }
+
+  if (
+    params.action === 'UPDATE_WEBCARD_KIND' &&
+    params.webCardKind !== 'business'
+  ) {
+    return;
+  }
+
+  if (
+    params.action === 'UPDATE_WEBCARD_PUBLICATION' &&
+    params.webCardKind !== 'business' &&
+    params.alreadyPublished < 2 &&
+    !params.webCardIsMultiUser
+  ) {
+    return;
+  }
+
   const { hasActiveSubscription, hasEnoughSeats } = await checkSubscription(
     userId,
-    addedSeats,
-    alreadyAdded,
+    params,
   );
 
   if (!hasActiveSubscription) {
@@ -125,29 +182,5 @@ export const updateMonthlySubscription = async (userId: string) => {
       userSubscription: monthly,
       totalSeats: seats,
     });
-  }
-};
-
-export const checkWebCardHasSubscription = async ({
-  webCard,
-  appliedModules,
-}: {
-  webCard: WebCard;
-  appliedModules?: CardModuleTemplate[];
-}) => {
-  const modules = appliedModules ?? (await getCardModulesByWebCard(webCard.id));
-
-  const owner = await webCardOwnerLoader.load(webCard.id);
-
-  if (
-    webCardRequiresSubscription(modules, webCard) &&
-    webCard.cardIsPublished
-  ) {
-    const subscription = owner
-      ? await activeSubscriptionsForUserLoader.load(owner.id)
-      : [];
-    if (!subscription) {
-      throw new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED);
-    }
   }
 };

@@ -1,9 +1,7 @@
 import { memo, useCallback } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Image, View, useColorScheme } from 'react-native';
-import { isModuleKindSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { colors, shadow } from '#theme';
-import PremiumIndicator from '#components/PremiumIndicator';
 import { useStyleSheet, createStyleSheet } from '#helpers/createStyles';
 
 import Icon from '#ui/Icon';
@@ -74,24 +72,12 @@ const ModuleSelectionListModalItem = ({
         >
           {module.ready ? (
             <View style={styles.freeTextView}>
-              {isModuleKindSubscription(module.moduleKind) ? (
-                <>
-                  <Text variant="xsmall">
-                    <FormattedMessage
-                      defaultMessage="azzapp+"
-                      description="Module Selection List - azzapp+ label for module"
-                    />
-                  </Text>
-                  <PremiumIndicator isRequired size={18} style={styles.badge} />
-                </>
-              ) : (
-                <Text variant="xsmall" style={{ paddingRight: 5 }}>
-                  <FormattedMessage
-                    defaultMessage="Free"
-                    description="Module Selection List - Free label for module"
-                  />
-                </Text>
-              )}
+              <Text variant="xsmall" style={{ paddingRight: 5 }}>
+                <FormattedMessage
+                  defaultMessage="Free"
+                  description="Module Selection List - Free label for module"
+                />
+              </Text>
             </View>
           ) : (
             <View style={styles.comingSoon}>

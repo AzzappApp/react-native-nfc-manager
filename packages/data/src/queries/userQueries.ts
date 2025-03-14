@@ -478,3 +478,21 @@ export const getUsersInfos = async ({
 
   return { users, count: nbUsers };
 };
+
+export const getPublishedWebCardCount = async (userId: string) => {
+  const webCards = await db()
+    .select({ count: count() })
+    .from(ProfileTable)
+    .innerJoin(WebCardTable, eq(ProfileTable.webCardId, WebCardTable.id))
+    .where(
+      and(
+        eq(ProfileTable.userId, userId),
+        eq(ProfileTable.profileRole, 'owner'),
+        eq(WebCardTable.cardIsPublished, true),
+        ne(WebCardTable.deleted, true),
+      ),
+    )
+    .then(rows => rows[0].count);
+
+  return webCards;
+};

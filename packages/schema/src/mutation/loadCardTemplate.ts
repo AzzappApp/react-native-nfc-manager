@@ -17,7 +17,6 @@ import { invalidateWebCard } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
 import { profileByWebCardIdAndUserIdLoader, webCardLoader } from '#loaders';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
-import { checkWebCardHasSubscription } from '#helpers/subscriptionHelpers';
 import { MODULES_SAVE_RULES } from './ModulesMutationsResolvers';
 import type { MutationResolvers } from '#/__generated__/types';
 
@@ -60,11 +59,6 @@ const loadCardTemplateMutation: MutationResolvers['loadCardTemplate'] = async (
   if (!webCard) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
-
-  await checkWebCardHasSubscription({
-    webCard,
-    appliedModules: cardTemplate.modules,
-  });
 
   const cardStyle =
     (await getCardStyleById(cardTemplate.cardStyleId)) ?? DEFAULT_CARD_STYLE;

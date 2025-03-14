@@ -1,5 +1,6 @@
 import { GraphQLError } from 'graphql';
 import {
+  getPublishedWebCardCount,
   getWebCardCountProfile,
   getWebCardPosts,
   updateWebCard,
@@ -28,16 +29,29 @@ const toggleWebCardPublished: MutationResolvers['toggleWebCardPublished'] =
       throw new GraphQLError(ERRORS.MISSING_COVER);
     }
 
-    //checking if there is enough seats for the user
-    if (published && webCard.isMultiUser) {
-      const owner = await webCardOwnerLoader.load(webCardId);
-      //we first need to heck if this is an IAP subscription and enought seath
-      if (owner?.id) {
-        await validateCurrentSubscription(
-          owner.id,
-          await getWebCardCountProfile(webCardId),
-        );
-      }
+    const owner = await webCardOwnerLoader.load(webCardId);
+
+    if (!owner) {
+      throw new GraphQLError(ERRORS.INVALID_REQUEST);
+    }
+
+    if (webCard.isMultiUser) {
+      await validateCurrentSubscription(owner.id, {
+        webCardIsPublished: published,
+        action: 'UPDATE_WEBCARD_PUBLICATION',
+        webCardIsMultiUser: true,
+        webCardKind: webCard.webCardKind,
+        alreadyPublished: await getPublishedWebCardCount(owner.id),
+        addedSeats: await getWebCardCountProfile(webCardId),
+      });
+    } else {
+      await validateCurrentSubscription(owner.id, {
+        webCardIsPublished: published,
+        action: 'UPDATE_WEBCARD_PUBLICATION',
+        webCardIsMultiUser: false,
+        webCardKind: webCard.webCardKind,
+        alreadyPublished: await getPublishedWebCardCount(owner.id),
+      });
     }
 
     const updates = {

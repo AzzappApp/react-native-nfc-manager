@@ -149,10 +149,7 @@ const WebCardTemplateSelectionScreen = ({
                 profile?.webCard &&
                 !profile?.webCard.isPremium &&
                 !currentUser?.isPremium && (
-                  <WebCardBuilderSubtitle
-                    modules={selectedTemplate.modules}
-                    webCard={profile.webCard}
-                  />
+                  <WebCardBuilderSubtitle webCard={profile.webCard} />
                 )}
             </View>
           }

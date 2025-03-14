@@ -8,7 +8,6 @@ import {
   referencesMedias,
   updateCardModule,
   createCardModule,
-  getCardModulesByWebCard,
   transaction,
   getCardModuleNextPosition,
 } from '@azzapp/data';
@@ -28,13 +27,8 @@ import {
   MODULE_KIND_TITLE_TEXT,
 } from '@azzapp/shared/cardModuleHelpers';
 import ERRORS from '@azzapp/shared/errors';
-import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { invalidateWebCard } from '#externals';
-import {
-  activeSubscriptionsForUserLoader,
-  webCardLoader,
-  webCardOwnerLoader,
-} from '#loaders';
+import { webCardLoader } from '#loaders';
 import { checkWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
@@ -61,23 +55,6 @@ const createModuleSavingMutation =
     let webCard = await webCardLoader.load(webCardId);
     if (!webCard) {
       throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
-    }
-
-    const modules = await getCardModulesByWebCard(webCardId);
-    const moduleCount = modules.length + (moduleId ? 0 : 1);
-
-    const owner = await webCardOwnerLoader.load(webCard.id);
-
-    if (
-      changeModuleRequireSubscription(moduleKind, moduleCount) &&
-      webCard.cardIsPublished
-    ) {
-      const subscription = owner
-        ? await activeSubscriptionsForUserLoader.load(owner.id)
-        : null;
-      if (!subscription || subscription.length === 0) {
-        throw new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED);
-      }
     }
 
     const { validator, getMedias } = MODULES_SAVE_RULES[moduleKind] ?? {};

@@ -14,6 +14,7 @@ import { isWebCardKindSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { colors, textStyles } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import PremiumIndicator from '#components/PremiumIndicator';
+import { getAuthState } from '#helpers/authStore';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { keyExtractor } from '#helpers/idHelpers';
 import relayScreen from '#helpers/relayScreen';
@@ -128,10 +129,6 @@ const WebCardParametersScreen = ({
         return;
       }
 
-      if (published && webCard.requiresSubscription && !webCard.isPremium) {
-        router.push({ route: 'USER_PAY_WALL' });
-        return;
-      }
       commitToggleWebCardPublished({
         variables: {
           webCardId: webCard.id,
@@ -148,6 +145,29 @@ const WebCardParametersScreen = ({
           },
         },
         onError: error => {
+          if (error.message === ERRORS.SUBSCRIPTION_REQUIRED) {
+            const profileInfos = getAuthState()?.profileInfos;
+            if (profileInfos?.profileRole === 'owner') {
+              router.push({ route: 'USER_PAY_WALL' });
+              return;
+            } else {
+              Toast.show({
+                type: 'error',
+                text1: intl.formatMessage(
+                  {
+                    defaultMessage:
+                      'Please contact the owner of this WebCard{azzappA}. There is an issue on his/her azzapp+ subscription.',
+                    description:
+                      'Error toast when a non-owner is trying to publish a WebCard from parameters without subscription',
+                  },
+                  {
+                    azzappA: <Text variant="azzapp">a</Text>,
+                  },
+                ) as unknown as string,
+              });
+              return;
+            }
+          }
           if (error.message === ERRORS.SUBSCRIPTION_INSUFFICIENT_SEATS) {
             Toast.show({
               type: 'error',
@@ -253,8 +273,27 @@ const WebCardParametersScreen = ({
                 r.message === ERRORS.SUBSCRIPTION_INSUFFICIENT_SEATS,
             )
           ) {
-            router.push({ route: 'USER_PAY_WALL' });
-            return;
+            const profileInfos = getAuthState()?.profileInfos;
+            if (profileInfos?.profileRole === 'owner') {
+              router.push({ route: 'USER_PAY_WALL' });
+              return;
+            } else {
+              Toast.show({
+                type: 'error',
+                text1: intl.formatMessage(
+                  {
+                    defaultMessage:
+                      'Please contact the owner of this WebCard{azzappA}. There is an issue on his/her azzapp+ subscription.',
+                    description:
+                      'Error toast when a non-owner is trying to update a WebCard from parameters without subscription',
+                  },
+                  {
+                    azzappA: <Text variant="azzapp">a</Text>,
+                  },
+                ) as unknown as string,
+              });
+              return;
+            }
           } else {
             Toast.show({
               type: 'error',
