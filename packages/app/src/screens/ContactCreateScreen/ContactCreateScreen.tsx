@@ -57,8 +57,14 @@ const ContactCreateScreen = ({
       $profileId: ID!
       $contact: AddContactInput!
       $notify: Boolean!
+      $scanUsed: Boolean!
     ) {
-      addContact(profileId: $profileId, input: $contact, notify: $notify) {
+      addContact(
+        profileId: $profileId
+        input: $contact
+        notify: $notify
+        scanUsed: $scanUsed
+      ) {
         contact {
           id
         }
@@ -165,6 +171,7 @@ const ContactCreateScreen = ({
     commit({
       variables: {
         profileId,
+        scanUsed: data.scanUsed,
         notify: data.notify,
         contact: {
           avatarId,
@@ -245,6 +252,7 @@ const ContactCreateScreen = ({
       setScanImage(image);
       setValue('firstName', data?.firstName);
       setValue('lastName', data?.lastName);
+      setValue('scanUsed', true);
       if (data?.title) {
         setValue('title', capitalize(data?.title));
       } else {

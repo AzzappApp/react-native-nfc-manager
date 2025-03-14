@@ -496,3 +496,9 @@ export const getPublishedWebCardCount = async (userId: string) => {
 
   return webCards;
 };
+
+export const updateNbFreeScans = (userId: string) =>
+  db()
+    .update(UserTable)
+    .set({ nbFreeScans: sql`${UserTable.nbFreeScans} + 1` })
+    .where(eq(UserTable.id, userId));

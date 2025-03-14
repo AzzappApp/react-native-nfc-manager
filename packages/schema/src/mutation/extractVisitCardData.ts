@@ -3,6 +3,7 @@ import { GraphQLError } from 'graphql';
 import { z } from 'zod';
 import ERRORS from '@azzapp/shared/errors';
 import { getSessionInfos } from '#GraphQLContext';
+import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#__generated__/types';
 
 const apiKey = process.env.OPENAI_API_SECRETKEY;
@@ -25,6 +26,11 @@ export const extractVisitCardData: MutationResolvers['extractVisitCardData'] =
     if (!userId) {
       throw new GraphQLError(ERRORS.UNAUTHORIZED);
     }
+
+    await validateCurrentSubscription(userId, {
+      action: 'USE_SCAN',
+    });
+
     try {
       const response = await fetch(
         'https://api.openai.com/v1/chat/completions',

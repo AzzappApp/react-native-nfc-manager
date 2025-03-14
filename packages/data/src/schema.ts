@@ -758,6 +758,7 @@ export const UserTable = cols.table(
       .boolean('hasAcceptedCommunications')
       .default(false)
       .notNull(),
+    nbFreeScans: cols.int('nbFreeScans').default(0).notNull(),
   },
   table => {
     return {

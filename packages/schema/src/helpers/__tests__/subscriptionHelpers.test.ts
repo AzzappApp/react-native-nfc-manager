@@ -1,5 +1,10 @@
 import { GraphQLError } from 'graphql';
-import { getActiveUserSubscriptions, getTotalMultiUser } from '@azzapp/data';
+import {
+  getActiveUserSubscriptions,
+  getTotalMultiUser,
+  getUserById,
+  updateNbFreeScans,
+} from '@azzapp/data';
 import { updateExistingSubscription } from '@azzapp/payment';
 import ERRORS from '@azzapp/shared/errors';
 import {
@@ -13,6 +18,8 @@ import type { UserSubscription } from '@azzapp/data';
 jest.mock('@azzapp/data', () => ({
   getActiveUserSubscriptions: jest.fn(),
   getTotalMultiUser: jest.fn(),
+  getUserById: jest.fn(),
+  updateNbFreeScans: jest.fn(),
   getCardModulesByWebCard: jest.fn(),
 }));
 
@@ -48,6 +55,19 @@ describe('Subscription Helpers', () => {
       expect(seats).toBe(6);
       expect(getTotalMultiUser).toHaveBeenCalledWith('user-1');
     });
+
+    test('should return correct seats when totalUsed is 0', async () => {
+      (getTotalMultiUser as jest.Mock).mockResolvedValue(0);
+      const userSubscription = {
+        userId: 'user-2',
+        totalSeats: 10,
+        freeSeats: 2,
+      } as UserSubscription;
+
+      const seats = await calculateAvailableSeats(userSubscription);
+
+      expect(seats).toBe(12);
+    });
   });
 
   describe('validateCurrentSubscription', () => {
@@ -76,39 +96,55 @@ describe('Subscription Helpers', () => {
       ).resolves.toBeUndefined();
     });
 
-    test('should throw SUBSCRIPTION_INSUFFICIENT_SEATS if not enough seats', async () => {
+    test('should update free scans if ADD_CONTACT_WITH_SCAN is used without a subscription', async () => {
+      (getActiveUserSubscriptions as jest.Mock).mockResolvedValue([]);
+
+      await validateCurrentSubscription('user-1', {
+        action: 'ADD_CONTACT_WITH_SCAN',
+      });
+
+      expect(updateNbFreeScans).toHaveBeenCalledWith('user-1');
+    });
+
+    test('should throw SUBSCRIPTION_REQUIRED if free scans exceed limit in USE_SCAN', async () => {
+      (getActiveUserSubscriptions as jest.Mock).mockResolvedValue([]);
+      (getUserById as jest.Mock).mockResolvedValue({
+        id: 'user-1',
+        nbFreeScans: 6,
+      });
+
+      await expect(
+        validateCurrentSubscription('user-1', { action: 'USE_SCAN' }),
+      ).rejects.toThrow(new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED));
+    });
+
+    test('should not throw error if free scans are below limit in USE_SCAN', async () => {
+      (getActiveUserSubscriptions as jest.Mock).mockResolvedValue([]);
+      (getUserById as jest.Mock).mockResolvedValue({
+        id: 'user-1',
+        nbFreeScans: 4,
+      });
+
+      await expect(
+        validateCurrentSubscription('user-1', { action: 'USE_SCAN' }),
+      ).resolves.not.toThrow();
+    });
+
+    test('should allow lifetime subscription without checking seats', async () => {
       (getActiveUserSubscriptions as jest.Mock).mockResolvedValue([
-        { subscriptionPlan: 'web.yearly', totalSeats: 2, userId: 'user-1' },
+        { subscriptionPlan: 'web.lifetime', userId: 'user-1' },
       ]);
-      (getTotalMultiUser as jest.Mock).mockResolvedValue(3);
 
       await expect(
         validateCurrentSubscription('user-1', {
           webCardIsPublished: true,
           action: 'UPDATE_MULTI_USER',
-          addedSeats: 1,
-        }),
-      ).rejects.toThrow(
-        new GraphQLError(ERRORS.SUBSCRIPTION_INSUFFICIENT_SEATS),
-      );
-    });
-
-    test('should validate UPDATE_CONTACT_CARD if webCard is published', async () => {
-      (getActiveUserSubscriptions as jest.Mock).mockResolvedValue([
-        { subscriptionPlan: 'web.yearly', userId: 'user-1' },
-      ]);
-
-      await expect(
-        validateCurrentSubscription('user-1', {
-          action: 'UPDATE_CONTACT_CARD',
-          webCardIsPublished: true,
-          contactCardHasCompanyName: true,
-          contactCardHasUrl: true,
+          addedSeats: 5,
         }),
       ).resolves.not.toThrow();
     });
 
-    test('should validate UPDATE_WEBCARD_PUBLICATION with enough seats', async () => {
+    test('should allow yearly subscription if there are enough seats', async () => {
       (getActiveUserSubscriptions as jest.Mock).mockResolvedValue([
         {
           subscriptionPlan: 'web.yearly',
@@ -121,14 +157,21 @@ describe('Subscription Helpers', () => {
 
       await expect(
         validateCurrentSubscription('user-1', {
-          action: 'UPDATE_WEBCARD_PUBLICATION',
-          webCardKind: 'business',
-          alreadyPublished: 1,
-          addedSeats: 1,
-          webCardIsMultiUser: true,
           webCardIsPublished: true,
+          action: 'UPDATE_MULTI_USER',
+          addedSeats: 1,
         }),
       ).resolves.not.toThrow();
+    });
+
+    test('should do nothing if the webCard is not published', async () => {
+      await expect(
+        validateCurrentSubscription('user-1', {
+          webCardIsPublished: false,
+          action: 'UPDATE_WEBCARD_KIND',
+          webCardKind: 'business',
+        }),
+      ).resolves.toBeUndefined();
     });
   });
 
@@ -158,6 +201,14 @@ describe('Subscription Helpers', () => {
         },
       ]);
       (getTotalMultiUser as jest.Mock).mockResolvedValue(4);
+
+      await updateMonthlySubscription('user-1');
+
+      expect(updateExistingSubscription).not.toHaveBeenCalled();
+    });
+
+    test('should not update if no active monthly subscription is found', async () => {
+      (getActiveUserSubscriptions as jest.Mock).mockResolvedValue([]);
 
       await updateMonthlySubscription('user-1');
 

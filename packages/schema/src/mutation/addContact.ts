@@ -18,12 +18,13 @@ import { buildUserUrl } from '@azzapp/shared/urlHelpers';
 import { notifyUsers, sendPushNotification } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
 import { profileLoader, userLoader, webCardLoader } from '#loaders';
+import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#__generated__/types';
 import type { Contact, ContactRow } from '@azzapp/data';
 
 const addContact: MutationResolvers['addContact'] = async (
   _,
-  { profileId: gqlProfileId, input, notify },
+  { profileId: gqlProfileId, input, notify, scanUsed },
 ) => {
   const { userId } = getSessionInfos();
 
@@ -88,6 +89,12 @@ const addContact: MutationResolvers['addContact'] = async (
       deletedAt: null,
       ...contactToCreate,
     };
+  }
+
+  if (scanUsed) {
+    await validateCurrentSubscription(userId, {
+      action: 'ADD_CONTACT_WITH_SCAN',
+    });
   }
 
   if (input.withShareBack && input.profileId) {

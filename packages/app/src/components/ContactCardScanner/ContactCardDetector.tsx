@@ -1,7 +1,6 @@
 import { makeImageFromView } from '@shopify/react-native-skia';
 import { Paths, File } from 'expo-file-system/next';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
-
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
@@ -13,11 +12,13 @@ import Animated, {
   useSharedValue,
 } from 'react-native-reanimated';
 import Svg, { Defs, Mask, Rect } from 'react-native-svg';
+import Toast from 'react-native-toast-message';
 import { useCameraDevice, Camera } from 'react-native-vision-camera';
 import { graphql, useMutation } from 'react-relay';
+import ERRORS from '@azzapp/shared/errors';
 import { colors } from '#theme';
 import ImagePicker, { SelectImageStep } from '#components/ImagePicker';
-import { ScreenModal } from '#components/NativeRouter';
+import { ScreenModal, useRouter } from '#components/NativeRouter';
 import PermissionModal from '#components/PermissionModal';
 import useBoolean from '#hooks/useBoolean';
 import useIsForeground from '#hooks/useIsForeground';
@@ -98,6 +99,8 @@ const ContactCardDetector = ({
     }
   `);
 
+  const router = useRouter();
+
   const takePicture = useCallback(async () => {
     if (!camera.current || !isActive) {
       return null;
@@ -139,7 +142,20 @@ const ContactCardDetector = ({
           close();
           closeLoading();
         },
-        onError: () => {},
+        onError: e => {
+          if (e.message === ERRORS.SUBSCRIPTION_REQUIRED) {
+            router.push({ route: 'USER_PAY_WALL' });
+            return;
+          }
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage:
+                'Oops, scanning your contact card was not possible. Please try again later.',
+              description: 'Error toast message when scanning a contact card',
+            }),
+          });
+        },
       });
     } catch (error) {
       closeLoading();
@@ -155,7 +171,9 @@ const ContactCardDetector = ({
     commit,
     extractData,
     height,
+    intl,
     isActive,
+    router,
     showLoading,
     width,
   ]);
@@ -272,8 +290,8 @@ const ContactCardDetector = ({
 
         // Write the byte array to a file
         const file = new File(filePath);
-        await file.create();
-        await file.write(pngData);
+        file.create();
+        file.write(pngData);
 
         commit({
           variables: { imgUrl: `data:image/jpg;base64,${base64Data}` },
@@ -285,8 +303,11 @@ const ContactCardDetector = ({
             close();
             closeLoading();
           },
-          onError: () => {
+          onError: error => {
             closeLoading();
+            if (error.message === ERRORS.SUBSCRIPTION_REQUIRED) {
+              router.push({ route: 'USER_PAY_WALL' });
+            }
           },
         });
       }
@@ -294,7 +315,7 @@ const ContactCardDetector = ({
       closeLoading();
       console.log(error);
     }
-  }, [close, closeLoading, commit, extractData, showLoading]);
+  }, [close, closeLoading, commit, extractData, router, showLoading]);
 
   const ref = useRef<View>(null);
   const animatedStyle = useAnimatedStyle(() => {
@@ -477,7 +498,6 @@ const ContactCardDetector = ({
                 onPress={openPicker}
               />
             </View>
-
             {isCameraMode ? (
               <Pressable
                 onPress={takePicture}
