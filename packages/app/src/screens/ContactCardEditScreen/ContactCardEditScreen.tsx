@@ -223,7 +223,7 @@ const ContactCardEditScreen = ({
       birthday: contactCard?.birthday,
       socials: contactCard?.socials?.map(p => ({ ...p })) ?? [],
       avatar,
-      logo,
+      logo: webCard?.logo || logo,
     },
   });
 

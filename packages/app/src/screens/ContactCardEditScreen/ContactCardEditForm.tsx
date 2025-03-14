@@ -68,6 +68,12 @@ const ContactCardEditForm = ({
     control,
     name: 'logo',
   });
+
+  const { field: companyField } = useController({
+    control,
+    name: 'company',
+  });
+
   const [imagePicker, setImagePicker] = useState<'avatar' | 'logo' | null>(
     null,
   );
@@ -184,6 +190,8 @@ const ContactCardEditForm = ({
           <Separation small />
           <ContactCardEditCompanyLogo
             control={control}
+            canEditLogo={!webCard?.logo}
+            company={commonInformation?.company || companyField.value}
             isPremium={webCard?.isPremium}
           />
           <Separation />
@@ -338,7 +346,6 @@ const styleSheet = createStyleSheet(appearance => ({
     alignItems: 'center',
     columnGap: 7,
   },
-  logoButtonContainer: { flexDirection: 'row', alignItems: 'center' },
   logoContainer: {
     flex: 1,
     paddingLeft: 65,

@@ -30,10 +30,14 @@ import type { ViewProps } from 'react-native';
 
 const ContactCardEditCompanyLogo = ({
   control,
+  canEditLogo = true,
   isPremium,
+  company,
 }: {
   control: Control<any>;
   isPremium?: boolean | null;
+  canEditLogo?: boolean;
+  company?: string | null;
 }) => {
   const styles = useStyleSheet(stylesheet);
 
@@ -57,14 +61,14 @@ const ContactCardEditCompanyLogo = ({
     }
   `);
 
-  const [searchCompany] = useDebounce(fieldCompany.value, 500);
+  const [searchCompany] = useDebounce(company || fieldCompany.value, 500);
 
   const [logos, setLogos] = useState<
     ContactCardEditCompanyLogoMutation$data['extractCompanyLogo']
   >([]);
 
   useEffect(() => {
-    if (searchCompany) {
+    if (canEditLogo && searchCompany) {
       commit({
         variables: { brand: searchCompany },
         onCompleted: data => {
@@ -75,7 +79,7 @@ const ContactCardEditCompanyLogo = ({
     } else {
       setLogos(null);
     }
-  }, [commit, searchCompany]);
+  }, [canEditLogo, commit, searchCompany]);
   const [showImagePicker, openImagePicker, closeImagePicker] =
     useBoolean(false);
 
@@ -147,6 +151,42 @@ const ContactCardEditCompanyLogo = ({
     [field],
   );
 
+  if (!canEditLogo) {
+    return (
+      <>
+        <View style={styles.logoField}>
+          <View style={styles.logoButtonContainer}>
+            <View style={styles.logoButton}>
+              <Icon icon="locked" />
+              <Text variant="smallbold">
+                <FormattedMessage
+                  defaultMessage="Logo"
+                  description="Logo field registered for the contact card"
+                />
+              </Text>
+            </View>
+            <View style={styles.logoContainer}>
+              <View style={styles.logoWrapper}>
+                <Image
+                  source={{ uri: field.value?.uri }}
+                  style={styles.logo}
+                  contentFit="contain"
+                />
+              </View>
+            </View>
+          </View>
+          <View style={styles.companyLogoDescription}>
+            <Text variant="xsmall" style={{ color: colors.grey400 }}>
+              <FormattedMessage
+                defaultMessage="Company logo will be used in your email signature"
+                description="Company logo field description"
+              />
+            </Text>
+          </View>
+        </View>
+      </>
+    );
+  }
   return (
     <Controller
       control={control}
@@ -346,11 +386,50 @@ const stylesheet = createStyleSheet(appearance => ({
     paddingLeft: 10,
   },
   addButton: { tintColor: colors.green },
+  noneEditableLogo: {
+    minHeight: 52,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingBottom: 10,
+    paddingTop: 10,
+  },
   titleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     width: '100%',
+  },
+  logoField: {
+    padding: 10,
+    borderColor: colors.grey50,
+    borderTopWidth: 1,
+  },
+  logoButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    columnGap: 7,
+  },
+  logoContainer: {
+    flex: 1,
+    paddingLeft: 65,
+    alignItems: 'flex-start',
+  },
+  logoWrapper: {
+    borderStyle: 'dashed',
+    borderWidth: 1,
+    borderColor: colors.grey100,
+    borderRadius: 5,
+  },
+  companyLogoDescription: {
+    paddingLeft: 30,
+    paddingVertical: 10,
+  },
+  logoButtonContainer: { flexDirection: 'row', alignItems: 'center' },
+  logo: {
+    height: 55,
+    width: 55,
   },
 }));
 
