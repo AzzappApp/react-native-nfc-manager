@@ -1,3 +1,7 @@
+## 1.9.0-canary.22
+
+* **feat:**  - **payment:** limit to 2 webcards ([#7835](https://github.com/AzzappApp/azzapp/pull/7835))
+
 ## 1.9.0-canary.21
 
 
