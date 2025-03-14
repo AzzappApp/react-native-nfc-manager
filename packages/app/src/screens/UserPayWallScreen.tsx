@@ -28,6 +28,7 @@ import { useMultiUserUpdate } from '#hooks/useMultiUserUpdate';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { useUserSubscriptionOffer } from '#hooks/useSubscriptionOffer';
 import Button from '#ui/Button';
+import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import PressableOpacity from '#ui/PressableOpacity';
 import SwitchLabel from '#ui/SwitchLabel';
@@ -312,21 +313,96 @@ const UserPayWallScreen = ({
             resizeMode="cover"
           />
           <LinearGradient
-            colors={['transparent', 'rgba(0, 0, 0, 0.9)']}
+            colors={['rgba(0, 0, 0, 0.6)', 'rgba(0, 0, 0, 0.95)']}
             locations={[0, 1]}
             style={{
               height: height - BOTTOM_HEIGHT + 130,
               width,
+
               position: 'absolute',
             }}
             pointerEvents="none"
           />
-          <Text variant="xlarge" style={styles.textPromo}>
-            <FormattedMessage
-              defaultMessage="Unlock multi-user to give contact card to all your team"
-              description="UserPaywall Screen - message promo section"
-            />
-          </Text>
+          <View style={styles.containerPromo}>
+            <Text variant="xlarge" style={styles.titlePromo}>
+              <FormattedMessage
+                defaultMessage="Try azzapp{plus} for free!"
+                description="UserPaywall Screen - Try azzapp+ for free"
+                values={{
+                  plus: (
+                    <Text variant="xlarge" style={{ color: colors.red400 }}>
+                      +
+                    </Text>
+                  ),
+                }}
+              />
+            </Text>
+            <View style={styles.containerTextPromo}>
+              <Icon
+                icon="check"
+                size={18}
+                style={{ tintColor: colors.white }}
+              />
+              <Text variant="button" style={styles.textPromo}>
+                <FormattedMessage
+                  defaultMessage="Multi-User"
+                  description="UserPaywall Screen - Multi-User"
+                />
+              </Text>
+            </View>
+            <View style={styles.containerTextPromo}>
+              <Icon
+                icon="check"
+                size={18}
+                style={{ tintColor: colors.white }}
+              />
+              <Text variant="button" style={styles.textPromo}>
+                <FormattedMessage
+                  defaultMessage="Unlimited AI Scans"
+                  description="UserPaywall Screen - Unlimited AI Scans"
+                />
+              </Text>
+            </View>
+            <View style={styles.containerTextPromo}>
+              <Icon
+                icon="check"
+                size={18}
+                style={{ tintColor: colors.white }}
+              />
+              <Text variant="button" style={styles.textPromo}>
+                <FormattedMessage
+                  defaultMessage="Unlimited WebCards"
+                  description="UserPaywall Screen - Unlimited WebCards"
+                />
+              </Text>
+            </View>
+            <View style={styles.containerTextPromo}>
+              <Icon
+                icon="check"
+                size={18}
+                style={{ tintColor: colors.white }}
+              />
+              <Text variant="button" style={styles.textPromo}>
+                <FormattedMessage
+                  defaultMessage="Pro Business Cards"
+                  description="UserPaywall Screen - Pro Business Cards"
+                />
+              </Text>
+            </View>
+            <View style={styles.containerTextPromo}>
+              <Icon
+                icon="check"
+                size={18}
+                style={{ tintColor: colors.white }}
+              />
+              <Text variant="button" style={styles.textPromo}>
+                <FormattedMessage
+                  defaultMessage="Email signature"
+                  description="UserPaywall Screen - Email signature"
+                />
+              </Text>{' '}
+            </View>
+          </View>
         </View>
       </View>
       <IconButton
@@ -334,7 +410,7 @@ const UserPayWallScreen = ({
         style={styles.icon}
         iconStyle={styles.iconStyle}
         variant="icon"
-        onPress={() => router.back()}
+        onPress={router.back}
         size={50}
       />
       <View style={styles.content}>
@@ -595,6 +671,16 @@ const OfferItem = ({
 const Offer = memo(OfferItem);
 const BOTTOM_HEIGHT = 450;
 const styles = StyleSheet.create({
+  containerPromo: {
+    position: 'absolute',
+    top: 0,
+    width,
+    gap: 10,
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  containerTextPromo: { flexDirection: 'row', alignItems: 'center', gap: 5 },
   yearlyPricing: { textAlign: 'right', color: colors.grey600 },
   promoContainer: {
     alignItems: 'flex-end',
@@ -607,11 +693,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 36,
   },
+  titlePromo: {
+    color: colors.white,
+    textAlign: 'center',
+    lineHeight: 40,
+  },
   textPromo: {
     color: colors.white,
-    width: '100%',
     textAlign: 'center',
-    paddingHorizontal: 41,
   },
   containerLogo: {
     flexDirection: 'row',
@@ -664,13 +753,13 @@ const styles = StyleSheet.create({
     color: colors.black,
   },
   icon: {
-    backgroundColor: colors.grey100,
+    backgroundColor: colors.black,
     position: 'absolute',
     top: 50,
-    left: 15,
+    right: 15,
   },
   iconStyle: {
-    tintColor: colors.black,
+    tintColor: colors.white,
   },
   buttonSubscribe: {
     width: '100%',
