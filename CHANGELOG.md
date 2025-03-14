@@ -1,3 +1,8 @@
+## 1.9.0-canary.24
+
+* **fix:**  - review sortableScrollList implementation, use react-native-sortables instead ([#7846](https://github.com/AzzappApp/azzapp/pull/7846))
+* **feat:**  - **payment:** [#7875](https://github.com/AzzappApp/azzapp/pull/7875) add premium indicators on details screen ([#7876](https://github.com/AzzappApp/azzapp/pull/7876))
+
 ## 1.9.0-canary.23
 
 * **feat:**  - update paywall ([#7702](https://github.com/AzzappApp/azzapp/pull/7702))
