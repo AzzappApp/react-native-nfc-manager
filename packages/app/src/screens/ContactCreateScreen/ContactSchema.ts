@@ -56,8 +56,8 @@ export const contactSchema = z
       .nullable(),
   })
   .refine(
-    data => !!data.firstName || !!data.lastName,
-    'Either one of firstname or lastname should be filled in.',
+    data => !!data.firstName || !!data.lastName || !!data.company,
+    'Either one of firstname or lastname or company name should be filled in.',
   );
 
 export type ContactFormValues = z.infer<typeof contactSchema>;
