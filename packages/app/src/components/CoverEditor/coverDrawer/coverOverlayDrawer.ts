@@ -126,7 +126,7 @@ const coverOverlayDrawer = ({
   let roll = editionParameters?.roll;
   if (
     !cropData ||
-    // minor difference is allowed since canvas aspect ration might not be exactly
+    // minor difference is allowed since canvas aspect ratio might not be exactly
     // the same as the COVER_ASPECT_RATIO
     Math.abs(cropData.width / cropData.height - imageWidth / imageHeight) > 0.02
   ) {
@@ -156,6 +156,28 @@ const coverOverlayDrawer = ({
 
   // We will clip the inner rect with border radius so we need to draw the shadow
   if (shadow) {
+    let shadowImageFilter = transformImage({
+      image,
+      imageInfo: {
+        matrix: Skia.Matrix(),
+        width: image.width(),
+        height: image.height(),
+      },
+      targetWidth: imageWidth,
+      targetHeight: imageHeight,
+      editionParameters: {
+        ...editionParameters,
+        cropData: scaleCropData(cropData, imagesScales[id] ?? 1),
+        roll,
+      },
+      lutTexture: filter ? lutTextures[filter] : null,
+    });
+
+    shadowImageFilter = Skia.ImageFilter.MakeCrop(
+      innerRect.rect,
+      shadowImageFilter,
+    );
+
     const shadowPaint = Skia.Paint();
     if (borderWidth > 0) {
       shadowPaint.setColor(Skia.Color('#00000099'));
@@ -173,7 +195,7 @@ const coverOverlayDrawer = ({
         convertToBaseCanvasRatio(8, width),
         convertToBaseCanvasRatio(8, width),
         Skia.Color('#00000099'),
-        null,
+        shadowImageFilter,
       );
       if (animateImageFilter) {
         shadowFilter = animateImageFilter(shadowFilter);
