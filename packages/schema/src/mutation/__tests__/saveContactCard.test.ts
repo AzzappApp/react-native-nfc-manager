@@ -1,14 +1,16 @@
+import { GraphQLError } from 'graphql';
 import {
-  buildDefaultContactCard,
   getPushTokens,
-  getUserById,
   referencesMedias,
+  transaction,
   updateProfile,
 } from '@azzapp/data';
+import ERRORS from '@azzapp/shared/errors';
 import { notifyApplePassWallet, notifyGooglePassWallet } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
 import { profileLoader, webCardLoader } from '#loaders';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
+import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import saveContactCard from '../saveContactCard';
 
 // Mock dependencies
@@ -16,10 +18,10 @@ jest.mock('@azzapp/data', () => ({
   buildDefaultContactCard: jest.fn(),
   checkMedias: jest.fn(),
   getPushTokens: jest.fn(),
+  getUserById: jest.fn(),
   referencesMedias: jest.fn(),
   transaction: jest.fn(callback => callback()),
   updateProfile: jest.fn(),
-  getUserById: jest.fn(),
 }));
 
 jest.mock('#externals', () => ({
@@ -46,6 +48,10 @@ jest.mock('@sentry/nextjs', () => ({
 
 jest.mock('#helpers/relayIdHelpers', () => jest.fn());
 
+jest.mock('#helpers/subscriptionHelpers', () => ({
+  validateCurrentSubscription: jest.fn(),
+}));
+
 // Mock `fromGlobalIdWithType`
 (fromGlobalIdWithType as jest.Mock).mockImplementation(
   (id: string, type: string) => {
@@ -68,25 +74,115 @@ describe('saveContactCard', () => {
     logoId: 'old-logo',
     avatarId: 'old-avatar',
     webCardId: 'webcard-789',
-    hasGooglePass: true, // add flag for Google Wallet
+    hasGooglePass: true,
   };
 
   const mockWebCard = {
     id: 'webcard-789',
+    cardIsPublished: true,
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  test('should successfully update a contact card and notify Apple Wallet', async () => {
+  test('should throw UNAUTHORIZED if user is not authenticated', async () => {
+    (getSessionInfos as jest.Mock).mockReturnValue({ userId: null });
+
+    await expect(
+      saveContactCard(
+        {},
+        {
+          profileId: 'global-profile-123',
+          contactCard: { avatarId: 'new-avatar' },
+        },
+        mockContext,
+        mockInfo,
+      ),
+    ).rejects.toThrow(new GraphQLError(ERRORS.UNAUTHORIZED));
+  });
+
+  test('should throw INVALID_REQUEST if profile is not found', async () => {
+    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-456' });
+    (profileLoader.load as jest.Mock).mockResolvedValue(null);
+
+    await expect(
+      saveContactCard(
+        {},
+        {
+          profileId: 'global-profile-123',
+          contactCard: { avatarId: 'new-avatar' },
+        },
+        mockContext,
+        mockInfo,
+      ),
+    ).rejects.toThrow(new GraphQLError(ERRORS.INVALID_REQUEST));
+  });
+
+  test('should throw UNAUTHORIZED if profile does not belong to user', async () => {
+    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-999' });
+    (profileLoader.load as jest.Mock).mockResolvedValue(mockProfile);
+
+    await expect(
+      saveContactCard(
+        {},
+        {
+          profileId: 'global-profile-123',
+          contactCard: { avatarId: 'new-avatar' },
+        },
+        mockContext,
+        mockInfo,
+      ),
+    ).rejects.toThrow(new GraphQLError(ERRORS.UNAUTHORIZED));
+  });
+
+  test('should throw INVALID_REQUEST if webCard is not found', async () => {
+    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-456' });
+    (profileLoader.load as jest.Mock).mockResolvedValue(mockProfile);
+    (webCardLoader.load as jest.Mock).mockResolvedValue(null);
+
+    await expect(
+      saveContactCard(
+        {},
+        {
+          profileId: 'global-profile-123',
+          contactCard: { avatarId: 'new-avatar' },
+        },
+        mockContext,
+        mockInfo,
+      ),
+    ).rejects.toThrow(new GraphQLError(ERRORS.INVALID_REQUEST));
+  });
+
+  test('should validate subscription before updating', async () => {
     (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-456' });
     (profileLoader.load as jest.Mock).mockResolvedValue(mockProfile);
     (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
-    (buildDefaultContactCard as jest.Mock).mockResolvedValue({});
+    (getPushTokens as jest.Mock).mockResolvedValue([]);
+
+    await saveContactCard(
+      {},
+      {
+        profileId: 'global-profile-123',
+        contactCard: { avatarId: 'new-avatar' },
+      },
+      mockContext,
+      mockInfo,
+    );
+
+    expect(validateCurrentSubscription).toHaveBeenCalledWith('user-456', {
+      action: 'UPDATE_CONTACT_CARD',
+      contactCardHasCompanyName: false,
+      webCardIsPublished: true,
+      contactCardHasUrl: false,
+    });
+  });
+
+  test('should update contact card and notify Apple & Google Wallet', async () => {
+    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-456' });
+    (profileLoader.load as jest.Mock).mockResolvedValue(mockProfile);
+    (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
     (getPushTokens as jest.Mock).mockResolvedValue(['token1', 'token2']);
-    (notifyApplePassWallet as jest.Mock).mockResolvedValue(undefined);
-    (notifyGooglePassWallet as jest.Mock).mockResolvedValue(undefined);
 
     const result = await saveContactCard(
       {},
@@ -116,15 +212,12 @@ describe('saveContactCard', () => {
     );
   });
 
-  test('should not notify Google Wallet if `hasGooglePass` is false', async () => {
+  test('should not notify Google Wallet if hasGooglePass is false', async () => {
     (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-456' });
     (profileLoader.load as jest.Mock).mockResolvedValue({
       ...mockProfile,
-      hasGooglePass: false, // deactivate Google Wallet
+      hasGooglePass: false,
     });
-    (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
-    (getPushTokens as jest.Mock).mockResolvedValue(['token1']);
-    (getUserById as jest.Mock).mockResolvedValue({ id: 'user-456' });
 
     await saveContactCard(
       {},
@@ -137,5 +230,26 @@ describe('saveContactCard', () => {
     );
 
     expect(notifyGooglePassWallet).not.toHaveBeenCalled();
+  });
+
+  test('should throw INTERNAL_SERVER_ERROR on transaction failure', async () => {
+    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-456' });
+    (profileLoader.load as jest.Mock).mockResolvedValue(mockProfile);
+    (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
+    (transaction as jest.Mock).mockRejectedValue(
+      new Error('Transaction failed'),
+    );
+
+    await expect(
+      saveContactCard(
+        {},
+        {
+          profileId: 'global-profile-123',
+          contactCard: { avatarId: 'new-avatar' },
+        },
+        mockContext,
+        mockInfo,
+      ),
+    ).rejects.toThrow(new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR));
   });
 });

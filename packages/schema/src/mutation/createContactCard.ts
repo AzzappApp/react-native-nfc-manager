@@ -52,10 +52,11 @@ const createContactCard: MutationResolvers['createContactCard'] = async (
 
   await validateCurrentSubscription(userId, {
     webCardKind,
-    action: 'UPDATE_WEBCARD_PUBLICATION',
+    action: 'CREATE_CONTACT_CARD',
     alreadyPublished: await getPublishedWebCardCount(userId),
-    webCardIsMultiUser: false,
     webCardIsPublished: true,
+    contactCardHasCompanyName: !!contactCard.company,
+    contactCardHasUrl: !!contactCard.urls?.length,
   });
 
   const inputWebCard: InferInsertModel<typeof WebCardTable> = {

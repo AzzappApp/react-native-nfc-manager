@@ -103,6 +103,20 @@ const checkSubscription = async (userId: string, params: FeatureParams) => {
 
 type FeatureParams =
   | {
+      action: 'CREATE_CONTACT_CARD';
+      alreadyPublished: number;
+      webCardKind: string;
+      webCardIsPublished: boolean;
+      contactCardHasCompanyName: boolean;
+      contactCardHasUrl: boolean;
+    }
+  | {
+      action: 'UPDATE_CONTACT_CARD';
+      webCardIsPublished: boolean;
+      contactCardHasCompanyName: boolean;
+      contactCardHasUrl: boolean;
+    }
+  | {
       action: 'UPDATE_MULTI_USER';
       addedSeats: number;
       alreadyAdded?: boolean;
@@ -150,6 +164,24 @@ export const validateCurrentSubscription = async (
     params.webCardKind !== 'business' &&
     params.alreadyPublished < 2 &&
     !params.webCardIsMultiUser
+  ) {
+    return;
+  }
+
+  if (
+    params.action === 'CREATE_CONTACT_CARD' &&
+    params.webCardKind !== 'business' &&
+    params.alreadyPublished < 2 &&
+    !params.contactCardHasCompanyName &&
+    !params.contactCardHasUrl
+  ) {
+    return;
+  }
+
+  if (
+    params.action === 'UPDATE_CONTACT_CARD' &&
+    !params.contactCardHasCompanyName &&
+    !params.contactCardHasUrl
   ) {
     return;
   }

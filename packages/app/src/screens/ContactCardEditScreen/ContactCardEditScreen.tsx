@@ -8,6 +8,7 @@ import * as mime from 'react-native-mime-types';
 import Toast from 'react-native-toast-message';
 import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
 import { Observable } from 'relay-runtime';
+import ERRORS from '@azzapp/shared/errors';
 import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
 import {
   preventModalDismiss,
@@ -358,6 +359,10 @@ const ContactCardEditScreen = ({
       },
       onError: e => {
         console.error(e);
+        if (e.message === ERRORS.SUBSCRIPTION_REQUIRED) {
+          router.push({ route: 'USER_PAY_WALL' });
+          return;
+        }
         Toast.show({
           type: 'error',
           text1: intl.formatMessage(

@@ -22,10 +22,15 @@ export const unpublishWebCardForUser = async ({
 
     const userIsPremium =
       (await getActiveUserSubscriptions([userId])).length > 0;
-    for (const { webCard } of profiles) {
+    for (const { webCard, profile } of profiles) {
       if (!userIsPremium || forceUnpublishUser) {
         if (webCard?.cardIsPublished) {
-          if (profiles.length > 2 || webCardRequiresSubscription(webCard)) {
+          if (
+            profiles.length > 2 ||
+            webCardRequiresSubscription(webCard) ||
+            profile.contactCard?.company ||
+            profile.contactCard?.urls?.length
+          ) {
             const currentDate = new Date();
             //unpublished webCard
             const updates: Partial<WebCard> = {
