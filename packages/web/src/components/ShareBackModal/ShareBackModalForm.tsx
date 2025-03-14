@@ -244,7 +244,12 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
         </div>
         <ShareBackFormSubmitButton
           isDirty={form.dirty}
-          hasErrors={(form.errors?.length ?? 0) > 0}
+          hasErrors={
+            (form.errors?.length ?? 0) > 0 ||
+            (!fields.firstName.value &&
+              !fields.lastName.value &&
+              !fields.company.value)
+          }
           isSuccess={lastResult?.status === 'success'}
         />
       </form>
