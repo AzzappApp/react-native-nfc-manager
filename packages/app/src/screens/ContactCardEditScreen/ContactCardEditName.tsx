@@ -11,10 +11,10 @@ import type { Control } from 'react-hook-form';
 
 const ContactCardEditModalName = ({
   control,
-  isFirstnameMandatory,
+  isFirstNameMandatory,
 }: {
   control: Control<ContactCardFormValues>;
-  isFirstnameMandatory?: boolean;
+  isFirstNameMandatory?: boolean;
 }) => {
   const styles = useStyleSheet(styleSheet);
   const intl = useIntl();
@@ -31,7 +31,7 @@ const ContactCardEditModalName = ({
                 defaultMessage="First name"
                 description="First name registered for the contact card"
               />
-              {isFirstnameMandatory && <Text>*</Text>}
+              {isFirstNameMandatory && <Text>*</Text>}
             </Text>
             <TextInput
               value={value ?? ''}

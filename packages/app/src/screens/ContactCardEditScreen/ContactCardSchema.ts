@@ -61,7 +61,6 @@ export const contactCardSchema = z.object({
     .nullable(),
   webCardKind: z.string().optional().nullable(),
   companyActivityLabel: z.string().optional().nullable(),
-  companyUrl: z.string().optional().nullable(),
   primaryColor: z.string().optional().nullable(),
   expendableColor: z.string().optional().nullable(),
 });

@@ -153,6 +153,7 @@ const MultiUserAddModal = (
         id
         isMultiUser
         userName
+        isPremium
         commonInformation {
           company
           addresses {

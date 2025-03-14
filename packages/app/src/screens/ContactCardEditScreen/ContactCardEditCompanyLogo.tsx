@@ -13,6 +13,7 @@ import ImagePicker, {
   type ImagePickerResult,
 } from '#components/ImagePicker';
 import { ScreenModal } from '#components/NativeRouter';
+import PremiumIndicator from '#components/PremiumIndicator';
 import { buildContactStyleSheet } from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { saveTransformedImageToFile } from '#helpers/mediaEditions';
@@ -27,7 +28,13 @@ import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
 import type { Control } from 'react-hook-form';
 import type { ViewProps } from 'react-native';
 
-const ContactCardEditCompanyLogo = ({ control }: { control: Control<any> }) => {
+const ContactCardEditCompanyLogo = ({
+  control,
+  isPremium,
+}: {
+  control: Control<any>;
+  isPremium?: boolean | null;
+}) => {
   const styles = useStyleSheet(stylesheet);
 
   const { field: fieldCompany } = useController({
@@ -148,12 +155,18 @@ const ContactCardEditCompanyLogo = ({ control }: { control: Control<any> }) => {
         return (
           <>
             <View style={[styles.field, styles.container]}>
-              <Text variant="smallbold" style={styles.fieldTitle}>
-                <FormattedMessage
-                  defaultMessage="Company’s logo"
-                  description="ContactCardCreationScreen - Compoany Logo"
+              <View style={styles.titleContainer}>
+                <Text variant="smallbold" style={styles.fieldTitle}>
+                  <FormattedMessage
+                    defaultMessage="Company’s logo"
+                    description="ContactCardCreationScreen - Company Logo"
+                  />
+                </Text>
+                <PremiumIndicator
+                  isRequired={!isPremium}
+                  color={value ? undefined : colors.grey100}
                 />
-              </Text>
+              </View>
               <Text variant="smallbold" style={styles.descriptionText}>
                 <FormattedMessage
                   defaultMessage="We search for logos based on the information provided. Please select the logo you’d like to use for your company."
@@ -333,6 +346,12 @@ const stylesheet = createStyleSheet(appearance => ({
     paddingLeft: 10,
   },
   addButton: { tintColor: colors.green },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
 }));
 
 const imageLocalUrl = new Map<string, string>();

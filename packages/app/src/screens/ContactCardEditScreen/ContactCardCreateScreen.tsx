@@ -13,7 +13,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { useColorScheme, View, StyleSheet } from 'react-native';
 import * as mime from 'react-native-mime-types'; // FIXME import is verry big
 import Toast from 'react-native-toast-message';
-import { useMutation } from 'react-relay';
+import { useMutation, usePreloadedQuery } from 'react-relay';
 import { graphql, Observable } from 'relay-runtime';
 import ERRORS from '@azzapp/shared/errors';
 import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
@@ -39,6 +39,7 @@ import {
   extractPhoneNumberDetails,
   getPhonenumberWithCountryCode,
 } from '#helpers/phoneNumbersHelper';
+import relayScreen from '#helpers/relayScreen';
 import useBoolean from '#hooks/useBoolean';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
@@ -54,13 +55,27 @@ import {
 } from './ContactCardSchema';
 import type { CoverEditorState } from '#components/CoverEditor';
 import type { ScreenOptions } from '#components/NativeRouter';
+import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { ContactCardCreateScreenMutation } from '#relayArtifacts/ContactCardCreateScreenMutation.graphql';
+import type { ContactCardCreateScreenQuery } from '#relayArtifacts/ContactCardCreateScreenQuery.graphql';
 import type { ContactCardDetectorMutation$data } from '#relayArtifacts/ContactCardDetectorMutation.graphql';
 import type { ContactCardCreateRoute } from '#routes';
 import type { CountryCode } from 'libphonenumber-js';
 import type { ViewStyle } from 'react-native';
 
-const ContactCardCreateScreen = () => {
+export const contactCardCreateScreenQuery = graphql`
+  query ContactCardCreateScreenQuery {
+    currentUser {
+      ...ContactCardCreateForm_user
+    }
+  }
+`;
+
+const ContactCardCreateScreen = ({
+  preloadedQuery,
+}: RelayScreenProps<ContactCardCreateRoute, ContactCardCreateScreenQuery>) => {
+  const data = usePreloadedQuery(contactCardCreateScreenQuery, preloadedQuery);
+
   const styles = useStyleSheet(stylesheet);
 
   const [commit, loading] = useMutation<ContactCardCreateScreenMutation>(
@@ -318,10 +333,6 @@ const ContactCardCreateScreen = () => {
       const logoId =
         logo === null ? null : logo?.local ? uploadedLogoId : logo?.id;
 
-      const urls = data.companyUrl
-        ? [{ address: data.companyUrl, selected: true }, ...data.urls]
-        : data.urls;
-
       commit({
         variables: {
           primaryColor: data.primaryColor ?? colors.grey400,
@@ -342,7 +353,7 @@ const ContactCardCreateScreen = () => {
                     return { ...phoneNumber, number };
                   })
               : undefined,
-            urls: urls?.length ? urls : undefined,
+            urls: data.urls.filter(({ address }) => address),
             addresses: data.addresses
               ? data.addresses.filter(address => address.address)
               : undefined,
@@ -583,7 +594,7 @@ const ContactCardCreateScreen = () => {
           style={styles.scanBusinessCardButton}
         />
 
-        <ContactCardCreateForm control={control} />
+        <ContactCardCreateForm control={control} user={data.currentUser} />
         <ScreenModal
           visible={!!progressIndicator}
           gestureEnabled={false}
@@ -690,11 +701,15 @@ const stylesheet = createStyleSheet(appearance => ({
   },
 }));
 
-ContactCardCreateScreen.getScreenOptions = (): ScreenOptions => ({
+const ContactCardCreateRelayScreen = relayScreen(ContactCardCreateScreen, {
+  query: contactCardCreateScreenQuery,
+});
+
+ContactCardCreateRelayScreen.getScreenOptions = (): ScreenOptions => ({
   stackAnimation: 'slide_from_bottom',
 });
 
-export default ContactCardCreateScreen;
+export default ContactCardCreateRelayScreen;
 
 export const ScanMyPaperBusinessCard = ({
   onPress,

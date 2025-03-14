@@ -15,6 +15,7 @@ import ImagePicker, {
   SelectImageStepWithFrontCameraByDefault,
 } from '#components/ImagePicker';
 import { ScreenModal } from '#components/NativeRouter';
+import PremiumIndicator from '#components/PremiumIndicator';
 import {
   MAX_FIELD_HEIGHT,
   buildContactStyleSheet,
@@ -172,12 +173,19 @@ const ContactCardEditForm = ({
                     })}
                     ref={ref}
                   />
+                  <PremiumIndicator
+                    isRequired={!webCard?.isPremium}
+                    color={value ? undefined : colors.grey100}
+                  />
                 </View>
               )}
             />
           )}
           <Separation small />
-          <ContactCardEditCompanyLogo control={control} />
+          <ContactCardEditCompanyLogo
+            control={control}
+            isPremium={webCard?.isPremium}
+          />
           <Separation />
           {webCard?.isMultiUser &&
             commonInformation?.phoneNumbers?.map((phoneNumber, index) => (
@@ -226,7 +234,10 @@ const ContactCardEditForm = ({
                 <Separation small />
               </Fragment>
             ))}
-          <ContactCardEditModalUrls control={control} />
+          <ContactCardEditModalUrls
+            control={control}
+            isPremium={webCard?.isPremium}
+          />
           <Separation />
           {webCard?.isMultiUser &&
             commonInformation?.addresses?.map((address, index) => (

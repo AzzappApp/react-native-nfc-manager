@@ -48,6 +48,7 @@ const contactCardEditScreenQuery = graphql`
         webCard {
           userName
           isMultiUser
+          isPremium
           commonInformation {
             company
             addresses {

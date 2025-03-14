@@ -1,3 +1,4 @@
+import { colors } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 
 import Icon from '#ui/Icon';
@@ -26,8 +27,7 @@ const PremiumIndicator = ({
     <Icon
       icon="plus"
       size={size}
-      style={[styles.icon, style]}
-      {...(color && { tintColor: color })}
+      style={[styles.icon, style, { tintColor: color ?? colors.red400 }]}
     />
   );
 };
