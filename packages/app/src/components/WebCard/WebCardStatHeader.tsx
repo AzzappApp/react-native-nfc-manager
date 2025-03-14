@@ -33,7 +33,7 @@ const WebCardStatHeader = ({
         nbPosts
         nbFollowers
         nbFollowings
-        nbLikes
+        nbPostsLiked
         coverIsPredefined
         userName
         id
@@ -133,7 +133,7 @@ const WebCardStatHeader = ({
           style={styles.counterContainer}
           onPress={goToLikedPost}
         >
-          <Text variant="xlarge">{webCard?.nbLikes}</Text>
+          <Text variant="xlarge">{webCard?.nbPostsLiked}</Text>
           <Text variant="small" style={styles.counterValue} numberOfLines={1}>
             <FormattedMessage
               defaultMessage="{count, plural,
@@ -141,7 +141,7 @@ const WebCardStatHeader = ({
       =1 {Like}
       other {Likes}}"
               description="Number of Likes"
-              values={{ count: webCard?.nbLikes }}
+              values={{ count: webCard?.nbPostsLiked }}
             />
           </Text>
         </PressableOpacity>
