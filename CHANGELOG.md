@@ -1,3 +1,7 @@
+## 1.9.0-canary.27
+
+* **fix:**  - update button color in dark mode ([#7831](https://github.com/AzzappApp/azzapp/pull/7831))
+
 ## 1.9.0-canary.26
 
 
