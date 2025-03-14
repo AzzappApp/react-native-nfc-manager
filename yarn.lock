@@ -472,6 +472,7 @@ __metadata:
     react-native-share: "npm:^12.0.9"
     react-native-shared-group-preferences: "npm:^1.1.24"
     react-native-skottie-template-player: "workspace:^"
+    react-native-sortables: "npm:^1.3.2"
     react-native-svg: "npm:^15.11.2"
     react-native-tab-view: "npm:^4.0.5"
     react-native-toast-message: "patch:react-native-toast-message@npm%3A2.2.1#~/.yarn/patches/react-native-toast-message-npm-2.2.1-82329f0933.patch"
@@ -24860,7 +24861,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-haptic-feedback@npm:^2.3.3":
+"react-native-haptic-feedback@npm:>=2.0.0, react-native-haptic-feedback@npm:^2.3.3":
   version: 2.3.3
   resolution: "react-native-haptic-feedback@npm:2.3.3"
   peerDependencies:
@@ -25102,6 +25103,23 @@ __metadata:
     react-native: ">=0.71.0"
   languageName: unknown
   linkType: soft
+
+"react-native-sortables@npm:^1.3.2":
+  version: 1.3.2
+  resolution: "react-native-sortables@npm:1.3.2"
+  dependencies:
+    react-native-haptic-feedback: "npm:>=2.0.0"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+    react-native-gesture-handler: ">=2.0.0"
+    react-native-reanimated: ">=3.0.0"
+  dependenciesMeta:
+    react-native-haptic-feedback:
+      optional: true
+  checksum: 10/9be5481ed4cf2e004e59a39898ded94ecc438c340a4c66e2c5b183f8d3294d308cf04d31439e4d18c0e7936fccfa54ae1ce52626467e59415c03e747da2d08c8
+  languageName: node
+  linkType: hard
 
 "react-native-svg@npm:^15.11.2":
   version: 15.11.2

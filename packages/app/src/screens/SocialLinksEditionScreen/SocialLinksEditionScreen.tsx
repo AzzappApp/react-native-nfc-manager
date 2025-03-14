@@ -393,7 +393,7 @@ const SocialLinksEditionScreen = ({
         id: 'links',
         element: (
           <SocialLinksLinksEditionPanel
-            links={links}
+            initialLinks={links}
             onChangeLinks={onLinksChange}
             onAddLink={openAddLink}
             onItemPress={onLinkItemPress}

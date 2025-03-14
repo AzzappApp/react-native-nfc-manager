@@ -151,6 +151,7 @@
     "react-native-share": "^12.0.9",
     "react-native-shared-group-preferences": "^1.1.24",
     "react-native-skottie-template-player": "workspace:^",
+    "react-native-sortables": "^1.3.2",
     "react-native-svg": "^15.11.2",
     "react-native-tab-view": "^4.0.5",
     "react-native-toast-message": "patch:react-native-toast-message@npm%3A2.2.1#~/.yarn/patches/react-native-toast-message-npm-2.2.1-82329f0933.patch",
