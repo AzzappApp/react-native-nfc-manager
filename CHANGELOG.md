@@ -1,3 +1,7 @@
+## 1.9.0-canary.26
+
+
+
 ## 1.9.0-canary.25
 
 * **fix:**  - fix fallback stylings in MediaScreen ([#7894](https://github.com/AzzappApp/azzapp/pull/7894))
