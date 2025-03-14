@@ -1,3 +1,7 @@
+## 1.9.0-canary.21
+
+
+
 ## 1.9.0-canary.20
 
 * **fix:**  - move @react-native-community/cli* depenedency in devDependencies ([#7890](https://github.com/AzzappApp/azzapp/pull/7890))
