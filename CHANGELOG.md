@@ -1,3 +1,8 @@
+## 1.9.0-canary.23
+
+* **feat:**  - update paywall ([#7702](https://github.com/AzzappApp/azzapp/pull/7702))
+* **feat:**  - **payment:** [#7842](https://github.com/AzzappApp/azzapp/pull/7842) check company name & url on contact card ([#7844](https://github.com/AzzappApp/azzapp/pull/7844))
+
 ## 1.9.0-canary.22
 
 * **feat:**  - **payment:** limit to 2 webcards ([#7835](https://github.com/AzzappApp/azzapp/pull/7835))
