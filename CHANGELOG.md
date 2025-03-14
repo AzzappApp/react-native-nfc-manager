@@ -1,3 +1,7 @@
+## 1.9.0-canary.29
+
+* **feat:**  - **payment:** [#7889](https://github.com/AzzappApp/azzapp/pull/7889) check subscription on email signature ([#7906](https://github.com/AzzappApp/azzapp/pull/7906))
+
 ## 1.9.0-canary.28
 
 * **feat:**  - handle logo from commonformation ([#7862](https://github.com/AzzappApp/azzapp/pull/7862))

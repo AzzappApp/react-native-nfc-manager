@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/web",
-  "version": "1.9.0-canary.28",
+  "version": "1.9.0-canary.29",
   "private": true,
   "scripts": {
     "lint": "eslint .",
@@ -21,8 +21,8 @@
     "@azzapp/i18n": "workspace:^",
     "@azzapp/payment": "workspace:^",
     "@azzapp/schema": "workspace:^",
-    "@azzapp/shared": "workspace:^",
     "@azzapp/service": "workspace:^",
+    "@azzapp/shared": "workspace:^",
     "@conform-to/react": "^1.2.2",
     "@conform-to/zod": "^1.2.2",
     "@envelop/dataloader": "^6.0.0",
