@@ -11,11 +11,9 @@ import client from '#client';
 import {
   calculateAmount,
   calculateAmountForSeats,
-  calculateAzzappPlusPrice,
   calculateNextPaymentIntervalInMinutes,
   calculateTaxes,
   generateRebillFailRule,
-  getAzzappPlusPrice,
   getPricePerSeat,
   MONTHLY_RECURRENCE,
   YEARLY_RECURRENCE,
@@ -64,12 +62,8 @@ const calculateSubscriptionUpdate = async (
       existingSubscription.subscriptionPlan,
     );
 
-    const azzappPlusPrice = calculateAzzappPlusPrice(
-      existingSubscription.subscriptionPlan,
-    );
-
     const { amount: taxes, rate } = await calculateTaxes(
-      amountForSeats + azzappPlusPrice,
+      amountForSeats,
       existingSubscription.subscriberCountryCode ?? undefined,
       existingSubscription.subscriberVatNumber ?? undefined,
     );
@@ -78,12 +72,8 @@ const calculateSubscriptionUpdate = async (
       firstPayment: null,
       firstPaymentNbMonths: null,
       recurringCost: {
-        amount: amountForSeats + azzappPlusPrice,
+        amount: amountForSeats,
         amountForSeats,
-        azzappPlusPerMonth: getAzzappPlusPrice(
-          existingSubscription.subscriptionPlan,
-        ),
-        amountAzzappPlus: azzappPlusPrice,
         pricePerSeat: getPricePerSeat(existingSubscription.subscriptionPlan),
         taxes,
         taxRate: rate,
@@ -110,18 +100,9 @@ const calculateSubscriptionUpdate = async (
         Math.floor(YEARLY_RECURRENCE / MONTHLY_RECURRENCE),
     );
 
-    const azzappPlusPrice = calculateAzzappPlusPrice(
-      existingSubscription.subscriptionPlan,
-    );
-
-    const azzappPlusPriceForTheRestOfTheYear = Math.floor(
-      (azzappPlusPrice * intervalInMonths) /
-        Math.floor(YEARLY_RECURRENCE / MONTHLY_RECURRENCE),
-    );
-
     const { amount: taxesForTheRestOfTheYear, rate: rateForTheRestOfTheYear } =
       await calculateTaxes(
-        amountForSeatsForTheRestOfTheYear + azzappPlusPriceForTheRestOfTheYear,
+        amountForSeatsForTheRestOfTheYear,
         existingSubscription.subscriberCountryCode ?? undefined,
         existingSubscription.subscriberVatNumber ?? undefined,
       );
@@ -132,38 +113,28 @@ const calculateSubscriptionUpdate = async (
     );
 
     const { amount: taxes, rate } = await calculateTaxes(
-      amountForSeats + azzappPlusPrice,
+      amountForSeats,
       existingSubscription.subscriberCountryCode ?? undefined,
       existingSubscription.subscriberVatNumber ?? undefined,
     );
 
     const pricePerSeat = getPricePerSeat(existingSubscription.subscriptionPlan);
 
-    const azzappPlusPerMonth = getAzzappPlusPrice(
-      existingSubscription.subscriptionPlan,
-    );
-
     return {
       firstPayment:
         intervalInMonths > 0
           ? {
-              amount:
-                amountForSeatsForTheRestOfTheYear +
-                azzappPlusPriceForTheRestOfTheYear,
+              amount: amountForSeatsForTheRestOfTheYear,
               amountForSeats: amountForSeatsForTheRestOfTheYear,
               taxes: taxesForTheRestOfTheYear,
               taxRate: rateForTheRestOfTheYear,
-              amountAzzappPlus: azzappPlusPriceForTheRestOfTheYear,
-              azzappPlusPerMonth,
               pricePerSeat,
             }
           : undefined,
       firstPaymentNbMonths: intervalInMonths > 0 ? intervalInMonths : 0,
       recurringCost: {
-        amount: amountForSeats + azzappPlusPrice,
+        amount: amountForSeats,
         amountForSeats,
-        azzappPlusPerMonth,
-        amountAzzappPlus: azzappPlusPrice,
         pricePerSeat,
         taxes,
         taxRate: rate,

@@ -33,7 +33,7 @@ export const estimateSubscriptionCost: MutationResolvers['estimateSubscriptionCo
       vatNumber ?? undefined,
     );
 
-    return cost;
+    return { ...cost, amountAzzappPlus: 0, azzappPlusPerMonth: 0 };
   };
 
 export const estimateUpdateSubscriptionCost: MutationResolvers['estimateUpdateSubscriptionCost'] =
@@ -49,7 +49,21 @@ export const estimateUpdateSubscriptionCost: MutationResolvers['estimateUpdateSu
         totalSeats,
         subscription,
       });
-      return result;
+      return {
+        ...result,
+        firstPayment: result.firstPayment
+          ? {
+              ...result.firstPayment,
+              azzappPlusPerMonth: 0,
+              amountAzzappPlus: 0,
+            }
+          : null,
+        recurringCost: {
+          ...result.recurringCost,
+          azzappPlusPerMonth: 0,
+          amountAzzappPlus: 0,
+        },
+      };
     } catch (err) {
       throw new GraphQLError(ERRORS.PAYMENT_ERROR, {
         originalError: err as Error,

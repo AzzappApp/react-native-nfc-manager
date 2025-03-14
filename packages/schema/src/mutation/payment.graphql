@@ -93,11 +93,11 @@ type SubscriptionEstimation {
   """
   The amount of the azzapp plus per month
   """
-  azzappPlusPerMonth: Int!
+  azzappPlusPerMonth: Int! @deprecated(reason: "always 0")
   """
   The amount of the azzapp paid
   """
-  amountAzzappPlus: Int!
+  amountAzzappPlus: Int! @deprecated(reason: "always 0")
   """
   The price per seat
   """
