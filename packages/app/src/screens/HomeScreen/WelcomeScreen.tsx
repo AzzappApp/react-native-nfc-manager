@@ -24,7 +24,7 @@ import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { WelcomeScreenQuery } from '#relayArtifacts/WelcomeScreenQuery.graphql';
 import type { OnboardingRoute } from '#routes';
 
-const WelcomeScreen = ({
+export const WelcomeScreen = ({
   hasFocus,
   preloadedQuery,
 }: RelayScreenProps<OnboardingRoute, WelcomeScreenQuery>) => {
@@ -59,6 +59,8 @@ const WelcomeScreen = ({
         invited: newProfile.invited,
       });
       router.replace({ route: 'HOME' });
+    } else if (currentUser?.profiles?.length === 0) {
+      onChangeWebCard(null);
     }
     profilesCountRef.current = currentUser?.profiles?.length;
   }, [currentUser, router]);
