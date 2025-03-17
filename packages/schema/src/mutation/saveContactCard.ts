@@ -70,6 +70,7 @@ const saveContactCard: MutationResolvers['saveContactCard'] = async (
     contactCardHasCompanyName: !!updates.contactCard?.company,
     webCardIsPublished: webCard.cardIsPublished,
     contactCardHasUrl: !!updates.contactCard?.urls?.length,
+    contactCardHasLogo: !!updates.logoId,
   });
 
   try {

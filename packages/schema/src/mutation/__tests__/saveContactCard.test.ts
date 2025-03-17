@@ -164,7 +164,11 @@ describe('saveContactCard', () => {
       {},
       {
         profileId: 'global-profile-123',
-        contactCard: { avatarId: 'new-avatar' },
+        contactCard: {
+          avatarId: 'new-avatar',
+          logoId: 'new-logo',
+          company: 'name',
+        },
       },
       mockContext,
       mockInfo,
@@ -172,9 +176,10 @@ describe('saveContactCard', () => {
 
     expect(validateCurrentSubscription).toHaveBeenCalledWith('user-456', {
       action: 'UPDATE_CONTACT_CARD',
-      contactCardHasCompanyName: false,
+      contactCardHasCompanyName: true,
       webCardIsPublished: true,
       contactCardHasUrl: false,
+      contactCardHasLogo: true,
     });
   });
 

@@ -124,6 +124,7 @@ type FeatureParams =
       webCardIsPublished: boolean;
       contactCardHasCompanyName: boolean;
       contactCardHasUrl: boolean;
+      contactCardHasLogo: boolean;
     }
   | {
       action: 'UPDATE_MULTI_USER';
@@ -226,7 +227,8 @@ export const validateCurrentSubscription = async (
       if (
         params.action === 'UPDATE_CONTACT_CARD' &&
         !params.contactCardHasCompanyName &&
-        !params.contactCardHasUrl
+        !params.contactCardHasUrl &&
+        !params.contactCardHasLogo
       ) {
         return;
       }

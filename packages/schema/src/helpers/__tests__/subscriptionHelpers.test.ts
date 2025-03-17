@@ -231,4 +231,76 @@ describe('Subscription Helpers', () => {
       });
     });
   });
+
+  describe('validateCurrentSubscription - UPDATE_CONTACT_CARD', () => {
+    test('should throw SUBSCRIPTION_REQUIRED if no active subscription and contact card has company name', async () => {
+      (getActiveUserSubscriptions as jest.Mock).mockResolvedValue([]);
+
+      await expect(
+        validateCurrentSubscription('user-1', {
+          action: 'UPDATE_CONTACT_CARD',
+          webCardIsPublished: true,
+          contactCardHasCompanyName: true,
+          contactCardHasUrl: false,
+          contactCardHasLogo: false,
+        }),
+      ).rejects.toThrow(new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED));
+    });
+
+    test('should throw SUBSCRIPTION_REQUIRED if no active subscription and contact card has a URL', async () => {
+      (getActiveUserSubscriptions as jest.Mock).mockResolvedValue([]);
+
+      await expect(
+        validateCurrentSubscription('user-1', {
+          action: 'UPDATE_CONTACT_CARD',
+          webCardIsPublished: true,
+          contactCardHasCompanyName: false,
+          contactCardHasUrl: true,
+          contactCardHasLogo: false,
+        }),
+      ).rejects.toThrow(new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED));
+    });
+
+    test('should throw SUBSCRIPTION_REQUIRED if no active subscription and contact card has a logo', async () => {
+      (getActiveUserSubscriptions as jest.Mock).mockResolvedValue([]);
+
+      await expect(
+        validateCurrentSubscription('user-1', {
+          action: 'UPDATE_CONTACT_CARD',
+          webCardIsPublished: true,
+          contactCardHasCompanyName: false,
+          contactCardHasUrl: false,
+          contactCardHasLogo: true,
+        }),
+      ).rejects.toThrow(new GraphQLError(ERRORS.SUBSCRIPTION_REQUIRED));
+    });
+
+    test('should allow UPDATE_CONTACT_CARD without a subscription if contact card has no company name, URL, or logo', async () => {
+      await expect(
+        validateCurrentSubscription('user-1', {
+          action: 'UPDATE_CONTACT_CARD',
+          webCardIsPublished: true,
+          contactCardHasCompanyName: false,
+          contactCardHasUrl: false,
+          contactCardHasLogo: false,
+        }),
+      ).resolves.toBeUndefined();
+    });
+
+    test('should allow UPDATE_CONTACT_CARD if user has an active subscription', async () => {
+      (getActiveUserSubscriptions as jest.Mock).mockResolvedValue([
+        { subscriptionPlan: 'web.yearly', userId: 'user-1' },
+      ]);
+
+      await expect(
+        validateCurrentSubscription('user-1', {
+          action: 'UPDATE_CONTACT_CARD',
+          webCardIsPublished: true,
+          contactCardHasCompanyName: true,
+          contactCardHasUrl: true,
+          contactCardHasLogo: true,
+        }),
+      ).resolves.not.toThrow();
+    });
+  });
 });
