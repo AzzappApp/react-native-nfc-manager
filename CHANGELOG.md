@@ -1,3 +1,8 @@
+## 1.9.0-canary.37
+
+* **fix:**  - refresh properly in all case contact screen ([#7937](https://github.com/AzzappApp/azzapp/pull/7937))
+* **fix:**  - **emailSignature:** [#7893](https://github.com/AzzappApp/azzapp/pull/7893) translate email ([#7925](https://github.com/AzzappApp/azzapp/pull/7925))
+
 ## 1.9.0-canary.36
 
 * **fix:**  - add border on android bottom tab item ([#7929](https://github.com/AzzappApp/azzapp/pull/7929))
