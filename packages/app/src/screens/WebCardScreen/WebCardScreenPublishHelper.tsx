@@ -1,9 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import { View } from 'react-native';
-import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
-import ERRORS from '@azzapp/shared/errors';
 import { buildReadableUserUrl } from '@azzapp/shared/urlHelpers';
 import { colors, shadow } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
@@ -14,6 +12,7 @@ import {
 } from '#components/NativeRouter';
 import PremiumIndicator from '#components/PremiumIndicator';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import useOnSubscriptionError from '#hooks/useOnSubscriptionError';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -40,6 +39,9 @@ const WebCardScreenPublishHelper = ({
         cardIsPublished
         requiresSubscription
         isPremium
+        subscription {
+          issuer
+        }
         ...CoverRenderer_webCard
       }
     `,
@@ -53,8 +55,6 @@ const WebCardScreenPublishHelper = ({
     requiresSubscription,
     isPremium,
   } = webCard;
-
-  const intl = useIntl();
 
   const [commit, publishing] = useMutation<WebCardScreenPublishHelperMutation>(
     graphql`
@@ -84,6 +84,10 @@ const WebCardScreenPublishHelper = ({
     editingRef.current = editing;
   }, [cardIsPublished, editing]);
 
+  const onError = useOnSubscriptionError(
+    webCard?.subscription?.issuer === 'web',
+  );
+
   const onPublish = () => {
     if (requiresSubscription && !isPremium) {
       router.push({ route: 'USER_PAY_WALL' });
@@ -101,33 +105,7 @@ const WebCardScreenPublishHelper = ({
         setShowPublishModal(false);
         router.backToTop();
       },
-      onError: error => {
-        if (error.message === ERRORS.SUBSCRIPTION_INSUFFICIENT_SEATS) {
-          Toast.show({
-            type: 'error',
-            text1: intl.formatMessage({
-              defaultMessage:
-                'Error, not enough users available in you subscription to publish this webcard, please upgrade your subscription',
-              description:
-                'Toast Error message when user tries to publish a webcard but has not enough seats',
-            }),
-          });
-          return;
-        }
-        Toast.show({
-          type: 'error',
-          text1: intl.formatMessage(
-            {
-              defaultMessage:
-                'Error, could not publish your WebCard{azzappA}, try again later',
-              description: 'Publish modal error toast',
-            },
-            {
-              azzappA: <Text variant="azzapp">a</Text>,
-            },
-          ) as unknown as string,
-        });
-      },
+      onError,
     });
   };
 

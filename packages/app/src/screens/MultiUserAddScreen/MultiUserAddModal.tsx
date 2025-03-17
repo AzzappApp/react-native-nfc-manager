@@ -32,6 +32,7 @@ import {
 } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import { parsePhoneNumber } from '#helpers/phoneNumbersHelper';
+import useOnSubscriptionError from '#hooks/useOnSubscriptionError';
 import ContactCardEditForm from '#screens/ContactCardEditScreen/ContactCardEditForm';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -154,6 +155,9 @@ const MultiUserAddModal = (
         isMultiUser
         userName
         isPremium
+        subscription {
+          issuer
+        }
         commonInformation {
           company
           addresses {
@@ -378,6 +382,10 @@ const MultiUserAddModal = (
     `,
   );
 
+  const onSubscriptionError = useOnSubscriptionError(
+    webCard.subscription?.issuer === 'web',
+  );
+
   const submit = handleSubmit(
     async value => {
       const { profileInfos } = getAuthState();
@@ -534,37 +542,9 @@ const MultiUserAddModal = (
                     'Error toast message when inviting user that is already a member from MultiUserAddModal',
                 }),
               });
-            } else if (e.message === ERRORS.SUBSCRIPTION_REQUIRED) {
-              Toast.show({
-                type: 'error',
-                text1: intl.formatMessage({
-                  defaultMessage: 'Error, you don’t have a subscription',
-                  description:
-                    'Error toast message when inviting user without subscription from MultiUserAddModal',
-                }),
-              });
-            } else if (e.message === ERRORS.SUBSCRIPTION_INSUFFICIENT_SEATS) {
-              Toast.show({
-                type: 'error',
-                text1: intl.formatMessage({
-                  defaultMessage:
-                    'Error, you don’t have enough seats in your subscription to invite this user',
-                  description:
-                    'Error toast message when inviting user without correct subscription from MultiUserAddModal',
-                }),
-              });
-            } else {
-              console.warn(e);
-              Toast.show({
-                type: 'error',
-                text1: intl.formatMessage({
-                  defaultMessage:
-                    'Error, could not invite user. Please try again.',
-                  description:
-                    'Error toast message when inviting user from MultiUserAddModal',
-                }),
-              });
+              return;
             }
+            onSubscriptionError(e);
           },
           updater: (store, data) => {
             const invitedProfile = data?.inviteUser?.profile;

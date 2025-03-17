@@ -10,6 +10,7 @@ import { getAuthState } from '#helpers/authStore';
 import { profileInfoHasAdminRight } from '#helpers/profileRoleHelper';
 import { getRelayEnvironment } from '#helpers/relayEnvironment';
 import useHandleProfileActionError from '#hooks/useHandleProfileError';
+import useOnSubscriptionError from '#hooks/useOnSubscriptionError';
 import Button from '#ui/Button';
 import Icon from '#ui/Icon';
 import Text from '#ui/Text';
@@ -36,6 +37,9 @@ const HomeBottomPanelPublish = ({ profile }: HomeBottomPanelPublishProps) => {
         azzappA: <Text variant="azzapp">a</Text>,
       },
     ) as unknown as string,
+  );
+  const onSubscriptionError = useOnSubscriptionError(
+    profile.webCard?.subscription?.issuer === 'google',
   );
   const router = useRouter();
 
@@ -108,7 +112,6 @@ const HomeBottomPanelPublish = ({ profile }: HomeBottomPanelPublishProps) => {
           },
         },
       },
-
       onCompleted: (_, error) => {
         if (error) {
           // TODO - handle error
@@ -130,9 +133,10 @@ const HomeBottomPanelPublish = ({ profile }: HomeBottomPanelPublishProps) => {
       },
       onError: error => {
         handleProfileActionError(error);
+        onSubscriptionError(error);
       },
     });
-  }, [handleProfileActionError, intl, profile, router]);
+  }, [handleProfileActionError, intl, onSubscriptionError, profile, router]);
 
   return (
     <>

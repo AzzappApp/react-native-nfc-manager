@@ -54,6 +54,9 @@ const HomeBottomPanelMessage = ({
             email
             phoneNumber
           }
+          subscription {
+            issuer
+          }
           requiresSubscription
           isPremium
           id

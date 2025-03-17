@@ -114,6 +114,9 @@ const CarouselEditionScreen = ({
             light
             dark
           }
+          subscription {
+            issuer
+          }
           cardStyle {
             borderColor
             borderRadius

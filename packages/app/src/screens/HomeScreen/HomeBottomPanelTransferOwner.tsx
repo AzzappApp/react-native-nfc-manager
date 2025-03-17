@@ -8,7 +8,6 @@ import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import { onChangeWebCard } from '#helpers/authStore';
 import { getRelayEnvironment } from '#helpers/relayEnvironment';
-
 import Button from '#ui/Button';
 import Text from '#ui/Text';
 import type { HomeBottomPanel_user$data } from '#relayArtifacts/HomeBottomPanel_user.graphql';

@@ -14,10 +14,10 @@ import { isWebCardKindSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { colors, textStyles } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import PremiumIndicator from '#components/PremiumIndicator';
-import { getAuthState } from '#helpers/authStore';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { keyExtractor } from '#helpers/idHelpers';
 import relayScreen from '#helpers/relayScreen';
+import useOnSubscriptionError from '#hooks/useOnSubscriptionError';
 import useQuitWebCard from '#hooks/useQuitWebCard';
 import useToggle from '#hooks/useToggle';
 import Container from '#ui/Container';
@@ -40,7 +40,6 @@ import type { WebCardParametersScreenQuery } from '#relayArtifacts/WebCardParame
 import type { WebCardParametersScreenUnPublishMutation } from '#relayArtifacts/WebCardParametersScreenUnPublishMutation.graphql';
 import type { WebCardParametersRoute } from '#routes';
 import type { WebCardKind } from '@azzapp/shared/webCardKind';
-import type { GraphQLError } from 'graphql';
 import type { ReactNode } from 'react';
 
 const webCardParametersScreenQuery = graphql`
@@ -89,6 +88,9 @@ const WebCardParametersScreen = ({
         hasCover
         requiresSubscription
         isPremium
+        subscription {
+          issuer
+        }
         firstName
         lastName
         companyName
@@ -123,6 +125,10 @@ const WebCardParametersScreen = ({
       }
     `);
 
+  const onError = useOnSubscriptionError(
+    webCard?.subscription?.issuer === 'web',
+  );
+
   const onChangeIsPublished = useCallback(
     (published: boolean) => {
       if (!webCard) {
@@ -144,59 +150,10 @@ const WebCardParametersScreen = ({
             },
           },
         },
-        onError: error => {
-          if (error.message === ERRORS.SUBSCRIPTION_REQUIRED) {
-            const profileInfos = getAuthState()?.profileInfos;
-            if (profileInfos?.profileRole === 'owner') {
-              router.push({ route: 'USER_PAY_WALL' });
-              return;
-            } else {
-              Toast.show({
-                type: 'error',
-                text1: intl.formatMessage(
-                  {
-                    defaultMessage:
-                      'Please contact the owner of this WebCard{azzappA}. There is an issue on his/her azzapp+ subscription.',
-                    description:
-                      'Error toast when a non-owner is trying to publish a WebCard from parameters without subscription',
-                  },
-                  {
-                    azzappA: <Text variant="azzapp">a</Text>,
-                  },
-                ) as unknown as string,
-              });
-              return;
-            }
-          }
-          if (error.message === ERRORS.SUBSCRIPTION_INSUFFICIENT_SEATS) {
-            Toast.show({
-              type: 'error',
-              text1: intl.formatMessage({
-                defaultMessage:
-                  'Error, not enough users available in you subscription to publish this webcard, please upgrade your subscription',
-                description:
-                  'Toast Error message when user tries to publish a webcard but has not enough seats',
-              }),
-            });
-            return;
-          }
-          Toast.show({
-            type: 'error',
-            text1: intl.formatMessage(
-              {
-                defaultMessage:
-                  'Oops, the WebCard{azzappA} could not be updated.',
-                description: 'Error toast message when saving webCard failed',
-              },
-              {
-                azzappA: <Text variant="azzapp">a</Text>,
-              },
-            ) as unknown as string,
-          });
-        },
+        onError,
       });
     },
-    [commitToggleWebCardPublished, intl, router, webCard],
+    [commitToggleWebCardPublished, onError, webCard],
   );
 
   const [commitUpdateWebCard] = useMutation<WebCardParametersScreenMutation>(
@@ -262,57 +219,10 @@ const WebCardParametersScreen = ({
             webCardKind: webCardCategory.id,
           },
         },
-        onError: error => {
-          const response = (
-            'response' in error ? error.response : undefined
-          ) as { errors: GraphQLError[] } | undefined;
-          if (
-            response?.errors.some(
-              r =>
-                r.message === ERRORS.SUBSCRIPTION_REQUIRED ||
-                r.message === ERRORS.SUBSCRIPTION_INSUFFICIENT_SEATS,
-            )
-          ) {
-            const profileInfos = getAuthState()?.profileInfos;
-            if (profileInfos?.profileRole === 'owner') {
-              router.push({ route: 'USER_PAY_WALL' });
-              return;
-            } else {
-              Toast.show({
-                type: 'error',
-                text1: intl.formatMessage(
-                  {
-                    defaultMessage:
-                      'Please contact the owner of this WebCard{azzappA}. There is an issue on his/her azzapp+ subscription.',
-                    description:
-                      'Error toast when a non-owner is trying to update a WebCard from parameters without subscription',
-                  },
-                  {
-                    azzappA: <Text variant="azzapp">a</Text>,
-                  },
-                ) as unknown as string,
-              });
-              return;
-            }
-          } else {
-            Toast.show({
-              type: 'error',
-              text1: intl.formatMessage(
-                {
-                  defaultMessage:
-                    'Oops, the WebCard{azzappA} could not be updated.',
-                  description: 'Error toast message when saving webCard failed',
-                },
-                {
-                  azzappA: <Text variant="azzapp">a</Text>,
-                },
-              ) as unknown as string,
-            });
-          }
-        },
+        onError,
       });
     },
-    [commitUpdateWebCard, intl, router, webCard],
+    [commitUpdateWebCard, onError, webCard],
   );
 
   const canChangeUserName = useMemo(() => {
