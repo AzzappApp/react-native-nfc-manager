@@ -66,6 +66,7 @@ const commonInformationScreenQuery = graphql`
           id
           uri(width: 180, pixelRatio: $pixelRatio)
         }
+        isPremium
         commonInformation {
           company
           emails {
@@ -188,6 +189,7 @@ export const CommonInformationScreen = ({
             id
             uri(width: 180, pixelRatio: $pixelRatio)
           }
+          isPremium
           commonInformation {
             company
             emails {
@@ -389,7 +391,10 @@ export const CommonInformationScreen = ({
               </View>
             )}
           />
-          <ContactCardEditCompanyLogo control={control} />
+          <ContactCardEditCompanyLogo
+            control={control}
+            isPremium={webCard?.isPremium}
+          />
           <Separation />
           <CommonInformationAddresses control={control} />
           <Separation />
