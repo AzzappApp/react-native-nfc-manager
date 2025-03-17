@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet } from 'react-native';
-import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Toast from 'react-native-toast-message';
 import { graphql, useMutation, usePaginationFragment } from 'react-relay';
 import { useDebounce } from 'use-debounce';
@@ -37,7 +36,7 @@ const FollowersScreenList = ({
         @refetchable(queryName: "FollowersListScreenQuery")
         @argumentDefinitions(
           after: { type: String }
-          first: { type: Int, defaultValue: 10 }
+          first: { type: Int, defaultValue: 50 }
           userName: { type: String, defaultValue: "" }
         ) {
           followers(after: $after, first: $first, userName: $userName)
@@ -57,7 +56,7 @@ const FollowersScreenList = ({
   useEffect(() => {
     // We need to refetch to see new coming followers (specially when we follow another webCard we have)
     refetch(
-      { first: 10, after: null },
+      { first: 50, after: null },
       {
         fetchPolicy: 'store-and-network',
       },
@@ -68,7 +67,7 @@ const FollowersScreenList = ({
 
   const onEndReached = useCallback(() => {
     if (!isLoadingNext && hasNext && !isRefreshing) {
-      loadNext(10);
+      loadNext(50);
     }
   }, [isLoadingNext, hasNext, isRefreshing, loadNext]);
 
@@ -147,7 +146,7 @@ const FollowersScreenList = ({
     if (debouncedSearch) {
       setIsRefreshing(true);
       const { dispose } = refetch(
-        { first: 10, userName: debouncedSearch, after: null },
+        { first: 50, userName: debouncedSearch, after: null },
         {
           fetchPolicy: 'store-and-network',
           onComplete() {
@@ -166,16 +165,14 @@ const FollowersScreenList = ({
   );
 
   return (
-    <KeyboardAvoidingView behavior="padding" style={styles.flex}>
-      <WebCardList
-        users={convertToNonNullArray(
-          data?.followers.edges?.map(edge => edge?.node) ?? [],
-        )}
-        onEndReached={onEndReached}
-        onToggleFollow={onToggleFollow}
-        ListEmptyComponent={<FollowersScreenListEmpty />}
-      />
-    </KeyboardAvoidingView>
+    <WebCardList
+      users={convertToNonNullArray(
+        data?.followers.edges?.map(edge => edge?.node) ?? [],
+      )}
+      onEndReached={onEndReached}
+      onToggleFollow={onToggleFollow}
+      ListEmptyComponent={<FollowersScreenListEmpty />}
+    />
   );
 };
 
@@ -228,6 +225,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  flex: { flex: 1 },
 });
 export default FollowersScreenList;

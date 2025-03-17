@@ -1,8 +1,8 @@
 import * as Contacts from 'expo-contacts';
 import { Image } from 'expo-image';
 import { memo, useEffect, useMemo, useState } from 'react';
-import { FlatList, Platform, StyleSheet, View } from 'react-native';
-import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
+import { FlatList, StyleSheet, View } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import { getContactsAsync } from '#helpers/getLocalContactsMap';
@@ -109,17 +109,13 @@ const MultiUserAddList = ({
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      style={styles.flex}
-    >
-      <FlatList<Contacts.Contact>
-        data={contactData}
-        renderItem={renderItem}
-        keyExtractor={keyExtractor}
-        keyboardShouldPersistTaps="always"
-      />
-    </KeyboardAvoidingView>
+    <FlatList<Contacts.Contact>
+      data={contactData}
+      renderItem={renderItem}
+      keyExtractor={keyExtractor}
+      keyboardShouldPersistTaps="always"
+      renderScrollComponent={props => <KeyboardAwareScrollView {...props} />}
+    />
   );
 };
 
@@ -127,9 +123,6 @@ const keyExtractor = (item: Contacts.Contact) => item.id ?? item.name;
 
 const AVATAR_SIZE = 56;
 const styles = StyleSheet.create({
-  flex: {
-    flex: 1,
-  },
   contact: {
     flexDirection: 'row',
     alignItems: 'center',

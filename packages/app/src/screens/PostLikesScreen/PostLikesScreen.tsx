@@ -1,6 +1,5 @@
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
-import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { useRouter } from '#components/NativeRouter';
 import relayScreen from '#helpers/relayScreen';
@@ -40,31 +39,29 @@ const PostLikesScreen = ({
         { paddingBottom: insets.bottom, paddingTop: insets.top },
       ]}
     >
-      <KeyboardAvoidingView behavior="padding" style={styles.container}>
-        <Header
-          middleElement={intl.formatMessage(
-            {
-              defaultMessage: `{likes, plural,
+      <Header
+        middleElement={intl.formatMessage(
+          {
+            defaultMessage: `{likes, plural,
               =0 {0 likes}
               =1 {# like}
               other {# likes}
             }`,
-              description: 'Post Likes header title',
-            },
-            { likes: post?.counterReactions },
-          )}
-          leftElement={
-            <IconButton
-              icon="arrow_down"
-              onPress={router.back}
-              iconSize={30}
-              size={47}
-              style={{ borderWidth: 0 }}
-            />
-          }
-        />
-        {post && <PostLikesList style={styles.likes} post={post} />}
-      </KeyboardAvoidingView>
+            description: 'Post Likes header title',
+          },
+          { likes: post?.counterReactions },
+        )}
+        leftElement={
+          <IconButton
+            icon="arrow_down"
+            onPress={router.back}
+            iconSize={30}
+            size={47}
+            style={{ borderWidth: 0 }}
+          />
+        }
+      />
+      {post && <PostLikesList style={styles.likes} post={post} />}
     </Container>
   );
 };

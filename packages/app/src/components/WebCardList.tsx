@@ -1,6 +1,7 @@
 import { memo, useCallback } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { FlatList, View } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import Animated from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -133,6 +134,7 @@ const WebCardList = ({
       getItemLayout={getItemLayout}
       ListEmptyComponent={ListEmptyComponent}
       ListFooterComponent={<View style={styles.footer} />}
+      renderScrollComponent={props => <KeyboardAwareScrollView {...props} />}
     />
   );
 };
