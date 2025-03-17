@@ -1,3 +1,7 @@
+## 1.9.0-canary.35
+
+* **fix:**  - **android:** [#7879](https://github.com/AzzappApp/azzapp/pull/7879) user filter on social links ([#7927](https://github.com/AzzappApp/azzapp/pull/7927))
+
 ## 1.9.0-canary.34
 
 * **build:**  - upgrade native deps ([#7921](https://github.com/AzzappApp/azzapp/pull/7921))
