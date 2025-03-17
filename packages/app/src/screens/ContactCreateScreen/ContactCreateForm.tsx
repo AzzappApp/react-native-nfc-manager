@@ -176,7 +176,7 @@ const ContactCreateForm = ({ control, scanImage }: ContactCreateFormProps) => {
           />
 
           <Separation small />
-          <ContactCardEditCompanyLogo control={control} />
+          <ContactCardEditCompanyLogo control={control} isPremium />
           <Separation />
           <ContactEditPhones control={control} />
           <Separation />
