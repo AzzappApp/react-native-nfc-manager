@@ -1,5 +1,3 @@
-/* eslint-disable formatjs/no-multiple-whitespaces */
-/* eslint-disable formatjs/enforce-placeholders */
 import { GraphQLError } from 'graphql';
 import { getUserById, getProfileWithWebCardById } from '@azzapp/data';
 import { buildAvatarUrl } from '@azzapp/service/mediaServices';
@@ -98,14 +96,8 @@ const generateEmailSignature: MutationResolvers['generateEmailSignature'] =
                   'Embrace the benefits of a custom dynamic email signature',
               }),
               start: intl.formatMessage({
-                defaultMessage: `
-                 Start using now a dynamic email signature and allow email recipients to instantly save your details directly to their phone (and possibly share with others).<br><br>
-                                            > Maximise networking<br>
-                                            > Enable two-way contact sharing to collect leads<br>
-                                            > Drive clicks to your social networks, website…<br>
-                                            > Make a lasting impression<br>
-                                             `,
-                id: 'DvJIgc',
+                defaultMessage: ` Start using now a dynamic email signature and allow email recipients to instantly save your details directly to their phone (and possibly share with others).<br/><br/> > Maximise networking<br/> > Enable two-way contact sharing to collect leads<br/> > Drive clicks to your social networks, website…<br/> > Make a lasting impression<br/> `,
+                id: '2tKhB9',
                 description:
                   'Start of the email sent to the user when generating an email signature',
               }),
@@ -161,20 +153,14 @@ const generateEmailSignature: MutationResolvers['generateEmailSignature'] =
                   'Action button to add a new signature to the email',
               }),
               believe: intl.formatMessage({
-                defaultMessage: `
-                We believe these enhancements will not only add a modern touch to your emails but also make it easier for your contacts to connect with you.<br>
-                                            <br>
-                                            Thank you for choosing azzapp to elevate your email experience.<br>
-                                            `,
-                id: 'cQOb1p',
+                defaultMessage: ` We believe these enhancements will not only add a modern touch to your emails but also make it easier for your contacts to connect with you.<br/> <br/> Thank you for choosing azzapp to elevate your email experience.<br/> `,
+                id: 'EDZb54',
                 description:
                   'End of the email sent to the user when generating an email signature',
               }),
               question: intl.formatMessage({
-                defaultMessage: `If you have any questions or need
-                                            assistance, feel free to reach out.<br>
-                                            Enjoy using azzapp!`,
-                id: 'IL+TLR',
+                defaultMessage: `If you have any questions or need assistance, feel free to reach out.<br/> Enjoy using azzapp!`,
+                id: 'ARm/k4',
                 description:
                   'Question at the end of the email sent to the user when generating an email signature',
               }),
