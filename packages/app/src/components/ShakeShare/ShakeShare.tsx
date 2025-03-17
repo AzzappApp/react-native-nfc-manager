@@ -1,8 +1,5 @@
 import EventEmitter from 'events';
-import {
-  BottomSheetModalProvider,
-  BottomSheetScrollView,
-} from '@gorhom/bottom-sheet';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import {
   BlendColor,
   Canvas,
@@ -18,6 +15,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useCallback, useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet, Dimensions, Platform } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import {
   SensorType,
   runOnJS,
@@ -189,7 +187,7 @@ const ShakeShareDisplay = ({
 
   return (
     <View style={styles.container}>
-      <BottomSheetScrollView>
+      <ScrollView>
         <CoverRenderer
           width={width}
           webCard={webCard}
@@ -280,7 +278,7 @@ const ShakeShareDisplay = ({
             )}
           </View>
         )}
-      </BottomSheetScrollView>
+      </ScrollView>
       <View style={styles.closeButtonContainer}>
         <LinearGradient
           colors={['rgba(0, 0, 0,0)', 'rgba(0, 0, 0, 1)']}
