@@ -79,7 +79,7 @@ PODS:
   - EXImageLoader (5.0.0):
     - ExpoModulesCore
     - React-Core
-  - Expo (52.0.37):
+  - Expo (52.0.39):
     - ExpoModulesCore
   - ExpoAsset (11.0.4):
     - ExpoModulesCore
@@ -111,7 +111,7 @@ PODS:
     - ExpoModulesCore
   - ExpoLinearGradient (14.0.2):
     - ExpoModulesCore
-  - ExpoModulesCore (2.2.2):
+  - ExpoModulesCore (2.2.3):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -309,8 +309,8 @@ PODS:
   - nanopb/decode (3.30910.0)
   - nanopb/encode (3.30910.0)
   - PromisesObjC (2.4.0)
-  - PurchasesHybridCommon (13.22.0):
-    - RevenueCat (= 5.18.0)
+  - PurchasesHybridCommon (13.25.0):
+    - RevenueCat (= 5.19.0)
   - RCT-Folly (2024.11.18.00):
     - boost
     - DoubleConversion
@@ -1788,7 +1788,7 @@ PODS:
     - React
     - React-Core
     - react-native-skia
-  - react-native-webview (13.13.3):
+  - react-native-webview (13.13.4):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2098,7 +2098,7 @@ PODS:
     - React-logger (= 0.77.1)
     - React-perflogger (= 0.77.1)
     - React-utils (= 0.77.1)
-  - RevenueCat (5.18.0)
+  - RevenueCat (5.19.0)
   - RNBootSplash (6.3.3):
     - DoubleConversion
     - glog
@@ -2176,7 +2176,7 @@ PODS:
     - FirebaseCoreExtension
     - React-Core
     - RNFBApp
-  - RNFlashList (1.7.3):
+  - RNFlashList (1.7.5):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2281,8 +2281,8 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNPurchases (8.8.0):
-    - PurchasesHybridCommon (= 13.22.0)
+  - RNPurchases (8.8.1):
+    - PurchasesHybridCommon (= 13.25.0)
     - React-Core
   - RNReactNativeHapticFeedback (2.3.3):
     - DoubleConversion
@@ -2471,7 +2471,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNSentry (6.9.0):
+  - RNSentry (6.9.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -3009,7 +3009,7 @@ SPEC CHECKSUMS:
   EXAV: 4c41f0a6ae54a0b96597abc90e37962ab2ee0d85
   EXConstants: 30c43b9ca8391c31bab9cc45c97f16eddcf11042
   EXImageLoader: e5da974e25b13585c196b658a440720c075482d5
-  Expo: 63515728b6f238842dc95702eb0fb385f00d7c5a
+  Expo: dc113fa18a3212dfdab60fc543b052ef4299f8a9
   ExpoAsset: 4033893dfb333b444bf45e951351254137b658d5
   ExpoBlur: 392c1207f71d0ecf22371621c1fbd44ba84d9742
   ExpoClipboard: 44fd1c8959ee8f6175d059dc011b154c9709a969
@@ -3022,7 +3022,7 @@ SPEC CHECKSUMS:
   ExpoImageManipulator: 4aca9cc1d84e31f62a7e8075c19026d3ad62f852
   ExpoKeepAwake: b0171a73665bfcefcfcc311742a72a956e6aa680
   ExpoLinearGradient: 35ebd83b16f80b3add053a2fd68cc328ed927f60
-  ExpoModulesCore: 3df312dd803e75d8e42ba6ca2e7fd9224110f25e
+  ExpoModulesCore: 5f742a35aa7861bb7d9cde9a2f64ef62032355f5
   ExpoQuickActions: 3fa116b4efea5baf19edb142f0b612a75c30265f
   ExpoSensors: 02a52ddab1e3a8a1438258c3d87d1ee5f721743a
   fast_float: 06eeec4fe712a76acc9376682e4808b05ce978b6
@@ -3048,7 +3048,7 @@ SPEC CHECKSUMS:
   lottie-react-native: 28e5b80459ee6723917995556657e54b98bb16bc
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
-  PurchasesHybridCommon: 16367f792481e8e2d61101ecb607b566937aa67f
+  PurchasesHybridCommon: f27e7fe57a9934319373b10c260db5d6c10bbb64
   RCT-Folly: e78785aa9ba2ed998ea4151e314036f6c49e6d82
   RCTDeprecation: 664055db806cce35c3c1b43c84414dd66e117ae6
   RCTRequired: dc9a83fa1012054f94430d210337ca3a1afe6fc0
@@ -3092,7 +3092,7 @@ SPEC CHECKSUMS:
   react-native-safe-area-context: 0f14bce545abcdfbff79ce2e3c78c109f0be283e
   react-native-skia: d3d3afa9c428c6c7ccfd89a02683b5dbf2f31d35
   react-native-skottie-template-player: e71f773222960069b747bd3b14d86be395c5a3d0
-  react-native-webview: 4c4e51dcfb4b68c80be207a640952698ecb4f65d
+  react-native-webview: 44edb564b5bee25f3cdb4bfa8b45d6ae9d3dedec
   React-nativeconfig: cb207ebba7cafce30657c7ad9f1587a8f32e4564
   React-NativeModulesApple: 8411d548b1ad9d2b3e597beb9348e715c8020e0c
   React-perflogger: c4c3b7c18f8a50cdbe2bcdd2f15705ba029a5a02
@@ -3122,7 +3122,7 @@ SPEC CHECKSUMS:
   ReactAppDependencyProvider: 41e9fb63606c32cce924653d2d410cb01ec81286
   ReactCodegen: 8cae67dac8144aa8d9d5bee12e55ead0fb73537f
   ReactCommon: 08f4808f02ff115884e870e5cfea689703ff759a
-  RevenueCat: e825836f5d6baa870c53d7281be25a5fd91abd91
+  RevenueCat: 4be87c151dff652d2a5b7af46073db11f01ad93f
   RNBootSplash: b83a1f87e0880ac30f9577d32cb046a081050d58
   RNCMaskedView: 308c763227e237d4d260bd8841870e099572bb3e
   RNDateTimePicker: e30677c15dfba25452b1434181970162115cc4fe
@@ -3130,17 +3130,17 @@ SPEC CHECKSUMS:
   RNFBAnalytics: a5deff2112ed229501c5804a6a4936c67c39f321
   RNFBApp: 3ecdb44edd5cce785ea9b796682766889962a5fd
   RNFBMessaging: 65b436add429c5fd8fed20643c3a92916d275444
-  RNFlashList: d6f5c8e04ae8ce8e27693cd98c0297abce8f4c54
+  RNFlashList: 63591e7f9fa279b50b90eec1e2dfe4eb01f0e0c7
   RNGestureHandler: 8b1080a6db0be82dbca18550d6212b885bfab6b2
   RNKeychain: 8d45ee314f242a6fb81fa9677ed8e0bf39dcecc3
   RNLocalize: 7ed277415799ab5a8931b77fd2124c4749822e8a
   RNPermissions: 0ec4c8312912a45056185b429db95457da490cf4
-  RNPurchases: d1f57477a73970b532790a85f48d1611d7b5b030
+  RNPurchases: 100443da77a1458a516a14f371d66f087a626414
   RNReactNativeHapticFeedback: 66c6b0cf19f5d9dae8be36b2336e1fe2a2e42566
   RNReactNativeSharedGroupPreferences: d4869af3c7757405b6b5ac633d0ef5f9886a9be7
   RNReanimated: afed763d6c0b1916bfef1dbde4271ec0947dd376
   RNScreens: 40f4d6b58fa33751b8b2b5450e3595898a993ad5
-  RNSentry: a48474ed3bd24610a57c81c62e36ba95ff98a084
+  RNSentry: e394efe0911c11cf90d88dfd5937dca2db5678d6
   RNShare: 56b5431c60e1e9ee167191f4f327471af1c2941a
   RNSVG: 877cd57c2db63dc9f1fd1bbb5e95506ccd481df6
   SDWebImage: 8a6b7b160b4d710e2a22b6900e25301075c34cb3
