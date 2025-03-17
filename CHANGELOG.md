@@ -1,3 +1,9 @@
+## 1.9.0-canary.39
+
+* **build:**  - run web tests on CI ([#7947](https://github.com/AzzappApp/azzapp/pull/7947))
+* **fix:**  - **contact:** [#7946](https://github.com/AzzappApp/azzapp/pull/7946) don’t display premium indicator on logo on contact creation ([#7948](https://github.com/AzzappApp/azzapp/pull/7948))
+* **fix:**  - **contactCard:** [#7938](https://github.com/AzzappApp/azzapp/pull/7938) check logo is added ([#7945](https://github.com/AzzappApp/azzapp/pull/7945))
+
 ## 1.9.0-canary.38
 
 * **fix:**  - **contactCard:** [#7908](https://github.com/AzzappApp/azzapp/pull/7908) close upload progress ([#7944](https://github.com/AzzappApp/azzapp/pull/7944))
