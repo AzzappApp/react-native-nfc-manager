@@ -1,3 +1,7 @@
+## 1.9.0-canary.32
+
+* **fix:**  - manage overflow in rich text buttons list ([#7923](https://github.com/AzzappApp/azzapp/pull/7923))
+
 ## 1.9.0-canary.31
 
 * **fix:**  - **payment:** [#7912](https://github.com/AzzappApp/azzapp/pull/7912) mutualize behavior on subscription error ([#7920](https://github.com/AzzappApp/azzapp/pull/7920))
