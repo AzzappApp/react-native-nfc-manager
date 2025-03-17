@@ -322,6 +322,7 @@ const ContactCardEditScreen = ({
         width: QRCodeWidth(),
       },
       onCompleted: () => {
+        setProgressIndicator(null);
         if (avatarId && avatar?.uri) {
           addLocalCachedMediaFile(
             `${'image'.slice(0, 1)}:${avatarId}`,
@@ -359,6 +360,7 @@ const ContactCardEditScreen = ({
         }
       },
       onError: e => {
+        setProgressIndicator(null);
         console.error(e);
         if (e.message === ERRORS.SUBSCRIPTION_REQUIRED) {
           router.push({ route: 'USER_PAY_WALL' });
