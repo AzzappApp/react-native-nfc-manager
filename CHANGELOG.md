@@ -1,3 +1,7 @@
+## 1.9.0-canary.34
+
+* **build:**  - upgrade native deps ([#7921](https://github.com/AzzappApp/azzapp/pull/7921))
+
 ## 1.9.0-canary.33
 
 
