@@ -1,3 +1,7 @@
+## 1.9.0-canary.31
+
+* **fix:**  - **payment:** [#7912](https://github.com/AzzappApp/azzapp/pull/7912) mutualize behavior on subscription error ([#7920](https://github.com/AzzappApp/azzapp/pull/7920))
+
 ## 1.9.0-canary.30
 
 * **fix:**  - **scanner:** [#7912](https://github.com/AzzappApp/azzapp/pull/7912) don’t limit scan on contact card creation ([#7919](https://github.com/AzzappApp/azzapp/pull/7919))
