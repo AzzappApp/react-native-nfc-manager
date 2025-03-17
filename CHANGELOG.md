@@ -1,3 +1,8 @@
+## 1.9.0-canary.36
+
+* **fix:**  - add border on android bottom tab item ([#7929](https://github.com/AzzappApp/azzapp/pull/7929))
+* **fix:**  - scrolling issue  in some list ([#7926](https://github.com/AzzappApp/azzapp/pull/7926))
+
 ## 1.9.0-canary.35
 
 * **fix:**  - **android:** [#7879](https://github.com/AzzappApp/azzapp/pull/7879) user filter on social links ([#7927](https://github.com/AzzappApp/azzapp/pull/7927))
