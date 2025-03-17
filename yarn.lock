@@ -784,6 +784,7 @@ __metadata:
     file-saver: "npm:^2.0.5"
     google-wallet: "npm:^1.0.21"
     graphql-yoga: "npm:^5.12.1"
+    jest: "npm:^29.7.0"
     jose: "npm:^6.0.8"
     jsonwebtoken: "npm:^9.0.2"
     jwt-decode: "npm:^4.0.0"
