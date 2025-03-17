@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleShortVersionString</key>
-	<string>1.8.20</string>
+	<string>1.8.21</string>
 	<key>CFBundleVersion</key>
-	<string>2</string>
+	<string>3</string>
 	<key>NSAppClip</key>
 	<dict>
 		<key>NSAppClipRequestEphemeralUserNotification</key>
