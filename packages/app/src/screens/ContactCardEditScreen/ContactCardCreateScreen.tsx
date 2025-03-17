@@ -377,6 +377,7 @@ const ContactCardCreateScreen = ({
           },
         },
         onCompleted: data => {
+          setProgressIndicator(null);
           if (avatarId && avatar?.uri) {
             addLocalCachedMediaFile(
               `${'image'.slice(0, 1)}:${avatarId}`,
@@ -432,6 +433,7 @@ const ContactCardCreateScreen = ({
           root.setLinkedRecord(user, 'currentUser');
         },
         onError: e => {
+          setProgressIndicator(null);
           console.error(e);
 
           if (e.message === ERRORS.SUBSCRIPTION_REQUIRED) {
