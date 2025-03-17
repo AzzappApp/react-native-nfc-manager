@@ -353,7 +353,10 @@ const ContactCardCreateScreen = ({
                     return { ...phoneNumber, number };
                   })
               : undefined,
-            urls: data.urls.filter(({ address }) => address),
+            urls:
+              webCardKind === 'business'
+                ? data.urls.filter(({ address }) => address)
+                : undefined,
             addresses: data.addresses
               ? data.addresses.filter(address => address.address)
               : undefined,
@@ -362,12 +365,15 @@ const ContactCardCreateScreen = ({
               ? data.socials.filter(social => social.url)
               : undefined,
             avatarId,
-            logoId,
-            company,
+            logoId: webCardKind === 'business' ? logoId : undefined,
+            company: webCardKind === 'business' ? company : undefined,
             firstName,
             lastName: data.lastName,
             title: data.title,
-            companyActivityLabel: data.companyActivityLabel,
+            companyActivityLabel:
+              webCardKind === 'business'
+                ? data.companyActivityLabel
+                : undefined,
           },
         },
         onCompleted: data => {
