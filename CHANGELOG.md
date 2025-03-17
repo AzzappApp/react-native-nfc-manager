@@ -1,3 +1,10 @@
+## 1.9.0-canary.30
+
+* **fix:**  - **scanner:** [#7912](https://github.com/AzzappApp/azzapp/pull/7912) don’t limit scan on contact card creation ([#7919](https://github.com/AzzappApp/azzapp/pull/7919))
+* **fix:**  - **contactCard:** [#7907](https://github.com/AzzappApp/azzapp/pull/7907) filter deactivated fields ([#7917](https://github.com/AzzappApp/azzapp/pull/7917))
+* **fix:**  - **contactCard:** [#7908](https://github.com/AzzappApp/azzapp/pull/7908) reinit progress indicator on complete ([#7916](https://github.com/AzzappApp/azzapp/pull/7916))
+* **fix:**  - **home:** [#7913](https://github.com/AzzappApp/azzapp/pull/7913) priority on style ([#7915](https://github.com/AzzappApp/azzapp/pull/7915))
+
 ## 1.9.0-canary.29
 
 * **feat:**  - **payment:** [#7889](https://github.com/AzzappApp/azzapp/pull/7889) check subscription on email signature ([#7906](https://github.com/AzzappApp/azzapp/pull/7906))
