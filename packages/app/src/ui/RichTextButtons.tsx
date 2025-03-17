@@ -100,6 +100,7 @@ const styles = StyleSheet.create({
   scrollView: {
     alignSelf: 'center',
     height: 32,
+    overflow: 'visible',
   },
   buttonContainer: {
     gap: 15,
