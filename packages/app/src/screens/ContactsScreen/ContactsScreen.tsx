@@ -1,13 +1,14 @@
-import { Suspense, useCallback, useState } from 'react';
+import { Suspense, useCallback, useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { colors } from '#theme';
 import AccountHeader from '#components/AccountHeader';
-import { useRouter } from '#components/NativeRouter';
+import { useRouter, useScreenHasFocus } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import relayScreen from '#helpers/relayScreen';
+import { useAppState } from '#hooks/useAppState';
 import useBoolean from '#hooks/useBoolean';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
@@ -19,8 +20,9 @@ import SearchBarStatic from '#ui/SearchBarStatic';
 import Text from '#ui/Text';
 
 import ContactScreenLists from './ContactsScreenLists';
+import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { ContactsScreenQuery } from '#relayArtifacts/ContactsScreenQuery.graphql';
-import type { PreloadedQuery } from 'react-relay';
+import type { ContactsRoute } from '#routes';
 
 const contactsScreenQuery = graphql`
   query ContactsScreenQuery($profileId: ID!) {
@@ -40,9 +42,8 @@ const contactsScreenQuery = graphql`
 
 const ContactsScreen = ({
   preloadedQuery,
-}: {
-  preloadedQuery: PreloadedQuery<ContactsScreenQuery>;
-}) => {
+  refreshQuery,
+}: RelayScreenProps<ContactsRoute, ContactsScreenQuery>) => {
   const router = useRouter();
   const { profile } = usePreloadedQuery(contactsScreenQuery, preloadedQuery);
 
@@ -75,6 +76,20 @@ const ContactsScreen = ({
   }, [closeNewContactMenu, profile?.id, router]);
 
   const intl = useIntl();
+  const hasFocus = useScreenHasFocus();
+  const appState = useAppState();
+
+  // fix ##7896
+  // this screen is on top (from tabbar), has focus does not proc when coming from background and screen was selected
+  // list is refresh by mounting : dismounting as children
+  // count was  never refresh until switch profile
+  // hasFocus: query does not REFRESH as the screen is always mount (us)
+  // appState : query does not REFRESH  when coming from background
+  useEffect(() => {
+    if (hasFocus || appState === 'active') {
+      refreshQuery?.();
+    }
+  }, [appState, hasFocus, refreshQuery]);
 
   return (
     <>
@@ -275,6 +290,7 @@ export default relayScreen(ContactsScreen, {
   query: contactsScreenQuery,
   getVariables: (_, profileInfos) => ({
     profileId: profileInfos?.profileId ?? '',
+    fetchPolicy: 'store-and-network',
   }),
   fallback: ContactsScreenFallback,
 });
