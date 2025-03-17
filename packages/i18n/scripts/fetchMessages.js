@@ -6,7 +6,7 @@ const API_SERVER_TOKEN = process.env.API_SERVER_TOKEN;
 const ENVIRONMENT = process.env.NEXT_PUBLIC_PLATFORM;
 
 // TODO duplicated from i18nConfig.ts but I don't want to import typescript in this script
-const SUPPORTED_LOCALES = ['en-US', 'fr', 'es'];
+const SUPPORTED_LOCALES = ['en-US', 'fr', 'es', 'it', 'de'];
 
 const fetchMessages = async (sourceId, messagesDir, appMessages) => {
   let messages = [];

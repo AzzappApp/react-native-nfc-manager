@@ -34,7 +34,8 @@ type ProfilePageProps = {
 };
 
 const ProfilePage = async ({ params }: ProfilePageProps) => {
-  const userName = params.userName.toLowerCase();
+  const userName = params.userName;
+
   const webCard = await cachedGetWebCardByUserName(userName);
   if (!webCard) {
     const redirection = await getRedirectWebCardByUserName(userName);

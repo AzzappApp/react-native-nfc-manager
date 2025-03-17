@@ -3,7 +3,6 @@ const SUPPORTED_LOCALES = [
   'fr',
   // disabled for now
   // 'en-GB',
-  // 'fr',
   // 'da',
   // 'nl',
   'de',
