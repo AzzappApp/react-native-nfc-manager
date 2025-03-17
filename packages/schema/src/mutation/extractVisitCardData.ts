@@ -26,10 +26,11 @@ export const extractVisitCardData: MutationResolvers['extractVisitCardData'] =
     if (!userId) {
       throw new GraphQLError(ERRORS.UNAUTHORIZED);
     }
-
-    await validateCurrentSubscription(userId, {
-      action: 'USE_SCAN',
-    });
+    if (!args.config?.createContactCard) {
+      await validateCurrentSubscription(userId, {
+        action: 'USE_SCAN',
+      });
+    }
 
     try {
       const response = await fetch(

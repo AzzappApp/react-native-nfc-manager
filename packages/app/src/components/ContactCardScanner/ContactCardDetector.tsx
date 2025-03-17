@@ -45,12 +45,14 @@ type ContactCardDetectorProps = {
     image: { uri: string; aspectRatio: number },
   ) => void;
   closeContainer?: () => void;
+  createContactCard?: boolean;
 };
 
 const ContactCardDetector = ({
   close,
   extractData,
   closeContainer,
+  createContactCard,
 }: ContactCardDetectorProps) => {
   const isActive = useIsForeground();
   const intl = useIntl();
@@ -85,8 +87,11 @@ const ContactCardDetector = ({
     }, [isHorizontal, width, height]);
 
   const [commit] = useMutation<ContactCardDetectorMutation>(graphql`
-    mutation ContactCardDetectorMutation($imgUrl: String!) {
-      extractVisitCardData(imgUrl: $imgUrl) {
+    mutation ContactCardDetectorMutation(
+      $imgUrl: String!
+      $config: ExtractVisitCardDataConfigInput
+    ) {
+      extractVisitCardData(imgUrl: $imgUrl, config: $config) {
         addresses
         company
         emails
@@ -133,7 +138,10 @@ const ContactCardDetector = ({
       );
 
       commit({
-        variables: { imgUrl: `data:image/jpg;base64,${croppedImage.base64}` },
+        variables: {
+          imgUrl: `data:image/jpg;base64,${croppedImage.base64}`,
+          config: { createContactCard },
+        },
         onCompleted: data => {
           extractData(data.extractVisitCardData, {
             uri: croppedImage.uri,
@@ -169,6 +177,7 @@ const ContactCardDetector = ({
     close,
     closeLoading,
     commit,
+    createContactCard,
     extractData,
     height,
     intl,

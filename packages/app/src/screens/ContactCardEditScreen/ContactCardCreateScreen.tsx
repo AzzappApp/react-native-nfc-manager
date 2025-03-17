@@ -661,6 +661,7 @@ const ContactCardCreateScreen = ({
           <ContactCardDetector
             close={closeScanner}
             extractData={loadFormFromScan}
+            createContactCard
           />
         </View>
       )}
