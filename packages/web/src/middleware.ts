@@ -108,4 +108,4 @@ const REGIONS = [
 ] as const;
 
 // Liste des régions Node.js
-const NODE_JS_REGIONS = ['fra1', 'iad1', 'sin1'];
+const NODE_JS_REGIONS = ['fra1', 'iad1', 'gru1'];
