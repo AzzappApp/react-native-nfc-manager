@@ -27,7 +27,7 @@ const PremiumIndicator = ({
     <Icon
       icon="plus"
       size={size}
-      style={[styles.icon, style, { tintColor: color ?? colors.red400 }]}
+      style={[styles.icon, { tintColor: color ?? colors.red400 }, style]}
     />
   );
 };
