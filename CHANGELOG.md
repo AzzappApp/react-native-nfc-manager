@@ -1,3 +1,7 @@
+## 1.9.0-canary.33
+
+
+
 ## 1.9.0-canary.32
 
 * **fix:**  - manage overflow in rich text buttons list ([#7923](https://github.com/AzzappApp/azzapp/pull/7923))
