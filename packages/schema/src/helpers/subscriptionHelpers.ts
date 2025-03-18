@@ -1,8 +1,8 @@
 import { GraphQLError } from 'graphql';
 import {
-  getActiveUserSubscriptions,
   getTotalMultiUser,
   getUserById,
+  getUserSubscriptions,
   updateNbFreeScans,
   type UserSubscription,
 } from '@azzapp/data';
@@ -18,7 +18,10 @@ export const calculateAvailableSeats = async (
 
 const checkSubscription = async (userId: string, params: FeatureParams) => {
   const result = { hasActiveSubscription: false, hasEnoughSeats: false };
-  const userSubscription = await getActiveUserSubscriptions([userId]);
+  const userSubscription = await getUserSubscriptions({
+    userIds: [userId],
+    onlyActive: true,
+  });
 
   const lifetime = userSubscription.find(
     subscription => subscription.subscriptionPlan === 'web.lifetime',
@@ -250,7 +253,10 @@ export const validateCurrentSubscription = async (
 };
 
 export const updateMonthlySubscription = async (userId: string) => {
-  const subs = await getActiveUserSubscriptions([userId]);
+  const subs = await getUserSubscriptions({
+    userIds: [userId],
+    onlyActive: true,
+  });
 
   const monthly = subs.find(
     subscription => subscription.subscriptionPlan === 'web.monthly',

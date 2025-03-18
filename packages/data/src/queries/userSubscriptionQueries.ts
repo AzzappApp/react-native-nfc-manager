@@ -3,7 +3,6 @@ import {
   eq,
   gte,
   or,
-  ne,
   asc,
   isNull,
   desc,
@@ -98,12 +97,15 @@ export const updateSubscriptionFreeSeats = async (
     .where(eq(UserSubscriptionTable.id, subscriptionId));
 };
 
-/**
- *
- * @param userIds contains the user ids
- * @returns the active subscriptions for the user
- */
-export const getActiveUserSubscriptions = async (userIds: string[]) => {
+export const getUserSubscriptions = async ({
+  userIds,
+  issuers,
+  onlyActive = false,
+}: {
+  userIds: string[];
+  issuers?: Array<'apple' | 'google' | 'web'>;
+  onlyActive?: boolean;
+}) => {
   const currentDate = new Date();
   return db()
     .select()
@@ -111,13 +113,22 @@ export const getActiveUserSubscriptions = async (userIds: string[]) => {
     .where(
       and(
         inArray(UserSubscriptionTable.userId, [...new Set(userIds)]),
-        or(
-          eq(UserSubscriptionTable.status, 'active'),
-          gte(UserSubscriptionTable.endAt, currentDate),
-        ),
+        issuers?.length
+          ? inArray(UserSubscriptionTable.issuer, issuers)
+          : undefined,
+        onlyActive
+          ? or(
+              eq(UserSubscriptionTable.status, 'active'),
+              gte(UserSubscriptionTable.endAt, currentDate),
+            )
+          : undefined,
       ),
     )
-    .orderBy(asc(UserSubscriptionTable.status));
+    .orderBy(
+      desc(eq(UserSubscriptionTable.status, 'active')), // Active subscriptions first
+      desc(gte(UserSubscriptionTable.endAt, currentDate)), // Then subscriptions with endAt in the future
+      desc(UserSubscriptionTable.startAt), // Finally, the most recently started subscriptions
+    );
 };
 
 /**
@@ -149,68 +160,6 @@ export const getSubscriptionByPaymentMeanId = async (
     .from(UserSubscriptionTable)
     .where(eq(UserSubscriptionTable.paymentMeanId, paymentMeanId))
     .then(res => res[0] ?? null);
-
-/**
- * Get a user subscription by its user id and web card id
- *
- * @param userId - The user id
- * @param webCardId - The web card id
- * @returns The user subscription if any
- */
-export const getUserWebSubscription = async (
-  userId: string,
-): Promise<UserSubscription | null> => {
-  return db()
-    .select()
-    .from(UserSubscriptionTable)
-    .where(
-      and(
-        eq(UserSubscriptionTable.userId, userId),
-        ne(UserSubscriptionTable.status, 'canceled'),
-        eq(UserSubscriptionTable.issuer, 'web'),
-      ),
-    )
-    .orderBy(asc(UserSubscriptionTable.status))
-    .then(res => res[0]);
-};
-
-export const getUserSubscriptions = async (
-  userId: string,
-  issuers: Array<'apple' | 'google' | 'web'>,
-): Promise<UserSubscription[]> => {
-  return db()
-    .select()
-    .from(UserSubscriptionTable)
-    .where(
-      and(
-        eq(UserSubscriptionTable.userId, userId),
-        inArray(UserSubscriptionTable.issuer, issuers),
-      ),
-    )
-    .orderBy(asc(UserSubscriptionTable.status));
-};
-
-/**
- *
- * @param userId is the user id
- * @param webCardId is the webcard id
- * @returns the last subscription of the user (active or not)
- */
-export const getLastSubscription = async (userId: string) => {
-  return db()
-    .select()
-    .from(UserSubscriptionTable)
-    .where(eq(UserSubscriptionTable.userId, userId))
-    .orderBy(desc(UserSubscriptionTable.startAt))
-    .then(res => res[0]);
-};
-
-export const getSubscriptionsOfUser = async (userId: string) => {
-  return db()
-    .select()
-    .from(UserSubscriptionTable)
-    .where(eq(UserSubscriptionTable.userId, userId));
-};
 
 export const cancelExpiredSubscription = async () => {
   const currentDate = new Date();

@@ -88,17 +88,22 @@ export const getWebcardsMediaFromContactIds = (
     });
 };
 
-export const getContactCount = (profileId: string): Promise<number> => {
-  return db()
-    .select({ count: count() })
+export const getContactCountPerOwner = async (profileIds: string[]) => {
+  const res = await db()
+    .select({
+      ownerProfileId: ContactTable.ownerProfileId,
+      count: count(),
+    })
     .from(ContactTable)
     .where(
       and(
-        eq(ContactTable.ownerProfileId, profileId),
+        inArray(ContactTable.ownerProfileId, profileIds),
         eq(ContactTable.deleted, false),
       ),
     )
-    .then(res => res[0].count || 0);
+    .groupBy(ContactTable.ownerProfileId);
+
+  return res;
 };
 
 export const createContact = async (newContact: ContactRow) => {

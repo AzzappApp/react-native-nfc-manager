@@ -4,8 +4,8 @@ import { notFound } from 'next/navigation';
 import {
   getUserById,
   getUserProfilesWithWebCard,
-  getSubscriptionsOfUser,
   getTotalMultiUser,
+  getUserSubscriptions,
 } from '@azzapp/data';
 import { Subscriptions } from './Subscriptions';
 import UserForm from './UserForm';
@@ -28,7 +28,7 @@ const UserPage = async ({ params: { id } }: UserPageProps) => {
   }
   const profiles = await getUserProfilesWithWebCard(user.id);
 
-  const subscriptions = await getSubscriptionsOfUser(user.id);
+  const subscriptions = await getUserSubscriptions({ userIds: [user.id] });
   const userSubscriptions: SubscriptionWithProfilesCount[] = await Promise.all(
     subscriptions.map(async s => {
       const totalUsed = await getTotalMultiUser(s.userId);

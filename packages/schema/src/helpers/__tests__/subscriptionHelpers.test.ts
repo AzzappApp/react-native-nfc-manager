@@ -1,6 +1,6 @@
 import { GraphQLError } from 'graphql';
 import {
-  getActiveUserSubscriptions,
+  getUserSubscriptions,
   getTotalMultiUser,
   getUserById,
   updateNbFreeScans,
@@ -16,7 +16,7 @@ import type { UserSubscription } from '@azzapp/data';
 
 // Mock dependencies
 jest.mock('@azzapp/data', () => ({
-  getActiveUserSubscriptions: jest.fn(),
+  getUserSubscriptions: jest.fn(),
   getTotalMultiUser: jest.fn(),
   getUserById: jest.fn(),
   updateNbFreeScans: jest.fn(),
@@ -72,7 +72,7 @@ describe('Subscription Helpers', () => {
 
   describe('validateCurrentSubscription', () => {
     test('should throw SUBSCRIPTION_REQUIRED if no active subscription', async () => {
-      (getActiveUserSubscriptions as jest.Mock).mockResolvedValue([]);
+      (getUserSubscriptions as jest.Mock).mockResolvedValue([]);
 
       await expect(
         validateCurrentSubscription('user-1', {
@@ -97,7 +97,7 @@ describe('Subscription Helpers', () => {
     });
 
     test('should update free scans if ADD_CONTACT_WITH_SCAN is used without a subscription', async () => {
-      (getActiveUserSubscriptions as jest.Mock).mockResolvedValue([]);
+      (getUserSubscriptions as jest.Mock).mockResolvedValue([]);
 
       await validateCurrentSubscription('user-1', {
         action: 'ADD_CONTACT_WITH_SCAN',
@@ -107,7 +107,7 @@ describe('Subscription Helpers', () => {
     });
 
     test('should throw SUBSCRIPTION_REQUIRED if free scans exceed limit in USE_SCAN', async () => {
-      (getActiveUserSubscriptions as jest.Mock).mockResolvedValue([]);
+      (getUserSubscriptions as jest.Mock).mockResolvedValue([]);
       (getUserById as jest.Mock).mockResolvedValue({
         id: 'user-1',
         nbFreeScans: 6,
@@ -119,7 +119,7 @@ describe('Subscription Helpers', () => {
     });
 
     test('should not throw error if free scans are below limit in USE_SCAN', async () => {
-      (getActiveUserSubscriptions as jest.Mock).mockResolvedValue([]);
+      (getUserSubscriptions as jest.Mock).mockResolvedValue([]);
       (getUserById as jest.Mock).mockResolvedValue({
         id: 'user-1',
         nbFreeScans: 4,
@@ -131,7 +131,7 @@ describe('Subscription Helpers', () => {
     });
 
     test('should allow lifetime subscription without checking seats', async () => {
-      (getActiveUserSubscriptions as jest.Mock).mockResolvedValue([
+      (getUserSubscriptions as jest.Mock).mockResolvedValue([
         { subscriptionPlan: 'web.lifetime', userId: 'user-1' },
       ]);
 
@@ -145,7 +145,7 @@ describe('Subscription Helpers', () => {
     });
 
     test('should allow yearly subscription if there are enough seats', async () => {
-      (getActiveUserSubscriptions as jest.Mock).mockResolvedValue([
+      (getUserSubscriptions as jest.Mock).mockResolvedValue([
         {
           subscriptionPlan: 'web.yearly',
           userId: 'user-1',
@@ -177,7 +177,7 @@ describe('Subscription Helpers', () => {
 
   describe('updateMonthlySubscription', () => {
     test('should update monthly subscription with correct seats', async () => {
-      (getActiveUserSubscriptions as jest.Mock).mockResolvedValue([
+      (getUserSubscriptions as jest.Mock).mockResolvedValue([
         { subscriptionPlan: 'web.monthly', userId: 'user-1', status: 'active' },
       ]);
       (getTotalMultiUser as jest.Mock).mockResolvedValue(4);
@@ -193,7 +193,7 @@ describe('Subscription Helpers', () => {
     });
 
     test('should not update canceled monthly subscription', async () => {
-      (getActiveUserSubscriptions as jest.Mock).mockResolvedValue([
+      (getUserSubscriptions as jest.Mock).mockResolvedValue([
         {
           subscriptionPlan: 'web.monthly',
           userId: 'user-1',
@@ -208,7 +208,7 @@ describe('Subscription Helpers', () => {
     });
 
     test('should not update if no active monthly subscription is found', async () => {
-      (getActiveUserSubscriptions as jest.Mock).mockResolvedValue([]);
+      (getUserSubscriptions as jest.Mock).mockResolvedValue([]);
 
       await updateMonthlySubscription('user-1');
 
@@ -216,7 +216,7 @@ describe('Subscription Helpers', () => {
     });
 
     test('should default to at least 1 seat if total seats are 0', async () => {
-      (getActiveUserSubscriptions as jest.Mock).mockResolvedValue([
+      (getUserSubscriptions as jest.Mock).mockResolvedValue([
         { subscriptionPlan: 'web.monthly', userId: 'user-1', status: 'active' },
       ]);
       (getTotalMultiUser as jest.Mock).mockResolvedValue(0);
@@ -234,7 +234,7 @@ describe('Subscription Helpers', () => {
 
   describe('validateCurrentSubscription - UPDATE_CONTACT_CARD', () => {
     test('should throw SUBSCRIPTION_REQUIRED if no active subscription and contact card has company name', async () => {
-      (getActiveUserSubscriptions as jest.Mock).mockResolvedValue([]);
+      (getUserSubscriptions as jest.Mock).mockResolvedValue([]);
 
       await expect(
         validateCurrentSubscription('user-1', {
@@ -248,7 +248,7 @@ describe('Subscription Helpers', () => {
     });
 
     test('should throw SUBSCRIPTION_REQUIRED if no active subscription and contact card has a URL', async () => {
-      (getActiveUserSubscriptions as jest.Mock).mockResolvedValue([]);
+      (getUserSubscriptions as jest.Mock).mockResolvedValue([]);
 
       await expect(
         validateCurrentSubscription('user-1', {
@@ -262,7 +262,7 @@ describe('Subscription Helpers', () => {
     });
 
     test('should throw SUBSCRIPTION_REQUIRED if no active subscription and contact card has a logo', async () => {
-      (getActiveUserSubscriptions as jest.Mock).mockResolvedValue([]);
+      (getUserSubscriptions as jest.Mock).mockResolvedValue([]);
 
       await expect(
         validateCurrentSubscription('user-1', {
@@ -288,7 +288,7 @@ describe('Subscription Helpers', () => {
     });
 
     test('should allow UPDATE_CONTACT_CARD if user has an active subscription', async () => {
-      (getActiveUserSubscriptions as jest.Mock).mockResolvedValue([
+      (getUserSubscriptions as jest.Mock).mockResolvedValue([
         { subscriptionPlan: 'web.yearly', userId: 'user-1' },
       ]);
 

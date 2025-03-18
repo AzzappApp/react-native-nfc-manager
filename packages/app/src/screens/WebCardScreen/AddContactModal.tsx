@@ -5,7 +5,7 @@ import {
 } from 'expo-contacts';
 import { File, Paths } from 'expo-file-system/next';
 import { fromGlobalId } from 'graphql-relay';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Alert, Platform, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -36,11 +36,12 @@ import Header from '#ui/Header';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import AddContactModalProfiles from './AddContactModalProfiles';
+import AddContactModalProfiles, {
+  AddContactModalProfilesFallback,
+} from './AddContactModalProfiles';
 import type { AddContactModal_webCard$key } from '#relayArtifacts/AddContactModal_webCard.graphql';
 
 import type { AddContactModalMutation } from '#relayArtifacts/AddContactModalMutation.graphql';
-import type { AddContactModalProfiles_user$key } from '#relayArtifacts/AddContactModalProfiles_user.graphql';
 import type { CheckboxStatus } from '#ui/CheckBox';
 import type { CommonInformation } from '@azzapp/shared/contactCardHelpers';
 import type { Contact, Image } from 'expo-contacts';
@@ -51,14 +52,12 @@ type Props = {
     avatarUrl?: string;
   };
   webCard: AddContactModal_webCard$key;
-  user: AddContactModalProfiles_user$key;
 };
 
 const AddContactModal = ({
   contactData,
   additionalContactData,
   webCard: webCardKey,
-  user: userKey,
 }: Props) => {
   const [viewer, setViewer] = useState<string | null>(null);
   const {
@@ -329,11 +328,6 @@ const AddContactModal = ({
             profile?.setValue(nbContacts + 1, 'nbContacts');
           }
 
-          const nbNewContacts = profile?.getValue('nbNewContacts');
-          if (typeof nbNewContacts === 'number') {
-            profile?.setValue(nbNewContacts + 1, 'nbNewContacts');
-          }
-
           if (profile) {
             ConnectionHandler.getConnection(
               profile,
@@ -443,7 +437,10 @@ const AddContactModal = ({
         <Icon icon="arrow_down" />
         <Icon icon="arrow_up" style={{ marginLeft: 10 }} />
       </View>
-      <AddContactModalProfiles user={userKey} onSelectProfile={setViewer} />
+
+      <Suspense fallback={<AddContactModalProfilesFallback />}>
+        <AddContactModalProfiles onSelectProfile={setViewer} />
+      </Suspense>
 
       <View style={{ paddingHorizontal: 20 }}>
         <CheckBox

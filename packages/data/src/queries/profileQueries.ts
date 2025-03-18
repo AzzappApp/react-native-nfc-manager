@@ -153,27 +153,6 @@ export const getUserProfilesWithWebCard = async (
 };
 
 /**
- * Retrieves an associated profiles to an user for a webCard
- * @param userId - The id of the user
- * @param webCardId - The id of the webCard
- * @returns The list of profile associated to the user
- */
-export const getProfile = async (userId: string, webCardId: string) => {
-  return db()
-    .select()
-    .from(ProfileTable)
-    .innerJoin(WebCardTable, eq(WebCardTable.id, ProfileTable.webCardId))
-    .where(
-      and(
-        eq(ProfileTable.userId, userId),
-        eq(ProfileTable.webCardId, webCardId),
-      ),
-    )
-    .limit(1)
-    .then(res => res.map(({ Profile }) => Profile).pop());
-};
-
-/**
  * Retrieves the owner profile by the username
  *
  * @param userName - The userName of the profile to retrieve
@@ -520,18 +499,24 @@ export const getCommonWebCardProfiles = async (
  *
  * @param webCardId - The id of the web card
  */
-export const getNbNewContacts = async (profileId: string, date: Date) => {
-  return db()
-    .select({ count: count() })
+export const getNbNewContactsPerOwner = async (profileIds: string[]) => {
+  const res = await db()
+    .select({
+      ownerProfileId: ContactTable.ownerProfileId,
+      count: count(),
+    })
     .from(ContactTable)
+    .innerJoin(ProfileTable, eq(ContactTable.ownerProfileId, ProfileTable.id)) // Join on profile ID
     .where(
       and(
-        eq(ContactTable.ownerProfileId, profileId),
+        inArray(ProfileTable.id, [...new Set(profileIds)]), // Ensure we filter only relevant profiles
         eq(ContactTable.deleted, false),
-        gt(ContactTable.createdAt, date),
+        gt(ContactTable.createdAt, ProfileTable.lastContactViewAt), // Compare createdAt with profile's last view date
       ),
     )
-    .then(res => res[0].count);
+    .groupBy(ContactTable.ownerProfileId);
+
+  return res;
 };
 
 export const getProfilesWhereUserBIsOwner = async (

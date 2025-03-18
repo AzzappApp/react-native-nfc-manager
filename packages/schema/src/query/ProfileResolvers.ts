@@ -16,8 +16,6 @@ import {
   searchWebCards,
   getCardTemplatesForWebCardKind,
   searchContacts,
-  getContactCount,
-  getNbNewContacts,
 } from '@azzapp/data';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import { shuffle } from '@azzapp/shared/arrayHelpers';
@@ -31,7 +29,9 @@ import {
 import { getOrCreateSessionResource, getSessionInfos } from '#GraphQLContext';
 import {
   companyActivityLoader,
+  contactCountForProfileLoader,
   labelLoader,
+  newContactsCountForProfileLoader,
   profileInUserContactLoader,
   profileLoader,
   profileStatisticsLoader,
@@ -148,12 +148,8 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
     ) {
       return 0;
     }
-    // profile.lastContactCardUpdate;
-    const nbNewContacts = await getNbNewContacts(
-      profile.id,
-      profile.lastContactViewAt,
-    );
-    return nbNewContacts;
+
+    return newContactsCountForProfileLoader.load(profile.id);
   },
   promotedAsOwner: async profile => {
     if (
@@ -288,7 +284,7 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
     if (!(await hasWebCardProfileRight(profile.webCardId))) {
       return 0;
     }
-    return getContactCount(profile.id);
+    return contactCountForProfileLoader.load(profile.id);
   },
   suggestedWebCards: async () => {
     return emptyConnection;

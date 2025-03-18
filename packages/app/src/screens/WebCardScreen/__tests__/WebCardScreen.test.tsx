@@ -13,7 +13,7 @@ jest.mock('react-native-share', () => ({}));
 describe('WebCardScreen', () => {
   const environment: RelayMockEnvironment = createMockEnvironment();
 
-  const renderWebCarScreen = (
+  const renderWebCardScreen = (
     webCardId = 'webCardId',
     viewerWebCardId = 'viewerWebCardId',
   ) => {
@@ -59,9 +59,6 @@ describe('WebCardScreen', () => {
             ...CoverRenderer_webCard
           }
         }
-        currentUser {
-          id
-        }
       }
     `;
     environment.commitPayload(
@@ -99,10 +96,10 @@ describe('WebCardScreen', () => {
       },
     );
 
-    const { getByTestId } = renderWebCarScreen('webCardId-1');
+    const { queryAllByTestId } = renderWebCardScreen('webCardId-1');
     act(() => {
       jest.runAllTimers();
     });
-    expect(getByTestId('cover-renderer')).toBeTruthy();
+    expect(queryAllByTestId('cover-renderer').length).toBeGreaterThan(0);
   });
 });

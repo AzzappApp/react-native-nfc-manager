@@ -406,14 +406,13 @@ export const WebCardScreen = ({
         editing={editing}
         editTransition={editTransition}
       />
-      <Suspense>
-        <AddContactModal
-          user={data.currentUser!}
-          webCard={data.webCard}
-          contactData={params.contactData}
-          additionalContactData={params.additionalContactData}
-        />
-      </Suspense>
+
+      <AddContactModal
+        webCard={data.webCard}
+        contactData={params.contactData}
+        additionalContactData={params.additionalContactData}
+      />
+
       <Suspense fallback={null}>
         <WebCardMenu
           visible={showWebcardModal}
@@ -451,9 +450,6 @@ const webCardScreenByIdQuery = graphql`
       ...WebCardScreenPublishHelper_webCard
       ...AddContactModal_webCard
     }
-    currentUser {
-      ...AddContactModalProfiles_user
-    }
   }
 `;
 
@@ -473,9 +469,6 @@ const webCardScreenByNameQuery = graphql`
       ...WebCardMenu_webCard @arguments(viewerWebCardId: $viewerWebCardId)
       ...WebCardScreenPublishHelper_webCard
       ...AddContactModal_webCard
-    }
-    currentUser {
-      ...AddContactModalProfiles_user
     }
   }
 `;

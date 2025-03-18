@@ -49,7 +49,6 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
           invited
           profileRole
           promotedAsOwner
-          nbNewContacts
           webCard {
             id
             isMultiUser

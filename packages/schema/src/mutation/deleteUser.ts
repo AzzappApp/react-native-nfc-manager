@@ -8,7 +8,7 @@ import {
 import ERRORS from '@azzapp/shared/errors';
 import { invalidateWebCard } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
-import { activeSubscriptionsForUserLoader } from '#loaders';
+import { subscriptionsForUserLoader } from '#loaders';
 import { updateMonthlySubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#__generated__/types';
 
@@ -18,8 +18,8 @@ const deleteUser: MutationResolvers['deleteUser'] = async () => {
     throw new GraphQLError(ERRORS.UNAUTHORIZED);
   }
   if (
-    (await activeSubscriptionsForUserLoader.load(userId)).filter(
-      sub => sub.subscriptionPlan !== 'web.lifetime',
+    (await subscriptionsForUserLoader.load(userId)).filter(
+      sub => sub.subscriptionPlan !== 'web.lifetime' && sub.status === 'active',
     ).length > 0
   ) {
     throw new GraphQLError(ERRORS.SUBSCRIPTION_IS_ACTIVE);

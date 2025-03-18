@@ -9,7 +9,9 @@ import {
   getProfileByUserAndWebCard,
   isFollowing,
   getContactsByUser,
-  getActiveUserSubscriptions,
+  getUserSubscriptions,
+  getContactCountPerOwner,
+  getNbNewContactsPerOwner,
 } from '@azzapp/data';
 import {
   createDataLoader,
@@ -256,16 +258,44 @@ export const cardModuleByWebCardLoader = createSessionDataLoader<
   return keys.map(key => modules[key] ?? []);
 });
 
-export const activeSubscriptionsForUserLoader = createSessionDataLoader(
-  'ActiveSubscriptionsForUserLoader',
+export const subscriptionsForUserLoader = createSessionDataLoader(
+  'subscriptionsForUserLoader',
   async (keys: readonly string[]) => {
     if (keys.length === 0) {
       return [];
     }
 
-    const userSubscriptions = await getActiveUserSubscriptions(
-      keys as string[],
-    );
+    const userSubscriptions = await getUserSubscriptions({
+      userIds: keys as string[],
+    });
     return keys.map(k => userSubscriptions.filter(u => u.userId === k) ?? null);
+  },
+);
+
+export const contactCountForProfileLoader = createSessionDataLoader(
+  'contactCountForProfileLoader',
+  async (keys: readonly string[]) => {
+    if (keys.length === 0) {
+      return [];
+    }
+
+    const contacts = await getContactCountPerOwner(keys as string[]);
+    return keys.map(
+      k => contacts.find(u => u.ownerProfileId === k)?.count ?? 0,
+    );
+  },
+);
+
+export const newContactsCountForProfileLoader = createSessionDataLoader(
+  'newContactsCountForProfileLoader',
+  async (keys: readonly string[]) => {
+    if (keys.length === 0) {
+      return [];
+    }
+
+    const contacts = await getNbNewContactsPerOwner(keys as string[]);
+    return keys.map(
+      k => contacts.find(u => u.ownerProfileId === k)?.count ?? 0,
+    );
   },
 );

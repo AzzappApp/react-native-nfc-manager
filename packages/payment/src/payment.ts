@@ -6,7 +6,7 @@ import {
   transaction,
   updatePayment,
   createId,
-  getUserWebSubscription,
+  getUserSubscriptions,
 } from '@azzapp/data';
 import { login } from '#authent';
 import client from './client';
@@ -177,9 +177,13 @@ export const createPaymentRequest = async ({
       maskedCard: '',
     });
 
-    const subscription = await getUserWebSubscription(userId);
+    const subscription = await getUserSubscriptions({
+      userIds: [userId],
+      issuers: ['web'],
+      onlyActive: true,
+    });
 
-    if (subscription && subscription.status === 'active') {
+    if (subscription.some(sub => sub.status === 'active')) {
       throw new Error('Subscription already active');
     }
     const subscriptionId = createId();

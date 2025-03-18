@@ -286,10 +286,6 @@ const ContactsScreenLists = ({
       variables: {
         profileId,
       },
-      updater: store => {
-        const profile = store.get(profileId);
-        profile?.setValue(0, 'nbNewContacts');
-      },
     });
   }, [commitContactsLastView, profileInfos, profileInfos?.profileId]);
 

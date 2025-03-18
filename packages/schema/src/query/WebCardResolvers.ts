@@ -13,7 +13,6 @@ import {
   getWebCardProfiles,
   countWebCardProfiles,
   getWebCardPendingOwnerProfile,
-  getLastSubscription,
   getFilterCoverTemplateTypes,
   getCoverTemplatesByTypesAndTag,
   countDeletedWebCardProfiles,
@@ -28,7 +27,7 @@ import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
 import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { getSessionInfos } from '#GraphQLContext';
 import {
-  activeSubscriptionsForUserLoader,
+  subscriptionsForUserLoader,
   cardModuleByWebCardLoader,
   companyActivityLoader,
   companyActivityTypeLoader,
@@ -230,7 +229,7 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
     }
     const owner = await webCardOwnerLoader.load(webCard.id);
     const subscriptions = owner
-      ? await activeSubscriptionsForUserLoader.load(owner.id)
+      ? await subscriptionsForUserLoader.load(owner.id)
       : null;
 
     const subscription = subscriptions?.find(
@@ -247,9 +246,14 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
     //cannot use the loader here (when IAP sub), can't find a way to for revalidation in api route.
     //Got a bug where the subscription is canceled however still active in the result set
     const subscriptions = owner
-      ? await activeSubscriptionsForUserLoader.load(owner.id)
+      ? await subscriptionsForUserLoader.load(owner.id)
       : null;
-    return !!subscriptions?.[0];
+    const lastSubscription = subscriptions?.[0];
+    return !!(
+      lastSubscription &&
+      (lastSubscription.status === 'active' ||
+        lastSubscription.endAt > new Date())
+    );
   },
   isFollowing: async (webCard, { webCardId: gqlWebCardId }) => {
     if (!gqlWebCardId) {
@@ -506,9 +510,9 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
       return null;
     }
 
-    const subscription = await getLastSubscription(owner.id);
+    const subscription = await subscriptionsForUserLoader.load(owner.id);
 
-    return subscription ?? null;
+    return subscription[0];
   },
   logo: async webCard =>
     webCard.logoId && (await hasWebCardProfileRight(webCard.id))
