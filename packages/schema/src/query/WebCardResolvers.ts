@@ -512,7 +512,7 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
 
     const subscription = await subscriptionsForUserLoader.load(owner.id);
 
-    return subscription[0];
+    return subscription.length > 0 ? subscription[0] : null;
   },
   logo: async webCard =>
     webCard.logoId && (await hasWebCardProfileRight(webCard.id))
