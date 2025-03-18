@@ -135,7 +135,8 @@ const SocialLinksLinksEditionPanel = ({
   const scrollableRef = useAnimatedRef<Animated.ScrollView>();
   const autoScrollEnabled = useSharedValue(true);
 
-  const keyExtractor = (item: SocialLinkItem) => `${item.socialId}${item.link}`;
+  const keyExtractor = (item: SocialLinkItem) =>
+    `${item.socialId}${item.link}${item.position}`;
 
   return (
     <View style={[styles.root, style]} {...props}>
@@ -155,6 +156,7 @@ const SocialLinksLinksEditionPanel = ({
         showsHorizontalScrollIndicator={false}
       >
         <Sortable.Grid
+          key={sortableLinks.length}
           scrollableRef={scrollableRef}
           rows={1}
           rowHeight={ITEM_HEIGHT}
