@@ -1,3 +1,7 @@
+## 1.9.0-canary.41
+
+* **fix:**  - android disabled button color ([#7963](https://github.com/AzzappApp/azzapp/pull/7963))
+
 ## 1.9.0-canary.40
 
 * **fix:**  - **scan:** [#7912](https://github.com/AzzappApp/azzapp/pull/7912) mutualize duplicated code ([#7949](https://github.com/AzzappApp/azzapp/pull/7949))
