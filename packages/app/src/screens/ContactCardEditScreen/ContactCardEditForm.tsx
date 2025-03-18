@@ -190,8 +190,11 @@ const ContactCardEditForm = ({
           <Separation small />
           <ContactCardEditCompanyLogo
             control={control}
-            canEditLogo={!webCard?.logo}
-            company={commonInformation?.company || companyField.value}
+            canEditLogo={!webCard?.isMultiUser || !webCard?.logo}
+            company={
+              (webCard?.isMultiUser && commonInformation?.company) ||
+              companyField.value
+            }
             isPremium={webCard?.isPremium}
           />
           <Separation />
