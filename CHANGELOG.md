@@ -1,3 +1,9 @@
+## 1.9.0-canary.46
+
+* **perf:**  - **home:** [#7934](https://github.com/AzzappApp/azzapp/pull/7934) reduce number of queries on home & prefetched webcards ([#7965](https://github.com/AzzappApp/azzapp/pull/7965))
+* **fix:**  - ensure keys are unique and fix random overlap in links on android ([#7970](https://github.com/AzzappApp/azzapp/pull/7970))
+* **fix:**  - **payment:** check subscription on profile update (may be used as saveContactCard) ([#7969](https://github.com/AzzappApp/azzapp/pull/7969))
+
 ## 1.9.0-canary.45
 
 * **fix:**  - **contactCard:** [#7961](https://github.com/AzzappApp/azzapp/pull/7961) ignore logo if not business ([#7968](https://github.com/AzzappApp/azzapp/pull/7968))
