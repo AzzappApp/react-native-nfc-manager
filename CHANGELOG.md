@@ -1,3 +1,7 @@
+## 1.9.0-canary.42
+
+* **fix:**  - correct company logo and company name on disabled multi user web… ([#7942](https://github.com/AzzappApp/azzapp/pull/7942))
+
 ## 1.9.0-canary.41
 
 * **fix:**  - android disabled button color ([#7963](https://github.com/AzzappApp/azzapp/pull/7963))
