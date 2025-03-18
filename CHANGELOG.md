@@ -1,3 +1,7 @@
+## 1.9.0-canary.40
+
+* **fix:**  - **scan:** [#7912](https://github.com/AzzappApp/azzapp/pull/7912) mutualize duplicated code ([#7949](https://github.com/AzzappApp/azzapp/pull/7949))
+
 ## 1.9.0-canary.39
 
 * **build:**  - run web tests on CI ([#7947](https://github.com/AzzappApp/azzapp/pull/7947))
