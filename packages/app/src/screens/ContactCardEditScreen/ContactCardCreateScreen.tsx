@@ -200,6 +200,8 @@ const ContactCardCreateScreen = ({
         uploads.push(null);
       }
 
+      logo = webCardKind === 'business' ? logo : null;
+
       if (logo?.uri) {
         const fileName = getFileName(logo.uri);
         const file: any = {
@@ -221,7 +223,7 @@ const ContactCardCreateScreen = ({
       const logoHeight = logo?.height ?? 0;
       //create the coverId
       if (logo && logo.id != null && logoWidth > 0 && logoHeight > 0) {
-        const logoTextureInfo = await NativeTextureLoader.loadImage(logo.uri, {
+        const logoTextureInfo = NativeTextureLoader.loadImage(logo.uri, {
           width: logoWidth,
           height: logoHeight,
         });
