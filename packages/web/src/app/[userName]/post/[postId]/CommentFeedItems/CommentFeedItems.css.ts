@@ -46,6 +46,15 @@ const item = style({
 
 const comment = style({
   margin: 0,
+  '@media': {
+    [MediaQuery.Mobile]: {
+      paddingRight: '10px',
+    },
+    [MediaQuery.Desktop]: {
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+    },
+  },
 });
 
 const name = style({
@@ -57,6 +66,11 @@ const name = style({
 const content = style({
   display: 'flex',
   flexDirection: 'column',
+  '@media': {
+    [MediaQuery.Desktop]: {
+      width: '90%',
+    },
+  },
 });
 
 const elapsed = style([
