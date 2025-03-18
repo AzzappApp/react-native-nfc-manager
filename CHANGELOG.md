@@ -1,3 +1,7 @@
+## 1.9.0-canary.44
+
+* **fix:**  - add small paddings around comment feed items ellipsis userName ([#7966](https://github.com/AzzappApp/azzapp/pull/7966))
+
 ## 1.9.0-canary.43
 
 * **fix:**  - **home:** [#7861](https://github.com/AzzappApp/azzapp/pull/7861) enhance sizes of tabs ([#7956](https://github.com/AzzappApp/azzapp/pull/7956))
