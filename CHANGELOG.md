@@ -1,3 +1,7 @@
+## 1.9.0-canary.47
+
+* **fix:**  - add check on length ([#7971](https://github.com/AzzappApp/azzapp/pull/7971))
+
 ## 1.9.0-canary.46
 
 * **perf:**  - **home:** [#7934](https://github.com/AzzappApp/azzapp/pull/7934) reduce number of queries on home & prefetched webcards ([#7965](https://github.com/AzzappApp/azzapp/pull/7965))
