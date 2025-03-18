@@ -1,3 +1,7 @@
+## 1.9.0-canary.45
+
+* **fix:**  - **contactCard:** [#7961](https://github.com/AzzappApp/azzapp/pull/7961) ignore logo if not business ([#7968](https://github.com/AzzappApp/azzapp/pull/7968))
+
 ## 1.9.0-canary.44
 
 * **fix:**  - add small paddings around comment feed items ellipsis userName ([#7966](https://github.com/AzzappApp/azzapp/pull/7966))
