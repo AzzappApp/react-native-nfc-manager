@@ -1,3 +1,7 @@
+## 1.9.0-canary.43
+
+* **fix:**  - **home:** [#7861](https://github.com/AzzappApp/azzapp/pull/7861) enhance sizes of tabs ([#7956](https://github.com/AzzappApp/azzapp/pull/7956))
+
 ## 1.9.0-canary.42
 
 * **fix:**  - correct company logo and company name on disabled multi user web… ([#7942](https://github.com/AzzappApp/azzapp/pull/7942))
