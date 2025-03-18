@@ -106,6 +106,40 @@ const ContactCardDetector = ({
 
   const router = useRouter();
 
+  const extractDataFromImage = useCallback(
+    (picture: { base64: string; uri: string; aspectRatio: number }) => {
+      commit({
+        variables: {
+          imgUrl: `data:image/jpg;base64,${picture.base64}`,
+          config: { createContactCard },
+        },
+        onCompleted: data => {
+          extractData(data.extractVisitCardData, {
+            uri: picture.uri,
+            aspectRatio: picture.aspectRatio,
+          });
+          close();
+          closeLoading();
+        },
+        onError: e => {
+          if (e.message === ERRORS.SUBSCRIPTION_REQUIRED) {
+            router.push({ route: 'USER_PAY_WALL' });
+            return;
+          }
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage:
+                'Oops, scanning your contact card was not possible. Please try again later.',
+              description: 'Error toast message when scanning a contact card',
+            }),
+          });
+        },
+      });
+    },
+    [close, closeLoading, commit, createContactCard, extractData, intl, router],
+  );
+
   const takePicture = useCallback(async () => {
     if (!camera.current || !isActive) {
       return null;
@@ -136,35 +170,13 @@ const ContactCardDetector = ({
         ],
         { compress: 0.8, format: SaveFormat.JPEG, base64: true },
       );
-
-      commit({
-        variables: {
-          imgUrl: `data:image/jpg;base64,${croppedImage.base64}`,
-          config: { createContactCard },
-        },
-        onCompleted: data => {
-          extractData(data.extractVisitCardData, {
-            uri: croppedImage.uri,
-            aspectRatio: croppedImage.width / croppedImage.height,
-          });
-          close();
-          closeLoading();
-        },
-        onError: e => {
-          if (e.message === ERRORS.SUBSCRIPTION_REQUIRED) {
-            router.push({ route: 'USER_PAY_WALL' });
-            return;
-          }
-          Toast.show({
-            type: 'error',
-            text1: intl.formatMessage({
-              defaultMessage:
-                'Oops, scanning your contact card was not possible. Please try again later.',
-              description: 'Error toast message when scanning a contact card',
-            }),
-          });
-        },
-      });
+      if (croppedImage.base64) {
+        extractDataFromImage({
+          base64: croppedImage.base64,
+          uri: croppedImage.uri,
+          aspectRatio: croppedImage.width / croppedImage.height,
+        });
+      }
     } catch (error) {
       closeLoading();
       console.log(error);
@@ -174,15 +186,10 @@ const ContactCardDetector = ({
     boxDimension.width,
     boxDimension.x,
     boxDimension.y,
-    close,
     closeLoading,
-    commit,
-    createContactCard,
-    extractData,
+    extractDataFromImage,
     height,
-    intl,
     isActive,
-    router,
     showLoading,
     width,
   ]);
@@ -302,29 +309,17 @@ const ContactCardDetector = ({
         file.create();
         file.write(pngData);
 
-        commit({
-          variables: { imgUrl: `data:image/jpg;base64,${base64Data}` },
-          onCompleted: data => {
-            extractData(data.extractVisitCardData, {
-              uri: filePath,
-              aspectRatio: image.width() / image.height(),
-            });
-            close();
-            closeLoading();
-          },
-          onError: error => {
-            closeLoading();
-            if (error.message === ERRORS.SUBSCRIPTION_REQUIRED) {
-              router.push({ route: 'USER_PAY_WALL' });
-            }
-          },
+        extractDataFromImage({
+          base64: base64Data,
+          uri: filePath,
+          aspectRatio: image.width() / image.height(),
         });
       }
     } catch (error) {
       closeLoading();
       console.log(error);
     }
-  }, [close, closeLoading, commit, extractData, router, showLoading]);
+  }, [closeLoading, extractDataFromImage, showLoading]);
 
   const ref = useRef<View>(null);
   const animatedStyle = useAnimatedStyle(() => {
