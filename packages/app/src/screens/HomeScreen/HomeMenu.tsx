@@ -55,6 +55,7 @@ const HomeMenu = ({ user, selected, setSelected, minWidth }: HomeMenuProps) => {
         backgroundColor={CLEAR_GRADIENT_COLOR}
         labelStyle={styles.menuLabelStyle}
         selectedLabelColor={colors.white}
+        style={styles.menuContainerStyle}
       >
         <FormattedMessage
           defaultMessage="Contact card{azzappA}"
@@ -76,6 +77,7 @@ const HomeMenu = ({ user, selected, setSelected, minWidth }: HomeMenuProps) => {
           backgroundColor={CLEAR_GRADIENT_COLOR}
           labelStyle={styles.menuLabelStyle}
           selectedLabelColor={colors.white}
+          style={styles.menuContainerStyle}
         >
           <FormattedMessage
             defaultMessage="Multi-user"
@@ -90,6 +92,7 @@ const HomeMenu = ({ user, selected, setSelected, minWidth }: HomeMenuProps) => {
         backgroundColor={CLEAR_GRADIENT_COLOR}
         labelStyle={styles.menuLabelStyle}
         selectedLabelColor={colors.white}
+        style={styles.menuContainerStyle}
       >
         <FormattedMessage
           defaultMessage="Statistics"
@@ -117,7 +120,9 @@ const styles = StyleSheet.create({
     gap: 5,
     alignSelf: 'center',
   },
+  menuContainerStyle: { flex: 1, paddingHorizontal: 10 },
   menuLabelStyle: {
     color: colors.white,
+    textOverflow: 'ellipsis',
   },
 });
