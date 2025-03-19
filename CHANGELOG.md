@@ -1,3 +1,7 @@
+## 1.9.0-canary.48
+
+* **feat:**  - background upload of cover ([#7984](https://github.com/AzzappApp/azzapp/pull/7984))
+
 ## 1.9.0-canary.47
 
 * **fix:**  - add check on length ([#7971](https://github.com/AzzappApp/azzapp/pull/7971))
