@@ -1,3 +1,7 @@
+## 1.9.0-canary.53
+
+
+
 ## 1.9.0-canary.52
 
 * **fix:**  - drop unused covertemplate preview model ([#7988](https://github.com/AzzappApp/azzapp/pull/7988))
