@@ -45,7 +45,7 @@ const generateEmailSignature: MutationResolvers['generateEmailSignature'] =
       profileId,
       webCard.id,
       profile.contactCard,
-      webCard.commonInformation,
+      webCard.isMultiUser ? webCard.commonInformation : undefined,
       avatarUrl,
     );
 

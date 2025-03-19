@@ -2,6 +2,7 @@ import { GraphQLError } from 'graphql';
 import { getUserById, getProfileWithWebCardById } from '@azzapp/data';
 import { sendTemplateEmail } from '@azzapp/shared/emailHelpers';
 import ERRORS from '@azzapp/shared/errors';
+import serializeAndSignEmailSignature from '@azzapp/shared/serializeAndSignEmailSignature';
 import { getSessionInfos } from '#GraphQLContext';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import generateEmailSignature from '../generateEmailSignature';
@@ -126,6 +127,60 @@ describe('generateEmailSignature Mutation', () => {
       action: 'GENERATE_EMAIL_SIGNATURE',
       webCardIsMultiUser: false,
     });
+  });
+
+  test('should call serializeAndSignEmailSignature without commonInformations if webcard is not multi user', async () => {
+    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-456' });
+    (getProfileWithWebCardById as jest.Mock).mockResolvedValue({
+      profile: mockProfile,
+      webCard: { ...mockWebCard, isMultiUser: false },
+    });
+
+    await generateEmailSignature(
+      {},
+      {
+        profileId: 'gql-Profile-123',
+        config: { preview: 'base64-image-data' },
+      },
+      mockContext,
+      mockInfo,
+    );
+
+    expect(serializeAndSignEmailSignature).toHaveBeenCalledWith(
+      'testUser',
+      'Profile-123',
+      'webcard-789',
+      { firstName: 'John', lastName: 'Doe' },
+      undefined,
+      'https://avatar-url.com',
+    );
+  });
+
+  test('should call serializeAndSignEmailSignature with commonInformations if webcard is multi user', async () => {
+    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-456' });
+    (getProfileWithWebCardById as jest.Mock).mockResolvedValue({
+      profile: mockProfile,
+      webCard: { ...mockWebCard, isMultiUser: true },
+    });
+
+    await generateEmailSignature(
+      {},
+      {
+        profileId: 'gql-Profile-123',
+        config: { preview: 'base64-image-data' },
+      },
+      mockContext,
+      mockInfo,
+    );
+
+    expect(serializeAndSignEmailSignature).toHaveBeenCalledWith(
+      'testUser',
+      'Profile-123',
+      'webcard-789',
+      { firstName: 'John', lastName: 'Doe' },
+      { emails: [], phoneNumbers: [] },
+      'https://avatar-url.com',
+    );
   });
 
   test('should throw INVALID_REQUEST if profile does not exist', async () => {
