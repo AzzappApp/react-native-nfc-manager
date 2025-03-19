@@ -49,6 +49,8 @@ const ContactCreateScreen = ({
   route: { params },
 }: NativeScreenProps<ContactCreateRoute>) => {
   const styles = useStyleSheet(stylesheet);
+
+  const [notifyError, setNotifyError] = useState(false);
   const [progressIndicator, setProgressIndicator] =
     useState<Observable<number> | null>(null);
 
@@ -90,151 +92,157 @@ const ContactCreateScreen = ({
     },
   });
 
-  const submit = handleSubmit(async ({ avatar, logo, ...data }) => {
-    if (!profileId) {
-      return;
-    }
-    if (data.notify && data.emails.length <= 0) {
-      Toast.show({
-        type: 'error',
-        text1: intl.formatMessage({
-          defaultMessage:
-            'Error, could not save your contact. Please add email or uncheck the box.',
-          description:
-            'Error toast message when saving contact card without email and box checked',
-        }),
-      });
-      return;
-    }
-
-    const uploads = [];
-
-    if (avatar?.local && avatar.uri) {
-      const fileName = getFileName(avatar.uri);
-      const file: any = {
-        name: fileName,
-        uri: avatar.uri,
-        type: mime.lookup(fileName) || 'image/jpeg',
-      };
-
-      const { uploadURL, uploadParameters } = await uploadSign({
-        kind: 'image',
-        target: 'avatar',
-      });
-      uploads.push(uploadMedia(file, uploadURL, uploadParameters));
-    } else {
-      uploads.push(null);
-    }
-
-    if (logo?.local && logo.uri) {
-      const fileName = getFileName(logo.uri);
-      const file: any = {
-        name: fileName,
-        uri: logo.uri,
-        type: mime.lookup(fileName) || 'image/jpeg',
-      };
-
-      const { uploadURL, uploadParameters } = await uploadSign({
-        kind: 'image',
-        target: 'logo',
-      });
-      uploads.push(uploadMedia(file, uploadURL, uploadParameters));
-    } else {
-      uploads.push(null);
-    }
-
-    const uploadsToDo = uploads.filter(val => val !== null);
-
-    if (uploadsToDo.length) {
-      setProgressIndicator(Observable.from(0));
-      setProgressIndicator(
-        combineMultiUploadProgresses(
-          uploadsToDo.map(upload => upload.progress),
-        ),
-      );
-    }
-
-    const [uploadedAvatarId, uploadedLogoId] = await Promise.all(
-      uploads.map(upload =>
-        upload?.promise.then(({ public_id }) => {
-          return public_id;
-        }),
-      ),
-    );
-
-    const avatarId =
-      avatar === null ? null : avatar?.local ? uploadedAvatarId : avatar?.id;
-
-    const logoId =
-      logo === null ? null : logo?.local ? uploadedLogoId : logo?.id;
-
-    commit({
-      variables: {
-        profileId,
-        scanUsed: data.scanUsed,
-        notify: data.notify,
-        contact: {
-          avatarId,
-          logoId,
-          emails: data.emails?.length
-            ? data.emails.filter(email => email.address)
-            : [],
-          phoneNumbers: data.phoneNumbers?.length
-            ? data.phoneNumbers
-                .filter(phoneNumber => phoneNumber.number)
-                .map(({ countryCode, ...phoneNumber }) => {
-                  const number = getPhonenumberWithCountryCode(
-                    phoneNumber.number,
-                    countryCode as CountryCode,
-                  );
-                  return { label: phoneNumber.label, number };
-                })
-            : [],
-          urls: data.urls,
-          addresses: data.addresses,
-          socials: data.socials,
-          company: data.company || '',
-          firstname: data.firstName || '',
-          lastname: data.lastName || '',
-          title: data.title || '',
-          birthday: data.birthday?.birthday || '',
-          withShareBack: false,
-        },
-      },
-      onCompleted: () => {
-        if (avatarId && avatar?.uri) {
-          addLocalCachedMediaFile(
-            `${'image'.slice(0, 1)}:${avatarId}`,
-            'image',
-            avatar.uri,
-          );
-        }
-        router.back();
-      },
-      updater: (store, response) => {
-        if (response && response.addContact && profileId) {
-          const profile = store.get(profileId);
-          const nbContacts = profile?.getValue('nbContacts');
-
-          if (typeof nbContacts === 'number') {
-            profile?.setValue(nbContacts + 1, 'nbContacts');
-          }
-        }
-      },
-      onError: e => {
-        console.error(e);
+  const submit = () => {
+    setNotifyError(false);
+    handleSubmit(async ({ avatar, logo, ...data }) => {
+      if (!profileId) {
+        return;
+      }
+      if (data.notify && data.emails.length <= 0) {
+        setNotifyError(true);
         Toast.show({
           type: 'error',
           text1: intl.formatMessage({
             defaultMessage:
-              'Error, could not save your contact. Please try again.',
-            description: 'Error toast message when saving contact card failed',
-          }) as unknown as string,
+              'Error, could not save your contact. Please add email or uncheck the box.',
+            description:
+              'Error toast message when saving contact card without email and box checked',
+          }),
         });
-        router.back();
-      },
-    });
-  });
+
+        return;
+      }
+
+      const uploads = [];
+
+      if (avatar?.local && avatar.uri) {
+        const fileName = getFileName(avatar.uri);
+        const file: any = {
+          name: fileName,
+          uri: avatar.uri,
+          type: mime.lookup(fileName) || 'image/jpeg',
+        };
+
+        const { uploadURL, uploadParameters } = await uploadSign({
+          kind: 'image',
+          target: 'avatar',
+        });
+        uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+      } else {
+        uploads.push(null);
+      }
+
+      if (logo?.local && logo.uri) {
+        const fileName = getFileName(logo.uri);
+        const file: any = {
+          name: fileName,
+          uri: logo.uri,
+          type: mime.lookup(fileName) || 'image/jpeg',
+        };
+
+        const { uploadURL, uploadParameters } = await uploadSign({
+          kind: 'image',
+          target: 'logo',
+        });
+        uploads.push(uploadMedia(file, uploadURL, uploadParameters));
+      } else {
+        uploads.push(null);
+      }
+
+      const uploadsToDo = uploads.filter(val => val !== null);
+
+      if (uploadsToDo.length) {
+        setProgressIndicator(Observable.from(0));
+        setProgressIndicator(
+          combineMultiUploadProgresses(
+            uploadsToDo.map(upload => upload.progress),
+          ),
+        );
+      }
+
+      const [uploadedAvatarId, uploadedLogoId] = await Promise.all(
+        uploads.map(upload =>
+          upload?.promise.then(({ public_id }) => {
+            return public_id;
+          }),
+        ),
+      );
+
+      const avatarId =
+        avatar === null ? null : avatar?.local ? uploadedAvatarId : avatar?.id;
+
+      const logoId =
+        logo === null ? null : logo?.local ? uploadedLogoId : logo?.id;
+
+      commit({
+        variables: {
+          profileId,
+          scanUsed: data.scanUsed,
+          notify: data.notify,
+          contact: {
+            avatarId,
+            logoId,
+            emails: data.emails?.length
+              ? data.emails.filter(email => email.address)
+              : [],
+            phoneNumbers: data.phoneNumbers?.length
+              ? data.phoneNumbers
+                  .filter(phoneNumber => phoneNumber.number)
+                  .map(({ countryCode, ...phoneNumber }) => {
+                    const number = getPhonenumberWithCountryCode(
+                      phoneNumber.number,
+                      countryCode as CountryCode,
+                    );
+                    return { label: phoneNumber.label, number };
+                  })
+              : [],
+            urls: data.urls,
+            addresses: data.addresses,
+            socials: data.socials,
+            company: data.company || '',
+            firstname: data.firstName || '',
+            lastname: data.lastName || '',
+            title: data.title || '',
+            birthday: data.birthday?.birthday || '',
+            withShareBack: false,
+          },
+        },
+        onCompleted: () => {
+          if (avatarId && avatar?.uri) {
+            addLocalCachedMediaFile(
+              `${'image'.slice(0, 1)}:${avatarId}`,
+              'image',
+              avatar.uri,
+            );
+          }
+          router.back();
+        },
+        updater: (store, response) => {
+          if (response && response.addContact && profileId) {
+            const profile = store.get(profileId);
+            const nbContacts = profile?.getValue('nbContacts');
+
+            if (typeof nbContacts === 'number') {
+              profile?.setValue(nbContacts + 1, 'nbContacts');
+            }
+          }
+        },
+        onError: e => {
+          console.error(e);
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage:
+                'Error, could not save your contact. Please try again.',
+              description:
+                'Error toast message when saving contact card failed',
+            }) as unknown as string,
+          });
+          router.back();
+        },
+      });
+    })();
+  };
 
   useEffect(() => {
     return Toast.hide;
@@ -369,7 +377,11 @@ const ContactCreateScreen = ({
           onPress={openScannerView}
           style={styles.scanButton}
         />
-        <ContactCreateForm control={control} scanImage={scanImage} />
+        <ContactCreateForm
+          control={control}
+          scanImage={scanImage}
+          notifyError={notifyError}
+        />
         <ScreenModal
           visible={!!progressIndicator}
           gestureEnabled={false}
