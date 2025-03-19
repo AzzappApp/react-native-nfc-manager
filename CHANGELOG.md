@@ -1,3 +1,7 @@
+## 1.9.0-canary.56
+
+* **fix:**  - **cover:** [#7999](https://github.com/AzzappApp/azzapp/pull/7999) don’t display azzapp + indicator when subscribed ([#8001](https://github.com/AzzappApp/azzapp/pull/8001))
+
 ## 1.9.0-canary.55
 
 
