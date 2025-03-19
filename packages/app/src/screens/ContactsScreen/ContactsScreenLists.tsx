@@ -119,6 +119,8 @@ const ContactsScreenLists = ({
             provider: "CappedPixelRatio.relayprovider"
           }
         ) {
+          id
+          nbContacts #keep this field to update  on the main screen after updating by pulling down #7896
           searchContacts(
             after: $after
             first: $first

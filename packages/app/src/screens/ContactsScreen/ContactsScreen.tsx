@@ -1,15 +1,15 @@
-import { Suspense, useCallback, useEffect, useState } from 'react';
+import { Suspense, useCallback, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { colors } from '#theme';
 import AccountHeader from '#components/AccountHeader';
-import { useRouter, useScreenHasFocus } from '#components/NativeRouter';
+import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import relayScreen from '#helpers/relayScreen';
-import { useAppState } from '#hooks/useAppState';
 import useBoolean from '#hooks/useBoolean';
+import useNotifications from '#hooks/useNotifications';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -55,6 +55,17 @@ const ContactsScreen = ({
   const [isAddNewContactMenuOpen, openNewContactMenu, closeNewContactMenu] =
     useBoolean();
 
+  const onDeepLink = useCallback(
+    (deepLink: string) => {
+      if (deepLink === 'shareBack') {
+        refreshQuery?.();
+      }
+    },
+    [refreshQuery],
+  );
+
+  useNotifications(onDeepLink);
+
   const onCreateWithScanner = useCallback(() => {
     closeNewContactMenu();
     if (profile?.id) {
@@ -76,20 +87,6 @@ const ContactsScreen = ({
   }, [closeNewContactMenu, profile?.id, router]);
 
   const intl = useIntl();
-  const hasFocus = useScreenHasFocus();
-  const appState = useAppState();
-
-  // fix ##7896
-  // this screen is on top (from tabbar), has focus does not proc when coming from background and screen was selected
-  // list is refresh by mounting : dismounting as children
-  // count was  never refresh until switch profile
-  // hasFocus: query does not REFRESH as the screen is always mount (us)
-  // appState : query does not REFRESH  when coming from background
-  useEffect(() => {
-    if (hasFocus || appState === 'active') {
-      refreshQuery?.();
-    }
-  }, [appState, hasFocus, refreshQuery]);
 
   return (
     <>
@@ -293,4 +290,5 @@ export default relayScreen(ContactsScreen, {
     fetchPolicy: 'store-and-network',
   }),
   fallback: ContactsScreenFallback,
+  refreshOnFocus: true,
 });
