@@ -1,3 +1,7 @@
+## 1.9.0-canary.51
+
+* **feat:**  - **shareBack:** [#7807](https://github.com/AzzappApp/azzapp/pull/7807) use template email ([#7985](https://github.com/AzzappApp/azzapp/pull/7985))
+
 ## 1.9.0-canary.50
 
 * **fix:**  - ensure share deeplink always work ([#7967](https://github.com/AzzappApp/azzapp/pull/7967))
