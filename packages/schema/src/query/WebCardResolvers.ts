@@ -539,7 +539,6 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
     const coverTemplates = await getCoverTemplatesByTypesAndTag(
       coverTemplatesTypes.map(t => t.id),
       tagId,
-      webCard.companyActivityId,
     );
 
     return connectionFromSortedArray(

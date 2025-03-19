@@ -27,7 +27,6 @@ generates:
         PostComment: '@azzapp/data#PostComment as PostCommentModel'
         CardTemplate: '@azzapp/data#CardTemplate as CardTemplateModel'
         CardTemplateType: '@azzapp/data#CardTemplateType as CardTemplateTypeModel'
-        CoverTemplatePreview: '@azzapp/data#CoverTemplatePreview as CoverTemplatePreviewModel'
         CoverTemplate: '@azzapp/data#CoverTemplate as CoverTemplateModel'
         CoverTemplateType: '@azzapp/data#CoverTemplateType as CoverTemplateTypeModel'
         CoverTemplateTag: '@azzapp/data#CoverTemplateTag as CoverTemplateTagModel'

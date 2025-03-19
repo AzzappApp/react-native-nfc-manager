@@ -215,28 +215,6 @@ export const CoverPredefinedTable = cols.table('CoverPredefined', {
 
 export type CoverPredefined = InferSelectModel<typeof CoverPredefinedTable>;
 
-// #region CoverTemplatePreview
-export const CoverTemplatePreviewTable = cols.table(
-  'CoverTemplatePreview',
-  {
-    mediaId: cols.mediaId('mediaId').notNull(),
-    coverTemplateId: cols.cuid('coverTemplateId').notNull(),
-    companyActivityId: cols.cuid('companyActivityId'),
-  },
-  table => {
-    return {
-      coverTemplatePreviewCoverTemplateIdCompanyActivityId: cols.primaryKey({
-        columns: [table.coverTemplateId, table.companyActivityId],
-      }),
-    };
-  },
-);
-
-export type CoverTemplatePreview = InferSelectModel<
-  typeof CoverTemplatePreviewTable
->;
-// #endregion
-
 // #region CoverTemplate
 export const CoverTemplateTable = cols.table('CoverTemplate', {
   id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),

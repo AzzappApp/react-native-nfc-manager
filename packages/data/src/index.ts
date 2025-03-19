@@ -32,7 +32,6 @@ export type {
   CoverPredefined,
   CoverTemplate,
   CoverTemplateParams,
-  CoverTemplatePreview,
   CoverTemplateTag,
   CoverTemplateType,
   CoverText,
