@@ -149,7 +149,6 @@ export type CardModuleTemplate = Pick<CardModule, 'data' | 'kind' | 'variant'>;
 // #region CardTemplateType
 export const CardTemplateTypeTable = cols.table('CardTemplateType', {
   id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
-  webCardCategoryId: cols.cuid('webCardCategoryId').notNull(),
   enabled: cols.boolean('enabled').default(true).notNull(),
 });
 

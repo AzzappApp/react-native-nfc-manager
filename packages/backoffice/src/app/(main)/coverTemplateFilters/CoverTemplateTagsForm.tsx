@@ -17,7 +17,6 @@ import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { intParser, useForm } from '#helpers/formHelpers';
 import { saveCoverTemplateTag } from './coverTemplateTagsActions';
-import type { WebCardCategoryErrors } from '../webCardCategories/webCardCategorySchema';
 import type { CoverTemplateTag } from '@azzapp/data';
 import type { FormEvent } from 'react';
 
@@ -40,10 +39,8 @@ const CoverTemplateTagForm = ({
   const [displaySaveSuccess, setDisplaySaveSuccess] = useState(saved);
   const [error, setError] = useState<string>();
   const [saving, startSaving] = useTransition();
-  const [formErrors, setFormErrors] = useState<WebCardCategoryErrors | null>(
-    null,
-  );
   const router = useRouter();
+  const [formErrors, setFormErrors] = useState<any>(null);
 
   const { data, fieldProps } = useForm<FormValue>(
     () =>

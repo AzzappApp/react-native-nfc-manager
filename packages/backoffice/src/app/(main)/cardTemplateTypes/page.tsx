@@ -9,7 +9,6 @@ import CardTemplateTypesList from './CardTemplateTypesList';
 export type CardTemplateTypeItem = {
   id: string;
   label: string | null;
-  category: string;
   status: boolean;
   templatesCount: number;
 };
@@ -25,9 +24,6 @@ const CardTemplateTypesPage = async () => {
     ({ cardTemplateType, templatesCount }) => ({
       id: cardTemplateType.id,
       label: labelsMap.get(cardTemplateType.id) || null,
-      category:
-        labelsMap.get(cardTemplateType.webCardCategoryId) ??
-        cardTemplateType.webCardCategoryId,
       status: cardTemplateType.enabled,
       templatesCount,
     }),

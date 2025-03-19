@@ -2,13 +2,8 @@
 
 import { parseWithZod } from '@conform-to/zod';
 
-import { revalidatePath } from 'next/cache';
 import {
   createCoverTemplate,
-  createCoverTemplatePreview,
-  removeCoverTemplatePreviewById,
-  updateCoverTemplatePreview,
-  getCoverTemplatePreview,
   updateCoverTemplate,
   checkMedias,
   referencesMedias,
@@ -90,52 +85,5 @@ export const saveCoverTemplate = async (
   } catch (e) {
     console.log(e);
     return { status: 'error' };
-  }
-};
-
-export const uploadPreview = async (prevState: unknown, formData: FormData) => {
-  try {
-    const coverTemplateId = formData.get('coverTemplateId') as string;
-    const previewId = formData.get('previewId') as string;
-
-    if (!previewId) {
-      throw new Error('MISSING_PREVIEW_ID');
-    }
-    await checkMedias([previewId]);
-
-    await transaction(async () => {
-      const coverTemplatePreview =
-        await getCoverTemplatePreview(coverTemplateId);
-
-      if (coverTemplatePreview) {
-        await updateCoverTemplatePreview(coverTemplateId, {
-          mediaId: previewId,
-        });
-      } else {
-        await createCoverTemplatePreview({
-          coverTemplateId,
-          mediaId: previewId,
-        });
-      }
-
-      await referencesMedias([previewId], [coverTemplatePreview?.mediaId]);
-
-      revalidatePath(`/coverTemplates/[id]`, 'layout');
-    });
-
-    return { status: 'success' };
-  } catch (e) {
-    console.log(e);
-    return { status: 'error' };
-  }
-};
-
-export const deletePreview = async (coverTemplateId: string) => {
-  try {
-    await removeCoverTemplatePreviewById(coverTemplateId);
-    revalidatePath(`/coverTemplates/[id]`, 'layout');
-  } catch (e) {
-    console.error(e);
-    throw e;
   }
 };
