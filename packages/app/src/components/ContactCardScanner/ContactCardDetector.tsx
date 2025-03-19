@@ -122,6 +122,7 @@ const ContactCardDetector = ({
           closeLoading();
         },
         onError: e => {
+          closeLoading();
           if (e.message === ERRORS.SUBSCRIPTION_REQUIRED) {
             router.push({ route: 'USER_PAY_WALL' });
             return;
