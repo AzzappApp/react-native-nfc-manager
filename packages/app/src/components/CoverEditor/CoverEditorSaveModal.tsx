@@ -6,10 +6,8 @@ import type { Observable } from 'relay-runtime';
 
 const CoverEditorSaveModal = ({
   exportProgressIndicator,
-  uploadProgressIndicator,
 }: {
   exportProgressIndicator: Observable<number> | null;
-  uploadProgressIndicator: Observable<number> | null;
 }) => {
   useKeepAwake();
 
@@ -19,9 +17,9 @@ const CoverEditorSaveModal = ({
     if (exportProgressIndicator) {
       result.push(exportProgressIndicator);
     }
-    result.push(uploadProgressIndicator);
+
     return result;
-  }, [exportProgressIndicator, uploadProgressIndicator]);
+  }, [exportProgressIndicator]);
 
   const texts = useMemo(() => {
     const result = [];
@@ -33,12 +31,7 @@ const CoverEditorSaveModal = ({
         }),
       );
     }
-    result.push(
-      intl.formatMessage({
-        defaultMessage: 'Upload',
-        description: 'Upload phase title in cover editor save modal',
-      }),
-    );
+
     return result;
   }, [exportProgressIndicator, intl]);
   return (

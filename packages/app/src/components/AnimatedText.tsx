@@ -2,11 +2,7 @@ import AnimateableText from 'react-native-animateable-text';
 import { useAnimatedProps, useAnimatedStyle } from 'react-native-reanimated';
 import { useVariantStyleSheet } from '#helpers/createStyles';
 import { textStyleSheet } from '#ui/Text';
-import type {
-  ColorSchemeName,
-  TextProps as RNTextProps,
-  TextStyle,
-} from 'react-native';
+import type { ColorSchemeName, TextProps as RNTextProps } from 'react-native';
 import type { DerivedValue, SharedValue } from 'react-native-reanimated';
 
 type TextProps = RNTextProps & {
@@ -57,12 +53,7 @@ const AnimatedText = ({
   }, [text]);
 
   const colorStyle = useAnimatedStyle(() => {
-    return {
-      color:
-        animatedTextColor?.value ||
-        (style as TextStyle)?.color ||
-        (styles.text as TextStyle)?.color,
-    };
+    return animatedTextColor?.value ? { color: animatedTextColor?.value } : {};
   });
 
   return (

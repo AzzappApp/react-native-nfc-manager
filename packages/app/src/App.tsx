@@ -27,6 +27,7 @@ import NetworkAvailableContextProvider, {
   useNetworkAvailableFetcher,
 } from '#networkAvailableContext';
 import { colors } from '#theme';
+import { ContextUploadProvider } from '#components/CoverEditor/CoverUploadContext';
 import ErrorBoundary from '#components/ErrorBoundary';
 import ErrorScreen from '#components/ErrorScreen';
 import MainTabBar from '#components/MainTabBar';
@@ -463,45 +464,47 @@ const AppRouter = () => {
     <NetworkAvailableContextProvider value={isConnected}>
       <RelayEnvironmentProvider environment={environment}>
         <ScreenPrefetcherProvider value={screenPrefetcher}>
-          <SafeAreaProvider
-            initialMetrics={Platform.select({
-              android: null,
-              default: initialWindowMetrics,
-            })}
-            style={safeAreaBackgroundStyle}
-          >
-            <GestureHandlerRootView style={styles.flex}>
-              <RouterProvider value={router}>
-                <BottomSheetModalProvider>
-                  <ScreensRenderer
-                    routerState={routerState}
-                    screens={screens}
-                    tabs={tabs}
-                    onFinishTransitioning={onFinishTransitioning}
-                    onScreenHasBeenDismissed={disposeScreens}
-                  />
-                </BottomSheetModalProvider>
-              </RouterProvider>
-              <Toast />
-              <Suspense>
-                <ShakeShare />
-              </Suspense>
+          <ContextUploadProvider>
+            <SafeAreaProvider
+              initialMetrics={Platform.select({
+                android: null,
+                default: initialWindowMetrics,
+              })}
+              style={safeAreaBackgroundStyle}
+            >
+              <GestureHandlerRootView style={styles.flex}>
+                <RouterProvider value={router}>
+                  <BottomSheetModalProvider>
+                    <ScreensRenderer
+                      routerState={routerState}
+                      screens={screens}
+                      tabs={tabs}
+                      onFinishTransitioning={onFinishTransitioning}
+                      onScreenHasBeenDismissed={disposeScreens}
+                    />
+                  </BottomSheetModalProvider>
+                </RouterProvider>
+                <Toast />
+                <Suspense>
+                  <ShakeShare />
+                </Suspense>
 
-              {offlineScreenDisplayed ? (
-                <View
-                  style={{
-                    width: screenWidth,
-                    height: screenHeight,
-                  }}
-                >
-                  <OfflineVCardScreenRenderer
-                    onClose={hideOfflineScreen}
-                    canLeaveScreen={isConnected}
-                  />
-                </View>
-              ) : undefined}
-            </GestureHandlerRootView>
-          </SafeAreaProvider>
+                {offlineScreenDisplayed ? (
+                  <View
+                    style={{
+                      width: screenWidth,
+                      height: screenHeight,
+                    }}
+                  >
+                    <OfflineVCardScreenRenderer
+                      onClose={hideOfflineScreen}
+                      canLeaveScreen={isConnected}
+                    />
+                  </View>
+                ) : undefined}
+              </GestureHandlerRootView>
+            </SafeAreaProvider>
+          </ContextUploadProvider>
         </ScreenPrefetcherProvider>
       </RelayEnvironmentProvider>
     </NetworkAvailableContextProvider>

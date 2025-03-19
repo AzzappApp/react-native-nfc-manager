@@ -3,11 +3,9 @@ import {
   createPicture,
   drawAsImageFromPicture,
 } from '@shopify/react-native-skia';
-import { FileSystemUploadType, UploadTask } from 'expo-file-system';
 import { File, Paths } from 'expo-file-system/next';
 import { useCallback, useState } from 'react';
 import { Platform } from 'react-native';
-import * as mime from 'react-native-mime-types';
 import { graphql, useMutation } from 'react-relay';
 import { Observable } from 'relay-runtime';
 import {
@@ -19,7 +17,6 @@ import { onChangeWebCard } from '#helpers/authStore';
 import {
   createRandomFileName,
   createRandomFilePath,
-  getFileName,
 } from '#helpers/fileHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadSign } from '#helpers/MobileWebAPI';
@@ -35,6 +32,7 @@ import {
   extractLottieInfoMemoized,
 } from './coverEditorHelpers';
 import coverLocalStore from './coversLocalStore';
+import { useCoverUpload } from './CoverUploadContext';
 import type { useSaveCoverMutation } from '#relayArtifacts/useSaveCoverMutation.graphql';
 import type {
   CoverEditorState,
@@ -66,12 +64,12 @@ const useSaveCover = (
   webCardId: string | null,
   coverEditorState: CoverEditorState,
 ) => {
+  const { startUpload } = useCoverUpload();
   const [savingStatus, setSavingStatus] = useState<SavingStatus | null>(null);
   const [error, setError] = useState<any>(null);
   const [exportProgressIndicator, setExportProgressIndicator] =
     useState<Observable<number> | null>(null);
-  const [uploadProgressIndicator, setUploadProgressIndicator] =
-    useState<Observable<number> | null>(null);
+
   const [commit] = useMutation<useSaveCoverMutation>(graphql`
     mutation useSaveCoverMutation($webCardId: ID!, $input: SaveCoverInput!) {
       saveCover(webCardId: $webCardId, input: $input) {
@@ -123,7 +121,6 @@ const useSaveCover = (
       setSavingStatus('error');
       setError(error);
       setExportProgressIndicator(null);
-      setUploadProgressIndicator(null);
       throw error;
     }
 
@@ -131,125 +128,98 @@ const useSaveCover = (
       kind: kind === 'video' ? 'video' : 'image',
       target: 'cover',
     });
-    let uploadProgressSink: Sink<number>;
-    const uploadProgress: Observable<number> = Observable.create(sink => {
-      uploadProgressSink = sink;
-    });
-
-    const uploadTask = new UploadTask(
-      uploadURL,
-      path,
-      {
-        uploadType: FileSystemUploadType.MULTIPART,
-        httpMethod: 'POST',
-        fieldName: 'file',
-        mimeType:
-          mime.lookup(getFileName(path)) ||
-          (kind === 'image' ? 'image/jpeg' : 'video/mp4'),
-        parameters: Object.fromEntries(
-          Object.entries(uploadParameters).map(([key, value]) => [
-            key,
-            value.toString(),
-          ]),
-        ),
-      },
-      ({ totalBytesSent, totalBytesExpectedToSend }) => {
-        uploadProgressSink?.next(totalBytesSent / totalBytesExpectedToSend);
-      },
-    );
-
-    setSavingStatus('uploading');
-    setUploadProgressIndicator(uploadProgress);
-    const result = await uploadTask.uploadAsync();
-    if (!result) {
-      throw new Error('Error uploading media');
-    }
-    const { public_id } = JSON.parse(result.body);
-
+    const public_id = uploadParameters.public_id;
     addLocalCachedMediaFile(public_id, kind, path);
 
-    setSavingStatus('saving');
+    startUpload(
+      path,
+      uploadURL,
+      uploadParameters,
+      kind,
+      webCardId,
+      async () => {
+        const texts = coverEditorState.textLayers.map(({ text }) => text);
+        const {
+          backgroundColor,
+          cardColors,
+          coverPreviewPositionPercentage,
+          shouldComputeCoverPreviewPositionPercentage,
+          coverTransition,
+        } = coverEditorState;
 
-    const texts = coverEditorState.textLayers.map(({ text }) => text);
-    const {
-      backgroundColor,
-      cardColors,
-      coverPreviewPositionPercentage,
-      shouldComputeCoverPreviewPositionPercentage,
-      coverTransition,
-    } = coverEditorState;
+        let _coverPreviewPositionPercentage = coverPreviewPositionPercentage;
+        // compute cover preview percentage for manually created cover
+        if (shouldComputeCoverPreviewPositionPercentage) {
+          // full duration of cover
+          const fullDuration = coverEditorState.medias.reduce((acc, media) => {
+            return acc + getMediaDuration(media);
+          }, 0);
+          // duration of first cover
+          const firstMediaDuration = coverEditorState.medias[0]
+            ? getMediaDuration(coverEditorState.medias[0])
+            : 0;
 
-    let _coverPreviewPositionPercentage = coverPreviewPositionPercentage;
-    // compute cover preview percentage for manually created cover
-    if (shouldComputeCoverPreviewPositionPercentage) {
-      // full duration of cover
-      const fullDuration = coverEditorState.medias.reduce((acc, media) => {
-        return acc + getMediaDuration(media);
-      }, 0);
-      // duration of first cover
-      const firstMediaDuration = coverEditorState.medias[0]
-        ? getMediaDuration(coverEditorState.medias[0])
-        : 0;
-
-      // remove transition duration
-      const transitionDuration =
-        (coverTransition && coverTransitions[coverTransition].duration) || 0;
-      const expectedPosition = firstMediaDuration - transitionDuration;
-      // move to percent
-      _coverPreviewPositionPercentage = Math.floor(
-        (expectedPosition * 100) / fullDuration,
-      );
-    }
-    try {
-      await new Promise<void>((resolve, reject) => {
-        commit({
-          variables: {
-            webCardId,
-            input: {
-              mediaId: public_id,
-              texts,
-              backgroundColor: backgroundColor ?? 'light',
-              coverPreviewPositionPercentage: _coverPreviewPositionPercentage,
-              cardColors,
-              dynamicLinks: coverEditorState.linksLayer,
-            },
-          },
-          onCompleted(response, error) {
-            onChangeWebCard({
-              coverIsPredefined: response.saveCover.webCard.coverIsPredefined,
+          // remove transition duration
+          const transitionDuration =
+            (coverTransition && coverTransitions[coverTransition].duration) ||
+            0;
+          const expectedPosition = firstMediaDuration - transitionDuration;
+          // move to percent
+          _coverPreviewPositionPercentage = Math.floor(
+            (expectedPosition * 100) / fullDuration,
+          );
+        }
+        try {
+          await new Promise<void>((resolve, reject) => {
+            commit({
+              variables: {
+                webCardId,
+                input: {
+                  mediaId: public_id,
+                  texts,
+                  backgroundColor: backgroundColor ?? 'light',
+                  coverPreviewPositionPercentage:
+                    _coverPreviewPositionPercentage,
+                  cardColors,
+                  dynamicLinks: coverEditorState.linksLayer,
+                },
+              },
+              onCompleted(response, error) {
+                onChangeWebCard({
+                  coverIsPredefined:
+                    response.saveCover.webCard.coverIsPredefined,
+                });
+                coverLocalStore.saveCover(webCardId, {
+                  ...coverEditorState,
+                  coverId: response?.saveCover?.webCard.coverId ?? undefined,
+                });
+                if (error) {
+                  reject(error);
+                  return;
+                }
+                resolve();
+              },
+              onError(error) {
+                reject(error);
+              },
             });
-            coverLocalStore.saveCover(webCardId, {
-              ...coverEditorState,
-              coverId: response?.saveCover?.webCard.coverId ?? undefined,
-            });
-            if (error) {
-              reject(error);
-              return;
-            }
-            resolve();
-          },
-          onError(error) {
-            reject(error);
-          },
-        });
-      });
-    } catch (error) {
-      setSavingStatus('error');
-      setError(error);
-      setExportProgressIndicator(null);
-      setUploadProgressIndicator(null);
-      throw error;
-    }
+          });
+        } catch (error) {
+          setSavingStatus('error');
+          setError(error);
+          setExportProgressIndicator(null);
+          throw error;
+        }
+      },
+    );
     setSavingStatus('complete');
     setExportProgressIndicator(null);
-    setUploadProgressIndicator(null);
-  }, [commit, coverEditorState, webCardId]);
+  }, [commit, coverEditorState, startUpload, webCardId]);
 
   const reset = useCallback(() => {
     setSavingStatus(null);
     setError(null);
     setExportProgressIndicator(null);
-    setUploadProgressIndicator(null);
   }, []);
 
   return {
@@ -258,7 +228,6 @@ const useSaveCover = (
     canSave: isCoverEditorStateValid(coverEditorState),
     savingStatus,
     exportProgressIndicator,
-    uploadProgressIndicator,
     error,
   };
 };
