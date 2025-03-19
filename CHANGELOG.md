@@ -1,3 +1,7 @@
+## 1.9.0-canary.50
+
+* **fix:**  - ensure share deeplink always work ([#7967](https://github.com/AzzappApp/azzapp/pull/7967))
+
 ## 1.9.0-canary.49
 
 * **fix:**  - clean update backoffice and remove cover template by category ([#7983](https://github.com/AzzappApp/azzapp/pull/7983))
