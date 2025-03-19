@@ -12,7 +12,7 @@ import {
   saveShareBack,
 } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
-import { sendEmail } from '@azzapp/shared/emailHelpers';
+import { sendTemplateEmail } from '@azzapp/shared/emailHelpers';
 import { buildVCardFromShareBackContact } from '@azzapp/shared/vCardHelpers';
 import { ShareBackFormSchema } from '#components/ShareBackModal/shareBackFormSchema';
 import {
@@ -28,7 +28,6 @@ import {
 } from '#helpers/shareBackHelper';
 import { sendTwilioSMS } from '#helpers/twilioHelpers';
 import type { NewSharedContact } from '@azzapp/data';
-import type { EmailAttachment } from '@azzapp/shared/emailHelpers';
 import type { SubmissionResult } from '@conform-to/react';
 import type { JwtPayload } from 'jwt-decode';
 import type { CountryCode } from 'libphonenumber-js';
@@ -138,13 +137,6 @@ export const processShareBackSubmission = async (
       });
     }
 
-    // @todo: wording for contact share back message
-    const shareBackBody = intl.formatMessage({
-      id: 'dMfROA',
-      defaultMessage: `Hello, You've received a new contact ShareBack. Best.`,
-      description: 'Email body for new contact share back',
-    });
-
     let phone = submission.value.phone?.number || '';
 
     try {
@@ -187,8 +179,13 @@ export const processShareBackSubmission = async (
       );
 
       const shareBackContactVCardUrl = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/shareBackVCard?c=${shareBackContactCompressedData}`;
+
       await sendTwilioSMS({
-        body: shareBackBody,
+        body: intl.formatMessage({
+          id: 'dMfROA',
+          defaultMessage: `Hello, You've received a new contact ShareBack. Best.`,
+          description: 'Email body for new contact share back',
+        }),
         to: user.phoneNumber as string,
         mediaUrl: shareBackContactVCardUrl,
       });
@@ -198,23 +195,41 @@ export const processShareBackSubmission = async (
 
       const vCardFileName = shareBackVCardFilename(submission.value);
 
-      const shareBackContactVCardAttachment = {
-        content: Buffer.from(buildVCardContact.toString()).toString('base64'),
-        filename: vCardFileName,
-        disposition: 'attachment',
-      } as EmailAttachment;
-
-      // @todo: wording for title email share back
-      await sendEmail({
-        to: user.email as string,
-        subject: intl.formatMessage({
-          id: 'ivEKQ2',
-          defaultMessage: 'New Contact ShareBack Received',
-          description: 'Email subject for new contact share back received',
-        }),
-        text: shareBackBody,
-        html: shareBackBody,
-        attachments: [shareBackContactVCardAttachment],
+      await sendTemplateEmail({
+        templateId: 'd-edcdee049b6d468cadf3ce7098bf0fe2',
+        recipients: [
+          {
+            to: user.email!,
+            dynamicTemplateData: {
+              subject: intl.formatMessage({
+                id: 'yYDi/Q',
+                defaultMessage: 'You received a new contact through azzapp.',
+                description:
+                  'Email subject for new contact share back received',
+              }),
+              title: intl.formatMessage({
+                id: 'PQ9+Ez',
+                defaultMessage: 'You have a new contact',
+                description: 'Email title for new contact share back received',
+              }),
+              body: intl.formatMessage({
+                id: 'WDHa6u',
+                defaultMessage:
+                  'You’ve received a new contact directly accessible on azzapp. Alternatively, you can also open and save the attached contact file.',
+                description: 'Email body for new contact share back',
+              }),
+            },
+          },
+        ],
+        attachments: [
+          {
+            content: Buffer.from(buildVCardContact.toString()).toString(
+              'base64',
+            ),
+            filename: vCardFileName,
+            disposition: 'attachment',
+          },
+        ],
       });
     }
 
