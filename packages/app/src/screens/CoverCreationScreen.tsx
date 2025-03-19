@@ -32,6 +32,7 @@ const queryWithCoverTemplate = graphql`
           webCardKind
           id
           userName
+          isPremium
         }
       }
     }
@@ -54,6 +55,7 @@ const queryWithoutCoverTemplate = graphql`
           webCardKind
           id
           userName
+          isPremium
         }
       }
     }
@@ -191,18 +193,20 @@ const CoverCreationScreen = ({
                   description="Cover creation Screen - screen title"
                 />
               </Text>
-              {webCardKind && isWebCardKindSubscription(webCardKind) && (
-                <View style={styles.proContainer}>
-                  <Text variant="medium" style={styles.proText}>
-                    <FormattedMessage
-                      description="NewWebCardScreen - Description for pro category"
-                      defaultMessage="azzapp+ WebCard{azzappA}"
-                      values={{ azzappA: <Text variant="azzapp">a</Text> }}
-                    />
-                  </Text>
-                  <PremiumIndicator isRequired />
-                </View>
-              )}
+              {!profile?.webCard?.isPremium &&
+                webCardKind &&
+                isWebCardKindSubscription(webCardKind) && (
+                  <View style={styles.proContainer}>
+                    <Text variant="medium" style={styles.proText}>
+                      <FormattedMessage
+                        description="NewWebCardScreen - Description for pro category"
+                        defaultMessage="azzapp+ WebCard{azzappA}"
+                        values={{ azzappA: <Text variant="azzapp">a</Text> }}
+                      />
+                    </Text>
+                    <PremiumIndicator isRequired />
+                  </View>
+                )}
             </View>
           )
         }

@@ -7,7 +7,8 @@
     "outDir": "./lib",
     "paths": {
       "#*": ["./*"],
-      "@azzapp/shared/*": ["../shared/src/*"]
+      "@azzapp/shared/*": ["../shared/src/*"],
+      "@azzapp/data/*": ["../data/src/*"]
     }
   },
   "include": ["./src/**/*.ts", "./src/**/*.tsx"],
