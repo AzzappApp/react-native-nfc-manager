@@ -1,3 +1,9 @@
+## 1.9.0-canary.54
+
+* **Fix:**  - contact refresh on notification and pull down ([#7990](https://github.com/AzzappApp/azzapp/pull/7990))
+* **fix:**  - remove remaining usage of webCardCategory ([#7993](https://github.com/AzzappApp/azzapp/pull/7993))
+* **fix:**  - **wallet:** [#7799](https://github.com/AzzappApp/azzapp/pull/7799) add text in predefined covers ([#7994](https://github.com/AzzappApp/azzapp/pull/7994))
+
 ## 1.9.0-canary.53
 
 
