@@ -3,11 +3,7 @@ import { matchUrlWithRoute } from '#helpers/deeplinkHelpers';
 import { verifySign } from '#helpers/MobileWebAPI';
 
 jest.mock('#helpers/MobileWebAPI');
-jest.mock('#components/ShakeShare', () => ({
-  openShakeShare: jest.fn(() => {
-    console.log('Mock openShakeShare called');
-  }),
-}));
+
 describe('deeplinkHelpers', () => {
   const verifySignMock = jest.mocked(verifySign);
 
@@ -166,6 +162,17 @@ describe('deeplinkHelpers', () => {
 
     expect(res).toEqual({
       route: 'HOME',
+    });
+  });
+
+  test('widget_share should redirect to home with openShakeShare', async () => {
+    const res = await matchUrlWithRoute('https://fake-azzapp.com/widget_share');
+
+    expect(res).toEqual({
+      route: 'HOME',
+      params: {
+        openShakeShare: true,
+      },
     });
   });
 });

@@ -1,7 +1,6 @@
 import * as Sentry from '@sentry/react-native';
 import { toGlobalId } from 'graphql-relay';
 import { decompressFromEncodedURIComponent } from 'lz-string';
-import { openShakeShare } from '#components/ShakeShare';
 import { logEvent } from './analytics';
 import { verifySign } from './MobileWebAPI';
 import type { Route } from '#routes';
@@ -62,9 +61,11 @@ export const matchUrlWithRoute = async (
     };
   }
   if (withoutPrefix === 'widget_share') {
-    openShakeShare();
     return {
       route: 'HOME',
+      params: {
+        openShakeShare: true,
+      },
     };
   }
   const matchResetPassword = withoutPrefix.match(resetPasswordUrl);

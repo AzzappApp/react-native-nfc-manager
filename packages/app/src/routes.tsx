@@ -13,7 +13,9 @@ export type AboutRoute = {
 
 export type HomeRoute = {
   route: 'HOME';
-  params?: never;
+  params?: {
+    openShakeShare?: boolean;
+  };
 };
 
 export type MediaRoute = {

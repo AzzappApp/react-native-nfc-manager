@@ -1,5 +1,8 @@
 import EventEmitter from 'events';
-import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import {
+  BottomSheetModalProvider,
+  BottomSheetScrollView,
+} from '@gorhom/bottom-sheet';
 import {
   BlendColor,
   Canvas,
@@ -15,7 +18,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useCallback, useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View, StyleSheet, Dimensions, Platform } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
 import {
   SensorType,
   runOnJS,
@@ -50,31 +52,54 @@ export const openShakeShare = () => {
   _shakeShareEventHandler.emit('open');
 };
 
-const ShakeShare = () => {
-  const [mountScreen, setMountScreen] = useState(false);
+export const useShakeShareDisplay = () => {
+  const [isMounted, setMounted] = useState(false);
+  const profileInfos = useProfileInfos();
+
+  const mount = useCallback(() => {
+    if (
+      profileInfos?.profileId && // no webcard available
+      !profileInfos?.invited && // invitation not validated
+      !!profileInfos?.webCardUserName // creation not finished
+    ) {
+      setMounted(true);
+    }
+  }, [
+    profileInfos?.invited,
+    profileInfos?.profileId,
+    profileInfos?.webCardUserName,
+  ]);
+
+  const umount = useCallback(() => {
+    setMounted(false);
+  }, []);
+
+  useEffect(() => {
+    _shakeShareEventHandler.on('open', mount);
+    return () => {
+      _shakeShareEventHandler.off('open', mount);
+    };
+  }, [mount]);
+
+  return { isMounted, mount, umount };
+};
+
+type ShakeShareProps = {
+  isMounted: boolean;
+  umount: () => void;
+  mount: () => void;
+};
+
+const ShakeShare = ({ isMounted, umount, mount }: ShakeShareProps) => {
   const isConnected = useNetworkAvailableContext();
   const profileInfos = useProfileInfos();
 
-  const visible = mountScreen && isConnected;
-  const dismount = useCallback(() => {
-    setMountScreen(false);
-  }, []);
+  const visible = isMounted && isConnected;
 
   const activateShakeAndShare =
     !profileInfos?.invited && !!profileInfos?.webCardUserName;
 
-  const activateDetector = useCallback(() => {
-    setMountScreen(true);
-  }, []);
-
-  useShakeDetector(activateDetector, activateShakeAndShare);
-
-  useEffect(() => {
-    _shakeShareEventHandler.on('open', activateDetector);
-    return () => {
-      _shakeShareEventHandler.off('open', activateDetector);
-    };
-  }, [activateDetector]);
+  useShakeDetector(mount, activateShakeAndShare);
 
   // this background is displayed under the scrollView.
   // When we reach the limits of scroll we see this background for a very short period
@@ -95,12 +120,12 @@ const ShakeShare = () => {
         automaticTopPadding={false}
         visible={visible}
         showHandleIndicator={false}
-        onDismiss={dismount}
+        onDismiss={umount}
         enableContentPanningGesture
         showShadow={false}
         backgroundComponent={visible ? renderBackgroundComponent : undefined}
       >
-        <ShakeShareDisplay onClose={dismount} visible={visible} />
+        <ShakeShareDisplay onClose={umount} visible={visible} />
       </BottomSheetModal>
     </BottomSheetModalProvider>
   );
@@ -187,7 +212,7 @@ const ShakeShareDisplay = ({
 
   return (
     <View style={styles.container}>
-      <ScrollView>
+      <BottomSheetScrollView>
         <CoverRenderer
           width={width}
           webCard={webCard}
@@ -278,7 +303,7 @@ const ShakeShareDisplay = ({
             )}
           </View>
         )}
-      </ScrollView>
+      </BottomSheetScrollView>
       <View style={styles.closeButtonContainer}>
         <LinearGradient
           colors={['rgba(0, 0, 0,0)', 'rgba(0, 0, 0, 1)']}

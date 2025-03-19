@@ -37,6 +37,7 @@ import {
   RouterProvider,
 } from '#components/NativeRouter';
 import ShakeShare from '#components/ShakeShare';
+import { useShakeShareDisplay } from '#components/ShakeShare/ShakeShare';
 import Toast from '#components/Toast';
 import { analyticsLogScreenEvent } from '#helpers/analytics';
 import {
@@ -293,6 +294,14 @@ const unauthenticatedRoutes = [
  * The main application component
  */
 const AppRouter = () => {
+  // This hooks allow to register shake and share
+  // event before rendering the component
+  const {
+    isMounted: isShakeShareMounted,
+    mount: mountShakeShare,
+    umount: umountShakeShare,
+  } = useShakeShareDisplay();
+
   // #region Routing
   const initialRoutes = useMemo(() => {
     const { authenticated, profileInfos } = getAuthState();
@@ -304,6 +313,8 @@ const AppRouter = () => {
   }, []);
 
   const { router, routerState } = useNativeRouter(initialRoutes);
+  useDeepLink(router);
+
   const authenticated = useIsAuthenticated();
 
   useEffect(() => {
@@ -433,8 +444,6 @@ const AppRouter = () => {
   }, [disposeScreens]);
   // #endregion
 
-  useDeepLink(router);
-
   const colorScheme = useColorScheme();
 
   const safeAreaBackgroundStyle = useMemo(() => {
@@ -486,7 +495,11 @@ const AppRouter = () => {
                 </RouterProvider>
                 <Toast />
                 <Suspense>
-                  <ShakeShare />
+                  <ShakeShare
+                    isMounted={isShakeShareMounted}
+                    mount={mountShakeShare}
+                    umount={umountShakeShare}
+                  />
                 </Suspense>
 
                 {offlineScreenDisplayed ? (

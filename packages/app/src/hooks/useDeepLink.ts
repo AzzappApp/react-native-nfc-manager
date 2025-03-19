@@ -2,6 +2,7 @@ import { useCallback, useEffect } from 'react';
 import { Linking } from 'react-native';
 import { MMKV } from 'react-native-mmkv';
 import { useRouter } from '#components/NativeRouter';
+import { openShakeShare } from '#components/ShakeShare';
 import { matchUrlWithRoute } from '#helpers/deeplinkHelpers';
 import { useIsAuthenticated } from './authStateHooks';
 import type { NativeRouter } from '#components/NativeRouter';
@@ -22,6 +23,9 @@ export const useDeepLink = (router: NativeRouter | null) => {
           if (route.route === 'HOME') {
             //routing to HOME causes that the footer menu is not displayed
             router?.backToTop();
+            if (route.params?.openShakeShare) {
+              openShakeShare();
+            }
           } else {
             router?.push(route);
           }
@@ -72,6 +76,9 @@ export const useDeepLinkStoredRoute = () => {
       if (storedRoute.route === 'HOME') {
         //routing to HOME causes that the footer menu is not displayed
         router.backToTop();
+        if (storedRoute.params.openShakeShare) {
+          openShakeShare();
+        }
       } else {
         router.push(JSON.parse(route));
       }
