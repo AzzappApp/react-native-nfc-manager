@@ -256,7 +256,7 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   textCheckbox: { paddingLeft: 10 },
   notifyError: {
-    backgroundColor: colors.warn,
+    backgroundColor: colors.warnLight,
   },
 }));
 
