@@ -1,3 +1,7 @@
+## 1.9.0-canary.55
+
+
+
 ## 1.9.0-canary.54
 
 * **Fix:**  - contact refresh on notification and pull down ([#7990](https://github.com/AzzappApp/azzapp/pull/7990))
