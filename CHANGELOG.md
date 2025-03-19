@@ -1,3 +1,7 @@
+## 1.9.0-canary.49
+
+* **fix:**  - clean update backoffice and remove cover template by category ([#7983](https://github.com/AzzappApp/azzapp/pull/7983))
+
 ## 1.9.0-canary.48
 
 * **feat:**  - background upload of cover ([#7984](https://github.com/AzzappApp/azzapp/pull/7984))
