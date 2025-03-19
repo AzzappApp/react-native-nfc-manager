@@ -86,7 +86,11 @@ const ContactAvatar = ({
                 styles.layer,
               ]}
             />
-            <MediaImageRenderer source={avatar} style={styles.avatar} />
+            <MediaImageRenderer
+              fit="cover"
+              source={avatar}
+              style={styles.avatarImageBackground}
+            />
           </>
         ) : (
           <View style={styles.avatar}>
@@ -123,6 +127,15 @@ const styleSheet = createStyleSheet(appearance => ({
     aspectRatio: COVER_RATIO,
     paddingTop: 20,
     paddingHorizontal: 10,
+    alignItems: 'center',
+  },
+  avatarImageBackground: {
+    width: 61,
+    height: 61,
+    borderRadius: 61,
+    backgroundColor: colors.grey50,
+    display: 'flex',
+    justifyContent: 'center',
     alignItems: 'center',
   },
   avatar: {

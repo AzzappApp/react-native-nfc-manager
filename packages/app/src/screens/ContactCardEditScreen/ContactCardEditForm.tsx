@@ -86,13 +86,16 @@ const ContactCardEditForm = ({
       filter,
       aspectRatio,
     }: ImagePickerResult) => {
+      const mimeType =
+        mime.lookup(uri) === 'image/png' ? ImageFormat.PNG : ImageFormat.JPEG;
+
       if (imagePicker === 'avatar') {
         const exportWidth = Math.min(AVATAR_MAX_WIDTH, width);
         const exportHeight = exportWidth / aspectRatio;
         const localPath = await saveTransformedImageToFile({
           uri,
           resolution: { width: exportWidth, height: exportHeight },
-          format: ImageFormat.JPEG,
+          format: mimeType,
           quality: 95,
           filter,
           editionParameters,
@@ -105,8 +108,6 @@ const ContactCardEditForm = ({
       } else {
         const exportWidth = width;
         const exportHeight = exportWidth / aspectRatio;
-        const mimeType =
-          mime.lookup(uri) === 'image/png' ? ImageFormat.PNG : ImageFormat.JPEG;
         const localPath = await saveTransformedImageToFile({
           uri,
           resolution: { width: exportWidth, height: exportHeight },

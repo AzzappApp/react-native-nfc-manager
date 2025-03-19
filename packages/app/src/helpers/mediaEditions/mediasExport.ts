@@ -33,6 +33,7 @@ import {
 import type { EditionParameters } from './EditionParameters';
 import type { TextureInfo } from './NativeTextureLoader';
 import type { Filter } from '@azzapp/shared/filtersHelper';
+import type { SkColor } from '@shopify/react-native-skia';
 
 export const saveTransformedImageToFile = async ({
   uri,
@@ -41,6 +42,7 @@ export const saveTransformedImageToFile = async ({
   quality,
   filter,
   editionParameters,
+  backgroundColor,
 }: {
   uri: string;
   resolution: { width: number; height: number };
@@ -48,6 +50,7 @@ export const saveTransformedImageToFile = async ({
   quality: number;
   filter?: Filter | null;
   editionParameters?: EditionParameters | null;
+  backgroundColor?: SkColor;
 }) => {
   const { key, promise } = NativeTextureLoader.loadImage(uri);
   const sourceImage = createImageFromNativeTexture(await promise);
@@ -77,6 +80,9 @@ export const saveTransformedImageToFile = async ({
         });
         const paint = Skia.Paint();
         paint.setImageFilter(imageFilter);
+        if (backgroundColor) {
+          canvas.clear(backgroundColor);
+        }
         canvas.drawRect(
           {
             x: 0,

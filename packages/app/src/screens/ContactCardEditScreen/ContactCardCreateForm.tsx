@@ -3,6 +3,7 @@ import { useCallback, useState } from 'react';
 import { Controller, useController, useWatch } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
+import * as mime from 'react-native-mime-types';
 import Animated, {
   useAnimatedStyle,
   withTiming,
@@ -104,10 +105,12 @@ const ContactCardCreateForm = ({
       if (imagePicker === 'avatar') {
         const exportWidth = Math.min(AVATAR_MAX_WIDTH, width);
         const exportHeight = exportWidth / aspectRatio;
+        const mimeType =
+          mime.lookup(uri) === 'image/png' ? ImageFormat.PNG : ImageFormat.JPEG;
         const localPath = await saveTransformedImageToFile({
           uri,
           resolution: { width: exportWidth, height: exportHeight },
-          format: ImageFormat.JPEG,
+          format: mimeType,
           quality: 95,
           filter,
           editionParameters,

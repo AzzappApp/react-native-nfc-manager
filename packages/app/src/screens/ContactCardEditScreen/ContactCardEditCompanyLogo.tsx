@@ -1,10 +1,10 @@
 import { ImageFormat } from '@shopify/react-native-skia';
 import { Image } from 'expo-image';
-import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import { useCallback, useEffect, useState } from 'react';
 import { Controller, useController } from 'react-hook-form';
 import { FormattedMessage } from 'react-intl';
 import { Pressable, ScrollView, View } from 'react-native';
+import * as mime from 'react-native-mime-types';
 import { useMutation, graphql } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { colors } from '#theme';
@@ -92,9 +92,13 @@ const ContactCardEditCompanyLogo = ({
 
   const onImagePickerFinished = useCallback(
     async ({ id, uri, width, height }: ImagePickerResult) => {
-      const { uri: localPath } = await manipulateAsync(uri, [], {
-        format: SaveFormat.JPEG,
-        compress: 1,
+      const mimeType =
+        mime.lookup(uri) === 'image/png' ? ImageFormat.PNG : ImageFormat.JPEG;
+      const localPath = await saveTransformedImageToFile({
+        uri,
+        resolution: { width, height },
+        format: mimeType,
+        quality: 95,
       });
 
       setPickerImage({
@@ -131,6 +135,7 @@ const ContactCardEditCompanyLogo = ({
       let localPath = imageLocalUrl.get(id);
       const exportWidth = width;
       const exportHeight = height;
+
       if (!localPath) {
         localPath = await saveTransformedImageToFile({
           uri,
