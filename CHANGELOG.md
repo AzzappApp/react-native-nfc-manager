@@ -1,3 +1,8 @@
+## 1.9.0-canary.52
+
+* **fix:**  - drop unused covertemplate preview model ([#7988](https://github.com/AzzappApp/azzapp/pull/7988))
+* **fix:**  - **scan:** [#7989](https://github.com/AzzappApp/azzapp/pull/7989) close loading on error ([#7991](https://github.com/AzzappApp/azzapp/pull/7991))
+
 ## 1.9.0-canary.51
 
 * **feat:**  - **shareBack:** [#7807](https://github.com/AzzappApp/azzapp/pull/7807) use template email ([#7985](https://github.com/AzzappApp/azzapp/pull/7985))
