@@ -6,8 +6,6 @@ import {
   CardTemplateTable,
   CardTemplateTypeTable,
   ColorPaletteTable,
-  CompanyActivityTable,
-  CompanyActivityTypeTable,
   WebCardTable,
   CoverTemplateTable,
   CoverTemplateTagTable,
@@ -28,8 +26,6 @@ import type {
   CardTemplate,
   CardTemplateType,
   ColorPalette,
-  CompanyActivity,
-  CompanyActivityType,
   CoverTemplate,
   CoverTemplateType,
   CoverTemplateTag,
@@ -54,8 +50,6 @@ export const ENTITIES = [
   'CardTemplate',
   'CardTemplateType',
   'ColorPalette',
-  'CompanyActivity',
-  'CompanyActivityType',
   'CoverTemplate',
   'CoverTemplateType',
   'CoverTemplateTag',
@@ -79,8 +73,6 @@ export type EntityToType<T extends Entity> = {
   CardTemplate: CardTemplate;
   CardTemplateType: CardTemplateType;
   ColorPalette: ColorPalette;
-  CompanyActivity: CompanyActivity;
-  CompanyActivityType: CompanyActivityType;
   CoverTemplate: CoverTemplate;
   CoverTemplateType: CoverTemplateType;
   CoverTemplateTag: CoverTemplateTag;
@@ -102,8 +94,6 @@ const entitiesTable = {
   CardTemplate: CardTemplateTable,
   CardTemplateType: CardTemplateTypeTable,
   ColorPalette: ColorPaletteTable,
-  CompanyActivity: CompanyActivityTable,
-  CompanyActivityType: CompanyActivityTypeTable,
   CoverTemplate: CoverTemplateTable,
   CoverTemplateType: CoverTemplateTypeTable,
   CoverTemplateTag: CoverTemplateTagTable,

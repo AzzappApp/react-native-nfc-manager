@@ -25,8 +25,6 @@ export type {
   CardTemplate,
   CardTemplateType,
   ColorPalette,
-  CompanyActivity,
-  CompanyActivityType,
   CoverDynamicLinks,
   CoverOverlay,
   CoverPredefined,

@@ -4,7 +4,6 @@ export * from './cardStyleQueries';
 export * from './cardTemplateQueries';
 export * from './cardTemplateTypeQueries';
 export * from './colorPaletteQueries';
-export * from './companyActivityQueries';
 export * from './coverTemplateQueries';
 export * from './coverTemplateTagQueries';
 export * from './coverTemplateTypeQueries';

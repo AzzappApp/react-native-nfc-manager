@@ -42,11 +42,8 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
 
   await checkWebCardProfileEditorRight(webCardId);
 
-  const {
-    webCardCategoryId: graphqlWebCardCategoryId,
-    companyActivityId: graphqlCompanyActivityId,
-    ...profileUpdates
-  } = updates;
+  const { webCardCategoryId: graphqlWebCardCategoryId, ...profileUpdates } =
+    updates;
 
   const webCard = await webCardLoader.load(webCardId);
 
@@ -103,22 +100,10 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
       'WebCardCategory',
     );
     partialWebCard.webCardCategoryId = webCardCategoryId;
-    if (webCardCategoryId !== webCard.webCardCategoryId) {
-      partialWebCard.companyActivityId = undefined;
-    }
 
     const webCardCategory = await webCardCategoryLoader.load(webCardCategoryId);
 
     partialWebCard.webCardKind = webCardCategory?.webCardKind;
-  }
-  if (graphqlCompanyActivityId) {
-    const companyActivityId = fromGlobalIdWithType(
-      graphqlCompanyActivityId,
-      'CompanyActivity',
-    );
-    partialWebCard.companyActivityId = companyActivityId;
-  } else if (graphqlCompanyActivityId === null) {
-    partialWebCard.companyActivityId = null;
   }
 
   if (profileUpdates.webCardKind) {
@@ -134,7 +119,7 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
     });
   }
 
-  if (webCard.companyActivityId !== partialWebCard.companyActivityId) {
+  if (updates.companyActivityLabel !== webCard.companyActivityLabel) {
     const profile =
       userId &&
       (await profileByWebCardIdAndUserIdLoader.load({ userId, webCardId }));
@@ -149,6 +134,7 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
       });
     }
   }
+
   try {
     await transaction(async () => {
       await updateWebCard(webCardId, partialWebCard);

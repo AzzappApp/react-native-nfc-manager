@@ -50,14 +50,6 @@ export const colorPaletteLoader = createDataLoader(
   createEntitiesBatchLoadFunction('ColorPalette'),
 );
 
-export const companyActivityLoader = createDataLoader(
-  createEntitiesBatchLoadFunction('CompanyActivity'),
-);
-
-export const companyActivityTypeLoader = createDataLoader(
-  createEntitiesBatchLoadFunction('CompanyActivityType'),
-);
-
 export const coverTemplateLoader = createDataLoader(
   createEntitiesBatchLoadFunction('CoverTemplate'),
 );

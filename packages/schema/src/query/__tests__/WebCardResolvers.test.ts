@@ -48,7 +48,6 @@ describe('WebCard Resolvers (with checks)', () => {
     logoId: null,
     commonInformation: null,
     companyName: null,
-    companyActivityId: null,
 
     locale: null,
     cardColors: null,

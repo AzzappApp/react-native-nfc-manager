@@ -28,9 +28,7 @@ import {
 } from '@azzapp/shared/urlHelpers';
 import { getOrCreateSessionResource, getSessionInfos } from '#GraphQLContext';
 import {
-  companyActivityLoader,
   contactCountForProfileLoader,
-  labelLoader,
   newContactsCountForProfileLoader,
   profileInUserContactLoader,
   profileLoader,
@@ -504,12 +502,7 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
     const offset = after ? cursorToOffset(after) : 0;
     let result: PexelsSearchResult<Photo>;
     try {
-      result = await searchPexelsPhotos(
-        search || (await getActivityName(profile.webCardId, locale)) || null,
-        locale,
-        offset,
-        first,
-      );
+      result = await searchPexelsPhotos(search || null, locale, offset, first);
     } catch (error) {
       console.warn('Error fetching photos from Pexels:', error);
       return emptyConnection;
@@ -540,12 +533,7 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
     const offset = after ? cursorToOffset(after) : 0;
     let result: PexelsSearchResult<Video>;
     try {
-      result = await searchPexelsVideos(
-        search || (await getActivityName(profile.webCardId, locale)) || null,
-        locale,
-        offset,
-        first,
-      );
+      result = await searchPexelsVideos(search || null, locale, offset, first);
     } catch (error) {
       console.warn('Error fetching photos from Pexels:', error);
       return emptyConnection;
@@ -639,18 +627,6 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
 };
 
 export { ProfileResolverImpl as Profile };
-
-const getActivityName = async (webCardId: string, locale: string) => {
-  const webcard = await webCardLoader.load(webCardId);
-  const activity = webcard?.companyActivityId
-    ? await companyActivityLoader.load(webcard.companyActivityId)
-    : null;
-  const activityName = activity?.id
-    ? ((await labelLoader.load([activity.id, locale])) ??
-      (await labelLoader.load([activity.id, DEFAULT_LOCALE])))
-    : null;
-  return activityName?.value;
-};
 
 const getContactCardUrl = async (profile: Profile) => {
   const webCard = await webCardLoader.load(profile.webCardId);

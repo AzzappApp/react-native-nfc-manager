@@ -21,8 +21,6 @@ generates:
         WebCardCategory: '@azzapp/data#WebCardCategory as WebCardCategoryModel'
         MediaImage: ../query/MediaResolvers#MediaResolverBaseType as MediaImageModel
         MediaVideo: ../query/MediaResolvers#MediaResolverBaseType as MediaVideoModel
-        CompanyActivity: '@azzapp/data#CompanyActivity as CompanyActivityModel'
-        CompanyActivityType: '@azzapp/data#CompanyActivityType as CompanyActivityTypeModel'
         Post: '@azzapp/data#Post as PostModel'
         PostComment: '@azzapp/data#PostComment as PostCommentModel'
         CardTemplate: '@azzapp/data#CardTemplate as CardTemplateModel'

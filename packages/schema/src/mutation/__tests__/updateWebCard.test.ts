@@ -135,7 +135,7 @@ describe('updateWebCardMutation', () => {
         {},
         {
           webCardId: 'global-webcard-123',
-          input: { companyActivityId: 'activity-002' },
+          input: { companyActivityLabel: 'activity-002' },
         },
         mockContext,
         mockInfo,

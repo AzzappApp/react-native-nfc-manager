@@ -167,39 +167,6 @@ export const ColorPaletteTable = cols.table('ColorPalette', {
 export type ColorPalette = InferSelectModel<typeof ColorPaletteTable>;
 // #endregion
 
-// #region CompanyActivity
-export const CompanyActivityTable = cols.table('CompanyActivity', {
-  id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
-  cardTemplateTypeId: cols.cuid('cardTemplateTypeId'),
-  companyActivityTypeId: cols.cuid('companyActivityTypeId'),
-});
-
-export const CompanyActivityTypeTable = cols.table('CompanyActivityType', {
-  id: cols.cuid('id').primaryKey().notNull().$defaultFn(createId),
-});
-
-export const WebCardCategoryCompanyActivityTable = cols.table(
-  'WebCardCategoryCompanyActivity',
-  {
-    webCardCategoryId: cols.cuid('categoryId').notNull(),
-    companyActivityId: cols.cuid('companyActivityId'),
-    order: cols.int('order').notNull(),
-  },
-  table => {
-    return {
-      pk: cols.primaryKey({
-        columns: [table.companyActivityId, table.webCardCategoryId],
-      }),
-    };
-  },
-);
-
-export type CompanyActivity = InferSelectModel<typeof CompanyActivityTable>;
-export type CompanyActivityType = InferSelectModel<
-  typeof CompanyActivityTypeTable
->;
-// #endregion
-
 export const CoverPredefinedTable = cols.table('CoverPredefined', {
   id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
   mediaId: cols.mediaId('mediaId').notNull(),
@@ -838,7 +805,6 @@ export const WebCardTable = cols.table(
       .json('commonInformation')
       .$type<CommonInformation>(),
     companyName: cols.defaultVarchar('companyName'),
-    companyActivityId: cols.cuid('companyActivityId'),
     createdAt: cols
       .dateTime('createdAt')
       .notNull()
