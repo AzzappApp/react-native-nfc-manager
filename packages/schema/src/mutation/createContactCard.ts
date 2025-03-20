@@ -22,7 +22,14 @@ import type { InferInsertModel } from 'drizzle-orm';
 
 const createContactCard: MutationResolvers['createContactCard'] = async (
   _,
-  { webCardKind, contactCard, webCardUserName, primaryColor, coverMediaId },
+  {
+    webCardKind,
+    contactCard,
+    webCardUserName,
+    primaryColor,
+    coverMediaId,
+    publishWebCard,
+  },
 ) => {
   const { userId } = getSessionInfos();
 
@@ -78,10 +85,10 @@ const createContactCard: MutationResolvers['createContactCard'] = async (
         : undefined,
     coverIsPredefined: !coverMediaId,
     coverIsLogoPredefined: !!coverMediaId,
-    cardIsPublished: true,
+    cardIsPublished: publishWebCard ?? true,
     coverMediaId: coverMediaId ?? defaultCover?.mediaId,
     companyActivityLabel: contactCard.companyActivityLabel,
-    alreadyPublished: true,
+    alreadyPublished: publishWebCard ?? true,
     userName: webCardUserName,
   };
 

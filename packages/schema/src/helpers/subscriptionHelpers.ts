@@ -148,6 +148,9 @@ type FeatureParams =
       alreadyAdded?: boolean;
       webCardIsMultiUser: true;
       webCardIsPublished: boolean;
+      ownerContactCardHasCompanyName: boolean;
+      ownerContactCardHasUrl: boolean;
+      ownerContactCardHasLogo: boolean;
     }
   | {
       action: 'UPDATE_WEBCARD_PUBLICATION';
@@ -155,6 +158,9 @@ type FeatureParams =
       webCardKind: string;
       webCardIsMultiUser: false;
       webCardIsPublished: boolean;
+      ownerContactCardHasCompanyName: boolean;
+      ownerContactCardHasUrl: boolean;
+      ownerContactCardHasLogo: boolean;
     }
   | {
       action: 'USE_SCAN';
@@ -212,7 +218,10 @@ export const validateCurrentSubscription = async (
         params.action === 'UPDATE_WEBCARD_PUBLICATION' &&
         params.webCardKind !== 'business' &&
         params.alreadyPublished < 2 &&
-        !params.webCardIsMultiUser
+        !params.webCardIsMultiUser &&
+        !params.ownerContactCardHasCompanyName &&
+        !params.ownerContactCardHasUrl &&
+        !params.ownerContactCardHasLogo
       ) {
         return;
       }

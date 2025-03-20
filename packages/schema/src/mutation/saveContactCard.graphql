@@ -12,6 +12,7 @@ extend type Mutation {
   """
   createContactCard(
     webCardKind: String!
+    publishWebCard: Boolean
     contactCard: ContactCardInput!
     primaryColor: String
     webCardUserName: String

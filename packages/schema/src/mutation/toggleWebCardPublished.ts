@@ -1,5 +1,6 @@
 import { GraphQLError } from 'graphql';
 import {
+  getProfileByUserAndWebCard,
   getPublishedWebCardCount,
   getWebCardCountProfile,
   getWebCardPosts,
@@ -35,6 +36,12 @@ const toggleWebCardPublished: MutationResolvers['toggleWebCardPublished'] =
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
 
+    const profile = await getProfileByUserAndWebCard(owner.id, webCardId);
+
+    if (!profile) {
+      throw new GraphQLError(ERRORS.INVALID_REQUEST);
+    }
+
     if (webCard.isMultiUser) {
       await validateCurrentSubscription(owner.id, {
         webCardIsPublished: published,
@@ -43,6 +50,9 @@ const toggleWebCardPublished: MutationResolvers['toggleWebCardPublished'] =
         webCardKind: webCard.webCardKind,
         alreadyPublished: await getPublishedWebCardCount(owner.id),
         addedSeats: await getWebCardCountProfile(webCardId),
+        ownerContactCardHasCompanyName: !!profile.contactCard?.company,
+        ownerContactCardHasUrl: !!profile.contactCard?.urls?.length,
+        ownerContactCardHasLogo: !!profile.logoId,
       });
     } else {
       await validateCurrentSubscription(owner.id, {
@@ -51,6 +61,9 @@ const toggleWebCardPublished: MutationResolvers['toggleWebCardPublished'] =
         webCardIsMultiUser: false,
         webCardKind: webCard.webCardKind,
         alreadyPublished: await getPublishedWebCardCount(owner.id),
+        ownerContactCardHasCompanyName: !!profile.contactCard?.company,
+        ownerContactCardHasUrl: !!profile.contactCard?.urls?.length,
+        ownerContactCardHasLogo: !!profile.logoId,
       });
     }
 

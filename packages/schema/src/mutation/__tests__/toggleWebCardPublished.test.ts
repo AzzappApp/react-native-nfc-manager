@@ -1,5 +1,6 @@
 import { GraphQLError } from 'graphql';
 import {
+  getProfileByUserAndWebCard,
   getPublishedWebCardCount,
   getWebCardCountProfile,
   getWebCardPosts,
@@ -15,6 +16,7 @@ import toggleWebCardPublished from '../toggleWebCardPublished';
 
 // Mock dependencies
 jest.mock('@azzapp/data', () => ({
+  getProfileByUserAndWebCard: jest.fn(),
   getPublishedWebCardCount: jest.fn(),
   getWebCardCountProfile: jest.fn(),
   getWebCardPosts: jest.fn(),
@@ -37,10 +39,6 @@ jest.mock('#loaders', () => ({
 
 jest.mock('#helpers/permissionsHelpers', () => ({
   checkWebCardProfileAdminRight: jest.fn(),
-}));
-
-jest.mock('#helpers/relayIdHelpers', () => ({
-  default: jest.fn().mockImplementation(id => id.replace('gql-', '')),
 }));
 
 jest.mock('#helpers/subscriptionHelpers', () => ({
@@ -74,12 +72,21 @@ describe('toggleWebCardPublished Mutation', () => {
   };
 
   const mockOwner = { id: 'owner-1' };
+  const mockProfile = {
+    id: 'profile-1',
+    contactCard: {
+      company: 'Azzapp',
+      urls: ['https://azzapp.com'],
+    },
+    logoId: 'logo-1',
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
     (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
     (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
     (webCardOwnerLoader.load as jest.Mock).mockResolvedValue(mockOwner);
+    (getProfileByUserAndWebCard as jest.Mock).mockResolvedValue(mockProfile);
     (getPublishedWebCardCount as jest.Mock).mockResolvedValue(1);
     (getWebCardCountProfile as jest.Mock).mockResolvedValue(2);
   });
@@ -148,6 +155,9 @@ describe('toggleWebCardPublished Mutation', () => {
       webCardKind: 'business',
       alreadyPublished: 1,
       addedSeats: 2,
+      ownerContactCardHasCompanyName: true,
+      ownerContactCardHasUrl: true,
+      ownerContactCardHasLogo: true,
     });
   });
 

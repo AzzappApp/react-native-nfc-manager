@@ -85,12 +85,14 @@ const ContactCardCreateScreen = ({
         $contactCard: ContactCardInput!
         $primaryColor: String
         $coverMediaId: String
+        $publishWebCard: Boolean!
       ) {
         createContactCard(
           webCardKind: $webCardKind
           contactCard: $contactCard
           primaryColor: $primaryColor
           coverMediaId: $coverMediaId
+          publishWebCard: $publishWebCard
         ) {
           profile {
             id
@@ -340,6 +342,7 @@ const ContactCardCreateScreen = ({
           primaryColor: data.primaryColor ?? colors.grey400,
           webCardKind: webCardKind as string,
           coverMediaId: uploadedCoverId,
+          publishWebCard: true,
           contactCard: {
             emails: data.emails?.length
               ? data.emails.filter(email => email.address)
