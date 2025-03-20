@@ -1,3 +1,8 @@
+## 1.9.0-canary.59
+
+* **fix:**  - **contact:** [#8016](https://github.com/AzzappApp/azzapp/pull/8016) read avatar in contact (like logo) ([#8017](https://github.com/AzzappApp/azzapp/pull/8017))
+* **build:**  - upgrade drizzle ([#8015](https://github.com/AzzappApp/azzapp/pull/8015))
+
 ## 1.9.0-canary.58
 
 * **fix:**  - support webcard is not published ([#8011](https://github.com/AzzappApp/azzapp/pull/8011))
