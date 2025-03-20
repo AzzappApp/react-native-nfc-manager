@@ -1,3 +1,7 @@
+## 1.9.0-canary.58
+
+* **fix:**  - support webcard is not published ([#8011](https://github.com/AzzappApp/azzapp/pull/8011))
+
 ## 1.9.0-canary.57
 
 * **fix:**  - long text doesn't sroll corretly when a range is selected ([#8008](https://github.com/AzzappApp/azzapp/pull/8008))
