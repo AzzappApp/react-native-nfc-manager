@@ -122,7 +122,7 @@
     "react": "^18.3.1",
     "react-hook-form": "^7.54.2",
     "react-intl": "^7.1.6",
-    "react-native": "patch:react-native@npm%3A0.77.1#~/.yarn/patches/react-native-npm-0.77.1-508c57ca1f.patch",
+    "react-native": "patch:react-native@patch%3Areact-native@npm%253A0.77.1%23~/.yarn/patches/react-native-npm-0.77.1-508c57ca1f.patch%3A%3Aversion=0.77.1&hash=67e384#~/.yarn/patches/react-native-patch-280398ffca.patch",
     "react-native-animateable-text": "^0.15.0",
     "react-native-blob-jsi-helper": "^0.3.1",
     "react-native-bootsplash": "^6.3.3",
