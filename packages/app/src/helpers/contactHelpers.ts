@@ -365,10 +365,8 @@ export const buildVCardFromAzzappContact = async (contact: ContactType) => {
     }
   });
 
-  const contactImageUrl =
-    contact.contactProfile?.avatar?.uri || contact.logo?.uri;
-  const contactImageId = contact.contactProfile?.avatar?.id || contact.logo?.id;
-
+  const contactImageUrl = contact.avatar?.uri || contact.logo?.uri;
+  const contactImageId = contact.avatar?.id || contact.logo?.id;
   if (contactImageUrl && contactImageUrl.startsWith('http')) {
     try {
       const file = new File(Paths.cache.uri + contactImageId);
