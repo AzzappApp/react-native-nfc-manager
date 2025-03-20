@@ -64,7 +64,6 @@ const mockWebCard: WebCard = {
   firstName: null,
   lastName: null,
   companyName: null,
-  companyActivityId: null,
   updatedAt: new Date(),
   locale: null,
   cardColors: null,

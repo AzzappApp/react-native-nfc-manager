@@ -26,7 +26,9 @@ export const useSaveOfflineVCard = (
   }, [profiles]);
 };
 
-export const getOfflineVCard = (): OfflineVCardScreen_profiles$data => {
+export const getOfflineVCard = ():
+  | OfflineVCardScreen_profiles$data
+  | undefined => {
   const data = storage.getString(VCardDataKey);
   return data ? JSON.parse(data) : undefined;
 };

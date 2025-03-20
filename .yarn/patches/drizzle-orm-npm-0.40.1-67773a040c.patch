@@ -1,5 +1,5 @@
 diff --git a/mysql-core/indexes.cjs b/mysql-core/indexes.cjs
-index bef9affe0cd24797e8c2256b5c42a712bbdde992..9a0e598756c267b6a4bbb7615b71806bfd2d5c73 100644
+index bef9affe0cd24797e8c2256b5c42a712bbdde992..86b9e059e841fcb0bbb0d83e42d2b4a01083a388 100644
 --- a/mysql-core/indexes.cjs
 +++ b/mysql-core/indexes.cjs
 @@ -22,29 +22,32 @@ __export(indexes_exports, {
@@ -14,7 +14,7 @@ index bef9affe0cd24797e8c2256b5c42a712bbdde992..9a0e598756c267b6a4bbb7615b71806b
  var import_entity = require("../entity.cjs");
  class IndexBuilderOn {
 -  constructor(name, unique) {
-+  constructor(name, unique, fulltext) {
++  constructor(name, unique,fulltext) {
      this.name = name;
      this.unique = unique;
 +    this.fulltext = fulltext;

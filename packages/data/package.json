@@ -17,20 +17,18 @@
     "@azzapp/shared": "workspace:^",
     "@paralleldrive/cuid2": "^2.2.2",
     "@planetscale/database": "^1.19.0",
-    "drizzle-orm": "^0.33.0",
+    "drizzle-orm": "patch:drizzle-orm@npm%3A0.40.1#~/.yarn/patches/drizzle-orm-npm-0.40.1-67773a040c.patch",
     "lodash": "^4.17.21",
     "zod": "^3.24.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.26.4",
-    "@types/better-sqlite3": "^7.6.11",
     "@types/lodash": "^4.17.10",
     "@types/node-fetch": "2.6.11",
-    "better-sqlite3": "^9.6.0",
-    "drizzle-kit": "^0.24.2",
+    "drizzle-kit": "patch:drizzle-kit@npm%3A0.30.5#~/.yarn/patches/drizzle-kit-npm-0.30.5-a6f8537ef2.patch",
     "eslint": "^9.17.0",
-    "mysql2": "^3.11.3",
+    "mysql2": "^3.14.0",
     "node-fetch": "2",
-    "typescript": "^5.7.2"
+    "typescript": "^5.8.2"
   }
 }
