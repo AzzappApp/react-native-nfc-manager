@@ -1,3 +1,7 @@
+## 1.9.0-canary.64
+
+* **feat:**  - **multiUser:** add sendEmailSignature mutation ([#8031](https://github.com/AzzappApp/azzapp/pull/8031))
+
 ## 1.9.0-canary.63
 
 
