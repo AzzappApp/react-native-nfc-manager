@@ -75,7 +75,17 @@ export const extractVisitCardData: MutationResolvers['extractVisitCardData'] =
         return null;
       }
       const match = data.choices[0].message.content.match(/\{[^}]*\}/); // Extract JSON object from the response
-      return match ? businessCardSchema.parse(JSON.parse(match[0])) : null;
+      const businessCard = match
+        ? businessCardSchema.parse(JSON.parse(match[0]))
+        : null;
+      if (!businessCard) {
+        return null;
+      }
+      const cleanBusinessCard = {
+        ...businessCard,
+        emails: businessCard?.emails?.map(email => email.replaceAll(' ', '')),
+      };
+      return cleanBusinessCard;
     } catch (error) {
       Sentry.captureException(error);
     }

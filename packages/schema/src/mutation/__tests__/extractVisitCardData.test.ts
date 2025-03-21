@@ -95,6 +95,43 @@ describe('extractVisitCardData', () => {
     expect(Sentry.captureException).not.toHaveBeenCalled();
   });
 
+  test('should return extracted business card data on valid API response', async () => {
+    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-123' });
+
+    const mockApiResponse = {
+      choices: [
+        {
+          message: {
+            content:
+              '{"firstName":"John","lastName":"Doe","phoneNumbers":["+123456789"],"emails":["john@example.com ", "john2@example.com", " johnny @example. com "],"addresses":["123 Street, City"],"company":"Azzapp","title":"CEO","urls":["https://company.com"]}',
+          },
+        },
+      ],
+    };
+
+    (global.fetch as jest.Mock).mockResolvedValue({
+      json: jest.fn().mockResolvedValue(mockApiResponse),
+    });
+
+    const result = await extractVisitCardData(
+      {},
+      mockArgs,
+      mockContext,
+      mockInfo,
+    );
+
+    expect(result).toEqual({
+      firstName: 'John',
+      lastName: 'Doe',
+      phoneNumbers: ['+123456789'],
+      emails: ['john@example.com', 'john2@example.com', 'johnny@example.com'],
+      addresses: ['123 Street, City'],
+      company: 'Azzapp',
+      title: 'CEO',
+      urls: ['https://company.com'],
+    });
+  });
+
   test('should log exceptions to Sentry if fetch request fails', async () => {
     (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-123' });
 
