@@ -1,3 +1,7 @@
+## 1.9.0-canary.62
+
+
+
 ## 1.9.0-canary.61
 
 * **fix:**  - **home:** [#8020](https://github.com/AzzappApp/azzapp/pull/8020) don’t cut labels on home tabs ([#8024](https://github.com/AzzappApp/azzapp/pull/8024))
