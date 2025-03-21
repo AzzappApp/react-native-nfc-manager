@@ -65,11 +65,12 @@ const ContactCreateForm = ({
   });
 
   useEffect(() => {
-    if (notifyError)
+    if (notifyError) {
       scrollRef.current?.scrollTo({
         y: 0,
         animated: true,
       });
+    }
   }, [notifyError]);
 
   const [imagePicker, setImagePicker] = useState<'avatar' | null>(null);

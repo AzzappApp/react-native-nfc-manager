@@ -3,7 +3,7 @@ import { capitalize } from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
-import { StyleSheet, View } from 'react-native';
+import { Keyboard, StyleSheet, View } from 'react-native';
 import * as mime from 'react-native-mime-types'; // FIXME import is verry big
 import Toast from 'react-native-toast-message';
 import { useMutation } from 'react-relay';
@@ -94,12 +94,12 @@ const ContactCreateScreen = ({
 
   const submit = () => {
     setNotifyError(false);
+    Keyboard.dismiss();
     handleSubmit(async ({ avatar, logo, ...data }) => {
       if (!profileId) {
         return;
       }
       if (data.notify && data.emails.length <= 0) {
-        setNotifyError(true);
         Toast.show({
           type: 'error',
           text1: intl.formatMessage({
@@ -108,6 +108,9 @@ const ContactCreateScreen = ({
             description:
               'Error toast message when saving contact card without email and box checked',
           }),
+          onHide: () => {
+            setNotifyError(true);
+          },
         });
 
         return;
