@@ -18,11 +18,7 @@ import { useMemo, useState } from 'react';
 import { useForm } from '#helpers/formHelpers';
 import { saveCardTemplateType } from './cardTemplateTypesActions';
 import type { CardTemplateTypeErrors } from './cardTemplateTypeSchema';
-import type {
-  CardTemplateType,
-  LocalizationMessage,
-  WebCardCategory,
-} from '@azzapp/data';
+import type { CardTemplateType, LocalizationMessage } from '@azzapp/data';
 
 type CardTemplateTypeFormProps = {
   cardTemplateType?: CardTemplateType | null;
@@ -32,7 +28,6 @@ type CardTemplateTypeFormProps = {
 
 type FormValue = CardTemplateType & {
   label: string;
-  webCardCategory: WebCardCategory;
 };
 
 const CardTemplateTypeForm = ({
