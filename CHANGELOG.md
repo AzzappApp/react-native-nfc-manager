@@ -1,3 +1,7 @@
+## 1.9.0-canary.60
+
+
+
 ## 1.9.0-canary.59
 
 * **fix:**  - **contact:** [#8016](https://github.com/AzzappApp/azzapp/pull/8016) read avatar in contact (like logo) ([#8017](https://github.com/AzzappApp/azzapp/pull/8017))
