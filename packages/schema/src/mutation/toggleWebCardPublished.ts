@@ -25,6 +25,11 @@ const toggleWebCardPublished: MutationResolvers['toggleWebCardPublished'] =
     if (!webCard || !userId) {
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
+    if (webCard.cardIsPublished === published) {
+      return {
+        webCard,
+      };
+    }
 
     if (!webCard.coverMediaId && published) {
       throw new GraphQLError(ERRORS.MISSING_COVER);

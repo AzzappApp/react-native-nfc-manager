@@ -238,4 +238,22 @@ describe('toggleWebCardPublished Mutation', () => {
 
     expect(updateWebCard).toHaveBeenCalledWith('webcard-1', expect.any(Object));
   });
+
+  test('should not update webCard already publish', async () => {
+    const resultWebCard = {
+      ...mockWebCard,
+      cardIsPublished: true,
+    };
+    (webCardLoader.load as jest.Mock).mockResolvedValue(resultWebCard);
+    const result = await toggleWebCardPublished(
+      {},
+      { webCardId: 'gql-webcard-1', input: { published: true } },
+      mockContext,
+      mockInfo,
+    );
+
+    expect(result).toEqual({
+      webCard: resultWebCard,
+    });
+  });
 });
