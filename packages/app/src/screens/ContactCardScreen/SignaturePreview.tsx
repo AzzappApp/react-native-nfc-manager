@@ -78,15 +78,17 @@ const SignaturePreview = ({ profile: profileKey }: SignaturePreviewProps) => {
     profileKey,
   );
 
-  const phones = (webCard?.commonInformation?.phoneNumbers ?? []).concat(
-    contactCard?.phoneNumbers?.filter(p => p.selected) ?? [],
-  );
+  const phones = (
+    (webCard?.isMultiUser ? webCard?.commonInformation?.phoneNumbers : []) ?? []
+  ).concat(contactCard?.phoneNumbers?.filter(p => p.selected) ?? []);
 
-  const mails = (webCard?.commonInformation?.emails ?? []).concat(
-    contactCard?.emails?.filter(p => p.selected) ?? [],
-  );
+  const mails = (
+    (webCard?.isMultiUser ? webCard?.commonInformation?.emails : []) ?? []
+  ).concat(contactCard?.emails?.filter(p => p.selected) ?? []);
 
-  const company = webCard?.commonInformation?.company || contactCard?.company;
+  const company =
+    (webCard?.isMultiUser && webCard?.commonInformation?.company) ||
+    contactCard?.company;
 
   const logo =
     webCard?.isMultiUser && webCard?.logo ? webCard?.logo : profileLogo;
