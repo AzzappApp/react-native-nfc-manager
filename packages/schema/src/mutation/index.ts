@@ -48,6 +48,7 @@ import saveCommonInformation from './saveCommonInformation';
 import saveContactCard from './saveContactCard';
 import saveCover from './saveCover';
 import saveFCMToken from './saveFCMToken';
+import sendEmailSignatures from './sendEmailSignatures';
 import sendInvitations from './sendInvitations';
 import sendReport from './sendReport';
 import toggleFollowing from './toggleFollowing';
@@ -129,6 +130,7 @@ export const Mutation: MutationResolvers = {
   acceptTermsOfUse,
   extractCompanyLogo,
   generateEmailSignature,
+  sendEmailSignatures,
   ...payment,
 };
 

@@ -584,3 +584,34 @@ export const getProfilesWithHasGooglePass = async (webCardId: string) => {
       ),
     );
 };
+
+/**
+ * Retrieves the list of profiles associated with a web card
+ *
+ * @param webCardId - The web card id
+ * @param profileIds - The list of profile ids to filter on,
+ *  if not provided all web card users are returned
+ * @returns The list of profiles (not deleted) associated with the web card
+ */
+export const getProfilesFromWebCard = async (
+  webCardId: string,
+  profileIds?: string[],
+) =>
+  db()
+    .select({
+      id: ProfileTable.id,
+    })
+    .from(ProfileTable)
+    .innerJoin(UserTable, eq(UserTable.id, ProfileTable.userId))
+    .where(
+      profileIds
+        ? and(
+            eq(ProfileTable.webCardId, webCardId),
+            inArray(ProfileTable.id, profileIds),
+            ne(ProfileTable.deleted, true),
+          )
+        : and(
+            eq(ProfileTable.webCardId, webCardId),
+            ne(ProfileTable.deleted, true),
+          ),
+    );

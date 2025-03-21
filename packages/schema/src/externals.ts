@@ -55,3 +55,7 @@ export const sendPushNotification = externalFunction<
     { type, mediaId, sound, deepLink, locale, localeParams }: MessageType,
   ) => Promise<void>
 >('sendPushNotification');
+
+export const sendEmailSignatures = externalFunction<
+  (profileIds: string[], webCard: WebCard) => Promise<void>
+>('sendEmailSignatures');

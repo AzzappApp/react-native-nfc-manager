@@ -32,7 +32,9 @@ import { sendPushNotification } from '#helpers/notificationsHelpers';
 import { withPluginsRoute } from '#helpers/queries';
 import { notifyUsers } from '#helpers/sendMessages';
 import { checkServerAuth, getSessionData } from '#helpers/tokens';
+import { inngest } from '#inngest/client';
 import packageJSON from '../../../../package.json';
+import type { WebCard } from '@azzapp/data';
 import type { LogLevel, Plugin as YogaPlugin } from 'graphql-yoga';
 
 const LAST_SUPPORTED_APP_VERSION =
@@ -161,6 +163,15 @@ const { handleRequest } = createYoga({
       notifyApplePassWallet,
       notifyGooglePassWallet,
       intl: getServerIntl(locale ?? DEFAULT_LOCALE),
+      sendEmailSignatures: async (profileIds: string[], webCard: WebCard) => {
+        await inngest.send({
+          name: 'batch/emailSignature',
+          data: {
+            profileIds,
+            webCard,
+          },
+        });
+      },
     };
   },
   plugins: [

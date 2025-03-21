@@ -21,6 +21,7 @@
   ],
   "dependencies": {
     "@azzapp/data": "workspace:^",
+    "@azzapp/i18n": "workspace:^",
     "@azzapp/shared": "workspace:^"
   },
   "devDependencies": {

@@ -47,7 +47,9 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
   const [form, fields] = useForm({
     lastResult,
     onValidate({ formData }) {
-      const isValid = parseWithZod(formData, { schema: ShareBackFormSchema });
+      const isValid = parseWithZod(formData, {
+        schema: ShareBackFormSchema,
+      });
       return isValid;
     },
     shouldValidate: 'onSubmit',

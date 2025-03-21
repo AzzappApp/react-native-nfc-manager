@@ -1,286 +1,154 @@
 import { GraphQLError } from 'graphql';
-import { getUserById, getProfileWithWebCardById } from '@azzapp/data';
-import { sendTemplateEmail } from '@azzapp/shared/emailHelpers';
+import { getProfileWithWebCardById } from '@azzapp/data';
+import { generateEmailSignature } from '@azzapp/service/emailSignatureServices';
 import ERRORS from '@azzapp/shared/errors';
-import serializeAndSignEmailSignature from '@azzapp/shared/serializeAndSignEmailSignature';
 import { getSessionInfos } from '#GraphQLContext';
+import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
-import generateEmailSignature from '../generateEmailSignature';
+import generateEmailSignatureMutation from '../generateEmailSignature';
+import type { GraphQLContext } from '#GraphQLContext';
 
-// Mock dependencies
+// Mocks
 jest.mock('@azzapp/data', () => ({
-  getUserById: jest.fn(),
   getProfileWithWebCardById: jest.fn(),
 }));
 
-jest.mock('@azzapp/service/mediaServices', () => ({
-  buildAvatarUrl: jest.fn().mockResolvedValue('https://avatar-url.com'),
-}));
-
-jest.mock('@azzapp/shared/emailHelpers', () => ({
-  sendTemplateEmail: jest.fn(),
-}));
-
-jest.mock('@azzapp/shared/serializeAndSignContactCard', () => ({
-  __esModule: true,
-  default: jest.fn().mockResolvedValue({
-    data: 'contactCardData',
-    signature: 'contactCardSignature',
-  }),
-}));
-
-jest.mock('@azzapp/shared/serializeAndSignEmailSignature', () => ({
-  __esModule: true,
-  default: jest.fn().mockResolvedValue({
-    data: 'emailSignatureData',
-    signature: 'emailSignatureSignature',
-  }),
-}));
-
-jest.mock('@azzapp/shared/urlHelpers', () => ({
-  buildEmailSignatureGenerationUrl: jest
-    .fn()
-    .mockReturnValue('https://azzapp.com/email-signature'),
+jest.mock('@azzapp/service/emailSignatureServices', () => ({
+  generateEmailSignature: jest.fn(),
 }));
 
 jest.mock('#GraphQLContext', () => ({
   getSessionInfos: jest.fn(),
 }));
 
-jest.mock('graphql-relay', () => ({
-  fromGlobalId: jest.fn().mockImplementation(id => ({
-    id: id.replace('gql-', ''),
-    type: id.split('-')[1],
-  })),
-}));
+jest.mock('#helpers/relayIdHelpers', () => jest.fn());
 
 jest.mock('#helpers/subscriptionHelpers', () => ({
   validateCurrentSubscription: jest.fn(),
 }));
 
-// Mock context and info
-const mockContext: any = { intl: { formatMessage: jest.fn() } };
-const mockInfo: any = {};
+const mockContext = {
+  intl: {
+    formatMessage: ({ defaultMessage }: any) => defaultMessage,
+  },
+} as GraphQLContext;
 
-describe('generateEmailSignature Mutation', () => {
-  const mockUser = {
-    id: 'user-456',
-    email: 'user@example.com',
-  };
+const mockInfo = {} as any;
 
-  const mockProfile = {
-    id: 'profile-123',
-    contactCard: {
-      firstName: 'John',
-      lastName: 'Doe',
-    },
-  };
-
-  const mockWebCard = {
-    id: 'webcard-789',
-    userName: 'testUser',
-    isMultiUser: false,
-    commonInformation: {
-      phoneNumbers: [],
-      emails: [],
-    },
-  };
+describe('generateEmailSignatureMutation', () => {
+  const gqlProfileId = 'gql-profile-id';
+  const profileId = 'real-profile-id';
+  const userId = 'user-1';
 
   beforeEach(() => {
     jest.clearAllMocks();
+    (getSessionInfos as jest.Mock).mockReturnValue({ userId });
+    (fromGlobalIdWithType as jest.Mock).mockReturnValue(profileId);
   });
 
-  test('should throw UNAUTHORIZED if user is not authenticated', async () => {
+  test('should throw UNAUTHORIZED if user is not logged in', async () => {
     (getSessionInfos as jest.Mock).mockReturnValue({ userId: null });
 
     await expect(
-      generateEmailSignature(
+      generateEmailSignatureMutation(
         {},
-        {
-          profileId: 'gql-Profile-123',
-          config: { preview: 'base64-image-data' },
-        },
+        { profileId: gqlProfileId, config: { preview: '' } },
         mockContext,
         mockInfo,
       ),
     ).rejects.toThrow(new GraphQLError(ERRORS.UNAUTHORIZED));
   });
 
-  test('should validate subscription before generating email signature', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-456' });
-    (getProfileWithWebCardById as jest.Mock).mockResolvedValue({
-      profile: mockProfile,
-      webCard: mockWebCard,
-    });
-
-    await generateEmailSignature(
-      {},
-      {
-        profileId: 'gql-Profile-123',
-        config: { preview: 'base64-image-data' },
-      },
-      mockContext,
-      mockInfo,
-    );
-
-    expect(validateCurrentSubscription).toHaveBeenCalledWith('user-456', {
-      action: 'GENERATE_EMAIL_SIGNATURE',
-      webCardIsMultiUser: false,
-    });
-  });
-
-  test('should call serializeAndSignEmailSignature without commonInformations if webcard is not multi user', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-456' });
-    (getProfileWithWebCardById as jest.Mock).mockResolvedValue({
-      profile: mockProfile,
-      webCard: { ...mockWebCard, isMultiUser: false },
-    });
-
-    await generateEmailSignature(
-      {},
-      {
-        profileId: 'gql-Profile-123',
-        config: { preview: 'base64-image-data' },
-      },
-      mockContext,
-      mockInfo,
-    );
-
-    expect(serializeAndSignEmailSignature).toHaveBeenCalledWith(
-      'testUser',
-      'Profile-123',
-      'webcard-789',
-      { firstName: 'John', lastName: 'Doe' },
-      undefined,
-      'https://avatar-url.com',
-    );
-  });
-
-  test('should call serializeAndSignEmailSignature with commonInformations if webcard is multi user', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-456' });
-    (getProfileWithWebCardById as jest.Mock).mockResolvedValue({
-      profile: mockProfile,
-      webCard: { ...mockWebCard, isMultiUser: true },
-    });
-
-    await generateEmailSignature(
-      {},
-      {
-        profileId: 'gql-Profile-123',
-        config: { preview: 'base64-image-data' },
-      },
-      mockContext,
-      mockInfo,
-    );
-
-    expect(serializeAndSignEmailSignature).toHaveBeenCalledWith(
-      'testUser',
-      'Profile-123',
-      'webcard-789',
-      { firstName: 'John', lastName: 'Doe' },
-      { emails: [], phoneNumbers: [] },
-      'https://avatar-url.com',
-    );
-  });
-
-  test('should throw INVALID_REQUEST if profile does not exist', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-456' });
+  test('should throw INVALID_REQUEST if no profile is found', async () => {
     (getProfileWithWebCardById as jest.Mock).mockResolvedValue(null);
 
     await expect(
-      generateEmailSignature(
+      generateEmailSignatureMutation(
         {},
-        {
-          profileId: 'gql-Profile-123',
-          config: { preview: 'base64-image-data' },
-        },
+        { profileId: gqlProfileId, config: { preview: '' } },
         mockContext,
         mockInfo,
       ),
     ).rejects.toThrow(new GraphQLError(ERRORS.INVALID_REQUEST));
   });
 
-  test('should throw INVALID_REQUEST if profile has no contactCard or webCard username', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-456' });
+  test('should throw INVALID_REQUEST if profile has no contact card', async () => {
     (getProfileWithWebCardById as jest.Mock).mockResolvedValue({
-      profile: { ...mockProfile, contactCard: null },
-      webCard: mockWebCard,
+      profile: { userId, contactCard: null },
+      webCard: { userName: 'test', isMultiUser: false },
     });
 
     await expect(
-      generateEmailSignature(
+      generateEmailSignatureMutation(
         {},
-        {
-          profileId: 'gql-Profile-123',
-          config: { preview: 'base64-image-data' },
-        },
+        { profileId: gqlProfileId, config: { preview: '' } },
         mockContext,
         mockInfo,
       ),
     ).rejects.toThrow(new GraphQLError(ERRORS.INVALID_REQUEST));
   });
 
-  test('should return the correct email signature URL', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-456' });
+  test('should throw INVALID_REQUEST if webCard has no userName', async () => {
     (getProfileWithWebCardById as jest.Mock).mockResolvedValue({
-      profile: mockProfile,
-      webCard: mockWebCard,
+      profile: { userId, contactCard: { firstName: 'John' } },
+      webCard: { userName: null, isMultiUser: false },
     });
 
-    const result = await generateEmailSignature(
-      {},
-      {
-        profileId: 'gql-Profile-123',
-        config: { preview: 'base64-image-data' },
-      },
-      mockContext,
-      mockInfo,
-    );
-
-    expect(result).toEqual({
-      url: 'https://azzapp.com/email-signature',
-    });
+    await expect(
+      generateEmailSignatureMutation(
+        {},
+        { profileId: gqlProfileId, config: { preview: '' } },
+        mockContext,
+        mockInfo,
+      ),
+    ).rejects.toThrow(new GraphQLError(ERRORS.INVALID_REQUEST));
   });
 
-  test('should send email with the correct parameters', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-456' });
+  test('should throw UNAUTHORIZED if user is not owner of the profile', async () => {
     (getProfileWithWebCardById as jest.Mock).mockResolvedValue({
-      profile: mockProfile,
-      webCard: mockWebCard,
+      profile: { userId: 'another-user', contactCard: { firstName: 'John' } },
+      webCard: { userName: 'test', isMultiUser: false },
     });
-    (getUserById as jest.Mock).mockResolvedValue(mockUser);
 
-    await generateEmailSignature(
-      {},
-      {
-        profileId: 'gql-Profile-123',
-        config: { preview: 'base64-image-data' },
-      },
-      mockContext,
-      mockInfo,
-    );
-
-    expect(sendTemplateEmail).toHaveBeenCalled();
+    await expect(
+      generateEmailSignatureMutation(
+        {},
+        { profileId: gqlProfileId, config: { preview: '' } },
+        mockContext,
+        mockInfo,
+      ),
+    ).rejects.toThrow(new GraphQLError(ERRORS.UNAUTHORIZED));
   });
 
-  test('should not send email if user email is not found', async () => {
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-456' });
+  test('should return url if everything is valid', async () => {
     (getProfileWithWebCardById as jest.Mock).mockResolvedValue({
-      profile: mockProfile,
-      webCard: mockWebCard,
+      profile: { userId, contactCard: { firstName: 'John' } },
+      webCard: { userName: 'test', isMultiUser: false },
     });
-    (getUserById as jest.Mock).mockResolvedValue(null);
 
-    await generateEmailSignature(
+    (generateEmailSignature as jest.Mock).mockResolvedValue(
+      'https://signature.link',
+    );
+
+    const result = await generateEmailSignatureMutation(
       {},
-      {
-        profileId: 'gql-Profile-123',
-        config: { preview: 'base64-image-data' },
-      },
+      { profileId: gqlProfileId, config: { preview: 'testPreview' } },
       mockContext,
       mockInfo,
     );
 
-    expect(sendTemplateEmail).not.toHaveBeenCalled();
+    expect(validateCurrentSubscription).toHaveBeenCalledWith(userId, {
+      action: 'GENERATE_EMAIL_SIGNATURE',
+      webCardIsMultiUser: false,
+    });
+
+    expect(generateEmailSignature).toHaveBeenCalledWith({
+      profile: expect.any(Object),
+      webCard: expect.any(Object),
+      preview: 'testPreview',
+      intl: mockContext.intl,
+    });
+
+    expect(result).toEqual({ url: 'https://signature.link' });
   });
 });
