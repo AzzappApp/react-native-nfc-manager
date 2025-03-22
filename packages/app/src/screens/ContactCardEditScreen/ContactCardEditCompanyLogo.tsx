@@ -353,16 +353,15 @@ const LogoComponentItem = ({
 const stylesheet = createStyleSheet(appearance => ({
   ...buildContactStyleSheet(appearance),
   boxItem: {
-    borderWidth: 1,
-    borderColor: colors.grey50,
     aspectRatio: 1,
-    height: 55,
-    borderRadius: 7,
+    height: 59,
+    borderRadius: 9,
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
+    borderWidth: 3,
+    borderColor: 'transparent',
   },
-  fallbackWidth: { width: 55 },
   descriptionText: {
     marginBottom: 15,
     marginTop: 15,
@@ -372,11 +371,20 @@ const stylesheet = createStyleSheet(appearance => ({
     color: appearance === 'light' ? colors.grey300 : colors.grey700,
   },
   selected: {
-    borderWidth: 3,
-    height: 55,
     borderColor: appearance === 'light' ? colors.black : colors.white,
   },
-  itemImage: { flex: 1, height: 55 },
+  fallbackWidth: {
+    aspectRatio: 1,
+  },
+  itemImage: {
+    flex: 1,
+    height: 55,
+    width: 55,
+    aspectRatio: 1,
+    borderRadius: 7,
+    borderWidth: 1,
+    borderColor: appearance === 'light' ? colors.grey50 : colors.grey1000,
+  },
   container: {
     paddingTop: 20,
     flexDirection: 'column',
