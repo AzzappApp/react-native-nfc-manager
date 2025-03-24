@@ -1,3 +1,7 @@
+## 1.9.0-canary.67
+
+
+
 ## 1.9.0-canary.66
 
 * **fix:**  - adapt company logo style to fix dark mode ui and tone on tone colors ([#8036](https://github.com/AzzappApp/azzapp/pull/8036))
