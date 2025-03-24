@@ -124,13 +124,15 @@ export const buildLocalContact = async (
   };
 };
 
-const prefixWithHttp = (link?: string): string | undefined => {
-  if (!link || link.includes('://')) {
+export function prefixWithHttp(link: string): string;
+export function prefixWithHttp(link: undefined): undefined;
+export function prefixWithHttp(link: string | undefined): string | undefined;
+export function prefixWithHttp(link?: string): string | undefined {
+  if (!link || link.startsWith('http://') || link.startsWith('https://')) {
     return link;
   }
   return `https://${link}`;
-};
-
+}
 export const reworkContactForDeviceInsert = (contact: Contact): Contact => {
   return {
     ...contact,

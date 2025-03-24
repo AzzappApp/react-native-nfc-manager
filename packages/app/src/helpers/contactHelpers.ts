@@ -13,7 +13,7 @@ import {
 } from '@azzapp/shared/vCardHelpers';
 import { textStyles } from '#theme';
 import { createStyleSheet } from '#helpers/createStyles';
-import type { ContactType } from './contactListHelpers';
+import { prefixWithHttp, type ContactType } from './contactListHelpers';
 import type { Contact } from 'expo-contacts';
 import type { ColorSchemeName } from 'react-native';
 
@@ -343,11 +343,12 @@ export const buildVCardFromAzzappContact = async (contact: ContactType) => {
   });
 
   contact.urls?.forEach(url => {
-    if (url.url) vCard.addURL(url.url);
+    if (url.url) vCard.addURL(prefixWithHttp(url.url));
   });
 
   contact.socials?.forEach(social => {
-    if (social.url) vCard.addSocial(social.url, social.label || '');
+    if (social.url)
+      vCard.addSocial(prefixWithHttp(social.url), social.label || '');
   });
 
   contact.addresses.forEach(addr => {
