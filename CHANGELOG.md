@@ -1,3 +1,7 @@
+## 1.9.0-canary.68
+
+* **build:**  - upgrade dependencies ([#8039](https://github.com/AzzappApp/azzapp/pull/8039))
+
 ## 1.9.0-canary.67
 
 
