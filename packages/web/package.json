@@ -54,7 +54,7 @@
     "lodash": "^4.17.21",
     "lottie-web": "^5.12.2",
     "lz-string": "^1.5.0",
-    "next": "^14.2.22",
+    "next": "^14.2.25",
     "next-axiom": "^1.9.1",
     "next-cloudinary": "^6.16.0",
     "os-browserify": "^0.3.0",
