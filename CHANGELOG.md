@@ -1,3 +1,9 @@
+## 1.9.0-canary.73
+
+* **fix:**  - avoid overlap in signature preview ([#8054](https://github.com/AzzappApp/azzapp/pull/8054))
+* **build:**  - automated i18n merge from staging to production ([#8007](https://github.com/AzzappApp/azzapp/pull/8007))
+* **feat:**  - **contacts:** [#7928](https://github.com/AzzappApp/azzapp/pull/7928) add contacts by location screen ([#8053](https://github.com/AzzappApp/azzapp/pull/8053))
+
 ## 1.9.0-canary.72
 
 
