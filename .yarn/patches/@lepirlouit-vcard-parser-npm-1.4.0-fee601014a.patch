@@ -1,0 +1,30 @@
+diff --git a/dist/vcard.js b/dist/vcard.js
+index 2ebdfc3ca1eb41d5aa1b0652537300bcdc27432f..0d417d6fa83103e46ae918f7d724005f5a2403b3 100644
+--- a/dist/vcard.js
++++ b/dist/vcard.js
+@@ -23,7 +23,6 @@ __export(vcard_exports, {
+   parse: () => parse
+ });
+ module.exports = __toCommonJS(vcard_exports);
+-var import_node_crypto = require("crypto");
+ var PREFIX = "BEGIN:VCARD";
+ var POSTFIX = "END:VCARD";
+ function parse(string) {
+@@ -130,7 +129,6 @@ function splitValue(value, separator) {
+   }
+   return newValue;
+ }
+-var guid = () => (0, import_node_crypto.randomUUID)();
+ var COMMA_SEPARATED_FIELDS = ["nickname", "related", "categories", "pid"];
+ var REQUIRED_FIELDS = ["fn"];
+ function generate(data, addRequired = false) {
+@@ -139,9 +137,6 @@ function generate(data, addRequired = false) {
+   if (addRequired && !data.version) {
+     data.version = [{ value: "3.0" }];
+   }
+-  if (addRequired && !data.uid) {
+-    data.uid = [{ value: guid() }];
+-  }
+   const escapeCharacters = function(v) {
+     if (typeof v === "undefined") {
+       return "";

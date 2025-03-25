@@ -102,7 +102,6 @@
     "@envelop/sentry@^9.0.0": "patch:@envelop/sentry@npm%3A9.0.0#./.yarn/patches/@envelop-sentry-npm-9.0.0-d01d6a8911.patch",
     "react-native-blob-jsi-helper@^0.3.1": "patch:react-native-blob-jsi-helper@npm%3A0.3.1#./.yarn/patches/react-native-blob-jsi-helper-npm-0.3.1-93a155f71e.patch",
     "react-native-image-size@^1.1.6": "patch:react-native-image-size@npm%3A1.1.6#./.yarn/patches/react-native-image-size-npm-1.1.6-38755aad48.patch",
-    "vcard-creator@^0.7.0": "patch:vcard-creator@npm%3A0.7.0#./.yarn/patches/vcard-creator-npm-0.7.0-a36000c711.patch",
     "source-map-explorer@npm:^2.5.3": "patch:source-map-explorer@npm%3A2.5.3#~/.yarn/patches/source-map-explorer-npm-2.5.3-1f901669e9.patch"
   },
   "dependencies": {

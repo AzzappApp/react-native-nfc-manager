@@ -16,7 +16,20 @@ import {
   ScreenModal,
   useRouter,
 } from '#components/NativeRouter';
+
 import { getAuthState } from '#helpers/authStore';
+import {
+  getVCardAddresses,
+  getVCardBirthday,
+  getVCardCompany,
+  getVCardEmail,
+  getVCardFirstName,
+  getVCardLastName,
+  getVCardPhoneNumber,
+  getVCardSocialUrls,
+  getVCardTitle,
+  getVCardUrls,
+} from '#helpers/contacts/textToVCard';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getFileName } from '#helpers/fileHelpers';
 import { keyboardDismiss } from '#helpers/keyboardHelper';
@@ -44,6 +57,7 @@ import type {
 import type { ContactCardDetectorMutation$data } from '#relayArtifacts/ContactCardDetectorMutation.graphql';
 import type { ContactCreateScreenMutation } from '#relayArtifacts/ContactCreateScreenMutation.graphql';
 import type { ContactCreateRoute } from '#routes';
+import type { vCard } from '@lepirlouit/vcard-parser';
 import type { CountryCode } from 'libphonenumber-js';
 
 const ContactCreateScreen = ({
@@ -277,6 +291,92 @@ const ContactCreateScreen = ({
     uri: string;
     aspectRatio: number;
   } | null>(null);
+
+  const loadFormFromVCard = useCallback(
+    (data: vCard) => {
+      setValue('firstName', getVCardFirstName(data));
+      setValue('lastName', getVCardLastName(data));
+      if (data?.title) {
+        setValue('title', capitalize(getVCardTitle(data)));
+      } else {
+        setValue('title', undefined);
+      }
+      setValue('company', getVCardCompany(data));
+
+      const formattedEmails = getVCardEmail(data)
+        ?.map(email => {
+          if (email) {
+            return { address: email.email, label: email.label };
+          }
+          return null;
+        })
+        .filter(n => n != null);
+      if (formattedEmails) {
+        setValue('emails', formattedEmails);
+      } else {
+        setValue('emails', []);
+      }
+      const formattedPhoneNumber = getVCardPhoneNumber(data)?.map(
+        phoneNumber => {
+          return {
+            ...extractPhoneNumberDetails(phoneNumber.phone),
+            selected: true,
+            label: phoneNumber.label,
+          };
+        },
+      );
+
+      if (formattedPhoneNumber) {
+        setValue('phoneNumbers', formattedPhoneNumber);
+      } else {
+        setValue('phoneNumbers', []);
+      }
+
+      const formattedUrl = getVCardUrls(data)
+        ?.map(url => {
+          return { url };
+        })
+        .filter(n => n != null);
+
+      if (formattedUrl) {
+        setValue('urls', formattedUrl);
+      } else {
+        setValue('urls', []);
+      }
+
+      const formattedAdress = getVCardAddresses(data)
+        ?.map(add => {
+          return { address: add.adr, label: add.label };
+        })
+        .filter(n => n != null);
+
+      if (formattedAdress) {
+        setValue('addresses', formattedAdress);
+      } else {
+        setValue('addresses', []);
+      }
+
+      const formatedBirthday = getVCardBirthday(data);
+      if (formatedBirthday) {
+        setValue('birthday', { birthday: formatedBirthday });
+      } else {
+        setValue('birthday', null);
+      }
+      const formattedSocialProfile = getVCardSocialUrls(data)
+        ?.map(profile => {
+          return { url: profile.url, label: profile.label };
+        })
+        .filter(n => n != null);
+
+      if (formattedSocialProfile) {
+        setValue('socials', formattedSocialProfile);
+      } else {
+        setValue('socials', []);
+      }
+    },
+    [setValue],
+  );
+
   const loadFormFromScan = useCallback(
     (
       data: ContactCardDetectorMutation$data['extractVisitCardData'],
@@ -422,6 +522,7 @@ const ContactCreateScreen = ({
             <ContactCardDetector
               close={closeScanner}
               extractData={loadFormFromScan}
+              extractVCardData={loadFormFromVCard}
               closeContainer={closeScannerView}
             />
           </View>

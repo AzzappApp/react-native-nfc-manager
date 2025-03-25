@@ -1,3 +1,4 @@
+import { parse } from '@lepirlouit/vcard-parser';
 import { makeImageFromView } from '@shopify/react-native-skia';
 import { Paths, File } from 'expo-file-system/next';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
@@ -13,13 +14,18 @@ import Animated, {
 } from 'react-native-reanimated';
 import Svg, { Defs, Mask, Rect } from 'react-native-svg';
 import Toast from 'react-native-toast-message';
-import { useCameraDevice, Camera } from 'react-native-vision-camera';
+import {
+  useCameraDevice,
+  Camera,
+  useCodeScanner,
+} from 'react-native-vision-camera';
 import { graphql, useMutation } from 'react-relay';
 import ERRORS from '@azzapp/shared/errors';
 import { colors } from '#theme';
 import ImagePicker, { SelectImageStep } from '#components/ImagePicker';
-import { ScreenModal, useRouter } from '#components/NativeRouter';
+import { ScreenModal, useOnFocus, useRouter } from '#components/NativeRouter';
 import PermissionModal from '#components/PermissionModal';
+import { matchUrlWithRoute } from '#helpers/deeplinkHelpers';
 import useBoolean from '#hooks/useBoolean';
 import useIsForeground from '#hooks/useIsForeground';
 import useScreenDimensions from '#hooks/useScreenDimensions';
@@ -33,6 +39,7 @@ import type {
   ContactCardDetectorMutation,
   ContactCardDetectorMutation$data,
 } from '#relayArtifacts/ContactCardDetectorMutation.graphql';
+import type { vCard } from '@lepirlouit/vcard-parser';
 import type { Point } from 'react-native-vision-camera';
 
 const horizontal = require('./assets/orientation_horizontal.png');
@@ -44,6 +51,7 @@ type ContactCardDetectorProps = {
     data: ContactCardDetectorMutation$data['extractVisitCardData'],
     image: { uri: string; aspectRatio: number },
   ) => void;
+  extractVCardData?: (data: vCard) => void;
   closeContainer?: () => void;
   createContactCard?: boolean;
 };
@@ -51,6 +59,7 @@ type ContactCardDetectorProps = {
 const ContactCardDetector = ({
   close,
   extractData,
+  extractVCardData,
   closeContainer,
   createContactCard,
 }: ContactCardDetectorProps) => {
@@ -349,6 +358,44 @@ const ContactCardDetector = ({
     };
   }, [loading]);
 
+  const scanOngoing = useRef(true);
+
+  const handleDeeplink = async (url: string) => {
+    if (!scanOngoing.current) return;
+
+    const route = await matchUrlWithRoute(url);
+    if (route) {
+      scanOngoing.current = false;
+      router?.push(route);
+    }
+  };
+
+  useOnFocus(() => {
+    scanOngoing.current = true;
+  });
+
+  const codeScanner = useCodeScanner({
+    codeTypes: ['qr', 'ean-13'],
+    onCodeScanned: codes => {
+      if (!scanOngoing.current) return;
+      if (codes.length && codes[0].value) {
+        const value = codes[0].value;
+        if (value.startsWith('http')) {
+          // url detected
+          handleDeeplink(value);
+          close();
+        } else if (value.startsWith('BEGIN:VCARD') && extractVCardData) {
+          const VCard = parse(value);
+          if (VCard) {
+            extractVCardData?.(VCard);
+            close();
+          }
+        }
+        scanOngoing.current = false;
+      }
+    },
+  });
+
   return (
     <GestureDetector gesture={composedGesture}>
       <View style={[styles.container, { width, height }]}>
@@ -362,6 +409,7 @@ const ContactCardDetector = ({
             video={false}
             androidPreviewViewType="surface-view"
             outputOrientation="device"
+            codeScanner={!createContactCard ? codeScanner : undefined}
           />
         ) : (
           <View
@@ -452,10 +500,17 @@ const ContactCardDetector = ({
               onPress={closeContainer ?? close}
             />
             <Text variant="large" style={styles.whiteText}>
-              <FormattedMessage
-                defaultMessage="Scan your paper business card"
-                description="ContactCardDetector - title Scan your paper business card"
-              />
+              {createContactCard ? (
+                <FormattedMessage
+                  defaultMessage="Scan your paper business card"
+                  description="ContactCardDetector - title Scan your paper business card"
+                />
+              ) : (
+                <FormattedMessage
+                  defaultMessage="Scan a card or QR-Code"
+                  description="ContactCardDetector - title Scan a card or QR-Code"
+                />
+              )}
             </Text>
           </View>
           <View

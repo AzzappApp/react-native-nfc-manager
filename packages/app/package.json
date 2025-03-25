@@ -32,6 +32,7 @@
     "@formatjs/intl-relativetimeformat": "^11.4.11",
     "@gorhom/bottom-sheet": "patch:@gorhom/bottom-sheet@npm%3A5.1.2#~/.yarn/patches/@gorhom-bottom-sheet-npm-5.1.2-9593eea256.patch",
     "@hookform/resolvers": "^3.10.0",
+    "@lepirlouit/vcard-parser": "patch:@lepirlouit/vcard-parser@npm%3A1.4.0#~/.yarn/patches/@lepirlouit-vcard-parser-npm-1.4.0-fee601014a.patch",
     "@lottiefiles/lottie-js": "0.4.2",
     "@miblanchard/react-native-slider": "2.6.0",
     "@react-native-camera-roll/camera-roll": "patch:@react-native-camera-roll/camera-roll@npm%3A7.9.0#~/.yarn/patches/@react-native-camera-roll-camera-roll-npm-7.9.0-285cb35c57.patch",
