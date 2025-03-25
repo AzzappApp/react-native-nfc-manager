@@ -1,3 +1,7 @@
+## 1.9.0-canary.77
+
+* **fix:**  - **EmailSignature:** add cellspacing cellpadding
+
 ## 1.9.0-canary.76
 
 * **fix:**  - **EmailSignature:** html qwark
