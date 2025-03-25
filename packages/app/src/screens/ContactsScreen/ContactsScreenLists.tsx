@@ -20,6 +20,7 @@ import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import ContactActionModal from './ContactActionModal';
 import ContactDetailsModal from './ContactDetailsModal';
 import ContactsScreenSearchByDate from './ContactsScreenSearchByDate';
+import ContactsScreenSearchByLocation from './ContactsScreenSearchByLocation';
 import ContactsScreenSearchByName from './ContactsScreenSearchByName';
 import type { ContactDetails, ContactType } from '#helpers/contactListHelpers';
 import type {
@@ -39,7 +40,7 @@ export type ContactActionProps = {
 
 type ContactsScreenListsProps = {
   search: string | undefined;
-  searchBy: 'date' | 'name';
+  searchBy: 'date' | 'location' | 'name';
   profile: ContactsScreenLists_contacts$key;
 };
 const ContactsScreenLists = ({
@@ -164,6 +165,12 @@ const ContactsScreenLists = ({
                   uri: uri(width: 61, pixelRatio: $pixelRatio, format: png)
                 }
                 birthday
+                meetingPlace {
+                  city
+                  region
+                  subregion
+                  country
+                }
                 contactProfile {
                   id
                   avatar {
@@ -436,6 +443,20 @@ const ContactsScreenLists = ({
       )}
       {profile && searchBy === 'date' && (
         <ContactsScreenSearchByDate
+          contacts={contacts}
+          onEndReached={onEndReached}
+          onRefresh={onRefresh}
+          refreshing={refreshing}
+          onInviteContact={onInviteContactInner}
+          onShowContact={onShowContact}
+          localContacts={localContacts}
+          contactsPermissionStatus={contactsPermissionStatus}
+          showContactAction={setContactActionData}
+          listFooterComponent={<Animated.View style={footerStyle} />}
+        />
+      )}
+      {profile && searchBy === 'location' && (
+        <ContactsScreenSearchByLocation
           contacts={contacts}
           onEndReached={onEndReached}
           onRefresh={onRefresh}

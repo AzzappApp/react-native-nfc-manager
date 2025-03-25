@@ -85,7 +85,21 @@ export type WebCardRoute = {
     fromRectangle?: LayoutRectangle;
     showPosts?: boolean;
     contactData?: string | null;
-    additionalContactData?: Pick<ContactCard, 'socials' | 'urls'>;
+    additionalContactData?: Pick<ContactCard, 'socials' | 'urls'> & {
+      avatarUrl?: string;
+      geolocation?: {
+        location: {
+          latitude: number;
+          longitude: number;
+        };
+        address?: {
+          city: string;
+          country: string;
+          subregion: string;
+          region: string;
+        };
+      };
+    };
     fromCreation?: boolean;
     editing?: boolean;
   } & (

@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import type { ContactType } from '#helpers/contactListHelpers';
 
-const useImageFromContact = ({ contact }: { contact: ContactType }) => {
+const useImageFromContact = (contact: ContactType) => {
   return useMemo(() => {
     if (contact.contactProfile?.avatar?.uri) {
       return {

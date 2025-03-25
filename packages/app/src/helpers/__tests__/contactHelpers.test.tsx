@@ -18,6 +18,7 @@ const contactMock: ContactType = {
   title: '',
   urls: null,
   webCard: null,
+  meetingPlace: null,
 };
 
 describe('contactHelpers', () => {

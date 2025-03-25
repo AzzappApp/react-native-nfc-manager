@@ -2,15 +2,15 @@ import { PermissionStatus as ContactPermissionStatus } from 'expo-contacts';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { colors } from '#theme';
+import WhatsappButton from '#components/Contact/WhatsappButton';
 import CoverRenderer from '#components/CoverRenderer';
 import { findLocalContact } from '#helpers/contactHelpers';
+import useImageFromContact from '#hooks/useImageFromContact';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
-import ContactAvatar from './ContactAvatar';
-import useImageFromContact from './useImageFromContact';
-import WhatsappButton from './WhatsappButton';
+import ContactAvatar from '../ContactAvatar';
 import type { ContactType } from '#helpers/contactListHelpers';
-import type { ContactActionProps } from './ContactsScreenLists';
+import type { ContactActionProps } from '#screens/ContactsScreen/ContactsScreenLists';
 import type { Contact } from 'expo-contacts';
 
 type Props = {
@@ -23,7 +23,7 @@ type Props = {
   showContactAction: (arg: ContactActionProps | undefined) => void;
 };
 
-const ContactSearchByDateItem = ({
+const ContactHorizontalItem = ({
   contact,
   onInviteContact,
   onShowContact,
@@ -98,7 +98,7 @@ const ContactSearchByDateItem = ({
     });
   }, [contact, showContactAction, showInvite]);
 
-  const avatarSource = useImageFromContact({ contact });
+  const avatarSource = useImageFromContact(contact);
 
   return (
     <View style={styles.profile}>
@@ -154,4 +154,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ContactSearchByDateItem;
+export default ContactHorizontalItem;

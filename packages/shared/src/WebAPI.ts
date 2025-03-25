@@ -286,6 +286,15 @@ export const verifySign: APIMethod<
   { signature: string; data: string; salt: string },
   Pick<CommonInformation, 'socials' | 'urls'> & {
     avatarUrl?: string;
+    geolocation?: {
+      location: { latitude: number; longitude: number };
+      address?: {
+        city: string;
+        subregion: string;
+        region: string;
+        country: string;
+      };
+    };
   }
 > = async ({ signature, data, salt }, init) =>
   apiFetch(`${API_ENDPOINT}/verifySign`, {

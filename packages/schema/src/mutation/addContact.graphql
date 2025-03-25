@@ -4,6 +4,8 @@ extend type Mutation {
     input: AddContactInput!
     scanUsed: Boolean
     notify: Boolean
+    location: LocationInput
+    address: AddressInput
   ): AddContactPayload
 }
 

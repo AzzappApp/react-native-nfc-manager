@@ -1,21 +1,22 @@
 import { useCallback, useState } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { FlatList, StyleSheet, View } from 'react-native';
 import { colors } from '#theme';
 import { keyExtractor } from '#helpers/idHelpers';
+import Button from '#ui/Button';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import ContactSearchByDateItem from './ContactSearchByDateItem';
+import ContactHorizontalItem from './ContactHorizontalItem';
 import type { ContactType } from '#helpers/contactListHelpers';
-import type { ContactActionProps } from './ContactsScreenLists';
+import type { ContactActionProps } from '../../../screens/ContactsScreen/ContactsScreenLists';
 import type {
   Contact,
   PermissionStatus as ContactPermissionStatus,
 } from 'expo-contacts';
 import type { ListRenderItemInfo } from 'react-native';
 
-type Props = {
+type ContactsScreenSectionProps = {
   title: string;
   data: ContactType[];
   localContacts: Contact[];
@@ -23,9 +24,10 @@ type Props = {
   onShowContact: (contact: ContactType) => void;
   contactsPermissionStatus: ContactPermissionStatus;
   showContactAction: (arg: ContactActionProps | undefined) => void;
+  onPressAll?: (title: string) => void;
 };
 
-const ContactSearchByDateSection = ({
+const ContactsScreenSection = ({
   title,
   data,
   localContacts,
@@ -33,7 +35,8 @@ const ContactSearchByDateSection = ({
   onShowContact,
   contactsPermissionStatus,
   showContactAction,
-}: Props) => {
+  onPressAll,
+}: ContactsScreenSectionProps) => {
   const [invited, setInvited] = useState(false);
 
   const onMore = useCallback(() => {
@@ -47,7 +50,7 @@ const ContactSearchByDateSection = ({
   const RenderProfile = useCallback(
     ({ item }: ListRenderItemInfo<ContactType>) => {
       return (
-        <ContactSearchByDateItem
+        <ContactHorizontalItem
           contact={item}
           onInviteContact={onHideInvitation => {
             onInviteContact(item, onHideInvitation);
@@ -70,6 +73,8 @@ const ContactSearchByDateSection = ({
     ],
   );
 
+  const intl = useIntl();
+
   return (
     <View style={styles.section}>
       <View style={styles.sectionTitle}>
@@ -82,7 +87,7 @@ const ContactSearchByDateSection = ({
               =1 {# contact received}
               other {# contacts received}
       }"
-              description="ContactsScreenSearchByDate - Contacts counter under section by date"
+              description="ContactsScreen - Contacts counter under section by location or date"
               values={{ contacts: data.length }}
             />
           </Text>
@@ -104,6 +109,18 @@ const ContactSearchByDateSection = ({
         scrollEventThrottle={16}
         nestedScrollEnabled
       />
+      {onPressAll ? (
+        <View style={styles.seeAll}>
+          <Button
+            variant="little_round"
+            label={intl.formatMessage({
+              defaultMessage: 'See all',
+              description: 'See all found contacts',
+            })}
+            onPress={() => onPressAll?.(title)}
+          />
+        </View>
+      ) : null}
     </View>
   );
 };
@@ -127,6 +144,11 @@ const styles = StyleSheet.create({
     marginTop: 15,
     gap: 5,
   },
+  seeAll: {
+    position: 'absolute',
+    right: 12,
+    top: '40%',
+  },
 });
 
-export default ContactSearchByDateSection;
+export default ContactsScreenSection;

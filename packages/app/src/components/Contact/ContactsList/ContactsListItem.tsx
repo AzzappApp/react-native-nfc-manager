@@ -5,14 +5,14 @@ import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors, textStyles } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import { findLocalContact } from '#helpers/contactHelpers';
+import useImageFromContact from '#hooks/useImageFromContact';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
-import ContactAvatar from './ContactAvatar';
-import useImageFromContact from './useImageFromContact';
-import WhatsappButton from './WhatsappButton';
+import ContactAvatar from '../ContactAvatar';
+import WhatsappButton from '../WhatsappButton';
 import type { ContactType } from '#helpers/contactListHelpers';
-import type { ContactActionProps } from './ContactsScreenLists';
+import type { ContactActionProps } from '#screens/ContactsScreen/ContactsScreenLists';
 import type { Contact } from 'expo-contacts';
 
 type Props = {
@@ -21,7 +21,7 @@ type Props = {
   onShowContact: (contact: ContactType) => void;
   localContacts: Contact[];
   contactsPermissionStatus: ContactPermissionStatus;
-  showContactAction: (arg: ContactActionProps | undefined) => void;
+  showContactAction: (arg?: ContactActionProps) => void;
 };
 
 const COVER_WIDTH = 35;
@@ -77,7 +77,7 @@ const ContactSearchByNameItem = ({
     });
   }, [contact, showContactAction, showInvite]);
 
-  const avatarSource = useImageFromContact({ contact });
+  const avatarSource = useImageFromContact(contact);
 
   const [firstname, lastname, name] = useMemo(() => {
     if (contact.firstName || contact.lastName) {

@@ -425,6 +425,7 @@ __metadata:
     expo-image-manipulator: "npm:^13.0.6"
     expo-keep-awake: "npm:^14.0.3"
     expo-linear-gradient: "npm:~14.0.2"
+    expo-location: "npm:^18.0.8"
     expo-quick-actions: "npm:^4.0.2"
     expo-sensors: "npm:14.0.2"
     graphql: "npm:^16.10.0"
@@ -17970,6 +17971,15 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 10/73471a435fa720137c5bb16ddc699c64181101db081cd4ff892b383e9f047db56039fd1235f3570dd2fccd099214230f98405963c9c8afc32891c43eabae2c60
+  languageName: node
+  linkType: hard
+
+"expo-location@npm:^18.0.8":
+  version: 18.0.8
+  resolution: "expo-location@npm:18.0.8"
+  peerDependencies:
+    expo: "*"
+  checksum: 10/10170aa7878c74dd8a580551e7bac304458689a965fb39b2089bebc50769737dbb80b22db3c3bf59696d9c5fb2bbb64738944174e59f127cc12487362386f572
   languageName: node
   linkType: hard
 

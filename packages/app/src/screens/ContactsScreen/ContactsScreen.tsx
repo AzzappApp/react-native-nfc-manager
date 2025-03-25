@@ -49,7 +49,9 @@ const ContactsScreen = ({
 
   const styles = useStyleSheet(stylesheet);
 
-  const [searchBy, setSearchBy] = useState<'date' | 'name'>('date');
+  const [searchBy, setSearchBy] = useState<'date' | 'location' | 'name'>(
+    'date',
+  );
   const [search, setSearch] = useState<string | undefined>(undefined);
   const [debounceSearch] = useDebounce(search, 500);
   const [isAddNewContactMenuOpen, openNewContactMenu, closeNewContactMenu] =
@@ -129,12 +131,12 @@ const ContactsScreen = ({
             id="name"
             onSelect={() => setSearchBy('name')}
           />
-          {/* <RoundedMenuComponent
+          <RoundedMenuComponent
             selected={searchBy === 'location'}
-            label={'Location'}
-            id={'location'}
+            label="Location"
+            id="location"
             onSelect={() => setSearchBy('location')}
-          /> */}
+          />
         </View>
         <SearchBarStatic
           style={styles.search}

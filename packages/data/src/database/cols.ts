@@ -1,3 +1,4 @@
+import { sql, type SQL } from 'drizzle-orm';
 import {
   char,
   datetime,
@@ -15,12 +16,15 @@ import {
   uniqueIndex,
   date,
   fulltextIndex,
+  customType,
 } from 'drizzle-orm/mysql-core';
 import {
   DEFAULT_DATETIME_PRECISION,
   DEFAULT_VARCHAR_LENGTH,
 } from './constants';
 import sqliteCols from './sqliteCols';
+
+type DataPoint = { longitude: number; latitude: number };
 
 const cols = {
   cuid: (name: string) => char(name, { length: 12 }),
@@ -49,6 +53,17 @@ const cols = {
   uniqueIndex,
   date,
   fulltextIndex,
+  point: customType<{
+    data: DataPoint;
+    driverData: string;
+  }>({
+    dataType() {
+      return 'point';
+    },
+    toDriver(value: DataPoint): SQL {
+      return sql`ST_GeomFromText('POINT(${value.longitude} ${value.latitude})')`;
+    },
+  }),
 };
 
 if (process.env.SQL_ENV === 'SQLITE') Object.assign(cols, sqliteCols);

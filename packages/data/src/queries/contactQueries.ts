@@ -7,12 +7,13 @@ import {
   count,
   desc,
   inArray,
+  sql,
 } from 'drizzle-orm';
 import { db, transaction } from '../database';
 import { ContactTable, ProfileTable, UserTable, WebCardTable } from '../schema';
 import { incrementShareBacksTotal } from './profileQueries';
 import { incrementShareBacks } from './profileStatisticQueries';
-import type { Contact, Profile } from '../schema';
+import type { Contact, NewContact, Profile } from '../schema';
 
 export type ContactRow = InferInsertModel<typeof ContactTable>;
 
@@ -121,14 +122,6 @@ export const updateContact = async (
   await db().update(ContactTable).set(values).where(eq(ContactTable.id, id));
 };
 
-export type NewSharedContact = {
-  firstName: string;
-  lastName: string;
-  phone: string;
-  email: string;
-  company: string;
-  title: string;
-};
 /**
  * Save a shareBack
  *
@@ -136,17 +129,12 @@ export type NewSharedContact = {
  */
 export const saveShareBack = async (
   profileId: string,
-  newContact: NewSharedContact,
+  newContact: NewContact,
 ) => {
   const value: ContactRow = {
-    firstName: newContact.firstName,
-    lastName: newContact.lastName,
+    ...newContact,
+    addresses: newContact.addresses ?? [],
     ownerProfileId: profileId,
-    phoneNumbers: [{ label: 'Home', number: newContact.phone }],
-    emails: [{ label: 'Main', address: newContact.email }],
-    addresses: [],
-    company: newContact.company,
-    title: newContact.title,
     type: 'shareback',
   };
 
@@ -169,14 +157,27 @@ export const searchContacts = async (
     offset?: number;
     ownerProfileId: string;
     name?: string;
-    orderBy: 'date' | 'name';
+    orderBy: 'date' | 'location' | 'name';
   },
   withDeleted = false,
 ): Promise<Contact[]> => {
+  const locationExpr = sql`
+  COALESCE(
+    NULLIF(JSON_UNQUOTE(meetingPlace->'$.city'), ''),
+    NULLIF(JSON_UNQUOTE(meetingPlace->'$.subregion'), ''),
+    NULLIF(JSON_UNQUOTE(meetingPlace->'$.region'), ''),
+    NULLIF(JSON_UNQUOTE(meetingPlace->'$.country'), ''),
+    ''
+  )
+`;
+
   const orders =
     orderBy === 'name'
       ? [ContactTable.firstName, ContactTable.lastName]
-      : [desc(ContactTable.createdAt)];
+      : orderBy === 'location'
+        ? [desc(locationExpr)]
+        : [desc(ContactTable.createdAt)];
+
   const contacts = await db()
     .select()
     .from(ContactTable)
@@ -190,6 +191,16 @@ export const searchContacts = async (
               like(ContactTable.lastName, `%${name}%`),
               like(ContactTable.company, `%${name}%`),
             )
+          : undefined,
+        orderBy === 'location'
+          ? sql`
+        COALESCE(
+          NULLIF(JSON_UNQUOTE(meetingPlace->'$.city'), ''),
+          NULLIF(JSON_UNQUOTE(meetingPlace->'$.subregion'), ''),
+          NULLIF(JSON_UNQUOTE(meetingPlace->'$.region'), ''),
+          NULLIF(JSON_UNQUOTE(meetingPlace->'$.country'), '')
+        ) IS NOT NULL
+      `
           : undefined,
       ),
     )

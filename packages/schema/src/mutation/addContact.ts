@@ -24,7 +24,7 @@ import type { Contact, ContactRow } from '@azzapp/data';
 
 const addContact: MutationResolvers['addContact'] = async (
   _,
-  { profileId: gqlProfileId, input, notify, scanUsed },
+  { profileId: gqlProfileId, input, notify, scanUsed, location, address },
 ) => {
   const { userId } = getSessionInfos();
 
@@ -70,6 +70,8 @@ const addContact: MutationResolvers['addContact'] = async (
     socials: input.socials || null,
     createdAt: new Date(),
     logoId: input.logoId ?? null,
+    meetingLocation: location ?? null,
+    meetingPlace: address ?? null,
   };
 
   let contact: Contact;
@@ -176,6 +178,8 @@ const addContact: MutationResolvers['addContact'] = async (
       deleted: false,
       urls: commonInformationToMerge.urls.concat(urls),
       socials: commonInformationToMerge.socials.concat(socials),
+      meetingLocation: location ?? null,
+      meetingPlace: address ?? null,
     };
 
     const existingShareBack = await getContactByProfiles({

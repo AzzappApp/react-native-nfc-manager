@@ -1,18 +1,14 @@
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
-import { FlatList, View } from 'react-native';
-import { colors } from '#theme';
-import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import ContactSearchByDateSection from './ContactSearchByDateSection';
+import SectionContactsHorizontalList from '#components/Contact/SectionContactsHorizontalList';
 import type { ContactType } from '#helpers/contactListHelpers';
 import type { ContactActionProps } from './ContactsScreenLists';
 import type {
   Contact,
   PermissionStatus as ContactPermissionStatus,
 } from 'expo-contacts';
-import type { ListRenderItemInfo } from 'react-native';
 
-type Props = {
+type ContactsScreenSearchByDateProps = {
   contacts: ContactType[];
   onEndReached: () => void;
   onRefresh: () => void;
@@ -36,9 +32,7 @@ const ContactsScreenSearchByDate = ({
   contactsPermissionStatus,
   showContactAction,
   listFooterComponent,
-}: Props) => {
-  const styles = useStyleSheet(stylesheet);
-
+}: ContactsScreenSearchByDateProps) => {
   const intl = useIntl();
 
   const sections = useMemo(() => {
@@ -74,68 +68,20 @@ const ContactsScreenSearchByDate = ({
     );
   }, [contacts, intl]);
 
-  const RenderListItem = useCallback(
-    ({ item }: ListRenderItemInfo<{ title: string; data: ContactType[] }>) => {
-      return (
-        <ContactSearchByDateSection
-          data={item.data}
-          localContacts={localContacts}
-          onInviteContact={onInviteContact}
-          onShowContact={onShowContact}
-          title={item.title}
-          contactsPermissionStatus={contactsPermissionStatus}
-          showContactAction={showContactAction}
-        />
-      );
-    },
-    [
-      contactsPermissionStatus,
-      localContacts,
-      onInviteContact,
-      onShowContact,
-      showContactAction,
-    ],
-  );
-
   return (
-    <FlatList
-      data={sections}
-      keyExtractor={sectionKeyExtractor}
-      renderItem={RenderListItem}
+    <SectionContactsHorizontalList
+      sections={sections}
       onEndReached={onEndReached}
       refreshing={refreshing}
       onRefresh={onRefresh}
-      contentContainerStyle={styles.content}
-      showsVerticalScrollIndicator={false}
-      snapToAlignment="start"
-      decelerationRate="fast"
-      scrollEventThrottle={16}
-      nestedScrollEnabled
-      ItemSeparatorComponent={RenderSectionSeparator}
-      ListFooterComponent={listFooterComponent}
+      onInviteContact={onInviteContact}
+      onShowContact={onShowContact}
+      localContacts={localContacts}
+      contactsPermissionStatus={contactsPermissionStatus}
+      showContactAction={showContactAction}
+      listFooterComponent={listFooterComponent}
     />
   );
 };
-
-const sectionKeyExtractor = (item: { title: string }) => {
-  return item.title;
-};
-
-const RenderSectionSeparator = () => {
-  const styles = useStyleSheet(stylesheet);
-  return <View style={styles.separator} />;
-};
-
-const stylesheet = createStyleSheet(appearance => ({
-  flex: { flex: 1 },
-  content: {
-    marginHorizontal: 10,
-  },
-  separator: {
-    height: 1,
-    width: '100%',
-    backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey900,
-  },
-}));
 
 export default ContactsScreenSearchByDate;

@@ -27,7 +27,8 @@ import {
   shareBackVCardFilename,
 } from '#helpers/shareBackHelper';
 import { sendTwilioSMS } from '#helpers/twilioHelpers';
-import type { NewSharedContact } from '@azzapp/data';
+import type { VerifySignToken } from '#app/api/verifySign/route';
+import type { NewContact } from '@azzapp/data/src/schema';
 import type { SubmissionResult } from '@conform-to/react';
 import type { JwtPayload } from 'jwt-decode';
 import type { CountryCode } from 'libphonenumber-js';
@@ -61,7 +62,7 @@ export const processShareBackSubmission = async (
 
   try {
     // decode token
-    const decodedToken = jwtDecode<JwtPayload>(token);
+    const decodedToken = jwtDecode<JwtPayload & VerifySignToken>(token);
     // verify expiration date
     if (!decodedToken.exp || decodedToken.exp < Date.now() / 1000) {
       return submission.reply({
@@ -151,12 +152,18 @@ export const processShareBackSubmission = async (
       Sentry.captureException(e);
     }
 
-    const contactFormValue: NewSharedContact = {
-      ...(submission.payload as NewSharedContact),
+    const contactFormValue = {
+      ...submission.payload,
       phone,
     };
 
-    await saveShareBack(profile.id, contactFormValue);
+    await saveShareBack(profile.id, {
+      ...submission.payload,
+      phoneNumbers: [{ label: 'Home', number: phone }],
+      emails: [{ label: 'Main', address: submission.payload.email }],
+      meetingLocation: decodedToken.geolocation?.location,
+      meetingPlace: decodedToken.geolocation?.address,
+    } as NewContact);
 
     await sendPushNotification(profile.userId, {
       type: 'shareBack',

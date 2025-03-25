@@ -48,7 +48,11 @@ import {
 } from '#helpers/permissionsHelpers';
 import { searchPexelsPhotos, searchPexelsVideos } from '#helpers/pexelsClient';
 import { idResolver } from '#helpers/relayIdHelpers';
-import type { ProfileResolvers } from '#/__generated__/types';
+import type {
+  LocationInput,
+  AddressInput,
+  ProfileResolvers,
+} from '#/__generated__/types';
 import type { PexelsSearchResult } from '#helpers/pexelsClient';
 import type { Profile, User } from '@azzapp/data';
 import type { WebCardKind } from '@azzapp/shared/webCardKind';
@@ -252,17 +256,20 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
   contactCardUrl: async profile => {
     return getContactCardUrl(profile);
   },
-  contactCardQrCode: async (profile, { width }) => {
-    const result = await toString(await getContactCardUrl(profile), {
-      errorCorrectionLevel: 'L',
-      width,
-      type: 'svg',
-      color: {
-        dark: '#000',
-        light: '#0000',
+  contactCardQrCode: async (profile, { width, location, address }) => {
+    const result = await toString(
+      await getContactCardUrl(profile, location, address),
+      {
+        errorCorrectionLevel: 'L',
+        width,
+        type: 'svg',
+        color: {
+          dark: '#000',
+          light: '#0000',
+        },
+        margin: 0,
       },
-      margin: 0,
-    });
+    );
     return result;
   },
   webCard: async profile => {
@@ -628,7 +635,11 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
 
 export { ProfileResolverImpl as Profile };
 
-const getContactCardUrl = async (profile: Profile) => {
+const getContactCardUrl = async (
+  profile: Profile,
+  location?: LocationInput | null,
+  address?: AddressInput | null,
+) => {
   const webCard = await webCardLoader.load(profile.webCardId);
   if (!webCard || !webCard?.userName) {
     return process.env.NEXT_PUBLIC_URL!;
@@ -644,10 +655,13 @@ const getContactCardUrl = async (profile: Profile) => {
     webCard.isMultiUser ? webCard?.commonInformation : null,
   );
 
+  const geolocation = location || address ? { location, address } : undefined;
+
   const url = buildUserUrlWithContactCard(
     webCard?.userName ?? '',
     data,
     signature,
+    geolocation,
   );
   return url;
 };

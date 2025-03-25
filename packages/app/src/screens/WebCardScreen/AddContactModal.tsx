@@ -42,15 +42,13 @@ import AddContactModalProfiles, {
 import type { AddContactModal_webCard$key } from '#relayArtifacts/AddContactModal_webCard.graphql';
 
 import type { AddContactModalMutation } from '#relayArtifacts/AddContactModalMutation.graphql';
+import type { WebCardRoute } from '#routes';
 import type { CheckboxStatus } from '#ui/CheckBox';
-import type { CommonInformation } from '@azzapp/shared/contactCardHelpers';
 import type { Contact, Image } from 'expo-contacts';
 
 type Props = {
   contactData?: string | null;
-  additionalContactData?: Pick<CommonInformation, 'socials' | 'urls'> & {
-    avatarUrl?: string;
-  };
+  additionalContactData?: WebCardRoute['params']['additionalContactData'];
   webCard: AddContactModal_webCard$key;
 };
 
@@ -80,8 +78,15 @@ const AddContactModal = ({
     mutation AddContactModalMutation(
       $profileId: ID!
       $input: AddContactInput!
+      $location: LocationInput
+      $address: AddressInput
     ) {
-      addContact(profileId: $profileId, input: $input) {
+      addContact(
+        profileId: $profileId
+        input: $input
+        location: $location
+        address: $address
+      ) {
         contact {
           id
         }
@@ -318,6 +323,8 @@ const AddContactModal = ({
       variables: {
         input,
         profileId: viewer,
+        location: additionalContactData?.geolocation?.location,
+        address: additionalContactData?.geolocation?.address,
       },
       updater: (store, response) => {
         if (response && response.addContact) {
@@ -361,7 +368,16 @@ const AddContactModal = ({
         });
       },
     });
-  }, [scanned, viewer, getContactInput, commit, close, intl]);
+  }, [
+    scanned,
+    viewer,
+    getContactInput,
+    commit,
+    additionalContactData?.geolocation?.location,
+    additionalContactData?.geolocation?.address,
+    close,
+    intl,
+  ]);
 
   useEffect(() => {
     (async () => {

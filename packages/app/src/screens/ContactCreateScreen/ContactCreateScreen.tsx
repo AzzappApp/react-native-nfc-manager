@@ -27,6 +27,7 @@ import {
   getPhonenumberWithCountryCode,
 } from '#helpers/phoneNumbersHelper';
 import useBoolean from '#hooks/useBoolean';
+import { useCurrentLocation } from '#hooks/useLocation';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { ScanMyPaperBusinessCard } from '#screens/ContactCardEditScreen/ContactCardCreateScreen';
 import Button from '#ui/Button';
@@ -54,18 +55,25 @@ const ContactCreateScreen = ({
   const [progressIndicator, setProgressIndicator] =
     useState<Observable<number> | null>(null);
 
+  const currentLocation = useCurrentLocation();
+  const { location, address } = currentLocation || {};
+
   const [commit, loading] = useMutation<ContactCreateScreenMutation>(graphql`
     mutation ContactCreateScreenMutation(
       $profileId: ID!
       $contact: AddContactInput!
       $notify: Boolean!
       $scanUsed: Boolean!
+      $location: LocationInput
+      $address: AddressInput
     ) {
       addContact(
         profileId: $profileId
         input: $contact
         notify: $notify
         scanUsed: $scanUsed
+        location: $location
+        address: $address
       ) {
         contact {
           id
@@ -209,6 +217,20 @@ const ContactCreateScreen = ({
             birthday: data.birthday?.birthday || '',
             withShareBack: false,
           },
+          location: location
+            ? {
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+              }
+            : null,
+          address: address
+            ? {
+                country: address.country,
+                city: address.city,
+                subregion: address.subregion,
+                region: address.region,
+              }
+            : null,
         },
         onCompleted: () => {
           if (avatarId && avatar?.uri) {

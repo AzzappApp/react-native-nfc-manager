@@ -19,7 +19,7 @@ import type {
   CommonInformation,
   ContactCard,
 } from '@azzapp/shared/contactCardHelpers';
-import type { InferSelectModel } from 'drizzle-orm';
+import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
 // #region CardModule
 export const CardModuleTable = cols.table(
@@ -961,6 +961,13 @@ export const ContactTable = cols.table(
       .json('socials')
       .$type<Array<{ url: string; label: string }>>(),
     logoId: cols.mediaId('logoId'),
+    meetingLocation: cols.point('meetingLocation'),
+    meetingPlace: cols.json('meetingPlace').$type<{
+      city?: string | null;
+      subregion?: string | null;
+      region?: string | null;
+      country?: string | null;
+    }>(),
   },
   table => {
     return {
@@ -971,6 +978,7 @@ export const ContactTable = cols.table(
   },
 );
 export type Contact = InferSelectModel<typeof ContactTable>;
+export type NewContact = InferInsertModel<typeof ContactTable>;
 //#endregion
 
 // #region FCMToken

@@ -1,17 +1,14 @@
-import { useCallback, useMemo } from 'react';
-import { StyleSheet } from 'react-native';
-import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
-import ContactsList from '#components/Contact/ContactsList';
-import Text from '#ui/Text';
+import { useMemo } from 'react';
+import { useIntl } from 'react-intl';
+import SectionContactsHorizontalList from '#components/Contact/SectionContactsHorizontalList';
 import type { ContactType } from '#helpers/contactListHelpers';
 import type { ContactActionProps } from './ContactsScreenLists';
 import type {
-  PermissionStatus as ContactPermissionStatus,
   Contact,
+  PermissionStatus as ContactPermissionStatus,
 } from 'expo-contacts';
-import type { SectionListData } from 'react-native';
 
-type Props = {
+type ContactsScreenSearchByLocationProps = {
   contacts: ContactType[];
   onEndReached: () => void;
   onRefresh: () => void;
@@ -24,7 +21,7 @@ type Props = {
   listFooterComponent: JSX.Element;
 };
 
-const ContactsScreenSearchByName = ({
+const ContactsScreenSearchByLocation = ({
   contacts,
   onEndReached,
   onRefresh,
@@ -35,24 +32,29 @@ const ContactsScreenSearchByName = ({
   contactsPermissionStatus,
   showContactAction,
   listFooterComponent,
-}: Props) => {
+}: ContactsScreenSearchByLocationProps) => {
+  const intl = useIntl();
+
   const sections = useMemo(() => {
-    return contacts.reduce(
+    return contacts?.reduce(
       (accumulator, contact) => {
-        const initial = (
-          contact.firstName?.[0] ??
-          contact.lastName?.[0] ??
-          contact.company?.[0] ??
-          contact.contactProfile?.webCard?.userName?.[0] ??
-          ''
-        ).toLocaleUpperCase();
+        const title =
+          (contact.meetingPlace?.city ||
+            contact.meetingPlace?.subregion ||
+            contact.meetingPlace?.region ||
+            contact.meetingPlace?.country) ??
+          intl.formatMessage({
+            defaultMessage: 'Unknown',
+            description:
+              'ContactsScreenSearchByLocation - Title for unknown location',
+          });
 
         const existingSection = accumulator.find(
-          section => section.title === initial,
+          section => section.title === title,
         );
 
         if (!existingSection) {
-          accumulator.push({ title: initial, data: [contact] });
+          accumulator.push({ title, data: [contact] });
         } else {
           existingSection.data.push(contact);
         }
@@ -61,29 +63,11 @@ const ContactsScreenSearchByName = ({
       },
       [] as Array<{ title: string; data: ContactType[] }>,
     );
-  }, [contacts]);
-
-  const renderHeaderSection = useCallback(
-    ({
-      section: { title },
-    }: {
-      section: SectionListData<
-        ContactType,
-        { title: string; data: ContactType[] }
-      >;
-    }) => {
-      if (isNotFalsyString(title)) {
-        return <Text style={styles.title}>{title}</Text>;
-      }
-      return null;
-    },
-    [],
-  );
+  }, [contacts, intl]);
 
   return (
-    <ContactsList
+    <SectionContactsHorizontalList
       sections={sections}
-      renderSectionHeader={renderHeaderSection}
       onEndReached={onEndReached}
       refreshing={refreshing}
       onRefresh={onRefresh}
@@ -97,11 +81,4 @@ const ContactsScreenSearchByName = ({
   );
 };
 
-const styles = StyleSheet.create({
-  title: {
-    marginVertical: 20,
-    textTransform: 'uppercase',
-  },
-});
-
-export default ContactsScreenSearchByName;
+export default ContactsScreenSearchByLocation;

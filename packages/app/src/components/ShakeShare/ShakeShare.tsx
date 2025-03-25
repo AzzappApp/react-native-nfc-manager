@@ -35,6 +35,7 @@ import ToastUi from '#components/Toast';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import useBoolean from '#hooks/useBoolean';
 import useLatestCallback from '#hooks/useLatestCallback';
+import { useCurrentLocation } from '#hooks/useLocation';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { get as qrCodeWidth } from '#relayProviders/qrCodeWidth.relayprovider';
 import BottomSheetModal from '#ui/BottomSheetModal';
@@ -151,6 +152,10 @@ const ShakeShareDisplay = ({
 
   const [enableShakeBack, setEnableShakeBack] = useState(false);
 
+  const currentLocation = useCurrentLocation();
+
+  const { location, address } = currentLocation ?? {};
+
   useEffect(() => {
     if (visible) {
       const tout = setTimeout(() => {
@@ -166,7 +171,12 @@ const ShakeShareDisplay = ({
 
   const { node } = useLazyLoadQuery<ShakeShareScreenQuery>(
     graphql`
-      query ShakeShareScreenQuery($profileId: ID!, $width: Int!) {
+      query ShakeShareScreenQuery(
+        $profileId: ID!
+        $width: Int!
+        $location: LocationInput
+        $address: AddressInput
+      ) {
         node(id: $profileId) {
           ... on Profile @alias(as: "profile") {
             webCard {
@@ -176,7 +186,11 @@ const ShakeShareDisplay = ({
               ...CoverRenderer_webCard
             }
             contactCardUrl
-            contactCardQrCode(width: $width)
+            contactCardQrCode(
+              width: $width
+              location: $location
+              address: $address
+            )
             ...ContactCardExportVcf_card
           }
         }
@@ -185,8 +199,24 @@ const ShakeShareDisplay = ({
     {
       profileId: profileInfos?.profileId ?? '',
       width: qrCodeWidth(),
+      location: location
+        ? {
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+          }
+        : null,
+      address: address
+        ? {
+            country: address.country,
+            city: address.city,
+            subregion: address.subregion,
+            region: address.region,
+          }
+        : null,
     },
-    { fetchKey: profileInfos?.profileId ?? '' },
+    {
+      fetchKey: `${profileInfos?.profileId ?? ''}${location ? `${location.coords.latitude}-${location.coords.longitude}` : ''}`,
+    },
   );
 
   const profile = node?.profile;

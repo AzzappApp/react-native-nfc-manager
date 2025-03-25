@@ -61,7 +61,11 @@ type Profile implements Node {
   """
   statsSummary: [ProfileStatistic!]
 
-  contactCardQrCode(width: Int!): String!
+  contactCardQrCode(
+    width: Int!
+    location: LocationInput
+    address: AddressInput
+  ): String!
 
   contactCardUrl: String!
 
@@ -379,4 +383,5 @@ type ProfileEdge {
 enum SearchContactOrderBy {
   name
   date
+  location
 }

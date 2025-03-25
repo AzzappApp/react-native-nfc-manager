@@ -9,6 +9,7 @@ import ShareBackModal from '#components/ShareBackModal/ShareBackModal';
 import { displayName } from '#helpers/contactCardHelpers';
 import DisplayWebCard from './WebCard';
 import WebCardPreview from './WebCardPreview';
+import type { VerifySignToken } from '#app/api/verifySign/route';
 import type { ModalActions } from '#ui/Modal';
 import type { Media, PostWithCommentAndAuthor, WebCard } from '@azzapp/data';
 import type { JwtPayload } from 'jwt-decode';
@@ -53,14 +54,7 @@ const WebCardPageLayout = (props: WebCardPageLayoutProps) => {
 
   const shareBackModal = useRef<ModalActions>(null);
 
-  type DownloadVCardJwtPayload = JwtPayload & {
-    userId: string;
-    avatarUrl?: string;
-    isMultiUser: boolean;
-    firstName?: string;
-    lastName?: string;
-    company?: string;
-  };
+  type DownloadVCardJwtPayload = JwtPayload & VerifySignToken;
 
   const handleCloseDownloadVCard = useCallback(
     ({ token }: { token?: string }) => {
@@ -71,7 +65,7 @@ const WebCardPageLayout = (props: WebCardPageLayoutProps) => {
             userId: tokenDecoded.userId,
             webcardId: webCard?.id,
             avatarUrl: tokenDecoded.avatarUrl ?? '',
-            isMultiUser: tokenDecoded.isMultiUser,
+            isMultiUser: !!tokenDecoded.isMultiUser,
             token,
             firstName: tokenDecoded.firstName ?? '',
             lastName: tokenDecoded.lastName ?? '',
