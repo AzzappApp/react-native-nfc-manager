@@ -312,6 +312,13 @@ export type ModulePreviewRoute = {
   };
 };
 
+export type ContactByLocationRoute = {
+  route: 'CONTACTS_BY_LOCATION';
+  params: {
+    location: string;
+  };
+};
+
 export type Route =
   | AboutRoute
   | AcceptTermsRoute
@@ -321,6 +328,7 @@ export type Route =
   | CommonInformationRoute
   | ConfirmChangeContactRoute
   | ConfirmRegistrationRoute
+  | ContactByLocationRoute
   | ContactCardCreateRoute
   | ContactCardEditRoute
   | ContactCardRoute

@@ -152,12 +152,17 @@ export const searchContacts = async (
     ownerProfileId,
     name,
     orderBy,
+    filterBy,
   }: {
     limit: number;
     offset?: number;
     ownerProfileId: string;
     name?: string;
     orderBy: 'date' | 'location' | 'name';
+    filterBy?: {
+      value: string;
+      type: 'location';
+    } | null;
   },
   withDeleted = false,
 ): Promise<Contact[]> => {
@@ -192,8 +197,16 @@ export const searchContacts = async (
               like(ContactTable.company, `%${name}%`),
             )
           : undefined,
-        orderBy === 'location'
+        filterBy
           ? sql`
+       COALESCE(
+         NULLIF(JSON_UNQUOTE(meetingPlace->'$.city'), ''),
+         NULLIF(JSON_UNQUOTE(meetingPlace->'$.subregion'), ''),
+         NULLIF(JSON_UNQUOTE(meetingPlace->'$.region'), ''),
+         NULLIF(JSON_UNQUOTE(meetingPlace->'$.country'), '')
+       ) = ${filterBy.value}`
+          : orderBy === 'location'
+            ? sql`
         COALESCE(
           NULLIF(JSON_UNQUOTE(meetingPlace->'$.city'), ''),
           NULLIF(JSON_UNQUOTE(meetingPlace->'$.subregion'), ''),
@@ -201,7 +214,7 @@ export const searchContacts = async (
           NULLIF(JSON_UNQUOTE(meetingPlace->'$.country'), '')
         ) IS NOT NULL
       `
-          : undefined,
+            : undefined,
       ),
     )
     .orderBy(...orders)

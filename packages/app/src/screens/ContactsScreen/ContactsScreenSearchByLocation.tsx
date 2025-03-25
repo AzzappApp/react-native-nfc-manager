@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import SectionContactsHorizontalList from '#components/Contact/SectionContactsHorizontalList';
+import { useRouter } from '#components/NativeRouter';
 import type { ContactType } from '#helpers/contactListHelpers';
 import type { ContactActionProps } from './ContactsScreenLists';
 import type {
@@ -65,6 +66,8 @@ const ContactsScreenSearchByLocation = ({
     );
   }, [contacts, intl]);
 
+  const router = useRouter();
+
   return (
     <SectionContactsHorizontalList
       sections={sections}
@@ -77,6 +80,12 @@ const ContactsScreenSearchByLocation = ({
       contactsPermissionStatus={contactsPermissionStatus}
       showContactAction={showContactAction}
       listFooterComponent={listFooterComponent}
+      onPressAll={location => {
+        router.push({
+          route: 'CONTACTS_BY_LOCATION',
+          params: { location },
+        });
+      }}
     />
   );
 };

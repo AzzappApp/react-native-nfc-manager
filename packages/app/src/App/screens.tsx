@@ -10,6 +10,7 @@ import ContactCardCreateScreen from '#screens/ContactCardEditScreen/ContactCardC
 import ContactCardScreen from '#screens/ContactCardScreen';
 import ContactCreateScreen from '#screens/ContactCreateScreen/ContactCreateScreen';
 import ContactDetailsScreen from '#screens/ContactDetailsScreen';
+import ContactsByLocationScreen from '#screens/ContactsByLocationScreen';
 import ContactsScreen from '#screens/ContactsScreen';
 import CoverCreationScreen from '#screens/CoverCreationScreen';
 import CoverEditionScreen from '#screens/CoverEditionScreen';
@@ -100,6 +101,7 @@ const screens = {
   WEBCARD: WebCardScreen,
   WEBCARD_PARAMETERS: WebCardParametersScreen,
   WEBCARD_TEMPLATE_SELECTION: WebCardTemplateSelectionScreen,
+  CONTACTS_BY_LOCATION: ContactsByLocationScreen,
 } satisfies ScreenMap;
 
 export default screens;

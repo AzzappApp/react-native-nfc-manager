@@ -19,6 +19,7 @@ import useScreenInsets from '#hooks/useScreenInsets';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
 import ContactActionModal from './ContactActionModal';
 import ContactDetailsModal from './ContactDetailsModal';
+import ContactsFilteredByLocation from './ContactsFilteredByLocation';
 import ContactsScreenSearchByDate from './ContactsScreenSearchByDate';
 import ContactsScreenSearchByLocation from './ContactsScreenSearchByLocation';
 import ContactsScreenSearchByName from './ContactsScreenSearchByName';
@@ -42,11 +43,13 @@ type ContactsScreenListsProps = {
   search: string | undefined;
   searchBy: 'date' | 'location' | 'name';
   profile: ContactsScreenLists_contacts$key;
+  filterBy?: string;
 };
 const ContactsScreenLists = ({
   search,
   searchBy,
   profile,
+  filterBy,
 }: ContactsScreenListsProps) => {
   const [refreshing, setRefreshing] = useState(false);
   const [localContacts, setLocalContacts] = useState<Contact[]>();
@@ -119,6 +122,7 @@ const ContactsScreenLists = ({
             type: "Float!"
             provider: "CappedPixelRatio.relayprovider"
           }
+          filterBy: { type: SearchFilter }
         ) {
           id
           nbContacts #keep this field to update  on the main screen after updating by pulling down #7896
@@ -127,6 +131,7 @@ const ContactsScreenLists = ({
             first: $first
             name: $name
             orderBy: $orderBy
+            filterBy: $filterBy
           ) @connection(key: "Profile_searchContacts") {
             __id
             edges {
@@ -241,7 +246,16 @@ const ContactsScreenLists = ({
       setRefreshing(true);
       refreshLocalContacts();
       refetch(
-        { name: search, orderBy: searchBy },
+        {
+          name: search,
+          orderBy: searchBy,
+          filterBy: filterBy
+            ? {
+                value: filterBy,
+                type: 'location',
+              }
+            : undefined,
+        },
         { fetchPolicy: 'store-and-network' },
       );
       setRefreshing(false);
@@ -253,6 +267,7 @@ const ContactsScreenLists = ({
     refetch,
     search,
     searchBy,
+    filterBy,
   ]);
 
   // This code is used to refresh the screen when we come back to it.
@@ -270,10 +285,19 @@ const ContactsScreenLists = ({
 
   useEffect(() => {
     refetch(
-      { name: search || undefined, orderBy: searchBy },
+      {
+        name: search || undefined,
+        orderBy: searchBy,
+        filterBy: filterBy
+          ? {
+              value: filterBy,
+              type: 'location',
+            }
+          : undefined,
+      },
       { fetchPolicy: 'store-and-network' },
     );
-  }, [search, refetch, searchBy]);
+  }, [search, refetch, searchBy, filterBy]);
 
   const [commitContactsLastView] =
     useMutation<ContactsScreenListsMutationUpdateContactsLastViewMutation>(
@@ -441,20 +465,35 @@ const ContactsScreenLists = ({
           listFooterComponent={<Animated.View style={footerStyle} />}
         />
       )}
-      {profile && searchBy === 'date' && (
-        <ContactsScreenSearchByDate
-          contacts={contacts}
-          onEndReached={onEndReached}
-          onRefresh={onRefresh}
-          refreshing={refreshing}
-          onInviteContact={onInviteContactInner}
-          onShowContact={onShowContact}
-          localContacts={localContacts}
-          contactsPermissionStatus={contactsPermissionStatus}
-          showContactAction={setContactActionData}
-          listFooterComponent={<Animated.View style={footerStyle} />}
-        />
-      )}
+      {profile &&
+        searchBy === 'date' &&
+        (filterBy ? (
+          <ContactsFilteredByLocation
+            contacts={contacts}
+            onEndReached={onEndReached}
+            onRefresh={onRefresh}
+            refreshing={refreshing}
+            onInviteContact={onInviteContactInner}
+            onShowContact={onShowContact}
+            localContacts={localContacts}
+            contactsPermissionStatus={contactsPermissionStatus}
+            showContactAction={setContactActionData}
+            listFooterComponent={<Animated.View style={footerStyle} />}
+          />
+        ) : (
+          <ContactsScreenSearchByDate
+            contacts={contacts}
+            onEndReached={onEndReached}
+            onRefresh={onRefresh}
+            refreshing={refreshing}
+            onInviteContact={onInviteContactInner}
+            onShowContact={onShowContact}
+            localContacts={localContacts}
+            contactsPermissionStatus={contactsPermissionStatus}
+            showContactAction={setContactActionData}
+            listFooterComponent={<Animated.View style={footerStyle} />}
+          />
+        ))}
       {profile && searchBy === 'location' && (
         <ContactsScreenSearchByLocation
           contacts={contacts}

@@ -1,14 +1,18 @@
-import { useMemo } from 'react';
-import { useIntl } from 'react-intl';
-import SectionContactsHorizontalList from '#components/Contact/SectionContactsHorizontalList';
+import { useCallback, useMemo } from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { StyleSheet, View } from 'react-native';
+import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
+import ContactsList from '#components/Contact/ContactsList';
+import Text from '#ui/Text';
 import type { ContactType } from '#helpers/contactListHelpers';
 import type { ContactActionProps } from './ContactsScreenLists';
 import type {
-  Contact,
   PermissionStatus as ContactPermissionStatus,
+  Contact,
 } from 'expo-contacts';
+import type { SectionListData } from 'react-native';
 
-type ContactsScreenSearchByDateProps = {
+type Props = {
   contacts: ContactType[];
   onEndReached: () => void;
   onRefresh: () => void;
@@ -21,7 +25,7 @@ type ContactsScreenSearchByDateProps = {
   listFooterComponent: JSX.Element;
 };
 
-const ContactsScreenSearchByDate = ({
+const ContactsFilteredByLocation = ({
   contacts,
   onEndReached,
   onRefresh,
@@ -32,7 +36,7 @@ const ContactsScreenSearchByDate = ({
   contactsPermissionStatus,
   showContactAction,
   listFooterComponent,
-}: ContactsScreenSearchByDateProps) => {
+}: Props) => {
   const intl = useIntl();
 
   const sections = useMemo(() => {
@@ -69,9 +73,38 @@ const ContactsScreenSearchByDate = ({
     );
   }, [contacts, intl]);
 
+  const renderHeaderSection = useCallback(
+    ({
+      section: { title, data },
+    }: {
+      section: SectionListData<
+        ContactType,
+        { title: string; data: ContactType[] }
+      >;
+    }) => {
+      if (isNotFalsyString(title)) {
+        return (
+          <View style={styles.title}>
+            <Text variant="large">{title}</Text>
+            <Text variant="small">
+              <FormattedMessage
+                defaultMessage="{nbContacts} contacts"
+                description="Number of contacts"
+                values={{ nbContacts: data.length }}
+              />
+            </Text>
+          </View>
+        );
+      }
+      return null;
+    },
+    [],
+  );
+
   return (
-    <SectionContactsHorizontalList
+    <ContactsList
       sections={sections}
+      renderSectionHeader={renderHeaderSection}
       onEndReached={onEndReached}
       refreshing={refreshing}
       onRefresh={onRefresh}
@@ -85,4 +118,11 @@ const ContactsScreenSearchByDate = ({
   );
 };
 
-export default ContactsScreenSearchByDate;
+const styles = StyleSheet.create({
+  title: {
+    marginVertical: 20,
+    rowGap: 5,
+  },
+});
+
+export default ContactsFilteredByLocation;

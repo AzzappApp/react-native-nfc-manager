@@ -179,6 +179,10 @@ type Profile implements Node {
     Returns the first n items from the list.
     """
     first: Int @max(value: 50)
+    """
+    The filter to apply
+    """
+    filterBy: SearchFilter
   ): ContactConnection!
 
   """
@@ -383,5 +387,14 @@ type ProfileEdge {
 enum SearchContactOrderBy {
   name
   date
+  location
+}
+
+input SearchFilter {
+  value: String!
+  type: FilterType!
+}
+
+enum FilterType {
   location
 }
