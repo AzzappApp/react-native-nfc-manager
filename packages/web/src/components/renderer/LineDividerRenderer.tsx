@@ -19,6 +19,7 @@ const LineDividerRenderer = ({
   colorPalette,
   resizeModes: _,
   style,
+  coverBackgroundColor: __,
   ...props
 }: LineDividerRendererProps) => {
   const {
