@@ -1,3 +1,7 @@
+## 1.9.0-canary.75
+
+* **fix:**  - email signature for outlook ([#8058](https://github.com/AzzappApp/azzapp/pull/8058))
+
 ## 1.9.0-canary.74
 
 * **feat:**  - add qrcode scanner ([#8044](https://github.com/AzzappApp/azzapp/pull/8044))
