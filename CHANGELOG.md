@@ -1,3 +1,7 @@
+## 1.9.0-canary.76
+
+* **fix:**  - **EmailSignature:** html qwark
+
 ## 1.9.0-canary.75
 
 * **fix:**  - email signature for outlook ([#8058](https://github.com/AzzappApp/azzapp/pull/8058))
