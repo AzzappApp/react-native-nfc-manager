@@ -58,9 +58,7 @@ const styles = {
     width: 500,
     '@media': {
       'screen and (max-width: 580px)': {
-        transform: 'scale(0.5)',
-        transformOrigin: 'top center',
-        marginBottom: 'calc(-50% + 30px)',
+        zoom: 0.5,
       },
     },
   }),
