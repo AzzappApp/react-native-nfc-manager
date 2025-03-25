@@ -1,3 +1,7 @@
+## 1.9.0-canary.74
+
+* **feat:**  - add qrcode scanner ([#8044](https://github.com/AzzappApp/azzapp/pull/8044))
+
 ## 1.9.0-canary.73
 
 * **fix:**  - avoid overlap in signature preview ([#8054](https://github.com/AzzappApp/azzapp/pull/8054))
