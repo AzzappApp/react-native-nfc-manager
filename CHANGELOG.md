@@ -1,3 +1,7 @@
+## 1.9.0-canary.71
+
+* **fix:**  - email signature bad comment
+
 ## 1.9.0-canary.70
 
 * **feat:**  - **Login:** Oauth  ([#8041](https://github.com/AzzappApp/azzapp/pull/8041))
