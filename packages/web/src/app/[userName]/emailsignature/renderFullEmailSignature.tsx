@@ -61,10 +61,10 @@ const renderFullEmailSignature = ({
     ? `<tr valign="top">
         <td style="padding-bottom: 5px;" >
           <span style="
-            color: ${titleColor};"
+            color: ${titleColor};
             line-height: 10px;
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 500;"
           >
             ${contact.title}
           </span>
@@ -167,7 +167,7 @@ const renderFullEmailSignature = ({
       <tr>
         <td
           valign="top"
-          style="border-right: 1px solid #E2E1E3; padding-right: 15px; min-width: 160px"
+          style="border-right: 1px solid #E2E1E3; padding-right: 15px; min-width: 160px;"
         >
           <table style="padding-bottom: 12px;">
             ${nameSection}
