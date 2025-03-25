@@ -1,3 +1,9 @@
+## 1.9.0-canary.78
+
+* **feat:**  - **web:** implement popup when user click on media on web ([#8014](https://github.com/AzzappApp/azzapp/pull/8014))
+* **fix:**  - update mobile provision file
+* **fix:**  - update mobile provision file
+
 ## 1.9.0-canary.77
 
 * **fix:**  - **EmailSignature:** add cellspacing cellpadding
