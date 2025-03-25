@@ -1,3 +1,7 @@
+## 1.9.0-canary.69
+
+* **feat:**  - **contacts:** [#7928](https://github.com/AzzappApp/azzapp/pull/7928) add geolocation ([#8042](https://github.com/AzzappApp/azzapp/pull/8042))
+
 ## 1.9.0-canary.68
 
 * **build:**  - upgrade dependencies ([#8039](https://github.com/AzzappApp/azzapp/pull/8039))

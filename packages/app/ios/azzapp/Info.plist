@@ -34,7 +34,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>69</string>
+	<string>70</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false />
 	<key>LSApplicationQueriesSchemes</key>
@@ -68,7 +68,7 @@
 	<key>NSUserNotificationsUsageDescription</key>
 	<string>$(PRODUCT_NAME) wants to send you notifications.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-  <string>$(PRODUCT_NAME) uses your position to record where you exchanged contact details with others.</string>
+	<string>$(PRODUCT_NAME) uses your position to record where you exchanged contact details with others.</string>
 	<key>PHPhotoLibraryPreventAutomaticLimitedAccessAlert</key>
 	<true />
 	<key>UIAppFonts</key>
