@@ -30,6 +30,10 @@ jobs:
 
       - name: Setup
         uses: ./.github/actions/setup
+      
+      - name: Put staging translations to production
+        run: yarn i18n:merge
+        if: github.ref == 'refs/heads/stable'
 
       - name: Pull translations
         uses: ./.github/actions/i18n-pull

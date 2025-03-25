@@ -24,6 +24,7 @@
     "relay:prepare": "touch ./packages/web/src/persisted-query-map.json",
     "i18n:extract": "yarn workspace @azzapp/i18n extract",
     "i18n:pull": "yarn workspace @azzapp/i18n pull",
+    "i18n:merge": "yarn workspace @azzapp/i18n merge",
     "i18n:purge": "yarn workspace @azzapp/i18n purge",
     "run:ios": "yarn workspace @azzapp/app run:ios",
     "run:android": "yarn workspace @azzapp/app run:android",
