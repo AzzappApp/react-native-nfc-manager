@@ -1,3 +1,9 @@
+## 1.9.0-canary.70
+
+* **feat:**  - **Login:** Oauth  ([#8041](https://github.com/AzzappApp/azzapp/pull/8041))
+* **fix:**  - add falshList patch to avoid key workaround ([#8047](https://github.com/AzzappApp/azzapp/pull/8047))
+* **fix:**  - change paddingTop on web SimpleCarousel to match mobile ([#8049](https://github.com/AzzappApp/azzapp/pull/8049))
+
 ## 1.9.0-canary.69
 
 * **feat:**  - **contacts:** [#7928](https://github.com/AzzappApp/azzapp/pull/7928) add geolocation ([#8042](https://github.com/AzzappApp/azzapp/pull/8042))
