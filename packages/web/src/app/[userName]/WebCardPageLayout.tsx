@@ -12,6 +12,7 @@ import WebCardPreview from './WebCardPreview';
 import type { VerifySignToken } from '#app/api/verifySign/route';
 import type { ModalActions } from '#ui/Modal';
 import type { Media, PostWithCommentAndAuthor, WebCard } from '@azzapp/data';
+import type { CardStyle } from '@azzapp/shared/cardHelpers';
 import type { JwtPayload } from 'jwt-decode';
 import type { PropsWithChildren } from 'react';
 
@@ -24,6 +25,7 @@ type WebCardPageLayoutProps = PropsWithChildren<{
   userName: string;
   color: string | null;
   isAzzappPlus: boolean;
+  cardStyle: CardStyle;
 }>;
 
 const WebCardPageLayout = (props: WebCardPageLayoutProps) => {
@@ -36,6 +38,7 @@ const WebCardPageLayout = (props: WebCardPageLayoutProps) => {
     lastModuleBackgroundColor,
     color,
     isAzzappPlus,
+    cardStyle,
   } = props;
   const searchParams = useSearchParams();
   const isShareBack = !!searchParams.get('c') || !!searchParams.get('token');
@@ -141,6 +144,7 @@ const WebCardPageLayout = (props: WebCardPageLayoutProps) => {
           handleCloseDownloadVCard={handleCloseDownloadVCard}
           isShareBack={isShareBack}
           isAzzappPlus={isAzzappPlus}
+          cardStyle={cardStyle}
         >
           {children}
         </DisplayWebCard>

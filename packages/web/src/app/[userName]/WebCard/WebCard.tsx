@@ -11,6 +11,7 @@ import arrows from '@azzapp/web/public/arrows@3x.png';
 import { FlipIcon } from '#assets';
 import { ButtonIcon } from '#ui';
 import ContactSteps from '#components/ContactSteps';
+import FullScreenOverlay from '#components/FullscreenOverlay/FullscreenOverlayContext';
 import CoverRenderer from '#components/renderer/CoverRenderer';
 import CoverRendererBackground from '#components/renderer/CoverRenderer/CoverRendererBackground';
 import { DeviceType, getDeviceType } from '#helpers/userAgent';
@@ -19,6 +20,8 @@ import PostFeed from '../PostFeed';
 import WebCardPostNavigation from '../WebCardPostNavigation';
 import styles from './WebCard.css';
 import type { WebCard, Media, PostWithCommentAndAuthor } from '@azzapp/data';
+import type { CardStyle } from '@azzapp/shared/cardHelpers';
+
 import type { PropsWithChildren } from 'react';
 
 const NEXT_PUBLIC_URL = process.env.NEXT_PUBLIC_URL || 'https://www.azzapp.com';
@@ -32,6 +35,7 @@ type Step1Props = PropsWithChildren<{
   color: string | null;
   isAzzappPlus: boolean;
   isShareBack?: boolean;
+  cardStyle: CardStyle;
   handleCloseDownloadVCard: ({ token }: { token?: string }) => void;
 }>;
 
@@ -45,6 +49,7 @@ const WebCard = ({
   lastModuleBackgroundColor,
   isShareBack,
   isAzzappPlus,
+  cardStyle,
   handleCloseDownloadVCard,
 }: Step1Props) => {
   const intl = useIntl();
@@ -57,7 +62,7 @@ const WebCard = ({
   const hasContactCard = !!searchParams.get('c');
 
   return (
-    <>
+    <FullScreenOverlay cardStyle={cardStyle}>
       <div
         className={styles.wrapper}
         style={{
@@ -210,7 +215,7 @@ const WebCard = ({
           step={2}
         />
       </div>
-    </>
+    </FullScreenOverlay>
   );
 };
 

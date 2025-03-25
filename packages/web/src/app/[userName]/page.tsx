@@ -160,6 +160,7 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
       userName={params.userName}
       color={cardBackgroundColor}
       isAzzappPlus={isAzzappPlus}
+      cardStyle={webCard.cardStyle ?? DEFAULT_CARD_STYLE}
     >
       {modules.map(module => (
         <ModuleRenderer

@@ -8,6 +8,7 @@ import React, {
   useState,
 } from 'react';
 import { swapColor } from '@azzapp/shared/cardHelpers';
+import { useFullScreenOverlayContext } from '#components/FullscreenOverlay/FullscreenOverlayContext';
 import { webCardTextFontsMap, webCardTitleFontsMap } from '#helpers/fonts';
 import { DEFAULT_MODULE_TEXT, DEFAULT_MODULE_TITLE } from '#helpers/modules';
 import useDimensions from '#hooks/useDimensions';
@@ -488,6 +489,8 @@ const SimpleCarouselItem = ({
     text?: string;
   };
 }) => {
+  const { setMedia } = useFullScreenOverlayContext(media);
+
   return (
     <div
       className={styles.itemContainer}
@@ -498,6 +501,7 @@ const SimpleCarouselItem = ({
       <div
         className={styles.imageContainer}
         style={{ borderRadius: cardStyle.borderRadius }}
+        onClick={setMedia}
       >
         {media.kind === 'video' ? (
           <CloudinaryVideo
