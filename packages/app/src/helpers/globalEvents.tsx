@@ -77,6 +77,10 @@ export type GlobalEvents =
   | TOKENS_REFRESHED
   | WEBCARD_CHANGE;
 
+export const GLOBAL_EVENT_DEFAULT_PRIORITY = 0;
+
+export const GLOBAL_EVENT_HIGH_PRIORITY = 100;
+
 type TypeToLister<TType extends GlobalEvents['type']> = TType extends 'SIGN_UP'
   ? SIGN_UP_EVENTS
   : TType extends 'SIGN_IN'
@@ -96,7 +100,7 @@ type EventListener<T extends GlobalEvents> =
   | ((event: T) => void);
 
 const listeners: {
-  [key in GlobalEvents['type']]?: Set<EventListener<TypeToLister<key>>>;
+  [key in GlobalEvents['type']]?: Map<EventListener<TypeToLister<key>>, number>;
 } = {};
 
 /**
@@ -108,11 +112,12 @@ const listeners: {
 export const addGlobalEventListener = <T extends GlobalEvents['type']>(
   type: T,
   listener: EventListener<TypeToLister<T>>,
+  priority = GLOBAL_EVENT_DEFAULT_PRIORITY,
 ) => {
   if (!listeners[type]) {
-    (listeners as any)[type] = new Set();
+    (listeners as any)[type] = new Map();
   }
-  listeners[type]?.add(listener);
+  listeners[type]?.set(listener, priority);
   return () => {
     listeners[type]?.delete(listener);
   };
@@ -124,14 +129,15 @@ export const addGlobalEventListener = <T extends GlobalEvents['type']>(
  *
  * @param event the event to dispatch
  */
-export const dispatchGlobalEvent = (event: GlobalEvents): Promise<void> => {
-  const eventListeners = listeners[event.type];
-  const promises = [];
-  for (const listener of eventListeners?.values() ?? []) {
-    const result = (listener as any)(event);
-    if (result instanceof Promise) {
-      promises.push(result.catch(() => void 0));
-    }
+export const dispatchGlobalEvent = async (
+  event: GlobalEvents,
+): Promise<void> => {
+  const eventListeners = [...(listeners[event.type]?.entries() ?? [])]
+    .sort(([, priorityA], [, priorityB]) => priorityB - priorityA)
+    .map(([listener]) => listener);
+  for (const listener of eventListeners) {
+    await Promise.resolve((listener as any)(event)).catch(error => {
+      console.error('Error while processing event ', event, error);
+    });
   }
-  return Promise.all(promises).then(() => void 0);
 };

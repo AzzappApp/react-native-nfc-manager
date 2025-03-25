@@ -686,4 +686,6 @@ const fakeUser: Omit<User, 'id'> = {
   hasAcceptedCommunications: false,
   replacedBy: null,
   nbFreeScans: 0,
+  userContactData: null,
+  appleId: null,
 };

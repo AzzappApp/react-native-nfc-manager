@@ -127,8 +127,22 @@ export const User: ProtectedResolver<UserResolvers> = {
     return totalSeats;
   },
   hasAcceptedLastTermsOfUse: async user => {
+    if (!user.termsOfUseAcceptedVersion) {
+      return false;
+    }
     const termsOfUse = await getLastTermsOfUse();
 
     return !termsOfUse || termsOfUse.version === user.termsOfUseAcceptedVersion;
+  },
+  userContactData: async user => {
+    return {
+      ...user.userContactData,
+      email: user.userContactData?.email
+        ? user.userContactData.email
+        : user.email,
+      phoneNumber: user.userContactData?.phoneNumber
+        ? user.userContactData.phoneNumber
+        : user.phoneNumber,
+    };
   },
 };

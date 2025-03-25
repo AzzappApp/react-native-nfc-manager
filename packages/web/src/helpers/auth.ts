@@ -9,8 +9,39 @@ export const handleSignInAuthMethod = async (
   user: User,
   profile: Profile | null | undefined,
 ) => {
-  if (user.deleted && user.id !== user.deletedBy) {
+  try {
+    return NextResponse.json(await retrieveSigninInfos(user, profile));
+  } catch {
     return NextResponse.json({ message: ERRORS.FORBIDDEN }, { status: 403 });
+  }
+};
+
+export type SigninInfos =
+  | {
+      profileInfos: {
+        profileId: string;
+        profileRole: string;
+        webCardId: string;
+        invited: boolean;
+        webCardUserName?: string | null;
+        cardIsPublished?: boolean;
+        coverIsPredefined?: boolean;
+      } | null;
+      email: string | null;
+      phoneNumber: string | null;
+      userId: string;
+      token: string;
+      refreshToken: string;
+      roles: string[] | null;
+    }
+  | { issuer: string };
+
+export const retrieveSigninInfos = async (
+  user: User,
+  profile: Profile | null | undefined,
+): Promise<SigninInfos> => {
+  if (user.deleted && user.id !== user.deletedBy) {
+    throw new Error('User deleted');
   }
 
   if (!user.emailConfirmed && !user.phoneNumberConfirmed) {
@@ -25,9 +56,7 @@ export const handleSignInAuthMethod = async (
       throw new Error('Verification canceled');
     }
 
-    return NextResponse.json({
-      issuer,
-    });
+    return { issuer };
   }
 
   const { token, refreshToken } = await generateTokens({
@@ -36,8 +65,7 @@ export const handleSignInAuthMethod = async (
 
   const webCard = await getWebCardById(profile?.webCardId ?? '');
 
-  return NextResponse.json({
-    ok: true,
+  return {
     profileInfos: profile
       ? {
           profileId: toGlobalId('Profile', profile.id),
@@ -55,5 +83,5 @@ export const handleSignInAuthMethod = async (
     token,
     refreshToken,
     roles: user.roles,
-  });
+  };
 };

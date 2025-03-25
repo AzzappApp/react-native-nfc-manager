@@ -56,4 +56,38 @@ type User {
   Returns true if the user has accepted new Terms of use
   """
   hasAcceptedLastTermsOfUse: Boolean!
+
+  userContactData: UserContactData
+}
+
+
+type UserContactData {
+  """
+  Returns the first name of the user if retrieved during signup
+  """
+  firstName: String
+  """
+  Returns the last name of the user if retrieved during signup
+  """
+  lastName: String
+
+  """
+  Returns the company name of the user if retrieved during signup
+  """
+  companyName: String
+
+  """
+  Returns the title of the user if retrieved during signup
+  """
+  email: String
+  
+  """
+  Returns the phone number of the user if retrieved during signup
+  """
+  phoneNumber: String
+
+  """
+  Returns the avatarURL of the user if retrieved during signup
+  """
+  avatarUrl: String
 }

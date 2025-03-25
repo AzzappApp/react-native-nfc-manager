@@ -121,9 +121,9 @@ export const POST = withPluginsRoute(async (req: Request) => {
     if (user) {
       await transaction(async () => {
         await updateUser(user.id, {
-          email: user.email === email ? null : user.email,
-          phoneNumber:
-            user.phoneNumber === userPhoneNumber ? null : user.phoneNumber,
+          email: null,
+          phoneNumber: null,
+          appleId: null,
         });
 
         const userId = await createUser({

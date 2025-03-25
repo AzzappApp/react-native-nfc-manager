@@ -143,3 +143,7 @@ jest.mock('expo-image-manipulator', () => ({
     PNG: 'png',
   },
 }));
+
+jest.mock('expo-auth-session', () => ({
+  makeRedirectUri: jest.fn(() => 'mock://redirect'),
+}));

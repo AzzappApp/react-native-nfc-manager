@@ -28,6 +28,11 @@ export const signup = withFetchFunction(
   unauthenticatedFetchJSON,
 );
 
+export const appleSignin = withFetchFunction(
+  WebAPI.appleSignin,
+  unauthenticatedFetchJSON,
+);
+
 export const confirmRegistration = withFetchFunction(
   WebAPI.confirmRegistration,
   authenticatedFetchJSON,

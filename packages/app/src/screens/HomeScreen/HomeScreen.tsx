@@ -1,9 +1,5 @@
-import LottieView from 'lottie-react-native';
-import { Suspense, useEffect, useMemo, useRef } from 'react';
-import { useColorScheme } from 'react-native';
+import { Suspense, useEffect, useRef } from 'react';
 import { graphql, usePreloadedQuery } from 'react-relay';
-import { replaceColors } from '@azzapp/shared/lottieHelpers';
-import { mainRoutes } from '#mobileRoutes';
 import { HomeIcon } from '#components/HomeIcon';
 import { setMainTabBarOpacity } from '#components/MainTabBar';
 import { useRouter } from '#components/NativeRouter';
@@ -15,7 +11,7 @@ import { useDeepLinkStoredRoute } from '#hooks/useDeepLink';
 import { useQuickActions } from '#hooks/useQuickActions';
 import { useRevenueCat } from '#hooks/useRevenueCat';
 import { useSetRevenueCatUserInfo } from '#hooks/useSetRevenueCatUserInfo';
-import Container from '#ui/Container';
+import AzzappLogoLoader from '#ui/AzzappLogoLoader';
 import HomeScreenContent from './HomeScreenContent';
 import { HomeScreenProvider } from './HomeScreenContext';
 import HomeScreenPrefetcher from './HomeScreenPrefetcher';
@@ -66,13 +62,6 @@ const HomeScreen = ({
       dispatchGlobalEvent({ type: 'SIGN_OUT' });
       return;
     }
-    //if not profile, launch onboarding (except if we are in offline mode)
-    if (
-      (!currentUser?.profiles || currentUser.profiles.length === 0) &&
-      hasFocus
-    ) {
-      router.replaceAll(mainRoutes(true));
-    }
   }, [currentUser, currentUser?.profiles, hasFocus, router]);
 
   useSaveOfflineVCard(currentUser?.profiles);
@@ -103,50 +92,12 @@ const HomeScreen = ({
   );
 };
 
-const lottie = require('./assets/home-loader.json');
-
 const HomeScreenFallback = () => {
   useEffect(() => {
     setMainTabBarOpacity(0);
   }, []);
-  const colorScheme = useColorScheme() ?? 'light';
 
-  const source = useMemo(
-    () =>
-      colorScheme === 'light'
-        ? lottie
-        : replaceColors(
-            [
-              {
-                sourceColor: '#000000',
-                targetColor: '#ffffff',
-              },
-            ],
-            lottie,
-          ),
-    [colorScheme],
-  );
-
-  return (
-    <Container
-      style={{
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <LottieView
-        source={source}
-        autoPlay
-        loop
-        hardwareAccelerationAndroid
-        style={{
-          width: 150,
-          height: 150,
-        }}
-      />
-    </Container>
-  );
+  return <AzzappLogoLoader />;
 };
 
 export default relayScreen(HomeScreen, {

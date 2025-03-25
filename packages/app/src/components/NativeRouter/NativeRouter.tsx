@@ -399,6 +399,7 @@ const initToRouteInstance = <T extends RouteInit | StackInit | TabsInit>(
         lazy: lazy ?? true,
         unmountInactive: unmountInactive ?? false,
         tabsHistory: [],
+        screenOptions: init.screenOptions,
       },
     } as any;
   } else {

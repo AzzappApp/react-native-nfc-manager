@@ -45,6 +45,11 @@ export type ConfirmRegistrationRoute = {
   };
 };
 
+export type AcceptTermsRoute = {
+  route: 'ACCEPT_TERMS';
+  params?: never;
+};
+
 export type ForgotPasswordRoute = {
   route: 'FORGOT_PASSWORD';
   params?: never;
@@ -309,6 +314,7 @@ export type ModulePreviewRoute = {
 
 export type Route =
   | AboutRoute
+  | AcceptTermsRoute
   | AccountDetailsRoute
   | AddModuleSectionRoute
   | CardModuleEditionRoute

@@ -47,6 +47,19 @@ export const getUserByEmail = (email: string): Promise<User | null> =>
     .then(res => res[0] ?? null);
 
 /**
+ * Retrieve a user by his email
+ *
+ * @param email - The email of the user to retrieve
+ * @returns The user if found, otherwise null
+ */
+export const getUserByAppleId = (appleId: string): Promise<User | null> =>
+  db()
+    .select()
+    .from(UserTable)
+    .where(eq(UserTable.appleId, appleId))
+    .then(res => res[0] ?? null);
+
+/**
  * Retrieve a list of users by their emails
  *
  * @param email - The email of the user to retrieve

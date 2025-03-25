@@ -672,6 +672,7 @@ export const UserTable = cols.table(
   {
     id: cols.cuid('id').primaryKey().$defaultFn(createId),
     email: cols.defaultVarchar('email'),
+    appleId: cols.defaultVarchar('appleId'),
     password: cols.defaultVarchar('password'),
     phoneNumber: cols.defaultVarchar('phoneNumber'),
     createdAt: cols
@@ -703,10 +704,19 @@ export const UserTable = cols.table(
       .default(false)
       .notNull(),
     nbFreeScans: cols.int('nbFreeScans').default(0).notNull(),
+    userContactData: cols.json('userContactData').$type<{
+      firstName?: string | null;
+      lastName?: string | null;
+      companyName?: string | null;
+      avatarUrl?: string | null;
+      phoneNumber?: string | null;
+      email?: string | null;
+    }>(),
   },
   table => {
     return {
       emailKey: cols.uniqueIndex('User_email_key').on(table.email),
+      appleIdKey: cols.uniqueIndex('User_appleId_key').on(table.appleId),
       phoneNumberKey: cols
         .uniqueIndex('User_phoneNumber_key')
         .on(table.phoneNumber),

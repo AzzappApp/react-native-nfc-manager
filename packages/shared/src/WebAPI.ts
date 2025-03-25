@@ -31,12 +31,31 @@ const apiFetch = <ReturnType>(
 };
 
 /**
- * Respon of API call related to authentication.
+ * Response of API call related to tokens (sign in, sign up, refresh tokens).
  */
 export type TokensResponse = {
   token: string;
   refreshToken: string;
 };
+
+/**
+ * Respond of API call related to authentication with valid signed user.
+ */
+export type ValidAuthResponse = TokensResponse & {
+  userId: string;
+  profileInfos: {
+    profileRole: string;
+    profileId: string;
+    webCardId: string;
+  } | null;
+  email: string | null;
+  phoneNumber: string | null;
+};
+
+/**
+ * Response of API call related to authentication.
+ */
+export type AuthResponse = ValidAuthResponse | { issuer: string };
 
 /**
  * Parameters for the signup API call.
@@ -94,21 +113,28 @@ export type ConfirmRegistrationReponse = {
 /**
  * API call to signup a new user.
  */
-export const signup: APIMethod<
-  SignUpParams,
-  TokensResponse & {
-    userId: string;
-    profileInfos: {
-      profileRole: string;
-      profileId: string;
-      webCardId: string;
-    } | null;
-    email: string | null;
-    phoneNumber: string | null;
-    issuer?: string;
-  }
-> = (data, init) =>
+export const signup: APIMethod<SignUpParams, AuthResponse> = (data, init) =>
   apiFetch(`${API_ENDPOINT}/signup`, {
+    ...init,
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+
+export type AppleSigninInParams = {
+  identityToken: string;
+  locale?: string;
+  firstName?: string | null;
+  lastName?: string | null;
+};
+
+/**
+ * API call to signup a new user.
+ */
+export const appleSignin: APIMethod<AppleSigninInParams, ValidAuthResponse> = (
+  data,
+  init,
+) =>
+  apiFetch(`${API_ENDPOINT}/signin/apple`, {
     ...init,
     method: 'POST',
     body: JSON.stringify(data),
@@ -144,20 +170,7 @@ export type SignInParams = {
 /**
  * API call to signin a user.
  */
-export const signin: APIMethod<
-  SignInParams,
-  TokensResponse & {
-    userId: string;
-    profileInfos: {
-      profileRole: string;
-      profileId: string;
-      webCardId: string;
-    } | null;
-    email: string | null;
-    phoneNumber: string | null;
-    issuer?: string;
-  }
-> = (data, init) =>
+export const signin: APIMethod<SignInParams, AuthResponse> = (data, init) =>
   apiFetch(`${API_ENDPOINT}/signin`, {
     ...init,
     method: 'POST',

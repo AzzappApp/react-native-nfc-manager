@@ -12,6 +12,7 @@ import { addGlobalEventListener } from './globalEvents';
 
 const ENCRYPTED_STORAGE_TOKENS_KEY = 'AZZAPP_AUTH';
 const MMKVS_PROFILE_INFOS = '@azzap/auth.profileInfos';
+const MMKVS_HAS_BEEN_SIGNED_IN = '@azzap/auth.hasBeenSignedIn';
 
 export const encryptedStorage = new MMKV({
   id: `encrypted-storage`,
@@ -126,6 +127,7 @@ export const init = async () => {
         JSON.stringify(tokens),
       );
       authTokens = tokens;
+      storage.set(MMKVS_HAS_BEEN_SIGNED_IN, true);
       if (profileInfos) {
         storage.set(
           MMKVS_PROFILE_INFOS,
@@ -213,11 +215,18 @@ export const getAuthState = (): AuthState => {
   } catch {
     profileInfos = null;
   }
+  if (authTokens) {
+    storage.set(MMKVS_HAS_BEEN_SIGNED_IN, true);
+  }
 
   return {
     authenticated: authTokens !== null,
     profileInfos: profileInfos ?? null,
   };
+};
+
+export const hasBeenSignedIn = () => {
+  return storage.getBoolean(MMKVS_HAS_BEEN_SIGNED_IN) ?? false;
 };
 
 /**

@@ -11,13 +11,13 @@ import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useColorScheme, View, StyleSheet } from 'react-native';
+import { getLocales } from 'react-native-localize';
 import * as mime from 'react-native-mime-types'; // FIXME import is verry big
 import Toast from 'react-native-toast-message';
 import { useMutation, usePreloadedQuery } from 'react-relay';
 import { graphql, Observable } from 'relay-runtime';
 import ERRORS from '@azzapp/shared/errors';
 import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
-import { mainRoutes } from '#mobileRoutes';
 import { colors } from '#theme';
 import ContactCardDetector from '#components/ContactCardScanner/ContactCardDetector';
 import coverDrawer from '#components/CoverEditor/coverDrawer';
@@ -63,10 +63,18 @@ import type { ContactCardCreateRoute } from '#routes';
 import type { CountryCode } from 'libphonenumber-js';
 import type { ViewStyle } from 'react-native';
 
-export const contactCardCreateScreenQuery = graphql`
+const contactCardCreateScreenQuery = graphql`
   query ContactCardCreateScreenQuery {
     currentUser {
       ...ContactCardCreateForm_user
+      userContactData {
+        firstName
+        lastName
+        email
+        phoneNumber
+        companyName
+        avatarUrl
+      }
     }
   }
 `;
@@ -74,9 +82,10 @@ export const contactCardCreateScreenQuery = graphql`
 const ContactCardCreateScreen = ({
   preloadedQuery,
 }: RelayScreenProps<ContactCardCreateRoute, ContactCardCreateScreenQuery>) => {
-  const data = usePreloadedQuery(contactCardCreateScreenQuery, preloadedQuery);
-
-  const styles = useStyleSheet(stylesheet);
+  const { currentUser } = usePreloadedQuery(
+    contactCardCreateScreenQuery,
+    preloadedQuery,
+  );
 
   const [commit, loading] = useMutation<ContactCardCreateScreenMutation>(
     graphql`
@@ -128,6 +137,8 @@ const ContactCardCreateScreen = ({
     useState<Observable<number> | null>(null);
   const [popupVisible, showPopup, hidePopup] = useBoolean(false);
 
+  const styles = useStyleSheet(stylesheet);
+
   const {
     control,
     handleSubmit,
@@ -140,6 +151,33 @@ const ContactCardCreateScreen = ({
     defaultValues: {
       webCardKind: 'personal',
       primaryColor: colors.grey400,
+      firstName: currentUser?.userContactData?.firstName,
+      lastName: currentUser?.userContactData?.lastName,
+      company: currentUser?.userContactData?.companyName,
+      emails: currentUser?.userContactData?.email
+        ? [
+            {
+              label: 'Work',
+              address: currentUser?.userContactData?.email,
+              selected: true,
+            },
+          ]
+        : [],
+      phoneNumbers: currentUser?.userContactData?.phoneNumber
+        ? [
+            {
+              number: currentUser?.userContactData?.phoneNumber,
+              selected: true,
+              countryCode: getLocales()[0].countryCode,
+            },
+          ]
+        : [],
+      avatar: currentUser?.userContactData?.avatarUrl
+        ? {
+            uri: currentUser?.userContactData?.avatarUrl,
+            local: false,
+          }
+        : null,
     },
   });
 
@@ -411,11 +449,9 @@ const ContactCardCreateScreen = ({
             coverIsPredefined: profile.webCard.coverIsPredefined,
           });
           if (
-            (router.getCurrentRoute() as ContactCardCreateRoute)?.params
+            !(router.getCurrentRoute() as ContactCardCreateRoute)?.params
               ?.launchedFromWelcomeScreen
           ) {
-            router.replaceAll(mainRoutes(false));
-          } else {
             // if we redirect too soon, the home background is not displayed
             router.back();
           }
@@ -607,7 +643,7 @@ const ContactCardCreateScreen = ({
           style={styles.scanBusinessCardButton}
         />
 
-        <ContactCardCreateForm control={control} user={data.currentUser} />
+        <ContactCardCreateForm control={control} user={currentUser} />
         <ScreenModal
           visible={!!progressIndicator}
           gestureEnabled={false}
@@ -723,7 +759,10 @@ ContactCardCreateRelayScreen.getScreenOptions = (): ScreenOptions => ({
   stackAnimation: 'slide_from_bottom',
 });
 
-export default ContactCardCreateRelayScreen;
+export default relayScreen(ContactCardCreateScreen, {
+  query: contactCardCreateScreenQuery,
+  profileBound: false,
+});
 
 export const ScanMyPaperBusinessCard = ({
   onPress,

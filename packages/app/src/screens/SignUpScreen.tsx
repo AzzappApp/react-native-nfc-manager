@@ -9,7 +9,6 @@ import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { waitTime } from '@azzapp/shared/asyncHelpers';
 import ERRORS from '@azzapp/shared/errors';
 import {
-  isNotFalsyString,
   isPhoneNumber,
   isValidEmail,
   isValidPassword,
@@ -17,16 +16,18 @@ import {
 import { colors } from '#theme';
 import EmailOrPhoneInput from '#components/EmailOrPhoneInput';
 import { useNativeNavigationEvent, useRouter } from '#components/NativeRouter';
+import OauthButtonsBar from '#components/OauthButtonsBar';
+import TermsCheckBoxes from '#components/TermsCheckBoxes';
 import { logEvent } from '#helpers/analytics';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import { signup } from '#helpers/MobileWebAPI';
+import useBoolean from '#hooks/useBoolean';
 import useKeyboardHeight from '#hooks/useKeyboardHeight';
 import useScreenDimensions from '#hooks/useScreenDimensions';
 import useScreenInsets from '#hooks/useScreenInsets';
+import AzzappLogoLoader from '#ui/AzzappLogoLoader';
 import Button from '#ui/Button';
-import CheckBox from '#ui/CheckBox';
-import HyperLink from '#ui/HyperLink';
 import PressableOpacity from '#ui/PressableOpacity';
 import SecuredTextInput from '#ui/SecuredTextInput';
 import Text from '#ui/Text';
@@ -36,9 +37,6 @@ import type {
   LayoutChangeEvent,
   TextInput as NativeTextInput,
 } from 'react-native';
-
-const TERMS_OF_SERVICE = process.env.TERMS_OF_SERVICE;
-const PRIVACY_POLICY = process.env.PRIVACY_POLICY;
 
 const SignUpScreen = () => {
   const router = useRouter();
@@ -52,8 +50,10 @@ const SignUpScreen = () => {
   const [password, setPassword] = useState('');
   const [showPasswordError, setShowPasswordError] = useState(false);
 
-  const [checkedCom, setCheckedCom] = useState<CheckboxStatus>('checked');
-  const [checkedToU, setCheckedToU] = useState<CheckboxStatus>('none');
+  const [communicationChecked, setCommunicationChecked] =
+    useState<CheckboxStatus>('checked');
+  const [termsOfUseChecked, setTermsOfUseChecked] =
+    useState<CheckboxStatus>('none');
   const [showTOSError, setShowTOSError] = useState<boolean>(false);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -89,7 +89,7 @@ const SignUpScreen = () => {
     setShowPasswordError(!passWordValid);
     canSignup &&= passWordValid;
 
-    const toUValid = checkedToU === 'checked';
+    const toUValid = termsOfUseChecked === 'checked';
     setShowTOSError(!toUValid);
     canSignup &&= toUValid;
 
@@ -106,7 +106,7 @@ const SignUpScreen = () => {
             email: username,
             password,
             locale: locale.languageTag,
-            hasAcceptedCommunications: checkedCom === 'checked',
+            hasAcceptedCommunications: communicationChecked === 'checked',
           });
         } else {
           username = parsePhoneNumber(
@@ -117,7 +117,7 @@ const SignUpScreen = () => {
             phoneNumber: username,
             locale: locale.languageTag,
             password,
-            hasAcceptedCommunications: checkedCom === 'checked',
+            hasAcceptedCommunications: communicationChecked === 'checked',
           });
         }
         await setSharedWebCredentials(
@@ -126,8 +126,18 @@ const SignUpScreen = () => {
           password,
         ).catch(() => {});
         setClearPassword(true);
-        if (isNotFalsyString(tokens.userId)) {
-          // Signin process
+        if ('issuer' in tokens) {
+          const { issuer } = tokens;
+
+          logEvent('sign_up_attempt', { issuer });
+
+          router.push({
+            route: 'CONFIRM_REGISTRATION',
+            params: {
+              issuer: issuer!,
+            },
+          });
+        } else {
           const { profileInfos } = tokens;
           await dispatchGlobalEvent({
             type: 'SIGN_IN',
@@ -140,17 +150,6 @@ const SignUpScreen = () => {
               email: tokens.email,
               phoneNumber: tokens.phoneNumber,
               userId: tokens.userId,
-            },
-          });
-        } else {
-          const { issuer } = tokens;
-
-          logEvent('sign_up_attempt', { issuer });
-
-          router.push({
-            route: 'CONFIRM_REGISTRATION',
-            params: {
-              issuer: issuer!,
             },
           });
         }
@@ -177,8 +176,8 @@ const SignUpScreen = () => {
       }
     }
   }, [
-    checkedCom,
-    checkedToU,
+    communicationChecked,
+    termsOfUseChecked,
     contact.countryCodeOrEmail,
     contact.value,
     intl,
@@ -204,6 +203,9 @@ const SignUpScreen = () => {
     setClearPassword(false);
   });
 
+  const [oauthLoading, setOauthIsLoading, setOauthIsNotLoading] =
+    useBoolean(false);
+
   const { height } = useScreenDimensions();
   const [panelHeight, setPanelHeight] = useState(height - 353);
   const onLayout = useCallback(
@@ -220,6 +222,7 @@ const SignUpScreen = () => {
       paddingBottom: keyboardHeight.value - insets.bottom + 16,
     };
   });
+
   return (
     <View style={styles.root}>
       <View style={styles.background}>
@@ -265,6 +268,11 @@ const SignUpScreen = () => {
             </Text>
           </View>
 
+          <OauthButtonsBar
+            onLoadingStart={setOauthIsLoading}
+            onLoadingEnd={setOauthIsNotLoading}
+          />
+
           <EmailOrPhoneInput
             input={contact}
             onChange={setContact}
@@ -305,57 +313,13 @@ const SignUpScreen = () => {
               />
             )}
           </Text>
-          <View style={styles.checkboxesContainer}>
-            <CheckBox
-              label={
-                <Text style={styles.checkLabel} variant="medium">
-                  <FormattedMessage
-                    defaultMessage="I want to receive communications about promotions and news from azzapp."
-                    description="Signup Screen - accept communications label"
-                  />{' '}
-                </Text>
-              }
-              status={checkedCom}
-              onValueChange={setCheckedCom}
-              accessibilityLabel={intl.formatMessage({
-                defaultMessage:
-                  'Tap to accept to receive communications about promotions and news from azzapp.',
-                description:
-                  'Signup Screen - Accessibility checkbox communications',
-              })}
-            />
-            <CheckBox
-              label={
-                <Text style={styles.checkLabel} variant="medium">
-                  <FormattedMessage
-                    defaultMessage="I have read and accept the <tosLink>Terms of Use</tosLink> and <ppLink>Privacy Policy</ppLink> of azzapp"
-                    description="Signup Screen - 'I have read and accept the' Terms of use"
-                    values={{
-                      tosLink: value => (
-                        <HyperLink
-                          label={value[0] as string}
-                          url={`${TERMS_OF_SERVICE}`}
-                        />
-                      ),
-                      ppLink: value => (
-                        <HyperLink
-                          label={value[0] as string}
-                          url={`${PRIVACY_POLICY}`}
-                        />
-                      ),
-                    }}
-                  />
-                </Text>
-              }
-              status={checkedToU}
-              onValueChange={setCheckedToU}
-              accessibilityLabel={intl.formatMessage({
-                defaultMessage: 'Tap to accept the privacy policy',
-                description:
-                  'Signup Screen - Accessibility checkbox  Privacy Policy',
-              })}
-            />
-          </View>
+          <TermsCheckBoxes
+            communicationChecked={communicationChecked}
+            onCommunicationCheckChange={setCommunicationChecked}
+            termsOfUseChecked={termsOfUseChecked}
+            onTermsOfUseCheckChange={setTermsOfUseChecked}
+            showError={showTOSError}
+          />
 
           <Button
             variant="primary"
@@ -373,15 +337,6 @@ const SignUpScreen = () => {
             loading={isSubmitting}
             onPress={onSubmit}
           />
-
-          {showTOSError && (
-            <Text style={styles.formError} variant="error">
-              <FormattedMessage
-                defaultMessage="You need to accept the Terms of Use and the Privacy Policy"
-                description="Signup Screen - error message when the user did not accept the terms of use and the privacy policy"
-              />
-            </Text>
-          )}
           <View style={styles.footer}>
             <Text style={styles.alrSignText} variant="medium">
               <FormattedMessage
@@ -399,6 +354,12 @@ const SignUpScreen = () => {
             </PressableOpacity>
           </View>
         </View>
+        {oauthLoading && (
+          <AzzappLogoLoader
+            backgroundOpacity={0.5}
+            style={StyleSheet.absoluteFill}
+          />
+        )}
       </Animated.View>
     </View>
   );
@@ -470,10 +431,6 @@ const styleSheet = createStyleSheet(appearance => ({
     marginTop: 20,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  formError: {
-    paddingLeft: 10,
-    marginTop: 10,
   },
   footer: {
     marginTop: 10,

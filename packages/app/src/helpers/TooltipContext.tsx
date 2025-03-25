@@ -7,7 +7,7 @@ import {
   useState,
 } from 'react';
 import type { ReactNode, RefObject } from 'react';
-import type { View } from 'react-native-reanimated/lib/typescript/Animated';
+import type { View } from 'react-native';
 
 type Tooltip = {
   ref: RefObject<View>;

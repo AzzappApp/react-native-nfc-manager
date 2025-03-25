@@ -1,9 +1,8 @@
 import { Video } from 'expo-av';
-import { useCallback, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Image, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { graphql, usePreloadedQuery } from 'react-relay';
-import { mainRoutes } from '#mobileRoutes';
 import { colors } from '#theme';
 import Link from '#components/Link';
 import { setMainTabBarOpacity } from '#components/MainTabBar';
@@ -12,7 +11,6 @@ import { onChangeWebCard } from '#helpers/authStore';
 import relayScreen from '#helpers/relayScreen';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import useBoolean from '#hooks/useBoolean';
-import { useFocusEffect } from '#hooks/useFocusEffect';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
 import IconButton from '#ui/IconButton';
@@ -65,13 +63,6 @@ export const WelcomeScreen = ({
     profilesCountRef.current = currentUser?.profiles?.length;
   }, [currentUser, router]);
 
-  const goBackToHome = useCallback(() => {
-    if (profileInfos?.webCardId) {
-      router.replaceAll(mainRoutes(false));
-    }
-  }, [profileInfos, router]);
-
-  useFocusEffect(goBackToHome);
   const { width } = useWindowDimensions();
   const { top } = useScreenInsets();
   return profileInfos?.profileId ? (

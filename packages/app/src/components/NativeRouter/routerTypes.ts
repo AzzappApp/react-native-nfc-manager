@@ -19,6 +19,7 @@ export type TabsState = {
   lazy: boolean;
   unmountInactive: boolean;
   tabsHistory: number[];
+  screenOptions?: ScreenOptions;
 };
 
 export type BasicRoute = { id: string; kind: 'route'; state: Route };
@@ -110,6 +111,7 @@ export type TabsInit = {
   currentIndex: number;
   lazy?: boolean;
   unmountInactive?: boolean;
+  screenOptions?: ScreenOptions;
 };
 
 export type StackInit = { stack: Array<RouteInit | TabsInit> };
