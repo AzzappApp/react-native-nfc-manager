@@ -357,7 +357,7 @@ __metadata:
     "@sentry/react-native": "npm:^6.9.1"
     "@sentry/types": "npm:^9.8.0"
     "@sentry/utils": "npm:^8.55.0"
-    "@shopify/flash-list": "npm:^1.7.6"
+    "@shopify/flash-list": "patch:@shopify/flash-list@npm%3A1.7.6#~/.yarn/patches/@shopify-flash-list-npm-1.7.6-dd7668e04d.patch"
     "@shopify/react-native-skia": "patch:@shopify/react-native-skia@npm%3A1.11.8#~/.yarn/patches/@shopify-react-native-skia-npm-1.11.8-e11c3369b8.patch"
     "@testing-library/react-native": "npm:^13.2.0"
     "@types/chroma-js": "npm:^3.1.1"
@@ -11165,7 +11165,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@shopify/flash-list@npm:^1.7.6":
+"@shopify/flash-list@npm:1.7.6":
   version: 1.7.6
   resolution: "@shopify/flash-list@npm:1.7.6"
   dependencies:
@@ -11176,6 +11176,20 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 10/2c635a3719013db2c8fd284593d6d5f6e495862c60bcafb5e56d0818e58cb8d202b19d80decb14df35041f957aa498223abcb76e642d91626e0a96056675c548
+  languageName: node
+  linkType: hard
+
+"@shopify/flash-list@patch:@shopify/flash-list@npm%3A1.7.6#~/.yarn/patches/@shopify-flash-list-npm-1.7.6-dd7668e04d.patch":
+  version: 1.7.6
+  resolution: "@shopify/flash-list@patch:@shopify/flash-list@npm%3A1.7.6#~/.yarn/patches/@shopify-flash-list-npm-1.7.6-dd7668e04d.patch::version=1.7.6&hash=710955"
+  dependencies:
+    recyclerlistview: "npm:4.2.3"
+    tslib: "npm:2.8.1"
+  peerDependencies:
+    "@babel/runtime": "*"
+    react: "*"
+    react-native: "*"
+  checksum: 10/4556bb32964a97e7ce1aa4c603681e2a6a549bc36defffd976879fb3d9b551eb2a134a3dde7a51ca1175ce2a7c48c0a2c3ee474d009f0844ee9ff164eebb2345
   languageName: node
   linkType: hard
 

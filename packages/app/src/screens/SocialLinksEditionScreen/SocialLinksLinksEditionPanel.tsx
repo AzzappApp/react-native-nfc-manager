@@ -156,7 +156,6 @@ const SocialLinksLinksEditionPanel = ({
         showsHorizontalScrollIndicator={false}
       >
         <Sortable.Grid
-          key={sortableLinks.length}
           scrollableRef={scrollableRef}
           rows={1}
           rowHeight={ITEM_HEIGHT}
