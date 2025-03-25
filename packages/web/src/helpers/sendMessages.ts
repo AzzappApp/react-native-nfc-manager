@@ -267,7 +267,12 @@ export const notifyUsers = async (
               ),
             };
 
-            const avatarUrl = await buildAvatarUrl(profile, webCard);
+            const avatarUrl = await buildAvatarUrl(
+              profile,
+              webCard,
+              false,
+              false,
+            );
             if (avatarUrl) {
               const data = await fetch(avatarUrl);
               const blob = await data.arrayBuffer();

@@ -14,12 +14,15 @@ export type Crop = (typeof CROP)[number];
 export const buildAvatarUrl = async (
   profile: Profile,
   webCard: WebCard | null,
+  fallbackOnCover: boolean = true,
+  fallbackOnCompanyLogo: boolean = true,
 ) => {
-  const avatarId = profile.avatarId ?? profile.logoId;
+  const avatarId =
+    profile.avatarId ?? (fallbackOnCompanyLogo ? profile.logoId : undefined);
   let avatarUrl: string | null = null;
   if (avatarId) {
     avatarUrl = `${CLOUDINARY_BASE_URL}/image/upload/c_fill,w_${AVATAR_WIDTH}/v1/${avatarId}.jpg`;
-  } else {
+  } else if (fallbackOnCover) {
     avatarUrl = await buildCoverAvatarUrl(webCard);
   }
 

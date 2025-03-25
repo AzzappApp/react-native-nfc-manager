@@ -26,7 +26,7 @@ export const generateEmailSignature = async ({
     throw new Error('Contact card is required');
   }
 
-  const avatarUrl = await buildAvatarUrl(profile, null);
+  const avatarUrl = await buildAvatarUrl(profile, null, false, false);
   const { data, signature } = await serializeAndSignEmailSignature(
     webCard.userName,
     profile.id,
