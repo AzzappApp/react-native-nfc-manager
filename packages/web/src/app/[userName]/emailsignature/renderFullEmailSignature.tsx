@@ -43,7 +43,7 @@ const renderFullEmailSignature = ({
               border-radius: 30px;" 
             src="${contact.avatar}"
           />
-          <![endif]-->
+          <!--<![endif]-->
         </td>
       </tr>
     `

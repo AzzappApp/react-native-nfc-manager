@@ -13,7 +13,7 @@ const renderSaveMyContactButton = ({
 }) =>
   `
   <div>
-  <!--[if mso]>
+    <!--[if mso]>
     <v:roundrect 
       xmlns:v="urn:schemas-microsoft-com:vml" 
       xmlns:w="urn:schemas-microsoft-com:office:word" 
@@ -58,7 +58,7 @@ const renderSaveMyContactButton = ({
       "
       href="${saveContactURL}"
     >${saveContactMessage}</a>
-  <!-- <![endif]-->
+    <!-- <![endif]-->
   </div>`;
 
 export default renderSaveMyContactButton;
