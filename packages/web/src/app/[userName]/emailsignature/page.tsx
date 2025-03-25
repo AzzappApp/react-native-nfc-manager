@@ -4,7 +4,10 @@ import Image from 'next/image';
 import { getMediasByIds, getProfileById } from '@azzapp/data';
 import { verifyHmacWithPassword } from '@azzapp/shared/crypto';
 import { parseEmailSignature } from '@azzapp/shared/emailSignatureHelpers';
-import { getImageURLForSize } from '@azzapp/shared/imagesHelpers';
+import {
+  getImageURLForSize,
+  getRoundImageURLForSize,
+} from '@azzapp/shared/imagesHelpers';
 import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
 import { buildUserUrlWithContactCard } from '@azzapp/shared/urlHelpers';
 import azzappFull from '#assets/images/azzapp-full.png';
@@ -91,7 +94,7 @@ const EmailSignaturePage = async ({
       ? webCard.logoId
       : profile.logoId;
   const companyLogoUrl = companyLogo
-    ? getImageURLForSize({ id: companyLogo, height: 140, format: 'png' })
+    ? getImageURLForSize({ id: companyLogo, height: 60, format: 'png' })
     : null;
 
   const saveContactURL = buildUserUrlWithContactCard(
@@ -108,6 +111,17 @@ const EmailSignaturePage = async ({
     id: 'YdhsiU',
     description: 'Signature web link / save my contact',
   });
+
+  // we override the avatar with the one from the profile if it exists
+  // to transform it into a round image
+  if (contact.avatar && profile.avatarId) {
+    contact.avatar = getRoundImageURLForSize({
+      id: profile.avatarId,
+      height: 60,
+      width: 60,
+      format: 'png',
+    });
+  }
 
   return (
     <div className={styles.container}>
