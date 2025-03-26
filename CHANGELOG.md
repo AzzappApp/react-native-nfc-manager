@@ -1,3 +1,8 @@
+## 1.9.0-canary.79
+
+* **fix:**  - case when no user found for token ([#8059](https://github.com/AzzappApp/azzapp/pull/8059))
+* **feat:**  - **payment:** add mechanism to auto publish webcard ([#8060](https://github.com/AzzappApp/azzapp/pull/8060))
+
 ## 1.9.0-canary.78
 
 * **feat:**  - **web:** implement popup when user click on media on web ([#8014](https://github.com/AzzappApp/azzapp/pull/8014))
