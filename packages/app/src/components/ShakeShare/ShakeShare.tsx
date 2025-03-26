@@ -7,17 +7,26 @@ import {
   BlendColor,
   Canvas,
   Group,
+  ImageFormat,
   ImageSVG,
   Paint,
   Skia,
   fitbox,
+  makeImageFromView,
   rect,
 } from '@shopify/react-native-skia';
 import * as Clipboard from 'expo-clipboard';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { View, StyleSheet, Dimensions, Platform } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Dimensions,
+  Platform,
+  useColorScheme,
+} from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import {
   SensorType,
   runOnJS,
@@ -27,24 +36,34 @@ import {
   useSharedValue,
 } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
-import { graphql, useLazyLoadQuery } from 'react-relay';
+import { graphql, useLazyLoadQuery, useMutation } from 'react-relay';
+import ERRORS from '@azzapp/shared/errors';
 import { useNetworkAvailableContext } from '#networkAvailableContext';
-import { colors } from '#theme';
+import { colors, shadow } from '#theme';
 import AddToWalletButton from '#components/AddToWalletButton';
+import { useRouter } from '#components/NativeRouter';
 import ToastUi from '#components/Toast';
+import { logEvent } from '#helpers/analytics';
+import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import downloadQrCode from '#helpers/DownloadQrCode';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import useBoolean from '#hooks/useBoolean';
 import useLatestCallback from '#hooks/useLatestCallback';
 import { useCurrentLocation } from '#hooks/useLocation';
+import useScreenDimensions from '#hooks/useScreenDimensions';
 import useScreenInsets from '#hooks/useScreenInsets';
 import { get as qrCodeWidth } from '#relayProviders/qrCodeWidth.relayprovider';
+import ActivityIndicator from '#ui/ActivityIndicator';
 import BottomSheetModal from '#ui/BottomSheetModal';
+import Icon from '#ui/Icon';
 import IconButton from '#ui/IconButton';
 import LargeButton from '#ui/LargeButton';
+import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import ContactCardExportVcf from '../ContactCardExportVcf';
 import CoverRenderer from '../CoverRenderer';
 import IosAddWidgetPopup from './IosAddWidgetPopup';
+import SignaturePreview from './SignaturePreview';
 import type { ShakeShareScreenQuery } from '#relayArtifacts/ShakeShareScreenQuery.graphql';
 
 const _shakeShareEventHandler = new EventEmitter();
@@ -92,6 +111,7 @@ type ShakeShareProps = {
 };
 
 const ShakeShare = ({ isMounted, umount, mount }: ShakeShareProps) => {
+  const styles = useStyleSheet(styleSheet);
   const isConnected = useNetworkAvailableContext();
   const profileInfos = useProfileInfos();
 
@@ -145,12 +165,19 @@ const ShakeShareDisplay = ({
   onClose: () => void;
   visible: boolean;
 }) => {
+  const intl = useIntl();
+  const styles = useStyleSheet(styleSheet);
+  const router = useRouter();
   const [popupIosWidgetVisible, showIosWidgetPopup, hideIosWidgetPopup] =
     useBoolean(false);
   const profileInfos = useProfileInfos();
   const { bottom } = useScreenInsets();
+  const { height, width } = useScreenDimensions();
+  const colorScheme = useColorScheme();
+  const ref = useRef<View>(null);
 
   const [enableShakeBack, setEnableShakeBack] = useState(false);
+  const [isGeneratingEmail, setIsGeneratingEmail] = useState(false);
 
   const currentLocation = useCurrentLocation();
 
@@ -169,7 +196,7 @@ const ShakeShareDisplay = ({
 
   useShakeDetector(onClose, enableShakeBack);
 
-  const { node } = useLazyLoadQuery<ShakeShareScreenQuery>(
+  const { node, currentUser } = useLazyLoadQuery<ShakeShareScreenQuery>(
     graphql`
       query ShakeShareScreenQuery(
         $profileId: ID!
@@ -179,20 +206,29 @@ const ShakeShareDisplay = ({
       ) {
         node(id: $profileId) {
           ... on Profile @alias(as: "profile") {
+            id
+            invited
             webCard {
               id
-              cardIsPublished
               userName
+              cardIsPublished
+              ...AccountHeader_webCard
               ...CoverRenderer_webCard
             }
+            createdAt
             contactCardUrl
             contactCardQrCode(
               width: $width
               location: $location
               address: $address
             )
+            contactCardQrCodeWithoutLocation: contactCardQrCode(width: $width)
             ...ContactCardExportVcf_card
+            ...SignaturePreview_profile
           }
+        }
+        currentUser {
+          email
         }
       }
     `,
@@ -219,6 +255,17 @@ const ShakeShareDisplay = ({
     },
   );
 
+  const [commit] = useMutation(graphql`
+    mutation ShakeShareGenerateEmailSignatureMutation(
+      $profileId: ID!
+      $config: GenerateEmailSignatureInput!
+    ) {
+      generateEmailSignature(config: $config, profileId: $profileId) {
+        url
+      }
+    }
+  `);
+
   const profile = node?.profile;
   const webCard = profile?.webCard;
 
@@ -228,34 +275,99 @@ const ShakeShareDisplay = ({
     }
   }, [onClose, webCard?.cardIsPublished]);
 
+  const generateEmail = useCallback(async () => {
+    if (!currentUser?.email) {
+      Toast.show({
+        type: 'error',
+        text1: intl.formatMessage({
+          defaultMessage:
+            'Please add an email address to your account to receive your email signature',
+          description:
+            'Toast message  if the user as not mail while generating email signature for the user',
+        }),
+      });
+      return;
+    }
+    if (profile?.id && webCard?.id && ref.current) {
+      setIsGeneratingEmail(true);
+      const image = await makeImageFromView(ref);
+      const base64 = image?.encodeToBase64(ImageFormat.JPEG, 100);
+
+      logEvent('generate_email_signature');
+      commit({
+        variables: {
+          profileId: profile.id,
+          config: {
+            preview: base64 ?? '',
+          },
+        },
+        onCompleted: () => {
+          setIsGeneratingEmail(false);
+          Toast.show({
+            type: 'success',
+            text1: intl.formatMessage({
+              defaultMessage: 'An email has been sent to you',
+              description:
+                'Toast message while generating email signature for the user',
+            }),
+          });
+        },
+        onError: e => {
+          setIsGeneratingEmail(false);
+          if (e.message === ERRORS.SUBSCRIPTION_REQUIRED) {
+            router.push({
+              route: 'USER_PAY_WALL',
+            });
+            return;
+          }
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage: 'Unknown error - Please retry',
+              description:
+                'ContactCardScreen - Error Unknown error - Please retry',
+            }),
+          });
+        },
+      });
+    }
+  }, [commit, currentUser?.email, intl, profile?.id, router, webCard?.id]);
+
+  const onDownloadQrCode = useCallback(() => {
+    if (profile) {
+      downloadQrCode(profile.id, profile?.contactCardQrCodeWithoutLocation);
+    }
+  }, [profile]);
+
   const svg = profile?.contactCardQrCode
     ? Skia.SVG.MakeFromString(profile?.contactCardQrCode)
     : null;
 
   const src = rect(0, 0, svg?.width() ?? 0, svg?.height() ?? 0);
   const dst = rect(0, 0, QR_CODE_WIDTH, QR_CODE_WIDTH);
-  const intl = useIntl();
 
   if (!webCard?.cardIsPublished) {
     return null;
   }
 
   return (
-    <View style={styles.container}>
-      <BottomSheetScrollView>
-        <CoverRenderer
-          width={width}
-          webCard={webCard}
-          style={styles.coverStyle}
-          canPlay
-        />
-        <LinearGradient
-          colors={['rgba(14, 18, 22,0)', 'rgba(0, 0, 0, 1)']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 0, y: 1 }}
-          locations={[0.2, 0.55]}
-          style={styles.linear}
-        />
+    <BottomSheetScrollView
+      contentContainerStyle={[styles.container, { height, width }]}
+    >
+      <CoverRenderer
+        width={width}
+        webCard={webCard}
+        style={styles.coverStyle}
+        canPlay
+      />
+      <LinearGradient
+        colors={['rgba(0, 0, 0,0.6)', 'rgba(0, 0, 0, 1)']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        locations={[0.2, 0.55]}
+        style={styles.linear}
+      />
+      <ScrollView style={styles.contentContainer}>
         {svg && (
           <View style={styles.actionContainer}>
             <View style={styles.qrCodeContainer}>
@@ -316,9 +428,65 @@ const ShakeShareDisplay = ({
                   );
                 }}
               />
+              <PressableNative
+                ripple={{
+                  foreground: true,
+                  color:
+                    colorScheme === 'dark' ? colors.grey100 : colors.grey900,
+                }}
+                style={[styles.button, styles.addToWalletButton]}
+                onPress={generateEmail}
+              >
+                {isGeneratingEmail ? (
+                  <ActivityIndicator
+                    color={colorScheme === 'dark' ? 'black' : 'white'}
+                    style={styles.addToWalletIcon}
+                  />
+                ) : (
+                  <Icon
+                    icon="signature"
+                    style={styles.sharedIcon}
+                    size={24}
+                    tintColor={
+                      colorScheme === 'dark' ? colors.black : colors.white
+                    }
+                  />
+                )}
+                <Text variant="button" style={styles.addToWalletButtonText}>
+                  <FormattedMessage
+                    defaultMessage="Smart email Signature"
+                    description="Generate an email Signature button label"
+                  />
+                </Text>
+              </PressableNative>
+              <Text
+                variant="xsmall"
+                style={{
+                  width: '100%',
+                  textAlign: 'center',
+                  color: colors.grey400,
+                  paddingVertical: 10,
+                }}
+              >
+                <FormattedMessage
+                  defaultMessage="Your smart email signature:"
+                  description="ConctactCardScreen - Your smart email signature"
+                />
+              </Text>
+              {profile && (
+                <View style={styles.signaturePreview}>
+                  <View
+                    ref={ref}
+                    collapsable={false}
+                    style={styles.viewShotBackgroundColor}
+                  >
+                    <SignaturePreview profile={profile} />
+                  </View>
+                </View>
+              )}
             </View>
-            {Platform.OS === 'ios' && (
-              <View style={styles.buttonContainer}>
+            <View style={styles.buttonContainer}>
+              {Platform.OS === 'ios' && (
                 <LargeButton
                   appearance="light"
                   icon="QR_code"
@@ -329,18 +497,40 @@ const ShakeShareDisplay = ({
                   style={styles.button}
                   onPress={showIosWidgetPopup}
                 />
-              </View>
-            )}
+              )}
+              {Platform.OS === 'ios' && (
+                <LargeButton
+                  appearance="light"
+                  icon="QR_code"
+                  title={intl.formatMessage({
+                    defaultMessage: 'Add qr-code to lock screen',
+                    description: 'Add qr-code to lock screen button label',
+                  })}
+                  style={styles.button}
+                  onPress={() => {}} // missing video
+                />
+              )}
+              <LargeButton
+                appearance="light"
+                icon="QR_code"
+                title={intl.formatMessage({
+                  defaultMessage: 'Download qr-code ',
+                  description: 'Download qr-code button label',
+                })}
+                style={styles.button}
+                onPress={onDownloadQrCode}
+              />
+            </View>
           </View>
         )}
-      </BottomSheetScrollView>
+      </ScrollView>
       <View style={styles.closeButtonContainer}>
         <LinearGradient
           colors={['rgba(0, 0, 0,0)', 'rgba(0, 0, 0, 1)']}
           start={{ x: 0, y: 0 }}
           end={{ x: 0, y: 1 }}
           locations={[0, 0.7]}
-          style={{ width: '100%', height: '100%' }}
+          style={{ width: '100%', height }}
           pointerEvents="none"
         />
         <IconButton
@@ -355,15 +545,21 @@ const ShakeShareDisplay = ({
         visible={popupIosWidgetVisible}
         onHide={hideIosWidgetPopup}
       />
-    </View>
+    </BottomSheetScrollView>
   );
 };
 
-const styles = StyleSheet.create({
+const styleSheet = createStyleSheet(appearance => ({
   iconContainerStyle: {
     position: 'absolute',
     borderColor: 'white',
     width: 24,
+  },
+  contentContainer: {
+    position: 'absolute',
+    top: 0,
+    width: '100%',
+    height: '100%',
   },
   actionContainer: {
     position: 'relative',
@@ -371,17 +567,48 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
     padding: 10,
+    paddingTop: 100,
     marginBottom: 200,
   },
   qrCodeContainer: {
-    position: 'absolute',
-    top: -QR_CODE_WIDTH - 80,
     backgroundColor: 'rgba(0,0,0,0.8)',
     borderRadius: 23,
     borderCurve: 'continuous',
     width: QR_CODE_WIDTH + 40,
     height: QR_CODE_WIDTH + 40,
   },
+  addToWalletButton: {
+    width: '100%',
+    height: 47,
+    borderRadius: 12,
+    backgroundColor: appearance === 'light' ? colors.black : colors.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addToWalletIcon: {
+    width: 38,
+    height: 37,
+    position: 'absolute',
+    left: 10,
+    marginVertical: 'auto',
+  },
+  addToWalletButtonText: {
+    color: appearance === 'light' ? colors.white : colors.black,
+  },
+  sharedIcon: {
+    position: 'absolute',
+    left: 10,
+    marginVertical: 'auto',
+  },
+  signaturePreview: {
+    width: '100%',
+    backgroundColor: 'white',
+    padding: 15,
+    borderRadius: 16,
+    transform: [{ scale: 0.85 }, { translateY: -20 }],
+    ...shadow({ appearance: 'light', direction: 'bottom' }),
+  },
+  viewShotBackgroundColor: { backgroundColor: 'white', paddingBottom: 5 },
   canvas: { width: QR_CODE_WIDTH, height: QR_CODE_WIDTH, margin: 20 },
   linear: {
     height: '100%',
@@ -393,7 +620,12 @@ const styles = StyleSheet.create({
   iconStyle: {
     tintColor: colors.white,
   },
-  coverStyle: { marginBottom: 0, borderRadius: 0 },
+  coverStyle: {
+    marginBottom: 0,
+    borderRadius: 0,
+    position: 'fixed',
+    top: 0,
+  },
   container: {
     flex: 1,
     alignItems: 'center',
@@ -402,8 +634,6 @@ const styles = StyleSheet.create({
   subtitle: {
     textAlign: 'center',
     width: '100%',
-    position: 'absolute',
-    top: -30, // we want to be inside qrcode container
     padding: 5,
     margin: 'auto',
     alignSelf: 'center',
@@ -434,7 +664,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'black',
   },
-});
+}));
 
 // This code is transposed from https://github.com/facebook/react-native/blob/184b295a019e2af6712d34276c741e0dae78f798/packages/react-native/ReactAndroid/src/main/java/com/facebook/react/common/ShakeDetector.java#L45
 const GRAVITY_EARTH = 9.80665;

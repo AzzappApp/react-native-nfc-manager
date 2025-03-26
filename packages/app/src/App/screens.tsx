@@ -7,7 +7,6 @@ import ConfirmChangeContactScreen from '#screens/ConfirmChangeContactScreen';
 import ConfirmRegistrationScreen from '#screens/ConfirmRegistrationScreen';
 import ContactCardEditScreen from '#screens/ContactCardEditScreen';
 import ContactCardCreateScreen from '#screens/ContactCardEditScreen/ContactCardCreateScreen';
-import ContactCardScreen from '#screens/ContactCardScreen';
 import ContactCreateScreen from '#screens/ContactCreateScreen/ContactCreateScreen';
 import ContactDetailsScreen from '#screens/ContactDetailsScreen';
 import ContactsByLocationScreen from '#screens/ContactsByLocationScreen';
@@ -60,7 +59,6 @@ const screens = {
   CARD_MODULE_MEDIA_TEXT_EDITION: MediaTextModuleWebCardEditionScreen,
   CARD_MODULE_MEDIA_TEXT_LINK_EDITION: MediaTextLinkModuleWebCardEditionScreen,
   CARD_MODULE_TITLE_TEXT_EDITION: TitleTextModuleWebCardEditionScreen,
-  CONTACT_CARD: ContactCardScreen,
   CONTACT_CARD_EDIT: ContactCardEditScreen,
   CONTACT_CARD_CREATE: ContactCardCreateScreen,
   CONTACT_CREATE: ContactCreateScreen,

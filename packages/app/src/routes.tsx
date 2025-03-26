@@ -191,11 +191,6 @@ export type InviteFriendsRoute = {
   params?: never;
 };
 
-export type ContactCardRoute = {
-  route: 'CONTACT_CARD';
-  params?: never;
-};
-
 export type ResetPasswordRoute = {
   route: 'RESET_PASSWORD';
   params: {
@@ -331,7 +326,6 @@ export type Route =
   | ContactByLocationRoute
   | ContactCardCreateRoute
   | ContactCardEditRoute
-  | ContactCardRoute
   | ContactCreateRoute
   | ContactDetailsRoute
   | ContactsRoute
