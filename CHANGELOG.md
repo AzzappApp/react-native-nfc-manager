@@ -1,3 +1,7 @@
+## 1.9.0-canary.84
+
+* **fix:**  - **android:** [#8071](https://github.com/AzzappApp/azzapp/pull/8071) hide paywall on android ([#8072](https://github.com/AzzappApp/azzapp/pull/8072))
+
 ## 1.9.0-canary.83
 
 * **feat:**  - google oauth ([#8080](https://github.com/AzzappApp/azzapp/pull/8080))
