@@ -19,15 +19,27 @@ const acceptTermsOfUseMutation: MutationResolvers['acceptTermsOfUse'] =
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
 
+    const user = await userLoader.load(userId);
+
+    if (!user) {
+      throw new GraphQLError(ERRORS.UNAUTHORIZED);
+    }
+
+    const updates = {
+      termsOfUseAcceptedVersion: termsOfUse.version,
+      termsOfUseAcceptedAt: new Date(),
+    };
+
     await updateUser(userId, {
       termsOfUseAcceptedVersion: termsOfUse.version,
       termsOfUseAcceptedAt: new Date(),
     });
 
-    const user = await userLoader.load(userId);
-
     return {
-      user,
+      user: {
+        ...user,
+        ...updates,
+      },
     };
   };
 

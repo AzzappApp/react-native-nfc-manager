@@ -3,7 +3,9 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useMutation } from 'react-relay';
+import ERRORS from '@azzapp/shared/errors';
 import TermsCheckBoxes from '#components/TermsCheckBoxes';
+import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import SafeAreaView from '#ui/SafeAreaView';
@@ -36,14 +38,18 @@ const AcceptTermsScreen = () => {
       variables: {},
       onError: error => {
         console.error(error);
-        Toast.show({
-          type: 'error',
-          text1: intl.formatMessage({
-            defaultMessage: 'An error occurred',
-            description:
-              'Error message displayed when accept cgu fail in Accept CGU modal',
-          }),
-        });
+        if (error.message === ERRORS.UNAUTHORIZED) {
+          void dispatchGlobalEvent({ type: 'SIGN_OUT' });
+        } else {
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage: 'An error occurred',
+              description:
+                'Error message displayed when accept cgu fail in Accept CGU modal',
+            }),
+          });
+        }
       },
     });
   };
