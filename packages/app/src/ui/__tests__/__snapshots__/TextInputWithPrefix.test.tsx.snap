@@ -36,6 +36,7 @@ exports[`TextInputWithPrefix component change text value 1`] = `
     style={
       [
         {
+          "color": "#0E1216",
           "flex": 1,
         },
         undefined,
@@ -83,6 +84,7 @@ exports[`TextInputWithPrefix component with value 1`] = `
     style={
       [
         {
+          "color": "#0E1216",
           "flex": 1,
         },
         undefined,
@@ -140,6 +142,7 @@ exports[`TextInputWithPrefix component with value and prefix 1`] = `
     style={
       [
         {
+          "color": "#0E1216",
           "flex": 1,
         },
         undefined,
@@ -187,6 +190,7 @@ exports[`TextInputWithPrefix empty component 1`] = `
     style={
       [
         {
+          "color": "#0E1216",
           "flex": 1,
         },
         undefined,
