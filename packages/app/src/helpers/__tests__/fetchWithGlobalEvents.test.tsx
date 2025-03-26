@@ -1,3 +1,4 @@
+import { PLATFORM_HEADER } from '@azzapp/shared/networkHelpers';
 import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import fetchWithGlobalEvents from '../fetchWithGlobalEvents';
 
@@ -10,7 +11,7 @@ describe('fetchWithGlobalEvents', () => {
 
   test('should call fetchJSON with the given input and init parameters', async () => {
     const input = 'http://test.com';
-    const init = { method: 'POST' };
+    const init = { method: 'POST', headers: { [PLATFORM_HEADER]: 'ios' } };
     const fetchSpy = jest
       .fn()
       .mockResolvedValueOnce({ data: 'Sample response data' });

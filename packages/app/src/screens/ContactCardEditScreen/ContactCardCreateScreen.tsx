@@ -18,6 +18,7 @@ import { useMutation, usePreloadedQuery } from 'react-relay';
 import { graphql, Observable } from 'relay-runtime';
 import ERRORS from '@azzapp/shared/errors';
 import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
+import { PAYMENT_IS_ENABLED } from '#Config';
 import { colors } from '#theme';
 import ContactCardDetector from '#components/ContactCardScanner/ContactCardDetector';
 import coverDrawer from '#components/CoverEditor/coverDrawer';
@@ -478,7 +479,20 @@ const ContactCardCreateScreen = ({
           console.error(e);
 
           if (e.message === ERRORS.SUBSCRIPTION_REQUIRED) {
-            router.push({ route: 'USER_PAY_WALL' });
+            if (PAYMENT_IS_ENABLED) {
+              router.push({ route: 'USER_PAY_WALL' });
+            } else {
+              Toast.show({
+                type: 'error',
+                text1: intl.formatMessage({
+                  defaultMessage:
+                    'You have reached the limit of contact cards or you can’t create such type of contact cards.',
+                  description:
+                    'Error toast message when reaching the limit of contact cards on android',
+                }),
+              });
+            }
+
             return;
           }
 

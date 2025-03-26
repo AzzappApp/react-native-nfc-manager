@@ -132,11 +132,10 @@ const OauthButtonsBar = ({
   );
 
   const router = useRouter();
+
   const onOpenIdSignUp = useCallback(
     async (kind: 'google' | 'linkedin') => {
-      const authUrl =
-        process.env.NEXT_PUBLIC_API_ENDPOINT +
-        (kind === 'google' ? '/signin/google' : '/signin/linkedin');
+      const authUrl = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/signin/${kind}?platform=${Platform.OS}`;
       const errorMessage =
         kind === 'google' ? googleErrorMessage : linkedinErrorMessage;
       const result = await WebBrowser.openAuthSessionAsync(

@@ -1,5 +1,9 @@
+import { Platform } from 'react-native';
+import {
+  PLATFORM_HEADER,
+  type FetchFunction,
+} from '@azzapp/shared/networkHelpers';
 import { dispatchGlobalEvent } from './globalEvents';
-import type { FetchFunction } from '@azzapp/shared/networkHelpers';
 
 /**
  * An higher order function that wraps the fetch function and dispatches global events
@@ -16,7 +20,14 @@ const fetchWithGlobalEvents =
   ): Promise<ReturnType> => {
     let result: any;
     try {
-      result = await fetchFunction(input, init);
+      const fetchInit = {
+        ...init,
+        headers: {
+          ...init?.headers,
+          [PLATFORM_HEADER]: Platform.OS,
+        },
+      };
+      result = await fetchFunction(input, fetchInit);
     } catch (error) {
       await dispatchGlobalEvent({
         type: 'NETWORK_ERROR',

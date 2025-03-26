@@ -3,13 +3,16 @@ import { createRemoteJWKSet, jwtVerify } from 'jose';
 import { NextResponse } from 'next/server';
 import * as z from 'zod';
 import {
+  createFreeSubscriptionForBetaAndroidPeriod,
   createUser,
   getProfilesByUser,
   getUserByAppleId,
   getUserByEmail,
+  transaction,
   updateUser,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
+import { PLATFORM_HEADER } from '@azzapp/shared/networkHelpers';
 import { handleSignInAuthMethod } from '#helpers/auth';
 import cors from '#helpers/cors';
 import { withPluginsRoute } from '#helpers/queries';
@@ -107,32 +110,40 @@ const appleSignin = async (req: Request) => {
           emailConfirmed: true,
           phoneNumberConfirmed: false,
         };
-        const userId = await createUser(newUser);
-        if (oldUser) {
-          await updateUser(oldUser.id, {
-            replacedBy: userId,
-          });
-        }
-        return handleSignInAuthMethod(
-          {
-            ...newUser,
-            id: userId,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            deletedAt: null,
-            note: null,
-            replacedBy: null,
-            deleted: false,
-            deletedBy: null,
-            invited: false,
-            nbFreeScans: 0,
-            userContactData: {
-              firstName,
-              lastName,
+
+        return transaction(async () => {
+          const userId = await createUser(newUser);
+          if (oldUser) {
+            await updateUser(oldUser.id, {
+              replacedBy: userId,
+            });
+          }
+
+          if (req.headers.get(PLATFORM_HEADER) === 'android') {
+            await createFreeSubscriptionForBetaAndroidPeriod([userId]);
+          }
+
+          return handleSignInAuthMethod(
+            {
+              ...newUser,
+              id: userId,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+              deletedAt: null,
+              note: null,
+              replacedBy: null,
+              deleted: false,
+              deletedBy: null,
+              invited: false,
+              nbFreeScans: 0,
+              userContactData: {
+                firstName,
+                lastName,
+              },
             },
-          },
-          null,
-        );
+            null,
+          );
+        });
       }
     }
   } catch (error) {

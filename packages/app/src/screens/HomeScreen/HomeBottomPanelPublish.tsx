@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, commitMutation } from 'react-relay';
 import { colors } from '#theme';
@@ -60,7 +60,23 @@ const HomeBottomPanelPublish = ({ profile }: HomeBottomPanelPublishProps) => {
 
     if (profile.webCard?.requiresSubscription && !profile.webCard.isPremium) {
       if (profileInfos?.profileRole === 'owner') {
-        router.push({ route: 'USER_PAY_WALL' });
+        if (Platform.OS === 'android') {
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage(
+              {
+                defaultMessage: 'You can’t publish with WebCard{azzappA}.',
+                description:
+                  'Error toast message when user tries to publish a premium contact card on android without a subscription',
+              },
+              {
+                azzappA: <Text variant="azzapp">a</Text>,
+              },
+            ) as unknown as string,
+          });
+        } else {
+          router.push({ route: 'USER_PAY_WALL' });
+        }
         return;
       } else {
         Toast.show({

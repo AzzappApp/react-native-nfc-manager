@@ -2,9 +2,11 @@ import cuid2 from '@paralleldrive/cuid2';
 import { jwtVerify, SignJWT } from 'jose';
 import { NextResponse } from 'next/server';
 import {
+  createFreeSubscriptionForBetaAndroidPeriod,
   createUser,
   getProfilesByUser,
   getUserByEmail,
+  transaction,
   updateUser,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
@@ -24,12 +26,13 @@ export const oauthSignin =
     clientId: string;
     csrfSecret: Uint8Array;
   }) =>
-  async () => {
+  async (req: NextRequest) => {
+    const platform = req.nextUrl.searchParams.get('platform');
     const url = new URL(authorizeURL);
     url.searchParams.append('client_id', clientId);
     url.searchParams.append('response_type', 'code');
     url.searchParams.append('redirect_uri', redirectURI);
-    const csrfToken = await new SignJWT({ csrf: cuid2.createId() })
+    const csrfToken = await new SignJWT({ csrf: cuid2.createId(), platform })
       .setProtectedHeader({ alg: 'HS256' })
       .setExpirationTime('10m')
       .sign(csrfSecret);
@@ -69,7 +72,13 @@ export const oauthSigninCallback =
       return redirectToApp({ error: ERRORS.INVALID_REQUEST });
     }
 
-    if (!(await jwtVerify(state, csrfSecret, { algorithms: ['HS256'] }))) {
+    let platform: string | null;
+    try {
+      const { payload } = await jwtVerify(state, csrfSecret, {
+        algorithms: ['HS256'],
+      });
+      platform = payload.platform as string | null;
+    } catch {
       return redirectToApp({ error: ERRORS.INVALID_REQUEST });
     }
 
@@ -165,25 +174,30 @@ export const oauthSigninCallback =
           appleId: null,
           userContactData,
         };
-        const userId = await createUser(newUser);
-        user = {
-          ...newUser,
-          id: userId,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          deletedAt: null,
-          note: null,
-          replacedBy: null,
-          deleted: false,
-          deletedBy: null,
-          invited: false,
-          nbFreeScans: 0,
-        };
-        if (oldUser) {
-          await updateUser(oldUser.id, {
-            replacedBy: userId,
-          });
-        }
+        await transaction(async () => {
+          const userId = await createUser(newUser);
+          user = {
+            ...newUser,
+            id: userId,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            deletedAt: null,
+            note: null,
+            replacedBy: null,
+            deleted: false,
+            deletedBy: null,
+            invited: false,
+            nbFreeScans: 0,
+          };
+          if (platform === 'android') {
+            await createFreeSubscriptionForBetaAndroidPeriod([userId]);
+          }
+          if (oldUser) {
+            await updateUser(oldUser.id, {
+              replacedBy: userId,
+            });
+          }
+        });
       }
     } catch (error) {
       console.error(error);
