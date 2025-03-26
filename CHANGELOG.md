@@ -1,3 +1,8 @@
+## 1.9.0-canary.83
+
+* **feat:**  - google oauth ([#8080](https://github.com/AzzappApp/azzapp/pull/8080))
+* **fix:**  - **emailSignature:** use locale of user ([#8068](https://github.com/AzzappApp/azzapp/pull/8068))
+
 ## 1.9.0-canary.82
 
 
