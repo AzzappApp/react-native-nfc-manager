@@ -1,7 +1,8 @@
 import { decompressFromEncodedURIComponent } from 'lz-string';
 import { headers } from 'next/headers';
 import Image from 'next/image';
-import { getMediasByIds, getProfileById } from '@azzapp/data';
+import { getMediasByIds, getProfileById, getUserById } from '@azzapp/data';
+import { DEFAULT_LOCALE, isSupportedLocale } from '@azzapp/i18n';
 import { verifyHmacWithPassword } from '@azzapp/shared/crypto';
 import { parseEmailSignature } from '@azzapp/shared/emailSignatureHelpers';
 import {
@@ -77,9 +78,16 @@ const EmailSignaturePage = async ({
   }
   const contact = parseEmailSignature(contactData);
   const profile = await getProfileById(contact.profileId);
+
   if (!profile || profile.webCardId !== webCard.id) {
     return notFound();
   }
+
+  const user = await getUserById(profile.userId);
+  if (!user) {
+    return notFound();
+  }
+
   const { data: saveContactData, signature: saveContactSignature } =
     await serializeAndSignContactCard(
       webCard.userName,
@@ -105,7 +113,9 @@ const EmailSignaturePage = async ({
 
   const showStoreLinks = !isMobileDevice;
 
-  const intl = getServerIntl();
+  const intl = getServerIntl(
+    isSupportedLocale(user.locale) ? user.locale : DEFAULT_LOCALE,
+  );
   const saveContactMessage = intl.formatMessage({
     defaultMessage: 'Save my contact',
     id: 'YdhsiU',
