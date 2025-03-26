@@ -78,7 +78,7 @@ const TextInputWithPrefix = (
         ref={ref}
         testID="nativeInputText"
         selectionColor={colors.primary400}
-        style={[styles.flex, inputStyle]}
+        style={[styles.text, inputStyle]}
         {...props}
         placeholderTextColor={colors.grey400}
         onFocus={onFocusInner}
@@ -90,9 +90,9 @@ const TextInputWithPrefix = (
 };
 
 export const styleSheetData = (appearance: DefinedColorSchemeName) => ({
-  flex: { flex: 1 },
   text: {
-    color: appearance === 'light' ? colors.black : colors.grey400,
+    flex: 1,
+    color: appearance === 'light' ? colors.black : colors.white,
   },
   input: {
     ...textStyles.textField,
