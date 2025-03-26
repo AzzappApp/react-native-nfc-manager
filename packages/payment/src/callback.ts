@@ -7,6 +7,8 @@ import {
   updateSubscriptionByPaymentMeanId,
   getSubscriptionById,
   getPaymentByTransactionId,
+  getWebCardById,
+  updateWebCard,
 } from '@azzapp/data';
 import { login } from '#authent';
 import client from './client';
@@ -18,11 +20,17 @@ import {
 } from './helpers';
 import type { UserSubscription } from '@azzapp/data';
 
-export const acknowledgeFirstPayment = async (
-  paymentMeanId: string,
-  transactionId: string,
-  paymentProviderResponse?: string,
-) => {
+export const acknowledgeFirstPayment = async ({
+  paymentMeanId,
+  transactionId,
+  paymentProviderResponse,
+  webCardId,
+}: {
+  paymentMeanId: string;
+  transactionId: string;
+  paymentProviderResponse?: string;
+  webCardId?: string | null;
+}) => {
   let paymentId: string | undefined;
   const subscription = await getSubscriptionByPaymentMeanId(paymentMeanId);
 
@@ -151,6 +159,19 @@ export const acknowledgeFirstPayment = async (
         });
       }
     }
+
+    if (webCardId) {
+      const webCard = await getWebCardById(webCardId);
+      if (webCard && !webCard.cardIsPublished) {
+        await updateWebCard(webCardId, {
+          cardIsPublished: true,
+          alreadyPublished: true,
+          updatedAt: new Date(),
+          lastCardUpdate: new Date(),
+        });
+      }
+    }
+
     return { subscription, paymentId };
   }
 };

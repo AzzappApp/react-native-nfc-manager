@@ -16,6 +16,7 @@ const paymentCallbackBody = z.object({
   TRANSACTIONID: z.string(),
   MESSAGE: z.string().optional(),
   HASH: z.string(),
+  EXTRADATA: z.string().optional(),
 });
 
 export const POST = withPluginsRoute(async (req: Request) => {
@@ -30,11 +31,14 @@ export const POST = withPluginsRoute(async (req: Request) => {
   let subscription;
 
   if (data.MULTIPSP_UNIFIED_STATUS === 'OK') {
-    const result = await acknowledgeFirstPayment(
-      data.MULTIPSP_CLIENT_PAYMENT_REQUEST_ULID,
-      data.TRANSACTIONID,
-      data.MESSAGE,
-    );
+    const extraData = JSON.parse(data.EXTRADATA || '{}');
+
+    const result = await acknowledgeFirstPayment({
+      paymentMeanId: data.MULTIPSP_CLIENT_PAYMENT_REQUEST_ULID,
+      transactionId: data.TRANSACTIONID,
+      paymentProviderResponse: data.MESSAGE,
+      webCardId: extraData.webCardId,
+    });
 
     if (result) {
       subscription = result.subscription;

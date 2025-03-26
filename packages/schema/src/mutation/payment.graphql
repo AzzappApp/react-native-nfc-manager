@@ -51,6 +51,7 @@ input PaymentIntentInput {
   customer: Customer!
   redirectUrlSuccess: String!
   redirectUrlCancel: String!
+  webCardId: String
 }
 
 input Customer {

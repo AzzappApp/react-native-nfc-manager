@@ -74,6 +74,7 @@ export const getPaymentRequest = async (ulid: string) => {
 export const createPaymentRequest = async ({
   totalSeats,
   userId,
+  webCardId,
   locale,
   plan,
   customer,
@@ -82,6 +83,7 @@ export const createPaymentRequest = async ({
 }: {
   totalSeats: number;
   userId: string;
+  webCardId?: string;
   locale: string;
   plan: 'monthly' | 'yearly';
   redirectUrlSuccess: string;
@@ -124,6 +126,7 @@ export const createPaymentRequest = async ({
     OPERATIONTYPE: 'payment',
     EXTRADATA: JSON.stringify({
       userId,
+      webCardId,
     }),
     CALLBACKURL: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/webhook/payment`,
     REDIRECTURLSUCCESS: redirectUrlSuccess,

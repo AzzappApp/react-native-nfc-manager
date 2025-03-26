@@ -19,6 +19,7 @@ import {
 } from '@azzapp/payment';
 import ERRORS from '@azzapp/shared/errors';
 import { getSessionInfos } from '#GraphQLContext';
+import { checkWebCardProfileAdminRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import type { MutationResolvers } from '#__generated__/types';
 import type { GraphQLContext } from '#GraphQLContext';
@@ -77,9 +78,18 @@ export const createPaymentIntent: MutationResolvers['createPaymentIntent'] =
     if (!userId) {
       throw new GraphQLError(ERRORS.UNAUTHORIZED);
     }
+
+    const webCardId = intent.webCardId
+      ? fromGlobalIdWithType(intent.webCardId, 'UserSubscription')
+      : undefined;
+    if (webCardId) {
+      await checkWebCardProfileAdminRight(webCardId);
+    }
+
     try {
       const result = await createPaymentRequest({
         ...intent,
+        webCardId,
         userId,
       });
 
