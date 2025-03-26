@@ -144,6 +144,7 @@ const Slideshow = ({
                 media={media}
                 borderRadius={borderRadius}
                 slide={slides[i]}
+                baseMedia={baseMedias[i]}
               />
             );
           })}
@@ -156,10 +157,16 @@ type SlideShowItemProps = {
   media: Media;
   borderRadius: number;
   slide: Slide;
+  baseMedia: Media;
 };
 
-const SlideShowItem = ({ media, borderRadius, slide }: SlideShowItemProps) => {
-  const { setMedia } = useFullScreenOverlayContext(media);
+const SlideShowItem = ({
+  media,
+  borderRadius,
+  slide,
+  baseMedia,
+}: SlideShowItemProps) => {
+  const { setMedia } = useFullScreenOverlayContext(baseMedia);
   return (
     <div
       className={styles.media}
