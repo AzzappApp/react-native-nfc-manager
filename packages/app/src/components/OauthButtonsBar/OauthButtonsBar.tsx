@@ -120,72 +120,93 @@ const OauthButtonsBar = ({
     [intl],
   );
 
+  const googleErrorMessage = useMemo(
+    () =>
+      intl.formatMessage({
+        defaultMessage:
+          'Failed to sign in with Google. Please try again later.',
+        description:
+          'Signup Screen - Error message when failed to sign in with Google',
+      }),
+    [intl],
+  );
+
   const router = useRouter();
-  const onLinkedInSignUp = useCallback(async () => {
-    const authUrl = process.env.NEXT_PUBLIC_API_ENDPOINT + '/signin/linkedin';
-    const result = await WebBrowser.openAuthSessionAsync(authUrl, redirectUri);
-    if (result.type === 'success' && result.url) {
-      const url = new URL(result.url);
-      const signInInfoParam = url.searchParams.get('data');
-      if (!signInInfoParam) {
-        Toast.show({
-          type: 'error',
-          text1: linkedinErrorMessage,
-        });
-        return;
-      }
-      let data: AuthResponse | { error: string };
-      try {
-        data = JSON.parse(signInInfoParam);
-      } catch {
-        Toast.show({
-          type: 'error',
-          text1: linkedinErrorMessage,
-        });
-        return;
-      }
-
-      if ('error' in data) {
-        console.error(data.error);
-        Toast.show({
-          type: 'error',
-          text1: linkedinErrorMessage,
-        });
-        return;
-      }
-
-      if ('issuer' in data) {
-        router.push({
-          route: 'CONFIRM_REGISTRATION',
-          params: {
-            issuer: data.issuer,
-          },
-        });
-      } else {
-        const {
-          token,
-          refreshToken,
-          profileInfos,
-          email,
-          phoneNumber,
-          userId,
-        } = data;
-        if (!token || !refreshToken || !userId) {
-          throw new Error('Invalid response');
+  const onOpenIdSignUp = useCallback(
+    async (kind: 'google' | 'linkedin') => {
+      const authUrl =
+        process.env.NEXT_PUBLIC_API_ENDPOINT +
+        (kind === 'google' ? '/signin/google' : '/signin/linkedin');
+      const errorMessage =
+        kind === 'google' ? googleErrorMessage : linkedinErrorMessage;
+      const result = await WebBrowser.openAuthSessionAsync(
+        authUrl,
+        redirectUri,
+      );
+      if (result.type === 'success' && result.url) {
+        const url = new URL(result.url);
+        const signInInfoParam = url.searchParams.get('data');
+        if (!signInInfoParam) {
+          Toast.show({
+            type: 'error',
+            text1: errorMessage,
+          });
+          return;
         }
-        await dispatchGlobalEvent({
-          type: 'SIGN_IN',
-          payload: {
-            authTokens: { token, refreshToken },
+        let data: AuthResponse | { error: string };
+        try {
+          data = JSON.parse(signInInfoParam);
+        } catch {
+          Toast.show({
+            type: 'error',
+            text1: errorMessage,
+          });
+          return;
+        }
+
+        if ('error' in data) {
+          console.error(data.error);
+          Toast.show({
+            type: 'error',
+            text1: errorMessage,
+          });
+          return;
+        }
+
+        if ('issuer' in data) {
+          router.push({
+            route: 'CONFIRM_REGISTRATION',
+            params: {
+              issuer: data.issuer,
+            },
+          });
+        } else {
+          const {
+            token,
+            refreshToken,
             profileInfos,
             email,
             phoneNumber,
             userId,
-          },
-        });
+          } = data;
+          if (!token || !refreshToken || !userId) {
+            throw new Error('Invalid response');
+          }
+          await dispatchGlobalEvent({
+            type: 'SIGN_IN',
+            payload: {
+              authTokens: { token, refreshToken },
+              profileInfos,
+              email,
+              phoneNumber,
+              userId,
+            },
+          });
+        }
       }
-    }
-  }, [linkedinErrorMessage, router]);
+    },
+    [googleErrorMessage, linkedinErrorMessage, router],
+  );
 
   return (
     <View style={styles.container}>
@@ -201,13 +222,19 @@ const OauthButtonsBar = ({
             />
           </PressableNative>
         )}
-        <PressableNative style={styles.button} onPress={onLinkedInSignUp}>
+        <PressableNative
+          style={styles.button}
+          onPress={() => onOpenIdSignUp('linkedin')}
+        >
           <Image
             source={require('./assets/linkedin.png')}
             style={{ width: 32, objectFit: 'contain' }}
           />
         </PressableNative>
-        <PressableNative style={styles.button}>
+        <PressableNative
+          style={styles.button}
+          onPress={() => onOpenIdSignUp('google')}
+        >
           <Image
             source={require('./assets/google.png')}
             style={{ width: 31, objectFit: 'contain' }}

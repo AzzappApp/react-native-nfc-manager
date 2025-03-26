@@ -1,0 +1,10 @@
+import { oauthSignin } from '../oauthSigninUtils';
+
+const googleSignin = oauthSignin({
+  authorizeURL: 'https://accounts.google.com/o/oauth2/v2/auth',
+  redirectURI: `${process.env.NEXT_PUBLIC_API_ENDPOINT!}/signin/google/callback`,
+  clientId: process.env.GOOGLE_CLIENT_ID!,
+  csrfSecret: new TextEncoder().encode(process.env.GOOGLE_TOKEN_SECRET),
+});
+
+export { googleSignin as GET };
