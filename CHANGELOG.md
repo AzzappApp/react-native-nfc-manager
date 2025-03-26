@@ -1,3 +1,9 @@
+## 1.9.0-canary.80
+
+* **fix:**  - **linkedin:** use configured app scheme
+* **fix:**  - used scheme
+* **fix:**  - **authent:** [#8063](https://github.com/AzzappApp/azzapp/pull/8063) missing scheme in app.json ([#8064](https://github.com/AzzappApp/azzapp/pull/8064))
+
 ## 1.9.0-canary.79
 
 * **fix:**  - case when no user found for token ([#8059](https://github.com/AzzappApp/azzapp/pull/8059))
