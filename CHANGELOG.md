@@ -1,3 +1,7 @@
+## 1.9.0-canary.85
+
+* **fix:**  - handle image portal with base image to use correct aspect ratio ([#8084](https://github.com/AzzappApp/azzapp/pull/8084))
+
 ## 1.9.0-canary.84
 
 * **fix:**  - **android:** [#8071](https://github.com/AzzappApp/azzapp/pull/8071) hide paywall on android ([#8072](https://github.com/AzzappApp/azzapp/pull/8072))
