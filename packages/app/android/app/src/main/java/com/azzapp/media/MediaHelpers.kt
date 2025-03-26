@@ -120,6 +120,33 @@ class MediaHelpers(private val reactContext: ReactApplicationContext) :
           promise.reject("ERROR", "unknown", e)  // InputStream could not be opened
       }
   }
+  @ReactMethod
+  fun downloadVCard(uriString: String, promise: Promise) {
+      try {
+          val context = reactContext
+          val uri = Uri.parse(uriString)
+          val inputStream: InputStream? = context.contentResolver.openInputStream(uri)
+
+          if (inputStream != null) {
+              // Generate a random file name with a .jpg extension
+              val fileName = "${UUID.randomUUID()}.vcf"
+              val cacheFile = File(context.cacheDir, fileName)
+
+              // Write the input stream data to the cache file
+              FileOutputStream(cacheFile).use { outputStream ->
+                  inputStream.copyTo(outputStream)
+              }
+
+              inputStream.close()
+              promise.resolve(cacheFile.absolutePath)   // Return the full path to the saved file
+          } else {
+              promise.reject("ERROR", "Cannot open input stream")  // InputStream could not be opened
+          }
+      } catch (e: Exception) {
+          e.printStackTrace()
+          promise.reject("ERROR", "unknown", e)  // InputStream could not be opened
+      }
+  }
 
   private fun getRealPathFromUri(uri: Uri): String? {
       val projection = arrayOf(MediaStore.MediaColumns.DATA)

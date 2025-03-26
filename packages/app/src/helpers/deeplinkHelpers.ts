@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/react-native';
 import { toGlobalId } from 'graphql-relay';
 import { decompressFromEncodedURIComponent } from 'lz-string';
+import { NativeModules, Platform } from 'react-native';
 import { logEvent } from './analytics';
 import { verifySign } from './MobileWebAPI';
 import type { Route } from '#routes';
@@ -16,6 +17,9 @@ const getSearchParamFromURL = (url: string, param: string) => {
   return value;
 };
 
+const ANDROID_CONTENT_PREFIX = 'content://';
+const FILE_PREFIX = 'file://';
+
 const profileUrl = /^^([^/?]+)(?:\/([^/?]+))?(?:\/([^/?]+))?.*$/;
 const resetPasswordUrl = new RegExp('^reset-password');
 const prefixes = [
@@ -25,8 +29,12 @@ const prefixes = [
   'https://staging.azzapp.com',
   'https://www.azzapp.com',
   'https://azzapp.com',
+  // to support vcf sharing
+  ANDROID_CONTENT_PREFIX,
+  FILE_PREFIX,
 ];
 //we had to many issue with end, add all url to avoid issue with env variable during build
+const { AZPMediaHelpers } = NativeModules;
 
 export const matchUrlWithRoute = async (
   url: string,
@@ -46,6 +54,23 @@ export const matchUrlWithRoute = async (
   const prefix = prefixes.find(prefix => prefix && url.startsWith(prefix));
   if (!prefix) {
     return;
+  }
+  if (Platform.OS === 'android' && prefix === ANDROID_CONTENT_PREFIX) {
+    const uri = `file://${await AZPMediaHelpers.downloadVCard(url)}`;
+    return {
+      route: 'CONTACT_CREATE',
+      params: {
+        vCardUri: uri,
+      },
+    };
+  }
+  if (prefix === FILE_PREFIX) {
+    return {
+      route: 'CONTACT_CREATE',
+      params: {
+        vCardUri: url,
+      },
+    };
   }
   let withoutPrefix = url.replace(prefix, '');
   if (withoutPrefix.startsWith('/')) {

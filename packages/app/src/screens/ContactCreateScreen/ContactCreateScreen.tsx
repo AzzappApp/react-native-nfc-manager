@@ -1,4 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { parse } from '@lepirlouit/vcard-parser';
+import { File } from 'expo-file-system/next';
 import { capitalize } from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -24,6 +26,7 @@ import {
   getVCardCompany,
   getVCardEmail,
   getVCardFirstName,
+  getVCardImage,
   getVCardLastName,
   getVCardPhoneNumber,
   getVCardSocialUrls,
@@ -373,9 +376,30 @@ const ContactCreateScreen = ({
       } else {
         setValue('socials', []);
       }
+      const photo = getVCardImage(data);
+      if (photo) {
+        setValue('avatar', {
+          id: photo,
+          local: true,
+          uri: photo,
+        });
+      }
     },
     [setValue],
   );
+
+  useEffect(() => {
+    // Load data from vCard uri
+    if (params?.vCardUri) {
+      const file = new File(params?.vCardUri);
+      if (file.exists) {
+        const VCard = parse(file.text());
+        if (VCard) {
+          loadFormFromVCard?.(VCard);
+        }
+      }
+    }
+  }, [loadFormFromVCard, params?.vCardUri]);
 
   const loadFormFromScan = useCallback(
     (

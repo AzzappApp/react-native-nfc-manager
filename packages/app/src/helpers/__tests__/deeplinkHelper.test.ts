@@ -175,4 +175,14 @@ describe('deeplinkHelpers', () => {
       },
     });
   });
+  test('open the app with a valid vcf file', async () => {
+    const res = await matchUrlWithRoute('file:///fake-azzapp.com/contact.vcf');
+
+    expect(res).toEqual({
+      route: 'CONTACT_CREATE',
+      params: {
+        vCardUri: 'file:///fake-azzapp.com/contact.vcf',
+      },
+    });
+  });
 });

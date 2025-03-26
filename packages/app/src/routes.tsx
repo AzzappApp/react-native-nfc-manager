@@ -261,6 +261,7 @@ export type ContactCreateRoute = {
   route: 'CONTACT_CREATE';
   params?: {
     showCardScanner?: boolean;
+    vCardUri?: string;
   };
 };
 

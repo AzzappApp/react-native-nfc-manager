@@ -1,5 +1,8 @@
+import { writeAsStringAsync } from 'expo-file-system';
+import { Paths } from 'expo-file-system/next';
 import { isDefined } from '@azzapp/shared/isDefined';
 import { SOCIAL_NETWORK_LINKS } from '@azzapp/shared/socialLinkHelpers';
+import { createRandomFileName } from '#helpers/fileHelpers';
 import type { vCard } from '@lepirlouit/vcard-parser';
 
 const valueToString = (value: string[] | string): string => {
@@ -155,4 +158,27 @@ export const getVCardUrls = (vcard: vCard) => {
   });
   urls = urls?.filter(isDefined);
   return urls && urls.length > 0 ? urls : undefined;
+};
+
+export const getVCardImage = (vcard: vCard) => {
+  const firstPhoto = vcard.photo?.[0];
+  if (firstPhoto.value && typeof firstPhoto.value === 'string') {
+    const base64Data = firstPhoto.value as string;
+    let extension;
+    if (firstPhoto.meta?.type?.[0] === 'JPEG') {
+      extension = 'jpg';
+    } else if (firstPhoto.meta?.type?.[0] === 'PNG') {
+      extension = 'png';
+    }
+    if (!extension) {
+      // cannot identify extension, do not import image
+      return undefined;
+    }
+    const outPath = Paths.cache.uri + createRandomFileName(extension);
+    writeAsStringAsync(outPath, base64Data, {
+      encoding: 'base64',
+    });
+    return outPath;
+  }
+  return undefined;
 };

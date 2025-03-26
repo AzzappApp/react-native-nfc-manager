@@ -64,11 +64,11 @@ export const extractPhoneNumberDetails = (
     if (parsedNumber) {
       return {
         countryCode: parsedNumber.country,
-        number: parsedNumber.nationalNumber,
+        number: parsedNumber.nationalNumber.replace(/\D/g, ''),
       };
     }
-    return { number: phoneNumber };
+    return { number: phoneNumber.replace(/\D/g, '') };
   } catch {
-    return { number: phoneNumber };
+    return { number: phoneNumber.replace(/\D/g, '') };
   }
 };

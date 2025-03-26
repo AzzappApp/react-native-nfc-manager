@@ -102,5 +102,18 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true />
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>vCard</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.vcard</string>
+			</array>
+		</dict>
+	</array>
+	<key>UIFileSharingEnabled</key>
+	<true/>
 </dict>
 </plist>
