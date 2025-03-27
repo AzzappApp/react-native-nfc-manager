@@ -394,6 +394,7 @@ export const CommonInformationScreen = ({
           <ContactCardEditCompanyLogo
             control={control}
             isPremium={webCard?.isPremium}
+            isUserContactCard
           />
           <Separation />
           <CommonInformationAddresses control={control} />

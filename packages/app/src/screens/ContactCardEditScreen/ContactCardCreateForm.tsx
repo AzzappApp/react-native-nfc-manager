@@ -213,7 +213,11 @@ const ContactCardCreateForm = ({
               )}
             />
             <Separation small />
-            <ContactCardEditCompanyLogo control={control} isPremium />
+            <ContactCardEditCompanyLogo
+              control={control}
+              isPremium
+              isUserContactCard
+            />
             <Separation small />
             {logoField.value && (
               <>

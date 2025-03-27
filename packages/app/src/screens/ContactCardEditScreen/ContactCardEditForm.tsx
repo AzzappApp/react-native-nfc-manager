@@ -197,6 +197,7 @@ const ContactCardEditForm = ({
               companyField.value
             }
             isPremium={webCard?.isPremium}
+            isUserContactCard
           />
           <Separation />
           {webCard?.isMultiUser &&

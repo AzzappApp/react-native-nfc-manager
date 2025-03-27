@@ -33,11 +33,13 @@ const ContactCardEditCompanyLogo = ({
   canEditLogo = true,
   isPremium,
   company,
+  isUserContactCard,
 }: {
   control: Control<any>;
   isPremium?: boolean | null;
   canEditLogo?: boolean;
   company?: string | null;
+  isUserContactCard?: boolean;
 }) => {
   const styles = useStyleSheet(stylesheet);
 
@@ -213,10 +215,17 @@ const ContactCardEditCompanyLogo = ({
                 />
               </View>
               <Text variant="smallbold" style={styles.descriptionText}>
-                <FormattedMessage
-                  defaultMessage="We search for logos based on the information provided. Please select the logo you’d like to use for your company."
-                  description="ContactCardCreationScreen - Compoany Logo explanation"
-                />
+                {isUserContactCard ? (
+                  <FormattedMessage
+                    defaultMessage="We search for logos based on the information provided. Please select the logo you’d like to use for your company."
+                    description="ContactCardCreationScreen - Compoany Logo explanation"
+                  />
+                ) : (
+                  <FormattedMessage
+                    defaultMessage="We search for logos based on the information provided. If you don't add an avatar, this logo will be used as the contact preview."
+                    description="new contact creation screen - Compoany Logo explanation"
+                  />
+                )}
               </Text>
             </View>
             <ScrollView
