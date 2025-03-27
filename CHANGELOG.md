@@ -1,3 +1,7 @@
+## 1.9.0-canary.98
+
+* **fix:**  - add safety check ([#8129](https://github.com/AzzappApp/azzapp/pull/8129))
+
 ## 1.9.0-canary.97
 
 * **fix:**  - handle webCardId in deeplink ([#8107](https://github.com/AzzappApp/azzapp/pull/8107))
