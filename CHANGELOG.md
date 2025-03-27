@@ -1,3 +1,7 @@
+## 1.9.0-canary.88
+
+
+
 ## 1.9.0-canary.87
 
 * **fix:**  - **OAuth:** use app environment app scheme conditionally ([#8102](https://github.com/AzzappApp/azzapp/pull/8102))
