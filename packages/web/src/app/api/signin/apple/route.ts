@@ -47,6 +47,7 @@ const appleSignin = async (req: Request) => {
       issuer: 'https://appleid.apple.com',
     }));
   } catch {
+    console.error('Apple Sign In: Invalid token');
     return NextResponse.json(
       { message: ERRORS.INVALID_CREDENTIALS },
       { status: 401 },
@@ -54,6 +55,7 @@ const appleSignin = async (req: Request) => {
   }
   const appleId = payload.sub;
   if (!appleId) {
+    console.error('Apple Sign In: Invalid token');
     return NextResponse.json(
       { message: ERRORS.INVALID_CREDENTIALS },
       { status: 401 },
@@ -79,6 +81,7 @@ const appleSignin = async (req: Request) => {
       return handleSignInAuthMethod(user, profiles[0] ?? null);
     } else {
       if (!email || typeof email !== 'string') {
+        console.error('Apple Sign In: no email');
         return NextResponse.json(
           { message: ERRORS.INVALID_CREDENTIALS },
           { status: 401 },
