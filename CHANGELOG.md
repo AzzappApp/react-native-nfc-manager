@@ -1,3 +1,8 @@
+## 1.9.0-canary.87
+
+* **fix:**  - **OAuth:** use app environment app scheme conditionally ([#8102](https://github.com/AzzappApp/azzapp/pull/8102))
+* **fix:**  - **gelocation:** [#8074](https://github.com/AzzappApp/azzapp/pull/8074) pass properly params to add contact modal ([#8092](https://github.com/AzzappApp/azzapp/pull/8092))
+
 ## 1.9.0-canary.86
 
 * **fix:**  - update Logo component to display different description dpending on the type of parent screen ([#8098](https://github.com/AzzappApp/azzapp/pull/8098))
