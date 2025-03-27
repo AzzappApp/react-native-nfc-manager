@@ -6,6 +6,7 @@ import {
   getVCardCompany,
   getVCardEmail,
   getVCardFirstName,
+  getVCardImage,
   getVCardLastName,
   getVCardPhoneNumber,
   getVCardSocialUrls,
@@ -434,6 +435,17 @@ describe('textToVCard', () => {
       // ensure accessor works well
       expect(getVCardFirstName(parsedVCard)).toBe('firstname');
       expect(getVCardLastName(parsedVCard)).toBe('lastname');
+    });
+  });
+  describe('image support', () => {
+    test('no default', () => {
+      // create vCard like an offline vcard
+      const vCard = new VCard();
+      // reparse it
+      const parsedVCard = parse(vCard.getOutput());
+
+      // ensure accessor works well
+      expect(getVCardImage(parsedVCard)).toBe(undefined);
     });
   });
 });

@@ -162,7 +162,7 @@ export const getVCardUrls = (vcard: vCard) => {
 
 export const getVCardImage = (vcard: vCard) => {
   const firstPhoto = vcard.photo?.[0];
-  if (firstPhoto.value && typeof firstPhoto.value === 'string') {
+  if (firstPhoto?.value && typeof firstPhoto.value === 'string') {
     const base64Data = firstPhoto.value as string;
     let extension;
     if (firstPhoto.meta?.type?.[0] === 'JPEG') {
