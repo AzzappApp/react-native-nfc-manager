@@ -142,7 +142,10 @@ const DownloadVCard = ({
             const fileURL = URL.createObjectURL(file);
             setFileUrl(fileURL);
 
-            updateContactCardScanCounter(contact.profileId);
+            if (step === 0) {
+              // No need to count views on other steps
+              updateContactCardScanCounter(contact.profileId);
+            }
             setToken(additionalData.token);
             setDisplayName(additionalData.displayName);
           }
@@ -152,7 +155,7 @@ const DownloadVCard = ({
         }
       }
     },
-    [webCard.userName, webCard.id, startOpen],
+    [webCard.userName, webCard.id, startOpen, step],
   );
 
   useEffect(() => {
