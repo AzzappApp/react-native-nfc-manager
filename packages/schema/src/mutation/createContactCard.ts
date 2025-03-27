@@ -56,12 +56,11 @@ const createContactCard: MutationResolvers['createContactCard'] = async (
       throw new GraphQLError(ERRORS.USERNAME_ALREADY_EXISTS);
     }
   }
-
   await validateCurrentSubscription(userId, {
     webCardKind,
     action: 'CREATE_CONTACT_CARD',
     alreadyPublished: await getPublishedWebCardCount(userId),
-    webCardIsPublished: true,
+    webCardIsPublished: publishWebCard ?? true,
     contactCardHasCompanyName: !!contactCard.company,
     contactCardHasUrl: !!contactCard.urls?.length,
   });
