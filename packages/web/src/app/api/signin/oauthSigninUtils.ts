@@ -27,7 +27,10 @@ export const oauthSignin =
     csrfSecret: Uint8Array;
   }) =>
   async (req: NextRequest) => {
-    const platform = req.nextUrl.searchParams.get('platform');
+    let platform = req.nextUrl.searchParams.get('platform');
+    if (platform !== 'android' && platform !== 'ios') {
+      platform = 'ios';
+    }
     const url = new URL(authorizeURL);
     url.searchParams.append('client_id', clientId);
     url.searchParams.append('response_type', 'code');
@@ -44,10 +47,17 @@ export const oauthSignin =
     return NextResponse.redirect(url.toString(), { status: 302 });
   };
 
-const redirectToApp = (data: SigninInfos | { error: string }) =>
-  NextResponse.redirect(`azzapp://login?data=${JSON.stringify(data)}`, {
+const redirectToApp = (data: SigninInfos | { error: string }) => {
+  const appScheme =
+    process.env.NEXT_PUBLIC_PLATFORM === 'development'
+      ? 'azzapp-dev'
+      : process.env.NEXT_PUBLIC_PLATFORM === 'staging'
+        ? 'azzapp-staging'
+        : 'azzapp';
+  NextResponse.redirect(`${appScheme}://login?data=${JSON.stringify(data)}`, {
     status: 302,
   });
+};
 
 export const oauthSigninCallback =
   ({
