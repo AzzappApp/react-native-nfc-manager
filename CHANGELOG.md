@@ -1,3 +1,7 @@
+## 1.9.0-canary.89
+
+* **fix:**  - avoid duplicating contact card view count ([#8100](https://github.com/AzzappApp/azzapp/pull/8100))
+
 ## 1.9.0-canary.88
 
 
