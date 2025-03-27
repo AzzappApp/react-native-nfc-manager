@@ -34,21 +34,21 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>86</string>
+	<string>87</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
+	<false />
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>whatsapp</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
-	<true/>
+	<true />
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
-		<false/>
+		<false />
 		<key>NSAllowsLocalNetworking</key>
-		<true/>
+		<true />
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>$(PRODUCT_NAME) needs access to your camera to capture photos and videos for sharing
@@ -70,7 +70,7 @@
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>$(PRODUCT_NAME) uses your position to record where you exchanged contact details with others.</string>
 	<key>PHPhotoLibraryPreventAutomaticLimitedAccessAlert</key>
-	<true/>
+	<true />
 	<key>UIAppFonts</key>
 	<array>
 		<string>PlusJakartaSans-SemiBold.ttf</string>
@@ -95,13 +95,13 @@
 		<string>arm64</string>
 	</array>
 	<key>UIStatusBarStyle</key>
-	<string></string>
+	<string />
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
-	<true/>
+	<true />
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
@@ -109,7 +109,7 @@
 			<string>vCard</string>
 			<key>CFBundleTypeExtensions</key>
 			<array>
-				<string></string>
+				<string />
 			</array>
 			<key>LSItemContentTypes</key>
 			<array>

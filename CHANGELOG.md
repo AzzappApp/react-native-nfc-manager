@@ -1,3 +1,9 @@
+## 1.9.0-canary.86
+
+* **fix:**  - update Logo component to display different description dpending on the type of parent screen ([#8098](https://github.com/AzzappApp/azzapp/pull/8098))
+* **fix:**  - update pList with store feedbacks ([#8097](https://github.com/AzzappApp/azzapp/pull/8097))
+* **fix:**  - revert signature preview avatar/companyLogo mix ([#8099](https://github.com/AzzappApp/azzapp/pull/8099))
+
 ## 1.9.0-canary.85
 
 * **fix:**  - handle image portal with base image to use correct aspect ratio ([#8084](https://github.com/AzzappApp/azzapp/pull/8084))
