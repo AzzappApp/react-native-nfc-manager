@@ -407,11 +407,7 @@ export const WebCardScreen = ({
         editTransition={editTransition}
       />
 
-      <AddContactModal
-        webCard={data.webCard}
-        contactData={params.contactData}
-        additionalContactData={params.additionalContactData}
-      />
+      <AddContactModal webCard={data.webCard} params={params} />
 
       <Suspense fallback={null}>
         <WebCardMenu

@@ -47,14 +47,12 @@ import type { CheckboxStatus } from '#ui/CheckBox';
 import type { Contact, Image } from 'expo-contacts';
 
 type Props = {
-  contactData?: string | null;
-  additionalContactData?: WebCardRoute['params']['additionalContactData'];
+  params: WebCardRoute['params'];
   webCard: AddContactModal_webCard$key;
 };
 
 const AddContactModal = ({
-  contactData,
-  additionalContactData,
+  params: { additionalContactData, contactData, geolocation },
   webCard: webCardKey,
 }: Props) => {
   const [viewer, setViewer] = useState<string | null>(null);
@@ -323,8 +321,8 @@ const AddContactModal = ({
       variables: {
         input,
         profileId: viewer,
-        location: additionalContactData?.geolocation?.location,
-        address: additionalContactData?.geolocation?.address,
+        location: geolocation?.location,
+        address: geolocation?.address,
       },
       updater: (store, response) => {
         if (response && response.addContact) {
@@ -373,8 +371,8 @@ const AddContactModal = ({
     viewer,
     getContactInput,
     commit,
-    additionalContactData?.geolocation?.location,
-    additionalContactData?.geolocation?.address,
+    geolocation?.location,
+    geolocation?.address,
     close,
     intl,
   ]);
@@ -493,7 +491,7 @@ const AddContactModal = ({
 
 const downloadAvatar = async (
   profileId: string,
-  additionalContactData: Props['additionalContactData'],
+  additionalContactData: WebCardRoute['params']['additionalContactData'],
 ) => {
   let image: Image | undefined = undefined;
   if (additionalContactData?.avatarUrl) {
@@ -521,7 +519,7 @@ const downloadAvatar = async (
 
 const buildContact = async (
   contactCardData: string,
-  additionalContactData: Props['additionalContactData'],
+  additionalContactData: WebCardRoute['params']['additionalContactData'],
   userName?: string,
 ) => {
   const {

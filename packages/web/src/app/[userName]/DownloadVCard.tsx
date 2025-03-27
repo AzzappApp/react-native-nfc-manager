@@ -79,15 +79,7 @@ const DownloadVCard = ({
     async (compressedContactCard: string) => {
       let contactData: string;
       let signature: string;
-      let geolocation: {
-        location: { latitude: number; longitude: number };
-        address: {
-          city: string;
-          country: string;
-          region: string;
-          subregion: string;
-        };
-      };
+      let geolocation: Geolocation;
       try {
         [contactData, signature, geolocation] = JSON.parse(
           decompressFromEncodedURIComponent(compressedContactCard),

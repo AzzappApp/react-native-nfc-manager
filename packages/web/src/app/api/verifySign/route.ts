@@ -96,7 +96,6 @@ const verifySignApi = async (req: Request) => {
       .setExpirationTime('20m')
       .setProtectedHeader({ alg: 'HS256' })
       .sign(new TextEncoder().encode(JWT_SECRET));
-
     return NextResponse.json(
       {
         urls: (webCard?.isMultiUser
@@ -110,7 +109,6 @@ const verifySignApi = async (req: Request) => {
         avatarUrl,
         displayName: displayName(foundContactCard, webCard),
         token,
-        geolocation,
       },
       { status: 200 },
     );

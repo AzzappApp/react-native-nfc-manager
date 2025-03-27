@@ -5,6 +5,7 @@ import { NativeModules, Platform } from 'react-native';
 import { logEvent } from './analytics';
 import { verifySign } from './MobileWebAPI';
 import type { Route } from '#routes';
+import type { Geolocation } from '@azzapp/shared/geolocationHelpers';
 
 const getSearchParamFromURL = (url: string, param: string) => {
   const include = url.includes(`${param}=`);
@@ -157,8 +158,9 @@ export const matchUrlWithRoute = async (
     if (compressedContactCard) {
       let contactData: string;
       let signature: string;
+      let geolocation: Geolocation;
       try {
-        [contactData, signature] = JSON.parse(
+        [contactData, signature, geolocation] = JSON.parse(
           //lz-string decompressFromEncodedURIComponent does not decode properly when space in the url is converted to %20? (happens with applink)
           //we need to use decodeURI in order to decode the url properly
           decompressFromEncodedURIComponent(decodeURI(compressedContactCard)),
@@ -189,6 +191,7 @@ export const matchUrlWithRoute = async (
               userName: username,
               contactData,
               additionalContactData,
+              geolocation,
             },
           };
         } catch {
@@ -230,8 +233,20 @@ const handleAppClip = async (url: string): Promise<Route | undefined> => {
   if (username && compressedContactCard) {
     let contactData: string;
     let signature: string;
+    let geolocation: {
+      location: {
+        latitude: number;
+        longitude: number;
+      };
+      address?: {
+        city: string;
+        subregion: string;
+        region: string;
+        country: string;
+      };
+    };
     try {
-      [contactData, signature] = JSON.parse(
+      [contactData, signature, geolocation] = JSON.parse(
         //lz-string decompressFromEncodedURIComponent does not decode properly when space in the url is converted to %20? (happens with applink)
         //we need to use decodeURI in order to decode the url properly
         decompressFromEncodedURIComponent(decodeURI(compressedContactCard)),
@@ -250,6 +265,7 @@ const handleAppClip = async (url: string): Promise<Route | undefined> => {
             userName: username,
             contactData,
             additionalContactData,
+            geolocation,
           },
         };
       }

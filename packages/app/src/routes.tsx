@@ -4,8 +4,10 @@ import type { SectionsRoute } from './sectionsRoutes';
 import type { ColorPaletteColor } from '@azzapp/shared/cardHelpers';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
+import type { Geolocation } from '@azzapp/shared/geolocationHelpers';
 import type { Contact } from 'expo-contacts';
 import type { LayoutRectangle } from 'react-native';
+
 export type AboutRoute = {
   route: 'ABOUT';
   params?: never;
@@ -92,19 +94,9 @@ export type WebCardRoute = {
     contactData?: string | null;
     additionalContactData?: Pick<ContactCard, 'socials' | 'urls'> & {
       avatarUrl?: string;
-      geolocation?: {
-        location: {
-          latitude: number;
-          longitude: number;
-        };
-        address?: {
-          city: string;
-          country: string;
-          subregion: string;
-          region: string;
-        };
-      };
     };
+    geolocation?: Geolocation;
+
     fromCreation?: boolean;
     editing?: boolean;
   } & (

@@ -3,6 +3,7 @@
  */
 import { fetchJSON, postFormData } from './networkHelpers';
 import type { CommonInformation } from './contactCardHelpers';
+import type { Geolocation } from './geolocationHelpers';
 import type { FetchFunction, fetchBlob } from './networkHelpers';
 
 const API_ENDPOINT = process.env.NEXT_PUBLIC_API_ENDPOINT!;
@@ -296,18 +297,14 @@ export const uploadMedia = (
  * Api call to check the signature of a contact card.
  */
 export const verifySign: APIMethod<
-  { signature: string; data: string; salt: string },
+  {
+    signature: string;
+    data: string;
+    salt: string;
+    geolocation?: Geolocation;
+  },
   Pick<CommonInformation, 'socials' | 'urls'> & {
     avatarUrl?: string;
-    geolocation?: {
-      location: { latitude: number; longitude: number };
-      address?: {
-        city: string;
-        subregion: string;
-        region: string;
-        country: string;
-      };
-    };
   }
 > = async ({ signature, data, salt }, init) =>
   apiFetch(`${API_ENDPOINT}/verifySign`, {
