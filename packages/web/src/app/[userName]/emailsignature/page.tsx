@@ -102,7 +102,7 @@ const EmailSignaturePage = async ({
       ? webCard.logoId
       : profile.logoId;
   const companyLogoUrl = companyLogo
-    ? getImageURLForSize({ id: companyLogo, height: 60, format: 'png' })
+    ? getImageURLForSize({ id: companyLogo, height: 120, format: 'png' })
     : null;
 
   const saveContactURL = buildUserUrlWithContactCard(
@@ -127,8 +127,8 @@ const EmailSignaturePage = async ({
   if (contact.avatar && profile.avatarId) {
     contact.avatar = getRoundImageURLForSize({
       id: profile.avatarId,
-      height: 60,
-      width: 60,
+      height: 120,
+      width: 120,
       format: 'png',
     });
   }

@@ -1,4 +1,3 @@
-import { colors } from '@azzapp/shared/colorsHelpers';
 import { ArrowRightIcon } from '#assets';
 import CoverRenderer from '#components/renderer/CoverRenderer';
 import styles from './EmailSignaturePreview.css';
@@ -45,8 +44,7 @@ const EmailSignaturePreview = ({
         className={styles.simpleSignatureContainer}
         dangerouslySetInnerHTML={{
           __html: renderSaveMyContactButton({
-            primaryColor: colors.white,
-            border: true,
+            primaryColor: '#000',
             saveContactMessage,
             saveContactURL: '#',
           }),
