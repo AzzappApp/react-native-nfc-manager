@@ -169,10 +169,7 @@ describe('deeplinkHelpers', () => {
     const res = await matchUrlWithRoute('https://fake-azzapp.com/widget_share');
 
     expect(res).toEqual({
-      route: 'HOME',
-      params: {
-        openShakeShare: true,
-      },
+      route: 'SHAKE_AND_SHARE',
     });
   });
   test('open the app with a valid vcf file', async () => {

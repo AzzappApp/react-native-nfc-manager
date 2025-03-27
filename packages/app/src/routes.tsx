@@ -15,9 +15,7 @@ export type AboutRoute = {
 
 export type HomeRoute = {
   route: 'HOME';
-  params?: {
-    openShakeShare?: boolean;
-  };
+  params?: never;
 };
 
 export type MediaRoute = {
@@ -307,6 +305,11 @@ export type ContactByLocationRoute = {
   };
 };
 
+export type ShakeAndShareRoute = {
+  route: 'SHAKE_AND_SHARE';
+  params?: never;
+};
+
 export type Route =
   | AboutRoute
   | AcceptTermsRoute
@@ -348,6 +351,7 @@ export type Route =
   | ResetPasswordRoute
   | SearchRoute
   | SectionsRoute
+  | ShakeAndShareRoute
   | SignInRoute
   | SignUpRoute
   | UserPayWallRoute

@@ -1,4 +1,11 @@
-import { memo, Suspense, useEffect, useMemo, useState } from 'react';
+import {
+  memo,
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { graphql, useLazyLoadQuery } from 'react-relay';
 import { waitTime } from '@azzapp/shared/asyncHelpers';
 import MainTabBar from '#components/MainTabBar';
@@ -7,8 +14,6 @@ import {
   ScreensRenderer,
   useNativeRouter,
 } from '#components/NativeRouter';
-import ShakeShare from '#components/ShakeShare';
-import { useShakeShareDisplay } from '#components/ShakeShare/ShakeShare';
 import { hasBeenSignedIn } from '#helpers/authStore';
 import {
   addGlobalEventListener,
@@ -16,6 +21,7 @@ import {
 } from '#helpers/globalEvents';
 import { useIsAuthenticated } from '#hooks/authStateHooks';
 import { useDeepLink } from '#hooks/useDeepLink';
+import { useShakeDetector } from '#hooks/useShakeDetector';
 import AzzappLogoLoader from '#ui/AzzappLogoLoader';
 import AppRelayEnvironmentProvider from './AppRelayEnvironmentProvider';
 import {
@@ -126,15 +132,21 @@ const MainRouter = () => {
 
   const { router, routerState } = useNativeRouter(initialRoutes);
 
-  const {
-    isMounted: isShakeShareMounted,
-    mount: mountShakeShare,
-    umount: umountShakeShare,
-  } = useShakeShareDisplay();
-
   useSentryRoutingInstrumentation(router);
   useRoutingAnalyticsLog(router);
   useDeepLink(router);
+
+  const toggleShakeShare = useCallback(() => {
+    if (router.getCurrentRoute()?.route === 'SHAKE_AND_SHARE') {
+      router.back();
+    } else {
+      router.push({
+        route: 'SHAKE_AND_SHARE',
+      });
+    }
+  }, [router]);
+
+  useShakeDetector(toggleShakeShare);
 
   return (
     <RouterProvider value={router}>
@@ -144,13 +156,6 @@ const MainRouter = () => {
         screens={screens}
         tabs={tabs}
       />
-      <Suspense>
-        <ShakeShare
-          isMounted={isShakeShareMounted}
-          mount={mountShakeShare}
-          umount={umountShakeShare}
-        />
-      </Suspense>
     </RouterProvider>
   );
 };

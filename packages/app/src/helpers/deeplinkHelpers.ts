@@ -88,10 +88,7 @@ export const matchUrlWithRoute = async (
   }
   if (withoutPrefix === 'widget_share') {
     return {
-      route: 'HOME',
-      params: {
-        openShakeShare: true,
-      },
+      route: 'SHAKE_AND_SHARE',
     };
   }
   const matchResetPassword = withoutPrefix.match(resetPasswordUrl);

@@ -1,4 +1,4 @@
-import { memo, useMemo } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { useFragment, graphql } from 'react-relay';
@@ -7,7 +7,7 @@ import { colors, shadow } from '#theme';
 import ContactCard, {
   CONTACT_CARD_RADIUS_HEIGHT,
 } from '#components/ContactCard/ContactCard';
-import { openShakeShare } from '#components/ShakeShare';
+import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import FingerHint, {
   FINGER_HINT_HEIGHT,
@@ -140,6 +140,15 @@ const ContactCardItem = ({
     () => getTextColor(profile.webCard?.cardColors?.primary ?? colors.black),
     [profile.webCard?.cardColors?.primary],
   );
+
+  const router = useRouter();
+
+  const openContactCard = useCallback(() => {
+    router.push({
+      route: 'SHAKE_AND_SHARE',
+    });
+  }, [router]);
+
   return (
     <View
       style={{ width, height, position: 'absolute', top: 0, left: position }}
@@ -153,7 +162,7 @@ const ContactCardItem = ({
               overflow: 'hidden',
             }}
           >
-            <TouchableOpacity onPress={openShakeShare}>
+            <TouchableOpacity onPress={openContactCard}>
               <ContactCard
                 profile={profile}
                 height={Math.min(height, height)}

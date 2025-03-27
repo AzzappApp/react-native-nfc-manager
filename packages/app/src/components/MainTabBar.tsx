@@ -24,7 +24,6 @@ import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
 import { HomeIcon } from './HomeIcon';
 import { useRouter } from './NativeRouter';
-import { openShakeShare } from './ShakeShare';
 import type { BottomMenuItem } from '#ui/BottomMenu';
 import type { ReactNode } from 'react';
 
@@ -92,7 +91,9 @@ const MainTabBar = ({
 
       switch (key) {
         case 'SHARE':
-          openShakeShare();
+          router.push({
+            route: 'SHAKE_AND_SHARE',
+          });
           break;
         case 'SCAN':
           router.push({

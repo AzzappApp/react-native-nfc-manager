@@ -38,6 +38,7 @@ import PostLikesScreen from '#screens/PostLikesScreen/PostLikesScreen';
 import PostScreen from '#screens/PostScreen';
 import ResetPasswordScreen from '#screens/ResetPasswordScreen';
 import SearchScreen from '#screens/SearchScreen';
+import ShakeAndShareScreen from '#screens/ShakeAndShareScreen';
 import SignInScreen from '#screens/SignInScreen';
 import SignUpScreen from '#screens/SignUpScreen';
 import TitleTextModuleWebCardEditionScreen from '#screens/TitleTextModuleWebCardEditionScreen';
@@ -100,6 +101,7 @@ const screens = {
   WEBCARD_PARAMETERS: WebCardParametersScreen,
   WEBCARD_TEMPLATE_SELECTION: WebCardTemplateSelectionScreen,
   CONTACTS_BY_LOCATION: ContactsByLocationScreen,
+  SHAKE_AND_SHARE: ShakeAndShareScreen,
 } satisfies ScreenMap;
 
 export default screens;
