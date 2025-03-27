@@ -8,3 +8,5 @@ const googleSignin = oauthSignin({
 });
 
 export { googleSignin as GET };
+
+export const runtime = 'nodejs';

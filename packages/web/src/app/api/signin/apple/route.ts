@@ -160,3 +160,5 @@ const appleSignin = async (req: Request) => {
 };
 
 export const { POST, OPTIONS } = cors({ POST: withPluginsRoute(appleSignin) });
+
+export const runtime = 'nodejs';

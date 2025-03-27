@@ -10,3 +10,5 @@ const googleSigninCallback = oauthSigninCallback({
 });
 
 export { googleSigninCallback as GET };
+
+export const runtime = 'nodejs';

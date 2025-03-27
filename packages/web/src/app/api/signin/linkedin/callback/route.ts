@@ -10,3 +10,5 @@ const linkedInSigninCallback = oauthSigninCallback({
 });
 
 export { linkedInSigninCallback as GET };
+
+export const runtime = 'nodejs';

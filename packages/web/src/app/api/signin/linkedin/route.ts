@@ -8,3 +8,5 @@ const linkedInSignin = oauthSignin({
 });
 
 export { linkedInSignin as GET };
+
+export const runtime = 'nodejs';
