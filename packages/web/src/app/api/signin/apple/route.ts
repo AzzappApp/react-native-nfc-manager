@@ -54,7 +54,6 @@ const appleSignin = async (req: Request) => {
     );
   }
   const appleId = payload.sub;
-  console.log(payload);
   if (!appleId) {
     console.error('Apple Sign In: Invalid token');
     return NextResponse.json(
