@@ -6,10 +6,12 @@ import {
 } from '@shopify/react-native-skia';
 import { File, Paths } from 'expo-file-system/next';
 import { Platform } from 'react-native';
+import { getVideoMetaData } from 'react-native-compressor';
 import {
   exportVideoComposition,
   getValidEncoderConfigurations,
 } from '@azzapp/react-native-skia-video';
+import { COVER_MAX_HEIGHT, COVER_MAX_WIDTH } from '@azzapp/shared/coverHelpers';
 import { MEMORY_SIZE } from '#helpers/device';
 import {
   createRandomFileName,
@@ -34,6 +36,51 @@ import type { EditionParameters } from './EditionParameters';
 import type { TextureInfo } from './NativeTextureLoader';
 import type { Filter } from '@azzapp/shared/filtersHelper';
 import type { SkColor } from '@shopify/react-native-skia';
+
+export const createVideoThumbnail = async ({
+  uri,
+  format,
+  quality,
+  previewPositionPercentage,
+}: {
+  uri: string;
+  format: ImageFormat;
+  quality: number;
+  previewPositionPercentage?: number | null;
+  backgroundColor?: SkColor;
+}) => {
+  const metadata = await getVideoMetaData(uri);
+
+  const { key, promise } = NativeTextureLoader.loadVideoThumbnail(
+    uri,
+    previewPositionPercentage
+      ? (metadata.duration * previewPositionPercentage) / 100
+      : 0,
+    {
+      width: COVER_MAX_HEIGHT,
+      height: COVER_MAX_WIDTH,
+    },
+  );
+  NativeTextureLoader.ref(key);
+  const sourceImage = createImageFromNativeTexture(await promise);
+  if (!sourceImage) {
+    NativeTextureLoader.unref(key);
+    throw new Error('Image not found');
+  }
+
+  const blob = await sourceImage.encodeToBytes(format, quality);
+  const ext =
+    format === ImageFormat.JPEG ? 'jpg' : ImageFormat.PNG ? 'png' : 'webp';
+
+  const path = Paths.cache.uri + createRandomFileName(ext);
+  const file = new File(path);
+  file.create();
+  file.write(blob);
+
+  NativeTextureLoader.unref(uri);
+
+  return path;
+};
 
 export const saveTransformedImageToFile = async ({
   uri,

@@ -22,6 +22,7 @@ import {
 
 import { colors, fontFamilies, shadow } from '#theme';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
+import { getLocalCachedMediaFile } from '#helpers/mediaHelpers/remoteMediaCache';
 import { HOME_ICON_COVER_WIDTH } from './constants';
 import { useCoverUpload } from './CoverEditor/CoverUploadContext';
 import CoverRendererUploadingProgress from './CoverRendererUploadingProgress';
@@ -175,11 +176,12 @@ const CoverRenderer = (
     coverKey ?? null,
   ) ?? {};
 
-  const { coverwebCardIdUploading } = useCoverUpload();
+  const { coverUploadingData } = useCoverUpload();
 
   const { __typename, uri, thumbnail, smallURI, smallThumbnail } =
     coverMedia ?? {};
-  const isVideoMedia = __typename === 'MediaVideo';
+  const isVideoMedia =
+    coverUploadingData?.mediaKind ?? __typename === 'MediaVideo';
 
   //#region Styles and media sources
   const borderRadius: number = large ? 0 : COVER_CARD_RADIUS * width;
@@ -195,14 +197,24 @@ const CoverRenderer = (
 
   const coverSource = useMemo(
     () =>
-      mediaUri && coverMedia?.id
+      coverUploadingData
         ? {
-            uri: mediaUri,
+            mediaId: coverUploadingData.mediaId,
+            uri:
+              getLocalCachedMediaFile(
+                coverUploadingData.mediaId,
+                coverUploadingData.mediaKind,
+              ) ?? '',
             requestedSize,
-            mediaId: coverMedia?.id,
           }
-        : null,
-    [mediaUri, coverMedia?.id, requestedSize],
+        : mediaUri && coverMedia?.id
+          ? {
+              uri: mediaUri,
+              requestedSize,
+              mediaId: coverMedia?.id,
+            }
+          : null,
+    [coverUploadingData, mediaUri, coverMedia?.id, requestedSize],
   );
 
   const styles = useStyleSheet(stylesheet);
@@ -385,7 +397,7 @@ const CoverRenderer = (
           </View>
         )}
       </View>
-      {!isSmallCover && coverwebCardIdUploading === webCardId && (
+      {!isSmallCover && coverUploadingData?.webCardId === webCardId && (
         <View
           style={[
             StyleSheet.absoluteFill,

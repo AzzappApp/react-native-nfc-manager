@@ -1,5 +1,6 @@
+import * as Sentry from '@sentry/react-native';
 import { FileSystemUploadType, UploadTask } from 'expo-file-system';
-import React, { createContext, useState, useContext, useMemo } from 'react';
+import { createContext, useState, useContext, useMemo } from 'react';
 import * as mime from 'react-native-mime-types';
 import { getFileName } from '#helpers/fileHelpers';
 import type { ReactNode } from 'react';
@@ -7,15 +8,19 @@ import type { ReactNode } from 'react';
 // Define the context value type
 type CoverUploadContextType = {
   progress: number;
-  coverwebCardIdUploading: string | null;
-  startUpload: (
-    path: string,
-    uploadURL: string,
-    uploadParameters: Record<string, any>,
-    kind: 'image' | 'video',
-    webCardId: string,
-    onComplete: () => Promise<void>,
-  ) => Promise<void>;
+  coverUploadingData: {
+    webCardId: string;
+    mediaId: string;
+    mediaKind: 'image' | 'video';
+  } | null;
+  startUpload: (args: {
+    path: string;
+    uploadURL: string;
+    uploadParameters: Record<string, any>;
+    kind: 'image' | 'video';
+    webCardId: string;
+    onComplete: () => Promise<void>;
+  }) => Promise<void>;
 };
 
 // Create the context with a default value of `undefined`
@@ -36,19 +41,32 @@ export const ContextUploadProvider = ({
   // if parallel cover upload is required, refactor with object of progress by id
   const [progress, setProgress] = useState<number>(0);
   //if not null, that means a cover is being uploaded
-  const [coverwebCardIdUploading, setCoverwebCardIdUploading] = useState<
-    string | null
-  >(null);
+  const [coverUploadingData, setCoverUploadingData] = useState<{
+    webCardId: string;
+    mediaId: string;
+    mediaKind: 'image' | 'video';
+  } | null>(null);
 
-  const startUpload = async (
-    path: string,
-    uploadURL: string,
-    uploadParameters: Record<string, any>,
-    kind: 'image' | 'video',
-    coverId: string,
-    onComplete: () => Promise<void>,
-  ): Promise<void> => {
-    setCoverwebCardIdUploading(coverId);
+  const startUpload = async ({
+    path,
+    uploadURL,
+    uploadParameters,
+    kind,
+    webCardId,
+    onComplete,
+  }: {
+    path: string;
+    uploadURL: string;
+    uploadParameters: Record<string, any>;
+    kind: 'image' | 'video';
+    webCardId: string;
+    onComplete: () => Promise<void>;
+  }): Promise<void> => {
+    setCoverUploadingData({
+      webCardId,
+      mediaId: uploadParameters.public_id,
+      mediaKind: kind,
+    });
     try {
       const uploadTask = new UploadTask(
         uploadURL,
@@ -79,15 +97,20 @@ export const ContextUploadProvider = ({
       onComplete();
     } catch (error) {
       console.error('Upload failed:', error);
+      Sentry.captureException(error);
     } finally {
-      setCoverwebCardIdUploading(null);
+      setCoverUploadingData(null);
       setProgress(0);
     }
   };
 
   const routerInfiniteRenderHack = useMemo(
-    () => ({ progress, coverwebCardIdUploading, startUpload }),
-    [coverwebCardIdUploading, progress],
+    () => ({
+      progress,
+      coverUploadingData,
+      startUpload,
+    }),
+    [coverUploadingData, progress],
   );
 
   return (

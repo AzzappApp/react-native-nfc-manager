@@ -10,6 +10,10 @@ import type { RelayMockEnvironment } from 'relay-test-utils/lib/RelayModernMockE
 
 jest.mock('react-native-share', () => ({}));
 
+jest.mock('react-native-compressor', () => ({
+  getVideoMetaData: jest.fn(),
+}));
+
 describe('WebCardScreen', () => {
   const environment: RelayMockEnvironment = createMockEnvironment();
 

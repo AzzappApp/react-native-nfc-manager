@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react-native';
 import {
   ImageFormat,
   createPicture,
@@ -13,11 +14,13 @@ import {
   getValidEncoderConfigurations,
 } from '@azzapp/react-native-skia-video';
 import { waitTime } from '@azzapp/shared/asyncHelpers';
+import { DEFAULT_VIDEO_PERCENTAGE_THUMBNAIL } from '@azzapp/shared/imagesHelpers';
 import { onChangeWebCard } from '#helpers/authStore';
 import {
   createRandomFileName,
   createRandomFilePath,
 } from '#helpers/fileHelpers';
+import { createVideoThumbnail } from '#helpers/mediaEditions';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadSign } from '#helpers/MobileWebAPI';
 import coverDrawer, { coverTransitions } from './coverDrawer';
@@ -130,14 +133,29 @@ const useSaveCover = (
     });
     const public_id = uploadParameters.public_id;
     addLocalCachedMediaFile(public_id, kind, path);
+    try {
+      if (kind === 'video') {
+        const thumbnail = await createVideoThumbnail({
+          uri: path,
+          format: ImageFormat.WEBP,
+          quality: 95,
+          previewPositionPercentage:
+            coverEditorState.coverPreviewPositionPercentage ??
+            DEFAULT_VIDEO_PERCENTAGE_THUMBNAIL,
+        });
+        addLocalCachedMediaFile(public_id, 'image', thumbnail);
+      }
+    } catch (e) {
+      Sentry.captureException(e);
+    }
 
-    startUpload(
+    startUpload({
       path,
       uploadURL,
       uploadParameters,
       kind,
       webCardId,
-      async () => {
+      onComplete: async () => {
         const texts = coverEditorState.textLayers.map(({ text }) => text);
         const {
           backgroundColor,
@@ -211,7 +229,7 @@ const useSaveCover = (
           throw error;
         }
       },
-    );
+    });
     setSavingStatus('complete');
     setExportProgressIndicator(null);
   }, [commit, coverEditorState, startUpload, webCardId]);
