@@ -1,3 +1,7 @@
+## 1.9.0-canary.91
+
+* **fix:**  - **cover:** [#8091](https://github.com/AzzappApp/azzapp/pull/8091) display cover that is currently uploading ([#8105](https://github.com/AzzappApp/azzapp/pull/8105))
+
 ## 1.9.0-canary.90
 
 * **fix:**  - **shakeAndShare:** [#8070](https://github.com/AzzappApp/azzapp/pull/8070) set ShakeAndShare screen as relay screen ([#8083](https://github.com/AzzappApp/azzapp/pull/8083))
