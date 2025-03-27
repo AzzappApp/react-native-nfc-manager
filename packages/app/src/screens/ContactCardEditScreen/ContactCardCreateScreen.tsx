@@ -483,6 +483,7 @@ const ContactCardCreateScreen = ({
               router.push({ route: 'USER_PAY_WALL' });
             } else {
               Toast.show({
+                position: 'top',
                 type: 'error',
                 text1: intl.formatMessage({
                   defaultMessage:
