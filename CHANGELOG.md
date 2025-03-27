@@ -1,3 +1,7 @@
+## 1.9.0-canary.93
+
+* **fix:**  - **Oauth:** properly redirect
+
 ## 1.9.0-canary.92
 
 * **fix:**  - **EmailSignature:** new design ([#8111](https://github.com/AzzappApp/azzapp/pull/8111))
