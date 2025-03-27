@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/service",
-  "version": "1.9.0-canary.91",
+  "version": "1.9.0-canary.92",
   "private": true,
   "exports": {
     "./*": {

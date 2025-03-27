@@ -1,3 +1,7 @@
+## 1.9.0-canary.92
+
+* **fix:**  - **EmailSignature:** new design ([#8111](https://github.com/AzzappApp/azzapp/pull/8111))
+
 ## 1.9.0-canary.91
 
 * **fix:**  - **cover:** [#8091](https://github.com/AzzappApp/azzapp/pull/8091) display cover that is currently uploading ([#8105](https://github.com/AzzappApp/azzapp/pull/8105))
