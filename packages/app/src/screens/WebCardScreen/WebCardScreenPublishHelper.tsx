@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { buildReadableUserUrl } from '@azzapp/shared/urlHelpers';
+import { PAYMENT_IS_ENABLED } from '#Config';
 import { colors, shadow } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
 import {
@@ -88,9 +90,23 @@ const WebCardScreenPublishHelper = ({
     webCard?.subscription?.issuer === 'web',
   );
 
+  const intl = useIntl();
+
   const onPublish = () => {
     if (requiresSubscription && !isPremium) {
-      router.push({ route: 'USER_PAY_WALL' });
+      if (PAYMENT_IS_ENABLED) {
+        router.push({ route: 'USER_PAY_WALL' });
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage:
+              'You have reached the limit of contact cards or you can’t publish such type of contact card.',
+            description:
+              'Error toast message when reaching the limit of contact cards or trying to publish premium contact card on android',
+          }),
+        });
+      }
       return;
     }
 

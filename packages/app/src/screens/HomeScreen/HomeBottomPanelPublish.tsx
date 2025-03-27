@@ -39,7 +39,7 @@ const HomeBottomPanelPublish = ({ profile }: HomeBottomPanelPublishProps) => {
     ) as unknown as string,
   );
   const onSubscriptionError = useOnSubscriptionError(
-    profile.webCard?.subscription?.issuer === 'google',
+    profile.webCard?.subscription?.issuer === 'web',
   );
   const router = useRouter();
 

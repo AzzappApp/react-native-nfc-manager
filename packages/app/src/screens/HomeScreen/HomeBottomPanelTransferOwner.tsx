@@ -4,6 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, commitMutation } from 'react-relay';
 import ERRORS from '@azzapp/shared/errors';
+import { PAYMENT_IS_ENABLED } from '#Config';
 import { colors } from '#theme';
 import { useRouter } from '#components/NativeRouter';
 import { onChangeWebCard } from '#helpers/authStore';
@@ -65,9 +66,30 @@ const HomeBottomPanelTransferOwner = ({
       onError: error => {
         setLoading(false);
         if (error.message === ERRORS.SUBSCRIPTION_REQUIRED) {
-          router.push({
-            route: 'USER_PAY_WALL',
-          });
+          if (PAYMENT_IS_ENABLED) {
+            router.push({
+              route: 'USER_PAY_WALL',
+            });
+          } else {
+            Toast.show({
+              type: 'error',
+              text1: intl.formatMessage(
+                {
+                  defaultMessage:
+                    'You can’t accept ownership of this WebCard{azzappA}.',
+                  description:
+                    'Error toast message when trying to accept ownership of a WebCard without a subscription on android',
+                },
+                {
+                  azzappA: (
+                    <Text style={styles.icon} variant="azzapp">
+                      a
+                    </Text>
+                  ) as unknown as string,
+                },
+              ),
+            });
+          }
         } else if (error.message === ERRORS.SUBSCRIPTION_INSUFFICIENT_SEATS) {
           if (userSubscription?.issuer === 'web') {
             Toast.show({
@@ -79,9 +101,28 @@ const HomeBottomPanelTransferOwner = ({
                   'Error message when trying to activate multi-user on mobile when it is configured on the WebApp.',
               }),
             });
-          } else {
+          } else if (PAYMENT_IS_ENABLED) {
             router.push({
               route: 'USER_PAY_WALL',
+            });
+          } else {
+            Toast.show({
+              type: 'error',
+              text1: intl.formatMessage(
+                {
+                  defaultMessage:
+                    'You can’t accept ownership of this WebCard{azzappA}.',
+                  description:
+                    'Error toast message when trying to accept ownership of a WebCard without a subscription on android',
+                },
+                {
+                  azzappA: (
+                    <Text style={styles.icon} variant="azzapp">
+                      a
+                    </Text>
+                  ) as unknown as string,
+                },
+              ),
             });
           }
         } else {
