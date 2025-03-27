@@ -4,15 +4,19 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { runOnJS, useAnimatedReaction } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { useDebouncedCallback } from 'use-debounce';
-import { onChangeWebCard } from '#helpers/authStore';
+import { useRouter } from '#components/NativeRouter';
+import { getAuthState, onChangeWebCard } from '#helpers/authStore';
 import useBoolean from '#hooks/useBoolean';
-import useNotifications from '#hooks/useNotifications';
+import useNotificationsEvent, {
+  useNotificationsManager,
+} from '#hooks/useNotifications';
 import useScreenInsets from '#hooks/useScreenInsets';
 import useWidget from '#hooks/useWidget';
 import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
@@ -53,6 +57,7 @@ const HomeScreenContent = ({
             id
             cardIsPublished
             userName
+            coverIsPredefined
           }
           ...HomeBottomSheetPanel_profile
           ...HomeBottomSheetPopupPanel_profile
@@ -69,17 +74,65 @@ const HomeScreenContent = ({
     userKey,
   );
 
-  const onDeepLink = useCallback(
+  const router = useRouter();
+
+  const onDeepLinkInApp = useCallback(
     (deepLink: string) => {
-      if (deepLink === 'multiuser_invitation' || deepLink === 'shareBack') {
+      if (deepLink === 'multiuser_invitation') {
         refreshQuery?.();
       }
     },
     [refreshQuery],
   );
 
+  const changeWebCardTimeout = useRef<ReturnType<typeof setTimeout>>();
+  const onDeepLinkOpenedApp = useCallback(
+    (deepLink: string, extra: any) => {
+      if (deepLink === 'shareBack') {
+        if (extra.webCardId) {
+          const newProfile = user.profiles?.find(
+            p => p.webCard?.id === extra.webCardId,
+          );
+          const { profileInfos } = getAuthState();
+
+          if (newProfile && newProfile.id !== profileInfos?.profileId) {
+            changeWebCardTimeout.current = setTimeout(() => {
+              onChangeWebCard({
+                profileId: newProfile.id,
+                profileRole: newProfile.profileRole,
+                invited: newProfile.invited,
+                webCardId: newProfile.webCard?.id,
+                webCardUserName: newProfile.webCard?.userName,
+                cardIsPublished: newProfile.webCard?.cardIsPublished,
+                coverIsPredefined: newProfile.webCard?.coverIsPredefined,
+              });
+              router.push({
+                route: 'CONTACTS',
+              });
+            }, 350);
+            // 350ms, allows to bypass HomeProfile workaround timeout see related code:
+            // changeIndexTimeout.current = setTimeout(() => {
+            //   onSelectedIndexChangeLatest(index);
+            // }, 300);
+          } else {
+            router.push({
+              route: 'CONTACTS',
+            });
+          }
+        }
+      }
+    },
+    [router, user.profiles],
+  );
+  useEffect(() => clearTimeout(changeWebCardTimeout.current), []);
+
   const { notificationAuthorized, requestNotificationPermission } =
-    useNotifications(onDeepLink);
+    useNotificationsManager();
+
+  useNotificationsEvent({
+    onDeepLinkInApp,
+    onDeepLinkOpenedApp,
+  });
 
   //TODO: improve the way to ask for notificatino permission, for now, we are asking for notification permission if the user has a published card
   useEffect(() => {

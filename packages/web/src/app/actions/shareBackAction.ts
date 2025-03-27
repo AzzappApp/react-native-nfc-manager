@@ -2,6 +2,7 @@
 
 import { parseWithZod } from '@conform-to/zod';
 import * as Sentry from '@sentry/nextjs';
+import { toGlobalId } from 'graphql-relay';
 import { jwtDecode } from 'jwt-decode';
 import { parsePhoneNumberWithError } from 'libphonenumber-js';
 import { compressToEncodedURIComponent } from 'lz-string';
@@ -171,6 +172,7 @@ export const processShareBackSubmission = async (
       sound: 'default',
       deepLink: 'shareBack',
       locale: guessLocale(user?.locale),
+      extraData: { webCardId: toGlobalId('WebCard', profile.webCardId) },
     });
 
     if (contactMethod.method === CONTACT_METHODS.SMS) {

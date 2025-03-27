@@ -1,5 +1,5 @@
 import { GraphQLError } from 'graphql';
-import { fromGlobalId } from 'graphql-relay';
+import { fromGlobalId, toGlobalId } from 'graphql-relay';
 
 import {
   checkMedias,
@@ -216,6 +216,9 @@ const addContact: MutationResolvers['addContact'] = async (
           sound: 'default',
           deepLink: 'shareBack',
           locale: guessLocale(userToNotify?.locale),
+          extraData: {
+            webCardId: toGlobalId('WebCard', profileToNotify.webCardId),
+          },
         });
       }
     }

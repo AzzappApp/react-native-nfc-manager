@@ -25,7 +25,7 @@ const mutationConfig = (
   });
 };
 
-const useNotifications = (onDeepLink?: ((deepLink: string) => void) | null) => {
+export const useNotificationsManager = () => {
   const [status, setStatus] = useState<PermissionStatus>('unavailable');
 
   useEffect(() => {
@@ -84,13 +84,41 @@ const useNotifications = (onDeepLink?: ((deepLink: string) => void) | null) => {
     }
   }, [saveTokenToDatabase, status]);
 
+  return {
+    notificationAuthorized: status === 'granted' || status === 'limited',
+    requestNotificationPermission,
+  };
+};
+
+type DeeplinkCallbackType =
+  | ((deepLink: string, extraData?: any) => void)
+  | null;
+
+type useNotificationsEventProp = {
+  onDeepLinkInApp?: DeeplinkCallbackType;
+  onDeepLinkOpenedApp?: DeeplinkCallbackType;
+};
+
+const useNotificationsEvent = ({
+  onDeepLinkInApp,
+  onDeepLinkOpenedApp,
+}: useNotificationsEventProp) => {
   const handleDeepLink = useCallback(
-    (deepLink: object | string) => {
+    (
+      deepLink: object | string,
+      callback?: DeeplinkCallbackType,
+      extraData?: any,
+    ) => {
       if (typeof deepLink === 'string') {
-        onDeepLink?.(deepLink);
+        callback?.(
+          deepLink,
+          extraData && typeof extraData === 'string'
+            ? JSON.parse(extraData)
+            : extraData,
+        );
       }
     },
-    [onDeepLink],
+    [],
   );
 
   const router = useRouter();
@@ -98,16 +126,12 @@ const useNotifications = (onDeepLink?: ((deepLink: string) => void) | null) => {
     //on opening the app in background
     const unsubscribe = messaging().onNotificationOpenedApp(remoteMessage => {
       if (remoteMessage.data?.deepLink) {
-        handleDeepLink(remoteMessage.data?.deepLink);
+        handleDeepLink(
+          remoteMessage.data?.deepLink,
+          onDeepLinkOpenedApp,
+          remoteMessage.data?.extraData,
+        );
       }
-      // deactivate this part for now, as the wrong user is selected
-      // changing the active user does not really work when opening app with the home
-      // if (remoteMessage.data?.deepLink === 'shareBack') {
-      //   //open the router
-      //   // router.push({
-      //   //   route: 'CONTACTS',
-      //   // });
-      // }
     });
     // this is call when the app is in quit mode (kill)
     messaging()
@@ -115,29 +139,32 @@ const useNotifications = (onDeepLink?: ((deepLink: string) => void) | null) => {
       .then(remoteMessage => {
         if (remoteMessage) {
           if (remoteMessage.data?.deepLink) {
-            handleDeepLink(remoteMessage.data?.deepLink);
+            handleDeepLink(
+              remoteMessage.data?.deepLink,
+              onDeepLinkOpenedApp,
+              remoteMessage.data?.extraData,
+            );
           }
         }
       });
 
     return unsubscribe;
-  }, [handleDeepLink, router]);
+  }, [handleDeepLink, onDeepLinkInApp, onDeepLinkOpenedApp, router]);
 
   useEffect(() => {
     //on opening the app in background
     const unsubscribe = messaging().onMessage(remoteMessage => {
       if (remoteMessage.data?.deepLink) {
-        handleDeepLink(remoteMessage.data?.deepLink);
+        handleDeepLink(
+          remoteMessage.data?.deepLink,
+          onDeepLinkInApp,
+          remoteMessage.data?.extraData,
+        );
       }
     });
 
     return unsubscribe;
-  }, [handleDeepLink]);
-
-  return {
-    notificationAuthorized: status === 'granted' || status === 'limited',
-    requestNotificationPermission,
-  };
+  }, [handleDeepLink, onDeepLinkInApp]);
 };
 
 export const useDeleteNotifications = () => {
@@ -160,4 +187,4 @@ export const useDeleteNotifications = () => {
   return deleteFcmToken;
 };
 
-export default useNotifications;
+export default useNotificationsEvent;

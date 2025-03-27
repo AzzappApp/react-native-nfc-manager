@@ -9,7 +9,7 @@ import { useRouter } from '#components/NativeRouter';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import relayScreen from '#helpers/relayScreen';
 import useBoolean from '#hooks/useBoolean';
-import useNotifications from '#hooks/useNotifications';
+import useNotificationsEvent from '#hooks/useNotifications';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
@@ -32,6 +32,7 @@ const contactsScreenQuery = graphql`
         nbContacts
         ...ContactsScreenLists_contacts
         webCard {
+          id
           ...CoverRenderer_webCard
           ...AccountHeader_webCard
         }
@@ -58,15 +59,18 @@ const ContactsScreen = ({
     useBoolean();
 
   const onDeepLink = useCallback(
-    (deepLink: string) => {
-      if (deepLink === 'shareBack') {
+    (deepLink: string, extra: any) => {
+      if (
+        deepLink === 'shareBack' &&
+        extra.webCardId === profile?.webCard?.id
+      ) {
         refreshQuery?.();
       }
     },
-    [refreshQuery],
+    [profile?.webCard?.id, refreshQuery],
   );
 
-  useNotifications(onDeepLink);
+  useNotificationsEvent({ onDeepLinkInApp: onDeepLink });
 
   const onCreateWithScanner = useCallback(() => {
     closeNewContactMenu();

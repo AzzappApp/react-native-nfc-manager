@@ -47,12 +47,21 @@ type MessageType = {
   deepLink?: string; //maybe we could merge type and deepLink...
   locale: Locale;
   localeParams?: Record<string, string>;
+  extraData?: Record<string, string>;
 };
 
 export const sendPushNotification = externalFunction<
   (
     targetUserId: string,
-    { type, mediaId, sound, deepLink, locale, localeParams }: MessageType,
+    {
+      type,
+      mediaId,
+      sound,
+      deepLink,
+      locale,
+      localeParams,
+      extraData,
+    }: MessageType,
   ) => Promise<void>
 >('sendPushNotification');
 

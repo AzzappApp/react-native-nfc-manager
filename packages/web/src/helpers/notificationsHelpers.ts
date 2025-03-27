@@ -16,6 +16,7 @@ type MessageType = {
   deepLink?: string;
   locale: Locale;
   localeParams?: Record<string, string>;
+  extraData?: Record<string, any>;
 };
 export const sendPushNotification = async (
   targetUserId: string,
@@ -26,6 +27,7 @@ export const sendPushNotification = async (
     deepLink,
     locale,
     localeParams,
+    extraData,
   }: MessageType,
 ) => {
   const fcms = await getFcmTokensForUserId(targetUserId);
@@ -69,6 +71,7 @@ export const sendPushNotification = async (
               sound,
               'mutable-content': 1,
             },
+            extraData: JSON.stringify(extraData),
             deepLink,
           },
           fcm_options: {
@@ -82,6 +85,7 @@ export const sendPushNotification = async (
             image: imageUrl,
           },
           data: {
+            extraData: JSON.stringify(extraData),
             deepLink,
           },
         };
