@@ -18,8 +18,7 @@ const renderFullEmailSignature = ({
   saveContactMessage: string;
   saveContactURL?: string;
 }) => {
-  const avatarToUse = contact?.avatar || companyLogoUrl;
-  const avatarSection = avatarToUse
+  const avatarSection = contact?.avatar
     ? `
       <tr>
         <td colSpan="2" valign="top" style="padding-bottom: 10px;">
@@ -29,7 +28,7 @@ const renderFullEmailSignature = ({
               height: 60px;
               display: inline-block; 
               border-radius: 30px;" 
-            src="${avatarToUse}"
+            src="${contact?.avatar}"
           />
         </td>
       </tr>
@@ -133,9 +132,8 @@ const renderFullEmailSignature = ({
           .join('')
       : '';
 
-  const companyLogoSection =
-    contact?.avatar && companyLogoUrl
-      ? `
+  const companyLogoSection = companyLogoUrl
+    ? `
       <tr>
         <td colspan="2" style="padding: 0;">
           <img
@@ -149,7 +147,7 @@ const renderFullEmailSignature = ({
         </td>
       </tr>
     `
-      : '';
+    : '';
 
   return `
    <table

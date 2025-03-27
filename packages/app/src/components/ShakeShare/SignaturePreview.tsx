@@ -93,14 +93,13 @@ const SignaturePreview = ({ profile: profileKey }: SignaturePreviewProps) => {
   const logo =
     webCard?.isMultiUser && webCard?.logo ? webCard?.logo : profileLogo;
 
-  const avatarUriToUse = avatar || logo;
   return (
     <>
-      {avatarUriToUse && (
+      {avatar?.uri && (
         <MediaImageRenderer
           source={{
-            uri: avatarUriToUse.uri,
-            mediaId: avatarUriToUse.id ?? '',
+            uri: avatar.uri,
+            mediaId: avatar.id ?? '',
             requestedSize: AVATAR_WIDTH,
           }}
           style={styles.avatar}
@@ -184,7 +183,7 @@ const SignaturePreview = ({ profile: profileKey }: SignaturePreviewProps) => {
               </View>
             );
           })}
-          {avatar && logo?.uri && (
+          {logo?.uri && (
             <Image
               source={{ uri: logo.uri }}
               style={styles.logoImage}
