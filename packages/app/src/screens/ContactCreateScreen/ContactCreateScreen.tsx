@@ -202,6 +202,14 @@ const ContactCreateScreen = ({
       const logoId =
         logo === null ? null : logo?.local ? uploadedLogoId : logo?.id;
 
+      if (avatar?.local) {
+        addLocalCachedMediaFile(avatarId, 'image', avatar.uri);
+      }
+
+      if (logo?.local) {
+        addLocalCachedMediaFile(logoId, 'image', logo.uri);
+      }
+
       commit({
         variables: {
           profileId,
@@ -250,13 +258,6 @@ const ContactCreateScreen = ({
             : null,
         },
         onCompleted: () => {
-          if (avatarId && avatar?.uri) {
-            addLocalCachedMediaFile(
-              `${'image'.slice(0, 1)}:${avatarId}`,
-              'image',
-              avatar.uri,
-            );
-          }
           router.back();
         },
         updater: (store, response) => {

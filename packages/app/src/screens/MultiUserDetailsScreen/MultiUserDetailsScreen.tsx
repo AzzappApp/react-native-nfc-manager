@@ -236,6 +236,13 @@ const MultiUserDetailsScreen = ({
       const logoId =
         logo === null ? null : logo?.local ? uploadedLogoId : logo?.id;
 
+      if (avatar?.local && avatar && avatar?.uri) {
+        addLocalCachedMediaFile(avatarId, 'image', avatar.uri);
+      }
+      if (logo?.local && logoId && logo?.uri) {
+        addLocalCachedMediaFile(logoId, 'image', logo.uri);
+      }
+
       if (dirtyFields.role) Object.assign(input, { profileRole: role });
 
       commit({
@@ -262,20 +269,6 @@ const MultiUserDetailsScreen = ({
           }
         },
         onCompleted: () => {
-          if (avatar && avatar?.uri) {
-            addLocalCachedMediaFile(
-              `${'image'.slice(0, 1)}:${avatarId}`,
-              'image',
-              avatar.uri,
-            );
-          }
-          if (logo && logo?.uri) {
-            addLocalCachedMediaFile(
-              `${'image'.slice(0, 1)}:${logo}`,
-              'image',
-              logo.uri,
-            );
-          }
           router.back();
         },
         onError: e => {

@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/react-native';
 import { File, Paths } from 'expo-file-system/next';
 import { Platform } from 'react-native';
+import { getLocalCachedMediaFile } from './mediaHelpers/remoteMediaCache';
 import type { ContactDetailsModal_webCard$key } from '#relayArtifacts/ContactDetailsModal_webCard.graphql';
 import type { ContactsScreenLists_contacts$data } from '#relayArtifacts/ContactsScreenLists_contacts.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
@@ -65,7 +66,7 @@ export const buildLocalContact = async (
     updatedBirthDay = contact.dates;
   }
 
-  let avatar = null;
+  let avatar: File | undefined;
   try {
     let contactAvatar = null;
     if ('avatar' in contact) {
@@ -78,10 +79,17 @@ export const buildLocalContact = async (
       contactAvatar = contact?.logo;
     }
     if (contactAvatar) {
-      const file = new File(Paths.cache.uri + contactAvatar.id);
-      avatar = file.exists
-        ? file
-        : await File.downloadFileAsync(contactAvatar.uri, file);
+      const existingFile = getLocalCachedMediaFile(contactAvatar.id, 'image');
+      if (existingFile) {
+        avatar = new File(existingFile);
+      }
+
+      if (!avatar || !avatar.exists) {
+        avatar = new File(Paths.cache.uri + contactAvatar.id);
+        if (!avatar.exists) {
+          await File.downloadFileAsync(contactAvatar.uri, avatar);
+        }
+      }
     }
   } catch (e) {
     Sentry.captureException(e);

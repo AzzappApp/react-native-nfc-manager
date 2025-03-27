@@ -376,6 +376,13 @@ const ContactCardCreateScreen = ({
       const logoId =
         logo === null ? null : logo?.local ? uploadedLogoId : logo?.id;
 
+      if (avatar?.local) {
+        addLocalCachedMediaFile(avatarId, 'image', avatar.uri);
+      }
+      if (logo?.local) {
+        addLocalCachedMediaFile(logoId, 'image', logo.uri);
+      }
+
       commit({
         variables: {
           primaryColor: data.primaryColor ?? colors.grey400,
@@ -422,20 +429,6 @@ const ContactCardCreateScreen = ({
         },
         onCompleted: data => {
           setProgressIndicator(null);
-          if (avatarId && avatar?.uri) {
-            addLocalCachedMediaFile(
-              `${'image'.slice(0, 1)}:${avatarId}`,
-              'image',
-              avatar.uri,
-            );
-          }
-          if (logo && logo?.uri) {
-            addLocalCachedMediaFile(
-              `${'image'.slice(0, 1)}:${logoId}`,
-              'image',
-              logo.uri,
-            );
-          }
           const { profile } = data.createContactCard;
           if (!profile?.webCard) {
             throw new Error('WebCard not created');

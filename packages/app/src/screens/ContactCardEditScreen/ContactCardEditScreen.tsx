@@ -297,6 +297,13 @@ const ContactCardEditScreen = ({
     const logoId =
       logo === null ? null : logo?.local ? uploadedLogoId : logo?.id;
 
+    if (avatar?.local) {
+      addLocalCachedMediaFile(avatarId, 'image', avatar.uri);
+    }
+    if (logo?.local) {
+      addLocalCachedMediaFile(logoId, 'image', logo.uri);
+    }
+
     commit({
       variables: {
         profileId: id,
@@ -324,21 +331,6 @@ const ContactCardEditScreen = ({
       },
       onCompleted: () => {
         setProgressIndicator(null);
-        if (avatarId && avatar?.uri) {
-          addLocalCachedMediaFile(
-            `${'image'.slice(0, 1)}:${avatarId}`,
-            'image',
-            avatar.uri,
-          );
-        }
-        if (logo && logo?.uri) {
-          addLocalCachedMediaFile(
-            `${'image'.slice(0, 1)}:${logoId}`,
-            'image',
-            logo.uri,
-          );
-        }
-
         router.back();
       },
       updater: store => {

@@ -14,6 +14,7 @@ import {
 import { textStyles } from '#theme';
 import { createStyleSheet } from '#helpers/createStyles';
 import { prefixWithHttp, type ContactType } from './contactListHelpers';
+import { getLocalCachedMediaFile } from './mediaHelpers/remoteMediaCache';
 import type { Contact } from 'expo-contacts';
 import type { ColorSchemeName } from 'react-native';
 
@@ -368,11 +369,18 @@ export const buildVCardFromAzzappContact = async (contact: ContactType) => {
 
   const contactImageUrl = contact.avatar?.uri || contact.logo?.uri;
   const contactImageId = contact.avatar?.id || contact.logo?.id;
-  if (contactImageUrl && contactImageUrl.startsWith('http')) {
+  if (contactImageId && contactImageUrl && contactImageUrl.startsWith('http')) {
     try {
-      const file = new File(Paths.cache.uri + contactImageId);
-      if (!file.exists) {
-        await File.downloadFileAsync(contactImageUrl, file);
+      const existingFile = getLocalCachedMediaFile(contactImageId, 'image');
+      let file: File | undefined;
+      if (existingFile) {
+        file = new File(existingFile);
+      }
+      if (!file || !file.exists) {
+        file = new File(existingFile ?? Paths.cache.uri + contactImageId);
+        if (!file.exists) {
+          await File.downloadFileAsync(contactImageUrl, file);
+        }
       }
       const image = file.base64();
       if (image) {
