@@ -1,3 +1,8 @@
+## 1.9.0-canary.90
+
+* **fix:**  - **shakeAndShare:** [#8070](https://github.com/AzzappApp/azzapp/pull/8070) set ShakeAndShare screen as relay screen ([#8083](https://github.com/AzzappApp/azzapp/pull/8083))
+* **fix:**  - **payment:** [#8079](https://github.com/AzzappApp/azzapp/pull/8079) we don’t need webcard to pay ([#8106](https://github.com/AzzappApp/azzapp/pull/8106))
+
 ## 1.9.0-canary.89
 
 * **fix:**  - avoid duplicating contact card view count ([#8100](https://github.com/AzzappApp/azzapp/pull/8100))
