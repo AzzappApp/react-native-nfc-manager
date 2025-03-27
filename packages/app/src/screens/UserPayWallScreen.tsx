@@ -185,9 +185,7 @@ const UserPayWallScreen = ({
   const activateMultiUser = route.params?.activateFeature === 'MULTI_USER';
 
   const processOrder = useCallback(async () => {
-    const { profileInfos } = getAuthState();
-    const webCardId = profileInfos?.webCardId;
-    if (!selectedPurchasePackage || !webCardId) {
+    if (!selectedPurchasePackage) {
       return;
     }
     try {
