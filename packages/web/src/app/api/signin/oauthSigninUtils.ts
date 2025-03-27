@@ -54,9 +54,12 @@ const redirectToApp = (data: SigninInfos | { error: string }) => {
       : process.env.NEXT_PUBLIC_PLATFORM === 'staging'
         ? 'azzapp-staging'
         : 'azzapp';
-  NextResponse.redirect(`${appScheme}://login?data=${JSON.stringify(data)}`, {
-    status: 302,
-  });
+  return NextResponse.redirect(
+    `${appScheme}://login?data=${JSON.stringify(data)}`,
+    {
+      status: 302,
+    },
+  );
 };
 
 export const oauthSigninCallback =
