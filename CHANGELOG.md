@@ -1,3 +1,8 @@
+## 1.9.0-canary.97
+
+* **fix:**  - handle webCardId in deeplink ([#8107](https://github.com/AzzappApp/azzapp/pull/8107))
+* **feat:**  - **emailSignature:** integrate new email without preview attachment ([#8122](https://github.com/AzzappApp/azzapp/pull/8122))
+
 ## 1.9.0-canary.96
 
 * **perf:**  - **contact:** [#8115](https://github.com/AzzappApp/azzapp/pull/8115) make contact directly openable when avatar is present ([#8117](https://github.com/AzzappApp/azzapp/pull/8117))
