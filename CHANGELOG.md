@@ -1,3 +1,9 @@
+## 1.9.0-canary.96
+
+* **perf:**  - **contact:** [#8115](https://github.com/AzzappApp/azzapp/pull/8115) make contact directly openable when avatar is present ([#8117](https://github.com/AzzappApp/azzapp/pull/8117))
+* **fix:**  - **android:** missed cases where paywall is displayed ([#8112](https://github.com/AzzappApp/azzapp/pull/8112))
+* **fix:**  - **android:** [#8101](https://github.com/AzzappApp/azzapp/pull/8101) put toast on top ([#8109](https://github.com/AzzappApp/azzapp/pull/8109))
+
 ## 1.9.0-canary.95
 
 
