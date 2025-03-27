@@ -145,7 +145,6 @@ describe('generateEmailSignatureMutation', () => {
     expect(generateEmailSignature).toHaveBeenCalledWith({
       profile: expect.any(Object),
       webCard: expect.any(Object),
-      preview: 'testPreview',
       intl: mockContext.intl,
     });
 

@@ -9,6 +9,7 @@ import type { Profile, WebCard } from '@azzapp/data';
 
 jest.mock('../mediaServices', () => ({
   buildAvatarUrl: jest.fn(),
+  buildLogoUrl: jest.fn(),
 }));
 
 jest.mock('@azzapp/data', () => ({
@@ -171,45 +172,6 @@ describe('generateEmailSignature', () => {
         ],
       }),
     );
-    expect(result).toBe('https://signature.url');
-  });
-
-  it('sends email with attachment when preview is provided', async () => {
-    (buildAvatarUrl as jest.Mock).mockResolvedValue('https://avatar.url');
-    (serializeAndSignEmailSignature as jest.Mock).mockResolvedValue({
-      data: 'sig-data',
-      signature: 'sig-signature',
-    });
-    (serializeAndSignContactCard as jest.Mock).mockResolvedValue({
-      data: 'card-data',
-      signature: 'card-signature',
-    });
-    (buildEmailSignatureGenerationUrl as jest.Mock).mockReturnValue(
-      'https://signature.url',
-    );
-    (getUserById as jest.Mock).mockResolvedValue({ email: 'test@example.com' });
-
-    const result = await generateEmailSignature({
-      webCard: baseWebCard,
-      profile: baseProfile,
-      intl: mockIntl,
-      preview: 'preview-image-base64',
-    });
-
-    expect(sendTemplateEmail).toHaveBeenCalledWith(
-      expect.objectContaining({
-        attachments: [
-          {
-            filename: 'azzapp_contact.jpg',
-            content: 'preview-image-base64',
-            type: 'image/jpeg',
-            contentId: 'contact',
-            disposition: 'inline',
-          },
-        ],
-      }),
-    );
-
     expect(result).toBe('https://signature.url');
   });
 

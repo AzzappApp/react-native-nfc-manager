@@ -3,20 +3,20 @@ import { sendTemplateEmail } from '@azzapp/shared/emailHelpers';
 import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
 import serializeAndSignEmailSignature from '@azzapp/shared/serializeAndSignEmailSignature';
 import { buildEmailSignatureGenerationUrl } from '@azzapp/shared/urlHelpers';
-import { buildAvatarUrl } from './mediaServices';
+import { buildAvatarUrl, buildLogoUrl } from './mediaServices';
 import type { Profile, WebCard } from '@azzapp/data';
 import type { IntlShape } from '@formatjs/intl';
+
+const IMAGE_AVATAR_LOGO_WIDTH = 180;
 
 export const generateEmailSignature = async ({
   webCard,
   profile,
   intl,
-  preview,
 }: {
   webCard: WebCard;
   profile: Profile;
   intl: IntlShape;
-  preview?: string;
 }) => {
   if (!webCard.userName) {
     throw new Error('User name is required');
@@ -26,7 +26,14 @@ export const generateEmailSignature = async ({
     throw new Error('Contact card is required');
   }
 
-  const avatarUrl = await buildAvatarUrl(profile, null, false, false);
+  const avatarUrl = await buildAvatarUrl(
+    profile,
+    null,
+    false,
+    false,
+    IMAGE_AVATAR_LOGO_WIDTH,
+  );
+  const logoUrl = await buildLogoUrl(profile, webCard, IMAGE_AVATAR_LOGO_WIDTH);
   const { data, signature } = await serializeAndSignEmailSignature(
     webCard.userName,
     profile.id,
@@ -62,6 +69,27 @@ export const generateEmailSignature = async ({
         {
           to: user.email,
           dynamicTemplateData: {
+            avatarUrl,
+            logoUrl,
+            name: `${profile.contactCard.firstName ?? ''} ${profile.contactCard.lastName ?? ''}`.trim(),
+            jobTitle: profile.contactCard.title,
+            company: webCard.isMultiUser
+              ? (webCard.commonInformation?.company ??
+                profile.contactCard.company)
+              : profile.contactCard.company,
+            saveMyContact: intl.formatMessage({
+              defaultMessage: 'Save my Contact',
+              id: 'QpZ1Iw',
+              description: 'Save my Contact link in the email signature',
+            }),
+            phoneNumbers: (webCard.isMultiUser
+              ? (webCard.commonInformation?.phoneNumbers ?? [])
+              : []
+            ).concat(profile.contactCard.phoneNumbers ?? []),
+            emails: (webCard.isMultiUser
+              ? (webCard.commonInformation?.emails ?? [])
+              : []
+            ).concat(profile.contactCard.emails ?? []),
             linkUrl,
             subject: intl.formatMessage({
               defaultMessage: 'Elevate your email signature',
@@ -70,33 +98,29 @@ export const generateEmailSignature = async ({
                 'Subject of the email sent to the user when generating an email signature',
             }),
             title: intl.formatMessage({
-              defaultMessage: 'Your Dynamic Email Signature is Ready',
+              defaultMessage: 'Elevate Your Email Signature 🚀y',
               id: 'BYBLJq',
               description:
                 'Title of the email sent to the user when generating an email signature',
             }),
-            embrace: intl.formatMessage({
-              defaultMessage:
-                'Embrace the benefits of a custom dynamic email signature',
+            hello: intl.formatMessage({
+              defaultMessage: `Hello,<br/>
+<br/>
+We hope this email finds you well! At azzapp, we're always looking for ways to help you make a lasting impression, and your email signature is no exception. We believe that a professional and engaging signature speaks volumes about you and your business.<br/>
+<br/>
+That's why we're excited to introduce two fantastic ways for you to enhance your email signature effortlessly:`,
               id: 'Ac75RT',
-              description:
-                'Embrace the benefits of a custom dynamic email signature',
-            }),
-            start: intl.formatMessage({
-              defaultMessage: ` Start using now a dynamic email signature and allow email recipients to instantly save your details directly to their phone (and possibly share with others).<br/><br/> > Maximise networking<br/> > Enable two-way contact sharing to collect leads<br/> > Drive clicks to your social networks, website…<br/> > Make a lasting impression<br/> `,
-              id: '2tKhB9',
-              description:
-                'Start of the email sent to the user when generating an email signature',
+              description: 'Introduction of email signature',
             }),
             option1: intl.formatMessage({
-              defaultMessage: 'Option 1: Add a "Save my Contact" Button',
+              defaultMessage: 'Option 1: Add a "Save my Contact" link',
               id: '5e+Gsa',
               description:
-                'Option 1: Add a "Save my Contact" button to your email signature',
+                'Option 1: Add a "Save my Contact" link to your email signature',
             }),
             option1Step1: intl.formatMessage({
               defaultMessage:
-                'If you are happy with your email signature and wish to enhance efficiency, you can easily add a "Save my Contact" button. This feature allows your recipients to save your contact information with a single click.',
+                'If you already have a signature and wish to give it a modern twist, you can easily add a "Save my Contact" link. This feature allows your recipients to save your contact information with a single click.',
               id: 'kMupCi',
               description:
                 'Content of the option 1: If you are happy with your email signature ',
@@ -109,20 +133,20 @@ export const generateEmailSignature = async ({
                 'Content of the option 1: Simply tap on the button below',
             }),
             option1Action: intl.formatMessage({
-              defaultMessage: 'Add “Save my Contact” button',
+              defaultMessage: 'Add “Save my Contact” link',
               id: 'W4euwn',
               description:
-                'Action button to add "Save my Contact" button to the email signature',
+                'Action button to add "Save my Contact" link to the email signature',
             }),
             option2: intl.formatMessage({
-              defaultMessage: 'Option 2: Generate a dynamic email signature',
+              defaultMessage: 'Option 2: Add a complete signature',
               id: 'NA71Zb',
               description:
-                'Option 2: Generate a dynamic email signature for the email signature',
+                'Option 2: Generate a complete email signature for the email signature',
             }),
             option2Step1: intl.formatMessage({
               defaultMessage:
-                'If you want a complete email signature, we have a stunning signature design for you to consider.',
+                'For those looking for a complete signature overhaul, we have a stunning signature design for you to consider.',
               id: 'sQMAEW',
               description:
                 'Content of the option 2: If you want a complete email signature',
@@ -139,7 +163,13 @@ export const generateEmailSignature = async ({
               description: 'Action button to add a new signature to the email',
             }),
             believe: intl.formatMessage({
-              defaultMessage: ` We believe these enhancements will not only add a modern touch to your emails but also make it easier for your contacts to connect with you.<br/> <br/> Thank you for choosing azzapp to elevate your email experience.<br/> `,
+              defaultMessage: `We believe these enhancements will not only add a personal touch to your emails but also make it easier for your contacts to connect with you.<br/>
+<br/>
+Thank you for choosing azzapp to elevate your email experience.<br/>
+<br/>
+Best regards<br/>
+<br/>
+The azzapp Team`,
               id: 'EDZb54',
               description:
                 'End of the email sent to the user when generating an email signature',
@@ -160,21 +190,9 @@ export const generateEmailSignature = async ({
                 year: new Date().getFullYear(),
               },
             ),
-            hide_contact_image: !preview,
           },
         },
       ],
-      attachments: preview
-        ? [
-            {
-              filename: 'azzapp_contact.jpg',
-              content: preview,
-              type: 'image/jpeg',
-              contentId: 'contact',
-              disposition: 'inline',
-            },
-          ]
-        : undefined,
     });
   }
 

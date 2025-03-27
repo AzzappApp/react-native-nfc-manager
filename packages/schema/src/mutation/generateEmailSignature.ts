@@ -8,11 +8,7 @@ import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#__generated__/types';
 
 const generateEmailSignatureMutation: MutationResolvers['generateEmailSignature'] =
-  async (
-    _parent,
-    { profileId: gqlProfileId, config: { preview } },
-    { intl },
-  ) => {
+  async (_parent, { profileId: gqlProfileId }, { intl }) => {
     const { userId } = getSessionInfos();
 
     if (!userId) {
@@ -42,7 +38,6 @@ const generateEmailSignatureMutation: MutationResolvers['generateEmailSignature'
     const linkUrl = await generateEmailSignature({
       profile,
       webCard,
-      preview,
       intl,
     });
 

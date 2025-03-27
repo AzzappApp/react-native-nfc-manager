@@ -4,16 +4,14 @@ import {
   Canvas,
   fitbox,
   Group,
-  ImageFormat,
   ImageSVG,
-  makeImageFromView,
   Paint,
   rect,
   Skia,
 } from '@shopify/react-native-skia';
 import * as Clipboard from 'expo-clipboard';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Suspense, useCallback, useEffect, useRef } from 'react';
+import { Suspense, useCallback, useEffect } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
   ActivityIndicator,
@@ -93,17 +91,14 @@ const ShakeAndShareScreen = ({
   const [commit, isGeneratingEmail] = useMutation(graphql`
     mutation ShakeAndShareScreenGenerateEmailSignatureMutation(
       $profileId: ID!
-      $config: GenerateEmailSignatureInput!
     ) {
-      generateEmailSignature(config: $config, profileId: $profileId) {
+      generateEmailSignature(profileId: $profileId) {
         url
       }
     }
   `);
 
   const intl = useIntl();
-
-  const emailSignatureRef = useRef<View>(null);
 
   const generateEmailSignature = useCallback(async () => {
     if (!currentUser?.email) {
@@ -118,17 +113,11 @@ const ShakeAndShareScreen = ({
       });
       return;
     }
-    if (profile?.id && webCard?.id && emailSignatureRef.current) {
-      const image = await makeImageFromView(emailSignatureRef);
-      const base64 = image?.encodeToBase64(ImageFormat.JPEG, 100);
-
+    if (profile?.id && webCard?.id) {
       logEvent('generate_email_signature');
       commit({
         variables: {
           profileId: profile.id,
-          config: {
-            preview: base64 ?? '',
-          },
         },
         onCompleted: () => {
           Toast.show({
@@ -292,11 +281,7 @@ const ShakeAndShareScreen = ({
               </Text>
               {profile && (
                 <View style={styles.signaturePreview}>
-                  <View
-                    ref={emailSignatureRef}
-                    collapsable={false}
-                    style={styles.viewShotBackgroundColor}
-                  >
+                  <View style={styles.viewShotBackgroundColor}>
                     <SignaturePreview profile={profile} />
                   </View>
                 </View>
