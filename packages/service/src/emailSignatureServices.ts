@@ -1,4 +1,5 @@
 import { getUserById } from '@azzapp/data';
+import { colors, isColorTooLight } from '@azzapp/shared/colorsHelpers';
 import { sendTemplateEmail } from '@azzapp/shared/emailHelpers';
 import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
 import serializeAndSignEmailSignature from '@azzapp/shared/serializeAndSignEmailSignature';
@@ -103,6 +104,7 @@ export const generateEmailSignature = async ({
               description:
                 'Title of the email sent to the user when generating an email signature',
             }),
+            titleColor: getEmailSignatureTitleColor(webCard),
             hello: intl.formatMessage({
               defaultMessage: `Hello,<br/>
 <br/>
@@ -197,4 +199,12 @@ The azzapp Team`,
   }
 
   return linkUrl;
+};
+
+export const getEmailSignatureTitleColor = (webCard: WebCard) => {
+  let titleColor = webCard.cardColors?.primary ?? colors.black;
+  if (isColorTooLight(titleColor)) {
+    titleColor = '#54535B'; // grey800
+  }
+  return titleColor;
 };

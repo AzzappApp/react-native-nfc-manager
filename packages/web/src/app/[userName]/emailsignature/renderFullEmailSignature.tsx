@@ -1,4 +1,4 @@
-import chroma from 'chroma-js';
+import { getEmailSignatureTitleColor } from '@azzapp/service/emailSignatureServices';
 import { colors } from '@azzapp/shared/colorsHelpers';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
 import renderSaveMyContactButton from './renderSaveMyContactButton';
@@ -52,11 +52,7 @@ const renderFullEmailSignature = ({
     </tr>
   `;
 
-  let titleColor = webCard.cardColors?.primary ?? colors.black;
-  const rgba = chroma(titleColor).rgba();
-  if (rgba[0] * 0.299 + rgba[1] * 0.587 + rgba[2] * 0.114 > 186) {
-    titleColor = '#54535B';
-  }
+  const titleColor = getEmailSignatureTitleColor(webCard);
 
   const titleSection = contact?.title
     ? `<tr valign="top">
