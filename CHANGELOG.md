@@ -1,3 +1,8 @@
+## 1.9.0-canary.108
+
+* **fix:**  - add camera-vision patch to avoid crash ([#8158](https://github.com/AzzappApp/azzapp/pull/8158))
+* **build:**  - use nodejs runtime to send notifications
+
 ## 1.9.0-canary.107
 
 * **build:**  - add missing signin key
