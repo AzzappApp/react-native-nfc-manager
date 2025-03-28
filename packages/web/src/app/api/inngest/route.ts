@@ -19,3 +19,5 @@ export const { GET, POST, PUT } = serve({
     notifyWebCardUser,
   ],
 });
+
+export const runtime = 'nodejs';
