@@ -267,7 +267,7 @@ const WebCardEditScreen = ({
   const intl = useIntl();
   const { bottom } = useScreenInsets();
   useEffect(() => {
-    if (!webCard?.cardIsPublished && webCard?.cardModules?.length) {
+    if (!webCard?.cardIsPublished && webCard?.cardModules?.length && editing) {
       Toast.show({
         type: 'info',
         bottomOffset: bottom + BOTTOM_MENU_HEIGHT,
@@ -287,13 +287,15 @@ const WebCardEditScreen = ({
           showClose: true,
         },
       });
+    } else {
+      Toast.hide();
     }
 
     return () => {
       Toast.hide();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [editing]);
   //#endregion
 
   const { width: windowWidth } = useScreenDimensions();
