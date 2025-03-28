@@ -1,3 +1,7 @@
+## 1.9.0-canary.105
+
+* **fix:**  - **payment:** [#8086](https://github.com/AzzappApp/azzapp/pull/8086) display paywall on top of other modals ([#8128](https://github.com/AzzappApp/azzapp/pull/8128))
+
 ## 1.9.0-canary.104
 
 * **fix:**  - **authent:** remove suffix in scheme
