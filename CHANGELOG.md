@@ -1,3 +1,7 @@
+## 1.9.0-canary.99
+
+* **fix:**  - **payment:** wrong type in id reading ([#8130](https://github.com/AzzappApp/azzapp/pull/8130))
+
 ## 1.9.0-canary.98
 
 * **fix:**  - add safety check ([#8129](https://github.com/AzzappApp/azzapp/pull/8129))
