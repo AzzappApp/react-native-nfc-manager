@@ -59,7 +59,6 @@ import { useWebCardEditTransition } from './WebCardEditTransition';
 import WebCardPostsList from './WebCardPostsList';
 import WebCardScreenButtonBar from './WebCardScreenButtonBar';
 import WebCardScreenContent from './WebCardScreenContent';
-import WebCardScreenPublishHelper from './WebCardScreenPublishHelper';
 import type { ScreenOptions } from '#components/NativeRouter';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { WebCardScreenByIdQuery } from '#relayArtifacts/WebCardScreenByIdQuery.graphql';
@@ -420,9 +419,6 @@ export const WebCardScreen = ({
           isAdmin={isAdmin}
         />
       </Suspense>
-      <Suspense>
-        <WebCardScreenPublishHelper webCard={data.webCard} editing={editing} />
-      </Suspense>
     </View>
   );
 };
@@ -440,10 +436,8 @@ const webCardScreenByIdQuery = graphql`
       ...WebCardScreenContent_webCard
       ...WebCardScreenButtonBar_webCard
         @arguments(viewerWebCardId: $viewerWebCardId)
-      ...WebCardScreenPublishHelper_webCard
       ...WebCardBackground_webCard
       ...WebCardMenu_webCard @arguments(viewerWebCardId: $viewerWebCardId)
-      ...WebCardScreenPublishHelper_webCard
       ...AddContactModal_webCard
     }
   }
@@ -460,10 +454,8 @@ const webCardScreenByNameQuery = graphql`
       ...WebCardScreenContent_webCard
       ...WebCardScreenButtonBar_webCard
         @arguments(viewerWebCardId: $viewerWebCardId)
-      ...WebCardScreenPublishHelper_webCard
       ...WebCardBackground_webCard
       ...WebCardMenu_webCard @arguments(viewerWebCardId: $viewerWebCardId)
-      ...WebCardScreenPublishHelper_webCard
       ...AddContactModal_webCard
     }
   }
