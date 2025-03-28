@@ -80,7 +80,7 @@ export const createPaymentIntent: MutationResolvers['createPaymentIntent'] =
     }
 
     const webCardId = intent.webCardId
-      ? fromGlobalIdWithType(intent.webCardId, 'UserSubscription')
+      ? fromGlobalIdWithType(intent.webCardId, 'WebCard')
       : undefined;
     if (webCardId) {
       await checkWebCardProfileAdminRight(webCardId);
