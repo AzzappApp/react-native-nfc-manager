@@ -44,8 +44,6 @@ export const oauthSignin =
     url.searchParams.append('scope', 'profile email openid');
     url.searchParams.append('access_type', 'online');
 
-    console.log('Oauth redirect url', url.toString());
-
     return NextResponse.redirect(url.toString(), { status: 302 });
   };
 
@@ -184,7 +182,7 @@ export const oauthSigninCallback =
           termsOfUseAcceptedVersion: null,
           termsOfUseAcceptedAt: null,
           hasAcceptedCommunications: false,
-          emailConfirmed: googleProfile.email_verified ?? false,
+          emailConfirmed: true,
           phoneNumberConfirmed: false,
           appleId: null,
           userContactData,
