@@ -575,14 +575,13 @@ const UserPayWallScreen = ({
   );
 };
 
-UserPayWallScreen.getScreenOptions = (): ScreenOptions => ({
-  replaceAnimation: 'push',
-  stackAnimation: 'slide_from_bottom',
-});
-
 export default relayScreen(UserPayWallScreen, {
   query: userPayWallScreenQuery,
   pollInterval: 500,
+  getScreenOptions: () => ({
+    stackPresentation: 'fullScreenModal',
+    stackAnimation: 'slide_from_bottom',
+  }),
 });
 
 type OfferItemProps = {
