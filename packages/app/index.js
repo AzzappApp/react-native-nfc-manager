@@ -2,7 +2,7 @@ require('#helpers/reactIntlPolyfillHelper');
 import 'react-native-url-polyfill/auto';
 import messaging from '@react-native-firebase/messaging';
 import { AppRegistry } from 'react-native';
-import { name as appName } from './app.json';
+import { name as appName } from './app.config';
 import App from './src/App';
 
 messaging().setBackgroundMessageHandler(async () => {
