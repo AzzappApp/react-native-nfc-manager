@@ -31,6 +31,7 @@ import { useHomeScreenContext } from './HomeScreenContext';
 import Tooltips from './Tooltips';
 import type { HomeScreenContent_user$key } from '#relayArtifacts/HomeScreenContent_user.graphql';
 import type { CarouselSelectListHandle } from '#ui/CarouselSelectList';
+import type { NotificationType } from '@azzapp/shared/notificationHelpers';
 import type { Ref } from 'react';
 
 type HomeScreenContentProps = {
@@ -74,10 +75,8 @@ const HomeScreenContent = ({
     userKey,
   );
 
-  const router = useRouter();
-
   const onDeepLinkInApp = useCallback(
-    (deepLink: string) => {
+    (deepLink: NotificationType) => {
       if (deepLink === 'multiuser_invitation') {
         refreshQuery?.();
       }
@@ -85,45 +84,71 @@ const HomeScreenContent = ({
     [refreshQuery],
   );
 
-  const changeWebCardTimeout = useRef<ReturnType<typeof setTimeout>>();
-  const onDeepLinkOpenedApp = useCallback(
-    (deepLink: string, extra: any) => {
-      if (deepLink === 'shareBack') {
-        if (extra.webCardId) {
-          const newProfile = user.profiles?.find(
-            p => p.webCard?.id === extra.webCardId,
-          );
-          const { profileInfos } = getAuthState();
+  const router = useRouter();
 
-          if (newProfile && newProfile.id !== profileInfos?.profileId) {
-            changeWebCardTimeout.current = setTimeout(() => {
-              onChangeWebCard({
-                profileId: newProfile.id,
-                profileRole: newProfile.profileRole,
-                invited: newProfile.invited,
-                webCardId: newProfile.webCard?.id,
-                webCardUserName: newProfile.webCard?.userName,
-                cardIsPublished: newProfile.webCard?.cardIsPublished,
-                coverIsPredefined: newProfile.webCard?.coverIsPredefined,
-              });
-              router.push({
-                route: 'CONTACTS',
-              });
-            }, 350);
-            // 350ms, allows to bypass HomeProfile workaround timeout see related code:
-            // changeIndexTimeout.current = setTimeout(() => {
-            //   onSelectedIndexChangeLatest(index);
-            // }, 300);
-          } else {
-            router.push({
-              route: 'CONTACTS',
+  const changeWebCardTimeout = useRef<ReturnType<typeof setTimeout>>();
+
+  const redirectDeepLink = useCallback(
+    (deepLink: NotificationType, webCardId: string) => {
+      switch (deepLink) {
+        case 'shareBack':
+          router.push({
+            route: 'CONTACTS',
+          });
+          break;
+        case 'webCardUpdate':
+          router.push({
+            route: 'WEBCARD',
+            params: {
+              webCardId,
+            },
+          });
+          break;
+        default:
+          break;
+      }
+    },
+    [router],
+  );
+
+  const onDeepLinkOpenedApp = useCallback(
+    (deepLink: NotificationType, extraData?: object | string) => {
+      if (
+        typeof extraData === 'object' &&
+        'webCardId' in extraData &&
+        typeof extraData.webCardId === 'string'
+      ) {
+        const webCardId = extraData.webCardId;
+        const newProfile = user.profiles?.find(
+          p => p.webCard?.id === extraData.webCardId,
+        );
+        const { profileInfos } = getAuthState();
+
+        if (newProfile && newProfile.id !== profileInfos?.profileId) {
+          changeWebCardTimeout.current = setTimeout(() => {
+            onChangeWebCard({
+              profileId: newProfile.id,
+              profileRole: newProfile.profileRole,
+              invited: newProfile.invited,
+              webCardId: newProfile.webCard?.id,
+              webCardUserName: newProfile.webCard?.userName,
+              cardIsPublished: newProfile.webCard?.cardIsPublished,
+              coverIsPredefined: newProfile.webCard?.coverIsPredefined,
             });
-          }
+            redirectDeepLink(deepLink, webCardId);
+          }, 350);
+          // 350ms, allows to bypass HomeProfile workaround timeout see related code:
+          // changeIndexTimeout.current = setTimeout(() => {
+          //   onSelectedIndexChangeLatest(index);
+          // }, 300);
+        } else {
+          redirectDeepLink(deepLink, webCardId);
         }
       }
     },
-    [router, user.profiles],
+    [redirectDeepLink, user.profiles],
   );
+
   useEffect(() => clearTimeout(changeWebCardTimeout.current), []);
 
   const { notificationAuthorized, requestNotificationPermission } =

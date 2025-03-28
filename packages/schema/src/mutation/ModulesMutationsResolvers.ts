@@ -10,6 +10,7 @@ import {
   createCardModule,
   transaction,
   getCardModuleNextPosition,
+  updateWebCard,
 } from '@azzapp/data';
 import {
   MODULE_KIND_BLOCK_TEXT,
@@ -27,7 +28,7 @@ import {
   MODULE_KIND_TITLE_TEXT,
 } from '@azzapp/shared/cardModuleHelpers';
 import ERRORS from '@azzapp/shared/errors';
-import { invalidateWebCard } from '#externals';
+import { invalidateWebCard, notifyWebCardUsers } from '#externals';
 import { webCardLoader } from '#loaders';
 import { checkWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
@@ -52,10 +53,12 @@ const createModuleSavingMutation =
     const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
     await checkWebCardProfileEditorRight(webCardId);
 
-    let webCard = await webCardLoader.load(webCardId);
+    const webCard = await webCardLoader.load(webCardId);
     if (!webCard) {
       throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
     }
+
+    const previousUpdatedAt = webCard.updatedAt;
 
     const { validator, getMedias } = MODULES_SAVE_RULES[moduleKind] ?? {};
 
@@ -107,16 +110,15 @@ const createModuleSavingMutation =
             variant,
           });
         }
+        await updateWebCard(webCardId, { updatedAt: new Date() });
+
+        await notifyWebCardUsers(webCard, previousUpdatedAt);
       });
     } catch (e) {
       console.error(e);
       throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
     }
 
-    webCard = await webCardLoader.load(webCardId);
-    if (!webCard) {
-      throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
-    }
     if (webCard.userName) {
       invalidateWebCard(webCard.userName);
     }

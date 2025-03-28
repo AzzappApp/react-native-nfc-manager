@@ -2,6 +2,7 @@ import { externalFunction } from './GraphQLContext';
 import type { AddContactInput } from '#__generated__/types';
 import type { Profile, WebCard } from '@azzapp/data';
 import type { Locale } from '@azzapp/i18n';
+import type { NotificationType } from '@azzapp/shared/notificationHelpers';
 
 type Parameters = {
   profile?: Profile;
@@ -41,7 +42,7 @@ export const notifyGooglePassWallet = externalFunction<
 >('notifyGooglePassWallet');
 
 type MessageType = {
-  type: 'multiuser_invitation' | 'shareBack';
+  type: NotificationType;
   mediaId?: string | null;
   sound?: string;
   deepLink?: string; //maybe we could merge type and deepLink...
@@ -68,3 +69,8 @@ export const sendPushNotification = externalFunction<
 export const sendEmailSignatures = externalFunction<
   (profileIds: string[], webCard: WebCard) => Promise<void>
 >('sendEmailSignatures');
+
+export const notifyWebCardUsers =
+  externalFunction<
+    (webCardId: WebCard, previousUpdatedAt: Date) => Promise<void>
+  >('notifyWebCardUsers');

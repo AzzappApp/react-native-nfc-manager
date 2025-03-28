@@ -8,7 +8,7 @@ import {
 import ERRORS from '@azzapp/shared/errors';
 import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
 import { isValidUserName } from '@azzapp/shared/stringHelpers';
-import { invalidateWebCard } from '#externals';
+import { invalidateWebCard, notifyWebCardUsers } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
 import {
   profileByWebCardIdAndUserIdLoader,
@@ -50,6 +50,8 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
   if (!webCard) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
+
+  const previousUpdateDate = webCard.updatedAt;
 
   const partialWebCard: Partial<WebCard> = {
     ...profileUpdates,
@@ -138,6 +140,8 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
   try {
     await transaction(async () => {
       await updateWebCard(webCardId, partialWebCard);
+
+      await notifyWebCardUsers(webCard, previousUpdateDate);
       if (
         webCard.alreadyPublished &&
         previousUserName &&

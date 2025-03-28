@@ -8,7 +8,11 @@ import {
   createId,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
-import { invalidatePost, invalidateWebCard } from '#externals';
+import {
+  invalidatePost,
+  invalidateWebCard,
+  notifyWebCardUsers,
+} from '#externals';
 import { webCardLoader } from '#loaders';
 import { checkWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
@@ -40,6 +44,8 @@ const saveCover: MutationResolvers['saveCover'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
+  const previousUpdateDate = webCard.updatedAt;
+
   if (!texts || !mediaId || !backgroundColor) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
@@ -66,10 +72,13 @@ const saveCover: MutationResolvers['saveCover'] = async (
         coverId: createId(),
         coverIsPredefined: coverIsPredefined || false,
         coverIsLogoPredefined: false,
+        updatedAt: new Date(),
       };
       await updateWebCard(webCard.id, updates);
       updatedWebCard = { ...updatedWebCard, ...updates };
     });
+
+    await notifyWebCardUsers(webCard, previousUpdateDate);
 
     await notifyRelatedWalletPasses(webCardId, true);
 

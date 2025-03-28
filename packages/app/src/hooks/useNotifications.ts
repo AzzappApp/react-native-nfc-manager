@@ -8,6 +8,10 @@ import {
   requestNotifications,
 } from 'react-native-permissions';
 import { useMutation, graphql, commitMutation } from 'react-relay';
+import {
+  isSupportedNotificationType,
+  type NotificationType,
+} from '@azzapp/shared/notificationHelpers';
 import { useRouter } from '#components/NativeRouter';
 import type { PermissionStatus } from 'react-native-permissions';
 import type { Environment } from 'react-relay';
@@ -90,13 +94,13 @@ export const useNotificationsManager = () => {
   };
 };
 
-type DeeplinkCallbackType =
-  | ((deepLink: string, extraData?: any) => void)
+type DeepLinkCallbackType =
+  | ((deepLink: NotificationType, extraData?: object | string) => void)
   | null;
 
 type useNotificationsEventProp = {
-  onDeepLinkInApp?: DeeplinkCallbackType;
-  onDeepLinkOpenedApp?: DeeplinkCallbackType;
+  onDeepLinkInApp?: DeepLinkCallbackType;
+  onDeepLinkOpenedApp?: DeepLinkCallbackType;
 };
 
 const useNotificationsEvent = ({
@@ -105,18 +109,11 @@ const useNotificationsEvent = ({
 }: useNotificationsEventProp) => {
   const handleDeepLink = useCallback(
     (
-      deepLink: object | string,
-      callback?: DeeplinkCallbackType,
-      extraData?: any,
+      deepLink: NotificationType,
+      callback?: DeepLinkCallbackType,
+      extraData?: object | string,
     ) => {
-      if (typeof deepLink === 'string') {
-        callback?.(
-          deepLink,
-          extraData && typeof extraData === 'string'
-            ? JSON.parse(extraData)
-            : extraData,
-        );
-      }
+      callback?.(deepLink, extraData);
     },
     [],
   );
@@ -125,11 +122,11 @@ const useNotificationsEvent = ({
   useEffect(() => {
     //on opening the app in background
     const unsubscribe = messaging().onNotificationOpenedApp(remoteMessage => {
-      if (remoteMessage.data?.deepLink) {
+      if (isSupportedNotificationType(remoteMessage.data?.deepLink)) {
         handleDeepLink(
-          remoteMessage.data?.deepLink,
+          remoteMessage.data.deepLink,
           onDeepLinkOpenedApp,
-          remoteMessage.data?.extraData,
+          remoteMessage.data.extraData,
         );
       }
     });
@@ -138,11 +135,11 @@ const useNotificationsEvent = ({
       .getInitialNotification()
       .then(remoteMessage => {
         if (remoteMessage) {
-          if (remoteMessage.data?.deepLink) {
+          if (isSupportedNotificationType(remoteMessage.data?.deepLink)) {
             handleDeepLink(
-              remoteMessage.data?.deepLink,
+              remoteMessage.data.deepLink,
               onDeepLinkOpenedApp,
-              remoteMessage.data?.extraData,
+              remoteMessage.data.extraData,
             );
           }
         }
@@ -154,11 +151,11 @@ const useNotificationsEvent = ({
   useEffect(() => {
     //on opening the app in background
     const unsubscribe = messaging().onMessage(remoteMessage => {
-      if (remoteMessage.data?.deepLink) {
+      if (isSupportedNotificationType(remoteMessage.data?.deepLink)) {
         handleDeepLink(
-          remoteMessage.data?.deepLink,
+          remoteMessage.data.deepLink,
           onDeepLinkInApp,
-          remoteMessage.data?.extraData,
+          remoteMessage.data.extraData,
         );
       }
     });

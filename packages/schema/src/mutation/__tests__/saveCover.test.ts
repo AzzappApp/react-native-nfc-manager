@@ -6,7 +6,11 @@ import {
   updateWebCard,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
-import { invalidatePost, invalidateWebCard } from '#externals';
+import {
+  invalidatePost,
+  invalidateWebCard,
+  notifyWebCardUsers,
+} from '#externals';
 import { webCardLoader } from '#loaders';
 import { checkWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
@@ -26,6 +30,7 @@ jest.mock('@azzapp/data', () => ({
 jest.mock('#externals', () => ({
   invalidatePost: jest.fn(),
   invalidateWebCard: jest.fn(),
+  notifyWebCardUsers: jest.fn(),
 }));
 
 jest.mock('#loaders', () => ({
@@ -53,6 +58,7 @@ describe('saveCover', () => {
     id: 'webcard-123',
     userName: 'testUser',
     coverMediaId: 'old-media-id',
+    updatedAt: new Date('2021-01-01'),
   };
 
   const input = {
@@ -105,6 +111,7 @@ describe('saveCover', () => {
     );
     expect(updateWebCard).toHaveBeenCalledWith('webcard-123', {
       lastCardUpdate: expect.any(Date),
+      updatedAt: expect.any(Date),
       coverMediaId: 'new-media-id',
       coverBackgroundColor: '#ffffff',
       cardColors: {
@@ -133,12 +140,18 @@ describe('saveCover', () => {
     expect(invalidatePost).toHaveBeenCalledTimes(2);
     expect(invalidatePost).toHaveBeenCalledWith('testUser', 'post-1');
     expect(invalidatePost).toHaveBeenCalledWith('testUser', 'post-2');
+    expect(notifyWebCardUsers).toHaveBeenCalledWith(
+      mockWebCard,
+      mockWebCard.updatedAt,
+    );
 
     expect(result).toEqual({
       webCard: expect.objectContaining({
         id: 'webcard-123',
         coverMediaId: 'new-media-id',
         coverId: 'generated-cover-id',
+        lastCardUpdate: expect.any(Date),
+        updatedAt: expect.any(Date),
       }),
     });
   });

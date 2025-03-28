@@ -172,6 +172,15 @@ const { handleRequest } = createYoga({
           },
         });
       },
+      notifyWebCardUsers: async (webCard: WebCard, previousUpdatedAt: Date) => {
+        await inngest.send({
+          name: 'batch/webCardUsersNotification',
+          data: {
+            webCard,
+            previousUpdatedAt,
+          },
+        });
+      },
     };
   },
   plugins: [

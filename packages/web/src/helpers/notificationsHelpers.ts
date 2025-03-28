@@ -6,11 +6,12 @@ import {
 } from '@azzapp/shared/imagesHelpers';
 import { getServerIntl } from './i18nHelpers';
 import type { Locale } from '@azzapp/i18n';
+import type { NotificationType } from '@azzapp/shared/notificationHelpers';
 
 let accessToken: string | null = null;
 let tokenExpiry = 0;
 type MessageType = {
-  type: 'multiuser_invitation' | 'shareBack';
+  type: NotificationType;
   mediaId?: string | null;
   sound?: string; // sound is optionnal, default will use the default sound, for custom sound they have to be compiled with the app
   deepLink?: string;
@@ -71,7 +72,7 @@ export const sendPushNotification = async (
               sound,
               'mutable-content': 1,
             },
-            extraData: JSON.stringify(extraData),
+            extraData,
             deepLink,
           },
           fcm_options: {
@@ -85,7 +86,7 @@ export const sendPushNotification = async (
             image: imageUrl,
           },
           data: {
-            extraData: JSON.stringify(extraData),
+            extraData,
             deepLink,
           },
         };
@@ -158,7 +159,7 @@ async function getAccessToken() {
 }
 
 const getLabel = (
-  type: string,
+  type: NotificationType,
   locale: Locale,
   params?: Record<string, string>,
 ) => {
@@ -195,6 +196,30 @@ const getLabel = (
           id: 'rAeWtj',
           description: 'Push Notification body message for contact share back',
         }),
+      };
+    case 'webCardUpdate':
+      return {
+        title: intl.formatMessage(
+          {
+            defaultMessage: 'WebCard {webCardUserName} Update',
+            id: 'Klvd4Y',
+            description: 'Push Notification title for webcard update',
+          },
+          {
+            webCardUserName: params?.webCardUserName,
+          },
+        ),
+        body: intl.formatMessage(
+          {
+            defaultMessage:
+              'The WebCard {webCardUserName} has been updated. Click to view it.',
+            id: 'tE1mwA',
+            description: 'Push Notification body message for webcard update',
+          },
+          {
+            webCardUserName: params?.webCardUserName,
+          },
+        ),
       };
     default:
       //should not happen,
