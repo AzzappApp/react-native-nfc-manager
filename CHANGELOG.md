@@ -1,3 +1,7 @@
+## 1.9.0-canary.100
+
+
+
 ## 1.9.0-canary.99
 
 * **fix:**  - **payment:** wrong type in id reading ([#8130](https://github.com/AzzappApp/azzapp/pull/8130))
