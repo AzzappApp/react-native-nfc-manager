@@ -1,3 +1,9 @@
+## 1.9.0-canary.106
+
+* **feat:**  - Cookie settings management ([#8143](https://github.com/AzzappApp/azzapp/pull/8143))
+* **fix:**  - **EmailSignature:** reduce logo size
+* **fix:**  - imports on cliennt side
+
 ## 1.9.0-canary.105
 
 * **fix:**  - **payment:** [#8086](https://github.com/AzzappApp/azzapp/pull/8086) display paywall on top of other modals ([#8128](https://github.com/AzzappApp/azzapp/pull/8128))
