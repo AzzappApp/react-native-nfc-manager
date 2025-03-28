@@ -6,6 +6,10 @@ import {
 } from '@shopify/react-native-skia';
 import { ResizeMode, Video } from 'expo-av';
 import { Paths, File } from 'expo-file-system/next';
+import {
+  parsePhoneNumberFromString,
+  type CountryCode,
+} from 'libphonenumber-js';
 import { capitalize } from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -61,7 +65,6 @@ import type { ContactCardCreateScreenMutation } from '#relayArtifacts/ContactCar
 import type { ContactCardCreateScreenQuery } from '#relayArtifacts/ContactCardCreateScreenQuery.graphql';
 import type { ContactCardDetectorMutation$data } from '#relayArtifacts/ContactCardDetectorMutation.graphql';
 import type { ContactCardCreateRoute } from '#routes';
-import type { CountryCode } from 'libphonenumber-js';
 import type { ViewStyle } from 'react-native';
 
 const contactCardCreateScreenQuery = graphql`
@@ -167,9 +170,13 @@ const ContactCardCreateScreen = ({
       phoneNumbers: currentUser?.userContactData?.phoneNumber
         ? [
             {
+              label: 'Work',
               number: currentUser?.userContactData?.phoneNumber,
               selected: true,
-              countryCode: getLocales()[0].countryCode,
+              countryCode:
+                parsePhoneNumberFromString(
+                  currentUser?.userContactData?.phoneNumber,
+                )?.country || getLocales()[0].countryCode,
             },
           ]
         : [],
