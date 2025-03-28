@@ -101,9 +101,18 @@ const EmailSignaturePage = async ({
     webCard.isMultiUser && webCard.logoId != null
       ? webCard.logoId
       : profile.logoId;
-  const companyLogoUrl = companyLogo
-    ? getImageURLForSize({ id: companyLogo, height: 120, format: 'png' })
-    : null;
+  let companyLogoUrl: string | null;
+
+  if (companyLogo) {
+    const [companyLogoMedia] = await getMediasByIds([companyLogo]);
+    if (companyLogoMedia) {
+      companyLogoUrl = getImageURLForSize({
+        id: companyLogo,
+        width: (companyLogoMedia.width / companyLogoMedia.height) * 120,
+        format: 'png',
+      });
+    }
+  }
 
   const saveContactURL = buildUserUrlWithContactCard(
     webCard.userName,

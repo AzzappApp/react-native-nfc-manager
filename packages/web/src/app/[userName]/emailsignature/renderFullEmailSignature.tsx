@@ -128,12 +128,13 @@ const renderFullEmailSignature = ({
   const companyLogoSection = companyLogoUrl
     ? `
       <tr>
-        <td colspan="2" style="padding: 0; height: 60px;">
+        <td colspan="2" style="padding: 0; height: 60px; max-height: 60px;">
           <img
             height="60"
             style="
               display: inline-block;
               height: 60px;
+              max-height: 60px;
               object-fit: contain;"
             src="${companyLogoUrl}"
           />
