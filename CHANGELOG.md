@@ -1,3 +1,8 @@
+## 1.9.0-canary.103
+
+* **fix:**  - don’t depend on app.json
+* **fix:**  - attempt to use correct app scheme
+
 ## 1.9.0-canary.102
 
 * **fix:**  - attempt to use correct app scheme
