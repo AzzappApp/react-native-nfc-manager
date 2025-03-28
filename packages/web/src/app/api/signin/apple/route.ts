@@ -143,6 +143,7 @@ const appleSignin = async (req: Request) => {
                 firstName,
                 lastName,
               },
+              cookiePreferences: null,
             },
             null,
           );

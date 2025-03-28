@@ -1,7 +1,20 @@
-import { getAnalytics as analytics } from '@react-native-firebase/analytics';
+import * as analytics from '@react-native-firebase/analytics';
 
-export function setAnalyticsUserId(profileId: string) {
-  analytics().setUserId(profileId).catch();
+export function setAnalyticsUserId(userId: string) {
+  analytics.setUserId(analytics.getAnalytics(), userId).catch();
+}
+
+export function setAnalyticsConsent(consents: {
+  analytics: boolean;
+  marketing: boolean;
+  functional: boolean;
+}) {
+  analytics.setConsent(analytics.getAnalytics(), {
+    ad_storage: consents.marketing,
+    analytics_storage: consents.analytics,
+    functional_storage: consents.functional,
+    security_storage: true,
+  });
 }
 
 /**
@@ -11,17 +24,17 @@ export function setAnalyticsUserId(profileId: string) {
  *
  */
 export function logSignUp(userId: string) {
-  analytics()
-    .setUserId(userId)
+  analytics
+    .setUserId(analytics.getAnalytics(), userId)
     .then(() => {
-      analytics().logSignUp({ method: 'manual' });
+      analytics.logSignUp(analytics.getAnalytics(), { method: 'manual' });
     })
     .catch();
 }
 
 export function logSignIn(userId: string) {
-  analytics()
-    .setUserId(userId)
+  analytics
+    .setUserId(analytics.getAnalytics(), userId)
     .then(() => {
       logEvent('sign_in', { userId });
     })
@@ -37,7 +50,7 @@ export function logSignIn(userId: string) {
  * @param {{ [key: string]: any }} [params]
  */
 export async function logEvent(name: string, params?: { [key: string]: any }) {
-  analytics().logEvent(name, params);
+  analytics.logEvent(analytics.getAnalytics(), name, params);
 }
 
 /**
@@ -47,7 +60,7 @@ export async function logEvent(name: string, params?: { [key: string]: any }) {
  * @param {string} screenName
  */
 export async function analyticsLogScreenEvent(screenName: string) {
-  await analytics().logScreenView({
+  await analytics.logScreenView(analytics.getAnalytics(), {
     screen_name: screenName,
     screen_class: screenName,
   });

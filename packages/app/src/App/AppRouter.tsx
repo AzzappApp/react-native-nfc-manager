@@ -14,6 +14,7 @@ import {
   ScreensRenderer,
   useNativeRouter,
 } from '#components/NativeRouter';
+import { setAnalyticsConsent, setAnalyticsUserId } from '#helpers/analytics';
 import { hasBeenSignedIn } from '#helpers/authStore';
 import {
   addGlobalEventListener,
@@ -26,6 +27,7 @@ import AzzappLogoLoader from '#ui/AzzappLogoLoader';
 import AppRelayEnvironmentProvider from './AppRelayEnvironmentProvider';
 import {
   acceptTermsRoutes,
+  cookieConsentsRoutes,
   mainRoutes,
   onboardIngRoutes,
   signInRoutes,
@@ -110,9 +112,15 @@ const MainRouter = () => {
     graphql`
       query AppRouterQuery {
         currentUser {
+          id
           hasAcceptedLastTermsOfUse
           profiles {
             id
+          }
+          cookiePreferences {
+            analytics
+            functional
+            marketing
           }
         }
       }
@@ -121,16 +129,34 @@ const MainRouter = () => {
   );
 
   const hasAcceptedLastTermsOfUse = !!currentUser?.hasAcceptedLastTermsOfUse;
+  const hasAcceptedCookies = !!currentUser?.cookiePreferences;
   const hasProfiles = !!currentUser?.profiles?.length;
   const initialRoutes = useMemo(() => {
-    return !hasAcceptedLastTermsOfUse
-      ? acceptTermsRoutes
-      : !hasProfiles
-        ? onboardIngRoutes
-        : mainRoutes;
-  }, [hasAcceptedLastTermsOfUse, hasProfiles]);
+    if (!hasAcceptedLastTermsOfUse) {
+      return acceptTermsRoutes;
+    }
+    if (!hasAcceptedCookies) {
+      return cookieConsentsRoutes;
+    }
+    if (!hasProfiles) {
+      return onboardIngRoutes;
+    }
+    return mainRoutes;
+  }, [hasAcceptedCookies, hasAcceptedLastTermsOfUse, hasProfiles]);
 
   const { router, routerState } = useNativeRouter(initialRoutes);
+
+  useEffect(() => {
+    if (currentUser?.id) {
+      setAnalyticsUserId(currentUser.id);
+    }
+  }, [currentUser?.id]);
+
+  useEffect(() => {
+    if (currentUser?.cookiePreferences) {
+      setAnalyticsConsent(currentUser.cookiePreferences);
+    }
+  }, [currentUser?.cookiePreferences]);
 
   useSentryRoutingInstrumentation(router);
   useRoutingAnalyticsLog(router);

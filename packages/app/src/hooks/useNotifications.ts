@@ -1,4 +1,4 @@
-import { getMessaging as messaging } from '@react-native-firebase/messaging';
+import * as messaging from '@react-native-firebase/messaging';
 import * as Device from 'expo-device';
 import { useCallback, useEffect, useState } from 'react';
 import { Platform } from 'react-native';
@@ -76,13 +76,11 @@ export const useNotificationsManager = () => {
 
   useEffect(() => {
     if (status === 'granted' || status === 'limited') {
-      messaging()
-        .getToken()
-        .then(token => {
-          return saveTokenToDatabase(token);
-        });
+      messaging.getToken(messaging.getMessaging()).then(token => {
+        return saveTokenToDatabase(token);
+      });
       // Listen to whether the token changes
-      return messaging().onTokenRefresh(token => {
+      return messaging.onTokenRefresh(messaging.getMessaging(), token => {
         saveTokenToDatabase(token);
       });
     }
@@ -121,18 +119,21 @@ const useNotificationsEvent = ({
   const router = useRouter();
   useEffect(() => {
     //on opening the app in background
-    const unsubscribe = messaging().onNotificationOpenedApp(remoteMessage => {
-      if (isSupportedNotificationType(remoteMessage.data?.deepLink)) {
-        handleDeepLink(
-          remoteMessage.data.deepLink,
-          onDeepLinkOpenedApp,
-          remoteMessage.data.extraData,
-        );
-      }
-    });
+    const unsubscribe = messaging.onNotificationOpenedApp(
+      messaging.getMessaging(),
+      remoteMessage => {
+        if (isSupportedNotificationType(remoteMessage.data?.deepLink)) {
+          handleDeepLink(
+            remoteMessage.data.deepLink,
+            onDeepLinkOpenedApp,
+            remoteMessage.data.extraData,
+          );
+        }
+      },
+    );
     // this is call when the app is in quit mode (kill)
-    messaging()
-      .getInitialNotification()
+    messaging
+      .getInitialNotification(messaging.getMessaging())
       .then(remoteMessage => {
         if (remoteMessage) {
           if (isSupportedNotificationType(remoteMessage.data?.deepLink)) {
@@ -150,15 +151,18 @@ const useNotificationsEvent = ({
 
   useEffect(() => {
     //on opening the app in background
-    const unsubscribe = messaging().onMessage(remoteMessage => {
-      if (isSupportedNotificationType(remoteMessage.data?.deepLink)) {
-        handleDeepLink(
-          remoteMessage.data.deepLink,
-          onDeepLinkInApp,
-          remoteMessage.data.extraData,
-        );
-      }
-    });
+    const unsubscribe = messaging.onMessage(
+      messaging.getMessaging(),
+      remoteMessage => {
+        if (isSupportedNotificationType(remoteMessage.data?.deepLink)) {
+          handleDeepLink(
+            remoteMessage.data.deepLink,
+            onDeepLinkInApp,
+            remoteMessage.data.extraData,
+          );
+        }
+      },
+    );
 
     return unsubscribe;
   }, [handleDeepLink, onDeepLinkInApp]);

@@ -137,6 +137,16 @@ export type NewPostRoute = {
   params?: { fromProfile: boolean };
 };
 
+export type CookieConsentRoute = {
+  route: 'COOKIE_CONSENT';
+  params?: never;
+};
+
+export type CookieSettingsRoute = {
+  route: 'COOKIE_SETTINGS';
+  params?: { fromConsent?: boolean };
+};
+
 export type CoverEditionRoute = {
   route: 'COVER_EDITION';
   params?: { isCreation?: boolean; coverKind?: 'others' | 'people' | 'video' };
@@ -325,6 +335,8 @@ export type Route =
   | ContactCreateRoute
   | ContactDetailsRoute
   | ContactsRoute
+  | CookieConsentRoute
+  | CookieSettingsRoute
   | CoverCreationRoute
   | CoverEditionRoute
   | CoverTemplateSelectionRoute

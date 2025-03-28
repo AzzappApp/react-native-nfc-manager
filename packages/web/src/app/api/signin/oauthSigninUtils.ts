@@ -201,6 +201,7 @@ export const oauthSigninCallback =
             deletedBy: null,
             invited: false,
             nbFreeScans: 0,
+            cookiePreferences: null,
           };
           if (platform === 'android') {
             await createFreeSubscriptionForBetaAndroidPeriod([userId]);

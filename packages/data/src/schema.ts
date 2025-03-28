@@ -712,6 +712,11 @@ export const UserTable = cols.table(
       phoneNumber?: string | null;
       email?: string | null;
     }>(),
+    cookiePreferences: cols.json('cookiePreferences').$type<{
+      analytics: boolean;
+      marketing: boolean;
+      functional: boolean;
+    }>(),
   },
   table => {
     return {

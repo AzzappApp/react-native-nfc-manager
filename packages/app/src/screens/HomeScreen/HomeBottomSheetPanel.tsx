@@ -412,6 +412,19 @@ const HomeBottomSheetPanel = ({
         },
         {
           type: 'row',
+          icon: 'locked',
+          text: intl.formatMessage({
+            defaultMessage: 'Privacy settings',
+            description:
+              'Privacy settings message item in Home bottom sheet panel',
+          }),
+          linkProps: {
+            route: 'COOKIE_SETTINGS',
+          },
+          onPress: close,
+        },
+        {
+          type: 'row',
           icon: 'logout',
           text: intl.formatMessage({
             defaultMessage: 'Logout',

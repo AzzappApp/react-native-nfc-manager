@@ -44,6 +44,11 @@ export const acceptTermsRoutes = createRouterInit('ACCEPT_TERMS', {
   route: 'ACCEPT_TERMS',
 });
 
+export const cookieConsentsRoutes = createRouterInit('COOKIE_CONSENT', {
+  id: 'COOKIE_CONSENT',
+  route: 'COOKIE_CONSENT',
+});
+
 /**
  * Sign in stack
  */

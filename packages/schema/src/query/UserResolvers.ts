@@ -145,4 +145,7 @@ export const User: ProtectedResolver<UserResolvers> = {
         : user.phoneNumber,
     };
   },
+  cookiePreferences: async user => {
+    return user.cookiePreferences;
+  },
 };

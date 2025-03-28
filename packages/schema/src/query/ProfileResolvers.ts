@@ -692,4 +692,5 @@ const fakeUser: Omit<User, 'id'> = {
   nbFreeScans: 0,
   userContactData: null,
   appleId: null,
+  cookiePreferences: null,
 };

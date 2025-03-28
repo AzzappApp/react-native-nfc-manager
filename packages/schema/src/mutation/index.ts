@@ -46,6 +46,7 @@ import saveCardColors from './saveCardColors';
 import saveCardStyle from './saveCardStyle';
 import saveCommonInformation from './saveCommonInformation';
 import saveContactCard from './saveContactCard';
+import saveCookiePreferences from './saveCookiePreferences';
 import saveCover from './saveCover';
 import saveFCMToken from './saveFCMToken';
 import sendEmailSignatures from './sendEmailSignatures';
@@ -91,6 +92,7 @@ export const Mutation: MutationResolvers = {
   saveCardColors,
   saveCardStyle,
   saveContactCard,
+  saveCookiePreferences,
   saveCover,
   saveTitleTextModule,
   toggleFollowing,

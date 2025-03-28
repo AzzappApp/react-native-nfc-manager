@@ -1,0 +1,17 @@
+extend type Mutation {
+  """
+  Update the card cover of the current profile
+  """
+  saveCookiePreferences(input: SaveCookiePreferencesInput!): SaveCookiePreferencesPayload!
+}
+
+
+input SaveCookiePreferencesInput {
+  analytics: Boolean!
+  marketing: Boolean!
+  functional: Boolean!
+}
+
+type SaveCookiePreferencesPayload {
+  user: User!
+}

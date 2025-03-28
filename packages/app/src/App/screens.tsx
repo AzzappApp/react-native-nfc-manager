@@ -11,6 +11,8 @@ import ContactCreateScreen from '#screens/ContactCreateScreen/ContactCreateScree
 import ContactDetailsScreen from '#screens/ContactDetailsScreen';
 import ContactsByLocationScreen from '#screens/ContactsByLocationScreen';
 import ContactsScreen from '#screens/ContactsScreen';
+import CookieContentScreen from '#screens/CookieConsentsScreen';
+import CookieSettingsScreen from '#screens/CookieSettingsScreen';
 import CoverCreationScreen from '#screens/CoverCreationScreen';
 import CoverEditionScreen from '#screens/CoverEditionScreen';
 import CoverTemplateSelectionScreen from '#screens/CoverTemplateSelectionScreen';
@@ -70,6 +72,8 @@ const screens = {
   CONTACT_DETAILS: ContactDetailsScreen,
   ADD_MODULE_SECTION: AddModuleSectionScreen,
   MODULE_PREVIEW: CardModuleConfirmationScreen,
+  COOKIE_CONSENT: CookieContentScreen,
+  COOKIE_SETTINGS: CookieSettingsScreen,
   COVER_CREATION: CoverCreationScreen,
   COVER_EDITION: CoverEditionScreen,
   COVER_TEMPLATE_SELECTION: CoverTemplateSelectionScreen,
