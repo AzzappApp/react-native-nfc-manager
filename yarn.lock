@@ -482,7 +482,7 @@ __metadata:
     react-native-tab-view: "npm:^4.0.6"
     react-native-toast-message: "patch:react-native-toast-message@npm%3A2.2.1#~/.yarn/patches/react-native-toast-message-npm-2.2.1-82329f0933.patch"
     react-native-url-polyfill: "npm:^2.0.0"
-    react-native-vision-camera: "npm:^4.6.4"
+    react-native-vision-camera: "patch:react-native-vision-camera@npm%3A4.6.4#~/.yarn/patches/react-native-vision-camera-npm-4.6.4-23daae881d.patch"
     react-native-webview: "npm:^13.13.4"
     react-relay: "npm:^18.2.0"
     react-test-renderer: "npm:^18.3.1"
@@ -25611,7 +25611,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-vision-camera@npm:^4.6.4":
+"react-native-vision-camera@npm:4.6.4":
   version: 4.6.4
   resolution: "react-native-vision-camera@npm:4.6.4"
   peerDependencies:
@@ -25628,6 +25628,26 @@ __metadata:
     react-native-worklets-core:
       optional: true
   checksum: 10/9de4166aae94f72d29ab6dc2b04066a8216b5d630508345da7cedfa300196b8c2500dd2b5c0076731357c0b9695961d4e71fe891b2714fffb278a410b081c3b5
+  languageName: node
+  linkType: hard
+
+"react-native-vision-camera@patch:react-native-vision-camera@npm%3A4.6.4#~/.yarn/patches/react-native-vision-camera-npm-4.6.4-23daae881d.patch":
+  version: 4.6.4
+  resolution: "react-native-vision-camera@patch:react-native-vision-camera@npm%3A4.6.4#~/.yarn/patches/react-native-vision-camera-npm-4.6.4-23daae881d.patch::version=4.6.4&hash=08ed82"
+  peerDependencies:
+    "@shopify/react-native-skia": "*"
+    react: "*"
+    react-native: "*"
+    react-native-reanimated: "*"
+    react-native-worklets-core: "*"
+  peerDependenciesMeta:
+    "@shopify/react-native-skia":
+      optional: true
+    react-native-reanimated:
+      optional: true
+    react-native-worklets-core:
+      optional: true
+  checksum: 10/f233b92ab8428e7fcc077278ce83c7f6aebbafe73ba99ac45d0a30eebdab62f0a2777b0b53fdcc6fd5d4e4937555accab213b898ef0706f74a1acf4a2bf5d8e5
   languageName: node
   linkType: hard
 
