@@ -1,3 +1,7 @@
+## 1.9.0-canary.107
+
+* **build:**  - add missing signin key
+
 ## 1.9.0-canary.106
 
 * **feat:**  - Cookie settings management ([#8143](https://github.com/AzzappApp/azzapp/pull/8143))
