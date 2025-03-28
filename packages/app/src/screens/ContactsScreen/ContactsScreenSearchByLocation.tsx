@@ -37,33 +37,37 @@ const ContactsScreenSearchByLocation = ({
   const intl = useIntl();
 
   const sections = useMemo(() => {
-    return contacts?.reduce(
-      (accumulator, contact) => {
-        const title =
-          (contact.meetingPlace?.city ||
-            contact.meetingPlace?.subregion ||
-            contact.meetingPlace?.region ||
-            contact.meetingPlace?.country) ??
-          intl.formatMessage({
-            defaultMessage: 'Unknown',
-            description:
-              'ContactsScreenSearchByLocation - Title for unknown location',
-          });
+    return contacts
+      ?.reduce(
+        (accumulator, contact) => {
+          const title =
+            (contact.meetingPlace?.city ||
+              contact.meetingPlace?.subregion ||
+              contact.meetingPlace?.region ||
+              contact.meetingPlace?.country) ??
+            intl.formatMessage({
+              defaultMessage: 'Unknown',
+              description:
+                'ContactsScreenSearchByLocation - Title for unknown location',
+            });
 
-        const existingSection = accumulator.find(
-          section => section.title === title,
-        );
+          const existingSection = accumulator.find(
+            section => section.title === title,
+          );
 
-        if (!existingSection) {
-          accumulator.push({ title, data: [contact] });
-        } else {
-          existingSection.data.push(contact);
-        }
+          if (!existingSection) {
+            accumulator.push({ title, data: [contact] });
+          } else {
+            existingSection.data.push(contact);
+          }
 
-        return accumulator;
-      },
-      [] as Array<{ title: string; data: ContactType[] }>,
-    );
+          return accumulator;
+        },
+        [] as Array<{ title: string; data: ContactType[] }>,
+      )
+      .sort((item1, item2) =>
+        item1.title.toLowerCase() > item2.title.toLowerCase() ? 1 : -1,
+      );
   }, [contacts, intl]);
 
   const router = useRouter();
