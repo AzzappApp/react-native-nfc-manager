@@ -85,7 +85,7 @@ export const WelcomeScreen = ({
         source={require('../../assets/welcome/home_welcome.mp4')}
         isLooping
         isMuted
-        shouldPlay
+        shouldPlay={hasFocus}
         style={{
           width,
           height: width,
