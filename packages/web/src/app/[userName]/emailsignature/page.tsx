@@ -101,8 +101,7 @@ const EmailSignaturePage = async ({
     webCard.isMultiUser && webCard.logoId != null
       ? webCard.logoId
       : profile.logoId;
-  let companyLogoUrl: string | null;
-
+  let companyLogoUrl: string | null = null;
   if (companyLogo) {
     const [companyLogoMedia] = await getMediasByIds([companyLogo]);
     if (companyLogoMedia) {
