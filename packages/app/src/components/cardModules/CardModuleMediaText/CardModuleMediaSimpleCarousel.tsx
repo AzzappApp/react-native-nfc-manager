@@ -1,11 +1,17 @@
 import { memo, useCallback, useRef, useState } from 'react';
-import { FlatList, View, Animated as AnimatedNative } from 'react-native';
+import {
+  FlatList,
+  View,
+  Animated as AnimatedNative,
+  Pressable,
+} from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import {
   defaultTextFontSize,
   defaultTitleFontSize,
   RichText,
 } from '#components/ui/RichText';
+import { useFullScreenOverlayContext } from '#components/WebCardPreviewFullScreenOverlay';
 import { getTextStyle, getTitleStyle } from '#helpers/cardModuleHelpers';
 import useIsModuleItemInViewPort from '#hooks/useIsModuleItemInViewPort';
 import useScreenDimensions from '#hooks/useScreenDimensions';
@@ -247,6 +253,8 @@ const SimpleCarouselItemComponent = ({
   webCardViewMode,
   dimension,
 }: SimpleCarouselItemProps) => {
+  const { setMedia } = useFullScreenOverlayContext(cardModuleMedia.media);
+
   const onPressItem = useCallback(() => {
     setEditableItemIndex?.(index);
   }, [index, setEditableItemIndex]);
@@ -274,19 +282,27 @@ const SimpleCarouselItemComponent = ({
           gap: cardStyle?.gap,
         }}
       >
-        <CardModuleMediaSelector
-          media={cardModuleMedia.media}
-          dimension={{
+        <Pressable
+          onPress={setMedia}
+          style={{
             width: mediaWidth,
             height: mediaHeight,
           }}
-          imageStyle={{
-            borderRadius: cardStyle?.borderRadius ?? 0,
-          }}
-          canPlay={canPlay && inViewport}
-          priority={inViewport ? 'high' : 'normal'}
-          paused={paused}
-        />
+        >
+          <CardModuleMediaSelector
+            media={cardModuleMedia.media}
+            dimension={{
+              width: mediaWidth,
+              height: mediaHeight,
+            }}
+            imageStyle={{
+              borderRadius: cardStyle?.borderRadius ?? 0,
+            }}
+            canPlay={canPlay && inViewport}
+            priority={inViewport ? 'high' : 'normal'}
+            paused={paused}
+          />
+        </Pressable>
         <Text variant="large" style={getTitleStyle(cardStyle, cardModuleColor)}>
           <RichText
             text={cardModuleMedia.title}
