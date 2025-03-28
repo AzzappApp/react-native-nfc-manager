@@ -1,3 +1,9 @@
+## 1.9.0-canary.104
+
+* **fix:**  - **authent:** remove suffix in scheme
+* **fix:**  - **emailSignature:** [#8136](https://github.com/AzzappApp/azzapp/pull/8136) missing colors in email ([#8147](https://github.com/AzzappApp/azzapp/pull/8147))
+* **feat:**  - **multiUser:** [#8121](https://github.com/AzzappApp/azzapp/pull/8121) notify other users of webcard ([#8144](https://github.com/AzzappApp/azzapp/pull/8144))
+
 ## 1.9.0-canary.103
 
 * **fix:**  - don’t depend on app.json

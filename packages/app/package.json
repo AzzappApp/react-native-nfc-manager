@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/app",
-  "version": "1.9.0-canary.103",
+  "version": "1.9.0-canary.104",
   "scripts": {
     "lint": "eslint .",
     "test": "jest",
