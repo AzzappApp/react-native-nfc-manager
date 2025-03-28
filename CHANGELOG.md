@@ -1,3 +1,8 @@
+## 1.9.0-canary.109
+
+* **fix:**  - fix congrats display conditions ([#8139](https://github.com/AzzappApp/azzapp/pull/8139))
+* **feat:**  - add full screen popup overlay on preview ([#8149](https://github.com/AzzappApp/azzapp/pull/8149))
+
 ## 1.9.0-canary.108
 
 * **fix:**  - add camera-vision patch to avoid crash ([#8158](https://github.com/AzzappApp/azzapp/pull/8158))
