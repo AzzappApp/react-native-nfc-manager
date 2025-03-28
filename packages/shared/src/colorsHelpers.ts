@@ -18,6 +18,14 @@ export const getTextColor = (backgroundColor: string) => {
   }
 };
 
+export const getEmailSignatureTitleColor = (color?: string) => {
+  let titleColor = color ?? colors.black;
+  if (isColorTooLight(titleColor)) {
+    titleColor = '#54535B'; // grey800
+  }
+  return titleColor;
+};
+
 const RED = 0.2126;
 const GREEN = 0.7152;
 const BLUE = 0.0722;

@@ -1,5 +1,7 @@
-import { getEmailSignatureTitleColor } from '@azzapp/service/emailSignatureServices';
-import { colors } from '@azzapp/shared/colorsHelpers';
+import {
+  getEmailSignatureTitleColor,
+  colors,
+} from '@azzapp/shared/colorsHelpers';
 import { formatDisplayName } from '@azzapp/shared/stringHelpers';
 import renderSaveMyContactButton from './renderSaveMyContactButton';
 import type { WebCard } from '@azzapp/data';
@@ -52,7 +54,7 @@ const renderFullEmailSignature = ({
     </tr>
   `;
 
-  const titleColor = getEmailSignatureTitleColor(webCard);
+  const titleColor = getEmailSignatureTitleColor(webCard.cardColors?.primary);
 
   const titleSection = contact?.title
     ? `<tr valign="top">

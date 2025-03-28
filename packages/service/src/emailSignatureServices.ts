@@ -1,5 +1,5 @@
 import { getUserById } from '@azzapp/data';
-import { colors, isColorTooLight } from '@azzapp/shared/colorsHelpers';
+import { getEmailSignatureTitleColor } from '@azzapp/shared/colorsHelpers';
 import { sendTemplateEmail } from '@azzapp/shared/emailHelpers';
 import serializeAndSignContactCard from '@azzapp/shared/serializeAndSignContactCard';
 import serializeAndSignEmailSignature from '@azzapp/shared/serializeAndSignEmailSignature';
@@ -7,7 +7,6 @@ import { buildEmailSignatureGenerationUrl } from '@azzapp/shared/urlHelpers';
 import { buildAvatarUrl, buildLogoUrl } from './mediaServices';
 import type { Profile, WebCard } from '@azzapp/data';
 import type { IntlShape } from '@formatjs/intl';
-
 const IMAGE_AVATAR_LOGO_WIDTH = 180;
 
 export const generateEmailSignature = async ({
@@ -104,7 +103,9 @@ export const generateEmailSignature = async ({
               description:
                 'Title of the email sent to the user when generating an email signature',
             }),
-            titleColor: getEmailSignatureTitleColor(webCard),
+            titleColor: getEmailSignatureTitleColor(
+              webCard.cardColors?.primary,
+            ),
             hello: intl.formatMessage({
               defaultMessage: `Hello,<br/>
 <br/>
@@ -199,12 +200,4 @@ The azzapp Team`,
   }
 
   return linkUrl;
-};
-
-export const getEmailSignatureTitleColor = (webCard: WebCard) => {
-  let titleColor = webCard.cardColors?.primary ?? colors.black;
-  if (isColorTooLight(titleColor)) {
-    titleColor = '#54535B'; // grey800
-  }
-  return titleColor;
 };
