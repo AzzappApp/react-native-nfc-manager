@@ -1,3 +1,7 @@
+## 1.9.0-canary.101
+
+* **fix:**  - sort contact by section name in ContactsByLocation ([#8134](https://github.com/AzzappApp/azzapp/pull/8134))
+
 ## 1.9.0-canary.100
 
 
