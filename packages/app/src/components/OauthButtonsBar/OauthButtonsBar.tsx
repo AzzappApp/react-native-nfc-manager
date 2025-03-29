@@ -19,6 +19,7 @@ WebBrowser.maybeCompleteAuthSession();
 const redirectUri = AuthSession.makeRedirectUri({
   scheme: process.env.APP_SCHEME?.replace('://', '') ?? 'azzapp',
   path: 'login',
+  native: `${process.env.APP_SCHEME}://login`,
 });
 
 export type OauthButtonsBarProps = {
@@ -142,7 +143,7 @@ const OauthButtonsBar = ({
         authUrl,
         redirectUri,
         {
-          preferEphemeralSession: true,
+          preferEphemeralSession: kind === 'google',
           presentationStyle: WebBrowser.WebBrowserPresentationStyle.FORM_SHEET,
         },
       );
