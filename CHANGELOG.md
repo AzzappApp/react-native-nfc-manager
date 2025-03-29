@@ -1,3 +1,7 @@
+## 1.9.0-canary.114
+
+* **fix:**  - don’t use ephemeral sessions with linkedin
+
 ## 1.9.0-canary.113
 
 * **build:**  - try to configure auto collection with firebase.json
