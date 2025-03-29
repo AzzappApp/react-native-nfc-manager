@@ -1,3 +1,8 @@
+## 1.9.0-canary.115
+
+* **fix:**  - update current user
+* **fix:**  - forgot to await update
+
 ## 1.9.0-canary.114
 
 * **fix:**  - don’t use ephemeral sessions with linkedin
