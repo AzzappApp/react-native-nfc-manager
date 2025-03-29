@@ -172,6 +172,14 @@ export const oauthSigninCallback =
           },
           locale: user.locale ?? googleProfile.locale?.language ?? null,
         });
+        user = {
+          ...user,
+          userContactData: {
+            ...user.userContactData,
+            ...userContactData,
+          },
+          locale: user.locale ?? googleProfile.locale?.language ?? null,
+        };
       } else {
         const newUser = {
           email,
