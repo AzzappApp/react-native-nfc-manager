@@ -1,3 +1,7 @@
+## 1.9.0-canary.113
+
+* **build:**  - try to configure auto collection with firebase.json
+
 ## 1.9.0-canary.112
 
 * **build:**  - disable automatic collection in Info.plist
