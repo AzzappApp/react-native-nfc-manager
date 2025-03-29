@@ -141,6 +141,7 @@ const OauthButtonsBar = ({
       const result = await WebBrowser.openAuthSessionAsync(
         authUrl,
         redirectUri,
+        { preferEphemeralSession: true },
       );
       if (result.type === 'success' && result.url) {
         const url = new URL(result.url);
