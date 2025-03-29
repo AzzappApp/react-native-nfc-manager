@@ -1,3 +1,7 @@
+## 1.9.0-canary.112
+
+* **build:**  - disable automatic collection in Info.plist
+
 ## 1.9.0-canary.111
 
 * **build:**  - use product name as scheme
