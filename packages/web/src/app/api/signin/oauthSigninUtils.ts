@@ -165,7 +165,7 @@ export const oauthSigninCallback =
       if (user) {
         const profiles = await getProfilesByUser(user.id);
         profile = profiles[0] ?? null;
-        updateUser(user.id, {
+        await updateUser(user.id, {
           userContactData: {
             ...user.userContactData,
             ...userContactData,
