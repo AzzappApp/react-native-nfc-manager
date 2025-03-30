@@ -1,3 +1,7 @@
+## 1.9.0-canary.116
+
+* **feat:**  - **oauth:** add prompt param
+
 ## 1.9.0-canary.115
 
 * **fix:**  - update current user
