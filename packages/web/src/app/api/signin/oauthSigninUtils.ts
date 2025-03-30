@@ -20,11 +20,13 @@ export const oauthSignin =
     redirectURI,
     clientId,
     csrfSecret,
+    prompt,
   }: {
     authorizeURL: string;
     redirectURI: string;
     clientId: string;
     csrfSecret: Uint8Array;
+    prompt?: string;
   }) =>
   async (req: NextRequest) => {
     let platform = req.nextUrl.searchParams.get('platform');
@@ -43,6 +45,10 @@ export const oauthSignin =
     url.searchParams.append('state', csrfToken);
     url.searchParams.append('scope', 'profile email openid');
     url.searchParams.append('access_type', 'online');
+
+    if (prompt) {
+      url.searchParams.append('prompt', prompt);
+    }
 
     return NextResponse.redirect(url.toString(), { status: 302 });
   };
