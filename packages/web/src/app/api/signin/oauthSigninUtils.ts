@@ -21,11 +21,13 @@ export const oauthSignin =
     clientId,
     csrfSecret,
     prompt,
+    scope,
   }: {
     authorizeURL: string;
     redirectURI: string;
     clientId: string;
     csrfSecret: Uint8Array;
+    scope?: string;
     prompt?: string;
   }) =>
   async (req: NextRequest) => {
@@ -43,7 +45,7 @@ export const oauthSignin =
       .sign(csrfSecret);
 
     url.searchParams.append('state', csrfToken);
-    url.searchParams.append('scope', 'profile email openid');
+    url.searchParams.append('scope', scope ?? 'profile email openid');
     url.searchParams.append('access_type', 'online');
 
     if (prompt) {

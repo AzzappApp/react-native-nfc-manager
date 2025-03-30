@@ -5,6 +5,7 @@ const googleSignin = oauthSignin({
   redirectURI: `${process.env.NEXT_PUBLIC_API_ENDPOINT!}/signin/google/callback`,
   clientId: process.env.GOOGLE_CLIENT_ID!,
   csrfSecret: new TextEncoder().encode(process.env.GOOGLE_TOKEN_SECRET),
+  scope: 'profile email',
   prompt: 'consent',
 });
 
