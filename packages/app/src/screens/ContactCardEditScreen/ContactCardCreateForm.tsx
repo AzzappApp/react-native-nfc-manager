@@ -162,6 +162,14 @@ const ContactCardCreateForm = ({
                     </Text>
                     <PremiumIndicator isRequired={!user?.isPremium} />
                   </View>
+                  {!user?.isPremium && (
+                    <Text variant="smallbold" style={styles.premiumSubtitle}>
+                      <FormattedMessage
+                        defaultMessage="7-Days free trial - Cancel anytime"
+                        description="Contact card create screen - business card subscription conditions"
+                      />
+                    </Text>
+                  )}
                 </View>
                 <Switch
                   variant="large"
