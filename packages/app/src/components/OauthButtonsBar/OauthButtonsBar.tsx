@@ -143,7 +143,6 @@ const OauthButtonsBar = ({
         authUrl,
         redirectUri,
         {
-          preferEphemeralSession: kind === 'google',
           presentationStyle: WebBrowser.WebBrowserPresentationStyle.FORM_SHEET,
         },
       );
