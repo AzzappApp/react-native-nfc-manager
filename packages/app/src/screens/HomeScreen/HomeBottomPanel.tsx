@@ -129,7 +129,8 @@ const HomeBottomPanel = ({ user: userKey }: HomeBottomPanelProps) => {
 
   const containerHeight = useMemo(
     () => ({
-      height: panelHeight + HOME_MENU_HEIGHT,
+      top: 20,
+      height: panelHeight + HOME_MENU_HEIGHT + 20,
     }),
     [panelHeight],
   );
