@@ -1,3 +1,5 @@
 {
-  "analytics_auto_collection_enabled": false
+  "react-native": {
+    "analytics_auto_collection_enabled": false
+  }
 }
