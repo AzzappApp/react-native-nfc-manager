@@ -1,3 +1,9 @@
+## 1.9.0-canary.121
+
+* **fix:**  - review push notification for shareback ([#8157](https://github.com/AzzappApp/azzapp/pull/8157))
+* **fix:**  - no need to send logo on multiUserWebcard ([#8162](https://github.com/AzzappApp/azzapp/pull/8162))
+* **fix:**  - **oauth:** analytics break google signin
+
 ## 1.9.0-canary.120
 
 * **fix:**  - do not wait for inngest answer to return and ignore error (not critical) ([#8163](https://github.com/AzzappApp/azzapp/pull/8163))
