@@ -142,6 +142,9 @@ const ContactCardCreateScreen = ({
   const [popupVisible, showPopup, hidePopup] = useBoolean(false);
 
   const styles = useStyleSheet(stylesheet);
+  const parsedPhoneNumber = currentUser?.userContactData?.phoneNumber
+    ? parsePhoneNumberFromString(currentUser?.userContactData?.phoneNumber)
+    : null;
 
   const {
     control,
@@ -171,12 +174,12 @@ const ContactCardCreateScreen = ({
         ? [
             {
               label: 'Work',
-              number: currentUser?.userContactData?.phoneNumber,
+              number:
+                parsedPhoneNumber?.nationalNumber ||
+                currentUser?.userContactData?.phoneNumber,
               selected: true,
               countryCode:
-                parsePhoneNumberFromString(
-                  currentUser?.userContactData?.phoneNumber,
-                )?.country || getLocales()[0].countryCode,
+                parsedPhoneNumber?.country || getLocales()[0].countryCode,
             },
           ]
         : [],
