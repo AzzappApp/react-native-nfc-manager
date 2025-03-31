@@ -1,3 +1,8 @@
+## 1.9.0-canary.123
+
+* **fix:**  - bad parsing user phone number in new webcard process ([#8169](https://github.com/AzzappApp/azzapp/pull/8169))
+* **fix:**  - move finger hint in edit contact card button ([#8170](https://github.com/AzzappApp/azzapp/pull/8170))
+
 ## 1.9.0-canary.122
 
 
