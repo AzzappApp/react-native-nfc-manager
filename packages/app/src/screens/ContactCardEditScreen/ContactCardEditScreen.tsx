@@ -324,7 +324,7 @@ const ContactCardEditScreen = ({
           birthday: data.birthday,
           socials: data.socials?.filter(social => social.url),
           avatarId,
-          logoId,
+          logoId: !webCard?.isMultiUser ? logoId : undefined,
         },
         pixelRatio: CappedPixelRatio(),
         width: QRCodeWidth(),
