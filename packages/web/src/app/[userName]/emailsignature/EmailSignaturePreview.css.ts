@@ -22,6 +22,7 @@ const styles = {
   coverContainer: style({
     width: 200,
     height: 200 / COVER_RATIO,
+    border: '1px solid rgba(226, 225, 227, 1)',
   }),
   openIcon: style({
     marginLeft: 20,

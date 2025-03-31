@@ -88,15 +88,18 @@ const renderFullEmailSignature = ({
 
   const generateContactLink = (href: string, text: string) =>
     `<tr>
-      <td style="padding: 0 0 5px 4px; vertical-align: middle;" valign="middle">
+      <td title="${text}" style="
+        padding: 0 0 5px 4px; 
+        vertical-align: middle;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 0px" valign="middle">
         <a
           style="
             padding: 0;
             font-size: 12px;
             line-height: 14px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
             font-weight: 400;
             text-align: center;
             color: black;
@@ -172,8 +175,8 @@ const renderFullEmailSignature = ({
             saveContactURL: saveContactURL ?? '#',
           })}
         </td>
-        <td valign="top">
-          <table cellspacing="0" cellpadding="0" style="padding-left: 15px;">
+        <td valign="top" style="width: 100%;">
+          <table cellspacing="0" cellpadding="0" style="padding-left: 15px; width:100%;">
             ${phoneSection}
             ${emailSection}
             ${companyLogoSection}

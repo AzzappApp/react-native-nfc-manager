@@ -15,6 +15,9 @@ type EmailSignaturePreviewProps = {
   saveContactMessage: string;
 };
 
+const COVER_WIDTH = 198;
+const COVER_RADIUS = `${(35 / 300) * COVER_WIDTH}px`;
+
 const EmailSignaturePreview = ({
   mode,
   webCard,
@@ -25,12 +28,15 @@ const EmailSignaturePreview = ({
 }: EmailSignaturePreviewProps) => {
   return mode === 'simple' ? (
     <section className={styles.simpleSignaturePreviewContainer}>
-      <div className={styles.coverContainer}>
+      <div
+        className={styles.coverContainer}
+        style={{ borderRadius: COVER_RADIUS }}
+      >
         <CoverRenderer
           webCard={webCard}
           media={media!}
           priority
-          width={200}
+          width={COVER_WIDTH}
           staticCover
         />
       </div>
