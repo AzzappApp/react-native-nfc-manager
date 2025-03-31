@@ -81,7 +81,7 @@ jest.mock('react-native-purchases', () => ({
 
 jest.mock('#hooks/useApplicationFonts', () => ({}));
 
-jest.mock('@react-native-firebase/analytics', () => {
+/** jest.mock('@react-native-firebase/analytics', () => {
   return {
     getAnalytics: () => jest.fn(),
     logEvent: jest.fn(),
@@ -92,7 +92,7 @@ jest.mock('@react-native-firebase/analytics', () => {
       analytics: jest.fn(),
     },
   };
-});
+});*/
 
 jest.mock('@gorhom/bottom-sheet', () => {
   const { ScrollView, TextInput } = jest.requireActual('react-native');
