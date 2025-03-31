@@ -15,7 +15,10 @@ export const notifyWebCardUsersBatch = inngest.createFunction(
         new Date().getTime() - new Date(previousUpdatedAt).getTime();
       const diffInMinutes = diffInMs / 1000 / 60;
 
-      if (diffInMinutes >= 30) {
+      if (
+        diffInMinutes >=
+        (process.env.NEXT_PUBLIC_PLATFORM === 'production' ? 30 : 2)
+      ) {
         const users = await getUsersToNotifyOnWebCard(webCard.id);
         for (const user of users) {
           await step.sendEvent(`send-webCardUpdate-${webCard.id}-${user.id}`, {
