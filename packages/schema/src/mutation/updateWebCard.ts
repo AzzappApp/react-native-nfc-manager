@@ -138,10 +138,11 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
   }
 
   try {
+    notifyWebCardUsers(webCard, previousUpdateDate);
+
     await transaction(async () => {
       await updateWebCard(webCardId, partialWebCard);
 
-      await notifyWebCardUsers(webCard, previousUpdateDate);
       if (
         webCard.alreadyPublished &&
         previousUserName &&

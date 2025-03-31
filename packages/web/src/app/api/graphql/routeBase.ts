@@ -11,6 +11,7 @@ import { maxAliasesPlugin } from '@escape.tech/graphql-armor-max-aliases';
 import { maxTokensPlugin } from '@escape.tech/graphql-armor-max-tokens';
 import { useDisableIntrospection } from '@graphql-yoga/plugin-disable-introspection';
 import { usePersistedOperations } from '@graphql-yoga/plugin-persisted-operations';
+import * as Sentry from '@sentry/nextjs';
 import { waitUntil } from '@vercel/functions';
 import { getVercelOidcToken } from '@vercel/functions/oidc';
 import { Kind, OperationTypeNode, type GraphQLError } from 'graphql';
@@ -173,13 +174,21 @@ const { handleRequest } = createYoga({
         });
       },
       notifyWebCardUsers: async (webCard: WebCard, previousUpdatedAt: Date) => {
-        await inngest.send({
-          name: 'batch/webCardUsersNotification',
-          data: {
-            webCard,
-            previousUpdatedAt,
-          },
-        });
+        try {
+          waitUntil(
+            inngest.send({
+              name: 'batch/webCardUsersNotification',
+              data: {
+                webCard,
+                previousUpdatedAt,
+              },
+            }),
+          );
+        } catch (e) {
+          Sentry.captureMessage('failure to notifyWebCardUsers', {
+            extra: { data: e },
+          });
+        }
       },
     };
   },

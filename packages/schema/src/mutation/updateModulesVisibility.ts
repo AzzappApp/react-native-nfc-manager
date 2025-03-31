@@ -41,7 +41,7 @@ const updateModulesVisibility: MutationResolvers['updateModulesVisibility'] =
         await updateCardModules(modulesIds, { visible });
         await updateWebCard(webCardId, { updatedAt: new Date() });
       });
-      await notifyWebCardUsers(webCard, previousUpdateDate);
+      notifyWebCardUsers(webCard, previousUpdateDate);
     } catch (e) {
       console.error(e);
       throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);

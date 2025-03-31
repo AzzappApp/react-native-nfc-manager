@@ -111,9 +111,8 @@ const createModuleSavingMutation =
           });
         }
         await updateWebCard(webCardId, { updatedAt: new Date() });
-
-        await notifyWebCardUsers(webCard, previousUpdatedAt);
       });
+      notifyWebCardUsers(webCard, previousUpdatedAt);
     } catch (e) {
       console.error(e);
       throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);

@@ -78,7 +78,7 @@ const saveCover: MutationResolvers['saveCover'] = async (
       updatedWebCard = { ...updatedWebCard, ...updates };
     });
 
-    await notifyWebCardUsers(webCard, previousUpdateDate);
+    notifyWebCardUsers(webCard, previousUpdateDate);
 
     await notifyRelatedWalletPasses(webCardId, true);
 

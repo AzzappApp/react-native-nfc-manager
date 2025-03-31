@@ -48,7 +48,7 @@ const reorderModules: MutationResolvers['reorderModules'] = async (
       await resetCardModulesPositions(webCardId);
       await updateWebCard(webCardId, { updatedAt: new Date() });
     });
-    await notifyWebCardUsers(webCard, previousUpdateDate);
+    notifyWebCardUsers(webCard, previousUpdateDate);
   } catch (e) {
     console.error(e);
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
