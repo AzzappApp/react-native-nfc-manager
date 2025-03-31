@@ -8,10 +8,10 @@ import {
 import {
   type LayoutChangeEvent,
   type PressableAndroidRippleConfig,
+  type View,
 } from 'react-native';
 import { Pressable } from 'react-native-gesture-handler';
 import { colors } from '#theme';
-import type GenericTouchable from 'react-native-gesture-handler/lib/typescript/components/touchables/GenericTouchable';
 import type { GenericTouchableProps } from 'react-native-gesture-handler/lib/typescript/components/touchables/GenericTouchableProps';
 
 const TIMEOUT = 200;
@@ -26,7 +26,7 @@ type PressableNativeProps = GenericTouchableProps & {
 
 const PressableNative = (
   { ripple, onDoublePress, ...props }: PressableNativeProps,
-  ref: ForwardedRef<GenericTouchable>,
+  ref: ForwardedRef<View>,
 ) => {
   const timer = useRef<NodeJS.Timeout | null>(null);
   const [width, setWidth] = useState(0);
