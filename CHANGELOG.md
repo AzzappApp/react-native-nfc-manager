@@ -1,3 +1,7 @@
+## 1.9.0-canary.120
+
+* **fix:**  - do not wait for inngest answer to return and ignore error (not critical) ([#8163](https://github.com/AzzappApp/azzapp/pull/8163))
+
 ## 1.9.0-canary.119
 
 
