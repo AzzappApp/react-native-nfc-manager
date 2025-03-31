@@ -1,3 +1,7 @@
+## 1.9.0-canary.128
+
+* **Chore:**  - remove firebase from AppDelegate
+
 ## 1.9.0-canary.127
 
 
