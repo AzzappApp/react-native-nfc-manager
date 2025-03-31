@@ -1,3 +1,7 @@
+## 1.9.0-canary.124
+
+* **fix:**  - **OAuth:** fix android conf for app scheme ([#8182](https://github.com/AzzappApp/azzapp/pull/8182))
+
 ## 1.9.0-canary.123
 
 * **fix:**  - bad parsing user phone number in new webcard process ([#8169](https://github.com/AzzappApp/azzapp/pull/8169))
