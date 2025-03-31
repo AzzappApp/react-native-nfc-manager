@@ -5,7 +5,7 @@
 #import <RNScreens/RNSScreenStackAnimator.h>
 #import <RNBootSplash/RNBootSplash.h>
 #import "AZPCustomReavealTransition.h"
-#import <Firebase.h>
+// #import <Firebase.h>
 
 
 /**
