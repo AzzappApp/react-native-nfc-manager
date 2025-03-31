@@ -6,6 +6,7 @@ require File.join(File.dirname(`node --print "require.resolve('expo/package.json
 $RNVideoUseVideoCaching=true
 # see https://github.com/mrousavy/react-native-vision-camera/blob/v4.5.0/docs/docs/guides/LOCATION.mdx#enable-or-disable-location-apis
 $VCEnableLocation=false
+
 def node_require(script)
   # Resolve script with node to allow for hoisting
   require Pod::Executable.execute_command('node', ['-p',
@@ -29,6 +30,7 @@ setup_permissions([
    'Notifications'
 ])  
 $RNFirebaseAsStaticFramework = true
+$RNFirebaseAnalyticsWithoutAdIdSupport = true
 $RNFirebaseAnalyticsEnableAdSupport = true # enable Firebase Analytics to generate automatic audience metrics for iOS 
 linkage = ENV['USE_FRAMEWORKS']
 if linkage != nil

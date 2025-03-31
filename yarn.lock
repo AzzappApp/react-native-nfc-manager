@@ -346,7 +346,6 @@ __metadata:
     "@react-native-community/cli-platform-ios": "npm:^15.0.0"
     "@react-native-community/datetimepicker": "npm:^8.3.0"
     "@react-native-community/netinfo": "npm:^11.4.1"
-    "@react-native-firebase/analytics": "npm:^21.12.3"
     "@react-native-firebase/app": "npm:^21.12.3"
     "@react-native-firebase/messaging": "npm:^21.12.3"
     "@react-native-masked-view/masked-view": "npm:^0.3.2"
@@ -457,7 +456,7 @@ __metadata:
     react-native-dotenv: "npm:^3.4.11"
     react-native-edge-to-edge: "npm:^1.5.0"
     react-native-email-link: "npm:^1.16.1"
-    react-native-gesture-handler: "npm:^2.24.0"
+    react-native-gesture-handler: "npm:^2.25.0"
     react-native-haptic-feedback: "npm:^2.3.3"
     react-native-image-colors: "npm:^2.4.0"
     react-native-image-size: "npm:^1.1.6"
@@ -477,7 +476,7 @@ __metadata:
     react-native-share: "npm:^12.0.9"
     react-native-shared-group-preferences: "npm:^1.1.24"
     react-native-skottie-template-player: "workspace:^"
-    react-native-sortables: "npm:^1.4.0"
+    react-native-sortables: "npm:^1.5.0"
     react-native-svg: "npm:^15.11.2"
     react-native-tab-view: "npm:^4.0.6"
     react-native-toast-message: "patch:react-native-toast-message@npm%3A2.2.1#~/.yarn/patches/react-native-toast-message-npm-2.2.1-82329f0933.patch"
@@ -10171,17 +10170,6 @@ __metadata:
   peerDependencies:
     react-native: ">=0.59"
   checksum: 10/47f0d61072ca04a545784daaa44a5b1927eb788a3521dce5462184855733485c3b58c52d2a9b790b5c784e806fb342c83bc14e348cc7e55263b63d31e1862f9d
-  languageName: node
-  linkType: hard
-
-"@react-native-firebase/analytics@npm:^21.12.3":
-  version: 21.12.3
-  resolution: "@react-native-firebase/analytics@npm:21.12.3"
-  dependencies:
-    superstruct: "npm:^2.0.2"
-  peerDependencies:
-    "@react-native-firebase/app": 21.12.3
-  checksum: 10/2762d4afcab8564a65ac998a9ac8ee3cb516fa554a305a6b00ed5947c9fb2d6035ccbfe9dfbb08bde02c75c20db993ad4df8d3c862be5ef37e7bff1697553694
   languageName: node
   linkType: hard
 
@@ -25631,9 +25619,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-gesture-handler@npm:^2.24.0":
-  version: 2.24.0
-  resolution: "react-native-gesture-handler@npm:2.24.0"
+"react-native-gesture-handler@npm:^2.25.0":
+  version: 2.25.0
+  resolution: "react-native-gesture-handler@npm:2.25.0"
   dependencies:
     "@egjs/hammerjs": "npm:^2.0.17"
     hoist-non-react-statics: "npm:^3.3.0"
@@ -25641,7 +25629,7 @@ __metadata:
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 10/e8e97fde1a1a4e776d448870c5a89e53df64836a7a131ba8348712038c4b6ff0a99e59be5702b98d5687a35ba57d260a02a50da9d7702427b62bc7abea2fe687
+  checksum: 10/780c53e90b41c8bc151c5b4dc908386d5709e7b8e5eaf44e8bbadc02b39d7b07ec15c3865e08f30463bd1fbfcac14a79ff8238752712e6f15a0f98b7a658afd3
   languageName: node
   linkType: hard
 
@@ -25888,9 +25876,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"react-native-sortables@npm:^1.4.0":
-  version: 1.4.0
-  resolution: "react-native-sortables@npm:1.4.0"
+"react-native-sortables@npm:^1.5.0":
+  version: 1.5.0
+  resolution: "react-native-sortables@npm:1.5.0"
   dependencies:
     react-native-haptic-feedback: "npm:>=2.0.0"
   peerDependencies:
@@ -25901,7 +25889,7 @@ __metadata:
   dependenciesMeta:
     react-native-haptic-feedback:
       optional: true
-  checksum: 10/dedcafa5c11ba644bc1781518f2a3e9ac2c2bcc291a3e4c2fa55b7cda9e64f431f56031356ab505f25427e6120474365f67ed7452a95e10df2f5fa98e871505e
+  checksum: 10/fe0f328df9d4f909908f91336a3ed39f3bdf883ceed4de18ee23712615ff855fd9736c86c743fa5d35b3cdc48752910c5bf682883f9272999d3feac138756ec3
   languageName: node
   linkType: hard
 
@@ -28402,13 +28390,6 @@ __metadata:
   version: 9.2.1
   resolution: "sudo-prompt@npm:9.2.1"
   checksum: 10/0557d0eecebf8db8212df4a9816509c875ca65ad9ee26a55240848820f9bdbdbbd9e5a1bdb5aa052fb1f748cba4ef90c8da9b40628f59e6dc79ca986e80740de
-  languageName: node
-  linkType: hard
-
-"superstruct@npm:^2.0.2":
-  version: 2.0.2
-  resolution: "superstruct@npm:2.0.2"
-  checksum: 10/10e1944a9da4baee187fbaa6c5d97d7af266b55786dfe50bce67f0f1e7d93f1a5a42dd51e245a2e16404f8336d07c21c67f1c1fbc4ad0a252d3d2601d6c926da
   languageName: node
   linkType: hard
 

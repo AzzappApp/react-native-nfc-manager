@@ -155,8 +155,6 @@ PODS:
   - FBLazyVector (0.77.2)
   - Firebase (11.10.0):
     - Firebase/Core (= 11.10.0)
-  - Firebase/Analytics (11.10.0):
-    - Firebase/Core
   - Firebase/Core (11.10.0):
     - Firebase/CoreOnly
     - FirebaseAnalytics (~> 11.10.0)
@@ -2176,10 +2174,6 @@ PODS:
     - Yoga
   - RNDeviceInfo (14.0.4):
     - React-Core
-  - RNFBAnalytics (21.12.3):
-    - Firebase/Analytics (= 11.10.0)
-    - React-Core
-    - RNFBApp
   - RNFBApp (21.12.3):
     - Firebase/CoreOnly (= 11.10.0)
     - React-Core
@@ -2209,7 +2203,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNGestureHandler (2.24.0):
+  - RNGestureHandler (2.25.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2714,7 +2708,6 @@ DEPENDENCIES:
   - "RNCMaskedView (from `../../../node_modules/@react-native-masked-view/masked-view`)"
   - "RNDateTimePicker (from `../../../node_modules/@react-native-community/datetimepicker`)"
   - RNDeviceInfo (from `../../../node_modules/react-native-device-info`)
-  - "RNFBAnalytics (from `../../../node_modules/@react-native-firebase/analytics`)"
   - "RNFBApp (from `../../../node_modules/@react-native-firebase/app`)"
   - "RNFBMessaging (from `../../../node_modules/@react-native-firebase/messaging`)"
   - "RNFlashList (from `../../../node_modules/@shopify/flash-list`)"
@@ -2992,8 +2985,6 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/@react-native-community/datetimepicker"
   RNDeviceInfo:
     :path: "../../../node_modules/react-native-device-info"
-  RNFBAnalytics:
-    :path: "../../../node_modules/@react-native-firebase/analytics"
   RNFBApp:
     :path: "../../../node_modules/@react-native-firebase/app"
   RNFBMessaging:
@@ -3163,11 +3154,10 @@ SPEC CHECKSUMS:
   RNCMaskedView: 308c763227e237d4d260bd8841870e099572bb3e
   RNDateTimePicker: e30677c15dfba25452b1434181970162115cc4fe
   RNDeviceInfo: d863506092aef7e7af3a1c350c913d867d795047
-  RNFBAnalytics: abe86d090dea4dfe9c4e36523df5d6477865c96f
   RNFBApp: 11d842b835d7e484a306e66e6fd02a13c0478fdc
   RNFBMessaging: fbb4b994cdd8fbf90d4310008893520628c0ba2d
   RNFlashList: 000e9cbdb8c42fde96449e68103e1553113b4cee
-  RNGestureHandler: 8b1080a6db0be82dbca18550d6212b885bfab6b2
+  RNGestureHandler: dcb1b1db024f3744b03af56d132f4f72c4c27195
   RNKeychain: 455cc7002480eac3d24f67b4329ec80c7d901edc
   RNLocalize: 7ed277415799ab5a8931b77fd2124c4749822e8a
   RNPermissions: 0f2ea503cb886cd6c7191bcefeb733467dae824c
@@ -3189,6 +3179,6 @@ SPEC CHECKSUMS:
   VisionCamera: 7aaae584148bbc250e81b5662e45a7f25c18be2e
   Yoga: 31a098f74c16780569aebd614a0f37a907de0189
 
-PODFILE CHECKSUM: ca03835200938cc10d80d63e8c003657ba0703d1
+PODFILE CHECKSUM: f8b3666d6cb5174aca39f6c2dcd9f3ee3bf47db0
 
 COCOAPODS: 1.16.2
