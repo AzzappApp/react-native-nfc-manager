@@ -197,7 +197,7 @@ const CoverRenderer = (
 
   const coverSource = useMemo(
     () =>
-      coverUploadingData
+      coverUploadingData && coverUploadingData.webCardId === webCardId
         ? {
             mediaId: coverUploadingData.mediaId,
             uri:
@@ -214,7 +214,7 @@ const CoverRenderer = (
               mediaId: coverMedia?.id,
             }
           : null,
-    [coverUploadingData, mediaUri, coverMedia?.id, requestedSize],
+    [coverUploadingData, webCardId, requestedSize, mediaUri, coverMedia?.id],
   );
 
   const styles = useStyleSheet(stylesheet);
