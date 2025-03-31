@@ -31,20 +31,19 @@ import { useHomeScreenContext } from './HomeScreenContext';
 import Tooltips from './Tooltips';
 import type { HomeScreenContent_user$key } from '#relayArtifacts/HomeScreenContent_user.graphql';
 import type { CarouselSelectListHandle } from '#ui/CarouselSelectList';
-import type { NotificationType } from '@azzapp/shared/notificationHelpers';
-import type { Ref } from 'react';
+import type { PushNotificationType } from '@azzapp/shared/notificationHelpers';
 
 type HomeScreenContentProps = {
   user: HomeScreenContent_user$key;
-  selectListRef: Ref<CarouselSelectListHandle>;
   refreshQuery: (() => void) | undefined;
 };
 
 const HomeScreenContent = ({
   user: userKey,
-  selectListRef,
   refreshQuery,
 }: HomeScreenContentProps) => {
+  const selectListRef = useRef<CarouselSelectListHandle | null>(null);
+
   // #regions data
   const user = useFragment(
     graphql`
@@ -76,8 +75,8 @@ const HomeScreenContent = ({
   );
 
   const onDeepLinkInApp = useCallback(
-    (deepLink: NotificationType) => {
-      if (deepLink === 'multiuser_invitation') {
+    (notification: PushNotificationType) => {
+      if (notification.type === 'multiuser_invitation') {
         refreshQuery?.();
       }
     },
@@ -89,8 +88,8 @@ const HomeScreenContent = ({
   const changeWebCardTimeout = useRef<ReturnType<typeof setTimeout>>();
 
   const redirectDeepLink = useCallback(
-    (deepLink: NotificationType, webCardId: string) => {
-      switch (deepLink) {
+    (notification: PushNotificationType) => {
+      switch (notification.type) {
         case 'shareBack':
           router.push({
             route: 'CONTACTS',
@@ -100,7 +99,7 @@ const HomeScreenContent = ({
           router.push({
             route: 'WEBCARD',
             params: {
-              webCardId,
+              webCardId: notification.webCardId,
             },
           });
           break;
@@ -112,39 +111,33 @@ const HomeScreenContent = ({
   );
 
   const onDeepLinkOpenedApp = useCallback(
-    (deepLink: NotificationType, extraData?: object | string) => {
-      if (
-        typeof extraData === 'object' &&
-        'webCardId' in extraData &&
-        typeof extraData.webCardId === 'string'
-      ) {
-        const webCardId = extraData.webCardId;
-        const newProfile = user.profiles?.find(
-          p => p.webCard?.id === extraData.webCardId,
+    (notification: PushNotificationType) => {
+      if ('webCardId' in notification && user.profiles) {
+        const webCardId = notification.webCardId;
+        const newProfileIndex = user.profiles.findIndex(
+          p => p.webCard?.id === webCardId,
         );
+        const newProfile =
+          newProfileIndex >= 0 ? user.profiles[newProfileIndex] : undefined;
+
         const { profileInfos } = getAuthState();
 
         if (newProfile && newProfile.id !== profileInfos?.profileId) {
-          changeWebCardTimeout.current = setTimeout(() => {
-            onChangeWebCard({
-              profileId: newProfile.id,
-              profileRole: newProfile.profileRole,
-              invited: newProfile.invited,
-              webCardId: newProfile.webCard?.id,
-              webCardUserName: newProfile.webCard?.userName,
-              cardIsPublished: newProfile.webCard?.cardIsPublished,
-              coverIsPredefined: newProfile.webCard?.coverIsPredefined,
-            });
-            redirectDeepLink(deepLink, webCardId);
-          }, 350);
-          // 350ms, allows to bypass HomeProfile workaround timeout see related code:
-          // changeIndexTimeout.current = setTimeout(() => {
-          //   onSelectedIndexChangeLatest(index);
-          // }, 300);
-        } else {
-          redirectDeepLink(deepLink, webCardId);
+          // The scroll to index is important here, even if onChangeWebCard will do it
+          // It allows to bypass the workaround to force selection of webcard after 300ms
+          selectListRef.current?.scrollToIndex(newProfileIndex + 1);
+          onChangeWebCard({
+            profileId: newProfile.id,
+            profileRole: newProfile.profileRole,
+            invited: newProfile.invited,
+            webCardId: newProfile.webCard?.id,
+            webCardUserName: newProfile.webCard?.userName,
+            cardIsPublished: newProfile.webCard?.cardIsPublished,
+            coverIsPredefined: newProfile.webCard?.coverIsPredefined,
+          });
         }
       }
+      redirectDeepLink(notification);
     },
     [redirectDeepLink, user.profiles],
   );

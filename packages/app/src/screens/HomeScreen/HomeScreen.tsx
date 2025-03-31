@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useRef } from 'react';
+import { Suspense, useEffect } from 'react';
 import { graphql, usePreloadedQuery } from 'react-relay';
 import { HomeIcon } from '#components/HomeIcon';
 import { setMainTabBarOpacity } from '#components/MainTabBar';
@@ -18,7 +18,6 @@ import HomeScreenPrefetcher from './HomeScreenPrefetcher';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { HomeScreenQuery } from '#relayArtifacts/HomeScreenQuery.graphql';
 import type { HomeRoute } from '#routes';
-import type { CarouselSelectListHandle } from '#ui/CarouselSelectList';
 
 export const homeScreenQuery = graphql`
   query HomeScreenQuery {
@@ -66,8 +65,6 @@ const HomeScreen = ({
 
   useSaveOfflineVCard(currentUser?.profiles);
 
-  const ref = useRef<CarouselSelectListHandle | null>(null);
-
   if (
     !currentUser ||
     !currentUser.profiles ||
@@ -80,11 +77,7 @@ const HomeScreen = ({
     <Suspense>
       <HomeScreenProvider userKey={currentUser}>
         <TooltipProvider>
-          <HomeScreenContent
-            user={currentUser}
-            selectListRef={ref}
-            refreshQuery={refreshQuery}
-          />
+          <HomeScreenContent user={currentUser} refreshQuery={refreshQuery} />
           <HomeScreenPrefetcher user={currentUser} />
         </TooltipProvider>
       </HomeScreenProvider>

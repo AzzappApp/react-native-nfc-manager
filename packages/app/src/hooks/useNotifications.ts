@@ -8,11 +8,9 @@ import {
   requestNotifications,
 } from 'react-native-permissions';
 import { useMutation, graphql, commitMutation } from 'react-relay';
-import {
-  isSupportedNotificationType,
-  type NotificationType,
-} from '@azzapp/shared/notificationHelpers';
+import { isSupportedNotificationType } from '@azzapp/shared/notificationHelpers';
 import { useRouter } from '#components/NativeRouter';
+import type { PushNotificationType } from '@azzapp/shared/notificationHelpers';
 import type { PermissionStatus } from 'react-native-permissions';
 import type { Environment } from 'react-relay';
 import type { MutationConfig, MutationParameters } from 'relay-runtime';
@@ -93,7 +91,7 @@ export const useNotificationsManager = () => {
 };
 
 type DeepLinkCallbackType =
-  | ((deepLink: NotificationType, extraData?: object | string) => void)
+  | ((notification: PushNotificationType) => void)
   | null;
 
 type useNotificationsEventProp = {
@@ -105,29 +103,14 @@ const useNotificationsEvent = ({
   onDeepLinkInApp,
   onDeepLinkOpenedApp,
 }: useNotificationsEventProp) => {
-  const handleDeepLink = useCallback(
-    (
-      deepLink: NotificationType,
-      callback?: DeepLinkCallbackType,
-      extraData?: object | string,
-    ) => {
-      callback?.(deepLink, extraData);
-    },
-    [],
-  );
-
   const router = useRouter();
   useEffect(() => {
     //on opening the app in background
     const unsubscribe = messaging.onNotificationOpenedApp(
       messaging.getMessaging(),
       remoteMessage => {
-        if (isSupportedNotificationType(remoteMessage.data?.deepLink)) {
-          handleDeepLink(
-            remoteMessage.data.deepLink,
-            onDeepLinkOpenedApp,
-            remoteMessage.data.extraData,
-          );
+        if (isSupportedNotificationType(remoteMessage.data?.type)) {
+          onDeepLinkOpenedApp?.(remoteMessage.data as PushNotificationType);
         }
       },
     );
@@ -136,36 +119,28 @@ const useNotificationsEvent = ({
       .getInitialNotification(messaging.getMessaging())
       .then(remoteMessage => {
         if (remoteMessage) {
-          if (isSupportedNotificationType(remoteMessage.data?.deepLink)) {
-            handleDeepLink(
-              remoteMessage.data.deepLink,
-              onDeepLinkOpenedApp,
-              remoteMessage.data.extraData,
-            );
+          if (isSupportedNotificationType(remoteMessage.data?.type)) {
+            onDeepLinkOpenedApp?.(remoteMessage.data as PushNotificationType);
           }
         }
       });
 
     return unsubscribe;
-  }, [handleDeepLink, onDeepLinkInApp, onDeepLinkOpenedApp, router]);
+  }, [onDeepLinkInApp, onDeepLinkOpenedApp, router]);
 
   useEffect(() => {
     //on opening the app in background
     const unsubscribe = messaging.onMessage(
       messaging.getMessaging(),
       remoteMessage => {
-        if (isSupportedNotificationType(remoteMessage.data?.deepLink)) {
-          handleDeepLink(
-            remoteMessage.data.deepLink,
-            onDeepLinkInApp,
-            remoteMessage.data.extraData,
-          );
+        if (isSupportedNotificationType(remoteMessage.data?.type)) {
+          onDeepLinkInApp?.(remoteMessage.data as PushNotificationType);
         }
       },
     );
 
     return unsubscribe;
-  }, [handleDeepLink, onDeepLinkInApp]);
+  }, [onDeepLinkInApp]);
 };
 
 export const useDeleteNotifications = () => {

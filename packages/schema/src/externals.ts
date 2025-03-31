@@ -2,7 +2,7 @@ import { externalFunction } from './GraphQLContext';
 import type { AddContactInput } from '#__generated__/types';
 import type { Profile, WebCard } from '@azzapp/data';
 import type { Locale } from '@azzapp/i18n';
-import type { NotificationType } from '@azzapp/shared/notificationHelpers';
+import type { PushNotificationType } from '@azzapp/shared/notificationHelpers';
 
 type Parameters = {
   profile?: Profile;
@@ -42,27 +42,17 @@ export const notifyGooglePassWallet = externalFunction<
 >('notifyGooglePassWallet');
 
 type MessageType = {
-  type: NotificationType;
+  notification: PushNotificationType;
   mediaId?: string | null;
   sound?: string;
-  deepLink?: string; //maybe we could merge type and deepLink...
   locale: Locale;
   localeParams?: Record<string, string>;
-  extraData?: Record<string, string>;
 };
 
 export const sendPushNotification = externalFunction<
   (
     targetUserId: string,
-    {
-      type,
-      mediaId,
-      sound,
-      deepLink,
-      locale,
-      localeParams,
-      extraData,
-    }: MessageType,
+    { notification, mediaId, sound, locale, localeParams }: MessageType,
   ) => Promise<void>
 >('sendPushNotification');
 

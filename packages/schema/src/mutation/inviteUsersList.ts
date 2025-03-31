@@ -225,9 +225,10 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
     }
     if (user && webCard.userName) {
       await sendPushNotification(user.id, {
-        type: 'multiuser_invitation',
+        notification: {
+          type: 'multiuser_invitation',
+        },
         mediaId: webCard.coverMediaId,
-        deepLink: 'multiuser_invitation',
         localeParams: { userName: webCard.userName },
         locale: guessLocale(user?.locale),
       });

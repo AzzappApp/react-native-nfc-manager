@@ -150,9 +150,10 @@ const sendInvitations: MutationResolvers['sendInvitations'] = async (
       const userToNotify = users[i].user;
       if (userToNotify && webCard.userName) {
         await sendPushNotification(userToNotify.id, {
-          type: 'multiuser_invitation',
+          notification: {
+            type: 'multiuser_invitation',
+          },
           mediaId: webCard.coverMediaId,
-          deepLink: 'multiuser_invitation',
           localeParams: { userName: webCard.userName },
           locale: guessLocale(userToNotify.locale),
         });

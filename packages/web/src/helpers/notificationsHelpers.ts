@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs';
 import { SignJWT, importPKCS8 } from 'jose'; // because of  edge (jsonwebToken, google-auth-library, etc are not supported on "you can do nothing" edge)import { getFcmTokensForUserId } from '@azzapp/data';
 import { getFcmTokensForUserId } from '@azzapp/data';
 import {
@@ -6,29 +7,29 @@ import {
 } from '@azzapp/shared/imagesHelpers';
 import { getServerIntl } from './i18nHelpers';
 import type { Locale } from '@azzapp/i18n';
-import type { NotificationType } from '@azzapp/shared/notificationHelpers';
+import type {
+  NotificationType,
+  PushNotificationType,
+} from '@azzapp/shared/notificationHelpers';
 
 let accessToken: string | null = null;
 let tokenExpiry = 0;
 type MessageType = {
-  type: NotificationType;
+  notification: PushNotificationType;
   mediaId?: string | null;
   sound?: string; // sound is optionnal, default will use the default sound, for custom sound they have to be compiled with the app
-  deepLink?: string;
   locale: Locale;
   localeParams?: Record<string, string>;
-  extraData?: Record<string, any>;
 };
+
 export const sendPushNotification = async (
   targetUserId: string,
   {
-    type,
+    notification,
     mediaId,
     sound = 'default',
-    deepLink,
     locale,
     localeParams,
-    extraData,
   }: MessageType,
 ) => {
   const fcms = await getFcmTokensForUserId(targetUserId);
@@ -41,7 +42,7 @@ export const sendPushNotification = async (
 
   const message: Record<string, any> = {
     notification: {
-      ...getLabel(type, locale, localeParams),
+      ...getLabel(notification.type, locale, localeParams),
     },
   };
 
@@ -72,8 +73,7 @@ export const sendPushNotification = async (
               sound,
               'mutable-content': 1,
             },
-            extraData,
-            deepLink,
+            ...notification,
           },
           fcm_options: {
             image: imageUrl,
@@ -85,10 +85,7 @@ export const sendPushNotification = async (
             sound,
             image: imageUrl,
           },
-          data: {
-            extraData,
-            deepLink,
-          },
+          data: notification,
         };
       }
 
@@ -103,7 +100,17 @@ export const sendPushNotification = async (
             },
             body: JSON.stringify({ message }),
           },
-        );
+        ).then(result => {
+          if (result.status !== 200) {
+            console.error(
+              'cannot send push notification message',
+              message,
+              ' result is ',
+              result,
+            );
+            Sentry.captureMessage('Fail to send fcm message');
+          }
+        });
       } catch (error) {
         console.error('Unexpected error:', error);
       }

@@ -167,12 +167,13 @@ export const processShareBackSubmission = async (
     } as NewContact);
 
     await sendPushNotification(profile.userId, {
-      type: 'shareBack',
+      notification: {
+        type: 'shareBack',
+        webCardId: toGlobalId('WebCard', profile.webCardId),
+      },
       mediaId: null,
       sound: 'default',
-      deepLink: 'shareBack',
       locale: guessLocale(user?.locale),
-      extraData: { webCardId: toGlobalId('WebCard', profile.webCardId) },
     });
 
     if (contactMethod.method === CONTACT_METHODS.SMS) {

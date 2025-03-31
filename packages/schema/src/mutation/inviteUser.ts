@@ -187,9 +187,10 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
       const locale = guessLocale(existingUser?.locale ?? user.locale);
       if (webCard.userName) {
         await sendPushNotification(existingUser.id, {
-          type: 'multiuser_invitation',
+          notification: {
+            type: 'multiuser_invitation',
+          },
           mediaId: webCard.coverMediaId,
-          deepLink: 'multiuser_invitation',
           localeParams: { userName: webCard.userName },
           locale,
         });

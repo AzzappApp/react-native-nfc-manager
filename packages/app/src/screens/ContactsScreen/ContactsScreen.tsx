@@ -23,6 +23,7 @@ import ContactScreenLists from './ContactsScreenLists';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { ContactsScreenQuery } from '#relayArtifacts/ContactsScreenQuery.graphql';
 import type { ContactsRoute } from '#routes';
+import type { PushNotificationType } from '@azzapp/shared/notificationHelpers';
 
 const contactsScreenQuery = graphql`
   query ContactsScreenQuery($profileId: ID!) {
@@ -59,10 +60,10 @@ const ContactsScreen = ({
     useBoolean();
 
   const onDeepLink = useCallback(
-    (deepLink: string, extra: any) => {
+    (notification: PushNotificationType) => {
       if (
-        deepLink === 'shareBack' &&
-        extra.webCardId === profile?.webCard?.id
+        notification.type === 'shareBack' &&
+        notification.webCardId === profile?.webCard?.id
       ) {
         refreshQuery?.();
       }

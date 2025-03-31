@@ -211,14 +211,13 @@ const addContact: MutationResolvers['addContact'] = async (
       const userToNotify = await userLoader.load(profileToNotify?.userId);
       if (userToNotify) {
         await sendPushNotification(userToNotify.id, {
-          type: 'shareBack',
-          mediaId: null,
-          sound: 'default',
-          deepLink: 'shareBack',
-          locale: guessLocale(userToNotify?.locale),
-          extraData: {
+          notification: {
+            type: 'shareBack',
             webCardId: toGlobalId('WebCard', profileToNotify.webCardId),
           },
+          mediaId: null,
+          sound: 'default',
+          locale: guessLocale(userToNotify?.locale),
         });
       }
     }

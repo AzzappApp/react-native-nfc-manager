@@ -44,15 +44,16 @@ export const notifyWebCardUser = inngest.createFunction(
   async ({ event }) => {
     const { user, webCard } = event.data;
     await sendPushNotification(user.id, {
-      type: 'webCardUpdate',
+      notification: {
+        type: 'webCardUpdate',
+        webCardId: toGlobalId('WebCard', webCard.id),
+      },
       mediaId: null,
       sound: 'default',
-      deepLink: 'webCardUpdate',
       locale: guessLocale(user.locale),
       localeParams: {
         webCardUserName: webCard.userName ?? '',
       },
-      extraData: { webCardId: toGlobalId('WebCard', webCard.id) },
     });
 
     return { sent: true };
