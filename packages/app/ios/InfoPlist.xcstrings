@@ -8,7 +8,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "azzapp - Dev"
+            "value" : "azzapp -  Digital Business Card"
           }
         },
         "fr" : {
@@ -26,7 +26,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "azzapp-dev"
+            "value" : "azzapp"
           }
         },
         "fr" : {
@@ -44,7 +44,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "azzapp-dev needs access to your camera to capture photos and videos for sharing\n\t\twithin the app."
+            "value" : "azzapp needs access to your camera to capture photos and videos for sharing\n\t\twithin the app."
           }
         },
         "fr" : {
@@ -62,25 +62,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Allow azzapp-dev to access your contacts to easily invite friends to join a\n\t\tmulti-user WebCard."
+            "value" : "Allow azzapp to access your contacts to easily invite friends to join a\n\t\tmulti-user WebCard."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Autorisez azzapp à accéder à vos contacts pour inviter facilement des amis à rejoindre une WebCard multi-utilisateurs."
-          }
-        }
-      }
-    },
-    "NSLocationWhenInUseUsageDescription" : {
-      "comment" : "Privacy - Location When In Use Usage Description",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "azzapp-dev uses your position to record where you exchanged contact details with others."
           }
         }
       }
@@ -92,7 +80,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "azzapp-dev needs access to your microphone to record audio for video content within\n\t\tthe app."
+            "value" : "azzapp needs access to your microphone to record audio for video content within\n\t\tthe app."
           }
         },
         "fr" : {
@@ -110,7 +98,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "azzapp-dev uses motion detection to optimize the display of your contact card based\n\t\ton your device’s orientation."
+            "value" : "azzapp uses motion detection to optimize the display of your contact card based\n\t\ton your device’s orientation."
           }
         },
         "fr" : {
@@ -128,7 +116,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "azzapp-dev requires access to your photo library, in order to create your WebCard,\n\t\tshare and upload media."
+            "value" : "azzapp requires access to your photo library, in order to create your WebCard,\n\t\tshare and upload media."
           }
         },
         "fr" : {
