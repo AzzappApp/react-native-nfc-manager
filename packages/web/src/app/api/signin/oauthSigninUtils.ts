@@ -22,6 +22,7 @@ export const oauthSignin =
     csrfSecret,
     prompt,
     scope,
+    errorCallback,
   }: {
     authorizeURL: string;
     redirectURI: string;
@@ -29,6 +30,7 @@ export const oauthSignin =
     csrfSecret: Uint8Array;
     scope?: string;
     prompt?: string;
+    errorCallback?: string;
   }) =>
   async (req: NextRequest) => {
     let platform = req.nextUrl.searchParams.get('platform');
@@ -47,6 +49,10 @@ export const oauthSignin =
     url.searchParams.append('state', csrfToken);
     url.searchParams.append('scope', scope ?? 'profile email openid');
     url.searchParams.append('access_type', 'online');
+
+    if (errorCallback) {
+      url.searchParams.append('error_callback', errorCallback);
+    }
 
     if (prompt) {
       url.searchParams.append('prompt', prompt);
