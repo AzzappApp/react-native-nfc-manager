@@ -37,7 +37,7 @@ static void ClearKeychainIfNecessary() {
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-  [FIRApp configure];
+  // [FIRApp configure];
   ClearKeychainIfNecessary();
 
   self.moduleName = @"azzapp";
