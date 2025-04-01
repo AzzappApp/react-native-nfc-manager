@@ -131,9 +131,7 @@ const FullScreenMediaOverlay = ({
           zIndex: 10,
           justifyContent: 'center',
           alignItems: 'center',
-        },
-        !visibilityState && {
-          pointerEvents: 'box-none',
+          pointerEvents: visibilityState ? 'auto' : 'none',
         },
         animatedStyle,
       ]}
