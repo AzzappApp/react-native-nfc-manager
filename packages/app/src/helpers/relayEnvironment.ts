@@ -225,7 +225,7 @@ const createNetwork = () => {
             if (sink.closed) {
               return;
             }
-            if (isAbortError(error)) {
+            if (isAbortError(error) || error.message === ERRORS.INVALID_TOKEN) {
               sink.complete();
             } else {
               sink.error(error);
