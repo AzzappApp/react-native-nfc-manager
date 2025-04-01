@@ -10,22 +10,9 @@
         ],
         "components": [
           {
-            "/": "/*",
-            "comment": "Matches any URL with a path that starts with /*. (profile)"
-          },
-          {
-            "/": "/*/post/*",
-            "comment": "Matches any URL with a path that starts with /*/*. (profile/post)"
-          },
-          {
-            "/": "/*/emailSignature*",
+            "path": "/*",
             "exclude": true,
-            "comment": "Excludes any URL with a path that starts with /:profileID/emailSignature"
-          },
-          {
-            "/": "/api/*",
-            "exclude": true,
-            "comment": "Excludes any URL with a path that starts with /api/*"
+            "comment": "Exclude all Universal Links"
           }
         ]
       }
