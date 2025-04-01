@@ -5,7 +5,7 @@
 #import <RNScreens/RNSScreenStackAnimator.h>
 #import <RNBootSplash/RNBootSplash.h>
 #import "AZPCustomReavealTransition.h"
-// #import <Firebase.h>
+#import <Firebase.h>
 
 
 /**
@@ -37,7 +37,7 @@ static void ClearKeychainIfNecessary() {
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-  // [FIRApp configure];
+  [FIRApp configure];
   ClearKeychainIfNecessary();
 
   self.moduleName = @"azzapp";

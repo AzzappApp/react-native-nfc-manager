@@ -1,26 +1,27 @@
-// import {firebase,
-// setUserId,
-// setConsent,
-// logScreenView,
-// logEvent as firebaseLogEvent,
-// logSignUp as firebaseLogSignUp}
-// from '@react-native-firebase/analytics';
+import {
+  firebase,
+  setUserId,
+  setConsent,
+  logScreenView,
+  logEvent as firebaseLogEvent,
+  logSignUp as firebaseLogSignUp,
+} from '@react-native-firebase/analytics';
 
-export function setAnalyticsUserId(_userId: string) {
-  //setUserId(firebase.analytics(), userId).catch();
+export function setAnalyticsUserId(userId: string) {
+  setUserId(firebase.analytics(), userId).catch();
 }
 
-export async function setAnalyticsConsent(_consents: {
+export async function setAnalyticsConsent(consents: {
   analytics: boolean;
   marketing: boolean;
   functional: boolean;
 }) {
-  /* await setConsent(firebase.analytics(), {
+  await setConsent(firebase.analytics(), {
     ad_storage: consents.marketing,
     analytics_storage: consents.analytics,
     functional_storage: consents.functional,
     security_storage: true,
-  }); */
+  });
 }
 
 /**
@@ -29,20 +30,20 @@ export async function setAnalyticsConsent(_consents: {
  * @param {string} userId
  *
  */
-export async function logSignUp(_userId: string) {
-  /* await setUserId(firebase.analytics(), userId)
+export async function logSignUp(userId: string) {
+  await setUserId(firebase.analytics(), userId)
     .then(async () => {
-         await firebaseLogSignUp(firebase.analytics(), { method: 'manual' });
+      await firebaseLogSignUp(firebase.analytics(), { method: 'manual' });
     })
-    .catch(); */
+    .catch();
 }
 
-export async function logSignIn(_userId: string) {
-  /*  await setUserId(firebase.analytics(), userId)
+export async function logSignIn(userId: string) {
+  await setUserId(firebase.analytics(), userId)
     .then(async () => {
       await logEvent('sign_in', { userId });
     })
-    .catch(); */
+    .catch();
 }
 
 /**
@@ -53,11 +54,8 @@ export async function logSignIn(_userId: string) {
  * @param {string} name
  * @param {{ [key: string]: any }} [params]
  */
-export async function logEvent(
-  _name: string,
-  _params?: { [key: string]: any },
-) {
-  //  await firebaseLogEvent(firebase.analytics(), name, params);
+export async function logEvent(name: string, params?: { [key: string]: any }) {
+  await firebaseLogEvent(firebase.analytics(), name, params);
 }
 
 /**
@@ -67,10 +65,10 @@ export async function logEvent(
  * @param {string} screenName
  */
 export async function analyticsLogScreenEvent(screenName: string) {
-  /*await logScreenView(firebase.analytics(), {
+  await logScreenView(firebase.analytics(), {
     screen_name: screenName,
     screen_class: screenName,
-  });*/
+  });
   // in order to prepare funnel
   //https://blog.theodo.com/2018/01/building-google-analytics-funnel-firebase-react-native/
   await logEvent('Page_' + screenName);

@@ -21,6 +21,11 @@
             "/": "/*/emailSignature*",
             "exclude": true,
             "comment": "Excludes any URL with a path that starts with /:profileID/emailSignature"
+          },
+          {
+            "/": "/api/*",
+            "exclude": true,
+            "comment": "Excludes any URL with a path that starts with /api/*"
           }
         ]
       }

@@ -1,4 +1,4 @@
-//import * as messaging from '@react-native-firebase/messaging';
+import * as messaging from '@react-native-firebase/messaging';
 import * as Device from 'expo-device';
 import { useCallback, useEffect, useState } from 'react';
 import { Platform } from 'react-native';
@@ -8,7 +8,7 @@ import {
   requestNotifications,
 } from 'react-native-permissions';
 import { useMutation, graphql, commitMutation } from 'react-relay';
-//import { isSupportedNotificationType } from '@azzapp/shared/notificationHelpers';
+import { isSupportedNotificationType } from '@azzapp/shared/notificationHelpers';
 import { useRouter } from '#components/NativeRouter';
 import type { PushNotificationType } from '@azzapp/shared/notificationHelpers';
 import type { PermissionStatus } from 'react-native-permissions';
@@ -73,7 +73,7 @@ export const useNotificationsManager = () => {
   );
 
   useEffect(() => {
-    /*    if (status === 'granted' || status === 'limited') {
+    if (status === 'granted' || status === 'limited') {
       messaging.getToken(messaging.getMessaging()).then(token => {
         return saveTokenToDatabase(token);
       });
@@ -81,7 +81,7 @@ export const useNotificationsManager = () => {
       return messaging.onTokenRefresh(messaging.getMessaging(), token => {
         saveTokenToDatabase(token);
       });
-    } */
+    }
   }, [saveTokenToDatabase, status]);
 
   return {
@@ -105,7 +105,7 @@ const useNotificationsEvent = ({
 }: useNotificationsEventProp) => {
   const router = useRouter();
   useEffect(() => {
-    /*  //on opening the app in background
+    //on opening the app in background
     const unsubscribe = messaging.onNotificationOpenedApp(
       messaging.getMessaging(),
       remoteMessage => {
@@ -125,12 +125,12 @@ const useNotificationsEvent = ({
         }
       });
 
-    return unsubscribe; */
+    return unsubscribe;
   }, [onDeepLinkInApp, onDeepLinkOpenedApp, router]);
 
   useEffect(() => {
     //on opening the app in background
-    /* const unsubscribe = messaging.onMessage(
+    const unsubscribe = messaging.onMessage(
       messaging.getMessaging(),
       remoteMessage => {
         if (isSupportedNotificationType(remoteMessage.data?.type)) {
@@ -139,7 +139,7 @@ const useNotificationsEvent = ({
       },
     );
 
-    return unsubscribe; */
+    return unsubscribe;
   }, [onDeepLinkInApp]);
 };
 
