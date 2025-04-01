@@ -17,7 +17,7 @@ import type { AuthResponse } from '@azzapp/shared/WebAPI';
 
 WebBrowser.maybeCompleteAuthSession();
 const redirectUri = AuthSession.makeRedirectUri({
-  scheme: process.env.APP_SCHEME?.replace('://', '') ?? 'azzapp',
+  scheme: process.env.APP_SCHEME ?? 'azzapp',
   path: 'login',
   native: `${process.env.APP_SCHEME}://login`,
 });

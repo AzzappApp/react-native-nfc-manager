@@ -42,7 +42,7 @@
         "PURCHASE_IOS_KEY": "appl_lWmNaDeIzQcECQzHakHNyLaktch",
         "NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME": "azzapp-dev",
         "APP_WEBSHARED_CREDENTIALS": "dev.azzapp.com",
-        "APP_SCHEME": "azzapp-dev://"
+        "APP_SCHEME": "azzapp-dev"
       },
       "channel": "development"
     },
@@ -65,7 +65,7 @@
         "PURCHASE_ANDROID_KEY": "TODO",
         "NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME": "azzapp-dev",
         "APP_WEBSHARED_CREDENTIALS": "staging.azzapp.com",
-        "APP_SCHEME": "azzapp-staging://"
+        "APP_SCHEME": "azzapp-staging"
       },
       "channel": "staging"
     },
@@ -88,7 +88,7 @@
         "PURCHASE_IOS_KEY": "appl_XWlrdgSwpfsScIXTNWeFxtyCqzz",
         "PURCHASE_ANDROID_KEY": "TODO",
         "APP_WEBSHARED_CREDENTIALS": "azzapp.com",
-        "APP_SCHEME": "azzapp://"
+        "APP_SCHEME": "azzapp"
       },
       "channel": "production"
     }

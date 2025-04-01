@@ -24,7 +24,7 @@ const FILE_PREFIX = 'file://';
 const profileUrl = /^^([^/?]+)(?:\/([^/?]+))?(?:\/([^/?]+))?.*$/;
 const resetPasswordUrl = new RegExp('^reset-password');
 const prefixes = [
-  process.env.APP_SCHEME,
+  `${process.env.APP_SCHEME}://`,
   process.env.NEXT_PUBLIC_URL,
   'https://dev.azzapp.com',
   'https://staging.azzapp.com',
