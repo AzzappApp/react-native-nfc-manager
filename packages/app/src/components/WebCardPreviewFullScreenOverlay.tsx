@@ -6,7 +6,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
-import { shadow } from '#theme';
+import { colors, shadow } from '#theme';
 import Icon from '#ui/Icon';
 import CardModuleMediaSelector from './cardModules/CardModuleMediaSelector';
 import type { WebCardPreviewFullScreenOverlay_webCard$key } from '#relayArtifacts/WebCardPreviewFullScreenOverlay_webCard.graphql';
@@ -172,7 +172,13 @@ const FullScreenMediaOverlay = ({
             left: (width - fullscreenWidth) / 2 - 20,
           }}
         >
-          <Icon width={20} icon="close" />
+          <Icon
+            width={20}
+            icon="close"
+            style={{
+              tintColor: colors.white,
+            }}
+          />
         </View>
       </Pressable>
     </Animated.View>
