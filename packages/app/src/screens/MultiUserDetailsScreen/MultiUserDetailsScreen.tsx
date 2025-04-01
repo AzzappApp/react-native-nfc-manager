@@ -111,7 +111,7 @@ const MultiUserDetailsScreen = ({
               value: phoneNumber.formatInternational()!,
             }
           : null,
-      logo: profile?.logo,
+      logo: profile?.webCard?.logo || profile?.logo,
     },
   });
 
