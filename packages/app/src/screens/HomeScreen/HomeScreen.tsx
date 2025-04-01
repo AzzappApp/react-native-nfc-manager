@@ -23,6 +23,7 @@ export const homeScreenQuery = graphql`
   query HomeScreenQuery {
     currentUser {
       id
+      isPremium
       profiles {
         id
         ...OfflineVCardScreen_profiles
@@ -63,13 +64,9 @@ const HomeScreen = ({
     }
   }, [currentUser, currentUser?.profiles, hasFocus, router]);
 
-  useSaveOfflineVCard(currentUser?.profiles);
+  useSaveOfflineVCard(currentUser?.profiles, currentUser?.isPremium);
 
-  if (
-    !currentUser ||
-    !currentUser.profiles ||
-    currentUser.profiles.length === 0
-  ) {
+  if (!currentUser?.profiles || currentUser.profiles.length === 0) {
     return null;
   }
 
