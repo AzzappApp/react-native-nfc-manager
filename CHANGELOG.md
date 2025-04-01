@@ -1,3 +1,7 @@
+## 1.8.21
+
+* **fix:**  - **backoffice:** ensure predefined covers media are referenced
+
 ## 1.8.20
 
 
