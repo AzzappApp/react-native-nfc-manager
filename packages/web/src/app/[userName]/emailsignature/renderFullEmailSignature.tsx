@@ -155,28 +155,33 @@ const renderFullEmailSignature = ({
       padding: 20px 15px;
       background: white;
       font-family: Helvetica Neue;
-      border-collapse: collapse;"
+      border-collapse: collapse;
+      width: 100%;"
     >
     <tbody>
       ${avatarSection}
       <tr>
         <td
           valign="top"
-          style="border-right: 1px solid #E2E1E3; padding-right: 15px; min-width: 160px;"
+          style="border-right: 1px solid #E2E1E3; padding-right: 10px; width:200px;"
         >
-          <table cellspacing="0" cellpadding="0" style="padding-bottom: 12px;">
+          <table cellspacing="0" cellpadding="0" style="width: 100%;">
             ${nameSection}
             ${titleSection}
             ${companySection}
+            <tr>
+              <td style="padding-top: 12px;">
+                ${renderSaveMyContactButton({
+                  primaryColor: webCard.cardColors?.primary ?? colors.black,
+                  saveContactMessage,
+                  saveContactURL: saveContactURL ?? '#',
+                })}
+              </td>
+            </tr>
           </table>
-          ${renderSaveMyContactButton({
-            primaryColor: webCard.cardColors?.primary ?? colors.black,
-            saveContactMessage,
-            saveContactURL: saveContactURL ?? '#',
-          })}
         </td>
-        <td valign="top" style="width: 100%;">
-          <table cellspacing="0" cellpadding="0" style="padding-left: 15px; width:100%;">
+        <td valign="top">
+          <table cellspacing="0" cellpadding="0" style="padding-left: 10px; width:100%;">
             ${phoneSection}
             ${emailSection}
             ${companyLogoSection}

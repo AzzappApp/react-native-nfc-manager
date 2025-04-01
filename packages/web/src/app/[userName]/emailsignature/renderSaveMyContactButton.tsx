@@ -14,18 +14,17 @@ const renderSaveMyContactButton = ({
     color = '#000';
   }
   return `
-    <div>
-      <a
-        style="
-          display: block;
-          line-height: 14px;
-          font-size: 12px;
-          font-family: Helvetica Neue;
-          color: ${color};
-        "
-        href="${saveContactURL}"
-      >${saveContactMessage}</a>
-    </div>`;
+    <a
+      style="
+        display: block;
+        line-height: 14px;
+        font-size: 12px;
+        font-family: Helvetica Neue;
+        color: ${color};
+      "
+      href="${saveContactURL}"
+    >${saveContactMessage}</a>
+  `;
 };
 
 export default renderSaveMyContactButton;
