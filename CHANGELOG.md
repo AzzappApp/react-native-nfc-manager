@@ -1,3 +1,13 @@
+## 1.9.0-canary.135
+
+* **fix:**  - **android:** [#8178](https://github.com/AzzappApp/azzapp/pull/8178) use padding instead of inset ([#8190](https://github.com/AzzappApp/azzapp/pull/8190))
+* **fix:**  - **payment:** [#8183](https://github.com/AzzappApp/azzapp/pull/8183) set revenue cat userId info on startup ([#8187](https://github.com/AzzappApp/azzapp/pull/8187))
+* **fix:**  - **home:** [#8156](https://github.com/AzzappApp/azzapp/pull/8156) display premium indicator only for premium users ([#8159](https://github.com/AzzappApp/azzapp/pull/8159))
+* **fix:**  - remove duplicated toast provider ([#8167](https://github.com/AzzappApp/azzapp/pull/8167))
+* **fix:**  - ensure the correct logo is displayed in multiuser management screens ([#8195](https://github.com/AzzappApp/azzapp/pull/8195))
+* **fix:**  - ensure the pointer event is correctly reset after changing visibility ([#8196](https://github.com/AzzappApp/azzapp/pull/8196))
+* **fix:**  - close icon goes black in dark mode ([#8197](https://github.com/AzzappApp/azzapp/pull/8197))
+
 ## 1.9.0-canary.134
 
 * **fix:**  - **android:** [#8138](https://github.com/AzzappApp/azzapp/pull/8138) use correct app scheme env var ([#8192](https://github.com/AzzappApp/azzapp/pull/8192))
