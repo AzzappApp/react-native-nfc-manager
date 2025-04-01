@@ -85,6 +85,7 @@ const WebCardPreview = ({
         ...WebCardBackground_webCard
         ...WebCardBackgroundPreview_webCard
         coverBackgroundColor
+        ...WebCardPreviewFullScreenOverlay_webCard
       }
     `,
     webCardKey,
@@ -157,7 +158,7 @@ const WebCardPreview = ({
         }}
       >
         <FullScreenOverlay
-          cardStyle={cardStyle}
+          webCard={webCard}
           width={webCardWidth}
           height={webCardHeight}
         >

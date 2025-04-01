@@ -5,15 +5,16 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { type CardStyle } from '@azzapp/shared/cardHelpers';
+import { graphql, useFragment } from 'react-relay';
 import { shadow } from '#theme';
 import Icon from '#ui/Icon';
 import CardModuleMediaSelector from './cardModules/CardModuleMediaSelector';
+import type { WebCardPreviewFullScreenOverlay_webCard$key } from '#relayArtifacts/WebCardPreviewFullScreenOverlay_webCard.graphql';
 import type { CardModuleSourceMedia } from './cardModules/cardModuleEditorType';
 
 type FullScreenOverlayContextProps = {
   children: React.ReactNode;
-  cardStyle?: CardStyle | null | undefined;
+  webCard?: WebCardPreviewFullScreenOverlay_webCard$key;
   width: number;
   height: number;
 };
@@ -33,7 +34,7 @@ export const useFullScreenOverlayContext = (media: CardModuleSourceMedia) => {
  */
 export const FullScreenOverlay = ({
   children,
-  cardStyle,
+  webCard,
   width,
   height,
 }: FullScreenOverlayContextProps) => {
@@ -54,7 +55,7 @@ export const FullScreenOverlay = ({
     <FullScreenOverlayContext.Provider value={valueMemo}>
       <FullScreenMediaOverlay
         media={media}
-        cardStyle={cardStyle}
+        webCard={webCard}
         visibilityState={visibilityState}
         setVisibilityState={setVisibilityState}
         width={width}
@@ -67,7 +68,7 @@ export const FullScreenOverlay = ({
 
 type FullScreenMediaOverlayProps = {
   media: CardModuleSourceMedia | null;
-  cardStyle?: CardStyle | null;
+  webCard?: WebCardPreviewFullScreenOverlay_webCard$key;
   visibilityState: boolean;
   setVisibilityState: (arg: boolean) => void;
   width: number;
@@ -79,7 +80,7 @@ type FullScreenMediaOverlayProps = {
  */
 const FullScreenMediaOverlay = ({
   media,
-  cardStyle,
+  webCard: webCardKey,
   visibilityState,
   setVisibilityState,
   width,
@@ -88,7 +89,16 @@ const FullScreenMediaOverlay = ({
   const onPress = () => {
     setVisibilityState(false);
   };
-
+  const webCard = useFragment(
+    graphql`
+      fragment WebCardPreviewFullScreenOverlay_webCard on WebCard {
+        cardStyle {
+          borderRadius
+        }
+      }
+    `,
+    webCardKey,
+  );
   // compute expected image sizes
   const aspectRatio = media ? media.width / media.height : 1;
   let fullscreenWidth = Math.min(900, width - 60);
@@ -146,7 +156,7 @@ const FullScreenMediaOverlay = ({
             height: fullscreenHeight,
           }}
           imageStyle={{
-            borderRadius: cardStyle?.borderRadius ?? 0,
+            borderRadius: webCard?.cardStyle?.borderRadius ?? 0,
             maxWidth: 900,
             maxHeight: '90%',
             ...shadow({ appearance: 'dark', direction: 'bottom' }),

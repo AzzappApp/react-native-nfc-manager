@@ -61,6 +61,7 @@ describe('WebCardScreen', () => {
               otherColors
             }
             ...CoverRenderer_webCard
+            ...WebCardPreviewFullScreenOverlay_webCard
           }
         }
       }
@@ -77,6 +78,9 @@ describe('WebCardScreen', () => {
             dark: '#000000',
             light: '#FFFFFF',
             otherColors: ['#000000', '#FFFFFF'],
+          },
+          cardStyle: {
+            borderRadius: 10,
           },
           coverIsPredefined: false,
           firstName: 'John',
