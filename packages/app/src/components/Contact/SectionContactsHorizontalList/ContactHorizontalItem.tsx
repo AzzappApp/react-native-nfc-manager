@@ -1,12 +1,10 @@
 import { PermissionStatus as ContactPermissionStatus } from 'expo-contacts';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { colors } from '#theme';
 import WhatsappButton from '#components/Contact/WhatsappButton';
 import CoverRenderer from '#components/CoverRenderer';
 import { findLocalContact } from '#helpers/contactHelpers';
 import useImageFromContact from '#hooks/useImageFromContact';
-import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
 import ContactAvatar from '../ContactAvatar';
 import type { ContactType } from '#helpers/contactListHelpers';
@@ -15,20 +13,16 @@ import type { Contact } from 'expo-contacts';
 
 type Props = {
   contact: ContactType;
-  onInviteContact: (onHideInvitation: () => void) => void;
   onShowContact: (contact: ContactType) => void;
   localContacts: Contact[];
-  invited: boolean;
   contactsPermissionStatus: ContactPermissionStatus;
   showContactAction: (arg: ContactActionProps | undefined) => void;
 };
 
 const ContactHorizontalItem = ({
   contact,
-  onInviteContact,
   onShowContact,
   localContacts,
-  invited,
   contactsPermissionStatus,
   showContactAction,
 }: Props) => {
@@ -55,10 +49,6 @@ const ContactHorizontalItem = ({
     contact.phoneNumbers,
     localContacts,
   ]);
-
-  const onInvite = useCallback(() => {
-    onInviteContact(() => setShowInvite(false));
-  }, [onInviteContact]);
 
   const onShow = useCallback(() => {
     onShowContact(contact);
@@ -115,12 +105,7 @@ const ContactHorizontalItem = ({
           />
         )}
       </PressableNative>
-      {showInvite && !invited && (
-        <PressableNative style={styles.invite} onPress={onInvite}>
-          <Icon icon="invite" style={styles.icon} size={17} />
-        </PressableNative>
-      )}
-      {!showInvite && !invited && (
+      {showInvite && (
         <WhatsappButton
           phoneNumber={contact?.phoneNumbers?.[0]?.number}
           style={styles.invite}
@@ -148,9 +133,6 @@ const styles = StyleSheet.create({
     height: 31,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  icon: {
-    tintColor: colors.white,
   },
 });
 

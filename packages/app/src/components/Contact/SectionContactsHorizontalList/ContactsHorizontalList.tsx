@@ -20,7 +20,6 @@ type ContactsScreenSectionProps = {
   title: string;
   data: ContactType[];
   localContacts: Contact[];
-  onInviteContact: (contact: ContactType, onHideInvitation: () => void) => void;
   onShowContact: (contact: ContactType) => void;
   contactsPermissionStatus: ContactPermissionStatus;
   showContactAction: (arg: ContactActionProps | undefined) => void;
@@ -31,7 +30,6 @@ const ContactsScreenSection = ({
   title,
   data,
   localContacts,
-  onInviteContact,
   onShowContact,
   contactsPermissionStatus,
   showContactAction,
@@ -52,25 +50,14 @@ const ContactsScreenSection = ({
       return (
         <ContactHorizontalItem
           contact={item}
-          onInviteContact={onHideInvitation => {
-            onInviteContact(item, onHideInvitation);
-          }}
           onShowContact={onShowContact}
           localContacts={localContacts}
-          invited={invited}
           contactsPermissionStatus={contactsPermissionStatus}
           showContactAction={showContactAction}
         />
       );
     },
-    [
-      invited,
-      localContacts,
-      onInviteContact,
-      onShowContact,
-      contactsPermissionStatus,
-      showContactAction,
-    ],
+    [localContacts, onShowContact, contactsPermissionStatus, showContactAction],
   );
 
   const intl = useIntl();

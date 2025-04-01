@@ -16,7 +16,6 @@ type Props = {
   onEndReached: () => void;
   onRefresh: () => void;
   refreshing: boolean;
-  onInviteContact: (contact: ContactType, onHideInvitation: () => void) => void;
   onShowContact: (contact: ContactType) => void;
   localContacts: Contact[];
   contactsPermissionStatus: ContactPermissionStatus;
@@ -35,7 +34,6 @@ const ContactsList = ({
   onEndReached,
   onRefresh,
   refreshing,
-  onInviteContact,
   onShowContact,
   localContacts,
   contactsPermissionStatus,
@@ -55,7 +53,6 @@ const ContactsList = ({
       return (
         <ContactsListItem
           contact={item}
-          onInviteContact={onInviteContact}
           onShowContact={onShowContact}
           localContacts={localContacts}
           contactsPermissionStatus={contactsPermissionStatus}
@@ -63,13 +60,7 @@ const ContactsList = ({
         />
       );
     },
-    [
-      showContactAction,
-      contactsPermissionStatus,
-      localContacts,
-      onInviteContact,
-      onShowContact,
-    ],
+    [showContactAction, contactsPermissionStatus, localContacts, onShowContact],
   );
 
   return (

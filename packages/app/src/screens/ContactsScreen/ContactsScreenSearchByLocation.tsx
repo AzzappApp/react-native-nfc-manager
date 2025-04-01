@@ -14,7 +14,6 @@ type ContactsScreenSearchByLocationProps = {
   onEndReached: () => void;
   onRefresh: () => void;
   refreshing: boolean;
-  onInviteContact: (contact: ContactType, onHideInvitation: () => void) => void;
   onShowContact: (contact: ContactType) => void;
   localContacts: Contact[];
   contactsPermissionStatus: ContactPermissionStatus;
@@ -27,7 +26,6 @@ const ContactsScreenSearchByLocation = ({
   onEndReached,
   onRefresh,
   refreshing,
-  onInviteContact,
   onShowContact,
   localContacts,
   contactsPermissionStatus,
@@ -78,7 +76,6 @@ const ContactsScreenSearchByLocation = ({
       onEndReached={onEndReached}
       refreshing={refreshing}
       onRefresh={onRefresh}
-      onInviteContact={onInviteContact}
       onShowContact={onShowContact}
       localContacts={localContacts}
       contactsPermissionStatus={contactsPermissionStatus}

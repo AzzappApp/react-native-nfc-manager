@@ -1,8 +1,11 @@
-import * as Sentry from '@sentry/react-native';
 import { Image } from 'expo-image';
 import parsePhoneNumberFromString from 'libphonenumber-js';
-import { memo, useEffect, useState } from 'react';
-import { Linking } from 'react-native';
+import { memo } from 'react';
+import { Linking, StyleSheet } from 'react-native';
+import {
+  getWhatsAppUrl,
+  useIsWhatsAppSupportedContext,
+} from '#screens/ContactsScreen/isWhatsappSupportedContext';
 import PressableNative from '#ui/PressableNative';
 import type { PressableNativeProps } from '#ui/PressableNative';
 
@@ -10,49 +13,31 @@ const WhatsappButton = ({
   phoneNumber: contactPhoneNumber,
   ...props
 }: PressableNativeProps & { phoneNumber: string }) => {
-  const [url, setUrl] = useState('');
+  const isWhatsappSupported = useIsWhatsAppSupportedContext();
+  if (!isWhatsappSupported || !contactPhoneNumber) return undefined;
 
-  useEffect(() => {
-    let phoneNumber;
-    if (contactPhoneNumber) {
-      phoneNumber = parsePhoneNumberFromString(contactPhoneNumber);
-    }
-    if (phoneNumber) {
-      getUrl(phoneNumber.number)
-        .then(setUrl)
-        .catch(err => {
-          Sentry.captureException(err);
-        });
-    }
-  }, [contactPhoneNumber]);
+  const phoneNumber = parsePhoneNumberFromString(contactPhoneNumber);
+  if (!phoneNumber) {
+    return undefined;
+  }
+  const url = getWhatsAppUrl(phoneNumber.number);
+  if (!url) {
+    return undefined;
+  }
 
   const handleClick = () => {
     Linking.openURL(url);
   };
 
-  if (!url) {
-    return null;
-  }
-
   return (
     <PressableNative onPress={handleClick} {...props}>
-      <Image
-        style={{ width: 31, height: 31 }}
-        source={require('#assets/whatsapp.svg')}
-      />
+      <Image style={styles.image} source={require('#assets/whatsapp.svg')} />
     </PressableNative>
   );
 };
 
+const styles = StyleSheet.create({
+  image: { width: 31, height: 31 },
+});
+
 export default memo(WhatsappButton);
-
-const getUrl = async (number: string) => {
-  const url = `whatsapp://send?phone=${number}`;
-  const supported = await Linking.canOpenURL(url);
-
-  if (!supported) {
-    console.warn(`${url} is not supported`);
-  }
-
-  return supported ? url : '';
-};

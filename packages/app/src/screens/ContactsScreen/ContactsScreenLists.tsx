@@ -23,6 +23,7 @@ import ContactsFilteredByLocation from './ContactsFilteredByLocation';
 import ContactsScreenSearchByDate from './ContactsScreenSearchByDate';
 import ContactsScreenSearchByLocation from './ContactsScreenSearchByLocation';
 import ContactsScreenSearchByName from './ContactsScreenSearchByName';
+import { IsAzzappSupportedProvider } from './isWhatsappSupportedContext';
 import type { ContactDetails, ContactType } from '#helpers/contactListHelpers';
 import type {
   ContactsScreenLists_contacts$data,
@@ -450,76 +451,74 @@ const ContactsScreenLists = ({
   }
 
   return (
-    <View style={styles.flex}>
-      {profile && searchBy === 'name' && (
-        <ContactsScreenSearchByName
-          contacts={contacts}
-          onEndReached={onEndReached}
-          onRefresh={onRefresh}
-          refreshing={refreshing}
-          onInviteContact={onInviteContactInner}
-          onShowContact={onShowContact}
-          localContacts={localContacts}
-          contactsPermissionStatus={contactsPermissionStatus}
-          showContactAction={setContactActionData}
-          listFooterComponent={<Animated.View style={footerStyle} />}
-        />
-      )}
-      {profile &&
-        searchBy === 'date' &&
-        (filterBy ? (
-          <ContactsFilteredByLocation
+    <IsAzzappSupportedProvider>
+      <View style={styles.flex}>
+        {profile && searchBy === 'name' && (
+          <ContactsScreenSearchByName
             contacts={contacts}
             onEndReached={onEndReached}
             onRefresh={onRefresh}
             refreshing={refreshing}
-            onInviteContact={onInviteContactInner}
             onShowContact={onShowContact}
             localContacts={localContacts}
             contactsPermissionStatus={contactsPermissionStatus}
             showContactAction={setContactActionData}
             listFooterComponent={<Animated.View style={footerStyle} />}
           />
-        ) : (
-          <ContactsScreenSearchByDate
+        )}
+        {profile &&
+          searchBy === 'date' &&
+          (filterBy ? (
+            <ContactsFilteredByLocation
+              contacts={contacts}
+              onEndReached={onEndReached}
+              onRefresh={onRefresh}
+              refreshing={refreshing}
+              onShowContact={onShowContact}
+              localContacts={localContacts}
+              contactsPermissionStatus={contactsPermissionStatus}
+              showContactAction={setContactActionData}
+              listFooterComponent={<Animated.View style={footerStyle} />}
+            />
+          ) : (
+            <ContactsScreenSearchByDate
+              contacts={contacts}
+              onEndReached={onEndReached}
+              onRefresh={onRefresh}
+              refreshing={refreshing}
+              onShowContact={onShowContact}
+              localContacts={localContacts}
+              contactsPermissionStatus={contactsPermissionStatus}
+              showContactAction={setContactActionData}
+              listFooterComponent={<Animated.View style={footerStyle} />}
+            />
+          ))}
+        {profile && searchBy === 'location' && (
+          <ContactsScreenSearchByLocation
             contacts={contacts}
             onEndReached={onEndReached}
             onRefresh={onRefresh}
             refreshing={refreshing}
-            onInviteContact={onInviteContactInner}
             onShowContact={onShowContact}
             localContacts={localContacts}
             contactsPermissionStatus={contactsPermissionStatus}
             showContactAction={setContactActionData}
             listFooterComponent={<Animated.View style={footerStyle} />}
           />
-        ))}
-      {profile && searchBy === 'location' && (
-        <ContactsScreenSearchByLocation
-          contacts={contacts}
-          onEndReached={onEndReached}
-          onRefresh={onRefresh}
-          refreshing={refreshing}
+        )}
+        <ContactDetailsModal
+          ref={contactDetails}
           onInviteContact={onInviteContactInner}
-          onShowContact={onShowContact}
-          localContacts={localContacts}
-          contactsPermissionStatus={contactsPermissionStatus}
-          showContactAction={setContactActionData}
-          listFooterComponent={<Animated.View style={footerStyle} />}
         />
-      )}
-      <ContactDetailsModal
-        ref={contactDetails}
-        onInviteContact={onInviteContactInner}
-      />
-      <ContactActionModal
-        contactActionData={contactActionData}
-        close={() => setContactActionData(undefined)}
-        onRemoveContacts={onRemoveContacts}
-        onInviteContact={onInviteContactInner}
-        onShow={onShowContact}
-      />
-    </View>
+        <ContactActionModal
+          contactActionData={contactActionData}
+          close={() => setContactActionData(undefined)}
+          onRemoveContacts={onRemoveContacts}
+          onInviteContact={onInviteContactInner}
+          onShow={onShowContact}
+        />
+      </View>
+    </IsAzzappSupportedProvider>
   );
 };
 

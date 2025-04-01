@@ -16,7 +16,6 @@ type Props = {
   onEndReached: () => void;
   onRefresh: () => void;
   refreshing: boolean;
-  onInviteContact: (contact: ContactType, onHideInvitation: () => void) => void;
   onShowContact: (contact: ContactType) => void;
   localContacts: Contact[];
   contactsPermissionStatus: ContactPermissionStatus;
@@ -30,7 +29,6 @@ const SectionContactsHorizontalList = ({
   onEndReached,
   onRefresh,
   refreshing,
-  onInviteContact,
   onShowContact,
   localContacts,
   contactsPermissionStatus,
@@ -46,7 +44,6 @@ const SectionContactsHorizontalList = ({
         <ContactsScreenSection
           data={item.data}
           localContacts={localContacts}
-          onInviteContact={onInviteContact}
           onShowContact={onShowContact}
           title={item.title}
           contactsPermissionStatus={contactsPermissionStatus}
@@ -58,7 +55,6 @@ const SectionContactsHorizontalList = ({
     [
       contactsPermissionStatus,
       localContacts,
-      onInviteContact,
       onPressAll,
       onShowContact,
       showContactAction,

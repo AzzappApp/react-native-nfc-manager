@@ -17,7 +17,6 @@ import type { Contact } from 'expo-contacts';
 
 type Props = {
   contact: ContactType;
-  onInviteContact: (contact: ContactType, onHideInvitation: () => void) => void;
   onShowContact: (contact: ContactType) => void;
   localContacts: Contact[];
   contactsPermissionStatus: ContactPermissionStatus;
@@ -28,7 +27,6 @@ const COVER_WIDTH = 35;
 
 const ContactSearchByNameItem = ({
   contact,
-  onInviteContact,
   onShowContact,
   localContacts,
   contactsPermissionStatus,
@@ -56,12 +54,6 @@ const ContactSearchByNameItem = ({
     contactsPermissionStatus,
     localContacts,
   ]);
-
-  const onInvite = useCallback(() => {
-    onInviteContact(contact, () => {
-      setShowInvite(false);
-    });
-  }, [contact, onInviteContact]);
 
   const onShow = useCallback(() => {
     onShowContact(contact);
@@ -151,14 +143,8 @@ const ContactSearchByNameItem = ({
       </PressableNative>
       <View style={styles.actions}>
         {showInvite && (
-          <PressableNative onPress={onInvite}>
-            <Icon icon="invite" />
-          </PressableNative>
-        )}
-        {!showInvite && (
           <WhatsappButton phoneNumber={contact?.phoneNumbers?.[0]?.number} />
         )}
-
         <PressableNative onPress={onMore}>
           <Icon icon="more" />
         </PressableNative>
