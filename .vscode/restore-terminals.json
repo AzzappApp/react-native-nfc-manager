@@ -74,6 +74,10 @@
         {
           "name": "web",
           "commands": ["cd packages/web", "yarn dev"]
+        },
+        {
+          "name": "inngest",
+          "commands": ["cd packages/web", "yarn inngest-cli"]
         }
       ]
     },
