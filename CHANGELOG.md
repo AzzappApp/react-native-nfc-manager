@@ -1,3 +1,7 @@
+## 1.9.0-canary.137
+
+* **fix:**  - **EmailSignature:** improve display on outlook ([#8201](https://github.com/AzzappApp/azzapp/pull/8201))
+
 ## 1.9.0-canary.136
 
 
