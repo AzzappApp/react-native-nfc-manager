@@ -1,3 +1,8 @@
+## 1.9.0-canary.132
+
+* **fix:**  - download qrcode as png instead of png ([#8184](https://github.com/AzzappApp/azzapp/pull/8184))
+* **fix:**  - add full screen overlay on webcard previews ([#8186](https://github.com/AzzappApp/azzapp/pull/8186))
+
 ## 1.9.0-canary.131
 
 
