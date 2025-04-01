@@ -5,6 +5,7 @@ import { createMockEnvironment } from 'relay-test-utils';
 import { onChangeWebCard } from '#helpers/authStore';
 import { render } from '#helpers/testHelpers';
 import { useProfileInfos } from '#hooks/authStateHooks';
+import { useSetRevenueCatUserInfo } from '#hooks/useSetRevenueCatUserInfo';
 import WelcomeScreenQueryNode from '#relayArtifacts/WelcomeScreenQuery.graphql';
 import { WelcomeScreen } from '../WelcomeScreen';
 import type { WelcomeScreenQuery } from '#relayArtifacts/WelcomeScreenQuery.graphql';
@@ -25,6 +26,10 @@ jest.mock('#hooks/authStateHooks', () => ({
   useProfileInfos: jest.fn(),
 }));
 
+jest.mock('#hooks/useSetRevenueCatUserInfo', () => ({
+  useSetRevenueCatUserInfo: jest.fn(),
+}));
+
 const onChangeWebCardMock = onChangeWebCard as jest.MockedFunction<
   typeof onChangeWebCard
 >;
@@ -36,7 +41,7 @@ const useProfileInfosMock = useProfileInfos as jest.MockedFunction<
 describe('WelcomeScreen', () => {
   const environment: RelayMockEnvironment = createMockEnvironment();
 
-  const renderWelcomScreen = (hasFocus = true) => {
+  const renderWelcomeScreen = (hasFocus = true) => {
     const preloadedQuery = loadQuery<WelcomeScreenQuery>(
       environment,
       WelcomeScreenQueryNode,
@@ -64,7 +69,7 @@ describe('WelcomeScreen', () => {
     environment.mock.clearCache();
   });
 
-  test("should call onChangeWebCard with null when current user don't have any profile", () => {
+  test("should call onChangeWebCard with null when current user don't have any profile", async () => {
     const testQuery = graphql`
       query WelcomeScreenTestPartialRenderQuery {
         currentUser {
@@ -88,7 +93,9 @@ describe('WelcomeScreen', () => {
 
     useProfileInfosMock.mockReturnValue(null);
 
-    renderWelcomScreen();
+    renderWelcomeScreen();
+
     expect(onChangeWebCardMock).toHaveBeenCalledWith(null);
+    expect(useSetRevenueCatUserInfo).toHaveBeenCalled();
   });
 });

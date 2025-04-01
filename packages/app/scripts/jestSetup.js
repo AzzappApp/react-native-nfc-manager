@@ -64,6 +64,7 @@ jest.mock('@sentry/react-native', () => ({
   init: () => jest.fn(),
   captureEvent: () => jest.fn(),
   captureMessage: () => jest.fn(),
+  captureException: () => jest.fn(),
 }));
 //#endRegion
 

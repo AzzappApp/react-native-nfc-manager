@@ -22,6 +22,7 @@ import { addGlobalEventListener } from '#helpers/globalEvents';
 import { PermissionProvider } from '#helpers/PermissionContext';
 import useApplicationFonts from '#hooks/useApplicationFonts';
 import useBoolean from '#hooks/useBoolean';
+import { useRevenueCat } from '#hooks/useRevenueCat';
 import useScreenDimensions from '#hooks/useScreenDimensions';
 import { OfflineVCardScreenRenderer } from '#screens/OfflineVCardScreen';
 import UpdateApplicationScreen from '#screens/UpdateApplicationScreen';
@@ -76,6 +77,8 @@ const App = () => {
     setSentryUser();
     addAuthStateListener(setSentryUser);
   }, []);
+
+  useRevenueCat();
 
   const onError = useCallback((error: Error) => {
     Sentry.captureException(error);

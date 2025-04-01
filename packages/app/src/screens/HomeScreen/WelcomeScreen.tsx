@@ -12,6 +12,7 @@ import relayScreen from '#helpers/relayScreen';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import useBoolean from '#hooks/useBoolean';
 import useScreenInsets from '#hooks/useScreenInsets';
+import { useSetRevenueCatUserInfo } from '#hooks/useSetRevenueCatUserInfo';
 import Button from '#ui/Button';
 import IconButton from '#ui/IconButton';
 import LoadingView from '#ui/LoadingView';
@@ -27,6 +28,8 @@ export const WelcomeScreen = ({
   preloadedQuery,
 }: RelayScreenProps<OnboardingRoute, WelcomeScreenQuery>) => {
   const { currentUser } = usePreloadedQuery(welcomeScreenQuery, preloadedQuery);
+
+  useSetRevenueCatUserInfo(currentUser);
 
   const intl = useIntl();
 
@@ -151,6 +154,7 @@ const welcomeScreenQuery = graphql`
         }
       }
       ...HomeBottomSheetPanel_user
+      ...useSetRevenueCatUserInfo_user
     }
   }
 `;

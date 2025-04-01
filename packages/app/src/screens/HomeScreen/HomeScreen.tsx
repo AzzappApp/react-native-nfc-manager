@@ -9,7 +9,6 @@ import relayScreen from '#helpers/relayScreen';
 import { TooltipProvider } from '#helpers/TooltipContext';
 import { useDeepLinkStoredRoute } from '#hooks/useDeepLink';
 import { useQuickActions } from '#hooks/useQuickActions';
-import { useRevenueCat } from '#hooks/useRevenueCat';
 import { useSetRevenueCatUserInfo } from '#hooks/useSetRevenueCatUserInfo';
 import AzzappLogoLoader from '#ui/AzzappLogoLoader';
 import HomeScreenContent from './HomeScreenContent';
@@ -48,7 +47,6 @@ const HomeScreen = ({
   const { currentUser } = usePreloadedQuery(homeScreenQuery, preloadedQuery);
 
   useSetRevenueCatUserInfo(currentUser);
-  useRevenueCat(currentUser?.id);
 
   const router = useRouter();
 
