@@ -65,6 +65,8 @@ type Profile implements Node {
     width: Int!
     location: LocationInput
     address: AddressInput
+    dark: String
+    light: String
   ): String!
 
   contactCardUrl: String!

@@ -82,6 +82,61 @@ export const createVideoThumbnail = async ({
   return path;
 };
 
+export const convertSvgToImageFile = async ({
+  filePath,
+  svg,
+  resolution,
+  format,
+  quality,
+}: {
+  filePath: string;
+  svg: string;
+  resolution: { width: number; height: number };
+  format: ImageFormat;
+  quality: number;
+}) => {
+  const svgData = Skia.SVG.MakeFromString(svg);
+  if (!svgData) return;
+
+  const surface = Skia.Surface.MakeOffscreen(
+    resolution.width,
+    resolution.height,
+  );
+  if (!surface) {
+    svgData.dispose();
+    return;
+  }
+  const canvas = surface.getCanvas();
+  const paint = Skia.Paint();
+
+  canvas.drawPaint(paint);
+  canvas.scale(
+    resolution.width / svgData.width(),
+    resolution.height / svgData.height(),
+  );
+  canvas.drawSvg(svgData, resolution.width, resolution.height);
+
+  const sourceImage = surface.makeImageSnapshot();
+  if (!sourceImage) {
+    svgData.dispose();
+    surface.dispose();
+    return;
+  }
+  const blob = await sourceImage.encodeToBytes(format, quality);
+  const ext =
+    format === ImageFormat.JPEG ? 'jpg' : ImageFormat.PNG ? 'png' : 'webp';
+
+  const path = `${Paths.cache.uri}${filePath}.${ext}`;
+  const file = new File(path);
+  if (!file.exists) {
+    file.create();
+  }
+  file.write(blob);
+  surface.dispose();
+  svgData.dispose();
+  return path;
+};
+
 export const saveTransformedImageToFile = async ({
   uri,
   resolution,

@@ -84,9 +84,16 @@ const ShakeAndShareScreen = ({
 
   const onDownloadQrCode = useCallback(() => {
     if (profile?.contactCardQrCodeWithoutLocation) {
-      downloadQrCode(profile.id, profile.contactCardQrCodeWithoutLocation);
+      downloadQrCode(
+        profile.webCard?.userName || profile.id,
+        profile.contactCardQrCodeWithoutLocation,
+      );
     }
-  }, [profile?.contactCardQrCodeWithoutLocation, profile?.id]);
+  }, [
+    profile?.contactCardQrCodeWithoutLocation,
+    profile?.id,
+    profile?.webCard?.userName,
+  ]);
 
   const [commit, isGeneratingEmail] = useMutation(graphql`
     mutation ShakeAndShareScreenGenerateEmailSignatureMutation(
@@ -312,6 +319,7 @@ const ShakeAndShareScreen = ({
                   onPress={() => {}} // missing video
                 />
               )}
+
               <LargeButton
                 appearance="light"
                 icon="QR_code"
@@ -550,7 +558,12 @@ const styleSheet = createStyleSheet(appearance => ({
 }));
 
 const shakeAndShareQuery = graphql`
-  query ShakeAndShareScreenQuery($profileId: ID!, $width: Int!) {
+  query ShakeAndShareScreenQuery(
+    $profileId: ID!
+    $width: Int!
+    $dark: String
+    $light: String
+  ) {
     node(id: $profileId) {
       ... on Profile @alias(as: "profile") {
         id
@@ -562,7 +575,11 @@ const shakeAndShareQuery = graphql`
           ...CoverRenderer_webCard
         }
         contactCardUrl
-        contactCardQrCodeWithoutLocation: contactCardQrCode(width: $width)
+        contactCardQrCodeWithoutLocation: contactCardQrCode(
+          width: $width
+          dark: $dark
+          light: $light
+        )
         ...ContactCardExportVcf_card
         ...SignaturePreview_profile
         ...ShakeAndShareScreen_profile
@@ -581,6 +598,8 @@ export default relayScreen(ShakeAndShareScreen, {
   getVariables: (_, profileInfos) => ({
     profileId: profileInfos?.profileId,
     width: qrCodeWidth(),
+    dark: '#FFFFFF',
+    light: '#000000',
   }),
   getScreenOptions: () => ({
     stackPresentation: Platform.OS === 'ios' ? 'formSheet' : 'fullScreenModal',

@@ -256,7 +256,10 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
   contactCardUrl: async profile => {
     return getContactCardUrl(profile);
   },
-  contactCardQrCode: async (profile, { width, location, address }) => {
+  contactCardQrCode: async (
+    profile,
+    { width, location, address, dark, light },
+  ) => {
     const result = await toString(
       await getContactCardUrl(profile, location, address),
       {
@@ -264,8 +267,8 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
         width,
         type: 'svg',
         color: {
-          dark: '#000',
-          light: '#0000',
+          dark: dark || '#000',
+          light: light || '#0000',
         },
         margin: 0,
       },

@@ -1,93 +1,76 @@
-import { captureException } from '@sentry/react-native';
-import { File } from 'expo-file-system/next';
+import * as Sentry from '@sentry/react-native';
 import ShareCommand from 'react-native-share';
-import { flushPromises } from '@azzapp/shared/jestHelpers';
-import DownloadQrCode from '#helpers/DownloadQrCode';
-import { act } from '#helpers/testHelpers';
+import DownloadQrCode from '../DownloadQrCode';
+import { convertSvgToImageFile } from '../mediaEditions/mediasExport';
 
-jest.mock('@sentry/react-native', () => ({
-  captureException: jest.fn(),
-}));
-
+jest.mock('../mediaEditions/mediasExport');
+jest.mock('expo-file-system/next', () => {
+  const deleteMock = jest.fn();
+  return {
+    File: jest.fn().mockImplementation(path => ({
+      path,
+      delete: deleteMock,
+    })),
+    Paths: { cache: { uri: '/cache' } },
+    __mocks__: {
+      deleteMock,
+    },
+  };
+});
 jest.mock('react-native-share', () => ({
   open: jest.fn(),
 }));
-
-jest.mock('expo-file-system/next', () => {
-  return {
-    Paths: {
-      cache: {
-        uri: '/mock/cache/directory/',
-      },
-    },
-    File: jest.fn().mockImplementation(() => {
-      return {
-        delete: jest.fn(),
-        create: jest.fn(),
-        write: jest.fn(),
-      };
-    }),
-  };
-});
+jest.mock('@sentry/react-native', () => ({
+  captureException: jest.fn(),
+}));
+const mockConvertSvgToImageFile = convertSvgToImageFile as jest.Mock;
+const mockShareOpen = ShareCommand.open as jest.Mock;
+const mockCaptureException = Sentry.captureException as jest.Mock;
+const { deleteMock } = (jest.requireMock('expo-file-system/next') as any)
+  .__mocks__;
+jest.mock('react-native-compressor', () => ({
+  getVideoMetaData: jest.fn(),
+}));
 
 describe('DownloadQrCode', () => {
-  test('should create file with correct file path and call with correct qrCode value and delete the temp file', async () => {
-    const writeMock = jest.fn();
-    const deleteMock = jest.fn();
-    jest.mocked(File).mockImplementation(
-      () =>
-        ({
-          delete: deleteMock,
-          create: jest.fn(),
-          write: writeMock,
-        }) as any,
-    );
-    await act(async () => {
-      await DownloadQrCode('profileId', 'qrCode');
-      flushPromises();
-    });
+  const profileId = 'user123';
+  const qrCodeSvg = '<svg></svg>';
+  const filePath = '/mock/cache/QrCode-user123.png';
 
-    expect(File).toHaveBeenCalledWith(
-      '/mock/cache/directory/QrCode-profileId.svg',
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should save, share, and delete the QR code file', async () => {
+    mockConvertSvgToImageFile.mockResolvedValue(filePath);
+
+    await DownloadQrCode(profileId, qrCodeSvg);
+
+    expect(mockConvertSvgToImageFile).toHaveBeenCalled();
+    expect(mockShareOpen).toHaveBeenCalledWith(
+      expect.objectContaining({ url: filePath }),
     );
-    expect(writeMock).toHaveBeenCalledWith('qrCode');
     expect(deleteMock).toHaveBeenCalled();
   });
 
-  test('should open ShareCommand with correct options', async () => {
-    const mock = jest.mocked(ShareCommand);
+  it('should not proceed if convertSvgToImageFile returns undefined', async () => {
+    mockConvertSvgToImageFile.mockResolvedValue(undefined);
 
-    await act(async () => {
-      await DownloadQrCode('profileId', 'qrCode');
-    });
+    await DownloadQrCode(profileId, qrCodeSvg);
 
-    expect(mock.open).toHaveBeenCalledWith({
-      failOnCancel: false,
-      saveToFiles: true,
-      type: 'image/svg+xml',
-      url: '/mock/cache/directory/QrCode-profileId.svg',
-    });
+    expect(mockShareOpen).not.toHaveBeenCalled();
+    expect(deleteMock).not.toHaveBeenCalled();
   });
 
-  test('should delete temp file on error', async () => {
-    const deleteMock = jest.fn();
-    const captureExceptionMock = jest.mocked(captureException);
-    jest.mocked(File).mockImplementation(
-      () =>
-        ({
-          delete: deleteMock,
-          create: jest.fn(),
-          write: jest.fn(() => {
-            throw new Error();
-          }),
-        }) as any,
-    );
-
-    await act(async () => {
-      await DownloadQrCode('profileId', 'qrCode');
+  it('should capture and log error if something fails', async () => {
+    const error = new Error('share failed');
+    mockConvertSvgToImageFile.mockImplementation(() => {
+      throw error;
     });
 
-    expect(captureExceptionMock).toHaveBeenCalled();
-    expect(deleteMock).toHaveBeenCalled();
+    await DownloadQrCode(profileId, qrCodeSvg);
+
+    expect(mockCaptureException).toHaveBeenCalledWith(error);
+    expect(deleteMock).not.toHaveBeenCalled(); // file was never created
   });
 });
