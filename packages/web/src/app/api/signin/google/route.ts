@@ -7,7 +7,6 @@ const googleSignin = oauthSignin({
   clientId: process.env.GOOGLE_CLIENT_ID!,
   csrfSecret: new TextEncoder().encode(process.env.GOOGLE_TOKEN_SECRET),
   scope: 'profile email',
-  prompt: 'consent',
 });
 
 export { googleSignin as GET };
