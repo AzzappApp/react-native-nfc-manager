@@ -1,3 +1,7 @@
+## 1.9.0-canary.134
+
+* **fix:**  - **android:** [#8138](https://github.com/AzzappApp/azzapp/pull/8138) use correct app scheme env var ([#8192](https://github.com/AzzappApp/azzapp/pull/8192))
+
 ## 1.9.0-canary.133
 
 
