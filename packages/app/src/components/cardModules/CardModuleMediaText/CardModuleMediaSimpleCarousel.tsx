@@ -92,17 +92,17 @@ const CardModuleMediaSimpleCarousel = ({
 
   const isSlidable = lineLength > dimension.width;
 
-  const horizontalPadding = isSlidable
+  const paddingHorizontal = isSlidable
     ? startPadding
     : (dimension.width - lineLength) / 2 + startPadding;
 
   const getItemLayout = useCallback(
     (_data: any, index: number) => ({
       length: itemWidth,
-      offset: itemWidth * index + cardGap * (index - 1) + horizontalPadding,
+      offset: itemWidth * index + cardGap * (index - 1) + paddingHorizontal,
       index,
     }),
-    [cardGap, horizontalPadding, itemWidth],
+    [cardGap, paddingHorizontal, itemWidth],
   );
 
   const renderItem = useCallback(
@@ -183,10 +183,9 @@ const CardModuleMediaSimpleCarousel = ({
             disableIntervalMomentum
             getItemLayout={getItemLayout}
             contentInsetAdjustmentBehavior="always"
-            contentOffset={{ x: -horizontalPadding, y: 0 }}
-            contentInset={{
-              right: horizontalPadding,
-              left: horizontalPadding,
+            contentOffset={{ x: -paddingHorizontal, y: 0 }}
+            contentContainerStyle={{
+              paddingHorizontal,
             }}
             ItemSeparatorComponent={() => {
               return <View style={{ width: cardGap, height: '100%' }} />;
@@ -196,7 +195,7 @@ const CardModuleMediaSimpleCarousel = ({
           <View
             style={{
               flexDirection: 'row',
-              paddingStart: horizontalPadding,
+              paddingStart: paddingHorizontal,
               alignItems: 'center',
             }}
           >
