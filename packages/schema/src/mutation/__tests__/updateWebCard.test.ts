@@ -9,6 +9,7 @@ import updateWebCardMutation from '../updateWebCard';
 // Mock dependencies
 jest.mock('@azzapp/data', () => ({
   updateWebCard: jest.fn(),
+  transaction: jest.fn(callback => callback()),
 }));
 
 jest.mock('#GraphQLContext', () => ({
@@ -44,14 +45,11 @@ jest.mock('@azzapp/shared/stringHelpers', () => ({
   isValidUserName: jest.fn(),
 }));
 
-jest.mock('@azzapp/shared/profileHelpers', () => ({
-  profileHasAdminRight: jest.fn(),
-}));
-
 jest.mock('#helpers/relayIdHelpers', () => jest.fn());
 
 jest.mock('#externals', () => ({
   invalidateWebCard: jest.fn(),
+  notifyWebCardUsers: jest.fn(),
 }));
 
 // Mock context and info
@@ -90,6 +88,12 @@ describe('updateWebCardMutation', () => {
     });
     (isValidUserName as jest.Mock).mockReturnValue(false);
     (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
+    (profileByWebCardIdAndUserIdLoader.load as jest.Mock).mockResolvedValueOnce(
+      {
+        invited: false,
+        profileRole: 'admin',
+      },
+    );
 
     await expect(
       updateWebCardMutation(
@@ -112,6 +116,12 @@ describe('updateWebCardMutation', () => {
     (isValidUserName as jest.Mock).mockReturnValue(true);
     (isUserNameAvailable as jest.Mock).mockResolvedValue({ available: false });
     (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
+    (profileByWebCardIdAndUserIdLoader.load as jest.Mock).mockResolvedValueOnce(
+      {
+        invited: false,
+        profileRole: 'admin',
+      },
+    );
 
     await expect(
       updateWebCardMutation(
@@ -123,23 +133,32 @@ describe('updateWebCardMutation', () => {
     ).rejects.toThrow(new GraphQLError(ERRORS.USERNAME_ALREADY_EXISTS));
   });
 
-  test('should throw UNAUTHORIZED if user is invited and tries to update company activity', async () => {
-    (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
-    (profileByWebCardIdAndUserIdLoader.load as jest.Mock).mockResolvedValue({
-      invited: true,
-    });
-    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
+  test('should update successfully and return webCard and profile', async () => {
+    const updatedWebCard = { ...mockWebCard, userName: 'updatedName' };
 
-    await expect(
-      updateWebCardMutation(
-        {},
-        {
-          webCardId: 'global-webcard-123',
-          input: { companyActivityLabel: 'activity-002' },
-        },
-        mockContext,
-        mockInfo,
-      ),
-    ).rejects.toThrow(new GraphQLError(ERRORS.UNAUTHORIZED));
+    (webCardLoader.load as jest.Mock)
+      .mockResolvedValueOnce(mockWebCard) // first load
+      .mockResolvedValueOnce(updatedWebCard); // after update
+    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
+    (profileByWebCardIdAndUserIdLoader.load as jest.Mock).mockResolvedValue({
+      invited: false,
+      profileRole: 'admin',
+    });
+    (isUserNameAvailable as jest.Mock).mockResolvedValue({ available: true });
+
+    const result = await updateWebCardMutation(
+      {},
+      { webCardId: 'global-webcard-123', input: { userName: 'updatedName' } },
+      mockContext,
+      mockInfo,
+    );
+
+    expect(result).toEqual({
+      webCard: updatedWebCard,
+      profile: {
+        invited: false,
+        profileRole: 'admin',
+      },
+    });
   });
 });

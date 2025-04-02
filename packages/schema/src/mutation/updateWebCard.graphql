@@ -15,4 +15,5 @@ input UpdateWebCardInput {
 
 type UpdateWebCardPayload {
   webCard: WebCard
+  profile: Profile
 }

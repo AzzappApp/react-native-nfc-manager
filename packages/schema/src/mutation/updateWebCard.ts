@@ -51,6 +51,21 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
+  const profile =
+    userId &&
+    (await profileByWebCardIdAndUserIdLoader.load({ userId, webCardId }));
+
+  if (!profile || profile.invited) {
+    throw new GraphQLError(ERRORS.UNAUTHORIZED);
+  }
+  if (!profileHasAdminRight(profile.profileRole)) {
+    throw new GraphQLError(ERRORS.FORBIDDEN, {
+      extensions: {
+        role: profile.profileRole,
+      },
+    });
+  }
+
   const previousUpdateDate = webCard.updatedAt;
 
   const partialWebCard: Partial<WebCard> = {
@@ -121,22 +136,6 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
     });
   }
 
-  if (updates.companyActivityLabel !== webCard.companyActivityLabel) {
-    const profile =
-      userId &&
-      (await profileByWebCardIdAndUserIdLoader.load({ userId, webCardId }));
-    if (!profile || profile.invited) {
-      throw new GraphQLError(ERRORS.UNAUTHORIZED);
-    }
-    if (!profileHasAdminRight(profile.profileRole)) {
-      throw new GraphQLError(ERRORS.FORBIDDEN, {
-        extensions: {
-          role: profile.profileRole,
-        },
-      });
-    }
-  }
-
   try {
     notifyWebCardUsers(webCard, previousUpdateDate);
 
@@ -172,10 +171,13 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
     if (result?.userName) {
       invalidateWebCard(result.userName);
     }
+
     return {
       webCard: result,
+      profile,
     };
-  } catch {
+  } catch (e) {
+    console.error(e);
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 };
