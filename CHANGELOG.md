@@ -1,3 +1,7 @@
+## 1.9.0-canary.146
+
+* **fix:**  - whatpsApp button should be always displayed is supported and one of the phone number is valid ([#8233](https://github.com/AzzappApp/azzapp/pull/8233))
+
 ## 1.9.0-canary.145
 
 
