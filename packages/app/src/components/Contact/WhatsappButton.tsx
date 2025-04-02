@@ -9,23 +9,41 @@ import {
 import PressableNative from '#ui/PressableNative';
 import type { PressableNativeProps } from '#ui/PressableNative';
 
+type NumberDescription = { readonly label: string; readonly number: string };
+
 const WhatsappButton = ({
   phoneNumber: contactPhoneNumber,
   ...props
-}: PressableNativeProps & { phoneNumber: string }) => {
+}: PressableNativeProps & {
+  phoneNumber: readonly NumberDescription[];
+}) => {
+  // check whatsapp is installed
   const isWhatsappSupported = useIsWhatsAppSupportedContext();
-  if (!isWhatsappSupported || !contactPhoneNumber) return undefined;
 
-  const phoneNumber = parsePhoneNumberFromString(contactPhoneNumber);
-  if (!phoneNumber) {
+  // check contact has phone number
+  if (
+    !isWhatsappSupported ||
+    !contactPhoneNumber ||
+    contactPhoneNumber.length === 0
+  ) {
     return undefined;
   }
-  const url = getWhatsAppUrl(phoneNumber.number);
-  if (!url) {
-    return undefined;
-  }
+  // check contact has valid phone number
+  const phoneNumber = contactPhoneNumber.find((number: NumberDescription) => {
+    if (!number.number) {
+      return false;
+    }
+    const parsedNumber = parsePhoneNumberFromString(number.number);
+    if (!parsedNumber) {
+      return false;
+    }
+    return true;
+  });
+  if (!phoneNumber) return undefined;
 
+  // get whatsapp deeplink
   const handleClick = () => {
+    const url = getWhatsAppUrl(phoneNumber.number);
     Linking.openURL(url);
   };
 

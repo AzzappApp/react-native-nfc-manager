@@ -105,12 +105,10 @@ const ContactHorizontalItem = ({
           />
         )}
       </PressableNative>
-      {showInvite && (
-        <WhatsappButton
-          phoneNumber={contact?.phoneNumbers?.[0]?.number}
-          style={styles.invite}
-        />
-      )}
+      <WhatsappButton
+        phoneNumber={contact?.phoneNumbers}
+        style={styles.invite}
+      />
     </View>
   );
 };

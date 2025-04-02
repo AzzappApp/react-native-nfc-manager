@@ -147,9 +147,7 @@ const ContactSearchByNameItem = ({
         </View>
       </PressableNative>
       <View style={styles.actions}>
-        {showInvite && (
-          <WhatsappButton phoneNumber={contact?.phoneNumbers?.[0]?.number} />
-        )}
+        <WhatsappButton phoneNumber={contact?.phoneNumbers} />
         <PressableNative onPress={onMore}>
           <Icon icon="more" />
         </PressableNative>
