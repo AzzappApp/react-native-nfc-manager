@@ -155,13 +155,13 @@ const AlternationItem = ({
         >
           <RichText
             text={cardModuleMedia.title}
-            fontSize={defaultTitleFontSize}
+            fontSize={cardStyle?.titleFontSize || defaultTitleFontSize}
             style={getTitleStyle(cardStyle, cardModuleColor)}
           />
           <RichText
             text={cardModuleMedia.text}
             style={getTextStyle(cardStyle, cardModuleColor)}
-            fontSize={defaultTextFontSize}
+            fontSize={cardStyle?.fontSize || defaultTextFontSize}
           />
         </View>
       </AlternationContainer>

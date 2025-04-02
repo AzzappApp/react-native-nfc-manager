@@ -21,8 +21,8 @@ type RichTextFromASTProps = {
   forceFontResizeValue?: number;
 };
 
-export const defaultFontSize = 15;
-export const defaultTextFontSize = 15;
+export const defaultFontSize = 16;
+export const defaultTextFontSize = 16;
 export const defaultTitleFontSize = 34;
 
 export const RichTextFromAST = ({
@@ -83,27 +83,35 @@ export const RichTextFromAST = ({
       }
     }
     if (stackedTags.includes('+3')) {
+      const newFontSize = fontSize + (forceFontResizeValue ?? 3);
       fontStyle = {
         ...fontStyle,
-        fontSize: fontSize + (forceFontResizeValue ?? 3),
+        fontSize: newFontSize,
+        lineHeight: Math.floor(newFontSize * 1.9),
       };
     }
     if (stackedTags.includes('-3')) {
+      const newFontSize = fontSize - (forceFontResizeValue ?? 3);
       fontStyle = {
         ...fontStyle,
         fontSize: fontSize - (forceFontResizeValue ?? 3),
+        lineHeight: Math.floor(newFontSize * 1.9),
       };
     }
     if (stackedTags.includes('+6')) {
+      const newFontSize = fontSize + (forceFontResizeValue ?? 6);
       fontStyle = {
         ...fontStyle,
-        fontSize: fontSize + (forceFontResizeValue ?? 6),
+        fontSize: newFontSize,
+        lineHeight: Math.floor(newFontSize * 1.6),
       };
     }
     if (stackedTags.includes('-6')) {
+      const newFontSize = fontSize - (forceFontResizeValue ?? 6);
       fontStyle = {
         ...fontStyle,
-        fontSize: fontSize - (forceFontResizeValue ?? 6),
+        fontSize: newFontSize,
+        lineHeight: Math.floor(newFontSize * 1.6),
       };
     }
 

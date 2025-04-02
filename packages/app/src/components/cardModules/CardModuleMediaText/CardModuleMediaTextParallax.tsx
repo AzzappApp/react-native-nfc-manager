@@ -139,13 +139,13 @@ const ParallaxItem = ({
           >
             <RichText
               text={cardModuleMedia.title}
-              fontSize={defaultTitleFontSize}
+              fontSize={cardStyle?.titleFontSize || defaultTitleFontSize}
             />
           </Text>
           <RichText
             text={cardModuleMedia.text}
             style={[getTextStyle(cardStyle, cardModuleColor), styles.textStyle]}
-            fontSize={defaultTextFontSize}
+            fontSize={cardStyle?.fontSize || defaultTextFontSize}
           />
         </View>
       </ParallaxContainer>

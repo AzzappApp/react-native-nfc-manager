@@ -116,13 +116,16 @@ const TitleTextModuleRenderer = ({
                 getTitleAlignmentStyle(variant),
               ]}
             >
-              <RichText text={data.title} fontSize={defaultTitleFontSize} />
+              <RichText
+                text={data.title}
+                fontSize={cardStyle?.titleFontSize || defaultTitleFontSize}
+              />
             </Text>
             <Text style={getTextAlignmentStyle(variant)}>
               <RichText
                 text={data.text}
                 style={getTextStyle(cardStyle, data.cardModuleColor)}
-                fontSize={defaultTextFontSize}
+                fontSize={cardStyle?.fontSize || defaultTextFontSize}
               />
             </Text>
           </View>
@@ -239,7 +242,7 @@ const TitleTextColumnRenderer = ({
               getTextStyle(cardStyle, cardModuleColor),
               getTextAlignmentStyle(variant),
             ]}
-            fontSize={defaultTextFontSize}
+            fontSize={cardStyle?.fontSize || defaultTextFontSize}
           />
         </View>
       );
