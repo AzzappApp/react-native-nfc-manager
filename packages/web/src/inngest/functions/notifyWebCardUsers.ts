@@ -4,6 +4,10 @@ import { guessLocale } from '@azzapp/i18n';
 import { sendPushNotification } from '#helpers/notificationsHelpers';
 import { inngest } from '../client';
 
+const NOTIF_DELAY = process.env.WEBCARD_NOTIFICATION_DELAY
+  ? parseInt(process.env.WEBCARD_NOTIFICATION_DELAY, 10)
+  : 5;
+
 export const notifyWebCardUsersBatch = inngest.createFunction(
   { id: 'webCardUsersNotificationBatch' },
   { event: 'batch/webCardUsersNotification' },
@@ -15,10 +19,7 @@ export const notifyWebCardUsersBatch = inngest.createFunction(
         new Date().getTime() - new Date(previousUpdatedAt).getTime();
       const diffInMinutes = diffInMs / 1000 / 60;
 
-      if (
-        diffInMinutes >=
-        (process.env.NEXT_PUBLIC_PLATFORM === 'production' ? 30 : 2)
-      ) {
+      if (diffInMinutes >= NOTIF_DELAY) {
         const users = await getUsersToNotifyOnWebCard(webCard.id);
         for (const user of users) {
           await step.sendEvent(`send-webCardUpdate-${webCard.id}-${user.id}`, {
