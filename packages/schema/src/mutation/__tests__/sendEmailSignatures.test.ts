@@ -28,7 +28,10 @@ describe('sendEmailSignaturesMutation', () => {
   const mockInfo = {} as any;
   const webCardId = 'webcard-1';
   const gqlWebCardId = 'gql-webcard-1';
-  const profiles = [{ id: 'profile-1' }, { id: 'profile-2' }];
+  const profiles = [
+    { id: 'profile-1', email: 'profile-1@email.com' },
+    { id: 'profile-2' },
+  ];
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -91,10 +94,9 @@ describe('sendEmailSignaturesMutation', () => {
       mockInfo,
     );
 
-    expect(sendEmailSignatures).toHaveBeenCalledWith(
-      ['profile-1', 'profile-2'],
-      { id: webCardId },
-    );
+    expect(sendEmailSignatures).toHaveBeenCalledWith(['profile-1'], {
+      id: webCardId,
+    });
   });
 
   it('returns the correct response', async () => {
@@ -110,11 +112,28 @@ describe('sendEmailSignaturesMutation', () => {
     );
 
     expect(result).toEqual({
-      profileIds: [
-        toGlobalId('Profile', 'profile-1'),
-        toGlobalId('Profile', 'profile-2'),
-      ],
-      sentCount: 2,
+      profileIds: [toGlobalId('Profile', 'profile-1')],
+      profileIdsWithoutEmail: [toGlobalId('Profile', 'profile-2')],
+      sentCount: 1,
     });
+  });
+
+  it('throws if we try to send email to user without email', async () => {
+    (getProfilesFromWebCard as jest.Mock).mockResolvedValue([
+      { id: 'profile-1' },
+    ]);
+
+    await expect(
+      sendEmailSignaturesMutation(
+        {},
+        {
+          webCardId: gqlWebCardId,
+          profileIds: ['gql-profile-1'],
+          allProfiles: false,
+        },
+        mockContext,
+        mockInfo,
+      ),
+    ).rejects.toThrow(new GraphQLError(ERRORS.USER_NO_EMAIL));
   });
 });

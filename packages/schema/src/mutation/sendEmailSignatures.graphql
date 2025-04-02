@@ -1,10 +1,13 @@
 extend type Mutation {
   sendEmailSignatures(
-     webCardId: ID!, profileIds: [ID!], allProfiles: Boolean
+    webCardId: ID!
+    profileIds: [ID!]
+    allProfiles: Boolean
   ): SendEmailSignatureResult!
 }
 
 type SendEmailSignatureResult {
   profileIds: [ID!]!
+  profileIdsWithoutEmail: [ID!]!
   sentCount: Int!
 }

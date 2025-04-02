@@ -30,13 +30,36 @@ export const sendEmailSignaturesMutation: MutationResolvers['sendEmailSignatures
           ? undefined
           : profileIds?.map(id => fromGlobalIdWithType(id, 'Profile')),
       )
-    ).map(profile => profile.id);
+    ).reduce<{ profileIds: string[]; profileIdsWithoutEmail: string[] }>(
+      (acc, profile) => {
+        if (profile.email) {
+          acc.profileIds.push(profile.id);
+        } else {
+          acc.profileIdsWithoutEmail.push(profile.id);
+        }
 
-    await sendEmailSignatures(foundProfileIds, webCard);
+        return acc;
+      },
+      {
+        profileIds: [],
+        profileIdsWithoutEmail: [],
+      },
+    );
+
+    if (foundProfileIds.profileIds.length <= 0) {
+      throw new GraphQLError(ERRORS.USER_NO_EMAIL);
+    }
+
+    await sendEmailSignatures(foundProfileIds.profileIds, webCard);
 
     return {
-      profileIds: foundProfileIds.map(id => toGlobalId('Profile', id)),
-      sentCount: foundProfileIds.length,
+      profileIds: foundProfileIds.profileIds.map(id =>
+        toGlobalId('Profile', id),
+      ),
+      profileIdsWithoutEmail: foundProfileIds.profileIdsWithoutEmail.map(id =>
+        toGlobalId('Profile', id),
+      ),
+      sentCount: foundProfileIds.profileIds.length,
     };
   };
 

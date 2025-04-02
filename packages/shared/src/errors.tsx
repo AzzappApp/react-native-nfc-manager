@@ -140,6 +140,10 @@ const ERRORS = {
    * The webcard doesn't have cover, action cannot be done
    */
   WEBCARD_NO_COVER: 'WEBCARD_NO_COVER',
+  /*
+   * The user does not have email adress
+   */
+  USER_NO_EMAIL: 'USER_NO_EMAIL',
   /**
    * not enough seats to publish a webcard
    */

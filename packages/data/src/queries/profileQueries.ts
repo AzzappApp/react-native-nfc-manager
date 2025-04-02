@@ -600,6 +600,7 @@ export const getProfilesFromWebCard = async (
   db()
     .select({
       id: ProfileTable.id,
+      email: UserTable.email,
     })
     .from(ProfileTable)
     .innerJoin(UserTable, eq(UserTable.id, ProfileTable.userId))
