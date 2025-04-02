@@ -1,70 +1,92 @@
 import { FlashList } from '@shopify/flash-list';
 import * as Contacts from 'expo-contacts';
 import { Image } from 'expo-image';
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
 import { getContactsAsync } from '#helpers/getLocalContactsMap';
 import IconButton from '#ui/IconButton';
+import ListLoadingFooter from '#ui/ListLoadingFooter';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
 import type { ListRenderItemInfo } from '@shopify/flash-list';
 import type { Contact } from 'expo-contacts';
+
+const PAGE_SIZE = 50;
 
 type MultiUserAddListProps = {
   onAddSingleUser: (contact: Contact) => void;
   searchValue: string | null | undefined;
 };
 
+const formatDisplayName = (contact: Contacts.Contact) =>
+  (contact.firstName && contact.lastName
+    ? `${contact.firstName} ${contact.lastName}`
+    : contact.firstName
+      ? `${contact.firstName}`
+      : contact.lastName
+        ? `${contact.lastName}`
+        : contact.name
+          ? `${contact.name}`
+          : ''
+  ).trim();
+
 const MultiUserAddList = ({
   onAddSingleUser,
   searchValue,
 }: MultiUserAddListProps) => {
   const [contacts, setContacts] = useState<Contacts.Contact[]>([]);
+  const [pageOffset, setPageOffset] = useState(0);
+  const [hasNextPage, setHasNextPage] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const formatDisplayName = (contact: Contacts.Contact) =>
-    (contact.firstName && contact.lastName
-      ? `${contact.firstName} ${contact.lastName}`
-      : contact.firstName
-        ? `${contact.firstName}`
-        : contact.lastName
-          ? `${contact.lastName}`
-          : contact.name
-            ? `${contact.name}`
-            : ''
-    ).trim();
+  const loadNextPage = useRef(false);
+
+  const loadContacts = useCallback(async () => {
+    if (loadNextPage.current || !hasNextPage) return;
+    loadNextPage.current = true;
+    setIsLoading(true);
+
+    const { status } = await Contacts.requestPermissionsAsync();
+    if (status === 'granted') {
+      const { data, hasNextPage } = await getContactsAsync({
+        pageSize: PAGE_SIZE,
+        pageOffset,
+        fields: [
+          Contacts.Fields.Name,
+          Contacts.Fields.FirstName,
+          Contacts.Fields.LastName,
+          Contacts.Fields.PhoneNumbers,
+          Contacts.Fields.Image,
+          Contacts.Fields.Birthday,
+          Contacts.Fields.UrlAddresses,
+          Contacts.Fields.SocialProfiles,
+          Contacts.Fields.Emails,
+          Contacts.Fields.Addresses,
+        ],
+        sort: Contacts.SortTypes.FirstName,
+      });
+
+      if (data.length > 0) {
+        setContacts(prev =>
+          [...prev, ...data].sort((a, b) =>
+            formatDisplayName(a).localeCompare(formatDisplayName(b)),
+          ),
+        );
+        setPageOffset(pageOffset + PAGE_SIZE);
+      }
+      setHasNextPage(hasNextPage);
+    }
+
+    setIsLoading(false);
+    loadNextPage.current = false;
+  }, [pageOffset, hasNextPage]);
 
   useEffect(() => {
-    (async () => {
-      const { status } = await Contacts.requestPermissionsAsync();
-      if (status === 'granted') {
-        const { data } = await getContactsAsync({
-          fields: [
-            Contacts.Fields.Name,
-            Contacts.Fields.FirstName,
-            Contacts.Fields.LastName,
-            Contacts.Fields.PhoneNumbers,
-            Contacts.Fields.Image,
-            Contacts.Fields.Birthday,
-            Contacts.Fields.UrlAddresses,
-            Contacts.Fields.SocialProfiles,
-            Contacts.Fields.Emails,
-            Contacts.Fields.Addresses,
-          ],
-        });
-
-        if (data.length > 0) {
-          setContacts(
-            data.sort((a, b) => {
-              return formatDisplayName(a).localeCompare(formatDisplayName(b));
-            }),
-          );
-        }
-      }
-    })();
-  }, []);
+    loadContacts();
+  }, [loadContacts]);
 
   const contactData = useMemo(() => {
     if (isNotFalsyString(searchValue)) {
@@ -112,19 +134,28 @@ const MultiUserAddList = ({
     [onAddSingleUser],
   );
 
+  const ListFooterComponent = useMemo(
+    () => <ListLoadingFooter loading={isLoading} />,
+    [isLoading],
+  );
+
   return (
     <FlashList
       data={contactData}
       renderItem={renderItem}
       keyExtractor={keyExtractor}
-      keyboardShouldPersistTaps="always"
-      renderScrollComponent={KeyboardAwareScrollView}
       estimatedItemSize={76}
+      onEndReached={loadContacts}
+      onEndReachedThreshold={0.2}
+      keyboardShouldPersistTaps="always"
+      ListFooterComponent={ListFooterComponent}
+      renderScrollComponent={KeyboardAwareScrollView}
     />
   );
 };
 
-const keyExtractor = (item: Contacts.Contact) => item.id ?? item.name;
+const keyExtractor = (item: Contacts.Contact) =>
+  item.id ?? formatDisplayName(item);
 
 const AVATAR_SIZE = 56;
 const styles = StyleSheet.create({
