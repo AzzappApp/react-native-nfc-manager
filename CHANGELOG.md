@@ -1,3 +1,8 @@
+## 1.9.0-canary.138
+
+* **fix:**  - **multiUser:** [#8205](https://github.com/AzzappApp/azzapp/pull/8205) don’t invalidate record in cache - use a common… ([#8209](https://github.com/AzzappApp/azzapp/pull/8209))
+* **fix:**  - **home:** correctly get updated profile + remove setTimeout to avoid… ([#8203](https://github.com/AzzappApp/azzapp/pull/8203))
+
 ## 1.9.0-canary.137
 
 * **fix:**  - **EmailSignature:** improve display on outlook ([#8201](https://github.com/AzzappApp/azzapp/pull/8201))
