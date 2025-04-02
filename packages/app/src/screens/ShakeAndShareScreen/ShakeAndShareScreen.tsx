@@ -54,6 +54,7 @@ import IconButton from '#ui/IconButton';
 import LargeButton from '#ui/LargeButton';
 import PressableNative from '#ui/PressableNative';
 import Text from '#ui/Text';
+import IosAddLockScreenWidgetPopup from './IosAddLockScreenWidgetPopup';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { ShakeAndShareScreen_profile$key } from '#relayArtifacts/ShakeAndShareScreen_profile.graphql';
 import type { ShakeAndShareScreen_profileQuery } from '#relayArtifacts/ShakeAndShareScreen_profileQuery.graphql';
@@ -81,6 +82,11 @@ const ShakeAndShareScreen = ({
 
   const [popupIosWidgetVisible, showIosWidgetPopup, hideIosWidgetPopup] =
     useBoolean(false);
+  const [
+    popupIosLockScreenWidgetVisible,
+    showIosLockScreenWidgetPopup,
+    hideIosLockScreenWidgetPopup,
+  ] = useBoolean(false);
 
   const onDownloadQrCode = useCallback(() => {
     if (profile?.contactCardQrCodeWithoutLocation) {
@@ -316,7 +322,7 @@ const ShakeAndShareScreen = ({
                     description: 'Add qr-code to lock screen button label',
                   })}
                   style={styles.button}
-                  onPress={() => {}} // missing video
+                  onPress={showIosLockScreenWidgetPopup} // missing video
                 />
               )}
 
@@ -356,6 +362,10 @@ const ShakeAndShareScreen = ({
         <IosAddWidgetPopup
           visible={popupIosWidgetVisible}
           onHide={hideIosWidgetPopup}
+        />
+        <IosAddLockScreenWidgetPopup
+          visible={popupIosLockScreenWidgetVisible}
+          onHide={hideIosLockScreenWidgetPopup}
         />
       </Container>
       <ToastUi />
