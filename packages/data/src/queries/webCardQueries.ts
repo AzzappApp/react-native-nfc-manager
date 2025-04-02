@@ -475,7 +475,7 @@ export const markWebCardAsDeleted = async (webCardId: string, userId: string) =>
 
 export const getUsersToNotifyOnWebCard = async (webCardId: string) => {
   return db()
-    .select({
+    .selectDistinct({
       user: UserTable,
     })
     .from(UserTable)
