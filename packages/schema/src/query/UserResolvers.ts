@@ -97,7 +97,7 @@ export const User: ProtectedResolver<UserResolvers> = {
     return (
       lastSubscription &&
       (lastSubscription.status === 'active' ||
-        lastSubscription.endAt < new Date())
+        lastSubscription.endAt > new Date())
     );
   },
   paymentMeans: async user => {
