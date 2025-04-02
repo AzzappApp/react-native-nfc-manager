@@ -5,7 +5,7 @@ import { createMockEnvironment } from 'relay-test-utils';
 import { render } from '#helpers/testHelpers';
 import ContactCardEditForm from '../ContactCardEditForm';
 import type { ImagePickerProps } from '#components/ImagePicker/ImagePicker';
-import type { ContactCardEditScreenQuery$data } from '#relayArtifacts/ContactCardEditScreenQuery.graphql';
+import type { ContactCardEditFormFragment_profile$data } from '#relayArtifacts/ContactCardEditFormFragment_profile.graphql';
 import type { ContactCardFormValues } from '../ContactCardSchema';
 import type { ReactNode } from 'react';
 import type { UseFormGetValues } from 'react-hook-form';
@@ -99,6 +99,7 @@ describe('ContactCardEditForm', () => {
         logo: { id: 'logo', uri: 'url' },
       },
       webCard: {
+        id: 'webcardId',
         commonInformation: null,
         isMultiUser: false,
         isPremium: false,
@@ -116,6 +117,7 @@ describe('ContactCardEditForm', () => {
     const { getByTestId } = renderComponent({
       initialValues: INITIAL_VALUES,
       webCard: {
+        id: 'webCardId',
         commonInformation: {
           company: 'azzappCommon',
           addresses: null,
@@ -147,6 +149,7 @@ describe('ContactCardEditForm', () => {
         logo: { id: 'logo', uri: 'url' },
       },
       webCard: {
+        id: 'webCardId',
         commonInformation: {
           company: 'azzappCommon',
           addresses: null,
@@ -178,6 +181,7 @@ describe('ContactCardEditForm', () => {
         logo: { id: 'logo', uri: 'url' },
       },
       webCard: {
+        id: 'webCardId',
         commonInformation: {
           company: 'azzappCommon',
           addresses: null,
@@ -205,7 +209,7 @@ const renderComponent = ({
 }: {
   initialValues: ContactCardFormValues;
   webCard: NonNullable<
-    NonNullable<ContactCardEditScreenQuery$data['node']>['profile']
+    NonNullable<ContactCardEditFormFragment_profile$data>
   >['webCard'];
 }) => {
   const environment = createMockEnvironment();

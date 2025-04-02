@@ -113,6 +113,9 @@ const updateProfileMutation: MutationResolvers['updateProfile'] = async (
   if (avatarId) {
     updatedProfile.avatarId = avatarId;
   }
+  if (logoId) {
+    updatedProfile.logoId = logoId;
+  }
   if (contactCard) {
     updatedProfile.contactCard = {
       ...contactCard,

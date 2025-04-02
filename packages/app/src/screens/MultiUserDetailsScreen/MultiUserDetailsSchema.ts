@@ -1,4 +1,5 @@
 import * as z from 'zod';
+import { phoneNumberSchema } from '#helpers/phoneNumbersHelper';
 
 export const multiUserDetailsSchema = z.object({
   role: z.string(),
@@ -6,13 +7,7 @@ export const multiUserDetailsSchema = z.object({
   lastName: z.string().nullable(),
   title: z.string().nullable(),
   company: z.string().optional(),
-  phoneNumbers: z.array(
-    z.object({
-      label: z.string(),
-      number: z.string(),
-      selected: z.boolean().nullable().optional(),
-    }),
-  ),
+  phoneNumbers: z.array(phoneNumberSchema),
   emails: z.array(
     z.object({
       label: z.string(),

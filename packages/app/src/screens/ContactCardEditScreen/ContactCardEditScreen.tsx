@@ -6,7 +6,12 @@ import { StyleSheet } from 'react-native';
 import { Image as ImageCompressor } from 'react-native-compressor';
 import * as mime from 'react-native-mime-types';
 import Toast from 'react-native-toast-message';
-import { graphql, useMutation, usePreloadedQuery } from 'react-relay';
+import {
+  graphql,
+  useFragment,
+  useMutation,
+  usePreloadedQuery,
+} from 'react-relay';
 import { Observable } from 'relay-runtime';
 import ERRORS from '@azzapp/shared/errors';
 import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
@@ -32,10 +37,12 @@ import Header from '#ui/Header';
 import SafeAreaView from '#ui/SafeAreaView';
 import Text from '#ui/Text';
 import UploadProgressModal from '#ui/UploadProgressModal';
+import { contactCardFormFragment } from '../../fragments/ContactCardEditFormFragment';
 import ContactCardEditForm from './ContactCardEditForm';
 import { contactCardSchema } from './ContactCardSchema';
 import type { ScreenOptions } from '#components/NativeRouter';
 import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { ContactCardEditFormFragment_profile$key } from '#relayArtifacts/ContactCardEditFormFragment_profile.graphql';
 import type { ContactCardEditScreenQuery } from '#relayArtifacts/ContactCardEditScreenQuery.graphql';
 import type { ContactCardEditRoute } from '#routes';
 import type { ContactCardFormValues } from './ContactCardSchema';
@@ -45,80 +52,8 @@ const contactCardEditScreenQuery = graphql`
   query ContactCardEditScreenQuery($profileId: ID!, $pixelRatio: Float!) {
     node(id: $profileId) {
       ... on Profile @alias(as: "profile") {
-        id
-        webCard {
-          userName
-          isMultiUser
-          isPremium
-          commonInformation {
-            company
-            addresses {
-              address
-              label
-            }
-            emails {
-              label
-              address
-            }
-            phoneNumbers {
-              label
-              number
-            }
-            urls {
-              address
-            }
-            socials {
-              label
-              url
-            }
-          }
-          logo {
-            id
-            uri: uri(width: 180, pixelRatio: $pixelRatio)
-          }
-        }
-        contactCard {
-          firstName
-          lastName
-          title
-          company
-          emails {
-            label
-            address
-            selected
-          }
-          phoneNumbers {
-            label
-            number
-            selected
-          }
-          urls {
-            address
-            selected
-          }
-          addresses {
-            address
-            label
-            selected
-          }
-          birthday {
-            birthday
-            selected
-          }
-          socials {
-            url
-            label
-            selected
-          }
-        }
-        avatar {
-          id
-          uri: uri(width: 112, pixelRatio: $pixelRatio)
-        }
-        logo {
-          id
-          uri: uri(width: 180, pixelRatio: $pixelRatio)
-        }
+        ...ContactCardEditFormFragment_profile
+          @arguments(pixelRatio: $pixelRatio)
       }
     }
   }
@@ -134,13 +69,16 @@ const ContactCardEditScreen = ({
 
   const profile = node?.profile;
 
-  const { id, contactCard, webCard, avatar, logo } = profile ?? {
-    id: null,
-    contactCard: null,
-    webCard: null,
-    avatar: null,
-    logo: null,
-  };
+  const {
+    contactCard,
+    avatar,
+    logo,
+    webCard,
+    id: profileId,
+  } = useFragment(
+    contactCardFormFragment,
+    profile as ContactCardEditFormFragment_profile$key,
+  );
 
   const [commit, loading] = useMutation(graphql`
     mutation ContactCardEditScreenMutation(
@@ -151,54 +89,12 @@ const ContactCardEditScreen = ({
     ) {
       saveContactCard(profileId: $profileId, contactCard: $contactCard) {
         profile {
-          id
-          contactCardUrl
-          contactCard {
-            firstName
-            lastName
-            title
-            company
-            emails {
-              label
-              address
-              selected
-            }
-            phoneNumbers {
-              label
-              number
-              selected
-            }
-            urls {
-              address
-              selected
-            }
-            addresses {
-              address
-              label
-              selected
-            }
-            birthday {
-              birthday
-              selected
-            }
-            socials {
-              url
-              label
-              selected
-            }
-          }
+          ...ContactCardEditFormFragment_profile
+            @arguments(pixelRatio: $pixelRatio)
           contactCardUrl
           contactCardQrCode(width: $width)
           lastContactCardUpdate
           createdAt
-          avatar {
-            id
-            uri: uri(width: 112, pixelRatio: $pixelRatio)
-          }
-          logo {
-            id
-            uri: uri(width: 180, pixelRatio: $pixelRatio)
-          }
         }
       }
     }
@@ -306,7 +202,7 @@ const ContactCardEditScreen = ({
 
     commit({
       variables: {
-        profileId: id,
+        profileId,
         contactCard: {
           ...data,
           emails: data.emails?.filter(email => email.address),
@@ -324,7 +220,7 @@ const ContactCardEditScreen = ({
           birthday: data.birthday,
           socials: data.socials?.filter(social => social.url),
           avatarId,
-          logoId: !webCard?.isMultiUser ? logoId : undefined,
+          logoId: !webCard?.isMultiUser || !webCard?.logo ? logoId : undefined,
         },
         pixelRatio: CappedPixelRatio(),
         width: QRCodeWidth(),
@@ -334,13 +230,13 @@ const ContactCardEditScreen = ({
         router.back();
       },
       updater: store => {
-        if (id) {
+        if (profileId) {
           const user = store.getRoot().getLinkedRecord('currentUser');
           const profiles = user?.getLinkedRecords('profiles');
 
           if (profiles) {
             const profile = profiles?.find(
-              profile => profile.getDataID() === id,
+              profile => profile.getDataID() === profileId,
             );
 
             if (profile) {
@@ -427,7 +323,7 @@ const ContactCardEditScreen = ({
           }
         />
 
-        {webCard && <ContactCardEditForm webCard={webCard} control={control} />}
+        <ContactCardEditForm webCard={webCard} control={control} />
         <ScreenModal
           visible={!!progressIndicator}
           gestureEnabled={false}

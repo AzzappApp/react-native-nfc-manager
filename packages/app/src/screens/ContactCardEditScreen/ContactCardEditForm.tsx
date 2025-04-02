@@ -36,7 +36,7 @@ import ContactCardEditModalPhones from './ContactCardEditPhones';
 import ContactCardEditModalSocials from './ContactCardEditSocials';
 import ContactCardEditModalUrls from './ContactCardEditUrls';
 import type { ImagePickerResult } from '#components/ImagePicker';
-import type { ContactCardEditScreenQuery$data } from '#relayArtifacts/ContactCardEditScreenQuery.graphql';
+import type { ContactCardEditFormFragment_profile$data } from '#relayArtifacts/ContactCardEditFormFragment_profile.graphql';
 import type { ContactCardFormValues } from './ContactCardSchema';
 import type { ReactNode } from 'react';
 import type { Control } from 'react-hook-form';
@@ -44,7 +44,7 @@ import type { Control } from 'react-hook-form';
 type ContactCardEditFormProps = {
   control: Control<ContactCardFormValues>;
   webCard: NonNullable<
-    NonNullable<ContactCardEditScreenQuery$data['node']>['profile']
+    NonNullable<ContactCardEditFormFragment_profile$data>
   >['webCard'];
   children?: ReactNode;
   footer?: ReactNode;
