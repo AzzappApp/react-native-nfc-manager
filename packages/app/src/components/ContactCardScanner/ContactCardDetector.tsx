@@ -378,7 +378,7 @@ const ContactCardDetector = ({
     const route = await matchUrlWithRoute(url);
     if (route) {
       scanOngoing.current = false;
-      router?.push(route);
+      router.replace(route);
     }
   };
 
@@ -395,7 +395,6 @@ const ContactCardDetector = ({
         if (value.startsWith('http')) {
           // url detected
           handleDeeplink(value);
-          close();
         } else if (value.startsWith('BEGIN:VCARD') && extractVCardData) {
           const VCard = parse(value);
           if (VCard) {
