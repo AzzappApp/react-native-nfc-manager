@@ -1,3 +1,7 @@
+## 1.9.0-canary.140
+
+* **fix:**  - order lines by location (most recent first) ([#8211](https://github.com/AzzappApp/azzapp/pull/8211))
+
 ## 1.9.0-canary.139
 
 * **fix:**  - **multiUser:** [#8210](https://github.com/AzzappApp/azzapp/pull/8210) don’t return duplicated users ([#8212](https://github.com/AzzappApp/azzapp/pull/8212))
