@@ -22,6 +22,7 @@ type Props = {
   showContactAction: (arg: ContactActionProps | undefined) => void;
   listFooterComponent: JSX.Element;
   onPressAll?: (title: string) => void;
+  showLocationInSubtitle?: boolean;
 };
 
 const SectionContactsHorizontalList = ({
@@ -35,6 +36,7 @@ const SectionContactsHorizontalList = ({
   showContactAction,
   listFooterComponent,
   onPressAll,
+  showLocationInSubtitle,
 }: Props) => {
   const styles = useStyleSheet(stylesheet);
 
@@ -49,10 +51,12 @@ const SectionContactsHorizontalList = ({
           contactsPermissionStatus={contactsPermissionStatus}
           showContactAction={showContactAction}
           onPressAll={onPressAll}
+          showLocationInSubtitle={showLocationInSubtitle}
         />
       );
     },
     [
+      showLocationInSubtitle,
       contactsPermissionStatus,
       localContacts,
       onPressAll,

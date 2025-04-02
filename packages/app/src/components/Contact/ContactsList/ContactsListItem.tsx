@@ -4,7 +4,10 @@ import { StyleSheet, View } from 'react-native';
 import { COVER_RATIO } from '@azzapp/shared/coverHelpers';
 import { colors, textStyles } from '#theme';
 import CoverRenderer from '#components/CoverRenderer';
-import { findLocalContact } from '#helpers/contactHelpers';
+import {
+  findLocalContact,
+  getFriendlyNameFromLocation,
+} from '#helpers/contactHelpers';
 import useImageFromContact from '#hooks/useImageFromContact';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
@@ -95,6 +98,7 @@ const ContactSearchByNameItem = ({
     contact.lastName,
   ]);
 
+  const location = getFriendlyNameFromLocation(contact.meetingPlace);
   return (
     <View key={contact.id} style={styles.contact}>
       <PressableNative
@@ -138,6 +142,7 @@ const ContactSearchByNameItem = ({
           {contact.company && <Text numberOfLines={1}>{contact.company}</Text>}
           <Text style={(textStyles.small, styles.date)} numberOfLines={1}>
             {new Date(contact.createdAt).toLocaleDateString()}
+            {location ? ` - ${location}` : ''}
           </Text>
         </View>
       </PressableNative>

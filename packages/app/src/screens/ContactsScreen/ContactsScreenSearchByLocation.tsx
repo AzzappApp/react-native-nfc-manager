@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import SectionContactsHorizontalList from '#components/Contact/SectionContactsHorizontalList';
 import { useRouter } from '#components/NativeRouter';
+import { getFriendlyNameFromLocation } from '#helpers/contactHelpers';
 import type { ContactType } from '#helpers/contactListHelpers';
 import type { ContactActionProps } from './ContactsScreenLists';
 import type {
@@ -39,10 +40,7 @@ const ContactsScreenSearchByLocation = ({
       ?.reduce(
         (accumulator, contact) => {
           const title =
-            (contact.meetingPlace?.city ||
-              contact.meetingPlace?.subregion ||
-              contact.meetingPlace?.region ||
-              contact.meetingPlace?.country) ??
+            getFriendlyNameFromLocation(contact.meetingPlace) ??
             intl.formatMessage({
               defaultMessage: 'Unknown',
               description:

@@ -455,3 +455,19 @@ export const buildVCardFromExpoContact = async (contact: Contact) => {
   }
   return vCard;
 };
+
+export const getFriendlyNameFromLocation = (
+  meetingPlace: {
+    readonly city: string | null;
+    readonly country: string | null;
+    readonly region: string | null;
+    readonly subregion: string | null;
+  } | null,
+) => {
+  return (
+    meetingPlace?.city ||
+    meetingPlace?.subregion ||
+    meetingPlace?.region ||
+    meetingPlace?.country
+  );
+};

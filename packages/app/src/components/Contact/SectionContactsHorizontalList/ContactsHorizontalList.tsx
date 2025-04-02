@@ -1,7 +1,9 @@
 import { useCallback, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { FlatList, StyleSheet, View } from 'react-native';
+import { isDefined } from '@azzapp/shared/isDefined';
 import { colors } from '#theme';
+import { getFriendlyNameFromLocation } from '#helpers/contactHelpers';
 import { keyExtractor } from '#helpers/idHelpers';
 import Button from '#ui/Button';
 import Icon from '#ui/Icon';
@@ -23,6 +25,7 @@ type ContactsScreenSectionProps = {
   onShowContact: (contact: ContactType) => void;
   contactsPermissionStatus: ContactPermissionStatus;
   showContactAction: (arg: ContactActionProps | undefined) => void;
+  showLocationInSubtitle?: boolean;
   onPressAll?: (title: string) => void;
 };
 
@@ -34,6 +37,7 @@ const ContactsScreenSection = ({
   contactsPermissionStatus,
   showContactAction,
   onPressAll,
+  showLocationInSubtitle,
 }: ContactsScreenSectionProps) => {
   const [invited, setInvited] = useState(false);
 
@@ -62,6 +66,19 @@ const ContactsScreenSection = ({
 
   const intl = useIntl();
 
+  // locations to display at the end of the detail line
+  const locations = showLocationInSubtitle
+    ? Array.from(
+        new Set(
+          data
+            .map(x => getFriendlyNameFromLocation(x.meetingPlace))
+            .filter(isDefined),
+        ),
+      )
+        .sort((x, y) => (x > y ? 1 : -1))
+        .reduce((acc, item) => `${acc} - ${item}`, '')
+    : '';
+
   return (
     <View style={styles.section}>
       <View style={styles.sectionTitle}>
@@ -77,6 +94,7 @@ const ContactsScreenSection = ({
               description="ContactsScreen - Contacts counter under section by location or date"
               values={{ contacts: data.length }}
             />
+            {locations}
           </Text>
         </View>
         <PressableNative onPress={onMore}>

@@ -78,6 +78,7 @@ const ContactsScreenSearchByDate = ({
       contactsPermissionStatus={contactsPermissionStatus}
       showContactAction={showContactAction}
       listFooterComponent={listFooterComponent}
+      showLocationInSubtitle
     />
   );
 };
