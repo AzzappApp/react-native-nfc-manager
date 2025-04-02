@@ -1,3 +1,7 @@
+## 1.9.0-canary.144
+
+* **feat:**  - display location in contacts screen ([#8227](https://github.com/AzzappApp/azzapp/pull/8227))
+
 ## 1.9.0-canary.143
 
 * **fix:**  - realign font sizes ([#8224](https://github.com/AzzappApp/azzapp/pull/8224))
