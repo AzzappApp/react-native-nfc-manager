@@ -1,3 +1,9 @@
+## 1.9.0-canary.148
+
+* **fix:**  - **payment:** round minutes to avoid error on backend ([#8241](https://github.com/AzzappApp/azzapp/pull/8241))
+* **fix:**  - **payment:** [#8222](https://github.com/AzzappApp/azzapp/pull/8222) customers are directly charged on subscription update ([#8223](https://github.com/AzzappApp/azzapp/pull/8223))
+* **fix:**  - **backoffice:** ensure predefined covers media are referenced
+
 ## 1.9.0-canary.147
 
 * **fix:**  - **multiUser:** [#8228](https://github.com/AzzappApp/azzapp/pull/8228) add pagination on screen ([#8234](https://github.com/AzzappApp/azzapp/pull/8234))
