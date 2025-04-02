@@ -1,3 +1,8 @@
+## 1.9.0-canary.143
+
+* **fix:**  - realign font sizes ([#8224](https://github.com/AzzappApp/azzapp/pull/8224))
+* **build:**  - upgrade expo dep ([#8226](https://github.com/AzzappApp/azzapp/pull/8226))
+
 ## 1.9.0-canary.142
 
 * **fix:**  - **EmailSignature:** improve spacing ([#8225](https://github.com/AzzappApp/azzapp/pull/8225))
