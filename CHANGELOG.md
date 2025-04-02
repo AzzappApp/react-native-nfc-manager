@@ -1,3 +1,7 @@
+## 1.9.0-canary.142
+
+* **fix:**  - **EmailSignature:** improve spacing ([#8225](https://github.com/AzzappApp/azzapp/pull/8225))
+
 ## 1.9.0-canary.141
 
 * **fix:**  - **contacts:** [#8185](https://github.com/AzzappApp/azzapp/pull/8185) use flashlist for better handling of large list of contacts ([#8215](https://github.com/AzzappApp/azzapp/pull/8215))
