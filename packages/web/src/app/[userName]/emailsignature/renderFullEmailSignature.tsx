@@ -13,12 +13,14 @@ const renderFullEmailSignature = ({
   companyLogoUrl,
   saveContactMessage,
   saveContactURL,
+  isPreview,
 }: {
   contact: EmailSignatureParsed | undefined;
   webCard: WebCard;
   companyLogoUrl: string | null;
   saveContactMessage: string;
   saveContactURL?: string;
+  isPreview?: boolean;
 }) => {
   const avatarSection = contact?.avatar
     ? `
@@ -46,7 +48,8 @@ const renderFullEmailSignature = ({
           color: black;
           line-height: 20px;
           font-size: 16px;
-          font-weight: 500;"
+          font-weight: 500;
+          white-space: nowrap;"
         >
           ${formatDisplayName(contact?.firstName, contact?.lastName)}
         </span>
@@ -63,7 +66,8 @@ const renderFullEmailSignature = ({
             color: ${titleColor};
             line-height: 10px;
             font-size: 14px;
-            font-weight: 500;"
+            font-weight: 500;
+            white-space: nowrap;"
           >
             ${contact.title}
           </span>
@@ -78,7 +82,8 @@ const renderFullEmailSignature = ({
             color: #87878E;
             font-size: 12px;
             line-height: 14px;
-            font-weight: 400;"
+            font-weight: 400;
+            white-space: nowrap;"
           >
             ${contact.company}
           </span>
@@ -88,13 +93,15 @@ const renderFullEmailSignature = ({
 
   const generateContactLink = (href: string, text: string) =>
     `<tr>
-      <td title="${text}" style="
-        padding: 0 0 5px 4px; 
+      <td 
+        title="${text}" 
+        valign="middle"
+        style="
+        padding: 0px 0px 5px 0px; 
         vertical-align: middle;
         overflow: hidden;
         text-overflow: ellipsis;
-        white-space: nowrap;
-        max-width: 0px" valign="middle">
+        white-space: nowrap;${isPreview ? 'max-width: 0;' : ''}" >
         <a
           style="
             padding: 0;
@@ -107,9 +114,7 @@ const renderFullEmailSignature = ({
             text-decoration: none;
             text-decoration: unset;"
           href="${href}"
-        >
-          ${text}
-        </a>
+        >${text}</a>
       </td>
     </tr>
     `;
@@ -156,16 +161,16 @@ const renderFullEmailSignature = ({
       background: white;
       font-family: Helvetica Neue;
       border-collapse: collapse;
-      width: 100%;"
+      ${isPreview ? 'width: 100%;' : ''}"
     >
     <tbody>
       ${avatarSection}
       <tr>
         <td
           valign="top"
-          style="border-right: 1px solid #E2E1E3; padding-right: 10px; width:200px;"
+          style="border-right: 1px solid #E2E1E3; padding-right: 15px;${isPreview ? 'width: 1%;' : ''}"
         >
-          <table cellspacing="0" cellpadding="0" style="width: 100%;">
+          <table cellspacing="0" cellpadding="0">
             ${nameSection}
             ${titleSection}
             ${companySection}
@@ -181,7 +186,7 @@ const renderFullEmailSignature = ({
           </table>
         </td>
         <td valign="top">
-          <table cellspacing="0" cellpadding="0" style="padding-left: 10px; width:100%;">
+          <table cellspacing="0" cellpadding="0" style="padding-left: 15px;${isPreview ? 'width: 100%;' : ''}">
             ${phoneSection}
             ${emailSection}
             ${companyLogoSection}

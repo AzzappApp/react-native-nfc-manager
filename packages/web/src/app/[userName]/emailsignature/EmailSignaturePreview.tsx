@@ -69,6 +69,7 @@ const EmailSignaturePreview = ({
             companyLogoUrl,
             saveContactMessage,
             saveContactURL,
+            isPreview: true,
           }),
         }}
       />
