@@ -1,3 +1,8 @@
+## 1.9.0-canary.141
+
+* **fix:**  - **contacts:** [#8185](https://github.com/AzzappApp/azzapp/pull/8185) use flashlist for better handling of large list of contacts ([#8215](https://github.com/AzzappApp/azzapp/pull/8215))
+* **fix:**  - **emailSignature:** [#7758](https://github.com/AzzappApp/azzapp/pull/7758) add missing url ([#8213](https://github.com/AzzappApp/azzapp/pull/8213))
+
 ## 1.9.0-canary.140
 
 * **fix:**  - order lines by location (most recent first) ([#8211](https://github.com/AzzappApp/azzapp/pull/8211))
