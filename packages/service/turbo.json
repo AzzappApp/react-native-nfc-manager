@@ -5,12 +5,9 @@
   ],
   "tasks": {
     "build": {
-      "inputs": [
-        "src/**"
-      ],
-      "outputs": [
-        "lib/**"
-      ]
+      "dependsOn": ["^build"],
+      "inputs": ["src/**"],
+      "outputs": ["lib/**"]
     },
     "typecheck": {
       "inputs": [
