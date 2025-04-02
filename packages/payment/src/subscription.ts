@@ -249,7 +249,7 @@ export const updateExistingSubscription = async ({
           },
           body: {
             billing_description: `Subscription ${existingSubscription.subscriptionPlan} for ${totalSeats} seats`,
-            rebill_manager_initial_type: 'PAID',
+            rebill_manager_initial_type: 'FREE',
             rebill_manager_initial_price_cnts: '0',
             rebill_manager_initial_duration_min: `${timeUntilNextPayment}`,
             rebill_manager_rebill_price_cnts: `${recurringCost.amount + recurringCost.taxes}`,
