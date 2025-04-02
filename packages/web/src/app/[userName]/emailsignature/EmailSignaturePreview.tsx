@@ -13,6 +13,7 @@ type EmailSignaturePreviewProps = {
   contact: EmailSignatureParsed;
   companyLogoUrl: string | null;
   saveContactMessage: string;
+  saveContactURL: string;
 };
 
 const COVER_WIDTH = 198;
@@ -25,6 +26,7 @@ const EmailSignaturePreview = ({
   contact,
   companyLogoUrl,
   saveContactMessage,
+  saveContactURL,
 }: EmailSignaturePreviewProps) => {
   return mode === 'simple' ? (
     <section className={styles.simpleSignaturePreviewContainer}>
@@ -52,7 +54,7 @@ const EmailSignaturePreview = ({
           __html: renderSaveMyContactButton({
             primaryColor: '#000',
             saveContactMessage,
-            saveContactURL: '#',
+            saveContactURL,
           }),
         }}
       />
@@ -66,7 +68,7 @@ const EmailSignaturePreview = ({
             webCard,
             companyLogoUrl,
             saveContactMessage,
-            saveContactURL: '#',
+            saveContactURL,
           }),
         }}
       />

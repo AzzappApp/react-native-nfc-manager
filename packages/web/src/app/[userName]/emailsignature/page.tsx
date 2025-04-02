@@ -171,6 +171,7 @@ const EmailSignaturePage = async ({
         contact={contact}
         companyLogoUrl={companyLogoUrl}
         saveContactMessage={saveContactMessage}
+        saveContactURL={saveContactURL}
       />
       <p className={styles.description}>
         {mode === 'simple'
