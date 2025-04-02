@@ -1,7 +1,8 @@
+import { FlashList } from '@shopify/flash-list';
 import * as Contacts from 'expo-contacts';
 import { Image } from 'expo-image';
-import { memo, useEffect, useMemo, useState } from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
 import { colors } from '#theme';
@@ -9,8 +10,8 @@ import { getContactsAsync } from '#helpers/getLocalContactsMap';
 import IconButton from '#ui/IconButton';
 import PressableOpacity from '#ui/PressableOpacity';
 import Text from '#ui/Text';
+import type { ListRenderItemInfo } from '@shopify/flash-list';
 import type { Contact } from 'expo-contacts';
-import type { ListRenderItemInfo } from 'react-native';
 
 type MultiUserAddListProps = {
   onAddSingleUser: (contact: Contact) => void;
@@ -92,29 +93,33 @@ const MultiUserAddList = ({
     return contacts;
   }, [contacts, searchValue]);
 
-  const renderItem = ({ item }: ListRenderItemInfo<Contacts.Contact>) => {
-    if (item) {
-      const displayName = formatDisplayName(item);
-      if (isNotFalsyString(displayName)) {
-        return (
-          <ContactItem
-            displayName={displayName}
-            item={item}
-            onPress={onAddSingleUser}
-          />
-        );
+  const renderItem = useCallback(
+    ({ item }: ListRenderItemInfo<Contacts.Contact>) => {
+      if (item) {
+        const displayName = formatDisplayName(item);
+        if (isNotFalsyString(displayName)) {
+          return (
+            <ContactItem
+              displayName={displayName}
+              item={item}
+              onPress={onAddSingleUser}
+            />
+          );
+        }
       }
-    }
-    return null;
-  };
+      return null;
+    },
+    [onAddSingleUser],
+  );
 
   return (
-    <FlatList<Contacts.Contact>
+    <FlashList
       data={contactData}
       renderItem={renderItem}
       keyExtractor={keyExtractor}
       keyboardShouldPersistTaps="always"
-      renderScrollComponent={props => <KeyboardAwareScrollView {...props} />}
+      renderScrollComponent={KeyboardAwareScrollView}
+      estimatedItemSize={76}
     />
   );
 };
