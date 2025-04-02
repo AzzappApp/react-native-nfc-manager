@@ -1,3 +1,8 @@
+## 1.9.0-canary.147
+
+* **fix:**  - **multiUser:** [#8228](https://github.com/AzzappApp/azzapp/pull/8228) add pagination on screen ([#8234](https://github.com/AzzappApp/azzapp/pull/8234))
+* **fix:**  - simplify qrcode scan workflow to avoid ghost contact add screen view ([#8240](https://github.com/AzzappApp/azzapp/pull/8240))
+
 ## 1.9.0-canary.146
 
 * **fix:**  - whatpsApp button should be always displayed is supported and one of the phone number is valid ([#8233](https://github.com/AzzappApp/azzapp/pull/8233))
