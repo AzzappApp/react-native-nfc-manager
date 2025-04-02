@@ -180,7 +180,7 @@ export const searchContacts = async (
     orderBy === 'name'
       ? [ContactTable.firstName, ContactTable.lastName]
       : orderBy === 'location'
-        ? [desc(locationExpr)]
+        ? [desc(locationExpr), desc(ContactTable.createdAt)]
         : [desc(ContactTable.createdAt)];
 
   const contacts = await db()
