@@ -1,3 +1,7 @@
+## 1.9.0-canary.139
+
+* **fix:**  - **multiUser:** [#8210](https://github.com/AzzappApp/azzapp/pull/8210) don’t return duplicated users ([#8212](https://github.com/AzzappApp/azzapp/pull/8212))
+
 ## 1.9.0-canary.138
 
 * **fix:**  - **multiUser:** [#8205](https://github.com/AzzappApp/azzapp/pull/8205) don’t invalidate record in cache - use a common… ([#8209](https://github.com/AzzappApp/azzapp/pull/8209))
