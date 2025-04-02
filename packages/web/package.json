@@ -14,8 +14,7 @@
     "inngest-cli": "inngest-cli dev"
   },
   "devScripts": [
-    "dev",
-    "inngest-cli"
+    "dev"
   ],
   "dependencies": {
     "@aws-sdk/credential-provider-web-identity": "^3.750.0",
