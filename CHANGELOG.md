@@ -1,3 +1,10 @@
+## 1.9.0-canary.149
+
+* **fix:**  - **cover:** [#8237](https://github.com/AzzappApp/azzapp/pull/8237) wait process is completed ([#8242](https://github.com/AzzappApp/azzapp/pull/8242))
+* **fix:**  - **multiUser:** [#8204](https://github.com/AzzappApp/azzapp/pull/8204) mutualize schema to fix all cases ([#8239](https://github.com/AzzappApp/azzapp/pull/8239))
+* **fix:**  - add missing company logo in add user screen ([#8252](https://github.com/AzzappApp/azzapp/pull/8252))
+* **fix:**  - avoid ghost add contact screen when closing scanner ([#8253](https://github.com/AzzappApp/azzapp/pull/8253))
+
 ## 1.9.0-canary.148
 
 * **fix:**  - **payment:** round minutes to avoid error on backend ([#8241](https://github.com/AzzappApp/azzapp/pull/8241))
