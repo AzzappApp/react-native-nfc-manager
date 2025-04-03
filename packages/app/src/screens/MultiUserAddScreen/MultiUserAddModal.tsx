@@ -31,9 +31,13 @@ import {
   downloadContactImage,
 } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
-import { parsePhoneNumber } from '#helpers/phoneNumbersHelper';
+import {
+  getPhonenumberWithCountryCode,
+  parsePhoneNumber,
+} from '#helpers/phoneNumbersHelper';
 import useOnSubscriptionError from '#hooks/useOnSubscriptionError';
 import ContactCardEditForm from '#screens/ContactCardEditScreen/ContactCardEditForm';
+import { baseUserDetailsSchema } from '#screens/MultiUserDetailsScreen/MultiUserDetailsSchema';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
@@ -52,81 +56,27 @@ import type { CountryCode } from 'libphonenumber-js';
 import type { ForwardedRef } from 'react';
 import type { Control } from 'react-hook-form';
 
-const multiUserAddFormSchema = z.object({
+const multiUserAddFormSchema = baseUserDetailsSchema.extend({
   selectedContact: z
     .object({
       countryCodeOrEmail: z.string(),
       value: z.string(),
     })
-    .refine(contact => {
-      if (contact.countryCodeOrEmail === 'email') {
-        return isValidEmail(contact.value);
-      } else if (contact.countryCodeOrEmail) {
-        return parsePhoneNumberFromString(
-          contact.value,
-          contact.countryCodeOrEmail as CountryCode,
-        )?.isValid();
-      }
-    }),
-  role: z.enum(['user', 'admin', 'editor']),
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
-  emails: z.array(
-    z.object({
-      label: z.string(),
-      address: z.string(),
-      selected: z.boolean().nullable().optional(),
-    }),
-  ),
-  phoneNumbers: z.array(
-    z.object({
-      label: z.string(),
-      number: z.string(),
-      selected: z.boolean().nullable().optional(),
-    }),
-  ),
-  title: z.string().optional(),
-  company: z.string().optional(),
-  urls: z.array(
-    z.object({
-      address: z.string(),
-      selected: z.boolean().nullable().optional(),
-    }),
-  ),
-  birthday: z
-    .object({
-      birthday: z.string(),
-      selected: z.boolean().nullable().optional(),
-    })
-    .optional(),
-  socials: z.array(
-    z.object({
-      url: z.string(),
-      label: z.string(),
-      selected: z.boolean().nullable().optional(),
-    }),
-  ),
-  addresses: z.array(
-    z.object({
-      address: z.string(),
-      label: z.string(),
-      selected: z.boolean().nullable().optional(),
-    }),
-  ),
-  avatar: z
-    .object({
-      uri: z.string(),
-      id: z.string(),
-      local: z.boolean(),
-    })
-    .optional(),
-  logo: z
-    .object({
-      uri: z.string(),
-      id: z.string().optional(),
-      local: z.boolean().optional(),
-    })
-    .optional(),
+    .refine(
+      contact => {
+        if (contact.countryCodeOrEmail === 'email') {
+          return isValidEmail(contact.value);
+        } else if (contact.countryCodeOrEmail) {
+          return parsePhoneNumberFromString(
+            contact.value,
+            contact.countryCodeOrEmail as CountryCode,
+          )?.isValid();
+        }
+      },
+      {
+        message: 'Invalid contact info',
+      },
+    ),
 });
 
 type MultiUserAddModalProps = {
@@ -524,7 +474,15 @@ const MultiUserAddModal = (
           contactCard: {
             firstName,
             lastName,
-            phoneNumbers,
+            phoneNumbers: phoneNumbers
+              ?.filter(phoneNumber => phoneNumber.number)
+              .map(({ countryCode, ...phoneNumber }) => {
+                const number = getPhonenumberWithCountryCode(
+                  phoneNumber.number,
+                  countryCode as CountryCode,
+                );
+                return { ...phoneNumber, number };
+              }),
             emails,
             title,
             company,
