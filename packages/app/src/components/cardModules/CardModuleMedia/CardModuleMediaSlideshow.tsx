@@ -1,18 +1,22 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { PixelRatio, Platform, StyleSheet } from 'react-native';
 import {
-  Gesture,
-  GestureDetector,
-  Pressable,
-} from 'react-native-gesture-handler';
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { PixelRatio, Platform, StyleSheet } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   interpolate,
   Extrapolation,
   useAnimatedScrollHandler,
+  runOnJS,
 } from 'react-native-reanimated';
-import { useFullScreenOverlayContext } from '#components/WebCardPreviewFullScreenOverlay';
+import { FullScreenOverlayContext } from '#components/WebCardPreviewFullScreenOverlay';
 import useBoolean from '#hooks/useBoolean';
 import useInterval from '#hooks/useInterval';
 import CardModuleMediaSelector from '../CardModuleMediaSelector';
@@ -145,7 +149,19 @@ const CardModuleMediaSlideshow = ({
     handleScrollToOffset(0, false);
   }, [itemWidth]);
 
+  const { setMedia } = useContext(FullScreenOverlayContext);
+
+  const openMedia = (index: number) => {
+    setMedia(cardModuleMedias[index]?.media);
+  };
+
   const nativeGesture = Gesture.Native();
+  const onPress = () => {
+    runOnJS(openMedia)(Math.round(scrollIndex.value));
+  };
+  const pressGesture = Gesture.Tap()
+    .onStart(onPress)
+    .simultaneousWithExternalGesture(nativeGesture);
 
   return (
     <Animated.View
@@ -158,7 +174,7 @@ const CardModuleMediaSlideshow = ({
         },
       ]}
     >
-      <GestureDetector gesture={nativeGesture}>
+      <GestureDetector gesture={pressGesture}>
         <Animated.FlatList
           ref={listRef}
           data={cardModuleMedias}
@@ -244,23 +260,19 @@ const SlideshowItem = ({
   });
 
   const { media } = cardModuleMedia;
-  const { setMedia } = useFullScreenOverlayContext(media);
 
   return (
-    <Pressable style={styles.flex} onPress={setMedia}>
-      <Animated.View style={[styles.imageContainer, animatedStyle]}>
-        <CardModuleMediaSelector
-          media={media}
-          canPlay={canPlay}
-          dimension={{ width: itemWidth, height: itemWidth }}
-        />
-      </Animated.View>
-    </Pressable>
+    <Animated.View style={[styles.imageContainer, animatedStyle]}>
+      <CardModuleMediaSelector
+        media={media}
+        canPlay={canPlay}
+        dimension={{ width: itemWidth, height: itemWidth }}
+      />
+    </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
-  flex: { flex: 1 },
   container: {
     justifyContent: 'center',
     flexGrow: 0,
