@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { isValidPhoneNumber, parsePhoneNumber } from 'libphonenumber-js';
+import { isValidPhoneNumber } from 'libphonenumber-js';
 import { useEffect, useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -12,6 +12,7 @@ import COUNTRY_FLAG from '@azzapp/shared/CountryFlag';
 import { isPhoneNumber } from '@azzapp/shared/stringHelpers';
 import { useRouter } from '#components/NativeRouter';
 import { requestUpdateContact } from '#helpers/MobileWebAPI';
+import { parsePhoneNumber } from '#helpers/phoneNumbersHelper';
 import Button from '#ui/Button';
 import CountryCodeListWithOptions from '#ui/CountryCodeListWithOptions';
 import Header from '#ui/Header';
@@ -179,12 +180,12 @@ const AccountDetailsPhoneNumberForm = ({
   };
 
   const submit = handleSubmit(async ({ phoneNumber, countryCode }) => {
-    if (phoneNumber) {
-      const storedPhoneNumber = parsePhoneNumber(
-        phoneNumber,
-        countryCode as CountryCode,
-      ).formatInternational();
-
+    const number = parsePhoneNumber(
+      phoneNumber || '',
+      countryCode as CountryCode,
+    );
+    if (number) {
+      const storedPhoneNumber = number.formatInternational();
       updatePhoneNumber(storedPhoneNumber);
     } else {
       deletePhoneNumber();

@@ -1,4 +1,3 @@
-import { parsePhoneNumber } from 'libphonenumber-js';
 import { useCallback, type ReactNode } from 'react';
 import { Controller, useController } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -7,6 +6,7 @@ import { colors } from '#theme';
 import EmailOrPhoneInput from '#components/EmailOrPhoneInput';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { keyExtractor } from '#helpers/idHelpers';
+import { parsePhoneNumber } from '#helpers/phoneNumbersHelper';
 import useScreenDimensions from '#hooks/useScreenDimensions';
 import useScreenInsets from '#hooks/useScreenInsets';
 import useToggle from '#hooks/useToggle';
@@ -72,11 +72,13 @@ const MultiUserAddForm = ({ contacts, control }: MultiUserAddFormProps) => {
         return;
       }
       const parsed = parsePhoneNumber(info.id);
-      setSelectedContact({
-        countryCodeOrEmail: parsed.country,
-        value: parsed.nationalNumber,
-      });
-      toggleShowAvailableInfo();
+      if (parsed) {
+        setSelectedContact({
+          countryCodeOrEmail: parsed.country,
+          value: parsed.nationalNumber,
+        });
+        toggleShowAvailableInfo();
+      }
     },
     [setSelectedContact, toggleShowAvailableInfo],
   );

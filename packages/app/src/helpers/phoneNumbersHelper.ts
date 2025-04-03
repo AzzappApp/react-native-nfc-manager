@@ -39,9 +39,12 @@ export const parseContactCardPhoneNumber = (
   }
 };
 
-export const parsePhoneNumber = (phoneNumber: string) => {
+export const parsePhoneNumber = (
+  phoneNumber: string,
+  countryCode?: CountryCode,
+) => {
   try {
-    const number = parsePhoneNumberWithError(phoneNumber);
+    const number = parsePhoneNumberWithError(phoneNumber, countryCode);
     return number;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {

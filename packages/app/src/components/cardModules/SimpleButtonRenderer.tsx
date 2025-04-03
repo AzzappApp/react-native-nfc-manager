@@ -1,4 +1,3 @@
-import { parsePhoneNumber } from 'libphonenumber-js';
 import { useCallback, useMemo } from 'react';
 import { Linking, Text, View } from 'react-native';
 import { graphql, readInlineData } from 'react-relay';
@@ -8,6 +7,7 @@ import {
   SIMPLE_BUTTON_STYLE_VALUES,
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
+import { formatPhoneNumberUri } from '@azzapp/shared/stringHelpers';
 import PressableOpacity from '#ui/PressableOpacity';
 import CardModuleBackground from './CardModuleBackground';
 import type {
@@ -130,7 +130,7 @@ export const SimpleButtonRenderer = ({
         await Linking.openURL(`mailto:${actionLink}`);
       } else if (actionType) {
         await Linking.openURL(
-          parsePhoneNumber(actionLink, actionType as CountryCode).getURI(),
+          formatPhoneNumberUri(actionLink, actionType as CountryCode),
         );
       }
     }

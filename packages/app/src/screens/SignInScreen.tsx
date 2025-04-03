@@ -1,4 +1,4 @@
-import { parsePhoneNumber } from 'libphonenumber-js';
+import { parsePhoneNumberWithError } from 'libphonenumber-js';
 import LottieView from 'lottie-react-native';
 import { useCallback, useState, useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -30,6 +30,7 @@ import SecuredTextInput from '#ui/SecuredTextInput';
 import Text from '#ui/Text';
 import type { EmailPhoneInput } from '#components/EmailOrPhoneInput';
 import type { Route } from '#routes';
+import type { CountryCode } from 'libphonenumber-js';
 import type {
   LayoutChangeEvent,
   TextInput as NativeTextInput,
@@ -57,7 +58,7 @@ const SignInScreen = () => {
 
     const intlPhoneNumber = tryGetPhoneNumber(
       credential.value,
-      credential.countryCodeOrEmail,
+      credential.countryCodeOrEmail as CountryCode,
     );
 
     if (
@@ -370,9 +371,9 @@ SignInScreen.options = {
   stackAnimation: 'fade',
 };
 
-function tryGetPhoneNumber(phoneNumber: string, countryCode?: string) {
+function tryGetPhoneNumber(phoneNumber: string, countryCode?: CountryCode) {
   try {
-    const phonenumber = parsePhoneNumber(phoneNumber, countryCode as any);
+    const phonenumber = parsePhoneNumberWithError(phoneNumber, countryCode);
     if (phonenumber.isValid()) {
       return phonenumber.formatInternational();
     }

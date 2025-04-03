@@ -1,4 +1,4 @@
-import { parsePhoneNumber } from 'libphonenumber-js';
+import { parsePhoneNumberWithError } from 'libphonenumber-js';
 import LottieView from 'lottie-react-native';
 import { useCallback, useState, useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -109,7 +109,7 @@ const SignUpScreen = () => {
             hasAcceptedCommunications: communicationChecked === 'checked',
           });
         } else {
-          username = parsePhoneNumber(
+          username = parsePhoneNumberWithError(
             contact.value,
             contact.countryCodeOrEmail,
           ).formatInternational();

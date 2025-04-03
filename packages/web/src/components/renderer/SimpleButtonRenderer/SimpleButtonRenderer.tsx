@@ -1,11 +1,11 @@
 import cx from 'classnames';
-import { parsePhoneNumber } from 'libphonenumber-js';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
   SIMPLE_BUTTON_DEFAULT_VALUES,
   SIMPLE_BUTTON_STYLE_VALUES,
   getModuleDataValues,
 } from '@azzapp/shared/cardModuleHelpers';
+import { formatPhoneNumberUri } from '@azzapp/shared/stringHelpers';
 import { fontsMap } from '#helpers/fonts';
 import CardModuleBackground from '../../CardModuleBackground';
 import styles from './SimpleButtonRenderer.css';
@@ -60,10 +60,7 @@ const SimpleButtonRenderer = ({
       href = `mailto:${actionLink}`;
       break;
     default:
-      href = `tel:${parsePhoneNumber(
-        actionLink,
-        actionType as CountryCode,
-      ).formatInternational()}`;
+      href = formatPhoneNumberUri(actionLink, actionType as CountryCode);
   }
 
   return (
