@@ -3,7 +3,7 @@ import { useFieldArray } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { colors } from '#theme';
-import ContactCardEditModalField from '#components/Contact/ContactEditField';
+import ContactEditField from '#components/Contact/ContactEditField';
 import { contactEditStyleSheet } from '#helpers/contactHelpers';
 import { useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
@@ -33,7 +33,7 @@ const ContactCardEditModalUrls = ({
     <>
       {fields.map((url, index) => (
         <Fragment key={url.id}>
-          <ContactCardEditModalField
+          <ContactEditField
             control={control}
             valueKey={`urls.${index}.address`}
             deleteField={() => remove(index)}
@@ -52,6 +52,7 @@ const ContactCardEditModalUrls = ({
             trim
             isPremium={isPremium}
             requiresPremium
+            returnKeyType="done"
           />
           <Separation small />
         </Fragment>

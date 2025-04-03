@@ -24,6 +24,8 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
   autoComplete = 'off',
   isPremium,
   requiresPremium,
+  returnKeyType,
+  multiline,
 }: {
   labelKey?: FieldPath<TFieldValues>;
   keyboardType: TextInputProps['keyboardType'];
@@ -40,6 +42,8 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
   autoComplete?: TextInputProps['autoComplete'];
   isPremium?: boolean | null;
   requiresPremium?: boolean;
+  returnKeyType?: TextInputProps['returnKeyType'];
+  multiline?: boolean;
 }) => {
   const styles = useStyleSheet(stylesheet);
 
@@ -65,7 +69,7 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
             onChangeText={trim ? value => onChange(value.trim()) : onChange}
             style={styles.input}
             numberOfLines={4}
-            multiline
+            multiline={multiline}
             keyboardType={keyboardType}
             clearButtonMode="while-editing"
             testID="contact-card-edit-modal-field"
@@ -75,6 +79,7 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
             onBlur={onBlur}
             autoFocus={isDirty}
             autoComplete={autoComplete}
+            returnKeyType={returnKeyType}
           />
           {requiresPremium && (
             <PremiumIndicator

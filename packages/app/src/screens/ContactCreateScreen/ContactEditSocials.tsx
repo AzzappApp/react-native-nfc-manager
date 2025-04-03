@@ -4,7 +4,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { SOCIAL_NETWORK_LINKS } from '@azzapp/shared/socialLinkHelpers';
 import { colors } from '#theme';
-import ContactField from '#components/Contact/ContactEditField';
+import ContactEditField from '#components/Contact/ContactEditField';
 import {
   contactEditStyleSheet,
   useSocialLinkLabels,
@@ -37,7 +37,7 @@ const ContactEditSocials = ({
     <>
       {fields.map((social, index) => (
         <Fragment key={social.id}>
-          <ContactField
+          <ContactEditField
             control={control}
             labelKey={`socials.${index}.label`}
             valueKey={`socials.${index}.url`}
@@ -57,6 +57,7 @@ const ContactEditSocials = ({
                   )?.mask ?? '',
               });
             }}
+            returnKeyType="done"
           />
           <Separation small />
         </Fragment>

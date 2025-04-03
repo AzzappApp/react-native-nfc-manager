@@ -2,7 +2,7 @@ import { useFieldArray } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { colors } from '#theme';
-import ContactCardEditModalField from '#components/Contact/ContactEditField';
+import ContactEditField from '#components/Contact/ContactEditField';
 import { useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
 import PressableNative from '#ui/PressableNative';
@@ -33,7 +33,7 @@ const CommonInformationAddresses = ({
   return (
     <>
       {fields.map((address, index) => (
-        <ContactCardEditModalField
+        <ContactEditField
           key={address.id}
           control={control}
           labelKey={`addresses.${index}.label`}
@@ -45,6 +45,7 @@ const CommonInformationAddresses = ({
             defaultMessage: 'Enter an adress',
             description: 'Placeholder for adress inside contact card',
           })}
+          multiline
         />
       ))}
       <View>

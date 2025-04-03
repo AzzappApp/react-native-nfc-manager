@@ -3,7 +3,7 @@ import { useFieldArray } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { colors } from '#theme';
-import ContactCardEditModalField from '#components/Contact/ContactEditField';
+import ContactEditField from '#components/Contact/ContactEditField';
 import {
   contactEditStyleSheet,
   useContactEmailLabels,
@@ -36,7 +36,7 @@ const ContactCardEditModalEmails = ({
     <>
       {fields.map((email, index) => (
         <Fragment key={email.id}>
-          <ContactCardEditModalField
+          <ContactEditField
             control={control}
             labelKey={`emails.${index}.label`}
             valueKey={`emails.${index}.address`}
@@ -54,6 +54,7 @@ const ContactCardEditModalEmails = ({
               description:
                 'Edit Contact Card - Error message when an email is wrongly formatted',
             })}
+            returnKeyType="done"
           />
           <Separation small />
         </Fragment>

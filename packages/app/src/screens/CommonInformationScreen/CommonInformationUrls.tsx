@@ -2,7 +2,7 @@ import { useFieldArray } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { colors } from '#theme';
-import ContactCardEditModalField from '#components/Contact/ContactEditField';
+import ContactEditField from '#components/Contact/ContactEditField';
 import { contactEditStyleSheet } from '#helpers/contactHelpers';
 import { useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
@@ -28,7 +28,7 @@ const CommonInformationUrls = ({
   return (
     <>
       {fields.map((url, index) => (
-        <ContactCardEditModalField
+        <ContactEditField
           key={url.id}
           control={control}
           valueKey={`urls.${index}.address`}
@@ -46,6 +46,7 @@ const CommonInformationUrls = ({
               'CommonInformationUrls - Error message when a url is wrongly formatted',
           })}
           trim
+          returnKeyType="done"
         />
       ))}
       <View>

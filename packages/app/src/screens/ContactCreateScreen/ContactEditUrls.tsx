@@ -3,7 +3,7 @@ import { useFieldArray } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { View } from 'react-native';
 import { colors } from '#theme';
-import ContactField from '#components/Contact/ContactEditField';
+import ContactEditField from '#components/Contact/ContactEditField';
 import { contactEditStyleSheet } from '#helpers/contactHelpers';
 import { useStyleSheet } from '#helpers/createStyles';
 import Icon from '#ui/Icon';
@@ -31,7 +31,7 @@ const ContactEditUrls = ({
     <>
       {fields.map((url, index) => (
         <Fragment key={url.id}>
-          <ContactField
+          <ContactEditField
             control={control}
             valueKey={`urls.${index}.url`}
             deleteField={() => remove(index)}
@@ -48,6 +48,7 @@ const ContactEditUrls = ({
                 'ContactEditUrls - Error message when a url is wrongly formatted',
             })}
             trim
+            returnKeyType="done"
           />
           <Separation small />
         </Fragment>
