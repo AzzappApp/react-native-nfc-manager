@@ -1,3 +1,7 @@
+## 1.9.2-canary.8
+
+
+
 ## 1.9.2-canary.7
 
 * **fix:**  - clean up webCard categories ([#8019](https://github.com/AzzappApp/azzapp/pull/8019))
