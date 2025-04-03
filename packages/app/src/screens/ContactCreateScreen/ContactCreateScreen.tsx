@@ -482,8 +482,9 @@ const ContactCreateScreen = ({
   const closeScannerView = useCallback(() => {
     if (!isDirty) {
       router.back();
+    } else {
+      closeScanner();
     }
-    closeScanner();
   }, [closeScanner, isDirty, router]);
 
   const openScannerView = useCallback(() => {
