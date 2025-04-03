@@ -1,3 +1,7 @@
+## 1.9.0-canary.152
+
+* **fix:**  - **multiUser:** [#8175](https://github.com/AzzappApp/azzapp/pull/8175) debounce webcard notifications ([#8257](https://github.com/AzzappApp/azzapp/pull/8257))
+
 ## 1.9.0-canary.151
 
 
