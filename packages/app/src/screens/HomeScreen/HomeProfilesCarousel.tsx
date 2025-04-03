@@ -168,8 +168,10 @@ const HomeProfilesCarousel = (
     } else {
       // profile has been removed,
       // scroll to previous available profile.
-      const newindex = selectedIndex - 2 > 0 ? selectedIndex - 2 : 0;
-      const profile = profiles?.[newindex];
+      const newIndex = selectedIndex - 1 > 0 ? selectedIndex - 1 : 0;
+      const profile = profiles?.[newIndex];
+
+      carouselRef.current?.scrollToIndex(newIndex, true);
       if (profile) {
         onChangeWebCard({
           profileId: profile.id,
@@ -183,7 +185,7 @@ const HomeProfilesCarousel = (
       } else {
         onChangeWebCard(null);
       }
-      setSelectedIndex(newindex);
+      setSelectedIndex(newIndex);
     }
     // No need to refresh when index change. Here we handle only profiles list update
     // eslint-disable-next-line react-hooks/exhaustive-deps
