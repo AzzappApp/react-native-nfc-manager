@@ -1,4 +1,4 @@
-name: Release
+name: Purge translation keys
 on:
   workflow_dispatch:
 jobs:
