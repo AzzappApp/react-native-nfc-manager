@@ -27,7 +27,7 @@ export const isPhoneNumberValid = (
   }
 };
 
-export const parsePhoneNumber = (
+export const parseContactCardPhoneNumber = (
   p: ContactCardPhoneNumber,
 ): ContactCardPhoneNumber => {
   try {
@@ -36,6 +36,16 @@ export const parsePhoneNumber = (
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {
     return p;
+  }
+};
+
+export const parsePhoneNumber = (phoneNumber: string) => {
+  try {
+    const number = parsePhoneNumberWithError(phoneNumber);
+    return number;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (e) {
+    return null;
   }
 };
 

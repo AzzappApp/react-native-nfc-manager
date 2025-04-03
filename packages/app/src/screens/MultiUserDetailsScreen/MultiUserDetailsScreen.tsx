@@ -1,6 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { fromGlobalId } from 'graphql-relay';
-import { parsePhoneNumber } from 'libphonenumber-js';
 import { useCallback, useEffect, useMemo, type ReactNode } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -35,7 +33,8 @@ import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import {
   getPhonenumberWithCountryCode,
-  parsePhoneNumber as parsePhoneNumberHelper,
+  parsePhoneNumber,
+  parseContactCardPhoneNumber,
 } from '#helpers/phoneNumbersHelper';
 import relayScreen from '#helpers/relayScreen';
 import { useProfileInfos } from '#hooks/authStateHooks';
@@ -112,7 +111,7 @@ const MultiUserDetailsScreen = ({
       lastName: contactCard?.lastName,
       //use .slice to tricks the readOnly coming from relay type.(using hard cast 'as' make it hard to read the code)
       phoneNumbers:
-        contactCard?.phoneNumbers?.map(parsePhoneNumberHelper) ?? [],
+        contactCard?.phoneNumbers?.map(parseContactCardPhoneNumber) ?? [],
       emails: contactCard?.emails?.slice() ?? [],
       title: contactCard?.title,
       company: contactCard?.company ?? undefined,
@@ -323,11 +322,7 @@ const MultiUserDetailsScreen = ({
         });
       },
       updater: (store, response) => {
-        if (
-          !response?.removeUsersFromWebCard?.includes(
-            fromGlobalId(profileId).id,
-          )
-        ) {
+        if (!response?.removeUsersFromWebCard?.includes(profileId)) {
           Toast.show({
             type: 'error',
             text1: intl.formatMessage({

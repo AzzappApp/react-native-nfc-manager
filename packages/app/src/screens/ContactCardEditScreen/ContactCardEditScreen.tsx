@@ -26,7 +26,7 @@ import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import {
   getPhonenumberWithCountryCode,
-  parsePhoneNumber,
+  parseContactCardPhoneNumber,
 } from '#helpers/phoneNumbersHelper';
 import relayScreen from '#helpers/relayScreen';
 import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';
@@ -114,7 +114,8 @@ const ContactCardEditScreen = ({
       ...contactCard,
       company: contactCard?.company ?? '',
       emails: contactCard?.emails?.map(m => ({ ...m })) ?? [],
-      phoneNumbers: contactCard?.phoneNumbers?.map(parsePhoneNumber) ?? [],
+      phoneNumbers:
+        contactCard?.phoneNumbers?.map(parseContactCardPhoneNumber) ?? [],
       urls: contactCard?.urls?.map(p => ({ ...p })) ?? [],
       addresses: contactCard?.addresses?.map(p => ({ ...p })) ?? [],
       birthday: contactCard?.birthday,

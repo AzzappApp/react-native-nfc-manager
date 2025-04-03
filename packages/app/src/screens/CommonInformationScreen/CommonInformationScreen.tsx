@@ -25,7 +25,7 @@ import { saveTransformedImageToFile } from '#helpers/mediaEditions';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import {
   getPhonenumberWithCountryCode,
-  parsePhoneNumber,
+  parseContactCardPhoneNumber,
 } from '#helpers/phoneNumbersHelper';
 import relayScreen from '#helpers/relayScreen';
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -125,7 +125,7 @@ export const CommonInformationScreen = ({
       ...commonInformation,
       emails: commonInformation?.emails?.map(m => ({ ...m })) ?? [],
       phoneNumbers:
-        commonInformation?.phoneNumbers?.map(parsePhoneNumber) ?? [],
+        commonInformation?.phoneNumbers?.map(parseContactCardPhoneNumber) ?? [],
       urls: commonInformation?.urls?.map(p => ({ ...p })) ?? [],
       addresses: commonInformation?.addresses?.map(p => ({ ...p })) ?? [],
       socials: commonInformation?.socials?.map(p => ({ ...p })) ?? [],

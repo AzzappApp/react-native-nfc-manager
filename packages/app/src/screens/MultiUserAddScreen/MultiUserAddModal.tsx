@@ -33,7 +33,7 @@ import {
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
 import {
   getPhonenumberWithCountryCode,
-  parsePhoneNumber,
+  parseContactCardPhoneNumber,
 } from '#helpers/phoneNumbersHelper';
 import useOnSubscriptionError from '#hooks/useOnSubscriptionError';
 import ContactCardEditForm from '#screens/ContactCardEditScreen/ContactCardEditForm';
@@ -258,7 +258,7 @@ const MultiUserAddModal = (
                   number: a.number || '',
                   selected: true,
                 }))
-                .map(parsePhoneNumber) ?? [],
+                .map(parseContactCardPhoneNumber) ?? [],
             emails:
               contact.emails?.map(a => ({
                 label: normalizePhoneMailLabel(a.label),
