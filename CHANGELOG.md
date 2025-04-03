@@ -1,3 +1,7 @@
+## 1.9.0-canary.150
+
+* **fix:**  - ensure we display help toast only once in edit unpublished webcard ([#8254](https://github.com/AzzappApp/azzapp/pull/8254))
+
 ## 1.9.0-canary.149
 
 * **fix:**  - **cover:** [#8237](https://github.com/AzzappApp/azzapp/pull/8237) wait process is completed ([#8242](https://github.com/AzzappApp/azzapp/pull/8242))
