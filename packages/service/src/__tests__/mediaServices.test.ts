@@ -60,7 +60,6 @@ const mockWebCard: WebCard = {
   deletedBy: null,
   lastUserNameUpdate: new Date(),
   webCardKind: 'personal',
-  webCardCategoryId: null,
   firstName: null,
   lastName: null,
   companyName: null,

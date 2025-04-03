@@ -18,7 +18,6 @@ import {
   PostTable,
   ProfileTable,
   UserTable,
-  WebCardCategoryTable,
 } from '../schema';
 import type {
   CardModule,
@@ -32,7 +31,6 @@ import type {
   Media,
   PostComment,
   Post,
-  WebCardCategory,
   Profile,
   WebCard,
   ModuleBackground,
@@ -56,7 +54,6 @@ export const ENTITIES = [
   'Media',
   'PostComment',
   'Post',
-  'WebCardCategory',
   'Profile',
   'ModuleBackground',
   'User',
@@ -79,7 +76,6 @@ export type EntityToType<T extends Entity> = {
   Media: Media;
   PostComment: PostComment;
   Post: Post;
-  WebCardCategory: WebCardCategory;
   Profile: Profile;
   WebCard: WebCard;
   ModuleBackground: ModuleBackground;
@@ -100,7 +96,6 @@ const entitiesTable = {
   Media: MediaTable,
   PostComment: PostCommentTable,
   Post: PostTable,
-  WebCardCategory: WebCardCategoryTable,
   Profile: ProfileTable,
   WebCard: WebCardTable,
   ModuleBackground: ModuleBackgroundTable,

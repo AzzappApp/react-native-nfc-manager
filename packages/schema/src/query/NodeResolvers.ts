@@ -8,7 +8,6 @@ import {
   postCommentLoader,
   postLoader,
   profileLoader,
-  webCardCategoryLoader,
   webCardLoader,
 } from '#loaders';
 import type { NodeResolvers } from '#/__generated__/types';
@@ -68,11 +67,6 @@ export const fetchNode = async (gqlId: string): Promise<any> => {
       const webCard = await webCardLoader.load(id);
       return withTypeSymbol(webCard?.deleted ? null : webCard, webCardSymbol);
     }
-    case 'WebCardCategory':
-      return withTypeSymbol(
-        await webCardCategoryLoader.load(id),
-        webCardCategorySymbol,
-      );
   }
   return null;
 };

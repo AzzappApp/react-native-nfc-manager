@@ -7,7 +7,6 @@ import {
   getCoverTemplateTags,
   getCoverTemplateTypes,
   getLocalizationMessagesByLocale,
-  getWebCardCategories,
 } from '@azzapp/data';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import appMessages from '@azzapp/i18n/src/appMessages.json';
@@ -70,11 +69,6 @@ export const GET = withPluginsRoute(
         getCoverTemplateTypes().then(coverTemplateTypes =>
           coverTemplateTypes.map(
             ({ id }) => ({ id, kind: 'CoverTemplateType' }) as const,
-          ),
-        ),
-        getWebCardCategories().then(cardCategories =>
-          cardCategories.map(
-            ({ id }) => ({ id, kind: 'WebCardCategory' }) as const,
           ),
         ),
       ]);

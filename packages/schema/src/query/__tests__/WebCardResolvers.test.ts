@@ -42,7 +42,6 @@ describe('WebCard Resolvers (with checks)', () => {
     lastUserNameUpdate: new Date(),
     userName: null,
     webCardKind: 'personal',
-    webCardCategoryId: null,
     firstName: null,
     lastName: null,
     logoId: null,

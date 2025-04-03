@@ -29,7 +29,6 @@ import {
   cardModuleByWebCardLoader,
   followingsLoader,
   profileByWebCardIdAndUserIdLoader,
-  webCardCategoryLoader,
   webCardOwnerLoader,
   webCardStatisticsLoader,
 } from '#loaders';
@@ -39,7 +38,6 @@ import {
   cursorToDate,
   emptyConnection,
 } from '#helpers/connectionsHelpers';
-import { labelResolver } from '#helpers/localeHelpers';
 import {
   getWebCardProfile,
   hasWebCardProfileRight,
@@ -49,10 +47,7 @@ import fromGlobalIdWithType, {
   idResolver,
   maybeFromGlobalIdWithType,
 } from '#helpers/relayIdHelpers';
-import type {
-  WebCardCategoryResolvers,
-  WebCardResolvers,
-} from '#/__generated__/types';
+import type { WebCardResolvers } from '#/__generated__/types';
 
 export const WebCard: ProtectedResolver<WebCardResolvers> = {
   id: idResolver('WebCard'),
@@ -158,11 +153,8 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
   // TODO: should it be protected?
   webCardKind: webCard => webCard.webCardKind,
   // TODO: should it be protected?
-  webCardCategory: async webCard => {
-    return webCard.webCardCategoryId
-      ? webCardCategoryLoader.load(webCard.webCardCategoryId)
-      : null;
-  },
+  // deprecated, shall be removed
+  webCardCategory: () => null,
   // TODO: should it be protected?
   companyActivity: () => {
     // deprecated, shall be removed
@@ -553,16 +545,6 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
   },
   coverIsPredefined: async webCard => webCard.coverIsPredefined,
   coverIsLogoPredefined: async webCard => webCard.coverIsLogoPredefined,
-};
-
-export const WebCardCategory: WebCardCategoryResolvers = {
-  id: idResolver('WebCardCategory'),
-  label: labelResolver,
-  medias: webCardCategory => webCardCategory.medias,
-  companyActivities: () => {
-    // deprecated, shall be removed
-    return [];
-  },
 };
 
 const USERNAME_CHANGE_FREQUENCY_DAY = parseInt(

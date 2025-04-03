@@ -53,7 +53,6 @@ export type {
   User,
   UserSubscription,
   WebCard,
-  WebCardCategory,
   WebCardStatistic,
   Contact,
 } from './schema';

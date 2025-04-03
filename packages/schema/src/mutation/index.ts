@@ -6,7 +6,6 @@ import cancelTransferOwnership from './cancelTransferOwnership';
 import createContactCard from './createContactCard';
 import createPost from './createPost';
 import createPostCommentMutation from './createPostComment';
-import createWebCard from './createWebCard';
 import declineOwnership from './declineOwnership';
 import deleteFCMToken from './deleteFCMToken';
 import deleteModules from './deleteModules';
@@ -70,7 +69,6 @@ import type { MutationResolvers } from '#/__generated__/types';
 export const Mutation: MutationResolvers = {
   createContactCard,
   createPost,
-  createWebCard,
   createPostComment: createPostCommentMutation,
   deleteModules,
   deletePostComment,

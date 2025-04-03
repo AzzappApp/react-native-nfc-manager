@@ -786,21 +786,7 @@ export const UserSubscriptionTable = cols.table(
 export type UserSubscription = InferSelectModel<typeof UserSubscriptionTable>;
 //#endregion
 
-// #region WebCardCategory
-export const WebCardCategoryTable = cols.table('WebCardCategory', {
-  id: cols.cuid('id').primaryKey().notNull().$defaultFn(createId),
-  webCardKind: cols.enum('webCardKind', ['personal', 'business']).notNull(),
-  cardTemplateTypeId: cols.cuid('cardTemplateTypeId'),
-  medias: cols.json('medias').$type<string[]>().notNull(),
-  order: cols.int('order').notNull(),
-  enabled: cols.boolean('enabled').default(true).notNull(),
-});
-
-export type WebCardCategory = InferSelectModel<typeof WebCardCategoryTable>;
-//#endregion
-
 // #region WebCard
-
 export const WebCardTable = cols.table(
   'WebCard',
   {
@@ -812,7 +798,6 @@ export const WebCardTable = cols.table(
       .notNull()
       .default(DEFAULT_DATETIME_VALUE),
     webCardKind: cols.enum('webCardKind', ['personal', 'business']).notNull(),
-    webCardCategoryId: cols.cuid('webCardCategoryId'),
     firstName: cols.defaultVarchar('firstName'),
     lastName: cols.defaultVarchar('lastName'),
     logoId: cols.mediaId('logoId'),

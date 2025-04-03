@@ -12,7 +12,6 @@ import { invalidateWebCard, notifyWebCardUsers } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
 import {
   profileByWebCardIdAndUserIdLoader,
-  webCardCategoryLoader,
   webCardLoader,
   webCardOwnerLoader,
 } from '#loaders';
@@ -42,8 +41,7 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
 
   await checkWebCardProfileEditorRight(webCardId);
 
-  const { webCardCategoryId: graphqlWebCardCategoryId, ...profileUpdates } =
-    updates;
+  const { ...profileUpdates } = updates;
 
   const webCard = await webCardLoader.load(webCardId);
 
@@ -107,18 +105,6 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
 
       partialWebCard.lastUserNameUpdate = now;
     }
-  }
-
-  if (graphqlWebCardCategoryId) {
-    const webCardCategoryId = fromGlobalIdWithType(
-      graphqlWebCardCategoryId,
-      'WebCardCategory',
-    );
-    partialWebCard.webCardCategoryId = webCardCategoryId;
-
-    const webCardCategory = await webCardCategoryLoader.load(webCardCategoryId);
-
-    partialWebCard.webCardKind = webCardCategory?.webCardKind;
   }
 
   if (profileUpdates.webCardKind) {

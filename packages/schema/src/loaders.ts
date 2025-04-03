@@ -72,10 +72,6 @@ export const postLoader = createSessionDataLoader(
   createEntitiesBatchLoadFunction('Post'),
 );
 
-export const webCardCategoryLoader = createDataLoader(
-  createEntitiesBatchLoadFunction('WebCardCategory'),
-);
-
 export const profileLoader = createSessionDataLoader(
   'ProfileLoader',
   createEntitiesBatchLoadFunction('Profile'),

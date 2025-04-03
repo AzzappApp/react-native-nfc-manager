@@ -18,7 +18,6 @@ generates:
       mappers:
         Profile: '@azzapp/data#Profile as ProfileModel'
         ModuleBackground: '@azzapp/data#ModuleBackground as ModuleBackgroundModel'
-        WebCardCategory: '@azzapp/data#WebCardCategory as WebCardCategoryModel'
         MediaImage: ../query/MediaResolvers#MediaResolverBaseType as MediaImageModel
         MediaVideo: ../query/MediaResolvers#MediaResolverBaseType as MediaVideoModel
         Post: '@azzapp/data#Post as PostModel'

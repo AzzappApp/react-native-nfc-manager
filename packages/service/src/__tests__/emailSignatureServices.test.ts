@@ -61,7 +61,6 @@ const baseWebCard: WebCard = {
   isMultiUser: false,
   lastUserNameUpdate: new Date(),
   webCardKind: 'personal',
-  webCardCategoryId: null,
   firstName: null,
   lastName: null,
   logoId: null,

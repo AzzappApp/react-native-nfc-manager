@@ -13,7 +13,6 @@ export * from './mediaQueries';
 export * from './postCommentQueries';
 export * from './postReactionQueries';
 export * from './postQueries';
-export * from './webCardCategoryQueries';
 export * from './profileQueries';
 export * from './redirectWebCardQueries';
 export * from './moduleBackgroundQueries';

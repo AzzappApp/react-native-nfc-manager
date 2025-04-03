@@ -21,9 +21,6 @@ jest.mock('#loaders', () => ({
     load: jest.fn(),
     clear: jest.fn(),
   },
-  webCardCategoryLoader: {
-    load: jest.fn(),
-  },
   profileByWebCardIdAndUserIdLoader: {
     load: jest.fn(),
   },

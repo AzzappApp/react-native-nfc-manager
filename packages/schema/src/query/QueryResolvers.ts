@@ -3,7 +3,6 @@ import latinize from 'latinize';
 import {
   getRedirectWebCardByUserName,
   getWebCardByUserName,
-  getWebCardCategories,
   getWebCardByUserNameWithRedirection,
   deleteRedirection,
   getWebCardById,
@@ -30,7 +29,8 @@ export const Query: QueryResolvers = {
   node: (_, { id }) => fetchNode(id),
   nodes: (_, { ids }) => Promise.all(ids.map(id => fetchNode(id))),
 
-  webCardCategories: async () => getWebCardCategories(),
+  // FIXME shall be removed
+  webCardCategories: () => [],
 
   webCardParameters: () => ({
     //use a single source of truth for settings. Those settings can also be dependant on vip/premium status
