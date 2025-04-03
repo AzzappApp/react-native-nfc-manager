@@ -118,12 +118,33 @@ const ContactCardDetector = ({
 
   const extractDataFromImage = useCallback(
     (picture: { base64: string; uri: string; aspectRatio: number }) => {
+      const networkLowSpeedTimeout = setTimeout(() => {
+        Toast.show({
+          type: 'error',
+          text1: intl.formatMessage({
+            defaultMessage: 'Seems slow... please check your connection',
+            description:
+              'Warning toast message when extractVisitCardData is ongoing',
+          }),
+          autoHide: false,
+          props: {
+            showClose: true,
+          },
+        });
+      }, 10000);
+
+      const resetNetworkLowSpeedTimeout = () => {
+        Toast.hide();
+        clearTimeout(networkLowSpeedTimeout);
+      };
+
       commit({
         variables: {
           imgUrl: `data:image/jpg;base64,${picture.base64}`,
           config: { createContactCard },
         },
         onCompleted: data => {
+          resetNetworkLowSpeedTimeout();
           extractData(data.extractVisitCardData, {
             uri: picture.uri,
             aspectRatio: picture.aspectRatio,
@@ -132,6 +153,7 @@ const ContactCardDetector = ({
           closeLoading();
         },
         onError: e => {
+          resetNetworkLowSpeedTimeout();
           closeLoading();
           if (e.message === ERRORS.SUBSCRIPTION_REQUIRED) {
             if (PAYMENT_IS_ENABLED) {
