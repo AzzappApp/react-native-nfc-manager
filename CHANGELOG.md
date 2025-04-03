@@ -1,3 +1,8 @@
+## 1.9.2-canary.7
+
+* **fix:**  - clean up webCard categories ([#8019](https://github.com/AzzappApp/azzapp/pull/8019))
+* **fix:**  - remove multiline and fix done button on url, social and Email ([#8268](https://github.com/AzzappApp/azzapp/pull/8268))
+
 ## 1.9.2-canary.6
 
 * **fix:**  - add a Toast when network connectivity is bad ([#8262](https://github.com/AzzappApp/azzapp/pull/8262))
