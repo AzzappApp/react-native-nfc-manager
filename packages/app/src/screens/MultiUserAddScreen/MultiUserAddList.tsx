@@ -15,6 +15,7 @@ import type { ListRenderItemInfo } from '@shopify/flash-list';
 import type { Contact } from 'expo-contacts';
 
 const PAGE_SIZE = 50;
+const MIN_SEARCH_RESULTS = 10;
 
 type MultiUserAddListProps = {
   onAddSingleUser: (contact: Contact) => void;
@@ -38,22 +39,24 @@ const MultiUserAddList = ({
   searchValue,
 }: MultiUserAddListProps) => {
   const [contacts, setContacts] = useState<Contacts.Contact[]>([]);
-  const [pageOffset, setPageOffset] = useState(0);
-  const [hasNextPage, setHasNextPage] = useState(true);
+
   const [isLoading, setIsLoading] = useState(false);
 
+  const pageOffset = useRef(0);
+
   const loadNextPage = useRef(false);
+  const hasNextPage = useRef(true);
 
   const loadContacts = useCallback(async () => {
-    if (loadNextPage.current || !hasNextPage) return;
+    if (loadNextPage.current || !hasNextPage.current) return;
     loadNextPage.current = true;
     setIsLoading(true);
 
     const { status } = await Contacts.requestPermissionsAsync();
     if (status === 'granted') {
-      const { data, hasNextPage } = await getContactsAsync({
+      const { data, hasNextPage: hasNextPageValue } = await getContactsAsync({
         pageSize: PAGE_SIZE,
-        pageOffset,
+        pageOffset: pageOffset.current,
         fields: [
           Contacts.Fields.Name,
           Contacts.Fields.FirstName,
@@ -75,14 +78,14 @@ const MultiUserAddList = ({
             formatDisplayName(a).localeCompare(formatDisplayName(b)),
           ),
         );
-        setPageOffset(pageOffset + PAGE_SIZE);
+        pageOffset.current += PAGE_SIZE;
       }
-      setHasNextPage(hasNextPage);
+      hasNextPage.current = hasNextPageValue;
     }
 
     setIsLoading(false);
     loadNextPage.current = false;
-  }, [pageOffset, hasNextPage]);
+  }, []);
 
   useEffect(() => {
     loadContacts();
@@ -114,6 +117,15 @@ const MultiUserAddList = ({
     }
     return contacts;
   }, [contacts, searchValue]);
+
+  useEffect(() => {
+    if (
+      isNotFalsyString(searchValue) &&
+      contactData.length < MIN_SEARCH_RESULTS
+    ) {
+      loadContacts();
+    }
+  }, [contactData, loadContacts, searchValue]);
 
   const renderItem = useCallback(
     ({ item }: ListRenderItemInfo<Contacts.Contact>) => {
