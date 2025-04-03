@@ -66,8 +66,6 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
     });
   }
 
-  const previousUpdateDate = webCard.updatedAt;
-
   const partialWebCard: Partial<WebCard> = {
     ...profileUpdates,
     webCardKind: profileUpdates.webCardKind || webCard?.webCardKind,
@@ -137,7 +135,7 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
   }
 
   try {
-    notifyWebCardUsers(webCard, previousUpdateDate);
+    notifyWebCardUsers(webCard);
 
     await transaction(async () => {
       await updateWebCard(webCardId, partialWebCard);

@@ -140,10 +140,7 @@ describe('saveCover', () => {
     expect(invalidatePost).toHaveBeenCalledTimes(2);
     expect(invalidatePost).toHaveBeenCalledWith('testUser', 'post-1');
     expect(invalidatePost).toHaveBeenCalledWith('testUser', 'post-2');
-    expect(notifyWebCardUsers).toHaveBeenCalledWith(
-      mockWebCard,
-      mockWebCard.updatedAt,
-    );
+    expect(notifyWebCardUsers).toHaveBeenCalledWith(mockWebCard);
 
     expect(result).toEqual({
       webCard: expect.objectContaining({

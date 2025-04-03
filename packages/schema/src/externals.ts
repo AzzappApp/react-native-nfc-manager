@@ -57,10 +57,8 @@ export const sendPushNotification = externalFunction<
 >('sendPushNotification');
 
 export const sendEmailSignatures = externalFunction<
-  (profileIds: string[], webCard: WebCard) => Promise<void>
+  (profileIds: string[], webCard: WebCard) => void
 >('sendEmailSignatures');
 
 export const notifyWebCardUsers =
-  externalFunction<
-    (webCardId: WebCard, previousUpdatedAt: Date) => Promise<void>
-  >('notifyWebCardUsers');
+  externalFunction<(webCard: WebCard) => void>('notifyWebCardUsers');

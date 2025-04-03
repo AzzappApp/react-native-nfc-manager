@@ -29,14 +29,6 @@ const reorderModules: MutationResolvers['reorderModules'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  const webCard = await getWebCardById(webCardId);
-
-  if (!webCard) {
-    throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
-  }
-
-  const previousUpdateDate = webCard.updatedAt;
-
   await checkWebCardProfileEditorRight(webCardId);
 
   try {
@@ -48,15 +40,19 @@ const reorderModules: MutationResolvers['reorderModules'] = async (
       await resetCardModulesPositions(webCardId);
       await updateWebCard(webCardId, { updatedAt: new Date() });
     });
-    notifyWebCardUsers(webCard, previousUpdateDate);
   } catch (e) {
     console.error(e);
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 
+  const webCard = await getWebCardById(webCardId);
+
   if (!webCard) {
-    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+    throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
+
+  notifyWebCardUsers(webCard);
+
   if (webCard.userName) {
     invalidateWebCard(webCard.userName);
   }

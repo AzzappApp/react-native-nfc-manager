@@ -44,8 +44,6 @@ const saveCover: MutationResolvers['saveCover'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  const previousUpdateDate = webCard.updatedAt;
-
   if (!texts || !mediaId || !backgroundColor) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
@@ -78,7 +76,7 @@ const saveCover: MutationResolvers['saveCover'] = async (
       updatedWebCard = { ...updatedWebCard, ...updates };
     });
 
-    notifyWebCardUsers(webCard, previousUpdateDate);
+    notifyWebCardUsers(webCard);
 
     await notifyRelatedWalletPasses(webCardId, true);
 

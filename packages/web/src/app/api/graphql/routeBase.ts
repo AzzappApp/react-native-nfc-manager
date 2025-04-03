@@ -165,30 +165,33 @@ const { handleRequest } = createYoga({
       notifyGooglePassWallet,
       intl: getServerIntl(locale ?? DEFAULT_LOCALE),
       sendEmailSignatures: async (profileIds: string[], webCard: WebCard) => {
-        await inngest.send({
-          name: 'batch/emailSignature',
-          data: {
-            profileIds,
-            webCard,
-          },
-        });
+        waitUntil(
+          inngest
+            .send({
+              name: 'batch/emailSignature',
+              data: {
+                profileIds,
+                webCard,
+              },
+            })
+            .catch(err => {
+              Sentry.captureException(err);
+            }),
+        );
       },
-      notifyWebCardUsers: async (webCard: WebCard, previousUpdatedAt: Date) => {
-        try {
-          waitUntil(
-            inngest.send({
+      notifyWebCardUsers: async (webCard: WebCard) => {
+        waitUntil(
+          inngest
+            .send({
               name: 'batch/webCardUsersNotification',
               data: {
                 webCard,
-                previousUpdatedAt,
               },
+            })
+            .catch(err => {
+              Sentry.captureException(err);
             }),
-          );
-        } catch (e) {
-          Sentry.captureMessage('failure to notifyWebCardUsers', {
-            extra: { data: e },
-          });
-        }
+        );
       },
     };
   },

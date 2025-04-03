@@ -23,12 +23,7 @@ const updateModulesVisibility: MutationResolvers['updateModulesVisibility'] =
     }
 
     const webCardId = fromGlobalId(gqlWebCardId).id;
-    const webCard = await getWebCardById(webCardId);
 
-    if (!webCard) {
-      throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
-    }
-    const previousUpdateDate = webCard.updatedAt;
     if (
       !modules.every(module => module != null && module.webCardId === webCardId)
     ) {
@@ -41,11 +36,18 @@ const updateModulesVisibility: MutationResolvers['updateModulesVisibility'] =
         await updateCardModules(modulesIds, { visible });
         await updateWebCard(webCardId, { updatedAt: new Date() });
       });
-      notifyWebCardUsers(webCard, previousUpdateDate);
     } catch (e) {
       console.error(e);
       throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
     }
+
+    const webCard = await getWebCardById(webCardId);
+
+    if (!webCard) {
+      throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
+    }
+
+    notifyWebCardUsers(webCard);
 
     if (webCard.userName) {
       invalidateWebCard(webCard.userName);

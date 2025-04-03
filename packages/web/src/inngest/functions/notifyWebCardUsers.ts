@@ -4,38 +4,41 @@ import { guessLocale } from '@azzapp/i18n';
 import { sendPushNotification } from '#helpers/notificationsHelpers';
 import { inngest } from '../client';
 
-const NOTIF_DELAY = process.env.WEBCARD_NOTIFICATION_DELAY
-  ? parseInt(process.env.WEBCARD_NOTIFICATION_DELAY, 10)
-  : 5;
+const NOTIF_DELAY = process.env.WEBCARD_NOTIFICATION_DELAY || '5m';
 
 export const notifyWebCardUsersBatch = inngest.createFunction(
-  { id: 'webCardUsersNotificationBatch' },
+  {
+    id: 'webCardUsersNotificationBatch',
+    cancelOn: [
+      {
+        event: 'batch/webCardUsersNotification',
+        match: 'data.webCard.id',
+      },
+    ],
+  },
   { event: 'batch/webCardUsersNotification' },
   async ({ event, step }) => {
     const webCard = event.data.webCard;
-    const previousUpdatedAt = event.data.previousUpdatedAt;
-    if (webCard) {
-      const diffInMs =
-        new Date().getTime() - new Date(previousUpdatedAt).getTime();
-      const diffInMinutes = diffInMs / 1000 / 60;
 
-      if (diffInMinutes >= NOTIF_DELAY) {
-        const users = await getUsersToNotifyOnWebCard(webCard.id);
-        for (const user of users) {
-          await step.sendEvent(`send-webCardUpdate-${webCard.id}-${user.id}`, {
-            name: 'send/webCardUsersNotification',
-            data: {
-              user,
-              webCard,
-            },
-          });
-        }
-
-        return { queued: users.length };
-      }
+    if (!webCard) {
+      return { queued: 0 };
     }
 
-    return { queued: 0 };
+    await step.sleep('wait-debounce', NOTIF_DELAY);
+
+    const users = await getUsersToNotifyOnWebCard(webCard.id);
+
+    for (const user of users) {
+      await step.sendEvent(`send-webCardUpdate-${webCard.id}-${user.id}`, {
+        name: 'send/webCardUsersNotification',
+        data: {
+          user,
+          webCard,
+        },
+      });
+    }
+
+    return { queued: users.length };
   },
 );
 

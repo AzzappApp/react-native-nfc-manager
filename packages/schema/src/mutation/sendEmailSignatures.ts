@@ -50,7 +50,7 @@ export const sendEmailSignaturesMutation: MutationResolvers['sendEmailSignatures
       throw new GraphQLError(ERRORS.USER_NO_EMAIL);
     }
 
-    await sendEmailSignatures(foundProfileIds.profileIds, webCard);
+    sendEmailSignatures(foundProfileIds.profileIds, webCard);
 
     return {
       profileIds: foundProfileIds.profileIds.map(id =>

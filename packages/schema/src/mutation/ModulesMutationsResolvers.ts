@@ -53,13 +53,6 @@ const createModuleSavingMutation =
     const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
     await checkWebCardProfileEditorRight(webCardId);
 
-    const webCard = await webCardLoader.load(webCardId);
-    if (!webCard) {
-      throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
-    }
-
-    const previousUpdatedAt = webCard.updatedAt;
-
     const { validator, getMedias } = MODULES_SAVE_RULES[moduleKind] ?? {};
 
     let module: CardModule | null = null;
@@ -112,11 +105,17 @@ const createModuleSavingMutation =
         }
         await updateWebCard(webCardId, { updatedAt: new Date() });
       });
-      notifyWebCardUsers(webCard, previousUpdatedAt);
     } catch (e) {
       console.error(e);
       throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
     }
+
+    const webCard = await webCardLoader.load(webCardId);
+    if (!webCard) {
+      throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
+    }
+
+    notifyWebCardUsers(webCard);
 
     if (webCard.userName) {
       invalidateWebCard(webCard.userName);

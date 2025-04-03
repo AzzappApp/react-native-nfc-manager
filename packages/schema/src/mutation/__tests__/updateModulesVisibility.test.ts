@@ -111,7 +111,7 @@ describe('updateModulesVisibility', () => {
       visible: true,
     });
     expect(updateWebCard).toHaveBeenCalled();
-    expect(notifyWebCardUsers).toHaveBeenCalledWith(webCard, expect.any(Date));
+    expect(notifyWebCardUsers).toHaveBeenCalledWith(webCard);
     expect(invalidateWebCard).toHaveBeenCalledWith('testUser');
     expect(result).toEqual({ webCard });
   });
