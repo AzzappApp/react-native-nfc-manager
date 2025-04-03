@@ -94,7 +94,7 @@ export const ContextUploadProvider = ({
         throw new Error('Error uploading media');
       }
 
-      onComplete();
+      await onComplete();
     } catch (error) {
       console.error('Upload failed:', error);
       Sentry.captureException(error);
