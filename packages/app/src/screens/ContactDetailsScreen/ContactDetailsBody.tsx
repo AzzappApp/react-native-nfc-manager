@@ -197,7 +197,7 @@ const ContactDetailsBody = ({ details, onSave, onClose }: Props) => {
                   const route = await matchUrlWithRoute(urlAddress.url);
                   if (route) {
                     // will close the contact detail modal
-                    router.back();
+                    onClose();
                     // move to route deeplink
                     router?.push(route);
                     return;
