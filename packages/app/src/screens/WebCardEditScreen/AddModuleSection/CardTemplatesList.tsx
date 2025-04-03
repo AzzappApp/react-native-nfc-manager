@@ -57,7 +57,7 @@ const CardTemplatesList = ({ webCard: webCardKey }: CardTemplatesListProps) => {
     useState<CardTemplateItem | null>(null);
 
   const [
-    templateTypesByWebCardCategory,
+    templateTypes,
     selectedCardTemplateType,
     templates,
     onSelectSection,
@@ -208,7 +208,7 @@ const CardTemplatesList = ({ webCard: webCardKey }: CardTemplatesListProps) => {
       <SelectSection
         nativeID="activities"
         accessibilityLabelledBy="activitiesLabel"
-        sections={templateTypesByWebCardCategory}
+        sections={templateTypes}
         inputLabel={selectedCardTemplateType?.title}
         selectedItemKey={selectedCardTemplateType?.id}
         keyExtractor={keyExtractor}
