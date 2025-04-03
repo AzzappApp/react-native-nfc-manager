@@ -1,3 +1,7 @@
+## 1.9.2-canary.6
+
+* **fix:**  - add a Toast when network connectivity is bad ([#8262](https://github.com/AzzappApp/azzapp/pull/8262))
+
 ## 1.9.2-canary.5
 
 
