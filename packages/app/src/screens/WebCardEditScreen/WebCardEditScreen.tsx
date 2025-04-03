@@ -1,6 +1,7 @@
 import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
+import { MMKV } from 'react-native-mmkv';
 import { useSharedValue, withTiming } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useRelayEnvironment } from 'react-relay';
@@ -58,6 +59,12 @@ type WebCardEditScreenProps = {
   transitionInfos: Record<string, ModuleTransitionInfo> | null;
   onDone: () => void;
 };
+
+// This mmkv boolean is here to ensure we display the help toast only once
+const MMKVS_HAS_DISPLAY_CONFIGURE_MODULE_TOAST =
+  '@azzap/auth.hasDisplayConfigureModuleToast';
+
+const storage = new MMKV();
 
 const WebCardEditScreen = ({
   webCard: webCardKey,
@@ -267,7 +274,15 @@ const WebCardEditScreen = ({
   const intl = useIntl();
   const { bottom } = useScreenInsets();
   useEffect(() => {
+    // ensure we display the toast only once
+    const hasDisplayConfigureModuleToast =
+      storage.getBoolean(MMKVS_HAS_DISPLAY_CONFIGURE_MODULE_TOAST) ?? false;
+
+    if (hasDisplayConfigureModuleToast) return;
+
     if (!webCard?.cardIsPublished && webCard?.cardModules?.length && editing) {
+      storage.set(MMKVS_HAS_DISPLAY_CONFIGURE_MODULE_TOAST, true);
+
       Toast.show({
         type: 'info',
         bottomOffset: bottom + BOTTOM_MENU_HEIGHT,
