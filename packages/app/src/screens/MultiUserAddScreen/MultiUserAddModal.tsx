@@ -376,6 +376,7 @@ const MultiUserAddModal = (
                 : (locale?.countryCode.toUpperCase() as CountryCode),
             value: contact,
           },
+          logo: webCard?.logo || profile?.logo,
         });
         setIsManual(isManual);
         setContact(undefined);
