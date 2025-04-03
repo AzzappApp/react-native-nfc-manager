@@ -1,6 +1,6 @@
 import { Suspense, useEffect, useState } from 'react';
 import { graphql, useLazyLoadQuery } from 'react-relay';
-import { addGlobalEventListener } from '#helpers/globalEvents';
+import { createId } from '#helpers/idHelpers';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import { HOME_ICON_COVER_WIDTH } from './constants';
 import CoverRenderer from './CoverRenderer';
@@ -10,15 +10,13 @@ type HomeIconProps = {
   webCardId: string;
 };
 
+const forceRefreshListeners = new Set<() => void>();
+const forceRefresh = () => {
+  forceRefreshListeners.forEach(listener => listener());
+};
+
 const HomeCoverIcon = ({ webCardId }: HomeIconProps) => {
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    addGlobalEventListener('READY', () => {
-      setReady(true);
-    });
-  }, []);
-
+  const [fetchKey, setFetchKey] = useState(createId());
   const data = useLazyLoadQuery<HomeIconQuery>(
     graphql`
       query HomeIconQuery($webCardId: ID!) {
@@ -31,10 +29,16 @@ const HomeCoverIcon = ({ webCardId }: HomeIconProps) => {
       webCardId,
     },
     {
-      fetchKey: `home-icon-ready-${ready}`,
+      fetchKey,
       fetchPolicy: 'store-only',
     },
   );
+
+  useEffect(() => {
+    forceRefreshListeners.add(() => {
+      setFetchKey(createId());
+    });
+  }, []);
 
   return (
     <CoverRenderer
@@ -60,3 +64,5 @@ export const HomeIcon = () => {
     </Suspense>
   );
 };
+
+HomeIcon.forceRefresh = forceRefresh;

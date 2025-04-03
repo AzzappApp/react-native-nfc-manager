@@ -4,8 +4,10 @@ import type { SectionsRoute } from './sectionsRoutes';
 import type { ColorPaletteColor } from '@azzapp/shared/cardHelpers';
 import type { ModuleKind } from '@azzapp/shared/cardModuleHelpers';
 import type { ContactCard } from '@azzapp/shared/contactCardHelpers';
+import type { Geolocation } from '@azzapp/shared/geolocationHelpers';
 import type { Contact } from 'expo-contacts';
 import type { LayoutRectangle } from 'react-native';
+
 export type AboutRoute = {
   route: 'ABOUT';
   params?: never;
@@ -41,6 +43,11 @@ export type ConfirmRegistrationRoute = {
   params: {
     issuer: string;
   };
+};
+
+export type AcceptTermsRoute = {
+  route: 'ACCEPT_TERMS';
+  params?: never;
 };
 
 export type ForgotPasswordRoute = {
@@ -83,7 +90,11 @@ export type WebCardRoute = {
     fromRectangle?: LayoutRectangle;
     showPosts?: boolean;
     contactData?: string | null;
-    additionalContactData?: Pick<ContactCard, 'socials' | 'urls'>;
+    additionalContactData?: Pick<ContactCard, 'socials' | 'urls'> & {
+      avatarUrl?: string;
+    };
+    geolocation?: Geolocation;
+
     fromCreation?: boolean;
     editing?: boolean;
   } & (
@@ -124,6 +135,16 @@ export type PostLikesRoute = {
 export type NewPostRoute = {
   route: 'NEW_POST';
   params?: { fromProfile: boolean };
+};
+
+export type CookieConsentRoute = {
+  route: 'COOKIE_CONSENT';
+  params?: never;
+};
+
+export type CookieSettingsRoute = {
+  route: 'COOKIE_SETTINGS';
+  params?: { fromConsent?: boolean };
 };
 
 export type CoverEditionRoute = {
@@ -167,11 +188,6 @@ export type AccountDetailsRoute = {
 
 export type InviteFriendsRoute = {
   route: 'INVITE_FRIENDS';
-  params?: never;
-};
-
-export type ContactCardRoute = {
-  route: 'CONTACT_CARD';
   params?: never;
 };
 
@@ -245,6 +261,7 @@ export type ContactCreateRoute = {
   route: 'CONTACT_CREATE';
   params?: {
     showCardScanner?: boolean;
+    vCardUri?: string;
   };
 };
 
@@ -288,24 +305,38 @@ export type ModulePreviewRoute = {
   route: 'MODULE_PREVIEW';
   params: {
     variant: ModuleKindWithVariant;
-    requireSubscription: boolean;
   };
+};
+
+export type ContactByLocationRoute = {
+  route: 'CONTACTS_BY_LOCATION';
+  params: {
+    location: string;
+  };
+};
+
+export type ShakeAndShareRoute = {
+  route: 'SHAKE_AND_SHARE';
+  params?: never;
 };
 
 export type Route =
   | AboutRoute
+  | AcceptTermsRoute
   | AccountDetailsRoute
   | AddModuleSectionRoute
   | CardModuleEditionRoute
   | CommonInformationRoute
   | ConfirmChangeContactRoute
   | ConfirmRegistrationRoute
+  | ContactByLocationRoute
   | ContactCardCreateRoute
   | ContactCardEditRoute
-  | ContactCardRoute
   | ContactCreateRoute
   | ContactDetailsRoute
   | ContactsRoute
+  | CookieConsentRoute
+  | CookieSettingsRoute
   | CoverCreationRoute
   | CoverEditionRoute
   | CoverTemplateSelectionRoute
@@ -332,6 +363,7 @@ export type Route =
   | ResetPasswordRoute
   | SearchRoute
   | SectionsRoute
+  | ShakeAndShareRoute
   | SignInRoute
   | SignUpRoute
   | UserPayWallRoute

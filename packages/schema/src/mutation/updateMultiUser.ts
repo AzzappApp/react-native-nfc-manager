@@ -33,12 +33,18 @@ const updateMultiUser: MutationResolvers['updateMultiUser'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
+  const webCard = await webCardLoader.load(webCardId);
+
+  if (!webCard) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
+
   if (isMultiUser) {
-    //we first need to heck if this is an IAP subscription and enought seath
-    await validateCurrentSubscription(
-      owner.id,
-      await getWebCardCountProfile(webCardId),
-    );
+    await validateCurrentSubscription(owner.id, {
+      webCardIsPublished: webCard.cardIsPublished,
+      action: 'UPDATE_MULTI_USER',
+      addedSeats: await getWebCardCountProfile(webCardId),
+    });
   }
 
   try {
@@ -55,7 +61,7 @@ const updateMultiUser: MutationResolvers['updateMultiUser'] = async (
     console.error(e);
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
-  const webCard = await webCardLoader.load(webCardId);
+
   if (!webCard) {
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
@@ -63,7 +69,10 @@ const updateMultiUser: MutationResolvers['updateMultiUser'] = async (
     invalidateWebCard(webCard.userName);
   }
   return {
-    webCard,
+    webCard: {
+      ...webCard,
+      ...updates,
+    },
   };
 };
 

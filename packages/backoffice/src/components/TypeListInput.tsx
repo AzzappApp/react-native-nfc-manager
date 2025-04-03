@@ -6,20 +6,16 @@ import {
   createFilterOptions,
 } from '@mui/material';
 import { useRef } from 'react';
-import type {
-  CardTemplateType,
-  CompanyActivityType,
-  LocalizationMessage,
-} from '@azzapp/data';
+import type { CardTemplateType, LocalizationMessage } from '@azzapp/data';
 import type { BoxProps } from '@mui/material';
 
-type Value = CardTemplateType | CompanyActivityType | string | null | undefined;
+type Value = CardTemplateType | string | null | undefined;
 
 type TypeListInput = Omit<BoxProps, 'onChange'> & {
   name: string;
   label: string;
   value: Value;
-  options: Array<CardTemplateType | CompanyActivityType>;
+  options: CardTemplateType[];
   error?: boolean | null;
   helperText?: string | null;
   onChange: (value: Value) => void;
@@ -96,8 +92,6 @@ const TypeListInput = ({
 
 export default TypeListInput;
 
-const filterType = createFilterOptions<
-  CardTemplateType | CompanyActivityType | string
->();
+const filterType = createFilterOptions<CardTemplateType | string>();
 
 const ADD_PREFIX = 'Add type : ';

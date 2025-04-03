@@ -377,7 +377,7 @@ export const dyptichByModuleVariant = (
   ]; //returning a default value is easier
 };
 
-export const getInitalDyptichColor = (
+export const getInitialDyptichColor = (
   module: ModuleKindAndVariant,
   coverBackgroundColor: string | null = 'light',
 ): CardModuleColor => {

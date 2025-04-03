@@ -12,6 +12,11 @@ export const YEARLY_RECURRENCE = ms(
   process.env.PAYMENT_YEARLY_RECURRENCE ?? '365d',
 );
 
+export const REBILL_MANAGER_REBILL_DURATION =
+  process.env.NEXT_PUBLIC_PLATFORM === 'production'
+    ? '0' // 0 means unlimited
+    : `${60 * 24}`; // 1 day (in minutes) in test environments
+
 /**
  *
  * @param subscriptionPlan
@@ -34,22 +39,8 @@ export const getNextPaymentDate = (
   return endAt;
 };
 
-export const getAzzappPlusPrice = (subscriptionPlan: SubscriptionPlan) =>
-  (subscriptionPlan === 'web.monthly' ? 2.99 : 1.99) * 100; //cents;
-
 export const getPricePerSeat = (subscriptionPlan: SubscriptionPlan) => {
   return subscriptionPlan === 'web.monthly' ? 1.5 * 100 : 1 * 100; // cents;
-};
-
-export const calculateAzzappPlusPrice = (
-  subscriptionPlan: SubscriptionPlan,
-) => {
-  return Math.round(
-    getAzzappPlusPrice(subscriptionPlan) *
-      (subscriptionPlan === 'web.monthly'
-        ? 1
-        : Math.floor(YEARLY_RECURRENCE / MONTHLY_RECURRENCE)),
-  );
 };
 
 export const calculateAmountForSeats = (
@@ -69,10 +60,7 @@ export const calculateAmount = (
   totalSeats: number,
   subscriptionPlan: SubscriptionPlan,
 ) => {
-  return (
-    calculateAmountForSeats(totalSeats, subscriptionPlan) +
-    calculateAzzappPlusPrice(subscriptionPlan)
-  );
+  return calculateAmountForSeats(totalSeats, subscriptionPlan);
 };
 
 export const calculateTaxes = async (

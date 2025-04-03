@@ -5,6 +5,7 @@ import {
   deletePredefinedCover as deletePredefinedCoverQuery,
   updatePredefinedCover,
   referencesMedias,
+  getPredefinedCoverById,
 } from '@azzapp/data';
 import { ADMIN } from '#roles';
 import { currentUserHasRole } from '#helpers/roleHelpers';
@@ -72,10 +73,15 @@ export const savePredefinedCover = async (data: {
         },
       };
       if (data.id) {
-        predefinedCoverId = await updatePredefinedCover(data.id, serverData);
+        const previousPredefinedCover = await getPredefinedCoverById(data.id);
+        await updatePredefinedCover(data.id, serverData);
+        await referencesMedias(
+          [data.mediaId],
+          [previousPredefinedCover?.mediaId ?? null],
+        );
       } else {
-        predefinedCoverId = await createPredefinedCover(serverData);
-        await referencesMedias([predefinedCoverId], null);
+        await createPredefinedCover(serverData);
+        await referencesMedias([serverData.mediaId], null);
       }
     });
     if (transactionResult) return transactionResult;

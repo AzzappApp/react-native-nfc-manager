@@ -1,0 +1,13 @@
+diff --git a/android/src/main/java/com/mrousavy/camera/react/CameraView+Focus.kt b/android/src/main/java/com/mrousavy/camera/react/CameraView+Focus.kt
+index a9d568309aaffdb1c38062c87dd42641aa7143a4..3cf037167e5fadee144787f535dee788632ac6f0 100644
+--- a/android/src/main/java/com/mrousavy/camera/react/CameraView+Focus.kt
++++ b/android/src/main/java/com/mrousavy/camera/react/CameraView+Focus.kt
+@@ -15,5 +15,7 @@ suspend fun CameraView.focus(pointMap: ReadableMap) {
+     val dp = Resources.getSystem().displayMetrics.density
+     previewView.meteringPointFactory.createPoint(x.toFloat() * dp, y.toFloat() * dp)
+   }
+-  cameraSession.focus(point)
++  try {
++    cameraSession.focus(point)
++  } catch (e: Exception) {}
+ }

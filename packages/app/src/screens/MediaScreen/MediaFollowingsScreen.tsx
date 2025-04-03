@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { View } from 'react-native';
+import { View, useWindowDimensions } from 'react-native';
 import {
   graphql,
   usePaginationFragment,
@@ -9,20 +9,29 @@ import {
 import { useDebounce } from 'use-debounce';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
 import PostsGrid from '#components/PostList/PostsGrid';
+import useScreenInsets from '#hooks/useScreenInsets';
 import ListLoadingFooter from '#ui/ListLoadingFooter';
+import { TAB_BAR_MENU_ITEM_HEIGHT } from '#ui/TabBarMenuItem/TabBarMenuItem';
+import type { ScrollableToOffset } from '#helpers/types';
 import type { MediaFollowingsScreen_webCard$key } from '#relayArtifacts/MediaFollowingsScreen_webCard.graphql';
 import type { PostsGrid_posts$key } from '#relayArtifacts/PostsGrid_posts.graphql';
+import type { NativeSyntheticEvent, NativeScrollEvent } from 'react-native';
 
 type MediaFollowingsScreenScreenProps = {
   webCard: MediaFollowingsScreen_webCard$key;
   canPlay: boolean;
   ListHeaderComponent?: React.ReactElement<any> | null;
+  onScroll?: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
+  scrollableRef?: ScrollableToOffset;
 };
+const TAB_MENU_HEIGHT = TAB_BAR_MENU_ITEM_HEIGHT + 2 * 9;
 
 const MediaFollowingsScreen = ({
   webCard,
   canPlay,
   ListHeaderComponent,
+  onScroll,
+  scrollableRef,
 }: MediaFollowingsScreenScreenProps) => {
   const [refreshing, setRefreshing] = useState(false);
   const { data, loadNext, refetch, hasNext, isLoadingNext } =
@@ -90,17 +99,22 @@ const MediaFollowingsScreen = ({
     refetch({ after: null, first: 10 });
   });
 
+  const { height: screenHeight } = useWindowDimensions();
+  const { top } = useScreenInsets();
+  const minHeight = top + TAB_MENU_HEIGHT + 40;
+
   const ListFooterComponent = useMemo(
     () => (
-      <View style={{ height: 80 }}>
+      <View style={{ minHeight: screenHeight - minHeight }}>
         <ListLoadingFooter loading={showLoadingIndicatorDebounced} />
       </View>
     ),
-    [showLoadingIndicatorDebounced],
+    [minHeight, screenHeight, showLoadingIndicatorDebounced],
   );
 
   return (
     <PostsGrid
+      scrollableRef={scrollableRef}
       posts={posts}
       canPlay={canPlay}
       ListHeaderComponent={ListHeaderComponent}
@@ -109,6 +123,7 @@ const MediaFollowingsScreen = ({
       onRefresh={onRefresh}
       onEndReached={onEndReached}
       nestedScrollEnabled
+      onScroll={onScroll}
     />
   );
 };

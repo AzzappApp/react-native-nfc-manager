@@ -112,7 +112,13 @@ const AlternationRender = async ({
                         fontSize: cardStyle.titleFontSize,
                       }}
                     >
-                      {sectionData?.title ?? DEFAULT_MODULE_TITLE}
+                      <RichText
+                        fontFamily={cardStyle.titleFontFamily}
+                        text={sectionData?.title ?? DEFAULT_MODULE_TITLE}
+                        textFontSize={
+                          cardStyle.titleFontSize || commonStyles.titleFontSize
+                        }
+                      />
                     </h2>
                     <p
                       className={cn(
@@ -127,6 +133,9 @@ const AlternationRender = async ({
                       <RichText
                         fontFamily={cardStyle.fontFamily}
                         text={sectionData?.text ?? DEFAULT_MODULE_TEXT}
+                        textFontSize={
+                          cardStyle.fontSize || commonStyles.textFontSize
+                        }
                       />
                     </p>
                     <div>

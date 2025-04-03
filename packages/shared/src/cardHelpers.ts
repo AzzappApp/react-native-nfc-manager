@@ -106,10 +106,10 @@ export const DEFAULT_CARD_STYLE: CardStyle = {
   buttonColor: '#000000',
   buttonRadius: 0,
   fontFamily: 'Inter_Regular',
-  fontSize: 12,
+  fontSize: 16,
   gap: 0,
   titleFontFamily: 'Inter_Regular',
-  titleFontSize: 18,
+  titleFontSize: 34,
 };
 
 /**

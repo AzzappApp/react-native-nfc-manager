@@ -53,7 +53,11 @@ const acceptOwnership: MutationResolvers['acceptOwnership'] = async (
 
   const webCardNbSeats = await getWebCardCountProfile(profile.webCardId);
 
-  await validateCurrentSubscription(user.id, webCardNbSeats);
+  await validateCurrentSubscription(user.id, {
+    webCardIsPublished: webCard.cardIsPublished,
+    action: 'UPDATE_MULTI_USER',
+    addedSeats: webCardNbSeats,
+  });
 
   try {
     const updatedProfile = await transaction(async () => {

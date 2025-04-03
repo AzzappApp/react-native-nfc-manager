@@ -70,7 +70,7 @@ export const dateDiffInMonths = (startDate: Date, endDate: Date) =>
   );
 
 export const dateDiffInMinutes = (startDate: Date, endDate: Date) =>
-  (endDate.getTime() - startDate.getTime()) / 1000 / 60;
+  Math.round((endDate.getTime() - startDate.getTime()) / 1000 / 60);
 
 export const formatDateToYYYYMMDD = (date: Date) => {
   const day = date.getDate();

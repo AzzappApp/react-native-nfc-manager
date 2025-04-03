@@ -20,10 +20,6 @@ const useCardTemplates = (profileId: string, search = '') => {
             cardTemplateTypes {
               id
               label
-              webCardCategory {
-                id
-                label
-              }
             }
           }
         }
@@ -35,7 +31,7 @@ const useCardTemplates = (profileId: string, search = '') => {
   const profile = node?.profile;
   const cardTemplateTypes = node?.profile?.cardTemplateTypes;
 
-  const templateTypesByWebCardCategory = useMemo(() => {
+  const templateTypes = useMemo(() => {
     return (
       cardTemplateTypes?.reduce(
         (
@@ -54,7 +50,7 @@ const useCardTemplates = (profileId: string, search = '') => {
           if (!curr) {
             return acc;
           }
-          const label = curr.webCardCategory?.label ?? '-';
+          const label = curr?.label ?? '-';
 
           const existingSection = acc.find(section => section.title === label);
 
@@ -187,7 +183,7 @@ const useCardTemplates = (profileId: string, search = '') => {
   }, [hasNext, isLoadingNext, loadNext]);
 
   return [
-    templateTypesByWebCardCategory,
+    templateTypes,
     selectedCardTemplateType,
     templates,
     onSelectSection,

@@ -1,5 +1,7 @@
 import { Controller } from 'react-hook-form';
 import { type TextInputProps } from 'react-native';
+import { colors } from '#theme';
+import PremiumIndicator from '#components/PremiumIndicator';
 import { buildContactStyleSheet } from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import TextInput from '#ui/TextInput';
@@ -20,6 +22,8 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
   errorMessage,
   trim = false,
   autoComplete = 'off',
+  isPremium,
+  requiresPremium,
 }: {
   labelKey?: FieldPath<TFieldValues>;
   keyboardType: TextInputProps['keyboardType'];
@@ -34,6 +38,8 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
   errorMessage?: string;
   trim?: boolean;
   autoComplete?: TextInputProps['autoComplete'];
+  isPremium?: boolean | null;
+  requiresPremium?: boolean;
 }) => {
   const styles = useStyleSheet(stylesheet);
 
@@ -70,6 +76,12 @@ const ContactCardEditField = <TFieldValues extends FieldValues>({
             autoFocus={isDirty}
             autoComplete={autoComplete}
           />
+          {requiresPremium && (
+            <PremiumIndicator
+              isRequired={!isPremium}
+              color={value ? undefined : colors.grey100}
+            />
+          )}
         </ContactCardEditFieldWrapper>
       )}
     />

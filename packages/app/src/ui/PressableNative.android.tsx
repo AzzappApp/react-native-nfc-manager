@@ -8,10 +8,10 @@ import {
 import {
   type LayoutChangeEvent,
   type PressableAndroidRippleConfig,
+  type View,
 } from 'react-native';
 import { Pressable } from 'react-native-gesture-handler';
 import { colors } from '#theme';
-import type GenericTouchable from 'react-native-gesture-handler/lib/typescript/components/touchables/GenericTouchable';
 import type { GenericTouchableProps } from 'react-native-gesture-handler/lib/typescript/components/touchables/GenericTouchableProps';
 
 const TIMEOUT = 200;
@@ -26,25 +26,30 @@ type PressableNativeProps = GenericTouchableProps & {
 
 const PressableNative = (
   { ripple, onDoublePress, ...props }: PressableNativeProps,
-  ref: ForwardedRef<GenericTouchable>,
+  ref: ForwardedRef<View>,
 ) => {
   const timer = useRef<NodeJS.Timeout | null>(null);
   const [width, setWidth] = useState(0);
-  const onLayout = (e: LayoutChangeEvent) => {
-    setWidth(e.nativeEvent.layout.width);
-  };
-  const androidRiple = ripple ?? { borderless: false, color: colors.grey400 };
-  if (!androidRiple.radius && androidRiple.borderless) {
-    androidRiple.radius = width / 2 + 2;
+  const androidRipple = ripple ?? { borderless: false, color: colors.grey400 };
+  const shallHandleWidth = !androidRipple.radius && androidRipple.borderless;
+
+  const onLayout = shallHandleWidth
+    ? (e: LayoutChangeEvent) => {
+        setWidth(e.nativeEvent.layout.width);
+      }
+    : undefined;
+
+  if (shallHandleWidth) {
+    androidRipple.radius = width / 2 + 2;
   }
 
-  if (androidRiple.radius) {
-    androidRiple.radius = Math.round(androidRiple.radius);
+  if (androidRipple.radius) {
+    androidRipple.radius = Math.round(androidRipple.radius);
   }
 
   const pressableProps = {
     ref,
-    android_ripple: androidRiple,
+    android_ripple: androidRipple,
     onLayout,
     ...props,
   } as const;

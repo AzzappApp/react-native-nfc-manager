@@ -31,8 +31,13 @@ import {
   downloadContactImage,
 } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
-import { parsePhoneNumber } from '#helpers/phoneNumbersHelper';
+import {
+  getPhonenumberWithCountryCode,
+  parseContactCardPhoneNumber,
+} from '#helpers/phoneNumbersHelper';
+import useOnSubscriptionError from '#hooks/useOnSubscriptionError';
 import ContactCardEditForm from '#screens/ContactCardEditScreen/ContactCardEditForm';
+import { baseUserDetailsSchema } from '#screens/MultiUserDetailsScreen/MultiUserDetailsSchema';
 import Button from '#ui/Button';
 import Container from '#ui/Container';
 import Header from '#ui/Header';
@@ -42,6 +47,7 @@ import MultiUserAddForm from './MultiUserAddForm';
 import type { EmailPhoneInput } from '#components/EmailOrPhoneInput';
 import type { ContactCardPhoneNumber } from '#helpers/phoneNumbersHelper';
 import type { MultiUserAddModal_InviteUserMutation } from '#relayArtifacts/MultiUserAddModal_InviteUserMutation.graphql';
+import type { MultiUserAddModal_profile$key } from '#relayArtifacts/MultiUserAddModal_profile.graphql';
 import type { MultiUserAddModal_webCard$key } from '#relayArtifacts/MultiUserAddModal_webCard.graphql';
 import type { ContactCardFormValues } from '#screens/ContactCardEditScreen/ContactCardSchema';
 import type { MultiUserAddFormValues } from './MultiUserAddForm';
@@ -50,87 +56,34 @@ import type { CountryCode } from 'libphonenumber-js';
 import type { ForwardedRef } from 'react';
 import type { Control } from 'react-hook-form';
 
-const multiUserAddFormSchema = z.object({
+const multiUserAddFormSchema = baseUserDetailsSchema.extend({
   selectedContact: z
     .object({
       countryCodeOrEmail: z.string(),
       value: z.string(),
     })
-    .refine(contact => {
-      if (contact.countryCodeOrEmail === 'email') {
-        return isValidEmail(contact.value);
-      } else if (contact.countryCodeOrEmail) {
-        return parsePhoneNumberFromString(
-          contact.value,
-          contact.countryCodeOrEmail as CountryCode,
-        )?.isValid();
-      }
-    }),
-  role: z.enum(['user', 'admin', 'editor']),
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
-  emails: z.array(
-    z.object({
-      label: z.string(),
-      address: z.string(),
-      selected: z.boolean().nullable().optional(),
-    }),
-  ),
-  phoneNumbers: z.array(
-    z.object({
-      label: z.string(),
-      number: z.string(),
-      selected: z.boolean().nullable().optional(),
-    }),
-  ),
-  title: z.string().optional(),
-  company: z.string().optional(),
-  urls: z.array(
-    z.object({
-      address: z.string(),
-      selected: z.boolean().nullable().optional(),
-    }),
-  ),
-  birthday: z
-    .object({
-      birthday: z.string(),
-      selected: z.boolean().nullable().optional(),
-    })
-    .optional(),
-  socials: z.array(
-    z.object({
-      url: z.string(),
-      label: z.string(),
-      selected: z.boolean().nullable().optional(),
-    }),
-  ),
-  addresses: z.array(
-    z.object({
-      address: z.string(),
-      label: z.string(),
-      selected: z.boolean().nullable().optional(),
-    }),
-  ),
-  avatar: z
-    .object({
-      uri: z.string(),
-      id: z.string(),
-      local: z.boolean(),
-    })
-    .optional(),
-  logo: z
-    .object({
-      uri: z.string(),
-      id: z.string().optional(),
-      local: z.boolean().optional(),
-    })
-    .optional(),
+    .refine(
+      contact => {
+        if (contact.countryCodeOrEmail === 'email') {
+          return isValidEmail(contact.value);
+        } else if (contact.countryCodeOrEmail) {
+          return parsePhoneNumberFromString(
+            contact.value,
+            contact.countryCodeOrEmail as CountryCode,
+          )?.isValid();
+        }
+      },
+      {
+        message: 'Invalid contact info',
+      },
+    ),
 });
 
 type MultiUserAddModalProps = {
   beforeClose: () => void;
   onCompleted: () => void;
   webCard: MultiUserAddModal_webCard$key;
+  profile: MultiUserAddModal_profile$key | null;
 };
 
 export type MultiUserAddModalActions = {
@@ -153,6 +106,10 @@ const MultiUserAddModal = (
         id
         isMultiUser
         userName
+        isPremium
+        subscription {
+          issuer
+        }
         commonInformation {
           company
           addresses {
@@ -182,6 +139,24 @@ const MultiUserAddModal = (
       }
     `,
     props.webCard,
+  );
+
+  const profile = useFragment(
+    graphql`
+      fragment MultiUserAddModal_profile on Profile
+      @argumentDefinitions(
+        pixelRatio: {
+          type: "Float!"
+          provider: "CappedPixelRatio.relayprovider"
+        }
+      ) {
+        logo {
+          uri: uri(width: 180, pixelRatio: $pixelRatio)
+          id
+        }
+      }
+    `,
+    props.profile,
   );
 
   const { beforeClose, onCompleted } = props;
@@ -219,6 +194,7 @@ const MultiUserAddModal = (
     resolver: zodResolver(multiUserAddFormSchema),
     defaultValues: {
       role: 'user',
+      logo: webCard?.logo || profile?.logo,
     },
     mode: 'onSubmit',
   });
@@ -282,7 +258,7 @@ const MultiUserAddModal = (
                   number: a.number || '',
                   selected: true,
                 }))
-                .map(parsePhoneNumber) ?? [],
+                .map(parseContactCardPhoneNumber) ?? [],
             emails:
               contact.emails?.map(a => ({
                 label: normalizePhoneMailLabel(a.label),
@@ -336,6 +312,7 @@ const MultiUserAddModal = (
                 selected: true,
               };
             }),
+            logo: webCard?.logo || profile?.logo,
           },
           { keepDirty: true },
         );
@@ -349,6 +326,7 @@ const MultiUserAddModal = (
                 : (locale?.countryCode.toUpperCase() as CountryCode),
             value: contact,
           },
+          logo: webCard?.logo || profile?.logo,
         });
         setIsManual(isManual);
         setContact(undefined);
@@ -375,6 +353,10 @@ const MultiUserAddModal = (
         }
       }
     `,
+  );
+
+  const onSubscriptionError = useOnSubscriptionError(
+    webCard.subscription?.issuer === 'web',
   );
 
   const submit = handleSubmit(
@@ -492,7 +474,15 @@ const MultiUserAddModal = (
           contactCard: {
             firstName,
             lastName,
-            phoneNumbers,
+            phoneNumbers: phoneNumbers
+              ?.filter(phoneNumber => phoneNumber.number)
+              .map(({ countryCode, ...phoneNumber }) => {
+                const number = getPhonenumberWithCountryCode(
+                  phoneNumber.number,
+                  countryCode as CountryCode,
+                );
+                return { ...phoneNumber, number };
+              }),
             emails,
             title,
             company,
@@ -505,20 +495,20 @@ const MultiUserAddModal = (
           },
         };
 
+        if (avatar?.local) {
+          addLocalCachedMediaFile(avatarId, 'image', avatar.uri);
+        }
+
+        if (logo?.local) {
+          addLocalCachedMediaFile(logoId, 'image', logo.uri);
+        }
+
         commit({
           variables: {
             profileId,
             invited,
           },
           onCompleted: () => {
-            if (avatarId && avatar?.uri) {
-              addLocalCachedMediaFile(
-                `${'image'.slice(0, 1)}:${avatarId}`,
-                'image',
-                avatar.uri,
-              );
-            }
-
             beforeClose();
             onClose();
             onCompleted();
@@ -533,37 +523,9 @@ const MultiUserAddModal = (
                     'Error toast message when inviting user that is already a member from MultiUserAddModal',
                 }),
               });
-            } else if (e.message === ERRORS.SUBSCRIPTION_REQUIRED) {
-              Toast.show({
-                type: 'error',
-                text1: intl.formatMessage({
-                  defaultMessage: 'Error, you don’t have a subscription',
-                  description:
-                    'Error toast message when inviting user without subscription from MultiUserAddModal',
-                }),
-              });
-            } else if (e.message === ERRORS.SUBSCRIPTION_INSUFFICIENT_SEATS) {
-              Toast.show({
-                type: 'error',
-                text1: intl.formatMessage({
-                  defaultMessage:
-                    'Error, you don’t have enough seats in your subscription to invite this user',
-                  description:
-                    'Error toast message when inviting user without correct subscription from MultiUserAddModal',
-                }),
-              });
-            } else {
-              console.warn(e);
-              Toast.show({
-                type: 'error',
-                text1: intl.formatMessage({
-                  defaultMessage:
-                    'Error, could not invite user. Please try again.',
-                  description:
-                    'Error toast message when inviting user from MultiUserAddModal',
-                }),
-              });
+              return;
             }
+            onSubscriptionError(e);
           },
           updater: (store, data) => {
             const invitedProfile = data?.inviteUser?.profile;

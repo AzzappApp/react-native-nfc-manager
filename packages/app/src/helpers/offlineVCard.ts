@@ -17,16 +17,22 @@ const VCardDataKey = 'vcardData';
 
 export const useSaveOfflineVCard = (
   profilesKey: OfflineVCardScreen_profiles$key | null | undefined,
+  isPremium?: boolean | null,
 ) => {
   const profiles = useFragment(OfflineVCardScreenProfilesFragment, profilesKey);
   useEffect(() => {
     if (profiles) {
-      storage.set(VCardDataKey, JSON.stringify(profiles));
+      storage.set(VCardDataKey, JSON.stringify({ isPremium, profiles }));
     }
-  }, [profiles]);
+  }, [isPremium, profiles]);
 };
 
-export const getOfflineVCard = (): OfflineVCardScreen_profiles$data => {
+export const getOfflineVCard = ():
+  | {
+      isPremium: boolean | undefined;
+      profiles: OfflineVCardScreen_profiles$data;
+    }
+  | undefined => {
   const data = storage.getString(VCardDataKey);
   return data ? JSON.parse(data) : undefined;
 };

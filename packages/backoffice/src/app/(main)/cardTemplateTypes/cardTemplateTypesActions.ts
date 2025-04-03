@@ -8,17 +8,10 @@ import {
 } from '@azzapp/data';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import { cardTemplateTypeSchema } from './cardTemplateTypeSchema';
-import type {
-  CardTemplateType,
-  NewCardTemplateType,
-  WebCardCategory,
-} from '@azzapp/data';
+import type { CardTemplateType, NewCardTemplateType } from '@azzapp/data';
 
 export const saveCardTemplateType = async (
-  data: { webCardCategory: WebCardCategory } & (
-    | CardTemplateType
-    | NewCardTemplateType
-  ),
+  data: CardTemplateType | NewCardTemplateType,
 ): Promise<{
   success: boolean;
   formErrors?: any;
@@ -39,7 +32,6 @@ export const saveCardTemplateType = async (
       const id = data.id;
       await transaction(async () => {
         await updateCardTemplateType(id, {
-          webCardCategoryId: data.webCardCategory.id,
           enabled: data.enabled,
         });
 
@@ -55,7 +47,6 @@ export const saveCardTemplateType = async (
       templateTypeId = await transaction(async () => {
         const id = await createCardTemplateType({
           id: templateTypeId,
-          webCardCategoryId: data.webCardCategory.id,
           enabled: data.enabled,
         });
 

@@ -41,7 +41,10 @@ const subscriptionWebHook = async (req: Request) => {
     switch (type) {
       case 'INITIAL_PURCHASE': {
         await transaction(async () => {
-          const sub = await getUserSubscriptions(userId, ['apple', 'google']);
+          const sub = await getUserSubscriptions({
+            userIds: [userId],
+            issuers: ['apple', 'google'],
+          });
           if (sub.length === 0) {
             await createSubscription({
               userId,
@@ -84,7 +87,10 @@ const subscriptionWebHook = async (req: Request) => {
         break;
       case 'EXPIRATION':
         await transaction(async () => {
-          const sub = await getUserSubscriptions(userId, ['apple', 'google']);
+          const sub = await getUserSubscriptions({
+            userIds: [userId],
+            issuers: ['apple', 'google'],
+          });
 
           if (sub.length === 0) {
             await createSubscription({
@@ -122,7 +128,10 @@ const subscriptionWebHook = async (req: Request) => {
       case 'SUBSCRIPTION_EXTENDED':
       case 'UNCANCELLATION':
         await transaction(async () => {
-          const sub = await getUserSubscriptions(userId, ['apple', 'google']);
+          const sub = await getUserSubscriptions({
+            userIds: [userId],
+            issuers: ['apple', 'google'],
+          });
           if (sub.length === 0) {
             await createSubscription({
               userId,
@@ -161,7 +170,10 @@ const subscriptionWebHook = async (req: Request) => {
       case 'RENEWAL':
         await transaction(async () => {
           const totalSeats = extractSeatsFromSubscriptionId(subscriptionId);
-          const sub = await getUserSubscriptions(userId, ['apple', 'google']);
+          const sub = await getUserSubscriptions({
+            userIds: userId,
+            issuers: ['apple', 'google'],
+          });
           if (sub.length === 0) {
             await createSubscription({
               userId,
@@ -213,7 +225,10 @@ const subscriptionWebHook = async (req: Request) => {
           new Date(grace_period_expiration_at_ms) > new Date()
         ) {
           await transaction(async () => {
-            const sub = await getUserSubscriptions(userId, ['apple', 'google']);
+            const sub = await getUserSubscriptions({
+              userIds: [userId],
+              issuers: ['apple', 'google'],
+            });
             if (sub.length === 0) {
               await createSubscription({
                 userId,

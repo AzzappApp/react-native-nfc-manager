@@ -8,6 +8,16 @@
 export const COVER_RATIO = 0.625;
 
 /**
+ * The max width of user card media (image or video) in pixels
+ */
+export const COVER_MAX_HEIGHT = 2048;
+
+/**
+ * The max height of user card media (image or video) in pixels
+ */
+export const COVER_MAX_WIDTH = COVER_MAX_HEIGHT * COVER_RATIO;
+
+/**
  * The duration of the cover animation in milliseconds
  */
 export const COVER_ANIMATION_DURATION = 5000;

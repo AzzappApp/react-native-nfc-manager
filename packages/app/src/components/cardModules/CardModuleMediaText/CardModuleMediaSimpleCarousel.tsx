@@ -1,7 +1,17 @@
 import { memo, useCallback, useRef, useState } from 'react';
-import { FlatList, View, Animated as AnimatedNative } from 'react-native';
+import {
+  FlatList,
+  View,
+  Animated as AnimatedNative,
+  Pressable,
+} from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import { RichText } from '#components/ui/RichText';
+import {
+  defaultTextFontSize,
+  defaultTitleFontSize,
+  RichText,
+} from '#components/ui/RichText';
+import { useFullScreenOverlayContext } from '#components/WebCardPreviewFullScreenOverlay';
 import { getTextStyle, getTitleStyle } from '#helpers/cardModuleHelpers';
 import useIsModuleItemInViewPort from '#hooks/useIsModuleItemInViewPort';
 import useScreenDimensions from '#hooks/useScreenDimensions';
@@ -82,17 +92,17 @@ const CardModuleMediaSimpleCarousel = ({
 
   const isSlidable = lineLength > dimension.width;
 
-  const horizontalPadding = isSlidable
+  const paddingHorizontal = isSlidable
     ? startPadding
     : (dimension.width - lineLength) / 2 + startPadding;
 
   const getItemLayout = useCallback(
     (_data: any, index: number) => ({
       length: itemWidth,
-      offset: itemWidth * index + cardGap * (index - 1) + horizontalPadding,
+      offset: itemWidth * index + cardGap * (index - 1) + paddingHorizontal,
       index,
     }),
-    [cardGap, horizontalPadding, itemWidth],
+    [cardGap, paddingHorizontal, itemWidth],
   );
 
   const renderItem = useCallback(
@@ -173,10 +183,9 @@ const CardModuleMediaSimpleCarousel = ({
             disableIntervalMomentum
             getItemLayout={getItemLayout}
             contentInsetAdjustmentBehavior="always"
-            contentOffset={{ x: -horizontalPadding, y: 0 }}
-            contentInset={{
-              right: horizontalPadding,
-              left: horizontalPadding,
+            contentOffset={{ x: -paddingHorizontal, y: 0 }}
+            contentContainerStyle={{
+              paddingHorizontal,
             }}
             ItemSeparatorComponent={() => {
               return <View style={{ width: cardGap, height: '100%' }} />;
@@ -186,7 +195,7 @@ const CardModuleMediaSimpleCarousel = ({
           <View
             style={{
               flexDirection: 'row',
-              paddingStart: horizontalPadding,
+              paddingStart: paddingHorizontal,
               alignItems: 'center',
             }}
           >
@@ -243,6 +252,8 @@ const SimpleCarouselItemComponent = ({
   webCardViewMode,
   dimension,
 }: SimpleCarouselItemProps) => {
+  const { setMedia } = useFullScreenOverlayContext(cardModuleMedia.media);
+
   const onPressItem = useCallback(() => {
     setEditableItemIndex?.(index);
   }, [index, setEditableItemIndex]);
@@ -270,25 +281,37 @@ const SimpleCarouselItemComponent = ({
           gap: cardStyle?.gap,
         }}
       >
-        <CardModuleMediaSelector
-          media={cardModuleMedia.media}
-          dimension={{
+        <Pressable
+          onPress={setMedia}
+          style={{
             width: mediaWidth,
             height: mediaHeight,
           }}
-          imageStyle={{
-            borderRadius: cardStyle?.borderRadius ?? 0,
-          }}
-          canPlay={canPlay && inViewport}
-          priority={inViewport ? 'high' : 'normal'}
-          paused={paused}
-        />
+        >
+          <CardModuleMediaSelector
+            media={cardModuleMedia.media}
+            dimension={{
+              width: mediaWidth,
+              height: mediaHeight,
+            }}
+            imageStyle={{
+              borderRadius: cardStyle?.borderRadius ?? 0,
+            }}
+            canPlay={canPlay && inViewport}
+            priority={inViewport ? 'high' : 'normal'}
+            paused={paused}
+          />
+        </Pressable>
         <Text variant="large" style={getTitleStyle(cardStyle, cardModuleColor)}>
-          {cardModuleMedia.title}
+          <RichText
+            text={cardModuleMedia.title}
+            fontSize={cardStyle?.titleFontSize || defaultTitleFontSize}
+          />
         </Text>
         <RichText
           text={cardModuleMedia.text}
           style={getTextStyle(cardStyle, cardModuleColor)}
+          fontSize={cardStyle?.fontSize || defaultTextFontSize}
         />
       </View>
     </CardModulePressableTool>

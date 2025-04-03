@@ -197,7 +197,7 @@ const BaseToast = ({
   contentContainerStyle,
   contentContainerProps,
   text1Style,
-  text1NumberOfLines = 1,
+  text1NumberOfLines = 2,
   text1Props,
   text2Style,
   text2NumberOfLines = 1,

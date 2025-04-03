@@ -6,10 +6,12 @@ import {
 } from '@shopify/react-native-skia';
 import { File, Paths } from 'expo-file-system/next';
 import { Platform } from 'react-native';
+import { getVideoMetaData } from 'react-native-compressor';
 import {
   exportVideoComposition,
   getValidEncoderConfigurations,
 } from '@azzapp/react-native-skia-video';
+import { COVER_MAX_HEIGHT, COVER_MAX_WIDTH } from '@azzapp/shared/coverHelpers';
 import { MEMORY_SIZE } from '#helpers/device';
 import {
   createRandomFileName,
@@ -33,6 +35,107 @@ import {
 import type { EditionParameters } from './EditionParameters';
 import type { TextureInfo } from './NativeTextureLoader';
 import type { Filter } from '@azzapp/shared/filtersHelper';
+import type { SkColor } from '@shopify/react-native-skia';
+
+export const createVideoThumbnail = async ({
+  uri,
+  format,
+  quality,
+  previewPositionPercentage,
+}: {
+  uri: string;
+  format: ImageFormat;
+  quality: number;
+  previewPositionPercentage?: number | null;
+  backgroundColor?: SkColor;
+}) => {
+  const metadata = await getVideoMetaData(uri);
+
+  const { key, promise } = NativeTextureLoader.loadVideoThumbnail(
+    uri,
+    previewPositionPercentage
+      ? (metadata.duration * previewPositionPercentage) / 100
+      : 0,
+    {
+      width: COVER_MAX_HEIGHT,
+      height: COVER_MAX_WIDTH,
+    },
+  );
+  NativeTextureLoader.ref(key);
+  const sourceImage = createImageFromNativeTexture(await promise);
+  if (!sourceImage) {
+    NativeTextureLoader.unref(key);
+    throw new Error('Image not found');
+  }
+
+  const blob = await sourceImage.encodeToBytes(format, quality);
+  const ext =
+    format === ImageFormat.JPEG ? 'jpg' : ImageFormat.PNG ? 'png' : 'webp';
+
+  const path = Paths.cache.uri + createRandomFileName(ext);
+  const file = new File(path);
+  file.create();
+  file.write(blob);
+
+  NativeTextureLoader.unref(uri);
+
+  return path;
+};
+
+export const convertSvgToImageFile = async ({
+  filePath,
+  svg,
+  resolution,
+  format,
+  quality,
+}: {
+  filePath: string;
+  svg: string;
+  resolution: { width: number; height: number };
+  format: ImageFormat;
+  quality: number;
+}) => {
+  const svgData = Skia.SVG.MakeFromString(svg);
+  if (!svgData) return;
+
+  const surface = Skia.Surface.MakeOffscreen(
+    resolution.width,
+    resolution.height,
+  );
+  if (!surface) {
+    svgData.dispose();
+    return;
+  }
+  const canvas = surface.getCanvas();
+  const paint = Skia.Paint();
+
+  canvas.drawPaint(paint);
+  canvas.scale(
+    resolution.width / svgData.width(),
+    resolution.height / svgData.height(),
+  );
+  canvas.drawSvg(svgData, resolution.width, resolution.height);
+
+  const sourceImage = surface.makeImageSnapshot();
+  if (!sourceImage) {
+    svgData.dispose();
+    surface.dispose();
+    return;
+  }
+  const blob = await sourceImage.encodeToBytes(format, quality);
+  const ext =
+    format === ImageFormat.JPEG ? 'jpg' : ImageFormat.PNG ? 'png' : 'webp';
+
+  const path = `${Paths.cache.uri}${filePath}.${ext}`;
+  const file = new File(path);
+  if (!file.exists) {
+    file.create();
+  }
+  file.write(blob);
+  surface.dispose();
+  svgData.dispose();
+  return path;
+};
 
 export const saveTransformedImageToFile = async ({
   uri,
@@ -41,6 +144,7 @@ export const saveTransformedImageToFile = async ({
   quality,
   filter,
   editionParameters,
+  backgroundColor,
 }: {
   uri: string;
   resolution: { width: number; height: number };
@@ -48,6 +152,7 @@ export const saveTransformedImageToFile = async ({
   quality: number;
   filter?: Filter | null;
   editionParameters?: EditionParameters | null;
+  backgroundColor?: SkColor;
 }) => {
   const { key, promise } = NativeTextureLoader.loadImage(uri);
   const sourceImage = createImageFromNativeTexture(await promise);
@@ -77,6 +182,9 @@ export const saveTransformedImageToFile = async ({
         });
         const paint = Skia.Paint();
         paint.setImageFilter(imageFilter);
+        if (backgroundColor) {
+          canvas.clear(backgroundColor);
+        }
         canvas.drawRect(
           {
             x: 0,

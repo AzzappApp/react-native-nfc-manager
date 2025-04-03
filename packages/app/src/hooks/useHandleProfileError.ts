@@ -60,27 +60,27 @@ const useHandleProfileActionError = (errorText: string) => {
         router.backToTop();
       }
 
-      const errors: Record<string, string> = {
-        [ERRORS.FORBIDDEN]: intl.formatMessage({
-          defaultMessage: 'Error, you lost the access right for this action',
-          description: 'Toast Error message when user lost access right',
-        }),
-        [ERRORS.UNAUTHORIZED]: intl.formatMessage({
-          defaultMessage: 'Error, you lost access to this webcard',
-          description: 'Toast Error message when user lost webcard access',
-        }),
-        [ERRORS.SUBSCRIPTION_INSUFFICIENT_SEATS]: intl.formatMessage({
-          defaultMessage:
-            'Error, not enough users available in you subscription to publish this webcard, please upgrade your subscription',
-          description:
-            'Toast Error message when user tries to publish a webcard but has not enough seats',
-        }),
-      };
+      if (
+        error.message === ERRORS.UNAUTHORIZED ||
+        error.message === ERRORS.FORBIDDEN
+      ) {
+        const errors: Record<string, string> = {
+          [ERRORS.FORBIDDEN]: intl.formatMessage({
+            defaultMessage: 'Error, you lost the access right for this action',
+            description: 'Toast Error message when user lost access right',
+          }),
+          [ERRORS.UNAUTHORIZED]: intl.formatMessage({
+            defaultMessage: 'Error, you lost access to this webcard',
+            description: 'Toast Error message when user lost webcard access',
+          }),
+        };
 
-      Toast.show({
-        type: 'error',
-        text1: errors[error.message] ?? errorText,
-      });
+        Toast.show({
+          type: 'error',
+          text1: errors[error.message] ?? errorText,
+        });
+        return;
+      }
     },
     [environment, errorText, intl, router],
   );

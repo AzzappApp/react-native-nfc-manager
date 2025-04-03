@@ -2,13 +2,14 @@ import { GraphQLError } from 'graphql';
 import { fromGlobalId } from 'graphql-relay';
 import {
   getCardModulesByIds,
+  getWebCardById,
   resetCardModulesPositions,
   transaction,
   updateCardModule,
+  updateWebCard,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
-import { invalidateWebCard } from '#externals';
-import { webCardLoader } from '#loaders';
+import { invalidateWebCard, notifyWebCardUsers } from '#externals';
 import { checkWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 
@@ -37,17 +38,21 @@ const reorderModules: MutationResolvers['reorderModules'] = async (
         await updateCardModule(moduleId, { position: index });
       }
       await resetCardModulesPositions(webCardId);
+      await updateWebCard(webCardId, { updatedAt: new Date() });
     });
   } catch (e) {
     console.error(e);
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 
-  const webCard = await webCardLoader.load(webCardId);
+  const webCard = await getWebCardById(webCardId);
 
   if (!webCard) {
-    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+    throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
+
+  notifyWebCardUsers(webCard);
+
   if (webCard.userName) {
     invalidateWebCard(webCard.userName);
   }

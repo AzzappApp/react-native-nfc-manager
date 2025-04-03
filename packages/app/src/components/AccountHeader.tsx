@@ -20,7 +20,7 @@ const AccountHeader = ({
 }: {
   webCard: AccountHeader_webCard$key | null;
   title: React.ReactNode;
-  leftIcon?: IconButtonProps['icon'];
+  leftIcon?: IconButtonProps['icon'] | null;
 }) => {
   const webCard = useFragment(
     graphql`
@@ -43,12 +43,14 @@ const AccountHeader = ({
   return (
     <Header
       leftElement={
-        <IconButton
-          icon={leftIcon}
-          onPress={router.back}
-          iconSize={28}
-          variant="icon"
-        />
+        leftIcon === null ? undefined : (
+          <IconButton
+            icon={leftIcon}
+            onPress={router.back}
+            iconSize={28}
+            variant="icon"
+          />
+        )
       }
       middleElement={<Text variant="large">{title}</Text>}
       rightElement={

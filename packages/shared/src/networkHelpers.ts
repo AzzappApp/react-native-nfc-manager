@@ -7,6 +7,8 @@ import type { Sink } from 'relay-runtime/lib/network/RelayObservable';
 const DEFAULT_TIMEOUT = 15000;
 const DEFAULT_RETRIES = [1000, 3000];
 
+export const PLATFORM_HEADER = 'X-Platform';
+
 export type FetchFunction<ReturnType> = (
   input: RequestInfo,
   init?: RequestInit,

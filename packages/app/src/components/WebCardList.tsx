@@ -1,6 +1,7 @@
 import { memo, useCallback } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { FlatList, View } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import Animated from 'react-native-reanimated';
 import { graphql, useFragment } from 'react-relay';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
@@ -76,7 +77,7 @@ type ProfileListProps = {
   onEndReached?: () => void;
   style?: StyleProp<ViewStyle>;
   onToggleFollow?: (id: string, userName: string) => void;
-  noProfileFoundLabel: string;
+  ListEmptyComponent: JSX.Element;
 };
 
 const COVER_WIDTH = 35;
@@ -95,7 +96,7 @@ const WebCardList = ({
   onEndReached,
   style,
   onToggleFollow,
-  noProfileFoundLabel,
+  ListEmptyComponent,
 }: ProfileListProps) => {
   const users = useFragment(
     graphql`
@@ -131,12 +132,9 @@ const WebCardList = ({
       contentContainerStyle={styles.container}
       style={style}
       getItemLayout={getItemLayout}
-      ListEmptyComponent={
-        <View style={styles.empty}>
-          <Text variant="medium">{noProfileFoundLabel}</Text>
-        </View>
-      }
+      ListEmptyComponent={ListEmptyComponent}
       ListFooterComponent={<View style={styles.footer} />}
+      renderScrollComponent={props => <KeyboardAwareScrollView {...props} />}
     />
   );
 };

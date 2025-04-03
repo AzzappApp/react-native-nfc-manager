@@ -12,7 +12,6 @@ import Animated, {
   useAnimatedStyle,
 } from 'react-native-reanimated';
 import { colors, shadow } from '#theme';
-import Toast from '#components/Toast';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import useKeyboardHeight from '#hooks/useKeyboardHeight';
 import useScreenInsets from '#hooks/useScreenInsets';
@@ -234,7 +233,6 @@ const BottomSheetModal = ({
           </Animated.View>
         </BottomSheetView>
       )}
-      <Toast />
     </BottomSheetModalG>
   );
 };

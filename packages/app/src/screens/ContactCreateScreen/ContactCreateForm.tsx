@@ -1,8 +1,9 @@
 import { ImageFormat } from '@shopify/react-native-skia';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Controller, useController } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Image, View } from 'react-native';
+import * as mime from 'react-native-mime-types';
 import { AVATAR_MAX_WIDTH } from '@azzapp/shared/contactCardHelpers';
 import { colors, shadow } from '#theme';
 import FormDeleteFieldOverlay from '#components/FormDeleteFieldOverlay';
@@ -33,6 +34,7 @@ import type { ImagePickerResult } from '#components/ImagePicker';
 import type { CheckboxStatus } from '#ui/CheckBox';
 import type { ContactFormValues } from './ContactSchema';
 import type { Control } from 'react-hook-form';
+import type { ScrollView } from 'react-native';
 
 type ContactCreateFormProps = {
   control: Control<ContactFormValues>;
@@ -41,11 +43,17 @@ type ContactCreateFormProps = {
     uri: string;
     aspectRatio: number;
   } | null;
+  notifyError: boolean;
 };
 
-const ContactCreateForm = ({ control, scanImage }: ContactCreateFormProps) => {
+const ContactCreateForm = ({
+  control,
+  scanImage,
+  notifyError,
+}: ContactCreateFormProps) => {
   const styles = useStyleSheet(styleSheet);
   const intl = useIntl();
+  const scrollRef = useRef<ScrollView>(null);
 
   const { field: avatarField } = useController({
     control,
@@ -55,6 +63,15 @@ const ContactCreateForm = ({ control, scanImage }: ContactCreateFormProps) => {
     control,
     name: 'notify',
   });
+
+  useEffect(() => {
+    if (notifyError) {
+      scrollRef.current?.scrollTo({
+        y: 0,
+        animated: true,
+      });
+    }
+  }, [notifyError]);
 
   const [imagePicker, setImagePicker] = useState<'avatar' | null>(null);
 
@@ -67,12 +84,15 @@ const ContactCreateForm = ({ control, scanImage }: ContactCreateFormProps) => {
       aspectRatio,
     }: ImagePickerResult) => {
       if (imagePicker === 'avatar') {
+        const mimeType =
+          mime.lookup(uri) === 'image/png' ? ImageFormat.PNG : ImageFormat.JPEG;
+
         const exportWidth = Math.min(AVATAR_MAX_WIDTH, width);
         const exportHeight = exportWidth / aspectRatio;
         const localPath = await saveTransformedImageToFile({
           uri,
           resolution: { width: exportWidth, height: exportHeight },
-          format: ImageFormat.JPEG,
+          format: mimeType,
           quality: 95,
           filter,
           editionParameters,
@@ -107,7 +127,7 @@ const ContactCreateForm = ({ control, scanImage }: ContactCreateFormProps) => {
   const { width } = useScreenDimensions();
   return (
     <>
-      <FormDeleteFieldOverlay>
+      <FormDeleteFieldOverlay ref={scrollRef}>
         <View style={styles.sectionsContainer}>
           {scanImage && (
             <View style={styles.imageContainer}>
@@ -126,7 +146,7 @@ const ContactCreateForm = ({ control, scanImage }: ContactCreateFormProps) => {
               </View>
             </View>
           )}
-          <View style={styles.shareback}>
+          <View style={[styles.shareback, notifyError && styles.notifyError]}>
             <CheckBox
               label={
                 <Text style={styles.textCheckbox}>
@@ -176,7 +196,7 @@ const ContactCreateForm = ({ control, scanImage }: ContactCreateFormProps) => {
           />
 
           <Separation small />
-          <ContactCardEditCompanyLogo control={control} />
+          <ContactCardEditCompanyLogo control={control} isPremium />
           <Separation />
           <ContactEditPhones control={control} />
           <Separation />
@@ -240,6 +260,9 @@ const styleSheet = createStyleSheet(appearance => ({
     marginTop: 10,
   },
   textCheckbox: { paddingLeft: 10 },
+  notifyError: {
+    backgroundColor: colors.warnLight,
+  },
 }));
 
 export default ContactCreateForm;

@@ -26,12 +26,10 @@ export const generateTokens = async (data: SessionData) => {
 };
 
 export const verifyToken = (token: string): Promise<SessionData> =>
-  unseal(token, TOKEN_SECRET, { ttl: TOKEN_EXP_TIME }) as Promise<any>;
+  unseal(token, TOKEN_SECRET) as Promise<any>;
 
 export const refreshTokens = async (refreshToken: string) => {
-  const data: any = await unseal(refreshToken, REFRESH_TOKEN_SECRET, {
-    ttl: REFRESH_TOKEN_EXP_TIME,
-  });
+  const data: any = await unseal(refreshToken, REFRESH_TOKEN_SECRET);
 
   if (typeof data !== 'object' || typeof data?.userId !== 'string') {
     throw new Error('Invalid token');

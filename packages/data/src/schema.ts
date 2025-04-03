@@ -19,7 +19,7 @@ import type {
   CommonInformation,
   ContactCard,
 } from '@azzapp/shared/contactCardHelpers';
-import type { InferSelectModel } from 'drizzle-orm';
+import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
 // #region CardModule
 export const CardModuleTable = cols.table(
@@ -149,7 +149,6 @@ export type CardModuleTemplate = Pick<CardModule, 'data' | 'kind' | 'variant'>;
 // #region CardTemplateType
 export const CardTemplateTypeTable = cols.table('CardTemplateType', {
   id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
-  webCardCategoryId: cols.cuid('webCardCategoryId').notNull(),
   enabled: cols.boolean('enabled').default(true).notNull(),
 });
 
@@ -168,39 +167,6 @@ export const ColorPaletteTable = cols.table('ColorPalette', {
 export type ColorPalette = InferSelectModel<typeof ColorPaletteTable>;
 // #endregion
 
-// #region CompanyActivity
-export const CompanyActivityTable = cols.table('CompanyActivity', {
-  id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
-  cardTemplateTypeId: cols.cuid('cardTemplateTypeId'),
-  companyActivityTypeId: cols.cuid('companyActivityTypeId'),
-});
-
-export const CompanyActivityTypeTable = cols.table('CompanyActivityType', {
-  id: cols.cuid('id').primaryKey().notNull().$defaultFn(createId),
-});
-
-export const WebCardCategoryCompanyActivityTable = cols.table(
-  'WebCardCategoryCompanyActivity',
-  {
-    webCardCategoryId: cols.cuid('categoryId').notNull(),
-    companyActivityId: cols.cuid('companyActivityId'),
-    order: cols.int('order').notNull(),
-  },
-  table => {
-    return {
-      pk: cols.primaryKey({
-        columns: [table.companyActivityId, table.webCardCategoryId],
-      }),
-    };
-  },
-);
-
-export type CompanyActivity = InferSelectModel<typeof CompanyActivityTable>;
-export type CompanyActivityType = InferSelectModel<
-  typeof CompanyActivityTypeTable
->;
-// #endregion
-
 export const CoverPredefinedTable = cols.table('CoverPredefined', {
   id: cols.cuid('id').notNull().primaryKey().$defaultFn(createId),
   mediaId: cols.mediaId('mediaId').notNull(),
@@ -215,28 +181,6 @@ export const CoverPredefinedTable = cols.table('CoverPredefined', {
 });
 
 export type CoverPredefined = InferSelectModel<typeof CoverPredefinedTable>;
-
-// #region CoverTemplatePreview
-export const CoverTemplatePreviewTable = cols.table(
-  'CoverTemplatePreview',
-  {
-    mediaId: cols.mediaId('mediaId').notNull(),
-    coverTemplateId: cols.cuid('coverTemplateId').notNull(),
-    companyActivityId: cols.cuid('companyActivityId'),
-  },
-  table => {
-    return {
-      coverTemplatePreviewCoverTemplateIdCompanyActivityId: cols.primaryKey({
-        columns: [table.coverTemplateId, table.companyActivityId],
-      }),
-    };
-  },
-);
-
-export type CoverTemplatePreview = InferSelectModel<
-  typeof CoverTemplatePreviewTable
->;
-// #endregion
 
 // #region CoverTemplate
 export const CoverTemplateTable = cols.table('CoverTemplate', {
@@ -728,6 +672,7 @@ export const UserTable = cols.table(
   {
     id: cols.cuid('id').primaryKey().$defaultFn(createId),
     email: cols.defaultVarchar('email'),
+    appleId: cols.defaultVarchar('appleId'),
     password: cols.defaultVarchar('password'),
     phoneNumber: cols.defaultVarchar('phoneNumber'),
     createdAt: cols
@@ -758,10 +703,25 @@ export const UserTable = cols.table(
       .boolean('hasAcceptedCommunications')
       .default(false)
       .notNull(),
+    nbFreeScans: cols.int('nbFreeScans').default(0).notNull(),
+    userContactData: cols.json('userContactData').$type<{
+      firstName?: string | null;
+      lastName?: string | null;
+      companyName?: string | null;
+      avatarUrl?: string | null;
+      phoneNumber?: string | null;
+      email?: string | null;
+    }>(),
+    cookiePreferences: cols.json('cookiePreferences').$type<{
+      analytics: boolean;
+      marketing: boolean;
+      functional: boolean;
+    }>(),
   },
   table => {
     return {
       emailKey: cols.uniqueIndex('User_email_key').on(table.email),
+      appleIdKey: cols.uniqueIndex('User_appleId_key').on(table.appleId),
       phoneNumberKey: cols
         .uniqueIndex('User_phoneNumber_key')
         .on(table.phoneNumber),
@@ -860,7 +820,6 @@ export const WebCardTable = cols.table(
       .json('commonInformation')
       .$type<CommonInformation>(),
     companyName: cols.defaultVarchar('companyName'),
-    companyActivityId: cols.cuid('companyActivityId'),
     createdAt: cols
       .dateTime('createdAt')
       .notNull()
@@ -1017,6 +976,13 @@ export const ContactTable = cols.table(
       .json('socials')
       .$type<Array<{ url: string; label: string }>>(),
     logoId: cols.mediaId('logoId'),
+    meetingLocation: cols.point('meetingLocation'),
+    meetingPlace: cols.json('meetingPlace').$type<{
+      city?: string | null;
+      subregion?: string | null;
+      region?: string | null;
+      country?: string | null;
+    }>(),
   },
   table => {
     return {
@@ -1027,6 +993,7 @@ export const ContactTable = cols.table(
   },
 );
 export type Contact = InferSelectModel<typeof ContactTable>;
+export type NewContact = InferInsertModel<typeof ContactTable>;
 //#endregion
 
 // #region FCMToken

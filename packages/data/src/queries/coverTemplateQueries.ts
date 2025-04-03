@@ -1,22 +1,7 @@
-import {
-  and,
-  asc,
-  count,
-  desc,
-  eq,
-  inArray,
-  isNull,
-  like,
-  or,
-  sql,
-} from 'drizzle-orm';
+import { and, asc, count, desc, eq, inArray, like, or, sql } from 'drizzle-orm';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import { db } from '../database';
-import {
-  CoverTemplatePreviewTable,
-  CoverTemplateTable,
-  LocalizationMessageTable,
-} from '../schema';
+import { CoverTemplateTable, LocalizationMessageTable } from '../schema';
 import type { CoverTemplate } from '../schema';
 import type { InferInsertModel } from 'drizzle-orm';
 
@@ -40,15 +25,12 @@ export const getCoverTemplateById = (id: string) =>
  *
  * @param typeIds - The ids of the cover template types to filter by
  * @param tagId - The id of the cover template tag to filter by
- * @param companyActivityId
- *  - The id of the company activity for which to retrieve the cover templates preview
  *
  * @returns a list of cover templates that match the given type ids and tag id
  */
 export const getCoverTemplatesByTypesAndTag = async (
   typeIds: string[],
   tagId?: string | null,
-  companyActivityId?: string | null,
 ) => {
   const tagIdJson = tagId ? JSON.stringify([tagId]) : null;
 
@@ -56,19 +38,10 @@ export const getCoverTemplatesByTypesAndTag = async (
 
   return db()
     .select({
-      previewId: sql`COALESCE(${CoverTemplatePreviewTable.mediaId}, ${CoverTemplateTable.previewId})`,
+      previewId: CoverTemplateTable.previewId,
       CoverTemplateTable,
     })
     .from(CoverTemplateTable)
-    .leftJoin(
-      CoverTemplatePreviewTable,
-      and(
-        eq(CoverTemplateTable.id, CoverTemplatePreviewTable.coverTemplateId),
-        companyActivityId
-          ? eq(CoverTemplatePreviewTable.companyActivityId, companyActivityId)
-          : isNull(CoverTemplatePreviewTable.companyActivityId),
-      ),
-    )
     .where(
       and(
         inArray(CoverTemplateTable.typeId, typeIds),

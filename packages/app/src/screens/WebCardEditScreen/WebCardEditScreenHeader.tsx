@@ -148,10 +148,7 @@ const WebCardEditScreenHeader = ({
                 )}
               </Text>
               {webCard && !webCard.isPremium && (
-                <WebCardBuilderSubtitle
-                  modules={webCard.cardModules}
-                  webCard={webCard}
-                />
+                <WebCardBuilderSubtitle webCard={webCard} />
               )}
             </View>
           }

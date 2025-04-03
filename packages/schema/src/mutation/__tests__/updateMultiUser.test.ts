@@ -82,13 +82,16 @@ describe('updateMultiUser', () => {
       'WebCard',
     );
     expect(checkWebCardOwnerProfile).toHaveBeenCalledWith('webcard-123');
-    expect(validateCurrentSubscription).toHaveBeenCalledWith('owner-1', 3);
+    expect(validateCurrentSubscription).toHaveBeenCalledWith('owner-1', {
+      action: 'UPDATE_MULTI_USER',
+      addedSeats: 3,
+    });
     expect(updateWebCard).toHaveBeenCalledWith('webcard-123', {
       isMultiUser: true,
     });
     expect(invalidateWebCard).toHaveBeenCalledWith('testUser');
 
-    expect(result).toEqual({ webCard: mockWebCard });
+    expect(result).toEqual({ webCard: { ...mockWebCard, isMultiUser: true } });
   });
 
   test('should successfully disable multi-user mode and remove non-owner profiles', async () => {
@@ -130,7 +133,7 @@ describe('updateMultiUser', () => {
     expect(updateWebCard).not.toHaveBeenCalled();
   });
 
-  test('should throw INTERNAL_SERVER_ERROR if web card is not found after update', async () => {
+  test('should throw INVALID_REQUEST if web card is not found during update', async () => {
     (fromGlobalIdWithType as jest.Mock).mockReturnValue('webcard-123');
     (checkWebCardOwnerProfile as jest.Mock).mockResolvedValue(undefined);
     (webCardOwnerLoader.load as jest.Mock).mockResolvedValue({ id: 'owner-1' });
@@ -145,9 +148,7 @@ describe('updateMultiUser', () => {
         mockContext,
         mockInfo,
       ),
-    ).rejects.toThrow(new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR));
-
-    expect(updateWebCard).toHaveBeenCalled();
+    ).rejects.toThrow(new GraphQLError(ERRORS.INVALID_REQUEST));
   });
 
   test('should not validate subscription if disabling multi-user mode', async () => {

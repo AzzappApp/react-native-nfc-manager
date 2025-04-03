@@ -6,7 +6,7 @@ import type { TextAndSelection } from './BottomSheetTextEditorTypes';
 import type { Icons } from './Icon';
 import type { RichTextASTTags } from '@azzapp/shared/richText/richTextTypes';
 
-const iconSize = 12;
+const defaultIconSize = 12;
 
 type BottomSheetTextEditorButtonProps = {
   onPress: (arg: RichTextASTTags) => void;
@@ -14,6 +14,8 @@ type BottomSheetTextEditorButtonProps = {
   tag: RichTextASTTags;
   icon: Icons;
   isFocused: boolean;
+  iconSize?: number;
+  enabledButtons?: RichTextASTTags[];
 };
 
 export const BottomSheetTextEditorButton = ({
@@ -22,9 +24,14 @@ export const BottomSheetTextEditorButton = ({
   tag,
   icon,
   isFocused,
+  enabledButtons,
+  iconSize = defaultIconSize,
 }: BottomSheetTextEditorButtonProps) => {
   const styles = useStyleSheet(styleSheet);
 
+  if (enabledButtons && !enabledButtons.includes(tag)) {
+    return undefined;
+  }
   const isDisableInner =
     !isFocused ||
     textAndSelection.selection?.start === textAndSelection.selection?.end;

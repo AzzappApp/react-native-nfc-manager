@@ -4,7 +4,6 @@ import {
   cardTemplateLoader,
   cardTemplateTypeLoader,
   colorPaletteLoader,
-  companyActivityLoader,
   coverTemplateLoader,
   postCommentLoader,
   postLoader,
@@ -73,11 +72,6 @@ export const fetchNode = async (gqlId: string): Promise<any> => {
       return withTypeSymbol(
         await webCardCategoryLoader.load(id),
         webCardCategorySymbol,
-      );
-    case 'CompanyActivity':
-      return withTypeSymbol(
-        await companyActivityLoader.load(id),
-        companyActivitySymbol,
       );
   }
   return null;

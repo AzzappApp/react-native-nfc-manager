@@ -6,17 +6,23 @@ import {
 } from '@shopify/react-native-skia';
 import { ResizeMode, Video } from 'expo-av';
 import { Paths, File } from 'expo-file-system/next';
+import {
+  parsePhoneNumberFromString,
+  type CountryCode,
+} from 'libphonenumber-js';
 import { capitalize } from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useColorScheme, View, StyleSheet } from 'react-native';
+import { getLocales } from 'react-native-localize';
 import * as mime from 'react-native-mime-types'; // FIXME import is verry big
 import Toast from 'react-native-toast-message';
-import { useMutation } from 'react-relay';
+import { useMutation, usePreloadedQuery } from 'react-relay';
 import { graphql, Observable } from 'relay-runtime';
+import ERRORS from '@azzapp/shared/errors';
 import { combineMultiUploadProgresses } from '@azzapp/shared/networkHelpers';
-import { mainRoutes } from '#mobileRoutes';
+import { PAYMENT_IS_ENABLED } from '#Config';
 import { colors } from '#theme';
 import ContactCardDetector from '#components/ContactCardScanner/ContactCardDetector';
 import coverDrawer from '#components/CoverEditor/coverDrawer';
@@ -38,6 +44,7 @@ import {
   extractPhoneNumberDetails,
   getPhonenumberWithCountryCode,
 } from '#helpers/phoneNumbersHelper';
+import relayScreen from '#helpers/relayScreen';
 import useBoolean from '#hooks/useBoolean';
 import useScreenInsets from '#hooks/useScreenInsets';
 import Button from '#ui/Button';
@@ -53,14 +60,36 @@ import {
 } from './ContactCardSchema';
 import type { CoverEditorState } from '#components/CoverEditor';
 import type { ScreenOptions } from '#components/NativeRouter';
+import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { ContactCardCreateScreenMutation } from '#relayArtifacts/ContactCardCreateScreenMutation.graphql';
+import type { ContactCardCreateScreenQuery } from '#relayArtifacts/ContactCardCreateScreenQuery.graphql';
 import type { ContactCardDetectorMutation$data } from '#relayArtifacts/ContactCardDetectorMutation.graphql';
 import type { ContactCardCreateRoute } from '#routes';
-import type { CountryCode } from 'libphonenumber-js';
 import type { ViewStyle } from 'react-native';
 
-const ContactCardCreateScreen = () => {
-  const styles = useStyleSheet(stylesheet);
+const contactCardCreateScreenQuery = graphql`
+  query ContactCardCreateScreenQuery {
+    currentUser {
+      ...ContactCardCreateForm_user
+      userContactData {
+        firstName
+        lastName
+        email
+        phoneNumber
+        companyName
+        avatarUrl
+      }
+    }
+  }
+`;
+
+const ContactCardCreateScreen = ({
+  preloadedQuery,
+}: RelayScreenProps<ContactCardCreateRoute, ContactCardCreateScreenQuery>) => {
+  const { currentUser } = usePreloadedQuery(
+    contactCardCreateScreenQuery,
+    preloadedQuery,
+  );
 
   const [commit, loading] = useMutation<ContactCardCreateScreenMutation>(
     graphql`
@@ -69,12 +98,14 @@ const ContactCardCreateScreen = () => {
         $contactCard: ContactCardInput!
         $primaryColor: String
         $coverMediaId: String
+        $publishWebCard: Boolean!
       ) {
         createContactCard(
           webCardKind: $webCardKind
           contactCard: $contactCard
           primaryColor: $primaryColor
           coverMediaId: $coverMediaId
+          publishWebCard: $publishWebCard
         ) {
           profile {
             id
@@ -110,6 +141,11 @@ const ContactCardCreateScreen = () => {
     useState<Observable<number> | null>(null);
   const [popupVisible, showPopup, hidePopup] = useBoolean(false);
 
+  const styles = useStyleSheet(stylesheet);
+  const parsedPhoneNumber = currentUser?.userContactData?.phoneNumber
+    ? parsePhoneNumberFromString(currentUser?.userContactData?.phoneNumber)
+    : null;
+
   const {
     control,
     handleSubmit,
@@ -122,6 +158,37 @@ const ContactCardCreateScreen = () => {
     defaultValues: {
       webCardKind: 'personal',
       primaryColor: colors.grey400,
+      firstName: currentUser?.userContactData?.firstName,
+      lastName: currentUser?.userContactData?.lastName,
+      company: currentUser?.userContactData?.companyName,
+      emails: currentUser?.userContactData?.email
+        ? [
+            {
+              label: 'Work',
+              address: currentUser?.userContactData?.email,
+              selected: true,
+            },
+          ]
+        : [],
+      phoneNumbers: currentUser?.userContactData?.phoneNumber
+        ? [
+            {
+              label: 'Work',
+              number:
+                parsedPhoneNumber?.nationalNumber ||
+                currentUser?.userContactData?.phoneNumber,
+              selected: true,
+              countryCode:
+                parsedPhoneNumber?.country || getLocales()[0].countryCode,
+            },
+          ]
+        : [],
+      avatar: currentUser?.userContactData?.avatarUrl
+        ? {
+            uri: currentUser?.userContactData?.avatarUrl,
+            local: false,
+          }
+        : null,
     },
   });
 
@@ -184,6 +251,8 @@ const ContactCardCreateScreen = () => {
         uploads.push(null);
       }
 
+      logo = webCardKind === 'business' ? logo : null;
+
       if (logo?.uri) {
         const fileName = getFileName(logo.uri);
         const file: any = {
@@ -205,7 +274,7 @@ const ContactCardCreateScreen = () => {
       const logoHeight = logo?.height ?? 0;
       //create the coverId
       if (logo && logo.id != null && logoWidth > 0 && logoHeight > 0) {
-        const logoTextureInfo = await NativeTextureLoader.loadImage(logo.uri, {
+        const logoTextureInfo = NativeTextureLoader.loadImage(logo.uri, {
           width: logoWidth,
           height: logoHeight,
         });
@@ -317,15 +386,19 @@ const ContactCardCreateScreen = () => {
       const logoId =
         logo === null ? null : logo?.local ? uploadedLogoId : logo?.id;
 
-      const urls = data.companyUrl
-        ? [{ address: data.companyUrl, selected: true }, ...data.urls]
-        : data.urls;
+      if (avatar?.local) {
+        addLocalCachedMediaFile(avatarId, 'image', avatar.uri);
+      }
+      if (logo?.local) {
+        addLocalCachedMediaFile(logoId, 'image', logo.uri);
+      }
 
       commit({
         variables: {
           primaryColor: data.primaryColor ?? colors.grey400,
           webCardKind: webCardKind as string,
           coverMediaId: uploadedCoverId,
+          publishWebCard: true,
           contactCard: {
             emails: data.emails?.length
               ? data.emails.filter(email => email.address)
@@ -341,7 +414,10 @@ const ContactCardCreateScreen = () => {
                     return { ...phoneNumber, number };
                   })
               : undefined,
-            urls: urls?.length ? urls : undefined,
+            urls:
+              webCardKind === 'business'
+                ? data.urls.filter(({ address }) => address)
+                : undefined,
             addresses: data.addresses
               ? data.addresses.filter(address => address.address)
               : undefined,
@@ -350,29 +426,19 @@ const ContactCardCreateScreen = () => {
               ? data.socials.filter(social => social.url)
               : undefined,
             avatarId,
-            logoId,
-            company,
+            logoId: webCardKind === 'business' ? logoId : undefined,
+            company: webCardKind === 'business' ? company : undefined,
             firstName,
             lastName: data.lastName,
             title: data.title,
-            companyActivityLabel: data.companyActivityLabel,
+            companyActivityLabel:
+              webCardKind === 'business'
+                ? data.companyActivityLabel
+                : undefined,
           },
         },
         onCompleted: data => {
-          if (avatarId && avatar?.uri) {
-            addLocalCachedMediaFile(
-              `${'image'.slice(0, 1)}:${avatarId}`,
-              'image',
-              avatar.uri,
-            );
-          }
-          if (logo && logo?.uri) {
-            addLocalCachedMediaFile(
-              `${'image'.slice(0, 1)}:${logoId}`,
-              'image',
-              logo.uri,
-            );
-          }
+          setProgressIndicator(null);
           const { profile } = data.createContactCard;
           if (!profile?.webCard) {
             throw new Error('WebCard not created');
@@ -387,11 +453,9 @@ const ContactCardCreateScreen = () => {
             coverIsPredefined: profile.webCard.coverIsPredefined,
           });
           if (
-            (router.getCurrentRoute() as ContactCardCreateRoute)?.params
+            !(router.getCurrentRoute() as ContactCardCreateRoute)?.params
               ?.launchedFromWelcomeScreen
           ) {
-            router.replaceAll(mainRoutes(false));
-          } else {
             // if we redirect too soon, the home background is not displayed
             router.back();
           }
@@ -414,7 +478,28 @@ const ContactCardCreateScreen = () => {
           root.setLinkedRecord(user, 'currentUser');
         },
         onError: e => {
+          setProgressIndicator(null);
           console.error(e);
+
+          if (e.message === ERRORS.SUBSCRIPTION_REQUIRED) {
+            if (PAYMENT_IS_ENABLED) {
+              router.push({ route: 'USER_PAY_WALL' });
+            } else {
+              Toast.show({
+                position: 'top',
+                type: 'error',
+                text1: intl.formatMessage({
+                  defaultMessage:
+                    'You have reached the limit of contact cards or you can’t create such type of contact cards.',
+                  description:
+                    'Error toast message when reaching the limit of contact cards on android',
+                }),
+              });
+            }
+
+            return;
+          }
+
           Toast.show({
             type: 'error',
             text1: intl.formatMessage(
@@ -465,7 +550,7 @@ const ContactCardCreateScreen = () => {
             return {
               ...extractPhoneNumberDetails(phoneNumber),
               selected: true,
-              label: 'WORK',
+              label: 'Work',
             };
           }
           return null;
@@ -576,7 +661,7 @@ const ContactCardCreateScreen = () => {
           style={styles.scanBusinessCardButton}
         />
 
-        <ContactCardCreateForm control={control} />
+        <ContactCardCreateForm control={control} user={currentUser} />
         <ScreenModal
           visible={!!progressIndicator}
           gestureEnabled={false}
@@ -637,6 +722,7 @@ const ContactCardCreateScreen = () => {
           <ContactCardDetector
             close={closeScanner}
             extractData={loadFormFromScan}
+            createContactCard
           />
         </View>
       )}
@@ -683,11 +769,18 @@ const stylesheet = createStyleSheet(appearance => ({
   },
 }));
 
-ContactCardCreateScreen.getScreenOptions = (): ScreenOptions => ({
+const ContactCardCreateRelayScreen = relayScreen(ContactCardCreateScreen, {
+  query: contactCardCreateScreenQuery,
+});
+
+ContactCardCreateRelayScreen.getScreenOptions = (): ScreenOptions => ({
   stackAnimation: 'slide_from_bottom',
 });
 
-export default ContactCardCreateScreen;
+export default relayScreen(ContactCardCreateScreen, {
+  query: contactCardCreateScreenQuery,
+  profileBound: false,
+});
 
 export const ScanMyPaperBusinessCard = ({
   onPress,

@@ -107,7 +107,7 @@ const CoverEditorLinksModal = ({
           />
           <SocialLinksLinksEditionPanel
             ignoreKeyboard
-            links={links}
+            initialLinks={links}
             onChangeLinks={onLinksChange}
             onItemPress={onLinkItemPress}
             onAddLink={openAddLink}

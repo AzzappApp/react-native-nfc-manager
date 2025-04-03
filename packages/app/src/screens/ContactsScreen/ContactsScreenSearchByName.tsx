@@ -1,30 +1,26 @@
 import { useCallback, useMemo } from 'react';
-import { SectionList, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
-import { colors } from '#theme';
-import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import useScreenInsets from '#hooks/useScreenInsets';
-import { BOTTOM_MENU_HEIGHT } from '#ui/BottomMenu';
+import ContactsList from '#components/Contact/ContactsList';
 import Text from '#ui/Text';
-import ContactSearchByNameItem from './ContactSearchByNameItem';
 import type { ContactType } from '#helpers/contactListHelpers';
 import type { ContactActionProps } from './ContactsScreenLists';
 import type {
   PermissionStatus as ContactPermissionStatus,
   Contact,
 } from 'expo-contacts';
-import type { SectionListData, SectionListRenderItemInfo } from 'react-native';
+import type { SectionListData } from 'react-native';
 
 type Props = {
   contacts: ContactType[];
   onEndReached: () => void;
   onRefresh: () => void;
   refreshing: boolean;
-  onInviteContact: (contact: ContactType, onHideInvitation: () => void) => void;
   onShowContact: (contact: ContactType) => void;
   localContacts: Contact[];
   contactsPermissionStatus: ContactPermissionStatus;
   showContactAction: (arg: ContactActionProps | undefined) => void;
+  listFooterComponent: JSX.Element;
 };
 
 const ContactsScreenSearchByName = ({
@@ -32,15 +28,12 @@ const ContactsScreenSearchByName = ({
   onEndReached,
   onRefresh,
   refreshing,
-  onInviteContact,
   onShowContact,
   localContacts,
   contactsPermissionStatus,
   showContactAction,
+  listFooterComponent,
 }: Props) => {
-  const { bottom } = useScreenInsets();
-  const styles = useStyleSheet(stylesheet);
-
   const sections = useMemo(() => {
     return contacts.reduce(
       (accumulator, contact) => {
@@ -53,111 +46,59 @@ const ContactsScreenSearchByName = ({
         ).toLocaleUpperCase();
 
         const existingSection = accumulator.find(
-          section => section.initial === initial,
+          section => section.title === initial,
         );
 
         if (!existingSection) {
-          accumulator.push({ initial, data: [contact] });
+          accumulator.push({ title: initial, data: [contact] });
         } else {
           existingSection.data.push(contact);
         }
 
         return accumulator;
       },
-      [] as Array<{ initial: string; data: ContactType[] }>,
+      [] as Array<{ title: string; data: ContactType[] }>,
     );
   }, [contacts]);
 
   const renderHeaderSection = useCallback(
     ({
-      section: { initial },
+      section: { title },
     }: {
       section: SectionListData<
         ContactType,
-        { initial: string; data: ContactType[] }
+        { title: string; data: ContactType[] }
       >;
     }) => {
-      if (isNotFalsyString(initial)) {
-        return <Text style={styles.title}>{initial}</Text>;
+      if (isNotFalsyString(title)) {
+        return <Text style={styles.title}>{title}</Text>;
       }
       return null;
     },
-    [styles.title],
-  );
-
-  const renderListItem = useCallback(
-    ({
-      item,
-    }: SectionListRenderItemInfo<
-      ContactType,
-      { initial: string; data: ContactType[] }
-    >) => {
-      return (
-        <ContactSearchByNameItem
-          contact={item}
-          onInviteContact={onInviteContact}
-          onShowContact={onShowContact}
-          localContacts={localContacts}
-          contactsPermissionStatus={contactsPermissionStatus}
-          showContactAction={showContactAction}
-        />
-      );
-    },
-    [
-      showContactAction,
-      contactsPermissionStatus,
-      localContacts,
-      onInviteContact,
-      onShowContact,
-    ],
+    [],
   );
 
   return (
-    <SectionList
-      accessibilityRole="list"
+    <ContactsList
       sections={sections}
-      keyExtractor={sectionKeyExtractor}
-      renderItem={renderListItem}
       renderSectionHeader={renderHeaderSection}
-      showsVerticalScrollIndicator={false}
       onEndReached={onEndReached}
       refreshing={refreshing}
       onRefresh={onRefresh}
-      contentContainerStyle={[
-        { paddingBottom: bottom + BOTTOM_MENU_HEIGHT },
-        styles.content,
-      ]}
-      ItemSeparatorComponent={ItemSeparator}
-      onEndReachedThreshold={0.5}
-      keyboardShouldPersistTaps="always"
+      onShowContact={onShowContact}
+      localContacts={localContacts}
+      contactsPermissionStatus={contactsPermissionStatus}
+      showContactAction={showContactAction}
+      listFooterComponent={listFooterComponent}
     />
   );
 };
 
-const sectionKeyExtractor = (item: { id: string }) => {
-  return item.id;
-};
-const ItemSeparator = () => {
-  const styles = useStyleSheet(stylesheet);
-  return <View style={styles.separator} />;
-};
-
-const stylesheet = createStyleSheet(appearance => ({
-  content: {
-    paddingHorizontal: 10,
-  },
+const styles = StyleSheet.create({
   title: {
     marginVertical: 20,
     textTransform: 'uppercase',
   },
-  section: {
-    margin: 20,
-  },
-  separator: {
-    height: 1,
-    width: '100%',
-    backgroundColor: appearance === 'light' ? colors.grey50 : colors.grey900,
-  },
-}));
+});
 
 export default ContactsScreenSearchByName;

@@ -87,3 +87,15 @@ enum ImageOrientation {
   LEFT
   RIGHT
 }
+
+input LocationInput {
+  latitude: Float!
+  longitude: Float!
+}
+
+input AddressInput {
+  city: String
+  subregion: String
+  region: String
+  country: String
+}

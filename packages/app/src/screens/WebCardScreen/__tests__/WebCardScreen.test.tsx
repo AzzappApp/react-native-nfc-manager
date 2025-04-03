@@ -10,18 +10,21 @@ import type { RelayMockEnvironment } from 'relay-test-utils/lib/RelayModernMockE
 
 jest.mock('react-native-share', () => ({}));
 
+jest.mock('react-native-compressor', () => ({
+  getVideoMetaData: jest.fn(),
+}));
+
 describe('WebCardScreen', () => {
   const environment: RelayMockEnvironment = createMockEnvironment();
 
-  const renderWebCarScreen = (
+  const renderWebCardScreen = (
     webCardId = 'webCardId',
     viewerWebCardId = 'viewerWebCardId',
-    profileId = 'testProfileId',
   ) => {
     const preloadedQuery = loadQuery<WebCardScreenByIdQuery>(
       environment,
       WebCardScreenByIdQueryNode,
-      { webCardId, viewerWebCardId, profileId },
+      { webCardId, viewerWebCardId },
     );
 
     return render(
@@ -58,22 +61,8 @@ describe('WebCardScreen', () => {
               otherColors
             }
             ...CoverRenderer_webCard
+            ...WebCardPreviewFullScreenOverlay_webCard
           }
-        }
-        webcard: node(id: "viewerWebCardId") {
-          id
-        }
-        ## TODO the fact that we need to fetch the profile is a miss conception and should be fixed
-        profile: node(id: "testProfileId") {
-          id
-          ... on Profile {
-            webCard {
-              id
-            }
-          }
-        }
-        currentUser {
-          id
         }
       }
     `;
@@ -89,6 +78,9 @@ describe('WebCardScreen', () => {
             dark: '#000000',
             light: '#FFFFFF',
             otherColors: ['#000000', '#FFFFFF'],
+          },
+          cardStyle: {
+            borderRadius: 10,
           },
           coverIsPredefined: false,
           firstName: 'John',
@@ -109,24 +101,13 @@ describe('WebCardScreen', () => {
         currentUser: {
           id: 'viewerId',
         },
-        webcard: {
-          id: 'viewerWebCardId',
-          __typename: 'WebCard',
-        },
-        profile: {
-          id: 'testProfileId',
-          __typename: 'Profile',
-          webCard: {
-            id: 'viewerWebCardId',
-          },
-        },
       },
     );
 
-    const { getByTestId } = renderWebCarScreen('webCardId-1');
+    const { queryAllByTestId } = renderWebCardScreen('webCardId-1');
     act(() => {
       jest.runAllTimers();
     });
-    expect(getByTestId('cover-renderer')).toBeTruthy();
+    expect(queryAllByTestId('cover-renderer').length).toBeGreaterThan(0);
   });
 });

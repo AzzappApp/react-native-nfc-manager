@@ -54,6 +54,10 @@
         {
           "name": "shared",
           "commands": ["cd packages/shared", "yarn dev"]
+        },
+        {
+          "name": "service",
+          "commands": ["cd packages/service", "yarn dev"]
         }
       ]
     },
@@ -70,6 +74,10 @@
         {
           "name": "web",
           "commands": ["cd packages/web", "yarn dev"]
+        },
+        {
+          "name": "inngest",
+          "commands": ["cd packages/web", "yarn inngest-cli"]
         }
       ]
     },

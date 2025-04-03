@@ -5,13 +5,12 @@ import {
   getUserProfilesWithWebCard,
   getUserPayments,
   countUserPayments,
-  getActiveUserSubscriptions,
   getTotalMultiUser,
   getLastTermsOfUse,
 } from '@azzapp/data';
 import { getSessionInfos } from '#GraphQLContext';
 import {
-  activeSubscriptionsForUserLoader,
+  subscriptionsForUserLoader,
   profileByWebCardIdAndUserIdLoader,
   profileLoader,
   webCardLoader,
@@ -85,7 +84,7 @@ export const User: ProtectedResolver<UserResolvers> = {
     if (!isSameUser(user)) {
       return null;
     }
-    const subscriptions = await activeSubscriptionsForUserLoader.load(user.id);
+    const subscriptions = await subscriptionsForUserLoader.load(user.id);
 
     return subscriptions[0] ?? null;
   },
@@ -93,8 +92,13 @@ export const User: ProtectedResolver<UserResolvers> = {
     if (!isSameUser(user)) {
       return null;
     }
-    const subscription = await getActiveUserSubscriptions([user.id]);
-    return !!subscription.filter(sub => !!sub).length;
+    const subscription = await subscriptionsForUserLoader.load(user.id);
+    const lastSubscription = subscription.length ? subscription[0] : null;
+    return (
+      lastSubscription &&
+      (lastSubscription.status === 'active' ||
+        lastSubscription.endAt > new Date())
+    );
   },
   paymentMeans: async user => {
     return getActivePaymentMeans(user.id);
@@ -123,8 +127,25 @@ export const User: ProtectedResolver<UserResolvers> = {
     return totalSeats;
   },
   hasAcceptedLastTermsOfUse: async user => {
+    if (!user.termsOfUseAcceptedVersion) {
+      return false;
+    }
     const termsOfUse = await getLastTermsOfUse();
 
     return !termsOfUse || termsOfUse.version === user.termsOfUseAcceptedVersion;
+  },
+  userContactData: async user => {
+    return {
+      ...user.userContactData,
+      email: user.userContactData?.email
+        ? user.userContactData.email
+        : user.email,
+      phoneNumber: user.userContactData?.phoneNumber
+        ? user.userContactData.phoneNumber
+        : user.phoneNumber,
+    };
+  },
+  cookiePreferences: async user => {
+    return user.cookiePreferences;
   },
 };

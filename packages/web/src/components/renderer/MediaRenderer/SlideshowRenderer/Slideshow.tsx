@@ -1,11 +1,13 @@
 'use client';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowRightIcon } from '#assets';
+import { useFullScreenOverlayContext } from '#components/FullscreenOverlay/FullscreenOverlayContext';
 import useIsVisible from '#hooks/useIsVisible';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CloudinaryVideo from '#ui/CloudinaryVideo';
 import styles from './Slideshow.css';
 import useSlideshow from './useSlideshow';
+import type { Slide } from './useSlideshow';
 import type { Media } from '@azzapp/data';
 import type { CSSProperties } from 'react';
 
@@ -137,47 +139,72 @@ const Slideshow = ({
         {size &&
           medias.map((media, i) => {
             return (
-              <div
+              <SlideShowItem
                 key={`${media.id}_${i}`}
-                className={styles.media}
-                style={{
-                  aspectRatio: media.height / media.width,
-                  borderRadius,
-                  ...slides[i],
-                }}
-              >
-                {media.kind === 'video' ? (
-                  <CloudinaryVideo
-                    assetKind="module"
-                    media={media}
-                    alt="cover"
-                    fluid
-                    style={{
-                      objectFit: 'cover',
-                      width: '100%',
-                    }}
-                    playsInline
-                    autoPlay
-                    muted
-                    loop
-                  />
-                ) : (
-                  <CloudinaryImage
-                    mediaId={media.id}
-                    draggable={false}
-                    alt="slideshow"
-                    fill
-                    format="auto"
-                    quality="auto:best"
-                    style={{
-                      objectFit: 'cover',
-                    }}
-                  />
-                )}
-              </div>
+                media={media}
+                borderRadius={borderRadius}
+                slide={slides[i]}
+                baseMedia={baseMedias[i]}
+              />
             );
           })}
       </div>
+    </div>
+  );
+};
+
+type SlideShowItemProps = {
+  media: Media;
+  borderRadius: number;
+  slide: Slide;
+  baseMedia: Media;
+};
+
+const SlideShowItem = ({
+  media,
+  borderRadius,
+  slide,
+  baseMedia,
+}: SlideShowItemProps) => {
+  const { setMedia } = useFullScreenOverlayContext(baseMedia);
+  return (
+    <div
+      className={styles.media}
+      style={{
+        aspectRatio: media.height / media.width,
+        borderRadius,
+        ...slide,
+      }}
+      onClick={setMedia}
+    >
+      {media.kind === 'video' ? (
+        <CloudinaryVideo
+          assetKind="module"
+          media={media}
+          alt="cover"
+          fluid
+          style={{
+            objectFit: 'cover',
+            width: '100%',
+          }}
+          playsInline
+          autoPlay
+          muted
+          loop
+        />
+      ) : (
+        <CloudinaryImage
+          mediaId={media.id}
+          draggable={false}
+          alt="slideshow"
+          fill
+          format="auto"
+          quality="auto:best"
+          style={{
+            objectFit: 'cover',
+          }}
+        />
+      )}
     </div>
   );
 };

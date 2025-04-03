@@ -64,7 +64,7 @@
         }
       }
     },
-    "Homescreen Widgets" : {
+    "LockScreen Widgets" : {
       "comment" : "widget configuration Title",
       "localizations" : {
         "fr" : {

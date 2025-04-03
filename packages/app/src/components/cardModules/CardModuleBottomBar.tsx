@@ -7,7 +7,7 @@ import { TOOLBOX_SECTION_HEIGHT } from '#components/Toolbar/ToolBoxSection';
 import {
   areCardModuleColorEqual,
   EMPTY_CARD_MODULE_COLOR,
-  getInitalDyptichColor,
+  getInitialDyptichColor,
 } from '#helpers/cardModuleColorsHelpers';
 import { getCardModuleMediaKind } from '#helpers/cardModuleHelpers';
 import useBoolean from '#hooks/useBoolean';
@@ -218,7 +218,7 @@ const CardModuleBottomBar = <T extends ModuleKindAndVariant>({
     (variant: Variant<T['moduleKind']>) => {
       if (variant !== module.variant) {
         //reset the default couleur when changing variant
-        const initialColor = getInitalDyptichColor(
+        const initialColor = getInitialDyptichColor(
           { ...module, variant } as ModuleKindAndVariant,
           webCard.coverBackgroundColor ?? 'light',
         );

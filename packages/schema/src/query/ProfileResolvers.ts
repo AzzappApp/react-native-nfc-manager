@@ -16,8 +16,6 @@ import {
   searchWebCards,
   getCardTemplatesForWebCardKind,
   searchContacts,
-  getContactCount,
-  getNbNewContacts,
 } from '@azzapp/data';
 import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import { shuffle } from '@azzapp/shared/arrayHelpers';
@@ -30,8 +28,8 @@ import {
 } from '@azzapp/shared/urlHelpers';
 import { getOrCreateSessionResource, getSessionInfos } from '#GraphQLContext';
 import {
-  companyActivityLoader,
-  labelLoader,
+  contactCountForProfileLoader,
+  newContactsCountForProfileLoader,
   profileInUserContactLoader,
   profileLoader,
   profileStatisticsLoader,
@@ -50,7 +48,11 @@ import {
 } from '#helpers/permissionsHelpers';
 import { searchPexelsPhotos, searchPexelsVideos } from '#helpers/pexelsClient';
 import { idResolver } from '#helpers/relayIdHelpers';
-import type { ProfileResolvers } from '#/__generated__/types';
+import type {
+  LocationInput,
+  AddressInput,
+  ProfileResolvers,
+} from '#/__generated__/types';
 import type { PexelsSearchResult } from '#helpers/pexelsClient';
 import type { Profile, User } from '@azzapp/data';
 import type { WebCardKind } from '@azzapp/shared/webCardKind';
@@ -148,12 +150,8 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
     ) {
       return 0;
     }
-    // profile.lastContactCardUpdate;
-    const nbNewContacts = await getNbNewContacts(
-      profile.id,
-      profile.lastContactViewAt,
-    );
-    return nbNewContacts;
+
+    return newContactsCountForProfileLoader.load(profile.id);
   },
   promotedAsOwner: async profile => {
     if (
@@ -258,17 +256,23 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
   contactCardUrl: async profile => {
     return getContactCardUrl(profile);
   },
-  contactCardQrCode: async (profile, { width }) => {
-    const result = await toString(await getContactCardUrl(profile), {
-      errorCorrectionLevel: 'L',
-      width,
-      type: 'svg',
-      color: {
-        dark: '#000',
-        light: '#0000',
+  contactCardQrCode: async (
+    profile,
+    { width, location, address, dark, light },
+  ) => {
+    const result = await toString(
+      await getContactCardUrl(profile, location, address),
+      {
+        errorCorrectionLevel: 'L',
+        width,
+        type: 'svg',
+        color: {
+          dark: dark || '#000',
+          light: light || '#0000',
+        },
+        margin: 0,
       },
-      margin: 0,
-    });
+    );
     return result;
   },
   webCard: async profile => {
@@ -288,7 +292,7 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
     if (!(await hasWebCardProfileRight(profile.webCardId))) {
       return 0;
     }
-    return getContactCount(profile.id);
+    return contactCountForProfileLoader.load(profile.id);
   },
   suggestedWebCards: async () => {
     return emptyConnection;
@@ -361,7 +365,10 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
       hasPreviousPage: offset !== null,
     });
   },
-  searchContacts: async (profile, { first, after, name, orderBy }) => {
+  searchContacts: async (
+    profile,
+    { first, after, name, orderBy, filterBy },
+  ) => {
     if (!profileIsAssociatedToCurrentUser(profile)) {
       return emptyConnection;
     }
@@ -374,6 +381,7 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
       name: name ?? undefined,
       offset,
       orderBy,
+      filterBy,
     });
     return connectionFromSortedArray(contacts.slice(0, limit), {
       offset,
@@ -508,12 +516,7 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
     const offset = after ? cursorToOffset(after) : 0;
     let result: PexelsSearchResult<Photo>;
     try {
-      result = await searchPexelsPhotos(
-        search || (await getActivityName(profile.webCardId, locale)) || null,
-        locale,
-        offset,
-        first,
-      );
+      result = await searchPexelsPhotos(search || null, locale, offset, first);
     } catch (error) {
       console.warn('Error fetching photos from Pexels:', error);
       return emptyConnection;
@@ -544,12 +547,7 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
     const offset = after ? cursorToOffset(after) : 0;
     let result: PexelsSearchResult<Video>;
     try {
-      result = await searchPexelsVideos(
-        search || (await getActivityName(profile.webCardId, locale)) || null,
-        locale,
-        offset,
-        first,
-      );
+      result = await searchPexelsVideos(search || null, locale, offset, first);
     } catch (error) {
       console.warn('Error fetching photos from Pexels:', error);
       return emptyConnection;
@@ -644,19 +642,11 @@ const ProfileResolverImpl: ProtectedResolver<ProfileResolvers> = {
 
 export { ProfileResolverImpl as Profile };
 
-const getActivityName = async (webCardId: string, locale: string) => {
-  const webcard = await webCardLoader.load(webCardId);
-  const activity = webcard?.companyActivityId
-    ? await companyActivityLoader.load(webcard.companyActivityId)
-    : null;
-  const activityName = activity?.id
-    ? ((await labelLoader.load([activity.id, locale])) ??
-      (await labelLoader.load([activity.id, DEFAULT_LOCALE])))
-    : null;
-  return activityName?.value;
-};
-
-const getContactCardUrl = async (profile: Profile) => {
+const getContactCardUrl = async (
+  profile: Profile,
+  location?: LocationInput | null,
+  address?: AddressInput | null,
+) => {
   const webCard = await webCardLoader.load(profile.webCardId);
   if (!webCard || !webCard?.userName) {
     return process.env.NEXT_PUBLIC_URL!;
@@ -672,10 +662,13 @@ const getContactCardUrl = async (profile: Profile) => {
     webCard.isMultiUser ? webCard?.commonInformation : null,
   );
 
+  const geolocation = location || address ? { location, address } : undefined;
+
   const url = buildUserUrlWithContactCard(
     webCard?.userName ?? '',
     data,
     signature,
+    geolocation,
   );
   return url;
 };
@@ -699,4 +692,8 @@ const fakeUser: Omit<User, 'id'> = {
   termsOfUseAcceptedAt: null,
   hasAcceptedCommunications: false,
   replacedBy: null,
+  nbFreeScans: 0,
+  userContactData: null,
+  appleId: null,
+  cookiePreferences: null,
 };

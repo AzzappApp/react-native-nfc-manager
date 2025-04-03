@@ -1,4 +1,5 @@
 import EventEmitter from 'events';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import memoize from 'lodash/memoize';
 import { useMemo, useEffect, useRef, useState, useCallback } from 'react';
 import {
@@ -75,40 +76,42 @@ export const ScreensRenderer = ({
   // to avoid re-rendering the whole tree when callbacks change (onScreenDismissed, onFinishTransitioning)
   return useMemo(
     () => (
-      <StackRenderer
-        stack={stack}
-        screens={screens}
-        tabsRenderers={tabs}
-        defaultScreenOptions={defaultScreenOptions}
-        onFinishTransitioning={onFinishTransitioningLatest}
-        onScreenDismissed={onScreenDismissed}
-        hasFocus={modals.length === 0}
-      >
-        {modals
-          .filter(({ ownerId }) => ownerId === currentScreenId)
-          .map(({ id, children, animationType, gestureEnabled }) => (
-            <Screen
-              key={id}
-              activityState={2}
-              isNativeStack
-              gestureEnabled={gestureEnabled}
-              onDismissed={modalDismissed(id)}
-              stackAnimation={
-                animationType === 'fade'
-                  ? 'fade'
-                  : animationType === 'none'
-                    ? 'none'
-                    : 'slide_from_bottom'
-              }
-              hideKeyboardOnSwipe
-              style={StyleSheet.absoluteFill}
-            >
-              <GestureHandlerRootView style={styles.flex}>
-                {children}
-              </GestureHandlerRootView>
-            </Screen>
-          ))}
-      </StackRenderer>
+      <BottomSheetModalProvider>
+        <StackRenderer
+          stack={stack}
+          screens={screens}
+          tabsRenderers={tabs}
+          defaultScreenOptions={defaultScreenOptions}
+          onFinishTransitioning={onFinishTransitioningLatest}
+          onScreenDismissed={onScreenDismissed}
+          hasFocus={modals.length === 0}
+        >
+          {modals
+            .filter(({ ownerId }) => ownerId === currentScreenId)
+            .map(({ id, children, animationType, gestureEnabled }) => (
+              <Screen
+                key={id}
+                activityState={2}
+                isNativeStack
+                gestureEnabled={gestureEnabled}
+                onDismissed={modalDismissed(id)}
+                stackAnimation={
+                  animationType === 'fade'
+                    ? 'fade'
+                    : animationType === 'none'
+                      ? 'none'
+                      : 'slide_from_bottom'
+                }
+                hideKeyboardOnSwipe
+                style={StyleSheet.absoluteFill}
+              >
+                <GestureHandlerRootView style={styles.flex}>
+                  {children}
+                </GestureHandlerRootView>
+              </Screen>
+            ))}
+        </StackRenderer>
+      </BottomSheetModalProvider>
     ),
     [
       currentScreenId,
@@ -156,6 +159,7 @@ const StackRenderer = ({
               isNativeStack
               style={StyleSheet.absoluteFill}
               hideKeyboardOnSwipe
+              {...routeInfo.state.screenOptions}
             >
               <TabsRenderer
                 id={routeInfo.id}

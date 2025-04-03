@@ -5,13 +5,25 @@ export const colors = {
   black: '#0E1216',
 };
 
+export const isColorTooLight = (color: string) => {
+  const rgba = chroma(color).rgba();
+  return rgba[0] * 0.299 + rgba[1] * 0.587 + rgba[2] * 0.114 > 186;
+};
+
 export const getTextColor = (backgroundColor: string) => {
-  const rgba = chroma(backgroundColor).rgba();
-  if (rgba[0] * 0.299 + rgba[1] * 0.587 + rgba[2] * 0.114 > 186) {
+  if (isColorTooLight(backgroundColor)) {
     return colors.black;
   } else {
     return colors.white;
   }
+};
+
+export const getEmailSignatureTitleColor = (color?: string) => {
+  let titleColor = color ?? colors.black;
+  if (isColorTooLight(titleColor)) {
+    titleColor = '#54535B'; // grey800
+  }
+  return titleColor;
 };
 
 const RED = 0.2126;

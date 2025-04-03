@@ -5,21 +5,15 @@
   ],
   "tasks": {
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "inputs": [
-        "src/**",
-        "public/**"
-      ],
-      "outputs": [
-        ".next/**"
-      ]
+      "dependsOn": ["^build"],
+      "inputs": ["src/**", "public/**"],
+      "outputs": [".next/**"]
     },
     "typecheck": {
-      "dependsOn": [
-        "^build"
-      ]
+      "dependsOn": ["^build"]
+    },
+    "test": {
+      "inputs": ["src/**"]
     }
   }
 }

@@ -275,6 +275,7 @@ const CameraView = (
             photoQualityBalance={
               Platform.OS === 'android' ? 'speed' : 'balanced'
             }
+            isMirrored={false}
           />
         </GestureDetector>
       ) : null}

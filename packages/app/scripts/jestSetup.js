@@ -64,6 +64,7 @@ jest.mock('@sentry/react-native', () => ({
   init: () => jest.fn(),
   captureEvent: () => jest.fn(),
   captureMessage: () => jest.fn(),
+  captureException: () => jest.fn(),
 }));
 //#endRegion
 
@@ -82,10 +83,16 @@ jest.mock('react-native-purchases', () => ({
 jest.mock('#hooks/useApplicationFonts', () => ({}));
 
 jest.mock('@react-native-firebase/analytics', () => {
-  return () => ({
+  return {
+    getAnalytics: () => jest.fn(),
     logEvent: jest.fn(),
     logSignUp: jest.fn(),
-  });
+    setUserId: jest.fn(),
+    logScreenView: jest.fn(),
+    firebase: {
+      analytics: jest.fn(),
+    },
+  };
 });
 
 jest.mock('@gorhom/bottom-sheet', () => {
@@ -140,4 +147,8 @@ jest.mock('expo-image-manipulator', () => ({
     JPEG: 'jpeg',
     PNG: 'png',
   },
+}));
+
+jest.mock('expo-auth-session', () => ({
+  makeRedirectUri: jest.fn(() => 'mock://redirect'),
 }));

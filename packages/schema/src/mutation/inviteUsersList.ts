@@ -197,11 +197,12 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
       throw new GraphQLError(ERRORS.INVALID_REQUEST);
     }
 
-    await validateCurrentSubscription(
-      owner.id,
-      createdProfiles.length + (webCard.isMultiUser ? 0 : 1),
-      true,
-    ); // seats are already added in the transaction, we just check that available seats are bigger or equal to 0
+    await validateCurrentSubscription(owner.id, {
+      webCardIsPublished: webCard.cardIsPublished,
+      action: 'UPDATE_MULTI_USER',
+      addedSeats: createdProfiles.length + (webCard.isMultiUser ? 0 : 1),
+      alreadyAdded: true,
+    }); // seats are already added in the transaction, we just check that available seats are bigger or equal to 0
 
     return { users, createdProfiles };
   });
@@ -224,9 +225,10 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
     }
     if (user && webCard.userName) {
       await sendPushNotification(user.id, {
-        type: 'multiuser_invitation',
+        notification: {
+          type: 'multiuser_invitation',
+        },
         mediaId: webCard.coverMediaId,
-        deepLink: 'multiuser_invitation',
         localeParams: { userName: webCard.userName },
         locale: guessLocale(user?.locale),
       });

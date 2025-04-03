@@ -121,6 +121,7 @@ const MediaVideoRenderer = (
   const sourceRef = useRef(source);
   const [loading, setLoading] = useState(true);
   const localVideoFile = getLocalCachedMediaFile(source.mediaId, 'video');
+  const localThumbnailFile = getLocalCachedMediaFile(source.mediaId, 'image');
   const [snapshotID, setSnapshotID] = useState(() =>
     useAnimationSnapshot ? (_videoSnapshots.get(source.mediaId) ?? null) : null,
   );
@@ -221,14 +222,20 @@ const MediaVideoRenderer = (
 
   const thumbnailSource = useMemo(
     () =>
-      thumbnailURI
+      localThumbnailFile
         ? {
-            uri: thumbnailURI,
+            uri: localThumbnailFile,
             mediaId: source.mediaId,
             requestedSize: source.requestedSize,
           }
-        : null,
-    [source.mediaId, source.requestedSize, thumbnailURI],
+        : thumbnailURI
+          ? {
+              uri: thumbnailURI,
+              mediaId: source.mediaId,
+              requestedSize: source.requestedSize,
+            }
+          : null,
+    [localThumbnailFile, source.mediaId, source.requestedSize, thumbnailURI],
   );
 
   const containerStyle = useMemo(

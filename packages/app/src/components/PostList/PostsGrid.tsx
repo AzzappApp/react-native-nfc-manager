@@ -15,14 +15,20 @@ import Skeleton from '#components/Skeleton';
 import { keyExtractor } from '#helpers/idHelpers';
 import useToggleLikePost from '#hooks/useToggleLikePost';
 import { POST_RENDERER_RADIUS } from './PostRendererFeed';
+import type { ScrollableToOffset } from '#helpers/types';
 import type {
   PostsGrid_posts$data,
   PostsGrid_posts$key,
 } from '#relayArtifacts/PostsGrid_posts.graphql';
 import type { ArrayItemType } from '@azzapp/shared/arrayHelpers';
-import type { MasonryListRenderItemInfo } from '@shopify/flash-list';
-import type { ReactElement } from 'react';
 import type {
+  MasonryFlashListRef,
+  MasonryListRenderItemInfo,
+} from '@shopify/flash-list';
+import type { MutableRefObject, ReactElement } from 'react';
+import type {
+  NativeScrollEvent,
+  NativeSyntheticEvent,
   StyleProp,
   ViewabilityConfig,
   ViewStyle,
@@ -42,6 +48,8 @@ type PostsGrid = {
   style?: StyleProp<ViewStyle>;
   nestedScrollEnabled?: boolean;
   extraData?: any;
+  onScroll?: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
+  scrollableRef?: ScrollableToOffset;
 };
 
 // This is an attemps to Use recycling for post list with custom layout
@@ -59,6 +67,8 @@ const PostsGrid = ({
   onRefresh,
   onEndReached,
   nestedScrollEnabled = false,
+  onScroll,
+  scrollableRef,
 }: PostsGrid) => {
   const posts = useFragment(
     graphql`
@@ -124,6 +134,7 @@ const PostsGrid = ({
 
   return (
     <MasonryFlashList
+      ref={scrollableRef as MutableRefObject<MasonryFlashListRef<any>>}
       data={posts}
       numColumns={2}
       accessibilityRole="list"
@@ -146,6 +157,7 @@ const PostsGrid = ({
       onRefresh={onRefresh}
       onEndReached={onEndReached}
       getItemType={getItemType}
+      onScroll={onScroll}
     />
   );
 };

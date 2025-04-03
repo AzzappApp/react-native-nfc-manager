@@ -6,8 +6,7 @@ import {
 } from '@azzapp/data';
 import { DEFAULT_LOCALE, isSupportedLocale } from '@azzapp/i18n';
 import { generateInvoice } from '@azzapp/payment';
-import { SUPPORT_EMAIL } from '@azzapp/shared/emailHelpers';
-import { sendTemplateEmail } from './emailHelpers';
+import { sendTemplateEmail, SUPPORT_EMAIL } from '@azzapp/shared/emailHelpers';
 import { getServerIntl } from './i18nHelpers';
 
 export const sendInvoice = async ({

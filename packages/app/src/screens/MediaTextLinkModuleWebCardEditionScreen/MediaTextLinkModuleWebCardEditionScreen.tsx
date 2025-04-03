@@ -12,12 +12,11 @@ import Toast from 'react-native-toast-message';
 import { graphql, useFragment, useMutation } from 'react-relay';
 import { DEFAULT_COLOR_PALETTE, swapColor } from '@azzapp/shared/cardHelpers';
 import { type CardModuleColor } from '@azzapp/shared/cardModuleHelpers';
-import ERRORS from '@azzapp/shared/errors';
 import CardModuleBottomBar from '#components/cardModules/CardModuleBottomBar';
 import MediaTextLinkModuleRenderer from '#components/cardModules/CardModuleMediaTextLink/MediaTextLinkModuleRenderer';
 import CardModulePreviewContainer from '#components/cardModules/tool/CardModulePreviewContainer';
 import { useRouter } from '#components/NativeRouter';
-import { getInitalDyptichColor } from '#helpers/cardModuleColorsHelpers';
+import { getInitialDyptichColor } from '#helpers/cardModuleColorsHelpers';
 import {
   convertModuleMediaRelay,
   handleOnCompletedModuleSave,
@@ -138,7 +137,7 @@ const MediaTextLinkModuleWebCardEditionScreen = (
 
   const [selectedCardModuleColor, setModuleColor] = useState<CardModuleColor>(
     data?.cardModuleColor ??
-      getInitalDyptichColor(
+      getInitialDyptichColor(
         { moduleKind: MODULE_KIND, variant },
         webCard.coverBackgroundColor,
       ),
@@ -212,28 +211,15 @@ const MediaTextLinkModuleWebCardEditionScreen = (
               resolve(null);
             },
             onError(error) {
-              if (error.message === ERRORS.SUBSCRIPTION_REQUIRED) {
-                Toast.show({
-                  type: 'error',
-                  text1: intl.formatMessage({
-                    defaultMessage:
-                      'You need a subscription to add this module.',
-                    description:
-                      'Error toast message when trying to add a module without a subscription.',
-                  }),
-                });
-                return;
-              } else {
-                Sentry.captureException(error);
-                Toast.show({
-                  type: 'error',
-                  text1: intl.formatMessage({
-                    defaultMessage: 'Error while saving your new module.',
-                    description:
-                      'Error toast message when saving a new module failed.',
-                  }),
-                });
-              }
+              Sentry.captureException(error);
+              Toast.show({
+                type: 'error',
+                text1: intl.formatMessage({
+                  defaultMessage: 'Error while saving your new module.',
+                  description:
+                    'Error toast message when saving a new module failed.',
+                }),
+              });
               reject(error);
             },
           });

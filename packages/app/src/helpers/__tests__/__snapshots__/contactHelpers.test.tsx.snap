@@ -1,0 +1,68 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`contactHelpers buildVCardFromAzzappContact contact with social 1`] = `
+{
+  "charset": "utf-8",
+  "contentType": "text/x-vcard",
+  "definedElements": {
+    "fullname": true,
+    "name": true,
+    "social": true,
+  },
+  "fileExtension": "vcf",
+  "filename": "vcard",
+  "multiplePropertiesForElementAllowed": [
+    "address",
+    "email",
+    "phoneNumber",
+    "social",
+    "url",
+  ],
+  "properties": [
+    {
+      "key": "N;CHARSET=utf-8",
+      "value": ";;;;",
+    },
+    {
+      "key": "FN;CHARSET=utf-8",
+      "value": "",
+    },
+    {
+      "key": "X-SOCIALPROFILE;type=facebook",
+      "value": "https://facebook.com/test",
+    },
+  ],
+  "useVCalendar": false,
+}
+`;
+
+exports[`contactHelpers buildVCardFromAzzappContact empty contact 1`] = `
+{
+  "charset": "utf-8",
+  "contentType": "text/x-vcard",
+  "definedElements": {
+    "fullname": true,
+    "name": true,
+  },
+  "fileExtension": "vcf",
+  "filename": "vcard",
+  "multiplePropertiesForElementAllowed": [
+    "address",
+    "email",
+    "phoneNumber",
+    "social",
+    "url",
+  ],
+  "properties": [
+    {
+      "key": "N;CHARSET=utf-8",
+      "value": ";;;;",
+    },
+    {
+      "key": "FN;CHARSET=utf-8",
+      "value": "",
+    },
+  ],
+  "useVCalendar": false,
+}
+`;

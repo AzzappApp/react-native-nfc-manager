@@ -20,6 +20,18 @@ describe('RichText: parseHTML', () => {
         '{"type":"root","children":[{"type":"i","start":0,"end":1,"children":[{"type":"text","value":"a","start":0,"end":1}]},{"type":"text","value":"b","start":1,"end":2}],"start":0,"end":2}',
       );
     });
+    test('simple with tag with multiple characters (+3)', () => {
+      const result = parseHTMLToRichText('<+3>a</+3>b');
+      expect(JSON.stringify(result)).toBe(
+        '{"type":"root","children":[{"type":"+3","start":0,"end":1,"children":[{"type":"text","value":"a","start":0,"end":1}]},{"type":"text","value":"b","start":1,"end":2}],"start":0,"end":2}',
+      );
+    });
+    test('simple with tag with multiple characters (-3)', () => {
+      const result = parseHTMLToRichText('<-3>a</-3>b');
+      expect(JSON.stringify(result)).toBe(
+        '{"type":"root","children":[{"type":"-3","start":0,"end":1,"children":[{"type":"text","value":"a","start":0,"end":1}]},{"type":"text","value":"b","start":1,"end":2}],"start":0,"end":2}',
+      );
+    });
     test('simple with tag end', () => {
       const result = parseHTMLToRichText('a<i>b</i>');
       expect(JSON.stringify(result)).toBe(

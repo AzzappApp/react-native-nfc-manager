@@ -8,13 +8,17 @@ import useBoolean from '#hooks/useBoolean';
 import useScreenInsets from '#hooks/useScreenInsets';
 import BottomSheetModal from '#ui/BottomSheetModal';
 import BottomSheetTextEditor from '#ui/BottomSheetTextEditor';
-import BottomSheetTextInput from '#ui/BottomSheetTextInput';
 import Header, { HEADER_HEIGHT } from '#ui/Header';
+import RichTextButtons, {
+  textButtons,
+  titleButtons,
+} from '#ui/RichTextButtons';
 import Text from '#ui/Text';
 import {
   DEFAULT_CARD_MODULE_TEXT,
   DEFAULT_CARD_MODULE_TITLE,
 } from '../CardModuleBottomBar';
+import useRichTextManager from './useRichTextManager';
 import type { ModuleKindAndVariant } from '#helpers/webcardModuleHelpers';
 import type { CardModuleData } from '../CardModuleBottomBar';
 
@@ -44,10 +48,40 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
   const [text, setText] = useState(cardModuleTitleText?.text);
   const [title, setTitle] = useState(cardModuleTitleText?.title);
 
-  useEffect(() => {
-    setText(cardModuleTitleText?.text);
-    setTitle(cardModuleTitleText?.title);
-  }, [cardModuleTitleText]);
+  const [focusedInput, setFocusedInput] = useState<'text' | 'title'>('title');
+
+  //#endregion
+  const onTextFocus = () => {
+    setFocusedInput('text');
+  };
+  const onTitleFocus = () => {
+    setFocusedInput('title');
+  };
+  const {
+    onApplyTagPress: onTextApplyTagPress,
+    onSelectionChange: onTextSelectionChange,
+    onChangeText: onTextChangeText,
+    textAndSelection: textTextAndSelection,
+  } = useRichTextManager({
+    defaultValue:
+      cardModuleTitleText?.text === DEFAULT_CARD_MODULE_TEXT
+        ? ''
+        : cardModuleTitleText?.text,
+    setText,
+  });
+
+  const {
+    onApplyTagPress: onTitleApplyTagPress,
+    onSelectionChange: onTitleSelectionChange,
+    onChangeText: onTitleChangeText,
+    textAndSelection: titleTextAndSelection,
+  } = useRichTextManager({
+    defaultValue:
+      cardModuleTitleText?.title === DEFAULT_CARD_MODULE_TITLE
+        ? ''
+        : cardModuleTitleText?.title,
+    setText: setTitle,
+  });
 
   // onDismiss call when the popup dismiss in order to save
   const onDismiss = () => {
@@ -61,6 +95,12 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
   };
 
   const { top: topInset } = useScreenInsets();
+
+  const onApplyTagPress =
+    focusedInput === 'text' ? onTextApplyTagPress : onTitleApplyTagPress;
+
+  const textAndSelectionInner =
+    focusedInput === 'text' ? textTextAndSelection : titleTextAndSelection;
 
   return (
     <>
@@ -112,15 +152,17 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
               description="CardModuleMediaTextTool - Title and text"
             />
           </Text>
-          <BottomSheetTextInput
+          <BottomSheetTextEditor
             multiline
             placeholder={intl.formatMessage({
               defaultMessage: 'Enter your title',
               description: 'Title placeholder in design module text tool',
             })}
-            defaultValue={title === DEFAULT_CARD_MODULE_TITLE ? '' : title}
-            onChangeText={setTitle}
+            onChangeText={onTitleChangeText}
             style={styles.titleStyle}
+            onSelectionChange={onTitleSelectionChange}
+            onFocus={onTitleFocus}
+            textAndSelection={titleTextAndSelection}
           />
           <BottomSheetTextEditor
             multiline
@@ -129,9 +171,19 @@ const CardModuleMediaTextTool = <T extends ModuleKindAndVariant>({
               description:
                 'Text description placeholder in design module text tool',
             })}
-            defaultValue={text === DEFAULT_CARD_MODULE_TEXT ? '' : text}
-            onChangeText={setText}
             style={styles.textStyle}
+            onChangeText={onTextChangeText}
+            onSelectionChange={onTextSelectionChange}
+            onFocus={onTextFocus}
+            textAndSelection={textTextAndSelection}
+          />
+          <RichTextButtons
+            onPress={onApplyTagPress}
+            textAndSelection={textAndSelectionInner}
+            isFocused
+            enabledButtons={
+              focusedInput === 'title' ? titleButtons : textButtons
+            }
           />
         </View>
       </BottomSheetModal>

@@ -22,6 +22,7 @@ const styles = {
   coverContainer: style({
     width: 200,
     height: 200 / COVER_RATIO,
+    border: '1px solid rgba(226, 225, 227, 1)',
   }),
   openIcon: style({
     marginLeft: 20,
@@ -58,9 +59,7 @@ const styles = {
     width: 500,
     '@media': {
       'screen and (max-width: 580px)': {
-        transform: 'scale(0.5)',
-        transformOrigin: 'top center',
-        marginBottom: 'calc(-50% + 30px)',
+        zoom: 0.5,
       },
     },
   }),

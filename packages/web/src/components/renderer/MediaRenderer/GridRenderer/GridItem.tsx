@@ -1,5 +1,6 @@
 'use client';
 import { useRef } from 'react';
+import { useFullScreenOverlayContext } from '#components/FullscreenOverlay/FullscreenOverlayContext';
 import { AppearanceSliderContainer } from '#components/renderer/AppearanceSliderContainer';
 import CloudinaryImage from '#ui/CloudinaryImage';
 import CloudinaryVideo from '#ui/CloudinaryVideo';
@@ -22,6 +23,8 @@ const GridItem = ({
   delaySec,
 }: GridItemProps) => {
   const pictureRef = useRef<HTMLDivElement>(null);
+  const { setMedia } = useFullScreenOverlayContext(media);
+
   return (
     <div
       key={`${media.id}_${index}`}
@@ -32,6 +35,7 @@ const GridItem = ({
         aspectRatio: square ? 1 : `${media.width} / ${media.height}`,
       }}
       ref={pictureRef}
+      onClick={setMedia}
     >
       <AppearanceSliderContainer pictureRef={pictureRef} delaySec={delaySec}>
         {media.kind === 'video' ? (
@@ -62,7 +66,6 @@ const GridItem = ({
             height={(EXPECTED_MEDIA_WIDTH * media.height) / media.width}
             style={{
               objectFit: 'cover',
-              borderRadius: cardStyle?.borderRadius ?? 0,
             }}
           />
         )}

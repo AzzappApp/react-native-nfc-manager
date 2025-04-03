@@ -47,6 +47,19 @@ export const getUserByEmail = (email: string): Promise<User | null> =>
     .then(res => res[0] ?? null);
 
 /**
+ * Retrieve a user by his email
+ *
+ * @param email - The email of the user to retrieve
+ * @returns The user if found, otherwise null
+ */
+export const getUserByAppleId = (appleId: string): Promise<User | null> =>
+  db()
+    .select()
+    .from(UserTable)
+    .where(eq(UserTable.appleId, appleId))
+    .then(res => res[0] ?? null);
+
+/**
  * Retrieve a list of users by their emails
  *
  * @param email - The email of the user to retrieve
@@ -478,3 +491,27 @@ export const getUsersInfos = async ({
 
   return { users, count: nbUsers };
 };
+
+export const getPublishedWebCardCount = async (userId: string) => {
+  const webCards = await db()
+    .select({ count: count() })
+    .from(ProfileTable)
+    .innerJoin(WebCardTable, eq(ProfileTable.webCardId, WebCardTable.id))
+    .where(
+      and(
+        eq(ProfileTable.userId, userId),
+        eq(ProfileTable.profileRole, 'owner'),
+        eq(WebCardTable.cardIsPublished, true),
+        ne(WebCardTable.deleted, true),
+      ),
+    )
+    .then(rows => rows[0].count);
+
+  return webCards;
+};
+
+export const updateNbFreeScans = (userId: string) =>
+  db()
+    .update(UserTable)
+    .set({ nbFreeScans: sql`${UserTable.nbFreeScans} + 1` })
+    .where(eq(UserTable.id, userId));

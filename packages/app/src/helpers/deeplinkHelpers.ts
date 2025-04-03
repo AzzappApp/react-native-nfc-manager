@@ -1,10 +1,11 @@
 import * as Sentry from '@sentry/react-native';
 import { toGlobalId } from 'graphql-relay';
 import { decompressFromEncodedURIComponent } from 'lz-string';
-import { openShakeShare } from '#components/ShakeShare';
+import { NativeModules, Platform } from 'react-native';
 import { logEvent } from './analytics';
 import { verifySign } from './MobileWebAPI';
 import type { Route } from '#routes';
+import type { Geolocation } from '@azzapp/shared/geolocationHelpers';
 
 const getSearchParamFromURL = (url: string, param: string) => {
   const include = url.includes(`${param}=`);
@@ -17,17 +18,24 @@ const getSearchParamFromURL = (url: string, param: string) => {
   return value;
 };
 
+const ANDROID_CONTENT_PREFIX = 'content://';
+const FILE_PREFIX = 'file://';
+
 const profileUrl = /^^([^/?]+)(?:\/([^/?]+))?(?:\/([^/?]+))?.*$/;
 const resetPasswordUrl = new RegExp('^reset-password');
 const prefixes = [
-  process.env.APP_SCHEME,
+  `${process.env.APP_SCHEME}://`,
   process.env.NEXT_PUBLIC_URL,
   'https://dev.azzapp.com',
   'https://staging.azzapp.com',
   'https://www.azzapp.com',
   'https://azzapp.com',
+  // to support vcf sharing
+  ANDROID_CONTENT_PREFIX,
+  FILE_PREFIX,
 ];
 //we had to many issue with end, add all url to avoid issue with env variable during build
+const { AZPMediaHelpers } = NativeModules;
 
 export const matchUrlWithRoute = async (
   url: string,
@@ -48,6 +56,23 @@ export const matchUrlWithRoute = async (
   if (!prefix) {
     return;
   }
+  if (Platform.OS === 'android' && prefix === ANDROID_CONTENT_PREFIX) {
+    const uri = `file://${await AZPMediaHelpers.downloadVCard(url)}`;
+    return {
+      route: 'CONTACT_CREATE',
+      params: {
+        vCardUri: uri,
+      },
+    };
+  }
+  if (prefix === FILE_PREFIX) {
+    return {
+      route: 'CONTACT_CREATE',
+      params: {
+        vCardUri: url,
+      },
+    };
+  }
   let withoutPrefix = url.replace(prefix, '');
   if (withoutPrefix.startsWith('/')) {
     withoutPrefix = withoutPrefix.slice(1);
@@ -62,9 +87,8 @@ export const matchUrlWithRoute = async (
     };
   }
   if (withoutPrefix === 'widget_share') {
-    openShakeShare();
     return {
-      route: 'HOME',
+      route: 'SHAKE_AND_SHARE',
     };
   }
   const matchResetPassword = withoutPrefix.match(resetPasswordUrl);
@@ -131,8 +155,9 @@ export const matchUrlWithRoute = async (
     if (compressedContactCard) {
       let contactData: string;
       let signature: string;
+      let geolocation: Geolocation;
       try {
-        [contactData, signature] = JSON.parse(
+        [contactData, signature, geolocation] = JSON.parse(
           //lz-string decompressFromEncodedURIComponent does not decode properly when space in the url is converted to %20? (happens with applink)
           //we need to use decodeURI in order to decode the url properly
           decompressFromEncodedURIComponent(decodeURI(compressedContactCard)),
@@ -163,6 +188,7 @@ export const matchUrlWithRoute = async (
               userName: username,
               contactData,
               additionalContactData,
+              geolocation,
             },
           };
         } catch {
@@ -204,8 +230,20 @@ const handleAppClip = async (url: string): Promise<Route | undefined> => {
   if (username && compressedContactCard) {
     let contactData: string;
     let signature: string;
+    let geolocation: {
+      location: {
+        latitude: number;
+        longitude: number;
+      };
+      address?: {
+        city: string;
+        subregion: string;
+        region: string;
+        country: string;
+      };
+    };
     try {
-      [contactData, signature] = JSON.parse(
+      [contactData, signature, geolocation] = JSON.parse(
         //lz-string decompressFromEncodedURIComponent does not decode properly when space in the url is converted to %20? (happens with applink)
         //we need to use decodeURI in order to decode the url properly
         decompressFromEncodedURIComponent(decodeURI(compressedContactCard)),
@@ -224,6 +262,7 @@ const handleAppClip = async (url: string): Promise<Route | undefined> => {
             userName: username,
             contactData,
             additionalContactData,
+            geolocation,
           },
         };
       }

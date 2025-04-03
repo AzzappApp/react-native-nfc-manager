@@ -1,15 +1,12 @@
 import { renderHook, act } from '@testing-library/react-hooks';
 import { loadQuery } from 'react-relay';
 import { getAuthState } from '#helpers/authStore';
-import {
-  addEnvironmentListener,
-  getRelayEnvironment,
-} from '#helpers/relayEnvironment';
+import { getRelayEnvironment } from '#helpers/relayEnvironment';
 import {
   loadQueryFor,
   disposeQueryFor,
   useManagedQuery,
-  init,
+  resetQueries,
 } from '../RelayQueryManager';
 
 jest.mock('react-relay');
@@ -21,11 +18,6 @@ describe('RelayQueryManager', () => {
     jest.useFakeTimers();
 
     // Mock
-    let envListener: (event: 'reset') => void = () => {};
-    jest.mocked(addEnvironmentListener).mockImplementation(listener => {
-      envListener = listener;
-      return () => {};
-    });
     (global as any).requestIdleCallback = (cb: () => void) => {
       cb();
     };
@@ -50,7 +42,6 @@ describe('RelayQueryManager', () => {
     );
 
     // Init
-    init();
     const screenId = 'testScreen';
     const { result } = renderHook(() => useManagedQuery(screenId));
     const queryOptions = {
@@ -147,9 +138,9 @@ describe('RelayQueryManager', () => {
     });
 
     // Check that the query is disposed when the environment is reset
-    envListener('reset');
+    resetQueries();
     expect(mockDispose).toHaveBeenCalledTimes(1);
-    envListener('reset');
+    resetQueries();
     expect(mockDispose).toHaveBeenCalledTimes(1);
     act(() => {
       jest.runAllTimers();

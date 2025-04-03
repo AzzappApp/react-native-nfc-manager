@@ -12,7 +12,6 @@ import {
   HORIZONTAL_PHOTO_STYLE_VALUES,
   MODULE_IMAGE_MAX_WIDTH,
 } from '@azzapp/shared/cardModuleHelpers';
-import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import AnimatedDataOverride from '#components/AnimatedDataOverride';
 import { CameraButton } from '#components/commonsButtons';
 import ImagePicker, {
@@ -121,7 +120,6 @@ const HorizontalPhotoEditionScreen = ({
         }
         webCard {
           id
-          cardIsPublished
           coverBackgroundColor
           cardColors {
             primary
@@ -139,10 +137,6 @@ const HorizontalPhotoEditionScreen = ({
             gap
             titleFontFamily
             titleFontSize
-          }
-          isPremium
-          cardModules {
-            id
           }
           ...HorizontalPhotoBorderEditionPanel_webCard
           ...ModuleEditionScreenTitle_webCard
@@ -228,9 +222,6 @@ const HorizontalPhotoEditionScreen = ({
 
   const router = useRouter();
   const intl = useIntl();
-
-  const cardModulesCount =
-    (profile.webCard?.cardModules.length ?? 0) + (horizontalPhoto ? 0 : 1);
 
   const onCancel = router.back;
 
@@ -325,20 +316,6 @@ const HorizontalPhotoEditionScreen = ({
       return;
     }
 
-    const requireSubscription = changeModuleRequireSubscription(
-      'horizontalPhoto',
-      cardModulesCount,
-    );
-
-    if (
-      profile.webCard?.cardIsPublished &&
-      requireSubscription &&
-      !profile.webCard?.isPremium
-    ) {
-      router.push({ route: 'USER_PAY_WALL' });
-      return;
-    }
-
     setProgressIndicator(Observable.from(0));
 
     const { image: updateMedia, ...rest } = value;
@@ -415,7 +392,6 @@ const HorizontalPhotoEditionScreen = ({
     });
   }, [
     canSave,
-    cardModulesCount,
     profile.webCard,
     value,
     data,
@@ -462,7 +438,6 @@ const HorizontalPhotoEditionScreen = ({
               description: 'HorizontalPhoto text screen title',
             })}
             kind="horizontalPhoto"
-            moduleCount={cardModulesCount}
             webCardKey={profile.webCard}
           />
         }

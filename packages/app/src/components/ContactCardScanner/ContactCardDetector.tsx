@@ -1,23 +1,32 @@
+import { parse } from '@lepirlouit/vcard-parser';
 import { makeImageFromView } from '@shopify/react-native-skia';
 import { Paths, File } from 'expo-file-system/next';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
-
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { trigger } from 'react-native-haptic-feedback';
 import Animated, {
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
 } from 'react-native-reanimated';
 import Svg, { Defs, Mask, Rect } from 'react-native-svg';
-import { useCameraDevice, Camera } from 'react-native-vision-camera';
+import Toast from 'react-native-toast-message';
+import {
+  useCameraDevice,
+  Camera,
+  useCodeScanner,
+} from 'react-native-vision-camera';
 import { graphql, useMutation } from 'react-relay';
+import ERRORS from '@azzapp/shared/errors';
+import { PAYMENT_IS_ENABLED } from '#Config';
 import { colors } from '#theme';
 import ImagePicker, { SelectImageStep } from '#components/ImagePicker';
-import { ScreenModal } from '#components/NativeRouter';
+import { ScreenModal, useOnFocus, useRouter } from '#components/NativeRouter';
 import PermissionModal from '#components/PermissionModal';
+import { matchUrlWithRoute } from '#helpers/deeplinkHelpers';
 import useBoolean from '#hooks/useBoolean';
 import useIsForeground from '#hooks/useIsForeground';
 import useScreenDimensions from '#hooks/useScreenDimensions';
@@ -31,6 +40,7 @@ import type {
   ContactCardDetectorMutation,
   ContactCardDetectorMutation$data,
 } from '#relayArtifacts/ContactCardDetectorMutation.graphql';
+import type { vCard } from '@lepirlouit/vcard-parser';
 import type { Point } from 'react-native-vision-camera';
 
 const horizontal = require('./assets/orientation_horizontal.png');
@@ -42,13 +52,17 @@ type ContactCardDetectorProps = {
     data: ContactCardDetectorMutation$data['extractVisitCardData'],
     image: { uri: string; aspectRatio: number },
   ) => void;
+  extractVCardData?: (data: vCard) => void;
   closeContainer?: () => void;
+  createContactCard?: boolean;
 };
 
 const ContactCardDetector = ({
   close,
   extractData,
+  extractVCardData,
   closeContainer,
+  createContactCard,
 }: ContactCardDetectorProps) => {
   const isActive = useIsForeground();
   const intl = useIntl();
@@ -83,8 +97,11 @@ const ContactCardDetector = ({
     }, [isHorizontal, width, height]);
 
   const [commit] = useMutation<ContactCardDetectorMutation>(graphql`
-    mutation ContactCardDetectorMutation($imgUrl: String!) {
-      extractVisitCardData(imgUrl: $imgUrl) {
+    mutation ContactCardDetectorMutation(
+      $imgUrl: String!
+      $config: ExtractVisitCardDataConfigInput
+    ) {
+      extractVisitCardData(imgUrl: $imgUrl, config: $config) {
         addresses
         company
         emails
@@ -96,6 +113,54 @@ const ContactCardDetector = ({
       }
     }
   `);
+
+  const router = useRouter();
+
+  const extractDataFromImage = useCallback(
+    (picture: { base64: string; uri: string; aspectRatio: number }) => {
+      commit({
+        variables: {
+          imgUrl: `data:image/jpg;base64,${picture.base64}`,
+          config: { createContactCard },
+        },
+        onCompleted: data => {
+          extractData(data.extractVisitCardData, {
+            uri: picture.uri,
+            aspectRatio: picture.aspectRatio,
+          });
+          close();
+          closeLoading();
+        },
+        onError: e => {
+          closeLoading();
+          if (e.message === ERRORS.SUBSCRIPTION_REQUIRED) {
+            if (PAYMENT_IS_ENABLED) {
+              router.push({ route: 'USER_PAY_WALL' });
+            } else {
+              Toast.show({
+                type: 'error',
+                text1: intl.formatMessage({
+                  defaultMessage: 'You have reached the limit of scans.',
+                  description:
+                    'Error toast message when reaching the limit of scans on android',
+                }),
+              });
+            }
+            return;
+          }
+          Toast.show({
+            type: 'error',
+            text1: intl.formatMessage({
+              defaultMessage:
+                'Oops, scanning your contact card was not possible. Please try again later.',
+              description: 'Error toast message when scanning a contact card',
+            }),
+          });
+        },
+      });
+    },
+    [close, closeLoading, commit, createContactCard, extractData, intl, router],
+  );
 
   const takePicture = useCallback(async () => {
     if (!camera.current || !isActive) {
@@ -127,19 +192,13 @@ const ContactCardDetector = ({
         ],
         { compress: 0.8, format: SaveFormat.JPEG, base64: true },
       );
-
-      commit({
-        variables: { imgUrl: `data:image/jpg;base64,${croppedImage.base64}` },
-        onCompleted: data => {
-          extractData(data.extractVisitCardData, {
-            uri: croppedImage.uri,
-            aspectRatio: croppedImage.width / croppedImage.height,
-          });
-          close();
-          closeLoading();
-        },
-        onError: () => {},
-      });
+      if (croppedImage.base64) {
+        extractDataFromImage({
+          base64: croppedImage.base64,
+          uri: croppedImage.uri,
+          aspectRatio: croppedImage.width / croppedImage.height,
+        });
+      }
     } catch (error) {
       closeLoading();
       console.log(error);
@@ -149,10 +208,8 @@ const ContactCardDetector = ({
     boxDimension.width,
     boxDimension.x,
     boxDimension.y,
-    close,
     closeLoading,
-    commit,
-    extractData,
+    extractDataFromImage,
     height,
     isActive,
     showLoading,
@@ -271,29 +328,20 @@ const ContactCardDetector = ({
 
         // Write the byte array to a file
         const file = new File(filePath);
-        await file.create();
-        await file.write(pngData);
+        file.create();
+        file.write(pngData);
 
-        commit({
-          variables: { imgUrl: `data:image/jpg;base64,${base64Data}` },
-          onCompleted: data => {
-            extractData(data.extractVisitCardData, {
-              uri: filePath,
-              aspectRatio: image.width() / image.height(),
-            });
-            close();
-            closeLoading();
-          },
-          onError: () => {
-            closeLoading();
-          },
+        extractDataFromImage({
+          base64: base64Data,
+          uri: filePath,
+          aspectRatio: image.width() / image.height(),
         });
       }
     } catch (error) {
       closeLoading();
       console.log(error);
     }
-  }, [close, closeLoading, commit, extractData, showLoading]);
+  }, [closeLoading, extractDataFromImage, showLoading]);
 
   const ref = useRef<View>(null);
   const animatedStyle = useAnimatedStyle(() => {
@@ -309,6 +357,56 @@ const ContactCardDetector = ({
     };
   });
 
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (loading) {
+      interval = setInterval(() => {
+        trigger('impactMedium');
+      }, 2000);
+    }
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [loading]);
+
+  const scanOngoing = useRef(true);
+
+  const handleDeeplink = async (url: string) => {
+    if (!scanOngoing.current) return;
+
+    const route = await matchUrlWithRoute(url);
+    if (route) {
+      scanOngoing.current = false;
+      router.replace(route);
+    }
+  };
+
+  useOnFocus(() => {
+    scanOngoing.current = true;
+  });
+
+  const codeScanner = useCodeScanner({
+    codeTypes: ['qr', 'ean-13'],
+    onCodeScanned: codes => {
+      if (!scanOngoing.current) return;
+      if (codes.length && codes[0].value) {
+        const value = codes[0].value;
+        if (value.startsWith('http')) {
+          // url detected
+          handleDeeplink(value);
+        } else if (value.startsWith('BEGIN:VCARD') && extractVCardData) {
+          const VCard = parse(value);
+          if (VCard) {
+            extractVCardData?.(VCard);
+            close();
+          }
+        }
+        scanOngoing.current = false;
+      }
+    },
+  });
+
   return (
     <GestureDetector gesture={composedGesture}>
       <View style={[styles.container, { width, height }]}>
@@ -322,6 +420,7 @@ const ContactCardDetector = ({
             video={false}
             androidPreviewViewType="surface-view"
             outputOrientation="device"
+            codeScanner={!createContactCard ? codeScanner : undefined}
           />
         ) : (
           <View
@@ -412,10 +511,17 @@ const ContactCardDetector = ({
               onPress={closeContainer ?? close}
             />
             <Text variant="large" style={styles.whiteText}>
-              <FormattedMessage
-                defaultMessage="Scan your paper business card"
-                description="ContactCardDetector - title Scan your paper business card"
-              />
+              {createContactCard ? (
+                <FormattedMessage
+                  defaultMessage="Scan your paper business card"
+                  description="ContactCardDetector - title Scan your paper business card"
+                />
+              ) : (
+                <FormattedMessage
+                  defaultMessage="Scan a card or QR-Code"
+                  description="ContactCardDetector - title Scan a card or QR-Code"
+                />
+              )}
             </Text>
           </View>
           <View
@@ -463,7 +569,6 @@ const ContactCardDetector = ({
                 onPress={openPicker}
               />
             </View>
-
             {isCameraMode ? (
               <Pressable
                 onPress={takePicture}

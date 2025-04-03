@@ -1,10 +1,20 @@
-import { createContext, useCallback, useContext, useReducer } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useReducer,
+  forwardRef,
+} from 'react';
 import { Pressable, StyleSheet } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DELETE_BUTTON_WIDTH } from '#helpers/contactHelpers';
-import type { PropsWithChildren } from 'react';
-import type { GestureResponderEvent, LayoutRectangle } from 'react-native';
+import type { LegacyRef, PropsWithChildren } from 'react';
+import type {
+  GestureResponderEvent,
+  LayoutRectangle,
+  ScrollView,
+} from 'react-native';
 import type { KeyboardAwareScrollViewProps } from 'react-native-keyboard-controller';
 
 type Context = {
@@ -60,10 +70,10 @@ const reducer = (
   }
 };
 
-const FormDeleteFieldOverlay = ({
-  children,
-  ...props
-}: KeyboardAwareScrollViewProps & PropsWithChildren) => {
+const FormDeleteFieldOverlay = (
+  { children, ...props }: PropsWithChildren<KeyboardAwareScrollViewProps>,
+  ref: LegacyRef<ScrollView>,
+) => {
   const [state, dispatch] = useReducer(reducer, { rect: null, deleted: false });
 
   const openDeleteButton = useCallback((rect: LayoutRectangle | null) => {
@@ -105,6 +115,7 @@ const FormDeleteFieldOverlay = ({
       value={{ ...state, openDeleteButton, closeDeleteButton }}
     >
       <KeyboardAwareScrollView
+        ref={ref}
         bottomOffset={30}
         scrollEnabled={!state.rect}
         contentContainerStyle={{ paddingBottom: bottom }}
@@ -119,4 +130,4 @@ const FormDeleteFieldOverlay = ({
   );
 };
 
-export default FormDeleteFieldOverlay;
+export default forwardRef(FormDeleteFieldOverlay);

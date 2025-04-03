@@ -47,6 +47,7 @@ const TabBarMenuItem = ({
       <Text
         style={[labelStyle, selected && { color: selectedLabelColor }]}
         variant="button"
+        numberOfLines={1}
       >
         {children}
       </Text>

@@ -277,7 +277,7 @@ public class BufferLoader {
       foundError = true;
     }
     if (foundError) {
-      Log.e("RNSkiaVideo", errorMessageBuilder.toString());
+      Log.e("RNBufferLoader", errorMessageBuilder.toString());
     }
   }
 

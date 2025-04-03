@@ -1,6 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { fromGlobalId } from 'graphql-relay';
-import { parsePhoneNumber } from 'libphonenumber-js';
 import { useCallback, useEffect, useMemo, type ReactNode } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -16,6 +14,7 @@ import Toast from 'react-native-toast-message';
 import {
   ConnectionHandler,
   graphql,
+  useFragment,
   useMutation,
   usePreloadedQuery,
 } from 'react-relay';
@@ -26,11 +25,17 @@ import { useRouter, type ScreenOptions } from '#components/NativeRouter';
 import ProfileStatisticsChart, {
   normalizeArray,
 } from '#components/ProfileStatisticsChart';
+import { contactCardFormFragment } from '#fragments/ContactCardEditFormFragment';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
 import { getFileName } from '#helpers/fileHelpers';
 import { keyExtractor } from '#helpers/idHelpers';
 import { addLocalCachedMediaFile } from '#helpers/mediaHelpers';
 import { uploadMedia, uploadSign } from '#helpers/MobileWebAPI';
+import {
+  getPhonenumberWithCountryCode,
+  parsePhoneNumber,
+  parseContactCardPhoneNumber,
+} from '#helpers/phoneNumbersHelper';
 import relayScreen from '#helpers/relayScreen';
 import { useProfileInfos } from '#hooks/authStateHooks';
 import { get as CappedPixelRatio } from '#relayProviders/CappedPixelRatio.relayprovider';
@@ -47,12 +52,15 @@ import TextInput from '#ui/TextInput';
 import { multiUserDetailsSchema } from './MultiUserDetailsSchema';
 import type { EmailPhoneInput } from '#components/EmailOrPhoneInput';
 import type { RelayScreenProps } from '#helpers/relayScreen';
+import type { ContactCardEditFormFragment_profile$key } from '#relayArtifacts/ContactCardEditFormFragment_profile.graphql';
 import type { MultiUserDetailsScreen_RemoveUserMutation } from '#relayArtifacts/MultiUserDetailsScreen_RemoveUserMutation.graphql';
 import type { MultiUserDetailsScreen_UpdateProfileMutation } from '#relayArtifacts/MultiUserDetailsScreen_UpdateProfileMutation.graphql';
 import type { MultiUserDetailsScreenQuery } from '#relayArtifacts/MultiUserDetailsScreenQuery.graphql';
 import type { ProfileRole } from '#relayArtifacts/MultiUserScreenQuery.graphql';
 import type { MultiUserDetailRoute } from '#routes';
 import type { ContactCardFormValues } from '#screens/ContactCardEditScreen/ContactCardSchema';
+import type { CountryCode } from 'libphonenumber-js';
+
 import type { Control } from 'react-hook-form';
 
 export type MultiUserDetailFormValues = ContactCardFormValues & {
@@ -74,6 +82,17 @@ const MultiUserDetailsScreen = ({
 
   const profile = node?.profile;
 
+  const {
+    contactCard,
+    logo,
+    avatar,
+    webCard,
+    id: profileId,
+  } = useFragment(
+    contactCardFormFragment,
+    profile as ContactCardEditFormFragment_profile$key,
+  );
+
   const phoneNumber =
     profile?.user?.phoneNumber && parsePhoneNumber(profile.user.phoneNumber);
 
@@ -88,18 +107,19 @@ const MultiUserDetailsScreen = ({
     shouldFocusError: true,
     defaultValues: {
       role: profile?.profileRole,
-      firstName: profile?.contactCard?.firstName,
-      lastName: profile?.contactCard?.lastName,
+      firstName: contactCard?.firstName,
+      lastName: contactCard?.lastName,
       //use .slice to tricks the readOnly coming from relay type.(using hard cast 'as' make it hard to read the code)
-      phoneNumbers: profile?.contactCard?.phoneNumbers?.slice() ?? [],
-      emails: profile?.contactCard?.emails?.slice() ?? [],
-      title: profile?.contactCard?.title,
-      company: profile?.contactCard?.company ?? undefined,
-      urls: profile?.contactCard?.urls?.slice() ?? [],
-      birthday: profile?.contactCard?.birthday,
-      socials: profile?.contactCard?.socials?.slice() ?? [],
-      addresses: profile?.contactCard?.addresses?.slice() ?? [],
-      avatar: profile?.avatar,
+      phoneNumbers:
+        contactCard?.phoneNumbers?.map(parseContactCardPhoneNumber) ?? [],
+      emails: contactCard?.emails?.slice() ?? [],
+      title: contactCard?.title,
+      company: contactCard?.company ?? undefined,
+      urls: contactCard?.urls?.slice() ?? [],
+      birthday: contactCard?.birthday,
+      socials: contactCard?.socials?.slice() ?? [],
+      addresses: contactCard?.addresses?.slice() ?? [],
+      avatar,
       selectedContact: profile?.user?.email
         ? {
             countryCodeOrEmail: 'email',
@@ -107,11 +127,11 @@ const MultiUserDetailsScreen = ({
           }
         : phoneNumber && phoneNumber?.isValid()
           ? {
-              countryCodeOrEmail: phoneNumber.country!,
+              countryCodeOrEmail: phoneNumber.country,
               value: phoneNumber.formatInternational()!,
             }
           : null,
-      logo: profile?.logo,
+      logo: webCard?.logo || logo,
     },
   });
 
@@ -124,57 +144,9 @@ const MultiUserDetailsScreen = ({
       ) {
         updateProfile(profileId: $profileId, input: $input) {
           profile {
-            id
-            contactCard {
-              firstName
-              lastName
-              title
-              company
-              emails {
-                label
-                address
-                selected
-              }
-              phoneNumbers {
-                label
-                number
-                selected
-              }
-              urls {
-                address
-                selected
-              }
-              addresses {
-                address
-                label
-                selected
-              }
-              birthday {
-                birthday
-                selected
-              }
-              socials {
-                url
-                label
-                selected
-              }
-            }
-            avatar {
-              id
-              uri: uri(width: 112, pixelRatio: $pixelRatio)
-            }
-            logo {
-              id
-              uri: uri(width: 180, pixelRatio: $pixelRatio)
-            }
-            user {
-              email
-              phoneNumber
-            }
+            ...ContactCardEditFormFragment_profile
+              @arguments(pixelRatio: $pixelRatio)
             profileRole
-            statsSummary {
-              contactCardScans
-            }
           }
         }
       }
@@ -236,46 +208,38 @@ const MultiUserDetailsScreen = ({
       const logoId =
         logo === null ? null : logo?.local ? uploadedLogoId : logo?.id;
 
+      if (avatar?.local && avatar && avatar?.uri) {
+        addLocalCachedMediaFile(avatarId, 'image', avatar.uri);
+      }
+      if (logo?.local && logoId && logo?.uri) {
+        addLocalCachedMediaFile(logoId, 'image', logo.uri);
+      }
+
       if (dirtyFields.role) Object.assign(input, { profileRole: role });
 
       commit({
         variables: {
-          profileId: profile.id,
+          profileId,
           input: {
             ...input,
             contactCard: {
               ...contactCard,
+              phoneNumbers: contactCard.phoneNumbers
+                ?.filter(phoneNumber => phoneNumber.number)
+                .map(({ countryCode, ...phoneNumber }) => {
+                  const number = getPhonenumberWithCountryCode(
+                    phoneNumber.number,
+                    countryCode as CountryCode,
+                  );
+                  return { ...phoneNumber, number };
+                }),
               avatarId,
               logoId,
             },
           },
           pixelRatio: CappedPixelRatio(),
         },
-        updater: (store, response) => {
-          if (
-            response?.updateProfile?.profile?.id === profileInfos?.profileId
-          ) {
-            store
-              .getRoot()
-              .getLinkedRecord('node', { id: profile.id })
-              ?.invalidateRecord();
-          }
-        },
         onCompleted: () => {
-          if (avatar && avatar?.uri) {
-            addLocalCachedMediaFile(
-              `${'image'.slice(0, 1)}:${avatarId}`,
-              'image',
-              avatar.uri,
-            );
-          }
-          if (logo && logo?.uri) {
-            addLocalCachedMediaFile(
-              `${'image'.slice(0, 1)}:${logo}`,
-              'image',
-              logo.uri,
-            );
-          }
           router.back();
         },
         onError: e => {
@@ -316,7 +280,7 @@ const MultiUserDetailsScreen = ({
   const lastName = watch('lastName');
   const role = watch('role');
 
-  const isCurrentProfile = profile?.id === profileInfos?.profileId;
+  const isCurrentProfile = profileId === profileInfos?.profileId;
 
   const [commitDelete, deletionIsActive] =
     useMutation<MultiUserDetailsScreen_RemoveUserMutation>(graphql`
@@ -337,11 +301,11 @@ const MultiUserDetailsScreen = ({
   }, [node, router]);
 
   const onRemoveUser = useCallback(() => {
-    if (profileInfos?.webCardId == null || profile == null) return;
+    if (webCard?.id == null) return;
     commitDelete({
       variables: {
-        webCardId: profileInfos?.webCardId,
-        input: [profile.id],
+        webCardId: webCard.id,
+        input: [profileId],
       },
       onCompleted: () => {
         router.back();
@@ -358,11 +322,7 @@ const MultiUserDetailsScreen = ({
         });
       },
       updater: (store, response) => {
-        if (
-          !response?.removeUsersFromWebCard?.includes(
-            fromGlobalId(profile.id).id,
-          )
-        ) {
+        if (!response?.removeUsersFromWebCard?.includes(profileId)) {
           Toast.show({
             type: 'error',
             text1: intl.formatMessage({
@@ -374,15 +334,15 @@ const MultiUserDetailsScreen = ({
           return;
         }
 
-        if (profile.webCard) {
-          const webCardRecord = store.get(profile.webCard.id);
+        if (webCard) {
+          const webCardRecord = store.get(webCard.id);
           if (webCardRecord) {
             const connection = ConnectionHandler.getConnection(
               webCardRecord,
               'MultiUserScreenUserList_webCard_connection_profiles',
             );
             if (connection) {
-              ConnectionHandler.deleteNode(connection, profile.id);
+              ConnectionHandler.deleteNode(connection, profileId);
             }
             //update the user counter profile?.webCard?.nbProfiles
             const nbProfiles = webCardRecord?.getValue('nbProfiles') as number;
@@ -391,7 +351,7 @@ const MultiUserDetailsScreen = ({
         }
       },
     });
-  }, [commitDelete, intl, profile, profileInfos?.webCardId, router]);
+  }, [commitDelete, intl, profileId, router, webCard]);
 
   const onConfirmRemoveUser = useCallback(() => {
     Alert.alert(
@@ -487,7 +447,7 @@ const MultiUserDetailsScreen = ({
           }
         />
         <ContactCardEditForm
-          webCard={profile.webCard}
+          webCard={webCard}
           control={control as unknown as Control<ContactCardFormValues>}
           footer={
             !isCurrentProfile &&
@@ -786,58 +746,13 @@ const multiUserDetailsScreenQuery = graphql`
   query MultiUserDetailsScreenQuery($profileId: ID!, $pixelRatio: Float!) {
     node(id: $profileId) {
       ... on Profile @alias(as: "profile") {
-        id
         profileRole
         promotedAsOwner
-        contactCard {
-          firstName
-          lastName
-          title
-          company
-          emails {
-            label
-            address
-            selected
-          }
-          phoneNumbers {
-            label
-            number
-            selected
-          }
-          urls {
-            address
-            selected
-          }
-          addresses {
-            address
-            label
-            selected
-          }
-          birthday {
-            birthday
-            selected
-          }
-          socials {
-            url
-            label
-            selected
-          }
-        }
-        avatar {
-          id
-          uri: uri(width: 112, pixelRatio: $pixelRatio)
-        }
-        logo {
-          id
-          uri: uri(width: 180, pixelRatio: $pixelRatio)
-        }
         user {
           email
           phoneNumber
         }
         webCard {
-          id
-          userName
           profilePendingOwner {
             id
             user {
@@ -845,39 +760,14 @@ const multiUserDetailsScreenQuery = graphql`
               phoneNumber
             }
           }
-          commonInformation {
-            company
-            addresses {
-              label
-              address
-            }
-            emails {
-              label
-              address
-            }
-            phoneNumbers {
-              label
-              number
-            }
-            urls {
-              address
-            }
-            socials {
-              label
-              url
-            }
-          }
-          logo {
-            id
-            uri: uri(width: 180, pixelRatio: $pixelRatio)
-          }
-          isMultiUser
         }
         nbContactCardScans
         statsSummary {
           day
           contactCardScans
         }
+        ...ContactCardEditFormFragment_profile
+          @arguments(pixelRatio: $pixelRatio)
       }
     }
   }

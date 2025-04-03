@@ -1,4 +1,4 @@
-import { Linking, View } from 'react-native';
+import { Linking, Platform, View } from 'react-native';
 import { swapColor } from '@azzapp/shared/cardHelpers';
 import {
   COVER_LINK_SIZE_TO_BORDER_RATIO,
@@ -77,8 +77,16 @@ export const SocialLinkRenderer = ({
             borderColor,
             alignItems: 'center',
             justifyContent: 'center',
+            filter:
+              hasShadow && Platform.OS === 'android' && Platform.Version >= 12
+                ? 'drop-shadow(0px 5px 10px rgba(0, 0, 0, 0.4))'
+                : undefined,
           },
-          hasShadow ? shadow({ appearance: 'dark' }) : undefined,
+          hasShadow &&
+          (Platform.OS === 'ios' ||
+            (Platform.OS === 'android' && Platform.Version < 12))
+            ? shadow({ appearance: 'dark' })
+            : undefined,
         ]}
       >
         <SocialIcon

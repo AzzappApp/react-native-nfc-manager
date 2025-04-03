@@ -11,6 +11,7 @@ import { maxAliasesPlugin } from '@escape.tech/graphql-armor-max-aliases';
 import { maxTokensPlugin } from '@escape.tech/graphql-armor-max-tokens';
 import { useDisableIntrospection } from '@graphql-yoga/plugin-disable-introspection';
 import { usePersistedOperations } from '@graphql-yoga/plugin-persisted-operations';
+import * as Sentry from '@sentry/nextjs';
 import { waitUntil } from '@vercel/functions';
 import { getVercelOidcToken } from '@vercel/functions/oidc';
 import { Kind, OperationTypeNode, type GraphQLError } from 'graphql';
@@ -27,13 +28,14 @@ import ERRORS from '@azzapp/shared/errors';
 import { AZZAPP_SERVER_HEADER } from '@azzapp/shared/urlHelpers';
 import queryMap from '#persisted-query-map.json';
 import { revalidateWebcardsAndPosts } from '#helpers/api';
-import { buildCoverAvatarUrl } from '#helpers/avatar';
 import { getServerIntl } from '#helpers/i18nHelpers';
 import { sendPushNotification } from '#helpers/notificationsHelpers';
 import { withPluginsRoute } from '#helpers/queries';
 import { notifyUsers } from '#helpers/sendMessages';
 import { checkServerAuth, getSessionData } from '#helpers/tokens';
+import { inngest } from '#inngest/client';
 import packageJSON from '../../../../package.json';
+import type { WebCard } from '@azzapp/data';
 import type { LogLevel, Plugin as YogaPlugin } from 'graphql-yoga';
 
 const LAST_SUPPORTED_APP_VERSION =
@@ -158,11 +160,39 @@ const { handleRequest } = createYoga({
       locale: locale ?? DEFAULT_LOCALE,
       notifyUsers,
       validateMailOrPhone,
-      buildCoverAvatarUrl,
       sendPushNotification,
       notifyApplePassWallet,
       notifyGooglePassWallet,
       intl: getServerIntl(locale ?? DEFAULT_LOCALE),
+      sendEmailSignatures: async (profileIds: string[], webCard: WebCard) => {
+        waitUntil(
+          inngest
+            .send({
+              name: 'batch/emailSignature',
+              data: {
+                profileIds,
+                webCard,
+              },
+            })
+            .catch(err => {
+              Sentry.captureException(err);
+            }),
+        );
+      },
+      notifyWebCardUsers: async (webCard: WebCard) => {
+        waitUntil(
+          inngest
+            .send({
+              name: 'batch/webCardUsersNotification',
+              data: {
+                webCard,
+              },
+            })
+            .catch(err => {
+              Sentry.captureException(err);
+            }),
+        );
+      },
     };
   },
   plugins: [

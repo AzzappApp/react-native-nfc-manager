@@ -14,10 +14,12 @@ import {
 import { db, transaction } from '../database';
 import { createId } from '../helpers/createId';
 import {
+  FCMTokenTable,
   FollowTable,
   PostTable,
   ProfileTable,
   RedirectWebCardTable,
+  UserTable,
   WebCardTable,
 } from '../schema';
 import { getUserById } from './userQueries';
@@ -470,3 +472,21 @@ export const markWebCardAsDeleted = async (webCardId: string, userId: string) =>
         ),
       );
   });
+
+export const getUsersToNotifyOnWebCard = async (webCardId: string) => {
+  return db()
+    .selectDistinct({
+      user: UserTable,
+    })
+    .from(UserTable)
+    .innerJoin(ProfileTable, eq(ProfileTable.userId, UserTable.id))
+    .innerJoin(FCMTokenTable, eq(FCMTokenTable.userId, UserTable.id)) // Only users with FCM token can be notified
+    .where(
+      and(
+        eq(ProfileTable.webCardId, webCardId),
+        ne(ProfileTable.deleted, true),
+        ne(UserTable.deleted, true),
+      ),
+    )
+    .then(res => res.map(({ user }) => user));
+};

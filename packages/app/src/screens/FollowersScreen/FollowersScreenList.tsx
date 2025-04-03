@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { View, StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { graphql, useMutation, usePaginationFragment } from 'react-relay';
 import { useDebounce } from 'use-debounce';
 import { convertToNonNullArray } from '@azzapp/shared/arrayHelpers';
+import EmptyContent from '#components/ui/EmptyContent';
 import WebCardList from '#components/WebCardList';
 import { getAuthState } from '#helpers/authStore';
 import { profileInfoHasEditorRight } from '#helpers/profileRoleHelper';
@@ -34,7 +36,7 @@ const FollowersScreenList = ({
         @refetchable(queryName: "FollowersListScreenQuery")
         @argumentDefinitions(
           after: { type: String }
-          first: { type: Int, defaultValue: 10 }
+          first: { type: Int, defaultValue: 50 }
           userName: { type: String, defaultValue: "" }
         ) {
           followers(after: $after, first: $first, userName: $userName)
@@ -54,7 +56,7 @@ const FollowersScreenList = ({
   useEffect(() => {
     // We need to refetch to see new coming followers (specially when we follow another webCard we have)
     refetch(
-      { first: 10, after: null },
+      { first: 50, after: null },
       {
         fetchPolicy: 'store-and-network',
       },
@@ -65,7 +67,7 @@ const FollowersScreenList = ({
 
   const onEndReached = useCallback(() => {
     if (!isLoadingNext && hasNext && !isRefreshing) {
-      loadNext(10);
+      loadNext(50);
     }
   }, [isLoadingNext, hasNext, isRefreshing, loadNext]);
 
@@ -144,7 +146,7 @@ const FollowersScreenList = ({
     if (debouncedSearch) {
       setIsRefreshing(true);
       const { dispose } = refetch(
-        { first: 10, userName: debouncedSearch, after: null },
+        { first: 50, userName: debouncedSearch, after: null },
         {
           fetchPolicy: 'store-and-network',
           onComplete() {
@@ -169,12 +171,29 @@ const FollowersScreenList = ({
       )}
       onEndReached={onEndReached}
       onToggleFollow={onToggleFollow}
-      noProfileFoundLabel={intl.formatMessage({
-        defaultMessage: 'No followers',
-        description:
-          'Message displayed in the followers screen when the user has no followers',
-      })}
+      ListEmptyComponent={<FollowersScreenListEmpty />}
     />
+  );
+};
+
+const FollowersScreenListEmpty = () => {
+  return (
+    <View style={styles.emptyScreenContainer}>
+      <EmptyContent
+        message={
+          <FormattedMessage
+            defaultMessage="No contact yet"
+            description="Empty followers message title"
+          />
+        }
+        description={
+          <FormattedMessage
+            defaultMessage="Seems like you have no follower yet..."
+            description="Empty followers list message content"
+          />
+        }
+      />
+    </View>
   );
 };
 
@@ -200,4 +219,11 @@ const updater = (
   }
 };
 
+const styles = StyleSheet.create({
+  emptyScreenContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
 export default FollowersScreenList;

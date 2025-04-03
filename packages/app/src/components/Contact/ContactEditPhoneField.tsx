@@ -1,14 +1,16 @@
+import {
+  parsePhoneNumberFromString,
+  type CountryCode,
+} from 'libphonenumber-js';
 import { Controller } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import { type TextInputProps } from 'react-native';
 import { colors } from '#theme';
 import { buildContactStyleSheet } from '#helpers/contactHelpers';
 import { createStyleSheet, useStyleSheet } from '#helpers/createStyles';
-import { isPhoneNumberValid } from '#helpers/phoneNumbersHelper';
 import CountryCodeListWithOptions from '#ui/CountryCodeListWithOptions';
-import TextInput from '#ui/TextInput';
+import TextInputWithPrefix from '#ui/TextInputWithPrefix';
 import ContactCardEditFieldWrapper from './ContactEditFieldWrapper';
-import type { CountryCode } from 'libphonenumber-js';
 import type { Control, FieldPath, FieldValues } from 'react-hook-form';
 
 export type PhoneInput = {
@@ -53,7 +55,7 @@ const ContactCardEditPhoneField = <TFieldValues extends FieldValues>({
       control={control}
       name={valueKey}
       render={({
-        field: { onChange, value, onBlur },
+        field: { onChange, value: inputValue, onBlur },
         fieldState: { error, isDirty },
       }) => (
         <ContactCardEditFieldWrapper
@@ -71,7 +73,10 @@ const ContactCardEditPhoneField = <TFieldValues extends FieldValues>({
             render={({
               field: { onChange: onChangeCountryCode, value: countryCode },
             }) => {
-              const isValid = isPhoneNumberValid(value, countryCode);
+              const phoneNumber = parsePhoneNumberFromString(
+                inputValue,
+                countryCode,
+              );
               return (
                 <>
                   <CountryCodeListWithOptions
@@ -90,14 +95,18 @@ const ContactCardEditPhoneField = <TFieldValues extends FieldValues>({
                         'Phone field- The accessibility hint for the country selector',
                     })}
                   />
-                  <TextInput
-                    value={value as string}
+                  <TextInputWithPrefix
+                    value={
+                      phoneNumber?.nationalNumber || (inputValue as string)
+                    }
                     onChangeText={
                       trim ? value => onChange(value.trim()) : onChange
                     }
-                    style={[styles.input, !isValid && styles.warning]}
+                    style={[
+                      styles.input,
+                      !phoneNumber?.isValid() && styles.warning,
+                    ]}
                     numberOfLines={4}
-                    multiline
                     keyboardType={keyboardType}
                     clearButtonMode="while-editing"
                     testID="contact-card-edit-modal-field"
@@ -106,6 +115,11 @@ const ContactCardEditPhoneField = <TFieldValues extends FieldValues>({
                     isErrored={!!error}
                     onBlur={onBlur}
                     autoFocus={isDirty}
+                    prefix={
+                      phoneNumber?.countryCallingCode
+                        ? `+${phoneNumber?.countryCallingCode}`
+                        : ''
+                    }
                   />
                 </>
               );

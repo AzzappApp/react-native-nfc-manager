@@ -11,7 +11,13 @@ import Icon from './Icon';
 import PressableNative from './PressableNative';
 import SelectList from './SelectList';
 import type { SelectListItemInfo } from './SelectList';
-import type { StyleProp, TextStyle, ViewProps, ViewStyle } from 'react-native';
+import type {
+  ImageStyle,
+  StyleProp,
+  TextStyle,
+  ViewProps,
+  ViewStyle,
+} from 'react-native';
 
 export type SelectItemInfo<ItemT> = SelectListItemInfo<ItemT> & {
   /**
@@ -103,6 +109,8 @@ type SelectProps<ItemT> = Omit<ViewProps, 'children'> & {
    * @default true
    */
   useFlatList?: boolean;
+
+  iconStyle?: ImageStyle;
 };
 
 /**
@@ -127,6 +135,7 @@ const Select = <ItemT,>({
   ListHeaderComponent,
   dismissKeyboardOnOpening,
   useFlatList,
+  iconStyle,
   ...props
 }: SelectProps<ItemT>) => {
   const [showDropDown, openDropDown, closeDropDown] = useBoolean(false);
@@ -191,15 +200,7 @@ const Select = <ItemT,>({
           <View />
         )}
         {props.disabled ? null : (
-          <Icon
-            icon="arrow_down"
-            style={{
-              width: 11,
-              height: 43,
-              marginLeft: 10,
-              marginRight: 10,
-            }}
-          />
+          <Icon icon="arrow_down" style={[styles.iconStyle, iconStyle]} />
         )}
       </PressableNative>
       <BottomSheetModal
@@ -255,5 +256,11 @@ const styleSheet = createStyleSheet(appearance => ({
   },
   error: {
     borderColor: colors.red400,
+  },
+  iconStyle: {
+    width: 11,
+    height: 43,
+    marginLeft: 10,
+    marginRight: 10,
   },
 }));

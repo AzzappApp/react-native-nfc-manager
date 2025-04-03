@@ -14,7 +14,6 @@ import {
   PHOTO_WITH_TEXT_AND_TITLE_TEXT_MAX_LENGTH,
 } from '@azzapp/shared/cardModuleHelpers';
 import { isNotFalsyString } from '@azzapp/shared/stringHelpers';
-import { changeModuleRequireSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { colors } from '#theme';
 import AnimatedDataOverride from '#components/AnimatedDataOverride';
 import ImagePicker, {
@@ -139,7 +138,6 @@ const PhotoWithTextAndTitleEditionScreen = ({
         }
         webCard {
           id
-          cardIsPublished
           coverBackgroundColor
           cardColors {
             primary
@@ -158,10 +156,6 @@ const PhotoWithTextAndTitleEditionScreen = ({
             titleFontFamily
             titleFontSize
           }
-          cardModules {
-            id
-          }
-          isPremium
           ...PhotoWithTextAndTitleSettingsEditionPanel_webCard
           ...ModuleEditionScreenTitle_webCard
         }
@@ -280,10 +274,6 @@ const PhotoWithTextAndTitleEditionScreen = ({
     (dirty || touched) && isValid && !saving && !progressIndicator;
   const router = useRouter();
   const intl = useIntl();
-
-  const cardModulesCount =
-    (profile.webCard?.cardModules.length ?? 0) +
-    (photoWithTextAndTitle ? 0 : 1);
 
   const onCancel = router.back;
 
@@ -435,20 +425,6 @@ const PhotoWithTextAndTitleEditionScreen = ({
       return;
     }
 
-    const requireSubscription = changeModuleRequireSubscription(
-      'photoWithTextAndTitle',
-      cardModulesCount,
-    );
-
-    if (
-      profile.webCard?.cardIsPublished &&
-      requireSubscription &&
-      !profile.webCard?.isPremium
-    ) {
-      router.push({ route: 'USER_PAY_WALL' });
-      return;
-    }
-
     setProgressIndicator(Observable.from(0));
 
     const { image: updateImage, ...rest } = value;
@@ -536,7 +512,6 @@ const PhotoWithTextAndTitleEditionScreen = ({
   }, [
     canSave,
     profile.webCard,
-    cardModulesCount,
     value,
     photoWithTextAndTitle?.id,
     titleFontSize,
@@ -599,7 +574,6 @@ const PhotoWithTextAndTitleEditionScreen = ({
               description: 'PhotoWithTextAndTitle text screen title',
             })}
             kind="photoWithTextAndTitle"
-            moduleCount={cardModulesCount}
             webCardKey={profile.webCard}
           />
         }

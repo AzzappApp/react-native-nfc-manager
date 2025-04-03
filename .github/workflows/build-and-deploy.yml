@@ -30,6 +30,10 @@ jobs:
 
       - name: Setup
         uses: ./.github/actions/setup
+      
+      - name: Put staging translations to production
+        run: yarn i18n:merge
+        if: github.ref == 'refs/heads/stable'
 
       - name: Pull translations
         uses: ./.github/actions/i18n-pull
@@ -443,6 +447,7 @@ jobs:
           PRIVACY_POLICY: https://web.azzapp.com/legal/privacy
           ABOUT: https://web.azzapp.com/company/about_us
           FAQ: https://web.azzapp.com/company/faq
+          APP_SCHEME: ${{ vars.APP_SCHEME }}
           ANDROID_APP_IDENTIFIER: ${{ vars.ANDROID_APP_IDENTIFIER }}
           ANDROID_BUILD_TASK: ${{ vars.ANDROID_BUILD_TASK }}
           ANDROID_KEYSTORE_PATH: ${{ github.workspace }}/keystore.jks

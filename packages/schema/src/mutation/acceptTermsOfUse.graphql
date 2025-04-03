@@ -3,5 +3,5 @@ extend type Mutation {
 }
 
 type AcceptTermsOfUsePayload {
-  user: User
+  user: User!
 }

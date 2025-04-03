@@ -136,12 +136,12 @@ describe('HomeBottomSheetPopupPanel', () => {
       environment.mock.getMostRecentOperation().request.node.operation.name,
     ).toBe('HomeBottomSheetPopupPanelMutation');
 
-    expect(environment.mock.getMostRecentOperation().request.variables).toEqual(
-      {
-        webCardId: 'test-webCard',
-        input: { userName: newUserName },
-      },
-    );
+    expect(
+      environment.mock.getMostRecentOperation().request.variables,
+    ).toMatchObject({
+      webCardId: 'test-webCard',
+      input: { userName: newUserName },
+    });
 
     // Resolve the mutation
     act(() => {

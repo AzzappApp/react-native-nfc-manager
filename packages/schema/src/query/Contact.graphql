@@ -21,6 +21,14 @@ type Contact {
   urls: [ContactUrl!]
   deleted: Boolean
   logo: Media
+  meetingPlace: Address
+}
+
+type Address {
+  city: String
+  country: String
+  subregion: String
+  region: String
 }
 
 type ContactUrl {

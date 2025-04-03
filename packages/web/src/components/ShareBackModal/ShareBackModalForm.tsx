@@ -5,7 +5,7 @@ import cx from 'classnames';
 import { useEffect, useRef } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { SuccessIcon } from '#assets';
+import { CheckRoundIcon } from '#assets';
 import { processShareBackSubmission } from '#app/actions/shareBackAction';
 import Loader from '#components/Loader';
 import Button from '#ui/Button';
@@ -47,7 +47,9 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
   const [form, fields] = useForm({
     lastResult,
     onValidate({ formData }) {
-      const isValid = parseWithZod(formData, { schema: ShareBackFormSchema });
+      const isValid = parseWithZod(formData, {
+        schema: ShareBackFormSchema,
+      });
       return isValid;
     },
     shouldValidate: 'onSubmit',
@@ -244,7 +246,12 @@ const ShareBackModalForm = (props: ShareBackModalContentProps) => {
         </div>
         <ShareBackFormSubmitButton
           isDirty={form.dirty}
-          hasErrors={(form.errors?.length ?? 0) > 0}
+          hasErrors={
+            (form.errors?.length ?? 0) > 0 ||
+            (!fields.firstName.value &&
+              !fields.lastName.value &&
+              !fields.company.value)
+          }
           isSuccess={lastResult?.status === 'success'}
         />
       </form>
@@ -298,7 +305,7 @@ const ShareBackFormSubmitButton = ({
                 isSuccess ? styles.formButtonSuccess : '',
               )}
             >
-              <SuccessIcon
+              <CheckRoundIcon
                 className={cx(
                   styles.formButtonSuccessSvg,
                   isSuccess ? styles.formButtonSuccess : '',

@@ -169,6 +169,7 @@ exports[`ShareContact buildVCardFromAzzappContact with avatar 1`] = `
   "definedElements": {
     "fullname": true,
     "name": true,
+    "photo": true,
   },
   "fileExtension": "vcf",
   "filename": "vcard",
@@ -187,6 +188,10 @@ exports[`ShareContact buildVCardFromAzzappContact with avatar 1`] = `
     {
       "key": "FN;CHARSET=utf-8",
       "value": "",
+    },
+    {
+      "key": "PHOTO;ENCODING=b;TYPE=JPEG",
+      "value": "<BASE64DATA>",
     },
   ],
   "useVCalendar": false,

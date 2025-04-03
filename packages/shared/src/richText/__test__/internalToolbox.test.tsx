@@ -8,26 +8,32 @@ describe('RichText: Internal functions', () => {
     test('deleteTagFromNode simple', () => {
       let result: RichTextASTNode | undefined =
         parseHTMLToRichText('a<i>a</i>a');
-      result = deleteTagFromRichTextAST(result, 'i');
+      result = deleteTagFromRichTextAST(result, ['i']);
       checkResultASTAsString(result, 'aaa');
     });
     test('deleteTagFromNode nested 1', () => {
       let result: RichTextASTNode | undefined =
         parseHTMLToRichText('a<i><b>a</b></i>a');
-      result = deleteTagFromRichTextAST(result, 'i');
+      result = deleteTagFromRichTextAST(result, ['i']);
       checkResultASTAsString(result, 'a<b>a</b>a');
     });
     test('deleteTagFromNode nested 2', () => {
       let result: RichTextASTNode | undefined =
         parseHTMLToRichText('a<b><i>a</i></b>a');
-      result = deleteTagFromRichTextAST(result, 'i');
+      result = deleteTagFromRichTextAST(result, ['i']);
       checkResultASTAsString(result, 'a<b>a</b>a');
     });
     test('deleteTagFromNode invalid tag', () => {
       let result: RichTextASTNode | undefined =
         parseHTMLToRichText('a<b><i>a</i></b>a');
-      result = deleteTagFromRichTextAST(result, 'GGG');
+      result = deleteTagFromRichTextAST(result, ['GGG']);
       checkResultASTAsString(result, 'a<b><i>a</i></b>a');
+    });
+    test('deleteTagFromNode multiple tag', () => {
+      let result: RichTextASTNode | undefined =
+        parseHTMLToRichText('a<b><i>a</i></b>a');
+      result = deleteTagFromRichTextAST(result, ['b', 'i']);
+      checkResultASTAsString(result, 'aaa');
     });
   });
   describe('simplifyAST', () => {

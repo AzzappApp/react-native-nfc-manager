@@ -15,8 +15,10 @@ import type { Control } from 'react-hook-form';
 
 const ContactCardEditModalUrls = ({
   control,
+  isPremium,
 }: {
   control: Control<ContactCardFormValues>;
+  isPremium?: boolean | null;
 }) => {
   const { fields, append, remove } = useFieldArray({
     control,
@@ -48,6 +50,8 @@ const ContactCardEditModalUrls = ({
                 'ContactCardEditModalUrls - Error message when a url is wrongly formatted',
             })}
             trim
+            isPremium={isPremium}
+            requiresPremium
           />
           <Separation small />
         </Fragment>

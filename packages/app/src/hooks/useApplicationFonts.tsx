@@ -1,129 +1,101 @@
-import {
-  AmaticSC_700Bold,
-  AmaticSC_400Regular,
-} from '@expo-google-fonts/amatic-sc';
-import { Anton_400Regular } from '@expo-google-fonts/anton';
-import {
-  Archivo_300Light,
-  Archivo_300Light_Italic,
-  Archivo_600SemiBold,
-  Archivo_600SemiBold_Italic,
-  Archivo_900Black,
-} from '@expo-google-fonts/archivo';
-import { BebasNeue_400Regular } from '@expo-google-fonts/bebas-neue';
-import { Cardo_400Regular } from '@expo-google-fonts/cardo';
-import { Cinzel_400Regular } from '@expo-google-fonts/cinzel';
-import {
-  CormorantGaramond_400Regular,
-  CormorantGaramond_400Regular_Italic,
-  CormorantGaramond_600SemiBold,
-  CormorantGaramond_600SemiBold_Italic,
-  CormorantGaramond_700Bold,
-  CormorantGaramond_700Bold_Italic,
-} from '@expo-google-fonts/cormorant-garamond';
-import {
-  CourierPrime_400Regular,
-  CourierPrime_400Regular_Italic,
-  CourierPrime_700Bold,
-  CourierPrime_700Bold_Italic,
-} from '@expo-google-fonts/courier-prime';
-import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
-import { FaunaOne_400Regular } from '@expo-google-fonts/fauna-one';
-import {
-  Fraunces_300Light,
-  Fraunces_300Light_Italic,
-  Fraunces_600SemiBold,
-  Fraunces_600SemiBold_Italic,
-} from '@expo-google-fonts/fraunces';
-import { GildaDisplay_400Regular } from '@expo-google-fonts/gilda-display';
-import { Gloock_400Regular } from '@expo-google-fonts/gloock';
-import { GreatVibes_400Regular } from '@expo-google-fonts/great-vibes';
-import {
-  Inter_400Regular,
-  Inter_400Regular_Italic,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_600SemiBold_Italic,
-  Inter_900Black,
-} from '@expo-google-fonts/inter';
-import {
-  JosefinSans_400Regular,
-  JosefinSans_400Regular_Italic,
-  JosefinSans_600SemiBold,
-  JosefinSans_600SemiBold_Italic,
-} from '@expo-google-fonts/josefin-sans';
-import {
-  Jost_400Regular,
-  Jost_400Regular_Italic,
-  Jost_600SemiBold,
-  Jost_600SemiBold_Italic,
-} from '@expo-google-fonts/jost';
-import { KaushanScript_400Regular } from '@expo-google-fonts/kaushan-script';
-import { Koulen_400Regular } from '@expo-google-fonts/koulen';
-import { Lexend_800ExtraBold } from '@expo-google-fonts/lexend';
-import { LibreBaskerville_400Regular_Italic } from '@expo-google-fonts/libre-baskerville';
-import { LibreCaslonDisplay_400Regular } from '@expo-google-fonts/libre-caslon-display';
-import { LibreCaslonText_400Regular } from '@expo-google-fonts/libre-caslon-text';
-import { Limelight_400Regular } from '@expo-google-fonts/limelight';
-import { Lora_400Regular, Lora_700Bold } from '@expo-google-fonts/lora';
-import {
-  Manrope_200ExtraLight,
-  Manrope_300Light,
-  Manrope_400Regular,
-} from '@expo-google-fonts/manrope';
-import { Monoton_400Regular } from '@expo-google-fonts/monoton';
-import {
-  Montserrat_400Regular,
-  Montserrat_400Regular_Italic,
-  Montserrat_600SemiBold,
-  Montserrat_600SemiBold_Italic,
-} from '@expo-google-fonts/montserrat';
-import { MrDafoe_400Regular } from '@expo-google-fonts/mr-dafoe';
-import {
-  OpenSans_400Regular,
-  OpenSans_400Regular_Italic,
-  OpenSans_600SemiBold,
-  OpenSans_600SemiBold_Italic,
-} from '@expo-google-fonts/open-sans';
-import { Outfit_500Medium } from '@expo-google-fonts/outfit';
-import { PlayfairDisplay_700Bold } from '@expo-google-fonts/playfair-display';
-import {
-  PlusJakartaSans_300Light,
-  PlusJakartaSans_300Light_Italic,
-  PlusJakartaSans_400Regular,
-  PlusJakartaSans_600SemiBold,
-  PlusJakartaSans_600SemiBold_Italic,
-  PlusJakartaSans_800ExtraBold,
-} from '@expo-google-fonts/plus-jakarta-sans';
-import {
-  Poppins_400Regular,
-  Poppins_600SemiBold,
-  Poppins_700Bold,
-  Poppins_900Black,
-} from '@expo-google-fonts/poppins';
-import {
-  Raleway_400Regular,
-  Raleway_400Regular_Italic,
-  Raleway_600SemiBold,
-  Raleway_600SemiBold_Italic,
-} from '@expo-google-fonts/raleway';
-import { Righteous_400Regular } from '@expo-google-fonts/righteous';
-import { Rubik_700Bold } from '@expo-google-fonts/rubik';
-import { Rye_400Regular } from '@expo-google-fonts/rye';
-import { SeaweedScript_400Regular } from '@expo-google-fonts/seaweed-script';
-import { SixCaps_400Regular } from '@expo-google-fonts/six-caps';
-import {
-  SourceSans3_400Regular,
-  SourceSans3_400Regular_Italic,
-  SourceSans3_600SemiBold,
-  SourceSans3_600SemiBold_Italic,
-} from '@expo-google-fonts/source-sans-3';
 import { SourceSansPro_400Regular } from '@expo-google-fonts/source-sans-pro';
-import { Ultra_400Regular } from '@expo-google-fonts/ultra';
-import { WaterBrush_400Regular } from '@expo-google-fonts/water-brush';
-import { YesevaOne_400Regular } from '@expo-google-fonts/yeseva-one';
 import { matchFont, Skia } from '@shopify/react-native-skia';
 import { useFonts } from 'expo-font';
+import { AmaticSC_400Regular } from 'expo-google-fonts-amatic-sc/400Regular';
+import { AmaticSC_700Bold } from 'expo-google-fonts-amatic-sc/700Bold';
+import { Anton_400Regular } from 'expo-google-fonts-anton/400Regular';
+import { Archivo_300Light } from 'expo-google-fonts-archivo/300Light';
+import { Archivo_300Light_Italic } from 'expo-google-fonts-archivo/300Light_Italic';
+import { Archivo_600SemiBold } from 'expo-google-fonts-archivo/600SemiBold';
+import { Archivo_600SemiBold_Italic } from 'expo-google-fonts-archivo/600SemiBold_Italic';
+import { Archivo_900Black } from 'expo-google-fonts-archivo/900Black';
+import { BebasNeue_400Regular } from 'expo-google-fonts-bebas-neue/400Regular';
+import { Cardo_400Regular } from 'expo-google-fonts-cardo/400Regular';
+import { Cinzel_400Regular } from 'expo-google-fonts-cinzel/400Regular';
+import { CormorantGaramond_400Regular } from 'expo-google-fonts-cormorant-garamond/400Regular';
+import { CormorantGaramond_400Regular_Italic } from 'expo-google-fonts-cormorant-garamond/400Regular_Italic';
+import { CormorantGaramond_600SemiBold } from 'expo-google-fonts-cormorant-garamond/600SemiBold';
+import { CormorantGaramond_600SemiBold_Italic } from 'expo-google-fonts-cormorant-garamond/600SemiBold_Italic';
+import { CormorantGaramond_700Bold } from 'expo-google-fonts-cormorant-garamond/700Bold';
+import { CormorantGaramond_700Bold_Italic } from 'expo-google-fonts-cormorant-garamond/700Bold_Italic';
+import { CourierPrime_400Regular } from 'expo-google-fonts-courier-prime/400Regular';
+import { CourierPrime_400Regular_Italic } from 'expo-google-fonts-courier-prime/400Regular_Italic';
+import { CourierPrime_700Bold } from 'expo-google-fonts-courier-prime/700Bold';
+import { CourierPrime_700Bold_Italic } from 'expo-google-fonts-courier-prime/700Bold_Italic';
+import { DMSerifDisplay_400Regular } from 'expo-google-fonts-dm-serif-display/400Regular';
+import { FaunaOne_400Regular } from 'expo-google-fonts-fauna-one/400Regular';
+import { Fraunces_300Light } from 'expo-google-fonts-fraunces/300Light';
+import { Fraunces_300Light_Italic } from 'expo-google-fonts-fraunces/300Light_Italic';
+import { Fraunces_600SemiBold } from 'expo-google-fonts-fraunces/600SemiBold';
+import { Fraunces_600SemiBold_Italic } from 'expo-google-fonts-fraunces/600SemiBold_Italic';
+import { GildaDisplay_400Regular } from 'expo-google-fonts-gilda-display/400Regular';
+import { Gloock_400Regular } from 'expo-google-fonts-gloock/400Regular';
+import { GreatVibes_400Regular } from 'expo-google-fonts-great-vibes/400Regular';
+import { Inter_400Regular } from 'expo-google-fonts-inter/400Regular';
+import { Inter_400Regular_Italic } from 'expo-google-fonts-inter/400Regular_Italic';
+import { Inter_500Medium } from 'expo-google-fonts-inter/500Medium';
+import { Inter_600SemiBold } from 'expo-google-fonts-inter/600SemiBold';
+import { Inter_600SemiBold_Italic } from 'expo-google-fonts-inter/600SemiBold_Italic';
+import { Inter_900Black } from 'expo-google-fonts-inter/900Black';
+import { JosefinSans_400Regular } from 'expo-google-fonts-josefin-sans/400Regular';
+import { JosefinSans_400Regular_Italic } from 'expo-google-fonts-josefin-sans/400Regular_Italic';
+import { JosefinSans_600SemiBold } from 'expo-google-fonts-josefin-sans/600SemiBold';
+import { JosefinSans_600SemiBold_Italic } from 'expo-google-fonts-josefin-sans/600SemiBold_Italic';
+import { Jost_400Regular } from 'expo-google-fonts-jost/400Regular';
+import { Jost_400Regular_Italic } from 'expo-google-fonts-jost/400Regular_Italic';
+import { Jost_600SemiBold } from 'expo-google-fonts-jost/600SemiBold';
+import { Jost_600SemiBold_Italic } from 'expo-google-fonts-jost/600SemiBold_Italic';
+import { KaushanScript_400Regular } from 'expo-google-fonts-kaushan-script/400Regular';
+import { Koulen_400Regular } from 'expo-google-fonts-koulen/400Regular';
+import { Lexend_800ExtraBold } from 'expo-google-fonts-lexend/800ExtraBold';
+import { LibreBaskerville_400Regular_Italic } from 'expo-google-fonts-libre-baskerville/400Regular_Italic';
+import { LibreCaslonDisplay_400Regular } from 'expo-google-fonts-libre-caslon-display/400Regular';
+import { LibreCaslonText_400Regular } from 'expo-google-fonts-libre-caslon-text/400Regular';
+import { Limelight_400Regular } from 'expo-google-fonts-limelight/400Regular';
+import { Lora_400Regular } from 'expo-google-fonts-lora/400Regular';
+import { Lora_700Bold } from 'expo-google-fonts-lora/700Bold';
+import { Manrope_200ExtraLight } from 'expo-google-fonts-manrope/200ExtraLight';
+import { Manrope_300Light } from 'expo-google-fonts-manrope/300Light';
+import { Manrope_400Regular } from 'expo-google-fonts-manrope/400Regular';
+import { Monoton_400Regular } from 'expo-google-fonts-monoton/400Regular';
+import { Montserrat_400Regular } from 'expo-google-fonts-montserrat/400Regular';
+import { Montserrat_400Regular_Italic } from 'expo-google-fonts-montserrat/400Regular_Italic';
+import { Montserrat_600SemiBold } from 'expo-google-fonts-montserrat/600SemiBold';
+import { Montserrat_600SemiBold_Italic } from 'expo-google-fonts-montserrat/600SemiBold_Italic';
+import { MrDafoe_400Regular } from 'expo-google-fonts-mr-dafoe/400Regular';
+import { OpenSans_400Regular } from 'expo-google-fonts-open-sans/400Regular';
+import { OpenSans_400Regular_Italic } from 'expo-google-fonts-open-sans/400Regular_Italic';
+import { OpenSans_600SemiBold } from 'expo-google-fonts-open-sans/600SemiBold';
+import { OpenSans_600SemiBold_Italic } from 'expo-google-fonts-open-sans/600SemiBold_Italic';
+import { Outfit_500Medium } from 'expo-google-fonts-outfit/500Medium';
+import { PlayfairDisplay_700Bold } from 'expo-google-fonts-playfair-display/700Bold';
+import { PlusJakartaSans_300Light } from 'expo-google-fonts-plus-jakarta-sans/300Light';
+import { PlusJakartaSans_300Light_Italic } from 'expo-google-fonts-plus-jakarta-sans/300Light_Italic';
+import { PlusJakartaSans_400Regular } from 'expo-google-fonts-plus-jakarta-sans/400Regular';
+import { PlusJakartaSans_600SemiBold } from 'expo-google-fonts-plus-jakarta-sans/600SemiBold';
+import { PlusJakartaSans_600SemiBold_Italic } from 'expo-google-fonts-plus-jakarta-sans/600SemiBold_Italic';
+import { PlusJakartaSans_800ExtraBold } from 'expo-google-fonts-plus-jakarta-sans/800ExtraBold';
+import { Poppins_400Regular } from 'expo-google-fonts-poppins/400Regular';
+import { Poppins_600SemiBold } from 'expo-google-fonts-poppins/600SemiBold';
+import { Poppins_700Bold } from 'expo-google-fonts-poppins/700Bold';
+import { Poppins_900Black } from 'expo-google-fonts-poppins/900Black';
+import { Raleway_400Regular } from 'expo-google-fonts-raleway/400Regular';
+import { Raleway_400Regular_Italic } from 'expo-google-fonts-raleway/400Regular_Italic';
+import { Raleway_600SemiBold } from 'expo-google-fonts-raleway/600SemiBold';
+import { Raleway_600SemiBold_Italic } from 'expo-google-fonts-raleway/600SemiBold_Italic';
+import { Righteous_400Regular } from 'expo-google-fonts-righteous/400Regular';
+import { Rubik_700Bold } from 'expo-google-fonts-rubik/700Bold';
+import { Rye_400Regular } from 'expo-google-fonts-rye/400Regular';
+import { SeaweedScript_400Regular } from 'expo-google-fonts-seaweed-script/400Regular';
+import { SixCaps_400Regular } from 'expo-google-fonts-six-caps/400Regular';
+import { SourceSans3_400Regular } from 'expo-google-fonts-source-sans-3/400Regular';
+import { SourceSans3_400Regular_Italic } from 'expo-google-fonts-source-sans-3/400Regular_Italic';
+import { SourceSans3_600SemiBold } from 'expo-google-fonts-source-sans-3/600SemiBold';
+import { SourceSans3_600SemiBold_Italic } from 'expo-google-fonts-source-sans-3/600SemiBold_Italic';
+import { Ultra_400Regular } from 'expo-google-fonts-ultra/400Regular';
+import { WaterBrush_400Regular } from 'expo-google-fonts-water-brush/400Regular';
+import { YesevaOne_400Regular } from 'expo-google-fonts-yeseva-one/400Regular';
+
 import { Image } from 'react-native';
 import type { ApplicationFonts } from '@azzapp/shared/fontHelpers';
 import type { SkTypefaceFontProvider } from '@shopify/react-native-skia';

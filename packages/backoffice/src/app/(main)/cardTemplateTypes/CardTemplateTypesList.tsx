@@ -43,8 +43,7 @@ const CardTemplateTypesList = ({
       (statusFilter === 'All' ||
         (type.status ? 'Enabled' : 'Disabled') === statusFilter) &&
       (!deferredSearch ||
-        type.label?.toLowerCase().includes(deferredSearch.toLowerCase()) ||
-        type.category.toLowerCase().includes(deferredSearch.toLowerCase())),
+        type.label?.toLowerCase().includes(deferredSearch.toLowerCase())),
   );
 
   return (

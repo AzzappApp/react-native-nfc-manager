@@ -25,9 +25,6 @@ import type {
 
 let environment: Environment | null;
 
-type RelayEnvironmentListener = (event: 'reset') => void;
-const listeners: RelayEnvironmentListener[] = [];
-
 export const getRelayEnvironment = () => {
   if (!environment) {
     init();
@@ -35,22 +32,12 @@ export const getRelayEnvironment = () => {
   return environment!;
 };
 
-export const addEnvironmentListener = (listener: RelayEnvironmentListener) => {
-  listeners.push(listener);
-  return () => {
-    const index = listeners.indexOf(listener);
-    if (index !== -1) {
-      listeners.splice(index, 1);
-    }
-  };
-};
-
 const init = () => {
   createEnvironment();
   let authState = getAuthState();
   addAuthStateListener(newAuthState => {
     if (!newAuthState.authenticated && authState.authenticated) {
-      resetEnvironment();
+      createEnvironment();
     }
     authState = newAuthState;
   });
@@ -238,7 +225,7 @@ const createNetwork = () => {
             if (sink.closed) {
               return;
             }
-            if (isAbortError(error)) {
+            if (isAbortError(error) || error.message === ERRORS.INVALID_TOKEN) {
               sink.complete();
             } else {
               sink.error(error);
@@ -294,8 +281,3 @@ const missingFieldHandlers: MissingFieldHandler[] = [
     kind: 'linked',
   },
 ];
-
-const resetEnvironment = () => {
-  createEnvironment();
-  listeners.forEach(listener => listener('reset'));
-};

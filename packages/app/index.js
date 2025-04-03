@@ -1,7 +1,7 @@
 require('#helpers/reactIntlPolyfillHelper');
+import 'react-native-url-polyfill/auto';
 import messaging from '@react-native-firebase/messaging';
 import { AppRegistry } from 'react-native';
-import { name as appName } from './app.json';
 import App from './src/App';
 
 messaging().setBackgroundMessageHandler(async () => {
@@ -10,4 +10,4 @@ messaging().setBackgroundMessageHandler(async () => {
   // It must not attempt to update any UI (e.g. via state) - you can however perform network requests, update local storage etc.
 });
 
-AppRegistry.registerComponent(appName, () => App);
+AppRegistry.registerComponent('azzapp', () => App);

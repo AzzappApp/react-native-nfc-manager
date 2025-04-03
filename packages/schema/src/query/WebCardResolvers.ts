@@ -4,7 +4,6 @@ import {
   fromGlobalId,
 } from 'graphql-relay';
 import {
-  getCompanyActivitiesByWebCardCategory,
   getWebCardPosts,
   getLikedPosts,
   getFollowerProfiles,
@@ -13,7 +12,6 @@ import {
   getWebCardProfiles,
   countWebCardProfiles,
   getWebCardPendingOwnerProfile,
-  getLastSubscription,
   getFilterCoverTemplateTypes,
   getCoverTemplatesByTypesAndTag,
   countDeletedWebCardProfiles,
@@ -21,19 +19,15 @@ import {
   getContactCountWithWebcardId,
   getAllOwnerProfilesByWebcardId,
 } from '@azzapp/data';
-import { DEFAULT_LOCALE } from '@azzapp/i18n';
+import { buildCoverAvatarUrl } from '@azzapp/service/mediaServices';
 import { getPreviewVideoForModule } from '@azzapp/shared/cloudinaryHelpers';
 import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
 import { webCardRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
-import { buildCoverAvatarUrl } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
 import {
-  activeSubscriptionsForUserLoader,
+  subscriptionsForUserLoader,
   cardModuleByWebCardLoader,
-  companyActivityLoader,
-  companyActivityTypeLoader,
   followingsLoader,
-  labelLoader,
   profileByWebCardIdAndUserIdLoader,
   webCardCategoryLoader,
   webCardOwnerLoader,
@@ -56,22 +50,9 @@ import fromGlobalIdWithType, {
   maybeFromGlobalIdWithType,
 } from '#helpers/relayIdHelpers';
 import type {
-  CompanyActivityResolvers,
-  CompanyActivityTypeResolvers,
   WebCardCategoryResolvers,
   WebCardResolvers,
 } from '#/__generated__/types';
-
-const getActivityName = async (companyActivityId: string, locale: string) => {
-  const activity = companyActivityId
-    ? await companyActivityLoader.load(companyActivityId)
-    : null;
-  const activityName = activity?.id
-    ? ((await labelLoader.load([activity.id, locale])) ??
-      (await labelLoader.load([activity.id, DEFAULT_LOCALE])))
-    : null;
-  return activityName?.value;
-};
 
 export const WebCard: ProtectedResolver<WebCardResolvers> = {
   id: idResolver('WebCard'),
@@ -183,10 +164,9 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
       : null;
   },
   // TODO: should it be protected?
-  companyActivity: async webCard => {
-    return webCard.companyActivityId
-      ? companyActivityLoader.load(webCard.companyActivityId)
-      : null;
+  companyActivity: () => {
+    // deprecated, shall be removed
+    return null;
   },
   coverMedia: async (webCard, _) => {
     return webCard.coverMediaId
@@ -218,9 +198,8 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
     if (!(await hasWebCardProfileRight(webCard.id))) {
       return false;
     }
-    const modules = await cardModuleByWebCardLoader.load(webCard.id);
 
-    return webCardRequiresSubscription(modules, {
+    return webCardRequiresSubscription({
       webCardKind: newWebCardKind ?? webCard.webCardKind,
       isMultiUser: webCard.isMultiUser,
     });
@@ -231,7 +210,7 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
     }
     const owner = await webCardOwnerLoader.load(webCard.id);
     const subscriptions = owner
-      ? await activeSubscriptionsForUserLoader.load(owner.id)
+      ? await subscriptionsForUserLoader.load(owner.id)
       : null;
 
     const subscription = subscriptions?.find(
@@ -248,9 +227,14 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
     //cannot use the loader here (when IAP sub), can't find a way to for revalidation in api route.
     //Got a bug where the subscription is canceled however still active in the result set
     const subscriptions = owner
-      ? await activeSubscriptionsForUserLoader.load(owner.id)
+      ? await subscriptionsForUserLoader.load(owner.id)
       : null;
-    return !!subscriptions?.[0];
+    const lastSubscription = subscriptions?.[0];
+    return !!(
+      lastSubscription &&
+      (lastSubscription.status === 'active' ||
+        lastSubscription.endAt > new Date())
+    );
   },
   isFollowing: async (webCard, { webCardId: gqlWebCardId }) => {
     if (!gqlWebCardId) {
@@ -507,9 +491,9 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
       return null;
     }
 
-    const subscription = await getLastSubscription(owner.id);
+    const subscription = await subscriptionsForUserLoader.load(owner.id);
 
-    return subscription ?? null;
+    return subscription.length > 0 ? subscription[0] : null;
   },
   logo: async webCard =>
     webCard.logoId && (await hasWebCardProfileRight(webCard.id))
@@ -536,7 +520,6 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
     const coverTemplates = await getCoverTemplatesByTypesAndTag(
       coverTemplatesTypes.map(t => t.id),
       tagId,
-      webCard.companyActivityId,
     );
 
     return connectionFromSortedArray(
@@ -566,17 +549,7 @@ export const WebCard: ProtectedResolver<WebCardResolvers> = {
     });
   },
   companyActivityLabel: async webCard => {
-    if (webCard.companyActivityLabel && webCard.companyActivityLabel !== '') {
-      return webCard.companyActivityLabel;
-    } else if (webCard.companyActivityId) {
-      const { locale } = getSessionInfos();
-      const activityName = await getActivityName(
-        webCard.companyActivityId,
-        locale,
-      );
-      return activityName || null;
-    }
-    return null;
+    return webCard.companyActivityLabel;
   },
   coverIsPredefined: async webCard => webCard.coverIsPredefined,
   coverIsLogoPredefined: async webCard => webCard.coverIsLogoPredefined,
@@ -586,24 +559,10 @@ export const WebCardCategory: WebCardCategoryResolvers = {
   id: idResolver('WebCardCategory'),
   label: labelResolver,
   medias: webCardCategory => webCardCategory.medias,
-  companyActivities: async (webCardCategory, _) => {
-    return getCompanyActivitiesByWebCardCategory(webCardCategory.id);
+  companyActivities: () => {
+    // deprecated, shall be removed
+    return [];
   },
-};
-
-export const CompanyActivity: CompanyActivityResolvers = {
-  id: idResolver('CompanyActivity'),
-  label: labelResolver,
-  companyActivityType: async companyActivity => {
-    return companyActivity.companyActivityTypeId
-      ? companyActivityTypeLoader.load(companyActivity.companyActivityTypeId)
-      : null;
-  },
-};
-
-export const CompanyActivityType: CompanyActivityTypeResolvers = {
-  id: idResolver('CompanyActivityType'),
-  label: labelResolver,
 };
 
 const USERNAME_CHANGE_FREQUENCY_DAY = parseInt(

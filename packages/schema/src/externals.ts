@@ -2,6 +2,7 @@ import { externalFunction } from './GraphQLContext';
 import type { AddContactInput } from '#__generated__/types';
 import type { Profile, WebCard } from '@azzapp/data';
 import type { Locale } from '@azzapp/i18n';
+import type { PushNotificationType } from '@azzapp/shared/notificationHelpers';
 
 type Parameters = {
   profile?: Profile;
@@ -28,12 +29,6 @@ export const invalidatePost =
 export const invalidateWebCard =
   externalFunction<(userName: string) => void>('invalidateWebCard');
 
-// TODO the fact that this function is injected in the context is a bit weird
-// I guess it should be moved to @azzapp/shared or something like that
-export const buildCoverAvatarUrl = externalFunction<
-  (webCard: WebCard | null) => Promise<string | null>
->('buildCoverAvatarUrl');
-
 export const validateMailOrPhone = externalFunction<
   (type: 'email' | 'phone', issuer: string, token: string) => Promise<void>
 >('validateMailOrPhone');
@@ -47,10 +42,9 @@ export const notifyGooglePassWallet = externalFunction<
 >('notifyGooglePassWallet');
 
 type MessageType = {
-  type: 'multiuser_invitation' | 'shareBack';
+  notification: PushNotificationType;
   mediaId?: string | null;
   sound?: string;
-  deepLink?: string; //maybe we could merge type and deepLink...
   locale: Locale;
   localeParams?: Record<string, string>;
 };
@@ -58,6 +52,13 @@ type MessageType = {
 export const sendPushNotification = externalFunction<
   (
     targetUserId: string,
-    { type, mediaId, sound, deepLink, locale, localeParams }: MessageType,
+    { notification, mediaId, sound, locale, localeParams }: MessageType,
   ) => Promise<void>
 >('sendPushNotification');
+
+export const sendEmailSignatures = externalFunction<
+  (profileIds: string[], webCard: WebCard) => void
+>('sendEmailSignatures');
+
+export const notifyWebCardUsers =
+  externalFunction<(webCard: WebCard) => void>('notifyWebCardUsers');

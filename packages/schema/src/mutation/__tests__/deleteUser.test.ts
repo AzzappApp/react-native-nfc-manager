@@ -8,7 +8,7 @@ import {
 import ERRORS from '@azzapp/shared/errors';
 import { invalidateWebCard } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
-import { activeSubscriptionsForUserLoader } from '#loaders';
+import { subscriptionsForUserLoader } from '#loaders';
 import { updateMonthlySubscription } from '#helpers/subscriptionHelpers';
 import deleteUser from '../deleteUser';
 
@@ -29,7 +29,7 @@ jest.mock('#GraphQLContext', () => ({
 }));
 
 jest.mock('#loaders', () => ({
-  activeSubscriptionsForUserLoader: {
+  subscriptionsForUserLoader: {
     load: jest.fn(),
   },
 }));
@@ -57,7 +57,7 @@ describe('deleteUser', () => {
 
   test('should successfully delete a user', async () => {
     (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
-    (activeSubscriptionsForUserLoader.load as jest.Mock).mockResolvedValue([]);
+    (subscriptionsForUserLoader.load as jest.Mock).mockResolvedValue([]);
     (markUserAsDeleted as jest.Mock).mockResolvedValue(undefined);
     (getUserProfilesWithWebCard as jest.Mock).mockResolvedValue(
       mockUserProfiles,
@@ -85,8 +85,8 @@ describe('deleteUser', () => {
 
   test('should throw SUBSCRIPTION_IS_ACTIVE if user has an active subscription', async () => {
     (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
-    (activeSubscriptionsForUserLoader.load as jest.Mock).mockResolvedValue([
-      { subscriptionPlan: 'web.monthly' },
+    (subscriptionsForUserLoader.load as jest.Mock).mockResolvedValue([
+      { subscriptionPlan: 'web.monthly', status: 'active' },
     ]);
 
     await expect(deleteUser({}, {}, mockContext, mockInfo)).rejects.toThrow(
@@ -98,7 +98,7 @@ describe('deleteUser', () => {
 
   test('should throw INVALID_REQUEST if user does not exist after deletion', async () => {
     (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
-    (activeSubscriptionsForUserLoader.load as jest.Mock).mockResolvedValue([]);
+    (subscriptionsForUserLoader.load as jest.Mock).mockResolvedValue([]);
     (markUserAsDeleted as jest.Mock).mockResolvedValue(undefined);
     (getUserProfilesWithWebCard as jest.Mock).mockResolvedValue(
       mockUserProfiles,
@@ -115,7 +115,7 @@ describe('deleteUser', () => {
 
   test('should throw INTERNAL_SERVER_ERROR if deletion fails', async () => {
     (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
-    (activeSubscriptionsForUserLoader.load as jest.Mock).mockResolvedValue([]);
+    (subscriptionsForUserLoader.load as jest.Mock).mockResolvedValue([]);
     (markUserAsDeleted as jest.Mock).mockRejectedValue(new Error('DB Error'));
 
     await expect(deleteUser({}, {}, mockContext, mockInfo)).rejects.toThrow(

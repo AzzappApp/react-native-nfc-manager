@@ -16,6 +16,7 @@ import deleteUser from './deleteUser';
 import duplicateModule from './duplicateModule';
 import { extractCompanyLogo } from './extractCompanyLogo';
 import { extractVisitCardData } from './extractVisitCardData';
+import generateEmailSignature from './generateEmailSignature';
 import inviteUser from './inviteUser';
 import inviteUsersList from './inviteUsersList';
 import loadCardTemplate from './loadCardTemplate';
@@ -45,8 +46,10 @@ import saveCardColors from './saveCardColors';
 import saveCardStyle from './saveCardStyle';
 import saveCommonInformation from './saveCommonInformation';
 import saveContactCard from './saveContactCard';
+import saveCookiePreferences from './saveCookiePreferences';
 import saveCover from './saveCover';
 import saveFCMToken from './saveFCMToken';
+import sendEmailSignatures from './sendEmailSignatures';
 import sendInvitations from './sendInvitations';
 import sendReport from './sendReport';
 import toggleFollowing from './toggleFollowing';
@@ -89,6 +92,7 @@ export const Mutation: MutationResolvers = {
   saveCardColors,
   saveCardStyle,
   saveContactCard,
+  saveCookiePreferences,
   saveCover,
   saveTitleTextModule,
   toggleFollowing,
@@ -127,6 +131,8 @@ export const Mutation: MutationResolvers = {
   extractVisitCardData,
   acceptTermsOfUse,
   extractCompanyLogo,
+  generateEmailSignature,
+  sendEmailSignatures,
   ...payment,
 };
 

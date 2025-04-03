@@ -159,6 +159,12 @@ const HomeProfilesCarousel = (
       // new profile has been created (typically from invitation).
       // scroll to the same selected profile.
       setSelectedIndex(index + 1);
+      const timeout = setTimeout(() => {
+        scrollToIndex(index + 1, false);
+      }, 100);
+      return () => {
+        clearTimeout(timeout);
+      };
     } else {
       // profile has been removed,
       // scroll to previous available profile.

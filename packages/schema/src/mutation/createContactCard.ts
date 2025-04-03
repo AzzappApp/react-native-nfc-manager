@@ -4,6 +4,7 @@ import {
   createProfile,
   createWebCard,
   getWebCardByUserNameWithRedirection,
+  getPublishedWebCardCount,
   pickRandomPredefinedCover,
   referencesMedias,
   transaction,
@@ -13,6 +14,7 @@ import { isDefined } from '@azzapp/shared/isDefined';
 import { isValidUserName } from '@azzapp/shared/stringHelpers';
 import { getSessionInfos } from '#GraphQLContext';
 import { profileLoader, userLoader } from '#loaders';
+import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import type { MutationResolvers } from '#/__generated__/types';
 import type { WebCardTable } from '@azzapp/data/src/schema';
 import type { WebCardKind } from '@azzapp/shared/webCardKind';
@@ -20,7 +22,14 @@ import type { InferInsertModel } from 'drizzle-orm';
 
 const createContactCard: MutationResolvers['createContactCard'] = async (
   _,
-  { webCardKind, contactCard, webCardUserName, primaryColor, coverMediaId },
+  {
+    webCardKind,
+    contactCard,
+    webCardUserName,
+    primaryColor,
+    coverMediaId,
+    publishWebCard,
+  },
 ) => {
   const { userId } = getSessionInfos();
 
@@ -47,6 +56,14 @@ const createContactCard: MutationResolvers['createContactCard'] = async (
       throw new GraphQLError(ERRORS.USERNAME_ALREADY_EXISTS);
     }
   }
+  await validateCurrentSubscription(userId, {
+    webCardKind,
+    action: 'CREATE_CONTACT_CARD',
+    alreadyPublished: await getPublishedWebCardCount(userId),
+    webCardIsPublished: publishWebCard ?? true,
+    contactCardHasCompanyName: !!contactCard.company,
+    contactCardHasUrl: !!contactCard.urls?.length,
+  });
 
   const inputWebCard: InferInsertModel<typeof WebCardTable> = {
     firstName: contactCard.firstName,
@@ -67,10 +84,10 @@ const createContactCard: MutationResolvers['createContactCard'] = async (
         : undefined,
     coverIsPredefined: !coverMediaId,
     coverIsLogoPredefined: !!coverMediaId,
-    cardIsPublished: true,
+    cardIsPublished: publishWebCard ?? true,
     coverMediaId: coverMediaId ?? defaultCover?.mediaId,
     companyActivityLabel: contactCard.companyActivityLabel,
-    alreadyPublished: true,
+    alreadyPublished: publishWebCard ?? true,
     userName: webCardUserName,
   };
 

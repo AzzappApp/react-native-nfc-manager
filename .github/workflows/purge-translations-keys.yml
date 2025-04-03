@@ -1,0 +1,26 @@
+name: Purge translation keys
+on:
+  workflow_dispatch:
+jobs:
+  purgeTranslationMessages:
+    if: github.ref == 'refs/heads/stable' || github.ref == 'refs/heads/staging'
+    environment: ${{(github.ref_name == 'stable' && 'Production') || (github.ref_name == 'staging' && 'Staging') || 'Development' }} 
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Purge translations
+        env:
+          NEXT_PUBLIC_PLATFORM: ${{ vars.NEXT_PUBLIC_PLATFORM }}
+          API_SERVER_TOKEN: ${{ secrets.API_SERVER_TOKEN }}
+          TRANSLATION_APP_API_ENDPOINT: https://translations.azzapp.com/api
+        run: |
+          yarn i18n:extract
+          yarn i18n:purge

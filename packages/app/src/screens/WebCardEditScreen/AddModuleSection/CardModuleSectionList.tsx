@@ -1,7 +1,5 @@
 import { memo, useCallback } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
-import { graphql, useFragment } from 'react-relay';
-import { moduleCountRequiresSubscription } from '@azzapp/shared/subscriptionHelpers';
 import { useRouter } from '#components/NativeRouter';
 import { MODULE_VARIANT_SECTION } from '#helpers/webcardModuleHelpers';
 import { useModuleLabel } from '#hooks/useModuleVariantsLabel';
@@ -12,56 +10,25 @@ import type {
   ModuleKindSection,
   ModuleKindWithVariant,
 } from '#helpers/webcardModuleHelpers';
-import type { CardModuleSectionList_webCard$key } from '#relayArtifacts/CardModuleSectionList_webCard.graphql';
 import type { ListRenderItemInfo } from 'react-native';
 
-type CardModuleSectionListProps = {
-  webCardKey: CardModuleSectionList_webCard$key;
-};
-
-const CardModuleSectionList = ({ webCardKey }: CardModuleSectionListProps) => {
+const CardModuleSectionList = () => {
   const router = useRouter();
-
-  const webCard = useFragment(
-    graphql`
-      fragment CardModuleSectionList_webCard on WebCard {
-        isPremium
-        cardIsPublished
-        userName
-        cardModules {
-          id
-        }
-      }
-    `,
-    webCardKey,
-  );
 
   const { bottom } = useScreenInsets();
 
   const onSelectModuleKind = useCallback(
     (variant: ModuleKindWithVariant) => {
-      const cardModulesCount = webCard.cardModules?.length;
-      const addingModuleRequiresSubscription =
-        moduleCountRequiresSubscription(cardModulesCount + 1) &&
-        webCard.cardIsPublished &&
-        !webCard.isPremium;
-
       if (!variant) return;
 
       router.push({
         route: 'MODULE_PREVIEW',
         params: {
           variant,
-          requireSubscription: addingModuleRequiresSubscription,
         },
       });
     },
-    [
-      router,
-      webCard.cardIsPublished,
-      webCard.cardModules?.length,
-      webCard.isPremium,
-    ],
+    [router],
   );
 
   const renderItem = useCallback(

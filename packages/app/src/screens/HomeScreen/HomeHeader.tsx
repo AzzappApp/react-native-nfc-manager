@@ -5,7 +5,6 @@ import {
   Rect,
   useSVG,
 } from '@shopify/react-native-skia';
-import concat from 'lodash/concat';
 import { memo, useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
@@ -30,16 +29,16 @@ type HomeHeaderProps = {
 };
 
 const HomeHeader = ({ openPanel, user: userKey }: HomeHeaderProps) => {
-  const { profiles } = useFragment(
+  const { isPremium, profiles } = useFragment(
     graphql`
       fragment HomeHeader_user on User {
+        isPremium
         profiles {
           webCard {
             id
             cardColors {
               primary
             }
-            isPremium
           }
         }
       }
@@ -72,15 +71,6 @@ const HomeHeader = ({ openPanel, user: userKey }: HomeHeaderProps) => {
   const iconStyles = useAnimatedStyle(() => ({
     tintColor: color.value,
   }));
-
-  const isPremium = useIndexInterpolation(
-    currentIndexSharedValue,
-    concat(
-      0,
-      profiles?.map(profile => (profile?.webCard?.isPremium ? 1 : 0)) ?? [],
-    ),
-    0,
-  );
 
   const premiumIndicatorAnimatedStyle = useAnimatedStyle(() => ({
     opacity:
@@ -134,7 +124,7 @@ const HomeHeader = ({ openPanel, user: userKey }: HomeHeaderProps) => {
 export default memo(HomeHeader);
 
 type AnimatedHomeHeaderCentralComponentProps = {
-  isPremium: DerivedValue<number>;
+  isPremium: boolean | null;
   color: DerivedValue<string>;
 };
 
@@ -148,17 +138,13 @@ export const AnimatedHomeHeaderCentralComponent = ({
 
   const svg = useSVG(require('./assets/homeLogo.svg'));
 
-  const premiumIndicatorAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: isPremium.value,
-  }));
-
   return (
     <>
-      <Animated.View
-        style={[styles.premiumIndicator, premiumIndicatorAnimatedStyle]}
-      >
-        <PremiumIndicator isRequired size={18} style={iconStyles} />
-      </Animated.View>
+      {isPremium && (
+        <View style={styles.premiumIndicator}>
+          <PremiumIndicator isRequired size={18} style={iconStyles} />
+        </View>
+      )}
       {/** 2 pixel more to avoid crop problem */}
       <Canvas
         style={{

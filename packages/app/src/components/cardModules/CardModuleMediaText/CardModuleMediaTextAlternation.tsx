@@ -1,9 +1,12 @@
 import { useCallback, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { RichText } from '#components/ui/RichText';
+import {
+  defaultTextFontSize,
+  defaultTitleFontSize,
+  RichText,
+} from '#components/ui/RichText';
 import { getTextStyle, getTitleStyle } from '#helpers/cardModuleHelpers';
 import useScreenDimensions from '#hooks/useScreenDimensions';
-import Text from '#ui/Text';
 import AlternationContainer from '../AlternationContainer';
 import CardModulePressableTool from '../tool/CardModulePressableTool';
 import type {
@@ -150,15 +153,15 @@ const AlternationItem = ({
             },
           ]}
         >
-          <Text
-            variant="large"
+          <RichText
+            text={cardModuleMedia.title}
+            fontSize={cardStyle?.titleFontSize || defaultTitleFontSize}
             style={getTitleStyle(cardStyle, cardModuleColor)}
-          >
-            {cardModuleMedia.title}
-          </Text>
+          />
           <RichText
             text={cardModuleMedia.text}
             style={getTextStyle(cardStyle, cardModuleColor)}
+            fontSize={cardStyle?.fontSize || defaultTextFontSize}
           />
         </View>
       </AlternationContainer>

@@ -15,11 +15,22 @@ type RichTextFromASTProps = {
   node: RichTextASTNode;
   style?: TextStyle | TextStyle[];
   stackedTags?: RichTextASTTags[];
+  fontSize: number;
+  // Force resizing value. In case of edit we don't want to decrease font size by 6
+  // This props allow to force small resizing
+  forceFontResizeValue?: number;
 };
+
+export const defaultFontSize = 16;
+export const defaultTextFontSize = 16;
+export const defaultTitleFontSize = 34;
+
 export const RichTextFromAST = ({
   node,
+  fontSize,
   style = {},
   stackedTags = [],
+  forceFontResizeValue,
 }: RichTextFromASTProps): JSX.Element => {
   const styleInner = Array.isArray(style) ? StyleSheet.flatten(style) : style;
   if (node.children) {
@@ -35,6 +46,8 @@ export const RichTextFromAST = ({
                 ? [...stackedTags, node.type as RichTextASTTags]
                 : stackedTags
             }
+            fontSize={fontSize}
+            forceFontResizeValue={forceFontResizeValue}
           />
         ))}
       </>
@@ -69,6 +82,39 @@ export const RichTextFromAST = ({
         fontStyle = { ...fontStyle, fontStyle: 'italic' };
       }
     }
+    if (stackedTags.includes('+3')) {
+      const newFontSize = fontSize + (forceFontResizeValue ?? 3);
+      fontStyle = {
+        ...fontStyle,
+        fontSize: newFontSize,
+        lineHeight: Math.floor(newFontSize * 1.9),
+      };
+    }
+    if (stackedTags.includes('-3')) {
+      const newFontSize = fontSize - (forceFontResizeValue ?? 3);
+      fontStyle = {
+        ...fontStyle,
+        fontSize: fontSize - (forceFontResizeValue ?? 3),
+        lineHeight: Math.floor(newFontSize * 1.9),
+      };
+    }
+    if (stackedTags.includes('+6')) {
+      const newFontSize = fontSize + (forceFontResizeValue ?? 6);
+      fontStyle = {
+        ...fontStyle,
+        fontSize: newFontSize,
+        lineHeight: Math.floor(newFontSize * 1.6),
+      };
+    }
+    if (stackedTags.includes('-6')) {
+      const newFontSize = fontSize - (forceFontResizeValue ?? 6);
+      fontStyle = {
+        ...fontStyle,
+        fontSize: newFontSize,
+        lineHeight: Math.floor(newFontSize * 1.6),
+      };
+    }
+
     if (stackedTags.includes('c')) {
       fontStyle = {
         ...fontStyle,
@@ -90,13 +136,25 @@ export const RichTextFromAST = ({
 type RichTextProps = {
   text: string | undefined;
   style?: TextStyle | TextStyle[];
+  fontSize: number;
+  forceFontResizeValue?: number;
 };
 
-export const RichText = ({ text, style = {} }: RichTextProps): JSX.Element => {
+export const RichText = ({
+  text,
+  style = {},
+  fontSize,
+  forceFontResizeValue,
+}: RichTextProps): JSX.Element => {
   const ast = parseHTMLToRichText(text);
   return (
     <Text style={style}>
-      <RichTextFromAST node={ast} style={style} />
+      <RichTextFromAST
+        node={ast}
+        style={style}
+        fontSize={fontSize}
+        forceFontResizeValue={forceFontResizeValue}
+      />
     </Text>
   );
 };

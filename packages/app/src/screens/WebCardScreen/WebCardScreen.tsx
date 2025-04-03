@@ -36,7 +36,6 @@ import {
 } from '#components/NativeRouter';
 import WebCardMenu from '#components/WebCardMenu';
 import { logEvent } from '#helpers/analytics';
-import { dispatchGlobalEvent } from '#helpers/globalEvents';
 import {
   profileInfoHasAdminRight,
   profileInfoHasEditorRight,
@@ -60,7 +59,6 @@ import { useWebCardEditTransition } from './WebCardEditTransition';
 import WebCardPostsList from './WebCardPostsList';
 import WebCardScreenButtonBar from './WebCardScreenButtonBar';
 import WebCardScreenContent from './WebCardScreenContent';
-import WebCardScreenPublishHelper from './WebCardScreenPublishHelper';
 import type { ScreenOptions } from '#components/NativeRouter';
 import type { RelayScreenProps } from '#helpers/relayScreen';
 import type { WebCardScreenByIdQuery } from '#relayArtifacts/WebCardScreenByIdQuery.graphql';
@@ -82,10 +80,6 @@ export const WebCardScreen = ({
   useWebCardViewStatistic(params.webCardId ?? data.webCard?.id);
 
   const ready = useDidAppear();
-
-  useEffect(() => {
-    dispatchGlobalEvent({ type: 'READY' });
-  }, []);
 
   const router = useRouter();
 
@@ -334,7 +328,7 @@ export const WebCardScreen = ({
 
   // #end region
 
-  if (!data.webCard || !data.profile?.webCard) {
+  if (!data.webCard) {
     return (
       <View style={styles.deletedCaseContainer}>
         <Text variant="large">
@@ -393,7 +387,6 @@ export const WebCardScreen = ({
                   webCardId={data.webCard.id}
                   hasFocus={hasFocus && showPost && ready}
                   userName={data.webCard.userName!}
-                  viewerWebCard={data.profile.webCard}
                 />
               )}
             </Suspense>
@@ -402,7 +395,6 @@ export const WebCardScreen = ({
       </GestureDetector>
       <WebCardScreenButtonBar
         webCard={data.webCard}
-        profile={data.profile}
         isViewer={isViewer}
         onHome={router.backToTop}
         isWebCardDisplayed={!showPost}
@@ -413,14 +405,9 @@ export const WebCardScreen = ({
         editing={editing}
         editTransition={editTransition}
       />
-      <Suspense>
-        <AddContactModal
-          user={data.currentUser!}
-          webCard={data.webCard}
-          contactData={params.contactData}
-          additionalContactData={params.additionalContactData}
-        />
-      </Suspense>
+
+      <AddContactModal webCard={data.webCard} params={params} />
+
       <Suspense fallback={null}>
         <WebCardMenu
           visible={showWebcardModal}
@@ -432,9 +419,6 @@ export const WebCardScreen = ({
           isAdmin={isAdmin}
         />
       </Suspense>
-      <Suspense>
-        <WebCardScreenPublishHelper webCard={data.webCard} editing={editing} />
-      </Suspense>
     </View>
   );
 };
@@ -443,11 +427,7 @@ const getQuery = (params: WebCardRoute['params']) =>
   params.webCardId ? webCardScreenByIdQuery : webCardScreenByNameQuery;
 
 const webCardScreenByIdQuery = graphql`
-  query WebCardScreenByIdQuery(
-    $webCardId: ID!
-    $viewerWebCardId: ID!
-    $profileId: ID!
-  ) {
+  query WebCardScreenByIdQuery($webCardId: ID!, $viewerWebCardId: ID!) {
     webCard: node(id: $webCardId) {
       id
       ... on WebCard {
@@ -456,23 +436,9 @@ const webCardScreenByIdQuery = graphql`
       ...WebCardScreenContent_webCard
       ...WebCardScreenButtonBar_webCard
         @arguments(viewerWebCardId: $viewerWebCardId)
-      ...WebCardScreenPublishHelper_webCard
       ...WebCardBackground_webCard
       ...WebCardMenu_webCard @arguments(viewerWebCardId: $viewerWebCardId)
-      ...WebCardScreenPublishHelper_webCard
       ...AddContactModal_webCard
-    }
-    ## TODO find a way to remove this profile fetch
-    profile: node(id: $profileId) {
-      ... on Profile {
-        ...WebCardScreenButtonBar_profile
-        webCard {
-          ...PostList_viewerWebCard
-        }
-      }
-    }
-    currentUser {
-      ...AddContactModalProfiles_user
     }
   }
 `;
@@ -481,7 +447,6 @@ const webCardScreenByNameQuery = graphql`
   query WebCardScreenByUserNameQuery(
     $userName: String!
     $viewerWebCardId: ID!
-    $profileId: ID!
   ) {
     webCard(userName: $userName) {
       id
@@ -489,23 +454,9 @@ const webCardScreenByNameQuery = graphql`
       ...WebCardScreenContent_webCard
       ...WebCardScreenButtonBar_webCard
         @arguments(viewerWebCardId: $viewerWebCardId)
-      ...WebCardScreenPublishHelper_webCard
       ...WebCardBackground_webCard
       ...WebCardMenu_webCard @arguments(viewerWebCardId: $viewerWebCardId)
-      ...WebCardScreenPublishHelper_webCard
       ...AddContactModal_webCard
-    }
-    ## TODO find a way to remove this profile fetch
-    profile: node(id: $profileId) {
-      ... on Profile {
-        ...WebCardScreenButtonBar_profile
-        webCard {
-          ...PostList_viewerWebCard
-        }
-      }
-    }
-    currentUser {
-      ...AddContactModalProfiles_user
     }
   }
 `;
@@ -552,12 +503,10 @@ export default relayScreen(WebCardScreen, {
       ? {
           webCardId,
           viewerWebCardId: profileInfos?.webCardId ?? '',
-          profileId: profileInfos?.profileId ?? '',
         }
       : {
           userName,
           viewerWebCardId: profileInfos?.webCardId ?? '',
-          profileId: profileInfos?.profileId ?? '',
         },
   fetchPolicy: 'store-and-network',
 });

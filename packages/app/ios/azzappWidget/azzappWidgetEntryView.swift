@@ -43,6 +43,8 @@ struct QRCodeWidgetEntryView: View {
             return Color(hex: entry.widgetData.textColor)
         }
     }
+  
+    let scheme = Bundle.main.infoDictionary?["AZZAPP_SCHEME"] as? String  ?? "azzapp"
 
     @ViewBuilder
     var body: some View { 
@@ -108,7 +110,7 @@ struct QRCodeWidgetEntryView: View {
              .scaledToFit()
              .frame(width: 40, height: 40)
         }.containerBackground(.fill, for: .widget)
-       .widgetURL(URL(string: "azzapp://widget_share"))
+       .widgetURL(URL(string: "\(scheme)://widget_share"))
   
        default:
            VStack {
@@ -125,7 +127,7 @@ struct QRCodeWidget: Widget {
     AppIntentConfiguration(kind: kind, intent: ConfigurationAppIntent.self, provider: Provider()) { entry in
       QRCodeWidgetEntryView(entry: entry)
     }
-    .configurationDisplayName("Homescreen Widgets")
+    .configurationDisplayName("LockScreen Widgets")
     .description("Instantly share your contact information from your home screen")
     .supportedFamilies([.systemSmall, .systemLarge, .accessoryCircular])
     .disableContentMarginsIfNeeded()

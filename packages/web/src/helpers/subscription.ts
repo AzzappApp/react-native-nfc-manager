@@ -1,8 +1,7 @@
 import { revalidatePath } from 'next/cache';
 import {
-  getActiveUserSubscriptions,
-  getCardModulesByWebCard,
   getUserProfilesWithWebCard,
+  getUserSubscriptions,
   transaction,
   updateWebCard,
 } from '@azzapp/data';
@@ -22,12 +21,17 @@ export const unpublishWebCardForUser = async ({
     );
 
     const userIsPremium =
-      (await getActiveUserSubscriptions([userId])).length > 0;
-    for (const { webCard } of profiles) {
+      (await getUserSubscriptions({ userIds: [userId], onlyActive: true }))
+        .length > 0;
+    for (const { webCard, profile } of profiles) {
       if (!userIsPremium || forceUnpublishUser) {
         if (webCard?.cardIsPublished) {
-          const modules = await getCardModulesByWebCard(webCard.id, false);
-          if (webCardRequiresSubscription(modules, webCard)) {
+          if (
+            profiles.length > 2 ||
+            webCardRequiresSubscription(webCard) ||
+            profile.contactCard?.company ||
+            profile.contactCard?.urls?.length
+          ) {
             const currentDate = new Date();
             //unpublished webCard
             const updates: Partial<WebCard> = {

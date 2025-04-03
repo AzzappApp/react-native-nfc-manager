@@ -54,11 +54,6 @@ const HomeScreenPrefetcher = ({ user: userKey }: HomeScreenPrefetcherProps) => {
                 }),
               );
             }
-            profilesDisposables.push(
-              prefetchRoute(environment, {
-                route: 'CONTACT_CARD',
-              }),
-            );
           }
         }
       }, PREFETCH_DELAY);
