@@ -429,7 +429,6 @@ __metadata:
     expo-linear-gradient: "npm:~14.0.2"
     expo-location: "npm:^18.0.10"
     expo-quick-actions: "npm:^4.0.2"
-    expo-sensors: "npm:14.0.2"
     expo-web-browser: "npm:^14.0.2"
     graphql: "npm:^16.10.0"
     graphql-relay: "npm:^0.10.2"
@@ -18213,18 +18212,6 @@ __metadata:
   peerDependencies:
     expo: "*"
   checksum: 10/3c96895411c4005c1d3b4538a0bcd1084dabbc0c246707cfa9003c27b0a608903051f8640b5ddc3103e2a4ee79dee56c40d2feaf5190707cde43d79a98364bbc
-  languageName: node
-  linkType: hard
-
-"expo-sensors@npm:14.0.2":
-  version: 14.0.2
-  resolution: "expo-sensors@npm:14.0.2"
-  dependencies:
-    invariant: "npm:^2.2.4"
-  peerDependencies:
-    expo: "*"
-    react-native: "*"
-  checksum: 10/adf2616822831cbac9ec1e1d00f47ba9be3366bf2a5977cb47f8ee9841a4fa45bc88276f25cfe033e6167859fbb7a9cc6c43a93826859a31418238416b9bd098
   languageName: node
   linkType: hard
 
