@@ -51,7 +51,7 @@
     "jose": "^6.0.10",
     "jsonwebtoken": "^9.0.2",
     "jwt-decode": "^4.0.0",
-    "libphonenumber-js": "^1.11.17",
+    "libphonenumber-js": "^1.12.4",
     "lodash": "^4.17.21",
     "lottie-web": "^5.12.2",
     "lz-string": "^1.5.0",

@@ -23,7 +23,7 @@
     "chroma-js": "^3.1.2",
     "csv42": "^5.0.3",
     "iron-webcrypto": "^1.2.1",
-    "libphonenumber-js": "^1.11.17",
+    "libphonenumber-js": "^1.12.4",
     "lz-string": "^1.5.0",
     "validator": "^13.12.0",
     "vcard-creator": "^0.7.1"
