@@ -92,6 +92,7 @@ const appleSignin = async (req: Request) => {
               emailConfirmed: true,
               userContactData: {
                 ...user.userContactData,
+                email,
                 firstName: firstName ?? user.userContactData?.firstName,
                 lastName: lastName ?? user.userContactData?.lastName,
               },
@@ -112,6 +113,11 @@ const appleSignin = async (req: Request) => {
               appleId,
               emailConfirmed: true,
               phoneNumberConfirmed: false,
+              userContactData: {
+                email,
+                firstName,
+                lastName,
+              },
             };
 
             const userId = await createUser(newUser);
@@ -137,10 +143,6 @@ const appleSignin = async (req: Request) => {
                 deletedBy: null,
                 invited: false,
                 nbFreeScans: 0,
-                userContactData: {
-                  firstName,
-                  lastName,
-                },
                 cookiePreferences: null,
               },
               null,
