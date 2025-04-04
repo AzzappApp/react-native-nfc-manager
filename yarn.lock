@@ -338,7 +338,6 @@ __metadata:
     "@gorhom/bottom-sheet": "patch:@gorhom/bottom-sheet@npm%3A5.1.2#~/.yarn/patches/@gorhom-bottom-sheet-npm-5.1.2-9593eea256.patch"
     "@hookform/resolvers": "npm:^3.10.0"
     "@lepirlouit/vcard-parser": "patch:@lepirlouit/vcard-parser@npm%3A1.4.0#~/.yarn/patches/@lepirlouit-vcard-parser-npm-1.4.0-fee601014a.patch"
-    "@lottiefiles/lottie-js": "npm:0.4.2"
     "@miblanchard/react-native-slider": "npm:2.6.0"
     "@react-native-camera-roll/camera-roll": "patch:@react-native-camera-roll/camera-roll@npm%3A7.9.0#~/.yarn/patches/@react-native-camera-roll-camera-roll-npm-7.9.0-285cb35c57.patch"
     "@react-native-community/cli": "npm:^15.0.0"
@@ -727,6 +726,7 @@ __metadata:
   resolution: "@azzapp/shared@workspace:packages/shared"
   dependencies:
     "@babel/cli": "npm:^7.26.4"
+    "@lottiefiles/lottie-js": "npm:0.4.2"
     "@types/chroma-js": "npm:^2.4.5"
     "@types/validator": "npm:^13.12.2"
     chroma-js: "npm:^3.1.2"
