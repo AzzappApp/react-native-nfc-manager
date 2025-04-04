@@ -1,3 +1,7 @@
+## 1.9.2-canary.11
+
+* **fix:**  - remove expo-sensor (replaced by reanimated sensors management) ([#8275](https://github.com/AzzappApp/azzapp/pull/8275))
+
 ## 1.9.2-canary.10
 
 * **fix:**  - remove unused package @react-native-masked-view/masked-view ([#8273](https://github.com/AzzappApp/azzapp/pull/8273))
