@@ -1,5 +1,7 @@
 import { Image } from 'expo-image';
-import parsePhoneNumberFromString from 'libphonenumber-js';
+import parsePhoneNumberFromString, {
+  isValidPhoneNumber,
+} from 'libphonenumber-js';
 import { memo } from 'react';
 import { Linking, StyleSheet } from 'react-native';
 import {
@@ -35,6 +37,9 @@ const WhatsappButton = ({
     }
     const parsedNumber = parsePhoneNumberFromString(number.number);
     if (!parsedNumber) {
+      return false;
+    }
+    if (!isValidPhoneNumber(number.number)) {
       return false;
     }
     return true;
