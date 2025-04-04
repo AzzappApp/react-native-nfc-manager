@@ -473,7 +473,10 @@ export const markWebCardAsDeleted = async (webCardId: string, userId: string) =>
       );
   });
 
-export const getUsersToNotifyOnWebCard = async (webCardId: string) => {
+export const getUsersToNotifyOnWebCard = async (
+  webCardId: string,
+  excludedUserId: string,
+) => {
   return db()
     .selectDistinct({
       user: UserTable,
@@ -486,6 +489,7 @@ export const getUsersToNotifyOnWebCard = async (webCardId: string) => {
         eq(ProfileTable.webCardId, webCardId),
         ne(ProfileTable.deleted, true),
         ne(UserTable.deleted, true),
+        ne(UserTable.id, excludedUserId),
       ),
     )
     .then(res => res.map(({ user }) => user));

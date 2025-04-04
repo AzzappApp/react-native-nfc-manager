@@ -179,19 +179,22 @@ const { handleRequest } = createYoga({
             }),
         );
       },
-      notifyWebCardUsers: async (webCard: WebCard) => {
-        waitUntil(
-          inngest
-            .send({
-              name: 'batch/webCardUsersNotification',
-              data: {
-                webCard,
-              },
-            })
-            .catch(err => {
-              Sentry.captureException(err);
-            }),
-        );
+      notifyWebCardUsers: async (webCard: WebCard, editorUserId: string) => {
+        if (webCard.isMultiUser) {
+          waitUntil(
+            inngest
+              .send({
+                name: 'batch/webCardUsersNotification',
+                data: {
+                  webCard,
+                  editorUserId,
+                },
+              })
+              .catch(err => {
+                Sentry.captureException(err);
+              }),
+          );
+        }
       },
     };
   },

@@ -51,7 +51,7 @@ const createModuleSavingMutation =
     },
   ) => {
     const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
-    await checkWebCardProfileEditorRight(webCardId);
+    const profile = await checkWebCardProfileEditorRight(webCardId);
 
     const { validator, getMedias } = MODULES_SAVE_RULES[moduleKind] ?? {};
 
@@ -115,7 +115,7 @@ const createModuleSavingMutation =
       throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
     }
 
-    notifyWebCardUsers(webCard);
+    notifyWebCardUsers(webCard, profile.userId);
 
     if (webCard.userName) {
       invalidateWebCard(webCard.userName);

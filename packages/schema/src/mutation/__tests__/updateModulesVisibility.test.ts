@@ -96,6 +96,11 @@ describe('updateModulesVisibility', () => {
   });
 
   it('successfully updates visibility and notifies/invalidate', async () => {
+    (checkWebCardProfileEditorRight as jest.Mock).mockResolvedValue({
+      id: 'profile-123',
+      profileRole: 'editor',
+      userId: 'editorUserId',
+    });
     const result = await updateModulesVisibility(
       {},
       {
@@ -111,7 +116,7 @@ describe('updateModulesVisibility', () => {
       visible: true,
     });
     expect(updateWebCard).toHaveBeenCalled();
-    expect(notifyWebCardUsers).toHaveBeenCalledWith(webCard);
+    expect(notifyWebCardUsers).toHaveBeenCalledWith(webCard, 'editorUserId');
     expect(invalidateWebCard).toHaveBeenCalledWith('testUser');
     expect(result).toEqual({ webCard });
   });

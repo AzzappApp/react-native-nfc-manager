@@ -36,7 +36,7 @@ const saveCover: MutationResolvers['saveCover'] = async (
   },
 ) => {
   const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
-  await checkWebCardProfileEditorRight(webCardId);
+  const profile = await checkWebCardProfileEditorRight(webCardId);
 
   const webCard = await webCardLoader.load(webCardId);
 
@@ -76,7 +76,7 @@ const saveCover: MutationResolvers['saveCover'] = async (
       updatedWebCard = { ...updatedWebCard, ...updates };
     });
 
-    notifyWebCardUsers(webCard);
+    notifyWebCardUsers(webCard, profile.userId);
 
     await notifyRelatedWalletPasses(webCardId, true);
 
