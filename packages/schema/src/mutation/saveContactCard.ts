@@ -12,7 +12,7 @@ import { DEFAULT_LOCALE } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
 import { notifyApplePassWallet, notifyGooglePassWallet } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
-import { profileLoader, webCardLoader } from '#loaders';
+import { profileLoader, webCardLoader, webCardOwnerLoader } from '#loaders';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import type { ContactCard, MutationResolvers } from '#/__generated__/types';
@@ -65,7 +65,16 @@ const saveContactCard: MutationResolvers['saveContactCard'] = async (
   updates.avatarId = contactCard.avatarId;
   updates.logoId = contactCard.logoId;
 
-  await validateCurrentSubscription(userId, {
+  const owner =
+    profile.profileRole === 'owner'
+      ? profile.userId
+      : (await webCardOwnerLoader.load(webCard.id))?.id;
+
+  if (!owner) {
+    throw new GraphQLError(ERRORS.INVALID_REQUEST);
+  }
+
+  await validateCurrentSubscription(owner, {
     action: 'UPDATE_CONTACT_CARD',
     contactCardHasCompanyName: !!updates.contactCard?.company,
     webCardIsPublished: webCard.cardIsPublished,

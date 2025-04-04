@@ -8,7 +8,7 @@ import {
 import ERRORS from '@azzapp/shared/errors';
 import { notifyApplePassWallet, notifyGooglePassWallet } from '#externals';
 import { getSessionInfos } from '#GraphQLContext';
-import { profileLoader, webCardLoader } from '#loaders';
+import { profileLoader, webCardLoader, webCardOwnerLoader } from '#loaders';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
 import saveContactCard from '../saveContactCard';
@@ -38,6 +38,9 @@ jest.mock('#loaders', () => ({
     load: jest.fn(),
   },
   webCardLoader: {
+    load: jest.fn(),
+  },
+  webCardOwnerLoader: {
     load: jest.fn(),
   },
 }));
@@ -159,6 +162,9 @@ describe('saveContactCard', () => {
     (profileLoader.load as jest.Mock).mockResolvedValue(mockProfile);
     (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
     (getPushTokens as jest.Mock).mockResolvedValue([]);
+    (webCardOwnerLoader.load as jest.Mock).mockResolvedValue({
+      id: 'owner-123',
+    });
 
     await saveContactCard(
       {},
@@ -174,7 +180,7 @@ describe('saveContactCard', () => {
       mockInfo,
     );
 
-    expect(validateCurrentSubscription).toHaveBeenCalledWith('user-456', {
+    expect(validateCurrentSubscription).toHaveBeenCalledWith('owner-123', {
       action: 'UPDATE_CONTACT_CARD',
       contactCardHasCompanyName: true,
       webCardIsPublished: true,
@@ -188,6 +194,9 @@ describe('saveContactCard', () => {
     (profileLoader.load as jest.Mock).mockResolvedValue(mockProfile);
     (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
     (getPushTokens as jest.Mock).mockResolvedValue(['token1', 'token2']);
+    (webCardOwnerLoader.load as jest.Mock).mockResolvedValue({
+      id: 'owner-123',
+    });
 
     const result = await saveContactCard(
       {},
@@ -223,6 +232,9 @@ describe('saveContactCard', () => {
       ...mockProfile,
       hasGooglePass: false,
     });
+    (webCardOwnerLoader.load as jest.Mock).mockResolvedValue({
+      id: 'owner-123',
+    });
 
     await saveContactCard(
       {},
@@ -244,6 +256,9 @@ describe('saveContactCard', () => {
     (transaction as jest.Mock).mockRejectedValue(
       new Error('Transaction failed'),
     );
+    (webCardOwnerLoader.load as jest.Mock).mockResolvedValue({
+      id: 'owner-123',
+    });
 
     await expect(
       saveContactCard(
@@ -256,5 +271,26 @@ describe('saveContactCard', () => {
         mockInfo,
       ),
     ).rejects.toThrow(new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR));
+  });
+
+  test('should throw INVALID_REQUEST if webCard owner is not found', async () => {
+    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-456' });
+    (profileLoader.load as jest.Mock).mockResolvedValue(mockProfile);
+    (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
+    jest
+      .mocked(require('#loaders').webCardOwnerLoader.load)
+      .mockResolvedValue(null);
+
+    await expect(
+      saveContactCard(
+        {},
+        {
+          profileId: 'global-profile-123',
+          contactCard: { avatarId: 'new-avatar' },
+        },
+        mockContext,
+        mockInfo,
+      ),
+    ).rejects.toThrow(new GraphQLError(ERRORS.INVALID_REQUEST));
   });
 });
