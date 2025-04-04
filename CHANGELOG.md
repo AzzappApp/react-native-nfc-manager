@@ -1,3 +1,7 @@
+## 1.9.2-canary.10
+
+* **fix:**  - remove unused package @react-native-masked-view/masked-view ([#8273](https://github.com/AzzappApp/azzapp/pull/8273))
+
 ## 1.9.2-canary.9
 
 * **fix:**  - move dev packages to devDependencies ([#8272](https://github.com/AzzappApp/azzapp/pull/8272))
