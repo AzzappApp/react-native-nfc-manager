@@ -21,7 +21,7 @@ import { type ProtectedResolver } from '#helpers/permissionsHelpers';
 import type { UserResolvers } from '#/__generated__/types';
 import type { User as UserModel } from '@azzapp/data';
 
-const isSameUser = async (user: UserModel) => {
+const isSameUser = (user: UserModel) => {
   const { userId } = getSessionInfos();
   return userId === user.id;
 };
@@ -147,5 +147,12 @@ export const User: ProtectedResolver<UserResolvers> = {
   },
   cookiePreferences: async user => {
     return user.cookiePreferences;
+  },
+  hasPassword: async user => {
+    if (isSameUser(user)) {
+      return user.password !== null;
+    }
+
+    return true; // we don't have a way to check if the user has a password
   },
 };

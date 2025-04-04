@@ -7,6 +7,7 @@ const useUpdateUser = () => {
         user {
           email
           phoneNumber
+          ...AccountDetailsPasswordForm_currentUser
         }
       }
     }

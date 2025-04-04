@@ -352,6 +352,29 @@ describe('updateUserMutation', () => {
     ).rejects.toThrow(new GraphQLError(ERRORS.INVALID_CREDENTIALS));
   });
 
+  test('should not check current password when no password in database', async () => {
+    (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
+    (userLoader.load as jest.Mock).mockResolvedValue({
+      ...mockUser,
+      password: null,
+    });
+    (bcrypt.compareSync as jest.Mock).mockReturnValue(false);
+
+    const result = await updateUserMutation(
+      {},
+      { input: { currentPassword: 'old-pass', newPassword: 'new-pass' } },
+      mockContext,
+      mockInfo,
+    );
+
+    expect(updateUser).toHaveBeenCalledWith('user-1', {
+      password: 'hashed-password',
+    });
+    expect(result).toEqual({
+      user: { ...mockUser, password: 'hashed-password' },
+    });
+  });
+
   test('should throw INVALID_REQUEST if user would have no email or phone', async () => {
     (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });
     (userLoader.load as jest.Mock).mockResolvedValue(mockUser);

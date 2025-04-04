@@ -35,6 +35,7 @@ const accountDetailsScreenQuery = graphql`
       userSubscription {
         totalSeats
       }
+      ...AccountDetailsPasswordForm_currentUser
     }
   }
 `;
@@ -284,6 +285,7 @@ const AccountDetailsScreen = ({
         toggleBottomSheet={togglePhoneNumberFormVisible}
       />
       <AccountDetailsPasswordForm
+        user={currentUser}
         visible={passwordVisible}
         toggleBottomSheet={togglePasswordVisible}
       />

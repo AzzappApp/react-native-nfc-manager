@@ -88,9 +88,9 @@ const updateUserMutation: MutationResolvers['updateUser'] = async (_, args) => {
 
   if (newPassword) {
     if (
-      !currentPassword ||
-      !dbUser.password ||
-      !bcrypt.compareSync(currentPassword, dbUser.password)
+      dbUser.password &&
+      (!currentPassword ||
+        !bcrypt.compareSync(currentPassword, dbUser.password))
     ) {
       throw new GraphQLError(ERRORS.INVALID_CREDENTIALS);
     }
