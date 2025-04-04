@@ -1,6 +1,5 @@
 import { GraphQLError } from 'graphql';
 import {
-  createId,
   createProfile,
   createUser,
   getProfileByUserAndWebCard,
