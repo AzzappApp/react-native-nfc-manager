@@ -156,86 +156,95 @@ export const oauthSigninCallback =
       return redirectToApp({ error: 'LinkedIn email is required' });
     }
 
-    let user: User | null = null;
-    let profile: Profile | null = null;
-    const userContactData = {
-      firstName: googleProfile.given_name,
-      lastName: googleProfile.family_name,
-      email: googleProfile.email,
-      avatarUrl: googleProfile.picture,
-    };
+    let user: User;
+    let profile: Profile | null;
     try {
-      user = await getUserByEmail(email);
-      let oldUser: User | null = null;
-      if (user?.deleted && user.id === user.deletedBy) {
-        await updateUser(user.id, {
-          appleId: null,
-          email: null,
-          phoneNumber: null,
-          emailConfirmed: true,
-        });
-        oldUser = user;
-        user = null;
-      }
-      if (user) {
-        const profiles = await getProfilesByUser(user.id);
-        profile = profiles[0] ?? null;
-        await updateUser(user.id, {
-          userContactData: {
-            ...user.userContactData,
-            ...userContactData,
-          },
-          locale: user.locale ?? googleProfile.locale?.language ?? null,
-        });
-        user = {
-          ...user,
-          userContactData: {
-            ...user.userContactData,
-            ...userContactData,
-          },
-          locale: user.locale ?? googleProfile.locale?.language ?? null,
-        };
-      } else {
-        const newUser = {
-          email,
-          phoneNumber: null,
-          password: null,
-          locale: googleProfile.locale?.language ?? null,
-          roles: null,
-          termsOfUseAcceptedVersion: null,
-          termsOfUseAcceptedAt: null,
-          hasAcceptedCommunications: false,
-          emailConfirmed: true,
-          phoneNumberConfirmed: false,
-          appleId: null,
-          userContactData,
-        };
-        await transaction(async () => {
-          const userId = await createUser(newUser);
-          user = {
-            ...newUser,
-            id: userId,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            deletedAt: null,
-            note: null,
-            replacedBy: null,
-            deleted: false,
-            deletedBy: null,
-            invited: false,
-            nbFreeScans: 0,
-            cookiePreferences: null,
+      [user, profile] = await transaction(
+        async (): Promise<[User, Profile | null]> => {
+          const userContactData = {
+            firstName: googleProfile.given_name,
+            lastName: googleProfile.family_name,
+            email: googleProfile.email,
+            avatarUrl: googleProfile.picture,
           };
-          if (platform === 'android') {
-            await createFreeSubscriptionForBetaAndroidPeriod([userId]);
-          }
-          if (oldUser) {
-            await updateUser(oldUser.id, {
-              replacedBy: userId,
+
+          let user = await getUserByEmail(email);
+          let oldUser: User | null = null;
+          if (user?.deleted && user.id === user.deletedBy) {
+            await updateUser(user.id, {
+              appleId: null,
+              email: null,
+              phoneNumber: null,
             });
+            oldUser = user;
+            user = null;
           }
-        });
-      }
+          if (user) {
+            const updates = {
+              userContactData: {
+                ...user.userContactData,
+                ...userContactData,
+              },
+              emailConfirmed: true,
+              locale: user.locale ?? googleProfile.locale?.language ?? null,
+            };
+            await updateUser(user.id, updates);
+            user = {
+              ...user,
+              ...updates,
+            };
+            const profiles = await getProfilesByUser(user.id);
+            return [
+              {
+                ...user,
+                ...updates,
+              },
+              profiles[0] ?? null,
+            ];
+          } else {
+            const newUser = {
+              email,
+              phoneNumber: null,
+              password: null,
+              locale: googleProfile.locale?.language ?? null,
+              roles: null,
+              termsOfUseAcceptedVersion: null,
+              termsOfUseAcceptedAt: null,
+              hasAcceptedCommunications: false,
+              emailConfirmed: true,
+              phoneNumberConfirmed: false,
+              appleId: null,
+              userContactData,
+            };
+            const userId = await createUser(newUser);
+            if (platform === 'android') {
+              await createFreeSubscriptionForBetaAndroidPeriod([userId]);
+            }
+            if (oldUser) {
+              await updateUser(oldUser.id, {
+                replacedBy: userId,
+              });
+            }
+            return [
+              {
+                ...newUser,
+                id: userId,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                deletedAt: null,
+                note: null,
+                replacedBy: null,
+                deleted: false,
+                deletedBy: null,
+                invited: false,
+                nbFreeScans: 0,
+                cookiePreferences: null,
+              },
+              null,
+            ];
+          }
+        },
+      );
     } catch (error) {
       console.error(error);
       return redirectToApp({ error: ERRORS.INVALID_REQUEST });
@@ -243,7 +252,7 @@ export const oauthSigninCallback =
 
     let signinInfos: SigninInfos;
     try {
-      signinInfos = await retrieveSigninInfos(user!, profile);
+      signinInfos = await retrieveSigninInfos(user, profile);
     } catch (error) {
       if (error instanceof Error && error.message === 'User deleted') {
         return redirectToApp({ error: ERRORS.FORBIDDEN });
