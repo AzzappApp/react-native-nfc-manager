@@ -1,3 +1,8 @@
+## 1.9.2-canary.15
+
+* **fix:**  - filter out invalid numbers (whatsapp use case) ([#8301](https://github.com/AzzappApp/azzapp/pull/8301))
+* **fix:**  - multiUserContact card update synchronization ([#8293](https://github.com/AzzappApp/azzapp/pull/8293))
+
 ## 1.9.2-canary.14
 
 * **fix:**  - align libphonenumber-js dependencies ([#8282](https://github.com/AzzappApp/azzapp/pull/8282))
