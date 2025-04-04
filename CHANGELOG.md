@@ -1,3 +1,7 @@
+## 1.9.2-rc.10
+
+
+
 ## 1.9.2-rc.9
 
 * **fix:**  - **multiUser:** [#8279](https://github.com/AzzappApp/azzapp/pull/8279) recreate deleted users on invitation ([#8288](https://github.com/AzzappApp/azzapp/pull/8288))
