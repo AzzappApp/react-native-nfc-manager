@@ -8,11 +8,7 @@ import {
 import ERRORS from '@azzapp/shared/errors';
 import { isValidUserName } from '@azzapp/shared/stringHelpers';
 import { invalidateWebCard, notifyWebCardUsers } from '#externals';
-import {
-  profileByWebCardIdAndUserIdLoader,
-  webCardLoader,
-  webCardOwnerLoader,
-} from '#loaders';
+import { webCardLoader, webCardOwnerLoader } from '#loaders';
 import { checkWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
 import fromGlobalIdWithType from '#helpers/relayIdHelpers';
 import { validateCurrentSubscription } from '#helpers/subscriptionHelpers';
