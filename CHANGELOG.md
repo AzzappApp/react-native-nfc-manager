@@ -1,3 +1,8 @@
+## 1.9.2-rc.12
+
+* **fix:**  - **modules:** [#8294](https://github.com/AzzappApp/azzapp/pull/8294) use rich text in title ([#8299](https://github.com/AzzappApp/azzapp/pull/8299))
+* **fix:**  - email is not returned to admin ([#8300](https://github.com/AzzappApp/azzapp/pull/8300))
+
 ## 1.9.2-rc.11
 
 * **fix:**  - **multiUser:** [#8279](https://github.com/AzzappApp/azzapp/pull/8279) recreate deleted users on invitation ([#8288](https://github.com/AzzappApp/azzapp/pull/8288))
