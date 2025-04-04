@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import { StyleSheet } from 'react-native';
@@ -102,15 +102,8 @@ const ContactCardEditScreen = ({
 
   const intl = useIntl();
 
-  const {
-    control,
-    handleSubmit,
-    formState: { isSubmitting },
-  } = useForm<ContactCardFormValues>({
-    mode: 'onBlur',
-    shouldFocusError: true,
-    resolver: zodResolver(contactCardSchema),
-    defaultValues: {
+  const defaultValues = useMemo(() => {
+    return {
       ...contactCard,
       company: contactCard?.company ?? '',
       emails: contactCard?.emails?.map(m => ({ ...m })) ?? [],
@@ -122,8 +115,24 @@ const ContactCardEditScreen = ({
       socials: contactCard?.socials?.map(p => ({ ...p })) ?? [],
       avatar,
       logo: webCard?.isMultiUser ? webCard?.logo || logo : logo,
-    },
+    };
+  }, [avatar, contactCard, logo, webCard?.isMultiUser, webCard?.logo]);
+
+  const {
+    control,
+    handleSubmit,
+    formState: { isSubmitting },
+    reset,
+  } = useForm<ContactCardFormValues>({
+    mode: 'onBlur',
+    shouldFocusError: true,
+    resolver: zodResolver(contactCardSchema),
+    defaultValues,
   });
+
+  useEffect(() => {
+    reset(defaultValues);
+  }, [defaultValues, reset]);
 
   const [progressIndicator, setProgressIndicator] =
     useState<Observable<number> | null>(null);
