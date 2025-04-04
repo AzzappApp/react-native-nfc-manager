@@ -3,6 +3,7 @@ import { getUsersToNotifyOnWebCard } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
 import { sendPushNotification } from '#helpers/notificationsHelpers';
 import { inngest } from '../client';
+import type { WebCard } from '@azzapp/data';
 
 const NOTIF_DELAY = process.env.WEBCARD_NOTIFICATION_DELAY || '5m';
 
@@ -18,7 +19,8 @@ export const notifyWebCardUsersBatch = inngest.createFunction(
   },
   { event: 'batch/webCardUsersNotification' },
   async ({ event, step }) => {
-    const webCard = event.data.webCard;
+    const webCard: WebCard = event.data.webCard;
+    const editorUserId: string = event.data.editorUserId;
 
     if (!webCard) {
       return { queued: 0 };
@@ -26,7 +28,7 @@ export const notifyWebCardUsersBatch = inngest.createFunction(
 
     await step.sleep('wait-debounce', NOTIF_DELAY);
 
-    const users = await getUsersToNotifyOnWebCard(webCard.id);
+    const users = await getUsersToNotifyOnWebCard(webCard.id, editorUserId);
 
     for (const user of users) {
       await step.sendEvent(`send-webCardUpdate-${webCard.id}-${user.id}`, {

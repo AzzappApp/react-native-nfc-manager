@@ -61,4 +61,6 @@ export const sendEmailSignatures = externalFunction<
 >('sendEmailSignatures');
 
 export const notifyWebCardUsers =
-  externalFunction<(webCard: WebCard) => void>('notifyWebCardUsers');
+  externalFunction<(webCard: WebCard, editorUserId: string) => void>(
+    'notifyWebCardUsers',
+  );

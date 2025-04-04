@@ -8,6 +8,7 @@ import {
   referencesMedias,
   transaction,
   updateProfile,
+  updateUser,
   updateWebCard,
 } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
@@ -109,6 +110,25 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
           email: invited.email,
           phoneNumber,
           invited: true,
+        });
+      } else if (existingUser && existingUser.deleted) {
+        if (existingUser.deletedBy !== existingUser.id) {
+          throw new GraphQLError(ERRORS.USER_IS_BLOCKED);
+        }
+
+        userId = await transaction(async () => {
+          const userId = await createUser({
+            email: invited.email,
+            phoneNumber,
+            invited: true,
+          });
+          await updateUser(existingUser.id, {
+            appleId: null,
+            email: null,
+            phoneNumber: null,
+            replacedBy: userId,
+          });
+          return userId;
         });
       } else {
         userId = existingUser.id;

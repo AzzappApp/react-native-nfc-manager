@@ -29,7 +29,7 @@ const reorderModules: MutationResolvers['reorderModules'] = async (
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
   }
 
-  await checkWebCardProfileEditorRight(webCardId);
+  const profile = await checkWebCardProfileEditorRight(webCardId);
 
   try {
     transaction(async () => {
@@ -51,7 +51,7 @@ const reorderModules: MutationResolvers['reorderModules'] = async (
     throw new GraphQLError(ERRORS.INTERNAL_SERVER_ERROR);
   }
 
-  notifyWebCardUsers(webCard);
+  notifyWebCardUsers(webCard, profile.userId);
 
   if (webCard.userName) {
     invalidateWebCard(webCard.userName);

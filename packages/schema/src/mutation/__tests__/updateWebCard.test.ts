@@ -3,6 +3,7 @@ import ERRORS from '@azzapp/shared/errors';
 import { isValidUserName } from '@azzapp/shared/stringHelpers';
 import { getSessionInfos } from '#GraphQLContext';
 import { profileByWebCardIdAndUserIdLoader, webCardLoader } from '#loaders';
+import { checkWebCardProfileEditorRight } from '#helpers/permissionsHelpers';
 import { isUserNameAvailable } from '#helpers/webCardHelpers';
 import updateWebCardMutation from '../updateWebCard';
 
@@ -82,6 +83,10 @@ describe('updateWebCardMutation', () => {
     (webCardLoader.load as jest.Mock).mockResolvedValue({
       ...mockWebCard,
       userName: null,
+    });
+    (checkWebCardProfileEditorRight as jest.Mock).mockResolvedValue({
+      invited: false,
+      profileRole: 'admin',
     });
     (isValidUserName as jest.Mock).mockReturnValue(false);
     (getSessionInfos as jest.Mock).mockReturnValue({ userId: 'user-1' });

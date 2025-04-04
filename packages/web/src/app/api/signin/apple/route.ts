@@ -16,7 +16,7 @@ import { PLATFORM_HEADER } from '@azzapp/shared/networkHelpers';
 import { handleSignInAuthMethod } from '#helpers/auth';
 import cors from '#helpers/cors';
 import { withPluginsRoute } from '#helpers/queries';
-import type { User } from '@azzapp/data';
+import type { Profile, User } from '@azzapp/data';
 import type { JWTPayload } from 'jose';
 
 const APPLE_JWKS_URL = 'https://appleid.apple.com/auth/keys';
@@ -63,96 +63,107 @@ const appleSignin = async (req: Request) => {
   }
 
   try {
-    const email = payload.email;
-    let user = await getUserByAppleId(appleId);
-    let oldUser: User | null = null;
-
-    if (user?.deleted && user.id === user.deletedBy) {
-      await updateUser(user.id, {
-        appleId: null,
-        email: null,
-        phoneNumber: null,
-      });
-      oldUser = user;
-      user = null;
-    }
-    if (user) {
-      const profiles = await getProfilesByUser(user.id);
-      return handleSignInAuthMethod(user, profiles[0] ?? null);
-    } else {
-      if (!email || typeof email !== 'string') {
-        console.error('Apple Sign In: no email');
-        return NextResponse.json(
-          { message: ERRORS.INVALID_CREDENTIALS },
-          { status: 401 },
-        );
-      }
-      const user = await getUserByEmail(email);
-      if (user) {
-        await updateUser(user.id, {
-          appleId,
-          userContactData: {
-            ...user.userContactData,
-            firstName: firstName ?? user.userContactData?.firstName,
-            lastName: lastName ?? user.userContactData?.lastName,
-          },
-        });
-        const profiles = await getProfilesByUser(user.id);
-        return handleSignInAuthMethod(user, profiles[0] ?? null);
-      } else {
-        const newUser = {
-          email,
-          phoneNumber: null,
-          password: null,
-          locale: locale ?? null,
-          roles: null,
-          termsOfUseAcceptedVersion: null,
-          termsOfUseAcceptedAt: null,
-          hasAcceptedCommunications: false,
-          appleId,
-          emailConfirmed: true,
-          phoneNumberConfirmed: false,
-        };
-
-        return transaction(async () => {
-          const userId = await createUser(newUser);
-          if (oldUser) {
-            await updateUser(oldUser.id, {
-              replacedBy: userId,
-            });
+    const [signedUser, profile] = await transaction(
+      async (): Promise<[User, Profile | null]> => {
+        const email = payload.email;
+        let user = await getUserByAppleId(appleId);
+        let oldUser: User | null = null;
+        if (user?.deleted && user.id === user.deletedBy) {
+          await updateUser(user.id, {
+            appleId: null,
+            email: null,
+            phoneNumber: null,
+          });
+          oldUser = user;
+          user = null;
+        }
+        if (user) {
+          const profiles = await getProfilesByUser(user.id);
+          return [user, profiles[0] ?? null];
+        } else {
+          if (!email || typeof email !== 'string') {
+            console.error('Apple Sign In: no email');
+            throw new Error(ERRORS.INVALID_CREDENTIALS);
           }
-
-          if (req.headers.get(PLATFORM_HEADER) === 'android') {
-            await createFreeSubscriptionForBetaAndroidPeriod([userId]);
-          }
-
-          return handleSignInAuthMethod(
-            {
-              ...newUser,
-              id: userId,
-              createdAt: new Date(),
-              updatedAt: new Date(),
-              deletedAt: null,
-              note: null,
-              replacedBy: null,
-              deleted: false,
-              deletedBy: null,
-              invited: false,
-              nbFreeScans: 0,
+          const user = await getUserByEmail(email);
+          if (user) {
+            const updates = {
+              appleId,
+              emailConfirmed: true,
               userContactData: {
+                ...user.userContactData,
+                email,
+                firstName: firstName ?? user.userContactData?.firstName,
+                lastName: lastName ?? user.userContactData?.lastName,
+              },
+            };
+            await updateUser(user.id, updates);
+            const profiles = await getProfilesByUser(user.id);
+            return [{ ...user, ...updates }, profiles[0] ?? null];
+          } else {
+            const newUser = {
+              email,
+              phoneNumber: null,
+              password: null,
+              locale: locale ?? null,
+              roles: null,
+              termsOfUseAcceptedVersion: null,
+              termsOfUseAcceptedAt: null,
+              hasAcceptedCommunications: false,
+              appleId,
+              emailConfirmed: true,
+              phoneNumberConfirmed: false,
+              userContactData: {
+                email,
                 firstName,
                 lastName,
               },
-              cookiePreferences: null,
-            },
-            null,
-          );
-        });
-      }
-    }
+            };
+
+            const userId = await createUser(newUser);
+            if (oldUser) {
+              await updateUser(oldUser.id, {
+                replacedBy: userId,
+              });
+            }
+
+            if (req.headers.get(PLATFORM_HEADER) === 'android') {
+              await createFreeSubscriptionForBetaAndroidPeriod([userId]);
+            }
+            return [
+              {
+                ...newUser,
+                id: userId,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                deletedAt: null,
+                note: null,
+                replacedBy: null,
+                deleted: false,
+                deletedBy: null,
+                invited: false,
+                nbFreeScans: 0,
+                cookiePreferences: null,
+              },
+              null,
+            ];
+          }
+        }
+      },
+    );
+    return handleSignInAuthMethod(signedUser, profile);
   } catch (error) {
     console.error(error);
     Sentry.captureException(error);
+    if (
+      error instanceof Error &&
+      error.message === ERRORS.INVALID_CREDENTIALS
+    ) {
+      return NextResponse.json(
+        { message: ERRORS.INVALID_CREDENTIALS },
+        { status: 401 },
+      );
+    }
     return NextResponse.json(
       { message: ERRORS.INTERNAL_SERVER_ERROR },
       { status: 500 },

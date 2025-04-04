@@ -514,6 +514,18 @@ const MultiUserAddModal = (
             onCompleted();
           },
           onError: e => {
+            if (e.message === ERRORS.USER_IS_BLOCKED) {
+              Toast.show({
+                type: 'error',
+                text1: intl.formatMessage({
+                  defaultMessage:
+                    'Error, this user is not allowed to user azzapp',
+                  description:
+                    'Error toast message when inviting user that is blocked from MultiUserAddModal',
+                }),
+              });
+              return;
+            }
             if (e.message === ERRORS.PROFILE_ALREADY_EXISTS) {
               Toast.show({
                 type: 'error',

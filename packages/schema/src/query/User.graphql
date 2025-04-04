@@ -63,6 +63,10 @@ type User {
   Returns the user's cookie preferences, null if the user has not set them yet
   """
   cookiePreferences: CookiePreferences
+  """
+  Returns true when user has filled a password
+  """
+  hasPassword: Boolean!
 }
 
 

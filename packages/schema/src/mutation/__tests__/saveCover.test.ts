@@ -89,7 +89,10 @@ describe('saveCover', () => {
 
   test('should successfully save cover with valid inputs', async () => {
     (fromGlobalIdWithType as jest.Mock).mockReturnValue('webcard-123');
-    (checkWebCardProfileEditorRight as jest.Mock).mockResolvedValue(undefined);
+    (checkWebCardProfileEditorRight as jest.Mock).mockResolvedValue({
+      profileRole: 'editor',
+      userId: 'editor-user-id',
+    });
     (webCardLoader.load as jest.Mock).mockResolvedValue(mockWebCard);
     (checkMedias as jest.Mock).mockResolvedValue(undefined);
     (getWebCardPosts as jest.Mock).mockResolvedValue([
@@ -140,7 +143,10 @@ describe('saveCover', () => {
     expect(invalidatePost).toHaveBeenCalledTimes(2);
     expect(invalidatePost).toHaveBeenCalledWith('testUser', 'post-1');
     expect(invalidatePost).toHaveBeenCalledWith('testUser', 'post-2');
-    expect(notifyWebCardUsers).toHaveBeenCalledWith(mockWebCard);
+    expect(notifyWebCardUsers).toHaveBeenCalledWith(
+      mockWebCard,
+      'editor-user-id',
+    );
 
     expect(result).toEqual({
       webCard: expect.objectContaining({

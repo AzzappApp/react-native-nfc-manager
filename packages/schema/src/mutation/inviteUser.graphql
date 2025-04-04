@@ -30,6 +30,7 @@ enum InviteUserRejectedReason {
   wrongPhoneNumber
   alreadyInvited
   unknownError
+  userIsBlocked
 }
 
 type InviteUsersListPayload {

@@ -6,10 +6,8 @@ import {
   deleteRedirectionFromTo,
 } from '@azzapp/data';
 import ERRORS from '@azzapp/shared/errors';
-import { profileHasAdminRight } from '@azzapp/shared/profileHelpers';
 import { isValidUserName } from '@azzapp/shared/stringHelpers';
 import { invalidateWebCard, notifyWebCardUsers } from '#externals';
-import { getSessionInfos } from '#GraphQLContext';
 import {
   profileByWebCardIdAndUserIdLoader,
   webCardLoader,
@@ -36,10 +34,9 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
   _,
   { webCardId: gqlWebCardId, input: updates },
 ) => {
-  const { userId } = getSessionInfos();
   const webCardId = fromGlobalIdWithType(gqlWebCardId, 'WebCard');
 
-  await checkWebCardProfileEditorRight(webCardId);
+  const profile = await checkWebCardProfileEditorRight(webCardId);
 
   const { ...profileUpdates } = updates;
 
@@ -47,21 +44,6 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
 
   if (!webCard) {
     throw new GraphQLError(ERRORS.INVALID_REQUEST);
-  }
-
-  const profile =
-    userId &&
-    (await profileByWebCardIdAndUserIdLoader.load({ userId, webCardId }));
-
-  if (!profile || profile.invited) {
-    throw new GraphQLError(ERRORS.UNAUTHORIZED);
-  }
-  if (!profileHasAdminRight(profile.profileRole)) {
-    throw new GraphQLError(ERRORS.FORBIDDEN, {
-      extensions: {
-        role: profile.profileRole,
-      },
-    });
   }
 
   const partialWebCard: Partial<WebCard> = {
@@ -121,7 +103,7 @@ const updateWebCardMutation: MutationResolvers['updateWebCard'] = async (
   }
 
   try {
-    notifyWebCardUsers(webCard);
+    notifyWebCardUsers(webCard, profile.userId);
 
     await transaction(async () => {
       await updateWebCard(webCardId, partialWebCard);

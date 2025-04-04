@@ -60,6 +60,21 @@ export const getUserByAppleId = (appleId: string): Promise<User | null> =>
     .then(res => res[0] ?? null);
 
 /**
+ * Retrieve a list of deleted users by their emails
+ *
+ * @param email - The email of the user to retrieve
+ * @returns The user if found, otherwise null
+ */
+export const getDeletedUsersByEmail = async (emails: string[]) => {
+  const users = await db()
+    .select()
+    .from(UserTable)
+    .where(and(inArray(UserTable.email, emails), eq(UserTable.deleted, true)));
+
+  return users;
+};
+
+/**
  * Retrieve a list of users by their emails
  *
  * @param email - The email of the user to retrieve

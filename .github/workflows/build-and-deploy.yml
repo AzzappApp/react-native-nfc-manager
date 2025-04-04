@@ -327,6 +327,9 @@ jobs:
           PURCHASE_ANDROID_KEY: ${{ vars.PURCHASE_ANDROID_KEY }}
           APP_WEBSHARED_CREDENTIALS: ${{ vars.APP_WEBSHARED_CREDENTIALS }}
           SENTRY_DSN: 'https://13a33b3788344ceea14cf298a220fead@o4505353883680768.ingest.sentry.io/4505358469038080'
+          SENTRY_AUTH_TOKEN: ${{ vars.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: 'azzapp'
+          SENTRY_PROJECT: 'azzapp-app'
           TERMS_OF_SERVICE: https://web.azzapp.com/legal/terms-of-service
           PRIVACY_POLICY: https://web.azzapp.com/legal/privacy
           ABOUT: https://web.azzapp.com/company/about_us
@@ -443,6 +446,9 @@ jobs:
           PURCHASE_ANDROID_KEY: ${{ vars.PURCHASE_ANDROID_KEY }}
           APP_WEBSHARED_CREDENTIALS: ${{ vars.APP_WEBSHARED_CREDENTIALS }}
           SENTRY_DSN: 'https://13a33b3788344ceea14cf298a220fead@o4505353883680768.ingest.sentry.io/4505358469038080'
+          SENTRY_AUTH_TOKEN: ${{ vars.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: 'azzapp'
+          SENTRY_PROJECT: 'azzapp-app'
           TERMS_OF_SERVICE: https://web.azzapp.com/legal/terms-of-service
           PRIVACY_POLICY: https://web.azzapp.com/legal/privacy
           ABOUT: https://web.azzapp.com/company/about_us
