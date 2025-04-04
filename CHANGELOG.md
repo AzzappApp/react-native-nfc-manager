@@ -1,3 +1,7 @@
+## 1.9.2-rc.8
+
+* **fix:**  - **OAuth:** use transaction for whole operation and confirm email ([#8285](https://github.com/AzzappApp/azzapp/pull/8285))
+
 ## 1.9.2-rc.7
 
 * **fix:**  - **multiUser:** [#8266](https://github.com/AzzappApp/azzapp/pull/8266) don’t send notification to editor of the webcard ([#8269](https://github.com/AzzappApp/azzapp/pull/8269))
