@@ -92,20 +92,11 @@ const MultiUserDetailsScreen = ({
     contactCardFormFragment,
     profile as ContactCardEditFormFragment_profile$key,
   );
+  const defaultValues = useMemo(() => {
+    const phoneNumber =
+      profile?.user?.phoneNumber && parsePhoneNumber(profile.user.phoneNumber);
 
-  const phoneNumber =
-    profile?.user?.phoneNumber && parsePhoneNumber(profile.user.phoneNumber);
-
-  const {
-    control,
-    watch,
-    handleSubmit,
-    formState: { dirtyFields, isSubmitting },
-  } = useForm<MultiUserDetailFormValues>({
-    mode: 'onBlur',
-    resolver: zodResolver(multiUserDetailsSchema),
-    shouldFocusError: true,
-    defaultValues: {
+    return {
       role: profile?.profileRole,
       firstName: contactCard?.firstName,
       lastName: contactCard?.lastName,
@@ -122,7 +113,7 @@ const MultiUserDetailsScreen = ({
       avatar,
       selectedContact: profile?.user?.email
         ? {
-            countryCodeOrEmail: 'email',
+            countryCodeOrEmail: 'email' as const,
             value: profile.user.email,
           }
         : phoneNumber && phoneNumber?.isValid()
@@ -132,8 +123,33 @@ const MultiUserDetailsScreen = ({
             }
           : null,
       logo: webCard?.logo || logo,
-    },
+    };
+  }, [
+    avatar,
+    contactCard,
+    logo,
+    profile?.profileRole,
+    profile?.user?.email,
+    profile?.user?.phoneNumber,
+    webCard?.logo,
+  ]);
+
+  const {
+    control,
+    watch,
+    handleSubmit,
+    formState: { dirtyFields, isSubmitting },
+    reset,
+  } = useForm<MultiUserDetailFormValues>({
+    mode: 'onBlur',
+    resolver: zodResolver(multiUserDetailsSchema),
+    shouldFocusError: true,
+    defaultValues,
   });
+
+  useEffect(() => {
+    reset(defaultValues);
+  }, [defaultValues, reset]);
 
   const [commit, saving] =
     useMutation<MultiUserDetailsScreen_UpdateProfileMutation>(graphql`
