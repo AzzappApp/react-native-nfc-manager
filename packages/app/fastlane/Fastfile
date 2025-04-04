@@ -238,6 +238,33 @@ platform :ios do
     )
 
     restore_file(path: pbxprojPath)
+
+     # === SENTRY SOURCEMAP UPLOAD ===
+
+    # Génère les fichiers JS bundle + sourcemap
+    sh("npx react-native bundle \
+      --platform ios \
+      --dev false \
+      --entry-file index.js \
+      --bundle-output ./main.jsbundle \
+      --assets-dest ./assets \
+      --sourcemap-output ./main.jsbundle.map")
+
+    # Récupère les infos de version pour nommer la release
+    version = get_info_plist_value(path: main_app_plist, key: "CFBundleShortVersionString")
+    build = get_info_plist_value(path: main_app_plist, key: "CFBundleVersion")
+    release_name = "#{APP_IDENT}@#{version}+#{build}"
+
+    # Upload vers Sentry via le plugin officiel
+    sentry_upload_sourcemaps(
+      auth_token: ENV['SENTRY_AUTH_TOKEN'],
+      org_slug: ENV['SENTRY_ORG'],
+      project_slug: ENV['SENTRY_PROJECT'],
+      release_name: release_name,
+      dist: build,
+      sourcemap_path: "./main.jsbundle.map",
+      bundle_path: "./main.jsbundle"
+    )
   end
 
   lane :deploy do
