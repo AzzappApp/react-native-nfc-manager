@@ -10,6 +10,7 @@ import {
   like,
   or,
   count,
+  isNotNull,
 } from 'drizzle-orm';
 import { db, transaction } from '../database';
 import { createId } from '../helpers/createId';
@@ -67,6 +68,7 @@ export const searchWebCards = ({
         eq(WebCardTable.cardIsPublished, true),
         eq(WebCardTable.deleted, false),
         eq(WebCardTable.coverIsPredefined, false),
+        isNotNull(WebCardTable.userName),
         after ? lt(WebCardTable.createdAt, after) : undefined,
         search
           ? or(
