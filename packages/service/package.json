@@ -1,6 +1,6 @@
 {
   "name": "@azzapp/service",
-  "version": "1.9.2-rc.2",
+  "version": "1.9.2-rc.3",
   "private": true,
   "exports": {
     "./*": {
