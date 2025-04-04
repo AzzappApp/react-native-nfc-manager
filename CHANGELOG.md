@@ -1,3 +1,7 @@
+## 1.9.2-canary.13
+
+* **fix:**  - align libphonenumber-js dependencies ([#8282](https://github.com/AzzappApp/azzapp/pull/8282))
+
 ## 1.9.2-canary.12
 
 
