@@ -1,3 +1,7 @@
+## 1.8.24
+
+* **fix:**  - **community:** [#8281](https://github.com/AzzappApp/azzapp/pull/8281) hide webcards that have no username ([#8292](https://github.com/AzzappApp/azzapp/pull/8292))
+
 ## 1.8.23
 
 * **fix:**  - **payment:** round minutes to avoid error on backend ([#8241](https://github.com/AzzappApp/azzapp/pull/8241))
