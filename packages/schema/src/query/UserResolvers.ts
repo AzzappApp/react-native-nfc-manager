@@ -48,14 +48,14 @@ const hasAdminRightOnSharedWebCard = async (user: UserModel) => {
 
 export const User: ProtectedResolver<UserResolvers> = {
   id: user => user.id,
-  email(user) {
-    if (!isSameUser(user) || !hasAdminRightOnSharedWebCard(user)) {
+  email: async user => {
+    if (!isSameUser(user) && !(await hasAdminRightOnSharedWebCard(user))) {
       return null;
     }
     return user.email;
   },
-  phoneNumber(user) {
-    if (!isSameUser(user) || !hasAdminRightOnSharedWebCard(user)) {
+  phoneNumber: async user => {
+    if (!isSameUser(user) && !(await hasAdminRightOnSharedWebCard(user))) {
       return null;
     }
     return user.phoneNumber;
