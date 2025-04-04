@@ -96,6 +96,7 @@ const appleSignin = async (req: Request) => {
             firstName: firstName ?? user.userContactData?.firstName,
             lastName: lastName ?? user.userContactData?.lastName,
           },
+          emailConfirmed: true,
         });
         const profiles = await getProfilesByUser(user.id);
         return handleSignInAuthMethod(user, profiles[0] ?? null);

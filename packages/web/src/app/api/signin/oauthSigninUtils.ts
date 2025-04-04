@@ -172,6 +172,7 @@ export const oauthSigninCallback =
           appleId: null,
           email: null,
           phoneNumber: null,
+          emailConfirmed: true,
         });
         oldUser = user;
         user = null;
