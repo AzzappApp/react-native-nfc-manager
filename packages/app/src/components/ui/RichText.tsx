@@ -133,20 +133,29 @@ export const RichTextFromAST = ({
   return <></>;
 };
 
-type RichTextProps = {
-  text: string | undefined;
-  style?: TextStyle | TextStyle[];
-  fontSize: number;
-  forceFontResizeValue?: number;
-};
+type RichTextProps =
+  | {
+      style?: TextStyle | TextStyle[];
+      fontSize: number;
+      forceFontResizeValue?: number;
+      children: string | undefined;
+    }
+  | {
+      text: string | undefined;
+      style?: TextStyle | TextStyle[];
+      fontSize: number;
+      forceFontResizeValue?: number;
+    };
 
 export const RichText = ({
-  text,
   style = {},
   fontSize,
   forceFontResizeValue,
+  ...props
 }: RichTextProps): JSX.Element => {
-  const ast = parseHTMLToRichText(text);
+  const ast = parseHTMLToRichText(
+    'children' in props ? props.children : props.text,
+  );
   return (
     <Text style={style}>
       <RichTextFromAST

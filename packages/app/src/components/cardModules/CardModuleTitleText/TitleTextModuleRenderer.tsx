@@ -237,13 +237,14 @@ const TitleTextColumnRenderer = ({
           key={`titleTextModule_column_${index}`}
         >
           <RichText
-            text={column}
             style={[
               getTextStyle(cardStyle, cardModuleColor),
               getTextAlignmentStyle(variant),
             ]}
             fontSize={cardStyle?.fontSize || defaultTextFontSize}
-          />
+          >
+            {column}
+          </RichText>
         </View>
       );
     });
@@ -257,15 +258,15 @@ const TitleTextColumnRenderer = ({
       }}
     >
       <View style={textViewContainerStyle}>
-        <Text
-          variant="large"
+        <RichText
           style={[
             getTitleStyle(cardStyle, cardModuleColor),
             getTitleAlignmentStyle(variant),
           ]}
+          fontSize={cardStyle?.titleFontSize || defaultTitleFontSize}
         >
           {title}
-        </Text>
+        </RichText>
       </View>
       {!iSplitLayout(variant) ? (
         renderTextColumn
