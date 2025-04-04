@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/react-native';
 import { screen, act, fireEvent } from '@testing-library/react-native';
 import { GraphQLError } from 'graphql';
-import { omit } from 'lodash';
+import omit from 'lodash/omit';
 import React, { createElement } from 'react';
 import { Text } from 'react-native';
 import { fetchQuery } from 'react-relay';

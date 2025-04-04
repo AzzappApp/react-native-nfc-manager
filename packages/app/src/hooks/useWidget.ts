@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/react-native';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import { useCallback, useEffect, useState } from 'react';
 import { NativeModules, Platform } from 'react-native';
 import SharedGroupPreferences from 'react-native-shared-group-preferences';

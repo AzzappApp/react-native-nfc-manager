@@ -1,4 +1,8 @@
-import _ from 'lodash';
+import intersection from 'lodash/intersection';
+import isEqual from 'lodash/isEqual';
+import keys from 'lodash/keys';
+import pick from 'lodash/pick';
+
 import { startTransition } from 'react';
 import { MMKV } from 'react-native-mmkv';
 import ERRORS from '@azzapp/shared/errors';
@@ -263,12 +267,12 @@ const emitAuthState = () => {
 export const getTokens = () => authTokens;
 
 export const commonKeysAreEqual = (a: any, b: any) => {
-  const commonKeys = _.intersection(_.keys(a), _.keys(b));
+  const commonKeys = intersection(keys(a), keys(b));
 
-  const obj1Common = _.pick(a, commonKeys);
-  const obj2Common = _.pick(b, commonKeys);
+  const obj1Common = pick(a, commonKeys);
+  const obj2Common = pick(b, commonKeys);
 
-  return _.isEqual(obj1Common, obj2Common);
+  return isEqual(obj1Common, obj2Common);
 };
 
 export const onChangeWebCard = (infos?: Partial<ProfileInfosInput> | null) => {

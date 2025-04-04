@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { parse } from '@lepirlouit/vcard-parser';
 import { File } from 'expo-file-system/next';
-import { capitalize } from 'lodash';
+import capitalize from 'lodash/capitalize';
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';

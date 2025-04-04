@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/react-native';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import {
   forwardRef,
   useCallback,
