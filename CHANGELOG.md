@@ -1,3 +1,7 @@
+## 1.9.2-rc.15
+
+* **fix:**  - **multiUser:** [#8305](https://github.com/AzzappApp/azzapp/pull/8305) issue on duplicated email ([#8307](https://github.com/AzzappApp/azzapp/pull/8307))
+
 ## 1.9.2-rc.14
 
 
