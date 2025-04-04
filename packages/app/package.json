@@ -41,7 +41,6 @@
     "@react-native-firebase/analytics": "^21.13.0",
     "@react-native-firebase/app": "^21.13.0",
     "@react-native-firebase/messaging": "^21.13.0",
-    "@react-native-masked-view/masked-view": "^0.3.2",
     "@reeq/react-native-passkit": "^0.1.3",
     "@sentry/core": "^9.10.1",
     "@sentry/react-native": "^6.10.0",

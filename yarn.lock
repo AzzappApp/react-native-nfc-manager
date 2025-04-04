@@ -349,7 +349,6 @@ __metadata:
     "@react-native-firebase/analytics": "npm:^21.13.0"
     "@react-native-firebase/app": "npm:^21.13.0"
     "@react-native-firebase/messaging": "npm:^21.13.0"
-    "@react-native-masked-view/masked-view": "npm:^0.3.2"
     "@react-native/babel-preset": "npm:^0.77.1"
     "@react-native/metro-config": "npm:^0.77.1"
     "@react-native/typescript-config": "npm:^0.77.1"
@@ -10211,16 +10210,6 @@ __metadata:
     expo:
       optional: true
   checksum: 10/208e1baf5337d7e068c81d7acc22cea4ea89f829aedf301331a642889c8153ebfe1dcf56d44ebf5da8390ef90640a077dd6145ad191da5ea67e5398d08900b46
-  languageName: node
-  linkType: hard
-
-"@react-native-masked-view/masked-view@npm:^0.3.2":
-  version: 0.3.2
-  resolution: "@react-native-masked-view/masked-view@npm:0.3.2"
-  peerDependencies:
-    react: ">=16"
-    react-native: ">=0.57"
-  checksum: 10/04ffbc01083aa563ca1e2d7ef6759e7b326b8129f5bb1aa5f3142348adab06d5e321a400cf70a5434324dfa906add383f8214640697c48c9e5311b30bfea03d9
   languageName: node
   linkType: hard
 

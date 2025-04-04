@@ -2105,27 +2105,6 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNCMaskedView (0.3.2):
-    - DoubleConversion
-    - glog
-    - hermes-engine
-    - RCT-Folly (= 2024.11.18.00)
-    - RCTRequired
-    - RCTTypeSafety
-    - React-Core
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-ImageManager
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-rendererdebug
-    - React-utils
-    - ReactCodegen
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
-    - Yoga
   - RNDateTimePicker (8.3.0):
     - DoubleConversion
     - glog
@@ -2681,7 +2660,6 @@ DEPENDENCIES:
   - ReactCodegen (from `build/generated/ios`)
   - ReactCommon/turbomodule/core (from `../../../node_modules/react-native/ReactCommon`)
   - RNBootSplash (from `../../../node_modules/react-native-bootsplash`)
-  - "RNCMaskedView (from `../../../node_modules/@react-native-masked-view/masked-view`)"
   - "RNDateTimePicker (from `../../../node_modules/@react-native-community/datetimepicker`)"
   - RNDeviceInfo (from `../../../node_modules/react-native-device-info`)
   - "RNFBAnalytics (from `../../../node_modules/@react-native-firebase/analytics`)"
@@ -2956,8 +2934,6 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native/ReactCommon"
   RNBootSplash:
     :path: "../../../node_modules/react-native-bootsplash"
-  RNCMaskedView:
-    :path: "../../../node_modules/@react-native-masked-view/masked-view"
   RNDateTimePicker:
     :path: "../../../node_modules/@react-native-community/datetimepicker"
   RNDeviceInfo:
@@ -3097,7 +3073,7 @@ SPEC CHECKSUMS:
   react-native-quick-base64: e69675f0ddca418dd1eb8a6ffa06ed388be293d9
   react-native-safe-area-context: 0f14bce545abcdfbff79ce2e3c78c109f0be283e
   react-native-skia: d3d3afa9c428c6c7ccfd89a02683b5dbf2f31d35
-  react-native-skottie-template-player: e71f773222960069b747bd3b14d86be395c5a3d0
+  react-native-skottie-template-player: 95854ca527f4c0cc16e2f14ff5258303360980b7
   react-native-webview: 5095dd03fc98a529e44a6bb81aed21062b5f879e
   React-nativeconfig: ecf4dc92c40b97e2b3f0c619938f78bfd6507b08
   React-NativeModulesApple: f457bbfb30fb3bc41979b1a87b99d292d7340d39
@@ -3130,7 +3106,6 @@ SPEC CHECKSUMS:
   ReactCommon: 7763e59534d58e15f8f22121cdfe319040e08888
   RevenueCat: e47ff90dfd271fde155a4befe48e8fc02e8281e4
   RNBootSplash: 540e4bfcfe3a9c0a2fe5b3d28d5efe0458f8e7cb
-  RNCMaskedView: 308c763227e237d4d260bd8841870e099572bb3e
   RNDateTimePicker: e30677c15dfba25452b1434181970162115cc4fe
   RNDeviceInfo: d863506092aef7e7af3a1c350c913d867d795047
   RNFBAnalytics: da29743db77019d6c757a91cc0450317770b489c
