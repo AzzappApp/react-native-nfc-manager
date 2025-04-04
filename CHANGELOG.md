@@ -1,3 +1,14 @@
+## 1.9.2-canary.14
+
+* **fix:**  - align libphonenumber-js dependencies ([#8282](https://github.com/AzzappApp/azzapp/pull/8282))
+* **fix:**  - remove expo-sensor (replaced by reanimated sensors management) ([#8275](https://github.com/AzzappApp/azzapp/pull/8275))
+* **fix:**  - remove unused package @react-native-masked-view/masked-view ([#8273](https://github.com/AzzappApp/azzapp/pull/8273))
+* **fix:**  - move dev packages to devDependencies ([#8272](https://github.com/AzzappApp/azzapp/pull/8272))
+* **fix:**  - clean up webCard categories ([#8019](https://github.com/AzzappApp/azzapp/pull/8019))
+* **fix:**  - remove multiline and fix done button on url, social and Email ([#8268](https://github.com/AzzappApp/azzapp/pull/8268))
+* **fix:**  - add a Toast when network connectivity is bad ([#8262](https://github.com/AzzappApp/azzapp/pull/8262))
+* **fix:**  - change the way carousel handle click to avoid incorect gesture i… ([#8260](https://github.com/AzzappApp/azzapp/pull/8260))
+
 ## 1.9.2-canary.13
 
 * **fix:**  - align libphonenumber-js dependencies ([#8282](https://github.com/AzzappApp/azzapp/pull/8282))
