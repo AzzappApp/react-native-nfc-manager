@@ -118,15 +118,17 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
             reason: 'userIsBlocked',
           });
         } else {
-          const userId = await createUser({
-            email: user.email,
-            invited: true,
-          });
+          const userId = createId();
           await updateUser(user.id, {
             appleId: null,
             email: null,
             phoneNumber: null,
             replacedBy: userId,
+          });
+          await createUser({
+            id: userId,
+            email: user.email,
+            invited: true,
           });
         }
       }),

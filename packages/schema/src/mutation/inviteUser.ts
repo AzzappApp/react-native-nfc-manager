@@ -1,6 +1,7 @@
 import { GraphQLError } from 'graphql';
 import {
   checkMedias,
+  createId,
   createProfile,
   createUser,
   getProfileByUserAndWebCard,
@@ -117,16 +118,18 @@ const inviteUserMutation: MutationResolvers['inviteUser'] = async (
         }
 
         userId = await transaction(async () => {
-          const userId = await createUser({
-            email: invited.email,
-            phoneNumber,
-            invited: true,
-          });
+          const userId = createId();
           await updateUser(existingUser.id, {
             appleId: null,
             email: null,
             phoneNumber: null,
             replacedBy: userId,
+          });
+          await createUser({
+            id: userId,
+            email: invited.email,
+            phoneNumber,
+            invited: true,
           });
           return userId;
         });

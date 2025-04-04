@@ -215,7 +215,7 @@ describe('inviteUsersListMutation', () => {
       appleId: null,
       email: null,
       phoneNumber: null,
-      replacedBy: 'new-user-1',
+      replacedBy: 'new-id',
     });
   });
 
