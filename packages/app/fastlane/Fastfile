@@ -261,9 +261,11 @@ platform :ios do
       org_slug: ENV['SENTRY_ORG'],
       project_slug: ENV['SENTRY_PROJECT'],
       version: release_name,
+      app_identifier: APP_IDENT,
+      build: build,
       dist: build,
-      sourcemap_path: "./main.jsbundle.map",
-      bundle_path: "./main.jsbundle"
+      sourcemap: ['main.jsbundle', 'main.jsbundle.map'],
+      rewrite: true
     )
   end
 
