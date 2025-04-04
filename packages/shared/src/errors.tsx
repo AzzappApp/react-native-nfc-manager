@@ -144,9 +144,10 @@ const ERRORS = {
    * The user does not have email adress
    */
   USER_NO_EMAIL: 'USER_NO_EMAIL',
-  /**
-   * not enough seats to publish a webcard
+  /*
+   * The user has been moderated
    */
+  USER_IS_BLOCKED: 'USER_IS_BLOCKED',
 } as const;
 
 export default ERRORS;

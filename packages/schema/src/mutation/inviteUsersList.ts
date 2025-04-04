@@ -10,6 +10,9 @@ import {
   createId,
   getProfilesByWebCard,
   updateProfile,
+  getDeletedUsersByEmail,
+  createUser,
+  updateUser,
 } from '@azzapp/data';
 import { guessLocale } from '@azzapp/i18n';
 import ERRORS from '@azzapp/shared/errors';
@@ -102,7 +105,32 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
       await updateWebCard(webCard.id, { isMultiUser: true });
     }
 
-    let userId;
+    const deletedUsers =
+      filtered.length > 0
+        ? await getDeletedUsersByEmail(filtered.map(f => f.email))
+        : [];
+
+    await Promise.all(
+      deletedUsers.map(async user => {
+        if (user.deletedBy !== user.id) {
+          rejected.push({
+            ...invited.find(f => f.email === user.email),
+            reason: 'userIsBlocked',
+          });
+        } else {
+          const userId = await createUser({
+            email: user.email,
+            invited: true,
+          });
+          await updateUser(user.id, {
+            appleId: null,
+            email: null,
+            phoneNumber: null,
+            replacedBy: userId,
+          });
+        }
+      }),
+    );
 
     await createUsers(
       filtered.map(f => ({
@@ -112,9 +140,12 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
       })),
     );
 
-    const users = (await getUsersByEmail(filtered.map(f => f.email))).filter(
-      user => !!user,
-    );
+    const users =
+      filtered.length > 0
+        ? (await getUsersByEmail(filtered.map(f => f.email))).filter(
+            user => !!user,
+          )
+        : [];
 
     const profiles = await getProfilesByWebCard(webCard.id);
 
@@ -139,7 +170,7 @@ const inviteUsersListMutation: MutationResolvers['inviteUsersList'] = async (
         profile => profile.userId === existingUser.id,
       );
 
-      userId = existingUser.id;
+      const userId = existingUser.id;
       const { displayedOnWebCard, isPrivate, avatarId, ...data } =
         invited.contactCard ?? {};
 
