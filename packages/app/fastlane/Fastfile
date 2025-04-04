@@ -256,7 +256,7 @@ platform :ios do
     release_name = "#{APP_IDENT}@#{version}+#{build}"
 
     # Upload vers Sentry via le plugin officiel
-    sentry_upload_sourcemaps(
+    sentry_upload_sourcemap(
       auth_token: ENV['SENTRY_AUTH_TOKEN'],
       org_slug: ENV['SENTRY_ORG'],
       project_slug: ENV['SENTRY_PROJECT'],
