@@ -1,3 +1,8 @@
+## 1.9.2-rc.9
+
+* **fix:**  - **multiUser:** [#8279](https://github.com/AzzappApp/azzapp/pull/8279) recreate deleted users on invitation ([#8288](https://github.com/AzzappApp/azzapp/pull/8288))
+* **fix:**  - **OAuth:** userContactData for new apple users ([#8289](https://github.com/AzzappApp/azzapp/pull/8289))
+
 ## 1.9.2-rc.8
 
 * **fix:**  - **OAuth:** use transaction for whole operation and confirm email ([#8285](https://github.com/AzzappApp/azzapp/pull/8285))
