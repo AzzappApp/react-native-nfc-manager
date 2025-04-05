@@ -1,12 +1,12 @@
 import { connectionFromArraySlice, cursorToOffset } from 'graphql-relay';
 import {
   getActivePaymentMeans,
-  getCommonWebCardProfiles,
   getUserProfilesWithWebCard,
   getUserPayments,
   countUserPayments,
   getTotalMultiUser,
   getLastTermsOfUse,
+  getSharedWebCardRelation,
 } from '@azzapp/data';
 import { getSessionInfos } from '#GraphQLContext';
 import {
@@ -26,39 +26,44 @@ const isSameUser = (user: UserModel) => {
   return userId === user.id;
 };
 
-const commonProfilesDataLoader = createSessionDataLoader(
-  'CommonProfilesDataLoader',
+const canSeeEmailOrPhoneNumberLoader = createSessionDataLoader(
+  'CanSeeEmailOrPhoneNumberLoader',
   async (keys: readonly string[]) => {
     const { userId } = getSessionInfos();
     if (!userId) {
       return keys.map(() => null);
     }
-    const profiles = await getCommonWebCardProfiles(userId, keys);
 
-    return keys.map(key => profiles[key] ?? null);
+    const relations = await getSharedWebCardRelation(userId, keys);
+
+    return keys.map(targetUserId => {
+      const rel = relations[targetUserId];
+      if (!rel) return false;
+
+      return rel.isAdminOrOwner || rel.hasSharedWithOwner;
+    });
   },
 );
-
-const hasAdminRightOnSharedWebCard = async (user: UserModel) => {
-  const profiles = (await commonProfilesDataLoader.load(user.id)) ?? [];
-  return profiles.some(
-    profileRole => profileRole === 'owner' || profileRole === 'admin',
-  );
-};
 
 export const User: ProtectedResolver<UserResolvers> = {
   id: user => user.id,
   email: async user => {
-    if (!isSameUser(user) && !(await hasAdminRightOnSharedWebCard(user))) {
-      return null;
+    if (
+      isSameUser(user) ||
+      (await canSeeEmailOrPhoneNumberLoader.load(user.id))
+    ) {
+      return user.email;
     }
-    return user.email;
+    return null;
   },
   phoneNumber: async user => {
-    if (!isSameUser(user) && !(await hasAdminRightOnSharedWebCard(user))) {
-      return null;
+    if (
+      isSameUser(user) ||
+      (await canSeeEmailOrPhoneNumberLoader.load(user.id))
+    ) {
+      return user.phoneNumber;
     }
-    return user.phoneNumber;
+    return null;
   },
   publishedWebCards: () => [],
   profiles: async user => {
