@@ -1,3 +1,7 @@
+## 1.9.2-rc.16
+
+* **fix:**  - **multiUser:** [#8304](https://github.com/AzzappApp/azzapp/pull/8304) all users must be able to see owner email or ph… ([#8308](https://github.com/AzzappApp/azzapp/pull/8308))
+
 ## 1.9.2-rc.15
 
 * **fix:**  - **multiUser:** [#8305](https://github.com/AzzappApp/azzapp/pull/8305) issue on duplicated email ([#8307](https://github.com/AzzappApp/azzapp/pull/8307))
