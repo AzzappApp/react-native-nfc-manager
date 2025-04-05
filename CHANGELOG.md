@@ -1,3 +1,7 @@
+## 1.9.2-rc.17
+
+* **fix:**  - **multiUser:** [#8231](https://github.com/AzzappApp/azzapp/pull/8231) add confirmation toast ([#8309](https://github.com/AzzappApp/azzapp/pull/8309))
+
 ## 1.9.2-rc.16
 
 * **fix:**  - **multiUser:** [#8304](https://github.com/AzzappApp/azzapp/pull/8304) all users must be able to see owner email or ph… ([#8308](https://github.com/AzzappApp/azzapp/pull/8308))
