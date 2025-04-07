@@ -70,6 +70,7 @@ exports[`TextInputWithEllipsizeMode component change text value 1`] = `
             "top": 9,
           },
           {
+            "borderWidth": 0,
             "opacity": 1,
           },
         ],
@@ -152,6 +153,7 @@ exports[`TextInputWithEllipsizeMode component with value 1`] = `
             "top": 9,
           },
           {
+            "borderWidth": 0,
             "opacity": 1,
           },
         ],
@@ -233,6 +235,7 @@ exports[`TextInputWithEllipsizeMode empty component 1`] = `
             "top": 9,
           },
           {
+            "borderWidth": 0,
             "opacity": 1,
           },
         ],
