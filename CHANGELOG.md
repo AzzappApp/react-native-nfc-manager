@@ -1,3 +1,7 @@
+## 1.9.2-rc.18
+
+* **fix:**  - ast replace and do not update when no text change ([#8310](https://github.com/AzzappApp/azzapp/pull/8310))
+
 ## 1.9.2-rc.17
 
 * **fix:**  - **multiUser:** [#8231](https://github.com/AzzappApp/azzapp/pull/8231) add confirmation toast ([#8309](https://github.com/AzzappApp/azzapp/pull/8309))
