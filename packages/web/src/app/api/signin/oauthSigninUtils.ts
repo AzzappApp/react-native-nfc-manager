@@ -18,7 +18,6 @@ import type { NextRequest } from 'next/server';
 type OpenIdProfile = {
   email: string;
   email_verified: boolean;
-  name: string;
   picture: string;
   given_name: string;
   family_name: string;
@@ -119,8 +118,23 @@ export const oauthSigninCallback =
     profileURL?: string;
   }) =>
   async (request: NextRequest) => {
-    const code = request.nextUrl.searchParams.get('code');
-    const state = request.nextUrl.searchParams.get('state');
+    const isPost = request.method === 'POST';
+
+    let code: string | null = null;
+    let state: string | null = null;
+    let userRaw: string | null = null;
+
+    if (isPost) {
+      const formData = await request.formData();
+      code = formData.get('code') as string | null;
+      state = formData.get('state') as string | null;
+      userRaw = formData.get('user') as string | null;
+    } else {
+      const urlParams = request.nextUrl.searchParams;
+      code = urlParams.get('code');
+      state = urlParams.get('state');
+    }
+
     if (typeof code !== 'string' || typeof state !== 'string') {
       return redirectToApp({ error: ERRORS.INVALID_REQUEST });
     }
@@ -167,7 +181,7 @@ export const oauthSigninCallback =
       return redirectToApp({ error: ERRORS.INVALID_REQUEST }, platform);
     }
 
-    let connectProfile: OpenIdProfile | null;
+    let connectProfile: OpenIdProfile | null = null;
     try {
       if (profileURL) {
         connectProfile = await fetch(profileURL, {
@@ -177,6 +191,20 @@ export const oauthSigninCallback =
         }).then(res => res.json());
       } else {
         connectProfile = await jwtDecode(id_token);
+
+        // add infos from userRaw (first connection only)
+        if (userRaw && connectProfile) {
+          const userInfo = JSON.parse(userRaw);
+          connectProfile = {
+            ...connectProfile,
+            given_name: userInfo.name?.firstName ?? connectProfile.given_name,
+            family_name: userInfo.name?.lastName ?? connectProfile.family_name,
+            email: userInfo.email ?? connectProfile.email,
+            email_verified: userInfo.email
+              ? true
+              : connectProfile.email_verified,
+          };
+        }
       }
     } catch (error) {
       console.error(error);
@@ -185,7 +213,6 @@ export const oauthSigninCallback =
     if (!connectProfile) {
       return redirectToApp({ error: ERRORS.INVALID_REQUEST }, platform);
     }
-
     const email: string = connectProfile.email;
     if (!email) {
       return redirectToApp({ error: 'LinkedIn email is required' }, platform);

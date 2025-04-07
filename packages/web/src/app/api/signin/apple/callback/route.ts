@@ -31,6 +31,6 @@ const appleSigninCallback = oauthSigninCallback({
   csrfSecret: new TextEncoder().encode(process.env.APPLE_TOKEN_SECRET),
 });
 
-export { appleSigninCallback as GET };
+export { appleSigninCallback as POST };
 
 export const runtime = 'nodejs';
