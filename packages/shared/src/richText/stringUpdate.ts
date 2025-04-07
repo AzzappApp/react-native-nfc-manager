@@ -61,9 +61,10 @@ const addTextInner = (
   if (node.type === 'text') {
     const originalText = node.value;
     node.value =
-      originalText?.substring(0, position - node.start) +
+      (originalText?.substring(0, position - node.start) || '') +
       text +
-      originalText?.substring(position - node.start, originalText.length);
+      (originalText?.substring(position - node.start, originalText.length) ||
+        '');
     node.end = node.end + text.length;
     return [node, text.length];
   }
@@ -135,11 +136,11 @@ const removeTextInner = (
   if (node.type === 'text' && node.value) {
     const originalText = node.value;
     node.value =
-      originalText?.substring(0, position - node.start) +
-      originalText?.substring(
+      (originalText?.substring(0, position - node.start) || '') +
+      (originalText?.substring(
         position - node.start + length,
         originalText.length,
-      );
+      ) || '');
     if (node.value.length === 0) {
       node.value = undefined;
     }
@@ -249,7 +250,7 @@ export function updateTextInRichText(
     end - start,
   );
   if (value.length) {
-    newAst = addTextInRichText(root, value, start);
+    newAst = addTextInRichText(newAst, value, start);
   }
   newAst = simplifyRichTextAST(newAst);
   if (newAst) {

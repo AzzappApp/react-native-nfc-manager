@@ -209,13 +209,14 @@ describe('inviteUsersListMutation', () => {
 
     expect(createUser).toHaveBeenCalledWith({
       email: 'a@example.com',
+      id: 'new-id',
       invited: true,
     });
     expect(updateUser).toHaveBeenCalledWith('deleted-1', {
       appleId: null,
       email: null,
       phoneNumber: null,
-      replacedBy: 'new-user-1',
+      replacedBy: 'new-id',
     });
   });
 

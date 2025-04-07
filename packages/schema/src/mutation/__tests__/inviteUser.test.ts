@@ -30,6 +30,7 @@ jest.mock('@azzapp/data', () => ({
   updateProfile: jest.fn(),
   updateWebCard: jest.fn(),
   updateUser: jest.fn(),
+  createId: jest.fn(() => 'new-id'),
 }));
 
 jest.mock('@azzapp/i18n', () => ({
@@ -300,6 +301,7 @@ describe('inviteUserMutation', () => {
     );
 
     expect(createUser).toHaveBeenCalledWith({
+      id: 'new-id',
       email: 'deleted@example.com',
       phoneNumber: undefined,
       invited: true,
@@ -309,13 +311,13 @@ describe('inviteUserMutation', () => {
       appleId: null,
       email: null,
       phoneNumber: null,
-      replacedBy: 'new-user-1',
+      replacedBy: 'new-id',
     });
 
     expect(result).toEqual({
       profile: expect.objectContaining({
         id: 'new-profile-123',
-        userId: 'new-user-1',
+        userId: 'new-id',
         profileRole: 'user',
       }),
     });

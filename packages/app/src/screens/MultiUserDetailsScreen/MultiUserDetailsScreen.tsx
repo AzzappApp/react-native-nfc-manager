@@ -324,6 +324,14 @@ const MultiUserDetailsScreen = ({
         input: [profileId],
       },
       onCompleted: () => {
+        Toast.show({
+          type: 'success',
+          text1: intl.formatMessage({
+            defaultMessage: 'User removed successfully.',
+            description:
+              'Success toast message when removing user from MultiUserDetailModal',
+          }),
+        });
         router.back();
       },
       onError: e => {
