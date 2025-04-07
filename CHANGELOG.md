@@ -1,3 +1,7 @@
+## 1.9.2-canary.20
+
+* **fix:**  - avoid transparent background on webcard error screen ([#8322](https://github.com/AzzappApp/azzapp/pull/8322))
+
 ## 1.9.2-canary.19
 
 
