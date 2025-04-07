@@ -1,3 +1,7 @@
+## 1.9.2-canary.22
+
+
+
 ## 1.9.2-canary.21
 
 * **fix:**  - **oAuth:** use post for apple ([#8329](https://github.com/AzzappApp/azzapp/pull/8329))
