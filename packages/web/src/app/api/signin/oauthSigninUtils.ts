@@ -136,6 +136,7 @@ export const oauthSigninCallback =
     }
 
     if (typeof code !== 'string' || typeof state !== 'string') {
+      console.error('Invalid code or state: ', code, state);
       return redirectToApp({ error: ERRORS.INVALID_REQUEST });
     }
 
@@ -145,7 +146,8 @@ export const oauthSigninCallback =
         algorithms: ['HS256'],
       });
       platform = payload.platform as string | null;
-    } catch {
+    } catch (e) {
+      console.error(e);
       return redirectToApp({ error: ERRORS.INVALID_REQUEST });
     }
 
