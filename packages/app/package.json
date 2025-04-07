@@ -56,7 +56,6 @@
     "expo-blur": "^14.0.3",
     "expo-clipboard": "~7.0.1",
     "expo-contacts": "patch:expo-contacts@npm%3A14.0.5#~/.yarn/patches/expo-contacts-npm-14.0.5-a00cfde952.patch",
-    "expo-device": "7.0.3",
     "expo-file-system": "^18.0.12",
     "expo-font": "^13.0.4",
     "expo-google-fonts-amatic-sc": "^0.3.0",

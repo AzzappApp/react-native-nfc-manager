@@ -1,8 +1,7 @@
 import * as messaging from '@react-native-firebase/messaging';
-import * as Device from 'expo-device';
 import { useCallback, useEffect, useState } from 'react';
 import { Platform } from 'react-native';
-import { getUniqueId, getDeviceId } from 'react-native-device-info';
+import { getUniqueId, getDeviceId, getModel } from 'react-native-device-info';
 import {
   checkNotifications,
   requestNotifications,
@@ -56,13 +55,14 @@ export const useNotificationsManager = () => {
     async (fcmToken: string) => {
       const deviceId = await getUniqueId();
       const deviceType = getDeviceId();
+
       if (fcmToken && deviceId && deviceType) {
         commit({
           variables: {
             input: {
               deviceId,
               deviceOS: Platform.OS === 'ios' ? 'ios' : 'android',
-              deviceType: Device.modelId ?? Device.modelName ?? 'unknown',
+              deviceType: getModel() ?? 'unknown',
               fcmToken,
             },
           },

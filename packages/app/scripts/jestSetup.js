@@ -1,3 +1,4 @@
+import mockRNDeviceInfo from 'react-native-device-info/jest/react-native-device-info-mock';
 const { jest } = require('@jest/globals');
 const { Platform } = require('react-native');
 
@@ -33,6 +34,9 @@ jest.mock('react-native-localize', () => require('react-native-localize/mock'));
 jest.mock('react-native-permissions', () =>
   require('react-native-permissions/mock'),
 );
+
+// mock react-native-device-info
+jest.mock('react-native-device-info', () => mockRNDeviceInfo);
 
 // React Native Safe Area Context Mock
 jest.mock(
