@@ -15,7 +15,7 @@ import logo2x from '@azzapp/web/public/pass/LOGO_PADDING_0-40@2x.png';
 import type { WebCard } from '@azzapp/data';
 
 const getCoverUrl = (webCard: WebCard, size: number) =>
-  `${process.env.NEXT_PUBLIC_URL}/api/cover/${webCard.userName}?width=${size}&crop=lpad&t=${webCard.updatedAt.getTime()}`;
+  `${process.env.NEXT_PUBLIC_API_ENDPOINT}/cover/${webCard.userName}?width=${size}&crop=lpad&t=${webCard.updatedAt.getTime()}`;
 
 export const APPLE_TEAM_IDENTIFIER = process.env.APPLE_TEAM_IDENTIFIER ?? ''; // Team ID
 
